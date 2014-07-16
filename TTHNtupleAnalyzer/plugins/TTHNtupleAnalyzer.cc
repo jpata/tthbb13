@@ -355,8 +355,8 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
     edm::Handle<pat::JetCollection> fatjets;
     iEvent.getByToken(fatjetToken_, fatjets);
-    for (const pat::Jet &j : *fatjets) {
-    }
+    //for (const pat::Jet &j : *fatjets) {
+    //}
  
     edm::Handle<pat::METCollection> mets;
     iEvent.getByToken(metToken_, mets);
