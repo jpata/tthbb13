@@ -271,7 +271,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
             tthtree->lep__dxy[n__lep] = x.leadTrack()->dxy(PV.position()); 
             tthtree->lep__dz[n__lep] = x.leadTrack()->dz(PV.position());
         } else {
-            edm::LogWarning("tau") << "gsfTrack is 0 for n_tau=" << n_tau;
+            edm::LogWarning("tau") << "leadTrack is 0 for n_tau=" << n_tau;
         } 
        
         if (isMC) { 
