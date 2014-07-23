@@ -4,4 +4,5 @@
 <use name="DataFormats/PatCandidates"/>
 <use name="FWCore/MessageLogger"/>
 <use name="PhysicsTools/UtilAlgos"/>
+<use name="SimDataFormats/GeneratorProducts"/>
 <flags EDM_PLUGIN="1"/>

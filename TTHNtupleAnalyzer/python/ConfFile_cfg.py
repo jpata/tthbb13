@@ -42,6 +42,7 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
     pruned = cms.InputTag("prunedGenParticles"),
     fatjets = cms.InputTag("slimmedJetsAK8"),
     mets = cms.InputTag("slimmedMETs"),
+    lhe = cms.InputTag("externalLHEProducer"),
 )
 
 process.TFileService = cms.Service("TFileService",

@@ -51,6 +51,8 @@
 
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 
+#include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
+
 //#include "CommonTools/UtilAlgos/interface/PhysObjectMatcher.h"
 //#include "CommonTools/UtilAlgos/interface/MatchByDRDPt.h"
 //#include "CommonTools/UtilAlgos/interface/MatchLessByDPt.h"
@@ -59,8 +61,26 @@
 #include "TTH/TTHNtupleAnalyzer/interface/tth_tree.hh"
 #include "TStopwatch.h"
 
+#define CANDPRINT(x) " pt=" << x.pt() << " eta=" << x.eta() << " phi=" << x.phi() << " id=" << x.pdgId() << " st=" << x.status()
+#define PCANDPRINT(x) " pt=" << x->pt() << " eta=" << x->eta() << " phi=" << x->phi() << " id=" << x->pdgId() << " st=" << x->status()
 #define GENJET_DR 0.5
 #define GENJET_REL_DP 0.5
+
+template <typename T, typename R>
+std::vector<R> to_ptrvec(T coll) {
+    std::vector<R> ret;
+    for (auto e : coll) {
+        assert(&e != NULL);
+        ret.push_back((R)&e);
+    }
+    return ret;
+}
+
+template <typename T>
+bool sort_by_pt(T a, T b) {
+    assert(a!=NULL && b!=NULL);
+    return (a->pt() > b->pt());
+};
 
 class TTHNtupleAnalyzer : public edm::EDAnalyzer {
     public:
@@ -87,6 +107,8 @@ class TTHNtupleAnalyzer : public edm::EDAnalyzer {
     
         const edm::EDGetTokenT<pat::JetCollection> fatjetToken_;
         const edm::EDGetTokenT<pat::METCollection> metToken_;
+        
+        const edm::EDGetTokenT<LHEEventProduct> lheToken_;
 
         TTHTree* tthtree; 
         const edm::Service<TFileService> fs;
@@ -111,6 +133,7 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
     packedGenToken_(consumes<edm::View<pat::PackedGenParticle> >(iConfig.getParameter<edm::InputTag>("packed"))),
     fatjetToken_(consumes<pat::JetCollection>(iConfig.getParameter<edm::InputTag>("fatjets"))),
     metToken_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("mets"))),
+    lheToken_(consumes<LHEEventProduct>(iConfig.getParameter<edm::InputTag>("lhe"))),
     tthtree(new TTHTree(fs->make<TTree>("events", "events"))), 
     isMC(iConfig.getParameter<bool>("isMC"))
 {
@@ -206,12 +229,14 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
             edm::LogWarning("muon") << "gsfTrack is 0 for n_mu=" << n_mu;
         } 
         if (isMC) { 
+            const reco::GenParticle* gp = x.genParticle();
             if (x.genParticle() != NULL) { 
-                tthtree->gen_lep__eta[n__lep] = x.genParticle()->eta();
-                tthtree->gen_lep__pt[n__lep] = x.genParticle()->pt();
-                tthtree->gen_lep__phi[n__lep] = x.genParticle()->phi();
-                tthtree->gen_lep__mass[n__lep] = x.genParticle()->mass();
-                tthtree->gen_lep__id[n__lep] = x.genParticle()->pdgId();
+                tthtree->gen_lep__eta[n__lep] = gp->eta();
+                tthtree->gen_lep__pt[n__lep] = gp->pt();
+                tthtree->gen_lep__phi[n__lep] = gp->phi();
+                tthtree->gen_lep__mass[n__lep] = gp->mass();
+                tthtree->gen_lep__id[n__lep] = gp->pdgId();
+                tthtree->gen_lep__status[n__lep] = gp->status();
             } else {
                 LogDebug("muons") << "genParticle()==0 for muon n_mu=" << n_mu;
             }
@@ -240,12 +265,14 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
             edm::LogWarning("electron") << "gsfTrack is 0 for n_ele=" << n_ele;
         } 
         if (isMC) { 
-            if (x.genParticle() != NULL) { 
-                tthtree->gen_lep__eta[n__lep] = x.genParticle()->eta();
-                tthtree->gen_lep__pt[n__lep] = x.genParticle()->pt();
-                tthtree->gen_lep__phi[n__lep] = x.genParticle()->phi();
-                tthtree->gen_lep__mass[n__lep] = x.genParticle()->mass();
-                tthtree->gen_lep__id[n__lep] = x.genParticle()->pdgId();
+            const reco::GenParticle* gp = x.genParticle();
+            if (gp != NULL) { 
+                tthtree->gen_lep__eta[n__lep] = gp->eta();
+                tthtree->gen_lep__pt[n__lep] = gp->pt();
+                tthtree->gen_lep__phi[n__lep] = gp->phi();
+                tthtree->gen_lep__mass[n__lep] = gp->mass();
+                tthtree->gen_lep__id[n__lep] = gp->pdgId();
+                tthtree->gen_lep__status[n__lep] = gp->status();
             } else {
                 LogDebug("electron") << "genParticle()==0 for electron n_ele=" << n_ele;
             }
@@ -265,22 +292,31 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
         tthtree->lep__mass[n__lep] = x.mass();
         tthtree->lep__id[n__lep] = x.pdgId();
         
+        tthtree->lep__ch_iso[n__lep] = x.chargedHadronIso();
+        tthtree->lep__puch_iso[n__lep] = x.puChargedHadronIso();
+        tthtree->lep__ec_iso[n__lep] = x.ecalIso();
+        tthtree->lep__hc_iso[n__lep] = x.hcalIso();
+        tthtree->lep__p_iso[n__lep] = x.particleIso();
+        tthtree->lep__ph_iso[n__lep] = x.photonIso();
+        
         //tthtree->lep__is_tight[n__lep] = x.isTightElectron(PV);
         //tthtree->lep__is_loose[n__lep] = x.isLooseElectron();
         if (x.leadTrack().isNonnull()) {
             tthtree->lep__dxy[n__lep] = x.leadTrack()->dxy(PV.position()); 
             tthtree->lep__dz[n__lep] = x.leadTrack()->dz(PV.position());
         } else {
-            edm::LogWarning("tau") << "leadTrack is 0 for n_tau=" << n_tau;
+            LogDebug("tau") << "leadTrack is 0 for n_tau=" << n_tau;
         } 
-       
+      
+        const reco::GenParticle* gp = x.genParticle();
         if (isMC) { 
-            if (x.genParticle()!=NULL) { 
-                tthtree->gen_lep__eta[n__lep] = x.genParticle()->eta();
-                tthtree->gen_lep__pt[n__lep] = x.genParticle()->pt();
-                tthtree->gen_lep__phi[n__lep] = x.genParticle()->phi();
-                tthtree->gen_lep__mass[n__lep] = x.genParticle()->mass();
-                tthtree->gen_lep__id[n__lep] = x.genParticle()->pdgId();
+            if (gp != NULL) { 
+                tthtree->gen_lep__eta[n__lep] = gp->eta();
+                tthtree->gen_lep__pt[n__lep] = gp->pt();
+                tthtree->gen_lep__phi[n__lep] = gp->phi();
+                tthtree->gen_lep__mass[n__lep] = gp->mass();
+                tthtree->gen_lep__id[n__lep] = gp->pdgId();
+                tthtree->gen_lep__status[n__lep] = gp->status();
             } else {
                 LogDebug("taus") << "genParticle()==0 for tau n_tau=" << n_tau;
             }
@@ -288,12 +324,18 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
         n_tau += 1;
         n__lep += 1;
     }
-    
+                
     edm::Handle<pat::JetCollection> jets;
     iEvent.getByToken(jetToken_, jets);
-    for (const pat::Jet &x : *jets) {
-        LogDebug("jets") << "n__jet=" << n__jet <<
-            " pt=" << x.pt();
+
+    //sort jets by pt
+    //auto jetps = to_ptrvec<const std::vector<pat::Jet>&, const pat::Jet*>(*jets);
+    //std::sort(jetps.begin(), jetps.end(), sort_by_pt<const pat::Jet*>);
+    
+    for (auto x : *jets) {
+        //assert(_x != NULL);
+        //const pat::Jet& x = *_x;
+        LogDebug("jets") << "n__jet=" << n__jet << CANDPRINT(x);
         tthtree->jet__eta[n__jet] = x.eta();
         tthtree->jet__pt[n__jet] = x.pt();
         tthtree->jet__phi[n__jet] = x.phi();
@@ -301,15 +343,21 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
         tthtree->jet__bd_csv[n__jet] = x.bDiscriminator("combinedSecondaryVertexBJetTags");
         tthtree->jet__id[n__jet] = x.partonFlavour();
         
+        tthtree->jet__nh_e[n__jet] = x.neutralHadronEnergy();
+        tthtree->jet__ne_e[n__jet] = x.neutralEmEnergy();
+        tthtree->jet__ch_e[n__jet] = x.chargedHadronEnergy();
+        tthtree->jet__ce_e[n__jet] = x.chargedEmEnergy();
+        tthtree->jet__mu_e[n__jet] = x.muonEnergy();
+        tthtree->jet__el_e[n__jet] = x.electronEnergy();
+        tthtree->jet__ph_e[n__jet] = x.photonEnergy();
+       
+
+
         if (isMC) { 
-            if (x.genParticle()!=NULL) { 
-                tthtree->gen_jet__eta[n__jet] = x.genParticle()->eta();
-                tthtree->gen_jet__pt[n__jet] = x.genParticle()->pt();
-                tthtree->gen_jet__phi[n__jet] = x.genParticle()->phi();
-                tthtree->gen_jet__mass[n__jet] = x.genParticle()->mass();
-                tthtree->gen_jet__id[n__jet] = x.genParticle()->pdgId();
-            } else {
-                LogDebug("jets") << "genParticle()==0 for jet n__jet=" << n__jet << " pt=" << x.pt() << " eta=" << x.eta() << " phi=" << x.phi();
+            //generated parton
+            const reco::GenParticle* gp = x.genParticle();
+            if (gp == NULL) { 
+                LogDebug("jets") << "n__jet=" << n__jet << " does not have genParticle(), doing dR/dP matching"; 
                 std::vector<const reco::GenParticle*> matched;
                 for (auto& p : *pruned) {
                     const float dr = sqrt(reco::deltaR2(x.p4(), p.p4()));
@@ -319,26 +367,78 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
                         matched.push_back(&p);
                     }
                 }
- 
+                LogDebug("jets") << "dR < " << GENJET_DR << " matched " << matched.size();
+                
+                //sort genparticles by dR(recojet, genparticle) ascending 
                 auto sortf = [&x](const reco::GenParticle* a, const reco::GenParticle* b) -> bool {
                     return (reco::deltaR2(x.p4(), a->p4()) < reco::deltaR2(x.p4(), b->p4()));
                 };
 
                 std::sort(matched.begin(), matched.end(), sortf);
-
-                LogDebug("jets") << "dR < " << GENJET_DR << " matched " << matched.size();
+                //if we had at least one match, choose lowest dR
                 if (matched.size()>0) {
-                    const reco::GenParticle* gp = matched[0];
-                    LogDebug("jets") << "best match" << " pt=" << gp->pt() << " eta=" << gp->eta() << " phi=" << gp->phi();
-                    tthtree->gen_jet__eta[n__jet] = gp->eta();
-                    tthtree->gen_jet__pt[n__jet] = gp->pt();
-                    tthtree->gen_jet__phi[n__jet] = gp->phi();
-                    tthtree->gen_jet__mass[n__jet] = gp->mass();
-                    tthtree->gen_jet__id[n__jet] = gp->pdgId();
+                    gp = matched[0];
+                    LogDebug("jets") << "best match " << PCANDPRINT(gp);
                 }
             }
+
+            if (gp != NULL) {
+                tthtree->gen_jet_parton__eta[n__jet] = gp->eta();
+                tthtree->gen_jet_parton__pt[n__jet] = gp->pt();
+                tthtree->gen_jet_parton__phi[n__jet] = gp->phi();
+                tthtree->gen_jet_parton__mass[n__jet] = gp->mass();
+                tthtree->gen_jet_parton__id[n__jet] = gp->pdgId();
+                tthtree->gen_jet_parton__status[n__jet] = gp->status();
+
+                for (auto _m : gp->motherRefVector()) {
+                    if (_m.isNull()) {
+                        continue;
+                    }
+                    auto& m = *_m;
+                    LogDebug("jets") << "jet " << n__jet << " genParticle mother " << CANDPRINT(m); 
+                }
+            } else {
+                LogDebug("jets") << "jet " << n__jet << " genParticle==0"; 
+            }
+ 
+            //generator-level jet
+            const reco::GenJet* gj = x.genJet();
+            if (gj != NULL) { 
+                tthtree->gen_jet__eta[n__jet] = gj->eta();
+                tthtree->gen_jet__pt[n__jet] = gj->pt();
+                tthtree->gen_jet__phi[n__jet] = gj->phi();
+                tthtree->gen_jet__mass[n__jet] = gj->mass();
+                tthtree->gen_jet__id[n__jet] = gj->pdgId();
+                tthtree->gen_jet__status[n__jet] = gj->status();
+                
+                //FIXME: do we want to save the constituents or just perform some maths on it?
+                unsigned int i = 0; 
+                for (auto cn : gj->getGenConstituents()) {
+                    if (i >= M_MAX || n__jet >= M_MAX) {
+                        LogDebug("jets") << "constituent " << i << " loop iteration exceeded M_MAX=" << M_MAX;
+                        break; 
+                    }
+                    if (cn != NULL) {
+                        LogDebug("jets") << "constituent " << i << " is null";
+                        continue;
+                    } else {
+                        LogDebug("jets") << "constituent " << i << " is not null";
+                    }
+                    LogDebug("jets") << "constituent " << i << cn->pt();
+                    LogDebug("jets") << "constituent " << i << " " << PCANDPRINT(cn);
+                    tthtree->jet__c_eta[n__jet][i] = cn->eta();
+                    tthtree->jet__c_pt[n__jet][i] = cn->pt();
+                    tthtree->jet__c_phi[n__jet][i] = cn->phi();
+                    tthtree->jet__c_id[n__jet][i] = cn->pdgId();
+                    LogDebug("jets") << "constituent " << i << " end of loop";
+                    i += 1;
+                }
+        
+
+            } else {
+                LogDebug("jet") << "jet " << n__jet << " did not have genJet";
+            }
         }
-        n_ele += 1;
         n__jet += 1;
     }
 
@@ -369,6 +469,49 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
         tthtree->met__pt__en_down = met.shiftedPt(pat::MET::JetEnDown);
         tthtree->gen_met__pt = met.genMET()->pt();
         tthtree->gen_met__phi = met.genMET()->phi();
+    }
+
+    //get the LHE gen-level stuff
+    //code from LB
+    if (isMC) {
+        edm::Handle<LHEEventProduct> lhe;
+        iEvent.getByToken(lheToken_, lhe);
+
+        const lhef::HEPEUP hepeup_ = lhe->hepeup();
+        const std::vector<lhef::HEPEUP::FiveVector> pup_ = hepeup_.PUP; // px, py, pz, E, M        
+   
+        double lheHT = 0.0;
+        unsigned int lheNj = 0;
+        unsigned int countBquarks=0, countCquarks=0, countUDSquarks=0, countGquarks=0, countExtraPartons=0; 
+        for (unsigned int i=0; i<pup_.size(); ++i) {
+            int id=hepeup_.IDUP[i]; //pdgId                                                                                 
+            int status = hepeup_.ISTUP[i];
+            int idabs=TMath::Abs(id);
+            
+             // gluons and quarks
+            if(status == 1 && ((idabs == 21) || (idabs > 0 && idabs < 7))) {                      
+                // first entry is px, second py
+                lheHT += TMath::Sqrt( TMath::Power(hepeup_.PUP[i][0],2) + TMath::Power(hepeup_.PUP[i][1],2) );
+                lheNj++;
+            }
+
+            if ( hepeup_.ISTUP[i] >= 0 && status == 1 ) {
+                if (!(hepeup_.MOTHUP[i].first !=1 && hepeup_.MOTHUP[i].second !=2)) {
+                    if(idabs==5  ) countBquarks++;
+                    if(idabs==4  ) countCquarks++;
+                    if(idabs<=3 && idabs>=1 ) countUDSquarks++;
+                    if(idabs==21  ) countGquarks++;
+                    if(idabs==21 || (idabs>=1 && idabs<=5)) countExtraPartons++;
+                }
+            }
+        }
+        tthtree->lhe__ht = lheHT;
+        tthtree->lhe__n_j = lheNj;
+        tthtree->lhe__n_b = countBquarks;
+        tthtree->lhe__n_c = countCquarks;
+        tthtree->lhe__n_l = countUDSquarks;
+        tthtree->lhe__n_g = countGquarks;
+        tthtree->lhe__n_e = countExtraPartons;
     }
 
     tthtree->n__lep = n__lep;
