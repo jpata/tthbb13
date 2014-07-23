@@ -1,0 +1,10 @@
+<use   name="FWCore/Utilities"/>
+<library   file="*.cc" name="TestDQMToolsPlugins">
+  <flags   EDM_PLUGIN="1"/>
+</library>
+
+<environment>
+  <bin   file="run.cc">
+    <flags   TEST_RUNNER_ARGS=" /bin/bash TTH/TTHNtupleAnalyzer/test runtests.sh"/>
+  </bin>
+</environment>
