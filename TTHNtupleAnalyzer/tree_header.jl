@@ -10,10 +10,14 @@ end
 
 #make a set of array branches with dynamic length
 #the length is counted by an int n_pref, which is created
-function prefixed_dynlength(pref::Symbol, t::Type, objs...)
+function prefixed_dynlength(pref::Symbol, t::Type, objs...; length_branch=nothing)
     d = Dict()
-    merge!(d, prefixed(:n, Int32, pref))
-    veclength = first(keys(d))
+    if length_branch == nothing
+        merge!(d, prefixed(:n, Int32, pref))
+        veclength = first(keys(d))
+    else
+        veclength = length_branch
+    end
     for o::Symbol in objs
         d[symbol(string(pref, "__", o))] = (t, veclength)
     end
@@ -21,7 +25,8 @@ function prefixed_dynlength(pref::Symbol, t::Type, objs...)
 end
 
 #needs to be hard-coded
-const M_MAX = 10
+#in case we need to store an array per object, we have to give it a fixed size
+const M_MAX = 100
 
 const type_map = {
     Float32 => "F",
@@ -83,9 +88,10 @@ function make_class(out::IO, name::Symbol, d::Dict)
     write(out, "#include <map>\n")
     write(out, "#define N_MAX 500\n")
     write(out, "#define M_MAX $M_MAX\n")
-    write(out, "#define DEF_VAL_FLOAT 0.0f\n")
-    write(out, "#define DEF_VAL_DOUBLE 0.0d\n")
-    write(out, "#define DEF_VAL_INT 0\n")
+    write(out, "//these are simple 'sentinel values' for uninitialized variables\n")
+    write(out, "#define DEF_VAL_FLOAT -9999.0f\n")
+    write(out, "#define DEF_VAL_DOUBLE -9999.0d\n")
+    write(out, "#define DEF_VAL_INT -9999\n")
     write(out, "#define FLOAT_EPS 0.0000001f\n")
     write(out, "#define DOUBLE_EPS 0.0000001d\n")
     write(out, "constexpr bool is_undef(int x) { return x==DEF_VAL_INT; };\n")
@@ -140,26 +146,28 @@ fourmomentum_cartesian = [:px, :py, :pz, :e]
 merge!(tree_structure,
     prefixed_dynlength(
         :lep, Vector{Float32},
-        fourmomentum..., :r_iso, :dxy, :dz, :mva,
+        fourmomentum...,
+        :dxy, :dz, :mva,
         :ch_iso, #charged hadron iso
         :puch_iso, #pile-up charged hadron iso
         :ec_iso, #ecal iso
         :hc_iso, #hcal iso
         :p_iso, #particle flow iso
         :ph_iso, #photon iso
+        :rel_iso #relative isolation
     )
 )
 
 merge!(tree_structure,
-    prefixed_dynlength(:lep, Vector{Int32}, particle_id..., :charge, :is_tight, :is_medium, :is_loose)
+    prefixed_dynlength(:lep, Vector{Int32}, particle_id..., :charge, :is_tight, :is_medium, :is_loose, :id_bitmask)
 )
 
 merge!(tree_structure,
-    prefixed_dynlength(:gen_lep, Vector{Float32}, fourmomentum...)
+    prefixed_dynlength(:gen_lep, Vector{Float32}, fourmomentum...; length_branch=:n__lep)
 )
 
 merge!(tree_structure,
-    prefixed_dynlength(:gen_lep, Vector{Int32}, particle_id..., :status)
+    prefixed_dynlength(:gen_lep, Vector{Int32}, particle_id..., :status; length_branch=:n__lep)
 )
 
 #Jets
@@ -185,19 +193,21 @@ merge!(tree_structure,
     )
 )
 
-merge!(tree_structure,
-    prefixed_dynlength(:jet, Array{Float32, 2},
-        :c_pt, :c_eta, :c_phi, :c_id
-    )
-)
+
+#jet constituent data
+#merge!(tree_structure,
+#    prefixed_dynlength(:jet, Array{Float32, 2},
+#        :c_pt, :c_eta, :c_phi, :c_id
+#    )
+#)
 
 for s in [:gen_jet, :gen_jet_parton]
     merge!(tree_structure,
-        prefixed_dynlength(s, Vector{Float32}, fourmomentum...)
+        prefixed_dynlength(s, Vector{Float32}, fourmomentum...; length_branch=:n__jet)
     )
     
     merge!(tree_structure,
-        prefixed_dynlength(s, Vector{Int32}, particle_id..., :status)
+        prefixed_dynlength(s, Vector{Int32}, particle_id..., :status; length_branch=:n__jet)
     )
 end
 

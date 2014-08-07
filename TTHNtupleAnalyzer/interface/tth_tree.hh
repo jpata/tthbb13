@@ -3,10 +3,11 @@
 #include <string>
 #include <map>
 #define N_MAX 500
-#define M_MAX 10
-#define DEF_VAL_FLOAT 0.0f
-#define DEF_VAL_DOUBLE 0.0d
-#define DEF_VAL_INT 0
+#define M_MAX 100
+//these are simple 'sentinel values' for uninitialized variables
+#define DEF_VAL_FLOAT -9999.0f
+#define DEF_VAL_DOUBLE -9999.0d
+#define DEF_VAL_INT -9999
 #define FLOAT_EPS 0.0000001f
 #define DOUBLE_EPS 0.0000001d
 constexpr bool is_undef(int x) { return x==DEF_VAL_INT; };
@@ -46,10 +47,6 @@ public:
 	float gen_met__phi;
 	float gen_met__pt;
 	float jet__bd_csv[N_MAX];
-	float jet__c_eta[N_MAX][N_MAX];
-	float jet__c_id[N_MAX][N_MAX];
-	float jet__c_phi[N_MAX][N_MAX];
-	float jet__c_pt[N_MAX][N_MAX];
 	float jet__ce_e[N_MAX];
 	float jet__ch_e[N_MAX];
 	float jet__el_e[N_MAX];
@@ -71,6 +68,7 @@ public:
 	float lep__eta[N_MAX];
 	float lep__hc_iso[N_MAX];
 	int lep__id[N_MAX];
+	int lep__id_bitmask[N_MAX];
 	int lep__is_loose[N_MAX];
 	int lep__is_medium[N_MAX];
 	int lep__is_tight[N_MAX];
@@ -81,7 +79,7 @@ public:
 	float lep__phi[N_MAX];
 	float lep__pt[N_MAX];
 	float lep__puch_iso[N_MAX];
-	float lep__r_iso[N_MAX];
+	float lep__rel_iso[N_MAX];
 	float lhe__ht;
 	int lhe__n_b;
 	int lhe__n_c;
@@ -93,9 +91,6 @@ public:
 	float met__pt;
 	float met__pt__en_down;
 	float met__pt__en_up;
-	int n__gen_jet;
-	int n__gen_jet_parton;
-	int n__gen_lep;
 	int n__jet;
 	int n__lep;
 	int n__pv;
@@ -137,10 +132,6 @@ public:
 		gen_met__phi = DEF_VAL_FLOAT;
 		gen_met__pt = DEF_VAL_FLOAT;
 		SET_ZERO(jet__bd_csv, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO_2(jet__c_eta, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO_2(jet__c_id, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO_2(jet__c_phi, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO_2(jet__c_pt, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet__ce_e, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet__ch_e, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet__el_e, N_MAX, DEF_VAL_FLOAT);
@@ -162,6 +153,7 @@ public:
 		SET_ZERO(lep__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(lep__hc_iso, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(lep__id, N_MAX, DEF_VAL_INT);
+		SET_ZERO(lep__id_bitmask, N_MAX, DEF_VAL_INT);
 		SET_ZERO(lep__is_loose, N_MAX, DEF_VAL_INT);
 		SET_ZERO(lep__is_medium, N_MAX, DEF_VAL_INT);
 		SET_ZERO(lep__is_tight, N_MAX, DEF_VAL_INT);
@@ -172,7 +164,7 @@ public:
 		SET_ZERO(lep__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(lep__pt, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(lep__puch_iso, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(lep__r_iso, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(lep__rel_iso, N_MAX, DEF_VAL_FLOAT);
 		lhe__ht = DEF_VAL_FLOAT;
 		lhe__n_b = DEF_VAL_INT;
 		lhe__n_c = DEF_VAL_INT;
@@ -184,9 +176,6 @@ public:
 		met__pt = DEF_VAL_FLOAT;
 		met__pt__en_down = DEF_VAL_FLOAT;
 		met__pt__en_up = DEF_VAL_FLOAT;
-		n__gen_jet = DEF_VAL_INT;
-		n__gen_jet_parton = DEF_VAL_INT;
-		n__gen_lep = DEF_VAL_INT;
 		n__jet = DEF_VAL_INT;
 		n__lep = DEF_VAL_INT;
 		n__pv = DEF_VAL_INT;
@@ -220,12 +209,6 @@ public:
 		branch_map["lhe__n_g"] = (void*)&lhe__n_g;
 		tree->Branch("lhe__n_l", &lhe__n_l, "lhe__n_l/I");
 		branch_map["lhe__n_l"] = (void*)&lhe__n_l;
-		tree->Branch("n__gen_jet", &n__gen_jet, "n__gen_jet/I");
-		branch_map["n__gen_jet"] = (void*)&n__gen_jet;
-		tree->Branch("n__gen_jet_parton", &n__gen_jet_parton, "n__gen_jet_parton/I");
-		branch_map["n__gen_jet_parton"] = (void*)&n__gen_jet_parton;
-		tree->Branch("n__gen_lep", &n__gen_lep, "n__gen_lep/I");
-		branch_map["n__gen_lep"] = (void*)&n__gen_lep;
 		tree->Branch("n__jet", &n__jet, "n__jet/I");
 		branch_map["n__jet"] = (void*)&n__jet;
 		tree->Branch("n__lep", &n__lep, "n__lep/I");
@@ -238,41 +221,41 @@ public:
 		branch_map["debug__time1c"] = (void*)&debug__time1c;
 		tree->Branch("debug__time1r", &debug__time1r, "debug__time1r/D");
 		branch_map["debug__time1r"] = (void*)&debug__time1r;
-		tree->Branch("gen_jet__eta", gen_jet__eta, "gen_jet__eta[n__gen_jet]/F");
+		tree->Branch("gen_jet__eta", gen_jet__eta, "gen_jet__eta[n__jet]/F");
 		branch_map["gen_jet__eta"] = (void*)gen_jet__eta;
-		tree->Branch("gen_jet__id", gen_jet__id, "gen_jet__id[n__gen_jet]/I");
+		tree->Branch("gen_jet__id", gen_jet__id, "gen_jet__id[n__jet]/I");
 		branch_map["gen_jet__id"] = (void*)gen_jet__id;
-		tree->Branch("gen_jet__mass", gen_jet__mass, "gen_jet__mass[n__gen_jet]/F");
+		tree->Branch("gen_jet__mass", gen_jet__mass, "gen_jet__mass[n__jet]/F");
 		branch_map["gen_jet__mass"] = (void*)gen_jet__mass;
-		tree->Branch("gen_jet__phi", gen_jet__phi, "gen_jet__phi[n__gen_jet]/F");
+		tree->Branch("gen_jet__phi", gen_jet__phi, "gen_jet__phi[n__jet]/F");
 		branch_map["gen_jet__phi"] = (void*)gen_jet__phi;
-		tree->Branch("gen_jet__pt", gen_jet__pt, "gen_jet__pt[n__gen_jet]/F");
+		tree->Branch("gen_jet__pt", gen_jet__pt, "gen_jet__pt[n__jet]/F");
 		branch_map["gen_jet__pt"] = (void*)gen_jet__pt;
-		tree->Branch("gen_jet__status", gen_jet__status, "gen_jet__status[n__gen_jet]/I");
+		tree->Branch("gen_jet__status", gen_jet__status, "gen_jet__status[n__jet]/I");
 		branch_map["gen_jet__status"] = (void*)gen_jet__status;
-		tree->Branch("gen_jet_parton__eta", gen_jet_parton__eta, "gen_jet_parton__eta[n__gen_jet_parton]/F");
+		tree->Branch("gen_jet_parton__eta", gen_jet_parton__eta, "gen_jet_parton__eta[n__jet]/F");
 		branch_map["gen_jet_parton__eta"] = (void*)gen_jet_parton__eta;
-		tree->Branch("gen_jet_parton__id", gen_jet_parton__id, "gen_jet_parton__id[n__gen_jet_parton]/I");
+		tree->Branch("gen_jet_parton__id", gen_jet_parton__id, "gen_jet_parton__id[n__jet]/I");
 		branch_map["gen_jet_parton__id"] = (void*)gen_jet_parton__id;
-		tree->Branch("gen_jet_parton__mass", gen_jet_parton__mass, "gen_jet_parton__mass[n__gen_jet_parton]/F");
+		tree->Branch("gen_jet_parton__mass", gen_jet_parton__mass, "gen_jet_parton__mass[n__jet]/F");
 		branch_map["gen_jet_parton__mass"] = (void*)gen_jet_parton__mass;
-		tree->Branch("gen_jet_parton__phi", gen_jet_parton__phi, "gen_jet_parton__phi[n__gen_jet_parton]/F");
+		tree->Branch("gen_jet_parton__phi", gen_jet_parton__phi, "gen_jet_parton__phi[n__jet]/F");
 		branch_map["gen_jet_parton__phi"] = (void*)gen_jet_parton__phi;
-		tree->Branch("gen_jet_parton__pt", gen_jet_parton__pt, "gen_jet_parton__pt[n__gen_jet_parton]/F");
+		tree->Branch("gen_jet_parton__pt", gen_jet_parton__pt, "gen_jet_parton__pt[n__jet]/F");
 		branch_map["gen_jet_parton__pt"] = (void*)gen_jet_parton__pt;
-		tree->Branch("gen_jet_parton__status", gen_jet_parton__status, "gen_jet_parton__status[n__gen_jet_parton]/I");
+		tree->Branch("gen_jet_parton__status", gen_jet_parton__status, "gen_jet_parton__status[n__jet]/I");
 		branch_map["gen_jet_parton__status"] = (void*)gen_jet_parton__status;
-		tree->Branch("gen_lep__eta", gen_lep__eta, "gen_lep__eta[n__gen_lep]/F");
+		tree->Branch("gen_lep__eta", gen_lep__eta, "gen_lep__eta[n__lep]/F");
 		branch_map["gen_lep__eta"] = (void*)gen_lep__eta;
-		tree->Branch("gen_lep__id", gen_lep__id, "gen_lep__id[n__gen_lep]/I");
+		tree->Branch("gen_lep__id", gen_lep__id, "gen_lep__id[n__lep]/I");
 		branch_map["gen_lep__id"] = (void*)gen_lep__id;
-		tree->Branch("gen_lep__mass", gen_lep__mass, "gen_lep__mass[n__gen_lep]/F");
+		tree->Branch("gen_lep__mass", gen_lep__mass, "gen_lep__mass[n__lep]/F");
 		branch_map["gen_lep__mass"] = (void*)gen_lep__mass;
-		tree->Branch("gen_lep__phi", gen_lep__phi, "gen_lep__phi[n__gen_lep]/F");
+		tree->Branch("gen_lep__phi", gen_lep__phi, "gen_lep__phi[n__lep]/F");
 		branch_map["gen_lep__phi"] = (void*)gen_lep__phi;
-		tree->Branch("gen_lep__pt", gen_lep__pt, "gen_lep__pt[n__gen_lep]/F");
+		tree->Branch("gen_lep__pt", gen_lep__pt, "gen_lep__pt[n__lep]/F");
 		branch_map["gen_lep__pt"] = (void*)gen_lep__pt;
-		tree->Branch("gen_lep__status", gen_lep__status, "gen_lep__status[n__gen_lep]/I");
+		tree->Branch("gen_lep__status", gen_lep__status, "gen_lep__status[n__lep]/I");
 		branch_map["gen_lep__status"] = (void*)gen_lep__status;
 		tree->Branch("gen_met__phi", &gen_met__phi, "gen_met__phi/F");
 		branch_map["gen_met__phi"] = (void*)&gen_met__phi;
@@ -280,14 +263,6 @@ public:
 		branch_map["gen_met__pt"] = (void*)&gen_met__pt;
 		tree->Branch("jet__bd_csv", jet__bd_csv, "jet__bd_csv[n__jet]/F");
 		branch_map["jet__bd_csv"] = (void*)jet__bd_csv;
-		tree->Branch("jet__c_eta", jet__c_eta, "jet__c_eta[10][10]/F");
-		branch_map["jet__c_eta"] = (void*)jet__c_eta;
-		tree->Branch("jet__c_id", jet__c_id, "jet__c_id[10][10]/F");
-		branch_map["jet__c_id"] = (void*)jet__c_id;
-		tree->Branch("jet__c_phi", jet__c_phi, "jet__c_phi[10][10]/F");
-		branch_map["jet__c_phi"] = (void*)jet__c_phi;
-		tree->Branch("jet__c_pt", jet__c_pt, "jet__c_pt[10][10]/F");
-		branch_map["jet__c_pt"] = (void*)jet__c_pt;
 		tree->Branch("jet__ce_e", jet__ce_e, "jet__ce_e[n__jet]/F");
 		branch_map["jet__ce_e"] = (void*)jet__ce_e;
 		tree->Branch("jet__ch_e", jet__ch_e, "jet__ch_e[n__jet]/F");
@@ -330,6 +305,8 @@ public:
 		branch_map["lep__hc_iso"] = (void*)lep__hc_iso;
 		tree->Branch("lep__id", lep__id, "lep__id[n__lep]/I");
 		branch_map["lep__id"] = (void*)lep__id;
+		tree->Branch("lep__id_bitmask", lep__id_bitmask, "lep__id_bitmask[n__lep]/I");
+		branch_map["lep__id_bitmask"] = (void*)lep__id_bitmask;
 		tree->Branch("lep__is_loose", lep__is_loose, "lep__is_loose[n__lep]/I");
 		branch_map["lep__is_loose"] = (void*)lep__is_loose;
 		tree->Branch("lep__is_medium", lep__is_medium, "lep__is_medium[n__lep]/I");
@@ -350,8 +327,8 @@ public:
 		branch_map["lep__pt"] = (void*)lep__pt;
 		tree->Branch("lep__puch_iso", lep__puch_iso, "lep__puch_iso[n__lep]/F");
 		branch_map["lep__puch_iso"] = (void*)lep__puch_iso;
-		tree->Branch("lep__r_iso", lep__r_iso, "lep__r_iso[n__lep]/F");
-		branch_map["lep__r_iso"] = (void*)lep__r_iso;
+		tree->Branch("lep__rel_iso", lep__rel_iso, "lep__rel_iso[n__lep]/F");
+		branch_map["lep__rel_iso"] = (void*)lep__rel_iso;
 		tree->Branch("lhe__ht", &lhe__ht, "lhe__ht/F");
 		branch_map["lhe__ht"] = (void*)&lhe__ht;
 		tree->Branch("lhe__n_j", &lhe__n_j, "lhe__n_j/F");

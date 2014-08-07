@@ -21,6 +21,7 @@ for br in brs:
 njets = []
 nleps = []
 lep_ids = []
+lep_isos = []
 for ev in t:
     njets += [ev.n__jet]
     nleps += [ev.n__lep]
@@ -28,8 +29,7 @@ for ev in t:
     for nl in range(0, ev.n__lep):
         lep_id = ev.lep__id[nl]
         lep_ids += [lep_id]
-
-
+        lep_isos += [ev.lep__rel_iso[nl]]
 
 if njets != [23, 33, 28, 24, 18, 20, 12, 25, 16, 16, 22, 18, 29, 22, 31, 22, 15, 33, 30, 20, 19, 28, 32, 23, 29, 21, 13, 29, 20, 15, 20, 17, 17, 13, 19, 18, 17, 20, 18, 22, 17, 14, 21, 17, 22, 21, 14, 20, 22, 20, 19, 23, 24, 22, 21, 26, 15, 21, 29, 24, 19, 11, 18, 28, 17, 14, 16, 26, 17, 26, 27, 15, 29, 7, 23, 25, 15, 22, 17, 23, 31, 16, 21, 16, 23, 24, 23, 18, 20, 19, 28, 23, 28, 18, 16, 26, 10, 20, 16, 20]:
     raise Exception("number of jets seems incorrect: %s" % njets)
@@ -39,5 +39,7 @@ if nleps != [6, 3, 6, 4, 4, 14, 8, 5, 3, 6, 9, 4, 2, 19, 4, 4, 8, 2, 11, 9, 9, 6
 clep_ids = Counter(lep_ids)
 if clep_ids != Counter({-13: 124, 13: 115, 15: 99, -15: 97, 11: 95, -11: 74}):
     raise Exception("Incorrect lepton ID counts: %s" % clep_ids)
+
+print lep_isos
 
 print "all tests passed!"
