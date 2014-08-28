@@ -50,54 +50,63 @@ using namespace std;
 
 int main(int argc, const char* argv[])
 {
-
-  /* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  */
-  /* @@@@@@@@@@@@@@@@@@@@@@@@ FWLITE @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  */
-
- 
-  cout << "MEAnalysis version " << VERSION << endl;
-  gROOT->SetBatch(true);
- 
-  gSystem->Load("libFWCoreFWLite");
-  gSystem->Load("libDataFormatsFWLite");
-
-  AutoLibraryLoader::enable();
-
-
-  /* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  */
-  /* @@@@@@@@@@@@@@@@@@@@@@@ CONFIGURATION @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  */
-
-
-  PythonProcessDesc builder(argv[1]);
-  //const edm::ParameterSet& in = builder.processDesc()->getProcessPSet()->getParameter<edm::ParameterSet>("fwliteInput");
-
-  //commented out to avoid not-in-use errors
-  // SAMPLES
-  //const edm::VParameterSet& samples = in.getParameter<edm::VParameterSet>("samples") ;
-  //const string outFileName    ( in.getParameter<string>  ("outFileName" ) );
-  //const string pathToFile     ( in.getParameter<string>  ("pathToFile" ) );
-  //const bool   verbose             ( in.getParameter<bool>         ("verbose" ) );
-  //const bool   isMC                ( in.getParameter<bool>         ("isMC" ) );
-  //
-  //// PARAMETERS
-  //const double lumi               ( in.getUntrackedParameter<double> ("lumi",   19.04));
-  //const float  MH                 ( in.getUntrackedParameter<double> ("MH",      125.));
-  //const float  MT                 ( in.getUntrackedParameter<double> ("MT",     174.3));
-  //const float  MW                 ( in.getUntrackedParameter<double> ("MW",     80.19));
-  //const float  MwL                ( in.getUntrackedParameter<double> ("MwL",       60));
-  //const float  MwH                ( in.getUntrackedParameter<double> ("MwH",      100));
-  //const float  MwLType3           ( in.getUntrackedParameter<double> ("MwLType3",  60));
-  //const float  MwHType3           ( in.getUntrackedParameter<double> ("MwHType3", 100));
-  //
-  //const vector<int>    evLimits (in.getParameter<vector<int> >    ("evLimits"));
-  //
-  //// upper and lower event bounds to be processed
-  //const int evLow  = evLimits[0];
-  //const int evHigh = evLimits[1];
+  
+    /* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  */
+    /* @@@@@@@@@@@@@@@@@@@@@@@@ FWLITE @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  */
+  
+   
+    cout << "MEAnalysis version " << VERSION << endl;
+    gROOT->SetBatch(true);
+   
+    gSystem->Load("libFWCoreFWLite");
+    gSystem->Load("libDataFormatsFWLite");
+  
+    AutoLibraryLoader::enable();
   
   
-  cout << "Finished!!!" << endl;
-  cout << "*******************" << endl;
+    /* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  */
+    /* @@@@@@@@@@@@@@@@@@@@@@@ CONFIGURATION @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  */
   
-  return 0;
+  
+    PythonProcessDesc builder(argv[1]);
+    const edm::ParameterSet& in = builder.processDesc()->getProcessPSet()->getParameter<edm::ParameterSet>("fwliteInput");
+  
+    //commented out to avoid not-in-use errors
+    // SAMPLES
+    const edm::VParameterSet& samples = in.getParameter<edm::VParameterSet>("samples") ;
+    const string outFileName    ( in.getParameter<string>  ("outFileName" ) );
+    //const string pathToFile     ( in.getParameter<string>  ("pathToFile" ) );
+    const bool   verbose             ( in.getParameter<bool>         ("verbose" ) );
+    const bool   isMC                ( in.getParameter<bool>         ("isMC" ) );
+    
+    // PARAMETERS
+    const double lumi               ( in.getUntrackedParameter<double> ("lumi",   19.04));
+    const float  MH                 ( in.getUntrackedParameter<double> ("MH",      125.));
+    const float  MT                 ( in.getUntrackedParameter<double> ("MT",     174.3));
+    const float  MW                 ( in.getUntrackedParameter<double> ("MW",     80.19));
+    
+    const vector<int>    evLimits (in.getParameter<vector<int> >    ("evLimits"));
+    
+    // upper and lower event bounds to be processed
+    const int evLow  = evLimits[0];
+    const int evHigh = evLimits[1];
+   
+    cout << "samples=" << endl;
+    for (auto& s : samples) {
+        cout << "sample " << s.getParameter<string>("name") << " " << s.getParameter<string>("nickName") << endl;  
+    }
+
+    cout << "outFileName " << outFileName << endl;
+    cout << "verbose " << verbose << endl;
+    cout << "isMC " << isMC << endl;
+    
+    cout << "lumi " << lumi << endl;
+    cout << "MH " << MH << " MT " << MT << " MW " << MW << endl;
+    
+    cout << "evLow " << evLow << " evHigh " << evHigh << endl;
+    
+    cout << "Finished!!!" << endl;
+    cout << "*******************" << endl;
+    
+    return 0;
 }
