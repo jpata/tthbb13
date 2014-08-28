@@ -3,26 +3,26 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("Demo")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
-process.MessageLogger = cms.Service("MessageLogger",
-        destinations=cms.untracked.vstring('cerr', 'debug', 'cout'),
-        debugModules=cms.untracked.vstring('*'),
-        cerr=cms.untracked.PSet(
-            threshold=cms.untracked.string('ERROR'),
-        #    FwkReport = cms.untracked.PSet(
-        #        reportEvery = cms.untracked.int32(100),
-        #    ),
-        ),
-        cout=cms.untracked.PSet(
-            threshold=cms.untracked.string('INFO'),
-            #FwkReport = cms.untracked.PSet(
-            #    reportEvery = cms.untracked.int32(100),
-            #),
-        ),
-        debug=cms.untracked.PSet(threshold=cms.untracked.string('DEBUG')),
-)
-#process.MessageLogger.cerr.FwkReport.reportEvery = 10000
+#process.MessageLogger = cms.Service("MessageLogger",
+#        destinations=cms.untracked.vstring('cerr', 'debug', 'cout'),
+#        debugModules=cms.untracked.vstring('*'),
+#        cerr=cms.untracked.PSet(
+#            threshold=cms.untracked.string('ERROR'),
+#        #    FwkReport = cms.untracked.PSet(
+#        #        reportEvery = cms.untracked.int32(100),
+#        #    ),
+#        ),
+#        cout=cms.untracked.PSet(
+#            threshold=cms.untracked.string('INFO'),
+#            #FwkReport = cms.untracked.PSet(
+#            #    reportEvery = cms.untracked.int32(100),
+#            #),
+#        ),
+#        debug=cms.untracked.PSet(threshold=cms.untracked.string('DEBUG')),
+#)
+process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10000) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.source = cms.Source("PoolSource",
     # replace 'myfile.root' with the source file you want to use
