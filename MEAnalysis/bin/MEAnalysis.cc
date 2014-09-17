@@ -41,6 +41,8 @@
 #include "DataFormats/FWLite/interface/Run.h"
 #include "DataFormats/Luminosity/interface/LumiSummary.h"
 
+#include "TTH/MEAnalysis/interface/Samples.h"
+
 using namespace std;
 
 //version numbering scheme according to CMSSW version major and minor version.
@@ -53,7 +55,6 @@ int main(int argc, const char* argv[])
   
     /* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  */
     /* @@@@@@@@@@@@@@@@@@@@@@@@ FWLITE @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  */
-  
    
     cout << "MEAnalysis version " << VERSION << endl;
     gROOT->SetBatch(true);
@@ -63,10 +64,8 @@ int main(int argc, const char* argv[])
   
     AutoLibraryLoader::enable();
   
-  
     /* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  */
     /* @@@@@@@@@@@@@@@@@@@@@@@ CONFIGURATION @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  */
-  
   
     PythonProcessDesc builder(argv[1]);
     const edm::ParameterSet& in = builder.processDesc()->getProcessPSet()->getParameter<edm::ParameterSet>("fwliteInput");
@@ -74,18 +73,18 @@ int main(int argc, const char* argv[])
     //commented out to avoid not-in-use errors
     // SAMPLES
     const edm::VParameterSet& samples = in.getParameter<edm::VParameterSet>("samples") ;
-    const string outFileName    ( in.getParameter<string>  ("outFileName" ) );
-    //const string pathToFile     ( in.getParameter<string>  ("pathToFile" ) );
-    const bool   verbose             ( in.getParameter<bool>         ("verbose" ) );
-    const bool   isMC                ( in.getParameter<bool>         ("isMC" ) );
+    const string outFileName    (in.getParameter<string>            ("outFileName"));
+    //const string pathToFile     ( in.getParameter<string>         ("pathToFile"));
+    const bool   verbose             (in.getParameter<bool>         ("verbose"));
+    const bool   isMC                (in.getParameter<bool>         ("isMC"));
     
     // PARAMETERS
-    const double lumi               ( in.getUntrackedParameter<double> ("lumi",   19.04));
-    const float  MH                 ( in.getUntrackedParameter<double> ("MH",      125.));
-    const float  MT                 ( in.getUntrackedParameter<double> ("MT",     174.3));
-    const float  MW                 ( in.getUntrackedParameter<double> ("MW",     80.19));
+    const double lumi               (in.getUntrackedParameter<double>("lumi",   19.04));
+    const float  MH                 (in.getUntrackedParameter<double>("MH",     125.));
+    const float  MT                 (in.getUntrackedParameter<double>("MT",     174.3));
+    const float  MW                 (in.getUntrackedParameter<double>("MW",     80.19));
     
-    const vector<int>    evLimits (in.getParameter<vector<int> >    ("evLimits"));
+    const vector<int> evLimits(in.getParameter<vector<int>>("evLimits"));
     
     // upper and lower event bounds to be processed
     const int evLow  = evLimits[0];
