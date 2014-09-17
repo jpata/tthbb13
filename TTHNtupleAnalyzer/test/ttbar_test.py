@@ -40,6 +40,4 @@ clep_ids = Counter(lep_ids)
 if clep_ids != Counter({-13: 124, 13: 115, 15: 99, -15: 97, 11: 95, -11: 74}):
     raise Exception("Incorrect lepton ID counts: %s" % clep_ids)
 
-print lep_isos
-
 print "all tests passed!"
