@@ -194,6 +194,23 @@ merge!(tree_structure,
 )
 
 
+#top tagger jets
+merge!(tree_structure,
+    prefixed_dynlength(:jet_toptagger, Vector{Float32},
+        fourmomentum...,
+        :energy, 
+        :top_mass, 
+        :w_mass,
+        :min_mass, #minimum invariant mass pairing 
+    )
+)
+merge!(tree_structure,
+    prefixed_dynlength(:jet_toptagger, Vector{Int32},
+        :n_sj, #number of subjets 
+    )
+)
+
+
 #jet constituent data
 #merge!(tree_structure,
 #    prefixed_dynlength(:jet, Array{Float32, 2},
