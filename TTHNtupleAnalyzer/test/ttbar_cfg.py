@@ -22,6 +22,8 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
     electrons = cms.InputTag("slimmedElectrons"),
     taus = cms.InputTag("slimmedTaus"),
     jets = cms.InputTag("slimmedJets"),
+    topjets = cms.InputTag("hepTopTagPFJetsCHS"),
+    topjetinfos = cms.InputTag("hepTopTagInfos"),
     packed = cms.InputTag("packedGenParticles"),
     pruned = cms.InputTag("prunedGenParticles"),
     fatjets = cms.InputTag("slimmedJetsAK8"),
@@ -102,5 +104,40 @@ process.TFileService = cms.Service("TFileService",
     #closeFileFast = cms.untracked.bool(True)
 )
 
+process.load('RecoJets.JetProducers.caTopTaggers_cff')
+process.hepTopTagPFJetsCHS.src = cms.InputTag("packedPFCandidates")
 
-process.p = cms.Path(process.tthNtupleAnalyzer)
+process.caTopTagInfos = cms.EDProducer("CATopJetTagger",
+    src = cms.InputTag("cmsTopTagPFJetsCHS"),
+    TopMass = cms.double(173),
+    TopMassMin = cms.double(0.),
+    TopMassMax = cms.double(250.),
+    WMass = cms.double(80.4),
+    WMassMin = cms.double(0.0),
+    WMassMax = cms.double(200.0),
+    MinMassMin = cms.double(0.0),
+    MinMassMax = cms.double(200.0),
+    verbose = cms.bool(False)
+)
+
+process.hepTopTagInfos = process.caTopTagInfos.clone(
+    src = cms.InputTag("hepTopTagPFJetsCHS")
+)
+
+process.p = cms.Path(
+    process.hepTopTagPFJetsCHS *
+    process.hepTopTagInfos *
+    process.tthNtupleAnalyzer
+)
+
+#process.out = cms.OutputModule(
+#    "PoolOutputModule",
+#    fileName = cms.untracked.string("edm.root"),
+#    # Drop per-event meta data from dropped objects
+#    dropMetaData = cms.untracked.string("ALL"),
+#    SelectEvents = cms.untracked.PSet(
+#        SelectEvents = cms.vstring("*")
+#    ),
+#    outputCommands = cms.untracked.vstring("keep *")
+#)
+#process.outpath = cms.EndPath(process.out)

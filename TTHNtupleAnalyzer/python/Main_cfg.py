@@ -140,21 +140,20 @@ process.hepTopTagInfos = process.caTopTagInfos.clone(
     src = cms.InputTag("hepTopTagPFJetsCHS")
 )
 
-
 process.p = cms.Path(
     process.hepTopTagPFJetsCHS *
     process.hepTopTagInfos *
     process.tthNtupleAnalyzer
 )
 
-process.out = cms.OutputModule(
-    "PoolOutputModule",
-    fileName = cms.untracked.string("edm.root"),
-    # Drop per-event meta data from dropped objects
-    dropMetaData = cms.untracked.string("ALL"),
-    SelectEvents = cms.untracked.PSet(
-        SelectEvents = cms.vstring("*")
-    ),
-    outputCommands = cms.untracked.vstring("keep *")
-)
-process.outpath = cms.EndPath(process.out)
+#process.out = cms.OutputModule(
+#    "PoolOutputModule",
+#    fileName = cms.untracked.string("edm.root"),
+#    # Drop per-event meta data from dropped objects
+#    dropMetaData = cms.untracked.string("ALL"),
+#    SelectEvents = cms.untracked.PSet(
+#        SelectEvents = cms.vstring("*")
+#    ),
+#    outputCommands = cms.untracked.vstring("keep *")
+#)
+#process.outpath = cms.EndPath(process.out)
