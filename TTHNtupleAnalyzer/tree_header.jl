@@ -210,6 +210,14 @@ merge!(tree_structure,
     )
 )
 
+#top jet subjets
+merge!(tree_structure,
+    prefixed_dynlength(:jet_toptagger_sj, Vector{Float32},
+        fourmomentum...,
+        :energy, 
+    )
+)
+
 
 #jet constituent data
 #merge!(tree_structure,

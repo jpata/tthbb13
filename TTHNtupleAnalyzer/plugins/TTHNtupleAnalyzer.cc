@@ -142,6 +142,7 @@ private:
     const edm::EDGetTokenT<pat::TauCollection> tauToken_;
     const edm::EDGetTokenT<pat::JetCollection> jetToken_;
     const edm::EDGetTokenT<edm::View<reco::BasicJet>> topJetToken_;
+    const edm::EDGetTokenT<edm::View<reco::PFJet>> topJetSubjetToken_;
     const edm::EDGetTokenT<edm::View<reco::CATopJetTagInfo>> topJetInfoToken_;
     const edm::EDGetTokenT<reco::VertexCollection> vertexToken_;
 
@@ -177,6 +178,7 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
     tauToken_(consumes<pat::TauCollection>(iConfig.getParameter<edm::InputTag>("taus"))),
     jetToken_(consumes<pat::JetCollection>(iConfig.getParameter<edm::InputTag>("jets"))),
     topJetToken_(consumes<edm::View<reco::BasicJet>>(iConfig.getParameter<edm::InputTag>("topjets"))),
+    topJetSubjetToken_(consumes<edm::View<reco::PFJet>>(iConfig.getParameter<edm::InputTag>("topjetsubjets"))),
     topJetInfoToken_(consumes<edm::View<reco::CATopJetTagInfo>>(iConfig.getParameter<edm::InputTag>("topjetinfos"))),
     vertexToken_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("vertices"))),
     prunedGenToken_(consumes<edm::View<reco::GenParticle> >(iConfig.getParameter<edm::InputTag>("pruned"))),
@@ -631,6 +633,19 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
         tthtree->jet_toptagger__n_sj[n_top_jet] = jet_info.properties().nSubJets;
     }
     tthtree->n__jet_toptagger = top_jets->size();
+   
+    //subjets of top jets
+    edm::Handle<edm::View<reco::PFJet>> top_jet_subjets;
+    iEvent.getByToken(topJetSubjetToken_, top_jet_subjets);
+    for (unsigned int n_top_jet_subjet=0; n_top_jet_subjet<top_jet_subjets->size(); n_top_jet_subjet++) {
+        const reco::PFJet& x = top_jet_subjets->at(n_top_jet_subjet);
+        tthtree->jet_toptagger_sj__eta[n_top_jet_subjet] = x.eta();
+        tthtree->jet_toptagger_sj__pt[n_top_jet_subjet] = x.pt();
+        tthtree->jet_toptagger_sj__phi[n_top_jet_subjet] = x.phi();
+        tthtree->jet_toptagger_sj__mass[n_top_jet_subjet] = x.mass();
+        tthtree->jet_toptagger_sj__energy[n_top_jet_subjet] = x.energy();
+    }
+    tthtree->n__jet_toptagger_sj = top_jet_subjets->size();
 
     if (n__lep>=N_MAX) {
         edm::LogError("N_MAX") << "Exceeded vector N_MAX with n__lep: " << n__lep << ">=> " << N_MAX;

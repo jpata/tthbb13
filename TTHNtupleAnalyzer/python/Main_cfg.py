@@ -22,7 +22,7 @@ process.load("FWCore.MessageService.MessageLogger_cfi")
 #)
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.source = cms.Source("PoolSource",
     # replace 'myfile.root' with the source file you want to use
@@ -40,6 +40,7 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
     jets = cms.InputTag("slimmedJets"),
     topjets = cms.InputTag("hepTopTagPFJetsCHS"),
     topjetinfos = cms.InputTag("hepTopTagInfos"),
+    topjetsubjets = cms.InputTag("hepTopTagPFJetsCHS", "caTopSubJets"),
     packed = cms.InputTag("packedGenParticles"),
     pruned = cms.InputTag("prunedGenParticles"),
     fatjets = cms.InputTag("slimmedJetsAK8"),
