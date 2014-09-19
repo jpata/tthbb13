@@ -12,7 +12,7 @@ process.fwliteInput = cms.PSet(
     #outFileName   = cms.string("/scratch/bianchi/Trees/MEM/MEAnalysisNewTEST_Sherpa_Had.root"),
 
     # input file directory
-    pathToFile    = cms.string("/hdfs/cms/store/user/liis/TTH_Ntuples_jsonUpdate/"),
+    pathToFile    = cms.string("/TEST/PATH/TO/NTUPLES"),
 
     # the samples
     #samples = samples_V3,
