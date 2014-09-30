@@ -3,7 +3,6 @@ tthbb13 setup
 
 1. Create the working directory ``mkdir my_tth;cd my_tth``
 2. Create the CMSSW directory by executing the commands in ``setup.sh`` "manually" (you can download the file and source it)
-3. Get the TTH code into the CMSSW directory ``cd CMSSW/src/TTH;git clone https://github.com/jpata/tthbb13.git``
 4. Compile ``scram b``
 5. Run the TTH tests ``cd CMSSW/src/TTH;scram b runtests``
 
