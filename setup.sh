@@ -7,4 +7,5 @@ git cms-addpkg PhysicsTools/PatAlgos
 #git cms-merge-topic 4330
 git clone https://github.com/jpata/tthbb13.git TTH
 cp TTH/MEAnalysis/libs/*.so ../lib/$SCRAM_ARCH/
+scram setup lhapdf
 scram b -j 20
