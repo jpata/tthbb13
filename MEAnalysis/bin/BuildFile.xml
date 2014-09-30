@@ -20,7 +20,7 @@
   <use   name="roottmva"/>
   <use   name="classlib"/>
   <use   name="boost"/>
-  <use   name="lhapdffull"/>  
+  <use   name="lhapdf"/>  
   <lib   name="openloops"/>
   <lib   name="coli"/>
   <lib   name="openloops_ppHtt_1tL"/>
