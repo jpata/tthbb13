@@ -123,47 +123,69 @@ const reco::GenParticle* find_dr_dp_id_match(const reco::Candidate& x, edm::Hand
     }
 }
 
+
+
 class TTHNtupleAnalyzer : public edm::EDAnalyzer {
+
 public:
-    explicit TTHNtupleAnalyzer(const edm::ParameterSet&);
-    ~TTHNtupleAnalyzer();
-
-    static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
-
+  explicit TTHNtupleAnalyzer(const edm::ParameterSet&);
+  ~TTHNtupleAnalyzer();
+  
+  static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
+  
 
 private:
-    virtual void beginJob() override;
-    virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
-    virtual void endJob() override;
-    virtual void finalizeLoop();
+  virtual void beginJob() override;
+  virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
+  virtual void endJob() override;
+  virtual void finalizeLoop();
+  
+  // collection of muons, electrons, taus, jets
+  const edm::EDGetTokenT<pat::MuonCollection> muonToken_;
+  const edm::EDGetTokenT<pat::ElectronCollection> electronToken_;
+  const edm::EDGetTokenT<pat::TauCollection> tauToken_;
+  const edm::EDGetTokenT<pat::JetCollection> jetToken_;
+ 
+  // collection of top jets
+  const edm::EDGetTokenT<edm::View<reco::BasicJet>> topJetToken_;
+  const edm::EDGetTokenT<edm::View<reco::PFJet>> topJetSubjetToken_;
+  const edm::EDGetTokenT<edm::View<reco::CATopJetTagInfo>> topJetInfoToken_;
 
-    const edm::EDGetTokenT<pat::MuonCollection> muonToken_;
-    const edm::EDGetTokenT<pat::ElectronCollection> electronToken_;
-    const edm::EDGetTokenT<pat::TauCollection> tauToken_;
-    const edm::EDGetTokenT<pat::JetCollection> jetToken_;
-    const edm::EDGetTokenT<edm::View<reco::BasicJet>> topJetToken_;
-    const edm::EDGetTokenT<edm::View<reco::PFJet>> topJetSubjetToken_;
-    const edm::EDGetTokenT<edm::View<reco::CATopJetTagInfo>> topJetInfoToken_;
-    const edm::EDGetTokenT<reco::VertexCollection> vertexToken_;
+  // collection of vertices
+  const edm::EDGetTokenT<reco::VertexCollection> vertexToken_;
 
-    const edm::EDGetTokenT<edm::View<reco::GenParticle> > prunedGenToken_;
-    const edm::EDGetTokenT<edm::View<pat::PackedGenParticle> > packedGenToken_;
+  // collection of gen particles
+  const edm::EDGetTokenT<edm::View<reco::GenParticle> > prunedGenToken_;
+  const edm::EDGetTokenT<edm::View<pat::PackedGenParticle> > packedGenToken_;
 
-    const edm::EDGetTokenT<pat::JetCollection> fatjetToken_;
-    const edm::EDGetTokenT<pat::METCollection> metToken_;
+  // collection of fatjets and MET
+  const edm::EDGetTokenT<pat::JetCollection> fatjetToken_;
+  const edm::EDGetTokenT<pat::METCollection> metToken_;
 
-    const edm::EDGetTokenT<LHEEventProduct> lheToken_;
-
-    TTHTree* tthtree;
-    const edm::Service<TFileService> fs;
-    const bool isMC;
-
-    TStopwatch* sw;
-
-    const std::vector<std::string> tauIdentifiers_;
-    const std::vector<std::string> eleIdentifiers_;
-    //const ElectronEffectiveArea::ElectronEffectiveAreaType electron_eff_area_type = ElectronEffectiveArea::ElectronEffectiveAreaType::kEleGammaAndNeutralHadronIso03;
-    //const ElectronEffectiveArea::ElectronEffectiveAreaType electron_eff_area_target = ElectronEffectiveArea::ElectronEffectiveAreaTarget::kEleEAData2012;
+  // LHE event product (may not be present!!)
+  const edm::EDGetTokenT<LHEEventProduct> lheToken_;
+  
+  // the output tree
+  TTHTree* tthtree;
+  const edm::Service<TFileService> fs;
+  
+  // a watch for CPU monitoring
+  TStopwatch* sw;
+  
+  //const ElectronEffectiveArea::ElectronEffectiveAreaType electron_eff_area_type = ElectronEffectiveArea::ElectronEffectiveAreaType::kEleGammaAndNeutralHadronIso03;
+  //const ElectronEffectiveArea::ElectronEffectiveAreaType electron_eff_area_target = ElectronEffectiveArea::ElectronEffectiveAreaTarget::kEleEAData2012;
+  
+  // particle identifiers
+  const std::vector<std::string> tauIdentifiers_;
+  const std::vector<std::string> eleIdentifiers_;
+  
+  // parameters
+  const bool    isMC;
+  const double jetPt_min_;
+  const int    jetMult_min_;
+  const double muPt_min_;
+  const double elePt_min_;
+  const double tauPt_min_;
 };
 
 TTHTree::TTHTree(TTree* _tree) {
@@ -185,11 +207,19 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
     packedGenToken_(consumes<edm::View<pat::PackedGenParticle> >(iConfig.getParameter<edm::InputTag>("packed"))),
     fatjetToken_(consumes<pat::JetCollection>(iConfig.getParameter<edm::InputTag>("fatjets"))),
     metToken_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("mets"))),
-    lheToken_(consumes<LHEEventProduct>(iConfig.getParameter<edm::InputTag>("lhe"))),
+
+    lheToken_( (iConfig.getParameter<edm::InputTag>("lhe")).label()!="" ? 
+	       consumes<LHEEventProduct>( iConfig.getParameter<edm::InputTag>("lhe")) : edm::EDGetTokenT<LHEEventProduct>() ),
+
     tthtree(new TTHTree(fs->make<TTree>("events", "events"))),
-    isMC(iConfig.getParameter<bool>("isMC")),
     tauIdentifiers_(iConfig.getParameter<std::vector<std::string>>("tauIdentifiers")),
-    eleIdentifiers_(iConfig.getParameter<std::vector<std::string>>("eleIdentifiers"))
+    eleIdentifiers_(iConfig.getParameter<std::vector<std::string>>("eleIdentifiers")),
+    isMC(iConfig.getParameter<bool>("isMC")),
+    jetPt_min_  (iConfig.getUntrackedParameter<double>("jetPt_min", 5.)),
+    jetMult_min_(iConfig.getUntrackedParameter<int>   ("jetMult_min", -99)),
+    muPt_min_   (iConfig.getUntrackedParameter<double>("muPt_min",  5.)),
+    elePt_min_  (iConfig.getUntrackedParameter<double>("elePt_min", 5.)),
+    tauPt_min_  (iConfig.getUntrackedParameter<double>("tauPt_min", 5.))
 {
     sw = new TStopwatch();
 }
@@ -214,6 +244,16 @@ double dbc_rel_iso(const pat::Muon& lepton) {
            );
 }
 
+bool jetID(const pat::Jet& j) {
+  if(j.neutralHadronEnergyFraction() > 0.99) return false;
+  if(j.neutralEmEnergyFraction() > 0.99)     return false;
+  if(fabs(j.p4().Eta())<2.4 && j.chargedEmEnergyFraction() > 0.99)   return false;
+  if(fabs(j.p4().Eta())<2.4 && j.chargedHadronEnergyFraction() == 0) return false;
+  //if(fabs(j.p4().Eta())<2.4 && j.associatedTracks().size() == 0) return false;
+  if(j.numberOfDaughters() <= 1) return false;
+  return true;
+}
+
 void TTHNtupleAnalyzer::finalizeLoop() {
 }
 
@@ -221,180 +261,193 @@ void TTHNtupleAnalyzer::finalizeLoop() {
 void
 TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
-    using namespace edm;
+  using namespace edm;
+  
+  sw->Start();
+  tthtree->loop_initialize();
+  
+  tthtree->event__id   = (unsigned int)iEvent.id().event();
+  tthtree->event__run  = (unsigned int)iEvent.id().run();
+  tthtree->event__lumi = (unsigned int)iEvent.id().luminosityBlock();
+  
+  //Primary vertices
+  edm::Handle<reco::VertexCollection> vertices;
+  iEvent.getByToken(vertexToken_, vertices);
+  if (vertices->empty()) {
+    edm::LogError("loop") << "no vertices found";
+    finalizeLoop();
+    return;
+  }
+  const reco::Vertex &PV = vertices->front();
+  tthtree->n__pv = vertices->size();
+  
+  //Pileup
+  if (isMC) {
+    Handle<std::vector<PileupSummaryInfo>> PupInfo;
+    iEvent.getByLabel(edm::InputTag("addPileupInfo"), PupInfo);
+    std::vector<PileupSummaryInfo>::const_iterator PVI;
+    tthtree->n__pvi = PupInfo->size();
+    int n_pu = 0;
+    for (PVI = PupInfo->begin(); PVI != PupInfo->end(); ++PVI)
+      {
+	const int BX = PVI->getBunchCrossing();
+	LogDebug("PVI") << n_pu << " BX=" << BX;
+	tthtree->pvi__n0[n_pu] = PVI->getPU_NumInteractions();
+	tthtree->pvi__bx[n_pu] = BX;
+	if (BX == 0)
+	  {
+	    tthtree->pvi__ntrue[n_pu] = PVI->getTrueNumInteractions();
+	  }
+	n_pu += 1;
+      }
+  }
+  
+  edm::Handle<pat::MuonCollection> muons;
+  iEvent.getByToken(muonToken_, muons);
+  
+  Handle<edm::View<reco::GenParticle> > pruned;
+  iEvent.getByToken(prunedGenToken_,pruned);
 
-    sw->Start();
-    tthtree->loop_initialize();
+  // lepton counters
+  int n__lep = 0;
+  int n_mu = 0;
+  int n_ele = 0;
+  int n_tau = 0;
+  
+  // jet counter
+  int n__jet = 0;
+  
+  for (const pat::Muon &x : *muons) {
+    LogDebug("muons") << "n_mu=" << n_mu <<
+      " pt=" << x.pt() <<
+      " dz(PV)=" << x.muonBestTrack()->dz(PV.position()) <<
+      " lID=" << x.isLooseMuon() <<
+      " tID=" << x.isTightMuon(PV);
 
-    tthtree->event__id = (unsigned int)iEvent.id().event();
-    tthtree->event__run = (unsigned int)iEvent.id().run();
-    tthtree->event__lumi = (unsigned int)iEvent.id().luminosityBlock();
-
-//Primary vertices
-    edm::Handle<reco::VertexCollection> vertices;
-    iEvent.getByToken(vertexToken_, vertices);
-    if (vertices->empty()) {
-        edm::LogError("loop") << "no vertices found";
-        finalizeLoop();
-        return;
+    if( x.pt()<muPt_min_ ){
+      LogDebug("muons") << "n_mu=" << n_mu << " fails pt cut" << endl;
+      continue;
     }
-    const reco::Vertex &PV = vertices->front();
-    tthtree->n__pv = vertices->size();
 
-//Pileup
+    tthtree->lep__eta[n__lep] = x.eta();
+    tthtree->lep__pt[n__lep] = x.pt();
+    tthtree->lep__phi[n__lep] = x.phi();
+    tthtree->lep__mass[n__lep] = x.mass();
+    tthtree->lep__id[n__lep] = x.pdgId();
+    tthtree->lep__charge[n__lep] = x.charge();
+    tthtree->lep__is_tight[n__lep] = x.isTightMuon(PV);
+    tthtree->lep__is_loose[n__lep] = x.isLooseMuon();
+    
+    tthtree->lep__ch_iso[n__lep] = x.chargedHadronIso();
+    tthtree->lep__puch_iso[n__lep] = x.puChargedHadronIso();
+    tthtree->lep__ec_iso[n__lep] = x.ecalIso();
+    tthtree->lep__hc_iso[n__lep] = x.hcalIso();
+    tthtree->lep__p_iso[n__lep] = x.particleIso();
+    tthtree->lep__ph_iso[n__lep] = x.photonIso();
+    
+    //manual DBC iso
+    //const auto& pfiso = x.pfIsolationR04();
+    //tthtree->lep__rel_iso[n__lep] = (pfiso.sumChargedHadronPt + std::max(0.0, pfiso.sumNeutralHadronEt + pfiso.sumPhotonEt - 0.5 * pfiso.sumPUPt))/x.pt();
+    
+    //automatic delta-beta relative isolation
+    tthtree->lep__rel_iso[n__lep] = dbc_rel_iso(x);
+    
+    if (x.muonBestTrack().isNonnull()) {
+      tthtree->lep__dxy[n__lep] = x.muonBestTrack()->dxy(PV.position());
+      tthtree->lep__dz[n__lep] = x.muonBestTrack()->dz(PV.position());
+    } else {
+      edm::LogWarning("muon") << "gsfTrack is 0 for n_mu=" << n_mu;
+    }
     if (isMC) {
-        Handle<std::vector<PileupSummaryInfo>> PupInfo;
-        iEvent.getByLabel(edm::InputTag("addPileupInfo"), PupInfo);
-        std::vector<PileupSummaryInfo>::const_iterator PVI;
-        tthtree->n__pvi = PupInfo->size();
-        int n_pu = 0;
-        for (PVI = PupInfo->begin(); PVI != PupInfo->end(); ++PVI)
-        {
-            const int BX = PVI->getBunchCrossing();
-            LogDebug("PVI") << n_pu << " BX=" << BX;
-            tthtree->pvi__n0[n_pu] = PVI->getPU_NumInteractions();
-            tthtree->pvi__bx[n_pu] = BX;
-            if (BX == 0)
-            {
-                tthtree->pvi__ntrue[n_pu] = PVI->getTrueNumInteractions();
-            }
-            n_pu += 1;
+      const reco::GenParticle* gp = x.genParticle();
+      if (gp == NULL) {
+	LogDebug("muon") << "n__lep=" << n__lep << " does not have genParticle(), doing dR/dP matching";
+	gp = find_dr_dp_id_match(x, pruned);
+      }
+      if (x.genParticle() != NULL) {
+	tthtree->gen_lep__eta[n__lep] = gp->eta();
+	tthtree->gen_lep__pt[n__lep] = gp->pt();
+	tthtree->gen_lep__phi[n__lep] = gp->phi();
+	tthtree->gen_lep__mass[n__lep] = gp->mass();
+	tthtree->gen_lep__id[n__lep] = gp->pdgId();
+	tthtree->gen_lep__status[n__lep] = gp->status();
+      } else {
+	LogDebug("muons") << "genParticle()==0 for muon n_mu=" << n_mu;
+      }
         }
+    n_mu += 1;
+    n__lep += 1;
+  }
+  
+  edm::Handle<pat::ElectronCollection> electrons;
+  iEvent.getByToken(electronToken_, electrons);
+  for (const pat::Electron &x : *electrons) {
+    LogDebug("electrons") << "n_ele=" << n_ele <<
+      " pt=" << x.pt();
+
+    if( x.pt()<elePt_min_ ){
+      LogDebug("electrons") << "n_ele=" << n_ele << " fails pt cut" << endl;
+      continue;
     }
 
-    edm::Handle<pat::MuonCollection> muons;
-    iEvent.getByToken(muonToken_, muons);
+    tthtree->lep__eta[n__lep] = x.eta();
+    tthtree->lep__pt[n__lep] = x.pt();
+    tthtree->lep__phi[n__lep] = x.phi();
+    tthtree->lep__mass[n__lep] = x.mass();
+    tthtree->lep__id[n__lep] = x.pdgId();
+    tthtree->lep__charge[n__lep] = x.charge();
+    
+    tthtree->lep__ch_iso[n__lep] = x.chargedHadronIso();
+    tthtree->lep__puch_iso[n__lep] = x.puChargedHadronIso();
+    tthtree->lep__ec_iso[n__lep] = x.ecalIso();
+    tthtree->lep__hc_iso[n__lep] = x.hcalIso();
+    tthtree->lep__p_iso[n__lep] = x.particleIso();
+    tthtree->lep__ph_iso[n__lep] = x.photonIso();
+    
+    //manual rho-corrected, probably deprecated
+    //const double eff_area = ElectronEffectiveArea::GetElectronEffectiveArea(
+    //    electron_eff_area_type,
+    //    x.eta(),
+    //    electron_eff_area_target
+    //);
+    //isocorr = PFChargedIso (PFNoPU) + max(PFIso(γ+NH) - rho * Aeff(γ+NH), 0.)
+    //float rc_iso = (lepton.chargedHadronIso() + std::max(0., lepton.neutralHadronIso() + lepton.photonIso() - ea*(*rho)))/lepton.userFloat("ptCorr");
+    tthtree->lep__rel_iso[n__lep] = dbc_rel_iso(x);
 
-    Handle<edm::View<reco::GenParticle> > pruned;
-    iEvent.getByToken(prunedGenToken_,pruned);
-
-    int n__lep = 0;
-
-    int n_mu = 0;
-    int n_ele = 0;
-    int n_tau = 0;
-
-    int n__jet = 0;
-
-    for (const pat::Muon &x : *muons) {
-        LogDebug("muons") << "n_mu=" << n_mu <<
-                          " pt=" << x.pt() <<
-                          " dz(PV)=" << x.muonBestTrack()->dz(PV.position()) <<
-                          " lID=" << x.isLooseMuon() <<
-                          " tID=" << x.isTightMuon(PV);
-        tthtree->lep__eta[n__lep] = x.eta();
-        tthtree->lep__pt[n__lep] = x.pt();
-        tthtree->lep__phi[n__lep] = x.phi();
-        tthtree->lep__mass[n__lep] = x.mass();
-        tthtree->lep__id[n__lep] = x.pdgId();
-        tthtree->lep__charge[n__lep] = x.charge();
-        tthtree->lep__is_tight[n__lep] = x.isTightMuon(PV);
-        tthtree->lep__is_loose[n__lep] = x.isLooseMuon();
-
-        tthtree->lep__ch_iso[n__lep] = x.chargedHadronIso();
-        tthtree->lep__puch_iso[n__lep] = x.puChargedHadronIso();
-        tthtree->lep__ec_iso[n__lep] = x.ecalIso();
-        tthtree->lep__hc_iso[n__lep] = x.hcalIso();
-        tthtree->lep__p_iso[n__lep] = x.particleIso();
-        tthtree->lep__ph_iso[n__lep] = x.photonIso();
-
-        //manual DBC iso
-        //const auto& pfiso = x.pfIsolationR04();
-        //tthtree->lep__rel_iso[n__lep] = (pfiso.sumChargedHadronPt + std::max(0.0, pfiso.sumNeutralHadronEt + pfiso.sumPhotonEt - 0.5 * pfiso.sumPUPt))/x.pt();
-
-        //automatic delta-beta relative isolation
-        tthtree->lep__rel_iso[n__lep] = dbc_rel_iso(x);
-
-        if (x.muonBestTrack().isNonnull()) {
-            tthtree->lep__dxy[n__lep] = x.muonBestTrack()->dxy(PV.position());
-            tthtree->lep__dz[n__lep] = x.muonBestTrack()->dz(PV.position());
-        } else {
-            edm::LogWarning("muon") << "gsfTrack is 0 for n_mu=" << n_mu;
-        }
-        if (isMC) {
-            const reco::GenParticle* gp = x.genParticle();
-            if (gp == NULL) {
-                LogDebug("muon") << "n__lep=" << n__lep << " does not have genParticle(), doing dR/dP matching";
-                gp = find_dr_dp_id_match(x, pruned);
-            }
-            if (x.genParticle() != NULL) {
-                tthtree->gen_lep__eta[n__lep] = gp->eta();
-                tthtree->gen_lep__pt[n__lep] = gp->pt();
-                tthtree->gen_lep__phi[n__lep] = gp->phi();
-                tthtree->gen_lep__mass[n__lep] = gp->mass();
-                tthtree->gen_lep__id[n__lep] = gp->pdgId();
-                tthtree->gen_lep__status[n__lep] = gp->status();
-            } else {
-                LogDebug("muons") << "genParticle()==0 for muon n_mu=" << n_mu;
-            }
-        }
-        n_mu += 1;
-        n__lep += 1;
+    //FIXME: implement tight/loose definition
+    tthtree->lep__is_tight[n__lep] = (x.passConversionVeto());
+    //tthtree->lep__is_loose[n__lep] = x.isLooseElectron();
+    
+    unsigned int ele_id_idx = 0;
+    tthtree->lep__id_bitmask[n__lep] = 0;
+    for (const auto& ele_id : eleIdentifiers_) {
+      LogDebug("ele") << " n__lep=" << n__lep << " ID(" << ele_id << ")=" << x.electronID(ele_id);
+      if (x.electronID(ele_id)) {
+	//passes, flip bit with index tau_id_idx to ON
+	tthtree->lep__id_bitmask[n__lep] = tthtree->lep__id_bitmask[n__lep] | (1 << ele_id_idx);
+      } else {
+	//fails, flip bit with index tau_id_idx to OFF
+	tthtree->lep__id_bitmask[n__lep] = tthtree->lep__id_bitmask[n__lep] & ~(1 << ele_id_idx);
+      }
+      ele_id_idx += 1;
+      if (ele_id_idx>= 32) {
+	edm::LogWarning("ele") << "More electron ID-s specified than can fit in bitmask, truncating after " << ele_id;
+	break;
+      }
     }
 
-    edm::Handle<pat::ElectronCollection> electrons;
-    iEvent.getByToken(electronToken_, electrons);
-    for (const pat::Electron &x : *electrons) {
-        LogDebug("electrons") << "n_ele=" << n_ele <<
-                              " pt=" << x.pt();
-        tthtree->lep__eta[n__lep] = x.eta();
-        tthtree->lep__pt[n__lep] = x.pt();
-        tthtree->lep__phi[n__lep] = x.phi();
-        tthtree->lep__mass[n__lep] = x.mass();
-        tthtree->lep__id[n__lep] = x.pdgId();
-        tthtree->lep__charge[n__lep] = x.charge();
-
-        tthtree->lep__ch_iso[n__lep] = x.chargedHadronIso();
-        tthtree->lep__puch_iso[n__lep] = x.puChargedHadronIso();
-        tthtree->lep__ec_iso[n__lep] = x.ecalIso();
-        tthtree->lep__hc_iso[n__lep] = x.hcalIso();
-        tthtree->lep__p_iso[n__lep] = x.particleIso();
-        tthtree->lep__ph_iso[n__lep] = x.photonIso();
-
-        //manual rho-corrected, probably deprecated
-        //const double eff_area = ElectronEffectiveArea::GetElectronEffectiveArea(
-        //    electron_eff_area_type,
-        //    x.eta(),
-        //    electron_eff_area_target
-        //);
-        //isocorr = PFChargedIso (PFNoPU) + max(PFIso(γ+NH) - rho * Aeff(γ+NH), 0.)
-        //float rc_iso = (lepton.chargedHadronIso() + std::max(0., lepton.neutralHadronIso() + lepton.photonIso() - ea*(*rho)))/lepton.userFloat("ptCorr");
-        tthtree->lep__rel_iso[n__lep] = dbc_rel_iso(x);
-
-        //FIXME: implement tight/loose definition
-        tthtree->lep__is_tight[n__lep] = (x.passConversionVeto());
-        //tthtree->lep__is_loose[n__lep] = x.isLooseElectron();
-
-        unsigned int ele_id_idx = 0;
-        tthtree->lep__id_bitmask[n__lep] = 0;
-        for (const auto& ele_id : eleIdentifiers_) {
-            LogDebug("ele") << " n__lep=" << n__lep << " ID(" << ele_id << ")=" << x.electronID(ele_id);
-            if (x.electronID(ele_id)) {
-                //passes, flip bit with index tau_id_idx to ON
-                tthtree->lep__id_bitmask[n__lep] = tthtree->lep__id_bitmask[n__lep] | (1 << ele_id_idx);
-            } else {
-                //fails, flip bit with index tau_id_idx to OFF
-                tthtree->lep__id_bitmask[n__lep] = tthtree->lep__id_bitmask[n__lep] & ~(1 << ele_id_idx);
-            }
-            ele_id_idx += 1;
-            if (ele_id_idx>= 32) {
-                edm::LogWarning("ele") << "More electron ID-s specified than can fit in bitmask, truncating after " << ele_id;
-                break;
-            }
-        }
-
-        if (x.gsfTrack().isNonnull()) {
-            tthtree->lep__dxy[n__lep] = x.gsfTrack()->dxy(PV.position());
-            tthtree->lep__dz[n__lep] = x.gsfTrack()->dz(PV.position());
-        } else {
-            edm::LogWarning("electron") << "gsfTrack is 0 for n_ele=" << n_ele;
-        }
-        if (isMC) {
-            const reco::GenParticle* gp = x.genParticle();
-            if (gp == NULL) {
-                LogDebug("electron") << "n__lep=" << n__lep << " does not have genParticle(), doing dR/dP matching";
-                gp = find_dr_dp_id_match(x, pruned);
-            }
+    if (x.gsfTrack().isNonnull()) {
+      tthtree->lep__dxy[n__lep] = x.gsfTrack()->dxy(PV.position());
+      tthtree->lep__dz[n__lep] = x.gsfTrack()->dz(PV.position());
+    } else {
+      edm::LogWarning("electron") << "gsfTrack is 0 for n_ele=" << n_ele;
+    }
+    if (isMC) {
+      const reco::GenParticle* gp = x.genParticle();
+      if (gp == NULL) {
+	LogDebug("electron") << "n__lep=" << n__lep << " does not have genParticle(), doing dR/dP matching";
+	gp = find_dr_dp_id_match(x, pruned);
+      }
             if (gp != NULL) {
                 tthtree->gen_lep__eta[n__lep] = gp->eta();
                 tthtree->gen_lep__pt[n__lep] = gp->pt();
@@ -415,6 +468,12 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     for (const pat::Tau &x : *taus) {
         LogDebug("taus") << "n_tau=" << n_tau <<
                          " pt=" << x.pt();
+
+	if( x.pt()<tauPt_min_ ){
+	  LogDebug("taus") << "n_tau=" << n_tau << " fails pt cut" << endl;
+	  continue;
+	}
+	
         tthtree->lep__eta[n__lep] = x.eta();
         tthtree->lep__pt[n__lep] = x.pt();
         tthtree->lep__phi[n__lep] = x.phi();
@@ -488,8 +547,19 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
     for (auto x : *jets) {
         //assert(_x != NULL);
-        //const pat::Jet& x = *_x;
         LogDebug("jets") << "n__jet=" << n__jet << CANDPRINT(x);
+
+	// jet pt cut
+	if( x.pt()<jetPt_min_ ){
+	  LogDebug("jets") << "n__jet=" << n__jet << " fails pt cut" << endl;
+	  continue;
+	}
+	// jet ID
+	if( !jetID( x ) ){
+	  LogDebug("jets") << "n__jet=" << n__jet << " fails ID cut" << endl;
+	  continue;
+	}
+
         tthtree->jet__eta[n__jet] = x.eta();
         tthtree->jet__pt[n__jet] = x.pt();
         tthtree->jet__phi[n__jet] = x.phi();
@@ -497,6 +567,12 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
         tthtree->jet__energy[n__jet] = x.energy();
         tthtree->jet__bd_csv[n__jet] = x.bDiscriminator("combinedSecondaryVertexBJetTags");
         tthtree->jet__id[n__jet] = x.partonFlavour();
+
+	tthtree->jet__pileupJetId[n__jet] = x.userFloat("pileupJetId:fullDiscriminant");
+	tthtree->jet__vtxMass   [n__jet]  = x.userFloat("vtxMass") ;
+	tthtree->jet__vtxNtracks[n__jet]  = x.userFloat("vtxNtracks")  ;
+	tthtree->jet__vtx3DVal  [n__jet]  = x.userFloat("vtx3DVal")  ;
+	tthtree->jet__vtx3DSig  [n__jet]  = x.userFloat("vtx3DSig")  ;
 
         tthtree->jet__nh_e[n__jet] = x.neutralHadronEnergy();
         tthtree->jet__ne_e[n__jet] = x.neutralEmEnergy();
@@ -607,6 +683,11 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
         n__jet += 1;
     }
 
+    if( jetMult_min_>0 && n__jet<jetMult_min_ ){
+      LogDebug("Event Cuts") << n__jet << " jets: skip this event" << endl;
+      return;
+    }
+
     //Top tagger jets
     edm::Handle<edm::View<reco::BasicJet>> top_jets;
     iEvent.getByToken(topJetToken_, top_jets);
@@ -677,46 +758,50 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     }
 
     //get the LHE gen-level stuff
-    //code from LB
-    if (isMC) {
+    //code from LB --> LHE not always available
+    if ( isMC ) {
         edm::Handle<LHEEventProduct> lhe;
-        iEvent.getByToken(lheToken_, lhe);
+	if( !lheToken_.isUninitialized() )
+	  iEvent.getByToken(lheToken_, lhe);
 
-        const lhef::HEPEUP hepeup_ = lhe->hepeup();
-        const std::vector<lhef::HEPEUP::FiveVector> pup_ = hepeup_.PUP; // px, py, pz, E, M
+	if( lhe.isValid() ){
 
-        double lheHT = 0.0;
-        unsigned int lheNj = 0;
-        unsigned int countBquarks=0, countCquarks=0, countUDSquarks=0, countGquarks=0, countExtraPartons=0;
-        for (unsigned int i=0; i<pup_.size(); ++i) {
+	  const lhef::HEPEUP hepeup_ = lhe->hepeup();
+	  const std::vector<lhef::HEPEUP::FiveVector> pup_ = hepeup_.PUP; // px, py, pz, E, M
+	  
+	  double lheHT = 0.0;
+	  unsigned int lheNj = 0;
+	  unsigned int countBquarks=0, countCquarks=0, countUDSquarks=0, countGquarks=0, countExtraPartons=0;
+	  for (unsigned int i=0; i<pup_.size(); ++i) {
             int id=hepeup_.IDUP[i]; //pdgId
             int status = hepeup_.ISTUP[i];
             int idabs=TMath::Abs(id);
-
+	    
             // gluons and quarks
             if(status == 1 && ((idabs == 21) || (idabs > 0 && idabs < 7))) {
-                // first entry is px, second py
-                lheHT += TMath::Sqrt( TMath::Power(hepeup_.PUP[i][0],2) + TMath::Power(hepeup_.PUP[i][1],2) );
-                lheNj++;
+	      // first entry is px, second py
+	      lheHT += TMath::Sqrt( TMath::Power(hepeup_.PUP[i][0],2) + TMath::Power(hepeup_.PUP[i][1],2) );
+	      lheNj++;
             }
-
+	    
             if ( hepeup_.ISTUP[i] >= 0 && status == 1 ) {
-                if (!(hepeup_.MOTHUP[i].first !=1 && hepeup_.MOTHUP[i].second !=2)) {
-                    if(idabs==5  ) countBquarks++;
-                    if(idabs==4  ) countCquarks++;
-                    if(idabs<=3 && idabs>=1 ) countUDSquarks++;
-                    if(idabs==21  ) countGquarks++;
-                    if(idabs==21 || (idabs>=1 && idabs<=5)) countExtraPartons++;
-                }
+	      if (!(hepeup_.MOTHUP[i].first !=1 && hepeup_.MOTHUP[i].second !=2)) {
+		if(idabs==5  ) countBquarks++;
+		if(idabs==4  ) countCquarks++;
+		if(idabs<=3 && idabs>=1 ) countUDSquarks++;
+		if(idabs==21  ) countGquarks++;
+		if(idabs==21 || (idabs>=1 && idabs<=5)) countExtraPartons++;
+	      }
             }
-        }
-        tthtree->lhe__ht = lheHT;
-        tthtree->lhe__n_j = lheNj;
-        tthtree->lhe__n_b = countBquarks;
-        tthtree->lhe__n_c = countCquarks;
-        tthtree->lhe__n_l = countUDSquarks;
-        tthtree->lhe__n_g = countGquarks;
-        tthtree->lhe__n_e = countExtraPartons;
+	  }
+	  tthtree->lhe__ht = lheHT;
+	  tthtree->lhe__n_j = lheNj;
+	  tthtree->lhe__n_b = countBquarks;
+	  tthtree->lhe__n_c = countCquarks;
+	  tthtree->lhe__n_l = countUDSquarks;
+	  tthtree->lhe__n_g = countGquarks;
+	  tthtree->lhe__n_e = countExtraPartons;
+	}
     }
 
     //These also index the number of generated lepton/jets

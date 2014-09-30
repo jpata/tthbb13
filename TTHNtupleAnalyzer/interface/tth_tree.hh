@@ -53,6 +53,7 @@ public:
 	float jet__energy[N_MAX];
 	float jet__eta[N_MAX];
 	int jet__id[N_MAX];
+	float jet__pileupJetId[N_MAX];
 	float jet__mass[N_MAX];
 	float jet__mu_e[N_MAX];
 	float jet__ne_e[N_MAX];
@@ -60,6 +61,10 @@ public:
 	float jet__ph_e[N_MAX];
 	float jet__phi[N_MAX];
 	float jet__pt[N_MAX];
+        float jet__vtxMass[N_MAX];
+        int   jet__vtxNtracks[N_MAX];
+        float jet__vtx3DVal[N_MAX];
+        float jet__vtx3DSig[N_MAX];
 	float jet_toptagger__energy[N_MAX];
 	float jet_toptagger__eta[N_MAX];
 	float jet_toptagger__mass[N_MAX];
@@ -154,6 +159,7 @@ public:
 		SET_ZERO(jet__energy, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet__id, N_MAX, DEF_VAL_INT);
+		SET_ZERO(jet__pileupJetId, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet__mass, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet__mu_e, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet__ne_e, N_MAX, DEF_VAL_FLOAT);
@@ -161,6 +167,10 @@ public:
 		SET_ZERO(jet__ph_e, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet__pt, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet__vtxMass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet__vtxNtracks, N_MAX, DEF_VAL_INT);
+		SET_ZERO(jet__vtx3DVal, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet__vtx3DSig, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_toptagger__energy, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_toptagger__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_toptagger__mass, N_MAX, DEF_VAL_FLOAT);
@@ -311,6 +321,8 @@ public:
 		branch_map["jet__eta"] = (void*)jet__eta;
 		tree->Branch("jet__id", jet__id, "jet__id[n__jet]/I");
 		branch_map["jet__id"] = (void*)jet__id;
+		tree->Branch("jet__pileupJetId", jet__pileupJetId, "jet__pileupJetId[n__jet]/F");
+		branch_map["jet__pileupJetId"] = (void*)jet__pileupJetId;
 		tree->Branch("jet__mass", jet__mass, "jet__mass[n__jet]/F");
 		branch_map["jet__mass"] = (void*)jet__mass;
 		tree->Branch("jet__mu_e", jet__mu_e, "jet__mu_e[n__jet]/F");
@@ -325,6 +337,14 @@ public:
 		branch_map["jet__phi"] = (void*)jet__phi;
 		tree->Branch("jet__pt", jet__pt, "jet__pt[n__jet]/F");
 		branch_map["jet__pt"] = (void*)jet__pt;
+		tree->Branch("jet__vtxMass", jet__vtxMass, "jet__vtxMass[n__jet]/F");
+		branch_map["jet__vtxMass"] = (void*)jet__vtxMass;
+		tree->Branch("jet__vtxNtracks", jet__vtxNtracks, "jet__vtxNtracks[n__jet]/I");
+		branch_map["jet__vtxNtracks"] = (void*)jet__vtxNtracks;
+		tree->Branch("jet__vtx3DVal", jet__vtx3DVal, "jet__vtx3DVal[n__jet]/F");
+		branch_map["jet__vtx3DVal"] = (void*)jet__vtx3DVal;
+		tree->Branch("jet__vtx3DSig", jet__vtx3DSig, "jet__vtx3DSig[n__jet]/F");
+		branch_map["jet__vtx3DSig"] = (void*)jet__vtx3DSig;
 		tree->Branch("jet_toptagger__energy", jet_toptagger__energy, "jet_toptagger__energy[n__jet_toptagger]/F");
 		branch_map["jet_toptagger__energy"] = (void*)jet_toptagger__energy;
 		tree->Branch("jet_toptagger__eta", jet_toptagger__eta, "jet_toptagger__eta[n__jet_toptagger]/F");
