@@ -336,11 +336,15 @@ MEIntegratorNew::MEIntegratorNew( string fileName , int param , int verbose ) {
 
     cout << "Begin constructor" << endl;
 
-    //was 0, however LHAPDF seems to have 1-based indexing? TODO: verify with LB
+    //nset (first arg) was 0, however LHAPDF seems to have 1-based indexing?
+    //this just indexes PDFS in the wrapper, has no physical effect. Not clear why LHAPDF low runs and full does not, though
     LHAPDF::initPDFSet(1, "cteq65.LHgrid");
+    cout << "initPDFSet successul" << endl;
 
     clock_ = new TStopwatch();
     ran_ = new TRandom3();
+
+    //TODO: seed fixed to a value?
     ran_->SetSeed(65539);
 
     intType_       = SL2wj;
@@ -402,6 +406,10 @@ MEIntegratorNew::MEIntegratorNew( string fileName , int param , int verbose ) {
     tthPtFormula_        = 0;
 
     TFile* file = TFile::Open(fileName.c_str(),"READ");
+    if(file == 0 || file->IsZombie()) {
+        cerr << "Failed to open transfer functions from file " << fileName << endl;
+        throw;
+    }
     w_ = (RooWorkspace*)file->Get("transferFuntions");
 
     // jets
