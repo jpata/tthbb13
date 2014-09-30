@@ -26,5 +26,5 @@ Code overview
 
 The analysis steps are as follows
 
-1. The step *TTH/TTHNtupleAnalyzer* prepares a simple flat analysis ntuple from miniAOD. The TTree format is specified by the file ``TTH/TTHNtupleAnalyzer/interface/tth_tree.hh``. This is run using CRAB3.
+1. The step *TTH/TTHNtupleAnalyzer* prepares a simple flat analysis ntuple from miniAOD. The TTree format is specified by the file ``TTH/TTHNtupleAnalyzer/interface/tth_tree.hh``. This is run using CRAB3. A sample configuration is in ``TTH/TTHNtupleAnalyzer/test/ttbar_cfg.py``
 2. *TTH/MEAnalysis* calculates the matrix-element related analysis code, operating on the output of *TTH/TTHNtupleAnalyzer*
