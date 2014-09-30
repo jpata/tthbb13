@@ -6,5 +6,5 @@ cmsenv
 git cms-addpkg PhysicsTools/PatAlgos
 #git cms-merge-topic 4330
 git clone https://github.com/jpata/tthbb13.git TTH
-cp TTH/MEAnalysis/libs/*.so CMSSW/lib/$SCRAM_ARCH/
+cp TTH/MEAnalysis/libs/*.so ../lib/$SCRAM_ARCH/
 scram b -j 20
