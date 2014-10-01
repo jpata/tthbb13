@@ -17,7 +17,11 @@ constexpr bool is_undef(double x) { return fabs(x-DEF_VAL_DOUBLE) < DOUBLE_EPS; 
 #define SET_ZERO_2(x,n,y) for(int i=0;i<n;i++) { for(int j=0;j<n;j++) { x[i][j]=y; } }
 class TTHTree {
 public:
-	TTHTree(TTree* _tree);
+	
+    TTHTree(TTree* _tree) {
+        tree = _tree; 
+    };
+
 	TTree* tree;
 	std::map<const std::string, const void*> branch_map;
 	double debug__time1c;
@@ -120,7 +124,7 @@ public:
 	float pvi__n0[N_MAX];
 	float pvi__ntrue[N_MAX];
 	float weight__pu;
-	float weight__pu__up;
+	float weight__pu_up;
 	float weight__pu_down;
 	float weight__trigger;
 	float weight__trigger_down;
@@ -226,7 +230,7 @@ public:
 		SET_ZERO(pvi__n0, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(pvi__ntrue, N_MAX, DEF_VAL_FLOAT);
 		weight__pu = DEF_VAL_FLOAT;
-		weight__pu__up = DEF_VAL_FLOAT;
+		weight__pu_up = DEF_VAL_FLOAT;
 		weight__pu_down = DEF_VAL_FLOAT;
 		weight__trigger = DEF_VAL_FLOAT;
 		weight__trigger_down = DEF_VAL_FLOAT;
@@ -433,8 +437,8 @@ public:
 		branch_map["pvi__ntrue"] = (void*)pvi__ntrue;
 		tree->Branch("weight__pu", &weight__pu, "weight__pu/F");
 		branch_map["weight__pu"] = (void*)&weight__pu;
-		tree->Branch("weight__pu__up", &weight__pu__up, "weight__pu__up/F");
-		branch_map["weight__pu__up"] = (void*)&weight__pu__up;
+		tree->Branch("weight__pu_up", &weight__pu_up, "weight__pu_up/F");
+		branch_map["weight__pu_up"] = (void*)&weight__pu_up;
 		tree->Branch("weight__pu_down", &weight__pu_down, "weight__pu_down/F");
 		branch_map["weight__pu_down"] = (void*)&weight__pu_down;
 		tree->Branch("weight__trigger", &weight__trigger, "weight__trigger/F");
