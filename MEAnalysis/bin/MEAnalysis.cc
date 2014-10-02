@@ -81,6 +81,9 @@
 #define ENABLE_MM   1
 #define ENABLE_JJ   0
 
+//Name of the input TTree
+#define TTH_TTREE_NAME "tthNtupleAnalyzer/events"
+
 using namespace std;
 
 //version numbering scheme according to CMSSW version major and minor version.
@@ -168,6 +171,7 @@ int main(int argc, const char* argv[])
 
     const int   triggerErrors      ( in.getUntrackedParameter<int>    ("triggerErrors",    0));
 
+    //FIXME: what are these
     const string pathTo_f_Vtype1_id  ( in.getParameter<std::string>     ("pathTo_f_Vtype1_id") );
     const string pathTo_f_Vtype1L1_tr( in.getParameter<std::string>     ("pathTo_f_Vtype1L1_tr") );
     const string pathTo_f_Vtype1L2_tr( in.getParameter<std::string>     ("pathTo_f_Vtype1L2_tr") );
@@ -455,12 +459,15 @@ int main(int argc, const char* argv[])
 
     // configure MEIntegrator
     MEIntegratorNew* meIntegrator = new MEIntegratorNew( pathToTF , 4 , int(verbose));
-    if( norm == 0)
+    if( norm == 0) {
         meIntegrator->setWeightNorm( MEIntegratorNew::None );
-    else if( norm==1 )
+    }
+    else if( norm==1 ) {
         meIntegrator->setWeightNorm( MEIntegratorNew::xSec );
-    else if( norm==2 )
+    }
+    else if( norm==2 ) {
         meIntegrator->setWeightNorm( MEIntegratorNew::Acc );
+    }
     else {
         cout << "Unsupported normalization... exit" << endl;
         delete meIntegrator;
@@ -535,9 +542,9 @@ int main(int argc, const char* argv[])
     for( int pin = 0; pin < n_untr_param ; pin++ ) {
         hparam->GetXaxis()->SetBinLabel  ( pin+1, params[pin].c_str() );
         if(in.existsAs<double>( params[pin], false ) )
-            hparam->SetBinContent( pin+1, in.getUntrackedParameter<double>( params[pin], -99. ) );
+            hparam->SetBinContent( pin+1, in.getUntrackedParameter<double>( params[pin], DEF_VAL_FLOAT ) );
         else if(in.existsAs<int>( params[pin], false ) )
-            hparam->SetBinContent( pin+1, in.getUntrackedParameter<int>   ( params[pin], -99  ) );
+            hparam->SetBinContent( pin+1, in.getUntrackedParameter<int>   ( params[pin], DEF_VAL_FLOAT  ) );
         else {}
     }
     hparam->SetBinContent            ( n_untr_param+1,  (in.getParameter<vector<int> >("evLimits"))[0]   );
@@ -610,7 +617,7 @@ int main(int argc, const char* argv[])
     // open first sample for b-energy regression => get pointer to the tree
     string currentName0     = mySampleFiles[0];
     mySamples->OpenFile( currentName0 );
-    TTree* currentTree_reg  = mySamples->GetTree( currentName0, "tree");
+    TTree* currentTree_reg  = mySamples->GetTree( currentName0, TTH_TTREE_NAME);
 
     // loop over input files
     for(unsigned int sample = 0 ; sample < mySampleFiles.size(); sample++) {
@@ -621,218 +628,34 @@ int main(int argc, const char* argv[])
 
         mySamples->OpenFile( currentName );
         cout << "Opening file " << currentName << endl;
-        TTree* currentTree       = mySamples->GetTree  (currentName, "tree");
+        TTree* currentTree       = mySamples->GetTree  (currentName, TTH_TTREE_NAME);
         TTHTree* itree = new TTHTree(currentTree);
 
         float scaleFactor        = mySamples->GetWeight(currentName);
 
         //FIXME: insert into ntuples 
-        TH1F* count_Q2           = mySamples->GetHisto (currentName, "Count_Q2");
-        
-        const float normDown           = count_Q2 ? count_Q2->GetBinContent(1)/count_Q2->GetBinContent(2) : 1.0;
-        const float normUp             = count_Q2 ? count_Q2->GetBinContent(3)/count_Q2->GetBinContent(2) : 1.0;
+        //TH1F* count_Q2           = mySamples->GetHisto (currentName, "Count_Q2");
+       
+        //FIXME: unused?
+        //const float normDown           = count_Q2 ? count_Q2->GetBinContent(1)/count_Q2->GetBinContent(2) : 1.0;
+        //const float normUp             = count_Q2 ? count_Q2->GetBinContent(3)/count_Q2->GetBinContent(2) : 1.0;
         
         cout << "Done!!" << endl;
        
         //FIXME: insert this into input ntuples
         int Vtype = 0, nSimBs = 0; 
-        UChar_t         triggerFlags[70];
-        genTopInfo      genTop, genTbar;
-        genParticleInfo genB, genBbar;
+        UChar_t triggerFlags[70];
+       
+        //initialize empty structs
+        genTopInfo genTop = {};
+        genTopInfo genTbar = {};
+        genParticleInfo genB = {};
+        genParticleInfo genBbar = {};
+
         float SimBsmass           [999];
         float SimBspt             [999];
         float SimBseta            [999];
         float SimBsphi            [999];
-
-        //// variables to be used from the input files
-        //genParticleInfo genB, genBbar;
-        //genTopInfo      genTop, genTbar;
-        //metInfo         METtype1p2corr;
-        //EventInfo       EVENT;
-        //int             nvlep, nalep, nSimBs, nhJets, naJets, nPVs, Vtype;
-        //float           PUweight, PUweightP, PUweightM;
-        //float           itree->lhe__n_j;
-        //float           weightTrig2012;
-        //UChar_t         triggerFlags[70];
-        //float           SCALEsyst[12];
-
-        //Int_t   vLepton_type      [2];
-        //Float_t vLepton_mass      [2];
-        //Float_t vLepton_pt        [2];
-        //Float_t vLepton_eta       [2];
-        //Float_t vLepton_phi       [2];
-        //Float_t vLepton_genPt     [2];
-        //Float_t vLepton_genEta    [2];
-        //Float_t vLepton_genPhi    [2];
-        //Float_t vLepton_charge    [2];
-        //Float_t vLepton_pfCorrIso [2];
-        //Float_t vLepton_wp80      [2];
-        //Float_t vLepton_wp95      [2];
-        //Float_t vLepton_wp70      [2];
-        //Float_t vLepton_idMVAtrig [2];
-
-        //Float_t vLepton_dxy       [2];
-        //Float_t vLepton_dz        [2];
-        ////Float_t vLepton_id2012tight[2];
-
-        //Int_t   aLepton_type      [999];
-        //Float_t aLepton_mass      [999];
-        //Float_t aLepton_pt        [999];
-        //Float_t aLepton_eta       [999];
-        //Float_t aLepton_phi       [999];
-        //Float_t aLepton_genPt     [999];
-        //Float_t aLepton_genEta    [999];
-        //Float_t aLepton_genPhi    [999];
-        //Float_t aLepton_charge    [999];
-        //Float_t aLepton_pfCorrIso [999];
-        //Float_t aLepton_wp80      [999];
-        //Float_t aLepton_wp95      [999];
-        //Float_t aLepton_dxy       [999];
-        //Float_t aLepton_dz        [999];
-        ////Float_t aLepton_id2012tight[999];
-
-        //Float_t hJet_pt           [999];
-        //Float_t hJet_eta          [999];
-        //Float_t hJet_phi          [999];
-        //Float_t hJet_e            [999];
-        //Float_t hJet_flavour      [999];
-        //Float_t hJet_puJetIdL     [999];
-        //UChar_t hJet_id           [999];
-        //Float_t hJet_csv          [999];
-        //Float_t hJet_cmva         [999];
-        //Float_t hJet_csv_nominal  [999];
-        //Float_t hJet_csv_upBC     [999];
-        //Float_t hJet_csv_downBC   [999];
-        //Float_t hJet_csv_upL      [999];
-        //Float_t hJet_csv_downL    [999];
-        //Float_t hJet_JECUnc       [999];
-        //Float_t hJet_genPt        [999];
-        //Float_t hJet_genEta       [999];
-        //Float_t hJet_genPhi       [999];
-        //Float_t aJet_pt           [999];
-        //Float_t aJet_eta          [999];
-        //Float_t aJet_phi          [999];
-        //Float_t aJet_e            [999];
-        //Float_t aJet_flavour      [999];
-        //Float_t aJet_puJetIdL     [999];
-        //UChar_t aJet_id           [999];
-        //Float_t aJet_csv          [999];
-        //Float_t aJet_cmva         [999];
-        //Float_t aJet_csv_nominal  [999];
-        //Float_t aJet_csv_upBC     [999];
-        //Float_t aJet_csv_downBC   [999];
-        //Float_t aJet_csv_upL      [999];
-        //Float_t aJet_csv_downL    [999];
-        //Float_t aJet_JECUnc       [999];
-        //Float_t aJet_genPt        [999];
-        //Float_t aJet_genEta       [999];
-        //Float_t aJet_genPhi       [999];
-        //float SimBsmass           [999];
-        //float SimBspt             [999];
-        //float SimBseta            [999];
-        //float SimBsphi            [999];
-
-        ////if( currentTree->GetBranch("") )
-
-        //currentTree->SetBranchAddress("EVENT",            &EVENT);
-        //if   ( currentTree->GetBranch("PUweight") )       currentTree->SetBranchAddress("PUweight",         &PUweight);
-        //if   ( currentTree->GetBranch("PUweightP") )      currentTree->SetBranchAddress("PUweightP",        &PUweightP);
-        //if   ( currentTree->GetBranch("PUweightM") )      currentTree->SetBranchAddress("PUweightM",        &PUweightM);
-        //if   ( currentTree->GetBranch("lheNj") )          currentTree->SetBranchAddress("lheNj",            &lheNj);
-        //if   ( currentTree->GetBranch("weightTrig2012") ) currentTree->SetBranchAddress("weightTrig2012",   &weightTrig2012);
-        //if   ( currentTree->GetBranch("triggerFlags") )   currentTree->SetBranchAddress("triggerFlags",     triggerFlags);
-        //if   ( currentTree->GetBranch("SCALEsyst") )      currentTree->SetBranchAddress("SCALEsyst",        SCALEsyst);
-        //currentTree->SetBranchAddress("Vtype",            &Vtype);
-        //if   ( currentTree->GetBranch("nhJets") )         currentTree->SetBranchAddress("nhJets",           &nhJets);
-        //currentTree->SetBranchAddress("naJets",           &naJets);
-        //currentTree->SetBranchAddress("nSimBs",           &nSimBs);
-        //currentTree->SetBranchAddress("nvlep",            &nvlep);
-        //currentTree->SetBranchAddress("nalep",            &nalep);
-        //if   ( currentTree->GetBranch("nPVs") )           currentTree->SetBranchAddress("nPVs",             &nPVs);
-        //currentTree->SetBranchAddress("genB",             &genB);
-        //currentTree->SetBranchAddress("genBbar",          &genBbar);
-        //currentTree->SetBranchAddress("genTop",           &genTop);
-        //currentTree->SetBranchAddress("genTbar",          &genTbar);
-        //currentTree->SetBranchAddress("METtype1p2corr",   &METtype1p2corr);
-        //currentTree->SetBranchAddress("vLepton_charge",   vLepton_charge);
-        //currentTree->SetBranchAddress("vLepton_mass"  ,   vLepton_mass);
-        //currentTree->SetBranchAddress("vLepton_pt"    ,   vLepton_pt);
-        //currentTree->SetBranchAddress("vLepton_eta"   ,   vLepton_eta);
-        //currentTree->SetBranchAddress("vLepton_phi"   ,   vLepton_phi);
-        //currentTree->SetBranchAddress("vLepton_genPt" ,   vLepton_genPt);
-        //currentTree->SetBranchAddress("vLepton_genEta",   vLepton_genEta);
-        //currentTree->SetBranchAddress("vLepton_genPhi",   vLepton_genPhi);
-        //currentTree->SetBranchAddress("vLepton_charge",   vLepton_charge);
-        //currentTree->SetBranchAddress("vLepton_pfCorrIso",vLepton_pfCorrIso);
-        //currentTree->SetBranchAddress("vLepton_type",     vLepton_type);
-        //currentTree->SetBranchAddress("vLepton_wp80",     vLepton_wp80);
-        //currentTree->SetBranchAddress("vLepton_wp95",     vLepton_wp95);
-        //currentTree->SetBranchAddress("vLepton_wp70",     vLepton_wp70);
-        //currentTree->SetBranchAddress("vLepton_idMVAtrig", vLepton_idMVAtrig);
-
-        //currentTree->SetBranchAddress("vLepton_dxy",      vLepton_dxy);
-        //currentTree->SetBranchAddress("vLepton_dz",       vLepton_dz);
-        ////currentTree->SetBranchAddress("vLepton_id2012tight",vLepton_id2012tight);
-        //currentTree->SetBranchAddress("aLepton_charge",   aLepton_charge);
-        //currentTree->SetBranchAddress("aLepton_mass"  ,   aLepton_mass);
-        //currentTree->SetBranchAddress("aLepton_pt"    ,   aLepton_pt);
-        //currentTree->SetBranchAddress("aLepton_eta"   ,   aLepton_eta);
-        //currentTree->SetBranchAddress("aLepton_phi"   ,   aLepton_phi);
-        //currentTree->SetBranchAddress("aLepton_genPt" ,   aLepton_genPt);
-        //currentTree->SetBranchAddress("aLepton_genEta",   aLepton_genEta);
-        //currentTree->SetBranchAddress("aLepton_genPhi",   aLepton_genPhi);
-        //currentTree->SetBranchAddress("aLepton_charge",   aLepton_charge);
-        //currentTree->SetBranchAddress("aLepton_pfCorrIso",aLepton_pfCorrIso);
-        //currentTree->SetBranchAddress("aLepton_type",     aLepton_type);
-        //currentTree->SetBranchAddress("aLepton_wp80",     aLepton_wp80);
-        //currentTree->SetBranchAddress("aLepton_wp95",     aLepton_wp95);
-        //currentTree->SetBranchAddress("aLepton_dxy",      aLepton_dxy);
-        //currentTree->SetBranchAddress("aLepton_dz",       aLepton_dz);
-        ////currentTree->SetBranchAddress("aLepton_id2012tight",aLepton_id2012tight);
-
-        //if( currentTree->GetBranch("hJet_pt") ) {
-        //    currentTree->SetBranchAddress("hJet_pt",          hJet_pt);
-        //    currentTree->SetBranchAddress("hJet_eta",         hJet_eta);
-        //    currentTree->SetBranchAddress("hJet_phi",         hJet_phi);
-        //    currentTree->SetBranchAddress("hJet_e",           hJet_e);
-        //    currentTree->SetBranchAddress("hJet_flavour",     hJet_flavour);
-        //    currentTree->SetBranchAddress("hJet_puJetIdL",    hJet_puJetIdL);
-        //    currentTree->SetBranchAddress("hJet_id",          hJet_id);
-        //    currentTree->SetBranchAddress("hJet_csv",         hJet_csv);
-        //    currentTree->SetBranchAddress("hJet_cmva",        hJet_cmva);
-        //    currentTree->SetBranchAddress("hJet_csv_nominal", hJet_csv_nominal);
-        //    currentTree->SetBranchAddress("hJet_csv_upBC",    hJet_csv_upBC);
-        //    currentTree->SetBranchAddress("hJet_csv_downBC",  hJet_csv_downBC);
-        //    currentTree->SetBranchAddress("hJet_csv_upL",     hJet_csv_upL);
-        //    currentTree->SetBranchAddress("hJet_csv_downL",   hJet_csv_downL);
-        //    currentTree->SetBranchAddress("hJet_JECUnc",      hJet_JECUnc);
-        //    currentTree->SetBranchAddress("hJet_genPt",       hJet_genPt);
-        //    currentTree->SetBranchAddress("hJet_genEta",      hJet_genEta);
-        //    currentTree->SetBranchAddress("hJet_genPhi",      hJet_genPhi);
-        //}
-        //currentTree->SetBranchAddress("aJet_pt",          aJet_pt);
-        //currentTree->SetBranchAddress("aJet_eta",         aJet_eta);
-        //currentTree->SetBranchAddress("aJet_phi",         aJet_phi);
-        //currentTree->SetBranchAddress("aJet_e",           aJet_e);
-        //currentTree->SetBranchAddress("aJet_flavour",     aJet_flavour);
-        //currentTree->SetBranchAddress("aJet_puJetIdL",    aJet_puJetIdL);
-        //currentTree->SetBranchAddress("aJet_id",          aJet_id);
-        //currentTree->SetBranchAddress("aJet_csv",         aJet_csv);
-        //if( currentTree->GetBranch("aJet_cmva") )
-        //    currentTree->SetBranchAddress("aJet_cmva",      aJet_cmva);
-        //currentTree->SetBranchAddress("aJet_csv_nominal", aJet_csv_nominal);
-        //currentTree->SetBranchAddress("aJet_csv_upBC",    aJet_csv_upBC);
-        //currentTree->SetBranchAddress("aJet_csv_downBC",  aJet_csv_downBC);
-        //currentTree->SetBranchAddress("aJet_csv_upL",     aJet_csv_upL);
-        //currentTree->SetBranchAddress("aJet_csv_downL",   aJet_csv_downL);
-        //currentTree->SetBranchAddress("aJet_JECUnc",      aJet_JECUnc);
-        //currentTree->SetBranchAddress("aJet_genPt",       aJet_genPt);
-        //currentTree->SetBranchAddress("aJet_genEta",      aJet_genEta);
-        //currentTree->SetBranchAddress("aJet_genPhi",      aJet_genPhi);
-        //currentTree->SetBranchAddress("SimBs_mass",       SimBsmass);
-        //currentTree->SetBranchAddress("SimBs_pt",         SimBspt);
-        //currentTree->SetBranchAddress("SimBs_eta",        SimBseta);
-        //currentTree->SetBranchAddress("SimBs_phi",        SimBsphi);
 
         /* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  */
         /* @@@@@@@@@@@@@@@@@@@@@@@@@ EVENT LOOP @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  */
@@ -876,14 +699,15 @@ int main(int argc, const char* argv[])
                 otree->SCALEsyst_[k] = 1.0;
             }
             
-            //FIXME: setting the value of inputs? 
+            //FIXME: setting the value of inputs? I guess it is resetting, right?
             //nhJets = 0;
             //nPVs   = 1;
 
 
+            // initialize branch variables
+            itree->loop_initialize();
             // read event...
             currentTree->GetEntry(i);
-
 
             if( debug>=2 ) {
                 cout << endl;
@@ -907,12 +731,12 @@ int main(int argc, const char* argv[])
             otree->EVENT_.event        = itree->event__id;
             otree->EVENT_.json         = itree->event__json;
 
-            otree->PUweight_           = PUweight;
-            otree->PUweightP_          = PUweightP;
-            otree->PUweightM_          = PUweightM;
+            otree->PUweight_           = itree->weight__pu;
+            otree->PUweightP_          = itree->weight__pu_up;
+            otree->PUweightM_          = itree->weight__pu_down;
 
             //get the madgraph generator product information
-            //FIXME: what is this SCALEsyst
+            //FIXME: what is this SCALEsyst, is it correct to take from LHE?
             otree->lheNj_              = itree->lhe__n_j;
             otree->n_b_                = itree->lhe__n_b;
             otree->n_c_                = itree->lhe__n_c;
@@ -933,11 +757,12 @@ int main(int argc, const char* argv[])
                 otree->triggerFlags_[k] = triggerFlags[k];
             }
 
-            otree->SCALEsyst_[0] = 1.0;
-            if( count_Q2 ) {
-                otree->SCALEsyst_[1] = TMath::Power(SCALEsyst[2],SCALEsyst[1])*SCALEsyst[4]/normDown;
-                otree->SCALEsyst_[2] = TMath::Power(SCALEsyst[3],SCALEsyst[1])*SCALEsyst[5]/normUp;
-            }
+            //FIXME: where to get this scalesyst
+            //otree->SCALEsyst_[0] = 1.0;
+            //if( count_Q2 ) {
+            //    otree->SCALEsyst_[1] = TMath::Power(SCALEsyst[2],SCALEsyst[1])*SCALEsyst[4]/normDown;
+            //    otree->SCALEsyst_[2] = TMath::Power(SCALEsyst[3],SCALEsyst[1])*SCALEsyst[5]/normUp;
+            //}
 
             otree->probAtSgn_          =  0.;
             otree->probAtSgn_alt_      =  0.;
@@ -949,46 +774,47 @@ int main(int argc, const char* argv[])
             otree->probAtSgn_alt_ttjj_ =  0.;
 
             otree->nMassPoints_        = TMath::Max(nHiggsMassPoints,nTopMassPoints);
-            otree->flag_type0_         = -99;
-            otree->flag_type1_         = -99;
-            otree->flag_type2_         = -99;
-            otree->flag_type3_         = -99;
-            otree->flag_type4_         = -99;
-            otree->flag_type6_         = -99;
+            otree->flag_type0_         = DEF_VAL_INT;
+            otree->flag_type1_         = DEF_VAL_INT;
+            otree->flag_type2_         = DEF_VAL_INT;
+            otree->flag_type3_         = DEF_VAL_INT;
+            otree->flag_type4_         = DEF_VAL_INT;
+            otree->flag_type6_         = DEF_VAL_INT;
 
-            otree->btag_LR_            = -99;
+            otree->btag_LR_            = DEF_VAL_INT;
 
-            for( int k = 0; k < 2; k++) {
-                otree->lepton_pt_[k] = -99;
-                otree->lepton_eta_[k] = -99;
-                otree->lepton_phi_[k] = -99;
-                otree->lepton_m_[k] = -99;
-                otree->lepton_charge_[k] = -99;
-                otree->lepton_rIso_[k] = -99;
-                otree->lepton_type_[k] = -99;
-                otree->lepton_dxy_[k] = -99;
-                otree->lepton_dz_[k] = -99;
-                otree->lepton_wp80_[k] = -99;
-                otree->lepton_wp70_[k] = -99;
-                otree->lepton_wp95_[k] = -99;
-                otree->lepton_MVAtrig_[k] = -99;
+            for( int k = 0; k < NMAXLEPTONS; k++) {
+                otree->lepton_pt_[k]        = DEF_VAL_FLOAT;
+                otree->lepton_eta_[k]       = DEF_VAL_FLOAT;
+                otree->lepton_phi_[k]       = DEF_VAL_FLOAT;
+                otree->lepton_m_[k]         = DEF_VAL_FLOAT;
+                otree->lepton_charge_[k]    = DEF_VAL_FLOAT;
+                otree->lepton_rIso_[k]      = DEF_VAL_FLOAT;
+                otree->lepton_type_[k]      = DEF_VAL_FLOAT;
+                otree->lepton_dxy_[k]       = DEF_VAL_FLOAT;
+                otree->lepton_dz_[k]        = DEF_VAL_FLOAT;
+                otree->lepton_wp80_[k]      = DEF_VAL_FLOAT;
+                otree->lepton_wp70_[k]      = DEF_VAL_FLOAT;
+                otree->lepton_wp95_[k]      = DEF_VAL_FLOAT;
+                otree->lepton_MVAtrig_[k]   = DEF_VAL_FLOAT;
             }
-            otree->Mll_  = -99.;
-            otree->MTln_ = -99.;
+
+            otree->Mll_  = DEF_VAL_FLOAT;
+            otree->MTln_ = DEF_VAL_FLOAT;
 
             for( int k = 0; k < NMAXJETS; k++) {
-                otree->jet_pt_[k] = -99;
-                otree->jet_pt_alt_[k] = -99;
-                otree->jet_eta_[k] = -99;
-                otree->jet_phi_[k] = -99;
-                otree->jet_m_[k] = -99;
-                otree->jet_csv_[k] = -99;
+                otree->jet_pt_[k] = DEF_VAL_FLOAT;
+                otree->jet_pt_alt_[k] = DEF_VAL_FLOAT;
+                otree->jet_eta_[k] = DEF_VAL_FLOAT;
+                otree->jet_phi_[k] = DEF_VAL_FLOAT;
+                otree->jet_m_[k] = DEF_VAL_FLOAT;
+                otree->jet_csv_[k] = DEF_VAL_FLOAT;
             }
             for( int k = 0; k < NMAXPERMUT; k++) {
-                otree->perm_to_jet_    [k] = -99;
-                otree->perm_to_gen_    [k] = -99;
-                otree->perm_to_jet_alt_[k] = -99;
-                otree->perm_to_gen_alt_[k] = -99;
+                otree->perm_to_jet_    [k] = DEF_VAL_INT;
+                otree->perm_to_gen_    [k] = DEF_VAL_INT;
+                otree->perm_to_jet_alt_[k] = DEF_VAL_INT;
+                otree->perm_to_gen_alt_[k] = DEF_VAL_INT;
             }
 
             // save the values into the tree (save mH[0] in case no scan is required)
@@ -1001,9 +827,9 @@ int main(int argc, const char* argv[])
 
             // reset the gen top/Higgs 4-vector
             for(int elem=0; elem<4; elem++) {
-                otree->p4T_   [elem] = -99.;
-                otree->p4Tbar_[elem] = -99.;
-                otree->p4H_   [elem] = -99.;
+                otree->p4T_   [elem] = DEF_VAL_FLOAT;
+                otree->p4Tbar_[elem] = DEF_VAL_FLOAT;
+                otree->p4H_   [elem] = DEF_VAL_FLOAT;
             }
             otree->ttH_.reset();
 
@@ -1011,12 +837,12 @@ int main(int argc, const char* argv[])
             otree->nJet_ = 8;
             for(int q = 0; q < otree->nJet_ ; q++ ) {
                 // kinematics
-                otree->jet_pt_     [q] = -99;
-                otree->jet_pt_alt_ [q] = -99;
-                otree->jet_eta_    [q] = -99;
-                otree->jet_phi_    [q] = -99;
-                otree->jet_m_      [q] = -99;
-                otree->jet_csv_    [q] = -99;
+                otree->jet_pt_     [q] = DEF_VAL_FLOAT;
+                otree->jet_pt_alt_ [q] = DEF_VAL_FLOAT;
+                otree->jet_eta_    [q] = DEF_VAL_FLOAT;
+                otree->jet_phi_    [q] = DEF_VAL_FLOAT;
+                otree->jet_m_      [q] = DEF_VAL_FLOAT;
+                otree->jet_csv_    [q] = DEF_VAL_FLOAT;
             }
             otree->hJetAmong_    = 0;
             otree->jetsAboveCut_ = 0;
@@ -1060,8 +886,6 @@ int main(int argc, const char* argv[])
 
             /* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  */
             /* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ GEN PARTICLES @@@@@@@@@@@@@@@@@@@@@@@@@@  */
-
-
 
             // read top decay products from input files
             TLorentzVector topBLV   (1,0,0,1);
@@ -1348,7 +1172,7 @@ int main(int argc, const char* argv[])
                     if( hJLV.Pt()>20 && TMath::Abs(hJLV.Eta())<5 && deltaR(Bs, hJLV)<0.5 ) otree->nMatchSimBsOld_++;
                 }
                 
-                //FIXME:
+                //FIXME: all jets now in the same vector
                 //for(int aj = 0; aj<naJets; aj++) {
                 //    TLorentzVector aJLV(1,0,0,1);
                 //    if(aJet_genPt[aj]>10)
@@ -1372,120 +1196,78 @@ int main(int argc, const char* argv[])
                 }
             }
 
-
+            auto vec_from_jet = [&itree] (const int nj) {
+                TLorentzVector hJLV(1,0,0,1);
+                hJLV.SetPtEtaPhiM( itree->gen_jet__pt[nj], itree->gen_jet__eta[nj], itree->gen_jet__phi[nj], 0.0);
+                return hJLV;
+            };
 
             // now find out how many matched b's we have...
             for(int hj = 0; hj<itree->n__jet; hj++) {
-                TLorentzVector hJLV(1,0,0,1);
-                if(hJet_genPt[hj]>10)
-                    hJLV.SetPtEtaPhiM( hJet_genPt[hj], hJet_genEta[hj], hJet_genPhi[hj], 0.0);
+                
+                //TLorentzVector hJLV(1,0,0,1);
+                //if(itree->jet__pt[hj]>10)
+                //    hJLV.SetPtEtaPhiM( itree->gen_jet__pt[hj], itree->gen_jet__eta[hj], itree->gen_jet__phi[hj], 0.0);
+                TLorentzVector hJLV = vec_from_jet(hj);
 
                 // if jet is within acceptance...
-                if( hJLV.Pt()>20 && TMath::Abs(hJLV.Eta())<5 ) {
-                    if( topBLV.Pt()>10 && deltaR(topBLV, hJLV )<0.5 ) continue;
-                    if(atopBLV.Pt()>10 && deltaR(atopBLV,hJLV )<0.5 ) continue;
-                    if( abs(hJet_flavour[hj])==5 ) otree->nMatchSimBs_v1_++;
+                if( hJLV.Pt() > 20 && TMath::Abs(hJLV.Eta()) < 5 ) {
+                    if( topBLV.Pt() > 10 && deltaR(topBLV, hJLV ) < 0.5 ) continue;
+                    if(atopBLV.Pt() > 10 && deltaR(atopBLV, hJLV ) < 0.5 ) continue;
+                    if( abs(itree->jet__id[hj])==5 ) otree->nMatchSimBs_v1_++;
                 }
 
-                if( hJLV.Pt()>20 && TMath::Abs(hJLV.Eta())<2.5 ) {
-                    if( topBLV.Pt()>10 && deltaR(topBLV, hJLV )<0.5 ) continue;
-                    if(atopBLV.Pt()>10 && deltaR(atopBLV,hJLV )<0.5 ) continue;
-                    if( abs(hJet_flavour[hj])==5 ) otree->nMatchSimBs_v2_++;
+                if( hJLV.Pt() > 20 && TMath::Abs(hJLV.Eta()) < 2.5 ) {
+                    if( topBLV.Pt() > 10 && deltaR(topBLV, hJLV ) < 0.5 ) continue;
+                    if(atopBLV.Pt() > 10 && deltaR(atopBLV,hJLV ) < 0.5 ) continue;
+                    if( abs(itree->jet__id[hj])==5 ) otree->nMatchSimBs_v2_++;
                 }
-
-                if( hJet_pt[hj]>30 && hJLV.Pt()>20 && TMath::Abs(hJLV.Eta())<2.5 ) {
+                
+                //FIXME: Why 2 Pt checks?
+                //if( itree->jet__pt[hj]>30 && hJLV.Pt()>20 && TMath::Abs(hJLV.Eta())<2.5 ) {
+                if( hJLV[hj]>30 && hJLV.Pt()>20 && TMath::Abs(hJLV.Eta())<2.5 ) {
                     if( topBLV.Pt()>10 && deltaR(topBLV, hJLV )<0.5 ) continue;
                     if(atopBLV.Pt()>10 && deltaR(atopBLV,hJLV )<0.5 ) continue;
-                    if( abs(hJet_flavour[hj])==5 ) otree->nMatchSimBs_++; //baseline
+                    if( abs(itree->jet__id[hj])==5 ) otree->nMatchSimBs_++; //baseline
                 }
 
             }
-            for(int aj = 0; aj<naJets; aj++) {
-                TLorentzVector aJLV(1,0,0,1);
-                if(aJet_genPt[aj]>10)
-                    aJLV.SetPtEtaPhiM( aJet_genPt[aj], aJet_genEta[aj], aJet_genPhi[aj], 0.0);
-
-                // if jet is within acceptance...
-                if( aJLV.Pt()>20 && TMath::Abs(aJLV.Eta())<5 ) {
-                    if( topBLV.Pt()>10 && deltaR(topBLV, aJLV )<0.5 ) continue;
-                    if(atopBLV.Pt()>10 && deltaR(atopBLV,aJLV )<0.5 ) continue;
-                    if( abs(aJet_flavour[aj])==5 ) otree->nMatchSimBs_v1_++;
-                }
-
-                if( aJLV.Pt()>20 && TMath::Abs(aJLV.Eta())<2.5 ) {
-                    if( topBLV.Pt()>10 && deltaR(topBLV, aJLV )<0.5 ) continue;
-                    if(atopBLV.Pt()>10 && deltaR(atopBLV,aJLV )<0.5 ) continue;
-                    if( abs(aJet_flavour[aj])==5 ) otree->nMatchSimBs_v2_++;
-                }
-
-                if( aJet_pt[aj]>30 && aJLV.Pt()>20 && TMath::Abs(aJLV.Eta())<2.5 ) {
-                    if( topBLV.Pt()>10 && deltaR(topBLV, aJLV )<0.5 ) continue;
-                    if(atopBLV.Pt()>10 && deltaR(atopBLV,aJLV )<0.5 ) continue;
-                    if( abs(aJet_flavour[aj])==5 ) otree->nMatchSimBs_++;
-                }
-
-            }
-
 
             // now find out how many matched c's we have...
             for(int hj = 0; hj<itree->n__jet; hj++) {
-                TLorentzVector hJLV(1,0,0,1);
-                if(hJet_genPt[hj]>10)
-                    hJLV.SetPtEtaPhiM( hJet_genPt[hj], hJet_genEta[hj], hJet_genPhi[hj], 0.0);
+                //TLorentzVector hJLV(1,0,0,1);
+                //if(itree->gen_jet__pt[hj]>10)
+                //    hJLV.SetPtEtaPhiM( itree->gen_jet__pt[hj], itree->gen_jet__eta[hj], itree->gen_jet__phi[hj], 0.0);
+                TLorentzVector hJLV = vec_from_jet(hj);
 
                 // if jet is within acceptance...
                 if( hJLV.Pt()>20 && TMath::Abs(hJLV.Eta())<5 ) {
                     if( topCLV.Pt()>10 && deltaR(topCLV, hJLV )<0.5 ) continue;
                     if(atopCLV.Pt()>10 && deltaR(atopCLV,hJLV )<0.5 ) continue;
-                    if( abs(hJet_flavour[hj])==4 ) otree->nMatchSimCs_v1_++;
+                    if( abs(itree->jet__id[hj])==4 ) otree->nMatchSimCs_v1_++;
                 }
 
                 if( hJLV.Pt()>20 && TMath::Abs(hJLV.Eta())<2.5 ) {
                     if( topCLV.Pt()>10 && deltaR(topCLV, hJLV )<0.5 ) continue;
                     if(atopCLV.Pt()>10 && deltaR(atopCLV,hJLV )<0.5 ) continue;
-                    if( abs(hJet_flavour[hj])==4 ) otree->nMatchSimCs_v2_++;
+                    if( abs(itree->jet__id[hj])==4 ) otree->nMatchSimCs_v2_++;
                 }
 
-                if( hJet_pt[hj]>30 && hJLV.Pt()>20 && TMath::Abs(hJLV.Eta())<2.5 ) {
+                //FIXME: Why 2 Pt checks?
+                //if( itree->jet__pt[hj]>30 && hJLV.Pt()>20 && TMath::Abs(hJLV.Eta())<2.5 ) {
+                if( hJLV[hj]>30 && hJLV.Pt()>20 && TMath::Abs(hJLV.Eta())<2.5 ) {
                     if( topCLV.Pt()>10 && deltaR(topCLV, hJLV )<0.5 ) continue;
                     if(atopCLV.Pt()>10 && deltaR(atopCLV,hJLV )<0.5 ) continue;
-                    if( abs(hJet_flavour[hj])==4 ) otree->nMatchSimCs_++;
+                    if( abs(itree->jet__id[hj])==4 ) otree->nMatchSimCs_++;
                 }
 
             }
-            for(int aj = 0; aj<naJets; aj++) {
-                TLorentzVector aJLV(1,0,0,1);
-                if(aJet_genPt[aj]>10)
-                    aJLV.SetPtEtaPhiM( aJet_genPt[aj], aJet_genEta[aj], aJet_genPhi[aj], 0.0);
-
-                // if jet is within acceptance...
-                if( aJLV.Pt()>20 && TMath::Abs(aJLV.Eta())<5 ) {
-                    if( topCLV.Pt()>10 && deltaR(topCLV, aJLV )<0.5 ) continue;
-                    if(atopCLV.Pt()>10 && deltaR(atopCLV,aJLV )<0.5 ) continue;
-                    if( abs(aJet_flavour[aj])==4 ) otree->nMatchSimCs_v1_++;
-                }
-
-                if( aJLV.Pt()>20 && TMath::Abs(aJLV.Eta())<2.5 ) {
-                    if( topCLV.Pt()>10 && deltaR(topCLV, aJLV )<0.5 ) continue;
-                    if(atopCLV.Pt()>10 && deltaR(atopCLV,aJLV )<0.5 ) continue;
-                    if( abs(aJet_flavour[aj])==4 ) otree->nMatchSimCs_v2_++;
-                }
-
-                if( aJet_pt[aj]>30 && aJLV.Pt()>20 && TMath::Abs(aJLV.Eta())<2.5 ) {
-                    if( topCLV.Pt()>10 && deltaR(topCLV, aJLV )<0.5 ) continue;
-                    if(atopCLV.Pt()>10 && deltaR(atopCLV,aJLV )<0.5 ) continue;
-                    if( abs(aJet_flavour[aj])==4 ) otree->nMatchSimCs_++;
-                }
-
-            }
-
-
-
 
             if(debug>=2) cout << "@H" << endl;
 
             int lock          = 0;
-            int trial_success = 0;
+            
+            //int trial_success = 0;
 
             // loop over systematics
             for( unsigned int syst = 0; syst < systematics.size() ; syst++) {
@@ -1542,6 +1324,10 @@ int main(int argc, const char* argv[])
                 //count the number of loose leptons (muons or electrons) in the event
                 int numLooseLep = 0;
 
+                //FIXME: could be renamed
+                int numLooseAElec = 0;
+                int loose_ele_idx    = DEF_VAL_INT;
+
                 for( int k = 0; k < itree->n__lep ; k++) {
 
                     float lep_pt   = itree->lep__pt[k];
@@ -1555,41 +1341,28 @@ int main(int argc, const char* argv[])
                         // muons
                         (lep_type==13 && lep_pt > lepPtLoose && TMath::Abs(lep_eta)<muEtaLoose && lep_iso < lepIsoLoose  && lep_dxy < 0.2 && lep_dz<0.5) ||
 
-                        // electrons [FIXME]
+                        // electrons, FIXME, add lepton WP to input ntuple
+                        //(lep_type == 11 && lep_pt > lepPtLoose && TMath::Abs(lep_eta)<elEta && !(TMath::Abs(lep_eta) >1.442 && TMath::Abs(lep_eta)<1.566) &&
+                        // lep_iso < lepIsoLoose && vLepton_wp95[k] > 0 && lep_dxy < 0.04 && lep_dz<1.0 )
                         (lep_type == 11 && lep_pt > lepPtLoose && TMath::Abs(lep_eta)<elEta && !(TMath::Abs(lep_eta) >1.442 && TMath::Abs(lep_eta)<1.566) &&
-                         lep_iso < lepIsoLoose && vLepton_wp95[k] > 0 && lep_dxy < 0.04 && lep_dz<1.0 )
-
+                         lep_iso < lepIsoLoose &&  lep_dxy < 0.04 && lep_dz<1.0 )
                     )
                         numLooseLep++;
+                
+                   
+                    //FIXME: missing WP
+                    if(  lep_type == 11 && lep_pt > lepPtLoose && TMath::Abs(lep_eta)<elEta && !(TMath::Abs(lep_eta) >1.442 && TMath::Abs(lep_eta)<1.566) &&
+                            lep_iso < lepIsoLoose && lep_dxy < 0.04 && lep_dz<1.0) {
+                        numLooseAElec++;
+                        loose_ele_idx  = k;
+                    }
                 }
-
-                ////count the number of loose electrons in the event
-                //int numLooseAElec = 0;
-                //int aEle_index    = -99;
-
-                //for( int k = 0; k < nalep ; k++) {
-
-                //    float lep_pt   = aLepton_pt[k];
-                //    float lep_eta  = aLepton_eta[k];
-                //    float lep_type = aLepton_type[k];
-                //    float lep_iso  = aLepton_pfCorrIso[k];
-                //    float lep_dxy  = TMath::Abs(aLepton_dxy[k]);
-                //    float lep_dz   = TMath::Abs(aLepton_dz[k]);
-                //    //float lep_2012tight = aLepton_id2012tight[k];
-
-                //    if(  lep_type == 11 && lep_pt > lepPtLoose && TMath::Abs(lep_eta)<elEta && !(TMath::Abs(lep_eta) >1.442 && TMath::Abs(lep_eta)<1.566) &&
-                //            lep_iso < lepIsoLoose && aLepton_wp95[k] > 0.5 && lep_dxy < 0.04 && lep_dz<1.0) {
-                //        numLooseAElec++;
-                //        aEle_index  = k;
-                //    }
-
-                //}
 
 
                 //FIXME
-                //if(  debug>=2 && Vtype==2 && numLooseAElec>0) {
-                //    cout << numLooseLep << " loose leptons, "<< numLooseAElec << " loose electron(s) found in aLepton collection" << endl;
-                //}
+                if(  debug>=2 && Vtype==2 && numLooseAElec>0) {
+                    cout << numLooseLep << " loose leptons, "<< numLooseAElec << " loose electron(s) found in aLepton collection" << endl;
+                }
 
 
                 ///////////////////////////////////
@@ -1600,22 +1373,24 @@ int main(int argc, const char* argv[])
                 if( (ENABLE_EJ && numLooseLep==1 && Vtype==3) || (ENABLE_MJ && numLooseLep==1 && numLooseAElec<1 && Vtype==2) ) {
 
                     // first lepton...
-                    leptonLV.SetPtEtaPhiM(vLepton_pt[0],vLepton_eta[0],vLepton_phi[0],vLepton_mass[0]);
+                    leptonLV.SetPtEtaPhiM(itree->lep__pt[0],itree->lep__eta[0],itree->lep__phi[0],itree->lep__mass[0]);
 
                     lep_index.push_back( 0 );
 
                     if(doGenLevelAnalysis) {
-                        if( vLepton_genPt[0]>5.)
-                            leptonLV.SetPtEtaPhiM(vLepton_genPt[0], vLepton_genEta[0], vLepton_genPhi[0], (vLepton_type[0]==13 ? 0.113 : 0.0005 )  );
+                        if( itree->gen_lep__pt[0]>5.)
+                            leptonLV.SetPtEtaPhiM(itree->gen_lep__pt[0], itree->gen_lep__eta[0], itree->gen_lep__phi[0], (itree->lep__type[0]==13 ? 0.113 : 0.0005 )  );
                         else
                             leptonLV.SetPtEtaPhiM( 5., 0., 0., 0. );
                     }
 
                     // tight cuts on lepton (SL)
-                    int lepSelVtype2 =  (Vtype==2 && vLepton_type[0]==13 && leptonLV.Pt()>lepPtTight &&
-                                         TMath::Abs(leptonLV.Eta())<muEtaTight && vLepton_pfCorrIso[0]<lepIsoTight);
-                    int lepSelVtype3 =  (Vtype==3 && vLepton_type[0]==11 && leptonLV.Pt()>lepPtTight &&
-                                         vLepton_pfCorrIso[0]<lepIsoTight && vLepton_wp80[0]>0 && TMath::Abs(vLepton_dxy[0])<0.02 );
+                    int lepSelVtype2 =  (Vtype==2 && itree->lep__type[0]==13 && leptonLV.Pt()>lepPtTight &&
+                                         TMath::Abs(leptonLV.Eta())<muEtaTight && itree->lep__rel_iso[0]<lepIsoTight);
+                    //int lepSelVtype3 =  (Vtype==3 && itree->lep__type[0]==11 && leptonLV.Pt()>lepPtTight &&
+                    //                     itree->lep__rel_iso[0]<lepIsoTight && vLepton_wp80[0]>0 && TMath::Abs(itree->lep__dxy[0])<0.02 );
+                    int lepSelVtype3 =  (Vtype==3 && itree->lep__type[0]==11 && leptonLV.Pt()>lepPtTight &&
+                                         itree->lep__rel_iso[0]<lepIsoTight && TMath::Abs(itree->lep__dxy[0])<0.02 );
 
                     // OR of four trigger paths:  "HLT_Mu40_eta2p1_v.*", "HLT_IsoMu24_eta2p1_v.*", "HLT_Mu40_v.*",  "HLT_IsoMu24_v.*"
                     int trigVtype2 =  (Vtype==2 && ( triggerFlags[22]>0 || triggerFlags[23]>0 || triggerFlags[14]>0 ||triggerFlags[21]>0 ));
@@ -1672,7 +1447,7 @@ int main(int argc, const char* argv[])
                     }
 
                     if( debug>=2 ) {
-                        cout << "nvlep=" << nvlep << ", Vtype=" << Vtype << endl;
+                        cout << "nvlep=" << itree->n__lep << ", Vtype=" << Vtype << endl;
                         cout << "Lep sel. Vtype2 = " << lepSelVtype2 << ", lep sel. Vtype3 = " << lepSelVtype3 << endl;
                         cout << "Trigger: " <<  ((isMC ? 1 : trigVtype2) || (isMC ? 1 : trigVtype3)) << endl;
                         cout << "Passes = " << int (properEventSL) << endl;
@@ -1685,15 +1460,16 @@ int main(int argc, const char* argv[])
                     otree->lepton_eta_    [0] = leptonLV.Eta();
                     otree->lepton_phi_    [0] = leptonLV.Phi();
                     otree->lepton_m_      [0] = leptonLV.M();
-                    otree->lepton_charge_ [0] = vLepton_charge   [0];
-                    otree->lepton_rIso_   [0] = vLepton_pfCorrIso[0];
-                    otree->lepton_type_   [0] = vLepton_type[0];
-                    otree->lepton_dxy_    [0] = vLepton_dxy[0];
-                    otree->lepton_dz_     [0] = vLepton_dz[0];
-                    otree->lepton_wp80_   [0] = vLepton_wp80[0];
-                    otree->lepton_wp95_   [0] = vLepton_wp95[0];
-                    otree->lepton_wp70_   [0] = vLepton_wp70[0];
-                    otree->lepton_MVAtrig_[0] = vLepton_idMVAtrig[0];
+                    otree->lepton_charge_ [0] = itree->lep__charge   [0];
+                    otree->lepton_rIso_   [0] = itree->lep__rel_iso[0];
+                    otree->lepton_type_   [0] = itree->lep__type[0];
+                    otree->lepton_dxy_    [0] = itree->lep__dxy[0];
+                    otree->lepton_dz_     [0] = itree->lep__dz[0];
+                    //FIXME 
+                    //otree->lepton_wp80_   [0] = vLepton_wp80[0];
+                    //otree->lepton_wp95_   [0] = vLepton_wp95[0];
+                    //otree->lepton_wp70_   [0] = vLepton_wp70[0];
+                    //otree->lepton_MVAtrig_[0] = vLepton_idMVAtrig[0];
 
                     if ( isMC && Vtype==3) // if single electron events
                         otree->sf_ele_ = eleSF( otree->lepton_pt_[0], otree->lepton_eta_[0]);
@@ -1709,35 +1485,40 @@ int main(int argc, const char* argv[])
                 if( numLooseLep==2 && ( (ENABLE_MM && Vtype==0) || (ENABLE_EE && Vtype==1) )) {
 
                     // first lepton...
-                    leptonLV.SetPtEtaPhiM (vLepton_pt[0],vLepton_eta[0],vLepton_phi[0],vLepton_mass[0]);
+                    leptonLV.SetPtEtaPhiM (itree->lep__pt[0],itree->lep__eta[0],itree->lep__phi[0],itree->lep__mass[0]);
                     lep_index.push_back( 0 );
 
                     // second lepton...
-                    leptonLV2.SetPtEtaPhiM(vLepton_pt[1],vLepton_eta[1],vLepton_phi[1],vLepton_mass[1]);
+                    leptonLV2.SetPtEtaPhiM(itree->lep__pt[1],itree->lep__eta[1],itree->lep__phi[1],itree->lep__mass[1]);
                     lep_index.push_back( 1 );
 
                     if(doGenLevelAnalysis) {
-                        if( vLepton_genPt[0]>5.)
-                            leptonLV. SetPtEtaPhiM(vLepton_genPt[0], vLepton_genEta[0], vLepton_genPhi[0], (vLepton_type[0]==13 ? 0.113 : 0.0005 )  );
+                        if( itree->gen_lep__pt[0]>5.)
+                            leptonLV. SetPtEtaPhiM(itree->gen_lep__pt[0], itree->gen_lep__eta[0], itree->gen_lep__phi[0], (itree->lep__type[0]==13 ? 0.113 : 0.0005 )  );
                         else
                             leptonLV. SetPtEtaPhiM( 5., 0., 0., 0. );
-                        if( vLepton_genPt[1]>5.)
-                            leptonLV2.SetPtEtaPhiM(vLepton_genPt[1], vLepton_genEta[1], vLepton_genPhi[1], (vLepton_type[1]==13 ? 0.113 : 0.0005 )  );
+                        if( itree->gen_lep__pt[1]>5.)
+                            leptonLV2.SetPtEtaPhiM(itree->gen_lep__pt[1], itree->gen_lep__eta[1], itree->gen_lep__phi[1], (itree->lep__type[1]==13 ? 0.113 : 0.0005 )  );
                         else
                             leptonLV2.SetPtEtaPhiM( 5., 0., 0., 0. );
                     }
 
 
                     // cut on leptons (DL)
-                    int lepSelVtype0 = ( Vtype==0 && vLepton_type[0]==13 && vLepton_type[1]==13 &&
-                                         ( (leptonLV.Pt() >20 && TMath::Abs(leptonLV.Eta()) <muEtaTight && vLepton_pfCorrIso[0]<lepIsoTight) ||
-                                           (leptonLV2.Pt()>20 && TMath::Abs(leptonLV2.Eta())<muEtaTight && vLepton_pfCorrIso[1]<lepIsoTight) )
-                                       ) && vLepton_charge[0]*vLepton_charge[1]<0;
+                    int lepSelVtype0 = ( Vtype==0 && itree->lep__type[0]==13 && itree->lep__type[1]==13 &&
+                                         ( (leptonLV.Pt() >20 && TMath::Abs(leptonLV.Eta()) <muEtaTight && itree->lep__rel_iso[0]<lepIsoTight) ||
+                                           (leptonLV2.Pt()>20 && TMath::Abs(leptonLV2.Eta())<muEtaTight && itree->lep__rel_iso[1]<lepIsoTight) )
+                                       ) && itree->lep__charge[0]*itree->lep__charge[1]<0;
 
-                    int lepSelVtype1 = ( Vtype==1 && vLepton_type[0]==11 && vLepton_type[1]==11 &&
-                                         ( (leptonLV.Pt() >20 && vLepton_pfCorrIso[0]<lepIsoTight && vLepton_wp95[0]>0.5 && TMath::Abs(vLepton_dxy[0])<0.02) ||
-                                           (leptonLV2.Pt()>20 && vLepton_pfCorrIso[1]<lepIsoTight && vLepton_wp95[1]>0.5 && TMath::Abs(vLepton_dxy[1])<0.02) )
-                                       ) && vLepton_charge[0]*vLepton_charge[1]<0;
+                    //FIXME
+                    //int lepSelVtype1 = ( Vtype==1 && itree->lep__type[0]==11 && itree->lep__type[1]==11 &&
+                    //                     ( (leptonLV.Pt() >20 && itree->lep__rel_iso[0]<lepIsoTight && vLepton_wp95[0]>0.5 && TMath::Abs(itree->lep__dxy[0])<0.02) ||
+                    //                       (leptonLV2.Pt()>20 && itree->lep__rel_iso[1]<lepIsoTight && vLepton_wp95[1]>0.5 && TMath::Abs(itree->lep__dxy[1])<0.02) )
+                    //                   ) && itree->lep__charge[0]*itree->lep__charge[1]<0;
+                    int lepSelVtype1 = ( Vtype==1 && itree->lep__type[0]==11 && itree->lep__type[1]==11 &&
+                                         ( (leptonLV.Pt() >20 && itree->lep__rel_iso[0]<lepIsoTight && TMath::Abs(itree->lep__dxy[0])<0.02) ||
+                                           (leptonLV2.Pt()>20 && itree->lep__rel_iso[1]<lepIsoTight && TMath::Abs(itree->lep__dxy[1])<0.02) )
+                                       ) && itree->lep__charge[0]*itree->lep__charge[1]<0;
 
                     // OR of four trigger paths:  "HLT_Mu40_eta2p1_v.*", "HLT_IsoMu24_eta2p1_v.*", "HLT_Mu40_v.*",  "HLT_IsoMu24_v.*"
                     int trigVtype0 =  (Vtype==0 && ( triggerFlags[22]>0 || triggerFlags[23]>0 || triggerFlags[14]>0 ||triggerFlags[21]>0 ));
@@ -1827,7 +1608,7 @@ int main(int argc, const char* argv[])
                     }
 
                     if( debug>=2 ) {
-                        cout << "nvlep=" << nvlep << ", Vtype=" << Vtype << endl;
+                        cout << "nvlep=" << itree->n__lep << ", Vtype=" << Vtype << endl;
                         cout << "Lep sel. Vtype2 = " << lepSelVtype0 << ", lep sel. Vtype3 = " << lepSelVtype1 << endl;
                         cout << "Trigger: " <<  ((isMC ? 1 : trigVtype0) || (isMC ? 1 : trigVtype1)) << endl;
                         cout << "Passes = " << int (properEventDL) << endl;
@@ -1841,30 +1622,31 @@ int main(int argc, const char* argv[])
                     otree->lepton_eta_    [0] = leptonLV.Eta();
                     otree->lepton_phi_    [0] = leptonLV.Phi();
                     otree->lepton_m_      [0] = leptonLV.M();
-                    otree->lepton_charge_ [0] = vLepton_charge   [0];
-                    otree->lepton_rIso_   [0] = vLepton_pfCorrIso[0];
-                    otree->lepton_type_   [0] = vLepton_type[0];
-                    otree->lepton_dxy_    [0] = vLepton_dxy[0];
-                    otree->lepton_dz_     [0] = vLepton_dz[0];
-                    otree->lepton_wp70_   [0] = vLepton_wp70[0];
-                    otree->lepton_wp80_   [0] = vLepton_wp80[0];
-                    otree->lepton_wp95_   [0] = vLepton_wp95[0];
-                    otree->lepton_MVAtrig_[0] = vLepton_idMVAtrig[0];
+                    otree->lepton_charge_ [0] = itree->lep__charge   [0];
+                    otree->lepton_rIso_   [0] = itree->lep__rel_iso[0];
+                    otree->lepton_type_   [0] = itree->lep__type[0];
+                    otree->lepton_dxy_    [0] = itree->lep__dxy[0];
+                    otree->lepton_dz_     [0] = itree->lep__dz[0];
+                    //FIXME: need to add ID-s 
+                    //otree->lepton_wp70_   [0] = vLepton_wp70[0];
+                    //otree->lepton_wp80_   [0] = vLepton_wp80[0];
+                    //otree->lepton_wp95_   [0] = vLepton_wp95[0];
+                    //otree->lepton_MVAtrig_[0] = vLepton_idMVAtrig[0];
 
                     // lep 2...
                     otree->lepton_pt_     [1] = leptonLV2.Pt();
                     otree->lepton_eta_    [1] = leptonLV2.Eta();
                     otree->lepton_phi_    [1] = leptonLV2.Phi();
                     otree->lepton_m_      [1] = leptonLV2.M();
-                    otree->lepton_charge_ [1] = vLepton_charge   [1];
-                    otree->lepton_rIso_   [1] = vLepton_pfCorrIso[1];
-                    otree->lepton_type_   [1] = vLepton_type[1];
-                    otree->lepton_dxy_    [1] = vLepton_dxy[1];
-                    otree->lepton_dz_     [1] = vLepton_dz[1];
-                    otree->lepton_wp80_   [1] = vLepton_wp80[1];
-                    otree->lepton_wp70_   [1] = vLepton_wp70[1];
-                    otree->lepton_wp95_   [1] = vLepton_wp95[1];
-                    otree->lepton_MVAtrig_[1] = vLepton_idMVAtrig[1];
+                    otree->lepton_charge_ [1] = itree->lep__charge   [1];
+                    otree->lepton_rIso_   [1] = itree->lep__rel_iso[1];
+                    otree->lepton_type_   [1] = itree->lep__type[1];
+                    otree->lepton_dxy_    [1] = itree->lep__dxy[1];
+                    otree->lepton_dz_     [1] = itree->lep__dz[1];
+                    //otree->lepton_wp80_   [1] = vLepton_wp80[1];
+                    //otree->lepton_wp70_   [1] = vLepton_wp70[1];
+                    //otree->lepton_wp95_   [1] = vLepton_wp95[1];
+                    //otree->lepton_MVAtrig_[1] = vLepton_idMVAtrig[1];
 
                     if ( isMC && Vtype==1 ) // if di-electron events
                         otree->sf_ele_ = eleSF( otree->lepton_pt_[0], otree->lepton_eta_[0]) * eleSF( otree->lepton_pt_[1], otree->lepton_eta_[1]);
@@ -1878,34 +1660,42 @@ int main(int argc, const char* argv[])
                 //         DL events:  em        //
                 ///////////////////////////////////
 
-                if( ENABLE_EM && Vtype==2 && numLooseLep==1 && numLooseAElec==1 && aEle_index>=0) {
+                if( ENABLE_EM && Vtype==2 && numLooseLep==1 && numLooseAElec==1 && loose_ele_idx>=0) {
 
                     // flag these events with different type
                     otree->type_ = 4;
 
                     // first lepton...
-                    leptonLV.SetPtEtaPhiM (vLepton_pt[0],vLepton_eta[0],vLepton_phi[0],vLepton_mass[0]);
+                    leptonLV.SetPtEtaPhiM (itree->lep__pt[0],itree->lep__eta[0],itree->lep__phi[0],itree->lep__mass[0]);
                     lep_index.push_back( 0 );
 
-                    // second lepton...
-                    leptonLV2.SetPtEtaPhiM(aLepton_pt[aEle_index],aLepton_eta[aEle_index],aLepton_phi[aEle_index],aLepton_mass[aEle_index]);
-                    lep_index.push_back( -aEle_index-1 );
+                    //// second lepton...
+                    //leptonLV2.SetPtEtaPhiM(aLepton_pt[loose_ele_idx],aLepton_eta[loose_ele_idx],aLepton_phi[loose_ele_idx],aLepton_mass[loose_ele_idx]);
+                    //lep_index.push_back( -loose_ele_idx-1 );
 
                     if(doGenLevelAnalysis) {
-                        if( vLepton_genPt[0]>5.)
-                            leptonLV. SetPtEtaPhiM(vLepton_genPt[0], vLepton_genEta[0], vLepton_genPhi[0], (vLepton_type[0]==13 ? 0.105 : 0.0005 )  );
-                        else
-                            leptonLV. SetPtEtaPhiM( 5., 0., 0., 0. );
-                        if( aLepton_genPt[aEle_index]>5.)
-                            leptonLV2.SetPtEtaPhiM(aLepton_genPt[aEle_index], aLepton_genEta[aEle_index], aLepton_genPhi[aEle_index], (aLepton_type[aEle_index]==13 ? 0.105 : 0.0005 )  );
-                        else
+                        if( itree->gen_lep__pt[0] > 5.0) {
+                            leptonLV.SetPtEtaPhiM(itree->gen_lep__pt[0], itree->gen_lep__eta[0], itree->gen_lep__phi[0], (itree->lep__type[0]==13 ? 0.105 : 0.0005 )  );
+                        } else {
+                            leptonLV.SetPtEtaPhiM( 5., 0., 0., 0. );
+                        }
+                        if( itree->gen_lep__pt[loose_ele_idx] > 5.0 ) {
+                            leptonLV2.SetPtEtaPhiM(
+                                itree->gen_lep__pt[loose_ele_idx],
+                                itree->gen_lep__eta[loose_ele_idx],
+                                itree->gen_lep__phi[loose_ele_idx],
+                                //FIXME: hardcoded masses?
+                                (itree->gen_lep__type[loose_ele_idx]==13 ? 0.105 : 0.0005 )
+                            );
+                        } else {
                             leptonLV2.SetPtEtaPhiM( 5., 0., 0., 0. );
+                        }
                     }
 
-                    int lepSelVtype4 = (Vtype==2 && vLepton_type[0]==13 && aLepton_type[aEle_index]==11 &&
-                                        (leptonLV.Pt() >20 && TMath::Abs(leptonLV.Eta()) <muEtaTight && vLepton_pfCorrIso[0]<lepIsoTight)
-                                        /* do something for electrons ? */
-                                        && vLepton_charge[0]*aLepton_charge[aEle_index]<0
+                    int lepSelVtype4 = (Vtype==2 && itree->lep__type[0]==13 && itree->gen_lep__type[loose_ele_idx]==11 &&
+                                        (leptonLV.Pt() >20 && TMath::Abs(leptonLV.Eta()) <muEtaTight && itree->lep__rel_iso[0]<lepIsoTight)
+                                        /* do something for electrons ? FIXME */
+                                        && itree->lep__charge[0] * itree->lep__charge[loose_ele_idx]<0
                                        );
 
                     // OR of four trigger paths:  "HLT_Mu40_eta2p1_v.*", "HLT_IsoMu24_eta2p1_v.*", "HLT_Mu40_v.*",  "HLT_IsoMu24_v.*"
@@ -1950,7 +1740,7 @@ int main(int argc, const char* argv[])
                     }
 
                     if( debug>=2 ) {
-                        cout << "nvlep=" << nvlep << ", nalep=" << nalep  << ", Vtype=" << Vtype << endl;
+                        cout << "nvlep=" << itree->n__lep << ", Vtype=" << Vtype << endl;
                         cout << "Lep sel. Vtype4 = " << lepSelVtype4 << endl;
                         cout << "Trigger: " <<  (isMC ? 1 : trigVtype4)  << endl;
                         cout << "Passes = " << int (properEventDL) << endl;
@@ -1959,36 +1749,39 @@ int main(int argc, const char* argv[])
                     // save lepton(s) kinematics into the tree...
                     otree->nLep_ = 2;
 
+                    //FIXME: need the correct index
                     // lep 1...
                     otree->lepton_pt_     [0] = leptonLV.Pt();
                     otree->lepton_eta_    [0] = leptonLV.Eta();
                     otree->lepton_phi_    [0] = leptonLV.Phi();
                     otree->lepton_m_      [0] = leptonLV.M();
-                    otree->lepton_charge_ [0] = vLepton_charge   [0];
-                    otree->lepton_rIso_   [0] = vLepton_pfCorrIso[0];
-                    otree->lepton_type_   [0] = vLepton_type[0];
-                    otree->lepton_dxy_    [0] = vLepton_dxy[0];
-                    otree->lepton_dz_     [0] = vLepton_dz[0];
+                    otree->lepton_charge_ [0] = itree->lep__charge[0];
+                    otree->lepton_rIso_   [0] = itree->lep__rel_iso[0];
+                    otree->lepton_type_   [0] = itree->lep__type[0];
+                    otree->lepton_dxy_    [0] = itree->lep__dxy[0];
+                    otree->lepton_dz_     [0] = itree->lep__dz[0];
 
                     // lep 2...
                     otree->lepton_pt_     [1] = leptonLV2.Pt();
                     otree->lepton_eta_    [1] = leptonLV2.Eta();
                     otree->lepton_phi_    [1] = leptonLV2.Phi();
                     otree->lepton_m_      [1] = leptonLV2.M();
-                    otree->lepton_charge_ [1] = aLepton_charge   [aEle_index];
-                    otree->lepton_rIso_   [1] = aLepton_pfCorrIso[aEle_index];
-                    otree->lepton_type_   [1] = aLepton_type[aEle_index];
-                    otree->lepton_dxy_    [1] = aLepton_dxy[aEle_index];
-                    otree->lepton_dz_     [1] = aLepton_dz[aEle_index];
-                    otree->lepton_wp80_   [1] = aLepton_wp80[aEle_index];
-                    otree->lepton_wp95_   [1] = aLepton_wp95[aEle_index];
+                    otree->lepton_charge_ [1] = itree->lep__charge[loose_ele_idx];
+                    otree->lepton_rIso_   [1] = itree->lep__rel_iso[loose_ele_idx];
+                    otree->lepton_type_   [1] = itree->lep__type[loose_ele_idx];
+                    otree->lepton_dxy_    [1] = itree->lep__dxy[loose_ele_idx];
+                    otree->lepton_dz_     [1] = itree->lep__dz[loose_ele_idx];
+                    //FIXME: add working points 
+                    //otree->lepton_wp80_   [1] = aLepton_wp80[loose_ele_idx];
+                    //otree->lepton_wp95_   [1] = aLepton_wp95[loose_ele_idx];
 
-                    if ( isMC && Vtype==4 ) // if EM events with triggered muon
+                    if ( isMC && Vtype==4 ) { // if EM events with triggered muon
                         otree->sf_ele_ = eleSF( otree->lepton_pt_[1], otree->lepton_eta_[1]);
-                    else
+                    } else {
                         otree->sf_ele_ = 1;
+                    }
 
-                } // end EM
+                } // end dilepton, electron muon
 
 
                 if ( !isMC && otree->EVENT_.json < 0.5 ) {
@@ -2026,146 +1819,172 @@ int main(int argc, const char* argv[])
                 // if doing the gen level analysis, read gen-jets
                 if( doGenLevelAnalysis==0 ) {
 
-                    // loop over jet collections
-                    for(int coll = 0 ; coll < 2 ; coll++) {
+                    // loop over jets
+                    for(int hj = 0; hj < itree->n__jet; hj++) {
 
-                        // loop over jets
-                        //FIXME: need to unify hjets and ajets
-                        for(int hj = 0; hj < (coll==0 ? nhJets : naJets); hj++) {
+                        float ptGen = -99.;
 
-                            float ptGen = -99.;
-                            if(coll==0 && hJet_genPt[hj]>0.) ptGen = hJet_genPt[hj];
-                            if(coll==1 && aJet_genPt[hj]>0.) ptGen = aJet_genPt[hj];
+                        //FIXME: why whould gen jet pt < 0
+                        if(itree->gen_jet__pt[hj]>0.) ptGen = itree->gen_jet__pt[hj];
 
-                            float pt     = (coll==0) ? hJet_pt [hj]  : aJet_pt [hj];
-                            float eta    = (coll==0) ? hJet_eta[hj]  : aJet_eta[hj];
-                            float phi    = (coll==0) ? hJet_phi[hj]  : aJet_phi[hj];
-                            float e      = (coll==0) ? hJet_e  [hj]  : aJet_e  [hj];
-                            float m2     = e*e - pt*pt*TMath::CosH(eta)*TMath::CosH(eta);
-                            if(m2<0) m2 = 0.;
-                            float m      = TMath::Sqrt( m2 );
-
-                            int flavour  = (coll==0) ? hJet_flavour [hj] : aJet_flavour [hj];
-                            int pu_id    = (coll==0) ? hJet_puJetIdL[hj] : aJet_puJetIdL[hj];
-                            int id       = (coll==0) ? hJet_id      [hj] : aJet_id      [hj];
-                            float JECUnc = (coll==0) ? hJet_JECUnc  [hj] : aJet_JECUnc  [hj];
-
-                            // subtract the nominal JEC corrected jet (px,py)
-                            deltaPx -= ( pt*TMath::Cos(phi) );
-                            deltaPy -= ( pt*TMath::Sin(phi) );
-
-                            // for JEC/JER systematics (N.B. this assumes that the jets are already corrected)
-                            float shift     = 1.0;
-                            if     ( doJECup   )  shift *= (1+JECUnc);
-                            else if( doJECdown )  shift *= (1-JECUnc);
-                            else if( doJERup   )  shift *= (ptGen>0. ?  1+resolutionBias(TMath::Abs(eta), +1, JERCORRECTED)*(1-ptGen/pt)   : 1.0);
-                            else if( doJERdown )  shift *= (ptGen>0. ?  1+resolutionBias(TMath::Abs(eta), -1, JERCORRECTED)*(1-ptGen/pt)   : 1.0);
-                            else {}
-
-                            // if correct for bias in jet resolution (for sanity, enforce isMC)
-                            if( isMC && doJERbias && !doJERup && !doJERdown)
-                                shift *= (ptGen>0. ?  1+resolutionBias(TMath::Abs(eta), 0, JERCORRECTED)*(1-ptGen/pt)   : 1.0);
-
-                            // change energy/mass by shift
-                            pt *= shift;
-                            m  *= shift;
-
-                            // add the +/- JEC corrected jet (px,py)
-                            deltaPx += ( pt*TMath::Cos(phi) );
-                            deltaPy += ( pt*TMath::Sin(phi) );
-
-                            // only jets in acceptance...
-                            if( TMath::Abs(eta)> 2.5 ) continue;
-
-                            // only jets passing pu ID...
-                            if( pu_id < 0.5 ) continue;
-
-                            // only jets passing id ID...
-                            if( id < 0.5 ) continue;
-
-                            // only jets above pt cut...
-                            if( pt < jetPtThreshold  ) continue;
-
-                            // if this is one of hJet, increment by one
-                            if( coll==0 ) otree->hJetAmong_++;
-
-                            // the jet four-vector
-                            TLorentzVector p4;
-                            p4.SetPtEtaPhiM( pt, eta, phi, m );
-
-                            // for csv systematics
-                            float csv_nominal =  (coll==0) ? hJet_csv_nominal[hj] : aJet_csv_nominal[hj];
-                            float csv_upBC    =  (coll==0) ? hJet_csv_upBC   [hj] : aJet_csv_upBC   [hj];
-                            float csv_downBC  =  (coll==0) ? hJet_csv_downBC [hj] : aJet_csv_downBC [hj];
-                            float csv_upL     =  (coll==0) ? hJet_csv_upL    [hj] : aJet_csv_upL    [hj];
-                            float csv_downL   =  (coll==0) ? hJet_csv_downL  [hj] : aJet_csv_downL  [hj];
-
-                            // default is csv_nominal ( <=> reshaped )
-                            float csv         = csv_nominal;
-
-                            // if doing cvs systematiics, use appropriate collection
-                            if     ( doCSVup  ) csv =  TMath::Max(csv_upBC,   csv_upL);
-                            else if( doCSVdown) csv =  TMath::Min(csv_downBC, csv_downL);
-                            else {}
-
-                            // if we apply SF for b-tag, or it is data, then deafult is 'reco' csv
-                            if( useCSVcalibration || !isMC ) csv = (coll==0) ? hJet_csv[hj] : aJet_csv[hj];
-
-                            // if using thr MVA btagger:
-                            if( useCMVA ) {
-
-                                // this is needed to remove the spike at zero!
-                                if( csv>0. )
-                                    csv = (coll==0) ? hJet_cmva[hj] : aJet_cmva[hj];
-                                else
-                                    csv = 0.;
-                            }
-
-
-                            if( enhanceMC && trial_success==0) {
-
-                                string bin = "";
-                                if( TMath::Abs( eta ) <= 1.0 )
-                                    bin = "Bin0";
-                                if( TMath::Abs( eta ) >  1.0 )
-                                    bin = "Bin1";
-
-                                string fl = "";
-                                if(abs(flavour)==5)
-                                    fl = "b";
-                                if(abs(flavour)==4)
-                                    fl = "c";
-                                else
-                                    fl = "l";
-
-                                csv     =  btagger[fl+"_"+bin]->GetRandom();
-
-                                if(coll==0) {
-                                    hJet_csv        [hj] = csv;
-                                    hJet_csv_nominal[hj] = csv;
-                                }
-                                if(coll==1) {
-                                    aJet_csv        [hj] = csv;
-                                    aJet_csv_nominal[hj] = csv;
-                                }
-                            }
-
-                            // the jet observables (p4 and csv)
-                            JetObservable myJet;
-                            myJet.p4     = p4;
-                            myJet.csv    = csv;
-                            myJet.index  = (coll==0 ? hj : -hj-1);
-                            myJet.shift  = shift;
-                            myJet.flavour= flavour;
-
-                            // push back the jet...
-                            jet_map.push_back    ( myJet );
-
-                            if( debug>=3 ) {
-                                cout << "Jet #" << coll << "-" << hj << " => (" << pt << "," << eta << "," << phi << "," << m << "), ID=" << id << ", PU-ID=" << pu_id << ", csv = " << csv << ", flavour=" << flavour << endl;
-                            }
-
+                        float pt     = itree->jet__pt [hj];
+                        float eta    = itree->jet__eta[hj];
+                        float phi    = itree->jet__phi[hj];
+                        float e      = itree->jet__energy[hj];
+                        float m2     = e*e - pt*pt*TMath::CosH(eta)*TMath::CosH(eta);
+                        
+                        //FIXME: shouldn't this be a problem/exception?
+                        if(m2<0) {
+                            m2 = 0.;
                         }
+
+                        float m      = TMath::Sqrt( m2 );
+
+                        int flavour  = itree->jet__id[hj];
+                        //int pu_id    = hJet_puJetIdL[hj];
+                        //FIXME: jet pile-up ID
+                        int pu_id    = DEF_VAL_INT;
+                        
+                        //FIXME: what is the difference between jet ID and flavour?
+                        //int id       = hJet_id      [hj];
+                        int id       = DEF_VAL_INT;
+
+                        //FIXME: where to get JEC uncertainty?
+                        //float JECUnc = hJet_JECUnc  [hj];
+                        float JECUnc = DEF_VAL_FLOAT;
+
+                        // subtract the nominal JEC corrected jet (px,py)
+                        deltaPx -= ( pt*TMath::Cos(phi) );
+                        deltaPy -= ( pt*TMath::Sin(phi) );
+
+                        // for JEC/JER systematics (N.B. this assumes that the jets are already corrected)
+                        float shift     = 1.0;
+                        if     ( doJECup   )  shift *= (1+JECUnc);
+                        else if( doJECdown )  shift *= (1-JECUnc);
+                        else if( doJERup   )  shift *= (ptGen>0. ?  1+resolutionBias(TMath::Abs(eta), +1, JERCORRECTED)*(1-ptGen/pt)   : 1.0);
+                        else if( doJERdown )  shift *= (ptGen>0. ?  1+resolutionBias(TMath::Abs(eta), -1, JERCORRECTED)*(1-ptGen/pt)   : 1.0);
+                        else {}
+
+                        // if correct for bias in jet resolution (for sanity, enforce isMC)
+                        if( isMC && doJERbias && !doJERup && !doJERdown)
+                            shift *= (ptGen>0. ?  1+resolutionBias(TMath::Abs(eta), 0, JERCORRECTED)*(1-ptGen/pt)   : 1.0);
+
+                        // change energy/mass by shift
+                        pt *= shift;
+                        m  *= shift;
+
+                        // add the +/- JEC corrected jet (px,py)
+                        deltaPx += ( pt*TMath::Cos(phi) );
+                        deltaPy += ( pt*TMath::Sin(phi) );
+
+                        // only jets in acceptance...
+                        if( TMath::Abs(eta)> 2.5 ) continue;
+
+                        // only jets passing pu ID...
+                        if( pu_id < 0.5 ) continue;
+
+                        // only jets passing id ID...
+                        if( id < 0.5 ) continue;
+
+                        // only jets above pt cut...
+                        if( pt < jetPtThreshold  ) continue;
+
+                        otree->hJetAmong_++;
+
+                        // the jet four-vector
+                        TLorentzVector p4;
+                        p4.SetPtEtaPhiM( pt, eta, phi, m );
+
+                        // for csv systematics
+                        float csv_nominal =  itree->jet__bd_csv[hj];
+                        //float csv_upBC    =  hJet_csv_upBC   [hj]
+                        //float csv_downBC  =  hJet_csv_downBC [hj]
+                        //float csv_upL     =  hJet_csv_upL    [hj]
+                        //float csv_downL   =  hJet_csv_downL  [hj]
+                        //FIXME: jet b-discriminator systematics
+                        const float csv_upBC    = DEF_VAL_FLOAT;
+                        const float csv_downBC  = DEF_VAL_FLOAT; 
+                        const float csv_upL     = DEF_VAL_FLOAT; 
+                        const float csv_downL   = DEF_VAL_FLOAT; 
+
+                        // default is csv_nominal ( <=> reshaped )
+                        float csv         = csv_nominal;
+
+                        // if doing cvs systematiics, use appropriate collection
+                        if( doCSVup  ) {
+                            csv = TMath::Max(csv_upBC, csv_upL);
+                        }
+                        else if( doCSVdown) {
+                            csv = TMath::Min(csv_downBC, csv_downL);
+                        }
+
+                        // if we apply SF for b-tag, or it is data, then deafult is 'reco' csv
+                        if( useCSVcalibration || !isMC ) {
+                            csv = itree->jet__bd_csv[hj];
+                        }
+
+                        // if using thr MVA btagger:
+                        if( useCMVA ) {
+
+                            // this is needed to remove the spike at zero! FIXME
+                            if( csv>0. )
+                                //FIXME: what is cmva
+                                //csv = hJet_cmva[hj];
+                                csv = DEF_VAL_FLOAT;
+                            else {
+                                csv = 0.;
+                            }
+                        }
+
+
+                        //disable MC enhancment for now
+                        //if( enhanceMC && trial_success==0) {
+
+                        //    string bin = "";
+                        //    if( TMath::Abs( eta ) <= 1.0 )
+                        //        bin = "Bin0";
+                        //    if( TMath::Abs( eta ) >  1.0 )
+                        //        bin = "Bin1";
+
+                        //    string fl = "";
+                        //    if(abs(flavour)==5)
+                        //        fl = "b";
+                        //    if(abs(flavour)==4)
+                        //        fl = "c";
+                        //    else
+                        //        fl = "l";
+
+                        //    csv     =  btagger[fl+"_"+bin]->GetRandom();
+
+                        //    if(coll==0) {
+
+                        //        //FIXME: what is the difference between hJet_csv and hJet_csv_nominal?
+                        //        hJet_csv        [hj] = csv;
+                        //        hJet_csv_nominal[hj] = csv;
+                        //    }
+                        //    if(coll==1) {
+                        //        aJet_csv        [hj] = csv;
+                        //        aJet_csv_nominal[hj] = csv;
+                        //    }
+                        //}
+
+                        // the jet observables (p4 and csv)
+                        JetObservable myJet;
+                        myJet.p4     = p4;
+                        myJet.csv    = csv;
+                        //FIXME 
+                        //myJet.index  = (coll==0 ? hj : -hj-1);
+                        myJet.index  = hj;
+                        myJet.shift  = shift;
+                        myJet.flavour= flavour;
+
+                        // push back the jet...
+                        jet_map.push_back    ( myJet );
+
+                        if( debug>=3 ) {
+                            cout << "Jet #" << hj << " => (" << pt << "," << eta << "," << phi << "," << m << "), ID=" << id << ", PU-ID=" << pu_id << ", csv = " << csv << ", flavour=" << flavour << endl;
+                        }
+
                     }
                 }
                 // if doing the gen level analysis, read gen-jets
@@ -2177,114 +1996,111 @@ int main(int argc, const char* argv[])
                     // reset the sumEt
                     otree->MET_sumEt_ = 0.;
 
-                    // loop over jet collections
-                    for(int coll = 0 ; coll < 2 ; coll++) {
+                    // loop over jets
+                    for(int hj = 0; hj < itree->n__jet; hj++) {
 
-                        // loop over jets
-                        for(int hj = 0; hj < (coll==0 ? nhJets : naJets); hj++) {
+                        float pt     = itree->gen_jet__pt [hj];
+                        float eta    = itree->gen_jet__eta[hj];
+                        float phi    = itree->gen_jet__phi[hj];
 
-                            float pt     = (coll==0) ? hJet_genPt [hj]  : aJet_genPt [hj];
-                            float eta    = (coll==0) ? hJet_genEta[hj]  : aJet_genEta[hj];
-                            float phi    = (coll==0) ? hJet_genPhi[hj]  : aJet_genPhi[hj];
+                        // assume massless jets
+                        // (unfortunately necessary because the mass of the genJet is not saved)
+                        float e      = itree->gen_jet__pt [hj]*TMath::CosH(itree->gen_jet__eta[hj]);
+                        float m      = 0.;
 
-                            // assume massless jets
-                            // (unfortunately necessary because the mass of the genJet is not saved)
-                            float e      = (coll==0) ? hJet_genPt [hj]*TMath::CosH(hJet_genEta[hj]) : aJet_genPt [hj]*TMath::CosH(aJet_genEta[hj]);
-                            float m      = 0.;
+                        float flavor = itree->jet__id [hj];
 
-                            float flavor = (coll==0) ? hJet_flavour [hj] : aJet_flavour [hj];
+                        // only jets in acceptance
+                        // (this is needed because the TF and csv shapes are valid only in the acceptance)
+                        if( TMath::Abs(eta) > 2.5 ) continue;
 
-                            // only jets in acceptance
-                            // (this is needed because the TF and csv shapes are valid only in the acceptance)
-                            if( TMath::Abs(eta) > 2.5 ) continue;
-
-                            if( debug>=3 ) {
-                                cout << "Gen-Jet #" << coll << "-" << hj << " => (" << pt << "," << eta << "," << phi << "," << m  << "), flavor=" << flavor << endl;
-                            }
-
-                            // keep track of the per-jet smearing (for the MET...)
-                            deltaPx -= ( pt*TMath::Cos(phi) );
-                            deltaPy -= ( pt*TMath::Sin(phi) );
-
-                            // needed to find appropriate PDF
-                            string bin = "";
-                            if( TMath::Abs( eta ) <= 1.0 )
-                                bin = "Bin0";
-                            if( TMath::Abs( eta ) >  1.0 )
-                                bin = "Bin1";
-
-                            // needed to find appropriate flavor
-                            string fl = "";
-                            if(abs(flavor)==5)
-                                fl = "b";
-                            else
-                                fl = "l";
-
-                            // set-up the TF parameters for the appropriate bin and flavor
-
-                            // relative fraction of the two gaussians
-                            jet_smear->SetParameter(0, fl == "b" ? 0.65 : 1.0);
-
-                            // mean and sigma of the 1st
-                            jet_smear->SetParameter(1, transferfunctions[fl+"_G1_m_"+bin]->Eval( e ));
-                            jet_smear->SetParameter(2, transferfunctions[fl+"_G1_s_"+bin]->Eval( e ));
-
-                            // mean and sigma of the 2nd
-                            jet_smear->SetParameter(3, fl == "b" ? transferfunctions[fl+"_G2_m_"+bin]->Eval( e ) : e);
-                            jet_smear->SetParameter(4, fl == "b" ? transferfunctions[fl+"_G2_s_"+bin]->Eval( e ) : 1.0);
-
-                            // consider the range [0.2,2.0]*e, and evaluate every s1/5 GeV, s1 = width of the narrower gaussian
-                            jet_smear->SetRange(e*0.2, e*2.0);
-                            jet_smear->SetNpx( TMath::Min( TMath::Max( int( (1.8*e)/( jet_smear->GetParameter(2)/5 ) ), int(4)), 200 ) );
-
-                            // the smeared energy
-                            float e_smear = TMath::Max( float(jet_smear->GetRandom()), float(0.) );
-
-                            // for c-quarks, we have a dedicated csv probability (but not a TF)
-                            if(abs(flavor)==4)
-                                fl = "c";
-
-                            // the random csv value
-                            float csv     =  btagger[fl+"_"+bin]->GetRandom();
-
-                            // !!! smear the jet energy !!!
-                            if(smearJets) pt *= (e_smear/e);
-
-                            // add the jet transverse energy to the sumEt
-                            otree->MET_sumEt_ += pt;
-
-                            if( debug>=3 ) {
-                                cout << "Gen-Jet (smear)" << " => (" << pt << "," << eta << "," << phi << "," << m  << ")" << ", csv=" << csv  << endl;
-                                cout << "jet_smear (" << jet_smear->GetNpx() << " points): " << string(Form("%.2f*exp(-0.5*((x-%.0f)**2)/%.1f**2) + %.2f*exp(-0.5*((x-%.0f)**2)/%.1f**2)",
-                                        jet_smear->GetParameter(0), jet_smear->GetParameter(1),jet_smear->GetParameter(2),
-                                        (1-jet_smear->GetParameter(0)), jet_smear->GetParameter(3), jet_smear->GetParameter(4)
-                                                                                                           ))
-                                     << " => ran : " << e << " --> " << e_smear << endl;
-                            }
-
-                            // keep track of the per-jet smearing (for the MET...)
-                            deltaPx += ( pt*TMath::Cos(phi) );
-                            deltaPy += ( pt*TMath::Sin(phi) );
-
-                            // only jets above pt cut...
-                            if( pt < jetPtThreshold ) continue;
-
-                            // the jet four-vector
-                            TLorentzVector p4;
-                            p4.SetPtEtaPhiM( pt, eta, phi, m );
-
-                            // the jet observables (p4 and csv)
-                            JetObservable myJet;
-                            myJet.p4     = p4;
-                            myJet.csv    = csv;
-                            myJet.flavour= flavor;
-                            myJet.index  = (coll==0 ? hj : -hj-1);
-                            myJet.shift  = 1.0;
-
-                            // push back the jet...
-                            jet_map.push_back    ( myJet );
-
+                        if( debug>=3 ) {
+                            cout << "Gen-Jet #" << hj << " => (" << pt << "," << eta << "," << phi << "," << m  << "), flavor=" << flavor << endl;
                         }
+
+                        // keep track of the per-jet smearing (for the MET...)
+                        deltaPx -= ( pt*TMath::Cos(phi) );
+                        deltaPy -= ( pt*TMath::Sin(phi) );
+
+                        // needed to find appropriate PDF
+                        string bin = "";
+                        if( TMath::Abs( eta ) <= 1.0 )
+                            bin = "Bin0";
+                        if( TMath::Abs( eta ) >  1.0 )
+                            bin = "Bin1";
+
+                        // needed to find appropriate flavor
+                        string fl = "";
+                        if(abs(flavor)==5)
+                            fl = "b";
+                        else
+                            fl = "l";
+
+                        // set-up the TF parameters for the appropriate bin and flavor
+
+                        // relative fraction of the two gaussians
+                        jet_smear->SetParameter(0, fl == "b" ? 0.65 : 1.0);
+
+                        // mean and sigma of the 1st
+                        jet_smear->SetParameter(1, transferfunctions[fl+"_G1_m_"+bin]->Eval( e ));
+                        jet_smear->SetParameter(2, transferfunctions[fl+"_G1_s_"+bin]->Eval( e ));
+
+                        // mean and sigma of the 2nd
+                        jet_smear->SetParameter(3, fl == "b" ? transferfunctions[fl+"_G2_m_"+bin]->Eval( e ) : e);
+                        jet_smear->SetParameter(4, fl == "b" ? transferfunctions[fl+"_G2_s_"+bin]->Eval( e ) : 1.0);
+
+                        // consider the range [0.2,2.0]*e, and evaluate every s1/5 GeV, s1 = width of the narrower gaussian
+                        jet_smear->SetRange(e*0.2, e*2.0);
+                        jet_smear->SetNpx( TMath::Min( TMath::Max( int( (1.8*e)/( jet_smear->GetParameter(2)/5 ) ), int(4)), 200 ) );
+
+                        // the smeared energy
+                        float e_smear = TMath::Max( float(jet_smear->GetRandom()), float(0.) );
+
+                        // for c-quarks, we have a dedicated csv probability (but not a TF)
+                        if(abs(flavor)==4)
+                            fl = "c";
+
+                        // the random csv value
+                        float csv     =  btagger[fl+"_"+bin]->GetRandom();
+
+                        // !!! smear the jet energy !!!
+                        if(smearJets) pt *= (e_smear/e);
+
+                        // add the jet transverse energy to the sumEt
+                        otree->MET_sumEt_ += pt;
+
+                        if( debug>=3 ) {
+                            cout << "Gen-Jet (smear)" << " => (" << pt << "," << eta << "," << phi << "," << m  << ")" << ", csv=" << csv  << endl;
+                            cout << "jet_smear (" << jet_smear->GetNpx() << " points): " << string(Form("%.2f*exp(-0.5*((x-%.0f)**2)/%.1f**2) + %.2f*exp(-0.5*((x-%.0f)**2)/%.1f**2)",
+                                    jet_smear->GetParameter(0), jet_smear->GetParameter(1),jet_smear->GetParameter(2),
+                                    (1-jet_smear->GetParameter(0)), jet_smear->GetParameter(3), jet_smear->GetParameter(4)
+                                                                                                       ))
+                                 << " => ran : " << e << " --> " << e_smear << endl;
+                        }
+
+                        // keep track of the per-jet smearing (for the MET...)
+                        deltaPx += ( pt*TMath::Cos(phi) );
+                        deltaPy += ( pt*TMath::Sin(phi) );
+
+                        // only jets above pt cut...
+                        if( pt < jetPtThreshold ) continue;
+
+                        // the jet four-vector
+                        TLorentzVector p4;
+                        p4.SetPtEtaPhiM( pt, eta, phi, m );
+
+                        // the jet observables (p4 and csv)
+                        JetObservable myJet;
+                        myJet.p4     = p4;
+                        myJet.csv    = csv;
+                        myJet.flavour= flavor;
+                        //FIXME
+                        //myJet.index  = (coll==0 ? hj : -hj-1);
+                        myJet.index  = hj;
+                        myJet.shift  = 1.0;
+
+                        // push back the jet...
+                        jet_map.push_back    ( myJet );
 
                     }
 
@@ -2325,8 +2141,10 @@ int main(int argc, const char* argv[])
                 ////////////////////////////////////////////////////////////////////////
 
                 // MET
-                float nuPx = METtype1p2corr.et*TMath::Cos(METtype1p2corr.phi);
-                float nuPy = METtype1p2corr.et*TMath::Sin(METtype1p2corr.phi);
+                //float nuPx = METtype1p2corr.et*TMath::Cos(METtype1p2corr.phi);
+                //float nuPy = METtype1p2corr.et*TMath::Sin(METtype1p2corr.phi);
+                float nuPx = itree->met__pt * TMath::Cos(itree->met__phi);
+                float nuPy = itree->met__pt * TMath::Sin(itree->met__phi);
 
                 // correct for JEC
                 nuPx -= deltaPx;
@@ -2339,7 +2157,10 @@ int main(int argc, const char* argv[])
                     // save MET kinematics into the tree...
                     otree->MET_pt_    = neutrinoLV.Pt();
                     otree->MET_phi_   = neutrinoLV.Phi();
-                    otree->MET_sumEt_ = METtype1p2corr.sumet;
+
+                    //FIXME: what is the difference between et and sumet for MET?
+                    //otree->MET_sumEt_ = METtype1p2corr.sumet;
+                    otree->MET_sumEt_ = DEF_VAL_FLOAT;
                 }
 
                 // save invisible particles kinematics into the tree...
@@ -2903,7 +2724,7 @@ int main(int argc, const char* argv[])
                 std::map< unsigned int, unsigned int> pos_to_index;
 
                 // condition to trigger the ME calculation
-                bool calcME =
+                const bool calcME =
                     (analyze_typeBTag6  || analyze_typeBTag5  || analyze_typeBTag4)  ||
                     ((analyze_type0      || analyze_type1      || analyze_type2      || analyze_type3      || analyze_type6 ) && numJets30BtagM==4 )  ||
                     (analyze_type7 && numJets30BtagM==3) ||
@@ -2912,14 +2733,12 @@ int main(int argc, const char* argv[])
                 // consider th event only if of the desired type
                 if( calcME ) {
 
-
                     if(debug>=2) {
                         cout << "Pass! Calc. ME..." << endl;
                     }
 
-
                     if( enhanceMC ) {
-                        trial_success = 1;
+                        //trial_success = 1;
                         cout << "Success after " << event_trials << " attempts!" << endl;
                         otree->num_of_trials_ = event_trials;
                         event_trials   = 0;
@@ -2975,7 +2794,7 @@ int main(int argc, const char* argv[])
 
                         if(syst==0) counter++;
                         if(fixNumEvJob && !(counter>=evLow && counter<=evHigh) ) continue;
-                        if(print) cout << "\nProcessing event # " << counter << " (TYPE DL-4 JETS)." << " Event ID " << EVENT.event << endl;
+                        if(print) cout << "\nProcessing event # " << counter << " (TYPE DL-4 JETS)." << " Event ID " << itree->event__id << endl;
 
                         /////////////////////////////////////////////////////
                         otree->type_       = -3;
@@ -2989,7 +2808,7 @@ int main(int argc, const char* argv[])
 
                         if(syst==0) counter++;
                         if(fixNumEvJob && !(counter>=evLow && counter<=evHigh) ) continue;
-                        if(print) cout << "\nProcessing event # " << counter << " (TYPE SL-5 JETS)." << " Event ID " << EVENT.event << endl;
+                        if(print) cout << "\nProcessing event # " << counter << " (TYPE SL-5 JETS)." << " Event ID " << itree->event__id << endl;
 
                         /////////////////////////////////////////////////////
                         otree->type_       = -1;
@@ -3003,7 +2822,7 @@ int main(int argc, const char* argv[])
 
                         if(syst==0) counter++;
                         if(fixNumEvJob && !(counter>=evLow && counter<=evHigh) ) continue;
-                        if(print) cout << "\nProcessing event # " << counter << " (TYPE SL6 JETS)." << " Event ID " << EVENT.event << endl;
+                        if(print) cout << "\nProcessing event # " << counter << " (TYPE SL6 JETS)." << " Event ID " << itree->event__id << endl;
 
                         /////////////////////////////////////////////////////
                         otree->type_       =  -2;
@@ -3034,7 +2853,7 @@ int main(int argc, const char* argv[])
 
                             if(syst==0) counter++;
                             if( fixNumEvJob && !(counter>=evLow && counter<=evHigh) ) continue;
-                            if(print) cout << "\nProcessing event # " << counter << " (TYPE 0), mW=" << WMass << " GeV." << " Event ID " << EVENT.event << endl;
+                            if(print) cout << "\nProcessing event # " << counter << " (TYPE 0), mW=" << WMass << " GeV." << " Event ID " << itree->event__id << endl;
 
                             /////////////////////////////////////////////////////
                             otree->type_       =  0;
@@ -3047,7 +2866,7 @@ int main(int argc, const char* argv[])
 
                             if(syst==0) counter++;
                             if( fixNumEvJob && !(counter>=evLow && counter<=evHigh)  ) continue;
-                            if(print) cout << "\nProcessing event # " << counter << " (TYPE 1), mW=" << WMass << " GeV." << " Event ID " << EVENT.event << endl;
+                            if(print) cout << "\nProcessing event # " << counter << " (TYPE 1), mW=" << WMass << " GeV." << " Event ID " << itree->event__id << endl;
 
                             /////////////////////////////////////////////////////
                             otree->type_       =  1;
@@ -3073,7 +2892,7 @@ int main(int argc, const char* argv[])
 
                         if(syst==0) counter++;
                         if(fixNumEvJob && !(counter>=evLow && counter<=evHigh) ) continue;
-                        if(print) cout << "\nProcessing event # " << counter << " (TYPE 1)." << " Event ID " << EVENT.event << endl;
+                        if(print) cout << "\nProcessing event # " << counter << " (TYPE 1)." << " Event ID " << itree->event__id << endl;
 
                         // set index for untagged jet
                         ind1 = buntag_indices[0];
@@ -3098,7 +2917,7 @@ int main(int argc, const char* argv[])
 
                         if(syst==0) counter++;
                         if(fixNumEvJob && !(counter>=evLow && counter<=evHigh) ) continue;
-                        if(print) cout << "\nProcessing event # " << counter << " (TYPE 3)." << " Event ID " << EVENT.event << endl;
+                        if(print) cout << "\nProcessing event # " << counter << " (TYPE 3)." << " Event ID " << itree->event__id << endl;
 
                         // find out which are ind1 and ind2...
                         float minDiff     = 99999.;
@@ -3210,7 +3029,7 @@ int main(int argc, const char* argv[])
 
                         if(syst==0) counter++;
                         if(fixNumEvJob && !(counter>=evLow && counter<=evHigh) ) continue;
-                        if(print) cout << "Processing event # " << counter << " (TYPE 6)." << " Event ID " << EVENT.event << endl;
+                        if(print) cout << "Processing event # " << counter << " (TYPE 6)." << " Event ID " << itree->event__id << endl;
 
                         /////////////////////////////////////////////////////
                         otree->type_       =  6;
@@ -3224,7 +3043,7 @@ int main(int argc, const char* argv[])
 
                         if(syst==0) counter++;
                         if(fixNumEvJob && !(counter>=evLow && counter<=evHigh) ) continue;
-                        if(print) cout << "Processing event # " << counter << " (TYPE 7)." << " Event ID " << EVENT.event << endl;
+                        if(print) cout << "Processing event # " << counter << " (TYPE 7)." << " Event ID " << itree->event__id << endl;
 
                         /////////////////////////////////////////////////////
                         otree->type_       =  7;
@@ -3252,7 +3071,7 @@ int main(int argc, const char* argv[])
 
                     // DEBUG
                     if(debug>=1) {
-                        cout << "*** Event ID " << EVENT.event << " *** systematics: " << otree->syst_ << endl;
+                        cout << "*** Event ID " << itree->event__id << " *** systematics: " << otree->syst_ << endl;
                         cout << " ==> SL=" << int(properEventSL) << ", DL=" << properEventDL << endl;
                         cout << "     NJets " << otree->numJets_ << " (" << otree->numBTagM_ << " tagged)" << endl;
                         if(useRegression)
@@ -3521,7 +3340,7 @@ int main(int argc, const char* argv[])
                     meIntegrator->setMEtCov(-99,-99,0);
 
                     // specify if topLep has pdgid +6 or -6
-                    meIntegrator->setTopFlags( vLepton_charge[0]==1 ? +1 : -1 , vLepton_charge[0]==1 ? -1 : +1 );
+                    meIntegrator->setTopFlags( itree->lep__charge[0]==1 ? +1 : -1 , itree->lep__charge[0]==1 ? -1 : +1 );
 
                     // if needed, switch off OL
                     if(switchoffOL) {
@@ -3615,7 +3434,7 @@ int main(int argc, const char* argv[])
                                         // update...
                                         meIntegrator->setJets(&jets);
 
-                                    }
+                                    } //try to recover events
 
                                     // consider permutation #pos & save permutation-to-jet mas into the tree...
                                     meIntegrator->initVersors( permutList[pos] );
@@ -3773,7 +3592,7 @@ int main(int argc, const char* argv[])
                                             otree->probAtSgn_jj_permut_[pos] =  p_b_bLep * p_b_bHad * p_j_b1 * p_j_b2 * p_j_w1 * p_j_w2;
                                         }
 
-                                    }
+                                    } //use b-tag
 
                                     // if doing scan over b-tag only, don't need amplitude...
                                     if( otree->type_<0  ) continue;
@@ -4074,7 +3893,7 @@ int main(int argc, const char* argv[])
                                             // free the allocated memory
                                             if( integralOption2==0 ) delete ig2;
 
-                                        }
+                                        } //full VEGAS run
 
 
                                         // re-run the integration using the last grid only
@@ -4142,7 +3961,7 @@ int main(int argc, const char* argv[])
                                         }
 
 
-                                    }
+                                    } //skip ME
 
                                     // can still be interested in b-tagging, so set p=1...
                                     else {
@@ -4207,8 +4026,8 @@ int main(int argc, const char* argv[])
 
                                     /////////////////////////////////////////////////////////////
 
-                                }  // hypothesis
-                            }  // permutations
+                                }  // hypothesis FIXME: actually permutations?
+                            }  // permutations  FIXME actually hypothesis?
                         }  // nTopMassPoints
                     }  // nHiggsMassPoints
 
@@ -4219,7 +4038,8 @@ int main(int argc, const char* argv[])
 
                     // this time is integrated over all hypotheses, permutations, and mass scan values
                     if(print) cout << "Done in " << otree->time_ << " sec" << endl;
-                }
+
+                } //calculate matrix element
 
                 ///////////////////////////////////////////////////
                 // ALL THE REST...                               //
@@ -4320,16 +4140,17 @@ int main(int argc, const char* argv[])
 
                             else {}
 
-                        }
+                        } //jet loop
 
-                        // fill the tree...
+                        // fill the tree 
                         otree->tree->Fill();
-                    }
+                    } //ntuplizeAll
 
                     continue;
-                }
+                } //case where matrix element is not calculated
 
                 // fill the tree...
+                // FIXME: why is this here twice?
                 otree->tree->Fill();
 
             } // systematics
@@ -4348,7 +4169,7 @@ int main(int argc, const char* argv[])
             if(perm_to_integrator.size()>0 && print)
                 cout << "Deleted " << countGSL << " GSLMCIntegrator(s)" << endl;
 
-        } // nentries
+        } // nentries, event loop
 
         // this histogram keeps track of the fraction of analyzed events per sample
         hcounter->SetBinContent(1,float(events_)/nentries);

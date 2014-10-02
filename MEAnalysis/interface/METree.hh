@@ -7,6 +7,7 @@
 // maximum number of four-vectors per event saved in output
 #define NMAXJETS   10
 
+#define NMAXLEPTONS 2
 class METree {
 public:
 	METree(TTree* _tree) {
@@ -153,19 +154,19 @@ public:
     
     // lepton kinematic (at most two leptons)
     int   nLep_;
-    float lepton_pt_    [2];
-    float lepton_eta_   [2];
-    float lepton_phi_   [2];
-    float lepton_m_     [2];
-    float lepton_charge_[2];
-    float lepton_rIso_  [2];
-    int   lepton_type_  [2];
-    float lepton_dxy_   [2];
-    float lepton_dz_    [2];
-    float lepton_wp80_  [2];
-    float lepton_wp95_  [2];
-    float lepton_wp70_  [2];
-    float lepton_MVAtrig_ [2];
+    float lepton_pt_    [NMAXLEPTONS];
+    float lepton_eta_   [NMAXLEPTONS];
+    float lepton_phi_   [NMAXLEPTONS];
+    float lepton_m_     [NMAXLEPTONS];
+    float lepton_charge_[NMAXLEPTONS];
+    float lepton_rIso_  [NMAXLEPTONS];
+    int   lepton_type_  [NMAXLEPTONS];
+    float lepton_dxy_   [NMAXLEPTONS];
+    float lepton_dz_    [NMAXLEPTONS];
+    float lepton_wp80_  [NMAXLEPTONS];
+    float lepton_wp95_  [NMAXLEPTONS];
+    float lepton_wp70_  [NMAXLEPTONS];
+    float lepton_MVAtrig_ [NMAXLEPTONS];
     
     float Mll_, MTln_;
     

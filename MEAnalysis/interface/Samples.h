@@ -221,9 +221,9 @@ TTree* Samples::GetTree(string sampleName, string treeName) {
 
     TTree *tree = 0;
     if(mapFile_[sampleName]!=0) tree = (TTree*)(mapFile_[sampleName])->Get(treeName.c_str());
-    if(!tree) {
+    if(!tree || tree->IsZombie()) {
         err_ = 1;
-        if(verbose_) cout << "Could not find tree " << treeName << " in sample " << sampleName << endl;
+        if(verbose_) cerr << "Could not find tree " << treeName << " in sample " << sampleName << endl;
     }
     return tree;
 

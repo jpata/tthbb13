@@ -18,11 +18,14 @@ constexpr bool is_undef(double x) { return fabs(x-DEF_VAL_DOUBLE) < DOUBLE_EPS; 
 class TTHTree {
 public:
 	
-    TTHTree(TTree* _tree) {
-        tree = _tree; 
-    };
-
 	TTree* tree;
+
+    TTHTree(TTree* _tree) {
+        tree = _tree;
+        loop_initialize();
+        make_branches();
+    }
+
 	std::map<const std::string, const void*> branch_map;
 	double debug__time1c;
 	double debug__time1r;
@@ -44,6 +47,7 @@ public:
 	int gen_jet_parton__status[N_MAX];
 	float gen_lep__eta[N_MAX];
 	int gen_lep__id[N_MAX];
+	int gen_lep__type[N_MAX];
 	float gen_lep__mass[N_MAX];
 	float gen_lep__phi[N_MAX];
 	float gen_lep__pt[N_MAX];
@@ -91,6 +95,7 @@ public:
 	float lep__eta[N_MAX];
 	float lep__hc_iso[N_MAX];
 	int lep__id[N_MAX];
+	int lep__type[N_MAX];
 	int lep__id_bitmask[N_MAX];
 	int lep__is_loose[N_MAX];
 	int lep__is_medium[N_MAX];

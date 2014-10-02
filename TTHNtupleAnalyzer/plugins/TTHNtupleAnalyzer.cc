@@ -188,11 +188,6 @@ private:
   const double tauPt_min_;
 };
 
-TTHTree::TTHTree(TTree* _tree) {
-    tree = _tree;
-    loop_initialize();
-    make_branches();
-}
 
 TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
     muonToken_(consumes<pat::MuonCollection>(iConfig.getParameter<edm::InputTag>("muons"))),
@@ -697,6 +692,9 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
     assert(top_jets->size()==top_jet_infos->size());
 
+    //FIXME: associate subjets and topjets via BasicJet::getConstituents
+    //See /cvmfs/cms.cern.ch/slc6_amd64_gcc481/cms/cmssw/CMSSW_7_0_9/src/RecoJets/JetProducers/plugins/CompoundJetProducer.cc
+    //about the association
     for (unsigned int n_top_jet=0; n_top_jet<top_jets->size(); n_top_jet++) {
         const reco::BasicJet& x = top_jets->at(n_top_jet);
         const reco::CATopJetTagInfo& jet_info = top_jet_infos->at(n_top_jet);
