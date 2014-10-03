@@ -227,7 +227,7 @@ int main(int argc, const char* argv[])
     const vector<string> functions(in.getParameter<vector<string> > ("functions"));
     const vector<int>    evLimits (in.getParameter<vector<int> >    ("evLimits"));
     const int   ntuplizeAll      ( in.getUntrackedParameter<int>    ("ntuplizeAll",0));
-    //FIXME: unused 
+    //FIXME: unused
     //const int   reject_pixel_misalign_evts ( in.getUntrackedParameter<int> ("reject_pixel_misalign_evts", 1));
 
     const int doGenLevelAnalysis ( in.getUntrackedParameter<int>    ("doGenLevelAnalysis",  0));
@@ -569,7 +569,7 @@ int main(int argc, const char* argv[])
     int events_     = 0;
 
     //Output TTree is now wrapped in a separate class
-    TTree* _otree = new TTree("tree", ""); 
+    TTree* _otree = new TTree("tree", "");
     METree* otree = new METree(_otree);
     otree->make_branches(MH);
 
@@ -629,24 +629,29 @@ int main(int argc, const char* argv[])
         mySamples->OpenFile( currentName );
         cout << "Opening file " << currentName << endl;
         TTree* currentTree       = mySamples->GetTree  (currentName, TTH_TTREE_NAME);
+
+        //create the input TTree with branches
         TTHTree* itree = new TTHTree(currentTree);
+        itree->set_branch_addresses();
+        currentTree->SetBranchStatus("*", 1);
 
         float scaleFactor        = mySamples->GetWeight(currentName);
 
-        //FIXME: insert into ntuples 
+        //FIXME: insert into ntuples
         //TH1F* count_Q2           = mySamples->GetHisto (currentName, "Count_Q2");
-       
+
         //FIXME: unused?
         //const float normDown           = count_Q2 ? count_Q2->GetBinContent(1)/count_Q2->GetBinContent(2) : 1.0;
         //const float normUp             = count_Q2 ? count_Q2->GetBinContent(3)/count_Q2->GetBinContent(2) : 1.0;
-        
+
         cout << "Done!!" << endl;
-       
+
         //FIXME: insert this into input ntuples
-        int Vtype = 0, nSimBs = 0; 
+        int Vtype = 0, nSimBs = 0;
         UChar_t triggerFlags[70];
-       
+
         //initialize empty structs
+        ////FIXME: need to add to input ntuples
         genTopInfo genTop = {};
         genTopInfo genTbar = {};
         genParticleInfo genB = {};
@@ -662,14 +667,17 @@ int main(int argc, const char* argv[])
 
         // loop over entries
         int counter = 0;
-        Long64_t nentries = currentTree->GetEntries();
+        const Long64_t nentries = currentTree->GetEntries();
         cout << "Total number of entries: " << nentries << endl;
         cout << " -> This job will process events in the range [ " << evLow << ", " << evHigh << " ]" << endl;
 
         int event_trials  = 0;
 
         if( evHigh<0 ) evHigh = nentries;
+        //event loop
         for (Long64_t i = 0; i < nentries ; i++) {
+            // initialize branch variables
+            itree->loop_initialize();
 
             // if fixed-size job and above upper bound, continue...
             if(counter>evHigh && fixNumEvJob) continue;
@@ -688,31 +696,29 @@ int main(int argc, const char* argv[])
             itree->weight__pu_up      = 1.0;
             itree->weight__pu_down      = 1.0;
             itree->lhe__n_j          = 1.0;
-            
-            //FIXME 
+
+            //FIXME
             //weightTrig2012 = 1.0;
-            
+
+            //initialize trigger flags
             for(int k = 0; k < 70 ; k++) {
                 otree->triggerFlags_[k] = 1;
             }
             for(int k = 0; k < 3 ; k++) {
                 otree->SCALEsyst_[k] = 1.0;
             }
-            
+
             //FIXME: setting the value of inputs? I guess it is resetting, right?
             //nhJets = 0;
             //nPVs   = 1;
 
-
-            // initialize branch variables
-            itree->loop_initialize();
             // read event...
-            currentTree->GetEntry(i);
+            long nbytes = currentTree->GetEntry(i);
 
             if( debug>=2 ) {
                 cout << endl;
                 cout << "******************************" << endl;
-                cout << "Analyzing event " << itree->event__id << endl;
+                cout << "Analyzing event " << itree->event__id << " bytes " << nbytes << " read" << endl;
             }
 
             //FIXME
@@ -746,11 +752,11 @@ int main(int argc, const char* argv[])
             //otree->n_c_                = SCALEsyst[8];
             //otree->n_l_                = SCALEsyst[7];
             //otree->n_g_                = SCALEsyst[6];
-            
+
 
             //FIXME: not needed any more, do we want to keep the trigger weight infrastructure
             //otree->trigger_     = weightTrig2012;
-            
+
             otree->loop_initialize();
 
             for(int k = 0; k < 70 ; k++) {
@@ -1105,9 +1111,7 @@ int main(int argc, const char* argv[])
             if(debug>=2) cout << "@F" << endl;
 
             // save informations on the ttH system
-            if( switchoffOL==0 &&
-                    otree->p4T_[0]>0. && otree->p4Tbar_[0]>0. && otree->p4H_[0]>0. &&
-                    TMath::Abs(HIGGSB1.Py())>0  && TMath::Abs(HIGGSB2.Py())>0) {
+            if( switchoffOL==0 && otree->p4T_[0]>0. && otree->p4Tbar_[0]>0. && otree->p4H_[0]>0. && TMath::Abs(HIGGSB1.Py())>0  && TMath::Abs(HIGGSB2.Py())>0) {
 
                 if(debug>=2) {
                     cout <<  "p4T    = (" << otree->p4T_   [0] << "," <<    otree->p4T_   [1]<< "," <<    otree->p4T_   [2] << "," <<    otree->p4T_   [3] << ")" << endl;
@@ -1146,7 +1150,7 @@ int main(int argc, const char* argv[])
             if(debug>=2) cout << "@G" << endl;
 
             // find out number of b-hadrons in the event...
-            //FIXME: duplicated earlier? 
+            //FIXME: duplicated earlier?
             //otree->nSimBs_         = nSimBs;
             otree->nMatchSimBsOld_ = 0;
             otree->nMatchSimBs_v1_ = 0;
@@ -1157,7 +1161,7 @@ int main(int argc, const char* argv[])
             otree->nMatchSimCs_    = 0;
 
 
-
+            //FIXME: what is this loop for?
             for(int l = 0; l<nSimBs; l++) {
                 TLorentzVector Bs(1,0,0,1);
                 Bs.SetPtEtaPhiM( SimBspt[l], SimBseta[l], SimBsphi[l], SimBsmass[l]);
@@ -1171,7 +1175,7 @@ int main(int argc, const char* argv[])
                         hJLV.SetPtEtaPhiM( itree->gen_jet__pt[hj], itree->gen_jet__eta[hj], itree->gen_jet__phi[hj], 0.0);
                     if( hJLV.Pt()>20 && TMath::Abs(hJLV.Eta())<5 && deltaR(Bs, hJLV)<0.5 ) otree->nMatchSimBsOld_++;
                 }
-                
+
                 //FIXME: all jets now in the same vector
                 //for(int aj = 0; aj<naJets; aj++) {
                 //    TLorentzVector aJLV(1,0,0,1);
@@ -1180,6 +1184,7 @@ int main(int argc, const char* argv[])
                 //    if( aJLV.Pt()>20 && TMath::Abs(aJLV.Eta())<5 && deltaR(Bs, aJLV)<0.5 ) otree->nMatchSimBsOld_++;
                 //}
             }
+
             if( nSimBs>=2) {
                 for(int l = 0; l<nSimBs-1; l++) {
                     TLorentzVector Bs1(1,0,0,1);
@@ -1196,77 +1201,89 @@ int main(int argc, const char* argv[])
                 }
             }
 
-            auto vec_from_jet = [&itree] (const int nj) {
-                TLorentzVector hJLV(1,0,0,1);
-                hJLV.SetPtEtaPhiM( itree->gen_jet__pt[nj], itree->gen_jet__eta[nj], itree->gen_jet__phi[nj], 0.0);
-                return hJLV;
-            };
+            //auto vec_from_gen_jet = [&itree, debug] (const int nj) {
+            //    TLorentzVector hJLV(1,0,0,1);
+            //    hJLV.SetPtEtaPhiM( itree->gen_jet__pt[nj], itree->gen_jet__eta[nj], itree->gen_jet__phi[nj], 0.0);
 
-            // now find out how many matched b's we have...
-            for(int hj = 0; hj<itree->n__jet; hj++) {
-                
-                //TLorentzVector hJLV(1,0,0,1);
-                //if(itree->jet__pt[hj]>10)
-                //    hJLV.SetPtEtaPhiM( itree->gen_jet__pt[hj], itree->gen_jet__eta[hj], itree->gen_jet__phi[hj], 0.0);
-                TLorentzVector hJLV = vec_from_jet(hj);
+            //    if (is_undef(itree->gen_jet__pt[nj])) {
+            //        cerr << "gen jet " << nj << " pt is " << itree->gen_jet__pt[nj] << " -> was unset in TTree" << endl;
+            //        return TLorentzVector(0, 0, 0, 0);
+            //    }
 
-                // if jet is within acceptance...
-                if( hJLV.Pt() > 20 && TMath::Abs(hJLV.Eta()) < 5 ) {
-                    if( topBLV.Pt() > 10 && deltaR(topBLV, hJLV ) < 0.5 ) continue;
-                    if(atopBLV.Pt() > 10 && deltaR(atopBLV, hJLV ) < 0.5 ) continue;
-                    if( abs(itree->jet__id[hj])==5 ) otree->nMatchSimBs_v1_++;
-                }
+            //    return hJLV;
+            //};
 
-                if( hJLV.Pt() > 20 && TMath::Abs(hJLV.Eta()) < 2.5 ) {
-                    if( topBLV.Pt() > 10 && deltaR(topBLV, hJLV ) < 0.5 ) continue;
-                    if(atopBLV.Pt() > 10 && deltaR(atopBLV,hJLV ) < 0.5 ) continue;
-                    if( abs(itree->jet__id[hj])==5 ) otree->nMatchSimBs_v2_++;
-                }
-                
-                //FIXME: Why 2 Pt checks?
-                //if( itree->jet__pt[hj]>30 && hJLV.Pt()>20 && TMath::Abs(hJLV.Eta())<2.5 ) {
-                if( hJLV[hj]>30 && hJLV.Pt()>20 && TMath::Abs(hJLV.Eta())<2.5 ) {
-                    if( topBLV.Pt()>10 && deltaR(topBLV, hJLV )<0.5 ) continue;
-                    if(atopBLV.Pt()>10 && deltaR(atopBLV,hJLV )<0.5 ) continue;
-                    if( abs(itree->jet__id[hj])==5 ) otree->nMatchSimBs_++; //baseline
-                }
+            //FIXME: commented out for now
+            //// now find out how many matched b's we have...
+            //for(int hj = 0; hj<itree->n__jet; hj++) {
+            //
+            //    //TLorentzVector hJLV(1,0,0,1);
+            //    //if(itree->jet__pt[hj]>10)
+            //    //    hJLV.SetPtEtaPhiM( itree->gen_jet__pt[hj], itree->gen_jet__eta[hj], itree->gen_jet__phi[hj], 0.0);
+            //    //
+            //    if (debug>2) {
+            //        cout << "jet rec " << itree->jet__id[hj] << " pt " << itree->jet__pt[hj] << " eta " << itree->jet__eta[hj] << " phi " << itree->jet__phi[hj] << endl;
+            //        cout << "jet gen " << itree->gen_jet__id[hj] << " pt " << itree->gen_jet__pt[hj] << " eta " << itree->gen_jet__eta[hj] << " phi " << itree->gen_jet__phi[hj] << endl;
+            //    }
+            //    TLorentzVector hJLV = vec_from_gen_jet(hj);
 
-            }
+            //    // if jet is within acceptance...
+            //    if( hJLV.Pt() > 20 && TMath::Abs(hJLV.Eta()) < 5 ) {
+            //        if( topBLV.Pt() > 10 && deltaR(topBLV, hJLV ) < 0.5 ) continue;
+            //        if(atopBLV.Pt() > 10 && deltaR(atopBLV, hJLV ) < 0.5 ) continue;
+            //        if( abs(itree->jet__id[hj])==5 ) otree->nMatchSimBs_v1_++;
+            //    }
 
-            // now find out how many matched c's we have...
-            for(int hj = 0; hj<itree->n__jet; hj++) {
-                //TLorentzVector hJLV(1,0,0,1);
-                //if(itree->gen_jet__pt[hj]>10)
-                //    hJLV.SetPtEtaPhiM( itree->gen_jet__pt[hj], itree->gen_jet__eta[hj], itree->gen_jet__phi[hj], 0.0);
-                TLorentzVector hJLV = vec_from_jet(hj);
+            //    if( hJLV.Pt() > 20 && TMath::Abs(hJLV.Eta()) < 2.5 ) {
+            //        if( topBLV.Pt() > 10 && deltaR(topBLV, hJLV ) < 0.5 ) continue;
+            //        if(atopBLV.Pt() > 10 && deltaR(atopBLV,hJLV ) < 0.5 ) continue;
+            //        if( abs(itree->jet__id[hj])==5 ) otree->nMatchSimBs_v2_++;
+            //    }
+            //
+            //    //FIXME: Why 2 Pt checks?
+            //    //if( itree->jet__pt[hj]>30 && hJLV.Pt()>20 && TMath::Abs(hJLV.Eta())<2.5 ) {
+            //    if( hJLV[hj]>30 && hJLV.Pt()>20 && TMath::Abs(hJLV.Eta())<2.5 ) {
+            //        if( topBLV.Pt()>10 && deltaR(topBLV, hJLV )<0.5 ) continue;
+            //        if(atopBLV.Pt()>10 && deltaR(atopBLV,hJLV )<0.5 ) continue;
+            //        if( abs(itree->jet__id[hj])==5 ) otree->nMatchSimBs_++; //baseline
+            //    }
 
-                // if jet is within acceptance...
-                if( hJLV.Pt()>20 && TMath::Abs(hJLV.Eta())<5 ) {
-                    if( topCLV.Pt()>10 && deltaR(topCLV, hJLV )<0.5 ) continue;
-                    if(atopCLV.Pt()>10 && deltaR(atopCLV,hJLV )<0.5 ) continue;
-                    if( abs(itree->jet__id[hj])==4 ) otree->nMatchSimCs_v1_++;
-                }
+            //}
 
-                if( hJLV.Pt()>20 && TMath::Abs(hJLV.Eta())<2.5 ) {
-                    if( topCLV.Pt()>10 && deltaR(topCLV, hJLV )<0.5 ) continue;
-                    if(atopCLV.Pt()>10 && deltaR(atopCLV,hJLV )<0.5 ) continue;
-                    if( abs(itree->jet__id[hj])==4 ) otree->nMatchSimCs_v2_++;
-                }
+            //// now find out how many matched c's we have...
+            //for(int hj = 0; hj<itree->n__jet; hj++) {
+            //    //TLorentzVector hJLV(1,0,0,1);
+            //    //if(itree->gen_jet__pt[hj]>10)
+            //    //    hJLV.SetPtEtaPhiM( itree->gen_jet__pt[hj], itree->gen_jet__eta[hj], itree->gen_jet__phi[hj], 0.0);
+            //    TLorentzVector hJLV = vec_from_gen_jet(hj);
 
-                //FIXME: Why 2 Pt checks?
-                //if( itree->jet__pt[hj]>30 && hJLV.Pt()>20 && TMath::Abs(hJLV.Eta())<2.5 ) {
-                if( hJLV[hj]>30 && hJLV.Pt()>20 && TMath::Abs(hJLV.Eta())<2.5 ) {
-                    if( topCLV.Pt()>10 && deltaR(topCLV, hJLV )<0.5 ) continue;
-                    if(atopCLV.Pt()>10 && deltaR(atopCLV,hJLV )<0.5 ) continue;
-                    if( abs(itree->jet__id[hj])==4 ) otree->nMatchSimCs_++;
-                }
+            //    // if jet is within acceptance...
+            //    if( hJLV.Pt()>20 && TMath::Abs(hJLV.Eta())<5 ) {
+            //        if( topCLV.Pt()>10 && deltaR(topCLV, hJLV )<0.5 ) continue;
+            //        if(atopCLV.Pt()>10 && deltaR(atopCLV,hJLV )<0.5 ) continue;
+            //        if( abs(itree->jet__id[hj])==4 ) otree->nMatchSimCs_v1_++;
+            //    }
 
-            }
+            //    if( hJLV.Pt()>20 && TMath::Abs(hJLV.Eta())<2.5 ) {
+            //        if( topCLV.Pt()>10 && deltaR(topCLV, hJLV )<0.5 ) continue;
+            //        if(atopCLV.Pt()>10 && deltaR(atopCLV,hJLV )<0.5 ) continue;
+            //        if( abs(itree->jet__id[hj])==4 ) otree->nMatchSimCs_v2_++;
+            //    }
+
+            //    //FIXME: Why 2 Pt checks?
+            //    //if( itree->jet__pt[hj]>30 && hJLV.Pt()>20 && TMath::Abs(hJLV.Eta())<2.5 ) {
+            //    if( hJLV[hj]>30 && hJLV.Pt()>20 && TMath::Abs(hJLV.Eta())<2.5 ) {
+            //        if( topCLV.Pt()>10 && deltaR(topCLV, hJLV )<0.5 ) continue;
+            //        if(atopCLV.Pt()>10 && deltaR(atopCLV,hJLV )<0.5 ) continue;
+            //        if( abs(itree->jet__id[hj])==4 ) otree->nMatchSimCs_++;
+            //    }
+
+            //}
 
             if(debug>=2) cout << "@H" << endl;
 
             int lock          = 0;
-            
+
             //int trial_success = 0;
 
             // loop over systematics
@@ -1328,14 +1345,33 @@ int main(int argc, const char* argv[])
                 int numLooseAElec = 0;
                 int loose_ele_idx    = DEF_VAL_INT;
 
+                //loop over leptons
                 for( int k = 0; k < itree->n__lep ; k++) {
 
-                    float lep_pt   = itree->lep__pt[k];
-                    float lep_eta  = itree->lep__eta[k];
-                    float lep_type = abs(itree->lep__id[k]);
-                    float lep_iso  = itree->lep__rel_iso[k];
-                    float lep_dxy  = TMath::Abs(itree->lep__dxy[k]);
-                    float lep_dz   = TMath::Abs(itree->lep__dz[k]);
+                    const float lep_pt   = itree->lep__pt[k];
+                    const float lep_eta  = itree->lep__eta[k];
+                    const float lep_phi  = itree->lep__phi[k];
+                    const float lep_type = abs(itree->lep__id[k]);
+                    const float lep_iso  = itree->lep__rel_iso[k];
+                    const float lep_dxy  = TMath::Abs(itree->lep__dxy[k]);
+                    const float lep_dz   = TMath::Abs(itree->lep__dz[k]);
+                    const float lep_charge = itree->lep__charge[k];
+
+                    if (debug > 2) {
+                        cout << "lepton rec " << lep_type << " pt " << lep_pt
+                             << " eta " << lep_eta << " phi " << lep_phi
+                             << " iso " << lep_iso << " dxy " << lep_dxy
+                             << " dz " << lep_dz << " charge " << lep_charge << endl;
+                    }
+
+                    const float gen_lep_pt   = itree->lep__pt[k];
+                    const float gen_lep_eta  = itree->lep__eta[k];
+                    const float gen_lep_phi  = itree->lep__phi[k];
+                    const float gen_lep_type = abs(itree->lep__id[k]);
+
+                    if (debug > 2) {
+                        cout << "lepton gen " << gen_lep_type << " pt " << gen_lep_pt << " eta " << gen_lep_eta << " phi " << gen_lep_phi << endl;
+                    }
 
                     if(
                         // muons
@@ -1346,10 +1382,11 @@ int main(int argc, const char* argv[])
                         // lep_iso < lepIsoLoose && vLepton_wp95[k] > 0 && lep_dxy < 0.04 && lep_dz<1.0 )
                         (lep_type == 11 && lep_pt > lepPtLoose && TMath::Abs(lep_eta)<elEta && !(TMath::Abs(lep_eta) >1.442 && TMath::Abs(lep_eta)<1.566) &&
                          lep_iso < lepIsoLoose &&  lep_dxy < 0.04 && lep_dz<1.0 )
-                    )
+                    ) {
                         numLooseLep++;
-                
-                   
+                    }
+
+
                     //FIXME: missing WP
                     if(  lep_type == 11 && lep_pt > lepPtLoose && TMath::Abs(lep_eta)<elEta && !(TMath::Abs(lep_eta) >1.442 && TMath::Abs(lep_eta)<1.566) &&
                             lep_iso < lepIsoLoose && lep_dxy < 0.04 && lep_dz<1.0) {
@@ -1359,8 +1396,8 @@ int main(int argc, const char* argv[])
                 }
 
 
-                //FIXME
-                if(  debug>=2 && Vtype==2 && numLooseAElec>0) {
+                //FIXME, removed Vtype from here
+                if( debug>=2 ) {
                     cout << numLooseLep << " loose leptons, "<< numLooseAElec << " loose electron(s) found in aLepton collection" << endl;
                 }
 
@@ -1373,12 +1410,12 @@ int main(int argc, const char* argv[])
                 if( (ENABLE_EJ && numLooseLep==1 && Vtype==3) || (ENABLE_MJ && numLooseLep==1 && numLooseAElec<1 && Vtype==2) ) {
 
                     // first lepton...
-                    leptonLV.SetPtEtaPhiM(itree->lep__pt[0],itree->lep__eta[0],itree->lep__phi[0],itree->lep__mass[0]);
+                    leptonLV.SetPtEtaPhiM(itree->lep__pt[0], itree->lep__eta[0], itree->lep__phi[0], itree->lep__mass[0]);
 
-                    lep_index.push_back( 0 );
+                    lep_index.push_back(0);
 
                     if(doGenLevelAnalysis) {
-                        if( itree->gen_lep__pt[0]>5.)
+                        if( itree->gen_lep__pt[0] > 5.)
                             leptonLV.SetPtEtaPhiM(itree->gen_lep__pt[0], itree->gen_lep__eta[0], itree->gen_lep__phi[0], (itree->lep__type[0]==13 ? 0.113 : 0.0005 )  );
                         else
                             leptonLV.SetPtEtaPhiM( 5., 0., 0., 0. );
@@ -1386,7 +1423,7 @@ int main(int argc, const char* argv[])
 
                     // tight cuts on lepton (SL)
                     int lepSelVtype2 =  (Vtype==2 && itree->lep__type[0]==13 && leptonLV.Pt()>lepPtTight &&
-                                         TMath::Abs(leptonLV.Eta())<muEtaTight && itree->lep__rel_iso[0]<lepIsoTight);
+                                         TMath::Abs(leptonLV.Eta()) < muEtaTight && itree->lep__rel_iso[0] < lepIsoTight);
                     //int lepSelVtype3 =  (Vtype==3 && itree->lep__type[0]==11 && leptonLV.Pt()>lepPtTight &&
                     //                     itree->lep__rel_iso[0]<lepIsoTight && vLepton_wp80[0]>0 && TMath::Abs(itree->lep__dxy[0])<0.02 );
                     int lepSelVtype3 =  (Vtype==3 && itree->lep__type[0]==11 && leptonLV.Pt()>lepPtTight &&
@@ -1450,7 +1487,7 @@ int main(int argc, const char* argv[])
                         cout << "nvlep=" << itree->n__lep << ", Vtype=" << Vtype << endl;
                         cout << "Lep sel. Vtype2 = " << lepSelVtype2 << ", lep sel. Vtype3 = " << lepSelVtype3 << endl;
                         cout << "Trigger: " <<  ((isMC ? 1 : trigVtype2) || (isMC ? 1 : trigVtype3)) << endl;
-                        cout << "Passes = " << int (properEventSL) << endl;
+                        cout << "Passes = " << int (properEventSL) << " SL" << endl;
                     }
 
                     // save lepton kinematics...
@@ -1465,7 +1502,7 @@ int main(int argc, const char* argv[])
                     otree->lepton_type_   [0] = itree->lep__type[0];
                     otree->lepton_dxy_    [0] = itree->lep__dxy[0];
                     otree->lepton_dz_     [0] = itree->lep__dz[0];
-                    //FIXME 
+                    //FIXME
                     //otree->lepton_wp80_   [0] = vLepton_wp80[0];
                     //otree->lepton_wp95_   [0] = vLepton_wp95[0];
                     //otree->lepton_wp70_   [0] = vLepton_wp70[0];
@@ -1484,6 +1521,8 @@ int main(int argc, const char* argv[])
                 properEventDL = false;
                 if( numLooseLep==2 && ( (ENABLE_MM && Vtype==0) || (ENABLE_EE && Vtype==1) )) {
 
+
+                    //FIXME: is it safe to assume the good leptons are in the beginning of the array?
                     // first lepton...
                     leptonLV.SetPtEtaPhiM (itree->lep__pt[0],itree->lep__eta[0],itree->lep__phi[0],itree->lep__mass[0]);
                     lep_index.push_back( 0 );
@@ -1492,6 +1531,7 @@ int main(int argc, const char* argv[])
                     leptonLV2.SetPtEtaPhiM(itree->lep__pt[1],itree->lep__eta[1],itree->lep__phi[1],itree->lep__mass[1]);
                     lep_index.push_back( 1 );
 
+                    //FIXME: hardcoded masses
                     if(doGenLevelAnalysis) {
                         if( itree->gen_lep__pt[0]>5.)
                             leptonLV. SetPtEtaPhiM(itree->gen_lep__pt[0], itree->gen_lep__eta[0], itree->gen_lep__phi[0], (itree->lep__type[0]==13 ? 0.113 : 0.0005 )  );
@@ -1609,9 +1649,10 @@ int main(int argc, const char* argv[])
 
                     if( debug>=2 ) {
                         cout << "nvlep=" << itree->n__lep << ", Vtype=" << Vtype << endl;
+                        //FIXME: mismatch between type names(?)
                         cout << "Lep sel. Vtype2 = " << lepSelVtype0 << ", lep sel. Vtype3 = " << lepSelVtype1 << endl;
                         cout << "Trigger: " <<  ((isMC ? 1 : trigVtype0) || (isMC ? 1 : trigVtype1)) << endl;
-                        cout << "Passes = " << int (properEventDL) << endl;
+                        cout << "Passes = " << int (properEventDL) << " DL ee/mm" << endl;
                     }
 
                     // save lepton(s) kinematics into the tree...
@@ -1627,7 +1668,7 @@ int main(int argc, const char* argv[])
                     otree->lepton_type_   [0] = itree->lep__type[0];
                     otree->lepton_dxy_    [0] = itree->lep__dxy[0];
                     otree->lepton_dz_     [0] = itree->lep__dz[0];
-                    //FIXME: need to add ID-s 
+                    //FIXME: need to add ID-s
                     //otree->lepton_wp70_   [0] = vLepton_wp70[0];
                     //otree->lepton_wp80_   [0] = vLepton_wp80[0];
                     //otree->lepton_wp95_   [0] = vLepton_wp95[0];
@@ -1743,7 +1784,7 @@ int main(int argc, const char* argv[])
                         cout << "nvlep=" << itree->n__lep << ", Vtype=" << Vtype << endl;
                         cout << "Lep sel. Vtype4 = " << lepSelVtype4 << endl;
                         cout << "Trigger: " <<  (isMC ? 1 : trigVtype4)  << endl;
-                        cout << "Passes = " << int (properEventDL) << endl;
+                        cout << "Passes = " << int (properEventDL) << " DL em" << endl;
                     }
 
                     // save lepton(s) kinematics into the tree...
@@ -1771,7 +1812,7 @@ int main(int argc, const char* argv[])
                     otree->lepton_type_   [1] = itree->lep__type[loose_ele_idx];
                     otree->lepton_dxy_    [1] = itree->lep__dxy[loose_ele_idx];
                     otree->lepton_dz_     [1] = itree->lep__dz[loose_ele_idx];
-                    //FIXME: add working points 
+                    //FIXME: add working points
                     //otree->lepton_wp80_   [1] = aLepton_wp80[loose_ele_idx];
                     //otree->lepton_wp95_   [1] = aLepton_wp95[loose_ele_idx];
 
@@ -1822,19 +1863,20 @@ int main(int argc, const char* argv[])
                     // loop over jets
                     for(int hj = 0; hj < itree->n__jet; hj++) {
 
-                        float ptGen = -99.;
+                        float ptGen = DEF_VAL_FLOAT;
 
                         //FIXME: why whould gen jet pt < 0
                         if(itree->gen_jet__pt[hj]>0.) ptGen = itree->gen_jet__pt[hj];
 
-                        float pt     = itree->jet__pt [hj];
+                        float pt     = itree->jet__pt[hj];
                         float eta    = itree->jet__eta[hj];
                         float phi    = itree->jet__phi[hj];
                         float e      = itree->jet__energy[hj];
                         float m2     = e*e - pt*pt*TMath::CosH(eta)*TMath::CosH(eta);
-                        
+
                         //FIXME: shouldn't this be a problem/exception?
                         if(m2<0) {
+                            cerr << "jet " << hj << " m2 " << m2 << endl;
                             m2 = 0.;
                         }
 
@@ -1844,7 +1886,7 @@ int main(int argc, const char* argv[])
                         //int pu_id    = hJet_puJetIdL[hj];
                         //FIXME: jet pile-up ID
                         int pu_id    = DEF_VAL_INT;
-                        
+
                         //FIXME: what is the difference between jet ID and flavour?
                         //int id       = hJet_id      [hj];
                         int id       = DEF_VAL_INT;
@@ -1880,11 +1922,12 @@ int main(int argc, const char* argv[])
                         // only jets in acceptance...
                         if( TMath::Abs(eta)> 2.5 ) continue;
 
-                        // only jets passing pu ID...
-                        if( pu_id < 0.5 ) continue;
+                        //FIXME: disabled jet PU ID and jet ID
+                        //// only jets passing pu ID...
+                        //if( pu_id < 0.5 ) continue;
 
-                        // only jets passing id ID...
-                        if( id < 0.5 ) continue;
+                        //// only jets passing id ID...
+                        //if( id < 0.5 ) continue;
 
                         // only jets above pt cut...
                         if( pt < jetPtThreshold  ) continue;
@@ -1903,9 +1946,9 @@ int main(int argc, const char* argv[])
                         //float csv_downL   =  hJet_csv_downL  [hj]
                         //FIXME: jet b-discriminator systematics
                         const float csv_upBC    = DEF_VAL_FLOAT;
-                        const float csv_downBC  = DEF_VAL_FLOAT; 
-                        const float csv_upL     = DEF_VAL_FLOAT; 
-                        const float csv_downL   = DEF_VAL_FLOAT; 
+                        const float csv_downBC  = DEF_VAL_FLOAT;
+                        const float csv_upL     = DEF_VAL_FLOAT;
+                        const float csv_downL   = DEF_VAL_FLOAT;
 
                         // default is csv_nominal ( <=> reshaped )
                         float csv         = csv_nominal;
@@ -1972,7 +2015,7 @@ int main(int argc, const char* argv[])
                         JetObservable myJet;
                         myJet.p4     = p4;
                         myJet.csv    = csv;
-                        //FIXME 
+                        //FIXME
                         //myJet.index  = (coll==0 ? hj : -hj-1);
                         myJet.index  = hj;
                         myJet.shift  = shift;
@@ -2435,6 +2478,9 @@ int main(int argc, const char* argv[])
                     // loop over hypothesis [ TTH, TTbb ]
                     for(int hyp = 0 ; hyp<2;  hyp++) {
 
+                        if (debug >= 2) {
+                            cout << "hypothesis loop " << hyp << endl;
+                        }
                         // list of permutations
                         int* permutList = 0;
                         if( btag_flag == 0 ) permutList = hyp==0 ?  permutations_6J_S : permutations_6J_B;
@@ -2443,6 +2489,10 @@ int main(int argc, const char* argv[])
 
                         // loop over permutations
                         for(unsigned int pos = 0; pos < (unsigned int)( hyp==0 ? nS : nB ) ; pos++) {
+
+                            if (debug >= 2) {
+                                cout << "permutation loop " << pos << endl;
+                            }
 
                             // index of the four jets associated to b-quarks or W->qq
                             int bLep_pos = (permutList[pos])%1000000/100000;
@@ -2464,7 +2514,7 @@ int main(int argc, const char* argv[])
                             // the total probability
                             float p_pos = 0.;
 
-                            // if sgn (ttbb)
+                            // if signal (ttbb)
                             if( hyp==0 ) {
                                 p_pos =  p_b_bLep * p_b_bHad * p_b_b1 * p_b_b2 * p_j_w1 * p_j_w2;
                                 p_bb += p_pos;
@@ -2476,7 +2526,7 @@ int main(int argc, const char* argv[])
                                 }
                             }
 
-                            // if bkg (ttjj)
+                            // if background (ttjj)
                             if( hyp==1 ) {
                                 p_pos =  p_b_bLep * p_b_bHad * p_j_b1 * p_j_b2 * p_j_w1 * p_j_w2;
                                 p_jj += p_pos;
@@ -2532,17 +2582,19 @@ int main(int argc, const char* argv[])
 
                             // check for a match among the b-tagged jets
                             int isTagged = 0;
-                            for( unsigned int bb = 0 ; bb<btag_indices.size(); bb++ )
+                            for( unsigned int bb = 0 ; bb<btag_indices.size(); bb++ ) {
                                 if( banytag_indices[jj]==btag_indices[bb] ) isTagged = 1;
+                            }
 
                             // if not matches, push back
-                            if( isTagged == 0)
+                            if( isTagged == 0 ) {
                                 buntag_indices.push_back( banytag_indices[jj] );
+                            }
                         }
 
-                    }
+                    } //passes b-tagshape
 
-                }
+                } //useBTag & properEvent SL or DL with jets
 
 
 
@@ -2580,7 +2632,7 @@ int main(int argc, const char* argv[])
                         cout << "  --> numUntag = "  << numJets30UntagM << endl;
                     }
 
-                }
+                } //recover
 
 
                 // categories defined by jet and btagged jet multiplicity (Nj,Nb)
@@ -2715,6 +2767,9 @@ int main(int argc, const char* argv[])
                 /* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  */
                 /* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ ANALYSIS @@@@@@@@@@@@@@@@@@@@@@@@@@@@@  */
 
+                if (debug >= 2) {
+                    cout << "@Analysis" << endl;
+                }
 
                 //  input 4-vectors
                 vector<TLorentzVector> jets;
@@ -2729,6 +2784,10 @@ int main(int argc, const char* argv[])
                     ((analyze_type0      || analyze_type1      || analyze_type2      || analyze_type3      || analyze_type6 ) && numJets30BtagM==4 )  ||
                     (analyze_type7 && numJets30BtagM==3) ||
                     ((analyze_type0_BTag || analyze_type1_BTag || analyze_type2_BTag || analyze_type3_BTag || analyze_type6_BTag) && passes_btagshape);
+
+                if(debug>=2) {
+                    cout << "calcME " << calcME << endl;
+                }
 
                 // consider th event only if of the desired type
                 if( calcME ) {
@@ -2782,7 +2841,7 @@ int main(int argc, const char* argv[])
                             // push back the regressed jet
                             jets_p4_reg.push_back ( p4_reg );
                         }
-                    }
+                    } //useRegression
 
 
 
@@ -3024,7 +3083,7 @@ int main(int argc, const char* argv[])
 
 
 
-                    }
+                    } //analyze_type3 || analyze_type3_BTag
                     else if( analyze_type6 || analyze_type6_BTag ) {
 
                         if(syst==0) counter++;
@@ -3119,12 +3178,9 @@ int main(int argc, const char* argv[])
 
                     }
 
-
-
                     // total number of integrations
                     otree->nTotInteg_      = otree->nPermut_    * otree->nMassPoints_;
                     otree->nTotInteg_alt_  = otree->nPermut_alt_* otree->nMassPoints_;
-
 
                     // setup jet collection
                     jets.clear();
@@ -3961,10 +4017,13 @@ int main(int argc, const char* argv[])
                                         }
 
 
-                                    } //skip ME
+                                    } //speedup to skip ME
 
                                     // can still be interested in b-tagging, so set p=1...
                                     else {
+                                        if (debug>=3) {
+                                            cout << "setting p to 1" << endl;
+                                        }
                                         p = 1.;
                                     }
 
@@ -4142,7 +4201,7 @@ int main(int argc, const char* argv[])
 
                         } //jet loop
 
-                        // fill the tree 
+                        // fill the tree
                         otree->tree->Fill();
                     } //ntuplizeAll
 
