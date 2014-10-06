@@ -33,11 +33,18 @@ process.fwliteInput = cms.PSet(
     # the samples
     samples  =   cms.VPSet(
         cms.PSet(
-        skip     = cms.bool(False),
-        name     = cms.string('tthbb'),
-        nickName = cms.string('TTHBB'),
-        color    = cms.int32(1),
-        xSec     = cms.double(1.0)
+            skip     = cms.bool(False),
+            name     = cms.string('tthbb_step1_numEvent1000'),
+            nickName = cms.string('TTHBB'),
+            color    = cms.int32(1),
+            xSec     = cms.double(1.0)
+        ),
+        cms.PSet(
+            skip     = cms.bool(False),
+            name     = cms.string('ttbar_step1_numEvent1000'),
+            nickName = cms.string('TTJets'),
+            color    = cms.int32(1),
+            xSec     = cms.double(1.0)
         ),
     ),
 
@@ -212,7 +219,7 @@ process.fwliteInput = cms.PSet(
     fixNumEvJob    = cms.untracked.int32(0),
 
     # event limits
-    evLimits       = cms.vint32(0, 2000),
+    evLimits       = cms.vint32(0, -1),
 
     # do systematic shifts (dummy)
     doJERbias  = cms.untracked.int32(0),
