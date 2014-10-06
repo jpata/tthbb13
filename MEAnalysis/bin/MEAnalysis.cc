@@ -697,7 +697,7 @@ int main(int argc, const char* argv[])
             itree->weight__pu_down      = 1.0;
             itree->lhe__n_j          = 1.0;
 
-            //FIXME
+            //FIXME: implement machinery for trigger weights
             //weightTrig2012 = 1.0;
 
             //initialize trigger flags
@@ -708,7 +708,7 @@ int main(int argc, const char* argv[])
                 otree->SCALEsyst_[k] = 1.0;
             }
 
-            //FIXME: setting the value of inputs? I guess it is resetting, right?
+            //FIXME
             //nhJets = 0;
             //nPVs   = 1;
 
@@ -721,7 +721,7 @@ int main(int argc, const char* argv[])
                 cout << "Analyzing event " << itree->event__id << " bytes " << nbytes << " read" << endl;
             }
 
-            //FIXME
+            //FIXME: what are nSimB-s
             //otree->nSimBs_             = nSimBs;
 
             otree->counter_            = counter;
