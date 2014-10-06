@@ -621,6 +621,9 @@ int main(int argc, const char* argv[])
 
     // loop over input files
     for(unsigned int sample = 0 ; sample < mySampleFiles.size(); sample++) {
+        
+        //Need to reinitialize for each file
+        evHigh = evLimits[1];
 
         string currentName       = mySampleFiles[sample];
 
