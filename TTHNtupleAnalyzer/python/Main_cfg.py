@@ -1,34 +1,22 @@
 import FWCore.ParameterSet.Config as cms
 
+from FWCore.ParameterSet.VarParsing import VarParsing
+options = VarParsing('analysis')
 process = cms.Process("Demo")
+options.parseArguments()
+
+if len(options.inputFiles)==0:
+        options.inputFiles = cms.untracked.vstring(["/store/mc/Spring14miniaod/TTbarH_HToBB_M-125_13TeV_pythia6/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/00000/0E97DD3E-2209-E411-8A04-003048945312.root"])
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
-#process.MessageLogger = cms.Service("MessageLogger",
-#        destinations=cms.untracked.vstring('cerr', 'debug', 'cout'),
-#        debugModules=cms.untracked.vstring('*'),
-#        cerr=cms.untracked.PSet(
-#            threshold=cms.untracked.string('ERROR'),
-#        #    FwkReport = cms.untracked.PSet(
-#        #        reportEvery = cms.untracked.int32(100),
-#        #    ),
-#        ),
-#        cout=cms.untracked.PSet(
-#            threshold=cms.untracked.string('INFO'),
-#            #FwkReport = cms.untracked.PSet(
-#            #    reportEvery = cms.untracked.int32(100),
-#            #),
-#        ),
-#        debug=cms.untracked.PSet(threshold=cms.untracked.string('DEBUG')),
-#)
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(2000) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(options.maxEvents) )
 
 process.source = cms.Source("PoolSource",
     # replace 'myfile.root' with the source file you want to use
     fileNames = cms.untracked.vstring(
-#        'file:/hdfs/local/joosep/ttbar_miniaod.root'
-        "/store/mc/Spring14miniaod/TTbarH_HToBB_M-125_13TeV_pythia6/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/00000/0E97DD3E-2209-E411-8A04-003048945312.root"
+        options.inputFiles
     )
 )
 
@@ -118,7 +106,7 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
 )
 
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string("ntuple.root"),
+    fileName = cms.string(options.outputFile)
     #closeFileFast = cms.untracked.bool(True)
 )
 
