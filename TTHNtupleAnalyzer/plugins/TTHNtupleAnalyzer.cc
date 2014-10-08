@@ -70,6 +70,9 @@
 #include <EgammaAnalysis/ElectronTools/interface/ElectronEffectiveArea.h>
 
 #include "TTH/TTHNtupleAnalyzer/interface/tth_tree.hh"
+
+#include "TTH/TTHNtupleAnalyzer/interface/EventHypothesis.hh"
+
 #include "TStopwatch.h"
 
 #define CANDPRINT(x) " pt=" << x.pt() << " eta=" << x.eta() << " phi=" << x.phi() << " id=" << x.pdgId() << " st=" << x.status()
@@ -79,6 +82,9 @@
 
 #define GENLEPTON_DR 0.5
 #define GENLEPTON_REL_DP 0.5
+
+//how many good leptons to store in the good_lep array at most?
+#define N_MAX_GOOD_LEPTONS 2
 
 template <typename T, typename R>
 std::vector<R> to_ptrvec(T coll) {
@@ -154,7 +160,7 @@ private:
     // collection of vertices
     const edm::EDGetTokenT<reco::VertexCollection> vertexToken_;
 
-    // collection of gen particles
+    // collection of genparticles
     const edm::EDGetTokenT<edm::View<reco::GenParticle> > prunedGenToken_;
     const edm::EDGetTokenT<edm::View<pat::PackedGenParticle> > packedGenToken_;
 
@@ -277,7 +283,9 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     const reco::Vertex &PV = vertices->front();
     tthtree->n__pv = vertices->size();
 
-    //Pileup
+    Handle<edm::View<reco::GenParticle> > pruned;
+    
+    //Pileup and genparticles
     if (isMC) {
         Handle<std::vector<PileupSummaryInfo>> PupInfo;
         iEvent.getByLabel(edm::InputTag("addPileupInfo"), PupInfo);
@@ -296,13 +304,14 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
             }
             n_pu += 1;
         }
+        
+        iEvent.getByToken(prunedGenToken_, pruned);
     }
 
+    //Muons
     edm::Handle<pat::MuonCollection> muons;
     iEvent.getByToken(muonToken_, muons);
 
-    Handle<edm::View<reco::GenParticle> > pruned;
-    iEvent.getByToken(prunedGenToken_,pruned);
 
     // lepton counters
     int n__lep = 0;
@@ -374,8 +383,10 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
         }
         n_mu += 1;
         n__lep += 1;
-    }
+    } //muons
 
+
+    //Electrons
     edm::Handle<pat::ElectronCollection> electrons;
     iEvent.getByToken(electronToken_, electrons);
     for (const pat::Electron &x : *electrons) {
@@ -458,7 +469,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
         }
         n_ele += 1;
         n__lep += 1;
-    }
+    } // electrons
 
     edm::Handle<pat::TauCollection> taus;
     iEvent.getByToken(tauToken_, taus);
@@ -533,7 +544,8 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
         }
         n_tau += 1;
         n__lep += 1;
-    }
+    } // taus
+     
 
     edm::Handle<pat::JetCollection> jets;
     iEvent.getByToken(jetToken_, jets);
@@ -676,10 +688,25 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
             } else {
                 LogDebug("jet") << "jet " << n__jet << " did not have genJet";
             }
-        }
+        } // isMC
         n__jet += 1;
-    }
+    } //jet loop
 
+    //// Good leptons for the tighter di-leptonic mode
+    vector<const pat::Muon*> good_muons_sl = TTH::find_good_muons(*muons, PV, TTH::DecayMode::semileptonic);
+    vector<const pat::Electron*> good_electrons_sl = TTH::find_good_electrons(*electrons, TTH::DecayMode::semileptonic);
+    vector<const pat::Tau*> good_taus_sl = TTH::find_good_taus(*taus, TTH::DecayMode::semileptonic);
+    vector<const pat::Jet*> good_jets_sl = TTH::find_good_jets(*jets, TTH::DecayMode::semileptonic);
+    
+    vector<const pat::Muon*> good_muons_dl = TTH::find_good_muons(*muons, PV, TTH::DecayMode::dileptonic);
+    vector<const pat::Electron*> good_electrons_dl = TTH::find_good_electrons(*electrons, TTH::DecayMode::dileptonic);
+    vector<const pat::Tau*> good_taus_dl = TTH::find_good_taus(*taus, TTH::DecayMode::dileptonic);
+    vector<const pat::Jet*> good_jets_dl = TTH::find_good_jets(*jets, TTH::DecayMode::dileptonic);
+    
+    TTH::EventDescription desc_sl(good_muons_sl, good_electrons_sl, good_taus_sl, good_jets_sl);
+    TTH::EventDescription desc_dl(good_muons_dl, good_electrons_dl, good_taus_dl, good_jets_dl);
+
+    //FIXME: should be min/max, not min/min!
     if( jetMult_min_>0 && n__jet<jetMult_min_ ) {
         LogDebug("Event Cuts") << n__jet << " jets: skip this event" << endl;
         return;
@@ -826,7 +853,136 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
             tthtree->lhe__n_g = countGquarks;
             tthtree->lhe__n_e = countExtraPartons;
         }
-    }
+    } // isMC for LHE
+
+    //FIXME: finish gen top and b quark finding algo
+    if (isMC) {
+        // Packed particles are all the status 1, so usable to remake jets
+        // The navigation from status 1 to pruned is possible (the other direction should be made by hand)
+        //Handle<edm::View<pat::PackedGenParticle>> packed;
+        //iEvent.getByToken(packedGenToken_, packed);
+
+        vector<const reco::GenParticle*> tops;
+        vector<const reco::GenParticle*> antitops;
+        
+        vector<const reco::GenParticle*> bquarks;
+        vector<const reco::GenParticle*> antibquarks;
+        
+        //find top and antitop
+        for (auto& gp : *pruned) {
+            //top quarks
+            if (gp.pdgId() == 6 && gp.status() == 3) {
+                tops.push_back(&gp);
+                LogDebug("genparticles") << "top " << CANDPRINT(gp) << " dau1 " << gp.daughter(0) << " dau2 " << gp.daughter(1);
+            }
+            if (gp.pdgId() == -6 && gp.status() == 3) {
+                antitops.push_back(&gp);
+                LogDebug("genparticles") << "antitop " << CANDPRINT(gp) << " dau1 " << gp.daughter(0) << " dau2 " << gp.daughter(1);
+            }
+           
+            //b-quarks not from top decay
+            if (gp.pdgId() == 5 && gp.status() == 3 && gp.mother(0)!=0 && abs(gp.mother(0)->pdgId()) != 6) {
+                bquarks.push_back(&gp);
+                LogDebug("genparticles") << "bquark " << CANDPRINT(gp) << " dau1 " << gp.daughter(0) << " dau2 " << gp.daughter(1);
+            }
+            
+            if (gp.pdgId() == -5 && gp.status() == 3 && gp.mother(0)!=0 && abs(gp.mother(0)->pdgId()) != 6) {
+                antibquarks.push_back(&gp);
+                LogDebug("genparticles") << "antibquark " << CANDPRINT(gp) << " dau1 " << gp.daughter(0) << " dau2 " << gp.daughter(1);
+            }
+
+        } //pruned genparticles
+        LogDebug("genparticles") << "gensummary top " << tops.size() << " antitop " << antitops.size() << " bquark " <<  bquarks.size() << " antibquarks " << antibquarks.size();
+
+        //FIXME: it seems that number of daughters = 2 or 4 but daughter -> null pointer
+        if (tops.size()==1) {
+            const reco::Candidate* dau1 = tops[0]->daughter(0);
+            const reco::Candidate* dau2 = tops[0]->daughter(1);
+            
+            if(dau1==0 || dau2==0 || tops[0]->numberOfDaughters()<2) {
+                edm::LogError("genparticles") << "top ndau " << tops[0]->numberOfDaughters() << " dau1 " << dau1 << " dau2 " << dau2 << " null pointer or not enough daugters";
+            } else {
+                const reco::Candidate* b = 0;
+                const reco::Candidate* w = 0;
+                if (abs(dau1->pdgId())==5 && abs(dau2->pdgId())==24) {
+                    b = dau1;
+                    w = dau2;
+                }
+                if (abs(dau2->pdgId())==5 && abs(dau1->pdgId())==24) {
+                    b = dau2;
+                    w = dau1;
+                }
+                if (b==0 or w==0) {
+                    edm::LogError("genparticle") << "could not assing b " << b << " or w" << w; 
+                }
+
+                tthtree->gen_t__b__pt = b->pt();
+                tthtree->gen_t__b__eta = b->eta();
+                tthtree->gen_t__b__phi = b->phi();
+                tthtree->gen_t__b__mass = b->mass();
+                
+                if(w->daughter(0)!=0 && w->daughter(1)!=0) { 
+                    tthtree->gen_t__w_d1__pt = w->daughter(0)->pt();
+                    tthtree->gen_t__w_d1__eta = w->daughter(0)->eta();
+                    tthtree->gen_t__w_d1__phi = w->daughter(0)->phi();
+                    tthtree->gen_t__w_d1__mass = w->daughter(0)->mass();
+                    LogDebug("genparticles") << "top w dau1 " << PCANDPRINT(w->daughter(0)); 
+                    
+                    tthtree->gen_t__w_d2__pt = w->daughter(1)->pt();
+                    tthtree->gen_t__w_d2__eta = w->daughter(1)->eta();
+                    tthtree->gen_t__w_d2__phi = w->daughter(1)->phi();
+                    tthtree->gen_t__w_d2__mass = w->daughter(1)->mass();
+                    LogDebug("genparticles") << "top w dau2 " << PCANDPRINT(w->daughter(1)); 
+                } else {
+                    edm::LogError("genparticles") << "top w dau1 " << w->daughter(0) << " dau2 " << w->daughter(1) << " null pointer!";
+                }
+            }
+        }
+   
+        //This is a carbon copy of the above
+        if (antitops.size()==1) {
+            const reco::Candidate* dau1 = antitops[0]->daughter(0);
+            const reco::Candidate* dau2 = antitops[0]->daughter(1);
+            
+            if(dau1==0 || dau2==0 || antitops[0]->numberOfDaughters()<2) {
+                edm::LogError("genparticles") << "antitop ndau " << antitops[0]->numberOfDaughters() << " dau1 " << dau1 << " dau2 " << dau2 << " null pointer or not enough daughters!";
+            } else {
+                const reco::Candidate* b = 0;
+                const reco::Candidate* w = 0;
+                if (abs(dau1->pdgId())==5 && abs(dau2->pdgId())==24) {
+                    b = dau1;
+                    w = dau2;
+                }
+                if (abs(dau2->pdgId())==5 && abs(dau1->pdgId())==24) {
+                    b = dau2;
+                    w = dau1;
+                }
+                if (b==0 or w==0) {
+                    edm::LogError("genparticle") << "could not assing b " << b << " or w" << w; 
+                }
+
+                tthtree->gen_tbar__b__pt = b->pt();
+                tthtree->gen_tbar__b__eta = b->eta();
+                tthtree->gen_tbar__b__phi = b->phi();
+                tthtree->gen_tbar__b__mass = b->mass();
+                
+                if(w->daughter(0)!=0 && w->daughter(1)!=0) { 
+                    tthtree->gen_tbar__w_d1__pt = w->daughter(0)->pt();
+                    tthtree->gen_tbar__w_d1__eta = w->daughter(0)->eta();
+                    tthtree->gen_tbar__w_d1__phi = w->daughter(0)->phi();
+                    tthtree->gen_tbar__w_d1__mass = w->daughter(0)->mass();
+                    LogDebug("genparticles") << "antitop w dau1 " << PCANDPRINT(w->daughter(0)); 
+                    tthtree->gen_tbar__w_d2__pt = w->daughter(1)->pt();
+                    tthtree->gen_tbar__w_d2__eta = w->daughter(1)->eta();
+                    tthtree->gen_tbar__w_d2__phi = w->daughter(1)->phi();
+                    tthtree->gen_tbar__w_d2__mass = w->daughter(1)->mass();
+                    LogDebug("genparticles") << "antitop w dau2 " << PCANDPRINT(w->daughter(1)); 
+                } else {
+                    edm::LogError("genparticles") << "antitop w dau1 " << w->daughter(0) << " dau2 " << w->daughter(1) << " null pointer!";
+                }
+            }
+        }
+    } // isMC
 
     //These also index the number of generated lepton/jets
     tthtree->n__lep = n__lep;
@@ -835,7 +991,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     sw->Stop();
     tthtree->debug__time1r = sw->RealTime();
     tthtree->debug__time1c = sw->CpuTime();
-    LogDebug("time") << tthtree->debug__time1r << " " << tthtree->debug__time1c;
+    LogDebug("time") << "timing " << tthtree->debug__time1r << " " << tthtree->debug__time1c;
     tthtree->tree->Fill();
 }
 
