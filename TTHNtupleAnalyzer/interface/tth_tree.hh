@@ -103,6 +103,10 @@ public:
 	float lep__pt[N_MAX];
 	float lep__puch_iso[N_MAX];
 	float lep__rel_iso[N_MAX];
+  	float trig_lep__pt[N_MAX];
+  	float trig_lep__eta[N_MAX];
+  	float trig_lep__phi[N_MAX];
+        int   trig_lep__pass[N_MAX];
 	float lhe__ht;
 	int lhe__n_b;
 	int lhe__n_c;
@@ -212,7 +216,11 @@ public:
 		SET_ZERO(lep__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(lep__pt, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(lep__puch_iso, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(lep__rel_iso, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(lep__rel_iso,  N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(trig_lep__pt,  N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(trig_lep__eta, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(trig_lep__phi, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(trig_lep__pass,N_MAX, DEF_VAL_INT);
 		lhe__ht = DEF_VAL_FLOAT;
 		lhe__n_b = DEF_VAL_INT;
 		lhe__n_c = DEF_VAL_INT;
@@ -430,6 +438,14 @@ public:
 		branch_map["lep__puch_iso"] = (void*)lep__puch_iso;
 		tree->Branch("lep__rel_iso", lep__rel_iso, "lep__rel_iso[n__lep]/F");
 		branch_map["lep__rel_iso"] = (void*)lep__rel_iso;
+		tree->Branch("trig_lep__pt", trig_lep__pt, "trig_lep__pt[n__lep]/F");
+		branch_map["trig_lep__pt"] = (void*)trig_lep__pt;
+		tree->Branch("trig_lep__eta", trig_lep__eta, "trig_lep__eta[n__lep]/F");
+		branch_map["trig_lep__eta"] = (void*)trig_lep__eta;
+		tree->Branch("trig_lep__phi", trig_lep__phi, "trig_lep__phi[n__lep]/F");
+		branch_map["trig_lep__phi"] = (void*)trig_lep__phi;
+		tree->Branch("trig_lep__pass", trig_lep__pass, "trig_lep__pass[n__lep]/I");
+		branch_map["trig_lep__pass"] = (void*)trig_lep__pass;		
 		tree->Branch("lhe__ht", &lhe__ht, "lhe__ht/F");
 		branch_map["lhe__ht"] = (void*)&lhe__ht;
 		tree->Branch("lhe__n_j", &lhe__n_j, "lhe__n_j/F");

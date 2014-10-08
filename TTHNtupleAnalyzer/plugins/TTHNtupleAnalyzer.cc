@@ -127,6 +127,24 @@ const reco::GenParticle* find_dr_dp_id_match(const reco::Candidate& x, edm::Hand
     }
 }
 
+typedef struct {
+  float pt;
+  float eta;
+  float phi;
+  int isL3;
+  int isLF;
+  //int index;
+  void fill(float pt_ = -99, float eta_ = -99, float phi_  = -99, 
+	    int isL3_ = -99, int isLF_  = -99 /*, int index_  = -99*/){
+    pt    = pt_ ; 
+    eta   = eta_; 
+    phi   = phi_;
+    isL3  = isL3_; 
+    isLF  = isLF_;
+    //index = index_;
+  };
+} LightTriggerObj ;
+
 
 
 class TTHNtupleAnalyzer : public edm::EDAnalyzer {
@@ -185,6 +203,7 @@ private:
 
   // trigger paths to be checked
   const std::vector<std::string> triggerIdentifiers_;
+  const std::vector<std::string> triggerIdentifiersForMatching_;
   
   // trigger results
   const edm::EDGetTokenT<edm::TriggerResults> triggerBits_;
@@ -227,6 +246,7 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
     tauIdentifiers_(iConfig.getParameter<std::vector<std::string>>("tauIdentifiers")),
     eleIdentifiers_(iConfig.getParameter<std::vector<std::string>>("eleIdentifiers")),
     triggerIdentifiers_(iConfig.getParameter<std::vector<std::string>>("triggerIdentifiers")),
+    triggerIdentifiersForMatching_(iConfig.getParameter<std::vector<std::string>>("triggerIdentifiersForMatching")),
     triggerBits_(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("bits"))),
     triggerObjects_(consumes<pat::TriggerObjectStandAloneCollection>(iConfig.getParameter<edm::InputTag>("objects"))),
     triggerPrescales_(consumes<pat::PackedTriggerPrescales>(iConfig.getParameter<edm::InputTag>("prescales"))),
@@ -360,6 +380,80 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     throw std::exception();
   }
 
+  /////////////////////////////////////////////
+  //std::cout << "\n === TRIGGER OBJECTS === " << std::endl;
+  vector< LightTriggerObj > muTriggerObj;
+  vector< LightTriggerObj > eleTriggerObj;
+
+  int countObj = 0;
+  for (pat::TriggerObjectStandAlone obj : *triggerObjects) { // note: not "const &" since we want to call unpackPathNames
+
+    obj.unpackPathNames(names);
+    unsigned filterSize = obj.filterIds().size();
+    if( filterSize!=1 ) continue;
+
+    LightTriggerObj lightObj;
+
+    // electron/muons HLTs	  
+    if( obj.filterIds()[0] == 82 || obj.filterIds()[0] == 83 ){ 
+
+      bool isL3 = false;
+      bool isLF = false;
+
+      // all path names associated to this obj
+      std::vector<std::string> pathNamesAll = obj.pathNames(false); 
+
+      // loop over them
+      for (unsigned h = 0, n = pathNamesAll.size(); h < n; ++h) {
+
+	// loop over the trigger bits for which we require a match
+	 for (unsigned int j = 0; j < triggerIdentifiersForMatching_.size(); ++j) {
+	   // check whether we have starred names
+	   string idName          =  triggerIdentifiersForMatching_[j];
+	   string idNameUnstarred = idName;
+	   bool isStarred         = idName.find("*")!=string::npos;    
+	   if( isStarred ) idNameUnstarred.erase( idName.find("*"), 1 );
+    
+	   // check whether this path matches
+	   if( ((isStarred  && pathNamesAll[h].find(idNameUnstarred)!=string::npos ) || 
+		(!isStarred && pathNamesAll[h]==idName)) &&
+	       (( obj.filterIds()[0] == 82 && idNameUnstarred.find("Ele")!=string::npos ) ||
+		( obj.filterIds()[0] == 83 && idNameUnstarred.find("Mu")!=string::npos && obj.collection().find("L3")!=string::npos  ))
+	       ){
+	     bool isL3tmp   = obj.hasPathName( pathNamesAll[h], false, true ); 
+	     bool isLFtmp   = obj.hasPathName( pathNamesAll[h], true, false ); 
+	     //cout << h << "th path for Obj "<< countObj << " with " <<  obj.filterIds()[0] << " with pt=" << obj.pt() << "  matches to [" << j << "]" << endl; 
+	     isL3 = isL3 || isL3tmp;
+	     isLF = isLF || (isLFtmp && isL3tmp);	   	     
+	   }
+
+	 }	 
+      }
+
+      if(isL3){
+	lightObj.fill( obj.pt(), obj.eta(), obj.phi(), isL3, isLF );     
+	if(obj.filterIds()[0] == 82) 
+	  eleTriggerObj.push_back( lightObj );
+	if(obj.filterIds()[0] == 83) 
+	  muTriggerObj.push_back ( lightObj );
+      }      
+
+    } // is Ele or muon
+    countObj++;
+  }
+
+  /*
+  for(unsigned int m = 0 ; m < eleTriggerObj.size(); m++){
+    cout << m << "th ele: pt=" << eleTriggerObj[m].pt << ", eta=" <<  eleTriggerObj[m].eta
+	 << ", PASS trigger ["  << "]: " <<  eleTriggerObj[m].isL3 <<  eleTriggerObj[m].isLF <<  endl;
+  }
+  for(unsigned int m = 0 ; m < muTriggerObj.size(); m++){
+    cout << m << "th mu: pt=" << muTriggerObj[m].pt << ", eta=" <<  muTriggerObj[m].eta
+	 << ", PASS trigger [" << "]: " <<  muTriggerObj[m].isL3 <<  muTriggerObj[m].isLF <<  endl;
+  }
+  */
+  //////////////////////////////////////////////////////////
+
   edm::Handle<pat::MuonCollection> muons;
   iEvent.getByToken(muonToken_, muons);
   
@@ -385,6 +479,25 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     if( x.pt()<muPt_min_ ){
       LogDebug("muons") << "n_mu=" << n_mu << " fails pt cut" << endl;
       continue;
+    }
+
+    float minDist = 999.;
+    float minDpT  = 999.;
+    for(unsigned int m = 0 ; m < muTriggerObj.size(); m++){
+      LightTriggerObj obj = muTriggerObj[m];
+      float dist = sqrt( (obj.eta-x.eta())*(obj.eta-x.eta()) + (obj.phi-x.phi())*(obj.phi-x.phi()) );
+      float dpT  = fabs( obj.pt - x.pt() )/x.pt();
+      if( dist<minDist && dist<0.50 && dpT<minDpT && dpT<0.50 ){
+	tthtree->trig_lep__pt [n__lep] = obj.pt;
+	tthtree->trig_lep__eta[n__lep] = obj.eta;
+	tthtree->trig_lep__phi[n__lep] = obj.phi;
+	tthtree->trig_lep__pass[n__lep]= obj.isLF + 1; 
+	minDist = dist;
+	minDpT  = dpT;
+      }
+    }
+    if( minDist>998. ){
+      tthtree->trig_lep__pass[n__lep] = 0;
     }
 
     tthtree->lep__eta[n__lep] = x.eta();
@@ -447,6 +560,26 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       LogDebug("electrons") << "n_ele=" << n_ele << " fails pt cut" << endl;
       continue;
     }
+
+    float minDist = 999.;
+    float minDpT  = 999.;
+    for(unsigned int m = 0 ; m < eleTriggerObj.size(); m++){
+      LightTriggerObj obj = eleTriggerObj[m];
+      float dist = sqrt( (obj.eta-x.eta())*(obj.eta-x.eta()) + (obj.phi-x.phi())*(obj.phi-x.phi()) );
+      float dpT  = fabs( obj.pt - x.pt() )/x.pt();
+      if( dist<minDist && dist<0.50 && dpT<minDpT && dpT<0.50 ){
+	tthtree->trig_lep__pt [n__lep] = obj.pt;
+	tthtree->trig_lep__eta[n__lep] = obj.eta;
+	tthtree->trig_lep__phi[n__lep] = obj.phi;
+	tthtree->trig_lep__pass[n__lep]= obj.isLF + 1; 
+	minDist = dist;
+	minDpT  = dpT;
+      }
+    }
+    if( minDist>998. ){
+      tthtree->trig_lep__pass[n__lep] = 0;
+    }
+
 
     tthtree->lep__eta[n__lep] = x.eta();
     tthtree->lep__pt[n__lep] = x.pt();

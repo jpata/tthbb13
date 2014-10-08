@@ -13,7 +13,7 @@ process = cms.Process("Demo")
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = 10
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
@@ -114,7 +114,12 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer(
     prescales = cms.InputTag("patTrigger"),
     objects   = cms.InputTag("selectedPatTrigger"),
     #triggerIdentifiers = cms.vstring(['DUMMY']),
-    triggerIdentifiers = triggerPathNames, 
+    triggerIdentifiers            = triggerPathNames, 
+    triggerIdentifiersForMatching = cms.vstring([
+            'HLT_Ele27_WP80_v*',
+            'HLT_IsoMu24_eta2p1_v*',
+            'HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*',
+            ]),
 
     jetMult_min   = cms.untracked.int32(-99),
     jetPt_min     = cms.untracked.double(20.),    
