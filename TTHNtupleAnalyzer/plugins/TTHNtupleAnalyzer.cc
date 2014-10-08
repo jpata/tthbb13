@@ -462,9 +462,9 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
   // lepton counters
   int n__lep = 0;
-  int n_mu = 0;
-  int n_ele = 0;
-  int n_tau = 0;
+  int n_mu   = 0;
+  int n_ele  = 0;
+  int n_tau  = 0;
   
   // jet counter
   int n__jet = 0;
@@ -938,10 +938,67 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     tthtree->met__phi = met.phi();
 
     if (isMC_) {
-        tthtree->met__pt__en_up = met.shiftedPt(pat::MET::JetEnUp);
-        tthtree->met__pt__en_down = met.shiftedPt(pat::MET::JetEnDown);
-        tthtree->gen_met__pt = met.genMET()->pt();
-        tthtree->gen_met__phi = met.genMET()->phi();
+
+      tthtree->n__met_shift = 12;
+  
+      // Pt
+      tthtree->met__pt__shift[0]  = met.shiftedPt(pat::MET::JetEnUp);
+      tthtree->met__pt__shift[1]  = met.shiftedPt(pat::MET::JetEnDown);
+      tthtree->met__pt__shift[2]  = met.shiftedPt(pat::MET::JetResUp);
+      tthtree->met__pt__shift[3]  = met.shiftedPt(pat::MET::JetResDown);
+      tthtree->met__pt__shift[4]  = met.shiftedPt(pat::MET::MuonEnUp);
+      tthtree->met__pt__shift[5]  = met.shiftedPt(pat::MET::MuonEnDown);
+      tthtree->met__pt__shift[6]  = met.shiftedPt(pat::MET::ElectronEnUp);
+      tthtree->met__pt__shift[7]  = met.shiftedPt(pat::MET::ElectronEnDown);
+      tthtree->met__pt__shift[8]  = met.shiftedPt(pat::MET::TauEnUp);
+      tthtree->met__pt__shift[9]  = met.shiftedPt(pat::MET::TauEnDown);
+      tthtree->met__pt__shift[10] = met.shiftedPt(pat::MET::UnclusteredEnUp);
+      tthtree->met__pt__shift[11] = met.shiftedPt(pat::MET::UnclusteredEnDown);
+     
+      // Px
+      tthtree->met__px__shift[0]  = met.shiftedPx(pat::MET::JetEnUp);
+      tthtree->met__px__shift[1]  = met.shiftedPx(pat::MET::JetEnDown);
+      tthtree->met__px__shift[2]  = met.shiftedPx(pat::MET::JetResUp);
+      tthtree->met__px__shift[3]  = met.shiftedPx(pat::MET::JetResDown);
+      tthtree->met__px__shift[4]  = met.shiftedPx(pat::MET::MuonEnUp);
+      tthtree->met__px__shift[5]  = met.shiftedPx(pat::MET::MuonEnDown);
+      tthtree->met__px__shift[6]  = met.shiftedPx(pat::MET::ElectronEnUp);
+      tthtree->met__px__shift[7]  = met.shiftedPx(pat::MET::ElectronEnDown);
+      tthtree->met__px__shift[8]  = met.shiftedPx(pat::MET::TauEnUp);
+      tthtree->met__px__shift[9]  = met.shiftedPx(pat::MET::TauEnDown);
+      tthtree->met__px__shift[10] = met.shiftedPx(pat::MET::UnclusteredEnUp);
+      tthtree->met__px__shift[11] = met.shiftedPx(pat::MET::UnclusteredEnDown);
+
+      // Py
+      tthtree->met__py__shift[0]  = met.shiftedPy(pat::MET::JetEnUp);
+      tthtree->met__py__shift[1]  = met.shiftedPy(pat::MET::JetEnDown);
+      tthtree->met__py__shift[2]  = met.shiftedPy(pat::MET::JetResUp);
+      tthtree->met__py__shift[3]  = met.shiftedPy(pat::MET::JetResDown);
+      tthtree->met__py__shift[4]  = met.shiftedPy(pat::MET::MuonEnUp);
+      tthtree->met__py__shift[5]  = met.shiftedPy(pat::MET::MuonEnDown);
+      tthtree->met__py__shift[6]  = met.shiftedPy(pat::MET::ElectronEnUp);
+      tthtree->met__py__shift[7]  = met.shiftedPy(pat::MET::ElectronEnDown);
+      tthtree->met__py__shift[8]  = met.shiftedPy(pat::MET::TauEnUp);
+      tthtree->met__py__shift[9]  = met.shiftedPy(pat::MET::TauEnDown);
+      tthtree->met__py__shift[10] = met.shiftedPy(pat::MET::UnclusteredEnUp);
+      tthtree->met__py__shift[11] = met.shiftedPy(pat::MET::UnclusteredEnDown);
+
+      // Phi
+      tthtree->met__phi__shift[0]  = met.shiftedPhi(pat::MET::JetEnUp);
+      tthtree->met__phi__shift[1]  = met.shiftedPhi(pat::MET::JetEnDown);
+      tthtree->met__phi__shift[2]  = met.shiftedPhi(pat::MET::JetResUp);
+      tthtree->met__phi__shift[3]  = met.shiftedPhi(pat::MET::JetResDown);
+      tthtree->met__phi__shift[4]  = met.shiftedPhi(pat::MET::MuonEnUp);
+      tthtree->met__phi__shift[5]  = met.shiftedPhi(pat::MET::MuonEnDown);
+      tthtree->met__phi__shift[6]  = met.shiftedPhi(pat::MET::ElectronEnUp);
+      tthtree->met__phi__shift[7]  = met.shiftedPhi(pat::MET::ElectronEnDown);
+      tthtree->met__phi__shift[8]  = met.shiftedPhi(pat::MET::TauEnUp);
+      tthtree->met__phi__shift[9]  = met.shiftedPhi(pat::MET::TauEnDown);
+      tthtree->met__phi__shift[10] = met.shiftedPhi(pat::MET::UnclusteredEnUp);
+      tthtree->met__phi__shift[11] = met.shiftedPhi(pat::MET::UnclusteredEnDown);
+     
+      tthtree->gen_met__pt  = met.genMET()->pt();
+      tthtree->gen_met__phi = met.genMET()->phi();
     }
 
     //get the LHE gen-level stuff

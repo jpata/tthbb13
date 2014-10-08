@@ -5,6 +5,7 @@
 #define N_MAX 500
 #define M_MAX 100
 #define T_MAX 100
+#define MET_S_MAX 20
 //these are simple 'sentinel values' for uninitialized variables
 #define DEF_VAL_FLOAT -9999.0f
 #define DEF_VAL_DOUBLE -9999.0d
@@ -116,8 +117,10 @@ public:
 	int lhe__n_l;
 	float met__phi;
 	float met__pt;
-	float met__pt__en_down;
-	float met__pt__en_up;
+	float met__pt__shift [MET_S_MAX];
+	float met__px__shift [MET_S_MAX];
+	float met__py__shift [MET_S_MAX];
+	float met__phi__shift[MET_S_MAX];
 	int n__jet;
 	int n__jet_toptagger;
 	int n__jet_toptagger_sj;
@@ -125,6 +128,7 @@ public:
 	int n__pv;
 	int n__pvi;
 	int n__tr;
+        int n__met_shift;
 	int pvi__bx[N_MAX];
 	float pvi__n0[N_MAX];
 	float pvi__ntrue[N_MAX];
@@ -230,8 +234,10 @@ public:
 		lhe__n_l = DEF_VAL_INT;
 		met__phi = DEF_VAL_FLOAT;
 		met__pt = DEF_VAL_FLOAT;
-		met__pt__en_down = DEF_VAL_FLOAT;
-		met__pt__en_up = DEF_VAL_FLOAT;
+		SET_ZERO(met__pt__shift,  MET_S_MAX , DEF_VAL_FLOAT);
+		SET_ZERO(met__px__shift,  MET_S_MAX , DEF_VAL_FLOAT);
+		SET_ZERO(met__py__shift,  MET_S_MAX , DEF_VAL_FLOAT);
+		SET_ZERO(met__phi__shift, MET_S_MAX , DEF_VAL_FLOAT);
 		n__jet = DEF_VAL_INT;
 		n__jet_toptagger = DEF_VAL_INT;
 		n__jet_toptagger_sj = DEF_VAL_INT;
@@ -239,6 +245,7 @@ public:
 		n__tr  = DEF_VAL_INT;
 		n__pv  = DEF_VAL_INT;
 		n__pvi = DEF_VAL_INT;
+                n__met_shift = DEF_VAL_INT;
 		SET_ZERO(pvi__bx, N_MAX, DEF_VAL_INT);
 		SET_ZERO(pvi__n0, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(pvi__ntrue, N_MAX, DEF_VAL_FLOAT);
@@ -282,6 +289,8 @@ public:
 		branch_map["n__pvi"] = (void*)&n__pvi;
 		tree->Branch("n__tr", &n__tr, "n__tr/I");
 		branch_map["n__tr"] = (void*)&n__tr;
+		tree->Branch("n__met_shift", &n__met_shift, "n__met_shift/I");
+		branch_map["n__met_shift"] = (void*)&n__met_shift;
 		tree->Branch("debug__time1c", &debug__time1c, "debug__time1c/D");
 		branch_map["debug__time1c"] = (void*)&debug__time1c;
 		tree->Branch("debug__time1r", &debug__time1r, "debug__time1r/D");
@@ -454,10 +463,14 @@ public:
 		branch_map["met__phi"] = (void*)&met__phi;
 		tree->Branch("met__pt", &met__pt, "met__pt/F");
 		branch_map["met__pt"] = (void*)&met__pt;
-		tree->Branch("met__pt__en_down", &met__pt__en_down, "met__pt__en_down/F");
-		branch_map["met__pt__en_down"] = (void*)&met__pt__en_down;
-		tree->Branch("met__pt__en_up", &met__pt__en_up, "met__pt__en_up/F");
-		branch_map["met__pt__en_up"] = (void*)&met__pt__en_up;
+		tree->Branch("met__pt__shift", met__pt__shift, "met__pt__shift[n__met_shift]/F");
+		branch_map["met__pt__shift"] = (void*)met__pt__shift;
+		tree->Branch("met__px__shift", met__px__shift, "met__px__shift[n__met_shift]/F");
+		branch_map["met__px__shift"] = (void*)met__px__shift;
+		tree->Branch("met__py__shift", met__py__shift, "met__py__shift[n__met_shift]/F");
+		branch_map["met__py__shift"] = (void*)met__py__shift;
+		tree->Branch("met__phi__shift", met__phi__shift, "met__phi__shift[n__met_shift]/F");
+		branch_map["met__phi__shift"] = (void*)met__phi__shift;       
 		tree->Branch("pvi__bx", pvi__bx, "pvi__bx[n__pvi]/I");
 		branch_map["pvi__bx"] = (void*)pvi__bx;
 		tree->Branch("pvi__n0", pvi__n0, "pvi__n0[n__pvi]/F");
