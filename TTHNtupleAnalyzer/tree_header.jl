@@ -198,6 +198,19 @@ merge!(tree_structure,
     prefixed_dynlength(:gen_lep, Vector{Int32}, particle_id..., :status; length_branch=:n__lep)
 )
 
+#a vector with the identified good signal leptons
+merge!(tree_structure,
+    prefixed_dynlength(
+        :good_lep, Vector{Float32},
+        fourmomentum...,
+        :rel_iso
+    )
+)
+
+merge!(tree_structure,
+    prefixed_dynlength(:good_lep, Vector{Int32}, particle_id..., :charge, :idx)
+)
+
 #Jets
 merge!(tree_structure,
     prefixed_dynlength(:jet, Vector{Float32},
@@ -306,6 +319,51 @@ merge!(tree_structure,
 merge!(tree_structure,
     prefixed(:debug, Float64, :time1r, :time1c)
 )
+
+#generated top quark
+top_quark = [
+    :b__pt, :b__eta, :b__phi, :b__mass,
+    :w_d1__pt, :w_d2__pt,
+    :w_d1__eta, :w_d2__eta,
+    :w_d1__phi, :w_d2__phi,
+    :w_d1__mass, :w_d2__mass,
+]
+
+top_quark_ints = [
+    :b__status,
+    :w_d1__status, :w_d2__status,
+    :w_d1__id, :w_d2__id
+]
+
+for s in [:gen_t, :gen_tbar]
+    merge!(tree_structure,
+        prefixed(s, Float32,
+            top_quark...
+        )
+    )
+
+    merge!(tree_structure,
+        prefixed(s, Int32,
+            top_quark_ints... 
+        )
+    )
+end
+
+#generated b quark
+for s in [:gen_b, :gen_bbar]
+    merge!(tree_structure,
+        prefixed(s, Float32,
+            fourmomentum...
+        )
+    )
+
+    merge!(tree_structure,
+        prefixed(s, Int32,
+            :status, :id 
+        )
+    )
+end
+
 
 #pv - primary vertices
 merge!(tree_structure,
