@@ -60,7 +60,6 @@
 #include "DataFormats/JetReco/interface/CATopJetTagInfo.h"
 
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
-
 #include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
 
 //#include "CommonTools/UtilAlgos/interface/PhysObjectMatcher.h"
@@ -68,6 +67,11 @@
 //#include "CommonTools/UtilAlgos/interface/MatchLessByDPt.h"
 //#include "CommonTools/UtilAlgos/interface/MCMatchSelector.h"
 #include <EgammaAnalysis/ElectronTools/interface/ElectronEffectiveArea.h>
+
+#include "FWCore/Common/interface/TriggerNames.h"
+#include "DataFormats/Common/interface/TriggerResults.h"
+#include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
+#include "DataFormats/PatCandidates/interface/PackedTriggerPrescales.h"
 
 #include "TTH/TTHNtupleAnalyzer/interface/tth_tree.hh"
 #include "TStopwatch.h"
@@ -178,9 +182,17 @@ private:
   // particle identifiers
   const std::vector<std::string> tauIdentifiers_;
   const std::vector<std::string> eleIdentifiers_;
+
+  // trigger paths to be checked
+  const std::vector<std::string> triggerIdentifiers_;
   
+  // trigger results
+  const edm::EDGetTokenT<edm::TriggerResults> triggerBits_;
+  const edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection> triggerObjects_;
+  const edm::EDGetTokenT<pat::PackedTriggerPrescales> triggerPrescales_;
+
   // parameters
-  const bool    isMC;
+  const bool    isMC_;
   const double jetPt_min_;
   const int    jetMult_min_;
   const double muPt_min_;
@@ -214,7 +226,11 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
     tthtree(new TTHTree(fs->make<TTree>("events", "events"))),
     tauIdentifiers_(iConfig.getParameter<std::vector<std::string>>("tauIdentifiers")),
     eleIdentifiers_(iConfig.getParameter<std::vector<std::string>>("eleIdentifiers")),
-    isMC(iConfig.getParameter<bool>("isMC")),
+    triggerIdentifiers_(iConfig.getParameter<std::vector<std::string>>("triggerIdentifiers")),
+    triggerBits_(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("bits"))),
+    triggerObjects_(consumes<pat::TriggerObjectStandAloneCollection>(iConfig.getParameter<edm::InputTag>("objects"))),
+    triggerPrescales_(consumes<pat::PackedTriggerPrescales>(iConfig.getParameter<edm::InputTag>("prescales"))),
+    isMC_(iConfig.getParameter<bool>("isMC")),
     jetPt_min_  (iConfig.getUntrackedParameter<double>("jetPt_min", 5.)),
     jetMult_min_(iConfig.getUntrackedParameter<int>   ("jetMult_min", -99)),
     muPt_min_   (iConfig.getUntrackedParameter<double>("muPt_min",  5.)),
@@ -282,7 +298,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   tthtree->n__pv = vertices->size();
   
   //Pileup
-  if (isMC) {
+  if (isMC_) {
     Handle<std::vector<PileupSummaryInfo>> PupInfo;
     iEvent.getByLabel(edm::InputTag("addPileupInfo"), PupInfo);
     std::vector<PileupSummaryInfo>::const_iterator PVI;
@@ -302,6 +318,48 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       }
   }
   
+  edm::Handle<edm::TriggerResults> triggerBits;
+  edm::Handle<pat::TriggerObjectStandAloneCollection> triggerObjects;
+  edm::Handle<pat::PackedTriggerPrescales> triggerPrescales;
+  
+  iEvent.getByToken(triggerBits_,      triggerBits);
+  iEvent.getByToken(triggerObjects_,   triggerObjects);
+  iEvent.getByToken(triggerPrescales_, triggerPrescales);
+  
+
+  const edm::TriggerNames &names = iEvent.triggerNames(*triggerBits);
+  //std::cout << "\n === TRIGGER PATHS === " << std::endl;
+
+  int n__tr = 0;
+  for (unsigned int j = 0; j < triggerIdentifiers_.size(); ++j) {
+
+    string idName          =  triggerIdentifiers_[j];
+    string idNameUnstarred = idName;
+    bool isStarred         = idName.find("*")!=string::npos;    
+    if( isStarred ) idNameUnstarred.erase( idName.find("*"), 1 );
+
+    for (unsigned int i = 0, n = triggerBits->size(); i < n; ++i) {
+      
+      if( (isStarred  && names.triggerName(i).find(idNameUnstarred)!=string::npos ) || 
+	  (!isStarred && names.triggerName(i)==idName)
+	  ){
+	tthtree->trigger__bits    [n__tr] = triggerBits->accept(i);
+	tthtree->trigger__prescale[n__tr] = triggerPrescales->getPrescaleForIndex(i);
+      }
+      //std::cout << "Trigger " << names.triggerName(i) << 
+      //", prescale " << triggerPrescales->getPrescaleForIndex(i) <<
+      //": " << (triggerBits->accept(i) ? "PASS" : "fail (or not run)") << std::endl;
+      //std::cout <<  "'" << names.triggerName(i) << "'," << std::endl;
+     }
+    n__tr++;
+  }
+  tthtree->n__tr = n__tr;  
+
+  if(  int(triggerIdentifiers_.size())>=T_MAX ){
+    edm::LogError("T_MAX") << "Exceeded vector T_MAX with n__tr: " << n__tr << ">=> " << T_MAX;
+    throw std::exception();
+  }
+
   edm::Handle<pat::MuonCollection> muons;
   iEvent.getByToken(muonToken_, muons);
   
@@ -358,7 +416,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     } else {
       edm::LogWarning("muon") << "gsfTrack is 0 for n_mu=" << n_mu;
     }
-    if (isMC) {
+    if (isMC_) {
       const reco::GenParticle* gp = x.genParticle();
       if (gp == NULL) {
 	LogDebug("muon") << "n__lep=" << n__lep << " does not have genParticle(), doing dR/dP matching";
@@ -442,7 +500,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     } else {
       edm::LogWarning("electron") << "gsfTrack is 0 for n_ele=" << n_ele;
     }
-    if (isMC) {
+    if (isMC_) {
       const reco::GenParticle* gp = x.genParticle();
       if (gp == NULL) {
 	LogDebug("electron") << "n__lep=" << n__lep << " does not have genParticle(), doing dR/dP matching";
@@ -517,7 +575,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
         }
 
         const reco::GenParticle* gp = x.genParticle();
-        if (isMC) {
+        if (isMC_) {
             if (gp == NULL) {
                 LogDebug("tau") << "n__lep=" << n__lep << " does not have genParticle(), doing dR/dP matching";
                 gp = find_dr_dp_id_match(x, pruned);
@@ -554,25 +612,21 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	  LogDebug("jets") << "n__jet=" << n__jet << " fails pt cut" << endl;
 	  continue;
 	}
-	// jet ID
-	if( !jetID( x ) ){
-	  LogDebug("jets") << "n__jet=" << n__jet << " fails ID cut" << endl;
-	  continue;
-	}
 
-        tthtree->jet__eta[n__jet] = x.eta();
-        tthtree->jet__pt[n__jet] = x.pt();
-        tthtree->jet__phi[n__jet] = x.phi();
-        tthtree->jet__mass[n__jet] = x.mass();
-        tthtree->jet__energy[n__jet] = x.energy();
-        tthtree->jet__bd_csv[n__jet] = x.bDiscriminator("combinedSecondaryVertexBJetTags");
-        tthtree->jet__id[n__jet] = x.partonFlavour();
+        tthtree->jet__eta    [n__jet] = x.eta();
+        tthtree->jet__pt     [n__jet] = x.pt();
+        tthtree->jet__phi    [n__jet] = x.phi();
+        tthtree->jet__mass   [n__jet] = x.mass();
+        tthtree->jet__energy [n__jet] = x.energy();
+        tthtree->jet__bd_csv [n__jet] = x.bDiscriminator("combinedSecondaryVertexBJetTags");
+        tthtree->jet__id     [n__jet] = x.partonFlavour();
 
-	tthtree->jet__pileupJetId[n__jet] = x.userFloat("pileupJetId:fullDiscriminant");
-	tthtree->jet__vtxMass   [n__jet]  = x.userFloat("vtxMass") ;
-	tthtree->jet__vtxNtracks[n__jet]  = x.userFloat("vtxNtracks")  ;
-	tthtree->jet__vtx3DVal  [n__jet]  = x.userFloat("vtx3DVal")  ;
-	tthtree->jet__vtx3DSig  [n__jet]  = x.userFloat("vtx3DSig")  ;
+	tthtree->jet__jetId      [n__jet]  = int(jetID( x ));
+	tthtree->jet__pileupJetId[n__jet]  = x.userFloat("pileupJetId:fullDiscriminant");
+	tthtree->jet__vtxMass    [n__jet]  = x.userFloat("vtxMass") ;
+	tthtree->jet__vtxNtracks [n__jet]  = x.userFloat("vtxNtracks")  ;
+	tthtree->jet__vtx3DVal   [n__jet]  = x.userFloat("vtx3DVal")  ;
+	tthtree->jet__vtx3DSig   [n__jet]  = x.userFloat("vtx3DSig")  ;
 
         tthtree->jet__nh_e[n__jet] = x.neutralHadronEnergy();
         tthtree->jet__ne_e[n__jet] = x.neutralEmEnergy();
@@ -596,7 +650,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
         //    constituent_idx += 1;
         //}
 
-        if (isMC) {
+        if (isMC_) {
             //generated parton
             const reco::GenParticle* gp = x.genParticle();
             if (gp == NULL) {
@@ -750,7 +804,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     tthtree->met__pt = met.pt();
     tthtree->met__phi = met.phi();
 
-    if (isMC) {
+    if (isMC_) {
         tthtree->met__pt__en_up = met.shiftedPt(pat::MET::JetEnUp);
         tthtree->met__pt__en_down = met.shiftedPt(pat::MET::JetEnDown);
         tthtree->gen_met__pt = met.genMET()->pt();
@@ -759,7 +813,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
     //get the LHE gen-level stuff
     //code from LB --> LHE not always available
-    if ( isMC ) {
+    if ( isMC_ ) {
         edm::Handle<LHEEventProduct> lhe;
 	if( !lheToken_.isUninitialized() )
 	  iEvent.getByToken(lheToken_, lhe);

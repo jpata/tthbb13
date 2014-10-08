@@ -1,11 +1,19 @@
 import FWCore.ParameterSet.Config as cms
 
+from TTH.TTHNtupleAnalyzer.triggers_MC_cff import triggerPathNames
+print '**** TRIGGER PATHS ****'
+counter = 0
+for trigger in triggerPathNames:
+    print "[%s] = %s" % (counter, trigger)
+    counter += 1
+
+
 process = cms.Process("Demo")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = 10
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
@@ -101,6 +109,12 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer(
             'neutralIsoPtSum',
             'puCorrPtSum'
             ]),
+
+    bits      = cms.InputTag("TriggerResults","","HLT"),
+    prescales = cms.InputTag("patTrigger"),
+    objects   = cms.InputTag("selectedPatTrigger"),
+    #triggerIdentifiers = cms.vstring(['DUMMY']),
+    triggerIdentifiers = triggerPathNames, 
 
     jetMult_min   = cms.untracked.int32(-99),
     jetPt_min     = cms.untracked.double(20.),    

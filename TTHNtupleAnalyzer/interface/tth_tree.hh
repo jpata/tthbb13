@@ -4,6 +4,7 @@
 #include <map>
 #define N_MAX 500
 #define M_MAX 100
+#define T_MAX 100
 //these are simple 'sentinel values' for uninitialized variables
 #define DEF_VAL_FLOAT -9999.0f
 #define DEF_VAL_DOUBLE -9999.0d
@@ -26,6 +27,8 @@ public:
 	int event__json;
 	int event__lumi;
 	int event__run;
+	int trigger__bits[T_MAX];
+        float trigger__prescale[T_MAX];
 	float gen_jet__eta[N_MAX];
 	int gen_jet__id[N_MAX];
 	float gen_jet__mass[N_MAX];
@@ -53,6 +56,7 @@ public:
 	float jet__energy[N_MAX];
 	float jet__eta[N_MAX];
 	int jet__id[N_MAX];
+	float jet__jetId[N_MAX];
 	float jet__pileupJetId[N_MAX];
 	float jet__mass[N_MAX];
 	float jet__mu_e[N_MAX];
@@ -116,6 +120,7 @@ public:
 	int n__lep;
 	int n__pv;
 	int n__pvi;
+	int n__tr;
 	int pvi__bx[N_MAX];
 	float pvi__n0[N_MAX];
 	float pvi__ntrue[N_MAX];
@@ -132,6 +137,8 @@ public:
 		event__json = DEF_VAL_INT;
 		event__lumi = DEF_VAL_INT;
 		event__run = DEF_VAL_INT;
+		SET_ZERO(trigger__bits, T_MAX, DEF_VAL_INT);
+		SET_ZERO(trigger__prescale, T_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(gen_jet__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(gen_jet__id, N_MAX, DEF_VAL_INT);
 		SET_ZERO(gen_jet__mass, N_MAX, DEF_VAL_FLOAT);
@@ -159,6 +166,7 @@ public:
 		SET_ZERO(jet__energy, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet__id, N_MAX, DEF_VAL_INT);
+		SET_ZERO(jet__jetId, N_MAX, DEF_VAL_INT);
 		SET_ZERO(jet__pileupJetId, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet__mass, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet__mu_e, N_MAX, DEF_VAL_FLOAT);
@@ -220,7 +228,8 @@ public:
 		n__jet_toptagger = DEF_VAL_INT;
 		n__jet_toptagger_sj = DEF_VAL_INT;
 		n__lep = DEF_VAL_INT;
-		n__pv = DEF_VAL_INT;
+		n__tr  = DEF_VAL_INT;
+		n__pv  = DEF_VAL_INT;
 		n__pvi = DEF_VAL_INT;
 		SET_ZERO(pvi__bx, N_MAX, DEF_VAL_INT);
 		SET_ZERO(pvi__n0, N_MAX, DEF_VAL_FLOAT);
@@ -263,10 +272,16 @@ public:
 		branch_map["n__pv"] = (void*)&n__pv;
 		tree->Branch("n__pvi", &n__pvi, "n__pvi/I");
 		branch_map["n__pvi"] = (void*)&n__pvi;
+		tree->Branch("n__tr", &n__tr, "n__tr/I");
+		branch_map["n__tr"] = (void*)&n__tr;
 		tree->Branch("debug__time1c", &debug__time1c, "debug__time1c/D");
 		branch_map["debug__time1c"] = (void*)&debug__time1c;
 		tree->Branch("debug__time1r", &debug__time1r, "debug__time1r/D");
 		branch_map["debug__time1r"] = (void*)&debug__time1r;
+		tree->Branch("trigger__bits", trigger__bits, "trigger__bits[n__tr]/I");
+		branch_map["trigger__bits"] = (void*)trigger__bits;
+		tree->Branch("trigger__prescale", trigger__prescale, "trigger__prescale[n__tr]/F");
+		branch_map["trigger__prescale"] = (void*)trigger__prescale;		
 		tree->Branch("gen_jet__eta", gen_jet__eta, "gen_jet__eta[n__jet]/F");
 		branch_map["gen_jet__eta"] = (void*)gen_jet__eta;
 		tree->Branch("gen_jet__id", gen_jet__id, "gen_jet__id[n__jet]/I");
@@ -321,6 +336,8 @@ public:
 		branch_map["jet__eta"] = (void*)jet__eta;
 		tree->Branch("jet__id", jet__id, "jet__id[n__jet]/I");
 		branch_map["jet__id"] = (void*)jet__id;
+		tree->Branch("jet__jetId", jet__jetId, "jet__jetId[n__jet]/I");
+		branch_map["jet__jetId"] = (void*)jet__jetId;
 		tree->Branch("jet__pileupJetId", jet__pileupJetId, "jet__pileupJetId[n__jet]/F");
 		branch_map["jet__pileupJetId"] = (void*)jet__pileupJetId;
 		tree->Branch("jet__mass", jet__mass, "jet__mass[n__jet]/F");
