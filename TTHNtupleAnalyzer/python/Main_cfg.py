@@ -1,6 +1,8 @@
 import FWCore.ParameterSet.Config as cms
 
 from FWCore.ParameterSet.VarParsing import VarParsing
+import os
+
 options = VarParsing('analysis')
 process = cms.Process("Demo")
 options.parseArguments()
@@ -8,8 +10,18 @@ options.parseArguments()
 if len(options.inputFiles)==0:
         options.inputFiles = cms.untracked.vstring(["/store/mc/Spring14miniaod/TTbarH_HToBB_M-125_13TeV_pythia6/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/00000/0E97DD3E-2209-E411-8A04-003048945312.root"])
 
-process.load("FWCore.MessageService.MessageLogger_cfi")
-process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+#enable debugging printout
+if "TTH_DEBUG" in os.environ:
+    process.load("FWCore.MessageLogger.MessageLogger_cfi")
+    process.MessageLogger = cms.Service("MessageLogger",
+           destinations=cms.untracked.vstring('cout', 'debug'),
+           debugModules=cms.untracked.vstring('*'),
+           cout=cms.untracked.PSet(threshold=cms.untracked.string('INFO')),
+           debug=cms.untracked.PSet(threshold=cms.untracked.string('DEBUG')),
+    )
+else:
+    process.load("FWCore.MessageService.MessageLogger_cfi")
+    process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(options.maxEvents) )
 
@@ -135,6 +147,16 @@ process.p = cms.Path(
     process.hepTopTagInfos *
     process.tthNtupleAnalyzer
 )
+
+if "TTH_DEBUG" in os.environ:
+    process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
+    process.printTree = cms.EDAnalyzer("ParticleListDrawer",
+        maxEventsToPrint = cms.untracked.int32(-1),
+        printVertex = cms.untracked.bool(True),
+        src = cms.InputTag("prunedGenParticles")
+    )
+    process.p += process.printTree
+
 
 #process.out = cms.OutputModule(
 #    "PoolOutputModule",
