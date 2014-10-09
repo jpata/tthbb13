@@ -2,25 +2,32 @@
 #include <TTree.h>
 #include <string>
 #include <map>
+
 #define N_MAX 500
 #define M_MAX 100
 #define T_MAX 100
 #define MET_S_MAX 20
+
 //these are simple 'sentinel values' for uninitialized variables
 #define DEF_VAL_FLOAT -9999.0f
 #define DEF_VAL_DOUBLE -9999.0d
 #define DEF_VAL_INT -9999
 #define FLOAT_EPS 0.0000001f
 #define DOUBLE_EPS 0.0000001d
+
 constexpr bool is_undef(int x) { return x==DEF_VAL_INT; };
 constexpr bool is_undef(float x) { return fabs(x-DEF_VAL_FLOAT) < FLOAT_EPS; };
 constexpr bool is_undef(double x) { return fabs(x-DEF_VAL_DOUBLE) < DOUBLE_EPS; };
+
 #define SET_ZERO(x,n,y) for(int i=0;i<n;i++) {x[i]=y;}
 #define SET_ZERO_2(x,n,y) for(int i=0;i<n;i++) { for(int j=0;j<n;j++) { x[i][j]=y; } }
+
 class TTHTree {
 public:
 	TTHTree(TTree* _tree) { tree = _tree; };
 	TTree* tree;
+
+
 	double debug__time1c;
 	double debug__time1r;
 	int event__id;
@@ -203,6 +210,8 @@ public:
 	float weight__trigger;
 	float weight__trigger_down;
 	float weight__trigger_up;
+
+    //initializes all branch variables
 	void loop_initialize(void) {
 		debug__time1c = DEF_VAL_DOUBLE;
 		debug__time1r = DEF_VAL_DOUBLE;
@@ -354,10 +363,10 @@ public:
 		lhe__n_l = DEF_VAL_INT;
 		met__phi = DEF_VAL_FLOAT;
 		met__pt = DEF_VAL_FLOAT;
-		SET_ZERO(met__pt__shift,  MET_S_MAX , DEF_VAL_FLOAT);
-		SET_ZERO(met__px__shift,  MET_S_MAX , DEF_VAL_FLOAT);
-		SET_ZERO(met__py__shift,  MET_S_MAX , DEF_VAL_FLOAT);
-		SET_ZERO(met__phi__shift, MET_S_MAX , DEF_VAL_FLOAT);
+		SET_ZERO(met__pt__shift,  MET_S_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(met__px__shift,  MET_S_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(met__py__shift,  MET_S_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(met__phi__shift, MET_S_MAX, DEF_VAL_FLOAT);
 		n__jet = DEF_VAL_INT;
 		n__jet_toptagger = DEF_VAL_INT;
 		n__jet_toptagger_sj = DEF_VAL_INT;
@@ -386,6 +395,8 @@ public:
 		weight__trigger_down = DEF_VAL_FLOAT;
 		weight__trigger_up = DEF_VAL_FLOAT;
 	}
+
+    //makes branches on a new TTree
 	void make_branches(void) {
 		tree->Branch("event__id", &event__id, "event__id/I");
 		tree->Branch("event__json", &event__json, "event__json/I");
@@ -570,6 +581,9 @@ public:
 		tree->Branch("weight__trigger_down", &weight__trigger_down, "weight__trigger_down/F");
 		tree->Branch("weight__trigger_up", &weight__trigger_up, "weight__trigger_up/F");
 	}
+
+    //connects the branches of an existing TTree to variables
+    //used when loading the file
 	void set_branch_addresses(void) {
 		tree->SetBranchAddress("debug__time1c", &debug__time1c);
 		tree->SetBranchAddress("debug__time1r", &debug__time1r);
