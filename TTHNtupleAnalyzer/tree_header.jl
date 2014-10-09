@@ -201,14 +201,14 @@ merge!(tree_structure,
 #a vector with the identified good signal leptons
 merge!(tree_structure,
     prefixed_dynlength(
-        :good_lep, Vector{Float32},
+        :sig_lep, Vector{Float32},
         fourmomentum...,
         :rel_iso
     )
 )
 
 merge!(tree_structure,
-    prefixed_dynlength(:good_lep, Vector{Int32}, particle_id..., :charge, :idx)
+    prefixed_dynlength(:sig_lep, Vector{Int32}, particle_id..., :charge, :idx)
 )
 
 #Jets
@@ -374,6 +374,11 @@ merge!(tree_structure,
 )
 merge!(tree_structure,
     prefixed_dynlength(:pvi, Vector{Int32}, :bx)
+)
+
+#Chosen hypothesis
+merge!(tree_structure,
+    {:hypo1=>(Int32, )}
 )
 #####
 

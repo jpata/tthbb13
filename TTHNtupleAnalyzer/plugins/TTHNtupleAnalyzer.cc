@@ -97,7 +97,7 @@ std::vector<R> to_ptrvec(T coll) {
 }
 
 template <typename T>
-bool sort_by_pt(T a, T b) {
+bool order_by_pt(T a, T b) {
     assert(a!=NULL && b!=NULL);
     return (a->pt() > b->pt());
 };
@@ -217,7 +217,7 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
     eleIdentifiers_(iConfig.getParameter<std::vector<std::string>>("eleIdentifiers")),
     isMC(iConfig.getParameter<bool>("isMC")),
     jetPt_min_  (iConfig.getUntrackedParameter<double>("jetPt_min", 5.)),
-    jetMult_min_(iConfig.getUntrackedParameter<int>   ("jetMult_min", -99)),
+    jetMult_min_(iConfig.getUntrackedParameter<int>   ("jetMult_min", DEF_VAL_INT)),
     muPt_min_   (iConfig.getUntrackedParameter<double>("muPt_min",  5.)),
     elePt_min_  (iConfig.getUntrackedParameter<double>("elePt_min", 5.)),
     tauPt_min_  (iConfig.getUntrackedParameter<double>("tauPt_min", 5.))
@@ -230,30 +230,6 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
 TTHNtupleAnalyzer::~TTHNtupleAnalyzer()
 {
     delete sw;
-}
-
-double dbc_rel_iso(const pat::Electron& lepton) {
-    return (
-               (lepton.chargedHadronIso() +
-                std::max(0.0, lepton.neutralHadronIso() + lepton.photonIso() - 0.5*lepton.puChargedHadronIso()))/lepton.pt()
-           );
-}
-
-double dbc_rel_iso(const pat::Muon& lepton) {
-    return (
-               (lepton.chargedHadronIso() +
-                std::max(0.0, lepton.neutralHadronIso() + lepton.photonIso() - 0.5*lepton.puChargedHadronIso()))/lepton.pt()
-           );
-}
-
-bool jetID(const pat::Jet& j) {
-    if(j.neutralHadronEnergyFraction() > 0.99) return false;
-    if(j.neutralEmEnergyFraction() > 0.99)     return false;
-    if(fabs(j.p4().Eta())<2.4 && j.chargedEmEnergyFraction() > 0.99)   return false;
-    if(fabs(j.p4().Eta())<2.4 && j.chargedHadronEnergyFraction() == 0) return false;
-    //if(fabs(j.p4().Eta())<2.4 && j.associatedTracks().size() == 0) return false;
-    if(j.numberOfDaughters() <= 1) return false;
-    return true;
 }
 
 void TTHNtupleAnalyzer::finalizeLoop() {
@@ -315,24 +291,28 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
     // lepton counters
     int n__lep = 0;
-    int n_mu = 0;
-    int n_ele = 0;
-    int n_tau = 0;
+    int n__mu = 0;
+    int n__ele = 0;
+    int n__tau = 0;
+
+    //collection to keep track of lepton pointers in the same order as in the tthtree->lep__* arrays
+    vector<const reco::Candidate*> leptons;
 
     // jet counter
     int n__jet = 0;
 
     for (const pat::Muon &x : *muons) {
-        LogDebug("muons") << "n_mu=" << n_mu <<
+        LogDebug("muons") << "n__mu=" << n__mu <<
                           " pt=" << x.pt() <<
                           " dz(PV)=" << x.muonBestTrack()->dz(PV.position()) <<
                           " lID=" << x.isLooseMuon() <<
                           " tID=" << x.isTightMuon(PV);
 
         if( x.pt()<muPt_min_ ) {
-            LogDebug("muons") << "n_mu=" << n_mu << " fails pt cut" << endl;
+            LogDebug("muons") << "n__mu=" << n__mu << " fails pt cut" << endl;
             continue;
         }
+        leptons.push_back((const reco::Candidate*)&x);
 
         tthtree->lep__eta[n__lep] = x.eta();
         tthtree->lep__pt[n__lep] = x.pt();
@@ -362,7 +342,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
             tthtree->lep__dxy[n__lep] = x.muonBestTrack()->dxy(PV.position());
             tthtree->lep__dz[n__lep] = x.muonBestTrack()->dz(PV.position());
         } else {
-            edm::LogWarning("muon") << "gsfTrack is 0 for n_mu=" << n_mu;
+            edm::LogWarning("muon") << "gsfTrack is 0 for n__mu=" << n__mu;
         }
         if (isMC) {
             const reco::GenParticle* gp = x.genParticle();
@@ -378,10 +358,10 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
                 tthtree->gen_lep__id[n__lep] = gp->pdgId();
                 tthtree->gen_lep__status[n__lep] = gp->status();
             } else {
-                LogDebug("muons") << "genParticle()==0 for muon n_mu=" << n_mu;
+                LogDebug("muons") << "genParticle()==0 for muon n__mu=" << n__mu;
             }
         }
-        n_mu += 1;
+        n__mu += 1;
         n__lep += 1;
     } //muons
 
@@ -390,13 +370,13 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     edm::Handle<pat::ElectronCollection> electrons;
     iEvent.getByToken(electronToken_, electrons);
     for (const pat::Electron &x : *electrons) {
-        LogDebug("electrons") << "n_ele=" << n_ele <<
+        LogDebug("electrons") << "n__ele=" << n__ele <<
                               " pt=" << x.pt();
-
         if( x.pt()<elePt_min_ ) {
-            LogDebug("electrons") << "n_ele=" << n_ele << " fails pt cut" << endl;
+            LogDebug("electrons") << "n__ele=" << n__ele << " fails pt cut" << endl;
             continue;
         }
+        leptons.push_back((const reco::Candidate*)&x);
 
         tthtree->lep__eta[n__lep] = x.eta();
         tthtree->lep__pt[n__lep] = x.pt();
@@ -448,7 +428,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
             tthtree->lep__dxy[n__lep] = x.gsfTrack()->dxy(PV.position());
             tthtree->lep__dz[n__lep] = x.gsfTrack()->dz(PV.position());
         } else {
-            edm::LogWarning("electron") << "gsfTrack is 0 for n_ele=" << n_ele;
+            edm::LogWarning("electron") << "gsfTrack is 0 for n__ele=" << n__ele;
         }
         if (isMC) {
             const reco::GenParticle* gp = x.genParticle();
@@ -464,23 +444,25 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
                 tthtree->gen_lep__id[n__lep] = gp->pdgId();
                 tthtree->gen_lep__status[n__lep] = gp->status();
             } else {
-                LogDebug("electron") << "genParticle()==0 for electron n_ele=" << n_ele;
+                LogDebug("electron") << "genParticle()==0 for electron n__ele=" << n__ele;
             }
         }
-        n_ele += 1;
+        n__ele += 1;
         n__lep += 1;
     } // electrons
 
     edm::Handle<pat::TauCollection> taus;
     iEvent.getByToken(tauToken_, taus);
     for (const pat::Tau &x : *taus) {
-        LogDebug("taus") << "n_tau=" << n_tau <<
-                         " pt=" << x.pt();
-
+        LogDebug("taus") << "n__tau=" << n__tau <<
+            " pt=" << x.pt();
+        
         if( x.pt()<tauPt_min_ ) {
-            LogDebug("taus") << "n_tau=" << n_tau << " fails pt cut" << endl;
+            LogDebug("taus") << "n__tau=" << n__tau << " fails pt cut" << endl;
             continue;
         }
+
+        leptons.push_back((const reco::Candidate*)&x);
 
         tthtree->lep__eta[n__lep] = x.eta();
         tthtree->lep__pt[n__lep] = x.pt();
@@ -521,7 +503,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
             tthtree->lep__dxy[n__lep] = x.leadTrack()->dxy(PV.position());
             tthtree->lep__dz[n__lep] = x.leadTrack()->dz(PV.position());
         } else {
-            LogDebug("tau") << "leadTrack is 0 for n_tau=" << n_tau;
+            LogDebug("tau") << "leadTrack is 0 for n__tau=" << n__tau;
         }
 
         const reco::GenParticle* gp = x.genParticle();
@@ -539,10 +521,10 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
                 tthtree->gen_lep__id[n__lep] = gp->pdgId();
                 tthtree->gen_lep__status[n__lep] = gp->status();
             } else {
-                LogDebug("taus") << "genParticle()==0 for tau n_tau=" << n_tau;
+                LogDebug("taus") << "genParticle()==0 for tau n__tau=" << n__tau;
             }
         }
-        n_tau += 1;
+        n__tau += 1;
         n__lep += 1;
     } // taus
      
@@ -552,7 +534,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
     //sort jets by pt
     //auto jetps = to_ptrvec<const std::vector<pat::Jet>&, const pat::Jet*>(*jets);
-    //std::sort(jetps.begin(), jetps.end(), sort_by_pt<const pat::Jet*>);
+    //std::sort(jetps.begin(), jetps.end(), order_by_pt<const pat::Jet*>);
 
     for (auto x : *jets) {
         //assert(_x != NULL);
@@ -594,11 +576,11 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
         //unsigned int constituent_idx = 0;
         //for (const auto& constituent : x.getJetConstituents()) {
         //    if (n__jet >= M_MAX || constituent_idx >= M_MAX) {
-        //        LogDebug("jet") << "jet constituent maximum count reached: n_jet=" << n__jet << " n_constituent=" << constituent_idx << " max=" << M_MAX;
+        //        LogDebug("jet") << "jet constituent maximum count reached: n__jet=" << n__jet << " n_constituent=" << constituent_idx << " max=" << M_MAX;
         //        break;
         //    }
         //    if (constituent.isNull()) {
-        //        edm::LogWarning("jet") << "jet constituent is null: n_jet=" << n__jet << " n_constituent=" << constituent_idx;
+        //        edm::LogWarning("jet") << "jet constituent is null: n__jet=" << n__jet << " n_constituent=" << constituent_idx;
         //        break;
         //    }
         //    tthtree->jet__c_pt[n__jet][constituent_idx] = constituent->pt();
@@ -692,21 +674,81 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
         n__jet += 1;
     } //jet loop
 
-    //// Good leptons for the tighter di-leptonic mode
+    //do initial hypothesis assignment
     vector<const pat::Muon*> good_muons_sl = TTH::find_good_muons(*muons, PV, TTH::DecayMode::semileptonic);
-    vector<const pat::Electron*> good_electrons_sl = TTH::find_good_electrons(*electrons, TTH::DecayMode::semileptonic);
+    vector<const pat::Electron*> good_electrons_sl = TTH::find_good_electrons(*electrons, PV, TTH::DecayMode::semileptonic);
     vector<const pat::Tau*> good_taus_sl = TTH::find_good_taus(*taus, TTH::DecayMode::semileptonic);
     vector<const pat::Jet*> good_jets_sl = TTH::find_good_jets(*jets, TTH::DecayMode::semileptonic);
     
     vector<const pat::Muon*> good_muons_dl = TTH::find_good_muons(*muons, PV, TTH::DecayMode::dileptonic);
-    vector<const pat::Electron*> good_electrons_dl = TTH::find_good_electrons(*electrons, TTH::DecayMode::dileptonic);
+    vector<const pat::Electron*> good_electrons_dl = TTH::find_good_electrons(*electrons, PV, TTH::DecayMode::dileptonic);
     vector<const pat::Tau*> good_taus_dl = TTH::find_good_taus(*taus, TTH::DecayMode::dileptonic);
     vector<const pat::Jet*> good_jets_dl = TTH::find_good_jets(*jets, TTH::DecayMode::dileptonic);
     
     TTH::EventDescription desc_sl(good_muons_sl, good_electrons_sl, good_taus_sl, good_jets_sl);
     TTH::EventDescription desc_dl(good_muons_dl, good_electrons_dl, good_taus_dl, good_jets_dl);
+    LogDebug("hypo") << "SL hypo mu " << good_muons_sl.size() << " ele " << good_electrons_sl.size() << " tau " << good_taus_sl.size() << " jet " << good_jets_sl.size();   
+    LogDebug("hypo") << "DL hypo mu " << good_muons_dl.size() << " ele " << good_electrons_dl.size() << " tau " << good_taus_dl.size() << " jet " << good_jets_sl.size();   
+    
+    TTH::EventHypothesis hypo = assign_event_hypothesis(desc_sl, desc_dl);
+    LogDebug("hypo") << "chosen hypo " << hypo;
+    tthtree->hypo1 = (int)hypo;
 
-    //FIXME: should be min/max, not min/min!
+    //Dilepton hypothesis, concatenate lepton arrays, sort by pt and put into TTree array
+    vector<const reco::Candidate*> good_leptons;
+    if (hypo == TTH::EventHypothesis::ee ||
+        hypo == TTH::EventHypothesis::mumu ||
+        hypo == TTH::EventHypothesis::tautau ||
+        hypo == TTH::EventHypothesis::emu ||
+        hypo == TTH::EventHypothesis::taue ||
+        hypo == TTH::EventHypothesis::taumu
+    ) {
+        for (auto* x : good_muons_dl) {
+            good_leptons.push_back((const reco::Candidate*)x); 
+        }
+        for (auto* x : good_electrons_dl) {
+            good_leptons.push_back((const reco::Candidate*)x); 
+        }
+        for (auto* x : good_taus_dl) {
+            good_leptons.push_back((const reco::Candidate*)x); 
+        }
+
+        //must be 2, otherwise there was a bug in the hypothesis assignment
+        assert(good_leptons.size()==2);
+    }
+    
+    if (hypo == TTH::EventHypothesis::en ||
+        hypo == TTH::EventHypothesis::mun ||
+        hypo == TTH::EventHypothesis::taun
+    ) {
+        for (auto* x : good_muons_sl) {
+            good_leptons.push_back((const reco::Candidate*)x); 
+        }
+        for (auto* x : good_electrons_sl) {
+            good_leptons.push_back((const reco::Candidate*)x); 
+        }
+        for (auto* x : good_taus_sl) {
+            good_leptons.push_back((const reco::Candidate*)x); 
+        }
+
+        //must be 1, otherwise there was a bug in the hypothesis assignment
+        assert(good_leptons.size()==1);
+       
+    }
+    //sort by pt descending
+    sort(good_leptons.begin(), good_leptons.end(), order_by_pt<const reco::Candidate*>);
+
+    for (unsigned int i=0; i<good_leptons.size(); i++) {
+        tthtree->sig_lep__pt[i] = good_leptons[i]->pt();
+        tthtree->sig_lep__eta[i] = good_leptons[i]->eta();
+        tthtree->sig_lep__phi[i] = good_leptons[i]->phi();
+        tthtree->sig_lep__mass[i] = good_leptons[i]->mass();
+
+        //get index into main lepton array
+        tthtree->sig_lep__idx[i] = find(leptons.begin(), leptons.end(), good_leptons[i]) - leptons.begin();
+    }
+    tthtree->n__sig_lep = good_leptons.size();
+
     if( jetMult_min_>0 && n__jet<jetMult_min_ ) {
         LogDebug("Event Cuts") << n__jet << " jets: skip this event" << endl;
         return;
@@ -721,10 +763,9 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
     assert(top_jets->size()==top_jet_infos->size());
 
-    //FIXME: associate subjets and topjets via BasicJet::getConstituents
+    //Top jets and subjets are associated by indices
     //See /cvmfs/cms.cern.ch/slc6_amd64_gcc481/cms/cmssw/CMSSW_7_0_9/src/RecoJets/JetProducers/plugins/CompoundJetProducer.cc
     //about the association
-
     int n_top_jet_subjet = 0;
 
     for (unsigned int n_top_jet=0; n_top_jet<top_jets->size(); n_top_jet++) {
@@ -766,19 +807,6 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     tthtree->n__jet_toptagger = top_jets->size();
     tthtree->n__jet_toptagger_sj = n_top_jet_subjet;
 
-    ////subjets of top jets
-    //edm::Handle<edm::View<reco::PFJet>> top_jet_subjets;
-    //iEvent.getByToken(topJetSubjetToken_, top_jet_subjets);
-    //for (unsigned int n_top_jet_subjet=0; n_top_jet_subjet<top_jet_subjets->size(); n_top_jet_subjet++) {
-    //    const reco::PFJet& x = top_jet_subjets->at(n_top_jet_subjet);
-    //    tthtree->jet_toptagger_sj__eta[n_top_jet_subjet] = x.eta();
-    //    tthtree->jet_toptagger_sj__pt[n_top_jet_subjet] = x.pt();
-    //    tthtree->jet_toptagger_sj__phi[n_top_jet_subjet] = x.phi();
-    //    tthtree->jet_toptagger_sj__mass[n_top_jet_subjet] = x.mass();
-    //    tthtree->jet_toptagger_sj__energy[n_top_jet_subjet] = x.energy();
-    //}
-    //tthtree->n__jet_toptagger_sj = top_jet_subjets->size();
-
     if (n__lep>=N_MAX) {
         edm::LogError("N_MAX") << "Exceeded vector N_MAX with n__lep: " << n__lep << ">=> " << N_MAX;
         throw std::exception();
@@ -790,8 +818,8 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     }
 
 
-    edm::Handle<pat::JetCollection> fatjets;
-    iEvent.getByToken(fatjetToken_, fatjets);
+    //edm::Handle<pat::JetCollection> fatjets;
+    //iEvent.getByToken(fatjetToken_, fatjets);
     //for (const pat::Jet &j : *fatjets) {
     //}
 
@@ -926,12 +954,16 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
                     tthtree->gen_t__w_d1__eta = w->daughter(0)->eta();
                     tthtree->gen_t__w_d1__phi = w->daughter(0)->phi();
                     tthtree->gen_t__w_d1__mass = w->daughter(0)->mass();
+                    tthtree->gen_t__w_d1__id = w->daughter(0)->pdgId();
+                    tthtree->gen_t__w_d1__status = w->daughter(0)->status();
                     LogDebug("genparticles") << "top w dau1 " << PCANDPRINT(w->daughter(0)); 
                     
                     tthtree->gen_t__w_d2__pt = w->daughter(1)->pt();
                     tthtree->gen_t__w_d2__eta = w->daughter(1)->eta();
                     tthtree->gen_t__w_d2__phi = w->daughter(1)->phi();
                     tthtree->gen_t__w_d2__mass = w->daughter(1)->mass();
+                    tthtree->gen_t__w_d2__id = w->daughter(1)->pdgId();
+                    tthtree->gen_t__w_d2__status = w->daughter(1)->status();
                     LogDebug("genparticles") << "top w dau2 " << PCANDPRINT(w->daughter(1)); 
                 } else {
                     edm::LogError("genparticles") << "top w dau1 " << w->daughter(0) << " dau2 " << w->daughter(1) << " null pointer!";
@@ -971,11 +1003,15 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
                     tthtree->gen_tbar__w_d1__eta = w->daughter(0)->eta();
                     tthtree->gen_tbar__w_d1__phi = w->daughter(0)->phi();
                     tthtree->gen_tbar__w_d1__mass = w->daughter(0)->mass();
+                    tthtree->gen_tbar__w_d1__id = w->daughter(0)->pdgId();
+                    tthtree->gen_tbar__w_d1__status = w->daughter(0)->status();
                     LogDebug("genparticles") << "antitop w dau1 " << PCANDPRINT(w->daughter(0)); 
                     tthtree->gen_tbar__w_d2__pt = w->daughter(1)->pt();
                     tthtree->gen_tbar__w_d2__eta = w->daughter(1)->eta();
                     tthtree->gen_tbar__w_d2__phi = w->daughter(1)->phi();
                     tthtree->gen_tbar__w_d2__mass = w->daughter(1)->mass();
+                    tthtree->gen_tbar__w_d2__id = w->daughter(1)->pdgId();
+                    tthtree->gen_tbar__w_d2__status = w->daughter(1)->status();
                     LogDebug("genparticles") << "antitop w dau2 " << PCANDPRINT(w->daughter(1)); 
                 } else {
                     edm::LogError("genparticles") << "antitop w dau1 " << w->daughter(0) << " dau2 " << w->daughter(1) << " null pointer!";
