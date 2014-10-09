@@ -503,7 +503,6 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
         tthtree->lep__type[n__lep] = abs(x.pdgId());
         tthtree->lep__charge[n__lep] = x.charge();
 
-        //FIXME: OK to use POG function or should define own?
         tthtree->lep__is_tight[n__lep] = is_tight_muon(x, PV);
         tthtree->lep__is_loose[n__lep] = is_loose_muon(x);
 
@@ -846,7 +845,10 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
                 tthtree->gen_jet__pt[n__jet] = gj->pt();
                 tthtree->gen_jet__phi[n__jet] = gj->phi();
                 tthtree->gen_jet__mass[n__jet] = gj->mass();
+
+                //FIXME: this id assignment does not seem to be correct. See issue #5 https://github.com/jpata/tthbb13/issues/5
                 tthtree->gen_jet__id[n__jet] = gj->pdgId();
+
                 tthtree->gen_jet__status[n__jet] = gj->status();
 
                 ////Get generator level constituents
@@ -1143,7 +1145,6 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
         }
     } // isMC for LHE
 
-    //FIXME: finish gen top and b quark finding algo
     if (isMC_) {
         // Packed particles are all the status 1, so usable to remake jets
         // The navigation from status 1 to pruned is possible (the other direction should be made by hand)
