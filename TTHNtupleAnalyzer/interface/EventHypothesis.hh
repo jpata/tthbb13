@@ -25,6 +25,65 @@ bool jetID(const pat::Jet& j) {
     return true;
 }
 
+bool is_tight_electron(const pat::Electron& ele, const reco::Vertex& vtx) {
+    const float ae = TMath::Abs(ele.eta());
+    return (
+        ele.pt() > 30 && ae < 2.5 && !(ae>1.4442 && ae<1.5660) &&
+        TMath::Abs(ele.gsfTrack()->dxy(vtx.position())) < 0.02 &&
+        ele.passConversionVeto() &&
+        
+        //throws error:
+        //pat::Electron: the ID mvaTrigV0 can't be found in this pat::Electron.
+        //The available IDs are: 'eidLoose' 'eidRobustHighEnergy' 'eidRobustLoose' 'eidRobustTight' 'eidTight'
+        //ele.electronID("mvaTrigV0") > 0.5 &&
+        ele.electronID("eidLoose") > 0.5 &&
+        ele.gsfTrack()->trackerExpectedHitsInner().numberOfHits() <= 0 &&
+        dbc_rel_iso(ele) < 0.1
+    );
+}
+
+bool is_loose_electron(const pat::Electron& ele, const reco::Vertex& vtx) {
+    const float ae = TMath::Abs(ele.eta());
+    return (
+        ele.pt() > 20 && ae < 2.5 &&
+        TMath::Abs(ele.gsfTrack()->dxy(vtx.position())) < 0.04 &&
+        ele.passConversionVeto() &&
+        
+        //throws error:
+        //pat::Electron: the ID mvaTrigV0 can't be found in this pat::Electron.
+        //The available IDs are: 'eidLoose' 'eidRobustHighEnergy' 'eidRobustLoose' 'eidRobustTight' 'eidTight'
+        //ele.electronID("mvaTrigV0") > 0.5 &&
+        ele.electronID("eidLoose") > 0.5 &&
+        ele.gsfTrack()->trackerExpectedHitsInner().numberOfHits() <= 0 &&
+        dbc_rel_iso(ele) < 0.15
+    ); 
+}
+
+bool is_tight_muon(const pat::Muon& mu, const reco::Vertex& vtx) {
+    return (
+        mu.pt()>26 &&
+        TMath::Abs(mu.eta()) < 2.1 &&
+        mu.isGlobalMuon() &&
+        mu.normChi2() < 10 &&
+        mu.track()->hitPattern().trackerLayersWithMeasurement() > 5 &&
+        mu.globalTrack()->hitPattern().numberOfValidMuonHits() > 0 &&
+        mu.muonBestTrack()->dxy(vtx.position()) < 0.2 &&
+        mu.muonBestTrack()->dz(vtx.position())< 0.5 &&
+        mu.innerTrack()->hitPattern().numberOfValidPixelHits() > 0 &&
+        mu.numberOfMatchedStations() > 1 &&
+        dbc_rel_iso(mu) < 0.12
+    );
+}
+
+bool is_loose_muon(const pat::Muon& mu) {
+    return (
+        mu.pt()>20 &&
+        TMath::Abs(mu.eta()) < 2.4 &&
+        (mu.isGlobalMuon() || mu.isTrackerMuon()) &&
+        dbc_rel_iso(mu) < 0.2
+    );
+}
+
 namespace TTH {
 
 //Initial classification based on the decay mode of the two top quarks
@@ -62,23 +121,12 @@ vector<const pat::Muon*> find_good_muons(const vector<pat::Muon>& muons, const r
             if (mu.track().isNull() || mu.globalTrack().isNull() || mu.muonBestTrack().isNull() || mu.innerTrack().isNull()) {
                 continue;
             }
-        }
-
-        if(
-            (mode==DecayMode::dileptonic ? mu.pt()>20 : mu.pt()>26) &&
-            (mode==DecayMode::dileptonic ? TMath::Abs(mu.eta()) < 2.4 : TMath::Abs(mu.eta()) < 2.1 ) &&
-            mu.isPFMuon() &&
-            (mode==DecayMode::dileptonic ? mu.isGlobalMuon() || mu.isTrackerMuon() : mu.isGlobalMuon()) &&
-            (mode==DecayMode::dileptonic ? true : mu.normChi2() < 10) &&
-            (mode==DecayMode::dileptonic ? true : mu.track()->hitPattern().trackerLayersWithMeasurement() > 5) &&
-            (mode==DecayMode::dileptonic ? true : mu.globalTrack()->hitPattern().numberOfValidMuonHits() > 0) &&
-            (mode==DecayMode::dileptonic ? true : mu.muonBestTrack()->dxy(vtx.position()) < 0.2) &&
-            (mode==DecayMode::dileptonic ? true : mu.muonBestTrack()->dz(vtx.position())< 0.5) &&
-            (mode==DecayMode::dileptonic ? true : mu.innerTrack()->hitPattern().numberOfValidPixelHits() > 0) &&
-            (mode==DecayMode::dileptonic ? true : mu.numberOfMatchedStations() > 1) &&
-            (mode==DecayMode::dileptonic ? dbc_rel_iso(mu) < 0.2 : dbc_rel_iso(mu) < 0.12)  
-        ) {
-            out.push_back(&mu);
+            if (mode==DecayMode::dileptonic && is_loose_muon(mu)) {
+                out.push_back(&mu);
+            }
+            else if (mode==DecayMode::semileptonic && is_tight_muon(mu, vtx)) {
+                out.push_back(&mu);
+            }
         }
     }
     return out;
@@ -90,27 +138,19 @@ vector<const pat::Electron*> find_good_electrons(const vector<pat::Electron>& el
     vector<const pat::Electron*> out;
 
     for (auto& ele : electrons) {
+
+        //electrons with no track will not pass in any case 
         if(mode == DecayMode::dileptonic) {
             if (ele.gsfTrack().isNull()) {
                 continue;
             }
         }
-        if(
-            (mode==DecayMode::dileptonic ? ele.pt()>20 : ele.pt()>30) &&
-            TMath::Abs(ele.eta())<2.5 &&
-            (mode==DecayMode::dileptonic ? true : (1.4442 < TMath::Abs(ele.eta())) && (1.5660 > TMath::Abs(ele.eta()))) &&
-            TMath::Abs(ele.gsfTrack()->dxy(vtx.position())) < (mode==dileptonic ? 0.04 : 0.02) &&
-            ele.passConversionVeto() &&
 
-            //throws error:
-            //pat::Electron: the ID mvaTrigV0 can't be found in this pat::Electron.
-            //The available IDs are: 'eidLoose' 'eidRobustHighEnergy' 'eidRobustLoose' 'eidRobustTight' 'eidTight'
-            //ele.electronID("mvaTrigV0") > 0.5 &&
-            ele.electronID("eidLoose") > 0.5 &&
-            ele.gsfTrack()->trackerExpectedHitsInner().numberOfHits() <= 0 &&
-            (mode==DecayMode::dileptonic ? dbc_rel_iso(ele) < 0.15 : dbc_rel_iso(ele) < 0.1)  
-        ) {
-            out.push_back(&ele);
+        if (mode==DecayMode::dileptonic && is_loose_electron(ele, vtx)) {
+            out.push_back(&ele); 
+        }
+        else if (mode==DecayMode::semileptonic && is_tight_electron(ele, vtx)) {
+            out.push_back(&ele); 
         }
     }
     return out;

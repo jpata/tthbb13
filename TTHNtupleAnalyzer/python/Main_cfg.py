@@ -32,6 +32,8 @@ process.source = cms.Source("PoolSource",
     )
 )
 
+from TTH.TTHNtupleAnalyzer.triggers_MC_cff import *
+
 process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
     isMC = cms.bool(True),
     vertices = cms.InputTag("offlineSlimmedPrimaryVertices"),
@@ -47,6 +49,13 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
     fatjets = cms.InputTag("slimmedJetsAK8"),
     mets = cms.InputTag("slimmedMETs"),
     lhe = cms.InputTag("externalLHEProducer"),
+
+    triggerIdentifiers=cms.vstring([]),
+    triggerIdentifiersForMatching=cms.vstring([]),
+    bits = cms.InputTag("TriggerResults"),
+    objects = cms.InputTag("selectedPatTrigger"),
+    prescales = cms.InputTag("patTrigger"),
+
     eleIdentifiers = cms.vstring([
         'eidLoose',
         'eidRobustHighEnergy',
