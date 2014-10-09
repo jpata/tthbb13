@@ -1,2 +1,6 @@
 *.pyc
+*/*/__init__.py
+MEAnalysis/root/MEAnalysis*.root
 *.un~
+*.orig
+VHbbAnalysis
