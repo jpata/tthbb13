@@ -58,18 +58,37 @@ branchtype(t::Tuple) = t[1]
 #make a vector branch
 function make_branch{T <: Any}(out::IO, bn::Symbol, bt::Type{Vector{T}}, veclength::Symbol)
     write(out, "tree->Branch(\"$bn\", ", "$bn, \"", bn, "[", veclength, "]/", type_map[eltype(bt)], "\");\n")
-    ts();ts();write(out, "branch_map[\"$bn\"] = (void*)", bn, ";\n")
+    #ts();ts();write(out, "branch_map[\"$bn\"] = (void*)", bn, ";\n")
 end
 
 #make a 2D-array branch
 function make_branch{T <: Any}(out::IO, bn::Symbol, bt::Type{Array{T, 2}}, veclength::Symbol)
     write(out, "tree->Branch(\"$bn\", ", "$bn, \"", bn, "[$M_MAX][$M_MAX]/", type_map[eltype(bt)], "\");\n")
-    ts();ts();write(out, "branch_map[\"$bn\"] = (void*)", bn, ";\n")
+    #ts();ts();write(out, "branch_map[\"$bn\"] = (void*)", bn, ";\n")
 end
 
 function make_branch(out::IO, bn::Symbol, bt::Any)
     write(out, "tree->Branch(\"$bn\", ", "&$bn, \"", bn ,"/", type_map[bt], "\");\n")
-    ts();ts();write(out, "branch_map[\"$bn\"] = ", "(void*)&$bn", ";\n")
+    #ts();ts();write(out, "branch_map[\"$bn\"] = ", "(void*)&$bn", ";\n")
+end
+
+
+###Set branch address
+#make a vector branch
+function set_branch_address{T <: Any}(out::IO, bn::Symbol, bt::Type{Vector{T}}, veclength::Symbol)
+    write(out, "tree->SetBranchAddress(\"", bn, "\"", ", $bn", ");\n");
+    #ts();ts();write(out, "branch_map[\"$bn\"] = (void*)", bn, ";\n")
+end
+
+#make a 2D-array branch
+function set_branch_address{T <: Any}(out::IO, bn::Symbol, bt::Type{Array{T, 2}}, veclength::Symbol)
+    write(out, "tree->SetBranchAddress(\"", bn, "\"", ", $bn", ");\n");
+    #ts();ts();write(out, "branch_map[\"$bn\"] = (void*)", bn, ";\n")
+end
+
+function set_branch_address(out::IO, bn::Symbol, bt::Any)
+    write(out, "tree->SetBranchAddress(\"", bn, "\"", ", &$bn", ");\n");
+    #ts();ts();write(out, "branch_map[\"$bn\"] = ", "(void*)&$bn", ";\n")
 end
 
 
@@ -102,10 +121,10 @@ function make_class(out::IO, name::Symbol, d::Dict)
     write(out, "class $name {\n")
 
     write("public:\n")
-    ts();write("$name(TTree* _tree);\n")
+    ts();write("$name(TTree* _tree) { tree = _tree; };\n")
 
     ts();write("TTree* tree;\n")
-    ts();write("std::map<const std::string, const void*> branch_map;\n")
+    #ts();write("std::map<const std::string, const void*> branch_map;\n")
     for (k, v) in tree
         ts();make_branch_var(out, k, branchtype(v))
     end
@@ -128,6 +147,14 @@ function make_class(out::IO, name::Symbol, d::Dict)
         ts();ts();make_branch(out, k, v...)
     end
     ts();write("}\n")
+    
+    
+    ts();write("void set_branch_addresses(void) {\n")
+
+    for (k, v) in tree
+        ts();ts();set_branch_address(out, k, v...)
+    end
+    ts();write("}\n")
 
     write(out, "};\n") #end class
 
@@ -137,7 +164,8 @@ end
 #####
 tree_structure = Dict()
 
-particle_id = [:id]
+#id is the PDG-id, type is the absolute value
+particle_id = [:id, :type]
 fourmomentum = [:pt, :eta, :phi, :mass]
 fourmomentum_cartesian = [:px, :py, :pz, :e]
 
@@ -170,6 +198,19 @@ merge!(tree_structure,
     prefixed_dynlength(:gen_lep, Vector{Int32}, particle_id..., :status; length_branch=:n__lep)
 )
 
+#a vector with the identified good signal leptons
+merge!(tree_structure,
+    prefixed_dynlength(
+        :sig_lep, Vector{Float32},
+        fourmomentum...,
+        :rel_iso
+    )
+)
+
+merge!(tree_structure,
+    prefixed_dynlength(:sig_lep, Vector{Int32}, particle_id..., :charge, :idx)
+)
+
 #Jets
 merge!(tree_structure,
     prefixed_dynlength(:jet, Vector{Float32},
@@ -183,7 +224,11 @@ merge!(tree_structure,
         :mu_e, #muon energy,
         :el_e, #electron energy,
         :ph_e, #photon energy,
-
+        :vtxMass, #vertex mass
+        :vtxNtracks, #vertex number of tracks
+        :vtx3DVal, 
+        :vtx3DSig,
+        :pileupJetId
     )
 )
 
@@ -206,7 +251,8 @@ merge!(tree_structure,
 )
 merge!(tree_structure,
     prefixed_dynlength(:jet_toptagger, Vector{Int32},
-        :n_sj, #number of subjets 
+        :n_sj, #number of subjets
+        :child_idx
     )
 )
 
@@ -215,6 +261,11 @@ merge!(tree_structure,
     prefixed_dynlength(:jet_toptagger_sj, Vector{Float32},
         fourmomentum...,
         :energy, 
+    )
+)
+merge!(tree_structure,
+    prefixed_dynlength(:jet_toptagger_sj, Vector{Float32},
+        :parent_idx, 
     )
 )
 
@@ -247,7 +298,7 @@ merge!(tree_structure,
 
 #Weights
 merge!(tree_structure,
-    prefixed(:weight, Float32, :pu, :pu__up, :pu_down, :trigger, :trigger_up, :trigger_down)
+    prefixed(:weight, Float32, :pu, :pu_up, :pu_down, :trigger, :trigger_up, :trigger_down)
 )
 
 #Per-event info
@@ -269,6 +320,51 @@ merge!(tree_structure,
     prefixed(:debug, Float64, :time1r, :time1c)
 )
 
+#generated top quark
+top_quark = [
+    :b__pt, :b__eta, :b__phi, :b__mass,
+    :w_d1__pt, :w_d2__pt,
+    :w_d1__eta, :w_d2__eta,
+    :w_d1__phi, :w_d2__phi,
+    :w_d1__mass, :w_d2__mass,
+]
+
+top_quark_ints = [
+    :b__status,
+    :w_d1__status, :w_d2__status,
+    :w_d1__id, :w_d2__id
+]
+
+for s in [:gen_t, :gen_tbar]
+    merge!(tree_structure,
+        prefixed(s, Float32,
+            top_quark...
+        )
+    )
+
+    merge!(tree_structure,
+        prefixed(s, Int32,
+            top_quark_ints... 
+        )
+    )
+end
+
+#generated b quark
+for s in [:gen_b, :gen_bbar]
+    merge!(tree_structure,
+        prefixed(s, Float32,
+            fourmomentum...
+        )
+    )
+
+    merge!(tree_structure,
+        prefixed(s, Int32,
+            :status, :id 
+        )
+    )
+end
+
+
 #pv - primary vertices
 merge!(tree_structure,
     prefixed(:n, Int32, :pv)
@@ -278,6 +374,11 @@ merge!(tree_structure,
 )
 merge!(tree_structure,
     prefixed_dynlength(:pvi, Vector{Int32}, :bx)
+)
+
+#Chosen hypothesis
+merge!(tree_structure,
+    {:hypo1=>(Int32, )}
 )
 #####
 
