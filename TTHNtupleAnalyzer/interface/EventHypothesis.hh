@@ -37,7 +37,7 @@ bool is_tight_electron(const pat::Electron& ele, const reco::Vertex& vtx) {
         //The available IDs are: 'eidLoose' 'eidRobustHighEnergy' 'eidRobustLoose' 'eidRobustTight' 'eidTight'
         //ele.electronID("mvaTrigV0") > 0.5 &&
         ele.electronID("eidLoose") > 0.5 &&
-        ele.gsfTrack()->trackerExpectedHitsInner().numberOfHits() <= 0 &&
+        //ele.gsfTrack()->trackerExpectedHitsInner().numberOfHits() <= 0 &&
         dbc_rel_iso(ele) < 0.1
     );
 }
@@ -54,7 +54,7 @@ bool is_loose_electron(const pat::Electron& ele, const reco::Vertex& vtx) {
         //The available IDs are: 'eidLoose' 'eidRobustHighEnergy' 'eidRobustLoose' 'eidRobustTight' 'eidTight'
         //ele.electronID("mvaTrigV0") > 0.5 &&
         ele.electronID("eidLoose") > 0.5 &&
-        ele.gsfTrack()->trackerExpectedHitsInner().numberOfHits() <= 0 &&
+        //ele.gsfTrack()->trackerExpectedHitsInner().numberOfHits() <= 0 &&
         dbc_rel_iso(ele) < 0.15
     ); 
 }

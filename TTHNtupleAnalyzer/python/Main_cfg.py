@@ -151,9 +151,33 @@ process.hepTopTagInfos = process.caTopTagInfos.clone(
     src = cms.InputTag("hepTopTagPFJetsCHS")
 )
 
+from RecoJets.JetProducers.AnomalousCellParameters_cfi import *
+from RecoJets.JetProducers.PFJetParameters_cfi import *
+
+process.HTTJetsCHSLoose = cms.EDProducer(
+   "HTTTopJetProducer",
+   PFJetParameters.clone(src = cms.InputTag('pfNoPileUpJME'),
+                         doAreaFastjet = cms.bool(True),
+                         doRhoFastjet = cms.bool(False),
+                         jetPtMin = cms.double(100.0)
+   ),
+   AnomalousCellParameters,
+   algorithm = cms.int32(1),
+   jetAlgorithm = cms.string("CambridgeAachen"),
+   rParam = cms.double(1.5),
+   minFatjetPt = cms.double(100.),
+   minCandPt = cms.double(100.),
+   minSubjetPt = cms.double(20.),
+   writeCompound = cms.bool(True),
+   minCandMass = cms.double(0.),
+   maxCandMass = cms.double(10000.),
+   massRatioWidth = cms.double(50.),
+)
+
 process.p = cms.Path(
     process.hepTopTagPFJetsCHS *
     process.hepTopTagInfos *
+    process.HTTJetsCHSLoose *
     process.tthNtupleAnalyzer
 )
 
