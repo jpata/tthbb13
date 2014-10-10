@@ -350,7 +350,7 @@ triggerPathNames = cms.vstring([
         #'HLT_Mu40_PFNoPUHT350_v5',
         #'HLT_Mu60_PFNoPUHT350_v5',
         #'HLT_DoubleMu5_Ele8_CaloIdT_TrkIdVL_v17',
-        #'HLT_DoubleMu8_Ele8_CaloIdT_TrkIdVL_v6',
+        #'HLT_DoubleMu_Ele8_CaloIdT_TrkIdVL_v6',
         #'HLT_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Jet30_v8',
         #'HLT_Ele8_CaloIdT_TrkIdT_DiJet30_v19',
         #'HLT_Ele8_CaloIdT_TrkIdT_TriJet30_v19',
