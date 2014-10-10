@@ -948,6 +948,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
         tthtree->sig_lep__eta[i] = good_leptons[i]->eta();
         tthtree->sig_lep__phi[i] = good_leptons[i]->phi();
         tthtree->sig_lep__mass[i] = good_leptons[i]->mass();
+	// FIXME initiaize more vars
 
         //get index into main lepton array
         tthtree->sig_lep__idx[i] = find(leptons.begin(), leptons.end(), good_leptons[i]) - leptons.begin();

@@ -98,7 +98,7 @@ enum EventHypothesis {
     taue,
     taun,
     tautau,
-    bb,
+    //bb,
     UNKNOWN_HYPO
 };
 
@@ -186,6 +186,7 @@ vector<const pat::Jet*> find_good_jets(const vector<pat::Jet>& jets, const Decay
             jet.pt() > 30 &&
             TMath::Abs(jet.eta()) < 2.5 &&
             jetID(jet)
+	    // LB: add jet pileup id
         ) {
             out.push_back(&jet);
         }

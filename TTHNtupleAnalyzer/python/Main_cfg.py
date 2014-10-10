@@ -8,7 +8,10 @@ process = cms.Process("Demo")
 options.parseArguments()
 
 if len(options.inputFiles)==0:
-        options.inputFiles = cms.untracked.vstring(["/store/mc/Spring14miniaod/TTbarH_HToBB_M-125_13TeV_pythia6/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/00000/0E97DD3E-2209-E411-8A04-003048945312.root"])
+        #options.inputFiles = cms.untracked.vstring(["/store/mc/Spring14miniaod/TTbarH_HToBB_M-125_13TeV_pythia6/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/00000/0E97DD3E-2209-E411-8A04-003048945312.root"])
+	options.inputFiles = cms.untracked.vstring(['/store/mc/Spring14miniaod/TTbarH_HToBB_M-125_13TeV_pythia6/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/00000/0E97DD3E-2209-E411-8A04-003048945312.root',
+						    '/store/mc/Spring14miniaod/TTbarH_HToBB_M-125_13TeV_pythia6/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/00000/D0242854-2209-E411-B361-003048C559CE.root'])
+
 
 #enable debugging printout
 if "TTH_DEBUG" in os.environ:
@@ -21,7 +24,7 @@ if "TTH_DEBUG" in os.environ:
     )
 else:
     process.load("FWCore.MessageService.MessageLogger_cfi")
-    process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+    process.MessageLogger.cerr.FwkReport.reportEvery = 10
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(options.maxEvents) )
 
@@ -33,6 +36,11 @@ process.source = cms.Source("PoolSource",
 )
 
 from TTH.TTHNtupleAnalyzer.triggers_MC_cff import *
+print '**** TRIGGER PATHS ****'
+counter = 0
+for trigger in triggerPathNames:
+    print "[%s] = %s" % (counter, trigger)
+    counter += 1
 
 process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
     isMC = cms.bool(True),
@@ -50,10 +58,23 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
     mets = cms.InputTag("slimmedMETs"),
     lhe = cms.InputTag("externalLHEProducer"),
 
-    triggerIdentifiers=cms.vstring([]),
-    triggerIdentifiersForMatching=cms.vstring([]),
-    bits = cms.InputTag("TriggerResults"),
-    objects = cms.InputTag("selectedPatTrigger"),
+    triggerIdentifiers = triggerPathNames,
+    #triggerIdentifiers=cms.vstring([]),
+    triggerIdentifiersForMatching = cms.vstring([
+            'HLT_Ele27_WP80_v*',
+            'HLT_IsoMu24_eta2p1_v*',
+            'HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*',
+            ]),
+    #triggerIdentifiersForMatching=cms.vstring([]),
+
+    jetMult_min   = cms.untracked.int32(-99),
+    jetPt_min     = cms.untracked.double(15.),    
+    muPt_min_     = cms.untracked.double(15.), 
+    elePt_min_    = cms.untracked.double(15.), 
+    tauPt_min_    = cms.untracked.double(15.), 
+
+    bits      = cms.InputTag("TriggerResults","","HLT"),
+    objects   = cms.InputTag("selectedPatTrigger"),
     prescales = cms.InputTag("patTrigger"),
 
     eleIdentifiers = cms.vstring([

@@ -113,7 +113,7 @@ public:
 	float jet__energy[N_MAX];
 	float jet__eta[N_MAX];
 	int jet__id[N_MAX];
-	float jet__jetId[N_MAX];
+	int jet__jetId[N_MAX];
 	float jet__mass[N_MAX];
 	float jet__mu_e[N_MAX];
 	float jet__ne_e[N_MAX];
@@ -190,7 +190,8 @@ public:
 	int n__pv;
 	int n__pvi;
 	int n__tr;
-    int n__met_shift;
+        //FIXME add num of verices
+        int n__met_shift;
 	int n__sig_lep;
 	int pvi__bx[N_MAX];
 	float pvi__n0[N_MAX];
