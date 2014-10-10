@@ -187,12 +187,17 @@ public:
 	int n__jet_toptagger;
 	int n__jet_toptagger_sj;
 	int n__lep;
+
+    //number of primary vertices
 	int n__pv;
 	int n__pvi;
+
+    //number of trigger identifiers
 	int n__tr;
-        //FIXME add num of verices
-        int n__met_shift;
+
+    int n__met_shift;
 	int n__sig_lep;
+    
 	int pvi__bx[N_MAX];
 	float pvi__n0[N_MAX];
 	float pvi__ntrue[N_MAX];
@@ -203,7 +208,6 @@ public:
 	float sig_lep__mass[N_MAX];
 	float sig_lep__phi[N_MAX];
 	float sig_lep__pt[N_MAX];
-	float sig_lep__rel_iso[N_MAX];
 	int sig_lep__type[N_MAX];
 	float weight__pu;
 	float weight__pu_down;
@@ -387,7 +391,6 @@ public:
 		SET_ZERO(sig_lep__mass, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(sig_lep__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(sig_lep__pt, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(sig_lep__rel_iso, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(sig_lep__type, N_MAX, DEF_VAL_INT);
 		weight__pu = DEF_VAL_FLOAT;
 		weight__pu_down = DEF_VAL_FLOAT;
@@ -573,7 +576,6 @@ public:
 		tree->Branch("sig_lep__mass", sig_lep__mass, "sig_lep__mass[n__sig_lep]/F");
 		tree->Branch("sig_lep__phi", sig_lep__phi, "sig_lep__phi[n__sig_lep]/F");
 		tree->Branch("sig_lep__pt", sig_lep__pt, "sig_lep__pt[n__sig_lep]/F");
-		tree->Branch("sig_lep__rel_iso", sig_lep__rel_iso, "sig_lep__rel_iso[n__sig_lep]/F");
 		tree->Branch("sig_lep__type", sig_lep__type, "sig_lep__type[n__sig_lep]/I");
 		tree->Branch("weight__pu", &weight__pu, "weight__pu/F");
 		tree->Branch("weight__pu_down", &weight__pu_down, "weight__pu_down/F");
@@ -747,7 +749,6 @@ public:
 		tree->SetBranchAddress("sig_lep__mass", sig_lep__mass);
 		tree->SetBranchAddress("sig_lep__phi", sig_lep__phi);
 		tree->SetBranchAddress("sig_lep__pt", sig_lep__pt);
-		tree->SetBranchAddress("sig_lep__rel_iso", sig_lep__rel_iso);
 		tree->SetBranchAddress("sig_lep__type", sig_lep__type);
 		tree->SetBranchAddress("weight__pu", &weight__pu);
 		tree->SetBranchAddress("weight__pu_down", &weight__pu_down);
