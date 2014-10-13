@@ -184,6 +184,7 @@ from RecoJets.JetProducers.PFJetParameters_cfi import *
 process.HTTJetsCHSLoose = cms.EDProducer(
    "HTTTopJetProducer",
 	#need to override from pfNoPileUpJME which is not present in miniAOD
+    #
 	PFJetParameters.clone(src = cms.InputTag('packedPFCandidates'),
 						 doAreaFastjet = cms.bool(True),
 						 doRhoFastjet = cms.bool(False),
