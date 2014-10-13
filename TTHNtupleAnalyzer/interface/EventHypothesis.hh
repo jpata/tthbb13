@@ -59,10 +59,13 @@ bool is_loose_electron(const pat::Electron& ele, const reco::Vertex& vtx) {
     ); 
 }
 
+//https://twiki.cern.ch/twiki/bin/viewauth/CMS/TopMUO
+//lepton + jets / single-top
 bool is_tight_muon(const pat::Muon& mu, const reco::Vertex& vtx) {
     return (
         mu.pt()>26 &&
         TMath::Abs(mu.eta()) < 2.1 &&
+        mu.isPFMuon() &&
         mu.isGlobalMuon() &&
         mu.normChi2() < 10 &&
         mu.track()->hitPattern().trackerLayersWithMeasurement() > 5 &&
@@ -75,14 +78,30 @@ bool is_tight_muon(const pat::Muon& mu, const reco::Vertex& vtx) {
     );
 }
 
+//https://twiki.cern.ch/twiki/bin/viewauth/CMS/TopMUO
+//dilepton
 bool is_loose_muon(const pat::Muon& mu) {
     return (
         mu.pt()>20 &&
+        mu.isPFMuon() &&
         TMath::Abs(mu.eta()) < 2.4 &&
         (mu.isGlobalMuon() || mu.isTrackerMuon()) &&
         dbc_rel_iso(mu) < 0.2
     );
 }
+
+//https://twiki.cern.ch/twiki/bin/viewauth/CMS/TopMUO
+//Muon POG does not provide recommendations for muon veto ID. Feedback from analyses are encouraged. Our suggestion is to use the same muon requirements defined in the dilepton channel to veto muons in the lepton+jets channel. This leads to a natural decoupling of the two final states.
+bool is_veto_muon(const pat::Muon& mu) {
+    return is_loose_muon(mu);
+}
+
+//bool is_veto_electron_loose(const pat::Electron& ele) {
+//    return (
+//        //ele.isGsfElectron(:ta
+//    );
+//}
+
 
 namespace TTH {
 
