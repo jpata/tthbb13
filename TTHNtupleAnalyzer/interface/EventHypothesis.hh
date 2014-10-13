@@ -96,11 +96,23 @@ bool is_veto_muon(const pat::Muon& mu) {
     return is_loose_muon(mu);
 }
 
-//bool is_veto_electron_loose(const pat::Electron& ele) {
-//    return (
-//        //ele.isGsfElectron(:ta
-//    );
-//}
+bool is_veto_electron_loose(const pat::Electron& ele) {
+    return (
+        ele.isPF() &&
+        ele.pt() > 10 &&
+        TMath::Abs(ele.eta()) < 2.5 &&
+        dbc_rel_iso(ele) < 0.15
+    );
+}
+
+bool is_veto_electron_tight(const pat::Electron& ele) {
+    return (
+        ele.isPF() &&
+        ele.pt() > 20 &&
+        TMath::Abs(ele.eta()) < 2.5 &&
+        dbc_rel_iso(ele) < 0.15
+    );
+}
 
 
 namespace TTH {
