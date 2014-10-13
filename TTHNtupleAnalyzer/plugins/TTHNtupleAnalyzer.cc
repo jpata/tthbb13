@@ -57,7 +57,8 @@
 #include "DataFormats/PatCandidates/interface/PackedCandidate.h"
 
 //for top tagger
-#include "DataFormats/JetReco/interface/CATopJetTagInfo.h"
+//#include "DataFormats/JetReco/interface/CATopJetTagInfo.h"
+#include "DataFormats/JetReco/interface/HTTTopJetTagInfo.h"
 
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 #include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
@@ -177,7 +178,7 @@ private:
 	// collection of top jets
 	const edm::EDGetTokenT<edm::View<reco::BasicJet>> topJetToken_;
 	const edm::EDGetTokenT<edm::View<reco::PFJet>> topJetSubjetToken_;
-	const edm::EDGetTokenT<edm::View<reco::CATopJetTagInfo>> topJetInfoToken_;
+	const edm::EDGetTokenT<edm::View<reco::HTTTopJetTagInfo>> topJetInfoToken_;
 
 	// collection of vertices
 	const edm::EDGetTokenT<reco::VertexCollection> vertexToken_;
@@ -233,7 +234,7 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
 	jetToken_(consumes<pat::JetCollection>(iConfig.getParameter<edm::InputTag>("jets"))),
 	topJetToken_(consumes<edm::View<reco::BasicJet>>(iConfig.getParameter<edm::InputTag>("topjets"))),
 	topJetSubjetToken_(consumes<edm::View<reco::PFJet>>(iConfig.getParameter<edm::InputTag>("topjetsubjets"))),
-	topJetInfoToken_(consumes<edm::View<reco::CATopJetTagInfo>>(iConfig.getParameter<edm::InputTag>("topjetinfos"))),
+	topJetInfoToken_(consumes<edm::View<reco::HTTTopJetTagInfo>>(iConfig.getParameter<edm::InputTag>("topjetinfos"))),
 	vertexToken_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("vertices"))),
 	prunedGenToken_(consumes<edm::View<reco::GenParticle> >(iConfig.getParameter<edm::InputTag>("pruned"))),
 	packedGenToken_(consumes<edm::View<pat::PackedGenParticle> >(iConfig.getParameter<edm::InputTag>("packed"))),
@@ -295,8 +296,10 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	const reco::Vertex &PV = vertices->front();
 	tthtree->n__pv = vertices->size();
 
-	//Pileup
 	if (isMC_) {
+	Handle<edm::View<reco::GenParticle> > pruned;
+	
+	//Pileup and genparticles
 		Handle<std::vector<PileupSummaryInfo>> PupInfo;
 		iEvent.getByLabel(edm::InputTag("addPileupInfo"), PupInfo);
 		std::vector<PileupSummaryInfo>::const_iterator PVI;
@@ -948,7 +951,6 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		tthtree->sig_lep__id[i] = good_leptons[i]->pdgId();
 		tthtree->sig_lep__type[i] = abs(good_leptons[i]->pdgId());
 		tthtree->sig_lep__charge[i] = good_leptons[i]->charge(); 
-		
 		//get index into main lepton array
 		tthtree->sig_lep__idx[i] = find(leptons.begin(), leptons.end(), good_leptons[i]) - leptons.begin();
 	}
@@ -963,7 +965,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	edm::Handle<edm::View<reco::BasicJet>> top_jets;
 	iEvent.getByToken(topJetToken_, top_jets);
 
-	edm::Handle<edm::View<reco::CATopJetTagInfo>> top_jet_infos;
+	edm::Handle<edm::View<reco::HTTTopJetTagInfo>> top_jet_infos;
 	iEvent.getByToken(topJetInfoToken_, top_jet_infos);
 
 	assert(top_jets->size()==top_jet_infos->size());
@@ -975,7 +977,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
 	for (unsigned int n_top_jet=0; n_top_jet<top_jets->size(); n_top_jet++) {
 		const reco::BasicJet& x = top_jets->at(n_top_jet);
-		const reco::CATopJetTagInfo& jet_info = top_jet_infos->at(n_top_jet);
+		const reco::HTTTopJetTagInfo& jet_info = top_jet_infos->at(n_top_jet);
 		//assert(_x != NULL);
 		//const pat::Jet& x = *_x;
 		LogDebug("top jets") << "n_top_jet=" << n_top_jet << CANDPRINT(x);
@@ -984,10 +986,17 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		tthtree->jet_toptagger__phi[n_top_jet] = x.phi();
 		tthtree->jet_toptagger__mass[n_top_jet] = x.mass();
 		tthtree->jet_toptagger__energy[n_top_jet] = x.energy();
-		tthtree->jet_toptagger__top_mass[n_top_jet] = jet_info.properties().topMass;
-		tthtree->jet_toptagger__w_mass[n_top_jet] = jet_info.properties().wMass;
-		tthtree->jet_toptagger__min_mass[n_top_jet] = jet_info.properties().minMass;
-		tthtree->jet_toptagger__n_sj[n_top_jet] = jet_info.properties().nSubJets;
+		tthtree->jet_toptagger__topMass[n_top_jet] = jet_info.properties().topMass;
+		tthtree->jet_toptagger__unfilteredMass[n_top_jet] = jet_info.properties().unfilteredMass;
+		tthtree->jet_toptagger__prunedMass[n_top_jet] = jet_info.properties().prunedMass;
+		tthtree->jet_toptagger__fW[n_top_jet] = jet_info.properties().fW;
+		tthtree->jet_toptagger__massRatioPassed[n_top_jet] = jet_info.properties().massRatioPassed;
+		tthtree->jet_toptagger__isMultiR[n_top_jet] = (int)jet_info.properties().isMultiR;
+		tthtree->jet_toptagger__Rmin[n_top_jet] = jet_info.properties().Rmin;
+		tthtree->jet_toptagger__RminExpected[n_top_jet] = jet_info.properties().RminExpected;
+		//FIXME: nSubJets no longer in new top jet properties
+		//tthtree->jet_toptagger__n_sj[n_top_jet] = jet_info.properties().nSubJets;
+		tthtree->jet_toptagger__n_sj[n_top_jet] = 3;
 
 		bool first = true;
 		for (auto& constituent : x.getJetConstituents()) {
@@ -1201,32 +1210,37 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 					w = dau1;
 				}
 				if (b==0 or w==0) {
-					edm::LogError("genparticle") << "could not assing b " << b << " or w" << w; 
-				}
-
-				tthtree->gen_t__b__pt = b->pt();
-				tthtree->gen_t__b__eta = b->eta();
-				tthtree->gen_t__b__phi = b->phi();
-				tthtree->gen_t__b__mass = b->mass();
-				
-				if(w->daughter(0)!=0 && w->daughter(1)!=0) { 
-					tthtree->gen_t__w_d1__pt = w->daughter(0)->pt();
-					tthtree->gen_t__w_d1__eta = w->daughter(0)->eta();
-					tthtree->gen_t__w_d1__phi = w->daughter(0)->phi();
-					tthtree->gen_t__w_d1__mass = w->daughter(0)->mass();
-					tthtree->gen_t__w_d1__id = w->daughter(0)->pdgId();
-					tthtree->gen_t__w_d1__status = w->daughter(0)->status();
-					LogDebug("genparticles") << "top w dau1 " << PCANDPRINT(w->daughter(0)); 
-					
-					tthtree->gen_t__w_d2__pt = w->daughter(1)->pt();
-					tthtree->gen_t__w_d2__eta = w->daughter(1)->eta();
-					tthtree->gen_t__w_d2__phi = w->daughter(1)->phi();
-					tthtree->gen_t__w_d2__mass = w->daughter(1)->mass();
-					tthtree->gen_t__w_d2__id = w->daughter(1)->pdgId();
-					tthtree->gen_t__w_d2__status = w->daughter(1)->status();
-					LogDebug("genparticles") << "top w dau2 " << PCANDPRINT(w->daughter(1)); 
+					edm::LogError("genparticle") << "top could not assign b " << b << " or w " << w;
+					edm::LogWarning("genparticle") << "top daughters " << tops[0]->numberOfDaughters();
+					for (unsigned int i=0;i < tops[0]->numberOfDaughters(); i++) {
+						cerr << " dau " << i << tops[0]->daughter(i) << " " << tops[0]->daughter(i)->pdgId();  
+					}
+					cerr << endl;
 				} else {
-					edm::LogError("genparticles") << "top w dau1 " << w->daughter(0) << " dau2 " << w->daughter(1) << " null pointer!";
+					tthtree->gen_t__b__pt = b->pt();
+					tthtree->gen_t__b__eta = b->eta();
+					tthtree->gen_t__b__phi = b->phi();
+					tthtree->gen_t__b__mass = b->mass();
+					
+					if(w->daughter(0)!=0 && w->daughter(1)!=0) { 
+						tthtree->gen_t__w_d1__pt = w->daughter(0)->pt();
+						tthtree->gen_t__w_d1__eta = w->daughter(0)->eta();
+						tthtree->gen_t__w_d1__phi = w->daughter(0)->phi();
+						tthtree->gen_t__w_d1__mass = w->daughter(0)->mass();
+						tthtree->gen_t__w_d1__id = w->daughter(0)->pdgId();
+						tthtree->gen_t__w_d1__status = w->daughter(0)->status();
+						LogDebug("genparticles") << "top w dau1 " << PCANDPRINT(w->daughter(0)); 
+						
+						tthtree->gen_t__w_d2__pt = w->daughter(1)->pt();
+						tthtree->gen_t__w_d2__eta = w->daughter(1)->eta();
+						tthtree->gen_t__w_d2__phi = w->daughter(1)->phi();
+						tthtree->gen_t__w_d2__mass = w->daughter(1)->mass();
+						tthtree->gen_t__w_d2__id = w->daughter(1)->pdgId();
+						tthtree->gen_t__w_d2__status = w->daughter(1)->status();
+						LogDebug("genparticles") << "top w dau2 " << PCANDPRINT(w->daughter(1)); 
+					} else {
+						edm::LogError("genparticles") << "top w dau1 " << w->daughter(0) << " dau2 " << w->daughter(1) << " null pointer!";
+					}
 				}
 			}
 		}
@@ -1250,31 +1264,36 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 					w = dau1;
 				}
 				if (b==0 or w==0) {
-					edm::LogError("genparticle") << "could not assing b " << b << " or w" << w; 
-				}
-
-				tthtree->gen_tbar__b__pt = b->pt();
-				tthtree->gen_tbar__b__eta = b->eta();
-				tthtree->gen_tbar__b__phi = b->phi();
-				tthtree->gen_tbar__b__mass = b->mass();
-				
-				if(w->daughter(0)!=0 && w->daughter(1)!=0) { 
-					tthtree->gen_tbar__w_d1__pt = w->daughter(0)->pt();
-					tthtree->gen_tbar__w_d1__eta = w->daughter(0)->eta();
-					tthtree->gen_tbar__w_d1__phi = w->daughter(0)->phi();
-					tthtree->gen_tbar__w_d1__mass = w->daughter(0)->mass();
-					tthtree->gen_tbar__w_d1__id = w->daughter(0)->pdgId();
-					tthtree->gen_tbar__w_d1__status = w->daughter(0)->status();
-					LogDebug("genparticles") << "antitop w dau1 " << PCANDPRINT(w->daughter(0)); 
-					tthtree->gen_tbar__w_d2__pt = w->daughter(1)->pt();
-					tthtree->gen_tbar__w_d2__eta = w->daughter(1)->eta();
-					tthtree->gen_tbar__w_d2__phi = w->daughter(1)->phi();
-					tthtree->gen_tbar__w_d2__mass = w->daughter(1)->mass();
-					tthtree->gen_tbar__w_d2__id = w->daughter(1)->pdgId();
-					tthtree->gen_tbar__w_d2__status = w->daughter(1)->status();
-					LogDebug("genparticles") << "antitop w dau2 " << PCANDPRINT(w->daughter(1)); 
+					edm::LogError("genparticle") << "antitop could not assign b " << b << " or w " << w; 
+					edm::LogWarning("genparticle") << "antitop daughters " << antitops[0]->numberOfDaughters();
+					for (unsigned int i=0;i < antitops[0]->numberOfDaughters(); i++) {
+						cerr << " dau " << i << antitops[0]->daughter(i) << " " << antitops[0]->daughter(i)->pdgId();
+					}
+                    cerr << endl;
 				} else {
-					edm::LogError("genparticles") << "antitop w dau1 " << w->daughter(0) << " dau2 " << w->daughter(1) << " null pointer!";
+					tthtree->gen_tbar__b__pt = b->pt();
+					tthtree->gen_tbar__b__eta = b->eta();
+					tthtree->gen_tbar__b__phi = b->phi();
+					tthtree->gen_tbar__b__mass = b->mass();
+					
+					if(w->daughter(0)!=0 && w->daughter(1)!=0) { 
+						tthtree->gen_tbar__w_d1__pt = w->daughter(0)->pt();
+						tthtree->gen_tbar__w_d1__eta = w->daughter(0)->eta();
+						tthtree->gen_tbar__w_d1__phi = w->daughter(0)->phi();
+						tthtree->gen_tbar__w_d1__mass = w->daughter(0)->mass();
+						tthtree->gen_tbar__w_d1__id = w->daughter(0)->pdgId();
+						tthtree->gen_tbar__w_d1__status = w->daughter(0)->status();
+						LogDebug("genparticles") << "antitop w dau1 " << PCANDPRINT(w->daughter(0)); 
+						tthtree->gen_tbar__w_d2__pt = w->daughter(1)->pt();
+						tthtree->gen_tbar__w_d2__eta = w->daughter(1)->eta();
+						tthtree->gen_tbar__w_d2__phi = w->daughter(1)->phi();
+						tthtree->gen_tbar__w_d2__mass = w->daughter(1)->mass();
+						tthtree->gen_tbar__w_d2__id = w->daughter(1)->pdgId();
+						tthtree->gen_tbar__w_d2__status = w->daughter(1)->status();
+						LogDebug("genparticles") << "antitop w dau2 " << PCANDPRINT(w->daughter(1)); 
+					} else {
+						edm::LogError("genparticles") << "antitop w dau1 " << w->daughter(0) << " dau2 " << w->daughter(1) << " null pointer!";
+					}
 				}
 			}
 		}
