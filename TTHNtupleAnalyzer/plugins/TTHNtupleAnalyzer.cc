@@ -245,6 +245,9 @@ private:
 	TTHTree* tthtree;
 	const edm::Service<TFileService> fs;
 
+    //a histogram with event counts	
+    TH1D* hcounter;
+
 	// a watch for CPU monitoring
 	TStopwatch* sw;
 
@@ -292,6 +295,7 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
 			   consumes<LHEEventProduct>( iConfig.getParameter<edm::InputTag>("lhe")) : edm::EDGetTokenT<LHEEventProduct>() ),
 
 	tthtree(new TTHTree(fs->make<TTree>("events", "events"))),
+	hcounter(fs->make<TH1D>("event_counter", "event_counter", 5, 0, 5)),
 	tauIdentifiers_(iConfig.getParameter<std::vector<std::string>>("tauIdentifiers")),
 	eleIdentifiers_(iConfig.getParameter<std::vector<std::string>>("eleIdentifiers")),
 	triggerIdentifiers_(iConfig.getParameter<std::vector<std::string>>("triggerIdentifiers")),
@@ -307,6 +311,9 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
 	tauPt_min_  (iConfig.getUntrackedParameter<double>("tauPt_min", 5.))
 {
 	tthtree->make_branches();
+    
+    hcounter->GetXaxis()->SetBinLabel(1, "TTHNtupleAnalyzer__processed");
+    hcounter->GetXaxis()->SetBinLabel(2, "TTHNtupleAnalyzer__passed");
 	sw = new TStopwatch();
 }
 
@@ -323,6 +330,8 @@ void TTHNtupleAnalyzer::finalizeLoop() {
 void
 TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
+    //fill analyzed
+    hcounter->SetBinContent(1, hcounter->GetBinContent(1)+1);
 	using namespace edm;
 
 	sw->Start();
@@ -1298,11 +1307,11 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 			} else {
 				const reco::Candidate* b = 0;
 				const reco::Candidate* w = 0;
-				if (abs(dau1->pdgId())==5 && abs(dau2->pdgId())==24) {
+				if (abs(dau2->pdgId())==24) {
 					b = dau1;
 					w = find_nonself_child(dau2);
 				}
-				if (abs(dau2->pdgId())==5 && abs(dau1->pdgId())==24) {
+				if (abs(dau1->pdgId())==24) {
 					b = dau2;
 					w = find_nonself_child(dau1);
 				}
@@ -1372,11 +1381,11 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 			} else {
 				const reco::Candidate* b = 0;
 				const reco::Candidate* w = 0;
-				if (abs(dau1->pdgId())==5 && abs(dau2->pdgId())==24) {
+				if (abs(dau2->pdgId())==24) {
 					b = dau1;
 					w = find_nonself_child(dau2);
 				}
-				if (abs(dau2->pdgId())==5 && abs(dau1->pdgId())==24) {
+				if (abs(dau1->pdgId())==24) {
 					b = dau2;
 					w = find_nonself_child(dau1);
 				}
@@ -1460,6 +1469,9 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	tthtree->debug__time1c = sw->CpuTime();
 	LogDebug("time") << "timing " << tthtree->debug__time1r << " " << tthtree->debug__time1c;
 	tthtree->tree->Fill();
+    
+    //fill passed 
+    hcounter->SetBinContent(2, hcounter->GetBinContent(2)+1);
 }
 
 // ------------ method called once each job just before starting event loop  ------------
