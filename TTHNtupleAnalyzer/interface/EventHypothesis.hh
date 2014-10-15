@@ -31,6 +31,7 @@ bool jetID(const pat::Jet& j) {
     return true;
 }
 
+//Single lepton e + n
 bool is_tight_electron(const pat::Electron& ele, const reco::Vertex& vtx) {
     const float ae = TMath::Abs(ele.eta());
     
@@ -54,6 +55,7 @@ bool is_tight_electron(const pat::Electron& ele, const reco::Vertex& vtx) {
     );
 }
 
+//
 bool is_loose_electron(const pat::Electron& ele, const reco::Vertex& vtx) {
     if (ele.gsfTrack().isNull()) {
         return false;
@@ -290,7 +292,7 @@ vector<const pat::Jet*> find_good_jets(const vector<pat::Jet>& jets, const Decay
             jet.pt() > 30 &&
             TMath::Abs(jet.eta()) < 2.5 &&
             jetID(jet)
-	    // LB: add jet pileup id
+	    // FIXME: LB: add jet pileup id
         ) {
             out.push_back(&jet);
         }
