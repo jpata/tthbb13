@@ -33,6 +33,11 @@ bool jetID(const pat::Jet& j) {
 
 bool is_tight_electron(const pat::Electron& ele, const reco::Vertex& vtx) {
     const float ae = TMath::Abs(ele.eta());
+    
+    if (ele.gsfTrack().isNull()) {
+        return false;
+    }
+
     return (
         ele.gsfTrack().isNonnull() &&
         ele.pt() > 30 && ae < 2.5 && !(ae>1.4442 && ae<1.5660) &&
@@ -50,6 +55,10 @@ bool is_tight_electron(const pat::Electron& ele, const reco::Vertex& vtx) {
 }
 
 bool is_loose_electron(const pat::Electron& ele, const reco::Vertex& vtx) {
+    if (ele.gsfTrack().isNull()) {
+        return false;
+    }
+ 
     const float ae = TMath::Abs(ele.eta());
     return (
         ele.gsfTrack().isNonnull() &&
@@ -70,6 +79,10 @@ bool is_loose_electron(const pat::Electron& ele, const reco::Vertex& vtx) {
 //https://twiki.cern.ch/twiki/bin/viewauth/CMS/TopMUO
 //lepton + jets / single-top
 bool is_tight_muon(const pat::Muon& mu, const reco::Vertex& vtx) {
+    if (mu.track().isNull() || mu.globalTrack().isNull() || mu.muonBestTrack().isNull() || mu.innerTrack().isNull()) {
+        return false; 
+    } 
+    
     return (
         mu.pt()>26 &&
         TMath::Abs(mu.eta()) < 2.1 &&
@@ -175,18 +188,11 @@ vector<const pat::Muon*> find_good_muons(const vector<pat::Muon>& muons, const r
     vector<const pat::Muon*> out;
 
     for (auto& mu : muons) {
-
-        //if need to do track checking and no tracks associated, skip muon
-        if(mode == DecayMode::dileptonic) {
-            if (mu.track().isNull() || mu.globalTrack().isNull() || mu.muonBestTrack().isNull() || mu.innerTrack().isNull()) {
-                continue;
-            }
-            if (mode==DecayMode::dileptonic && is_loose_muon(mu)) {
-                out.push_back(&mu);
-            }
-            else if (mode==DecayMode::semileptonic && is_tight_muon(mu, vtx)) {
-                out.push_back(&mu);
-            }
+        if (mode==DecayMode::dileptonic && is_loose_muon(mu)) {
+            out.push_back(&mu);
+        }
+        else if (mode==DecayMode::semileptonic && is_tight_muon(mu, vtx)) {
+            out.push_back(&mu);
         }
     }
     return out;
@@ -198,14 +204,6 @@ vector<const pat::Electron*> find_good_electrons(const vector<pat::Electron>& el
     vector<const pat::Electron*> out;
 
     for (auto& ele : electrons) {
-
-        //electrons with no track will not pass in any case 
-        if(mode == DecayMode::dileptonic) {
-            if (ele.gsfTrack().isNull()) {
-                continue;
-            }
-        }
-
         if (mode==DecayMode::dileptonic && is_loose_electron(ele, vtx)) {
             out.push_back(&ele); 
         }
@@ -461,8 +459,8 @@ EventHypothesis assign_event_hypothesis(const EventDescription& ev_sl, const Eve
     if (is_tau_mu(ev_dl)) {
         return EventHypothesis::taumu;
     }
+
     //check other hypotheses
-    
     if (is_n_n(ev_sl)) {
         return EventHypothesis::nn; 
     }
