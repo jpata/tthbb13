@@ -11,9 +11,9 @@ brs = sorted([b for b in tt.GetListOfBranches()])
 print tt.GetEntries()
 
 for ev in tt:
-    print "---"
-    print ev.event__id
-
+    #print "---"
+    #print ev.event__id, ev.hypo1
+    hypos.append(ev.hypo1)
     #print [ev.jet_toptagger__pt[i] for i in range(ev.n__jet_toptagger)]
     #print [ev.jet_toptagger__n_sj[i] for i in range(ev.n__jet_toptagger)]
     #print [ev.jet_toptagger__child_idx[i] for i in range(ev.n__jet_toptagger)]
@@ -30,3 +30,8 @@ for ev in tt:
     #if ev.n__sig_lep == 2:
     #    print "DL", ev.sig_lep__pt[0], ev.sig_lep__pt[1], ev.lep__pt[ev.sig_lep__idx[0]], ev.lep__pt[ev.sig_lep__idx[1]]
     #print "b", ev.gen_b__pt, ev.gen_bbar__pt
+
+
+from collections import Counter
+
+print Counter(hypos)
