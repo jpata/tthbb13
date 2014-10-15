@@ -52,9 +52,9 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
 	#topjets = cms.InputTag("hepTopTagPFJetsCHS"),
 	#topjetinfos = cms.InputTag("hepTopTagInfos"),
 	#topjetsubjets = cms.InputTag("hepTopTagPFJetsCHS", "caTopSubJets"),
-	topjets = cms.InputTag("HTTJetsCHSLoose"),
-	topjetinfos = cms.InputTag("HTTJetsCHSLoose"),
-	topjetsubjets = cms.InputTag("HTTJetsCHSLoose", "caTopSubJets"),
+	topjets = cms.InputTag("HTTJetsCHS"),
+	topjetinfos = cms.InputTag("HTTJetsCHS"),
+	topjetsubjets = cms.InputTag("HTTJetsCHS", "caTopSubJets"),
 	packed = cms.InputTag("packedGenParticles"),
 	pruned = cms.InputTag("prunedGenParticles"),
 	fatjets = cms.InputTag("slimmedJetsAK8"),
@@ -181,32 +181,73 @@ process.load('RecoJets.JetProducers.caTopTaggers_cff')
 from RecoJets.JetProducers.AnomalousCellParameters_cfi import *
 from RecoJets.JetProducers.PFJetParameters_cfi import *
 
-process.HTTJetsCHSLoose = cms.EDProducer(
-   "HTTTopJetProducer",
-	#need to override from pfNoPileUpJME which is not present in miniAOD
-    #
+#process.HTTJetsCHSLoose = cms.EDProducer(
+#   "HTTTopJetProducer",
+#	#need to override from pfNoPileUpJME which is not present in miniAOD
+#    #
+#	PFJetParameters.clone(src = cms.InputTag('packedPFCandidates'),
+#						 doAreaFastjet = cms.bool(True),
+#						 doRhoFastjet = cms.bool(False),
+#						 jetPtMin = cms.double(100.0)
+#	),
+#	AnomalousCellParameters,
+#	algorithm = cms.int32(1),
+#	jetAlgorithm = cms.string("CambridgeAachen"),
+#	rParam = cms.double(1.5),
+#	minFatjetPt = cms.double(100.),
+#	minCandPt = cms.double(100.),
+#	minSubjetPt = cms.double(20.),
+#	writeCompound = cms.bool(True),
+#	minCandMass = cms.double(0.),
+#	maxCandMass = cms.double(10000.),
+#	massRatioWidth = cms.double(50.),
+#)
+
+
+#for comparison with Thomas/Gregor 15.10.14
+#process.HTTJetsCHS = cms.EDProducer(
+#    "HTTTopJetProducer",
+#    PFJetParameters.clone( src = cms.InputTag('packedPFCandidates'),
+#                           doAreaFastjet = cms.bool(True),
+#                           doRhoFastjet = cms.bool(False),
+#                           jetPtMin = cms.double(100.0)
+#                       ),
+#    AnomalousCellParameters,
+#    algorithm = cms.int32(1),
+#    jetAlgorithm = cms.string("CambridgeAachen"),
+#    rParam = cms.double(1.5),
+#    mode = cms.int32(0),
+#    minFatjetPt = cms.double(200.),
+#    minCandPt = cms.double(0.),
+#    minSubjetPt = cms.double(30.),
+#    writeCompound = cms.bool(True),
+#    minCandMass = cms.double(140.),
+#    maxCandMass = cms.double(20000.),
+#)
+process.HTTJetsCHS = cms.EDProducer(
+	"HTTTopJetProducer",
 	PFJetParameters.clone(src = cms.InputTag('packedPFCandidates'),
-						 doAreaFastjet = cms.bool(True),
-						 doRhoFastjet = cms.bool(False),
-						 jetPtMin = cms.double(100.0)
-	),
+						  doAreaFastjet = cms.bool(True),
+						  doRhoFastjet = cms.bool(False),
+						  jetPtMin = cms.double(100.0)
+					   ),
 	AnomalousCellParameters,
 	algorithm = cms.int32(1),
 	jetAlgorithm = cms.string("CambridgeAachen"),
 	rParam = cms.double(1.5),
-	minFatjetPt = cms.double(100.),
-	minCandPt = cms.double(100.),
-	minSubjetPt = cms.double(20.),
+	mode = cms.int32(0),
+	minFatjetPt = cms.double(200.),
+	minCandPt = cms.double(200.),
+	minSubjetPt = cms.double(30.),
 	writeCompound = cms.bool(True),
 	minCandMass = cms.double(0.),
-	maxCandMass = cms.double(10000.),
-	massRatioWidth = cms.double(50.),
+	maxCandMass = cms.double(20000.),
 )
 
 process.p = cms.Path(
 	#process.hepTopTagPFJetsCHS *
 	#process.hepTopTagInfos *
-	process.HTTJetsCHSLoose *
+	process.HTTJetsCHS *
 	process.tthNtupleAnalyzer
 )
 
