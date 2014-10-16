@@ -8,7 +8,8 @@ config.General.workArea = 'crab_TTH_Oct15'
 config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = '/home/joosep/Dropbox/tthbb13/CMSSW/src/TTH/TTHNtupleAnalyzer/python/Main_cfg.py'
-
+#job runtime in minutes
+config.JobType.maxjobruntime = 60*47
 
 config.section_("Data")
 config.Data.inputDataset = '/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/Spring14miniaod-PU20bx25_POSTLS170_V5-v2/MINIAODSIM'
