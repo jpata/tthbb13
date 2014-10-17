@@ -18,9 +18,9 @@
 #define DOUBLE_EPS 0.0000001d
 
 //checks if a branch variable is undefined
-constexpr bool is_undef(int x) { return x==DEF_VAL_INT; };
-constexpr bool is_undef(float x) { return fabs(x-DEF_VAL_FLOAT) < FLOAT_EPS; };
-constexpr bool is_undef(double x) { return fabs(x-DEF_VAL_DOUBLE) < DOUBLE_EPS; };
+bool is_undef(int x) { return x==DEF_VAL_INT; };
+bool is_undef(float x) { return fabs(x-DEF_VAL_FLOAT) < FLOAT_EPS; };
+bool is_undef(double x) { return fabs(x-DEF_VAL_DOUBLE) < DOUBLE_EPS; };
 
 //macros to initialize 1D and 2D (square) arrays
 //x is the array, n is the size, y is the initialized value
