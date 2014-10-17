@@ -28,3 +28,6 @@ run_toptagger_1:
 
 run_toptagger_2:
 	cmsRun TTHNtupleAnalyzer/python/toptagger/loose.py $(INFS) outputFile=toptagger_loose.root
+
+run_step2:
+	cd MEAnalysis; $(CMSSW_BASE)/bin/$(SCRAM_ARCH)/MEAnalysis python/MEAnalysis_cfg.py
