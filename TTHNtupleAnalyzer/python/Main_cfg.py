@@ -261,14 +261,14 @@ if "TTH_DEBUG" in os.environ:
 	process.p += process.printTree
 
 
-process.out = cms.OutputModule(
-	"PoolOutputModule",
-	fileName = cms.untracked.string("edm.root"),
-	# Drop per-event meta data from dropped objects
-	dropMetaData = cms.untracked.string("ALL"),
-	SelectEvents = cms.untracked.PSet(
-		SelectEvents = cms.vstring("*")
-	),
-	outputCommands = cms.untracked.vstring("keep *")
-)
-process.outpath = cms.EndPath(process.out)
+#process.out = cms.OutputModule(
+#	"PoolOutputModule",
+#	fileName = cms.untracked.string("edm.root"),
+#	# Drop per-event meta data from dropped objects
+#	dropMetaData = cms.untracked.string("ALL"),
+#	SelectEvents = cms.untracked.PSet(
+#		SelectEvents = cms.vstring("*")
+#	),
+#	outputCommands = cms.untracked.vstring("keep *")
+#)
+#process.outpath = cms.EndPath(process.out)
