@@ -1,4 +1,5 @@
 #include <algorithm>
+#include "TTH/TTHNtupleAnalyzer/interface/HypoEnums.hh"
 
 template <typename T> bool is_in(const std::vector<T>& v, T o) {
     return std::find(v.begin(), v.end(), o)!=v.end();
@@ -156,34 +157,6 @@ bool is_veto_electron_tight(const pat::Electron& ele) {
 
 
 namespace TTH {
-
-//Initial classification based on the decay mode of the two top quarks
-enum EventHypothesis {
-    mumu,
-    ee,
-    mun,
-    en,
-    nn,
-    emu,
-    taumu,
-    taue,
-    taun,
-    tautau,
-    //bb,
-    //could not assign a hyothesis
-    UNKNOWN_HYPO,
-
-    //assigned multiple hypotheses
-    BAD_HYPO
-};
-
-//top quark pair decay mode
-enum DecayMode {
-    dileptonic,
-    semileptonic,
-    hadronic,
-    UNKNOWN_MODE
-};
 
 //select muons which pass quality criteria
 vector<const pat::Muon*> find_good_muons(const vector<pat::Muon>& muons, const reco::Vertex& vtx, const DecayMode mode) {
