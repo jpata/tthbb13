@@ -1,7 +1,7 @@
 From b379df82780fe1c9384d95016fb6b72559e0b19c Mon Sep 17 00:00:00 2001
 From: Joosep Pata <joosep.pata@cern.ch>
 Date: Tue, 14 Oct 2014 14:47:20 +0300
-Subject: [PATCH] merged HepTopTagger
+Subject: [PATCH 1/2] merged HepTopTagger
 
 ---
  DataFormats/JetReco/src/classes_4.h                |  15 +-
@@ -1101,6 +1101,788 @@ index 0307d6f..4c05f3f 100644
  
  private:
    std::auto_ptr<AnomalousTower>   anomalousTowerDef_;  // anomalous tower definition
+-- 
+1.8.3.1
+
+
+From 7881a263b848789f6e4d0d18181e3cabb9d4a562 Mon Sep 17 00:00:00 2001
+From: Joosep Pata <joosep.pata@cern.ch>
+Date: Fri, 17 Oct 2014 14:12:02 +0300
+Subject: [PATCH 2/2] added missing files
+
+---
+ DataFormats/JetReco/interface/HTTTopJetTagInfo.h   |  73 +++++
+ RecoJets/JetAlgorithms/src/HEPTopTagger.cc         | 350 +++++++++++++++++++++
+ RecoJets/JetProducers/plugins/HTTTopJetProducer.cc | 184 +++++++++++
+ RecoJets/JetProducers/plugins/HTTTopJetProducer.h  | 131 ++++++++
+ 4 files changed, 738 insertions(+)
+ create mode 100644 DataFormats/JetReco/interface/HTTTopJetTagInfo.h
+ create mode 100644 RecoJets/JetAlgorithms/src/HEPTopTagger.cc
+ create mode 100644 RecoJets/JetProducers/plugins/HTTTopJetProducer.cc
+ create mode 100644 RecoJets/JetProducers/plugins/HTTTopJetProducer.h
+
+diff --git a/DataFormats/JetReco/interface/HTTTopJetTagInfo.h b/DataFormats/JetReco/interface/HTTTopJetTagInfo.h
+new file mode 100644
+index 0000000..98f133e
+--- /dev/null
++++ b/DataFormats/JetReco/interface/HTTTopJetTagInfo.h
+@@ -0,0 +1,73 @@
++#ifndef AnalysisDataFormats_TopObjects_interface_HTTTopJetTagInfo_h
++#define AnalysisDataFormats_TopObjects_interface_HTTTopJetTagInfo_h
++
++
++// \class HTTTopJetTagInfo
++// 
++// \short specific tag info for HEPTopTagger tagging algorithm
++// HTTTopJetTagInfo is a class to hold the discriminator variables for the
++// HEPTopTagger algorithm.
++// 
++//
++// \author Gregor Kasieczka (based on  CATopJetTagInfo by Salvatore Rappoccio)
++// \version first version on 25 Sep 2014
++
++#include "DataFormats/BTauReco/interface/RefMacros.h"
++#include "DataFormats/BTauReco/interface/JetTagInfo.h"
++#include "DataFormats/BTauReco/interface/TaggingVariable.h"
++#include <vector>
++
++namespace reco {
++ 
++class HTTTopJetProperties {
++public:
++  HTTTopJetProperties() {
++    topMass          = 0.;
++    unfilteredMass   = 0.;
++    prunedMass	     = 0.;
++    fW		     = 0.;
++    massRatioPassed  = 0.;
++    isMultiR	     = 0;
++    Rmin	     = 0.;
++    RminExpected     = 0.;
++  }
++  double              topMass;         //<! Mass of the HTT top quark candidate [GeV] (at R=Rmin for MultiR)
++  double              unfilteredMass;  //<! Unfiltered mass of the triplet [GeV] (at R=Rmin for MultiR)
++  double              prunedMass;      //<! Mass of the pruned fat jet [GeV] (at R=Rmin for MultiR)
++  double              fW;              //<! Minimum distance of m_ij/m_123 from m_W/m_top (at R=Rmin for MultiR)
++  double              massRatioPassed; //<! Did the candidate pass the default mass ratio? Can be used instead of fW (at R=Rmin for MultiR)
++  bool                isMultiR;        //<! Tagger operated in MultiR mode
++  double              Rmin;            //<! R_min found in MultiR procedure. Set to -1 for non-MultiR mode.
++  double              RminExpected;    //<! R_min expected for a top quark based on filtered fat-jet pT. Set to -1 for non-MultiR mode.
++};
++
++ class HTTTopJetTagInfo : public JetTagInfo {
++public:
++  typedef edm::RefToBase<Jet> jet_type;
++  typedef HTTTopJetProperties  properties_type;
++    
++    HTTTopJetTagInfo(void) {}
++
++    virtual ~HTTTopJetTagInfo(void) {}
++  
++    virtual HTTTopJetTagInfo* clone(void) const { return new HTTTopJetTagInfo(*this); }
++    
++    const properties_type & properties() const {
++      return properties_;
++    }
++
++    void insert(const edm::RefToBase<Jet> & jet, const HTTTopJetProperties & properties) {
++      setJetRef(jet);
++      properties_ = properties;
++    }
++
++protected:
++    properties_type properties_;
++
++};
++
++DECLARE_EDM_REFS( HTTTopJetTagInfo )
++
++}
++
++#endif // AnalysisDataFormats_TopObjects_interface_HTTTopJetTagInfo_h
+diff --git a/RecoJets/JetAlgorithms/src/HEPTopTagger.cc b/RecoJets/JetAlgorithms/src/HEPTopTagger.cc
+new file mode 100644
+index 0000000..2c230bc
+--- /dev/null
++++ b/RecoJets/JetAlgorithms/src/HEPTopTagger.cc
+@@ -0,0 +1,350 @@
++
++#include "../interface/HEPTopTagger.h"
++
++// Do not change next line, it's needed by the sed-code that makes the tagger CMSSW-compatible.
++namespace external {
++
++bool HEPTopTagger::_first_time = true;
++
++void HEPTopTagger::print_banner() {
++  if (!_first_time) {return;}
++  _first_time = false;
++
++  std::cout << "#--------------------------------------------------------------------------\n";
++  std::cout << "#                   HEPTopTagger - under construction                      \n";
++  std::cout << "#                                                                          \n";
++  std::cout << "# Please cite JHEP 1010 (2010) 078 [arXiv:1006.2833 [hep-ph]]              \n";
++  std::cout << "# and Phys.Rev. D89 (2014) 074047 [arXiv:1312.1504 [hep-ph]]               \n";
++  std::cout << "#--------------------------------------------------------------------------\n";
++  get_setting();
++}
++
++double HEPTopTagger::perp(const PseudoJet & vec, const fastjet::PseudoJet & ref) {
++  double ref_ref = ref.px() * ref.px() + ref.py() * ref.py() + ref.pz() * ref.pz();
++  double vec_ref = vec.px() * ref.px() + vec.py() * ref.py() + vec.pz() * ref.pz();
++  double per_per = vec.px() * vec.px() + vec.py() * vec.py() + vec.pz() * vec.pz();
++  if (ref_ref > 0.) 
++    per_per -= vec_ref * vec_ref / ref_ref;
++  if (per_per < 0.) 
++    per_per = 0.;
++  return sqrt(per_per);
++}
++
++double HEPTopTagger::djademod (const fastjet::PseudoJet& subjet_i, const fastjet::PseudoJet& subjet_j, const fastjet::PseudoJet& ref) {
++  double dj = -1.0;
++  double delta_phi = subjet_i.delta_phi_to(subjet_j);
++  double delta_eta = subjet_i.eta() - subjet_j.eta();
++  double delta_R = sqrt(delta_eta * delta_eta + delta_phi * delta_phi);	
++  dj = perp(subjet_i, ref) * perp(subjet_j, ref) * pow(delta_R, 4.);
++  return dj;
++}
++
++double HEPTopTagger::fW() {
++  // Minimal:
++  // |(m_ij / m_123) / (m_w/ m_t) - 1|
++
++  double m12 = (_top_subs[0] + _top_subs[1]).m();
++  double m13 = (_top_subs[0] + _top_subs[2]).m();
++  double m23 = (_top_subs[1] + _top_subs[2]).m();
++  double m123 = (_top_subs[0] + _top_subs[1] + _top_subs[2]).m();
++
++  double fw12 = fabs( (m12/m123) / (_mwmass/_mtmass) - 1);
++  double fw13 = fabs( (m13/m123) / (_mwmass/_mtmass) - 1);
++  double fw23 = fabs( (m23/m123) / (_mwmass/_mtmass) - 1);
++  
++  return std::min(fw12, std::min(fw13, fw23));  
++}
++
++//Find hard substructures
++void HEPTopTagger::FindHardSubst(const PseudoJet & this_jet, std::vector<fastjet::PseudoJet> & t_parts) {
++  PseudoJet parent1(0, 0, 0, 0), parent2(0, 0, 0, 0);
++  if (this_jet.m() < _max_subjet_mass || !this_jet.validated_cs()->has_parents(this_jet, parent1, parent2)) {
++    t_parts.push_back(this_jet);
++  } else {
++    if (parent1.m() < parent2.m()) 
++      std::swap(parent1, parent2);   
++    FindHardSubst(parent1, t_parts);
++    if (parent1.m() < _mass_drop_threshold * this_jet.m())
++      FindHardSubst(parent2, t_parts);   
++  }
++}
++
++//store subjets as vector<PseudoJet> with [0]->b [1]->W-jet 1 [2]->W-jet 2
++void HEPTopTagger::store_topsubjets(const std::vector<PseudoJet>& top_subs) {
++  _top_subjets.resize(0);
++  double m12 = (top_subs[0] + top_subs[1]).m();
++  double m13 = (top_subs[0] + top_subs[2]).m();
++  double m23 = (top_subs[1] + top_subs[2]).m();
++  double dm12 = fabs(m12 - _mwmass);
++  double dm13 = fabs(m13 - _mwmass);
++  double dm23 = fabs(m23 - _mwmass);
++  
++  if (dm23 <= dm12 && dm23 <= dm13) {
++    _top_subjets.push_back(top_subs[0]); 
++    _top_subjets.push_back(top_subs[1]); 
++    _top_subjets.push_back(top_subs[2]);	
++  } else if (dm13 <= dm12 && dm13 < dm23) {
++    _top_subjets.push_back(top_subs[1]);
++    _top_subjets.push_back(top_subs[0]);
++    _top_subjets.push_back(top_subs[2]);
++  } else if (dm12 < dm23 && dm12 < dm13) {
++    _top_subjets.push_back(top_subs[2]);
++    _top_subjets.push_back(top_subs[0]);
++    _top_subjets.push_back(top_subs[1]);
++  }
++  _W = _top_subjets[1] + _top_subjets[2];
++  return;
++}
++
++//check mass plane cuts
++bool HEPTopTagger::check_mass_criteria(const std::vector<PseudoJet> & top_subs) const {
++  bool is_passed = false;
++  double m12 = (top_subs[0] + top_subs[1]).m();
++  double m13 = (top_subs[0] + top_subs[2]).m();
++  double m23 = (top_subs[1] + top_subs[2]).m();
++  double m123 = (top_subs[0] + top_subs[1] + top_subs[2]).m();
++  if (
++      (atan(m13/m12) > _m13cutmin && _m13cutmax > atan(m13/m12)
++       && (m23/m123 > _rmin && _rmax > m23/m123))
++      ||
++      (((m23/m123) * (m23/m123) < 1 - _rmin * _rmin* (1 + (m13/m12) * (m13/m12)))
++       &&
++       ((m23/m123) * (m23/m123) > 1 - _rmax * _rmax * (1 + (m13/m12) * (m13/m12)))
++       && 
++       (m23/m123 > _m23cut))
++      ||
++      (((m23/m123) * (m23/m123) < 1 - _rmin * _rmin * (1 + (m12/m13) * (m12/m13)))
++       &&
++       ((m23/m123) * (m23/m123) > 1 - _rmax * _rmax * (1 + (m12/m13) * (m12/m13)))
++       && 
++       (m23/m123 > _m23cut))
++      ) { 
++    is_passed = true;
++  }
++  return is_passed;
++}
++
++HEPTopTagger::HEPTopTagger() {}
++
++HEPTopTagger::HEPTopTagger(fastjet::PseudoJet jet) : 
++  _jet(&jet), _mtmass(172.3), _mwmass(80.4), 
++  _mass_drop_threshold(0.8), _max_subjet_mass(30.), 
++  _mtmin(150.), _mtmax(200.), _rmin(0.85*80.4/172.3), _rmax(1.15*80.4/172.3), 
++  _m23cut(0.35), _m13cutmin(0.2), _m13cutmax(1.3), 
++  _nfilt(5), _Rfilt(0.3), _Rprun(1.5), _jet_algorithm_filter(fastjet::cambridge_algorithm), _jet_algorithm_recluster(fastjet::cambridge_algorithm), _zcut(0.1),
++  _rcut_factor(0.5), _mode(0), _minpt_tag(200.), _minpt_subjet(0.), _debug(false), _fat(jet)
++{}
++
++HEPTopTagger::HEPTopTagger(fastjet::PseudoJet jet, 
++			   double mtmass, double mwmass
++			   ) : 
++  _jet(&jet), _mtmass(mtmass), _mwmass(mwmass), 
++  _mass_drop_threshold(0.8), _max_subjet_mass(30.), 
++  _mtmin(150.), _mtmax(200.), _rmin(0.85*mwmass/mtmass), _rmax(1.15*mwmass/mtmass), 
++  _m23cut(0.35), _m13cutmin(0.2), _m13cutmax(1.3), 
++  _nfilt(5), _Rfilt(0.3), _Rprun(1.5), _jet_algorithm_filter(fastjet::cambridge_algorithm), _jet_algorithm_recluster(fastjet::cambridge_algorithm), _zcut(0.1),
++  _rcut_factor(0.5), _mode(0), _minpt_tag(200.), _debug(false), _fat(jet)
++{}
++
++void HEPTopTagger::run_tagger() {
++  print_banner();
++
++  if ((_mode != Mode::EARLY_MASSRATIO_SORT_MASS) 
++      && (_mode != Mode::LATE_MASSRATIO_SORT_MASS) 
++      && (_mode != Mode::EARLY_MASSRATIO_SORT_MODDJADE)
++      && (_mode != Mode::LATE_MASSRATIO_SORT_MODDJADE)
++      && (_mode != Mode::TWO_STEP_FILTER) ) {
++    std::cout << "ERROR: UNKNOWN MODE" << std::endl;
++    return;
++  }
++  
++  //initialization
++  _djsum = 0.;
++  _delta_top = 1000000000000.0;
++  _pruned_mass = 0.;
++  _unfiltered_mass = 0.;
++  _top_candidate.reset(0., 0., 0., 0.);
++  _parts_size = 0;
++  _is_maybe_top = _is_masscut_passed = _is_ptmincut_passed = false;
++  _top_subs.clear();
++  _top_subjets.clear();
++  _top_hadrons.clear();
++  _top_parts.clear();
++  
++  //find hard substructures
++  FindHardSubst(*_jet, _top_parts);
++  _parts_size = _top_parts.size();
++  
++  if (_top_parts.size() < 3) { 
++    if (_debug) {std::cout << "< 3 hard substructures " << std::endl;}
++    return; //such events are not interesting   
++  }
++  
++  // Sort subjets-after-unclustering by pT.
++  // Necessary so that two-step-filtering can use the leading-three.
++  _top_parts=sorted_by_pt(_top_parts);
++
++  // loop over triples
++  _top_parts = sorted_by_pt(_top_parts);
++  for (unsigned rr = 0; rr < _top_parts.size(); rr++) {
++    for (unsigned ll = rr + 1; ll < _top_parts.size(); ll++) {
++      for (unsigned kk = ll + 1; kk < _top_parts.size(); kk++) {
++	
++	// two-step filtering 
++	// This means that we only look at the triplet formed by the
++	// three leading-in-pT subjets-after-unclustering.
++	if((_mode==Mode::TWO_STEP_FILTER) && rr>0)
++	  continue;
++	if((_mode==Mode::TWO_STEP_FILTER) && ll>1)
++	  continue;
++	if((_mode==Mode::TWO_STEP_FILTER) && kk>2)
++	  continue;
++
++      	//pick triple
++	PseudoJet triple = join(_top_parts[rr], _top_parts[ll], _top_parts[kk]);
++	
++	//filtering 
++	double filt_top_R 
++	  = std::min(_Rfilt, 0.5*sqrt(std::min(_top_parts[kk].squared_distance(_top_parts[ll]), 
++				     std::min(_top_parts[rr].squared_distance(_top_parts[ll]), 
++					 _top_parts[kk].squared_distance(_top_parts[rr])))));
++	JetDefinition filtering_def(_jet_algorithm_filter, filt_top_R);
++	fastjet::Filter filter(filtering_def, fastjet::SelectorNHardest(_nfilt) * fastjet::SelectorPtMin(_minpt_subjet));
++	PseudoJet topcandidate = filter(triple);
++
++
++	//mass window cut
++  	if (topcandidate.m() < _mtmin || _mtmax < topcandidate.m()) continue;
++
++	// Sanity cut: can't recluster less than 3 objects into three subjets
++	if (topcandidate.pieces().size() < 3)
++	  continue;
++       
++	// Recluster to 3 subjets and apply mass plane cuts
++	// Use a self-deleting CS-pointer. Taken from CMSSW version of HTT
++	// Initial CMSSW edit by CKV, suggested by G. P. Salam)	
++	JetDefinition reclustering(_jet_algorithm_recluster, 3.14);
++	ClusterSequence *  cs_top_sub = new ClusterSequence(topcandidate.pieces(), reclustering);
++        std::vector <PseudoJet> top_subs = sorted_by_pt(cs_top_sub->exclusive_jets(3));         
++	cs_top_sub->delete_self_when_unused();
++
++	// Require the third subjet to be above the pT threshold
++	if (top_subs[2].perp() < _minpt_subjet)
++	  continue;
++
++	// Modes with early 2d-massplane cuts
++	if (_mode == Mode::EARLY_MASSRATIO_SORT_MASS      && !check_mass_criteria(top_subs)) {continue;}
++	if (_mode == Mode::EARLY_MASSRATIO_SORT_MODDJADE  && !check_mass_criteria(top_subs)) {continue;}
++
++	//is this candidate better than the other? -> update
++	double deltatop = fabs(topcandidate.m() - _mtmass);
++	double djsum = djademod(top_subs[0], top_subs[1], topcandidate) 
++			       + djademod(top_subs[0], top_subs[2], topcandidate)
++			       + djademod(top_subs[1], top_subs[2], topcandidate);
++	bool better = false;
++
++	// Modes 0 and 1 sort by top mass
++	if ( (_mode == Mode::EARLY_MASSRATIO_SORT_MASS) 
++	     || (_mode == Mode::LATE_MASSRATIO_SORT_MASS)) {
++	  if (deltatop < _delta_top) 
++	    better = true;
++	}
++	// Modes 2 and 3 sort by modified jade distance
++	else if ( (_mode == Mode::EARLY_MASSRATIO_SORT_MODDJADE) 
++		  || (_mode == Mode::LATE_MASSRATIO_SORT_MODDJADE)) {
++	  if (djsum > _djsum) 
++	    better = true;
++	}
++	// Mode 4 is the two-step filtering. No sorting necessary as
++	// we just look at the triplet of highest pT objects after
++	// unclustering
++	else if (_mode == Mode::TWO_STEP_FILTER) {
++	  better = true;
++	} 
++	else {
++	  std::cout << "ERROR: UNKNOWN MODE (IN DISTANCE MEASURE SELECTION)" << std::endl;
++	  return;
++	}
++
++	if (better) {
++	  _djsum = djsum;
++	  _delta_top = deltatop; 
++	  _is_maybe_top = true;
++	  _top_candidate = topcandidate;
++	  _top_subs = top_subs;
++	  store_topsubjets(top_subs);
++	  _top_hadrons = topcandidate.constituents();
++	  //pruning
++	  JetDefinition jet_def_prune(fastjet::cambridge_algorithm, _Rprun);
++	  fastjet::Pruner pruner(jet_def_prune, _zcut, _rcut_factor);
++	  PseudoJet prunedjet = pruner(triple);
++	  _pruned_mass = prunedjet.m();
++	  _unfiltered_mass = triple.m();
++	  
++	  //are all criteria fulfilled?
++	  _is_masscut_passed = false;
++	  if (check_mass_criteria(top_subs)) {
++	    _is_masscut_passed = true;
++	  }
++	  _is_ptmincut_passed = false;
++	  if (_top_candidate.pt() > _minpt_tag) {
++	    _is_ptmincut_passed = true;
++	  }
++	}//end better
++      }//end kk
++    }//end ll
++  }//end rr
++  return;
++}
++
++void HEPTopTagger::get_info() const {  
++  std::cout << "#--------------------------------------------------------------------------\n";
++  std::cout << "#                          HEPTopTagger Result" << std::endl;
++  std::cout << "#" << std::endl;
++  std::cout << "# is top candidate: " << _is_maybe_top << std::endl;
++  std::cout << "# mass plane cuts passed: " << _is_masscut_passed << std::endl;
++  std::cout << "# top candidate mass: " << _top_candidate.m() << std::endl;
++  std::cout << "# top candidate (pt, eta, phi): (" 
++       << _top_candidate.perp() << ", "
++       << _top_candidate.eta() << ", "
++       << _top_candidate.phi_std() << ")" << std::endl;
++  std::cout << "# top hadrons: " << _top_hadrons.size() << std::endl;
++  std::cout << "# hard substructures: " << _parts_size << std::endl;
++  std::cout << "# |m - mtop| : " << _delta_top << std::endl; 
++  std::cout << "# djsum : " << _djsum << std::endl;
++  std::cout << "# is consistency cut passed: " << _is_ptmincut_passed << std::endl; 
++  std::cout << "#--------------------------------------------------------------------------\n";
++  return;
++}
++
++void HEPTopTagger::get_setting() const {
++  std::cout << "#--------------------------------------------------------------------------\n";
++  std::cout << "#                         HEPTopTagger Settings" << std::endl;
++  std::cout << "#" << std::endl;
++  std::cout << "# mode: " << _mode << " (0 = EARLY_MASSRATIO_SORT_MASS) " << std::endl;
++  std::cout << "#        "         << " (1 = LATE_MASSRATIO_SORT_MASS)  " << std::endl;
++  std::cout << "#        "         << " (2 = EARLY_MASSRATIO_SORT_MODDJADE)  " << std::endl;
++  std::cout << "#        "         << " (3 = LATE_MASSRATIO_SORT_MODDJADE)  " << std::endl;
++  std::cout << "#        "         << " (4 = TWO_STEP_FILTER)  " << std::endl;
++  std::cout << "# top mass: " << _mtmass << "    ";
++  std::cout << "W mass: " << _mwmass << std::endl;
++  std::cout << "# top mass window: [" << _mtmin << ", " << _mtmax << "]" << std::endl;
++  std::cout << "# W mass ratio: [" << _rmin << ", " << _rmax << "] (["
++       <<_rmin*_mtmass/_mwmass<< "%, "<< _rmax*_mtmass/_mwmass << "%])"<< std::endl;
++  std::cout << "# mass plane cuts: (m23cut, m13min, m13max) = (" 
++       << _m23cut << ", " << _m13cutmin << ", " << _m13cutmax << ")" << std::endl;
++  std::cout << "# mass_drop_threshold: " << _mass_drop_threshold << "    ";
++  std::cout << "max_subjet_mass: " << _max_subjet_mass << std::endl;
++  std::cout << "# R_filt: " << _Rfilt << "    ";
++  std::cout << "n_filt: " << _nfilt << std::endl;
++  std::cout << "# minimal subjet pt: " << _minpt_subjet << std::endl;
++  std::cout << "# minimal reconstructed pt: " << _minpt_tag << std::endl;
++  std::cout << "# internal jet algorithms (0 = kt, 1 = C/A, 2 = anti-kt): " << std::endl; 
++  std::cout << "#   filtering: "<< _jet_algorithm_filter << std::endl;
++  std::cout << "#   reclustering: "<< _jet_algorithm_recluster << std::endl;
++  std::cout << "#--------------------------------------------------------------------------\n";
++  
++  return;
++}
++// Do not change next line, it's needed by the sed-code that makes the tagger CMSSW-compatible.
++};
+diff --git a/RecoJets/JetProducers/plugins/HTTTopJetProducer.cc b/RecoJets/JetProducers/plugins/HTTTopJetProducer.cc
+new file mode 100644
+index 0000000..430ab2e
+--- /dev/null
++++ b/RecoJets/JetProducers/plugins/HTTTopJetProducer.cc
+@@ -0,0 +1,184 @@
++#include "FWCore/Framework/interface/MakerMacros.h"
++#include "DataFormats/JetReco/interface/HTTTopJetTagInfo.h"
++#include "DataFormats/JetReco/interface/BasicJetCollection.h"
++#include "HTTTopJetProducer.h"
++
++using namespace edm;
++using namespace cms;
++using namespace reco;
++using namespace std;
++
++HTTTopJetProducer::HTTTopJetProducer(edm::ParameterSet const& conf):
++       FastjetJetProducer( conf ),
++       minFatjetPt_(200.),
++       minSubjetPt_(20.),
++       minCandPt_(200.),
++       maxFatjetAbsEta_(2.5),
++       subjetMass_(30.),
++       muCut_(0.8),
++       mode_(0),
++       minCandMass_(150.),
++       maxCandMass_(200.),
++       massRatioWidth_(15),
++       minM23Cut_(0.35),
++       minM13Cut_(0.2),
++       maxM13Cut_(1.3),
++       verbose_(false )
++{
++  
++  // Read in all the options from the configuration
++  if ( conf.exists("minFatjetPt") ) 
++    minFatjetPt_ = conf.getParameter<double>("minFatjetPt");
++  
++  if ( conf.exists("minSubjetPt") ) 
++    minSubjetPt_ = conf.getParameter<double>("minSubjetPt");
++  
++  if ( conf.exists("minCandPt") ) 
++    minCandPt_ = conf.getParameter<double>("minCandPt");
++  
++  if ( conf.exists("maxFatjetAbsEta") )
++    maxFatjetAbsEta_ = conf.getParameter<double>("maxFatjetAbsEta");
++  
++  if ( conf.exists("subjetMass") )
++    subjetMass_ = conf.getParameter<double>("subjetMass");
++  
++  if ( conf.exists("muCut") )
++    muCut_ = conf.getParameter<double>("muCut");
++  
++  if ( conf.exists("mode") )
++    mode_ = conf.getParameter<int>("mode");
++  
++  if ( conf.exists("minCandMass") )
++    minCandMass_ = conf.getParameter<double>("minCandMass");
++  
++  if ( conf.exists("maxCandMass") )
++    maxCandMass_ = conf.getParameter<double>("maxCandMass");
++  
++  if ( conf.exists("massRatioWidth") )
++    massRatioWidth_ = conf.getParameter<double>("massRatioWidth");
++  
++  if ( conf.exists("minM23Cut") )
++    minM23Cut_ = conf.getParameter<double>("minM23Cut");
++
++  if ( conf.exists("minM13Cut") )
++    minM13Cut_ = conf.getParameter<double>("minM13Cut");
++  
++  if ( conf.exists("maxM13Cut") )
++    maxM13Cut_ = conf.getParameter<double>("maxM13Cut");
++  
++  if ( conf.exists("verbose") )
++    verbose_ = conf.getParameter<bool>("verbose");
++  
++  // Create the tagger-wrapper
++  produces<HTTTopJetTagInfoCollection>();
++  fjHEPTopTagger_ = std::auto_ptr<fastjet::HEPTopTagger>(new fastjet::HEPTopTagger(minSubjetPt_, 
++										   minCandPt_,
++										   subjetMass_, 	    
++										   muCut_, 		    
++										   mode_, 		    
++										   minCandMass_, 	    
++										   maxCandMass_, 	    
++										   massRatioWidth_, 	    
++										   minM23Cut_, 	    
++										   minM13Cut_, 	    
++										   maxM13Cut_)); 
++  fromHTTTopJetProducer_ = 1;
++
++}
++
++		
++
++
++
++void HTTTopJetProducer::produce(  edm::Event & e, const edm::EventSetup & c ) 
++{
++  FastjetJetProducer::produce(e, c);
++}
++
++void HTTTopJetProducer::runAlgorithm( edm::Event& iEvent, const edm::EventSetup& iSetup)
++{
++
++  if ( !doAreaFastjet_ && !doRhoFastjet_) {
++    fjClusterSeq_ = ClusterSequencePtr( new fastjet::ClusterSequence( fjInputs_, *fjJetDefinition_ ) );
++  } else if (voronoiRfact_ <= 0) {
++    fjClusterSeq_ = ClusterSequencePtr( new fastjet::ClusterSequenceArea( fjInputs_, *fjJetDefinition_ , *fjAreaDefinition_ ) );
++  } else {
++    fjClusterSeq_ = ClusterSequencePtr( new fastjet::ClusterSequenceVoronoiArea( fjInputs_, *fjJetDefinition_ , fastjet::VoronoiAreaSpec(voronoiRfact_) ) );
++  }
++
++  //Run the jet clustering
++  vector<fastjet::PseudoJet> inclusiveJets = fjClusterSeq_->inclusive_jets(minFatjetPt_);
++
++  if ( verbose_ ) cout << "Getting central jets" << endl;
++  // Find the transient central jets
++  vector<fastjet::PseudoJet> centralJets;
++  for (unsigned int i = 0; i < inclusiveJets.size(); i++) {
++    
++    if (inclusiveJets[i].perp() > minFatjetPt_ && fabs(inclusiveJets[i].rapidity()) < maxFatjetAbsEta_) {
++      centralJets.push_back(inclusiveJets[i]);
++    }
++  }
++
++  fastjet::HEPTopTagger & HEPTagger = *fjHEPTopTagger_;
++
++  vector<fastjet::PseudoJet>::iterator jetIt = centralJets.begin(), centralJetsEnd = centralJets.end();
++  if ( verbose_ )cout<<"Loop over jets"<<endl;
++  for ( ; jetIt != centralJetsEnd; ++jetIt ) {
++    
++    if (verbose_) cout << "CMS FJ jet pt: " << (*jetIt).perp() << endl;
++    
++    fastjet::PseudoJet taggedJet;
++    taggedJet = HEPTagger.result(*jetIt);
++    
++    if (taggedJet != 0){
++      fjJets_.push_back(taggedJet);           
++    }
++  }
++  
++}
++
++void HTTTopJetProducer::addHTTTopJetTagInfoCollection( edm::Event& iEvent, 
++						       const edm::EventSetup& iSetup,
++						       edm::OrphanHandle<reco::BasicJetCollection> & oh){
++
++
++  // Set up output list
++  auto_ptr<HTTTopJetTagInfoCollection> tagInfos(new HTTTopJetTagInfoCollection() );
++
++  // Loop over jets
++  for (size_t ij=0; ij != fjJets_.size(); ij++){
++
++    HTTTopJetProperties properties;
++    HTTTopJetTagInfo tagInfo;
++
++    // Black magic:
++    // In the standard CA treatment the RefToBase is made from the handle directly
++    // Since we only have a OrphanHandle (the JetCollection is created by this process) 
++    // we have to take the detour via the Ref
++    edm::Ref<reco::BasicJetCollection> ref(oh, ij);  
++    edm::RefToBase<reco::Jet> rtb(ref);  
++    
++    fastjet::HEPTopTaggerStructure *s = (fastjet::HEPTopTaggerStructure*) fjJets_[ij].structure_non_const_ptr();
++
++    properties.topMass          = s->top_mass();
++    properties.unfilteredMass	= s->unfiltered_mass();
++    properties.prunedMass	= s->pruned_mass();
++    properties.fW		= s->fW();
++    properties.massRatioPassed  = s->mass_ratio_passed();
++
++    // Only needed for MultiR tagger
++    properties.isMultiR	        = 0;
++    properties.Rmin	        = -1.;
++    properties.RminExpected     = -1.;
++    
++    tagInfo.insert(rtb, properties );
++    tagInfos->push_back( tagInfo );
++  }  
++
++  iEvent.put( tagInfos );
++  
++};
++
++ 
++//define this as a plug-in
++DEFINE_FWK_MODULE(HTTTopJetProducer);
+diff --git a/RecoJets/JetProducers/plugins/HTTTopJetProducer.h b/RecoJets/JetProducers/plugins/HTTTopJetProducer.h
+new file mode 100644
+index 0000000..068157e
+--- /dev/null
++++ b/RecoJets/JetProducers/plugins/HTTTopJetProducer.h
+@@ -0,0 +1,131 @@
++#ifndef RecoJets_JetProducers_HTTTopJetProducer_h
++#define RecoJets_JetProducers_HTTTopJetProducer_h
++
++
++/* *********************************************************
++
++
++ * \class CATopJetProducer
++ * Jet producer to produce top jets using the C-A algorithm to break
++ * jets into subjets as described here:
++ * "Top-tagging: A Method for Identifying Boosted Hadronic Tops"
++ * David E. Kaplan, Keith Rehermann, Matthew D. Schwartz, Brock Tweedie
++ * arXiv:0806.0848v1 [hep-ph] 
++
++  \brief Jet producer to run the CATopJetAlgorithm
++
++  \author   Salvatore Rappoccio
++  \version  
++
++         Notes on implementation:
++
++	 Because the BaseJetProducer only allows the user to produce
++	 one jet collection at a time, this algorithm cannot
++	 fit into that paradigm. 
++
++	 All of the "hard" jets are of type BasicJet, since
++	 they are "jets of jets". The subjets will be either
++	 CaloJets, GenJets, etc.
++
++	 In order to avoid a templatization of the entire
++	 EDProducer itself, we only use a templated method
++	 to write out the subjets to the event record,
++	 and to use that information to write out the
++	 hard jets to the event record.
++
++	 This templated method is called "write_outputs". It
++	 relies on a second templated method called "write_specific",
++	 which relies on some template specialization to create
++	 different specific objects (i.e. CaloJets, BasicJets, GenJets, etc). 
++
++ ************************************************************/
++
++
++
++
++#include "FWCore/Framework/interface/Event.h"
++#include "FWCore/Framework/interface/EventSetup.h"
++#include "DataFormats/Common/interface/View.h"
++#include "DataFormats/Common/interface/Handle.h"
++#include "DataFormats/Provenance/interface/ProductID.h"
++#include "FWCore/MessageLogger/interface/MessageLogger.h"
++
++#include "DataFormats/JetReco/interface/CaloJetCollection.h"
++#include "DataFormats/JetReco/interface/GenJetCollection.h"
++#include "DataFormats/JetReco/interface/PFJetCollection.h"
++#include "DataFormats/JetReco/interface/BasicJetCollection.h"
++#include "RecoJets/JetAlgorithms/interface/JetAlgoHelper.h"
++#include "DataFormats/Candidate/interface/CandidateFwd.h"
++#include "DataFormats/Candidate/interface/LeafCandidate.h"
++#include "FWCore/Framework/interface/ESHandle.h"
++#include "Geometry/CaloGeometry/interface/CaloGeometry.h"
++#include "Geometry/Records/interface/CaloGeometryRecord.h"
++
++#include "RecoJets/JetProducers/plugins/FastjetJetProducer.h"
++
++
++#include "RecoJets/JetAlgorithms/interface/HEPTopTaggerWrapper.h"
++
++#include "fastjet/SISConePlugin.hh"
++
++
++namespace cms
++{
++  class HTTTopJetProducer : public FastjetJetProducer
++  {
++  public:
++
++    HTTTopJetProducer(const edm::ParameterSet& ps);
++
++    virtual ~HTTTopJetProducer() {}
++
++    virtual void produce( edm::Event& iEvent, const edm::EventSetup& iSetup );
++
++    virtual void runAlgorithm( edm::Event& iEvent, const edm::EventSetup& iSetup );
++
++    virtual void addHTTTopJetTagInfoCollection( edm::Event& iEvent, 
++						const edm::EventSetup& iSetup,
++						edm::OrphanHandle<reco::BasicJetCollection> & oh);
++
++
++  private:
++    std::auto_ptr<fastjet::HEPTopTagger>     fjHEPTopTagger_;
++
++    // Below are all configurable options. 
++    // Parenthesis indicates if this is enforced by the tagger itself or by the producer
++
++    double minFatjetPt_; // Only process fatjets larger pT with the tagger [GeV] (producer)
++    double minSubjetPt_; // Minimal pT for subjets [GeV] (tagger)
++    double minCandPt_;   // Minimal pT to return a candidate [GeV] (tagger)
++ 
++    double maxFatjetAbsEta_; // Only process fatjets with smaller |eta| with the tagger. (producer)
++
++    double subjetMass_; // Mass above which subjets are further unclustered (tagger)
++    double muCut_; // Mass drop threshold (tagger)
++    
++    // HEPTopTagger Mode (tagger):
++    // 0: do 2d-plane, return candidate with delta m_top minimal
++    // 1: return candidate with delta m_top minimal IF passes 2d plane
++    // 2: do 2d-plane, return candidate with max dj_sum
++    // 3: return candidate with max dj_sum IF passes 2d plane
++    // 4: return candidate built from leading three subjets after unclustering IF passes 2d plane
++    // Note: Original HTT was mode==1    
++    int mode_; 
++
++    // Top Quark mass window in GeV (tagger)
++    double minCandMass_;
++    double maxCandMass_;
++    
++    double massRatioWidth_; // One sided width of the A-shaped window around m_W/m_top in % (tagger)
++    double minM23Cut_; // minimal value of m23/m123 (tagger)
++    double minM13Cut_; // minimal value of atan(m13/m12) (tagger)
++    double maxM13Cut_; // maximal value of atan(m13/m12) (tagger)
++        
++    bool verbose_;
++
++  };
++
++}
++
++
++#endif
 -- 
 1.8.3.1
 
