@@ -492,6 +492,8 @@ int main(int argc, const char* argv[])
     // initialize top and W mass
     meIntegrator->setTopMass( MT , MW );
 
+    meIntegrator->setSqrtS(13000.);
+
     // configure ME calculation
     meIntegrator->setUseME (useME);
     meIntegrator->setUseJac(useJac);
@@ -1975,7 +1977,7 @@ int main(int argc, const char* argv[])
 
                         //FIXME: where to get JEC uncertainty?
                         //float JECUnc = hJet_JECUnc  [hj];
-                        float JECUnc = DEF_VAL_FLOAT;
+                        float JECUnc = 0.; // this has no effect
 
                         // subtract the nominal JEC corrected jet (px,py)
                         deltaPx -= ( pt*TMath::Cos(phi) );
@@ -3589,7 +3591,8 @@ int main(int argc, const char* argv[])
 
                                     // the barcode for this permutation
                                     string barcode = Form("%d%d_%d_%d%d%d_%d%d%d_%d%d",
-                                                          otree->type_, meIntegrator->getIntType(), hyp, lep_index[0], 0, jets_index[ pos_to_index[bLep_pos] ],
+                                                          otree->type_, meIntegrator->getIntType(), hyp, 
+							  lep_index[0], 0, jets_index[ pos_to_index[bLep_pos] ],
                                                           otree->type_<6 ? jets_index[ pos_to_index[w1_pos] ] : lep_index[1], otree->type_<6 ? jets_index[ pos_to_index[w2_pos] ] : 0, jets_index[ pos_to_index[bHad_pos] ],
                                                           jets_index[ pos_to_index[b1_pos] ], jets_index[ pos_to_index[b2_pos] ]);
                                     PhaseSpacePoint PSP;

@@ -21,19 +21,19 @@ process.fwliteInput = cms.PSet(
     pathToCP_smear= cms.string("./root/ControlPlotsTEST_std_gen.root"),
 
     # input file directory
-    pathToFile    = cms.string("/home/joosep/Dropbox/tthbb13/data"),
-    #pathToFile    = cms.string("dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store//user/bianchi/HBB_EDMNtuple/AllHDiJetPt_V4/"),
+    #pathToFile    = cms.string("/home/joosep/Dropbox/tthbb13/data"),
+    pathToFile    = cms.string("dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store//user/bianchi/TTH_EDMNtuple/"),
     #pathToFile    = cms.string("dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/bianchi/HepMC/Sherpa_run/"),
     #pathToFile    = cms.string("/scratch/bianchi/HBB_EDMNtuple/Sherpa_run/"),
     #pathToFile    = cms.string("/shome/bianchi/CMSSW_5_3_3_patch2_New/src/VHbbAnalysis/VHbbDataFormats/bin/"),
 
     # a name tag for the input files
-    ordering      = cms.string(""),
+    ordering      = cms.string("output_"),
 
     # the samples
     samples  =   cms.VPSet(
         cms.PSet(
-            skip     = cms.bool(False),
+            skip     = cms.bool(True),
             name     = cms.string('tthbb_step1_numEvent1000'),
             nickName = cms.string('TTHBB'),
             color    = cms.int32(1),
@@ -41,7 +41,8 @@ process.fwliteInput = cms.PSet(
         ),
         cms.PSet(
             skip     = cms.bool(False),
-            name     = cms.string('ttbar_step1_numEvent1000'),
+            #name     = cms.string('ttbar_step1_numEvent1000'),
+            name     = cms.string('122'),
             nickName = cms.string('TTJets'),
             color    = cms.int32(1),
             xSec     = cms.double(1.0)
@@ -97,21 +98,21 @@ process.fwliteInput = cms.PSet(
     speedup       = cms.untracked.int32(0), ###### CHECK HERE
 
     # select which analysis to run
-    doTypeBTag6   = cms.untracked.int32(1),  #SL 6 jets
-    doTypeBTag5   = cms.untracked.int32(1),  #SL 5 jets
-    doTypeBTag4   = cms.untracked.int32(1),  #DL 4 jets
-    doType0       = cms.untracked.int32(1),  #SL(4,2)  w/  W-tag
-    doType1       = cms.untracked.int32(1),  #SL(4,2)  w/o W-tag
-    doType2       = cms.untracked.int32(1),  #SL(4,1)
-    doType3       = cms.untracked.int32(1),  #SL(4,3)
-    doType4       = cms.untracked.int32(1),  #SL(3,2)
-    doType6       = cms.untracked.int32(1),  #DL(4,X)
-    doType7       = cms.untracked.int32(1),  #DL(3M+1L,X)
+    doTypeBTag6   = cms.untracked.int32(0),  #SL 6 jets
+    doTypeBTag5   = cms.untracked.int32(0),  #SL 5 jets
+    doTypeBTag4   = cms.untracked.int32(0),  #DL 4 jets
+    doType0       = cms.untracked.int32(0),  #SL(4,2)  w/  W-tag
+    doType1       = cms.untracked.int32(0),  #SL(4,2)  w/o W-tag
+    doType2       = cms.untracked.int32(0),  #SL(4,1)
+    doType3       = cms.untracked.int32(0),  #SL(4,3)
+    doType4       = cms.untracked.int32(0),  #SL(3,2)
+    doType6       = cms.untracked.int32(0),  #DL(4,X)
+    doType7       = cms.untracked.int32(0),  #DL(3M+1L,X)
     doType0ByBTagShape = cms.untracked.int32(1),
-    doType1ByBTagShape = cms.untracked.int32(1),
-    doType2ByBTagShape = cms.untracked.int32(1),
-    doType3ByBTagShape = cms.untracked.int32(1),
-    doType6ByBTagShape = cms.untracked.int32(1),
+    doType1ByBTagShape = cms.untracked.int32(0),
+    doType2ByBTagShape = cms.untracked.int32(0),
+    doType3ByBTagShape = cms.untracked.int32(0),
+    doType6ByBTagShape = cms.untracked.int32(0),
 
     # MEIntegrator options
     useME         = cms.untracked.int32(1),
@@ -169,7 +170,7 @@ process.fwliteInput = cms.PSet(
     pathTo_f_Vtype3_tr   = cms.string("root/SingleEle.TrigEff.wp80.2012ABCD.root"),
 
     # print out the integral at run-time
-    printout     = cms.untracked.int32(0),
+    printout     = cms.untracked.int32(1),
 
     # various degrees of verbosity
     debug        = cms.untracked.int32(0),
@@ -216,10 +217,10 @@ process.fwliteInput = cms.PSet(
 
     # if 1, process evLimits[1]-evLimits[0] events passing the selection cuts
     # if 0, process all events in the tree from evLimits[0] to evLimits[1]
-    fixNumEvJob    = cms.untracked.int32(0),
+    fixNumEvJob    = cms.untracked.int32(1),
 
     # event limits
-    evLimits       = cms.vint32(0, -1),
+    evLimits       = cms.vint32(0, 1),
 
     # do systematic shifts (dummy)
     doJERbias  = cms.untracked.int32(0),
