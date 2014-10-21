@@ -1,20 +1,156 @@
-From b379df82780fe1c9384d95016fb6b72559e0b19c Mon Sep 17 00:00:00 2001
-From: Joosep Pata <joosep.pata@cern.ch>
-Date: Tue, 14 Oct 2014 14:47:20 +0300
-Subject: [PATCH 1/2] merged HepTopTagger
+From 8cb31b5587b7e73780d58976a8d174c01330cf44 Mon Sep 17 00:00:00 2001
+From: Gregor Kasieczka <g.kasieczka@gmail.com>
+Date: Wed, 17 Sep 2014 16:20:58 +0200
+Subject: [PATCH 01/10] Changed HTTWrapper to work with newer tagger version
 
+Added new devel version of HTT. Corresponds to aca15e
+
+Added first version of HTTJetTagInfo to DataFormats
+
+Added HTTTopJetProperties to classes_4.h
+
+Removed accidentally created HTTJetTagInfo.h
+
+Add a few more HTT versions of producers/helpers
+
+Add HTTTopJetProducer (copy of CATopJetProducer)
+
+More HTT interfacing
+
+seems to work now..
+
+Started cleaning up a bit
+
+a bit more tidy up
+
+Started filling all the properties, removed useless Helper
+
+full chain for pruned mass
+
+Added top mass
+
+Added unfiltered mass
+
+Added fW (not yet implemented in HTT itself)
+
+Added mass_ratio_passed
+
+Added more config options to HTT, removed HTT from CATopJetTagger
+
+Moved HTTProducer from untracked to tracked config parameters
+
+Cleaned up comments in Wrapper a bit
+
+Updated HTT to 4779fe4601060cfb5825836bfafea0e37c507983
+
+Small changes to wrapper
+
+HTT now has working sj pT cut. a92f9f67973387cc4b2497b101873d793e67a79a
+
+Updated mode handling: e1f51f128be23b1aaa1d714df0d766fd1897191c
+
+Added fW (849a93b565d310fd8403c24c683ef693e74ac8b8)
 ---
+ DataFormats/JetReco/interface/HTTTopJetTagInfo.h   |  73 +++
  DataFormats/JetReco/src/classes_4.h                |  15 +-
  DataFormats/JetReco/src/classes_def_4.xml          |  17 +
  RecoJets/JetAlgorithms/interface/HEPTopTagger.h    | 527 ++++++---------------
  .../JetAlgorithms/interface/HEPTopTaggerWrapper.h  | 185 +++++---
+ RecoJets/JetAlgorithms/src/HEPTopTagger.cc         | 350 ++++++++++++++
  RecoJets/JetAlgorithms/src/HEPTopTaggerWrapper.cc  |  71 +--
  RecoJets/JetProducers/plugins/CATopJetProducer.cc  |  12 +-
  RecoJets/JetProducers/plugins/CATopJetProducer.h   |   2 -
+ .../JetProducers/plugins/FastjetJetProducer.cc     |   4 +
+ RecoJets/JetProducers/plugins/HTTTopJetProducer.cc | 184 +++++++
+ RecoJets/JetProducers/plugins/HTTTopJetProducer.h  | 131 +++++
  .../JetProducers/plugins/VirtualJetProducer.cc     |  13 +-
  RecoJets/JetProducers/plugins/VirtualJetProducer.h |  10 +-
- 9 files changed, 348 insertions(+), 504 deletions(-)
+ .../JetProducers/python/CATopJetParameters_cfi.py  |   2 +-
+ 15 files changed, 1091 insertions(+), 505 deletions(-)
+ create mode 100644 DataFormats/JetReco/interface/HTTTopJetTagInfo.h
+ create mode 100644 RecoJets/JetAlgorithms/src/HEPTopTagger.cc
+ create mode 100644 RecoJets/JetProducers/plugins/HTTTopJetProducer.cc
+ create mode 100644 RecoJets/JetProducers/plugins/HTTTopJetProducer.h
 
+diff --git a/DataFormats/JetReco/interface/HTTTopJetTagInfo.h b/DataFormats/JetReco/interface/HTTTopJetTagInfo.h
+new file mode 100644
+index 0000000..98f133e
+--- /dev/null
++++ b/DataFormats/JetReco/interface/HTTTopJetTagInfo.h
+@@ -0,0 +1,73 @@
++#ifndef AnalysisDataFormats_TopObjects_interface_HTTTopJetTagInfo_h
++#define AnalysisDataFormats_TopObjects_interface_HTTTopJetTagInfo_h
++
++
++// \class HTTTopJetTagInfo
++// 
++// \short specific tag info for HEPTopTagger tagging algorithm
++// HTTTopJetTagInfo is a class to hold the discriminator variables for the
++// HEPTopTagger algorithm.
++// 
++//
++// \author Gregor Kasieczka (based on  CATopJetTagInfo by Salvatore Rappoccio)
++// \version first version on 25 Sep 2014
++
++#include "DataFormats/BTauReco/interface/RefMacros.h"
++#include "DataFormats/BTauReco/interface/JetTagInfo.h"
++#include "DataFormats/BTauReco/interface/TaggingVariable.h"
++#include <vector>
++
++namespace reco {
++ 
++class HTTTopJetProperties {
++public:
++  HTTTopJetProperties() {
++    topMass          = 0.;
++    unfilteredMass   = 0.;
++    prunedMass	     = 0.;
++    fW		     = 0.;
++    massRatioPassed  = 0.;
++    isMultiR	     = 0;
++    Rmin	     = 0.;
++    RminExpected     = 0.;
++  }
++  double              topMass;         //<! Mass of the HTT top quark candidate [GeV] (at R=Rmin for MultiR)
++  double              unfilteredMass;  //<! Unfiltered mass of the triplet [GeV] (at R=Rmin for MultiR)
++  double              prunedMass;      //<! Mass of the pruned fat jet [GeV] (at R=Rmin for MultiR)
++  double              fW;              //<! Minimum distance of m_ij/m_123 from m_W/m_top (at R=Rmin for MultiR)
++  double              massRatioPassed; //<! Did the candidate pass the default mass ratio? Can be used instead of fW (at R=Rmin for MultiR)
++  bool                isMultiR;        //<! Tagger operated in MultiR mode
++  double              Rmin;            //<! R_min found in MultiR procedure. Set to -1 for non-MultiR mode.
++  double              RminExpected;    //<! R_min expected for a top quark based on filtered fat-jet pT. Set to -1 for non-MultiR mode.
++};
++
++ class HTTTopJetTagInfo : public JetTagInfo {
++public:
++  typedef edm::RefToBase<Jet> jet_type;
++  typedef HTTTopJetProperties  properties_type;
++    
++    HTTTopJetTagInfo(void) {}
++
++    virtual ~HTTTopJetTagInfo(void) {}
++  
++    virtual HTTTopJetTagInfo* clone(void) const { return new HTTTopJetTagInfo(*this); }
++    
++    const properties_type & properties() const {
++      return properties_;
++    }
++
++    void insert(const edm::RefToBase<Jet> & jet, const HTTTopJetProperties & properties) {
++      setJetRef(jet);
++      properties_ = properties;
++    }
++
++protected:
++    properties_type properties_;
++
++};
++
++DECLARE_EDM_REFS( HTTTopJetTagInfo )
++
++}
++
++#endif // AnalysisDataFormats_TopObjects_interface_HTTTopJetTagInfo_h
 diff --git a/DataFormats/JetReco/src/classes_4.h b/DataFormats/JetReco/src/classes_4.h
 index 1de6d02..9567f13 100644
 --- a/DataFormats/JetReco/src/classes_4.h
@@ -852,354 +988,6 @@ index 858fe63..0238882 100644
    return oss.str();
  }
  
-diff --git a/RecoJets/JetAlgorithms/src/HEPTopTaggerWrapper.cc b/RecoJets/JetAlgorithms/src/HEPTopTaggerWrapper.cc
-index 2d670fa..0c4823c 100644
---- a/RecoJets/JetAlgorithms/src/HEPTopTaggerWrapper.cc
-+++ b/RecoJets/JetAlgorithms/src/HEPTopTaggerWrapper.cc
-@@ -22,15 +22,17 @@
- #include <fastjet/Error.hh>
- #include <fastjet/JetDefinition.hh>
- #include <fastjet/ClusterSequence.hh>
-+#include "fastjet/PseudoJet.hh"
-+#include "fastjet/tools/Pruner.hh"
-+#include "fastjet/tools/Filter.hh"
- 
-+#include <math.h>
- #include <limits>
- #include <cassert>
- using namespace std;
- 
--// namespace hack so that this tagger can have the same name as the core code
--namespace external {
- #include "RecoJets/JetAlgorithms/interface/HEPTopTagger.h"
--}
-+
- 
- FASTJET_BEGIN_NAMESPACE
- 
-@@ -38,6 +40,7 @@ FASTJET_BEGIN_NAMESPACE
- // returns the tagged PseudoJet if successful, 0 otherwise
- //  - jet   the PseudoJet to tag
- PseudoJet HEPTopTagger::result(const PseudoJet & jet) const{
-+
-   // make sure that there is a "regular" cluster sequence associated
-   // with the jet. Note that we also check it is valid (to avoid a
-   // more criptic error later on)
-@@ -45,18 +48,37 @@ PseudoJet HEPTopTagger::result(const PseudoJet & jet) const{
-     throw Error("HEPTopTagger can only be applied on jets having an associated (and valid) ClusterSequence");
-   }
- 
--  external::HEPTopTagger tagger(*jet.associated_cluster_sequence(), jet);
--  tagger.set_top_range(0.0, 10000.0); // don't do top mass cut; this can be applied later
--  tagger.set_mass_drop_threshold(_mass_drop_threshold);
--  tagger.set_max_subjet_mass(_max_subjet_mass);
-+  external::HEPTopTagger tagger(jet);
- 
--  tagger.run_tagger();
-+  // translate the massRatioWidth (which should be the half-width given in %) 
-+  // to values useful for the A-shape cuts
-+  double mw_over_mt = 80.4/172.3;
-+  double ratio_min = mw_over_mt * (100.-massRatioWidth_)/100.;
-+  double ratio_max = mw_over_mt * (100.+massRatioWidth_)/100.;
-+ 
-   
--  // check that we passed the tagger; if not return a blank PseudoJet
--  if (_use_subjet_mass_cuts) {
--    if (!tagger.is_masscut_passed()) // encompasses is_maybe_top() plus subjet mass cuts
--      return PseudoJet();
--  } else if (!tagger.is_maybe_top())
-+  // Unclustering, Filtering & Subjet Settings
-+  tagger.set_max_subjet_mass(subjetMass_);
-+  tagger.set_mass_drop_threshold(muCut_);
-+  tagger.set_minpt_subjet(minSubjetPt_); 
-+
-+  // How to select among candidates
-+  tagger.set_mode(mode_);
-+  
-+  // Requirements to accept a candidate
-+  tagger.set_minpt_tag(minCandPt_); 
-+  tagger.set_top_range(minCandMass_, maxCandMass_); 
-+  tagger.set_mass_ratio_cut(minM23Cut_, minM13Cut_, maxM13Cut_);
-+  tagger.set_mass_ratio_range(ratio_min, ratio_max);
-+
-+  tagger.run_tagger();
-+
-+  // Requires:
-+  //   - top mass window
-+  //   - mass ratio cuts
-+  //   - minimal candidate pT
-+  // If this is not intended: use loose top mass and ratio windows
-+  if (!tagger.is_tagged())
-     return PseudoJet();
-   
-   // create the result and its structure
-@@ -71,24 +93,17 @@ PseudoJet HEPTopTagger::result(const PseudoJet & jet) const{
-   PseudoJet W2 = subjets[2];
-   PseudoJet W = join(subjets[1], subjets[2], *rec);
- 
--
-   PseudoJet result = join<HEPTopTaggerStructure>( W1, W2, non_W, *rec);
--  //HEPTopTaggerStructure *s = (HEPTopTaggerStructure*) result.structure_non_const_ptr();
--//  s->_cos_theta_w = _cos_theta_W(result);
--
--  // Check selectors to see if identified top, W pass and cuts
--  //
--  // Note that we could perhaps ensure this cut before constructing
--  // the result structure but this has the advantage that the top
--  // 4-vector is already available and does not have to de re-computed
--  if (! _top_selector.pass(result) || ! _W_selector.pass(W)) {
--    result *= 0.0;
--  }
-+  HEPTopTaggerStructure *s = (HEPTopTaggerStructure*) result.structure_non_const_ptr();
-+
-+  s->_top_mass = tagger.t().m();
-+  s->_pruned_mass = tagger.pruned_mass();
-+  s->_unfiltered_mass = tagger.unfiltered_mass();
-+  s->_fW = tagger.fW();
-+  s->_mass_ratio_passed = tagger.is_masscut_passed();
- 
-+  // Removed selectors as all cuts are applied ion HTT
-   return result;
- }
- 
--
--
--
- FASTJET_END_NAMESPACE
-diff --git a/RecoJets/JetProducers/plugins/CATopJetProducer.cc b/RecoJets/JetProducers/plugins/CATopJetProducer.cc
-index f16b065..d81d7b4 100644
---- a/RecoJets/JetProducers/plugins/CATopJetProducer.cc
-+++ b/RecoJets/JetProducers/plugins/CATopJetProducer.cc
-@@ -45,15 +45,7 @@ CATopJetProducer::CATopJetProducer(edm::ParameterSet const& conf):
- 						  conf.getParameter<double> ("rFrac"),
- 						  conf.getParameter<double> ("adjacencyParam"))
- 		);
--	}
--	else if (tagAlgo_ == FJ_HEP_TOPTAG ) {
--		fjHEPTopTagger_ = std::auto_ptr<fastjet::HEPTopTagger>(
--			new fastjet::HEPTopTagger(conf.getParameter<double>("muCut"),
--						  conf.getParameter<double>("maxSubjetMass"),
--						  conf.getParameter<bool>("useSubjetMass")
--						  )
--		);
--	}
-+	}	
- 	else if (tagAlgo_ == FJ_JHU_TOPTAG ) {
- 		fjJHUTopTagger_ = std::auto_ptr<fastjet::JHTopTagger>(
- 			new fastjet::JHTopTagger(conf.getParameter<double>("ptFrac"),
-@@ -116,7 +108,6 @@ void CATopJetProducer::runAlgorithm( edm::Event& iEvent, const edm::EventSetup&
- 	}
- 
- 	fastjet::CMSTopTagger & CMSTagger = *fjCMSTopTagger_;
--	fastjet::HEPTopTagger & HEPTagger = *fjHEPTopTagger_;
- 	fastjet::JHTopTagger & JHUTagger = *fjJHUTopTagger_;
- 	fastjet::RestFrameNSubjettinessTagger & NSUBTagger = *fjNSUBTagger_;
- 
-@@ -129,7 +120,6 @@ void CATopJetProducer::runAlgorithm( edm::Event& iEvent, const edm::EventSetup&
- 
- 		fastjet::PseudoJet taggedJet;
- 		if (tagAlgo_ == FJ_CMS_TOPTAG) taggedJet = CMSTagger.result(*jetIt);
--		else if (tagAlgo_ == FJ_HEP_TOPTAG) taggedJet = HEPTagger.result(*jetIt);
- 		else if (tagAlgo_ == FJ_JHU_TOPTAG) taggedJet = JHUTagger.result(*jetIt);
- 		else if (tagAlgo_ == FJ_NSUB_TAG) taggedJet = NSUBTagger.result(*jetIt);
- 		else cout << "NOT A VALID TAGGING ALGORITHM CHOICE!" << endl;
-diff --git a/RecoJets/JetProducers/plugins/CATopJetProducer.h b/RecoJets/JetProducers/plugins/CATopJetProducer.h
-index 0d09c30..e942edf 100644
---- a/RecoJets/JetProducers/plugins/CATopJetProducer.h
-+++ b/RecoJets/JetProducers/plugins/CATopJetProducer.h
-@@ -65,7 +65,6 @@
- #include "RecoJets/JetAlgorithms/interface/CATopJetAlgorithm.h"
- #include "CATopJetProducer.h"
- #include "RecoJets/JetAlgorithms/interface/CMSTopTagger.h"
--#include "RecoJets/JetAlgorithms/interface/HEPTopTaggerWrapper.h"
- 
- #include <fastjet/tools/RestFrameNSubjettinessTagger.hh>
- #include "fastjet/SISConePlugin.hh"
-@@ -88,7 +87,6 @@ namespace cms
-   private:
-     std::auto_ptr<CATopJetAlgorithm>        legacyCMSTopTagger_;         /// The algorithm to do the work
-     std::auto_ptr<fastjet::CMSTopTagger>     fjCMSTopTagger_;    // The FastJet implementation of the CMS tagger
--    std::auto_ptr<fastjet::HEPTopTagger>     fjHEPTopTagger_;
-     std::auto_ptr<fastjet::JHTopTagger>     fjJHUTopTagger_;
-     std::auto_ptr<fastjet::RestFrameNSubjettinessTagger>   fjNSUBTagger_;
- 
-diff --git a/RecoJets/JetProducers/plugins/VirtualJetProducer.cc b/RecoJets/JetProducers/plugins/VirtualJetProducer.cc
-index 5cd8867..14a03e5 100644
---- a/RecoJets/JetProducers/plugins/VirtualJetProducer.cc
-+++ b/RecoJets/JetProducers/plugins/VirtualJetProducer.cc
-@@ -11,6 +11,10 @@
- #include "RecoJets/JetProducers/interface/BackgroundEstimator.h"
- #include "RecoJets/JetProducers/interface/VirtualJetProducerHelper.h"
- 
-+#include "DataFormats/Common/interface/RefProd.h"
-+#include "DataFormats/Common/interface/Ref.h"
-+#include "DataFormats/Common/interface/RefVector.h"
-+
- #include "FWCore/Framework/interface/Event.h"
- #include "FWCore/Framework/interface/EventSetup.h"
- #include "FWCore/Framework/interface/ESHandle.h"
-@@ -136,6 +140,7 @@ VirtualJetProducer::VirtualJetProducer(const edm::ParameterSet& iConfig)
-   , jetCollInstanceName_ ("")
-   , writeCompound_ ( false )
-   , verbosity_(0)
-+  , fromHTTTopJetProducer_(0)
- {
-   anomalousTowerDef_ = std::auto_ptr<AnomalousTower>(new AnomalousTower(iConfig));
- 
-@@ -832,5 +837,11 @@ void VirtualJetProducer::writeCompoundJets(  edm::Event & iEvent, edm::EventSetu
-   }
- 
-   // put hard jets into event record
--  iEvent.put( jetCollection);
-+  // Store the Orphan handle for adding HTT information
-+  edm::OrphanHandle<reco::BasicJetCollection>  oh = iEvent.put( jetCollection);
-+
-+  if (fromHTTTopJetProducer_){
-+    addHTTTopJetTagInfoCollection( iEvent, iSetup, oh);
-+  }
-+
- }
-diff --git a/RecoJets/JetProducers/plugins/VirtualJetProducer.h b/RecoJets/JetProducers/plugins/VirtualJetProducer.h
-index 0307d6f..4c05f3f 100644
---- a/RecoJets/JetProducers/plugins/VirtualJetProducer.h
-+++ b/RecoJets/JetProducers/plugins/VirtualJetProducer.h
-@@ -11,6 +11,7 @@
- #include "DataFormats/JetReco/interface/PFJet.h"
- #include "DataFormats/JetReco/interface/BasicJet.h"
- #include "DataFormats/JetReco/interface/GenJet.h"
-+#include "DataFormats/JetReco/interface/BasicJetCollection.h"
- 
- #include "RecoJets/JetProducers/interface/PileUpSubtractor.h"
- #include "RecoJets/JetProducers/interface/AnomalousTower.h"
-@@ -117,6 +118,11 @@ protected:
-   // has no default. 
-   virtual void runAlgorithm( edm::Event& iEvent, const edm::EventSetup& iSetup) = 0;
- 
-+  // This will allow making the HTTTopJetTagInfoCollection
-+  virtual void addHTTTopJetTagInfoCollection( edm::Event& iEvent, 
-+					      const edm::EventSetup& iSetup,
-+					      edm::OrphanHandle<reco::BasicJetCollection> & oh){};
-+ 
-   // Do the offset correction. 
-   // Only runs if "doPUOffsetCorrection_" is true.  
-   void offsetCorrectJets(std::vector<fastjet::PseudoJet> & orphanInput);
-@@ -174,7 +180,6 @@ protected:
-   bool                  doPUOffsetCorr_;            // add the pileup calculation from offset correction? 
-   std::string           puSubtractorName_;
- 
--
-   std::vector<edm::Ptr<reco::Candidate> > inputs_;  // input candidates [View, PtrVector and CandCollection have limitations]
-   reco::Particle::Point           vertex_;          // Primary vertex 
-   ClusterSequencePtr              fjClusterSeq_;    // fastjet cluster sequence
-@@ -199,6 +204,9 @@ protected:
-   unsigned int                    minSeed_;              // minimum seed to use, useful for MC generation
- 
-   int                   verbosity_;                 // flag to enable/disable debug output
-+  bool                  fromHTTTopJetProducer_;   // for running the v2.0 HEPTopTagger
-+
-+
- 
- private:
-   std::auto_ptr<AnomalousTower>   anomalousTowerDef_;  // anomalous tower definition
--- 
-1.8.3.1
-
-
-From 7881a263b848789f6e4d0d18181e3cabb9d4a562 Mon Sep 17 00:00:00 2001
-From: Joosep Pata <joosep.pata@cern.ch>
-Date: Fri, 17 Oct 2014 14:12:02 +0300
-Subject: [PATCH 2/2] added missing files
-
----
- DataFormats/JetReco/interface/HTTTopJetTagInfo.h   |  73 +++++
- RecoJets/JetAlgorithms/src/HEPTopTagger.cc         | 350 +++++++++++++++++++++
- RecoJets/JetProducers/plugins/HTTTopJetProducer.cc | 184 +++++++++++
- RecoJets/JetProducers/plugins/HTTTopJetProducer.h  | 131 ++++++++
- 4 files changed, 738 insertions(+)
- create mode 100644 DataFormats/JetReco/interface/HTTTopJetTagInfo.h
- create mode 100644 RecoJets/JetAlgorithms/src/HEPTopTagger.cc
- create mode 100644 RecoJets/JetProducers/plugins/HTTTopJetProducer.cc
- create mode 100644 RecoJets/JetProducers/plugins/HTTTopJetProducer.h
-
-diff --git a/DataFormats/JetReco/interface/HTTTopJetTagInfo.h b/DataFormats/JetReco/interface/HTTTopJetTagInfo.h
-new file mode 100644
-index 0000000..98f133e
---- /dev/null
-+++ b/DataFormats/JetReco/interface/HTTTopJetTagInfo.h
-@@ -0,0 +1,73 @@
-+#ifndef AnalysisDataFormats_TopObjects_interface_HTTTopJetTagInfo_h
-+#define AnalysisDataFormats_TopObjects_interface_HTTTopJetTagInfo_h
-+
-+
-+// \class HTTTopJetTagInfo
-+// 
-+// \short specific tag info for HEPTopTagger tagging algorithm
-+// HTTTopJetTagInfo is a class to hold the discriminator variables for the
-+// HEPTopTagger algorithm.
-+// 
-+//
-+// \author Gregor Kasieczka (based on  CATopJetTagInfo by Salvatore Rappoccio)
-+// \version first version on 25 Sep 2014
-+
-+#include "DataFormats/BTauReco/interface/RefMacros.h"
-+#include "DataFormats/BTauReco/interface/JetTagInfo.h"
-+#include "DataFormats/BTauReco/interface/TaggingVariable.h"
-+#include <vector>
-+
-+namespace reco {
-+ 
-+class HTTTopJetProperties {
-+public:
-+  HTTTopJetProperties() {
-+    topMass          = 0.;
-+    unfilteredMass   = 0.;
-+    prunedMass	     = 0.;
-+    fW		     = 0.;
-+    massRatioPassed  = 0.;
-+    isMultiR	     = 0;
-+    Rmin	     = 0.;
-+    RminExpected     = 0.;
-+  }
-+  double              topMass;         //<! Mass of the HTT top quark candidate [GeV] (at R=Rmin for MultiR)
-+  double              unfilteredMass;  //<! Unfiltered mass of the triplet [GeV] (at R=Rmin for MultiR)
-+  double              prunedMass;      //<! Mass of the pruned fat jet [GeV] (at R=Rmin for MultiR)
-+  double              fW;              //<! Minimum distance of m_ij/m_123 from m_W/m_top (at R=Rmin for MultiR)
-+  double              massRatioPassed; //<! Did the candidate pass the default mass ratio? Can be used instead of fW (at R=Rmin for MultiR)
-+  bool                isMultiR;        //<! Tagger operated in MultiR mode
-+  double              Rmin;            //<! R_min found in MultiR procedure. Set to -1 for non-MultiR mode.
-+  double              RminExpected;    //<! R_min expected for a top quark based on filtered fat-jet pT. Set to -1 for non-MultiR mode.
-+};
-+
-+ class HTTTopJetTagInfo : public JetTagInfo {
-+public:
-+  typedef edm::RefToBase<Jet> jet_type;
-+  typedef HTTTopJetProperties  properties_type;
-+    
-+    HTTTopJetTagInfo(void) {}
-+
-+    virtual ~HTTTopJetTagInfo(void) {}
-+  
-+    virtual HTTTopJetTagInfo* clone(void) const { return new HTTTopJetTagInfo(*this); }
-+    
-+    const properties_type & properties() const {
-+      return properties_;
-+    }
-+
-+    void insert(const edm::RefToBase<Jet> & jet, const HTTTopJetProperties & properties) {
-+      setJetRef(jet);
-+      properties_ = properties;
-+    }
-+
-+protected:
-+    properties_type properties_;
-+
-+};
-+
-+DECLARE_EDM_REFS( HTTTopJetTagInfo )
-+
-+}
-+
-+#endif // AnalysisDataFormats_TopObjects_interface_HTTTopJetTagInfo_h
 diff --git a/RecoJets/JetAlgorithms/src/HEPTopTagger.cc b/RecoJets/JetAlgorithms/src/HEPTopTagger.cc
 new file mode 100644
 index 0000000..2c230bc
@@ -1556,9 +1344,195 @@ index 0000000..2c230bc
 +}
 +// Do not change next line, it's needed by the sed-code that makes the tagger CMSSW-compatible.
 +};
+diff --git a/RecoJets/JetAlgorithms/src/HEPTopTaggerWrapper.cc b/RecoJets/JetAlgorithms/src/HEPTopTaggerWrapper.cc
+index 2d670fa..0c4823c 100644
+--- a/RecoJets/JetAlgorithms/src/HEPTopTaggerWrapper.cc
++++ b/RecoJets/JetAlgorithms/src/HEPTopTaggerWrapper.cc
+@@ -22,15 +22,17 @@
+ #include <fastjet/Error.hh>
+ #include <fastjet/JetDefinition.hh>
+ #include <fastjet/ClusterSequence.hh>
++#include "fastjet/PseudoJet.hh"
++#include "fastjet/tools/Pruner.hh"
++#include "fastjet/tools/Filter.hh"
+ 
++#include <math.h>
+ #include <limits>
+ #include <cassert>
+ using namespace std;
+ 
+-// namespace hack so that this tagger can have the same name as the core code
+-namespace external {
+ #include "RecoJets/JetAlgorithms/interface/HEPTopTagger.h"
+-}
++
+ 
+ FASTJET_BEGIN_NAMESPACE
+ 
+@@ -38,6 +40,7 @@ FASTJET_BEGIN_NAMESPACE
+ // returns the tagged PseudoJet if successful, 0 otherwise
+ //  - jet   the PseudoJet to tag
+ PseudoJet HEPTopTagger::result(const PseudoJet & jet) const{
++
+   // make sure that there is a "regular" cluster sequence associated
+   // with the jet. Note that we also check it is valid (to avoid a
+   // more criptic error later on)
+@@ -45,18 +48,37 @@ PseudoJet HEPTopTagger::result(const PseudoJet & jet) const{
+     throw Error("HEPTopTagger can only be applied on jets having an associated (and valid) ClusterSequence");
+   }
+ 
+-  external::HEPTopTagger tagger(*jet.associated_cluster_sequence(), jet);
+-  tagger.set_top_range(0.0, 10000.0); // don't do top mass cut; this can be applied later
+-  tagger.set_mass_drop_threshold(_mass_drop_threshold);
+-  tagger.set_max_subjet_mass(_max_subjet_mass);
++  external::HEPTopTagger tagger(jet);
+ 
+-  tagger.run_tagger();
++  // translate the massRatioWidth (which should be the half-width given in %) 
++  // to values useful for the A-shape cuts
++  double mw_over_mt = 80.4/172.3;
++  double ratio_min = mw_over_mt * (100.-massRatioWidth_)/100.;
++  double ratio_max = mw_over_mt * (100.+massRatioWidth_)/100.;
++ 
+   
+-  // check that we passed the tagger; if not return a blank PseudoJet
+-  if (_use_subjet_mass_cuts) {
+-    if (!tagger.is_masscut_passed()) // encompasses is_maybe_top() plus subjet mass cuts
+-      return PseudoJet();
+-  } else if (!tagger.is_maybe_top())
++  // Unclustering, Filtering & Subjet Settings
++  tagger.set_max_subjet_mass(subjetMass_);
++  tagger.set_mass_drop_threshold(muCut_);
++  tagger.set_minpt_subjet(minSubjetPt_); 
++
++  // How to select among candidates
++  tagger.set_mode(mode_);
++  
++  // Requirements to accept a candidate
++  tagger.set_minpt_tag(minCandPt_); 
++  tagger.set_top_range(minCandMass_, maxCandMass_); 
++  tagger.set_mass_ratio_cut(minM23Cut_, minM13Cut_, maxM13Cut_);
++  tagger.set_mass_ratio_range(ratio_min, ratio_max);
++
++  tagger.run_tagger();
++
++  // Requires:
++  //   - top mass window
++  //   - mass ratio cuts
++  //   - minimal candidate pT
++  // If this is not intended: use loose top mass and ratio windows
++  if (!tagger.is_tagged())
+     return PseudoJet();
+   
+   // create the result and its structure
+@@ -71,24 +93,17 @@ PseudoJet HEPTopTagger::result(const PseudoJet & jet) const{
+   PseudoJet W2 = subjets[2];
+   PseudoJet W = join(subjets[1], subjets[2], *rec);
+ 
+-
+   PseudoJet result = join<HEPTopTaggerStructure>( W1, W2, non_W, *rec);
+-  //HEPTopTaggerStructure *s = (HEPTopTaggerStructure*) result.structure_non_const_ptr();
+-//  s->_cos_theta_w = _cos_theta_W(result);
+-
+-  // Check selectors to see if identified top, W pass and cuts
+-  //
+-  // Note that we could perhaps ensure this cut before constructing
+-  // the result structure but this has the advantage that the top
+-  // 4-vector is already available and does not have to de re-computed
+-  if (! _top_selector.pass(result) || ! _W_selector.pass(W)) {
+-    result *= 0.0;
+-  }
++  HEPTopTaggerStructure *s = (HEPTopTaggerStructure*) result.structure_non_const_ptr();
++
++  s->_top_mass = tagger.t().m();
++  s->_pruned_mass = tagger.pruned_mass();
++  s->_unfiltered_mass = tagger.unfiltered_mass();
++  s->_fW = tagger.fW();
++  s->_mass_ratio_passed = tagger.is_masscut_passed();
+ 
++  // Removed selectors as all cuts are applied ion HTT
+   return result;
+ }
+ 
+-
+-
+-
+ FASTJET_END_NAMESPACE
+diff --git a/RecoJets/JetProducers/plugins/CATopJetProducer.cc b/RecoJets/JetProducers/plugins/CATopJetProducer.cc
+index f16b065..d81d7b4 100644
+--- a/RecoJets/JetProducers/plugins/CATopJetProducer.cc
++++ b/RecoJets/JetProducers/plugins/CATopJetProducer.cc
+@@ -45,15 +45,7 @@ CATopJetProducer::CATopJetProducer(edm::ParameterSet const& conf):
+ 						  conf.getParameter<double> ("rFrac"),
+ 						  conf.getParameter<double> ("adjacencyParam"))
+ 		);
+-	}
+-	else if (tagAlgo_ == FJ_HEP_TOPTAG ) {
+-		fjHEPTopTagger_ = std::auto_ptr<fastjet::HEPTopTagger>(
+-			new fastjet::HEPTopTagger(conf.getParameter<double>("muCut"),
+-						  conf.getParameter<double>("maxSubjetMass"),
+-						  conf.getParameter<bool>("useSubjetMass")
+-						  )
+-		);
+-	}
++	}	
+ 	else if (tagAlgo_ == FJ_JHU_TOPTAG ) {
+ 		fjJHUTopTagger_ = std::auto_ptr<fastjet::JHTopTagger>(
+ 			new fastjet::JHTopTagger(conf.getParameter<double>("ptFrac"),
+@@ -116,7 +108,6 @@ void CATopJetProducer::runAlgorithm( edm::Event& iEvent, const edm::EventSetup&
+ 	}
+ 
+ 	fastjet::CMSTopTagger & CMSTagger = *fjCMSTopTagger_;
+-	fastjet::HEPTopTagger & HEPTagger = *fjHEPTopTagger_;
+ 	fastjet::JHTopTagger & JHUTagger = *fjJHUTopTagger_;
+ 	fastjet::RestFrameNSubjettinessTagger & NSUBTagger = *fjNSUBTagger_;
+ 
+@@ -129,7 +120,6 @@ void CATopJetProducer::runAlgorithm( edm::Event& iEvent, const edm::EventSetup&
+ 
+ 		fastjet::PseudoJet taggedJet;
+ 		if (tagAlgo_ == FJ_CMS_TOPTAG) taggedJet = CMSTagger.result(*jetIt);
+-		else if (tagAlgo_ == FJ_HEP_TOPTAG) taggedJet = HEPTagger.result(*jetIt);
+ 		else if (tagAlgo_ == FJ_JHU_TOPTAG) taggedJet = JHUTagger.result(*jetIt);
+ 		else if (tagAlgo_ == FJ_NSUB_TAG) taggedJet = NSUBTagger.result(*jetIt);
+ 		else cout << "NOT A VALID TAGGING ALGORITHM CHOICE!" << endl;
+diff --git a/RecoJets/JetProducers/plugins/CATopJetProducer.h b/RecoJets/JetProducers/plugins/CATopJetProducer.h
+index 0d09c30..e942edf 100644
+--- a/RecoJets/JetProducers/plugins/CATopJetProducer.h
++++ b/RecoJets/JetProducers/plugins/CATopJetProducer.h
+@@ -65,7 +65,6 @@
+ #include "RecoJets/JetAlgorithms/interface/CATopJetAlgorithm.h"
+ #include "CATopJetProducer.h"
+ #include "RecoJets/JetAlgorithms/interface/CMSTopTagger.h"
+-#include "RecoJets/JetAlgorithms/interface/HEPTopTaggerWrapper.h"
+ 
+ #include <fastjet/tools/RestFrameNSubjettinessTagger.hh>
+ #include "fastjet/SISConePlugin.hh"
+@@ -88,7 +87,6 @@ namespace cms
+   private:
+     std::auto_ptr<CATopJetAlgorithm>        legacyCMSTopTagger_;         /// The algorithm to do the work
+     std::auto_ptr<fastjet::CMSTopTagger>     fjCMSTopTagger_;    // The FastJet implementation of the CMS tagger
+-    std::auto_ptr<fastjet::HEPTopTagger>     fjHEPTopTagger_;
+     std::auto_ptr<fastjet::JHTopTagger>     fjJHUTopTagger_;
+     std::auto_ptr<fastjet::RestFrameNSubjettinessTagger>   fjNSUBTagger_;
+ 
+diff --git a/RecoJets/JetProducers/plugins/FastjetJetProducer.cc b/RecoJets/JetProducers/plugins/FastjetJetProducer.cc
+index a2a23e7..6a1fd6b 100644
+--- a/RecoJets/JetProducers/plugins/FastjetJetProducer.cc
++++ b/RecoJets/JetProducers/plugins/FastjetJetProducer.cc
+@@ -122,6 +122,10 @@ FastjetJetProducer::FastjetJetProducer(const edm::ParameterSet& iConfig)
+     maxDepth_ = -1;
+     useExplicitGhosts_ = true;
+ 
++    if ( iConfig.exists("writeCompound") ) {
++      std::cout << "Write Compound = " << iConfig.getParameter<bool>("writeCompound") << std::endl;
++    }
++
+     if ( iConfig.exists("useMassDropTagger") ) {
+       useMassDropTagger_ = iConfig.getParameter<bool>("useMassDropTagger");
+       muCut_ = iConfig.getParameter<double>("muCut");
 diff --git a/RecoJets/JetProducers/plugins/HTTTopJetProducer.cc b/RecoJets/JetProducers/plugins/HTTTopJetProducer.cc
 new file mode 100644
-index 0000000..430ab2e
+index 0000000..9100894
 --- /dev/null
 +++ b/RecoJets/JetProducers/plugins/HTTTopJetProducer.cc
 @@ -0,0 +1,184 @@
@@ -1583,7 +1557,7 @@ index 0000000..430ab2e
 +       mode_(0),
 +       minCandMass_(150.),
 +       maxCandMass_(200.),
-+       massRatioWidth_(15),
++       massRatioWidth_(0.15),
 +       minM23Cut_(0.35),
 +       minM13Cut_(0.2),
 +       maxM13Cut_(1.3),
@@ -1883,6 +1857,1703 @@ index 0000000..068157e
 +
 +
 +#endif
+diff --git a/RecoJets/JetProducers/plugins/VirtualJetProducer.cc b/RecoJets/JetProducers/plugins/VirtualJetProducer.cc
+index 7b242f1..c112d8b 100644
+--- a/RecoJets/JetProducers/plugins/VirtualJetProducer.cc
++++ b/RecoJets/JetProducers/plugins/VirtualJetProducer.cc
+@@ -10,6 +10,10 @@
+ #include "RecoJets/JetProducers/interface/BackgroundEstimator.h"
+ #include "RecoJets/JetProducers/interface/VirtualJetProducerHelper.h"
+ 
++#include "DataFormats/Common/interface/RefProd.h"
++#include "DataFormats/Common/interface/Ref.h"
++#include "DataFormats/Common/interface/RefVector.h"
++
+ #include "FWCore/Framework/interface/Event.h"
+ #include "FWCore/Framework/interface/EventSetup.h"
+ #include "FWCore/Framework/interface/ESHandle.h"
+@@ -135,6 +139,7 @@ VirtualJetProducer::VirtualJetProducer(const edm::ParameterSet& iConfig)
+   , jetCollInstanceName_ ("")
+   , writeCompound_ ( false )
+   , verbosity_(0)
++  , fromHTTTopJetProducer_(0)
+ {
+   anomalousTowerDef_ = std::auto_ptr<AnomalousTower>(new AnomalousTower(iConfig));
+ 
+@@ -836,5 +841,11 @@ void VirtualJetProducer::writeCompoundJets(  edm::Event & iEvent, edm::EventSetu
+   }
+ 
+   // put hard jets into event record
+-  iEvent.put( jetCollection);
++  // Store the Orphan handle for adding HTT information
++  edm::OrphanHandle<reco::BasicJetCollection>  oh = iEvent.put( jetCollection);
++
++  if (fromHTTTopJetProducer_){
++    addHTTTopJetTagInfoCollection( iEvent, iSetup, oh);
++  }
++
+ }
+diff --git a/RecoJets/JetProducers/plugins/VirtualJetProducer.h b/RecoJets/JetProducers/plugins/VirtualJetProducer.h
+index 8838f38..7214771 100644
+--- a/RecoJets/JetProducers/plugins/VirtualJetProducer.h
++++ b/RecoJets/JetProducers/plugins/VirtualJetProducer.h
+@@ -12,6 +12,7 @@
+ #include "DataFormats/JetReco/interface/PFJet.h"
+ #include "DataFormats/JetReco/interface/BasicJet.h"
+ #include "DataFormats/JetReco/interface/GenJet.h"
++#include "DataFormats/JetReco/interface/BasicJetCollection.h"
+ 
+ #include "RecoJets/JetProducers/interface/PileUpSubtractor.h"
+ #include "RecoJets/JetProducers/interface/AnomalousTower.h"
+@@ -118,6 +119,11 @@ protected:
+   // has no default. 
+   virtual void runAlgorithm( edm::Event& iEvent, const edm::EventSetup& iSetup) = 0;
+ 
++  // This will allow making the HTTTopJetTagInfoCollection
++  virtual void addHTTTopJetTagInfoCollection( edm::Event& iEvent, 
++					      const edm::EventSetup& iSetup,
++					      edm::OrphanHandle<reco::BasicJetCollection> & oh){};
++ 
+   // Do the offset correction. 
+   // Only runs if "doPUOffsetCorrection_" is true.  
+   void offsetCorrectJets(std::vector<fastjet::PseudoJet> & orphanInput);
+@@ -175,7 +181,6 @@ protected:
+   bool                  doPUOffsetCorr_;            // add the pileup calculation from offset correction? 
+   std::string           puSubtractorName_;
+ 
+-
+   std::vector<edm::Ptr<reco::Candidate> > inputs_;  // input candidates [View, PtrVector and CandCollection have limitations]
+   reco::Particle::Point           vertex_;          // Primary vertex 
+   ClusterSequencePtr              fjClusterSeq_;    // fastjet cluster sequence
+@@ -201,6 +206,9 @@ protected:
+ 
+   int                   verbosity_;                 // flag to enable/disable debug output
+ 
++  bool                  fromHTTTopJetProducer_;   // for running the v2.0 HEPTopTagger
++
++
+  private:
+ 
+   std::auto_ptr<AnomalousTower>   anomalousTowerDef_;  // anomalous tower definition
+diff --git a/RecoJets/JetProducers/python/CATopJetParameters_cfi.py b/RecoJets/JetProducers/python/CATopJetParameters_cfi.py
+index ad16881..0810de1 100644
+--- a/RecoJets/JetProducers/python/CATopJetParameters_cfi.py
++++ b/RecoJets/JetProducers/python/CATopJetParameters_cfi.py
+@@ -4,7 +4,7 @@ import FWCore.ParameterSet.Config as cms
+ # $Id
+ CATopJetParameters = cms.PSet(
+     jetCollInstanceName = cms.string("caTopSubJets"),	# subjet collection
+-    verbose = cms.bool(False),          
++    verbose = cms.bool(True),          
+     algorithm = cms.int32(1),               			# 0 = KT, 1 = CA, 2 = anti-KT
+     tagAlgo = cms.int32(0),				#choice of top tagging algorithm
+     useAdjacency = cms.int32(2),         				# veto adjacent subjets
+-- 
+1.8.3.1
+
+
+From 372f6aa003599d8264afc666b4253c123ab36a0d Mon Sep 17 00:00:00 2001
+From: Gregor Kasieczka <g.kasieczka@gmail.com>
+Date: Fri, 10 Oct 2014 14:10:20 +0200
+Subject: [PATCH 02/10] Changed default value for massRatioWidth in
+ HTTTopJetProducer.cc
+
+---
+ RecoJets/JetProducers/plugins/HTTTopJetProducer.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/RecoJets/JetProducers/plugins/HTTTopJetProducer.cc b/RecoJets/JetProducers/plugins/HTTTopJetProducer.cc
+index 9100894..430ab2e 100644
+--- a/RecoJets/JetProducers/plugins/HTTTopJetProducer.cc
++++ b/RecoJets/JetProducers/plugins/HTTTopJetProducer.cc
+@@ -19,7 +19,7 @@ HTTTopJetProducer::HTTTopJetProducer(edm::ParameterSet const& conf):
+        mode_(0),
+        minCandMass_(150.),
+        maxCandMass_(200.),
+-       massRatioWidth_(0.15),
++       massRatioWidth_(15),
+        minM23Cut_(0.35),
+        minM13Cut_(0.2),
+        maxM13Cut_(1.3),
+-- 
+1.8.3.1
+
+
+From 9daf0f0db784d2e7e566849265cf5ac32b51d348 Mon Sep 17 00:00:00 2001
+From: Gregor Kasieczka <g.kasieczka@gmail.com>
+Date: Fri, 10 Oct 2014 14:12:24 +0200
+Subject: [PATCH 03/10] Removed writeCompound debug statement in
+ FastjetJetProducer.cc
+
+---
+ RecoJets/JetProducers/plugins/FastjetJetProducer.cc | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/RecoJets/JetProducers/plugins/FastjetJetProducer.cc b/RecoJets/JetProducers/plugins/FastjetJetProducer.cc
+index 6a1fd6b..a2a23e7 100644
+--- a/RecoJets/JetProducers/plugins/FastjetJetProducer.cc
++++ b/RecoJets/JetProducers/plugins/FastjetJetProducer.cc
+@@ -122,10 +122,6 @@ FastjetJetProducer::FastjetJetProducer(const edm::ParameterSet& iConfig)
+     maxDepth_ = -1;
+     useExplicitGhosts_ = true;
+ 
+-    if ( iConfig.exists("writeCompound") ) {
+-      std::cout << "Write Compound = " << iConfig.getParameter<bool>("writeCompound") << std::endl;
+-    }
+-
+     if ( iConfig.exists("useMassDropTagger") ) {
+       useMassDropTagger_ = iConfig.getParameter<bool>("useMassDropTagger");
+       muCut_ = iConfig.getParameter<double>("muCut");
+-- 
+1.8.3.1
+
+
+From 452651e1650bfbf8b9a1a7fb65a29e14616c0a25 Mon Sep 17 00:00:00 2001
+From: Gregor Kasieczka <g.kasieczka@gmail.com>
+Date: Fri, 10 Oct 2014 14:13:10 +0200
+Subject: [PATCH 04/10] Set default verbosity in CATopJetParameters_cfi.py back
+ to false
+
+---
+ RecoJets/JetProducers/python/CATopJetParameters_cfi.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/RecoJets/JetProducers/python/CATopJetParameters_cfi.py b/RecoJets/JetProducers/python/CATopJetParameters_cfi.py
+index 0810de1..ad16881 100644
+--- a/RecoJets/JetProducers/python/CATopJetParameters_cfi.py
++++ b/RecoJets/JetProducers/python/CATopJetParameters_cfi.py
+@@ -4,7 +4,7 @@ import FWCore.ParameterSet.Config as cms
+ # $Id
+ CATopJetParameters = cms.PSet(
+     jetCollInstanceName = cms.string("caTopSubJets"),	# subjet collection
+-    verbose = cms.bool(True),          
++    verbose = cms.bool(False),          
+     algorithm = cms.int32(1),               			# 0 = KT, 1 = CA, 2 = anti-KT
+     tagAlgo = cms.int32(0),				#choice of top tagging algorithm
+     useAdjacency = cms.int32(2),         				# veto adjacent subjets
+-- 
+1.8.3.1
+
+
+From 68227e8fd2ca3126c813d0f0defa286a11aa4093 Mon Sep 17 00:00:00 2001
+From: Gregor Kasieczka <g.kasieczka@gmail.com>
+Date: Tue, 14 Oct 2014 16:38:59 +0200
+Subject: [PATCH 05/10] Started adding MultiR HTT
+
+---
+ .../JetAlgorithms/interface/MultiRHEPTopTagger.h   |  78 +++++++++++++
+ RecoJets/JetAlgorithms/src/MultiRHEPTopTagger.cc   | 126 +++++++++++++++++++++
+ 2 files changed, 204 insertions(+)
+ create mode 100644 RecoJets/JetAlgorithms/interface/MultiRHEPTopTagger.h
+ create mode 100644 RecoJets/JetAlgorithms/src/MultiRHEPTopTagger.cc
+
+diff --git a/RecoJets/JetAlgorithms/interface/MultiRHEPTopTagger.h b/RecoJets/JetAlgorithms/interface/MultiRHEPTopTagger.h
+new file mode 100644
+index 0000000..638705d
+--- /dev/null
++++ b/RecoJets/JetAlgorithms/interface/MultiRHEPTopTagger.h
+@@ -0,0 +1,78 @@
++//Adapted Version based on the work of Gregor.
++
++#ifndef __MULTIR_TOPTAGGER_HH__
++#define __MULTIR_TOPTAGGER_HH__
++
++#include <vector>
++#include <algorithm>  // for swap
++#include <math.h>
++#include "../interface/HEPTopTagger.h"
++
++using namespace std;
++using namespace fastjet;
++
++// Do not change next line, it's needed by the sed-code that makes the tagger CMSSW-compatible.
++namespace external {
++
++
++class MultiR_TopTagger {
++public:
++  MultiR_TopTagger(double max_fatjet_R,
++		   double min_fatjet_R,
++		   double step_R,
++		   double multiR_threshold,
++		   bool use_dR_max_triplet,
++		   fastjet::ClusterSequence & cs, 
++		   fastjet::PseudoJet & jet, 
++		   double mtmass, double mwmass
++		   );
++
++  ~MultiR_TopTagger();
++
++  //run tagger
++  void run_tagger();
++
++  const map<int,external::HEPTopTagger> & HTTagger() const {return _HEPTopTagger;}
++  external::HEPTopTagger HTTagger(int i)  {return _HEPTopTagger[i];}
++  
++  const map<int,int> & n_small_fatjets() const {return _n_small_fatjets;}
++  const double & Rmin() const {return _Rmin;}
++  const double & mass_Rmin() const {return _mass_Rmin;}
++  const double & pt_Rmin() const {return _pt_Rmin;}
++
++  void set_max_subjet_mass(double x) {_subjet_mass = x;}
++  void set_top_range(double top_range_min, double top_range_max) {_top_range[0] = top_range_min; _top_range[1] = top_range_max;}
++  void set_f_W(double f_W) {_f_W = f_W;}
++  void set_mass_ratio_cut(double mass_ratios_0, double mass_ratios_1, double mass_ratios_2) {_mass_ratios[0] = mass_ratios_0; _mass_ratios[1] = mass_ratios_1; _mass_ratios[2] = mass_ratios_2;}
++  void set_nfilt(unsigned nfilt) {_n_filt = nfilt;}
++  void set_Rfilt(double Rfilt) {_R_filt = Rfilt;}
++  void set_debug(bool debug) {_debug = debug;}
++ 
++
++private:
++  const ClusterSequence * _cs;
++  const PseudoJet *       _jet;
++  double _mtmass, _mwmass;
++  double _subjet_mass;
++  map<int,external::HEPTopTagger> _HEPTopTagger;
++  map<int,int> _n_small_fatjets;
++  double _Rmin, _mass_Rmin, _pt_Rmin;
++  double _mass_mean, _mass_width;
++  double _top_range[2];
++  unsigned _n_filt;
++  double _R_filt;
++  double _f_W;
++  double _mass_ratios[3];
++  double _max_fatjet_R, _min_fatjet_R, _step_R, _multiR_threshold;
++  bool _use_dR_max_triplet;
++  bool _debug;
++
++  void UnclusterFatjets(const vector<fastjet::PseudoJet> & big_fatjets, vector<fastjet::PseudoJet> & small_fatjets, const ClusterSequence & cs, const double small_radius);
++
++};
++//--------------------------------------------------------------------
++// Do not change next line, it's needed by the sed-code that makes the tagger CMSSW-compatible.
++};
++
++#endif // __MULTIR_TOPTAGGER_HH__
++
+diff --git a/RecoJets/JetAlgorithms/src/MultiRHEPTopTagger.cc b/RecoJets/JetAlgorithms/src/MultiRHEPTopTagger.cc
+new file mode 100644
+index 0000000..397abc6
+--- /dev/null
++++ b/RecoJets/JetAlgorithms/src/MultiRHEPTopTagger.cc
+@@ -0,0 +1,126 @@
++#include "../interface/MultiRHEPTopTagger.h"
++
++// Do not change next line, it's needed by the sed-code that makes the tagger CMSSW-compatible.
++namespace external {
++
++
++//uncluster a fat jet to subjets of given cone size
++void MultiR_TopTagger::UnclusterFatjets(const vector<fastjet::PseudoJet> & big_fatjets, 
++					vector<fastjet::PseudoJet> & small_fatjets, 
++					const ClusterSequence & cs, 
++					const double small_radius) {
++  for (unsigned i=0; i < big_fatjets.size(); i++) {
++    PseudoJet this_jet = big_fatjets[i];
++    PseudoJet parent1(0, 0, 0, 0), parent2(0, 0, 0, 0);
++    bool test = cs.has_parents(this_jet, parent1, parent2);
++    double dR = sqrt(parent1.squared_distance(parent2));
++
++    if (!test || dR<small_radius) {
++      small_fatjets.push_back(this_jet);
++    } else {
++      vector<fastjet::PseudoJet> parents;
++      parents.push_back(parent1);
++      parents.push_back(parent2);
++      UnclusterFatjets(parents, small_fatjets, cs, small_radius);
++    }
++  }
++}
++
++//////MultiR_TopTagger/////////////////////////
++//Start with a fatjet clustered with radius max_fatjet_R
++//Then run the HEPTopTagger for fatjets with smaller radii
++//Quantities stored as map<double,...> where the key is the fatjet radius
++
++MultiR_TopTagger::MultiR_TopTagger(double max_fatjet_R,
++				   double min_fatjet_R,
++				   double step_R,
++				   double multiR_threshold,
++				   bool use_dR_max_triplet,
++				   fastjet::ClusterSequence & cs, 
++				   fastjet::PseudoJet & jet, 
++				   double mtmass, double mwmass
++				   ) : _cs(&cs),  _jet(&jet),
++				       _mtmass(mtmass),	_mwmass(mwmass), _max_fatjet_R(max_fatjet_R), _min_fatjet_R(min_fatjet_R), _step_R(step_R), _multiR_threshold(multiR_threshold), _use_dR_max_triplet(use_dR_max_triplet), _debug(false)
++{}
++
++void MultiR_TopTagger::run_tagger() {
++  if (_debug) {
++    cout << "============================="  << endl 
++	 << "new MultiR" << endl;
++  }
++  
++  vector<fastjet::PseudoJet> big_fatjets;
++  vector<fastjet::PseudoJet> small_fatjets;
++  
++  big_fatjets.push_back(* _jet);
++  _Rmin = 0;
++  _mass_Rmin = 0.;
++  _pt_Rmin = 0.;
++
++  int maxR = int(_max_fatjet_R * 10);
++  int minR = int(_min_fatjet_R * 10);
++  int stepR = int(_step_R * 10);
++
++  for (int R = maxR; R >= minR; R -= stepR) {
++
++    // Deactivated this piece for now as dR_max_triplet is not used.
++    // Problem in lines below?
++    //  
++    //float dR_max_triplet = 9999;
++    //if (_use_dR_max_triplet) {
++    //  small_fatjets = big_fatjets;
++    //  dR_max_triplet = R / 10.;   
++    //} else {
++
++    UnclusterFatjets(big_fatjets, small_fatjets, *_cs, R / 10.);
++    //}
++    
++    if (_debug) {cout << "R = " << R << " -> n_small_fatjets = " << small_fatjets.size();}
++    
++    _n_small_fatjets[R] = small_fatjets.size();
++    double dummy = 1000000000000.0;
++
++    for (unsigned i = 0; i < small_fatjets.size(); i++) {
++      external::HEPTopTagger htt(small_fatjets[i], _mtmass, _mwmass);
++      htt.set_top_range(_top_range[0], _top_range[1]);
++      htt.set_mass_ratio_cut(_mass_ratios[0], _mass_ratios[1], _mass_ratios[2]);
++      htt.set_max_subjet_mass(_subjet_mass);
++      htt.set_nfilt(_n_filt);
++      htt.set_Rfilt(_R_filt);
++      htt.set_mass_ratio_range((1.-_f_W)*_mwmass/_mtmass, (1.+_f_W)*_mwmass/_mtmass); 
++      htt.set_mode(1);	
++      
++      htt.run_tagger();
++     
++      double deltatop = fabs(htt.top_candidate().m() - _mtmass);
++      if (deltatop < dummy) {
++	dummy = deltatop;
++	_HEPTopTagger[R] = htt;
++      }
++    } //End of loop over small_fatjets
++    
++    if (_Rmin == 0 && R < maxR) {
++      double delta_m = fabs(_HEPTopTagger[maxR].top_candidate().m() - _HEPTopTagger[R].top_candidate().m());
++      if (delta_m > _multiR_threshold*_HEPTopTagger[maxR].top_candidate().m() || _HEPTopTagger[R].top_candidate().m() == 0) {
++	_Rmin = R + 1;
++      }
++    }
++    
++    big_fatjets = small_fatjets;
++    small_fatjets.clear();
++
++  }//End of loop over R
++
++  if (_Rmin == 0 && _HEPTopTagger[maxR].top_candidate().m() > 0)
++    _Rmin = 5;
++
++  _mass_Rmin = _HEPTopTagger[_Rmin].top_candidate().m();
++  _pt_Rmin = _HEPTopTagger[_Rmin].top_candidate().perp();
++ 
++  if (_debug) {cout << "MultiR done" << endl;}
++}
++
++MultiR_TopTagger::~MultiR_TopTagger(){}
++
++// Do not change next line, it's needed by the sed-code that makes the tagger CMSSW-compatible.
++};
+-- 
+1.8.3.1
+
+
+From 4a7f7a7976811140fc30647420a0de6376af5ec4 Mon Sep 17 00:00:00 2001
+From: Gregor Kasieczka <g.kasieczka@gmail.com>
+Date: Wed, 15 Oct 2014 10:46:16 +0200
+Subject: [PATCH 06/10] working on MultiR wrappers
+
+---
+ .../JetAlgorithms/interface/MultiRHEPTopTagger.h   |  16 +-
+ .../interface/MultiRHEPTopTaggerWrapper.h          | 195 +++++++++++++++++++++
+ RecoJets/JetAlgorithms/src/MultiRHEPTopTagger.cc   |   7 +-
+ .../JetAlgorithms/src/MultiRHEPTopTaggerWrapper.cc | 107 +++++++++++
+ RecoJets/JetProducers/plugins/HTTTopJetProducer.cc |   5 +
+ RecoJets/JetProducers/plugins/HTTTopJetProducer.h  |   2 +
+ 6 files changed, 323 insertions(+), 9 deletions(-)
+ create mode 100644 RecoJets/JetAlgorithms/interface/MultiRHEPTopTaggerWrapper.h
+ create mode 100644 RecoJets/JetAlgorithms/src/MultiRHEPTopTaggerWrapper.cc
+
+diff --git a/RecoJets/JetAlgorithms/interface/MultiRHEPTopTagger.h b/RecoJets/JetAlgorithms/interface/MultiRHEPTopTagger.h
+index 638705d..2a78950 100644
+--- a/RecoJets/JetAlgorithms/interface/MultiRHEPTopTagger.h
++++ b/RecoJets/JetAlgorithms/interface/MultiRHEPTopTagger.h
+@@ -32,13 +32,16 @@ public:
+   //run tagger
+   void run_tagger();
+ 
+-  const map<int,external::HEPTopTagger> & HTTagger() const {return _HEPTopTagger;}
+-  external::HEPTopTagger HTTagger(int i)  {return _HEPTopTagger[i];}
+-  
+-  const map<int,int> & n_small_fatjets() const {return _n_small_fatjets;}
+-  const double & Rmin() const {return _Rmin;}
++  // Return the candidate (and some properties) at R=R_min
++  external::HEPTopTagger cand_Rmin(){return _HEPTopTagger[_Rmin];}
++  const int & Rmin_raw() const {return _Rmin;}
++  const double Rmin() const {return _Rmin/10.;}
+   const double & mass_Rmin() const {return _mass_Rmin;}
+   const double & pt_Rmin() const {return _pt_Rmin;}
++  
++  // Access to all candidates and number-of-small-fatjets
++  external::HEPTopTagger HTTagger(int i)  {return _HEPTopTagger[i];}
++  const double n_small_fatjets(int i) {return _n_small_fatjets[i];}
+ 
+   void set_max_subjet_mass(double x) {_subjet_mass = x;}
+   void set_top_range(double top_range_min, double top_range_max) {_top_range[0] = top_range_min; _top_range[1] = top_range_max;}
+@@ -56,7 +59,8 @@ private:
+   double _subjet_mass;
+   map<int,external::HEPTopTagger> _HEPTopTagger;
+   map<int,int> _n_small_fatjets;
+-  double _Rmin, _mass_Rmin, _pt_Rmin;
++  int _Rmin;
++  double _mass_Rmin, _pt_Rmin;
+   double _mass_mean, _mass_width;
+   double _top_range[2];
+   unsigned _n_filt;
+diff --git a/RecoJets/JetAlgorithms/interface/MultiRHEPTopTaggerWrapper.h b/RecoJets/JetAlgorithms/interface/MultiRHEPTopTaggerWrapper.h
+new file mode 100644
+index 0000000..90953ed
+--- /dev/null
++++ b/RecoJets/JetAlgorithms/interface/MultiRHEPTopTaggerWrapper.h
+@@ -0,0 +1,195 @@
++//----------------------------------------------------------------------
++//  This file is free software; you can redistribute it and/or modify
++//  it under the terms of the GNU General Public License as published by
++//  the Free Software Foundation; either version 3 of the License, or
++//  (at your option) any later version.
++//
++//  This file is distributed in the hope that it will be useful,
++//  but WITHOUT ANY WARRANTY; without even the implied warranty of
++//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++//  GNU General Public License for more details.
++//
++//  The GNU General Public License is available at
++//  http://www.gnu.org/licenses/gpl.html or you can write to the Free Software
++//  Foundation, Inc.:
++//      59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++//----------------------------------------------------------------------
++
++#ifndef __MULTIRHEPTOPTAGGER_WRAPPER_HH__
++#define __MULTIRHEPTOPTAGGER_WRAPPER_HH__
++
++#include <fastjet/tools/TopTaggerBase.hh>
++#include <fastjet/CompositeJetStructure.hh>
++#include <sstream>
++
++FASTJET_BEGIN_NAMESPACE
++
++// Based on HEPTopTaggerWrapper.h
++
++class MultiRHEPTopTaggerStructure;
++
++class MultiRHEPTopTagger : public TopTaggerBase {
++public:
++  MultiRHEPTopTagger(double minSubjetPt, 
++		     double minCandPt, 
++		     double subjetMass, 
++		     double muCut, 
++		     int mode, 
++		     double minCandMass, 
++		     double maxCandMass, 
++		     double massRatioWidth, 
++		     double minM23Cut, 
++		     double minM13Cut, 
++		     double maxM13Cut) : minSubjetPt_(minSubjetPt),
++    minCandPt_(minCandPt),
++    subjetMass_(subjetMass),
++    muCut_(muCut),
++    mode_(mode),
++    minCandMass_(minCandMass),
++    maxCandMass_(maxCandMass),
++    massRatioWidth_(massRatioWidth),
++    minM23Cut_(minM23Cut),
++    minM13Cut_(minM13Cut),
++    maxM13Cut_(maxM13Cut)   
++  {}
++
++  /// returns a textual description of the tagger
++  virtual std::string description() const;
++
++  /// runs the tagger on the given jet and
++  /// returns the tagged PseudoJet if successful, or a PseudoJet==0 otherwise
++  /// (standard access is through operator()).
++  ///  \param jet   the PseudoJet to tag
++  virtual PseudoJet result(const PseudoJet & jet) const;
++
++  // the type of the associated structure
++  typedef MultiRHEPTopTaggerStructure StructureType;
++
++private:
++    double minSubjetPt_; // Minimal pT for subjets [GeV]
++    double minCandPt_;   // Minimal pT to return a candidate [GeV]
++ 
++    double subjetMass_; // Mass above which subjets are further unclustered
++    double muCut_; // Mass drop threshold
++    
++    // HEPTopTagger Mode
++    // 0: do 2d-plane, return candidate with delta m_top minimal
++    // 1: return candidate with delta m_top minimal IF passes 2d plane
++    // 2: do 2d-plane, return candidate with max dj_sum
++    // 3: return candidate with max dj_sum IF passes 2d plane
++    // 4: return candidate built from leading three subjets after unclustering IF passes 2d plane
++    // Note: Original HTT was mode==1    
++    int mode_; 
++
++    // Top Quark mass window in GeV
++    double minCandMass_;
++    double maxCandMass_;
++    
++    double massRatioWidth_; // One sided width of the A-shaped window around m_W/m_top in %
++    double minM23Cut_; // minimal value of m23/m123
++    double minM13Cut_; // minimal value of atan(m13/m12)
++    double maxM13Cut_; // maximal value of atan(m13/m12)
++};
++
++
++class MultiRHEPTopTaggerStructure : public CompositeJetStructure, public TopTaggerBaseStructure {
++ public:
++   /// ctor with pieces initialisation
++   MultiRHEPTopTaggerStructure(const std::vector<PseudoJet>& pieces_in,
++                  const JetDefinition::Recombiner *recombiner = 0) : CompositeJetStructure(pieces_in, recombiner),
++    _cos_theta_w(0.0),
++    _top_mass(0.0),
++    _unfiltered_mass(0.0),
++    _pruned_mass(0.0),
++    _fW(-1.),
++    _mass_ratio_passed(-1),
++    W_rec(recombiner), 
++    rW_(){}
++  
++   // Return W subjet
++   inline PseudoJet const & W() const{ 
++     rW_ = join(_pieces[0], _pieces[1], *W_rec);
++     return rW_;
++   }
++     
++   // Return leading subjet in W
++   inline PseudoJet  W1() const{
++     assert(W().pieces().size()>0);
++     return W().pieces()[0];
++   }
++       
++   /// returns the second W subjet
++   inline PseudoJet W2() const{
++     assert(W().pieces().size()>1);
++     return W().pieces()[1];
++   }
++ 
++
++   /// returns the non-W subjet
++   /// It will have 1 or 2 pieces depending on whether the tagger has
++   /// found 3 or 4 pieces
++   inline const PseudoJet & non_W() const{ 
++     return _pieces[2];
++   }
++ 
++   /// returns the W helicity angl
++   inline double cos_theta_W() const {return _cos_theta_w;}
++
++   /// returns the candidate mass
++   inline double top_mass() const {return _top_mass;}
++
++   /// returns the unfiltered mass
++   inline double unfiltered_mass() const {return _unfiltered_mass;}
++
++   /// returns the pruned mass
++   inline double pruned_mass() const {return _pruned_mass;}
++
++   /// returns fW
++   inline double fW() const {return _fW;}
++
++   /// returns if 2d-mass plane cuts were passed
++   inline double mass_ratio_passed() const {return _mass_ratio_passed;}
++    
++ protected:
++      double _cos_theta_w; ///< the W helicity angle
++      double _top_mass;
++      double _unfiltered_mass;
++      double _pruned_mass;
++      double _fW;
++      int _mass_ratio_passed;
++
++      const JetDefinition::Recombiner  * W_rec;
++ 
++      mutable PseudoJet rW_;
++
++   // allow the tagger to set these
++   friend class HEPTopTagger;
++   friend class MultiRHEPTopTagger;
++ };
++
++
++//------------------------------------------------------------------------
++// description of the tagger
++inline std::string MultiRHEPTopTagger::description() const{ 
++
++  // TODO: FIXME!!!
++  std::ostringstream oss;
++  oss << "MultiRHEPTopTagger with: "
++      << "minSubjetPt = " << minSubjetPt_ 
++      << "minCandPt = " << minCandPt_ 
++      << "subjetMass = " << subjetMass_ 
++      << "muCut = " << muCut_ 
++      << "mode = " << mode_ 
++      << "minCandMass = " << minCandMass_ 
++      << "maxCandMass = " << maxCandMass_ 
++      << "massRatioWidth = " << massRatioWidth_ 
++      << "minM23Cut = " << minM23Cut_ 
++      << "minM13Cut = " << minM13Cut_ 
++      << "maxM13Cut = " << maxM13Cut_ << std::endl;
++  return oss.str();
++}
++
++
++FASTJET_END_NAMESPACE
++
++#endif // __MULTIRHEPTOPTAGGER_HH__
+diff --git a/RecoJets/JetAlgorithms/src/MultiRHEPTopTagger.cc b/RecoJets/JetAlgorithms/src/MultiRHEPTopTagger.cc
+index 397abc6..b0ef169 100644
+--- a/RecoJets/JetAlgorithms/src/MultiRHEPTopTagger.cc
++++ b/RecoJets/JetAlgorithms/src/MultiRHEPTopTagger.cc
+@@ -62,7 +62,8 @@ void MultiR_TopTagger::run_tagger() {
+   int stepR = int(_step_R * 10);
+ 
+   for (int R = maxR; R >= minR; R -= stepR) {
+-
++    
++    // TODO: check!
+     // Deactivated this piece for now as dR_max_triplet is not used.
+     // Problem in lines below?
+     //  
+@@ -102,7 +103,7 @@ void MultiR_TopTagger::run_tagger() {
+     if (_Rmin == 0 && R < maxR) {
+       double delta_m = fabs(_HEPTopTagger[maxR].top_candidate().m() - _HEPTopTagger[R].top_candidate().m());
+       if (delta_m > _multiR_threshold*_HEPTopTagger[maxR].top_candidate().m() || _HEPTopTagger[R].top_candidate().m() == 0) {
+-	_Rmin = R + 1;
++	_Rmin = R + stepR;
+       }
+     }
+     
+@@ -112,7 +113,7 @@ void MultiR_TopTagger::run_tagger() {
+   }//End of loop over R
+ 
+   if (_Rmin == 0 && _HEPTopTagger[maxR].top_candidate().m() > 0)
+-    _Rmin = 5;
++    _Rmin = minR;
+ 
+   _mass_Rmin = _HEPTopTagger[_Rmin].top_candidate().m();
+   _pt_Rmin = _HEPTopTagger[_Rmin].top_candidate().perp();
+diff --git a/RecoJets/JetAlgorithms/src/MultiRHEPTopTaggerWrapper.cc b/RecoJets/JetAlgorithms/src/MultiRHEPTopTaggerWrapper.cc
+new file mode 100644
+index 0000000..1696e1a
+--- /dev/null
++++ b/RecoJets/JetAlgorithms/src/MultiRHEPTopTaggerWrapper.cc
+@@ -0,0 +1,107 @@
++//----------------------------------------------------------------------
++//  This file is free software; you can redistribute it and/or modify
++//  it under the terms of the GNU General Public License as published by
++//  the Free Software Foundation; either version 3 of the License, or
++//  (at your option) any later version.
++//
++//  This file is distributed in the hope that it will be useful,
++//  but WITHOUT ANY WARRANTY; without even the implied warranty of
++//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++//  GNU General Public License for more details.
++//
++//  The GNU General Public License is available at
++//  http://www.gnu.org/licenses/gpl.html or you can write to the Free Software
++//  Foundation, Inc.:
++//      59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++//----------------------------------------------------------------------
++
++#include "RecoJets/JetAlgorithms/interface/MultiRHEPTopTaggerWrapper.h"
++
++#include <fastjet/Error.hh>
++#include <fastjet/JetDefinition.hh>
++#include <fastjet/ClusterSequence.hh>
++#include "fastjet/PseudoJet.hh"
++#include "fastjet/tools/Pruner.hh"
++#include "fastjet/tools/Filter.hh"
++
++#include <math.h>
++#include <limits>
++#include <cassert>
++using namespace std;
++
++#include "RecoJets/JetAlgorithms/interface/HEPTopTagger.h"
++#include "RecoJets/JetAlgorithms/interface/MultiRHEPTopTagger.h"
++
++FASTJET_BEGIN_NAMESPACE
++
++//------------------------------------------------------------------------
++// returns the tagged PseudoJet if successful, 0 otherwise
++//  - jet   the PseudoJet to tag
++PseudoJet MultiRHEPTopTagger::result(const PseudoJet & jet) const{
++
++  // make sure that there is a "regular" cluster sequence associated
++  // with the jet. Note that we also check it is valid (to avoid a
++  // more criptic error later on)
++  if (!jet.has_valid_cluster_sequence()){
++    throw Error("HEPTopTagger can only be applied on jets having an associated (and valid) ClusterSequence");
++  }
++
++  external::HEPTopTagger tagger(jet);
++
++  // translate the massRatioWidth (which should be the half-width given in %) 
++  // to values useful for the A-shape cuts
++  double mw_over_mt = 80.4/172.3;
++  double ratio_min = mw_over_mt * (100.-massRatioWidth_)/100.;
++  double ratio_max = mw_over_mt * (100.+massRatioWidth_)/100.;
++ 
++  
++  // Unclustering, Filtering & Subjet Settings
++  tagger.set_max_subjet_mass(subjetMass_);
++  tagger.set_mass_drop_threshold(muCut_);
++  tagger.set_minpt_subjet(minSubjetPt_); 
++
++  // How to select among candidates
++  tagger.set_mode(mode_);
++  
++  // Requirements to accept a candidate
++  tagger.set_minpt_tag(minCandPt_); 
++  tagger.set_top_range(minCandMass_, maxCandMass_); 
++  tagger.set_mass_ratio_cut(minM23Cut_, minM13Cut_, maxM13Cut_);
++  tagger.set_mass_ratio_range(ratio_min, ratio_max);
++
++  tagger.run_tagger();
++
++  // Requires:
++  //   - top mass window
++  //   - mass ratio cuts
++  //   - minimal candidate pT
++  // If this is not intended: use loose top mass and ratio windows
++  if (!tagger.is_tagged())
++    return PseudoJet();
++  
++  // create the result and its structure
++  const JetDefinition::Recombiner *rec
++    = jet.associated_cluster_sequence()->jet_def().recombiner();
++
++  const vector<PseudoJet>& subjets = tagger.top_subjets();
++  assert(subjets.size() == 3);
++
++  PseudoJet non_W = subjets[0];
++  PseudoJet W1 = subjets[1];
++  PseudoJet W2 = subjets[2];
++  PseudoJet W = join(subjets[1], subjets[2], *rec);
++
++  PseudoJet result = join<MultiRHEPTopTaggerStructure>( W1, W2, non_W, *rec);
++  MultiRHEPTopTaggerStructure *s = (MultiRHEPTopTaggerStructure*) result.structure_non_const_ptr();
++
++  s->_top_mass = tagger.t().m();
++  s->_pruned_mass = tagger.pruned_mass();
++  s->_unfiltered_mass = tagger.unfiltered_mass();
++  s->_fW = tagger.fW();
++  s->_mass_ratio_passed = tagger.is_masscut_passed();
++
++  // Removed selectors as all cuts are applied ion HTT
++  return result;
++}
++
++FASTJET_END_NAMESPACE
+diff --git a/RecoJets/JetProducers/plugins/HTTTopJetProducer.cc b/RecoJets/JetProducers/plugins/HTTTopJetProducer.cc
+index 430ab2e..363f1ef 100644
+--- a/RecoJets/JetProducers/plugins/HTTTopJetProducer.cc
++++ b/RecoJets/JetProducers/plugins/HTTTopJetProducer.cc
+@@ -10,6 +10,7 @@ using namespace std;
+ 
+ HTTTopJetProducer::HTTTopJetProducer(edm::ParameterSet const& conf):
+        FastjetJetProducer( conf ),
++       multiR_(false),
+        minFatjetPt_(200.),
+        minSubjetPt_(20.),
+        minCandPt_(200.),
+@@ -27,6 +28,9 @@ HTTTopJetProducer::HTTTopJetProducer(edm::ParameterSet const& conf):
+ {
+   
+   // Read in all the options from the configuration
++  if ( conf.exists("multiR") ) 
++    multiR_ = conf.getParameter<bool>("multiR");
++
+   if ( conf.exists("minFatjetPt") ) 
+     minFatjetPt_ = conf.getParameter<double>("minFatjetPt");
+   
+@@ -71,6 +75,7 @@ HTTTopJetProducer::HTTTopJetProducer(edm::ParameterSet const& conf):
+   
+   // Create the tagger-wrapper
+   produces<HTTTopJetTagInfoCollection>();
++
+   fjHEPTopTagger_ = std::auto_ptr<fastjet::HEPTopTagger>(new fastjet::HEPTopTagger(minSubjetPt_, 
+ 										   minCandPt_,
+ 										   subjetMass_, 	    
+diff --git a/RecoJets/JetProducers/plugins/HTTTopJetProducer.h b/RecoJets/JetProducers/plugins/HTTTopJetProducer.h
+index 068157e..6326a98 100644
+--- a/RecoJets/JetProducers/plugins/HTTTopJetProducer.h
++++ b/RecoJets/JetProducers/plugins/HTTTopJetProducer.h
+@@ -94,6 +94,8 @@ namespace cms
+     // Below are all configurable options. 
+     // Parenthesis indicates if this is enforced by the tagger itself or by the producer
+ 
++    bool multiR_; // Should the MultiR version of the tagger be used? (producer)
++
+     double minFatjetPt_; // Only process fatjets larger pT with the tagger [GeV] (producer)
+     double minSubjetPt_; // Minimal pT for subjets [GeV] (tagger)
+     double minCandPt_;   // Minimal pT to return a candidate [GeV] (tagger)
+-- 
+1.8.3.1
+
+
+From e7d2302229d3573454b8022aecc96401a3fc626a Mon Sep 17 00:00:00 2001
+From: Gregor Kasieczka <g.kasieczka@gmail.com>
+Date: Thu, 16 Oct 2014 14:35:09 +0200
+Subject: [PATCH 07/10] Working MultiR version based on
+ 37e0db4ced95efcf8723ba862a4f1d6df3e8afb2
+
+---
+ .../JetAlgorithms/interface/MultiRHEPTopTagger.h   | 13 ++-
+ .../interface/MultiRHEPTopTaggerWrapper.h          |  8 +-
+ RecoJets/JetAlgorithms/src/MultiRHEPTopTagger.cc   | 21 +++--
+ .../JetAlgorithms/src/MultiRHEPTopTaggerWrapper.cc | 57 +++++++------
+ RecoJets/JetProducers/plugins/HTTTopJetProducer.cc | 95 +++++++++++++++-------
+ RecoJets/JetProducers/plugins/HTTTopJetProducer.h  |  5 +-
+ 6 files changed, 131 insertions(+), 68 deletions(-)
+
+diff --git a/RecoJets/JetAlgorithms/interface/MultiRHEPTopTagger.h b/RecoJets/JetAlgorithms/interface/MultiRHEPTopTagger.h
+index 2a78950..9cb4475 100644
+--- a/RecoJets/JetAlgorithms/interface/MultiRHEPTopTagger.h
++++ b/RecoJets/JetAlgorithms/interface/MultiRHEPTopTagger.h
+@@ -22,8 +22,8 @@ public:
+ 		   double step_R,
+ 		   double multiR_threshold,
+ 		   bool use_dR_max_triplet,
+-		   fastjet::ClusterSequence & cs, 
+-		   fastjet::PseudoJet & jet, 
++		   const fastjet::ClusterSequence & cs, 
++		   const fastjet::PseudoJet & jet, 
+ 		   double mtmass, double mwmass
+ 		   );
+ 
+@@ -43,7 +43,12 @@ public:
+   external::HEPTopTagger HTTagger(int i)  {return _HEPTopTagger[i];}
+   const double n_small_fatjets(int i) {return _n_small_fatjets[i];}
+ 
++  void set_mode(int mode) {_mode = mode;}
++
+   void set_max_subjet_mass(double x) {_subjet_mass = x;}
++  void set_mass_drop_threshold(double x) {_mass_drop_threshold = x;}
++  void set_minpt_subjet(double x) {_minpt_subjet = x;}
++  void set_minpt_tag(double x) {_minpt_tag = x;}
+   void set_top_range(double top_range_min, double top_range_max) {_top_range[0] = top_range_min; _top_range[1] = top_range_max;}
+   void set_f_W(double f_W) {_f_W = f_W;}
+   void set_mass_ratio_cut(double mass_ratios_0, double mass_ratios_1, double mass_ratios_2) {_mass_ratios[0] = mass_ratios_0; _mass_ratios[1] = mass_ratios_1; _mass_ratios[2] = mass_ratios_2;}
+@@ -56,10 +61,14 @@ private:
+   const ClusterSequence * _cs;
+   const PseudoJet *       _jet;
+   double _mtmass, _mwmass;
++  double _mass_drop_threshold;
+   double _subjet_mass;
++  double _minpt_subjet;
++  double _minpt_tag;
+   map<int,external::HEPTopTagger> _HEPTopTagger;
+   map<int,int> _n_small_fatjets;
+   int _Rmin;
++  int _mode;
+   double _mass_Rmin, _pt_Rmin;
+   double _mass_mean, _mass_width;
+   double _top_range[2];
+diff --git a/RecoJets/JetAlgorithms/interface/MultiRHEPTopTaggerWrapper.h b/RecoJets/JetAlgorithms/interface/MultiRHEPTopTaggerWrapper.h
+index 90953ed..9b3cd77 100644
+--- a/RecoJets/JetAlgorithms/interface/MultiRHEPTopTaggerWrapper.h
++++ b/RecoJets/JetAlgorithms/interface/MultiRHEPTopTaggerWrapper.h
+@@ -147,6 +147,9 @@ class MultiRHEPTopTaggerStructure : public CompositeJetStructure, public TopTagg
+    /// returns fW
+    inline double fW() const {return _fW;}
+ 
++   /// returns Rmin
++   inline double R_min() const {return _Rmin;}
++
+    /// returns if 2d-mass plane cuts were passed
+    inline double mass_ratio_passed() const {return _mass_ratio_passed;}
+     
+@@ -155,9 +158,10 @@ class MultiRHEPTopTaggerStructure : public CompositeJetStructure, public TopTagg
+       double _top_mass;
+       double _unfiltered_mass;
+       double _pruned_mass;
+-      double _fW;
++      double _fW;      
+       int _mass_ratio_passed;
+-
++      double _Rmin;
++      
+       const JetDefinition::Recombiner  * W_rec;
+  
+       mutable PseudoJet rW_;
+diff --git a/RecoJets/JetAlgorithms/src/MultiRHEPTopTagger.cc b/RecoJets/JetAlgorithms/src/MultiRHEPTopTagger.cc
+index b0ef169..cf00f19 100644
+--- a/RecoJets/JetAlgorithms/src/MultiRHEPTopTagger.cc
++++ b/RecoJets/JetAlgorithms/src/MultiRHEPTopTagger.cc
+@@ -36,8 +36,8 @@ MultiR_TopTagger::MultiR_TopTagger(double max_fatjet_R,
+ 				   double step_R,
+ 				   double multiR_threshold,
+ 				   bool use_dR_max_triplet,
+-				   fastjet::ClusterSequence & cs, 
+-				   fastjet::PseudoJet & jet, 
++				   const fastjet::ClusterSequence & cs, 
++				   const fastjet::PseudoJet & jet, 
+ 				   double mtmass, double mwmass
+ 				   ) : _cs(&cs),  _jet(&jet),
+ 				       _mtmass(mtmass),	_mwmass(mwmass), _max_fatjet_R(max_fatjet_R), _min_fatjet_R(min_fatjet_R), _step_R(step_R), _multiR_threshold(multiR_threshold), _use_dR_max_triplet(use_dR_max_triplet), _debug(false)
+@@ -86,11 +86,15 @@ void MultiR_TopTagger::run_tagger() {
+       htt.set_top_range(_top_range[0], _top_range[1]);
+       htt.set_mass_ratio_cut(_mass_ratios[0], _mass_ratios[1], _mass_ratios[2]);
+       htt.set_max_subjet_mass(_subjet_mass);
++      htt.set_minpt_subjet(_minpt_subjet);
++      htt.set_minpt_tag(_minpt_tag);
++      htt.set_mass_drop_threshold(_mass_drop_threshold);
+       htt.set_nfilt(_n_filt);
+       htt.set_Rfilt(_R_filt);
+       htt.set_mass_ratio_range((1.-_f_W)*_mwmass/_mtmass, (1.+_f_W)*_mwmass/_mtmass); 
+-      htt.set_mode(1);	
++      htt.set_mode(_mode); 
+       
++
+       htt.run_tagger();
+      
+       double deltatop = fabs(htt.top_candidate().m() - _mtmass);
+@@ -100,18 +104,19 @@ void MultiR_TopTagger::run_tagger() {
+       }
+     } //End of loop over small_fatjets
+     
+-    if (_Rmin == 0 && R < maxR) {
+-      double delta_m = fabs(_HEPTopTagger[maxR].top_candidate().m() - _HEPTopTagger[R].top_candidate().m());
+-      if (delta_m > _multiR_threshold*_HEPTopTagger[maxR].top_candidate().m() || _HEPTopTagger[R].top_candidate().m() == 0) {
++    // Only check if we have not found Rmin yet
++    if (_Rmin == 0 && R < maxR) {                 
++      // If the new mass is OUTSIDE the window ..
++      if (_HEPTopTagger[R].top_candidate().m() < (1-_multiR_threshold)*_HEPTopTagger[maxR].top_candidate().m())
++	// .. set _Rmin to the previous mass 
+ 	_Rmin = R + stepR;
+-      }
+     }
+     
+     big_fatjets = small_fatjets;
+     small_fatjets.clear();
+-
+   }//End of loop over R
+ 
++  // if we did not find Rmin in the loop, pick the last value
+   if (_Rmin == 0 && _HEPTopTagger[maxR].top_candidate().m() > 0)
+     _Rmin = minR;
+ 
+diff --git a/RecoJets/JetAlgorithms/src/MultiRHEPTopTaggerWrapper.cc b/RecoJets/JetAlgorithms/src/MultiRHEPTopTaggerWrapper.cc
+index 1696e1a..27e4a76 100644
+--- a/RecoJets/JetAlgorithms/src/MultiRHEPTopTaggerWrapper.cc
++++ b/RecoJets/JetAlgorithms/src/MultiRHEPTopTaggerWrapper.cc
+@@ -46,19 +46,23 @@ PseudoJet MultiRHEPTopTagger::result(const PseudoJet & jet) const{
+     throw Error("HEPTopTagger can only be applied on jets having an associated (and valid) ClusterSequence");
+   }
+ 
+-  external::HEPTopTagger tagger(jet);
+-
+-  // translate the massRatioWidth (which should be the half-width given in %) 
+-  // to values useful for the A-shape cuts
+-  double mw_over_mt = 80.4/172.3;
+-  double ratio_min = mw_over_mt * (100.-massRatioWidth_)/100.;
+-  double ratio_max = mw_over_mt * (100.+massRatioWidth_)/100.;
+- 
+-  
++  double m_W = 80.4;
++  double m_top = 172.3;
++
++  external::MultiR_TopTagger tagger(1.5,   // R_max
++				    0.5,   // R_min
++				    0.1,   // R_step
++				    0.2,   // Mass-drop threshold
++				    false, // use_dR_max_triplet
++				    *(jet.associated_cluster_sequence()),
++				    jet,
++				    m_top,
++				    m_W);
++   
+   // Unclustering, Filtering & Subjet Settings
+   tagger.set_max_subjet_mass(subjetMass_);
+-  tagger.set_mass_drop_threshold(muCut_);
+-  tagger.set_minpt_subjet(minSubjetPt_); 
++  tagger.set_mass_drop_threshold(muCut_); 
++  tagger.set_minpt_subjet(minSubjetPt_);
+ 
+   // How to select among candidates
+   tagger.set_mode(mode_);
+@@ -67,23 +71,24 @@ PseudoJet MultiRHEPTopTagger::result(const PseudoJet & jet) const{
+   tagger.set_minpt_tag(minCandPt_); 
+   tagger.set_top_range(minCandMass_, maxCandMass_); 
+   tagger.set_mass_ratio_cut(minM23Cut_, minM13Cut_, maxM13Cut_);
+-  tagger.set_mass_ratio_range(ratio_min, ratio_max);
++  tagger.set_f_W(massRatioWidth_/100.);
+ 
+   tagger.run_tagger();
+-
+-  // Requires:
+-  //   - top mass window
+-  //   - mass ratio cuts
+-  //   - minimal candidate pT
++  
++  // MultiR tagging requirements:
++  //   - found a valid R_min
++  //   - HTT top mass window
++  //   - HTT mass ratio cuts
++  //   - HTT minimal candidate pT
+   // If this is not intended: use loose top mass and ratio windows
+-  if (!tagger.is_tagged())
+-    return PseudoJet();
++  if ( (tagger.Rmin_raw()==0) || (! tagger.cand_Rmin().is_tagged()))
++      return PseudoJet();
+   
+   // create the result and its structure
+   const JetDefinition::Recombiner *rec
+     = jet.associated_cluster_sequence()->jet_def().recombiner();
+ 
+-  const vector<PseudoJet>& subjets = tagger.top_subjets();
++  const vector<PseudoJet>& subjets = tagger.cand_Rmin().top_subjets();
+   assert(subjets.size() == 3);
+ 
+   PseudoJet non_W = subjets[0];
+@@ -94,13 +99,13 @@ PseudoJet MultiRHEPTopTagger::result(const PseudoJet & jet) const{
+   PseudoJet result = join<MultiRHEPTopTaggerStructure>( W1, W2, non_W, *rec);
+   MultiRHEPTopTaggerStructure *s = (MultiRHEPTopTaggerStructure*) result.structure_non_const_ptr();
+ 
+-  s->_top_mass = tagger.t().m();
+-  s->_pruned_mass = tagger.pruned_mass();
+-  s->_unfiltered_mass = tagger.unfiltered_mass();
+-  s->_fW = tagger.fW();
+-  s->_mass_ratio_passed = tagger.is_masscut_passed();
++  s->_top_mass = tagger.cand_Rmin().t().m();
++  s->_pruned_mass = tagger.cand_Rmin().pruned_mass();
++  s->_unfiltered_mass = tagger.cand_Rmin().unfiltered_mass();
++  s->_fW = tagger.cand_Rmin().fW();
++  s->_mass_ratio_passed = tagger.cand_Rmin().is_masscut_passed();
++  s->_Rmin = tagger.Rmin();
+ 
+-  // Removed selectors as all cuts are applied ion HTT
+   return result;
+ }
+ 
+diff --git a/RecoJets/JetProducers/plugins/HTTTopJetProducer.cc b/RecoJets/JetProducers/plugins/HTTTopJetProducer.cc
+index 363f1ef..f841b69 100644
+--- a/RecoJets/JetProducers/plugins/HTTTopJetProducer.cc
++++ b/RecoJets/JetProducers/plugins/HTTTopJetProducer.cc
+@@ -76,19 +76,36 @@ HTTTopJetProducer::HTTTopJetProducer(edm::ParameterSet const& conf):
+   // Create the tagger-wrapper
+   produces<HTTTopJetTagInfoCollection>();
+ 
+-  fjHEPTopTagger_ = std::auto_ptr<fastjet::HEPTopTagger>(new fastjet::HEPTopTagger(minSubjetPt_, 
+-										   minCandPt_,
+-										   subjetMass_, 	    
+-										   muCut_, 		    
+-										   mode_, 		    
+-										   minCandMass_, 	    
+-										   maxCandMass_, 	    
+-										   massRatioWidth_, 	    
+-										   minM23Cut_, 	    
+-										   minM13Cut_, 	    
+-										   maxM13Cut_)); 
++  // Signal to the VirtualJetProducer that we have to add HTT information
+   fromHTTTopJetProducer_ = 1;
+ 
++  if (multiR_){
++    fjMultiRHEPTopTagger_ = std::auto_ptr<fastjet::MultiRHEPTopTagger>(new fastjet::MultiRHEPTopTagger(minSubjetPt_, 
++												       minCandPt_,
++												       subjetMass_, 	    
++												       muCut_, 		    
++												       mode_, 		    
++												       minCandMass_, 	    
++												       maxCandMass_, 	    
++												       massRatioWidth_, 	    
++												       minM23Cut_, 	    
++												       minM13Cut_, 	    
++												       maxM13Cut_)); 
++  }
++  else{
++    fjHEPTopTagger_ = std::auto_ptr<fastjet::HEPTopTagger>(new fastjet::HEPTopTagger(minSubjetPt_, 
++										     minCandPt_,
++										     subjetMass_, 	    
++										     muCut_, 		    
++										     mode_, 		    
++										     minCandMass_, 	    
++										     maxCandMass_, 	    
++										     massRatioWidth_, 	    
++										     minM23Cut_, 	    
++										     minM13Cut_, 	    
++										     maxM13Cut_)); 
++  }
++
+ }
+ 
+ 		
+@@ -125,6 +142,7 @@ void HTTTopJetProducer::runAlgorithm( edm::Event& iEvent, const edm::EventSetup&
+   }
+ 
+   fastjet::HEPTopTagger & HEPTagger = *fjHEPTopTagger_;
++  fastjet::MultiRHEPTopTagger & MultiRHEPTagger = *fjMultiRHEPTopTagger_;
+ 
+   vector<fastjet::PseudoJet>::iterator jetIt = centralJets.begin(), centralJetsEnd = centralJets.end();
+   if ( verbose_ )cout<<"Loop over jets"<<endl;
+@@ -133,8 +151,12 @@ void HTTTopJetProducer::runAlgorithm( edm::Event& iEvent, const edm::EventSetup&
+     if (verbose_) cout << "CMS FJ jet pt: " << (*jetIt).perp() << endl;
+     
+     fastjet::PseudoJet taggedJet;
+-    taggedJet = HEPTagger.result(*jetIt);
+-    
++
++    if (multiR_)
++      taggedJet = MultiRHEPTagger.result(*jetIt);
++    else
++      taggedJet = HEPTagger.result(*jetIt);
++
+     if (taggedJet != 0){
+       fjJets_.push_back(taggedJet);           
+     }
+@@ -163,21 +185,38 @@ void HTTTopJetProducer::addHTTTopJetTagInfoCollection( edm::Event& iEvent,
+     edm::Ref<reco::BasicJetCollection> ref(oh, ij);  
+     edm::RefToBase<reco::Jet> rtb(ref);  
+     
+-    fastjet::HEPTopTaggerStructure *s = (fastjet::HEPTopTaggerStructure*) fjJets_[ij].structure_non_const_ptr();
+-
+-    properties.topMass          = s->top_mass();
+-    properties.unfilteredMass	= s->unfiltered_mass();
+-    properties.prunedMass	= s->pruned_mass();
+-    properties.fW		= s->fW();
+-    properties.massRatioPassed  = s->mass_ratio_passed();
+-
+-    // Only needed for MultiR tagger
+-    properties.isMultiR	        = 0;
+-    properties.Rmin	        = -1.;
+-    properties.RminExpected     = -1.;
+-    
+-    tagInfo.insert(rtb, properties );
+-    tagInfos->push_back( tagInfo );
++    if (multiR_){
++      fastjet::MultiRHEPTopTaggerStructure *s = (fastjet::MultiRHEPTopTaggerStructure*) fjJets_[ij].structure_non_const_ptr();
++      
++      properties.topMass         = s->top_mass();
++      properties.unfilteredMass	 = s->unfiltered_mass();
++      properties.prunedMass	 = s->pruned_mass();
++      properties.fW		 = s->fW();
++      properties.massRatioPassed = s->mass_ratio_passed();     
++      properties.isMultiR	 = 1;
++      properties.Rmin	         = s->R_min();    
++      properties.RminExpected    = 999.;
++      
++      tagInfo.insert(rtb, properties );
++      tagInfos->push_back( tagInfo );
++    }
++    else{      
++      fastjet::HEPTopTaggerStructure *s = (fastjet::HEPTopTaggerStructure*) fjJets_[ij].structure_non_const_ptr();
++      
++      properties.topMass         = s->top_mass();
++      properties.unfilteredMass	 = s->unfiltered_mass();
++      properties.prunedMass	 = s->pruned_mass();
++      properties.fW		 = s->fW();
++      properties.massRatioPassed = s->mass_ratio_passed();
++      
++      // Only needed for MultiR tagger
++      properties.isMultiR	        = 0;
++      properties.Rmin	        = -1.;
++      properties.RminExpected     = -1.;
++      
++      tagInfo.insert(rtb, properties );
++      tagInfos->push_back( tagInfo );
++    }
+   }  
+ 
+   iEvent.put( tagInfos );
+diff --git a/RecoJets/JetProducers/plugins/HTTTopJetProducer.h b/RecoJets/JetProducers/plugins/HTTTopJetProducer.h
+index 6326a98..e0f9968 100644
+--- a/RecoJets/JetProducers/plugins/HTTTopJetProducer.h
++++ b/RecoJets/JetProducers/plugins/HTTTopJetProducer.h
+@@ -63,8 +63,8 @@
+ 
+ #include "RecoJets/JetProducers/plugins/FastjetJetProducer.h"
+ 
+-
+ #include "RecoJets/JetAlgorithms/interface/HEPTopTaggerWrapper.h"
++#include "RecoJets/JetAlgorithms/interface/MultiRHEPTopTaggerWrapper.h"
+ 
+ #include "fastjet/SISConePlugin.hh"
+ 
+@@ -89,7 +89,8 @@ namespace cms
+ 
+ 
+   private:
+-    std::auto_ptr<fastjet::HEPTopTagger>     fjHEPTopTagger_;
++    std::auto_ptr<fastjet::HEPTopTagger>        fjHEPTopTagger_;
++    std::auto_ptr<fastjet::MultiRHEPTopTagger>  fjMultiRHEPTopTagger_;
+ 
+     // Below are all configurable options. 
+     // Parenthesis indicates if this is enforced by the tagger itself or by the producer
+-- 
+1.8.3.1
+
+
+From 2e9130dcd6c6790e69172df48bcb285a9f85c2c7 Mon Sep 17 00:00:00 2001
+From: Gregor Kasieczka <g.kasieczka@gmail.com>
+Date: Thu, 16 Oct 2014 15:36:31 +0200
+Subject: [PATCH 08/10] Added chaning of Rmin and Rmax for MultiR tagger
+
+---
+ .../JetAlgorithms/interface/HEPTopTaggerWrapper.h  |  6 ------
+ .../interface/MultiRHEPTopTaggerWrapper.h          | 24 ++++++++++++----------
+ .../JetAlgorithms/src/MultiRHEPTopTaggerWrapper.cc |  8 +++++---
+ RecoJets/JetProducers/plugins/HTTTopJetProducer.cc | 13 +++++++++++-
+ RecoJets/JetProducers/plugins/HTTTopJetProducer.h  |  3 +++
+ 5 files changed, 33 insertions(+), 21 deletions(-)
+
+diff --git a/RecoJets/JetAlgorithms/interface/HEPTopTaggerWrapper.h b/RecoJets/JetAlgorithms/interface/HEPTopTaggerWrapper.h
+index 0238882..f496bd7 100644
+--- a/RecoJets/JetAlgorithms/interface/HEPTopTaggerWrapper.h
++++ b/RecoJets/JetAlgorithms/interface/HEPTopTaggerWrapper.h
+@@ -114,7 +114,6 @@ class HEPTopTaggerStructure : public CompositeJetStructure, public TopTaggerBase
+    /// ctor with pieces initialisation
+    HEPTopTaggerStructure(const std::vector<PseudoJet>& pieces_in,
+                   const JetDefinition::Recombiner *recombiner = 0) : CompositeJetStructure(pieces_in, recombiner),
+-    _cos_theta_w(0.0),
+     _top_mass(0.0),
+     _unfiltered_mass(0.0),
+     _pruned_mass(0.0),
+@@ -149,9 +148,6 @@ class HEPTopTaggerStructure : public CompositeJetStructure, public TopTaggerBase
+      return _pieces[2];
+    }
+  
+-   /// returns the W helicity angl
+-   inline double cos_theta_W() const {return _cos_theta_w;}
+-
+    /// returns the candidate mass
+    inline double top_mass() const {return _top_mass;}
+ 
+@@ -168,7 +164,6 @@ class HEPTopTaggerStructure : public CompositeJetStructure, public TopTaggerBase
+    inline double mass_ratio_passed() const {return _mass_ratio_passed;}
+     
+  protected:
+-      double _cos_theta_w; ///< the W helicity angle
+       double _top_mass;
+       double _unfiltered_mass;
+       double _pruned_mass;
+@@ -188,7 +183,6 @@ class HEPTopTaggerStructure : public CompositeJetStructure, public TopTaggerBase
+ // description of the tagger
+ inline std::string HEPTopTagger::description() const{ 
+ 
+-  // TODO: FIXME!!!
+   std::ostringstream oss;
+   oss << "HEPTopTagger with: "
+       << "minSubjetPt = " << minSubjetPt_ 
+diff --git a/RecoJets/JetAlgorithms/interface/MultiRHEPTopTaggerWrapper.h b/RecoJets/JetAlgorithms/interface/MultiRHEPTopTaggerWrapper.h
+index 9b3cd77..5704421 100644
+--- a/RecoJets/JetAlgorithms/interface/MultiRHEPTopTaggerWrapper.h
++++ b/RecoJets/JetAlgorithms/interface/MultiRHEPTopTaggerWrapper.h
+@@ -40,7 +40,9 @@ public:
+ 		     double massRatioWidth, 
+ 		     double minM23Cut, 
+ 		     double minM13Cut, 
+-		     double maxM13Cut) : minSubjetPt_(minSubjetPt),
++		     double maxM13Cut,
++		     double R_max,
++		     double R_min) : minSubjetPt_(minSubjetPt),
+     minCandPt_(minCandPt),
+     subjetMass_(subjetMass),
+     muCut_(muCut),
+@@ -50,7 +52,9 @@ public:
+     massRatioWidth_(massRatioWidth),
+     minM23Cut_(minM23Cut),
+     minM13Cut_(minM13Cut),
+-    maxM13Cut_(maxM13Cut)   
++    maxM13Cut_(maxM13Cut),
++    R_max_(R_max),
++    R_min_(R_min)
+   {}
+ 
+   /// returns a textual description of the tagger
+@@ -65,7 +69,7 @@ public:
+   // the type of the associated structure
+   typedef MultiRHEPTopTaggerStructure StructureType;
+ 
+-private:
++private: 
+     double minSubjetPt_; // Minimal pT for subjets [GeV]
+     double minCandPt_;   // Minimal pT to return a candidate [GeV]
+  
+@@ -89,6 +93,9 @@ private:
+     double minM23Cut_; // minimal value of m23/m123
+     double minM13Cut_; // minimal value of atan(m13/m12)
+     double maxM13Cut_; // maximal value of atan(m13/m12)
++
++    double R_max_; // Maximal fatjet size to consider
++    double R_min_; // Minimal fatjet size to consider
+ };
+ 
+ 
+@@ -97,7 +104,6 @@ class MultiRHEPTopTaggerStructure : public CompositeJetStructure, public TopTagg
+    /// ctor with pieces initialisation
+    MultiRHEPTopTaggerStructure(const std::vector<PseudoJet>& pieces_in,
+                   const JetDefinition::Recombiner *recombiner = 0) : CompositeJetStructure(pieces_in, recombiner),
+-    _cos_theta_w(0.0),
+     _top_mass(0.0),
+     _unfiltered_mass(0.0),
+     _pruned_mass(0.0),
+@@ -132,9 +138,6 @@ class MultiRHEPTopTaggerStructure : public CompositeJetStructure, public TopTagg
+      return _pieces[2];
+    }
+  
+-   /// returns the W helicity angl
+-   inline double cos_theta_W() const {return _cos_theta_w;}
+-
+    /// returns the candidate mass
+    inline double top_mass() const {return _top_mass;}
+ 
+@@ -154,7 +157,6 @@ class MultiRHEPTopTaggerStructure : public CompositeJetStructure, public TopTagg
+    inline double mass_ratio_passed() const {return _mass_ratio_passed;}
+     
+  protected:
+-      double _cos_theta_w; ///< the W helicity angle
+       double _top_mass;
+       double _unfiltered_mass;
+       double _pruned_mass;
+@@ -176,7 +178,6 @@ class MultiRHEPTopTaggerStructure : public CompositeJetStructure, public TopTagg
+ // description of the tagger
+ inline std::string MultiRHEPTopTagger::description() const{ 
+ 
+-  // TODO: FIXME!!!
+   std::ostringstream oss;
+   oss << "MultiRHEPTopTagger with: "
+       << "minSubjetPt = " << minSubjetPt_ 
+@@ -188,8 +189,9 @@ inline std::string MultiRHEPTopTagger::description() const{
+       << "maxCandMass = " << maxCandMass_ 
+       << "massRatioWidth = " << massRatioWidth_ 
+       << "minM23Cut = " << minM23Cut_ 
+-      << "minM13Cut = " << minM13Cut_ 
+-      << "maxM13Cut = " << maxM13Cut_ << std::endl;
++      << "minM13Cut = " << minM13Cut_
++      << "Rmax = " << R_max_ 
++      << "Rmin = " << R_min_ << std::endl;
+   return oss.str();
+ }
+ 
+diff --git a/RecoJets/JetAlgorithms/src/MultiRHEPTopTaggerWrapper.cc b/RecoJets/JetAlgorithms/src/MultiRHEPTopTaggerWrapper.cc
+index 27e4a76..39b9f0c 100644
+--- a/RecoJets/JetAlgorithms/src/MultiRHEPTopTaggerWrapper.cc
++++ b/RecoJets/JetAlgorithms/src/MultiRHEPTopTaggerWrapper.cc
+@@ -49,9 +49,9 @@ PseudoJet MultiRHEPTopTagger::result(const PseudoJet & jet) const{
+   double m_W = 80.4;
+   double m_top = 172.3;
+ 
+-  external::MultiR_TopTagger tagger(1.5,   // R_max
+-				    0.5,   // R_min
+-				    0.1,   // R_step
++  external::MultiR_TopTagger tagger(R_max_,   // R_max
++				    R_min_,   // R_min
++				    0.1,   // R_step (using a stepsize smaller than 0.1 would currently not work)
+ 				    0.2,   // Mass-drop threshold
+ 				    false, // use_dR_max_triplet
+ 				    *(jet.associated_cluster_sequence()),
+@@ -105,6 +105,8 @@ PseudoJet MultiRHEPTopTagger::result(const PseudoJet & jet) const{
+   s->_fW = tagger.cand_Rmin().fW();
+   s->_mass_ratio_passed = tagger.cand_Rmin().is_masscut_passed();
+   s->_Rmin = tagger.Rmin();
++  // TODO: Add Rmin(expected)
++  
+ 
+   return result;
+ }
+diff --git a/RecoJets/JetProducers/plugins/HTTTopJetProducer.cc b/RecoJets/JetProducers/plugins/HTTTopJetProducer.cc
+index f841b69..56e3334 100644
+--- a/RecoJets/JetProducers/plugins/HTTTopJetProducer.cc
++++ b/RecoJets/JetProducers/plugins/HTTTopJetProducer.cc
+@@ -24,6 +24,8 @@ HTTTopJetProducer::HTTTopJetProducer(edm::ParameterSet const& conf):
+        minM23Cut_(0.35),
+        minM13Cut_(0.2),
+        maxM13Cut_(1.3),
++       maxR_(1.5),
++       minR_(0.5),
+        verbose_(false )
+ {
+   
+@@ -69,6 +71,13 @@ HTTTopJetProducer::HTTTopJetProducer(edm::ParameterSet const& conf):
+   
+   if ( conf.exists("maxM13Cut") )
+     maxM13Cut_ = conf.getParameter<double>("maxM13Cut");
++
++  if ( conf.exists("maxR") )
++    maxR_ = conf.getParameter<double>("maxR");
++
++  if ( conf.exists("minR") )
++    minR_ = conf.getParameter<double>("minR");
++
+   
+   if ( conf.exists("verbose") )
+     verbose_ = conf.getParameter<bool>("verbose");
+@@ -90,7 +99,9 @@ HTTTopJetProducer::HTTTopJetProducer(edm::ParameterSet const& conf):
+ 												       massRatioWidth_, 	    
+ 												       minM23Cut_, 	    
+ 												       minM13Cut_, 	    
+-												       maxM13Cut_)); 
++												       maxM13Cut_,
++												       maxR_,
++												       minR_)); 
+   }
+   else{
+     fjHEPTopTagger_ = std::auto_ptr<fastjet::HEPTopTagger>(new fastjet::HEPTopTagger(minSubjetPt_, 
+diff --git a/RecoJets/JetProducers/plugins/HTTTopJetProducer.h b/RecoJets/JetProducers/plugins/HTTTopJetProducer.h
+index e0f9968..d6a7a90 100644
+--- a/RecoJets/JetProducers/plugins/HTTTopJetProducer.h
++++ b/RecoJets/JetProducers/plugins/HTTTopJetProducer.h
+@@ -123,6 +123,9 @@ namespace cms
+     double minM23Cut_; // minimal value of m23/m123 (tagger)
+     double minM13Cut_; // minimal value of atan(m13/m12) (tagger)
+     double maxM13Cut_; // maximal value of atan(m13/m12) (tagger)
++
++    double maxR_; // maximal fatjet size for MultiR tagger (tagger)
++    double minR_; // minimal fatjet size for MultiR tagger (tagger)
+         
+     bool verbose_;
+ 
+-- 
+1.8.3.1
+
+
+From 0b5b3a1da9d6d99719d51abaa1c60bf4874c10d0 Mon Sep 17 00:00:00 2001
+From: Gregor Kasieczka <g.kasieczka@gmail.com>
+Date: Mon, 20 Oct 2014 13:34:37 +0200
+Subject: [PATCH 09/10] Made filtR and filtN fully steerable
+
+---
+ RecoJets/JetAlgorithms/interface/HEPTopTaggerWrapper.h     |  9 +++++++++
+ .../JetAlgorithms/interface/MultiRHEPTopTaggerWrapper.h    |  9 +++++++++
+ RecoJets/JetAlgorithms/src/HEPTopTaggerWrapper.cc          |  2 ++
+ RecoJets/JetAlgorithms/src/MultiRHEPTopTaggerWrapper.cc    |  2 ++
+ RecoJets/JetProducers/plugins/HTTTopJetProducer.cc         | 14 +++++++++++++-
+ RecoJets/JetProducers/plugins/HTTTopJetProducer.h          |  3 +++
+ 6 files changed, 38 insertions(+), 1 deletion(-)
+
+diff --git a/RecoJets/JetAlgorithms/interface/HEPTopTaggerWrapper.h b/RecoJets/JetAlgorithms/interface/HEPTopTaggerWrapper.h
+index f496bd7..d324827 100644
+--- a/RecoJets/JetAlgorithms/interface/HEPTopTaggerWrapper.h
++++ b/RecoJets/JetAlgorithms/interface/HEPTopTaggerWrapper.h
+@@ -51,6 +51,8 @@ public:
+ 	       double minCandPt, 
+ 	       double subjetMass, 
+ 	       double muCut, 
++	       double filtR,
++	       int filtN,
+ 	       int mode, 
+ 	       double minCandMass, 
+ 	       double maxCandMass, 
+@@ -61,6 +63,8 @@ public:
+     minCandPt_(minCandPt),
+     subjetMass_(subjetMass),
+     muCut_(muCut),
++    filtR_(filtR),
++    filtN_(filtN),
+     mode_(mode),
+     minCandMass_(minCandMass),
+     maxCandMass_(maxCandMass),
+@@ -89,6 +93,9 @@ private:
+     double subjetMass_; // Mass above which subjets are further unclustered
+     double muCut_; // Mass drop threshold
+     
++    double filtR_; // maximal filtering radius
++    int filtN_; // number of filtered subjets to use
++
+     // HEPTopTagger Mode
+     // 0: do 2d-plane, return candidate with delta m_top minimal
+     // 1: return candidate with delta m_top minimal IF passes 2d plane
+@@ -189,6 +196,8 @@ inline std::string HEPTopTagger::description() const{
+       << "minCandPt = " << minCandPt_ 
+       << "subjetMass = " << subjetMass_ 
+       << "muCut = " << muCut_ 
++      << "filtR = " << filtR_ 
++      << "filtN = " << filtN_     
+       << "mode = " << mode_ 
+       << "minCandMass = " << minCandMass_ 
+       << "maxCandMass = " << maxCandMass_ 
+diff --git a/RecoJets/JetAlgorithms/interface/MultiRHEPTopTaggerWrapper.h b/RecoJets/JetAlgorithms/interface/MultiRHEPTopTaggerWrapper.h
+index 5704421..6de8fb1 100644
+--- a/RecoJets/JetAlgorithms/interface/MultiRHEPTopTaggerWrapper.h
++++ b/RecoJets/JetAlgorithms/interface/MultiRHEPTopTaggerWrapper.h
+@@ -34,6 +34,8 @@ public:
+ 		     double minCandPt, 
+ 		     double subjetMass, 
+ 		     double muCut, 
++		     double filtR,
++		     int filtN,
+ 		     int mode, 
+ 		     double minCandMass, 
+ 		     double maxCandMass, 
+@@ -46,6 +48,8 @@ public:
+     minCandPt_(minCandPt),
+     subjetMass_(subjetMass),
+     muCut_(muCut),
++    filtR_(filtR),
++    filtN_(filtN),
+     mode_(mode),
+     minCandMass_(minCandMass),
+     maxCandMass_(maxCandMass),
+@@ -76,6 +80,9 @@ private:
+     double subjetMass_; // Mass above which subjets are further unclustered
+     double muCut_; // Mass drop threshold
+     
++    double filtR_; // maximal filtering radius
++    int filtN_; // number of filtered subjets to use
++    
+     // HEPTopTagger Mode
+     // 0: do 2d-plane, return candidate with delta m_top minimal
+     // 1: return candidate with delta m_top minimal IF passes 2d plane
+@@ -184,6 +191,8 @@ inline std::string MultiRHEPTopTagger::description() const{
+       << "minCandPt = " << minCandPt_ 
+       << "subjetMass = " << subjetMass_ 
+       << "muCut = " << muCut_ 
++      << "filtR = " << filtR_ 
++      << "filtN = " << filtN_     
+       << "mode = " << mode_ 
+       << "minCandMass = " << minCandMass_ 
+       << "maxCandMass = " << maxCandMass_ 
+diff --git a/RecoJets/JetAlgorithms/src/HEPTopTaggerWrapper.cc b/RecoJets/JetAlgorithms/src/HEPTopTaggerWrapper.cc
+index 0c4823c..a82b037 100644
+--- a/RecoJets/JetAlgorithms/src/HEPTopTaggerWrapper.cc
++++ b/RecoJets/JetAlgorithms/src/HEPTopTaggerWrapper.cc
+@@ -60,6 +60,8 @@ PseudoJet HEPTopTagger::result(const PseudoJet & jet) const{
+   // Unclustering, Filtering & Subjet Settings
+   tagger.set_max_subjet_mass(subjetMass_);
+   tagger.set_mass_drop_threshold(muCut_);
++  tagger.set_Rfilt(filtR_);
++  tagger.set_nfilt(filtN_);
+   tagger.set_minpt_subjet(minSubjetPt_); 
+ 
+   // How to select among candidates
+diff --git a/RecoJets/JetAlgorithms/src/MultiRHEPTopTaggerWrapper.cc b/RecoJets/JetAlgorithms/src/MultiRHEPTopTaggerWrapper.cc
+index 39b9f0c..a6b8433 100644
+--- a/RecoJets/JetAlgorithms/src/MultiRHEPTopTaggerWrapper.cc
++++ b/RecoJets/JetAlgorithms/src/MultiRHEPTopTaggerWrapper.cc
+@@ -62,6 +62,8 @@ PseudoJet MultiRHEPTopTagger::result(const PseudoJet & jet) const{
+   // Unclustering, Filtering & Subjet Settings
+   tagger.set_max_subjet_mass(subjetMass_);
+   tagger.set_mass_drop_threshold(muCut_); 
++  tagger.set_Rfilt(filtR_);
++  tagger.set_nfilt(filtN_);
+   tagger.set_minpt_subjet(minSubjetPt_);
+ 
+   // How to select among candidates
+diff --git a/RecoJets/JetProducers/plugins/HTTTopJetProducer.cc b/RecoJets/JetProducers/plugins/HTTTopJetProducer.cc
+index 56e3334..fb7db32 100644
+--- a/RecoJets/JetProducers/plugins/HTTTopJetProducer.cc
++++ b/RecoJets/JetProducers/plugins/HTTTopJetProducer.cc
+@@ -17,6 +17,8 @@ HTTTopJetProducer::HTTTopJetProducer(edm::ParameterSet const& conf):
+        maxFatjetAbsEta_(2.5),
+        subjetMass_(30.),
+        muCut_(0.8),
++       filtR_(0.3),
++       filtN_(5),       
+        mode_(0),
+        minCandMass_(150.),
+        maxCandMass_(200.),
+@@ -50,6 +52,12 @@ HTTTopJetProducer::HTTTopJetProducer(edm::ParameterSet const& conf):
+   
+   if ( conf.exists("muCut") )
+     muCut_ = conf.getParameter<double>("muCut");
++
++  if ( conf.exists("filtR") )
++    filtR_ = conf.getParameter<double>("filtR");
++
++  if ( conf.exists("filtN") )
++    filtN_ = conf.getParameter<int>("filtN");
+   
+   if ( conf.exists("mode") )
+     mode_ = conf.getParameter<int>("mode");
+@@ -92,7 +100,9 @@ HTTTopJetProducer::HTTTopJetProducer(edm::ParameterSet const& conf):
+     fjMultiRHEPTopTagger_ = std::auto_ptr<fastjet::MultiRHEPTopTagger>(new fastjet::MultiRHEPTopTagger(minSubjetPt_, 
+ 												       minCandPt_,
+ 												       subjetMass_, 	    
+-												       muCut_, 		    
++												       muCut_, 	
++												       filtR_,
++												       filtN_,
+ 												       mode_, 		    
+ 												       minCandMass_, 	    
+ 												       maxCandMass_, 	    
+@@ -108,6 +118,8 @@ HTTTopJetProducer::HTTTopJetProducer(edm::ParameterSet const& conf):
+ 										     minCandPt_,
+ 										     subjetMass_, 	    
+ 										     muCut_, 		    
++										     filtR_,
++										     filtN_,
+ 										     mode_, 		    
+ 										     minCandMass_, 	    
+ 										     maxCandMass_, 	    
+diff --git a/RecoJets/JetProducers/plugins/HTTTopJetProducer.h b/RecoJets/JetProducers/plugins/HTTTopJetProducer.h
+index d6a7a90..e3cc5bc 100644
+--- a/RecoJets/JetProducers/plugins/HTTTopJetProducer.h
++++ b/RecoJets/JetProducers/plugins/HTTTopJetProducer.h
+@@ -105,6 +105,9 @@ namespace cms
+ 
+     double subjetMass_; // Mass above which subjets are further unclustered (tagger)
+     double muCut_; // Mass drop threshold (tagger)
++
++    double filtR_; // maximal filtering radius
++    int filtN_; // number of filtered subjets to use
+     
+     // HEPTopTagger Mode (tagger):
+     // 0: do 2d-plane, return candidate with delta m_top minimal
+-- 
+1.8.3.1
+
+
+From 3c46d23a009906f06b1dc86dbe51982f33a37cfc Mon Sep 17 00:00:00 2001
+From: Gregor Kasieczka <g.kasieczka@gmail.com>
+Date: Mon, 20 Oct 2014 14:05:00 +0200
+Subject: [PATCH 10/10] Switched to pt-sorting between different MultiR cands
+ (59fa31e48f0b479f6a563597ca445a29c8db6a74)
+
+---
+ RecoJets/JetAlgorithms/src/MultiRHEPTopTagger.cc | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/RecoJets/JetAlgorithms/src/MultiRHEPTopTagger.cc b/RecoJets/JetAlgorithms/src/MultiRHEPTopTagger.cc
+index cf00f19..2e059c3 100644
+--- a/RecoJets/JetAlgorithms/src/MultiRHEPTopTagger.cc
++++ b/RecoJets/JetAlgorithms/src/MultiRHEPTopTagger.cc
+@@ -79,7 +79,9 @@ void MultiR_TopTagger::run_tagger() {
+     if (_debug) {cout << "R = " << R << " -> n_small_fatjets = " << small_fatjets.size();}
+     
+     _n_small_fatjets[R] = small_fatjets.size();
+-    double dummy = 1000000000000.0;
++
++    // We are sorting by pt - so start with a negative dummy
++    double dummy = -99999;
+ 
+     for (unsigned i = 0; i < small_fatjets.size(); i++) {
+       external::HEPTopTagger htt(small_fatjets[i], _mtmass, _mwmass);
+@@ -94,12 +96,10 @@ void MultiR_TopTagger::run_tagger() {
+       htt.set_mass_ratio_range((1.-_f_W)*_mwmass/_mtmass, (1.+_f_W)*_mwmass/_mtmass); 
+       htt.set_mode(_mode); 
+       
+-
+       htt.run_tagger();
+      
+-      double deltatop = fabs(htt.top_candidate().m() - _mtmass);
+-      if (deltatop < dummy) {
+-	dummy = deltatop;
++      if (htt.top_candidate().perp() > dummy) {
++	dummy = htt.top_candidate().perp();
+ 	_HEPTopTagger[R] = htt;
+       }
+     } //End of loop over small_fatjets
 -- 
 1.8.3.1
 
