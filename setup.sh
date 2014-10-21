@@ -24,7 +24,7 @@ cp TTH/MEAnalysis/libs/*.so ../lib/$SCRAM_ARCH/
 #apply the top tagger as a commit
 git remote add jpata https://github.com/jpata/cmssw.git
 git fetch -a jpata
-git checkout jpata/patched_toptagger
+git merge jpata/patched_toptagger
 
 #to apply a the top tagger as a patch
 #git apply --check TTH/0001-merged-HepTopTagger.patch && git apply TTH/0001-merged-HepTopTagger.patch  
