@@ -19,13 +19,9 @@ git cms-addpkg RecoJets/JetProducers
 
 #get the TTH code
 git clone https://github.com/jpata/tthbb13.git TTH
-cd TTH
-git checkout toptagger_merge_7_0
-cd ..
 cp TTH/MEAnalysis/libs/*.so ../lib/$SCRAM_ARCH/
 
 #to apply a the top tagger as a patch
-git apply TTH/0001-merged-HepTopTagger.patch
+git apply --check TTH/0001-merged-HepTopTagger.patch && git apply TTH/0001-merged-HepTopTagger.patch  
 
 scram setup lhapdf
-scram b -j 20
