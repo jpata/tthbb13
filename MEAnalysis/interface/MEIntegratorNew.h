@@ -146,6 +146,7 @@ public:
     void   cachePdf( string , string , string, string, TArrayF, TArrayF, TArrayF);
     void   setMass   (double);
     void   setQ      (double);
+    void   setSqrtS  (double);
     void   setTopMass(double, double);
     void   setSumEt  (double);
     void   setMEtCov  (double, double, double);
@@ -1650,6 +1651,10 @@ void MEIntegratorNew::setQ(double Q) {
     Q_    = Q;
 }
 
+void MEIntegratorNew::setSqrtS(double S) {
+    SqrtS_    = S;
+}
+
 void MEIntegratorNew::setTopMass(double massTop, double massW) {
     Mtop_    = massTop;
     Mw_      = massW;
@@ -2514,7 +2519,7 @@ int MEIntegratorNew::higgsEnergies(double E1, double& E2, double& cos1, int& err
 
 double MEIntegratorNew::ggPdf( double x1, double x2, double Q) const {
 
-    double lumiGG =  LHAPDF::xfx(0, x1, Q, 0) *  LHAPDF::xfx(0, x2 , Q, 0)
+    double lumiGG =  LHAPDF::xfx(1, x1, Q, 0) *  LHAPDF::xfx(1, x2 , Q, 0)
                      /x1/x1/x2/x2;
 
     return lumiGG;
@@ -2523,11 +2528,11 @@ double MEIntegratorNew::ggPdf( double x1, double x2, double Q) const {
 
 double MEIntegratorNew::qqPdf( double x1, double x2, double Q) const {
 
-    double lumiQQ =  2*(LHAPDF::xfx(0, x1, Q, 1) *  LHAPDF::xfx(0, x2, Q, -1) +
-                        LHAPDF::xfx(0, x1, Q, 2) *  LHAPDF::xfx(0, x2, Q, -2) +
-                        LHAPDF::xfx(0, x1, Q, 3) *  LHAPDF::xfx(0, x2, Q, -3) +
-                        LHAPDF::xfx(0, x1, Q, 4) *  LHAPDF::xfx(0, x2, Q, -4) +
-                        LHAPDF::xfx(0, x1, Q, 5) *  LHAPDF::xfx(0, x2, Q, -5)
+    double lumiQQ =  2*(LHAPDF::xfx(1, x1, Q, 1) *  LHAPDF::xfx(1, x2, Q, -1) +
+                        LHAPDF::xfx(1, x1, Q, 2) *  LHAPDF::xfx(1, x2, Q, -2) +
+                        LHAPDF::xfx(1, x1, Q, 3) *  LHAPDF::xfx(1, x2, Q, -3) +
+                        LHAPDF::xfx(1, x1, Q, 4) *  LHAPDF::xfx(1, x2, Q, -4) +
+                        LHAPDF::xfx(1, x1, Q, 5) *  LHAPDF::xfx(1, x2, Q, -5)
                        )
                      /x1/x1/x2/x2;
 
@@ -2538,13 +2543,13 @@ double MEIntegratorNew::qqPdf( double x1, double x2, double Q) const {
 
 double MEIntegratorNew::EvalPdf(const double* x) const {
 
-    double lumiGG =  LHAPDF::xfx(0, x[0], Q_, 0) *  LHAPDF::xfx(0, Q_*Q_/x[0]/SqrtS_/SqrtS_, Q_, 0)
+    double lumiGG =  LHAPDF::xfx(1, x[0], Q_, 0) *  LHAPDF::xfx(1, Q_*Q_/x[0]/SqrtS_/SqrtS_, Q_, 0)
                      /x[0]/x[0]/x[0]/Q_/Q_; //SqrtS_/SqrtS_
-    //double lumiQQ =  2*(LHAPDF::xfx(0, x[0], Q_, 1) *  LHAPDF::xfx(0, Q_*Q_/x[0]/SqrtS_/SqrtS_, Q_, -1) +
-    //	      LHAPDF::xfx(0, x[0], Q_, 2) *  LHAPDF::xfx(0, Q_*Q_/x[0]/SqrtS_/SqrtS_, Q_, -2) +
-    //	      LHAPDF::xfx(0, x[0], Q_, 3) *  LHAPDF::xfx(0, Q_*Q_/x[0]/SqrtS_/SqrtS_, Q_, -3) +
-    //	      LHAPDF::xfx(0, x[0], Q_, 4) *  LHAPDF::xfx(0, Q_*Q_/x[0]/SqrtS_/SqrtS_, Q_, -4) +
-    //	      LHAPDF::xfx(0, x[0], Q_, 5) *  LHAPDF::xfx(0, Q_*Q_/x[0]/SqrtS_/SqrtS_, Q_, -5)
+    //double lumiQQ =  2*(LHAPDF::xfx(1, x[0], Q_, 1) *  LHAPDF::xfx(1, Q_*Q_/x[0]/SqrtS_/SqrtS_, Q_, -1) +
+    //	      LHAPDF::xfx(1, x[0], Q_, 2) *  LHAPDF::xfx(1, Q_*Q_/x[0]/SqrtS_/SqrtS_, Q_, -2) +
+    //	      LHAPDF::xfx(1, x[0], Q_, 3) *  LHAPDF::xfx(1, Q_*Q_/x[0]/SqrtS_/SqrtS_, Q_, -3) +
+    //	      LHAPDF::xfx(1, x[0], Q_, 4) *  LHAPDF::xfx(1, Q_*Q_/x[0]/SqrtS_/SqrtS_, Q_, -4) +
+    //	      LHAPDF::xfx(1, x[0], Q_, 5) *  LHAPDF::xfx(1, Q_*Q_/x[0]/SqrtS_/SqrtS_, Q_, -5)
     //	      )
     ///x[0]/x[0]/x[0]/Q_/Q_; //SqrtS_/SqrtS_
 
@@ -3341,6 +3346,11 @@ double MEIntegratorNew::probabilitySL2wj(const double* x, int sign) const {
     if(useMET_) prob *= METpart;
     if(useTF_)  prob *= TFpart;
     if(usePDF_) prob *= PDFpart;
+
+    if(verbose_) {
+      cout << tf1 << ", " << tf2 << ", " << tf3 << ", "<< tf4 << ", "<< tf5 << ", "<< tf6 << ", " << tf7 << endl;
+      cout << MEpart << ", " << Jpart << ", " << PDFpart << " (x1,x2)=" << x1 << "," << x2 << endl;
+    }
 
     ////////////////////////
 

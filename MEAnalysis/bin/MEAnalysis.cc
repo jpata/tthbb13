@@ -52,6 +52,12 @@
 //the output ttree specification
 #include "TTH/MEAnalysis/interface/METree.hh"
 
+//the output ttree specification
+#include "TTH/TTHNtupleAnalyzer/interface/HypoEnums.hh"
+
+#define MU_MASS 0.106
+#define ELE_MASS 0.005
+
 // dR distance for reco-gen matching
 #define GENJETDR  0.3
 
@@ -144,12 +150,12 @@ int main(int argc, const char* argv[])
     const float  csv_WP_M           ( in.getUntrackedParameter<double> ("csv_WP_M",      0.679));
     const float  csv_WP_T           ( in.getUntrackedParameter<double> ("csv_WP_T",      0.898));
 
-    const double lepPtLoose         ( in.getUntrackedParameter<double>  ("lepPtLoose", 20.));
+    //const double lepPtLoose         ( in.getUntrackedParameter<double>  ("lepPtLoose", 20.));
     const double lepPtTight         ( in.getUntrackedParameter<double>  ("lepPtTight", 30.));
-    const double lepIsoLoose        ( in.getUntrackedParameter<double>  ("lepIsoLoose", 0.2));
+    //const double lepIsoLoose        ( in.getUntrackedParameter<double>  ("lepIsoLoose", 0.2));
     const double lepIsoTight        ( in.getUntrackedParameter<double>  ("lepIsoTight", 0.12));
-    const double elEta              ( in.getUntrackedParameter<double>  ("elEta",      2.5));
-    const double muEtaLoose         ( in.getUntrackedParameter<double>  ("muEtaLoose", 2.4));
+    //const double elEta              ( in.getUntrackedParameter<double>  ("elEta",      2.5));
+    //const double muEtaLoose         ( in.getUntrackedParameter<double>  ("muEtaLoose", 2.4));
     const double muEtaTight         ( in.getUntrackedParameter<double>  ("muEtaTight", 2.1));
 
     const int    jetMultLoose       ( in.getUntrackedParameter<int>     ("jetMultLoose",    4 ));
@@ -486,6 +492,8 @@ int main(int argc, const char* argv[])
     // initialize top and W mass
     meIntegrator->setTopMass( MT , MW );
 
+    meIntegrator->setSqrtS(13000.);
+
     // configure ME calculation
     meIntegrator->setUseME (useME);
     meIntegrator->setUseJac(useJac);
@@ -646,11 +654,12 @@ int main(int argc, const char* argv[])
         //FIXME: unused?
         //const float normDown           = count_Q2 ? count_Q2->GetBinContent(1)/count_Q2->GetBinContent(2) : 1.0;
         //const float normUp             = count_Q2 ? count_Q2->GetBinContent(3)/count_Q2->GetBinContent(2) : 1.0;
+		TTH::EventHypothesis Vtype;
 
         cout << "Done!!" << endl;
 
         //FIXME: insert this into input ntuples
-        int Vtype = 0, nSimBs = 0;
+		int nSimBs = 0;
         UChar_t triggerFlags[70];
 
         //initialize empty structs
@@ -717,6 +726,54 @@ int main(int argc, const char* argv[])
 
             // read event...
             long nbytes = currentTree->GetEntry(i);
+		
+			if (is_undef(itree->hypo1)) {
+				cerr << "hypo1 undefined " << itree->hypo1 << " probably there will be issues" << endl;
+			}
+			
+			Vtype = static_cast<TTH::EventHypothesis>(itree->hypo1);
+			if (debug>3) cout << "hypo1 " << itree->hypo1 << " " << Vtype << endl;
+			if (((int)Vtype < 0) || ((int)Vtype>11)) {
+				cerr << "Vtype undefined " << (int)Vtype << " probably there will be issues" << endl;
+			}
+			
+			genTop.bmass = itree->gen_t__b__mass;
+			genTop.bpt = itree->gen_t__b__pt;
+			genTop.beta = itree->gen_t__b__eta;
+			genTop.bphi = itree->gen_t__b__phi;
+			genTop.bphi = itree->gen_t__b__phi;
+			genTop.bstatus = itree->gen_t__b__status;
+			
+			genTop.wdau1mass = itree->gen_t__w_d1__mass;
+			genTop.wdau1pt = itree->gen_t__w_d1__pt;
+			genTop.wdau1eta = itree->gen_t__w_d1__eta;
+			genTop.wdau1phi = itree->gen_t__w_d1__phi;
+			genTop.wdau1id = itree->gen_t__w_d1__id;
+
+			genTop.wdau2mass = itree->gen_t__w_d2__mass;
+			genTop.wdau2pt = itree->gen_t__w_d2__pt;
+			genTop.wdau2eta = itree->gen_t__w_d2__eta;
+			genTop.wdau2phi = itree->gen_t__w_d2__phi;
+			genTop.wdau2id = itree->gen_t__w_d2__id;
+			
+			genTbar.bmass = itree->gen_tbar__b__mass;
+			genTbar.bpt = itree->gen_tbar__b__pt;
+			genTbar.beta = itree->gen_tbar__b__eta;
+			genTbar.bphi = itree->gen_tbar__b__phi;
+			genTbar.bphi = itree->gen_tbar__b__phi;
+			genTbar.bstatus = itree->gen_tbar__b__status;
+			
+			genTbar.wdau1mass = itree->gen_tbar__w_d1__mass;
+			genTbar.wdau1pt = itree->gen_tbar__w_d1__pt;
+			genTbar.wdau1eta = itree->gen_tbar__w_d1__eta;
+			genTbar.wdau1phi = itree->gen_tbar__w_d1__phi;
+			genTbar.wdau1id = itree->gen_tbar__w_d1__id;
+
+			genTbar.wdau2mass = itree->gen_tbar__w_d2__mass;
+			genTbar.wdau2pt = itree->gen_tbar__w_d2__pt;
+			genTbar.wdau2eta = itree->gen_tbar__w_d2__eta;
+			genTbar.wdau2phi = itree->gen_tbar__w_d2__phi;
+			genTbar.wdau2id = itree->gen_tbar__w_d2__id;
 
             if( debug>=2 ) {
                 cout << endl;
@@ -733,7 +790,7 @@ int main(int argc, const char* argv[])
             otree->nPVs_               = itree->n__pv;
 
             //FIXME: what is this Vtype
-            otree->type_              = Vtype;
+            otree->type_              = (int)Vtype;
 
             otree->EVENT_.run          = itree->event__run;
             otree->EVENT_.lumi         = itree->event__lumi;
@@ -1341,102 +1398,124 @@ int main(int argc, const char* argv[])
                 TLorentzVector leptonLV, leptonLV2;
                 TLorentzVector neutrinoLV;
 
-                //count the number of loose leptons (muons or electrons) in the event
-                int numLooseLep = 0;
-
-                //FIXME: could be renamed
-                int numLooseAElec = 0;
-                int loose_ele_idx    = DEF_VAL_INT;
 
                 //loop over leptons
-                for( int k = 0; k < itree->n__lep ; k++) {
+				//Find number of loose leptons with custom conditions
+				//useful for re-tightening the loose lepton definition
+                //for( int k = 0; k < itree->n__lep ; k++) {
 
-                    const float lep_pt   = itree->lep__pt[k];
-                    const float lep_eta  = itree->lep__eta[k];
-                    const float lep_phi  = itree->lep__phi[k];
-                    const float lep_type = abs(itree->lep__id[k]);
-                    const float lep_iso  = itree->lep__rel_iso[k];
-                    const float lep_dxy  = TMath::Abs(itree->lep__dxy[k]);
-                    const float lep_dz   = TMath::Abs(itree->lep__dz[k]);
-                    const float lep_charge = itree->lep__charge[k];
+                //    const float lep_pt   = itree->lep__pt[k];
+                //    const float lep_eta  = itree->lep__eta[k];
+                //    const float lep_phi  = itree->lep__phi[k];
+                //    const float lep_type = abs(itree->lep__id[k]);
+                //    const float lep_iso  = itree->lep__rel_iso[k];
+                //    const float lep_dxy  = TMath::Abs(itree->lep__dxy[k]);
+                //    const float lep_dz   = TMath::Abs(itree->lep__dz[k]);
+                //    const float lep_charge = itree->lep__charge[k];
 
-                    if (debug > 2) {
-                        cout << "lepton rec " << lep_type << " pt " << lep_pt
-                             << " eta " << lep_eta << " phi " << lep_phi
-                             << " iso " << lep_iso << " dxy " << lep_dxy
-                             << " dz " << lep_dz << " charge " << lep_charge << endl;
-                    }
+                //    if (debug > 2) {
+                //        cout << "lepton rec " << lep_type << " pt " << lep_pt
+                //             << " eta " << lep_eta << " phi " << lep_phi
+                //             << " iso " << lep_iso << " dxy " << lep_dxy
+                //             << " dz " << lep_dz << " charge " << lep_charge << endl;
+                //    }
 
-                    const float gen_lep_pt   = itree->lep__pt[k];
-                    const float gen_lep_eta  = itree->lep__eta[k];
-                    const float gen_lep_phi  = itree->lep__phi[k];
-                    const float gen_lep_type = abs(itree->lep__id[k]);
+                //    const float gen_lep_pt   = itree->lep__pt[k];
+                //    const float gen_lep_eta  = itree->lep__eta[k];
+                //    const float gen_lep_phi  = itree->lep__phi[k];
+                //    const float gen_lep_type = abs(itree->lep__id[k]);
 
-                    if (debug > 2) {
-                        cout << "lepton gen " << gen_lep_type << " pt " << gen_lep_pt << " eta " << gen_lep_eta << " phi " << gen_lep_phi << endl;
-                    }
+                //    if (debug > 2) {
+                //        cout << "lepton gen " << gen_lep_type << " pt " << gen_lep_pt << " eta " << gen_lep_eta << " phi " << gen_lep_phi << endl;
+                //    }
 
-                    if(
-                        // muons
-                        (lep_type==13 && lep_pt > lepPtLoose && TMath::Abs(lep_eta)<muEtaLoose && lep_iso < lepIsoLoose  && lep_dxy < 0.2 && lep_dz<0.5) ||
+                //    if(
+                //        // muons
+                //        (lep_type==13 && lep_pt > lepPtLoose && TMath::Abs(lep_eta)<muEtaLoose && lep_iso < lepIsoLoose  && lep_dxy < 0.2 && lep_dz<0.5) ||
 
-                        // electrons, FIXME, add lepton WP to input ntuple
-                        //(lep_type == 11 && lep_pt > lepPtLoose && TMath::Abs(lep_eta)<elEta && !(TMath::Abs(lep_eta) >1.442 && TMath::Abs(lep_eta)<1.566) &&
-                        // lep_iso < lepIsoLoose && vLepton_wp95[k] > 0 && lep_dxy < 0.04 && lep_dz<1.0 )
-                        (lep_type == 11 && lep_pt > lepPtLoose && TMath::Abs(lep_eta)<elEta && !(TMath::Abs(lep_eta) >1.442 && TMath::Abs(lep_eta)<1.566) &&
-                         lep_iso < lepIsoLoose &&  lep_dxy < 0.04 && lep_dz<1.0 )
-                    ) {
-                        numLooseLep++;
-                    }
-
-
-                    //FIXME: missing WP
-                    if(  lep_type == 11 && lep_pt > lepPtLoose && TMath::Abs(lep_eta)<elEta && !(TMath::Abs(lep_eta) >1.442 && TMath::Abs(lep_eta)<1.566) &&
-                            lep_iso < lepIsoLoose && lep_dxy < 0.04 && lep_dz<1.0) {
-                        numLooseAElec++;
-                        loose_ele_idx  = k;
-                    }
-                }
+                //        // electrons, FIXME, add lepton WP to input ntuple
+                //        //(lep_type == 11 && lep_pt > lepPtLoose && TMath::Abs(lep_eta)<elEta && !(TMath::Abs(lep_eta) >1.442 && TMath::Abs(lep_eta)<1.566) &&
+                //        // lep_iso < lepIsoLoose && vLepton_wp95[k] > 0 && lep_dxy < 0.04 && lep_dz<1.0 )
+                //        (lep_type == 11 && lep_pt > lepPtLoose && TMath::Abs(lep_eta)<elEta && !(TMath::Abs(lep_eta) >1.442 && TMath::Abs(lep_eta)<1.566) &&
+                //         lep_iso < lepIsoLoose &&  lep_dxy < 0.04 && lep_dz<1.0 )
+                //    ) {
+                //        //numLooseLep++;
+                //    }
 
 
-                //FIXME, removed Vtype from here
-                if( debug>=2 ) {
-                    cout << numLooseLep << " loose leptons, "<< numLooseAElec << " loose electron(s) found in aLepton collection" << endl;
-                }
+                //    //FIXME: missing WP
+                //    if(  lep_type == 11 && lep_pt > lepPtLoose && TMath::Abs(lep_eta)<elEta && !(TMath::Abs(lep_eta) >1.442 && TMath::Abs(lep_eta)<1.566) &&
+                //            lep_iso < lepIsoLoose && lep_dxy < 0.04 && lep_dz<1.0) {
+                //        //numLooseAElec++;
+                //    }
+                //}
 
+
+                ////FIXME, removed Vtype from here
+                //if( debug>=2 ) {
+                //    cout << numLooseLep << " loose leptons, "<< numLooseAElec << " loose electron(s) found in aLepton collection" << endl;
+                //}
+				
+				if (debug > 3) {
+					cout << "n__sig_lep " << itree->n__sig_lep << " hypo " << Vtype << endl;	
+					for (int _i=0; _i < itree->n__sig_lep; _i++) {
+						cout << "sig_lep " << _i << " "
+							<< itree->sig_lep__id[_i] << " "
+							<< itree->sig_lep__type[_i] << " "
+							<< itree->sig_lep__pt[_i] << " "
+							<< itree->sig_lep__eta[_i] << " "
+							<< itree->sig_lep__phi[_i] << " "
+							<< itree->sig_lep__mass[_i] << endl;
+					}
+				}
 
                 ///////////////////////////////////
                 //         SL events:  e+j/m+j   //
                 ///////////////////////////////////
 
                 properEventSL = false;
-                if( (ENABLE_EJ && numLooseLep==1 && Vtype==3) || (ENABLE_MJ && numLooseLep==1 && numLooseAElec<1 && Vtype==2) ) {
+				//FIXME: do we still need to count loose leptons, looseAElec?
+                if( (ENABLE_EJ && Vtype == TTH::EventHypothesis::en) || (ENABLE_MJ && Vtype == TTH::EventHypothesis::mun) ) {
 
-                    // first lepton...
-                    leptonLV.SetPtEtaPhiM(itree->lep__pt[0], itree->lep__eta[0], itree->lep__phi[0], itree->lep__mass[0]);
-
+					if(debug>3) cout << "EJ/MJ" << endl;
+                    
+					//for SL, the first lepton in the sig_lep array is always filled with THE signal lepton
+                    leptonLV.SetPtEtaPhiM(itree->sig_lep__pt[0], itree->sig_lep__eta[0], itree->sig_lep__phi[0], itree->sig_lep__mass[0]);
+					
+					//index in the main lepton array	
+					const int lepton_idx = itree->sig_lep__idx[0]; 
+					if(debug>3) cout << "lepton idx " << lepton_idx << endl;
                     lep_index.push_back(0);
 
                     if(doGenLevelAnalysis) {
-                        if( itree->gen_lep__pt[0] > 5.)
-                            leptonLV.SetPtEtaPhiM(itree->gen_lep__pt[0], itree->gen_lep__eta[0], itree->gen_lep__phi[0], (itree->lep__type[0]==13 ? 0.113 : 0.0005 )  );
+                        if( itree->gen_lep__pt[lepton_idx] > 5.)
+                            leptonLV.SetPtEtaPhiM(itree->gen_lep__pt[0], itree->gen_lep__eta[0], itree->gen_lep__phi[0], (itree->gen_lep__type[0]==13 ? MU_MASS : ELE_MASS )  );
                         else
                             leptonLV.SetPtEtaPhiM( 5., 0., 0., 0. );
                     }
 
                     // tight cuts on lepton (SL)
-                    int lepSelVtype2 =  (Vtype==2 && itree->lep__type[0]==13 && leptonLV.Pt()>lepPtTight &&
-                                         TMath::Abs(leptonLV.Eta()) < muEtaTight && itree->lep__rel_iso[0] < lepIsoTight);
+                    int lepSelVtype2 =  (Vtype == TTH::EventHypothesis::mun && itree->sig_lep__type[0] == 13 && leptonLV.Pt()>lepPtTight &&
+                                         TMath::Abs(leptonLV.Eta()) < muEtaTight && itree->lep__rel_iso[lepton_idx] < lepIsoTight);
                     //int lepSelVtype3 =  (Vtype==3 && itree->lep__type[0]==11 && leptonLV.Pt()>lepPtTight &&
                     //                     itree->lep__rel_iso[0]<lepIsoTight && vLepton_wp80[0]>0 && TMath::Abs(itree->lep__dxy[0])<0.02 );
-                    int lepSelVtype3 =  (Vtype==3 && itree->lep__type[0]==11 && leptonLV.Pt()>lepPtTight &&
-                                         itree->lep__rel_iso[0]<lepIsoTight && TMath::Abs(itree->lep__dxy[0])<0.02 );
+                    int lepSelVtype3 =  (Vtype == TTH::EventHypothesis::en && itree->sig_lep__type[0] == 11 && leptonLV.Pt() > lepPtTight &&
+                                         itree->lep__rel_iso[lepton_idx] < lepIsoTight && TMath::Abs(itree->lep__dxy[lepton_idx]) < 0.02 );
+					
+					if (debug>3) {
+						cout << "lepSelVtype2,3 " << itree->sig_lep__type[0] << "==13 " <<
+							leptonLV.Pt() << " (" << lepPtTight << ") " <<
+							TMath::Abs(leptonLV.Eta()) << " (" << muEtaTight << ") " <<
+							TMath::Abs(itree->lep__dxy[lepton_idx]) << " (" << 0.02 << ") " <<
+							itree->lep__rel_iso[lepton_idx] << " (" << lepIsoTight << ")" << endl;
+					}
 
+					//FIXME: need to put trigger bits here
                     // OR of four trigger paths:  "HLT_Mu40_eta2p1_v.*", "HLT_IsoMu24_eta2p1_v.*", "HLT_Mu40_v.*",  "HLT_IsoMu24_v.*"
-                    int trigVtype2 =  (Vtype==2 && ( triggerFlags[22]>0 || triggerFlags[23]>0 || triggerFlags[14]>0 ||triggerFlags[21]>0 ));
+                    int trigVtype2 =  Vtype == TTH::EventHypothesis::en;// && ( triggerFlags[22]>0 || triggerFlags[23]>0 || triggerFlags[14]>0 ||triggerFlags[21]>0 ));
 
                     // OR of two trigger paths:   "HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v.*", "HLT_Ele27_WP80_v.*"
-                    int trigVtype3 =  (Vtype==3 &&  triggerFlags[44]>0 );
+                    int trigVtype3 =  Vtype == TTH::EventHypothesis::mun;// && triggerFlags[44]>0 );
 
                     // for the moment, don't cut on trigger bit (save and cut offline)
                     trigVtype2 = 1;
@@ -1500,18 +1579,18 @@ int main(int argc, const char* argv[])
                     otree->lepton_eta_    [0] = leptonLV.Eta();
                     otree->lepton_phi_    [0] = leptonLV.Phi();
                     otree->lepton_m_      [0] = leptonLV.M();
-                    otree->lepton_charge_ [0] = itree->lep__charge   [0];
-                    otree->lepton_rIso_   [0] = itree->lep__rel_iso[0];
-                    otree->lepton_type_   [0] = itree->lep__type[0];
-                    otree->lepton_dxy_    [0] = itree->lep__dxy[0];
-                    otree->lepton_dz_     [0] = itree->lep__dz[0];
+                    otree->lepton_charge_ [0] = itree->lep__charge[lepton_idx];
+                    otree->lepton_rIso_   [0] = itree->lep__rel_iso[lepton_idx];
+                    otree->lepton_type_   [0] = itree->lep__type[lepton_idx];
+                    otree->lepton_dxy_    [0] = itree->lep__dxy[lepton_idx];
+                    otree->lepton_dz_     [0] = itree->lep__dz[lepton_idx];
                     //FIXME
                     //otree->lepton_wp80_   [0] = vLepton_wp80[0];
                     //otree->lepton_wp95_   [0] = vLepton_wp95[0];
                     //otree->lepton_wp70_   [0] = vLepton_wp70[0];
                     //otree->lepton_MVAtrig_[0] = vLepton_idMVAtrig[0];
 
-                    if ( isMC && Vtype==3) // if single electron events
+                    if ( isMC && Vtype == TTH::EventHypothesis::en) // if single electron events
                         otree->sf_ele_ = eleSF( otree->lepton_pt_[0], otree->lepton_eta_[0]);
                     else
                         otree->sf_ele_ = 1;
@@ -1522,52 +1601,53 @@ int main(int argc, const char* argv[])
                 ///////////////////////////////////
 
                 properEventDL = false;
-                if( numLooseLep==2 && ( (ENABLE_MM && Vtype==0) || (ENABLE_EE && Vtype==1) )) {
+                if((ENABLE_MM && Vtype == TTH::EventHypothesis::mumu) || (ENABLE_EE && Vtype == TTH::EventHypothesis::ee)) {
 
 
-                    //FIXME: is it safe to assume the good leptons are in the beginning of the array?
-                    // first lepton...
-                    leptonLV.SetPtEtaPhiM (itree->lep__pt[0],itree->lep__eta[0],itree->lep__phi[0],itree->lep__mass[0]);
-                    lep_index.push_back( 0 );
+					//sig_lep always contain 2 leptons
+                    leptonLV.SetPtEtaPhiM (itree->sig_lep__pt[0], itree->sig_lep__eta[0], itree->sig_lep__phi[0], itree->sig_lep__mass[0]);
+					const int lep_idx_1 = itree->sig_lep__idx[0];
+                    lep_index.push_back(0);
 
-                    // second lepton...
-                    leptonLV2.SetPtEtaPhiM(itree->lep__pt[1],itree->lep__eta[1],itree->lep__phi[1],itree->lep__mass[1]);
-                    lep_index.push_back( 1 );
+                    leptonLV2.SetPtEtaPhiM(itree->sig_lep__pt[1], itree->sig_lep__eta[1], itree->sig_lep__phi[1], itree->sig_lep__mass[1]);
+					const int lep_idx_2 = itree->sig_lep__idx[1];
+                    lep_index.push_back(1);
 
                     //FIXME: hardcoded masses
                     if(doGenLevelAnalysis) {
                         if( itree->gen_lep__pt[0]>5.)
-                            leptonLV. SetPtEtaPhiM(itree->gen_lep__pt[0], itree->gen_lep__eta[0], itree->gen_lep__phi[0], (itree->lep__type[0]==13 ? 0.113 : 0.0005 )  );
+                            leptonLV. SetPtEtaPhiM(itree->gen_lep__pt[lep_idx_1], itree->gen_lep__eta[lep_idx_1], itree->gen_lep__phi[lep_idx_1], (itree->lep__type[lep_idx_1]==13 ? MU_MASS : ELE_MASS ) );
                         else
                             leptonLV. SetPtEtaPhiM( 5., 0., 0., 0. );
                         if( itree->gen_lep__pt[1]>5.)
-                            leptonLV2.SetPtEtaPhiM(itree->gen_lep__pt[1], itree->gen_lep__eta[1], itree->gen_lep__phi[1], (itree->lep__type[1]==13 ? 0.113 : 0.0005 )  );
+                            leptonLV2.SetPtEtaPhiM(itree->gen_lep__pt[lep_idx_2], itree->gen_lep__eta[lep_idx_2], itree->gen_lep__phi[lep_idx_2], (itree->lep__type[lep_idx_2]==13 ? MU_MASS : ELE_MASS ) );
                         else
                             leptonLV2.SetPtEtaPhiM( 5., 0., 0., 0. );
                     }
 
 
                     // cut on leptons (DL)
-                    int lepSelVtype0 = ( Vtype==0 && itree->lep__type[0]==13 && itree->lep__type[1]==13 &&
-                                         ( (leptonLV.Pt() >20 && TMath::Abs(leptonLV.Eta()) <muEtaTight && itree->lep__rel_iso[0]<lepIsoTight) ||
-                                           (leptonLV2.Pt()>20 && TMath::Abs(leptonLV2.Eta())<muEtaTight && itree->lep__rel_iso[1]<lepIsoTight) )
-                                       ) && itree->lep__charge[0]*itree->lep__charge[1]<0;
+                    int lepSelVtype0 = ( Vtype == TTH::EventHypothesis::mumu && itree->sig_lep__type[0]==13 && itree->sig_lep__type[1]==13 &&
+                                         ( (leptonLV.Pt() >20 && TMath::Abs(leptonLV.Eta()) < muEtaTight && itree->lep__rel_iso[lep_idx_1]<lepIsoTight) ||
+                                           (leptonLV2.Pt()>20 && TMath::Abs(leptonLV2.Eta()) < muEtaTight && itree->lep__rel_iso[lep_idx_1]<lepIsoTight) )
+                                       ) && itree->sig_lep__charge[0] * itree->sig_lep__charge[1]<0;
 
-                    //FIXME
+                    //FIXME, removed lepton WP
                     //int lepSelVtype1 = ( Vtype==1 && itree->lep__type[0]==11 && itree->lep__type[1]==11 &&
                     //                     ( (leptonLV.Pt() >20 && itree->lep__rel_iso[0]<lepIsoTight && vLepton_wp95[0]>0.5 && TMath::Abs(itree->lep__dxy[0])<0.02) ||
                     //                       (leptonLV2.Pt()>20 && itree->lep__rel_iso[1]<lepIsoTight && vLepton_wp95[1]>0.5 && TMath::Abs(itree->lep__dxy[1])<0.02) )
                     //                   ) && itree->lep__charge[0]*itree->lep__charge[1]<0;
-                    int lepSelVtype1 = ( Vtype==1 && itree->lep__type[0]==11 && itree->lep__type[1]==11 &&
-                                         ( (leptonLV.Pt() >20 && itree->lep__rel_iso[0]<lepIsoTight && TMath::Abs(itree->lep__dxy[0])<0.02) ||
-                                           (leptonLV2.Pt()>20 && itree->lep__rel_iso[1]<lepIsoTight && TMath::Abs(itree->lep__dxy[1])<0.02) )
-                                       ) && itree->lep__charge[0]*itree->lep__charge[1]<0;
+                    int lepSelVtype1 = ( Vtype == TTH::EventHypothesis::ee && itree->sig_lep__type[0] == 11 && itree->sig_lep__type[1]==11 &&
+                                         ( (leptonLV.Pt() >20 && itree->lep__rel_iso[lep_idx_1] < lepIsoTight && TMath::Abs(itree->lep__dxy[lep_idx_1]) < 0.02) ||
+                                           (leptonLV2.Pt()>20 && itree->lep__rel_iso[lep_idx_2] < lepIsoTight && TMath::Abs(itree->lep__dxy[lep_idx_2]) < 0.02) )
+                                       ) && itree->sig_lep__charge[0]*itree->sig_lep__charge[1] < 0;
 
+					//FIXME: need to implement trigger bits
                     // OR of four trigger paths:  "HLT_Mu40_eta2p1_v.*", "HLT_IsoMu24_eta2p1_v.*", "HLT_Mu40_v.*",  "HLT_IsoMu24_v.*"
-                    int trigVtype0 =  (Vtype==0 && ( triggerFlags[22]>0 || triggerFlags[23]>0 || triggerFlags[14]>0 ||triggerFlags[21]>0 ));
+                    int trigVtype0 =  (Vtype == TTH::EventHypothesis::mumu && ( triggerFlags[22]>0 || triggerFlags[23]>0 || triggerFlags[14]>0 ||triggerFlags[21]>0 ));
 
                     // OR of two trigger paths:    "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v.*", "HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v.*"
-                    int trigVtype1 =  (Vtype==1 && ( triggerFlags[5]>0 || triggerFlags[6]>0 ) );
+                    int trigVtype1 =  (Vtype == TTH::EventHypothesis::ee && ( triggerFlags[5]>0 || triggerFlags[6]>0 ) );
 
                     // for the moment, don't cut on trigger bit (save and cut offline)
                     trigVtype0 = 1;
@@ -1666,11 +1746,11 @@ int main(int argc, const char* argv[])
                     otree->lepton_eta_    [0] = leptonLV.Eta();
                     otree->lepton_phi_    [0] = leptonLV.Phi();
                     otree->lepton_m_      [0] = leptonLV.M();
-                    otree->lepton_charge_ [0] = itree->lep__charge   [0];
-                    otree->lepton_rIso_   [0] = itree->lep__rel_iso[0];
-                    otree->lepton_type_   [0] = itree->lep__type[0];
-                    otree->lepton_dxy_    [0] = itree->lep__dxy[0];
-                    otree->lepton_dz_     [0] = itree->lep__dz[0];
+                    otree->lepton_charge_ [0] = itree->lep__charge[lep_idx_1];
+                    otree->lepton_rIso_   [0] = itree->lep__rel_iso[lep_idx_1];
+                    otree->lepton_type_   [0] = itree->lep__type[lep_idx_1];
+                    otree->lepton_dxy_    [0] = itree->lep__dxy[lep_idx_1];
+                    otree->lepton_dz_     [0] = itree->lep__dz[lep_idx_1];
                     //FIXME: need to add ID-s
                     //otree->lepton_wp70_   [0] = vLepton_wp70[0];
                     //otree->lepton_wp80_   [0] = vLepton_wp80[0];
@@ -1682,17 +1762,17 @@ int main(int argc, const char* argv[])
                     otree->lepton_eta_    [1] = leptonLV2.Eta();
                     otree->lepton_phi_    [1] = leptonLV2.Phi();
                     otree->lepton_m_      [1] = leptonLV2.M();
-                    otree->lepton_charge_ [1] = itree->lep__charge   [1];
-                    otree->lepton_rIso_   [1] = itree->lep__rel_iso[1];
-                    otree->lepton_type_   [1] = itree->lep__type[1];
-                    otree->lepton_dxy_    [1] = itree->lep__dxy[1];
-                    otree->lepton_dz_     [1] = itree->lep__dz[1];
+                    otree->lepton_charge_ [1] = itree->lep__charge[lep_idx_2];
+                    otree->lepton_rIso_   [1] = itree->lep__rel_iso[lep_idx_2];
+                    otree->lepton_type_   [1] = itree->lep__type[lep_idx_2];
+                    otree->lepton_dxy_    [1] = itree->lep__dxy[lep_idx_2];
+                    otree->lepton_dz_     [1] = itree->lep__dz[lep_idx_2];
                     //otree->lepton_wp80_   [1] = vLepton_wp80[1];
                     //otree->lepton_wp70_   [1] = vLepton_wp70[1];
                     //otree->lepton_wp95_   [1] = vLepton_wp95[1];
                     //otree->lepton_MVAtrig_[1] = vLepton_idMVAtrig[1];
 
-                    if ( isMC && Vtype==1 ) // if di-electron events
+                    if ( isMC && Vtype==TTH::EventHypothesis::ee ) // if di-electron events
                         otree->sf_ele_ = eleSF( otree->lepton_pt_[0], otree->lepton_eta_[0]) * eleSF( otree->lepton_pt_[1], otree->lepton_eta_[1]);
                     else
                         otree->sf_ele_ = 1;
@@ -1704,46 +1784,53 @@ int main(int argc, const char* argv[])
                 //         DL events:  em        //
                 ///////////////////////////////////
 
-                if( ENABLE_EM && Vtype==2 && numLooseLep==1 && numLooseAElec==1 && loose_ele_idx>=0) {
+                if( ENABLE_EM && Vtype==TTH::EventHypothesis::emu) {
 
                     // flag these events with different type
                     otree->type_ = 4;
 
                     // first lepton...
-                    leptonLV.SetPtEtaPhiM (itree->lep__pt[0],itree->lep__eta[0],itree->lep__phi[0],itree->lep__mass[0]);
-                    lep_index.push_back( 0 );
-
-                    //// second lepton...
-                    //leptonLV2.SetPtEtaPhiM(aLepton_pt[loose_ele_idx],aLepton_eta[loose_ele_idx],aLepton_phi[loose_ele_idx],aLepton_mass[loose_ele_idx]);
-                    //lep_index.push_back( -loose_ele_idx-1 );
+                    leptonLV.SetPtEtaPhiM (itree->sig_lep__pt[0], itree->sig_lep__eta[0], itree->sig_lep__phi[0], itree->sig_lep__mass[0]);
+                    lep_index.push_back(0);
+					const int lep_idx_1 = itree->sig_lep__idx[0];
+                    
+					//// second lepton...
+                    leptonLV2.SetPtEtaPhiM (itree->sig_lep__pt[1], itree->sig_lep__eta[1], itree->sig_lep__phi[1], itree->sig_lep__mass[1]);
+                    lep_index.push_back(1);
+					const int lep_idx_2 = itree->sig_lep__idx[1];
 
                     if(doGenLevelAnalysis) {
                         if( itree->gen_lep__pt[0] > 5.0) {
-                            leptonLV.SetPtEtaPhiM(itree->gen_lep__pt[0], itree->gen_lep__eta[0], itree->gen_lep__phi[0], (itree->lep__type[0]==13 ? 0.105 : 0.0005 )  );
+                            leptonLV.SetPtEtaPhiM(
+								itree->gen_lep__pt[lep_idx_1],
+								itree->gen_lep__eta[lep_idx_1],
+								itree->gen_lep__phi[lep_idx_1],
+								(itree->lep__type[lep_idx_1]==13 ? MU_MASS : ELE_MASS )
+							);
                         } else {
                             leptonLV.SetPtEtaPhiM( 5., 0., 0., 0. );
                         }
-                        if( itree->gen_lep__pt[loose_ele_idx] > 5.0 ) {
+                        if( itree->gen_lep__pt[lep_idx_2] > 5.0 ) {
                             leptonLV2.SetPtEtaPhiM(
-                                itree->gen_lep__pt[loose_ele_idx],
-                                itree->gen_lep__eta[loose_ele_idx],
-                                itree->gen_lep__phi[loose_ele_idx],
-                                //FIXME: hardcoded masses?
-                                (itree->gen_lep__type[loose_ele_idx]==13 ? 0.105 : 0.0005 )
+                                itree->gen_lep__pt[lep_idx_2],
+                                itree->gen_lep__eta[lep_idx_2],
+                                itree->gen_lep__phi[lep_idx_2],
+                                (itree->gen_lep__type[lep_idx_2]==13 ? MU_MASS : ELE_MASS )
                             );
                         } else {
                             leptonLV2.SetPtEtaPhiM( 5., 0., 0., 0. );
                         }
                     }
 
-                    int lepSelVtype4 = (Vtype==2 && itree->lep__type[0]==13 && itree->gen_lep__type[loose_ele_idx]==11 &&
-                                        (leptonLV.Pt() >20 && TMath::Abs(leptonLV.Eta()) <muEtaTight && itree->lep__rel_iso[0]<lepIsoTight)
-                                        /* do something for electrons ? FIXME */
-                                        && itree->lep__charge[0] * itree->lep__charge[loose_ele_idx]<0
+					//First lepton is mu
+					//FIXME: if electron is the first, does not work
+                    int lepSelVtype4 = (Vtype == TTH::EventHypothesis::emu && itree->sig_lep__type[0] == 13 && itree->sig_lep__type[1] == 11 &&
+                                        (leptonLV.Pt() >20 && TMath::Abs(leptonLV.Eta()) < muEtaTight && itree->lep__rel_iso[lep_idx_1] < lepIsoTight)
+                                        && itree->sig_lep__charge[0] * itree->sig_lep__charge[1]<0
                                        );
 
                     // OR of four trigger paths:  "HLT_Mu40_eta2p1_v.*", "HLT_IsoMu24_eta2p1_v.*", "HLT_Mu40_v.*",  "HLT_IsoMu24_v.*"
-                    int trigVtype4 =  (Vtype==2 && ( triggerFlags[22]>0 || triggerFlags[23]>0 || triggerFlags[14]>0 ||triggerFlags[21]>0 ));
+                    int trigVtype4 =  (Vtype == TTH::EventHypothesis::emu && ( triggerFlags[22]>0 || triggerFlags[23]>0 || triggerFlags[14]>0 ||triggerFlags[21]>0 ));
 
                     // for the moment, don't cut on trigger bit (save and cut offline)
                     trigVtype4 = 1;
@@ -1799,27 +1886,28 @@ int main(int argc, const char* argv[])
                     otree->lepton_eta_    [0] = leptonLV.Eta();
                     otree->lepton_phi_    [0] = leptonLV.Phi();
                     otree->lepton_m_      [0] = leptonLV.M();
-                    otree->lepton_charge_ [0] = itree->lep__charge[0];
-                    otree->lepton_rIso_   [0] = itree->lep__rel_iso[0];
-                    otree->lepton_type_   [0] = itree->lep__type[0];
-                    otree->lepton_dxy_    [0] = itree->lep__dxy[0];
-                    otree->lepton_dz_     [0] = itree->lep__dz[0];
+                    otree->lepton_charge_ [0] = itree->lep__charge[lep_idx_1];
+                    otree->lepton_rIso_   [0] = itree->lep__rel_iso[lep_idx_1];
+                    otree->lepton_type_   [0] = itree->lep__type[lep_idx_1];
+                    otree->lepton_dxy_    [0] = itree->lep__dxy[lep_idx_1];
+                    otree->lepton_dz_     [0] = itree->lep__dz[lep_idx_1];
 
                     // lep 2...
                     otree->lepton_pt_     [1] = leptonLV2.Pt();
                     otree->lepton_eta_    [1] = leptonLV2.Eta();
                     otree->lepton_phi_    [1] = leptonLV2.Phi();
                     otree->lepton_m_      [1] = leptonLV2.M();
-                    otree->lepton_charge_ [1] = itree->lep__charge[loose_ele_idx];
-                    otree->lepton_rIso_   [1] = itree->lep__rel_iso[loose_ele_idx];
-                    otree->lepton_type_   [1] = itree->lep__type[loose_ele_idx];
-                    otree->lepton_dxy_    [1] = itree->lep__dxy[loose_ele_idx];
-                    otree->lepton_dz_     [1] = itree->lep__dz[loose_ele_idx];
+                    otree->lepton_charge_ [1] = itree->lep__charge[lep_idx_2];
+                    otree->lepton_rIso_   [1] = itree->lep__rel_iso[lep_idx_2];
+                    otree->lepton_type_   [1] = itree->lep__type[lep_idx_2];
+                    otree->lepton_dxy_    [1] = itree->lep__dxy[lep_idx_2];
+                    otree->lepton_dz_     [1] = itree->lep__dz[lep_idx_2];
                     //FIXME: add working points
-                    //otree->lepton_wp80_   [1] = aLepton_wp80[loose_ele_idx];
-                    //otree->lepton_wp95_   [1] = aLepton_wp95[loose_ele_idx];
+                    //otree->lepton_wp80_   [1] = aLepton_wp80[lep_idx_2];
+                    //otree->lepton_wp95_   [1] = aLepton_wp95[lep_idx_2];
 
-                    if ( isMC && Vtype==4 ) { // if EM events with triggered muon
+					//FIXME: =4 correct?
+                    if ( isMC && Vtype == 4 ) { // if EM events with triggered muon
                         otree->sf_ele_ = eleSF( otree->lepton_pt_[1], otree->lepton_eta_[1]);
                     } else {
                         otree->sf_ele_ = 1;
@@ -1833,11 +1921,6 @@ int main(int argc, const char* argv[])
                         cout << "Event rejected: not present in json file"<<endl;
                     continue;
                 }
-                //else if ( !isMC && reject_pixel_misalign_evts && (otree->EVENT_.run > 207883 && otree->EVENT_.run < 208307) ) {
-                //    if ( debug>=2 )
-                //        cout<<"Event rejected due to pixel misalignement"<<endl;
-                //    continue;
-                //}
 
                 // continue if leptons do not satisfy cuts
                 if( !(properEventSL || properEventDL) ) {
@@ -1868,7 +1951,6 @@ int main(int argc, const char* argv[])
 
                         float ptGen = DEF_VAL_FLOAT;
 
-                        //FIXME: why whould gen jet pt < 0
                         if(itree->gen_jet__pt[hj]>0.) ptGen = itree->gen_jet__pt[hj];
 
                         float pt     = itree->jet__pt[hj];
@@ -1877,7 +1959,6 @@ int main(int argc, const char* argv[])
                         float e      = itree->jet__energy[hj];
                         float m2     = e*e - pt*pt*TMath::CosH(eta)*TMath::CosH(eta);
 
-                        //FIXME: shouldn't this be a problem/exception?
                         if(m2<0) {
                             cerr << "jet " << hj << " m2 " << m2 << endl;
                             m2 = 0.;
@@ -1896,7 +1977,7 @@ int main(int argc, const char* argv[])
 
                         //FIXME: where to get JEC uncertainty?
                         //float JECUnc = hJet_JECUnc  [hj];
-                        float JECUnc = DEF_VAL_FLOAT;
+                        float JECUnc = 0.; // this has no effect
 
                         // subtract the nominal JEC corrected jet (px,py)
                         deltaPx -= ( pt*TMath::Cos(phi) );
@@ -3399,7 +3480,7 @@ int main(int argc, const char* argv[])
                     meIntegrator->setMEtCov(-99,-99,0);
 
                     // specify if topLep has pdgid +6 or -6
-                    meIntegrator->setTopFlags( itree->lep__charge[0]==1 ? +1 : -1 , itree->lep__charge[0]==1 ? -1 : +1 );
+                    meIntegrator->setTopFlags( itree->sig_lep__charge[0]==1 ? +1 : -1 , itree->sig_lep__charge[0]==1 ? -1 : +1 );
 
                     // if needed, switch off OL
                     if(switchoffOL) {
@@ -3510,7 +3591,8 @@ int main(int argc, const char* argv[])
 
                                     // the barcode for this permutation
                                     string barcode = Form("%d%d_%d_%d%d%d_%d%d%d_%d%d",
-                                                          otree->type_, meIntegrator->getIntType(), hyp, lep_index[0], 0, jets_index[ pos_to_index[bLep_pos] ],
+                                                          otree->type_, meIntegrator->getIntType(), hyp, 
+							  lep_index[0], 0, jets_index[ pos_to_index[bLep_pos] ],
                                                           otree->type_<6 ? jets_index[ pos_to_index[w1_pos] ] : lep_index[1], otree->type_<6 ? jets_index[ pos_to_index[w2_pos] ] : 0, jets_index[ pos_to_index[bHad_pos] ],
                                                           jets_index[ pos_to_index[b1_pos] ], jets_index[ pos_to_index[b2_pos] ]);
                                     PhaseSpacePoint PSP;
