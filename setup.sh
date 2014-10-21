@@ -1,6 +1,8 @@
 export SCRAM_ARCH=slc6_amd64_gcc481
 #cmsrel CMSSW_7_0_6_patch1
-scram project -n CMSSW CMSSW CMSSW_7_0_9_patch1
+
+#newest version existing on PSI
+scram project -n CMSSW CMSSW CMSSW_7_0_7_patch1
 cd CMSSW/src/
 cmsenv
 git cms-addpkg PhysicsTools/PatAlgos
