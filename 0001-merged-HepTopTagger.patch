@@ -1927,7 +1927,7 @@ index 8838f38..7214771 100644
    ClusterSequencePtr              fjClusterSeq_;    // fastjet cluster sequence
 @@ -201,6 +206,9 @@ protected:
  
-   int                   verbosity_;                 // flag to enable/disable debug output
+  int                   verbosity_;                 // flag to enable/disable debug output
  
 +  bool                  fromHTTTopJetProducer_;   // for running the v2.0 HEPTopTagger
 +
