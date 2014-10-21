@@ -220,7 +220,7 @@ process.fwliteInput = cms.PSet(
     fixNumEvJob    = cms.untracked.int32(1),
 
     # event limits
-    evLimits       = cms.vint32(0, 1),
+    evLimits       = cms.vint32(0, 20),
 
     # do systematic shifts (dummy)
     doJERbias  = cms.untracked.int32(0),
