@@ -49,12 +49,16 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
 	electrons = cms.InputTag("slimmedElectrons"),
 	taus = cms.InputTag("slimmedTaus"),
 	jets = cms.InputTag("slimmedJets"),
-	#topjets = cms.InputTag("hepTopTagPFJetsCHS"),
-	#topjetinfos = cms.InputTag("hepTopTagInfos"),
-	#topjetsubjets = cms.InputTag("hepTopTagPFJetsCHS", "caTopSubJets"),
-	topjets = cms.InputTag("HTTJetsCHS"),
-	topjetinfos = cms.InputTag("HTTJetsCHS"),
-	topjetsubjets = cms.InputTag("HTTJetsCHS", "caTopSubJets"),
+	genjets = cms.InputTag("slimmedGenJets"),
+
+	topjets1 = cms.InputTag("HTTJetsCHS"),
+	topjetinfos1 = cms.InputTag("HTTJetsCHS"),
+	topjetsubjets1 = cms.InputTag("HTTJetsCHS", "caTopSubJets"),
+
+	topjets2 = cms.InputTag("MultiRHTTJetsCHS"),
+	topjetinfos2 = cms.InputTag("MultiRHTTJetsCHS"),
+	topjetsubjets2 = cms.InputTag("MultiRHTTJetsCHS", "caTopSubJets"),
+
 	packed = cms.InputTag("packedGenParticles"),
 	pruned = cms.InputTag("prunedGenParticles"),
 	fatjets = cms.InputTag("slimmedJetsAK8"),
@@ -243,6 +247,32 @@ process.HTTJetsCHS = cms.EDProducer(
 	minCandMass = cms.double(0.),
 	maxCandMass = cms.double(20000.),
 )
+
+process.MultiRHTTJetsCHS = cms.EDProducer(
+    "HTTTopJetProducer",
+    PFJetParameters.clone( src = cms.InputTag('particleFlow'),
+                           doAreaFastjet = cms.bool(True),
+                           doRhoFastjet = cms.bool(False),
+                           jetPtMin = cms.double(100.0)
+                       ),
+    AnomalousCellParameters,
+    multiR = cms.bool(True),
+    algorithm = cms.int32(1),
+    jetAlgorithm = cms.string("CambridgeAachen"),
+    rParam = cms.double(1.5),
+    mode = cms.int32(4),
+    minFatjetPt = cms.double(200.),
+    minCandPt = cms.double(0.),
+    minSubjetPt = cms.double(30.),
+    writeCompound = cms.bool(True),
+    minCandMass = cms.double(0.),
+    maxCandMass = cms.double(20000.),
+    massRatioWidth = cms.double(15.),
+)
+
+process.load('Configuration.StandardSequences.Services_cff')
+process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
+process.GlobalTag.globaltag = "PLS170_V7AN1"
 
 process.p = cms.Path(
 	#process.hepTopTagPFJetsCHS *
