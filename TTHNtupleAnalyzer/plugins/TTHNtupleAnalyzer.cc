@@ -34,6 +34,7 @@
 #include "FWCore/Framework/interface/EDAnalyzer.h"
 
 #include "FWCore/Framework/interface/Event.h"
+#include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
@@ -42,6 +43,7 @@
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/PatCandidates/interface/Tau.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
+#include "DataFormats/JetReco/interface/GenJet.h"
 
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
@@ -74,8 +76,13 @@
 #include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
 #include "DataFormats/PatCandidates/interface/PackedTriggerPrescales.h"
 
-#include "TTH/TTHNtupleAnalyzer/interface/tth_tree.hh"
+#include "FWCore/Framework/interface/ESHandle.h"
+#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
+#include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
+#include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
+#include "JetMETCorrections/Objects/interface/JetCorrector.h"
 
+#include "TTH/TTHNtupleAnalyzer/interface/tth_tree.hh"
 
 #include "TStopwatch.h"
 
@@ -93,6 +100,7 @@
 //TTH, EventHypothesis
 #include "TTH/TTHNtupleAnalyzer/interface/EventHypothesis.hh"
 
+//converts a vector of objects to a vector of pointers 
 template <typename T, typename R>
 std::vector<R> to_ptrvec(T coll) {
 	std::vector<R> ret;
@@ -103,12 +111,18 @@ std::vector<R> to_ptrvec(T coll) {
 	return ret;
 }
 
+//ordering function for pt sorting
 template <typename T>
 bool order_by_pt(T a, T b) {
 	assert(a!=NULL && b!=NULL);
 	return (a->pt() > b->pt());
 };
 
+//finds a matched genparticle by dR, dPt and id
+//x - particle to match
+//pruned - collection of genparticles
+//returns: pointer to matched particle or 0 in case of no match
+//in case of multiple matches, the one with smallest dR is returned
 const reco::GenParticle* find_dr_dp_id_match(const reco::Candidate& x, edm::Handle<edm::View<reco::GenParticle>> pruned) {
 	std::vector<const reco::GenParticle*> matched;
 	for (auto& p : *pruned) {
@@ -221,11 +235,17 @@ private:
 	const edm::EDGetTokenT<pat::ElectronCollection> electronToken_;
 	const edm::EDGetTokenT<pat::TauCollection> tauToken_;
 	const edm::EDGetTokenT<pat::JetCollection> jetToken_;
+	const edm::EDGetTokenT<std::vector<reco::GenJet>> genJetToken_;
 
 	// collection of top jets
 	const edm::EDGetTokenT<edm::View<reco::BasicJet>> topJetToken_;
 	const edm::EDGetTokenT<edm::View<reco::PFJet>> topJetSubjetToken_;
 	const edm::EDGetTokenT<edm::View<reco::HTTTopJetTagInfo>> topJetInfoToken_;
+	
+	//second collection of top jets
+	const edm::EDGetTokenT<edm::View<reco::BasicJet>> topJetToken2_;
+	const edm::EDGetTokenT<edm::View<reco::PFJet>> topJetSubjetToken2_;
+	const edm::EDGetTokenT<edm::View<reco::HTTTopJetTagInfo>> topJetInfoToken2_;
 
 	// collection of vertices
 	const edm::EDGetTokenT<reco::VertexCollection> vertexToken_;
@@ -268,12 +288,12 @@ private:
 	const edm::EDGetTokenT<pat::PackedTriggerPrescales> triggerPrescales_;
 
 	// parameters
-	const bool	isMC_;
-	const double jetPt_min_;
-	const int	jetMult_min_;
-	const double muPt_min_;
-	const double elePt_min_;
-	const double tauPt_min_;
+	const bool		isMC_;
+	const double	jetPt_min_;
+	const int		jetMult_min_;
+	const double	muPt_min_;
+	const double	elePt_min_;
+	const double	tauPt_min_;
 };
 
 
@@ -282,27 +302,42 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
 	electronToken_(consumes<pat::ElectronCollection>(iConfig.getParameter<edm::InputTag>("electrons"))),
 	tauToken_(consumes<pat::TauCollection>(iConfig.getParameter<edm::InputTag>("taus"))),
 	jetToken_(consumes<pat::JetCollection>(iConfig.getParameter<edm::InputTag>("jets"))),
-	topJetToken_(consumes<edm::View<reco::BasicJet>>(iConfig.getParameter<edm::InputTag>("topjets"))),
-	topJetSubjetToken_(consumes<edm::View<reco::PFJet>>(iConfig.getParameter<edm::InputTag>("topjetsubjets"))),
-	topJetInfoToken_(consumes<edm::View<reco::HTTTopJetTagInfo>>(iConfig.getParameter<edm::InputTag>("topjetinfos"))),
+	genJetToken_(consumes<std::vector<reco::GenJet>>(iConfig.getParameter<edm::InputTag>("genjets"))),
+	
+	topJetToken_(consumes<edm::View<reco::BasicJet>>(iConfig.getParameter<edm::InputTag>("topjets1"))),
+	topJetSubjetToken_(consumes<edm::View<reco::PFJet>>(iConfig.getParameter<edm::InputTag>("topjetsubjets1"))),
+	topJetInfoToken_(consumes<edm::View<reco::HTTTopJetTagInfo>>(iConfig.getParameter<edm::InputTag>("topjetinfos1"))),
+
+	topJetToken2_(consumes<edm::View<reco::BasicJet>>(iConfig.getParameter<edm::InputTag>("topjets2"))),
+	topJetSubjetToken2_(consumes<edm::View<reco::PFJet>>(iConfig.getParameter<edm::InputTag>("topjetsubjets2"))),
+	topJetInfoToken2_(consumes<edm::View<reco::HTTTopJetTagInfo>>(iConfig.getParameter<edm::InputTag>("topjetinfos2"))),
+	
 	vertexToken_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("vertices"))),
 	prunedGenToken_(consumes<edm::View<reco::GenParticle> >(iConfig.getParameter<edm::InputTag>("pruned"))),
 	packedGenToken_(consumes<edm::View<pat::PackedGenParticle> >(iConfig.getParameter<edm::InputTag>("packed"))),
 	fatjetToken_(consumes<pat::JetCollection>(iConfig.getParameter<edm::InputTag>("fatjets"))),
 	metToken_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("mets"))),
 
+	//Gen-level
 	lheToken_( (iConfig.getParameter<edm::InputTag>("lhe")).label()!="" ?
-			   consumes<LHEEventProduct>( iConfig.getParameter<edm::InputTag>("lhe")) : edm::EDGetTokenT<LHEEventProduct>() ),
+			consumes<LHEEventProduct>( iConfig.getParameter<edm::InputTag>("lhe")) : edm::EDGetTokenT<LHEEventProduct>() ),
 
+	//output
 	tthtree(new TTHTree(fs->make<TTree>("events", "events"))),
 	hcounter(fs->make<TH1D>("event_counter", "event_counter", 5, 0, 5)),
+
+	//ID lists for tau and ele
 	tauIdentifiers_(iConfig.getParameter<std::vector<std::string>>("tauIdentifiers")),
 	eleIdentifiers_(iConfig.getParameter<std::vector<std::string>>("eleIdentifiers")),
+
+	//triggers
 	triggerIdentifiers_(iConfig.getParameter<std::vector<std::string>>("triggerIdentifiers")),
 	triggerIdentifiersForMatching_(iConfig.getParameter<std::vector<std::string>>("triggerIdentifiersForMatching")),
 	triggerBits_(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("bits"))),
 	triggerObjects_(consumes<pat::TriggerObjectStandAloneCollection>(iConfig.getParameter<edm::InputTag>("objects"))),
 	triggerPrescales_(consumes<pat::PackedTriggerPrescales>(iConfig.getParameter<edm::InputTag>("prescales"))),
+	
+	//cuts
 	isMC_(iConfig.getParameter<bool>("isMC")),
 	jetPt_min_  (iConfig.getUntrackedParameter<double>("jetPt_min", 5.)),
 	jetMult_min_(iConfig.getUntrackedParameter<int>   ("jetMult_min", DEF_VAL_INT)),
@@ -802,7 +837,23 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	//auto jetps = to_ptrvec<const std::vector<pat::Jet>&, const pat::Jet*>(*jets);
 	//std::sort(jetps.begin(), jetps.end(), order_by_pt<const pat::Jet*>);
 
+	//jet uncertainties
+	//https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyCorrections
+	//edm::ESHandle<JetCorrectorParametersCollection> JetCorParColl;
+	//iSetup.get<JetCorrectionsRecord>().get("AK4PFchs", JetCorParColl); 
+	//JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];
+	//JetCorrectionUncertainty *jec_unc = new JetCorrectionUncertainty(JetCorPar);
+	//Get the jet corrector from the event setup
+	//const JetCorrector* jet_corrector = JetCorrector::getJetCorrector("AK4PFchs", iSetup);
+
+
 	for (auto x : *jets) {
+
+		//edm::RefToBase<reco::Jet> jet_ref(edm::Ref<std::vector<pat::Jet>>(jets, n__jet));
+
+		//const double jec = jet_corrector->correction(x, jet_ref, iEvent, iSetup);
+		//const double unc = jec_unc->getUncertainty(true);
+
 		//assert(_x != NULL);
 		LogDebug("jets") << "n__jet=" << n__jet << CANDPRINT(x);
 
@@ -818,28 +869,28 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 			continue;
 		}
 
-		tthtree->jet__eta		   [n__jet] = x.eta();
+		tthtree->jet__eta			[n__jet] = x.eta();
 		tthtree->jet__pt			[n__jet] = x.pt();
-		tthtree->jet__phi		   [n__jet] = x.phi();
-		tthtree->jet__mass		  [n__jet] = x.mass();
+		tthtree->jet__phi			[n__jet] = x.phi();
+		tthtree->jet__mass			[n__jet] = x.mass();
 		tthtree->jet__energy		[n__jet] = x.energy();
 		tthtree->jet__bd_csv		[n__jet] = x.bDiscriminator("combinedSecondaryVertexBJetTags");
 		tthtree->jet__id			[n__jet] = x.partonFlavour();
 
-		tthtree->jet__jetId		 [n__jet]  = int(jetID( x ));
-		tthtree->jet__pileupJetId   [n__jet]  = x.userFloat("pileupJetId:fullDiscriminant");
-		tthtree->jet__vtxMass	   [n__jet]  = x.userFloat("vtxMass") ;
+		tthtree->jet__jetId			[n__jet]  = int(jetID( x ));
+		tthtree->jet__pileupJetId	[n__jet]  = x.userFloat("pileupJetId:fullDiscriminant");
+		tthtree->jet__vtxMass		[n__jet]  = x.userFloat("vtxMass") ;
 		tthtree->jet__vtxNtracks	[n__jet]  = x.userFloat("vtxNtracks")  ;
-		tthtree->jet__vtx3DVal	  [n__jet]  = x.userFloat("vtx3DVal")  ;
-		tthtree->jet__vtx3DSig	  [n__jet]  = x.userFloat("vtx3DSig")  ;
+		tthtree->jet__vtx3DVal		[n__jet]  = x.userFloat("vtx3DVal")  ;
+		tthtree->jet__vtx3DSig		[n__jet]  = x.userFloat("vtx3DSig")  ;
 
-		tthtree->jet__nh_e		  [n__jet] = x.neutralHadronEnergy();
-		tthtree->jet__ne_e		  [n__jet] = x.neutralEmEnergy();
-		tthtree->jet__ch_e		  [n__jet] = x.chargedHadronEnergy();
-		tthtree->jet__ce_e		  [n__jet] = x.chargedEmEnergy();
-		tthtree->jet__mu_e		  [n__jet] = x.muonEnergy();
-		tthtree->jet__el_e		  [n__jet] = x.electronEnergy();
-		tthtree->jet__ph_e		  [n__jet] = x.photonEnergy();
+		tthtree->jet__nh_e			[n__jet] = x.neutralHadronEnergy();
+		tthtree->jet__ne_e			[n__jet] = x.neutralEmEnergy();
+		tthtree->jet__ch_e			[n__jet] = x.chargedHadronEnergy();
+		tthtree->jet__ce_e			[n__jet] = x.chargedEmEnergy();
+		tthtree->jet__mu_e			[n__jet] = x.muonEnergy();
+		tthtree->jet__el_e			[n__jet] = x.electronEnergy();
+		tthtree->jet__ph_e			[n__jet] = x.photonEnergy();
 
 		//unsigned int constituent_idx = 0;
 		//for (const auto& constituent : x.getJetConstituents()) {
@@ -944,6 +995,26 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		} // isMC
 		n__jet += 1;
 	} //jet loop
+
+	//loop over all gen jets and find number of true B/C jets
+	if (isMC_) {
+		int n_sim_b = 0;
+		int n_sim_c = 0;
+
+		edm::Handle<std::vector<reco::GenJet>> genjets;
+		iEvent.getByToken(genJetToken_, genjets);
+		for (auto& p : *genjets) {
+			if(TMath::Abs(p.pdgId()) == 5) {
+				n_sim_b += 1;	
+			}
+			else if(TMath::Abs(p.pdgId()) == 4) {
+				n_sim_c += 1;	
+			}
+		}
+
+		tthtree->n_sim_b = n_sim_b;
+		tthtree->n_sim_c = n_sim_c;
+	}
 
 	//do initial hypothesis assignment
 	//identify signal leptons under two hypotheses: single lepton (tight), dilepton (loose)
@@ -1051,7 +1122,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	}
 	tthtree->n__sig_lep = good_leptons.size();
 
-	if( jetMult_min_>0 && n__jet<jetMult_min_ ) {
+	if( jetMult_min_ > 0 && n__jet < jetMult_min_ ) {
 		LogDebug("Event Cuts") << n__jet << " jets: skip this event" << endl;
 		return;
 	}
@@ -1065,10 +1136,20 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
 	assert(top_jets->size()==top_jet_infos->size());
 
+	//second collection of top tagger jets
+	//edm::Handle<edm::View<reco::BasicJet>> top_jets2;
+	//iEvent.getByToken(topJetToken2_, top_jets2);
+
+	//edm::Handle<edm::View<reco::HTTTopJetTagInfo>> top_jet_infos2;
+	//iEvent.getByToken(topJetInfoToken2_, top_jet_infos2);
+
+	//assert(top_jets->size()==top_jet_infos->size());
+
 	//Top jets and subjets are associated by indices
 	//See /cvmfs/cms.cern.ch/slc6_amd64_gcc481/cms/cmssw/CMSSW_7_0_9/src/RecoJets/JetProducers/plugins/CompoundJetProducer.cc
 	//about the association
 	int n_top_jet_subjet = 0;
+	//int n_top_jet_subjet2 = 0;
 
 	for (unsigned int n_top_jet=0; n_top_jet<top_jets->size(); n_top_jet++) {
 		const reco::BasicJet& x = top_jets->at(n_top_jet);
@@ -1138,6 +1219,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	tthtree->met__pt = met.pt();
 	tthtree->met__phi = met.phi();
 
+	//do MET shifting
 	if (isMC_) {
 
 		tthtree->n__met_shift = 12;
@@ -1200,7 +1282,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
 		tthtree->gen_met__pt  = met.genMET()->pt();
 		tthtree->gen_met__phi = met.genMET()->phi();
-	}
+	} //isMC for shifted MET
 
 	//get the LHE gen-level stuff
 	//code from LB --> LHE not always available
