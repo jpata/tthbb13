@@ -202,13 +202,13 @@ typedef struct {
 	int isL3;
 	int isLF;
 	//int index;
-	void fill(float pt_ = -99, float eta_ = -99, float phi_  = -99,
-			  int isL3_ = -99, int isLF_  = -99 /*, int index_  = -99*/) {
-		pt	= pt_ ;
-		eta   = eta_;
-		phi   = phi_;
-		isL3  = isL3_;
-		isLF  = isLF_;
+	void fill(float pt_ = -99, float eta_ = -99, float phi_ = -99,
+				int isL3_ = -99, int isLF_ = -99 /*, int index_ = -99*/) {
+		pt		= pt_ ;
+		eta		= eta_;
+		phi		= phi_;
+		isL3	= isL3_;
+		isLF	= isLF_;
 		//index = index_;
 	};
 } LightTriggerObj ;
@@ -265,8 +265,8 @@ private:
 	TTHTree* tthtree;
 	const edm::Service<TFileService> fs;
 
-    //a histogram with event counts	
-    TH1D* hcounter;
+	//a histogram with event counts	
+	TH1D* hcounter;
 
 	// a watch for CPU monitoring
 	TStopwatch* sw;
@@ -339,16 +339,16 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
 	
 	//cuts
 	isMC_(iConfig.getParameter<bool>("isMC")),
-	jetPt_min_  (iConfig.getUntrackedParameter<double>("jetPt_min", 5.)),
-	jetMult_min_(iConfig.getUntrackedParameter<int>   ("jetMult_min", DEF_VAL_INT)),
-	muPt_min_   (iConfig.getUntrackedParameter<double>("muPt_min",  5.)),
-	elePt_min_  (iConfig.getUntrackedParameter<double>("elePt_min", 5.)),
-	tauPt_min_  (iConfig.getUntrackedParameter<double>("tauPt_min", 5.))
+	jetPt_min_ (iConfig.getUntrackedParameter<double>("jetPt_min", 5.)),
+	jetMult_min_(iConfig.getUntrackedParameter<int> ("jetMult_min", DEF_VAL_INT)),
+	muPt_min_ (iConfig.getUntrackedParameter<double>("muPt_min", 5.)),
+	elePt_min_ (iConfig.getUntrackedParameter<double>("elePt_min", 5.)),
+	tauPt_min_ (iConfig.getUntrackedParameter<double>("tauPt_min", 5.))
 {
 	tthtree->make_branches();
-    
-    hcounter->GetXaxis()->SetBinLabel(1, "TTHNtupleAnalyzer__processed");
-    hcounter->GetXaxis()->SetBinLabel(2, "TTHNtupleAnalyzer__passed");
+	
+	hcounter->GetXaxis()->SetBinLabel(1, "TTHNtupleAnalyzer__processed");
+	hcounter->GetXaxis()->SetBinLabel(2, "TTHNtupleAnalyzer__passed");
 	sw = new TStopwatch();
 }
 
@@ -361,19 +361,19 @@ TTHNtupleAnalyzer::~TTHNtupleAnalyzer()
 void TTHNtupleAnalyzer::finalizeLoop() {
 }
 
-// ------------ method called for each event  ------------
+// ------------ method called for each event ------------
 void
 TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
-    //fill analyzed
-    hcounter->SetBinContent(1, hcounter->GetBinContent(1)+1);
+	//fill analyzed
+	hcounter->SetBinContent(1, hcounter->GetBinContent(1)+1);
 	using namespace edm;
 
 	sw->Start();
 	tthtree->loop_initialize();
 
-	tthtree->event__id   = (unsigned int)iEvent.id().event();
-	tthtree->event__run  = (unsigned int)iEvent.id().run();
+	tthtree->event__id = (unsigned int)iEvent.id().event();
+	tthtree->event__run = (unsigned int)iEvent.id().run();
 	tthtree->event__lumi = (unsigned int)iEvent.id().luminosityBlock();
 
 	//Primary vertices
@@ -414,8 +414,8 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	edm::Handle<pat::TriggerObjectStandAloneCollection> triggerObjects;
 	edm::Handle<pat::PackedTriggerPrescales> triggerPrescales;
 
-	iEvent.getByToken(triggerBits_,	  triggerBits);
-	iEvent.getByToken(triggerObjects_,   triggerObjects);
+	iEvent.getByToken(triggerBits_, triggerBits);
+	iEvent.getByToken(triggerObjects_, triggerObjects);
 	iEvent.getByToken(triggerPrescales_, triggerPrescales);
 
 
@@ -439,22 +439,22 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
 		for (unsigned int i = 0, n = triggerBits->size(); i < n; ++i) {
 
-			if( (isStarred  && names.triggerName(i).find(idNameUnstarred)!=string::npos ) ||
+			if( (isStarred && names.triggerName(i).find(idNameUnstarred)!=string::npos ) ||
 					(!isStarred && names.triggerName(i)==idName)
-			  ) {
+			) {
 				tthtree->trigger__bits	[n__tr] = triggerBits->accept(i);
 				tthtree->trigger__prescale[n__tr] = triggerPrescales->getPrescaleForIndex(i);
 			}
 			//std::cout << "Trigger " << names.triggerName(i) <<
 			//", prescale " << triggerPrescales->getPrescaleForIndex(i) <<
 			//": " << (triggerBits->accept(i) ? "PASS" : "fail (or not run)") << std::endl;
-			//std::cout <<  "'" << names.triggerName(i) << "'," << std::endl;
+			//std::cout << "'" << names.triggerName(i) << "'," << std::endl;
 		}
 		n__tr++;
 	}
 	tthtree->n__tr = n__tr;
 
-	if(  int(triggerIdentifiers_.size())>=T_MAX ) {
+	if( int(triggerIdentifiers_.size())>=T_MAX ) {
 		edm::LogError("T_MAX") << "Exceeded vector T_MAX with n__tr: " << n__tr << ">=> " << T_MAX;
 		throw std::exception();
 	}
@@ -493,21 +493,21 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 				// loop over the trigger bits for which we require a match
 				for (unsigned int j = 0; j < triggerIdentifiersForMatching_.size(); ++j) {
 					// check whether we have starred names
-					const string idName		  =  triggerIdentifiersForMatching_[j];
+					const string idName = triggerIdentifiersForMatching_[j];
 					//LogDebug("triggers") << "identifier for matcing " << idName;
 					string idNameUnstarred = idName;
 					bool isStarred		 = idName.find("*")!=string::npos;
 					if( isStarred ) idNameUnstarred.erase( idName.find("*"), 1 );
 
 					// check whether this path matches
-					if( ((isStarred  && pathNamesAll[h].find(idNameUnstarred)!=string::npos ) ||
+					if( ((isStarred && pathNamesAll[h].find(idNameUnstarred)!=string::npos ) ||
 							(!isStarred && pathNamesAll[h]==idName)) &&
 							(( obj.filterIds()[0] == 82 && idNameUnstarred.find("Ele")!=string::npos ) ||
 							 ( obj.filterIds()[0] == 83 && idNameUnstarred.find("Mu")!=string::npos && obj.collection().find("L3")!=string::npos ))
-					  ) {
-						bool isL3tmp   = obj.hasPathName( pathNamesAll[h], false, true );
-						bool isLFtmp   = obj.hasPathName( pathNamesAll[h], true, false );
-						//cout << h << "th path for Obj "<< countObj << " with " <<  obj.filterIds()[0] << " with pt=" << obj.pt() << "  matches to [" << j << "]" << endl;
+					) {
+						bool isL3tmp = obj.hasPathName( pathNamesAll[h], false, true );
+						bool isLFtmp = obj.hasPathName( pathNamesAll[h], true, false );
+						//cout << h << "th path for Obj "<< countObj << " with " << obj.filterIds()[0] << " with pt=" << obj.pt() << " matches to [" << j << "]" << endl;
 						isL3 = isL3 || isL3tmp;
 						isLF = isLF || (isLFtmp && isL3tmp);
 					}
@@ -555,22 +555,22 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	int n__jet = 0;
 
 	for (const pat::Muon &x : *muons) {
-        
+		
 		LogDebug("muons") << "n__mu=" << n__mu <<
-						  " pt=" << CANDPRINT(x) <<
-						  "abs eta " << TMath::Abs(x.eta()) << " " <<
-						  "isPF " << x.isPFMuon() << " " <<
-						  "isGlobal" << x.isGlobalMuon() << " " <<
-						  "normchi2" << (x.globalTrack().isNonnull() ? x.normChi2() : DEF_VAL_FLOAT) << " " << 
-						  "track layers " << (x.track().isNonnull() ? x.track()->hitPattern().trackerLayersWithMeasurement() : DEF_VAL_INT) << " " <<
-						  "globalTrack hits "<< (x.globalTrack().isNonnull() ? x.globalTrack()->hitPattern().numberOfValidMuonHits() : DEF_VAL_INT) << " " <<
-						  "dxy " << (x.muonBestTrack().isNonnull() ? x.muonBestTrack()->dxy(PV.position()) : DEF_VAL_INT) << " " <<
-						  "dz " << (x.muonBestTrack().isNonnull() ? x.muonBestTrack()->dz(PV.position()) : DEF_VAL_INT) << " " <<
-						  "inner pixelhits "<< (x.innerTrack().isNonnull() ? x.innerTrack()->hitPattern().numberOfValidPixelHits() : DEF_VAL_INT)  << " " <<
-						  "stations " << x.numberOfMatchedStations() << " " <<
-						  "lID=" << is_loose_muon(x) << " " <<
-						  "tID=" << is_tight_muon(x, PV) << " " <<
-						  "rel_iso "<< dbc_rel_iso(x);
+						" pt=" << CANDPRINT(x) <<
+						"abs eta " << TMath::Abs(x.eta()) << " " <<
+						"isPF " << x.isPFMuon() << " " <<
+						"isGlobal" << x.isGlobalMuon() << " " <<
+						"normchi2" << (x.globalTrack().isNonnull() ? x.normChi2() : DEF_VAL_FLOAT) << " " << 
+						"track layers " << (x.track().isNonnull() ? x.track()->hitPattern().trackerLayersWithMeasurement() : DEF_VAL_INT) << " " <<
+						"globalTrack hits "<< (x.globalTrack().isNonnull() ? x.globalTrack()->hitPattern().numberOfValidMuonHits() : DEF_VAL_INT) << " " <<
+						"dxy " << (x.muonBestTrack().isNonnull() ? x.muonBestTrack()->dxy(PV.position()) : DEF_VAL_INT) << " " <<
+						"dz " << (x.muonBestTrack().isNonnull() ? x.muonBestTrack()->dz(PV.position()) : DEF_VAL_INT) << " " <<
+						"inner pixelhits "<< (x.innerTrack().isNonnull() ? x.innerTrack()->hitPattern().numberOfValidPixelHits() : DEF_VAL_INT) << " " <<
+						"stations " << x.numberOfMatchedStations() << " " <<
+						"lID=" << is_loose_muon(x) << " " <<
+						"tID=" << is_tight_muon(x, PV) << " " <<
+						"rel_iso "<< dbc_rel_iso(x);
 
 		if( x.pt()<muPt_min_ ) {
 			LogDebug("muons") << "n__mu=" << n__mu << " fails pt cut" << endl;
@@ -579,18 +579,18 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		leptons.push_back((const reco::Candidate*)&x);
 
 		float minDist = 999.;
-		float minDpT  = 999.;
+		float minDpT = 999.;
 		for(unsigned int m = 0 ; m < muTriggerObj.size(); m++) {
 			LightTriggerObj obj = muTriggerObj[m];
 			float dist = sqrt( (obj.eta-x.eta())*(obj.eta-x.eta()) + (obj.phi-x.phi())*(obj.phi-x.phi()) );
-			float dpT  = fabs( obj.pt - x.pt() )/x.pt();
+			float dpT = fabs( obj.pt - x.pt() )/x.pt();
 			if( dist<minDist && dist<0.50 && dpT<minDpT && dpT<0.50 ) {
 				tthtree->trig_lep__pt [n__lep] = obj.pt;
 				tthtree->trig_lep__eta[n__lep] = obj.eta;
 				tthtree->trig_lep__phi[n__lep] = obj.phi;
 				tthtree->trig_lep__pass[n__lep]= obj.isLF + 1;
 				minDist = dist;
-				minDpT  = dpT;
+				minDpT = dpT;
 			}
 		}
 		if( minDist>998. ) {
@@ -661,18 +661,18 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		}
 		
 		float minDist = 999.;
-		float minDpT  = 999.;
+		float minDpT = 999.;
 		for(unsigned int m = 0 ; m < eleTriggerObj.size(); m++) {
 			LightTriggerObj obj = eleTriggerObj[m];
 			float dist = sqrt( (obj.eta-x.eta())*(obj.eta-x.eta()) + (obj.phi-x.phi())*(obj.phi-x.phi()) );
-			float dpT  = fabs( obj.pt - x.pt() )/x.pt();
+			float dpT = fabs( obj.pt - x.pt() )/x.pt();
 			if( dist<minDist && dist<0.50 && dpT<minDpT && dpT<0.50 ) {
 				tthtree->trig_lep__pt [n__lep] = obj.pt;
 				tthtree->trig_lep__eta[n__lep] = obj.eta;
 				tthtree->trig_lep__phi[n__lep] = obj.phi;
 				tthtree->trig_lep__pass[n__lep]= obj.isLF + 1;
 				minDist = dist;
-				minDpT  = dpT;
+				minDpT = dpT;
 			}
 		}
 		if( minDist>998. ) {
@@ -877,12 +877,12 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		tthtree->jet__bd_csv		[n__jet] = x.bDiscriminator("combinedSecondaryVertexBJetTags");
 		tthtree->jet__id			[n__jet] = x.partonFlavour();
 
-		tthtree->jet__jetId			[n__jet]  = int(jetID( x ));
-		tthtree->jet__pileupJetId	[n__jet]  = x.userFloat("pileupJetId:fullDiscriminant");
-		tthtree->jet__vtxMass		[n__jet]  = x.userFloat("vtxMass") ;
-		tthtree->jet__vtxNtracks	[n__jet]  = x.userFloat("vtxNtracks")  ;
-		tthtree->jet__vtx3DVal		[n__jet]  = x.userFloat("vtx3DVal")  ;
-		tthtree->jet__vtx3DSig		[n__jet]  = x.userFloat("vtx3DSig")  ;
+		tthtree->jet__jetId			[n__jet] = int(jetID( x ));
+		tthtree->jet__pileupJetId	[n__jet] = x.userFloat("pileupJetId:fullDiscriminant");
+		tthtree->jet__vtxMass		[n__jet] = x.userFloat("vtxMass") ;
+		tthtree->jet__vtxNtracks	[n__jet] = x.userFloat("vtxNtracks");
+		tthtree->jet__vtx3DVal		[n__jet] = x.userFloat("vtx3DVal");
+		tthtree->jet__vtx3DSig		[n__jet] = x.userFloat("vtx3DSig");
 
 		tthtree->jet__nh_e			[n__jet] = x.neutralHadronEnergy();
 		tthtree->jet__ne_e			[n__jet] = x.neutralEmEnergy();
@@ -1049,8 +1049,8 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		good_jets_dl
 	);
 
-	LogDebug("hypo") << "SL hypo mu " << good_muons_sl.size() << " ele " << good_electrons_sl.size() << " tau " << good_taus_sl.size() << " jet " << good_jets_sl.size();   
-	LogDebug("hypo") << "DL hypo mu " << good_muons_dl.size() << " ele " << good_electrons_dl.size() << " tau " << good_taus_dl.size() << " jet " << good_jets_sl.size();   
+	LogDebug("hypo") << "SL hypo mu " << good_muons_sl.size() << " ele " << good_electrons_sl.size() << " tau " << good_taus_sl.size() << " jet " << good_jets_sl.size();
+	LogDebug("hypo") << "DL hypo mu " << good_muons_dl.size() << " ele " << good_electrons_dl.size() << " tau " << good_taus_dl.size() << " jet " << good_jets_sl.size();
 	
 	TTH::EventHypothesis hypo = assign_event_hypothesis(desc_sl, desc_dl);
 	LogDebug("hypo") << "chosen hypo " << hypo;
@@ -1095,7 +1095,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
 		//must be 1, otherwise there was a bug in the hypothesis assignment
 		assert(good_leptons.size()==1);
-	   
+	
 	}
 	//sort by pt descending
 	sort(good_leptons.begin(), good_leptons.end(), order_by_pt<const reco::Candidate*>);
@@ -1225,62 +1225,62 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		tthtree->n__met_shift = 12;
 
 		// Pt
-		tthtree->met__pt__shift[0]  = met.shiftedPt(pat::MET::JetEnUp);
-		tthtree->met__pt__shift[1]  = met.shiftedPt(pat::MET::JetEnDown);
-		tthtree->met__pt__shift[2]  = met.shiftedPt(pat::MET::JetResUp);
-		tthtree->met__pt__shift[3]  = met.shiftedPt(pat::MET::JetResDown);
-		tthtree->met__pt__shift[4]  = met.shiftedPt(pat::MET::MuonEnUp);
-		tthtree->met__pt__shift[5]  = met.shiftedPt(pat::MET::MuonEnDown);
-		tthtree->met__pt__shift[6]  = met.shiftedPt(pat::MET::ElectronEnUp);
-		tthtree->met__pt__shift[7]  = met.shiftedPt(pat::MET::ElectronEnDown);
-		tthtree->met__pt__shift[8]  = met.shiftedPt(pat::MET::TauEnUp);
-		tthtree->met__pt__shift[9]  = met.shiftedPt(pat::MET::TauEnDown);
-		tthtree->met__pt__shift[10] = met.shiftedPt(pat::MET::UnclusteredEnUp);
-		tthtree->met__pt__shift[11] = met.shiftedPt(pat::MET::UnclusteredEnDown);
+		tthtree->met__pt__shift[0]	= met.shiftedPt(pat::MET::JetEnUp);
+		tthtree->met__pt__shift[1]	= met.shiftedPt(pat::MET::JetEnDown);
+		tthtree->met__pt__shift[2]	= met.shiftedPt(pat::MET::JetResUp);
+		tthtree->met__pt__shift[3]	= met.shiftedPt(pat::MET::JetResDown);
+		tthtree->met__pt__shift[4]	= met.shiftedPt(pat::MET::MuonEnUp);
+		tthtree->met__pt__shift[5]	= met.shiftedPt(pat::MET::MuonEnDown);
+		tthtree->met__pt__shift[6]	= met.shiftedPt(pat::MET::ElectronEnUp);
+		tthtree->met__pt__shift[7]	= met.shiftedPt(pat::MET::ElectronEnDown);
+		tthtree->met__pt__shift[8]	= met.shiftedPt(pat::MET::TauEnUp);
+		tthtree->met__pt__shift[9]	= met.shiftedPt(pat::MET::TauEnDown);
+		tthtree->met__pt__shift[10]	= met.shiftedPt(pat::MET::UnclusteredEnUp);
+		tthtree->met__pt__shift[11]	= met.shiftedPt(pat::MET::UnclusteredEnDown);
 
 		// Px
-		tthtree->met__px__shift[0]  = met.shiftedPx(pat::MET::JetEnUp);
-		tthtree->met__px__shift[1]  = met.shiftedPx(pat::MET::JetEnDown);
-		tthtree->met__px__shift[2]  = met.shiftedPx(pat::MET::JetResUp);
-		tthtree->met__px__shift[3]  = met.shiftedPx(pat::MET::JetResDown);
-		tthtree->met__px__shift[4]  = met.shiftedPx(pat::MET::MuonEnUp);
-		tthtree->met__px__shift[5]  = met.shiftedPx(pat::MET::MuonEnDown);
-		tthtree->met__px__shift[6]  = met.shiftedPx(pat::MET::ElectronEnUp);
-		tthtree->met__px__shift[7]  = met.shiftedPx(pat::MET::ElectronEnDown);
-		tthtree->met__px__shift[8]  = met.shiftedPx(pat::MET::TauEnUp);
-		tthtree->met__px__shift[9]  = met.shiftedPx(pat::MET::TauEnDown);
-		tthtree->met__px__shift[10] = met.shiftedPx(pat::MET::UnclusteredEnUp);
-		tthtree->met__px__shift[11] = met.shiftedPx(pat::MET::UnclusteredEnDown);
+		tthtree->met__px__shift[0]	= met.shiftedPx(pat::MET::JetEnUp);
+		tthtree->met__px__shift[1]	= met.shiftedPx(pat::MET::JetEnDown);
+		tthtree->met__px__shift[2]	= met.shiftedPx(pat::MET::JetResUp);
+		tthtree->met__px__shift[3]	= met.shiftedPx(pat::MET::JetResDown);
+		tthtree->met__px__shift[4]	= met.shiftedPx(pat::MET::MuonEnUp);
+		tthtree->met__px__shift[5]	= met.shiftedPx(pat::MET::MuonEnDown);
+		tthtree->met__px__shift[6]	= met.shiftedPx(pat::MET::ElectronEnUp);
+		tthtree->met__px__shift[7]	= met.shiftedPx(pat::MET::ElectronEnDown);
+		tthtree->met__px__shift[8]	= met.shiftedPx(pat::MET::TauEnUp);
+		tthtree->met__px__shift[9]	= met.shiftedPx(pat::MET::TauEnDown);
+		tthtree->met__px__shift[10]	= met.shiftedPx(pat::MET::UnclusteredEnUp);
+		tthtree->met__px__shift[11]	= met.shiftedPx(pat::MET::UnclusteredEnDown);
 
 		// Py
-		tthtree->met__py__shift[0]  = met.shiftedPy(pat::MET::JetEnUp);
-		tthtree->met__py__shift[1]  = met.shiftedPy(pat::MET::JetEnDown);
-		tthtree->met__py__shift[2]  = met.shiftedPy(pat::MET::JetResUp);
-		tthtree->met__py__shift[3]  = met.shiftedPy(pat::MET::JetResDown);
-		tthtree->met__py__shift[4]  = met.shiftedPy(pat::MET::MuonEnUp);
-		tthtree->met__py__shift[5]  = met.shiftedPy(pat::MET::MuonEnDown);
-		tthtree->met__py__shift[6]  = met.shiftedPy(pat::MET::ElectronEnUp);
-		tthtree->met__py__shift[7]  = met.shiftedPy(pat::MET::ElectronEnDown);
-		tthtree->met__py__shift[8]  = met.shiftedPy(pat::MET::TauEnUp);
-		tthtree->met__py__shift[9]  = met.shiftedPy(pat::MET::TauEnDown);
-		tthtree->met__py__shift[10] = met.shiftedPy(pat::MET::UnclusteredEnUp);
-		tthtree->met__py__shift[11] = met.shiftedPy(pat::MET::UnclusteredEnDown);
+		tthtree->met__py__shift[0]		= met.shiftedPy(pat::MET::JetEnUp);
+		tthtree->met__py__shift[1]		= met.shiftedPy(pat::MET::JetEnDown);
+		tthtree->met__py__shift[2]		= met.shiftedPy(pat::MET::JetResUp);
+		tthtree->met__py__shift[3]		= met.shiftedPy(pat::MET::JetResDown);
+		tthtree->met__py__shift[4]		= met.shiftedPy(pat::MET::MuonEnUp);
+		tthtree->met__py__shift[5]		= met.shiftedPy(pat::MET::MuonEnDown);
+		tthtree->met__py__shift[6]		= met.shiftedPy(pat::MET::ElectronEnUp);
+		tthtree->met__py__shift[7]		= met.shiftedPy(pat::MET::ElectronEnDown);
+		tthtree->met__py__shift[8]		= met.shiftedPy(pat::MET::TauEnUp);
+		tthtree->met__py__shift[9]		= met.shiftedPy(pat::MET::TauEnDown);
+		tthtree->met__py__shift[10]		= met.shiftedPy(pat::MET::UnclusteredEnUp);
+		tthtree->met__py__shift[11]		= met.shiftedPy(pat::MET::UnclusteredEnDown);
 
 		// Phi
-		tthtree->met__phi__shift[0]  = met.shiftedPhi(pat::MET::JetEnUp);
-		tthtree->met__phi__shift[1]  = met.shiftedPhi(pat::MET::JetEnDown);
-		tthtree->met__phi__shift[2]  = met.shiftedPhi(pat::MET::JetResUp);
-		tthtree->met__phi__shift[3]  = met.shiftedPhi(pat::MET::JetResDown);
-		tthtree->met__phi__shift[4]  = met.shiftedPhi(pat::MET::MuonEnUp);
-		tthtree->met__phi__shift[5]  = met.shiftedPhi(pat::MET::MuonEnDown);
-		tthtree->met__phi__shift[6]  = met.shiftedPhi(pat::MET::ElectronEnUp);
-		tthtree->met__phi__shift[7]  = met.shiftedPhi(pat::MET::ElectronEnDown);
-		tthtree->met__phi__shift[8]  = met.shiftedPhi(pat::MET::TauEnUp);
-		tthtree->met__phi__shift[9]  = met.shiftedPhi(pat::MET::TauEnDown);
-		tthtree->met__phi__shift[10] = met.shiftedPhi(pat::MET::UnclusteredEnUp);
-		tthtree->met__phi__shift[11] = met.shiftedPhi(pat::MET::UnclusteredEnDown);
+		tthtree->met__phi__shift[0]		= met.shiftedPhi(pat::MET::JetEnUp);
+		tthtree->met__phi__shift[1]		= met.shiftedPhi(pat::MET::JetEnDown);
+		tthtree->met__phi__shift[2]		= met.shiftedPhi(pat::MET::JetResUp);
+		tthtree->met__phi__shift[3]		= met.shiftedPhi(pat::MET::JetResDown);
+		tthtree->met__phi__shift[4]		= met.shiftedPhi(pat::MET::MuonEnUp);
+		tthtree->met__phi__shift[5]		= met.shiftedPhi(pat::MET::MuonEnDown);
+		tthtree->met__phi__shift[6]		= met.shiftedPhi(pat::MET::ElectronEnUp);
+		tthtree->met__phi__shift[7]		= met.shiftedPhi(pat::MET::ElectronEnDown);
+		tthtree->met__phi__shift[8]		= met.shiftedPhi(pat::MET::TauEnUp);
+		tthtree->met__phi__shift[9]		= met.shiftedPhi(pat::MET::TauEnDown);
+		tthtree->met__phi__shift[10]	= met.shiftedPhi(pat::MET::UnclusteredEnUp);
+		tthtree->met__phi__shift[11]	= met.shiftedPhi(pat::MET::UnclusteredEnDown);
 
-		tthtree->gen_met__pt  = met.genMET()->pt();
+		tthtree->gen_met__pt = met.genMET()->pt();
 		tthtree->gen_met__phi = met.genMET()->phi();
 	} //isMC for shifted MET
 
@@ -1313,10 +1313,10 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
 				if ( hepeup_.ISTUP[i] >= 0 && status == 1 ) {
 					if (!(hepeup_.MOTHUP[i].first !=1 && hepeup_.MOTHUP[i].second !=2)) {
-						if(idabs==5  ) countBquarks++;
-						if(idabs==4  ) countCquarks++;
+						if(idabs==5 ) countBquarks++;
+						if(idabs==4 ) countCquarks++;
 						if(idabs<=3 && idabs>=1 ) countUDSquarks++;
-						if(idabs==21  ) countGquarks++;
+						if(idabs==21 ) countGquarks++;
 						if(idabs==21 || (idabs>=1 && idabs<=5)) countExtraPartons++;
 					}
 				}
@@ -1361,7 +1361,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 				antitops.push_back(&gp);
 				LogDebug("genparticles") << "antitop " << CANDPRINT(gp) << " dau1 " << gp.daughter(0) << " dau2 " << gp.daughter(1);
 			}
-		   
+			
 			//b-quarks not from top decay
 			else if (gp.pdgId() == 5 && gp.status() == 3 && gp.mother(0)!=0 && abs(gp.mother(0)->pdgId()) == 25) {
 				bquarks.push_back(&gp);
@@ -1374,7 +1374,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 			}
 
 		} //pruned genparticles
-		LogDebug("genparticles") << "gensummary top " << tops.size() << " antitop " << antitops.size() << " bquark " <<  bquarks.size() << " antibquarks " << antibquarks.size();
+		LogDebug("genparticles") << "gensummary top " << tops.size() << " antitop " << antitops.size() << " bquark " << bquarks.size() << " antibquarks " << antibquarks.size();
 
 
 		if (tops.size()==1) {
@@ -1401,7 +1401,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 					edm::LogError("genparticle") << "top could not assign b " << b << " or w " << w;
 					edm::LogWarning("genparticle") << "top daughters " << top->numberOfDaughters();
 					for (unsigned int i=0;i < top->numberOfDaughters(); i++) {
-						cerr << " dau " << i << top->daughter(i) << " " << top->daughter(i)->pdgId();  
+						cerr << " dau " << i << top->daughter(i) << " " << top->daughter(i)->pdgId();
 					}
 					cerr << endl;
 					recursive_genparticle_print(top);
@@ -1449,7 +1449,6 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 				}
 			}
 		}
-   
 		//This is a carbon copy of the above
 		if (antitops.size()==1) {
 			//recursive_genparticle_print(antitops[0]);
@@ -1551,9 +1550,9 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	tthtree->debug__time1c = sw->CpuTime();
 	LogDebug("time") << "timing " << tthtree->debug__time1r << " " << tthtree->debug__time1c;
 	tthtree->tree->Fill();
-    
-    //fill passed 
-    hcounter->SetBinContent(2, hcounter->GetBinContent(2)+1);
+	
+	//fill passed 
+	hcounter->SetBinContent(2, hcounter->GetBinContent(2)+1);
 }
 
 // ------------ method called once each job just before starting event loop  ------------
