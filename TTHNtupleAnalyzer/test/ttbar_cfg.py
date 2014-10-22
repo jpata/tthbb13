@@ -1,3 +1,5 @@
+#a simple test config to run on a ttbar sample
+#used for scram b runtests (automatic testing)
 from TTH.TTHNtupleAnalyzer.Main_cfg import *
 
 process.source.fileNames = cms.untracked.vstring([
