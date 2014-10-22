@@ -58,24 +58,31 @@ public:
 
 	double debug__time1c;
 	double debug__time1r;
+	
 	int event__id;
 	int event__json;
 	int event__lumi;
 	int event__run;
+
 	int trigger__bits[T_MAX];
 	float trigger__prescale[T_MAX];
+
+	//b quark from TTH(->bb)
 	float gen_b__eta;
 	int gen_b__id;
 	float gen_b__mass;
 	float gen_b__phi;
 	float gen_b__pt;
 	int gen_b__status;
+
+	//bbar quark from TTH(->bb)
 	float gen_bbar__eta;
 	int gen_bbar__id;
 	float gen_bbar__mass;
 	float gen_bbar__phi;
 	float gen_bbar__pt;
 	int gen_bbar__status;
+
 	float gen_jet__eta[N_MAX];
 	int gen_jet__id[N_MAX];
 	float gen_jet__mass[N_MAX];
@@ -90,6 +97,7 @@ public:
 	float gen_jet_parton__pt[N_MAX];
 	int gen_jet_parton__status[N_MAX];
 	int gen_jet_parton__type[N_MAX];
+
 	float gen_lep__eta[N_MAX];
 	int gen_lep__id[N_MAX];
 	float gen_lep__mass[N_MAX];
@@ -97,8 +105,11 @@ public:
 	float gen_lep__pt[N_MAX];
 	int gen_lep__status[N_MAX];
 	int gen_lep__type[N_MAX];
+
 	float gen_met__phi;
 	float gen_met__pt;
+
+	//top quark in ttbar processes
 	float gen_t__b__eta;
 	float gen_t__b__mass;
 	float gen_t__b__phi;
@@ -116,6 +127,8 @@ public:
 	float gen_t__w_d2__phi;
 	float gen_t__w_d2__pt;
 	int gen_t__w_d2__status;
+
+	//tbar quark in ttbar processes
 	float gen_tbar__b__eta;
 	float gen_tbar__b__mass;
 	float gen_tbar__b__phi;
@@ -133,7 +146,11 @@ public:
 	float gen_tbar__w_d2__phi;
 	float gen_tbar__w_d2__pt;
 	int gen_tbar__w_d2__status;
+
+	//initial top pair decay hypothesis based on leptons
 	int hypo1;
+	
+	//reco-level jets
 	float jet__bd_csv[N_MAX];
 	float jet__ce_e[N_MAX];
 	float jet__ch_e[N_MAX];
@@ -155,6 +172,8 @@ public:
 	float jet__vtx3DVal[N_MAX];
 	float jet__vtxMass[N_MAX];
 	float jet__vtxNtracks[N_MAX];
+
+	//jets from top tagger 1
 	int jet_toptagger__child_idx[N_MAX];
 	float jet_toptagger__energy[N_MAX];
 	float jet_toptagger__eta[N_MAX];
@@ -177,6 +196,8 @@ public:
 	float jet_toptagger_sj__parent_idx[N_MAX];
 	float jet_toptagger_sj__phi[N_MAX];
 	float jet_toptagger_sj__pt[N_MAX];
+
+	//reco lepton, all ID-s, no particular ordering
 	float lep__ch_iso[N_MAX];
 	int lep__charge[N_MAX];
 	float lep__dxy[N_MAX];
@@ -197,11 +218,15 @@ public:
 	float lep__pt[N_MAX];
 	float lep__puch_iso[N_MAX];
 	float lep__rel_iso[N_MAX];
+	int lep__type[N_MAX];
+
+	//trigger lepton
   	float trig_lep__pt[N_MAX];
   	float trig_lep__eta[N_MAX];
   	float trig_lep__phi[N_MAX];
     int trig_lep__pass[N_MAX];
-	int lep__type[N_MAX];
+
+	//gen-level information from LHE
 	float lhe__ht;
 	int lhe__n_b;
 	int lhe__n_c;
@@ -209,14 +234,21 @@ public:
 	int lhe__n_g;
 	float lhe__n_j;
 	int lhe__n_l;
+	
+	int n_sim_b;
+	int n_sim_c;
+
+	//MET along with systematic shifts
 	float met__phi;
 	float met__pt;
 	float met__pt__en_down;
 	float met__pt__en_up;
-	float met__pt__shift [MET_S_MAX];
-	float met__px__shift [MET_S_MAX];
-	float met__py__shift [MET_S_MAX];
+	float met__pt__shift[MET_S_MAX];
+	float met__px__shift[MET_S_MAX];
+	float met__py__shift[MET_S_MAX];
 	float met__phi__shift[MET_S_MAX];
+    int n__met_shift;
+
 	int n__jet;
 	int n__jet_toptagger;
 	int n__jet_toptagger_sj;
@@ -229,12 +261,13 @@ public:
     //number of trigger identifiers
 	int n__tr;
 
-    int n__met_shift;
 	int n__sig_lep;
     
 	int pvi__bx[N_MAX];
 	float pvi__n0[N_MAX];
 	float pvi__ntrue[N_MAX];
+
+	//identified good signal leptons, number depends on hypothesis
 	int sig_lep__charge[N_MAX];
 	float sig_lep__eta[N_MAX];
 	int sig_lep__id[N_MAX];
@@ -243,6 +276,7 @@ public:
 	float sig_lep__phi[N_MAX];
 	float sig_lep__pt[N_MAX];
 	int sig_lep__type[N_MAX];
+
 	float weight__pu;
 	float weight__pu_down;
 	float weight__pu_up;
@@ -254,12 +288,15 @@ public:
 	void loop_initialize(void) {
 		debug__time1c = DEF_VAL_DOUBLE;
 		debug__time1r = DEF_VAL_DOUBLE;
+		
 		event__id = DEF_VAL_INT;
 		event__json = DEF_VAL_INT;
 		event__lumi = DEF_VAL_INT;
 		event__run = DEF_VAL_INT;
+		
 		SET_ZERO(trigger__bits, T_MAX, DEF_VAL_INT);
 		SET_ZERO(trigger__prescale, T_MAX, DEF_VAL_FLOAT);
+		
 		gen_b__eta = DEF_VAL_FLOAT;
 		gen_b__id = DEF_VAL_INT;
 		gen_b__mass = DEF_VAL_FLOAT;
@@ -272,6 +309,7 @@ public:
 		gen_bbar__phi = DEF_VAL_FLOAT;
 		gen_bbar__pt = DEF_VAL_FLOAT;
 		gen_bbar__status = DEF_VAL_INT;
+
 		SET_ZERO(gen_jet__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(gen_jet__id, N_MAX, DEF_VAL_INT);
 		SET_ZERO(gen_jet__mass, N_MAX, DEF_VAL_FLOAT);
@@ -295,6 +333,7 @@ public:
 		SET_ZERO(gen_lep__type, N_MAX, DEF_VAL_INT);
 		gen_met__phi = DEF_VAL_FLOAT;
 		gen_met__pt = DEF_VAL_FLOAT;
+
 		gen_t__b__eta = DEF_VAL_FLOAT;
 		gen_t__b__mass = DEF_VAL_FLOAT;
 		gen_t__b__phi = DEF_VAL_FLOAT;
@@ -312,6 +351,7 @@ public:
 		gen_t__w_d2__phi = DEF_VAL_FLOAT;
 		gen_t__w_d2__pt = DEF_VAL_FLOAT;
 		gen_t__w_d2__status = DEF_VAL_INT;
+
 		gen_tbar__b__eta = DEF_VAL_FLOAT;
 		gen_tbar__b__mass = DEF_VAL_FLOAT;
 		gen_tbar__b__phi = DEF_VAL_FLOAT;
@@ -329,7 +369,9 @@ public:
 		gen_tbar__w_d2__phi = DEF_VAL_FLOAT;
 		gen_tbar__w_d2__pt = DEF_VAL_FLOAT;
 		gen_tbar__w_d2__status = DEF_VAL_INT;
+		
 		hypo1 = DEF_VAL_INT;
+
 		SET_ZERO(jet__bd_csv, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet__ce_e, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet__ch_e, N_MAX, DEF_VAL_FLOAT);
@@ -351,6 +393,7 @@ public:
 		SET_ZERO(jet__vtx3DVal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet__vtxMass, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet__vtxNtracks, N_MAX, DEF_VAL_FLOAT);
+
 		SET_ZERO(jet_toptagger__child_idx, N_MAX, DEF_VAL_INT);
 		SET_ZERO(jet_toptagger__energy, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_toptagger__eta, N_MAX, DEF_VAL_FLOAT);
@@ -373,6 +416,7 @@ public:
 		SET_ZERO(jet_toptagger_sj__parent_idx, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_toptagger_sj__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_toptagger_sj__pt, N_MAX, DEF_VAL_FLOAT);
+
 		SET_ZERO(lep__ch_iso, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(lep__charge, N_MAX, DEF_VAL_INT);
 		SET_ZERO(lep__dxy, N_MAX, DEF_VAL_FLOAT);
@@ -406,6 +450,10 @@ public:
 		lhe__n_g = DEF_VAL_INT;
 		lhe__n_j = DEF_VAL_FLOAT;
 		lhe__n_l = DEF_VAL_INT;
+		
+		n_sim_b = DEF_VAL_INT;
+		n_sim_c = DEF_VAL_INT;
+		
 		met__phi = DEF_VAL_FLOAT;
 		met__pt = DEF_VAL_FLOAT;
 		SET_ZERO(met__pt__shift,  MET_S_MAX, DEF_VAL_FLOAT);
@@ -460,12 +508,17 @@ public:
 		tree->Branch("gen_tbar__w_d1__status", &gen_tbar__w_d1__status, "gen_tbar__w_d1__status/I");
 		tree->Branch("gen_tbar__w_d2__id", &gen_tbar__w_d2__id, "gen_tbar__w_d2__id/I");
 		tree->Branch("gen_tbar__w_d2__status", &gen_tbar__w_d2__status, "gen_tbar__w_d2__status/I");
+		
 		tree->Branch("hypo1", &hypo1, "hypo1/I");
+		
 		tree->Branch("lhe__n_b", &lhe__n_b, "lhe__n_b/I");
 		tree->Branch("lhe__n_c", &lhe__n_c, "lhe__n_c/I");
 		tree->Branch("lhe__n_e", &lhe__n_e, "lhe__n_e/I");
 		tree->Branch("lhe__n_g", &lhe__n_g, "lhe__n_g/I");
 		tree->Branch("lhe__n_l", &lhe__n_l, "lhe__n_l/I");
+		tree->Branch("n_sim_b", &n_sim_b, "n_sim_b/I");
+		tree->Branch("n_sim_c", &n_sim_c, "n_sim_c/I");
+
 		tree->Branch("n__jet", &n__jet, "n__jet/I");
 		tree->Branch("n__jet_toptagger", &n__jet_toptagger, "n__jet_toptagger/I");
 		tree->Branch("n__jet_toptagger_sj", &n__jet_toptagger_sj, "n__jet_toptagger_sj/I");
@@ -773,6 +826,7 @@ public:
 		tree->SetBranchAddress("lep__puch_iso", lep__puch_iso);
 		tree->SetBranchAddress("lep__rel_iso", lep__rel_iso);
 		tree->SetBranchAddress("lep__type", lep__type);
+
 		tree->SetBranchAddress("lhe__ht", &lhe__ht);
 		tree->SetBranchAddress("lhe__n_b", &lhe__n_b);
 		tree->SetBranchAddress("lhe__n_c", &lhe__n_c);
@@ -780,6 +834,9 @@ public:
 		tree->SetBranchAddress("lhe__n_g", &lhe__n_g);
 		tree->SetBranchAddress("lhe__n_j", &lhe__n_j);
 		tree->SetBranchAddress("lhe__n_l", &lhe__n_l);
+		tree->SetBranchAddress("n_sim_b", &n_sim_b);
+		tree->SetBranchAddress("n_sim_c", &n_sim_c);
+		
 		tree->SetBranchAddress("met__phi", &met__phi);
 		tree->SetBranchAddress("met__pt", &met__pt);
 		tree->SetBranchAddress("met__pt__en_down", &met__pt__en_down);
