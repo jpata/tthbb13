@@ -840,11 +840,11 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	//jet uncertainties
 	//https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyCorrections
 	//edm::ESHandle<JetCorrectorParametersCollection> JetCorParColl;
-	//iSetup.get<JetCorrectionsRecord>().get("AK4PFchs", JetCorParColl); 
+	//iSetup.get<JetCorrectionsRecord>().get("AK4PF", JetCorParColl); 
 	//JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];
 	//JetCorrectionUncertainty *jec_unc = new JetCorrectionUncertainty(JetCorPar);
 	//Get the jet corrector from the event setup
-	//const JetCorrector* jet_corrector = JetCorrector::getJetCorrector("AK4PFchs", iSetup);
+	//const JetCorrector* jet_corrector = JetCorrector::getJetCorrector("AK4PF", iSetup);
 
 
 	for (auto x : *jets) {
@@ -856,6 +856,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
 		//assert(_x != NULL);
 		LogDebug("jets") << "n__jet=" << n__jet << CANDPRINT(x);
+		//LogDebug("jets") << "n__jet=" << n__jet << CANDPRINT(x) << " " << unc;
 
 		// jet pt cut
 		if( x.pt()<jetPt_min_ ) {
@@ -1137,13 +1138,13 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	assert(top_jets->size()==top_jet_infos->size());
 
 	//second collection of top tagger jets
-	//edm::Handle<edm::View<reco::BasicJet>> top_jets2;
-	//iEvent.getByToken(topJetToken2_, top_jets2);
+	edm::Handle<edm::View<reco::BasicJet>> top_jets2;
+	iEvent.getByToken(topJetToken2_, top_jets2);
 
-	//edm::Handle<edm::View<reco::HTTTopJetTagInfo>> top_jet_infos2;
-	//iEvent.getByToken(topJetInfoToken2_, top_jet_infos2);
+	edm::Handle<edm::View<reco::HTTTopJetTagInfo>> top_jet_infos2;
+	iEvent.getByToken(topJetInfoToken2_, top_jet_infos2);
 
-	//assert(top_jets->size()==top_jet_infos->size());
+	assert(top_jets->size()==top_jet_infos->size());
 
 	//Top jets and subjets are associated by indices
 	//See /cvmfs/cms.cern.ch/slc6_amd64_gcc481/cms/cmssw/CMSSW_7_0_9/src/RecoJets/JetProducers/plugins/CompoundJetProducer.cc
@@ -1196,6 +1197,54 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	}
 	tthtree->n__jet_toptagger = top_jets->size();
 	tthtree->n__jet_toptagger_sj = n_top_jet_subjet;
+
+	//top jets 2
+	n_top_jet_subjet = 0;
+	for (unsigned int n_top_jet=0; n_top_jet<top_jets2->size(); n_top_jet++) {
+		const reco::BasicJet& x = top_jets2->at(n_top_jet);
+		const reco::HTTTopJetTagInfo& jet_info = top_jet_infos2->at(n_top_jet);
+		//assert(_x != NULL);
+		//const pat::Jet& x = *_x;
+		LogDebug("top jets") << "n_top_jet=" << n_top_jet << CANDPRINT(x);
+		tthtree->jet_toptagger2__eta[n_top_jet] = x.eta();
+		tthtree->jet_toptagger2__pt[n_top_jet] = x.pt();
+		tthtree->jet_toptagger2__phi[n_top_jet] = x.phi();
+		tthtree->jet_toptagger2__mass[n_top_jet] = x.mass();
+		tthtree->jet_toptagger2__energy[n_top_jet] = x.energy();
+		tthtree->jet_toptagger2__topMass[n_top_jet] = jet_info.properties().topMass;
+		tthtree->jet_toptagger2__unfilteredMass[n_top_jet] = jet_info.properties().unfilteredMass;
+		tthtree->jet_toptagger2__prunedMass[n_top_jet] = jet_info.properties().prunedMass;
+		tthtree->jet_toptagger2__fW[n_top_jet] = jet_info.properties().fW;
+		tthtree->jet_toptagger2__massRatioPassed[n_top_jet] = jet_info.properties().massRatioPassed;
+		tthtree->jet_toptagger2__isMultiR[n_top_jet] = (int)jet_info.properties().isMultiR;
+		tthtree->jet_toptagger2__Rmin[n_top_jet] = jet_info.properties().Rmin;
+		tthtree->jet_toptagger2__RminExpected[n_top_jet] = jet_info.properties().RminExpected;
+		//FIXME: nSubJets no longer in new top jet properties
+		//tthtree->jet_toptagger__n_sj[n_top_jet] = jet_info.properties().nSubJets;
+		tthtree->jet_toptagger2__n_sj[n_top_jet] = 3;
+
+		bool first = true;
+		for (auto& constituent : x.getJetConstituents()) {
+			if (constituent.isNull()) {
+				edm::LogWarning("top jets") << "n_top_jet=" << n_top_jet << " constituent is not valid";
+				break;
+			}
+			if (first) {
+				tthtree->jet_toptagger2__child_idx[n_top_jet] = n_top_jet_subjet;
+			}
+			tthtree->jet_toptagger2_sj__eta[n_top_jet_subjet] = constituent->eta();
+			tthtree->jet_toptagger2_sj__pt[n_top_jet_subjet] = constituent->pt();
+			tthtree->jet_toptagger2_sj__phi[n_top_jet_subjet] = constituent->phi();
+			tthtree->jet_toptagger2_sj__mass[n_top_jet_subjet] = constituent->mass();
+			tthtree->jet_toptagger2_sj__energy[n_top_jet_subjet] = constituent->energy();
+			tthtree->jet_toptagger2_sj__parent_idx[n_top_jet_subjet] = n_top_jet;
+			n_top_jet_subjet += 1;
+
+			first = false;
+		}
+	}
+	tthtree->n__jet_toptagger2 = top_jets2->size();
+	tthtree->n__jet_toptagger2_sj = n_top_jet_subjet;
 
 	if (n__lep>=N_MAX) {
 		edm::LogError("N_MAX") << "Exceeded vector N_MAX with n__lep: " << n__lep << ">=> " << N_MAX;

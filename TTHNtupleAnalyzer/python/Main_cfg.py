@@ -250,7 +250,7 @@ process.HTTJetsCHS = cms.EDProducer(
 
 process.MultiRHTTJetsCHS = cms.EDProducer(
     "HTTTopJetProducer",
-    PFJetParameters.clone( src = cms.InputTag('particleFlow'),
+    PFJetParameters.clone( src = cms.InputTag('packedPFCandidates'),
                            doAreaFastjet = cms.bool(True),
                            doRhoFastjet = cms.bool(False),
                            jetPtMin = cms.double(100.0)
@@ -274,10 +274,40 @@ process.load('Configuration.StandardSequences.Services_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.GlobalTag.globaltag = "PLS170_V7AN1"
 
+process.ak4PFL1Offset = cms.ESProducer("L1OffsetCorrectionESProducer",
+    minVtxNdof = cms.int32(4),
+    vertexCollection = cms.string('offlineSlimmedPrimaryVertices'),
+    algorithm = cms.string('AK4PF'),
+    level = cms.string('L1Offset')
+)
+
+process.ak4PFL2Relative = cms.ESProducer("LXXXCorrectionESProducer",
+    algorithm = cms.string('AK4PF'),
+    level = cms.string('L2Relative')
+)
+
+process.ak4PFL3Absolute = cms.ESProducer("LXXXCorrectionESProducer",
+    algorithm = cms.string('AK4PF'),
+    level = cms.string('L3Absolute')
+)
+
+process.ak4PFResidual = cms.ESProducer("LXXXCorrectionESProducer",
+    algorithm = cms.string('AK4PF'),
+    level = cms.string('L2L3Residual')
+)
+
+process.ak4PFL1FastL2L3Residual = cms.ESProducer("JetCorrectionESChain",
+    correctors = cms.vstring('ak4PFL1Fastjet',
+        'ak4PFL2Relative',
+        'ak4PFL3Absolute',
+        'ak4PFResidual')
+)
+
 process.p = cms.Path(
 	#process.hepTopTagPFJetsCHS *
 	#process.hepTopTagInfos *
 	process.HTTJetsCHS *
+	process.MultiRHTTJetsCHS *
 	process.tthNtupleAnalyzer
 )
 

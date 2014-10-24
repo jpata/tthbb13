@@ -178,7 +178,6 @@ public:
 	float jet_toptagger__energy[N_MAX];
 	float jet_toptagger__eta[N_MAX];
 	float jet_toptagger__mass[N_MAX];
-	float jet_toptagger__min_mass[N_MAX];
 	int jet_toptagger__n_sj[N_MAX];
 	float jet_toptagger__phi[N_MAX];
 	float jet_toptagger__pt[N_MAX];
@@ -196,6 +195,29 @@ public:
 	float jet_toptagger_sj__parent_idx[N_MAX];
 	float jet_toptagger_sj__phi[N_MAX];
 	float jet_toptagger_sj__pt[N_MAX];
+	
+	//jets from top tagger 1
+	int jet_toptagger2__child_idx[N_MAX];
+	float jet_toptagger2__energy[N_MAX];
+	float jet_toptagger2__eta[N_MAX];
+	float jet_toptagger2__mass[N_MAX];
+	int jet_toptagger2__n_sj[N_MAX];
+	float jet_toptagger2__phi[N_MAX];
+	float jet_toptagger2__pt[N_MAX];
+	float jet_toptagger2__topMass[N_MAX];
+	float jet_toptagger2__unfilteredMass[N_MAX];
+	float jet_toptagger2__prunedMass[N_MAX];
+	float jet_toptagger2__fW[N_MAX];
+	float jet_toptagger2__massRatioPassed[N_MAX];
+	int jet_toptagger2__isMultiR[N_MAX];
+	float jet_toptagger2__Rmin[N_MAX];
+	float jet_toptagger2__RminExpected[N_MAX];
+	float jet_toptagger2_sj__energy[N_MAX];
+	float jet_toptagger2_sj__eta[N_MAX];
+	float jet_toptagger2_sj__mass[N_MAX];
+	float jet_toptagger2_sj__parent_idx[N_MAX];
+	float jet_toptagger2_sj__phi[N_MAX];
+	float jet_toptagger2_sj__pt[N_MAX];
 
 	//reco lepton, all ID-s, no particular ordering
 	float lep__ch_iso[N_MAX];
@@ -252,6 +274,10 @@ public:
 	int n__jet;
 	int n__jet_toptagger;
 	int n__jet_toptagger_sj;
+	
+	int n__jet_toptagger2;
+	int n__jet_toptagger2_sj;
+	
 	int n__lep;
 
     //number of primary vertices
@@ -398,7 +424,6 @@ public:
 		SET_ZERO(jet_toptagger__energy, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_toptagger__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_toptagger__mass, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(jet_toptagger__min_mass, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_toptagger__n_sj, N_MAX, DEF_VAL_INT);
 		SET_ZERO(jet_toptagger__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_toptagger__pt, N_MAX, DEF_VAL_FLOAT);
@@ -416,6 +441,28 @@ public:
 		SET_ZERO(jet_toptagger_sj__parent_idx, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_toptagger_sj__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_toptagger_sj__pt, N_MAX, DEF_VAL_FLOAT);
+		
+		SET_ZERO(jet_toptagger2__child_idx, N_MAX, DEF_VAL_INT);
+		SET_ZERO(jet_toptagger2__energy, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_toptagger2__eta, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_toptagger2__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_toptagger2__n_sj, N_MAX, DEF_VAL_INT);
+		SET_ZERO(jet_toptagger2__phi, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_toptagger2__pt, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_toptagger2__topMass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_toptagger2__unfilteredMass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_toptagger2__prunedMass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_toptagger2__fW, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_toptagger2__massRatioPassed, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_toptagger2__isMultiR, N_MAX, DEF_VAL_INT);
+		SET_ZERO(jet_toptagger2__Rmin, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_toptagger2__RminExpected, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_toptagger2_sj__energy, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_toptagger2_sj__eta, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_toptagger2_sj__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_toptagger2_sj__parent_idx, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_toptagger2_sj__phi, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_toptagger2_sj__pt, N_MAX, DEF_VAL_FLOAT);
 
 		SET_ZERO(lep__ch_iso, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(lep__charge, N_MAX, DEF_VAL_INT);
@@ -463,6 +510,10 @@ public:
 		n__jet = DEF_VAL_INT;
 		n__jet_toptagger = DEF_VAL_INT;
 		n__jet_toptagger_sj = DEF_VAL_INT;
+		
+		n__jet_toptagger2 = DEF_VAL_INT;
+		n__jet_toptagger2_sj = DEF_VAL_INT;
+		
 		n__lep = DEF_VAL_INT;
 		n__tr  = DEF_VAL_INT;
 		n__pv  = DEF_VAL_INT;
@@ -522,6 +573,10 @@ public:
 		tree->Branch("n__jet", &n__jet, "n__jet/I");
 		tree->Branch("n__jet_toptagger", &n__jet_toptagger, "n__jet_toptagger/I");
 		tree->Branch("n__jet_toptagger_sj", &n__jet_toptagger_sj, "n__jet_toptagger_sj/I");
+		
+		tree->Branch("n__jet_toptagger2", &n__jet_toptagger2, "n__jet_toptagger2/I");
+		tree->Branch("n__jet_toptagger2_sj", &n__jet_toptagger2_sj, "n__jet_toptagger2_sj/I");
+		
 		tree->Branch("n__lep", &n__lep, "n__lep/I");
 		tree->Branch("n__pv", &n__pv, "n__pv/I");
 		tree->Branch("n__pvi", &n__pvi, "n__pvi/I");
@@ -608,11 +663,11 @@ public:
 		tree->Branch("jet__vtx3DVal", jet__vtx3DVal, "jet__vtx3DVal[n__jet]/F");
 		tree->Branch("jet__vtxMass", jet__vtxMass, "jet__vtxMass[n__jet]/F");
 		tree->Branch("jet__vtxNtracks", jet__vtxNtracks, "jet__vtxNtracks[n__jet]/F");
+		
 		tree->Branch("jet_toptagger__child_idx", jet_toptagger__child_idx, "jet_toptagger__child_idx[n__jet_toptagger]/I");
 		tree->Branch("jet_toptagger__energy", jet_toptagger__energy, "jet_toptagger__energy[n__jet_toptagger]/F");
 		tree->Branch("jet_toptagger__eta", jet_toptagger__eta, "jet_toptagger__eta[n__jet_toptagger]/F");
 		tree->Branch("jet_toptagger__mass", jet_toptagger__mass, "jet_toptagger__mass[n__jet_toptagger]/F");
-		tree->Branch("jet_toptagger__min_mass", jet_toptagger__min_mass, "jet_toptagger__min_mass[n__jet_toptagger]/F");
 		tree->Branch("jet_toptagger__n_sj", jet_toptagger__n_sj, "jet_toptagger__n_sj[n__jet_toptagger]/I");
 		tree->Branch("jet_toptagger__phi", jet_toptagger__phi, "jet_toptagger__phi[n__jet_toptagger]/F");
 		tree->Branch("jet_toptagger__pt", jet_toptagger__pt, "jet_toptagger__pt[n__jet_toptagger]/F");
@@ -630,6 +685,29 @@ public:
 		tree->Branch("jet_toptagger_sj__parent_idx", jet_toptagger_sj__parent_idx, "jet_toptagger_sj__parent_idx[n__jet_toptagger_sj]/F");
 		tree->Branch("jet_toptagger_sj__phi", jet_toptagger_sj__phi, "jet_toptagger_sj__phi[n__jet_toptagger_sj]/F");
 		tree->Branch("jet_toptagger_sj__pt", jet_toptagger_sj__pt, "jet_toptagger_sj__pt[n__jet_toptagger_sj]/F");
+		
+		tree->Branch("jet_toptagger2__child_idx", jet_toptagger2__child_idx, "jet_toptagger2__child_idx[n__jet_toptagger2]/I");
+		tree->Branch("jet_toptagger2__energy", jet_toptagger2__energy, "jet_toptagger2__energy[n__jet_toptagger2]/F");
+		tree->Branch("jet_toptagger2__eta", jet_toptagger2__eta, "jet_toptagger2__eta[n__jet_toptagger2]/F");
+		tree->Branch("jet_toptagger2__mass", jet_toptagger2__mass, "jet_toptagger2__mass[n__jet_toptagger2]/F");
+		tree->Branch("jet_toptagger2__n_sj", jet_toptagger2__n_sj, "jet_toptagger2__n_sj[n__jet_toptagger2]/I");
+		tree->Branch("jet_toptagger2__phi", jet_toptagger2__phi, "jet_toptagger2__phi[n__jet_toptagger2]/F");
+		tree->Branch("jet_toptagger2__pt", jet_toptagger2__pt, "jet_toptagger2__pt[n__jet_toptagger2]/F");
+		tree->Branch("jet_toptagger2__topMass", jet_toptagger2__topMass, "jet_toptagger2__topMass[n__jet_toptagger2]/F");
+		tree->Branch("jet_toptagger2__unfilteredMass", jet_toptagger2__unfilteredMass, "jet_toptagger2__unfilteredMass[n__jet_toptagger2]/F");
+		tree->Branch("jet_toptagger2__prunedMass", jet_toptagger2__prunedMass, "jet_toptagger2__prunedMass[n__jet_toptagger2]/F");
+		tree->Branch("jet_toptagger2__fW", jet_toptagger2__fW, "jet_toptagger2__fW[n__jet_toptagger2]/F");
+		tree->Branch("jet_toptagger2__massRatioPassed", jet_toptagger2__massRatioPassed, "jet_toptagger2__massRatioPassed[n__jet_toptagger2]/F");
+		tree->Branch("jet_toptagger2__isMultiR", jet_toptagger2__isMultiR, "jet_toptagger2__isMultiR[n__jet_toptagger2]/I");
+		tree->Branch("jet_toptagger2__Rmin", jet_toptagger2__Rmin, "jet_toptagger2__Rmin[n__jet_toptagger2]/F");
+		tree->Branch("jet_toptagger2__RminExpected", jet_toptagger2__RminExpected, "jet_toptagger2__RminExpected[n__jet_toptagger2]/F");
+		tree->Branch("jet_toptagger2_sj__energy", jet_toptagger2_sj__energy, "jet_toptagger2_sj__energy[n__jet_toptagger2_sj]/F");
+		tree->Branch("jet_toptagger2_sj__eta", jet_toptagger2_sj__eta, "jet_toptagger2_sj__eta[n__jet_toptagger2_sj]/F");
+		tree->Branch("jet_toptagger2_sj__mass", jet_toptagger2_sj__mass, "jet_toptagger2_sj__mass[n__jet_toptagger2_sj]/F");
+		tree->Branch("jet_toptagger2_sj__parent_idx", jet_toptagger2_sj__parent_idx, "jet_toptagger2_sj__parent_idx[n__jet_toptagger2_sj]/F");
+		tree->Branch("jet_toptagger2_sj__phi", jet_toptagger2_sj__phi, "jet_toptagger2_sj__phi[n__jet_toptagger2_sj]/F");
+		tree->Branch("jet_toptagger2_sj__pt", jet_toptagger2_sj__pt, "jet_toptagger2_sj__pt[n__jet_toptagger2_sj]/F");
+		
 		tree->Branch("lep__ch_iso", lep__ch_iso, "lep__ch_iso[n__lep]/F");
 		tree->Branch("lep__charge", lep__charge, "lep__charge[n__lep]/I");
 		tree->Branch("lep__dxy", lep__dxy, "lep__dxy[n__lep]/F");
@@ -787,7 +865,6 @@ public:
 		tree->SetBranchAddress("jet_toptagger__energy", jet_toptagger__energy);
 		tree->SetBranchAddress("jet_toptagger__eta", jet_toptagger__eta);
 		tree->SetBranchAddress("jet_toptagger__mass", jet_toptagger__mass);
-		tree->SetBranchAddress("jet_toptagger__min_mass", jet_toptagger__min_mass);
 		tree->SetBranchAddress("jet_toptagger__n_sj", jet_toptagger__n_sj);
 		tree->SetBranchAddress("jet_toptagger__phi", jet_toptagger__phi);
 		tree->SetBranchAddress("jet_toptagger__pt", jet_toptagger__pt);
