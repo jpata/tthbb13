@@ -31,7 +31,7 @@ process.fwliteInput = cms.PSet(
     ordering      = cms.string("output_"),
 
     # the samples
-    samples  =   cms.VPSet(
+    samples = cms.VPSet(
         cms.PSet(
             skip     = cms.bool(True),
             name     = cms.string('tthbb_step1_numEvent1000'),
