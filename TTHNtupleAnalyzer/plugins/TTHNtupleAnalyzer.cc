@@ -86,6 +86,8 @@
 
 #include "TStopwatch.h"
 
+#include "TLorentzVector.h"
+
 #define CANDPRINT(x) " pt=" << x.pt() << " eta=" << x.eta() << " phi=" << x.phi() << " id=" << x.pdgId() << " st=" << x.status()
 #define PCANDPRINT(x) " pt=" << x->pt() << " eta=" << x->eta() << " phi=" << x->phi() << " id=" << x->pdgId() << " st=" << x->status()
 #define GENJET_DR 0.5
@@ -93,6 +95,9 @@
 
 #define GENLEPTON_DR 0.5
 #define GENLEPTON_REL_DP 0.5
+
+//minimum dR between jet and leptonn
+#define JET_LEPTON_DR 0.4
 
 //how many good leptons to store in the good_lep array at most?
 #define N_MAX_GOOD_LEPTONS 2
@@ -194,7 +199,7 @@ const reco::Candidate* find_nonself_child(const reco::Candidate* p, int id=0) {
 		
 }
 
-
+//Trigger lepton struct
 typedef struct {
 	float pt;
 	float eta;
@@ -445,10 +450,10 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 				tthtree->trigger__bits	[n__tr] = triggerBits->accept(i);
 				tthtree->trigger__prescale[n__tr] = triggerPrescales->getPrescaleForIndex(i);
 			}
-			//std::cout << "Trigger " << names.triggerName(i) <<
-			//", prescale " << triggerPrescales->getPrescaleForIndex(i) <<
-			//": " << (triggerBits->accept(i) ? "PASS" : "fail (or not run)") << std::endl;
-			//std::cout << "'" << names.triggerName(i) << "'," << std::endl;
+			LogDebug("trigger") << "Trigger " << names.triggerName(i) <<
+			", prescale " << triggerPrescales->getPrescaleForIndex(i) <<
+			": " << (triggerBits->accept(i) ? "PASS" : "fail (or not run)") << std::endl;
+			LogDebug("trigger") << "'" << names.triggerName(i) << "'," << std::endl;
 		}
 		n__tr++;
 	}
@@ -778,6 +783,9 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		tthtree->lep__hc_iso[n__lep] = x.hcalIso();
 		tthtree->lep__p_iso[n__lep] = x.particleIso();
 		tthtree->lep__ph_iso[n__lep] = x.photonIso();
+		
+		tthtree->lep__is_tight[n__lep] = is_good_tau(x);
+		tthtree->lep__is_loose[n__lep] = is_good_tau(x); //FIXME: implement loose tau ID
 
 		//Bit-shift specified tau id-s into the id_bitmask
 		//Order is specified in the python config
@@ -847,6 +855,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	//const JetCorrector* jet_corrector = JetCorrector::getJetCorrector("AK4PF", iSetup);
 
 
+	
 	for (auto x : *jets) {
 
 		//edm::RefToBase<reco::Jet> jet_ref(edm::Ref<std::vector<pat::Jet>>(jets, n__jet));
@@ -870,8 +879,38 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 			continue;
 		}
 
+		bool fails_dr = false;
+		for (int n = 0; n < n__lep; n++) {
+			TLorentzVector v1;
+			v1.SetPtEtaPhiM(
+				tthtree->lep__pt[n],
+				tthtree->lep__eta[n],
+				tthtree->lep__phi[n],
+				tthtree->lep__mass[n]
+			);
+			
+			TLorentzVector v2;
+			v2.SetPtEtaPhiM(
+				x.pt(),
+				x.eta(),
+				x.phi(),
+				x.mass()
+			);
+
+			double dr = v1.DeltaR(v2);
+			if (tthtree->lep__is_loose[n]==1 && dr < JET_LEPTON_DR) {
+				LogDebug("jet") << "dR failed" << CANDPRINT(x) << " lep " << tthtree->lep__pt[n] << " " << tthtree->lep__eta[n] << " " << tthtree->lep__phi[n] << " " << tthtree->lep__id[n];
+				fails_dr = true;
+				break;
+			}
+		}
+		if (fails_dr) {
+			continue;	
+		}
+
 		tthtree->jet__eta			[n__jet] = x.eta();
 		tthtree->jet__pt			[n__jet] = x.pt();
+		tthtree->jet__pt_alt		[n__jet] = x.correctedJet("Uncorrected").pt();
 		tthtree->jet__phi			[n__jet] = x.phi();
 		tthtree->jet__mass			[n__jet] = x.mass();
 		tthtree->jet__energy		[n__jet] = x.energy();
@@ -880,6 +919,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
 		tthtree->jet__jetId			[n__jet] = int(jetID( x ));
 		tthtree->jet__pileupJetId	[n__jet] = x.userFloat("pileupJetId:fullDiscriminant");
+		tthtree->jet__pass_pileupJetId	[n__jet] = pu_mva::pass_id(x, x.userFloat("pileupJetId:fullDiscriminant"));
 		tthtree->jet__vtxMass		[n__jet] = x.userFloat("vtxMass") ;
 		tthtree->jet__vtxNtracks	[n__jet] = x.userFloat("vtxNtracks");
 		tthtree->jet__vtx3DVal		[n__jet] = x.userFloat("vtx3DVal");
@@ -1267,6 +1307,8 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	const pat::MET &met = mets->front();
 	tthtree->met__pt = met.pt();
 	tthtree->met__phi = met.phi();
+	
+	tthtree->met__sumet = met.sumEt();
 
 	//do MET shifting
 	if (isMC_) {
@@ -1330,6 +1372,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		tthtree->met__phi__shift[11]	= met.shiftedPhi(pat::MET::UnclusteredEnDown);
 
 		tthtree->gen_met__pt = met.genMET()->pt();
+		tthtree->gen_met__sumet = met.genMET()->sumEt();
 		tthtree->gen_met__phi = met.genMET()->phi();
 	} //isMC for shifted MET
 
