@@ -1,5 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
+import FWCore.ParameterSet.Config as cms
+
 triggerPathNames = cms.vstring([
         #'digitisation_step',
         #'L1simulation_step',
@@ -28,17 +30,17 @@ triggerPathNames = cms.vstring([
         #'HLT_DiPFJetAve400_v11',
         #'HLT_FatDiPFJetMass750_DR1p1_Deta1p5_v11',
         #'HLT_DoubleJet20_ForwardBackward_v4',
-        #'HLT_DiJet80_DiJet60_DiJet20_v6',
+        'HLT_DiJet80_DiJet60_DiJet20_v6',
         #'HLT_DiPFJet40_PFMETnoMu65_MJJ800VBF_AllJets_v10',
         #'HLT_DiPFJet40_PFMETnoMu65_MJJ600VBF_LeadingJets_v10',
         #'HLT_DiJet40Eta2p6_BTagIP3DFastPV_v8',
-        #'HLT_DiJet80Eta2p6_BTagIP3DFastPVLoose_v8',
-        #'HLT_Jet60Eta1p7_Jet53Eta1p7_DiBTagIP3DFastPV_v8',
-        #'HLT_Jet80Eta1p7_Jet70Eta1p7_DiBTagIP3DFastPV_v8',
-        #'HLT_Jet160Eta2p4_Jet120Eta2p4_DiBTagIP3DFastPVLoose_v8',
-        #'HLT_QuadJet45_v1',
-        #'HLT_QuadJet50_v5',
-        #'HLT_QuadJet60_DiJet20_v6',
+        'HLT_DiJet80Eta2p6_BTagIP3DFastPVLoose_v8',
+        'HLT_Jet60Eta1p7_Jet53Eta1p7_DiBTagIP3DFastPV_v8',
+        'HLT_Jet80Eta1p7_Jet70Eta1p7_DiBTagIP3DFastPV_v8',
+        'HLT_Jet160Eta2p4_Jet120Eta2p4_DiBTagIP3DFastPVLoose_v8',
+        'HLT_QuadJet45_v1',
+        'HLT_QuadJet50_v5',
+        'HLT_QuadJet60_DiJet20_v6',
         'HLT_QuadJet70_v6',
         'HLT_QuadJet80_v6',
         'HLT_QuadJet90_v6',
