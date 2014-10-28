@@ -15,6 +15,7 @@ from TTH.MEAnalysis.samples_v1 import samples
 
 # 0 = all events between evLow and evHigh will be considered
 # 1 = process (evHigh-evLow) events of the desired type starting from the beginning
+#
 fixNumEvJob = 0
 
 # run on all events
@@ -31,6 +32,7 @@ debug       = 0
 
 # systematics
 #systematics = cms.vint32(0,3,4,5,6)
+#
 systematics = cms.vint32(0)
 
 ############################################### Object definition
@@ -89,6 +91,8 @@ csv_WP_M = 0.679
 csv_WP_T = 0.898
 
 # select by btag_LR
+#0 -> choose fixed num of tags
+#1 -> choose by LR cut
 selectByBTagShape  = 1
 
 # cut values to select events

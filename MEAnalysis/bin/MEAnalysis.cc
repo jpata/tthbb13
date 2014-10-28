@@ -2493,6 +2493,7 @@ int main(int argc, const char* argv[])
                 // variable that flags events passing or failing the b-probability cut
                 int passes_btagshape = 0;
 
+				//LH ratio
                 if( /*selectByBTagShape &&*/ useBtag &&                    // run this only if specified AND...
                                              ((properEventSL && banytag_indices.size()>=5) ||   // [ run this only if SL and at least 5 jets OR...
                                               (properEventDL && banytag_indices.size()>=4)) ) { //   run this only if DL and at least 4 jets ]
