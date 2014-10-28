@@ -1,6 +1,71 @@
 #include <algorithm>
 #include "TTH/TTHNtupleAnalyzer/interface/HypoEnums.hh"
 
+//working points from RecoJets/JetProducers/python/PileupJetIDCutParams_cfi.py
+//Eta Categories  0-2.5 2.5-2.75 2.75-3.0 3.0-5.0
+namespace pu_mva {
+
+float full_chs_loose[4][4] = {
+	{-0.98,-0.95,-0.94,-0.94}, //pt 0-10
+	{-0.98,-0.95,-0.94,-0.94}, //pt 10-20
+	{-0.89,-0.77,-0.69,-0.75}, //pt 20-30
+	{-0.89,-0.77,-0.69,-0.57}, //pt 30-50
+};
+
+int eta_idx(float eta) {
+	const float ae = TMath::Abs(eta);
+	if (ae < 2.5) {
+		return 0;
+	}
+	else if(ae < 2.75) {
+		return 1;
+	}	
+	else if(ae < 3.0) {
+		return 2;
+	}	
+	else if(ae < 5.0) {
+		return 3;
+	} else {
+		edm::LogWarning("jet_pu_id") << "abs eta outside range " << ae;
+		return 3;
+	}	
+}
+
+int pt_idx(float pt) {
+	if (pt < 10) {
+		return 0;
+	}
+	else if(pt < 20) {
+		return 1;
+	}	
+	else if(pt < 30) {
+		return 2;
+	}	
+	else if(pt < 50) {
+		return 3;
+	} else {
+		//edm::LogWarning("jet_pu_id") << "pt outside range " << pt;
+		return -1;
+	}	
+}
+
+bool pass_id(const pat::Jet& x, float mva) {
+	int _pt_idx = pt_idx(x.pt());
+	int _eta_idx = eta_idx(x.eta());
+	
+	//hard jet
+	if (_pt_idx == -1) {
+		return true;	
+	}
+
+	if (mva > full_chs_loose[_pt_idx][_eta_idx]) {
+		return true;	
+	}
+	return false;
+}
+
+}
+
 template <typename T> bool is_in(const std::vector<T>& v, T o) {
     return std::find(v.begin(), v.end(), o)!=v.end();
 }
@@ -264,8 +329,8 @@ vector<const pat::Jet*> find_good_jets(const vector<pat::Jet>& jets, const Decay
         if(
             jet.pt() > 30 &&
             TMath::Abs(jet.eta()) < 2.5 &&
-            jetID(jet)
-	    // FIXME: LB: add jet pileup id
+            jetID(jet) &&
+            pu_mva::pass_id(jet, jet.userFloat("pileupJetId:fullDiscriminant"))
         ) {
             out.push_back(&jet);
         }
