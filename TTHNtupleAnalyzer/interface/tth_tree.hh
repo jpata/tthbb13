@@ -108,6 +108,7 @@ public:
 
 	float gen_met__phi;
 	float gen_met__pt;
+	float gen_met__sumet;
 
 	//top quark in ttbar processes
 	float gen_t__b__eta;
@@ -166,7 +167,9 @@ public:
 	float jet__ph_e[N_MAX];
 	float jet__phi[N_MAX];
 	float jet__pileupJetId[N_MAX];
+	int jet__pass_pileupJetId[N_MAX];
 	float jet__pt[N_MAX];
+	float jet__pt_alt[N_MAX]; //uncorrected jet pt
 	int jet__type[N_MAX];
 	float jet__vtx3DSig[N_MAX];
 	float jet__vtx3DVal[N_MAX];
@@ -263,6 +266,7 @@ public:
 	//MET along with systematic shifts
 	float met__phi;
 	float met__pt;
+	float met__sumet;
 	float met__pt__en_down;
 	float met__pt__en_up;
 	float met__pt__shift[MET_S_MAX];
@@ -359,6 +363,7 @@ public:
 		SET_ZERO(gen_lep__type, N_MAX, DEF_VAL_INT);
 		gen_met__phi = DEF_VAL_FLOAT;
 		gen_met__pt = DEF_VAL_FLOAT;
+		gen_met__sumet = DEF_VAL_FLOAT;
 
 		gen_t__b__eta = DEF_VAL_FLOAT;
 		gen_t__b__mass = DEF_VAL_FLOAT;
@@ -413,7 +418,9 @@ public:
 		SET_ZERO(jet__ph_e, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet__pileupJetId, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet__pass_pileupJetId, N_MAX, DEF_VAL_INT);
 		SET_ZERO(jet__pt, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet__pt_alt, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet__type, N_MAX, DEF_VAL_INT);
 		SET_ZERO(jet__vtx3DSig, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet__vtx3DVal, N_MAX, DEF_VAL_FLOAT);
@@ -503,6 +510,7 @@ public:
 		
 		met__phi = DEF_VAL_FLOAT;
 		met__pt = DEF_VAL_FLOAT;
+		met__sumet = DEF_VAL_FLOAT;
 		SET_ZERO(met__pt__shift,  MET_S_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(met__px__shift,  MET_S_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(met__py__shift,  MET_S_MAX, DEF_VAL_FLOAT);
@@ -657,7 +665,9 @@ public:
 		tree->Branch("jet__ph_e", jet__ph_e, "jet__ph_e[n__jet]/F");
 		tree->Branch("jet__phi", jet__phi, "jet__phi[n__jet]/F");
 		tree->Branch("jet__pileupJetId", jet__pileupJetId, "jet__pileupJetId[n__jet]/F");
+		tree->Branch("jet__pass_pileupJetId", jet__pass_pileupJetId, "jet__pass_pileupJetId[n__jet]/I");
 		tree->Branch("jet__pt", jet__pt, "jet__pt[n__jet]/F");
+		tree->Branch("jet__pt_alt", jet__pt_alt, "jet__pt_alt[n__jet]/F");
 		tree->Branch("jet__type", jet__type, "jet__type[n__jet]/I");
 		tree->Branch("jet__vtx3DSig", jet__vtx3DSig, "jet__vtx3DSig[n__jet]/F");
 		tree->Branch("jet__vtx3DVal", jet__vtx3DVal, "jet__vtx3DVal[n__jet]/F");
@@ -737,6 +747,7 @@ public:
 		tree->Branch("lhe__n_j", &lhe__n_j, "lhe__n_j/F");
 		tree->Branch("met__phi", &met__phi, "met__phi/F");
 		tree->Branch("met__pt", &met__pt, "met__pt/F");
+		tree->Branch("met__sumet", &met__sumet, "met__sumet/F");
 		tree->Branch("met__pt__shift", met__pt__shift, "met__pt__shift[n__met_shift]/F");
 		tree->Branch("met__px__shift", met__px__shift, "met__px__shift[n__met_shift]/F");
 		tree->Branch("met__py__shift", met__py__shift, "met__py__shift[n__met_shift]/F");
@@ -806,6 +817,7 @@ public:
 		tree->SetBranchAddress("gen_lep__type", gen_lep__type);
 		tree->SetBranchAddress("gen_met__phi", &gen_met__phi);
 		tree->SetBranchAddress("gen_met__pt", &gen_met__pt);
+		tree->SetBranchAddress("gen_met__sumet", &gen_met__sumet);
 		tree->SetBranchAddress("gen_t__b__eta", &gen_t__b__eta);
 		tree->SetBranchAddress("gen_t__b__mass", &gen_t__b__mass);
 		tree->SetBranchAddress("gen_t__b__phi", &gen_t__b__phi);
@@ -855,7 +867,8 @@ public:
 		tree->SetBranchAddress("jet__ph_e", jet__ph_e);
 		tree->SetBranchAddress("jet__phi", jet__phi);
 		tree->SetBranchAddress("jet__pileupJetId", jet__pileupJetId);
-		tree->SetBranchAddress("jet__pt", jet__pt);
+		tree->SetBranchAddress("jet__pass_pileupJetId", jet__pass_pileupJetId);
+		tree->SetBranchAddress("jet__pt_alt", jet__pt_alt);
 		tree->SetBranchAddress("jet__type", jet__type);
 		tree->SetBranchAddress("jet__vtx3DSig", jet__vtx3DSig);
 		tree->SetBranchAddress("jet__vtx3DVal", jet__vtx3DVal);
@@ -916,6 +929,7 @@ public:
 		
 		tree->SetBranchAddress("met__phi", &met__phi);
 		tree->SetBranchAddress("met__pt", &met__pt);
+		tree->SetBranchAddress("met__sumet", &met__sumet);
 		tree->SetBranchAddress("met__pt__en_down", &met__pt__en_down);
 		tree->SetBranchAddress("met__pt__en_up", &met__pt__en_up);
 		tree->SetBranchAddress("n__jet", &n__jet);
