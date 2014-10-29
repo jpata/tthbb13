@@ -18,7 +18,11 @@ public:
     
     // counts how many events have been analyzed (to have fixed-size jobs)
     int counter_;
-    // number of jet-quark permutations (for signal and bkg hypotheses)
+    
+	//Index of the processed sample
+    int sample;
+    
+	// number of jet-quark permutations (for signal and bkg hypotheses)
     int nPermut_, nPermut_alt_;
     // number of (Higgs/Top) mass points
     int nMassPoints_;
@@ -219,6 +223,7 @@ public:
     
 	void make_branches(const float MH) {
         tree->Branch("counter",      &counter_,       "counter/I");
+        tree->Branch("sample",       &sample,        "sample/I");
         tree->Branch("nPermut_s",    &nPermut_,       "nPermut_s/I");
         tree->Branch("nPermut_b",    &nPermut_alt_,   "nPermut_b/I");
         tree->Branch("nMassPoints",  &nMassPoints_,   "nMassPoints/I");
