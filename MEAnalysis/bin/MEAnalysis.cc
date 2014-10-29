@@ -103,7 +103,6 @@ int main(int argc, const char* argv[])
     /* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  */
     /* @@@@@@@@@@@@@@@@@@@@@@@@ FWLITE @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  */
 
-    cout << "MEAnalysis version " << VERSION << endl;
     gROOT->SetBatch(true);
 
     gSystem->Load("libFWCoreFWLite");
@@ -531,7 +530,10 @@ int main(int argc, const char* argv[])
     TFile* fout_tmp = TFile::Open(outFileName.c_str(),"UPDATE");
 
     // total event counter for normalization
-    TH1F*  hcounter = new TH1F("hcounter","",2,0,2);
+    TH1F*  hcounter = new TH1F("hcounter", "", 3, 0, 3);
+	hcounter->GetXaxis()->SetBinLabel(1, "fraction of processed events");
+	hcounter->GetXaxis()->SetBinLabel(2, "number of events processed");
+	hcounter->GetXaxis()->SetBinLabel(3, "number of events passing");
 
     // save a snapshot of the configuration parameters
     vector<std::string> paramsAll = in.getParameterNames();
@@ -630,16 +632,16 @@ int main(int argc, const char* argv[])
     // loop over input files
     for(unsigned int sample = 0 ; sample < mySampleFiles.size(); sample++) {
         
-        //Need to reinitialize for each file
+		//Need to reinitialize for each file
         evHigh = evLimits[1];
 
-        string currentName       = mySampleFiles[sample];
+        string currentName = mySampleFiles[sample];
 
         //if(currentName.find("Run2012")!=string::npos) isMC = false;
 
         mySamples->OpenFile( currentName );
         cout << "Opening file " << currentName << endl;
-        TTree* currentTree       = mySamples->GetTree  (currentName, TTH_TTREE_NAME);
+        TTree* currentTree = mySamples->GetTree  (currentName, TTH_TTREE_NAME);
 
         //create the input TTree with branches
         TTHTree* itree = new TTHTree(currentTree);
@@ -690,6 +692,9 @@ int main(int argc, const char* argv[])
         for (Long64_t i = 0; i < nentries ; i++) {
             // initialize branch variables
             itree->loop_initialize();
+
+			//fill histogram counter with number of processed events
+			hcounter->SetBinContent(2, hcounter->GetBinContent(2)+1);
 
             // if fixed-size job and above upper bound, continue...
             if(counter>evHigh && fixNumEvJob) continue;
@@ -783,7 +788,7 @@ int main(int argc, const char* argv[])
 
             //FIXME: what are nSimB-s
             //otree->nSimBs_             = nSimBs;
-
+			otree->sample				= sample; 
             otree->counter_            = counter;
             otree->weight_             = scaleFactor;
             otree->weightTopPt_        = 1;
@@ -1960,7 +1965,7 @@ int main(int argc, const char* argv[])
                         float m2     = e*e - pt*pt*TMath::CosH(eta)*TMath::CosH(eta);
 
                         if(m2<0) {
-                            cerr << "jet " << hj << " m2 " << m2 << endl;
+                            cerr << "jet " << hj << " m2 " << m2 << " " << pt << " " << eta << " " << phi << " " << e << endl;
                             m2 = 0.;
                         }
 
@@ -4297,6 +4302,9 @@ int main(int argc, const char* argv[])
                 // fill the tree...
                 // FIXME: why is this here twice?
                 otree->tree->Fill();
+				
+				//fill histogram counter with number of processed events
+				hcounter->SetBinContent(3, hcounter->GetBinContent(3)+1);
 
             } // systematics
 
@@ -4313,12 +4321,11 @@ int main(int argc, const char* argv[])
             }
             if(perm_to_integrator.size()>0 && print)
                 cout << "Deleted " << countGSL << " GSLMCIntegrator(s)" << endl;
-
-        } // nentries, event loop
+        
+		} // nentries, event loop
 
         // this histogram keeps track of the fraction of analyzed events per sample
         hcounter->SetBinContent(1,float(events_)/nentries);
-        hcounter->SetBinContent(2,nentries);
 
         if(debug>=2) cout << "@L" << endl;
 
