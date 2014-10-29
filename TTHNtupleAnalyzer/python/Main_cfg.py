@@ -4,13 +4,22 @@ from FWCore.ParameterSet.VarParsing import VarParsing
 import os
 
 options = VarParsing('analysis')
+options.register ('skipEvents',
+	0,
+	VarParsing.multiplicity.singleton,
+	VarParsing.varType.int,
+	"Skip this number of events"
+)
+
 process = cms.Process("Demo")
 options.parseArguments()
 
 if len(options.inputFiles)==0:
 		#options.inputFiles = cms.untracked.vstring(["/store/mc/Spring14miniaod/TTbarH_HToBB_M-125_13TeV_pythia6/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/00000/0E97DD3E-2209-E411-8A04-003048945312.root"])
-	options.inputFiles = cms.untracked.vstring(['/store/mc/Spring14miniaod/TTbarH_HToBB_M-125_13TeV_pythia6/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/00000/0E97DD3E-2209-E411-8A04-003048945312.root',
-							'/store/mc/Spring14miniaod/TTbarH_HToBB_M-125_13TeV_pythia6/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/00000/D0242854-2209-E411-B361-003048C559CE.root'])
+	options.inputFiles = cms.untracked.vstring([
+		'/store/mc/Spring14miniaod/TTbarH_HToBB_M-125_13TeV_pythia6/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/00000/0E97DD3E-2209-E411-8A04-003048945312.root',
+		'/store/mc/Spring14miniaod/TTbarH_HToBB_M-125_13TeV_pythia6/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/00000/D0242854-2209-E411-B361-003048C559CE.root'
+])
 
 
 #enable debugging printout
@@ -32,7 +41,8 @@ process.source = cms.Source("PoolSource",
 	# replace 'myfile.root' with the source file you want to use
 	fileNames = cms.untracked.vstring(
 		options.inputFiles
-	)
+	),
+	skipEvents = cms.untracked.uint32(options.skipEvents)
 )
 
 from TTH.TTHNtupleAnalyzer.triggers_MC_cff import *
@@ -269,6 +279,29 @@ process.MultiRHTTJetsCHS = cms.EDProducer(
     maxCandMass = cms.double(20000.),
     massRatioWidth = cms.double(15.),
 )
+
+#for comparison with Gregor
+#process.MultiRHTTJetsCHS = cms.EDProducer(
+#     "HTTTopJetProducer",
+#     PFJetParameters.clone( src = cms.InputTag('packedPFCandidates'),
+#                            doAreaFastjet = cms.bool(True),
+#                            doRhoFastjet = cms.bool(False),
+#                            jetPtMin = cms.double(100.0)
+#                        ),
+#     AnomalousCellParameters,
+#     multiR = cms.bool(True),
+#     algorithm = cms.int32(1),
+#     jetAlgorithm = cms.string("CambridgeAachen"),
+#     rParam = cms.double(1.5),
+#     mode = cms.int32(4),
+#     minFatjetPt = cms.double(200.),
+#     minCandPt = cms.double(0.),
+#     minSubjetPt = cms.double(30.),
+#     writeCompound = cms.bool(True),
+#     minCandMass = cms.double(140.),
+#     maxCandMass = cms.double(250.),
+#     massRatioWidth = cms.double(15.),
+#)
 
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
