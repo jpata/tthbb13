@@ -626,6 +626,7 @@ public:
 		tree->Branch("gen_lep__type", gen_lep__type, "gen_lep__type[n__lep]/I");
 		tree->Branch("gen_met__phi", &gen_met__phi, "gen_met__phi/F");
 		tree->Branch("gen_met__pt", &gen_met__pt, "gen_met__pt/F");
+		tree->Branch("gen_met__sumet", &gen_met__sumet, "gen_met__sumet/F");
 		tree->Branch("gen_t__b__eta", &gen_t__b__eta, "gen_t__b__eta/F");
 		tree->Branch("gen_t__b__mass", &gen_t__b__mass, "gen_t__b__mass/F");
 		tree->Branch("gen_t__b__phi", &gen_t__b__phi, "gen_t__b__phi/F");
@@ -868,6 +869,7 @@ public:
 		tree->SetBranchAddress("jet__phi", jet__phi);
 		tree->SetBranchAddress("jet__pileupJetId", jet__pileupJetId);
 		tree->SetBranchAddress("jet__pass_pileupJetId", jet__pass_pileupJetId);
+		tree->SetBranchAddress("jet__pt", jet__pt);
 		tree->SetBranchAddress("jet__pt_alt", jet__pt_alt);
 		tree->SetBranchAddress("jet__type", jet__type);
 		tree->SetBranchAddress("jet__vtx3DSig", jet__vtx3DSig);
