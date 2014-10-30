@@ -558,7 +558,8 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
 	// jet counter
 	int n__jet = 0;
-
+	
+	std::vector<pat::Muon> analysis_muons;
 	for (const pat::Muon &x : *muons) {
 		
 		LogDebug("muons") << "n__mu=" << n__mu <<
@@ -652,12 +653,14 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		}
 		n__mu += 1;
 		n__lep += 1;
+		analysis_muons.push_back(x);
 	} //muons
 
 
 	//Electrons
 	edm::Handle<pat::ElectronCollection> electrons;
 	iEvent.getByToken(electronToken_, electrons);
+	std::vector<pat::Electron> analysis_electrons;
 	for (const pat::Electron &x : *electrons) {
 		LogDebug("electrons") << "n__ele=" << n__ele << CANDPRINT(x); 
 		if( x.pt()<elePt_min_ ) {
@@ -755,10 +758,13 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		}
 		n__ele += 1;
 		n__lep += 1;
+
+		analysis_electrons.push_back(x);
 	} // electrons
 
 	edm::Handle<pat::TauCollection> taus;
 	iEvent.getByToken(tauToken_, taus);
+	std::vector<pat::Tau> analysis_taus;
 	for (const pat::Tau &x : *taus) {
 		LogDebug("taus") << "n__tau=" << n__tau <<
 			" pt=" << CANDPRINT(x);
@@ -835,6 +841,8 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		}
 		n__tau += 1;
 		n__lep += 1;
+
+		analysis_taus.push_back(x);
 	} // taus
 	 
 
@@ -855,7 +863,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	//const JetCorrector* jet_corrector = JetCorrector::getJetCorrector("AK4PF", iSetup);
 
 
-	
+	std::vector<pat::Jet> analysis_jets;
 	for (auto x : *jets) {
 
 		//edm::RefToBase<reco::Jet> jet_ref(edm::Ref<std::vector<pat::Jet>>(jets, n__jet));
@@ -864,7 +872,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		//const double unc = jec_unc->getUncertainty(true);
 
 		//assert(_x != NULL);
-		LogDebug("jets") << "n__jet=" << n__jet << CANDPRINT(x);
+		LogDebug("jets") << "n__jet=" << n__jet << CANDPRINT(x) << " " << x.userFloat("pileupJetId:fullDiscriminant");
 		//LogDebug("jets") << "n__jet=" << n__jet << CANDPRINT(x) << " " << unc;
 
 		// jet pt cut
@@ -879,6 +887,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 			continue;
 		}
 
+		//dR overlap checking between loose leptons and jets
 		bool fails_dr = false;
 		for (int n = 0; n < n__lep; n++) {
 			TLorentzVector v1;
@@ -1035,6 +1044,8 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 			}
 		} // isMC
 		n__jet += 1;
+
+		analysis_jets.push_back(x);
 	} //jet loop
 
 	//loop over all gen jets and find number of true B/C jets
@@ -1057,26 +1068,28 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		tthtree->n_sim_c = n_sim_c;
 	}
 
+	LogDebug("content") << analysis_electrons.size() << " " << analysis_muons.size() << " " << analysis_taus.size() << " " << analysis_jets.size();
+
 	//do initial hypothesis assignment
 	//identify signal leptons under two hypotheses: single lepton (tight), dilepton (loose)
-	vector<const pat::Muon*> good_muons_sl = TTH::find_good_muons(*muons, PV, TTH::DecayMode::semileptonic);
-	vector<const pat::Electron*> good_electrons_sl = TTH::find_good_electrons(*electrons, PV, TTH::DecayMode::semileptonic);
-	vector<const pat::Tau*> good_taus_sl = TTH::find_good_taus(*taus, TTH::DecayMode::semileptonic);
-	vector<const pat::Jet*> good_jets_sl = TTH::find_good_jets(*jets, TTH::DecayMode::semileptonic);
+	vector<const pat::Muon*> good_muons_sl = TTH::find_good_muons(analysis_muons, PV, TTH::DecayMode::semileptonic);
+	vector<const pat::Electron*> good_electrons_sl = TTH::find_good_electrons(analysis_electrons, PV, TTH::DecayMode::semileptonic);
+	vector<const pat::Tau*> good_taus_sl = TTH::find_good_taus(analysis_taus, TTH::DecayMode::semileptonic);
+	vector<const pat::Jet*> good_jets_sl = TTH::find_good_jets(analysis_jets, TTH::DecayMode::semileptonic);
 	
-	vector<const pat::Muon*> good_muons_dl = TTH::find_good_muons(*muons, PV, TTH::DecayMode::dileptonic);
-	vector<const pat::Electron*> good_electrons_dl = TTH::find_good_electrons(*electrons, PV, TTH::DecayMode::dileptonic);
-	vector<const pat::Tau*> good_taus_dl = TTH::find_good_taus(*taus, TTH::DecayMode::dileptonic);
-	vector<const pat::Jet*> good_jets_dl = TTH::find_good_jets(*jets, TTH::DecayMode::dileptonic);
+	vector<const pat::Muon*> good_muons_dl = TTH::find_good_muons(analysis_muons, PV, TTH::DecayMode::dileptonic);
+	vector<const pat::Electron*> good_electrons_dl = TTH::find_good_electrons(analysis_electrons, PV, TTH::DecayMode::dileptonic);
+	vector<const pat::Tau*> good_taus_dl = TTH::find_good_taus(analysis_taus, TTH::DecayMode::dileptonic);
+	vector<const pat::Jet*> good_jets_dl = TTH::find_good_jets(analysis_jets, TTH::DecayMode::dileptonic);
 
 	//Identify veto leptons, which are guaranteed not to overlap with signal leptons
-	vector<const pat::Muon*> veto_muons_sl = TTH::find_veto_muons(*muons, good_muons_sl, TTH::DecayMode::semileptonic);
-	vector<const pat::Electron*> veto_electrons_sl = TTH::find_veto_electrons(*electrons, good_electrons_sl, TTH::DecayMode::semileptonic);
-	vector<const pat::Tau*> veto_taus_sl = TTH::find_veto_taus(*taus, good_taus_sl, TTH::DecayMode::semileptonic);
+	vector<const pat::Muon*> veto_muons_sl = TTH::find_veto_muons(analysis_muons, good_muons_sl, TTH::DecayMode::semileptonic);
+	vector<const pat::Electron*> veto_electrons_sl = TTH::find_veto_electrons(analysis_electrons, good_electrons_sl, TTH::DecayMode::semileptonic);
+	vector<const pat::Tau*> veto_taus_sl = TTH::find_veto_taus(analysis_taus, good_taus_sl, TTH::DecayMode::semileptonic);
 	
-	vector<const pat::Muon*> veto_muons_dl = TTH::find_veto_muons(*muons, good_muons_dl, TTH::DecayMode::dileptonic);
-	vector<const pat::Electron*> veto_electrons_dl = TTH::find_veto_electrons(*electrons, good_electrons_dl, TTH::DecayMode::dileptonic);
-	vector<const pat::Tau*> veto_taus_dl = TTH::find_veto_taus(*taus, good_taus_dl, TTH::DecayMode::dileptonic);
+	vector<const pat::Muon*> veto_muons_dl = TTH::find_veto_muons(analysis_muons, good_muons_dl, TTH::DecayMode::dileptonic);
+	vector<const pat::Electron*> veto_electrons_dl = TTH::find_veto_electrons(analysis_electrons, good_electrons_dl, TTH::DecayMode::dileptonic);
+	vector<const pat::Tau*> veto_taus_dl = TTH::find_veto_taus(analysis_taus, good_taus_dl, TTH::DecayMode::dileptonic);
 
 	//Build two event descriptions according to the hypotheses
 	TTH::EventDescription desc_sl(
