@@ -5,7 +5,7 @@ import FWCore.ParameterSet.Config as cms
 
 # path to file
 #pathToFile = '/pnfs/psi.ch/cms/trivcat/store//user/bianchi/HBB_EDMNtuple/AllHDiJetPt'
-pathToFile = '/hdfs/cms/store/user/jpata/tth/v1/'
+pathToFile = '/hdfs/local/joosep/tth/'
 ordering   = ''
 
 # luminosity
@@ -22,7 +22,7 @@ fixNumEvJob = 0
 evLimits = cms.vint32(0, -1),
 
 # ntuplize all events ?
-ntuplizeAll = 0
+ntuplizeAll = 1
 
 # print intermediate steps
 printout    = 1
@@ -96,9 +96,9 @@ csv_WP_T = 0.898
 selectByBTagShape  = 1
 
 # cut values to select events
-btag_prob_cut_6jets = 0.960
-btag_prob_cut_5jets = 0.970
-btag_prob_cut_4jets = 0.850
+btag_prob_cut_6jets = 0.960 #SL cat 1-2, type 0-2
+btag_prob_cut_5jets = 0.970 #SL cat 3: type 3
+btag_prob_cut_4jets = 0.850 #DL: type 6
 
 ############################################### Category definition
 ###############################################

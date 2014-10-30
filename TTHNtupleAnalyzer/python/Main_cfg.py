@@ -76,13 +76,12 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
 	lhe = cms.InputTag("externalLHEProducer"),
 
 	triggerIdentifiers = triggerPathNames,
-	#triggerIdentifiers=cms.vstring([]),
-	triggerIdentifiersForMatching = cms.vstring([
-			'HLT_Ele27_WP80_v*',
-			'HLT_IsoMu24_eta2p1_v*',
-			'HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*',
-			]),
-	#triggerIdentifiersForMatching=cms.vstring([]),
+	#triggerIdentifiersForMatching = cms.vstring([
+	#		'HLT_Ele27_WP80_v*',
+	#		'HLT_IsoMu24_eta2p1_v*',
+	#		'HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*',
+	#		]),
+	triggerIdentifiersForMatching = triggerPathNames,
 
 	jetMult_min   = cms.untracked.int32(-99),
 	jetPt_min	 = cms.untracked.double(15.),

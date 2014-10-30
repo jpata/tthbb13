@@ -224,10 +224,11 @@ bool is_veto_electron_tight(const pat::Electron& ele) {
 namespace TTH {
 
 //select muons which pass quality criteria
-vector<const pat::Muon*> find_good_muons(const vector<pat::Muon>& muons, const reco::Vertex& vtx, const DecayMode mode) {
+vector<const pat::Muon*> find_good_muons(const vector<const pat::Muon*>& muons, const reco::Vertex& vtx, const DecayMode mode) {
     vector<const pat::Muon*> out;
 
-    for (auto& mu : muons) {
+    for (auto* _mu : muons) {
+		auto& mu = *_mu;
         if (mode==DecayMode::dileptonic && is_loose_muon(mu)) {
             out.push_back(&mu);
         }
@@ -240,10 +241,11 @@ vector<const pat::Muon*> find_good_muons(const vector<pat::Muon>& muons, const r
 
 //select electrons which pass quality criteria
 //https://twiki.cern.ch/twiki/bin/viewauth/CMS/TopEGM
-vector<const pat::Electron*> find_good_electrons(const vector<pat::Electron>& electrons, const reco::Vertex& vtx, const DecayMode mode) {
+vector<const pat::Electron*> find_good_electrons(const vector<const pat::Electron*>& electrons, const reco::Vertex& vtx, const DecayMode mode) {
     vector<const pat::Electron*> out;
 
-    for (auto& ele : electrons) {
+    for (auto* _ele : electrons) {
+		auto& ele = *_ele;
         if (mode==DecayMode::dileptonic && is_loose_electron(ele, vtx)) {
             out.push_back(&ele); 
         }
@@ -254,10 +256,11 @@ vector<const pat::Electron*> find_good_electrons(const vector<pat::Electron>& el
     return out;
 }
 
-vector<const pat::Electron*> find_veto_electrons(const vector<pat::Electron>& electrons, const vector<const pat::Electron*> signal_electrons,  const DecayMode mode) {
+vector<const pat::Electron*> find_veto_electrons(const vector<const pat::Electron*>& electrons, const vector<const pat::Electron*> signal_electrons,  const DecayMode mode) {
     vector<const pat::Electron*> out;
 
-    for (auto& ele : electrons) {
+    for (auto* _ele : electrons) {
+		auto& ele = *_ele;
         //skip already identified signal electrons
         if (is_in<const pat::Electron*>(signal_electrons, &ele)) {
             LogDebug("veto ele") << "skipping ele" << CANDPRINT(ele);
@@ -276,10 +279,11 @@ vector<const pat::Electron*> find_veto_electrons(const vector<pat::Electron>& el
 }
 
 //select muons which pass quality criteria
-vector<const pat::Muon*> find_veto_muons(const vector<pat::Muon>& muons, const vector<const pat::Muon*>& signal_muons, const DecayMode mode) {
+vector<const pat::Muon*> find_veto_muons(const vector<const pat::Muon*>& muons, const vector<const pat::Muon*>& signal_muons, const DecayMode mode) {
     vector<const pat::Muon*> out;
 
-    for (auto& mu : muons) {
+    for (auto* _mu : muons) {
+		auto& mu = *_mu;
         //skip already identified signal muons
         if (is_in<const pat::Muon*>(signal_muons, &mu)) {
             continue;
@@ -295,10 +299,11 @@ vector<const pat::Muon*> find_veto_muons(const vector<pat::Muon>& muons, const v
 //select taus which pass quality criteria
 //https://twiki.cern.ch/twiki/bin/viewauth/CMS/TauIDRecommendation
 //https://twiki.cern.ch/twiki/bin/viewauth/CMS/TopTAU
-vector<const pat::Tau*> find_good_taus(const vector<pat::Tau>& taus, const DecayMode mode) {
+vector<const pat::Tau*> find_good_taus(const vector<const pat::Tau*>& taus, const DecayMode mode) {
     vector<const pat::Tau*> out;
 
-    for (auto& tau : taus) {
+    for (auto* _tau : taus) {
+		auto& tau = *_tau;
         if (is_good_tau(tau)) {
             out.push_back(&tau);
         }
@@ -306,10 +311,11 @@ vector<const pat::Tau*> find_good_taus(const vector<pat::Tau>& taus, const Decay
     return out;
 }
 
-vector<const pat::Tau*> find_veto_taus(const vector<pat::Tau>& taus, const vector<const pat::Tau*>& signal_taus, const DecayMode mode) {
+vector<const pat::Tau*> find_veto_taus(const vector<const pat::Tau*>& taus, const vector<const pat::Tau*>& signal_taus, const DecayMode mode) {
     vector<const pat::Tau*> out;
 
-    for (auto& tau : taus) {
+    for (auto* _tau : taus) {
+		auto& tau = *_tau;
         if (is_in<const pat::Tau*>(signal_taus, &tau)) {
             continue;
         }

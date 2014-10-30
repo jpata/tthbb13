@@ -468,6 +468,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	//std::cout << "\n === TRIGGER OBJECTS === " << std::endl;
 	vector< LightTriggerObj > muTriggerObj;
 	vector< LightTriggerObj > eleTriggerObj;
+	vector< LightTriggerObj > jetTriggerObj;
 
 	int countObj = 0;
 	for (pat::TriggerObjectStandAlone obj : *triggerObjects) { // note: not "const &" since we want to call unpackPathNames
@@ -481,16 +482,35 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		if( filterSize!=1 ) continue;
 
 		LightTriggerObj lightObj;
-
-		// electron/muons HLTs
-		if( obj.filterIds()[0] == 82 || obj.filterIds()[0] == 83 ) {
+		const auto fids = obj.filterIds();
+		
+		const bool is_jet = (find(fids.begin(), fids.end(), 85) != fids.end() ||
+			find(fids.begin(), fids.end(), 86) != fids.end() ||
+			find(fids.begin(), fids.end(), -84) != fids.end() ||
+			find(fids.begin(), fids.end(), -89) != fids.end()
+		);
+		const bool is_ele = (fids[0] == 82);
+		const bool is_mu = (fids[0] == 83);
+		
+		stringstream ss1;
+		for (auto f : fids)
+			ss1 << f << " ";
+		LogDebug("trigger") << "fids " << ss1.str();
+		
+		// all path names associated to this obj
+		std::vector<std::string> pathNamesAll = obj.pathNames(false);
+		
+		stringstream ss2;
+		for (auto f : pathNamesAll)
+			ss2 << f << " ";
+		LogDebug("trigger") << "pathnames " << ss2.str();
+		
+		LogDebug("trigger") << "filterids " << is_mu << " " << is_ele << " " << is_jet;
+	
+		if( is_ele || is_mu || is_jet ) {
 
 			bool isL3 = false;
 			bool isLF = false;
-
-			// all path names associated to this obj
-			std::vector<std::string> pathNamesAll = obj.pathNames(false);
-			//LogDebug("triggers") << "pathNamesAll" << pathNamesAll.size();
 
 			// loop over them
 			for (unsigned h = 0, n = pathNamesAll.size(); h < n; ++h) {
@@ -501,20 +521,25 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 					const string idName = triggerIdentifiersForMatching_[j];
 					//LogDebug("triggers") << "identifier for matcing " << idName;
 					string idNameUnstarred = idName;
-					bool isStarred		 = idName.find("*")!=string::npos;
+					bool isStarred = idName.find("*") != string::npos;
 					if( isStarred ) idNameUnstarred.erase( idName.find("*"), 1 );
+					//cout << "checking " << pathNamesAll[h] << " " << idNameUnstarred << endl;
 
 					// check whether this path matches
-					if( ((isStarred && pathNamesAll[h].find(idNameUnstarred)!=string::npos ) ||
-							(!isStarred && pathNamesAll[h]==idName)) &&
-							(( obj.filterIds()[0] == 82 && idNameUnstarred.find("Ele")!=string::npos ) ||
-							 ( obj.filterIds()[0] == 83 && idNameUnstarred.find("Mu")!=string::npos && obj.collection().find("L3")!=string::npos ))
+					if( ((isStarred && pathNamesAll[h].find(idNameUnstarred)!=string::npos) ||
+							(!isStarred && pathNamesAll[h]==idName)
+						) && (
+							(is_ele && idNameUnstarred.find("Ele") != string::npos ) || //electron
+							(is_mu && idNameUnstarred.find("Mu") != string::npos && obj.collection().find("L3") != string::npos ) || //muon
+							(is_jet && idNameUnstarred.find("Jet") != string::npos) //jet
+						)
 					) {
 						bool isL3tmp = obj.hasPathName( pathNamesAll[h], false, true );
 						bool isLFtmp = obj.hasPathName( pathNamesAll[h], true, false );
-						//cout << h << "th path for Obj "<< countObj << " with " << obj.filterIds()[0] << " with pt=" << obj.pt() << " matches to [" << j << "]" << endl;
 						isL3 = isL3 || isL3tmp;
 						isLF = isLF || (isLFtmp && isL3tmp);
+						//cout << h << "th path for Obj "<< countObj << " with " << obj.filterIds()[0] << " with pt=" << obj.pt() << " matches to [" << j << "]"
+						//	<< " " << isL3 << " " << isLF << endl;
 					}
 
 				}
@@ -522,26 +547,30 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
 			if(isL3) {
 				lightObj.fill( obj.pt(), obj.eta(), obj.phi(), isL3, isLF );
-				if(obj.filterIds()[0] == 82)
-					eleTriggerObj.push_back( lightObj );
-				if(obj.filterIds()[0] == 83)
-					muTriggerObj.push_back ( lightObj );
+				if(is_ele)
+					eleTriggerObj.push_back(lightObj);
+				if(is_mu)
+					muTriggerObj.push_back (lightObj);
+				if(is_jet)
+					jetTriggerObj.push_back(lightObj);
 			}
 
 		} // is Ele or muon
 		countObj++;
 	}
 
-	/*
 	for(unsigned int m = 0 ; m < eleTriggerObj.size(); m++){
-	  cout << m << "th ele: pt=" << eleTriggerObj[m].pt << ", eta=" <<  eleTriggerObj[m].eta
-	 << ", PASS trigger ["  << "]: " <<  eleTriggerObj[m].isL3 <<  eleTriggerObj[m].isLF <<  endl;
+	  LogDebug("triggerobj") << m << "th ele: pt=" << eleTriggerObj[m].pt << ", eta=" <<  eleTriggerObj[m].eta
+	 << ", PASS trigger ["  << "]: " <<  eleTriggerObj[m].isL3 <<  eleTriggerObj[m].isLF;
 	}
 	for(unsigned int m = 0 ; m < muTriggerObj.size(); m++){
-	  cout << m << "th mu: pt=" << muTriggerObj[m].pt << ", eta=" <<  muTriggerObj[m].eta
-	 << ", PASS trigger [" << "]: " <<  muTriggerObj[m].isL3 <<  muTriggerObj[m].isLF <<  endl;
+	  LogDebug("triggerobj") << m << "th mu: pt=" << muTriggerObj[m].pt << ", eta=" <<  muTriggerObj[m].eta
+	 << ", PASS trigger [" << "]: " <<  muTriggerObj[m].isL3 <<  muTriggerObj[m].isLF;
 	}
-	*/
+	for(unsigned int m = 0 ; m < jetTriggerObj.size(); m++){
+	  LogDebug("triggerobj") << m << "th jet: pt=" << jetTriggerObj[m].pt << ", eta=" <<  jetTriggerObj[m].eta
+	 << ", PASS trigger [" << "]: " <<  jetTriggerObj[m].isL3 <<  jetTriggerObj[m].isLF;
+	}
 	//////////////////////////////////////////////////////////
 
 	edm::Handle<pat::MuonCollection> muons;
@@ -559,7 +588,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	// jet counter
 	int n__jet = 0;
 	
-	std::vector<pat::Muon> analysis_muons;
+	std::vector<const pat::Muon*> analysis_muons;
 	for (const pat::Muon &x : *muons) {
 		
 		LogDebug("muons") << "n__mu=" << n__mu <<
@@ -653,14 +682,14 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		}
 		n__mu += 1;
 		n__lep += 1;
-		analysis_muons.push_back(x);
+		analysis_muons.push_back(&x);
 	} //muons
 
 
 	//Electrons
 	edm::Handle<pat::ElectronCollection> electrons;
 	iEvent.getByToken(electronToken_, electrons);
-	std::vector<pat::Electron> analysis_electrons;
+	std::vector<const pat::Electron*> analysis_electrons;
 	for (const pat::Electron &x : *electrons) {
 		LogDebug("electrons") << "n__ele=" << n__ele << CANDPRINT(x); 
 		if( x.pt()<elePt_min_ ) {
@@ -759,12 +788,12 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		n__ele += 1;
 		n__lep += 1;
 
-		analysis_electrons.push_back(x);
+		analysis_electrons.push_back(&x);
 	} // electrons
 
 	edm::Handle<pat::TauCollection> taus;
 	iEvent.getByToken(tauToken_, taus);
-	std::vector<pat::Tau> analysis_taus;
+	std::vector<const pat::Tau*> analysis_taus;
 	for (const pat::Tau &x : *taus) {
 		LogDebug("taus") << "n__tau=" << n__tau <<
 			" pt=" << CANDPRINT(x);
@@ -842,7 +871,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		n__tau += 1;
 		n__lep += 1;
 
-		analysis_taus.push_back(x);
+		analysis_taus.push_back(&x);
 	} // taus
 	 
 
@@ -915,6 +944,22 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		}
 		if (fails_dr) {
 			continue;	
+		}
+		
+		float minDist = 999.;
+		float minDpT = 999.;
+		for(unsigned int m = 0 ; m < jetTriggerObj.size(); m++) {
+			LightTriggerObj& obj = jetTriggerObj[m];
+			float dist = sqrt( (obj.eta-x.eta())*(obj.eta-x.eta()) + (obj.phi-x.phi())*(obj.phi-x.phi()) );
+			float dpT = fabs( obj.pt - x.pt() )/x.pt();
+			if( dist<minDist && dist<0.50 && dpT<minDpT && dpT<0.50 ) {
+				tthtree->trig_jet__pt [n__jet] = obj.pt;
+				tthtree->trig_jet__eta[n__jet] = obj.eta;
+				tthtree->trig_jet__phi[n__jet] = obj.phi;
+				tthtree->trig_jet__pass[n__jet]= obj.isLF + 1;
+				minDist = dist;
+				minDpT = dpT;
+			}
 		}
 
 		tthtree->jet__eta			[n__jet] = x.eta();
@@ -1014,7 +1059,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 				tthtree->gen_jet__mass[n__jet] = gj->mass();
 
 				//FIXME: this id assignment does not seem to be correct. See issue #5 https://github.com/jpata/tthbb13/issues/5
-				tthtree->gen_jet__id[n__jet] = gj->pdgId();
+				//tthtree->gen_jet__id[n__jet] = gj->pdgId();
 
 				tthtree->gen_jet__status[n__jet] = gj->status();
 
@@ -1053,19 +1098,22 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		int n_sim_b = 0;
 		int n_sim_c = 0;
 
-		edm::Handle<std::vector<reco::GenJet>> genjets;
-		iEvent.getByToken(genJetToken_, genjets);
-		for (auto& p : *genjets) {
-			if(TMath::Abs(p.pdgId()) == 5) {
-				n_sim_b += 1;	
-			}
-			else if(TMath::Abs(p.pdgId()) == 4) {
-				n_sim_c += 1;	
-			}
-		}
+		//NB: this reco::GenJet::pdgId() does not contain useful information. Need a more sophisticated formula
+		//edm::Handle<std::vector<reco::GenJet>> genjets;
+		//iEvent.getByToken(genJetToken_, genjets);
+		//for (auto& p : *genjets) {
+		//	cout << "genjet " << p.pdgId();
+		//	if(TMath::Abs((int)p.pdgId()) == 5) {
+		//		n_sim_b += 1;	
+		//	}
+		//	else if(TMath::Abs((int)p.pdgId()) == 4) {
+		//		n_sim_c += 1;	
+		//	}
+		//}
 
 		tthtree->n_sim_b = n_sim_b;
 		tthtree->n_sim_c = n_sim_c;
+		LogDebug("nsim") << n_sim_b << " " << n_sim_c;
 	}
 
 	LogDebug("content") << analysis_electrons.size() << " " << analysis_muons.size() << " " << analysis_taus.size() << " " << analysis_jets.size();
@@ -1170,9 +1218,18 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		tthtree->sig_lep__mass[i] = good_leptons[i]->mass();
 		tthtree->sig_lep__id[i] = good_leptons[i]->pdgId();
 		tthtree->sig_lep__type[i] = abs(good_leptons[i]->pdgId());
-		tthtree->sig_lep__charge[i] = good_leptons[i]->charge(); 
+		tthtree->sig_lep__charge[i] = good_leptons[i]->charge();
 		//get index into main lepton array
-		tthtree->sig_lep__idx[i] = find(leptons.begin(), leptons.end(), good_leptons[i]) - leptons.begin();
+		auto lepidx = find(leptons.begin(), leptons.end(), good_leptons[i]);
+		if (lepidx != leptons.end()) {
+			tthtree->sig_lep__idx[i] = lepidx - leptons.begin();
+			LogDebug("siglep") << good_leptons[i]->pt() << " " << tthtree->sig_lep__idx[i] << " " << tthtree->lep__pt[tthtree->sig_lep__idx[i]];
+		} else {
+			std::ostringstream ss;
+			for (auto l : leptons)
+				ss << l << " ";
+			edm::LogWarning("siglep") << "Could not find lepton " << good_leptons[i] << " in collection";
+		}
 	}
 	tthtree->n__sig_lep = good_leptons.size();
 

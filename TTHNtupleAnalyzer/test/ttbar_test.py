@@ -8,8 +8,8 @@ t = f.Get("tthNtupleAnalyzer/events")
 if not t or t.IsZombie():
     raise Exception("could not open ttree tthNtupleAnalyzer/events")
 
-if t.GetEntries() != 100:
-    raise Exception("number of entries != 100: %s" % t.GetEntries())
+if t.GetEntries() != 1000:
+    raise Exception("number of entries != 1000: %s" % t.GetEntries())
 
 brs = t.GetListOfBranches()
 

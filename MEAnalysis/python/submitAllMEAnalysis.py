@@ -17,7 +17,6 @@ from TTH.MEAnalysis.mem_parameters_cff import *
 ###########################################
 ###########################################
 
-outfile = open("step2.dat", "w")
 
 #file which contains scheduler commands to submit jobs
 tosubmit = open("submit.sh", "w")
@@ -40,7 +39,7 @@ else:
 	address1		= ''
 	subcommand			= 'sbatch -q main'
 	tempOutPath = "/scratch/" + os.environ["USER"] + "/"
-	finalOutPath = "/hdfs/local/" + os.environ["USER"] + "/tth/"
+	finalOutPath = "/home/" + os.environ["USER"] + "/tth/v1/"
 
 if not os.path.exists(finalOutPath):
 	os.makedirs(finalOutPath)
@@ -96,7 +95,7 @@ def submitMEAnalysis(script,
 							evLow,evHigh):
 
 	#print "Overload meAnalysisNew_all.py..."
-	os.system('cp ../python/MEAnalysis_cfg.py ./')
+	os.system('cp $CMSSW_BASE/src/TTH/MEAnalysis/python/MEAnalysis_cfg.py ./')
 
 	from MEAnalysis_cfg import process
 
@@ -183,11 +182,11 @@ def submitMEAnalysis(script,
 		process.fwliteInput.doType3			= cms.untracked.int32(not selectByBTagShape)
 		process.fwliteInput.doType6			= cms.untracked.int32(not selectByBTagShape)
 		process.fwliteInput.doType7			= cms.untracked.int32(0)
-		process.fwliteInput.doType0ByBTagShape = cms.untracked.int32(	selectByBTagShape)
-		process.fwliteInput.doType1ByBTagShape = cms.untracked.int32(	selectByBTagShape)
-		process.fwliteInput.doType2ByBTagShape = cms.untracked.int32(	selectByBTagShape)
-		process.fwliteInput.doType3ByBTagShape = cms.untracked.int32(	selectByBTagShape)
-		process.fwliteInput.doType6ByBTagShape = cms.untracked.int32(	selectByBTagShape)
+		process.fwliteInput.doType0ByBTagShape = cms.untracked.int32(selectByBTagShape)
+		process.fwliteInput.doType1ByBTagShape = cms.untracked.int32(selectByBTagShape)
+		process.fwliteInput.doType2ByBTagShape = cms.untracked.int32(selectByBTagShape)
+		process.fwliteInput.doType3ByBTagShape = cms.untracked.int32(selectByBTagShape)
+		process.fwliteInput.doType6ByBTagShape = cms.untracked.int32(selectByBTagShape)
 		process.fwliteInput.doTypeBTag6		= cms.untracked.int32(0)
 		process.fwliteInput.doTypeBTag5		= cms.untracked.int32(0)
 		process.fwliteInput.doTypeBTag4		= cms.untracked.int32(0)
@@ -261,6 +260,8 @@ def submitMEAnalysis(script,
 
 	f = open(scriptName,'w')
 	f.write('#!/bin/bash\n\n')
+	f.write('set -e\n')
+	f.write('echo "SCRIPT '+scriptName+'"\n')
 	f.write('cd ${CMSSW_BASE}/src/TTH/MEAnalysis/\n')
 	f.write('export SCRAM_ARCH="slc6_amd64_gcc481"\n')
 	f.write('source $VO_CMS_SW_DIR/cmsset_default.sh\n')
@@ -269,7 +270,7 @@ def submitMEAnalysis(script,
 
 	#call script with absolute path
 	d = os.getcwd()
-	f.write('MEAnalysis ' + d + "/" + jobName+'.py\n')
+	f.write('time MEAnalysis ' + d + "/" + jobName+'.py\n')
 
 	#remove output from final location and copy
 	f.write('rm -f %s\n' % (finalOutFilename))
@@ -286,7 +287,6 @@ def submitMEAnalysis(script,
 	#os.system(submitToQueue)
 
 	#print "\n@@@@@ END JOB @@@@@@@@@@@@@@@"
-	outfile.write(jobName + ".py = " + str(evHigh-evLow) + "\n")
 	#os.system('rm testME_tmp.py')
 
 ###########################################
@@ -407,7 +407,6 @@ def submitFullMEAnalysis( analysis ):
 		num_of_jobs = run[1]
 		version	= run[2]
 		evs_per_job = getSplitting(pathToFile+version+ordering , sample, num_of_jobs )
-		outfile.write("[/tth/%s]\n"%sample)
 		if evs_per_job==-2:
 			print "Error in getSplitting.. please check again."
 			continue
@@ -434,8 +433,6 @@ for analysis in analyses:
 	else:
 		analysis = analysis+'_std'
 	submitFullMEAnalysis( analysis)
-
-outfile.close()
 
 ###########################################
 ###########################################

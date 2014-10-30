@@ -252,6 +252,12 @@ public:
   	float trig_lep__eta[N_MAX];
   	float trig_lep__phi[N_MAX];
     int trig_lep__pass[N_MAX];
+	
+	//trigger lepton
+  	float trig_jet__pt[N_MAX];
+  	float trig_jet__eta[N_MAX];
+  	float trig_jet__phi[N_MAX];
+    int trig_jet__pass[N_MAX];
 
 	//gen-level information from LHE
 	float lhe__ht;
@@ -499,6 +505,10 @@ public:
 		SET_ZERO(trig_lep__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(trig_lep__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(trig_lep__pass,N_MAX, DEF_VAL_INT);
+		SET_ZERO(trig_jet__pt,  N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(trig_jet__eta, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(trig_jet__phi, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(trig_jet__pass,N_MAX, DEF_VAL_INT);
 		SET_ZERO(lep__rel_iso, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(lep__type, N_MAX, DEF_VAL_INT);
 		lhe__ht = DEF_VAL_FLOAT;
@@ -749,6 +759,10 @@ public:
 		tree->Branch("trig_lep__eta", trig_lep__eta, "trig_lep__eta[n__lep]/F");
 		tree->Branch("trig_lep__phi", trig_lep__phi, "trig_lep__phi[n__lep]/F");
 		tree->Branch("trig_lep__pass", trig_lep__pass, "trig_lep__pass[n__lep]/I");
+		tree->Branch("trig_jet__pt", trig_jet__pt, "trig_jet__pt[n__jet]/F");
+		tree->Branch("trig_jet__eta", trig_jet__eta, "trig_jet__eta[n__jet]/F");
+		tree->Branch("trig_jet__phi", trig_jet__phi, "trig_jet__phi[n__jet]/F");
+		tree->Branch("trig_jet__pass", trig_jet__pass, "trig_jet__pass[n__jet]/I");
 		tree->Branch("lep__type", lep__type, "lep__type[n__lep]/I");
 		tree->Branch("lhe__ht", &lhe__ht, "lhe__ht/F");
 		tree->Branch("lhe__n_j", &lhe__n_j, "lhe__n_j/F");
@@ -868,6 +882,7 @@ public:
 		tree->SetBranchAddress("jet__energy", jet__energy);
 		tree->SetBranchAddress("jet__eta", jet__eta);
 		tree->SetBranchAddress("jet__id", jet__id);
+		tree->SetBranchAddress("jet__jetId", jet__jetId);
 		tree->SetBranchAddress("jet__mass", jet__mass);
 		tree->SetBranchAddress("jet__mu_e", jet__mu_e);
 		tree->SetBranchAddress("jet__ne_e", jet__ne_e);

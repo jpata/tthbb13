@@ -98,16 +98,20 @@ process.fwliteInput = cms.PSet(
     speedup       = cms.untracked.int32(0), ###### CHECK HERE
 
     # select which analysis to run
-    doTypeBTag6   = cms.untracked.int32(1),  #SL 6 jets
-    doTypeBTag5   = cms.untracked.int32(1),  #SL 5 jets
-    doTypeBTag4   = cms.untracked.int32(1),  #DL 4 jets
-    doType0       = cms.untracked.int32(1),  #SL(4,2)  w/  W-tag
-    doType1       = cms.untracked.int32(1),  #SL(4,2)  w/o W-tag
-    doType2       = cms.untracked.int32(1),  #SL(4,1)
-    doType3       = cms.untracked.int32(1),  #SL(4,3)
-    doType4       = cms.untracked.int32(1),  #SL(3,2)
-    doType6       = cms.untracked.int32(1),  #DL(4,X)
-    doType7       = cms.untracked.int32(1),  #DL(3M+1L,X)
+	# select with 4-6 jets regardless of btagging
+	# used for determinging btag_LR cut
+    doTypeBTag6   = cms.untracked.int32(0),  #SL 6 jets
+    doTypeBTag5   = cms.untracked.int32(0),  #SL 5 jets
+    doTypeBTag4   = cms.untracked.int32(0),  #DL 4 jets
+
+	# select by CSVM count
+    doType0       = cms.untracked.int32(0),  #SL(4,2)  w/  W-tag
+    doType1       = cms.untracked.int32(0),  #SL(4,2)  w/o W-tag
+    doType2       = cms.untracked.int32(0),  #SL(4,1)
+    doType3       = cms.untracked.int32(0),  #SL(4,3)
+    doType4       = cms.untracked.int32(0),  #SL(3,2)
+    doType6       = cms.untracked.int32(0),  #DL(4,X)
+    doType7       = cms.untracked.int32(0),  #DL(3M+1L,X)
     doType0ByBTagShape = cms.untracked.int32(1),
     doType1ByBTagShape = cms.untracked.int32(1),
     doType2ByBTagShape = cms.untracked.int32(1),

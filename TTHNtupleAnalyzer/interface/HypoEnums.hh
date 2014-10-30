@@ -13,10 +13,10 @@ enum EventHypothesis {
     mumu, 
     ee,
     mun,
-    en,
+    en, //3
     nn,
     emu,
-    taumu,
+    taumu, //6
     taue,
     taun,
     tautau,

@@ -57,6 +57,7 @@ public:
     
     // num. of b-hadrons and c-quarks
     int nSimBs_; //, nC_, nCTop_;
+    int nSimCs_;
     
     // num of b-hadrons inside jets (backward compatibility)
     int nMatchSimBsOld_;
@@ -199,6 +200,7 @@ public:
     float jet_phi_   [NMAXJETS];
     float jet_m_     [NMAXJETS];
     float jet_csv_   [NMAXJETS];
+    int jet_id_    [NMAXJETS];
     
     // number of selected hJets
     int hJetAmong_;
@@ -242,6 +244,7 @@ public:
         tree->Branch("iterations",   &iterations_,    "iterations/I");
         
         tree->Branch("nSimBs",       &nSimBs_,        "nSimBs/I");
+        tree->Branch("nSimCs",       &nSimCs_,        "nSimCs/I");
         tree->Branch("nMatchSimBsOld",&nMatchSimBsOld_,"nMatchSimBsOld/I");
         tree->Branch("nMatchSimBs_v1",&nMatchSimBs_v1_,"nMatchSimBs_v1/I");
         tree->Branch("nMatchSimBs_v2",&nMatchSimBs_v2_,"nMatchSimBs_v2/I");
@@ -262,7 +265,7 @@ public:
         tree->Branch("flag_type3",   &flag_type3_,    "flag_type3/I");
         tree->Branch("flag_type4",   &flag_type4_,    "flag_type4/I");
         tree->Branch("flag_type6",   &flag_type6_,    "flag_type6/I");
-        tree->Branch("Vtype",        &Vtype_,         "type/I");
+        tree->Branch("Vtype",        &Vtype_,         "Vtype/I");
         tree->Branch("EVENT",        &EVENT_,         "run/I:lumi/I:event/I:json/I");
         tree->Branch("nPVs",         &nPVs_,          "nPVs/I");
         tree->Branch("PUweight",     &PUweight_,      "PUweight/F");
@@ -352,6 +355,7 @@ public:
         tree->Branch("jet_phi",                 jet_phi_,      "jet_phi[nJet]/F");
         tree->Branch("jet_m",                   jet_m_,        "jet_m[nJet]/F");
         tree->Branch("jet_csv",                 jet_csv_,      "jet_csv[nJet]/F");
+        tree->Branch("jet_id",                  jet_id_,       "jet_id[nJet]/I");
         tree->Branch("hJetAmong",               &hJetAmong_,   "hJetAmong/I");
         tree->Branch("jetsAboveCut",            &jetsAboveCut_,"jetsAboveCut/I");
         tree->Branch("num_of_trials",           &num_of_trials_,"num_of_trials/I");
@@ -381,6 +385,8 @@ public:
     }
 
     void loop_initialize(void) {
+		Vtype_ = DEF_VAL_INT;
+		type_ = DEF_VAL_INT;
         nPermut_            = 0;
         nPermut_alt_        = 0;
         nTotInteg_          = 0;
