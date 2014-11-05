@@ -259,26 +259,27 @@ process.HTTJetsCHS = cms.EDProducer(
 )
 
 process.MultiRHTTJetsCHS = cms.EDProducer(
-    "HTTTopJetProducer",
-    PFJetParameters.clone( src = cms.InputTag('packedPFCandidates'),
-                           doAreaFastjet = cms.bool(True),
-                           doRhoFastjet = cms.bool(False),
-                           jetPtMin = cms.double(100.0)
-                       ),
-    AnomalousCellParameters,
-    multiR = cms.bool(True),
-    algorithm = cms.int32(1),
-    jetAlgorithm = cms.string("CambridgeAachen"),
-    rParam = cms.double(1.5),
-    mode = cms.int32(4),
-    minFatjetPt = cms.double(200.),
-    minCandPt = cms.double(0.),
-    minSubjetPt = cms.double(30.),
-    writeCompound = cms.bool(True),
-    minCandMass = cms.double(0.),
-    maxCandMass = cms.double(20000.),
-    massRatioWidth = cms.double(15.),
+     "HTTTopJetProducer",
+     PFJetParameters.clone( src = cms.InputTag('packedPFCandidates'),
+                            doAreaFastjet = cms.bool(True),
+                            doRhoFastjet = cms.bool(False),
+                            jetPtMin = cms.double(100.0)
+                        ),
+     AnomalousCellParameters,
+     multiR = cms.bool(True),
+     algorithm = cms.int32(1),
+     jetAlgorithm = cms.string("CambridgeAachen"),
+     rParam = cms.double(1.5),
+     mode = cms.int32(4),
+     minFatjetPt = cms.double(200.),
+     minCandPt = cms.double(200.),
+     minSubjetPt = cms.double(30.),
+     writeCompound = cms.bool(True),
+     minCandMass = cms.double(100.),
+     maxCandMass = cms.double(250.),
+     massRatioWidth = cms.double(30.),
 )
+
 
 #for comparison with Gregor
 #process.MultiRHTTJetsCHS = cms.EDProducer(

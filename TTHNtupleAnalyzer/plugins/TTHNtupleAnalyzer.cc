@@ -1211,6 +1211,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		tthtree->jet_toptagger__isMultiR[n_top_jet] = (int)jet_info.properties().isMultiR;
 		tthtree->jet_toptagger__Rmin[n_top_jet] = jet_info.properties().Rmin;
 		tthtree->jet_toptagger__RminExpected[n_top_jet] = jet_info.properties().RminExpected;
+		tthtree->jet_toptagger__ptFiltForRminExp[n_top_jet] = jet_info.properties().ptFiltForRminExp;
 		//FIXME: nSubJets no longer in new top jet properties
 		//tthtree->jet_toptagger__n_sj[n_top_jet] = jet_info.properties().nSubJets;
 		tthtree->jet_toptagger__n_sj[n_top_jet] = 3;
@@ -1259,6 +1260,8 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		tthtree->jet_toptagger2__isMultiR[n_top_jet] = (int)jet_info.properties().isMultiR;
 		tthtree->jet_toptagger2__Rmin[n_top_jet] = jet_info.properties().Rmin;
 		tthtree->jet_toptagger2__RminExpected[n_top_jet] = jet_info.properties().RminExpected;
+		tthtree->jet_toptagger2__ptFiltForRminExp[n_top_jet] = jet_info.properties().ptFiltForRminExp;
+		LogDebug("toptagger2") << jet_info.properties().RminExpected;	
 		//FIXME: nSubJets no longer in new top jet properties
 		//tthtree->jet_toptagger__n_sj[n_top_jet] = jet_info.properties().nSubJets;
 		tthtree->jet_toptagger2__n_sj[n_top_jet] = 3;
