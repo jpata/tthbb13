@@ -15,11 +15,13 @@ git cms-addpkg RecoJets/JetProducers
 #get the TTH code
 git clone https://github.com/jpata/tthbb13.git TTH
 # switch to devel branch
+cd TTH
 git checkout dev-jettoolbox
+cd ..
 cp TTH/MEAnalysis/libs/*.so ../lib/$SCRAM_ARCH/
 
 # Apply the jet toolbox patch
-git apply  --ignore-whitespace --ignore-space-change TTH/jet_toolbox.patch
+git apply  --ignore-whitespace --ignore-space-change --exclude DataFormats/PatCandidates/src/classes_def_objects.xml TTH/jet_toolbox.patch
 
 # Bring fastjet contrib up to speed
 # for lxplus use: cp ~algomez/public/fastjet/* ../config/toolbox/$SCRAM_ARCH/tools/selected/
@@ -33,5 +35,5 @@ git apply -3 --ignore-whitespace --ignore-space-change TTH/0001-merged-HepTopTag
 
 scram setup lhapdf
 
-# And build
-scram b -j 10
+# And build:
+# scram b -j 10
