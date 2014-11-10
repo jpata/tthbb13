@@ -45,6 +45,12 @@ process.source = cms.Source("PoolSource",
 	skipEvents = cms.untracked.uint32(options.skipEvents)
 )
 
+process.Njettiness = cms.EDProducer("NjettinessAdder",
+                                    src=cms.InputTag("slimmedJetsAK8"),
+                                    cone=cms.double(0.8)
+                            )
+
+
 from TTH.TTHNtupleAnalyzer.triggers_MC_cff import *
 print '**** TRIGGER PATHS ****'
 counter = 0
@@ -339,6 +345,7 @@ process.ak4PFL1FastL2L3Residual = cms.ESProducer("JetCorrectionESChain",
 process.p = cms.Path(
 	#process.hepTopTagPFJetsCHS *
 	#process.hepTopTagInfos *
+        process.Njettiness *        
 	process.HTTJetsCHS *
 	process.MultiRHTTJetsCHS *
 	process.tthNtupleAnalyzer

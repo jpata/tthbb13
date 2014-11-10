@@ -39,6 +39,8 @@
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
+#include "DataFormats/Common/interface/ValueMap.h"
+
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/PatCandidates/interface/Tau.h"
@@ -1118,6 +1120,11 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
 	LogDebug("content") << analysis_electrons.size() << " " << analysis_muons.size() << " " << analysis_taus.size() << " " << analysis_jets.size();
 
+
+	edm::Handle<edm::ValueMap<float> > fatjet_nsub_tau1;
+	iEvent.getByLabel("Njettiness", "tau1", fatjet_nsub_tau1);
+       
+
 	//do initial hypothesis assignment
 	//identify signal leptons under two hypotheses: single lepton (tight), dilepton (loose)
 	vector<const pat::Muon*> good_muons_sl = TTH::find_good_muons(analysis_muons, PV, TTH::DecayMode::semileptonic);
@@ -1370,9 +1377,23 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	}
 
 
-	//edm::Handle<pat::JetCollection> fatjets;
-	//iEvent.getByToken(fatjetToken_, fatjets);
+	edm::Handle<pat::JetCollection> fatjets;
+	iEvent.getByToken(fatjetToken_, fatjets);
+
+	std::cout << fatjets->size() << " " << fatjet_nsub_tau1->size() << std::endl;
+
+	for (unsigned ijet = 0; ijet != fatjets->size(); ijet++){
+	  std::cout << "pT = " << (*fatjets)[ijet].pt() << "tau1 = " << fatjet_nsub_tau1->get(ijet) << std::endl;
+	}
+
 	//for (const pat::Jet &j : *fatjets) {
+
+	  
+	  //const std::vector<std::string> float_names = j.userFloatNames();
+	  //for (unsigned int iname=0; iname != float_names.size(); iname++)
+	  //  std::cout << float_names[iname] << std::endl;
+
+	  //std::cout << "pT = " << fatjet_nsub_tau1[j] << std::endl;
 	//}
 
 	edm::Handle<pat::METCollection> mets;
