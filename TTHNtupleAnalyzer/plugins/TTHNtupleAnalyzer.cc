@@ -1280,6 +1280,10 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		tthtree->jet_toptagger__phi[n_top_jet] = x.phi();
 		tthtree->jet_toptagger__mass[n_top_jet] = x.mass();
 		tthtree->jet_toptagger__energy[n_top_jet] = x.energy();
+		tthtree->jet_toptagger__fj_pt[n_top_jet] = jet_info.properties().fjPt;
+		tthtree->jet_toptagger__fj_mass[n_top_jet] = jet_info.properties().fjMass;
+		tthtree->jet_toptagger__fj_eta[n_top_jet] = jet_info.properties().fjEta;
+		tthtree->jet_toptagger__fj_phi[n_top_jet] = jet_info.properties().fjPhi;
 		tthtree->jet_toptagger__topMass[n_top_jet] = jet_info.properties().topMass;
 		tthtree->jet_toptagger__unfilteredMass[n_top_jet] = jet_info.properties().unfilteredMass;
 		tthtree->jet_toptagger__prunedMass[n_top_jet] = jet_info.properties().prunedMass;
@@ -1329,6 +1333,10 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		tthtree->jet_toptagger2__phi[n_top_jet] = x.phi();
 		tthtree->jet_toptagger2__mass[n_top_jet] = x.mass();
 		tthtree->jet_toptagger2__energy[n_top_jet] = x.energy();
+		tthtree->jet_toptagger2__fj_pt[n_top_jet] = jet_info.properties().fjPt;
+		tthtree->jet_toptagger2__fj_mass[n_top_jet] = jet_info.properties().fjMass;
+		tthtree->jet_toptagger2__fj_eta[n_top_jet] = jet_info.properties().fjEta;
+		tthtree->jet_toptagger2__fj_phi[n_top_jet] = jet_info.properties().fjPhi;
 		tthtree->jet_toptagger2__topMass[n_top_jet] = jet_info.properties().topMass;
 		tthtree->jet_toptagger2__unfilteredMass[n_top_jet] = jet_info.properties().unfilteredMass;
 		tthtree->jet_toptagger2__prunedMass[n_top_jet] = jet_info.properties().prunedMass;
