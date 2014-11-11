@@ -30,8 +30,8 @@ cp ~gregor/fastjet/* ../config/toolbox/$SCRAM_ARCH/tools/selected/
 scram setup fastjet-contrib
 scram setup fastjet-contrib-archive
 
-#to apply a the top tagger as a patch
-git apply -3 --ignore-whitespace --ignore-space-change TTH/0001-merged-HepTopTagger.patch
+# to apply a the top tagger as a patch
+git apply -3 --ignore-whitespace --ignore-space-change --exclude DataFormats/PatCandidates/src/classes_def_objects.xml TTH/0001-merged-HepTopTagger.patch
 
 scram setup lhapdf
 
