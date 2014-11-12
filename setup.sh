@@ -23,10 +23,8 @@ cp TTH/MEAnalysis/libs/*.so ../lib/$SCRAM_ARCH/
 # Apply the jet toolbox patch
 git apply  --ignore-whitespace --ignore-space-change --exclude DataFormats/PatCandidates/src/classes_def_objects.xml TTH/jet_toolbox.patch
 
-# Bring fastjet contrib up to speed
-# for lxplus use: cp ~algomez/public/fastjet/* ../config/toolbox/$SCRAM_ARCH/tools/selected/
-# following line works on PSI Tier 3 
-cp ~gregor/fastjet/* ../config/toolbox/$SCRAM_ARCH/tools/selected/
+# Bring fastjet contrib up to speed (necessary as long as we not on 7_2)
+cp TTH/fastjet-xmls/* ../config/toolbox/$SCRAM_ARCH/tools/selected/
 scram setup fastjet-contrib
 scram setup fastjet-contrib-archive
 
