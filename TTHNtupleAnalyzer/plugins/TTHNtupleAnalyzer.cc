@@ -1119,12 +1119,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	}
 
 	LogDebug("content") << analysis_electrons.size() << " " << analysis_muons.size() << " " << analysis_taus.size() << " " << analysis_jets.size();
-
-
-	edm::Handle<edm::ValueMap<float> > fatjet_nsub_tau1;
-	iEvent.getByLabel("Njettiness", "tau1", fatjet_nsub_tau1);
        
-
 	//do initial hypothesis assignment
 	//identify signal leptons under two hypotheses: single lepton (tight), dilepton (loose)
 	vector<const pat::Muon*> good_muons_sl = TTH::find_good_muons(analysis_muons, PV, TTH::DecayMode::semileptonic);
@@ -1384,25 +1379,45 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		throw std::exception();
 	}
 
-
+	// Fill the fatjet information
+	// Fatjet iteself
 	edm::Handle<reco::PFJetCollection> fatjets;
 	iEvent.getByToken(fatjetToken_, fatjets);
+	
+	// Handles to get the Nsubjettiness
+	edm::Handle<edm::ValueMap<float> > fatjet_nsub_tau1;
+	iEvent.getByLabel("Njettiness", "tau1", fatjet_nsub_tau1);
 
-	std::cout << fatjets->size() << " " << fatjet_nsub_tau1->size() << std::endl;
+	edm::Handle<edm::ValueMap<float> > fatjet_nsub_tau2;
+	iEvent.getByLabel("Njettiness", "tau2", fatjet_nsub_tau2);
 
-	for (unsigned ijet = 0; ijet != fatjets->size(); ijet++){
-	  std::cout << "pT = " << (*fatjets)[ijet].pt() << "tau1 = " << fatjet_nsub_tau1->get(ijet) << std::endl;
-	}
+	edm::Handle<edm::ValueMap<float> > fatjet_nsub_tau3;
+	iEvent.getByLabel("Njettiness", "tau3", fatjet_nsub_tau3);
 
-	//for (const pat::Jet &j : *fatjets) {
+	// Make sure the fatjets and nsujettiness containers have same size
+	assert(fatjets->size()==fatjet_nsub_tau1->size());
+	assert(fatjets->size()==fatjet_nsub_tau2->size());
+	assert(fatjets->size()==fatjet_nsub_tau3->size());
 
+	// Loop over fatjets
+	for (unsigned n_fat_jet = 0; n_fat_jet != fatjets->size(); n_fat_jet++){
 	  
-	  //const std::vector<std::string> float_names = j.userFloatNames();
-	  //for (unsigned int iname=0; iname != float_names.size(); iname++)
-	  //  std::cout << float_names[iname] << std::endl;
+	  const reco::PFJet& x = (*fatjets)[n_fat_jet];
+	  
+	  LogDebug("fat jets") << "n_fat_jet=" << n_fat_jet << CANDPRINT(x);
+	  tthtree->jet_fat__eta[n_fat_jet]  = x.eta();
+	  tthtree->jet_fat__pt[n_fat_jet]   = x.pt();
+	  tthtree->jet_fat__phi[n_fat_jet]  = x.phi();
+	  tthtree->jet_fat__mass[n_fat_jet] = x.mass();
+	  tthtree->jet_fat__tau1[n_fat_jet] = fatjet_nsub_tau1->get(n_fat_jet);
+	  tthtree->jet_fat__tau2[n_fat_jet] = fatjet_nsub_tau2->get(n_fat_jet);
+	  tthtree->jet_fat__tau3[n_fat_jet] = fatjet_nsub_tau3->get(n_fat_jet);
 
-	  //std::cout << "pT = " << fatjet_nsub_tau1[j] << std::endl;
-	//}
+	} // End loop over fatjets
+	tthtree->n__jet_fat = fatjets->size();
+
+	// Done filling the fatjet information
+
 
 	edm::Handle<pat::METCollection> mets;
 	iEvent.getByToken(metToken_, mets);
