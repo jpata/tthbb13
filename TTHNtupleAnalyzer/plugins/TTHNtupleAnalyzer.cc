@@ -39,6 +39,8 @@
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
+#include "DataFormats/Common/interface/ValueMap.h"
+
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/PatCandidates/interface/Tau.h"
@@ -260,7 +262,7 @@ private:
 	const edm::EDGetTokenT<edm::View<pat::PackedGenParticle> > packedGenToken_;
 
 	// collection of fatjets and MET
-	const edm::EDGetTokenT<pat::JetCollection> fatjetToken_;
+	const edm::EDGetTokenT<reco::PFJetCollection> fatjetToken_;
 	const edm::EDGetTokenT<pat::METCollection> metToken_;
 
 	// LHE event product (may not be present!!)
@@ -320,7 +322,7 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
 	vertexToken_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("vertices"))),
 	prunedGenToken_(consumes<edm::View<reco::GenParticle> >(iConfig.getParameter<edm::InputTag>("pruned"))),
 	packedGenToken_(consumes<edm::View<pat::PackedGenParticle> >(iConfig.getParameter<edm::InputTag>("packed"))),
-	fatjetToken_(consumes<pat::JetCollection>(iConfig.getParameter<edm::InputTag>("fatjets"))),
+	fatjetToken_(consumes<reco::PFJetCollection>(iConfig.getParameter<edm::InputTag>("fatjets"))),
 	metToken_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("mets"))),
 
 	//Gen-level
@@ -1117,7 +1119,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	}
 
 	LogDebug("content") << analysis_electrons.size() << " " << analysis_muons.size() << " " << analysis_taus.size() << " " << analysis_jets.size();
-
+       
 	//do initial hypothesis assignment
 	//identify signal leptons under two hypotheses: single lepton (tight), dilepton (loose)
 	vector<const pat::Muon*> good_muons_sl = TTH::find_good_muons(analysis_muons, PV, TTH::DecayMode::semileptonic);
@@ -1273,6 +1275,10 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		tthtree->jet_toptagger__phi[n_top_jet] = x.phi();
 		tthtree->jet_toptagger__mass[n_top_jet] = x.mass();
 		tthtree->jet_toptagger__energy[n_top_jet] = x.energy();
+		tthtree->jet_toptagger__fj_pt[n_top_jet] = jet_info.properties().fjPt;
+		tthtree->jet_toptagger__fj_mass[n_top_jet] = jet_info.properties().fjMass;
+		tthtree->jet_toptagger__fj_eta[n_top_jet] = jet_info.properties().fjEta;
+		tthtree->jet_toptagger__fj_phi[n_top_jet] = jet_info.properties().fjPhi;
 		tthtree->jet_toptagger__topMass[n_top_jet] = jet_info.properties().topMass;
 		tthtree->jet_toptagger__unfilteredMass[n_top_jet] = jet_info.properties().unfilteredMass;
 		tthtree->jet_toptagger__prunedMass[n_top_jet] = jet_info.properties().prunedMass;
@@ -1322,6 +1328,10 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		tthtree->jet_toptagger2__phi[n_top_jet] = x.phi();
 		tthtree->jet_toptagger2__mass[n_top_jet] = x.mass();
 		tthtree->jet_toptagger2__energy[n_top_jet] = x.energy();
+		tthtree->jet_toptagger2__fj_pt[n_top_jet] = jet_info.properties().fjPt;
+		tthtree->jet_toptagger2__fj_mass[n_top_jet] = jet_info.properties().fjMass;
+		tthtree->jet_toptagger2__fj_eta[n_top_jet] = jet_info.properties().fjEta;
+		tthtree->jet_toptagger2__fj_phi[n_top_jet] = jet_info.properties().fjPhi;
 		tthtree->jet_toptagger2__topMass[n_top_jet] = jet_info.properties().topMass;
 		tthtree->jet_toptagger2__unfilteredMass[n_top_jet] = jet_info.properties().unfilteredMass;
 		tthtree->jet_toptagger2__prunedMass[n_top_jet] = jet_info.properties().prunedMass;
@@ -1369,11 +1379,45 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		throw std::exception();
 	}
 
+	// Fill the fatjet information
+	// Fatjet iteself
+	edm::Handle<reco::PFJetCollection> fatjets;
+	iEvent.getByToken(fatjetToken_, fatjets);
+	
+	// Handles to get the Nsubjettiness
+	edm::Handle<edm::ValueMap<float> > fatjet_nsub_tau1;
+	iEvent.getByLabel("Njettiness", "tau1", fatjet_nsub_tau1);
 
-	//edm::Handle<pat::JetCollection> fatjets;
-	//iEvent.getByToken(fatjetToken_, fatjets);
-	//for (const pat::Jet &j : *fatjets) {
-	//}
+	edm::Handle<edm::ValueMap<float> > fatjet_nsub_tau2;
+	iEvent.getByLabel("Njettiness", "tau2", fatjet_nsub_tau2);
+
+	edm::Handle<edm::ValueMap<float> > fatjet_nsub_tau3;
+	iEvent.getByLabel("Njettiness", "tau3", fatjet_nsub_tau3);
+
+	// Make sure the fatjets and nsujettiness containers have same size
+	assert(fatjets->size()==fatjet_nsub_tau1->size());
+	assert(fatjets->size()==fatjet_nsub_tau2->size());
+	assert(fatjets->size()==fatjet_nsub_tau3->size());
+
+	// Loop over fatjets
+	for (unsigned n_fat_jet = 0; n_fat_jet != fatjets->size(); n_fat_jet++){
+	  
+	  const reco::PFJet& x = (*fatjets)[n_fat_jet];
+	  
+	  LogDebug("fat jets") << "n_fat_jet=" << n_fat_jet << CANDPRINT(x);
+	  tthtree->jet_fat__eta[n_fat_jet]  = x.eta();
+	  tthtree->jet_fat__pt[n_fat_jet]   = x.pt();
+	  tthtree->jet_fat__phi[n_fat_jet]  = x.phi();
+	  tthtree->jet_fat__mass[n_fat_jet] = x.mass();
+	  tthtree->jet_fat__tau1[n_fat_jet] = fatjet_nsub_tau1->get(n_fat_jet);
+	  tthtree->jet_fat__tau2[n_fat_jet] = fatjet_nsub_tau2->get(n_fat_jet);
+	  tthtree->jet_fat__tau3[n_fat_jet] = fatjet_nsub_tau3->get(n_fat_jet);
+
+	} // End loop over fatjets
+	tthtree->n__jet_fat = fatjets->size();
+
+	// Done filling the fatjet information
+
 
 	edm::Handle<pat::METCollection> mets;
 	iEvent.getByToken(metToken_, mets);

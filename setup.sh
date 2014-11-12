@@ -12,24 +12,26 @@ git cms-addpkg DataFormats/JetReco
 git cms-addpkg RecoJets/JetAlgorithms
 git cms-addpkg RecoJets/JetProducers
 
-#to get original 7_2 top-tagger code
-#git remote add gkasieczka https://github.com/gkasieczka/cmssw.git
-#git fetch -a gkasieczka
-#git merge 8cb31b5587b7e73780d58976a8d174c01330cf44
-#toptagger merged from branch CMSSW_7_2_X / htt-dev
-
 #get the TTH code
 git clone https://github.com/jpata/tthbb13.git TTH
+# switch to devel branch
+cd TTH
+git checkout dev-jettoolbox
+cd ..
 cp TTH/MEAnalysis/libs/*.so ../lib/$SCRAM_ARCH/
 
-#apply the top tagger as a commit
-#git remote add jpata https://github.com/jpata/cmssw.git
-#git fetch -a jpata
-#git merge jpata/patched_toptagger
+# Apply the jet toolbox patch
+git apply  --ignore-whitespace --ignore-space-change --exclude DataFormats/PatCandidates/src/classes_def_objects.xml TTH/jet_toolbox.patch
 
-#to apply a the top tagger as a patch
-#git apply --check TTH/0001-merged-HepTopTagger.patch && git apply TTH/0001-merged-HepTopTagger.patch  
-#git apply -v --ignore-whitespace TTH/0001-merged-HepTopTagger.patch
-git apply -3 --ignore-whitespace --ignore-space-change TTH/0001-merged-HepTopTagger.patch
+# Bring fastjet contrib up to speed (necessary as long as we not on 7_2)
+cp TTH/fastjet-xmls/* ../config/toolbox/$SCRAM_ARCH/tools/selected/
+scram setup fastjet-contrib
+scram setup fastjet-contrib-archive
+
+# to apply a the top tagger as a patch
+git apply -3 --ignore-whitespace --ignore-space-change --exclude DataFormats/PatCandidates/src/classes_def_objects.xml TTH/0001-merged-HepTopTagger.patch
 
 scram setup lhapdf
+
+# And build:
+# scram b -j 10

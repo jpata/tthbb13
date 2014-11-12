@@ -30,6 +30,7 @@ if "TTH_DEBUG" in os.environ:
 		   debugModules=cms.untracked.vstring('*'),
 		   cout=cms.untracked.PSet(threshold=cms.untracked.string('INFO')),
 		   debug=cms.untracked.PSet(threshold=cms.untracked.string('DEBUG')),
+
 	)
 else:
 	process.load("FWCore.MessageService.MessageLogger_cfi")
@@ -44,6 +45,31 @@ process.source = cms.Source("PoolSource",
 	),
 	skipEvents = cms.untracked.uint32(options.skipEvents)
 )
+
+# Select candidates that would pass CHS requirements
+# This can be used as input for HTT and other jet clustering algorithms
+process.chs = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedPFCandidates"), cut = cms.string("fromPV"))
+
+# Add stand-alone fat-jet collection 
+from RecoJets.JetProducers.PFJetParameters_cfi import *
+from RecoJets.JetProducers.AnomalousCellParameters_cfi import *
+process.ca15PFJetsCHS = cms.EDProducer(
+        "FastjetJetProducer",
+        PFJetParameters,
+        AnomalousCellParameters,
+        jetAlgorithm = cms.string("CambridgeAachen"),
+        rParam       = cms.double(1.5),
+    )
+process.ca15PFJetsCHS.src      = cms.InputTag("chs")
+process.ca15PFJetsCHS.jetPtMin = cms.double(200)
+
+
+# Calculate n-subjettiness for stand-alone fatjets
+process.Njettiness = cms.EDProducer("NjettinessAdder",
+                                    src=cms.InputTag("ca15PFJetsCHS"),
+                                    cone=cms.double(1.5)
+                            )
+
 
 from TTH.TTHNtupleAnalyzer.triggers_MC_cff import *
 print '**** TRIGGER PATHS ****'
@@ -71,7 +97,7 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
 
 	packed = cms.InputTag("packedGenParticles"),
 	pruned = cms.InputTag("prunedGenParticles"),
-	fatjets = cms.InputTag("slimmedJetsAK8"),
+	fatjets = cms.InputTag("ca15PFJetsCHS"),
 	mets = cms.InputTag("slimmedMETs"),
 	lhe = cms.InputTag("externalLHEProducer"),
 
@@ -170,76 +196,12 @@ process.TFileService = cms.Service("TFileService",
 
 process.load('RecoJets.JetProducers.caTopTaggers_cff')
 
-##need to override from pfNoPileUpJME which is not present in miniAOD
-#process.hepTopTagPFJetsCHS.src = cms.InputTag("packedPFCandidates")
-#
-##NB: this module is actually not called, it's here just for reference
-#caTopTagInfos = cms.EDProducer("CATopJetTagger",
-#	src = cms.InputTag("cmsTopTagPFJetsCHS"),
-#	TopMass = cms.double(173),
-#	TopMassMin = cms.double(0.),
-#	TopMassMax = cms.double(250.),
-#	WMass = cms.double(80.4),
-#	WMassMin = cms.double(0.0),
-#	WMassMax = cms.double(200.0),
-#	MinMassMin = cms.double(0.0),
-#	MinMassMax = cms.double(200.0),
-#	verbose = cms.bool(False)
-#)
-#
-#process.hepTopTagInfos = caTopTagInfos.clone(
-#	src = cms.InputTag("hepTopTagPFJetsCHS")
-#)
-
 from RecoJets.JetProducers.AnomalousCellParameters_cfi import *
 from RecoJets.JetProducers.PFJetParameters_cfi import *
 
-#process.HTTJetsCHSLoose = cms.EDProducer(
-#   "HTTTopJetProducer",
-#	#need to override from pfNoPileUpJME which is not present in miniAOD
-#    #
-#	PFJetParameters.clone(src = cms.InputTag('packedPFCandidates'),
-#						 doAreaFastjet = cms.bool(True),
-#						 doRhoFastjet = cms.bool(False),
-#						 jetPtMin = cms.double(100.0)
-#	),
-#	AnomalousCellParameters,
-#	algorithm = cms.int32(1),
-#	jetAlgorithm = cms.string("CambridgeAachen"),
-#	rParam = cms.double(1.5),
-#	minFatjetPt = cms.double(100.),
-#	minCandPt = cms.double(100.),
-#	minSubjetPt = cms.double(20.),
-#	writeCompound = cms.bool(True),
-#	minCandMass = cms.double(0.),
-#	maxCandMass = cms.double(10000.),
-#	massRatioWidth = cms.double(50.),
-#)
-
-
-#for comparison with Thomas/Gregor 15.10.14
-#process.HTTJetsCHS = cms.EDProducer(
-#    "HTTTopJetProducer",
-#    PFJetParameters.clone( src = cms.InputTag('packedPFCandidates'),
-#                           doAreaFastjet = cms.bool(True),
-#                           doRhoFastjet = cms.bool(False),
-#                           jetPtMin = cms.double(100.0)
-#                       ),
-#    AnomalousCellParameters,
-#    algorithm = cms.int32(1),
-#    jetAlgorithm = cms.string("CambridgeAachen"),
-#    rParam = cms.double(1.5),
-#    mode = cms.int32(0),
-#    minFatjetPt = cms.double(200.),
-#    minCandPt = cms.double(0.),
-#    minSubjetPt = cms.double(30.),
-#    writeCompound = cms.bool(True),
-#    minCandMass = cms.double(140.),
-#    maxCandMass = cms.double(20000.),
-#)
 process.HTTJetsCHS = cms.EDProducer(
 	"HTTTopJetProducer",
-	PFJetParameters.clone(src = cms.InputTag('packedPFCandidates'),
+	PFJetParameters.clone(src = cms.InputTag('chs'),
 						  doAreaFastjet = cms.bool(True),
 						  doRhoFastjet = cms.bool(False),
 						  jetPtMin = cms.double(100.0)
@@ -259,7 +221,7 @@ process.HTTJetsCHS = cms.EDProducer(
 
 process.MultiRHTTJetsCHS = cms.EDProducer(
      "HTTTopJetProducer",
-     PFJetParameters.clone( src = cms.InputTag('packedPFCandidates'),
+     PFJetParameters.clone( src = cms.InputTag('chs'),
                             doAreaFastjet = cms.bool(True),
                             doRhoFastjet = cms.bool(False),
                             jetPtMin = cms.double(100.0)
@@ -279,29 +241,6 @@ process.MultiRHTTJetsCHS = cms.EDProducer(
      massRatioWidth = cms.double(30.),
 )
 
-
-#for comparison with Gregor
-#process.MultiRHTTJetsCHS = cms.EDProducer(
-#     "HTTTopJetProducer",
-#     PFJetParameters.clone( src = cms.InputTag('packedPFCandidates'),
-#                            doAreaFastjet = cms.bool(True),
-#                            doRhoFastjet = cms.bool(False),
-#                            jetPtMin = cms.double(100.0)
-#                        ),
-#     AnomalousCellParameters,
-#     multiR = cms.bool(True),
-#     algorithm = cms.int32(1),
-#     jetAlgorithm = cms.string("CambridgeAachen"),
-#     rParam = cms.double(1.5),
-#     mode = cms.int32(4),
-#     minFatjetPt = cms.double(200.),
-#     minCandPt = cms.double(0.),
-#     minSubjetPt = cms.double(30.),
-#     writeCompound = cms.bool(True),
-#     minCandMass = cms.double(140.),
-#     maxCandMass = cms.double(250.),
-#     massRatioWidth = cms.double(15.),
-#)
 
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
@@ -339,6 +278,9 @@ process.ak4PFL1FastL2L3Residual = cms.ESProducer("JetCorrectionESChain",
 process.p = cms.Path(
 	#process.hepTopTagPFJetsCHS *
 	#process.hepTopTagInfos *
+        process.chs *
+        process.ca15PFJetsCHS *
+        process.Njettiness *        
 	process.HTTJetsCHS *
 	process.MultiRHTTJetsCHS *
 	process.tthNtupleAnalyzer
