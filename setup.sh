@@ -14,10 +14,6 @@ git cms-addpkg RecoJets/JetProducers
 
 #get the TTH code
 git clone https://github.com/jpata/tthbb13.git TTH
-# switch to devel branch
-cd TTH
-git checkout dev-jettoolbox
-cd ..
 cp TTH/MEAnalysis/libs/*.so ../lib/$SCRAM_ARCH/
 
 # Apply the jet toolbox patch
