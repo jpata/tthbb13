@@ -50,9 +50,24 @@ process.source = cms.Source("PoolSource",
 # This can be used as input for HTT and other jet clustering algorithms
 process.chs = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedPFCandidates"), cut = cms.string("fromPV"))
 
+# Add stand-alone fat-jet collection 
+from RecoJets.JetProducers.PFJetParameters_cfi import *
+from RecoJets.JetProducers.AnomalousCellParameters_cfi import *
+process.ca15PFJetsCHS = cms.EDProducer(
+        "FastjetJetProducer",
+        PFJetParameters,
+        AnomalousCellParameters,
+        jetAlgorithm = cms.string("CambridgeAachen"),
+        rParam       = cms.double(1.5),
+    )
+process.ca15PFJetsCHS.src      = cms.InputTag("chs")
+process.ca15PFJetsCHS.jetPtMin = cms.double(200)
+
+
+# Calculate n-subjettiness for stand-alone fatjets
 process.Njettiness = cms.EDProducer("NjettinessAdder",
-                                    src=cms.InputTag("slimmedJetsAK8"),
-                                    cone=cms.double(0.8)
+                                    src=cms.InputTag("ca15PFJetsCHS"),
+                                    cone=cms.double(1.5)
                             )
 
 
@@ -82,7 +97,7 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
 
 	packed = cms.InputTag("packedGenParticles"),
 	pruned = cms.InputTag("prunedGenParticles"),
-	fatjets = cms.InputTag("slimmedJetsAK8"),
+	fatjets = cms.InputTag("ca15PFJetsCHS"),
 	mets = cms.InputTag("slimmedMETs"),
 	lhe = cms.InputTag("externalLHEProducer"),
 
@@ -264,6 +279,7 @@ process.p = cms.Path(
 	#process.hepTopTagPFJetsCHS *
 	#process.hepTopTagInfos *
         process.chs *
+        process.ca15PFJetsCHS *
         process.Njettiness *        
 	process.HTTJetsCHS *
 	process.MultiRHTTJetsCHS *

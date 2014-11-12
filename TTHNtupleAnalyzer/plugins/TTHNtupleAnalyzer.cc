@@ -262,7 +262,7 @@ private:
 	const edm::EDGetTokenT<edm::View<pat::PackedGenParticle> > packedGenToken_;
 
 	// collection of fatjets and MET
-	const edm::EDGetTokenT<pat::JetCollection> fatjetToken_;
+	const edm::EDGetTokenT<reco::PFJetCollection> fatjetToken_;
 	const edm::EDGetTokenT<pat::METCollection> metToken_;
 
 	// LHE event product (may not be present!!)
@@ -322,7 +322,7 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
 	vertexToken_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("vertices"))),
 	prunedGenToken_(consumes<edm::View<reco::GenParticle> >(iConfig.getParameter<edm::InputTag>("pruned"))),
 	packedGenToken_(consumes<edm::View<pat::PackedGenParticle> >(iConfig.getParameter<edm::InputTag>("packed"))),
-	fatjetToken_(consumes<pat::JetCollection>(iConfig.getParameter<edm::InputTag>("fatjets"))),
+	fatjetToken_(consumes<reco::PFJetCollection>(iConfig.getParameter<edm::InputTag>("fatjets"))),
 	metToken_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("mets"))),
 
 	//Gen-level
@@ -1385,7 +1385,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	}
 
 
-	edm::Handle<pat::JetCollection> fatjets;
+	edm::Handle<reco::PFJetCollection> fatjets;
 	iEvent.getByToken(fatjetToken_, fatjets);
 
 	std::cout << fatjets->size() << " " << fatjet_nsub_tau1->size() << std::endl;
