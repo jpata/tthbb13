@@ -14,4 +14,5 @@ process.fwliteInput.samples = cms.VPSet(
         xSec     = cms.double(1.0)
     )
 )
+process.fwliteInput.debug = cms.untracked.int32(4)
 process.fwliteInput.evLimits = cms.vint32(0, 100)

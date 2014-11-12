@@ -1,3 +1,5 @@
+#ifndef TTH_HYPOENUMS
+#define TTH_HYPOENUMS
 
 namespace TTH {
 
@@ -36,3 +38,5 @@ enum DecayMode {
     UNKNOWN_MODE
 };
 }
+
+#endif

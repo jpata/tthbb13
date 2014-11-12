@@ -5,7 +5,7 @@ import FWCore.ParameterSet.Config as cms
 
 # path to file
 #pathToFile = '/pnfs/psi.ch/cms/trivcat/store//user/bianchi/HBB_EDMNtuple/AllHDiJetPt'
-pathToFile = '/hdfs/local/joosep/tth/'
+pathToFile = '/hdfs/cms/store/user/jpata/tth/v5/'
 ordering   = ''
 
 # luminosity

@@ -1,3 +1,6 @@
+#include "TTH/MEAnalysis/interface/HelperFunctions.h"
+#include "TTH/TTHNtupleAnalyzer/interface/tth_tree.hh"
+
 // maximum number of permutations per event
 #define NMAXPERMUT 60
 
@@ -384,10 +387,69 @@ public:
         tree->Branch("perm_to_gen_b" ,            perm_to_gen_alt_,"perm_to_gen[nPermut_b]/I");
     }
 
+	void set_branch_addresses(const float MH) {
+        tree->SetBranchAddress("lepton_pt", &lepton_pt_);
+        tree->SetBranchAddress("lepton_rIso", &lepton_rIso_);
+        tree->SetBranchAddress("numBTagL", &numBTagL_);
+        tree->SetBranchAddress("numBTagM", &numBTagM_);
+        tree->SetBranchAddress("numBTagT", &numBTagT_);
+        tree->SetBranchAddress("numJets", &numJets_);
+        tree->SetBranchAddress("btag_LR", &btag_LR_);
+        tree->SetBranchAddress("nLep", &nLep_);
+        tree->SetBranchAddress(Form("p_%d_all_s",     int(MH)), &probAtSgn_);
+        tree->SetBranchAddress(Form("p_%d_all_b",     int(MH)), &probAtSgn_alt_);
+        tree->SetBranchAddress(Form("p_%d_all_s_ttbb",int(MH)), &probAtSgn_ttbb_);
+        tree->SetBranchAddress(Form("p_%d_all_b_ttbb",int(MH)), &probAtSgn_alt_ttbb_);
+        tree->SetBranchAddress(Form("p_%d_all_b_ttjj",int(MH)), &probAtSgn_alt_ttjj_);
+        tree->SetBranchAddress(Form("p_%d_all_b_ttbj",int(MH)), &probAtSgn_alt_ttbj_);
+        tree->SetBranchAddress(Form("p_%d_all_b_ttcc",int(MH)), &probAtSgn_alt_ttcc_);
+        tree->SetBranchAddress("Vtype", &Vtype_);
+        tree->SetBranchAddress("type", &type_);
+        tree->SetBranchAddress("flag_type0", &flag_type0_);
+        tree->SetBranchAddress("flag_type1", &flag_type1_);
+        tree->SetBranchAddress("flag_type2", &flag_type2_);
+        tree->SetBranchAddress("flag_type3", &flag_type3_);
+        tree->SetBranchAddress("flag_type4", &flag_type4_);
+        tree->SetBranchAddress("flag_type6", &flag_type6_);
+        tree->SetBranchAddress("syst", &syst_);
+        tree->SetBranchAddress("triggerFlags", &triggerFlags_);
+        tree->SetBranchAddress("nMatchSimBs", &nMatchSimBs_);
+        tree->SetBranchAddress("nMatchSimCs", &nMatchSimCs_);
+	}
+
     void loop_initialize(void) {
 		Vtype_ = DEF_VAL_INT;
 		type_ = DEF_VAL_INT;
-        nPermut_            = 0;
+        SET_ZERO(lepton_pt_, NMAXLEPTONS, DEF_VAL_FLOAT);
+        SET_ZERO(lepton_rIso_, NMAXLEPTONS, DEF_VAL_FLOAT);
+        SET_ZERO(triggerFlags_, 70, 0);
+
+		numBTagL_ = DEF_VAL_INT;
+		numBTagM_ = DEF_VAL_INT;
+		numBTagT_ = DEF_VAL_INT;
+		numJets_ = DEF_VAL_INT;
+        
+        nMatchSimBs_ = DEF_VAL_INT;
+        nMatchSimCs_ = DEF_VAL_INT;
+        
+		btag_LR_ = DEF_VAL_FLOAT;
+
+		probAtSgn_ = DEF_VAL_FLOAT;
+		probAtSgn_alt_ = DEF_VAL_FLOAT;
+		probAtSgn_ttbb_ = DEF_VAL_FLOAT;
+		probAtSgn_alt_ttbb_ = DEF_VAL_FLOAT;
+		probAtSgn_alt_ttjj_ = DEF_VAL_FLOAT;
+		probAtSgn_alt_ttbj_ = DEF_VAL_FLOAT;
+		probAtSgn_alt_ttcc_ = DEF_VAL_FLOAT;
+		
+		flag_type0_ = DEF_VAL_INT;
+		flag_type1_ = DEF_VAL_INT;
+		flag_type2_ = DEF_VAL_INT;
+		flag_type3_ = DEF_VAL_INT;
+		flag_type4_ = DEF_VAL_INT;
+		flag_type6_ = DEF_VAL_INT;
+        
+		nPermut_            = 0;
         nPermut_alt_        = 0;
         nTotInteg_          = 0;
         nTotInteg_alt_      = 0;

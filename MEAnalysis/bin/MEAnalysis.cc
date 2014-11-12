@@ -660,9 +660,6 @@ int main(int argc, const char* argv[])
 
         cout << "Done!!" << endl;
 
-        //FIXME: insert this into input ntuples
-        UChar_t triggerFlags[70];
-
         //initialize empty structs
         ////FIXME: need to add to input ntuples
         genTopInfo genTop = {};
@@ -719,7 +716,7 @@ int main(int argc, const char* argv[])
 
             //initialize trigger flags
             for(int k = 0; k < 70 ; k++) {
-                otree->triggerFlags_[k] = 1;
+                otree->triggerFlags_[k] = 0;
             }
             for(int k = 0; k < 3 ; k++) {
                 otree->SCALEsyst_[k] = 1.0;
@@ -820,9 +817,15 @@ int main(int argc, const char* argv[])
             //otree->trigger_     = weightTrig2012;
 
 
+			//cout << "trigbits";
             for(int k = 0; k < 70 ; k++) {
-                otree->triggerFlags_[k] = triggerFlags[k];
+                otree->triggerFlags_[k] = itree->trigger__bits[k];
+				//if (debug>3)
+				//	cout << " " << itree->trigger__bits[k];
             }
+			//cout << endl;
+			//if (debug>3)
+			//	cout << "sumbits " << sumbits << endl;
 
             //FIXME: where to get this scalesyst
             //otree->SCALEsyst_[0] = 1.0;
@@ -1509,7 +1512,7 @@ int main(int argc, const char* argv[])
                     //int lepSelVtype3 =  (Vtype==3 && itree->lep__type[0]==11 && leptonLV.Pt()>lepPtTight &&
                     //                     itree->lep__rel_iso[0]<lepIsoTight && vLepton_wp80[0]>0 && TMath::Abs(itree->lep__dxy[0])<0.02 );
                     int lepSelVtype3 =  (Vtype == TTH::EventHypothesis::en && itree->sig_lep__type[0] == 11 && leptonLV.Pt() > lepPtTight &&
-                                         itree->lep__rel_iso[lepton_idx] < lepIsoTight && TMath::Abs(itree->lep__dxy[lepton_idx]) < 0.02 );
+                                         itree->lep__rel_iso[lepton_idx] < lepIsoTight && TMath::Abs(itree->lep__dxy[lepton_idx]) < 0.02);
 					
 					if (debug>3) {
 						cout << "lepSelVtype2,3 " << itree->sig_lep__type[0] << "==13 " <<
@@ -1521,14 +1524,14 @@ int main(int argc, const char* argv[])
 
 					//FIXME: need to put trigger bits here
                     // OR of four trigger paths:  "HLT_Mu40_eta2p1_v.*", "HLT_IsoMu24_eta2p1_v.*", "HLT_Mu40_v.*",  "HLT_IsoMu24_v.*"
-                    int trigVtype2 =  Vtype == TTH::EventHypothesis::en;// && ( triggerFlags[22]>0 || triggerFlags[23]>0 || triggerFlags[14]>0 ||triggerFlags[21]>0 ));
+                    //int trigVtype2 =  Vtype == TTH::EventHypothesis::mun && ( triggerFlags[20]>0 || triggerFlags[21]>0 || triggerFlags[25]>0 ||triggerFlags[26]>0 ));
 
                     // OR of two trigger paths:   "HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v.*", "HLT_Ele27_WP80_v.*"
-                    int trigVtype3 =  Vtype == TTH::EventHypothesis::mun;// && triggerFlags[44]>0 );
+                    //int trigVtype3 =  Vtype == TTH::EventHypothesis::en && triggerFlags[44]>0;
 
                     // for the moment, don't cut on trigger bit (save and cut offline)
-                    trigVtype2 = 1;
-                    trigVtype3 = 1;
+                    int trigVtype2 = 1;
+                    int trigVtype3 = 1;
 
                     // ID && trigger
                     properEventSL = (lepSelVtype2 && (isMC ? 1 : trigVtype2)) || (lepSelVtype3 && (isMC ? 1 : trigVtype3));
@@ -1668,14 +1671,14 @@ int main(int argc, const char* argv[])
 
 					//FIXME: need to implement trigger bits
                     // OR of four trigger paths:  "HLT_Mu40_eta2p1_v.*", "HLT_IsoMu24_eta2p1_v.*", "HLT_Mu40_v.*",  "HLT_IsoMu24_v.*"
-                    int trigVtype0 =  (Vtype == TTH::EventHypothesis::mumu && ( triggerFlags[22]>0 || triggerFlags[23]>0 || triggerFlags[14]>0 ||triggerFlags[21]>0 ));
+                    //int trigVtype0 =  (Vtype == TTH::EventHypothesis::mumu && ( triggerFlags[21]>0 || triggerFlags[26]>0 || triggerFlags[20]>0 ||triggerFlags[25]>0 ));
 
                     // OR of two trigger paths:    "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v.*", "HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v.*"
-                    int trigVtype1 =  (Vtype == TTH::EventHypothesis::ee && ( triggerFlags[5]>0 || triggerFlags[6]>0 ) );
+                    //int trigVtype1 =  (Vtype == TTH::EventHypothesis::ee && ( triggerFlags[42]>0 || triggerFlags[42]>0 ) );
 
                     // for the moment, don't cut on trigger bit (save and cut offline)
-                    trigVtype0 = 1;
-                    trigVtype1 = 1;
+                    int trigVtype0 = 1;
+                    int trigVtype1 = 1;
 					
 					if (debug>3) {
 						cout << "EE/MM " << lepSelVtype0 << " " << lepSelVtype1 << endl;	
@@ -1852,16 +1855,18 @@ int main(int argc, const char* argv[])
 
 					//First lepton is mu
 					//FIXME: if electron is the first, does not work
-                    int lepSelVtype4 = (Vtype == TTH::EventHypothesis::emu && itree->sig_lep__type[0] == 13 && itree->sig_lep__type[1] == 11 &&
-                                        (leptonLV.Pt() >20 && TMath::Abs(leptonLV.Eta()) < muEtaTight && itree->lep__rel_iso[lep_idx_1] < lepIsoTight)
-                                        && itree->sig_lep__charge[0] * itree->sig_lep__charge[1]<0
-                                       );
+                    int lepSelVtype4 = (Vtype == TTH::EventHypothesis::emu && (
+						(itree->sig_lep__type[0] == 13 && itree->sig_lep__type[1] == 11) ||
+						(itree->sig_lep__type[0] == 11 && itree->sig_lep__type[1] == 13)) &&
+                        (leptonLV.Pt() > 20 && TMath::Abs(leptonLV.Eta()) < muEtaTight && itree->lep__rel_iso[lep_idx_1] < lepIsoTight) &&
+						itree->sig_lep__charge[0] * itree->sig_lep__charge[1]<0
+                	);
 
                     // OR of four trigger paths:  "HLT_Mu40_eta2p1_v.*", "HLT_IsoMu24_eta2p1_v.*", "HLT_Mu40_v.*",  "HLT_IsoMu24_v.*"
-                    int trigVtype4 =  (Vtype == TTH::EventHypothesis::emu && ( triggerFlags[22]>0 || triggerFlags[23]>0 || triggerFlags[14]>0 ||triggerFlags[21]>0 ));
+                    //int trigVtype4 =  (Vtype == TTH::EventHypothesis::emu && ( triggerFlags[21]>0 || triggerFlags[26]>0 || triggerFlags[20]>0 ||triggerFlags[25]>0 ));
 
                     // for the moment, don't cut on trigger bit (save and cut offline)
-                    trigVtype4 = 1;
+                    int trigVtype4 = 1;
 
                     // ID && trigger
                     properEventDL = lepSelVtype4 && (isMC ? 1 : trigVtype4) ;
