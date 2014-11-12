@@ -30,6 +30,7 @@ if "TTH_DEBUG" in os.environ:
 		   debugModules=cms.untracked.vstring('*'),
 		   cout=cms.untracked.PSet(threshold=cms.untracked.string('INFO')),
 		   debug=cms.untracked.PSet(threshold=cms.untracked.string('DEBUG')),
+
 	)
 else:
 	process.load("FWCore.MessageService.MessageLogger_cfi")
@@ -44,6 +45,10 @@ process.source = cms.Source("PoolSource",
 	),
 	skipEvents = cms.untracked.uint32(options.skipEvents)
 )
+
+# Select candidates that would pass CHS requirements
+# This can be used as input for HTT and other jet clustering algorithms
+process.chs = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedPFCandidates"), cut = cms.string("fromPV"))
 
 process.Njettiness = cms.EDProducer("NjettinessAdder",
                                     src=cms.InputTag("slimmedJetsAK8"),
@@ -181,7 +186,7 @@ from RecoJets.JetProducers.PFJetParameters_cfi import *
 
 process.HTTJetsCHS = cms.EDProducer(
 	"HTTTopJetProducer",
-	PFJetParameters.clone(src = cms.InputTag('packedPFCandidates'),
+	PFJetParameters.clone(src = cms.InputTag('chs'),
 						  doAreaFastjet = cms.bool(True),
 						  doRhoFastjet = cms.bool(False),
 						  jetPtMin = cms.double(100.0)
@@ -201,7 +206,7 @@ process.HTTJetsCHS = cms.EDProducer(
 
 process.MultiRHTTJetsCHS = cms.EDProducer(
      "HTTTopJetProducer",
-     PFJetParameters.clone( src = cms.InputTag('packedPFCandidates'),
+     PFJetParameters.clone( src = cms.InputTag('chs'),
                             doAreaFastjet = cms.bool(True),
                             doRhoFastjet = cms.bool(False),
                             jetPtMin = cms.double(100.0)
@@ -258,6 +263,7 @@ process.ak4PFL1FastL2L3Residual = cms.ESProducer("JetCorrectionESChain",
 process.p = cms.Path(
 	#process.hepTopTagPFJetsCHS *
 	#process.hepTopTagInfos *
+        process.chs *
         process.Njettiness *        
 	process.HTTJetsCHS *
 	process.MultiRHTTJetsCHS *
