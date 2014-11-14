@@ -1,4 +1,4 @@
-From dae670ab132031b249a12db78c89d1b11c318dd9 Mon Sep 17 00:00:00 2001
+From 13a21371fe6757e516d370e6a56d6512668075f0 Mon Sep 17 00:00:00 2001
 From: Gregor Kasieczka <g.kasieczka@gmail.com>
 Date: Wed, 17 Sep 2014 16:20:58 +0200
 Subject: [PATCH] Changed HTTWrapper to work with newer tagger version
@@ -82,6 +82,10 @@ Added comment
 Added information on initial fatjet to HTTTopJetTagInfo
 
 Playing with VJP to get a clean merge with the jet toolbox
+
+Updated HTT to 84fb7d6fc7aab5896cd4efe9ae82bd4df477c29f
+
+Added R_min_expected
 ---
  DataFormats/JetReco/interface/HTTTopJetTagInfo.h   |  83 ++++
  DataFormats/JetReco/src/classes_4.h                |  15 +-
@@ -89,18 +93,18 @@ Playing with VJP to get a clean merge with the jet toolbox
  RecoJets/JetAlgorithms/interface/HEPTopTagger.h    | 527 ++++++---------------
  .../JetAlgorithms/interface/HEPTopTaggerWrapper.h  | 214 ++++++---
  .../JetAlgorithms/interface/MultiRHEPTopTagger.h   | 105 ++++
- .../interface/MultiRHEPTopTaggerWrapper.h          | 237 +++++++++
+ .../interface/MultiRHEPTopTaggerWrapper.h          | 241 ++++++++++
  RecoJets/JetAlgorithms/src/HEPTopTagger.cc         | 350 ++++++++++++++
  RecoJets/JetAlgorithms/src/HEPTopTaggerWrapper.cc  |  78 +--
  RecoJets/JetAlgorithms/src/MultiRHEPTopTagger.cc   | 146 ++++++
- .../JetAlgorithms/src/MultiRHEPTopTaggerWrapper.cc | 124 +++++
+ .../JetAlgorithms/src/MultiRHEPTopTaggerWrapper.cc | 141 ++++++
  RecoJets/JetProducers/plugins/CATopJetProducer.cc  |  12 +-
  RecoJets/JetProducers/plugins/CATopJetProducer.h   |   2 -
  RecoJets/JetProducers/plugins/HTTTopJetProducer.cc | 263 ++++++++++
  RecoJets/JetProducers/plugins/HTTTopJetProducer.h  | 140 ++++++
  .../JetProducers/plugins/VirtualJetProducer.cc     |  13 +-
  RecoJets/JetProducers/plugins/VirtualJetProducer.h |  11 +-
- 17 files changed, 1829 insertions(+), 508 deletions(-)
+ 17 files changed, 1850 insertions(+), 508 deletions(-)
  create mode 100644 DataFormats/JetReco/interface/HTTTopJetTagInfo.h
  create mode 100644 RecoJets/JetAlgorithms/interface/MultiRHEPTopTagger.h
  create mode 100644 RecoJets/JetAlgorithms/interface/MultiRHEPTopTaggerWrapper.h
@@ -1065,7 +1069,7 @@ index 858fe63..9ab7fe7 100644
  
 diff --git a/RecoJets/JetAlgorithms/interface/MultiRHEPTopTagger.h b/RecoJets/JetAlgorithms/interface/MultiRHEPTopTagger.h
 new file mode 100644
-index 0000000..6c38707
+index 0000000..0f42f16
 --- /dev/null
 +++ b/RecoJets/JetAlgorithms/interface/MultiRHEPTopTagger.h
 @@ -0,0 +1,105 @@
@@ -1115,7 +1119,7 @@ index 0000000..6c38707
 +  // used for the HTT
 +  const double & pt_for_exp() const {return _pt_for_exp;}
 +  
-+  double R_min_exp(double x) {return _r_min_exp_function(x);}
++  double R_min_exp() {return _r_min_exp_function(_pt_for_exp);}
 +
 +  // Access to all candidates and number-of-small-fatjets
 +  HEPTopTagger HTTagger(int i)  {return _HEPTopTagger[i];}
@@ -1176,10 +1180,10 @@ index 0000000..6c38707
 +
 diff --git a/RecoJets/JetAlgorithms/interface/MultiRHEPTopTaggerWrapper.h b/RecoJets/JetAlgorithms/interface/MultiRHEPTopTaggerWrapper.h
 new file mode 100644
-index 0000000..aed6f14
+index 0000000..5280b17
 --- /dev/null
 +++ b/RecoJets/JetAlgorithms/interface/MultiRHEPTopTaggerWrapper.h
-@@ -0,0 +1,237 @@
+@@ -0,0 +1,241 @@
 +//----------------------------------------------------------------------
 +//  This file is free software; you can redistribute it and/or modify
 +//  it under the terms of the GNU General Public License as published by
@@ -1359,6 +1363,9 @@ index 0000000..aed6f14
 +   /// returns Rmin
 +   inline double R_min() const {return _Rmin;}
 +
++   /// returns expected Rmin
++   inline double R_min_expected() const {return _RminExpected;}
++
 +   /// returns if 2d-mass plane cuts were passed
 +   inline double mass_ratio_passed() const {return _mass_ratio_passed;}
 +
@@ -1379,6 +1386,7 @@ index 0000000..aed6f14
 +      int _mass_ratio_passed;
 +      double _ptFiltForRminExp;
 +      double _Rmin;
++      double _RminExpected;
 +      
 +      const JetDefinition::Recombiner  * W_rec;
 + 
@@ -2048,10 +2056,10 @@ index 0000000..517894b
 +};
 diff --git a/RecoJets/JetAlgorithms/src/MultiRHEPTopTaggerWrapper.cc b/RecoJets/JetAlgorithms/src/MultiRHEPTopTaggerWrapper.cc
 new file mode 100644
-index 0000000..2f900f8
+index 0000000..bfb8f0c
 --- /dev/null
 +++ b/RecoJets/JetAlgorithms/src/MultiRHEPTopTaggerWrapper.cc
-@@ -0,0 +1,124 @@
+@@ -0,0 +1,141 @@
 +//----------------------------------------------------------------------
 +//  This file is free software; you can redistribute it and/or modify
 +//  it under the terms of the GNU General Public License as published by
@@ -2088,6 +2096,23 @@ index 0000000..2f900f8
 +
 +FASTJET_BEGIN_NAMESPACE
 +
++
++// Expected R_min for tops (as function of filtered initial fatjet pT in GeV (using CA, R=0.2, n=10)
++// From ttbar sample, matched to hadronically decaying top with delta R < 0.8 and true top pT > 200
++// Cuts are: fW < 0.175 and  m_top = 120..170
++// Input objects are packed pfCandidates (wo/ filtering)
++// IMPORTANT: this might need to be changed when using CHS or very different other cuts
++double R_min_expected_function(double x){
++  if (x<300)
++    return 1.17 + 1.91e-03*x - 6.45e-06*x*x;
++  else if (x<500)
++    return 1.89 - 2.89e-03*x + 1.55e-06*x*x;
++  else
++    return 1.86 - 2.78e-03*x + 1.44e-06*x*x;
++}
++
++
++
 +//------------------------------------------------------------------------
 +// returns the tagged PseudoJet if successful, 0 otherwise
 +//  - jet   the PseudoJet to tag
@@ -2120,8 +2145,6 @@ index 0000000..2f900f8
 +  tagger.set_nfilt(filtN_);
 +  tagger.set_minpt_subjet(minSubjetPt_);
 +
-+
-+
 +  // How to select among candidates
 +  tagger.set_mode(mode_);
 +  
@@ -2130,6 +2153,9 @@ index 0000000..2f900f8
 +  tagger.set_top_range(minCandMass_, maxCandMass_); 
 +  tagger.set_mass_ratio_cut(minM23Cut_, minM13Cut_, maxM13Cut_);
 +  tagger.set_f_W(massRatioWidth_/100.);
++
++  // Set function to calculate R_min_expected
++  tagger.set_r_min_exp_function(R_min_expected_function);
 +
 +  tagger.run_tagger();
 +  
@@ -2169,9 +2195,8 @@ index 0000000..2f900f8
 +  s->_mass_ratio_passed = tagger.cand_Rmin().is_masscut_passed();
 +  s->_Rmin = tagger.Rmin();
 +  s->_ptFiltForRminExp = tagger.pt_for_exp(); // CA, R=0.2, n=10 is the current default in the tagger
-+  // TODO: Add Rmin(expected)
++  s->_RminExpected = tagger.R_min_exp();
 +  
-+
 +  return result;
 +}
 +
@@ -2235,7 +2260,7 @@ index 0d09c30..e942edf 100644
  
 diff --git a/RecoJets/JetProducers/plugins/HTTTopJetProducer.cc b/RecoJets/JetProducers/plugins/HTTTopJetProducer.cc
 new file mode 100644
-index 0000000..073a563
+index 0000000..ddaec95
 --- /dev/null
 +++ b/RecoJets/JetProducers/plugins/HTTTopJetProducer.cc
 @@ -0,0 +1,263 @@
@@ -2464,7 +2489,7 @@ index 0000000..073a563
 +      properties.massRatioPassed  = s->mass_ratio_passed();     
 +      properties.isMultiR	  = 1;
 +      properties.Rmin	          = s->R_min();    
-+      properties.RminExpected     = 999.;
++      properties.RminExpected     = s->R_min_expected();    
 +      properties.ptFiltForRminExp = s->ptFiltForRminExp();     
 +
 +      tagInfo.insert(rtb, properties );
