@@ -270,6 +270,7 @@ private:
 
 	// the output tree
 	TTHTree* tthtree;
+	TNamed* config_dump;
 	const edm::Service<TFileService> fs;
 
 	//a histogram with event counts	
@@ -331,6 +332,7 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
 
 	//output
 	tthtree(new TTHTree(fs->make<TTree>("events", "events"))),
+	config_dump(fs->make<TNamed>("configdump", iConfig.dump().c_str())),
 	hcounter(fs->make<TH1D>("event_counter", "event_counter", 5, 0, 5)),
 
 	//ID lists for tau and ele
@@ -356,6 +358,7 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
 	
 	hcounter->GetXaxis()->SetBinLabel(1, "TTHNtupleAnalyzer__processed");
 	hcounter->GetXaxis()->SetBinLabel(2, "TTHNtupleAnalyzer__passed");
+
 	sw = new TStopwatch();
 }
 
