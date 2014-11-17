@@ -114,6 +114,11 @@ public:
 	float gen_met__sumet;
 
 	//top quark in ttbar processes
+	float gen_t__eta;
+	float gen_t__mass;
+	float gen_t__phi;
+	float gen_t__pt;
+
 	float gen_t__b__eta;
 	float gen_t__b__mass;
 	float gen_t__b__phi;
@@ -133,6 +138,11 @@ public:
 	int gen_t__w_d2__status;
 
 	//tbar quark in ttbar processes
+	float gen_tbar__eta;
+	float gen_tbar__mass;
+	float gen_tbar__phi;
+	float gen_tbar__pt;
+
 	float gen_tbar__b__eta;
 	float gen_tbar__b__mass;
 	float gen_tbar__b__phi;
@@ -395,6 +405,10 @@ public:
 		gen_met__pt = DEF_VAL_FLOAT;
 		gen_met__sumet = DEF_VAL_FLOAT;
 
+		gen_t__pt = DEF_VAL_FLOAT;
+		gen_t__eta = DEF_VAL_FLOAT;
+		gen_t__phi = DEF_VAL_FLOAT;
+		gen_t__mass = DEF_VAL_FLOAT;
 		gen_t__b__eta = DEF_VAL_FLOAT;
 		gen_t__b__mass = DEF_VAL_FLOAT;
 		gen_t__b__phi = DEF_VAL_FLOAT;
@@ -413,6 +427,10 @@ public:
 		gen_t__w_d2__pt = DEF_VAL_FLOAT;
 		gen_t__w_d2__status = DEF_VAL_INT;
 
+		gen_tbar__pt = DEF_VAL_FLOAT;
+		gen_tbar__eta = DEF_VAL_FLOAT;
+		gen_tbar__phi = DEF_VAL_FLOAT;
+		gen_tbar__mass = DEF_VAL_FLOAT;
 		gen_tbar__b__eta = DEF_VAL_FLOAT;
 		gen_tbar__b__mass = DEF_VAL_FLOAT;
 		gen_tbar__b__phi = DEF_VAL_FLOAT;
@@ -681,6 +699,12 @@ public:
 		tree->Branch("gen_met__phi", &gen_met__phi, "gen_met__phi/F");
 		tree->Branch("gen_met__pt", &gen_met__pt, "gen_met__pt/F");
 		tree->Branch("gen_met__sumet", &gen_met__sumet, "gen_met__sumet/F");
+		
+		tree->Branch("gen_t__eta", &gen_t__eta, "gen_t__eta/F");
+		tree->Branch("gen_t__mass", &gen_t__mass, "gen_t__mass/F");
+		tree->Branch("gen_t__phi", &gen_t__phi, "gen_t__phi/F");
+		tree->Branch("gen_t__pt", &gen_t__pt, "gen_t__pt/F");
+
 		tree->Branch("gen_t__b__eta", &gen_t__b__eta, "gen_t__b__eta/F");
 		tree->Branch("gen_t__b__mass", &gen_t__b__mass, "gen_t__b__mass/F");
 		tree->Branch("gen_t__b__phi", &gen_t__b__phi, "gen_t__b__phi/F");
@@ -693,6 +717,12 @@ public:
 		tree->Branch("gen_t__w_d2__mass", &gen_t__w_d2__mass, "gen_t__w_d2__mass/F");
 		tree->Branch("gen_t__w_d2__phi", &gen_t__w_d2__phi, "gen_t__w_d2__phi/F");
 		tree->Branch("gen_t__w_d2__pt", &gen_t__w_d2__pt, "gen_t__w_d2__pt/F");
+		
+		tree->Branch("gen_tbar__eta", &gen_tbar__eta, "gen_tbar__eta/F");
+		tree->Branch("gen_tbar__mass", &gen_tbar__mass, "gen_tbar__mass/F");
+		tree->Branch("gen_tbar__phi", &gen_tbar__phi, "gen_tbar__phi/F");
+		tree->Branch("gen_tbar__pt", &gen_tbar__pt, "gen_tbar__pt/F");
+		
 		tree->Branch("gen_tbar__b__eta", &gen_tbar__b__eta, "gen_tbar__b__eta/F");
 		tree->Branch("gen_tbar__b__mass", &gen_tbar__b__mass, "gen_tbar__b__mass/F");
 		tree->Branch("gen_tbar__b__phi", &gen_tbar__b__phi, "gen_tbar__b__phi/F");
@@ -705,6 +735,7 @@ public:
 		tree->Branch("gen_tbar__w_d2__mass", &gen_tbar__w_d2__mass, "gen_tbar__w_d2__mass/F");
 		tree->Branch("gen_tbar__w_d2__phi", &gen_tbar__w_d2__phi, "gen_tbar__w_d2__phi/F");
 		tree->Branch("gen_tbar__w_d2__pt", &gen_tbar__w_d2__pt, "gen_tbar__w_d2__pt/F");
+		
 		tree->Branch("jet__bd_csv", jet__bd_csv, "jet__bd_csv[n__jet]/F");
 		tree->Branch("jet__ce_e", jet__ce_e, "jet__ce_e[n__jet]/F");
 		tree->Branch("jet__ch_e", jet__ch_e, "jet__ch_e[n__jet]/F");
@@ -895,6 +926,12 @@ public:
 		tree->SetBranchAddress("gen_met__phi", &gen_met__phi);
 		tree->SetBranchAddress("gen_met__pt", &gen_met__pt);
 		tree->SetBranchAddress("gen_met__sumet", &gen_met__sumet);
+		
+		tree->SetBranchAddress("gen_t__eta", &gen_t__eta);
+		tree->SetBranchAddress("gen_t__mass", &gen_t__mass);
+		tree->SetBranchAddress("gen_t__phi", &gen_t__phi);
+		tree->SetBranchAddress("gen_t__pt", &gen_t__pt);
+		
 		tree->SetBranchAddress("gen_t__b__eta", &gen_t__b__eta);
 		tree->SetBranchAddress("gen_t__b__mass", &gen_t__b__mass);
 		tree->SetBranchAddress("gen_t__b__phi", &gen_t__b__phi);
@@ -912,6 +949,12 @@ public:
 		tree->SetBranchAddress("gen_t__w_d2__phi", &gen_t__w_d2__phi);
 		tree->SetBranchAddress("gen_t__w_d2__pt", &gen_t__w_d2__pt);
 		tree->SetBranchAddress("gen_t__w_d2__status", &gen_t__w_d2__status);
+		
+		tree->SetBranchAddress("gen_tbar__eta", &gen_tbar__eta);
+		tree->SetBranchAddress("gen_tbar__mass", &gen_tbar__mass);
+		tree->SetBranchAddress("gen_tbar__phi", &gen_tbar__phi);
+		tree->SetBranchAddress("gen_tbar__pt", &gen_tbar__pt);
+		
 		tree->SetBranchAddress("gen_tbar__b__eta", &gen_tbar__b__eta);
 		tree->SetBranchAddress("gen_tbar__b__mass", &gen_tbar__b__mass);
 		tree->SetBranchAddress("gen_tbar__b__phi", &gen_tbar__b__phi);

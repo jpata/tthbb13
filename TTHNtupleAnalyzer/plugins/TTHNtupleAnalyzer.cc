@@ -1591,6 +1591,11 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 			const reco::Candidate* top = find_nonself_child(tops[0]);
 			const reco::Candidate* dau1 = top->daughter(0);
 			const reco::Candidate* dau2 = top->daughter(1);
+					
+			tthtree->gen_t__pt = top->pt();
+			tthtree->gen_t__eta = top->eta();
+			tthtree->gen_t__phi = top->phi();
+			tthtree->gen_t__mass = top->mass();
 			
 			if(dau1==0 || dau2==0 || top->numberOfDaughters()<2) {
 				edm::LogError("genparticles") << "top ndau " << top->numberOfDaughters() << " dau1 " << dau1 << " dau2 " << dau2 << " null pointer or not enough daughters";
@@ -1664,6 +1669,11 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 			const reco::Candidate* top = find_nonself_child(antitops[0]);
 			const reco::Candidate* dau1 = top->daughter(0);
 			const reco::Candidate* dau2 = top->daughter(1);
+			
+			tthtree->gen_tbar__pt = top->pt();
+			tthtree->gen_tbar__eta = top->eta();
+			tthtree->gen_tbar__phi = top->phi();
+			tthtree->gen_tbar__mass = top->mass();
 			
 			if(dau1==0 || dau2==0 || top->numberOfDaughters()<2) {
 				edm::LogError("genparticles") << "antitop ndau " << top->numberOfDaughters() << " dau1 " << dau1 << " dau2 " << dau2 << " null pointer or not enough daughters!";
