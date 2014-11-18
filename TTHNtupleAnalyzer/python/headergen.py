@@ -1,7 +1,13 @@
 #!/usr/bin/env python
-#run as ./headergen.py infile.h outfile.h branchefs.py
-#branchdefs.py must contain a list of branches named "process"
-#author: Joosep Pata (ETHz) joosep.pata@cern.ch
+#
+# run as ./headergen.py infile.h outfile.h branchefs.py
+# branchdefs.py must contain a list of branches named "process"
+# or ./headergen.py this will set:
+#  infile.h -> ../interface/ttbar_tree_template.h
+#  outfile.h -> ../interface/ttbar_tree.h
+#  branchdefs.py -> sample_branches.py
+#
+# author: Joosep Pata (ETHz) joosep.pata@cern.ch
 import sys, os, imp
 
 #add type mappings from C++ -> ROOT 1-character here
@@ -128,10 +134,23 @@ class Dynamic1DArray:
 
 
 if __name__ == "__main__":
-    imp.load_source("branches", sys.argv[3])
+        
+    if len(sys.argv)==4:            
+        filename_in = sys.argv[1]
+        filename_out = sys.argv[2]
+        filename_branches = sys.argv[3]
+    elif len(sys.argv)==1:            
+        filename_in = "../interface/tth_tree_template.hh"
+        filename_out = "../interface/tth_tree.hh"
+        filename_branches = "sample_branches.py"
+    else:
+        print "Invalid number of arguments. Exiting..."
+        sys.exit()
+
+    imp.load_source("branches", filename_branches)
     import branches
     branches_to_add = branches.process
-    infile = open(sys.argv[1])
+    infile = open(filename_in)
 
     lines = infile.readlines()
 
@@ -163,10 +182,8 @@ if __name__ == "__main__":
     		  "\t\t%s;\n" % (branch.setaddress())
     	)
 
-    if os.path.isfile(sys.argv[2]):
-    	raise Exception("output file %s already exists, aborting for safety" % sys.argv[2])
 
-    outfile = open(sys.argv[2], "w")
+    outfile = open(filename_out, "w")
     for line in lines:
     	outfile.write(line)
     outfile.close()
