@@ -11,6 +11,7 @@ process = [
 	#Static1DArray("jec", "float", "NJECS")
 ]
 
+# True Top Branches
 for t in ["t2", "tbar2"]:
     for v in [
         ("b__eta"), ("b__mass"), ("b__phi"), ("b__pt"), ("b__status"),
@@ -21,3 +22,26 @@ for t in ["t2", "tbar2"]:
         if "status" in v or "id" in v:
             typ = "int"
         process += [Scalar("gen_%s__%s" % (t, v), typ)]
+
+
+# Fatjet Branches
+for fj_name in ["fat"]:
+
+    # How many of these objects do we have?
+    full_counter_name = "n__jet_{0}".format(fj_name)
+    process += [Scalar(full_counter_name, "int")]
+
+    # And all the individual branches
+    for branch_name in [
+            "pt", "eta", "phi", "mass",  # Kinematics
+            "tau1", "tau2", "tau3"]:     # N-subjettiness
+
+        full_branch_name = "jet_{0}__{1}".format(fj_name, branch_name)
+        process += [Dynamic1DArray(full_branch_name, 
+                                   "float",
+                                   full_counter_name,
+                                   "N_MAX"
+                               )]
+
+    # End of loop over branches
+# End of loop over fat jets

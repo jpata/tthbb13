@@ -189,16 +189,6 @@ public:
 	float jet__vtxMass[N_MAX];
 	float jet__vtxNtracks[N_MAX];
 
-	//reco-level fat jets
-	float jet_fat__pt[N_MAX];
-	float jet_fat__eta[N_MAX];
-	float jet_fat__phi[N_MAX];
-        float jet_fat__mass[N_MAX];  
-        // Nsubjettiness for fat jets
-	float jet_fat__tau1[N_MAX];
-	float jet_fat__tau2[N_MAX];
-	float jet_fat__tau3[N_MAX];
-
 	//jets from top tagger 1
 	int jet_toptagger__child_idx[N_MAX];
 	float jet_toptagger__energy[N_MAX];
@@ -314,9 +304,8 @@ public:
 	float met__phi__shift[MET_S_MAX];
     int n__met_shift;
 
-    int n__jet;
-    int n__jet_fat;
-    
+  int n__jet;
+      
 	int n__jet_toptagger;
 	int n__jet_toptagger_sj;
 	
@@ -387,6 +376,14 @@ public:
 	float gen_tbar2__w_d2__phi;
 	float gen_tbar2__w_d2__pt;
 	int gen_tbar2__w_d2__status;
+	int n__jet_fat;
+	float jet_fat__pt[N_MAX];
+	float jet_fat__eta[N_MAX];
+	float jet_fat__phi[N_MAX];
+	float jet_fat__mass[N_MAX];
+	float jet_fat__tau1[N_MAX];
+	float jet_fat__tau2[N_MAX];
+	float jet_fat__tau3[N_MAX];
     //HEADERGEN_BRANCH_VARIABLES
     //This comment is for automatic header generation, do not remove
 
@@ -511,14 +508,6 @@ public:
 		SET_ZERO(jet__vtxMass, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet__vtxNtracks, N_MAX, DEF_VAL_FLOAT);
 
-		SET_ZERO(jet_fat__pt, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(jet_fat__eta, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(jet_fat__phi, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(jet_fat__mass, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(jet_fat__tau1, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(jet_fat__tau2, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(jet_fat__tau3, N_MAX, DEF_VAL_FLOAT);
-
 		SET_ZERO(jet_toptagger__child_idx, N_MAX, DEF_VAL_INT);
 		SET_ZERO(jet_toptagger__energy, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_toptagger__eta, N_MAX, DEF_VAL_FLOAT);
@@ -622,7 +611,6 @@ public:
 		SET_ZERO(met__py__shift,  MET_S_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(met__phi__shift, MET_S_MAX, DEF_VAL_FLOAT);
 		n__jet = DEF_VAL_INT;
-		n__jet_fat = DEF_VAL_INT;
 		n__jet_toptagger = DEF_VAL_INT;
 		n__jet_toptagger_sj = DEF_VAL_INT;
 		
@@ -685,6 +673,14 @@ public:
 		gen_tbar2__w_d2__phi = DEF_VAL_FLOAT;
 		gen_tbar2__w_d2__pt = DEF_VAL_FLOAT;
 		gen_tbar2__w_d2__status = DEF_VAL_INT;
+		n__jet_fat = DEF_VAL_INT;
+		SET_ZERO(jet_fat__pt, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_fat__eta, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_fat__phi, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_fat__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_fat__tau1, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_fat__tau2, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_fat__tau3, N_MAX, DEF_VAL_FLOAT);
         //HEADERGEN_BRANCH_INITIALIZERS
 	}
 
@@ -720,7 +716,6 @@ public:
 		tree->Branch("n_sim_c", &n_sim_c, "n_sim_c/I");
 
 		tree->Branch("n__jet", &n__jet, "n__jet/I");
-		tree->Branch("n__jet_fat", &n__jet_fat, "n__jet_fat/I");
 		tree->Branch("n__jet_toptagger", &n__jet_toptagger, "n__jet_toptagger/I");
 		tree->Branch("n__jet_toptagger_sj", &n__jet_toptagger_sj, "n__jet_toptagger_sj/I");
 		
@@ -830,14 +825,6 @@ public:
 		tree->Branch("jet__vtxMass", jet__vtxMass, "jet__vtxMass[n__jet]/F");
 		tree->Branch("jet__vtxNtracks", jet__vtxNtracks, "jet__vtxNtracks[n__jet]/F");
 		
-		tree->Branch("jet_fat__pt", jet_fat__pt, "jet_fat__pt[n__jet_fat]/F");
-		tree->Branch("jet_fat__eta", jet_fat__eta, "jet_fat__eta[n__jet_fat]/F");
-		tree->Branch("jet_fat__phi", jet_fat__phi, "jet_fat__phi[n__jet_fat]/F");
-		tree->Branch("jet_fat__mass", jet_fat__mass, "jet_fat__mass[n__jet_fat]/F");
-		tree->Branch("jet_fat__tau1", jet_fat__tau1, "jet_fat__tau1[n__jet_fat]/F");
-		tree->Branch("jet_fat__tau2", jet_fat__tau2, "jet_fat__tau2[n__jet_fat]/F");
-		tree->Branch("jet_fat__tau3", jet_fat__tau3, "jet_fat__tau3[n__jet_fat]/F");
-
 		tree->Branch("jet_toptagger__child_idx", jet_toptagger__child_idx, "jet_toptagger__child_idx[n__jet_toptagger]/I");
 
 		tree->Branch("jet_toptagger__eta", jet_toptagger__eta, "jet_toptagger__eta[n__jet_toptagger]/F");
@@ -982,6 +969,14 @@ public:
 		tree->Branch("gen_tbar2__w_d2__phi", &gen_tbar2__w_d2__phi, "gen_tbar2__w_d2__phi/F");
 		tree->Branch("gen_tbar2__w_d2__pt", &gen_tbar2__w_d2__pt, "gen_tbar2__w_d2__pt/F");
 		tree->Branch("gen_tbar2__w_d2__status", &gen_tbar2__w_d2__status, "gen_tbar2__w_d2__status/I");
+		tree->Branch("n__jet_fat", &n__jet_fat, "n__jet_fat/I");
+		tree->Branch("jet_fat__pt", jet_fat__pt, "jet_fat__pt[n__jet_fat]/F");
+		tree->Branch("jet_fat__eta", jet_fat__eta, "jet_fat__eta[n__jet_fat]/F");
+		tree->Branch("jet_fat__phi", jet_fat__phi, "jet_fat__phi[n__jet_fat]/F");
+		tree->Branch("jet_fat__mass", jet_fat__mass, "jet_fat__mass[n__jet_fat]/F");
+		tree->Branch("jet_fat__tau1", jet_fat__tau1, "jet_fat__tau1[n__jet_fat]/F");
+		tree->Branch("jet_fat__tau2", jet_fat__tau2, "jet_fat__tau2[n__jet_fat]/F");
+		tree->Branch("jet_fat__tau3", jet_fat__tau3, "jet_fat__tau3[n__jet_fat]/F");
         //HEADERGEN_BRANCH_CREATOR
 	}
 
@@ -1102,14 +1097,6 @@ public:
 		tree->SetBranchAddress("jet__vtxMass", jet__vtxMass);
 		tree->SetBranchAddress("jet__vtxNtracks", jet__vtxNtracks);
 
-		tree->SetBranchAddress("jet_fat__pt"  ,  jet_fat__pt  );
-		tree->SetBranchAddress("jet_fat__eta" ,  jet_fat__eta );
-		tree->SetBranchAddress("jet_fat__phi" ,  jet_fat__phi );
-		tree->SetBranchAddress("jet_fat__mass",  jet_fat__mass);
-		tree->SetBranchAddress("jet_fat__tau1",  jet_fat__tau1);
-		tree->SetBranchAddress("jet_fat__tau2",  jet_fat__tau2);
-		tree->SetBranchAddress("jet_fat__tau3",  jet_fat__tau3);
-
 		tree->SetBranchAddress("jet_toptagger__child_idx", jet_toptagger__child_idx);
 		tree->SetBranchAddress("jet_toptagger__energy", jet_toptagger__energy);
 		tree->SetBranchAddress("jet_toptagger__eta", jet_toptagger__eta);
@@ -1202,7 +1189,6 @@ public:
 		tree->SetBranchAddress("met__pt__en_down", &met__pt__en_down);
 		tree->SetBranchAddress("met__pt__en_up", &met__pt__en_up);
 		tree->SetBranchAddress("n__jet", &n__jet);
-		tree->SetBranchAddress("n__jet_fat", &n__jet_fat);
 		tree->SetBranchAddress("n__jet_toptagger", &n__jet_toptagger);
 		tree->SetBranchAddress("n__jet_toptagger_sj", &n__jet_toptagger_sj);
 		tree->SetBranchAddress("n__jet_toptagger2", &n__jet_toptagger2);
@@ -1261,6 +1247,14 @@ public:
 		tree->SetBranchAddress("gen_tbar2__w_d2__phi", &gen_tbar2__w_d2__phi);
 		tree->SetBranchAddress("gen_tbar2__w_d2__pt", &gen_tbar2__w_d2__pt);
 		tree->SetBranchAddress("gen_tbar2__w_d2__status", &gen_tbar2__w_d2__status);
+		tree->SetBranchAddress("n__jet_fat", &n__jet_fat);
+		tree->SetBranchAddress("jet_fat__pt", jet_fat__pt);
+		tree->SetBranchAddress("jet_fat__eta", jet_fat__eta);
+		tree->SetBranchAddress("jet_fat__phi", jet_fat__phi);
+		tree->SetBranchAddress("jet_fat__mass", jet_fat__mass);
+		tree->SetBranchAddress("jet_fat__tau1", jet_fat__tau1);
+		tree->SetBranchAddress("jet_fat__tau2", jet_fat__tau2);
+		tree->SetBranchAddress("jet_fat__tau3", jet_fat__tau3);
         //HEADERGEN_BRANCH_SETADDRESS
 
 	}
