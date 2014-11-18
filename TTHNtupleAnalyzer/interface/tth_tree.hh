@@ -28,7 +28,7 @@ bool is_undef(double x) { return fabs(x-DEF_VAL_DOUBLE) < DOUBLE_EPS; };
 //macros to initialize 1D and 2D (square) arrays
 //x is the array, n is the size, y is the initialized value
 #define SET_ZERO(x,n,y) for(int i=0;i<n;i++) {x[i]=y;}
-#define SET_ZERO_2(x,n,y) for(int i=0;i<n;i++) { for(int j=0;j<n;j++) { x[i][j]=y; } }
+#define SET_ZERO_2(x,n,m,y) for(int i=0;i<n;i++) { for(int j=0;j<m;j++) { x[i][j]=y; } }
 
 /*
 This is a simple wrapper class for the TTH-specific flat data format.
@@ -314,8 +314,9 @@ public:
 	float met__phi__shift[MET_S_MAX];
     int n__met_shift;
 
-        int n__jet;
-        int n__jet_fat;
+    int n__jet;
+    int n__jet_fat;
+    
 	int n__jet_toptagger;
 	int n__jet_toptagger_sj;
 	
@@ -353,6 +354,9 @@ public:
 	float weight__trigger;
 	float weight__trigger_down;
 	float weight__trigger_up;
+    
+    //HEADERGEN_BRANCH_VARIABLES
+    //This comment is for automatic header generation, do not remove
 
     //initializes all branch variables
 	void loop_initialize(void) {
@@ -616,6 +620,8 @@ public:
 		weight__trigger = DEF_VAL_FLOAT;
 		weight__trigger_down = DEF_VAL_FLOAT;
 		weight__trigger_up = DEF_VAL_FLOAT;
+        
+        //HEADERGEN_BRANCH_INITIALIZERS
 	}
 
     //makes branches on a new TTree
@@ -879,6 +885,8 @@ public:
 		tree->Branch("weight__trigger", &weight__trigger, "weight__trigger/F");
 		tree->Branch("weight__trigger_down", &weight__trigger_down, "weight__trigger_down/F");
 		tree->Branch("weight__trigger_up", &weight__trigger_up, "weight__trigger_up/F");
+        
+        //HEADERGEN_BRANCH_CREATOR
 	}
 
     //connects the branches of an existing TTree to variables
@@ -1124,6 +1132,9 @@ public:
 		tree->SetBranchAddress("weight__trigger", &weight__trigger);
 		tree->SetBranchAddress("weight__trigger_down", &weight__trigger_down);
 		tree->SetBranchAddress("weight__trigger_up", &weight__trigger_up);
+        
+        //HEADERGEN_BRANCH_SETADDRESS
+
 	}
 };
 

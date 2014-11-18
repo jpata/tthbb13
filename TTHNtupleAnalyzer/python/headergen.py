@@ -1,0 +1,172 @@
+#!/usr/bin/env python
+#run as ./headergen.py infile.h outfile.h branchefs.py
+#branchdefs.py must contain a list of branches named "process"
+#author: Joosep Pata (ETHz) joosep.pata@cern.ch
+import sys, os, imp
+
+#add type mappings from C++ -> ROOT 1-character here
+typemap = {
+	"float": "F",
+	"int": "I",
+}
+
+#A branch representing a single number
+#e.g. float met
+class Scalar:
+	#varname - name of variable in TTree and of the Branch
+	def __init__(self, varname, type):
+		self.varname = varname
+		self.type = type
+
+	#returns variable definition
+	def branchvar(self):
+		return "%s %s" % (self.type, self.varname)
+
+	#returns variable at loop initialization
+	def initializer(self):
+		return "%s = DEF_VAL_%s" % (self.varname, self.type.upper())
+
+	#creates branch
+	def creator(self):
+		return "tree->Branch(\"%s\", &%s, \"%s/%s\")" % (
+			self.varname,
+			self.varname,
+			self.varname,
+			typemap[self.type]
+		)
+
+	#attaches existing branch
+	def setaddress(self):
+		return "tree->SetBranchAddress(\"%s\", &%s)" % (self.varname, self.varname)
+
+#A branch representing a fixed size 1D array
+#e.g. float corrections[100]
+class Static1DArray:
+	#n - number or defined const static/define giving the size of the array
+	def __init__(self, varname, type, n):
+		self.varname = varname
+		self.type = type
+		self.n = n
+
+	def branchvar(self):
+		return "%s %s[%s]" % (self.type, self.varname, self.n)
+
+	def initializer(self):
+		return "SET_ZERO(%s, %s, DEF_VAL_%s)" % (self.varname, self.n, self.type.upper())
+
+	def creator(self):
+		return "tree->Branch(\"%s\", %s, \"%s[%s]/%s\")" % (
+			self.varname,
+			self.varname,
+			self.varname,
+			self.n,
+			typemap[self.type]
+		)
+
+	def setaddress(self):
+		return "tree->SetBranchAddress(\"%s\", %s)" % (self.varname, self.varname)
+
+
+class Static2DArray:
+	#n, m - compile-time constants giving the size of the array
+	def __init__(self, varname, type, n, m):
+		self.varname = varname
+		self.type = type
+		self.n = n
+		self.m = m
+
+	def branchvar(self):
+		return "%s %s[%s][%s]" % (self.type, self.varname, self.n, self.m)
+
+	def initializer(self):
+		return "SET_ZERO_2(%s, %s, %s, DEF_VAL_%s)" % (
+			self.varname, self.n, self.m, self.type.upper()
+		)
+
+	def creator(self):
+		return "tree->Branch(\"%s\", %s, \"%s[%s][%s]/%s\")" % (
+			self.varname,
+			self.varname,
+			self.varname,
+			self.n,
+			self.m,
+			typemap[self.type]
+		)
+
+	def setaddress(self):
+		return "tree->SetBranchAddress(\"%s\", %s)" % (self.varname, self.varname)
+
+
+#dynamic-size 1D array, length varies across entries and is given by a branch.
+class Dynamic1DArray:
+
+	#n - branch name giving the length
+	#maxlength - size of buffer
+	def __init__(self, varname, type, n, maxlength):
+		self.varname = varname
+		self.type = type
+		self.n = n
+		self.maxlength = maxlength
+
+	def branchvar(self):
+		return "%s %s[%s]" % (self.type, self.varname, self.maxlength)
+
+	def initializer(self):
+		return "SET_ZERO(%s, %s, DEF_VAL_%s)" % (self.varname, self.maxlength, self.type.upper())
+
+	def creator(self):
+		return "tree->Branch(\"%s\", %s, \"%s[%s]/%s\")" % (
+			self.varname,
+			self.varname,
+			self.varname,
+			self.n,
+			typemap[self.type]
+		)
+
+	def setaddress(self):
+		return "tree->SetBranchAddress(\"%s\", %s)" % (self.varname, self.varname)
+
+
+if __name__ == "__main__":
+    imp.load_source("branches", sys.argv[3])
+    import branches
+    branches_to_add = branches.process
+    infile = open(sys.argv[1])
+
+    lines = infile.readlines()
+
+    def insert_to(key_string, added_lines):
+    	i = 0
+    	for li in lines:
+    		if key_string in li:
+    			idx = i
+    			break
+    		i += 1
+    	lines.insert(idx, added_lines)
+
+
+
+    for branch in branches_to_add:
+    	insert_to("//HEADERGEN_BRANCH_VARIABLES",
+    			  "\t%s;\n" % (branch.branchvar())
+    	)
+
+    	insert_to("//HEADERGEN_BRANCH_INITIALIZERS",
+    			  "\t\t%s;\n" % (branch.initializer())
+    	)
+
+    	insert_to("//HEADERGEN_BRANCH_CREATOR",
+    			  "\t\t%s;\n" % (branch.creator())
+    	)
+
+    	insert_to("//HEADERGEN_BRANCH_SETADDRESS",
+    		  "\t\t%s;\n" % (branch.setaddress())
+    	)
+
+    if os.path.isfile(sys.argv[2]):
+    	raise Exception("output file %s already exists, aborting for safety" % sys.argv[2])
+
+    outfile = open(sys.argv[2], "w")
+    for line in lines:
+    	outfile.write(line)
+    outfile.close()
