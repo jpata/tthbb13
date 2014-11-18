@@ -97,10 +97,15 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
 
 	packed = cms.InputTag("packedGenParticles"),
 	pruned = cms.InputTag("prunedGenParticles"),
-	fatjets = cms.InputTag("ca15PFJetsCHS"),
+	#fatjets = cms.InputTag("ca15PFJetsCHS"),
 	mets = cms.InputTag("slimmedMETs"),
 	lhe = cms.InputTag("externalLHEProducer"),
 
+        # take ca15PFJetsCHS jets, add the Njettiness values and store them as jet_fat
+        fatjetsObjects  = cms.vstring(['ca15PFJetsCHS']),
+        fatjetsNsubs    = cms.vstring(['Njettiness']),
+        fatjetsBranches = cms.vstring(['fat']),
+ 
 	triggerIdentifiers = triggerPathNames,
 	#triggerIdentifiersForMatching = cms.vstring([
 	#		'HLT_Ele27_WP80_v*',
