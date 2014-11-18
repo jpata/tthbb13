@@ -355,38 +355,6 @@ public:
 	float weight__trigger_down;
 	float weight__trigger_up;
     
-	float gen_t__dpt_alt;
-	float gen_tbar__dpt_alt;
-	float gen_t2__b__eta;
-	float gen_t2__b__mass;
-	float gen_t2__b__phi;
-	float gen_t2__b__pt;
-	int gen_t2__b__status;
-	float gen_t2__w_d1__eta;
-	float gen_t2__w_d1__mass;
-	float gen_t2__w_d1__phi;
-	float gen_t2__w_d1__pt;
-	int gen_t2__w_d1__status;
-	float gen_t2__w_d2__eta;
-	float gen_t2__w_d2__mass;
-	float gen_t2__w_d2__phi;
-	float gen_t2__w_d2__pt;
-	int gen_t2__w_d2__status;
-	float gen_tbar2__b__eta;
-	float gen_tbar2__b__mass;
-	float gen_tbar2__b__phi;
-	float gen_tbar2__b__pt;
-	int gen_tbar2__b__status;
-	float gen_tbar2__w_d1__eta;
-	float gen_tbar2__w_d1__mass;
-	float gen_tbar2__w_d1__phi;
-	float gen_tbar2__w_d1__pt;
-	int gen_tbar2__w_d1__status;
-	float gen_tbar2__w_d2__eta;
-	float gen_tbar2__w_d2__mass;
-	float gen_tbar2__w_d2__phi;
-	float gen_tbar2__w_d2__pt;
-	int gen_tbar2__w_d2__status;
     //HEADERGEN_BRANCH_VARIABLES
     //This comment is for automatic header generation, do not remove
 
@@ -653,38 +621,6 @@ public:
 		weight__trigger_down = DEF_VAL_FLOAT;
 		weight__trigger_up = DEF_VAL_FLOAT;
         
-		gen_t__dpt_alt = DEF_VAL_FLOAT;
-		gen_tbar__dpt_alt = DEF_VAL_FLOAT;
-		gen_t2__b__eta = DEF_VAL_FLOAT;
-		gen_t2__b__mass = DEF_VAL_FLOAT;
-		gen_t2__b__phi = DEF_VAL_FLOAT;
-		gen_t2__b__pt = DEF_VAL_FLOAT;
-		gen_t2__b__status = DEF_VAL_INT;
-		gen_t2__w_d1__eta = DEF_VAL_FLOAT;
-		gen_t2__w_d1__mass = DEF_VAL_FLOAT;
-		gen_t2__w_d1__phi = DEF_VAL_FLOAT;
-		gen_t2__w_d1__pt = DEF_VAL_FLOAT;
-		gen_t2__w_d1__status = DEF_VAL_INT;
-		gen_t2__w_d2__eta = DEF_VAL_FLOAT;
-		gen_t2__w_d2__mass = DEF_VAL_FLOAT;
-		gen_t2__w_d2__phi = DEF_VAL_FLOAT;
-		gen_t2__w_d2__pt = DEF_VAL_FLOAT;
-		gen_t2__w_d2__status = DEF_VAL_INT;
-		gen_tbar2__b__eta = DEF_VAL_FLOAT;
-		gen_tbar2__b__mass = DEF_VAL_FLOAT;
-		gen_tbar2__b__phi = DEF_VAL_FLOAT;
-		gen_tbar2__b__pt = DEF_VAL_FLOAT;
-		gen_tbar2__b__status = DEF_VAL_INT;
-		gen_tbar2__w_d1__eta = DEF_VAL_FLOAT;
-		gen_tbar2__w_d1__mass = DEF_VAL_FLOAT;
-		gen_tbar2__w_d1__phi = DEF_VAL_FLOAT;
-		gen_tbar2__w_d1__pt = DEF_VAL_FLOAT;
-		gen_tbar2__w_d1__status = DEF_VAL_INT;
-		gen_tbar2__w_d2__eta = DEF_VAL_FLOAT;
-		gen_tbar2__w_d2__mass = DEF_VAL_FLOAT;
-		gen_tbar2__w_d2__phi = DEF_VAL_FLOAT;
-		gen_tbar2__w_d2__pt = DEF_VAL_FLOAT;
-		gen_tbar2__w_d2__status = DEF_VAL_INT;
         //HEADERGEN_BRANCH_INITIALIZERS
 	}
 
@@ -950,38 +886,6 @@ public:
 		tree->Branch("weight__trigger_down", &weight__trigger_down, "weight__trigger_down/F");
 		tree->Branch("weight__trigger_up", &weight__trigger_up, "weight__trigger_up/F");
         
-		tree->Branch("gen_t__dpt_alt", &gen_t__dpt_alt, "gen_t__dpt_alt/F");
-		tree->Branch("gen_tbar__dpt_alt", &gen_tbar__dpt_alt, "gen_tbar__dpt_alt/F");
-		tree->Branch("gen_t2__b__eta", &gen_t2__b__eta, "gen_t2__b__eta/F");
-		tree->Branch("gen_t2__b__mass", &gen_t2__b__mass, "gen_t2__b__mass/F");
-		tree->Branch("gen_t2__b__phi", &gen_t2__b__phi, "gen_t2__b__phi/F");
-		tree->Branch("gen_t2__b__pt", &gen_t2__b__pt, "gen_t2__b__pt/F");
-		tree->Branch("gen_t2__b__status", &gen_t2__b__status, "gen_t2__b__status/I");
-		tree->Branch("gen_t2__w_d1__eta", &gen_t2__w_d1__eta, "gen_t2__w_d1__eta/F");
-		tree->Branch("gen_t2__w_d1__mass", &gen_t2__w_d1__mass, "gen_t2__w_d1__mass/F");
-		tree->Branch("gen_t2__w_d1__phi", &gen_t2__w_d1__phi, "gen_t2__w_d1__phi/F");
-		tree->Branch("gen_t2__w_d1__pt", &gen_t2__w_d1__pt, "gen_t2__w_d1__pt/F");
-		tree->Branch("gen_t2__w_d1__status", &gen_t2__w_d1__status, "gen_t2__w_d1__status/I");
-		tree->Branch("gen_t2__w_d2__eta", &gen_t2__w_d2__eta, "gen_t2__w_d2__eta/F");
-		tree->Branch("gen_t2__w_d2__mass", &gen_t2__w_d2__mass, "gen_t2__w_d2__mass/F");
-		tree->Branch("gen_t2__w_d2__phi", &gen_t2__w_d2__phi, "gen_t2__w_d2__phi/F");
-		tree->Branch("gen_t2__w_d2__pt", &gen_t2__w_d2__pt, "gen_t2__w_d2__pt/F");
-		tree->Branch("gen_t2__w_d2__status", &gen_t2__w_d2__status, "gen_t2__w_d2__status/I");
-		tree->Branch("gen_tbar2__b__eta", &gen_tbar2__b__eta, "gen_tbar2__b__eta/F");
-		tree->Branch("gen_tbar2__b__mass", &gen_tbar2__b__mass, "gen_tbar2__b__mass/F");
-		tree->Branch("gen_tbar2__b__phi", &gen_tbar2__b__phi, "gen_tbar2__b__phi/F");
-		tree->Branch("gen_tbar2__b__pt", &gen_tbar2__b__pt, "gen_tbar2__b__pt/F");
-		tree->Branch("gen_tbar2__b__status", &gen_tbar2__b__status, "gen_tbar2__b__status/I");
-		tree->Branch("gen_tbar2__w_d1__eta", &gen_tbar2__w_d1__eta, "gen_tbar2__w_d1__eta/F");
-		tree->Branch("gen_tbar2__w_d1__mass", &gen_tbar2__w_d1__mass, "gen_tbar2__w_d1__mass/F");
-		tree->Branch("gen_tbar2__w_d1__phi", &gen_tbar2__w_d1__phi, "gen_tbar2__w_d1__phi/F");
-		tree->Branch("gen_tbar2__w_d1__pt", &gen_tbar2__w_d1__pt, "gen_tbar2__w_d1__pt/F");
-		tree->Branch("gen_tbar2__w_d1__status", &gen_tbar2__w_d1__status, "gen_tbar2__w_d1__status/I");
-		tree->Branch("gen_tbar2__w_d2__eta", &gen_tbar2__w_d2__eta, "gen_tbar2__w_d2__eta/F");
-		tree->Branch("gen_tbar2__w_d2__mass", &gen_tbar2__w_d2__mass, "gen_tbar2__w_d2__mass/F");
-		tree->Branch("gen_tbar2__w_d2__phi", &gen_tbar2__w_d2__phi, "gen_tbar2__w_d2__phi/F");
-		tree->Branch("gen_tbar2__w_d2__pt", &gen_tbar2__w_d2__pt, "gen_tbar2__w_d2__pt/F");
-		tree->Branch("gen_tbar2__w_d2__status", &gen_tbar2__w_d2__status, "gen_tbar2__w_d2__status/I");
         //HEADERGEN_BRANCH_CREATOR
 	}
 
@@ -1229,38 +1133,6 @@ public:
 		tree->SetBranchAddress("weight__trigger_down", &weight__trigger_down);
 		tree->SetBranchAddress("weight__trigger_up", &weight__trigger_up);
         
-		tree->SetBranchAddress("gen_t__dpt_alt", &gen_t__dpt_alt);
-		tree->SetBranchAddress("gen_tbar__dpt_alt", &gen_tbar__dpt_alt);
-		tree->SetBranchAddress("gen_t2__b__eta", &gen_t2__b__eta);
-		tree->SetBranchAddress("gen_t2__b__mass", &gen_t2__b__mass);
-		tree->SetBranchAddress("gen_t2__b__phi", &gen_t2__b__phi);
-		tree->SetBranchAddress("gen_t2__b__pt", &gen_t2__b__pt);
-		tree->SetBranchAddress("gen_t2__b__status", &gen_t2__b__status);
-		tree->SetBranchAddress("gen_t2__w_d1__eta", &gen_t2__w_d1__eta);
-		tree->SetBranchAddress("gen_t2__w_d1__mass", &gen_t2__w_d1__mass);
-		tree->SetBranchAddress("gen_t2__w_d1__phi", &gen_t2__w_d1__phi);
-		tree->SetBranchAddress("gen_t2__w_d1__pt", &gen_t2__w_d1__pt);
-		tree->SetBranchAddress("gen_t2__w_d1__status", &gen_t2__w_d1__status);
-		tree->SetBranchAddress("gen_t2__w_d2__eta", &gen_t2__w_d2__eta);
-		tree->SetBranchAddress("gen_t2__w_d2__mass", &gen_t2__w_d2__mass);
-		tree->SetBranchAddress("gen_t2__w_d2__phi", &gen_t2__w_d2__phi);
-		tree->SetBranchAddress("gen_t2__w_d2__pt", &gen_t2__w_d2__pt);
-		tree->SetBranchAddress("gen_t2__w_d2__status", &gen_t2__w_d2__status);
-		tree->SetBranchAddress("gen_tbar2__b__eta", &gen_tbar2__b__eta);
-		tree->SetBranchAddress("gen_tbar2__b__mass", &gen_tbar2__b__mass);
-		tree->SetBranchAddress("gen_tbar2__b__phi", &gen_tbar2__b__phi);
-		tree->SetBranchAddress("gen_tbar2__b__pt", &gen_tbar2__b__pt);
-		tree->SetBranchAddress("gen_tbar2__b__status", &gen_tbar2__b__status);
-		tree->SetBranchAddress("gen_tbar2__w_d1__eta", &gen_tbar2__w_d1__eta);
-		tree->SetBranchAddress("gen_tbar2__w_d1__mass", &gen_tbar2__w_d1__mass);
-		tree->SetBranchAddress("gen_tbar2__w_d1__phi", &gen_tbar2__w_d1__phi);
-		tree->SetBranchAddress("gen_tbar2__w_d1__pt", &gen_tbar2__w_d1__pt);
-		tree->SetBranchAddress("gen_tbar2__w_d1__status", &gen_tbar2__w_d1__status);
-		tree->SetBranchAddress("gen_tbar2__w_d2__eta", &gen_tbar2__w_d2__eta);
-		tree->SetBranchAddress("gen_tbar2__w_d2__mass", &gen_tbar2__w_d2__mass);
-		tree->SetBranchAddress("gen_tbar2__w_d2__phi", &gen_tbar2__w_d2__phi);
-		tree->SetBranchAddress("gen_tbar2__w_d2__pt", &gen_tbar2__w_d2__pt);
-		tree->SetBranchAddress("gen_tbar2__w_d2__status", &gen_tbar2__w_d2__status);
         //HEADERGEN_BRANCH_SETADDRESS
 
 	}
