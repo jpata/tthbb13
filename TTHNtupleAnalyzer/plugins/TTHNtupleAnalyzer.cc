@@ -439,7 +439,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	       
 	edm::Handle<edm::TriggerResults> triggerBits;
 	edm::Handle<pat::TriggerObjectStandAloneCollection> triggerObjects;
-	edm::Handle<pat::PackedTriggerPrescales> triggerPrescales;
+	edm::Handle<pat::PackedTriggerPrescales> triggerPrescales; 
 
 	iEvent.getByToken(triggerBits_, triggerBits);
 	iEvent.getByToken(triggerObjects_, triggerObjects);
@@ -1403,9 +1403,9 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	for (unsigned i_fj_coll = 0; i_fj_coll < fatjet_objects_.size(); i_fj_coll++){
 
 	  // Get the proper names
-	  string fj_object_name	  = fatjet_objects_[i_fj_coll];
-	  string fj_nsubs_name	  = fatjet_nsubs_[i_fj_coll];
-	  string fj_branches_name = fatjet_branches_[i_fj_coll];
+	  std::string fj_object_name	  = fatjet_objects_[i_fj_coll];
+	  std::string fj_nsubs_name	  = fatjet_nsubs_[i_fj_coll];
+	  std::string fj_branches_name = fatjet_branches_[i_fj_coll];
  
 	  // Get Fatjet iteself
 	  edm::Handle<reco::PFJetCollection> fatjets;
@@ -1433,23 +1433,25 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	    
 	    LogDebug("fat jets") << "n_fat_jet=" << n_fat_jet << CANDPRINT(x);
 	    	    
-	    TString prefix("jet_" + fj_branches_name + "__");
-	    
+	    std::string prefix("jet_");
+	    prefix.append(fj_branches_name);
+	    prefix.append("__");
+
 	    // Turn the branch address into the actual object we want to fill
-	    (reinterpret_cast<float *> (tthtree->tree->GetBranch(prefix + "pt"  )->GetAddress()))[n_fat_jet] = x.pt();
-	    (reinterpret_cast<float *> (tthtree->tree->GetBranch(prefix + "eta" )->GetAddress()))[n_fat_jet] = x.eta();
-	    (reinterpret_cast<float *> (tthtree->tree->GetBranch(prefix + "phi" )->GetAddress()))[n_fat_jet] = x.phi();
-	    (reinterpret_cast<float *> (tthtree->tree->GetBranch(prefix + "mass")->GetAddress()))[n_fat_jet] = x.mass();
-	    
-	    (reinterpret_cast<float *> (tthtree->tree->GetBranch(prefix + "tau1")->GetAddress()))[n_fat_jet] = fatjet_nsub_tau1->get(n_fat_jet);
-	    (reinterpret_cast<float *> (tthtree->tree->GetBranch(prefix + "tau2")->GetAddress()))[n_fat_jet] = fatjet_nsub_tau2->get(n_fat_jet);
-	    (reinterpret_cast<float *> (tthtree->tree->GetBranch(prefix + "tau3")->GetAddress()))[n_fat_jet] = fatjet_nsub_tau3->get(n_fat_jet);
+	    tthtree->get_address<float *>(prefix + "pt"  )[n_fat_jet] = x.pt();
+	    tthtree->get_address<float *>(prefix + "eta" )[n_fat_jet] = x.eta();
+	    tthtree->get_address<float *>(prefix + "phi" )[n_fat_jet] = x.phi();
+	    tthtree->get_address<float *>(prefix + "mass")[n_fat_jet] = x.mass();
+
+	    tthtree->get_address<float *>(prefix + "tau1")[n_fat_jet] = fatjet_nsub_tau1->get(n_fat_jet);
+	    tthtree->get_address<float *>(prefix + "tau2")[n_fat_jet] = fatjet_nsub_tau2->get(n_fat_jet);
+	    tthtree->get_address<float *>(prefix + "tau3")[n_fat_jet] = fatjet_nsub_tau3->get(n_fat_jet);
 	    
 	  } // End loop over fatjets
 	  
-	  // Also count the number of fatjers
-	  TString njet_branch("n__jet_" + fj_branches_name);
-	  *(reinterpret_cast<int *> (tthtree->tree->GetBranch(njet_branch)->GetAddress())) = fatjets->size();
+	  // Also count the number of fatjets
+	  std::string njet_branch("n__jet_" + fj_branches_name);
+	  *(tthtree->get_address<int *>(njet_branch)) = fatjets->size();
 	  
 	} // End of loop over fatjet collections
 	// Done filling the fatjet information

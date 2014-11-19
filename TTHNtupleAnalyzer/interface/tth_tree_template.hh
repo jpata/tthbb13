@@ -25,6 +25,7 @@ bool is_undef(int x) { return x==DEF_VAL_INT; };
 bool is_undef(float x) { return fabs(x-DEF_VAL_FLOAT) < FLOAT_EPS; };
 bool is_undef(double x) { return fabs(x-DEF_VAL_DOUBLE) < DOUBLE_EPS; };
 
+
 //macros to initialize 1D and 2D (square) arrays
 //x is the array, n is the size, y is the initialized value
 #define SET_ZERO(x,n,y) for(int i=0;i<n;i++) {x[i]=y;}
@@ -57,7 +58,10 @@ class TTHTree {
 public:
 	TTHTree(TTree* _tree) { tree = _tree; };
 	TTree* tree;
-
+   
+        // Helper functions for accessing branches
+        template <typename T> 
+	T get_address(const std::string name){return reinterpret_cast<T> (tree->GetBranch(name.c_str())->GetAddress());}
 
 	double debug__time1c;
 	double debug__time1r;
