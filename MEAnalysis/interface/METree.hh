@@ -415,6 +415,12 @@ public:
         tree->SetBranchAddress("triggerFlags", &triggerFlags_);
         tree->SetBranchAddress("nMatchSimBs", &nMatchSimBs_);
         tree->SetBranchAddress("nMatchSimCs", &nMatchSimCs_);
+        
+        tree->SetBranchAddress("nPermut_s", &nPermut_);
+        tree->SetBranchAddress("nPermut_b", &nPermut_alt_);
+        
+        tree->SetBranchAddress("perm_to_gen_s", perm_to_gen_);
+        tree->SetBranchAddress("perm_to_gen_b", perm_to_gen_alt_);
 	}
 
     void loop_initialize(void) {
@@ -423,6 +429,9 @@ public:
         SET_ZERO(lepton_pt_, NMAXLEPTONS, DEF_VAL_FLOAT);
         SET_ZERO(lepton_rIso_, NMAXLEPTONS, DEF_VAL_FLOAT);
         SET_ZERO(triggerFlags_, 70, 0);
+        
+        SET_ZERO(perm_to_gen_, NMAXPERMUT, 0.0);
+        SET_ZERO(perm_to_gen_alt_, NMAXPERMUT, 0.0);
 
 		numBTagL_ = DEF_VAL_INT;
 		numBTagM_ = DEF_VAL_INT;
