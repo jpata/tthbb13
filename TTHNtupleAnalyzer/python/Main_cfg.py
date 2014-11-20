@@ -87,17 +87,8 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
 	jets = cms.InputTag("slimmedJets"),
 	genjets = cms.InputTag("slimmedGenJets"),
 
-	topjets1 = cms.InputTag("HTTJetsCHS"),
-	topjetinfos1 = cms.InputTag("HTTJetsCHS"),
-	topjetsubjets1 = cms.InputTag("HTTJetsCHS", "caTopSubJets"),
-
-	topjets2 = cms.InputTag("MultiRHTTJetsCHS"),
-	topjetinfos2 = cms.InputTag("MultiRHTTJetsCHS"),
-	topjetsubjets2 = cms.InputTag("MultiRHTTJetsCHS", "caTopSubJets"),
-
 	packed = cms.InputTag("packedGenParticles"),
 	pruned = cms.InputTag("prunedGenParticles"),
-	#fatjets = cms.InputTag("ca15PFJetsCHS"),
 	mets = cms.InputTag("slimmedMETs"),
 	lhe = cms.InputTag("externalLHEProducer"),
 
@@ -105,7 +96,10 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
         fatjetsObjects  = cms.vstring(['ca15PFJetsCHS']),
         fatjetsNsubs    = cms.vstring(['Njettiness']),
         fatjetsBranches = cms.vstring(['fat']),
- 
+
+        httObjects  = cms.vstring(['HTTJetsCHS', 'MultiRHTTJetsCHS']),                                           
+        httBranches = cms.vstring(['toptagger', 'toptagger2']),                                           
+        
 	triggerIdentifiers = triggerPathNames,
 	#triggerIdentifiersForMatching = cms.vstring([
 	#		'HLT_Ele27_WP80_v*',

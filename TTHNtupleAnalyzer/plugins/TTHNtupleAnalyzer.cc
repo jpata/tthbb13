@@ -273,6 +273,13 @@ private:
 	const std::vector<std::string> fatjet_objects_;
 	const std::vector<std::string> fatjet_nsubs_;
 	const std::vector<std::string> fatjet_branches_;
+
+        // HEPTopTagger information
+        // objects = name of the input collection
+        // htt branches = name of the branches to put this in
+        // !!the lists have to be in sync!!
+	const std::vector<std::string> htt_objects_;
+	const std::vector<std::string> htt_branches_;
 	
 	// LHE event product (may not be present!!)
 	const edm::EDGetTokenT<LHEEventProduct> lheToken_;
@@ -320,15 +327,7 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
 	tauToken_(consumes<pat::TauCollection>(iConfig.getParameter<edm::InputTag>("taus"))),
 	jetToken_(consumes<pat::JetCollection>(iConfig.getParameter<edm::InputTag>("jets"))),
 	genJetToken_(consumes<std::vector<reco::GenJet>>(iConfig.getParameter<edm::InputTag>("genjets"))),
-	
-	topJetToken_(consumes<edm::View<reco::BasicJet>>(iConfig.getParameter<edm::InputTag>("topjets1"))),
-	topJetSubjetToken_(consumes<edm::View<reco::PFJet>>(iConfig.getParameter<edm::InputTag>("topjetsubjets1"))),
-	topJetInfoToken_(consumes<edm::View<reco::HTTTopJetTagInfo>>(iConfig.getParameter<edm::InputTag>("topjetinfos1"))),
 
-	topJetToken2_(consumes<edm::View<reco::BasicJet>>(iConfig.getParameter<edm::InputTag>("topjets2"))),
-	topJetSubjetToken2_(consumes<edm::View<reco::PFJet>>(iConfig.getParameter<edm::InputTag>("topjetsubjets2"))),
-	topJetInfoToken2_(consumes<edm::View<reco::HTTTopJetTagInfo>>(iConfig.getParameter<edm::InputTag>("topjetinfos2"))),
-	
 	vertexToken_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("vertices"))),
 	prunedGenToken_(consumes<edm::View<reco::GenParticle> >(iConfig.getParameter<edm::InputTag>("pruned"))),
 	packedGenToken_(consumes<edm::View<pat::PackedGenParticle> >(iConfig.getParameter<edm::InputTag>("packed"))),
@@ -337,6 +336,9 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
         fatjet_objects_(iConfig.getParameter<std::vector<std::string>>("fatjetsObjects")),
         fatjet_nsubs_(iConfig.getParameter<std::vector<std::string>>("fatjetsNsubs")),
         fatjet_branches_(iConfig.getParameter<std::vector<std::string>>("fatjetsBranches")),
+
+        htt_objects_(iConfig.getParameter<std::vector<std::string>>("httObjects")),
+        htt_branches_(iConfig.getParameter<std::vector<std::string>>("httBranches")),
 							  
 	//Gen-level
 	lheToken_( (iConfig.getParameter<edm::InputTag>("lhe")).label()!="" ?
@@ -435,6 +437,9 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	// Sanity check the fatjet lists-of-names
 	assert(fatjet_objects_.size()==fatjet_nsubs_.size());
 	assert(fatjet_objects_.size()==fatjet_branches_.size());
+
+	// Sanity check the htt lists-of-names
+	assert(htt_objects_.size()==htt_branches_.size());
 
 	       
 	edm::Handle<edm::TriggerResults> triggerBits;
@@ -1259,135 +1264,107 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		LogDebug("Event Cuts") << n__jet << " jets: skip this event" << endl;
 		return;
 	}
+	
+	
+	// Loop over HTT collections
+	for (unsigned i_htt_coll = 0; i_htt_coll < htt_objects_.size(); i_htt_coll++){
 
-	//Top tagger jets
-	edm::Handle<edm::View<reco::BasicJet>> top_jets;
-	iEvent.getByToken(topJetToken_, top_jets);
+	  // Get the proper names
+	  std::string htt_object_name   = htt_objects_[i_htt_coll];
+	  std::string htt_branches_name = htt_branches_[i_htt_coll];
+ 	  
+	  // Top tagger jets
+	  edm::Handle<edm::View<reco::BasicJet>> top_jets;
+	  iEvent.getByLabel(htt_object_name, top_jets);
 
-	edm::Handle<edm::View<reco::HTTTopJetTagInfo>> top_jet_infos;
-	iEvent.getByToken(topJetInfoToken_, top_jet_infos);
+	  // Extra Info
+	  edm::Handle<edm::View<reco::HTTTopJetTagInfo>> top_jet_infos;
+	  iEvent.getByLabel(htt_object_name, top_jet_infos);
 
-	assert(top_jets->size()==top_jet_infos->size());
+	  // Make sure both collections have the same size
+	  assert(top_jets->size()==top_jet_infos->size());
 
-	//second collection of top tagger jets
-	edm::Handle<edm::View<reco::BasicJet>> top_jets2;
-	iEvent.getByToken(topJetToken2_, top_jets2);
+	  // Top jets and subjets are associated by indices. See:
+	  // /cvmfs/cms.cern.ch/slc6_amd64_gcc481/cms/cmssw/CMSSW_7_0_9/src/RecoJets/JetProducers/plugins/CompoundJetProducer.cc
+	  // about the association
+	  int n_top_jet_subjet = 0;
 
-	edm::Handle<edm::View<reco::HTTTopJetTagInfo>> top_jet_infos2;
-	iEvent.getByToken(topJetInfoToken2_, top_jet_infos2);
+	  // Loop over top candidates
+	  for (unsigned int n_top_jet=0; n_top_jet<top_jets->size(); n_top_jet++) {
 
-	assert(top_jets->size()==top_jet_infos->size());
+	    const reco::BasicJet& x = top_jets->at(n_top_jet);
+	    const reco::HTTTopJetTagInfo& jet_info = top_jet_infos->at(n_top_jet);
 
-	//Top jets and subjets are associated by indices
-	//See /cvmfs/cms.cern.ch/slc6_amd64_gcc481/cms/cmssw/CMSSW_7_0_9/src/RecoJets/JetProducers/plugins/CompoundJetProducer.cc
-	//about the association
-	int n_top_jet_subjet = 0;
-	//int n_top_jet_subjet2 = 0;
+	    LogDebug("top jets") << "n_top_jet=" << n_top_jet << CANDPRINT(x);
 
-	for (unsigned int n_top_jet=0; n_top_jet<top_jets->size(); n_top_jet++) {
-		const reco::BasicJet& x = top_jets->at(n_top_jet);
-		const reco::HTTTopJetTagInfo& jet_info = top_jet_infos->at(n_top_jet);
-		//assert(_x != NULL);
-		//const pat::Jet& x = *_x;
-		LogDebug("top jets") << "n_top_jet=" << n_top_jet << CANDPRINT(x);
-		tthtree->jet_toptagger__eta[n_top_jet] = x.eta();
-		tthtree->jet_toptagger__pt[n_top_jet] = x.pt();
-		tthtree->jet_toptagger__phi[n_top_jet] = x.phi();
-		tthtree->jet_toptagger__mass[n_top_jet] = x.mass();
-		tthtree->jet_toptagger__energy[n_top_jet] = x.energy();
-		tthtree->jet_toptagger__fj_pt[n_top_jet] = jet_info.properties().fjPt;
-		tthtree->jet_toptagger__fj_mass[n_top_jet] = jet_info.properties().fjMass;
-		tthtree->jet_toptagger__fj_eta[n_top_jet] = jet_info.properties().fjEta;
-		tthtree->jet_toptagger__fj_phi[n_top_jet] = jet_info.properties().fjPhi;
-		tthtree->jet_toptagger__topMass[n_top_jet] = jet_info.properties().topMass;
-		tthtree->jet_toptagger__unfilteredMass[n_top_jet] = jet_info.properties().unfilteredMass;
-		tthtree->jet_toptagger__prunedMass[n_top_jet] = jet_info.properties().prunedMass;
-		tthtree->jet_toptagger__fW[n_top_jet] = jet_info.properties().fW;
-		tthtree->jet_toptagger__massRatioPassed[n_top_jet] = jet_info.properties().massRatioPassed;
-		tthtree->jet_toptagger__isMultiR[n_top_jet] = (int)jet_info.properties().isMultiR;
-		tthtree->jet_toptagger__Rmin[n_top_jet] = jet_info.properties().Rmin;
-		tthtree->jet_toptagger__RminExpected[n_top_jet] = jet_info.properties().RminExpected;
-		tthtree->jet_toptagger__ptFiltForRminExp[n_top_jet] = jet_info.properties().ptFiltForRminExp;
-		//FIXME: nSubJets no longer in new top jet properties
-		//tthtree->jet_toptagger__n_sj[n_top_jet] = jet_info.properties().nSubJets;
-		tthtree->jet_toptagger__n_sj[n_top_jet] = 3;
+	    std::string prefix("jet_");
+	    prefix.append(htt_branches_name);
+	    prefix.append("__");
 
-		bool first = true;
-		for (auto& constituent : x.getJetConstituents()) {
-			if (constituent.isNull()) {
-				edm::LogWarning("top jets") << "n_top_jet=" << n_top_jet << " constituent is not valid";
-				break;
-			}
-			if (first) {
-				tthtree->jet_toptagger__child_idx[n_top_jet] = n_top_jet_subjet;
-			}
-			tthtree->jet_toptagger_sj__eta[n_top_jet_subjet] = constituent->eta();
-			tthtree->jet_toptagger_sj__pt[n_top_jet_subjet] = constituent->pt();
-			tthtree->jet_toptagger_sj__phi[n_top_jet_subjet] = constituent->phi();
-			tthtree->jet_toptagger_sj__mass[n_top_jet_subjet] = constituent->mass();
-			tthtree->jet_toptagger_sj__energy[n_top_jet_subjet] = constituent->energy();
-			tthtree->jet_toptagger_sj__parent_idx[n_top_jet_subjet] = n_top_jet;
-			n_top_jet_subjet += 1;
+	    tthtree->get_address<float *>(prefix + "eta"    )[n_top_jet] = x.eta();
+	    tthtree->get_address<float *>(prefix + "pt"     )[n_top_jet] = x.pt();
+	    tthtree->get_address<float *>(prefix + "phi"    )[n_top_jet] = x.phi();
+	    tthtree->get_address<float *>(prefix + "mass"   )[n_top_jet] = x.mass();
 
-			first = false;
-		}
-	}
-	tthtree->n__jet_toptagger = top_jets->size();
-	tthtree->n__jet_toptagger_sj = n_top_jet_subjet;
+	    tthtree->get_address<float *>(prefix + "fj_pt"   )[n_top_jet] = jet_info.properties().fjPt;
+	    tthtree->get_address<float *>(prefix + "fj_mass" )[n_top_jet] = jet_info.properties().fjMass;
+	    tthtree->get_address<float *>(prefix + "fj_eta"  )[n_top_jet] = jet_info.properties().fjEta;
+	    tthtree->get_address<float *>(prefix + "fj_phi"  )[n_top_jet] = jet_info.properties().fjPhi;
 
-	//top jets 2
-	n_top_jet_subjet = 0;
-	for (unsigned int n_top_jet=0; n_top_jet<top_jets2->size(); n_top_jet++) {
-		const reco::BasicJet& x = top_jets2->at(n_top_jet);
-		const reco::HTTTopJetTagInfo& jet_info = top_jet_infos2->at(n_top_jet);
-		//assert(_x != NULL);
-		//const pat::Jet& x = *_x;
-		LogDebug("top jets") << "n_top_jet=" << n_top_jet << CANDPRINT(x);
-		tthtree->jet_toptagger2__eta[n_top_jet] = x.eta();
-		tthtree->jet_toptagger2__pt[n_top_jet] = x.pt();
-		tthtree->jet_toptagger2__phi[n_top_jet] = x.phi();
-		tthtree->jet_toptagger2__mass[n_top_jet] = x.mass();
-		tthtree->jet_toptagger2__energy[n_top_jet] = x.energy();
-		tthtree->jet_toptagger2__fj_pt[n_top_jet] = jet_info.properties().fjPt;
-		tthtree->jet_toptagger2__fj_mass[n_top_jet] = jet_info.properties().fjMass;
-		tthtree->jet_toptagger2__fj_eta[n_top_jet] = jet_info.properties().fjEta;
-		tthtree->jet_toptagger2__fj_phi[n_top_jet] = jet_info.properties().fjPhi;
-		tthtree->jet_toptagger2__topMass[n_top_jet] = jet_info.properties().topMass;
-		tthtree->jet_toptagger2__unfilteredMass[n_top_jet] = jet_info.properties().unfilteredMass;
-		tthtree->jet_toptagger2__prunedMass[n_top_jet] = jet_info.properties().prunedMass;
-		tthtree->jet_toptagger2__fW[n_top_jet] = jet_info.properties().fW;
-		tthtree->jet_toptagger2__massRatioPassed[n_top_jet] = jet_info.properties().massRatioPassed;
-		tthtree->jet_toptagger2__isMultiR[n_top_jet] = (int)jet_info.properties().isMultiR;
-		tthtree->jet_toptagger2__Rmin[n_top_jet] = jet_info.properties().Rmin;
-		tthtree->jet_toptagger2__RminExpected[n_top_jet] = jet_info.properties().RminExpected;
-		tthtree->jet_toptagger2__ptFiltForRminExp[n_top_jet] = jet_info.properties().ptFiltForRminExp;
-		LogDebug("toptagger2") << jet_info.properties().RminExpected;	
-		//FIXME: nSubJets no longer in new top jet properties
-		//tthtree->jet_toptagger__n_sj[n_top_jet] = jet_info.properties().nSubJets;
-		tthtree->jet_toptagger2__n_sj[n_top_jet] = 3;
+	    tthtree->get_address<float *>(prefix + "topMass" )[n_top_jet] = jet_info.properties().topMass;
 
-		bool first = true;
-		for (auto& constituent : x.getJetConstituents()) {
-			if (constituent.isNull()) {
-				edm::LogWarning("top jets") << "n_top_jet=" << n_top_jet << " constituent is not valid";
-				break;
-			}
-			if (first) {
-				tthtree->jet_toptagger2__child_idx[n_top_jet] = n_top_jet_subjet;
-			}
-			tthtree->jet_toptagger2_sj__eta[n_top_jet_subjet] = constituent->eta();
-			tthtree->jet_toptagger2_sj__pt[n_top_jet_subjet] = constituent->pt();
-			tthtree->jet_toptagger2_sj__phi[n_top_jet_subjet] = constituent->phi();
-			tthtree->jet_toptagger2_sj__mass[n_top_jet_subjet] = constituent->mass();
-			tthtree->jet_toptagger2_sj__energy[n_top_jet_subjet] = constituent->energy();
-			tthtree->jet_toptagger2_sj__parent_idx[n_top_jet_subjet] = n_top_jet;
-			n_top_jet_subjet += 1;
+	    tthtree->get_address<float *>(prefix + "unfilteredMass" )[n_top_jet] = jet_info.properties().unfilteredMass;
+	    tthtree->get_address<float *>(prefix + "prunedMass" )[n_top_jet]	 = jet_info.properties().prunedMass;
+	    tthtree->get_address<float *>(prefix + "fW" )[n_top_jet]		 = jet_info.properties().fW;
 
-			first = false;
-		}
-	}
-	tthtree->n__jet_toptagger2 = top_jets2->size();
-	tthtree->n__jet_toptagger2_sj = n_top_jet_subjet;
+	    tthtree->get_address<float *>(prefix + "massRatioPassed" )[n_top_jet]  = jet_info.properties().massRatioPassed;
+	    tthtree->get_address<int   *>(prefix + "isMultiR" )[n_top_jet]  = (int) jet_info.properties().isMultiR;
+
+	    tthtree->get_address<float *>(prefix + "Rmin" )[n_top_jet]  = jet_info.properties().Rmin;
+	    tthtree->get_address<float *>(prefix + "RminExpected" )[n_top_jet]  = jet_info.properties().RminExpected;
+	    tthtree->get_address<float *>(prefix + "ptFiltForRminExp" )[n_top_jet]  = jet_info.properties().ptFiltForRminExp;
+
+	    tthtree->get_address<int *>(prefix + "n_sj" )[n_top_jet]  = 3;
+	    
+	    bool first = true;
+	    for (auto& constituent : x.getJetConstituents()) {
+	      if (constituent.isNull()) {
+		edm::LogWarning("top jets") << "n_top_jet=" << n_top_jet << " constituent is not valid";
+		break;
+	      }
+	      if (first) {
+	      	tthtree->get_address<int *>(prefix + "child_idx" )[n_top_jet]  = n_top_jet_subjet;
+	      }
+	      
+	      std::string prefix_sj("jet_");
+	      prefix_sj.append(htt_branches_name);
+	      prefix_sj.append("_sj__");
+
+	      tthtree->get_address<float *>(prefix_sj + "pt" )[n_top_jet_subjet]  = constituent->pt();
+	      tthtree->get_address<float *>(prefix_sj + "eta" )[n_top_jet_subjet]  = constituent->eta();
+	      tthtree->get_address<float *>(prefix_sj + "phi" )[n_top_jet_subjet]  = constituent->phi();
+	      tthtree->get_address<float *>(prefix_sj + "mass" )[n_top_jet_subjet]  = constituent->mass();
+	      tthtree->get_address<float *>(prefix_sj + "energy" )[n_top_jet_subjet]  = constituent->energy();
+
+	      tthtree->get_address<int *>(prefix_sj + "parent_idx" )[n_top_jet_subjet]  = n_top_jet;
+
+	      n_top_jet_subjet += 1;	      
+	      first = false;
+	    }
+	  } // End of loop over candidates
+
+	  // Also fill counters	  
+	  std::string ncand_branch("n__jet_");
+	  ncand_branch.append(htt_branches_name);
+
+	  std::string ncand_sj_branch("n__jet_");
+	  ncand_sj_branch.append(htt_branches_name);
+	  ncand_sj_branch.append("_sj");
+	  
+	  *(tthtree->get_address<int *>(ncand_branch ))    = top_jets->size();
+	  *(tthtree->get_address<int *>(ncand_sj_branch )) = n_top_jet_subjet;
+
+	} // End of filling HTT related branches
 
 	if (n__lep>=N_MAX) {
 		edm::LogError("N_MAX") << "Exceeded vector N_MAX with n__lep: " << n__lep << ">=> " << N_MAX;
