@@ -126,6 +126,64 @@ bool order_by_pt(T a, T b) {
 	return (a->pt() > b->pt());
 };
 
+// Function to fill the branches for a fatjet collection
+// This needs to be templated as we can have either PFJets or BasicJet 
+// objects as fatjets
+template <typename JetType, typename CollectionType>
+void fill_fatjet_branches(const edm::Event& iEvent, 
+			  TTHTree* tthtree, 
+			  std::string fj_object_name,
+			  std::string fj_nsubs_name,
+			  std::string fj_branches_name){
+  
+  // Get Fatjet iteself
+  edm::Handle<CollectionType> fatjets;
+  iEvent.getByLabel(fj_object_name, fatjets);
+	  
+  // Handles to get the Nsubjettiness
+  edm::Handle<edm::ValueMap<float> > fatjet_nsub_tau1;
+  iEvent.getByLabel(fj_nsubs_name, "tau1", fatjet_nsub_tau1);
+
+  edm::Handle<edm::ValueMap<float> > fatjet_nsub_tau2;
+  iEvent.getByLabel(fj_nsubs_name, "tau2", fatjet_nsub_tau2);
+	  
+  edm::Handle<edm::ValueMap<float> > fatjet_nsub_tau3;
+  iEvent.getByLabel(fj_nsubs_name, "tau3", fatjet_nsub_tau3);
+
+  // Make sure the fatjets and nsujettiness containers have same size
+  assert(fatjets->size()==fatjet_nsub_tau1->size());
+  assert(fatjets->size()==fatjet_nsub_tau2->size());
+  assert(fatjets->size()==fatjet_nsub_tau3->size());
+	  
+  // Loop over fatjets
+  for (unsigned n_fat_jet = 0; n_fat_jet != fatjets->size(); n_fat_jet++){
+	    
+    const JetType& x = (*fatjets)[n_fat_jet];
+    
+    LogDebug("fat jets") << "n_fat_jet=" << n_fat_jet << CANDPRINT(x);
+	    	    
+    std::string prefix("jet_");
+    prefix.append(fj_branches_name);
+    prefix.append("__");
+
+    // Turn the branch address into the actual object we want to fill
+    tthtree->get_address<float *>(prefix + "pt"  )[n_fat_jet] = x.pt();
+    tthtree->get_address<float *>(prefix + "eta" )[n_fat_jet] = x.eta();
+    tthtree->get_address<float *>(prefix + "phi" )[n_fat_jet] = x.phi();
+    tthtree->get_address<float *>(prefix + "mass")[n_fat_jet] = x.mass();
+
+    tthtree->get_address<float *>(prefix + "tau1")[n_fat_jet] = fatjet_nsub_tau1->get(n_fat_jet);
+    tthtree->get_address<float *>(prefix + "tau2")[n_fat_jet] = fatjet_nsub_tau2->get(n_fat_jet);
+    tthtree->get_address<float *>(prefix + "tau3")[n_fat_jet] = fatjet_nsub_tau3->get(n_fat_jet);
+    
+  } // End loop over fatjets
+  
+  // Also count the number of fatjets
+  std::string njet_branch("n__jet_" + fj_branches_name);
+  *(tthtree->get_address<int *>(njet_branch)) = fatjets->size();  
+}
+
+
 //finds a matched genparticle by dR, dPt and id
 //x - particle to match
 //pruned - collection of genparticles
@@ -269,10 +327,12 @@ private:
         // objects = name of the jet collection
         // nsubs = name of the N-subjettiness calculation process
         // fatjet branches = name of the branches to put this in
+        // isbasicjets = data type of the fat jet (BasicJet or PFJet)
         // !!the lists have to be in sync!!
 	const std::vector<std::string> fatjet_objects_;
 	const std::vector<std::string> fatjet_nsubs_;
 	const std::vector<std::string> fatjet_branches_;
+	const std::vector<int> fatjet_isbasicjets_;
 
         // HEPTopTagger information
         // objects = name of the input collection
@@ -336,6 +396,7 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
         fatjet_objects_(iConfig.getParameter<std::vector<std::string>>("fatjetsObjects")),
         fatjet_nsubs_(iConfig.getParameter<std::vector<std::string>>("fatjetsNsubs")),
         fatjet_branches_(iConfig.getParameter<std::vector<std::string>>("fatjetsBranches")),
+        fatjet_isbasicjets_(iConfig.getParameter<std::vector<int>>("fatjetsIsBasicJets")),
 
         htt_objects_(iConfig.getParameter<std::vector<std::string>>("httObjects")),
         htt_branches_(iConfig.getParameter<std::vector<std::string>>("httBranches")),
@@ -437,6 +498,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	// Sanity check the fatjet lists-of-names
 	assert(fatjet_objects_.size()==fatjet_nsubs_.size());
 	assert(fatjet_objects_.size()==fatjet_branches_.size());
+	assert(fatjet_objects_.size()==fatjet_isbasicjets_.size());
 
 	// Sanity check the htt lists-of-names
 	assert(htt_objects_.size()==htt_branches_.size());
@@ -1382,54 +1444,30 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	  // Get the proper names
 	  std::string fj_object_name	  = fatjet_objects_[i_fj_coll];
 	  std::string fj_nsubs_name	  = fatjet_nsubs_[i_fj_coll];
-	  std::string fj_branches_name = fatjet_branches_[i_fj_coll];
- 
-	  // Get Fatjet iteself
-	  edm::Handle<reco::PFJetCollection> fatjets;
-	  iEvent.getByLabel(fj_object_name, fatjets);
+	  std::string fj_branches_name    = fatjet_branches_[i_fj_coll];
+	  int fj_isbasicjets              = fatjet_isbasicjets_[i_fj_coll];
 	  
-	  // Handles to get the Nsubjettiness
-	  edm::Handle<edm::ValueMap<float> > fatjet_nsub_tau1;
-	  iEvent.getByLabel(fj_nsubs_name, "tau1", fatjet_nsub_tau1);
-
-	  edm::Handle<edm::ValueMap<float> > fatjet_nsub_tau2;
-	  iEvent.getByLabel(fj_nsubs_name, "tau2", fatjet_nsub_tau2);
-	  
-	  edm::Handle<edm::ValueMap<float> > fatjet_nsub_tau3;
-	  iEvent.getByLabel(fj_nsubs_name, "tau3", fatjet_nsub_tau3);
-
-	  // Make sure the fatjets and nsujettiness containers have same size
-	  assert(fatjets->size()==fatjet_nsub_tau1->size());
-	  assert(fatjets->size()==fatjet_nsub_tau2->size());
-	  assert(fatjets->size()==fatjet_nsub_tau3->size());
-	  
-	  // Loop over fatjets
-	  for (unsigned n_fat_jet = 0; n_fat_jet != fatjets->size(); n_fat_jet++){
-	    
-	    const reco::PFJet& x = (*fatjets)[n_fat_jet];
-	    
-	    LogDebug("fat jets") << "n_fat_jet=" << n_fat_jet << CANDPRINT(x);
-	    	    
-	    std::string prefix("jet_");
-	    prefix.append(fj_branches_name);
-	    prefix.append("__");
-
-	    // Turn the branch address into the actual object we want to fill
-	    tthtree->get_address<float *>(prefix + "pt"  )[n_fat_jet] = x.pt();
-	    tthtree->get_address<float *>(prefix + "eta" )[n_fat_jet] = x.eta();
-	    tthtree->get_address<float *>(prefix + "phi" )[n_fat_jet] = x.phi();
-	    tthtree->get_address<float *>(prefix + "mass")[n_fat_jet] = x.mass();
-
-	    tthtree->get_address<float *>(prefix + "tau1")[n_fat_jet] = fatjet_nsub_tau1->get(n_fat_jet);
-	    tthtree->get_address<float *>(prefix + "tau2")[n_fat_jet] = fatjet_nsub_tau2->get(n_fat_jet);
-	    tthtree->get_address<float *>(prefix + "tau3")[n_fat_jet] = fatjet_nsub_tau3->get(n_fat_jet);
-	    
-	  } // End loop over fatjets
-	  
-	  // Also count the number of fatjets
-	  std::string njet_branch("n__jet_" + fj_branches_name);
-	  *(tthtree->get_address<int *>(njet_branch)) = fatjets->size();
-	  
+	  // Fill PFJets
+	  if (fj_isbasicjets==0){
+	    fill_fatjet_branches<reco::PFJet, reco::PFJetCollection>(iEvent, 
+								     tthtree, 
+								     fj_object_name,
+								     fj_nsubs_name,
+								     fj_branches_name);
+	  }
+	  // Fill BasicJets
+	  else if (fj_isbasicjets==1){
+	    fill_fatjet_branches<reco::BasicJet, reco::BasicJetCollection>(iEvent, 
+									   tthtree, 
+									   fj_object_name,
+									   fj_nsubs_name,
+									   fj_branches_name);
+	  }
+	  else{
+	    edm::LogError("FJ") << "Invalid value for fj_isbasicjets (can be 0 or 1)" << fj_isbasicjets;
+	    throw std::exception();
+	  }
+	 
 	} // End of loop over fatjet collections
 	// Done filling the fatjet information
 
