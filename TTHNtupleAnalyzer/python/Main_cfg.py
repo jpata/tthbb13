@@ -96,6 +96,7 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
         fatjetsObjects  = cms.vstring(['ca15PFJetsCHS']),
         fatjetsNsubs    = cms.vstring(['Njettiness']),
         fatjetsBranches = cms.vstring(['fat']),
+        fatjetsIsBasicJets = cms.vint32([1]),
 
         httObjects  = cms.vstring(['HTTJetsCHS', 'MultiRHTTJetsCHS']),                                           
         httBranches = cms.vstring(['toptagger', 'toptagger2']),                                           
