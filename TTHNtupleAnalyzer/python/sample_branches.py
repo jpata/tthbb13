@@ -4,19 +4,20 @@ from TTH.TTHNtupleAnalyzer.headergen import *
 
 #define branches to add here
 process = [
-	Scalar("gen_t__dpt_alt", "float"),
-	Scalar("gen_tbar__dpt_alt", "float"),
-	#Dynamic1DArray("fjet__pt", "float", "n__fjet", "N_FATJETS"),
-	#Dynamic1DArray("fjet__eta", "float", "n__fjet", "N_FATJETS"),
-	#Static1DArray("jec", "float", "NJECS")
+    #Scalar("gen_t__dpt_alt", "float"),
+    #Scalar("gen_tbar__dpt_alt", "float"),
+    #Dynamic1DArray("fjet__pt", "float", "n__fjet", "N_FATJETS"),
+    #Dynamic1DArray("fjet__eta", "float", "n__fjet", "N_FATJETS"),
+    #Static1DArray("jec", "float", "NJECS")
 ]
 
 # True Top Branches
-for t in ["t2", "tbar2"]:
+for t in ["t", "tbar", "t2", "tbar2"]:
     for v in [
+        ("eta"), ("mass"), ("phi"), ("pt"), ("status"),
         ("b__eta"), ("b__mass"), ("b__phi"), ("b__pt"), ("b__status"),
-        ("w_d1__eta"), ("w_d1__mass"), ("w_d1__phi"), ("w_d1__pt"), ("w_d1__status"),
-        ("w_d2__eta"), ("w_d2__mass"), ("w_d2__phi"), ("w_d2__pt"), ("w_d2__status")
+        ("w_d1__eta"), ("w_d1__mass"), ("w_d1__phi"), ("w_d1__pt"), ("w_d1__status"), ("w_d1__id"),
+        ("w_d2__eta"), ("w_d2__mass"), ("w_d2__phi"), ("w_d2__pt"), ("w_d2__status"), ("w_d2__id")
     ]:
         typ = "float"
         if "status" in v or "id" in v:
@@ -37,7 +38,7 @@ for fj_name in ["fat"]:
             "tau1", "tau2", "tau3"]:     # N-subjettiness
 
         full_branch_name = "jet_{0}__{1}".format(fj_name, branch_name)
-        process += [Dynamic1DArray(full_branch_name, 
+        process += [Dynamic1DArray(full_branch_name,
                                    "float",
                                    full_counter_name,
                                    "N_MAX"
@@ -51,7 +52,7 @@ for fj_name in ["fat"]:
 htt_float_branches =  [
     "pt", "mass", "eta", "phi", "energy",       # Kinematics
     "fj_pt", "fj_mass", "fj_eta", "fj_phi",     # Original Fat-jet kinematics
-    "fW", "massRatioPassed",                    # Standard HTT variables 
+    "fW", "massRatioPassed",                    # Standard HTT variables
     "Rmin", "ptFiltForRminExp", "RminExpected", # MultiR variables
     "prunedMass", "topMass", "unfilteredMass"   # extra masses
 ]

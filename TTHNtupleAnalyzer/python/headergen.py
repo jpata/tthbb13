@@ -134,12 +134,12 @@ class Dynamic1DArray:
 
 
 if __name__ == "__main__":
-        
-    if len(sys.argv)==4:            
+
+    if len(sys.argv)==4:
         filename_in = sys.argv[1]
         filename_out = sys.argv[2]
         filename_branches = sys.argv[3]
-    elif len(sys.argv)==1:            
+    elif len(sys.argv)==1:
         filename_in = "../interface/tth_tree_template.hh"
         filename_out = "../interface/tth_tree.hh"
         filename_branches = "sample_branches.py"

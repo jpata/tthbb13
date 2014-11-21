@@ -777,6 +777,22 @@ int main(int argc, const char* argv[])
 			genTbar.wdau2phi = itree->gen_tbar__w_d2__phi;
 			genTbar.wdau2id = itree->gen_tbar__w_d2__id;
 
+			genB.mass = itree->gen_b__mass; 
+			genB.pt = itree->gen_b__pt; 
+			genB.eta = itree->gen_b__eta; 
+			genB.phi = itree->gen_b__phi; 
+			genB.status = itree->gen_b__status; 
+			genB.charge = 0;
+			genB.momid = 25;
+			
+			genBbar.mass = itree->gen_bbar__mass; 
+			genBbar.pt = itree->gen_bbar__pt; 
+			genBbar.eta = itree->gen_bbar__eta; 
+			genBbar.phi = itree->gen_bbar__phi; 
+			genBbar.status = itree->gen_bbar__status; 
+			genBbar.charge = 0;
+			genBbar.momid = 25;
+
             if( debug>=2 ) {
                 cout << endl;
                 cout << "******************************" << endl;
