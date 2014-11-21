@@ -29,5 +29,6 @@ git apply -3 --ignore-whitespace --ignore-space-change --exclude DataFormats/Pat
 
 scram setup lhapdf
 
+cp $CMSSW_BASE/external/$SCRAM_ARCH/lib/* $CMSSW_BASE/lib/$SCRAM_ARCH/
 # And build:
 # scram b -j 10
