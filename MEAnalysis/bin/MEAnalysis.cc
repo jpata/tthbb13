@@ -726,8 +726,11 @@ int main(int argc, const char* argv[])
             //nhJets = 0;
             //nPVs   = 1;
 
+
             // read event...
             long nbytes = currentTree->GetEntry(i);
+
+			otree->copy_branches(itree);
 		
 			if (is_undef(itree->hypo1)) {
 				cerr << "hypo1 undefined " << itree->hypo1 << " probably there will be issues" << endl;

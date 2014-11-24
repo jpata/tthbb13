@@ -50,7 +50,7 @@ process.source = cms.Source("PoolSource",
 # This can be used as input for HTT and other jet clustering algorithms
 process.chs = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedPFCandidates"), cut = cms.string("fromPV"))
 
-# Add stand-alone fat-jet collection 
+# Add stand-alone fat-jet collection
 from RecoJets.JetProducers.PFJetParameters_cfi import *
 from RecoJets.JetProducers.AnomalousCellParameters_cfi import *
 process.ca15PFJetsCHS = cms.EDProducer(
@@ -96,11 +96,11 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
         fatjetsObjects  = cms.vstring(['ca15PFJetsCHS']),
         fatjetsNsubs    = cms.vstring(['Njettiness']),
         fatjetsBranches = cms.vstring(['fat']),
-        fatjetsIsBasicJets = cms.vint32([1]),
+        fatjetsIsBasicJets = cms.vint32([0]),
 
-        httObjects  = cms.vstring(['HTTJetsCHS', 'MultiRHTTJetsCHS']),                                           
-        httBranches = cms.vstring(['toptagger', 'toptagger2']),                                           
-        
+        httObjects  = cms.vstring(['HTTJetsCHS', 'MultiRHTTJetsCHS']),
+        httBranches = cms.vstring(['toptagger', 'toptagger2']),
+
 	triggerIdentifiers = triggerPathNames,
 	#triggerIdentifiersForMatching = cms.vstring([
 	#		'HLT_Ele27_WP80_v*',
@@ -280,7 +280,7 @@ process.p = cms.Path(
 	#process.hepTopTagInfos *
         process.chs *
         process.ca15PFJetsCHS *
-        process.Njettiness *        
+        process.Njettiness *
 	process.HTTJetsCHS *
 	process.MultiRHTTJetsCHS *
 	process.tthNtupleAnalyzer
