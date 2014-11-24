@@ -528,12 +528,14 @@ int main(int argc, const char* argv[])
 
     // output file
     TFile* fout_tmp = TFile::Open(outFileName.c_str(),"UPDATE");
+    
+    TNamed* config_dump = new TNamed("configdump", builder.dump().c_str());
 
     // total event counter for normalization
     TH1F*  hcounter = new TH1F("hcounter", "", 3, 0, 3);
-	hcounter->GetXaxis()->SetBinLabel(1, "fraction of processed events");
-	hcounter->GetXaxis()->SetBinLabel(2, "number of events processed");
-	hcounter->GetXaxis()->SetBinLabel(3, "number of events passing");
+    hcounter->GetXaxis()->SetBinLabel(1, "fraction of processed events");
+    hcounter->GetXaxis()->SetBinLabel(2, "number of events processed");
+    hcounter->GetXaxis()->SetBinLabel(3, "number of events passing");
 
     // save a snapshot of the configuration parameters
     vector<std::string> paramsAll = in.getParameterNames();
@@ -632,7 +634,7 @@ int main(int argc, const char* argv[])
     // loop over input files
     for(unsigned int sample = 0 ; sample < mySampleFiles.size(); sample++) {
         
-		//Need to reinitialize for each file
+        //Need to reinitialize for each file
         evHigh = evLimits[1];
 
         string currentName = mySampleFiles[sample];
@@ -656,7 +658,7 @@ int main(int argc, const char* argv[])
         //FIXME: unused?
         //const float normDown           = count_Q2 ? count_Q2->GetBinContent(1)/count_Q2->GetBinContent(2) : 1.0;
         //const float normUp             = count_Q2 ? count_Q2->GetBinContent(3)/count_Q2->GetBinContent(2) : 1.0;
-		TTH::EventHypothesis Vtype;
+        TTH::EventHypothesis Vtype;
 
         cout << "Done!!" << endl;
 
@@ -692,13 +694,13 @@ int main(int argc, const char* argv[])
 
             // if fixed-size job and above upper bound, continue...
             if(counter>evHigh && fixNumEvJob) continue;
-			
+            
             // otherwise, if outside the event window, continue...
             if(!fixNumEvJob && !(i>=evLow && i<evHigh) ) continue;
             events_++;
-			
-			//fill histogram counter with number of processed events
-			hcounter->SetBinContent(2, hcounter->GetBinContent(2)+1);
+            
+            //fill histogram counter with number of processed events
+            hcounter->SetBinContent(2, hcounter->GetBinContent(2)+1);
 
             // print the processed event number
             if(i%500==0) {
@@ -730,71 +732,71 @@ int main(int argc, const char* argv[])
             // read event...
             long nbytes = currentTree->GetEntry(i);
 
-			otree->copy_branches(itree);
-		
-			if (is_undef(itree->hypo1)) {
-				cerr << "hypo1 undefined " << itree->hypo1 << " probably there will be issues" << endl;
-			}
-			
-			Vtype = static_cast<TTH::EventHypothesis>(itree->hypo1);
-			if (debug>3) cout << "hypo1 " << itree->hypo1 << " " << Vtype << endl;
-			if (((int)Vtype < 0) || ((int)Vtype>11)) {
-				cerr << "Vtype undefined " << (int)Vtype << " probably there will be issues" << endl;
-			}
-			
-			genTop.bmass = itree->gen_t__b__mass;
-			genTop.bpt = itree->gen_t__b__pt;
-			genTop.beta = itree->gen_t__b__eta;
-			genTop.bphi = itree->gen_t__b__phi;
-			genTop.bphi = itree->gen_t__b__phi;
-			genTop.bstatus = itree->gen_t__b__status;
-			
-			genTop.wdau1mass = itree->gen_t__w_d1__mass;
-			genTop.wdau1pt = itree->gen_t__w_d1__pt;
-			genTop.wdau1eta = itree->gen_t__w_d1__eta;
-			genTop.wdau1phi = itree->gen_t__w_d1__phi;
-			genTop.wdau1id = itree->gen_t__w_d1__id;
+            otree->copy_branches(itree);
+        
+            if (is_undef(itree->hypo1)) {
+                cerr << "hypo1 undefined " << itree->hypo1 << " probably there will be issues" << endl;
+            }
+            
+            Vtype = static_cast<TTH::EventHypothesis>(itree->hypo1);
+            if (debug>3) cout << "hypo1 " << itree->hypo1 << " " << Vtype << endl;
+            if (((int)Vtype < 0) || ((int)Vtype>11)) {
+                cerr << "Vtype undefined " << (int)Vtype << " probably there will be issues" << endl;
+            }
+            
+            genTop.bmass = itree->gen_t__b__mass;
+            genTop.bpt = itree->gen_t__b__pt;
+            genTop.beta = itree->gen_t__b__eta;
+            genTop.bphi = itree->gen_t__b__phi;
+            genTop.bphi = itree->gen_t__b__phi;
+            genTop.bstatus = itree->gen_t__b__status;
+            
+            genTop.wdau1mass = itree->gen_t__w_d1__mass;
+            genTop.wdau1pt = itree->gen_t__w_d1__pt;
+            genTop.wdau1eta = itree->gen_t__w_d1__eta;
+            genTop.wdau1phi = itree->gen_t__w_d1__phi;
+            genTop.wdau1id = itree->gen_t__w_d1__id;
 
-			genTop.wdau2mass = itree->gen_t__w_d2__mass;
-			genTop.wdau2pt = itree->gen_t__w_d2__pt;
-			genTop.wdau2eta = itree->gen_t__w_d2__eta;
-			genTop.wdau2phi = itree->gen_t__w_d2__phi;
-			genTop.wdau2id = itree->gen_t__w_d2__id;
-			
-			genTbar.bmass = itree->gen_tbar__b__mass;
-			genTbar.bpt = itree->gen_tbar__b__pt;
-			genTbar.beta = itree->gen_tbar__b__eta;
-			genTbar.bphi = itree->gen_tbar__b__phi;
-			genTbar.bphi = itree->gen_tbar__b__phi;
-			genTbar.bstatus = itree->gen_tbar__b__status;
-			
-			genTbar.wdau1mass = itree->gen_tbar__w_d1__mass;
-			genTbar.wdau1pt = itree->gen_tbar__w_d1__pt;
-			genTbar.wdau1eta = itree->gen_tbar__w_d1__eta;
-			genTbar.wdau1phi = itree->gen_tbar__w_d1__phi;
-			genTbar.wdau1id = itree->gen_tbar__w_d1__id;
+            genTop.wdau2mass = itree->gen_t__w_d2__mass;
+            genTop.wdau2pt = itree->gen_t__w_d2__pt;
+            genTop.wdau2eta = itree->gen_t__w_d2__eta;
+            genTop.wdau2phi = itree->gen_t__w_d2__phi;
+            genTop.wdau2id = itree->gen_t__w_d2__id;
+            
+            genTbar.bmass = itree->gen_tbar__b__mass;
+            genTbar.bpt = itree->gen_tbar__b__pt;
+            genTbar.beta = itree->gen_tbar__b__eta;
+            genTbar.bphi = itree->gen_tbar__b__phi;
+            genTbar.bphi = itree->gen_tbar__b__phi;
+            genTbar.bstatus = itree->gen_tbar__b__status;
+            
+            genTbar.wdau1mass = itree->gen_tbar__w_d1__mass;
+            genTbar.wdau1pt = itree->gen_tbar__w_d1__pt;
+            genTbar.wdau1eta = itree->gen_tbar__w_d1__eta;
+            genTbar.wdau1phi = itree->gen_tbar__w_d1__phi;
+            genTbar.wdau1id = itree->gen_tbar__w_d1__id;
 
-			genTbar.wdau2mass = itree->gen_tbar__w_d2__mass;
-			genTbar.wdau2pt = itree->gen_tbar__w_d2__pt;
-			genTbar.wdau2eta = itree->gen_tbar__w_d2__eta;
-			genTbar.wdau2phi = itree->gen_tbar__w_d2__phi;
-			genTbar.wdau2id = itree->gen_tbar__w_d2__id;
+            genTbar.wdau2mass = itree->gen_tbar__w_d2__mass;
+            genTbar.wdau2pt = itree->gen_tbar__w_d2__pt;
+            genTbar.wdau2eta = itree->gen_tbar__w_d2__eta;
+            genTbar.wdau2phi = itree->gen_tbar__w_d2__phi;
+            genTbar.wdau2id = itree->gen_tbar__w_d2__id;
 
-			genB.mass = itree->gen_b__mass; 
-			genB.pt = itree->gen_b__pt; 
-			genB.eta = itree->gen_b__eta; 
-			genB.phi = itree->gen_b__phi; 
-			genB.status = itree->gen_b__status; 
-			genB.charge = 0;
-			genB.momid = 25;
-			
-			genBbar.mass = itree->gen_bbar__mass; 
-			genBbar.pt = itree->gen_bbar__pt; 
-			genBbar.eta = itree->gen_bbar__eta; 
-			genBbar.phi = itree->gen_bbar__phi; 
-			genBbar.status = itree->gen_bbar__status; 
-			genBbar.charge = 0;
-			genBbar.momid = 25;
+            genB.mass = itree->gen_b__mass; 
+            genB.pt = itree->gen_b__pt; 
+            genB.eta = itree->gen_b__eta; 
+            genB.phi = itree->gen_b__phi; 
+            genB.status = itree->gen_b__status; 
+            genB.charge = 0;
+            genB.momid = 25;
+            
+            genBbar.mass = itree->gen_bbar__mass; 
+            genBbar.pt = itree->gen_bbar__pt; 
+            genBbar.eta = itree->gen_bbar__eta; 
+            genBbar.phi = itree->gen_bbar__phi; 
+            genBbar.status = itree->gen_bbar__status; 
+            genBbar.charge = 0;
+            genBbar.momid = 25;
 
             if( debug>=2 ) {
                 cout << endl;
@@ -802,7 +804,7 @@ int main(int argc, const char* argv[])
                 cout << "Analyzing event " << itree->event__id << " bytes " << nbytes << " read" << endl;
             }
 
-			otree->sample				= sample; 
+            otree->sample                = sample; 
             otree->counter_            = counter;
             otree->weight_             = scaleFactor;
             otree->weightTopPt_        = 1;
@@ -836,15 +838,15 @@ int main(int argc, const char* argv[])
             //otree->trigger_     = weightTrig2012;
 
 
-			//cout << "trigbits";
+            //cout << "trigbits";
             for(int k = 0; k < 70 ; k++) {
                 otree->triggerFlags_[k] = itree->trigger__bits[k];
-				//if (debug>3)
-				//	cout << " " << itree->trigger__bits[k];
+                //if (debug>3)
+                //    cout << " " << itree->trigger__bits[k];
             }
-			//cout << endl;
-			//if (debug>3)
-			//	cout << "sumbits " << sumbits << endl;
+            //cout << endl;
+            //if (debug>3)
+            //    cout << "sumbits " << sumbits << endl;
 
             //FIXME: where to get this scalesyst
             //otree->SCALEsyst_[0] = 1.0;
@@ -1286,14 +1288,14 @@ int main(int argc, const char* argv[])
             //    }
             //}
 
-			//creates a TLorentzVector with the four-momentum of the gen jet with index nj
+            //creates a TLorentzVector with the four-momentum of the gen jet with index nj
             auto vec_from_gen_jet = [&itree, debug] (const int nj) {
                 TLorentzVector hJLV(1,0,0,1);
                 hJLV.SetPtEtaPhiM( itree->gen_jet__pt[nj], itree->gen_jet__eta[nj], itree->gen_jet__phi[nj], itree->gen_jet__mass[nj]);
 
                 if (is_undef(itree->gen_jet__pt[nj])) {
                     if (debug>3)
-						cerr << "gen jet " << nj << " pt is " << itree->gen_jet__pt[nj] << " -> was unset in TTree" << endl;
+                        cerr << "gen jet " << nj << " pt is " << itree->gen_jet__pt[nj] << " -> was unset in TTree" << endl;
                     return TLorentzVector(0, 0, 0, 0);
                 }
 
@@ -1360,15 +1362,15 @@ int main(int argc, const char* argv[])
                     if( abs(itree->jet__id[hj])==4 ) otree->nMatchSimCs_++;
                 }
             }
-			if (debug>3) {
-				cout << "nsim "
-					 << otree->nMatchSimBs_v1_ << " "
-					 << otree->nMatchSimBs_v2_ << " "
-					 << otree->nMatchSimBs_ << " "
-				     << otree->nMatchSimCs_v1_ << " "
-					 << otree->nMatchSimCs_v2_ << " "
-					 << otree->nMatchSimCs_ << endl;
-			}
+            if (debug>3) {
+                cout << "nsim "
+                     << otree->nMatchSimBs_v1_ << " "
+                     << otree->nMatchSimBs_v2_ << " "
+                     << otree->nMatchSimBs_ << " "
+                     << otree->nMatchSimCs_v1_ << " "
+                     << otree->nMatchSimCs_v2_ << " "
+                     << otree->nMatchSimCs_ << endl;
+            }
 
             if(debug>=2) cout << "@H" << endl;
 
@@ -1430,8 +1432,8 @@ int main(int argc, const char* argv[])
 
 
                 //loop over leptons
-				//Find number of loose leptons with custom conditions
-				//useful for re-tightening the loose lepton definition
+                //Find number of loose leptons with custom conditions
+                //useful for re-tightening the loose lepton definition
                 //for( int k = 0; k < itree->n__lep ; k++) {
 
                 //    const float lep_pt   = itree->lep__pt[k];
@@ -1485,37 +1487,37 @@ int main(int argc, const char* argv[])
                 //if( debug>=2 ) {
                 //    cout << numLooseLep << " loose leptons, "<< numLooseAElec << " loose electron(s) found in aLepton collection" << endl;
                 //}
-				
-				if (debug > 3) {
-					cout << "n__sig_lep " << itree->n__sig_lep << " hypo " << Vtype << endl;	
-					for (int _i=0; _i < itree->n__sig_lep; _i++) {
-						cout << "sig_lep " << _i << " "
-							<< itree->sig_lep__idx[_i] << " "
-							<< itree->sig_lep__id[_i] << " "
-							<< itree->sig_lep__type[_i] << " "
-							<< itree->sig_lep__pt[_i] << " "
-							<< itree->sig_lep__eta[_i] << " "
-							<< itree->sig_lep__phi[_i] << " "
-							<< itree->sig_lep__mass[_i] << endl;
-					}
-				}
+                
+                if (debug > 3) {
+                    cout << "n__sig_lep " << itree->n__sig_lep << " hypo " << Vtype << endl;    
+                    for (int _i=0; _i < itree->n__sig_lep; _i++) {
+                        cout << "sig_lep " << _i << " "
+                            << itree->sig_lep__idx[_i] << " "
+                            << itree->sig_lep__id[_i] << " "
+                            << itree->sig_lep__type[_i] << " "
+                            << itree->sig_lep__pt[_i] << " "
+                            << itree->sig_lep__eta[_i] << " "
+                            << itree->sig_lep__phi[_i] << " "
+                            << itree->sig_lep__mass[_i] << endl;
+                    }
+                }
 
                 ///////////////////////////////////
                 //         SL events:  e+j/m+j   //
                 ///////////////////////////////////
 
                 properEventSL = false;
-				//FIXME: do we still need to count loose leptons, looseAElec?
+                //FIXME: do we still need to count loose leptons, looseAElec?
                 if( (ENABLE_EJ && Vtype == TTH::EventHypothesis::en) || (ENABLE_MJ && Vtype == TTH::EventHypothesis::mun) ) {
 
-					if(debug>3) cout << "EJ/MJ" << endl;
+                    if(debug>3) cout << "EJ/MJ" << endl;
                     
-					//for SL, the first lepton in the sig_lep array is always filled with THE signal lepton
+                    //for SL, the first lepton in the sig_lep array is always filled with THE signal lepton
                     leptonLV.SetPtEtaPhiM(itree->sig_lep__pt[0], itree->sig_lep__eta[0], itree->sig_lep__phi[0], itree->sig_lep__mass[0]);
-					
-					//index in the main lepton array	
-					const int lepton_idx = itree->sig_lep__idx[0]; 
-					if(debug>3) cout << "lepton idx " << lepton_idx << endl;
+                    
+                    //index in the main lepton array    
+                    const int lepton_idx = itree->sig_lep__idx[0]; 
+                    if(debug>3) cout << "lepton idx " << lepton_idx << endl;
                     lep_index.push_back(0);
 
                     if(doGenLevelAnalysis) {
@@ -1532,16 +1534,16 @@ int main(int argc, const char* argv[])
                     //                     itree->lep__rel_iso[0]<lepIsoTight && vLepton_wp80[0]>0 && TMath::Abs(itree->lep__dxy[0])<0.02 );
                     int lepSelVtype3 =  (Vtype == TTH::EventHypothesis::en && itree->sig_lep__type[0] == 11 && leptonLV.Pt() > lepPtTight &&
                                          itree->lep__rel_iso[lepton_idx] < lepIsoTight && TMath::Abs(itree->lep__dxy[lepton_idx]) < 0.02);
-					
-					if (debug>3) {
-						cout << "lepSelVtype2,3 " << itree->sig_lep__type[0] << "==13 " <<
-							leptonLV.Pt() << " (" << lepPtTight << ") " <<
-							TMath::Abs(leptonLV.Eta()) << " (" << muEtaTight << ") " <<
-							TMath::Abs(itree->lep__dxy[lepton_idx]) << " (" << 0.02 << ") " <<
-							itree->lep__rel_iso[lepton_idx] << " (" << lepIsoTight << ")" << endl;
-					}
+                    
+                    if (debug>3) {
+                        cout << "lepSelVtype2,3 " << itree->sig_lep__type[0] << "==13 " <<
+                            leptonLV.Pt() << " (" << lepPtTight << ") " <<
+                            TMath::Abs(leptonLV.Eta()) << " (" << muEtaTight << ") " <<
+                            TMath::Abs(itree->lep__dxy[lepton_idx]) << " (" << 0.02 << ") " <<
+                            itree->lep__rel_iso[lepton_idx] << " (" << lepIsoTight << ")" << endl;
+                    }
 
-					//FIXME: need to put trigger bits here
+                    //FIXME: need to put trigger bits here
                     // OR of four trigger paths:  "HLT_Mu40_eta2p1_v.*", "HLT_IsoMu24_eta2p1_v.*", "HLT_Mu40_v.*",  "HLT_IsoMu24_v.*"
                     //int trigVtype2 =  Vtype == TTH::EventHypothesis::mun && ( triggerFlags[20]>0 || triggerFlags[21]>0 || triggerFlags[25]>0 ||triggerFlags[26]>0 ));
 
@@ -1635,13 +1637,13 @@ int main(int argc, const char* argv[])
                 if((ENABLE_MM && Vtype == TTH::EventHypothesis::mumu) || (ENABLE_EE && Vtype == TTH::EventHypothesis::ee)) {
 
 
-					//sig_lep always contain 2 leptons
+                    //sig_lep always contain 2 leptons
                     leptonLV.SetPtEtaPhiM (itree->sig_lep__pt[0], itree->sig_lep__eta[0], itree->sig_lep__phi[0], itree->sig_lep__mass[0]);
-					const int lep_idx_1 = itree->sig_lep__idx[0];
+                    const int lep_idx_1 = itree->sig_lep__idx[0];
                     lep_index.push_back(0);
 
                     leptonLV2.SetPtEtaPhiM(itree->sig_lep__pt[1], itree->sig_lep__eta[1], itree->sig_lep__phi[1], itree->sig_lep__mass[1]);
-					const int lep_idx_2 = itree->sig_lep__idx[1];
+                    const int lep_idx_2 = itree->sig_lep__idx[1];
                     lep_index.push_back(1);
 
                     //FIXME: hardcoded masses
@@ -1655,21 +1657,21 @@ int main(int argc, const char* argv[])
                         else
                             leptonLV2.SetPtEtaPhiM( 5., 0., 0., 0. );
                     }
-					
-					if (debug>3) {
-						cout << "EE/MM "
-							<< "idx " << lep_idx_1 << " " << lep_idx_2 << " " 
-							<< "type " << itree->lep__type[lep_idx_1] << " "
-							<< itree->lep__type[lep_idx_2] << " "
-							<< "pt " << itree->lep__pt[lep_idx_1] << " "
-							<< itree->lep__pt[lep_idx_2] << " "
-							<< "riso " << itree->lep__rel_iso[lep_idx_1] << " "
-							<< itree->lep__rel_iso[lep_idx_2] << " "
-							<< "dxy " << itree->lep__dxy[lep_idx_1] << " "
-							<< itree->lep__dxy[lep_idx_2] << " "
-							<< "q " << itree->sig_lep__charge[lep_idx_1] << " "
-							<< itree->sig_lep__charge[lep_idx_2] << endl;
-					}
+                    
+                    if (debug>3) {
+                        cout << "EE/MM "
+                            << "idx " << lep_idx_1 << " " << lep_idx_2 << " " 
+                            << "type " << itree->lep__type[lep_idx_1] << " "
+                            << itree->lep__type[lep_idx_2] << " "
+                            << "pt " << itree->lep__pt[lep_idx_1] << " "
+                            << itree->lep__pt[lep_idx_2] << " "
+                            << "riso " << itree->lep__rel_iso[lep_idx_1] << " "
+                            << itree->lep__rel_iso[lep_idx_2] << " "
+                            << "dxy " << itree->lep__dxy[lep_idx_1] << " "
+                            << itree->lep__dxy[lep_idx_2] << " "
+                            << "q " << itree->sig_lep__charge[lep_idx_1] << " "
+                            << itree->sig_lep__charge[lep_idx_2] << endl;
+                    }
 
 
                     // cut on leptons (DL)
@@ -1688,7 +1690,7 @@ int main(int argc, const char* argv[])
                                            (leptonLV2.Pt()>20 && itree->lep__rel_iso[lep_idx_2] < lepIsoTight && TMath::Abs(itree->lep__dxy[lep_idx_2]) < 0.02) )
                                        ) && itree->sig_lep__charge[0]*itree->sig_lep__charge[1] < 0;
 
-					//FIXME: need to implement trigger bits
+                    //FIXME: need to implement trigger bits
                     // OR of four trigger paths:  "HLT_Mu40_eta2p1_v.*", "HLT_IsoMu24_eta2p1_v.*", "HLT_Mu40_v.*",  "HLT_IsoMu24_v.*"
                     //int trigVtype0 =  (Vtype == TTH::EventHypothesis::mumu && ( triggerFlags[21]>0 || triggerFlags[26]>0 || triggerFlags[20]>0 ||triggerFlags[25]>0 ));
 
@@ -1698,10 +1700,10 @@ int main(int argc, const char* argv[])
                     // for the moment, don't cut on trigger bit (save and cut offline)
                     int trigVtype0 = 1;
                     int trigVtype1 = 1;
-					
-					if (debug>3) {
-						cout << "EE/MM " << lepSelVtype0 << " " << lepSelVtype1 << endl;	
-					}
+                    
+                    if (debug>3) {
+                        cout << "EE/MM " << lepSelVtype0 << " " << lepSelVtype1 << endl;    
+                    }
 
                     // ID && trigger
                     properEventDL = (lepSelVtype0 && (isMC ? 1 : trigVtype0)) || (lepSelVtype1 && (isMC ? 1 : trigVtype1));
@@ -1842,21 +1844,21 @@ int main(int argc, const char* argv[])
                     // first lepton...
                     leptonLV.SetPtEtaPhiM (itree->sig_lep__pt[0], itree->sig_lep__eta[0], itree->sig_lep__phi[0], itree->sig_lep__mass[0]);
                     lep_index.push_back(0);
-					const int lep_idx_1 = itree->sig_lep__idx[0];
+                    const int lep_idx_1 = itree->sig_lep__idx[0];
                     
-					//// second lepton...
+                    //// second lepton...
                     leptonLV2.SetPtEtaPhiM (itree->sig_lep__pt[1], itree->sig_lep__eta[1], itree->sig_lep__phi[1], itree->sig_lep__mass[1]);
                     lep_index.push_back(1);
-					const int lep_idx_2 = itree->sig_lep__idx[1];
+                    const int lep_idx_2 = itree->sig_lep__idx[1];
 
                     if(doGenLevelAnalysis) {
                         if( itree->gen_lep__pt[0] > 5.0) {
                             leptonLV.SetPtEtaPhiM(
-								itree->gen_lep__pt[lep_idx_1],
-								itree->gen_lep__eta[lep_idx_1],
-								itree->gen_lep__phi[lep_idx_1],
-								(itree->lep__type[lep_idx_1]==13 ? MU_MASS : ELE_MASS )
-							);
+                                itree->gen_lep__pt[lep_idx_1],
+                                itree->gen_lep__eta[lep_idx_1],
+                                itree->gen_lep__phi[lep_idx_1],
+                                (itree->lep__type[lep_idx_1]==13 ? MU_MASS : ELE_MASS )
+                            );
                         } else {
                             leptonLV.SetPtEtaPhiM( 5., 0., 0., 0. );
                         }
@@ -1872,14 +1874,14 @@ int main(int argc, const char* argv[])
                         }
                     }
 
-					//First lepton is mu
-					//FIXME: if electron is the first, does not work
+                    //First lepton is mu
+                    //FIXME: if electron is the first, does not work
                     int lepSelVtype4 = (Vtype == TTH::EventHypothesis::emu && (
-						(itree->sig_lep__type[0] == 13 && itree->sig_lep__type[1] == 11) ||
-						(itree->sig_lep__type[0] == 11 && itree->sig_lep__type[1] == 13)) &&
+                        (itree->sig_lep__type[0] == 13 && itree->sig_lep__type[1] == 11) ||
+                        (itree->sig_lep__type[0] == 11 && itree->sig_lep__type[1] == 13)) &&
                         (leptonLV.Pt() > 20 && TMath::Abs(leptonLV.Eta()) < muEtaTight && itree->lep__rel_iso[lep_idx_1] < lepIsoTight) &&
-						itree->sig_lep__charge[0] * itree->sig_lep__charge[1]<0
-                	);
+                        itree->sig_lep__charge[0] * itree->sig_lep__charge[1]<0
+                    );
 
                     // OR of four trigger paths:  "HLT_Mu40_eta2p1_v.*", "HLT_IsoMu24_eta2p1_v.*", "HLT_Mu40_v.*",  "HLT_IsoMu24_v.*"
                     //int trigVtype4 =  (Vtype == TTH::EventHypothesis::emu && ( triggerFlags[21]>0 || triggerFlags[26]>0 || triggerFlags[20]>0 ||triggerFlags[25]>0 ));
@@ -1958,7 +1960,7 @@ int main(int argc, const char* argv[])
                     //otree->lepton_wp80_   [1] = aLepton_wp80[lep_idx_2];
                     //otree->lepton_wp95_   [1] = aLepton_wp95[lep_idx_2];
 
-					//FIXME: =4 correct?
+                    //FIXME: =4 correct?
                     if ( isMC && Vtype == 4 ) { // if EM events with triggered muon
                         otree->sf_ele_ = eleSF( otree->lepton_pt_[1], otree->lepton_eta_[1]);
                     } else {
@@ -2051,10 +2053,10 @@ int main(int argc, const char* argv[])
                         // add the +/- JEC corrected jet (px,py)
                         deltaPx += ( pt*TMath::Cos(phi) );
                         deltaPy += ( pt*TMath::Sin(phi) );
-						
-						if (debug>3) {
-							cout << "jet " << pt << " " << eta << " " << phi << " " << id << " " << pu_id << " " << itree->jet__bd_csv[hj] << endl;
-						}
+                        
+                        if (debug>3) {
+                            cout << "jet " << pt << " " << eta << " " << phi << " " << id << " " << pu_id << " " << itree->jet__bd_csv[hj] << endl;
+                        }
 
                         // only jets in acceptance...
                         if( TMath::Abs(eta)> 2.5 ) continue;
@@ -2064,7 +2066,7 @@ int main(int argc, const char* argv[])
                         //if( pass_pu_id != 1 ) continue;
 
                         //// only jets passing id ID...
-						//Jet ID now a boolean
+                        //Jet ID now a boolean
                         //if( id < 0.5 ) continue;
                         //if( id != 1 ) continue;
 
@@ -2388,17 +2390,17 @@ int main(int argc, const char* argv[])
                 }
 
                 // fill arrays of jets
-                std::vector<TLorentzVector>	jets_p4;
-                std::vector<TLorentzVector>	jets_p4_reg;
+                std::vector<TLorentzVector>    jets_p4;
+                std::vector<TLorentzVector>    jets_p4_reg;
 
-                std::vector<double>			jets_csv;
-                std::vector<double>			jets_csv_prob_b;
-                std::vector<double>			jets_csv_prob_c;
-                std::vector<double>			jets_csv_prob_j;
+                std::vector<double>            jets_csv;
+                std::vector<double>            jets_csv_prob_b;
+                std::vector<double>            jets_csv_prob_c;
+                std::vector<double>            jets_csv_prob_j;
 
-                std::vector<int>			jets_index;
+                std::vector<int>            jets_index;
                 
-				std::vector<int>  			jets_flavour;
+                std::vector<int>              jets_flavour;
 
                 int jetsAboveCut = 0;
 
@@ -2549,7 +2551,7 @@ int main(int argc, const char* argv[])
                 // variable that flags events passing or failing the b-probability cut
                 int passes_btagshape = 0;
 
-				//LH ratio
+                //LH ratio
                 if( /*selectByBTagShape &&*/ useBtag &&                    // run this only if specified AND...
                                              ((properEventSL && banytag_indices.size()>=5) ||   // [ run this only if SL and at least 5 jets OR...
                                               (properEventDL && banytag_indices.size()>=4)) ) { //   run this only if DL and at least 4 jets ]
@@ -3336,7 +3338,7 @@ int main(int argc, const char* argv[])
                     // b1,...,w1,w2 are indices for jets_p4 collection;
                     // This is a map between the internal ordering bLep=2, W1Had=3, ..., higgs2 = 7, and jets_p4
                     pos_to_index.clear();
-					
+                    
                     if( otree->type_==-3) {
                         jets.push_back( jets_p4[ banytag_indices[0] ]);
                         jets.push_back( leptonLV2    );
@@ -3650,7 +3652,7 @@ int main(int argc, const char* argv[])
                                     // the barcode for this permutation
                                     string barcode = Form("%d%d_%d_%d%d%d_%d%d%d_%d%d",
                                                           otree->type_, meIntegrator->getIntType(), hyp, 
-							  lep_index[0], 0, jets_index[ pos_to_index[bLep_pos] ],
+                              lep_index[0], 0, jets_index[ pos_to_index[bLep_pos] ],
                                                           otree->type_<6 ? jets_index[ pos_to_index[w1_pos] ] : lep_index[1], otree->type_<6 ? jets_index[ pos_to_index[w2_pos] ] : 0, jets_index[ pos_to_index[bHad_pos] ],
                                                           jets_index[ pos_to_index[b1_pos] ], jets_index[ pos_to_index[b2_pos] ]);
                                     PhaseSpacePoint PSP;
@@ -4354,9 +4356,9 @@ int main(int argc, const char* argv[])
                 // fill the tree...
                 // FIXME: why is this here twice?
                 otree->tree->Fill();
-				
-				//fill histogram counter with number of processed events
-				hcounter->SetBinContent(3, hcounter->GetBinContent(3)+1);
+                
+                //fill histogram counter with number of processed events
+                hcounter->SetBinContent(3, hcounter->GetBinContent(3)+1);
 
             } // systematics
 
@@ -4374,7 +4376,7 @@ int main(int argc, const char* argv[])
             if(perm_to_integrator.size()>0 && print)
                 cout << "Deleted " << countGSL << " GSLMCIntegrator(s)" << endl;
         
-		} // nentries, event loop
+        } // nentries, event loop
 
         // this histogram keeps track of the fraction of analyzed events per sample
         hcounter->SetBinContent(1,float(events_)/nentries);
@@ -4405,6 +4407,7 @@ int main(int argc, const char* argv[])
 
     // save the tree and the counting histo in the ROOT file
     fout_tmp->cd();
+    config_dump->Write("", TObject::kOverwrite);
     hcounter->Write("", TObject::kOverwrite );
     hparam->Write("", TObject::kOverwrite );
     otree->tree->Write("", TObject::kOverwrite );
