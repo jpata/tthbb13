@@ -67,7 +67,8 @@ process.ca15PFJetsCHS.jetPtMin = cms.double(200)
 # Calculate n-subjettiness for stand-alone fatjets
 process.Njettiness = cms.EDProducer("NjettinessAdder",
                                     src=cms.InputTag("ca15PFJetsCHS"),
-                                    cone=cms.double(1.5)
+                                    cone=cms.double(1.5),
+				    Njets = cms.vuint32(1,2,3),
                             )
 
 
