@@ -13,7 +13,7 @@ import glob
 import os
 import ROOT
 
-from PrepareRootStyle import myStyle
+from TTH.Plotting.Helpers.PrepareRootStyle import myStyle
 
 myStyle.SetPadLeftMargin(0.18)
 myStyle.SetPadTopMargin(0.06)
@@ -26,8 +26,7 @@ ROOT.gROOT.ForceStyle()
 # Import private support code
 ########################################
 
-import Samples
-import Helpers.OutputDirectoryHelper as OutputDirectoryHelper
+import TTH.Plotting.Helpers.OutputDirectoryHelper as OutputDirectoryHelper
 
 
 ########################################
