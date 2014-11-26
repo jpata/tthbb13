@@ -19,7 +19,7 @@ import pickle
 
 import ROOT
 
-from PrepareRootStyle import myStyle
+from TTH.Plotting.Helpers.PrepareRootStyle import myStyle
 
 ROOT.gROOT.SetStyle("myStyle")
 ROOT.gROOT.ForceStyle()
@@ -31,8 +31,7 @@ ROOT.TH1.SetDefaultSumw2()
 # Import private helpers
 ########################################
 
-import Samples
-import Helpers.OutputDirectoryHelper as OutputDirectoryHelper
+import TTH.Plotting.Helpers.OutputDirectoryHelper as OutputDirectoryHelper
 
 
 ########################################
@@ -382,15 +381,11 @@ def makePlots( dic_files,
         dic_all_profiles[ plot_name ] = prof
     
         # Add to legend and draw it
-        # TODO: make the legend properly handle plot_type==multiple_friend if we want it
         if plot.do_legend:
-            if plot.sample in Samples.dic_names.keys():
-                legend.AddEntry( prof, Samples.dic_names[plot.sample], "LF" )
+            if isinstance( plot.sample, str):
+                legend.AddEntry( prof, plot.sample, "LF" )
             else:
-                if isinstance( plot.sample, str):
-                    legend.AddEntry( prof, plot.sample, "LF" )
-                else:
-                    legend.AddEntry( prof, plot.sample[0]+" / "+plot.sample[1], "LF" )
+                legend.AddEntry( prof, plot.sample[0]+" / "+plot.sample[1], "LF" )
                 
         # Draw the legend
         if plot.do_legend:
