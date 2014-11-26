@@ -20,7 +20,7 @@ import pickle
 ########################################
 
 import ROOT
-from PrepareRootStyle import myStyle
+from TTH.Plotting.Helpers.PrepareRootStyle import myStyle
 ROOT.gROOT.SetStyle("myStyle")
 ROOT.gROOT.ForceStyle()
 
@@ -31,8 +31,8 @@ ROOT.TH1.SetDefaultSumw2()
 # Import private support code
 ########################################
 
-import OutputDirectoryHelper
-import RebinHelper
+import TTH.Plotting.Helpers.OutputDirectoryHelper
+import TTH.Plotting.Helpers.RebinHelper
 
 
 ########################################
