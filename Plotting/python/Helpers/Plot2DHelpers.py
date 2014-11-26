@@ -13,7 +13,7 @@ import math
 import glob
 import copy
 import ROOT
-from PrepareRootStyle import myStyle
+from TTH.Plotting.Helpers.PrepareRootStyle import myStyle
 
 ROOT.gROOT.SetStyle("myStyle")
 ROOT.gROOT.ForceStyle()
@@ -35,7 +35,7 @@ ROOT.TH1.SetDefaultSumw2()
 ########################################
 
 import Samples
-import Helpers.OutputDirectoryHelper as OutputDirectoryHelper
+import TTH.Plotting.Helpers.OutputDirectoryHelper as OutputDirectoryHelper
 
 
 ########################################
