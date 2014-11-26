@@ -30,11 +30,11 @@ ROOT.gStyle.SetNumberContours(100)
 
 ROOT.TH1.SetDefaultSumw2()
 
+
 ########################################
 # Import private support code
 ########################################
 
-import Samples
 import TTH.Plotting.Helpers.OutputDirectoryHelper as OutputDirectoryHelper
 
 

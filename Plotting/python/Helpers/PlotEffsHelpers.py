@@ -31,8 +31,8 @@ ROOT.TH1.SetDefaultSumw2()
 # Import private support code
 ########################################
 
-import TTH.Plotting.Helpers.OutputDirectoryHelper
-import TTH.Plotting.Helpers.RebinHelper
+import TTH.Plotting.Helpers.OutputDirectoryHelper as OutputDirectoryHelper
+import TTH.Plotting.Helpers.RebinHelper as RebinHelper
 
 
 ########################################
