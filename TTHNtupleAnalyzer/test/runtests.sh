@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 echo "TTH/TTHNtupleAnalyzer runtests.sh " $LOCAL_TEST_DIR
 cmsRun $LOCAL_TEST_DIR/ttbar_cfg.py 
 python $LOCAL_TEST_DIR/../python/produce_dqm.py $CMSSW_BASE/output.root $LOCAL_TEST_DIR/dqm.root

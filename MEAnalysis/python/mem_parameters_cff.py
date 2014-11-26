@@ -5,7 +5,8 @@ import FWCore.ParameterSet.Config as cms
 
 # path to file
 #pathToFile = '/pnfs/psi.ch/cms/trivcat/store//user/bianchi/HBB_EDMNtuple/AllHDiJetPt'
-pathToFile = '/hdfs/cms/store/user/jpata/tth/v5/'
+pathToFile = '/hdfs/cms/store/user/jpata/tth/nov19_3a4602f/'
+processing_tag = "s1_nov19_3a4602f__s2_b7e13a1"
 ordering   = ''
 
 # luminosity

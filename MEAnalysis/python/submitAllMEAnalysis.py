@@ -37,9 +37,9 @@ if PSI==1:
 else:
 	address2		= ''
 	address1		= ''
-	subcommand			= 'sbatch -q main'
+	subcommand			= 'sbatch -p main'
 	tempOutPath = "/scratch/" + os.environ["USER"] + "/"
-	finalOutPath = "/home/" + os.environ["USER"] + "/tth/v1/"
+	finalOutPath = "/home/" + os.environ["USER"] + "/tth/{0}/".format(processing_tag)
 
 if not os.path.exists(finalOutPath):
 	os.makedirs(finalOutPath)

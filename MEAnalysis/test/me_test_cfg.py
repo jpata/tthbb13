@@ -16,3 +16,4 @@ process.fwliteInput.samples = cms.VPSet(
 )
 process.fwliteInput.debug = cms.untracked.int32(4)
 process.fwliteInput.evLimits = cms.vint32(0, 100)
+process.fwliteInput.ntuplizeAll = cms.untracked.int32(1)
