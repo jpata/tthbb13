@@ -325,9 +325,6 @@ def doWork( dic_files, output_dir ):
             h.GetYaxis().SetTitleOffset(2.)
 
 
-#TString extraText   = "Preliminary";
-#float extraTextFont = 52;  // default is helvetica-italics
-
             # Draw the histogram
             if i_p == 0:
 
@@ -338,20 +335,14 @@ def doWork( dic_files, output_dir ):
                 txt = ROOT.TText()
                 txt.SetTextFont(61)
                 txt.SetTextSize(0.05)
-                txt.DrawTextNDC(0.23, 0.86, "CMS")
+                txt.DrawTextNDC(0.23, 0.88, "CMS")
 
                 txt.SetTextFont(52)
                 txt.SetTextSize(0.04)
-                txt.DrawTextNDC(0.23, 0.82, "Simulation Preliminary")
+                txt.DrawTextNDC(0.23, 0.84, "Simulation Preliminary")
 
                 txt.SetTextFont(41)
-                txt.DrawTextNDC(0.85, 0.95, "8 TeV")
-
-                txtl = ROOT.TLatex()
-                txtl.SetTextSize(0.04)
-                txtl.SetNDC()
-                txtl.DrawLatex(0.61, 0.7, "Jet p_{T} > 200 GeV")
-                txtl.DrawLatex(0.61, 0.65, "CA R = 1.5 |#eta| < 2.4")
+                txt.DrawTextNDC(0.85, 0.95, "13 TeV")
 
             else:
                 h.Draw("HIST SAME")
