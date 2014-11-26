@@ -130,42 +130,50 @@ process.ca15PFJetsCHSTrimmed = process.ca15PFJetsCHS.clone(
 # Nsubjettiness for groomed and ungroomed fatjets
 process.NjettinessCA08 = cms.EDProducer("NjettinessAdder",
                                         src=cms.InputTag("ca08PFJetsCHS"),
-                                        cone=cms.double(0.8)
+                                        cone=cms.double(0.8),
+                                        Njets = cms.vuint32(1,2,3),
                             )
 
 process.NjettinessCA08Filtered = cms.EDProducer("NjettinessAdder",
                                                 src=cms.InputTag("ca08PFJetsCHSFiltered"),
-                                                cone=cms.double(0.8)
+                                                cone=cms.double(0.8),
+                                                Njets = cms.vuint32(1,2,3),
                             )
 
 process.NjettinessCA08Pruned = cms.EDProducer("NjettinessAdder",
                                                 src=cms.InputTag("ca08PFJetsCHSPruned"),
-                                                cone=cms.double(0.8)
+                                                cone=cms.double(0.8),
+                                                Njets = cms.vuint32(1,2,3),
                             )
 
 process.NjettinessCA08Trimmed = cms.EDProducer("NjettinessAdder",
                                                 src=cms.InputTag("ca08PFJetsCHSTrimmed"),
-                                                cone=cms.double(0.8)
+                                                cone=cms.double(0.8),
+                                                Njets = cms.vuint32(1,2,3),
                             )
 
 process.NjettinessCA15 = cms.EDProducer("NjettinessAdder",
                                         src=cms.InputTag("ca15PFJetsCHS"),
-                                        cone=cms.double(1.5)
+                                        cone=cms.double(1.5),
+                                        Njets = cms.vuint32(1,2,3),
                             )
 
 process.NjettinessCA15Filtered = cms.EDProducer("NjettinessAdder",
                                                 src=cms.InputTag("ca15PFJetsCHSFiltered"),
-                                                cone=cms.double(1.5)
+                                                cone=cms.double(1.5),
+                                                Njets = cms.vuint32(1,2,3),
                             )
 
 process.NjettinessCA15Pruned = cms.EDProducer("NjettinessAdder",
                                                 src=cms.InputTag("ca15PFJetsCHSPruned"),
-                                                cone=cms.double(1.5)
+                                                cone=cms.double(1.5),
+                                                Njets = cms.vuint32(1,2,3),
                             )
 
 process.NjettinessCA15Trimmed = cms.EDProducer("NjettinessAdder",
                                                 src=cms.InputTag("ca15PFJetsCHSTrimmed"),
-                                                cone=cms.double(1.5)
+                                                cone=cms.double(1.5),
+                                                Njets = cms.vuint32(1,2,3),
                             )
 
 
