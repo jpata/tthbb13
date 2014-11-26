@@ -421,6 +421,7 @@ public:
         
         tree->SetBranchAddress("perm_to_gen_s", perm_to_gen_);
         tree->SetBranchAddress("perm_to_gen_b", perm_to_gen_alt_);
+        tree->SetBranchAddress("weight", &weight_);
 	}
 
     void loop_initialize(void) {
