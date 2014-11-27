@@ -1,3 +1,5 @@
+//Generate METree.hh with
+//python $CMSSW_BASE/src/TTH/TTHNtupleAnalyzer/python/headergen.py $CMSSW_BASE/src/TTH/MEAnalysis/interface/METree_template.hh $CMSSW_BASE/src/TTH/MEAnalysis/interface/METree.hh $CMSSW_BASE/src/TTH/TTHNtupleAnalyzer/python/toptagger_branches.py
 #include "TTH/MEAnalysis/interface/HelperFunctions.h"
 #include "TTH/TTHNtupleAnalyzer/interface/tth_tree.hh"
 
@@ -532,6 +534,9 @@ public:
     }
 
 	void set_branch_addresses(const float MH) {
+        tree->SetBranchAddress("weight", &weight_);
+        tree->SetBranchAddress("time", &time_);
+
         tree->SetBranchAddress("lepton_pt", &lepton_pt_);
         tree->SetBranchAddress("lepton_rIso", &lepton_rIso_);
         tree->SetBranchAddress("numBTagL", &numBTagL_);
