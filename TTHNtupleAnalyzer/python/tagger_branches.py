@@ -36,7 +36,7 @@ for fj_name in ["ca08", "ca08filtered", "ca08pruned", "ca08trimmed",
     for branch_name in [
             "pt", "eta", "phi", "mass",  # Kinematics
             "tau1", "tau2", "tau3",      # N-subjettiness
-            "close_top_pt"  # truth matching
+            "close_hadtop_pt",  "close_hadtop_dr" # truth matching
             ]:
 
         full_branch_name = "jet_{0}__{1}".format(fj_name, branch_name)
@@ -45,19 +45,6 @@ for fj_name in ["ca08", "ca08filtered", "ca08pruned", "ca08trimmed",
                                    full_counter_name,
                                    "N_MAX"
                                )]
-
-    # And all the individual int branches
-    for branch_name in [
-            "close_top"  # truth matching
-            ]:
-
-        full_branch_name = "jet_{0}__{1}".format(fj_name, branch_name)
-        process += [Dynamic1DArray(full_branch_name, 
-                                   "int",
-                                   full_counter_name,
-                                   "N_MAX"
-                               )]
-
 
     # End of loop over branches
 # End of loop over fat jets

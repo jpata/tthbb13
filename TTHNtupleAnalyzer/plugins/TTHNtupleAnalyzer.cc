@@ -29,6 +29,7 @@
 #include <algorithm>
 #include <string>
 
+
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/EDAnalyzer.h"
@@ -92,6 +93,8 @@
 #include "TLorentzVector.h"
 #include "TString.h"
 
+#include <Math/VectorUtil.h>
+
 #include "TTH/TTHNtupleAnalyzer/interface/helpers.h"
 
 //TTH, EventHypothesis
@@ -115,6 +118,31 @@ bool order_by_pt(T a, T b) {
 	return (a->pt() > b->pt());
 };
 
+
+// Return a pointer interface for all objects (reference or pointer)
+// From:
+// http://stackoverflow.com/questions/14466620/c-template-specialization-calling-methods-on-types-that-could-be-pointers-or/14466705
+template<typename T>
+T * ptr(T & obj) { return &obj; } //turn reference into pointer!
+template<typename T>
+T * ptr(T * obj) { return obj; } //obj is already pointer, return it!
+
+
+// Functor so we can sort a list of ElementType objects according to
+// their deltaR distance to the reference object.  
+// Can take anything that inherits the p4() to give Lorentz Vector. 
+// Can deal with references and pointers.
+template <typename ReferenceType, typename ElementType>
+struct distance_sorter
+{  
+  ReferenceType reference;
+  distance_sorter(ReferenceType reference) : reference(reference) { }
+  bool operator()(ElementType first, 
+		  ElementType second){    
+    return ROOT::Math::VectorUtil::DeltaR( ptr(first)->p4(), ptr(reference)->p4()) < ROOT::Math::VectorUtil::DeltaR( ptr(second)->p4(), ptr(reference)->p4());
+  }
+};
+
 // Function to fill the branches for a fatjet collection
 // This needs to be templated as we can have either PFJets or BasicJet 
 // objects as fatjets
@@ -123,7 +151,10 @@ void fill_fatjet_branches(const edm::Event& iEvent,
 			  TTHTree* tthtree, 
 			  std::string fj_object_name,
 			  std::string fj_nsubs_name,
-			  std::string fj_branches_name){
+			  std::string fj_branches_name,
+			  // true top and anti top for optional matching
+			  const vector<const reco::Candidate*>  & true_t
+			  ){
   
   // Get Fatjet iteself
   edm::Handle<CollectionType> fatjets;
@@ -144,6 +175,18 @@ void fill_fatjet_branches(const edm::Event& iEvent,
   assert(fatjets->size()==fatjet_nsub_tau2->size());
   assert(fatjets->size()==fatjet_nsub_tau3->size());
 	  
+  // Create a list of true_tops that can be used for matching
+  // only take the ones passing the pT threshold
+  float min_true_top_pt = 200;
+  vector<const reco::Candidate*>  true_t_for_matching;
+  
+  for (vector<const reco::Candidate*>::const_iterator iter = true_t.begin();
+       iter != true_t.end();
+       ++iter){
+    if ((*iter)->pt() > min_true_top_pt)      
+      true_t_for_matching.push_back(*iter);
+  }
+
   // Loop over fatjets
   for (unsigned n_fat_jet = 0; n_fat_jet != fatjets->size(); n_fat_jet++){
 	    
@@ -164,7 +207,28 @@ void fill_fatjet_branches(const edm::Event& iEvent,
     tthtree->get_address<float *>(prefix + "tau1")[n_fat_jet] = fatjet_nsub_tau1->get(n_fat_jet);
     tthtree->get_address<float *>(prefix + "tau2")[n_fat_jet] = fatjet_nsub_tau2->get(n_fat_jet);
     tthtree->get_address<float *>(prefix + "tau3")[n_fat_jet] = fatjet_nsub_tau3->get(n_fat_jet);
-    
+
+    // Optional: Fill true top matching information
+    if (ADD_TRUE_TOP_MATCHING_FOR_FJ){
+      
+      // Sort true tops according to distance to fatjet under study
+      sort(true_t_for_matching.begin(), 
+	   true_t_for_matching.end(), 
+	   distance_sorter<JetType, const reco::Candidate*>(x));	   
+      
+      // Fill true top pT and DeltaR if at least one true top
+      if (true_t_for_matching.size() > 0){		
+	float dR = ROOT::Math::VectorUtil::DeltaR( ptr(x)->p4(), ptr(true_t_for_matching[0])->p4());			
+	tthtree->get_address<float *>(prefix + "close_hadtop_pt" )[n_fat_jet] = true_t_for_matching[0]->pt();
+	tthtree->get_address<float *>(prefix + "close_hadtop_dr" )[n_fat_jet] = dR;       
+      }
+      // Otherwise use dummy values
+      else{
+	tthtree->get_address<float *>(prefix + "close_hadtop_pt" )[n_fat_jet] = -1;
+	tthtree->get_address<float *>(prefix + "close_hadtop_dr" )[n_fat_jet] = 999;
+      }
+    } // Done matching fatjets and true tops
+        
   } // End loop over fatjets
   
   // Also count the number of fatjets
@@ -1271,6 +1335,42 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	}
 	
 	
+	// These quantities will be filled by gen_association
+	// Last Tops in Chain
+	vector<const reco::GenParticle*> tops_last;
+	vector<const reco::GenParticle*> antitops_last;
+	// First Tops in Chain
+	vector<const reco::Candidate*> tops_first;
+	vector<const reco::Candidate*> antitops_first;
+	vector<const reco::GenParticle*> bquarks;
+	vector<const reco::GenParticle*> antibquarks;
+
+	if (isMC_) {
+	  gen_association(pruned, 
+			  tthtree,
+			  tops_last,
+			  antitops_last,
+			  tops_first,
+			  antitops_first,
+			  bquarks,
+			  antibquarks);
+	}	
+
+	// Combine tops and antitops for truth matching
+	vector<const reco::Candidate*> tops_antitops_last; // empty list
+	tops_antitops_last.insert(tops_antitops_last.end(), tops_last.begin(), tops_last.end()); // add tops
+	tops_antitops_last.insert(tops_antitops_last.end(), antitops_last.begin(), antitops_last.end()); // add antis
+
+	// Hadronically decaying top quarks
+	vector<const reco::Candidate*> hadronic_ts;
+	for (vector<const reco::Candidate*>::const_iterator iter = tops_antitops_last.begin();
+	     iter != tops_antitops_last.end();
+	     ++iter){	  	  
+	  if (is_hadronic_top(*iter) == 1)
+	    hadronic_ts.push_back(*iter);
+	}
+
+
 	// Loop over HTT collections
 	for (unsigned i_htt_coll = 0; i_htt_coll < htt_objects_.size(); i_htt_coll++){
 
@@ -1328,9 +1428,9 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	    tthtree->get_address<float *>(prefix + "Rmin" )[n_top_jet]  = jet_info.properties().Rmin;
 	    tthtree->get_address<float *>(prefix + "RminExpected" )[n_top_jet]  = jet_info.properties().RminExpected;
 	    tthtree->get_address<float *>(prefix + "ptFiltForRminExp" )[n_top_jet]  = jet_info.properties().ptFiltForRminExp;
-
+	   
 	    tthtree->get_address<int *>(prefix + "n_sj" )[n_top_jet]  = 3;
-	    
+	   
 	    bool first = true;
 	    for (auto& constituent : x.getJetConstituents()) {
 	      if (constituent.isNull()) {
@@ -1396,7 +1496,9 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 								     tthtree, 
 								     fj_object_name,
 								     fj_nsubs_name,
-								     fj_branches_name);
+								     fj_branches_name,
+								     hadronic_ts
+								     );
 	  }
 	  // Fill BasicJets
 	  else if (fj_isbasicjets==1){
@@ -1404,7 +1506,9 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 									   tthtree, 
 									   fj_object_name,
 									   fj_nsubs_name,
-									   fj_branches_name);
+									   fj_branches_name,
+									   hadronic_ts
+									   );
 	  }
 	  else{
 	    edm::LogError("FJ") << "Invalid value for fj_isbasicjets (can be 0 or 1)" << fj_isbasicjets;
@@ -1535,10 +1639,6 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 			tthtree->lhe__n_e = countExtraPartons;
 		}
 	} // isMC for LHE
-
-	if (isMC_) {
-		gen_association(pruned, tthtree);
-	}	
 
 	//These also index the number of generated lepton/jets
 	tthtree->n__lep = n__lep;
