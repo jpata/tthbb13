@@ -224,8 +224,8 @@ void fill_fatjet_branches(const edm::Event& iEvent,
       }
       // Otherwise use dummy values
       else{
-	tthtree->get_address<float *>(prefix + "close_hadtop_pt" )[n_fat_jet] = -1;
-	tthtree->get_address<float *>(prefix + "close_hadtop_dr" )[n_fat_jet] = 999;
+	tthtree->get_address<float *>(prefix + "close_hadtop_pt" )[n_fat_jet] = DEF_VAL_FLOAT;
+	tthtree->get_address<float *>(prefix + "close_hadtop_dr" )[n_fat_jet] = 9999.0;
       }
     } // Done matching fatjets and true tops
         
@@ -1460,8 +1460,8 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	      }
 	      // Otherwise use dummy values
 	      else{
-		tthtree->get_address<float *>(prefix + "close_hadtop_pt" )[n_top_jet] = -1;
-		tthtree->get_address<float *>(prefix + "close_hadtop_dr" )[n_top_jet] = 999;
+		tthtree->get_address<float *>(prefix + "close_hadtop_pt" )[n_top_jet] = DEF_VAL_FLOAT;
+		tthtree->get_address<float *>(prefix + "close_hadtop_dr" )[n_top_jet] = 9999.0;
 	      }
 	    } // Done matching fatjets and true tops
 	    
