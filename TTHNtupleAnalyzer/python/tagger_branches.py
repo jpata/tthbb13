@@ -2,9 +2,9 @@
 #uses branch classes from headergen
 from TTH.TTHNtupleAnalyzer.headergen import *
 
-defines = ["#define ADD_TRUE_TOP_MATCHING_FOR_FJ 1",
-           "#define ADD_TRUE_TOP_MATCHING_FOR_HTT 1"
-           ]
+defines.extend(["#define ADD_TRUE_TOP_MATCHING_FOR_FJ 1",
+                "#define ADD_TRUE_TOP_MATCHING_FOR_HTT 1"])
+
 
 #define branches to add here
 process = [

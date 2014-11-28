@@ -2,9 +2,8 @@
 #uses branch classes from headergen
 from TTH.TTHNtupleAnalyzer.headergen import *
 
-defines = ["#define ADD_TRUE_TOP_MATCHING_FOR_FJ 0",
-           "#define ADD_TRUE_TOP_MATCHING_FOR_HTT 0"
-           ]
+defines.extend(["#define ADD_TRUE_TOP_MATCHING_FOR_FJ 0",
+                "#define ADD_TRUE_TOP_MATCHING_FOR_HTT 0"])
 
 # True Top Branches
 for t in ["t", "tbar", "t2", "tbar2"]:
@@ -20,3 +19,4 @@ for t in ["t", "tbar", "t2", "tbar2"]:
         process += [Scalar("gen_%s__%s" % (t, v), typ)]
 
 from TTH.TTHNtupleAnalyzer.toptagger_branches import *
+
