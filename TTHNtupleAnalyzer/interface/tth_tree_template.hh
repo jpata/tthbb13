@@ -22,6 +22,8 @@
 #define FLOAT_EPS 0.0000001f
 #define DOUBLE_EPS 0.0000001d
 
+//HEADERGEN_DEFINES
+
 //checks if a branch variable is undefined
 inline bool is_undef(int x) { return x==DEF_VAL_INT; };
 inline bool is_undef(float x) { return fabs(x-DEF_VAL_FLOAT) < FLOAT_EPS; };
