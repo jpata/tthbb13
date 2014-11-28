@@ -2,6 +2,9 @@
 #uses branch classes from headergen
 from TTH.TTHNtupleAnalyzer.headergen import *
 
+defines = ["#define ADD_TRUE_TOP_MATCHING_FOR_FJ 1"
+           ]
+
 #define branches to add here
 process = [
 	Scalar("gen_t__dpt_alt", "float"),
