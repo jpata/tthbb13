@@ -205,22 +205,28 @@ void fill_top_branches(TTHTree* tthtree, const reco::Candidate* top, const std::
 	} //dau1!=0  && dau2!=0
 } //fill_top_branches
 
-void gen_association(edm::Handle<edm::View<reco::GenParticle>> pruned, TTHTree* tthtree) {
+void gen_association(edm::Handle<edm::View<reco::GenParticle>> pruned, 
+		     TTHTree* tthtree,
+		     vector<const reco::GenParticle*> & tops_last,
+		     vector<const reco::GenParticle*> & antitops_last,		     
+		     vector<const reco::Candidate*> & tops_first,
+		     vector<const reco::Candidate*> &antitops_first,		     
+		     vector<const reco::GenParticle*> & bquarks,
+		     vector<const reco::GenParticle*> & antibquarks) {
+
 	// Packed particles are all the status 1, so usable to remake jets
 	// The navigation from status 1 to pruned is possible (the other direction should be made by hand)
 	//Handle<edm::View<pat::PackedGenParticle>> packed;
 	//iEvent.getByToken(packedGenToken_, packed);
 
-	//last top quarks of chain
-	vector<const reco::GenParticle*> tops_last;
-	vector<const reco::GenParticle*> antitops_last;
-	
-	//first top quarks of chain
-	vector<const reco::Candidate*> tops_first;
-	vector<const reco::Candidate*> antitops_first;
-	
-	vector<const reco::GenParticle*> bquarks;
-	vector<const reco::GenParticle*> antibquarks;
+        if ((tops_last.size() != 0) ||
+	    (antitops_last.size() != 0) ||
+	    (tops_first.size() != 0) ||
+	    (antitops_first.size() != 0) ||
+	    (bquarks.size() != 0) ||
+	    (antibquarks.size() != 0)){
+	  std::cout << "Warning: Received a non-empty vector in gen_association." << std::endl;
+	}
 	
 	//find top and antitop
 	//check if status=3 (pythia) or if decaying to W
@@ -295,3 +301,50 @@ void gen_association(edm::Handle<edm::View<reco::GenParticle>> pruned, TTHTree* 
 		tthtree->gen_bbar__id = antibquarks[0]->pdgId(); 
 	}
 } // isMC
+
+
+// get the decay channel of a last-in-chain top quark
+// -1: non-defined, error
+// 0: leptonic
+// 1: hadronic
+int is_hadronic_top(const reco::Candidate* p) {
+  
+  // Top should have at least two decay products b and W
+  if(p->numberOfDaughters()<2)
+    return -1;
+
+  const reco::Candidate* b = get_daughter_with_abs_id(p, 5);
+  const reco::Candidate* w = get_daughter_with_abs_id(p, 24);
+  
+  // Make sure we can assign b and W
+  if (b==0 || w==0)
+    return -1;
+    
+  // Deal with W->W->W chains
+  const reco::Candidate* w2 = find_nonself_child(w);  
+  if (w2 == 0)
+    return -1;
+
+  // Get the daughters of the W
+  const reco::Candidate* w_dau1 = 0;
+  const reco::Candidate* w_dau2 = 0;  
+  w_dau1 = w2->daughter(0);
+  w_dau2 = w2->daughter(1);
+
+  // Invalud w daughters
+  if ((w_dau1 == 0) || (w_dau2 == 0))
+    return -1;
+  
+  // Now look for a charged lepton daughter
+  if ((abs(w_dau1->pdgId()) == 11) ||
+      (abs(w_dau1->pdgId()) == 13) ||
+      (abs(w_dau1->pdgId()) == 15) ||
+      (abs(w_dau2->pdgId()) == 11) ||
+      (abs(w_dau2->pdgId()) == 13) ||
+      (abs(w_dau2->pdgId()) == 15) )
+    return 0;
+  // If we dont find any, it's a hadronic top
+  else
+    return 1;
+
+}
