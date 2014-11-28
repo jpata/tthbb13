@@ -2,7 +2,8 @@
 #uses branch classes from headergen
 from TTH.TTHNtupleAnalyzer.headergen import *
 
-defines = ["#define ADD_TRUE_TOP_MATCHING_FOR_FJ 0"
+defines = ["#define ADD_TRUE_TOP_MATCHING_FOR_FJ 0",
+           "#define ADD_TRUE_TOP_MATCHING_FOR_HTT 0"
            ]
 
 # True Top Branches

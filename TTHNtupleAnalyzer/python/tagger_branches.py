@@ -2,7 +2,8 @@
 #uses branch classes from headergen
 from TTH.TTHNtupleAnalyzer.headergen import *
 
-defines = ["#define ADD_TRUE_TOP_MATCHING_FOR_FJ 1"
+defines = ["#define ADD_TRUE_TOP_MATCHING_FOR_FJ 1",
+           "#define ADD_TRUE_TOP_MATCHING_FOR_HTT 1"
            ]
 
 #define branches to add here
@@ -56,7 +57,8 @@ htt_float_branches =  [
     "fj_pt", "fj_mass", "fj_eta", "fj_phi",     # Original Fat-jet kinematics
     "fW", "massRatioPassed",                    # Standard HTT variables 
     "Rmin", "ptFiltForRminExp", "RminExpected", # MultiR variables
-    "prunedMass", "topMass", "unfilteredMass"   # extra masses
+    "prunedMass", "topMass", "unfilteredMass",  # extra masses
+    "close_hadtop_pt",  "close_hadtop_dr"       # truth matching
 ]
 
 htt_int_branches = ["child_idx", "isMultiR", "n_sj"]

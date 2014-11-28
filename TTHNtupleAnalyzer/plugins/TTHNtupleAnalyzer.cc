@@ -1389,6 +1389,19 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	  // Make sure both collections have the same size
 	  assert(top_jets->size()==top_jet_infos->size());
 
+	  // Create a list of true_tops that can be used for matching
+	  // only take the ones passing the pT threshold
+	  float min_true_top_pt = 200;
+	  vector<const reco::Candidate*>  true_t_for_matching;
+	  
+	  for (vector<const reco::Candidate*>::const_iterator iter = hadronic_ts.begin();
+	       iter != hadronic_ts.end();
+	       ++iter){
+	    if ((*iter)->pt() > min_true_top_pt)      
+	      true_t_for_matching.push_back(*iter);
+	  }
+
+
 	  // Top jets and subjets are associated by indices. See:
 	  // /cvmfs/cms.cern.ch/slc6_amd64_gcc481/cms/cmssw/CMSSW_7_0_9/src/RecoJets/JetProducers/plugins/CompoundJetProducer.cc
 	  // about the association
@@ -1431,6 +1444,28 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	   
 	    tthtree->get_address<int *>(prefix + "n_sj" )[n_top_jet]  = 3;
 	   
+	    // Optional: Fill true top matching information
+	    if (ADD_TRUE_TOP_MATCHING_FOR_HTT){
+	      
+	      // Sort true tops according to distance to HTT candidate under study
+	      sort(true_t_for_matching.begin(), 
+		   true_t_for_matching.end(), 
+		   distance_sorter<const reco::BasicJet&, const reco::Candidate*>(x));	   
+	      
+	      // Fill true top pT and DeltaR if at least one true top
+	      if (true_t_for_matching.size() > 0){		
+		float dR = ROOT::Math::VectorUtil::DeltaR( ptr(x)->p4(), ptr(true_t_for_matching[0])->p4());			
+		tthtree->get_address<float *>(prefix + "close_hadtop_pt" )[n_top_jet] = true_t_for_matching[0]->pt();
+		tthtree->get_address<float *>(prefix + "close_hadtop_dr" )[n_top_jet] = dR;       
+	      }
+	      // Otherwise use dummy values
+	      else{
+		tthtree->get_address<float *>(prefix + "close_hadtop_pt" )[n_top_jet] = -1;
+		tthtree->get_address<float *>(prefix + "close_hadtop_dr" )[n_top_jet] = 999;
+	      }
+	    } // Done matching fatjets and true tops
+	    
+
 	    bool first = true;
 	    for (auto& constituent : x.getJetConstituents()) {
 	      if (constituent.isNull()) {
