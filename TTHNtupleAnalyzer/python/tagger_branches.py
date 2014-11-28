@@ -32,10 +32,12 @@ for fj_name in ["ca08", "ca08filtered", "ca08pruned", "ca08trimmed",
     full_counter_name = "n__jet_{0}".format(fj_name)
     process += [Scalar(full_counter_name, "int")]
 
-    # And all the individual branches
+    # And all the individual float branches
     for branch_name in [
             "pt", "eta", "phi", "mass",  # Kinematics
-            "tau1", "tau2", "tau3"]:     # N-subjettiness
+            "tau1", "tau2", "tau3",      # N-subjettiness
+            "close_top_pt"  # truth matching
+            ]:
 
         full_branch_name = "jet_{0}__{1}".format(fj_name, branch_name)
         process += [Dynamic1DArray(full_branch_name, 
@@ -43,6 +45,19 @@ for fj_name in ["ca08", "ca08filtered", "ca08pruned", "ca08trimmed",
                                    full_counter_name,
                                    "N_MAX"
                                )]
+
+    # And all the individual int branches
+    for branch_name in [
+            "close_top"  # truth matching
+            ]:
+
+        full_branch_name = "jet_{0}__{1}".format(fj_name, branch_name)
+        process += [Dynamic1DArray(full_branch_name, 
+                                   "int",
+                                   full_counter_name,
+                                   "N_MAX"
+                               )]
+
 
     # End of loop over branches
 # End of loop over fat jets
