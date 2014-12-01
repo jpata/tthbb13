@@ -39,7 +39,8 @@ for fj_name in ["ca08", "ca08filtered", "ca08pruned", "ca08trimmed",
     for branch_name in [
             "pt", "eta", "phi", "mass",  # Kinematics
             "tau1", "tau2", "tau3",      # N-subjettiness
-            "close_hadtop_pt",  "close_hadtop_dr" # truth matching
+            "close_hadtop_pt",  "close_hadtop_dr", # top truth matching
+            "close_parton_pt",  "close_parton_dr" # parton truth matching
             ]:
 
         full_branch_name = "jet_{0}__{1}".format(fj_name, branch_name)
@@ -60,7 +61,8 @@ htt_float_branches =  [
     "fW", "massRatioPassed",                    # Standard HTT variables 
     "Rmin", "ptFiltForRminExp", "RminExpected", # MultiR variables
     "prunedMass", "topMass", "unfilteredMass",  # extra masses
-    "close_hadtop_pt",  "close_hadtop_dr"       # truth matching
+    "close_hadtop_pt",  "close_hadtop_dr",      # top truth matching
+    "close_parton_pt",  "close_parton_dr"       # parton truth matching
 ]
 
 htt_int_branches = ["child_idx", "isMultiR", "n_sj"]

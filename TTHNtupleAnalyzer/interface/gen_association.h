@@ -24,6 +24,6 @@ int is_hadronic_top(const reco::Candidate* p);
 
 void get_hard_partons(edm::Handle<edm::View<reco::GenParticle>> pruned, 
 		      double min_parton_pt,
-		      std::vector<const reco::GenParticle*> & hard_partons);
+		      std::vector<const reco::Candidate*> & hard_partons);
 
 #endif
