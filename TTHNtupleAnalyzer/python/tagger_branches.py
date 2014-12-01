@@ -4,6 +4,8 @@ from TTH.TTHNtupleAnalyzer.headergen import *
 
 defines.extend(["#define ADD_TRUE_TOP_MATCHING_FOR_FJ 1",
                 "#define ADD_TRUE_TOP_MATCHING_FOR_HTT 1",
+                "#define ADD_TRUE_HIGGS_MATCHING_FOR_FJ 1",
+                "#define ADD_TRUE_HIGGS_MATCHING_FOR_HTT 1",
                 "#define ADD_TRUE_PARTON_MATCHING_FOR_FJ 1",
                 "#define ADD_TRUE_PARTON_MATCHING_FOR_HTT 1"])
 
@@ -40,7 +42,8 @@ for fj_name in ["ca08", "ca08filtered", "ca08pruned", "ca08trimmed",
             "pt", "eta", "phi", "mass",  # Kinematics
             "tau1", "tau2", "tau3",      # N-subjettiness
             "close_hadtop_pt",  "close_hadtop_dr", # top truth matching
-            "close_parton_pt",  "close_parton_dr" # parton truth matching
+            "close_parton_pt",  "close_parton_dr", # parton truth matching
+            "close_higgs_pt",   "close_higgs_dr"   # higgs truth matching
             ]:
 
         full_branch_name = "jet_{0}__{1}".format(fj_name, branch_name)
@@ -62,7 +65,8 @@ htt_float_branches =  [
     "Rmin", "ptFiltForRminExp", "RminExpected", # MultiR variables
     "prunedMass", "topMass", "unfilteredMass",  # extra masses
     "close_hadtop_pt",  "close_hadtop_dr",      # top truth matching
-    "close_parton_pt",  "close_parton_dr"       # parton truth matching
+    "close_parton_pt",  "close_parton_dr",      # parton truth matching
+    "close_higgs_pt",  "close_higgs_dr"         # higgs truth matching
 ]
 
 htt_int_branches = ["child_idx", "isMultiR", "n_sj"]

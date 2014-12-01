@@ -416,3 +416,23 @@ void get_hard_partons(edm::Handle<edm::View<reco::GenParticle>> pruned,
 } // get_hard_partons
 
 
+
+// Find truth level higgs bosons and add them to the vector
+// status==3
+// |pdgId|==25
+// pt>min_higgs_pt
+void get_gen_higgs(edm::Handle<edm::View<reco::GenParticle>> pruned, 
+		   double min_higgs_pt,
+		   vector<const reco::Candidate*> & gen_higgs){
+
+  // Extract higgs
+  for (auto& gp : *pruned){
+    if ( (abs(gp.pdgId()) == 25) &&
+	 (gp.status() == 3) &&
+	 (gp.pt() > min_higgs_pt) )
+      gen_higgs.push_back(&gp);
+  } // end loop over gen particles
+
+} // get_gen_higgs
+
+

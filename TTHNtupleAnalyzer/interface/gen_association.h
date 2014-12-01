@@ -26,4 +26,8 @@ void get_hard_partons(edm::Handle<edm::View<reco::GenParticle>> pruned,
 		      double min_parton_pt,
 		      std::vector<const reco::Candidate*> & hard_partons);
 
+void get_gen_higgs(edm::Handle<edm::View<reco::GenParticle>> pruned, 
+		   double min_higgs_pt,
+		   std::vector<const reco::Candidate*> & gen_higgs);
+
 #endif

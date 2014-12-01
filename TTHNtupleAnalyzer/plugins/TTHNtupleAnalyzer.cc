@@ -193,7 +193,9 @@ void fill_fatjet_branches(const edm::Event& iEvent,
 			  // true top and anti top for optional matching
 			  const vector<const reco::Candidate*>  & true_t,
 			  // hard partons for matching
-			  vector<const reco::Candidate*>  & hard_partons
+			  vector<const reco::Candidate*>  & hard_partons,
+			  // true higgs for matching
+			  vector<const reco::Candidate*>  & gen_higgs
 			  ){
   
   // Get Fatjet iteself
@@ -253,6 +255,8 @@ void fill_fatjet_branches(const edm::Event& iEvent,
       fill_truth_matching<JetType>(tthtree, x, n_fat_jet, true_t_for_matching, prefix, "hadtop");
     if (ADD_TRUE_PARTON_MATCHING_FOR_FJ)	      
       fill_truth_matching<JetType>(tthtree, x, n_fat_jet, hard_partons, prefix, "parton");
+    if (ADD_TRUE_HIGGS_MATCHING_FOR_FJ)	      
+      fill_truth_matching<JetType>(tthtree, x, n_fat_jet, gen_higgs, prefix, "higgs");
         
   }// End loop over fatjets
   
@@ -1374,6 +1378,10 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	double min_hard_parton_pt = 200; 
 	vector<const reco::Candidate*> hard_partons;
 
+	// Higgs Bosons
+	double min_higgs_pt = 0.; 
+	vector<const reco::Candidate*> gen_higgs;
+
 	if (isMC_) {
 	  gen_association(pruned, 
 			  tthtree,
@@ -1386,6 +1394,9 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
 	  if (ADD_TRUE_PARTON_MATCHING_FOR_FJ || ADD_TRUE_PARTON_MATCHING_FOR_HTT)
 	    get_hard_partons(pruned, min_hard_parton_pt, hard_partons);
+
+	  if (ADD_TRUE_HIGGS_MATCHING_FOR_FJ || ADD_TRUE_HIGGS_MATCHING_FOR_HTT)
+	    get_gen_higgs(pruned, min_higgs_pt, gen_higgs);
 
 	}	
 
@@ -1482,6 +1493,8 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	      fill_truth_matching<reco::BasicJet>(tthtree, x, n_top_jet, true_t_for_matching, prefix, "hadtop");
 	    if (ADD_TRUE_PARTON_MATCHING_FOR_HTT)
 	      fill_truth_matching<reco::BasicJet>(tthtree, x, n_top_jet, hard_partons, prefix, "parton");
+	    if (ADD_TRUE_HIGGS_MATCHING_FOR_HTT)
+	      fill_truth_matching<reco::BasicJet>(tthtree, x, n_top_jet, gen_higgs, prefix, "higgs");
 	    
 	    bool first = true;
 	    for (auto& constituent : x.getJetConstituents()) {
@@ -1550,7 +1563,8 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 								     fj_nsubs_name,
 								     fj_branches_name,
 								     hadronic_ts,
-								     hard_partons
+								     hard_partons,
+								     gen_higgs
 								     );
 	  }
 	  // Fill BasicJets
@@ -1561,7 +1575,8 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 									   fj_nsubs_name,
 									   fj_branches_name,
 									   hadronic_ts,
-									   hard_partons
+									   hard_partons,
+									   gen_higgs
 									   );
 	  }
 	  else{
