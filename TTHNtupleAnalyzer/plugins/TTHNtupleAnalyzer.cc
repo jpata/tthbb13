@@ -1344,6 +1344,10 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	vector<const reco::Candidate*> antitops_first;
 	vector<const reco::GenParticle*> bquarks;
 	vector<const reco::GenParticle*> antibquarks;
+	
+	// Hard partons (usually for QCD matching)
+	double min_hard_parton_pt = 200; 
+	vector<const reco::GenParticle*> hard_partons;
 
 	if (isMC_) {
 	  gen_association(pruned, 
@@ -1353,7 +1357,11 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 			  tops_first,
 			  antitops_first,
 			  bquarks,
-			  antibquarks);
+			  antibquarks);	  
+
+	  if (ADD_TRUE_PARTON_MATCHING_FOR_FJ || ADD_TRUE_PARTON_MATCHING_FOR_HTT)
+	    get_hard_partons(pruned, min_hard_parton_pt, hard_partons);
+
 	}	
 
 	// Combine tops and antitops for truth matching

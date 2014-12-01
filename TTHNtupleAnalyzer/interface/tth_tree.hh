@@ -24,6 +24,8 @@
 
 #define ADD_TRUE_TOP_MATCHING_FOR_FJ 1
 #define ADD_TRUE_TOP_MATCHING_FOR_HTT 1
+#define ADD_TRUE_PARTON_MATCHING_FOR_FJ 0
+#define ADD_TRUE_PARTON_MATCHING_FOR_HTT 0
 //HEADERGEN_DEFINES
 
 //checks if a branch variable is undefined
