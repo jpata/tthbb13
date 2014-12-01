@@ -143,6 +143,44 @@ struct distance_sorter
   }
 };
 
+
+template <typename JetType>
+void fill_truth_matching(TTHTree* tthtree, 				 
+			 JetType x, // object for which to fill - fatjet or HTT cand
+			 int n, // position at which to insert new values in the tree (ie n_fat_jet)
+			 vector<const reco::Candidate*>  & truth_particles, // particles for matching
+			 std::string prefix, // prefix for branch names
+			 std::string truth_name // what are we matching (to select branch name to fill into) hadtop/parton/..
+			 ){
+
+  // Branch names to fill
+  std::string name_pt_branch = prefix + "close_";
+  name_pt_branch += truth_name;
+  name_pt_branch += "_pt";
+
+  std::string name_dr_branch = prefix + "close_";
+  name_dr_branch += truth_name;
+  name_dr_branch += "_dr";
+
+  // Sort true tops according to distance to object (fatjet, HTT cand) under study
+  sort(truth_particles.begin(), truth_particles.end(), 
+       distance_sorter<JetType, const reco::Candidate*>(x));	   
+
+  // Fill true pT and DeltaR if at least one truth object
+  if (truth_particles.size() > 0){		
+    float dR = ROOT::Math::VectorUtil::DeltaR( ptr(x)->p4(), ptr(truth_particles[0])->p4());			
+    tthtree->get_address<float *>(name_pt_branch)[n] = truth_particles[0]->pt();
+    tthtree->get_address<float *>(name_dr_branch)[n] = dR;       
+  }
+  // Otherwise use dummy values
+  else{
+    tthtree->get_address<float *>(name_pt_branch)[n] = DEF_VAL_FLOAT;
+    tthtree->get_address<float *>(name_dr_branch)[n] = 9999.0;
+  }
+
+}//fill_truth_matching
+
+
 // Function to fill the branches for a fatjet collection
 // This needs to be templated as we can have either PFJets or BasicJet 
 // objects as fatjets
@@ -153,7 +191,11 @@ void fill_fatjet_branches(const edm::Event& iEvent,
 			  std::string fj_nsubs_name,
 			  std::string fj_branches_name,
 			  // true top and anti top for optional matching
-			  const vector<const reco::Candidate*>  & true_t
+			  const vector<const reco::Candidate*>  & true_t,
+			  // hard partons for matching
+			  vector<const reco::Candidate*>  & hard_partons,
+			  // true higgs for matching
+			  vector<const reco::Candidate*>  & gen_higgs
 			  ){
   
   // Get Fatjet iteself
@@ -208,28 +250,15 @@ void fill_fatjet_branches(const edm::Event& iEvent,
     tthtree->get_address<float *>(prefix + "tau2")[n_fat_jet] = fatjet_nsub_tau2->get(n_fat_jet);
     tthtree->get_address<float *>(prefix + "tau3")[n_fat_jet] = fatjet_nsub_tau3->get(n_fat_jet);
 
-    // Optional: Fill true top matching information
-    if (ADD_TRUE_TOP_MATCHING_FOR_FJ){
-      
-      // Sort true tops according to distance to fatjet under study
-      sort(true_t_for_matching.begin(), 
-	   true_t_for_matching.end(), 
-	   distance_sorter<JetType, const reco::Candidate*>(x));	   
-      
-      // Fill true top pT and DeltaR if at least one true top
-      if (true_t_for_matching.size() > 0){		
-	float dR = ROOT::Math::VectorUtil::DeltaR( ptr(x)->p4(), ptr(true_t_for_matching[0])->p4());			
-	tthtree->get_address<float *>(prefix + "close_hadtop_pt" )[n_fat_jet] = true_t_for_matching[0]->pt();
-	tthtree->get_address<float *>(prefix + "close_hadtop_dr" )[n_fat_jet] = dR;       
-      }
-      // Otherwise use dummy values
-      else{
-	tthtree->get_address<float *>(prefix + "close_hadtop_pt" )[n_fat_jet] = DEF_VAL_FLOAT;
-	tthtree->get_address<float *>(prefix + "close_hadtop_dr" )[n_fat_jet] = 9999.0;
-      }
-    } // Done matching fatjets and true tops
+    // Optional: Fill truth matching information
+    if (ADD_TRUE_TOP_MATCHING_FOR_FJ)
+      fill_truth_matching<JetType>(tthtree, x, n_fat_jet, true_t_for_matching, prefix, "hadtop");
+    if (ADD_TRUE_PARTON_MATCHING_FOR_FJ)	      
+      fill_truth_matching<JetType>(tthtree, x, n_fat_jet, hard_partons, prefix, "parton");
+    if (ADD_TRUE_HIGGS_MATCHING_FOR_FJ)	      
+      fill_truth_matching<JetType>(tthtree, x, n_fat_jet, gen_higgs, prefix, "higgs");
         
-  } // End loop over fatjets
+  }// End loop over fatjets
   
   // Also count the number of fatjets
   std::string njet_branch("n__jet_" + fj_branches_name);
@@ -1344,6 +1373,14 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	vector<const reco::Candidate*> antitops_first;
 	vector<const reco::GenParticle*> bquarks;
 	vector<const reco::GenParticle*> antibquarks;
+	
+	// Hard partons (usually for QCD matching)
+	double min_hard_parton_pt = 200; 
+	vector<const reco::Candidate*> hard_partons;
+
+	// Higgs Bosons
+	double min_higgs_pt = 0.; 
+	vector<const reco::Candidate*> gen_higgs;
 
 	if (isMC_) {
 	  gen_association(pruned, 
@@ -1353,7 +1390,14 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 			  tops_first,
 			  antitops_first,
 			  bquarks,
-			  antibquarks);
+			  antibquarks);	  
+
+	  if (ADD_TRUE_PARTON_MATCHING_FOR_FJ || ADD_TRUE_PARTON_MATCHING_FOR_HTT)
+	    get_hard_partons(pruned, min_hard_parton_pt, hard_partons);
+
+	  if (ADD_TRUE_HIGGS_MATCHING_FOR_FJ || ADD_TRUE_HIGGS_MATCHING_FOR_HTT)
+	    get_gen_higgs(pruned, min_higgs_pt, gen_higgs);
+
 	}	
 
 	// Combine tops and antitops for truth matching
@@ -1444,28 +1488,14 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	   
 	    tthtree->get_address<int *>(prefix + "n_sj" )[n_top_jet]  = 3;
 	   
-	    // Optional: Fill true top matching information
-	    if (ADD_TRUE_TOP_MATCHING_FOR_HTT){
-	      
-	      // Sort true tops according to distance to HTT candidate under study
-	      sort(true_t_for_matching.begin(), 
-		   true_t_for_matching.end(), 
-		   distance_sorter<const reco::BasicJet&, const reco::Candidate*>(x));	   
-	      
-	      // Fill true top pT and DeltaR if at least one true top
-	      if (true_t_for_matching.size() > 0){		
-		float dR = ROOT::Math::VectorUtil::DeltaR( ptr(x)->p4(), ptr(true_t_for_matching[0])->p4());			
-		tthtree->get_address<float *>(prefix + "close_hadtop_pt" )[n_top_jet] = true_t_for_matching[0]->pt();
-		tthtree->get_address<float *>(prefix + "close_hadtop_dr" )[n_top_jet] = dR;       
-	      }
-	      // Otherwise use dummy values
-	      else{
-		tthtree->get_address<float *>(prefix + "close_hadtop_pt" )[n_top_jet] = DEF_VAL_FLOAT;
-		tthtree->get_address<float *>(prefix + "close_hadtop_dr" )[n_top_jet] = 9999.0;
-	      }
-	    } // Done matching fatjets and true tops
+	    // Optional: Fill truth matching information
+	    if (ADD_TRUE_TOP_MATCHING_FOR_HTT)
+	      fill_truth_matching<reco::BasicJet>(tthtree, x, n_top_jet, true_t_for_matching, prefix, "hadtop");
+	    if (ADD_TRUE_PARTON_MATCHING_FOR_HTT)
+	      fill_truth_matching<reco::BasicJet>(tthtree, x, n_top_jet, hard_partons, prefix, "parton");
+	    if (ADD_TRUE_HIGGS_MATCHING_FOR_HTT)
+	      fill_truth_matching<reco::BasicJet>(tthtree, x, n_top_jet, gen_higgs, prefix, "higgs");
 	    
-
 	    bool first = true;
 	    for (auto& constituent : x.getJetConstituents()) {
 	      if (constituent.isNull()) {
@@ -1532,7 +1562,9 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 								     fj_object_name,
 								     fj_nsubs_name,
 								     fj_branches_name,
-								     hadronic_ts
+								     hadronic_ts,
+								     hard_partons,
+								     gen_higgs
 								     );
 	  }
 	  // Fill BasicJets
@@ -1542,7 +1574,9 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 									   fj_object_name,
 									   fj_nsubs_name,
 									   fj_branches_name,
-									   hadronic_ts
+									   hadronic_ts,
+									   hard_partons,
+									   gen_higgs
 									   );
 	  }
 	  else{

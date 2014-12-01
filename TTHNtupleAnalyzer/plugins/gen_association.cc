@@ -213,7 +213,7 @@ void gen_association(edm::Handle<edm::View<reco::GenParticle>> pruned,
 		     vector<const reco::Candidate*> &antitops_first,		     
 		     vector<const reco::GenParticle*> & bquarks,
 		     vector<const reco::GenParticle*> & antibquarks) {
-
+ 
 	// Packed particles are all the status 1, so usable to remake jets
 	// The navigation from status 1 to pruned is possible (the other direction should be made by hand)
 	//Handle<edm::View<pat::PackedGenParticle>> packed;
@@ -348,3 +348,91 @@ int is_hadronic_top(const reco::Candidate* p) {
     return 1;
 
 }
+
+// Find all hard partons and add them to the vector
+// Useful for truth-matching in QCD sample
+// - Start with all Status==3 particles
+// - Remove the ones that have a daughter that is also Status==3
+// - Remove if pT < min_parton_pt
+// 
+// Important: This procedure might not work anymore with Pythia 8
+// (no more status 3)
+// https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMiniAOD#MC_Truth
+
+void get_hard_partons(edm::Handle<edm::View<reco::GenParticle>> pruned, 
+		      double min_parton_pt,
+		      vector<const reco::Candidate*> & hard_partons){
+
+  bool debug_this = false;
+
+
+  if (debug_this)
+    std::cout << "number of pruned particles: " << pruned->size() << std::endl;
+
+  // Extract the status three particles
+  vector<const reco::GenParticle*> status_3_particles;
+  for (auto& gp : *pruned){
+    if (gp.status() == 3)
+      status_3_particles.push_back(&gp);
+  }    
+
+  if (debug_this)
+    std::cout << "number of status 3 particles: " << status_3_particles.size() << std::endl;
+
+  for (auto& gp : status_3_particles){    
+
+    bool keep = true;
+
+    if (debug_this)
+      std::cout << "\t number of daughters: " << gp->numberOfDaughters() << std::endl;
+    
+    // Loop over daughters
+    for (unsigned id=0; id != gp->numberOfDaughters(); id++){      
+      
+      // Check if daughter is also in the list of status 3 particles
+      const reco::Candidate* daughter = gp->daughter(id);      
+      bool found = std::find(status_3_particles.begin(), 
+			    status_3_particles.end(), 
+			    daughter) != status_3_particles.end();     
+
+      if (found)
+	keep = false;	      
+
+      if (debug_this)
+	std::cout << "\t\t at daughter: " << id << "  " << found << std::endl;
+      
+    } // end of loop over daughters
+    
+    // If no daughter is also status 3 and particle has enough pt:
+    // store it
+    if (keep && (gp->pt() >= min_parton_pt))
+      hard_partons.push_back(gp);         
+
+  } // end of looping over status 3 particles
+
+  if (debug_this)
+    std::cout << "number of hard partons: " << hard_partons.size() << std::endl;    
+
+} // get_hard_partons
+
+
+
+// Find truth level higgs bosons and add them to the vector
+// status==3
+// |pdgId|==25
+// pt>min_higgs_pt
+void get_gen_higgs(edm::Handle<edm::View<reco::GenParticle>> pruned, 
+		   double min_higgs_pt,
+		   vector<const reco::Candidate*> & gen_higgs){
+
+  // Extract higgs
+  for (auto& gp : *pruned){
+    if ( (abs(gp.pdgId()) == 25) &&
+	 (gp.status() == 3) &&
+	 (gp.pt() > min_higgs_pt) )
+      gen_higgs.push_back(&gp);
+  } // end loop over gen particles
+
+} // get_gen_higgs
+
+

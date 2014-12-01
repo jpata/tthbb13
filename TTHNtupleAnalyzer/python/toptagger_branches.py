@@ -11,7 +11,8 @@ for fj_name in ["fat"]:
     for branch_name in [
             "pt", "eta", "phi", "mass",  # Kinematics
             "tau1", "tau2", "tau3",  # N-subjettiness
-            "close_hadtop_pt",  "close_hadtop_dr"       # truth matching
+            "close_hadtop_pt",  "close_hadtop_dr", # true top matching
+            "close_higgs_pt",  "close_higgs_dr"    # true higgs matching
     ]:     
 
         full_branch_name = "jet_{0}__{1}".format(fj_name, branch_name)
@@ -32,7 +33,8 @@ htt_float_branches =  [
     "fW", "massRatioPassed",                     # Standard HTT variables
     "Rmin", "ptFiltForRminExp", "RminExpected",  # MultiR variables
     "prunedMass", "topMass", "unfilteredMass",   # extra masses
-    "close_hadtop_pt",  "close_hadtop_dr"        # truth matching
+    "close_hadtop_pt",  "close_hadtop_dr",       # true top matching
+    "close_higgs_pt",  "close_higgs_dr"          # true higgs matching
 ]
 
 htt_int_branches = ["child_idx", "isMultiR", "n_sj"]
