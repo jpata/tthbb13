@@ -1,7 +1,7 @@
 from TTH.TTHNtupleAnalyzer.headergen import *
 
 # Fatjet Branche
-for fj_name in ["fat"]:
+for fj_name in ["fat", "fatMDT", "fatMDTFiltered"]:
 
     # How many of these objects do we have?
     full_counter_name = "n__jet_{0}".format(fj_name)
