@@ -44,8 +44,10 @@ process.source = cms.Source("PoolSource",
 process.chs = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedPFCandidates"), cut = cms.string("fromPV"))
 
 # Add stand-alone fat-jet collection 
-from RecoJets.JetProducers.PFJetParameters_cfi import *
 from RecoJets.JetProducers.AnomalousCellParameters_cfi import *
+from RecoJets.JetProducers.PFJetParameters_cfi import *
+from RecoJets.JetProducers.CATopJetParameters_cfi import *
+
 
 # First create the ungroomed CA08 and CA15 fatjet collections:
 
@@ -127,6 +129,62 @@ process.ca15PFJetsCHSTrimmed = process.ca15PFJetsCHS.clone(
     )
 
 
+# CMS Top Tagger Jets
+process.cmsTopTagCa08PFJetsCHS = cms.EDProducer(
+        "CATopJetProducer",
+        PFJetParameters,
+        AnomalousCellParameters,
+        CATopJetParameters,
+        jetAlgorithm = cms.string("CambridgeAachen"),
+        rParam = cms.double(0.8),
+        writeCompound = cms.bool(True)
+    )
+process.cmsTopTagCa08PFJetsCHS.src = cms.InputTag('chs')
+process.cmsTopTagCa08PFJetsCHS.doAreaFastjet = cms.bool(True)
+process.cmsTopTagCa08PFJetsCHS.jetPtMin = cms.double(200.0)
+
+process.cmsTopTagCa15PFJetsCHS = cms.EDProducer(
+        "CATopJetProducer",
+        PFJetParameters,
+        AnomalousCellParameters,
+        CATopJetParameters,
+        jetAlgorithm = cms.string("CambridgeAachen"),
+        rParam = cms.double(1.5),
+        writeCompound = cms.bool(True)
+    )
+process.cmsTopTagCa15PFJetsCHS.src = cms.InputTag('chs')
+process.cmsTopTagCa15PFJetsCHS.doAreaFastjet = cms.bool(True)
+process.cmsTopTagCa15PFJetsCHS.jetPtMin = cms.double(200.0)
+
+
+# CMS Top Tagger Infos
+process.ca08CMSTopTagInfos = cms.EDProducer("CATopJetTagger",
+                                            src = cms.InputTag("cmsTopTagCa08PFJetsCHS"),
+                                            TopMass = cms.double(173),
+                                            TopMassMin = cms.double(0.),
+                                            TopMassMax = cms.double(250.),
+                                            WMass = cms.double(80.4),
+                                            WMassMin = cms.double(0.0),
+                                            WMassMax = cms.double(200.0),
+                                            MinMassMin = cms.double(0.0),
+                                            MinMassMax = cms.double(200.0),
+                                            verbose = cms.bool(False))
+
+
+process.ca15CMSTopTagInfos = cms.EDProducer("CATopJetTagger",
+                                            src = cms.InputTag("cmsTopTagCa15PFJetsCHS"),
+                                            TopMass = cms.double(173),
+                                            TopMassMin = cms.double(0.),
+                                            TopMassMax = cms.double(250.),
+                                            WMass = cms.double(80.4),
+                                            WMassMin = cms.double(0.0),
+                                            WMassMax = cms.double(200.0),
+                                            MinMassMin = cms.double(0.0),
+                                            MinMassMax = cms.double(200.0),
+                                            verbose = cms.bool(False))
+
+
+
 # Nsubjettiness for groomed and ungroomed fatjets
 process.NjettinessCA08 = cms.EDProducer("NjettinessAdder",
                                         src=cms.InputTag("ca08PFJetsCHS"),
@@ -204,7 +262,11 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
 
         httObjects  = cms.vstring(['LooseMultiRHTTJetsCHS']),                                           
         httBranches = cms.vstring(['looseMultiRHTT']),                                           
-        
+       
+        cmsttObjects  = cms.vstring(['cmsTopTagCa08PFJetsCHS', 'cmsTopTagCa15PFJetsCHS']),
+        cmsttInfos    = cms.vstring(['ca08CMSTopTagInfos',     'ca15CMSTopTagInfos']),
+        cmsttBranches = cms.vstring(['ca08cmstt',              'ca15cmstt']),
+
 	jetMult_min   = cms.untracked.int32(-99),
 	jetPt_min     = cms.untracked.double(15.),
 	muPt_min_     = cms.untracked.double(15.),
@@ -223,10 +285,6 @@ process.TFileService = cms.Service("TFileService",
 	fileName = cms.string(options.outputFile)
 )
 
-process.load('RecoJets.JetProducers.caTopTaggers_cff')
-
-from RecoJets.JetProducers.AnomalousCellParameters_cfi import *
-from RecoJets.JetProducers.PFJetParameters_cfi import *
 
 
 process.LooseMultiRHTTJetsCHS = cms.EDProducer(
@@ -282,6 +340,11 @@ process.p = cms.Path(
         process.NjettinessCA15Filtered *        
         process.NjettinessCA15Pruned *        
         process.NjettinessCA15Trimmed *        
+
+        process.cmsTopTagCa08PFJetsCHS *
+        process.cmsTopTagCa15PFJetsCHS *
+        process.ca08CMSTopTagInfos * 
+        process.ca15CMSTopTagInfos * 
 
 	process.LooseMultiRHTTJetsCHS * 
        

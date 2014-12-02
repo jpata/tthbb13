@@ -4,10 +4,13 @@ from TTH.TTHNtupleAnalyzer.headergen import *
 
 defines.extend(["#define ADD_TRUE_TOP_MATCHING_FOR_FJ 1",
                 "#define ADD_TRUE_TOP_MATCHING_FOR_HTT 1",
+                "#define ADD_TRUE_TOP_MATCHING_FOR_CMSTT 0",
                 "#define ADD_TRUE_HIGGS_MATCHING_FOR_FJ 1",
                 "#define ADD_TRUE_HIGGS_MATCHING_FOR_HTT 1",
+                "#define ADD_TRUE_HIGGS_MATCHING_FOR_CMSTT 0",
                 "#define ADD_TRUE_PARTON_MATCHING_FOR_FJ 0",
                 "#define ADD_TRUE_PARTON_MATCHING_FOR_HTT 0",
+                "#define ADD_TRUE_PARTON_MATCHING_FOR_CMSTT 0",
             ])
 
 # True Top Branches

@@ -61,8 +61,8 @@
 #include "DataFormats/PatCandidates/interface/MET.h"
 #include "DataFormats/PatCandidates/interface/PackedCandidate.h"
 
-//for top tagger
-//#include "DataFormats/JetReco/interface/CATopJetTagInfo.h"
+//for top taggers
+#include "DataFormats/JetReco/interface/CATopJetTagInfo.h"
 #include "DataFormats/JetReco/interface/HTTTopJetTagInfo.h"
 
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
@@ -339,16 +339,6 @@ private:
 	const edm::EDGetTokenT<pat::JetCollection> jetToken_;
 	const edm::EDGetTokenT<std::vector<reco::GenJet>> genJetToken_;
 
-	// collection of top jets
-	const edm::EDGetTokenT<edm::View<reco::BasicJet>> topJetToken_;
-	const edm::EDGetTokenT<edm::View<reco::PFJet>> topJetSubjetToken_;
-	const edm::EDGetTokenT<edm::View<reco::HTTTopJetTagInfo>> topJetInfoToken_;
-	
-	//second collection of top jets
-	const edm::EDGetTokenT<edm::View<reco::BasicJet>> topJetToken2_;
-	const edm::EDGetTokenT<edm::View<reco::PFJet>> topJetSubjetToken2_;
-	const edm::EDGetTokenT<edm::View<reco::HTTTopJetTagInfo>> topJetInfoToken2_;
-
 	// collection of vertices
 	const edm::EDGetTokenT<reco::VertexCollection> vertexToken_;
 
@@ -376,6 +366,15 @@ private:
         // !!the lists have to be in sync!!
 	const std::vector<std::string> htt_objects_;
 	const std::vector<std::string> htt_branches_;
+
+        // CMSTopTagger information
+        // objects = name of the input jet collection
+        // infos = name of the input info collection
+        // cmstt branches = name of the branches to put this in
+        // !!the lists have to be in sync!!
+	const std::vector<std::string> cmstt_objects_;
+	const std::vector<std::string> cmstt_infos_;
+	const std::vector<std::string> cmstt_branches_;
 	
 	// LHE event product (may not be present!!)
 	const edm::EDGetTokenT<LHEEventProduct> lheToken_;
@@ -440,6 +439,10 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
 
         htt_objects_(iConfig.getParameter<std::vector<std::string>>("httObjects")),
         htt_branches_(iConfig.getParameter<std::vector<std::string>>("httBranches")),
+
+        cmstt_objects_(iConfig.getParameter<std::vector<std::string>>("cmsttObjects")),
+        cmstt_infos_(iConfig.getParameter<std::vector<std::string>>("cmsttInfos")),
+        cmstt_branches_(iConfig.getParameter<std::vector<std::string>>("cmsttBranches")),
 							  
 	//Gen-level
 	lheToken_( (iConfig.getParameter<edm::InputTag>("lhe")).label()!="" ?
@@ -546,6 +549,9 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	// Sanity check the htt lists-of-names
 	assert(htt_objects_.size()==htt_branches_.size());
 
+	// Sanity check the cmstt lists-of-names
+	assert(cmstt_objects_.size()==cmstt_branches_.size());
+	assert(cmstt_objects_.size()==cmstt_infos_.size());
 	       
 	edm::Handle<edm::TriggerResults> triggerBits;
 	edm::Handle<pat::TriggerObjectStandAloneCollection> triggerObjects;
@@ -1387,10 +1393,10 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 			  bquarks,
 			  antibquarks);	  
 
-	  if (ADD_TRUE_PARTON_MATCHING_FOR_FJ || ADD_TRUE_PARTON_MATCHING_FOR_HTT)
+	  if (ADD_TRUE_PARTON_MATCHING_FOR_FJ || ADD_TRUE_PARTON_MATCHING_FOR_HTT || ADD_TRUE_PARTON_MATCHING_FOR_CMSTT)
 	    get_hard_partons(pruned, min_hard_parton_pt, hard_partons);
 
-	  if (ADD_TRUE_HIGGS_MATCHING_FOR_FJ || ADD_TRUE_HIGGS_MATCHING_FOR_HTT)
+	  if (ADD_TRUE_HIGGS_MATCHING_FOR_FJ || ADD_TRUE_HIGGS_MATCHING_FOR_HTT || ADD_TRUE_HIGGS_MATCHING_FOR_CMSTT)
 	    get_gen_higgs(pruned, min_higgs_pt, gen_higgs);
 
 	}	
@@ -1440,7 +1446,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	      true_t_for_matching.push_back(*iter);
 	  }
 
-
+          // HEPTopTagger
 	  // Top jets and subjets are associated by indices. See:
 	  // /cvmfs/cms.cern.ch/slc6_amd64_gcc481/cms/cmssw/CMSSW_7_0_9/src/RecoJets/JetProducers/plugins/CompoundJetProducer.cc
 	  // about the association
@@ -1530,6 +1536,112 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	  *(tthtree->get_address<int *>(ncand_sj_branch )) = n_top_jet_subjet;
 
 	} // End of filling HTT related branches
+
+	
+	// Loop over CMSTT collections
+	for (unsigned i_cmstt_coll = 0; i_cmstt_coll < cmstt_objects_.size(); i_cmstt_coll++){
+
+	  // Get the proper names
+	  std::string cmstt_object_name   = cmstt_objects_[i_cmstt_coll];
+	  std::string cmstt_infos_name    = cmstt_infos_[i_cmstt_coll];
+	  std::string cmstt_branches_name = cmstt_branches_[i_cmstt_coll];
+ 	  
+	  // Top tagger jets
+	  edm::Handle<edm::View<reco::BasicJet>> top_jets;
+	  iEvent.getByLabel(cmstt_object_name, top_jets);
+
+	  // Extra Info
+	  edm::Handle<edm::View<reco::CATopJetTagInfo>> top_jet_infos;
+	  iEvent.getByLabel(cmstt_infos_name, top_jet_infos);
+
+	  // Make sure both collections have the same size
+	  assert(top_jets->size()==top_jet_infos->size());
+
+	  // Create a list of true_tops that can be used for matching
+	  // only take the ones passing the pT threshold
+	  float min_true_top_pt = 200;
+	  vector<const reco::Candidate*>  true_t_for_matching;
+	  
+	  for (vector<const reco::Candidate*>::const_iterator iter = hadronic_ts.begin();
+	       iter != hadronic_ts.end();
+	       ++iter){
+	    if ((*iter)->pt() > min_true_top_pt)      
+	      true_t_for_matching.push_back(*iter);
+	  }
+
+	  // Top jets and subjets are associated by indices. See:
+	  // /cvmfs/cms.cern.ch/slc6_amd64_gcc481/cms/cmssw/CMSSW_7_0_9/src/RecoJets/JetProducers/plugins/CompoundJetProducer.cc
+	  // about the association
+	  int n_top_jet_subjet = 0;
+
+	  // Loop over top candidates
+	  for (unsigned int n_top_jet=0; n_top_jet<top_jets->size(); n_top_jet++) {
+
+	    const reco::BasicJet& x = top_jets->at(n_top_jet);
+	    const reco::CATopJetTagInfo& jet_info = top_jet_infos->at(n_top_jet);
+
+	    std::string prefix("jet_");
+	    prefix.append(cmstt_branches_name);
+	    prefix.append("__");
+
+	    tthtree->get_address<float *>(prefix + "eta"    )[n_top_jet] = x.eta();
+	    tthtree->get_address<float *>(prefix + "pt"     )[n_top_jet] = x.pt();
+	    tthtree->get_address<float *>(prefix + "phi"    )[n_top_jet] = x.phi();
+	    tthtree->get_address<float *>(prefix + "mass"   )[n_top_jet] = x.mass();
+
+	    tthtree->get_address<float *>(prefix + "minMass" )[n_top_jet] = jet_info.properties().minMass;
+	    tthtree->get_address<float *>(prefix + "wMass" )[n_top_jet] = jet_info.properties().wMass;
+	    tthtree->get_address<float *>(prefix + "topMass" )[n_top_jet] = jet_info.properties().topMass;
+	    tthtree->get_address<int   *>(prefix + "nSubJets" )[n_top_jet] = jet_info.properties().nSubJets;
+	   
+	    // Optional: Fill truth matching information
+	    if (ADD_TRUE_TOP_MATCHING_FOR_CMSTT)
+	      fill_truth_matching<reco::BasicJet>(tthtree, x, n_top_jet, true_t_for_matching, prefix, "hadtop");
+	    if (ADD_TRUE_PARTON_MATCHING_FOR_CMSTT)
+	      fill_truth_matching<reco::BasicJet>(tthtree, x, n_top_jet, hard_partons, prefix, "parton");
+	    if (ADD_TRUE_HIGGS_MATCHING_FOR_CMSTT)
+	      fill_truth_matching<reco::BasicJet>(tthtree, x, n_top_jet, gen_higgs, prefix, "higgs");
+	    
+	    bool first = true;
+	    for (auto& constituent : x.getJetConstituents()) {
+	      if (constituent.isNull()) {
+		edm::LogWarning("top jets") << "n_top_jet=" << n_top_jet << " constituent is not valid";
+		break;
+	      }
+	      if (first) {
+	      	tthtree->get_address<int *>(prefix + "child_idx" )[n_top_jet]  = n_top_jet_subjet;
+	      }
+	      
+	      std::string prefix_sj("jet_");
+	      prefix_sj.append(cmstt_branches_name);
+	      prefix_sj.append("_sj__");
+
+	      tthtree->get_address<float *>(prefix_sj + "pt" )[n_top_jet_subjet]  = constituent->pt();
+	      tthtree->get_address<float *>(prefix_sj + "eta" )[n_top_jet_subjet]  = constituent->eta();
+	      tthtree->get_address<float *>(prefix_sj + "phi" )[n_top_jet_subjet]  = constituent->phi();
+	      tthtree->get_address<float *>(prefix_sj + "mass" )[n_top_jet_subjet]  = constituent->mass();
+	      tthtree->get_address<float *>(prefix_sj + "energy" )[n_top_jet_subjet]  = constituent->energy();
+
+	      tthtree->get_address<int *>(prefix_sj + "parent_idx" )[n_top_jet_subjet]  = n_top_jet;
+
+	      n_top_jet_subjet += 1;	      
+	      first = false;
+	    }
+	  } // End of loop over candidates
+
+	  // Also fill counters	  
+	  std::string ncand_branch("n__jet_");
+	  ncand_branch.append(cmstt_branches_name);
+
+	  std::string ncand_sj_branch("n__jet_");
+	  ncand_sj_branch.append(cmstt_branches_name);
+	  ncand_sj_branch.append("_sj");
+	  
+	  *(tthtree->get_address<int *>(ncand_branch ))    = top_jets->size();
+	  *(tthtree->get_address<int *>(ncand_sj_branch )) = n_top_jet_subjet;
+
+	} // End of filling CMSTT related branches
+
 
 	if (n__lep>=N_MAX) {
 		edm::LogError("N_MAX") << "Exceeded vector N_MAX with n__lep: " << n__lep << ">=> " << N_MAX;
