@@ -136,6 +136,10 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
         httObjects  = cms.vstring(['HTTJetsCHS', 'MultiRHTTJetsCHS']),
         httBranches = cms.vstring(['toptagger', 'toptagger2']),
 
+        cmsttObjects  = cms.vstring([]),
+        cmsttInfos    = cms.vstring([]),
+        cmsttBranches = cms.vstring([]),
+
 	triggerIdentifiers = triggerPathNames,
 	#triggerIdentifiersForMatching = cms.vstring([
 	#		'HLT_Ele27_WP80_v*',
