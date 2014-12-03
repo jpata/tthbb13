@@ -414,6 +414,10 @@ private:
 	const double	muPt_min_;
 	const double	elePt_min_;
 	const double	tauPt_min_;
+	JetCorrectorParameters* jetCorrPars;
+	JetCorrectionUncertainty* jetCorrUnc;
+	const edm::EDGetTokenT<double> rhoSrc_;
+
 };
 
 
@@ -463,7 +467,10 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
 	jetMult_min_(iConfig.getUntrackedParameter<int> ("jetMult_min", DEF_VAL_INT)),
 	muPt_min_ (iConfig.getUntrackedParameter<double>("muPt_min", 5.)),
 	elePt_min_ (iConfig.getUntrackedParameter<double>("elePt_min", 5.)),
-	tauPt_min_ (iConfig.getUntrackedParameter<double>("tauPt_min", 5.))
+	tauPt_min_ (iConfig.getUntrackedParameter<double>("tauPt_min", 5.)),
+	jetCorrPars(new JetCorrectorParameters(iConfig.getParameter<edm::FileInPath>("jecFile").fullPath().c_str(), "Total")),
+	jetCorrUnc(new JetCorrectionUncertainty(*jetCorrPars)),
+	rhoSrc_(consumes<double>(iConfig.getParameter<edm::InputTag>("rho")))
 {
 	tthtree->make_branches();
 	
@@ -559,6 +566,10 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	if (isMC_) {
 		iEvent.getByToken(prunedGenToken_,pruned);
 	}
+	
+	edm::Handle<double> rhoHandle;
+	iEvent.getByToken(rhoSrc_, rhoHandle);
+	const double rho = *rhoHandle;
 
 	for (unsigned int j = 0; j < triggerIdentifiers_.size(); ++j) {
 
@@ -765,7 +776,8 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		tthtree->lep__type[n__lep] = abs(x.pdgId());
 		tthtree->lep__charge[n__lep] = x.charge();
 
-		tthtree->lep__is_tight[n__lep] = is_tight_muon(x, PV);
+		tthtree->lep__is_tight_id[n__lep] = is_tight_muon(x, PV);
+		tthtree->lep__is_tight[n__lep] = is_tight_muon(x, PV) && (dbc_rel_iso(x) < 0.12);
 		tthtree->lep__is_loose[n__lep] = is_loose_muon(x);
 
 		tthtree->lep__ch_iso[n__lep] = x.chargedHadronIso();
@@ -775,12 +787,8 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		tthtree->lep__p_iso[n__lep] = x.particleIso();
 		tthtree->lep__ph_iso[n__lep] = x.photonIso();
 
-		//manual DBC iso
-		//const auto& pfiso = x.pfIsolationR04();
-		//tthtree->lep__rel_iso[n__lep] = (pfiso.sumChargedHadronPt + std::max(0.0, pfiso.sumNeutralHadronEt + pfiso.sumPhotonEt - 0.5 * pfiso.sumPUPt))/x.pt();
-
-		//automatic delta-beta relative isolation
 		tthtree->lep__rel_iso[n__lep] = dbc_rel_iso(x);
+		tthtree->lep__rel_iso2[n__lep] = rc_rel_iso(x, rho);
 
 		if (x.muonBestTrack().isNonnull()) {
 			tthtree->lep__dxy[n__lep] = x.muonBestTrack()->dxy(PV.position());
@@ -856,17 +864,12 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		tthtree->lep__p_iso[n__lep] = x.particleIso();
 		tthtree->lep__ph_iso[n__lep] = x.photonIso();
 
-		//manual rho-corrected, probably deprecated
-		//const double eff_area = ElectronEffectiveArea::GetElectronEffectiveArea(
-		//	electron_eff_area_type,
-		//	x.eta(),
-		//	electron_eff_area_target
-		//);
-		//isocorr = PFChargedIso (PFNoPU) + max(PFIso(γ+NH) - rho * Aeff(γ+NH), 0.)
-		//float rc_iso = (lepton.chargedHadronIso() + std::max(0., lepton.neutralHadronIso() + lepton.photonIso() - ea*(*rho)))/lepton.userFloat("ptCorr");
 		tthtree->lep__rel_iso[n__lep] = dbc_rel_iso(x);
+		tthtree->lep__rel_iso2[n__lep] = rc_rel_iso(x, rho);
+		LogDebug("leptoniso") << dbc_rel_iso(x) << " " << x.userFloat("deltaBetaCorrRelIso") << " " << x.userFloat("rhoCorrRelIso");
 
-		tthtree->lep__is_tight[n__lep] = is_tight_electron(x, PV);
+		tthtree->lep__is_tight_id[n__lep] = is_tight_electron(x, PV);
+		tthtree->lep__is_tight[n__lep] = is_tight_electron(x, PV) && (dbc_rel_iso(x) < 0.1);
 		tthtree->lep__is_loose[n__lep] = is_loose_electron(x, PV);
 
 		unsigned int ele_id_idx = 0;
@@ -1009,25 +1012,10 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
 	//jet uncertainties
 	//https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyCorrections
-	//edm::ESHandle<JetCorrectorParametersCollection> JetCorParColl;
-	//iSetup.get<JetCorrectionsRecord>().get("AK4PF", JetCorParColl); 
-	//JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];
-	//JetCorrectionUncertainty *jec_unc = new JetCorrectionUncertainty(JetCorPar);
-	//Get the jet corrector from the event setup
-	//const JetCorrector* jet_corrector = JetCorrector::getJetCorrector("AK4PF", iSetup);
-
 
 	std::vector<pat::Jet> analysis_jets;
 	for (auto x : *jets) {
-
-		//edm::RefToBase<reco::Jet> jet_ref(edm::Ref<std::vector<pat::Jet>>(jets, n__jet));
-
-		//const double jec = jet_corrector->correction(x, jet_ref, iEvent, iSetup);
-		//const double unc = jec_unc->getUncertainty(true);
-
 		//assert(_x != NULL);
-		LogDebug("jets") << "n__jet=" << n__jet << CANDPRINT(x) << " " << x.userFloat("pileupJetId:fullDiscriminant");
-		//LogDebug("jets") << "n__jet=" << n__jet << CANDPRINT(x) << " " << unc;
 
 		// jet pt cut
 		if( x.pt()<jetPt_min_ ) {
@@ -1086,6 +1074,12 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 				minDpT = dpT;
 			}
 		}
+		
+		jetCorrUnc->setJetEta(x.eta());	
+		jetCorrUnc->setJetPt(x.pt());	
+		const double unc = jetCorrUnc->getUncertainty(true);
+		
+		LogDebug("jets") << "n__jet=" << n__jet << CANDPRINT(x) << " puid=" << x.userFloat("pileupJetId:fullDiscriminant") << " unc=" << unc;
 
 		tthtree->jet__eta			[n__jet] = x.eta();
 		tthtree->jet__pt			[n__jet] = x.pt();
@@ -1095,6 +1089,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		tthtree->jet__energy		[n__jet] = x.energy();
 		tthtree->jet__bd_csv		[n__jet] = x.bDiscriminator("combinedSecondaryVertexBJetTags");
 		tthtree->jet__id			[n__jet] = x.partonFlavour();
+		tthtree->jet__unc			[n__jet] = unc;
 
 		tthtree->jet__jetId			[n__jet] = int(jetID( x ));
 		tthtree->jet__pileupJetId	[n__jet] = x.userFloat("pileupJetId:fullDiscriminant");

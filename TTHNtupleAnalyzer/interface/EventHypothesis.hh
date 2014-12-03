@@ -1,71 +1,73 @@
 #include <algorithm>
 #include "TTH/TTHNtupleAnalyzer/interface/HypoEnums.hh"
+#include <EgammaAnalysis/ElectronTools/interface/ElectronEffectiveArea.h>
 
 //working points from RecoJets/JetProducers/python/PileupJetIDCutParams_cfi.py
 //Eta Categories  0-2.5 2.5-2.75 2.75-3.0 3.0-5.0
 namespace pu_mva {
 
 float full_chs_loose[4][4] = {
-	{-0.98,-0.95,-0.94,-0.94}, //pt 0-10
-	{-0.98,-0.95,-0.94,-0.94}, //pt 10-20
-	{-0.89,-0.77,-0.69,-0.75}, //pt 20-30
-	{-0.89,-0.77,-0.69,-0.57}, //pt 30-50
+    {-0.98,-0.95,-0.94,-0.94}, //pt 0-10
+    {-0.98,-0.95,-0.94,-0.94}, //pt 10-20
+    {-0.89,-0.77,-0.69,-0.75}, //pt 20-30
+    {-0.89,-0.77,-0.69,-0.57}, //pt 30-50
 };
 
 int eta_idx(float eta) {
-	const float ae = TMath::Abs(eta);
-	if (ae < 2.5) {
-		return 0;
-	}
-	else if(ae < 2.75) {
-		return 1;
-	}	
-	else if(ae < 3.0) {
-		return 2;
-	}	
-	else if(ae < 5.0) {
-		return 3;
-	} else {
-		edm::LogWarning("jet_pu_id") << "abs eta outside range " << ae;
-		return 3;
-	}	
+    const float ae = TMath::Abs(eta);
+    if (ae < 2.5) {
+        return 0;
+    }
+    else if(ae < 2.75) {
+        return 1;
+    }    
+    else if(ae < 3.0) {
+        return 2;
+    }    
+    else if(ae < 5.0) {
+        return 3;
+    } else {
+        edm::LogWarning("jet_pu_id") << "abs eta outside range " << ae;
+        return 3;
+    }    
 }
 
 int pt_idx(float pt) {
-	if (pt < 10) {
-		return 0;
-	}
-	else if(pt < 20) {
-		return 1;
-	}	
-	else if(pt < 30) {
-		return 2;
-	}	
-	else if(pt < 50) {
-		return 3;
-	} else {
-		//edm::LogWarning("jet_pu_id") << "pt outside range " << pt;
-		return -1;
-	}	
+    if (pt < 10) {
+        return 0;
+    }
+    else if(pt < 20) {
+        return 1;
+    }    
+    else if(pt < 30) {
+        return 2;
+    }    
+    else if(pt < 50) {
+        return 3;
+    } else {
+        //edm::LogWarning("jet_pu_id") << "pt outside range " << pt;
+        return -1;
+    }    
 }
 
 bool pass_id(const pat::Jet& x, float mva) {
-	int _pt_idx = pt_idx(x.pt());
-	int _eta_idx = eta_idx(x.eta());
-	
-	//hard jet
-	if (_pt_idx == -1) {
-		return true;	
-	}
+    int _pt_idx = pt_idx(x.pt());
+    int _eta_idx = eta_idx(x.eta());
+    
+    //hard jet
+    if (_pt_idx == -1) {
+        return true;    
+    }
 
-	if (mva > full_chs_loose[_pt_idx][_eta_idx]) {
-		return true;	
-	}
-	return false;
+    if (mva > full_chs_loose[_pt_idx][_eta_idx]) {
+        return true;    
+    }
+    return false;
 }
 
 }
 
+//checks if object o is in collection v
 template <typename T> bool is_in(const std::vector<T>& v, T o) {
     return std::find(v.begin(), v.end(), o)!=v.end();
 }
@@ -85,6 +87,36 @@ double dbc_rel_iso(const pat::Muon& lepton) {
            );
 }
 
+// Muon EA source info: https://indico.cern.ch/getFile.py/access?contribId=1&resId=0&materialId=slides&confId=188494 (slide 9, last column (dR<0.4))
+double effective_area(const pat::Muon& lepton) {
+    const double eta = fabs(lepton.eta());
+    if (eta < 1.0) return 0.674;
+    if (eta < 1.5) return 0.565;
+    if (eta < 2.0) return 0.442;
+    if (eta < 2.2) return 0.515;
+    if (eta < 2.3) return 0.821;
+    if (eta < 2.4) return 0.66;
+    else return 0.0;
+}
+
+// Electron EA source info: https://twiki.cern.ch/twiki/bin/view/CMS/EgammaEARhoCorrection
+double effective_area(const pat::Electron& lepton) {
+    //FIXME: perhaps corrected eta needed, e.g. supercluster    
+    const double eta = lepton.eta();
+    return ElectronEffectiveArea::GetElectronEffectiveArea(
+        ElectronEffectiveArea::ElectronEffectiveAreaType::kEleGammaAndNeutralHadronIso03,
+        eta, ElectronEffectiveArea::ElectronEffectiveAreaTarget::kEleEAData2012);
+}
+
+//rho-corrected relative isolation
+template <typename T>
+double rc_rel_iso(const T& lepton, double rho) {
+    double ea = effective_area(lepton);
+    //FIXME: perhaps corrected pt needed, e.g. ECAL driven pt for electrons    
+    double pt = lepton.pt();
+    return (lepton.chargedHadronIso() + std::max(0., lepton.neutralHadronIso() + lepton.photonIso() - ea*(rho)))/pt;
+}
+
 //jet ID
 //https://twiki.cern.ch/twiki/bin/viewauth/CMS/TopJME#Jets
 bool jetID(const pat::Jet& j) {
@@ -100,7 +132,6 @@ bool jetID(const pat::Jet& j) {
 //Single lepton e + n
 bool is_tight_electron(const pat::Electron& ele, const reco::Vertex& vtx) {
     const float ae = TMath::Abs(ele.eta());
-    
     if (ele.gsfTrack().isNull()) {
         return false;
     }
@@ -110,14 +141,16 @@ bool is_tight_electron(const pat::Electron& ele, const reco::Vertex& vtx) {
         ele.pt() > 30 && ae < 2.5 && !(ae>1.4442 && ae<1.5660) &&
         TMath::Abs(ele.gsfTrack()->dxy(vtx.position())) < 0.02 &&
         ele.passConversionVeto() &&
-        
         //throws error:
         //pat::Electron: the ID mvaTrigV0 can't be found in this pat::Electron.
         //The available IDs are: 'eidLoose' 'eidRobustHighEnergy' 'eidRobustLoose' 'eidRobustTight' 'eidTight'
         //ele.electronID("mvaTrigV0") > 0.5 &&
-        ele.electronID("eidLoose") > 0.5 &&
+        //FIXME: currently, using loose electron ID instead of mvaTrigV0, also
+		//need to optimize WP
+        ele.electronID("eidLoose") > 0.5// &&
+
         //ele.gsfTrack()->trackerExpectedHitsInner().numberOfHits() <= 0 &&
-        dbc_rel_iso(ele) < 0.1
+        //dbc_rel_iso(ele) < 0.1
     );
 }
 
@@ -138,9 +171,11 @@ bool is_loose_electron(const pat::Electron& ele, const reco::Vertex& vtx) {
         //pat::Electron: the ID mvaTrigV0 can't be found in this pat::Electron.
         //The available IDs are: 'eidLoose' 'eidRobustHighEnergy' 'eidRobustLoose' 'eidRobustTight' 'eidTight'
         //ele.electronID("mvaTrigV0") > 0.5 &&
-        ele.electronID("eidLoose") > 0.5 &&
+        //FIXME: currently, using loose electron ID instead of mvaTrigV0, also
+		//need to optimize WP
+        ele.electronID("eidLoose") > 0.5// &&
         //ele.gsfTrack()->trackerExpectedHitsInner().numberOfHits() <= 0 &&
-        dbc_rel_iso(ele) < 0.15
+        //dbc_rel_iso(ele) < 0.15
     ); 
 }
 
@@ -162,8 +197,8 @@ bool is_tight_muon(const pat::Muon& mu, const reco::Vertex& vtx) {
         mu.muonBestTrack()->dxy(vtx.position()) < 0.2 &&
         mu.muonBestTrack()->dz(vtx.position())< 0.5 &&
         mu.innerTrack()->hitPattern().numberOfValidPixelHits() > 0 &&
-        mu.numberOfMatchedStations() > 1 &&
-        dbc_rel_iso(mu) < 0.12
+        mu.numberOfMatchedStations() > 1// &&
+        //dbc_rel_iso(mu) < 0.12
     );
 }
 
@@ -228,7 +263,7 @@ vector<const pat::Muon*> find_good_muons(const vector<const pat::Muon*>& muons, 
     vector<const pat::Muon*> out;
 
     for (auto* _mu : muons) {
-		auto& mu = *_mu;
+        auto& mu = *_mu;
         if (mode==DecayMode::dileptonic && is_loose_muon(mu)) {
             out.push_back(&mu);
         }
@@ -245,7 +280,7 @@ vector<const pat::Electron*> find_good_electrons(const vector<const pat::Electro
     vector<const pat::Electron*> out;
 
     for (auto* _ele : electrons) {
-		auto& ele = *_ele;
+        auto& ele = *_ele;
         if (mode==DecayMode::dileptonic && is_loose_electron(ele, vtx)) {
             out.push_back(&ele); 
         }
@@ -260,7 +295,7 @@ vector<const pat::Electron*> find_veto_electrons(const vector<const pat::Electro
     vector<const pat::Electron*> out;
 
     for (auto* _ele : electrons) {
-		auto& ele = *_ele;
+        auto& ele = *_ele;
         //skip already identified signal electrons
         if (is_in<const pat::Electron*>(signal_electrons, &ele)) {
             LogDebug("veto ele") << "skipping ele" << CANDPRINT(ele);
@@ -283,7 +318,7 @@ vector<const pat::Muon*> find_veto_muons(const vector<const pat::Muon*>& muons, 
     vector<const pat::Muon*> out;
 
     for (auto* _mu : muons) {
-		auto& mu = *_mu;
+        auto& mu = *_mu;
         //skip already identified signal muons
         if (is_in<const pat::Muon*>(signal_muons, &mu)) {
             continue;
@@ -303,7 +338,7 @@ vector<const pat::Tau*> find_good_taus(const vector<const pat::Tau*>& taus, cons
     vector<const pat::Tau*> out;
 
     for (auto* _tau : taus) {
-		auto& tau = *_tau;
+        auto& tau = *_tau;
         if (is_good_tau(tau)) {
             out.push_back(&tau);
         }
@@ -315,7 +350,7 @@ vector<const pat::Tau*> find_veto_taus(const vector<const pat::Tau*>& taus, cons
     vector<const pat::Tau*> out;
 
     for (auto* _tau : taus) {
-		auto& tau = *_tau;
+        auto& tau = *_tau;
         if (is_in<const pat::Tau*>(signal_taus, &tau)) {
             continue;
         }

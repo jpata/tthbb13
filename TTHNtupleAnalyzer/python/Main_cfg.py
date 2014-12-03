@@ -54,12 +54,12 @@ process.chs = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedPFCandid
 from RecoJets.JetProducers.PFJetParameters_cfi import *
 from RecoJets.JetProducers.AnomalousCellParameters_cfi import *
 process.ca15PFJetsCHS = cms.EDProducer(
-        "FastjetJetProducer",
-        PFJetParameters,
-        AnomalousCellParameters,
-        jetAlgorithm = cms.string("CambridgeAachen"),
-        rParam       = cms.double(1.5),
-    )
+    "FastjetJetProducer",
+    PFJetParameters,
+    AnomalousCellParameters,
+    jetAlgorithm = cms.string("CambridgeAachen"),
+    rParam       = cms.double(1.5),
+)
 process.ca15PFJetsCHS.src      = cms.InputTag("chs")
 process.ca15PFJetsCHS.jetPtMin = cms.double(200)
 
@@ -88,33 +88,30 @@ process.ca15PFJetsCHSMDTFiltered = process.ca15PFJetsCHS.clone(
 
 # Calculate n-subjettiness for stand-alone fatjets
 process.Njettiness = cms.EDProducer("NjettinessAdder",
-                                    src=cms.InputTag("ca15PFJetsCHS"),
-                                    cone=cms.double(1.5),
-				    Njets = cms.vuint32(1,2,3),
-                            )
+	src=cms.InputTag("ca15PFJetsCHS"),
+	cone=cms.double(1.5),
+	Njets = cms.vuint32(1,2,3),
+)
 
 process.NjettinessMDT = cms.EDProducer("NjettinessAdder",
-                                       src=cms.InputTag("ca15PFJetsCHSMDT"),
-                                       cone=cms.double(1.5),
-                                       Njets = cms.vuint32(1,2,3),
-                               )
+	src=cms.InputTag("ca15PFJetsCHSMDT"),
+	cone=cms.double(1.5),
+	Njets = cms.vuint32(1,2,3),
+	)
 
 process.NjettinessMDTFiltered = cms.EDProducer("NjettinessAdder",
-                                               src=cms.InputTag("ca15PFJetsCHSMDTFiltered"),
-                                               cone=cms.double(1.5),
-                                               Njets = cms.vuint32(1,2,3),
-                                       )
+	src=cms.InputTag("ca15PFJetsCHSMDTFiltered"),
+	cone=cms.double(1.5),
+	Njets = cms.vuint32(1,2,3),
+)
 
-
-
-
-
+#trigger paths are now saved in ntuple
 from TTH.TTHNtupleAnalyzer.triggers_MC_cff import *
-print '**** TRIGGER PATHS ****'
-counter = 0
-for trigger in triggerPathNames:
-	print "[%s] = %s" % (counter, trigger)
-	counter += 1
+#print '**** TRIGGER PATHS ****'
+#counter = 0
+#for trigger in triggerPathNames:
+#	print "[%s] = %s" % (counter, trigger)
+#	counter += 1
 
 process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
 	isMC = cms.bool(True),
@@ -224,7 +221,9 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
 		'decayModeFindingNewDMs',
 		'neutralIsoPtSum',
 		'puCorrPtSum'
-		])
+		]),
+	rho=cms.InputTag("fixedGridRhoAll"),
+	jecFile=cms.FileInPath("TTH/TTHNtupleAnalyzer/data/Summer13_V4_DATA_UncertaintySources_AK5PFchs.txt")
 )
 
 process.TFileService = cms.Service("TFileService",
@@ -316,13 +315,13 @@ process.ak4PFL1FastL2L3Residual = cms.ESProducer("JetCorrectionESChain",
 process.p = cms.Path(
 	#process.hepTopTagPFJetsCHS *
 	#process.hepTopTagInfos *
-        process.chs *
-        process.ca15PFJetsCHS *
-        process.ca15PFJetsCHSMDT *
-        process.ca15PFJetsCHSMDTFiltered *
-        process.Njettiness *
-        process.NjettinessMDT *
-        process.NjettinessMDTFiltered *
+	process.chs *
+	process.ca15PFJetsCHS *
+	process.ca15PFJetsCHSMDT *
+	process.ca15PFJetsCHSMDTFiltered *
+	process.Njettiness *
+	process.NjettinessMDT *
+	process.NjettinessMDTFiltered *
 	process.HTTJetsCHS *
 	process.MultiRHTTJetsCHS *
 	process.tthNtupleAnalyzer
