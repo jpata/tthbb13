@@ -67,6 +67,7 @@
 
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 #include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 
 //#include "CommonTools/UtilAlgos/interface/PhysObjectMatcher.h"
 //#include "CommonTools/UtilAlgos/interface/MatchByDRDPt.h"
@@ -448,6 +449,7 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
 	lheToken_( (iConfig.getParameter<edm::InputTag>("lhe")).label()!="" ?
 			consumes<LHEEventProduct>( iConfig.getParameter<edm::InputTag>("lhe")) : edm::EDGetTokenT<LHEEventProduct>() ),
 
+
 	//output
 	tthtree(new TTHTree(fs->make<TTree>("events", "events"))),
 	config_dump(fs->make<TNamed>("configdump", iConfig.dump().c_str())),
@@ -519,6 +521,12 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	tthtree->n__pv = vertices->size();
 
 	if (isMC_) {
+	
+	// MC Event Weight
+	edm::Handle<GenEventInfoProduct> genEvtInfo;
+	iEvent.getByLabel( "generator", genEvtInfo );
+	tthtree->weight__genmc = genEvtInfo->weight();
+	 
 	Handle<edm::View<reco::GenParticle> > pruned;
 	
 	//Pileup and genparticles
