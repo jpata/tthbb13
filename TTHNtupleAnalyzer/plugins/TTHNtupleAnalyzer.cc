@@ -783,7 +783,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		tthtree->lep__charge[n__lep] = x.charge();
 
 		tthtree->lep__is_tight_id[n__lep] = is_tight_muon(x, PV);
-		tthtree->lep__is_tight[n__lep] = is_tight_muon(x, PV) && (dbc_rel_iso(x) < 0.12);
+		tthtree->lep__is_tight[n__lep] = is_tight_muon(x, PV) && tight_muon_iso(x);
 		tthtree->lep__is_loose[n__lep] = is_loose_muon(x);
 
 		tthtree->lep__ch_iso[n__lep] = x.chargedHadronIso();
@@ -875,7 +875,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		LogDebug("leptoniso") << dbc_rel_iso(x) << " " << x.userFloat("deltaBetaCorrRelIso") << " " << x.userFloat("rhoCorrRelIso");
 
 		tthtree->lep__is_tight_id[n__lep] = is_tight_electron(x, PV);
-		tthtree->lep__is_tight[n__lep] = is_tight_electron(x, PV) && (dbc_rel_iso(x) < 0.1);
+		tthtree->lep__is_tight[n__lep] = is_tight_electron(x, PV) && tight_electron_iso(x);
 		tthtree->lep__is_loose[n__lep] = is_loose_electron(x, PV);
 
 		unsigned int ele_id_idx = 0;

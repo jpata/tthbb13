@@ -154,6 +154,10 @@ bool is_tight_electron(const pat::Electron& ele, const reco::Vertex& vtx) {
     );
 }
 
+bool tight_electron_iso(const pat::Electron& mu) {
+	return (dbc_rel_iso(mu) < 0.1);
+}
+
 //
 bool is_loose_electron(const pat::Electron& ele, const reco::Vertex& vtx) {
     if (ele.gsfTrack().isNull()) {
@@ -173,9 +177,9 @@ bool is_loose_electron(const pat::Electron& ele, const reco::Vertex& vtx) {
         //ele.electronID("mvaTrigV0") > 0.5 &&
         //FIXME: currently, using loose electron ID instead of mvaTrigV0, also
 		//need to optimize WP
-        ele.electronID("eidLoose") > 0.5// &&
+        ele.electronID("eidLoose") > 0.5 &&
         //ele.gsfTrack()->trackerExpectedHitsInner().numberOfHits() <= 0 &&
-        //dbc_rel_iso(ele) < 0.15
+        dbc_rel_iso(ele) < 0.15
     ); 
 }
 
@@ -200,6 +204,10 @@ bool is_tight_muon(const pat::Muon& mu, const reco::Vertex& vtx) {
         mu.numberOfMatchedStations() > 1// &&
         //dbc_rel_iso(mu) < 0.12
     );
+}
+
+bool tight_muon_iso(const pat::Muon& mu) {
+	return (dbc_rel_iso(mu) < 0.12);
 }
 
 //https://twiki.cern.ch/twiki/bin/viewauth/CMS/TopMUO
@@ -267,7 +275,7 @@ vector<const pat::Muon*> find_good_muons(const vector<const pat::Muon*>& muons, 
         if (mode==DecayMode::dileptonic && is_loose_muon(mu)) {
             out.push_back(&mu);
         }
-        else if (mode==DecayMode::semileptonic && is_tight_muon(mu, vtx)) {
+        else if (mode==DecayMode::semileptonic && is_tight_muon(mu, vtx) && tight_muon_iso(mu)) {
             out.push_back(&mu);
         }
     }
@@ -284,7 +292,7 @@ vector<const pat::Electron*> find_good_electrons(const vector<const pat::Electro
         if (mode==DecayMode::dileptonic && is_loose_electron(ele, vtx)) {
             out.push_back(&ele); 
         }
-        else if (mode==DecayMode::semileptonic && is_tight_electron(ele, vtx)) {
+        else if (mode==DecayMode::semileptonic && is_tight_electron(ele, vtx) && tight_electron_iso(ele)) {
             out.push_back(&ele); 
         }
     }
