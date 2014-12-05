@@ -7,7 +7,27 @@
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include <iostream>
+#include <vector>
 
-void gen_association(edm::Handle<edm::View<reco::GenParticle>> pruned, TTHTree* tthtree);
+void gen_association(edm::Handle<edm::View<reco::GenParticle>> pruned, 
+		     TTHTree* tthtree,
+		     // These vectors will be filled by gen_association - pass empty
+		     std::vector<const reco::GenParticle*> & tops_last,
+		     std::vector<const reco::GenParticle*> & antitops_last,		     
+		     //first top quarks of chain
+		     std::vector<const reco::Candidate*> & tops_first,
+		     std::vector<const reco::Candidate*> & antitops_first,		     
+		     std::vector<const reco::GenParticle*> & bquarks,
+		     std::vector<const reco::GenParticle*> & antibquarks);
+
+int is_hadronic_top(const reco::Candidate* p);
+
+void get_hard_partons(edm::Handle<edm::View<reco::GenParticle>> pruned, 
+		      double min_parton_pt,
+		      std::vector<const reco::Candidate*> & hard_partons);
+
+void get_gen_higgs(edm::Handle<edm::View<reco::GenParticle>> pruned, 
+		   double min_higgs_pt,
+		   std::vector<const reco::Candidate*> & gen_higgs);
 
 #endif

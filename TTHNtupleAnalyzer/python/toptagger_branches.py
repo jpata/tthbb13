@@ -1,7 +1,7 @@
 from TTH.TTHNtupleAnalyzer.headergen import *
 
 # Fatjet Branche
-for fj_name in ["fat"]:
+for fj_name in ["fat", "fatMDT", "fatMDTFiltered"]:
 
     # How many of these objects do we have?
     full_counter_name = "n__jet_{0}".format(fj_name)
@@ -10,7 +10,10 @@ for fj_name in ["fat"]:
     # And all the individual branches
     for branch_name in [
             "pt", "eta", "phi", "mass",  # Kinematics
-            "tau1", "tau2", "tau3"]:     # N-subjettiness
+            "tau1", "tau2", "tau3",  # N-subjettiness
+            "close_hadtop_pt",  "close_hadtop_dr", # true top matching
+            "close_higgs_pt",  "close_higgs_dr"    # true higgs matching
+    ]:     
 
         full_branch_name = "jet_{0}__{1}".format(fj_name, branch_name)
         process += [Dynamic1DArray(full_branch_name,
@@ -25,11 +28,13 @@ for fj_name in ["fat"]:
 
 # HEPTopTagger Branches
 htt_float_branches =  [
-    "pt", "mass", "eta", "phi", "energy",       # Kinematics
-    "fj_pt", "fj_mass", "fj_eta", "fj_phi",     # Original Fat-jet kinematics
-    "fW", "massRatioPassed",                    # Standard HTT variables
-    "Rmin", "ptFiltForRminExp", "RminExpected", # MultiR variables
-    "prunedMass", "topMass", "unfilteredMass"   # extra masses
+    "pt", "mass", "eta", "phi", "energy",        # Kinematics
+    "fj_pt", "fj_mass", "fj_eta", "fj_phi",      # Original Fat-jet kinematics
+    "fW", "massRatioPassed",                     # Standard HTT variables
+    "Rmin", "ptFiltForRminExp", "RminExpected",  # MultiR variables
+    "prunedMass", "topMass", "unfilteredMass",   # extra masses
+    "close_hadtop_pt",  "close_hadtop_dr",       # true top matching
+    "close_higgs_pt",  "close_higgs_dr"          # true higgs matching
 ]
 
 htt_int_branches = ["child_idx", "isMultiR", "n_sj"]

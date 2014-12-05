@@ -15,6 +15,8 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/PythonParameterSet/interface/PythonProcessDesc.h"
 
+//Name of the input TTree
+#define TTH_TTREE_NAME "tthNtupleAnalyzer/events"
 
 using namespace std;
 

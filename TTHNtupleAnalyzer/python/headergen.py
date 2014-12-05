@@ -148,6 +148,9 @@ class Dynamic1DArray:
 #list of all branches to add, modified by imports
 process = []
 
+#list of define statements to add
+defines = []
+
 if __name__ == "__main__":
 
     if len(sys.argv)==4:
@@ -168,6 +171,7 @@ if __name__ == "__main__":
     imp.load_source("branches", filename_branches)
     import branches
     branches_to_add = branches.process
+    defines_to_add = branches.defines
     infile = open(filename_in)
 
     lines = infile.readlines()
@@ -199,11 +203,17 @@ if __name__ == "__main__":
         insert_to("//HEADERGEN_BRANCH_SETADDRESS",
               "\t\t%s;\n" % (branch.setaddress())
         )
-
+                
         if "//HEADERGEN_COPY_BRANCHES" in "".join(lines):
             insert_to("//HEADERGEN_COPY_BRANCHES",
                   "\t\t%s;\n" % (branch.copy_branch())
             )
+    
+    # Also allow inserting define statements
+    for define in defines_to_add:
+        print "Adding: ", define
+        insert_to("//HEADERGEN_DEFINES", define + "\n"
+        )
 
 
     outfile = open(filename_out, "w")

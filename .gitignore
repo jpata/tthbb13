@@ -1,7 +1,10 @@
 *.pyc
+*~
 */*/__init__.py
+*/*/*/__init__.py
 MEAnalysis/root/MEAnalysis*.root
 MEStudiesJP/*
 *.un~
 *.orig
 VHbbAnalysis
+\#*\#

@@ -87,9 +87,6 @@
 #define ENABLE_MM   1
 #define ENABLE_JJ   0
 
-//Name of the input TTree
-#define TTH_TTREE_NAME "tthNtupleAnalyzer/events"
-
 using namespace std;
 
 //version numbering scheme according to CMSSW version major and minor version.

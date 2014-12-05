@@ -22,6 +22,8 @@
 #define FLOAT_EPS 0.0000001f
 #define DOUBLE_EPS 0.0000001d
 
+//HEADERGEN_DEFINES
+
 //checks if a branch variable is undefined
 inline bool is_undef(int x) { return x==DEF_VAL_INT; };
 inline bool is_undef(float x) { return fabs(x-DEF_VAL_FLOAT) < FLOAT_EPS; };
@@ -84,45 +86,6 @@ public:
 	int trigger__bits[T_MAX];
 	float trigger__prescale[T_MAX];
 
-	//b quark from TTH(->bb)
-	float gen_b__eta;
-	int gen_b__id;
-	float gen_b__mass;
-	float gen_b__phi;
-	float gen_b__pt;
-	int gen_b__status;
-
-	//bbar quark from TTH(->bb)
-	float gen_bbar__eta;
-	int gen_bbar__id;
-	float gen_bbar__mass;
-	float gen_bbar__phi;
-	float gen_bbar__pt;
-	int gen_bbar__status;
-
-	float gen_jet__eta[N_MAX];
-	int gen_jet__id[N_MAX];
-	float gen_jet__mass[N_MAX];
-	float gen_jet__phi[N_MAX];
-	float gen_jet__pt[N_MAX];
-	int gen_jet__status[N_MAX];
-	int gen_jet__type[N_MAX];
-	float gen_jet_parton__eta[N_MAX];
-	int gen_jet_parton__id[N_MAX];
-	float gen_jet_parton__mass[N_MAX];
-	float gen_jet_parton__phi[N_MAX];
-	float gen_jet_parton__pt[N_MAX];
-	int gen_jet_parton__status[N_MAX];
-	int gen_jet_parton__type[N_MAX];
-
-	float gen_lep__eta[N_MAX];
-	int gen_lep__id[N_MAX];
-	float gen_lep__mass[N_MAX];
-	float gen_lep__phi[N_MAX];
-	float gen_lep__pt[N_MAX];
-	int gen_lep__status[N_MAX];
-	int gen_lep__type[N_MAX];
-
 	float gen_met__phi;
 	float gen_met__pt;
 	float gen_met__sumet;
@@ -131,66 +94,6 @@ public:
 	//initial top pair decay hypothesis based on leptons
 	int hypo1;
 	
-	//reco-level jets
-	float jet__bd_csv[N_MAX];
-	float jet__ce_e[N_MAX];
-	float jet__ch_e[N_MAX];
-	float jet__el_e[N_MAX];
-	float jet__energy[N_MAX];
-	float jet__eta[N_MAX];
-	int jet__id[N_MAX];
-	int jet__jetId[N_MAX];
-	float jet__mass[N_MAX];
-	float jet__mu_e[N_MAX];
-	float jet__ne_e[N_MAX];
-	float jet__nh_e[N_MAX];
-	float jet__ph_e[N_MAX];
-	float jet__phi[N_MAX];
-	float jet__pileupJetId[N_MAX];
-	int jet__pass_pileupJetId[N_MAX];
-	float jet__pt[N_MAX];
-	float jet__pt_alt[N_MAX]; //uncorrected jet pt
-	int jet__type[N_MAX];
-	float jet__vtx3DSig[N_MAX];
-	float jet__vtx3DVal[N_MAX];
-	float jet__vtxMass[N_MAX];
-	float jet__vtxNtracks[N_MAX];
-
-	//reco lepton, all ID-s, no particular ordering
-	float lep__ch_iso[N_MAX];
-	int lep__charge[N_MAX];
-	float lep__dxy[N_MAX];
-	float lep__dz[N_MAX];
-	float lep__ec_iso[N_MAX];
-	float lep__eta[N_MAX];
-	float lep__hc_iso[N_MAX];
-	int lep__id[N_MAX];
-	int lep__id_bitmask[N_MAX];
-	int lep__is_loose[N_MAX];
-	int lep__is_medium[N_MAX];
-	int lep__is_tight[N_MAX];
-	float lep__mass[N_MAX];
-	float lep__mva[N_MAX];
-	float lep__p_iso[N_MAX];
-	float lep__ph_iso[N_MAX];
-	float lep__phi[N_MAX];
-	float lep__pt[N_MAX];
-	float lep__puch_iso[N_MAX];
-	float lep__rel_iso[N_MAX];
-	int lep__type[N_MAX];
-
-	//trigger lepton
-  	float trig_lep__pt[N_MAX];
-  	float trig_lep__eta[N_MAX];
-  	float trig_lep__phi[N_MAX];
-    int trig_lep__pass[N_MAX];
-	
-	//trigger lepton
-  	float trig_jet__pt[N_MAX];
-  	float trig_jet__eta[N_MAX];
-  	float trig_jet__phi[N_MAX];
-    int trig_jet__pass[N_MAX];
-
 	//gen-level information from LHE
 	float lhe__ht;
 	int lhe__n_b;
@@ -214,8 +117,8 @@ public:
 	float met__py__shift[MET_S_MAX];
 	float met__phi__shift[MET_S_MAX];
     
-        int n__met_shift;
-        int n__jet;      	
+    int n__met_shift;
+    int n__jet;
 	int n__lep;
 
     //number of primary vertices
@@ -230,16 +133,6 @@ public:
 	int pvi__bx[N_MAX];
 	float pvi__n0[N_MAX];
 	float pvi__ntrue[N_MAX];
-
-	//identified good signal leptons, number depends on hypothesis
-	int sig_lep__charge[N_MAX];
-	float sig_lep__eta[N_MAX];
-	int sig_lep__id[N_MAX];
-	int sig_lep__idx[N_MAX];
-	float sig_lep__mass[N_MAX];
-	float sig_lep__phi[N_MAX];
-	float sig_lep__pt[N_MAX];
-	int sig_lep__type[N_MAX];
 
 	float weight__pu;
 	float weight__pu_down;
@@ -263,101 +156,13 @@ public:
 		
 		SET_ZERO(trigger__bits, T_MAX, DEF_VAL_INT);
 		SET_ZERO(trigger__prescale, T_MAX, DEF_VAL_FLOAT);
-		
-		gen_b__eta = DEF_VAL_FLOAT;
-		gen_b__id = DEF_VAL_INT;
-		gen_b__mass = DEF_VAL_FLOAT;
-		gen_b__phi = DEF_VAL_FLOAT;
-		gen_b__pt = DEF_VAL_FLOAT;
-		gen_b__status = DEF_VAL_INT;
-		gen_bbar__eta = DEF_VAL_FLOAT;
-		gen_bbar__id = DEF_VAL_INT;
-		gen_bbar__mass = DEF_VAL_FLOAT;
-		gen_bbar__phi = DEF_VAL_FLOAT;
-		gen_bbar__pt = DEF_VAL_FLOAT;
-		gen_bbar__status = DEF_VAL_INT;
 
-		SET_ZERO(gen_jet__eta, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(gen_jet__id, N_MAX, DEF_VAL_INT);
-		SET_ZERO(gen_jet__mass, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(gen_jet__phi, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(gen_jet__pt, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(gen_jet__status, N_MAX, DEF_VAL_INT);
-		SET_ZERO(gen_jet__type, N_MAX, DEF_VAL_INT);
-		SET_ZERO(gen_jet_parton__eta, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(gen_jet_parton__id, N_MAX, DEF_VAL_INT);
-		SET_ZERO(gen_jet_parton__mass, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(gen_jet_parton__phi, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(gen_jet_parton__pt, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(gen_jet_parton__status, N_MAX, DEF_VAL_INT);
-		SET_ZERO(gen_jet_parton__type, N_MAX, DEF_VAL_INT);
-		SET_ZERO(gen_lep__eta, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(gen_lep__id, N_MAX, DEF_VAL_INT);
-		SET_ZERO(gen_lep__mass, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(gen_lep__phi, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(gen_lep__pt, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(gen_lep__status, N_MAX, DEF_VAL_INT);
-		SET_ZERO(gen_lep__type, N_MAX, DEF_VAL_INT);
 		gen_met__phi = DEF_VAL_FLOAT;
 		gen_met__pt = DEF_VAL_FLOAT;
 		gen_met__sumet = DEF_VAL_FLOAT;
 
 		hypo1 = DEF_VAL_INT;
 
-		SET_ZERO(jet__bd_csv, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(jet__ce_e, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(jet__ch_e, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(jet__el_e, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(jet__energy, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(jet__eta, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(jet__id, N_MAX, DEF_VAL_INT);
-		SET_ZERO(jet__jetId, N_MAX, DEF_VAL_INT);
-		SET_ZERO(jet__mass, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(jet__mu_e, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(jet__ne_e, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(jet__nh_e, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(jet__ph_e, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(jet__phi, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(jet__pileupJetId, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(jet__pass_pileupJetId, N_MAX, DEF_VAL_INT);
-		SET_ZERO(jet__pt, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(jet__pt_alt, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(jet__type, N_MAX, DEF_VAL_INT);
-		SET_ZERO(jet__vtx3DSig, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(jet__vtx3DVal, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(jet__vtxMass, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(jet__vtxNtracks, N_MAX, DEF_VAL_FLOAT);
-
-		SET_ZERO(lep__ch_iso, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(lep__charge, N_MAX, DEF_VAL_INT);
-		SET_ZERO(lep__dxy, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(lep__dz, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(lep__ec_iso, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(lep__eta, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(lep__hc_iso, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(lep__id, N_MAX, DEF_VAL_INT);
-		SET_ZERO(lep__id_bitmask, N_MAX, DEF_VAL_INT);
-		SET_ZERO(lep__is_loose, N_MAX, DEF_VAL_INT);
-		SET_ZERO(lep__is_medium, N_MAX, DEF_VAL_INT);
-		SET_ZERO(lep__is_tight, N_MAX, DEF_VAL_INT);
-		SET_ZERO(lep__mass, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(lep__mva, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(lep__p_iso, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(lep__ph_iso, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(lep__phi, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(lep__pt, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(lep__puch_iso, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(lep__rel_iso,  N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(trig_lep__pt,  N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(trig_lep__eta, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(trig_lep__phi, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(trig_lep__pass,N_MAX, DEF_VAL_INT);
-		SET_ZERO(trig_jet__pt,  N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(trig_jet__eta, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(trig_jet__phi, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(trig_jet__pass,N_MAX, DEF_VAL_INT);
-		SET_ZERO(lep__rel_iso, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(lep__type, N_MAX, DEF_VAL_INT);
 		lhe__ht = DEF_VAL_FLOAT;
 		lhe__n_b = DEF_VAL_INT;
 		lhe__n_c = DEF_VAL_INT;
@@ -387,14 +192,6 @@ public:
 		SET_ZERO(pvi__bx, N_MAX, DEF_VAL_INT);
 		SET_ZERO(pvi__n0, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(pvi__ntrue, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(sig_lep__charge, N_MAX, DEF_VAL_INT);
-		SET_ZERO(sig_lep__eta, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(sig_lep__id, N_MAX, DEF_VAL_INT);
-		SET_ZERO(sig_lep__idx, N_MAX, DEF_VAL_INT);
-		SET_ZERO(sig_lep__mass, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(sig_lep__phi, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(sig_lep__pt, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(sig_lep__type, N_MAX, DEF_VAL_INT);
 		weight__pu = DEF_VAL_FLOAT;
 		weight__pu_down = DEF_VAL_FLOAT;
 		weight__pu_up = DEF_VAL_FLOAT;
@@ -411,10 +208,6 @@ public:
 		tree->Branch("event__json", &event__json, "event__json/I");
 		tree->Branch("event__lumi", &event__lumi, "event__lumi/I");
 		tree->Branch("event__run", &event__run, "event__run/I");
-		tree->Branch("gen_b__id", &gen_b__id, "gen_b__id/I");
-		tree->Branch("gen_b__status", &gen_b__status, "gen_b__status/I");
-		tree->Branch("gen_bbar__id", &gen_bbar__id, "gen_bbar__id/I");
-		tree->Branch("gen_bbar__status", &gen_bbar__status, "gen_bbar__status/I");
 		
 		tree->Branch("hypo1", &hypo1, "hypo1/I");
 		
@@ -438,94 +231,10 @@ public:
 		tree->Branch("debug__time1r", &debug__time1r, "debug__time1r/D");
 		tree->Branch("trigger__bits", trigger__bits, "trigger__bits[n__tr]/I");
 		tree->Branch("trigger__prescale", trigger__prescale, "trigger__prescale[n__tr]/F");
-		tree->Branch("gen_b__eta", &gen_b__eta, "gen_b__eta/F");
-		tree->Branch("gen_b__mass", &gen_b__mass, "gen_b__mass/F");
-		tree->Branch("gen_b__phi", &gen_b__phi, "gen_b__phi/F");
-		tree->Branch("gen_b__pt", &gen_b__pt, "gen_b__pt/F");
-		tree->Branch("gen_bbar__eta", &gen_bbar__eta, "gen_bbar__eta/F");
-		tree->Branch("gen_bbar__mass", &gen_bbar__mass, "gen_bbar__mass/F");
-		tree->Branch("gen_bbar__phi", &gen_bbar__phi, "gen_bbar__phi/F");
-		tree->Branch("gen_bbar__pt", &gen_bbar__pt, "gen_bbar__pt/F");
-		tree->Branch("gen_jet__eta", gen_jet__eta, "gen_jet__eta[n__jet]/F");
-		tree->Branch("gen_jet__id", gen_jet__id, "gen_jet__id[n__jet]/I");
-		tree->Branch("gen_jet__mass", gen_jet__mass, "gen_jet__mass[n__jet]/F");
-		tree->Branch("gen_jet__phi", gen_jet__phi, "gen_jet__phi[n__jet]/F");
-		tree->Branch("gen_jet__pt", gen_jet__pt, "gen_jet__pt[n__jet]/F");
-		tree->Branch("gen_jet__status", gen_jet__status, "gen_jet__status[n__jet]/I");
-		tree->Branch("gen_jet__type", gen_jet__type, "gen_jet__type[n__jet]/I");
-		tree->Branch("gen_jet_parton__eta", gen_jet_parton__eta, "gen_jet_parton__eta[n__jet]/F");
-		tree->Branch("gen_jet_parton__id", gen_jet_parton__id, "gen_jet_parton__id[n__jet]/I");
-		tree->Branch("gen_jet_parton__mass", gen_jet_parton__mass, "gen_jet_parton__mass[n__jet]/F");
-		tree->Branch("gen_jet_parton__phi", gen_jet_parton__phi, "gen_jet_parton__phi[n__jet]/F");
-		tree->Branch("gen_jet_parton__pt", gen_jet_parton__pt, "gen_jet_parton__pt[n__jet]/F");
-		tree->Branch("gen_jet_parton__status", gen_jet_parton__status, "gen_jet_parton__status[n__jet]/I");
-		tree->Branch("gen_jet_parton__type", gen_jet_parton__type, "gen_jet_parton__type[n__jet]/I");
-		tree->Branch("gen_lep__eta", gen_lep__eta, "gen_lep__eta[n__lep]/F");
-		tree->Branch("gen_lep__id", gen_lep__id, "gen_lep__id[n__lep]/I");
-		tree->Branch("gen_lep__mass", gen_lep__mass, "gen_lep__mass[n__lep]/F");
-		tree->Branch("gen_lep__phi", gen_lep__phi, "gen_lep__phi[n__lep]/F");
-		tree->Branch("gen_lep__pt", gen_lep__pt, "gen_lep__pt[n__lep]/F");
-		tree->Branch("gen_lep__status", gen_lep__status, "gen_lep__status[n__lep]/I");
-		tree->Branch("gen_lep__type", gen_lep__type, "gen_lep__type[n__lep]/I");
 		tree->Branch("gen_met__phi", &gen_met__phi, "gen_met__phi/F");
 		tree->Branch("gen_met__pt", &gen_met__pt, "gen_met__pt/F");
 		tree->Branch("gen_met__sumet", &gen_met__sumet, "gen_met__sumet/F");
 		
-		
-		tree->Branch("jet__bd_csv", jet__bd_csv, "jet__bd_csv[n__jet]/F");
-		tree->Branch("jet__ce_e", jet__ce_e, "jet__ce_e[n__jet]/F");
-		tree->Branch("jet__ch_e", jet__ch_e, "jet__ch_e[n__jet]/F");
-		tree->Branch("jet__el_e", jet__el_e, "jet__el_e[n__jet]/F");
-		tree->Branch("jet__energy", jet__energy, "jet__energy[n__jet]/F");
-		tree->Branch("jet__eta", jet__eta, "jet__eta[n__jet]/F");
-		tree->Branch("jet__id", jet__id, "jet__id[n__jet]/I");
-		tree->Branch("jet__jetId", jet__jetId, "jet__jetId[n__jet]/I");
-		tree->Branch("jet__mass", jet__mass, "jet__mass[n__jet]/F");
-		tree->Branch("jet__mu_e", jet__mu_e, "jet__mu_e[n__jet]/F");
-		tree->Branch("jet__ne_e", jet__ne_e, "jet__ne_e[n__jet]/F");
-		tree->Branch("jet__nh_e", jet__nh_e, "jet__nh_e[n__jet]/F");
-		tree->Branch("jet__ph_e", jet__ph_e, "jet__ph_e[n__jet]/F");
-		tree->Branch("jet__phi", jet__phi, "jet__phi[n__jet]/F");
-		tree->Branch("jet__pileupJetId", jet__pileupJetId, "jet__pileupJetId[n__jet]/F");
-		tree->Branch("jet__pass_pileupJetId", jet__pass_pileupJetId, "jet__pass_pileupJetId[n__jet]/I");
-		tree->Branch("jet__pt", jet__pt, "jet__pt[n__jet]/F");
-		tree->Branch("jet__pt_alt", jet__pt_alt, "jet__pt_alt[n__jet]/F");
-		tree->Branch("jet__type", jet__type, "jet__type[n__jet]/I");
-		tree->Branch("jet__vtx3DSig", jet__vtx3DSig, "jet__vtx3DSig[n__jet]/F");
-		tree->Branch("jet__vtx3DVal", jet__vtx3DVal, "jet__vtx3DVal[n__jet]/F");
-		tree->Branch("jet__vtxMass", jet__vtxMass, "jet__vtxMass[n__jet]/F");
-		tree->Branch("jet__vtxNtracks", jet__vtxNtracks, "jet__vtxNtracks[n__jet]/F");
-		
-		
-		tree->Branch("lep__ch_iso", lep__ch_iso, "lep__ch_iso[n__lep]/F");
-		tree->Branch("lep__charge", lep__charge, "lep__charge[n__lep]/I");
-		tree->Branch("lep__dxy", lep__dxy, "lep__dxy[n__lep]/F");
-		tree->Branch("lep__dz", lep__dz, "lep__dz[n__lep]/F");
-		tree->Branch("lep__ec_iso", lep__ec_iso, "lep__ec_iso[n__lep]/F");
-		tree->Branch("lep__eta", lep__eta, "lep__eta[n__lep]/F");
-		tree->Branch("lep__hc_iso", lep__hc_iso, "lep__hc_iso[n__lep]/F");
-		tree->Branch("lep__id", lep__id, "lep__id[n__lep]/I");
-		tree->Branch("lep__id_bitmask", lep__id_bitmask, "lep__id_bitmask[n__lep]/I");
-		tree->Branch("lep__is_loose", lep__is_loose, "lep__is_loose[n__lep]/I");
-		tree->Branch("lep__is_medium", lep__is_medium, "lep__is_medium[n__lep]/I");
-		tree->Branch("lep__is_tight", lep__is_tight, "lep__is_tight[n__lep]/I");
-		tree->Branch("lep__mass", lep__mass, "lep__mass[n__lep]/F");
-		tree->Branch("lep__mva", lep__mva, "lep__mva[n__lep]/F");
-		tree->Branch("lep__p_iso", lep__p_iso, "lep__p_iso[n__lep]/F");
-		tree->Branch("lep__ph_iso", lep__ph_iso, "lep__ph_iso[n__lep]/F");
-		tree->Branch("lep__phi", lep__phi, "lep__phi[n__lep]/F");
-		tree->Branch("lep__pt", lep__pt, "lep__pt[n__lep]/F");
-		tree->Branch("lep__puch_iso", lep__puch_iso, "lep__puch_iso[n__lep]/F");
-		tree->Branch("lep__rel_iso", lep__rel_iso, "lep__rel_iso[n__lep]/F");
-		tree->Branch("trig_lep__pt", trig_lep__pt, "trig_lep__pt[n__lep]/F");
-		tree->Branch("trig_lep__eta", trig_lep__eta, "trig_lep__eta[n__lep]/F");
-		tree->Branch("trig_lep__phi", trig_lep__phi, "trig_lep__phi[n__lep]/F");
-		tree->Branch("trig_lep__pass", trig_lep__pass, "trig_lep__pass[n__lep]/I");
-		tree->Branch("trig_jet__pt", trig_jet__pt, "trig_jet__pt[n__jet]/F");
-		tree->Branch("trig_jet__eta", trig_jet__eta, "trig_jet__eta[n__jet]/F");
-		tree->Branch("trig_jet__phi", trig_jet__phi, "trig_jet__phi[n__jet]/F");
-		tree->Branch("trig_jet__pass", trig_jet__pass, "trig_jet__pass[n__jet]/I");
-		tree->Branch("lep__type", lep__type, "lep__type[n__lep]/I");
 		tree->Branch("lhe__ht", &lhe__ht, "lhe__ht/F");
 		tree->Branch("lhe__n_j", &lhe__n_j, "lhe__n_j/F");
 		tree->Branch("met__phi", &met__phi, "met__phi/F");
@@ -540,14 +249,6 @@ public:
 		tree->Branch("pvi__bx", pvi__bx, "pvi__bx[n__pvi]/I");
 		tree->Branch("pvi__n0", pvi__n0, "pvi__n0[n__pvi]/F");
 		tree->Branch("pvi__ntrue", pvi__ntrue, "pvi__ntrue[n__pvi]/F");
-		tree->Branch("sig_lep__charge", sig_lep__charge, "sig_lep__charge[n__sig_lep]/I");
-		tree->Branch("sig_lep__eta", sig_lep__eta, "sig_lep__eta[n__sig_lep]/F");
-		tree->Branch("sig_lep__id", sig_lep__id, "sig_lep__id[n__sig_lep]/I");
-		tree->Branch("sig_lep__idx", sig_lep__idx, "sig_lep__idx[n__sig_lep]/I");
-		tree->Branch("sig_lep__mass", sig_lep__mass, "sig_lep__mass[n__sig_lep]/F");
-		tree->Branch("sig_lep__phi", sig_lep__phi, "sig_lep__phi[n__sig_lep]/F");
-		tree->Branch("sig_lep__pt", sig_lep__pt, "sig_lep__pt[n__sig_lep]/F");
-		tree->Branch("sig_lep__type", sig_lep__type, "sig_lep__type[n__sig_lep]/I");
 		tree->Branch("weight__pu", &weight__pu, "weight__pu/F");
 		tree->Branch("weight__pu_down", &weight__pu_down, "weight__pu_down/F");
 		tree->Branch("weight__pu_up", &weight__pu_up, "weight__pu_up/F");
@@ -567,91 +268,12 @@ public:
 		tree->SetBranchAddress("event__json", &event__json);
 		tree->SetBranchAddress("event__lumi", &event__lumi);
 		tree->SetBranchAddress("event__run", &event__run);
-		tree->SetBranchAddress("gen_b__eta", &gen_b__eta);
-		tree->SetBranchAddress("gen_b__id", &gen_b__id);
-		tree->SetBranchAddress("gen_b__mass", &gen_b__mass);
-		tree->SetBranchAddress("gen_b__phi", &gen_b__phi);
-		tree->SetBranchAddress("gen_b__pt", &gen_b__pt);
-		tree->SetBranchAddress("gen_b__status", &gen_b__status);
-		tree->SetBranchAddress("gen_bbar__eta", &gen_bbar__eta);
-		tree->SetBranchAddress("gen_bbar__id", &gen_bbar__id);
-		tree->SetBranchAddress("gen_bbar__mass", &gen_bbar__mass);
-		tree->SetBranchAddress("gen_bbar__phi", &gen_bbar__phi);
-		tree->SetBranchAddress("gen_bbar__pt", &gen_bbar__pt);
-		tree->SetBranchAddress("gen_bbar__status", &gen_bbar__status);
-		tree->SetBranchAddress("gen_jet__eta", gen_jet__eta);
-		tree->SetBranchAddress("gen_jet__id", gen_jet__id);
-		tree->SetBranchAddress("gen_jet__mass", gen_jet__mass);
-		tree->SetBranchAddress("gen_jet__phi", gen_jet__phi);
-		tree->SetBranchAddress("gen_jet__pt", gen_jet__pt);
-		tree->SetBranchAddress("gen_jet__status", gen_jet__status);
-		tree->SetBranchAddress("gen_jet__type", gen_jet__type);
-		tree->SetBranchAddress("gen_jet_parton__eta", gen_jet_parton__eta);
-		tree->SetBranchAddress("gen_jet_parton__id", gen_jet_parton__id);
-		tree->SetBranchAddress("gen_jet_parton__mass", gen_jet_parton__mass);
-		tree->SetBranchAddress("gen_jet_parton__phi", gen_jet_parton__phi);
-		tree->SetBranchAddress("gen_jet_parton__pt", gen_jet_parton__pt);
-		tree->SetBranchAddress("gen_jet_parton__status", gen_jet_parton__status);
-		tree->SetBranchAddress("gen_jet_parton__type", gen_jet_parton__type);
-		tree->SetBranchAddress("gen_lep__eta", gen_lep__eta);
-		tree->SetBranchAddress("gen_lep__id", gen_lep__id);
-		tree->SetBranchAddress("gen_lep__mass", gen_lep__mass);
-		tree->SetBranchAddress("gen_lep__phi", gen_lep__phi);
-		tree->SetBranchAddress("gen_lep__pt", gen_lep__pt);
-		tree->SetBranchAddress("gen_lep__status", gen_lep__status);
-		tree->SetBranchAddress("gen_lep__type", gen_lep__type);
 		tree->SetBranchAddress("gen_met__phi", &gen_met__phi);
 		tree->SetBranchAddress("gen_met__pt", &gen_met__pt);
 		tree->SetBranchAddress("gen_met__sumet", &gen_met__sumet);
 		
 		tree->SetBranchAddress("hypo1", &hypo1);
 		
-		tree->SetBranchAddress("jet__bd_csv", jet__bd_csv);
-		tree->SetBranchAddress("jet__ce_e", jet__ce_e);
-		tree->SetBranchAddress("jet__ch_e", jet__ch_e);
-		tree->SetBranchAddress("jet__el_e", jet__el_e);
-		tree->SetBranchAddress("jet__energy", jet__energy);
-		tree->SetBranchAddress("jet__eta", jet__eta);
-		tree->SetBranchAddress("jet__id", jet__id);
-		tree->SetBranchAddress("jet__jetId", jet__jetId);
-		tree->SetBranchAddress("jet__mass", jet__mass);
-		tree->SetBranchAddress("jet__mu_e", jet__mu_e);
-		tree->SetBranchAddress("jet__ne_e", jet__ne_e);
-		tree->SetBranchAddress("jet__nh_e", jet__nh_e);
-		tree->SetBranchAddress("jet__ph_e", jet__ph_e);
-		tree->SetBranchAddress("jet__phi", jet__phi);
-		tree->SetBranchAddress("jet__pileupJetId", jet__pileupJetId);
-		tree->SetBranchAddress("jet__pass_pileupJetId", jet__pass_pileupJetId);
-		tree->SetBranchAddress("jet__pt", jet__pt);
-		tree->SetBranchAddress("jet__pt_alt", jet__pt_alt);
-		tree->SetBranchAddress("jet__type", jet__type);
-		tree->SetBranchAddress("jet__vtx3DSig", jet__vtx3DSig);
-		tree->SetBranchAddress("jet__vtx3DVal", jet__vtx3DVal);
-		tree->SetBranchAddress("jet__vtxMass", jet__vtxMass);
-		tree->SetBranchAddress("jet__vtxNtracks", jet__vtxNtracks);
-		
-		tree->SetBranchAddress("lep__ch_iso", lep__ch_iso);
-		tree->SetBranchAddress("lep__charge", lep__charge);
-		tree->SetBranchAddress("lep__dxy", lep__dxy);
-		tree->SetBranchAddress("lep__dz", lep__dz);
-		tree->SetBranchAddress("lep__ec_iso", lep__ec_iso);
-		tree->SetBranchAddress("lep__eta", lep__eta);
-		tree->SetBranchAddress("lep__hc_iso", lep__hc_iso);
-		tree->SetBranchAddress("lep__id", lep__id);
-		tree->SetBranchAddress("lep__id_bitmask", lep__id_bitmask);
-		tree->SetBranchAddress("lep__is_loose", lep__is_loose);
-		tree->SetBranchAddress("lep__is_medium", lep__is_medium);
-		tree->SetBranchAddress("lep__is_tight", lep__is_tight);
-		tree->SetBranchAddress("lep__mass", lep__mass);
-		tree->SetBranchAddress("lep__mva", lep__mva);
-		tree->SetBranchAddress("lep__p_iso", lep__p_iso);
-		tree->SetBranchAddress("lep__ph_iso", lep__ph_iso);
-		tree->SetBranchAddress("lep__phi", lep__phi);
-		tree->SetBranchAddress("lep__pt", lep__pt);
-		tree->SetBranchAddress("lep__puch_iso", lep__puch_iso);
-		tree->SetBranchAddress("lep__rel_iso", lep__rel_iso);
-		tree->SetBranchAddress("lep__type", lep__type);
-
 		tree->SetBranchAddress("lhe__ht", &lhe__ht);
 		tree->SetBranchAddress("lhe__n_b", &lhe__n_b);
 		tree->SetBranchAddress("lhe__n_c", &lhe__n_c);
@@ -675,14 +297,6 @@ public:
 		tree->SetBranchAddress("pvi__bx", pvi__bx);
 		tree->SetBranchAddress("pvi__n0", pvi__n0);
 		tree->SetBranchAddress("pvi__ntrue", pvi__ntrue);
-		tree->SetBranchAddress("sig_lep__charge", sig_lep__charge);
-		tree->SetBranchAddress("sig_lep__eta", sig_lep__eta);
-		tree->SetBranchAddress("sig_lep__id", sig_lep__id);
-		tree->SetBranchAddress("sig_lep__idx", sig_lep__idx);
-		tree->SetBranchAddress("sig_lep__mass", sig_lep__mass);
-		tree->SetBranchAddress("sig_lep__phi", sig_lep__phi);
-		tree->SetBranchAddress("sig_lep__pt", sig_lep__pt);
-		tree->SetBranchAddress("sig_lep__type", sig_lep__type);
 		tree->SetBranchAddress("weight__pu", &weight__pu);
 		tree->SetBranchAddress("weight__pu_down", &weight__pu_down);
 		tree->SetBranchAddress("weight__pu_up", &weight__pu_up);

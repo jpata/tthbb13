@@ -2,10 +2,9 @@ from WMCore.Configuration import Configuration
 config = Configuration()
 
 config.section_("General")
-config.General.requestName = 'WD_TTJets_MSDecaysCKM'
-config.General.workArea = 'WD_TTJets'
+config.General.workArea = 'crab_TTH_Dec4'
 config.General.saveLogs = True
-config.General.requestName = "tth/step1/nov24/TTJets_MSDecaysCKM"
+config.General.requestName = "tth/step1/Dec4/TTJets_MSDecaysCKM"
 
 config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
@@ -17,7 +16,7 @@ config.section_("Data")
 config.Data.inputDataset = '/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/Spring14miniaod-PU20bx25_POSTLS170_V5-v2/MINIAODSIM'
 config.Data.dbsUrl = 'global'
 config.Data.splitting = 'FileBased'
-config.Data.unitsPerJob = 5
+config.Data.unitsPerJob = 2
 config.Data.publication = False
 #config.Data.publishDbsUrl = 'phys03'
 #config.Data.publishDataName = 'tth_ntp_test1'
