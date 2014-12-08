@@ -1068,10 +1068,11 @@ int main(int argc, const char* argv[])
             bool properEventSL = (genBLV.Pt()>0 && genBbarLV.Pt()>0 && topBLV.Pt()>0 && topW1LV.Pt()>0 && topW2LV.Pt()>0 && atopBLV.Pt()>0 && atopW1LV.Pt()>0 && atopW2LV.Pt()>0);
             bool properEventDL = (genBLV.Pt()>0 && genBbarLV.Pt()>0 && topBLV.Pt()>0 && topW1LV.Pt()>0 && topW2LV.Pt()>0 && atopBLV.Pt()>0 && atopW1LV.Pt()>0 && atopW2LV.Pt()>0);
 
-            if(!(properEventSL || properEventDL)) {
+            if(cutLeptons && !(properEventSL || properEventDL)) {
                 cout << "A dummy cut has failed..." << endl;
                 cout << " => go to next event!" << endl;
                 cout << "******************************" << endl;
+				fill_cut(hcut, Cuts::TTH_MBB_INCOMPATIBLE);
                 continue;
             }
 
@@ -1974,7 +1975,7 @@ int main(int argc, const char* argv[])
                 }
 
                 // continue if leptons do not satisfy cuts
-                if( !(properEventSL || properEventDL) ) {
+                if(cutLeptons && !(properEventSL || properEventDL) ) {
                     if( debug>=2 ) {
                         cout << "Rejected by lepton selection" << endl ;
                         cout << " => go to next event!" << endl;
@@ -2447,7 +2448,7 @@ int main(int argc, const char* argv[])
                 otree->jetsAboveCut_ = jetsAboveCut;
 
                 // continue if not enough jets
-                if( otree->jetsAboveCut_<jetMultLoose ) {
+                if(cutJets && otree->jetsAboveCut_<jetMultLoose ) {
                     if( debug>=2 ) {
                         cout << "Rejected by min jet cut (>= " <<jetMultLoose << " jets above " << jetPtLoose << " GeV)" << endl ;
                         cout << " => go to next event!" << endl;
@@ -2608,7 +2609,7 @@ int main(int argc, const char* argv[])
                         nB = 6;
                         btag_flag = 2;
                     }
-                    else {
+                    else if (cutBTagShape) {
                         cout << "Inconsistency in selectByBTagShape... continue" << endl;
                         cout << " => go to next event!" << endl;
                         cout << "******************************" << endl;
@@ -3074,7 +3075,7 @@ int main(int argc, const char* argv[])
                             meIntegrator->setIntType( MEIntegratorNew::SL1wj );
                             /////////////////////////////////////////////////////
                         }
-                        else {
+                        else if (cutWMass) {
                             continue;
                         }
 
@@ -3793,7 +3794,7 @@ int main(int argc, const char* argv[])
                                     } //use b-tag
 
                                     // if doing scan over b-tag only, don't need amplitude...
-                                    if( otree->type_<0  ) continue;
+                                    if(otree->type_<0) continue;
 
 
                                     // if type 0/3 and incompatible with MW or MT (and we are not scanning vs MT) continue
@@ -3879,7 +3880,8 @@ int main(int argc, const char* argv[])
                                     else if( otree->type_==6 )  nParam = 5; // eta_nu, phi_nu, eta_nu', phi_nu', Eb
                                     else if( otree->type_==7 )  nParam = 5; // eta_nu, phi_nu, eta_nu', phi_nu', Eb
                                     else {
-                                        cout << "No type match...contine." << endl;
+                                        cout << "No type match...continue." << endl;
+										fill_cut(hcut, Cuts::NOTYPEMATCH);	
                                         continue;
                                     }
 
@@ -3897,14 +3899,23 @@ int main(int argc, const char* argv[])
                                     double chi2  = 0.;
 
                                     // if doing higgs mass scan, don't consider bkg hypo
-                                    if( nHiggsMassPoints>1 && hyp==1 ) continue;
+                                    if( nHiggsMassPoints>1 && hyp==1 ) {
+										fill_cut(hcut, Cuts::H_MASS_SCAN_BKG);
+										continue;
+									}
 
                                     // if doing top mass scan, don't consider sgn hypo
-                                    if( nTopMassPoints>1 && hyp==0 ) continue;
+                                    if( nTopMassPoints>1 && hyp==0) {
+										fill_cut(hcut, Cuts::T_MASS_SCAN_SIG);
+										continue;
+									}
 
                                     // if consider only one hypothesis (SoB=0)
                                     // and the current hypo is not the desired one, continue...
-                                    if( SoB==0 && hyp!=hypo) continue;
+                                    if( SoB==0 && hyp!=hypo) {
+										fill_cut(hcut, Cuts::ONE_HYPO_MISMATCH);
+										continue;
+									}
 
                                     // if current hypo is TTH, but M(b1b2) incompatible with 125
                                     // (and we are not scanning vs MH) continue...
@@ -3915,6 +3926,7 @@ int main(int argc, const char* argv[])
                                                  << "] Perm. #" << pos;
                                             cout << " => p=" << p << endl;
                                         }
+										fill_cut(hcut, Cuts::TTH_MBB_INCOMPATIBLE);
                                         continue;
                                     }
 
@@ -3929,6 +3941,7 @@ int main(int argc, const char* argv[])
                                             cout << "Skip    hypo " << (hyp==0 ? "ttH " : "ttbb")
                                                  << " because no valid ttH permutations found" << endl;
                                         }
+										fill_cut(hcut, Cuts::TTJETS_MBB_INCOMPATIBLE);
                                         continue;
                                     }
 
