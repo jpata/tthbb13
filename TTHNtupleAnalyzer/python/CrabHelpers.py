@@ -23,7 +23,7 @@ def submit(name,
            cmssw_config_script = "Main_cfg.py",
            site = "T2_CH_CSCS",
            template_filename = "c_TEMPLATE.py",
-           cfg_filename = "c_tmp.py"
+           cfg_filename = "c_tmp.py",
            blacklist = []):
     """Submit a single job to the Grid"""
 
