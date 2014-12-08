@@ -32,7 +32,7 @@ for k,v in dic_files.iteritems():
         dic_files[k] = ( basepath+v[0]+".root", v[1] )
 # end of adding paths to the filenames
 
-output_dir = "TopVars/"
+output_dir = "results/TopVars/"
 
 
 ########################################

@@ -13,6 +13,8 @@ defines.extend(["#define ADD_TRUE_TOP_MATCHING_FOR_FJ 1",
                 "#define ADD_TRUE_PARTON_MATCHING_FOR_CMSTT 0",
             ])
 
+process += Scalar("weight__genmc", "float"),
+
 # True Top Branches
 for t in ["t", "tbar", "t2", "tbar2"]:
     for v in [
