@@ -188,50 +188,119 @@ process.ca15CMSTopTagInfos = cms.EDProducer("CATopJetTagger",
 # Nsubjettiness for groomed and ungroomed fatjets
 process.NjettinessCA08 = cms.EDProducer("NjettinessAdder",
                                         src=cms.InputTag("ca08PFJetsCHS"),
-                                        cone=cms.double(0.8),
-                                        Njets = cms.vuint32(1,2,3),
+                                        Njets=cms.vuint32(1,2,3),          # compute 1-, 2-, 3- subjettiness
+                                        # variables for measure definition : 
+                                        measureDefinition = cms.uint32( 0 ), # CMS default is normalized measure
+                                        beta = cms.double(1.0),              # CMS default is 1
+                                        R0 = cms.double( 0.8 ),              # CMS default is jet cone size
+                                        Rcutoff = cms.double( -999.0),       # not used by default
+                                        # variables for axes definition :
+                                        axesDefinition = cms.uint32( 6 ),    # CMS default is 1-pass KT axes
+                                        nPass = cms.int32(-999),             # not used by default
+                                        akAxesR0 = cms.double(-999.0)        # not used by default
                             )
+
+
+
 
 process.NjettinessCA08Filtered = cms.EDProducer("NjettinessAdder",
                                                 src=cms.InputTag("ca08PFJetsCHSFiltered"),
-                                                cone=cms.double(0.8),
-                                                Njets = cms.vuint32(1,2,3),
+                                                Njets=cms.vuint32(1,2,3),          # compute 1-, 2-, 3- subjettiness
+                                                # variables for measure definition : 
+                                                measureDefinition = cms.uint32( 0 ), # CMS default is normalized measure
+                                                beta = cms.double(1.0),              # CMS default is 1
+                                                R0 = cms.double( 0.8 ),              # CMS default is jet cone size
+                                                Rcutoff = cms.double( -999.0),       # not used by default
+                                                # variables for axes definition :
+                                                axesDefinition = cms.uint32( 6 ),    # CMS default is 1-pass KT axes
+                                                nPass = cms.int32(-999),             # not used by default
+                                                akAxesR0 = cms.double(-999.0)        # not used by default
                             )
 
 process.NjettinessCA08Pruned = cms.EDProducer("NjettinessAdder",
-                                                src=cms.InputTag("ca08PFJetsCHSPruned"),
-                                                cone=cms.double(0.8),
-                                                Njets = cms.vuint32(1,2,3),
+                                              src=cms.InputTag("ca08PFJetsCHSPruned"),
+                                              Njets=cms.vuint32(1,2,3),          # compute 1-, 2-, 3- subjettiness
+                                              # variables for measure definition : 
+                                              measureDefinition = cms.uint32( 0 ), # CMS default is normalized measure
+                                              beta = cms.double(1.0),              # CMS default is 1
+                                              R0 = cms.double( 0.8 ),              # CMS default is jet cone size
+                                              Rcutoff = cms.double( -999.0),       # not used by default
+                                              # variables for axes definition :
+                                              axesDefinition = cms.uint32( 6 ),    # CMS default is 1-pass KT axes
+                                              nPass = cms.int32(-999),             # not used by default
+                                              akAxesR0 = cms.double(-999.0)        # not used by default
+
                             )
 
+
 process.NjettinessCA08Trimmed = cms.EDProducer("NjettinessAdder",
-                                                src=cms.InputTag("ca08PFJetsCHSTrimmed"),
-                                                cone=cms.double(0.8),
-                                                Njets = cms.vuint32(1,2,3),
+                                               src=cms.InputTag("ca08PFJetsCHSTrimmed"),
+                                               Njets=cms.vuint32(1,2,3),          # compute 1-, 2-, 3- subjettiness
+                                               # variables for measure definition : 
+                                               measureDefinition = cms.uint32( 0 ), # CMS default is normalized measure
+                                               beta = cms.double(1.0),              # CMS default is 1
+                                               R0 = cms.double( 0.8 ),              # CMS default is jet cone size
+                                               Rcutoff = cms.double( -999.0),       # not used by default
+                                               # variables for axes definition :
+                                               axesDefinition = cms.uint32( 6 ),    # CMS default is 1-pass KT axes
+                                               nPass = cms.int32(-999),             # not used by default
+                                               akAxesR0 = cms.double(-999.0)        # not used by default
                             )
 
 process.NjettinessCA15 = cms.EDProducer("NjettinessAdder",
                                         src=cms.InputTag("ca15PFJetsCHS"),
-                                        cone=cms.double(1.5),
-                                        Njets = cms.vuint32(1,2,3),
+                                        Njets=cms.vuint32(1,2,3),          # compute 1-, 2-, 3- subjettiness
+                                        # variables for measure definition : 
+                                        measureDefinition = cms.uint32( 0 ), # CMS default is normalized measure
+                                        beta = cms.double(1.0),              # CMS default is 1
+                                        R0 = cms.double( 1.5 ),              # CMS default is jet cone size
+                                        Rcutoff = cms.double( -999.0),       # not used by default
+                                        # variables for axes definition :
+                                        axesDefinition = cms.uint32( 6 ),    # CMS default is 1-pass KT axes
+                                        nPass = cms.int32(-999),             # not used by default
+                                        akAxesR0 = cms.double(-999.0)        # not used by default
                             )
 
 process.NjettinessCA15Filtered = cms.EDProducer("NjettinessAdder",
                                                 src=cms.InputTag("ca15PFJetsCHSFiltered"),
-                                                cone=cms.double(1.5),
-                                                Njets = cms.vuint32(1,2,3),
+                                                Njets=cms.vuint32(1,2,3),          # compute 1-, 2-, 3- subjettiness
+                                                # variables for measure definition : 
+                                                measureDefinition = cms.uint32( 0 ), # CMS default is normalized measure
+                                                beta = cms.double(1.0),              # CMS default is 1
+                                                R0 = cms.double( 1.5 ),              # CMS default is jet cone size
+                                                Rcutoff = cms.double( -999.0),       # not used by default
+                                                # variables for axes definition :
+                                                axesDefinition = cms.uint32( 6 ),    # CMS default is 1-pass KT axes
+                                                nPass = cms.int32(-999),             # not used by default
+                                                akAxesR0 = cms.double(-999.0)        # not used by default
                             )
 
 process.NjettinessCA15Pruned = cms.EDProducer("NjettinessAdder",
-                                                src=cms.InputTag("ca15PFJetsCHSPruned"),
-                                                cone=cms.double(1.5),
-                                                Njets = cms.vuint32(1,2,3),
-                            )
+                                              src=cms.InputTag("ca15PFJetsCHSPruned"),
+                                              Njets=cms.vuint32(1,2,3),          # compute 1-, 2-, 3- subjettiness
+                                              # variables for measure definition : 
+                                              measureDefinition = cms.uint32( 0 ), # CMS default is normalized measure
+                                              beta = cms.double(1.0),              # CMS default is 1
+                                              R0 = cms.double( 1.5 ),              # CMS default is jet cone size
+                                              Rcutoff = cms.double( -999.0),       # not used by default
+                                              # variables for axes definition :
+                                              axesDefinition = cms.uint32( 6 ),    # CMS default is 1-pass KT axes
+                                              nPass = cms.int32(-999),             # not used by default
+                                              akAxesR0 = cms.double(-999.0)        # not used by default
+)
 
 process.NjettinessCA15Trimmed = cms.EDProducer("NjettinessAdder",
-                                                src=cms.InputTag("ca15PFJetsCHSTrimmed"),
-                                                cone=cms.double(1.5),
-                                                Njets = cms.vuint32(1,2,3),
+                                               src=cms.InputTag("ca15PFJetsCHSTrimmed"),
+                                               Njets=cms.vuint32(1,2,3),          # compute 1-, 2-, 3- subjettiness
+                                               # variables for measure definition : 
+                                               measureDefinition = cms.uint32( 0 ), # CMS default is normalized measure
+                                               beta = cms.double(1.0),              # CMS default is 1
+                                               R0 = cms.double( 1.5 ),              # CMS default is jet cone size
+                                               Rcutoff = cms.double( -999.0),       # not used by default
+                                               # variables for axes definition :
+                                               axesDefinition = cms.uint32( 6 ),    # CMS default is 1-pass KT axes
+                                               nPass = cms.int32(-999),             # not used by default
+                                               akAxesR0 = cms.double(-999.0)        # not used by default
                             )
 
 
