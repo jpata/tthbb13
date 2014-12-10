@@ -8,6 +8,7 @@ Collection of functions for simple crab3 submission.
 
 import subprocess
 import imp
+import glob
 
 from TTH.TTHNtupleAnalyzer.Samples import Samples
 
@@ -52,3 +53,46 @@ def submit(name,
     subprocess.call(["crab", "submit", "-c", "c_tmp.py"])
 
 # End of submit
+
+
+#######################################
+# download
+#######################################
+
+def download(name,
+             sample_shortname,
+             version,        
+             target_basepath):
+    """Download a single job from the Grid. Assume we are in the same
+    directory used for submission (crab_configs)
+    and the crab working directory is of the form
+    crab_ntop_v3_zprime_m1000_1p_13tev/crab_ntop_v3_zprime_m1000_1p_13tev
+
+    Download to target_basepath + job name
+    """
+
+    working_dir = "crab_{0}_{1}_{2}/crab_{0}_{1}_{2}".format(name, version, sample_shortname)
+    
+    output_dir = target_basepath + "{0}_{1}_{2}".format(name, version, sample_shortname)    
+    subprocess.call(["crab", "getoutput", "-d", working_dir, "--outputpath", output_dir])
+# End of download
+
+
+#######################################
+# hadd
+#######################################
+
+def hadd(name,
+         sample_shortname,
+         version,        
+         basepath = ""):
+    """ Hadd all root files in basepath+jobname to basepath/jobname.root
+    """
+
+    input_dir = basepath + "{0}_{1}_{2}/*".format(name, version, sample_shortname)    
+    input_filenames = glob.glob(input_dir)
+        
+    output_filename = basepath + "{0}_{1}_{2}.root".format(name, version, sample_shortname)    
+
+    subprocess.call(["hadd", "-f", output_filename] + input_filenames)
+# End of hadd
