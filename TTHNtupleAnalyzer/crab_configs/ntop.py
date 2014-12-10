@@ -15,7 +15,7 @@ from TTH.TTHNtupleAnalyzer.CrabHelpers import submit, status, download, hadd
 
 # Ntuple name/version and samples to include
 name = "ntop"
-version = "v4"
+version = "v5"
 li_samples = [#"qcd_120_170_pythia6_13tev", 
               #"qcd_170_300_pythia6_13tev", 
               #"qcd_300_470_pythia6_13tev", 
@@ -33,7 +33,7 @@ li_samples = [#"qcd_120_170_pythia6_13tev",
               #"zprime_m4000_1p_13tev" 
               ]
 
-cmssw_config_path = '/shome/gregor/TTH-72X/CMSSW/src/TTH/TTHNtupleAnalyzer/python/'
+cmssw_config_path = '/shome/gregor/TTH-73X/CMSSW/src/TTH/TTHNtupleAnalyzer/python/'
 config_script_name = 'Taggers_cfg.py'
 storage_path = '/scratch/gregor/'
 
