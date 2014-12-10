@@ -6,7 +6,7 @@
 
 import sys
 
-from TTH.TTHNtupleAnalyzer.CrabHelpers import submit, download, hadd
+from TTH.TTHNtupleAnalyzer.CrabHelpers import submit, status, download, hadd
 
 
 #######################################
@@ -15,12 +15,12 @@ from TTH.TTHNtupleAnalyzer.CrabHelpers import submit, download, hadd
 
 # Ntuple name/version and samples to include
 name = "ntop"
-version = "v3"
+version = "v3c"
 li_samples = [#"qcd_120_170_pythia6_13tev", ok
               #"qcd_170_300_pythia6_13tev", ok
               #"qcd_300_470_pythia6_13tev", ok
               #"qcd_470_600_pythia6_13tev", ok
-              #"qcd_600_800_pythia6_13tev", no job
+              "qcd_600_800_pythia6_13tev", 
               # "qcd_800_1000_pythia6_13tev, ok
               # "qcd_1000_1400_pythia6_13tev", ok
               #"qcd_1400_1800_pythia6_13tev", ok
@@ -29,7 +29,7 @@ li_samples = [#"qcd_120_170_pythia6_13tev", ok
               #"zprime_m1250_1p_13tev", ok
               #"zprime_m1500_1p_13tev", ok
               #"zprime_m2000_1p_13tev", ok
-              #"zprime_m3000_1p_13tev", no job
+              "zprime_m3000_1p_13tev", 
               # "zprime_m4000_1p_13tev" ok
               ]
 
@@ -42,7 +42,7 @@ storage_path = '/scratch/gregor/'
 #####################################
 
 # Decide what to do
-actions = ["submit", "download", "hadd"]
+actions = ["submit", "status", "download", "hadd"]
 
 if not len(sys.argv) == 2:
     print "Invalid number of arguments"
@@ -65,6 +65,13 @@ if action == "submit":
                cmssw_config_path = cmssw_config_path,
                cmssw_config_script = config_script_name,
                blacklist = [])
+
+# Status
+if action == "status":
+    for sample_shortname in li_samples:
+        status(name,
+               sample_shortname,  
+               version)
 
 # Download
 elif action == "download":

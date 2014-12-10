@@ -51,8 +51,22 @@ def submit(name,
     print "Now calling crab submit"
 
     subprocess.call(["crab", "submit", "-c", "c_tmp.py"])
-
 # End of submit
+
+
+#######################################
+# status
+#######################################
+
+def status(name,
+           sample_shortname,
+           version):
+    """Get status of a single job on the Grid."""
+
+    working_dir = "crab_{0}_{1}_{2}/crab_{0}_{1}_{2}".format(name, version, sample_shortname)
+    
+    subprocess.call(["crab", "status", "-d", working_dir])
+# End of status
 
 
 #######################################
