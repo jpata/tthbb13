@@ -275,7 +275,7 @@ def doWork( dic_files, output_dir ):
             if cp.log_y:
                 cp.max_y = 2*found_max
             else:
-                cp.max_y = 1.1*found_max
+                cp.max_y = 1.25*found_max
                 # End of cp.max_y == None
 
         # Loop over plots
@@ -299,7 +299,7 @@ def doWork( dic_files, output_dir ):
 
             # Adjust y-range        
             if cp.log_y:
-                h.SetAxisRange(0.01, cp.max_y,"y")
+                h.SetAxisRange(0.0001, cp.max_y,"y")
                 h.GetYaxis().SetLimits(0.01,cp.max_y)
                 c.SetLogy(True)
             else:
@@ -309,7 +309,7 @@ def doWork( dic_files, output_dir ):
                 # end of y-range adjusting
 
             # reduce number of ticks on x-axis
-            # h.GetXaxis().SetNdivisions(5,5,0)
+            h.GetXaxis().SetNdivisions(5,5,0)
 
             # Label the x-axis
             # proper adding of [units] to the x-axis label
