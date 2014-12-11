@@ -81,8 +81,7 @@ process.ca08PFJetsCHSFiltered = process.ca08PFJetsCHS.clone(
     nFilt = cms.int32(3),
     rFilt = cms.double(0.3),
     useExplicitGhosts = cms.bool(True),
-    writeCompound = cms.bool(True),
-    jetCollInstanceName=cms.string("SubJets")
+    #jetCollInstanceName=cms.string("SubJets")
     )
 
 process.ca08PFJetsCHSPruned = process.ca08PFJetsCHS.clone(
@@ -91,8 +90,7 @@ process.ca08PFJetsCHSPruned = process.ca08PFJetsCHS.clone(
              rcut_factor = cms.double(0.5)),
     usePruning = cms.bool(True),
     useExplicitGhosts = cms.bool(True),
-    writeCompound = cms.bool(True),
-    jetCollInstanceName=cms.string("SubJets")
+    #jetCollInstanceName=cms.string("SubJets")
     )
 
 process.ca08PFJetsCHSTrimmed = process.ca08PFJetsCHS.clone(
@@ -102,13 +100,21 @@ process.ca08PFJetsCHSTrimmed = process.ca08PFJetsCHS.clone(
     useExplicitGhosts = cms.bool(True)
     )
 
+process.ca08PFJetsCHSSoftDrop = process.ca08PFJetsCHS.clone(
+        useSoftDrop = cms.bool(True),
+        zcut = cms.double(0.8),
+        beta = cms.double(.5),
+        verbosity = cms.int32(99),
+        useExplicitGhosts = cms.bool(True),
+    #jetCollInstanceName=cms.string("SubJets")
+)
+
 process.ca15PFJetsCHSFiltered = process.ca15PFJetsCHS.clone(
     useFiltering = cms.bool(True),
     nFilt = cms.int32(3),
     rFilt = cms.double(0.3),
     useExplicitGhosts = cms.bool(True),
-    writeCompound = cms.bool(True),
-    jetCollInstanceName=cms.string("SubJets")
+    #jetCollInstanceName=cms.string("SubJets")
     )
 
 process.ca15PFJetsCHSPruned = process.ca15PFJetsCHS.clone(
@@ -117,8 +123,7 @@ process.ca15PFJetsCHSPruned = process.ca15PFJetsCHS.clone(
              rcut_factor = cms.double(0.5)),
     usePruning = cms.bool(True),
     useExplicitGhosts = cms.bool(True),
-    writeCompound = cms.bool(True),
-    jetCollInstanceName=cms.string("SubJets")
+    #jetCollInstanceName=cms.string("SubJets")
     )
 
 process.ca15PFJetsCHSTrimmed = process.ca15PFJetsCHS.clone(
@@ -127,6 +132,14 @@ process.ca15PFJetsCHSTrimmed = process.ca15PFJetsCHS.clone(
     trimPtFracMin = cms.double(0.03),
     useExplicitGhosts = cms.bool(True)
     )
+
+process.ca15PFJetsCHSSoftDrop = process.ca15PFJetsCHS.clone(
+    useSoftDrop = cms.bool(True),
+    zcut = cms.double(0.1),
+    beta = cms.double(0.0),
+    useExplicitGhosts = cms.bool(True)
+)
+
 
 
 # CMS Top Tagger Jets
@@ -247,6 +260,20 @@ process.NjettinessCA08Trimmed = cms.EDProducer("NjettinessAdder",
                                                akAxesR0 = cms.double(-999.0)        # not used by default
                             )
 
+process.NjettinessCA08SoftDrop = cms.EDProducer("NjettinessAdder",
+                                               src=cms.InputTag("ca08PFJetsCHSSoftDrop"),
+                                               Njets=cms.vuint32(1,2,3),          # compute 1-, 2-, 3- subjettiness
+                                               # variables for measure definition : 
+                                               measureDefinition = cms.uint32( 0 ), # CMS default is normalized measure
+                                               beta = cms.double(1.0),              # CMS default is 1
+                                               R0 = cms.double( 0.8 ),              # CMS default is jet cone size
+                                               Rcutoff = cms.double( -999.0),       # not used by default
+                                               # variables for axes definition :
+                                               axesDefinition = cms.uint32( 6 ),    # CMS default is 1-pass KT axes
+                                               nPass = cms.int32(-999),             # not used by default
+                                               akAxesR0 = cms.double(-999.0)        # not used by default
+                            )
+
 process.NjettinessCA15 = cms.EDProducer("NjettinessAdder",
                                         src=cms.InputTag("ca15PFJetsCHS"),
                                         Njets=cms.vuint32(1,2,3),          # compute 1-, 2-, 3- subjettiness
@@ -303,6 +330,20 @@ process.NjettinessCA15Trimmed = cms.EDProducer("NjettinessAdder",
                                                akAxesR0 = cms.double(-999.0)        # not used by default
                             )
 
+process.NjettinessCA15SoftDrop = cms.EDProducer("NjettinessAdder",
+                                               src=cms.InputTag("ca15PFJetsCHSSoftDrop"),
+                                               Njets=cms.vuint32(1,2,3),          # compute 1-, 2-, 3- subjettiness
+                                               # variables for measure definition : 
+                                               measureDefinition = cms.uint32( 0 ), # CMS default is normalized measure
+                                               beta = cms.double(1.0),              # CMS default is 1
+                                               R0 = cms.double( 1.5 ),              # CMS default is jet cone size
+                                               Rcutoff = cms.double( -999.0),       # not used by default
+                                               # variables for axes definition :
+                                               axesDefinition = cms.uint32( 6 ),    # CMS default is 1-pass KT axes
+                                               nPass = cms.int32(-999),             # not used by default
+                                               akAxesR0 = cms.double(-999.0)        # not used by default
+                            )
+
 
 
 
@@ -324,10 +365,10 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
         triggerIdentifiersForMatching = cms.vstring([]),
 
         # take ca15PFJetsCHS jets, add the Njettiness values and store them as jet_fat
-        fatjetsObjects  = cms.vstring(  ['ca08PFJetsCHS',  'ca08PFJetsCHSFiltered',  'ca08PFJetsCHSPruned',  'ca08PFJetsCHSTrimmed',  'ca15PFJetsCHS',  'ca15PFJetsCHSFiltered',  'ca15PFJetsCHSPruned',  'ca15PFJetsCHSTrimmed'  ]),
-        fatjetsNsubs    = cms.vstring(  ['NjettinessCA08', 'NjettinessCA08Filtered', 'NjettinessCA08Pruned', 'NjettinessCA08Trimmed', 'NjettinessCA15', 'NjettinessCA15Filtered', 'NjettinessCA15Pruned', 'NjettinessCA15Trimmed' ]),
-        fatjetsBranches = cms.vstring(  ['ca08',           'ca08filtered',           'ca08pruned',           'ca08trimmed',           'ca15',           'ca15filtered',           'ca15pruned',           'ca15trimmed'           ]),
-        fatjetsIsBasicJets = cms.vint32([0,                 1,                        1,                      0,                       0,                1,                        1,                      0]),                                           
+        fatjetsObjects  = cms.vstring(  ['ca08PFJetsCHS',  'ca08PFJetsCHSFiltered',  'ca08PFJetsCHSPruned',  'ca08PFJetsCHSTrimmed',  'ca08PFJetsCHSSoftDrop',  'ca15PFJetsCHS',  'ca15PFJetsCHSFiltered',  'ca15PFJetsCHSPruned',  'ca15PFJetsCHSTrimmed' ,'ca15PFJetsCHSSoftDrop'  ]),
+        fatjetsNsubs    = cms.vstring(  ['NjettinessCA08', 'NjettinessCA08Filtered', 'NjettinessCA08Pruned', 'NjettinessCA08Trimmed', 'NjettinessCA08SoftDrop', 'NjettinessCA15', 'NjettinessCA15Filtered', 'NjettinessCA15Pruned', 'NjettinessCA15Trimmed','NjettinessCA15SoftDrop' ]),
+        fatjetsBranches = cms.vstring(  ['ca08',           'ca08filtered',           'ca08pruned',           'ca08trimmed',           'ca08softdrop',           'ca15',           'ca15filtered',           'ca15pruned',           'ca15trimmed'          ,'ca15softdrop'           ]),
+        fatjetsIsBasicJets = cms.vint32([0,                 0,                        0,                      0,                       0,                       0,                0,                        0,                       0                     , 0                      ]),                                           
 
         httObjects  = cms.vstring(['LooseMultiRHTTJetsCHS']),                                           
         httBranches = cms.vstring(['looseMultiRHTT']),                                           
@@ -398,20 +439,24 @@ process.p = cms.Path(
         process.ca08PFJetsCHSFiltered * 
         process.ca08PFJetsCHSPruned   * 
         process.ca08PFJetsCHSTrimmed  * 
+        process.ca08PFJetsCHSSoftDrop *
 
         process.ca15PFJetsCHSFiltered * 
         process.ca15PFJetsCHSPruned   * 
         process.ca15PFJetsCHSTrimmed  * 
+        process.ca15PFJetsCHSSoftDrop *
 
         process.NjettinessCA08 *        
         process.NjettinessCA08Filtered *        
         process.NjettinessCA08Pruned *        
         process.NjettinessCA08Trimmed *        
+        process.NjettinessCA08SoftDrop *        
 
         process.NjettinessCA15 *        
         process.NjettinessCA15Filtered *        
         process.NjettinessCA15Pruned *        
         process.NjettinessCA15Trimmed *        
+        process.NjettinessCA15SoftDrop *        
 
         process.cmsTopTagCa08PFJetsCHS *
         process.cmsTopTagCa15PFJetsCHS *
