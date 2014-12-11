@@ -81,7 +81,6 @@ process.ca08PFJetsCHSFiltered = process.ca08PFJetsCHS.clone(
     nFilt = cms.int32(3),
     rFilt = cms.double(0.3),
     useExplicitGhosts = cms.bool(True),
-    #jetCollInstanceName=cms.string("SubJets")
     )
 
 process.ca08PFJetsCHSPruned = process.ca08PFJetsCHS.clone(
@@ -90,7 +89,6 @@ process.ca08PFJetsCHSPruned = process.ca08PFJetsCHS.clone(
              rcut_factor = cms.double(0.5)),
     usePruning = cms.bool(True),
     useExplicitGhosts = cms.bool(True),
-    #jetCollInstanceName=cms.string("SubJets")
     )
 
 process.ca08PFJetsCHSTrimmed = process.ca08PFJetsCHS.clone(
@@ -102,11 +100,9 @@ process.ca08PFJetsCHSTrimmed = process.ca08PFJetsCHS.clone(
 
 process.ca08PFJetsCHSSoftDrop = process.ca08PFJetsCHS.clone(
         useSoftDrop = cms.bool(True),
-        zcut = cms.double(0.8),
-        beta = cms.double(.5),
-        verbosity = cms.int32(99),
+        zcut = cms.double(0.1),
+        beta = cms.double(0.0),
         useExplicitGhosts = cms.bool(True),
-    #jetCollInstanceName=cms.string("SubJets")
 )
 
 process.ca15PFJetsCHSFiltered = process.ca15PFJetsCHS.clone(
@@ -114,30 +110,28 @@ process.ca15PFJetsCHSFiltered = process.ca15PFJetsCHS.clone(
     nFilt = cms.int32(3),
     rFilt = cms.double(0.3),
     useExplicitGhosts = cms.bool(True),
-    #jetCollInstanceName=cms.string("SubJets")
-    )
+)
 
 process.ca15PFJetsCHSPruned = process.ca15PFJetsCHS.clone(
-    cms.PSet(nFilt = cms.int32(2),
-             zcut = cms.double(0.1),
-             rcut_factor = cms.double(0.5)),
-    usePruning = cms.bool(True),
-    useExplicitGhosts = cms.bool(True),
-    #jetCollInstanceName=cms.string("SubJets")
-    )
+        cms.PSet(nFilt = cms.int32(2),
+                 zcut = cms.double(0.1),
+                 rcut_factor = cms.double(0.5)),
+        usePruning = cms.bool(True),
+        useExplicitGhosts = cms.bool(True),
+)
 
 process.ca15PFJetsCHSTrimmed = process.ca15PFJetsCHS.clone(
-    useTrimming = cms.bool(True),
-    rFilt = cms.double(0.2),
-    trimPtFracMin = cms.double(0.03),
-    useExplicitGhosts = cms.bool(True)
-    )
+        useTrimming = cms.bool(True),
+        rFilt = cms.double(0.2),
+        trimPtFracMin = cms.double(0.03),
+        useExplicitGhosts = cms.bool(True)
+)
 
 process.ca15PFJetsCHSSoftDrop = process.ca15PFJetsCHS.clone(
-    useSoftDrop = cms.bool(True),
-    zcut = cms.double(0.1),
-    beta = cms.double(0.0),
-    useExplicitGhosts = cms.bool(True)
+        useSoftDrop = cms.bool(True),
+        zcut = cms.double(0.1),
+        beta = cms.double(0.0),
+        useExplicitGhosts = cms.bool(True)
 )
 
 
