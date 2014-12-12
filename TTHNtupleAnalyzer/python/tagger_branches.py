@@ -22,6 +22,21 @@ process = [
 
 process += Scalar("weight__genmc", "float"),
 
+# Simple Truth Branches
+# - Just the kinematics
+# - above a pT threshold
+# - these are the objects the jets/taggers are matched to and know the indices of
+for particle in ["hadtop", "higgs", "parton"]:
+
+    counter_name =  "n__gen_{0}".format(particle)
+    process += [Scalar(counter_name, "int")]
+
+    for v in ["eta", "mass", "phi", "pt"]:
+        full_branch_name = "gen_{0}__{1}".format(particle, v)
+        process += [Dynamic1DArray(full_branch_name, "float", counter_name, "N_MAX")]
+# End of Simple Truth
+
+
 # True Top Branches
 for t in ["t", "tbar", "t2", "tbar2"]:
     for v in [
