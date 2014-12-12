@@ -233,18 +233,6 @@ void fill_fatjet_branches(const edm::Event& iEvent,
   assert(fatjets->size()==fatjet_nsub_tau2->size());
   assert(fatjets->size()==fatjet_nsub_tau3->size());
 	  
-  // Create a list of true_tops that can be used for matching
-  // only take the ones passing the pT threshold
-  float min_true_top_pt = 200;
-  vector<const reco::Candidate*>  true_t_for_matching;
-  
-  for (vector<const reco::Candidate*>::const_iterator iter = true_t.begin();
-       iter != true_t.end();
-       ++iter){
-    if ((*iter)->pt() > min_true_top_pt)      
-      true_t_for_matching.push_back(*iter);
-  }
-
   // Loop over fatjets
   for (unsigned n_fat_jet = 0; n_fat_jet != fatjets->size(); n_fat_jet++){
 	    
@@ -268,7 +256,7 @@ void fill_fatjet_branches(const edm::Event& iEvent,
 
     // Optional: Fill truth matching information
     if (ADD_TRUE_TOP_MATCHING_FOR_FJ)
-      fill_truth_matching<JetType>(tthtree, x, n_fat_jet, true_t_for_matching, prefix, "hadtop");
+      fill_truth_matching<JetType>(tthtree, x, n_fat_jet, true_t, prefix, "hadtop");
     if (ADD_TRUE_PARTON_MATCHING_FOR_FJ)	      
       fill_truth_matching<JetType>(tthtree, x, n_fat_jet, hard_partons, prefix, "parton");
     if (ADD_TRUE_HIGGS_MATCHING_FOR_FJ)	      
@@ -1429,12 +1417,14 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	tops_antitops_last.insert(tops_antitops_last.end(), tops_last.begin(), tops_last.end()); // add tops
 	tops_antitops_last.insert(tops_antitops_last.end(), antitops_last.begin(), antitops_last.end()); // add antis
 
-	// Hadronically decaying top quarks
+	// Hadronically decaying top quarks - only take the ones passing the pT threshold
+	float min_true_top_pt = 200;
 	vector<const reco::Candidate*> hadronic_ts;
 	for (vector<const reco::Candidate*>::const_iterator iter = tops_antitops_last.begin();
 	     iter != tops_antitops_last.end();
 	     ++iter){	  	  
-	  if (is_hadronic_top(*iter) == 1)
+	  if ( (is_hadronic_top(*iter) == 1) &&   // Check hadronic decay
+	       ((*iter)->pt() > min_true_top_pt)) // Check pT
 	    hadronic_ts.push_back(*iter);
 	}
 
@@ -1456,18 +1446,6 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
 	  // Make sure both collections have the same size
 	  assert(top_jets->size()==top_jet_infos->size());
-
-	  // Create a list of true_tops that can be used for matching
-	  // only take the ones passing the pT threshold
-	  float min_true_top_pt = 200;
-	  vector<const reco::Candidate*>  true_t_for_matching;
-	  
-	  for (vector<const reco::Candidate*>::const_iterator iter = hadronic_ts.begin();
-	       iter != hadronic_ts.end();
-	       ++iter){
-	    if ((*iter)->pt() > min_true_top_pt)      
-	      true_t_for_matching.push_back(*iter);
-	  }
 
           // HEPTopTagger
 	  // Top jets and subjets are associated by indices. See:
@@ -1514,7 +1492,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	   
 	    // Optional: Fill truth matching information
 	    if (ADD_TRUE_TOP_MATCHING_FOR_HTT)
-	      fill_truth_matching<reco::BasicJet>(tthtree, x, n_top_jet, true_t_for_matching, prefix, "hadtop");
+	      fill_truth_matching<reco::BasicJet>(tthtree, x, n_top_jet, hadronic_ts, prefix, "hadtop");
 	    if (ADD_TRUE_PARTON_MATCHING_FOR_HTT)
 	      fill_truth_matching<reco::BasicJet>(tthtree, x, n_top_jet, hard_partons, prefix, "parton");
 	    if (ADD_TRUE_HIGGS_MATCHING_FOR_HTT)
@@ -1580,17 +1558,6 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	  // Make sure both collections have the same size
 	  assert(top_jets->size()==top_jet_infos->size());
 
-	  // Create a list of true_tops that can be used for matching
-	  // only take the ones passing the pT threshold
-	  float min_true_top_pt = 200;
-	  vector<const reco::Candidate*>  true_t_for_matching;
-	  
-	  for (vector<const reco::Candidate*>::const_iterator iter = hadronic_ts.begin();
-	       iter != hadronic_ts.end();
-	       ++iter){
-	    if ((*iter)->pt() > min_true_top_pt)      
-	      true_t_for_matching.push_back(*iter);
-	  }
 
 	  // Top jets and subjets are associated by indices. See:
 	  // /cvmfs/cms.cern.ch/slc6_amd64_gcc481/cms/cmssw/CMSSW_7_0_9/src/RecoJets/JetProducers/plugins/CompoundJetProducer.cc
@@ -1619,7 +1586,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	   
 	    // Optional: Fill truth matching information
 	    if (ADD_TRUE_TOP_MATCHING_FOR_CMSTT)
-	      fill_truth_matching<reco::BasicJet>(tthtree, x, n_top_jet, true_t_for_matching, prefix, "hadtop");
+	      fill_truth_matching<reco::BasicJet>(tthtree, x, n_top_jet, hadronic_ts, prefix, "hadtop");
 	    if (ADD_TRUE_PARTON_MATCHING_FOR_CMSTT)
 	      fill_truth_matching<reco::BasicJet>(tthtree, x, n_top_jet, hard_partons, prefix, "parton");
 	    if (ADD_TRUE_HIGGS_MATCHING_FOR_CMSTT)
