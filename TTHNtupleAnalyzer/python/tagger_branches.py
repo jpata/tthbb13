@@ -151,14 +151,19 @@ for fj_name in ["ca08", "ca08filtered", "ca08pruned", "ca08trimmed",
     for branch_name in [
             "pt", "eta", "phi", "mass",  # Kinematics
             "tau1", "tau2", "tau3",      # N-subjettiness
-            "close_hadtop_pt",  "close_hadtop_dr", # top truth matching
-            "close_parton_pt",  "close_parton_dr", # parton truth matching
-            "close_higgs_pt",   "close_higgs_dr"   # higgs truth matching
+            "close_hadtop_pt",  "close_hadtop_dr", "close_hadtop_i", # top truth matching
+            "close_parton_pt",  "close_parton_dr", "close_parton_i", # parton truth matching
+            "close_higgs_pt",   "close_higgs_dr",  "close_higgs_i"   # higgs truth matching
             ]:
+
+        if branch_name in ["close_higgs_i", "close_hadtop_i", "close_parton_i"]:
+            the_type = "int"
+        else:
+            the_type = "float"
 
         full_branch_name = "jet_{0}__{1}".format(fj_name, branch_name)
         process += [Dynamic1DArray(full_branch_name, 
-                                   "float",
+                                   the_type,
                                    full_counter_name,
                                    "N_MAX"
                                )]
@@ -174,12 +179,12 @@ htt_float_branches =  [
     "fW", "massRatioPassed",                    # Standard HTT variables 
     "Rmin", "ptFiltForRminExp", "RminExpected", # MultiR variables
     "prunedMass", "topMass", "unfilteredMass",  # extra masses
-    "close_hadtop_pt",  "close_hadtop_dr",      # top truth matching
-    "close_parton_pt",  "close_parton_dr",      # parton truth matching
-    "close_higgs_pt",  "close_higgs_dr"         # higgs truth matching
+    "close_hadtop_pt", "close_hadtop_dr",       # top truth matching
+    "close_parton_pt", "close_parton_dr",       # parton truth matching
+    "close_higgs_pt",  "close_higgs_dr",        # higgs truth matching
 ]
 
-htt_int_branches = ["child_idx", "isMultiR", "n_sj"]
+htt_int_branches = ["child_idx", "isMultiR", "n_sj", "close_higgs_i", "close_parton_i", "close_hadtop_i"]
 
 htt_sj_float_branches =  ["energy", "eta", "mass", "phi", "pt"]
 
@@ -226,7 +231,7 @@ cmstt_float_branches =  [
     "close_higgs_pt",   "close_higgs_dr",     # higgs truth matching
 ]
 
-cmstt_int_branches = ["child_idx", "nSubJets"]
+cmstt_int_branches = ["child_idx", "nSubJets", "close_higgs_i", "close_parton_i", "close_hadtop_i"]
 
 cmstt_sj_float_branches =  ["energy", "eta", "mass", "phi", "pt"]
 

@@ -130,7 +130,17 @@ class plot:
 ########################################
 
 # List of nice plotting colors
-li_colors = [ROOT.kBlack, ROOT.kRed, ROOT.kBlue, 28, ROOT.kOrange, ROOT.kGreen, ROOT.kMagenta, ROOT.kGray]*10
+li_colors = [ROOT.kBlack, 
+             ROOT.kRed, 
+             ROOT.kBlue, 
+             28, 
+             ROOT.kOrange, 
+             ROOT.kGreen, 
+             ROOT.kMagenta, 
+             ROOT.kGray, 
+             ROOT.kCyan,
+             ROOT.kOrange+3
+          ]*10
 
 # List of nice line style
 li_line_styles = [1,1,4,2,3,5,6]*10
@@ -322,7 +332,7 @@ def doWork( dic_files, output_dir ):
             # Label the y-axis
             #h.GetYaxis().SetTitle( cp.label_y + " / "+str(bin_width) +" "+ cp.axis_unit)
             h.GetYaxis().SetTitle( cp.label_y)
-            h.GetYaxis().SetTitleOffset(2.)
+            h.GetYaxis().SetTitleOffset(1.7)
 
 
             # Draw the histogram
