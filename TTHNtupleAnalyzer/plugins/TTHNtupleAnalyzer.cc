@@ -27,8 +27,9 @@
 // system include files
 #include <memory>
 #include <algorithm>
+#include <vector>
 #include <string>
-
+#include <iterator>
 
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
@@ -129,6 +130,7 @@ template<typename T>
 T * ptr(T * obj) { return obj; } //obj is already pointer, return it!
 
 
+// OBSOLOTE: Not needed at the moment!
 // Functor so we can sort a list of ElementType objects according to
 // their deltaR distance to the reference object.  
 // Can take anything that inherits the p4() to give Lorentz Vector. 
@@ -149,7 +151,7 @@ template <typename JetType>
 void fill_truth_matching(TTHTree* tthtree, 				 
 			 JetType x, // object for which to fill - fatjet or HTT cand
 			 int n, // position at which to insert new values in the tree (ie n_fat_jet)
-			 vector<const reco::Candidate*>  & truth_particles, // particles for matching
+			 const vector<const reco::Candidate*>  & truth_particles, // particles for matching
 			 std::string prefix, // prefix for branch names
 			 std::string truth_name // what are we matching (to select branch name to fill into) hadtop/parton/..
 			 ){
@@ -163,20 +165,33 @@ void fill_truth_matching(TTHTree* tthtree,
   name_dr_branch += truth_name;
   name_dr_branch += "_dr";
 
-  // Sort true tops according to distance to object (fatjet, HTT cand) under study
-  sort(truth_particles.begin(), truth_particles.end(), 
-       distance_sorter<JetType, const reco::Candidate*>(x));	   
+  std::string name_i_branch = prefix + "close_";
+  name_i_branch += truth_name;
+  name_i_branch += "_i";
 
+  // Calculate the DeltaR from each truth particle to the jet
+  std::vector<double> distances;
+  for (vector<const reco::Candidate*>::const_iterator it = truth_particles.begin();
+       it != truth_particles.end();
+       ++it){
+    distances.push_back(ROOT::Math::VectorUtil::DeltaR(ptr(*it)->p4(), ptr(x)->p4()));
+  }   
+  
+  // And find the index of the closest one
+ std::vector<double>::iterator min_distance = std::min_element(std::begin(distances), std::end(distances));
+ int index_closest = std::distance(std::begin(distances), min_distance);
+ 
   // Fill true pT and DeltaR if at least one truth object
   if (truth_particles.size() > 0){		
-    float dR = ROOT::Math::VectorUtil::DeltaR( ptr(x)->p4(), ptr(truth_particles[0])->p4());			
-    tthtree->get_address<float *>(name_pt_branch)[n] = truth_particles[0]->pt();
-    tthtree->get_address<float *>(name_dr_branch)[n] = dR;       
+    tthtree->get_address<float *>(name_pt_branch)[n] = truth_particles[index_closest]->pt();
+    tthtree->get_address<float *>(name_dr_branch)[n] = *min_distance;
+    tthtree->get_address<int *>(  name_i_branch)[n]  = index_closest;
   }
   // Otherwise use dummy values
   else{
     tthtree->get_address<float *>(name_pt_branch)[n] = DEF_VAL_FLOAT;
     tthtree->get_address<float *>(name_dr_branch)[n] = 9999.0;
+    tthtree->get_address<int *>(  name_i_branch)[n]  = DEF_VAL_INT;
   }
 
 }//fill_truth_matching
