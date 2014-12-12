@@ -15,7 +15,7 @@ from TTH.TTHNtupleAnalyzer.CrabHelpers import submit, status, download, hadd
 
 # Ntuple name/version and samples to include
 name = "ntop"
-version = "v7"
+version = "v8"
 li_samples = [
     "qcd_800_1000_pythia8_13tev",    
     #"zprime_m1000_1p_13tev",
