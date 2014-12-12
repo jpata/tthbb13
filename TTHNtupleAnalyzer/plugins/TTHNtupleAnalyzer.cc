@@ -209,9 +209,9 @@ void fill_fatjet_branches(const edm::Event& iEvent,
 			  // true top and anti top for optional matching
 			  const vector<const reco::Candidate*>  & true_t,
 			  // hard partons for matching
-			  vector<const reco::Candidate*>  & hard_partons,
+			  const vector<const reco::Candidate*>  & hard_partons,
 			  // true higgs for matching
-			  vector<const reco::Candidate*>  & gen_higgs
+			  const vector<const reco::Candidate*>  & gen_higgs
 			  ){
   
   // Get Fatjet iteself
@@ -1427,6 +1427,12 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	       ((*iter)->pt() > min_true_top_pt)) // Check pT
 	    hadronic_ts.push_back(*iter);
 	}
+
+	// Sort the truth top/higgs/parton collections by pT descending 
+	sort(hard_partons.begin(), hard_partons.end(), order_by_pt<const reco::Candidate*>);
+	sort(gen_higgs.begin(),    gen_higgs.end(),    order_by_pt<const reco::Candidate*>);
+	sort(hadronic_ts.begin(),  hadronic_ts.end(),  order_by_pt<const reco::Candidate*>);
+
 
 
 	// Loop over HTT collections
