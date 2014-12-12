@@ -270,6 +270,38 @@ void fill_fatjet_branches(const edm::Event& iEvent,
 }
 
 
+// Function to fill the branches for a  truth collection
+// (higgs, hadronic tops or partons)
+// objects as fatjets
+void fill_genparticle_branches(TTHTree* tthtree, 
+			       const vector<const reco::Candidate*>  & particles,
+			       std::string name){
+  
+  // Loop over particles
+  for (vector<const reco::Candidate*>::const_iterator it = particles.begin();
+       it != particles.end();
+       ++it){
+    
+    std::string prefix("gen_");
+    prefix.append(name);
+    prefix.append("__");
+
+    int n = it - particles.begin();
+    
+    // Fill the branches
+    tthtree->get_address<float *>(prefix + "pt"  )[n] = (*it)->pt();
+    tthtree->get_address<float *>(prefix + "eta" )[n] = (*it)->eta();
+    tthtree->get_address<float *>(prefix + "phi" )[n] = (*it)->phi();
+    tthtree->get_address<float *>(prefix + "mass")[n] = (*it)->mass();    
+  }
+  
+  // Also count the number of particles
+  std::string n_branch("n__gen_" + name);
+  *(tthtree->get_address<int *>(n_branch)) = particles.size();
+}
+
+
+
 //finds a matched genparticle by dR, dPt and id
 //x - particle to match
 //pruned - collection of genparticles
@@ -1433,8 +1465,12 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	sort(gen_higgs.begin(),    gen_higgs.end(),    order_by_pt<const reco::Candidate*>);
 	sort(hadronic_ts.begin(),  hadronic_ts.end(),  order_by_pt<const reco::Candidate*>);
 
-
-
+	// Fill the genparticle branches
+	fill_genparticle_branches(tthtree, hard_partons, "parton");
+	fill_genparticle_branches(tthtree, gen_higgs,    "higgs");
+	fill_genparticle_branches(tthtree, hadronic_ts,  "hadtop");
+  
+      
 	// Loop over HTT collections
 	for (unsigned i_htt_coll = 0; i_htt_coll < htt_objects_.size(); i_htt_coll++){
 

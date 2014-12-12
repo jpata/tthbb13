@@ -151,6 +151,21 @@ public:
 	float weight__trigger_up;
     
 	float weight__genmc;
+	int n__gen_hadtop;
+	float gen_hadtop__eta[N_MAX];
+	float gen_hadtop__mass[N_MAX];
+	float gen_hadtop__phi[N_MAX];
+	float gen_hadtop__pt[N_MAX];
+	int n__gen_higgs;
+	float gen_higgs__eta[N_MAX];
+	float gen_higgs__mass[N_MAX];
+	float gen_higgs__phi[N_MAX];
+	float gen_higgs__pt[N_MAX];
+	int n__gen_parton;
+	float gen_parton__eta[N_MAX];
+	float gen_parton__mass[N_MAX];
+	float gen_parton__phi[N_MAX];
+	float gen_parton__pt[N_MAX];
 	float gen_t__eta;
 	float gen_t__mass;
 	float gen_t__phi;
@@ -504,6 +519,21 @@ public:
 		weight__trigger_up = DEF_VAL_FLOAT;
         
 		weight__genmc = DEF_VAL_FLOAT;
+		n__gen_hadtop = DEF_VAL_INT;
+		SET_ZERO(gen_hadtop__eta, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(gen_hadtop__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(gen_hadtop__phi, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(gen_hadtop__pt, N_MAX, DEF_VAL_FLOAT);
+		n__gen_higgs = DEF_VAL_INT;
+		SET_ZERO(gen_higgs__eta, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(gen_higgs__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(gen_higgs__phi, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(gen_higgs__pt, N_MAX, DEF_VAL_FLOAT);
+		n__gen_parton = DEF_VAL_INT;
+		SET_ZERO(gen_parton__eta, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(gen_parton__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(gen_parton__phi, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(gen_parton__pt, N_MAX, DEF_VAL_FLOAT);
 		gen_t__eta = DEF_VAL_FLOAT;
 		gen_t__mass = DEF_VAL_FLOAT;
 		gen_t__phi = DEF_VAL_FLOAT;
@@ -856,6 +886,21 @@ public:
 		tree->Branch("weight__trigger_up", &weight__trigger_up, "weight__trigger_up/F");
         
 		tree->Branch("weight__genmc", &weight__genmc, "weight__genmc/F");
+		tree->Branch("n__gen_hadtop", &n__gen_hadtop, "n__gen_hadtop/I");
+		tree->Branch("gen_hadtop__eta", gen_hadtop__eta, "gen_hadtop__eta[n__gen_hadtop]/F");
+		tree->Branch("gen_hadtop__mass", gen_hadtop__mass, "gen_hadtop__mass[n__gen_hadtop]/F");
+		tree->Branch("gen_hadtop__phi", gen_hadtop__phi, "gen_hadtop__phi[n__gen_hadtop]/F");
+		tree->Branch("gen_hadtop__pt", gen_hadtop__pt, "gen_hadtop__pt[n__gen_hadtop]/F");
+		tree->Branch("n__gen_higgs", &n__gen_higgs, "n__gen_higgs/I");
+		tree->Branch("gen_higgs__eta", gen_higgs__eta, "gen_higgs__eta[n__gen_higgs]/F");
+		tree->Branch("gen_higgs__mass", gen_higgs__mass, "gen_higgs__mass[n__gen_higgs]/F");
+		tree->Branch("gen_higgs__phi", gen_higgs__phi, "gen_higgs__phi[n__gen_higgs]/F");
+		tree->Branch("gen_higgs__pt", gen_higgs__pt, "gen_higgs__pt[n__gen_higgs]/F");
+		tree->Branch("n__gen_parton", &n__gen_parton, "n__gen_parton/I");
+		tree->Branch("gen_parton__eta", gen_parton__eta, "gen_parton__eta[n__gen_parton]/F");
+		tree->Branch("gen_parton__mass", gen_parton__mass, "gen_parton__mass[n__gen_parton]/F");
+		tree->Branch("gen_parton__phi", gen_parton__phi, "gen_parton__phi[n__gen_parton]/F");
+		tree->Branch("gen_parton__pt", gen_parton__pt, "gen_parton__pt[n__gen_parton]/F");
 		tree->Branch("gen_t__eta", &gen_t__eta, "gen_t__eta/F");
 		tree->Branch("gen_t__mass", &gen_t__mass, "gen_t__mass/F");
 		tree->Branch("gen_t__phi", &gen_t__phi, "gen_t__phi/F");
@@ -1199,6 +1244,21 @@ public:
 		tree->SetBranchAddress("weight__trigger_up", &weight__trigger_up);
         
 		tree->SetBranchAddress("weight__genmc", &weight__genmc);
+		tree->SetBranchAddress("n__gen_hadtop", &n__gen_hadtop);
+		tree->SetBranchAddress("gen_hadtop__eta", gen_hadtop__eta);
+		tree->SetBranchAddress("gen_hadtop__mass", gen_hadtop__mass);
+		tree->SetBranchAddress("gen_hadtop__phi", gen_hadtop__phi);
+		tree->SetBranchAddress("gen_hadtop__pt", gen_hadtop__pt);
+		tree->SetBranchAddress("n__gen_higgs", &n__gen_higgs);
+		tree->SetBranchAddress("gen_higgs__eta", gen_higgs__eta);
+		tree->SetBranchAddress("gen_higgs__mass", gen_higgs__mass);
+		tree->SetBranchAddress("gen_higgs__phi", gen_higgs__phi);
+		tree->SetBranchAddress("gen_higgs__pt", gen_higgs__pt);
+		tree->SetBranchAddress("n__gen_parton", &n__gen_parton);
+		tree->SetBranchAddress("gen_parton__eta", gen_parton__eta);
+		tree->SetBranchAddress("gen_parton__mass", gen_parton__mass);
+		tree->SetBranchAddress("gen_parton__phi", gen_parton__phi);
+		tree->SetBranchAddress("gen_parton__pt", gen_parton__pt);
 		tree->SetBranchAddress("gen_t__eta", &gen_t__eta);
 		tree->SetBranchAddress("gen_t__mass", &gen_t__mass);
 		tree->SetBranchAddress("gen_t__phi", &gen_t__phi);
