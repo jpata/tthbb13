@@ -1,4 +1,4 @@
-<bin   file="joosep/cutflow.cc" name="cutflow_step2">
+<bin file="joosep/cutflow_step2.cc,../../../TTH/TTHNtupleAnalyzer/plugins/event_interpretation.cc" name="cutflow_step2">
   <use   name="DataFormats/FWLite"/>
   <use   name="FWCore/FWLite"/>
   <use   name="FWCore/PythonParameterSet"/>
@@ -57,3 +57,7 @@
 	<use   name="classlib"/>
 	<use   name="boost"/>
 </bin>
+
+<export>
+	<lib name="TTH/Plotting" />
+</export>
