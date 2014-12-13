@@ -19,8 +19,10 @@ config.JobType.maxJobRuntimeMin =60*48
 config.section_("Data")
 config.Data.inputDataset = '/TTbarH_HToBB_M-125_13TeV_pythia6/Spring14miniaod-PU20bx25_POSTLS170_V5-v1/MINIAODSIM'
 config.Data.inputDBS = 'global'
-config.Data.splitting = 'LumiBased'
-config.Data.unitsPerJob = 10
+
+config.Data.splitting = 'FileBased'
+config.Data.unitsPerJob = 2
+
 config.Data.publication = False
 #config.Data.publishDbsUrl = 'phys03'
 #config.Data.publishDataName = 'tth_ntp_test1'
