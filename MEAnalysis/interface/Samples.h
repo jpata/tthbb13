@@ -119,8 +119,8 @@ Samples::Samples(bool openAllFiles, string pathToFile, string ordering,
             double weight = 1.0;
 
             if(xSec<0) weight = 1.0;
-            else if( (TH1F*)f->Get("CountWithPU") != 0) {
-                double counter = ((TH1F*)f->Get("CountWithPU"))->GetBinContent(1);
+            else if( (TH1F*)f->Get("event_counter") != 0) {
+                double counter = ((TH1F*)f->Get("event_counter"))->GetBinContent(1);
                 weight = counter>0 ? lumi*1000/(counter/xSec) : 1.0;
             }
 

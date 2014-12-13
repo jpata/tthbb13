@@ -26,7 +26,7 @@ evLimits = cms.vint32(0, -1),
 ntuplizeAll = 1
 
 # print intermediate steps
-printout    = 1
+printout    = 0
 
 # verbosity [0,1,2,3]
 debug       = 0
@@ -180,7 +180,7 @@ integralOption2_niter     = 1
 integralOption2_nevalfact = 1.0
 
 # switch off ME calculation
-speedup              = 0
+speedup              = 1
 
 # switch off OL calculation
-switchoffOL          = 0
+switchoffOL          = 1

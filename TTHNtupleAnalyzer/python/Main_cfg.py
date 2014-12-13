@@ -54,36 +54,36 @@ process.chs = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedPFCandid
 from RecoJets.JetProducers.PFJetParameters_cfi import *
 from RecoJets.JetProducers.AnomalousCellParameters_cfi import *
 process.ca15PFJetsCHS = cms.EDProducer(
-    "FastjetJetProducer",
-    PFJetParameters,
-    AnomalousCellParameters,
-    jetAlgorithm = cms.string("CambridgeAachen"),
-    rParam       = cms.double(1.5),
+	"FastjetJetProducer",
+	PFJetParameters,
+	AnomalousCellParameters,
+	jetAlgorithm = cms.string("CambridgeAachen"),
+	rParam	   = cms.double(1.5),
 )
-process.ca15PFJetsCHS.src      = cms.InputTag("chs")
+process.ca15PFJetsCHS.src	  = cms.InputTag("chs")
 process.ca15PFJetsCHS.jetPtMin = cms.double(200)
 
 # Mass Drop Tagger for Higgs
 process.ca15PFJetsCHSMDT = process.ca15PFJetsCHS.clone(
-        useMassDropTagger = cms.bool(True),
-        muCut = cms.double(0.667),
-        yCut = cms.double(0.08),
-        useExplicitGhosts = cms.bool(True),
-        writeCompound = cms.bool(True),
-        jetCollInstanceName=cms.string("SubJets"),
+		useMassDropTagger = cms.bool(True),
+		muCut = cms.double(0.667),
+		yCut = cms.double(0.08),
+		useExplicitGhosts = cms.bool(True),
+		writeCompound = cms.bool(True),
+		jetCollInstanceName=cms.string("SubJets"),
 )
 
 # Mass Drop Tagger + Filtering for Higgs
 process.ca15PFJetsCHSMDTFiltered = process.ca15PFJetsCHS.clone(
-        useMassDropTagger = cms.bool(True),
-        useFiltering = cms.bool(True),
-        muCut = cms.double(0.667),
-        yCut = cms.double(0.08),
-        nFilt = cms.int32(2),
-        rFilt = cms.double(0.3),
-        useExplicitGhosts = cms.bool(True),
-        writeCompound = cms.bool(True),
-        jetCollInstanceName=cms.string("SubJets"))
+		useMassDropTagger = cms.bool(True),
+		useFiltering = cms.bool(True),
+		muCut = cms.double(0.667),
+		yCut = cms.double(0.08),
+		nFilt = cms.int32(2),
+		rFilt = cms.double(0.3),
+		useExplicitGhosts = cms.bool(True),
+		writeCompound = cms.bool(True),
+		jetCollInstanceName=cms.string("SubJets"))
 
 
 # Calculate n-subjettiness for stand-alone fatjets
@@ -127,18 +127,18 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
 	mets = cms.InputTag("slimmedMETs"),
 	lhe = cms.InputTag("externalLHEProducer"),
 
-        # take ca15PFJetsCHS jets, add the Njettiness values and store them as jet_fat
-        fatjetsObjects  = cms.vstring([  'ca15PFJetsCHS', 'ca15PFJetsCHSMDT', 'ca15PFJetsCHSMDTFiltered']),
-        fatjetsNsubs    = cms.vstring([  'Njettiness',    'NjettinessMDT',    'NjettinessMDTFiltered']),
-        fatjetsBranches = cms.vstring([  'fat',           'fatMDT',           'fatMDTFiltered']),
-        fatjetsIsBasicJets = cms.vint32([ 0,               1,                  1]),
+	# take ca15PFJetsCHS jets, add the Njettiness values and store them as jet_fat
+	fatjetsObjects  = cms.vstring([  'ca15PFJetsCHS', 'ca15PFJetsCHSMDT', 'ca15PFJetsCHSMDTFiltered']),
+	fatjetsNsubs	= cms.vstring([  'Njettiness',	'NjettinessMDT',	'NjettinessMDTFiltered']),
+	fatjetsBranches = cms.vstring([  'fat',		   'fatMDT',		   'fatMDTFiltered']),
+	fatjetsIsBasicJets = cms.vint32([ 0,			   1,				  1]),
 
-        httObjects  = cms.vstring(['HTTJetsCHS', 'MultiRHTTJetsCHS']),
-        httBranches = cms.vstring(['toptagger', 'toptagger2']),
+	httObjects  = cms.vstring(['HTTJetsCHS', 'MultiRHTTJetsCHS']),
+	httBranches = cms.vstring(['toptagger', 'toptagger2']),
 
-        cmsttObjects  = cms.vstring([]),
-        cmsttInfos    = cms.vstring([]),
-        cmsttBranches = cms.vstring([]),
+	cmsttObjects  = cms.vstring([]),
+	cmsttInfos	= cms.vstring([]),
+	cmsttBranches = cms.vstring([]),
 
 	triggerIdentifiers = triggerPathNames,
 	#triggerIdentifiersForMatching = cms.vstring([
@@ -261,25 +261,25 @@ process.HTTJetsCHS = cms.EDProducer(
 )
 
 process.MultiRHTTJetsCHS = cms.EDProducer(
-     "HTTTopJetProducer",
-     PFJetParameters.clone( src = cms.InputTag('chs'),
-                            doAreaFastjet = cms.bool(True),
-                            doRhoFastjet = cms.bool(False),
-                            jetPtMin = cms.double(100.0)
-                        ),
-     AnomalousCellParameters,
-     multiR = cms.bool(True),
-     algorithm = cms.int32(1),
-     jetAlgorithm = cms.string("CambridgeAachen"),
-     rParam = cms.double(1.5),
-     mode = cms.int32(4),
-     minFatjetPt = cms.double(200.),
-     minCandPt = cms.double(200.),
-     minSubjetPt = cms.double(30.),
-     writeCompound = cms.bool(True),
-     minCandMass = cms.double(100.),
-     maxCandMass = cms.double(250.),
-     massRatioWidth = cms.double(30.),
+	 "HTTTopJetProducer",
+	 PFJetParameters.clone( src = cms.InputTag('chs'),
+							doAreaFastjet = cms.bool(True),
+							doRhoFastjet = cms.bool(False),
+							jetPtMin = cms.double(100.0)
+						),
+	 AnomalousCellParameters,
+	 multiR = cms.bool(True),
+	 algorithm = cms.int32(1),
+	 jetAlgorithm = cms.string("CambridgeAachen"),
+	 rParam = cms.double(1.5),
+	 mode = cms.int32(4),
+	 minFatjetPt = cms.double(200.),
+	 minCandPt = cms.double(200.),
+	 minSubjetPt = cms.double(30.),
+	 writeCompound = cms.bool(True),
+	 minCandMass = cms.double(100.),
+	 maxCandMass = cms.double(250.),
+	 massRatioWidth = cms.double(30.),
 )
 
 
@@ -288,32 +288,32 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.GlobalTag.globaltag = "PLS170_V7AN1"
 
 process.ak4PFL1Offset = cms.ESProducer("L1OffsetCorrectionESProducer",
-    minVtxNdof = cms.int32(4),
-    vertexCollection = cms.string('offlineSlimmedPrimaryVertices'),
-    algorithm = cms.string('AK4PF'),
-    level = cms.string('L1Offset')
+	minVtxNdof = cms.int32(4),
+	vertexCollection = cms.string('offlineSlimmedPrimaryVertices'),
+	algorithm = cms.string('AK4PF'),
+	level = cms.string('L1Offset')
 )
 
 process.ak4PFL2Relative = cms.ESProducer("LXXXCorrectionESProducer",
-    algorithm = cms.string('AK4PF'),
-    level = cms.string('L2Relative')
+	algorithm = cms.string('AK4PF'),
+	level = cms.string('L2Relative')
 )
 
 process.ak4PFL3Absolute = cms.ESProducer("LXXXCorrectionESProducer",
-    algorithm = cms.string('AK4PF'),
-    level = cms.string('L3Absolute')
+	algorithm = cms.string('AK4PF'),
+	level = cms.string('L3Absolute')
 )
 
 process.ak4PFResidual = cms.ESProducer("LXXXCorrectionESProducer",
-    algorithm = cms.string('AK4PF'),
-    level = cms.string('L2L3Residual')
+	algorithm = cms.string('AK4PF'),
+	level = cms.string('L2L3Residual')
 )
 
 process.ak4PFL1FastL2L3Residual = cms.ESProducer("JetCorrectionESChain",
-    correctors = cms.vstring('ak4PFL1Fastjet',
-        'ak4PFL2Relative',
-        'ak4PFL3Absolute',
-        'ak4PFResidual')
+	correctors = cms.vstring('ak4PFL1Fastjet',
+		'ak4PFL2Relative',
+		'ak4PFL3Absolute',
+		'ak4PFResidual')
 )
 
 process.p = cms.Path(
