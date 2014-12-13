@@ -27,8 +27,9 @@
 // system include files
 #include <memory>
 #include <algorithm>
+#include <vector>
 #include <string>
-
+#include <iterator>
 
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
@@ -67,6 +68,7 @@
 
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 #include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 
 //#include "CommonTools/UtilAlgos/interface/PhysObjectMatcher.h"
 //#include "CommonTools/UtilAlgos/interface/MatchByDRDPt.h"
@@ -128,6 +130,7 @@ template<typename T>
 T * ptr(T * obj) { return obj; } //obj is already pointer, return it!
 
 
+// OBSOLOTE: Not needed at the moment!
 // Functor so we can sort a list of ElementType objects according to
 // their deltaR distance to the reference object.  
 // Can take anything that inherits the p4() to give Lorentz Vector. 
@@ -148,7 +151,7 @@ template <typename JetType>
 void fill_truth_matching(TTHTree* tthtree, 				 
 			 JetType x, // object for which to fill - fatjet or HTT cand
 			 int n, // position at which to insert new values in the tree (ie n_fat_jet)
-			 vector<const reco::Candidate*>  & truth_particles, // particles for matching
+			 const vector<const reco::Candidate*>  & truth_particles, // particles for matching
 			 std::string prefix, // prefix for branch names
 			 std::string truth_name // what are we matching (to select branch name to fill into) hadtop/parton/..
 			 ){
@@ -162,20 +165,33 @@ void fill_truth_matching(TTHTree* tthtree,
   name_dr_branch += truth_name;
   name_dr_branch += "_dr";
 
-  // Sort true tops according to distance to object (fatjet, HTT cand) under study
-  sort(truth_particles.begin(), truth_particles.end(), 
-       distance_sorter<JetType, const reco::Candidate*>(x));	   
+  std::string name_i_branch = prefix + "close_";
+  name_i_branch += truth_name;
+  name_i_branch += "_i";
 
+  // Calculate the DeltaR from each truth particle to the jet
+  std::vector<double> distances;
+  for (vector<const reco::Candidate*>::const_iterator it = truth_particles.begin();
+       it != truth_particles.end();
+       ++it){
+    distances.push_back(ROOT::Math::VectorUtil::DeltaR(ptr(*it)->p4(), ptr(x)->p4()));
+  }   
+  
+  // And find the index of the closest one
+ std::vector<double>::iterator min_distance = std::min_element(std::begin(distances), std::end(distances));
+ int index_closest = std::distance(std::begin(distances), min_distance);
+ 
   // Fill true pT and DeltaR if at least one truth object
   if (truth_particles.size() > 0){		
-    float dR = ROOT::Math::VectorUtil::DeltaR( ptr(x)->p4(), ptr(truth_particles[0])->p4());			
-    tthtree->get_address<float *>(name_pt_branch)[n] = truth_particles[0]->pt();
-    tthtree->get_address<float *>(name_dr_branch)[n] = dR;       
+    tthtree->get_address<float *>(name_pt_branch)[n] = truth_particles[index_closest]->pt();
+    tthtree->get_address<float *>(name_dr_branch)[n] = *min_distance;
+    tthtree->get_address<int *>(  name_i_branch)[n]  = index_closest;
   }
   // Otherwise use dummy values
   else{
     tthtree->get_address<float *>(name_pt_branch)[n] = DEF_VAL_FLOAT;
     tthtree->get_address<float *>(name_dr_branch)[n] = 9999.0;
+    tthtree->get_address<int *>(  name_i_branch)[n]  = DEF_VAL_INT;
   }
 
 }//fill_truth_matching
@@ -193,9 +209,9 @@ void fill_fatjet_branches(const edm::Event& iEvent,
 			  // true top and anti top for optional matching
 			  const vector<const reco::Candidate*>  & true_t,
 			  // hard partons for matching
-			  vector<const reco::Candidate*>  & hard_partons,
+			  const vector<const reco::Candidate*>  & hard_partons,
 			  // true higgs for matching
-			  vector<const reco::Candidate*>  & gen_higgs
+			  const vector<const reco::Candidate*>  & gen_higgs
 			  ){
   
   // Get Fatjet iteself
@@ -217,18 +233,6 @@ void fill_fatjet_branches(const edm::Event& iEvent,
   assert(fatjets->size()==fatjet_nsub_tau2->size());
   assert(fatjets->size()==fatjet_nsub_tau3->size());
 	  
-  // Create a list of true_tops that can be used for matching
-  // only take the ones passing the pT threshold
-  float min_true_top_pt = 200;
-  vector<const reco::Candidate*>  true_t_for_matching;
-  
-  for (vector<const reco::Candidate*>::const_iterator iter = true_t.begin();
-       iter != true_t.end();
-       ++iter){
-    if ((*iter)->pt() > min_true_top_pt)      
-      true_t_for_matching.push_back(*iter);
-  }
-
   // Loop over fatjets
   for (unsigned n_fat_jet = 0; n_fat_jet != fatjets->size(); n_fat_jet++){
 	    
@@ -252,7 +256,7 @@ void fill_fatjet_branches(const edm::Event& iEvent,
 
     // Optional: Fill truth matching information
     if (ADD_TRUE_TOP_MATCHING_FOR_FJ)
-      fill_truth_matching<JetType>(tthtree, x, n_fat_jet, true_t_for_matching, prefix, "hadtop");
+      fill_truth_matching<JetType>(tthtree, x, n_fat_jet, true_t, prefix, "hadtop");
     if (ADD_TRUE_PARTON_MATCHING_FOR_FJ)	      
       fill_truth_matching<JetType>(tthtree, x, n_fat_jet, hard_partons, prefix, "parton");
     if (ADD_TRUE_HIGGS_MATCHING_FOR_FJ)	      
@@ -264,6 +268,38 @@ void fill_fatjet_branches(const edm::Event& iEvent,
   std::string njet_branch("n__jet_" + fj_branches_name);
   *(tthtree->get_address<int *>(njet_branch)) = fatjets->size();  
 }
+
+
+// Function to fill the branches for a  truth collection
+// (higgs, hadronic tops or partons)
+// objects as fatjets
+void fill_genparticle_branches(TTHTree* tthtree, 
+			       const vector<const reco::Candidate*>  & particles,
+			       std::string name){
+  
+  // Loop over particles
+  for (vector<const reco::Candidate*>::const_iterator it = particles.begin();
+       it != particles.end();
+       ++it){
+    
+    std::string prefix("gen_");
+    prefix.append(name);
+    prefix.append("__");
+
+    int n = it - particles.begin();
+    
+    // Fill the branches
+    tthtree->get_address<float *>(prefix + "pt"  )[n] = (*it)->pt();
+    tthtree->get_address<float *>(prefix + "eta" )[n] = (*it)->eta();
+    tthtree->get_address<float *>(prefix + "phi" )[n] = (*it)->phi();
+    tthtree->get_address<float *>(prefix + "mass")[n] = (*it)->mass();    
+  }
+  
+  // Also count the number of particles
+  std::string n_branch("n__gen_" + name);
+  *(tthtree->get_address<int *>(n_branch)) = particles.size();
+}
+
 
 
 //finds a matched genparticle by dR, dPt and id
@@ -448,6 +484,7 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
 	lheToken_( (iConfig.getParameter<edm::InputTag>("lhe")).label()!="" ?
 			consumes<LHEEventProduct>( iConfig.getParameter<edm::InputTag>("lhe")) : edm::EDGetTokenT<LHEEventProduct>() ),
 
+
 	//output
 	tthtree(new TTHTree(fs->make<TTree>("events", "events"))),
 	config_dump(fs->make<TNamed>("configdump", iConfig.dump().c_str())),
@@ -519,6 +556,12 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	tthtree->n__pv = vertices->size();
 
 	if (isMC_) {
+	
+	// MC Event Weight
+	edm::Handle<GenEventInfoProduct> genEvtInfo;
+	iEvent.getByLabel( "generator", genEvtInfo );
+	tthtree->weight__genmc = genEvtInfo->weight();
+	 
 	Handle<edm::View<reco::GenParticle> > pruned;
 	
 	//Pileup and genparticles
@@ -1406,16 +1449,28 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	tops_antitops_last.insert(tops_antitops_last.end(), tops_last.begin(), tops_last.end()); // add tops
 	tops_antitops_last.insert(tops_antitops_last.end(), antitops_last.begin(), antitops_last.end()); // add antis
 
-	// Hadronically decaying top quarks
+	// Hadronically decaying top quarks - only take the ones passing the pT threshold
+	float min_true_top_pt = 200;
 	vector<const reco::Candidate*> hadronic_ts;
 	for (vector<const reco::Candidate*>::const_iterator iter = tops_antitops_last.begin();
 	     iter != tops_antitops_last.end();
 	     ++iter){	  	  
-	  if (is_hadronic_top(*iter) == 1)
+	  if ( (is_hadronic_top(*iter) == 1) &&   // Check hadronic decay
+	       ((*iter)->pt() > min_true_top_pt)) // Check pT
 	    hadronic_ts.push_back(*iter);
 	}
 
+	// Sort the truth top/higgs/parton collections by pT descending 
+	sort(hard_partons.begin(), hard_partons.end(), order_by_pt<const reco::Candidate*>);
+	sort(gen_higgs.begin(),    gen_higgs.end(),    order_by_pt<const reco::Candidate*>);
+	sort(hadronic_ts.begin(),  hadronic_ts.end(),  order_by_pt<const reco::Candidate*>);
 
+	// Fill the genparticle branches
+	fill_genparticle_branches(tthtree, hard_partons, "parton");
+	fill_genparticle_branches(tthtree, gen_higgs,    "higgs");
+	fill_genparticle_branches(tthtree, hadronic_ts,  "hadtop");
+  
+      
 	// Loop over HTT collections
 	for (unsigned i_htt_coll = 0; i_htt_coll < htt_objects_.size(); i_htt_coll++){
 
@@ -1433,18 +1488,6 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
 	  // Make sure both collections have the same size
 	  assert(top_jets->size()==top_jet_infos->size());
-
-	  // Create a list of true_tops that can be used for matching
-	  // only take the ones passing the pT threshold
-	  float min_true_top_pt = 200;
-	  vector<const reco::Candidate*>  true_t_for_matching;
-	  
-	  for (vector<const reco::Candidate*>::const_iterator iter = hadronic_ts.begin();
-	       iter != hadronic_ts.end();
-	       ++iter){
-	    if ((*iter)->pt() > min_true_top_pt)      
-	      true_t_for_matching.push_back(*iter);
-	  }
 
           // HEPTopTagger
 	  // Top jets and subjets are associated by indices. See:
@@ -1491,7 +1534,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	   
 	    // Optional: Fill truth matching information
 	    if (ADD_TRUE_TOP_MATCHING_FOR_HTT)
-	      fill_truth_matching<reco::BasicJet>(tthtree, x, n_top_jet, true_t_for_matching, prefix, "hadtop");
+	      fill_truth_matching<reco::BasicJet>(tthtree, x, n_top_jet, hadronic_ts, prefix, "hadtop");
 	    if (ADD_TRUE_PARTON_MATCHING_FOR_HTT)
 	      fill_truth_matching<reco::BasicJet>(tthtree, x, n_top_jet, hard_partons, prefix, "parton");
 	    if (ADD_TRUE_HIGGS_MATCHING_FOR_HTT)
@@ -1557,17 +1600,6 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	  // Make sure both collections have the same size
 	  assert(top_jets->size()==top_jet_infos->size());
 
-	  // Create a list of true_tops that can be used for matching
-	  // only take the ones passing the pT threshold
-	  float min_true_top_pt = 200;
-	  vector<const reco::Candidate*>  true_t_for_matching;
-	  
-	  for (vector<const reco::Candidate*>::const_iterator iter = hadronic_ts.begin();
-	       iter != hadronic_ts.end();
-	       ++iter){
-	    if ((*iter)->pt() > min_true_top_pt)      
-	      true_t_for_matching.push_back(*iter);
-	  }
 
 	  // Top jets and subjets are associated by indices. See:
 	  // /cvmfs/cms.cern.ch/slc6_amd64_gcc481/cms/cmssw/CMSSW_7_0_9/src/RecoJets/JetProducers/plugins/CompoundJetProducer.cc
@@ -1596,7 +1628,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	   
 	    // Optional: Fill truth matching information
 	    if (ADD_TRUE_TOP_MATCHING_FOR_CMSTT)
-	      fill_truth_matching<reco::BasicJet>(tthtree, x, n_top_jet, true_t_for_matching, prefix, "hadtop");
+	      fill_truth_matching<reco::BasicJet>(tthtree, x, n_top_jet, hadronic_ts, prefix, "hadtop");
 	    if (ADD_TRUE_PARTON_MATCHING_FOR_CMSTT)
 	      fill_truth_matching<reco::BasicJet>(tthtree, x, n_top_jet, hard_partons, prefix, "parton");
 	    if (ADD_TRUE_HIGGS_MATCHING_FOR_CMSTT)

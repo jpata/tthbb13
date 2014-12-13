@@ -279,6 +279,9 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
 
 	eleIdentifiers = cms.vstring([]),
 	tauIdentifiers = cms.vstring([]),
+
+        rho = cms.InputTag("fixedGridRhoAll"),
+        jecFile = cms.FileInPath("TTH/TTHNtupleAnalyzer/data/Summer13_V4_DATA_UncertaintySources_AK5PFchs.txt")
 )
 
 process.TFileService = cms.Service("TFileService",
