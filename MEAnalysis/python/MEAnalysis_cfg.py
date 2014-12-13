@@ -98,13 +98,13 @@ process.fwliteInput = cms.PSet(
     speedup       = cms.untracked.int32(0), ###### CHECK HERE
 
     # select which analysis to run
-	# select with 4-6 jets regardless of btagging
-	# used for determinging btag_LR cut
+    # select with 4-6 jets regardless of btagging
+    # used for determinging btag_LR cut
     doTypeBTag6   = cms.untracked.int32(0),  #SL 6 jets
     doTypeBTag5   = cms.untracked.int32(0),  #SL 5 jets
     doTypeBTag4   = cms.untracked.int32(0),  #DL 4 jets
 
-	# select by CSVM count
+    # select by CSVM count
     doType0       = cms.untracked.int32(0),  #SL(4,2)  w/  W-tag
     doType1       = cms.untracked.int32(0),  #SL(4,2)  w/o W-tag
     doType2       = cms.untracked.int32(0),  #SL(4,1)
@@ -256,5 +256,10 @@ process.fwliteInput = cms.PSet(
     # if 0, save only events passing the analysis cuts
     ntuplizeAll         = cms.untracked.int32(1),
 
-    )
+    cutLeptons = cms.untracked.bool(False),
+    cutJets = cms.untracked.bool(False),
+    cutWMass = cms.untracked.bool(False),
+    cutBTagShape = cms.untracked.bool(False),
+
+)
 

@@ -1,5 +1,5 @@
 //Generate METree.hh with
-//python $CMSSW_BASE/src/TTH/TTHNtupleAnalyzer/python/headergen.py $CMSSW_BASE/src/TTH/MEAnalysis/interface/METree_template.hh $CMSSW_BASE/src/TTH/MEAnalysis/interface/METree.hh $CMSSW_BASE/src/TTH/TTHNtupleAnalyzer/python/toptagger_branches.py
+//python $CMSSW_BASE/src/TTH/TTHNtupleAnalyzer/python/headergen.py $CMSSW_BASE/src/TTH/MEAnalysis/interface/METree_template.hh $CMSSW_BASE/src/TTH/MEAnalysis/interface/METree.hh $CMSSW_BASE/src/TTH/MEAnalysis/python/branches.py
 #include "TTH/MEAnalysis/interface/HelperFunctions.h"
 #include "TTH/TTHNtupleAnalyzer/interface/tth_tree.hh"
 
@@ -247,6 +247,34 @@ public:
 	float jet_fat__tau1[N_MAX];
 	float jet_fat__tau2[N_MAX];
 	float jet_fat__tau3[N_MAX];
+	float jet_fat__close_hadtop_pt[N_MAX];
+	float jet_fat__close_hadtop_dr[N_MAX];
+	float jet_fat__close_higgs_pt[N_MAX];
+	float jet_fat__close_higgs_dr[N_MAX];
+	int n__jet_fatMDT;
+	float jet_fatMDT__pt[N_MAX];
+	float jet_fatMDT__eta[N_MAX];
+	float jet_fatMDT__phi[N_MAX];
+	float jet_fatMDT__mass[N_MAX];
+	float jet_fatMDT__tau1[N_MAX];
+	float jet_fatMDT__tau2[N_MAX];
+	float jet_fatMDT__tau3[N_MAX];
+	float jet_fatMDT__close_hadtop_pt[N_MAX];
+	float jet_fatMDT__close_hadtop_dr[N_MAX];
+	float jet_fatMDT__close_higgs_pt[N_MAX];
+	float jet_fatMDT__close_higgs_dr[N_MAX];
+	int n__jet_fatMDTFiltered;
+	float jet_fatMDTFiltered__pt[N_MAX];
+	float jet_fatMDTFiltered__eta[N_MAX];
+	float jet_fatMDTFiltered__phi[N_MAX];
+	float jet_fatMDTFiltered__mass[N_MAX];
+	float jet_fatMDTFiltered__tau1[N_MAX];
+	float jet_fatMDTFiltered__tau2[N_MAX];
+	float jet_fatMDTFiltered__tau3[N_MAX];
+	float jet_fatMDTFiltered__close_hadtop_pt[N_MAX];
+	float jet_fatMDTFiltered__close_hadtop_dr[N_MAX];
+	float jet_fatMDTFiltered__close_higgs_pt[N_MAX];
+	float jet_fatMDTFiltered__close_higgs_dr[N_MAX];
 	int n__jet_toptagger;
 	int n__jet_toptagger_sj;
 	float jet_toptagger__pt[N_MAX];
@@ -266,6 +294,10 @@ public:
 	float jet_toptagger__prunedMass[N_MAX];
 	float jet_toptagger__topMass[N_MAX];
 	float jet_toptagger__unfilteredMass[N_MAX];
+	float jet_toptagger__close_hadtop_pt[N_MAX];
+	float jet_toptagger__close_hadtop_dr[N_MAX];
+	float jet_toptagger__close_higgs_pt[N_MAX];
+	float jet_toptagger__close_higgs_dr[N_MAX];
 	int jet_toptagger__child_idx[N_MAX];
 	int jet_toptagger__isMultiR[N_MAX];
 	int jet_toptagger__n_sj[N_MAX];
@@ -294,6 +326,10 @@ public:
 	float jet_toptagger2__prunedMass[N_MAX];
 	float jet_toptagger2__topMass[N_MAX];
 	float jet_toptagger2__unfilteredMass[N_MAX];
+	float jet_toptagger2__close_hadtop_pt[N_MAX];
+	float jet_toptagger2__close_hadtop_dr[N_MAX];
+	float jet_toptagger2__close_higgs_pt[N_MAX];
+	float jet_toptagger2__close_higgs_dr[N_MAX];
 	int jet_toptagger2__child_idx[N_MAX];
 	int jet_toptagger2__isMultiR[N_MAX];
 	int jet_toptagger2__n_sj[N_MAX];
@@ -303,6 +339,7 @@ public:
 	float jet_toptagger2_sj__phi[N_MAX];
 	float jet_toptagger2_sj__pt[N_MAX];
 	int jet_toptagger2_sj__parent_idx[N_MAX];
+	float mW;
     //HEADERGEN_BRANCH_VARIABLES
     
 	void make_branches(const float MH) {
@@ -473,6 +510,34 @@ public:
 		tree->Branch("jet_fat__tau1", jet_fat__tau1, "jet_fat__tau1[n__jet_fat]/F");
 		tree->Branch("jet_fat__tau2", jet_fat__tau2, "jet_fat__tau2[n__jet_fat]/F");
 		tree->Branch("jet_fat__tau3", jet_fat__tau3, "jet_fat__tau3[n__jet_fat]/F");
+		tree->Branch("jet_fat__close_hadtop_pt", jet_fat__close_hadtop_pt, "jet_fat__close_hadtop_pt[n__jet_fat]/F");
+		tree->Branch("jet_fat__close_hadtop_dr", jet_fat__close_hadtop_dr, "jet_fat__close_hadtop_dr[n__jet_fat]/F");
+		tree->Branch("jet_fat__close_higgs_pt", jet_fat__close_higgs_pt, "jet_fat__close_higgs_pt[n__jet_fat]/F");
+		tree->Branch("jet_fat__close_higgs_dr", jet_fat__close_higgs_dr, "jet_fat__close_higgs_dr[n__jet_fat]/F");
+		tree->Branch("n__jet_fatMDT", &n__jet_fatMDT, "n__jet_fatMDT/I");
+		tree->Branch("jet_fatMDT__pt", jet_fatMDT__pt, "jet_fatMDT__pt[n__jet_fatMDT]/F");
+		tree->Branch("jet_fatMDT__eta", jet_fatMDT__eta, "jet_fatMDT__eta[n__jet_fatMDT]/F");
+		tree->Branch("jet_fatMDT__phi", jet_fatMDT__phi, "jet_fatMDT__phi[n__jet_fatMDT]/F");
+		tree->Branch("jet_fatMDT__mass", jet_fatMDT__mass, "jet_fatMDT__mass[n__jet_fatMDT]/F");
+		tree->Branch("jet_fatMDT__tau1", jet_fatMDT__tau1, "jet_fatMDT__tau1[n__jet_fatMDT]/F");
+		tree->Branch("jet_fatMDT__tau2", jet_fatMDT__tau2, "jet_fatMDT__tau2[n__jet_fatMDT]/F");
+		tree->Branch("jet_fatMDT__tau3", jet_fatMDT__tau3, "jet_fatMDT__tau3[n__jet_fatMDT]/F");
+		tree->Branch("jet_fatMDT__close_hadtop_pt", jet_fatMDT__close_hadtop_pt, "jet_fatMDT__close_hadtop_pt[n__jet_fatMDT]/F");
+		tree->Branch("jet_fatMDT__close_hadtop_dr", jet_fatMDT__close_hadtop_dr, "jet_fatMDT__close_hadtop_dr[n__jet_fatMDT]/F");
+		tree->Branch("jet_fatMDT__close_higgs_pt", jet_fatMDT__close_higgs_pt, "jet_fatMDT__close_higgs_pt[n__jet_fatMDT]/F");
+		tree->Branch("jet_fatMDT__close_higgs_dr", jet_fatMDT__close_higgs_dr, "jet_fatMDT__close_higgs_dr[n__jet_fatMDT]/F");
+		tree->Branch("n__jet_fatMDTFiltered", &n__jet_fatMDTFiltered, "n__jet_fatMDTFiltered/I");
+		tree->Branch("jet_fatMDTFiltered__pt", jet_fatMDTFiltered__pt, "jet_fatMDTFiltered__pt[n__jet_fatMDTFiltered]/F");
+		tree->Branch("jet_fatMDTFiltered__eta", jet_fatMDTFiltered__eta, "jet_fatMDTFiltered__eta[n__jet_fatMDTFiltered]/F");
+		tree->Branch("jet_fatMDTFiltered__phi", jet_fatMDTFiltered__phi, "jet_fatMDTFiltered__phi[n__jet_fatMDTFiltered]/F");
+		tree->Branch("jet_fatMDTFiltered__mass", jet_fatMDTFiltered__mass, "jet_fatMDTFiltered__mass[n__jet_fatMDTFiltered]/F");
+		tree->Branch("jet_fatMDTFiltered__tau1", jet_fatMDTFiltered__tau1, "jet_fatMDTFiltered__tau1[n__jet_fatMDTFiltered]/F");
+		tree->Branch("jet_fatMDTFiltered__tau2", jet_fatMDTFiltered__tau2, "jet_fatMDTFiltered__tau2[n__jet_fatMDTFiltered]/F");
+		tree->Branch("jet_fatMDTFiltered__tau3", jet_fatMDTFiltered__tau3, "jet_fatMDTFiltered__tau3[n__jet_fatMDTFiltered]/F");
+		tree->Branch("jet_fatMDTFiltered__close_hadtop_pt", jet_fatMDTFiltered__close_hadtop_pt, "jet_fatMDTFiltered__close_hadtop_pt[n__jet_fatMDTFiltered]/F");
+		tree->Branch("jet_fatMDTFiltered__close_hadtop_dr", jet_fatMDTFiltered__close_hadtop_dr, "jet_fatMDTFiltered__close_hadtop_dr[n__jet_fatMDTFiltered]/F");
+		tree->Branch("jet_fatMDTFiltered__close_higgs_pt", jet_fatMDTFiltered__close_higgs_pt, "jet_fatMDTFiltered__close_higgs_pt[n__jet_fatMDTFiltered]/F");
+		tree->Branch("jet_fatMDTFiltered__close_higgs_dr", jet_fatMDTFiltered__close_higgs_dr, "jet_fatMDTFiltered__close_higgs_dr[n__jet_fatMDTFiltered]/F");
 		tree->Branch("n__jet_toptagger", &n__jet_toptagger, "n__jet_toptagger/I");
 		tree->Branch("n__jet_toptagger_sj", &n__jet_toptagger_sj, "n__jet_toptagger_sj/I");
 		tree->Branch("jet_toptagger__pt", jet_toptagger__pt, "jet_toptagger__pt[n__jet_toptagger]/F");
@@ -492,6 +557,10 @@ public:
 		tree->Branch("jet_toptagger__prunedMass", jet_toptagger__prunedMass, "jet_toptagger__prunedMass[n__jet_toptagger]/F");
 		tree->Branch("jet_toptagger__topMass", jet_toptagger__topMass, "jet_toptagger__topMass[n__jet_toptagger]/F");
 		tree->Branch("jet_toptagger__unfilteredMass", jet_toptagger__unfilteredMass, "jet_toptagger__unfilteredMass[n__jet_toptagger]/F");
+		tree->Branch("jet_toptagger__close_hadtop_pt", jet_toptagger__close_hadtop_pt, "jet_toptagger__close_hadtop_pt[n__jet_toptagger]/F");
+		tree->Branch("jet_toptagger__close_hadtop_dr", jet_toptagger__close_hadtop_dr, "jet_toptagger__close_hadtop_dr[n__jet_toptagger]/F");
+		tree->Branch("jet_toptagger__close_higgs_pt", jet_toptagger__close_higgs_pt, "jet_toptagger__close_higgs_pt[n__jet_toptagger]/F");
+		tree->Branch("jet_toptagger__close_higgs_dr", jet_toptagger__close_higgs_dr, "jet_toptagger__close_higgs_dr[n__jet_toptagger]/F");
 		tree->Branch("jet_toptagger__child_idx", jet_toptagger__child_idx, "jet_toptagger__child_idx[n__jet_toptagger]/I");
 		tree->Branch("jet_toptagger__isMultiR", jet_toptagger__isMultiR, "jet_toptagger__isMultiR[n__jet_toptagger]/I");
 		tree->Branch("jet_toptagger__n_sj", jet_toptagger__n_sj, "jet_toptagger__n_sj[n__jet_toptagger]/I");
@@ -520,6 +589,10 @@ public:
 		tree->Branch("jet_toptagger2__prunedMass", jet_toptagger2__prunedMass, "jet_toptagger2__prunedMass[n__jet_toptagger2]/F");
 		tree->Branch("jet_toptagger2__topMass", jet_toptagger2__topMass, "jet_toptagger2__topMass[n__jet_toptagger2]/F");
 		tree->Branch("jet_toptagger2__unfilteredMass", jet_toptagger2__unfilteredMass, "jet_toptagger2__unfilteredMass[n__jet_toptagger2]/F");
+		tree->Branch("jet_toptagger2__close_hadtop_pt", jet_toptagger2__close_hadtop_pt, "jet_toptagger2__close_hadtop_pt[n__jet_toptagger2]/F");
+		tree->Branch("jet_toptagger2__close_hadtop_dr", jet_toptagger2__close_hadtop_dr, "jet_toptagger2__close_hadtop_dr[n__jet_toptagger2]/F");
+		tree->Branch("jet_toptagger2__close_higgs_pt", jet_toptagger2__close_higgs_pt, "jet_toptagger2__close_higgs_pt[n__jet_toptagger2]/F");
+		tree->Branch("jet_toptagger2__close_higgs_dr", jet_toptagger2__close_higgs_dr, "jet_toptagger2__close_higgs_dr[n__jet_toptagger2]/F");
 		tree->Branch("jet_toptagger2__child_idx", jet_toptagger2__child_idx, "jet_toptagger2__child_idx[n__jet_toptagger2]/I");
 		tree->Branch("jet_toptagger2__isMultiR", jet_toptagger2__isMultiR, "jet_toptagger2__isMultiR[n__jet_toptagger2]/I");
 		tree->Branch("jet_toptagger2__n_sj", jet_toptagger2__n_sj, "jet_toptagger2__n_sj[n__jet_toptagger2]/I");
@@ -529,6 +602,7 @@ public:
 		tree->Branch("jet_toptagger2_sj__phi", jet_toptagger2_sj__phi, "jet_toptagger2_sj__phi[n__jet_toptagger2_sj]/F");
 		tree->Branch("jet_toptagger2_sj__pt", jet_toptagger2_sj__pt, "jet_toptagger2_sj__pt[n__jet_toptagger2_sj]/F");
 		tree->Branch("jet_toptagger2_sj__parent_idx", jet_toptagger2_sj__parent_idx, "jet_toptagger2_sj__parent_idx[n__jet_toptagger2_sj]/I");
+		tree->Branch("mW", &mW, "mW/F");
 		//HEADERGEN_BRANCH_CREATOR
         
     }
@@ -578,6 +652,34 @@ public:
 		tree->SetBranchAddress("jet_fat__tau1", jet_fat__tau1);
 		tree->SetBranchAddress("jet_fat__tau2", jet_fat__tau2);
 		tree->SetBranchAddress("jet_fat__tau3", jet_fat__tau3);
+		tree->SetBranchAddress("jet_fat__close_hadtop_pt", jet_fat__close_hadtop_pt);
+		tree->SetBranchAddress("jet_fat__close_hadtop_dr", jet_fat__close_hadtop_dr);
+		tree->SetBranchAddress("jet_fat__close_higgs_pt", jet_fat__close_higgs_pt);
+		tree->SetBranchAddress("jet_fat__close_higgs_dr", jet_fat__close_higgs_dr);
+		tree->SetBranchAddress("n__jet_fatMDT", &n__jet_fatMDT);
+		tree->SetBranchAddress("jet_fatMDT__pt", jet_fatMDT__pt);
+		tree->SetBranchAddress("jet_fatMDT__eta", jet_fatMDT__eta);
+		tree->SetBranchAddress("jet_fatMDT__phi", jet_fatMDT__phi);
+		tree->SetBranchAddress("jet_fatMDT__mass", jet_fatMDT__mass);
+		tree->SetBranchAddress("jet_fatMDT__tau1", jet_fatMDT__tau1);
+		tree->SetBranchAddress("jet_fatMDT__tau2", jet_fatMDT__tau2);
+		tree->SetBranchAddress("jet_fatMDT__tau3", jet_fatMDT__tau3);
+		tree->SetBranchAddress("jet_fatMDT__close_hadtop_pt", jet_fatMDT__close_hadtop_pt);
+		tree->SetBranchAddress("jet_fatMDT__close_hadtop_dr", jet_fatMDT__close_hadtop_dr);
+		tree->SetBranchAddress("jet_fatMDT__close_higgs_pt", jet_fatMDT__close_higgs_pt);
+		tree->SetBranchAddress("jet_fatMDT__close_higgs_dr", jet_fatMDT__close_higgs_dr);
+		tree->SetBranchAddress("n__jet_fatMDTFiltered", &n__jet_fatMDTFiltered);
+		tree->SetBranchAddress("jet_fatMDTFiltered__pt", jet_fatMDTFiltered__pt);
+		tree->SetBranchAddress("jet_fatMDTFiltered__eta", jet_fatMDTFiltered__eta);
+		tree->SetBranchAddress("jet_fatMDTFiltered__phi", jet_fatMDTFiltered__phi);
+		tree->SetBranchAddress("jet_fatMDTFiltered__mass", jet_fatMDTFiltered__mass);
+		tree->SetBranchAddress("jet_fatMDTFiltered__tau1", jet_fatMDTFiltered__tau1);
+		tree->SetBranchAddress("jet_fatMDTFiltered__tau2", jet_fatMDTFiltered__tau2);
+		tree->SetBranchAddress("jet_fatMDTFiltered__tau3", jet_fatMDTFiltered__tau3);
+		tree->SetBranchAddress("jet_fatMDTFiltered__close_hadtop_pt", jet_fatMDTFiltered__close_hadtop_pt);
+		tree->SetBranchAddress("jet_fatMDTFiltered__close_hadtop_dr", jet_fatMDTFiltered__close_hadtop_dr);
+		tree->SetBranchAddress("jet_fatMDTFiltered__close_higgs_pt", jet_fatMDTFiltered__close_higgs_pt);
+		tree->SetBranchAddress("jet_fatMDTFiltered__close_higgs_dr", jet_fatMDTFiltered__close_higgs_dr);
 		tree->SetBranchAddress("n__jet_toptagger", &n__jet_toptagger);
 		tree->SetBranchAddress("n__jet_toptagger_sj", &n__jet_toptagger_sj);
 		tree->SetBranchAddress("jet_toptagger__pt", jet_toptagger__pt);
@@ -597,6 +699,10 @@ public:
 		tree->SetBranchAddress("jet_toptagger__prunedMass", jet_toptagger__prunedMass);
 		tree->SetBranchAddress("jet_toptagger__topMass", jet_toptagger__topMass);
 		tree->SetBranchAddress("jet_toptagger__unfilteredMass", jet_toptagger__unfilteredMass);
+		tree->SetBranchAddress("jet_toptagger__close_hadtop_pt", jet_toptagger__close_hadtop_pt);
+		tree->SetBranchAddress("jet_toptagger__close_hadtop_dr", jet_toptagger__close_hadtop_dr);
+		tree->SetBranchAddress("jet_toptagger__close_higgs_pt", jet_toptagger__close_higgs_pt);
+		tree->SetBranchAddress("jet_toptagger__close_higgs_dr", jet_toptagger__close_higgs_dr);
 		tree->SetBranchAddress("jet_toptagger__child_idx", jet_toptagger__child_idx);
 		tree->SetBranchAddress("jet_toptagger__isMultiR", jet_toptagger__isMultiR);
 		tree->SetBranchAddress("jet_toptagger__n_sj", jet_toptagger__n_sj);
@@ -625,6 +731,10 @@ public:
 		tree->SetBranchAddress("jet_toptagger2__prunedMass", jet_toptagger2__prunedMass);
 		tree->SetBranchAddress("jet_toptagger2__topMass", jet_toptagger2__topMass);
 		tree->SetBranchAddress("jet_toptagger2__unfilteredMass", jet_toptagger2__unfilteredMass);
+		tree->SetBranchAddress("jet_toptagger2__close_hadtop_pt", jet_toptagger2__close_hadtop_pt);
+		tree->SetBranchAddress("jet_toptagger2__close_hadtop_dr", jet_toptagger2__close_hadtop_dr);
+		tree->SetBranchAddress("jet_toptagger2__close_higgs_pt", jet_toptagger2__close_higgs_pt);
+		tree->SetBranchAddress("jet_toptagger2__close_higgs_dr", jet_toptagger2__close_higgs_dr);
 		tree->SetBranchAddress("jet_toptagger2__child_idx", jet_toptagger2__child_idx);
 		tree->SetBranchAddress("jet_toptagger2__isMultiR", jet_toptagger2__isMultiR);
 		tree->SetBranchAddress("jet_toptagger2__n_sj", jet_toptagger2__n_sj);
@@ -634,6 +744,7 @@ public:
 		tree->SetBranchAddress("jet_toptagger2_sj__phi", jet_toptagger2_sj__phi);
 		tree->SetBranchAddress("jet_toptagger2_sj__pt", jet_toptagger2_sj__pt);
 		tree->SetBranchAddress("jet_toptagger2_sj__parent_idx", jet_toptagger2_sj__parent_idx);
+		tree->SetBranchAddress("mW", &mW);
         //HEADERGEN_BRANCH_SETADDRESS
 	}
 
@@ -701,6 +812,34 @@ public:
 		SET_ZERO(jet_fat__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_fat__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_fat__tau3, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_fat__close_hadtop_pt, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_fat__close_hadtop_dr, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_fat__close_higgs_pt, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_fat__close_higgs_dr, N_MAX, DEF_VAL_FLOAT);
+		n__jet_fatMDT = DEF_VAL_INT;
+		SET_ZERO(jet_fatMDT__pt, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_fatMDT__eta, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_fatMDT__phi, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_fatMDT__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_fatMDT__tau1, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_fatMDT__tau2, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_fatMDT__tau3, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_fatMDT__close_hadtop_pt, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_fatMDT__close_hadtop_dr, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_fatMDT__close_higgs_pt, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_fatMDT__close_higgs_dr, N_MAX, DEF_VAL_FLOAT);
+		n__jet_fatMDTFiltered = DEF_VAL_INT;
+		SET_ZERO(jet_fatMDTFiltered__pt, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_fatMDTFiltered__eta, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_fatMDTFiltered__phi, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_fatMDTFiltered__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_fatMDTFiltered__tau1, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_fatMDTFiltered__tau2, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_fatMDTFiltered__tau3, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_fatMDTFiltered__close_hadtop_pt, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_fatMDTFiltered__close_hadtop_dr, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_fatMDTFiltered__close_higgs_pt, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_fatMDTFiltered__close_higgs_dr, N_MAX, DEF_VAL_FLOAT);
 		n__jet_toptagger = DEF_VAL_INT;
 		n__jet_toptagger_sj = DEF_VAL_INT;
 		SET_ZERO(jet_toptagger__pt, N_MAX, DEF_VAL_FLOAT);
@@ -720,6 +859,10 @@ public:
 		SET_ZERO(jet_toptagger__prunedMass, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_toptagger__topMass, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_toptagger__unfilteredMass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_toptagger__close_hadtop_pt, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_toptagger__close_hadtop_dr, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_toptagger__close_higgs_pt, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_toptagger__close_higgs_dr, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_toptagger__child_idx, N_MAX, DEF_VAL_INT);
 		SET_ZERO(jet_toptagger__isMultiR, N_MAX, DEF_VAL_INT);
 		SET_ZERO(jet_toptagger__n_sj, N_MAX, DEF_VAL_INT);
@@ -748,6 +891,10 @@ public:
 		SET_ZERO(jet_toptagger2__prunedMass, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_toptagger2__topMass, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_toptagger2__unfilteredMass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_toptagger2__close_hadtop_pt, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_toptagger2__close_hadtop_dr, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_toptagger2__close_higgs_pt, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_toptagger2__close_higgs_dr, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_toptagger2__child_idx, N_MAX, DEF_VAL_INT);
 		SET_ZERO(jet_toptagger2__isMultiR, N_MAX, DEF_VAL_INT);
 		SET_ZERO(jet_toptagger2__n_sj, N_MAX, DEF_VAL_INT);
@@ -757,6 +904,7 @@ public:
 		SET_ZERO(jet_toptagger2_sj__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_toptagger2_sj__pt, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_toptagger2_sj__parent_idx, N_MAX, DEF_VAL_INT);
+		mW = DEF_VAL_FLOAT;
 		//HEADERGEN_BRANCH_INITIALIZERS
     }
 
@@ -769,6 +917,34 @@ public:
 		std::copy(std::begin(itree->jet_fat__tau1), std::end(itree->jet_fat__tau1), std::begin(jet_fat__tau1));
 		std::copy(std::begin(itree->jet_fat__tau2), std::end(itree->jet_fat__tau2), std::begin(jet_fat__tau2));
 		std::copy(std::begin(itree->jet_fat__tau3), std::end(itree->jet_fat__tau3), std::begin(jet_fat__tau3));
+		std::copy(std::begin(itree->jet_fat__close_hadtop_pt), std::end(itree->jet_fat__close_hadtop_pt), std::begin(jet_fat__close_hadtop_pt));
+		std::copy(std::begin(itree->jet_fat__close_hadtop_dr), std::end(itree->jet_fat__close_hadtop_dr), std::begin(jet_fat__close_hadtop_dr));
+		std::copy(std::begin(itree->jet_fat__close_higgs_pt), std::end(itree->jet_fat__close_higgs_pt), std::begin(jet_fat__close_higgs_pt));
+		std::copy(std::begin(itree->jet_fat__close_higgs_dr), std::end(itree->jet_fat__close_higgs_dr), std::begin(jet_fat__close_higgs_dr));
+		n__jet_fatMDT = itree->n__jet_fatMDT;
+		std::copy(std::begin(itree->jet_fatMDT__pt), std::end(itree->jet_fatMDT__pt), std::begin(jet_fatMDT__pt));
+		std::copy(std::begin(itree->jet_fatMDT__eta), std::end(itree->jet_fatMDT__eta), std::begin(jet_fatMDT__eta));
+		std::copy(std::begin(itree->jet_fatMDT__phi), std::end(itree->jet_fatMDT__phi), std::begin(jet_fatMDT__phi));
+		std::copy(std::begin(itree->jet_fatMDT__mass), std::end(itree->jet_fatMDT__mass), std::begin(jet_fatMDT__mass));
+		std::copy(std::begin(itree->jet_fatMDT__tau1), std::end(itree->jet_fatMDT__tau1), std::begin(jet_fatMDT__tau1));
+		std::copy(std::begin(itree->jet_fatMDT__tau2), std::end(itree->jet_fatMDT__tau2), std::begin(jet_fatMDT__tau2));
+		std::copy(std::begin(itree->jet_fatMDT__tau3), std::end(itree->jet_fatMDT__tau3), std::begin(jet_fatMDT__tau3));
+		std::copy(std::begin(itree->jet_fatMDT__close_hadtop_pt), std::end(itree->jet_fatMDT__close_hadtop_pt), std::begin(jet_fatMDT__close_hadtop_pt));
+		std::copy(std::begin(itree->jet_fatMDT__close_hadtop_dr), std::end(itree->jet_fatMDT__close_hadtop_dr), std::begin(jet_fatMDT__close_hadtop_dr));
+		std::copy(std::begin(itree->jet_fatMDT__close_higgs_pt), std::end(itree->jet_fatMDT__close_higgs_pt), std::begin(jet_fatMDT__close_higgs_pt));
+		std::copy(std::begin(itree->jet_fatMDT__close_higgs_dr), std::end(itree->jet_fatMDT__close_higgs_dr), std::begin(jet_fatMDT__close_higgs_dr));
+		n__jet_fatMDTFiltered = itree->n__jet_fatMDTFiltered;
+		std::copy(std::begin(itree->jet_fatMDTFiltered__pt), std::end(itree->jet_fatMDTFiltered__pt), std::begin(jet_fatMDTFiltered__pt));
+		std::copy(std::begin(itree->jet_fatMDTFiltered__eta), std::end(itree->jet_fatMDTFiltered__eta), std::begin(jet_fatMDTFiltered__eta));
+		std::copy(std::begin(itree->jet_fatMDTFiltered__phi), std::end(itree->jet_fatMDTFiltered__phi), std::begin(jet_fatMDTFiltered__phi));
+		std::copy(std::begin(itree->jet_fatMDTFiltered__mass), std::end(itree->jet_fatMDTFiltered__mass), std::begin(jet_fatMDTFiltered__mass));
+		std::copy(std::begin(itree->jet_fatMDTFiltered__tau1), std::end(itree->jet_fatMDTFiltered__tau1), std::begin(jet_fatMDTFiltered__tau1));
+		std::copy(std::begin(itree->jet_fatMDTFiltered__tau2), std::end(itree->jet_fatMDTFiltered__tau2), std::begin(jet_fatMDTFiltered__tau2));
+		std::copy(std::begin(itree->jet_fatMDTFiltered__tau3), std::end(itree->jet_fatMDTFiltered__tau3), std::begin(jet_fatMDTFiltered__tau3));
+		std::copy(std::begin(itree->jet_fatMDTFiltered__close_hadtop_pt), std::end(itree->jet_fatMDTFiltered__close_hadtop_pt), std::begin(jet_fatMDTFiltered__close_hadtop_pt));
+		std::copy(std::begin(itree->jet_fatMDTFiltered__close_hadtop_dr), std::end(itree->jet_fatMDTFiltered__close_hadtop_dr), std::begin(jet_fatMDTFiltered__close_hadtop_dr));
+		std::copy(std::begin(itree->jet_fatMDTFiltered__close_higgs_pt), std::end(itree->jet_fatMDTFiltered__close_higgs_pt), std::begin(jet_fatMDTFiltered__close_higgs_pt));
+		std::copy(std::begin(itree->jet_fatMDTFiltered__close_higgs_dr), std::end(itree->jet_fatMDTFiltered__close_higgs_dr), std::begin(jet_fatMDTFiltered__close_higgs_dr));
 		n__jet_toptagger = itree->n__jet_toptagger;
 		n__jet_toptagger_sj = itree->n__jet_toptagger_sj;
 		std::copy(std::begin(itree->jet_toptagger__pt), std::end(itree->jet_toptagger__pt), std::begin(jet_toptagger__pt));
@@ -788,6 +964,10 @@ public:
 		std::copy(std::begin(itree->jet_toptagger__prunedMass), std::end(itree->jet_toptagger__prunedMass), std::begin(jet_toptagger__prunedMass));
 		std::copy(std::begin(itree->jet_toptagger__topMass), std::end(itree->jet_toptagger__topMass), std::begin(jet_toptagger__topMass));
 		std::copy(std::begin(itree->jet_toptagger__unfilteredMass), std::end(itree->jet_toptagger__unfilteredMass), std::begin(jet_toptagger__unfilteredMass));
+		std::copy(std::begin(itree->jet_toptagger__close_hadtop_pt), std::end(itree->jet_toptagger__close_hadtop_pt), std::begin(jet_toptagger__close_hadtop_pt));
+		std::copy(std::begin(itree->jet_toptagger__close_hadtop_dr), std::end(itree->jet_toptagger__close_hadtop_dr), std::begin(jet_toptagger__close_hadtop_dr));
+		std::copy(std::begin(itree->jet_toptagger__close_higgs_pt), std::end(itree->jet_toptagger__close_higgs_pt), std::begin(jet_toptagger__close_higgs_pt));
+		std::copy(std::begin(itree->jet_toptagger__close_higgs_dr), std::end(itree->jet_toptagger__close_higgs_dr), std::begin(jet_toptagger__close_higgs_dr));
 		std::copy(std::begin(itree->jet_toptagger__child_idx), std::end(itree->jet_toptagger__child_idx), std::begin(jet_toptagger__child_idx));
 		std::copy(std::begin(itree->jet_toptagger__isMultiR), std::end(itree->jet_toptagger__isMultiR), std::begin(jet_toptagger__isMultiR));
 		std::copy(std::begin(itree->jet_toptagger__n_sj), std::end(itree->jet_toptagger__n_sj), std::begin(jet_toptagger__n_sj));
@@ -816,6 +996,10 @@ public:
 		std::copy(std::begin(itree->jet_toptagger2__prunedMass), std::end(itree->jet_toptagger2__prunedMass), std::begin(jet_toptagger2__prunedMass));
 		std::copy(std::begin(itree->jet_toptagger2__topMass), std::end(itree->jet_toptagger2__topMass), std::begin(jet_toptagger2__topMass));
 		std::copy(std::begin(itree->jet_toptagger2__unfilteredMass), std::end(itree->jet_toptagger2__unfilteredMass), std::begin(jet_toptagger2__unfilteredMass));
+		std::copy(std::begin(itree->jet_toptagger2__close_hadtop_pt), std::end(itree->jet_toptagger2__close_hadtop_pt), std::begin(jet_toptagger2__close_hadtop_pt));
+		std::copy(std::begin(itree->jet_toptagger2__close_hadtop_dr), std::end(itree->jet_toptagger2__close_hadtop_dr), std::begin(jet_toptagger2__close_hadtop_dr));
+		std::copy(std::begin(itree->jet_toptagger2__close_higgs_pt), std::end(itree->jet_toptagger2__close_higgs_pt), std::begin(jet_toptagger2__close_higgs_pt));
+		std::copy(std::begin(itree->jet_toptagger2__close_higgs_dr), std::end(itree->jet_toptagger2__close_higgs_dr), std::begin(jet_toptagger2__close_higgs_dr));
 		std::copy(std::begin(itree->jet_toptagger2__child_idx), std::end(itree->jet_toptagger2__child_idx), std::begin(jet_toptagger2__child_idx));
 		std::copy(std::begin(itree->jet_toptagger2__isMultiR), std::end(itree->jet_toptagger2__isMultiR), std::begin(jet_toptagger2__isMultiR));
 		std::copy(std::begin(itree->jet_toptagger2__n_sj), std::end(itree->jet_toptagger2__n_sj), std::begin(jet_toptagger2__n_sj));

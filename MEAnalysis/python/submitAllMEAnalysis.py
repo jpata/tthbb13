@@ -22,6 +22,12 @@ parser.add_argument('--site',
 	default="T2_EE_Estonia",
 	help="CMS Tier 2/3 site where commands are run"
 )
+
+parser.add_argument('--njobs',
+	type=int,
+	default=100,
+	help="Number of jobs for the signal process"
+)
 parser.add_argument('--verbose', '-v', action='count')
 args = parser.parse_args()
 
@@ -119,7 +125,8 @@ def submitMEAnalysis(script,
 
 	os.system('cp $CMSSW_BASE/src/TTH/MEAnalysis/python/MEAnalysis_cfg.py ./')
 
-	from MEAnalysis_cfg import process
+	imp.load_source("localME", "./MEAnalysis_cfg.py")
+	from localME import process
 
 	scriptName = 'job_'+script+'.sh'
 	jobName	= 'job_'+script
@@ -366,8 +373,8 @@ def submitFullMEAnalysis( analysis ):
 			]
 	elif args.site == "T2_EE_Estonia":
 		toBeRun = [
-			["TTJets", 1000, ''],
-			["TTHBB125", 100, '']
+			["TTJets", 10 * args.njobs, ''],
+			["TTHBB125", args.njobs, '']
 			#['TTH125',		  50, ''], #499
 			#['TTJetsSemiLept',  50,''], #499
 			#['TTJetsFullLept',  50,''], #499

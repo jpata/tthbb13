@@ -19,6 +19,24 @@ process = [
 	Scalar("gen_tbar__dpt_alt", "float"),
 ]
 
+
+process += Scalar("weight__genmc", "float"),
+
+# Simple Truth Branches
+# - Just the kinematics
+# - above a pT threshold
+# - these are the objects the jets/taggers are matched to and know the indices of
+for particle in ["hadtop", "higgs", "parton"]:
+
+    counter_name =  "n__gen_{0}".format(particle)
+    process += [Scalar(counter_name, "int")]
+
+    for v in ["eta", "mass", "phi", "pt"]:
+        full_branch_name = "gen_{0}__{1}".format(particle, v)
+        process += [Dynamic1DArray(full_branch_name, "float", counter_name, "N_MAX")]
+# End of Simple Truth
+
+
 # True Top Branches
 for t in ["t", "tbar", "t2", "tbar2"]:
     for v in [
@@ -32,6 +50,110 @@ for t in ["t", "tbar", "t2", "tbar2"]:
             typ = "int"
         process += [Scalar("gen_%s__%s" % (t, v), typ)]
 
+# True Top Branches
+for t in ["b", "bbar"]:
+    for v in ["eta", "mass", "phi", "pt", "status", "id"]:
+        typ = "float"
+        if "status" in v or "id" in v:
+            typ = "int"
+        process += [Scalar("gen_%s__%s" % (t, v), typ)]
+
+for t in ["pt", "eta", "phi", "mass",
+    "dxy", "dz",
+    "ch_iso", "ec_iso", "hc_iso",
+    "mva",
+    "p_iso", "ph_iso", "puch_iso", "rel_iso", "rel_iso2"]:
+    full_branch_name = "lep__{0}".format(t)
+    process += [
+        Dynamic1DArray(full_branch_name, "float", "n__lep", "N_MAX")
+    ]
+
+for t in ["id", "id_bitmask", "is_loose", "is_medium", "is_tight",
+    "is_tight_id", "charge", "type"]:
+    full_branch_name = "lep__{0}".format(t)
+    process += [
+        Dynamic1DArray(full_branch_name, "int", "n__lep", "N_MAX")
+    ]
+
+for t in ["pt", "eta", "phi", "pass"]:
+    for x in ["lep", "jet"]:
+        full_branch_name = "trig_{0}__{1}".format(x, t)
+        process += [
+            Dynamic1DArray(full_branch_name, "int" if t=="pass" else "float", "n__{0}".format(x), "N_MAX")
+        ]
+
+for t in ["pt", "eta", "phi", "mass"]:
+    full_branch_name = "sig_lep__{0}".format(t)
+    process += [
+        Dynamic1DArray(full_branch_name, "float", "n__sig_lep", "N_MAX")
+    ]
+
+for t in ["charge", "id", "idx", "type"]:
+    full_branch_name = "sig_lep__{0}".format(t)
+    process += [
+        Dynamic1DArray(full_branch_name, "int", "n__sig_lep", "N_MAX")
+    ]
+
+for t in [
+    "bd_csv",
+    "ce_e",
+    "ch_e",
+    "el_e",
+    "energy",
+    "eta",
+    "mass",
+    "mu_e",
+    "ne_e",
+    "nh_e",
+    "ph_e",
+    "phi",
+    "pileupJetId",
+    "pt",
+    "pt_alt",
+    "unc",
+    "vtx3DSig",
+    "vtx3DVal",
+    "vtxMass",
+    "vtxNtracks"]:
+    full_branch_name = "jet__{0}".format(t)
+    process += [
+        Dynamic1DArray(full_branch_name, "float", "n__jet", "N_MAX")
+    ]
+
+for t in [
+    "id",
+    "jetId",
+    "pass_pileupJetId",
+    "type"]:
+    full_branch_name = "jet__{0}".format(t)
+    process += [
+        Dynamic1DArray(full_branch_name, "int", "n__jet", "N_MAX")
+    ]
+
+for t in [
+    "mass",
+    "phi",
+    "pt",
+    "eta"]:
+    for x in ["gen_jet", "gen_jet_parton", "gen_lep"]:
+        full_branch_name = "{0}__{1}".format(x, t)
+        process += [
+            Dynamic1DArray(full_branch_name, "float", "n__jet" if "jet" in x
+                else "n__lep", "N_MAX")
+        ]
+
+for t in [
+    "id",
+    "status",
+    "type"]:
+    for x in ["gen_jet", "gen_jet_parton", "gen_lep"]:
+        full_branch_name = "{0}__{1}".format(x, t)
+        process += [
+            Dynamic1DArray(full_branch_name, "int", "n__jet" if "jet" in x
+                else "n__lep", "N_MAX")
+        ]
+
+
 # Fatjet Branches
 for fj_name in ["ca08", "ca08filtered", "ca08pruned", "ca08trimmed", 
                 "ca15", "ca15filtered", "ca15pruned", "ca15trimmed"]:
@@ -44,14 +166,19 @@ for fj_name in ["ca08", "ca08filtered", "ca08pruned", "ca08trimmed",
     for branch_name in [
             "pt", "eta", "phi", "mass",  # Kinematics
             "tau1", "tau2", "tau3",      # N-subjettiness
-            "close_hadtop_pt",  "close_hadtop_dr", # top truth matching
-            "close_parton_pt",  "close_parton_dr", # parton truth matching
-            "close_higgs_pt",   "close_higgs_dr"   # higgs truth matching
+            "close_hadtop_pt",  "close_hadtop_dr", "close_hadtop_i", # top truth matching
+            "close_parton_pt",  "close_parton_dr", "close_parton_i", # parton truth matching
+            "close_higgs_pt",   "close_higgs_dr",  "close_higgs_i"   # higgs truth matching
             ]:
+
+        if branch_name in ["close_higgs_i", "close_hadtop_i", "close_parton_i"]:
+            the_type = "int"
+        else:
+            the_type = "float"
 
         full_branch_name = "jet_{0}__{1}".format(fj_name, branch_name)
         process += [Dynamic1DArray(full_branch_name, 
-                                   "float",
+                                   the_type,
                                    full_counter_name,
                                    "N_MAX"
                                )]
@@ -67,12 +194,12 @@ htt_float_branches =  [
     "fW", "massRatioPassed",                    # Standard HTT variables 
     "Rmin", "ptFiltForRminExp", "RminExpected", # MultiR variables
     "prunedMass", "topMass", "unfilteredMass",  # extra masses
-    "close_hadtop_pt",  "close_hadtop_dr",      # top truth matching
-    "close_parton_pt",  "close_parton_dr",      # parton truth matching
-    "close_higgs_pt",  "close_higgs_dr"         # higgs truth matching
+    "close_hadtop_pt", "close_hadtop_dr",       # top truth matching
+    "close_parton_pt", "close_parton_dr",       # parton truth matching
+    "close_higgs_pt",  "close_higgs_dr",        # higgs truth matching
 ]
 
-htt_int_branches = ["child_idx", "isMultiR", "n_sj"]
+htt_int_branches = ["child_idx", "isMultiR", "n_sj", "close_higgs_i", "close_parton_i", "close_hadtop_i"]
 
 htt_sj_float_branches =  ["energy", "eta", "mass", "phi", "pt"]
 
@@ -119,7 +246,7 @@ cmstt_float_branches =  [
     "close_higgs_pt",   "close_higgs_dr",     # higgs truth matching
 ]
 
-cmstt_int_branches = ["child_idx", "nSubJets"]
+cmstt_int_branches = ["child_idx", "nSubJets", "close_higgs_i", "close_parton_i", "close_hadtop_i"]
 
 cmstt_sj_float_branches =  ["energy", "eta", "mass", "phi", "pt"]
 
