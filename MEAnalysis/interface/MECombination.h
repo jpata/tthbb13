@@ -309,6 +309,8 @@ int permutations_4J_B[6] =
 //////////////////////////////////////////////////////////////////////////
 
 namespace perm_maps {
+
+  using namespace std;
 //map1 -> i => xxxxxx
 //map2 -> xxxxxx => i
 //where xxxxxx is a 6-digit int consisting of 1-s and 0-s signifiying the perm_to_gen matching
@@ -446,8 +448,23 @@ namespace perm_maps {
 		{111111, 63},
 	};
 	
+  int get_n(int x, int n) {
+    if (n <= 0) {
+      throw exception();
+    }
+    return (int)((x % (int)pow(10, n)) / (int)pow(10, n-1));
+  }
+
+  vector<int> comb_as_vector(int x, int length) {
+      vector<int> ret;
+      for (int i=length; i > 0; i--) {
+          ret.push_back(get_n(x, i));
+      }
+      return ret;
+  }
+
 	bool has_n(int x, int n) {
-		return (int)((x % (int)pow(10, n)) / (int)pow(10, n-1));
+		return (bool)get_n(x, n);
 	}
 	
 	const char* positions[] = {"bl", "w1", "w2", "bh", "b1", "b2"};

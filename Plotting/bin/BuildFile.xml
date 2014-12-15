@@ -58,6 +58,7 @@
 	<use   name="boost"/>
 </bin>
 
-<export>
-	<lib name="TTH/Plotting" />
-</export>
+<bin   file="joosep/test.cc" name="test_joosep">
+  <use   name="boost"/>
+  <Flags LDFLAGS="-lboost_unit_test_framework"/>
+</bin>
