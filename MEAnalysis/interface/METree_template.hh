@@ -408,16 +408,21 @@ public:
 	void set_branch_addresses(const float MH) {
         tree->SetBranchAddress("weight", &weight_);
         tree->SetBranchAddress("time", &time_);
-
-        tree->SetBranchAddress("lepton_pt", &lepton_pt_);
+		
+		tree->SetBranchAddress("EVENT", &EVENT_);
+		tree->SetBranchAddress("jet_pt", &jet_pt_);
+		tree->SetBranchAddress("lepton_pt", &lepton_pt_);
+		
         tree->SetBranchAddress("lepton_rIso", &lepton_rIso_);
         tree->SetBranchAddress("numBTagL", &numBTagL_);
         tree->SetBranchAddress("numBTagM", &numBTagM_);
         tree->SetBranchAddress("numBTagT", &numBTagT_);
         tree->SetBranchAddress("numJets", &numJets_);
         tree->SetBranchAddress("btag_LR", &btag_LR_);
-        tree->SetBranchAddress("nLep", &nLep_);
-        tree->SetBranchAddress(Form("p_%d_all_s",     int(MH)), &probAtSgn_);
+		tree->SetBranchAddress("nLep", &nLep_);
+		tree->SetBranchAddress("nJet", &nJet_);
+
+		tree->SetBranchAddress(Form("p_%d_all_s",     int(MH)), &probAtSgn_);
         tree->SetBranchAddress(Form("p_%d_all_b",     int(MH)), &probAtSgn_alt_);
         tree->SetBranchAddress(Form("p_%d_all_s_ttbb",int(MH)), &probAtSgn_ttbb_);
         tree->SetBranchAddress(Form("p_%d_all_b_ttbb",int(MH)), &probAtSgn_alt_ttbb_);

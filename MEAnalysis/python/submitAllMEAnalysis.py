@@ -1,47 +1,75 @@
 #!/usr/bin/env python
-
-
 import commands
 import re
 import os
 import ROOT
+import imp
 
 import sys
 sys.path.append('./')
 
 import FWCore.ParameterSet.Config as cms
 
-from TTH.MEAnalysis.mem_parameters_cff import *
+import argparse
+parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+default_pars = os.environ["CMSSW_BASE"] + "/python/TTH/MEAnalysis/mem_parameters_cff.py"
+parser.add_argument('--pars',
+	default=default_pars, type=str,
+	help="path to file with MEM parameters"
+)
+parser.add_argument('--site',
+	choices=['T2_EE_Estonia', 'T3_CH_PSI'], type=str,
+	default="T2_EE_Estonia",
+	help="CMS Tier 2/3 site where commands are run"
+)
 
+parser.add_argument('--njobs',
+	type=int,
+	default=100,
+	help="Number of jobs for the signal process"
+)
+parser.add_argument('--verbose', '-v', action='count')
+args = parser.parse_args()
+
+#import MEM parameters from specified file
+#from TTH.MEAnalysis.mem_parameters_cff import *
+if args.verbose > 0:
+	print "loading MEM parameters from", args.pars
+
+imp.load_source("mem_parameters", args.pars)
+from mem_parameters import *
 
 ###########################################
 ###########################################
 
 
 #file which contains scheduler commands to submit jobs
-tosubmit = open("submit.sh", "w")
-tosubmit.write("#!/bin/bash\n")
-os.system('chmod +x submit.sh')
+#tosubmit = open("submit.sh", "w")
+#tosubmit.write("#!/bin/bash\n")
+#os.system('chmod +x submit.sh')
 
 DOMEMCATEGORIES = 1
-PSI			 = 0
 
 address1 = ''
 address2 = ''
 subcommand	 = ''
 
-if PSI==1:
+if args.site=="T3_CH_PSI":
 	address1		= 'gsidcap://t3se01.psi.ch:22128/'
 	address2		= 'dcap://t3se01.psi.ch:22125/'
 	subcommand			= 'subcommand -V -cwd -l h_vmem=2G -q all.q'
-else:
+elif args.site=="T2_EE_Estonia":
 	address2		= ''
 	address1		= ''
 	subcommand			= 'sbatch -p main'
 	tempOutPath = "/scratch/" + os.environ["USER"] + "/"
 	finalOutPath = "/home/" + os.environ["USER"] + "/tth/{0}/".format(processing_tag)
+else:
+	raise ValueError("Unknown site: {0}".format(args.site))
 
 if not os.path.exists(finalOutPath):
+	if args.verbose > 0:
+		print "creating output directory", finalOutPath
 	os.makedirs(finalOutPath)
 
 ###########################################
@@ -50,7 +78,8 @@ if not os.path.exists(finalOutPath):
 
 def getSplitting(path, sample, numjobs, treeName="tthNtupleAnalyzer/events"):
 
-	print "getSplitting for", path, sample, numjobs
+	if args.verbose > 0:
+		print "getSplitting for", path, sample, numjobs
 	sampleName = None
 
 	for sam in samples:
@@ -94,12 +123,11 @@ def submitMEAnalysis(script,
 							version,
 							evLow,evHigh):
 
-	#print "Overload meAnalysisNew_all.py..."
 	os.system('cp $CMSSW_BASE/src/TTH/MEAnalysis/python/MEAnalysis_cfg.py ./')
 
-	from MEAnalysis_cfg import process
+	imp.load_source("localME", "./MEAnalysis_cfg.py")
+	from localME import process
 
-	#print "Creating the shell file for the batch..."
 	scriptName = 'job_'+script+'.sh'
 	jobName	= 'job_'+script
 
@@ -264,7 +292,7 @@ def submitMEAnalysis(script,
 	f.write('echo "SCRIPT '+scriptName+'"\n')
 	f.write('cd ${CMSSW_BASE}/src/TTH/MEAnalysis/\n')
 	f.write('export SCRAM_ARCH="slc6_amd64_gcc481"\n')
-	f.write('source $VO_CMS_SW_DIR/cmsset_default.sh\n')
+	f.write('source /cvmfs/cms.cern.ch/cmsset_default.sh\n')
 	f.write('eval `scramv1 runtime -sh`\n')
 	f.write('\n\n')
 
@@ -282,7 +310,7 @@ def submitMEAnalysis(script,
 	os.system('chmod +x '+scriptName)
 
 	submitToQueue = subcommand+' -N job'+sample+' '+scriptName
-	tosubmit.write(submitToQueue + "\n")
+	#tosubmit.write(submitToQueue + "\n")
 	#print submitToQueue
 	#os.system(submitToQueue)
 
@@ -298,7 +326,7 @@ def submitFullMEAnalysis( analysis ):
 	toBeRun = []
 	total_jobs = 0
 
-	if PSI:
+	if args.site=="T3_PSI_CH":
 		toBeRun = [
 			['TTH125',		 50,'_V4/'],
 			#['TTJetsSemiLept', 50,'_V4/'],
@@ -343,10 +371,10 @@ def submitFullMEAnalysis( analysis ):
 			#['Run2012_SingleMuRun2012CPromptV2TopUp',								 8, '_V4/'],
 			#['Run2012_SingleMuRun2012D-PromptReco-v1',							   40, '_V4/'],
 			]
-	else:
+	elif args.site == "T2_EE_Estonia":
 		toBeRun = [
-			["TTJets", 1000, ''],
-			["TTHBB125", 100, '']
+			["TTJets", 10 * args.njobs, ''],
+			["TTHBB125", args.njobs, '']
 			#['TTH125',		  50, ''], #499
 			#['TTJetsSemiLept',  50,''], #499
 			#['TTJetsFullLept',  50,''], #499

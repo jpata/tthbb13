@@ -20,9 +20,10 @@ typemap = {
 #e.g. float met
 class Scalar:
     #varname - name of variable in TTree and of the Branch
-    def __init__(self, varname, type):
+    def __init__(self, varname, type, needs_copy=False):
         self.varname = varname
         self.type = type
+        self.needs_copy = needs_copy
 
     #returns variable definition
     def branchvar(self):
@@ -52,10 +53,11 @@ class Scalar:
 #e.g. float corrections[100]
 class Static1DArray:
     #n - number or defined const static/define giving the size of the array
-    def __init__(self, varname, type, n):
+    def __init__(self, varname, type, n, needs_copy=False):
         self.varname = varname
         self.type = type
         self.n = n
+        self.needs_copy = needs_copy
 
     def branchvar(self):
         return "%s %s[%s]" % (self.type, self.varname, self.n)
@@ -81,11 +83,12 @@ class Static1DArray:
 
 class Static2DArray:
     #n, m - compile-time constants giving the size of the array
-    def __init__(self, varname, type, n, m):
+    def __init__(self, varname, type, n, m, needs_copy=False):
         self.varname = varname
         self.type = type
         self.n = n
         self.m = m
+        self.needs_copy = needs_copy
 
     def branchvar(self):
         return "%s %s[%s][%s]" % (self.type, self.varname, self.n, self.m)
@@ -117,11 +120,12 @@ class Dynamic1DArray:
 
     #n - branch name giving the length
     #maxlength - size of buffer
-    def __init__(self, varname, type, n, maxlength):
+    def __init__(self, varname, type, n, maxlength, needs_copy=False):
         self.varname = varname
         self.type = type
         self.n = n
         self.maxlength = maxlength
+        self.needs_copy = needs_copy
 
     def branchvar(self):
         return "%s %s[%s]" % (self.type, self.varname, self.maxlength)
@@ -203,12 +207,12 @@ if __name__ == "__main__":
         insert_to("//HEADERGEN_BRANCH_SETADDRESS",
               "\t\t%s;\n" % (branch.setaddress())
         )
-                
-        if "//HEADERGEN_COPY_BRANCHES" in "".join(lines):
+
+        if branch.needs_copy and "//HEADERGEN_COPY_BRANCHES" in "".join(lines):
             insert_to("//HEADERGEN_COPY_BRANCHES",
                   "\t\t%s;\n" % (branch.copy_branch())
             )
-    
+
     # Also allow inserting define statements
     for define in defines_to_add:
         print "Adding: ", define

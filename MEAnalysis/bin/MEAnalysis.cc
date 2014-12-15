@@ -94,6 +94,58 @@ using namespace std;
 //minor version - data-compatible
 #define VERSION "70X v0.1"
 
+class CutHistogram {
+
+    private:
+    const unsigned int enum_length;
+    
+    public:
+    TH1D* h;
+    
+    enum Cuts {
+        NOTYPEMATCH,
+        H_MASS_SCAN_BKG,
+        T_MASS_SCAN_SIG,
+        ONE_HYPO_MISMATCH,
+        TTH_MBB_INCOMPATIBLE,
+        TTJETS_MBB_INCOMPATIBLE,
+        LEPTONS,
+		JETS,
+        BTAGSHAPE,
+        WMASS,
+        passes,
+        unknown
+    };
+
+    CutHistogram(const std::string name) :
+        enum_length((int)Cuts::unknown + 1),
+        h(new TH1D(name.c_str(), name.c_str(), enum_length, 0, enum_length)) 
+    {
+        h->GetXaxis()->SetBinLabel(1, "NOTYPEMATCH");
+        h->GetXaxis()->SetBinLabel(2, "H_MASS_SCAN_BKG");
+        h->GetXaxis()->SetBinLabel(3, "T_MASS_SCAN_SIG");
+        h->GetXaxis()->SetBinLabel(4, "ONE_HYPO_MISMATCH");
+        h->GetXaxis()->SetBinLabel(5, "TTH_MBB_INCOMPATIBLE");
+        h->GetXaxis()->SetBinLabel(6, "TTJETS_MBB_INCOMPATIBLE");
+        h->GetXaxis()->SetBinLabel(7, "LEPTONS");
+        h->GetXaxis()->SetBinLabel(8, "JETS");
+        h->GetXaxis()->SetBinLabel(9, "BTAGSHAPE");
+        h->GetXaxis()->SetBinLabel(10, "WMASS");
+        h->GetXaxis()->SetBinLabel(11, "passes");
+        h->GetXaxis()->SetBinLabel(12, "unknown");
+    }
+
+    void fill(Cuts c) {
+        h->Fill((int)c);
+    }
+};
+
+#define DO_BTAG_LR_TREE
+
+#ifdef DO_BTAG_LR_TREE
+#include "TTH/MEAnalysis/interface/btag_lr_tree.hh"
+#endif
+
 int main(int argc, const char* argv[])
 {
 
@@ -148,11 +200,19 @@ int main(int argc, const char* argv[])
 
     //const double lepPtLoose         ( in.getUntrackedParameter<double>  ("lepPtLoose", 20.));
     const double lepPtTight         ( in.getUntrackedParameter<double>  ("lepPtTight", 30.));
+    const double muPtTight         ( in.getUntrackedParameter<double>  ("muPtTight", 30.));
+    const double elPtTight         ( in.getUntrackedParameter<double>  ("elPtTight", 30.));
     //const double lepIsoLoose        ( in.getUntrackedParameter<double>  ("lepIsoLoose", 0.2));
     const double lepIsoTight        ( in.getUntrackedParameter<double>  ("lepIsoTight", 0.12));
     //const double elEta              ( in.getUntrackedParameter<double>  ("elEta",      2.5));
     //const double muEtaLoose         ( in.getUntrackedParameter<double>  ("muEtaLoose", 2.4));
     const double muEtaTight         ( in.getUntrackedParameter<double>  ("muEtaTight", 2.1));
+   
+    //configures if the following skims are applied
+    const bool cutLeptons           ( in.getUntrackedParameter<bool>  ("cutLeptons", true));
+    const bool cutJets              ( in.getUntrackedParameter<bool>  ("cutJets", true));
+    const bool cutWMass             ( in.getUntrackedParameter<bool>  ("cutWMass", true));
+    const bool cutBTagShape         ( in.getUntrackedParameter<bool>  ("cutBTagShape", true));
 
     const int    jetMultLoose       ( in.getUntrackedParameter<int>     ("jetMultLoose",    4 ));
     const double jetPtLoose         ( in.getUntrackedParameter<double>  ("jetPtLoose",     40.));
@@ -506,7 +566,9 @@ int main(int argc, const char* argv[])
     meIntegrator->initTFparameters(1.0,1.0,1.0,1.0, 1.0);
     if(switchoffOL) {
         meIntegrator->switchOffOL();
-        cout << "*** Switching off OpenLoops to speed-up the calculation ***" << endl;
+        if (print) {
+			cout << "*** Switching off OpenLoops to speed-up the calculation ***" << endl;
+		}
     }
 
 
@@ -533,6 +595,9 @@ int main(int argc, const char* argv[])
     hcounter->GetXaxis()->SetBinLabel(1, "fraction of processed events");
     hcounter->GetXaxis()->SetBinLabel(2, "number of events processed");
     hcounter->GetXaxis()->SetBinLabel(3, "number of events passing");
+    
+    fout_tmp->cd();
+    CutHistogram cuts("cuts");
 
     // save a snapshot of the configuration parameters
     vector<std::string> paramsAll = in.getParameterNames();
@@ -581,6 +646,12 @@ int main(int argc, const char* argv[])
     TTree* _otree = new TTree("tree", "");
     METree* otree = new METree(_otree);
     otree->make_branches(MH);
+
+#ifdef DO_BTAG_LR_TREE
+    TTree* _btag_tree = new TTree("btag_lr", "");
+    BTagLRTree btag_tree(_btag_tree);
+    btag_tree.make_branches();
+#endif
 
     /* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  */
     /* @@@@@@@@@@@@@@@@@@@@@@@@@ OPEN FILES @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  */
@@ -683,8 +754,11 @@ int main(int argc, const char* argv[])
         int event_trials  = 0;
 
         if( evHigh<0 ) evHigh = nentries;
+
+		TStopwatch processing_sw;
+		processing_sw.Start();
         //event loop
-        for (Long64_t i = 0; i < nentries ; i++) {
+        for (Long64_t i = 0; i < evHigh ; i++) {
             // initialize branch variables
             itree->loop_initialize();
             otree->loop_initialize();
@@ -701,14 +775,19 @@ int main(int argc, const char* argv[])
 
             // print the processed event number
             if(i%500==0) {
-                cout << i << " (" << float(i)/float(nentries)*100 << " %)" << endl;
+                processing_sw.Stop();
+                float _swtime_c = processing_sw.CpuTime();
+                float _swtime_r = processing_sw.RealTime();
+                processing_sw.Reset();
+				processing_sw.Start();
+                cout << i << " (" << float(i)/float(nentries)*100 << " %) " << 500/_swtime_c << " " << 500/_swtime_r << endl;
             }
 
             // set variables that are used, but for which there may be no branches in the input tree
-            itree->weight__pu       = 1.0;
-            itree->weight__pu_up      = 1.0;
-            itree->weight__pu_down      = 1.0;
-            itree->lhe__n_j          = 1.0;
+            itree->weight__pu = 1.0;
+            itree->weight__pu_up = 1.0;
+            itree->weight__pu_down = 1.0;
+            itree->lhe__n_j = 1.0;
 
             //FIXME: implement machinery for trigger weights
             //weightTrig2012 = 1.0;
@@ -1069,10 +1148,16 @@ int main(int argc, const char* argv[])
             bool properEventDL = (genBLV.Pt()>0 && genBbarLV.Pt()>0 && topBLV.Pt()>0 && topW1LV.Pt()>0 && topW2LV.Pt()>0 && atopBLV.Pt()>0 && atopW1LV.Pt()>0 && atopW2LV.Pt()>0);
 
             if(!(properEventSL || properEventDL)) {
-                cout << "A dummy cut has failed..." << endl;
-                cout << " => go to next event!" << endl;
-                cout << "******************************" << endl;
-                continue;
+
+				if (debug>=2) {
+                	cout << "A dummy cut has failed..." << endl;
+                	cout << " => go to next event!" << endl;
+                	cout << "******************************" << endl;
+				}
+            	if (cutLeptons) {
+                	cuts.fill(CutHistogram::Cuts::LEPTONS);
+					continue;
+				}
             }
 
             if(debug>=2) cout << "@C" << endl;
@@ -1504,7 +1589,6 @@ int main(int argc, const char* argv[])
                 ///////////////////////////////////
 
                 properEventSL = false;
-                //FIXME: do we still need to count loose leptons, looseAElec?
                 if( (ENABLE_EJ && Vtype == TTH::EventHypothesis::en) || (ENABLE_MJ && Vtype == TTH::EventHypothesis::mun) ) {
 
                     if(debug>3) cout << "EJ/MJ" << endl;
@@ -1525,11 +1609,11 @@ int main(int argc, const char* argv[])
                     }
 
                     // tight cuts on lepton (SL)
-                    int lepSelVtype2 =  (Vtype == TTH::EventHypothesis::mun && itree->sig_lep__type[0] == 13 && leptonLV.Pt()>lepPtTight &&
+                    int lepSelVtype2 =  (Vtype == TTH::EventHypothesis::mun && itree->sig_lep__type[0] == 13 && leptonLV.Pt() > muPtTight &&
                                          TMath::Abs(leptonLV.Eta()) < muEtaTight && itree->lep__rel_iso[lepton_idx] < lepIsoTight);
                     //int lepSelVtype3 =  (Vtype==3 && itree->lep__type[0]==11 && leptonLV.Pt()>lepPtTight &&
                     //                     itree->lep__rel_iso[0]<lepIsoTight && vLepton_wp80[0]>0 && TMath::Abs(itree->lep__dxy[0])<0.02 );
-                    int lepSelVtype3 =  (Vtype == TTH::EventHypothesis::en && itree->sig_lep__type[0] == 11 && leptonLV.Pt() > lepPtTight &&
+                    int lepSelVtype3 =  (Vtype == TTH::EventHypothesis::en && itree->sig_lep__type[0] == 11 && leptonLV.Pt() > elPtTight &&
                                          itree->lep__rel_iso[lepton_idx] < lepIsoTight && TMath::Abs(itree->lep__dxy[lepton_idx]) < 0.02);
                     
                     if (debug>3) {
@@ -1614,6 +1698,11 @@ int main(int argc, const char* argv[])
                     otree->lepton_type_   [0] = itree->lep__type[lepton_idx];
                     otree->lepton_dxy_    [0] = itree->lep__dxy[lepton_idx];
                     otree->lepton_dz_     [0] = itree->lep__dz[lepton_idx];
+                    //otree->gen_lepton_pt  [0] = itree->gen_lep__pt[lepton_idx];
+                    //otree->gen_lepton_eta [0] = itree->gen_lep__eta[lepton_idx];
+                    //otree->gen_lepton_phi [0] = itree->gen_lep__phi[lepton_idx];
+                    //otree->gen_lepton_m   [0] = itree->gen_lep__m[lepton_idx];
+                    //otree->gen_lepton_id  [0] = itree->gen_lep__id[lepton_idx];
                     //FIXME
                     //otree->lepton_wp80_   [0] = vLepton_wp80[0];
                     //otree->lepton_wp95_   [0] = vLepton_wp95[0];
@@ -1800,6 +1889,11 @@ int main(int argc, const char* argv[])
                     otree->lepton_type_   [0] = itree->lep__type[lep_idx_1];
                     otree->lepton_dxy_    [0] = itree->lep__dxy[lep_idx_1];
                     otree->lepton_dz_     [0] = itree->lep__dz[lep_idx_1];
+                    //otree->gen_lepton_pt  [0] = itree->gen_lep__pt[lep_idx_1];
+                    //otree->gen_lepton_eta [0] = itree->gen_lep__eta[lep_idx_1];
+                    //otree->gen_lepton_phi [0] = itree->gen_lep__phi[lep_idx_1];
+                    //otree->gen_lepton_m   [0] = itree->gen_lep__m[lep_idx_1];
+                    //otree->gen_lepton_id  [0] = itree->gen_lep__id[lep_idx_1];
                     //FIXME: need to add ID-s
                     //otree->lepton_wp70_   [0] = vLepton_wp70[0];
                     //otree->lepton_wp80_   [0] = vLepton_wp80[0];
@@ -1816,6 +1910,11 @@ int main(int argc, const char* argv[])
                     otree->lepton_type_   [1] = itree->lep__type[lep_idx_2];
                     otree->lepton_dxy_    [1] = itree->lep__dxy[lep_idx_2];
                     otree->lepton_dz_     [1] = itree->lep__dz[lep_idx_2];
+                    //otree->gen_lepton_pt  [0] = itree->gen_lep__pt[lep_idx_2];
+                    //otree->gen_lepton_eta [0] = itree->gen_lep__eta[lep_idx_2];
+                    //otree->gen_lepton_phi [0] = itree->gen_lep__phi[lep_idx_2];
+                    //otree->gen_lepton_m   [0] = itree->gen_lep__m[lep_idx_2];
+                    //otree->gen_lepton_id  [0] = itree->gen_lep__id[lep_idx_2];
                     //otree->lepton_wp80_   [1] = vLepton_wp80[1];
                     //otree->lepton_wp70_   [1] = vLepton_wp70[1];
                     //otree->lepton_wp95_   [1] = vLepton_wp95[1];
@@ -1974,13 +2073,16 @@ int main(int argc, const char* argv[])
                 }
 
                 // continue if leptons do not satisfy cuts
-                if( !(properEventSL || properEventDL) ) {
+                if(!(properEventSL || properEventDL) ) {
                     if( debug>=2 ) {
                         cout << "Rejected by lepton selection" << endl ;
                         cout << " => go to next event!" << endl;
                         cout << "******************************" << endl;
                     }
-                    continue;
+					if (cutLeptons) {
+                		cuts.fill(CutHistogram::Cuts::LEPTONS);
+                    	continue;
+					}
                 }
 
 
@@ -2374,9 +2476,9 @@ int main(int argc, const char* argv[])
                 // if use btag shape, order by decreasing CSV
                 // <=> when considering only a subset of the jets, this ensures that the combination
                 // obtained from CSVM only jets is among those considered
-                if( selectByBTagShape || recoverTopBTagBin)
+                if( selectByBTagShape || recoverTopBTagBin) {
                     std::sort( jet_map.begin(),   jet_map.end(),     JetObservableListerByCSV() );
-
+                }
 
                 for( int csv_sys = 0; csv_sys < 19 ; csv_sys++) {
                     double csv_syst_value = 1.0;
@@ -2395,9 +2497,8 @@ int main(int argc, const char* argv[])
                 std::vector<double>            jets_csv_prob_c;
                 std::vector<double>            jets_csv_prob_j;
 
-                std::vector<int>            jets_index;
-                
-                std::vector<int>              jets_flavour;
+                std::vector<int>               jets_index;
+                std::vector<int>               jets_flavour;
 
                 int jetsAboveCut = 0;
 
@@ -2416,6 +2517,7 @@ int main(int argc, const char* argv[])
 
                     // the index
                     int index = jet_map[jj].index;
+                    int flavour = jet_map[jj].flavour;
 
                     // count jets above 40 GeV
                     if( p4.Pt()>jetPtLoose ) jetsAboveCut++;
@@ -2438,6 +2540,8 @@ int main(int argc, const char* argv[])
                         bin = "Bin1";
 
                     // store PDF(csv)
+                    jets_flavour.push_back(flavour);
+
                     jets_csv_prob_b.push_back( btagger["b_"+bin]!=0 ? btagger["b_"+bin]->GetBinContent( btagger["b_"+bin]->FindBin( csv ) ) : 1.);
                     jets_csv_prob_c.push_back( btagger["c_"+bin]!=0 ? btagger["c_"+bin]->GetBinContent( btagger["c_"+bin]->FindBin( csv ) ) : 1.);
                     jets_csv_prob_j.push_back( btagger["l_"+bin]!=0 ? btagger["l_"+bin]->GetBinContent( btagger["l_"+bin]->FindBin( csv ) ) : 1.);
@@ -2447,13 +2551,16 @@ int main(int argc, const char* argv[])
                 otree->jetsAboveCut_ = jetsAboveCut;
 
                 // continue if not enough jets
-                if( otree->jetsAboveCut_<jetMultLoose ) {
+                if(otree->jetsAboveCut_<jetMultLoose ) {
                     if( debug>=2 ) {
                         cout << "Rejected by min jet cut (>= " <<jetMultLoose << " jets above " << jetPtLoose << " GeV)" << endl ;
                         cout << " => go to next event!" << endl;
                         cout << "******************************" << endl;
                     }
-                    continue;
+					if (cutJets) { 
+                		cuts.fill(CutHistogram::Cuts::JETS);
+                    	continue;
+					}
                 }
 
 
@@ -2549,16 +2656,16 @@ int main(int argc, const char* argv[])
                 int passes_btagshape = 0;
 
                 //LH ratio
-                if( /*selectByBTagShape &&*/ useBtag &&                    // run this only if specified AND...
-                                             ((properEventSL && banytag_indices.size()>=5) ||   // [ run this only if SL and at least 5 jets OR...
-                                              (properEventDL && banytag_indices.size()>=4)) ) { //   run this only if DL and at least 4 jets ]
+                if( /*selectByBTagShape &&*/ useBtag &&               // run this only if specified AND...
+                    ((properEventSL && banytag_indices.size()>=5) ||  // [ run this only if SL and at least 5 jets OR...
+                    (properEventDL && banytag_indices.size()>=4)) ) { //   run this only if DL and at least 4 jets ]
 
                     // map that transforms the indices into the permutation convention
                     std::map< unsigned int, unsigned int> btag_map;
                     btag_map.clear();
 
                     // number of inequivalent permutations
-                    int nS, nB;
+                    int nS=0, nB=0;
 
                     // sum of the b-tag probability over all permutations
                     float p_bb     =  0.;
@@ -2608,10 +2715,13 @@ int main(int argc, const char* argv[])
                         nB = 6;
                         btag_flag = 2;
                     }
-                    else {
-                        cout << "Inconsistency in selectByBTagShape... continue" << endl;
-                        cout << " => go to next event!" << endl;
-                        cout << "******************************" << endl;
+                    else if (cutBTagShape) {
+						if (debug >= 2) {
+                        	cout << "Inconsistency in selectByBTagShape... continue" << endl;
+                        	cout << " => go to next event!" << endl;
+                        	cout << "******************************" << endl;
+						}
+                		cuts.fill(CutHistogram::Cuts::BTAGSHAPE);
                         continue;
                     }
 
@@ -2634,6 +2744,7 @@ int main(int argc, const char* argv[])
                                 cout << "permutation loop " << pos << endl;
                             }
 
+
                             // index of the four jets associated to b-quarks or W->qq
                             int bLep_pos = (permutList[pos])%1000000/100000;
                             int w1_pos   = (permutList[pos])%100000/10000;
@@ -2641,6 +2752,7 @@ int main(int argc, const char* argv[])
                             int bHad_pos = (permutList[pos])%1000/100;
                             int b1_pos   = (permutList[pos])%100/10;
                             int b2_pos   = (permutList[pos])%10/1;
+                        
 
                             double p_b_bLep =  jets_csv_prob_b[  btag_map[bLep_pos] ];
                             double p_b_bHad =  jets_csv_prob_b[  btag_map[bHad_pos] ];
@@ -2650,6 +2762,13 @@ int main(int argc, const char* argv[])
                             double p_j_b2   =  jets_csv_prob_j[  btag_map[b2_pos]   ];
                             double p_j_w1   =  jets_csv_prob_j[  btag_map[w1_pos]   ];
                             double p_j_w2   =  jets_csv_prob_j[  btag_map[w2_pos]   ];
+                            
+                            double id_bLep =  jets_flavour[  btag_map[bLep_pos] ];
+                            double id_bHad =  jets_flavour[  btag_map[bHad_pos] ];
+                            double id_b1   =  jets_flavour[  btag_map[b1_pos]   ];
+                            double id_b2   =  jets_flavour[  btag_map[b2_pos]   ];
+                            double id_w1   =  jets_flavour[  btag_map[w1_pos]   ];
+                            double id_w2   =  jets_flavour[  btag_map[w2_pos]   ];
 
                             // the total probability
                             float p_pos = 0.;
@@ -2672,7 +2791,54 @@ int main(int argc, const char* argv[])
                                 p_jj += p_pos;
                             }
 
-                        }
+#ifdef DO_BTAG_LR_TREE
+                            btag_tree.permutation = permutList[pos];
+                            btag_tree.event = counter;
+                            btag_tree.event_run = itree->event__run;
+                            btag_tree.event_lumi = itree->event__lumi;
+                            btag_tree.event_id = itree->event__id;
+                            btag_tree.syst = syst;
+                            btag_tree.permutation_pos = pos;
+                            btag_tree.bLep_pos = bLep_pos;
+                            btag_tree.w1_pos = w1_pos;
+                            btag_tree.w2_pos = w2_pos;
+                            btag_tree.bHad_pos = bHad_pos;
+                            btag_tree.b1_pos = b2_pos;
+                            
+                            btag_tree.jets_bLep_pos = btag_map[bLep_pos];
+                            btag_tree.jets_w1_pos = btag_map[w1_pos];
+                            btag_tree.jets_w2_pos = btag_map[w2_pos];
+                            btag_tree.jets_bHad_pos = btag_map[bHad_pos];
+                            btag_tree.jets_b1_pos = btag_map[b2_pos];
+                            
+                            btag_tree.p_b_bLep = p_b_bLep;
+                            btag_tree.p_b_bHad = p_b_bHad;
+                            btag_tree.p_b_b1   = p_b_b1;
+                            btag_tree.p_j_b1   = p_j_b1;
+                            btag_tree.p_b_b2   = p_b_b2;
+                            btag_tree.p_j_b2   = p_j_b2;
+                            btag_tree.p_j_w1   = p_j_w1;
+                            btag_tree.p_j_w2   = p_j_w2;
+                            
+                            btag_tree.id_bLep = id_bLep;
+                            btag_tree.id_bHad = id_bHad;
+                            btag_tree.id_b1   = id_b1;
+                            btag_tree.id_b2   = id_b2;
+                            btag_tree.id_w1   = id_w1;
+                            btag_tree.id_w2   = id_w2;
+                            
+                            btag_tree.hypo = hyp;
+                            btag_tree.p_pos = p_pos;
+                            
+                            btag_tree.p_bb = p_bb;
+                            btag_tree.p_jj = p_jj;
+                            
+                            btag_tree.nS = nS;
+                            btag_tree.nB = nB;
+                            btag_tree.tree->Fill();
+#endif //DO_BTAG_LR_TREE
+
+                        } //permutations
 
                     } // end loop over hypothesis
 
@@ -3043,7 +3209,7 @@ int main(int argc, const char* argv[])
 
                         // use untagged mass to assign to type 0 OR type 1
                         float WMass = (jets_p4[ buntag_indices[0] ]+jets_p4[  buntag_indices[1] ]).M();
-
+						otree->mW = WMass;
                         // set index for untagged jets
                         ind1 = buntag_indices[0];
                         ind2 = buntag_indices[1];
@@ -3074,7 +3240,8 @@ int main(int argc, const char* argv[])
                             meIntegrator->setIntType( MEIntegratorNew::SL1wj );
                             /////////////////////////////////////////////////////
                         }
-                        else {
+                        else if (cutWMass) {
+                			cuts.fill(CutHistogram::Cuts::WMASS);
                             continue;
                         }
 
@@ -3542,7 +3709,9 @@ int main(int argc, const char* argv[])
                     // if needed, switch off OL
                     if(switchoffOL) {
                         meIntegrator->switchOffOL();
-                        cout << "*** Switching off OpenLoops to speed-up the calculation ***" << endl;
+						if (print) {
+                        	cout << "*** Switching off OpenLoops to speed-up the calculation ***" << endl;
+						}
                     }
 
                     // start the clock...
@@ -3675,6 +3844,8 @@ int main(int argc, const char* argv[])
                                     if(TMath::Abs(TOPHADB.Py())>0 && deltaR( jets_p4[ pos_to_index[bHad_pos] ], TOPHADB ) < GENJETDR) {
                                         bHad_match = 1;
                                     }
+
+                                    //check if b1 and b2 match H->bb
                                     int b1_match = 0;
                                     int b2_match = 0;
                                     if( (TMath::Abs(HIGGSB1.Py())>0 && deltaR( jets_p4[ pos_to_index[b1_pos] ], HIGGSB1 ) < GENJETDR) ||
@@ -3793,7 +3964,7 @@ int main(int argc, const char* argv[])
                                     } //use b-tag
 
                                     // if doing scan over b-tag only, don't need amplitude...
-                                    if( otree->type_<0  ) continue;
+                                    if(otree->type_<0) continue;
 
 
                                     // if type 0/3 and incompatible with MW or MT (and we are not scanning vs MT) continue
@@ -3879,8 +4050,9 @@ int main(int argc, const char* argv[])
                                     else if( otree->type_==6 )  nParam = 5; // eta_nu, phi_nu, eta_nu', phi_nu', Eb
                                     else if( otree->type_==7 )  nParam = 5; // eta_nu, phi_nu, eta_nu', phi_nu', Eb
                                     else {
-                                        cout << "No type match...contine." << endl;
-                                        continue;
+                                        cout << "No type match...continue." << endl;
+                                        cuts.fill(CutHistogram::Cuts::NOTYPEMATCH);
+                                        continue; //continue permutation loop
                                     }
 
                                     if( testSLw1jType3 && otree->type_==3 && otree->flag_type3_<0 ) {
@@ -3897,14 +4069,23 @@ int main(int argc, const char* argv[])
                                     double chi2  = 0.;
 
                                     // if doing higgs mass scan, don't consider bkg hypo
-                                    if( nHiggsMassPoints>1 && hyp==1 ) continue;
+                                    if( nHiggsMassPoints>1 && hyp==1 ) {
+                                        cuts.fill(CutHistogram::Cuts::H_MASS_SCAN_BKG);
+                                        continue; //continue permutation loop
+                                    }
 
                                     // if doing top mass scan, don't consider sgn hypo
-                                    if( nTopMassPoints>1 && hyp==0 ) continue;
+                                    if( nTopMassPoints>1 && hyp==0) {
+                                        cuts.fill(CutHistogram::Cuts::T_MASS_SCAN_SIG);
+                                        continue; //continue permutation loop
+                                    }
 
                                     // if consider only one hypothesis (SoB=0)
                                     // and the current hypo is not the desired one, continue...
-                                    if( SoB==0 && hyp!=hypo) continue;
+                                    if( SoB==0 && hyp!=hypo) {
+                                        cuts.fill(CutHistogram::Cuts::ONE_HYPO_MISMATCH);
+                                        continue; //continue permutation loop
+                                    }
 
                                     // if current hypo is TTH, but M(b1b2) incompatible with 125
                                     // (and we are not scanning vs MH) continue...
@@ -3915,7 +4096,8 @@ int main(int argc, const char* argv[])
                                                  << "] Perm. #" << pos;
                                             cout << " => p=" << p << endl;
                                         }
-                                        continue;
+                                        cuts.fill(CutHistogram::Cuts::TTH_MBB_INCOMPATIBLE);
+                                        continue; //continue permutation loop
                                     }
 
                                     // increment counters
@@ -3929,7 +4111,8 @@ int main(int argc, const char* argv[])
                                             cout << "Skip    hypo " << (hyp==0 ? "ttH " : "ttbb")
                                                  << " because no valid ttH permutations found" << endl;
                                         }
-                                        continue;
+                                        cuts.fill(CutHistogram::Cuts::TTJETS_MBB_INCOMPATIBLE);
+                                        continue; //continue permutation loop
                                     }
 
                                     // setup hypothesis
@@ -4344,17 +4527,20 @@ int main(int argc, const char* argv[])
                         } //jet loop
 
                         // fill the tree
+                        cuts.fill(CutHistogram::Cuts::passes);
                         otree->tree->Fill();
+                		hcounter->SetBinContent(3, hcounter->GetBinContent(3)+1);
                     } //ntuplizeAll
 
-                    continue;
+                    continue; //continue systematics loop in case ntuplizeAll
                 } //case where matrix element is not calculated
 
-                // fill the tree...
+                // fill the tree in case !ntuplizeAll
                 // FIXME: why is this here twice?
+                cuts.fill(CutHistogram::Cuts::passes);
                 otree->tree->Fill();
                 
-                //fill histogram counter with number of processed events
+                //fill histogram counter with number of passing events
                 hcounter->SetBinContent(3, hcounter->GetBinContent(3)+1);
 
             } // systematics
@@ -4402,12 +4588,15 @@ int main(int argc, const char* argv[])
         if(f_Vtype3_tr)   f_Vtype3_tr->Close();
     }
 
+	cout << "Writing to " << outFileName << endl;
     // save the tree and the counting histo in the ROOT file
     fout_tmp->cd();
     config_dump->Write("", TObject::kOverwrite);
     hcounter->Write("", TObject::kOverwrite );
     hparam->Write("", TObject::kOverwrite );
     otree->tree->Write("", TObject::kOverwrite );
+    btag_tree.tree->Write("", TObject::kOverwrite );
+    cuts.h->Write("", TObject::kOverwrite);
     fout_tmp->Close();
 
     if(debug>=2) cout << "@M" << endl;
