@@ -19,7 +19,7 @@ from TTH.TTHNtupleAnalyzer.Samples import Samples
 
 def submit(name,
            sample_shortname,
-           version,        
+           version,
            cmssw_config_path,
            cmssw_config_script = "Main_cfg.py",
            site = "T2_CH_CSCS",
@@ -30,7 +30,7 @@ def submit(name,
 
     # Import template, add parameters and save to new file
     imp.load_source("template", template_filename)
-    import template    
+    import template
 
     template.config.General.workArea = "crab_{0}_{1}_{2}".format(name, version, sample_shortname)
     template.config.General.requestName = "{0}_{1}_{2}".format(name, version, sample_shortname)
@@ -64,7 +64,7 @@ def status(name,
     """Get status of a single job on the Grid."""
 
     working_dir = "crab_{0}_{1}_{2}/crab_{0}_{1}_{2}".format(name, version, sample_shortname)
-    
+
     subprocess.call(["crab", "status", "-d", working_dir])
 # End of status
 
@@ -75,7 +75,7 @@ def status(name,
 
 def download(name,
              sample_shortname,
-             version,        
+             version,
              target_basepath):
     """Download a single job from the Grid. Assume we are in the same
     directory used for submission (crab_configs)
@@ -86,8 +86,8 @@ def download(name,
     """
 
     working_dir = "crab_{0}_{1}_{2}/crab_{0}_{1}_{2}".format(name, version, sample_shortname)
-    
-    output_dir = target_basepath + "{0}_{1}_{2}".format(name, version, sample_shortname)    
+
+    output_dir = target_basepath + "{0}_{1}_{2}".format(name, version, sample_shortname)
     subprocess.call(["crab", "getoutput", "-d", working_dir, "--outputpath", output_dir])
 # End of download
 
@@ -98,15 +98,15 @@ def download(name,
 
 def hadd(name,
          sample_shortname,
-         version,        
+         version,
          basepath = ""):
     """ Hadd all root files in basepath+jobname to basepath/jobname.root
     """
 
-    input_dir = basepath + "{0}_{1}_{2}/*".format(name, version, sample_shortname)    
+    input_dir = basepath + "{0}_{1}_{2}/*".format(name, version, sample_shortname)
     input_filenames = glob.glob(input_dir)
-        
-    output_filename = basepath + "{0}_{1}_{2}.root".format(name, version, sample_shortname)    
+
+    output_filename = basepath + "{0}_{1}_{2}.root".format(name, version, sample_shortname)
 
     subprocess.call(["hadd", "-f", output_filename] + input_filenames)
 # End of hadd
