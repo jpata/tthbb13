@@ -200,6 +200,8 @@ int main(int argc, const char* argv[])
 
     //const double lepPtLoose         ( in.getUntrackedParameter<double>  ("lepPtLoose", 20.));
     const double lepPtTight         ( in.getUntrackedParameter<double>  ("lepPtTight", 30.));
+    const double muPtTight         ( in.getUntrackedParameter<double>  ("muPtTight", 30.));
+    const double elPtTight         ( in.getUntrackedParameter<double>  ("elPtTight", 30.));
     //const double lepIsoLoose        ( in.getUntrackedParameter<double>  ("lepIsoLoose", 0.2));
     const double lepIsoTight        ( in.getUntrackedParameter<double>  ("lepIsoTight", 0.12));
     //const double elEta              ( in.getUntrackedParameter<double>  ("elEta",      2.5));
@@ -1587,7 +1589,6 @@ int main(int argc, const char* argv[])
                 ///////////////////////////////////
 
                 properEventSL = false;
-                //FIXME: do we still need to count loose leptons, looseAElec?
                 if( (ENABLE_EJ && Vtype == TTH::EventHypothesis::en) || (ENABLE_MJ && Vtype == TTH::EventHypothesis::mun) ) {
 
                     if(debug>3) cout << "EJ/MJ" << endl;
@@ -1608,11 +1609,11 @@ int main(int argc, const char* argv[])
                     }
 
                     // tight cuts on lepton (SL)
-                    int lepSelVtype2 =  (Vtype == TTH::EventHypothesis::mun && itree->sig_lep__type[0] == 13 && leptonLV.Pt()>lepPtTight &&
+                    int lepSelVtype2 =  (Vtype == TTH::EventHypothesis::mun && itree->sig_lep__type[0] == 13 && leptonLV.Pt() > muPtTight &&
                                          TMath::Abs(leptonLV.Eta()) < muEtaTight && itree->lep__rel_iso[lepton_idx] < lepIsoTight);
                     //int lepSelVtype3 =  (Vtype==3 && itree->lep__type[0]==11 && leptonLV.Pt()>lepPtTight &&
                     //                     itree->lep__rel_iso[0]<lepIsoTight && vLepton_wp80[0]>0 && TMath::Abs(itree->lep__dxy[0])<0.02 );
-                    int lepSelVtype3 =  (Vtype == TTH::EventHypothesis::en && itree->sig_lep__type[0] == 11 && leptonLV.Pt() > lepPtTight &&
+                    int lepSelVtype3 =  (Vtype == TTH::EventHypothesis::en && itree->sig_lep__type[0] == 11 && leptonLV.Pt() > elPtTight &&
                                          itree->lep__rel_iso[lepton_idx] < lepIsoTight && TMath::Abs(itree->lep__dxy[lepton_idx]) < 0.02);
                     
                     if (debug>3) {
