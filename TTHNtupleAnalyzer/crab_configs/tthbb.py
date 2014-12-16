@@ -7,7 +7,7 @@
 import sys
 
 from TTH.TTHNtupleAnalyzer.CrabHelpers import submit, status, download, hadd
-
+from collections import Counter
 
 #######################################
 # Configuration
@@ -59,15 +59,21 @@ if action == "submit":
                version,
                cmssw_config_path = cmssw_config_path,
                cmssw_config_script = config_script_name,
-			   site = "T2_EE_Estonia",
+               site = "T2_EE_Estonia",
                blacklist = [])
 
 # Status
 if action == "status":
     for sample_shortname in li_samples:
-        status(name,
+        stat = status(name,
                sample_shortname,
-               version)
+               version,
+               parse=True
+        )
+        #print stat
+        sm = Counter(map(lambda x: x["State"], stat.values()))
+        done_pc = float(sm.get("finished", 0)) / float(sum(sm.values()))
+        print "{0} {1:.2f} {2}".format(sample_shortname, done_pc, sm.items())
 
 # Download
 elif action == "download":

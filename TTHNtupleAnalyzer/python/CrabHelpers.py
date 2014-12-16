@@ -58,14 +58,30 @@ def submit(name,
 # status
 #######################################
 
+import json
 def status(name,
            sample_shortname,
-           version):
+           version,
+           parse=False):
     """Get status of a single job on the Grid."""
 
     working_dir = "crab_{0}_{1}_{2}/crab_{0}_{1}_{2}".format(name, version, sample_shortname)
 
-    subprocess.call(["crab", "status", "-d", working_dir])
+    if not parse:
+        subprocess.call(["crab", "status", "-d", working_dir], stdout=of)
+    else:
+        of = open("crab.stdout", "w")
+        subprocess.call(["crab", "status", "-d", working_dir, "--json"], stdout=of)
+        of.close()
+        of = open("crab.stdout", "r")
+        lines = of.readlines()
+        of.close()
+        jsonlines = reduce(
+            lambda x,y: dict(x.items() + y.items()),
+            map(lambda x: eval(x.strip()), filter(lambda x: x.startswith("{"), lines)),
+            {}
+        )
+        return jsonlines
 # End of status
 
 
