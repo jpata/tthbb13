@@ -1563,7 +1563,10 @@ public:
 		std::vector<Particle*> particles;
 		std::vector<Particle*> jets;
 		std::vector<Particle*> gen_jets;
+
 		std::vector<Particle*> top_decay;
+		std::vector<Particle*> w_decay;
+
 		std::vector<Particle*> higgs_decay;
 		std::vector<Particle*> leptons;
 		std::vector<Particle*> gen_leptons;
@@ -1593,19 +1596,19 @@ public:
 		}
 		
 		Particle* d1 = new Particle(gen_t__w_d1__pt, gen_t__w_d1__eta, gen_t__w_d1__phi, gen_t__w_d1__mass, gen_t__w_d1__id);
-		top_decay.push_back(d1);
+		w_decay.push_back(d1);
 		particles.push_back(d1);
 		
 		Particle* d2 = new Particle(gen_t__w_d2__pt, gen_t__w_d2__eta, gen_t__w_d2__phi, gen_t__w_d2__mass, gen_t__w_d2__id);
-		top_decay.push_back(d2);
+		w_decay.push_back(d2);
 		particles.push_back(d2);
-		;
+		
 		Particle* d3 = new Particle(gen_tbar__w_d1__pt, gen_tbar__w_d1__eta, gen_tbar__w_d1__phi, gen_tbar__w_d1__mass, gen_tbar__w_d1__id);
-		top_decay.push_back(d3);
+		w_decay.push_back(d3);
 		particles.push_back(d3);
 		
 		Particle* d4 = new Particle(gen_tbar__w_d2__pt, gen_tbar__w_d2__eta, gen_tbar__w_d2__phi, gen_tbar__w_d2__mass, gen_tbar__w_d2__id);
-		top_decay.push_back(d4);
+		w_decay.push_back(d4);
 		particles.push_back(d4);
 		
 		Particle* d5 = new Particle(gen_t__b__pt, gen_t__b__eta, gen_t__b__phi, gen_t__b__mass, 5);
@@ -1624,7 +1627,7 @@ public:
 		higgs_decay.push_back(d8);
 		particles.push_back(d8);
 		
-		return new Event(particles, jets, gen_jets, leptons, gen_leptons, top_decay, higgs_decay);
+		return new Event(particles, jets, gen_jets, leptons, gen_leptons, top_decay, w_decay, higgs_decay);
 	}
 };
 

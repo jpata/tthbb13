@@ -10,6 +10,7 @@
 #define TTHNtupleAnalyzer_event_interpretation_hh
 
 #include "TLorentzVector.h"
+#include <iostream>
 
 class Particle {
 public:
@@ -24,6 +25,7 @@ public:
 	Particle(double pt, double eta, double phi, double m, int _id, int _idx);
 	Particle(double pt, double eta, double phi, double m, int _id);
 	~Particle() {};
+
 };
 
 class Event {
@@ -37,9 +39,18 @@ public:
 	std::vector<Particle*> gen_leptons;
 	
 	std::vector<Particle*> top_decays;
+	std::vector<Particle*> w_decays;
 	std::vector<Particle*> higgs_decays;
 	
-	Event(plist _particles, plist _jets, plist _gen_jets, plist _leptons, plist _gen_leptons, plist _top_decays, plist _higgs_decays);
+	Event(plist _particles,
+		plist _jets,
+		plist _gen_jets,
+		plist _leptons,
+		plist _gen_leptons,
+		plist _top_decays,
+		plist _w_decays,
+		plist _higgs_decays
+		);
 	~Event();
 	
 };

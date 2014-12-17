@@ -55,13 +55,14 @@ idx(-1)
 {
 }
 
-Event::Event(plist _particles, plist _jets, plist _gen_jets, plist _leptons, plist _gen_leptons, plist _top_decays, plist _higgs_decays) :
+Event::Event(plist _particles, plist _jets, plist _gen_jets, plist _leptons, plist _gen_leptons, plist _top_decays, plist _w_decays, plist _higgs_decays) :
 particles(_particles),
 jets(_jets),
 gen_jets(_gen_jets),
 leptons(_leptons),
 gen_leptons(_gen_leptons),
 top_decays(_top_decays),
+w_decays(_w_decays),
 higgs_decays(_higgs_decays)
 {
 }
@@ -70,4 +71,20 @@ Event::~Event() {
 	for (auto* v : particles) {
 		delete v;
 	}
+}
+
+std::ostream& operator<<(std::ostream& os, const Particle& obj)
+{
+  	using namespace std;
+  	os << obj.p4.Pt() << " " << obj.p4.Eta() << " " << obj.p4.Phi() << " " << obj.p4.M() << " " << obj.id;
+  	os << " parents ";
+  	for (auto* x : obj.parents) {
+  		os << x << ",";
+  	}
+  	os << " children ";
+  	for (auto* x : obj.children) {
+  		os << x << ",";
+  	}
+  	os << endl;
+  	return os;
 }
