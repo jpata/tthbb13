@@ -9,6 +9,8 @@ Collection of functions for simple crab3 submission.
 import subprocess
 import imp
 import glob
+import re
+import os
 
 from TTH.TTHNtupleAnalyzer.Samples import Samples
 
@@ -58,14 +60,30 @@ def submit(name,
 # status
 #######################################
 
+import json
 def status(name,
            sample_shortname,
-           version):
+           version,
+           parse=False):
     """Get status of a single job on the Grid."""
 
     working_dir = "crab_{0}_{1}_{2}/crab_{0}_{1}_{2}".format(name, version, sample_shortname)
 
-    subprocess.call(["crab", "status", "-d", working_dir])
+    if not parse:
+        subprocess.call(["crab", "status", "-d", working_dir], stdout=of)
+    else:
+        of = open("crab.stdout", "w")
+        subprocess.call(["crab", "status", "-d", working_dir, "--json"], stdout=of)
+        of.close()
+        of = open("crab.stdout", "r")
+        lines = of.readlines()
+        of.close()
+        jsonlines = reduce(
+            lambda x,y: dict(x.items() + y.items()),
+            map(lambda x: eval(x.strip()), filter(lambda x: x.startswith("{"), lines)),
+            {}
+        )
+        return jsonlines
 # End of status
 
 
@@ -93,6 +111,28 @@ def download(name,
 
 
 #######################################
+# get LFN
+#######################################
+
+def get_lfn(name, sample_shortname, version, file_output=True):
+    working_dir = "crab_{0}_{1}_{2}/crab_{0}_{1}_{2}".format(name, version, sample_shortname)
+    of = open("crab.stdout", "w")
+    ret = subprocess.call(["crab", "getoutput", "-d", working_dir, "--dump"], stdout=of)
+    of.close()
+    if not ret==0:
+        print "ERROR: could not get output"
+        print "".join(open("crab.stdout", "r").readlines())
+    of = open("crab.stdout", "r")
+    lines = "".join(of.readlines())
+    lines = lines.split("===")
+    lfns = {}
+    for line in lines:
+        m = re.match(".*job ([0-9]+)\n.*\nLFN: (/.*root)\n", line)
+        if m:
+            lfns[int(m.group(1))] = m.group(2)
+    return lfns
+# End of get LFN
+#######################################
 # hadd
 #######################################
 
@@ -109,4 +149,20 @@ def hadd(name,
     output_filename = basepath + "{0}_{1}_{2}.root".format(name, version, sample_shortname)
 
     subprocess.call(["hadd", "-f", output_filename] + input_filenames)
+
+def hadd_from_file(name,
+         sample_shortname,
+         version,
+         basepath = ""):
+    """ Hadd all root files in basepath+jobname to basepath/jobname.root
+    """
+
+    input_fn = "crab_{0}_{1}_{2}/crab_{0}_{1}_{2}/files.txt".format(name, version, sample_shortname)
+    if os.path.isfile(input_fn):
+        input_filenames = map(lambda x: x.strip(), open(input_fn).readlines())
+        if len(input_filenames)>0:
+            output_filename = basepath + "/{0}_{1}_{2}.root".format(name, version, sample_shortname)
+            subprocess.call(["echo", "hadd", "-f", output_filename, "-n", "500"] + input_filenames)
+            return
+    print "no output from {0}".format(sample_shortname)
 # End of hadd
