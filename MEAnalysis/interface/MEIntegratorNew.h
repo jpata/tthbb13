@@ -2606,7 +2606,7 @@ double MEIntegratorNew::Eval(const double* x) const {
         prob /=  xSection(1);
     else {}
 
-    if(verbose_) cout << "#" << evaluation_ << ": " << prob << endl;
+    //if(verbose_) cout << "#" << evaluation_ << ": " << prob << endl;
 
     return prob;
 }

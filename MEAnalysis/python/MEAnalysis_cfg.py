@@ -181,7 +181,7 @@ process.fwliteInput = cms.PSet(
     debug        = cms.untracked.int32(0),
 
     # extremely verbose
-    verbose      = cms.bool(True),
+    verbose      = cms.bool(False),
 
     # the 'nominal' Higgs, top, and W masses
     MH           = cms.untracked.double(125.00),
@@ -225,7 +225,7 @@ process.fwliteInput = cms.PSet(
     fixNumEvJob    = cms.untracked.int32(1),
 
     # event limits
-    evLimits       = cms.vint32(0, 100),
+    evLimits       = cms.vint32(0, -1),
 
     # do systematic shifts (dummy)
     doJERbias  = cms.untracked.int32(0),
