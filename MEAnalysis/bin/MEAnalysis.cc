@@ -113,6 +113,7 @@ class CutHistogram {
 		JETS,
         BTAGSHAPE,
         WMASS,
+        TYPELESSZERO,
         passes,
         unknown
     };
@@ -131,8 +132,9 @@ class CutHistogram {
         h->GetXaxis()->SetBinLabel(8, "JETS");
         h->GetXaxis()->SetBinLabel(9, "BTAGSHAPE");
         h->GetXaxis()->SetBinLabel(10, "WMASS");
-        h->GetXaxis()->SetBinLabel(11, "passes");
-        h->GetXaxis()->SetBinLabel(12, "unknown");
+        h->GetXaxis()->SetBinLabel(11, "TYPELESSZERO");
+        h->GetXaxis()->SetBinLabel(12, "passes");
+        h->GetXaxis()->SetBinLabel(13, "unknown");
     }
 
     void fill(Cuts c) {
@@ -3818,7 +3820,7 @@ int main(int argc, const char* argv[])
                                     // the barcode for this permutation
                                     string barcode = Form("%d%d_%d_%d%d%d_%d%d%d_%d%d",
                                                           otree->type_, meIntegrator->getIntType(), hyp, 
-                              lep_index[0], 0, jets_index[ pos_to_index[bLep_pos] ],
+                                                          lep_index[0], 0, jets_index[ pos_to_index[bLep_pos] ],
                                                           otree->type_<6 ? jets_index[ pos_to_index[w1_pos] ] : lep_index[1], otree->type_<6 ? jets_index[ pos_to_index[w2_pos] ] : 0, jets_index[ pos_to_index[bHad_pos] ],
                                                           jets_index[ pos_to_index[b1_pos] ], jets_index[ pos_to_index[b2_pos] ]);
                                     PhaseSpacePoint PSP;
@@ -3964,7 +3966,10 @@ int main(int argc, const char* argv[])
                                     } //use b-tag
 
                                     // if doing scan over b-tag only, don't need amplitude...
-                                    if(otree->type_<0) continue;
+                                    if(otree->type_<0) {
+                                        cuts.fill(CutHistogram::Cuts::TYPELESSZERO);
+                                        continue;
+                                    }
 
 
                                     // if type 0/3 and incompatible with MW or MT (and we are not scanning vs MT) continue
@@ -3975,71 +3980,71 @@ int main(int argc, const char* argv[])
                                     }
 
                                     // retrieve integration boundaries from meIntegrator
-                                    pair<double, double> range_x0 = (meIntegrator->getW1JetEnergyCI(0.95));
-                                    pair<double, double> range_x1 =  make_pair(-1,1);
-                                    pair<double, double> range_x2 =  make_pair(-PI,PI);
-                                    pair<double, double> range_x3 =  make_pair(-1,1);
-                                    pair<double, double> range_x4 =  useMET ? (meIntegrator->getNuPhiCI(0.95)) : make_pair(-PI,PI);
-                                    pair<double, double> range_x5 = (meIntegrator->getB1EnergyCI(0.95));
-                                    pair<double, double> range_x6 = (meIntegrator->getB2EnergyCI(0.95));
+                                    const pair<double, double> range_x0 = (meIntegrator->getW1JetEnergyCI(0.95));
+                                    const pair<double, double> range_x1 =  make_pair(-1,1);
+                                    const pair<double, double> range_x2 =  make_pair(-PI,PI);
+                                    const pair<double, double> range_x3 =  make_pair(-1,1);
+                                    const pair<double, double> range_x4 =  useMET ? (meIntegrator->getNuPhiCI(0.95)) : make_pair(-PI,PI);
+                                    const pair<double, double> range_x5 = (meIntegrator->getB1EnergyCI(0.95));
+                                    const pair<double, double> range_x6 = (meIntegrator->getB2EnergyCI(0.95));
 
                                     // boundaries
-                                    double x0L = range_x0.first;
-                                    double x0U = range_x0.second;
-                                    double x1L = range_x1.first;
-                                    double x1U = range_x1.second;
-                                    double x2L = range_x2.first;
-                                    double x2U = range_x2.second;
-                                    double x3L = range_x3.first;
-                                    double x3U = range_x3.second;
-                                    double x4L = range_x4.first;
-                                    double x4U = range_x4.second;
-                                    double x5L = range_x5.first;
-                                    double x5U = range_x5.second;
-                                    double x6L = range_x6.first;
-                                    double x6U = range_x6.second;
+                                    const double x0L = range_x0.first;
+                                    const double x0U = range_x0.second;
+                                    const double x1L = range_x1.first;
+                                    const double x1U = range_x1.second;
+                                    const double x2L = range_x2.first;
+                                    const double x2U = range_x2.second;
+                                    const double x3L = range_x3.first;
+                                    const double x3U = range_x3.second;
+                                    const double x4L = range_x4.first;
+                                    const double x4U = range_x4.second;
+                                    const double x5L = range_x5.first;
+                                    const double x5U = range_x5.second;
+                                    const double x6L = range_x6.first;
+                                    const double x6U = range_x6.second;
 
                                     // these hold for the sgn integration and type0...
-                                    double xLmode0_s[4] = {x0L, x3L, x4L, x5L};
-                                    double xUmode0_s[4] = {x0U, x3U, x4U, x5U};
+                                    const double xLmode0_s[4] = {x0L, x3L, x4L, x5L};
+                                    const double xUmode0_s[4] = {x0U, x3U, x4U, x5U};
                                     // these hold for the bkg integration and type0...
-                                    double xLmode0_b[5] = {x0L, x3L, x4L, x5L, x6L};
-                                    double xUmode0_b[5] = {x0U, x3U, x4U, x5U, x6U};
-
+                                    const double xLmode0_b[5] = {x0L, x3L, x4L, x5L, x6L};
+                                    const double xUmode0_b[5] = {x0U, x3U, x4U, x5U, x6U};
+ 
                                     // these hold for the sgn integration and type1...
-                                    double xLmode1_s[6] = {x0L, x1L, x2L, x3L, x4L, x5L};
-                                    double xUmode1_s[6] = {x0U, x1U, x2U, x3U, x4U, x5U};
+                                    const double xLmode1_s[6] = {x0L, x1L, x2L, x3L, x4L, x5L};
+                                    const double xUmode1_s[6] = {x0U, x1U, x2U, x3U, x4U, x5U};
                                     // these hold for the bkg integration and type1...
-                                    double xLmode1_b[7] = {x0L, x1L, x2L, x3L, x4L, x5L, x6L};
-                                    double xUmode1_b[7] = {x0U, x1U, x2U, x3U, x4U, x5U, x6U};
-
+                                    const double xLmode1_b[7] = {x0L, x1L, x2L, x3L, x4L, x5L, x6L};
+                                    const double xUmode1_b[7] = {x0U, x1U, x2U, x3U, x4U, x5U, x6U};
+ 
                                     // these hold for the sgn integration and type2...
-                                    double xLmode2_s[6] = {x0L, x1L, x2L, x3L, x4L, x5L};
-                                    double xUmode2_s[6] = {x0U, x1U, x2U, x3U, x4U, x5U};
+                                    const double xLmode2_s[6] = {x0L, x1L, x2L, x3L, x4L, x5L};
+                                    const double xUmode2_s[6] = {x0U, x1U, x2U, x3U, x4U, x5U};
                                     // these hold for the bkg integration and type2...
-                                    double xLmode2_b[7] = {x0L, x1L, x2L, x3L, x4L, x5L, x6L};
-                                    double xUmode2_b[7] = {x0U, x1U, x2U, x3U, x4U, x5U, x6U};
-
+                                    const double xLmode2_b[7] = {x0L, x1L, x2L, x3L, x4L, x5L, x6L};
+                                    const double xUmode2_b[7] = {x0U, x1U, x2U, x3U, x4U, x5U, x6U};
+ 
                                     // these hold for the sgn integration and type3...
-                                    double xLmode3_s[4] = {x0L, x3L, x4L, x5L};
-                                    double xUmode3_s[4] = {x0U, x3U, x4U, x5U};
+                                    const double xLmode3_s[4] = {x0L, x3L, x4L, x5L};
+                                    const double xUmode3_s[4] = {x0U, x3U, x4U, x5U};
                                     // these hold for the bkg integration and type3...
-                                    double xLmode3_b[5] = {x0L, x3L, x4L, x5L, x6L};
-                                    double xUmode3_b[5] = {x0U, x3U, x4U, x5U, x6U};
-
+                                    const double xLmode3_b[5] = {x0L, x3L, x4L, x5L, x6L};
+                                    const double xUmode3_b[5] = {x0U, x3U, x4U, x5U, x6U};
+ 
                                     // these hold for the sgn integration and type6...
-                                    double xLmode6_s[5] = {x1L, x2L, x1L, x2L, x5L};
-                                    double xUmode6_s[5] = {x1U, x2U, x1U, x2U, x5U};
+                                    const double xLmode6_s[5] = {x1L, x2L, x1L, x2L, x5L};
+                                    const double xUmode6_s[5] = {x1U, x2U, x1U, x2U, x5U};
                                     // these hold for the bkg integration and type6...
-                                    double xLmode6_b[6] = {x1L, x2L, x1L, x2L, x5L, x6L};
-                                    double xUmode6_b[6] = {x1U, x2U, x1U, x2U, x5U, x6U};
-
+                                    const double xLmode6_b[6] = {x1L, x2L, x1L, x2L, x5L, x6L};
+                                    const double xUmode6_b[6] = {x1U, x2U, x1U, x2U, x5U, x6U};
+ 
                                     // these hold for the sgn integration and type7...
-                                    double xLmode7_s[5] = {x1L, x2L, x1L, x2L, x5L};
-                                    double xUmode7_s[5] = {x1U, x2U, x1U, x2U, x5U};
+                                    const double xLmode7_s[5] = {x1L, x2L, x1L, x2L, x5L};
+                                    const double xUmode7_s[5] = {x1U, x2U, x1U, x2U, x5U};
                                     // these hold for the bkg integration and type7...
-                                    double xLmode7_b[6] = {x1L, x2L, x1L, x2L, x5L, x6L};
-                                    double xUmode7_b[6] = {x1U, x2U, x1U, x2U, x5U, x6U};
+                                    const double xLmode7_b[6] = {x1L, x2L, x1L, x2L, x5L, x6L};
+                                    const double xUmode7_b[6] = {x1U, x2U, x1U, x2U, x5U, x6U};
 
                                     // number of integration variables (TTH hypothesis)
                                     int nParam;
@@ -4142,12 +4147,13 @@ int main(int argc, const char* argv[])
                                     // count number of Integral() calls
                                     int nCalls = 0;
 
+                                    meIntegrator->resetEvaluation();
 
                                     // skip ME calculation... for debugging
                                     if(speedup==0) {
 
                                         // setup # of parameters
-                                        meIntegrator->SetPar( nParam+hyp );
+                                        meIntegrator->SetPar(nParam + hyp);
                                         // integrand
                                         ROOT::Math::Functor toIntegrate(meIntegrator, &MEIntegratorNew::Eval, nParam+hyp);
 
@@ -4166,11 +4172,16 @@ int main(int argc, const char* argv[])
 
                                         // if run full VEGAS integration for the first time,
                                         // or run the optimized VEGAS integration, but the permutation is new...
-                                        if( (integralOption2==0 && need2Rerun) ||
-                                                ( integralOption2==1 && perm_to_integrator.find( barcode ) == perm_to_integrator.end() ) ) {
+                                        if((integralOption2==0 && need2Rerun) ||
+                                            (integralOption2==1 && perm_to_integrator.find( barcode ) == perm_to_integrator.end())) {
 
                                             // VEGAS integrator
-                                            ROOT::Math::GSLMCIntegrator* ig2 = new ROOT::Math::GSLMCIntegrator( ROOT::Math::IntegrationMultiDim::kVEGAS , 1.e-12, 1.e-5, intPoints);
+                                            ROOT::Math::GSLMCIntegrator* ig2 = new ROOT::Math::GSLMCIntegrator(
+                                                ROOT::Math::IntegrationMultiDim::kVEGAS ,
+                                                1.e-12, //absolute tolerance
+                                                1.e-5, //relative tolerance
+                                                intPoints //maximum number of calls
+                                            );
                                             ig2->SetFunction(toIntegrate);
 
                                             // refinement: redo integration if it returned a bad chi2
@@ -4223,30 +4234,47 @@ int main(int argc, const char* argv[])
                                                 // error from VEGAS
                                                 pErr =  ig2->Error();
 
+                                                cout << "INT0 hyp " << hyp <<
+                                                    " ev " << itree->event__id <<
+                                                    " syst " << syst <<
+                                                    " pm " << permutList[pos] <<
+                                                    " bc " << barcode <<
+                                                    " NT " << ntries <<
+                                                    " IP " << intPoints <<
+                                                    " chi2 " << chi2 <<
+                                                    " pErr " << pErr <<
+                                                    " N " << meIntegrator->getEvaluations() <<
+                                                    " Ne " << ig2->NEval() <<
+                                                    endl;
+
                                                 // save the various integrators
                                                 if( integralOption2==1 ) {
-                                                    if( perm_to_integrator.find( barcode )!=perm_to_integrator.end() ) {
-                                                        perm_to_integrator.erase     ( perm_to_integrator.find(barcode) );
+                                                    if(perm_to_integrator.find( barcode )!=perm_to_integrator.end()) {
+                                                        perm_to_integrator.erase(perm_to_integrator.find(barcode));
                                                     }
-                                                    perm_to_integrator     [barcode] = ig2;
+                                                    perm_to_integrator[barcode] = ig2;
                                                 }
 
                                                 // save the result...
-                                                if( perm_to_phasespacepoint.find( barcode )!=perm_to_phasespacepoint.end() )
+                                                if( perm_to_phasespacepoint.find( barcode )!=perm_to_phasespacepoint.end() ) {
                                                     perm_to_phasespacepoint.erase( perm_to_phasespacepoint.find(barcode) );
+                                                }
                                                 perm_to_phasespacepoint[barcode] = PSP;
 
-                                                if( perm_to_integral.find( barcode )!=perm_to_integral.end() )
-                                                    perm_to_integral.erase       ( perm_to_integral.find(barcode) );
-                                                perm_to_integral       [barcode] = p;
+                                                if( perm_to_integral.find( barcode )!=perm_to_integral.end() ) {
+                                                    perm_to_integral.erase( perm_to_integral.find(barcode) );
+                                                }
+                                                perm_to_integral[barcode] = p;
 
-                                                if( perm_to_integralError.find( barcode )!=perm_to_integralError.end() )
+                                                if( perm_to_integralError.find( barcode )!=perm_to_integralError.end() ) {
                                                     perm_to_integralError.erase( perm_to_integralError.find( barcode ) );
-                                                perm_to_integralError [barcode] = pErr;
+                                                }
+                                                perm_to_integralError[barcode] = pErr;
 
-                                                if( perm_to_integralChi2.find( barcode )!=perm_to_integralChi2.end() )
+                                                if( perm_to_integralChi2.find( barcode )!=perm_to_integralChi2.end() ) {
                                                     perm_to_integralChi2.erase( perm_to_integralChi2.find( barcode ) );
-                                                perm_to_integralChi2 [barcode] = chi2;
+                                                }
+                                                perm_to_integralChi2[barcode] = chi2;
 
                                                 // check if the actual permutation returned a small or large number...
                                                 // if the value is less than 10% of the largest found that far, skip
@@ -4266,16 +4294,15 @@ int main(int argc, const char* argv[])
                                                     intPoints *= 1.5;
                                                 }
                                                 // otherwise, just go to the next permutation...
-                                                else
+                                                else {
                                                     ntries = MAX_REEVAL_TRIES+1;
+                                                }
 
                                             }
 
                                             // free the allocated memory
                                             if( integralOption2==0 ) delete ig2;
-
-                                        } //full VEGAS run
-
+                                        } // end full VEGAS run integralOption==0 or ==1 and no barcode
 
                                         // re-run the integration using the last grid only
                                         // (optionally, change the VEGAS parameters)
@@ -4335,13 +4362,23 @@ int main(int argc, const char* argv[])
                                             chi2 =  perm_to_integrator[barcode]->ChiSqr();
                                             pErr =  perm_to_integrator[barcode]->Error();
 
-                                        }
+                                            cout << "INT1 hyp " << hyp <<
+                                                " ev " << itree->event__id <<
+                                                " syst " << syst <<
+                                                " pm " << permutList[pos] <<
+                                                " bc " << barcode <<
+                                                " NT " << ntries <<
+                                                " IP " << intPoints <<
+                                                " chi2 " << chi2 <<
+                                                " pErr " << pErr <<
+                                                " N " << meIntegrator->getEvaluations() <<
+                                                " Ne " << perm_to_integrator[barcode]->NEval() <<
+                                                endl;
+                                        } //end VEGAS re-run with integralOption==1
 
                                         else {
                                             /* ... */
                                         }
-
-
                                     } //speedup to skip ME
 
                                     // can still be interested in b-tagging, so set p=1...
@@ -4429,7 +4466,7 @@ int main(int argc, const char* argv[])
                 // ALL THE REST...                               //
                 ///////////////////////////////////////////////////
 
-                else {
+                else { //not calcME
 
                     if( enhanceMC ) {
 

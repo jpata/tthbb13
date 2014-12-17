@@ -139,11 +139,11 @@ public:
     double        probabilitySLUnconstrained(const double*, int ) const;
     unsigned int  findMatch(double, double) const;
     void   initTFparameters(float,float,float,float,float);
-    void   cachePdf( string , string , int );
-    void   cachePdf( string , string , string, int,    int );
-    void   cachePdf( string , string , string, string, int, int, int );
-    void   cachePdf( string , string , string, TArrayF, TArrayF);
-    void   cachePdf( string , string , string, string, TArrayF, TArrayF, TArrayF);
+    void   cachePdf( const string , const string , int );
+    void   cachePdf( const string , const string , const string, int,    int );
+    void   cachePdf( const string , const string , const string, string, int, int, int );
+    void   cachePdf( const string , const string , const string, TArrayF, TArrayF);
+    void   cachePdf( const string , const string , const string, const string, TArrayF, TArrayF, TArrayF);
     void   setMass   (double);
     void   setQ      (double);
     void   setSqrtS  (double);
@@ -170,8 +170,8 @@ public:
     void   setConstrainToRecoil  (int);
     void   setUseRefinedTF       (int);
 
-    TH1*   getCachedPdf( string ) const;
-    TH1*   getCachedTF ( string ) const;
+    TH1*   getCachedPdf( const string ) const;
+    TH1*   getCachedTF ( const string ) const;
     TH2F*  getMash( );
     TH1F*  getDebugHisto( );
     void   debug();
@@ -182,12 +182,12 @@ public:
     void   deleteTF();
     void   adaptRange(TF1*, float&, float&, float, float);
     void   adaptRange(TH1*, float&, float&, float, float);
-    void   createTFjet(string, float , float, string , float, float);
-    void   createTFmet(string , float , float, float, float);
+    void   createTFjet(const string, float , float, string , float, float);
+    void   createTFmet(const string , float , float, float, float);
     void   createTFmetFromCovM(string, float);
 
     pair<double,double> getNuPhiCI      (float);
-    pair<double,double> getJetEnergyCI  (float, float, string, float);
+    pair<double,double> getJetEnergyCI  (float, float, const string, float);
     pair<double,double> getBLepEnergyCI (float);
     pair<double,double> getW1JetEnergyCI(float);
     pair<double,double> getW2JetEnergyCI(float);
@@ -201,7 +201,7 @@ public:
     bool compatibilityCheck_WHad  (float, int, double&, double&, double&);
     bool compatibilityCheck_TopHad(float, int, double&, double&, double&);
 
-    double jetEnergyTF(float, double, double, string) const;
+    double jetEnergyTF(float, double, double, const string) const;
 
     int    topHadEnergies     (double, double&, double&, double&, double&, int&) const;
     int    topLepEnergies     (double, double,  double&, double&, double&, double&, int&) const;
@@ -277,7 +277,7 @@ private:
     int useRefinedTF_;
 
     int par_;
-    int verbose_;
+    const int verbose_;
     int usePtPhiParam_;
     int constrainToRecoil_;
     int evaluation_;
@@ -330,10 +330,15 @@ private:
     TStopwatch* clock_;
     TRandom3* ran_;
 
+public:
+    double getEvaluations() {
+        return this->evaluation_;
+    }
+
 };
 
 
-MEIntegratorNew::MEIntegratorNew( string fileName , int param , int verbose ) {
+MEIntegratorNew::MEIntegratorNew( string fileName , int param , int verbose ) : verbose_(verbose) {
 
     cout << "Begin constructor" << endl;
 
@@ -350,7 +355,6 @@ MEIntegratorNew::MEIntegratorNew( string fileName , int param , int verbose ) {
 
     intType_       = SL2wj;
     par_           = param;
-    verbose_       = verbose;
     sumEt_         = 1500.;
     usePtPhiParam_ = 0;
     evaluation_    = 0;
@@ -419,6 +423,10 @@ MEIntegratorNew::MEIntegratorNew( string fileName , int param , int verbose ) {
     RooRealVar* var = 0;
     while( (var = (RooRealVar*)(*iter)() ) ) {
         jetParam_[ string(var->GetName()) ] = var->getVal();
+
+        //FIXME: make jetParam a map of enums
+        //param0resolHeavyBin0
+        //jetParamEnum_
         cout << string(var->GetName()) << ": " << var->getVal() << endl;
     }
 
@@ -1312,14 +1320,11 @@ bool MEIntegratorNew::compatibilityCheck_TopHad(float quantile, int print, doubl
 
 }
 
+double MEIntegratorNew::jetEnergyTF(float eta, double Erec, double Egen, const string flavor) const {
 
-
-
-double MEIntegratorNew::jetEnergyTF(float eta, double Erec, double Egen, string flavor) const {
-
-    string bin = "Bin0";
-    if(  TMath::Abs( eta )<1.0 ) bin = "Bin0";
-    else bin = "Bin1";
+    const string bin = TMath::Abs( eta )<1.0 ? "Bin0" : "Bin1"; 
+    //if(  TMath::Abs( eta )<1.0 ) bin = "Bin0";
+    //else bin = "Bin1";
 
     if( useRefinedTF_==0 || flavor.find("Light")!=string::npos) {
 
@@ -3195,7 +3200,7 @@ double MEIntegratorNew::probabilitySL2wj(const double* x, int sign) const {
 
 
     if(verbose_) {
-        cout << "#" << evaluation_ << endl;
+        cout << "#" << evaluation_ << " SL2wj" << endl;
         cout << "Eq1 = "         << Eq1 << endl;
         cout << "cosThetaNu = " << cosThetaNu << endl;
         cout << "phiNu = "      << phiNu  << endl;
@@ -3387,7 +3392,7 @@ double MEIntegratorNew::probabilitySL1wj(const double* x, int sign) const {
 
 
     if(verbose_) {
-        cout << "#" << evaluation_ << endl;
+        cout << "#" << evaluation_ << " SL1wj" << endl;
         cout << "Eq1 =        "  << Eq1 << endl;
         cout << "cosThetaq2 = "  << cosThetaq2 << endl;
         cout << "phiNuq2 =    "  << phiNuq2 << endl;
@@ -3638,7 +3643,7 @@ double MEIntegratorNew::probabilitySLNoBHad(const double* x, int sign) const {
 
 
     if(verbose_) {
-        cout << "#" << evaluation_ << endl;
+        cout << "#" << evaluation_ << " SLNoBHad" << endl;
         cout << "Eq1 =          "  << Eq1 << endl;
         cout << "cosThetaBHad = "  << cosThetaBHad << endl;
         cout << "phiNuBHad =    "  << phiBHad << endl;
@@ -3900,7 +3905,7 @@ double MEIntegratorNew::probabilitySLNoBLep(const double* x, int sign) const {
 
 
     if(verbose_) {
-        cout << "#" << evaluation_ << endl;
+        cout << "#" << evaluation_ << " SLNoBLep" << endl;
         cout << "Eq1 =          "  << Eq1 << endl;
         cout << "cosThetaBLep = "  << cosThetaBLep << endl;
         cout << "phiBLep =      "  << phiBLep << endl;
@@ -4162,7 +4167,7 @@ double MEIntegratorNew::probabilitySLNoHiggs(const double* x, int sign) const {
 
 
     if(verbose_) {
-        cout << "#" << evaluation_ << endl;
+        cout << "#" << evaluation_ << " SLNoHiggs" << endl;
         cout << "Eq1 =          "  << Eq1 << endl;
         cout << "cosThetaB2 = "  << cosThetaB2 << endl;
         cout << "phiNuB2 =    "  << phiB2 << endl;
@@ -4424,7 +4429,7 @@ double MEIntegratorNew::probabilityDL(const double* x, int sign) const {
 
 
     if(verbose_) {
-        cout << "#" << evaluation_ << endl;
+        cout << "#" << evaluation_ << " DL" << endl;
         cout << "cosThetaNu1 = " << cosThetaNu1 << endl;
         cout << "phiNu1 = "      << phiNu1  << endl;
         cout << "cosThetaNu2 = " << cosThetaNu2 << endl;

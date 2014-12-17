@@ -180,7 +180,7 @@ integralOption2_niter     = 1
 integralOption2_nevalfact = 1.0
 
 # switch off ME calculation
-speedup              = 1
+speedup              = 0
 
 # switch off OL calculation
 switchoffOL          = 1
