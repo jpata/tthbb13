@@ -6,7 +6,7 @@
 
 import sys
 
-from TTH.TTHNtupleAnalyzer.CrabHelpers import submit, status, download, hadd
+from TTH.TTHNtupleAnalyzer.CrabHelpers import submit, status, download, hadd, get_lfn, hadd_from_file
 from collections import Counter
 
 #######################################
@@ -31,13 +31,14 @@ li_samples = [
 cmssw_config_path = '/home/joosep/TTH/CMSSW/src/TTH/TTHNtupleAnalyzer/python/'
 config_script_name = 'Main_cfg.py'
 storage_path = '/scratch/joosep'
+tier_prefix = '/hdfs/cms/'
 
 #######################################
 # Actual work
 #####################################
 
 # Decide what to do
-actions = ["submit", "status", "download", "hadd"]
+actions = ["submit", "status", "download", "hadd", "haddfiles"]
 
 if not len(sys.argv) == 2:
     print "Invalid number of arguments"
@@ -72,8 +73,25 @@ if action == "status":
         )
         #print stat
         sm = Counter(map(lambda x: x["State"], stat.values()))
-        done_pc = float(sm.get("finished", 0)) / float(sum(sm.values()))
+        if sum(sm.values())>0:
+            done_pc = float(sm.get("finished", 0)) / float(sum(sm.values()))
+        else:
+            done_pc = -1
         print "{0} {1:.2f} {2}".format(sample_shortname, done_pc, sm.items())
+        lfns = get_lfn(name,
+               sample_shortname,
+               version,
+        )
+        working_dir = "crab_{0}_{1}_{2}/crab_{0}_{1}_{2}".format(name, version, sample_shortname)
+        of = open(working_dir + "/files.txt", "w")
+        nf = 0
+        for k in stat.keys():
+            if stat[k]["State"] == "finished":
+                if lfns.has_key(int(k)):
+                    of.write(tier_prefix + lfns[int(k)] + "\n")
+                    nf += 1
+        of.close()
+        print "wrote {0} files".format(nf)
 
 # Download
 elif action == "download":
@@ -84,4 +102,11 @@ elif action == "download":
 elif action == "hadd":
     for sample_shortname in li_samples:
         hadd(name, sample_shortname, version, storage_path)
+
+elif action == "haddfiles":
+    for sample_shortname in li_samples:
+        hadd_from_file(name, sample_shortname, version, storage_path)
+
+
+
 
