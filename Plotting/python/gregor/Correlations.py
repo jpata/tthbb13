@@ -48,17 +48,16 @@ tagger_vars = [
     var('ca15cmstt_minMass', "CMSTT minMass", 0., 1000),
 ]
 
-                                                                              
-#'jet_ca15cmstt':"CMSTT",             
-#             "jet_looseMultiRHTT" : "HTT",}
 
+corrs = [corr("masses", "zprime_m2000_1p", mass_vars),
+         corr("taus", "zprime_m2000_1p", tau_vars),
+         corr("taggers", "zprime_m2000_1p", tagger_vars),
+         corr("all", "zprime_m2000_1p", mass_vars+tau_vars+tagger_vars),
 
-#corrs = [corr("masses", "zprime_m2000_1p", mass_vars)]
-#corrs = [corr("taus", "zprime_m2000_1p", tau_vars)]
-#corrs = [corr("taggers", "zprime_m2000_1p", tagger_vars)]
-#corrs = [corr("all", "zprime_m2000_1p", mass_vars+tau_vars+tagger_vars)]
-
-corrs = [corr("all", "qcd_800_1000", mass_vars+tau_vars+tagger_vars)]
-
+         corr("masses", "qcd_800_1000", mass_vars),
+         corr("taus", "qcd_800_1000", tau_vars),
+         corr("taggers", "qcd_800_1000", tagger_vars),
+         corr("all", "qcd_800_1000", mass_vars+tau_vars+tagger_vars)
+]
 
 MakePlots(corrs, files)
