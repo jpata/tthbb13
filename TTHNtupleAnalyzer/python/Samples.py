@@ -72,16 +72,24 @@ Samples = {
     "zprime_m3000_1p_13tev" : "/ZPrimeToTTJets_M3000GeV_W30GeV_Tune4C_13TeV-madgraph-tauola/Spring14miniaod-PU20bx25_POSTLS170_V5-v1/MINIAODSIM",
     "zprime_m4000_1p_13tev" : "/ZPrimeToTTJets_M4000GeV_W40GeV_Tune4C_13TeV-madgraph-tauola/Spring14miniaod-PU20bx25_POSTLS170_V5-v1/MINIAODSIM",
 
-	#PHYS14
+    #PHYS14
     "ttjets_13tev_phys14" : "/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM",
     "ttjets_13tev_phys14_pythia8" : "/TT_Tune4C_13TeV-pythia8-tauola/Phys14DR-PU20bx25_tsg_PHYS14_25_V1-v1/MINIAODSIM",
     "ttjets_13tev_phys14_pythia8_pu40bx50" : "/TT_Tune4C_13TeV-pythia8-tauola/Phys14DR-PU40bx25_tsg_PHYS14_25_V1-v1/MINIAODSIM",
-	"t_t_13tev_phys14": "/TToLeptons_t-channel-CSA14_Tune4C_13TeV-aMCatNLO-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM",
-	"tbar_t_13tev_phys14": "/TBarToLeptons_t-channel_Tune4C_CSA14_13TeV-aMCatNLO-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM",
+    "t_t_13tev_phys14": "/TToLeptons_t-channel-CSA14_Tune4C_13TeV-aMCatNLO-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM",
+    "tbar_t_13tev_phys14": "/TBarToLeptons_t-channel_Tune4C_CSA14_13TeV-aMCatNLO-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM",
 
-	#PU40 bx50
-	"tth_hbb_13tev_pu40bx50" : "/TTbarH_HToBB_M-125_13TeV_pythia6/Spring14miniaod-141029_PU40bx50_PLS170_V6AN2-v1/MINIAODSIM",
+    #PU40 bx50
+    "tth_hbb_13tev_pu40bx50" : "/TTbarH_HToBB_M-125_13TeV_pythia6/Spring14miniaod-141029_PU40bx50_PLS170_V6AN2-v1/MINIAODSIM",
     "ttjets_13tev_pu40bx50" : "/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/Spring14miniaod-141029_PU40bx50_PLS170_V6AN2-v1/MINIAODSIM",
+}
+
+#Here the lumi per job can be overridden
+Samples_lumi = {
+    "ttjets_13tev_pu40bx50": 500,
+    "ttjets_13tev_phys14": 500,
+    "ttjets_13tev_phys14_pythia8": 500,
+    "ttjets_13tev_phys14_pythia8_pu40bx50": 500,
 }
 
 
