@@ -13,7 +13,10 @@ import glob
 import os
 import ROOT
 
+import TTH.Plotting.Helpers.OutputDirectoryHelper as OutputDirectoryHelper
 from TTH.Plotting.Helpers.PrepareRootStyle import myStyle
+# initializer: simple creation of bag-of-object classes
+from Initializer import initializer
 
 myStyle.SetPadLeftMargin(0.18)
 myStyle.SetPadTopMargin(0.06)
@@ -23,23 +26,17 @@ ROOT.gROOT.ForceStyle()
 
 
 ########################################
-# Import private support code
-########################################
-
-import TTH.Plotting.Helpers.OutputDirectoryHelper as OutputDirectoryHelper
-
-
-########################################
-# Helper Class to Configure Plots
+# class combinedPlot:
 ########################################
 
 class combinedPlot:
-   """ foo  """
-
+   """Helper Class to Configure Plots"""
+   
    # Static member variable. Add all objects to this list
    # to be able to draw them at once.
    li_combined_plots = []
-      
+
+   @initializer
    def __init__(self, 
                 name,
                 li_plots,
@@ -76,52 +73,32 @@ class combinedPlot:
       legend_size_y   : (float) vertical extension of the legend        
       legend_text_size: (float) text size of the legend        
       """
-      self.name            = name
-      self.li_plots        = [p for p in li_plots]
-      self.nbins_x         = nbins_x
-      self.min_x           = min_x
-      self.max_x           = max_x
-      self.max_y           = max_y
-      self.label_x         = label_x
-      self.label_y         = label_y
-      self.axis_unit       = axis_unit
-      self.log_y           = log_y
-      self.normalize       = normalize
-      self.legend_origin_x = legend_origin_x
-      self.legend_origin_y = legend_origin_y
-      self.legend_size_x   = legend_size_x
-      self.legend_size_y   = legend_size_y
-      self.legend_text_size= legend_text_size
 
-      # Add to the static member for keeping track of
-      # all objects
+      # Add to the static member for keeping track of all objects
       self.__class__.li_combined_plots.append( self )
 # End of class combinedPlot
 
 
 class plot:
-   """  """
+   @initializer
    def __init__(self, 
                 name,
                 var,
                 cut,
                 from_file,
-                scale_cut=""):
+                scale_cut="",
+                fit = None,
+             ):
       """ Constructor. Arguments:
       name        : (string) name to use for the legend
       var         : (string) variable to plot
       cut         : (string) cut to apply
       from_file   : (string, key in dic_files): which distribution to draw
       scale_cut   : (string) scale the histogram by 1/#entries passing the cut
-
+      fit         : (TF1) function to fit. Warning: fitting only works if
+                            exactly one plot is added to combinedPlots
       """
-
-      self.name      = name
-      self.var       = var
-      self.cut       = cut
-      self.from_file = from_file
-      self.scale_cut = scale_cut
-
+      pass
 # End of class plot      
 
 
@@ -192,7 +169,7 @@ def doWork( dic_files, output_dir ):
            # ONLY FILENAME GIVEN
            if isinstance( dic_files[p.from_file], str ):          
               input_file = ROOT.TFile( dic_files[p.from_file], "READ" )
-              input_tree = getattr(input_file, "SpartyJet_Tree")
+              input_tree = getattr(input_file, "tree")
            # FILENAME AND TREENAME FIVEN
            else:
               input_file = ROOT.TFile( dic_files[p.from_file][0], "READ" )
@@ -334,13 +311,16 @@ def doWork( dic_files, output_dir ):
             h.GetYaxis().SetTitle( cp.label_y)
             h.GetYaxis().SetTitleOffset(1.7)
 
+            # Optional fit            
+            if p.fit is not None:
+               h.Fit(p.fit, "R")
 
             # Draw the histogram
             if i_p == 0:
 
                 h.GetYaxis().SetNdivisions(410)
 
-                h.Draw("HIST")
+                h.Draw()
 
                 txt = ROOT.TText()
                 txt.SetTextFont(61)
@@ -355,9 +335,9 @@ def doWork( dic_files, output_dir ):
                 txt.DrawTextNDC(0.85, 0.95, "13 TeV")
 
             else:
-                h.Draw("HIST SAME")
-                # end of loop over plots
-
+                h.Draw("SAME")
+        
+         
         # Draw the legend
         leg.Draw()
         
