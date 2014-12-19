@@ -1386,7 +1386,6 @@ int main(int argc, const char* argv[])
                 return hJLV;
             };
 
-            //FIXME: commented out for now
             //// now find out how many matched b's we have...
             for(int hj = 0; hj<itree->n__jet; hj++) {
             

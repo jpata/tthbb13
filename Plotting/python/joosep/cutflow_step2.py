@@ -10,15 +10,15 @@ process.fwliteInput = cms.PSet(
 							   
     samples = cms.VPSet([
         cms.PSet(
-            fileName=cms.string("/Users/joosep/Documents/tth/step2/s1_nov19_3a4602f__s2_b7e13a1/MEAnalysis_all_rec_std_TTHBB125_p1.root"),
-            step1FileName=cms.untracked.string("/Users/joosep/Documents/tth/step1/nov19_3a4602f/tthbb.root"),
+            fileName=cms.string("/Users/joosep/Documents/tth/data/step2/s1_nov19_3a4602f__s2_b7e13a1/MEAnalysis_all_rec_std_TTHBB125_p1.root"),
+            step1FileName=cms.untracked.string("/Users/joosep/Documents/tth/data/step1/nov19_3a4602f/tthbb.root"),
             nickName=cms.string("tthbb_13TeV"),
             type=cms.int32(3),
             process=cms.int32(0)
         ),
         cms.PSet(
-            fileName=cms.string("/Users/joosep/Documents/tth/step2/s1_nov19_3a4602f__s2_b7e13a1/MEAnalysis_all_rec_std_TTHBB125_p1_elept40.root"),
-            step1FileName=cms.untracked.string("/Users/joosep/Documents/tth/step1/nov19_3a4602f/tthbb.root"),
+            fileName=cms.string("/Users/joosep/Documents/tth/data/step2/s1_nov19_3a4602f__s2_b7e13a1/MEAnalysis_all_rec_std_TTHBB125_p1_elept40.root"),
+            step1FileName=cms.untracked.string("/Users/joosep/Documents/tth/data/step1/nov19_3a4602f/tthbb.root"),
             nickName=cms.string("tthbb_13TeV_elePt40"),
             type=cms.int32(3),
             process=cms.int32(0)
