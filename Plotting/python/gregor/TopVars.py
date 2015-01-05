@@ -320,28 +320,26 @@ combinedPlot ("ca15_groomed_masses",
               legend_size_x   = 0.2,
               legend_size_y   = 0.05 * 2 * len(jet_collections_ca15))
 
-
-
-# N-Subjettiness for CA R=1.5
-combinedPlot ("ca15_tau32",
-              [plot( "Z' " +jet_names[jc], 
-                     "{0}__tau3/{0}__tau2".format(jc), 
-                     '({0}__close_hadtop_dr<1.2)'.format(jc), 
-                     "ntop_v7_zprime_m2000_1p_13tev") for jc in jet_collections_ca15] + 
-              [plot( "QCD " + jet_names[jc], 
-                     "{0}__tau3/{0}__tau2".format(jc), 
-                     '({0}__close_parton_dr<1.2)'.format(jc), 
-                     "ntop_v7_qcd_800_1000_pythia8_13tev") for jc in jet_collections_ca15],
-              50, 0, 1, 
-              label_x   = "CA (R=1.5) #tau_{3}/#tau_{2}",
-              label_y   = "Jets",
-              axis_unit = "",
-              log_y     = False,
-              normalize = True,
-              legend_origin_x = 0.2,
-              legend_origin_y = 0.4,
-              legend_size_x   = 0.2,
-              legend_size_y   = 0.05 * 2 * len(jet_collections_ca15))
+    # N-Subjettiness for CA R=1.5
+    combinedPlot ("ca15_tau32",
+                  [plot( "Z' " +jet_names[jc], 
+                         "{0}__tau3/{0}__tau2".format(jc), 
+                         '({0}__close_hadtop_dr<1.2)'.format(jc), 
+                         "ntop_v7_zprime_m2000_1p_13tev") for jc in jet_collections_ca15] + 
+                  [plot( "QCD " + jet_names[jc], 
+                         "{0}__tau3/{0}__tau2".format(jc), 
+                         '({0}__close_parton_dr<1.2)'.format(jc), 
+                         "ntop_v7_qcd_800_1000_pythia8_13tev") for jc in jet_collections_ca15],
+                  50, 0, 1, 
+                  label_x   = "CA (R=1.5) #tau_{3}/#tau_{2}",
+                  label_y   = "Jets",
+                  axis_unit = "",
+                  log_y     = False,
+                  normalize = True,
+                  legend_origin_x = 0.2,
+                  legend_origin_y = 0.4,
+                  legend_size_x   = 0.2,
+                  legend_size_y   = 0.05 * 2 * len(jet_collections_ca15))
 
 
 

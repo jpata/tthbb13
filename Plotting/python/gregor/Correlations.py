@@ -17,8 +17,10 @@ from TTH.Plotting.Helpers.CorrelationHelpers import *
 basepath = '/scratch/gregor/'
 
 files = {}
-files["qcd_800_1000"] = "ntop_v8_qcd_800_1000_pythia8_13tev-tagging"
-files["zprime_m2000_1p"] = "ntop_v8_zprime_m2000_1p_13tev-tagging"
+files["qcd_800_1000"] = "ntop_v8_qcd_800_1000_pythia8_13tev-tagging-weighted"
+files["zprime_m2000_1p"] = "ntop_v8_zprime_m2000_1p_13tev-tagging-weighted"
+
+fiducial_cut_and_weight = "(weight*((pt>801)&&(pt<999)))"
                                         
 # for the filename: basepath + filename + .root
 for k,v in files.iteritems():
@@ -49,15 +51,15 @@ tagger_vars = [
 ]
 
 
-corrs = [corr("masses", "zprime_m2000_1p", mass_vars),
-         corr("taus", "zprime_m2000_1p", tau_vars),
-         corr("taggers", "zprime_m2000_1p", tagger_vars),
-         corr("all", "zprime_m2000_1p", mass_vars+tau_vars+tagger_vars),
+corrs = [corr("masses", "zprime_m2000_1p", mass_vars, fiducial_cut_and_weight),
+         corr("taus", "zprime_m2000_1p", tau_vars, fiducial_cut_and_weight),
+         corr("taggers", "zprime_m2000_1p", tagger_vars, fiducial_cut_and_weight),
+         corr("all", "zprime_m2000_1p", mass_vars+tau_vars+tagger_vars, fiducial_cut_and_weight),
 
-         corr("masses", "qcd_800_1000", mass_vars),
-         corr("taus", "qcd_800_1000", tau_vars),
-         corr("taggers", "qcd_800_1000", tagger_vars),
-         corr("all", "qcd_800_1000", mass_vars+tau_vars+tagger_vars)
+         corr("masses", "qcd_800_1000", mass_vars, fiducial_cut_and_weight),
+         corr("taus", "qcd_800_1000", tau_vars, fiducial_cut_and_weight),
+         corr("taggers", "qcd_800_1000", tagger_vars, fiducial_cut_and_weight),
+         corr("all", "qcd_800_1000", mass_vars+tau_vars+tagger_vars, fiducial_cut_and_weight)
 ]
 
 MakePlots(corrs, files)

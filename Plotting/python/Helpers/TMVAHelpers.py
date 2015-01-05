@@ -59,6 +59,8 @@ class TMVASetup:
     tree_name_bg     - [string]: name of the tree with background events
     fiducial_cut_sig - [string]: fiducial cut signal - define denominator of efficiencies
     fiducial_cut_bg  - [string]: fiducial cut background - define denominator of efficiencies
+    weight_sig       - [string]: weight for signal
+    weight_bg        - [string]: weight for bg
     """
 
     @initializer    
@@ -73,6 +75,8 @@ class TMVASetup:
                   tree_name_bg     = "tree",
                   fiducial_cut_sig = "(1)",
                   fiducial_cut_bg  = "(1)",
+                  weight_sig       = "(1)",
+                  weight_bg        = "(1)",
               ):
         pass
 
@@ -122,11 +126,11 @@ def doTMVA(setup):
 
     # Calculate cut efficiency and store it in a pickle file
     # This can be used later to properly normalize the ROC curves
-    n_sig = signal.Draw("(1)", setup.fiducial_cut_sig)
-    n_sig_cut = signal.Draw("(1)", cut_signal)
+    n_sig = signal.Draw("(1)", "({0})*{1}".format(setup.fiducial_cut_sig, setup.weight_sig))
+    n_sig_cut = signal.Draw("(1)", "({0})*{1}".format(cut_signal, setup.weight_sig))
 
-    n_bg = background.Draw("(1)", setup.fiducial_cut_bg)
-    n_bg_cut = background.Draw("(1)", cut_bg)
+    n_bg = background.Draw("(1)", "({0})*{1}".format(setup.fiducial_cut_bg, setup.weight_bg))
+    n_bg_cut = background.Draw("(1)", "({0})*{1}".format(cut_bg, setup.weight_bg))
 
     cut_frac = {}
     cut_frac["sig"] = (1. * n_sig_cut / n_sig)
@@ -158,7 +162,12 @@ def doTMVA(setup):
     factory.AddBackgroundTree( background, backgroundWeight )
 
     mycutSig = ROOT.TCut(cut_signal ) 
-    mycutBkg = ROOT.TCut(cut_bg ) 
+    mycutBkg = ROOT.TCut(cut_bg )
+
+    factory.SetSignalWeightExpression( setup.weight_sig )
+    factory.SetBackgroundWeightExpression( setup.weight_bg)
+
+
 
     # prepare trees
     factory.PrepareTrainingAndTestTree( mycutSig, mycutBkg,
@@ -182,7 +191,7 @@ def doTMVA(setup):
     if "Fisher" in setup.li_methods:
         factory.BookMethod( ROOT.TMVA.Types.kFisher, 
                             "Fisher", 
-                            "H:!V:Fisher:CreateMVAPdfs:PDFInterpolMVAPdf=Spline2:NbinsMVAPdf=50:NsmoothMVAPdf=10" )
+                            "H:!V:Fisher" )
 
     if "MLP" in setup.li_methods:
         factory.BookMethod( ROOT.TMVA.Types.kMLP, 
@@ -222,7 +231,10 @@ def doTMVA(setup):
     factory.TrainAllMethods()
     factory.TestAllMethods()
     factory.EvaluateAllMethods()    
+
     outputFile.Close()
+    inputFileSig.Close()
+    inputFileBkg.Close()
 # end of doTMVA
 
 
@@ -230,13 +242,13 @@ def doTMVA(setup):
 # plotROCs
 ########################################
 
-def plotROCs(name, li_setups):
+def plotROCs(name, li_setups, zoom=False):
     
     li_colors = [ROOT.kRed,      ROOT.kBlue+1,     ROOT.kBlack, 
                  ROOT.kOrange-1, ROOT.kViolet+1,   ROOT.kGreen+1,
                  ROOT.kGray,     ROOT.kYellow]*10
 
-    li_line_styles = [1,2]*40
+    li_line_styles = [1]*(len(li_colors)/10) + [2]*(len(li_colors)/10) + [3]*(len(li_colors)/10)
 
 
     ########################################
@@ -286,7 +298,11 @@ def plotROCs(name, li_setups):
     legend.SetTextSize(0.03)      
     legend.SetBorderSize(0)
 
-    h_bg = ROOT.TH2F("","",100,0,1,100,0,1)
+    if zoom:
+        h_bg = ROOT.TH2F("","",100,0,0.2,100,0.95,1)
+    else:
+        h_bg = ROOT.TH2F("","",100,0,1,100,0,1)
+
 
     h_bg.GetXaxis().SetTitle( "#varepsilon(S)" )      
     h_bg.GetYaxis().SetTitle( "1-#varepsilon(B)" )      

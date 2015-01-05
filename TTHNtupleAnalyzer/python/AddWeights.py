@@ -2,7 +2,8 @@
 """
 Add an additional branch to an existing flat Ntuple.
 
-Use to add a weight-branch to the Ntuples for tagging studies
+Use to add a weight-branch to the Ntuples for tagging studies. 
+Also add a true pt branch (either filled by hadtop_pt or parton_pt).
 """
 
 ########################################
@@ -22,8 +23,8 @@ import TTH.TTHNtupleAnalyzer.AccessHelpers as AH
 
 basepath = '/scratch/gregor/'
 
-input_name = "ntop_v8_zprime_m2000_1p_13tev-tagging"     
-#input_name = "ntop_v8_qcd_800_1000_pythia8_13tev-tagging"     
+#input_name = "ntop_v8_zprime_m2000_1p_13tev-tagging"     
+input_name = "ntop_v8_qcd_800_1000_pythia8_13tev-tagging"     
 input_tree_name = "tree"
 
 input_pickle_file_name = "/shome/gregor/TTH-73X/CMSSW/src/TTH/Plotting/python/gregor/flat_pt_weights.pickle"
@@ -58,7 +59,7 @@ variable_types = {}
 AH.addScalarBranches(variables,
                      variable_types,
                      output_tree,
-                     ["weight"],
+                     ["weight","pt"],
                      datatype = 'float')
 
 
@@ -101,13 +102,15 @@ for i_event in range(n_entries):
     input_tree.GetEntry( i_event )    
 
     # Calculate the weight
-    value = fun(AH.getter(input_tree, param_name))
+    pt = AH.getter(input_tree, param_name)
+    value = fun(pt)
     if value > 0:
         weight = 1/(value)
     else:
         weight = 0
         
     variables["weight"][0] = weight
+    variables["pt"][0]     = pt
 
     output_tree.Fill()
 # End of event loop
