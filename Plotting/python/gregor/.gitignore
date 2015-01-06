@@ -1,1 +1,7 @@
+OutputCorrelations/
+OutputPlot2D/
 results/
+weights
+*.png
+*.root
+*.dat
