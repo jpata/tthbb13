@@ -166,6 +166,7 @@ for fj_name in ["ca08", "ca08filtered", "ca08pruned", "ca08trimmed", "ca08softdr
     for branch_name in [
             "pt", "eta", "phi", "mass",  # Kinematics
             "tau1", "tau2", "tau3",      # N-subjettiness
+            "btag",                      # b-tag discriminator
             "chi",                       # Shower deconstruction chi
                                          # (only fill for ca08 and ca15 wo grooming at the moment)
             "close_hadtop_pt",  "close_hadtop_dr", "close_hadtop_i", # top truth matching

@@ -17,6 +17,16 @@ options.register ('skipEvents',
 process = cms.Process("Demo")
 options.parseArguments()
 
+# Load some standard configuration files
+process.load("Configuration.StandardSequences.MagneticField_cff")
+process.load("Configuration.Geometry.GeometryIdeal_cff")
+process.load("RecoBTag.Configuration.RecoBTag_cff") # this loads all available b-taggers
+
+# Load the necessary conditions 
+process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+from Configuration.AlCa.GlobalTag import GlobalTag
+process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_mc')
+
 #enable debugging printout
 if "TTH_DEBUG" in os.environ:
 	process.load("FWCore.MessageLogger.MessageLogger_cfi")
@@ -39,9 +49,11 @@ process.source = cms.Source("PoolSource",
 	skipEvents = cms.untracked.uint32(options.skipEvents)
 )
 
+
 # Select candidates that would pass CHS requirements
 # This can be used as input for HTT and other jet clustering algorithms
 process.chs = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedPFCandidates"), cut = cms.string("fromPV"))
+
 
 # Add stand-alone fat-jet collection 
 from RecoJets.JetProducers.AnomalousCellParameters_cfi import *
@@ -348,6 +360,8 @@ process.SDCA15 = cms.EDProducer("SDProducer",
                                 MicrojetCone = cms.double(0.2))
 
 
+
+
 # Setup fatjet collections to store
 li_fatjets_objects = ['ca08PFJetsCHS',  
                       'ca08PFJetsCHSFiltered',  
@@ -371,12 +385,12 @@ li_fatjets_nsubs = ['NjettinessCA08',
                     'NjettinessCA15Trimmed',
                     'NjettinessCA15SoftDrop' ]
 
-li_fatjets_sds = ['SDCA08', 
+li_fatjets_sds = ['None', #SDCA08', 
                   'None', 
                   'None', 
                   'None', 
                   'None', 
-                  'SDCA15', 
+                  'None', #'SDCA15', 
                   'None', 
                   'None', 
                   'None',
@@ -394,6 +408,53 @@ li_fatjets_branches =  ['ca08',
                         'ca15softdrop']
 
 li_fatjets_is_basic_jets = [0] * len(li_fatjets_objects)
+
+
+
+# Add b-tagging information for all fatjets
+process.my_btagging = cms.Sequence()
+li_fatjets_btags = []
+for fatjet_name in li_fatjets_objects:
+
+        # Define the names
+        impact_info_name = fatjet_name + "ImpactParameterTagInfos"
+        sv_tag_info_name = fatjet_name + "SecondaryVertexTagInfos"
+        ssv_btags_name   = fatjet_name + "SimpleSecondaryVertexHighEffBJetTags"
+
+        # Setup the modules
+        setattr(process, 
+                impact_info_name, 
+                process.pfImpactParameterTagInfos.clone(
+                        primaryVertex = cms.InputTag("offlineSlimmedPrimaryVertices"),
+                        candidates = cms.InputTag("packedPFCandidates"),
+                        jets = cms.InputTag(fatjet_name)
+                ))
+
+        setattr(process,
+                sv_tag_info_name, 
+                process.pfSecondaryVertexTagInfos.clone(
+                        trackIPTagInfos = cms.InputTag(impact_info_name) 
+                ))
+
+        setattr(process,
+                ssv_btags_name,                
+                process.pfSimpleSecondaryVertexHighEffBJetTags.clone(
+                        tagInfos = cms.VInputTag(cms.InputTag(sv_tag_info_name))
+                ))
+        
+        # Add modules to sequence
+        process.my_btagging += getattr(process, impact_info_name)
+        process.my_btagging += getattr(process, sv_tag_info_name)
+        process.my_btagging += getattr(process, ssv_btags_name)        
+
+        # remember the module that actually produces the b-tag
+        # discriminator so we can pass it to the NTupelizer
+        li_fatjets_btags.append(ssv_btags_name)
+
+# end of loop over fatjets
+
+
+
 
 process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
 	isMC = cms.bool(True),
@@ -415,6 +476,7 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
         fatjetsObjects  = cms.vstring(li_fatjets_objects),
         fatjetsNsubs    = cms.vstring(li_fatjets_nsubs),
         fatjetsSDs      = cms.vstring(li_fatjets_sds),
+        fatjetsBtags    = cms.vstring(li_fatjets_btags),
         fatjetsBranches = cms.vstring(li_fatjets_branches),
         fatjetsIsBasicJets = cms.vint32(li_fatjets_is_basic_jets),                                           
 
@@ -439,7 +501,7 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
 	tauIdentifiers = cms.vstring([]),
 
         rho = cms.InputTag("fixedGridRhoAll"),
-        jecFile = cms.FileInPath("Summer13_V4_DATA_UncertaintySources_AK5PFchs.txt")
+        jecFile = cms.FileInPath("TTH/TTHNtupleAnalyzer/data/Summer13_V4_DATA_UncertaintySources_AK5PFchs.txt")
 )
 
 process.TFileService = cms.Service("TFileService",
@@ -473,12 +535,8 @@ process.LooseMultiRHTTJetsCHS = cms.EDProducer(
      maxM13Cut = cms.double(2.),
 )
 
-
-process.load('Configuration.StandardSequences.Services_cff')
-process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
-process.GlobalTag.globaltag = "PLS170_V7AN1"
-
 process.p = cms.Path(
+
         process.chs *
 
         process.ca08PFJetsCHS *
@@ -511,11 +569,13 @@ process.p = cms.Path(
         process.ca08CMSTopTagInfos * 
         process.ca15CMSTopTagInfos * 
 
-        process.SDCA08 * 
-        process.SDCA15 * 
+        #process.SDCA08 * 
+        #process.SDCA15 * 
 
 	process.LooseMultiRHTTJetsCHS * 
 
+        process.my_btagging *
+        
 	process.tthNtupleAnalyzer
 )
 

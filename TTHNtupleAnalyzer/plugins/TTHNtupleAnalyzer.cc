@@ -42,6 +42,7 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 #include "DataFormats/Common/interface/ValueMap.h"
+#include "DataFormats/BTauReco/interface/JetTag.h"
 
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
@@ -206,6 +207,7 @@ void fill_fatjet_branches(const edm::Event& iEvent,
 			  std::string fj_object_name,
 			  std::string fj_nsubs_name,
 			  std::string fj_sds_name,
+			  std::string fj_btags_name,
 			  std::string fj_branches_name,
 			  // true top and anti top for optional matching
 			  const vector<const reco::Candidate*>  & true_t,
@@ -216,7 +218,7 @@ void fill_fatjet_branches(const edm::Event& iEvent,
 			  ){
   
   // Get Fatjet iteself
-  edm::Handle<CollectionType> fatjets;
+  edm::Handle<CollectionType>  fatjets;
   iEvent.getByLabel(fj_object_name, fatjets);
 	  
   // Handles to get the Nsubjettiness
@@ -238,11 +240,16 @@ void fill_fatjet_branches(const edm::Event& iEvent,
   edm::Handle<edm::ValueMap<double> > fatjet_sd_chi;
   if (fj_sds_name != "None")
     iEvent.getByLabel(fj_sds_name, "chi", fatjet_sd_chi);
+
+  // b-tag discriminators handle
+  edm::Handle<reco::JetTagCollection> btagDiscriminators;
+  if (fj_btags_name != "None")
+    iEvent.getByLabel(fj_btags_name, btagDiscriminators);
 	  
   // Loop over fatjets
   for (unsigned n_fat_jet = 0; n_fat_jet != fatjets->size(); n_fat_jet++){
 	    
-    const JetType& x = (*fatjets)[n_fat_jet];
+    const JetType& x = (*fatjets).at(n_fat_jet);
     
     LogDebug("fat jets") << "n_fat_jet=" << n_fat_jet << CANDPRINT(x);
 	    	    
@@ -256,12 +263,18 @@ void fill_fatjet_branches(const edm::Event& iEvent,
     tthtree->get_address<float *>(prefix + "phi" )[n_fat_jet] = x.phi();
     tthtree->get_address<float *>(prefix + "mass")[n_fat_jet] = x.mass();
 
+    // NSubjettiness
     tthtree->get_address<float *>(prefix + "tau1")[n_fat_jet] = fatjet_nsub_tau1->get(n_fat_jet);
     tthtree->get_address<float *>(prefix + "tau2")[n_fat_jet] = fatjet_nsub_tau2->get(n_fat_jet);
     tthtree->get_address<float *>(prefix + "tau3")[n_fat_jet] = fatjet_nsub_tau3->get(n_fat_jet);
 
+    // Shower Deconstruction
     if (fj_sds_name != "None")
       tthtree->get_address<float *>(prefix + "chi")[n_fat_jet] = fatjet_sd_chi->get(n_fat_jet);
+
+    // B-tag
+    if (fj_btags_name != "None")
+      tthtree->get_address<float *>(prefix + "btag")[n_fat_jet] = (*btagDiscriminators)[n_fat_jet].second;
    
     // Optional: Fill truth matching information
     if (ADD_TRUE_TOP_MATCHING_FOR_FJ)
@@ -398,12 +411,14 @@ private:
         // objects = name of the jet collection
         // nsubs = name of the N-subjettiness calculation process
         // sds = name of the Shower Deconstruction calculation process (or None)
+        // batgs = name of the btagger processes (or None) 
         // fatjet branches = name of the branches to put this in
         // isbasicjets = data type of the fat jet (BasicJet or PFJet)
         // !!the lists have to be in sync!!
 	const std::vector<std::string> fatjet_objects_;
 	const std::vector<std::string> fatjet_nsubs_;
 	const std::vector<std::string> fatjet_sds_;
+	const std::vector<std::string> fatjet_btags_;
 	const std::vector<std::string> fatjet_branches_;
 	const std::vector<int> fatjet_isbasicjets_;
 
@@ -478,10 +493,11 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
 	prunedGenToken_(consumes<edm::View<reco::GenParticle> >(iConfig.getParameter<edm::InputTag>("pruned"))),
 	packedGenToken_(consumes<edm::View<pat::PackedGenParticle> >(iConfig.getParameter<edm::InputTag>("packed"))),
 	metToken_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("mets"))),
-							  
+	       					  
         fatjet_objects_(iConfig.getParameter<std::vector<std::string>>("fatjetsObjects")),
         fatjet_nsubs_(iConfig.getParameter<std::vector<std::string>>("fatjetsNsubs")),
         fatjet_sds_(iConfig.getParameter<std::vector<std::string>>("fatjetsSDs")),
+        fatjet_btags_(iConfig.getParameter<std::vector<std::string>>("fatjetsBtags")),
         fatjet_branches_(iConfig.getParameter<std::vector<std::string>>("fatjetsBranches")),
         fatjet_isbasicjets_(iConfig.getParameter<std::vector<int>>("fatjetsIsBasicJets")),
 
@@ -599,6 +615,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	// Sanity check the fatjet lists-of-names
 	assert(fatjet_objects_.size()==fatjet_nsubs_.size());
 	assert(fatjet_objects_.size()==fatjet_sds_.size());
+	assert(fatjet_objects_.size()==fatjet_btags_.size());
 	assert(fatjet_objects_.size()==fatjet_branches_.size());
 	assert(fatjet_objects_.size()==fatjet_isbasicjets_.size());
 
@@ -1705,6 +1722,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	  std::string fj_object_name	  = fatjet_objects_[i_fj_coll];
 	  std::string fj_nsubs_name	  = fatjet_nsubs_[i_fj_coll];
 	  std::string fj_sds_name	  = fatjet_sds_[i_fj_coll];
+	  std::string fj_btags_name	  = fatjet_btags_[i_fj_coll];
 	  std::string fj_branches_name    = fatjet_branches_[i_fj_coll];
 	  int fj_isbasicjets              = fatjet_isbasicjets_[i_fj_coll];
 	  
@@ -1715,6 +1733,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 								     fj_object_name,
 								     fj_nsubs_name,
 								     fj_sds_name,
+								     fj_btags_name,
 								     fj_branches_name,
 								     hadronic_ts,
 								     hard_partons,
@@ -1728,6 +1747,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 									   fj_object_name,
 									   fj_nsubs_name,
 									   fj_sds_name,
+									   fj_btags_name,
 									   fj_branches_name,
 									   hadronic_ts,
 									   hard_partons,
