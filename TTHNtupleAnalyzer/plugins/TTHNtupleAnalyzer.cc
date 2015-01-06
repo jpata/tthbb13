@@ -205,6 +205,7 @@ void fill_fatjet_branches(const edm::Event& iEvent,
 			  TTHTree* tthtree, 
 			  std::string fj_object_name,
 			  std::string fj_nsubs_name,
+			  std::string fj_sds_name,
 			  std::string fj_branches_name,
 			  // true top and anti top for optional matching
 			  const vector<const reco::Candidate*>  & true_t,
@@ -232,6 +233,11 @@ void fill_fatjet_branches(const edm::Event& iEvent,
   assert(fatjets->size()==fatjet_nsub_tau1->size());
   assert(fatjets->size()==fatjet_nsub_tau2->size());
   assert(fatjets->size()==fatjet_nsub_tau3->size());
+
+  // Handle to get the Shower Deconstruction info
+  edm::Handle<edm::ValueMap<double> > fatjet_sd_chi;
+  if (fj_sds_name != "None")
+    iEvent.getByLabel(fj_sds_name, "chi", fatjet_sd_chi);
 	  
   // Loop over fatjets
   for (unsigned n_fat_jet = 0; n_fat_jet != fatjets->size(); n_fat_jet++){
@@ -254,6 +260,9 @@ void fill_fatjet_branches(const edm::Event& iEvent,
     tthtree->get_address<float *>(prefix + "tau2")[n_fat_jet] = fatjet_nsub_tau2->get(n_fat_jet);
     tthtree->get_address<float *>(prefix + "tau3")[n_fat_jet] = fatjet_nsub_tau3->get(n_fat_jet);
 
+    if (fj_sds_name != "None")
+      tthtree->get_address<float *>(prefix + "chi")[n_fat_jet] = fatjet_sd_chi->get(n_fat_jet);
+   
     // Optional: Fill truth matching information
     if (ADD_TRUE_TOP_MATCHING_FOR_FJ)
       fill_truth_matching<JetType>(tthtree, x, n_fat_jet, true_t, prefix, "hadtop");
@@ -388,11 +397,13 @@ private:
         // fatjet information
         // objects = name of the jet collection
         // nsubs = name of the N-subjettiness calculation process
+        // sds = name of the Shower Deconstruction calculation process (or None)
         // fatjet branches = name of the branches to put this in
         // isbasicjets = data type of the fat jet (BasicJet or PFJet)
         // !!the lists have to be in sync!!
 	const std::vector<std::string> fatjet_objects_;
 	const std::vector<std::string> fatjet_nsubs_;
+	const std::vector<std::string> fatjet_sds_;
 	const std::vector<std::string> fatjet_branches_;
 	const std::vector<int> fatjet_isbasicjets_;
 
@@ -470,6 +481,7 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
 							  
         fatjet_objects_(iConfig.getParameter<std::vector<std::string>>("fatjetsObjects")),
         fatjet_nsubs_(iConfig.getParameter<std::vector<std::string>>("fatjetsNsubs")),
+        fatjet_sds_(iConfig.getParameter<std::vector<std::string>>("fatjetsSDs")),
         fatjet_branches_(iConfig.getParameter<std::vector<std::string>>("fatjetsBranches")),
         fatjet_isbasicjets_(iConfig.getParameter<std::vector<int>>("fatjetsIsBasicJets")),
 
@@ -586,6 +598,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
 	// Sanity check the fatjet lists-of-names
 	assert(fatjet_objects_.size()==fatjet_nsubs_.size());
+	assert(fatjet_objects_.size()==fatjet_sds_.size());
 	assert(fatjet_objects_.size()==fatjet_branches_.size());
 	assert(fatjet_objects_.size()==fatjet_isbasicjets_.size());
 
@@ -1691,6 +1704,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	  // Get the proper names
 	  std::string fj_object_name	  = fatjet_objects_[i_fj_coll];
 	  std::string fj_nsubs_name	  = fatjet_nsubs_[i_fj_coll];
+	  std::string fj_sds_name	  = fatjet_sds_[i_fj_coll];
 	  std::string fj_branches_name    = fatjet_branches_[i_fj_coll];
 	  int fj_isbasicjets              = fatjet_isbasicjets_[i_fj_coll];
 	  
@@ -1700,6 +1714,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 								     tthtree, 
 								     fj_object_name,
 								     fj_nsubs_name,
+								     fj_sds_name,
 								     fj_branches_name,
 								     hadronic_ts,
 								     hard_partons,
@@ -1712,6 +1727,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 									   tthtree, 
 									   fj_object_name,
 									   fj_nsubs_name,
+									   fj_sds_name,
 									   fj_branches_name,
 									   hadronic_ts,
 									   hard_partons,

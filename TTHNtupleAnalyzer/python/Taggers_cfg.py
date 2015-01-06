@@ -338,8 +338,62 @@ process.NjettinessCA15SoftDrop = cms.EDProducer("NjettinessAdder",
                                                akAxesR0 = cms.double(-999.0)        # not used by default
                             )
 
+# Schedule Shower Deconstruction
+process.SDCA08 = cms.EDProducer("SDProducer",
+                                FatjetName = cms.string("ca08PFJetsCHS"),
+                                MicrojetCone = cms.double(0.2))
+
+process.SDCA15 = cms.EDProducer("SDProducer",
+                                FatjetName = cms.string("ca15PFJetsCHS"),
+                                MicrojetCone = cms.double(0.2))
 
 
+# Setup fatjet collections to store
+li_fatjets_objects = ['ca08PFJetsCHS',  
+                      'ca08PFJetsCHSFiltered',  
+                      'ca08PFJetsCHSPruned',  
+                      'ca08PFJetsCHSTrimmed',  
+                      'ca08PFJetsCHSSoftDrop',  
+                      'ca15PFJetsCHS',  
+                      'ca15PFJetsCHSFiltered',  
+                      'ca15PFJetsCHSPruned',  
+                      'ca15PFJetsCHSTrimmed' ,
+                      'ca15PFJetsCHSSoftDrop'  ]
+
+li_fatjets_nsubs = ['NjettinessCA08', 
+                    'NjettinessCA08Filtered', 
+                    'NjettinessCA08Pruned', 
+                    'NjettinessCA08Trimmed', 
+                    'NjettinessCA08SoftDrop', 
+                    'NjettinessCA15', 
+                    'NjettinessCA15Filtered', 
+                    'NjettinessCA15Pruned', 
+                    'NjettinessCA15Trimmed',
+                    'NjettinessCA15SoftDrop' ]
+
+li_fatjets_sds = ['SDCA08', 
+                  'None', 
+                  'None', 
+                  'None', 
+                  'None', 
+                  'SDCA15', 
+                  'None', 
+                  'None', 
+                  'None',
+                  'None' ]
+
+li_fatjets_branches =  ['ca08',           
+                        'ca08filtered',           
+                        'ca08pruned',           
+                        'ca08trimmed',           
+                        'ca08softdrop',           
+                        'ca15',           
+                        'ca15filtered',           
+                        'ca15pruned',           
+                        'ca15trimmed',
+                        'ca15softdrop']
+
+li_fatjets_is_basic_jets = [0] * len(li_fatjets_objects)
 
 process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
 	isMC = cms.bool(True),
@@ -358,11 +412,11 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
         triggerIdentifiers = cms.vstring([]),
         triggerIdentifiersForMatching = cms.vstring([]),
 
-        # take ca15PFJetsCHS jets, add the Njettiness values and store them as jet_fat
-        fatjetsObjects  = cms.vstring(  ['ca08PFJetsCHS',  'ca08PFJetsCHSFiltered',  'ca08PFJetsCHSPruned',  'ca08PFJetsCHSTrimmed',  'ca08PFJetsCHSSoftDrop',  'ca15PFJetsCHS',  'ca15PFJetsCHSFiltered',  'ca15PFJetsCHSPruned',  'ca15PFJetsCHSTrimmed' ,'ca15PFJetsCHSSoftDrop'  ]),
-        fatjetsNsubs    = cms.vstring(  ['NjettinessCA08', 'NjettinessCA08Filtered', 'NjettinessCA08Pruned', 'NjettinessCA08Trimmed', 'NjettinessCA08SoftDrop', 'NjettinessCA15', 'NjettinessCA15Filtered', 'NjettinessCA15Pruned', 'NjettinessCA15Trimmed','NjettinessCA15SoftDrop' ]),
-        fatjetsBranches = cms.vstring(  ['ca08',           'ca08filtered',           'ca08pruned',           'ca08trimmed',           'ca08softdrop',           'ca15',           'ca15filtered',           'ca15pruned',           'ca15trimmed'          ,'ca15softdrop'           ]),
-        fatjetsIsBasicJets = cms.vint32([0,                 0,                        0,                      0,                       0,                       0,                0,                        0,                       0                     , 0                      ]),                                           
+        fatjetsObjects  = cms.vstring(li_fatjets_objects),
+        fatjetsNsubs    = cms.vstring(li_fatjets_nsubs),
+        fatjetsSDs      = cms.vstring(li_fatjets_sds),
+        fatjetsBranches = cms.vstring(li_fatjets_branches),
+        fatjetsIsBasicJets = cms.vint32(li_fatjets_is_basic_jets),                                           
 
         httObjects  = cms.vstring(['LooseMultiRHTTJetsCHS']),                                           
         httBranches = cms.vstring(['looseMultiRHTT']),                                           
@@ -457,8 +511,11 @@ process.p = cms.Path(
         process.ca08CMSTopTagInfos * 
         process.ca15CMSTopTagInfos * 
 
+        process.SDCA08 * 
+        process.SDCA15 * 
+
 	process.LooseMultiRHTTJetsCHS * 
-       
+
 	process.tthNtupleAnalyzer
 )
 
