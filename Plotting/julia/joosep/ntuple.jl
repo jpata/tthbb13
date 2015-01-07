@@ -13,6 +13,8 @@ isfile(fn) || error("File error: $fn")
 const CFG = imp.load_source("cfg", fn)[:process][:fwliteInput]
 const SAMPLES = CFG[:samples]
 
+const HYPOS = [:tthbb, :ttjets]
+const BTAG_LR_HYPOS = [:ttjj, :ttbb]
 
 module Cuts
 	import ..CFG
@@ -22,6 +24,9 @@ module Cuts
 	const jetEta = 2.5
 end
 
+module Kinematics
+
+using HEP
 abstract AbstractParticle
 
 immutable Particle <: AbstractParticle
@@ -46,6 +51,30 @@ immutable SignalLepton <: AbstractParticle
 	idx::Int64
 end
 
+abstract AbstractEvent
+
+immutable Event <: AbstractEvent
+	jets::Vector{Jet}
+	leptons::Vector{Lepton}
+	signal_leptons::Vector{SignalLepton}
+	vtype::Symbol
+	lepton_category::Symbol
+end
+
+immutable InterpretedEventSL <: AbstractEvent
+	jets::Vector{Jet}
+	leptons::Vector{Lepton}
+	vtype::Symbol
+end
+
+export AbstractParticle, Particle, Jet, Lepton, SignalLepton
+export AbstractEvent
+export Event, InterpretedEventSL
+
+end
+
+using Kinematics
+
 import HEP: eta, phi
 pt(x::AbstractParticle) = perp(x.p)
 eta(x::AbstractParticle) = eta(x.p)
@@ -58,21 +87,6 @@ string(p::Particle) = @sprintf("p=%s id=%d", string(p.p), p.id)
 string(p::Jet) = @sprintf("p=%s id=%d b(csv)=%.3f", string(p.p), p.id, p.bdisc)
 string(p::Lepton) = @sprintf("p=%s id=%d Ir=%.3f", string(p.p), p.id, p.iso)
 string(p::SignalLepton) = "idx=$(p.idx + 1)"
-
-immutable Event
-	jets::Vector{Jet}
-	leptons::Vector{Lepton}
-	signal_leptons::Vector{SignalLepton}
-	vtype_::Int64
-	vtype::Symbol
-end
-
-immutable InterpretedEventSL
-	jets::Vector{Jet}
-	leptons::Vector{Lepton}
-	vtype::Symbol
-end
-
 
 function string(ev::Event, l::Int64=0) 
 	s = "$(length(ev.jets))J $(length(ev.leptons))l Vt=$(ev.vtype)"
@@ -185,7 +199,10 @@ function parse_event(df::TreeDataFrame, i::Int64)
 	sig_leps = parse_branches(df, i, SignalLepton)
 
 	vtype_ = df[i, :hypo1]
-	Event(jets, leps, sig_leps, vtype_, EventHypothesis.as(vtype_))
+	Event(jets, leps, sig_leps,
+		EventHypothesis.as(vtype_),
+		assign_lepton_category(EventHypothesis.as(vtype_))
+	)
 end
 
 function select_sl(ev::Event)
@@ -217,19 +234,122 @@ function select_sl(ev::Event)
 	return (passes, Lepton[main_lep])
 end
 
+function assign_lepton_category(vtype::Symbol)
+	if vtype in [:en, :mun, :taun]
+		return :sl
+	elseif vtype in [:ee, :mumu, :emu, :taue]
+		return :dl
+	elseif vtype in [:nn]
+		return :had
+	end
+	return vtype
+end
+
+
+#selects good jets and returns at most the 6 hardest jets
 function select_jets(ev::Event)
 
 	jets = Jet[]
 	for jet in ev.jets
 		passes = pt(jet) > Cuts.jetPt
 		passes = passes && abs(eta(jet)) < Cuts.jetEta
-
 		passes && push!(jets, jet)
 	end
 
-	return jets
+	jets = sort(jets, by=x->pt(x), rev=true)
+
+	nmax = 6
+	return jets[1:min(length(jets), nmax)]
 end
 
+const DEBUG = 2
+
+cp = ROOT.TFile(string(ENV["CMSSW_BASE"], "/src/TTH/MEAnalysis/", CFG[:pathToCP][:_value]))
+
+import StatsBase.Histogram
+
+function Histogram(h::TH1D)
+	const nb = int32(GetNbinsX(h))
+	bins = Float64[]
+	contents = Float64[]
+	for i=int32(1):nb
+		push!(bins, GetBinLowEdge(h, i))
+		push!(contents, GetBinContent(h, i))
+	end
+	push!(bins, GetBinLowEdge(h, nb + int32(1)))
+	return Histogram{Float64, 1, (Vector{Float64}, )}((bins, ), contents, :right)
+end
+
+function findbin{T <: Real, N, E}(h::Histogram{T, N, E}, xs::Real)
+    is = if h.closed == :right
+        map((edge, x) -> searchsortedfirst(edge,x) - 1, h.edges, xs)
+    else
+        map(searchsortedlast, h.edges, xs)
+    end
+    return is
+end
+
+function findbin{T <: Real, E}(h::Histogram{T, 1, E}, x::Real)
+    i = if h.closed == :right 
+        searchsortedfirst(h.edges[1], x) - 1 
+    else
+        searchsortedlast(h.edges[1], x)
+    end
+    return i
+end
+
+btag_prob_maps = Dict(
+	:h => Histogram(root_cast(TH1D, Get(cp, "csv_b_Bin0__csv_rec"))),
+	:l => Histogram(root_cast(TH1D, Get(cp, "csv_l_Bin0__csv_rec")))
+)
+
+println(btag_prob_maps)
+
+function pdf_bdisc(csv::Float64, flavour::Symbol)
+	h = btag_prob_maps[flavour]
+	b = findbin(h, csv)
+	if b <= 0
+		b = 1
+	end
+	if b > length(h.weights)
+		b = length(h.weights)
+	end
+	@inbounds return h.weights[b]
+end
+
+dprintln(level::Int64, msg) = DEBUG>=level && println([" " for i=1:level]..., msg)
+function calculate_btag_lr(jets::AbstractVector{Jet})
+	P = Dict{Symbol, Float64}()
+
+	for hypo in BTAG_LR_HYPOS
+		_P = 0.0
+
+		#count how many combinations per jet
+		nc = 0
+
+		ntagged = 2
+		if hypo == :ttbb
+			ntagged = 4
+		end
+
+		#jets in selected combination are assumed to be true b quarks
+		for comb in combinations(1:length(jets), ntagged)
+			#dprintln(2, "comb=$comb")
+			p = 1.0
+
+			nc += 1
+			for i in 1:length(jets)
+				p = p * pdf_bdisc(jets[i].bdisc, i in comb ? :h : :l)
+				#dprintln(3, "p=$p")
+			end
+			_P += p
+		end
+		dprintln(1, "P[$hypo]=$_P nc=$nc")
+		P[hypo] = _P / nc
+	end
+	ret = P[:ttbb] / sum(values(P))
+	return isnan(ret) ? 0.0 : ret
+end
 
 function process_sample(fn::ASCIIString)
 	println("processing $fn")
@@ -237,17 +357,37 @@ function process_sample(fn::ASCIIString)
 
 	const t0 = time()
 	for i=1:nrow(df)
+
+		#Load the TTree row
 		load_row(df, i)
+
+		#Get the primary event interpretation
 		const ev = parse_event(df, i)
+		analyzed_event = Nullable{AbstractEvent}()
 
-		println(string(ev, 1))
+		println(string(ev, 0))
 
-		pass_sl, lepton_sl = select_sl(ev)
+		##################
+		### Jet selection
+		##################
 		jets = select_jets(ev)
+		println("selected jets $(length(jets))")
+
+		#######################
+		### Single lepton (SL)
+		#######################
+		pass_sl, lepton_sl = select_sl(ev)
 
 		if pass_sl
 			analyzed_event = InterpretedEventSL(jets, lepton_sl, ev.vtype)
 		end
+
+		###############################
+		### B-tagging likelihood ratio
+		###############################
+		btag_lr = calculate_btag_lr(jets)
+
+		println("bLR = $btag_lr")
 
 		println("---")
 	end
