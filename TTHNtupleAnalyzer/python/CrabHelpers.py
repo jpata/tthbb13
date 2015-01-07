@@ -113,25 +113,39 @@ def download(name,
 #######################################
 # get LFN
 #######################################
+def chunks(l, n):
+    """ Yield successive n-sized chunks from l.
+    """
+    for i in xrange(0, len(l), n):
+        yield l[i:i+n]
 
-def get_lfn(name, sample_shortname, version, file_output=True):
+def get_lfn(name, sample_shortname, version, status_dict, file_output=True, chunksize=100):
     working_dir = "crab_{0}_{1}_{2}/crab_{0}_{1}_{2}".format(name, version, sample_shortname)
-    of = open("crab.stdout", "w")
-    ret = subprocess.call(["crab", "getoutput", "-d", working_dir, "--dump"], stdout=of)
-    of.close()
-    if not ret==0:
-        print "ERROR: could not get output"
-        print "".join(open("crab.stdout", "r").readlines())
-    of = open("crab.stdout", "r")
-    lines = "".join(of.readlines())
-    lines = lines.split("===")
+
     lfns = {}
-    for line in lines:
-        m = re.match(".*job ([0-9]+)\n.*\nLFN: (/.*root)\n", line)
-        if m:
-            lfns[int(m.group(1))] = m.group(2)
+    for ch in chunks(status_dict.keys(), chunksize):
+        ch = filter(lambda x: status_dict[x]["State"] == "finished", ch)
+        ret = -1
+        nretries = 0
+        while ret != 0    :
+            of = open("crab.stdout", "w")
+            ret = subprocess.call(["crab", "getoutput", "-d", working_dir, "--dump", "--wait=120", "--jobids=" + ",".join(ch)] , stdout=of)
+            of.close()
+            nretries += 1
+            if nretries > 10:
+                raise Exception("ERROR: could not get output" + "".join(open("crab.stdout", "r").readlines()))
+        of = open("crab.stdout", "r")
+        lines = "".join(of.readlines())
+        lines = lines.split("===")
+        for line in lines:
+            m = re.match(".*job ([0-9]+)\n.*\nLFN: (/.*root)\n", line)
+            if m:
+                lfns[int(m.group(1))] = m.group(2)
+        print "got", len(lfns), "items"
     return lfns
 # End of get LFN
+
+
 #######################################
 # hadd
 #######################################

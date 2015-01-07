@@ -81,6 +81,7 @@ if action == "status":
         lfns = get_lfn(name,
                sample_shortname,
                version,
+               stat
         )
         working_dir = "crab_{0}_{1}_{2}/crab_{0}_{1}_{2}".format(name, version, sample_shortname)
         of = open(working_dir + "/files.txt", "w")
