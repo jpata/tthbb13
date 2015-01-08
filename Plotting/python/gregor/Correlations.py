@@ -8,6 +8,10 @@
 
 from TTH.Plotting.Helpers.CorrelationHelpers import *
 
+from TTH.Plotting.Helpers.VariableHelpers import variable as var
+
+from TTH.Plotting.gregor.TopTaggingVariables import *
+
 
 ########################################
 # Define Input Files and
@@ -27,39 +31,17 @@ for k,v in files.iteritems():
     files[k] = basepath + v + ".root"
 
 
-mass_vars = [
-    var('ca15_mass', "m", 0, 1000),
-    var('ca15filtered_mass', "filtered m", 0, 1000),
-    var('ca15pruned_mass', "pruned m", 0, 1000),
-    var('ca15trimmed_mass', "trimmed m", 0, 1000),
-    var('ca15softdrop_mass', "softdrop m", 0, 1000),    
-]
+corrs = [corr("masses_15", "zprime_m2000_1p", mass_vars_15, fiducial_cut_and_weight),
+         corr("masses_15", "qcd_800_1000",    mass_vars_15, fiducial_cut_and_weight),
 
-tau_vars = [
-    var('ca15_tau3/ca15_tau2', "#tau_{3}/#tau_{2}", 0, 2.),
-    var('ca15filtered_tau3/ca15filtered_tau2', "filtered #tau_{3}/#tau_{2}", 0, 2.),
-    var('ca15pruned_tau3/ca15pruned_tau2', "pruned #tau_{3}/#tau_{2}", 0, 2.),
-    var('ca15trimmed_tau3/ca15trimmed_tau2', "trimmed #tau_{3}/#tau_{2}", 0, 2.),
-    var('ca15softdrop_tau3/ca15softdrop_tau2', "softdrop #tau_{3}/#tau_{2}", 0, 2.),    
-]
+         #corr("taus_15", "zprime_m2000_1p", tau_vars_15, fiducial_cut_and_weight),
+         #corr("taus_15", "qcd_800_1000",    tau_vars_15, fiducial_cut_and_weight),
+         
+         #corr("taggers_15", "zprime_m2000_1p", tagger_vars_15, fiducial_cut_and_weight),
+         #corr("taggers_15", "qcd_800_1000",    tagger_vars_15, fiducial_cut_and_weight),
 
-tagger_vars = [
-    var('looseMultiRHTT_mass', "HTT m", 0, 1000),
-    var('looseMultiRHTT_fW', "HTT f_{W}", 0, 2),
-    var('looseMultiRHTT_Rmin-looseMultiRHTT_RminExpected', "HTT #Delta R_{min,exp}", -3., 3.),
-    var('ca15cmstt_minMass', "CMSTT minMass", 0., 1000),
-]
-
-
-corrs = [corr("masses", "zprime_m2000_1p", mass_vars, fiducial_cut_and_weight),
-         corr("taus", "zprime_m2000_1p", tau_vars, fiducial_cut_and_weight),
-         corr("taggers", "zprime_m2000_1p", tagger_vars, fiducial_cut_and_weight),
-         corr("all", "zprime_m2000_1p", mass_vars+tau_vars+tagger_vars, fiducial_cut_and_weight),
-
-         corr("masses", "qcd_800_1000", mass_vars, fiducial_cut_and_weight),
-         corr("taus", "qcd_800_1000", tau_vars, fiducial_cut_and_weight),
-         corr("taggers", "qcd_800_1000", tagger_vars, fiducial_cut_and_weight),
-         corr("all", "qcd_800_1000", mass_vars+tau_vars+tagger_vars, fiducial_cut_and_weight)
+         #corr("all_15", "zprime_m2000_1p", mass_vars_15 + tau_vars_15 + tagger_vars_15, fiducial_cut_and_weight),
+         #corr("all_15", "qcd_800_1000",    mass_vars_15 + tau_vars_15 + tagger_vars_15, fiducial_cut_and_weight),
 ]
 
 MakePlots(corrs, files)

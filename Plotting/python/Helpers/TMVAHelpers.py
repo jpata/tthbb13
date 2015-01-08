@@ -15,25 +15,7 @@ import ROOT
 # initializer: simple creation of bag-of-object classes
 from Initializer import initializer
 
-
-########################################
-# class variable
-########################################
-
-class variable:
-    """ Helper class to store a variable used as TMVA input """
-
-    @initializer
-    def __init__(self,
-                 name,
-                 pretty_name = "",
-                 allowed_range = [],
-                 extra_cut = ""):
-        if pretty_name == "":
-            pretty_name = name
-
-# end of variable class
-
+from TTH.Plotting.Helpers.VariableHelpers import variable
 
 ########################################
 # class TMVASetup
@@ -114,9 +96,8 @@ def doTMVA(setup):
         if var.extra_cut:
             li_cuts.append(var.extra_cut)
             
-        if len(var.allowed_range):                    
-            li_cuts.append( "({0}>={1})".format(var.name, var.allowed_range[0]))
-            li_cuts.append( "({0}<={1})".format(var.name, var.allowed_range[1]))
+        li_cuts.append( "({0}>={1})".format(var.name, var.range_min))
+        li_cuts.append( "({0}<={1})".format(var.name, var.range_max))
 
     # The final cut is:
     #  - the && of per-variable cuts 
@@ -181,7 +162,7 @@ def doTMVA(setup):
     if "Cuts" in setup.li_methods:
         factory.BookMethod( ROOT.TMVA.Types.kCuts, 
                             "Cuts",
-                            "FitMethod=SA" )
+                            "" )
 
     if "Likelihood" in setup.li_methods:
         factory.BookMethod( ROOT.TMVA.Types.kLikelihood, 
@@ -299,8 +280,10 @@ def plotROCs(name, li_setups, zoom=False):
     legend.SetBorderSize(0)
 
     if zoom:
-        h_bg = ROOT.TH2F("","",100,0,0.2,100,0.95,1)
+        c.SetLogy(0)
+        h_bg = ROOT.TH2F("","",100,0,0.5,100,0.94,1)
     else:
+        c.SetLogy(0)
         h_bg = ROOT.TH2F("","",100,0,1,100,0,1)
 
 

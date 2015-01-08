@@ -42,6 +42,9 @@ ROOT.TH1.SetDefaultSumw2()
 # Import private support code
 ########################################
 
+# initializer: simple creation of bag-of-object classes
+from Initializer import initializer
+
 import TTH.Plotting.Helpers.OutputDirectoryHelper as OutputDirectoryHelper
 
 
@@ -59,31 +62,9 @@ OutputDirectoryHelper.CreateOutputDirs( output_dir )
 # Helper Classes
 ########################################
 
-class var():
-   """ Helper class to store ranges for a given variable """
-   def __init__(self, 
-                name,
-                nice_name,
-                range_min,
-                range_max,
-                extra_cut = "(1)"):
-      """ Constructor. Arguments:
-      name                : (string) name of the variable in the n-tuple
-      nice_name           : (string) nicer name (for printing)
-      range_min           : (float) minimal reasonable value
-      range_max           : (float) maximal reasonable value
-      extra cut           : (string) additional cut to apply - NOT FIDUCUAL. Only numerator.
-      """
-      self.name                = name
-      self.nice_name           = nice_name
-      self.range_min           = range_min
-      self.range_max           = range_max
-      self.extra_cut           = extra_cut
-# end of class var
-
-
 class corr():
    """ Helper class to store all information for a set of correlation tests."""
+   @initializer
    def __init__(self, 
                 name,                
                 sample_name,
@@ -92,13 +73,10 @@ class corr():
       """ Constructor. Arguments:
       name                : (string) name of the corr
       sample_name         : (string) sample to process
-      vars                : list of var objects 
+      vars                : list of variable (from VariableHelpers) objects 
       fiducial_cut        : (string) fiducial cut (numerator and denominator)
       """
-      self.name                = name
-      self.sample_name         = sample_name
-      self.li_vars             = [v for v in li_vars]
-      self.fiducial_cut        = fiducial_cut
+      pass
 # end of class var
       
 
@@ -223,11 +201,11 @@ def MakePlots(corrs, files, input_treename = 'tree'):
 
       for ivar1, var1 in enumerate(corr.li_vars):         
 
-         h_cut_fraction.GetXaxis().SetBinLabel(ivar1+1, var1.nice_name)
-         h_cut_fraction.GetYaxis().SetBinLabel(ivar1+1, var1.nice_name)
+         h_cut_fraction.GetXaxis().SetBinLabel(ivar1+1, var1.pretty_name)
+         h_cut_fraction.GetYaxis().SetBinLabel(ivar1+1, var1.pretty_name)
 
-         h_corr_factor.GetXaxis().SetBinLabel(ivar1+1, var1.nice_name)
-         h_corr_factor.GetYaxis().SetBinLabel(ivar1+1, var1.nice_name)
+         h_corr_factor.GetXaxis().SetBinLabel(ivar1+1, var1.pretty_name)
+         h_corr_factor.GetYaxis().SetBinLabel(ivar1+1, var1.pretty_name)
 
 
          for ivar2, var2 in enumerate(corr.li_vars):
