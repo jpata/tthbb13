@@ -75,7 +75,7 @@ combinedPlot ("parton_pt_cut",
               log_y     = False,
               normalize = True,
               legend_origin_x = 0.32,
-              legend_origin_y = 0.25,
+              legend_origin_y = 0.4,
               legend_size_x   = 0.2,
               legend_size_y   = 0.05 * 2)
 

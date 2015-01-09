@@ -223,7 +223,7 @@ def doTMVA(setup):
 # plotROCs
 ########################################
 
-def plotROCs(name, li_setups, zoom=False):
+def plotROCs(name, li_setups, view="all"):
     
     li_colors = [ROOT.kRed,      ROOT.kBlue+1,     ROOT.kBlack, 
                  ROOT.kOrange-1, ROOT.kViolet+1,   ROOT.kGreen+1,
@@ -243,6 +243,9 @@ def plotROCs(name, li_setups, zoom=False):
     di_cut_fracs = {}
 
     for setup in li_setups: 
+        
+        print setup.name
+
         input_filename = "TMVA_{0}.root".format(setup.name)
         f = ROOT.TFile(input_filename, "READ" )
 
@@ -279,13 +282,21 @@ def plotROCs(name, li_setups, zoom=False):
     legend.SetTextSize(0.03)      
     legend.SetBorderSize(0)
 
-    if zoom:
+    if view == "left":
         c.SetLogy(0)
-        h_bg = ROOT.TH2F("","",100,0,0.5,100,0.94,1)
+        h_bg = ROOT.TH2F("","",100,0,0.33,100,0.95,1)
+    elif view == "middle":
+        c.SetLogy(0)
+        h_bg = ROOT.TH2F("","",100,0.33,0.66,100,0.8,1)
+    elif view == "right":
+        c.SetLogy(0)
+        h_bg = ROOT.TH2F("","",100,0.66,1.,100,0.4,1)
+    elif view == "all":
+        c.SetLogy(0)
+        h_bg = ROOT.TH2F("","",100,0,1.,100,0.,1)
     else:
-        c.SetLogy(0)
-        h_bg = ROOT.TH2F("","",100,0,1,100,0,1)
-
+        print "Ivalid view! Exiting.."
+        sys.exit()
 
     h_bg.GetXaxis().SetTitle( "#varepsilon(S)" )      
     h_bg.GetYaxis().SetTitle( "1-#varepsilon(B)" )      
@@ -314,8 +325,22 @@ def plotROCs(name, li_setups, zoom=False):
         h.Draw("SAME")
     legend.Draw()
 
-    c.Print(name+".png")
+    c.Print("{0}_{1}.png".format(name, view))
 # end of plotROCs
+
+
+########################################
+# plotROCMultiple
+########################################
+
+def plotROCMultiple(name, li_setups):
+    """ Call plotROCs multiple times looking at different regions"""
+    
+    plotROCs(name, li_setups, "all")
+    plotROCs(name, li_setups, "left")
+    plotROCs(name, li_setups, "middle")
+    plotROCs(name, li_setups, "right")
+# end of plotROCMultiple
 
 
 
