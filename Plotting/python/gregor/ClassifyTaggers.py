@@ -63,29 +63,48 @@ tau_setups_08  = create_setups(tau_vars_08)
 tagger_setups_08 = create_setups(tagger_vars_08)
 all_setups_08 = create_setups(all_vars_08)
 
+good_setups = create_setups(good_vars)
+
 all_setups = all_setups_08 + all_setups_15
+
+
 
 mass_setups = mass_setups_08 + mass_setups_15
 tau_setups = tau_setups_08 + tau_setups_15
 tagger_setups = tagger_setups_08 + tagger_setups_15
 
 
-setup_combined = TMVASetup("combined",
-                  "combined",
-                  ["Cuts"], 
-                  htt_vars,
-                  file_name_sig,
-                  file_name_bg,
-                  fiducial_cut_sig = "((pt>801)&&(pt<999))",
-                  fiducial_cut_bg  = "((pt>801)&&(pt<999))",
-                  weight_sig = "weight",
-                  weight_bg = "weight")
-doTMVA(setup_combined)
+setup_htt_combined = TMVASetup("HTT_combined",
+                               "HTT (m, f_W, #Delta R_min)",
+                               ["BDT"], 
+                               htt_vars,
+                               file_name_sig,
+                               file_name_bg,
+                               fiducial_cut_sig = "((pt>801)&&(pt<999))",
+                               fiducial_cut_bg  = "((pt>801)&&(pt<999))",
+                               weight_sig = "weight",
+                               weight_bg = "weight")
+#doTMVA(setup_htt_combined)
+
+setup_08_combined = TMVASetup("08_combined",
+                              "R=0.8 (m_{softdrop}, #tau_{3}/#tau_{2})",
+                              ["BDT"], 
+                              [variable.di['ca08_tau3/ca08_tau2'],
+                               variable.di['ca08softdrop_mass']],
+                              file_name_sig,
+                              file_name_bg,
+                              fiducial_cut_sig = "((pt>801)&&(pt<999))",
+                              fiducial_cut_bg  = "((pt>801)&&(pt<999))",
+                              weight_sig = "weight",
+                              weight_bg = "weight")
+#doTMVA(setup_08_combined)
 
 
 if run_TMVA:
     for setup in all_setups:
         doTMVA(setup)
+
+plotROCMultiple("ROC_good", good_setups+[setup_08_combined])
 
 #plotROCMultiple("ROC_mass", mass_setups)
 #plotROCMultiple("ROC_tau", tau_setups)

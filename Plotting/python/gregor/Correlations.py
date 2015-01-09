@@ -40,8 +40,11 @@ corrs = [#corr("masses_15", "zprime_m2000_1p", mass_vars_15, fiducial_cut_and_we
          #corr("taggers_taus08", "zprime_m2000_1p", tagger_vars + tau_vars_08, fiducial_cut_and_weight),
          #corr("taggers_taus08", "qcd_800_1000",    tagger_vars + tau_vars_08, fiducial_cut_and_weight),
          
-         corr("taggers", "zprime_m2000_1p", tagger_vars, fiducial_cut_and_weight),
+         #corr("taggers", "zprime_m2000_1p", tagger_vars, fiducial_cut_and_weight),
          #corr("taggers", "qcd_800_1000",    tagger_vars, fiducial_cut_and_weight),
+
+         corr("good", "zprime_m2000_1p", good_vars, fiducial_cut_and_weight),
+         #corr("good", "qcd_800_1000",    good_vars, fiducial_cut_and_weight),
 
          #corr("all_15", "zprime_m2000_1p", mass_vars_15 + tau_vars_15 + tagger_vars_15, fiducial_cut_and_weight),
          #corr("all_15", "qcd_800_1000",    mass_vars_15 + tau_vars_15 + tagger_vars_15, fiducial_cut_and_weight),

@@ -20,10 +20,10 @@ ROOT.gStyle.SetPadBottomMargin(0.25)
 ROOT.gROOT.SetStyle("myStyle")
 ROOT.gROOT.ForceStyle()
 
-ROOT.gStyle.SetPadLeftMargin(0.2)
+ROOT.gStyle.SetPadLeftMargin(0.26)
 ROOT.gStyle.SetPadRightMargin(0.1)
 ROOT.gStyle.SetPadTopMargin(0.05)
-ROOT.gStyle.SetPadBottomMargin(0.25)
+ROOT.gStyle.SetPadBottomMargin(0.29)
 
 ROOT.gROOT.ForceStyle()
 
@@ -34,6 +34,8 @@ ROOT.gROOT.ForceStyle()
 ROOT.gStyle.SetPalette(53)
 # make the colors smoother
 ROOT.gStyle.SetNumberContours(100)
+
+ROOT.gStyle.SetPaintTextFormat("3.2f");
 
 ROOT.TH1.SetDefaultSumw2()
 
@@ -217,14 +219,14 @@ def MakePlots(corrs, files, input_treename = 'tree'):
             h_corr_factor.SetBinContent(ivar1+1, ivar2+1, corr_factor[var1.name][var2.name])
 
             
+      for h2d in [h_cut_fraction, h_corr_factor]:         
+         h2d.LabelsOption("v","X")
+         h2d.GetXaxis().SetLabelSize(0.035)
+         h2d.GetYaxis().SetLabelSize(0.035)
+         h2d.GetZaxis().SetLabelSize(0.03)
+
       if corr.name == "all":
          draw_opts = "COLZ"
-         for h2d in [h_cut_fraction, h_corr_factor]:         
-            h2d.LabelsOption("v","X")
-            h2d.GetXaxis().SetLabelSize(0.035)
-            h2d.GetYaxis().SetLabelSize(0.035)
-            h2d.GetZaxis().SetLabelSize(0.03)
-
       else:
          draw_opts = "COLZ TEXT"
 

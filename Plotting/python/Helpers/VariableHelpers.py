@@ -17,6 +17,11 @@ from Initializer import initializer
 
 class variable:
     """ Helper class to store a variable used as TMVA input """
+    
+    # Dictionary of all available variables
+    #  -newly created objects register automatically
+    #  -keys = variable bane
+    di = {}
 
     @initializer
     def __init__(self,
@@ -27,7 +32,8 @@ class variable:
                  unit = "",         # (string) for axis labels
                  extra_cut = "(1)"  # additional cut to apply
              ):
-        pass
-        
+        variable.di[self.name] = self
+    # end __init__
+
 # end of variable class
 
