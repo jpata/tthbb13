@@ -9,6 +9,12 @@ ls -lactrh *
 echo "pwd"
 pwd
 
+echo "Extending CMSSW SEARCH PATH"
+export CMSSW_SEARCH_PATH=$PWD:$CMSSW_SEARCH_PATH
+export CMSSW_SEARCH_PATH=$PWD/src:$CMSSW_SEARCH_PATH
+export CMSSW_SEARCH_PATH=$PWD/src/TTH/TTHNtupleAnalyzer/data:$CMSSW_SEARCH_PATH
+echo "CMSSW_SEARCH_PATH="
+echo $CMSSW_SEARCH_PATH
 
 echo "LD_LIBRARY_PATH="
 echo $LD_LIBRARY_PATH   

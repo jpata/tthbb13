@@ -36,7 +36,6 @@ def submit(name,
     template.config.General.requestName = "{0}_{1}_{2}".format(name, version, sample_shortname)
     template.config.JobType.psetName = cmssw_config_path + cmssw_config_script
     template.config.Data.inputDataset = Samples[sample_shortname]
-    template.config.Data.unitsPerJob = 5
     template.config.Site.storageSite = site
 
     if blacklist:
