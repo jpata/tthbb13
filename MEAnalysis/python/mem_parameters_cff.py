@@ -5,9 +5,11 @@ import FWCore.ParameterSet.Config as cms
 
 # path to file
 #pathToFile = '/pnfs/psi.ch/cms/trivcat/store//user/bianchi/HBB_EDMNtuple/AllHDiJetPt'
-pathToFile = '/hdfs/cms/store/user/jpata/tth/nov19_3a4602f/'
+pathToFile = '/hdfs/cms/store/user/jpata/tth/dec19_5b21f5f/'
+
+#this is the unique tag/identifier for step2
 processing_tag = "s1_nov19_3a4602f__s2_b7e13a1"
-ordering   = ''
+ordering   = 'TTHbb_s1_5b21f5'
 
 # luminosity
 lumi = 1.0
