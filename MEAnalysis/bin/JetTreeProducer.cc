@@ -124,9 +124,9 @@ int main(int argc, const char* argv[])
 	//mySamples->OpenFile( currentName0 );
 	//TTree* currentTree0		 = mySamples->GetTree( currentName0, "tree");
 
-	for(unsigned int i = 0 ; i < mySampleFiles.size(); i++) {
+	for(unsigned int sample = 0 ; sample < mySampleFiles.size(); sample++) {
 
-		string currentName		 = mySampleFiles[i];
+		string currentName = mySampleFiles[i];
 
 		mySamples->OpenFile( currentName );
 		cout << "Opening file " << currentName << endl;
@@ -144,16 +144,16 @@ int main(int argc, const char* argv[])
 		genParticleInfo genB = {};
 		genParticleInfo genBbar = {};
 
-		for (Long64_t i = 0; i < nentries ; i++) {
+		for (Long64_t entry = 0; entry < nentries ; entry++) {
 
-			if(i%5000==0) cout << i << "  (" << float(i)/float(nentries)*100. << " % completed)" << endl;
+			if(entry%5000==0) cout << entry << "  (" << float(entry)/float(nentries)*100. << " % completed)" << endl;
 
-			if(i>maxnum) {
-				i = nentries;
+			if(entry>maxnum) {
+				entry = nentries;
 				continue;
 			}
 
-			currentTree->GetEntry(i);
+			currentTree->GetEntry(entry);
 
 			jt->loop_initialize();
 			
