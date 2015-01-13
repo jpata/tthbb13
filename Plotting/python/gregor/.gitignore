@@ -3,5 +3,6 @@ OutputPlot2D/
 results/
 weights
 *.png
+*.pdf
 *.root
 *.dat
