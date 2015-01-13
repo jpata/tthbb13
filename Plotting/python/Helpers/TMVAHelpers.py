@@ -8,6 +8,7 @@ Helper script for the evaluation of different methods/variables using TMVA.
 ########################################
 
 import sys
+import os
 import pickle
 
 import ROOT
@@ -15,7 +16,13 @@ import ROOT
 # initializer: simple creation of bag-of-object classes
 from Initializer import initializer
 
-from TTH.Plotting.Helpers.VariableHelpers import variable
+# Our support Code
+# With CMSSW
+if "CMSSW_VERSION" in os.environ.keys():
+    from TTH.Plotting.Helpers.VariableHelpers import variable
+# Without CMSSW
+else:
+    from TTH.Plotting.python.Helpers.VariableHelpers import variable
 
 ########################################
 # class TMVASetup
