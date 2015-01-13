@@ -17,9 +17,10 @@ import sys
 import ROOT
 
 from TTH.Plotting.python.Helpers.PrepareRootStyle import myStyle
+from TTH.Plotting.python.Helpers.HistogramHelpers import Count
 
 ROOT.gStyle.SetPadLeftMargin(0.2)
-ROOT.gStyle.SetPadRightMargin(0.1)
+ROOT.gStyle.SetPadRightMargin(0.16)
 ROOT.gStyle.SetPadTopMargin(0.05)
 ROOT.gStyle.SetPadBottomMargin(0.25)
 
@@ -98,50 +99,54 @@ class mi():
 # CalculateEntropy
 ########################################
 
-def CalculateEntropy(h, verbose = False):
-   """ Calculate and return the Shannon Entropy (base 2) of a histogram."""
+def CalculateEntropy(hs, n_extra_events, verbose = False):
+   """ Calculate and return the Shannon Entropy (base 2) of histograms."""
 
-   total = h.Integral()
+   # As sometimes variables can be ill defined we need to be able to deal with 
+   # -> multiple histograms: for example a TH2 and two TH1 where one variable each is ill-defined
+   # an extra number of events that passed the fiducial cut but fail both variable selections
+
+   # n_extra_events: If a variable is only defined for a subset of
+   # events we need to take this into account when calculating the
+   # entropy
+   total = sum([h.Integral() for h in hs]) + n_extra_events
    checksum = 0
    entropy = 0.
 
-   # 1d Histograms
-   if type(h) in [ROOT.TH1F, ROOT.TH1D]:
-      for i_bin in range(1, h.GetXaxis().GetNbins()+1):
+   # Add events failing the cuts to entropy
+   p_extra = 1. * n_extra_events / total
+   if p_extra > 0:
+      checksum += p_extra
+      entropy -= p_extra*math.log(p_extra,2) 
 
-         p = 1. * h.GetBinContent(i_bin)/total
-         if p>0:
-            checksum += p
-            entropy -= p*math.log(p,2) 
+   # Loop over histograms
+   for h in hs:
+      # 1d Histograms
+      if type(h) in [ROOT.TH1F, ROOT.TH1D]:
+         for i_bin in range(1, h.GetXaxis().GetNbins()+1):
 
-   # 2d Histograms
-   elif type(h) in [ROOT.TH2F, ROOT.TH2D]:
-      
-      for i_bin_x in range(1, h.GetXaxis().GetNbins()+1):
-         for i_bin_y in range(1, h.GetYaxis().GetNbins()+1):
-            
-            p = 1. * h.GetBinContent(i_bin_x, i_bin_y)/total
+            p = 1. * h.GetBinContent(i_bin)/total
             if p>0:
                checksum += p
                entropy -= p*math.log(p,2) 
 
-   # 3d Histograms
-   elif type(h) in [ROOT.TH3F, ROOT.TH3D]:
-      
-      for i_bin_x in range(1, h.GetXaxis().GetNbins()+1):
-         for i_bin_y in range(1, h.GetYaxis().GetNbins()+1):
-            for i_bin_z in range(1, h.GetZaxis().GetNbins()+1):
-            
-               p = 1. * h.GetBinContent(i_bin_x, i_bin_y, i_bin_z)/total
+      # 2d Histograms
+      elif type(h) in [ROOT.TH2F, ROOT.TH2D]:
+
+         for i_bin_x in range(1, h.GetXaxis().GetNbins()+1):
+            for i_bin_y in range(1, h.GetYaxis().GetNbins()+1):
+
+               p = 1. * h.GetBinContent(i_bin_x, i_bin_y)/total
                if p>0:
                   checksum += p
                   entropy -= p*math.log(p,2) 
-
-   # Invalid Histogram type
-   else:
-      print "Ivalid type {0} for histogram in CalculateEntropy".format(type(h))
-      print "Exiting"
-   # End of handling different histogram dimensions
+      
+      # Invalid Histogram type
+      else:
+         print "Ivalid type {0} for histogram in CalculateEntropy".format(type(h))
+         print "Exiting"
+      # End of handling different histogram dimensions
+   # End of loop over histograms
 
    if verbose:
       print "checksum = ", checksum
@@ -184,22 +189,6 @@ def MakeHistogram(tree, variables, n_bins, cuts):
                                                                    variables[1].range_min,
                                                                    variables[1].range_max)
 
-   # Make a TH3
-   elif len(variables)==3:
-      draw_string = "{0}:{1}:{2}>>{3}({4},{5},{6},{7},{8},{9},{10},{11},{12})".format(variables[2].name,  # z
-                                                                                      variables[1].name,  # y
-                                                                                      variables[0].name,  # x
-                                                                                      tmp_name,
-                                                                                      n_bins,
-                                                                                      variables[0].range_min,
-                                                                                      variables[0].range_max,
-                                                                                      n_bins,
-                                                                                      variables[1].range_min,
-                                                                                      variables[1].range_max,
-                                                                                      n_bins,
-                                                                                      variables[2].range_min,
-                                                                                      variables[2].range_max)
-
    # Otherwise fail
    else:
       print "Invalid number of variables: ", len(variables)
@@ -235,8 +224,8 @@ def MakePlots(mis, files, input_treename = 'tree'):
    # Binning
    n_bins_one_var_one_sample = 400
    n_bins_one_var_two_sample = 400
-   n_bins_two_var_one_sample = 50  # this is per axis, total bins -> n^2
-   n_bins_two_var_two_sample = 50  # this is per axis, total bins -> n^2
+   n_bins_two_var_one_sample = 60  # this is per axis, total bins -> n^2
+   n_bins_two_var_two_sample = 60  # this is per axis, total bins -> n^2
    
    # Loop over the list of plots
    li_h2d = []
@@ -252,8 +241,8 @@ def MakePlots(mis, files, input_treename = 'tree'):
       input_tree_bkg = infile_bkg.Get(input_treename)
 
       # Count events
-      passed_fiducial_sig = input_tree_sig.Draw("(1)", mi.fiducial_cut)
-      passed_fiducial_bkg = input_tree_bkg.Draw("(1)", mi.fiducial_cut)
+      passed_fiducial_sig = Count(input_tree_sig, mi.fiducial_cut)
+      passed_fiducial_bkg = Count(input_tree_bkg, mi.fiducial_cut)
 
       # Calculate overall additional background weight so that:
       # signal / signal+background = f
@@ -293,12 +282,47 @@ def MakePlots(mis, files, input_treename = 'tree'):
                h_sigbkg_sig = MakeHistogram(input_tree_sig, [var1], n_bins_one_var_two_sample, cut_and_weight_sig)
                h_sigbkg_bkg = MakeHistogram(input_tree_bkg, [var1], n_bins_one_var_two_sample, cut_and_weight_bkg)
 
+               # Combine signal/background
+               h_sigbkg = h_sigbkg_sig
+               h_sigbkg.Add(h_sigbkg_bkg)
+
+               # Also count events that pass fiducial but not variable selection cuts
+               # Inverted cut is 
+               # fiducial + (! range(var1)) + (! extra cut(var1))
+               inverted_cut = "("
+               inverted_cut += "({0})".format(mi.fiducial_cut)
+               inverted_cut += "&&(({0}<{1})".format(var1.name, var1.range_min)
+               inverted_cut += " ||({0}>{1})".format(var1.name, var1.range_max)
+               inverted_cut += " ||(!({0})))".format(var1.extra_cut)
+               inverted_cut += ")"
+               
+               # Count events with inverted cut
+               inverted_cut_and_weight_sig = "{0}*{1}".format(inverted_cut, extra_weight_sig)
+               inverted_cut_and_weight_bkg = "{0}*{1}".format(inverted_cut, extra_weight_bkg)
+
+               cnt_inv_sig = Count(input_tree_sig, inverted_cut_and_weight_sig)
+               cnt_inv_bkg = Count(input_tree_bkg, inverted_cut_and_weight_bkg)
+
+               # Calculate entropies
+               entropy_sig = CalculateEntropy([h_sig], cnt_inv_sig)
+               entropy_bkg = CalculateEntropy([h_bkg], cnt_inv_bkg)
+               entropy_sigbkg = CalculateEntropy([h_sigbkg], cnt_inv_sig + cnt_inv_bkg)
+
+
             # Below Diagonal
             elif ivar2 < ivar1:
 
                # For the off-diagonal we want to calculate:
                # I(T;A,B) = H(sig,bkg)[A,B] - f * H(sig)[A,B] - (1-f) * H(bkg)[A,B]
 
+               # We need to take into account 4 contributions
+               # var1 and var2 valid        -> cut, this is a TH2
+               # var1 valid, var2 invalid   -> inverted_cut_v2, this is a TH1
+               # var1 invalid, var2 valid   -> inverted_cut_v1, this is a TH1
+               # var1 invalid, var2 invalid -> inverted_cut_v1v2, this is number
+
+
+               # ----- var1 valid, var2 valid -----
                # Total cut is
                # fiducial + range(var1) + extra cut(var1) + range(var2) + extra_cut(var2)
                cut = "("
@@ -318,28 +342,103 @@ def MakePlots(mis, files, input_treename = 'tree'):
                h_bkg = MakeHistogram(input_tree_bkg, [var1, var2], n_bins_two_var_one_sample, cut_and_weight_bkg)
                h_sigbkg_sig = MakeHistogram(input_tree_sig, [var1, var2], n_bins_two_var_two_sample, cut_and_weight_sig)
                h_sigbkg_bkg = MakeHistogram(input_tree_bkg, [var1, var2], n_bins_two_var_two_sample, cut_and_weight_bkg)
+               
+               # Combine signal/background
+               h_sigbkg = h_sigbkg_sig
+               h_sigbkg.Add(h_sigbkg_bkg)
 
+               
+               # ----- var1 invalid, var2 valid -----
+               # inverted cut var1  is
+               # fiducial AND (!range(var1) OR !extra_cut(var1)) AND (range(var2) AND extra_cut(var2))
+               inverted_cut_var1 = "("
+               inverted_cut_var1 += "({0})".format(mi.fiducial_cut)
+               inverted_cut_var1 += "&&(({0}<{1})".format(var1.name, var1.range_min)
+               inverted_cut_var1 += " ||({0}>{1})".format(var1.name, var1.range_max)
+               inverted_cut_var1 += " ||(!({0})))".format(var1.extra_cut)
+               inverted_cut_var1 += "&&({0}>={1})".format(var2.name, var2.range_min)
+               inverted_cut_var1 += "&&({0}<={1})".format(var2.name, var2.range_max)
+               inverted_cut_var1 += "&&(({0}))".format(var2.extra_cut)
+               inverted_cut_var1 += ")"
+               
+               cut_and_weight_sig_inv_var1 = "{0}*{1}".format(inverted_cut_var1, extra_weight_sig)
+               cut_and_weight_bkg_inv_var1 = "{0}*{1}".format(inverted_cut_var1, extra_weight_bkg)
+
+               h_sig_inv1 = MakeHistogram(input_tree_sig, [var2], n_bins_one_var_one_sample, cut_and_weight_sig_inv_var1)
+               h_bkg_inv1 = MakeHistogram(input_tree_bkg, [var2], n_bins_one_var_one_sample, cut_and_weight_bkg_inv_var1)
+               h_sigbkg_sig_inv1 = MakeHistogram(input_tree_sig, [var2], n_bins_one_var_two_sample, cut_and_weight_sig_inv_var1)
+               h_sigbkg_bkg_inv1 = MakeHistogram(input_tree_bkg, [var2], n_bins_one_var_two_sample, cut_and_weight_bkg_inv_var1)
+
+               # Combine signal/background
+               h_sigbkg_inv1 = h_sigbkg_sig_inv1
+               h_sigbkg_inv1.Add(h_sigbkg_bkg_inv1)
+
+
+               # ----- var1 valid, var2 invalid -----
+               # fiducial AND (range(var1) AND extra_cut(var1)) AND (!range(var2) OR !extra_cut(var2))
+               inverted_cut_var2 = "("
+               inverted_cut_var2 += "({0})".format(mi.fiducial_cut)
+               inverted_cut_var2 += "&&({0}>={1})".format(var1.name, var1.range_min)
+               inverted_cut_var2 += "&&({0}<={1})".format(var1.name, var1.range_max)
+               inverted_cut_var2 += "&&(({0}))".format(var1.extra_cut)
+               inverted_cut_var2 += "&&(({0}<{1})".format(var2.name, var2.range_min)
+               inverted_cut_var2 += " ||({0}>{1})".format(var2.name, var2.range_max)
+               inverted_cut_var2 += " ||(!({0})))".format(var2.extra_cut)
+               inverted_cut_var2 += ")"
+
+               cut_and_weight_sig_inv_var2 = "{0}*{1}".format(inverted_cut_var2, extra_weight_sig)
+               cut_and_weight_bkg_inv_var2 = "{0}*{1}".format(inverted_cut_var2, extra_weight_bkg)
+
+               h_sig_inv2 = MakeHistogram(input_tree_sig, [var1], n_bins_one_var_one_sample, cut_and_weight_sig_inv_var2)
+               h_bkg_inv2 = MakeHistogram(input_tree_bkg, [var1], n_bins_one_var_one_sample, cut_and_weight_bkg_inv_var2)
+               h_sigbkg_sig_inv2 = MakeHistogram(input_tree_sig, [var1], n_bins_one_var_two_sample, cut_and_weight_sig_inv_var2)
+               h_sigbkg_bkg_inv2 = MakeHistogram(input_tree_bkg, [var1], n_bins_one_var_two_sample, cut_and_weight_bkg_inv_var2)
+
+               h_sigbkg_inv2 = h_sigbkg_sig_inv2
+               h_sigbkg_inv2.Add(h_sigbkg_bkg_inv2)
+
+
+               # ----- var1 invalid, var2 invalid -----
+               # inverted cut  is
+               # fiducial AND (!range(var1) OR !extra cut(var1)) AND (!range(var2) OR !extra_cut(var2))
+               inverted_cut = "("
+               inverted_cut += "({0})".format(mi.fiducial_cut)
+               inverted_cut += "&&(({0}<{1})".format(var1.name, var1.range_min)
+               inverted_cut += " ||({0}>{1})".format(var1.name, var1.range_max)
+               inverted_cut += " ||(!({0})))".format(var1.extra_cut)
+               inverted_cut += "&&(({0}<{1})".format(var2.name, var2.range_min)
+               inverted_cut += " ||({0}>{1})".format(var2.name, var2.range_max)
+               inverted_cut += " ||(!({0})))".format(var2.extra_cut)
+               inverted_cut += ")"
+                              
+               # Count events with inverted cut
+               inverted_cut_and_weight_sig = "{0}*{1}".format(inverted_cut, extra_weight_sig)
+               inverted_cut_and_weight_bkg = "{0}*{1}".format(inverted_cut, extra_weight_bkg)
+               
+               cnt_inv_sig = Count(input_tree_sig, inverted_cut_and_weight_sig)
+               cnt_inv_bkg = Count(input_tree_bkg, inverted_cut_and_weight_bkg)               
+
+
+               # ----- Put everything together -----
+               # Calculate entropies
+               entropy_sig = CalculateEntropy([h_sig, h_sig_inv1, h_sig_inv2], cnt_inv_sig)
+               entropy_bkg = CalculateEntropy([h_bkg, h_bkg_inv1, h_bkg_inv2], cnt_inv_bkg)
+               entropy_sigbkg = CalculateEntropy([h_sigbkg, h_sigbkg_inv1, h_sigbkg_inv2], cnt_inv_sig + cnt_inv_bkg)
+            
             # Above Diagonal
             else:
                continue
             # End of Diagonal vs Off-Diagonal difference
-            
-            # Combine signal/background
-            h_sigbkg = h_sigbkg_sig
-            h_sigbkg.Add(h_sigbkg_bkg)
-
-            # Calculate entropies
-            entropy_sig = CalculateEntropy(h_sig)
-            entropy_bkg = CalculateEntropy(h_bkg)
-            entropy_sigbkg = CalculateEntropy(h_sigbkg)
 
             # Calculate Mutual Information
             I = entropy_sigbkg  - f * entropy_sig  - (1-f) * entropy_bkg
             
-            print "H_sig = {0} \t H_bkg = {1} \t H_sigbkg = {2} \t I = {3}".format(entropy_sig,
-                                                                                   entropy_bkg,
-                                                                                   entropy_sigbkg,
-                                                                                   I)
+            print "{0} / {1}:\t H_sig = {2:.3f} \t H_bkg = {3:.3f} \t H_sigbkg = {4:.3f} \t I = {5:.3f}".format(var1.name,
+                                                                                                var2.name,
+                                                                                                entropy_sig,
+                                                                                                entropy_bkg,
+                                                                                                entropy_sigbkg,
+                                                                                                I)
 
             mi_result[var1.name][var2.name] = I
          # End var2 loop
