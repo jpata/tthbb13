@@ -1,5 +1,13 @@
 echo "Hello World!"
 
+ls -lactrh src/TTH/TTHNtupleAnalyzer/data/*UncertaintySources*
+
+cp -v src/TTH/TTHNtupleAnalyzer/data/*UncertaintySources* .
+cp -v src/TTH/TTHNtupleAnalyzer/data/*UncertaintySources* src/
+cp -v src/TTH/TTHNtupleAnalyzer/data/*UncertaintySources* CMSSW_7_3_0
+cp -v src/TTH/TTHNtupleAnalyzer/data/*UncertaintySources* CMSSW_7_3_0/src
+cp -v src/TTH/TTHNtupleAnalyzer/data/*UncertaintySources* CMSSW_7_3_0/external/slc6_amd64_gcc491/data
+
 echo "ls -lactrh"
 ls -lactrh
 
