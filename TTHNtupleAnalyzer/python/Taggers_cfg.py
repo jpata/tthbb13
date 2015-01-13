@@ -351,11 +351,11 @@ process.NjettinessCA15SoftDrop = cms.EDProducer("NjettinessAdder",
                             )
 
 # Schedule Shower Deconstruction
-#process.SDCA08 = cms.EDProducer("SDProducer",
-#                                FatjetName = cms.string("ca08PFJetsCHS"),
-#                                MicrojetCone = cms.double(0.2),
-#                                InputCard = cms.string("src/TTH/TTHNtupleAnalyzer/data/sd_input_card_08.dat"))
-#
+process.SDCA08 = cms.EDProducer("SDProducer",
+                                FatjetName = cms.string("ca08PFJetsCHS"),
+                                MicrojetCone = cms.double(0.2),
+                                InputCard = cms.string("src/TTH/TTHNtupleAnalyzer/data/sd_input_card_08.dat"))
+
 #process.SDCA15 = cms.EDProducer("SDProducer",
 #                                FatjetName = cms.string("ca15PFJetsCHS"),
 #                                MicrojetCone = cms.double(0.2),
@@ -384,8 +384,8 @@ li_fatjets_nsubs = ['NjettinessCA08',
                     'NjettinessCA15Trimmed',
                     'NjettinessCA15SoftDrop' ]
 
-li_fatjets_sds = [#'SDCA08', 
-                  'None', 
+li_fatjets_sds = ['SDCA08', 
+                  #'None', 
 		  'None', 
                   'None', 
                   'None', 
@@ -570,7 +570,7 @@ process.p = cms.Path(
         process.ca08CMSTopTagInfos * 
         process.ca15CMSTopTagInfos * 
 
-        #process.SDCA08 * 
+        process.SDCA08 * 
         #process.SDCA15 * 
 
 	process.LooseMultiRHTTJetsCHS * 
