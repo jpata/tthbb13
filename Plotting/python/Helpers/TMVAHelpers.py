@@ -20,9 +20,11 @@ from Initializer import initializer
 # With CMSSW
 if "CMSSW_VERSION" in os.environ.keys():
     from TTH.Plotting.Helpers.VariableHelpers import variable
+    from TTH.Plotting.Helpers.HistogramHelpers import Count
 # Without CMSSW
 else:
     from TTH.Plotting.python.Helpers.VariableHelpers import variable
+    from TTH.Plotting.python.Helpers.HistogramHelpers import Count
 
 ########################################
 # class TMVASetup
@@ -114,11 +116,11 @@ def doTMVA(setup):
 
     # Calculate cut efficiency and store it in a pickle file
     # This can be used later to properly normalize the ROC curves
-    n_sig = signal.Draw("(1)", "({0})*{1}".format(setup.fiducial_cut_sig, setup.weight_sig))
-    n_sig_cut = signal.Draw("(1)", "({0})*{1}".format(cut_signal, setup.weight_sig))
+    n_sig = Count(signal, "({0})*{1}".format(setup.fiducial_cut_sig, setup.weight_sig))
+    n_sig_cut = Count(signal, "({0})*{1}".format(cut_signal, setup.weight_sig))
 
-    n_bg = background.Draw("(1)", "({0})*{1}".format(setup.fiducial_cut_bg, setup.weight_bg))
-    n_bg_cut = background.Draw("(1)", "({0})*{1}".format(cut_bg, setup.weight_bg))
+    n_bg = Count(background, "({0})*{1}".format(setup.fiducial_cut_bg, setup.weight_bg))
+    n_bg_cut = Count(background, "({0})*{1}".format(cut_bg, setup.weight_bg))
 
     cut_frac = {}
     cut_frac["sig"] = (1. * n_sig_cut / n_sig)
@@ -169,13 +171,14 @@ def doTMVA(setup):
     if "Cuts" in setup.li_methods:
         factory.BookMethod( ROOT.TMVA.Types.kCuts, 
                             "Cuts",
-                            "FitMethod=MC:SampleSize=200000" )
+                            "FitMethod=MC:SampleSize=200000")
 
     if "Likelihood" in setup.li_methods:
         factory.BookMethod( ROOT.TMVA.Types.kLikelihood, 
                             "Likelihood",
+                            "")
                             #"H:!V:TransformOutput:PDFInterpol=Spline2:NSmoothSig[0]=20:NSmoothBkg[0]=20:NSmoothBkg[1]=10:NSmooth=1:NAvEvtPerBin=50"
-                            "!H:!V:!TransformOutput:PDFInterpol=KDE:KDEtype=Gauss:KDEiter=Adaptive:KDEFineFactor=0.3:KDEborder=None:NAvEvtPerBin=100")
+                            #"!H:!V:!TransformOutput:PDFInterpol=KDE:KDEtype=Gauss:KDEiter=Adaptive:KDEFineFactor=0.3:KDEborder=None:NAvEvtPerBin=100")
 
     if "Fisher" in setup.li_methods:
         factory.BookMethod( ROOT.TMVA.Types.kFisher, 
