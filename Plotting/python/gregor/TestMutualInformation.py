@@ -6,12 +6,15 @@
 # Imports
 ########################################
 
-from TTH.Plotting.python.Helpers.MutualInformationHelpers import *
-
-from TTH.Plotting.python.Helpers.VariableHelpers import variable as var
-
-from TTH.Plotting.python.gregor.TopTaggingVariables import *
-
+# With CMSSW
+if "CMSSW_VERSION" in os.environ.keys():
+    from TTH.Plotting.Helpers.MutualInformationHelpers import *
+    from TTH.Plotting.Helpers.VariableHelpers import variable as var
+    from TTH.Plotting.gregor.TopTaggingVariables import *
+else:
+    from TTH.Plotting.python.Helpers.MutualInformationHelpers import *
+    from TTH.Plotting.python.Helpers.VariableHelpers import variable as var
+    from TTH.Plotting.python.gregor.TopTaggingVariables import *
 
 ########################################
 # Define Input Files and

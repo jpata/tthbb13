@@ -64,15 +64,12 @@ tagger_vars_08 = [
 
 tagger_vars = tagger_vars_15 + tagger_vars_08
 
-good_vars = [ variable.di['looseMultiRHTT_mass'],
-              variable.di['log(ca15_chi)'],
-              variable.di['ca08cmstt_minMass'],
+good_vars = [ variable.di['ca08trimmed_mass'],
               variable.di['ca08softdrop_mass'],
-              variable.di['ca15softdrop_mass'],
-              variable.di['ca08trimmed_mass'],
               variable.di['ca08_tau3/ca08_tau2'],
-              variable.di['ca08filtered_tau3/ca08filtered_tau2'],              
-          ]
+              variable.di['log(ca15_chi)'],
+              variable.di['looseMultiRHTT_mass'],
+              variable.di['ca08cmstt_minMass'] ]
               
 
 all_vars_15 = mass_vars_15 + tau_vars_15 + tagger_vars_15

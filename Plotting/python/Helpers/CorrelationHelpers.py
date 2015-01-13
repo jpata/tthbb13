@@ -9,8 +9,22 @@
 import math
 import glob
 import copy
+import os
+
 import ROOT
-from TTH.Plotting.Helpers.PrepareRootStyle import myStyle
+
+# initializer: simple creation of bag-of-object classes
+from Initializer import initializer
+
+# With CMSSW
+if "CMSSW_VERSION" in os.environ.keys():
+   from TTH.Plotting.Helpers.PrepareRootStyle import myStyle
+   from TTH.Plotting.Helpers.HistogramHelpers import Count
+   import TTH.Plotting.Helpers.OutputDirectoryHelper as OutputDirectoryHelper
+else:
+   from TTH.Plotting.python.Helpers.PrepareRootStyle import myStyle
+   from TTH.Plotting.python.Helpers.HistogramHelpers import Count
+   import TTH.Plotting.python.Helpers.OutputDirectoryHelper as OutputDirectoryHelper
 
 ROOT.gStyle.SetPadLeftMargin(0.2)
 ROOT.gStyle.SetPadRightMargin(0.1)
@@ -38,16 +52,6 @@ ROOT.gStyle.SetNumberContours(100)
 ROOT.gStyle.SetPaintTextFormat("3.2f");
 
 ROOT.TH1.SetDefaultSumw2()
-
-
-########################################
-# Import private support code
-########################################
-
-# initializer: simple creation of bag-of-object classes
-from Initializer import initializer
-
-import TTH.Plotting.Helpers.OutputDirectoryHelper as OutputDirectoryHelper
 
 
 ########################################
@@ -112,7 +116,7 @@ def MakePlots(corrs, files, input_treename = 'tree'):
       input_tree = infile.Get(input_treename)
 
       all_events = input_tree.GetEntries()
-      passed_fiducial = input_tree.Draw("(1)", corr.fiducial_cut)
+      passed_fiducial = Count(input_tree, corr.fiducial_cut)
 
       cut_fraction = {}
       corr_factor = {}
@@ -140,7 +144,7 @@ def MakePlots(corrs, files, input_treename = 'tree'):
             cut += "&&({0})".format(var2.extra_cut)
             cut += ")"
             
-            passed_cut = input_tree.Draw("(1)", cut)
+            passed_cut = Count(input_tree, cut)
             cut_fraction[var1.name][var2.name] = 1.*passed_cut/passed_fiducial
             
             # draw the variable and save into 
