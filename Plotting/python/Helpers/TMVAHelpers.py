@@ -162,17 +162,18 @@ def doTMVA(setup):
     if "Cuts" in setup.li_methods:
         factory.BookMethod( ROOT.TMVA.Types.kCuts, 
                             "Cuts",
-                            "" )
+                            "FitMethod=MC:SampleSize=200000" )
 
     if "Likelihood" in setup.li_methods:
         factory.BookMethod( ROOT.TMVA.Types.kLikelihood, 
                             "Likelihood",
-                            "" )
+                            #"H:!V:TransformOutput:PDFInterpol=Spline2:NSmoothSig[0]=20:NSmoothBkg[0]=20:NSmoothBkg[1]=10:NSmooth=1:NAvEvtPerBin=50"
+                            "!H:!V:!TransformOutput:PDFInterpol=KDE:KDEtype=Gauss:KDEiter=Adaptive:KDEFineFactor=0.3:KDEborder=None:NAvEvtPerBin=100")
 
     if "Fisher" in setup.li_methods:
         factory.BookMethod( ROOT.TMVA.Types.kFisher, 
                             "Fisher", 
-                            "H:!V:Fisher" )
+                            "H:!V" )
 
     if "MLP" in setup.li_methods:
         factory.BookMethod( ROOT.TMVA.Types.kMLP, 
@@ -192,7 +193,7 @@ def doTMVA(setup):
     if "BDT" in setup.li_methods:
         factory.BookMethod( ROOT.TMVA.Types.kBDT, 
                             "BDT",
-                            "!H:!V:NTrees=850:nEventsMin=150:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:SeparationType=GiniIndex:nCuts=20:PruneMethod=NoPruning" )
+                            "!H:!V:NTrees=50:MaxDepth=2:BoostType=AdaBoost:AdaBoostBeta=0.5:SeparationType=GiniIndex:nCuts=20:PruneMethod=NoPruning" )
 
     if "BDTB" in setup.li_methods:
         factory.BookMethod( ROOT.TMVA.Types.kBDT, 
@@ -271,7 +272,7 @@ def plotROCs(name, li_setups, view="all"):
     legend_origin_x     = 0.17
     legend_origin_y     = 0.18
     legend_size_x       = 0.3
-    legend_size_y       = 0.03 * len(li_hs)
+    legend_size_y       = 0.04 * len(li_hs)
 
     legend = ROOT.TLegend( legend_origin_x, 
                            legend_origin_y,
@@ -322,7 +323,7 @@ def plotROCs(name, li_setups, view="all"):
         legend.AddEntry( h, li_pretty_names[i_h], "L" )
 
     for h in li_hs:    
-        h.Draw("SAME")
+        h.Draw("SAME ][")
     legend.Draw()
 
     c.Print("{0}_{1}.png".format(name, view))
