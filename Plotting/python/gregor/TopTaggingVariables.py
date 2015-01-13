@@ -3,7 +3,15 @@
 Collection of Top Tagging Variables (so we can use them across Plotting/Correlation/TMVA)
 """
 
-from TTH.Plotting.Helpers.VariableHelpers import variable
+import os
+
+# Our support Code
+# With CMSSW
+if "CMSSW_VERSION" in os.environ.keys():
+    from TTH.Plotting.Helpers.VariableHelpers import variable
+# Without CMSSW
+else:
+    from TTH.Plotting.python.Helpers.VariableHelpers import variable
 
 
 mass_vars_15 = [
@@ -44,9 +52,10 @@ htt_vars = [
     variable('looseMultiRHTT_Rmin-looseMultiRHTT_RminExpected', "HTT #Delta R_{min,exp}", -0.5, 1.5),
 ]
 
-tagger_vars_15 = htt_vars + [variable('ca15cmstt_minMass', "CMSTT minMass (R=1.5)", 0., 400, unit = "GeV"),
-                             variable('log(ca15_chi)', "log(#chi) (R=1.5)", -10., 10, extra_cut = 'ca15_chi>0')
-]
+tagger_vars_15 = htt_vars + [variable('log(ca15_chi)', "log(#chi) (R=1.5)", -10., 10, extra_cut = 'ca15_chi>0'),
+                             variable('ca15cmstt_minMass', "CMSTT minMass (R=1.5)", 0., 400, unit = "GeV")
+                             ]
+                             
 
 tagger_vars_08 = [
     variable('ca08cmstt_minMass', "CMSTT minMass (R=0.8)", 0., 250, unit = "GeV"),
@@ -62,8 +71,7 @@ good_vars = [ variable.di['looseMultiRHTT_mass'],
               variable.di['ca15softdrop_mass'],
               variable.di['ca08trimmed_mass'],
               variable.di['ca08_tau3/ca08_tau2'],
-              variable.di['ca08filtered_tau3/ca08filtered_tau2'],
-              
+              variable.di['ca08filtered_tau3/ca08filtered_tau2'],              
           ]
               
 
