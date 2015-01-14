@@ -32,7 +32,7 @@ ROOT.gROOT.ForceStyle()
 # Configuration
 ########################################
 
-run_TMVA = False
+run_TMVA = True
 
 basepath = '/scratch/gregor/'
 file_name_sig  = basepath + "ntop_v11_zprime_m2000_1p_13tev-tagging-weighted.root"
@@ -64,17 +64,21 @@ def create_setups(li_vars):
 
 mass_setups_15 = create_setups(mass_vars_15)
 tau_setups_15  = create_setups(tau_vars_15)
+tau31_setups_15  = create_setups(tau31_vars_15)
 tagger_setups_15 = create_setups(tagger_vars_15)
 all_setups_15 = create_setups(all_vars_15)
 
 mass_setups_08 = create_setups(mass_vars_08)
 tau_setups_08  = create_setups(tau_vars_08)
+tau31_setups_08  = create_setups(tau31_vars_08)
 tagger_setups_08 = create_setups(tagger_vars_08)
 all_setups_08 = create_setups(all_vars_08)
 
+btag_setups = create_setups(btag_vars)
+
 good_setups = create_setups(good_vars)
 
-all_setups = all_setups_08 + all_setups_15
+all_setups = all_setups_08 + all_setups_15 + btag_setups
 
 
 
@@ -97,6 +101,19 @@ setup_htt_combined = TMVASetup("HTT_combined",
                                weight_bg = "weight")
 #doTMVA(setup_htt_combined)
 
+setup_cmstt_combined = TMVASetup("CMSTT_combined",
+                               "CMSTT (topMass, minMass)",
+                               ["Cuts"], 
+                               [variable.di['ca08cmstt_topMass'],
+                                variable.di['ca08cmstt_minMass']], 
+                               file_name_sig,
+                               file_name_bg,
+                               fiducial_cut_sig = "((pt>801)&&(pt<999))",
+                               fiducial_cut_bg  = "((pt>801)&&(pt<999))",
+                               weight_sig = "weight",
+                               weight_bg = "weight")
+#doTMVA()
+
 setup_08_combined = TMVASetup("08_combined",
                               "softdrop m + #tau_{3}/#tau_{2} (R=0.8)",
                               ["Cuts"], 
@@ -110,12 +127,28 @@ setup_08_combined = TMVASetup("08_combined",
                               weight_bg = "weight")
 #doTMVA(setup_08_combined)
 
+setup_softdrop_b = TMVASetup("softdrop_b",
+                              "softdrop m + b-tag (R=0.8)",
+                              ["Cuts"], 
+                              [variable.di['ca08_btag'],
+                               variable.di['ca08softdrop_mass']],
+                              file_name_sig,
+                              file_name_bg,
+                              fiducial_cut_sig = "((pt>801)&&(pt<999))",
+                              fiducial_cut_bg  = "((pt>801)&&(pt<999))",
+                              weight_sig = "weight",
+                              weight_bg = "weight")
+#doTMVA(setup_softdrop_b)
+
+
+
 if run_TMVA:
-    for setup in all_setups:
+    for setup in tau31_setups:
         doTMVA(setup)
 
-plotROCMultiple("ROC_good", [setup_08_combined, setup_htt_combined] + good_setups)
+plotROCMultiple("ROC_good", [setup_08_combined, setup_cmstt_combined] + good_setups)
 
 plotROCMultiple("ROC_mass", mass_setups)
 plotROCMultiple("ROC_tau", tau_setups)
+plotROCMultiple("ROC_tau31", tau31_setups)
 plotROCMultiple("ROC_tagger", tagger_setups)

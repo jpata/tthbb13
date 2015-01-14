@@ -99,7 +99,7 @@ good_vars = [ variable.di['ca08trimmed_mass'],
 ]
               
 
-all_vars_15 = mass_vars_15 + tau_vars_15 + tagger_vars_15
-all_vars_08 = mass_vars_08 + tau_vars_08 + tagger_vars_08
+all_vars_15 = mass_vars_15 + tau_vars_15 + tau31_vars_15 + tagger_vars_15 
+all_vars_08 = mass_vars_08 + tau_vars_08 + tau31_vars_08 + tagger_vars_08
 
 all_vars = all_vars_08 + all_vars_15
