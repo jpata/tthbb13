@@ -45,6 +45,23 @@ tau_vars_08 = [
     variable('ca08softdrop_tau3/ca08softdrop_tau2', "softdrop #tau_{3}/#tau_{2}  (R=0.8)", 0.01, 1.),    
 ]
 
+tau31_vars_15 = [
+    variable('ca15_tau3/ca15_tau1', "#tau_{3}/#tau_{1}  (R=1.5)", 0, 1.),
+    variable('ca15filtered_tau3/ca15filtered_tau1', "filtered #tau_{3}/#tau_{1}  (R=1.5)", 0, 1.),
+    variable('ca15pruned_tau3/ca15pruned_tau1', "pruned #tau_{3}/#tau_{1}  (R=1.5)", 0, 1.),
+    variable('ca15trimmed_tau3/ca15trimmed_tau1', "trimmed #tau_{3}/#tau_{1}  (R=1.5)", 0, 1.),
+    variable('ca15softdrop_tau3/ca15softdrop_tau1', "softdrop #tau_{3}/#tau_{1}  (R=1.5)", 0, 1.),    
+]
+
+tau31_vars_08 = [
+    variable('ca08_tau3/ca08_tau1', "#tau_{3}/#tau_{1}  (R=0.8)", 0.01, 1.),
+    variable('ca08filtered_tau3/ca08filtered_tau1', "filtered #tau_{3}/#tau_{1}  (R=0.8)", 0.01, 1.),
+    variable('ca08pruned_tau3/ca08pruned_tau1', "pruned #tau_{3}/#tau_{1}  (R=0.8)", 0.01, 1.),
+    variable('ca08trimmed_tau3/ca08trimmed_tau1', "trimmed #tau_{3}/#tau_{1}  (R=0.8)", 0.01, 1.),
+    variable('ca08softdrop_tau3/ca08softdrop_tau1', "softdrop #tau_{3}/#tau_{1}  (R=0.8)", 0.01, 1.),    
+]
+
+
 btag_vars = [
     variable('ca15_btag', "btag (R=1.5)", 0, 10),
     variable('ca08_btag', "btag (R=0.8)", 0, 10),
@@ -76,8 +93,9 @@ good_vars = [ variable.di['ca08trimmed_mass'],
               variable.di['ca08_tau3/ca08_tau2'],
               variable.di['log(ca15_chi)'],
               variable.di['looseMultiRHTT_mass'],
-              variable.di['ca08cmstt_minMass'],
+              variable.di['looseMultiRHTT_fW'],
               variable.di['ca08cmstt_topMass'],              
+              variable.di['ca08cmstt_minMass'],
 ]
               
 
