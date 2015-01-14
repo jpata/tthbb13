@@ -61,6 +61,12 @@ tau31_vars_08 = [
     variable('ca08softdrop_tau3/ca08softdrop_tau1', "softdrop #tau_{3}/#tau_{1}  (R=0.8)", 0.01, 1.),    
 ]
 
+tau_cross_vars = [
+    variable('ca08softdrop_tau3/ca08_tau2', "#tau_{3, softdrop}/#tau_{2}  (R=0.8)", 0.01, 1.),
+    variable('ca08_tau3/ca08softdrop_tau2', "#tau_{3}/#tau_{2,softdrop}  (R=0.8)", 0.01, 1.),
+]
+
+
 
 btag_vars = [
     variable('ca15_btag', "btag (R=1.5)", 0, 10),
