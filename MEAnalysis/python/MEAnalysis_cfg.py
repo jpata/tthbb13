@@ -21,7 +21,7 @@ process.fwliteInput = cms.PSet(
     pathToCP_smear= cms.string("./root/ControlPlotsTEST_std_gen.root"),
 
     # input file directory
-    pathToFile    = cms.string("/pnfs/psi.ch/cms/trivcat/store/user/jpata/tth/dec19_5b21f5f"),
+    pathToFile    = cms.string("dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/jpata/tth/dec19_5b21f5f"),
     #pathToFile    = cms.string("dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store//user/bianchi/TTH_EDMNtuple/"),
     #pathToFile    = cms.string("dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/bianchi/HepMC/Sherpa_run/"),
     #pathToFile    = cms.string("/scratch/bianchi/HBB_EDMNtuple/Sherpa_run/"),
