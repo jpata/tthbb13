@@ -13,8 +13,15 @@ import glob
 import os
 import ROOT
 
-import TTH.Plotting.Helpers.OutputDirectoryHelper as OutputDirectoryHelper
-from TTH.Plotting.Helpers.PrepareRootStyle import myStyle
+# With CMSSW
+if "CMSSW_VERSION" in os.environ.keys():
+   import TTH.Plotting.Helpers.OutputDirectoryHelper as OutputDirectoryHelper
+   from TTH.Plotting.Helpers.PrepareRootStyle import myStyle
+# Without CMSSW
+else:
+   import TTH.Plotting.python.Helpers.OutputDirectoryHelper as OutputDirectoryHelper
+   from TTH.Plotting.python.Helpers.PrepareRootStyle import myStyle
+
 # initializer: simple creation of bag-of-object classes
 from Initializer import initializer
 

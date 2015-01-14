@@ -5,7 +5,6 @@ Collection of Top Tagging Variables (so we can use them across Plotting/Correlat
 
 import os
 
-# Our support Code
 # With CMSSW
 if "CMSSW_VERSION" in os.environ.keys():
     from TTH.Plotting.Helpers.VariableHelpers import variable
@@ -46,6 +45,13 @@ tau_vars_08 = [
     variable('ca08softdrop_tau3/ca08softdrop_tau2', "softdrop #tau_{3}/#tau_{2}  (R=0.8)", 0.01, 1.),    
 ]
 
+btag_vars = [
+    variable('ca15_btag', "btag (R=1.5)", 0, 10),
+    variable('ca08_btag', "btag (R=0.8)", 0, 10),
+]
+
+
+
 htt_vars = [
     variable('looseMultiRHTT_mass', "HTT m", 0, 400, unit = "GeV"),
     variable('looseMultiRHTT_fW', "HTT f_{W}", 0, 0.8),
@@ -69,7 +75,9 @@ good_vars = [ variable.di['ca08trimmed_mass'],
               variable.di['ca08_tau3/ca08_tau2'],
               variable.di['log(ca15_chi)'],
               variable.di['looseMultiRHTT_mass'],
-              variable.di['ca08cmstt_minMass'] ]
+              variable.di['ca08cmstt_minMass'],
+              variable.di['ca15_btag'],
+]
               
 
 all_vars_15 = mass_vars_15 + tau_vars_15 + tagger_vars_15

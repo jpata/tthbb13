@@ -6,23 +6,33 @@
 # Imports
 ########################################
 
+import os
 import pickle
+import socket # to get the hostname
 
-from TTH.Plotting.Helpers.CompareDistributionsHelpers import *
-from TTH.Plotting.gregor.TopTaggingVariables import *
+# With CMSSW
+if "CMSSW_VERSION" in os.environ.keys():
+    from TTH.Plotting.Helpers.CompareDistributionsHelpers import *
+    from TTH.Plotting.gregor.TopTaggingVariables import *
+else:
+    from TTH.Plotting.python.Helpers.CompareDistributionsHelpers import *
+    from TTH.Plotting.python.gregor.TopTaggingVariables import *
+
 
 ########################################
 # Define Input Files and
 # output directory
 ########################################
 
-basepath = '/scratch/gregor/'
+if socket.gethostname() == "t3ui12":
+    basepath = '/scratch/gregor/'
+else:
+    basepath = '/Users/gregor/'
 
 files = {}
 files["qcd_800_1000"] = "ntop_v11_qcd_800_1000_pythia8_13tev-tagging-weighted"
 files["zprime_m2000"] = "ntop_v11_zprime_m2000_1p_13tev-tagging-weighted"     
                                          
-
 # for the filename: basepath + filename + .root
 full_file_names = {}
 for k,v in files.iteritems():
@@ -73,6 +83,7 @@ if False:
 
 
 for var in all_vars: 
+    continue
 
     if ("chi" in var.name or 
         "tau" in var.name
@@ -100,11 +111,13 @@ for var in all_vars:
 
 for sample in files.keys():
     
-    if False:
-        variable_collection_names = ["mass_vars_15", 
-                                     "mass_vars_08", 
-                                     "tau_vars_15", 
-                                     "tau_vars_08"]
+    if True:
+        variable_collection_names = [
+            "btag_vars",
+            "mass_vars_15", 
+            "mass_vars_08", 
+            "tau_vars_15", 
+            "tau_vars_08"]
 
         for name in variable_collection_names:
 
