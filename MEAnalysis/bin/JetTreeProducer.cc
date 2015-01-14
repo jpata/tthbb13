@@ -126,7 +126,7 @@ int main(int argc, const char* argv[])
 
 	for(unsigned int sample = 0 ; sample < mySampleFiles.size(); sample++) {
 
-		string currentName = mySampleFiles[i];
+		string currentName = mySampleFiles[sample];
 
 		mySamples->OpenFile( currentName );
 		cout << "Opening file " << currentName << endl;
@@ -535,7 +535,8 @@ int main(int argc, const char* argv[])
 				TOPHADW2.Boost(-boostToWHadCMS);
 
 				jt->BetaW	 = TMath::Cos((TOPHADB.Vect()).Angle( boostToTopHadCMS  ));
-				jt->GammaW	= i%2==0 ? TMath::Cos( (TOPHADW1.Vect()).Angle(boostToWHadCMS) ) : TMath::Cos( (TOPHADW2.Vect()).Angle(boostToWHadCMS) );  //average over W flavor (unobserved)
+				//FIXME, what is this i?
+				//jt->GammaW	= i%2==0 ? TMath::Cos( (TOPHADW1.Vect()).Angle(boostToWHadCMS) ) : TMath::Cos( (TOPHADW2.Vect()).Angle(boostToWHadCMS) );  //average over W flavor (unobserved)
 
 
 				// then deal with TOPLEP...

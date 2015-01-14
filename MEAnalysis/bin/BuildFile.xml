@@ -29,6 +29,7 @@
   <lib   name="ppttxbbxcallme2born"/>
 </bin>
 
+<!--
 <bin   file="JetTreeProducer.cc" name="JetTreeProducer">
   <use   name="DataFormats/FWLite"/>
   <use   name="FWCore/FWLite"/>
@@ -46,4 +47,5 @@
   <use   name="classlib"/>
   <use   name="boost"/>
 </bin>
+-->
 
