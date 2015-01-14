@@ -15,11 +15,19 @@
 ########################################
 
 import os
+import sys
 import glob
+import socket
 
 import ROOT
 
-import TTH.TTHNtupleAnalyzer.AccessHelpers as AH
+# for working on tier 3
+if socket.gethostname() == "t3ui12":
+    import TTH.TTHNtupleAnalyzer.AccessHelpers as AH
+# on the Grid
+else:
+    import AccessHelpers as AH
+
 
 ########################################
 # Configuration
@@ -27,14 +35,28 @@ import TTH.TTHNtupleAnalyzer.AccessHelpers as AH
 
 DEF_VAL_FLOAT = -9999.0
 
-#infile_name = "/scratch/gregor/ntop_v11_zprime_m2000_1p_13tev.root"
-#infile_name = "/scratch/gregor/ntop_v11_qcd_800_1000_pythia8_13tev.root"
-#infile_name = "/scratch/gregor/ntop_v11_qcd_800_1000_pythia8_13tev/output_111.root"
+# Allow overrding input file from command line
+if len(sys.argv)==2:
+    infile_name = sys.argv[1]
+else:
+    infile_name = "output.root"
 
-indir_name = "/scratch/gregor/ntop_v11_qcd_800_1000_pythia8_13tev/"
-outdir_name = "/scratch/gregor/ntop_v11_qcd_800_1000_pythia8_13tev-tagging/"
+# Determine particle species
+# Tier3
+if socket.gethostname() == "t3ui12":
+    particle_name = "hadtop"
+# Grid
+else:
+    import PSet
+    initial_miniAOD_filename = list(PSet.process.source.fileNames)[0]
+    if "ZPrimeToTTJets" in initial_miniAOD_filename:
+        particle_name = "hadtop"
+    else:
+        particle_name = "parton"
+    print "Initial MiniAOD filename:", initial_miniAOD_filename
+    print "Determined particle_name:", particle_name
+        
 
-particle_name = "parton"
 particle_branches = ["pt", "eta", "phi", "mass"]
 
 # "Normal" branches for most fatjet collections
@@ -85,122 +107,116 @@ object_drs = {
     "looseMultiRHTT" : 1.2
 }
 
-if not os.path.exists(outdir_name):
-    os.makedirs(outdir_name)
+
+########################################
+# Prepare input/output
+########################################
+
+infile = ROOT.TFile(infile_name)
+intree = infile.Get('tthNtupleAnalyzer/events')
 
 
-input_files = glob.glob(indir_name + "/*.root")
+n_entries = intree.GetEntries()
 
-for i_file, infile_name in enumerate(input_files):
+# Define the name of the output file
+outfile_name = infile_name.replace(".root","-tagging.root")
 
-    ########################################
-    # Prepare input/output
-    ########################################
+outfile = ROOT.TFile( outfile_name, 'recreate')
 
-    infile = ROOT.TFile(infile_name)
-    intree = infile.Get('tthNtupleAnalyzer/events')
+# Create dicitionaries to hold the information that will be
+# written as new branches
+variables      = {}
+variable_types = {}
 
-    n_entries = intree.GetEntries()
-    print "{0}/{1} - Processing {2} events".format(i_file, len(input_files), n_entries)
+# Tree to store the output variables in
+outtree = ROOT.TTree("tree", "tree")
 
-    # Define the name of the output file
-    outfile_name = infile_name.split("/")[-1]
-    outfile_name = outdir_name + outfile_name
-    
-    outfile = ROOT.TFile( outfile_name, 'recreate')
+# Setup the output branches for the true object
+AH.addScalarBranches(variables,
+                     variable_types,
+                     outtree,
+                     ["{0}_{1}".format(particle_name, branch_name) for branch_name in particle_branches],
+                     datatype = 'float')
 
-    # Create dicitionaries to hold the information that will be
-    # written as new branches
-    variables      = {}
-    variable_types = {}
-
-    # Tree to store the output variables in
-    outtree = ROOT.TTree("tree", "tree")
-
-    # Setup the output branches for the true object
-    AH.addScalarBranches(variables,
-                         variable_types,
-                         outtree,
-                         ["{0}_{1}".format(particle_name, branch_name) for branch_name in particle_branches],
-                         datatype = 'float')
-
-    # Setup the output branches for tagging variables
-    for object_name, branch_names in objects.iteritems():    
-        for branch_name in branch_names:
-            AH.addScalarBranches( variables,
-                                  variable_types,
-                                  outtree,
-                                  ["{0}_{1}".format(object_name, branch_name)],
-                                  datatype = 'float')
+# Setup the output branches for tagging variables
+for object_name, branch_names in objects.iteritems():    
+    for branch_name in branch_names:
+        AH.addScalarBranches( variables,
+                              variable_types,
+                              outtree,
+                              ["{0}_{1}".format(object_name, branch_name)],
+                              datatype = 'float')
 
 
-    ########################################
-    # Event loop
-    ########################################
+########################################
+# Event loop
+########################################
 
-    for i_event in range(n_entries):
+print "Will process {0} events".format(n_entries)
 
-        # Progress
-        if not i_event % 1000:
-            print "{0:.1f}%".format( 100.*i_event /n_entries)
+for i_event in range(n_entries):
 
-        intree.GetEntry( i_event )    
+    # Progress
+    if not i_event % 1000:
+        print "{0:.1f}%".format( 100.*i_event /n_entries)
 
-        # Loop over truth particles
-        n_particles = len(AH.getter( intree, "gen_{0}__pt".format(particle_name)))
+    intree.GetEntry( i_event )    
 
-        for i_particle in range(n_particles):
+    # Loop over truth particles
+    n_particles = len(AH.getter( intree, "gen_{0}__pt".format(particle_name)))
 
-            # Reset branches
-            AH.resetBranches(variables, variable_types)
+    for i_particle in range(n_particles):
 
-            # Fill truth particle branches
-            for branch_name in particle_branches:
-                full_branch_in  = "gen_{0}__{1}".format(particle_name, branch_name)
-                full_branch_out = "{0}_{1}".format(particle_name, branch_name)
-                variables[full_branch_out][0] = AH.getter(intree, full_branch_in)[i_particle]
+        # Reset branches
+        AH.resetBranches(variables, variable_types)
 
-
-            # Fill fatjets and taggers
-            for object_name, branch_names in objects.iteritems():    
-
-                # First we two branches for the tagger/jet 
-                #  - how far the closest true object was
-                #  - and what true_index (i) it had in the list of true objects
-                full_i_branch_name =  "jet_{0}__close_{1}_i".format(object_name, particle_name)
-                full_dr_branch_name = "jet_{0}__close_{1}_dr".format(object_name, particle_name)
-
-                # Then we build a list of pairs
-                # deltaR and jet_index of the jet in ITS list (so we can access it later)
-                # the true_index of is only used to filter out jets that are matched to other tops!            
-                i_branch = AH.getter(intree, full_i_branch_name)
-                dr_branch = AH.getter(intree, full_dr_branch_name)
-                dr_and_pos = [(dr,pos) for i,dr,pos in zip(i_branch, dr_branch, range(len(i_branch))) if i==i_particle]
-
-                # Apply the Delta R cut
-                dr_and_pos = [(dr,pos) for dr,pos in dr_and_pos if dr < object_drs[object_name]]
-
-                if len(dr_and_pos):
-                    # Now extract the closest jet and use it to fill the branches
-                    i_matched = sorted(dr_and_pos, key=lambda x:x[0])[0][1]
-
-                    for branch_name in branch_names:
-                        full_branch_in  = "jet_{0}__{1}".format(object_name, branch_name)
-                        full_branch_out = "{0}_{1}".format(object_name, branch_name)
-                        variables[full_branch_out][0] = AH.getter(intree, full_branch_in)[i_matched]                    
-                else:
-                    for branch_name in branch_names:
-                        full_branch_out = "{0}_{1}".format(object_name, branch_name)
-                        variables[full_branch_out][0] = DEF_VAL_FLOAT
-
-            # Fill the tree
-            outtree.Fill()    
-
-        # End of particle loop
-    # End of Event Loop
+        # Fill truth particle branches
+        for branch_name in particle_branches:
+            full_branch_in  = "gen_{0}__{1}".format(particle_name, branch_name)
+            full_branch_out = "{0}_{1}".format(particle_name, branch_name)
+            variables[full_branch_out][0] = AH.getter(intree, full_branch_in)[i_particle]
 
 
-    # Save everything & exit cleanly
-    outtree.AutoSave()
-    outfile.Close()    
-# End of loop over files
+        # Fill fatjets and taggers
+        for object_name, branch_names in objects.iteritems():    
+
+            # First we two branches for the tagger/jet 
+            #  - how far the closest true object was
+            #  - and what true_index (i) it had in the list of true objects
+            full_i_branch_name =  "jet_{0}__close_{1}_i".format(object_name, particle_name)
+            full_dr_branch_name = "jet_{0}__close_{1}_dr".format(object_name, particle_name)
+
+            # Then we build a list of pairs
+            # deltaR and jet_index of the jet in ITS list (so we can access it later)
+            # the true_index of is only used to filter out jets that are matched to other tops!            
+            i_branch = AH.getter(intree, full_i_branch_name)
+            dr_branch = AH.getter(intree, full_dr_branch_name)
+            dr_and_pos = [(dr,pos) for i,dr,pos in zip(i_branch, dr_branch, range(len(i_branch))) if i==i_particle]
+
+            # Apply the Delta R cut
+            dr_and_pos = [(dr,pos) for dr,pos in dr_and_pos if dr < object_drs[object_name]]
+
+            if len(dr_and_pos):
+                # Now extract the closest jet and use it to fill the branches
+                i_matched = sorted(dr_and_pos, key=lambda x:x[0])[0][1]
+
+                for branch_name in branch_names:
+                    full_branch_in  = "jet_{0}__{1}".format(object_name, branch_name)
+                    full_branch_out = "{0}_{1}".format(object_name, branch_name)
+                    variables[full_branch_out][0] = AH.getter(intree, full_branch_in)[i_matched]                    
+            else:
+                for branch_name in branch_names:
+                    full_branch_out = "{0}_{1}".format(object_name, branch_name)
+                    variables[full_branch_out][0] = DEF_VAL_FLOAT
+
+        # Fill the tree
+        outtree.Fill()    
+
+    # End of particle loop
+# End of Event Loop
+
+
+# Save everything & exit cleanly
+outtree.AutoSave()
+outfile.Close()    
+

@@ -2,6 +2,7 @@ echo "Hello World!"
 
 ls -lactrh src/TTH/TTHNtupleAnalyzer/data/*UncertaintySources*
 
+# Put the UncertaintySources in a few places to make sure the NTupelize fins it
 cp -v src/TTH/TTHNtupleAnalyzer/data/*UncertaintySources* .
 cp -v src/TTH/TTHNtupleAnalyzer/data/*UncertaintySources* src/
 cp -v src/TTH/TTHNtupleAnalyzer/data/*UncertaintySources* CMSSW_7_3_0
@@ -48,4 +49,15 @@ python -c "import PSet; print PSet.process.dumpPython()"
 # Ok, let's stop fooling around and execute the job:
 cmsRun -j FrameworkJobReport.xml -p PSet.py
 
-echo "Done"
+echo "Done with cmsRun"
+
+echo "Doing ls"
+ls -lactrh .
+
+echo "Running MakeTaggingNtuple.py"
+python MakeTaggingNtuple.py
+echo "Done with MakeTaggingNtuple.py"
+
+echo "Doing ls"
+ls -lactrh .
+
