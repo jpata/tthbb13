@@ -82,8 +82,8 @@ if False:
 
 
 
-for var in all_vars: 
-    continue
+for var in tagger_vars_08: 
+    #continue
 
     if ("chi" in var.name or 
         "tau" in var.name
@@ -111,13 +111,14 @@ for var in all_vars:
 
 for sample in files.keys():
     
-    if True:
+    if False:
         variable_collection_names = [
             "btag_vars",
-            "mass_vars_15", 
-            "mass_vars_08", 
-            "tau_vars_15", 
-            "tau_vars_08"]
+            #"mass_vars_15", 
+            #"mass_vars_08", 
+            #"tau_vars_15", 
+            #"tau_vars_08"
+        ]
 
         for name in variable_collection_names:
 

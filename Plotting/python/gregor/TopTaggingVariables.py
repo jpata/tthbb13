@@ -65,6 +65,7 @@ tagger_vars_15 = htt_vars + [variable('log(ca15_chi)', "log(#chi) (R=1.5)", -10.
 
 tagger_vars_08 = [
     variable('ca08cmstt_minMass', "CMSTT minMass (R=0.8)", 0., 250, unit = "GeV"),
+    variable('ca08cmstt_topMass', "CMSTT topMass (R=0.8)", 0., 600., unit = "GeV"),
     variable('log(ca08_chi)', "log(#chi) (R=0.8)", -10., 10, extra_cut = 'ca08_chi>0'),
 ]
 
@@ -76,7 +77,7 @@ good_vars = [ variable.di['ca08trimmed_mass'],
               variable.di['log(ca15_chi)'],
               variable.di['looseMultiRHTT_mass'],
               variable.di['ca08cmstt_minMass'],
-              variable.di['ca15_btag'],
+              variable.di['ca08cmstt_topMass'],              
 ]
               
 

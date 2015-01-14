@@ -6,6 +6,8 @@
 # Imports
 ########################################
 
+import os
+
 # With CMSSW
 if "CMSSW_VERSION" in os.environ.keys():
     from TTH.Plotting.Helpers.MutualInformationHelpers import *
