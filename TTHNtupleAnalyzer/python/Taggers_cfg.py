@@ -5,6 +5,9 @@ import FWCore.ParameterSet.Config as cms
 
 from FWCore.ParameterSet.VarParsing import VarParsing
 import os
+import socket
+
+hostname = socket.gethostname()
 
 options = VarParsing('analysis')
 options.register ('skipEvents',
@@ -351,15 +354,22 @@ process.NjettinessCA15SoftDrop = cms.EDProducer("NjettinessAdder",
                             )
 
 # Schedule Shower Deconstruction
-process.SDCA08 = cms.EDProducer("SDProducer",
-                                FatjetName = cms.string("ca08PFJetsCHS"),
-                                MicrojetCone = cms.double(0.2),
-                                InputCard = cms.string("src/TTH/TTHNtupleAnalyzer/data/sd_input_card_08.dat"))
+# Tier3
+if hostname == "t3ui12":
+  sd_path = "../data/"
+# Grid
+else:
+  sd_path = "src/TTH/TTHNtupleAnalyzer/data/"
+
+#process.SDCA08 = cms.EDProducer("SDProducer",
+#                                FatjetName = cms.string("ca08PFJetsCHS"),
+#                                MicrojetCone = cms.double(0.2),
+#                                InputCard = cms.string(sd_path + "sd_input_card_08.dat"))
 
 #process.SDCA15 = cms.EDProducer("SDProducer",
 #                                FatjetName = cms.string("ca15PFJetsCHS"),
 #                                MicrojetCone = cms.double(0.2),
-#                                InputCard = cms.string("src/TTH/TTHNtupleAnalyzer/data/sd_input_card_15.dat"))
+#                                InputCard = cms.string(sd_path + "sd_input_card_15.dat"))
 
 # Setup fatjet collections to store
 li_fatjets_objects = ['ca08PFJetsCHS',  
@@ -384,8 +394,8 @@ li_fatjets_nsubs = ['NjettinessCA08',
                     'NjettinessCA15Trimmed',
                     'NjettinessCA15SoftDrop' ]
 
-li_fatjets_sds = ['SDCA08', 
-                  #'None', 
+li_fatjets_sds = [#'SDCA08', 
+                  'None', 
 		  'None', 
                   'None', 
                   'None', 
@@ -422,13 +432,19 @@ for fatjet_name in li_fatjets_objects:
         sv_tag_info_name = fatjet_name + "SecondaryVertexTagInfos"
         ssv_btags_name   = fatjet_name + "SimpleSecondaryVertexHighEffBJetTags"
 
+        if "08" in fatjet_name:
+                delta_r = 0.8
+        else:
+                delta_r = 1.5
+
         # Setup the modules
         setattr(process, 
                 impact_info_name, 
                 process.pfImpactParameterTagInfos.clone(
                         primaryVertex = cms.InputTag("offlineSlimmedPrimaryVertices"),
                         candidates = cms.InputTag("packedPFCandidates"),
-                        jets = cms.InputTag(fatjet_name)
+                        jets = cms.InputTag(fatjet_name),
+                        maxDeltaR= cms.double(delta_r)
                 ))
 
         setattr(process,
@@ -570,7 +586,7 @@ process.p = cms.Path(
         process.ca08CMSTopTagInfos * 
         process.ca15CMSTopTagInfos * 
 
-        process.SDCA08 * 
+        #process.SDCA08 * 
         #process.SDCA15 * 
 
 	process.LooseMultiRHTTJetsCHS * 
