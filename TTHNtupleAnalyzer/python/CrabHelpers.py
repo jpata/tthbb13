@@ -102,10 +102,10 @@ def hadd(name,
     """ Hadd all root files in basepath+jobname to basepath/jobname.root
     """
 
-    input_dir = basepath + "{0}_{1}_{2}/*".format(name, version, sample_shortname)    
+    input_dir = basepath + "{0}_{1}_{2}/output-tagging_*.root*".format(name, version, sample_shortname)    
     input_filenames = glob.glob(input_dir)
         
-    output_filename = basepath + "{0}_{1}_{2}.root".format(name, version, sample_shortname)    
+    output_filename = basepath + "{0}_{1}_{2}-tagging.root".format(name, version, sample_shortname)    
 
     subprocess.call(["hadd", "-f", output_filename] + input_filenames)
 # End of hadd

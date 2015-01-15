@@ -23,8 +23,8 @@ import TTH.TTHNtupleAnalyzer.AccessHelpers as AH
 
 basepath = '/scratch/gregor/'
 
-#input_name = "ntop_v11_zprime_m2000_1p_13tev-tagging"     
-input_name = "ntop_v11_qcd_800_1000_pythia8_13tev-tagging"     
+input_name = "ntop_v13_zprime_m2000_1p_13tev-tagging"     
+#input_name = "ntop_v13_qcd_800_1000_pythia8_13tev-tagging"     
 input_tree_name = "tree"
 
 input_pickle_file_name = "/shome/gregor/TTH-73X/CMSSW/src/TTH/Plotting/python/gregor/flat_pt_weights.pickle"
