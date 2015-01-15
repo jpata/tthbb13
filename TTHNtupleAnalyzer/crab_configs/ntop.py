@@ -15,7 +15,7 @@ from TTH.TTHNtupleAnalyzer.CrabHelpers import submit, status, download, hadd
 
 # Ntuple name/version and samples to include
 name = "ntop"
-version = "v13"
+version = "v14"
 li_samples = [
     "qcd_800_1000_pythia8_13tev",    
     #"zprime_m1000_1p_13tev",
@@ -74,5 +74,5 @@ elif action == "download":
 # Hadd
 elif action == "hadd":
     for sample_shortname in li_samples:
-        hadd(name, sample_shortname + "-tagging", version, storage_path)    
+        hadd(name, sample_shortname, version, storage_path)    
 
