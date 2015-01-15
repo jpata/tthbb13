@@ -26,9 +26,12 @@ process.load("Configuration.Geometry.GeometryIdeal_cff")
 process.load("RecoBTag.Configuration.RecoBTag_cff") # this loads all available b-taggers
 
 # Load the necessary conditions 
+process.load("Configuration.StandardSequences.MagneticField_cff")
+process.load("Configuration.Geometry.GeometryIdeal_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_mc')
+
 
 #enable debugging printout
 if "TTH_DEBUG" in os.environ:
@@ -422,20 +425,35 @@ li_fatjets_is_basic_jets = [0] * len(li_fatjets_objects)
 
 
 
+## Jet collection we'll be using
+jetCollection=cms.InputTag("ca08PFJetsCHS")
+
+## Load b-tagging modules
+process.pfImpactParameterTagInfos.jets = jetCollection
+
 # Add b-tagging information for all fatjets
 process.my_btagging = cms.Sequence()
 li_fatjets_btags = []
 for fatjet_name in li_fatjets_objects:
 
         # Define the names
-        impact_info_name = fatjet_name + "ImpactParameterTagInfos"
-        sv_tag_info_name = fatjet_name + "SecondaryVertexTagInfos"
-        ssv_btags_name   = fatjet_name + "SimpleSecondaryVertexHighEffBJetTags"
+        impact_info_name          = fatjet_name + "ImpactParameterTagInfos"
+        track_count_high_eff_name = fatjet_name + "TrackCountHighEff"
+        track_count_high_pur_name = fatjet_name + "TrackCountHighPur"
+        jet_prob_name             = fatjet_name + "JetProbability"
+        jet_bprob_name            = fatjet_name + "JetBProbability"
+        sv_tag_info_name          = fatjet_name + "SecondaryVertexTagInfos"
+        ssv_high_eff_btags_name   = fatjet_name + "SimpleSecondaryVertexHighEffBJetTags"
+        ssv_high_pur_btags_name   = fatjet_name + "SimpleSecondaryVertexHighPurBJetTags"
+        csv_btags_name            = fatjet_name + "pfCombinedSecondaryVertexBJetTags"
+        isv_info_name             = fatjet_name + "pfInclusiveSecondaryVertexFinderTagInfos"        
+        csvv2ivf_name             = fatjet_name + "pfCombinedInclusiveSecondaryVertexV2BJetTags"        
 
         if "08" in fatjet_name:
                 delta_r = 0.8
         else:
                 delta_r = 1.5
+
 
         # Setup the modules
         setattr(process, 
@@ -448,25 +466,87 @@ for fatjet_name in li_fatjets_objects:
                 ))
 
         setattr(process,
+                track_count_high_eff_name,                
+                process.pfTrackCountingHighEffBJetTags.clone(
+                        tagInfos = cms.VInputTag(cms.InputTag(impact_info_name))
+                        ))
+
+        setattr(process,
+                track_count_high_pur_name,                
+                process.pfTrackCountingHighPurBJetTags.clone(
+                        tagInfos = cms.VInputTag(cms.InputTag(impact_info_name))
+                        ))
+
+        setattr(process,
+                jet_prob_name,
+                process.pfJetProbabilityBJetTags.clone(
+                        tagInfos = cms.VInputTag(cms.InputTag(impact_info_name))
+                        ))
+
+        setattr(process,
+                jet_bprob_name,
+                process.pfJetBProbabilityBJetTags.clone(
+                        tagInfos = cms.VInputTag(cms.InputTag(impact_info_name))
+                ))
+
+        setattr(process,
                 sv_tag_info_name, 
-                process.pfSecondaryVertexTagInfos.clone(
+                process.pfSecondaryVertexTagInfos.clone(                
                         trackIPTagInfos = cms.InputTag(impact_info_name) 
                 ))
 
         setattr(process,
-                ssv_btags_name,                
+                ssv_high_eff_btags_name,                
                 process.pfSimpleSecondaryVertexHighEffBJetTags.clone(
                         tagInfos = cms.VInputTag(cms.InputTag(sv_tag_info_name))
                 ))
-        
+
+        setattr(process,
+                ssv_high_pur_btags_name,                
+                process.pfSimpleSecondaryVertexHighPurBJetTags.clone(
+                        tagInfos = cms.VInputTag(cms.InputTag(sv_tag_info_name))
+                ))
+
+        setattr(process,
+                csv_btags_name,
+                process.pfCombinedSecondaryVertexBJetTags.clone(
+                        tagInfos = cms.VInputTag(cms.InputTag(impact_info_name),
+                                                 cms.InputTag(sv_tag_info_name))
+                ))
+
+        setattr(process,
+                isv_info_name,                
+                process.pfInclusiveSecondaryVertexFinderTagInfos.clone(
+                        extSVCollection = cms.InputTag('slimmedSecondaryVertices'),
+                        trackIPTagInfos = cms.InputTag(impact_info_name),
+
+                ))
+
+        setattr(process,
+                csvv2ivf_name,
+                process.pfCombinedInclusiveSecondaryVertexV2BJetTags.clone(
+                        tagInfos = cms.VInputTag(cms.InputTag(impact_info_name),
+                                                 cms.InputTag(isv_info_name))
+                ))
+
+
         # Add modules to sequence
-        process.my_btagging += getattr(process, impact_info_name)
-        process.my_btagging += getattr(process, sv_tag_info_name)
-        process.my_btagging += getattr(process, ssv_btags_name)        
+        for module_name in [impact_info_name,
+                            track_count_high_eff_name,
+                            track_count_high_pur_name,
+                            jet_prob_name,
+                            jet_bprob_name,          
+                            sv_tag_info_name,         
+                            ssv_high_eff_btags_name,  
+                            ssv_high_pur_btags_name,  
+                            csv_btags_name,           
+                            isv_info_name,              
+                            csvv2ivf_name]:              
+                process.my_btagging += getattr(process, module_name)
 
         # remember the module that actually produces the b-tag
         # discriminator so we can pass it to the NTupelizer
-        li_fatjets_btags.append(ssv_btags_name)
+        li_fatjets_btags.append(csvv2ivf_name)
 
 # end of loop over fatjets
 
