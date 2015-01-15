@@ -35,8 +35,8 @@ ROOT.gROOT.ForceStyle()
 run_TMVA = True
 
 basepath = '/scratch/gregor/'
-file_name_sig  = basepath + "ntop_v11_zprime_m2000_1p_13tev-tagging-weighted.root"
-file_name_bg   = basepath + "ntop_v11_qcd_800_1000_pythia8_13tev-tagging-weighted.root"
+file_name_sig  = basepath + "ntop_v13_zprime_m2000_1p_13tev-tagging-weighted.root"
+file_name_bg   = basepath + "ntop_v13_qcd_800_1000_pythia8_13tev-tagging-weighted.root"
 
 li_methods      = ["Likelihood"]
 
@@ -77,10 +77,9 @@ all_setups_08 = create_setups(all_vars_08)
 btag_setups = create_setups(btag_vars)
 
 good_setups = create_setups(good_vars)
+cmstt_setups = create_setups(cmstt_vars)
 
 all_setups = all_setups_08 + all_setups_15 + btag_setups
-
-
 
 mass_setups = mass_setups_08 + mass_setups_15
 tau_setups = tau_setups_08 + tau_setups_15
@@ -88,11 +87,12 @@ tagger_setups = tagger_setups_08 + tagger_setups_15
 
 
 setup_htt_combined = TMVASetup("HTT_combined",
-                               "HTT (m, f_W, #Delta R)",
+                               "HTT (m, f_{W})",
                                ["Cuts"], 
                                [variable.di['looseMultiRHTT_mass'],
                                 variable.di['looseMultiRHTT_fW'],
-                                variable.di['looseMultiRHTT_Rmin-looseMultiRHTT_RminExpected']],                               
+                                #variable.di['looseMultiRHTT_Rmin-looseMultiRHTT_RminExpected']
+                            ],                               
                                file_name_sig,
                                file_name_bg,
                                fiducial_cut_sig = "((pt>801)&&(pt<999))",
@@ -127,6 +127,20 @@ setup_08_combined = TMVASetup("08_combined",
                               weight_bg = "weight")
 #doTMVA(setup_08_combined)
 
+setup_08_combined2 = TMVASetup("08_combined2",
+                              "softdrop m + #tau_{3}/#tau_{2} + .. (R=0.8)",
+                              ["Cuts"], 
+                              [variable.di['ca08_tau3/ca08_tau2'],
+                               variable.di['ca08softdrop_tau3/ca08_tau2'],
+                               variable.di['ca08softdrop_mass']],
+                              file_name_sig,
+                              file_name_bg,
+                              fiducial_cut_sig = "((pt>801)&&(pt<999))",
+                              fiducial_cut_bg  = "((pt>801)&&(pt<999))",
+                              weight_sig = "weight",
+                              weight_bg = "weight")
+#doTMVA(setup_08_combined2)
+
 setup_softdrop_b = TMVASetup("softdrop_b",
                               "softdrop m + b-tag (R=0.8)",
                               ["Cuts"], 
@@ -143,12 +157,12 @@ setup_softdrop_b = TMVASetup("softdrop_b",
 
 
 if run_TMVA:
-    for setup in tau31_setups:
+    for setup in tau_cross_setups:
         doTMVA(setup)
 
-plotROCMultiple("ROC_good", [setup_08_combined, setup_cmstt_combined] + good_setups)
+plotROCMultiple("ROC_good", [setup_08_combined, setup_cmstt_combined, setup_htt_combined] + good_setups)
 
 plotROCMultiple("ROC_mass", mass_setups)
 plotROCMultiple("ROC_tau", tau_setups)
-plotROCMultiple("ROC_tau31", tau31_setups)
+plotROCMultiple("ROC_tau31", tau31_setups_08 + tau31_setups_15)
 plotROCMultiple("ROC_tagger", tagger_setups)

@@ -43,6 +43,8 @@ tau_vars_08 = [
     variable('ca08pruned_tau3/ca08pruned_tau2', "pruned #tau_{3}/#tau_{2}  (R=0.8)", 0.01, 1.),
     variable('ca08trimmed_tau3/ca08trimmed_tau2', "trimmed #tau_{3}/#tau_{2}  (R=0.8)", 0.01, 1.),
     variable('ca08softdrop_tau3/ca08softdrop_tau2', "softdrop #tau_{3}/#tau_{2}  (R=0.8)", 0.01, 1.),    
+    variable('ca08softdrop_tau3/ca08_tau2', "#tau_{3, softdrop}/#tau_{2}  (R=0.8)", 0.01, 1.),
+    variable('ca08_tau3/ca08softdrop_tau2', "#tau_{3}/#tau_{2,softdrop}  (R=0.8)", 0.01, 1.),
 ]
 
 tau31_vars_15 = [
@@ -61,10 +63,6 @@ tau31_vars_08 = [
     variable('ca08softdrop_tau3/ca08softdrop_tau1', "softdrop #tau_{3}/#tau_{1}  (R=0.8)", 0.01, 1.),    
 ]
 
-tau_cross_vars = [
-    variable('ca08softdrop_tau3/ca08_tau2', "#tau_{3, softdrop}/#tau_{2}  (R=0.8)", 0.01, 1.),
-    variable('ca08_tau3/ca08softdrop_tau2', "#tau_{3}/#tau_{2,softdrop}  (R=0.8)", 0.01, 1.),
-]
 
 
 
@@ -81,28 +79,37 @@ htt_vars = [
     variable('looseMultiRHTT_Rmin-looseMultiRHTT_RminExpected', "HTT #Delta R_{min,exp}", -0.5, 1.5),
 ]
 
-tagger_vars_15 = htt_vars + [variable('log(ca15_chi)', "log(#chi) (R=1.5)", -10., 10, extra_cut = 'ca15_chi>0'),
-                             variable('ca15cmstt_minMass', "CMSTT minMass (R=1.5)", 0., 400, unit = "GeV")
-                             ]
+tagger_vars_15 = [variable('log(ca15_chi)', "log(#chi) (R=1.5)", -10., 10, extra_cut = 'ca15_chi>0'),
+                  variable('ca15cmstt_minMass', "CMSTT minMass (R=1.5)", 0., 400, unit = "GeV"),
+                  variable('ca15cmstt_topMass', "CMSTT topMass (R=1.5)", 0., 600, unit = "GeV")
+              ] + htt_vars 
                              
 
 tagger_vars_08 = [
+    variable('log(ca08_chi)', "log(#chi) (R=0.8)", -10., 10, extra_cut = 'ca08_chi>0'),
     variable('ca08cmstt_minMass', "CMSTT minMass (R=0.8)", 0., 250, unit = "GeV"),
     variable('ca08cmstt_topMass', "CMSTT topMass (R=0.8)", 0., 600., unit = "GeV"),
-    variable('log(ca08_chi)', "log(#chi) (R=0.8)", -10., 10, extra_cut = 'ca08_chi>0'),
 ]
 
-tagger_vars = tagger_vars_15 + tagger_vars_08
 
-good_vars = [ variable.di['ca08trimmed_mass'],
-              variable.di['ca08softdrop_mass'],
+tagger_vars = tagger_vars_08 + tagger_vars_15
+
+good_vars = [ variable.di['ca08softdrop_mass'],
               variable.di['ca08_tau3/ca08_tau2'],
-              variable.di['log(ca15_chi)'],
               variable.di['looseMultiRHTT_mass'],
-              variable.di['looseMultiRHTT_fW'],
-              variable.di['ca08cmstt_topMass'],              
               variable.di['ca08cmstt_minMass'],
+              variable.di['log(ca15_chi)'],
 ]
+
+cmstt_vars = [variable.di['ca08cmstt_topMass'],              
+              variable.di['ca08cmstt_minMass'],
+              variable.di['ca15cmstt_topMass'],              
+              variable.di['ca15cmstt_minMass']
+]
+
+
+sd_vars = [variable.di['log(ca08_chi)'],              
+           variable.di['log(ca15_chi)']]
               
 
 all_vars_15 = mass_vars_15 + tau_vars_15 + tau31_vars_15 + tagger_vars_15 
