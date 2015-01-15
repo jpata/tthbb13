@@ -56,6 +56,7 @@ class combinedPlot:
                 axis_unit       = "",
                 log_y           = False,
                 normalize       = False,
+                draw_legend     = True,
                 legend_origin_x = 0.52,
                 legend_origin_y = 0.7, 
                 legend_size_x   = 0.38,
@@ -74,6 +75,7 @@ class combinedPlot:
       axis_unit       : (string) unit for the x-axis (added to x- and y-labels)
       log_y           : (bool) logarithmic y-axis
       normalize       : (bool) area-normalize the graphs
+      draw_legend     : (bool) draw the legend
       legend_origin_x : (float) position of the left? edge of the legend
       legend_origin_y : (float) position of the upper? edge of the legend
       legend_size_x   : (float) horizontal extension of the legen
@@ -118,10 +120,10 @@ li_colors = [ROOT.kBlack,
              ROOT.kRed, 
              ROOT.kBlue, 
              28, 
-             ROOT.kOrange, 
+             #ROOT.kOrange, 
+             ROOT.kGray, 
              ROOT.kGreen, 
              ROOT.kMagenta, 
-             ROOT.kGray, 
              ROOT.kCyan,
              ROOT.kOrange+3
           ]*10
@@ -346,7 +348,8 @@ def doWork( dic_files, output_dir ):
         
          
         # Draw the legend
-        leg.Draw()
+        if cp.draw_legend:
+           leg.Draw()
         
         # Save the results to a file (in different formats)
         OutputDirectoryHelper.ManyPrint( c, output_dir, cp.name )
