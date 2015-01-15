@@ -36,10 +36,22 @@ for k,v in files.iteritems():
     files[k] = basepath + v + ".root"
 
 
-mis =[ #mi("taggers", "zprime_m2000_1p", "qcd_800_1000", tagger_vars, fiducial_cut_and_weight),
+interesting_taus = tau_cross_vars + [var.di['ca08_tau3/ca08_tau2'],
+                                     var.di['ca08softdrop_tau3/ca08softdrop_tau2'],
+                                     var.di['ca08softdrop_mass']]
+
+mis =[ 
        #mi("masses", "zprime_m2000_1p", "qcd_800_1000", mass_vars_08+mass_vars_15, fiducial_cut_and_weight),
        #mi("taus", "zprime_m2000_1p", "qcd_800_1000",   tau_vars_08+tau_vars_15+[var.di['ca08softdrop_mass']], fiducial_cut_and_weight),
-       mi("good", "zprime_m2000_1p", "qcd_800_1000", good_vars, fiducial_cut_and_weight),
+       #mi("interesting_taus", "zprime_m2000_1p", "qcd_800_1000", interesting_taus, fiducial_cut_and_weight),
+       
+
+    mi("taus_08", "zprime_m2000_1p", "qcd_800_1000",   tau_vars_08 + tau_cross_vars, fiducial_cut_and_weight),
+    #mi("taus_15", "zprime_m2000_1p", "qcd_800_1000",   tau_vars_15, fiducial_cut_and_weight),
+    #mi("masses_08", "zprime_m2000_1p", "qcd_800_1000",   mass_vars_08, fiducial_cut_and_weight),
+    #mi("masses_15", "zprime_m2000_1p", "qcd_800_1000",   mass_vars_15, fiducial_cut_and_weight),
+    #mi("taggers", "zprime_m2000_1p", "qcd_800_1000", tagger_vars, fiducial_cut_and_weight),
+    mi("good", "zprime_m2000_1p", "qcd_800_1000", good_vars, fiducial_cut_and_weight),
 ]
 
 MakePlots(mis, files)
