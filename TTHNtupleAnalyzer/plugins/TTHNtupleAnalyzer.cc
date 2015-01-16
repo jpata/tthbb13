@@ -475,6 +475,8 @@ private:
 	const double	muPt_min_;
 	const double	elePt_min_;
 	const double	tauPt_min_;
+  	const double	genPartonPt_min_;
+  
 	JetCorrectorParameters* jetCorrPars;
 	JetCorrectionUncertainty* jetCorrUnc;
 	const edm::EDGetTokenT<double> rhoSrc_;
@@ -536,6 +538,8 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
 	muPt_min_ (iConfig.getUntrackedParameter<double>("muPt_min", 5.)),
 	elePt_min_ (iConfig.getUntrackedParameter<double>("elePt_min", 5.)),
 	tauPt_min_ (iConfig.getUntrackedParameter<double>("tauPt_min", 5.)),
+	genPartonPt_min_ (iConfig.getUntrackedParameter<double>("genPartonPt_min", 200.)),
+
 	jetCorrPars(new JetCorrectorParameters(iConfig.getParameter<edm::FileInPath>("jecFile").fullPath().c_str(), "Total")),
 	jetCorrUnc(new JetCorrectionUncertainty(*jetCorrPars)),
 	rhoSrc_(consumes<double>(iConfig.getParameter<edm::InputTag>("rho")))
@@ -1449,7 +1453,6 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	vector<const reco::GenParticle*> antibquarks;
 	
 	// Hard partons (usually for QCD matching)
-	double min_hard_parton_pt = 200; 
 	vector<const reco::Candidate*> hard_partons;
 
 	// Higgs Bosons
@@ -1467,7 +1470,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 			  antibquarks);	  
 
 	  if (ADD_TRUE_PARTON_MATCHING_FOR_FJ || ADD_TRUE_PARTON_MATCHING_FOR_HTT || ADD_TRUE_PARTON_MATCHING_FOR_CMSTT)
-	    get_hard_partons(pruned, min_hard_parton_pt, hard_partons);
+	    get_hard_partons(pruned, genPartonPt_min_, hard_partons);
 
 	  if (ADD_TRUE_HIGGS_MATCHING_FOR_FJ || ADD_TRUE_HIGGS_MATCHING_FOR_HTT || ADD_TRUE_HIGGS_MATCHING_FOR_CMSTT)
 	    get_gen_higgs(pruned, min_higgs_pt, gen_higgs);
