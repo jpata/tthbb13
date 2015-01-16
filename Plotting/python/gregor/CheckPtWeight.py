@@ -30,8 +30,8 @@ else:
     basepath = '/Users/gregor/'
 
 files = {}
-files["qcd_800_1000"] = "ntop_v13_qcd_800_1000_pythia8_13tev-tagging-weighted"
-files["zprime_m2000"] = "ntop_v13_zprime_m2000_1p_13tev-tagging-weighted"     
+files["qcd_800_1000"] = "ntop_v14_qcd_800_1000_pythia8_13tev-tagging-weighted"
+files["zprime_m2000"] = "ntop_v14_zprime_m2000_1p_13tev-tagging-weighted"     
                                          
 # for the filename: basepath + filename + .root
 full_file_names = {}
@@ -45,7 +45,7 @@ output_dir = "results/CheckPtWeight/"
 # Define plots and do fits
 ########################################
 
-if True:
+if False:
     combinedPlot("true_top_pt_cut",
                  [plot( "zprime_m2000", 
                         'hadtop_pt', 
@@ -63,7 +63,7 @@ if True:
                  legend_size_x   = 0.2,
                  legend_size_y   = 0.05 * 2)
 
-if True:
+if False:
     combinedPlot("parton_pt_cut",
                  [plot( "qcd_800_1000", 
                         'parton_pt', 
@@ -149,7 +149,7 @@ for sample in files.keys():
                      legend_size_x   = 0.2,
                      legend_size_y   = 0.05 * len(collection))
 
-    if True:
+    if False:
         name = "tau_vars_08"
         collection = globals()[name]
         if "qcd" in sample:
@@ -234,7 +234,7 @@ for sample in files.keys():
                      legend_size_x   = 0.2,
                      legend_size_y   = 0.05 * len(collection))
 
-    if False:
+    if True:
         name = "btag_vars"
         collection = globals()[name]
         combinedPlot(name + "_" + sample,                     

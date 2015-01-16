@@ -23,8 +23,8 @@ from TTH.Plotting.Helpers.CompareDistributionsHelpers import *
 basepath = '/scratch/gregor/'
 
 files = {}
-files["qcd_800_1000"] = "ntop_v13_qcd_800_1000_pythia8_13tev-tagging"
-files["zprime_m2000"] = "ntop_v13_zprime_m2000_1p_13tev-tagging"     
+files["qcd_800_1000"] = "ntop_v14_qcd_800_1000_pythia8_13tev-tagging"
+files["zprime_m2000"] = "ntop_v14_zprime_m2000_1p_13tev-tagging"     
                                          
 
 # for the filename: basepath + filename + .root

@@ -67,8 +67,8 @@ tau31_vars_08 = [
 
 
 btag_vars = [
-    variable('ca15_btag', "btag (R=1.5)", 0, 10),
-    variable('ca08_btag', "btag (R=0.8)", 0, 10),
+    variable('ca15_btag', "btag (R=1.5)", -0.1, 1.1),
+    variable('ca08_btag', "btag (R=0.8)", -0.1, 1.1),
 ]
 
 
