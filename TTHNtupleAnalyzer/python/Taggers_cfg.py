@@ -425,35 +425,23 @@ li_fatjets_is_basic_jets = [0] * len(li_fatjets_objects)
 
 
 
-## Jet collection we'll be using
-jetCollection=cms.InputTag("ca08PFJetsCHS")
-
-## Load b-tagging modules
-process.pfImpactParameterTagInfos.jets = jetCollection
-
 # Add b-tagging information for all fatjets
 process.my_btagging = cms.Sequence()
 li_fatjets_btags = []
 for fatjet_name in li_fatjets_objects:
 
+
         # Define the names
         impact_info_name          = fatjet_name + "ImpactParameterTagInfos"
-        track_count_high_eff_name = fatjet_name + "TrackCountHighEff"
-        track_count_high_pur_name = fatjet_name + "TrackCountHighPur"
-        jet_prob_name             = fatjet_name + "JetProbability"
-        jet_bprob_name            = fatjet_name + "JetBProbability"
         sv_tag_info_name          = fatjet_name + "SecondaryVertexTagInfos"
-        ssv_high_eff_btags_name   = fatjet_name + "SimpleSecondaryVertexHighEffBJetTags"
-        ssv_high_pur_btags_name   = fatjet_name + "SimpleSecondaryVertexHighPurBJetTags"
-        csv_btags_name            = fatjet_name + "pfCombinedSecondaryVertexBJetTags"
         isv_info_name             = fatjet_name + "pfInclusiveSecondaryVertexFinderTagInfos"        
+        csvv2_computer_name       = fatjet_name + "combinedSecondaryVertexV2Computer"
         csvv2ivf_name             = fatjet_name + "pfCombinedInclusiveSecondaryVertexV2BJetTags"        
 
         if "08" in fatjet_name:
                 delta_r = 0.8
         else:
                 delta_r = 1.5
-
 
         # Setup the modules
         setattr(process, 
@@ -465,81 +453,43 @@ for fatjet_name in li_fatjets_objects:
                         maxDeltaR= cms.double(delta_r)
                 ))
 
-        setattr(process,
-                track_count_high_eff_name,                
-                process.pfTrackCountingHighEffBJetTags.clone(
-                        tagInfos = cms.VInputTag(cms.InputTag(impact_info_name))
-                        ))
-
-        setattr(process,
-                track_count_high_pur_name,                
-                process.pfTrackCountingHighPurBJetTags.clone(
-                        tagInfos = cms.VInputTag(cms.InputTag(impact_info_name))
-                        ))
-
-        setattr(process,
-                jet_prob_name,
-                process.pfJetProbabilityBJetTags.clone(
-                        tagInfos = cms.VInputTag(cms.InputTag(impact_info_name))
-                        ))
-
-        setattr(process,
-                jet_bprob_name,
-                process.pfJetBProbabilityBJetTags.clone(
-                        tagInfos = cms.VInputTag(cms.InputTag(impact_info_name))
-                ))
 
         setattr(process,
                 sv_tag_info_name, 
                 process.pfSecondaryVertexTagInfos.clone(                
-                        trackIPTagInfos = cms.InputTag(impact_info_name) 
+                        trackIPTagInfos = cms.InputTag(impact_info_name),                        
                 ))
+        getattr(process, sv_tag_info_name).trackSelection.jetDeltaRMax = cms.double(delta_r)
+        getattr(process, sv_tag_info_name).vertexCuts.maxDeltaRToJetAxis = cms.double(delta_r)
 
-        setattr(process,
-                ssv_high_eff_btags_name,                
-                process.pfSimpleSecondaryVertexHighEffBJetTags.clone(
-                        tagInfos = cms.VInputTag(cms.InputTag(sv_tag_info_name))
-                ))
-
-        setattr(process,
-                ssv_high_pur_btags_name,                
-                process.pfSimpleSecondaryVertexHighPurBJetTags.clone(
-                        tagInfos = cms.VInputTag(cms.InputTag(sv_tag_info_name))
-                ))
-
-        setattr(process,
-                csv_btags_name,
-                process.pfCombinedSecondaryVertexBJetTags.clone(
-                        tagInfos = cms.VInputTag(cms.InputTag(impact_info_name),
-                                                 cms.InputTag(sv_tag_info_name))
-                ))
 
         setattr(process,
                 isv_info_name,                
                 process.pfInclusiveSecondaryVertexFinderTagInfos.clone(
-                        extSVCollection = cms.InputTag('slimmedSecondaryVertices'),
-                        trackIPTagInfos = cms.InputTag(impact_info_name),
-
+                        extSVCollection               = cms.InputTag('slimmedSecondaryVertices'),
+                        trackIPTagInfos               = cms.InputTag(impact_info_name),
+                        extSVDeltaRToJet              = cms.double(delta_r)
                 ))
+        getattr(process, isv_info_name).vertexCuts.maxDeltaRToJetAxis = cms.double(delta_r)
+        
 
+        setattr(process,
+                csvv2_computer_name,
+                process.candidateCombinedSecondaryVertexV2Computer.clone())
+        getattr(process, csvv2_computer_name).trackSelection.jetDeltaRMax       = cms.double(delta_r) 
+        getattr(process, csvv2_computer_name).trackPseudoSelection.jetDeltaRMax = cms.double(delta_r) 
+        
         setattr(process,
                 csvv2ivf_name,
                 process.pfCombinedInclusiveSecondaryVertexV2BJetTags.clone(
                         tagInfos = cms.VInputTag(cms.InputTag(impact_info_name),
-                                                 cms.InputTag(isv_info_name))
+                                                 cms.InputTag(isv_info_name)),
+                        jetTagComputer = cms.string(csvv2_computer_name,)
                 ))
-
 
         # Add modules to sequence
         for module_name in [impact_info_name,
-                            track_count_high_eff_name,
-                            track_count_high_pur_name,
-                            jet_prob_name,
-                            jet_bprob_name,          
                             sv_tag_info_name,         
-                            ssv_high_eff_btags_name,  
-                            ssv_high_pur_btags_name,  
-                            csv_btags_name,           
                             isv_info_name,              
                             csvv2ivf_name]:              
                 process.my_btagging += getattr(process, module_name)
