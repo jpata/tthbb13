@@ -44,15 +44,19 @@ else:
 # Determine particle species
 # Tier3
 if socket.gethostname() == "t3ui12":
-    particle_name = "hadtop"
+    particle_name = "parton"
 # Grid
 else:
     import PSet
     initial_miniAOD_filename = list(PSet.process.source.fileNames)[0]
     if "ZPrimeToTTJets" in initial_miniAOD_filename:
         particle_name = "hadtop"
+    elif "TTbarH_HToBB_M" in initial_miniAOD_filename:
+        particle_name = "higgs"
     else:
         particle_name = "parton"
+
+
     print "Initial MiniAOD filename:", initial_miniAOD_filename
     print "Determined particle_name:", particle_name
         
@@ -115,6 +119,7 @@ object_drs = {
 infile = ROOT.TFile(infile_name)
 intree = infile.Get('tthNtupleAnalyzer/events')
 
+branches_in_input = [b.GetName() for b in intree.GetListOfBranches()]
 
 n_entries = intree.GetEntries()
 
@@ -141,11 +146,20 @@ AH.addScalarBranches(variables,
 # Setup the output branches for tagging variables
 for object_name, branch_names in objects.iteritems():    
     for branch_name in branch_names:
-        AH.addScalarBranches( variables,
-                              variable_types,
-                              outtree,
-                              ["{0}_{1}".format(object_name, branch_name)],
-                              datatype = 'float')
+
+        full_branch_in  = "jet_{0}__{1}".format(object_name, branch_name)
+        full_branch_out =  "{0}_{1}".format(object_name, branch_name)
+
+        if full_branch_in in branches_in_input:
+            AH.addScalarBranches( variables,
+                                  variable_types,
+                                  outtree,
+                                  [full_branch_out],
+                                  datatype = 'float')
+        else:
+            print "Warning: Branch {0} not available in input file. Removing full object {1}".format(full_branch_in, object_name)
+            objects.pop(object_name, 0)
+# End of loop over objects and branches
 
 
 ########################################
