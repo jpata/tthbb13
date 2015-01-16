@@ -365,9 +365,10 @@ void get_hard_partons(edm::Handle<edm::View<reco::GenParticle>> pruned,
 
   bool debug_this = false;
 
-
-  if (debug_this)
+  if (debug_this){
+    std::cout << "parton_status = " << parton_status << std::endl;
     std::cout << "number of pruned particles: " << pruned->size() << std::endl;
+  }
 
   // Extract the status X  
   vector<const reco::GenParticle*> status_X_particles;
