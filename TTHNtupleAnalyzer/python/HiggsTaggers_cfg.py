@@ -84,7 +84,24 @@ process.ca15PFJetsCHS.jetPtMin = cms.double(200)
 # Add grooming
 process.ca15PFJetsCHSFiltered = process.ca15PFJetsCHS.clone(
     useFiltering = cms.bool(True),
-    nFilt = cms.int32(2),
+    nFilt = cms.int32(3),
+    rFilt = cms.double(0.3),
+    useExplicitGhosts = cms.bool(True),
+)
+
+process.ca15PFJetsCHSMassDrop = process.ca15PFJetsCHS.clone(
+    useMassDropTagger = cms.bool(True),
+    muCut = cms.double(0.667),
+    yCut = cms.double(0.08),
+    useExplicitGhosts = cms.bool(True),
+)
+
+process.ca15PFJetsCHSMassDropFiltered = process.ca15PFJetsCHS.clone(
+    useMassDropTagger = cms.bool(True),
+    useFiltering = cms.bool(True),
+    muCut = cms.double(0.667),
+    yCut = cms.double(0.08),
+    nFilt = cms.int32(3),
     rFilt = cms.double(0.3),
     useExplicitGhosts = cms.bool(True),
 )
@@ -129,6 +146,34 @@ process.NjettinessCA15 = cms.EDProducer("NjettinessAdder",
 
 process.NjettinessCA15Filtered = cms.EDProducer("NjettinessAdder",
                                                 src=cms.InputTag("ca15PFJetsCHSFiltered"),
+                                                Njets=cms.vuint32(1,2,3),          # compute 1-, 2-, 3- subjettiness
+                                                # variables for measure definition : 
+                                                measureDefinition = cms.uint32( 0 ), # CMS default is normalized measure
+                                                beta = cms.double(1.0),              # CMS default is 1
+                                                R0 = cms.double( 1.5 ),              # CMS default is jet cone size
+                                                Rcutoff = cms.double( -999.0),       # not used by default
+                                                # variables for axes definition :
+                                                axesDefinition = cms.uint32( 6 ),    # CMS default is 1-pass KT axes
+                                                nPass = cms.int32(-999),             # not used by default
+                                                akAxesR0 = cms.double(-999.0)        # not used by default
+                            )
+
+process.NjettinessCA15MassDrop = cms.EDProducer("NjettinessAdder",
+                                                src=cms.InputTag("ca15PFJetsCHSMassDrop"),
+                                                Njets=cms.vuint32(1,2,3),          # compute 1-, 2-, 3- subjettiness
+                                                # variables for measure definition : 
+                                                measureDefinition = cms.uint32( 0 ), # CMS default is normalized measure
+                                                beta = cms.double(1.0),              # CMS default is 1
+                                                R0 = cms.double( 1.5 ),              # CMS default is jet cone size
+                                                Rcutoff = cms.double( -999.0),       # not used by default
+                                                # variables for axes definition :
+                                                axesDefinition = cms.uint32( 6 ),    # CMS default is 1-pass KT axes
+                                                nPass = cms.int32(-999),             # not used by default
+                                                akAxesR0 = cms.double(-999.0)        # not used by default
+                            )
+
+process.NjettinessCA15MassDropFiltered = cms.EDProducer("NjettinessAdder",
+                                                src=cms.InputTag("ca15PFJetsCHSMassDropFiltered"),
                                                 Njets=cms.vuint32(1,2,3),          # compute 1-, 2-, 3- subjettiness
                                                 # variables for measure definition : 
                                                 measureDefinition = cms.uint32( 0 ), # CMS default is normalized measure
@@ -187,12 +232,16 @@ process.NjettinessCA15SoftDrop = cms.EDProducer("NjettinessAdder",
 # Setup fatjet collections to store
 li_fatjets_objects = ['ca15PFJetsCHS',  
                       'ca15PFJetsCHSFiltered',  
+                      'ca15PFJetsCHSMassDrop',  
+                      'ca15PFJetsCHSMassDropFiltered',  
                       'ca15PFJetsCHSPruned',  
                       'ca15PFJetsCHSTrimmed' ,
                       'ca15PFJetsCHSSoftDrop'  ]
 
 li_fatjets_nsubs = ['NjettinessCA15', 
                     'NjettinessCA15Filtered', 
+                    'NjettinessCA15MassDrop', 
+                    'NjettinessCA15MassDropFiltered', 
                     'NjettinessCA15Pruned', 
                     'NjettinessCA15Trimmed',
                     'NjettinessCA15SoftDrop' ]
@@ -200,41 +249,38 @@ li_fatjets_nsubs = ['NjettinessCA15',
 li_fatjets_sds = ['None', 
                   'None', 
                   'None', 
+                  'None', 
+                  'None', 
                   'None',
                   'None' ]
 
 li_fatjets_branches =  ['ca15',           
                         'ca15filtered',           
+                        'ca15massdrop',           
+                        'ca15massdropfiltered',           
                         'ca15pruned',           
                         'ca15trimmed',
                         'ca15softdrop']
 
 li_fatjets_is_basic_jets = [0] * len(li_fatjets_objects)
 
-
 # Add b-tagging information for all fatjets
 process.my_btagging = cms.Sequence()
 li_fatjets_btags = []
 for fatjet_name in li_fatjets_objects:
 
+
         # Define the names
         impact_info_name          = fatjet_name + "ImpactParameterTagInfos"
-        track_count_high_eff_name = fatjet_name + "TrackCountHighEff"
-        track_count_high_pur_name = fatjet_name + "TrackCountHighPur"
-        jet_prob_name             = fatjet_name + "JetProbability"
-        jet_bprob_name            = fatjet_name + "JetBProbability"
         sv_tag_info_name          = fatjet_name + "SecondaryVertexTagInfos"
-        ssv_high_eff_btags_name   = fatjet_name + "SimpleSecondaryVertexHighEffBJetTags"
-        ssv_high_pur_btags_name   = fatjet_name + "SimpleSecondaryVertexHighPurBJetTags"
-        csv_btags_name            = fatjet_name + "pfCombinedSecondaryVertexBJetTags"
         isv_info_name             = fatjet_name + "pfInclusiveSecondaryVertexFinderTagInfos"        
+        csvv2_computer_name       = fatjet_name + "combinedSecondaryVertexV2Computer"
         csvv2ivf_name             = fatjet_name + "pfCombinedInclusiveSecondaryVertexV2BJetTags"        
 
         if "08" in fatjet_name:
                 delta_r = 0.8
         else:
                 delta_r = 1.5
-
 
         # Setup the modules
         setattr(process, 
@@ -246,81 +292,43 @@ for fatjet_name in li_fatjets_objects:
                         maxDeltaR= cms.double(delta_r)
                 ))
 
-        setattr(process,
-                track_count_high_eff_name,                
-                process.pfTrackCountingHighEffBJetTags.clone(
-                        tagInfos = cms.VInputTag(cms.InputTag(impact_info_name))
-                        ))
-
-        setattr(process,
-                track_count_high_pur_name,                
-                process.pfTrackCountingHighPurBJetTags.clone(
-                        tagInfos = cms.VInputTag(cms.InputTag(impact_info_name))
-                        ))
-
-        setattr(process,
-                jet_prob_name,
-                process.pfJetProbabilityBJetTags.clone(
-                        tagInfos = cms.VInputTag(cms.InputTag(impact_info_name))
-                        ))
-
-        setattr(process,
-                jet_bprob_name,
-                process.pfJetBProbabilityBJetTags.clone(
-                        tagInfos = cms.VInputTag(cms.InputTag(impact_info_name))
-                ))
 
         setattr(process,
                 sv_tag_info_name, 
                 process.pfSecondaryVertexTagInfos.clone(                
-                        trackIPTagInfos = cms.InputTag(impact_info_name) 
+                        trackIPTagInfos = cms.InputTag(impact_info_name),                        
                 ))
+        getattr(process, sv_tag_info_name).trackSelection.jetDeltaRMax = cms.double(delta_r)
+        getattr(process, sv_tag_info_name).vertexCuts.maxDeltaRToJetAxis = cms.double(delta_r)
 
-        setattr(process,
-                ssv_high_eff_btags_name,                
-                process.pfSimpleSecondaryVertexHighEffBJetTags.clone(
-                        tagInfos = cms.VInputTag(cms.InputTag(sv_tag_info_name))
-                ))
-
-        setattr(process,
-                ssv_high_pur_btags_name,                
-                process.pfSimpleSecondaryVertexHighPurBJetTags.clone(
-                        tagInfos = cms.VInputTag(cms.InputTag(sv_tag_info_name))
-                ))
-
-        setattr(process,
-                csv_btags_name,
-                process.pfCombinedSecondaryVertexBJetTags.clone(
-                        tagInfos = cms.VInputTag(cms.InputTag(impact_info_name),
-                                                 cms.InputTag(sv_tag_info_name))
-                ))
 
         setattr(process,
                 isv_info_name,                
                 process.pfInclusiveSecondaryVertexFinderTagInfos.clone(
-                        extSVCollection = cms.InputTag('slimmedSecondaryVertices'),
-                        trackIPTagInfos = cms.InputTag(impact_info_name),
-
+                        extSVCollection               = cms.InputTag('slimmedSecondaryVertices'),
+                        trackIPTagInfos               = cms.InputTag(impact_info_name),
+                        extSVDeltaRToJet              = cms.double(delta_r)
                 ))
+        getattr(process, isv_info_name).vertexCuts.maxDeltaRToJetAxis = cms.double(delta_r)
+        
 
+        setattr(process,
+                csvv2_computer_name,
+                process.candidateCombinedSecondaryVertexV2Computer.clone())
+        getattr(process, csvv2_computer_name).trackSelection.jetDeltaRMax       = cms.double(delta_r) 
+        getattr(process, csvv2_computer_name).trackPseudoSelection.jetDeltaRMax = cms.double(delta_r) 
+        
         setattr(process,
                 csvv2ivf_name,
                 process.pfCombinedInclusiveSecondaryVertexV2BJetTags.clone(
                         tagInfos = cms.VInputTag(cms.InputTag(impact_info_name),
-                                                 cms.InputTag(isv_info_name))
+                                                 cms.InputTag(isv_info_name)),
+                        jetTagComputer = cms.string(csvv2_computer_name,)
                 ))
-
 
         # Add modules to sequence
         for module_name in [impact_info_name,
-                            track_count_high_eff_name,
-                            track_count_high_pur_name,
-                            jet_prob_name,
-                            jet_bprob_name,          
                             sv_tag_info_name,         
-                            ssv_high_eff_btags_name,  
-                            ssv_high_pur_btags_name,  
-                            csv_btags_name,           
                             isv_info_name,              
                             csvv2ivf_name]:              
                 process.my_btagging += getattr(process, module_name)
@@ -391,18 +399,23 @@ process.TFileService = cms.Service("TFileService",
 
 
 
+
 process.p = cms.Path(
 
         process.chs *
         process.ca15PFJetsCHS *
 
         process.ca15PFJetsCHSFiltered * 
+        process.ca15PFJetsCHSMassDrop * 
+        process.ca15PFJetsCHSMassDropFiltered * 
         process.ca15PFJetsCHSPruned   * 
         process.ca15PFJetsCHSTrimmed  * 
         process.ca15PFJetsCHSSoftDrop *
 
         process.NjettinessCA15 *        
         process.NjettinessCA15Filtered *        
+        process.NjettinessCA15MassDrop *        
+        process.NjettinessCA15MassDropFiltered *        
         process.NjettinessCA15Pruned *        
         process.NjettinessCA15Trimmed *        
         process.NjettinessCA15SoftDrop *        
@@ -411,13 +424,4 @@ process.p = cms.Path(
         
 	process.tthNtupleAnalyzer
 )
-
-if "TTH_DEBUG" in os.environ:
-	process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
-	process.printTree = cms.EDAnalyzer("ParticleListDrawer",
-		maxEventsToPrint = cms.untracked.int32(-1),
-		printVertex = cms.untracked.bool(True),
-		src = cms.InputTag("prunedGenParticles")
-	)
-	process.p += process.printTree
 
