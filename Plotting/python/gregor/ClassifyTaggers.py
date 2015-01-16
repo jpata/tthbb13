@@ -35,8 +35,8 @@ ROOT.gROOT.ForceStyle()
 run_TMVA = True
 
 basepath = '/scratch/gregor/'
-file_name_sig  = basepath + "ntop_v13_zprime_m2000_1p_13tev-tagging-weighted.root"
-file_name_bg   = basepath + "ntop_v13_qcd_800_1000_pythia8_13tev-tagging-weighted.root"
+file_name_sig  = basepath + "ntop_v14_zprime_m2000_1p_13tev-tagging-weighted.root"
+file_name_bg   = basepath + "ntop_v14_qcd_800_1000_pythia8_13tev-tagging-weighted.root"
 
 li_methods      = ["Likelihood"]
 
@@ -157,10 +157,10 @@ setup_softdrop_b = TMVASetup("softdrop_b",
 
 
 if run_TMVA:
-    for setup in tau_cross_setups:
+    for setup in btag_setups:
         doTMVA(setup)
 
-plotROCMultiple("ROC_good", [setup_08_combined, setup_cmstt_combined, setup_htt_combined] + good_setups)
+plotROCMultiple("ROC_good", [setup_08_combined, setup_cmstt_combined, setup_htt_combined] + good_setups + btag_setups)
 
 plotROCMultiple("ROC_mass", mass_setups)
 plotROCMultiple("ROC_tau", tau_setups)
