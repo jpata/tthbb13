@@ -79,11 +79,13 @@ objects = {
     "ca08trimmed"    : fj_branches,
     "ca08softdrop"   : fj_branches,
     
-    "ca15"           : fj_branches_chi,
-    "ca15filtered"   : fj_branches,
-    "ca15pruned"     : fj_branches,
-    "ca15trimmed"    : fj_branches,
-    "ca15softdrop"   : fj_branches,
+    "ca15"                   : fj_branches_chi,
+    "ca15filtered"           : fj_branches,
+    "ca15massdrop"           : fj_branches,
+    "ca15massdropfiltered"   : fj_branches,
+    "ca15pruned"             : fj_branches,
+    "ca15trimmed"            : fj_branches,
+    "ca15softdrop"           : fj_branches,
     
     "ca08cmstt"      : cmstt_branches,
     "ca15cmstt"      : cmstt_branches,
@@ -99,11 +101,13 @@ object_drs = {
     "ca08trimmed"    : 0.6,
     "ca08softdrop"   : 0.6,
     
-    "ca15"           : 1.2,
-    "ca15filtered"   : 1.2,
-    "ca15pruned"     : 1.2,
-    "ca15trimmed"    : 1.2,
-    "ca15softdrop"   : 1.2,
+    "ca15"                   : 1.2,
+    "ca15filtered"           : 1.2,
+    "ca15massdrop"           : 1.2,
+    "ca15massdropfiltered"   : 1.2,
+    "ca15pruned"             : 1.2,
+    "ca15trimmed"            : 1.2,
+    "ca15softdrop"           : 1.2,
     
     "ca08cmstt"      : 0.6,
     "ca15cmstt"      : 1.2,
@@ -144,6 +148,7 @@ AH.addScalarBranches(variables,
                      datatype = 'float')
 
 # Setup the output branches for tagging variables
+objects_to_pop = []
 for object_name, branch_names in objects.iteritems():    
     for branch_name in branch_names:
 
@@ -158,9 +163,12 @@ for object_name, branch_names in objects.iteritems():
                                   datatype = 'float')
         else:
             print "Warning: Branch {0} not available in input file. Removing full object {1}".format(full_branch_in, object_name)
-            objects.pop(object_name, 0)
+            objects_to_pop.append(object_name)
 # End of loop over objects and branches
 
+objects_to_pop = list(set(objects_to_pop))
+for o in objects_to_pop:
+    objects.pop(o)
 
 ########################################
 # Event loop
