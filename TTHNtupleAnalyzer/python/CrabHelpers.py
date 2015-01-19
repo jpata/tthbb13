@@ -69,6 +69,21 @@ def status(name,
 
 
 #######################################
+# kill
+#######################################
+
+def kill(name,
+           sample_shortname,
+           version):
+    """Kill a single job on the Grid."""
+
+    working_dir = "crab_{0}_{1}_{2}/crab_{0}_{1}_{2}".format(name, version, sample_shortname)
+    
+    subprocess.call(["crab", "kill", "-d", working_dir])
+# End of kill
+
+
+#######################################
 # download
 #######################################
 
