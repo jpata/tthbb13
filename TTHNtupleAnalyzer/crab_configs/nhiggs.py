@@ -6,7 +6,7 @@
 
 import sys
 
-from TTH.TTHNtupleAnalyzer.CrabHelpers import submit, status, download, hadd
+from TTH.TTHNtupleAnalyzer.CrabHelpers import submit, status, kill, download, hadd
 
 
 #######################################
@@ -15,10 +15,10 @@ from TTH.TTHNtupleAnalyzer.CrabHelpers import submit, status, download, hadd
 
 # Ntuple name/version and samples to include
 name = "nhiggs"
-version = "v2"
+version = "v3"
 li_samples = [
     "tth_hbb_13tev",
-    "ttj_13tev"
+#    "ttj_13tev"
 ]
 
 cmssw_config_path = '/shome/gregor/TTH-73X/CMSSW/src/TTH/TTHNtupleAnalyzer/python/'
@@ -30,7 +30,7 @@ storage_path = '/scratch/gregor/'
 #####################################
 
 # Decide what to do
-actions = ["submit", "status", "download", "hadd"]
+actions = ["submit", "status", "kill", "download", "hadd"]
 
 if not len(sys.argv) == 2:
     print "Invalid number of arguments"
@@ -58,6 +58,13 @@ if action == "submit":
 if action == "status":
     for sample_shortname in li_samples:
         status(name,
+               sample_shortname,  
+               version)
+
+# Status
+if action == "kill":
+    for sample_shortname in li_samples:
+        kill(name,
                sample_shortname,  
                version)
 
