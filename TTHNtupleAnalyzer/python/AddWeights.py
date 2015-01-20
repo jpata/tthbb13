@@ -15,7 +15,8 @@ import pickle
 import ROOT
 
 import TTH.TTHNtupleAnalyzer.AccessHelpers as AH
-from TTH.Plotting.gregor.TopSamples import files 
+#from TTH.Plotting.gregor.TopSamples import files 
+from TTH.Plotting.gregor.HiggsSamples import files 
 
 
 ########################################
@@ -77,14 +78,26 @@ for k,v in files.iteritems():
     # Example:
     # { "ntop_v8_zprime_m2000_1p_13tev-tagging" : [ROOT.TF1(..), "hadtop"], ...}
 
-    pickle_file = open(input_pickle_file_name)
-    functions_and_parameter = pickle.load(pickle_file)
+    try:
+        pickle_file = open(input_pickle_file_name)
+        functions_and_parameter = pickle.load(pickle_file)
 
-    fun = functions_and_parameter[input_name][0]
-    param_name = functions_and_parameter[input_name][1]
+        fun = functions_and_parameter[input_name][0]
+        param_name = functions_and_parameter[input_name][1]
+    
+        print "Read from file: "
+        print fun, param_name
+    except KeyError:
+        print "WARNING: No weight function found for", input_name
+        print "Using 1.0 as weight"
+        print "This only makes sense for tth and ttj for Higgs tagging"
+        
+        if k=="tth":            
+            param_name = "higgs_pt"
+        elif k=="ttj":
+            param_name = "parton_pt"
 
-    print "Read from file: "
-    print fun, param_name
+        fun = lambda x:1.
 
 
     ########################################
