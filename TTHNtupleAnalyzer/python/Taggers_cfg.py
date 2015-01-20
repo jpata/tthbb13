@@ -56,6 +56,15 @@ process.source = cms.Source("PoolSource",
 )
 
 
+process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService",
+                                                   QjetsCA08 = cms.PSet(
+                                                           initialSeed = cms.untracked.uint32(1314015),
+                                                           engineName = cms.untracked.string('TRandom3')),
+                                                   QjetsCA15 = cms.PSet(
+                                                           initialSeed = cms.untracked.uint32(1415016),
+                                                           engineName = cms.untracked.string('TRandom3')),
+                                           )
+
 # Select candidates that would pass CHS requirements
 # This can be used as input for HTT and other jet clustering algorithms
 process.chs = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedPFCandidates"), cut = cms.string("fromPV"))
@@ -65,7 +74,6 @@ process.chs = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedPFCandid
 from RecoJets.JetProducers.AnomalousCellParameters_cfi import *
 from RecoJets.JetProducers.PFJetParameters_cfi import *
 from RecoJets.JetProducers.CATopJetParameters_cfi import *
-
 
 # First create the ungroomed CA08 and CA15 fatjet collections:
 
@@ -209,6 +217,31 @@ process.ca15CMSTopTagInfos = cms.EDProducer("CATopJetTagger",
                                             verbose = cms.bool(False))
 
 
+process.QjetsCA08 = cms.EDProducer("QjetsAdder",
+                                   src=cms.InputTag("ca08PFJetsCHS"),
+                                   zcut=cms.double(0.1),
+                                   dcutfctr=cms.double(0.5),
+                                   expmin=cms.double(0.0),
+                                   expmax=cms.double(0.0),
+                                   rigidity=cms.double(0.1),
+                                   ntrial = cms.int32(50),
+                                   cutoff=cms.double(10.0),
+                                   jetRad= cms.double(0.8),
+                                   jetAlgo=cms.string("CA"),
+                                   preclustering = cms.int32(50))
+
+process.QjetsCA15 = cms.EDProducer("QjetsAdder",
+                                   src=cms.InputTag("ca15PFJetsCHS"),
+                                   zcut=cms.double(0.1),
+                                   dcutfctr=cms.double(0.5),
+                                   expmin=cms.double(0.0),
+                                   expmax=cms.double(0.0),
+                                   rigidity=cms.double(0.1),
+                                   ntrial = cms.int32(50),
+                                   cutoff=cms.double(10.0),
+                                   jetRad= cms.double(1.5),
+                                   jetAlgo=cms.string("CA"),
+                                   preclustering = cms.int32(50))
 
 # Nsubjettiness for groomed and ungroomed fatjets
 process.NjettinessCA08 = cms.EDProducer("NjettinessAdder",
@@ -397,6 +430,17 @@ li_fatjets_nsubs = ['NjettinessCA08',
                     'NjettinessCA15Trimmed',
                     'NjettinessCA15SoftDrop' ]
 
+li_fatjets_qvols = ['QjetsCA08', 
+                    'None', 
+                    'None',
+                    'None', 
+                    'None', 
+                    'QjetsCA15', 
+                    'None', 
+                    'None',
+                    'None',
+                    'None']
+
 li_fatjets_sds = [#'SDCA08', 
                   'None', 
 		  'None', 
@@ -524,6 +568,7 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
         fatjetsNsubs    = cms.vstring(li_fatjets_nsubs),
         fatjetsSDs      = cms.vstring(li_fatjets_sds),
         fatjetsBtags    = cms.vstring(li_fatjets_btags),
+        fatjetsQvols    = cms.vstring(li_fatjets_qvols),
         fatjetsBranches = cms.vstring(li_fatjets_branches),
         fatjetsIsBasicJets = cms.vint32(li_fatjets_is_basic_jets),                                           
 
@@ -598,6 +643,9 @@ process.p = cms.Path(
         process.ca15PFJetsCHSPruned   * 
         process.ca15PFJetsCHSTrimmed  * 
         process.ca15PFJetsCHSSoftDrop *
+
+        process.QjetsCA08 *
+        process.QjetsCA15 *
 
         process.NjettinessCA08 *        
         process.NjettinessCA08Filtered *        

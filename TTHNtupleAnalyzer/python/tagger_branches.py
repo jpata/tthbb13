@@ -169,13 +169,15 @@ for fj_name in ["ca08", "ca08filtered", "ca08pruned", "ca08trimmed", "ca08softdr
             "btag",                      # b-tag discriminator
             "chi",                       # Shower deconstruction chi
                                          # (only fill for ca08 and ca15 wo grooming at the moment)
+            "qvol",                      # Qjet volatility
+                                         # (only fill for ca08 and ca15 wo grooming at the moment)
             "close_hadtop_pt",  "close_hadtop_dr", "close_hadtop_i", # top truth matching
             "close_parton_pt",  "close_parton_dr", "close_parton_i", # parton truth matching
             "close_higgs_pt",   "close_higgs_dr",  "close_higgs_i"   # higgs truth matching
             ]:
 
         # Don't do chi unless we have the unfiltered fatjets
-        if (branch_name == "chi") and not (fj_name in ["ca08","ca15"]):
+        if (branch_name in ["chi", "qvol"]) and not (fj_name in ["ca08","ca15"]):
             continue
 
         if branch_name in ["close_higgs_i", "close_hadtop_i", "close_parton_i"]:

@@ -208,6 +208,7 @@ void fill_fatjet_branches(const edm::Event& iEvent,
 			  std::string fj_nsubs_name,
 			  std::string fj_sds_name,
 			  std::string fj_btags_name,
+			  std::string fj_qvols_name,
 			  std::string fj_branches_name,
 			  // true top and anti top for optional matching
 			  const vector<const reco::Candidate*>  & true_t,
@@ -245,6 +246,11 @@ void fill_fatjet_branches(const edm::Event& iEvent,
   edm::Handle<reco::JetTagCollection> btagDiscriminators;
   if (fj_btags_name != "None")
     iEvent.getByLabel(fj_btags_name, btagDiscriminators);
+
+  // Q-jet volatility handle
+  edm::Handle<edm::ValueMap<float> > QjetVols;
+  if (fj_qvols_name != "None")
+    iEvent.getByLabel(fj_qvols_name,"QjetsVolatility", QjetVols);
 	  
   // Loop over fatjets
   for (unsigned n_fat_jet = 0; n_fat_jet != fatjets->size(); n_fat_jet++){
@@ -275,6 +281,10 @@ void fill_fatjet_branches(const edm::Event& iEvent,
     // B-tag
     if (fj_btags_name != "None")
       tthtree->get_address<float *>(prefix + "btag")[n_fat_jet] = (*btagDiscriminators)[n_fat_jet].second;
+
+    // Q-jet volatility
+    if (fj_qvols_name != "None")
+      tthtree->get_address<float *>(prefix + "qvol")[n_fat_jet] = QjetVols->get(n_fat_jet);
    
     // Optional: Fill truth matching information
     if (ADD_TRUE_TOP_MATCHING_FOR_FJ)
@@ -411,7 +421,8 @@ private:
         // objects = name of the jet collection
         // nsubs = name of the N-subjettiness calculation process
         // sds = name of the Shower Deconstruction calculation process (or None)
-        // batgs = name of the btagger processes (or None) 
+        // btags = name of the btagger processes (or None) 
+        // qvols = name of the QJet volatility processes (or None) 
         // fatjet branches = name of the branches to put this in
         // isbasicjets = data type of the fat jet (BasicJet or PFJet)
         // !!the lists have to be in sync!!
@@ -419,6 +430,7 @@ private:
 	const std::vector<std::string> fatjet_nsubs_;
 	const std::vector<std::string> fatjet_sds_;
 	const std::vector<std::string> fatjet_btags_;
+	const std::vector<std::string> fatjet_qvols_;
 	const std::vector<std::string> fatjet_branches_;
 	const std::vector<int> fatjet_isbasicjets_;
 
@@ -501,6 +513,7 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
         fatjet_nsubs_(iConfig.getParameter<std::vector<std::string>>("fatjetsNsubs")),
         fatjet_sds_(iConfig.getParameter<std::vector<std::string>>("fatjetsSDs")),
         fatjet_btags_(iConfig.getParameter<std::vector<std::string>>("fatjetsBtags")),
+        fatjet_qvols_(iConfig.getParameter<std::vector<std::string>>("fatjetsQvols")),
         fatjet_branches_(iConfig.getParameter<std::vector<std::string>>("fatjetsBranches")),
         fatjet_isbasicjets_(iConfig.getParameter<std::vector<int>>("fatjetsIsBasicJets")),
 
@@ -622,6 +635,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	assert(fatjet_objects_.size()==fatjet_nsubs_.size());
 	assert(fatjet_objects_.size()==fatjet_sds_.size());
 	assert(fatjet_objects_.size()==fatjet_btags_.size());
+	assert(fatjet_objects_.size()==fatjet_qvols_.size());
 	assert(fatjet_objects_.size()==fatjet_branches_.size());
 	assert(fatjet_objects_.size()==fatjet_isbasicjets_.size());
 
@@ -1728,6 +1742,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	  std::string fj_nsubs_name	  = fatjet_nsubs_[i_fj_coll];
 	  std::string fj_sds_name	  = fatjet_sds_[i_fj_coll];
 	  std::string fj_btags_name	  = fatjet_btags_[i_fj_coll];
+	  std::string fj_qvols_name	  = fatjet_qvols_[i_fj_coll];
 	  std::string fj_branches_name    = fatjet_branches_[i_fj_coll];
 	  int fj_isbasicjets              = fatjet_isbasicjets_[i_fj_coll];
 	  
@@ -1739,6 +1754,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 								     fj_nsubs_name,
 								     fj_sds_name,
 								     fj_btags_name,
+								     fj_qvols_name,
 								     fj_branches_name,
 								     hadronic_ts,
 								     hard_partons,
@@ -1753,6 +1769,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 									   fj_nsubs_name,
 									   fj_sds_name,
 									   fj_btags_name,
+									   fj_qvols_name,
 									   fj_branches_name,
 									   hadronic_ts,
 									   hard_partons,
