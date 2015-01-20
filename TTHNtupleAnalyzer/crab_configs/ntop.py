@@ -15,10 +15,10 @@ from TTH.TTHNtupleAnalyzer.CrabHelpers import submit, status, download, hadd
 
 # Ntuple name/version and samples to include
 name = "ntop"
-version = "v15c"
+version = "v16"
 li_samples = [
-    "qcd_170_300_pythia8_13tev",
-    "qcd_300_470_pythia8_13tev",
+    #"qcd_170_300_pythia8_13tev",
+    #"qcd_300_470_pythia8_13tev",
     #"qcd_800_1000_pythia8_13tev",    
 
     #"zprime_m500_1p_13tev",
@@ -28,7 +28,7 @@ li_samples = [
     #"zprime_m1250_1p_13tev", 
     #"zprime_m1500_1p_13tev", 
     #"zprime_m2000_1p_13tev",
-    #"zprime_m3000_1p_13tev", 
+    "zprime_m3000_1p_13tev", 
     #"zprime_m4000_1p_13tev" 
 ]
 

@@ -18,7 +18,7 @@ name = "nhiggs"
 version = "v3"
 li_samples = [
     "tth_hbb_13tev",
-#    "ttj_13tev"
+    "ttj_13tev"
 ]
 
 cmssw_config_path = '/shome/gregor/TTH-73X/CMSSW/src/TTH/TTHNtupleAnalyzer/python/'
@@ -76,5 +76,5 @@ elif action == "download":
 # Hadd
 elif action == "hadd":
     for sample_shortname in li_samples:
-        hadd(name, sample_shortname, version, storage_path)    
+        hadd(name, sample_shortname, version, storage_path, "output_*.root", "")    
 
