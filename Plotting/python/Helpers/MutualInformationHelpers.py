@@ -9,15 +9,27 @@ Inspired by 1408.3122
 # Imports and setup ROOT with style
 ########################################
 
+import os
+import sys
 import math
 import glob
 import copy
-import sys
 
 import ROOT
 
-from TTH.Plotting.python.Helpers.PrepareRootStyle import myStyle
-from TTH.Plotting.python.Helpers.HistogramHelpers import Count
+# initializer: simple creation of bag-of-object classes
+from Initializer import initializer
+
+# With CMSSW
+if "CMSSW_VERSION" in os.environ.keys():
+   from TTH.Plotting.Helpers.PrepareRootStyle import myStyle
+   from TTH.Plotting.Helpers.HistogramHelpers import Count
+   import TTH.Plotting.Helpers.OutputDirectoryHelper as OutputDirectoryHelper
+# Without
+else:
+   from TTH.Plotting.python.Helpers.PrepareRootStyle import myStyle
+   from TTH.Plotting.python.Helpers.HistogramHelpers import Count
+   import TTH.Plotting.python.Helpers.OutputDirectoryHelper as OutputDirectoryHelper
 
 ROOT.gStyle.SetPadLeftMargin(0.2)
 ROOT.gStyle.SetPadRightMargin(0.16)
@@ -51,15 +63,6 @@ ROOT.gErrorIgnoreLevel = 1
 # Global variable to count drawn histograms for unique naming
 i_draw = 0 
 
-########################################
-# Import private support code
-########################################
-
-# initializer: simple creation of bag-of-object classes
-from Initializer import initializer
-
-import TTH.Plotting.python.Helpers.OutputDirectoryHelper as OutputDirectoryHelper
-
 
 ########################################
 # Define and crate output directory
@@ -83,15 +86,24 @@ class mi():
                 sample_name_signal,
                 sample_name_background,
                 li_vars,
-                fiducial_cut = "(1)"):
+                fiducial_cut_signal     = "(1)",
+                fiducial_cut_background = "(1)",
+   ):
       """ Constructor. Arguments:
       name                    : (string) name of the mutual information set
       sample_name_signal      : (string) signal sample to process
       sample_name_background  : (string) background sample to process
       vars                    : list of variable (from VariableHelpers) objects 
-      fiducial_cut            : (string) fiducial cut (numerator and denominator)
+      fiducial_cut_signal     : (string) fiducial cut (numerator and denominator)
+      fiducial_cut_background : (string) fiducial cut (numerator and denominator)
       """
-      pass
+      
+      if ((fiducial_cut_signal == "(1)") and (not (fiducial_cut_background == "(1)")) or
+          (not (fiducial_cut_signal == "(1)")) and (fiducial_cut_background == "(1)")):
+         print "One of fiducial cut signal/background is (1). This is probably wrong!"
+         sys.exit()
+
+      
 # end of class mi
 
 
@@ -241,8 +253,8 @@ def MakePlots(mis, files, input_treename = 'tree'):
       input_tree_bkg = infile_bkg.Get(input_treename)
 
       # Count events
-      passed_fiducial_sig = Count(input_tree_sig, mi.fiducial_cut)
-      passed_fiducial_bkg = Count(input_tree_bkg, mi.fiducial_cut)
+      passed_fiducial_sig = Count(input_tree_sig, mi.fiducial_cut_signal)
+      passed_fiducial_bkg = Count(input_tree_bkg, mi.fiducial_cut_background)
 
       # Calculate overall additional background weight so that:
       # signal / signal+background = f
@@ -267,15 +279,19 @@ def MakePlots(mis, files, input_treename = 'tree'):
 
                # Total cut is
                # fiducial + range(var1) + extra cut(var1)
-               cut = "("
-               cut += "({0})".format(mi.fiducial_cut)
-               cut += "&&({0}>={1})".format(var1.name, var1.range_min)
-               cut += "&&({0}<={1})".format(var1.name, var1.range_max)
-               cut += "&&({0})".format(var1.extra_cut)
-               cut += ")"
+               cut_and_weight_sig = "("
+               cut_and_weight_sig += "({0})".format(mi.fiducial_cut_signal)
+               cut_and_weight_sig += "&&({0}>={1})".format(var1.name, var1.range_min)
+               cut_and_weight_sig += "&&({0}<={1})".format(var1.name, var1.range_max)
+               cut_and_weight_sig += "&&({0})".format(var1.extra_cut)
+               cut_and_weight_sig += ")*{0}".format(extra_weight_sig)
 
-               cut_and_weight_sig = "{0}*{1}".format(cut, extra_weight_sig)
-               cut_and_weight_bkg = "{0}*{1}".format(cut, extra_weight_bkg)
+               cut_and_weight_bkg = "("
+               cut_and_weight_bkg += "({0})".format(mi.fiducial_cut_background)
+               cut_and_weight_bkg += "&&({0}>={1})".format(var1.name, var1.range_min)
+               cut_and_weight_bkg += "&&({0}<={1})".format(var1.name, var1.range_max)
+               cut_and_weight_bkg += "&&({0})".format(var1.extra_cut)
+               cut_and_weight_bkg += ")*{0}".format(extra_weight_bkg)
 
                h_sig = MakeHistogram(input_tree_sig, [var1], n_bins_one_var_one_sample, cut_and_weight_sig)
                h_bkg = MakeHistogram(input_tree_bkg, [var1], n_bins_one_var_one_sample, cut_and_weight_bkg)
@@ -289,17 +305,21 @@ def MakePlots(mis, files, input_treename = 'tree'):
                # Also count events that pass fiducial but not variable selection cuts
                # Inverted cut is 
                # fiducial + (! range(var1)) + (! extra cut(var1))
-               inverted_cut = "("
-               inverted_cut += "({0})".format(mi.fiducial_cut)
-               inverted_cut += "&&(({0}<{1})".format(var1.name, var1.range_min)
-               inverted_cut += " ||({0}>{1})".format(var1.name, var1.range_max)
-               inverted_cut += " ||(!({0})))".format(var1.extra_cut)
-               inverted_cut += ")"
+               inverted_cut_and_weight_sig = "("
+               inverted_cut_and_weight_sig += "({0})".format(mi.fiducial_cut_signal)
+               inverted_cut_and_weight_sig += "&&(({0}<{1})".format(var1.name, var1.range_min)
+               inverted_cut_and_weight_sig += " ||({0}>{1})".format(var1.name, var1.range_max)
+               inverted_cut_and_weight_sig += " ||(!({0})))".format(var1.extra_cut)
+               inverted_cut_and_weight_sig += ")*{0}".format(extra_weight_sig)
+
+               inverted_cut_and_weight_bkg = "("
+               inverted_cut_and_weight_bkg += "({0})".format(mi.fiducial_cut_background)
+               inverted_cut_and_weight_bkg += "&&(({0}<{1})".format(var1.name, var1.range_min)
+               inverted_cut_and_weight_bkg += " ||({0}>{1})".format(var1.name, var1.range_max)
+               inverted_cut_and_weight_bkg += " ||(!({0})))".format(var1.extra_cut)
+               inverted_cut_and_weight_bkg += ")*{0}".format(extra_weight_bkg)
                
                # Count events with inverted cut
-               inverted_cut_and_weight_sig = "{0}*{1}".format(inverted_cut, extra_weight_sig)
-               inverted_cut_and_weight_bkg = "{0}*{1}".format(inverted_cut, extra_weight_bkg)
-
                cnt_inv_sig = Count(input_tree_sig, inverted_cut_and_weight_sig)
                cnt_inv_bkg = Count(input_tree_bkg, inverted_cut_and_weight_bkg)
 
@@ -325,18 +345,25 @@ def MakePlots(mis, files, input_treename = 'tree'):
                # ----- var1 valid, var2 valid -----
                # Total cut is
                # fiducial + range(var1) + extra cut(var1) + range(var2) + extra_cut(var2)
-               cut = "("
-               cut += "({0})".format(mi.fiducial_cut)
-               cut += "&&({0}>={1})".format(var1.name, var1.range_min)
-               cut += "&&({0}<={1})".format(var1.name, var1.range_max)
-               cut += "&&({0})".format(var1.extra_cut)
-               cut += "&&({0}>={1})".format(var2.name, var2.range_min)
-               cut += "&&({0}<={1})".format(var2.name, var2.range_max)
-               cut += "&&({0})".format(var2.extra_cut)
-               cut += ")"
+               cut_and_weight_sig = "("
+               cut_and_weight_sig += "({0})".format(mi.fiducial_cut_signal)
+               cut_and_weight_sig += "&&({0}>={1})".format(var1.name, var1.range_min)
+               cut_and_weight_sig += "&&({0}<={1})".format(var1.name, var1.range_max)
+               cut_and_weight_sig += "&&({0})".format(var1.extra_cut)
+               cut_and_weight_sig += "&&({0}>={1})".format(var2.name, var2.range_min)
+               cut_and_weight_sig += "&&({0}<={1})".format(var2.name, var2.range_max)
+               cut_and_weight_sig += "&&({0})".format(var2.extra_cut)
+               cut_and_weight_sig += ")*{0}".format(extra_weight_sig)
 
-               cut_and_weight_sig = "{0}*{1}".format(cut, extra_weight_sig)
-               cut_and_weight_bkg = "{0}*{1}".format(cut, extra_weight_bkg)
+               cut_and_weight_bkg = "("
+               cut_and_weight_bkg += "({0})".format(mi.fiducial_cut_background)
+               cut_and_weight_bkg += "&&({0}>={1})".format(var1.name, var1.range_min)
+               cut_and_weight_bkg += "&&({0}<={1})".format(var1.name, var1.range_max)
+               cut_and_weight_bkg += "&&({0})".format(var1.extra_cut)
+               cut_and_weight_bkg += "&&({0}>={1})".format(var2.name, var2.range_min)
+               cut_and_weight_bkg += "&&({0}<={1})".format(var2.name, var2.range_max)
+               cut_and_weight_bkg += "&&({0})".format(var2.extra_cut)
+               cut_and_weight_bkg += ")*{0}".format(extra_weight_bkg)
 
                h_sig = MakeHistogram(input_tree_sig, [var1, var2], n_bins_two_var_one_sample, cut_and_weight_sig)
                h_bkg = MakeHistogram(input_tree_bkg, [var1, var2], n_bins_two_var_one_sample, cut_and_weight_bkg)
@@ -351,18 +378,25 @@ def MakePlots(mis, files, input_treename = 'tree'):
                # ----- var1 invalid, var2 valid -----
                # inverted cut var1  is
                # fiducial AND (!range(var1) OR !extra_cut(var1)) AND (range(var2) AND extra_cut(var2))
-               inverted_cut_var1 = "("
-               inverted_cut_var1 += "({0})".format(mi.fiducial_cut)
-               inverted_cut_var1 += "&&(({0}<{1})".format(var1.name, var1.range_min)
-               inverted_cut_var1 += " ||({0}>{1})".format(var1.name, var1.range_max)
-               inverted_cut_var1 += " ||(!({0})))".format(var1.extra_cut)
-               inverted_cut_var1 += "&&({0}>={1})".format(var2.name, var2.range_min)
-               inverted_cut_var1 += "&&({0}<={1})".format(var2.name, var2.range_max)
-               inverted_cut_var1 += "&&(({0}))".format(var2.extra_cut)
-               inverted_cut_var1 += ")"
-               
-               cut_and_weight_sig_inv_var1 = "{0}*{1}".format(inverted_cut_var1, extra_weight_sig)
-               cut_and_weight_bkg_inv_var1 = "{0}*{1}".format(inverted_cut_var1, extra_weight_bkg)
+               cut_and_weight_sig_inv_var1 = "("
+               cut_and_weight_sig_inv_var1 += "({0})".format(mi.fiducial_cut_signal)
+               cut_and_weight_sig_inv_var1 += "&&(({0}<{1})".format(var1.name, var1.range_min)
+               cut_and_weight_sig_inv_var1 += " ||({0}>{1})".format(var1.name, var1.range_max)
+               cut_and_weight_sig_inv_var1 += " ||(!({0})))".format(var1.extra_cut)
+               cut_and_weight_sig_inv_var1 += "&&({0}>={1})".format(var2.name, var2.range_min)
+               cut_and_weight_sig_inv_var1 += "&&({0}<={1})".format(var2.name, var2.range_max)
+               cut_and_weight_sig_inv_var1 += "&&(({0}))".format(var2.extra_cut)
+               cut_and_weight_sig_inv_var1 += ")*{0}".format(extra_weight_sig)
+
+               cut_and_weight_bkg_inv_var1 = "("
+               cut_and_weight_bkg_inv_var1 += "({0})".format(mi.fiducial_cut_background)
+               cut_and_weight_bkg_inv_var1 += "&&(({0}<{1})".format(var1.name, var1.range_min)
+               cut_and_weight_bkg_inv_var1 += " ||({0}>{1})".format(var1.name, var1.range_max)
+               cut_and_weight_bkg_inv_var1 += " ||(!({0})))".format(var1.extra_cut)
+               cut_and_weight_bkg_inv_var1 += "&&({0}>={1})".format(var2.name, var2.range_min)
+               cut_and_weight_bkg_inv_var1 += "&&({0}<={1})".format(var2.name, var2.range_max)
+               cut_and_weight_bkg_inv_var1 += "&&(({0}))".format(var2.extra_cut)
+               cut_and_weight_bkg_inv_var1 += ")*{0}".format(extra_weight_bkg)
 
                h_sig_inv1 = MakeHistogram(input_tree_sig, [var2], n_bins_one_var_one_sample, cut_and_weight_sig_inv_var1)
                h_bkg_inv1 = MakeHistogram(input_tree_bkg, [var2], n_bins_one_var_one_sample, cut_and_weight_bkg_inv_var1)
@@ -376,18 +410,25 @@ def MakePlots(mis, files, input_treename = 'tree'):
 
                # ----- var1 valid, var2 invalid -----
                # fiducial AND (range(var1) AND extra_cut(var1)) AND (!range(var2) OR !extra_cut(var2))
-               inverted_cut_var2 = "("
-               inverted_cut_var2 += "({0})".format(mi.fiducial_cut)
-               inverted_cut_var2 += "&&({0}>={1})".format(var1.name, var1.range_min)
-               inverted_cut_var2 += "&&({0}<={1})".format(var1.name, var1.range_max)
-               inverted_cut_var2 += "&&(({0}))".format(var1.extra_cut)
-               inverted_cut_var2 += "&&(({0}<{1})".format(var2.name, var2.range_min)
-               inverted_cut_var2 += " ||({0}>{1})".format(var2.name, var2.range_max)
-               inverted_cut_var2 += " ||(!({0})))".format(var2.extra_cut)
-               inverted_cut_var2 += ")"
+               cut_and_weight_sig_inv_var2 = "("
+               cut_and_weight_sig_inv_var2 += "({0})".format(mi.fiducial_cut_signal)
+               cut_and_weight_sig_inv_var2 += "&&({0}>={1})".format(var1.name, var1.range_min)
+               cut_and_weight_sig_inv_var2 += "&&({0}<={1})".format(var1.name, var1.range_max)
+               cut_and_weight_sig_inv_var2 += "&&(({0}))".format(var1.extra_cut)
+               cut_and_weight_sig_inv_var2 += "&&(({0}<{1})".format(var2.name, var2.range_min)
+               cut_and_weight_sig_inv_var2 += " ||({0}>{1})".format(var2.name, var2.range_max)
+               cut_and_weight_sig_inv_var2 += " ||(!({0})))".format(var2.extra_cut)
+               cut_and_weight_sig_inv_var2 += ")*{0}".format(extra_weight_sig)
 
-               cut_and_weight_sig_inv_var2 = "{0}*{1}".format(inverted_cut_var2, extra_weight_sig)
-               cut_and_weight_bkg_inv_var2 = "{0}*{1}".format(inverted_cut_var2, extra_weight_bkg)
+               cut_and_weight_bkg_inv_var2 = "("
+               cut_and_weight_bkg_inv_var2 += "({0})".format(mi.fiducial_cut_background)
+               cut_and_weight_bkg_inv_var2 += "&&({0}>={1})".format(var1.name, var1.range_min)
+               cut_and_weight_bkg_inv_var2 += "&&({0}<={1})".format(var1.name, var1.range_max)
+               cut_and_weight_bkg_inv_var2 += "&&(({0}))".format(var1.extra_cut)
+               cut_and_weight_bkg_inv_var2 += "&&(({0}<{1})".format(var2.name, var2.range_min)
+               cut_and_weight_bkg_inv_var2 += " ||({0}>{1})".format(var2.name, var2.range_max)
+               cut_and_weight_bkg_inv_var2 += " ||(!({0})))".format(var2.extra_cut)
+               cut_and_weight_bkg_inv_var2 += ")*{0}".format(extra_weight_bkg)
 
                h_sig_inv2 = MakeHistogram(input_tree_sig, [var1], n_bins_one_var_one_sample, cut_and_weight_sig_inv_var2)
                h_bkg_inv2 = MakeHistogram(input_tree_bkg, [var1], n_bins_one_var_one_sample, cut_and_weight_bkg_inv_var2)
@@ -401,23 +442,28 @@ def MakePlots(mis, files, input_treename = 'tree'):
                # ----- var1 invalid, var2 invalid -----
                # inverted cut  is
                # fiducial AND (!range(var1) OR !extra cut(var1)) AND (!range(var2) OR !extra_cut(var2))
-               inverted_cut = "("
-               inverted_cut += "({0})".format(mi.fiducial_cut)
-               inverted_cut += "&&(({0}<{1})".format(var1.name, var1.range_min)
-               inverted_cut += " ||({0}>{1})".format(var1.name, var1.range_max)
-               inverted_cut += " ||(!({0})))".format(var1.extra_cut)
-               inverted_cut += "&&(({0}<{1})".format(var2.name, var2.range_min)
-               inverted_cut += " ||({0}>{1})".format(var2.name, var2.range_max)
-               inverted_cut += " ||(!({0})))".format(var2.extra_cut)
-               inverted_cut += ")"
-                              
-               # Count events with inverted cut
-               inverted_cut_and_weight_sig = "{0}*{1}".format(inverted_cut, extra_weight_sig)
-               inverted_cut_and_weight_bkg = "{0}*{1}".format(inverted_cut, extra_weight_bkg)
+               inverted_cut_and_weight_sig = "("
+               inverted_cut_and_weight_sig += "({0})".format(mi.fiducial_cut_signal)
+               inverted_cut_and_weight_sig += "&&(({0}<{1})".format(var1.name, var1.range_min)
+               inverted_cut_and_weight_sig += " ||({0}>{1})".format(var1.name, var1.range_max)
+               inverted_cut_and_weight_sig += " ||(!({0})))".format(var1.extra_cut)
+               inverted_cut_and_weight_sig += "&&(({0}<{1})".format(var2.name, var2.range_min)
+               inverted_cut_and_weight_sig += " ||({0}>{1})".format(var2.name, var2.range_max)
+               inverted_cut_and_weight_sig += " ||(!({0})))".format(var2.extra_cut)
+               inverted_cut_and_weight_sig += ")*{0}".format(extra_weight_sig)
+
+               inverted_cut_and_weight_bkg = "("
+               inverted_cut_and_weight_bkg += "({0})".format(mi.fiducial_cut_background)
+               inverted_cut_and_weight_bkg += "&&(({0}<{1})".format(var1.name, var1.range_min)
+               inverted_cut_and_weight_bkg += " ||({0}>{1})".format(var1.name, var1.range_max)
+               inverted_cut_and_weight_bkg += " ||(!({0})))".format(var1.extra_cut)
+               inverted_cut_and_weight_bkg += "&&(({0}<{1})".format(var2.name, var2.range_min)
+               inverted_cut_and_weight_bkg += " ||({0}>{1})".format(var2.name, var2.range_max)
+               inverted_cut_and_weight_bkg += " ||(!({0})))".format(var2.extra_cut)
+               inverted_cut_and_weight_bkg += ")*{0}".format(extra_weight_bkg)
                
                cnt_inv_sig = Count(input_tree_sig, inverted_cut_and_weight_sig)
                cnt_inv_bkg = Count(input_tree_bkg, inverted_cut_and_weight_bkg)               
-
 
                # ----- Put everything together -----
                # Calculate entropies

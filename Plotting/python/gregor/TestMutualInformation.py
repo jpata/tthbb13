@@ -13,45 +13,35 @@ if "CMSSW_VERSION" in os.environ.keys():
     from TTH.Plotting.Helpers.MutualInformationHelpers import *
     from TTH.Plotting.Helpers.VariableHelpers import variable as var
     from TTH.Plotting.gregor.TopTaggingVariables import *
+    from TTH.Plotting.gregor.TopSamples import *
 else:
     from TTH.Plotting.python.Helpers.MutualInformationHelpers import *
     from TTH.Plotting.python.Helpers.VariableHelpers import variable as var
     from TTH.Plotting.python.gregor.TopTaggingVariables import *
+    from TTH.Plotting.python.gregor.TopSamples import *
+
 
 ########################################
 # Define Input Files and
 # output directory
 ########################################
 
-basepath = '/Users/gregor/'
-
-files = {}
-files["qcd_800_1000"] = "ntop_v11_qcd_800_1000_pythia8_13tev-tagging-weighted"
-files["zprime_m2000_1p"] = "ntop_v11_zprime_m2000_1p_13tev-tagging-weighted"
+basepath = '/scratch/gregor/'
 
 fiducial_cut_and_weight = "(weight*((pt>801)&&(pt<999)))"
                                         
-# for the filename: basepath + filename + .root
+# for the filename: basepath + filename + weighted.root
+full_filenames = {}
 for k,v in files.iteritems():
-    files[k] = basepath + v + ".root"
-
-
-interesting_taus = tau_cross_vars + [var.di['ca08_tau3/ca08_tau2'],
-                                     var.di['ca08softdrop_tau3/ca08softdrop_tau2'],
-                                     var.di['ca08softdrop_mass']]
+    full_filenames[k] = basepath + v + "-weighted.root"
 
 mis =[ 
-       #mi("masses", "zprime_m2000_1p", "qcd_800_1000", mass_vars_08+mass_vars_15, fiducial_cut_and_weight),
-       #mi("taus", "zprime_m2000_1p", "qcd_800_1000",   tau_vars_08+tau_vars_15+[var.di['ca08softdrop_mass']], fiducial_cut_and_weight),
-       #mi("interesting_taus", "zprime_m2000_1p", "qcd_800_1000", interesting_taus, fiducial_cut_and_weight),
-       
-
-    mi("taus_08", "zprime_m2000_1p", "qcd_800_1000",   tau_vars_08 + tau_cross_vars, fiducial_cut_and_weight),
-    #mi("taus_15", "zprime_m2000_1p", "qcd_800_1000",   tau_vars_15, fiducial_cut_and_weight),
-    #mi("masses_08", "zprime_m2000_1p", "qcd_800_1000",   mass_vars_08, fiducial_cut_and_weight),
-    #mi("masses_15", "zprime_m2000_1p", "qcd_800_1000",   mass_vars_15, fiducial_cut_and_weight),
-    #mi("taggers", "zprime_m2000_1p", "qcd_800_1000", tagger_vars, fiducial_cut_and_weight),
-    mi("good", "zprime_m2000_1p", "qcd_800_1000", good_vars, fiducial_cut_and_weight),
+    #mi("taus_08", "zprime_m2000_1p", "qcd_800_1000",   tau_vars_08 + tau_cross_vars, fiducial_cut_and_weight, fiducial_cut_and_weight),
+    #mi("taus_15", "zprime_m2000_1p", "qcd_800_1000",   tau_vars_15, fiducial_cut_and_weight, fiducial_cut_and_weight),
+    #mi("masses_08", "zprime_m2000_1p", "qcd_800_1000",   mass_vars_08, fiducial_cut_and_weight, fiducial_cut_and_weight),
+    #mi("masses_15", "zprime_m2000_1p", "qcd_800_1000",   mass_vars_15, fiducial_cut_and_weight, fiducial_cut_and_weight),
+    #mi("taggers", "zprime_m2000_1p", "qcd_800_1000", tagger_vars, fiducial_cut_and_weight, fiducial_cut_and_weight),
+    mi("good_top", "zprime_m2000", "qcd_800_1000", good_vars + [variable.di['ca08_btag'],], fiducial_cut_and_weight, fiducial_cut_and_weight),
 ]
 
-MakePlots(mis, files)
+MakePlots(mis, full_filenames)

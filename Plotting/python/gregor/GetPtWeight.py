@@ -13,6 +13,7 @@ We want to use flat true-pT distributions
 import pickle
 
 from TTH.Plotting.Helpers.CompareDistributionsHelpers import *
+from TTH.Plotting.gregor.TopSamples import files, ranges
 
 
 ########################################
@@ -21,11 +22,22 @@ from TTH.Plotting.Helpers.CompareDistributionsHelpers import *
 ########################################
 
 basepath = '/scratch/gregor/'
-
-files = {}
-files["qcd_800_1000"] = "ntop_v14_qcd_800_1000_pythia8_13tev-tagging"
-files["zprime_m2000"] = "ntop_v14_zprime_m2000_1p_13tev-tagging"     
                                          
+fits = {}
+fits["zprime_m750"]  = ROOT.TF1("fit_fun_zprime","pol5",201,299)
+fits["zprime_m2000"] = ROOT.TF1("fit_fun_zprime","pol5",801,999)
+
+fits["qcd_170_300"]  = ROOT.TF1("fit_fun_qcd","[0]+[1]*sqrt(x)+[2]/x+[3]*x",201,299)
+fits["qcd_300_470"]  = ROOT.TF1("fit_fun_qcd","[0]+[1]*sqrt(x)+[2]/x+[3]/(x*x)+[4]/(x*x*x)",301,470)
+fits["qcd_800_1000"] = ROOT.TF1("fit_fun_qcd","[0]+[1]*sqrt(x)+[2]/x",801,999)
+
+for qcd_name in ["qcd_170_300", "qcd_300_470", "qcd_800_1000"]:
+    fits[qcd_name].SetParameter(0,1)
+    fits[qcd_name].SetParameter(1,1)
+    fits[qcd_name].SetParameter(2,0)
+
+
+
 
 # for the filename: basepath + filename + .root
 full_file_names = {}
@@ -41,49 +53,31 @@ output_pickle_file_name = "/shome/gregor/TTH-73X/CMSSW/src/TTH/Plotting/python/g
 # Define plots and do fits
 ########################################
 
-fit_zprime = ROOT.TF1("fit_fun_zprime","pol5",801,999)
+if True:    
+    for k in files.keys():
 
-if True:
-    combinedPlot ("true_top_pt_cut",
-                  [plot( "zprime_m2000", 
-                         'hadtop_pt', 
-                         '(hadtop_pt>801)&&(hadtop_pt<999)', 
-                         "zprime_m2000", 
-                         fit=fit_zprime), 
-                   ],
-                  80, 750, 1050, 
-                  label_x   = "True top p_{T}",
-                  label_y   = "Events",
-                  axis_unit = "GeV",
-                  log_y     = False,
-                  normalize = True,
-                  legend_origin_x = 0.35,
-                  legend_origin_y = 0.3,
-                  legend_size_x   = 0.2,
-                  legend_size_y   = 0.05 * 2)
+        if "zprime" in k:
+            pt_var = "hadtop_pt"
+        else:
+            pt_var = "parton_pt"
 
-
-if True:
-    fit_qcd = ROOT.TF1("fit_fun_qcd","[0]+[1]*sqrt(x)+[2]/x",801,999)
-    fit_qcd.SetParameter(0,1)
-    fit_qcd.SetParameter(1,1)
-    fit_qcd.SetParameter(2,0)
-
-    combinedPlot ("parton_pt_cut",
-                  [plot( "qcd_800_1000", 
-                         'parton_pt', 
-                         '(parton_pt>801)&&(parton_pt<999)', 
-                         "qcd_800_1000", fit=fit_qcd)],
-                  80, 750, 1050, 
-                  label_x   = "Parton p_{T}",
-                  label_y   = "Events",
-                  axis_unit = "GeV",
-                  log_y     = False,
-                  normalize = True,
-                  legend_origin_x = 0.32,
-                  legend_origin_y = 0.25,
-                  legend_size_x   = 0.2,
-                  legend_size_y   = 0.05 * 2)
+        combinedPlot ( k + "_pt_cut",
+                      [plot( k, 
+                             pt_var,
+                             '(({0}>{1})&&({0}<{2}))'.format(pt_var, ranges[k][0], ranges[k][1]), 
+                             k,
+                             fit=fits[k]), 
+                       ],
+                      80, ranges[k][0], ranges[k][1], 
+                      label_x   = "True p_{T}",
+                      label_y   = "Partons",
+                      axis_unit = "GeV",
+                      log_y     = False,
+                      normalize = True,
+                      legend_origin_x = 0.55,
+                      legend_origin_y = 0.6,
+                      legend_size_x   = 0.2,
+                      legend_size_y   = 0.05 * 2)
 
 doWork(full_file_names, output_dir )
 
@@ -107,8 +101,14 @@ for k in functions_and_parameter:
 pickle_file.close()
 
 # Then add the new ones
-functions_and_parameter[files["qcd_800_1000"]] = [fit_qcd, "parton_pt"]
-functions_and_parameter[files["zprime_m2000"]] = [fit_zprime, "hadtop_pt"]
+for k,v in files.iteritems():
+
+    if "zprime" in k:
+        pt_var = "hadtop_pt"
+    else:
+        pt_var = "parton_pt"
+
+    functions_and_parameter[v] = [fits[k], pt_var]
 
 # And write everything to the file
 pickle_file = open(output_pickle_file_name, "w")

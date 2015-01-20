@@ -67,9 +67,8 @@ tau31_vars_08 = [
 
 
 btag_vars = [
-    #variable('ca15_btag', "btag (R=1.5)", -0.1, 1.1),
+    variable('ca15_btag', "btag (R=1.5)", -0.1, 1.1),
     variable('ca08_btag', "btag (R=0.8)", -0.1, 1.1),
-    variable('ca08softdrop_btag', "btag softdrop (R=0.8)", -0.1, 1.1),
 ]
 
 
@@ -80,14 +79,14 @@ htt_vars = [
     variable('looseMultiRHTT_Rmin-looseMultiRHTT_RminExpected', "HTT #Delta R_{min,exp}", -0.5, 1.5),
 ]
 
-tagger_vars_15 = [variable('log(ca15_chi)', "log(#chi) (R=1.5)", -10., 10, extra_cut = 'ca15_chi>0'),
+tagger_vars_15 = [#variable('log(ca15_chi)', "log(#chi) (R=1.5)", -10., 10, extra_cut = 'ca15_chi>0'),
                   variable('ca15cmstt_minMass', "CMSTT minMass (R=1.5)", 0., 400, unit = "GeV"),
                   variable('ca15cmstt_topMass', "CMSTT topMass (R=1.5)", 0., 600, unit = "GeV")
               ] + htt_vars 
                              
 
 tagger_vars_08 = [
-    variable('log(ca08_chi)', "log(#chi) (R=0.8)", -10., 10, extra_cut = 'ca08_chi>0'),
+#    variable('log(ca08_chi)', "log(#chi) (R=0.8)", -10., 10, extra_cut = 'ca08_chi>0'),
     variable('ca08cmstt_minMass', "CMSTT minMass (R=0.8)", 0., 250, unit = "GeV"),
     variable('ca08cmstt_topMass', "CMSTT topMass (R=0.8)", 0., 600., unit = "GeV"),
 ]
@@ -99,7 +98,8 @@ good_vars = [ variable.di['ca08softdrop_mass'],
               variable.di['ca08_tau3/ca08_tau2'],
               variable.di['looseMultiRHTT_mass'],
               variable.di['ca08cmstt_minMass'],
-              variable.di['log(ca15_chi)'],
+#              variable.di['ca08_btag'],
+#              variable.di['log(ca15_chi)'],
 ]
 
 cmstt_vars = [variable.di['ca08cmstt_topMass'],              
@@ -109,11 +109,12 @@ cmstt_vars = [variable.di['ca08cmstt_topMass'],
 ]
 
 
-sd_vars = [variable.di['log(ca08_chi)'],              
-           variable.di['log(ca15_chi)']]
+sd_vars = [#variable.di['log(ca08_chi)'],              
+           #variable.di['log(ca15_chi)']
+    ]
               
 
-all_vars_15 = mass_vars_15 + tau_vars_15 + tau31_vars_15 + tagger_vars_15 
-all_vars_08 = mass_vars_08 + tau_vars_08 + tau31_vars_08 + tagger_vars_08
+all_vars_15 = mass_vars_15 + tau_vars_15 +   tagger_vars_15 
+all_vars_08 = mass_vars_08 + tau_vars_08 +   tagger_vars_08
 
 all_vars = all_vars_08 + all_vars_15

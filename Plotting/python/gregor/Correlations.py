@@ -6,11 +6,20 @@
 # Imports
 ########################################
 
-from TTH.Plotting.Helpers.CorrelationHelpers import *
+import os
 
-from TTH.Plotting.Helpers.VariableHelpers import variable as var
-
-from TTH.Plotting.gregor.TopTaggingVariables import *
+# With CMSSW
+if "CMSSW_VERSION" in os.environ.keys():
+    from TTH.Plotting.Helpers.CorrelationHelpers import *
+    from TTH.Plotting.Helpers.VariableHelpers import variable as var
+    from TTH.Plotting.gregor.TopTaggingVariables import *
+    from TTH.Plotting.gregor.TopSamples import files, ranges
+# Without CMSSW
+else:
+    from TTH.Plotting.python.Helpers.CorrelationHelpers import *
+    from TTH.Plotting.python.Helpers.VariableHelpers import variable as var
+    from TTH.Plotting.python.gregor.TopTaggingVariables import *
+    from TTH.Plotting.python.gregor.TopSamples import files, ranges
 
 
 ########################################
@@ -20,16 +29,12 @@ from TTH.Plotting.gregor.TopTaggingVariables import *
 
 basepath = '/scratch/gregor/'
 
-files = {}
-files["qcd_800_1000"] = "ntop_v11_qcd_800_1000_pythia8_13tev-tagging-weighted"
-files["zprime_m2000_1p"] = "ntop_v11_zprime_m2000_1p_13tev-tagging-weighted"
+# for the filename: basepath + filename + .root
+full_filenames = {}
+for k,v in files.iteritems():
+    full_filenames[k] = basepath + v + "-weighted.root"
 
 fiducial_cut_and_weight = "(weight*((pt>801)&&(pt<999)))"
-                                        
-# for the filename: basepath + filename + .root
-for k,v in files.iteritems():
-    files[k] = basepath + v + ".root"
-
 
 corrs = [#corr("masses_15", "zprime_m2000_1p", mass_vars_15, fiducial_cut_and_weight),
          #corr("masses_15", "qcd_800_1000",    mass_vars_15, fiducial_cut_and_weight),

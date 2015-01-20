@@ -134,6 +134,8 @@ def doTMVA(setup):
     # TMVA starts here
     ########################################
 
+    print cut_signal
+
     # Create instance of TMVA factory
     factory = ROOT.TMVA.Factory( "TMVAClassification", outputFile, 
                             "!V:!Silent:Color:DrawProgressBar:Transformations=I:AnalysisType=Classification" )
@@ -154,6 +156,7 @@ def doTMVA(setup):
     mycutSig = ROOT.TCut(cut_signal ) 
     mycutBkg = ROOT.TCut(cut_bg )
 
+
     factory.SetSignalWeightExpression( setup.weight_sig )
     factory.SetBackgroundWeightExpression( setup.weight_bg)
 
@@ -169,9 +172,15 @@ def doTMVA(setup):
     ########################################
     
     if "Cuts" in setup.li_methods:
+
+        sample_size = { 1 :   10000,
+                        2 :  200000,
+                        3 : 4000000}
+
         factory.BookMethod( ROOT.TMVA.Types.kCuts, 
                             "Cuts",
-                            "FitMethod=MC:SampleSize=200000")
+                            "FitMethod=MC:SampleSize={0}".format(sample_size[len(setup.li_vars)])
+        )
 
     if "Likelihood" in setup.li_methods:
         factory.BookMethod( ROOT.TMVA.Types.kLikelihood, 
@@ -293,15 +302,37 @@ def plotROCs(name, li_setups, view="all"):
     legend.SetTextSize(0.03)      
     legend.SetBorderSize(0)
 
-    if view == "left":
+    # Top Tagging
+    # High Purity
+    if view == "left_top":
         c.SetLogy(0)
         h_bg = ROOT.TH2F("","",100,0,0.33,100,0.95,1)
-    elif view == "middle":
+    # Top Tagging
+    # Medium
+    elif view == "middle_top":
         c.SetLogy(0)
         h_bg = ROOT.TH2F("","",100,0.33,0.66,100,0.8,1)
-    elif view == "right":
+    # Top Tagging
+    # High Efficiency
+    elif view == "right_top":
         c.SetLogy(0)
         h_bg = ROOT.TH2F("","",100,0.66,1.,100,0.4,1)
+    # Higgs Tagging
+    # High Purity
+    if view == "left_higgs":
+        c.SetLogy(0)
+        h_bg = ROOT.TH2F("","",100,0,0.33,100,0.85,1)
+    # Higgs Tagging
+    # Middle
+    elif view == "middle_higgs":
+        c.SetLogy(0)
+        h_bg = ROOT.TH2F("","",100,0.33,0.66,100,0.5,.95)
+    # Middle Tagging
+    # High Efficiency
+    elif view == "right_higgs":
+        c.SetLogy(0)
+        h_bg = ROOT.TH2F("","",100,0.66,1.,100,0.0,.6)
+    # All
     elif view == "all":
         c.SetLogy(0)
         h_bg = ROOT.TH2F("","",100,0,1.,100,0.,1)
@@ -344,13 +375,18 @@ def plotROCs(name, li_setups, view="all"):
 # plotROCMultiple
 ########################################
 
-def plotROCMultiple(name, li_setups):
+def plotROCMultiple(name, li_setups, tagging_object = "top"):
     """ Call plotROCs multiple times looking at different regions"""
     
     plotROCs(name, li_setups, "all")
-    plotROCs(name, li_setups, "left")
-    plotROCs(name, li_setups, "middle")
-    plotROCs(name, li_setups, "right")
+    if tagging_object == "top":
+        plotROCs(name, li_setups, "left_top")
+        plotROCs(name, li_setups, "middle_top")
+        plotROCs(name, li_setups, "right_top")
+    elif tagging_object == "higgs":
+        plotROCs(name, li_setups, "left_higgs")
+        plotROCs(name, li_setups, "middle_higgs")
+        plotROCs(name, li_setups, "right_higgs")
 # end of plotROCMultiple
 
 
