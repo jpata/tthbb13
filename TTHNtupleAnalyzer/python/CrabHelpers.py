@@ -113,14 +113,23 @@ def download(name,
 def hadd(name,
          sample_shortname,
          version,        
-         basepath = ""):
+         basepath = "",
+         infile_glob = "output-tagging_*.root*",
+         outfile_suffix = "-tagging"
+):
     """ Hadd all root files in basepath+jobname to basepath/jobname.root
     """
 
-    input_dir = basepath + "{0}_{1}_{2}/output-tagging_*.root*".format(name, version, sample_shortname)    
+    input_dir = basepath + "{0}_{1}_{2}/{3}".format(name, 
+                                                    version, 
+                                                    sample_shortname,
+                                                    infile_glob)    
     input_filenames = glob.glob(input_dir)
         
-    output_filename = basepath + "{0}_{1}_{2}-tagging.root".format(name, version, sample_shortname)    
+    output_filename = basepath + "{0}_{1}_{2}{3}.root".format(name, 
+                                                              version, 
+                                                              sample_shortname,
+                                                              outfile_suffix)    
 
     subprocess.call(["hadd", "-f", output_filename] + input_filenames)
 # End of hadd
