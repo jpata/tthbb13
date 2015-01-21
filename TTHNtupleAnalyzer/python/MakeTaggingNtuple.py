@@ -71,8 +71,8 @@ fj_branches = ["pt", "mass", "tau1", "tau2", "tau3", "btag"]
 # (to expensive to calc for everything)
 fj_branches_plus = fj_branches + ["chi", "qvol"]
 
-htt_branches = ["pt", "mass", "fW", "Rmin", "RminExpected", "prunedMass"]
-cmstt_branches = ["pt", "mass", "minMass", "wMass", "topMass"]
+htt_branches = ["pt", "mass", "fW", "Rmin", "RminExpected", "prunedMass", "ptFiltForRminExp"]
+cmstt_branches = ["pt", "mass", "minMass", "wMass", "topMass", "nSubJets"]
 
 objects = {
     "ca08"            : fj_branches_plus,
