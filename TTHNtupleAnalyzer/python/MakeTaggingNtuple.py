@@ -44,7 +44,7 @@ else:
 # Determine particle species
 # Tier3
 if socket.gethostname() == "t3ui12":
-    particle_name = "parton"
+    particle_name = "hadtop"
 # Grid
 else:
     import PSet
@@ -65,27 +65,33 @@ particle_branches = ["pt", "eta", "phi", "mass"]
 
 # "Normal" branches for most fatjet collections
 fj_branches = ["pt", "mass", "tau1", "tau2", "tau3", "btag"]
-# Extended fj branches, including shower deconstruction chi
+# Extended fj branches, including
+#   shower deconstruction chi
+#   qjets volatility
 # (to expensive to calc for everything)
-fj_branches_chi = fj_branches + ["chi"]
+fj_branches_plus = fj_branches + ["chi", "qvol"]
 
 htt_branches = ["pt", "mass", "fW", "Rmin", "RminExpected", "prunedMass"]
 cmstt_branches = ["pt", "mass", "minMass", "wMass", "topMass"]
 
 objects = {
-    "ca08"           : fj_branches_chi,
-    "ca08filtered"   : fj_branches,
-    "ca08pruned"     : fj_branches,
-    "ca08trimmed"    : fj_branches,
-    "ca08softdrop"   : fj_branches,
+    "ca08"            : fj_branches_plus,
+    "ca08filtered"    : fj_branches,
+    "ca08pruned"      : fj_branches,
+    "ca08newpruned"   : fj_branches,
+    "ca08trimmed"     : fj_branches,
+    "ca08softdrop"    : fj_branches,
+    "ca08newsoftdrop" : fj_branches,
     
-    "ca15"                   : fj_branches_chi,
+    "ca15"                   : fj_branches_plus,
     "ca15filtered"           : fj_branches,
     "ca15massdrop"           : fj_branches,
     "ca15massdropfiltered"   : fj_branches,
     "ca15pruned"             : fj_branches,
+    "ca15newpruned"          : fj_branches,
     "ca15trimmed"            : fj_branches,
     "ca15softdrop"           : fj_branches,
+    "ca15newsoftdrop"        : fj_branches,
     
     "ca08cmstt"      : cmstt_branches,
     "ca15cmstt"      : cmstt_branches,
@@ -95,19 +101,23 @@ objects = {
 
 # Matching DeltaR for the varipus object types
 object_drs = {                      
-    "ca08"           : 0.6,
-    "ca08filtered"   : 0.6,
-    "ca08pruned"     : 0.6,
-    "ca08trimmed"    : 0.6,
-    "ca08softdrop"   : 0.6,
+    "ca08"            : 0.6,
+    "ca08filtered"    : 0.6,
+    "ca08pruned"      : 0.6,
+    "ca08newpruned"   : 0.6,
+    "ca08trimmed"     : 0.6,
+    "ca08softdrop"    : 0.6,
+    "ca08newsoftdrop" : 0.6,
     
     "ca15"                   : 1.2,
     "ca15filtered"           : 1.2,
     "ca15massdrop"           : 1.2,
     "ca15massdropfiltered"   : 1.2,
     "ca15pruned"             : 1.2,
+    "ca15newpruned"          : 1.2,
     "ca15trimmed"            : 1.2,
     "ca15softdrop"           : 1.2,
+    "ca15newsoftdrop"        : 1.2,
     
     "ca08cmstt"      : 0.6,
     "ca15cmstt"      : 1.2,

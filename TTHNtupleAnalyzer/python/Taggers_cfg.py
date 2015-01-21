@@ -5,6 +5,7 @@ import FWCore.ParameterSet.Config as cms
 
 from FWCore.ParameterSet.VarParsing import VarParsing
 import os
+import sys
 import socket
 
 hostname = socket.gethostname()
@@ -56,15 +57,6 @@ process.source = cms.Source("PoolSource",
 )
 
 
-process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService",
-                                                   QjetsCA08 = cms.PSet(
-                                                           initialSeed = cms.untracked.uint32(1314015),
-                                                           engineName = cms.untracked.string('TRandom3')),
-                                                   QjetsCA15 = cms.PSet(
-                                                           initialSeed = cms.untracked.uint32(1415016),
-                                                           engineName = cms.untracked.string('TRandom3')),
-                                           )
-
 # Select candidates that would pass CHS requirements
 # This can be used as input for HTT and other jet clustering algorithms
 process.chs = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedPFCandidates"), cut = cms.string("fromPV"))
@@ -75,405 +67,313 @@ from RecoJets.JetProducers.AnomalousCellParameters_cfi import *
 from RecoJets.JetProducers.PFJetParameters_cfi import *
 from RecoJets.JetProducers.CATopJetParameters_cfi import *
 
-# First create the ungroomed CA08 and CA15 fatjet collections:
 
+#####################################
+# Ungroomed Fatjets
+#####################################
+
+# Setup fatjet collections to store
+li_fatjets_objects = []
+li_fatjets_branches = []
+
+# First create the ungroomed CA08 and CA15 fatjet collections:
 # CA, R=0.8, pT > 200 GeV
-process.ca08PFJetsCHS = cms.EDProducer(
+fj_name = "ca08PFJetsCHS"
+branch_name = 'ca08'
+setattr(process, fj_name, cms.EDProducer(
         "FastjetJetProducer",
         PFJetParameters,
         AnomalousCellParameters,
         jetAlgorithm = cms.string("CambridgeAachen"),
-        rParam       = cms.double(0.8),
-    )
-process.ca08PFJetsCHS.src      = cms.InputTag("chs")
-process.ca08PFJetsCHS.jetPtMin = cms.double(200)
-
+        rParam       = cms.double(0.8)))
+getattr(process, fj_name).src = cms.InputTag("chs")
+getattr(process, fj_name).jetPtMin = cms.double(200)
+li_fatjets_objects.append(fj_name)
+li_fatjets_branches.append(branch_name)
+fj_ca08 = getattr(process, fj_name) # We will re-use this one
 
 # CA, R=1.5, pT > 200 GeV
-process.ca15PFJetsCHS = cms.EDProducer(
+fj_name = "ca15PFJetsCHS"
+branch_name = 'ca15'
+setattr(process, fj_name, cms.EDProducer(
         "FastjetJetProducer",
         PFJetParameters,
         AnomalousCellParameters,
         jetAlgorithm = cms.string("CambridgeAachen"),
-        rParam       = cms.double(1.5),
-    )
-process.ca15PFJetsCHS.src      = cms.InputTag("chs")
-process.ca15PFJetsCHS.jetPtMin = cms.double(200)
+        rParam       = cms.double(1.5)))
+getattr(process, fj_name).src = cms.InputTag("chs")
+getattr(process, fj_name).jetPtMin = cms.double(200)
+li_fatjets_objects.append(fj_name)
+li_fatjets_branches.append(branch_name)
+fj_ca15 = getattr(process, fj_name) # We will re-use this one
 
 
-# Add grooming for the CA08 and CA15 fatjets
-process.ca08PFJetsCHSFiltered = process.ca08PFJetsCHS.clone(
-    useFiltering = cms.bool(True),
-    nFilt = cms.int32(3),
-    rFilt = cms.double(0.3),
-    useExplicitGhosts = cms.bool(True),
-    )
+#####################################
+# Groomed Fatjets
+#####################################
 
-process.ca08PFJetsCHSPruned = process.ca08PFJetsCHS.clone(
-    cms.PSet(nFilt = cms.int32(2),
-             zcut = cms.double(0.1),
-             rcut_factor = cms.double(0.5)),
+fj_name = "ca08PFJetsCHSFiltered"
+branch_name = 'ca08filtered'
+setattr(process, fj_name, fj_ca08.clone(
+        useFiltering = cms.bool(True),
+        nFilt = cms.int32(3),
+        rFilt = cms.double(0.3),
+        useExplicitGhosts = cms.bool(True)))
+li_fatjets_objects.append(fj_name)
+li_fatjets_branches.append(branch_name)
+
+
+fj_name = "ca08PFJetsCHSPruned"
+branch_name = 'ca08pruned'
+setattr(process, fj_name, fj_ca08.clone(
+        cms.PSet(nFilt = cms.int32(99),
+            zcut = cms.double(0.1),
+            rcut_factor = cms.double(0.5)),
     usePruning = cms.bool(True),
-    useExplicitGhosts = cms.bool(True),
-    )
+    useExplicitGhosts = cms.bool(True)))
+li_fatjets_objects.append(fj_name)
+li_fatjets_branches.append(branch_name)
 
-process.ca08PFJetsCHSTrimmed = process.ca08PFJetsCHS.clone(
-    useTrimming = cms.bool(True),
-    rFilt = cms.double(0.2),
-    trimPtFracMin = cms.double(0.03),
-    useExplicitGhosts = cms.bool(True)
-    )
 
-process.ca08PFJetsCHSSoftDrop = process.ca08PFJetsCHS.clone(
-        useSoftDrop = cms.bool(True),
-        zcut = cms.double(0.1),
-        beta = cms.double(0.0),
-        useExplicitGhosts = cms.bool(True),
-)
-
-process.ca15PFJetsCHSFiltered = process.ca15PFJetsCHS.clone(
-    useFiltering = cms.bool(True),
-    nFilt = cms.int32(3),
-    rFilt = cms.double(0.3),
-    useExplicitGhosts = cms.bool(True),
-)
-
-process.ca15PFJetsCHSPruned = process.ca15PFJetsCHS.clone(
-        cms.PSet(nFilt = cms.int32(2),
-                 zcut = cms.double(0.1),
+fj_name = "ca08PFJetsCHSNewPruned"
+branch_name = 'ca08newpruned'
+setattr(process, fj_name, fj_ca08.clone(
+        cms.PSet(nFilt = cms.int32(99),
+                 zcut = cms.double(0.05),
                  rcut_factor = cms.double(0.5)),
         usePruning = cms.bool(True),
-        useExplicitGhosts = cms.bool(True),
-)
+        useExplicitGhosts = cms.bool(True)))
+li_fatjets_objects.append(fj_name)
+li_fatjets_branches.append(branch_name)
 
-process.ca15PFJetsCHSTrimmed = process.ca15PFJetsCHS.clone(
+
+fj_name = "ca08PFJetsCHSTrimmed"
+branch_name = 'ca08trimmed'
+setattr(process, fj_name, fj_ca08.clone(
         useTrimming = cms.bool(True),
         rFilt = cms.double(0.2),
         trimPtFracMin = cms.double(0.03),
-        useExplicitGhosts = cms.bool(True)
-)
+        useExplicitGhosts = cms.bool(True)))
+li_fatjets_objects.append(fj_name)        
+li_fatjets_branches.append(branch_name)
+        
 
-process.ca15PFJetsCHSSoftDrop = process.ca15PFJetsCHS.clone(
+fj_name = "ca08PFJetsCHSSoftDrop"
+branch_name = 'ca08softdrop'
+setattr(process, fj_name, fj_ca08.clone(
         useSoftDrop = cms.bool(True),
         zcut = cms.double(0.1),
         beta = cms.double(0.0),
-        useExplicitGhosts = cms.bool(True)
-)
+        useExplicitGhosts = cms.bool(True)))
+li_fatjets_objects.append(fj_name)
+li_fatjets_branches.append(branch_name)
 
 
-
-# CMS Top Tagger Jets
-process.cmsTopTagCa08PFJetsCHS = cms.EDProducer(
-        "CATopJetProducer",
-        PFJetParameters,
-        AnomalousCellParameters,
-        CATopJetParameters,
-        jetAlgorithm = cms.string("CambridgeAachen"),
-        rParam = cms.double(0.8),
-        writeCompound = cms.bool(True)
-    )
-process.cmsTopTagCa08PFJetsCHS.src = cms.InputTag('chs')
-process.cmsTopTagCa08PFJetsCHS.doAreaFastjet = cms.bool(True)
-process.cmsTopTagCa08PFJetsCHS.jetPtMin = cms.double(200.0)
-
-process.cmsTopTagCa15PFJetsCHS = cms.EDProducer(
-        "CATopJetProducer",
-        PFJetParameters,
-        AnomalousCellParameters,
-        CATopJetParameters,
-        jetAlgorithm = cms.string("CambridgeAachen"),
-        rParam = cms.double(1.5),
-        writeCompound = cms.bool(True)
-    )
-process.cmsTopTagCa15PFJetsCHS.src = cms.InputTag('chs')
-process.cmsTopTagCa15PFJetsCHS.doAreaFastjet = cms.bool(True)
-process.cmsTopTagCa15PFJetsCHS.jetPtMin = cms.double(200.0)
+fj_name = "ca08PFJetsCHSNewSoftDrop"
+branch_name = 'ca08newsoftdrop'
+setattr(process, fj_name, fj_ca08.clone(
+        useSoftDrop = cms.bool(True),
+        zcut = cms.double(0.15),
+        beta = cms.double(2.0),
+        useExplicitGhosts = cms.bool(True)))
+li_fatjets_objects.append(fj_name)
+li_fatjets_branches.append(branch_name)
 
 
-# CMS Top Tagger Infos
-process.ca08CMSTopTagInfos = cms.EDProducer("CATopJetTagger",
-                                            src = cms.InputTag("cmsTopTagCa08PFJetsCHS"),
-                                            TopMass = cms.double(173),
-                                            TopMassMin = cms.double(0.),
-                                            TopMassMax = cms.double(250.),
-                                            WMass = cms.double(80.4),
-                                            WMassMin = cms.double(0.0),
-                                            WMassMax = cms.double(200.0),
-                                            MinMassMin = cms.double(0.0),
-                                            MinMassMax = cms.double(200.0),
-                                            verbose = cms.bool(False))
+fj_name = "ca15PFJetsCHSFiltered"
+branch_name = 'ca15filtered'
+setattr(process, fj_name, fj_ca15.clone(
+        useFiltering = cms.bool(True),
+        nFilt = cms.int32(3),
+        rFilt = cms.double(0.3),
+        useExplicitGhosts = cms.bool(True)))
+li_fatjets_objects.append(fj_name)
+li_fatjets_branches.append(branch_name)
 
 
-process.ca15CMSTopTagInfos = cms.EDProducer("CATopJetTagger",
-                                            src = cms.InputTag("cmsTopTagCa15PFJetsCHS"),
-                                            TopMass = cms.double(173),
-                                            TopMassMin = cms.double(0.),
-                                            TopMassMax = cms.double(250.),
-                                            WMass = cms.double(80.4),
-                                            WMassMin = cms.double(0.0),
-                                            WMassMax = cms.double(200.0),
-                                            MinMassMin = cms.double(0.0),
-                                            MinMassMax = cms.double(200.0),
-                                            verbose = cms.bool(False))
+fj_name = "ca15PFJetsCHSPruned"
+branch_name = 'ca15pruned'
+setattr(process, fj_name, fj_ca15.clone(
+        cms.PSet(nFilt = cms.int32(99),
+                 zcut = cms.double(0.1),
+                 rcut_factor = cms.double(0.5)),
+        usePruning = cms.bool(True),
+        useExplicitGhosts = cms.bool(True)))
+li_fatjets_objects.append(fj_name)
+li_fatjets_branches.append(branch_name)
 
 
-process.QjetsCA08 = cms.EDProducer("QjetsAdder",
-                                   src=cms.InputTag("ca08PFJetsCHS"),
-                                   zcut=cms.double(0.1),
-                                   dcutfctr=cms.double(0.5),
-                                   expmin=cms.double(0.0),
-                                   expmax=cms.double(0.0),
-                                   rigidity=cms.double(0.1),
-                                   ntrial = cms.int32(50),
-                                   cutoff=cms.double(10.0),
-                                   jetRad= cms.double(0.8),
-                                   jetAlgo=cms.string("CA"),
-                                   preclustering = cms.int32(50))
-
-process.QjetsCA15 = cms.EDProducer("QjetsAdder",
-                                   src=cms.InputTag("ca15PFJetsCHS"),
-                                   zcut=cms.double(0.1),
-                                   dcutfctr=cms.double(0.5),
-                                   expmin=cms.double(0.0),
-                                   expmax=cms.double(0.0),
-                                   rigidity=cms.double(0.1),
-                                   ntrial = cms.int32(50),
-                                   cutoff=cms.double(10.0),
-                                   jetRad= cms.double(1.5),
-                                   jetAlgo=cms.string("CA"),
-                                   preclustering = cms.int32(50))
-
-# Nsubjettiness for groomed and ungroomed fatjets
-process.NjettinessCA08 = cms.EDProducer("NjettinessAdder",
-                                        src=cms.InputTag("ca08PFJetsCHS"),
-                                        Njets=cms.vuint32(1,2,3),          # compute 1-, 2-, 3- subjettiness
-                                        # variables for measure definition : 
-                                        measureDefinition = cms.uint32( 0 ), # CMS default is normalized measure
-                                        beta = cms.double(1.0),              # CMS default is 1
-                                        R0 = cms.double( 0.8 ),              # CMS default is jet cone size
-                                        Rcutoff = cms.double( -999.0),       # not used by default
-                                        # variables for axes definition :
-                                        axesDefinition = cms.uint32( 6 ),    # CMS default is 1-pass KT axes
-                                        nPass = cms.int32(-999),             # not used by default
-                                        akAxesR0 = cms.double(-999.0)        # not used by default
-                            )
+fj_name = "ca15PFJetsCHSNewPruned"
+branch_name = 'ca15newpruned'
+setattr(process, fj_name, fj_ca15.clone(
+        cms.PSet(nFilt = cms.int32(99),
+                 zcut = cms.double(0.05),
+                 rcut_factor = cms.double(0.5)),
+        usePruning = cms.bool(True),
+        useExplicitGhosts = cms.bool(True)))
+li_fatjets_objects.append(fj_name)
+li_fatjets_branches.append(branch_name)
 
 
+fj_name = "ca15PFJetsCHSTrimmed"
+branch_name = 'ca15trimmed'
+setattr(process, fj_name, fj_ca15.clone(
+        useTrimming = cms.bool(True),
+        rFilt = cms.double(0.2),
+        trimPtFracMin = cms.double(0.03),
+        useExplicitGhosts = cms.bool(True)))
+li_fatjets_objects.append(fj_name)
+li_fatjets_branches.append(branch_name)
+
+fj_name = "ca15PFJetsCHSSoftDrop"
+branch_name = 'ca15softdrop'
+setattr(process, fj_name, fj_ca15.clone(
+        useSoftDrop = cms.bool(True),
+        zcut = cms.double(0.1),
+        beta = cms.double(0.0),
+        useExplicitGhosts = cms.bool(True)))
+li_fatjets_objects.append(fj_name)
+li_fatjets_branches.append(branch_name)
 
 
-process.NjettinessCA08Filtered = cms.EDProducer("NjettinessAdder",
-                                                src=cms.InputTag("ca08PFJetsCHSFiltered"),
-                                                Njets=cms.vuint32(1,2,3),          # compute 1-, 2-, 3- subjettiness
-                                                # variables for measure definition : 
-                                                measureDefinition = cms.uint32( 0 ), # CMS default is normalized measure
-                                                beta = cms.double(1.0),              # CMS default is 1
-                                                R0 = cms.double( 0.8 ),              # CMS default is jet cone size
-                                                Rcutoff = cms.double( -999.0),       # not used by default
-                                                # variables for axes definition :
-                                                axesDefinition = cms.uint32( 6 ),    # CMS default is 1-pass KT axes
-                                                nPass = cms.int32(-999),             # not used by default
-                                                akAxesR0 = cms.double(-999.0)        # not used by default
-                            )
+fj_name = "ca15PFJetsCHSNewSoftDrop"
+branch_name = 'ca15newsoftdrop'
+setattr(process, fj_name, fj_ca15.clone(
+        useSoftDrop = cms.bool(True),
+        zcut = cms.double(0.15),
+        beta = cms.double(2.0),
+        useExplicitGhosts = cms.bool(True)))
+li_fatjets_objects.append(fj_name)
+li_fatjets_branches.append(branch_name)
 
-process.NjettinessCA08Pruned = cms.EDProducer("NjettinessAdder",
-                                              src=cms.InputTag("ca08PFJetsCHSPruned"),
+
+#####################################
+# Helpers: GetRadiusFromName / GetRadiusStringFromName
+#####################################
+
+def GetRadiusFromName(name):       
+   if "08" in fj_name:
+      return 0.8 
+   elif "15" in fj_name:
+      return 1.5
+   else:
+      print "Invalid jet radius!"
+      sys.exit()
+
+def GetRadiusStringFromName(name):        
+   if "08" in fj_name:
+      return "08"
+   elif "15" in fj_name:
+      return "15"
+   else:
+      print "Invalid jet radius!"
+      sys.exit()
+
+
+#####################################
+# NSubjettiness
+#####################################
+
+li_fatjets_nsubs = []
+for fj_name in li_fatjets_objects:
+
+   nsub_name = fj_name + "Njettiness"
+        
+   r = GetRadiusFromName(fj_name)
+
+   setattr(process, nsub_name, cms.EDProducer("NjettinessAdder",
+                                              src=cms.InputTag(fj_name),
                                               Njets=cms.vuint32(1,2,3),          # compute 1-, 2-, 3- subjettiness
                                               # variables for measure definition : 
                                               measureDefinition = cms.uint32( 0 ), # CMS default is normalized measure
                                               beta = cms.double(1.0),              # CMS default is 1
-                                              R0 = cms.double( 0.8 ),              # CMS default is jet cone size
+                                              R0 = cms.double(r),              # CMS default is jet cone size
                                               Rcutoff = cms.double( -999.0),       # not used by default
                                               # variables for axes definition :
                                               axesDefinition = cms.uint32( 6 ),    # CMS default is 1-pass KT axes
                                               nPass = cms.int32(-999),             # not used by default
                                               akAxesR0 = cms.double(-999.0)        # not used by default
-
-                            )
-
-
-process.NjettinessCA08Trimmed = cms.EDProducer("NjettinessAdder",
-                                               src=cms.InputTag("ca08PFJetsCHSTrimmed"),
-                                               Njets=cms.vuint32(1,2,3),          # compute 1-, 2-, 3- subjettiness
-                                               # variables for measure definition : 
-                                               measureDefinition = cms.uint32( 0 ), # CMS default is normalized measure
-                                               beta = cms.double(1.0),              # CMS default is 1
-                                               R0 = cms.double( 0.8 ),              # CMS default is jet cone size
-                                               Rcutoff = cms.double( -999.0),       # not used by default
-                                               # variables for axes definition :
-                                               axesDefinition = cms.uint32( 6 ),    # CMS default is 1-pass KT axes
-                                               nPass = cms.int32(-999),             # not used by default
-                                               akAxesR0 = cms.double(-999.0)        # not used by default
-                            )
-
-process.NjettinessCA08SoftDrop = cms.EDProducer("NjettinessAdder",
-                                               src=cms.InputTag("ca08PFJetsCHSSoftDrop"),
-                                               Njets=cms.vuint32(1,2,3),          # compute 1-, 2-, 3- subjettiness
-                                               # variables for measure definition : 
-                                               measureDefinition = cms.uint32( 0 ), # CMS default is normalized measure
-                                               beta = cms.double(1.0),              # CMS default is 1
-                                               R0 = cms.double( 0.8 ),              # CMS default is jet cone size
-                                               Rcutoff = cms.double( -999.0),       # not used by default
-                                               # variables for axes definition :
-                                               axesDefinition = cms.uint32( 6 ),    # CMS default is 1-pass KT axes
-                                               nPass = cms.int32(-999),             # not used by default
-                                               akAxesR0 = cms.double(-999.0)        # not used by default
-                            )
-
-process.NjettinessCA15 = cms.EDProducer("NjettinessAdder",
-                                        src=cms.InputTag("ca15PFJetsCHS"),
-                                        Njets=cms.vuint32(1,2,3),          # compute 1-, 2-, 3- subjettiness
-                                        # variables for measure definition : 
-                                        measureDefinition = cms.uint32( 0 ), # CMS default is normalized measure
-                                        beta = cms.double(1.0),              # CMS default is 1
-                                        R0 = cms.double( 1.5 ),              # CMS default is jet cone size
-                                        Rcutoff = cms.double( -999.0),       # not used by default
-                                        # variables for axes definition :
-                                        axesDefinition = cms.uint32( 6 ),    # CMS default is 1-pass KT axes
-                                        nPass = cms.int32(-999),             # not used by default
-                                        akAxesR0 = cms.double(-999.0)        # not used by default
-                            )
-
-process.NjettinessCA15Filtered = cms.EDProducer("NjettinessAdder",
-                                                src=cms.InputTag("ca15PFJetsCHSFiltered"),
-                                                Njets=cms.vuint32(1,2,3),          # compute 1-, 2-, 3- subjettiness
-                                                # variables for measure definition : 
-                                                measureDefinition = cms.uint32( 0 ), # CMS default is normalized measure
-                                                beta = cms.double(1.0),              # CMS default is 1
-                                                R0 = cms.double( 1.5 ),              # CMS default is jet cone size
-                                                Rcutoff = cms.double( -999.0),       # not used by default
-                                                # variables for axes definition :
-                                                axesDefinition = cms.uint32( 6 ),    # CMS default is 1-pass KT axes
-                                                nPass = cms.int32(-999),             # not used by default
-                                                akAxesR0 = cms.double(-999.0)        # not used by default
-                            )
-
-process.NjettinessCA15Pruned = cms.EDProducer("NjettinessAdder",
-                                              src=cms.InputTag("ca15PFJetsCHSPruned"),
-                                              Njets=cms.vuint32(1,2,3),          # compute 1-, 2-, 3- subjettiness
-                                              # variables for measure definition : 
-                                              measureDefinition = cms.uint32( 0 ), # CMS default is normalized measure
-                                              beta = cms.double(1.0),              # CMS default is 1
-                                              R0 = cms.double( 1.5 ),              # CMS default is jet cone size
-                                              Rcutoff = cms.double( -999.0),       # not used by default
-                                              # variables for axes definition :
-                                              axesDefinition = cms.uint32( 6 ),    # CMS default is 1-pass KT axes
-                                              nPass = cms.int32(-999),             # not used by default
-                                              akAxesR0 = cms.double(-999.0)        # not used by default
-)
-
-process.NjettinessCA15Trimmed = cms.EDProducer("NjettinessAdder",
-                                               src=cms.InputTag("ca15PFJetsCHSTrimmed"),
-                                               Njets=cms.vuint32(1,2,3),          # compute 1-, 2-, 3- subjettiness
-                                               # variables for measure definition : 
-                                               measureDefinition = cms.uint32( 0 ), # CMS default is normalized measure
-                                               beta = cms.double(1.0),              # CMS default is 1
-                                               R0 = cms.double( 1.5 ),              # CMS default is jet cone size
-                                               Rcutoff = cms.double( -999.0),       # not used by default
-                                               # variables for axes definition :
-                                               axesDefinition = cms.uint32( 6 ),    # CMS default is 1-pass KT axes
-                                               nPass = cms.int32(-999),             # not used by default
-                                               akAxesR0 = cms.double(-999.0)        # not used by default
-                            )
-
-process.NjettinessCA15SoftDrop = cms.EDProducer("NjettinessAdder",
-                                               src=cms.InputTag("ca15PFJetsCHSSoftDrop"),
-                                               Njets=cms.vuint32(1,2,3),          # compute 1-, 2-, 3- subjettiness
-                                               # variables for measure definition : 
-                                               measureDefinition = cms.uint32( 0 ), # CMS default is normalized measure
-                                               beta = cms.double(1.0),              # CMS default is 1
-                                               R0 = cms.double( 1.5 ),              # CMS default is jet cone size
-                                               Rcutoff = cms.double( -999.0),       # not used by default
-                                               # variables for axes definition :
-                                               axesDefinition = cms.uint32( 6 ),    # CMS default is 1-pass KT axes
-                                               nPass = cms.int32(-999),             # not used by default
-                                               akAxesR0 = cms.double(-999.0)        # not used by default
-                            )
-
-# Schedule Shower Deconstruction
-# Tier3
-if hostname == "t3ui12":
-  sd_path = "../data/"
-# Grid
-else:
-  sd_path = "src/TTH/TTHNtupleAnalyzer/data/"
-
-#process.SDCA08 = cms.EDProducer("SDProducer",
-#                                FatjetName = cms.string("ca08PFJetsCHS"),
-#                                MicrojetCone = cms.double(0.2),
-#                                InputCard = cms.string(sd_path + "sd_input_card_08.dat"))
-
-#process.SDCA15 = cms.EDProducer("SDProducer",
-#                                FatjetName = cms.string("ca15PFJetsCHS"),
-#                                MicrojetCone = cms.double(0.2),
-#                                InputCard = cms.string(sd_path + "sd_input_card_15.dat"))
-
-# Setup fatjet collections to store
-li_fatjets_objects = ['ca08PFJetsCHS',  
-                      'ca08PFJetsCHSFiltered',  
-                      'ca08PFJetsCHSPruned',  
-                      'ca08PFJetsCHSTrimmed',  
-                      'ca08PFJetsCHSSoftDrop',  
-                      'ca15PFJetsCHS',  
-                      'ca15PFJetsCHSFiltered',  
-                      'ca15PFJetsCHSPruned',  
-                      'ca15PFJetsCHSTrimmed' ,
-                      'ca15PFJetsCHSSoftDrop'  ]
-
-li_fatjets_nsubs = ['NjettinessCA08', 
-                    'NjettinessCA08Filtered', 
-                    'NjettinessCA08Pruned', 
-                    'NjettinessCA08Trimmed', 
-                    'NjettinessCA08SoftDrop', 
-                    'NjettinessCA15', 
-                    'NjettinessCA15Filtered', 
-                    'NjettinessCA15Pruned', 
-                    'NjettinessCA15Trimmed',
-                    'NjettinessCA15SoftDrop' ]
-
-li_fatjets_qvols = ['QjetsCA08', 
-                    'None', 
-                    'None',
-                    'None', 
-                    'None', 
-                    'QjetsCA15', 
-                    'None', 
-                    'None',
-                    'None',
-                    'None']
-
-li_fatjets_sds = [#'SDCA08', 
-                  'None', 
-		  'None', 
-                  'None', 
-                  'None', 
-                  'None', 
-                  #'SDCA15', 
-                  'None', 
-                  'None', 
-                  'None', 
-                  'None',
-                  'None' ]
-
-li_fatjets_branches =  ['ca08',           
-                        'ca08filtered',           
-                        'ca08pruned',           
-                        'ca08trimmed',           
-                        'ca08softdrop',           
-                        'ca15',           
-                        'ca15filtered',           
-                        'ca15pruned',           
-                        'ca15trimmed',
-                        'ca15softdrop']
-
-li_fatjets_is_basic_jets = [0] * len(li_fatjets_objects)
+                                      ))
+   li_fatjets_nsubs.append(nsub_name)
 
 
+#####################################
+# Shower Deconstruction
+#####################################
+
+li_fatjets_sds = []
+for fj_name in li_fatjets_objects:
+
+   # Tier3
+   if hostname == "t3ui12":
+     sd_path = "../data/"
+   # Grid
+   else:
+     sd_path = "src/TTH/TTHNtupleAnalyzer/data/"
+        
+   sd_fatjets = []
+   # sd_fatjets = ["ca08PFJetsCHS", "ca15PFJetsCHS"]
+   
+   r = GetRadiusStringFromName(fj_name)
+   
+   if fj_name in sd_fatjets:
+        sd_name = fj_name + "SD"
+        setattr(process, sd_name, cms.EDProducer("SDProducer",
+                                                 FatjetName = cms.string(fj_name),
+                                                 MicrojetCone = cms.double(0.2),
+                                                 InputCard = cms.string(sd_path + "sd_input_card_{0}.dat".format(r))))
+        li_fatjets_sds.append(sd_name)
+   else:
+        li_fatjets_sds.append('None')
+
+
+#####################################
+# QJets
+#####################################
+
+# Qjets need a RNG
+process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService")
+
+li_fatjets_qvols = []
+for i_fj, fj_name in enumerate(li_fatjets_objects):
+        
+   qvol_fatjets = ["ca08PFJetsCHS", "ca15PFJetsCHS"]
+   
+   r = GetRadiusFromName(fj_name)   
+
+   if fj_name in qvol_fatjets:
+        qvol_name = fj_name + "QJetVolatility"
+
+        setattr(process, qvol_name, cms.EDProducer("QjetsAdder",
+                                                   src=cms.InputTag(fj_name),
+                                                   zcut=cms.double(0.1),
+                                                   dcutfctr=cms.double(0.5),
+                                                   expmin=cms.double(0.0),
+                                                   expmax=cms.double(0.0),
+                                                   rigidity=cms.double(0.1),
+                                                   ntrial = cms.int32(50),
+                                                   cutoff=cms.double(10.0),
+                                                   jetRad= cms.double(r),
+                                                   jetAlgo=cms.string("CA"),
+                                                   preclustering = cms.int32(50)))
+
+        setattr(process.RandomNumberGeneratorService, qvol_name, cms.PSet(initialSeed = cms.untracked.uint32(i_fj),
+                                                                          engineName = cms.untracked.string('TRandom3')))
+
+
+        li_fatjets_qvols.append(qvol_name)
+   else:
+        li_fatjets_qvols.append('None')
+
+
+#####################################
+# b-tagging
+#####################################
 
 # Add b-tagging information for all fatjets
 process.my_btagging = cms.Sequence()
 li_fatjets_btags = []
 for fatjet_name in li_fatjets_objects:
-
 
         # Define the names
         impact_info_name          = fatjet_name + "ImpactParameterTagInfos"
@@ -482,10 +382,7 @@ for fatjet_name in li_fatjets_objects:
         csvv2_computer_name       = fatjet_name + "combinedSecondaryVertexV2Computer"
         csvv2ivf_name             = fatjet_name + "pfCombinedInclusiveSecondaryVertexV2BJetTags"        
 
-        if "08" in fatjet_name:
-                delta_r = 0.8
-        else:
-                delta_r = 1.5
+        delta_r = GetRadiusFromName(fatjet_name)
 
         # Setup the modules
         setattr(process, 
@@ -545,7 +442,98 @@ for fatjet_name in li_fatjets_objects:
 # end of loop over fatjets
 
 
+#####################################
+# CMS Top Tagger
+#####################################
 
+# CMS Top Tagger Jets
+process.cmsTopTagCa08PFJetsCHS = cms.EDProducer(
+        "CATopJetProducer",
+        PFJetParameters,
+        AnomalousCellParameters,
+        CATopJetParameters,
+        jetAlgorithm = cms.string("CambridgeAachen"),
+        rParam = cms.double(0.8),
+        writeCompound = cms.bool(True)
+    )
+process.cmsTopTagCa08PFJetsCHS.src = cms.InputTag('chs')
+process.cmsTopTagCa08PFJetsCHS.doAreaFastjet = cms.bool(True)
+process.cmsTopTagCa08PFJetsCHS.jetPtMin = cms.double(200.0)
+
+process.cmsTopTagCa15PFJetsCHS = cms.EDProducer(
+        "CATopJetProducer",
+        PFJetParameters,
+        AnomalousCellParameters,
+        CATopJetParameters,
+        jetAlgorithm = cms.string("CambridgeAachen"),
+        rParam = cms.double(1.5),
+        writeCompound = cms.bool(True)
+    )
+process.cmsTopTagCa15PFJetsCHS.src = cms.InputTag('chs')
+process.cmsTopTagCa15PFJetsCHS.doAreaFastjet = cms.bool(True)
+process.cmsTopTagCa15PFJetsCHS.jetPtMin = cms.double(200.0)
+
+# CMS Top Tagger Infos
+process.ca08CMSTopTagInfos = cms.EDProducer("CATopJetTagger",
+                                            src = cms.InputTag("cmsTopTagCa08PFJetsCHS"),
+                                            TopMass = cms.double(173),
+                                            TopMassMin = cms.double(0.),
+                                            TopMassMax = cms.double(250.),
+                                            WMass = cms.double(80.4),
+                                            WMassMin = cms.double(0.0),
+                                            WMassMax = cms.double(200.0),
+                                            MinMassMin = cms.double(0.0),
+                                            MinMassMax = cms.double(200.0),
+                                            verbose = cms.bool(False))
+
+process.ca15CMSTopTagInfos = cms.EDProducer("CATopJetTagger",
+                                            src = cms.InputTag("cmsTopTagCa15PFJetsCHS"),
+                                            TopMass = cms.double(173),
+                                            TopMassMin = cms.double(0.),
+                                            TopMassMax = cms.double(250.),
+                                            WMass = cms.double(80.4),
+                                            WMassMin = cms.double(0.0),
+                                            WMassMax = cms.double(200.0),
+                                            MinMassMin = cms.double(0.0),
+                                            MinMassMax = cms.double(200.0),
+                                            verbose = cms.bool(False))
+
+
+#####################################
+#  HEPTopTagger
+#####################################
+
+process.LooseMultiRHTTJetsCHS = cms.EDProducer(
+     "HTTTopJetProducer",
+     PFJetParameters.clone( src = cms.InputTag('chs'),
+                            doAreaFastjet = cms.bool(True),
+                            doRhoFastjet = cms.bool(False),
+                            jetPtMin = cms.double(100.0)
+                        ),
+     AnomalousCellParameters,
+     multiR = cms.bool(True),
+     algorithm = cms.int32(1),
+     jetAlgorithm = cms.string("CambridgeAachen"),
+     rParam = cms.double(1.5),
+     mode = cms.int32(4),
+     minFatjetPt = cms.double(200.),
+     minCandPt = cms.double(200.),
+     minSubjetPt = cms.double(30.),
+     writeCompound = cms.bool(True),
+     minCandMass = cms.double(0.),
+     maxCandMass = cms.double(1000),
+     massRatioWidth = cms.double(100.),
+     minM23Cut = cms.double(0.),
+     minM13Cut = cms.double(0.),
+     maxM13Cut = cms.double(2.),
+)
+
+
+#####################################
+# NTupelizer
+#####################################
+
+li_fatjets_is_basic_jets = [0] * len(li_fatjets_objects)
 
 process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
 	isMC = cms.bool(True),
@@ -596,83 +584,54 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
         jecFile = cms.FileInPath("Summer13_V4_DATA_UncertaintySources_AK5PFchs.txt")
 )
 
+
 process.TFileService = cms.Service("TFileService",
 	fileName = cms.string(options.outputFile)
 )
 
 
+#####################################
+# Schedule Algorithms
+#####################################
 
-process.LooseMultiRHTTJetsCHS = cms.EDProducer(
-     "HTTTopJetProducer",
-     PFJetParameters.clone( src = cms.InputTag('chs'),
-                            doAreaFastjet = cms.bool(True),
-                            doRhoFastjet = cms.bool(False),
-                            jetPtMin = cms.double(100.0)
-                        ),
-     AnomalousCellParameters,
-     multiR = cms.bool(True),
-     algorithm = cms.int32(1),
-     jetAlgorithm = cms.string("CambridgeAachen"),
-     rParam = cms.double(1.5),
-     mode = cms.int32(4),
-     minFatjetPt = cms.double(200.),
-     minCandPt = cms.double(200.),
-     minSubjetPt = cms.double(30.),
-     writeCompound = cms.bool(True),
-     minCandMass = cms.double(0.),
-     maxCandMass = cms.double(1000),
-     massRatioWidth = cms.double(100.),
-     minM23Cut = cms.double(0.),
-     minM13Cut = cms.double(0.),
-     maxM13Cut = cms.double(2.),
-)
+process.p = cms.Path(process.chs)
 
-process.p = cms.Path(
+# Schedule all fatjets
+for fj_name in li_fatjets_objects:
+   process.p += getattr(process, fj_name)
 
-        process.chs *
+# Schedule NSubjettiness
+for nsub_name in li_fatjets_nsubs:
+   if nsub_name == "None":
+      continue
+   else:
+      process.p += getattr(process, nsub_name)
 
-        process.ca08PFJetsCHS *
-        process.ca15PFJetsCHS *
+# Schedule QJet Volatility
+for qvol_name in li_fatjets_qvols:
+   if qvol_name == "None":
+      continue
+   else:
+      process.p += getattr(process, qvol_name)       
+                
+# Schedule Shower Deconstruction
+for sd_name in li_fatjets_sds:
+   if sd_name == "None":
+      continue
+   else:
+      process.p += getattr(process, sd_name)
 
-        process.ca08PFJetsCHSFiltered * 
-        process.ca08PFJetsCHSPruned   * 
-        process.ca08PFJetsCHSTrimmed  * 
-        process.ca08PFJetsCHSSoftDrop *
+# Schedule CMS Top Tagger, HEPTopTagger, b-tagging and Ntupelizer
+for x in [process.cmsTopTagCa08PFJetsCHS,
+          process.cmsTopTagCa15PFJetsCHS,
+          process.ca08CMSTopTagInfos,
+          process.ca15CMSTopTagInfos,
+          process.LooseMultiRHTTJetsCHS,
+          process.my_btagging,
+          process.tthNtupleAnalyzer
+  ]:
+   process.p += x
 
-        process.ca15PFJetsCHSFiltered * 
-        process.ca15PFJetsCHSPruned   * 
-        process.ca15PFJetsCHSTrimmed  * 
-        process.ca15PFJetsCHSSoftDrop *
-
-        process.QjetsCA08 *
-        process.QjetsCA15 *
-
-        process.NjettinessCA08 *        
-        process.NjettinessCA08Filtered *        
-        process.NjettinessCA08Pruned *        
-        process.NjettinessCA08Trimmed *        
-        process.NjettinessCA08SoftDrop *        
-
-        process.NjettinessCA15 *        
-        process.NjettinessCA15Filtered *        
-        process.NjettinessCA15Pruned *        
-        process.NjettinessCA15Trimmed *        
-        process.NjettinessCA15SoftDrop *        
-
-        process.cmsTopTagCa08PFJetsCHS *
-        process.cmsTopTagCa15PFJetsCHS *
-        process.ca08CMSTopTagInfos * 
-        process.ca15CMSTopTagInfos * 
-
-        #process.SDCA08 * 
-        #process.SDCA15 * 
-
-	process.LooseMultiRHTTJetsCHS * 
-
-        process.my_btagging *
-        
-	process.tthNtupleAnalyzer
-)
 
 if "TTH_DEBUG" in os.environ:
 	process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")

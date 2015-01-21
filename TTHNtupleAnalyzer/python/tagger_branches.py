@@ -155,8 +155,8 @@ for t in [
 
 
 # Fatjet Branches
-for fj_name in ["ca08", "ca08filtered", "ca08pruned", "ca08trimmed", "ca08softdrop", 
-                "ca15", "ca15filtered", "ca15pruned", "ca15trimmed", "ca15softdrop"]:
+for fj_name in ["ca08", "ca08filtered", "ca08pruned", "ca08newpruned", "ca08trimmed", "ca08softdrop", "ca08newsoftdrop", 
+                "ca15", "ca15filtered", "ca15pruned", "ca15newpruned", "ca15trimmed", "ca15softdrop", "ca15newsoftdrop"]:
 
     # How many of these objects do we have?
     full_counter_name = "n__jet_{0}".format(fj_name)
