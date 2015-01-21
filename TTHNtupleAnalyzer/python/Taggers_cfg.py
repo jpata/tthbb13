@@ -311,8 +311,8 @@ for fj_name in li_fatjets_objects:
    else:
      sd_path = "src/TTH/TTHNtupleAnalyzer/data/"
         
-   sd_fatjets = []
-   # sd_fatjets = ["ca08PFJetsCHS", "ca15PFJetsCHS"]
+   #sd_fatjets = []
+   sd_fatjets = ["ca08PFJetsCHS", "ca15PFJetsCHS"]
    
    r = GetRadiusStringFromName(fj_name)
    
