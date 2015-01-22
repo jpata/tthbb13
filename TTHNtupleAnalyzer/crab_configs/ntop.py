@@ -6,7 +6,7 @@
 
 import sys
 
-from TTH.TTHNtupleAnalyzer.CrabHelpers import submit, status, download, hadd
+from TTH.TTHNtupleAnalyzer.CrabHelpers import submit, status, kill, download, hadd
 
 
 #######################################
@@ -15,7 +15,7 @@ from TTH.TTHNtupleAnalyzer.CrabHelpers import submit, status, download, hadd
 
 # Ntuple name/version and samples to include
 name = "ntop"
-version = "v17"
+version = "v18"
 li_samples = [
     #"qcd_170_300_pythia8_13tev",
     #"qcd_300_470_pythia8_13tev",
@@ -41,7 +41,7 @@ storage_path = '/scratch/gregor/'
 #####################################
 
 # Decide what to do
-actions = ["submit", "status", "download", "hadd"]
+actions = ["submit", "status", "kill", "download", "hadd"]
 
 if not len(sys.argv) == 2:
     print "Invalid number of arguments"
@@ -71,6 +71,13 @@ if action == "status":
         status(name,
                sample_shortname,  
                version)
+
+# Kill
+if action == "kill":
+    for sample_shortname in li_samples:
+        kill(name,
+             sample_shortname,  
+             version)
 
 # Download
 elif action == "download":

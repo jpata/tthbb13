@@ -305,23 +305,25 @@ li_fatjets_sds = []
 for fj_name in li_fatjets_objects:
 
    # Tier3
-   if hostname == "t3ui12":
-     sd_path = "../data/"
-   # Grid
-   else:
-     sd_path = "src/TTH/TTHNtupleAnalyzer/data/"
+   #if hostname == "t3ui12":
+   #  sd_path = "../data/"
+   ## Grid
+   #else:
+   sd_path = "src/TTH/TTHNtupleAnalyzer/data/"
         
    #sd_fatjets = []
    sd_fatjets = ["ca08PFJetsCHS", "ca15PFJetsCHS"]
    
    r = GetRadiusStringFromName(fj_name)
+   input_card = sd_path + "sd_input_card_{0}.dat".format(r)
+   print "SD input card:", input_card
    
    if fj_name in sd_fatjets:
         sd_name = fj_name + "SD"
         setattr(process, sd_name, cms.EDProducer("SDProducer",
                                                  FatjetName = cms.string(fj_name),
                                                  MicrojetCone = cms.double(0.2),
-                                                 InputCard = cms.string(sd_path + "sd_input_card_{0}.dat".format(r))))
+                                                 InputCard = cms.string(input_card)))
         li_fatjets_sds.append(sd_name)
    else:
         li_fatjets_sds.append('None')
