@@ -155,13 +155,15 @@ for t in [
 
 
 # Fatjet Branches
-for fj_name in ["ca15", 
-                "ca15filtered", 
-                "ca15massdrop", 
-                "ca15massdropfiltered", 
-                "ca15pruned", 
-                "ca15trimmed", 
-                "ca15softdrop"]:
+for fj_name in ['ca15', 'ca15filteredn2r2', 'ca15filteredn2r3',
+                'ca15filteredn3r3', 'ca15filteredn4r2', 'ca15massdrop',
+                'ca15massdropfilteredn2r2', 'ca15massdropfilteredn2r3',
+                'ca15massdropfilteredn3r3', 'ca15massdropfilteredn4r2',
+                'ca15prunedz1r5', 'ca15prunedz2r5', 'ca15prunedz1r3',
+                'ca15trimmedr2f3', 'ca15trimmedr2f1', 'ca15trimmedr2f6',
+                'ca15softdropz10b0', 'ca15softdropz5b0', 'ca15softdropz15b2']:
+
+    print "Adding", fj_name
 
     # How many of these objects do we have?
     full_counter_name = "n__jet_{0}".format(fj_name)
@@ -173,14 +175,16 @@ for fj_name in ["ca15",
             "tau1", "tau2", "tau3",      # N-subjettiness
             "btag",                      # b-tag discriminator
             "chi",                       # Shower deconstruction chi
-                                         # (only fill for ca08 and ca15 wo grooming at the moment)
+                                         # (only fill for ca15 wo grooming at the moment)
+            "qvol",                      # Qjet Volatility
+                                         # (only fill for ca15 wo grooming at the moment)
             "close_hadtop_pt",  "close_hadtop_dr", "close_hadtop_i", # top truth matching
             "close_parton_pt",  "close_parton_dr", "close_parton_i", # parton truth matching
             "close_higgs_pt",   "close_higgs_dr",  "close_higgs_i"   # higgs truth matching
             ]:
 
         # Don't do chi unless we have the unfiltered fatjets
-        if (branch_name == "chi") and not (fj_name in ["ca08","ca15"]):
+        if (branch_name in ["chi","qvol"]) and not (fj_name in ["ca15"]):
             continue
 
         if branch_name in ["close_higgs_i", "close_hadtop_i", "close_parton_i"]:

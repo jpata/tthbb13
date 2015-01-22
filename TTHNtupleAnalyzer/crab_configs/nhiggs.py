@@ -15,7 +15,7 @@ from TTH.TTHNtupleAnalyzer.CrabHelpers import submit, status, kill, download, ha
 
 # Ntuple name/version and samples to include
 name = "nhiggs"
-version = "v3"
+version = "v4z"
 li_samples = [
     "tth_hbb_13tev",
     "ttj_13tev"
@@ -61,7 +61,7 @@ if action == "status":
                sample_shortname,  
                version)
 
-# Status
+# Kill
 if action == "kill":
     for sample_shortname in li_samples:
         kill(name,

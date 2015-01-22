@@ -44,7 +44,7 @@ else:
 # Determine particle species
 # Tier3
 if socket.gethostname() == "t3ui12":
-    particle_name = "hadtop"
+    particle_name = "higgs"
 # Grid
 else:
     import PSet
@@ -93,6 +93,25 @@ objects = {
     "ca15softdrop"           : fj_branches,
     "ca15newsoftdrop"        : fj_branches,
     
+    'ca15filteredn2r2'          : fj_branches,      
+    'ca15filteredn2r3'          : fj_branches,	 
+    'ca15filteredn3r3'          : fj_branches, 
+    'ca15filteredn4r2'          : fj_branches, 
+    'ca15massdrop'              : fj_branches,
+    'ca15massdropfilteredn2r2'  : fj_branches, 
+    'ca15massdropfilteredn2r3'  : fj_branches,
+    'ca15massdropfilteredn3r3'  : fj_branches, 
+    'ca15massdropfilteredn4r2'  : fj_branches,
+    'ca15prunedz1r5'            : fj_branches, 
+    'ca15prunedz2r5'            : fj_branches, 
+    'ca15prunedz1r3'            : fj_branches,
+    'ca15trimmedr2f3'           : fj_branches, 
+    'ca15trimmedr2f1'           : fj_branches, 
+    'ca15trimmedr2f6'           : fj_branches,
+    'ca15softdropz10b0'         : fj_branches, 
+    'ca15softdropz5b0'          : fj_branches, 
+    'ca15softdropz15b2'         : fj_branches, 
+
     "ca08cmstt"      : cmstt_branches,
     "ca15cmstt"      : cmstt_branches,
 
@@ -118,6 +137,25 @@ object_drs = {
     "ca15trimmed"            : 1.2,
     "ca15softdrop"           : 1.2,
     "ca15newsoftdrop"        : 1.2,
+
+    'ca15filteredn2r2'          : 1.2,      
+    'ca15filteredn2r3'          : 1.2,	 
+    'ca15filteredn3r3'          : 1.2, 
+    'ca15filteredn4r2'          : 1.2, 
+    'ca15massdrop'              : 1.2,
+    'ca15massdropfilteredn2r2'  : 1.2, 
+    'ca15massdropfilteredn2r3'  : 1.2,
+    'ca15massdropfilteredn3r3'  : 1.2, 
+    'ca15massdropfilteredn4r2'  : 1.2,
+    'ca15prunedz1r5'            : 1.2, 
+    'ca15prunedz2r5'            : 1.2, 
+    'ca15prunedz1r3'            : 1.2,
+    'ca15trimmedr2f3'           : 1.2, 
+    'ca15trimmedr2f1'           : 1.2, 
+    'ca15trimmedr2f6'           : 1.2,
+    'ca15softdropz10b0'         : 1.2, 
+    'ca15softdropz5b0'          : 1.2, 
+    'ca15softdropz15b2'         : 1.2, 
     
     "ca08cmstt"      : 0.6,
     "ca15cmstt"      : 1.2,
