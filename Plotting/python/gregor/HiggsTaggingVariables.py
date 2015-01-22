@@ -14,13 +14,13 @@ else:
 
 
 mass_vars = [
-#    variable('ca15_mass', "m", 0, 800, unit = "GeV"),
-#    variable('ca15filtered_mass', "filtered m", 0, 800, unit = "GeV"),
-#    variable('ca15massdrop_mass', "massdrop m", 0, 800, unit = "GeV"),
-#    variable('ca15massdropfiltered_mass', "massdrop+filtered m", 0, 800, unit = "GeV"),
-#    variable('ca15pruned_mass', "pruned m", 0, 800, unit = "GeV"),
+    variable('ca15_mass', "m", 0, 800, unit = "GeV"),
+    variable('ca15filtered_mass', "filtered m", 0, 800, unit = "GeV"),
+    variable('ca15massdrop_mass', "massdrop m", 0, 800, unit = "GeV"),
+    variable('ca15massdropfiltered_mass', "massdrop+filtered m", 0, 800, unit = "GeV"),
+    variable('ca15pruned_mass', "pruned m", 0, 800, unit = "GeV"),
     variable('ca15trimmed_mass', "trimmed m", 0, 800, unit = "GeV"),
-#    variable('ca15softdrop_mass', "softdrop m", 0, 800, unit = "GeV"),   
+    variable('ca15softdrop_mass', "softdrop m", 0, 800, unit = "GeV"),   
 ]
 
 tau_vars = [

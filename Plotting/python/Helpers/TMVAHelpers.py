@@ -179,7 +179,8 @@ def doTMVA(setup):
 
         factory.BookMethod( ROOT.TMVA.Types.kCuts, 
                             "Cuts",
-                            "FitMethod=MC:SampleSize={0}".format(sample_size[len(setup.li_vars)])
+                            "PopSize=150:Steps=20",
+                            #"FitMethod=MC:SampleSize={0}".format(sample_size[len(setup.li_vars)])
         )
 
     if "Likelihood" in setup.li_methods:
@@ -319,7 +320,7 @@ def plotROCs(name, li_setups, view="all"):
         h_bg = ROOT.TH2F("","",100,0.66,1.,100,0.4,1)
     # Higgs Tagging
     # High Purity
-    if view == "left_higgs":
+    elif view == "left_higgs":
         c.SetLogy(0)
         h_bg = ROOT.TH2F("","",100,0,0.33,100,0.85,1)
     # Higgs Tagging

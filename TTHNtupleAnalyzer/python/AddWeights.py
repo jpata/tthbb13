@@ -15,8 +15,8 @@ import pickle
 import ROOT
 
 import TTH.TTHNtupleAnalyzer.AccessHelpers as AH
-#from TTH.Plotting.gregor.TopSamples import files 
-from TTH.Plotting.gregor.HiggsSamples import files 
+from TTH.Plotting.gregor.TopSamples import files 
+#from TTH.Plotting.gregor.HiggsSamples import files 
 
 
 ########################################
@@ -63,7 +63,7 @@ for k,v in files.iteritems():
     AH.addScalarBranches(variables,
                          variable_types,
                          output_tree,
-                         ["weight","pt"],
+                         ["weight","pt", "eta"],
                          datatype = 'float')
 
 
@@ -80,24 +80,30 @@ for k,v in files.iteritems():
 
     try:
         pickle_file = open(input_pickle_file_name)
-        functions_and_parameter = pickle.load(pickle_file)
 
-        fun = functions_and_parameter[input_name][0]
-        param_name = functions_and_parameter[input_name][1]
-    
-        print "Read from file: "
-        print fun, param_name
+        functions_and_parameter_pt  = pickle.load(pickle_file)
+        functions_and_parameter_eta = pickle.load(pickle_file)
+
+        pt_fun = functions_and_parameter_pt[input_name][0]
+        pt_param_name = functions_and_parameter_pt[input_name][1]
+
+        eta_fun = functions_and_parameter_eta[input_name][0]
+        eta_param_name = functions_and_parameter_eta[input_name][1]
+
     except KeyError:
         print "WARNING: No weight function found for", input_name
         print "Using 1.0 as weight"
         print "This only makes sense for tth and ttj for Higgs tagging"
         
         if k=="tth":            
-            param_name = "higgs_pt"
+            pt_param_name = "higgs_pt"
+            eta_param_name = "higgs_eta"
         elif k=="ttj":
-            param_name = "parton_pt"
+            pt_param_name = "parton_pt"
+            eta_param_name = "parton_eta"
 
-        fun = lambda x:1.
+        pt_fun = lambda x:1.
+        eta_fun = lambda x:1.
 
 
     ########################################
@@ -118,14 +124,16 @@ for k,v in files.iteritems():
         input_tree.GetEntry( i_event )    
 
         # Calculate the weight
-        pt = AH.getter(input_tree, param_name)
-        value = fun(pt)
+        pt = AH.getter(input_tree, pt_param_name)
+        eta = AH.getter(input_tree, eta_param_name)
+        value = pt_fun(pt) * eta_fun(eta)
         if value > 0:
             weight = 1/(value)
         else:
             weight = 0
 
         variables["weight"][0] = weight
+        variables["eta"][0]    = eta
         variables["pt"][0]     = pt
 
         output_tree.Fill()

@@ -35,7 +35,7 @@ ROOT.gROOT.ForceStyle()
 # Configuration
 ########################################
 
-run_TMVA = True
+run_TMVA = False
 
 sample_sig = "tth"
 sample_bkg  = "ttj"
@@ -44,7 +44,7 @@ basepath = '/scratch/gregor/'
 file_name_sig  = basepath + files[sample_sig] + "-weighted.root"
 file_name_bg   = basepath + files[sample_bkg] + "-weighted.root"
 
-li_methods      = ["Likelihood"]
+li_methods      = ["Cuts"]
 
 
 # We want to make single-variable ROC curves
@@ -72,23 +72,12 @@ def create_setups(li_vars):
 
 combined_setups = []
 
-#combined_setups.append(TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "trimmed_combined"),
-#                                 "trimmed m + unfiltered tau_{2}/tau_{1}",
-#                                 ["Cuts"], 
-#                                 [variable.di['ca15trimmed_mass'],
-#                                  variable.di['ca15_tau2/ca15_tau1'],
-#                              ],                               
-#                                 file_name_sig,
-#                                 file_name_bg,
-#                                 fiducial_cut_sig = "(pt>150)", 
-#                                 fiducial_cut_bg  = "(pt>150)",
-#                                 weight_sig = "(1)",
-#                                 weight_bg =  "(1)"))
-
-combined_setups.append(TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "test"),
-                                 "trimmed m (Cuts)",
+combined_setups.append(TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "trimmed_combined"),
+                                 "trimmed m + unfiltered tau_{2}/tau_{1}",
                                  ["Cuts"], 
-                                 [variable.di['ca15trimmed_mass']],                               
+                                 [variable.di['ca15trimmed_mass'],
+                                  variable.di['ca15_tau2/ca15_tau1'],
+                              ],                               
                                  file_name_sig,
                                  file_name_bg,
                                  fiducial_cut_sig = "(pt>150)", 
@@ -98,16 +87,17 @@ combined_setups.append(TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "t
 
 
 
+btag_setups = create_setups(btag_vars)
 mass_setups = create_setups(mass_vars)
 tau_setups  = create_setups(tau_vars)
 
-all_setups = mass_setups + tau_setups
+all_setups =  tau_setups + btag_setups
 
 
 
 if run_TMVA:
-    for setup in mass_setups:
+    for setup in all_setups + combined_setups:
         doTMVA(setup)
 
-plotROCMultiple("ROC_higgs_mass", mass_setups + combined_setups, "higgs")
-plotROCMultiple("ROC_higgs_tau", tau_setups, "higgs")
+plotROCMultiple("ROC_higgs_mass", mass_setups, "higgs")
+#plotROCMultiple("ROC_higgs_tau", tau_setups, "higgs")

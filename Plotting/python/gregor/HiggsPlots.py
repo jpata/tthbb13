@@ -49,11 +49,10 @@ fiducial_cuts = {
 }
 
 
-if False:
+if True:
     combinedPlot("true_pt",
                  [plot( "ttH",     'higgs_pt',  fiducial_cuts["tth"], "tth"), 
-                  plot( "tt+Jets", 'parton_pt', fiducial_cuts["ttj"], "ttj"), 
-              ],
+                  plot( "tt+Jets", 'parton_pt', fiducial_cuts["ttj"], "ttj")],
                  50, 150, 600, 
                  label_x   = "True p_{T}",
                  label_y   = "Events",
@@ -64,6 +63,21 @@ if False:
                  legend_origin_y = 0.3,
                  legend_size_x   = 0.2,
                  legend_size_y   = 0.05 * 2)
+
+    for var in mass_vars:
+        combinedPlot(var.pretty_name.replace("/","_").replace(" ","_"),
+                     [plot( "ttH",     var.name, fiducial_cuts["tth"], "tth"), 
+                      plot( "tt+Jets", var.name, fiducial_cuts["ttj"], "ttj")],
+                     80, var.range_min, var.range_max, 
+                     label_x   = var.pretty_name,
+                     label_y   = "",
+                     axis_unit = "",
+                     log_y     = False,
+                     normalize = True,
+                     legend_origin_x = 0.35,
+                     legend_origin_y = 0.3,
+                     legend_size_x   = 0.2,
+                     legend_size_y   = 0.05 * 2)
 
 
 
@@ -107,7 +121,7 @@ for sample in files.keys():
                      legend_size_x   = 0.2,
                      legend_size_y   = 0.05 * len(collection))
 
-    if True:
+    if False:
         name = "btag_vars"
         collection = globals()[name]
         combinedPlot(name + "_" + sample,                     
