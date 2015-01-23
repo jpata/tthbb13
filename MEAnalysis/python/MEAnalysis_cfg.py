@@ -29,7 +29,7 @@ process.fwliteInput = cms.PSet(
     #pathToFile    = cms.string("/shome/bianchi/CMSSW_5_3_3_patch2_New/src/VHbbAnalysis/VHbbDataFormats/bin/"),
 
     # a name tag for the input files
-    ordering      = cms.string(""),
+    ordering      = cms.string("TTHbb_s1_5b21f5f_"),
 
     # the samples
     samples = cms.VPSet(

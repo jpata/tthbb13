@@ -5,9 +5,12 @@ import FWCore.ParameterSet.Config as cms
 
 # path to file
 #pathToFile = '/pnfs/psi.ch/cms/trivcat/store//user/bianchi/HBB_EDMNtuple/AllHDiJetPt'
-pathToFile = '/hdfs/cms/store/user/jpata/tth/nov19_3a4602f/'
-processing_tag = "s1_nov19_3a4602f__s2_b7e13a1"
-ordering   = ''
+#pathToFile = '/hdfs/cms/store/user/jpata/tth/dec19_5b21f5f/'
+pathToFile = "dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/jpata/tth/dec19_5b21f5f/"
+
+#this is the unique tag/identifier for step2
+processing_tag = "s1_dec19_5b21f5f__s2_test"
+ordering   = 'TTHbb_s1_5b21f5f_'
 
 # luminosity
 lumi = 1.0
@@ -183,4 +186,4 @@ integralOption2_nevalfact = 1.0
 speedup              = 0
 
 # switch off OL calculation
-switchoffOL          = 1
+switchoffOL          = 0

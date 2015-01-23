@@ -588,6 +588,7 @@ int main(int argc, const char* argv[])
     gSystem->Exec(("rm "+outFileName).c_str());
 
     // output file
+	cout << "Writing to " << outFileName << endl;
     TFile* fout_tmp = TFile::Open(outFileName.c_str(),"UPDATE");
     
     TNamed* config_dump = new TNamed("configdump", builder.dump().c_str());
@@ -760,7 +761,7 @@ int main(int argc, const char* argv[])
 		TStopwatch processing_sw;
 		processing_sw.Start();
         //event loop
-        for (Long64_t i = 0; i < evHigh ; i++) {
+        for (Long64_t i = evLow; i < evHigh ; i++) {
             // initialize branch variables
             itree->loop_initialize();
             otree->loop_initialize();
@@ -4624,8 +4625,6 @@ int main(int argc, const char* argv[])
         if(f_Vtype3_tr)   f_Vtype3_tr->Close();
     }
 
-	cout << "Writing to " << outFileName << endl;
-    // save the tree and the counting histo in the ROOT file
     fout_tmp->cd();
     config_dump->Write("", TObject::kOverwrite);
     hcounter->Write("", TObject::kOverwrite );
