@@ -330,7 +330,7 @@ process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService
 li_fatjets_qvols = []
 for i_fj, fj_name in enumerate(li_fatjets_objects):
         
-   qvol_fatjets = ["ca15PFJetsCHS"]
+   qvol_fatjets = []
    
    r = "15"
 
