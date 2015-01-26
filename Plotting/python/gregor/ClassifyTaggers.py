@@ -19,13 +19,13 @@ if "CMSSW_VERSION" in os.environ.keys():
     from TTH.Plotting.Helpers.TMVAHelpers import variable, TMVASetup, doTMVA, plotROCMultiple
     from TTH.Plotting.Helpers.PrepareRootStyle import myStyle
     from TTH.Plotting.gregor.TopTaggingVariables import *
-    from TTH.Plotting.gregor.TopSamples import files, ranges, fiducial_cuts
+    from TTH.Plotting.gregor.TopSamples import files, ranges, fiducial_cuts, pairs
 # Without CMSSW
 else:
     from TTH.Plotting.python.Helpers.TMVAHelpers import variable, TMVASetup, doTMVA, plotROCMultiple
     from TTH.Plotting.python.Helpers.PrepareRootStyle import myStyle
     from TTH.Plotting.python.gregor.TopTaggingVariables import *
-    from TTH.Plotting.python.gregor.TopSamples import files, ranges, fiducial_cuts
+    from TTH.Plotting.python.gregor.TopSamples import files, ranges, fiducial_cuts, pairs
 
 ROOT.gROOT.SetStyle("myStyle")
 ROOT.gROOT.ForceStyle()
@@ -35,19 +35,19 @@ ROOT.gROOT.ForceStyle()
 # Configuration
 ########################################
 
-run_TMVA = False
+run_TMVA = True
 
-#sample_sig = "zprime_m750"
-#sample_bkg  = "qcd_170_300"
+pair_name = "pt-200-to-300"
 
-sample_sig = "zprime_m2000"
-sample_bkg  = "qcd_800_1000"
+pair = pairs[pair_name]
+sample_sig = pair[0]
+sample_bkg = pair[1]
 
 basepath = '/scratch/gregor/'
 file_name_sig  = basepath + files[sample_sig] + "-weighted.root"
 file_name_bg   = basepath + files[sample_bkg] + "-weighted.root"
 
-li_methods      = ["Likelihood"]
+li_methods      = ["Cuts"]
 
 
 # We want to make single-variable ROC curves
@@ -95,22 +95,9 @@ mass_setups = mass_setups_08 + mass_setups_15
 tau_setups = tau_setups_08 + tau_setups_15
 tagger_setups = tagger_setups_08 + tagger_setups_15
 
+good_setups_200_300 = create_setups(good_vars_200_300)
 
 combined_setups = []
-
-#combined_setups.append(TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "HTT_combined"),
-#                                 "HTT (m, f_{W})",
-#                                 ["Cuts"], 
-#                                 [variable.di['looseMultiRHTT_mass'],
-#                                  variable.di['looseMultiRHTT_fW'],
-#                              ],                               
-#                                 file_name_sig,
-#                                 file_name_bg,
-#                                 fiducial_cut_sig = fiducial_cuts[sample_sig],
-#                                 fiducial_cut_bg  = fiducial_cuts[sample_bkg],
-#                                 weight_sig = "weight",
-#                                 weight_bg = "weight"))
-
 
 combined_setups.append(TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "CMSTT_combined"),
                                  "CMSTT (topMass, minMass)",
@@ -124,12 +111,38 @@ combined_setups.append(TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "C
                                  weight_sig = "weight",
                                  weight_bg = "weight"))
 
-
-combined_setups.append(TMVASetup("08_combined",
-                                 "softdrop m + #tau_{3}/#tau_{2} (R=0.8)",
+combined_setups.append(TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "HTT_combined"),
+                                 "HTT (m, f_{W}, #Delta R)",
                                  ["Cuts"], 
-                                 [variable.di['ca08_tau3/ca08_tau2'],
-                                  variable.di['ca08softdrop_mass']],
+                                 [variable.di['looseMultiRHTT_mass'],
+                                  variable.di['looseMultiRHTT_fW'],
+                                  variable.di['looseMultiRHTT_Rmin-looseMultiRHTT_RminExpected']],                               
+                                 file_name_sig,
+                                 file_name_bg,
+                                 fiducial_cut_sig = fiducial_cuts[sample_sig],
+                                 fiducial_cut_bg  = fiducial_cuts[sample_bkg],
+                                 weight_sig = "weight",
+                                 weight_bg = "weight"))
+
+combined_setups.append(TMVASetup("{0}_{1}_200_to_300_mass_tau".format(sample_sig, sample_bkg),
+                                  "trimmed m + #tau_{3}/#tau_{2} (R=1.5)",
+                                  ["Cuts"], 
+                                 [variable.di['ca15trimmed_mass'],
+                                  variable.di['ca15_tau3/ca15_tau2']],
+                                  file_name_sig,
+                                  file_name_bg,
+                                  fiducial_cut_sig = fiducial_cuts[sample_sig],
+                                  fiducial_cut_bg  = fiducial_cuts[sample_bkg],
+                                  weight_sig = "weight",
+                                  weight_bg = "weight"))
+
+combined_setups.append(TMVASetup("{0}_{1}_200_to_300_mass_tau_qvol".format(sample_sig, sample_bkg),
+                                  "trimmed m + #tau_{3}/#tau_{2} + Q-vol (R=1.5)",
+                                  ["Cuts"], 
+                                 [variable.di['ca15trimmed_mass'],
+                                  variable.di['ca15_tau3/ca15_tau2'],
+                                  variable.di['ca15_qvol'],
+                              ],
                                  file_name_sig,
                                  file_name_bg,
                                  fiducial_cut_sig = fiducial_cuts[sample_sig],
@@ -138,17 +151,21 @@ combined_setups.append(TMVASetup("08_combined",
                                  weight_bg = "weight"))
 
 
-#combined_setups.append(TMVASetup("{0}_{1}_15_combined".format(sample_sig, sample_bkg),
-#                                  "filtered m + filtered #tau_{3}/#tau_{2} (R=1.5)",
-#                                  ["Cuts"], 
-#                                  [variable.di['ca15filtered_tau3/ca15filtered_tau2'],
-#                                   variable.di['ca15filtered_mass']],
-#                                  file_name_sig,
-#                                  file_name_bg,
-#                                  fiducial_cut_sig = fiducial_cuts[sample_sig],
-#                                  fiducial_cut_bg  = fiducial_cuts[sample_bkg],
-#                                  weight_sig = "weight",
-#                                  weight_bg = "weight"))
+
+
+#combined_setups.append(TMVASetup("08_combined",
+#                                 "softdrop m + #tau_{3}/#tau_{2} (R=0.8)",
+#                                 ["Cuts"], 
+#                                 [variable.di['ca08_tau3/ca08_tau2'],
+#                                  variable.di['ca08softdrop_mass']],
+#                                 file_name_sig,
+#                                 file_name_bg,
+#                                 fiducial_cut_sig = fiducial_cuts[sample_sig],
+#                                 fiducial_cut_bg  = fiducial_cuts[sample_bkg],
+#                                 weight_sig = "weight",
+#                                 weight_bg = "weight"))
+#
+
 
 with_btag_setups = []
 for setup in combined_setups:
@@ -162,7 +179,7 @@ for setup in combined_setups:
 
 
 if run_TMVA:
-    for setup in combined_setups:
+    for setup in good_setups_200_300 + combined_setups:
         doTMVA(setup)
 
 #plotROCMultiple("ROC_good", [setup_08_combined, setup_cmstt_combined, setup_htt_combined] + good_setups + btag_setups)
@@ -173,4 +190,4 @@ if run_TMVA:
 #
 #plotROCMultiple("ROC_good", [setup_08_combined, setup_htt_combined, setup_cmstt_combined]+good_setups + btag_setups)
 #plotROCMultiple("ROC_withb", combined_setups + with_btag_setups)
-plotROCMultiple("ROC_comb", combined_setups)
+plotROCMultiple("ROC_" + pair_name, good_setups_200_300 + combined_setups)

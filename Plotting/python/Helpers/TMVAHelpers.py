@@ -179,8 +179,8 @@ def doTMVA(setup):
 
         factory.BookMethod( ROOT.TMVA.Types.kCuts, 
                             "Cuts",
-                            "PopSize=150:Steps=20",
-                            #"FitMethod=MC:SampleSize={0}".format(sample_size[len(setup.li_vars)])
+                            #"PopSize=150:Steps=20",
+                            "FitMethod=MC:SampleSize={0}".format(sample_size[len(setup.li_vars)])
         )
 
     if "Likelihood" in setup.li_methods:

@@ -28,20 +28,23 @@ else:
 
 basepath = '/scratch/gregor/'
 
-fiducial_cut_and_weight = "(weight*((pt>801)&&(pt<999)))"
-                                        
-# for the filename: basepath + filename + weighted.root
-full_filenames = {}
-for k,v in files.iteritems():
-    full_filenames[k] = basepath + v + "-weighted.root"
+for pair_name, pair in pairs.iteritems():
 
-mis =[ 
-    #mi("taus_08", "zprime_m2000_1p", "qcd_800_1000",   tau_vars_08 + tau_cross_vars, fiducial_cut_and_weight, fiducial_cut_and_weight),
-    #mi("taus_15", "zprime_m2000_1p", "qcd_800_1000",   tau_vars_15, fiducial_cut_and_weight, fiducial_cut_and_weight),
-    #mi("masses_08", "zprime_m2000_1p", "qcd_800_1000",   mass_vars_08, fiducial_cut_and_weight, fiducial_cut_and_weight),
-    #mi("masses_15", "zprime_m2000_1p", "qcd_800_1000",   mass_vars_15, fiducial_cut_and_weight, fiducial_cut_and_weight),
-    #mi("taggers", "zprime_m2000_1p", "qcd_800_1000", tagger_vars, fiducial_cut_and_weight, fiducial_cut_and_weight),
-    mi("good_top", "zprime_m2000", "qcd_800_1000", good_vars + [variable.di['ca08_btag'],], fiducial_cut_and_weight, fiducial_cut_and_weight),
-]
+    fiducial_cut_and_weight = "(weight*({0}))".format(fiducial_cuts[pair[0]])
 
-MakePlots(mis, full_filenames)
+    # for the filename: basepath + filename + weighted.root
+    full_filenames = {}
+    for k,v in files.iteritems():
+        full_filenames[k] = basepath + v + "-weighted.root"
+
+    mis =[ 
+        #mi(pair_name + "_taus_08", pair[0], pair[1],   tau_vars_08, fiducial_cut_and_weight, fiducial_cut_and_weight),
+        #mi(pair_name + "_taus_15", pair[0], pair[1],   tau_vars_15, fiducial_cut_and_weight, fiducial_cut_and_weight),
+        #mi(pair_name + "_masses_08", pair[0], pair[1], mass_vars_08, fiducial_cut_and_weight, fiducial_cut_and_weight),
+        #mi(pair_name + "_masses_15", pair[0], pair[1], mass_vars_15, fiducial_cut_and_weight, fiducial_cut_and_weight),
+        #mi(pair_name + "_taggers", pair[0], pair[1], tagger_vars, fiducial_cut_and_weight, fiducial_cut_and_weight),
+
+        mi(pair_name + "_taggers", pair[0],  pair[1], good_vars_200_300, fiducial_cut_and_weight, fiducial_cut_and_weight),
+    ]
+
+    MakePlots(mis, full_filenames)

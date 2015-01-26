@@ -64,7 +64,7 @@ if False:
 
 
 
-for var in htt_vars: 
+for var in tagger_vars: 
 
     combinedPlot(var.name.replace("/","_"),
              [plot(sample,

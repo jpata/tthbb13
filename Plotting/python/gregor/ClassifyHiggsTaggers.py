@@ -56,7 +56,7 @@ def create_setups(li_vars):
         name = "{0}_{1}_{2}".format(sample_sig, sample_bkg, v.name)
         name = name.replace("/","_")
         li_TMVAs.append( TMVASetup( name,
-                                    v.pretty_name,
+                                    prettier_names[v.pretty_name],
                                     li_methods, 
                                     [v],
                                     file_name_sig,
@@ -72,32 +72,34 @@ def create_setups(li_vars):
 
 combined_setups = []
 
-combined_setups.append(TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "trimmed_combined"),
-                                 "trimmed m + unfiltered tau_{2}/tau_{1}",
-                                 ["Cuts"], 
-                                 [variable.di['ca15trimmed_mass'],
-                                  variable.di['ca15_tau2/ca15_tau1'],
-                              ],                               
-                                 file_name_sig,
-                                 file_name_bg,
-                                 fiducial_cut_sig = "(pt>150)", 
-                                 fiducial_cut_bg  = "(pt>150)",
-                                 weight_sig = "(1)",
-                                 weight_bg =  "(1)"))
+#combined_setups.append(TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "trimmed_combined"),
+#                                 "trimmed m + unfiltered tau_{2}/tau_{1}",
+#                                 ["Cuts"], 
+#                                 [variable.di['ca15trimmed_mass'],
+#                                  variable.di['ca15_tau2/ca15_tau1'],
+#                              ],                               
+#                                 file_name_sig,
+#                                 file_name_bg,
+#                                 fiducial_cut_sig = "(pt>150)", 
+#                                 fiducial_cut_bg  = "(pt>150)",
+#                                 weight_sig = "(1)",
+#                                 weight_bg =  "(1)"))
+#
+#
 
-
-
-btag_setups = create_setups(btag_vars)
+#btag_setups = create_setups(btag_vars)
 mass_setups = create_setups(mass_vars)
-tau_setups  = create_setups(tau_vars)
+good_setups = create_setups(good_vars)
+#tau_setups  = create_setups(tau_vars)
 
-all_setups =  tau_setups + btag_setups
+#all_setups =  tau_setups + btag_setups
 
 
 
 if run_TMVA:
-    for setup in all_setups + combined_setups:
+    for setup in mass_setups:
         doTMVA(setup)
 
 plotROCMultiple("ROC_higgs_mass", mass_setups, "higgs")
+plotROCMultiple("ROC_higgs_good", good_setups, "higgs")
 #plotROCMultiple("ROC_higgs_tau", tau_setups, "higgs")

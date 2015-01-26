@@ -40,7 +40,7 @@ for k,v in files.iteritems():
 
 output_dir = "results/CompareZprimes/"
 
-interesting_samples = ["zprime_m2000"]
+interesting_samples = ["zprime_m750", "qcd_170_300"]
 
 
 ########################################
@@ -53,7 +53,7 @@ if True:
                  [plot(sample,
                        'pt', 
                        '({0})*weight'.format(fiducial_cuts[sample]),
-                       sample) for sample in interesting_samples + ["qcd_800_1000"]],
+                       sample) for sample in interesting_samples],
                  80, ranges[sample][0], ranges[sample][1], 
                  label_x   = "True top p_{T}",
                  label_y   = "True Tops",
@@ -67,15 +67,10 @@ if True:
 
     combinedPlot("true_eta",
                  [plot(sample,
-                       'hadtop_eta', 
+                       'eta', 
                        '((pt>{0})&&(pt<{1})&&(fabs(eta)<2.5))*weight'.format(ranges[sample][0], 
-                                                            ranges[sample][1]),
-                       sample) for sample in interesting_samples
-              ] + [plot("qcd_800_1000",
-                       'parton_eta', 
-                       '((pt>{0})&&(pt<{1})&&(fabs(eta)<2.5))*weight'.format(ranges[sample][0], 
-                                                            ranges[sample][1]),
-                       "qcd_800_1000")],
+                                                                             ranges[sample][1]),
+                       sample) for sample in interesting_samples],
                  80, -3, 3, 0.07,
                  label_x   = "True #eta",
                  label_y   = "True Partons",
@@ -89,13 +84,9 @@ if True:
 
     combinedPlot("true_eta_cut",
                  [plot(sample,
-                       'hadtop_eta', 
+                       'eta', 
                        '({0})*weight'.format(fiducial_cuts[sample]),
-                       sample) for sample in interesting_samples
-              ] + [plot("qcd_800_1000",
-                       'parton_eta', 
-                       '({0})*weight'.format(fiducial_cuts[sample]),
-                       "qcd_800_1000")],
+                       sample) for sample in interesting_samples], 
                  80, -2, 2, 0.04,
                  label_x   = "True #eta",
                  label_y   = "True Partons",
