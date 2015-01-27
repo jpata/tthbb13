@@ -156,7 +156,7 @@ setattr(process, fj_name, fj_ca08.clone(
         useExplicitGhosts = cms.bool(True)))
 li_fatjets_objects.append(fj_name)        
 li_fatjets_branches.append(branch_name)
-        
+       
 
 fj_name = "ca08PFJetsCHSSoftDrop"
 branch_name = 'ca08softdrop'
@@ -306,7 +306,7 @@ for fj_name in li_fatjets_objects:
 
    # Tier3
    #if hostname == "t3ui12":
-   #  sd_path = "../data/"
+   #sd_path = "../data/"
    ## Grid
    #else:
    sd_path = "src/TTH/TTHNtupleAnalyzer/data/"
@@ -322,7 +322,7 @@ for fj_name in li_fatjets_objects:
         sd_name = fj_name + "SD"
         setattr(process, sd_name, cms.EDProducer("SDProducer",
                                                  FatjetName = cms.string(fj_name),
-                                                 MicrojetCone = cms.double(0.2),
+                                                 MicrojetCone = cms.double(-1.), # Use dynamic microjet cone-size
                                                  InputCard = cms.string(input_card)))
         li_fatjets_sds.append(sd_name)
    else:
