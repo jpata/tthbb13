@@ -40,63 +40,62 @@ for k,v in files.iteritems():
 
 output_dir = "results/CompareZprimes/"
 
-interesting_samples = ["zprime_m750", "qcd_170_300"]
-
 
 ########################################
 # Define plots and do fits
 ########################################
 
 if True:
+    for pair_name, pair in pairs.iteritems():
+    
+        combinedPlot("true_pt_" + pair_name,
+                     [plot(sample,
+                           'pt', 
+                           '({0})*weight'.format(fiducial_cuts[sample]),
+                           sample) for sample in pair],
+                     80, ranges[sample][0], ranges[sample][1], 
+                     label_x   = "True top p_{T}",
+                     label_y   = "True Tops",
+                     axis_unit = "GeV",
+                     log_y     = False,
+                     normalize = True,
+                     legend_origin_x = 0.35,
+                     legend_origin_y = 0.3,
+                     legend_size_x   = 0.2,
+                     legend_size_y   = 0.05 * 2)
 
-    combinedPlot("true_pt",
-                 [plot(sample,
-                       'pt', 
-                       '({0})*weight'.format(fiducial_cuts[sample]),
-                       sample) for sample in interesting_samples],
-                 80, ranges[sample][0], ranges[sample][1], 
-                 label_x   = "True top p_{T}",
-                 label_y   = "True Tops",
-                 axis_unit = "GeV",
-                 log_y     = False,
-                 normalize = True,
-                 legend_origin_x = 0.35,
-                 legend_origin_y = 0.3,
-                 legend_size_x   = 0.2,
-                 legend_size_y   = 0.05 * 2)
+        combinedPlot("true_eta_" + pair_name,
+                     [plot(sample,
+                           'eta', 
+                           '((pt>{0})&&(pt<{1})&&(fabs(eta)<2.5))*weight'.format(ranges[sample][0], 
+                                                                                 ranges[sample][1]),
+                           sample) for sample in pair],
+                     80, -3, 3, 0.07,
+                     label_x   = "True #eta",
+                     label_y   = "True Partons",
+                     axis_unit = "GeV",
+                     log_y     = False,
+                     normalize = True,
+                     legend_origin_x = 0.35,
+                     legend_origin_y = 0.7,
+                     legend_size_x   = 0.2,
+                     legend_size_y   = 0.05 * 3)
 
-    combinedPlot("true_eta",
-                 [plot(sample,
-                       'eta', 
-                       '((pt>{0})&&(pt<{1})&&(fabs(eta)<2.5))*weight'.format(ranges[sample][0], 
-                                                                             ranges[sample][1]),
-                       sample) for sample in interesting_samples],
-                 80, -3, 3, 0.07,
-                 label_x   = "True #eta",
-                 label_y   = "True Partons",
-                 axis_unit = "GeV",
-                 log_y     = False,
-                 normalize = True,
-                 legend_origin_x = 0.35,
-                 legend_origin_y = 0.7,
-                 legend_size_x   = 0.2,
-                 legend_size_y   = 0.05 * 3)
-
-    combinedPlot("true_eta_cut",
-                 [plot(sample,
-                       'eta', 
-                       '({0})*weight'.format(fiducial_cuts[sample]),
-                       sample) for sample in interesting_samples], 
-                 80, -2, 2, 0.04,
-                 label_x   = "True #eta",
-                 label_y   = "True Partons",
-                 axis_unit = "GeV",
-                 log_y     = False,
-                 normalize = True,
-                 legend_origin_x = 0.35,
-                 legend_origin_y = 0.6,
-                 legend_size_x   = 0.2,
-                 legend_size_y   = 0.05 * 3)
+        combinedPlot("true_eta_cut_" + pair_name,
+                     [plot(sample,
+                           'eta', 
+                           '({0})*weight'.format(fiducial_cuts[sample]),
+                           sample) for sample in pair], 
+                     80, -2, 2, 0.04,
+                     label_x   = "True #eta",
+                     label_y   = "True Partons",
+                     axis_unit = "GeV",
+                     log_y     = False,
+                     normalize = True,
+                     legend_origin_x = 0.35,
+                     legend_origin_y = 0.6,
+                     legend_size_x   = 0.2,
+                     legend_size_y   = 0.05 * 3)
 
 
 

@@ -25,14 +25,16 @@ basepath = '/scratch/gregor/'
                                          
 fits = {}
 fits["zprime_m750"]  = ROOT.TF1("fit_fun_zprime","pol5",201,999)
+fits["zprime_m1250"] = ROOT.TF1("fit_fun_zprime","pol5",471,599)
 fits["zprime_m2000"] = ROOT.TF1("fit_fun_zprime","pol5",801,999)
 fits["zprime_m3000"] = ROOT.TF1("fit_fun_zprime","pol5",801,999)
 
 fits["qcd_170_300"]  = ROOT.TF1("fit_fun_qcd","[0]+[1]*sqrt(x)+[2]/x + [3]*x",201,299)
+fits["qcd_470_600"]  = ROOT.TF1("fit_fun_qcd","[0]+[1]*sqrt(x)+[2]/x + [3]*x",471,599)
 fits["qcd_300_470"]  = ROOT.TF1("fit_fun_qcd","[0]+[1]*sqrt(x)+[2]/x+[3]/(x*x)+[4]/(x*x*x)",301,470)
 fits["qcd_800_1000"] = ROOT.TF1("fit_fun_qcd","[0]+[1]*sqrt(x)+[2]/x",801,999)
 
-for qcd_name in ["qcd_170_300", "qcd_300_470", "qcd_800_1000"]:
+for qcd_name in ["qcd_170_300", "qcd_300_470", "qcd_470_600", "qcd_800_1000"]:
     fits[qcd_name].SetParameter(0,1)
     fits[qcd_name].SetParameter(1,1)
     fits[qcd_name].SetParameter(2,0.5)
@@ -41,10 +43,12 @@ for qcd_name in ["qcd_170_300", "qcd_300_470", "qcd_800_1000"]:
 eta_fits = {}
 
 eta_fits["zprime_m750"] = ROOT.TF1("a","pol6", -2.5, 2.5)
+eta_fits["zprime_m1250"] = ROOT.TF1("a","pol6", -2.5, 2.5)
 eta_fits["zprime_m2000"] = ROOT.TF1("a","pol6", -2.5, 2.5)
 eta_fits["zprime_m3000"] = ROOT.TF1("a","pol6", -2.5, 2.5)
 
 eta_fits["qcd_170_300"] = ROOT.TF1("b","pol6", -2.5, 2.5)
+eta_fits["qcd_470_600"] = ROOT.TF1("b","pol6", -2.5, 2.5)
 eta_fits["qcd_800_1000"] = ROOT.TF1("b","pol6", -2.5, 2.5)
 
 

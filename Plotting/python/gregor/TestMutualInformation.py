@@ -28,23 +28,28 @@ else:
 
 basepath = '/scratch/gregor/'
 
-for pair_name, pair in pairs.iteritems():
+pair_name = "pt-470-to-600"
+pair =  pairs[pair_name]
 
-    fiducial_cut_and_weight = "(weight*({0}))".format(fiducial_cuts[pair[0]])
+fiducial_cut_and_weight = "(weight*({0}))".format(fiducial_cuts[pair[0]])
 
-    # for the filename: basepath + filename + weighted.root
-    full_filenames = {}
-    for k,v in files.iteritems():
-        full_filenames[k] = basepath + v + "-weighted.root"
+# for the filename: basepath + filename + weighted.root
+full_filenames = {}
+for k,v in files.iteritems():
+    full_filenames[k] = basepath + v + "-weighted.root"
 
-    mis =[ 
-        #mi(pair_name + "_taus_08", pair[0], pair[1],   tau_vars_08, fiducial_cut_and_weight, fiducial_cut_and_weight),
-        #mi(pair_name + "_taus_15", pair[0], pair[1],   tau_vars_15, fiducial_cut_and_weight, fiducial_cut_and_weight),
-        #mi(pair_name + "_masses_08", pair[0], pair[1], mass_vars_08, fiducial_cut_and_weight, fiducial_cut_and_weight),
-        #mi(pair_name + "_masses_15", pair[0], pair[1], mass_vars_15, fiducial_cut_and_weight, fiducial_cut_and_weight),
-        #mi(pair_name + "_taggers", pair[0], pair[1], tagger_vars, fiducial_cut_and_weight, fiducial_cut_and_weight),
+mis =[ 
+    #mi(pair_name + "_taus_08", pair[0], pair[1],   tau_vars_08, fiducial_cut_and_weight, fiducial_cut_and_weight),
+    #mi(pair_name + "_taus_15", pair[0], pair[1],   tau_vars_15, fiducial_cut_and_weight, fiducial_cut_and_weight),
+    #mi(pair_name + "_masses_08", pair[0], pair[1], mass_vars_08, fiducial_cut_and_weight, fiducial_cut_and_weight),
+    #mi(pair_name + "_masses_15", pair[0], pair[1], mass_vars_15, fiducial_cut_and_weight, fiducial_cut_and_weight),
+    #mi(pair_name + "_taggers", pair[0], pair[1], tagger_vars, fiducial_cut_and_weight, fiducial_cut_and_weight),
 
-        mi(pair_name + "_taggers", pair[0],  pair[1], good_vars_200_300, fiducial_cut_and_weight, fiducial_cut_and_weight),
-    ]
+    mi(pair_name + "_interesting", pair[0], pair[1], interesting_vars_470_600,fiducial_cut_and_weight,fiducial_cut_and_weight),
 
-    MakePlots(mis, full_filenames)
+    #mi(pair_name + "_taggers", pair[0],  pair[1], good_vars_200_300, fiducial_cut_and_weight, fiducial_cut_and_weight),
+    #mi(pair_name + "_taggers", pair[0],  pair[1], good_vars_470_600, fiducial_cut_and_weight, fiducial_cut_and_weight),
+    #mi(pair_name + "_good", pair[0],  pair[1], good_vars_800_1000, fiducial_cut_and_weight, fiducial_cut_and_weight),
+]
+
+MakePlots(mis, full_filenames)
