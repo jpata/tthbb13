@@ -12,8 +12,8 @@ import glob
 import re
 import os
 
-from TTH.TTHNtupleAnalyzer.Samples import Samples
-
+from TTH.TTHNtupleAnalyzer.Samples import Samples, Samples_lumi
+from TTH.TTHNtupleAnalyzer.Helpers import chunks
 
 #######################################
 # submit
@@ -38,6 +38,7 @@ def submit(name,
     template.config.General.requestName = "{0}_{1}_{2}".format(name, version, sample_shortname)
     template.config.JobType.psetName = cmssw_config_path + cmssw_config_script
     template.config.Data.inputDataset = Samples[sample_shortname]
+    #template.config.Data.unitsPerJob = Samples_lumi.get(sample_shortname, 90)
     template.config.Data.unitsPerJob = 90
     template.config.Site.storageSite = site
 
@@ -52,7 +53,7 @@ def submit(name,
     print "Created config for", sample_shortname
     print "Now calling crab submit"
 
-    subprocess.call(["crab", "submit", "-c", "c_tmp.py"])
+    #subprocess.call(["crab", "submit", "-c", "c_tmp.py"])
 # End of submit
 
 
@@ -113,13 +114,33 @@ def download(name,
 #######################################
 # get LFN
 #######################################
-def chunks(l, n):
-    """ Yield successive n-sized chunks from l.
-    """
-    for i in xrange(0, len(l), n):
-        yield l[i:i+n]
 
-def get_lfn(name, sample_shortname, version, status_dict, file_output=True, chunksize=100):
+def get_lfn(name, sample_shortname, version, status_dict, file_output=True, chunksize=500):
+    """ Gets the LFNs of successful crab jobs.
+
+    Uses `crab getoutput --dump` to successively get the output LFN of all
+    crab jobs which are done
+
+    Args:
+        name (string): the nickname of the processing
+        sample_shortname (string): the nickname of the sample to merge
+        version (string): the processing version/tag of the sample to merge
+        basepath (string): the base path for output files
+        status_dict (dict): the state of the crab task, retrieved via status() by parsing
+            `crab status --json`. Must contain str(job_id) as keys in the form
+            {"123": {"State": "finished", ...}, ...}
+        file_output (bool, optional): if True, save LFNs to an output file in the crab
+            task directory.
+        chunksize (int, optional): how many LFNs to get per one `crab getoutput` call.
+            A number that is too large (>few k) will cause the crab server to timeout.
+
+    Returns:
+        dict(int->string): a map between the successful job ID-s and the LFNs of
+            the output files.
+
+    Raises:
+        Exception: if `crab getoutput` failed more than an alloted amount of retries.
+    """
     working_dir = "crab_{0}_{1}_{2}/crab_{0}_{1}_{2}".format(name, version, sample_shortname)
 
     lfns = {}
@@ -168,7 +189,18 @@ def hadd_from_file(name,
          sample_shortname,
          version,
          basepath = ""):
-    """ Hadd all root files in basepath+jobname to basepath/jobname.root
+    """ Merges the output of crab jobs which are in storage.
+
+    The output file lists must be stored in the crab directory as files.txt.
+    These file lists can be created using get_lfn(). This command uses ParHadd.py
+    to speed up the merge.
+
+    Args:
+        sample_shortname (string): the nickname of the sample to merge
+        version (string): the processing version/tag of the sample to merge
+        basepath (string): the base path for output files
+
+    Returns: nothing
     """
 
     input_fn = "crab_{0}_{1}_{2}/crab_{0}_{1}_{2}/files.txt".format(name, version, sample_shortname)
@@ -176,7 +208,8 @@ def hadd_from_file(name,
         input_filenames = map(lambda x: x.strip(), open(input_fn).readlines())
         if len(input_filenames)>0:
             output_filename = basepath + "/{0}_{1}_{2}.root".format(name, version, sample_shortname)
-            subprocess.call(["echo", "hadd", "-f", output_filename, "-n", "500"] + input_filenames)
+            #subprocess.call(["echo", "hadd", "-f", output_filename, "-n", "500"] + input_filenames)
+            subprocess.call(["python", "../python/ParHadd.py", output_filename] + input_filenames)
             return
     print "no output from {0}".format(sample_shortname)
 # End of hadd
