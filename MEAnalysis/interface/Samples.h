@@ -86,24 +86,25 @@ Samples::Samples(bool openAllFiles, string pathToFile, string ordering,
 
     for(auto & p : vpset) {
 
-        bool skip       = p.getParameter<bool>("skip");
-        string fileName = p.getParameter<string>("name");
-        string nickName = p.getParameter<string>("nickName");
-        int color       = p.getParameter<int>("color");
-        double xSec     = p.getParameter<double>("xSec");
-        bool update     = p.exists("update") ?  p.getParameter<bool>("update") : false;
-        string cut      = p.exists("cut")    ?  p.getParameter<string>("cut")  : "DUMMY";
+        const bool skip       = p.getParameter<bool>("skip");
+        const string fileName = p.getParameter<string>("name");
+        const string nickName = p.getParameter<string>("nickName");
+        const int color       = p.getParameter<int>("color");
+        const double xSec     = p.getParameter<double>("xSec");
+        const bool update     = p.exists("update") ?  p.getParameter<bool>("update") : false;
+        const string cut      = p.exists("cut")    ?  p.getParameter<string>("cut")  : "DUMMY";
+        const string full_fn  = p.exists("fullFilename") ? p.getParameter<string>("fullFilename")  : "";
 
         if(skip) continue;
 
         TString TfileName( fileName.c_str() );
-        TString pfn = pathToFile+"/"+ordering+TfileName+".root";
-        if(verbose_) std::cout << string(pfn.Data()) << std::endl;
+        TString pfn(full_fn.size()==0 ? (pathToFile + "/" + ordering + TfileName + ".root") : full_fn);
+        std::cout << "Opening file: " << string(pfn.Data()) << std::endl;
 
         TFile *f = 0;
 
-        if(openAllFiles) f = update ?  TFile::Open(pfn,"UPDATE") :  TFile::Open(pfn,"READ");
-        else f = TFile::Open(pfn,"READ");
+        if(openAllFiles) f = update ?  TFile::Open(pfn.Data(),"UPDATE") :  TFile::Open(pfn.Data(),"READ");
+        else f = TFile::Open(pfn.Data(), "READ");
 
         if(!f || f->IsZombie()) {
             err_ = 1;
