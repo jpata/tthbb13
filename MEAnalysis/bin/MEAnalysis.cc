@@ -110,7 +110,7 @@ class CutHistogram {
         TTH_MBB_INCOMPATIBLE,
         TTJETS_MBB_INCOMPATIBLE,
         LEPTONS,
-		JETS,
+        JETS,
         BTAGSHAPE,
         WMASS,
         passes,
@@ -140,7 +140,7 @@ class CutHistogram {
     }
 };
 
-#define DO_BTAG_LR_TREE
+//#define DO_BTAG_LR_TREE
 
 #ifdef DO_BTAG_LR_TREE
 #include "TTH/MEAnalysis/interface/btag_lr_tree.hh"
@@ -567,8 +567,8 @@ int main(int argc, const char* argv[])
     if(switchoffOL) {
         meIntegrator->switchOffOL();
         if (print) {
-			cout << "*** Switching off OpenLoops to speed-up the calculation ***" << endl;
-		}
+            cout << "*** Switching off OpenLoops to speed-up the calculation ***" << endl;
+        }
     }
 
 
@@ -586,7 +586,7 @@ int main(int argc, const char* argv[])
     gSystem->Exec(("rm "+outFileName).c_str());
 
     // output file
-	cout << "Writing to " << outFileName << endl;
+    cout << "Writing to " << outFileName << endl;
     TFile* fout_tmp = TFile::Open(outFileName.c_str(),"UPDATE");
     
     TNamed* config_dump = new TNamed("configdump", builder.dump().c_str());
@@ -756,8 +756,8 @@ int main(int argc, const char* argv[])
 
         if( evHigh<0 ) evHigh = nentries;
 
-		TStopwatch processing_sw;
-		processing_sw.Start();
+        TStopwatch processing_sw;
+        processing_sw.Start();
         //event loop
         for (Long64_t i = evLow; i < evHigh ; i++) {
             // initialize branch variables
@@ -780,7 +780,7 @@ int main(int argc, const char* argv[])
                 float _swtime_c = processing_sw.CpuTime();
                 float _swtime_r = processing_sw.RealTime();
                 processing_sw.Reset();
-				processing_sw.Start();
+                processing_sw.Start();
                 cout << i << " (" << float(i)/float(nentries)*100 << " %) " << 500/_swtime_c << " " << 500/_swtime_r << endl;
             }
 
@@ -1150,15 +1150,15 @@ int main(int argc, const char* argv[])
 
             if(!(properEventSL || properEventDL)) {
 
-				if (debug>=2) {
-                	cout << "A dummy cut has failed..." << endl;
-                	cout << " => go to next event!" << endl;
-                	cout << "******************************" << endl;
-				}
-            	if (cutLeptons) {
-                	cuts.fill(CutHistogram::Cuts::LEPTONS);
-					continue;
-				}
+                if (debug>=2) {
+                    cout << "A dummy cut has failed..." << endl;
+                    cout << " => go to next event!" << endl;
+                    cout << "******************************" << endl;
+                }
+                if (cutLeptons) {
+                    cuts.fill(CutHistogram::Cuts::LEPTONS);
+                    continue;
+                }
             }
 
             if(debug>=2) cout << "@C" << endl;
@@ -2080,10 +2080,10 @@ int main(int argc, const char* argv[])
                         cout << " => go to next event!" << endl;
                         cout << "******************************" << endl;
                     }
-					if (cutLeptons) {
-                		cuts.fill(CutHistogram::Cuts::LEPTONS);
-                    	continue;
-					}
+                    if (cutLeptons) {
+                        cuts.fill(CutHistogram::Cuts::LEPTONS);
+                        continue;
+                    }
                 }
 
 
@@ -2558,10 +2558,10 @@ int main(int argc, const char* argv[])
                         cout << " => go to next event!" << endl;
                         cout << "******************************" << endl;
                     }
-					if (cutJets) { 
-                		cuts.fill(CutHistogram::Cuts::JETS);
-                    	continue;
-					}
+                    if (cutJets) { 
+                        cuts.fill(CutHistogram::Cuts::JETS);
+                        continue;
+                    }
                 }
 
 
@@ -2717,12 +2717,12 @@ int main(int argc, const char* argv[])
                         btag_flag = 2;
                     }
                     else if (cutBTagShape) {
-						if (debug >= 2) {
-                        	cout << "Inconsistency in selectByBTagShape... continue" << endl;
-                        	cout << " => go to next event!" << endl;
-                        	cout << "******************************" << endl;
-						}
-                		cuts.fill(CutHistogram::Cuts::BTAGSHAPE);
+                        if (debug >= 2) {
+                            cout << "Inconsistency in selectByBTagShape... continue" << endl;
+                            cout << " => go to next event!" << endl;
+                            cout << "******************************" << endl;
+                        }
+                        cuts.fill(CutHistogram::Cuts::BTAGSHAPE);
                         continue;
                     }
 
@@ -2763,13 +2763,15 @@ int main(int argc, const char* argv[])
                             double p_j_b2   =  jets_csv_prob_j[  btag_map[b2_pos]   ];
                             double p_j_w1   =  jets_csv_prob_j[  btag_map[w1_pos]   ];
                             double p_j_w2   =  jets_csv_prob_j[  btag_map[w2_pos]   ];
-                            
+                           
+#ifdef DO_BTAG_LR_TREE
                             double id_bLep =  jets_flavour[  btag_map[bLep_pos] ];
                             double id_bHad =  jets_flavour[  btag_map[bHad_pos] ];
                             double id_b1   =  jets_flavour[  btag_map[b1_pos]   ];
                             double id_b2   =  jets_flavour[  btag_map[b2_pos]   ];
                             double id_w1   =  jets_flavour[  btag_map[w1_pos]   ];
                             double id_w2   =  jets_flavour[  btag_map[w2_pos]   ];
+#endif //btag lr tree
 
                             // the total probability
                             float p_pos = 0.;
@@ -3210,7 +3212,7 @@ int main(int argc, const char* argv[])
 
                         // use untagged mass to assign to type 0 OR type 1
                         float WMass = (jets_p4[ buntag_indices[0] ]+jets_p4[  buntag_indices[1] ]).M();
-						otree->mW = WMass;
+                        otree->mW = WMass;
                         // set index for untagged jets
                         ind1 = buntag_indices[0];
                         ind2 = buntag_indices[1];
@@ -3242,7 +3244,7 @@ int main(int argc, const char* argv[])
                             /////////////////////////////////////////////////////
                         }
                         else if (cutWMass) {
-                			cuts.fill(CutHistogram::Cuts::WMASS);
+                            cuts.fill(CutHistogram::Cuts::WMASS);
                             continue;
                         }
 
@@ -3710,9 +3712,9 @@ int main(int argc, const char* argv[])
                     // if needed, switch off OL
                     if(switchoffOL) {
                         meIntegrator->switchOffOL();
-						if (print) {
-                        	cout << "*** Switching off OpenLoops to speed-up the calculation ***" << endl;
-						}
+                        if (print) {
+                            cout << "*** Switching off OpenLoops to speed-up the calculation ***" << endl;
+                        }
                     }
 
                     // start the clock...
@@ -4530,7 +4532,7 @@ int main(int argc, const char* argv[])
                         // fill the tree
                         cuts.fill(CutHistogram::Cuts::passes);
                         otree->tree->Fill();
-                		hcounter->SetBinContent(3, hcounter->GetBinContent(3)+1);
+                        hcounter->SetBinContent(3, hcounter->GetBinContent(3)+1);
                     } //ntuplizeAll
 
                     continue; //continue systematics loop in case ntuplizeAll
@@ -4594,7 +4596,9 @@ int main(int argc, const char* argv[])
     hcounter->Write("", TObject::kOverwrite );
     hparam->Write("", TObject::kOverwrite );
     otree->tree->Write("", TObject::kOverwrite );
+#ifdef DO_BTAG_LR_TREE
     btag_tree.tree->Write("", TObject::kOverwrite );
+#endif
     cuts.h->Write("", TObject::kOverwrite);
     fout_tmp->Close();
 
