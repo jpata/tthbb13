@@ -12,12 +12,44 @@ samples = cms.VPSet(
     ),
     cms.PSet(
         skip     = cms.bool(False),
+        name     = cms.string('ttjets_13tev_phys14'),
+        nickName = cms.string('TTJets_PHYS14'),
+        color    = cms.int32(1),
+        xSec     = cms.double(508.5)
+    ),
+    cms.PSet(
+        skip     = cms.bool(False),
+        name     = cms.string('ttjets_13tev_pu40bx50'),
+        nickName = cms.string('TTJets_PU40BX50'),
+        color    = cms.int32(1),
+        xSec     = cms.double(508.5)
+    ),
+    cms.PSet(
+        skip     = cms.bool(False),
         name     = cms.string('tth_hbb_13tev'),
         nickName = cms.string('TTHBB125'),
         color    = cms.int32(2),
         xSec     = cms.double(831.76)
     ),
+    cms.PSet(
+        skip     = cms.bool(False),
+        name     = cms.string('tth_hbb_13tev_pu20bx25_phys14'),
+        nickName = cms.string('TTHBB125_PHYS14'),
+        color    = cms.int32(2),
+        xSec     = cms.double(831.76)
+    ),
+    cms.PSet(
+        skip     = cms.bool(False),
+        name     = cms.string('tth_hbb_13tev_pu40bx50'),
+        nickName = cms.string('TTHBB125_PU40BX50'),
+        color    = cms.int32(2),
+        xSec     = cms.double(831.76)
+    ),
 )
+
+if __name__=="__main__":
+	for s in samples:
+		print s.name.value() + ".root"
 
 # now defined in TTH/TTHNtupleAnalyzer/python/Samples.py
 # nickname_map = {
