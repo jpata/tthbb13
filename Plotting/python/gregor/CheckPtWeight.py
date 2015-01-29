@@ -64,9 +64,9 @@ if False:
 
 
 
-for var in tagger_vars: 
+for var in htt_vars: 
 
-    combinedPlot(var.name.replace("/","_"),
+    combinedPlot(var.pretty_name.replace("/","_").replace(" ", "_").replace("{","").replace("}",""),
              [plot(sample,
                    var.name,                                           
                    '((pt>{0})&&(pt<{1})&&({2}))*weight'.format(ranges[sample][0], 
@@ -82,7 +82,7 @@ for var in tagger_vars:
                  legend_origin_x = 0.6,
                  legend_origin_y = 0.6,
                  legend_size_x   = 0.2,
-                 legend_size_y   = 0.05*2)
+                 legend_size_y   = 0.05*6)
 
 
 for sample in files.keys():

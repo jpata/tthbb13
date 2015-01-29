@@ -21,13 +21,25 @@ from TTH.Plotting.gregor.TopSamples import files, ranges
 # output directory
 ########################################
 
+to_process = files.keys()
+#[
+    #"zprime_m1000",
+    #"zprime_m2000_low",
+    #"zprime_m3000",    
+    #"zprime_m4000",    
+#]
+
 basepath = '/scratch/gregor/'
                                          
 fits = {}
-fits["zprime_m750"]  = ROOT.TF1("fit_fun_zprime","pol5",201,999)
-fits["zprime_m1250"] = ROOT.TF1("fit_fun_zprime","pol5",471,599)
-fits["zprime_m2000"] = ROOT.TF1("fit_fun_zprime","pol5",801,999)
-fits["zprime_m3000"] = ROOT.TF1("fit_fun_zprime","pol5",801,999)
+fits["zprime_m750"]      = ROOT.TF1("fit_fun_zprime","pol5",201,299)
+fits["zprime_m1000"]     = ROOT.TF1("fit_fun_zprime","pol5",301,469)
+fits["zprime_m1250"]     = ROOT.TF1("fit_fun_zprime","pol5",471,599)
+fits["zprime_m1500"]     = ROOT.TF1("fit_fun_zprime","pol5",601,799)
+fits["zprime_m2000_low"] = ROOT.TF1("fit_fun_zprime","pol5",601,799)
+fits["zprime_m2000"]     = ROOT.TF1("fit_fun_zprime","pol5",801,999)
+fits["zprime_m3000"]     = ROOT.TF1("fit_fun_zprime","pol5",1001,1499)
+fits["zprime_m4000"]     = ROOT.TF1("fit_fun_zprime","pol5",1401,1799)
 
 fits["qcd_170_300"]  = ROOT.TF1("fit_fun_qcd","[0]+[1]*sqrt(x)+[2]/x + [3]*x",201,299)
 fits["qcd_470_600"]  = ROOT.TF1("fit_fun_qcd","[0]+[1]*sqrt(x)+[2]/x + [3]*x",471,599)
@@ -42,20 +54,14 @@ for qcd_name in ["qcd_170_300", "qcd_300_470", "qcd_470_600", "qcd_800_1000"]:
 
 eta_fits = {}
 
-eta_fits["zprime_m750"] = ROOT.TF1("a","pol6", -2.5, 2.5)
-eta_fits["zprime_m1250"] = ROOT.TF1("a","pol6", -2.5, 2.5)
-eta_fits["zprime_m2000"] = ROOT.TF1("a","pol6", -2.5, 2.5)
-eta_fits["zprime_m3000"] = ROOT.TF1("a","pol6", -2.5, 2.5)
-
-eta_fits["qcd_170_300"] = ROOT.TF1("b","pol6", -2.5, 2.5)
-eta_fits["qcd_470_600"] = ROOT.TF1("b","pol6", -2.5, 2.5)
-eta_fits["qcd_800_1000"] = ROOT.TF1("b","pol6", -2.5, 2.5)
+for k in fits.keys():
+    eta_fits[k] = ROOT.TF1("eta_k","pol6", -1.5, 1.5)
 
 
 # for the filename: basepath + filename + .root
 full_file_names = {}
-for k,v in files.iteritems():
-    full_file_names[k] = basepath + v + ".root"
+for name in to_process:
+    full_file_names[name] = basepath + files[name] + ".root"
 
 output_dir = "results/GetPtWeight/"
 
@@ -67,7 +73,7 @@ output_pickle_file_name = "/shome/gregor/TTH-73X/CMSSW/src/TTH/Plotting/python/g
 ########################################
 
 if True:    
-    for k in files.keys():
+    for k in to_process:
 
         if "zprime" in k:
             truth_var = "hadtop"
@@ -112,6 +118,8 @@ if True:
                       legend_size_x   = 0.2,
                       legend_size_y   = 0.05 * 2)
 
+print full_file_names
+
 doWork(full_file_names, output_dir )
 
 
@@ -140,7 +148,8 @@ for k in functions_and_parameter_eta:
 pickle_file.close()
 
 # Then add the new ones
-for k,v in files.iteritems():
+for k in to_process:
+    v = files[k]
     print "Adding: ", v
 
     if "zprime" in k:

@@ -1,6 +1,7 @@
 OutputCorrelations/
-OutputMutualInformation
+OutputMutualInformation/
 OutputPlot2D/
+OutputProfiles/
 results/
 weights
 *.png

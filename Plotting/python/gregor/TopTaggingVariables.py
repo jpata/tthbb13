@@ -85,7 +85,8 @@ btag_vars = [
 htt_vars = [
     variable('looseMultiRHTT_mass', "HTT m", 0, 400, unit = "GeV"),
     variable('looseMultiRHTT_fW', "HTT f_{W}", 0, 0.8),
-    variable('looseMultiRHTT_Rmin-looseMultiRHTT_RminExpected', "HTT #Delta R_{min,exp}", -0.5, 1.5),
+    variable('looseMultiRHTT_Rmin-looseMultiRHTT_RminExpected', "HTT #Delta R_{min,exp}", -0.8, 1., extra_cut = "looseMultiRHTT_mass>0"),
+    variable('looseMultiRHTT_Rmin-(-0.2695+0.0154709*sqrt(looseMultiRHTT_ptFiltForRminExp)+321.749/looseMultiRHTT_ptFiltForRminExp+42234.2/(looseMultiRHTT_ptFiltForRminExp*looseMultiRHTT_ptFiltForRminExp)+-1.2832e+07/(looseMultiRHTT_ptFiltForRminExp*looseMultiRHTT_ptFiltForRminExp*looseMultiRHTT_ptFiltForRminExp))', "HTT new delta",-.8,1.)
 ]
 
 tagger_vars_15 = [variable('log(ca15_chi)', "log(#chi) (R=1.5)", -10., 10, extra_cut = 'ca15_chi>0'),

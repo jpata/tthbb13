@@ -59,8 +59,8 @@ class combinedPlot:
                 draw_legend     = True,
                 legend_origin_x = 0.52,
                 legend_origin_y = 0.7, 
-                legend_size_x   = 0.38,
-                legend_size_y   = 0.2,
+                legend_size_x   = 0.2,
+                legend_size_y   = -1,
                 legend_text_size= 0.05,
                 ):
       """ Constructor. Arguments:
@@ -129,7 +129,9 @@ li_colors = [ROOT.kBlack,
           ]*10
 
 # List of nice line style
-li_line_styles = [1,1,4,2,3,5,6]*10
+li_line_styles = [1]*len(li_colors) + [4]*len(li_colors) + [2]*len(li_colors)
+
+
 
 c = ROOT.TCanvas("","",800,800)
 
@@ -249,6 +251,9 @@ def doWork( dic_files, output_dir ):
 
     # Loop over combinedPlots
     for cp in combinedPlot.li_combined_plots:
+
+        if cp.legend_size_y==-1:
+           cp.legend_size_y = cp.legend_text_size * 1.25 * len(cp.li_plots)
 
         # Init the Legend
         leg = ROOT.TLegend( cp.legend_origin_x,

@@ -25,10 +25,13 @@ from TTH.Plotting.gregor.TopSamples import files
 
 basepath = '/scratch/gregor/'
 
-for k,v in files.iteritems():
+#to_process  = ["zprime_m1000"]
+to_process  = files.keys()
+
+for k in to_process:
     print "doing", k
 
-    input_name = v
+    input_name = files[k]
     input_tree_name = "tree"
 
     input_pickle_file_name = "/shome/gregor/TTH-73X/CMSSW/src/TTH/Plotting/python/gregor/flat_pt_weights.pickle"
