@@ -155,8 +155,17 @@ for t in [
 
 
 # Fatjet Branches
-for fj_name in ["ca08", "ca08filtered", "ca08pruned", "ca08newpruned", "ca08trimmed", "ca08softdrop", "ca08newsoftdrop", 
-                "ca15", "ca15filtered", "ca15pruned", "ca15newpruned", "ca15trimmed", "ca15softdrop", "ca15newsoftdrop"]:
+for fj_name in ['ca08', 'ca15', 'ca08filtered', 'ca08pruned',
+                'ca08newpruned', 'ca08trimmedr2f3', 'ca08trimmedr2f6',
+                'ca08softdropz10b00', 'ca08softdropz10b10', 'ca08softdropz10b20',
+                'ca08softdropz15b00', 'ca08softdropz15b10', 'ca08softdropz15b20',
+                'ca08softdropz20b00', 'ca08softdropz20b10', 'ca08softdropz20b20',
+                'ca15filtered', 'ca15pruned', 'ca15newpruned', 'ca15trimmedr2f3',
+                'ca15trimmedr2f6', 'ca15trimmed', 'ca15softdropz10b00',
+                'ca15softdropz10b10', 'ca15softdropz10b20', 'ca15softdropz15b00',
+                'ca15softdropz15b10', 'ca15softdropz15b20', 'ca15softdropz20b00',
+                'ca15softdropz20b10', 'ca15softdropz20b20']:
+
 
     # How many of these objects do we have?
     full_counter_name = "n__jet_{0}".format(fj_name)
@@ -167,18 +176,17 @@ for fj_name in ["ca08", "ca08filtered", "ca08pruned", "ca08newpruned", "ca08trim
             "pt", "eta", "phi", "mass",  # Kinematics
             "tau1", "tau2", "tau3",      # N-subjettiness
             "btag",                      # b-tag discriminator
-            "chi",                       # Shower deconstruction chi
-                                         # (only fill for ca08 and ca15 wo grooming at the moment)
-            "qvol",                      # Qjet volatility
-                                         # (only fill for ca08 and ca15 wo grooming at the moment)
+            #"chi",                       # Shower deconstruction chi
+            #                             # (only fill for ca08 and ca15 wo grooming at the moment)
+            #"qvol",                      # Qjet volatility
             "close_hadtop_pt",  "close_hadtop_dr", "close_hadtop_i", # top truth matching
             "close_parton_pt",  "close_parton_dr", "close_parton_i", # parton truth matching
             "close_higgs_pt",   "close_higgs_dr",  "close_higgs_i"   # higgs truth matching
             ]:
 
         # Don't do chi unless we have the unfiltered fatjets
-        if (branch_name in ["chi", "qvol"]) and not (fj_name in ["ca08","ca15"]):
-            continue
+        #if (branch_name in ["chi", "qvol"])): and not (fj_name in ["ca08","ca15"]):
+        #    continue
 
         if branch_name in ["close_higgs_i", "close_hadtop_i", "close_parton_i"]:
             the_type = "int"

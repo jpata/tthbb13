@@ -44,7 +44,7 @@ else:
 # Determine particle species
 # Tier3
 if socket.gethostname() == "t3ui12":
-    particle_name = "higgs"
+    particle_name = "hadtop"
 # Grid
 else:
     import PSet
@@ -64,12 +64,14 @@ else:
 particle_branches = ["pt", "eta", "phi", "mass"]
 
 # "Normal" branches for most fatjet collections
-fj_branches = ["pt", "mass", "tau1", "tau2", "tau3", "btag"]
+fj_branches = ["pt", "mass", "tau1", "tau2", "tau3", 
+               #"btag", "qvol"
+               ]
 # Extended fj branches, including
 #   shower deconstruction chi
 #   qjets volatility
 # (to expensive to calc for everything)
-fj_branches_plus = fj_branches + ["chi", "qvol"]
+fj_branches_plus = fj_branches + ["chi"]
 
 htt_branches = ["pt", "mass", "fW", "Rmin", "RminExpected", "prunedMass", "ptFiltForRminExp"]
 cmstt_branches = ["pt", "mass", "minMass", "wMass", "topMass", "nSubJets"]
@@ -111,6 +113,29 @@ objects = {
     'ca15softdropz10b0'         : fj_branches, 
     'ca15softdropz5b0'          : fj_branches, 
     'ca15softdropz15b2'         : fj_branches, 
+
+    'ca08trimmedr2f3'          : fj_branches, 
+    'ca08trimmedr2f6'          : fj_branches, 
+    'ca08softdropz10b00'       : fj_branches, 
+    'ca08softdropz10b10'       : fj_branches, 
+    'ca08softdropz10b20'       : fj_branches, 
+    'ca08softdropz15b00'       : fj_branches, 
+    'ca08softdropz15b10'       : fj_branches, 
+    'ca08softdropz15b20'       : fj_branches, 
+    'ca08softdropz20b00'       : fj_branches, 
+    'ca08softdropz20b10'       : fj_branches, 
+    'ca08softdropz20b20'       : fj_branches, 
+    'ca15trimmedr2f3'          : fj_branches, 
+    'ca15trimmedr2f6'          : fj_branches, 
+    'ca15softdropz10b00'       : fj_branches, 
+    'ca15softdropz10b10'       : fj_branches, 
+    'ca15softdropz10b20'       : fj_branches, 
+    'ca15softdropz15b00'       : fj_branches, 
+    'ca15softdropz15b10'       : fj_branches, 
+    'ca15softdropz15b20'       : fj_branches, 
+    'ca15softdropz20b00'       : fj_branches, 
+    'ca15softdropz20b10'       : fj_branches, 
+    'ca15softdropz20b20'       : fj_branches, 
 
     "ca08cmstt"      : cmstt_branches,
     "ca15cmstt"      : cmstt_branches,
@@ -157,6 +182,30 @@ object_drs = {
     'ca15softdropz5b0'          : 1.2, 
     'ca15softdropz15b2'         : 1.2, 
     
+    'ca08trimmedr2f3'          : 0.6, 
+    'ca08trimmedr2f6'          : 0.6, 
+    'ca08softdropz10b00'       : 0.6, 
+    'ca08softdropz10b10'       : 0.6, 
+    'ca08softdropz10b20'       : 0.6, 
+    'ca08softdropz15b00'       : 0.6, 
+    'ca08softdropz15b10'       : 0.6, 
+    'ca08softdropz15b20'       : 0.6, 
+    'ca08softdropz20b00'       : 0.6, 
+    'ca08softdropz20b10'       : 0.6, 
+    'ca08softdropz20b20'       : 0.6, 
+
+    'ca15trimmedr2f3'          : 1.2, 
+    'ca15trimmedr2f6'          : 1.2, 
+    'ca15softdropz10b00'       : 1.2, 
+    'ca15softdropz10b10'       : 1.2, 
+    'ca15softdropz10b20'       : 1.2, 
+    'ca15softdropz15b00'       : 1.2, 
+    'ca15softdropz15b10'       : 1.2, 
+    'ca15softdropz15b20'       : 1.2, 
+    'ca15softdropz20b00'       : 1.2, 
+    'ca15softdropz20b10'       : 1.2, 
+    'ca15softdropz20b20'       : 1.2, 
+
     "ca08cmstt"      : 0.6,
     "ca15cmstt"      : 1.2,
     

@@ -6,7 +6,7 @@
 
 import sys
 
-from TTH.TTHNtupleAnalyzer.CrabHelpers import submit, status, kill, download, hadd
+from TTH.TTHNtupleAnalyzer.CrabHelpers import submit, status, kill, download, download_globus, hadd
 
 
 #######################################
@@ -15,19 +15,19 @@ from TTH.TTHNtupleAnalyzer.CrabHelpers import submit, status, kill, download, ha
 
 # Ntuple name/version and samples to include
 name = "ntop"
-version = "v19"
+version = "v20"
 li_samples = [
-    #"qcd_170_300_pythia8_13tev",
+    "qcd_170_300_pythia8_13tev",
     #"qcd_300_470_pythia8_13tev",
+    "qcd_470_600_pythia8_13tev",
     #"qcd_600_800_pythia8_13tev",    
-    #"qcd_470_600_pythia8_13tev",
     "qcd_800_1000_pythia8_13tev",    
 
     #"zprime_m500_1p_13tev",
-    #"zprime_m750_1p_13tev",
+    "zprime_m750_1p_13tev",
 
     #"zprime_m1000_1p_13tev",
-    #"zprime_m1250_1p_13tev", 
+    "zprime_m1250_1p_13tev", 
     #"zprime_m1500_1p_13tev", 
     "zprime_m2000_1p_13tev",
     #"zprime_m3000_1p_13tev", 
@@ -43,7 +43,7 @@ storage_path = '/scratch/gregor/'
 #####################################
 
 # Decide what to do
-actions = ["submit", "status", "kill", "download", "hadd"]
+actions = ["submit", "status", "kill", "download", "download_globus", "hadd"]
 
 if not len(sys.argv) == 2:
     print "Invalid number of arguments"
@@ -85,6 +85,11 @@ if action == "kill":
 elif action == "download":
     for sample_shortname in li_samples:
         download(name, sample_shortname, version, storage_path)    
+
+# Download
+elif action == "download_globus":
+    for sample_shortname in li_samples:
+        download_globus(name, sample_shortname, version, storage_path)    
 
 # Hadd
 elif action == "hadd":
