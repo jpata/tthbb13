@@ -10,3 +10,8 @@ VHbbAnalysis
 \#*\#
 .DS_Store
 ._.DS_Store
+*.root
+*.csv
+*.gz
+__init__.py
+*.log

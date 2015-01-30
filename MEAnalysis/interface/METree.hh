@@ -1,3 +1,5 @@
+#ifndef METREE_H
+#define METREE_H
 //Generate METree.hh with
 //python $CMSSW_BASE/src/TTH/TTHNtupleAnalyzer/python/headergen.py $CMSSW_BASE/src/TTH/MEAnalysis/interface/METree_template.hh $CMSSW_BASE/src/TTH/MEAnalysis/interface/METree.hh $CMSSW_BASE/src/TTH/MEAnalysis/python/branches.py
 #include "TTH/MEAnalysis/interface/HelperFunctions.h"
@@ -236,6 +238,12 @@ public:
     int   perm_to_jet_    [NMAXPERMUT];
     int   perm_to_jet_alt_[NMAXPERMUT];
     // permutation -> gen association
+    // bLep W1 W2 bHad bH1 bH2
+    // If a particular index is set, then for this permutation
+    // the jet was matched to the corresponding gen-level object.
+    // E.g. 110011 means that the b from the leptonic top, one of
+    // the quarks from W->qq and both of the bs from H->bb were matched
+    // correctly to gen-level objects for this permutation
     int   perm_to_gen_     [NMAXPERMUT];
     int   perm_to_gen_alt_ [NMAXPERMUT];
 
@@ -1067,3 +1075,5 @@ public:
         //HEADERGEN_COPY_BRANCHES
 	}
 };
+
+#endif

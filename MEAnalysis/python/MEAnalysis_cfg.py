@@ -1,5 +1,6 @@
 import FWCore.ParameterSet.Types  as CfgTypes
 import FWCore.ParameterSet.Config as cms
+import os
 
 process = cms.Process("MEAnalysisNew")
 
@@ -21,7 +22,7 @@ process.fwliteInput = cms.PSet(
     pathToCP_smear= cms.string("./root/ControlPlotsTEST_std_gen.root"),
 
     # input file directory
-    pathToFile    = cms.string("dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/jpata/tth/dec19_5b21f5f"),
+    pathToFile    = cms.string(os.environ["CMSSW_BASE"]),
     #pathToFile    = cms.string("dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store//user/bianchi/TTH_EDMNtuple/"),
     #pathToFile    = cms.string("dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/bianchi/HepMC/Sherpa_run/"),
     #pathToFile    = cms.string("/scratch/bianchi/HBB_EDMNtuple/Sherpa_run/"),
@@ -34,14 +35,14 @@ process.fwliteInput = cms.PSet(
     samples = cms.VPSet(
         cms.PSet(
             skip     = cms.bool(False),
-            name     = cms.string('tth_hbb_13tev'),
+            name     = cms.string('tthbb_step1'),
             nickName = cms.string('TTHBB'),
             color    = cms.int32(1),
             xSec     = cms.double(1.0)
         ),
         cms.PSet(
-            skip     = cms.bool(True), #This file will not be processed
-            name     = cms.string('ttjets_13tev'),
+            skip     = cms.bool(True),
+            name     = cms.string('ttbar_step1'),
             #name     = cms.string('122'),
             nickName = cms.string('TTJets'),
             color    = cms.int32(1),

@@ -22,24 +22,37 @@ process.fwliteInput = cms.PSet(
     pathToCP_smear= cms.string("./root/ControlPlotsTEST_std_gen.root"),
 
     # input file directory
+<<<<<<< HEAD
     pathToFile    = cms.string("/home/joosep/mac-docs/tth/data/jan28_8a4239/"),
+=======
+    pathToFile    = cms.string(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data"),
+>>>>>>> jpata/dev-meanalysis
     #pathToFile    = cms.string("dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store//user/bianchi/TTH_EDMNtuple/"),
     #pathToFile    = cms.string("dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/bianchi/HepMC/Sherpa_run/"),
     #pathToFile    = cms.string("/scratch/bianchi/HBB_EDMNtuple/Sherpa_run/"),
     #pathToFile    = cms.string("/shome/bianchi/CMSSW_5_3_3_patch2_New/src/VHbbAnalysis/VHbbDataFormats/bin/"),
 
     # a name tag for the input files
+<<<<<<< HEAD
     ordering      = cms.string(""),
+=======
+    ordering      = cms.string("TTHbb_s1_5b21f5f_"),
+>>>>>>> jpata/dev-meanalysis
 
     # the samples
     samples = cms.VPSet(
         cms.PSet(
             skip     = cms.bool(False),
+<<<<<<< HEAD
             name     = cms.string('TTHbb_s1_8a4239_tth_hbb_13tev_pu20bx25_phys14'),
+=======
+            name     = cms.string('tth_hbb_13tev'),
+>>>>>>> jpata/dev-meanalysis
             nickName = cms.string('TTHBB'),
             color    = cms.int32(1),
             xSec     = cms.double(1.0)
         ),
+<<<<<<< HEAD
        cms.PSet(
            skip     = cms.bool(False),
            name     = cms.string('ttjets_small'),
@@ -48,6 +61,16 @@ process.fwliteInput = cms.PSet(
            color    = cms.int32(1),
            xSec     = cms.double(1.0)
        ),
+=======
+#        cms.PSet(
+#            skip     = cms.bool(True),
+#            name     = cms.string('ttbar_step1'),
+#            #name     = cms.string('122'),
+#            nickName = cms.string('TTJets'),
+#            color    = cms.int32(1),
+#            xSec     = cms.double(1.0)
+#        ),
+>>>>>>> jpata/dev-meanalysis
     ),
 
     # the target luminosity (used to calculate the 'weight' variable)

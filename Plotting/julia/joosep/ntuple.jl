@@ -382,6 +382,7 @@ function process_sample(fn::ASCIIString)
 	df = TreeDataFrame([fn], "tthNtupleAnalyzer/events")
 
 	SetCacheSize(df.tt, 0)
+<<<<<<< HEAD
 	SetCacheSize(df.tt, 32 * 1024 * 1024)
 
 	# ERROR: LoadError: TypeError: getfield: expected Symbol, got ASCIIString
@@ -392,6 +393,12 @@ function process_sample(fn::ASCIIString)
 	for b in ["jet__*", "n__jet*". "n__lep*", "lep__*", "sig_lep*", "hypo1", "event*"]
 	    #AddBranchToCache(df.tt, "$b")
 	end
+=======
+	SetCacheSize(df.tt, 256 * 1024 * 1024)
+
+	for b in df.branches
+	    AddBranchToCache(df.tt, "$b")
+>>>>>>> jpata/dev-meanalysis
 
 	ofdf = similar(
 		DataFrame(

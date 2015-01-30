@@ -1,4 +1,4 @@
-<bin   file="MEAnalysis.cc" name="MEAnalysis">
+<bin   file="MEAnalysis.cc,HelperFunctions.cc" name="MEAnalysis">
   <use   name="DataFormats/FWLite"/>
   <use   name="FWCore/FWLite"/>
   <use   name="FWCore/PythonParameterSet"/>
@@ -29,7 +29,7 @@
   <lib   name="ppttxbbxcallme2born"/>
 </bin>
 
-<bin   file="JetTreeProducer.cc" name="JetTreeProducer">
+<bin   file="JetTreeProducer.cc,HelperFunctions.cc" name="JetTreeProducer">
   <use   name="DataFormats/FWLite"/>
   <use   name="FWCore/FWLite"/>
   <use   name="FWCore/PythonParameterSet"/>
