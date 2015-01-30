@@ -1,4 +1,4 @@
-<bin file="joosep/cutflow_step2.cc,../../../TTH/TTHNtupleAnalyzer/plugins/event_interpretation.cc" name="cutflow_step2">
+<bin file="joosep/cutflow_step2.cc,../../../TTH/TTHNtupleAnalyzer/plugins/event_interpretation.cc,joosep/histograms_step2.cc,joosep/Sample.cc,../../../TTH/MEAnalysis/bin/HelperFunctions.cc" name="cutflow_step2">
   <use   name="DataFormats/FWLite"/>
   <use   name="FWCore/FWLite"/>
   <use   name="FWCore/PythonParameterSet"/>
