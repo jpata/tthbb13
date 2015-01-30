@@ -59,7 +59,7 @@ if args.site=="T3_CH_PSI":
 	#address2		= 'dcap://t3se01.psi.ch:22125/'
 	address1		= ''
 	address2		= ''
-	subcommand			= 'qsub -V -cwd -l h_vmem=2G -q all.q'
+	subcommand			= 'qsub -V -cwd -l os=sl6,h_vmem=2G -q all.q'
 	#tempOutPath = "/scratch/" + os.environ["USER"] + "/"
 	tempOutPath = "$TMPDIR/"
 	finalOutPath = "/shome/" + os.environ["USER"] + "/tth/{0}/".format(processing_tag)
