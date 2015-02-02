@@ -38,8 +38,11 @@ public:
 	const bool step2Enabled;
 
 	TChain *chainS1, *chainS2;
-
+	
+	TTHTree* treeS1;
 	METree* treeS2;
+
+	map<tuple<long long, long long, long long>, long long> event_map_S1;
 
 	Sample(const edm::ParameterSet& pars);
 
@@ -49,6 +52,7 @@ public:
 		}
 		return 0;
 	}
+	
 	long long getLastEvent() {
 		if(skip) {
 			return -1;
@@ -58,6 +62,13 @@ public:
 			return (long long)(fractionToProcess * totalEvents);
 		}
 		return totalEvents;
+	}
+
+	long long getIndexS1(long long event, long long run, long long lumi) {
+		const auto event_key = make_tuple(run, lumi, event);
+		const long long idx = event_map_S1[event_key];
+		assert(idx >= 0);
+		return idx;
 	}
 };
 

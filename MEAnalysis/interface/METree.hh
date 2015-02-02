@@ -640,7 +640,12 @@ public:
         tree->SetBranchAddress("time", &time_);
 		
 		tree->SetBranchAddress("EVENT", &EVENT_);
-		tree->SetBranchAddress("jet_pt", &jet_pt_);
+        tree->SetBranchAddress("jet_pt", &jet_pt_);
+        tree->SetBranchAddress("jet_csv", &jet_csv_);
+        tree->SetBranchAddress("jet_id", &jet_id_);
+        tree->SetBranchAddress("jet_eta", &jet_eta_);
+        tree->SetBranchAddress("jet_phi", &jet_phi_);
+        tree->SetBranchAddress("jet_m", &jet_m_);
 		tree->SetBranchAddress("lepton_pt", &lepton_pt_);
 		
         tree->SetBranchAddress("lepton_rIso", &lepton_rIso_);
@@ -677,6 +682,9 @@ public:
         
         tree->SetBranchAddress("perm_to_gen_s", perm_to_gen_);
         tree->SetBranchAddress("perm_to_gen_b", perm_to_gen_alt_);
+        tree->SetBranchAddress("perm_to_jet_s", perm_to_jet_);
+        tree->SetBranchAddress("perm_to_jet_b", perm_to_jet_alt_);
+
 		tree->SetBranchAddress("n__jet_fat", &n__jet_fat);
 		tree->SetBranchAddress("jet_fat__pt", jet_fat__pt);
 		tree->SetBranchAddress("jet_fat__eta", jet_fat__eta);
@@ -800,6 +808,9 @@ public:
         
         SET_ZERO(perm_to_gen_, NMAXPERMUT, 0.0);
         SET_ZERO(perm_to_gen_alt_, NMAXPERMUT, 0.0);
+        
+        SET_ZERO(perm_to_jet_, NMAXPERMUT, 0.0);
+        SET_ZERO(perm_to_jet_alt_, NMAXPERMUT, 0.0);
 
 		numBTagL_ = DEF_VAL_INT;
 		numBTagM_ = DEF_VAL_INT;

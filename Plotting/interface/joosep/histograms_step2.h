@@ -86,6 +86,9 @@ public:
 	TH2D* h_cat_discr;
 	TH2D* h_nlep_gen_reco;
 
+	TH1D *h_nmatched_wqq, *h_unmatched_wqq_pt, *h_unmatched_wqq_eta;
+	TH1D *h_matched_wqq_pt, *h_matched_wqq_eta;
+
 	Histograms(const std::string pf, SampleType sample_type);
 
 	template <class T>
