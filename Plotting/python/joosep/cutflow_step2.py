@@ -10,7 +10,7 @@ process.fwliteInput = cms.PSet(
 							   
     samples = cms.VPSet([
         cms.PSet(
-            fileNamesS1=cms.vstring([]),
+            fileNamesS1=cms.vstring(["/home/joosep/mac-docs/tth/data/TTHbb_s1_5b21f5f_tth_hbb_13tev.root"]),
             fileNamesS2=cms.vstring(["/home/joosep/mac-docs/tth/data/tthbb.root"]),
             nickName=cms.string("tthbb_13TeV"),
             fractionToProcess=cms.double(1.0),
