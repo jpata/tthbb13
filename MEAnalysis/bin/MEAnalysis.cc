@@ -2870,6 +2870,7 @@ int main(int argc, const char* argv[])
                     default:
                         break;
                     }
+                    otree->selected_comb = selected_comb;
 
                     // if the event passes the cut, reshuffle jets into btag/buntag vectors
                     // N.B. ==> jets will be sorted by descending btag probaility!!!
@@ -3632,6 +3633,9 @@ int main(int argc, const char* argv[])
                         otree->jet_m_     [q] = jets[q].M();
                         otree->jet_csv_   [q] = q>1 ? jets_csv[ pos_to_index[q] ] : DEF_VAL_FLOAT ;
                         //otree->jet_id_    [q] = jets_id[q] ;
+                    }
+                    for (int pos=0; pos<6; pos++) {
+                        otree->pos_to_index[pos] = pos_to_index[pos];
                     }
 
                     // set all prob. to 0.0;

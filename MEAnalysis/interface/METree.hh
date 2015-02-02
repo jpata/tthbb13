@@ -358,6 +358,8 @@ public:
 	float jet_toptagger2_sj__pt[N_MAX];
 	int jet_toptagger2_sj__parent_idx[N_MAX];
 	float mW;
+	int selected_comb;
+	int pos_to_index[6];
     //HEADERGEN_BRANCH_VARIABLES
     
 	void make_branches(const float MH) {
@@ -631,6 +633,8 @@ public:
 		tree->Branch("jet_toptagger2_sj__pt", jet_toptagger2_sj__pt, "jet_toptagger2_sj__pt[n__jet_toptagger2_sj]/F");
 		tree->Branch("jet_toptagger2_sj__parent_idx", jet_toptagger2_sj__parent_idx, "jet_toptagger2_sj__parent_idx[n__jet_toptagger2_sj]/I");
 		tree->Branch("mW", &mW, "mW/F");
+		tree->Branch("selected_comb", &selected_comb, "selected_comb/I");
+		tree->Branch("pos_to_index", pos_to_index, "pos_to_index[6]/I");
 		//HEADERGEN_BRANCH_CREATOR
         
     }
@@ -796,6 +800,8 @@ public:
 		tree->SetBranchAddress("jet_toptagger2_sj__pt", jet_toptagger2_sj__pt);
 		tree->SetBranchAddress("jet_toptagger2_sj__parent_idx", jet_toptagger2_sj__parent_idx);
 		tree->SetBranchAddress("mW", &mW);
+		tree->SetBranchAddress("selected_comb", &selected_comb);
+		tree->SetBranchAddress("pos_to_index", pos_to_index);
         //HEADERGEN_BRANCH_SETADDRESS
 	}
 
@@ -969,6 +975,8 @@ public:
 		SET_ZERO(jet_toptagger2_sj__pt, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_toptagger2_sj__parent_idx, N_MAX, DEF_VAL_INT);
 		mW = DEF_VAL_FLOAT;
+		selected_comb = DEF_VAL_INT;
+		SET_ZERO(pos_to_index, 6, DEF_VAL_INT);
 		//HEADERGEN_BRANCH_INITIALIZERS
     }
 

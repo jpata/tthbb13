@@ -14,3 +14,5 @@ for b in process:
 #	process += [Dynamic1DArray("gen_lepton_{0}".format(x), "float", "nLep", "NMAXLEPTONS")]
 #	process += [Dynamic1DArray("gen_jet_{0}".format(x), "float", "nJet", "NMAXLEPTONS")]
 process += [Scalar("mW", "float")]
+process += [Scalar("selected_comb", "int")]
+process += [Static1DArray("pos_to_index", "int", 6)]
