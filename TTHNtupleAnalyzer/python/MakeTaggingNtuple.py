@@ -44,7 +44,7 @@ else:
 # Determine particle species
 # Tier3
 if socket.gethostname() == "t3ui12":
-    particle_name = "hadtop"
+    particle_name = "higgs"
 # Grid
 else:
     import PSet
@@ -71,146 +71,44 @@ fj_branches = ["pt", "mass", "tau1", "tau2", "tau3",
 #   shower deconstruction chi
 #   qjets volatility
 # (to expensive to calc for everything)
-fj_branches_plus = fj_branches + ["chi"]
+fj_branches_plus = fj_branches + [#"chi", 
+                                  "qvol"
+]
 
 htt_branches = ["pt", "mass", "fW", "Rmin", "RminExpected", "prunedMass", "ptFiltForRminExp"]
 cmstt_branches = ["pt", "mass", "minMass", "wMass", "topMass", "nSubJets"]
 
-objects = {
-    "ca08"            : fj_branches_plus,
-    "ca08filtered"    : fj_branches,
-    "ca08pruned"      : fj_branches,
-    "ca08newpruned"   : fj_branches,
-    "ca08trimmed"     : fj_branches,
-    "ca08softdrop"    : fj_branches,
-    "ca08newsoftdrop" : fj_branches,
-    
-    "ca15"                   : fj_branches_plus,
-    "ca15filtered"           : fj_branches,
-    "ca15massdrop"           : fj_branches,
-    "ca15massdropfiltered"   : fj_branches,
-    "ca15pruned"             : fj_branches,
-    "ca15newpruned"          : fj_branches,
-    "ca15trimmed"            : fj_branches,
-    "ca15softdrop"           : fj_branches,
-    "ca15newsoftdrop"        : fj_branches,
-    
-    'ca15filteredn2r2'          : fj_branches,      
-    'ca15filteredn2r3'          : fj_branches,	 
-    'ca15filteredn3r3'          : fj_branches, 
-    'ca15filteredn4r2'          : fj_branches, 
-    'ca15massdrop'              : fj_branches,
-    'ca15massdropfilteredn2r2'  : fj_branches, 
-    'ca15massdropfilteredn2r3'  : fj_branches,
-    'ca15massdropfilteredn3r3'  : fj_branches, 
-    'ca15massdropfilteredn4r2'  : fj_branches,
-    'ca15prunedz1r5'            : fj_branches, 
-    'ca15prunedz2r5'            : fj_branches, 
-    'ca15prunedz1r3'            : fj_branches,
-    'ca15trimmedr2f3'           : fj_branches, 
-    'ca15trimmedr2f1'           : fj_branches, 
-    'ca15trimmedr2f6'           : fj_branches,
-    'ca15softdropz10b0'         : fj_branches, 
-    'ca15softdropz5b0'          : fj_branches, 
-    'ca15softdropz15b2'         : fj_branches, 
+li_fatjets = ['ca08', 'ca15', 'ca08trimmedr2f4', 'ca08trimmedr2f6', 'ca08trimmedr2f8', 'ca08softdropz15b00', 'ca08softdropz20b10', 'ca08softdropz30b20', 'ca08softdropz30b30', 'ca08softdropz30b100', 'ca15trimmedr2f4', 'ca15trimmedr2f6', 'ca15trimmedr2f8', 'ca15softdropz15b00', 'ca15softdropz20b10', 'ca15softdropz30b20', 'ca15softdropz30b30', 'ca15softdropz30b100']
 
-    'ca08trimmedr2f3'          : fj_branches, 
-    'ca08trimmedr2f6'          : fj_branches, 
-    'ca08softdropz10b00'       : fj_branches, 
-    'ca08softdropz10b10'       : fj_branches, 
-    'ca08softdropz10b20'       : fj_branches, 
-    'ca08softdropz15b00'       : fj_branches, 
-    'ca08softdropz15b10'       : fj_branches, 
-    'ca08softdropz15b20'       : fj_branches, 
-    'ca08softdropz20b00'       : fj_branches, 
-    'ca08softdropz20b10'       : fj_branches, 
-    'ca08softdropz20b20'       : fj_branches, 
-    'ca15trimmedr2f3'          : fj_branches, 
-    'ca15trimmedr2f6'          : fj_branches, 
-    'ca15softdropz10b00'       : fj_branches, 
-    'ca15softdropz10b10'       : fj_branches, 
-    'ca15softdropz10b20'       : fj_branches, 
-    'ca15softdropz15b00'       : fj_branches, 
-    'ca15softdropz15b10'       : fj_branches, 
-    'ca15softdropz15b20'       : fj_branches, 
-    'ca15softdropz20b00'       : fj_branches, 
-    'ca15softdropz20b10'       : fj_branches, 
-    'ca15softdropz20b20'       : fj_branches, 
+# Generic
+objects = {}
+for fj in li_fatjets:
+    objects[fj] = fj_branches
 
-    "ca08cmstt"      : cmstt_branches,
-    "ca15cmstt"      : cmstt_branches,
+# And some extras
+objects["ca08"]           = fj_branches_plus
+objects["ca15"]           = fj_branches_plus
+objects["ca08cmstt"]      = cmstt_branches
+objects["ca15cmstt"]      = cmstt_branches
+objects["looseMultiRHTT"] = htt_branches
 
-    "looseMultiRHTT" : htt_branches,
-}
+
+
 
 # Matching DeltaR for the varipus object types
-object_drs = {                      
-    "ca08"            : 0.6,
-    "ca08filtered"    : 0.6,
-    "ca08pruned"      : 0.6,
-    "ca08newpruned"   : 0.6,
-    "ca08trimmed"     : 0.6,
-    "ca08softdrop"    : 0.6,
-    "ca08newsoftdrop" : 0.6,
-    
-    "ca15"                   : 1.2,
-    "ca15filtered"           : 1.2,
-    "ca15massdrop"           : 1.2,
-    "ca15massdropfiltered"   : 1.2,
-    "ca15pruned"             : 1.2,
-    "ca15newpruned"          : 1.2,
-    "ca15trimmed"            : 1.2,
-    "ca15softdrop"           : 1.2,
-    "ca15newsoftdrop"        : 1.2,
+object_drs = {}                      
+for object_name in objects.keys():
+    if "ca08" in object_name:
+        object_drs[object_name] = 0.6
+    elif "ca15" in object_name:
+        object_drs[object_name] = 1.2
+    elif object_name == "looseMultiRHTT":
+        object_drs[object_name] = 1.2
+    else:
+        print "No delta R defined for", object_name
+        print "Exiting!"
+        sys.exit()
 
-    'ca15filteredn2r2'          : 1.2,      
-    'ca15filteredn2r3'          : 1.2,	 
-    'ca15filteredn3r3'          : 1.2, 
-    'ca15filteredn4r2'          : 1.2, 
-    'ca15massdrop'              : 1.2,
-    'ca15massdropfilteredn2r2'  : 1.2, 
-    'ca15massdropfilteredn2r3'  : 1.2,
-    'ca15massdropfilteredn3r3'  : 1.2, 
-    'ca15massdropfilteredn4r2'  : 1.2,
-    'ca15prunedz1r5'            : 1.2, 
-    'ca15prunedz2r5'            : 1.2, 
-    'ca15prunedz1r3'            : 1.2,
-    'ca15trimmedr2f3'           : 1.2, 
-    'ca15trimmedr2f1'           : 1.2, 
-    'ca15trimmedr2f6'           : 1.2,
-    'ca15softdropz10b0'         : 1.2, 
-    'ca15softdropz5b0'          : 1.2, 
-    'ca15softdropz15b2'         : 1.2, 
-    
-    'ca08trimmedr2f3'          : 0.6, 
-    'ca08trimmedr2f6'          : 0.6, 
-    'ca08softdropz10b00'       : 0.6, 
-    'ca08softdropz10b10'       : 0.6, 
-    'ca08softdropz10b20'       : 0.6, 
-    'ca08softdropz15b00'       : 0.6, 
-    'ca08softdropz15b10'       : 0.6, 
-    'ca08softdropz15b20'       : 0.6, 
-    'ca08softdropz20b00'       : 0.6, 
-    'ca08softdropz20b10'       : 0.6, 
-    'ca08softdropz20b20'       : 0.6, 
-
-    'ca15trimmedr2f3'          : 1.2, 
-    'ca15trimmedr2f6'          : 1.2, 
-    'ca15softdropz10b00'       : 1.2, 
-    'ca15softdropz10b10'       : 1.2, 
-    'ca15softdropz10b20'       : 1.2, 
-    'ca15softdropz15b00'       : 1.2, 
-    'ca15softdropz15b10'       : 1.2, 
-    'ca15softdropz15b20'       : 1.2, 
-    'ca15softdropz20b00'       : 1.2, 
-    'ca15softdropz20b10'       : 1.2, 
-    'ca15softdropz20b20'       : 1.2, 
-
-    "ca08cmstt"      : 0.6,
-    "ca15cmstt"      : 1.2,
-    
-    "looseMultiRHTT" : 1.2
-}
 
 
 ########################################

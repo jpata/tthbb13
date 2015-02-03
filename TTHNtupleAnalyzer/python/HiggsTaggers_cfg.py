@@ -95,160 +95,14 @@ fj_ca15 = getattr(process, fj_name) # We will re-use this one
 # Groomed Fatjets
 #####################################
 
-fj_name = "ca15PFJetsCHSFilteredN2R2"
-branch_name = 'ca15filteredn2r2'
-setattr(process, fj_name, fj_ca15.clone(
-        useFiltering = cms.bool(True),
-        nFilt = cms.int32(2),
-        rFilt = cms.double(0.2),
-        useExplicitGhosts = cms.bool(True)))
-li_fatjets_objects.append(fj_name)
-li_fatjets_branches.append(branch_name)
-
-fj_name = "ca15PFJetsCHSFilteredN2R3"
-branch_name = 'ca15filteredn2r3'
-setattr(process, fj_name, fj_ca15.clone(
-        useFiltering = cms.bool(True),
-        nFilt = cms.int32(2),
-        rFilt = cms.double(0.3),
-        useExplicitGhosts = cms.bool(True)))
-li_fatjets_objects.append(fj_name)
-li_fatjets_branches.append(branch_name)
-
-fj_name = "ca15PFJetsCHSFilteredN3R3"
-branch_name = 'ca15filteredn3r3'
-setattr(process, fj_name, fj_ca15.clone(
-        useFiltering = cms.bool(True),
-        nFilt = cms.int32(3),
-        rFilt = cms.double(0.3),
-        useExplicitGhosts = cms.bool(True)))
-li_fatjets_objects.append(fj_name)
-li_fatjets_branches.append(branch_name)
-
-fj_name = "ca15PFJetsCHSFilteredN4R2"
-branch_name = 'ca15filteredn4r2'
-setattr(process, fj_name, fj_ca15.clone(
-        useFiltering = cms.bool(True),
-        nFilt = cms.int32(4),
-        rFilt = cms.double(0.2),
-        useExplicitGhosts = cms.bool(True)))
-li_fatjets_objects.append(fj_name)
-li_fatjets_branches.append(branch_name)
-
-fj_name = "ca15PFJetsCHSMassDrop"
-branch_name = 'ca15massdrop'
-setattr(process, fj_name, fj_ca15.clone(
-        useMassDropTagger = cms.bool(True),
-        muCut = cms.double(0.667),
-        yCut = cms.double(0.08),
-        useExplicitGhosts = cms.bool(True)))
-li_fatjets_objects.append(fj_name)
-li_fatjets_branches.append(branch_name)
-
-fj_name = "ca15PFJetsCHSMassDropFilteredN2R2"
-branch_name = 'ca15massdropfilteredn2r2'
-setattr(process, fj_name, fj_ca15.clone(
-        useMassDropTagger = cms.bool(True),
-        useFiltering = cms.bool(True),
-        muCut = cms.double(0.667),
-        yCut = cms.double(0.08),
-        nFilt = cms.int32(2),
-        rFilt = cms.double(0.2),
-        useExplicitGhosts = cms.bool(True)))
-li_fatjets_objects.append(fj_name)
-li_fatjets_branches.append(branch_name)
-
-fj_name = "ca15PFJetsCHSMassDropFilteredN2R3"
-branch_name = 'ca15massdropfilteredn2r3'
-setattr(process, fj_name, fj_ca15.clone(
-        useMassDropTagger = cms.bool(True),
-        useFiltering = cms.bool(True),
-        muCut = cms.double(0.667),
-        yCut = cms.double(0.08),
-        nFilt = cms.int32(2),
-        rFilt = cms.double(0.3),
-        useExplicitGhosts = cms.bool(True)))
-li_fatjets_objects.append(fj_name)
-li_fatjets_branches.append(branch_name)
-
-fj_name = "ca15PFJetsCHSMassDropFilteredN3R3"
-branch_name = 'ca15massdropfilteredn3r3'
-setattr(process, fj_name, fj_ca15.clone(
-        useMassDropTagger = cms.bool(True),
-        useFiltering = cms.bool(True),
-        muCut = cms.double(0.667),
-        yCut = cms.double(0.08),
-        nFilt = cms.int32(3),
-        rFilt = cms.double(0.3),
-        useExplicitGhosts = cms.bool(True)))
-li_fatjets_objects.append(fj_name)
-li_fatjets_branches.append(branch_name)
-
-fj_name = "ca15PFJetsCHSMassDropFilteredN4R2"
-branch_name = 'ca15massdropfilteredn4r2'
-setattr(process, fj_name, fj_ca15.clone(
-        useMassDropTagger = cms.bool(True),
-        useFiltering = cms.bool(True),
-        muCut = cms.double(0.667),
-        yCut = cms.double(0.08),
-        nFilt = cms.int32(4),
-        rFilt = cms.double(0.2),
-        useExplicitGhosts = cms.bool(True)))
-li_fatjets_objects.append(fj_name)
-li_fatjets_branches.append(branch_name)
-
-fj_name = "ca15PFJetsCHSPrunedZ1R5"
-branch_name = 'ca15prunedz1r5'
-setattr(process, fj_name, fj_ca15.clone(
-        cms.PSet(nFilt = cms.int32(99),
-                 zcut = cms.double(0.1),
-                 rcut_factor = cms.double(0.5)),
-        usePruning = cms.bool(True),
-        useExplicitGhosts = cms.bool(True)))
-li_fatjets_objects.append(fj_name)
-li_fatjets_branches.append(branch_name)
-
-fj_name = "ca15PFJetsCHSPrunedZ2R5"
-branch_name = 'ca15prunedz2r5'
-setattr(process, fj_name, fj_ca15.clone(
-        cms.PSet(nFilt = cms.int32(99),
-                 zcut = cms.double(0.2),
-                 rcut_factor = cms.double(0.5)),
-        usePruning = cms.bool(True),
-        useExplicitGhosts = cms.bool(True)))
-li_fatjets_objects.append(fj_name)
-li_fatjets_branches.append(branch_name)
-
-fj_name = "ca15PFJetsCHSPrunedZ1R3"
-branch_name = 'ca15prunedz1r3'
-setattr(process, fj_name, fj_ca15.clone(
-        cms.PSet(nFilt = cms.int32(99),
-                 zcut = cms.double(0.1),
-                 rcut_factor = cms.double(0.3)),
-        usePruning = cms.bool(True),
-        useExplicitGhosts = cms.bool(True)))
-li_fatjets_objects.append(fj_name)
-li_fatjets_branches.append(branch_name)
-
-
-fj_name = "ca15PFJetsCHSTrimmedR2F3"
-branch_name = 'ca15trimmedr2f3'
+fj_name = "ca15PFJetsCHSTrimmedR2F4"
+branch_name = 'ca15trimmedr2f4'
 setattr(process, fj_name, fj_ca15.clone(
         useTrimming = cms.bool(True),
         rFilt = cms.double(0.2),
-        trimPtFracMin = cms.double(0.03),
+        trimPtFracMin = cms.double(0.04),
         useExplicitGhosts = cms.bool(True)))
-li_fatjets_objects.append(fj_name)
-li_fatjets_branches.append(branch_name)
-
-fj_name = "ca15PFJetsCHSTrimmedR2F1"
-branch_name = 'ca15trimmedr2f1'
-setattr(process, fj_name, fj_ca15.clone(
-        useTrimming = cms.bool(True),
-        rFilt = cms.double(0.2),
-        trimPtFracMin = cms.double(0.01),
-        useExplicitGhosts = cms.bool(True)))
-li_fatjets_objects.append(fj_name)
+li_fatjets_objects.append(fj_name)        
 li_fatjets_branches.append(branch_name)
 
 fj_name = "ca15PFJetsCHSTrimmedR2F6"
@@ -258,42 +112,70 @@ setattr(process, fj_name, fj_ca15.clone(
         rFilt = cms.double(0.2),
         trimPtFracMin = cms.double(0.06),
         useExplicitGhosts = cms.bool(True)))
-li_fatjets_objects.append(fj_name)
+li_fatjets_objects.append(fj_name)        
 li_fatjets_branches.append(branch_name)
 
-
-fj_name = "ca15PFJetsCHSSoftDropZ10B0"
-branch_name = 'ca15softdropz10b0'
+fj_name = "ca15PFJetsCHSTrimmedR2F8"
+branch_name = 'ca15trimmedr2f8'
 setattr(process, fj_name, fj_ca15.clone(
-        useSoftDrop = cms.bool(True),
-        zcut = cms.double(0.1),
-        beta = cms.double(0.0),
+        useTrimming = cms.bool(True),
+        rFilt = cms.double(0.2),
+        trimPtFracMin = cms.double(0.08),
         useExplicitGhosts = cms.bool(True)))
-li_fatjets_objects.append(fj_name)
+li_fatjets_objects.append(fj_name)        
 li_fatjets_branches.append(branch_name)
 
-fj_name = "ca15PFJetsCHSSoftDropZ5B0"
-branch_name = 'ca15softdropz5b0'
-setattr(process, fj_name, fj_ca15.clone(
-        useSoftDrop = cms.bool(True),
-        zcut = cms.double(0.05),
-        beta = cms.double(0.0),
-        useExplicitGhosts = cms.bool(True)))
-li_fatjets_objects.append(fj_name)
-li_fatjets_branches.append(branch_name)
-
-fj_name = "ca15PFJetsCHSSoftDropZ15B2"
-branch_name = 'ca15softdropz15b2'
+fj_name = "ca15PFJetsCHSSoftDropZ15b00"
+branch_name = 'ca15softdropz15b00'
 setattr(process, fj_name, fj_ca15.clone(
         useSoftDrop = cms.bool(True),
         zcut = cms.double(0.15),
-        beta = cms.double(0.2),
+        beta = cms.double(0.0),
         useExplicitGhosts = cms.bool(True)))
 li_fatjets_objects.append(fj_name)
 li_fatjets_branches.append(branch_name)
 
+fj_name = "ca15PFJetsCHSSoftDropZ20b10"
+branch_name = 'ca15softdropz20b10'
+setattr(process, fj_name, fj_ca15.clone(
+        useSoftDrop = cms.bool(True),
+        zcut = cms.double(0.2),
+        beta = cms.double(1.0),
+        useExplicitGhosts = cms.bool(True)))
+li_fatjets_objects.append(fj_name)
+li_fatjets_branches.append(branch_name)
 
+fj_name = "ca15PFJetsCHSSoftDropZ30b20"
+branch_name = 'ca15softdropz30b20'
+setattr(process, fj_name, fj_ca15.clone(
+        useSoftDrop = cms.bool(True),
+        zcut = cms.double(0.3),
+        beta = cms.double(2.0),
+        useExplicitGhosts = cms.bool(True)))
+li_fatjets_objects.append(fj_name)
+li_fatjets_branches.append(branch_name)
 
+fj_name = "ca15PFJetsCHSSoftDropZ30b30"
+branch_name = 'ca15softdropz30b30'
+setattr(process, fj_name, fj_ca15.clone(
+        useSoftDrop = cms.bool(True),
+        zcut = cms.double(0.3),
+        beta = cms.double(3.0),
+        useExplicitGhosts = cms.bool(True)))
+li_fatjets_objects.append(fj_name)
+li_fatjets_branches.append(branch_name)
+
+fj_name = "ca15PFJetsCHSSoftDropZ30b100"
+branch_name = 'ca15softdropz30b100'
+setattr(process, fj_name, fj_ca15.clone(
+        useSoftDrop = cms.bool(True),
+        zcut = cms.double(0.3),
+        beta = cms.double(10.0),
+        useExplicitGhosts = cms.bool(True)))
+li_fatjets_objects.append(fj_name)
+li_fatjets_branches.append(branch_name)
+
+print li_fatjets_branches 
 
 #####################################
 # NSubjettiness
@@ -330,7 +212,7 @@ process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService
 li_fatjets_qvols = []
 for i_fj, fj_name in enumerate(li_fatjets_objects):
         
-   qvol_fatjets = []
+   qvol_fatjets = ["ca15PFJetsCHS"]
    
    r = "15"
 

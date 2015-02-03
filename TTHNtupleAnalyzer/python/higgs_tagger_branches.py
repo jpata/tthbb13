@@ -155,13 +155,9 @@ for t in [
 
 
 # Fatjet Branches
-for fj_name in ['ca15', 'ca15filteredn2r2', 'ca15filteredn2r3',
-                'ca15filteredn3r3', 'ca15filteredn4r2', 'ca15massdrop',
-                'ca15massdropfilteredn2r2', 'ca15massdropfilteredn2r3',
-                'ca15massdropfilteredn3r3', 'ca15massdropfilteredn4r2',
-                'ca15prunedz1r5', 'ca15prunedz2r5', 'ca15prunedz1r3',
-                'ca15trimmedr2f3', 'ca15trimmedr2f1', 'ca15trimmedr2f6',
-                'ca15softdropz10b0', 'ca15softdropz5b0', 'ca15softdropz15b2']:
+for fj_name in ['ca15', 'ca15trimmedr2f4', 'ca15trimmedr2f6',
+                'ca15trimmedr2f8', 'ca15softdropz15b00', 'ca15softdropz20b10',
+                'ca15softdropz30b20', 'ca15softdropz30b30', 'ca15softdropz30b100']:
 
     print "Adding", fj_name
 
@@ -176,8 +172,8 @@ for fj_name in ['ca15', 'ca15filteredn2r2', 'ca15filteredn2r3',
             "btag",                      # b-tag discriminator
             "chi",                       # Shower deconstruction chi
                                          # (only fill for ca15 wo grooming at the moment)
-#            "qvol",                      # Qjet Volatility
-#                                         # (only fill for ca15 wo grooming at the moment)
+            "qvol",                      # Qjet Volatility
+                                         # (only fill for ca15 wo grooming at the moment)
             "close_hadtop_pt",  "close_hadtop_dr", "close_hadtop_i", # top truth matching
             "close_parton_pt",  "close_parton_dr", "close_parton_i", # parton truth matching
             "close_higgs_pt",   "close_higgs_dr",  "close_higgs_i"   # higgs truth matching
