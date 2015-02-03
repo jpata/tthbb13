@@ -10,7 +10,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export TTH_DIR=$SCRIPT_DIR
 
 #set the correct scram arch
-export SCRAM_ARCH=slc6_amd64_gcc481
+export SCRAM_ARCH=slc6_amd64_gcc491
 
 #do cmsenv
 cd $SCRIPT_DIR
