@@ -7,8 +7,13 @@ mkdir TTH
 cd TTH
 wget --no-check-certificate https://raw.githubusercontent.com/jpata/tthbb13/dev-73X/setup.sh
 source setup.sh
-scram b 
 ~~~
+
+When running later just execute
+~~~
+export SCRAM_ARCH=slc6_amd64_gcc491
+~~~
+before setting up the CMS environment.
 
 As the default Ntuple is for TTH we need to change a few branches:
 ~~~
@@ -24,6 +29,7 @@ scram b -j 10
 
 ### NTuple Production
 
+
 To test the Ntuple making:
 (first download a MiniAOD (CSA14 and Phys14 should both do, Pythia6 will have problems with parton matching) and set the path to it in taggers_cfg)
 ~~~
@@ -37,8 +43,30 @@ cmsRun taggers_cfg.py
 TTH/TTHNtupleAnalyzer/python/MakeTaggingNtuple.py
 ~~~
 
+### Adding Variables
+
+New variables can be added by modifying three scripts
+
+Define the algorithm and add to cmsRun schedule:
+~~~
+TTH/TTHNtupleAnalyzer/python/Taggers_cfg.py
+~~~
+
+Add branches to the Step1 Ntuple (do not forget to rerun headergen and recompile after changing this):
+~~~
+TTH/TTHNtupleAnalyzer/python/tagger_branches.py
+~~~
+
+Add branches to the Step2 Ntuple:
+~~~
+TTH/TTHNtupleAnalyzer/python/MakeTaggingNtuple.py
+~~~
+
+(In principle tagger_branches and MakeTaggingNtuple can be made top pick up the correct branches from Taggers_cfg. Fix soon)
+
+
 ### Grid Submission:
-This is done in 
+The grid submission scripts are in: 
 ~~~
 TTH/TTHNtupleAnalyzer/crab_configs
 ~~~
