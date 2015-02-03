@@ -1,7 +1,7 @@
 Top Tagging Ntuple Making (based on TTH-MEM Ntuple)
 ==============
 
-Setup on SLC6
+### Setup on SLC6
 ~~~
 mkdir TTH
 cd TTH
@@ -22,6 +22,8 @@ cd $CMSSW_BASE/src
 scram b -j 10
 ~~~
 
+### NTuple Production
+
 To test the Ntuple making:
 (first download a MiniAOD (CSA14 and Phys14 should both do, Pythia6 will have problems with parton matching) and set the path to it in taggers_cfg)
 ~~~
@@ -35,13 +37,15 @@ cmsRun taggers_cfg.py
 TTH/TTHNtupleAnalyzer/python/MakeTaggingNtuple.py
 ~~~
 
-Grid Submission:
+### Grid Submission:
 This is done in 
 ~~~
 TTH/TTHNtupleAnalyzer/crab_configs
 ~~~
 
 The submission is done by ntop.py which relies on ~~~../python/CrabHelpers.py~~~ Most of the parameters are set in c_TEMPLATE.py and the actual thing that runs on the grid is myScript.sh
+
+### Plotting
 
 Some plotting examples are in:
 ~~~
