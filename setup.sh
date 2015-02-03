@@ -1,4 +1,4 @@
-export SCRAM_ARCH=slc6_amd64_gcc481
+export SCRAM_ARCH=slc6_amd64_gcc491
 
 scram project -n CMSSW CMSSW CMSSW_7_3_0
 cd CMSSW/src/
