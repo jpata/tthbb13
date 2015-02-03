@@ -43,6 +43,8 @@ cmsRun taggers_cfg.py
 TTH/TTHNtupleAnalyzer/python/MakeTaggingNtuple.py
 ~~~
 
+You should also either comment out Shower Deconstruction or ping Gregor to get added to the private github repo that contains the code.
+
 ### Adding Variables
 
 New variables can be added by modifying three scripts
