@@ -48,7 +48,14 @@ for pair_name, pair in pairs.iteritems():
         #mi(pair_name + "_taggers", pair[0], pair[1], tagger_vars, fiducial_cut_and_weight, fiducial_cut_and_weight),
 
         #mi(pair_name + "_interesting", pair[0], pair[1], interesting_vars_470_600,fiducial_cut_and_weight,fiducial_cut_and_weight),
-        mi(pair_name + "_htt", pair[0], pair[1], htt_vars,fiducial_cut_and_weight, fiducial_cut_and_weight),
+        #mi(pair_name + "_htt", pair[0], pair[1], htt_vars,fiducial_cut_and_weight, fiducial_cut_and_weight),
+
+        #mi(pair_name + "_new_masses_08", pair[0], pair[1], new_mass_vars_08, fiducial_cut_and_weight, fiducial_cut_and_weight, True),
+        #mi(pair_name + "_new_masses_15", pair[0], pair[1], new_mass_vars_15, fiducial_cut_and_weight, fiducial_cut_and_weight, True),
+
+        mi(pair_name + "_mass_vars_08_v21", pair[0], pair[1], mass_vars_08_v21, fiducial_cut_and_weight, fiducial_cut_and_weight, True),
+        mi(pair_name + "_mass_vars_15_v21", pair[0], pair[1], mass_vars_15_v21, fiducial_cut_and_weight, fiducial_cut_and_weight, True),
+
 
         #mi(pair_name + "_taggers", pair[0],  pair[1], good_vars_200_300, fiducial_cut_and_weight, fiducial_cut_and_weight),
         #mi(pair_name + "_taggers", pair[0],  pair[1], good_vars_470_600, fiducial_cut_and_weight, fiducial_cut_and_weight),

@@ -21,13 +21,15 @@ files = {}
 #files["qcd_470_600"] = "ntop_v18a_qcd_470_600_pythia8_13tev-tagging"
 #files["qcd_800_1000"] = "ntop_v18_qcd_800_1000_pythia8_13tev-tagging"
 
-files["zprime_m750"]  = "ntop_v20_zprime_m750_1p_13tev-tagging"     
-files["zprime_m1250"] = "ntop_v20_zprime_m1250_1p_13tev-tagging"     
-files["zprime_m2000"] = "ntop_v20_zprime_m2000_1p_13tev-tagging"     
-files["qcd_170_300"]  = "ntop_v20_qcd_170_300_pythia8_13tev-tagging"
-files["qcd_470_600"]  = "ntop_v20_qcd_470_600_pythia8_13tev-tagging"
-files["qcd_800_1000"] = "ntop_v20_qcd_800_1000_pythia8_13tev-tagging"
+#files["zprime_m750"]  = "ntop_v21_zprime_m750_1p_13tev-tagging"     
+#files["zprime_m1250"] = "ntop_v21_zprime_m1250_1p_13tev-tagging"     
+#files["zprime_m2000"] = "ntop_v21_zprime_m2000_1p_13tev-tagging"     
+#files["qcd_170_300"]  = "ntop_v21a_qcd_170_300_pythia8_13tev-tagging"
+#files["qcd_470_600"]  = "ntop_v21a_qcd_470_600_pythia8_13tev-tagging"
+#files["qcd_800_1000"] = "ntop_v21_qcd_800_1000_pythia8_13tev-tagging"
 
+files["zprime_m2000"] = "ntop_v19_zprime_m2000_1p_13tev-tagging"     
+files["qcd_800_1000"] = "ntop_v19_qcd_800_1000_pythia8_13tev-tagging"
 
 weighted_files = {}
 for k,v in files.iteritems():

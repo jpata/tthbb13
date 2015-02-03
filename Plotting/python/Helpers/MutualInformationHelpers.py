@@ -88,6 +88,7 @@ class mi():
                 li_vars,
                 fiducial_cut_signal     = "(1)",
                 fiducial_cut_background = "(1)",
+                diagonal_only = False,
    ):
       """ Constructor. Arguments:
       name                    : (string) name of the mutual information set
@@ -96,6 +97,7 @@ class mi():
       vars                    : list of variable (from VariableHelpers) objects 
       fiducial_cut_signal     : (string) fiducial cut (numerator and denominator)
       fiducial_cut_background : (string) fiducial cut (numerator and denominator)
+      diagonal_only           : (bool) only check variable/truth, not variable pairs
       """
       
       if ((fiducial_cut_signal == "(1)") and (not (fiducial_cut_background == "(1)")) or
@@ -332,6 +334,9 @@ def MakePlots(mis, files, input_treename = 'tree'):
             # Below Diagonal
             elif ivar2 < ivar1:
 
+               if mi.diagonal_only:
+                  continue
+
                # For the off-diagonal we want to calculate:
                # I(T;A,B) = H(sig,bkg)[A,B] - f * H(sig)[A,B] - (1-f) * H(bkg)[A,B]
 
@@ -506,6 +511,9 @@ def MakePlots(mis, files, input_treename = 'tree'):
             if ivar2 > ivar1:
                continue
 
+            if mi.diagonal_only and ivar1 > ivar2:
+               continue
+
             h_mi.SetBinContent(ivar1+1, ivar2+1, mi_result[var1.name][var2.name])
 
 
@@ -517,8 +525,10 @@ def MakePlots(mis, files, input_treename = 'tree'):
       draw_opts = "COLZ TEXT"
 
       h_mi.Draw(draw_opts)
-      OutputDirectoryHelper.ManyPrint(c, output_dir, "{0}_mi".format(mi.name))
-
+      if mi.diagonal_only:
+         OutputDirectoryHelper.ManyPrint(c, output_dir, "{0}_mi_diag".format(mi.name))
+      else:
+         OutputDirectoryHelper.ManyPrint(c, output_dir, "{0}_mi".format(mi.name))
    # End mi loop
 # End MakePlots
             

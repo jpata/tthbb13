@@ -23,6 +23,48 @@ mass_vars_15 = [
     variable('ca15newsoftdrop_mass', "softdrop m (z=0.15, #beta=2, R=1.5)", 0, 1000, unit = "GeV"),   
 ]
 
+new_mass_vars_15 = [
+    variable('ca15trimmedr2f3_mass', "trim r2f3 m (R=1.5)", 0, 1000, unit = "GeV"),
+    variable('ca15trimmedr2f6_mass', "trim r2f6 m (R=1.5)", 0, 1000, unit = "GeV"),
+    variable('ca15softdropz10b00_mass', "sd 10b00 m (R=1.5)", 0, 1000, unit = "GeV"),
+    variable('ca15softdropz10b10_mass', "sd 10b10 m (R=1.5)", 0, 1000, unit = "GeV"),
+    variable('ca15softdropz10b20_mass', "sd 10b20 m (R=1.5)", 0, 1000, unit = "GeV"),
+    variable('ca15softdropz15b00_mass', "sd 15b00 m (R=1.5)", 0, 1000, unit = "GeV"),
+    variable('ca15softdropz15b10_mass', "sd 15b10 m (R=1.5)", 0, 1000, unit = "GeV"),
+    variable('ca15softdropz15b20_mass', "sd 15b20 m (R=1.5)", 0, 1000, unit = "GeV"),
+    variable('ca15softdropz20b00_mass', "sd 20b00 m (R=1.5)", 0, 1000, unit = "GeV"),
+    variable('ca15softdropz20b10_mass', "sd 20b10 m (R=1.5)", 0, 1000, unit = "GeV"),
+    variable('ca15softdropz20b20_mass', "sd 20b20 m (R=1.5)", 0, 1000, unit = "GeV"),    
+]
+
+mass_vars_15_v21 = [
+    variable('ca15trimmedr2f4_mass', "trim r2f4 m (R=1.5)", 0, 1000, unit = "GeV"),
+    variable('ca15trimmedr2f6_mass', "trim r2f6 m (R=1.5)", 0, 1000, unit = "GeV"),
+    variable('ca15trimmedr2f8_mass', "trim r2f8 m (R=1.5)", 0, 1000, unit = "GeV"),
+    variable('ca15softdropz15b00_mass', "sd 15b00 m (R=1.5)", 0, 1000, unit = "GeV"),
+    variable('ca15softdropz20b10_mass', "sd 20b10 m (R=1.5)", 0, 1000, unit = "GeV"),
+    variable('ca15softdropz30b20_mass', "sd 30b20 m (R=1.5)", 0, 1000, unit = "GeV"),
+    variable('ca15softdropz30b30_mass', "sd 30b30 m (R=1.5)", 0, 1000, unit = "GeV"),
+    variable('ca15softdropz30b100_mass', "sd 30b100 m (R=1.5)", 0, 1000, unit = "GeV"),
+]
+
+mass_vars_08_v21 = [
+    variable('ca08trimmedr2f4_mass', "trim r2f4 m (R=0.8)", 0, 1000, unit = "GeV"),
+    variable('ca08trimmedr2f6_mass', "trim r2f6 m (R=0.8)", 0, 1000, unit = "GeV"),
+    variable('ca08trimmedr2f8_mass', "trim r2f8 m (R=0.8)", 0, 1000, unit = "GeV"),
+    variable('ca08softdropz15b00_mass', "sd 15b00 m (R=0.8)", 0, 1000, unit = "GeV"),
+    variable('ca08softdropz20b10_mass', "sd 20b10 m (R=0.8)", 0, 1000, unit = "GeV"),
+    variable('ca08softdropz30b20_mass', "sd 30b20 m (R=0.8)", 0, 1000, unit = "GeV"),
+    variable('ca08softdropz30b30_mass', "sd 30b30 m (R=0.8)", 0, 1000, unit = "GeV"),
+    variable('ca08softdropz30b100_mass', "sd 30b100 m (R=0.8)", 0, 1000, unit = "GeV"),
+]
+
+
+
+
+
+
+
 mass_vars_08 = [
     variable('ca08_mass', "m (R=0.8)", 0, 500, unit = "GeV"),
     variable('ca08filtered_mass', "filtered m (R=0.8)", 0, 500, unit = "GeV"),
@@ -32,6 +74,21 @@ mass_vars_08 = [
     variable('ca08softdrop_mass', "softdrop m (z=0.1, #beta=0, R=0.8)", 0, 500, unit = "GeV"),   
     variable('ca08newsoftdrop_mass', "softdrop m (z=0.15, #beta=2, R=0.8)", 0, 500, unit = "GeV"),   
 ]
+
+new_mass_vars_08 = [
+    variable('ca08trimmedr2f3_mass', "trim r2f3 m (R=0.8)", 0, 1000, unit = "GeV"),
+    variable('ca08trimmedr2f6_mass', "trim r2f6 m (R=0.8)", 0, 1000, unit = "GeV"),
+    variable('ca08softdropz10b00_mass', "sd 10b00 m (R=0.8)", 0, 1000, unit = "GeV"),
+    variable('ca08softdropz10b10_mass', "sd 10b10 m (R=0.8)", 0, 1000, unit = "GeV"),
+    variable('ca08softdropz10b20_mass', "sd 10b20 m (R=0.8)", 0, 1000, unit = "GeV"),
+    variable('ca08softdropz15b00_mass', "sd 15b00 m (R=0.8)", 0, 1000, unit = "GeV"),
+    variable('ca08softdropz15b10_mass', "sd 15b10 m (R=0.8)", 0, 1000, unit = "GeV"),
+    variable('ca08softdropz15b20_mass', "sd 15b20 m (R=0.8)", 0, 1000, unit = "GeV"),
+    variable('ca08softdropz20b00_mass', "sd 20b00 m (R=0.8)", 0, 1000, unit = "GeV"),
+    variable('ca08softdropz20b10_mass', "sd 20b10 m (R=0.8)", 0, 1000, unit = "GeV"),
+    variable('ca08softdropz20b20_mass', "sd 20b20 m (R=0.8)", 0, 1000, unit = "GeV"),    
+]
+
 
 tau_vars_15 = [
     variable('ca15_tau3/ca15_tau2', "#tau_{3}/#tau_{2}  (R=1.5)", 0, 1.),
@@ -175,7 +232,8 @@ cmstt_vars = [variable.di['ca08cmstt_topMass'],
 
 
 sd_vars = [variable.di['log(ca08_chi)'],              
-           variable.di['log(ca15_chi)']]
+           variable.di['log(ca15_chi)']
+]
               
 
 all_vars_15 = mass_vars_15 + tau_vars_15 +   tagger_vars_15 

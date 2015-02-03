@@ -91,7 +91,7 @@ for sample in files.keys():
     fiducial_cut = '((pt>{0})&&(pt<{1}))*weight'.format(ranges[sample][0], 
                                                         ranges[sample][1])
     
-    if True:
+    if False:
         name = "mass_vars_15"
         collection = globals()[name]
         combinedPlot(name + "_" + sample,                     
@@ -110,7 +110,7 @@ for sample in files.keys():
                      legend_size_x   = 0.2,
                      legend_size_y   = 0.05 * len(collection))
 
-    if True:
+    if False:
         name = "mass_vars_08"
         collection = globals()[name]
         combinedPlot(name + "_" + sample,                     
@@ -129,7 +129,7 @@ for sample in files.keys():
                      legend_size_x   = 0.2,
                      legend_size_y   = 0.05 * len(collection))
 
-    if True:
+    if False:
         name = "tau_vars_08"
         collection = globals()[name]
         if "qcd" in sample:
@@ -153,7 +153,7 @@ for sample in files.keys():
                      legend_size_x   = 0.2,
                      legend_size_y   = 0.05 * len(collection))
 
-    if True:
+    if False:
         name = "tau_vars_15"
         collection = globals()[name]
         combinedPlot(name + "_" + sample,                     
@@ -172,7 +172,7 @@ for sample in files.keys():
                      legend_size_x   = 0.2,
                      legend_size_y   = 0.05 * len(collection))
 
-    if True:
+    if False:
         name = "cmstt_vars"
         collection = globals()[name]
         combinedPlot(name + "_" + sample,                     
@@ -191,7 +191,7 @@ for sample in files.keys():
                      legend_size_x   = 0.2,
                      legend_size_y   = 0.05 * len(collection))
 
-    if False:
+    if True:
         name = "sd_vars"
         collection = globals()[name]
         if "qcd" in sample:
@@ -216,7 +216,7 @@ for sample in files.keys():
                      legend_size_x   = 0.2,
                      legend_size_y   = 0.05 * len(collection))
 
-    if True:
+    if False:
         name = "btag_vars"
         collection = globals()[name]
         combinedPlot(name + "_" + sample,                     

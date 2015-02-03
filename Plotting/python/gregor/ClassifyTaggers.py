@@ -37,6 +37,8 @@ ROOT.gROOT.ForceStyle()
 
 run_TMVA = True
 
+#pair_name = "pt-200-to-300"
+#pair_name = "pt-470-to-600"
 pair_name = "pt-800-to-1000"
 
 pair = pairs[pair_name]
@@ -72,34 +74,39 @@ def create_setups(li_vars):
     return li_TMVAs
 # end of create_setups
 
-mass_setups_15 = create_setups(mass_vars_15)
-tau_setups_15  = create_setups(tau_vars_15)
-tau31_setups_15  = create_setups(tau31_vars_15)
-tagger_setups_15 = create_setups(tagger_vars_15)
-all_setups_15 = create_setups(all_vars_15)
+#mass_setups_15 = create_setups(mass_vars_15)
+#tau_setups_15  = create_setups(tau_vars_15)
+#tau31_setups_15  = create_setups(tau31_vars_15)
+#tagger_setups_15 = create_setups(tagger_vars_15)
+#all_setups_15 = create_setups(all_vars_15)
+#
+#mass_setups_08 = create_setups(mass_vars_08)
+#tau_setups_08  = create_setups(tau_vars_08)
+#tau31_setups_08  = create_setups(tau31_vars_08)
+#tagger_setups_08 = create_setups(tagger_vars_08)
+#all_setups_08 = create_setups(all_vars_08)
+#
+#btag_setups = create_setups(btag_vars)
+#
+#good_setups = create_setups(good_vars)
+#
+#cmstt_setups = create_setups(cmstt_vars)
+#sd_setups = create_setups(sd_vars)
+#
+#all_setups = all_setups_08 + all_setups_15 + btag_setups
+#
+#mass_setups = mass_setups_08 + mass_setups_15
+#tau_setups = tau_setups_08 + tau_setups_15
+#tagger_setups = tagger_setups_08 + tagger_setups_15
+#
+#good_setups_200_300 = create_setups(good_vars_200_300)
+#good_setups_470_600 = create_setups(good_vars_470_600)
+#good_setups_800_1000 = create_setups(good_vars_800_1000)
+#
 
-mass_setups_08 = create_setups(mass_vars_08)
-tau_setups_08  = create_setups(tau_vars_08)
-tau31_setups_08  = create_setups(tau31_vars_08)
-tagger_setups_08 = create_setups(tagger_vars_08)
-all_setups_08 = create_setups(all_vars_08)
+new_mass_setups_15 = create_setups(new_mass_vars_15)
+new_mass_setups_08 = create_setups(new_mass_vars_08)
 
-btag_setups = create_setups(btag_vars)
-
-good_setups = create_setups(good_vars)
-
-cmstt_setups = create_setups(cmstt_vars)
-sd_setups = create_setups(sd_vars)
-
-all_setups = all_setups_08 + all_setups_15 + btag_setups
-
-mass_setups = mass_setups_08 + mass_setups_15
-tau_setups = tau_setups_08 + tau_setups_15
-tagger_setups = tagger_setups_08 + tagger_setups_15
-
-good_setups_200_300 = create_setups(good_vars_200_300)
-good_setups_470_600 = create_setups(good_vars_470_600)
-good_setups_800_1000 = create_setups(good_vars_800_1000)
 
 combined_setups = []
 
@@ -141,18 +148,18 @@ combined_setups = []
 #                                  weight_bg = "weight"))
 #
 
-combined_setups.append(TMVASetup("{0}_{1}_470_to_600_mass_tau".format(sample_sig, sample_bkg),
-                                  "trimmed m + #tau_{3}/#tau_{2} (R=0.8)",
-                                  ["Cuts"], 
-                                 [variable.di['ca08trimmed_mass'],
-                                  variable.di['ca08_tau3/ca08_tau2']],
-                                  file_name_sig,
-                                  file_name_bg,
-                                  fiducial_cut_sig = fiducial_cuts[sample_sig],
-                                  fiducial_cut_bg  = fiducial_cuts[sample_bkg],
-                                  weight_sig = "weight",
-                                  weight_bg = "weight"))
-
+#combined_setups.append(TMVASetup("{0}_{1}_470_to_600_mass_tau".format(sample_sig, sample_bkg),
+#                                  "trimmed m + #tau_{3}/#tau_{2} (R=0.8)",
+#                                  ["Cuts"], 
+#                                 [variable.di['ca08trimmed_mass'],
+#                                  variable.di['ca08_tau3/ca08_tau2']],
+#                                  file_name_sig,
+#                                  file_name_bg,
+#                                  fiducial_cut_sig = fiducial_cuts[sample_sig],
+#                                  fiducial_cut_bg  = fiducial_cuts[sample_bkg],
+#                                  weight_sig = "weight",
+#                                  weight_bg = "weight"))
+#
 
 #combined_setups.append(TMVASetup("{0}_{1}_200_to_300_mass_tau".format(sample_sig, sample_bkg),
 #                                  "trimmed m + #tau_{3}/#tau_{2} (R=1.5)",
@@ -200,7 +207,7 @@ combined_setups.append(TMVASetup("{0}_{1}_470_to_600_mass_tau".format(sample_sig
 
 
 with_btag_setups = []
-for setup in combined_setups:
+for setup in new_mass_setups_15:
     new_setup = deepcopy(setup)
 
     new_setup.name = setup.name + "_btag"
@@ -211,7 +218,7 @@ for setup in combined_setups:
 
 
 if run_TMVA:
-    for setup in sd_setups:
+    for setup in new_mass_setups_15:
         doTMVA(setup)
 
 #plotROCMultiple("ROC_good", [setup_08_combined, setup_cmstt_combined, setup_htt_combined] + good_setups + btag_setups)
@@ -224,4 +231,6 @@ if run_TMVA:
 #plotROCMultiple("ROC_withb", combined_setups + with_btag_setups)
 #plotROCMultiple("ROC_" + pair_name, good_setups_200_300 + combined_setups)
 #plotROCMultiple("ROC_" + pair_name, good_setups_470_600 + combined_setups)
-plotROCMultiple("ROC_sd_" + pair_name, sd_setups)
+#plotROCMultiple("ROC_sd_" + pair_name, sd_setups)
+#plotROCMultiple("ROC_new_mass_15_" + pair_name, new_mass_setups_15)
+plotROCMultiple("ROC_new_mass_08_" + pair_name, new_mass_setups_08)

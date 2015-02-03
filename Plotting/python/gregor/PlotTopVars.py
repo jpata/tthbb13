@@ -39,23 +39,21 @@ low_pt_mass_vars = [
 ]
 
 
-
-combinedPlot(pair_name + "_masses",
-             [plot(sample +" " + var.pretty_name,
-                   var.name,                                           
-                   '((pt>{0})&&(pt<{1})&&({2}))*weight'.format(ranges[sample][0], 
-                                                               ranges[sample][1],
-                                                               var.extra_cut),
-                   sample) for sample in pair for var in low_pt_mass_vars],
-             60, 0, 600, 
-             label_x   = "Mass",
-             label_y   = "A.U.",
-             axis_unit = "GeV",
-             log_y     = False,
-             normalize = True,
-             legend_origin_x = 0.5,
-             legend_origin_y = 0.5,
-             legend_text_size= 0.02)
+for var in new_mass_vars_15:
+    combinedPlot(pair_name + "_" + var.name,
+                 [plot(sample +" " + var.pretty_name,
+                       var.name,                                           
+                       '(({0})&&({1}))*weight'.format(fiducial_cuts[sample], var.extra_cut),
+                       sample) for sample in pair],
+                 60, 0, 600, 
+                 label_x   = "Mass",
+                 label_y   = "A.U.",
+                 axis_unit = "GeV",
+                 log_y     = False,
+                 normalize = True,
+                 legend_origin_x = 0.5,
+                 legend_origin_y = 0.5,
+                 legend_text_size= 0.03)
 
 doWork(weighted_files, output_dir)
 

@@ -64,7 +64,42 @@ if True:
                  legend_size_x   = 0.2,
                  legend_size_y   = 0.05 * 2)
 
+
+if True:
+    for var in other_vars:
+        combinedPlot(var.pretty_name.replace("/","_").replace(" ","_"),
+                     [plot( "ttH",     var.name, fiducial_cuts["tth"], "tth"), 
+                      plot( "tt+Jets", var.name, fiducial_cuts["ttj"], "ttj")],
+                     80, var.range_min, var.range_max, 
+                     label_x   = var.pretty_name,
+                     label_y   = "",
+                     axis_unit = "",
+                     log_y     = False,
+                     normalize = True,
+                     legend_origin_x = 0.35,
+                     legend_origin_y = 0.3,
+                     legend_size_x   = 0.2,
+                     legend_size_y   = 0.05 * 2)
+
+
+if False:
     for var in mass_vars:
+        combinedPlot(var.pretty_name.replace("/","_").replace(" ","_"),
+                     [plot( "ttH",     var.name, fiducial_cuts["tth"], "tth"), 
+                      plot( "tt+Jets", var.name, fiducial_cuts["ttj"], "ttj")],
+                     80, var.range_min, var.range_max, 
+                     label_x   = var.pretty_name,
+                     label_y   = "",
+                     axis_unit = "",
+                     log_y     = False,
+                     normalize = True,
+                     legend_origin_x = 0.35,
+                     legend_origin_y = 0.3,
+                     legend_size_x   = 0.2,
+                     legend_size_y   = 0.05 * 2)
+
+if False:
+    for var in tau_vars:
         combinedPlot(var.pretty_name.replace("/","_").replace(" ","_"),
                      [plot( "ttH",     var.name, fiducial_cuts["tth"], "tth"), 
                       plot( "tt+Jets", var.name, fiducial_cuts["ttj"], "ttj")],

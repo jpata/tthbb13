@@ -31,11 +31,14 @@ basepath = '/scratch/gregor/'
 # for the filename: basepath + filename + .root
 full_filenames = {}
 for k,v in files.iteritems():
-    full_filenames[k] = basepath + v + ".root"
+    full_filenames[k] = basepath + v + "-weighted.root"
 
-mis =[ 
-    #mi("masses", "tth", "ttj", mass_vars, fiducial_cuts["tth"], fiducial_cuts["ttj"]),
-    mi("taus",   "tth", "ttj", tau_vars + [variable.di["ca15trimmed_mass"]] ,  fiducial_cuts["tth"], fiducial_cuts["ttj"])
-]
+for pair_name, pair in pairs.iteritems():
+    mis =[ 
+        #mi("masses_v5_"+pair_name, pair[0], pair[1], mass_vars_v5, fiducial_cuts[pair[0]], fiducial_cuts[pair[1]], diagonal_only = True),
+        #mi("taus",   "tth", "ttj", tau_vars,  fiducial_cuts["tth"], fiducial_cuts["ttj"], diagonal_only = True)
+        #mi("interesting",   "tth", "ttj", interesting_vars,  fiducial_cuts["tth"], fiducial_cuts["ttj"], diagonal_only = False)
+        mi("interesting_higgs_v5_"+pair_name, pair[0], pair[1], interesting_vars_v5,  fiducial_cuts[pair[0]], fiducial_cuts[pair[1]], diagonal_only = False)
+    ]
 
-MakePlots(mis, full_filenames)
+    MakePlots(mis, full_filenames)
