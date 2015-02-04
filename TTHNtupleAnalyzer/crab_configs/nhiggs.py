@@ -52,6 +52,7 @@ if action == "submit":
                version,
                cmssw_config_path = cmssw_config_path,
                cmssw_config_script = config_script_name,
+               template_filename = "c_TEMPLATE_script.py",
                blacklist = ["T1_US_FNAL"])
 
 # Status
@@ -73,13 +74,18 @@ elif action == "download":
     for sample_shortname in li_samples:
         download(name, sample_shortname, version, storage_path)    
 
+# Download / Globus
 elif action == "download_globus":
     for sample_shortname in li_samples:
-        download_globus(name, sample_shortname, version, storage_path)    
-
+        download_globus(name, sample_shortname, version, storage_path, "gregor", "*tagging*")    
 
 # Hadd
 elif action == "hadd":
     for sample_shortname in li_samples:
-        hadd(name, sample_shortname, version, storage_path)    
+        hadd(name, 
+             sample_shortname, 
+             version, 
+             storage_path, 
+             infile_glob = "*tagging*.root*", 
+             outfile_suffix = "-tagging")    
 

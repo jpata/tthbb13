@@ -18,20 +18,20 @@ name = "ntop"
 version = "v19"
 li_samples = [
  #   "qcd_170_300_pythia8_13tev",
-    #"qcd_300_470_pythia8_13tev",
+ #   "qcd_300_470_pythia8_13tev",
  #   "qcd_470_600_pythia8_13tev",
-    #"qcd_600_800_pythia8_13tev",    
-    "qcd_800_1000_pythia8_13tev",    
+ #   "qcd_600_800_pythia8_13tev",    
+ #   "qcd_800_1000_pythia8_13tev",    
 
-    #"zprime_m500_1p_13tev",
-#    "zprime_m750_1p_13tev",
+ #   "zprime_m500_1p_13tev",
+ #   "zprime_m750_1p_13tev",
 
-    #"zprime_m1000_1p_13tev",
-#    "zprime_m1250_1p_13tev", 
-    #"zprime_m1500_1p_13tev", 
-    "zprime_m2000_1p_13tev",
-    #"zprime_m3000_1p_13tev", 
-    #"zprime_m4000_1p_13tev",
+ #   "zprime_m1000_1p_13tev",
+ #   "zprime_m1250_1p_13tev", 
+ #   "zprime_m1500_1p_13tev", 
+ #   "zprime_m2000_1p_13tev",
+ #   "zprime_m3000_1p_13tev", 
+ #   "zprime_m4000_1p_13tev",
 ]
 
 cmssw_config_path = '/shome/gregor/TTH-73X/CMSSW/src/TTH/TTHNtupleAnalyzer/python/'
@@ -65,6 +65,7 @@ if action == "submit":
                version,
                cmssw_config_path = cmssw_config_path,
                cmssw_config_script = config_script_name,
+               template_filename = "c_TEMPLATE_script.py",
                blacklist = ["T1_US_FNAL"])
 
 # Status
@@ -86,13 +87,18 @@ elif action == "download":
     for sample_shortname in li_samples:
         download(name, sample_shortname, version, storage_path)    
 
-# Download
+# Download / Globus
 elif action == "download_globus":
     for sample_shortname in li_samples:
-        download_globus(name, sample_shortname, version, storage_path)    
+        download_globus(name, sample_shortname, version, storage_path, "gregor", "*tagging*")    
 
 # Hadd
 elif action == "hadd":
     for sample_shortname in li_samples:
-        hadd(name, sample_shortname, version, storage_path)    
+        hadd(name, 
+             sample_shortname, 
+             version, 
+             storage_path, 
+             infile_glob = "*tagging*.root*", 
+             outfile_suffix = "-tagging")    
 

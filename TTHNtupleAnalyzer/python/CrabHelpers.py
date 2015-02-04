@@ -161,6 +161,70 @@ def download(name,
 # End of download
 
 
+
+#######################################
+# download_globus 
+#######################################
+
+def download_globus(name,
+                    sample_shortname,
+                    version,        
+                    basepath,
+                    user_name = "gregor",
+                    glob_string = "*"):
+    """Download a single job from the Grid using globus-url-copy instead of crab
+    """
+
+    timeout = 5 # seconds
+    
+    storage_host = "storage01.lcg.cscs.ch"
+    gsiftp_base = "gsiftp://" + storage_host
+    srm_base    = "srm://" + storage_host
+    user_path_on_storage = "pnfs/lcg.cscs.ch/cms/trivcat/store/user/{0}/".format(user_name)    
+    local_mount_path = "/scratch/{0}/mount/storage/".format(user_name)
+    output_path = os.path.join(basepath, "{0}_{1}_{2}".format(name, version, sample_shortname))
+
+    crab_job_name = "crab_{0}_{1}_{2}".format(name, version, sample_shortname)
+    sample_name = Samples[sample_shortname].split("/")[1]
+
+    # Make sure output directory exists
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+
+    # Make sure the local mount path exists and mount remote storage into it
+    if not os.path.exists(local_mount_path):
+        os.makedirs(local_mount_path)
+    subprocess.call(["gfalFS", "-s", local_mount_path, srm_base])
+
+    # Use glob to get the full path of the files we are interested in.
+    # The structure is user_path_on_storage / full sample name / name of crab job / timestamp / i / *.root
+    # i starts at 0 and each i-directory holds the output of at most 1k jobs
+    directories_to_process = glob.glob( os.path.join(local_mount_path, 
+                                                     user_path_on_storage, 
+                                                     sample_name,
+                                                     crab_job_name,
+                                                     "*/*"))
+
+    # Loop over directories, get full list of files and download them
+    for i, directory in enumerate(directories_to_process):
+        files_to_download = glob.glob(os.path.join(directory, glob_string))
+        print "Subdir:", i, "Number of files to download:", len(files_to_download)
+
+        for ifn, fn in enumerate(files_to_download):
+            source = os.path.join(gsiftp_base, fn.replace(local_mount_path, ""))
+            target = os.path.join(output_path, os.path.basename(fn))
+            subprocess.call(["globus-url-copy", "-stall-timeout", str(timeout), source, target])
+            update_progress( 1. * ifn/len(files_to_download))
+        # end of loop over files
+        print ""
+    # end of loop over directories
+
+    # Finally: Unmount storage from local system
+    subprocess.call(["gfalFS_umount", local_mount_path])
+
+# End of download
+
+
 #######################################
 # get LFN
 #######################################
@@ -231,69 +295,6 @@ def get_lfn(name, sample_shortname, version, status_dict, file_output=True, chun
     assert(len(lfns) == len(ch))
     return lfns
 # End of get LFN
-
-
-#######################################
-# download_globus 
-#######################################
-
-def download_globus(name,
-                    sample_shortname,
-                    version,        
-                    basepath,
-                    user_name = "gregor"):
-    """Download a single job from the Grid using globus-url-copy instead of crab
-    """
-
-    timeout = 5 # seconds
-    
-    storage_host = "storage01.lcg.cscs.ch"
-    gsiftp_base = "gsiftp://" + storage_host
-    srm_base    = "srm://" + storage_host
-    user_path_on_storage = "pnfs/lcg.cscs.ch/cms/trivcat/store/user/{0}/".format(user_name)    
-    local_mount_path = "/scratch/{0}/mount/storage/".format(user_name)
-    output_path = os.path.join(basepath, "{0}_{1}_{2}".format(name, version, sample_shortname))
-
-    crab_job_name = "crab_{0}_{1}_{2}".format(name, version, sample_shortname)
-    sample_name = Samples[sample_shortname].split("/")[1]
-
-    # Make sure output directory exists
-    if not os.path.exists(output_path):
-        os.makedirs(output_path)
-
-    # Make sure the local mount path exists and mount remote storage into it
-    if not os.path.exists(local_mount_path):
-        os.makedirs(local_mount_path)
-    subprocess.call(["gfalFS", "-s", local_mount_path, srm_base])
-
-    # Use glob to get the full path of the files we are interested in.
-    # The structure is user_path_on_storage / full sample name / name of crab job / timestamp / i / *.root
-    # i starts at 0 and each i-directory holds the output of at most 1k jobs
-    directories_to_process = glob.glob( os.path.join(local_mount_path, 
-                                                     user_path_on_storage, 
-                                                     sample_name,
-                                                     crab_job_name,
-                                                     "*/*"))
-
-    # Loop over directories, get full list of files and download them
-    for i, directory in enumerate(directories_to_process):
-        files_to_download = glob.glob(os.path.join(directory, "*tagging*"))
-        print "Subdir:", i, "Number of files to download:", len(files_to_download)
-
-        for ifn, fn in enumerate(files_to_download):
-            source = os.path.join(gsiftp_base, fn.replace(local_mount_path, ""))
-            target = os.path.join(output_path, os.path.basename(fn))
-            subprocess.call(["globus-url-copy", "-stall-timeout", str(timeout), source, target])
-            update_progress( 1. * ifn/len(files_to_download))
-        # end of loop over files
-        print ""
-    # end of loop over directories
-
-    # Finally: Unmount storage from local system
-    subprocess.call(["gfalFS_umount", local_mount_path])
-
-# End of download
-
 
 
 #######################################
