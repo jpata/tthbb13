@@ -17,7 +17,7 @@ before setting up the CMS environment.
 
 As the default Ntuple is for TTH we need to change a few branches:
 ~~~
-cd TTHNtupleAnalyzer/python
+cd TTH/TTHNtupleAnalyzer/python
 python headergen.py ../interface/tth_tree_template.hh ../interface/tth_tree.hh tagger_branches.py
 ~~~
 
