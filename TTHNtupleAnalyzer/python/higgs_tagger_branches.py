@@ -155,7 +155,11 @@ for t in [
 
 
 # Fatjet Branches
-for fj_name in ['ca08', 'ca15', 'ca08trimmedr2f4', 'ca08trimmedr2f6', 'ca08trimmedr2f8', 'ca08softdropz15b00', 'ca08softdropz20b10', 'ca08softdropz30b20', 'ca08softdropz30b30', 'ca08softdropz30b100', 'ca15trimmedr2f4', 'ca15trimmedr2f6', 'ca15trimmedr2f8', 'ca15softdropz15b00', 'ca15softdropz20b10', 'ca15softdropz30b20', 'ca15softdropz30b30', 'ca15softdropz30b100']:
+for fj_name in ['ca15', 'ca15trimmedr2f4', 'ca15trimmedr2f6',
+                'ca15trimmedr2f8', 'ca15softdropz15b00', 'ca15softdropz20b10',
+                'ca15softdropz30b20', 'ca15softdropz30b30', 'ca15softdropz30b100']:
+
+    print "Adding", fj_name
 
     # How many of these objects do we have?
     full_counter_name = "n__jet_{0}".format(fj_name)
@@ -166,16 +170,17 @@ for fj_name in ['ca08', 'ca15', 'ca08trimmedr2f4', 'ca08trimmedr2f6', 'ca08trimm
             "pt", "eta", "phi", "mass",  # Kinematics
             "tau1", "tau2", "tau3",      # N-subjettiness
             "btag",                      # b-tag discriminator
-            #"chi",                       # Shower deconstruction chi
-            #                             # (only fill for ca08 and ca15 wo grooming at the moment)
-            "qvol",                      # Qjet volatility
+            "chi",                       # Shower deconstruction chi
+                                         # (only fill for ca15 wo grooming at the moment)
+            "qvol",                      # Qjet Volatility
+                                         # (only fill for ca15 wo grooming at the moment)
             "close_hadtop_pt",  "close_hadtop_dr", "close_hadtop_i", # top truth matching
             "close_parton_pt",  "close_parton_dr", "close_parton_i", # parton truth matching
             "close_higgs_pt",   "close_higgs_dr",  "close_higgs_i"   # higgs truth matching
             ]:
 
         # Don't do chi unless we have the unfiltered fatjets
-        if (branch_name in ["chi", "qvol"]) and not (fj_name in ["ca08","ca15"]):
+        if (branch_name in ["chi","qvol"]) and not (fj_name in ["ca15"]):
             continue
 
         if branch_name in ["close_higgs_i", "close_hadtop_i", "close_parton_i"]:
@@ -192,106 +197,3 @@ for fj_name in ['ca08', 'ca15', 'ca08trimmedr2f4', 'ca08trimmedr2f6', 'ca08trimm
 
     # End of loop over branches
 # End of loop over fat jets
-
-
-# HEPTopTagger Branches
-htt_float_branches =  [
-    "pt", "mass", "eta", "phi", "energy",       # Kinematics
-    "fj_pt", "fj_mass", "fj_eta", "fj_phi",     # Original Fat-jet kinematics
-    "fW", "massRatioPassed",                    # Standard HTT variables 
-    "Rmin", "ptFiltForRminExp", "RminExpected", # MultiR variables
-    "prunedMass", "topMass", "unfilteredMass",  # extra masses
-    "close_hadtop_pt", "close_hadtop_dr",       # top truth matching
-    "close_parton_pt", "close_parton_dr",       # parton truth matching
-    "close_higgs_pt",  "close_higgs_dr",        # higgs truth matching
-]
-
-htt_int_branches = ["child_idx", "isMultiR", "n_sj", "close_higgs_i", "close_parton_i", "close_hadtop_i"]
-
-htt_sj_float_branches =  ["energy", "eta", "mass", "phi", "pt"]
-
-htt_sj_int_branches =  ["parent_idx"]
-
-for htt_name in ["looseMultiRHTT"]:
-
-    # How many objects do we have?
-    tagger_counter_name = "n__jet_{0}".format(htt_name)
-    sj_counter_name = "n__jet_{0}_sj".format(htt_name)
-    process += [Scalar(tagger_counter_name, "int")]
-    process += [Scalar(sj_counter_name, "int")]
-
-    # Float branches: One per tagger candidate
-    for branch_name in htt_float_branches:
-        full_branch_name = "jet_{0}__{1}".format(htt_name, branch_name)
-        process += [Dynamic1DArray(full_branch_name, "float", tagger_counter_name, "N_MAX")]
-
-    # Int branches: One per tagger candidate
-    for branch_name in htt_int_branches:
-        full_branch_name = "jet_{0}__{1}".format(htt_name, branch_name)
-        process += [Dynamic1DArray(full_branch_name, "int", tagger_counter_name, "N_MAX")]
-
-    # Float branches: One per tagger subjet
-    for branch_name in htt_sj_float_branches:
-        full_branch_name = "jet_{0}_sj__{1}".format(htt_name, branch_name)
-        process += [Dynamic1DArray(full_branch_name, "float", sj_counter_name, "N_MAX")]
-
-    # Int branches: One per tagger subjet
-    for branch_name in htt_sj_int_branches:
-        full_branch_name = "jet_{0}_sj__{1}".format(htt_name, branch_name)
-        process += [Dynamic1DArray(full_branch_name, "int", sj_counter_name, "N_MAX")]
-
-# End of loop over heptoptaggers
-
-
-
-# CMS TopTagger Branches
-cmstt_float_branches =  [
-    "pt", "mass", "eta", "phi", "energy",     # Kinematics
-    "minMass", "wMass", "topMass",            # Standard CMSTT variables     
-    "close_hadtop_pt",  "close_hadtop_dr",    # top truth matching
-    "close_parton_pt",  "close_parton_dr",    # parton truth matching
-    "close_higgs_pt",   "close_higgs_dr",     # higgs truth matching
-]
-
-cmstt_int_branches = ["child_idx", "nSubJets", "close_higgs_i", "close_parton_i", "close_hadtop_i"]
-
-cmstt_sj_float_branches =  ["energy", "eta", "mass", "phi", "pt"]
-
-cmstt_sj_int_branches =  ["parent_idx"]
-
-for cmstt_name in ["ca08cmstt", "ca15cmstt"]:
-
-    # How many objects do we have?
-    tagger_counter_name = "n__jet_{0}".format(cmstt_name)
-    sj_counter_name = "n__jet_{0}_sj".format(cmstt_name)
-    process += [Scalar(tagger_counter_name, "int")]
-    process += [Scalar(sj_counter_name, "int")]
-
-    # Float branches: One per tagger candidate
-    for branch_name in cmstt_float_branches:
-        full_branch_name = "jet_{0}__{1}".format(cmstt_name, branch_name)
-        process += [Dynamic1DArray(full_branch_name, "float", tagger_counter_name, "N_MAX")]
-
-    # Int branches: One per tagger candidate
-    for branch_name in cmstt_int_branches:
-        full_branch_name = "jet_{0}__{1}".format(cmstt_name, branch_name)
-        process += [Dynamic1DArray(full_branch_name, "int", tagger_counter_name, "N_MAX")]
-
-    # Float branches: One per tagger subjet
-    for branch_name in cmstt_sj_float_branches:
-        full_branch_name = "jet_{0}_sj__{1}".format(cmstt_name, branch_name)
-        process += [Dynamic1DArray(full_branch_name, "float", sj_counter_name, "N_MAX")]
-
-    # Int branches: One per tagger subjet
-    for branch_name in cmstt_sj_int_branches:
-        full_branch_name = "jet_{0}_sj__{1}".format(cmstt_name, branch_name)
-        process += [Dynamic1DArray(full_branch_name, "int", sj_counter_name, "N_MAX")]
-
-# End of loop over cmstoptaggers
-
-
-
-
-
-
-

@@ -351,35 +351,36 @@ int is_hadronic_top(const reco::Candidate* p) {
 
 // Find all hard partons and add them to the vector
 // Useful for truth-matching in QCD sample
-// - Start with all Status==3 particles
-// - Remove the ones that have a daughter that is also Status==3
+// - Start with all Status==parton_status (=X) particles
+// - Remove the ones that have a daughter that is also Status==parton_status
 // - Remove if pT < min_parton_pt
-// 
-// Important: This procedure might not work anymore with Pythia 8
-// (no more status 3)
-// https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMiniAOD#MC_Truth
+//
+// For Pythia6 parton_status should be 3
+// For Pythia8 parton_status should be 23
 
 void get_hard_partons(edm::Handle<edm::View<reco::GenParticle>> pruned, 
 		      double min_parton_pt,
+		      int parton_status,
 		      vector<const reco::Candidate*> & hard_partons){
 
   bool debug_this = false;
 
-
-  if (debug_this)
+  if (debug_this){
+    std::cout << "parton_status = " << parton_status << std::endl;
     std::cout << "number of pruned particles: " << pruned->size() << std::endl;
+  }
 
-  // Extract the status three particles
-  vector<const reco::GenParticle*> status_3_particles;
+  // Extract the status X  
+  vector<const reco::GenParticle*> status_X_particles;
   for (auto& gp : *pruned){
-    if (gp.status() == 3)
-      status_3_particles.push_back(&gp);
+    if (gp.status() == parton_status)
+      status_X_particles.push_back(&gp);
   }    
 
   if (debug_this)
-    std::cout << "number of status 3 particles: " << status_3_particles.size() << std::endl;
+    std::cout << "number of status X particles: " << status_X_particles.size() << std::endl;
 
-  for (auto& gp : status_3_particles){    
+  for (auto& gp : status_X_particles){    
 
     bool keep = true;
 
@@ -389,11 +390,11 @@ void get_hard_partons(edm::Handle<edm::View<reco::GenParticle>> pruned,
     // Loop over daughters
     for (unsigned id=0; id != gp->numberOfDaughters(); id++){      
       
-      // Check if daughter is also in the list of status 3 particles
+      // Check if daughter is also in the list of status X particles
       const reco::Candidate* daughter = gp->daughter(id);      
-      bool found = std::find(status_3_particles.begin(), 
-			    status_3_particles.end(), 
-			    daughter) != status_3_particles.end();     
+      bool found = std::find(status_X_particles.begin(), 
+			    status_X_particles.end(), 
+			    daughter) != status_X_particles.end();     
 
       if (found)
 	keep = false;	      
@@ -403,12 +404,12 @@ void get_hard_partons(edm::Handle<edm::View<reco::GenParticle>> pruned,
       
     } // end of loop over daughters
     
-    // If no daughter is also status 3 and particle has enough pt:
+    // If no daughter is also status X and particle has enough pt:
     // store it
     if (keep && (gp->pt() >= min_parton_pt))
       hard_partons.push_back(gp);         
 
-  } // end of looping over status 3 particles
+  } // end of looping over status X particles
 
   if (debug_this)
     std::cout << "number of hard partons: " << hard_partons.size() << std::endl;    

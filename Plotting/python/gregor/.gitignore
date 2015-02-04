@@ -1,1 +1,10 @@
+OutputCorrelations/
+OutputMutualInformation/
+OutputPlot2D/
+OutputProfiles/
 results/
+weights
+*.png
+*.pdf
+*.root
+*.dat

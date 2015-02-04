@@ -1,7 +1,6 @@
-export SCRAM_ARCH=slc6_amd64_gcc481
+export SCRAM_ARCH=slc6_amd64_gcc491
 
-#newest version existing on PSI
-scram project -n CMSSW CMSSW CMSSW_7_2_2_patch1
+scram project -n CMSSW CMSSW CMSSW_7_3_0
 cd CMSSW/src/
 cmsenv
 git cms-addpkg PhysicsTools/PatAlgos
@@ -13,6 +12,9 @@ git cms-addpkg RecoJets/JetProducers
 
 #get the TTH code
 git clone https://github.com/jpata/tthbb13.git TTH
+cd TTH
+git checkout dev-73X
+cd ..
 cp TTH/MEAnalysis/libs/*.so ../lib/$SCRAM_ARCH/
 
 # to apply a the top tagger as a patch

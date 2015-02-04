@@ -38,7 +38,7 @@ import TTH.Plotting.Helpers.OutputDirectoryHelper as OutputDirectoryHelper
 # Define and crate output directory
 ########################################
 
-output_dir = "../OutputProfiles/"
+output_dir = "OutputProfiles/"
 
 # Create directory and subdirectories for all filetypes
 OutputDirectoryHelper.CreateOutputDirs( output_dir )
@@ -224,7 +224,7 @@ class plotSettings:
 ########################################
 
 def makePlots( dic_files, 
-               default_treename = "SpartyJet_Tree",
+               default_treename = "tree",
                extra_prefix = ""
            ):
     """ Draw all the plots defined using the plotSettings class.
@@ -314,7 +314,10 @@ def makePlots( dic_files,
                               ")"]
             draw_string = "".join(li_draw_string)
 
-            input_tree.Draw( draw_string, plot.cuts)
+            if plot.sample_type == "multiple":
+                input_tree.Draw( draw_string, plot.cuts[i_sample])
+            else:
+                input_tree.Draw( draw_string, plot.cuts)
             i_histo += 1
 
             # Retrieve 2d histogram and close input file
@@ -376,6 +379,29 @@ def makePlots( dic_files,
         prof.SetFillStyle( 3253 )   
         prof.Draw("E2 SAME")
         prof.SetDirectory(0)
+
+        
+        f1 = ROOT.TF1("","1.05 + 0.00230*x  -6.44e-06*x^2")
+        f1.SetRange(0,300)
+
+        f2 = ROOT.TF1("","1.69  -0.00193*x + 6.09e-07*x^2",300,500)
+        f2.SetRange(300,500)
+        f2.SetLineColor(ROOT.kBlue)
+
+        f3 = ROOT.TF1("","1.89  -0.00274*x + 1.43e-06*x^2",500,2000)
+        f3.SetRange(500,2000)
+
+        f = ROOT.TF1("fit_fun_qcd","[0]+[1]*sqrt(x)+[2]/x+[3]/(x*x)+[4]/(x*x*x)",220,2000)
+        f.SetParameter(0,1)  
+        f.SetParameter(1,1)  
+        f.SetParameter(2,0.5)
+        f.SetLineColor(ROOT.kRed)
+        prof.Fit(f, "R")
+        f.Print()
+
+        f1.Draw("SAME")
+        f2.Draw("SAME")
+        f3.Draw("SAME")
 
         print "adding to dic:", prof
         dic_all_profiles[ plot_name ] = prof

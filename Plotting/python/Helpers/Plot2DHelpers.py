@@ -170,7 +170,7 @@ c = ROOT.TCanvas("","",800,800)
 def MakePlots( 
    dic_input_files,
    li_plots,
-   input_treename = 't'):
+   input_treename = 'tree'):
    ''' Create the requested 2D Plots.
    
    Arguments:
@@ -206,6 +206,8 @@ def MakePlots(
          infile = ROOT.TFile(dic_input_files[plot.sample])
          # Get the Tree
          input_tree = infile.Get(input_treename)
+         print input_tree
+
       else:
          # Sample is a tuple
 
