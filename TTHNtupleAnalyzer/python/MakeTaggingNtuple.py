@@ -24,6 +24,9 @@ import ROOT
 # for working on tier 3
 if socket.gethostname() == "t3ui12":
     import TTH.TTHNtupleAnalyzer.AccessHelpers as AH
+    from TTH.TTHNtupleAnalyzer.HiggsTaggers_cfg import li_fatjets_branches as higgs_fj_branches
+    from TTH.TTHNtupleAnalyzer.Taggers_cfg import li_fatjets_branches as top_fj_branches
+
 # on the Grid
 else:
     import AccessHelpers as AH
@@ -78,7 +81,7 @@ fj_branches_plus = fj_branches + [#"chi",
 htt_branches = ["pt", "mass", "fW", "Rmin", "RminExpected", "prunedMass", "ptFiltForRminExp"]
 cmstt_branches = ["pt", "mass", "minMass", "wMass", "topMass", "nSubJets"]
 
-li_fatjets = ['ca08', 'ca15', 'ca08trimmedr2f4', 'ca08trimmedr2f6', 'ca08trimmedr2f8', 'ca08softdropz15b00', 'ca08softdropz20b10', 'ca08softdropz30b20', 'ca08softdropz30b30', 'ca08softdropz30b100', 'ca15trimmedr2f4', 'ca15trimmedr2f6', 'ca15trimmedr2f8', 'ca15softdropz15b00', 'ca15softdropz20b10', 'ca15softdropz30b20', 'ca15softdropz30b30', 'ca15softdropz30b100']
+li_fatjets = higgs_fj_branches + top_fj_branches
 
 # Generic
 objects = {}
@@ -91,8 +94,6 @@ objects["ca15"]           = fj_branches_plus
 objects["ca08cmstt"]      = cmstt_branches
 objects["ca15cmstt"]      = cmstt_branches
 objects["looseMultiRHTT"] = htt_branches
-
-
 
 
 # Matching DeltaR for the varipus object types

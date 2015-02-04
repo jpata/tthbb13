@@ -19,7 +19,13 @@ options.register ('skipEvents',
 )
 
 process = cms.Process("Demo")
-options.parseArguments()
+
+# Necessary so we can import HiggsTaggers_cfg.py from ordinary python
+# scripts and extract the fatjets
+try:
+   options.parseArguments()
+except:
+   pass
 
 # Load some standard configuration files
 process.load("Configuration.StandardSequences.MagneticField_cff")
@@ -274,8 +280,6 @@ setattr(process, fj_name, fj_ca15.clone(
 li_fatjets_objects.append(fj_name)
 li_fatjets_branches.append(branch_name)
 
-print li_fatjets_branches
-
 
 #####################################
 # Helpers: GetRadiusFromName / GetRadiusStringFromName
@@ -333,12 +337,10 @@ for fj_name in li_fatjets_objects:
 
 li_fatjets_sds = []
 for fj_name in li_fatjets_objects:
-
-   # Tier3
-   #if hostname == "t3ui12":
-   #sd_path = "../data/"
-   ## Grid
-   #else:
+        
+   # For Local Testing
+   # sd_path = "../data/"
+   # For Grid Submission
    sd_path = "src/TTH/TTHNtupleAnalyzer/data/"
         
    sd_fatjets = []
@@ -346,7 +348,6 @@ for fj_name in li_fatjets_objects:
    
    r = GetRadiusStringFromName(fj_name)
    input_card = sd_path + "sd_input_card_{0}.dat".format(r)
-   print "SD input card:", input_card
    
    if fj_name in sd_fatjets:
         sd_name = fj_name + "SD"
@@ -407,8 +408,6 @@ for i_fj, fj_name in enumerate(li_fatjets_objects):
 # Add b-tagging information for all fatjets
 process.my_btagging = cms.Sequence()
 li_fatjets_btags = ["None"] * len(li_fatjets_objects)
-
-print li_fatjets_branches
 
 
 #for fatjet_name in li_fatjets_objects:
