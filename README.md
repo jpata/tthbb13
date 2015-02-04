@@ -29,7 +29,7 @@ python headergen.py ../interface/tth_tree_template.hh ../interface/tth_tree.hh t
 
 Re-Compile the TTHNtupleAnalyzer:
 ~~~
-cd $CMSSW_BASE/src
+cd $CMSSW_BASE/src/TTH/TTHNtupleAnalyzer
 scram b -j 10
 ~~~
 
