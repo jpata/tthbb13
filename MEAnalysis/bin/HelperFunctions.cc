@@ -734,3 +734,123 @@ float weightError( TTree* tree, float pt, float eta, float& scale_){
   return err;
 
 }
+
+BTagLikelihood::BTagLikelihood(TFile* fCP, TString csvName) {
+  btagger[make_tuple(BTagLikelihood::EFlavour::b, BTagLikelihood::EBin::Bin0)] = fCP->Get("csv_b_Bin0__"+csvName)!=0 ? (TH1F*)fCP->Get("csv_b_Bin0__"+csvName) : 0;
+  btagger[make_tuple(BTagLikelihood::EFlavour::b, BTagLikelihood::EBin::Bin1)] = fCP->Get("csv_b_Bin1__"+csvName)!=0 ? (TH1F*)fCP->Get("csv_b_Bin1__"+csvName) : 0;
+  btagger[make_tuple(BTagLikelihood::EFlavour::c, BTagLikelihood::EBin::Bin0)] = fCP->Get("csv_c_Bin0__"+csvName)!=0 ? (TH1F*)fCP->Get("csv_c_Bin0__"+csvName) : 0;
+  btagger[make_tuple(BTagLikelihood::EFlavour::c, BTagLikelihood::EBin::Bin1)] = fCP->Get("csv_c_Bin1__"+csvName)!=0 ? (TH1F*)fCP->Get("csv_c_Bin1__"+csvName) : 0;
+  btagger[make_tuple(BTagLikelihood::EFlavour::l, BTagLikelihood::EBin::Bin0)] = fCP->Get("csv_l_Bin0__"+csvName)!=0 ? (TH1F*)fCP->Get("csv_l_Bin0__"+csvName) : 0;
+  btagger[make_tuple(BTagLikelihood::EFlavour::l, BTagLikelihood::EBin::Bin1)] = fCP->Get("csv_l_Bin1__"+csvName)!=0 ? (TH1F*)fCP->Get("csv_l_Bin1__"+csvName) : 0;
+}
+
+
+double BTagLikelihood::get_value(TH1F* h, double csv) {
+  //assert(h != 0);
+  return h != 0 ? h->GetBinContent(h->FindBin(csv)) : 1.0;
+}
+
+std::vector<BTagLikelihood::JetProbability> BTagLikelihood::evaluate_jet_probabilities(
+  vector<double>& jet_csv,
+  std::vector<double>& jet_eta) {
+  
+  assert(jet_csv.size() == jet_eta.size());
+  vector<BTagLikelihood::JetProbability> probs;
+  
+  for (unsigned int i = 0; i < jet_csv.size(); i++) {
+    EBin bin = std::abs(jet_eta[i]) > 1.0 ? BTagLikelihood::EBin::Bin1 : BTagLikelihood::EBin::Bin0;
+    JetProbability jp(
+      get_value(btagger[make_tuple(BTagLikelihood::EFlavour::b, bin)], jet_csv[i]),
+      get_value(btagger[make_tuple(BTagLikelihood::EFlavour::c, bin)], jet_csv[i]),
+      get_value(btagger[make_tuple(BTagLikelihood::EFlavour::l, bin)], jet_csv[i])
+    );
+    probs.push_back(jp);
+  }
+
+  return probs;
+}
+
+void print_vector(vector<int>& v) {
+for (int i : v) {
+  cout << i;
+}
+}
+
+double BTagLikelihood::btag_likelihood(vector<BTagLikelihood::JetProbability>& jet_probs, unsigned int nB, unsigned int nC, unsigned int nL, vector<int>& best_perm) {
+  vector<int> perms;
+  for (unsigned int i=0; i < jet_probs.size(); i++) {
+    perms.push_back(i);
+  }
+
+  double P = 0.0;
+  double max_p = -1.0;
+
+  int nperms = 0;
+  do {
+    double p = 1.0;
+
+    //cout << "nB " << nB << " ";
+    //print_vector(perms);
+    //cout << " ";
+
+    for (unsigned int i=0; i < nB; i++) {
+      if (i < perms.size()) {
+        p = p * jet_probs[perms[i]].b;
+      }
+      //cout << " b " << jet_probs[perms[i]].b;
+    }
+    for (unsigned int i = nB; i < nB + nC; i++) {
+      if (i < perms.size()) {
+        p = p * jet_probs[perms[i]].c;
+      }
+      //cout << " c " << jet_probs[perms[i]].c;
+    }
+    for (unsigned int i=nB + nC; i < jet_probs.size(); i++) {
+      if (i < perms.size()) {
+        p = p * jet_probs[perms[i]].l;
+      }
+      //cout << " l " << jet_probs[perms[i]].l;
+    }
+    //cout << endl;
+    
+    if (p > max_p) {
+      best_perm = perms;
+      max_p = p;
+    }
+
+    P += p;
+    nperms += 1;
+  } while(std::next_permutation(perms.begin(), perms.end()));
+
+  P = P / nperms;
+  return P;
+}
+
+double BTagLikelihood::btag_lr_default(vector<BTagLikelihood::JetProbability>& jet_probs, vector<int>& best_perm) {
+  vector<int> best_perm_bbjj;
+  double l_bbbb = btag_likelihood(jet_probs, 4, 0, 2, best_perm);
+  double l_bbjj = btag_likelihood(jet_probs, 2, 0, 4, best_perm_bbjj);
+  return l_bbbb / (l_bbbb + l_bbjj); 
+}
+
+double BTagLikelihood::btag_lr_wcq(vector<BTagLikelihood::JetProbability>& jet_probs, vector<int>& best_perm) {
+  vector<int> best_perm_dummy;
+  double l_bbbbxy = 0.5 * (
+    btag_likelihood(jet_probs, 4, 0, 2, best_perm) +		//W -> qq'
+    btag_likelihood(jet_probs, 4, 1, 1, best_perm_dummy) 	//W -> cq
+  );
+  double l_bbjjxy = 0.5 * (
+    btag_likelihood(jet_probs, 2, 0, 4, best_perm_dummy) +	//W -> qq'
+    btag_likelihood(jet_probs, 2, 1, 3, best_perm_dummy)	//W -> cq
+    );
+  return l_bbbbxy / (l_bbbbxy + l_bbjjxy); 
+}
+
+double BTagLikelihood::btag_lr_radcc(vector<BTagLikelihood::JetProbability>& jet_probs, vector<int>& best_perm) {
+  vector<int> best_perm_bbjj;
+  double l_bbbb = btag_likelihood(jet_probs, 4, 0, 2, best_perm);
+  double l_bbjj = btag_likelihood(jet_probs, 2, 0, 4, best_perm_bbjj);
+  double l_bbcc = btag_likelihood(jet_probs, 2, 2, 2, best_perm_bbjj);
+  //From CMS tt+bb/tt+jj ratio paper
+  return l_bbbb / (l_bbjj + 0.022 * l_bbbb + 0.015 * l_bbcc); 
+}

@@ -232,11 +232,12 @@ public:
     // nummber of selected jets
     int numJets_;
     // btag likelihood ratio
-    float btag_LR_;
+    //float btag_LR_;
     
     // permutation -> jets association
     int   perm_to_jet_    [NMAXPERMUT];
     int   perm_to_jet_alt_[NMAXPERMUT];
+
     // permutation -> gen association
     // bLep W1 W2 bHad bH1 bH2
     // If a particular index is set, then for this permutation
@@ -360,6 +361,16 @@ public:
 	float mW;
 	int selected_comb;
 	int pos_to_index[6];
+	float btag_LR;
+	float btag_LR2;
+	float btag_LR3;
+	float btag_LR4;
+	float btag_lr_l_bbbb;
+	float btag_lr_l_bbcc;
+	float btag_lr_l_bbjj;
+	float btag_lr_l_bbbbcq;
+	float btag_lr_l_bbcccq;
+	float btag_lr_l_bbjjcq;
     //HEADERGEN_BRANCH_VARIABLES
     
 	void make_branches(const float MH) {
@@ -505,7 +516,7 @@ public:
         tree->Branch("numBTagM",                &numBTagM_,    "numBTagM/I");
         tree->Branch("numBTagT",                &numBTagT_,    "numBTagT/I");
         tree->Branch("numJets",                 &numJets_,     "numJets/I");
-        tree->Branch("btag_LR",                 &btag_LR_,     "btag_LR/F");
+        //tree->Branch("btag_LR",                 &btag_LR_,     "btag_LR/F");
         
         // Control variables
         tree->Branch("mH_matched",              &mH_matched_,   "mH_matched/F");
@@ -635,6 +646,16 @@ public:
 		tree->Branch("mW", &mW, "mW/F");
 		tree->Branch("selected_comb", &selected_comb, "selected_comb/I");
 		tree->Branch("pos_to_index", pos_to_index, "pos_to_index[6]/I");
+		tree->Branch("btag_LR", &btag_LR, "btag_LR/F");
+		tree->Branch("btag_LR2", &btag_LR2, "btag_LR2/F");
+		tree->Branch("btag_LR3", &btag_LR3, "btag_LR3/F");
+		tree->Branch("btag_LR4", &btag_LR4, "btag_LR4/F");
+		tree->Branch("btag_lr_l_bbbb", &btag_lr_l_bbbb, "btag_lr_l_bbbb/F");
+		tree->Branch("btag_lr_l_bbcc", &btag_lr_l_bbcc, "btag_lr_l_bbcc/F");
+		tree->Branch("btag_lr_l_bbjj", &btag_lr_l_bbjj, "btag_lr_l_bbjj/F");
+		tree->Branch("btag_lr_l_bbbbcq", &btag_lr_l_bbbbcq, "btag_lr_l_bbbbcq/F");
+		tree->Branch("btag_lr_l_bbcccq", &btag_lr_l_bbcccq, "btag_lr_l_bbcccq/F");
+		tree->Branch("btag_lr_l_bbjjcq", &btag_lr_l_bbjjcq, "btag_lr_l_bbjjcq/F");
 		//HEADERGEN_BRANCH_CREATOR
         
     }
@@ -644,12 +665,11 @@ public:
         tree->SetBranchAddress("time", &time_);
 		
 		tree->SetBranchAddress("EVENT", &EVENT_);
-        tree->SetBranchAddress("jet_pt", &jet_pt_);
-        tree->SetBranchAddress("jet_csv", &jet_csv_);
-        tree->SetBranchAddress("jet_id", &jet_id_);
-        tree->SetBranchAddress("jet_eta", &jet_eta_);
-        tree->SetBranchAddress("jet_phi", &jet_phi_);
-        tree->SetBranchAddress("jet_m", &jet_m_);
+		tree->SetBranchAddress("jet_pt", &jet_pt_);
+		tree->SetBranchAddress("jet_eta", &jet_eta_);
+		tree->SetBranchAddress("jet_phi", &jet_phi_);
+		tree->SetBranchAddress("jet_m", &jet_m_);
+		tree->SetBranchAddress("jet_id", &jet_id_);
 		tree->SetBranchAddress("lepton_pt", &lepton_pt_);
 		
         tree->SetBranchAddress("lepton_rIso", &lepton_rIso_);
@@ -657,7 +677,7 @@ public:
         tree->SetBranchAddress("numBTagM", &numBTagM_);
         tree->SetBranchAddress("numBTagT", &numBTagT_);
         tree->SetBranchAddress("numJets", &numJets_);
-        tree->SetBranchAddress("btag_LR", &btag_LR_);
+        //tree->SetBranchAddress("btag_LR", &btag_LR_);
 		tree->SetBranchAddress("nLep", &nLep_);
 		tree->SetBranchAddress("nJet", &nJet_);
 
@@ -686,9 +706,6 @@ public:
         
         tree->SetBranchAddress("perm_to_gen_s", perm_to_gen_);
         tree->SetBranchAddress("perm_to_gen_b", perm_to_gen_alt_);
-        tree->SetBranchAddress("perm_to_jet_s", perm_to_jet_);
-        tree->SetBranchAddress("perm_to_jet_b", perm_to_jet_alt_);
-
 		tree->SetBranchAddress("n__jet_fat", &n__jet_fat);
 		tree->SetBranchAddress("jet_fat__pt", jet_fat__pt);
 		tree->SetBranchAddress("jet_fat__eta", jet_fat__eta);
@@ -802,6 +819,16 @@ public:
 		tree->SetBranchAddress("mW", &mW);
 		tree->SetBranchAddress("selected_comb", &selected_comb);
 		tree->SetBranchAddress("pos_to_index", pos_to_index);
+		tree->SetBranchAddress("btag_LR", &btag_LR);
+		tree->SetBranchAddress("btag_LR2", &btag_LR2);
+		tree->SetBranchAddress("btag_LR3", &btag_LR3);
+		tree->SetBranchAddress("btag_LR4", &btag_LR4);
+		tree->SetBranchAddress("btag_lr_l_bbbb", &btag_lr_l_bbbb);
+		tree->SetBranchAddress("btag_lr_l_bbcc", &btag_lr_l_bbcc);
+		tree->SetBranchAddress("btag_lr_l_bbjj", &btag_lr_l_bbjj);
+		tree->SetBranchAddress("btag_lr_l_bbbbcq", &btag_lr_l_bbbbcq);
+		tree->SetBranchAddress("btag_lr_l_bbcccq", &btag_lr_l_bbcccq);
+		tree->SetBranchAddress("btag_lr_l_bbjjcq", &btag_lr_l_bbjjcq);
         //HEADERGEN_BRANCH_SETADDRESS
 	}
 
@@ -814,9 +841,6 @@ public:
         
         SET_ZERO(perm_to_gen_, NMAXPERMUT, 0.0);
         SET_ZERO(perm_to_gen_alt_, NMAXPERMUT, 0.0);
-        
-        SET_ZERO(perm_to_jet_, NMAXPERMUT, 0.0);
-        SET_ZERO(perm_to_jet_alt_, NMAXPERMUT, 0.0);
 
 		numBTagL_ = DEF_VAL_INT;
 		numBTagM_ = DEF_VAL_INT;
@@ -826,7 +850,7 @@ public:
         nMatchSimBs_ = DEF_VAL_INT;
         nMatchSimCs_ = DEF_VAL_INT;
         
-		btag_LR_ = DEF_VAL_FLOAT;
+		//btag_LR_ = DEF_VAL_FLOAT;
 
 		probAtSgn_ = DEF_VAL_FLOAT;
 		probAtSgn_alt_ = DEF_VAL_FLOAT;
@@ -977,6 +1001,16 @@ public:
 		mW = DEF_VAL_FLOAT;
 		selected_comb = DEF_VAL_INT;
 		SET_ZERO(pos_to_index, 6, DEF_VAL_INT);
+		btag_LR = DEF_VAL_FLOAT;
+		btag_LR2 = DEF_VAL_FLOAT;
+		btag_LR3 = DEF_VAL_FLOAT;
+		btag_LR4 = DEF_VAL_FLOAT;
+		btag_lr_l_bbbb = DEF_VAL_FLOAT;
+		btag_lr_l_bbcc = DEF_VAL_FLOAT;
+		btag_lr_l_bbjj = DEF_VAL_FLOAT;
+		btag_lr_l_bbbbcq = DEF_VAL_FLOAT;
+		btag_lr_l_bbcccq = DEF_VAL_FLOAT;
+		btag_lr_l_bbjjcq = DEF_VAL_FLOAT;
 		//HEADERGEN_BRANCH_INITIALIZERS
     }
 
@@ -1094,5 +1128,5 @@ public:
         //HEADERGEN_COPY_BRANCHES
 	}
 };
-
 #endif
+
