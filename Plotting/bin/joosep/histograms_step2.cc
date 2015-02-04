@@ -123,14 +123,23 @@ Histograms::Histograms(const std::string pf, SampleType sample_type) {
     h_btag_lr_nmatched_b = add_hist_2d<TH2D>(histmap, pf + "btag_lr_nmatched_b", 0.0, 1, 20, 0, 5, 5);
 	
 	h_nmatched_wqq = add_hist_1d<TH1D>(histmap, pf + "nmatched_wqq", 0, 3);
+	h_nmatched_wqq_selected = add_hist_1d<TH1D>(histmap, pf + "nmatched_wqq_selected", 0, 3);
 	h_unmatched_wqq_pt = add_hist_1d<TH1D>(histmap, pf + "unmatched_wqq_pt", 0, 300, 10);
 	h_unmatched_wqq_eta = add_hist_1d<TH1D>(histmap, pf + "unmatched_wqq_eta", -2.5, 2.5, 10);
 	h_matched_wqq_pt = add_hist_1d<TH1D>(histmap, pf + "matched_wqq_pt", 0, 300, 10);
 	h_matched_wqq_eta = add_hist_1d<TH1D>(histmap, pf + "matched_wqq_eta", -2.5, 2.5, 10);
+
+	h_nmatched_tagging_wqq = add_hist_2d<TH2D>(histmap, pf + "nmatched_tagging_wqq", 0, 3, 0, 3);
 
     h_cat_discr = 0;
     if (sample_type == ME_8TEV || sample_type == ME_13TEV) {
         h_cat_discr = add_hist_2d<TH2D>(histmap, pf + "cat_discr", 0, 8, 8, 0, 1, 6);
         h_discr = add_hist_1d<TH1D>(histmap, pf + "discr", 0, 1, 6);
     }
+
+    h_btag_lr = add_hist_2d<TH2D>(histmap, pf + "btag_lr_rad", 0, 1, 2000, 0, 5, 5);
+    h_btag_lr2 = add_hist_2d<TH2D>(histmap, pf + "btag_lr2_rad", 0, 1, 2000, 0, 5, 5);
+    h_btag_lr3 = add_hist_2d<TH2D>(histmap, pf + "btag_lr3_rad", 0, 1, 2000, 0, 5, 5);
+    h_btag_lr4 = add_hist_2d<TH2D>(histmap, pf + "btag_lr4_rad", 0, 1, 2000, 0, 5, 5);
+    h_radmode = add_hist_1d<TH1D>(histmap, pf + "radmode", 0, 5);
 }

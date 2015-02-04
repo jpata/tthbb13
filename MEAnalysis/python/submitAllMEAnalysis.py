@@ -308,7 +308,10 @@ def submitMEAnalysis(script,
 	f.close()
 	os.system('chmod +x '+scriptName)
 
-	submitToQueue = subcommand+' -N job'+sample+' '+scriptName
+	if args.site == "T3_CH_PSI":
+		submitToQueue = subcommand+' -N job'+sample+' '+scriptName
+	elif args.site == "T3_EE_Estonia":
+		submitToQueue = subcommand+' -J job'+sample+' '+scriptName
 	tosubmit.write(submitToQueue + "\n")
 	#print submitToQueue
 	#os.system(submitToQueue)

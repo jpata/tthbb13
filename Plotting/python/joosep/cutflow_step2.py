@@ -7,7 +7,7 @@ process.fwliteInput = cms.PSet(
 	outFile = cms.string("outfile.root"),
 	elePt=cms.double(-1),
 	muPt=cms.double(-1),
-							   
+
     samples = cms.VPSet([
         cms.PSet(
             fileNamesS1=cms.vstring(["/home/joosep/mac-docs/tth/data/TTHbb_s1_5b21f5f_tth_hbb_13tev.root"]),
@@ -23,7 +23,7 @@ process.fwliteInput = cms.PSet(
             fileNamesS1=cms.vstring([]),
             fileNamesS2=cms.vstring(["/home/joosep/mac-docs/tth/data/ttjets.root"]),
             nickName=cms.string("ttjets_13TeV"),
-            fractionToProcess=cms.double(0.01),
+            fractionToProcess=cms.double(0.1),
             totalEvents=cms.int64(-1),
             type=cms.int32(3),
             process=cms.int32(1),
