@@ -56,24 +56,19 @@ You should also either comment out Shower Deconstruction or ping Gregor to get a
 
 ### Adding Variables
 
-New variables can be added by modifying three scripts
-
-Define the algorithm and add to cmsRun schedule:
+New grooming settings can be added by modifying:
 ~~~
 TTH/TTHNtupleAnalyzer/python/Taggers_cfg.py
 ~~~
 
-Add branches to the Step1 Ntuple (do not forget to rerun headergen and recompile after changing this):
+These changes should be automatically picked up py
+
 ~~~
 TTH/TTHNtupleAnalyzer/python/tagger_branches.py
-~~~
-
-Add branches to the Step2 Ntuple:
-~~~
 TTH/TTHNtupleAnalyzer/python/MakeTaggingNtuple.py
 ~~~
 
-(In principle tagger_branches and MakeTaggingNtuple can be made top pick up the correct branches from Taggers_cfg. Fix soon)
+Do not forget to re-run the headergen step and recompile after changing the grooming settings/
 
 
 ### Grid Submission:
