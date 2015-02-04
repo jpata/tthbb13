@@ -23,3 +23,7 @@ step1_test: run_step1_tthbb run_step1_ttbar
 
 headers:
 	python $(CMSSW_BASE)/src/TTH/TTHNtupleAnalyzer/python/headergen.py $(CMSSW_BASE)/src/TTH/MEAnalysis/interface/METree_template.hh $(CMSSW_BASE)/src/TTH/MEAnalysis/interface/METree.hh $(CMSSW_BASE)/src/TTH/MEAnalysis/python/branches.py
+
+
+cutflow_step2:
+	cutflow_step2 $(CMSSW_BASE)/src/TTH/Plotting/python/joosep/cutflow_step2_EE.py
