@@ -15,17 +15,26 @@ export SCRAM_ARCH=slc6_amd64_gcc491
 ~~~
 before setting up the CMS environment.
 
+Now everything is ready for compilation:
+~~~
+cd $CMSSW_BASE/src
+scram b -j 10
+~~~
+
 As the default Ntuple is for TTH we need to change a few branches:
 ~~~
 cd TTH/TTHNtupleAnalyzer/python
 python headergen.py ../interface/tth_tree_template.hh ../interface/tth_tree.hh tagger_branches.py
 ~~~
 
-Now everything is ready for compilation:
+Re-Compile the TTHNtupleAnalyzer:
 ~~~
 cd $CMSSW_BASE/src
 scram b -j 10
 ~~~
+
+
+
 
 ### NTuple Production
 
