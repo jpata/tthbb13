@@ -1,9 +1,8 @@
 # Tagger_cfg.py
 # cmsRun configuration file for producing NTuples for Top & Higgs-Tagging Studies
-
 import FWCore.ParameterSet.Config as cms
-
 from FWCore.ParameterSet.VarParsing import VarParsing
+
 import os
 import socket
 
@@ -18,7 +17,13 @@ options.register ('skipEvents',
 )
 
 process = cms.Process("Demo")
-options.parseArguments()
+
+# Necessary so we can import HiggsTaggers_cfg.py from ordinary python
+# scripts and extract the fatjets
+try:
+   options.parseArguments()
+except:
+   pass
 
 # Load some standard configuration files
 process.load("Configuration.StandardSequences.MagneticField_cff")
@@ -249,7 +254,6 @@ for i_fj, fj_name in enumerate(li_fatjets_objects):
 process.my_btagging = cms.Sequence()
 li_fatjets_btags = []
 for fatjet_name in li_fatjets_objects:
-
 
         # Define the names
         impact_info_name          = fatjet_name + "ImpactParameterTagInfos"

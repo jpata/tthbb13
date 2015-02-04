@@ -1,6 +1,7 @@
 #sample branches file for headergen.py
 #uses branch classes from headergen
 from TTH.TTHNtupleAnalyzer.headergen import *
+from TTH.TTHNtupleAnalyzer.Taggers_cfg import li_fatjets_branches
 
 defines.extend(["#define ADD_TRUE_TOP_MATCHING_FOR_FJ 1",
                 "#define ADD_TRUE_TOP_MATCHING_FOR_HTT 1",
@@ -155,7 +156,7 @@ for t in [
 
 
 # Fatjet Branches
-for fj_name in ['ca08', 'ca15', 'ca08trimmedr2f4', 'ca08trimmedr2f6', 'ca08trimmedr2f8', 'ca08softdropz15b00', 'ca08softdropz20b10', 'ca08softdropz30b20', 'ca08softdropz30b30', 'ca08softdropz30b100', 'ca15trimmedr2f4', 'ca15trimmedr2f6', 'ca15trimmedr2f8', 'ca15softdropz15b00', 'ca15softdropz20b10', 'ca15softdropz30b20', 'ca15softdropz30b30', 'ca15softdropz30b100']:
+for fj_name in li_fatjets_branches:
 
     # How many of these objects do we have?
     full_counter_name = "n__jet_{0}".format(fj_name)
@@ -166,9 +167,10 @@ for fj_name in ['ca08', 'ca15', 'ca08trimmedr2f4', 'ca08trimmedr2f6', 'ca08trimm
             "pt", "eta", "phi", "mass",  # Kinematics
             "tau1", "tau2", "tau3",      # N-subjettiness
             "btag",                      # b-tag discriminator
-            #"chi",                       # Shower deconstruction chi
-            #                             # (only fill for ca08 and ca15 wo grooming at the moment)
+            "chi",                       # Shower deconstruction chi
+                                         # (only fill for ca08 and ca15 wo grooming at the moment)
             "qvol",                      # Qjet volatility
+                                         # (only fill for ca08 and ca15 wo grooming at the moment)
             "close_hadtop_pt",  "close_hadtop_dr", "close_hadtop_i", # top truth matching
             "close_parton_pt",  "close_parton_dr", "close_parton_i", # parton truth matching
             "close_higgs_pt",   "close_higgs_dr",  "close_higgs_i"   # higgs truth matching
