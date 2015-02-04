@@ -68,7 +68,7 @@ TTH/TTHNtupleAnalyzer/python/tagger_branches.py
 TTH/TTHNtupleAnalyzer/python/MakeTaggingNtuple.py
 ~~~
 
-Do not forget to re-run the headergen step and recompile after changing the grooming settings/
+Do not forget to re-run the headergen step and recompile after changing the grooming settings.
 
 
 ### Grid Submission:
