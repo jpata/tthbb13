@@ -334,16 +334,12 @@ function flavour_index(ind, n_b, n_c)
 end
 
 function lh(bdiscs::Array{Float64, 2}, njets::Int64, perms::Vector{Vector{Int64}}, n_b::Int64, n_c::Int64)
-	#println("lh $n_b $n_c")
 	_P = 0.0
 	nc = 0
 	const flavour_inds = Int64[flavour_index(i, n_b, n_c) for i=1:njets]
 	for perm::Vector{Int64} in perms
-		#println("perm=$perm")
 		p = 1.0
 		for i::Int64 in perm
-			#println("$i fl=$(flavour_index(i, n_b, n_c))")
-			#p = p * pdf_bdisc(jets[i].bdisc, flavour_index(i, n_b, n_c))
 			@inbounds p = p * bdiscs[flavour_inds[i], i]
 			nc += 1
 		end

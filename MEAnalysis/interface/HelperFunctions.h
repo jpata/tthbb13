@@ -6,6 +6,7 @@ using namespace std;
 #include <cassert>
 #include <cstdlib>
 #include <iostream>
+#include <memory>
 #include <map>
 #include <string>
 #include <vector>
@@ -15,6 +16,7 @@ using namespace std;
 #include "TLorentzVector.h"
 #include "TTree.h"
 #include "TString.h"
+#include "TH1F.h"
 
 #if not defined(__CINT__) || defined(__MAKECINT__)
 #include "TMVA/Reader.h"
@@ -217,5 +219,49 @@ float eleSF(float pt, float eta);
 
 
 float weightError( TTree* tree, float pt, float eta, float& scale_);
+
+
+using namespace std;
+class BTagLikelihood {
+public:
+
+  /*
+  Keeps the jet CSV PDF values for the b, c and l hypotheses. 
+  */
+  class JetProbability {
+  public:
+    double b, c, l;
+    JetProbability(double _b, double _c, double _l) {
+      b = _b;
+      c = _c;
+      l = _l;
+    }
+  };
+
+  enum EFlavour {
+    b,
+    c,
+    l
+  };
+
+  enum EBin {
+    Bin0,
+    Bin1
+  };
+
+  map<tuple<EFlavour, EBin>, TH1F*> btagger;
+
+  BTagLikelihood(TFile* fCP, TString csvName);
+  double get_value(TH1F* h, double csv);
+  std::vector<JetProbability> evaluate_jet_probabilities(std::vector<double>& jet_csv, std::vector<double>& jet_eta);
+  double btag_likelihood(std::vector<JetProbability>& jet_probs, unsigned int nB, unsigned int nC, unsigned int nL, vector<int>& best_perm);
+  double btag_lr_default(std::vector<JetProbability>& jet_probs, vector<int>& best_perm);
+
+  //Case where W->cq is taken into account
+  double btag_lr_wcq(vector<JetProbability>& jet_probs, vector<int>& best_perm);
+  //Case where tt + cc is added to the likelihood
+  double btag_lr_radcc(vector<JetProbability>& jet_probs, vector<int>& best_perm);
+
+};
 
 #endif

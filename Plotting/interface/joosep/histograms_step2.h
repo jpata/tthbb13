@@ -86,11 +86,19 @@ public:
 	TH2D* h_cat_discr;
 	TH2D* h_nlep_gen_reco;
 
+	TH1D *h_nmatched_wqq, *h_nmatched_wqq_selected; 
+	TH1D *h_unmatched_wqq_pt, *h_unmatched_wqq_eta;
+	TH1D *h_matched_wqq_pt, *h_matched_wqq_eta;
+	TH2D *h_nmatched_tagging_wqq;
+
+	TH2D *h_btag_lr, *h_btag_lr2, *h_btag_lr3, *h_btag_lr4;
+	TH1D *h_radmode;
+
 	Histograms(const std::string pf, SampleType sample_type);
 
 	template <class T>
 	T* add_hist_1d(std::map<std::string, TH1*>& histmap, std::string hname, int b1, int b2) {
-	    histmap[hname] = new T(hname.c_str(), hname.c_str(), b2 -b1, b1, b2);
+	    histmap[hname] = new T(hname.c_str(), hname.c_str(), b2 - b1, b1, b2);
 	    return (T*)histmap[hname];
 	}
 
@@ -103,6 +111,12 @@ public:
 	template <class T>
 	T* add_hist_2d(std::map<std::string, TH1*>& histmap, std::string hname, double b11, double b21, int nb1, double b12, double b22, int nb2) {
 	    histmap[hname] = new T(hname.c_str(), hname.c_str(), nb1, b11, b21, nb2, b12, b22);
+	    return (T*)histmap[hname];
+	}
+
+	template <class T>
+	T* add_hist_2d(std::map<std::string, TH1*>& histmap, std::string hname, int b11, int b12, int b21, int b22) {
+	    histmap[hname] = new T(hname.c_str(), hname.c_str(), b12 - b11, b11, b12, b22 - b21, b21, b22);
 	    return (T*)histmap[hname];
 	}
 };

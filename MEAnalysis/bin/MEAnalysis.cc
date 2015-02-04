@@ -110,7 +110,7 @@ class CutHistogram {
         TTH_MBB_INCOMPATIBLE,
         TTJETS_MBB_INCOMPATIBLE,
         LEPTONS,
-		JETS,
+        JETS,
         BTAGSHAPE,
         WMASS,
         TYPELESSZERO,
@@ -142,7 +142,7 @@ class CutHistogram {
     }
 };
 
-#define DO_BTAG_LR_TREE
+//#define DO_BTAG_LR_TREE
 
 #ifdef DO_BTAG_LR_TREE
 #include "TTH/MEAnalysis/interface/btag_lr_tree.hh"
@@ -333,6 +333,8 @@ int main(int argc, const char* argv[])
     // name of csv in the input file ()
     TString csvName = "csv_rec";
     if( useCMVA ) csvName = "csv_mva_rec";
+
+    BTagLikelihood btag_lh_calc(fCP, csvName);
 
     // b-tag pdf for b-quark ('b'), c-quark ('c'), and light jets ('l')
     map<string,TH1F*> btagger;
@@ -569,8 +571,8 @@ int main(int argc, const char* argv[])
     if(switchoffOL) {
         meIntegrator->switchOffOL();
         if (print) {
-			cout << "*** Switching off OpenLoops to speed-up the calculation ***" << endl;
-		}
+            cout << "*** Switching off OpenLoops to speed-up the calculation ***" << endl;
+        }
     }
 
 
@@ -588,7 +590,7 @@ int main(int argc, const char* argv[])
     gSystem->Exec(("rm "+outFileName).c_str());
 
     // output file
-	cout << "Writing to " << outFileName << endl;
+    cout << "Writing to " << outFileName << endl;
     TFile* fout_tmp = TFile::Open(outFileName.c_str(),"UPDATE");
     
     TNamed* config_dump = new TNamed("configdump", builder.dump().c_str());
@@ -758,8 +760,8 @@ int main(int argc, const char* argv[])
 
         if( evHigh<0 ) evHigh = nentries;
 
-		TStopwatch processing_sw;
-		processing_sw.Start();
+        TStopwatch processing_sw;
+        processing_sw.Start();
         //event loop
         for (Long64_t i = evLow; i < evHigh ; i++) {
             // initialize branch variables
@@ -782,7 +784,7 @@ int main(int argc, const char* argv[])
                 float _swtime_c = processing_sw.CpuTime();
                 float _swtime_r = processing_sw.RealTime();
                 processing_sw.Reset();
-				processing_sw.Start();
+                processing_sw.Start();
                 cout << i << " (" << float(i)/float(nentries)*100 << " %) " << 500/_swtime_c << " " << 500/_swtime_r << endl;
             }
 
@@ -951,7 +953,7 @@ int main(int argc, const char* argv[])
             otree->flag_type4_         = DEF_VAL_INT;
             otree->flag_type6_         = DEF_VAL_INT;
 
-            otree->btag_LR_            = DEF_VAL_INT;
+            otree->btag_LR            = DEF_VAL_INT;
 
             for( int k = 0; k < NMAXLEPTONS; k++) {
                 otree->lepton_pt_[k]        = DEF_VAL_FLOAT;
@@ -979,6 +981,7 @@ int main(int argc, const char* argv[])
                 otree->jet_phi_[k] = DEF_VAL_FLOAT;
                 otree->jet_m_[k] = DEF_VAL_FLOAT;
                 otree->jet_csv_[k] = DEF_VAL_FLOAT;
+                otree->jet_id_[k] = DEF_VAL_INT;
             }
             for( int k = 0; k < NMAXPERMUT; k++) {
                 otree->perm_to_jet_    [k] = DEF_VAL_INT;
@@ -1152,15 +1155,15 @@ int main(int argc, const char* argv[])
 
             if(!(properEventSL || properEventDL)) {
 
-				if (debug>=2) {
-                	cout << "A dummy cut has failed..." << endl;
-                	cout << " => go to next event!" << endl;
-                	cout << "******************************" << endl;
-				}
-            	if (cutLeptons) {
-                	cuts.fill(CutHistogram::Cuts::LEPTONS);
-					continue;
-				}
+                if (debug>=2) {
+                    cout << "A dummy cut has failed..." << endl;
+                    cout << " => go to next event!" << endl;
+                    cout << "******************************" << endl;
+                }
+                if (cutLeptons) {
+                    cuts.fill(CutHistogram::Cuts::LEPTONS);
+                    continue;
+                }
             }
 
             if(debug>=2) cout << "@C" << endl;
@@ -2081,10 +2084,10 @@ int main(int argc, const char* argv[])
                         cout << " => go to next event!" << endl;
                         cout << "******************************" << endl;
                     }
-					if (cutLeptons) {
-                		cuts.fill(CutHistogram::Cuts::LEPTONS);
-                    	continue;
-					}
+                    if (cutLeptons) {
+                        cuts.fill(CutHistogram::Cuts::LEPTONS);
+                        continue;
+                    }
                 }
 
 
@@ -2541,7 +2544,6 @@ int main(int argc, const char* argv[])
                     if( TMath::Abs( p4.Eta() ) >  1.0 )
                         bin = "Bin1";
 
-                    // store PDF(csv)
                     jets_flavour.push_back(flavour);
 
                     jets_csv_prob_b.push_back( btagger["b_"+bin]!=0 ? btagger["b_"+bin]->GetBinContent( btagger["b_"+bin]->FindBin( csv ) ) : 1.);
@@ -2559,10 +2561,10 @@ int main(int argc, const char* argv[])
                         cout << " => go to next event!" << endl;
                         cout << "******************************" << endl;
                     }
-					if (cutJets) { 
-                		cuts.fill(CutHistogram::Cuts::JETS);
-                    	continue;
-					}
+                    if (cutJets) { 
+                        cuts.fill(CutHistogram::Cuts::JETS);
+                        continue;
+                    }
                 }
 
 
@@ -2593,7 +2595,6 @@ int main(int argc, const char* argv[])
                 // this vector contains the indices of up to 12 jets passing ANY b-tag selection...
                 vector<unsigned int> banytag_indices;
 
-
                 for(unsigned int k = 0; k < jets_p4.size(); k++) {
 
                     float csv_k = jets_csv[k];
@@ -2607,7 +2608,9 @@ int main(int argc, const char* argv[])
                     int btag_T = csv_k>csv_WP_T ;
 
                     // any btag value...
-                    if( pt_k>jetPtThreshold ) banytag_indices.push_back( k );
+                    if( pt_k>jetPtThreshold ) {
+                        banytag_indices.push_back( k );
+                    }
 
                     // passing at least CSVL...
                     if( pt_k>jetPtThreshold &&  btag_L ) {
@@ -2718,14 +2721,15 @@ int main(int argc, const char* argv[])
                         btag_flag = 2;
                     }
                     else if (cutBTagShape) {
-						if (debug >= 2) {
-                        	cout << "Inconsistency in selectByBTagShape... continue" << endl;
-                        	cout << " => go to next event!" << endl;
-                        	cout << "******************************" << endl;
-						}
-                		cuts.fill(CutHistogram::Cuts::BTAGSHAPE);
+                        if (debug >= 2) {
+                            cout << "Inconsistency in selectByBTagShape... continue" << endl;
+                            cout << " => go to next event!" << endl;
+                            cout << "******************************" << endl;
+                        }
+                        cuts.fill(CutHistogram::Cuts::BTAGSHAPE);
                         continue;
                     }
+
 
                     // loop over hypothesis [ TTH, TTbb ]
                     for(int hyp = 0 ; hyp<2;  hyp++) {
@@ -2764,13 +2768,15 @@ int main(int argc, const char* argv[])
                             double p_j_b2   =  jets_csv_prob_j[  btag_map[b2_pos]   ];
                             double p_j_w1   =  jets_csv_prob_j[  btag_map[w1_pos]   ];
                             double p_j_w2   =  jets_csv_prob_j[  btag_map[w2_pos]   ];
-                            
+                           
+#ifdef DO_BTAG_LR_TREE
                             double id_bLep =  jets_flavour[  btag_map[bLep_pos] ];
                             double id_bHad =  jets_flavour[  btag_map[bHad_pos] ];
                             double id_b1   =  jets_flavour[  btag_map[b1_pos]   ];
                             double id_b2   =  jets_flavour[  btag_map[b2_pos]   ];
                             double id_w1   =  jets_flavour[  btag_map[w1_pos]   ];
                             double id_w2   =  jets_flavour[  btag_map[w2_pos]   ];
+#endif //btag lr tree
 
                             // the total probability
                             float p_pos = 0.;
@@ -2778,6 +2784,12 @@ int main(int argc, const char* argv[])
                             // if signal (ttbb)
                             if( hyp==0 ) {
                                 p_pos =  p_b_bLep * p_b_bHad * p_b_b1 * p_b_b2 * p_j_w1 * p_j_w2;
+                                // cout << "bbbb perm " << permutList[pos] << " "
+                                //     << p_b_bLep << " " << p_b_bHad
+                                //     << " " << p_b_b1
+                                //     << " " << p_b_b2
+                                //     << " " << p_j_w1
+                                //     << " " << p_j_w2 << endl;
                                 p_bb += p_pos;
 
                                 // look for a global maximum
@@ -2789,6 +2801,15 @@ int main(int argc, const char* argv[])
 
                             // if background (ttjj)
                             if( hyp==1 ) {
+
+                                // cout << "bbjj perm " << permutList[pos] << " "
+                                //     << p_b_bLep << " " << p_b_bHad
+                                //     << " " << p_j_b1
+                                //     << " " << p_j_b2
+                                //     << " " << p_j_w1
+                                //     << " " << p_j_w2 << endl;
+                                p_bb += p_pos;
+
                                 p_pos =  p_b_bLep * p_b_bHad * p_j_b1 * p_j_b2 * p_j_w1 * p_j_w2;
                                 p_jj += p_pos;
                             }
@@ -2849,27 +2870,67 @@ int main(int argc, const char* argv[])
                     p_jj /= nB;
 
                     // LR of ttbb vs ttjj hypotheses as variable to select events
-                    otree->btag_LR_ = (p_bb+p_jj)>0 ? p_bb/(p_bb+p_jj) : 0. ;
+                    otree->btag_LR = (p_bb+p_jj)>0 ? p_bb/(p_bb+p_jj) : 0. ;
 
+
+                    vector<double> lh_jet_csvs, lh_jet_etas;
+                    for (uint i=0; i < min(banytag_indices.size(), (long unsigned int)6); i++) {
+                        int idx = banytag_indices[i];
+                        //cout << i << "=>" << idx << " ";
+                        lh_jet_csvs.push_back(jets_csv[idx]);
+                        lh_jet_etas.push_back(jets_p4[idx].Eta());
+                    }
+                    //cout << endl;
+
+                    vector<int> best_perm_lh_indices;
+                    vector<BTagLikelihood::JetProbability> jet_probs = btag_lh_calc.evaluate_jet_probabilities(
+                        lh_jet_csvs, lh_jet_etas
+                    );
+                    otree->btag_LR2 = btag_lh_calc.btag_lr_default(jet_probs, best_perm_lh_indices);
+                    vector<int> best_perm_lh;
+                    for (int i : best_perm_lh_indices) {
+                        best_perm_lh.push_back(banytag_indices[i]);
+                    }
+
+                    vector<int> best_perm_dummy;
+                    otree->btag_LR3 = btag_lh_calc.btag_lr_wcq(jet_probs, best_perm_lh_indices);
+                    otree->btag_LR4 = btag_lh_calc.btag_lr_radcc(jet_probs, best_perm_lh_indices);
+
+                    double l_bbbb = btag_lh_calc.btag_likelihood(jet_probs, 4, 0, 2, best_perm_dummy);
+                    double l_bbjj = btag_lh_calc.btag_likelihood(jet_probs, 2, 0, 4, best_perm_dummy);
+                    double l_bbcc = btag_lh_calc.btag_likelihood(jet_probs, 2, 2, 2, best_perm_dummy);
+                    double l_bbbbcq = btag_lh_calc.btag_likelihood(jet_probs, 4, 1, 1, best_perm_dummy);
+                    double l_bbjjcq = btag_lh_calc.btag_likelihood(jet_probs, 2, 1, 3, best_perm_dummy);
+                    double l_bbcccq = btag_lh_calc.btag_likelihood(jet_probs, 2, 3, 1, best_perm_dummy);
+
+                    otree->btag_lr_l_bbbb = l_bbbb;
+                    otree->btag_lr_l_bbjj = l_bbjj;
+                    otree->btag_lr_l_bbcc = l_bbcc;
+                    otree->btag_lr_l_bbbbcq = l_bbbbcq;
+                    otree->btag_lr_l_bbjjcq = l_bbjjcq;
+                    otree->btag_lr_l_bbcccq = l_bbcccq;
+
+                    //cout << "LR " << otree->btag_LR << " " << otree->btag_LR2_ << endl;
                     // depending on event type, check if the event passes the cut:
                     // if it does, check which combination yields the **largest** ttbb probability
                     int* permutListS = 0;
                     switch( btag_flag ) {
                     case 0:
-                        passes_btagshape = ( otree->btag_LR_ >= btag_prob_cut_6jets && selected_comb!=999);
+                        passes_btagshape = ( otree->btag_LR >= btag_prob_cut_6jets && selected_comb!=999);
                         permutListS      = permutations_6J_S;
                         break;
                     case 1:
-                        passes_btagshape = ( otree->btag_LR_ >= btag_prob_cut_5jets && selected_comb!=999);
+                        passes_btagshape = ( otree->btag_LR >= btag_prob_cut_5jets && selected_comb!=999);
                         permutListS      = permutations_5J_S;
                         break;
                     case 2:
-                        passes_btagshape = ( otree->btag_LR_ >= btag_prob_cut_4jets && selected_comb!=999);
+                        passes_btagshape = ( otree->btag_LR >= btag_prob_cut_4jets && selected_comb!=999);
                         permutListS      = permutations_4J_S;
                         break;
                     default:
                         break;
                     }
+                    otree->selected_comb = selected_comb;
 
                     // if the event passes the cut, reshuffle jets into btag/buntag vectors
                     // N.B. ==> jets will be sorted by descending btag probaility!!!
@@ -2883,7 +2944,9 @@ int main(int argc, const char* argv[])
                         btag_indices.push_back(  btag_map[(permutListS[selected_comb])%1000/100]       );
                         btag_indices.push_back(  btag_map[(permutListS[selected_comb])%100/10]         );
                         btag_indices.push_back(  btag_map[(permutListS[selected_comb])%10/1]           );
-
+                        //cout << "LR best perm " << btag_indices[0] << " " << btag_indices[1] << " " << btag_indices[2] << " " << btag_indices[3] << endl;
+                        //cout << "LR2 best perm " << best_perm_lh[0] << " " << best_perm_lh[1] << " " << best_perm_lh[2] << " " << best_perm_lh[3] << endl;
+                        
                         // all other jets go into this collection
                         buntag_indices.clear();
                         for( unsigned int jj = 0 ; jj<banytag_indices.size(); jj++) {
@@ -3081,6 +3144,7 @@ int main(int argc, const char* argv[])
 
                 //  input 4-vectors
                 vector<TLorentzVector> jets;
+                vector<int> jet_ids;
                 vector<TLorentzVector> jets_alt;
 
                 // internal map: [ position in "jets" ] -> [ position in "jets_p4" ]
@@ -3211,7 +3275,7 @@ int main(int argc, const char* argv[])
 
                         // use untagged mass to assign to type 0 OR type 1
                         float WMass = (jets_p4[ buntag_indices[0] ]+jets_p4[  buntag_indices[1] ]).M();
-						otree->mW = WMass;
+                        otree->mW = WMass;
                         // set index for untagged jets
                         ind1 = buntag_indices[0];
                         ind2 = buntag_indices[1];
@@ -3243,7 +3307,7 @@ int main(int argc, const char* argv[])
                             /////////////////////////////////////////////////////
                         }
                         else if (cutWMass) {
-                			cuts.fill(CutHistogram::Cuts::WMASS);
+                            cuts.fill(CutHistogram::Cuts::WMASS);
                             continue;
                         }
 
@@ -3467,7 +3531,7 @@ int main(int argc, const char* argv[])
                                  << jets_p4[ buntag_indices_backup[jj] ].Phi() << ","
                                  << jets_p4[ buntag_indices_backup[jj] ].M() << "), CSV= "
                                  << jets_csv[buntag_indices_backup[jj] ] << endl;
-                        cout << "     btag probability is " << otree->btag_LR_ << endl;
+                        cout << "     btag probability is " << otree->btag_LR << endl;
 
                         if(passes_btagshape && selectByBTagShape) {
                             cout << "     @@@@@ the jet collection has been re-ordered according to btag probability @@@@@@" << endl;
@@ -3495,6 +3559,8 @@ int main(int argc, const char* argv[])
                     jets.clear();
                     jets.push_back( leptonLV     );
                     jets.push_back( neutrinoLV   );
+                    jet_ids.push_back(0);
+                    jet_ids.push_back(0);
 
                     // keep track of an alternative jet selection when doing regression
                     jets_alt.clear();
@@ -3506,12 +3572,21 @@ int main(int argc, const char* argv[])
                     pos_to_index.clear();
                     
                     if( otree->type_==-3) {
-                        jets.push_back( jets_p4[ banytag_indices[0] ]);
+                        jets.push_back( jets_p4[banytag_indices[0]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[0]]);
+
                         jets.push_back( leptonLV2    );
                         jets.push_back( neutrinoLV   );       // dummy
+                        jet_ids.push_back(0);
+                        jet_ids.push_back(0);
+
                         jets.push_back( jets_p4[ banytag_indices[1] ]);
                         jets.push_back( jets_p4[ banytag_indices[2] ]);
                         jets.push_back( jets_p4[ banytag_indices[3] ]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[1]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[2]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[3]]);
+
 
                         pos_to_index[2] = banytag_indices[0];
                         pos_to_index[3] = banytag_indices[0]; // dummy
@@ -3528,6 +3603,13 @@ int main(int argc, const char* argv[])
                         jets.push_back( jets_p4[ banytag_indices[4] ]);
                         jets.push_back( jets_p4[ banytag_indices[5] ]);
 
+                        jet_ids.push_back(jets_flavour[banytag_indices[0]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[1]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[2]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[3]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[4]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[5]]);
+
                         pos_to_index[2] = banytag_indices[0];
                         pos_to_index[3] = banytag_indices[1];
                         pos_to_index[4] = banytag_indices[2];
@@ -3542,6 +3624,13 @@ int main(int argc, const char* argv[])
                         jets.push_back( jets_p4[ banytag_indices[2] ]);
                         jets.push_back( jets_p4[ banytag_indices[3] ]);
                         jets.push_back( jets_p4[ banytag_indices[4] ]);
+
+                        jet_ids.push_back(jets_flavour[banytag_indices[0]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[1]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[1]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[2]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[3]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[4]]);
 
                         pos_to_index[2] = banytag_indices[0];
                         pos_to_index[3] = banytag_indices[1];
@@ -3564,6 +3653,13 @@ int main(int argc, const char* argv[])
                         jets_alt.push_back( useRegression ? jets_p4[ btag_indices[1] ] : jets_p4_reg[ btag_indices[1] ] );
                         jets_alt.push_back( useRegression ? jets_p4[ btag_indices[2] ] : jets_p4_reg[ btag_indices[2] ] );
                         jets_alt.push_back( useRegression ? jets_p4[ btag_indices[3] ] : jets_p4_reg[ btag_indices[3] ] );
+
+                        jet_ids.push_back(jets_flavour[banytag_indices[0]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[ind1]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[ind2]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[1]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[2]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[3]]);
 
                         pos_to_index[2] = btag_indices[0];
                         pos_to_index[3] = ind1;
@@ -3588,6 +3684,13 @@ int main(int argc, const char* argv[])
                         jets_alt.push_back( useRegression ? jets_p4[ btag_indices[2] ] : jets_p4_reg[ btag_indices[2] ]);
                         jets_alt.push_back( useRegression ? jets_p4[ btag_indices[3] ] : jets_p4_reg[ btag_indices[3] ]);
 
+                        jet_ids.push_back(jets_flavour[banytag_indices[0]]);
+                        jet_ids.push_back(0);
+                        jet_ids.push_back(0);
+                        jet_ids.push_back(jets_flavour[banytag_indices[1]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[2]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[3]]);
+
                         pos_to_index[2] = btag_indices[0];
                         pos_to_index[3] = btag_indices[0];  // dummy
                         pos_to_index[4] = btag_indices[0];  // dummy
@@ -3610,6 +3713,13 @@ int main(int argc, const char* argv[])
                         jets_alt.push_back( useRegression ? jets_p4[ btagLoose_indices[2] ] : jets_p4_reg[ btagLoose_indices[2] ]);
                         jets_alt.push_back( useRegression ? jets_p4[ btagLoose_indices[3] ] : jets_p4_reg[ btagLoose_indices[3] ]);
 
+                        jet_ids.push_back(jets_flavour[banytag_indices[0]]);
+                        jet_ids.push_back(0);
+                        jet_ids.push_back(0);
+                        jet_ids.push_back(jets_flavour[banytag_indices[1]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[2]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[3]]);
+
                         pos_to_index[2] = btagLoose_indices[0];
                         pos_to_index[3] = btagLoose_indices[0];  // dummy
                         pos_to_index[4] = btagLoose_indices[0];  // dummy
@@ -3630,8 +3740,12 @@ int main(int argc, const char* argv[])
                         otree->jet_eta_   [q] = jets[q].Eta();
                         otree->jet_phi_   [q] = jets[q].Phi();
                         otree->jet_m_     [q] = jets[q].M();
+                        otree->jet_id_    [q] = jet_ids[q];
                         otree->jet_csv_   [q] = q>1 ? jets_csv[ pos_to_index[q] ] : DEF_VAL_FLOAT ;
                         //otree->jet_id_    [q] = jets_id[q] ;
+                    }
+                    for (int pos=0; pos<6; pos++) {
+                        otree->pos_to_index[pos] = pos_to_index[pos];
                     }
 
                     // set all prob. to 0.0;
@@ -3711,9 +3825,9 @@ int main(int argc, const char* argv[])
                     // if needed, switch off OL
                     if(switchoffOL) {
                         meIntegrator->switchOffOL();
-						if (print) {
-                        	cout << "*** Switching off OpenLoops to speed-up the calculation ***" << endl;
-						}
+                        if (print) {
+                            cout << "*** Switching off OpenLoops to speed-up the calculation ***" << endl;
+                        }
                     }
 
                     // start the clock...
@@ -4479,10 +4593,10 @@ int main(int argc, const char* argv[])
                             i--;
                             lock = 1;
                             event_trials++;
-                            if( event_trials%10000==0 ) cout << "   >>> : " << event_trials << "th trial ---> btag_LR = " <<  otree->btag_LR_  << ", numBtagM = " << numJets30BtagM << endl;
+                            if( event_trials%10000==0 ) cout << "   >>> : " << event_trials << "th trial ---> btag_LR = " <<  otree->btag_LR  << ", numBtagM = " << numJets30BtagM << endl;
                             if(debug>=2) {
                                 cout << "Enhance MC: stay with event " << i+1 << endl;
-                                cout << "  - lock for systematics, # of trials = " <<  event_trials << "; btagLR = " << otree->btag_LR_ << endl;
+                                cout << "  - lock for systematics, # of trials = " <<  event_trials << "; btagLR = " << otree->btag_LR << endl;
                             }
                             continue;
                         }
@@ -4515,6 +4629,7 @@ int main(int argc, const char* argv[])
                                 otree->jet_phi_   [q] = leptonLV.Phi();
                                 otree->jet_m_     [q] = leptonLV.M();
                                 otree->jet_csv_   [q] = -99.;
+                                otree->jet_id_    [q] = 0;
                             }
 
                             // fill elem 1st w/ MET kinematics
@@ -4525,16 +4640,22 @@ int main(int argc, const char* argv[])
                                 otree->jet_phi_   [q] = neutrinoLV.Phi();
                                 otree->jet_m_     [q] = neutrinoLV.M();
                                 otree->jet_csv_   [q] = -99.;
+                                otree->jet_id_    [q] = 0;
                             }
 
                             // fill other elems w/ the jet kinematics
                             else if( jets_p4_ind < jets_p4.size() && ( properEventSL || (properEventDL && !(q==3 || q==4)))   ) {
+
+                                assert(jets_p4.size() == jets_csv.size());
+                                assert(jets_p4.size() == jets_flavour.size());
+
                                 otree->jet_pt_     [q] = !useRegression ? jets_p4[jets_p4_ind].Pt() : jets_p4_reg[jets_p4_ind].Pt();
                                 otree->jet_pt_alt_ [q] =  useRegression ? jets_p4[jets_p4_ind].Pt() : jets_p4_reg[jets_p4_ind].Pt();
                                 otree->jet_eta_    [q] = jets_p4 [jets_p4_ind].Eta();
                                 otree->jet_phi_    [q] = jets_p4 [jets_p4_ind].Phi();
                                 otree->jet_m_      [q] = jets_p4 [jets_p4_ind].M();
                                 otree->jet_csv_    [q] = jets_csv[jets_p4_ind];
+                                otree->jet_id_    [q] = jets_flavour[jets_p4_ind];
 
                                 jets_p4_ind++;
                             }
@@ -4547,6 +4668,7 @@ int main(int argc, const char* argv[])
                                 otree->jet_phi_    [q] = leptonLV2.Phi();
                                 otree->jet_m_      [q] = leptonLV2.M();
                                 otree->jet_csv_    [q] = -99.;
+                                otree->jet_id_    [q] = 0;
                             }
 
                             //  if DL, fill elem 4th w/ MET kinematics
@@ -4557,6 +4679,7 @@ int main(int argc, const char* argv[])
                                 otree->jet_phi_   [q] = neutrinoLV.Phi();
                                 otree->jet_m_     [q] = neutrinoLV.M();
                                 otree->jet_csv_   [q] = -99.;
+                                otree->jet_id_    [q] = 0;
                             }
 
                             else {}
@@ -4566,7 +4689,7 @@ int main(int argc, const char* argv[])
                         // fill the tree
                         cuts.fill(CutHistogram::Cuts::passes);
                         otree->tree->Fill();
-                		hcounter->SetBinContent(3, hcounter->GetBinContent(3)+1);
+                        hcounter->SetBinContent(3, hcounter->GetBinContent(3)+1);
                     } //ntuplizeAll
 
                     continue; //continue systematics loop in case ntuplizeAll
@@ -4630,7 +4753,9 @@ int main(int argc, const char* argv[])
     hcounter->Write("", TObject::kOverwrite );
     hparam->Write("", TObject::kOverwrite );
     otree->tree->Write("", TObject::kOverwrite );
+#ifdef DO_BTAG_LR_TREE
     btag_tree.tree->Write("", TObject::kOverwrite );
+#endif
     cuts.h->Write("", TObject::kOverwrite);
     fout_tmp->Close();
 

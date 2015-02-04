@@ -59,7 +59,7 @@ if args.site=="T3_CH_PSI":
 	#address2		= 'dcap://t3se01.psi.ch:22125/'
 	address1		= ''
 	address2		= ''
-	subcommand			= 'qsub -V -cwd -l h_vmem=2G -q all.q'
+	subcommand			= 'qsub -V -cwd -l os=sl6,h_vmem=2G -q all.q'
 	#tempOutPath = "/scratch/" + os.environ["USER"] + "/"
 	tempOutPath = "$TMPDIR/"
 	finalOutPath = "/shome/" + os.environ["USER"] + "/tth/{0}/".format(processing_tag)
@@ -308,7 +308,10 @@ def submitMEAnalysis(script,
 	f.close()
 	os.system('chmod +x '+scriptName)
 
-	submitToQueue = subcommand+' -N job'+sample+' '+scriptName
+	if args.site == "T3_CH_PSI":
+		submitToQueue = subcommand+' -N job'+sample+' '+scriptName
+	elif args.site == "T3_EE_Estonia":
+		submitToQueue = subcommand+' -J job'+sample+' '+scriptName
 	tosubmit.write(submitToQueue + "\n")
 	#print submitToQueue
 	#os.system(submitToQueue)

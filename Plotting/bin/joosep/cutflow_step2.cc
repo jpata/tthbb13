@@ -1,4 +1,4 @@
-#define _DEBUG
+//#define _DEBUG
 
 #include "FWCore/FWLite/interface/AutoLibraryLoader.h"
 
@@ -50,7 +50,7 @@ using namespace std;
 MECategory assign_me_category(METree* t, SampleType st) {
     TTH::EventHypothesis vt = static_cast<TTH::EventHypothesis>(t->Vtype_);
     
-    if (t->btag_LR_ >= 0.0 ) {
+    if (t->btag_LR >= 0.0 ) {
         if (t->type_ == 0 || (t->type_ == 3 && t->flag_type3_ > 0)) {
             return CAT1;
         }
@@ -131,30 +131,30 @@ bool is_double_lepton(METree* t, SampleType sample_type) {
 //-1 -> neither
 int is_btag_lr_high_low(METree* t, MECategory cat) {
     if (cat == CAT1) {
-        if (t->btag_LR_ >= 0.995) {
+        if (t->btag_LR >= 0.995) {
             return 1;
-        } else if (t->btag_LR_ < 0.995 && t->btag_LR_ >= 0.96) {
+        } else if (t->btag_LR < 0.995 && t->btag_LR >= 0.96) {
             return 0;
         }
     }
     else if (cat == CAT2) {
-        if (t->btag_LR_ >= 0.9925) {
+        if (t->btag_LR >= 0.9925) {
             return 1;
-        } else if (t->btag_LR_ < 0.9925 && t->btag_LR_ >= 0.96) {
+        } else if (t->btag_LR < 0.9925 && t->btag_LR >= 0.96) {
             return 0;
         }
     }
     else if (cat == CAT3) {
-        if (t->btag_LR_ >= 0.995) {
+        if (t->btag_LR >= 0.995) {
             return 1;
-        } else if (t->btag_LR_ < 0.995 && t->btag_LR_ >= 0.97) {
+        } else if (t->btag_LR < 0.995 && t->btag_LR >= 0.97) {
             return 0;
         }
     }
     else if (cat == CAT6mumu || cat == CAT6ee || cat == CAT6emu) {
-        if (t->btag_LR_ >= 0.925) {
+        if (t->btag_LR >= 0.925) {
             return 1;
-        } else if (t->btag_LR_ < 0.925 && t->btag_LR_ >= 0.850) {
+        } else if (t->btag_LR < 0.925 && t->btag_LR >= 0.850) {
             return 0;
         }
     }
@@ -169,6 +169,33 @@ bool is_correct_perm(int perm, MECategory cat, Process prc) {
         return ((perm == 100111) && prc==TTHBB) || ((perm == 100100) && prc==TTJETS);
     }
     return false;
+}
+
+enum RadiationMode {
+    BB,
+    BJ,
+    CC,
+    JJ,
+    UNKNOWN_RADIATION
+};
+
+RadiationMode classify_radiation(METree* t, Process p) {
+    int nB = t->nMatchSimBs_;
+    int nC = t->nMatchSimCs_;
+
+    if (p == TTJETS) {
+        if (nB >= 2) {
+            return RadiationMode::BB;
+        } else if (nB == 1) {
+            return RadiationMode::BJ;
+        } else if (nB == 0 && nC >= 2) {
+            return RadiationMode::CC;
+        } else {
+            return RadiationMode::JJ;
+        }
+    } else {
+        return UNKNOWN_RADIATION;
+    }
 }
 
 TTH::EventHypothesis assing_gen_vtype(TTHTree* t) {
@@ -240,6 +267,8 @@ int main(int argc, const char* argv[])
 
     TFile* outfile = new TFile(outfn.c_str(), "RECREATE");
 	
+    TTree* outtree_s1 = 0;
+    TTree* outtree_s2 = 0;
 	//const double lepton_pt_min = in.getParameter<double>("leptonPtMin");
 	    
     TStopwatch sw;
@@ -250,91 +279,18 @@ int main(int argc, const char* argv[])
 
 
         Sample sample(sample_pars);
+        if (sample.treeS1 != 0) {
+            outtree_s1 = sample.treeS1->tree->CloneTree(0);
+            outtree_s1->SetName("tree_s1");
+        }
+        if (sample.treeS2 != 0) {
+            outtree_s2 = sample.treeS2->tree->CloneTree(0);
+            outtree_s2->SetName("tree_s2");
+        }
+
         TH1::SetDefaultSumw2(true);
 
         Histograms hs(sample.nickName + "_", sample.type);
-        
-        ///
-        /// Load step2 sample file
-        ///
-        //cout << "sample " << sample_fn << " type " << sample_type << endl;
-        // LOG(INFO) << "sample " << sample_fn << " type " << sample_type;
-        // TFile* tf = new TFile(sample_fn.c_str());
-        // if (tf==0 || tf->IsZombie()) {
-        //     LOG(ERROR) << "ERROR: could not open file " << sample_fn << " " << tf;
-        //     throw std::exception();
-        // }
-        // assert(tf != 0);
-        // TTree* tree = static_cast<TTree*>(tf->Get("tree"));
-        // assert(tree != 0);
-        // //create ME TTree and branch variables
-        // METree t((TTree*)(tree));
-        // LOG(INFO) << "T1 entries " << t.tree->GetEntries();
-        
-
-        ////////////////////////////////////
-        /// Try to load step1 sample file
-        ////////////////////////////////////
-		// TFile* tf2 = 0;
-		// bool has_step1_tree = false;
-		// if (step1_sample_fn.size() > 0) {
-		// 	tf2 = new TFile(step1_sample_fn.c_str());
-		// 	if (tf2==0 || tf->IsZombie()) {
-		// 		LOG(ERROR) << "ERROR: could not open file " << sample_fn << " " << tf;
-		// 		throw std::exception();
-		// 	}
-		// 	has_step1_tree = true;
-		// }
-		// TTHTree* t2 = 0;
-
-        ////////////////////////////////////
-        /// Try to load b-tagging LR tree
-        ////////////////////////////////////
-        // TTree* btag_ttree = (TTree*)tf->Get("btag_lr");
-        // BTagLRTree* btag_tree = 0;
-        // if (btag_ttree != 0) {
-        //     btag_tree = new BTagLRTree(btag_ttree);
-        //     btag_tree->set_branch_addresses();
-        // }
-		
-		
-  //       ///Maps event (run, lumi, id) to an index in the step1 file
-  //       map<tuple<int,int, int>, int> event_map;
-
-  //       ///Maps event (run, lumi, id) to indies in the btag LR tree
-  //       map<tuple<int,int, int>, vector<int>> btag_lr_event_map;
-		// if (has_step1_tree) {
-		// //create ME TTree and branch variables
-		// 	t2 = new TTHTree((TTree*)tf2->Get("tthNtupleAnalyzer/events"));
-		// 	LOG(INFO) << "T2 entries " << t2->tree->GetEntries();
-		// 	t2->set_branch_addresses();
-			
-		// 	//assert(t.tree->GetEntries() == t2->tree->GetEntries());
-		// 	has_step1_tree = true;
-			
-		// 	t2->tree->SetBranchStatus("*", false);
-		// 	t2->tree->SetBranchStatus("event__*", true);
-
-		// 	for (int entry = 0; entry < t2->tree->GetEntries(); entry++) {
-		// 		t2->tree->GetEntry(entry);
-  //               const auto k = make_tuple(t2->event__run, t2->event__lumi, t2->event__id);
-		// 		event_map[k] = entry;
-		// 	}
-		// 	t2->tree->SetBranchStatus("*", true);
-		// }
-
-        // if (btag_tree != 0) {
-        //     for (int entry = 0; entry < btag_tree->tree->GetEntries(); entry++) {
-        //         btag_tree->tree->GetEntry(entry);
-
-        //         const auto k = make_tuple(btag_tree->event_run, btag_tree->event_lumi, btag_tree->event_id);
-        //         if (btag_lr_event_map.find(k) == btag_lr_event_map.end()) {
-        //             btag_lr_event_map[k] = vector<int>();
-        //         }
-
-        //         btag_lr_event_map[k].push_back(entry);
-        //     }
-        // }
 
         //attach branches with MH=125 (for ME branch names)
         sample.treeS2->set_branch_addresses(125.0);
@@ -380,28 +336,15 @@ int main(int argc, const char* argv[])
 
             //zero all branch variables
             sample.treeS2->loop_initialize();
-            nbytes += sample.treeS2->tree->GetEntry(entry);
+            long nb = sample.treeS2->tree->GetEntry(entry);
+            nbytes += nb;
 
             METree t(*sample.treeS2);
-            assert(t.EVENT_.event != 0);
-
-            // const auto event_key = make_tuple(t.EVENT_.run, t.EVENT_.lumi, t.EVENT_.event);
-            // const int idx = event_map[event_key];
-            // assert(idx >= 0);
-
-			// if (has_step1_tree) {
-			// 	t2->loop_initialize();
-   //              LOG(DEBUG) << t.EVENT_.run << " " << t.EVENT_.lumi << " " << t.EVENT_.event << " " << idx;
-   //              int nb = t2->tree->GetEntry(idx);
-			// 	if (nb <= 0) {
-			// 		LOG(ERROR) << "failed to read entry " << entry;
-			// 		throw exception();
-			// 	}
-			// 	nbytes += nb;
-			// 	assert(t.EVENT_.run == t2->event__run);
-			// 	assert(t.EVENT_.lumi == t2->event__lumi);
-			// 	assert(t.EVENT_.event == t2->event__id);
-			// }
+            //assert(!is_undef(t.EVENT_.run));
+            if (is_undef(t.EVENT_.run)) {
+                LOG(ERROR) << "failed to read entry " << entry << " " << nb;
+                continue;
+            }
 			
 			//keep only nominal events
 			if (!(t.syst_ == 0)) {
@@ -411,18 +354,7 @@ int main(int argc, const char* argv[])
 			
             const double w = t.weight_ * wratio;
 
-			// Event* event = 0;
-			// if (has_step1_tree) {
-			// 	event = t2->as_event();
-   //              assert(event != 0);
-			// }
-			
-            //list of pointers to original particles in step1 TTree
-			// vector<Particle*> orig_jets;
-			// vector<Particle*> orig_leptons;
-
-            //association between METree->TTHTree jet indices
-            //map<int, int> jet_map;
+			Event* event = 0;
 
             //reco vtype
             const TTH::EventHypothesis vt = static_cast<TTH::EventHypothesis>(t.Vtype_);
@@ -431,63 +363,18 @@ int main(int argc, const char* argv[])
             const bool is_sl = is_single_lepton(&t, sample.type);
             const bool is_dl = is_double_lepton(&t, sample.type);
             MECategory cat = assign_me_category(&t, sample.type);
-
+            RadiationMode rad = classify_radiation(&t, sample.process);
             if (!((is_sl || is_dl))) {
                 continue;
             }
 
+			hs.h_radmode->Fill(rad, w);
+
             //keep only events for which Blr was calculated
-            if (!(t.btag_LR_ >= 0)) {
+            if (!(t.btag_LR >= 0)) {
                 hs.h_cutreasons->Fill(BTAG_LR+1);
                 continue;
             }
-			
-			// if (has_step1_tree) {
-			// 	//find lepton from original collection
-			// 	for (int _i=0; _i < t.nLep_; _i++) {
-			// 		for (auto* p : event->leptons) {
-			// 			if (p->p4.Pt()>0 && std::abs(p->p4.Pt() - t.lepton_pt_[_i]) < 0.1) {
-			// 				orig_leptons.push_back(p);
-			// 				break;
-			// 			}
-			// 		}
-			// 	}
-			// 	assert(orig_leptons.size()==1 || orig_leptons.size()==2);
-			// }
-			
-			// if (has_step1_tree) {
-			// 	//find jet from original collection
-			// 	//cout << "looping over " << t.nJet_ << " jets" << endl;
-			// 	for (int _i=0; _i < t.nJet_; _i++) {
-			// 		Particle* matched = 0;
-   //                  int _j = 0;
-			// 		for (auto* p : event->jets) {
-   //                      //cout << p->p4.Pt() << " " << t.jet_pt_[_i] << endl;
-			// 			if (p->p4.Pt()>0 && std::abs(p->p4.Pt() - t.jet_pt_[_i]) < 0.5) {
-			// 				//cout << "matched jet " << p << endl;
-			// 				matched = p;
-			// 				break;
-			// 			}
-   //                      _j += 1;
-			// 		}
-			// 		if (matched) {
-			// 			//cout << "matched jet with idx " << matched->idx << endl;
-			// 			orig_jets.push_back(matched);
-   //                      jet_map[_i] = _j;
-			// 		}
-			// 	}
-
-   //              //cout << vt << " " << is_sl << " " << is_dl << " " << cat << endl;
-   //              //LOG(DEBUG) << "event " << is_sl << " " << is_dl << " " << t.nJet_ << " " << t.numJets_ << " " << t.btag_LR_;
-
-   //              assert(orig_jets.size()>0);
-
-   //              //loop over btag LR permutations corresponding to event
-   //              //LOG(DEBUG) << "perm 0 " << max_perm[0] << " " << max_perm_prob[0] << " " << has_match_map[0];
-   //              //LOG(DEBUG) << "perm 1 " << max_perm[1] << " " << max_perm_prob[1] << " " << has_match_map[1];
-			// }
-
-
 
 			//Single lepton cuts
             if (is_sl) {
@@ -515,8 +402,8 @@ int main(int argc, const char* argv[])
                 }
                 
                 hs.h_lep_riso_sl->Fill(t.lepton_rIso_[0], w);
-				hs.h_btag_lr_sl->Fill(t.btag_LR_, w);
-				hs.h_btag_lr_sl2->Fill(t.btag_LR_, w);
+				hs.h_btag_lr_sl->Fill(t.btag_LR, w);
+				hs.h_btag_lr_sl2->Fill(t.btag_LR, w);
             }
 			
             //dilepton cuts
@@ -566,8 +453,8 @@ int main(int argc, const char* argv[])
                 
                 hs.h_lep1_riso_dl->Fill(t.lepton_rIso_[0], w);
                 hs.h_lep2_riso_dl->Fill(t.lepton_rIso_[1], w);
-				hs.h_btag_lr_dl->Fill(t.btag_LR_, w);
-				hs.h_btag_lr_dl2->Fill(t.btag_LR_, w);
+				hs.h_btag_lr_dl->Fill(t.btag_LR, w);
+				hs.h_btag_lr_dl2->Fill(t.btag_LR, w);
             }
 
 
@@ -578,51 +465,9 @@ int main(int argc, const char* argv[])
             max_perm[0] = -1.0;
             max_perm[1] = -1.0;
 
-            // if (btag_tree != 0) {
-            //     for (auto _idx : btag_lr_event_map[event_key]) {
-            //         btag_tree->loop_initialize();
-            //         btag_tree->tree->GetEntry(_idx);
-
-            //         int n_matched = 0;
-                    
-            //         int id_b1 = btag_tree->id_b1;
-            //         n_matched += abs(id_b1)==5 ? 1 : 0;
-                    
-            //         int id_b2 = btag_tree->id_b2;
-            //         n_matched += abs(id_b2)==5 ? 1 : 0;
-
-            //         int id_bHad = btag_tree->id_bHad;
-            //         n_matched += abs(id_bHad)==5 ? 1 : 0;
-
-            //         int id_bLep = btag_tree->id_bLep;
-            //         n_matched += abs(id_bLep)==5 ? 1 : 0;
-
-            //         //LOG(DEBUG) << "perm " << btag_tree->permutation << " " << btag_tree->p_pos << " " << id_b1 << " " << id_b2 << " " << id_bHad << " " << id_bLep;
-
-            //         if (max_perm_prob[btag_tree->hypo] < btag_tree->p_pos) {
-            //             max_perm_prob[btag_tree->hypo] = btag_tree->p_pos;
-            //             max_perm[btag_tree->hypo] = btag_tree->permutation;
-            //             has_match_map[btag_tree->hypo] = n_matched;
-            //         }
-            //     }
-
-            //     hs.h_btag_lr_nmatched_s->Fill(t.btag_LR_, has_match_map[0], w);
-            //     hs.h_btag_lr_nmatched_b->Fill(t.btag_LR_, has_match_map[1], w);
-            
-
-            // }
-
 			//get trigger flags
 			const bool* trf = t.triggerFlags_;
 			
-			//#    #// OR of four trigger paths:  "HLT_Mu40_eta2p1_v.*", "HLT_IsoMu24_eta2p1_v.*", "HLT_Mu40_v.*",  "HLT_IsoMu24_v.*"
-			//#    #int trigVtype2 =  (Vtype==2 && ( triggerFlags[22]>0 || triggerFlags[23]>0 || triggerFlags[14]>0 ||triggerFlags[21]>0 ));
-			//#    #// OR of two trigger paths:   "HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v.*", "HLT_Ele27_WP80_v.*"
-			//#    #int trigVtype3 =  (Vtype==3 &&  triggerFlags[44]>0 );⇥␣
-			//#    # // OR of four trigger paths:  "HLT_Mu40_eta2p1_v.*", "HLT_IsoMu24_eta2p1_v.*", "HLT_Mu40_v.*",  "HLT_IsoMu24_v.*"
-			//#    #int trigVtype0 =  (Vtype==0 && ( triggerFlags[22]>0 || triggerFlags[23]>0 || triggerFlags[14]>0 ||triggerFlags[21]>0 ));
-			//#    #// OR of two trigger paths:    "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v.*",
-			//
 			hs.h_triggers->Fill(0.0, w);
 			bool trig_mu = trf[22]==1 || trf[23]==1 || trf[14]==1 || trf[21]==1;
 			bool trig_ele = trf[44]==1;
@@ -632,28 +477,17 @@ int main(int argc, const char* argv[])
 			if (trig_ele) {
 				hs.h_triggers->Fill(2.0, w);
 			}
-			//std::cout << trig_mu << std::endl;
-			
-			//            if (i<10) {
-			//                std::cout << "triggerflags ";
-			//                for (int j=0;j<70;j++)
-			//                    std::cout << trf[j];
-			//                std::cout << endl;
-			//            }
 						
             hs.h_Vtype->Fill(t.Vtype_, w);
             hs.h_type->Fill(t.type_, w);
-			//TTH::EventHypothesis vt2 = TTH::EventHypothesis::UNKNOWN_HYPO;
 
-			// if (has_step1_tree) {
-			// 	vt2 = assing_gen_vtype(t2);
-			// 	hs.h_gvtype_vtype->Fill(vt2, t.Vtype_, w);
-			// 	hs.h_gvtype_cat->Fill(vt2, cat, w);
-			// }
-			
-            //h_gvtype_vtype->Fill(gen_hypo(std::abs(t.gen_))
-			hs.h_cat_btag_lr->Fill(cat, t.btag_LR_, w);
-			hs.h_vtype_btag_lr->Fill(t.Vtype_, t.btag_LR_, w);
+            hs.h_btag_lr->Fill(t.btag_LR, rad, w);
+            hs.h_btag_lr2->Fill(t.btag_LR2, rad, w);
+            hs.h_btag_lr3->Fill(t.btag_LR3, rad, w);
+            hs.h_btag_lr4->Fill(t.btag_LR4, rad, w);
+
+			hs.h_cat_btag_lr->Fill(cat, t.btag_LR, w);
+			hs.h_vtype_btag_lr->Fill(t.Vtype_, t.btag_LR, w);
 			
             //passes btag LR cut
             int btag_lr_cat = is_btag_lr_high_low(&t, cat);
@@ -679,6 +513,39 @@ int main(int argc, const char* argv[])
 			}
 			
             if (btag_lr_cat == 1 && (sample.type == ME_8TEV || sample.type == ME_13TEV)) {
+
+                if (sample.step1Enabled) {
+                    sample.treeS1->loop_initialize();
+
+                    long long idx = sample.getIndexS1(t.EVENT_.event, t.EVENT_.run, t.EVENT_.lumi);
+                    int nb = sample.treeS1->tree->GetEntry(
+                        idx, 1
+                    );
+                    if (nb <= 0) {
+                        LOG(ERROR) << "failed to read entry " << entry;
+                        throw exception();
+                    }
+
+                    nbytes += nb;
+
+                    assert(!is_undef(sample.treeS1->event__run));
+                    
+                    if (t.EVENT_.run != sample.treeS1->event__run) {
+                        LOG(ERROR) << "Mismatch " << t.EVENT_.run << " "
+                            << sample.treeS1->event__run
+                            << " i1 " << entry
+                            << " i2 " << idx;
+                        continue;
+                    }
+                    assert(t.EVENT_.run == sample.treeS1->event__run);
+                    assert(t.EVENT_.lumi == sample.treeS1->event__lumi);
+                    assert(t.EVENT_.event == sample.treeS1->event__id);
+                    assert(!is_undef(sample.treeS1->hypo1));
+
+                    event = sample.treeS1->as_event();
+                    assert(event != 0);
+                    assert(!is_undef(sample.treeS1->hypo1));
+                }
                 double me_discr = t.probAtSgn_ /
                 (t.probAtSgn_ + 0.02 * t.probAtSgn_alt_);
                 
@@ -701,293 +568,109 @@ int main(int argc, const char* argv[])
 				// //keep track of the best permutation (most matches)
 				int best_perm = 0;
 				int n_best_perm = 0;
-                int idx_best_perm = -1;
+                //int idx_best_perm = -1;
 
                 for (int np=0; np < t.nPermut_; np++) {
 					const int perm = t.perm_to_gen_[np];
                     if (is_correct_perm(perm, cat, sample.process)) {
                         n_correct_perm_s += 1;
                     }
-					
+
                     //number of particles matched out of 6
 					int _n = perm_maps::count_matched(perm);
 					if (_n > n_best_perm) {
 						n_best_perm = _n;
 						best_perm = perm;
-                        idx_best_perm = np;
+                        //idx_best_perm = np;
 					}
                 }
-                //Now we know the best matching permutation
-                //We can check if any of the W->qq quarks were not matched in the best case
-                bool q1_match = !perm_maps::w_q1_missed(best_perm);
-                bool q2_match = !perm_maps::w_q2_missed(best_perm);
-                LOG(DEBUG) << "match Wqq perm_to_gen[" << idx_best_perm << "]="
-                    << best_perm
-                    << " perm_to_jet[" << idx_best_perm << "]=" << t.perm_to_jet_[idx_best_perm]
-                    << " qm " << q1_match << " " << q2_match;
-				// h_max_perm_s_cat->Fill(perm_maps::map2[best_perm], cat, w);
-				
-				// for (int i=1;i<7;i++) {
-				// 	if (perm_maps::has_n(best_perm, i)) {
-				// 		h_matched_perm_s_cat->Fill(i - 1, cat, w);
-				// 	} else {
-				// 		h_unmatched_perm_s_cat->Fill(i - 1, cat, w);
-				// 	}
-				// }
-				
-                
-// 				//H
-//                 if (btag_lr_cat == 1) {
-//                     //h_nperm_s_btaglr->Fill(n_correct_perm_s, t.btag_LR_, w);
-//                     //h_nperm_b_btaglr->Fill(n_correct_perm_b, t.btag_LR_, w);
-					
-//                     //h_nperm_s_me->Fill(n_correct_perm_s, me_discr, w);
-//                     //h_nperm_b_me->Fill(n_correct_perm_b, me_discr, w);
-                    
-//                     //h_nperm_s_cat->Fill(n_correct_perm_s, cat, w);
-//                     //h_nperm_b_cat->Fill(n_correct_perm_b, cat, w);
-					
-// 					//find the spectra of the H->bb b quarks which are not matched to jets
-// 					if (has_step1_tree && !is_undef(t2->gen_b__pt) && perm_maps::higgs_b_missed(best_perm)) {
 
-//                         bool filled_fail = false; 
-// 						for (auto* p : event->higgs_decays) {
-// 							double min_dr = 100.0;
-// 							Particle* nearest_match = 0;
-// 							bool has_match = false;
-// 							for (auto* j : orig_jets) {
-// 								double dr = j->p4.DeltaR(p->p4);
-// 								if (dr < min_dr) {
-// 									min_dr = dr;
-// 									nearest_match = j;
-// 								}
-// 								//cout << dr << endl;
-// 								if (dr < 0.3) {
-// 									has_match = true;
-// 									break;
-// 								}
-// 							}
-// 							if (!has_match) {
-//                                 assert(nearest_match != 0);
-// 								h_unmatchedHbb_pt->Fill(nearest_match->p4.Pt(), p->p4.Pt(), w);
-// 								if (p->p4.Pt() > 30) {
-//                                     if (!filled_fail) {
-// 									   h_failreasons_cat->Fill(FailReason::NO_H_B, cat, w);
-//                                        filled_fail = true;
-//                                     }
-// 									h_unmatchedHbb_eta->Fill(nearest_match->p4.Eta(), p->p4.Eta(), w);
-// 									float csvval = nearest_match->idx >= 0 ? t2->jet__bd_csv[nearest_match->idx] : -1;
-// 									if (csvval < 0) {
-// 										csvval = 0;
-// 									}
-// 									h_unmatchedHbb_csv->Fill(csvval, w);
-// 									h_unmatchedHbb_jetid->Fill(nearest_match->idx >= 0 ? t2->jet__jetId[nearest_match->idx] : -1, w);
-// 									h_unmatchedHbb_dr->Fill(min_dr, w);
-// 								}
-// 							}
-// 						}
-// 					} //missed higgs b
-					
-// 					if (has_step1_tree && perm_maps::top_b_missed(best_perm)) {
-						
-// 						if (is_undef(t2->gen_t__b__pt) || is_undef(t2->gen_tbar__b__pt)) {
-// 							cerr << "undefined top b pt" << endl;
-// 							continue;
-// 						}
-// 						Particle p1(t2->gen_t__b__pt, t2->gen_t__b__eta, t2->gen_t__b__phi, t2->gen_t__b__mass, 5);
-// 						Particle p2(t2->gen_tbar__b__pt, t2->gen_tbar__b__eta, t2->gen_tbar__b__phi, t2->gen_tbar__b__mass, -5);
+                //if (cat == CAT1 || cat == CAT2 || cat == CAT3) {
+                if (cat == CAT1) {
 
-//                         bool filled_fail = false;
-						
-// 						for (auto* p : {&p1, &p2}) {
-							
-// 							double min_dr = 100.0;
-// 							Particle* nearest_match = 0;
-// 							bool has_match = false;
-							
-// 							int ij = 0;
-// 							for (auto* j : orig_jets) {
-								
-// 								//cout << t2->jet__pt[ij] << " " << t2->jet__eta[ij] << " " << t2->jet__phi[ij] << " " << t2->jet__mass[ij] << endl;
-// 								ij++;
-// 								double dr = j->p4.DeltaR(p->p4);
-								
-// 								if (dr < 0.3 && dr < min_dr) {
-// 									has_match = true;
-// 									break;
-// 								}
-								
-// 								if (dr < min_dr) {
-// 									min_dr = dr;
-// 									nearest_match = j;
-// 								}
-// 							}
-							
-// 							if (!has_match) {
-//                                 assert(nearest_match != 0);
-// 								//cout << "tb " << t.EVENT_.run << " " << t.EVENT_.lumi << " " << t.EVENT_.event << endl;
-//                                 if (!filled_fail) {
-//                                    h_failreasons_cat->Fill(FailReason::NO_T_B, cat, w);
-//                                    filled_fail = true;
-//                                 }
-// 								h_unmatched_tb_pt->Fill(nearest_match->p4.Pt(), p->p4.Pt(), w);
-								
-// 								if (p->p4.Pt() > 30 ) {
-// 									h_unmatched_tb_eta->Fill(nearest_match->p4.Eta(), p->p4.Eta(), w);
-// 									float csvval = nearest_match->idx >= 0 ? t2->jet__bd_csv[nearest_match->idx] : -1;
-// 									if (csvval < 0) {
-// 										csvval = 0;
-// 									}
-// 									h_unmatched_tb_csv->Fill(csvval, w);
-// 									h_unmatched_tb_jetid->Fill(nearest_match->idx >= 0 ? t2->jet__jetId[nearest_match->idx] : -1, w);
-// 									h_unmatched_tb_dr->Fill(min_dr, w);
-// 								}
-// 							}
-// 						}
-// 					} //missed top b
-					
-// 					if ((cat == CAT1 || cat == CAT2 || cat == CAT3 ) && has_step1_tree && perm_maps::w_q_missed(best_perm)) {
-// 						int id1 = std::abs(t2->gen_t__w_d1__id);
-// 						int id2 = std::abs(t2->gen_tbar__w_d1__id);
+                    //Now we know the best matching permutation
+                    //We can check if any of the W->qq quarks were not matched in the best case
+                    bool q1_match = perm_maps::get_n(best_perm, 4);
+                    bool q2_match = perm_maps::get_n(best_perm, 5);
+                    //int best_perm_to_jet = t.perm_to_jet_[idx_best_perm];
+                    //int q1_idx = perm_maps::get_n(best_perm_to_jet, 4);
+                    //int q2_idx = perm_maps::get_n(best_perm_to_jet, 5);
 
-//                         bool filled_fail = false;
-						
-//                         if (is_undef(id1) || is_undef(id2)) {
-//                             cerr << "top undefined" << endl;
-//                             continue;
-//                         }
-// 						Particle* p1 = 0;
-// 						Particle* p2 = 0;
-// 						//t is hadronic
-// 						if (id1>0 && id1 < 10) {
-// 							p1 = new Particle(t2->gen_t__w_d1__pt, t2->gen_t__w_d1__eta, t2->gen_t__w_d1__phi, t2->gen_t__w_d1__mass, t2->gen_t__w_d1__id);
-// 							p2 = new Particle(t2->gen_t__w_d2__pt, t2->gen_t__w_d2__eta, t2->gen_t__w_d2__phi, t2->gen_t__w_d2__mass, t2->gen_t__w_d2__id);
-// 						}
-// 						//tbar is hadronic
-// 						else if (id2>0 && id2 < 10) {
-// 							p1 = new Particle(t2->gen_tbar__w_d1__pt, t2->gen_tbar__w_d1__eta, t2->gen_tbar__w_d1__phi, t2->gen_tbar__w_d1__mass, t2->gen_tbar__w_d1__id);
-// 							p2 = new Particle(t2->gen_tbar__w_d2__pt, t2->gen_tbar__w_d2__eta, t2->gen_tbar__w_d2__phi, t2->gen_tbar__w_d2__mass, t2->gen_tbar__w_d2__id);
-// 						} else {
-// //							LOG(ERROR) << "SL event but no hadronic W " << id1 << " " << id2;
-//                             h_failreasons_cat->Fill(FailReason::DL_AS_SL, cat, w);
+                    int nmatched = q1_match + q2_match;
 
-// 							continue;
-// 						}
-						
-// 						for (auto* p : {p1, p2}) {
-							
-// 							double min_dr = 100.0;
-// 							Particle* nearest_match = 0;
-// 							bool has_match = false;
-							
-// 							int ij = 0;
-// 							for (auto* j : orig_jets) {
-								
-// 								//cout << t2->jet__pt[ij] << " " << t2->jet__eta[ij] << " " << t2->jet__phi[ij] << " " << t2->jet__mass[ij] << endl;
-// 								ij++;
-// 								double dr = j->p4.DeltaR(p->p4);
-								
-// 								if (dr < 0.3 && dr < min_dr) {
-// 									has_match = true;
-// 									break;
-// 								}
-								
-// 								if (dr < min_dr) {
-// 									min_dr = dr;
-// 									nearest_match = j;
-// 								}
-// 							}
-							
-// 							if (!has_match) {
-//                                 assert(nearest_match != 0);
-// 								//cout << "tb " << t.EVENT_.run << " " << t.EVENT_.lumi << " " << t.EVENT_.event << endl;
-//                                 if (!filled_fail) {
-//                                    h_failreasons_cat->Fill(FailReason::NO_W_Q, cat, w);
-//                                    filled_fail = true;
-//                                 }
-// 								h_unmatched_Wqq_pt->Fill(nearest_match->p4.Pt(), p->p4.Pt(), w);
-								
-// 								if (p->p4.Pt() > 30) {
-// 									h_unmatched_Wqq_eta->Fill(nearest_match->p4.Eta(), p->p4.Eta(), w);
-// 									float csvval = nearest_match->idx >= 0 ? t2->jet__bd_csv[nearest_match->idx] : -1;
-// 									if (csvval < 0) {
-// 										csvval = 0;
-// 									}
-// 									h_unmatched_Wqq_csv->Fill(csvval, w);
-// 									h_unmatched_Wqq_jetid->Fill(nearest_match->idx >= 0 ? t2->jet__jetId[nearest_match->idx] : -1, w);
-// 									h_unmatched_Wqq_id->Fill(std::abs(p->id), w);
-// 									h_unmatched_Wqq_dr->Fill(min_dr, w);
-// 								}
-// 							}
-// 						}
-// 						delete p1;
-// 						delete p2;
-// 					}
-					
-// 					// check if lepton correctly identified
-// 					if (has_step1_tree) {
-// 						int nlep = 0;
-						
-//                         bool filled_fail = false;
-// 						int nele = 0, nmu = 0, ntau = 0;
-// 						for (auto* p : event->top_decays) {
-							
-// 							double min_dr = 100.0;
-// 							Particle* nearest_match = 0;
-// 							bool has_match = false;
-							
-							
-// 							int abs_id = std::abs(p->id);
-							
-// 							if (abs_id == 11) {
-// 								nele += 1;
-// 							}
-// 							if (abs_id == 13) {
-// 								nmu += 1;
-// 							}
-// 							if (abs_id == 15) {
-// 								ntau += 1;
-// 							}
-							
-// 							//leptons
-// 							if (abs_id == 11 || abs_id == 13 || abs_id == 15) {
-// 								nlep += 1;
-								
-// 								for (auto* l : orig_leptons) {
-// 									double dr = l->p4.DeltaR(p->p4);
-									
-// 									if (dr < 0.3 && dr < min_dr) {
-// 										has_match = true;
-// 									}
-									
-// 									if (dr < min_dr) {
-// 										min_dr = dr;
-// 										nearest_match = l;
-// 									}
-// 								}
-								
-// 								if (!has_match) {
-//                                     assert(nearest_match != 0);
-// 									//cout << "lepton " << t.EVENT_.run << " " << t.EVENT_.lumi << " " << t.EVENT_.event << endl;
-//                                     if (!filled_fail) {
-//                                        h_failreasons_cat->Fill(FailReason::NO_LEPTON, cat, w);
-//                                        filled_fail = true;
-//                                     }
+                    hs.h_nmatched_wqq->Fill(nmatched, w);
 
-// 									h_unmatched_lepton_pt->Fill(nearest_match->p4.Pt(), p->p4.Pt(), w);
-// 									h_unmatched_lepton_eta->Fill(nearest_match->p4.Eta(), p->p4.Eta(), w);
-// 									h_unmatched_lepton_dr->Fill(min_dr, w);
-// 									h_unmatched_lepton_id->Fill(abs_id, std::abs(nearest_match->id), w);
-// 								}
-// 							}
-// 						} //top decays
-						
-// 						h_nlep_gen_reco->Fill(nlep, t.nLep_, w);
-// 					}
-//                 } //btag lr cat 1 (H)
+                    int selcomb = t.perm_to_gen_[t.selected_comb];
+                    bool q1_match_selcomb = perm_maps::get_n(selcomb, 4);
+                    bool q2_match_selcomb = perm_maps::get_n(selcomb, 5);
+
+                    hs.h_nmatched_wqq_selected->Fill(q1_match_selcomb + q2_match_selcomb, w);
+
+                    if (sample.step1Enabled) {
+                        vector<Particle*> w_quarks;
+                        for (int i=0; i<4; i++) {
+                            int id = abs(event->top_decays[i]->id);
+                            if (id<=6) {
+                                w_quarks.push_back(event->top_decays[i]);
+                                //cout << "q " << event->top_decays[i]->p4.Pt()
+                                //    << " " << event->top_decays[i]->p4.Eta()
+                                //    << " " << event->top_decays[i]->p4.Phi()
+                                //    << " " << event->top_decays[i]->id
+                                //    << endl;
+                            }
+                        }
+
+                        //for (int i=0; i<t.nJet_; i++) {
+                        //    TLorentzVector v(1.0, 0.0, 0.0, 1.0);
+                        //    v.SetPtEtaPhiM(t.jet_pt_[i], t.jet_eta_[i], t.jet_phi_[i], t.jet_m_[i]); 
+
+                        //    //cout << "j " << v.Pt()
+                        //    //    << " " << v.Eta()
+                        //    //    << " " << v.Phi()
+                        //    //    << " " << t.jet_id_[i]
+                        //    //    << endl;
+                        //}
+
+                        int nmatched_quarks = 0;
+                        for (unsigned int nq=0; nq < w_quarks.size(); nq++) {
+                            auto* q = w_quarks[nq];
+                            bool match = false;
+
+							//First two jets are leptons
+                            for (int i=2; i<t.nJet_; i++) {
+                                TLorentzVector v(1.0, 0.0, 0.0, 1.0);
+                                v.SetPtEtaPhiM(t.jet_pt_[i], t.jet_eta_[i], t.
+                                    jet_phi_[i], t.jet_m_[i]); 
+                                double dr = q->p4.DeltaR(v);
+
+                                if (dr < 0.3) {
+                                    match = true;
+                                    nmatched_quarks += 1;
+                                    break;
+                                }
+                            }
+                            if (!match) {
+                                hs.h_unmatched_wqq_pt->Fill(q->p4.Pt(), w);
+                                hs.h_unmatched_wqq_eta->Fill(q->p4.Eta(), w);
+                            } else {
+                                hs.h_matched_wqq_pt->Fill(q->p4.Pt(), w);
+                                hs.h_matched_wqq_eta->Fill(q->p4.Eta(), w);
+                            }
+                        } //loop over quarks
+
+                        hs.h_nmatched_tagging_wqq->Fill(nmatched, nmatched_quarks, w);
+                    } //step1 enabled
+                } //CAT1
 				
                 
                 hs.h_proc->Fill(2);
+
+                if (outtree_s1 != 0) {
+                    outtree_s1->Fill();
+                }
+                if (outtree_s2 != 0) {
+                    outtree_s2->Fill();
+                }
             } //btag_lr_cat 1 (H) and has ME
 		
 			//delete event;
@@ -999,6 +682,13 @@ int main(int argc, const char* argv[])
         
         outfile->cd();
         
+        if (outtree_s1 != 0) {
+            outtree_s1->SetDirectory(outfile);
+        }
+        if (outtree_s2 != 0) {
+            outtree_s2->SetDirectory(outfile);
+        }
+
         for(auto& kv : hs.histmap) {
             const std::string& k = kv.first;
             TH1* h = kv.second;

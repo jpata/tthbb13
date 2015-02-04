@@ -20,7 +20,10 @@ public:
 	std::vector<Particle*> parents;
 	std::vector<Particle*> children;
 	
-	Particle(double pt, double eta, double phi, double m, int _id, int _idx, const std::vector<Particle*> _parents, const std::vector<Particle*> _children);
+	Particle(double pt, double eta, double phi, double m, int _id, int _idx,
+		const std::vector<Particle*> _parents,
+		const std::vector<Particle*> _children
+	);
 	
 	Particle(double pt, double eta, double phi, double m, int _id, int _idx);
 	Particle(double pt, double eta, double phi, double m, int _id);

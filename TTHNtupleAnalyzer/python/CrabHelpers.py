@@ -38,8 +38,9 @@ def submit(name,
     template.config.General.requestName = "{0}_{1}_{2}".format(name, version, sample_shortname)
     template.config.JobType.psetName = cmssw_config_path + cmssw_config_script
     template.config.Data.inputDataset = Samples[sample_shortname]
-    #template.config.Data.unitsPerJob = Samples_lumi.get(sample_shortname, 90)
-    template.config.Data.unitsPerJob = 90
+    #For very large samples, e.g tt + jets, a low file count can overflow CRAB3s built-in job limit of 13k
+    template.config.Data.unitsPerJob = Samples_lumi.get(sample_shortname, 90)
+    #template.config.Data.unitsPerJob = 90
     template.config.Site.storageSite = site
 
     if blacklist:
@@ -53,7 +54,7 @@ def submit(name,
     print "Created config for", sample_shortname
     print "Now calling crab submit"
 
-    #subprocess.call(["crab", "submit", "-c", "c_tmp.py"])
+    subprocess.call(["crab", "submit", "-c", "c_tmp.py"])
 # End of submit
 
 
@@ -115,7 +116,7 @@ def download(name,
 # get LFN
 #######################################
 
-def get_lfn(name, sample_shortname, version, status_dict, file_output=True, chunksize=500):
+def get_lfn(name, sample_shortname, version, status_dict, file_output=True, chunksize=100):
     """ Gets the LFNs of successful crab jobs.
 
     Uses `crab getoutput --dump` to successively get the output LFN of all
@@ -144,25 +145,41 @@ def get_lfn(name, sample_shortname, version, status_dict, file_output=True, chun
     working_dir = "crab_{0}_{1}_{2}/crab_{0}_{1}_{2}".format(name, version, sample_shortname)
 
     lfns = {}
+    nchunk = 0
     for ch in chunks(status_dict.keys(), chunksize):
-        ch = filter(lambda x: status_dict[x]["State"] == "finished", ch)
+        ch = sorted(filter(lambda x: status_dict[x]["State"] == "finished", ch))
         ret = -1
         nretries = 0
-        while ret != 0    :
-            of = open("crab.stdout", "w")
-            ret = subprocess.call(["crab", "getoutput", "-d", working_dir, "--dump", "--wait=120", "--jobids=" + ",".join(ch)] , stdout=of)
-            of.close()
-            nretries += 1
-            if nretries > 10:
-                raise Exception("ERROR: could not get output" + "".join(open("crab.stdout", "r").readlines()))
-        of = open("crab.stdout", "r")
-        lines = "".join(of.readlines())
-        lines = lines.split("===")
-        for line in lines:
-            m = re.match(".*job ([0-9]+)\n.*\nLFN: (/.*root)\n", line)
-            if m:
-                lfns[int(m.group(1))] = m.group(2)
-        print "got", len(lfns), "items"
+        curlfns = {}
+        while ret != 0 or len(curlfns) != len(ch):
+            try:
+                print "getting LFN for chunk ", nchunk, len(ch)
+                of = open("crab.stdout", "w")
+                ret = subprocess.call(["crab", "getoutput", "-d", working_dir, "--dump", "--wait=120", "--jobids=" + ",".join(ch)] , stdout=of)
+                #print "crab getoutput call", ret
+                of.close()
+                nretries += 1
+                if nretries > 10:
+                    raise Exception("ERROR: could not get output" + "".join(open("crab.stdout", "r").readlines()))
+                of = open("crab.stdout", "r")
+                lines = "".join(of.readlines())
+                #print lines
+                if len(lines) == 0:
+                    raise Exception("ERROR: could not get output, stdout was empty")
+                lines = lines.split("===")
+                for line in lines:
+                    m = re.match(".*job ([0-9]+).*\n.*\n.*LFN.* (/.*root).*", line)
+                    if m:
+                        curlfns[int(m.group(1))] = m.group(2)
+                if len(curlfns) == 0:
+                    raise Exception("Could not match any LFN using regex, probably CRAB3 output has changed")
+                print "got {0} LFNs".format(len(curlfns))
+            except Exception as e:
+                print e
+        nchunk += 1
+        lfns.update(curlfns)
+    ch = filter(lambda x: status_dict[x]["State"] == "finished", status_dict.keys())
+    assert(len(lfns) == len(ch))
     return lfns
 # End of get LFN
 
