@@ -239,8 +239,11 @@ void fill_fatjet_branches(const edm::Event& iEvent,
 
   // Handle to get the Shower Deconstruction info
   edm::Handle<edm::ValueMap<double> > fatjet_sd_chi;
-  if (fj_sds_name != "None")
+  edm::Handle<edm::ValueMap<int> > fatjet_sd_nmj;
+  if (fj_sds_name != "None"){
     iEvent.getByLabel(fj_sds_name, "chi", fatjet_sd_chi);
+    iEvent.getByLabel(fj_sds_name, "nmicrojets", fatjet_sd_nmj);
+  }
 
   // b-tag discriminators handle
   edm::Handle<reco::JetTagCollection> btagDiscriminators;
@@ -275,8 +278,10 @@ void fill_fatjet_branches(const edm::Event& iEvent,
     tthtree->get_address<float *>(prefix + "tau3")[n_fat_jet] = fatjet_nsub_tau3->get(n_fat_jet);
 
     // Shower Deconstruction
-    if (fj_sds_name != "None")
+    if (fj_sds_name != "None"){
       tthtree->get_address<float *>(prefix + "chi")[n_fat_jet] = fatjet_sd_chi->get(n_fat_jet);
+      tthtree->get_address<int *>(prefix   + "nmj")[n_fat_jet] = fatjet_sd_nmj->get(n_fat_jet);
+    }
 
     // B-tag
     if (fj_btags_name != "None")

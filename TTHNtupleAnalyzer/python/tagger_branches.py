@@ -167,7 +167,7 @@ for fj_name in li_fatjets_branches:
             "pt", "eta", "phi", "mass",  # Kinematics
             "tau1", "tau2", "tau3",      # N-subjettiness
             "btag",                      # b-tag discriminator
-            "chi",                       # Shower deconstruction chi
+            "chi", "nmj",                # Shower deconstruction chi and number of microjets
                                          # (only fill for ca08 and ca15 wo grooming at the moment)
             "qvol",                      # Qjet volatility
                                          # (only fill for ca08 and ca15 wo grooming at the moment)
@@ -177,10 +177,10 @@ for fj_name in li_fatjets_branches:
             ]:
 
         # Don't do chi unless we have the unfiltered fatjets
-        if (branch_name in ["chi", "qvol"]) and not (fj_name in ["ca08","ca15"]):
+        if (branch_name in ["chi", "nmj", "qvol"]) and not (fj_name in ["ca08","ca15"]):
             continue
 
-        if branch_name in ["close_higgs_i", "close_hadtop_i", "close_parton_i"]:
+        if branch_name in ["close_higgs_i", "close_hadtop_i", "close_parton_i", "nmj"]:
             the_type = "int"
         else:
             the_type = "float"

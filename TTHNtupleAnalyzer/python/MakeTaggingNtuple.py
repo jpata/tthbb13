@@ -30,6 +30,17 @@ if socket.gethostname() == "t3ui12":
 # on the Grid
 else:
     import AccessHelpers as AH
+    
+    try:
+        from HiggsTaggers_cfg import li_fatjets_branches as higgs_fj_branches
+    except:
+        higgs_fj_branches = []
+
+    try:
+        from Taggers_cfg import li_fatjets_branches as top_fj_branches
+    except:
+        top_fj_branches = []
+
 
 
 ########################################
