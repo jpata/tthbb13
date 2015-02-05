@@ -1,7 +1,7 @@
 #sample branches file for headergen.py
 #uses branch classes from headergen
 from TTH.TTHNtupleAnalyzer.headergen import *
-from TTH.TTHNtupleAnalyzer.Taggers_cfg import li_fatjets_branches
+from TTH.TTHNtupleAnalyzer.Taggers_cfg import li_fatjets_branches, li_ungroomed_fatjets_branches 
 
 defines.extend(["#define ADD_TRUE_TOP_MATCHING_FOR_FJ 1",
                 "#define ADD_TRUE_TOP_MATCHING_FOR_HTT 1",
@@ -168,16 +168,16 @@ for fj_name in li_fatjets_branches:
             "tau1", "tau2", "tau3",      # N-subjettiness
             "btag",                      # b-tag discriminator
             "chi", "nmj",                # Shower deconstruction chi and number of microjets
-                                         # (only fill for ca08 and ca15 wo grooming at the moment)
+                                         # (only fill for ungroomed)
             "qvol",                      # Qjet volatility
-                                         # (only fill for ca08 and ca15 wo grooming at the moment)
+                                         # (only fill for ungroomed)
             "close_hadtop_pt",  "close_hadtop_dr", "close_hadtop_i", # top truth matching
             "close_parton_pt",  "close_parton_dr", "close_parton_i", # parton truth matching
             "close_higgs_pt",   "close_higgs_dr",  "close_higgs_i"   # higgs truth matching
             ]:
 
         # Don't do chi unless we have the unfiltered fatjets
-        if (branch_name in ["chi", "nmj", "qvol"]) and not (fj_name in ["ca08","ca15"]):
+        if (branch_name in ["chi", "nmj", "qvol"]) and not (fj_name in li_ungroomed_fatjets_branches):
             continue
 
         if branch_name in ["close_higgs_i", "close_hadtop_i", "close_parton_i", "nmj"]:
@@ -214,7 +214,7 @@ htt_sj_float_branches =  ["energy", "eta", "mass", "phi", "pt"]
 
 htt_sj_int_branches =  ["parent_idx"]
 
-for htt_name in ["looseMultiRHTT"]:
+for htt_name in ["looseMultiRHTT", "looseMultiRHTTpuppi"]:
 
     # How many objects do we have?
     tagger_counter_name = "n__jet_{0}".format(htt_name)
@@ -261,7 +261,7 @@ cmstt_sj_float_branches =  ["energy", "eta", "mass", "phi", "pt"]
 
 cmstt_sj_int_branches =  ["parent_idx"]
 
-for cmstt_name in ["ca08cmstt", "ca15cmstt"]:
+for cmstt_name in ["ca08cmstt", "ca15cmstt", 'ca08puppicmstt',  'ca15puppicmstt']:
 
     # How many objects do we have?
     tagger_counter_name = "n__jet_{0}".format(cmstt_name)

@@ -103,11 +103,16 @@ for fj in li_fatjets:
     objects[fj] = fj_branches
 
 # And some extras
-objects["ca08"]           = fj_branches_plus
-objects["ca15"]           = fj_branches_plus
-objects["ca08cmstt"]      = cmstt_branches
-objects["ca15cmstt"]      = cmstt_branches
-objects["looseMultiRHTT"] = htt_branches
+objects["ca08"]                = fj_branches_plus
+objects["ca15"]                = fj_branches_plus
+objects["ca08puppi"]           = fj_branches_plus
+objects["ca15puppi"]           = fj_branches_plus
+objects["ca08cmstt"]           = cmstt_branches
+objects["ca15cmstt"]           = cmstt_branches
+objects["ca08puppicmstt"]      = cmstt_branches
+objects["ca15puppicmstt"]      = cmstt_branches
+objects["looseMultiRHTT"]      = htt_branches
+objects["looseMultiRHTTpuppi"] = htt_branches
 
 
 # Matching DeltaR for the varipus object types
@@ -117,7 +122,7 @@ for object_name in objects.keys():
         object_drs[object_name] = 0.6
     elif "ca15" in object_name:
         object_drs[object_name] = 1.2
-    elif object_name == "looseMultiRHTT":
+    elif "looseMultiRHTT" in object_name:
         object_drs[object_name] = 1.2
     else:
         print "No delta R defined for", object_name
