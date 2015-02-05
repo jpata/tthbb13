@@ -150,6 +150,9 @@ variable_types = {}
 # Tree to store the output variables in
 outtree = ROOT.TTree("tree", "tree")
 
+# Setup branch for distance jet-truth particle
+AH.addScalarBranches(variables, variable_types, outtree, ["dr"], datatype = 'float')
+
 # Setup the output branches for the event info
 for k,v in event_infos.iteritems():
     AH.addScalarBranches(variables,
@@ -157,7 +160,6 @@ for k,v in event_infos.iteritems():
                          outtree,
                          [k],
                          datatype = v[1])
-
 
 # Setup the output branches for the true object
 AH.addScalarBranches(variables,
@@ -244,13 +246,16 @@ for i_event in range(n_entries):
 
             if len(dr_and_pos):
                 # Now extract the closest jet and use it to fill the branches
-                i_matched = sorted(dr_and_pos, key=lambda x:x[0])[0][1]
+                closest_dr_and_pos = sorted(dr_and_pos, key=lambda x:x[0])[0]
+                i_matched = closest_dr_and_pos[1]
 
+                variables["dr"][0] = closest_dr_and_pos[0]
                 for branch_name in branch_names:
                     full_branch_in  = "jet_{0}__{1}".format(object_name, branch_name)
                     full_branch_out = "{0}_{1}".format(object_name, branch_name)
                     variables[full_branch_out][0] = AH.getter(intree, full_branch_in)[i_matched]                    
             else:
+                variables["dr"][0] = 9999.
                 for branch_name in branch_names:
                     full_branch_out = "{0}_{1}".format(object_name, branch_name)
                     variables[full_branch_out][0] = DEF_VAL_FLOAT
