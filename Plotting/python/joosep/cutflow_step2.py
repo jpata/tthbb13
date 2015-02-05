@@ -7,64 +7,45 @@ process.fwliteInput = cms.PSet(
 	outFile = cms.string("outfile.root"),
 	elePt=cms.double(-1),
 	muPt=cms.double(-1),
-							   
+
     samples = cms.VPSet([
         cms.PSet(
-            fileName=cms.string("/Users/joosep/Documents/tth/step2/s1_nov19_3a4602f__s2_b7e13a1/MEAnalysis_all_rec_std_TTHBB125_p1.root"),
-            step1FileName=cms.untracked.string("/Users/joosep/Documents/tth/step1/nov19_3a4602f/tthbb.root"),
+            fileNamesS1=cms.vstring(["/home/joosep/mac-docs/tth/data/TTHbb_s1_5b21f5f_tth_hbb_13tev.root"]),
+            fileNamesS2=cms.vstring(["/home/joosep/mac-docs/tth/data/tthbb.root"]),
             nickName=cms.string("tthbb_13TeV"),
+            fractionToProcess=cms.double(1.0),
+            totalEvents=cms.int64(-1),
             type=cms.int32(3),
-            process=cms.int32(0)
+            process=cms.int32(0),
+            skip=cms.bool(False),
         ),
         cms.PSet(
-            fileName=cms.string("/Users/joosep/Documents/tth/step2/s1_nov19_3a4602f__s2_b7e13a1/MEAnalysis_all_rec_std_TTHBB125_p1_elept40.root"),
-            step1FileName=cms.untracked.string("/Users/joosep/Documents/tth/step1/nov19_3a4602f/tthbb.root"),
-            nickName=cms.string("tthbb_13TeV_elePt40"),
+            fileNamesS1=cms.vstring([]),
+            fileNamesS2=cms.vstring(["/home/joosep/mac-docs/tth/data/ttjets.root"]),
+            nickName=cms.string("ttjets_13TeV"),
+            fractionToProcess=cms.double(0.1),
+            totalEvents=cms.int64(-1),
             type=cms.int32(3),
-            process=cms.int32(0)
+            process=cms.int32(1),
+            skip=cms.bool(False),
         ),
-#        cms.PSet(
-#                 fileName=cms.string("/Users/joosep/MEAnalysis_all_rec_std_TTHBB125_p1.root"),
-#				 step1FileName=cms.untracked.string("/Users/joosep/Documents/tth/step1/nov19_3a4602f/tthbb.root"),
-#                 nickName=cms.string("tthbb_13TeV_noskim"),
-#                 type=cms.int32(3),
-#                 process=cms.int32(0)
-#        ),
-     #    cms.PSet(
-     #             fileName=cms.string("/Users/joosep/Documents/tth/step2/s1_nov19_3a4602f__s2_b7e13a1/ttjets.root"),
-				 # step1FileName=cms.untracked.string("/Users/joosep/Documents/tth/step1/nov19_3a4602f/ttjets.root"),
-     #             nickName=cms.string("ttjets_13TeV"),
-     #             type=cms.int32(3),
-     #             process=cms.int32(1),
-				 # maxEvents=cms.untracked.int32(1000000),
-     #    ),
-     #    cms.PSet(
-     #             fileName=cms.string("/Users/joosep/Documents/tth/Apr23_2014/MEAnalysisNew_all_rec_std_TTH125.root"),
-     #             nickName=cms.string("tthbb_8TeV_ME"),
-     #             type=cms.int32(1),
-     #             process=cms.int32(0)
-     #    ),
-     #    cms.PSet(
-     #             fileName=cms.string("/Users/joosep/Documents/tth/Apr23_2014/MEAnalysisNew_all_rec_std_TTJets_nC.root"),
-     #             nickName=cms.string("ttjets_8TeV_ME"),
-     #             type=cms.int32(1),
-     #             process=cms.int32(1),
-				 # maxEvents=cms.untracked.int32(1000000),
-     #    ),
-     #    cms.PSet(
-     #             fileName=cms.string("/Users/joosep/Documents/tth/MEAnalysisNew_all_ntuplizeAll_v3_rec_std_TTH125.root"),
-     #             nickName=cms.string("tthbb_8TeV_noME"),
-     #             type=cms.int32(0),
-     #             process=cms.int32(0)
-                 
-     #    ),
-     #    cms.PSet(
-     #             fileName=cms.string("/Users/joosep/Documents/tth/MEAnalysisNew_all_ntuplizeAll_v3_rec_std_TTJets_nC.root"),
-     #             nickName=cms.string("ttjets_8TeV_noME"),
-     #             type=cms.int32(0),
-     #             process=cms.int32(1),
-				 # maxEvents=cms.untracked.int32(1000000),
-     #    ),
         ]),
-evLimits=cms.vint32(0, -1)
+    evLimits=cms.vint64(0, -1)
 )
+
+# import os
+# if "FILE_NAMES" in os.environ.keys():
+#     fns = os.environ["FILE_NAMES"].split()
+#     for sample in process.fwliteInput.samples:
+#         if sample.fileName.value() in fns:
+#             sample.skip = False
+#             print "Enabling", sample.nickName
+#         else:
+#             print "Skipping", sample.nickName
+#             sample.skip = True
+
+#     process.fwliteInput.evLimits = cms.vint64(
+#         int(os.environ["SKIP_EVENTS"]),
+#         int(os.environ["SKIP_EVENTS"] + os.environ["MAX_EVENTS"])
+#     )
+#     process.fwliteInput.outFile = cms.string("outfile_{0}.root".format(os.environ["MY_JOBID"]))

@@ -36,9 +36,9 @@
 //HEADERGEN_DEFINES
 
 //checks if a branch variable is undefined
-inline bool is_undef(int x) { return x==DEF_VAL_INT; };
-inline bool is_undef(float x) { return fabs(x-DEF_VAL_FLOAT) < FLOAT_EPS; };
-inline bool is_undef(double x) { return fabs(x-DEF_VAL_DOUBLE) < DOUBLE_EPS; };
+//inline bool is_undef(int x) { return x==DEF_VAL_INT; };
+//inline bool is_undef(float x) { return fabs(x-DEF_VAL_FLOAT) < FLOAT_EPS; };
+//inline bool is_undef(double x) { return fabs(x-DEF_VAL_DOUBLE) < DOUBLE_EPS; };
 
 
 //macros to initialize 1D and 2D (square) arrays
@@ -131,6 +131,7 @@ public:
     int n__met_shift;
     int n__jet;
 	int n__lep;
+	int n__tau;
 
     //number of primary vertices
 	int n__pv;
@@ -307,7 +308,41 @@ public:
 	int sig_lep__id[N_MAX];
 	int sig_lep__idx[N_MAX];
 	int sig_lep__type[N_MAX];
+	float tau__pt[N_MAX];
+	float tau__eta[N_MAX];
+	float tau__phi[N_MAX];
+	float tau__mass[N_MAX];
+	float tau__pf_jet__pt[N_MAX];
+	float tau__pf_jet__eta[N_MAX];
+	float tau__pf_jet__phi[N_MAX];
+	float tau__pf_jet__mass[N_MAX];
+	float tau__pf_cjet__pt[N_MAX];
+	float tau__pf_cjet__eta[N_MAX];
+	float tau__pf_cjet__phi[N_MAX];
+	float tau__pf_cjet__mass[N_MAX];
+	float tau__lead_ch_had__pt[N_MAX];
+	float tau__dxy[N_MAX];
+	float tau__vtx__z[N_MAX];
+	float tau__id__ch_iso[N_MAX];
+	float tau__id__n_iso[N_MAX];
+	float tau__id__puc[N_MAX];
+	int tau__id[N_MAX];
+	int tau__id_bitmask[N_MAX];
+	int tau__dmode[N_MAX];
+	int tau__charge[N_MAX];
+	float gen_tau_lep__pt[N_MAX];
+	float gen_tau_jet__pt[N_MAX];
+	float gen_tau_lep__eta[N_MAX];
+	float gen_tau_jet__eta[N_MAX];
+	float gen_tau_lep__phi[N_MAX];
+	float gen_tau_jet__phi[N_MAX];
+	float gen_tau_lep__mass[N_MAX];
+	float gen_tau_jet__mass[N_MAX];
+	int gen_tau_lep__id[N_MAX];
+	int gen_tau_jet__id[N_MAX];
+	float jet__bd_tchp[N_MAX];
 	float jet__bd_csv[N_MAX];
+	float jet__bd_cisvv2[N_MAX];
 	float jet__ce_e[N_MAX];
 	float jet__ch_e[N_MAX];
 	float jet__el_e[N_MAX];
@@ -508,6 +543,7 @@ public:
 		n__jet = DEF_VAL_INT;
 		
 		n__lep = DEF_VAL_INT;
+		n__tau = DEF_VAL_INT;
 		n__tr  = DEF_VAL_INT;
 		n__pv  = DEF_VAL_INT;
 		n__pvi = DEF_VAL_INT;
@@ -678,7 +714,41 @@ public:
 		SET_ZERO(sig_lep__id, N_MAX, DEF_VAL_INT);
 		SET_ZERO(sig_lep__idx, N_MAX, DEF_VAL_INT);
 		SET_ZERO(sig_lep__type, N_MAX, DEF_VAL_INT);
+		SET_ZERO(tau__pt, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(tau__eta, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(tau__phi, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(tau__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(tau__pf_jet__pt, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(tau__pf_jet__eta, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(tau__pf_jet__phi, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(tau__pf_jet__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(tau__pf_cjet__pt, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(tau__pf_cjet__eta, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(tau__pf_cjet__phi, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(tau__pf_cjet__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(tau__lead_ch_had__pt, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(tau__dxy, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(tau__vtx__z, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(tau__id__ch_iso, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(tau__id__n_iso, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(tau__id__puc, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(tau__id, N_MAX, DEF_VAL_INT);
+		SET_ZERO(tau__id_bitmask, N_MAX, DEF_VAL_INT);
+		SET_ZERO(tau__dmode, N_MAX, DEF_VAL_INT);
+		SET_ZERO(tau__charge, N_MAX, DEF_VAL_INT);
+		SET_ZERO(gen_tau_lep__pt, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(gen_tau_jet__pt, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(gen_tau_lep__eta, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(gen_tau_jet__eta, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(gen_tau_lep__phi, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(gen_tau_jet__phi, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(gen_tau_lep__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(gen_tau_jet__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(gen_tau_lep__id, N_MAX, DEF_VAL_INT);
+		SET_ZERO(gen_tau_jet__id, N_MAX, DEF_VAL_INT);
+		SET_ZERO(jet__bd_tchp, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet__bd_csv, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet__bd_cisvv2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet__ce_e, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet__ch_e, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet__el_e, N_MAX, DEF_VAL_FLOAT);
@@ -859,6 +929,7 @@ public:
 		tree->Branch("n__jet", &n__jet, "n__jet/I");
 		
 		tree->Branch("n__lep", &n__lep, "n__lep/I");
+		tree->Branch("n__tau", &n__tau, "n__tau/I");
 		tree->Branch("n__pv", &n__pv, "n__pv/I");
 		tree->Branch("n__pvi", &n__pvi, "n__pvi/I");
 		tree->Branch("n__tr", &n__tr, "n__tr/I");
@@ -1048,7 +1119,41 @@ public:
 		tree->Branch("sig_lep__id", sig_lep__id, "sig_lep__id[n__sig_lep]/I");
 		tree->Branch("sig_lep__idx", sig_lep__idx, "sig_lep__idx[n__sig_lep]/I");
 		tree->Branch("sig_lep__type", sig_lep__type, "sig_lep__type[n__sig_lep]/I");
+		tree->Branch("tau__pt", tau__pt, "tau__pt[n__tau]/F");
+		tree->Branch("tau__eta", tau__eta, "tau__eta[n__tau]/F");
+		tree->Branch("tau__phi", tau__phi, "tau__phi[n__tau]/F");
+		tree->Branch("tau__mass", tau__mass, "tau__mass[n__tau]/F");
+		tree->Branch("tau__pf_jet__pt", tau__pf_jet__pt, "tau__pf_jet__pt[n__tau]/F");
+		tree->Branch("tau__pf_jet__eta", tau__pf_jet__eta, "tau__pf_jet__eta[n__tau]/F");
+		tree->Branch("tau__pf_jet__phi", tau__pf_jet__phi, "tau__pf_jet__phi[n__tau]/F");
+		tree->Branch("tau__pf_jet__mass", tau__pf_jet__mass, "tau__pf_jet__mass[n__tau]/F");
+		tree->Branch("tau__pf_cjet__pt", tau__pf_cjet__pt, "tau__pf_cjet__pt[n__tau]/F");
+		tree->Branch("tau__pf_cjet__eta", tau__pf_cjet__eta, "tau__pf_cjet__eta[n__tau]/F");
+		tree->Branch("tau__pf_cjet__phi", tau__pf_cjet__phi, "tau__pf_cjet__phi[n__tau]/F");
+		tree->Branch("tau__pf_cjet__mass", tau__pf_cjet__mass, "tau__pf_cjet__mass[n__tau]/F");
+		tree->Branch("tau__lead_ch_had__pt", tau__lead_ch_had__pt, "tau__lead_ch_had__pt[n__tau]/F");
+		tree->Branch("tau__dxy", tau__dxy, "tau__dxy[n__tau]/F");
+		tree->Branch("tau__vtx__z", tau__vtx__z, "tau__vtx__z[n__tau]/F");
+		tree->Branch("tau__id__ch_iso", tau__id__ch_iso, "tau__id__ch_iso[n__tau]/F");
+		tree->Branch("tau__id__n_iso", tau__id__n_iso, "tau__id__n_iso[n__tau]/F");
+		tree->Branch("tau__id__puc", tau__id__puc, "tau__id__puc[n__tau]/F");
+		tree->Branch("tau__id", tau__id, "tau__id[n__tau]/I");
+		tree->Branch("tau__id_bitmask", tau__id_bitmask, "tau__id_bitmask[n__tau]/I");
+		tree->Branch("tau__dmode", tau__dmode, "tau__dmode[n__tau]/I");
+		tree->Branch("tau__charge", tau__charge, "tau__charge[n__tau]/I");
+		tree->Branch("gen_tau_lep__pt", gen_tau_lep__pt, "gen_tau_lep__pt[n__tau]/F");
+		tree->Branch("gen_tau_jet__pt", gen_tau_jet__pt, "gen_tau_jet__pt[n__tau]/F");
+		tree->Branch("gen_tau_lep__eta", gen_tau_lep__eta, "gen_tau_lep__eta[n__tau]/F");
+		tree->Branch("gen_tau_jet__eta", gen_tau_jet__eta, "gen_tau_jet__eta[n__tau]/F");
+		tree->Branch("gen_tau_lep__phi", gen_tau_lep__phi, "gen_tau_lep__phi[n__tau]/F");
+		tree->Branch("gen_tau_jet__phi", gen_tau_jet__phi, "gen_tau_jet__phi[n__tau]/F");
+		tree->Branch("gen_tau_lep__mass", gen_tau_lep__mass, "gen_tau_lep__mass[n__tau]/F");
+		tree->Branch("gen_tau_jet__mass", gen_tau_jet__mass, "gen_tau_jet__mass[n__tau]/F");
+		tree->Branch("gen_tau_lep__id", gen_tau_lep__id, "gen_tau_lep__id[n__tau]/I");
+		tree->Branch("gen_tau_jet__id", gen_tau_jet__id, "gen_tau_jet__id[n__tau]/I");
+		tree->Branch("jet__bd_tchp", jet__bd_tchp, "jet__bd_tchp[n__jet]/F");
 		tree->Branch("jet__bd_csv", jet__bd_csv, "jet__bd_csv[n__jet]/F");
+		tree->Branch("jet__bd_cisvv2", jet__bd_cisvv2, "jet__bd_cisvv2[n__jet]/F");
 		tree->Branch("jet__ce_e", jet__ce_e, "jet__ce_e[n__jet]/F");
 		tree->Branch("jet__ch_e", jet__ch_e, "jet__ch_e[n__jet]/F");
 		tree->Branch("jet__el_e", jet__el_e, "jet__el_e[n__jet]/F");
@@ -1241,6 +1346,7 @@ public:
 		tree->SetBranchAddress("met__pt__en_up", &met__pt__en_up);
 		tree->SetBranchAddress("n__jet", &n__jet);
 		tree->SetBranchAddress("n__lep", &n__lep);
+		tree->SetBranchAddress("n__tau", &n__tau);
 		tree->SetBranchAddress("n__pv", &n__pv);
 		tree->SetBranchAddress("n__pvi", &n__pvi);
 		tree->SetBranchAddress("n__sig_lep", &n__sig_lep);
@@ -1409,7 +1515,41 @@ public:
 		tree->SetBranchAddress("sig_lep__id", sig_lep__id);
 		tree->SetBranchAddress("sig_lep__idx", sig_lep__idx);
 		tree->SetBranchAddress("sig_lep__type", sig_lep__type);
+		tree->SetBranchAddress("tau__pt", tau__pt);
+		tree->SetBranchAddress("tau__eta", tau__eta);
+		tree->SetBranchAddress("tau__phi", tau__phi);
+		tree->SetBranchAddress("tau__mass", tau__mass);
+		tree->SetBranchAddress("tau__pf_jet__pt", tau__pf_jet__pt);
+		tree->SetBranchAddress("tau__pf_jet__eta", tau__pf_jet__eta);
+		tree->SetBranchAddress("tau__pf_jet__phi", tau__pf_jet__phi);
+		tree->SetBranchAddress("tau__pf_jet__mass", tau__pf_jet__mass);
+		tree->SetBranchAddress("tau__pf_cjet__pt", tau__pf_cjet__pt);
+		tree->SetBranchAddress("tau__pf_cjet__eta", tau__pf_cjet__eta);
+		tree->SetBranchAddress("tau__pf_cjet__phi", tau__pf_cjet__phi);
+		tree->SetBranchAddress("tau__pf_cjet__mass", tau__pf_cjet__mass);
+		tree->SetBranchAddress("tau__lead_ch_had__pt", tau__lead_ch_had__pt);
+		tree->SetBranchAddress("tau__dxy", tau__dxy);
+		tree->SetBranchAddress("tau__vtx__z", tau__vtx__z);
+		tree->SetBranchAddress("tau__id__ch_iso", tau__id__ch_iso);
+		tree->SetBranchAddress("tau__id__n_iso", tau__id__n_iso);
+		tree->SetBranchAddress("tau__id__puc", tau__id__puc);
+		tree->SetBranchAddress("tau__id", tau__id);
+		tree->SetBranchAddress("tau__id_bitmask", tau__id_bitmask);
+		tree->SetBranchAddress("tau__dmode", tau__dmode);
+		tree->SetBranchAddress("tau__charge", tau__charge);
+		tree->SetBranchAddress("gen_tau_lep__pt", gen_tau_lep__pt);
+		tree->SetBranchAddress("gen_tau_jet__pt", gen_tau_jet__pt);
+		tree->SetBranchAddress("gen_tau_lep__eta", gen_tau_lep__eta);
+		tree->SetBranchAddress("gen_tau_jet__eta", gen_tau_jet__eta);
+		tree->SetBranchAddress("gen_tau_lep__phi", gen_tau_lep__phi);
+		tree->SetBranchAddress("gen_tau_jet__phi", gen_tau_jet__phi);
+		tree->SetBranchAddress("gen_tau_lep__mass", gen_tau_lep__mass);
+		tree->SetBranchAddress("gen_tau_jet__mass", gen_tau_jet__mass);
+		tree->SetBranchAddress("gen_tau_lep__id", gen_tau_lep__id);
+		tree->SetBranchAddress("gen_tau_jet__id", gen_tau_jet__id);
+		tree->SetBranchAddress("jet__bd_tchp", jet__bd_tchp);
 		tree->SetBranchAddress("jet__bd_csv", jet__bd_csv);
+		tree->SetBranchAddress("jet__bd_cisvv2", jet__bd_cisvv2);
 		tree->SetBranchAddress("jet__ce_e", jet__ce_e);
 		tree->SetBranchAddress("jet__ch_e", jet__ch_e);
 		tree->SetBranchAddress("jet__el_e", jet__el_e);
@@ -1570,74 +1710,8 @@ public:
         //HEADERGEN_BRANCH_SETADDRESS
 
 	}
-	
-	Event* as_event() {
-		std::vector<Particle*> particles;
-		std::vector<Particle*> jets;
-		std::vector<Particle*> gen_jets;
-		std::vector<Particle*> top_decay;
-		std::vector<Particle*> higgs_decay;
-		std::vector<Particle*> leptons;
-		std::vector<Particle*> gen_leptons;
-		
-		for (int i=0;i < n__jet; i++) {
-			Particle* jet = new Particle(jet__pt[i], jet__eta[i], jet__phi[i], jet__mass[i], jet__id[i], i);
-			particles.push_back(jet);
-			jets.push_back(jet);
-		}
-		
-		for (int i=0;i < n__jet; i++) {
-			Particle* jet = new Particle(gen_jet__pt[i], gen_jet__eta[i], gen_jet__phi[i], gen_jet__mass[i], gen_jet__id[i], i);
-			particles.push_back(jet);
-			gen_jets.push_back(jet);
-		}
-		
-		for (int i=0;i < n__lep; i++) {
-			Particle* lep = new Particle(lep__pt[i], lep__eta[i], lep__phi[i], lep__mass[i], lep__id[i], i);
-			particles.push_back(lep);
-			leptons.push_back(lep);
-		}
-		
-		for (int i=0;i < n__lep; i++) {
-			Particle* lep = new Particle(gen_lep__pt[i], gen_lep__eta[i], gen_lep__phi[i], gen_lep__mass[i], gen_lep__id[i], i);
-			particles.push_back(lep);
-			gen_leptons.push_back(lep);
-		}
-		
-		Particle* d1 = new Particle(gen_t__w_d1__pt, gen_t__w_d1__eta, gen_t__w_d1__phi, gen_t__w_d1__mass, gen_t__w_d1__id);
-		top_decay.push_back(d1);
-		particles.push_back(d1);
-		
-		Particle* d2 = new Particle(gen_t__w_d2__pt, gen_t__w_d2__eta, gen_t__w_d2__phi, gen_t__w_d2__mass, gen_t__w_d2__id);
-		top_decay.push_back(d2);
-		particles.push_back(d2);
-		;
-		Particle* d3 = new Particle(gen_tbar__w_d1__pt, gen_tbar__w_d1__eta, gen_tbar__w_d1__phi, gen_tbar__w_d1__mass, gen_tbar__w_d1__id);
-		top_decay.push_back(d3);
-		particles.push_back(d3);
-		
-		Particle* d4 = new Particle(gen_tbar__w_d2__pt, gen_tbar__w_d2__eta, gen_tbar__w_d2__phi, gen_tbar__w_d2__mass, gen_tbar__w_d2__id);
-		top_decay.push_back(d4);
-		particles.push_back(d4);
-		
-		Particle* d5 = new Particle(gen_t__b__pt, gen_t__b__eta, gen_t__b__phi, gen_t__b__mass, 5);
-		top_decay.push_back(d5);
-		particles.push_back(d5);
-		
-		Particle* d6 = new Particle(gen_tbar__b__pt, gen_tbar__b__eta, gen_tbar__b__phi, gen_tbar__b__mass, -5);
-		top_decay.push_back(d6);
-		particles.push_back(d6);
-		
-		Particle* d7 = new Particle(gen_b__pt, gen_b__eta, gen_b__phi, gen_b__mass, 5);
-		higgs_decay.push_back(d7);
-		particles.push_back(d7);
-		
-		Particle* d8 = new Particle(gen_bbar__pt, gen_bbar__eta, gen_bbar__phi, gen_bbar__mass, -5);
-		higgs_decay.push_back(d8);
-		particles.push_back(d8);
-		
-		return new Event(particles, jets, gen_jets, leptons, gen_leptons, top_decay, higgs_decay);
-	}
+
+	Event* as_event();
 };
 
 #endif

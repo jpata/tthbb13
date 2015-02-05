@@ -133,7 +133,7 @@ def kill(name,
     """Kill a single job on the Grid."""
 
     working_dir = "crab_{0}_{1}_{2}/crab_{0}_{1}_{2}".format(name, version, sample_shortname)
-    
+
     subprocess.call(["crab", "kill", "-d", working_dir])
 # End of kill
 
@@ -163,12 +163,12 @@ def download(name,
 
 
 #######################################
-# download_globus 
+# download_globus
 #######################################
 
 def download_globus(name,
                     sample_shortname,
-                    version,        
+                    version,
                     basepath,
                     user_name = "gregor",
                     glob_string = "*"):
@@ -176,11 +176,11 @@ def download_globus(name,
     """
 
     timeout = 5 # seconds
-    
+
     storage_host = "storage01.lcg.cscs.ch"
     gsiftp_base = "gsiftp://" + storage_host
     srm_base    = "srm://" + storage_host
-    user_path_on_storage = "pnfs/lcg.cscs.ch/cms/trivcat/store/user/{0}/".format(user_name)    
+    user_path_on_storage = "pnfs/lcg.cscs.ch/cms/trivcat/store/user/{0}/".format(user_name)
     local_mount_path = "/scratch/{0}/mount/storage/".format(user_name)
     output_path = os.path.join(basepath, "{0}_{1}_{2}".format(name, version, sample_shortname))
 
@@ -199,8 +199,8 @@ def download_globus(name,
     # Use glob to get the full path of the files we are interested in.
     # The structure is user_path_on_storage / full sample name / name of crab job / timestamp / i / *.root
     # i starts at 0 and each i-directory holds the output of at most 1k jobs
-    directories_to_process = glob.glob( os.path.join(local_mount_path, 
-                                                     user_path_on_storage, 
+    directories_to_process = glob.glob( os.path.join(local_mount_path,
+                                                     user_path_on_storage,
                                                      sample_name,
                                                      crab_job_name,
                                                      "*/*"))
@@ -264,7 +264,10 @@ def get_lfn(name, sample_shortname, version, status_dict, file_output=True, chun
         ret = -1
         nretries = 0
         curlfns = {}
+        if len(ch)==0:
+            continue
         while ret != 0 or len(curlfns) != len(ch):
+        #while ret != 0:
             try:
                 print "getting LFN for chunk ", nchunk, len(ch)
                 of = open("crab.stdout", "w")
@@ -273,18 +276,25 @@ def get_lfn(name, sample_shortname, version, status_dict, file_output=True, chun
                 of.close()
                 nretries += 1
                 if nretries > 10:
-                    raise Exception("ERROR: could not get output" + "".join(open("crab.stdout", "r").readlines()))
+                    print "exceeded maximum amount of retries"
+                    break
+                    #raise Exception("ERROR: could not get output" + "".join(open("crab.stdout", "r").readlines()))
                 of = open("crab.stdout", "r")
                 lines = "".join(of.readlines())
                 #print lines
                 if len(lines) == 0:
                     raise Exception("ERROR: could not get output, stdout was empty")
                 lines = lines.split("===")
+                totlines = "".join(lines)
                 for line in lines:
                     m = re.match(".*job ([0-9]+).*\n.*\n.*LFN.* (/.*root).*", line)
                     if m:
                         curlfns[int(m.group(1))] = m.group(2)
-                if len(curlfns) == 0:
+                ready = "No files to retrieve" not in totlines
+                if not ready:
+                    break
+                if ready and len(curlfns) == 0:
+                    print totlines
                     raise Exception("Could not match any LFN using regex, probably CRAB3 output has changed")
                 print "got {0} LFNs".format(len(curlfns))
             except Exception as e:
@@ -303,22 +313,22 @@ def get_lfn(name, sample_shortname, version, status_dict, file_output=True, chun
 
 def hadd(name,
          sample_shortname,
-         version,        
+         version,
          basepath = "",
          infile_glob = "*",
          outfile_suffix = ""):
     """ Hadd all root files in basepath+jobname to basepath/jobname.root"""
 
-    input_dir = basepath + "{0}_{1}_{2}/{3}".format(name, 
-                                                    version, 
+    input_dir = basepath + "{0}_{1}_{2}/{3}".format(name,
+                                                    version,
                                                     sample_shortname,
-                                                    infile_glob)    
+                                                    infile_glob)
     input_filenames = glob.glob(input_dir)
-        
-    output_filename = basepath + "{0}_{1}_{2}{3}.root".format(name, 
-                                                              version, 
+
+    output_filename = basepath + "{0}_{1}_{2}{3}.root".format(name,
+                                                              version,
                                                               sample_shortname,
-                                                              outfile_suffix)    
+                                                              outfile_suffix)
 
     subprocess.call(["hadd", "-f", output_filename] + input_filenames)
 # End of hadd
@@ -339,7 +349,7 @@ def hadd_from_file(name,
         version (string): the processing version/tag of the sample to merge
         basepath (string): the base path for output files
 
-    Returns: nothing
+    Returns: name of total root file if successful, otherwise nothing
     """
 
     input_fn = "crab_{0}_{1}_{2}/crab_{0}_{1}_{2}/files.txt".format(name, version, sample_shortname)
@@ -349,6 +359,31 @@ def hadd_from_file(name,
             output_filename = basepath + "/{0}_{1}_{2}.root".format(name, version, sample_shortname)
             #subprocess.call(["echo", "hadd", "-f", output_filename, "-n", "500"] + input_filenames)
             subprocess.call(["python", "../python/ParHadd.py", output_filename] + input_filenames)
-            return
+            return output_filename
     print "no output from {0}".format(sample_shortname)
-# End of hadd
+    return None
+# End of hadd_from_file
+
+def replicate(fname, site, path):
+    """ Replicates the files created by hadd_from_file using SRM data replication
+
+    The list of files to copy is processed by the data_replica.py script.
+
+    Args:
+        fname (string): name of the file that contains the filenames to replicate.
+        site (string): the CMS site name to copy to
+        path (string): the LFN prefix to copy to. Will be created by data_replica.py.
+
+    Returns: the return code of the data_replica.py script
+    """
+
+    return subprocess.call([
+        "python", "../python/data_replica.py",
+        "--delete",
+        "--from", "LOCAL",
+        "--to", site,
+        fname,
+        path
+        ]
+    )
+# End of replicate

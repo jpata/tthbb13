@@ -4,8 +4,16 @@ STEP1_CFG=$(CMSSW_BASE)/python/TTH/TTHNtupleAnalyzer/Main_cfg.py
 compile:
 	cd $(CMSSW_BASE); scram b -j16
 
-test:
-	cd $(CMSSW_BASE); scram b TTH/TTHNtuplAnalyzer runtests
+#test:
+#	cd $(CMSSW_BASE); scram b TTH/TTHNtuplAnalyzer runtests
+
+test: test_s1 test_s2
+
+test_s1:
+	cd $(CMSSW_BASE); LOCAL_TEST_DIR=$(CMSSW_BASE)/src/TTH/TTHNtupleAnalyzer/test $(CMSSW_BASE)/src/TTH/TTHNtupleAnalyzer/test/runtests.sh
+
+test_s2:
+	cd $(CMSSW_BASE); LOCAL_TEST_DIR=$(CMSSW_BASE)/src/TTH/MEAnalysis/test $(CMSSW_BASE)/src/TTH/MEAnalysis/test/runtests.sh
 
 debug:
 	cd $(CMSSW_BASE); scram b -j16 USER_CXXFLAGS="-DEDM_ML_DEBUG"
@@ -22,4 +30,5 @@ run_step1_ttbar:
 step1_test: run_step1_tthbb run_step1_ttbar
 
 headers:
-	python $(CMSSW_BASE)/src/TTH/TTHNtupleAnalyzer/python/headergen.py $(CMSSW_BASE)/src/TTH/MEAnalysis/interface/METree_template.hh $(CMSSW_BASE)/src/TTH/MEAnalysis/interface/METree.hh $(CMSSW_BASE)/src/TTH/MEAnalysis/python/branches.py
+	#python $(CMSSW_BASE)/src/TTH/TTHNtupleAnalyzer/python/headergen.py $(CMSSW_BASE)/src/TTH/MEAnalysis/interface/METree_template.hh $(CMSSW_BASE)/src/TTH/MEAnalysis/interface/METree.hh $(CMSSW_BASE)/src/TTH/MEAnalysis/python/branches.py
+	python $(CMSSW_BASE)/src/TTH/TTHNtupleAnalyzer/python/headergen.py $(CMSSW_BASE)/src/TTH/TTHNtupleAnalyzer/interface/tth_tree_template.hh $(CMSSW_BASE)/src/TTH/TTHNtupleAnalyzer/interface/tth_tree.hh $(CMSSW_BASE)/src/TTH/TTHNtupleAnalyzer/python/sample_branches.py

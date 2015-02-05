@@ -23,11 +23,6 @@ parser.add_argument('--site',
 	help="CMS Tier 2/3 site where commands are run"
 )
 
-parser.add_argument('--njobs',
-	type=int,
-	default=100,
-	help="Number of jobs for the signal process"
-)
 parser.add_argument('--verbose', '-v', action='count')
 args = parser.parse_args()
 
@@ -87,24 +82,31 @@ def getSplitting(path, sample, numjobs, treeName="tthNtupleAnalyzer/events"):
 		print "getSplitting for", path, sample, numjobs
 	sampleName = None
 
+	#convert nickname to name (file-name)
 	for sam in samples:
-		if sam.nickName == sample:
+		if sam.nickName.value() == sample:
 			sampleName = (sam.name).value()
+	if sampleName is None:
+		raise KeyError("could not find sample with nickname {0} in {1}".format(
+			sample,
+			[s.nickName.value() for s in samples]
+		))
 
-	fn = address1+path+sampleName+'.root'
+	fn = address1 + path + sampleName + '.root'
 
 	f = ROOT.TFile.Open(fn, 'read')
 	if f != None :
 		t = f.Get(treeName)
 		if t != None and not t.IsZombie():
 			entries = t.GetEntries()
+			print "entries =", entries
 			entries_per_job = (entries/numjobs + 1)
 		else:
 			raise Exception("Cannot open tree %s in file %s" % (treeName, fn))
 		print "\033[94mProcessing..... %s jobs will run on (%.2fK ev/job) * (%.0f job) = %.0f events (%.1f%% of %s)\033[0m" % (numjobs, float(entries_per_job)/1000., numjobs, entries_per_job*numjobs, float(entries_per_job*numjobs)/float(entries)*100, sample)
 		f.Close()
 
-		if numjobs==1:
+		if numjobs == 1:
 			return -1
 		else:
 			return int(entries_per_job)
@@ -117,12 +119,22 @@ def getSplitting(path, sample, numjobs, treeName="tthNtupleAnalyzer/events"):
 ###########################################
 
 
-def submitMEAnalysis(script,
-							sample,
-							version,
-							evLow,evHigh):
+def submitMEAnalysis(
+	script,
+	sample,
+	version,
+	evLow,evHigh
+	):
+	""" Creates the .sh and .py files to run MEAnalysis on a particular sample between evLow and evHigh.
 
-	os.system('cp $CMSSW_BASE/src/TTH/MEAnalysis/python/MEAnalysis_cfg.py ./')
+
+	Args:
+		script (string): filename of the .sh and .py file to be created
+		sample (string): the nickname of the sample to use
+		version (string): FIXME
+		evLow (int): first event to process
+		evHigh (int): last event to process
+	"""
 
 	imp.load_source("localME", "./MEAnalysis_cfg.py")
 	from localME import process
@@ -153,7 +165,7 @@ def submitMEAnalysis(script,
 
 	process.fwliteInput.outFileName		= cms.string(tempOutPath + 'MEAnalysis_'+extraoutname+script+'.root')
 	finalOutFilename						= finalOutPath + 'MEAnalysis_'+extraoutname+script+'.root'
-	process.fwliteInput.pathToFile		= cms.string(address2 + pathToFile+version + '/' )
+	#process.fwliteInput.pathToFile		= cms.string(address2 + pathToFile+version + '/' )
 	process.fwliteInput.ordering		= cms.string(ordering)
 
 
@@ -308,8 +320,13 @@ def submitMEAnalysis(script,
 	f.close()
 	os.system('chmod +x '+scriptName)
 
-	submitToQueue = subcommand+' -N job'+sample+' '+scriptName
+	if args.site == "T3_CH_PSI":
+		submitToQueue = subcommand+' -N job'+sample+' '+scriptName
+	elif args.site == "T2_EE_Estonia":
+		submitToQueue = subcommand+' -J job'+sample+' '+scriptName
 	tosubmit.write(submitToQueue + "\n")
+	os.system('chmod +x submit.sh')
+
 	#print submitToQueue
 	#os.system(submitToQueue)
 
@@ -322,36 +339,56 @@ def submitMEAnalysis(script,
 def submitFullMEAnalysis( analysis ):
 	print "Running full analysis for %s" %  (analysis)
 
+	os.system('cp $CMSSW_BASE/src/TTH/MEAnalysis/python/MEAnalysis_cfg.py ./')
+	imp.load_source("localME", "./MEAnalysis_cfg.py")
+	from localME import process
+
 	toBeRun = []
 	total_jobs = 0
+	for samp in samples:
+		perjob = samp.perJob.value() if hasattr(samp, "perJob") else 100
+		toBeRun += [(samp.nickName.value(), samp.nEvents.value() / perjob + 1)]
 
-	if args.site=="T3_CH_PSI":
-		toBeRun = [
-			["TTJets", 10 * args.njobs, ''],
-			["TTHBB125", args.njobs, '']
-			]
-	elif args.site == "T2_EE_Estonia":
-		toBeRun = [
-			["TTJets", 10 * args.njobs, ''],
-			["TTHBB125", args.njobs, '']
-			]
+	# if args.site=="T3_CH_PSI":
+	# 	toBeRun = [
+	# 		["TTJets", 10 * args.njobs, ''],
+	# 		["TTHBB125", args.njobs, '']
+	# 		]
+	# elif args.site == "T2_EE_Estonia":
+	# 	toBeRun = [
+	# 		#["TTJets", 10 * args.njobs, ''],
+	# 		["TTHBB125", args.njobs, ''],
+	# 		["TTHBB125_PU20BX25_PHYS14", args.njobs, ''],
+	# 		["TTHBB125_PU40BX50_PHYS14", args.njobs, ''],
+	# 		]
 
 	for run in toBeRun:
 		print "running", run
 		counter	= 0
 		sample= run[0]
 		num_of_jobs = run[1]
-		version	= run[2]
-		evs_per_job = getSplitting(pathToFile+version+ordering , sample, num_of_jobs )
+
+		evs_per_job = getSplitting(
+			process.fwliteInput.pathToFile.value() + ordering,
+			sample,
+			num_of_jobs
+		)
+
 		if evs_per_job==-2:
 			print "Error in getSplitting.. please check again."
 			continue
 		for i in range(num_of_jobs):
 			counter = counter + 1
-			submitMEAnalysis(analysis+'_'+sample+'_p'+str(counter), sample,  version,  i*evs_per_job, (i+1)*evs_per_job )
+			submitMEAnalysis(
+				analysis + '_' + sample + '_p' + str(counter),
+				sample,
+				"",
+				i*evs_per_job,
+				(i+1)*evs_per_job
+			)
 			total_jobs += 1
 
-	print "Total jobs submitted.....%d" % total_jobs
+	print "Total jobs created.....%d" % total_jobs
 
 ###########################################
 ###########################################
