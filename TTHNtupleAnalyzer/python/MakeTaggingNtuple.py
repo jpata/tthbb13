@@ -58,7 +58,7 @@ else:
 # Determine particle species
 # Tier3
 if socket.gethostname() == "t3ui12":
-    particle_name = "higgs"
+    particle_name = "hadtop"
 # Grid
 else:
     import PSet
@@ -73,21 +73,24 @@ else:
 
     print "Initial MiniAOD filename:", initial_miniAOD_filename
     print "Determined particle_name:", particle_name
-        
 
+
+# Event Info
+# Dictionary of event info branches to add
+# key -> branch name to use for storing
+# value -> list[branch name in input, data type]
+event_infos = {"npv" : ["n__pv", "int"]}
+        
 particle_branches = ["pt", "eta", "phi", "mass"]
 
 # "Normal" branches for most fatjet collections
-fj_branches = ["pt", "mass", "tau1", "tau2", "tau3", 
-               #"btag", "qvol"
-               ]
+fj_branches = ["pt", "mass", "tau1", "tau2", "tau3"]
+
 # Extended fj branches, including
 #   shower deconstruction chi
 #   qjets volatility
 # (to expensive to calc for everything)
-fj_branches_plus = fj_branches + [#"chi", 
-                                  "qvol"
-]
+fj_branches_plus = fj_branches + ["chi", "qvol", "nmj"]
 
 htt_branches = ["pt", "mass", "fW", "Rmin", "RminExpected", "prunedMass", "ptFiltForRminExp"]
 cmstt_branches = ["pt", "mass", "minMass", "wMass", "topMass", "nSubJets"]
@@ -147,6 +150,15 @@ variable_types = {}
 # Tree to store the output variables in
 outtree = ROOT.TTree("tree", "tree")
 
+# Setup the output branches for the event info
+for k,v in event_infos.iteritems():
+    AH.addScalarBranches(variables,
+                         variable_types,
+                         outtree,
+                         [k],
+                         datatype = v[1])
+
+
 # Setup the output branches for the true object
 AH.addScalarBranches(variables,
                      variable_types,
@@ -198,6 +210,11 @@ for i_event in range(n_entries):
 
         # Reset branches
         AH.resetBranches(variables, variable_types)
+
+        # Fill Event Info Branches
+        for k,v in event_infos.iteritems():            
+            variables[k][0] = AH.getter(intree, v[0])
+            
 
         # Fill truth particle branches
         for branch_name in particle_branches:
