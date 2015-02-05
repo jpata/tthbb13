@@ -454,15 +454,17 @@ private:
 	const edm::EDGetTokenT<LHEEventProduct> lheToken_;
 
 	// the output tree
-	TTHTree* tthtree;
-	TNamed* config_dump;
+	TTHTree* tthtree = 0;
+
+	//Save the full configuration dump as a string
+	TNamed* config_dump = 0;
 	const edm::Service<TFileService> fs;
 
-	//a histogram with event counts	
-	TH1D* hcounter;
+	//a histogram with event counts
+	TH1D* hcounter = 0;
 
 	// a watch for CPU monitoring
-	TStopwatch* sw;
+	TStopwatch* sw = 0;
 
 	//const ElectronEffectiveArea::ElectronEffectiveAreaType electron_eff_area_type = ElectronEffectiveArea::ElectronEffectiveAreaType::kEleGammaAndNeutralHadronIso03;
 	//const ElectronEffectiveArea::ElectronEffectiveAreaType electron_eff_area_target = ElectronEffectiveArea::ElectronEffectiveAreaTarget::kEleEAData2012;
@@ -490,10 +492,10 @@ private:
   	const double	genPartonPt_min_;
         const int       genPartonStatus_;
 
-	JetCorrectorParameters* jetCorrPars;
-	JetCorrectionUncertainty* jetCorrUnc;
+	JetCorrectorParameters* jetCorrPars = 0;
+	JetCorrectionUncertainty* jetCorrUnc = 0;
 	const edm::EDGetTokenT<double> rhoSrc_;
-
+	const bool jecsFromFile;
 };
 
 
@@ -553,15 +555,23 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
 	elePt_min_ (iConfig.getUntrackedParameter<double>("elePt_min", 5.)),
 	tauPt_min_ (iConfig.getUntrackedParameter<double>("tauPt_min", 5.)),
 	genPartonPt_min_(iConfig.getUntrackedParameter<double>("genPartonPt_min", 200.)),
-        genPartonStatus_(iConfig.getUntrackedParameter<int>("genPartonStatus", 23)),
-
-	jetCorrPars(new JetCorrectorParameters(iConfig.getParameter<edm::FileInPath>("jecFile").fullPath().c_str(), "Total")),
-	jetCorrUnc(new JetCorrectionUncertainty(*jetCorrPars)),
-	rhoSrc_(consumes<double>(iConfig.getParameter<edm::InputTag>("rho")))
+	genPartonStatus_(iConfig.getUntrackedParameter<int>("genPartonStatus", 23)),
+	rhoSrc_(consumes<double>(iConfig.getParameter<edm::InputTag>("rho"))),
+	jecsFromFile(iConfig.getUntrackedParameter<bool>("jecsFromFile", true))
 {
 	tthtree->make_branches();
-	
+
+	//If enabled, load JECs from supplied file instead of DB (in event loop)
+	if (jecsFromFile) {
+		jetCorrPars = new JetCorrectorParameters(iConfig.getParameter<edm::FileInPath>("jecFile").fullPath().c_str(), "Total");
+		assert(jetCorrPars != 0);
+		jetCorrUnc = new JetCorrectionUncertainty(*jetCorrPars);
+		assert(jetCorrUnc != 0);
+	}
+
+	//Keep track of the processed events
 	hcounter->GetXaxis()->SetBinLabel(1, "TTHNtupleAnalyzer__processed");
+	//Keep track of the events that pass the cuts inside the ntuplizer (if any)
 	hcounter->GetXaxis()->SetBinLabel(2, "TTHNtupleAnalyzer__passed");
 
 	sw = new TStopwatch();
@@ -580,6 +590,17 @@ void TTHNtupleAnalyzer::finalizeLoop() {
 void
 TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
+	//FIXME: Loading the jet correction factors from the DB currently results in a segfault
+	//later in jetCorrUnc->setJetEta
+	//For the moment, stick to file-based loading (jecsFromFile)
+	if (!jecsFromFile) {
+		edm::ESHandle<JetCorrectorParametersCollection> JetCorParColl;
+		iSetup.get<JetCorrectionsRecord>().get("AK4PF",JetCorParColl);
+		JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];
+		jetCorrUnc = new JetCorrectionUncertainty(JetCorPar);
+		assert(jetCorrUnc != 0);
+	}
+
 	//fill analyzed
 	hcounter->SetBinContent(1, hcounter->GetBinContent(1)+1);
 	using namespace edm;
@@ -1173,9 +1194,10 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 				minDpT = dpT;
 			}
 		}
-		
-		jetCorrUnc->setJetEta(x.eta());	
-		jetCorrUnc->setJetPt(x.pt());	
+	
+		assert(jetCorrUnc != 0);
+		jetCorrUnc->setJetEta(x.eta());
+		jetCorrUnc->setJetPt(x.pt());
 		const double unc = jetCorrUnc->getUncertainty(true);
 		
 		LogDebug("jets") << "n__jet=" << n__jet << CANDPRINT(x) << " puid=" << x.userFloat("pileupJetId:fullDiscriminant") << " unc=" << unc;
@@ -1186,7 +1208,9 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		tthtree->jet__phi			[n__jet] = x.phi();
 		tthtree->jet__mass			[n__jet] = x.mass();
 		tthtree->jet__energy		[n__jet] = x.energy();
+		tthtree->jet__bd_tchp		[n__jet] = x.bDiscriminator("trackCountingHighPurBJetTags");
 		tthtree->jet__bd_csv		[n__jet] = x.bDiscriminator("combinedSecondaryVertexBJetTags");
+		tthtree->jet__bd_cisvv2		[n__jet] = x.bDiscriminator("combinedInclusiveSecondaryVertexV2BJetTags");
 		tthtree->jet__id			[n__jet] = x.partonFlavour();
 		tthtree->jet__unc			[n__jet] = unc;
 

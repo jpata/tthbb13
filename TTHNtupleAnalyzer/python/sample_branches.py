@@ -88,7 +88,9 @@ for t in ["charge", "id", "idx", "type"]:
     ]
 
 for t in [
+    "bd_tchp",
     "bd_csv",
+    "bd_cisvv2",
     "ce_e",
     "ch_e",
     "el_e",

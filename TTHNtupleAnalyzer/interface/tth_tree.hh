@@ -307,7 +307,9 @@ public:
 	int sig_lep__id[N_MAX];
 	int sig_lep__idx[N_MAX];
 	int sig_lep__type[N_MAX];
+	float jet__bd_tchp[N_MAX];
 	float jet__bd_csv[N_MAX];
+	float jet__bd_cisvv2[N_MAX];
 	float jet__ce_e[N_MAX];
 	float jet__ch_e[N_MAX];
 	float jet__el_e[N_MAX];
@@ -678,7 +680,9 @@ public:
 		SET_ZERO(sig_lep__id, N_MAX, DEF_VAL_INT);
 		SET_ZERO(sig_lep__idx, N_MAX, DEF_VAL_INT);
 		SET_ZERO(sig_lep__type, N_MAX, DEF_VAL_INT);
+		SET_ZERO(jet__bd_tchp, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet__bd_csv, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet__bd_cisvv2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet__ce_e, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet__ch_e, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet__el_e, N_MAX, DEF_VAL_FLOAT);
@@ -1048,7 +1052,9 @@ public:
 		tree->Branch("sig_lep__id", sig_lep__id, "sig_lep__id[n__sig_lep]/I");
 		tree->Branch("sig_lep__idx", sig_lep__idx, "sig_lep__idx[n__sig_lep]/I");
 		tree->Branch("sig_lep__type", sig_lep__type, "sig_lep__type[n__sig_lep]/I");
+		tree->Branch("jet__bd_tchp", jet__bd_tchp, "jet__bd_tchp[n__jet]/F");
 		tree->Branch("jet__bd_csv", jet__bd_csv, "jet__bd_csv[n__jet]/F");
+		tree->Branch("jet__bd_cisvv2", jet__bd_cisvv2, "jet__bd_cisvv2[n__jet]/F");
 		tree->Branch("jet__ce_e", jet__ce_e, "jet__ce_e[n__jet]/F");
 		tree->Branch("jet__ch_e", jet__ch_e, "jet__ch_e[n__jet]/F");
 		tree->Branch("jet__el_e", jet__el_e, "jet__el_e[n__jet]/F");
@@ -1409,7 +1415,9 @@ public:
 		tree->SetBranchAddress("sig_lep__id", sig_lep__id);
 		tree->SetBranchAddress("sig_lep__idx", sig_lep__idx);
 		tree->SetBranchAddress("sig_lep__type", sig_lep__type);
+		tree->SetBranchAddress("jet__bd_tchp", jet__bd_tchp);
 		tree->SetBranchAddress("jet__bd_csv", jet__bd_csv);
+		tree->SetBranchAddress("jet__bd_cisvv2", jet__bd_cisvv2);
 		tree->SetBranchAddress("jet__ce_e", jet__ce_e);
 		tree->SetBranchAddress("jet__ch_e", jet__ch_e);
 		tree->SetBranchAddress("jet__el_e", jet__el_e);
