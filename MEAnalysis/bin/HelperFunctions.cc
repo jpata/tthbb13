@@ -736,12 +736,16 @@ float weightError( TTree* tree, float pt, float eta, float& scale_){
 }
 
 BTagLikelihood::BTagLikelihood(TFile* fCP, TString csvName) {
+  assert(fCP != 0);
   btagger[make_tuple(BTagLikelihood::EFlavour::b, BTagLikelihood::EBin::Bin0)] = fCP->Get("csv_b_Bin0__"+csvName)!=0 ? (TH1F*)fCP->Get("csv_b_Bin0__"+csvName) : 0;
   btagger[make_tuple(BTagLikelihood::EFlavour::b, BTagLikelihood::EBin::Bin1)] = fCP->Get("csv_b_Bin1__"+csvName)!=0 ? (TH1F*)fCP->Get("csv_b_Bin1__"+csvName) : 0;
   btagger[make_tuple(BTagLikelihood::EFlavour::c, BTagLikelihood::EBin::Bin0)] = fCP->Get("csv_c_Bin0__"+csvName)!=0 ? (TH1F*)fCP->Get("csv_c_Bin0__"+csvName) : 0;
   btagger[make_tuple(BTagLikelihood::EFlavour::c, BTagLikelihood::EBin::Bin1)] = fCP->Get("csv_c_Bin1__"+csvName)!=0 ? (TH1F*)fCP->Get("csv_c_Bin1__"+csvName) : 0;
   btagger[make_tuple(BTagLikelihood::EFlavour::l, BTagLikelihood::EBin::Bin0)] = fCP->Get("csv_l_Bin0__"+csvName)!=0 ? (TH1F*)fCP->Get("csv_l_Bin0__"+csvName) : 0;
   btagger[make_tuple(BTagLikelihood::EFlavour::l, BTagLikelihood::EBin::Bin1)] = fCP->Get("csv_l_Bin1__"+csvName)!=0 ? (TH1F*)fCP->Get("csv_l_Bin1__"+csvName) : 0;
+  for (auto& kv : btagger) {
+    assert(kv.second != 0); 
+  }
 }
 
 
