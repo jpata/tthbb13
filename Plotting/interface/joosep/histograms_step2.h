@@ -93,6 +93,14 @@ public:
 
 	TH2D *h_btag_lr, *h_btag_lr2, *h_btag_lr3, *h_btag_lr4;
 	TH1D *h_radmode;
+	TH2D *h_catH_radmode, *h_catL_radmode, *h_cat_radmode;
+
+    TH2D *h_rad_lr_default;
+    TH2D *h_rad_lr_cc;
+    TH2D *h_rad_lr_cc_bj;
+    TH2D *h_rad_lr_cc_bj_w;
+    TH2D *h_rad_lr_wcq;
+
 
 	Histograms(const std::string pf, SampleType sample_type);
 
