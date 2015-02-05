@@ -174,7 +174,7 @@ def doTMVA(setup):
     if "Cuts" in setup.li_methods:
 
         sample_size = { 1 :   10000,
-                        2 :   80000,
+                        2 :   80000*4,
                         3 : 4000000}
 
         factory.BookMethod( ROOT.TMVA.Types.kCuts, 

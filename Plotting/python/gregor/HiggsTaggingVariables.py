@@ -59,14 +59,16 @@ li_fjs = ['ca15',
 
 
 mass_vars = [ variable(fj+"_mass", fj, 0, 800, unit = "GeV") for fj in li_fjs   ]
-tau_vars = [ variable("{0}_tau2/{0}_tau1".format(fj), fj + "tau_{2}/tau_{1}", 0., 1.,) for fj in li_fjs   ]
+tau_vars = [ variable("{0}_tau2/{0}_tau1".format(fj), fj + "tau_{2}/tau_{1}", 0., 1., extra_cut = "{0}_tau1>0".format(fj)) for fj in li_fjs   ]
+
+variable.di['ca15_mass'].pretty_name = "Ungroomed mass"
 
 mass_vars_v5 = [
     variable('ca15trimmedr2f4_mass', "trim r2f4 m (R=1.5)", 0, 800, unit = "GeV"),
-    variable('ca15trimmedr2f6_mass', "trim r2f6 m (R=1.5)", 0, 800, unit = "GeV"),
+    variable('ca15trimmedr2f6_mass', "Trimmed (r=0.2, f=0.06) mass", 0, 800, unit = "GeV"),
     variable('ca15trimmedr2f8_mass', "trim r2f8 m (R=1.5)", 0, 800, unit = "GeV"),
     variable('ca15softdropz15b00_mass', "sd 15b00 m (R=1.5)", 0, 800, unit = "GeV"),
-    variable('ca15softdropz20b10_mass', "sd 20b10 m (R=1.5)", 0, 800, unit = "GeV"),
+    variable('ca15softdropz20b10_mass', "Softdrop(z=0.2, #beta=1) mass", 0, 800, unit = "GeV"),
     variable('ca15softdropz30b20_mass', "sd 30b20 m (R=1.5)", 0, 800, unit = "GeV"),
     variable('ca15softdropz30b30_mass', "sd 30b30 m (R=1.5)", 0, 800, unit = "GeV"),
     variable('ca15softdropz30b100_mass', "sd 30b100 m (R=1.5)", 0, 800, unit = "GeV"),
