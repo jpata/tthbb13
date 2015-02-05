@@ -366,6 +366,7 @@ public:
 	float btag_LR3;
 	float btag_LR4;
 	float btag_lr_l_bbbb;
+	float btag_lr_l_bbbj;
 	float btag_lr_l_bbcc;
 	float btag_lr_l_bbjj;
 	float btag_lr_l_bbbbcq;
@@ -651,6 +652,7 @@ public:
 		tree->Branch("btag_LR3", &btag_LR3, "btag_LR3/F");
 		tree->Branch("btag_LR4", &btag_LR4, "btag_LR4/F");
 		tree->Branch("btag_lr_l_bbbb", &btag_lr_l_bbbb, "btag_lr_l_bbbb/F");
+		tree->Branch("btag_lr_l_bbbj", &btag_lr_l_bbbj, "btag_lr_l_bbbj/F");
 		tree->Branch("btag_lr_l_bbcc", &btag_lr_l_bbcc, "btag_lr_l_bbcc/F");
 		tree->Branch("btag_lr_l_bbjj", &btag_lr_l_bbjj, "btag_lr_l_bbjj/F");
 		tree->Branch("btag_lr_l_bbbbcq", &btag_lr_l_bbbbcq, "btag_lr_l_bbbbcq/F");
@@ -824,6 +826,7 @@ public:
 		tree->SetBranchAddress("btag_LR3", &btag_LR3);
 		tree->SetBranchAddress("btag_LR4", &btag_LR4);
 		tree->SetBranchAddress("btag_lr_l_bbbb", &btag_lr_l_bbbb);
+		tree->SetBranchAddress("btag_lr_l_bbbj", &btag_lr_l_bbbj);
 		tree->SetBranchAddress("btag_lr_l_bbcc", &btag_lr_l_bbcc);
 		tree->SetBranchAddress("btag_lr_l_bbjj", &btag_lr_l_bbjj);
 		tree->SetBranchAddress("btag_lr_l_bbbbcq", &btag_lr_l_bbbbcq);
@@ -1006,6 +1009,7 @@ public:
 		btag_LR3 = DEF_VAL_FLOAT;
 		btag_LR4 = DEF_VAL_FLOAT;
 		btag_lr_l_bbbb = DEF_VAL_FLOAT;
+		btag_lr_l_bbbj = DEF_VAL_FLOAT;
 		btag_lr_l_bbcc = DEF_VAL_FLOAT;
 		btag_lr_l_bbjj = DEF_VAL_FLOAT;
 		btag_lr_l_bbbbcq = DEF_VAL_FLOAT;

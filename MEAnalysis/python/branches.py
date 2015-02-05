@@ -22,6 +22,7 @@ process += [
 	Scalar("btag_LR3", "float"),
 	Scalar("btag_LR4", "float"),
 	Scalar("btag_lr_l_bbbb", "float"),
+	Scalar("btag_lr_l_bbbj", "float"),
 	Scalar("btag_lr_l_bbcc", "float"),
 	Scalar("btag_lr_l_bbjj", "float"),
 	Scalar("btag_lr_l_bbbbcq", "float"),
