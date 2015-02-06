@@ -28,8 +28,16 @@ files = {}
 #files["qcd_470_600"]  = "ntop_v21a_qcd_470_600_pythia8_13tev-tagging"
 #files["qcd_800_1000"] = "ntop_v21_qcd_800_1000_pythia8_13tev-tagging"
 
-files["zprime_m2000"] = "ntop_v19_zprime_m2000_1p_13tev-tagging"     
-files["qcd_800_1000"] = "ntop_v19_qcd_800_1000_pythia8_13tev-tagging"
+#files["zprime_m2000"] = "ntop_v19_zprime_m2000_1p_13tev-tagging"     
+#files["qcd_800_1000"] = "ntop_v19_qcd_800_1000_pythia8_13tev-tagging"
+
+files["zprime_m750"]  = "ntop_v25_zprime_m750_1p_13tev-tagging"     
+files["zprime_m1250"] = "ntop_v25_zprime_m1250_1p_13tev-tagging"     
+files["zprime_m2000"] = "ntop_v25_zprime_m2000_1p_13tev-tagging"     
+files["qcd_170_300"]  = "ntop_v25_qcd_170_300_pythia8_13tev-tagging"
+files["qcd_470_600"]  = "ntop_v25_qcd_470_600_pythia8_13tev-tagging"
+files["qcd_800_1000"] = "ntop_v25_qcd_800_1000_pythia8_13tev-tagging"
+
 
 weighted_files = {}
 for k,v in files.iteritems():
@@ -41,24 +49,23 @@ pairs = {
     "pt-800-to-1000" : ["zprime_m2000", "qcd_800_1000"],
 }
 
-ranges = {"zprime_m750"      : [201, 299],
-          "zprime_m1000"     : [301, 469],
-          "zprime_m1250"     : [471, 599], 
-          "zprime_m2000_low" : [601, 799],
-          "zprime_m2000"     : [801, 999],
-          "zprime_m3000"     : [1001, 1399], 
-          "zprime_m4000"     : [1401, 1799],
+# [Minimal pT, Maximal pT, |eta|]
+ranges = {"zprime_m750"      : [201, 299,   2.5],
+          "zprime_m1000"     : [301, 469,   2.5],
+          "zprime_m1250"     : [471, 599,   2.2], 
+          "zprime_m2000_low" : [601, 799,   2.2],
+          "zprime_m2000"     : [801, 999,   1.8],
+          "zprime_m3000"     : [1001, 1399, 1.6], 
+          "zprime_m4000"     : [1401, 1799, 1.4],
 
-          "qcd_170_300"      : [201, 299],
-          "qcd_300_470"      : [301, 469],
-          "qcd_470_600"      : [471, 599],
-          "qcd_800_1000"     : [801, 999],
+          "qcd_170_300"      : [201, 299, 2.5],
+          "qcd_300_470"      : [301, 469, 2.5],
+          "qcd_470_600"      : [471, 599, 2.2],
+          "qcd_800_1000"     : [801, 999, 1.8],
        }
 
-
-eta_max = 1.5
 fiducial_cuts = {}
 for k,v in ranges.iteritems():
-    fiducial_cuts[k] = "((pt>{0})&&(pt<{1})&&(fabs(eta)<{2}))".format(v[0], v[1], eta_max)
+    fiducial_cuts[k] = "((pt>{0})&&(pt<{1})&&(fabs(eta)<{2}))".format(v[0], v[1], v[2])
 
 

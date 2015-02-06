@@ -13,7 +13,7 @@ We want to use flat true-pT distributions
 import pickle
 
 from TTH.Plotting.Helpers.CompareDistributionsHelpers import *
-from TTH.Plotting.gregor.TopSamples import files, ranges
+from TTH.Plotting.gregor.TopSamples import files, ranges, fiducial_cuts
 
 
 ########################################
@@ -35,7 +35,6 @@ fits = {}
 fits["zprime_m750"]      = ROOT.TF1("fit_fun_zprime","pol5",201,299)
 fits["zprime_m1000"]     = ROOT.TF1("fit_fun_zprime","pol5",301,469)
 fits["zprime_m1250"]     = ROOT.TF1("fit_fun_zprime","pol5",471,599)
-fits["zprime_m1500"]     = ROOT.TF1("fit_fun_zprime","pol5",601,799)
 fits["zprime_m2000_low"] = ROOT.TF1("fit_fun_zprime","pol5",601,799)
 fits["zprime_m2000"]     = ROOT.TF1("fit_fun_zprime","pol5",801,999)
 fits["zprime_m3000"]     = ROOT.TF1("fit_fun_zprime","pol5",1001,1499)
@@ -55,7 +54,7 @@ for qcd_name in ["qcd_170_300", "qcd_300_470", "qcd_470_600", "qcd_800_1000"]:
 eta_fits = {}
 
 for k in fits.keys():
-    eta_fits[k] = ROOT.TF1("eta_k","pol6", -1.5, 1.5)
+    eta_fits[k] = ROOT.TF1("eta_k","pol6", -1. * ranges[k][2], ranges[k][2])
 
 
 # for the filename: basepath + filename + .root
@@ -80,10 +79,14 @@ if True:
         else:
             truth_var = "parton"
 
+        pt_var = "{0}_pt".format(truth_var)
+        eta_var = "{0}_eta".format(truth_var)
+        fiducial_cut = fiducial_cuts[k].replace("pt", pt_var).replace("eta", eta_var)
+
         combinedPlot ( k + "_pt_cut",
                       [plot( k, 
-                             "{0}_pt".format(truth_var),
-                             '(({0}_pt>{1})&&({0}_pt<{2}))'.format(truth_var, ranges[k][0], ranges[k][1]), 
+                             pt_var,
+                             fiducial_cut,
                              k,
                              fit=fits[k]
                          ), 
@@ -101,8 +104,8 @@ if True:
 
         combinedPlot ( k + "_eta",
                       [plot( k, 
-                             "{0}_eta".format(truth_var),
-                             '(({0}_pt>{1})&&({0}_pt<{2}))'.format(truth_var, ranges[k][0], ranges[k][1]), 
+                             eta_var,
+                             fiducial_cut,
                              k,
                              fit=eta_fits[k]
                          ), 
