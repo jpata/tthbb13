@@ -11,6 +11,7 @@ process.fwliteInput.samples = cms.VPSet(
         name     = cms.string('tthbb_step1'),
         nickName = cms.string('TTHBB'),
         color    = cms.int32(1),
+        bdisc    = cms.int32(1), #use the old CSV discriminant
         xSec     = cms.double(1.0)
     )
 )
@@ -20,7 +21,3 @@ process.fwliteInput.ntuplizeAll = cms.untracked.int32(1)
 process.fwliteInput.outFileName = cms.string("tthbb_step2.root")
 process.fwliteInput.switchoffOL = cms.untracked.int32(0)
 process.fwliteInput.speedup     = cms.untracked.int32(0)
-#process.fwliteInput.cutLeptons = cms.untracked.bool(False)
-#process.fwliteInput.cutJets = cms.untracked.bool(False)
-#process.fwliteInput.cutWMass = cms.untracked.bool(False)
-#process.fwliteInput.cutBTagShape = cms.untracked.bool(False)
