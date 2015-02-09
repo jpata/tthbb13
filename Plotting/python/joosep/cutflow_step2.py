@@ -23,7 +23,7 @@ process.fwliteInput = cms.PSet(
             fileNamesS1=cms.vstring([]),
             fileNamesS2=cms.vstring(["/home/joosep/mac-docs/tth/data/ttjets.root"]),
             nickName=cms.string("ttjets_13TeV"),
-            fractionToProcess=cms.double(0.1),
+            fractionToProcess=cms.double(1.0),
             totalEvents=cms.int64(-1),
             type=cms.int32(3),
             process=cms.int32(1),
@@ -32,20 +32,3 @@ process.fwliteInput = cms.PSet(
         ]),
     evLimits=cms.vint64(0, -1)
 )
-
-# import os
-# if "FILE_NAMES" in os.environ.keys():
-#     fns = os.environ["FILE_NAMES"].split()
-#     for sample in process.fwliteInput.samples:
-#         if sample.fileName.value() in fns:
-#             sample.skip = False
-#             print "Enabling", sample.nickName
-#         else:
-#             print "Skipping", sample.nickName
-#             sample.skip = True
-
-#     process.fwliteInput.evLimits = cms.vint64(
-#         int(os.environ["SKIP_EVENTS"]),
-#         int(os.environ["SKIP_EVENTS"] + os.environ["MAX_EVENTS"])
-#     )
-#     process.fwliteInput.outFile = cms.string("outfile_{0}.root".format(os.environ["MY_JOBID"]))

@@ -1,5 +1,4 @@
-[/tthbb]
-/home/joosep/mac-docs/tth/data/tthbb.root = 97550 
-
-[/ttjets]
-/home/joosep/mac-docs/tth/data/ttjets.root = 25472500
+[tthbb_13TeV]
+/home/joosep/tth/tthbb.root = 97550
+[ttjets_13TeV]
+/home/joosep/tth/ttjets.root = 25472500

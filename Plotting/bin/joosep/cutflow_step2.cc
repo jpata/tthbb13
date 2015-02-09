@@ -1,4 +1,5 @@
 //#define _DEBUG
+#define NDEBUG
 
 #include "FWCore/FWLite/interface/AutoLibraryLoader.h"
 
@@ -199,43 +200,47 @@ RadiationMode classify_radiation(METree* t, Process p) {
 }
 
 TTH::EventHypothesis assing_gen_vtype(TTHTree* t) {
-	std::vector<int> w_daus;
-	w_daus.push_back(std::abs(t->gen_t__w_d1__id));
-	w_daus.push_back(std::abs(t->gen_t__w_d2__id));
-	w_daus.push_back(std::abs(t->gen_tbar__w_d1__id));
-	w_daus.push_back(std::abs(t->gen_tbar__w_d2__id));
-	
-	int nele = std::count(w_daus.begin(), w_daus.end(), 11);
-	int nmu = std::count(w_daus.begin(), w_daus.end(), 13);
-	int ntau = std::count(w_daus.begin(), w_daus.end(), 15);
-	
-	if (nmu == 2)
-		return TTH::EventHypothesis::mumu;
-	if (nele == 2)
-		return TTH::EventHypothesis::ee;
-	if (ntau == 2)
-		return TTH::EventHypothesis::tautau;
-	
-	if (nmu == 1 && nele == 1)
-		return TTH::EventHypothesis::emu;
-	
-	if (nmu == 1 && ntau == 1)
-		return TTH::EventHypothesis::taumu;
-	
-	if (nele == 1 && ntau == 1)
-		return TTH::EventHypothesis::taue;
-	
-	if (nmu == 1)
-		return TTH::EventHypothesis::mun;
-	
-	if (nele == 1)
-		return TTH::EventHypothesis::en;
+    std::vector<int> w_daus;
+    w_daus.push_back(std::abs(t->gen_t__w_d1__id));
+    w_daus.push_back(std::abs(t->gen_t__w_d2__id));
+    w_daus.push_back(std::abs(t->gen_tbar__w_d1__id));
+    w_daus.push_back(std::abs(t->gen_tbar__w_d2__id));
+    
+    int nele = std::count(w_daus.begin(), w_daus.end(), 11);
+    int nmu = std::count(w_daus.begin(), w_daus.end(), 13);
+    int ntau = std::count(w_daus.begin(), w_daus.end(), 15);
+    
+    if (nmu == 2)
+        return TTH::EventHypothesis::mumu;
+    if (nele == 2)
+        return TTH::EventHypothesis::ee;
+    if (ntau == 2)
+        return TTH::EventHypothesis::tautau;
+    
+    if (nmu == 1 && nele == 1)
+        return TTH::EventHypothesis::emu;
+    
+    if (nmu == 1 && ntau == 1)
+        return TTH::EventHypothesis::taumu;
+    
+    if (nele == 1 && ntau == 1)
+        return TTH::EventHypothesis::taue;
+    
+    if (nmu == 1)
+        return TTH::EventHypothesis::mun;
+    
+    if (nele == 1)
+        return TTH::EventHypothesis::en;
 
-	if (ntau == 1)
-		return TTH::EventHypothesis::taun;
-	return TTH::EventHypothesis::nn;
+    if (ntau == 1)
+        return TTH::EventHypothesis::taun;
+    return TTH::EventHypothesis::nn;
 }
 
+const double lambda_bb = 0.1;
+const double lambda_bj = 0.2;
+const double lambda_cc = 0.1;
+const double lambda_jj = 0.6;
 
 _INITIALIZE_EASYLOGGINGPP
 
@@ -259,18 +264,18 @@ int main(int argc, const char* argv[])
     const edm::VParameterSet& samples_pars = in.getParameter<edm::VParameterSet>("samples");
     
     //limits with [first, last] events to process, indexed by full list of samples
-	const std::vector<long long> ev_limits = in.getParameter<std::vector<long long>>("evLimits");
-	const std::string outfn = in.getParameter<std::string>("outFile");
-	const double elePt = in.getParameter<double>("elePt");
-	const double muPt = in.getParameter<double>("muPt");
+    const std::vector<long long> ev_limits = in.getParameter<std::vector<long long>>("evLimits");
+    const std::string outfn = in.getParameter<std::string>("outFile");
+    const double elePt = in.getParameter<double>("elePt");
+    const double muPt = in.getParameter<double>("muPt");
 
 
     TFile* outfile = new TFile(outfn.c_str(), "RECREATE");
-	
+    
     TTree* outtree_s1 = 0;
     TTree* outtree_s2 = 0;
-	//const double lepton_pt_min = in.getParameter<double>("leptonPtMin");
-
+    //const double lepton_pt_min = in.getParameter<double>("leptonPtMin");
+        
     TStopwatch sw;
     
     long long n_total_entries = 0;
@@ -286,32 +291,6 @@ int main(int argc, const char* argv[])
         if (sample.treeS2 != 0) {
             outtree_s2 = sample.treeS2->tree->CloneTree(0);
             outtree_s2->SetName("tree_s2");
-    for(auto& sample : samples ) {
-        
-        //LFN of sample to read
-		const string sample_fn = sample.getParameter<string>("fileName");
-		const string step1_sample_fn = sample.getUntrackedParameter<string>("step1FileName", "");
-		cout << "step1 file name: " << step1_sample_fn << endl;
-		
-        //nickname of sample (must be unique)
-		const string sample_nick = sample.getParameter<string>("nickName");
-		int max_events = sample.getUntrackedParameter<int>("maxEvents", -1);
-		
-        //sample type, which may affect the meaning/contents of the TTrees
-        const SampleType sample_type = static_cast<SampleType>(sample.getParameter<int>("type"));
-        
-        //sample type, which may affect the meaning/contents of the TTrees
-        const Process process = static_cast<Process>(sample.getParameter<int>("process"));
-        
-        TH1::SetDefaultSumw2(true);
-        make_histograms(sample_nick, sample_type);
-        
-        //cout << "sample " << sample_fn << " type " << sample_type << endl;
-        LOG(INFO) << "sample " << sample_fn << " type " << sample_type;
-        TFile* tf = new TFile(sample_fn.c_str());
-        if (tf==0 || tf->IsZombie()) {
-            std::cerr << "ERROR: could not open file " << sample_fn << " " << tf << std::endl;
-            throw std::exception();
         }
 
         TH1::SetDefaultSumw2(true);
@@ -320,14 +299,14 @@ int main(int argc, const char* argv[])
 
         //attach branches with MH=125 (for ME branch names)
         sample.treeS2->set_branch_addresses(125.0);
-		
+        
         //count number of bytes read
         long long nbytes = 0;
         long long max_events = sample.getLastEvent();
 
-		//if using less than full events, calculate weight modification to compensate
-		const double wratio = sample.treeS2->tree->GetEntries() / max_events;
-		LOG(INFO) << "wratio " << wratio;
+        //if using less than full events, calculate weight modification to compensate
+        const double wratio = sample.treeS2->tree->GetEntries() / max_events;
+        LOG(INFO) << "wratio " << wratio;
 
         if (sample.skip) {
             LOG(INFO) << "Skipping sample " << sample.nickName;
@@ -338,7 +317,7 @@ int main(int argc, const char* argv[])
             << " Njob " << n_total_entries;
         for (long long entry = sample.getFirstEvent() ;entry < max_events; entry++) {
             n_total_entries += 1;
-            
+            LOG(DEBUG) << "processing entry " << entry;
             if(n_total_entries % 10000 == 0) {
                 sw.Stop();
                 float t = sw.CpuTime();
@@ -371,16 +350,16 @@ int main(int argc, const char* argv[])
                 LOG(ERROR) << "failed to read entry " << entry << " " << nb;
                 continue;
             }
-			
-			//keep only nominal events
-			if (!(t.syst_ == 0)) {
-				hs.h_cutreasons->Fill(SYST+1);
-				continue;
-			}
-			
+            
+            //keep only nominal events
+            if (!(t.syst_ == 0)) {
+                hs.h_cutreasons->Fill(SYST+1);
+                continue;
+            }
+            
             const double w = t.weight_ * wratio;
 
-			Event* event = 0;
+            Event* event = 0;
 
             //reco vtype
             const TTH::EventHypothesis vt = static_cast<TTH::EventHypothesis>(t.Vtype_);
@@ -394,7 +373,7 @@ int main(int argc, const char* argv[])
                 continue;
             }
 
-			hs.h_radmode->Fill(rad, w);
+            hs.h_radmode->Fill(rad, w);
 
             //keep only events for which Blr was calculated
             if (!(t.btag_LR >= 0)) {
@@ -402,19 +381,19 @@ int main(int argc, const char* argv[])
                 continue;
             }
 
-			//Single lepton cuts
+            //Single lepton cuts
             if (is_sl) {
-				const float lep_pt1 = t.lepton_pt_[0];
-				//const float lep_id = t.lepton_id_[0];
+                const float lep_pt1 = t.lepton_pt_[0];
+                //const float lep_id = t.lepton_id_[0];
                 hs.h_lep_pt_sl->Fill(lep_pt1, w);
-				
+                
                 //Offline cut on lepton
-				if (vt == TTH::EventHypothesis::en) {
-					if (elePt>0 && lep_pt1 < elePt) {
-						hs.h_cutreasons->Fill(LEPTON+1);
+                if (vt == TTH::EventHypothesis::en) {
+                    if (elePt>0 && lep_pt1 < elePt) {
+                        hs.h_cutreasons->Fill(LEPTON+1);
                         continue;
-					}
-				}
+                    }
+                }
                 else if (vt == TTH::EventHypothesis::mun) {
                     if (muPt > 0 && lep_pt1 < muPt) {
                         hs.h_cutreasons->Fill(LEPTON+1);
@@ -428,10 +407,10 @@ int main(int argc, const char* argv[])
                 }
                 
                 hs.h_lep_riso_sl->Fill(t.lepton_rIso_[0], w);
-				hs.h_btag_lr_sl->Fill(t.btag_LR, w);
-				hs.h_btag_lr_sl2->Fill(t.btag_LR, w);
+                hs.h_btag_lr_sl->Fill(t.btag_LR, w);
+                hs.h_btag_lr_sl2->Fill(t.btag_LR, w);
             }
-			
+            
             //dilepton cuts
             if (is_dl) {
                 const float lep_pt1 = t.lepton_pt_[0];
@@ -441,16 +420,16 @@ int main(int argc, const char* argv[])
                 const float lep_pt2 = t.lepton_pt_[1];
                 const int lep_id2 = abs(t.lepton_type_[1]);
                 hs.h_lep2_pt_dl->Fill(lep_pt2, w);
-				
-				if (vt == TTH::EventHypothesis::ee || vt == TTH::EventHypothesis::taue) {
-					if (elePt>0 &&
+                
+                if (vt == TTH::EventHypothesis::ee || vt == TTH::EventHypothesis::taue) {
+                    if (elePt>0 &&
                         ((lep_id1 == 11 && lep_pt1 < elePt) ||
                         (lep_id2 == 11 && lep_pt2 < elePt))
                     ) {
-						hs.h_cutreasons->Fill(LEPTON+1);
+                        hs.h_cutreasons->Fill(LEPTON+1);
                         continue;
-					}
-				}
+                    }
+                }
                 else if (vt == TTH::EventHypothesis::mumu || vt == TTH::EventHypothesis::taumu) {
                     if (muPt>0 &&
                         ((lep_id1 == 13 && lep_pt1 < muPt) ||
@@ -470,7 +449,7 @@ int main(int argc, const char* argv[])
                         hs.h_cutreasons->Fill(LEPTON+1);
                     }
                 }
-				
+                
                 hs.h_nt_dl->Fill(t.numBTagM_, w);
 
                 if (t.numBTagM_ >= 2) {
@@ -479,8 +458,8 @@ int main(int argc, const char* argv[])
                 
                 hs.h_lep1_riso_dl->Fill(t.lepton_rIso_[0], w);
                 hs.h_lep2_riso_dl->Fill(t.lepton_rIso_[1], w);
-				hs.h_btag_lr_dl->Fill(t.btag_LR, w);
-				hs.h_btag_lr_dl2->Fill(t.btag_LR, w);
+                hs.h_btag_lr_dl->Fill(t.btag_LR, w);
+                hs.h_btag_lr_dl2->Fill(t.btag_LR, w);
             }
 
 
@@ -491,19 +470,19 @@ int main(int argc, const char* argv[])
             max_perm[0] = -1.0;
             max_perm[1] = -1.0;
 
-			//get trigger flags
-			const bool* trf = t.triggerFlags_;
-			
-			hs.h_triggers->Fill(0.0, w);
-			bool trig_mu = trf[22]==1 || trf[23]==1 || trf[14]==1 || trf[21]==1;
-			bool trig_ele = trf[44]==1;
-			if (trig_mu) {
-				hs.h_triggers->Fill(1.0, w);
-			}
-			if (trig_ele) {
-				hs.h_triggers->Fill(2.0, w);
-			}
-						
+            //get trigger flags
+            const bool* trf = t.triggerFlags_;
+            
+            hs.h_triggers->Fill(0.0, w);
+            bool trig_mu = trf[22]==1 || trf[23]==1 || trf[14]==1 || trf[21]==1;
+            bool trig_ele = trf[44]==1;
+            if (trig_mu) {
+                hs.h_triggers->Fill(1.0, w);
+            }
+            if (trig_ele) {
+                hs.h_triggers->Fill(2.0, w);
+            }
+                        
             hs.h_Vtype->Fill(t.Vtype_, w);
             hs.h_type->Fill(t.type_, w);
 
@@ -512,32 +491,50 @@ int main(int argc, const char* argv[])
             hs.h_btag_lr3->Fill(t.btag_LR3, rad, w);
             hs.h_btag_lr4->Fill(t.btag_LR4, rad, w);
 
-			hs.h_cat_btag_lr->Fill(cat, t.btag_LR, w);
-			hs.h_vtype_btag_lr->Fill(t.Vtype_, t.btag_LR, w);
-			
+            hs.h_cat_btag_lr->Fill(cat, t.btag_LR, w);
+            hs.h_vtype_btag_lr->Fill(t.Vtype_, t.btag_LR, w);
+            
             //passes btag LR cut
             int btag_lr_cat = is_btag_lr_high_low(&t, cat);
-			
-			
-			//H
+            
+            hs.h_cat_radmode->Fill(cat, rad, w);
+
+            const double lr_default = t.btag_lr_l_bbbb / (t.btag_lr_l_bbbb + t.btag_lr_l_bbjj);
+            const double lr_cc = lambda_bb * t.btag_lr_l_bbbb / (lambda_bb * t.btag_lr_l_bbbb + (1.0 - lambda_bb - lambda_cc) * t.btag_lr_l_bbjj + lambda_cc * t.btag_lr_l_bbcc);
+            const double lr_cc_bj = t.btag_lr_l_bbbb / (t.btag_lr_l_bbbb + t.btag_lr_l_bbbj + t.btag_lr_l_bbjj + t.btag_lr_l_bbcc);
+            const double lr_cc_bj_w = lambda_bb * t.btag_lr_l_bbbb / (lambda_bb * t.btag_lr_l_bbbb + lambda_bj * t.btag_lr_l_bbbj + lambda_jj * t.btag_lr_l_bbjj + lambda_cc * t.btag_lr_l_bbcc);
+            const double lr_wcq = (t.btag_lr_l_bbbb + t.btag_lr_l_bbbbcq) / (t.btag_lr_l_bbbb + t.btag_lr_l_bbbbcq + t.btag_lr_l_bbjj + t.btag_lr_l_bbjjcq);
+           
+            if (t.numJets_ >= 6) {
+                hs.h_radmode->Fill(rad, w);
+                hs.h_rad_lr_default  -> Fill(rad, lr_default, w);
+                hs.h_rad_lr_cc       -> Fill(rad, lr_cc, w);
+                hs.h_rad_lr_cc_bj    -> Fill(rad, lr_cc_bj, w);
+                hs.h_rad_lr_cc_bj_w  -> Fill(rad, lr_cc_bj_w, w);
+                hs.h_rad_lr_wcq      -> Fill(rad, lr_wcq, w);
+            }
+             
+            //H
             if (btag_lr_cat == 1) {
                 hs.h_catH->Fill(cat, w);
-				//h_cat_rad_modeH->Fill(cat, rad_mode, w);
-			//L
+                hs.h_catH_radmode->Fill(cat, rad, w);
+                //h_cat_rad_modeH->Fill(cat, rad_mode, w);
+            //L
             } else if (btag_lr_cat == 0) {
                 hs.h_catL->Fill(cat, w);
-				//h_cat_rad_modeL->Fill(cat, rad_mode, w);
+                hs.h_catL_radmode->Fill(cat, rad, w);
+                //h_cat_rad_modeL->Fill(cat, rad_mode, w);
             }
-			
-			//H or L
-			if (btag_lr_cat >= 0) {
-				hs.h_cat->Fill(cat, w);
-				hs.h_vtype_cat->Fill(t.Vtype_, cat, w);
-				hs.h_cat_time->Fill(cat, t.time_, w);
+            
+            //H or L
+            if (btag_lr_cat >= 0) {
+                hs.h_cat->Fill(cat, w);
+                hs.h_vtype_cat->Fill(t.Vtype_, cat, w);
+                hs.h_cat_time->Fill(cat, t.time_, w);
 
-				//h_cat_rad_mode->Fill(cat, rad_mode, w);
-			}
-			
+                //h_cat_rad_mode->Fill(cat, rad_mode, w);
+            }
+            
             if (btag_lr_cat == 1 && (sample.type == ME_8TEV || sample.type == ME_13TEV)) {
 
                 if (sample.step1Enabled) {
@@ -586,37 +583,29 @@ int main(int argc, const char* argv[])
                     hs.h_discr->Fill(me_discr, w);
                     hs.h_cat_discr->Fill(cat, me_discr, w);
                 }
-				
-				// //number of events with correct permutation, signal and background hypo
-
-            //cat*H
-            if (btag_lr_cat == 1 && (sample_type == ME_8TEV || sample_type == ME_13TEV)) {
-                double me_discr = clip_value(
-                    t.probAtSgn_ /
-                    (t.probAtSgn_ + 0.02 * t.probAtSgn_alt_), 0.0, 1.0
-                );
                 
-                h_cat_discr->Fill(cat, me_discr, w);
-                				
-				//number of events with correct permutation, signal and background hypo
-				// //keep track of the best permutation (most matches)
-				int best_perm = 0;
-				int n_best_perm = 0;
+                // //number of events with correct permutation, signal and background hypo
+                int n_correct_perm_s = 0;
+                //int n_correct_perm_b = 0;
+                
+                // //keep track of the best permutation (most matches)
+                int best_perm = 0;
+                int n_best_perm = 0;
                 //int idx_best_perm = -1;
 
                 for (int np=0; np < t.nPermut_; np++) {
-					const int perm = t.perm_to_gen_[np];
+                    const int perm = t.perm_to_gen_[np];
                     if (is_correct_perm(perm, cat, sample.process)) {
                         n_correct_perm_s += 1;
                     }
 
                     //number of particles matched out of 6
-					int _n = perm_maps::count_matched(perm);
-					if (_n > n_best_perm) {
-						n_best_perm = _n;
-						best_perm = perm;
+                    int _n = perm_maps::count_matched(perm);
+                    if (_n > n_best_perm) {
+                        n_best_perm = _n;
+                        best_perm = perm;
                         //idx_best_perm = np;
-					}
+                    }
                 }
 
                 //if (cat == CAT1 || cat == CAT2 || cat == CAT3) {
@@ -641,11 +630,13 @@ int main(int argc, const char* argv[])
                     hs.h_nmatched_wqq_selected->Fill(q1_match_selcomb + q2_match_selcomb, w);
 
                     if (sample.step1Enabled) {
+                        LOG(DEBUG) << "Wqq loop";
                         vector<Particle*> w_quarks;
-                        for (int i=0; i<4; i++) {
-                            int id = abs(event->top_decays[i]->id);
+                        for (unsigned int i=0; i < event->w_decays.size(); i++) {
+                            LOG(DEBUG) << "Wqq loop " << i << " " << event->w_decays.size() << " " << event->w_decays[i];
+                            int id = abs(event->w_decays[i]->id);
                             if (id<=6) {
-                                w_quarks.push_back(event->top_decays[i]);
+                                w_quarks.push_back(event->w_decays[i]);
                                 //cout << "q " << event->top_decays[i]->p4.Pt()
                                 //    << " " << event->top_decays[i]->p4.Eta()
                                 //    << " " << event->top_decays[i]->p4.Phi()
@@ -653,54 +644,8 @@ int main(int argc, const char* argv[])
                                 //    << endl;
                             }
                         }
-
-                        //for (int i=0; i<t.nJet_; i++) {
-                        //    TLorentzVector v(1.0, 0.0, 0.0, 1.0);
-                        //    v.SetPtEtaPhiM(t.jet_pt_[i], t.jet_eta_[i], t.jet_phi_[i], t.jet_m_[i]); 
-
-                        //    //cout << "j " << v.Pt()
-                        //    //    << " " << v.Eta()
-                        //    //    << " " << v.Phi()
-                        //    //    << " " << t.jet_id_[i]
-                        //    //    << endl;
-                        //}
-
-                        int nmatched_quarks = 0;
-                        for (unsigned int nq=0; nq < w_quarks.size(); nq++) {
-                            auto* q = w_quarks[nq];
-                            bool match = false;
-
-							//First two jets are leptons
-                            for (int i=2; i<t.nJet_; i++) {
-                                TLorentzVector v(1.0, 0.0, 0.0, 1.0);
-                                v.SetPtEtaPhiM(t.jet_pt_[i], t.jet_eta_[i], t.
-                                    jet_phi_[i], t.jet_m_[i]); 
-                                double dr = q->p4.DeltaR(v);
-
-                                if (dr < 0.3) {
-                                    match = true;
-                                    nmatched_quarks += 1;
-                                    break;
-                                }
-                            }
-                            if (!match) {
-                                hs.h_unmatched_wqq_pt->Fill(q->p4.Pt(), w);
-                                hs.h_unmatched_wqq_eta->Fill(q->p4.Eta(), w);
-                            } else {
-                                hs.h_matched_wqq_pt->Fill(q->p4.Pt(), w);
-                                hs.h_matched_wqq_eta->Fill(q->p4.Eta(), w);
-                            }
-                        } //loop over quarks
-
-                        hs.h_nmatched_tagging_wqq->Fill(nmatched, nmatched_quarks, w);
-                    } //step1 enabled
-                } //CAT1
-				
-                // check_missed_hbb(event, t2, best_perm, cat, w, orig_jets, orig_leptons);
-                // check_missed_tbb(event, t2, best_perm, cat, w, orig_jets, orig_leptons);
-                // check_missed_wqq(event, t2, best_perm, cat, w, orig_jets, orig_leptons);
-		      
-                find_match_perm(event, t2, orig_jets, orig_leptons);
+                    }
+                }
                 
                 hs.h_proc->Fill(2);
 
@@ -711,8 +656,6 @@ int main(int argc, const char* argv[])
                     outtree_s2->Fill();
                 }
             } //btag_lr_cat 1 (H) and has ME
-		
-			//delete event;
         } //entries
         
         LOG(INFO) << "read " << nbytes/1024/1024 << " Mb";

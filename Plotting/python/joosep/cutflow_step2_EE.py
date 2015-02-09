@@ -58,29 +58,29 @@ def get_n(fn):
     fi = ROOT.TFile(fn)
     return fi.Get("tree").GetEntries()
 
-#if __name__ == "__main__":
-#    import sys, ROOT
-#    if hasattr(sys, "argv") and "--create-datasets" in sys.argv:
-#        of = open("step2.dat", "w")
-#        for samp in process.fwliteInput.samples:
-#            of.write("[{0}]".format(samp.nickName.value()) + "\n")
-#            for fi in samp.fileNamesS2:
-#                of.write("{0} = {1}".format(fi, get_n(fi)) + "\n")
-#        of.close()
-#    else:
-#        import os
-#        if "FILE_NAMES" in os.environ.keys():
-#            fns = os.environ["FILE_NAMES"].split()
-#            for sample in process.fwliteInput.samples:
-#                if sample.fileName.value() in fns:
-#                    sample.skip = False
-#                    print "Enabling", sample.nickName
-#                else:
-#                    print "Skipping", sample.nickName
-#                    sample.skip = True
-#
-#            process.fwliteInput.evLimits = cms.vint64(
-#                int(os.environ["SKIP_EVENTS"]),
-#                int(os.environ["SKIP_EVENTS"] + os.environ["MAX_EVENTS"])
-#            )
-#            process.fwliteInput.outFile = cms.string("outfile_{0}.root".format(os.environ["MY_JOBID"]))
+if __name__ == "__main__":
+    import sys, ROOT
+    if hasattr(sys, "argv") and "--create-datasets" in sys.argv:
+        of = open("step2.dat", "w")
+        for samp in process.fwliteInput.samples:
+            of.write("[{0}]".format(samp.nickName.value()) + "\n")
+            for fi in samp.fileNamesS2:
+                of.write("{0} = {1}".format(fi, get_n(fi)) + "\n")
+        of.close()
+    else:
+        import os
+        if "FILE_NAMES" in os.environ.keys():
+            fns = os.environ["FILE_NAMES"].split()
+            for sample in process.fwliteInput.samples:
+                if sample.fileName.value() in fns:
+                    sample.skip = False
+                    print "Enabling", sample.nickName
+                else:
+                    print "Skipping", sample.nickName
+                    sample.skip = True
+
+            process.fwliteInput.evLimits = cms.vint64(
+                int(os.environ["SKIP_EVENTS"]),
+                int(os.environ["SKIP_EVENTS"] + os.environ["MAX_EVENTS"])
+            )
+            process.fwliteInput.outFile = cms.string("outfile_{0}.root".format(os.environ["MY_JOBID"]))

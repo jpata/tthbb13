@@ -59,7 +59,7 @@ def axis_label(var):
 	if "numJets" in var:
 		return "$N_{j}$"
 	if "numBTagM" in var:
-		return "$N_{b,CSVM}$"		
+		return "$N_{b,CSVM}$"
 	if "btag_lr" in var:
 		return "$b_{LR}$"
 	if "wqq_pt" in var:
@@ -67,6 +67,8 @@ def axis_label(var):
 	if "wqq_eta" in var:
 		return "$\\eta_{q,gen}$ of quarks from W"
 if __name__ == "__main__":
+
+	tf = ROOT.TFile(sys.argv[1])
 	variables = [
 		"lepton_pt_sl", "lepton1_pt_dl", "lepton2_pt_dl",
 		"numJets_sl", "numJets_dl",
@@ -132,7 +134,6 @@ if __name__ == "__main__":
 
 			c = ROOT.TCanvas("c", "c", 800, 800)
 			st = ROOT.THStack()
-			
 			st.Add(h1)
 			st.Add(h2)
 

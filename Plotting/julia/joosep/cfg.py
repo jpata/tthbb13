@@ -48,6 +48,14 @@ process.fwliteInput = cms.PSet(
            color    = cms.int32(1),
            xSec     = cms.double(1.0)
        ),
+#        cms.PSet(
+#            skip     = cms.bool(True),
+#            name     = cms.string('ttbar_step1'),
+#            #name     = cms.string('122'),
+#            nickName = cms.string('TTJets'),
+#            color    = cms.int32(1),
+#            xSec     = cms.double(1.0)
+#        ),
     ),
 
     # the target luminosity (used to calculate the 'weight' variable)

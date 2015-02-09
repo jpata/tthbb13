@@ -142,4 +142,13 @@ Histograms::Histograms(const std::string pf, SampleType sample_type) {
     h_btag_lr3 = add_hist_2d<TH2D>(histmap, pf + "btag_lr3_rad", 0, 1, 2000, 0, 5, 5);
     h_btag_lr4 = add_hist_2d<TH2D>(histmap, pf + "btag_lr4_rad", 0, 1, 2000, 0, 5, 5);
     h_radmode = add_hist_1d<TH1D>(histmap, pf + "radmode", 0, 5);
+    h_catH_radmode = add_hist_2d<TH2D>(histmap, pf + "catH_radmode", 0, 8, 8, 0, 5, 5);
+    h_catL_radmode = add_hist_2d<TH2D>(histmap, pf + "catL_radmode", 0, 8, 8, 0, 5, 5);
+    h_cat_radmode = add_hist_2d<TH2D>(histmap, pf + "cat_radmode", 0, 8, 8, 0, 5, 5);
+    
+    h_rad_lr_default = add_hist_2d<TH2D>(histmap, pf + "cat1_rad_lr", 0, 5, 5, 0.0, 1.0, 10000);
+    h_rad_lr_cc = add_hist_2d<TH2D>(histmap, pf + "cat1_rad_lr_cc", 0, 5, 5, 0.0, 1.0, 10000);
+    h_rad_lr_cc_bj = add_hist_2d<TH2D>(histmap, pf + "cat1_rad_lr_cc_bj", 0, 5, 5, 0.0, 1.0, 10000);
+    h_rad_lr_cc_bj_w = add_hist_2d<TH2D>(histmap, pf + "cat1_rad_lr_cc_bj_w", 0, 5, 5, 0.0, 1.0, 10000);
+    h_rad_lr_wcq = add_hist_2d<TH2D>(histmap, pf + "cat1_rad_lr_wcq", 0, 5, 5, 0.0, 1.0, 10000);
 }

@@ -378,10 +378,16 @@ function process_sample(fn::ASCIIString)
 	df = TreeDataFrame([fn], "tthNtupleAnalyzer/events")
 
 	SetCacheSize(df.tt, 0)
-	SetCacheSize(df.tt, 256 * 1024 * 1024)
 
-	for b in df.branches
-	    AddBranchToCache(df.tt, "$b")
+	# ERROR: LoadError: TypeError: getfield: expected Symbol, got ASCIIString
+	#  in process_sample at /home/joosep/mac-docs/tth/sw-slc6/CMSSW/src/TTH/Plotting/julia/joosep/ntuple.jl:387
+	#  in main at /home/joosep/mac-docs/tth/sw-slc6/CMSSW/src/TTH/Plotting/julia/joosep/ntuple.jl:506
+
+
+	for b in ["jet__*", "n__jet*". "n__lep*", "lep__*", "sig_lep*", "hypo1", "event*"]
+	    #AddBranchToCache(df.tt, "$b")
+	end
+	SetCacheSize(df.tt, 256 * 1024 * 1024)
 
 	ofdf = similar(
 		DataFrame(

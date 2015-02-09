@@ -2882,7 +2882,6 @@ int main(int argc, const char* argv[])
                     // LR of ttbb vs ttjj hypotheses as variable to select events
                     otree->btag_LR = (p_bb+p_jj)>0 ? p_bb/(p_bb+p_jj) : 0. ;
 
-
                     vector<double> lh_jet_csvs, lh_jet_etas;
                     for (uint i=0; i < min(banytag_indices.size(), (long unsigned int)6); i++) {
                         int idx = banytag_indices[i];
@@ -2907,6 +2906,7 @@ int main(int argc, const char* argv[])
                     otree->btag_LR4 = btag_lh_calc.btag_lr_radcc(jet_probs, best_perm_lh_indices);
 
                     double l_bbbb = btag_lh_calc.btag_likelihood(jet_probs, 4, 0, 2, best_perm_dummy);
+                    double l_bbbj = btag_lh_calc.btag_likelihood(jet_probs, 3, 0, 3, best_perm_dummy);
                     double l_bbjj = btag_lh_calc.btag_likelihood(jet_probs, 2, 0, 4, best_perm_dummy);
                     double l_bbcc = btag_lh_calc.btag_likelihood(jet_probs, 2, 2, 2, best_perm_dummy);
                     double l_bbbbcq = btag_lh_calc.btag_likelihood(jet_probs, 4, 1, 1, best_perm_dummy);
@@ -2914,6 +2914,7 @@ int main(int argc, const char* argv[])
                     double l_bbcccq = btag_lh_calc.btag_likelihood(jet_probs, 2, 3, 1, best_perm_dummy);
 
                     otree->btag_lr_l_bbbb = l_bbbb;
+                    otree->btag_lr_l_bbbj = l_bbbj;
                     otree->btag_lr_l_bbjj = l_bbjj;
                     otree->btag_lr_l_bbcc = l_bbcc;
                     otree->btag_lr_l_bbbbcq = l_bbbbcq;
@@ -4505,6 +4506,7 @@ int main(int argc, const char* argv[])
                                             /* ... */
                                         }
                                         cuts.fill(CutHistogram::Cuts::ME);
+
 
 
                                     } //speedup to skip ME
