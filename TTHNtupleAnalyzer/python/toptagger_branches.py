@@ -1,19 +1,22 @@
 from TTH.TTHNtupleAnalyzer.headergen import *
+from TTH.TTHNtupleAnalyzer.Main_cfg import li_fatjets_branches
 
 # Fatjet Branche
-for fj_name in ["fat", "fatMDT", "fatMDTFiltered"]:
+for fj_name in li_fatjets_branches:
 
     # How many of these objects do we have?
     full_counter_name = "n__jet_{0}".format(fj_name)
     process += [Scalar(full_counter_name, "int")]
 
-    # And all the individual branches
+
+    # And all the individual float branches
     for branch_name in [
             "pt", "eta", "phi", "mass",  # Kinematics
-            "tau1", "tau2", "tau3",  # N-subjettiness
-            "close_hadtop_pt",  "close_hadtop_dr", "close_hadtop_i",   # true top matching
-            "close_higgs_pt",   "close_higgs_dr",  "close_higgs_i",   # true higgs matching
-    ]:     
+            "tau1", "tau2", "tau3",      # N-subjettiness
+            "qvol",                      # Qjet Volatility
+            "close_hadtop_pt",  "close_hadtop_dr", "close_hadtop_i", # top truth matching
+            "close_higgs_pt",   "close_higgs_dr",  "close_higgs_i"   # higgs truth matching
+            ]:
 
         if branch_name in ["close_higgs_i", "close_hadtop_i"]:
             the_type = "int"

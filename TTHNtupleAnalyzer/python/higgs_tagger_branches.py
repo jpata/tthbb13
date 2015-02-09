@@ -1,17 +1,25 @@
 #sample branches file for headergen.py
 #uses branch classes from headergen
 from TTH.TTHNtupleAnalyzer.headergen import *
+from TTH.TTHNtupleAnalyzer.HiggsTaggers_cfg import li_fatjets_branches
 
 defines.extend(["#define ADD_TRUE_TOP_MATCHING_FOR_FJ 1",
                 "#define ADD_TRUE_TOP_MATCHING_FOR_HTT 1",
-                "#define ADD_TRUE_TOP_MATCHING_FOR_CMSTT 0",
+                "#define ADD_TRUE_TOP_MATCHING_FOR_CMSTT 1",
                 "#define ADD_TRUE_HIGGS_MATCHING_FOR_FJ 1",
                 "#define ADD_TRUE_HIGGS_MATCHING_FOR_HTT 1",
-                "#define ADD_TRUE_HIGGS_MATCHING_FOR_CMSTT 0",
-                "#define ADD_TRUE_PARTON_MATCHING_FOR_FJ 0",
-                "#define ADD_TRUE_PARTON_MATCHING_FOR_HTT 0",
-                "#define ADD_TRUE_PARTON_MATCHING_FOR_CMSTT 0",
-            ])
+                "#define ADD_TRUE_HIGGS_MATCHING_FOR_CMSTT 1",
+                "#define ADD_TRUE_PARTON_MATCHING_FOR_FJ 1",
+                "#define ADD_TRUE_PARTON_MATCHING_FOR_HTT 1",
+                "#define ADD_TRUE_PARTON_MATCHING_FOR_CMSTT 1"])
+
+
+#define branches to add here
+process = [
+	Scalar("gen_t__dpt_alt", "float"),
+	Scalar("gen_tbar__dpt_alt", "float"),
+]
+
 
 process += Scalar("weight__genmc", "float"),
 
@@ -88,9 +96,7 @@ for t in ["charge", "id", "idx", "type"]:
     ]
 
 for t in [
-    "bd_tchp",
     "bd_csv",
-    "bd_cisvv2",
     "ce_e",
     "ch_e",
     "el_e",
@@ -149,5 +155,37 @@ for t in [
         ]
 
 
+# Fatjet Branches
+for fj_name in li_fatjets_branches:
 
-from TTH.TTHNtupleAnalyzer.toptagger_branches import *
+    print "Adding", fj_name
+
+    # How many of these objects do we have?
+    full_counter_name = "n__jet_{0}".format(fj_name)
+    process += [Scalar(full_counter_name, "int")]
+
+    # And all the individual float branches
+    for branch_name in [
+            "pt", "eta", "phi", "mass",  # Kinematics
+            "tau1", "tau2", "tau3",      # N-subjettiness
+            "btag",                      # b-tag discriminator
+            "qvol",                      # Qjet Volatility
+            "close_hadtop_pt",  "close_hadtop_dr", "close_hadtop_i", # top truth matching
+            "close_parton_pt",  "close_parton_dr", "close_parton_i", # parton truth matching
+            "close_higgs_pt",   "close_higgs_dr",  "close_higgs_i"   # higgs truth matching
+            ]:
+
+        if branch_name in ["close_higgs_i", "close_hadtop_i", "close_parton_i"]:
+            the_type = "int"
+        else:
+            the_type = "float"
+
+        full_branch_name = "jet_{0}__{1}".format(fj_name, branch_name)
+        process += [Dynamic1DArray(full_branch_name, 
+                                   the_type,
+                                   full_counter_name,
+                                   "N_MAX"
+                               )]
+
+    # End of loop over branches
+# End of loop over fat jets

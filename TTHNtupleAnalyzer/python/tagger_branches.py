@@ -1,6 +1,7 @@
 #sample branches file for headergen.py
 #uses branch classes from headergen
 from TTH.TTHNtupleAnalyzer.headergen import *
+from TTH.TTHNtupleAnalyzer.Taggers_cfg import li_fatjets_branches
 
 defines.extend(["#define ADD_TRUE_TOP_MATCHING_FOR_FJ 1",
                 "#define ADD_TRUE_TOP_MATCHING_FOR_HTT 1",
@@ -155,8 +156,7 @@ for t in [
 
 
 # Fatjet Branches
-for fj_name in ["ca08", "ca08filtered", "ca08pruned", "ca08trimmed", 
-                "ca15", "ca15filtered", "ca15pruned", "ca15trimmed"]:
+for fj_name in li_fatjets_branches:
 
     # How many of these objects do we have?
     full_counter_name = "n__jet_{0}".format(fj_name)
@@ -166,10 +166,19 @@ for fj_name in ["ca08", "ca08filtered", "ca08pruned", "ca08trimmed",
     for branch_name in [
             "pt", "eta", "phi", "mass",  # Kinematics
             "tau1", "tau2", "tau3",      # N-subjettiness
+            "btag",                      # b-tag discriminator
+            "chi",                       # Shower deconstruction chi
+                                         # (only fill for ca08 and ca15 wo grooming at the moment)
+            "qvol",                      # Qjet volatility
+                                         # (only fill for ca08 and ca15 wo grooming at the moment)
             "close_hadtop_pt",  "close_hadtop_dr", "close_hadtop_i", # top truth matching
             "close_parton_pt",  "close_parton_dr", "close_parton_i", # parton truth matching
             "close_higgs_pt",   "close_higgs_dr",  "close_higgs_i"   # higgs truth matching
             ]:
+
+        # Don't do chi unless we have the unfiltered fatjets
+        if (branch_name in ["chi", "qvol"]) and not (fj_name in ["ca08","ca15"]):
+            continue
 
         if branch_name in ["close_higgs_i", "close_hadtop_i", "close_parton_i"]:
             the_type = "int"

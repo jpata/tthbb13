@@ -24,6 +24,7 @@ int is_hadronic_top(const reco::Candidate* p);
 
 void get_hard_partons(edm::Handle<edm::View<reco::GenParticle>> pruned, 
 		      double min_parton_pt,
+		      int parton_status,
 		      std::vector<const reco::Candidate*> & hard_partons);
 
 void get_gen_higgs(edm::Handle<edm::View<reco::GenParticle>> pruned, 

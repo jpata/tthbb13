@@ -11,6 +11,9 @@ config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
 config.JobType.allowNonProductionCMSSW = True
 config.JobType.maxJobRuntimeMin = 60*48 #maximal job runtime in minute
+config.JobType.scriptExe = 'myScript.sh'
+config.JobType.inputFiles = ["../python/MakeTaggingNtuple.py", "../python/AccessHelpers.py"]
+config.JobType.outputFiles = ["output-tagging.root"]
 
 config.section_("Data")
 config.Data.inputDBS = 'global'

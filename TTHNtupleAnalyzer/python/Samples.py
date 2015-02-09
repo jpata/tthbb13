@@ -17,6 +17,9 @@ Samples = {
     "ttjets_13tev" : "/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/Spring14miniaod-PU20bx25_POSTLS170_V5-v2/MINIAODSIM",
 
 
+    # TTbar + jets
+    "ttj_13tev"     : "/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/Spring14miniaod-PU20bx25_POSTLS170_V5-v2/MINIAODSIM",
+
     # QCD, Pythia 6, binned in pT
     "qcd_5_15_pythia6_13tev" : "/QCD_Pt-5to15_TuneZ2star_13TeV_pythia6/Spring14miniaod-PU20bx25_POSTLS170_V5-v1/MINIAODSIM",
     "qcd_15_30_pythia6_13tev" : "/QCD_Pt-15to30_TuneZ2star_13TeV_pythia6/Spring14miniaod-PU20bx25_POSTLS170_V5-v1/MINIAODSIM",
