@@ -1,8 +1,10 @@
 import FWCore.ParameterSet.Types  as CfgTypes
 import FWCore.ParameterSet.Config as cms
+import os
 
 process = cms.Process("MEAnalysisNew")
 
+from TTH.MEAnalysis.samples_v1 import samples
 process.fwliteInput = cms.PSet(
 
     # output file name
@@ -21,33 +23,18 @@ process.fwliteInput = cms.PSet(
     pathToCP_smear= cms.string("./root/ControlPlotsTEST_std_gen.root"),
 
     # input file directory
-    pathToFile    = cms.string("dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/jpata/tth/dec19_5b21f5f"),
+    pathToFile    = cms.string("root://cmsxrootd.fnal.gov//store/user/jpata/tth/s1_eb733a1/"),
+    #pathToFile    = cms.string("dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/jpata/tth/dec19_5b21f5f"),
     #pathToFile    = cms.string("dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store//user/bianchi/TTH_EDMNtuple/"),
     #pathToFile    = cms.string("dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/bianchi/HepMC/Sherpa_run/"),
     #pathToFile    = cms.string("/scratch/bianchi/HBB_EDMNtuple/Sherpa_run/"),
     #pathToFile    = cms.string("/shome/bianchi/CMSSW_5_3_3_patch2_New/src/VHbbAnalysis/VHbbDataFormats/bin/"),
 
     # a name tag for the input files
-    ordering      = cms.string("TTHbb_s1_5b21f5f_"),
+    ordering      = cms.string("TTHbb_s1_eb733a1_"),
 
     # the samples
-    samples = cms.VPSet(
-        cms.PSet(
-            skip     = cms.bool(False),
-            name     = cms.string('tth_hbb_13tev'),
-            nickName = cms.string('TTHBB'),
-            color    = cms.int32(1),
-            xSec     = cms.double(1.0)
-        ),
-        cms.PSet(
-            skip     = cms.bool(True), #This file will not be processed
-            name     = cms.string('ttjets_13tev'),
-            #name     = cms.string('122'),
-            nickName = cms.string('TTJets'),
-            color    = cms.int32(1),
-            xSec     = cms.double(1.0)
-        ),
-    ),
+    samples = samples,
 
     # the target luminosity (used to calculate the 'weight' variable)
     lumi          = cms.untracked.double(19.04),
@@ -221,7 +208,7 @@ process.fwliteInput = cms.PSet(
 
     # if 1, process evLimits[1]-evLimits[0] events passing the selection cuts
     # if 0, process all events in the tree from evLimits[0] to evLimits[1]
-    fixNumEvJob    = cms.untracked.int32(1),
+    fixNumEvJob    = cms.untracked.int32(0),
 
     # event limits
     evLimits       = cms.vint32(0, -1),
@@ -260,6 +247,12 @@ process.fwliteInput = cms.PSet(
     cutJets = cms.untracked.bool(False),
     cutWMass = cms.untracked.bool(False),
     cutBTagShape = cms.untracked.bool(False),
-
 )
 
+import os
+hn = os.environ["HOSTNAME"]
+vo = os.environ.get("VO_CMS_DEFAULT_SE", "")
+if "kbfi" in hn or "comp-" in hn or "kbfi" in vo:
+    process.fwliteInput.pathToFile = cms.string("file:///hdfs/cms/store/user/jpata/tth/s1_eb733a1/")
+elif "psi" in hn or "psi" in vo:
+    process.fwliteInput.pathToFile = cms.string("dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/jpata/tth/s1_eb733a1/")

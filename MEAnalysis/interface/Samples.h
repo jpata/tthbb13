@@ -20,6 +20,42 @@
 
 using namespace std;
 
+
+// class Sample {
+// public:
+//     const string pfn, filename, cut;
+//     const bool update;
+//     const double xsec;
+//     const double weight;
+//     const double color;
+//     const int bdiscriminator_choice;
+//     TFile* file;
+
+//     Sample(const string _pfn, const string _filename, const string _cut,
+//         bool _update, double _xsec, double _weight, double _color,
+//         int _bdiscriminator_choice
+//     ) : (
+//         pfn(_pfn),
+//         filename(_filename),
+//         cut(_cut),
+//         update(_update),
+//         xsec(xsec),
+//         weight(_weight),
+//         color(_color),
+//         bdiscriminator_choice(_bdiscriminator_choice)) {
+
+//         TString pfn(filename.size()==0 ? (pathToFile + "/" + ordering + TfileName + ".root") : full_fn);
+//         std::cout << "Opening file: " << string(pfn.Data()) << std::endl;
+
+//         TFile *f = 0;
+
+//         if(openAllFiles) f = update ?  TFile::Open(pfn.Data(),"UPDATE") :  TFile::Open(pfn.Data(),"READ");
+//         else f = TFile::Open(pfn.Data(), "READ");
+
+//     }
+
+// };
+
 class Samples {
 
 public:
@@ -50,6 +86,8 @@ public:
         return (err_!=1);
     }
     vector<string> Files();
+
+    map<string, int>  bdiscriminator;
 
 private:
 
@@ -94,7 +132,7 @@ Samples::Samples(bool openAllFiles, string pathToFile, string ordering,
         const bool update     = p.exists("update") ?  p.getParameter<bool>("update") : false;
         const string cut      = p.exists("cut")    ?  p.getParameter<string>("cut")  : "DUMMY";
         const string full_fn  = p.exists("fullFilename") ? p.getParameter<string>("fullFilename")  : "";
-
+        
         if(skip) continue;
 
         TString TfileName( fileName.c_str() );
@@ -116,6 +154,7 @@ Samples::Samples(bool openAllFiles, string pathToFile, string ordering,
             mapUpdate_[nickName]   = update;
             mapCut_[nickName]      = cut;
             mapFileName_[nickName] = ordering+fileName;
+            bdiscriminator[nickName] = p.exists("bdisc") ?  p.getParameter<int>("bdisc") : 0;
 
             double weight = 1.0;
 

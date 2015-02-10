@@ -51,6 +51,7 @@ for t in ["b", "bbar"]:
             typ = "int"
         process += [Scalar("gen_%s__%s" % (t, v), typ)]
 
+#Muons and electrons
 for t in ["pt", "eta", "phi", "mass",
     "dxy", "dz",
     "ch_iso", "ec_iso", "hc_iso",
@@ -75,6 +76,7 @@ for t in ["pt", "eta", "phi", "pass"]:
             Dynamic1DArray(full_branch_name, "int" if t=="pass" else "float", "n__{0}".format(x), "N_MAX")
         ]
 
+#Signal leptons
 for t in ["pt", "eta", "phi", "mass"]:
     full_branch_name = "sig_lep__{0}".format(t)
     process += [
@@ -87,6 +89,57 @@ for t in ["charge", "id", "idx", "type"]:
         Dynamic1DArray(full_branch_name, "int", "n__sig_lep", "N_MAX")
     ]
 
+#Taus
+for t in ["pt", "eta", "phi", "mass",
+    "pf_jet__pt", "pf_jet__eta", "pf_jet__phi", "pf_jet__mass",
+    "pf_cjet__pt", "pf_cjet__eta", "pf_cjet__phi", "pf_cjet__mass",
+    "lead_ch_had__pt",
+    "dxy",
+    "vtx__z",
+    "id__ch_iso", "id__n_iso", "id__puc",
+    #"mva",
+    #p_iso", "ph_iso", "puch_iso", "rel_iso", "rel_iso2"
+    ]:
+    full_branch_name = "tau__{0}".format(t)
+    process += [
+        Dynamic1DArray(full_branch_name, "float", "n__tau", "N_MAX")
+    ]
+
+for t in [
+    "id", "id_bitmask", "dmode",
+    "charge",
+    #"type"
+    ]:
+    full_branch_name = "tau__{0}".format(t)
+    process += [
+        Dynamic1DArray(full_branch_name, "int", "n__tau", "N_MAX")
+    ]
+
+for t in [
+    "pt", "eta", "phi", "mass",
+    ]:
+    full_branch_name = "gen_tau_lep__{0}".format(t)
+    process += [
+        Dynamic1DArray(full_branch_name, "float", "n__tau", "N_MAX")
+    ]
+    full_branch_name = "gen_tau_jet__{0}".format(t)
+    process += [
+        Dynamic1DArray(full_branch_name, "float", "n__tau", "N_MAX")
+    ]
+
+for t in [
+    "id",
+    ]:
+    full_branch_name = "gen_tau_lep__{0}".format(t)
+    process += [
+        Dynamic1DArray(full_branch_name, "int", "n__tau", "N_MAX")
+    ]
+    full_branch_name = "gen_tau_jet__{0}".format(t)
+    process += [
+        Dynamic1DArray(full_branch_name, "int", "n__tau", "N_MAX")
+    ]
+
+#Jets
 for t in [
     "bd_tchp",
     "bd_csv",

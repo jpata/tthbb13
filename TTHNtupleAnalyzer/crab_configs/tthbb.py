@@ -4,9 +4,9 @@
 # Imports
 ######################################
 
-import sys
+import sys, os
 
-from TTH.TTHNtupleAnalyzer.CrabHelpers import submit, status, download, hadd, get_lfn, hadd_from_file
+from TTH.TTHNtupleAnalyzer.CrabHelpers import submit, status, download, hadd, get_lfn, hadd_from_file, replicate
 from collections import Counter
 
 #######################################
@@ -15,20 +15,21 @@ from collections import Counter
 
 # Ntuple name/version and samples to include
 name = "TTHbb"
-version = "s1_5b21f5f"
+version = "s1_eb733a1"
 li_samples = [
-"tth_hbb_13tev",
-"ttjets_13tev",
-"ttjets_13tev_phys14",
-"ttjets_13tev_phys14_pythia8",
-"ttjets_13tev_phys14_pythia8_pu40bx50",
-"t_t_13tev_phys14",
-"tbar_t_13tev_phys14",
-"tth_hbb_13tev_pu40bx50",
-"ttjets_13tev_pu40bx50"
+    "tth_hbb_13tev",
+    "ttjets_13tev",
+    "t_t_13tev_amcatnlo_pu20bx25_phys14",
+    "tbar_t_13tev_amcatnlo_pu20bx25_phys14",
+    "tth_hbb_13tev_amcatnlo_pu20bx25_phys14",
+    "tth_hbb_13tev_amcatnlo_pu40bx50_phys14",
+    "ttjets_13tev_madgraph_pu20bx25_phys14",
+    "ttjets_13tev_pythia8_pu20bx25_phys14",
+    "ttjets_13tev_pythia8_pu40bx50_phys14",
+    "tth_htautau_13tev_amcatnlo_pu30bx50_phys14"
 ]
 
-cmssw_config_path = '/home/joosep/TTH/CMSSW/src/TTH/TTHNtupleAnalyzer/python/'
+cmssw_config_path = os.environ["CMSSW_BASE"] + '/src/TTH/TTHNtupleAnalyzer/python/'
 config_script_name = 'Main_cfg.py'
 storage_path = '/scratch/joosep'
 tier_prefix = '/hdfs/cms/'
@@ -38,7 +39,7 @@ tier_prefix = '/hdfs/cms/'
 #####################################
 
 # Decide what to do
-actions = ["submit", "status", "download", "hadd", "haddfiles"]
+actions = ["submit", "status", "download", "hadd", "haddfiles", "replicate"]
 
 if not len(sys.argv) == 2:
     print "Invalid number of arguments"
@@ -105,9 +106,19 @@ elif action == "hadd":
         hadd(name, sample_shortname, version, storage_path)
 
 elif action == "haddfiles":
+    ofile = open("to-replica.txt", "w")
     for sample_shortname in li_samples:
-        hadd_from_file(name, sample_shortname, version, storage_path)
+        ofname = hadd_from_file(name, sample_shortname, version, storage_path)
+        if not ofname:
+            print "ERROR: could not hadd ", sample_shortname
+            continue
+        ofile.write(ofname + "\n")
+    ofile.close()
 
+
+elif action == "replicate":
+    #replicate("to-replica.txt", "T2_EE_Estonia", "/store/user/jpata/tth/" + version)
+    replicate("to-replica.txt", "T3_CH_PSI", "/store/user/jpata/tth/" + version)
 
 
 
