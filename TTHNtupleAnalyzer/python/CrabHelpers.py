@@ -355,6 +355,13 @@ def hadd_from_file(name,
     input_fn = "crab_{0}_{1}_{2}/crab_{0}_{1}_{2}/files.txt".format(name, version, sample_shortname)
     if os.path.isfile(input_fn):
         input_filenames = map(lambda x: x.strip(), open(input_fn).readlines())
+        to_process = []
+        for inf in input_filenames:
+            if not os.path.isfile(inf):
+                print "ERROR: file", inf, "does not exist!"
+                continue
+            to_process += [inf]
+        input_filenames = to_process
         if len(input_filenames)>0:
             output_filename = basepath + "/{0}_{1}_{2}.root".format(name, version, sample_shortname)
             #subprocess.call(["echo", "hadd", "-f", output_filename, "-n", "500"] + input_filenames)

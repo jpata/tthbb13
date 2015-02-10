@@ -117,7 +117,8 @@ elif action == "haddfiles":
 
 
 elif action == "replicate":
-    replicate("to-replica.txt", "T2_EE_Estonia", "/store/user/jpata/tth/" + version)
+    #replicate("to-replica.txt", "T2_EE_Estonia", "/store/user/jpata/tth/" + version)
+    replicate("to-replica.txt", "T3_CH_PSI", "/store/user/jpata/tth/" + version)
 
 
 
