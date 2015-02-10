@@ -1,3 +1,5 @@
+#ifndef METREE_H
+#define METREE_H
 //Generate METree.hh with
 //python $CMSSW_BASE/src/TTH/TTHNtupleAnalyzer/python/headergen.py $CMSSW_BASE/src/TTH/MEAnalysis/interface/METree_template.hh $CMSSW_BASE/src/TTH/MEAnalysis/interface/METree.hh $CMSSW_BASE/src/TTH/MEAnalysis/python/branches.py
 #include "TTH/MEAnalysis/interface/HelperFunctions.h"
@@ -230,12 +232,19 @@ public:
     // nummber of selected jets
     int numJets_;
     // btag likelihood ratio
-    float btag_LR_;
+    //float btag_LR_;
     
     // permutation -> jets association
     int   perm_to_jet_    [NMAXPERMUT];
     int   perm_to_jet_alt_[NMAXPERMUT];
+
     // permutation -> gen association
+    // bLep W1 W2 bHad bH1 bH2
+    // If a particular index is set, then for this permutation
+    // the jet was matched to the corresponding gen-level object.
+    // E.g. 110011 means that the b from the leptonic top, one of
+    // the quarks from W->qq and both of the bs from H->bb were matched
+    // correctly to gen-level objects for this permutation
     int   perm_to_gen_     [NMAXPERMUT];
     int   perm_to_gen_alt_ [NMAXPERMUT];
 
@@ -384,7 +393,7 @@ public:
         tree->Branch("numBTagM",                &numBTagM_,    "numBTagM/I");
         tree->Branch("numBTagT",                &numBTagT_,    "numBTagT/I");
         tree->Branch("numJets",                 &numJets_,     "numJets/I");
-        tree->Branch("btag_LR",                 &btag_LR_,     "btag_LR/F");
+        //tree->Branch("btag_LR",                 &btag_LR_,     "btag_LR/F");
         
         // Control variables
         tree->Branch("mH_matched",              &mH_matched_,   "mH_matched/F");
@@ -411,6 +420,10 @@ public:
 		
 		tree->SetBranchAddress("EVENT", &EVENT_);
 		tree->SetBranchAddress("jet_pt", &jet_pt_);
+		tree->SetBranchAddress("jet_eta", &jet_eta_);
+		tree->SetBranchAddress("jet_phi", &jet_phi_);
+		tree->SetBranchAddress("jet_m", &jet_m_);
+		tree->SetBranchAddress("jet_id", &jet_id_);
 		tree->SetBranchAddress("lepton_pt", &lepton_pt_);
 		
         tree->SetBranchAddress("lepton_rIso", &lepton_rIso_);
@@ -418,7 +431,7 @@ public:
         tree->SetBranchAddress("numBTagM", &numBTagM_);
         tree->SetBranchAddress("numBTagT", &numBTagT_);
         tree->SetBranchAddress("numJets", &numJets_);
-        tree->SetBranchAddress("btag_LR", &btag_LR_);
+        //tree->SetBranchAddress("btag_LR", &btag_LR_);
 		tree->SetBranchAddress("nLep", &nLep_);
 		tree->SetBranchAddress("nJet", &nJet_);
 
@@ -468,7 +481,7 @@ public:
         nMatchSimBs_ = DEF_VAL_INT;
         nMatchSimCs_ = DEF_VAL_INT;
         
-		btag_LR_ = DEF_VAL_FLOAT;
+		//btag_LR_ = DEF_VAL_FLOAT;
 
 		probAtSgn_ = DEF_VAL_FLOAT;
 		probAtSgn_alt_ = DEF_VAL_FLOAT;
@@ -513,3 +526,5 @@ public:
         //HEADERGEN_COPY_BRANCHES
 	}
 };
+#endif
+

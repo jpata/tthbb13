@@ -113,6 +113,8 @@ class CutHistogram {
         JETS,
         BTAGSHAPE,
         WMASS,
+        ME,
+        TYPELESSZERO,
         passes,
         unknown
     };
@@ -131,12 +133,20 @@ class CutHistogram {
         h->GetXaxis()->SetBinLabel(8, "JETS");
         h->GetXaxis()->SetBinLabel(9, "BTAGSHAPE");
         h->GetXaxis()->SetBinLabel(10, "WMASS");
-        h->GetXaxis()->SetBinLabel(11, "passes");
-        h->GetXaxis()->SetBinLabel(12, "unknown");
+        h->GetXaxis()->SetBinLabel(11, "ME");
+        h->GetXaxis()->SetBinLabel(12, "TYPELESSZERO");
+        h->GetXaxis()->SetBinLabel(13, "passes");
+        h->GetXaxis()->SetBinLabel(14, "unknown");
     }
 
     void fill(Cuts c) {
         h->Fill((int)c);
+    }
+
+    void print() {
+        for (int i=1; i<=h->GetNbinsX(); i++) {
+            std::cout << h->GetXaxis()->GetBinLabel(i) << " " << h->GetBinContent(i) << endl;
+        }
     }
 };
 
@@ -331,6 +341,8 @@ int main(int argc, const char* argv[])
     // name of csv in the input file ()
     TString csvName = "csv_rec";
     if( useCMVA ) csvName = "csv_mva_rec";
+
+    BTagLikelihood btag_lh_calc(fCP, csvName);
 
     // b-tag pdf for b-quark ('b'), c-quark ('c'), and light jets ('l')
     map<string,TH1F*> btagger;
@@ -622,16 +634,16 @@ int main(int argc, const char* argv[])
             hparam->SetBinContent( pin+1, in.getUntrackedParameter<int>   ( params[pin], DEF_VAL_FLOAT  ) );
         else {}
     }
-    hparam->SetBinContent            ( n_untr_param+1,  (in.getParameter<vector<int> >("evLimits"))[0]   );
-    hparam->GetXaxis()->SetBinLabel  ( n_untr_param+1,  "evLow" );
-    hparam->SetBinContent            ( n_untr_param+2,  (in.getParameter<vector<int> >("evLimits"))[1]   );
-    hparam->GetXaxis()->SetBinLabel  ( n_untr_param+2,  "evHigh" );
-    hparam->GetXaxis()->SetBinLabel  ( n_untr_param+3,  (in.getParameter<string>("outFileName")).c_str() );
-    hparam->GetXaxis()->SetBinLabel  ( n_untr_param+4,  (in.getParameter<string>("pathToTF")).c_str() );
-    hparam->GetXaxis()->SetBinLabel  ( n_untr_param+5,  (in.getParameter<string>("pathToCP")).c_str() );
-    hparam->GetXaxis()->SetBinLabel  ( n_untr_param+6,  (in.getParameter<string>("pathToCP_smear")).c_str() );
-    hparam->GetXaxis()->SetBinLabel  ( n_untr_param+7,  (in.getParameter<string>("pathToFile")).c_str() );
-    hparam->GetXaxis()->SetBinLabel  ( n_untr_param+8,  (in.getParameter<string>("ordering")).c_str() );
+    hparam->SetBinContent            (n_untr_param + 1,  (in.getParameter<vector<int> >("evLimits"))[0]   );
+    hparam->GetXaxis()->SetBinLabel  (n_untr_param + 1,  "evLow" );
+    hparam->SetBinContent            (n_untr_param + 2,  (in.getParameter<vector<int> >("evLimits"))[1]   );
+    hparam->GetXaxis()->SetBinLabel  (n_untr_param + 2,  "evHigh" );
+    hparam->GetXaxis()->SetBinLabel  (n_untr_param + 3,  (in.getParameter<string>("outFileName")).c_str() );
+    hparam->GetXaxis()->SetBinLabel  (n_untr_param + 4,  (in.getParameter<string>("pathToTF")).c_str() );
+    hparam->GetXaxis()->SetBinLabel  (n_untr_param + 5,  (in.getParameter<string>("pathToCP")).c_str() );
+    hparam->GetXaxis()->SetBinLabel  (n_untr_param + 6,  (in.getParameter<string>("pathToCP_smear")).c_str() );
+    hparam->GetXaxis()->SetBinLabel  (n_untr_param + 7,  (in.getParameter<string>("pathToFile")).c_str() );
+    hparam->GetXaxis()->SetBinLabel  (n_untr_param + 8,  (in.getParameter<string>("ordering")).c_str() );
 
     for( int sam = 0 ; sam < (int)samples.size(); sam++) {
         if( !(samples[sam].getParameter<bool>("skip")) ) {
@@ -669,7 +681,7 @@ int main(int argc, const char* argv[])
         mySampleFiles = mySamples->Files();
 
         for( unsigned int i = 0 ; i < mySampleFiles.size(); i++) {
-            string sampleName       = mySampleFiles[i];
+            string sampleName = mySampleFiles[i];
 
             if(verbose) {
                 cout << mySampleFiles[i] << " ==> " << mySamples->GetXSec(sampleName)
@@ -706,7 +718,8 @@ int main(int argc, const char* argv[])
         //Need to reinitialize for each file
         evHigh = evLimits[1];
 
-        string currentName = mySampleFiles[sample];
+        const string currentName = mySampleFiles[sample];
+        const int bdisc = mySamples->bdiscriminator[currentName];
 
         //if(currentName.find("Run2012")!=string::npos) isMC = false;
 
@@ -949,7 +962,7 @@ int main(int argc, const char* argv[])
             otree->flag_type4_         = DEF_VAL_INT;
             otree->flag_type6_         = DEF_VAL_INT;
 
-            otree->btag_LR_            = DEF_VAL_INT;
+            otree->btag_LR            = DEF_VAL_INT;
 
             for( int k = 0; k < NMAXLEPTONS; k++) {
                 otree->lepton_pt_[k]        = DEF_VAL_FLOAT;
@@ -977,6 +990,7 @@ int main(int argc, const char* argv[])
                 otree->jet_phi_[k] = DEF_VAL_FLOAT;
                 otree->jet_m_[k] = DEF_VAL_FLOAT;
                 otree->jet_csv_[k] = DEF_VAL_FLOAT;
+                otree->jet_id_[k] = DEF_VAL_INT;
             }
             for( int k = 0; k < NMAXPERMUT; k++) {
                 otree->perm_to_jet_    [k] = DEF_VAL_INT;
@@ -1385,7 +1399,6 @@ int main(int argc, const char* argv[])
                 return hJLV;
             };
 
-            //FIXME: commented out for now
             //// now find out how many matched b's we have...
             for(int hj = 0; hj<itree->n__jet; hj++) {
             
@@ -2154,8 +2167,9 @@ int main(int argc, const char* argv[])
                         deltaPx += ( pt*TMath::Cos(phi) );
                         deltaPy += ( pt*TMath::Sin(phi) );
                         
+                        const double csv_val = (bdisc == 0 ? itree->jet__bd_cisvv2[hj] : itree->jet__bd_csv[hj]);
                         if (debug>3) {
-                            cout << "jet " << pt << " " << eta << " " << phi << " " << id << " " << pu_id << " " << itree->jet__bd_csv[hj] << endl;
+                            cout << "jet " << pt << " " << eta << " " << phi << " " << id << " " << pu_id << " " << csv_val << endl;
                         }
 
                         // only jets in acceptance...
@@ -2180,7 +2194,7 @@ int main(int argc, const char* argv[])
                         p4.SetPtEtaPhiM( pt, eta, phi, m );
 
                         // for csv systematics
-                        float csv_nominal =  itree->jet__bd_csv[hj];
+                        float csv_nominal =  csv_val;
                         //float csv_upBC    =  hJet_csv_upBC   [hj]
                         //float csv_downBC  =  hJet_csv_downBC [hj]
                         //float csv_upL     =  hJet_csv_upL    [hj]
@@ -2192,7 +2206,7 @@ int main(int argc, const char* argv[])
                         const float csv_downL   = DEF_VAL_FLOAT;
 
                         // default is csv_nominal ( <=> reshaped )
-                        float csv         = csv_nominal;
+                        float csv = csv_nominal;
 
                         // if doing cvs systematiics, use appropriate collection
                         if( doCSVup  ) {
@@ -2204,7 +2218,7 @@ int main(int argc, const char* argv[])
 
                         // if we apply SF for b-tag, or it is data, then deafult is 'reco' csv
                         if( useCSVcalibration || !isMC ) {
-                            csv = itree->jet__bd_csv[hj];
+                            csv = csv_val;
                         }
 
                         // if using thr MVA btagger:
@@ -2540,7 +2554,6 @@ int main(int argc, const char* argv[])
                     if( TMath::Abs( p4.Eta() ) >  1.0 )
                         bin = "Bin1";
 
-                    // store PDF(csv)
                     jets_flavour.push_back(flavour);
 
                     jets_csv_prob_b.push_back( btagger["b_"+bin]!=0 ? btagger["b_"+bin]->GetBinContent( btagger["b_"+bin]->FindBin( csv ) ) : 1.);
@@ -2592,7 +2605,6 @@ int main(int argc, const char* argv[])
                 // this vector contains the indices of up to 12 jets passing ANY b-tag selection...
                 vector<unsigned int> banytag_indices;
 
-
                 for(unsigned int k = 0; k < jets_p4.size(); k++) {
 
                     float csv_k = jets_csv[k];
@@ -2606,7 +2618,9 @@ int main(int argc, const char* argv[])
                     int btag_T = csv_k>csv_WP_T ;
 
                     // any btag value...
-                    if( pt_k>jetPtThreshold ) banytag_indices.push_back( k );
+                    if( pt_k>jetPtThreshold ) {
+                        banytag_indices.push_back( k );
+                    }
 
                     // passing at least CSVL...
                     if( pt_k>jetPtThreshold &&  btag_L ) {
@@ -2726,6 +2740,7 @@ int main(int argc, const char* argv[])
                         continue;
                     }
 
+
                     // loop over hypothesis [ TTH, TTbb ]
                     for(int hyp = 0 ; hyp<2;  hyp++) {
 
@@ -2779,6 +2794,12 @@ int main(int argc, const char* argv[])
                             // if signal (ttbb)
                             if( hyp==0 ) {
                                 p_pos =  p_b_bLep * p_b_bHad * p_b_b1 * p_b_b2 * p_j_w1 * p_j_w2;
+                                // cout << "bbbb perm " << permutList[pos] << " "
+                                //     << p_b_bLep << " " << p_b_bHad
+                                //     << " " << p_b_b1
+                                //     << " " << p_b_b2
+                                //     << " " << p_j_w1
+                                //     << " " << p_j_w2 << endl;
                                 p_bb += p_pos;
 
                                 // look for a global maximum
@@ -2790,6 +2811,15 @@ int main(int argc, const char* argv[])
 
                             // if background (ttjj)
                             if( hyp==1 ) {
+
+                                // cout << "bbjj perm " << permutList[pos] << " "
+                                //     << p_b_bLep << " " << p_b_bHad
+                                //     << " " << p_j_b1
+                                //     << " " << p_j_b2
+                                //     << " " << p_j_w1
+                                //     << " " << p_j_w2 << endl;
+                                p_bb += p_pos;
+
                                 p_pos =  p_b_bLep * p_b_bHad * p_j_b1 * p_j_b2 * p_j_w1 * p_j_w2;
                                 p_jj += p_pos;
                             }
@@ -2850,27 +2880,68 @@ int main(int argc, const char* argv[])
                     p_jj /= nB;
 
                     // LR of ttbb vs ttjj hypotheses as variable to select events
-                    otree->btag_LR_ = (p_bb+p_jj)>0 ? p_bb/(p_bb+p_jj) : 0. ;
+                    otree->btag_LR = (p_bb+p_jj)>0 ? p_bb/(p_bb+p_jj) : 0. ;
 
+                    vector<double> lh_jet_csvs, lh_jet_etas;
+                    for (uint i=0; i < min(banytag_indices.size(), (long unsigned int)6); i++) {
+                        int idx = banytag_indices[i];
+                        //cout << i << "=>" << idx << " ";
+                        lh_jet_csvs.push_back(jets_csv[idx]);
+                        lh_jet_etas.push_back(jets_p4[idx].Eta());
+                    }
+                    //cout << endl;
+
+                    vector<int> best_perm_lh_indices;
+                    vector<BTagLikelihood::JetProbability> jet_probs = btag_lh_calc.evaluate_jet_probabilities(
+                        lh_jet_csvs, lh_jet_etas
+                    );
+                    otree->btag_LR2 = btag_lh_calc.btag_lr_default(jet_probs, best_perm_lh_indices);
+                    vector<int> best_perm_lh;
+                    for (int i : best_perm_lh_indices) {
+                        best_perm_lh.push_back(banytag_indices[i]);
+                    }
+
+                    vector<int> best_perm_dummy;
+                    otree->btag_LR3 = btag_lh_calc.btag_lr_wcq(jet_probs, best_perm_lh_indices);
+                    otree->btag_LR4 = btag_lh_calc.btag_lr_radcc(jet_probs, best_perm_lh_indices);
+
+                    double l_bbbb = btag_lh_calc.btag_likelihood(jet_probs, 4, 0, 2, best_perm_dummy);
+                    double l_bbbj = btag_lh_calc.btag_likelihood(jet_probs, 3, 0, 3, best_perm_dummy);
+                    double l_bbjj = btag_lh_calc.btag_likelihood(jet_probs, 2, 0, 4, best_perm_dummy);
+                    double l_bbcc = btag_lh_calc.btag_likelihood(jet_probs, 2, 2, 2, best_perm_dummy);
+                    double l_bbbbcq = btag_lh_calc.btag_likelihood(jet_probs, 4, 1, 1, best_perm_dummy);
+                    double l_bbjjcq = btag_lh_calc.btag_likelihood(jet_probs, 2, 1, 3, best_perm_dummy);
+                    double l_bbcccq = btag_lh_calc.btag_likelihood(jet_probs, 2, 3, 1, best_perm_dummy);
+
+                    otree->btag_lr_l_bbbb = l_bbbb;
+                    otree->btag_lr_l_bbbj = l_bbbj;
+                    otree->btag_lr_l_bbjj = l_bbjj;
+                    otree->btag_lr_l_bbcc = l_bbcc;
+                    otree->btag_lr_l_bbbbcq = l_bbbbcq;
+                    otree->btag_lr_l_bbjjcq = l_bbjjcq;
+                    otree->btag_lr_l_bbcccq = l_bbcccq;
+
+                    //cout << "LR " << otree->btag_LR << " " << otree->btag_LR2_ << endl;
                     // depending on event type, check if the event passes the cut:
                     // if it does, check which combination yields the **largest** ttbb probability
                     int* permutListS = 0;
                     switch( btag_flag ) {
                     case 0:
-                        passes_btagshape = ( otree->btag_LR_ >= btag_prob_cut_6jets && selected_comb!=999);
+                        passes_btagshape = ( otree->btag_LR >= btag_prob_cut_6jets && selected_comb!=999);
                         permutListS      = permutations_6J_S;
                         break;
                     case 1:
-                        passes_btagshape = ( otree->btag_LR_ >= btag_prob_cut_5jets && selected_comb!=999);
+                        passes_btagshape = ( otree->btag_LR >= btag_prob_cut_5jets && selected_comb!=999);
                         permutListS      = permutations_5J_S;
                         break;
                     case 2:
-                        passes_btagshape = ( otree->btag_LR_ >= btag_prob_cut_4jets && selected_comb!=999);
+                        passes_btagshape = ( otree->btag_LR >= btag_prob_cut_4jets && selected_comb!=999);
                         permutListS      = permutations_4J_S;
                         break;
                     default:
                         break;
                     }
+                    otree->selected_comb = selected_comb;
 
                     // if the event passes the cut, reshuffle jets into btag/buntag vectors
                     // N.B. ==> jets will be sorted by descending btag probaility!!!
@@ -2884,7 +2955,9 @@ int main(int argc, const char* argv[])
                         btag_indices.push_back(  btag_map[(permutListS[selected_comb])%1000/100]       );
                         btag_indices.push_back(  btag_map[(permutListS[selected_comb])%100/10]         );
                         btag_indices.push_back(  btag_map[(permutListS[selected_comb])%10/1]           );
-
+                        //cout << "LR best perm " << btag_indices[0] << " " << btag_indices[1] << " " << btag_indices[2] << " " << btag_indices[3] << endl;
+                        //cout << "LR2 best perm " << best_perm_lh[0] << " " << best_perm_lh[1] << " " << best_perm_lh[2] << " " << best_perm_lh[3] << endl;
+                        
                         // all other jets go into this collection
                         buntag_indices.clear();
                         for( unsigned int jj = 0 ; jj<banytag_indices.size(); jj++) {
@@ -3082,6 +3155,7 @@ int main(int argc, const char* argv[])
 
                 //  input 4-vectors
                 vector<TLorentzVector> jets;
+                vector<int> jet_ids;
                 vector<TLorentzVector> jets_alt;
 
                 // internal map: [ position in "jets" ] -> [ position in "jets_p4" ]
@@ -3468,7 +3542,7 @@ int main(int argc, const char* argv[])
                                  << jets_p4[ buntag_indices_backup[jj] ].Phi() << ","
                                  << jets_p4[ buntag_indices_backup[jj] ].M() << "), CSV= "
                                  << jets_csv[buntag_indices_backup[jj] ] << endl;
-                        cout << "     btag probability is " << otree->btag_LR_ << endl;
+                        cout << "     btag probability is " << otree->btag_LR << endl;
 
                         if(passes_btagshape && selectByBTagShape) {
                             cout << "     @@@@@ the jet collection has been re-ordered according to btag probability @@@@@@" << endl;
@@ -3496,6 +3570,8 @@ int main(int argc, const char* argv[])
                     jets.clear();
                     jets.push_back( leptonLV     );
                     jets.push_back( neutrinoLV   );
+                    jet_ids.push_back(0);
+                    jet_ids.push_back(0);
 
                     // keep track of an alternative jet selection when doing regression
                     jets_alt.clear();
@@ -3507,12 +3583,21 @@ int main(int argc, const char* argv[])
                     pos_to_index.clear();
                     
                     if( otree->type_==-3) {
-                        jets.push_back( jets_p4[ banytag_indices[0] ]);
+                        jets.push_back( jets_p4[banytag_indices[0]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[0]]);
+
                         jets.push_back( leptonLV2    );
                         jets.push_back( neutrinoLV   );       // dummy
+                        jet_ids.push_back(0);
+                        jet_ids.push_back(0);
+
                         jets.push_back( jets_p4[ banytag_indices[1] ]);
                         jets.push_back( jets_p4[ banytag_indices[2] ]);
                         jets.push_back( jets_p4[ banytag_indices[3] ]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[1]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[2]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[3]]);
+
 
                         pos_to_index[2] = banytag_indices[0];
                         pos_to_index[3] = banytag_indices[0]; // dummy
@@ -3529,6 +3614,13 @@ int main(int argc, const char* argv[])
                         jets.push_back( jets_p4[ banytag_indices[4] ]);
                         jets.push_back( jets_p4[ banytag_indices[5] ]);
 
+                        jet_ids.push_back(jets_flavour[banytag_indices[0]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[1]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[2]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[3]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[4]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[5]]);
+
                         pos_to_index[2] = banytag_indices[0];
                         pos_to_index[3] = banytag_indices[1];
                         pos_to_index[4] = banytag_indices[2];
@@ -3543,6 +3635,13 @@ int main(int argc, const char* argv[])
                         jets.push_back( jets_p4[ banytag_indices[2] ]);
                         jets.push_back( jets_p4[ banytag_indices[3] ]);
                         jets.push_back( jets_p4[ banytag_indices[4] ]);
+
+                        jet_ids.push_back(jets_flavour[banytag_indices[0]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[1]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[1]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[2]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[3]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[4]]);
 
                         pos_to_index[2] = banytag_indices[0];
                         pos_to_index[3] = banytag_indices[1];
@@ -3565,6 +3664,13 @@ int main(int argc, const char* argv[])
                         jets_alt.push_back( useRegression ? jets_p4[ btag_indices[1] ] : jets_p4_reg[ btag_indices[1] ] );
                         jets_alt.push_back( useRegression ? jets_p4[ btag_indices[2] ] : jets_p4_reg[ btag_indices[2] ] );
                         jets_alt.push_back( useRegression ? jets_p4[ btag_indices[3] ] : jets_p4_reg[ btag_indices[3] ] );
+
+                        jet_ids.push_back(jets_flavour[banytag_indices[0]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[ind1]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[ind2]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[1]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[2]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[3]]);
 
                         pos_to_index[2] = btag_indices[0];
                         pos_to_index[3] = ind1;
@@ -3589,6 +3695,13 @@ int main(int argc, const char* argv[])
                         jets_alt.push_back( useRegression ? jets_p4[ btag_indices[2] ] : jets_p4_reg[ btag_indices[2] ]);
                         jets_alt.push_back( useRegression ? jets_p4[ btag_indices[3] ] : jets_p4_reg[ btag_indices[3] ]);
 
+                        jet_ids.push_back(jets_flavour[banytag_indices[0]]);
+                        jet_ids.push_back(0);
+                        jet_ids.push_back(0);
+                        jet_ids.push_back(jets_flavour[banytag_indices[1]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[2]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[3]]);
+
                         pos_to_index[2] = btag_indices[0];
                         pos_to_index[3] = btag_indices[0];  // dummy
                         pos_to_index[4] = btag_indices[0];  // dummy
@@ -3611,6 +3724,13 @@ int main(int argc, const char* argv[])
                         jets_alt.push_back( useRegression ? jets_p4[ btagLoose_indices[2] ] : jets_p4_reg[ btagLoose_indices[2] ]);
                         jets_alt.push_back( useRegression ? jets_p4[ btagLoose_indices[3] ] : jets_p4_reg[ btagLoose_indices[3] ]);
 
+                        jet_ids.push_back(jets_flavour[banytag_indices[0]]);
+                        jet_ids.push_back(0);
+                        jet_ids.push_back(0);
+                        jet_ids.push_back(jets_flavour[banytag_indices[1]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[2]]);
+                        jet_ids.push_back(jets_flavour[banytag_indices[3]]);
+
                         pos_to_index[2] = btagLoose_indices[0];
                         pos_to_index[3] = btagLoose_indices[0];  // dummy
                         pos_to_index[4] = btagLoose_indices[0];  // dummy
@@ -3631,8 +3751,12 @@ int main(int argc, const char* argv[])
                         otree->jet_eta_   [q] = jets[q].Eta();
                         otree->jet_phi_   [q] = jets[q].Phi();
                         otree->jet_m_     [q] = jets[q].M();
+                        otree->jet_id_    [q] = jet_ids[q];
                         otree->jet_csv_   [q] = q>1 ? jets_csv[ pos_to_index[q] ] : DEF_VAL_FLOAT ;
                         //otree->jet_id_    [q] = jets_id[q] ;
+                    }
+                    for (int pos=0; pos<6; pos++) {
+                        otree->pos_to_index[pos] = pos_to_index[pos];
                     }
 
                     // set all prob. to 0.0;
@@ -3719,6 +3843,7 @@ int main(int argc, const char* argv[])
 
                     // start the clock...
                     clock->Start();
+                    std::cout << "calculating ME t=" << otree->type_  << std::endl;
 
                     // loop over Higgs mass values...
                     for(int m = 0; m < nHiggsMassPoints ; m++) {
@@ -3821,7 +3946,7 @@ int main(int argc, const char* argv[])
                                     // the barcode for this permutation
                                     string barcode = Form("%d%d_%d_%d%d%d_%d%d%d_%d%d",
                                                           otree->type_, meIntegrator->getIntType(), hyp, 
-                              lep_index[0], 0, jets_index[ pos_to_index[bLep_pos] ],
+                                                          lep_index[0], 0, jets_index[ pos_to_index[bLep_pos] ],
                                                           otree->type_<6 ? jets_index[ pos_to_index[w1_pos] ] : lep_index[1], otree->type_<6 ? jets_index[ pos_to_index[w2_pos] ] : 0, jets_index[ pos_to_index[bHad_pos] ],
                                                           jets_index[ pos_to_index[b1_pos] ], jets_index[ pos_to_index[b2_pos] ]);
                                     PhaseSpacePoint PSP;
@@ -3967,7 +4092,10 @@ int main(int argc, const char* argv[])
                                     } //use b-tag
 
                                     // if doing scan over b-tag only, don't need amplitude...
-                                    if(otree->type_<0) continue;
+                                    if(otree->type_<0) {
+                                        cuts.fill(CutHistogram::Cuts::TYPELESSZERO);
+                                        continue;
+                                    }
 
 
                                     // if type 0/3 and incompatible with MW or MT (and we are not scanning vs MT) continue
@@ -3978,71 +4106,71 @@ int main(int argc, const char* argv[])
                                     }
 
                                     // retrieve integration boundaries from meIntegrator
-                                    pair<double, double> range_x0 = (meIntegrator->getW1JetEnergyCI(0.95));
-                                    pair<double, double> range_x1 =  make_pair(-1,1);
-                                    pair<double, double> range_x2 =  make_pair(-PI,PI);
-                                    pair<double, double> range_x3 =  make_pair(-1,1);
-                                    pair<double, double> range_x4 =  useMET ? (meIntegrator->getNuPhiCI(0.95)) : make_pair(-PI,PI);
-                                    pair<double, double> range_x5 = (meIntegrator->getB1EnergyCI(0.95));
-                                    pair<double, double> range_x6 = (meIntegrator->getB2EnergyCI(0.95));
+                                    const pair<double, double> range_x0 = (meIntegrator->getW1JetEnergyCI(0.95));
+                                    const pair<double, double> range_x1 =  make_pair(-1,1);
+                                    const pair<double, double> range_x2 =  make_pair(-PI,PI);
+                                    const pair<double, double> range_x3 =  make_pair(-1,1);
+                                    const pair<double, double> range_x4 =  useMET ? (meIntegrator->getNuPhiCI(0.95)) : make_pair(-PI,PI);
+                                    const pair<double, double> range_x5 = (meIntegrator->getB1EnergyCI(0.95));
+                                    const pair<double, double> range_x6 = (meIntegrator->getB2EnergyCI(0.95));
 
                                     // boundaries
-                                    double x0L = range_x0.first;
-                                    double x0U = range_x0.second;
-                                    double x1L = range_x1.first;
-                                    double x1U = range_x1.second;
-                                    double x2L = range_x2.first;
-                                    double x2U = range_x2.second;
-                                    double x3L = range_x3.first;
-                                    double x3U = range_x3.second;
-                                    double x4L = range_x4.first;
-                                    double x4U = range_x4.second;
-                                    double x5L = range_x5.first;
-                                    double x5U = range_x5.second;
-                                    double x6L = range_x6.first;
-                                    double x6U = range_x6.second;
+                                    const double x0L = range_x0.first;
+                                    const double x0U = range_x0.second;
+                                    const double x1L = range_x1.first;
+                                    const double x1U = range_x1.second;
+                                    const double x2L = range_x2.first;
+                                    const double x2U = range_x2.second;
+                                    const double x3L = range_x3.first;
+                                    const double x3U = range_x3.second;
+                                    const double x4L = range_x4.first;
+                                    const double x4U = range_x4.second;
+                                    const double x5L = range_x5.first;
+                                    const double x5U = range_x5.second;
+                                    const double x6L = range_x6.first;
+                                    const double x6U = range_x6.second;
 
                                     // these hold for the sgn integration and type0...
-                                    double xLmode0_s[4] = {x0L, x3L, x4L, x5L};
-                                    double xUmode0_s[4] = {x0U, x3U, x4U, x5U};
+                                    const double xLmode0_s[4] = {x0L, x3L, x4L, x5L};
+                                    const double xUmode0_s[4] = {x0U, x3U, x4U, x5U};
                                     // these hold for the bkg integration and type0...
-                                    double xLmode0_b[5] = {x0L, x3L, x4L, x5L, x6L};
-                                    double xUmode0_b[5] = {x0U, x3U, x4U, x5U, x6U};
-
+                                    const double xLmode0_b[5] = {x0L, x3L, x4L, x5L, x6L};
+                                    const double xUmode0_b[5] = {x0U, x3U, x4U, x5U, x6U};
+ 
                                     // these hold for the sgn integration and type1...
-                                    double xLmode1_s[6] = {x0L, x1L, x2L, x3L, x4L, x5L};
-                                    double xUmode1_s[6] = {x0U, x1U, x2U, x3U, x4U, x5U};
+                                    const double xLmode1_s[6] = {x0L, x1L, x2L, x3L, x4L, x5L};
+                                    const double xUmode1_s[6] = {x0U, x1U, x2U, x3U, x4U, x5U};
                                     // these hold for the bkg integration and type1...
-                                    double xLmode1_b[7] = {x0L, x1L, x2L, x3L, x4L, x5L, x6L};
-                                    double xUmode1_b[7] = {x0U, x1U, x2U, x3U, x4U, x5U, x6U};
-
+                                    const double xLmode1_b[7] = {x0L, x1L, x2L, x3L, x4L, x5L, x6L};
+                                    const double xUmode1_b[7] = {x0U, x1U, x2U, x3U, x4U, x5U, x6U};
+ 
                                     // these hold for the sgn integration and type2...
-                                    double xLmode2_s[6] = {x0L, x1L, x2L, x3L, x4L, x5L};
-                                    double xUmode2_s[6] = {x0U, x1U, x2U, x3U, x4U, x5U};
+                                    const double xLmode2_s[6] = {x0L, x1L, x2L, x3L, x4L, x5L};
+                                    const double xUmode2_s[6] = {x0U, x1U, x2U, x3U, x4U, x5U};
                                     // these hold for the bkg integration and type2...
-                                    double xLmode2_b[7] = {x0L, x1L, x2L, x3L, x4L, x5L, x6L};
-                                    double xUmode2_b[7] = {x0U, x1U, x2U, x3U, x4U, x5U, x6U};
-
+                                    const double xLmode2_b[7] = {x0L, x1L, x2L, x3L, x4L, x5L, x6L};
+                                    const double xUmode2_b[7] = {x0U, x1U, x2U, x3U, x4U, x5U, x6U};
+ 
                                     // these hold for the sgn integration and type3...
-                                    double xLmode3_s[4] = {x0L, x3L, x4L, x5L};
-                                    double xUmode3_s[4] = {x0U, x3U, x4U, x5U};
+                                    const double xLmode3_s[4] = {x0L, x3L, x4L, x5L};
+                                    const double xUmode3_s[4] = {x0U, x3U, x4U, x5U};
                                     // these hold for the bkg integration and type3...
-                                    double xLmode3_b[5] = {x0L, x3L, x4L, x5L, x6L};
-                                    double xUmode3_b[5] = {x0U, x3U, x4U, x5U, x6U};
-
+                                    const double xLmode3_b[5] = {x0L, x3L, x4L, x5L, x6L};
+                                    const double xUmode3_b[5] = {x0U, x3U, x4U, x5U, x6U};
+ 
                                     // these hold for the sgn integration and type6...
-                                    double xLmode6_s[5] = {x1L, x2L, x1L, x2L, x5L};
-                                    double xUmode6_s[5] = {x1U, x2U, x1U, x2U, x5U};
+                                    const double xLmode6_s[5] = {x1L, x2L, x1L, x2L, x5L};
+                                    const double xUmode6_s[5] = {x1U, x2U, x1U, x2U, x5U};
                                     // these hold for the bkg integration and type6...
-                                    double xLmode6_b[6] = {x1L, x2L, x1L, x2L, x5L, x6L};
-                                    double xUmode6_b[6] = {x1U, x2U, x1U, x2U, x5U, x6U};
-
+                                    const double xLmode6_b[6] = {x1L, x2L, x1L, x2L, x5L, x6L};
+                                    const double xUmode6_b[6] = {x1U, x2U, x1U, x2U, x5U, x6U};
+ 
                                     // these hold for the sgn integration and type7...
-                                    double xLmode7_s[5] = {x1L, x2L, x1L, x2L, x5L};
-                                    double xUmode7_s[5] = {x1U, x2U, x1U, x2U, x5U};
+                                    const double xLmode7_s[5] = {x1L, x2L, x1L, x2L, x5L};
+                                    const double xUmode7_s[5] = {x1U, x2U, x1U, x2U, x5U};
                                     // these hold for the bkg integration and type7...
-                                    double xLmode7_b[6] = {x1L, x2L, x1L, x2L, x5L, x6L};
-                                    double xUmode7_b[6] = {x1U, x2U, x1U, x2U, x5U, x6U};
+                                    const double xLmode7_b[6] = {x1L, x2L, x1L, x2L, x5L, x6L};
+                                    const double xUmode7_b[6] = {x1U, x2U, x1U, x2U, x5U, x6U};
 
                                     // number of integration variables (TTH hypothesis)
                                     int nParam;
@@ -4145,12 +4273,13 @@ int main(int argc, const char* argv[])
                                     // count number of Integral() calls
                                     int nCalls = 0;
 
+                                    meIntegrator->resetEvaluation();
 
-                                    // skip ME calculation... for debugging
+                                    // skip ME calculation if 1... for debugging
                                     if(speedup==0) {
 
                                         // setup # of parameters
-                                        meIntegrator->SetPar( nParam+hyp );
+                                        meIntegrator->SetPar(nParam + hyp);
                                         // integrand
                                         ROOT::Math::Functor toIntegrate(meIntegrator, &MEIntegratorNew::Eval, nParam+hyp);
 
@@ -4169,11 +4298,16 @@ int main(int argc, const char* argv[])
 
                                         // if run full VEGAS integration for the first time,
                                         // or run the optimized VEGAS integration, but the permutation is new...
-                                        if( (integralOption2==0 && need2Rerun) ||
-                                                ( integralOption2==1 && perm_to_integrator.find( barcode ) == perm_to_integrator.end() ) ) {
+                                        if((integralOption2==0 && need2Rerun) ||
+                                            (integralOption2==1 && perm_to_integrator.find( barcode ) == perm_to_integrator.end())) {
 
                                             // VEGAS integrator
-                                            ROOT::Math::GSLMCIntegrator* ig2 = new ROOT::Math::GSLMCIntegrator( ROOT::Math::IntegrationMultiDim::kVEGAS , 1.e-12, 1.e-5, intPoints);
+                                            ROOT::Math::GSLMCIntegrator* ig2 = new ROOT::Math::GSLMCIntegrator(
+                                                ROOT::Math::IntegrationMultiDim::kVEGAS ,
+                                                1.e-12, //absolute tolerance
+                                                1.e-5, //relative tolerance
+                                                intPoints //maximum number of calls
+                                            );
                                             ig2->SetFunction(toIntegrate);
 
                                             // refinement: redo integration if it returned a bad chi2
@@ -4226,30 +4360,47 @@ int main(int argc, const char* argv[])
                                                 // error from VEGAS
                                                 pErr =  ig2->Error();
 
+                                                cout << "INT0 hyp " << hyp <<
+                                                    " ev " << itree->event__id <<
+                                                    " syst " << syst <<
+                                                    " pm " << permutList[pos] <<
+                                                    " bc " << barcode <<
+                                                    " NT " << ntries <<
+                                                    " IP " << intPoints <<
+                                                    " chi2 " << chi2 <<
+                                                    " pErr " << pErr <<
+                                                    " N " << meIntegrator->getEvaluations() <<
+                                                    " Ne " << ig2->NEval() <<
+                                                    endl;
+
                                                 // save the various integrators
                                                 if( integralOption2==1 ) {
-                                                    if( perm_to_integrator.find( barcode )!=perm_to_integrator.end() ) {
-                                                        perm_to_integrator.erase     ( perm_to_integrator.find(barcode) );
+                                                    if(perm_to_integrator.find( barcode )!=perm_to_integrator.end()) {
+                                                        perm_to_integrator.erase(perm_to_integrator.find(barcode));
                                                     }
-                                                    perm_to_integrator     [barcode] = ig2;
+                                                    perm_to_integrator[barcode] = ig2;
                                                 }
 
                                                 // save the result...
-                                                if( perm_to_phasespacepoint.find( barcode )!=perm_to_phasespacepoint.end() )
+                                                if( perm_to_phasespacepoint.find( barcode )!=perm_to_phasespacepoint.end() ) {
                                                     perm_to_phasespacepoint.erase( perm_to_phasespacepoint.find(barcode) );
+                                                }
                                                 perm_to_phasespacepoint[barcode] = PSP;
 
-                                                if( perm_to_integral.find( barcode )!=perm_to_integral.end() )
-                                                    perm_to_integral.erase       ( perm_to_integral.find(barcode) );
-                                                perm_to_integral       [barcode] = p;
+                                                if( perm_to_integral.find( barcode )!=perm_to_integral.end() ) {
+                                                    perm_to_integral.erase( perm_to_integral.find(barcode) );
+                                                }
+                                                perm_to_integral[barcode] = p;
 
-                                                if( perm_to_integralError.find( barcode )!=perm_to_integralError.end() )
+                                                if( perm_to_integralError.find( barcode )!=perm_to_integralError.end() ) {
                                                     perm_to_integralError.erase( perm_to_integralError.find( barcode ) );
-                                                perm_to_integralError [barcode] = pErr;
+                                                }
+                                                perm_to_integralError[barcode] = pErr;
 
-                                                if( perm_to_integralChi2.find( barcode )!=perm_to_integralChi2.end() )
+                                                if( perm_to_integralChi2.find( barcode )!=perm_to_integralChi2.end() ) {
                                                     perm_to_integralChi2.erase( perm_to_integralChi2.find( barcode ) );
-                                                perm_to_integralChi2 [barcode] = chi2;
+                                                }
+                                                perm_to_integralChi2[barcode] = chi2;
 
                                                 // check if the actual permutation returned a small or large number...
                                                 // if the value is less than 10% of the largest found that far, skip
@@ -4269,16 +4420,15 @@ int main(int argc, const char* argv[])
                                                     intPoints *= 1.5;
                                                 }
                                                 // otherwise, just go to the next permutation...
-                                                else
+                                                else {
                                                     ntries = MAX_REEVAL_TRIES+1;
+                                                }
 
-                                            }
+                                            } //integration eval loop
 
                                             // free the allocated memory
                                             if( integralOption2==0 ) delete ig2;
-
-                                        } //full VEGAS run
-
+                                        } // end full VEGAS run integralOption==0 or ==1 and no barcode
 
                                         // re-run the integration using the last grid only
                                         // (optionally, change the VEGAS parameters)
@@ -4329,7 +4479,7 @@ int main(int argc, const char* argv[])
                                                     nCalls--;
                                                 }
 
-                                            }
+                                            } //isSamePoint
 
                                             // the point has already been calculated, just read the result...
                                             else p = perm_to_integral[barcode];
@@ -4338,11 +4488,25 @@ int main(int argc, const char* argv[])
                                             chi2 =  perm_to_integrator[barcode]->ChiSqr();
                                             pErr =  perm_to_integrator[barcode]->Error();
 
-                                        }
+                                            cout << "INT1 hyp " << hyp <<
+                                                " ev " << itree->event__id <<
+                                                " syst " << syst <<
+                                                " pm " << permutList[pos] <<
+                                                " bc " << barcode <<
+                                                " NT " << ntries <<
+                                                " IP " << intPoints <<
+                                                " chi2 " << chi2 <<
+                                                " pErr " << pErr <<
+                                                " N " << meIntegrator->getEvaluations() <<
+                                                " Ne " << perm_to_integrator[barcode]->NEval() <<
+                                                endl;
+                                        } //end VEGAS re-run with integralOption==1
 
                                         else {
                                             /* ... */
                                         }
+                                        cuts.fill(CutHistogram::Cuts::ME);
+
 
 
                                     } //speedup to skip ME
@@ -4423,6 +4587,10 @@ int main(int argc, const char* argv[])
                     otree->time_ = clock->CpuTime();
                     clock->Reset();
 
+                    cout << "ME p_s=" << otree->probAtSgn_
+                        << " p_b=" << otree->probAtSgn_alt_
+                        << " calculated in " << otree->time_ << endl;
+
                     // this time is integrated over all hypotheses, permutations, and mass scan values
                     if(print) cout << "Done in " << otree->time_ << " sec" << endl;
 
@@ -4432,7 +4600,7 @@ int main(int argc, const char* argv[])
                 // ALL THE REST...                               //
                 ///////////////////////////////////////////////////
 
-                else {
+                else { //not calcME
 
                     if( enhanceMC ) {
 
@@ -4445,10 +4613,10 @@ int main(int argc, const char* argv[])
                             i--;
                             lock = 1;
                             event_trials++;
-                            if( event_trials%10000==0 ) cout << "   >>> : " << event_trials << "th trial ---> btag_LR = " <<  otree->btag_LR_  << ", numBtagM = " << numJets30BtagM << endl;
+                            if( event_trials%10000==0 ) cout << "   >>> : " << event_trials << "th trial ---> btag_LR = " <<  otree->btag_LR  << ", numBtagM = " << numJets30BtagM << endl;
                             if(debug>=2) {
                                 cout << "Enhance MC: stay with event " << i+1 << endl;
-                                cout << "  - lock for systematics, # of trials = " <<  event_trials << "; btagLR = " << otree->btag_LR_ << endl;
+                                cout << "  - lock for systematics, # of trials = " <<  event_trials << "; btagLR = " << otree->btag_LR << endl;
                             }
                             continue;
                         }
@@ -4481,6 +4649,7 @@ int main(int argc, const char* argv[])
                                 otree->jet_phi_   [q] = leptonLV.Phi();
                                 otree->jet_m_     [q] = leptonLV.M();
                                 otree->jet_csv_   [q] = -99.;
+                                otree->jet_id_    [q] = 0;
                             }
 
                             // fill elem 1st w/ MET kinematics
@@ -4491,16 +4660,22 @@ int main(int argc, const char* argv[])
                                 otree->jet_phi_   [q] = neutrinoLV.Phi();
                                 otree->jet_m_     [q] = neutrinoLV.M();
                                 otree->jet_csv_   [q] = -99.;
+                                otree->jet_id_    [q] = 0;
                             }
 
                             // fill other elems w/ the jet kinematics
                             else if( jets_p4_ind < jets_p4.size() && ( properEventSL || (properEventDL && !(q==3 || q==4)))   ) {
+
+                                assert(jets_p4.size() == jets_csv.size());
+                                assert(jets_p4.size() == jets_flavour.size());
+
                                 otree->jet_pt_     [q] = !useRegression ? jets_p4[jets_p4_ind].Pt() : jets_p4_reg[jets_p4_ind].Pt();
                                 otree->jet_pt_alt_ [q] =  useRegression ? jets_p4[jets_p4_ind].Pt() : jets_p4_reg[jets_p4_ind].Pt();
                                 otree->jet_eta_    [q] = jets_p4 [jets_p4_ind].Eta();
                                 otree->jet_phi_    [q] = jets_p4 [jets_p4_ind].Phi();
                                 otree->jet_m_      [q] = jets_p4 [jets_p4_ind].M();
                                 otree->jet_csv_    [q] = jets_csv[jets_p4_ind];
+                                otree->jet_id_    [q] = jets_flavour[jets_p4_ind];
 
                                 jets_p4_ind++;
                             }
@@ -4513,6 +4688,7 @@ int main(int argc, const char* argv[])
                                 otree->jet_phi_    [q] = leptonLV2.Phi();
                                 otree->jet_m_      [q] = leptonLV2.M();
                                 otree->jet_csv_    [q] = -99.;
+                                otree->jet_id_    [q] = 0;
                             }
 
                             //  if DL, fill elem 4th w/ MET kinematics
@@ -4523,6 +4699,7 @@ int main(int argc, const char* argv[])
                                 otree->jet_phi_   [q] = neutrinoLV.Phi();
                                 otree->jet_m_     [q] = neutrinoLV.M();
                                 otree->jet_csv_   [q] = -99.;
+                                otree->jet_id_    [q] = 0;
                             }
 
                             else {}
@@ -4600,7 +4777,10 @@ int main(int argc, const char* argv[])
     btag_tree.tree->Write("", TObject::kOverwrite );
 #endif
     cuts.h->Write("", TObject::kOverwrite);
+    cout << "Cut histogram" << endl;
+    cuts.print();
     fout_tmp->Close();
+
 
     if(debug>=2) cout << "@M" << endl;
 
@@ -4619,6 +4799,7 @@ int main(int argc, const char* argv[])
     if(jet_smear!=0) delete jet_smear;
     cout << "Finished!!!" << endl;
     cout << "*******************" << endl;
+
 
     // Done!!!
     return 0;

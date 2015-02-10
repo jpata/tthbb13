@@ -2,6 +2,7 @@
 #define MECOMBINATION_H
 
 #include <map>
+#include <cmath>
 
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
@@ -452,7 +453,7 @@ namespace perm_maps {
     if (n <= 0) {
       throw exception();
     }
-    return (int)((x % (int)pow(10, n)) / (int)pow(10, n-1));
+    return (int)((x % (int)std::pow(10, n)) / (int)std::pow(10, n-1));
   }
 
   vector<int> comb_as_vector(int x, int length) {
@@ -476,10 +477,18 @@ namespace perm_maps {
 	bool top_b_missed(int x) {
 		return !(has_n(x, 6) && has_n(x, 3));
 	}
-	
-	bool w_q_missed(int x) {
-		return !(has_n(x, 4) && has_n(x, 5));
-	}
+
+  bool w_q1_missed(int x) {
+    return !(has_n(x, 4));
+  }
+
+  bool w_q2_missed(int x) {
+    return !(has_n(x, 5));
+  }
+
+  bool w_qq_missed(int x) {
+    return !(has_n(x, 4) && has_n(x, 5));
+  }
 	
 	int count_matched(int x) {
 		int n = 0;
