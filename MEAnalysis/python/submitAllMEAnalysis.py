@@ -78,8 +78,13 @@ if not os.path.exists(finalOutPath):
 
 def getSplitting(path, sample, numjobs, treeName="tthNtupleAnalyzer/events"):
 
-	if args.verbose > 0:
-		print "getSplitting for", path, sample, numjobs
+	entries = getEntries(path, sample, treeName)
+	entries_per_job = (entries/numjobs + 1)
+	print "\033[94mProcessing..... %s jobs will run on (%.2fK ev/job) * (%.0f job) = %.0f events (%.1f%% of %s)\033[0m" % (numjobs, float(entries_per_job)/1000., numjobs, entries_per_job*numjobs, float(entries_per_job*numjobs)/float(entries)*100, sample)
+	return int(entries_per_job)
+
+def getEntries(path, sample, treeName="tthNtupleAnalyzer/events"):
+
 	sampleName = None
 
 	#convert nickname to name (file-name)
@@ -99,21 +104,13 @@ def getSplitting(path, sample, numjobs, treeName="tthNtupleAnalyzer/events"):
 		t = f.Get(treeName)
 		if t != None and not t.IsZombie():
 			entries = t.GetEntries()
-			print "entries =", entries
-			entries_per_job = (entries/numjobs + 1)
+			return entries
 		else:
 			raise Exception("Cannot open tree %s in file %s" % (treeName, fn))
-		print "\033[94mProcessing..... %s jobs will run on (%.2fK ev/job) * (%.0f job) = %.0f events (%.1f%% of %s)\033[0m" % (numjobs, float(entries_per_job)/1000., numjobs, entries_per_job*numjobs, float(entries_per_job*numjobs)/float(entries)*100, sample)
 		f.Close()
 
-		if numjobs == 1:
-			return -1
-		else:
-			return int(entries_per_job)
 	else:
 		raise Exception('Cannot open file %s' % fn)
-		#print 'Cannot open file %s' % fn
-		#return -2
 
 ###########################################
 ###########################################
@@ -347,44 +344,33 @@ def submitFullMEAnalysis( analysis ):
 	total_jobs = 0
 	for samp in samples:
 		perjob = samp.perJob.value() if hasattr(samp, "perJob") else 100
-		toBeRun += [(samp.nickName.value(), samp.nEvents.value() / perjob + 1)]
-
-	# if args.site=="T3_CH_PSI":
-	# 	toBeRun = [
-	# 		["TTJets", 10 * args.njobs, ''],
-	# 		["TTHBB125", args.njobs, '']
-	# 		]
-	# elif args.site == "T2_EE_Estonia":
-	# 	toBeRun = [
-	# 		#["TTJets", 10 * args.njobs, ''],
-	# 		["TTHBB125", args.njobs, ''],
-	# 		["TTHBB125_PU20BX25_PHYS14", args.njobs, ''],
-	# 		["TTHBB125_PU40BX50_PHYS14", args.njobs, ''],
-	# 		]
+		toBeRun += [(samp.nickName.value(), perjob)]
 
 	for run in toBeRun:
-		print "running", run
 		counter	= 0
-		sample= run[0]
-		num_of_jobs = run[1]
+		sample = run[0]
+		perjob = run[1]
 
-		evs_per_job = getSplitting(
+		events = getEntries(
 			process.fwliteInput.pathToFile.value() + ordering,
 			sample,
-			num_of_jobs
 		)
+		num_of_jobs = int(events / perjob + 1)
+		print "running", run, num_of_jobs
+		#evs_per_job = getSplitting(
+		#	process.fwliteInput.pathToFile.value() + ordering,
+		#	sample,
+		#	num_of_jobs
+		#)
 
-		if evs_per_job==-2:
-			print "Error in getSplitting.. please check again."
-			continue
 		for i in range(num_of_jobs):
 			counter = counter + 1
 			submitMEAnalysis(
 				analysis + '_' + sample + '_p' + str(counter),
 				sample,
 				"",
-				i*evs_per_job,
-				(i+1)*evs_per_job
+				i*perjob,
+				(i+1)*perjob
 			)
 			total_jobs += 1
 

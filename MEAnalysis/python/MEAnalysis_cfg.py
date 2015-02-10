@@ -82,7 +82,7 @@ process.fwliteInput = cms.PSet(
     switchoffOL   = cms.untracked.int32(0), ###### CHECK HERE
 
     # skip VEGAS call
-    speedup       = cms.untracked.int32(0), ###### CHECK HERE
+    speedup       = cms.untracked.int32(1), ###### CHECK HERE
 
     # select which analysis to run
     # select with 4-6 jets regardless of btagging
