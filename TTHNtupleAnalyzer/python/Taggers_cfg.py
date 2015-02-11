@@ -295,12 +295,12 @@ li_fatjets_sds = []
 for fj_name in li_fatjets_objects:
         
    # For Local Testing
-   #sd_path = "../data/"
+   sd_path = "../data/"
    # For Grid Submission
-   sd_path = "src/TTH/TTHNtupleAnalyzer/data/"
+   #sd_path = "src/TTH/TTHNtupleAnalyzer/data/"
         
-   sd_fatjets = []
-   #sd_fatjets = ["ca08PFJetsCHS", "ca15PFJetsCHS"]
+   #sd_fatjets = []
+   sd_fatjets = li_ungroomed_fatjets_objects
    
    r = GetRadiusStringFromName(fj_name)
    input_card = sd_path + "sd_input_card_{0}.dat".format(r)
@@ -718,3 +718,4 @@ if "TTH_DEBUG" in os.environ:
 	)
 	process.p += process.printTree
 
+print li_fatjets_branches

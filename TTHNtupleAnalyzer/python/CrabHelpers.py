@@ -12,6 +12,11 @@ import sys
 import glob
 import subprocess
 
+try:
+    import ROOT
+except:
+    pass
+
 from TTH.TTHNtupleAnalyzer.Samples import Samples
 
 #######################################
@@ -144,7 +149,8 @@ def download_globus(name,
                     sample_shortname,
                     version,        
                     basepath,
-                    user_name = "gregor"):
+                    user_name = "gregor",
+                    glob_string = "*.root"):
     """Download a single job from the Grid using globus-url-copy instead of crab
     """
 
@@ -180,7 +186,7 @@ def download_globus(name,
 
     # Loop over directories, get full list of files and download them
     for i, directory in enumerate(directories_to_process):
-        files_to_download = glob.glob(os.path.join(directory, "*tagging*"))
+        files_to_download = glob.glob(os.path.join(directory, glob_string))
         print "Subdir:", i, "Number of files to download:", len(files_to_download)
 
         for ifn, fn in enumerate(files_to_download):
@@ -225,3 +231,44 @@ def hadd(name,
 
     subprocess.call(["hadd", "-f", output_filename] + input_filenames)
 # End of hadd
+
+
+#######################################
+# cleanup
+#######################################
+
+def cleanup(name,
+         sample_shortname,
+         version,        
+         basepath = "",
+         infile_glob = "output-tagging_*.root*"):
+    """ 
+    Remove all files for which GetEntries() fails. Useful after failed downloads.
+    """
+
+    input_dir = basepath + "{0}_{1}_{2}/{3}".format(name, 
+                                                    version, 
+                                                    sample_shortname,
+                                                    infile_glob)    
+    input_filenames = glob.glob(input_dir)
+    if len(input_filenames)==0:
+        print "No files found in ", input_dir
+        return
+
+    broken = []
+    for fn in  input_filenames:
+        try:
+            f = ROOT.TFile(fn)
+            x = f.tree.GetEntries()
+            f.Close()
+        except AttributeError:
+            broken.append(fn)
+                            
+    for fn in broken:
+        print "Removing", fn
+        os.remove(fn)
+    
+    print "{0} of {1} files removed. That's {2:.0f}%".format(len(broken), 
+                                                             len(input_filenames),
+                                                             100. * len(broken) / len(input_filenames))      
+# End of cleanup

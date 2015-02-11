@@ -6,7 +6,7 @@
 
 import sys
 
-from TTH.TTHNtupleAnalyzer.CrabHelpers import submit, status, kill, download, download_globus, hadd
+import TTH.TTHNtupleAnalyzer.CrabHelpers as CH
 
 
 #######################################
@@ -15,7 +15,7 @@ from TTH.TTHNtupleAnalyzer.CrabHelpers import submit, status, kill, download, do
 
 # Ntuple name/version and samples to include
 name = "ntop"
-version = "v25"
+version = "v28"
 li_samples = [
     #"qcd_170_300_pythia8_13tev",
     #"qcd_300_470_pythia8_13tev",
@@ -25,7 +25,6 @@ li_samples = [
 
     #"zprime_m500_1p_13tev",
     #"zprime_m750_1p_13tev",
-
     #"zprime_m1000_1p_13tev",
     #"zprime_m1250_1p_13tev", 
     #"zprime_m1500_1p_13tev", 
@@ -43,7 +42,7 @@ storage_path = '/scratch/gregor/'
 #####################################
 
 # Decide what to do
-actions = ["submit", "status", "kill", "download", "download_globus", "hadd"]
+actions = ["submit", "status", "kill", "download", "download_globus", "cleanup", "hadd"]
 
 if not len(sys.argv) == 2:
     print "Invalid number of arguments"
@@ -60,7 +59,7 @@ if not action in actions:
 # Submit
 if action == "submit":
     for sample_shortname in li_samples:
-        submit(name,
+        CH.submit(name,
                sample_shortname,  
                version,
                cmssw_config_path = cmssw_config_path,
@@ -70,29 +69,34 @@ if action == "submit":
 # Status
 if action == "status":
     for sample_shortname in li_samples:
-        status(name,
+        CH.status(name,
                sample_shortname,  
                version)
 
 # Kill
 if action == "kill":
     for sample_shortname in li_samples:
-        kill(name,
+        CH.kill(name,
              sample_shortname,  
              version)
 
 # Download
 elif action == "download":
     for sample_shortname in li_samples:
-        download(name, sample_shortname, version, storage_path)    
+        CH.download(name, sample_shortname, version, storage_path)    
 
 # Download
 elif action == "download_globus":
     for sample_shortname in li_samples:
-        download_globus(name, sample_shortname, version, storage_path)    
+        CH.download_globus(name, sample_shortname, version, storage_path, glob_string = "output-tagging*.root")    
+
+# Cleanup
+elif action == "cleanup":
+    for sample_shortname in li_samples:
+        CH.cleanup(name, sample_shortname, version, storage_path, infile_glob="*.root")    
 
 # Hadd
 elif action == "hadd":
     for sample_shortname in li_samples:
-        hadd(name, sample_shortname, version, storage_path)    
+        CH.hadd(name, sample_shortname, version, storage_path)    
 

@@ -95,7 +95,8 @@ fj_branches_plus = fj_branches + ["chi", "qvol", "nmj"]
 htt_branches = ["pt", "mass", "fW", "Rmin", "RminExpected", "prunedMass", "ptFiltForRminExp"]
 cmstt_branches = ["pt", "mass", "minMass", "wMass", "topMass", "nSubJets"]
 
-li_fatjets = higgs_fj_branches + top_fj_branches
+li_fatjets = higgs_fj_branches + top_fj_branches + ['ca08', 'ca15', 'ca08puppi', 'ca15puppi', 'ca08trimmedr2f6', 'ca08trimmedr2f10', 'ca08softdropz15b00', 'ca08softdropz20b10', 'ca08softdropz30b10', 'ca08softdropz30b15', 'ca15trimmedr2f6', 'ca15trimmedr2f10', 'ca15softdropz15b00', 'ca15softdropz20b10', 'ca15softdropz30b10', 'ca15softdropz30b15', 'ca08puppitrimmedr2f6', 'ca08puppitrimmedr2f10', 'ca08puppisoftdropz15b00', 'ca08puppisoftdropz20b10', 'ca08puppisoftdropz30b10', 'ca08puppisoftdropz30b15', 'ca15puppitrimmedr2f6', 'ca15puppitrimmedr2f10', 'ca15puppisoftdropz15b00', 'ca15puppisoftdropz20b10', 'ca15puppisoftdropz30b10', 'ca15puppisoftdropz30b15']
+
 
 # Generic
 objects = {}
