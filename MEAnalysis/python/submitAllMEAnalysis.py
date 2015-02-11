@@ -54,7 +54,7 @@ if args.site=="T3_CH_PSI":
 	#address2		= 'dcap://t3se01.psi.ch:22125/'
 	address1		= ''
 	address2		= ''
-	subcommand			= 'qsub -V -cwd -l os=sl6,h_vmem=2G -q all.q'
+	subcommand			= 'qsub -V -cwd -l os=sl6,h_vmem=4G -q short.q'
 	#tempOutPath = "/scratch/" + os.environ["USER"] + "/"
 	tempOutPath = "$TMPDIR/"
 	finalOutPath = "/shome/" + os.environ["USER"] + "/tth/{0}/".format(processing_tag)
@@ -296,21 +296,25 @@ def submitMEAnalysis(
 
 	f = open(scriptName,'w')
 	f.write('#!/bin/bash\n\n')
+	f.write('env\n')
 	f.write('set -e\n')
 	f.write('echo "SCRIPT '+scriptName+'"\n')
 	f.write('cd ${CMSSW_BASE}/src/TTH/MEAnalysis/\n')
-	f.write('export SCRAM_ARCH="slc6_amd64_gcc481"\n')
+	f.write('export SCRAM_ARCH="slc6_amd64_gcc491"\n')
+	f.write('echo "setting CMSSW global environment"\n')
 	f.write('source /cvmfs/cms.cern.ch/cmsset_default.sh\n')
+	f.write('echo "setting CMSSW local environment"\n')
 	f.write('eval `scramv1 runtime -sh`\n')
-	f.write('\n\n')
 
 	#call script with absolute path
 	d = os.getcwd()
 	f.write('time MEAnalysis ' + d + "/" + jobName+'.py\n')
+	f.write('echo "MEAnalysis completed"\n')
 
 	#remove output from final location and copy
 	f.write('rm -f %s\n' % (finalOutFilename))
 	f.write('rsync %s %s\n' % (process.fwliteInput.outFileName.value(), finalOutFilename))
+	f.write('echo "copy completed"\n')
 	f.write('rm -f %s\n' % process.fwliteInput.outFileName.value())
 	f.write('echo "JOB DONE"\n')
 
@@ -339,12 +343,15 @@ def submitFullMEAnalysis( analysis ):
 	os.system('cp $CMSSW_BASE/src/TTH/MEAnalysis/python/MEAnalysis_cfg.py ./')
 	imp.load_source("localME", "./MEAnalysis_cfg.py")
 	from localME import process
+	enabled = ["ttjets_13tev_madgraph_pu20bx25_phys14", "tth_hbb_13tev_amcatnlo_pu20bx25_phys14"]
 
 	toBeRun = []
 	total_jobs = 0
 	for samp in samples:
 		perjob = samp.perJob.value() if hasattr(samp, "perJob") else 100
-		toBeRun += [(samp.nickName.value(), perjob)]
+		nick = samp.nickName.value()
+		if nick in enabled:
+			toBeRun += [(nick, perjob)]
 
 	for run in toBeRun:
 		counter	= 0
@@ -356,7 +363,7 @@ def submitFullMEAnalysis( analysis ):
 			sample,
 		)
 		num_of_jobs = int(events / perjob + 1)
-		print "running", run, num_of_jobs
+		print "running", run, events, num_of_jobs
 		#evs_per_job = getSplitting(
 		#	process.fwliteInput.pathToFile.value() + ordering,
 		#	sample,

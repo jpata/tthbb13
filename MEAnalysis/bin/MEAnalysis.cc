@@ -709,9 +709,13 @@ int main(int argc, const char* argv[])
 
     // open first sample for b-energy regression => get pointer to the tree
     string currentName0     = mySampleFiles[0];
+
     mySamples->OpenFile( currentName0 );
     TTree* currentTree_reg  = mySamples->GetTree( currentName0, TTH_TTREE_NAME);
-
+    if (currentTree_reg == 0) {
+        currentTree_reg  = mySamples->GetTree( currentName0, "events");
+    }
+    cout << "Looping over events " << endl;
     // loop over input files
     for(unsigned int sample = 0 ; sample < mySampleFiles.size(); sample++) {
         
@@ -726,7 +730,10 @@ int main(int argc, const char* argv[])
         mySamples->OpenFile( currentName );
         cout << "Opening file " << currentName << endl;
         TTree* currentTree = mySamples->GetTree  (currentName, TTH_TTREE_NAME);
-
+        if (currentTree == 0) {
+            currentTree  = mySamples->GetTree( currentName, "events");
+        }
+        assert(currentTree != 0);
         //create the input TTree with branches
         TTHTree* itree = new TTHTree(currentTree);
         itree->set_branch_addresses();

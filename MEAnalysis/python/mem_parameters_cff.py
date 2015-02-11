@@ -10,7 +10,7 @@ import FWCore.ParameterSet.Config as cms
 #pathToFile = "/store/user/jpata/tth/dec19_5b21f5f/"
 
 #this is the unique tag/identifier for step2
-processing_tag = "s1_eb733a1__s2_test"
+processing_tag = "s1_eb733a1__s2_long"
 ordering   = 'TTHbb_s1_eb733a1_'
 
 # luminosity
