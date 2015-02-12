@@ -12,7 +12,7 @@ fns = os.environ["FILE_NAMES"].split()
 if len(fns) != 1:
 	raise Exception("can only process one file at a time")
 fn = fns[0]
-dataset = os.environ["DATASETNICK"]
+dataset = os.environ["DATASETPATH"]
 
 good_samp = []
 for ns in range(len(process.fwliteInput.samples)):
@@ -26,6 +26,12 @@ for ns in range(len(process.fwliteInput.samples)):
 
 process.fwliteInput.samples = good_samp
 process.fwliteInput.outFileName = cms.string(os.environ["MY_SCRATCH"] + "/output.root")
+
 print "------"
 print process.dumpPython()
 print "------"
+
+if __name__ == "__main__":
+	of = open("MEAnalysis_cfg.py", "w")
+	of.write(process.dumpPython())
+	of.close()

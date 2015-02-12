@@ -4,7 +4,7 @@ import os
 
 process = cms.Process("MEAnalysisNew")
 
-from TTH.MEAnalysis.samples_v1 import samples
+from TTH.MEAnalysis.samples_v1 import samples, pathToFile, samplePrefix
 process.fwliteInput = cms.PSet(
 
     # output file name
@@ -23,15 +23,10 @@ process.fwliteInput = cms.PSet(
     pathToCP_smear= cms.string("./root/ControlPlotsTEST_std_gen.root"),
 
     # input file directory
-    pathToFile    = cms.string("root://cmsxrootd.fnal.gov//store/user/jpata/tth/s1_eb733a1/"),
-    #pathToFile    = cms.string("dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/jpata/tth/dec19_5b21f5f"),
-    #pathToFile    = cms.string("dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store//user/bianchi/TTH_EDMNtuple/"),
-    #pathToFile    = cms.string("dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/bianchi/HepMC/Sherpa_run/"),
-    #pathToFile    = cms.string("/scratch/bianchi/HBB_EDMNtuple/Sherpa_run/"),
-    #pathToFile    = cms.string("/shome/bianchi/CMSSW_5_3_3_patch2_New/src/VHbbAnalysis/VHbbDataFormats/bin/"),
+    pathToFile    = pathToFile,
 
     # a name tag for the input files
-    ordering      = cms.string("TTHbb_s1_eb733a1_"),
+    ordering      = samplePrefix,
 
     # the samples
     samples = samples,
@@ -248,11 +243,3 @@ process.fwliteInput = cms.PSet(
     cutWMass = cms.untracked.bool(False),
     cutBTagShape = cms.untracked.bool(False),
 )
-
-import os
-hn = os.environ["HOSTNAME"]
-vo = os.environ.get("VO_CMS_DEFAULT_SE", "")
-if "kbfi" in hn or "comp-" in hn or "kbfi" in vo:
-    process.fwliteInput.pathToFile = cms.string("file:///hdfs/cms/store/user/jpata/tth/s1_eb733a1/")
-elif "psi" in hn or "psi" in vo:
-    process.fwliteInput.pathToFile = cms.string("dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/jpata/tth/s1_eb733a1/")
