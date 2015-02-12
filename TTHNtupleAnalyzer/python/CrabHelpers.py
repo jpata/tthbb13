@@ -385,7 +385,7 @@ def replicate(fname, site, path):
     """
 
     return subprocess.call([
-        "python", "../python/data_replica.py",
+        "python", os.environ["CMSSW_BASE"] + "/src/TTH/TTHNtupleAnalyzer/python/data_replica.py",
         "--delete",
         "--from", "LOCAL",
         "--to", site,

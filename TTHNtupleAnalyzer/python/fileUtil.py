@@ -1,4 +1,4 @@
-import ROOT, sys, re
+import ROOT, sys, re, os
 
 def scan(tf, pref=""):
     for k in tf.GetListOfKeys():
@@ -13,6 +13,10 @@ for fn in sys.argv[1:]:
     fn = fn.split()[0]
     if fn.endswith(".root"):
         tf = ROOT.TFile.Open(fn)
-        scan(tf, fn+":")
+        if tf!=None and not tf.IsZombie():
+            print fn, int(tf.GetSize())
+            scan(tf, fn+":")
+        else:
+            print "error", fn
     else:
         print "skipping", fn
