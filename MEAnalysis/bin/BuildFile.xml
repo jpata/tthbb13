@@ -1,4 +1,4 @@
-<bin   file="MEAnalysis.cc,HelperFunctions.cc" name="MEAnalysis">
+<bin   file="MEAnalysis.cc,HelperFunctions.cc,MECombination.cc" name="MEAnalysis">
   <use   name="DataFormats/FWLite"/>
   <use   name="FWCore/FWLite"/>
   <use   name="FWCore/PythonParameterSet"/>

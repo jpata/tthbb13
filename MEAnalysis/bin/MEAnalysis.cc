@@ -2755,7 +2755,7 @@ int main(int argc, const char* argv[])
                             cout << "hypothesis loop " << hyp << endl;
                         }
                         // list of permutations
-                        int* permutList = 0;
+                        const int* permutList = 0;
                         if( btag_flag == 0 ) permutList = hyp==0 ?  permutations_6J_S : permutations_6J_B;
                         if( btag_flag == 1 ) permutList = hyp==0 ?  permutations_5J_S : permutations_5J_B;
                         if( btag_flag == 2 ) permutList = hyp==0 ?  permutations_4J_S : permutations_4J_B;
@@ -2931,7 +2931,7 @@ int main(int argc, const char* argv[])
                     //cout << "LR " << otree->btag_LR << " " << otree->btag_LR2_ << endl;
                     // depending on event type, check if the event passes the cut:
                     // if it does, check which combination yields the **largest** ttbb probability
-                    int* permutListS = 0;
+                    const int* permutListS = 0;
                     switch( btag_flag ) {
                     case 0:
                         passes_btagshape = ( otree->btag_LR >= btag_prob_cut_6jets && selected_comb!=999);
@@ -3872,7 +3872,7 @@ int main(int argc, const char* argv[])
                             for(int hyp = 0 ; hyp<2;  hyp++) {
 
                                 // choose which permutations to consider;
-                                int* permutList = 0;
+                                const int* permutList = 0;
                                 if     ( otree->type_ == -3 ) permutList = hyp==0 ?  permutations_4J_S      : permutations_4J_B;
                                 else if( otree->type_ == -2 ) permutList = hyp==0 ?  permutations_6J_S      : permutations_6J_B;
                                 else if( otree->type_ == -1 ) permutList = hyp==0 ?  permutations_5J_S      : permutations_5J_B;

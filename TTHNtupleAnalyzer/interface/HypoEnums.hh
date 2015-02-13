@@ -32,26 +32,26 @@ namespace TTH {
 	    BAD_HYPO
 	};
 	
-	void label_axis(TAxis* ax) {
-		int i=1;
-		for (const char* v : {
-			"mumu",
-			"ee",
-			"mun",
-			"en",
-			"nn",
-			"emu",
-			"taumu",
-			"taue",
-			"taun",
-			"tautau",
-			"UNKNOWN_HYPO",
-			"BAD_HYPO"
-		}) {
-			ax->SetBinLabel(i, v);
-			i += 1;
-		}
-	}
+	// void label_axis(TAxis* ax) {
+	// 	int i=1;
+	// 	for (const char* v : {
+	// 		"mumu",
+	// 		"ee",
+	// 		"mun",
+	// 		"en",
+	// 		"nn",
+	// 		"emu",
+	// 		"taumu",
+	// 		"taue",
+	// 		"taun",
+	// 		"tautau",
+	// 		"UNKNOWN_HYPO",
+	// 		"BAD_HYPO"
+	// 	}) {
+	// 		ax->SetBinLabel(i, v);
+	// 		i += 1;
+	// 	}
+	// }
 
 	
 //top quark pair decay mode
