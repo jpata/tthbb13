@@ -1,7 +1,7 @@
 #sample branches file for headergen.py
 #uses branch classes from headergen
 from TTH.TTHNtupleAnalyzer.headergen import *
-from TTH.TTHNtupleAnalyzer.Taggers_cfg import li_fatjets_branches, li_ungroomed_fatjets_branches 
+from TTH.TTHNtupleAnalyzer.Taggers_cfg import li_fatjets_branches, li_ungroomed_fatjets_branches, li_htt_branches
 
 defines.extend(["#define ADD_TRUE_TOP_MATCHING_FOR_FJ 1",
                 "#define ADD_TRUE_TOP_MATCHING_FOR_HTT 1",
@@ -214,7 +214,7 @@ htt_sj_float_branches =  ["energy", "eta", "mass", "phi", "pt"]
 
 htt_sj_int_branches =  ["parent_idx"]
 
-for htt_name in ["looseMultiRHTT", "looseMultiRHTTpuppi"]:
+for htt_name in li_htt_branches:
 
     # How many objects do we have?
     tagger_counter_name = "n__jet_{0}".format(htt_name)

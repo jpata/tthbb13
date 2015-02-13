@@ -299,8 +299,8 @@ for fj_name in li_fatjets_objects:
    # For Grid Submission
    sd_path = "src/TTH/TTHNtupleAnalyzer/data/"
         
-   #sd_fatjets = []
-   sd_fatjets = li_ungroomed_fatjets_objects
+   sd_fatjets = []
+   #sd_fatjets = li_ungroomed_fatjets_objects
    
    r = GetRadiusStringFromName(fj_name)
    input_card = sd_path + "sd_input_card_{0}.dat".format(r)
@@ -547,56 +547,112 @@ process.ca15puppiCMSTopTagInfos = cms.EDProducer("CATopJetTagger",
 #  HEPTopTagger
 #####################################
 
-process.LooseMultiRHTTJetsCHS = cms.EDProducer(
-     "HTTTopJetProducer",
-     PFJetParameters.clone( src = cms.InputTag('chs'),
-                            doAreaFastjet = cms.bool(True),
-                            doRhoFastjet = cms.bool(False),
-                            jetPtMin = cms.double(100.0)
-                        ),
-     AnomalousCellParameters,
-     multiR = cms.bool(True),
-     algorithm = cms.int32(1),
-     jetAlgorithm = cms.string("CambridgeAachen"),
-     rParam = cms.double(1.5),
-     mode = cms.int32(4),
-     minFatjetPt = cms.double(200.),
-     minCandPt = cms.double(200.),
-     minSubjetPt = cms.double(30.),
-     writeCompound = cms.bool(True),
-     minCandMass = cms.double(0.),
-     maxCandMass = cms.double(1000),
-     massRatioWidth = cms.double(100.),
-     minM23Cut = cms.double(0.),
-     minM13Cut = cms.double(0.),
-     maxM13Cut = cms.double(2.),
-)
+li_htt_branches = []
+
+for input_object in ["chs", "puppi"]:
+   
+
+   name = "looseMultiRHTT"
+   if not input_object == "chs":
+      name += input_object
+
+   setattr(process, name, cms.EDProducer(
+        "HTTTopJetProducer",
+        PFJetParameters.clone( src = cms.InputTag(input_object),
+                               doAreaFastjet = cms.bool(True),
+                               doRhoFastjet = cms.bool(False),
+                               jetPtMin = cms.double(100.0)
+                           ),
+        AnomalousCellParameters,
+        multiR = cms.bool(True),
+        algorithm = cms.int32(1),
+        jetAlgorithm = cms.string("CambridgeAachen"),
+        rParam = cms.double(1.5),
+        mode = cms.int32(4),
+        minFatjetPt = cms.double(200.),
+        minCandPt = cms.double(200.),
+        minSubjetPt = cms.double(30.),
+        writeCompound = cms.bool(True),
+        minCandMass = cms.double(0.),
+        maxCandMass = cms.double(1000),
+        massRatioWidth = cms.double(100.),
+        minM23Cut = cms.double(0.),
+        minM13Cut = cms.double(0.),
+        maxM13Cut = cms.double(2.)))
+   li_htt_branches.append(name)
 
 
-process.LooseMultiRHTTJetsPUPPI = cms.EDProducer(
-     "HTTTopJetProducer",
-     PFJetParameters.clone( src = cms.InputTag('puppi'),
-                            doAreaFastjet = cms.bool(True),
-                            doRhoFastjet = cms.bool(False),
-                            jetPtMin = cms.double(100.0)
-                        ),
-     AnomalousCellParameters,
-     multiR = cms.bool(True),
-     algorithm = cms.int32(1),
-     jetAlgorithm = cms.string("CambridgeAachen"),
-     rParam = cms.double(1.5),
-     mode = cms.int32(4),
-     minFatjetPt = cms.double(200.),
-     minCandPt = cms.double(200.),
-     minSubjetPt = cms.double(30.),
-     writeCompound = cms.bool(True),
-     minCandMass = cms.double(0.),
-     maxCandMass = cms.double(1000),
-     massRatioWidth = cms.double(100.),
-     minM23Cut = cms.double(0.),
-     minM13Cut = cms.double(0.),
-     maxM13Cut = cms.double(2.),
-)
+   name = "softdropz15b00MultiRHTT"
+   if not input_object == "chs":
+      name += input_object
+
+   setattr(process, name, cms.EDProducer(
+        "HTTTopJetProducer",
+        PFJetParameters.clone( src = cms.InputTag(input_object),
+                               doAreaFastjet = cms.bool(True),
+                               doRhoFastjet = cms.bool(False),
+                               jetPtMin = cms.double(100.0)
+                           ),
+        AnomalousCellParameters,
+        multiR = cms.bool(True),
+        algorithm = cms.int32(1),
+        jetAlgorithm = cms.string("CambridgeAachen"),
+        rParam = cms.double(1.5),
+        mode = cms.int32(4),
+        minFatjetPt = cms.double(200.),
+        minCandPt = cms.double(200.),
+        minSubjetPt = cms.double(30.),
+        writeCompound = cms.bool(True),
+        minCandMass = cms.double(0.),
+        maxCandMass = cms.double(1000),
+        massRatioWidth = cms.double(100.),
+        minM23Cut = cms.double(0.),
+        minM13Cut = cms.double(0.),
+        maxM13Cut = cms.double(2.),
+        unclustering_pt = cms.bool(True),
+        unclustering_R0 = cms.double(1.5),
+        unclustering_beta = cms.double(0),
+        unclustering_zcut = cms.double(0.15),
+   ))
+   li_htt_branches.append(name)
+
+
+
+   name = "softdropz20b10MultiRHTT"
+   if not input_object == "chs":
+      name += input_object
+
+   setattr(process, name, cms.EDProducer(
+        "HTTTopJetProducer",
+        PFJetParameters.clone( src = cms.InputTag(input_object),
+                               doAreaFastjet = cms.bool(True),
+                               doRhoFastjet = cms.bool(False),
+                               jetPtMin = cms.double(100.0)
+                           ),
+        AnomalousCellParameters,
+        multiR = cms.bool(True),
+        algorithm = cms.int32(1),
+        jetAlgorithm = cms.string("CambridgeAachen"),
+        rParam = cms.double(1.5),
+        mode = cms.int32(4),
+        minFatjetPt = cms.double(200.),
+        minCandPt = cms.double(200.),
+        minSubjetPt = cms.double(30.),
+        writeCompound = cms.bool(True),
+        minCandMass = cms.double(0.),
+        maxCandMass = cms.double(1000),
+        massRatioWidth = cms.double(100.),
+        minM23Cut = cms.double(0.),
+        minM13Cut = cms.double(0.),
+        maxM13Cut = cms.double(2.),
+        unclustering_pt = cms.bool(True),
+        unclustering_R0 = cms.double(1.5),
+        unclustering_beta = cms.double(1.0),
+        unclustering_zcut = cms.double(0.2),
+   ))
+   li_htt_branches.append(name)
+
+
 
 
 #####################################
@@ -630,8 +686,8 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
         fatjetsBranches = cms.vstring(li_fatjets_branches),
         fatjetsIsBasicJets = cms.vint32(li_fatjets_is_basic_jets),                                           
 
-        httObjects  = cms.vstring(['LooseMultiRHTTJetsCHS', 'LooseMultiRHTTJetsPUPPI']),                                           
-        httBranches = cms.vstring(['looseMultiRHTT', 'looseMultiRHTTpuppi']),                                           
+        httObjects  = cms.vstring(li_htt_branches), # Using branch names also as object names
+        httBranches = cms.vstring(li_htt_branches),                                           
        
         cmsttObjects  = cms.vstring(['cmsTopTagCa08PFJetsCHS', 'cmsTopTagCa15PFJetsCHS', 'cmsTopTagCa08PFJetsPUPPI', 'cmsTopTagCa15PFJetsPUPPI']),
         cmsttInfos    = cms.vstring(['ca08CMSTopTagInfos',     'ca15CMSTopTagInfos'    , 'ca08puppiCMSTopTagInfos',  'ca15puppiCMSTopTagInfos']),
@@ -692,6 +748,10 @@ for sd_name in li_fatjets_sds:
    else:
       process.p += getattr(process, sd_name)
 
+# Schedule HEPTopTagger
+for htt_name in li_htt_branches:
+   process.p += getattr(process, htt_name)
+
 # Schedule CMS Top Tagger, HEPTopTagger, b-tagging and Ntupelizer
 for x in [process.cmsTopTagCa08PFJetsCHS,
           process.cmsTopTagCa15PFJetsCHS,
@@ -701,8 +761,6 @@ for x in [process.cmsTopTagCa08PFJetsCHS,
           process.ca15CMSTopTagInfos,
           process.ca08puppiCMSTopTagInfos,
           process.ca15puppiCMSTopTagInfos,
-          process.LooseMultiRHTTJetsCHS,
-          process.LooseMultiRHTTJetsPUPPI,
           process.my_btagging,
           process.tthNtupleAnalyzer
   ]:
