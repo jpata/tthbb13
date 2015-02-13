@@ -17,6 +17,7 @@
 import os
 import sys
 import glob
+import math
 import socket
 
 import ROOT
@@ -26,6 +27,7 @@ if socket.gethostname() == "t3ui12":
     import TTH.TTHNtupleAnalyzer.AccessHelpers as AH
     from TTH.TTHNtupleAnalyzer.HiggsTaggers_cfg import li_fatjets_branches as higgs_fj_branches
     from TTH.TTHNtupleAnalyzer.Taggers_cfg import li_fatjets_branches as top_fj_branches
+    from TTH.TTHNtupleAnalyzer.Taggers_cfg import li_htt_branches
 
 # on the Grid
 else:
@@ -38,8 +40,41 @@ else:
 
     try:
         from Taggers_cfg import li_fatjets_branches as top_fj_branches
+        from Taggers_cfg import li_htt_branches
     except:
         top_fj_branches = []
+        li_htt_branches = []
+
+
+########################################
+# deltaR
+########################################
+
+def deltaR(eta1, phi1, eta2, phi2):
+    """ Helper function to calculate delta R"""
+    tlv1 = ROOT.TLorentzVector()
+    tlv2 = ROOT.TLorentzVector()
+    
+    tlv1.SetPtEtaPhiM(1, eta1, phi1, 0)
+    tlv2.SetPtEtaPhiM(1, eta2, phi2, 0)
+
+    dphi = abs(abs(abs(phi1-phi2)-math.pi)-math.pi)
+    deta = eta1 - eta2
+
+    return math.sqrt(pow(dphi,2) + pow(deta,2))
+
+
+def deltaRAlt(eta1, phi1, eta2, phi2):
+    """ Helper function to calculate delta R
+    Alternative version using TLorentzVector    
+    """
+    tlv1 = ROOT.TLorentzVector()
+    tlv2 = ROOT.TLorentzVector()
+    
+    tlv1.SetPtEtaPhiM(1, eta1, phi1, 0)
+    tlv2.SetPtEtaPhiM(1, eta2, phi2, 0)
+
+    return tlv1.DeltaR(tlv2)
 
 
 
@@ -103,6 +138,10 @@ objects = {}
 for fj in li_fatjets:
     objects[fj] = fj_branches
 
+# HEPTopTagger
+for htt in li_htt_branches:
+    objects[htt]                = htt_branches
+
 # And some extras
 objects["ca08"]                = fj_branches_plus
 objects["ca15"]                = fj_branches_plus
@@ -112,8 +151,7 @@ objects["ca08cmstt"]           = cmstt_branches
 objects["ca15cmstt"]           = cmstt_branches
 objects["ca08puppicmstt"]      = cmstt_branches
 objects["ca15puppicmstt"]      = cmstt_branches
-objects["looseMultiRHTT"]      = htt_branches
-objects["looseMultiRHTTpuppi"] = htt_branches
+
 
 
 # Matching DeltaR for the varipus object types
@@ -123,7 +161,7 @@ for object_name in objects.keys():
         object_drs[object_name] = 0.6
     elif "ca15" in object_name:
         object_drs[object_name] = 1.2
-    elif "looseMultiRHTT" in object_name:
+    elif "HTT" in object_name:
         object_drs[object_name] = 1.2
     else:
         print "No delta R defined for", object_name
@@ -173,6 +211,11 @@ AH.addScalarBranches(variables,
                      outtree,
                      ["{0}_{1}".format(particle_name, branch_name) for branch_name in particle_branches],
                      datatype = 'float')
+
+AH.addScalarBranches(variables, variable_types, outtree,
+                     ["top_size"],
+                     datatype = 'float')
+
 
 # Setup the output branches for tagging variables
 objects_to_pop = []
@@ -230,6 +273,44 @@ for i_event in range(n_entries):
             full_branch_out = "{0}_{1}".format(particle_name, branch_name)
             variables[full_branch_out][0] = AH.getter(intree, full_branch_in)[i_particle]
 
+        # If we have the hadronic top, we also want to know it's size
+        # This is a bit tricky as we only store the decay products for top and antitop
+        # so first we check which one of the two our hadronic top actually was
+        # and then we look at the daughters of that object
+        if particle_name == "hadtop":
+            t_eta = AH.getter(intree, "gen_t__eta")
+            t_phi = AH.getter(intree, "gen_t__phi")
+            tbar_eta = AH.getter(intree, "gen_tbar__eta")
+            tbar_phi = AH.getter(intree, "gen_tbar__phi")
+            
+            dr_had_t    = deltaR(variables["hadtop_eta"][0], variables["hadtop_phi"][0], t_eta, t_phi)  
+            dr_had_tbar = deltaR(variables["hadtop_eta"][0], variables["hadtop_phi"][0], tbar_eta, tbar_phi) 
+            
+            if dr_had_t < dr_had_tbar:
+                true_top_name = "gen_t"
+            else:
+                true_top_name = "gen_tbar"
+        
+            # b-quark
+            b_eta = AH.getter(intree, "{0}__b__eta".format(true_top_name))
+            b_phi = AH.getter(intree, "{0}__b__phi".format(true_top_name))
+            # leading w daughter
+            w1_eta = AH.getter(intree, "{0}__w_d1__eta".format(true_top_name))
+            w1_phi = AH.getter(intree, "{0}__w_d1__phi".format(true_top_name))
+            # sub-leading w daughter
+            w2_eta = AH.getter(intree, "{0}__w_d2__eta".format(true_top_name))
+            w2_phi = AH.getter(intree, "{0}__w_d2__phi".format(true_top_name))
+
+            # Take maximal distance of a decay product to the top as the tops size
+            x = deltaR(b_eta, b_phi, variables["hadtop_eta"][0], variables["hadtop_phi"][0])
+            y = deltaR(w1_eta, w1_phi, variables["hadtop_eta"][0], variables["hadtop_phi"][0])
+            z = deltaR(w2_eta, w2_phi, variables["hadtop_eta"][0], variables["hadtop_phi"][0])
+                        
+            top_size = max([x,y,z])
+        else:
+            top_size = -1
+        variables["top_size"][0] = top_size
+            
 
         # Fill fatjets and taggers
         for object_name, branch_names in objects.iteritems():    
@@ -271,7 +352,6 @@ for i_event in range(n_entries):
 
     # End of particle loop
 # End of Event Loop
-
 
 # Save everything & exit cleanly
 outtree.AutoSave()
