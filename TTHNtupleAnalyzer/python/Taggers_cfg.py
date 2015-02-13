@@ -295,9 +295,9 @@ li_fatjets_sds = []
 for fj_name in li_fatjets_objects:
         
    # For Local Testing
-   sd_path = "../data/"
+   #sd_path = "../data/"
    # For Grid Submission
-   #sd_path = "src/TTH/TTHNtupleAnalyzer/data/"
+   sd_path = "src/TTH/TTHNtupleAnalyzer/data/"
         
    #sd_fatjets = []
    sd_fatjets = li_ungroomed_fatjets_objects
@@ -309,7 +309,7 @@ for fj_name in li_fatjets_objects:
         sd_name = fj_name + "SD"
         setattr(process, sd_name, cms.EDProducer("SDProducer",
                                                  FatjetName = cms.string(fj_name),
-                                                 MicrojetCone = cms.double(-1.), # Use dynamic microjet cone-size
+                                                 MicrojetCone = cms.double(0.2), 
                                                  InputCard = cms.string(input_card)))
         li_fatjets_sds.append(sd_name)
    else:
