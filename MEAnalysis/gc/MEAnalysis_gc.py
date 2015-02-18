@@ -27,6 +27,11 @@ for ns in range(len(process.fwliteInput.samples)):
 process.fwliteInput.samples = good_samp
 process.fwliteInput.outFileName = cms.string(os.environ["MY_SCRATCH"] + "/output.root")
 
+if "phys14" in fn:
+    process.fwliteInput.csv_WP_L = 0.423
+    process.fwliteInput.csv_WP_M = 0.814
+    process.fwliteInput.csv_WP_T = 0.941
+
 print "------"
 print process.dumpPython()
 print "------"
