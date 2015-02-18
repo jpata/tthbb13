@@ -81,15 +81,15 @@ samples = cms.VPSet(
     ),
 )
 
-for (i, s) in enumerate(samples):
-    samp_path = pfPath + "/" + s.name.value()
-    if os.path.isfile(samp_path + ".dat"):
-        metadata = open(samp_path + ".dat")
-        fs = map(lambda x: x.strip(), metadata.readlines())
-        #fs = glob.glob(samp_path + "/*.root")
-        samples[i].subFiles = cms.vstring(map(lambda x: lfPrefix + x, fs))
-    else:
-        samples[i].subFiles = cms.vstring([pathToFile.value() + "/" + samplePrefix.value() + s.name.value() + ".root"])
+#for (i, s) in enumerate(samples):
+#    samp_path = pfPath + "/" + s.name.value()
+#    if os.path.isfile(samp_path + ".dat"):
+#        metadata = open(samp_path + ".dat")
+#        fs = map(lambda x: x.strip(), metadata.readlines())
+#        #fs = glob.glob(samp_path + "/*.root")
+#        samples[i].subFiles = cms.vstring(map(lambda x: lfPrefix + x, fs))
+#    else:
+#        samples[i].subFiles = cms.vstring([pathToFile.value() + "/" + samplePrefix.value() + s.name.value() + ".root"])
 if __name__=="__main__":
     for s in samples:
         print "[/{0}]".format(s.nickName.value())
