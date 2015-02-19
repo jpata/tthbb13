@@ -833,12 +833,14 @@ int main(int argc, const char* argv[])
         
             if (is_undef(itree->hypo1)) {
                 cerr << "hypo1 undefined " << itree->hypo1 << " probably there will be issues" << endl;
+                continue;
             }
             
             Vtype = static_cast<TTH::EventHypothesis>(itree->hypo1);
             if (debug>3) cout << "hypo1 " << itree->hypo1 << " " << Vtype << endl;
             if (((int)Vtype < 0) || ((int)Vtype>11)) {
                 cerr << "Vtype undefined " << (int)Vtype << " probably there will be issues" << endl;
+                continue;
             }
             
             genTop.bmass = itree->gen_t__b__mass;

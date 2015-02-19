@@ -333,6 +333,8 @@ def hadd(name,
     subprocess.call(["hadd", "-f", output_filename] + input_filenames)
 # End of hadd
 
+def getFileListName(name, sample_shortname, version):
+    return "crab_{0}_{1}_{2}/crab_{0}_{1}_{2}/files.txt".format(name, version, sample_shortname)
 
 def hadd_from_file(name,
          sample_shortname,
@@ -352,7 +354,7 @@ def hadd_from_file(name,
     Returns: name of total root file if successful, otherwise nothing
     """
 
-    input_fn = "crab_{0}_{1}_{2}/crab_{0}_{1}_{2}/files.txt".format(name, version, sample_shortname)
+    input_fn = getFileListName(name, sample_shortname, version)
     if os.path.isfile(input_fn):
         input_filenames = map(lambda x: x.strip(), open(input_fn).readlines())
         to_process = []
@@ -371,7 +373,7 @@ def hadd_from_file(name,
     return None
 # End of hadd_from_file
 
-def replicate(fname, site, path):
+def replicate(fname, site, path, dryRun=False):
     """ Replicates the files created by hadd_from_file using SRM data replication
 
     The list of files to copy is processed by the data_replica.py script.
@@ -380,17 +382,20 @@ def replicate(fname, site, path):
         fname (string): name of the file that contains the filenames to replicate.
         site (string): the CMS site name to copy to
         path (string): the LFN prefix to copy to. Will be created by data_replica.py.
+        dryRun (bool): if True, only echo command to run. Defaults to False.
 
     Returns: the return code of the data_replica.py script
     """
-
-    return subprocess.call([
+    cmds = []
+    if dryRun:
+        cmds += ["echo"]
+    cmds += [
         "python", os.environ["CMSSW_BASE"] + "/src/TTH/TTHNtupleAnalyzer/python/data_replica.py",
         "--delete",
         "--from", "LOCAL",
         "--to", site,
         fname,
         path
-        ]
-    )
+    ]
+    return subprocess.call(cmds)
 # End of replicate

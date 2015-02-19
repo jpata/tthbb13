@@ -4,9 +4,9 @@
 # Imports
 ######################################
 
-import sys, os
+import sys, os, argparse
 
-from TTH.TTHNtupleAnalyzer.CrabHelpers import submit, status, download, hadd, get_lfn, hadd_from_file, replicate
+from TTH.TTHNtupleAnalyzer.CrabHelpers import submit, status, download, hadd, get_lfn, hadd_from_file, replicate, getFileListName
 from collections import Counter
 
 #######################################
@@ -39,19 +39,25 @@ tier_prefix = '/hdfs/cms/'
 #####################################
 
 # Decide what to do
-actions = ["submit", "status", "download", "hadd", "haddfiles", "replicate"]
+actions = ["submit", "status", "download", "hadd", "haddfiles", "replicate", "replicate-direct"]
+#sites = ["T2_EE_Estonia", "T3_CH_PSI"]
+sites = ["T3_CH_PSI"]
 
-if not len(sys.argv) == 2:
-    print "Invalid number of arguments"
-    print "Usage: {0} {1}".format(sys.argv[0], "/".join(actions))
-    sys.exit()
+parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser.add_argument('--action',
+    choices=actions, type=str,
+    help="Action to perform"
+)
+parser.add_argument('--dryRun',
+    type=bool,
+    default=False,
+    help="if True, only echo commands to run"
+)
 
-action = sys.argv[1]
+parser.add_argument('--verbose', '-v', action='count')
+args = parser.parse_args()
 
-if not action in actions:
-    print "Invalid action"
-    print "Usage: {0} {1}".format(sys.argv[0], "/".join(actions))
-    sys.exit()
+action = args.action
 
 # Submit
 if action == "submit":
@@ -117,8 +123,25 @@ elif action == "haddfiles":
 
 
 elif action == "replicate":
-    #replicate("to-replica.txt", "T2_EE_Estonia", "/store/user/jpata/tth/" + version)
-    replicate("to-replica.txt", "T3_CH_PSI", "/store/user/jpata/tth/" + version)
+    replicate("to-replica.txt", "T2_EE_Estonia", "/store/user/jpata/tth/" + version)
+    #replicate("to-replica.txt", "T3_CH_PSI", "/store/user/jpata/tth/" + version)
 
+elif action == "replicate-direct":
+    #sample_metadata_files = open("sample_metadata_files.dat", "w")
+    #for sample_shortname in li_samples:
+    #    fn = getFileListName(name, sample_shortname, version)
+    #    metadata_fn = "{0}.dat".format(sample_shortname)
+    #    sample_metadata = open(metadata_fn, "w")
 
+    #    for fi in open(fn).readlines():
+    #        fi = fi.strip()
+    #        basename = fi.split("/")[-1]
+    #        sample_metadata.write(sample_shortname + "/" + basename + "\n")
+    #    sample_metadata.close()
+    #    sample_metadata_files.write(os.getcwd() + "/" + metadata_fn + "\n")
+    #    for site in sites:
+    #        replicate(fn, site, "/store/user/jpata/tth/" + version + "/" + sample_shortname, dryRun=args.dryRun)
+    #sample_metadata_files.close()
+    for site in sites:
+        replicate("sample_metadata_files.dat", site, "/store/user/jpata/tth/" + version + "/", dryRun=args.dryRun)
 
