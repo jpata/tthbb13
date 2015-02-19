@@ -13,6 +13,8 @@ else:
     from TTH.Plotting.python.Helpers.VariableHelpers import variable
 
 
+variable('top_size', "Top Size", 0, 4.)
+
 mass_vars_15 = [
     variable('ca15_mass', "m (R=1.5)", 0, 1000, unit = "GeV"),
     variable('ca15filtered_mass', "filtered m (R=1.5)", 0, 1000, unit = "GeV"),
@@ -59,8 +61,110 @@ mass_vars_08_v21 = [
     variable('ca08softdropz30b100_mass', "sd 30b100 m (R=0.8)", 0, 1000, unit = "GeV"),
 ]
 
+groomers_v27 = [
+    "",
+    "trimmedr2f6",
+    "trimmedr2f10",
+    "softdropz15b00",
+    "softdropz20b10",
+    "softdropz30b10",
+    "softdropz30b15",
+]
 
 
+
+mass_vars_v27 = []
+qvol_vars_v27 = []
+nsub_vars_v27 = []
+cmstt_vars_v27 = []
+
+for fj in ["ca08", 
+           "ca15", 
+           "ca08puppi", 
+           "ca15puppi"]:
+
+    qvol_vars_v27.append(variable(fj+"_qvol", fj+"_qvol", 0, 1.))
+    for groomer in groomers_v27:
+        mass_vars_v27.append(variable(fj+groomer+"_mass", fj+"_"+groomer, 0, 400, unit = "GeV"))
+        nsub_vars_v27.append(variable("{0}{1}_tau3/{0}{1}_tau2".format(fj,groomer), 
+                                      fj+"_"+groomer+"_nsub", 
+                                      0, 1., 
+                                      extra_cut = "({0}{1}_tau2>0)".format(fj,groomer)))
+
+    cmstt_vars_v27.append(variable(fj+'cmstt_minMass', 
+                                   fj+"cmstt_minMass",  
+                                   0, 400, unit = "GeV", 
+                                   extra_cut = "({0}cmstt_nSubJets >= 3)".format(fj)))
+    cmstt_vars_v27.append(variable(fj+'cmstt_topMass', 
+                                   fj+"cmstt_topMass",  
+                                   0, 800, unit = "GeV",
+                                   extra_cut = "({0}cmstt_nSubJets >= 3)".format(fj)))
+
+
+htt_v27 = ["looseMultiRHTT", "softdropz15b00MultiRHTT", "softdropz20b10MultiRHTT"]
+htt_vars_v27 = []
+for htt in htt_v27:
+    htt_vars_v27.append(variable(htt+'_mass', htt+"_m", 0, 400, unit = "GeV"))
+    htt_vars_v27.append(variable(htt+'_fW', htt+"_fW", 0, 0.8))
+    htt_vars_v27.append(variable('{0}_Rmin-{0}_RminExpected'.format(htt), htt+"_DeltaRmin", -0.8, 1.))
+
+
+
+
+
+
+ineresting_lowpt_vars_v27 = [
+    variable.di["ca15trimmedr2f6_mass"],
+    variable.di["ca15puppitrimmedr2f6_mass"],
+    variable.di["ca15softdropz20b10_mass"],
+    variable.di["ca15puppisoftdropz20b10_mass"],
+    variable.di["ca15softdropz30b15_mass"],
+    variable.di["ca15puppisoftdropz30b15_mass"],
+    variable.di["ca15_qvol"],
+    variable.di["ca15puppi_qvol"],
+    variable.di["ca15_tau3/ca15_tau2"],
+    variable.di["ca15puppi_tau3/ca15puppi_tau2"],
+    variable.di["ca15trimmedr2f6_tau3/ca15trimmedr2f6_tau2"],
+    variable.di["ca15puppitrimmedr2f6_tau3/ca15puppitrimmedr2f6_tau2"],
+    variable.di["ca15puppicmstt_minMass"],
+    variable.di["ca15puppicmstt_topMass"],
+]
+
+ineresting_midpt_vars_v27 = [
+    variable.di["ca08trimmedr2f6_mass"],
+    variable.di["ca08puppitrimmedr2f6_mass"],
+    variable.di["ca08softdropz15b00_mass"],
+    variable.di["ca08puppisoftdropz15b00_mass"],
+
+    variable.di["ca08_qvol"],
+    variable.di["ca08puppi_qvol"],
+    variable.di["ca08_tau3/ca08_tau2"],
+    variable.di["ca08puppi_tau3/ca08puppi_tau2"],
+
+    variable.di["ca08cmstt_minMass"],
+    variable.di["ca08cmstt_topMass"],
+    variable.di["ca08puppicmstt_minMass"],
+    variable.di["ca08puppicmstt_topMass"],
+
+]
+
+ineresting_highpt_vars_v27 = [
+    variable.di["ca08trimmedr2f6_mass"],
+    variable.di["ca08puppitrimmedr2f6_mass"],
+    variable.di["ca08softdropz15b00_mass"],
+    variable.di["ca08puppisoftdropz15b00_mass"],
+
+    variable.di["ca08_qvol"],
+    variable.di["ca08puppi_qvol"],
+    variable.di["ca08_tau3/ca08_tau2"],
+    variable.di["ca08puppi_tau3/ca08puppi_tau2"],
+
+    variable.di["ca08cmstt_minMass"],
+    variable.di["ca08cmstt_topMass"],
+    variable.di["ca08puppicmstt_minMass"],
+    variable.di["ca08puppicmstt_topMass"],
+
+]
 
 
 
@@ -231,10 +335,11 @@ cmstt_vars = [variable.di['ca08cmstt_topMass'],
 ]
 
 
-sd_vars = [variable.di['log(ca08_chi)'],              
-           variable.di['log(ca15_chi)']
-]
-              
+sd_vars =[]              
+for fj in ["ca08", "ca15", "ca08puppi", "ca15puppi"]:
+    sd_vars.append(variable('log({0}_chi)'.format(fj), "log(#chi)_"+fj, -10., 10, extra_cut = '{0}_chi>0'.format(fj)))
+    sd_vars.append(variable('{0}_nmj'.format(fj), "N (microjets)", 0., 20., extra_cut = '{0}_chi>0'.format(fj)))
+
 
 all_vars_15 = mass_vars_15 + tau_vars_15 +   tagger_vars_15 
 all_vars_08 = mass_vars_08 + tau_vars_08 +   tagger_vars_08

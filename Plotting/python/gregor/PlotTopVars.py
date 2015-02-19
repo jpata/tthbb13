@@ -39,7 +39,7 @@ low_pt_mass_vars = [
 ]
 
 
-for var in new_mass_vars_15:
+for var in mass_vars_v27:
     combinedPlot(pair_name + "_" + var.name,
                  [plot(sample +" " + var.pretty_name,
                        var.name,                                           

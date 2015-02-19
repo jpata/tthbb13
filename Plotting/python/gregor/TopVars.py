@@ -300,7 +300,7 @@ if False:
                   legend_size_y   = 0.05 * 4)
 
 # Comparison of Groomed Masses
-combinedPlot ("ca15_groomed_masses",
+    combinedPlot ("ca15_groomed_masses",
               [plot( "Z' " +jet_names[jc], 
                      "{0}__mass".format(jc), 
                      '({0}__close_hadtop_dr<1.2)'.format(jc), 

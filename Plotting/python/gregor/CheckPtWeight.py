@@ -7,6 +7,7 @@
 ########################################
 
 import os
+import sys
 import pickle
 import socket # to get the hostname
 
@@ -44,11 +45,13 @@ output_dir = "results/CheckPtWeight/"
 
 if False:
     for sample in files.keys():
+
+        fiducial_cut_and_weight = "(weight*({0}))".format(fiducial_cuts[sample])
+
         combinedPlot(sample + "_true_pt",
                      [plot( sample,
                             'pt', 
-                            '((pt>{0})&&(pt<{1}))*weight'.format(ranges[sample][0], 
-                                                                 ranges[sample][1]),
+                            fiducial_cut_and_weight,
                             sample), 
                   ],
                      80, ranges[sample][0], ranges[sample][1], 
@@ -62,17 +65,36 @@ if False:
                      legend_size_x   = 0.2,
                      legend_size_y   = 0.05 * 2)
 
+        combinedPlot(sample + "_true_eta",
+                     [plot( sample,
+                            'eta', 
+                            fiducial_cut_and_weight,
+                            sample), 
+                  ],
+                     80, -2.6, 2.6, 
+                     label_x   = "True #eta",
+                     label_y   = "Partons",
+                     axis_unit = "",
+                     log_y     = False,
+                     normalize = True,
+                     legend_origin_x = 0.35,
+                     legend_origin_y = 0.3,
+                     legend_size_x   = 0.2,
+                     legend_size_y   = 0.05 * 2)
 
 
-for var in htt_vars: 
 
-    combinedPlot(var.pretty_name.replace("/","_").replace(" ", "_").replace("{","").replace("}",""),
-             [plot(sample,
-                   var.name,                                           
-                   '((pt>{0})&&(pt<{1})&&({2}))*weight'.format(ranges[sample][0], 
-                                                               ranges[sample][1],
-                                                               var.extra_cut),
-                   sample) for sample in files.keys()],
+if False:
+    samples = [x for x in files.keys() if "zprime" in x]
+    var = variable.di["top_size"]
+    combinedPlot(("top_size"),
+                 [plot(sample,
+                       var.name,                                           
+                       '((pt>{0})&&(pt<{1})&&(abs(eta)<{2})&&({3}))*weight'.format(ranges[sample][0], 
+                                                                                   ranges[sample][1],
+                                                                                   ranges[sample][2],
+                                                                                   var.extra_cut),
+                       sample) for sample in samples],
                  80, var.range_min, var.range_max, 
                  label_x   = var.pretty_name,
                  label_y   = "A.U.",
@@ -80,14 +102,67 @@ for var in htt_vars:
                  log_y     = False,
                  normalize = True,
                  legend_origin_x = 0.6,
-                 legend_origin_y = 0.6,
+                 legend_origin_y = 0.7,
                  legend_size_x   = 0.2,
-                 legend_size_y   = 0.05*6)
+                 legend_size_y   = 0.05*len(samples))
+
+
+for var in sd_vars: 
+    continue
+    samples = files.keys()
+    
+    combinedPlot(var.name.replace("/","_").replace(" ", "_").replace("{","").replace("}",""),
+             [plot(sample,
+                   var.name,                                           
+                   '((pt>{0})&&(pt<{1})&&(abs(eta)<{2})&&({3}))*weight'.format(ranges[sample][0], 
+                                                                               ranges[sample][1],
+                                                                               ranges[sample][2],
+                                                                               var.extra_cut),
+                   sample) for sample in samples],
+                 80, var.range_min, var.range_max, 
+                 label_x   = var.pretty_name,
+                 label_y   = "A.U.",
+                 axis_unit = var.unit,
+                 log_y     = False,
+                 normalize = True,
+                 legend_origin_x = 0.6,
+                 legend_origin_y = 0.7,
+                 legend_size_x   = 0.2,
+                 legend_size_y   = 0.05*len(samples))
+
+
+for var in cmstt_vars_v27: #nsub_vars_v27: #qvol_vars_v27: #mass_vars_v27:
+
+
+    samples = ['zprime_m750', 'zprime_m1250', 'zprime_m2000', 'qcd_170_300', 'qcd_470_600', 'qcd_800_1000']
+        
+    samples = [s for s in samples if ranges[s][4] in var.name]
+
+    combinedPlot(var.pretty_name.replace("/","_").replace(" ", "_").replace("{","").replace("}",""),
+             [plot(sample,
+                   var.name,                                           
+                   '({0}&&{1})*weight'.format(fiducial_cuts[sample], var.extra_cut),
+                   sample) for sample in samples],
+                 80, var.range_min, var.range_max, 
+                 label_x   = var.pretty_name,
+                 label_y   = "A.U.",
+                 axis_unit = var.unit,
+                 log_y     = False,
+                 normalize = True,
+                 legend_origin_x = 0.7,
+                 legend_origin_y = 0.65,
+                 legend_size_x   = 0.2,
+                 legend_size_y   = 0.03*len(samples),
+                 legend_text_size= 0.03)
+
+
+
+
 
 
 for sample in files.keys():
     continue
-
+    
     fiducial_cut = '((pt>{0})&&(pt<{1}))*weight'.format(ranges[sample][0], 
                                                         ranges[sample][1])
     
@@ -191,7 +266,7 @@ for sample in files.keys():
                      legend_size_x   = 0.2,
                      legend_size_y   = 0.05 * len(collection))
 
-    if True:
+    if False:
         name = "sd_vars"
         collection = globals()[name]
         if "qcd" in sample:

@@ -36,17 +36,17 @@ ROOT.gROOT.ForceStyle()
 run_TMVA = False
 
 pairs = { 
-    "pt-800-to-1000-v18" : ["zprime_m2000_v18", "qcd_800_1000_v18", "fixed R_{microjet}"],
-    "pt-800-to-1000-v19" : ["zprime_m2000_v19", "qcd_800_1000_v19", "dynamic R_{microjet}"],
+    "pt-800-to-1000-v31" : ["zprime_m2000_v31", "qcd_800_1000_v31", "dynamic R_{microjet}"],
+    "pt-800-to-1000-v32" : ["zprime_m2000_v32", "qcd_800_1000_v32", "fixed R_{microjet}"],
 }
 
 
 
 files = {
-    "zprime_m2000_v18" : "ntop_v18_zprime_m2000_1p_13tev-tagging",     
-    "qcd_800_1000_v18" : "ntop_v18_qcd_800_1000_pythia8_13tev-tagging",
-    "zprime_m2000_v19" : "ntop_v19_zprime_m2000_1p_13tev-tagging",     
-    "qcd_800_1000_v19" : "ntop_v19_qcd_800_1000_pythia8_13tev-tagging",
+    "zprime_m2000_v31" : "ntop_v31_zprime_m2000_1p_13tev-tagging",     
+    "qcd_800_1000_v31" : "ntop_v31_qcd_800_1000_pythia8_13tev-tagging",
+    "zprime_m2000_v32" : "ntop_v32_zprime_m2000_1p_13tev-tagging",     
+    "qcd_800_1000_v32" : "ntop_v32_qcd_800_1000_pythia8_13tev-tagging",
 }
 
 fiducial_cut = "((pt>801)&&(pt<999)&&(fabs(eta)<1.5))"
@@ -64,10 +64,12 @@ for pair_name, pair in pairs.iteritems():
 
 
     for v in sd_vars:
+        if not "chi" in v.name:
+            continue
         name = "{0}_{1}_{2}".format(sample_sig, sample_bkg, v.name)
         name = name.replace("/","_")
         li_TMVAs.append( TMVASetup( name,
-                                    v.pretty_name +" " +pair[2],
+                                    v.pretty_name.replace("log(#chi)_","") +" " +pair[2],
                                     li_methods, 
                                     [v],
                                     file_name_sig,

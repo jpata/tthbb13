@@ -40,12 +40,20 @@ fits["zprime_m2000"]     = ROOT.TF1("fit_fun_zprime","pol5",801,999)
 fits["zprime_m3000"]     = ROOT.TF1("fit_fun_zprime","pol5",1001,1499)
 fits["zprime_m4000"]     = ROOT.TF1("fit_fun_zprime","pol5",1401,1799)
 
-fits["qcd_170_300"]  = ROOT.TF1("fit_fun_qcd","[0]+[1]*sqrt(x)+[2]/x + [3]*x",201,299)
+fits["qcd_170_300"]  = ROOT.TF1("fit_fun_qcd","[0]+[1]*sqrt(x)+[2]/x+[3]/(x*x)+[4]/(x*x*x)",201,299)
 fits["qcd_470_600"]  = ROOT.TF1("fit_fun_qcd","[0]+[1]*sqrt(x)+[2]/x + [3]*x",471,599)
 fits["qcd_300_470"]  = ROOT.TF1("fit_fun_qcd","[0]+[1]*sqrt(x)+[2]/x+[3]/(x*x)+[4]/(x*x*x)",301,470)
 fits["qcd_800_1000"] = ROOT.TF1("fit_fun_qcd","[0]+[1]*sqrt(x)+[2]/x",801,999)
 
-for qcd_name in ["qcd_170_300", "qcd_300_470", "qcd_470_600", "qcd_800_1000"]:
+for qcd_name in ["qcd_170_300"]:
+    fits[qcd_name].SetParameter(0,0)
+    fits[qcd_name].SetParameter(1,0)
+    fits[qcd_name].SetParameter(2,0)
+    fits[qcd_name].SetParameter(3,0.)
+    fits[qcd_name].SetParameter(4,0.)
+    
+
+for qcd_name in ["qcd_300_470", "qcd_470_600", "qcd_800_1000"]:
     fits[qcd_name].SetParameter(0,1)
     fits[qcd_name].SetParameter(1,1)
     fits[qcd_name].SetParameter(2,0.5)
@@ -54,7 +62,7 @@ for qcd_name in ["qcd_170_300", "qcd_300_470", "qcd_470_600", "qcd_800_1000"]:
 eta_fits = {}
 
 for k in fits.keys():
-    eta_fits[k] = ROOT.TF1("eta_k","pol6", -1. * ranges[k][2], ranges[k][2])
+    eta_fits[k] = ROOT.TF1("eta_k","pol6", -1.05 * ranges[k][2], 1.05 *ranges[k][2])
 
 
 # for the filename: basepath + filename + .root
@@ -81,7 +89,9 @@ if True:
 
         pt_var = "{0}_pt".format(truth_var)
         eta_var = "{0}_eta".format(truth_var)
-        fiducial_cut = fiducial_cuts[k].replace("pt", pt_var).replace("eta", eta_var)
+
+        fiducial_cut = "(({0}>{1})&&({0}<{2}))".format(pt_var, ranges[k][0], ranges[k][1])
+
 
         combinedPlot ( k + "_pt_cut",
                       [plot( k, 

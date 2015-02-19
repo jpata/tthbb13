@@ -281,6 +281,8 @@ def MakePlots(
       h.GetYaxis().SetTitle( plot.label_y )      
       h.Draw( plot.draw_opts )
       
+      h.ProfileX().Draw("SAME")
+
       # Get the number of bins for the two axes
       nbinsx = h.GetNbinsX()
       nbinsy = h.GetNbinsY()
