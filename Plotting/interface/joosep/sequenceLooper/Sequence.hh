@@ -30,10 +30,14 @@ public:
     std::map<std::string, GenericAnalyzer *> analyzers;
     long long processed = 0;
     const std::string name;
+    const std::string fullName;
+    const std::vector<std::string> dependsOn;
 
     Sequence(AnalyzerRegistry &analyzer_registry,
              fwlite::TFileService *fs,
              const std::string _name,
+             const std::string _fullName,
+             const std::vector<std::string> _dependsOn,
              const edm::VParameterSet &sequence_vpset
             );
     bool process(EventContainer &ev);

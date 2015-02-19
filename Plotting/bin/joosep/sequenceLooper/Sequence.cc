@@ -5,17 +5,22 @@
 Sequence::Sequence(AnalyzerRegistry &analyzer_registry,
                    fwlite::TFileService *fs,
                    const std::string _name,
+                   const std::string _fullName,
+                   const std::vector<std::string> _dependsOn,
                    const edm::VParameterSet &sequence_vpset) :
-    name(_name)
+    name(_name),
+    fullName(_fullName),
+    dependsOn(_dependsOn)
 {
     for (auto &seq_elem : sequence_vpset)
     {
-        const auto k = seq_elem.getParameter<std::string>("type");
+        const auto& k = seq_elem.getParameter<std::string>("type");
+        const auto& n = seq_elem.getParameter<std::string>("name");
         if (analyzer_registry.find(k) == analyzer_registry.end())
         {
             throw std::runtime_error("could not find analyzer with type " + k);
         }
-        LOG(INFO) << "Booked analyzer " << k;
+        LOG(INFO) << "Booked analyzer " << k << ":" << n;
         GenericAnalyzer *a = analyzer_registry[k](fs, this, seq_elem);
 
         analyzers_order.push_back(a->name);
@@ -25,25 +30,50 @@ Sequence::Sequence(AnalyzerRegistry &analyzer_registry,
 
 bool Sequence::process(EventContainer &ev)
 {
-    for (const auto &analyzer : analyzers_order)
+    LOG(DEBUG) << "Processing sequence " << name << ":" << fullName;
+
+    ev.setWasRun(name, true);
+    processed++;
+
+    bool ret = true;
+
+    for (const auto &dep : dependsOn)
     {
-        GenericAnalyzer *an = analyzers[analyzer];
-        bool ret = an->process(ev);
-        if (!ret)
+        if (!ev.wasRun(dep))
         {
-            break;
+            LOG(ERROR) << "Sequence "  << name << " requires " << dep;
+            ev.print();
+            throw std::runtime_error("missing sequence " + dep);
+        }
+        if (!ev.wasSuccess(dep)) {
+            ret = false;
         }
     }
-    processed++;
-    return true;
+
+    if (ret) {
+        for (const auto &analyzer : analyzers_order)
+        {
+            GenericAnalyzer *an = analyzers[analyzer];
+            ret = an->process(ev);
+            if (!ret)
+            {
+                LOG(DEBUG) << "Sequence " << name << " analyzer " << an->name << " did not pass, breaking";
+                break;
+            }
+        }
+    }
+
+    ev.setWasSuccess(name, ret);
+
+    return ret;
 }
 
 void Sequence::printSummary()
 {
-    std::cout << "Sequence " << name << " processed " << processed << std::endl;
+    std::cout << "Sequence " << fullName << " processed " << processed << std::endl;
     for (auto &k : analyzers_order)
     {
-        std::cout << "Analyzer " << k << " processed " << analyzers[k]->processed << std::endl;
+        std::cout << "Analyzer " << analyzers[k]->name << " processed " << analyzers[k]->processed << std::endl;
     }
     std::cout << "---" << std::endl;
 }

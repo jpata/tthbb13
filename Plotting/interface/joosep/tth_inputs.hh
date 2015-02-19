@@ -21,8 +21,8 @@ public:
         for (auto &sample_pset : pset.getParameter<edm::VParameterSet>("samples"))
         {
             Sample s = Sample(sample_pset);
-            s.treeS2->set_branch_addresses(125.0);
-            s.treeS1->set_branch_addresses();
+            //s.treeS2->set_branch_addresses(125.0);
+            //s.treeS1->set_branch_addresses();
             samples.push_back(s);
         }
 

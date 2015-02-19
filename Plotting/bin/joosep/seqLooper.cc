@@ -33,12 +33,14 @@
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 
+
+//Need to define it here to specialize templates
 template <typename T, class ...Ts>
 T *GenericAnalyzer::fsmake(Ts... args)
 {
     T *t = fs->make<T>(args...);
     t->SetName(
-        (sequence->name + "__" + this->name + "__" + string(t->GetName())).c_str()
+        (sequence->fullName + "__" + this->name + "__" + string(t->GetName())).c_str()
     );
     return t;
 }
@@ -58,13 +60,19 @@ AnalyzerRegistry analyzer_registry =
     {"EventPrinterAnalyzer", &createAnalyzerInstance<EventPrinterAnalyzer>},
     {"TTHMETreeAnalyzer", &createAnalyzerInstance<TTHMETreeAnalyzer>},
     {"LeptonAnalyzer", &createAnalyzerInstance<LeptonAnalyzer>},
+    {"MEDiscriminatorAnalyzer", &createAnalyzerInstance<MEDiscriminatorAnalyzer>},
     {"BoolSelector", &createAnalyzerInstance<BoolSelector>},
+    {"IntSelector", &createAnalyzerInstance<IntSelector>},
+    {"DoubleRangeSelector", &createAnalyzerInstance<DoubleRangeSelector>},
+    {"TTHEventPrinterAnalyzer", &createAnalyzerInstance<TTHEventPrinterAnalyzer>},
 };
 
 _INITIALIZE_EASYLOGGINGPP
 
 int main(int argc, const char *argv[])
 {
+    TH1::SetDefaultSumw2(true);
+
     _START_EASYLOGGINGPP(argc, argv);
 
     gROOT->SetBatch(true);
@@ -73,10 +81,11 @@ int main(int argc, const char *argv[])
 
     AutoLibraryLoader::enable();
 
-    fwlite::TFileService *fs = new fwlite::TFileService("output.root");
-
     PythonProcessDesc builder(argv[1]);
     const edm::VParameterSet &inputs_par = builder.processDesc()->getProcessPSet()->getParameter<edm::VParameterSet>("inputs");
+    const edm::ParameterSet &output_par = builder.processDesc()->getProcessPSet()->getParameter<edm::ParameterSet>("outputs");
+
+    fwlite::TFileService *fs = new fwlite::TFileService(output_par.getParameter<std::string>("outFileName"));
     //const edm::ParameterSet& output = builder.processDesc()->getProcessPSet()->getParameter<edm::ParameterSet>("output");
     const edm::VParameterSet &list_of_sequences = builder.processDesc()->getProcessPSet()->getParameter<edm::VParameterSet>("sequences");
 
@@ -124,12 +133,15 @@ int main(int argc, const char *argv[])
                 for (auto &seqp : list_of_sequences)
                 {
                     const auto &seq_name = seqp.getParameter<std::string>("name");
+                    const auto &dependsOn = seqp.getParameter<std::vector<std::string>>("dependsOn");
                     const auto &sequence_pset = builder.processDesc()->getProcessPSet()->
                                                 getParameter<edm::VParameterSet>(seq_name);
 
                     Sequence *seq = new Sequence(
                         analyzer_registry, fs,
-                        (inp->currentName + "__" + seq_name),
+                        seq_name, //name
+                        (inp->currentName + "__" + seq_name), //fullName
+                        dependsOn, //dependsOn
                         sequence_pset
                     );
 
