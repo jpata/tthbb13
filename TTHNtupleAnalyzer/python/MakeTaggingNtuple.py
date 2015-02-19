@@ -45,6 +45,7 @@ else:
         top_fj_branches = []
         li_htt_branches = []
 
+print li_htt_branches
 
 ########################################
 # deltaR

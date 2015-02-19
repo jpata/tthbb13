@@ -170,6 +170,17 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
 
    ungroomed_fj = getattr(process, ungroomed_fj_name)
 
+   name = "trimmedr2f3"   
+   fj_name = ungroomed_fj_name + name
+   branch_name = ungroomed_branch_name + name
+   setattr(process, fj_name, ungroomed_fj.clone(
+      useTrimming = cms.bool(True),
+      rFilt = cms.double(0.2),
+      trimPtFracMin = cms.double(0.03),
+      useExplicitGhosts = cms.bool(True)))
+   li_fatjets_objects.append(fj_name)        
+   li_fatjets_branches.append(branch_name)
+
    name = "trimmedr2f6"   
    fj_name = ungroomed_fj_name + name
    branch_name = ungroomed_branch_name + name
@@ -192,6 +203,17 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
    li_fatjets_objects.append(fj_name)        
    li_fatjets_branches.append(branch_name)
 
+   name = "softdropz10b00"   
+   fj_name = ungroomed_fj_name + name
+   branch_name = ungroomed_branch_name + name
+   setattr(process, fj_name, ungroomed_fj.clone(
+           useSoftDrop = cms.bool(True),
+           zcut = cms.double(0.1),
+           beta = cms.double(0.0),
+           useExplicitGhosts = cms.bool(True)))
+   li_fatjets_objects.append(fj_name)        
+   li_fatjets_branches.append(branch_name)
+
    name = "softdropz15b00"   
    fj_name = ungroomed_fj_name + name
    branch_name = ungroomed_branch_name + name
@@ -199,6 +221,28 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
            useSoftDrop = cms.bool(True),
            zcut = cms.double(0.15),
            beta = cms.double(0.0),
+           useExplicitGhosts = cms.bool(True)))
+   li_fatjets_objects.append(fj_name)        
+   li_fatjets_branches.append(branch_name)
+
+   name = "softdropz15b10"   
+   fj_name = ungroomed_fj_name + name
+   branch_name = ungroomed_branch_name + name
+   setattr(process, fj_name, ungroomed_fj.clone(
+           useSoftDrop = cms.bool(True),
+           zcut = cms.double(0.15),
+           beta = cms.double(1.0),
+           useExplicitGhosts = cms.bool(True)))
+   li_fatjets_objects.append(fj_name)        
+   li_fatjets_branches.append(branch_name)
+
+   name = "softdropz15b20"   
+   fj_name = ungroomed_fj_name + name
+   branch_name = ungroomed_branch_name + name
+   setattr(process, fj_name, ungroomed_fj.clone(
+           useSoftDrop = cms.bool(True),
+           zcut = cms.double(0.15),
+           beta = cms.double(2.0),
            useExplicitGhosts = cms.bool(True)))
    li_fatjets_objects.append(fj_name)        
    li_fatjets_branches.append(branch_name)
@@ -582,42 +626,6 @@ for input_object in ["chs", "puppi"]:
    li_htt_branches.append(name)
 
 
-   name = "softdropz15b00MultiRHTT"
-   if not input_object == "chs":
-      name += input_object
-
-   setattr(process, name, cms.EDProducer(
-        "HTTTopJetProducer",
-        PFJetParameters.clone( src = cms.InputTag(input_object),
-                               doAreaFastjet = cms.bool(True),
-                               doRhoFastjet = cms.bool(False),
-                               jetPtMin = cms.double(100.0)
-                           ),
-        AnomalousCellParameters,
-        multiR = cms.bool(True),
-        algorithm = cms.int32(1),
-        jetAlgorithm = cms.string("CambridgeAachen"),
-        rParam = cms.double(1.5),
-        mode = cms.int32(4),
-        minFatjetPt = cms.double(200.),
-        minCandPt = cms.double(200.),
-        minSubjetPt = cms.double(30.),
-        writeCompound = cms.bool(True),
-        minCandMass = cms.double(0.),
-        maxCandMass = cms.double(1000),
-        massRatioWidth = cms.double(100.),
-        minM23Cut = cms.double(0.),
-        minM13Cut = cms.double(0.),
-        maxM13Cut = cms.double(2.),
-        unclustering_pt = cms.bool(True),
-        unclustering_R0 = cms.double(1.5),
-        unclustering_beta = cms.double(0),
-        unclustering_zcut = cms.double(0.15),
-   ))
-   li_htt_branches.append(name)
-
-
-
    name = "softdropz20b10MultiRHTT"
    if not input_object == "chs":
       name += input_object
@@ -653,6 +661,47 @@ for input_object in ["chs", "puppi"]:
    li_htt_branches.append(name)
 
 
+
+   for beta in [-2., -1., 0., 1.]:
+   
+      if beta < 0:
+         beta_name = "minus{0:0>2}".format(int(abs(beta*10.)))
+      else:
+         beta_name = "{0:0>2}".format(int(beta*10.))
+   
+      name = "softdropz15b{0}MultiRHTT".format(beta_name)
+      if not input_object == "chs":
+         name += input_object
+
+      setattr(process, name, cms.EDProducer(
+           "HTTTopJetProducer",
+           PFJetParameters.clone( src = cms.InputTag(input_object),
+                                  doAreaFastjet = cms.bool(True),
+                                  doRhoFastjet = cms.bool(False),
+                                  jetPtMin = cms.double(100.0)
+                              ),
+           AnomalousCellParameters,
+           multiR = cms.bool(True),
+           algorithm = cms.int32(1),
+           jetAlgorithm = cms.string("CambridgeAachen"),
+           rParam = cms.double(1.5),
+           mode = cms.int32(4),
+           minFatjetPt = cms.double(200.),
+           minCandPt = cms.double(200.),
+           minSubjetPt = cms.double(30.),
+           writeCompound = cms.bool(True),
+           minCandMass = cms.double(0.),
+           maxCandMass = cms.double(1000),
+           massRatioWidth = cms.double(100.),
+           minM23Cut = cms.double(0.),
+           minM13Cut = cms.double(0.),
+           maxM13Cut = cms.double(2.),
+           unclustering_pt = cms.bool(True),
+           unclustering_R0 = cms.double(1.5),
+           unclustering_beta = cms.double(beta),
+           unclustering_zcut = cms.double(0.15),
+      ))
+      li_htt_branches.append(name)
 
 
 #####################################

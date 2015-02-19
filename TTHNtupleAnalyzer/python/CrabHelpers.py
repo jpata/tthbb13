@@ -224,6 +224,10 @@ def hadd(name,
                                                     infile_glob)    
     input_filenames = glob.glob(input_dir)
         
+    # Only add the first 4k files (temp workaround)
+    if len(input_filenames) > 4000:
+        input_filenames = input_filenames[:4000]
+
     output_filename = basepath + "{0}_{1}_{2}{3}.root".format(name, 
                                                               version, 
                                                               sample_shortname,
@@ -259,7 +263,14 @@ def cleanup(name,
     for fn in  input_filenames:
         try:
             f = ROOT.TFile(fn)
-            x = f.tree.GetEntries()
+            t = f.tree
+            x = t.GetEntries()
+            
+            t.GetEntry(10)
+            m = t.ca15_mass
+        
+            if f.IsZombie():
+                broken.append(fn)
             f.Close()
         except AttributeError:
             broken.append(fn)
