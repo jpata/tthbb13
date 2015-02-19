@@ -45,6 +45,7 @@ Sample::Sample(const edm::ParameterSet& pars) :
 		}
 
 		treeS2 = new METree(chainS2);
+		treeS2->set_branch_addresses(125);
 	}
 
 	if (totalEvents <= 0) {

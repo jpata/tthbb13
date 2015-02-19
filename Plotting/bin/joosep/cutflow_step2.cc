@@ -379,8 +379,9 @@ int main(int argc, const char* argv[])
                     assert(event != 0);
                     assert(!is_undef(sample.treeS1->hypo1));
                 }
+                
                 double me_discr = t.probAtSgn_ /
-                (t.probAtSgn_ + 0.02 * t.probAtSgn_alt_);
+                    (t.probAtSgn_ + 0.02 * t.probAtSgn_alt_);
                 
                 if (me_discr > 1.0)
                     me_discr = 1.0;

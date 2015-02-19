@@ -16,7 +16,7 @@ GenericAnalyzer::GenericAnalyzer(
 
 bool GenericAnalyzer::process(EventContainer &event)
 {
-    LOG(DEBUG) << "processing " << name << " " << event.i;
+    LOG(DEBUG) << "processing " << sequence->fullName << " " << name << " " << event.i;
     processed++;
     return true;
 };
