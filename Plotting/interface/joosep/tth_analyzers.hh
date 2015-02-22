@@ -33,17 +33,17 @@ public:
         addData(event, "Vtype", static_cast<TTH::EventHypothesis>(t->Vtype_));
         addData(event, "is_sl", is_single_lepton(t, s->type));
         addData(event, "is_dl", is_double_lepton(t, s->type));
-        addData(event, "cat", cat);
+        addData(event, "cat", (int)cat);
         addData(event, "rad", classify_radiation(t, s->process));
-        addData(event, "btag_LR", t->btag_LR);
+        addData(event, "btag_LR", (double)(t->btag_LR));
         addData(event, "numJets", t->numJets_);
         addData(event, "numBTagM", t->numBTagM_);
         addData(event, "btag_lr_high_low", is_btag_lr_high_low(t, cat));
 
         bool ret = true;
-        ret = ret && (is_sl || is_dl) && !(is_sl && is_dl);
+        ret = ret && (is_sl || is_dl);// && !(is_sl && is_dl);
         ret = ret && (t->syst_ == 0);
-        ret = ret && (t->btag_LR >= 0);
+        //ret = ret && (t->btag_LR >= 0);
         return ret;
     };
 };
@@ -51,8 +51,8 @@ public:
 class LeptonAnalyzer : public GenericAnalyzer
 {
 
-    TH1D* h_leptype = 0;
-    TH1D* h_samptype = 0;
+    TH1D *h_leptype = 0;
+    TH1D *h_samptype = 0;
     TH1D *h_pt1 = 0;
     TH1D *h_pt2 = 0;
 
@@ -62,7 +62,8 @@ class LeptonAnalyzer : public GenericAnalyzer
     TH1D *h_njets = 0;
 
     TH1D *h_btag_lr = 0;
-    TH1D *h_btag_lr2 = 0;
+    TH1D *h_btag_lr080 = 0;
+    TH1D *h_btag_lr095 = 0;
 
     TH1D *h_vtype = 0;
     TH1D *h_type = 0;
@@ -71,14 +72,18 @@ class LeptonAnalyzer : public GenericAnalyzer
     TH2D *h_cat_btag_lr = 0;
     TH2D *h_cat_btag_lr2 = 0;
 
-    TH1D* h_radmode = 0;
-    TH2D* h_rad_lr_default = 0;
-    TH2D* h_rad_lr_cc = 0;
-    TH2D* h_rad_lr_cc_bj = 0;
-    TH2D* h_rad_lr_cc_bj_w = 0;
-    TH2D* h_rad_lr_wcq = 0;
+    TH1D *h_radmode = 0;
+    TH2D *h_rad_lr_default = 0;
+    TH2D *h_rad_lr_cc = 0;
+    TH2D *h_rad_lr_cc_bj = 0;
+    TH2D *h_rad_lr_cc_bj_w = 0;
+    TH2D *h_rad_lr_wcq = 0;
 
-    TH1D* h_w = 0;
+    TH2D *h_jet_id_csv = 0;
+    TH2D *h_jet_pt_csv = 0;
+    TH2D *h_jet_eta_csv = 0;
+
+    TH1D *h_w = 0;
 
     const double lambda_bb = 0.1;
     const double lambda_bj = 0.2;
@@ -108,7 +113,8 @@ public:
         h_ntags = fsmake<TH1D>("ntags", "Number of CSVM b-tagged jets", 8, 0, 8);
 
         h_btag_lr = fsmake<TH1D>("btag_lr", "B-tagging likelihood ratio", 100, 0, 1);
-        h_btag_lr2 = fsmake<TH1D>("btag_lr2", "B-tagging likelihood ratio", 100, 0.8, 1.0);
+        h_btag_lr080 = fsmake<TH1D>("btag_lr080", "B-tagging likelihood ratio", 100, 0.8, 1.0);
+        h_btag_lr095 = fsmake<TH1D>("btag_lr095", "B-tagging likelihood ratio", 100, 0.95, 1.0);
 
         h_vtype = fsmake<TH1D>("Vtype", "Vtype", 8, 0, 8);
         h_type = fsmake<TH1D>("type", "type", 8, 0, 8);
@@ -124,6 +130,10 @@ public:
         h_rad_lr_cc_bj_w = fsmake<TH2D>("rad_lr_cc_bj_w", "Radiation mode vs bLR", 8, 0, 8, 100, 0, 1);
         h_rad_lr_wcq = fsmake<TH2D>("rad_lr_wcq", "Radiation mode vs bLR", 8, 0, 8, 100, 0, 1);
 
+        h_jet_id_csv = fsmake<TH2D>("jet_id_csv", "Jet flavour vs. b-discriminator", 25, 0, 25, 100, 0, 1); 
+        h_jet_pt_csv = fsmake<TH2D>("jet_pt_csv", "Jet pt vs. b-discriminator", 100, 0, 500, 100, 0, 1); 
+        h_jet_eta_csv = fsmake<TH2D>("jet_eta_csv", "Jet eta vs. b-discriminator", 100, 0, 5, 100, 0, 1); 
+
         h_w = fsmake<TH1D>("w", "Event weight", 100, -2, 2);
     };
 
@@ -134,7 +144,7 @@ public:
         METree *t = event.getData<METree *>("tth_metree__tree");
 
         double w = event.getData<double>("tth_metree__weight");
-        MECategory cat = event.getData<MECategory>("tth_metree__cat");
+        MECategory cat = static_cast<MECategory>(event.getData<int>("tth_metree__cat"));
         RadiationMode rad = event.getData<RadiationMode>("tth_metree__rad");
         //SampleType samp = event.getData<SampleType>("sample");
 
@@ -161,7 +171,7 @@ public:
         const double lr_cc_bj = t->btag_lr_l_bbbb / (t->btag_lr_l_bbbb + t->btag_lr_l_bbbj + t->btag_lr_l_bbjj + t->btag_lr_l_bbcc);
         const double lr_cc_bj_w = lambda_bb * t->btag_lr_l_bbbb / (lambda_bb * t->btag_lr_l_bbbb + lambda_bj * t->btag_lr_l_bbbj + lambda_jj * t->btag_lr_l_bbjj + lambda_cc * t->btag_lr_l_bbcc);
         const double lr_wcq = (t->btag_lr_l_bbbb + t->btag_lr_l_bbbbcq) / (t->btag_lr_l_bbbb + t->btag_lr_l_bbbbcq + t->btag_lr_l_bbjj + t->btag_lr_l_bbjjcq);
-        
+
         if (t->numJets_ >= 6) {
             h_radmode->Fill(rad, w);
             h_rad_lr_default  -> Fill(rad, lr_default, w);
@@ -183,7 +193,8 @@ public:
         h_ntags->Fill(t->numBTagM_, w);
 
         h_btag_lr->Fill(t->btag_LR, w);
-        h_btag_lr2->Fill(t->btag_LR, w);
+        h_btag_lr080->Fill(t->btag_LR, w);
+        h_btag_lr095->Fill(t->btag_LR, w);
 
         h_vtype->Fill(t->Vtype_, w);
         h_type->Fill(t->type_, w);
@@ -191,6 +202,18 @@ public:
         h_cat->Fill(cat, w);
         h_cat_btag_lr->Fill(cat, t->btag_LR, w);
         h_cat_btag_lr2->Fill(cat, t->btag_LR, w);
+
+        //Fill jet kinematics and discriminator
+        for (int i=0; i < t->numJets_; i++) {
+            const float csv = t->jet_csv_[i];
+            const float eta = t->jet_eta_[i];
+            const float pt = t->jet_pt_[i];
+            const int id = t->jet_id_[i];
+
+            h_jet_eta_csv->Fill(std::abs(eta), csv, w);
+            h_jet_pt_csv->Fill(pt, csv, w);
+            h_jet_id_csv->Fill(std::abs(id), csv, w);
+        }
 
         return true;
     };
@@ -201,11 +224,13 @@ class MEDiscriminatorAnalyzer : public GenericAnalyzer
 {
 
 
-TH2D *h_cat_discr = 0;
+    TH2D *h_cat_discr = 0;
+    TH2D *h_cat_discr_matched = 0;
+    TH2D *h_cat_discr_unmatched = 0;
 
-TH2D *h_cat_n_wqq_matched = 0;
-TH2D *h_cat_n_bt_matched = 0;
-TH2D *h_cat_n_bh_matched = 0;
+    TH2D *h_cat_n_wqq_matched = 0;
+    TH2D *h_cat_n_bt_matched = 0;
+    TH2D *h_cat_n_bh_matched = 0;
 
 public:
     MEDiscriminatorAnalyzer(
@@ -217,6 +242,8 @@ public:
         LOG(DEBUG) << "MEDiscriminatorAnalyzer: created MEDiscriminatorAnalyzer";
 
         h_cat_discr = fsmake<TH2D>("cat_discr", "ME Category vs. discriminator", 8, 0, 8, 6, 0, 1);
+        h_cat_discr_matched = fsmake<TH2D>("cat_discr_matched", "ME Category vs. discriminator (matched to gen)", 8, 0, 8, 6, 0, 1);
+        h_cat_discr_unmatched = fsmake<TH2D>("cat_discr_unmatched", "ME Category vs. discriminator (not matched to gen)", 8, 0, 8, 6, 0, 1);
 
         h_cat_n_wqq_matched = fsmake<TH2D>("cat_n_wqq_matched", "ME Category vs. discriminator", 8, 0, 8, 3, 0, 3);
         h_cat_n_bt_matched  = fsmake<TH2D>("cat_n_bt_matched", "ME Category vs. discriminator", 8, 0, 8, 3, 0, 3);
@@ -231,7 +258,8 @@ public:
         METree *t = event.getData<METree *>("tth_metree__tree");
 
         double w = event.getData<double>("tth_metree__weight");
-        MECategory cat = event.getData<MECategory>("tth_metree__cat");
+        MECategory cat = static_cast<MECategory>(event.getData<int>("tth_metree__cat"));
+        Sample *sample = event.getData<Sample *>("tth_metree__sample");
 
         double me_discr = t->probAtSgn_ / (t->probAtSgn_ + 0.02 * t->probAtSgn_alt_);
         if (me_discr > 1.0)
@@ -240,13 +268,12 @@ public:
             me_discr = 0.0;
         if (me_discr != me_discr)
             me_discr = 0.0;
-        
-        h_cat_discr->Fill(cat, me_discr, w);
 
+        h_cat_discr->Fill(cat, me_discr, w);
 
         int n_best_perm = -1;
         int best_perm = 0;
-        for (int np=0; np < t->nPermut_; np++) {
+        for (int np = 0; np < t->nPermut_; np++) {
             const int perm = t->perm_to_gen_[np];
 
             //number of particles matched out of 6
@@ -258,19 +285,27 @@ public:
             }
         }
 
-        bool bt1_match = perm_maps::get_n(best_perm, 6);
-        bool bt2_match = perm_maps::get_n(best_perm, 3);
+        const bool bt1_match = perm_maps::get_n(best_perm, 6);
+        const bool bt2_match = perm_maps::get_n(best_perm, 3);
 
-        bool bh1_match = perm_maps::get_n(best_perm, 1);
-        bool bh2_match = perm_maps::get_n(best_perm, 2);
+        const bool bh1_match = perm_maps::get_n(best_perm, 1);
+        const bool bh2_match = perm_maps::get_n(best_perm, 2);
 
-        bool q1_match = perm_maps::get_n(best_perm, 4);
-        bool q2_match = perm_maps::get_n(best_perm, 5);
+        const bool q1_match = perm_maps::get_n(best_perm, 4);
+        const bool q2_match = perm_maps::get_n(best_perm, 5);
 
+        const bool correct_perm = is_correct_perm(best_perm, cat, sample->process);
 
-        int n_q_matched = q1_match + q2_match;
-        int n_bt_matched = bt1_match + bt2_match;
-        int n_bh_matched = bh1_match + bh2_match;
+        if (correct_perm) {
+            h_cat_discr_matched->Fill(cat, me_discr, w);
+
+        } else {
+            h_cat_discr_unmatched->Fill(cat, me_discr, w);
+        }
+
+        const int n_q_matched = q1_match + q2_match;
+        const int n_bt_matched = bt1_match + bt2_match;
+        const int n_bh_matched = bh1_match + bh2_match;
 
         h_cat_n_wqq_matched->Fill(cat, n_q_matched, w);
         h_cat_n_bt_matched->Fill(cat, n_bt_matched, w);
@@ -315,30 +350,30 @@ public:
         bool succ_dlCatHSeq = event.wasSuccess("dlCatHSeq");
 
         METree *t = static_cast<METree *>(event.getData<void *>("metree"));
-        MECategory cat = event.getData<MECategory>("tth_metree__cat");
+        MECategory cat = static_cast<MECategory>(event.getData<int>("tth_metree__cat"));
 
         std::cout
-            << "vt=" << t->Vtype_ <<  " "
-            << "cat=" << cat <<  " "
-            << "blr=" << t->btag_LR <<  " "
-            << "HL=" << is_btag_lr_high_low(t, cat) <<  " "
-            << "sl=" << event.getData<bool>("tth_metree__is_sl") <<  " "
-            << "dl=" << event.getData<bool>("tth_metree__is_dl") << " "
-            << proc_MEAnalysisSeq << " "
-            << proc_slSeq << " " 
-            << proc_slCatLSeq << " " 
-            << proc_slCatHSeq << " " 
-            << proc_dlSeq << " " 
-            << proc_dlCatLSeq << " " 
-            << proc_dlCatHSeq << " " 
+                << "vt=" << t->Vtype_ <<  " "
+                << "cat=" << cat <<  " "
+                << "blr=" << t->btag_LR <<  " "
+                << "HL=" << is_btag_lr_high_low(t, cat) <<  " "
+                << "sl=" << event.getData<bool>("tth_metree__is_sl") <<  " "
+                << "dl=" << event.getData<bool>("tth_metree__is_dl") << " "
+                << proc_MEAnalysisSeq << " "
+                << proc_slSeq << " "
+                << proc_slCatLSeq << " "
+                << proc_slCatHSeq << " "
+                << proc_dlSeq << " "
+                << proc_dlCatLSeq << " "
+                << proc_dlCatHSeq << " "
 
-            << succ_MEAnalysisSeq << " "
-            << succ_slSeq << " " 
-            << succ_slCatLSeq << " " 
-            << succ_slCatHSeq << " " 
-            << succ_dlSeq << " " 
-            << succ_dlCatLSeq << " " 
-            << succ_dlCatHSeq << std::endl;
+                << succ_MEAnalysisSeq << " "
+                << succ_slSeq << " "
+                << succ_slCatLSeq << " "
+                << succ_slCatHSeq << " "
+                << succ_dlSeq << " "
+                << succ_dlCatLSeq << " "
+                << succ_dlCatHSeq << std::endl;
         return true;
     };
 };

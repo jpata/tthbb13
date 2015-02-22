@@ -38,9 +38,9 @@ bool EventPrinterAnalyzer::process(EventContainer &event)
     GenericAnalyzer::process(event);
     LOG(DEBUG) << "processing " << name << " " << event.i;
 
-    if ((processed - 1) % processEvery == 0)
+    if (processed % processEvery == 0)
     {
-        std::cout << name << ":" << event.i << std::endl;
+        std::cout << name << ":" << processed << ":" << event.i << std::endl;
 
         if (printAll)
         {

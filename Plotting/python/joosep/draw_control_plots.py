@@ -21,43 +21,43 @@ samples = [
 	"tthbb_8TeV_noME__dlCatLSeq__cplots",
 	"tthbb_8TeV_noME__dlCatHSeq__cplots",
 
-	"tthbb_13TeV_phys14__slSeq__cplots",
-	"tthbb_13TeV_phys14__slCatLSeq__cplots",
-	"tthbb_13TeV_phys14__slCatHSeq__cplots",
+	# "tthbb_13TeV_spring14__slSeq__cplots",
+	# "tthbb_13TeV_spring14__slCatLSeq__cplots",
+	# "tthbb_13TeV_spring14__slCatHSeq__cplots",
 
-	"tthbb_13TeV_phys14__dlSeq__cplots",
-	"tthbb_13TeV_phys14__dlCatLSeq__cplots",
-	"tthbb_13TeV_phys14__dlCatHSeq__cplots",
+	# "tthbb_13TeV_spring14__dlSeq__cplots",
+	# "tthbb_13TeV_spring14__dlCatLSeq__cplots",
+	# "tthbb_13TeV_spring14__dlCatHSeq__cplots",
 
-	"ttjets_8TeV_noME__slSeq__cplots",
-	"ttjets_8TeV_noME__slCatLSeq__cplots",
-	"ttjets_8TeV_noME__slCatHSeq__cplots",
-	"ttjets_8TeV_noME__dlSeq__cplots",
-	"ttjets_8TeV_noME__dlCatLSeq__cplots",
-	"ttjets_8TeV_noME__dlCatHSeq__cplots",
-	"ttjets_13TeV_phys14__slSeq__cplots",
-	"ttjets_13TeV_phys14__slCatLSeq__cplots",
-	"ttjets_13TeV_phys14__slCatHSeq__cplots",
-	"ttjets_13TeV_phys14__dlSeq__cplots",
-	"ttjets_13TeV_phys14__dlCatLSeq__cplots",
-	"ttjets_13TeV_phys14__dlCatHSeq__cplots",
+	# "ttjets_8TeV_noME__slSeq__cplots",
+	# "ttjets_8TeV_noME__slCatLSeq__cplots",
+	# "ttjets_8TeV_noME__slCatHSeq__cplots",
+	# "ttjets_8TeV_noME__dlSeq__cplots",
+	# "ttjets_8TeV_noME__dlCatLSeq__cplots",
+	# "ttjets_8TeV_noME__dlCatHSeq__cplots",
+	# "ttjets_13TeV_spring14__slSeq__cplots",
+	# "ttjets_13TeV_spring14__slCatLSeq__cplots",
+	# "ttjets_13TeV_spring14__slCatHSeq__cplots",
+	# "ttjets_13TeV_spring14__dlSeq__cplots",
+	# "ttjets_13TeV_spring14__dlCatLSeq__cplots",
+	# "ttjets_13TeV_spring14__dlCatHSeq__cplots",
 
 ]
 
 sample_pairs = [
-	("tthbb_8TeV_noME__slSeq__cplots", "tthbb_13TeV_phys14__slSeq__cplots"),
-	("tthbb_8TeV_noME__dlSeq__cplots", "tthbb_13TeV_phys14__dlSeq__cplots"),
-	("tthbb_8TeV_noME__slCatLSeq__cplots", "tthbb_13TeV_phys14__slCatLSeq__cplots"),
-	("tthbb_8TeV_noME__slCatHSeq__cplots", "tthbb_13TeV_phys14__slCatHSeq__cplots"),
-	("tthbb_8TeV_noME__dlCatLSeq__cplots", "tthbb_13TeV_phys14__dlCatLSeq__cplots"),
-	("tthbb_8TeV_noME__dlCatHSeq__cplots", "tthbb_13TeV_phys14__dlCatHSeq__cplots"),
+	("tthbb_8TeV_noME__slSeq__cplots", "tthbb_13TeV_spring14__slSeq__cplots"),
+	("tthbb_8TeV_noME__dlSeq__cplots", "tthbb_13TeV_spring14__dlSeq__cplots"),
+	("tthbb_8TeV_noME__slCatLSeq__cplots", "tthbb_13TeV_spring14__slCatLSeq__cplots"),
+	("tthbb_8TeV_noME__slCatHSeq__cplots", "tthbb_13TeV_spring14__slCatHSeq__cplots"),
+	("tthbb_8TeV_noME__dlCatLSeq__cplots", "tthbb_13TeV_spring14__dlCatLSeq__cplots"),
+	("tthbb_8TeV_noME__dlCatHSeq__cplots", "tthbb_13TeV_spring14__dlCatHSeq__cplots"),
 
-	("ttjets_8TeV_noME__slSeq__cplots", "ttjets_13TeV_phys14__slSeq__cplots"),
-	("ttjets_8TeV_noME__dlSeq__cplots", "ttjets_13TeV_phys14__dlSeq__cplots"),
-	("ttjets_8TeV_noME__slCatLSeq__cplots", "ttjets_13TeV_phys14__slCatLSeq__cplots"),
-	("ttjets_8TeV_noME__slCatHSeq__cplots", "ttjets_13TeV_phys14__slCatHSeq__cplots"),
-	("ttjets_8TeV_noME__dlCatLSeq__cplots", "ttjets_13TeV_phys14__dlCatLSeq__cplots"),
-	("ttjets_8TeV_noME__dlCatHSeq__cplots", "ttjets_13TeV_phys14__dlCatHSeq__cplots"),
+	("ttjets_8TeV_noME__slSeq__cplots", "ttjets_13TeV_spring14__slSeq__cplots"),
+	("ttjets_8TeV_noME__dlSeq__cplots", "ttjets_13TeV_spring14__dlSeq__cplots"),
+	("ttjets_8TeV_noME__slCatLSeq__cplots", "ttjets_13TeV_spring14__slCatLSeq__cplots"),
+	("ttjets_8TeV_noME__slCatHSeq__cplots", "ttjets_13TeV_spring14__slCatHSeq__cplots"),
+	("ttjets_8TeV_noME__dlCatLSeq__cplots", "ttjets_13TeV_spring14__dlCatLSeq__cplots"),
+	("ttjets_8TeV_noME__dlCatHSeq__cplots", "ttjets_13TeV_spring14__dlCatHSeq__cplots"),
 ]
 
 def sample_name(s):
@@ -108,16 +108,20 @@ def parse_title(t):
 def sample_weight(sample):
 	if "tthbb" in sample:
 		if "8TeV" in sample:
-			return (0.5085 / 0.1293) * 20.0/12.0
+			return 20.0/12.0
 		else:
+			if "13TeV_spring14" in sample:
+				return 20000 * 0.1293 * 0.569 / 199700.0
 			if "13TeV_phys14" in sample:
-				return 20000 * (0.5085) * 0.569 / 199700.0
+				return 20000 * 0.1293 * 0.569 / 97520
 	elif "ttjets" in sample:
 		if "8TeV" in sample:
-			return (831.76  /  252.89) * 20.0/12.0
+			return 20.0/12.0#20.0/12.0
 		else:
 			if "13TeV_phys14" in sample:
-				return 20000 * (831.76) / 25405611
+				return 20000 * 252.89 / 25405611
+			if "13TeV" in sample and "spring14" in sample:
+				return 20000 * 252.89 / 25360410
 
 def axis_label(var):
 	if "lep1_pt" in var:
@@ -169,7 +173,12 @@ def yield_plot(tf, s1, s2, w1, w2):
 
 def get_discriminator_hists(tf, postf):
     hs = {}
-    for sample in ["tthbb_8TeV_ME", "tthbb_13TeV_phys14", "ttjets_8TeV_ME", "ttjets_13TeV_phys14"]:
+    for sample in [
+    	"tthbb_8TeV_ME",
+    	#"tthbb_13TeV_spring14",
+    	#"ttjets_8TeV_ME",
+    	#"ttjets_13TeV_spring14"
+    	]:
         h = tf.Get(sample + "__" + postf)
         for i in range(2,8):
             hn = "{0}/{1}/cat{2}".format(sample, postf, i-2)
@@ -226,7 +235,7 @@ if __name__ == "__main__":
 		"lep1_pt", "lep2_pt",
 		"lep1_iso", "lep2_iso",
 		"njets", "ntags",
-		"btag_lr", "btag_lr2",
+		"btag_lr", "btag_lr080", "btag_lr095",
 		#"Vtype", "type",
 		#"cat",
 		#"rad",
@@ -259,71 +268,77 @@ if __name__ == "__main__":
 			plt.savefig(sample + "_" + var + ".png")
 			plt.close()
 
-	for sample in [
-		"tthbb_8TeV_ME__slCatHSeq__meplots",
-		"tthbb_8TeV_ME__dlCatHSeq__meplots",
-		"tthbb_13TeV_phys14__slCatHSeq__meplots",
-		"tthbb_13TeV_phys14__dlCatHSeq__meplots"
+	# for sample in [
+	# 	"tthbb_8TeV_ME__slCatHSeq__meplots",
+	# 	"tthbb_8TeV_ME__dlCatHSeq__meplots",
+	# 	"tthbb_13TeV_spring14__slCatHSeq__meplots",
+	# 	"tthbb_13TeV_spring14__dlCatHSeq__meplots"
+	# 	]:
+	# 	hs = get_by_categories(tf.Get(sample + "__" + "cat_discr"))
+	# 	for (i, h) in enumerate(hs):
+	# 		h.Scale(sample_weight(sample))
+	# 		fig = plt.figure(figsize=(8,8))
+	# 		ax = plt.axes()
+	# 		b1 = he.barhist(h, color="red", lw=2)
+	# 		plt.title(parse_title(h.GetTitle()))
+	# 		plt.savefig(sample + "_cat{0}_discr.png".format(i))
+	# 		plt.close()
+
+	# for (s1, s2) in sample_pairs:
+	# 	for var in variables_1d:
+	# 		print s1, s2, var
+	# 		h1 = tf.Get(s1 + "__" + var)
+	# 		h2 = tf.Get(s2 + "__" + var)
+	# 		assert(h1 != None)
+	# 		assert(h2 != None)
+	# 		h1 = asrootpy(h1).Clone()
+	# 		h2 = asrootpy(h2).Clone()
+
+	# 		rebin(h1, var)
+	# 		rebin(h2, var)
+
+	# 		for instr in ["", "normalized"]:
+	# 			fig = plt.figure(figsize=(8,8))
+	# 			ax = plt.axes()
+	# 			#ax.grid()
+
+	# 			if "normalized" in instr:
+	# 				if h1.Integral()>0:
+	# 					h1.Scale(1.0 / h1.Integral())
+	# 				if h2.Integral()>0:
+	# 					h2.Scale(1.0 / h2.Integral())
+	# 			else:
+	# 				h1.Scale(sample_weight(s1))
+	# 				h2.Scale(sample_weight(s2))
+
+	# 			b1 = he.barhist(h1, color="red", lw=2, label=sample_name(s1))
+	# 			b2 = he.barhist(h2, color="blue", lw=2, label=sample_name(s2))
+
+	# 			configure_ticks(ax, var)
+
+	# 			if "normalized" in instr:
+	# 				plt.ylabel("normalized events / bin")
+	# 			else:
+	# 				plt.ylabel("events / 20 $fb^{-1}$/ bin")
+	# 			plt.xlabel(axis_label(var))
+
+	# 			#ax.xaxis.grid(True, which='minor')
+	# 			plt.legend()
+	# 			plt.title(parse_title(h1.GetTitle()))
+
+	# 			plt.savefig(s1 + "_" + s2 + "_" + var + "_" + instr + ".png")
+	# 			plt.close()
+
+	for (s1, s2) in [
+		("tthbb_8TeV_noME", "tthbb_8TeV_noME"),
+		#("tthbb_8TeV_noME", "tthbb_13TeV_spring14"),
+		#("ttjets_8TeV_noME", "ttjets_13TeV_spring14")
 		]:
-		hs = get_by_categories(tf.Get(sample + "__" + "cat_discr"))
-		for (i, h) in enumerate(hs):
-			h.Scale(sample_weight(sample))
-			fig = plt.figure(figsize=(8,8))
-			ax = plt.axes()
-			b1 = he.barhist(h, color="red", lw=2)
-			plt.title(parse_title(h.GetTitle()))
-			plt.savefig(sample + "_cat{0}_discr.png".format(i))
-			plt.close()
-
-	for (s1, s2) in sample_pairs:
-		for var in variables_1d:
-			print s1, s2, var
-			h1 = tf.Get(s1 + "__" + var)
-			h2 = tf.Get(s2 + "__" + var)
-			assert(h1 != None)
-			assert(h2 != None)
-			h1 = asrootpy(h1).Clone()
-			h2 = asrootpy(h2).Clone()
-
-			rebin(h1, var)
-			rebin(h2, var)
-
-			for instr in ["", "normalized"]:
-				fig = plt.figure(figsize=(8,8))
-				ax = plt.axes()
-				#ax.grid()
-
-				if "normalized" in instr:
-					if h1.Integral()>0:
-						h1.Scale(1.0 / h1.Integral())
-					if h2.Integral()>0:
-						h2.Scale(1.0 / h2.Integral())
-				else:
-					h1.Scale(sample_weight(s1))
-					h2.Scale(sample_weight(s2))
-
-				b1 = he.barhist(h1, color="red", lw=2, label=sample_name(s1))
-				b2 = he.barhist(h2, color="blue", lw=2, label=sample_name(s2))
-
-				configure_ticks(ax, var)
-
-				if "normalized" in instr:
-					plt.ylabel("normalized events / bin")
-				else:
-					plt.ylabel("events / 20 $fb^{-1}$/ bin")
-				plt.xlabel(axis_label(var))
-
-				#ax.xaxis.grid(True, which='minor')
-				plt.legend()
-				plt.title(parse_title(h1.GetTitle()))
-
-				plt.savefig(s1 + "_" + s2 + "_" + var + "_" + instr + ".png")
-				plt.close()
-
-	for (s1, s2) in [("tthbb_8TeV_noME", "tthbb_13TeV_phys14"), ("ttjets_8TeV_noME", "ttjets_13TeV_phys14")]:
 		yt = yield_plot(tf, s1, s2, sample_weight(s1), sample_weight(s2))
 
 		fig = plt.figure(figsize=(8,8))
+		ax = plt.axes()
+
 		xs = np.linspace(1, 12, 12)
 		ys1 = ([yt["sl", "H", i][0] for i in range(3)] + [yt["dl", "H", i][0] for i in range(3,6)] +
 		    [yt["sl", "L", i][0] for i in range(3)] + [yt["dl", "L", i][0] for i in range(3,6)])
@@ -335,33 +350,52 @@ if __name__ == "__main__":
 		ys2e = ([yt["sl", "H", i][3] for i in range(3)] + [yt["dl", "H", i][3] for i in range(3,6)] + 
 		    [yt["sl", "L", i][3] for i in range(3)] + [yt["dl", "L", i][3] for i in range(3,6)])
 
-		plt.bar(xs+0.1, ys1, 0.3, yerr=ys1e, color="red", ecolor="black", label="8 TeV scaled to 13 TeV")
-		plt.bar(xs+0.1+0.3+0.1, ys2, 0.3, yerr=ys2e, color="green", ecolor="black", label="13 TeV")
+		plt.bar(xs+0.1, ys1, 0.3, yerr=ys1e, color="red", ecolor="black", label="8 TeV")
+		plt.bar(xs+0.1+0.3+0.1, ys2, 0.3, yerr=ys2e, color="green", ecolor="black", label="13 TeV scaled down")
 		plt.legend()
-		plt.xticks(xs+0.5, ["cat 1 H", "cat 2 H", "cat 3 H", "DL $\\mu\\mu$ H", "DL $e\\mu$ H", "DL $ee$ H",
+		plt.xticks(xs + 0.5 - 0.05, ["cat 1 H", "cat 2 H", "cat 3 H", "DL $\\mu\\mu$ H", "DL $e\\mu$ H", "DL $ee$ H",
 		                    "cat 1 L", "cat 2 L", "cat 3 L", "DL $\\mu\\mu$ L", "DL $e\\mu$ L", "DL $ee$ L"
 		], rotation=90)
 		plt.grid()
 		plt.xlim(1, 13)
 		plt.axvline(7-0.05)
+		#ax.set_xticks(xs)
+
 		plt.ylabel("expected yield / 20 $fb^{-1}$ at $\\sqrt{s} = 13 TeV$")
-		plt.savefig(s1 + "_" + s2 + "_yields.png")
+		plt.savefig(s1 + "_" + s2 + "_yields.png", bbox_inches='tight', pad_inches=1.0)
 		plt.close()
 		#plt.bar([2], [b], 1, color="green")
 
 	hs = get_discriminator_hists(tf, "slCatLSeq__meplots__cat_discr")
 	hs.update(get_discriminator_hists(tf, "dlCatLSeq__meplots__cat_discr"))
-
 	hs.update(get_discriminator_hists(tf, "slCatHSeq__meplots__cat_discr"))
 	hs.update(get_discriminator_hists(tf, "dlCatHSeq__meplots__cat_discr"))
 
-	for (s1, s2) in [("tthbb_8TeV_ME", "tthbb_13TeV_phys14"), ("ttjets_8TeV_ME", "ttjets_13TeV_phys14")]:
+
+	hs_matched = get_discriminator_hists(tf, "slCatLSeq__meplots__cat_discr_matched")
+	hs_matched.update(get_discriminator_hists(tf, "dlCatLSeq__meplots__cat_discr_matched"))
+	hs_matched.update(get_discriminator_hists(tf, "slCatHSeq__meplots__cat_discr_matched"))
+	hs_matched.update(get_discriminator_hists(tf, "dlCatHSeq__meplots__cat_discr_matched"))
+
+
+	hs_unmatched = get_discriminator_hists(tf, "slCatLSeq__meplots__cat_discr_unmatched")
+	hs_unmatched.update(get_discriminator_hists(tf, "dlCatLSeq__meplots__cat_discr_unmatched"))
+	hs_unmatched.update(get_discriminator_hists(tf, "slCatHSeq__meplots__cat_discr_unmatched"))
+	hs_unmatched.update(get_discriminator_hists(tf, "dlCatHSeq__meplots__cat_discr_unmatched"))
+
+	for (s1, s2) in [
+		("tthbb_8TeV_ME", "tthbb_8TeV_ME"),
+		#("tthbb_8TeV_ME", "tthbb_13TeV_spring14"),
+		#("ttjets_8TeV_ME", "ttjets_13TeV_spring14")
+		]:
 		for lep in ["sl", "dl"]:
 			for cat in range(6):
 				if lep == "sl" and cat>2:
 					continue
 				if lep == "dl" and cat<3:
 					continue
+
+				#Full distribution
 				fig = plt.figure(figsize=(8,8))
 				h1 = hs["{0}/{1}CatHSeq__meplots__cat_discr/cat{2}".format(s1, lep, cat)]
 				h2 = hs["{0}/{1}CatHSeq__meplots__cat_discr/cat{2}".format(s2, lep, cat)]
@@ -374,15 +408,43 @@ if __name__ == "__main__":
 				#plt.ylabel("Expected events / 20 $\\mathrm{fb}^{-1}$ / bin")
 				plt.ylabel("Normalized events / bin")
 				plt.grid()
-				plt.legend()
+				plt.legend(loc=2)
 				plt.xticks(np.linspace(0.0, 1.0, 7))
 				plt.savefig(s1 + "_" + s2 + "_" + lep + "cat{0}H_discr.png".format(cat))
 				plt.close()
+
+				#Matched/unmatched distribution
+				fig = plt.figure(figsize=(8,8))
+				h1y = hs_matched["{0}/{1}CatHSeq__meplots__cat_discr/cat{2}".format(s1, lep, cat)]
+				h1n = hs_unmatched["{0}/{1}CatHSeq__meplots__cat_discr/cat{2}".format(s1, lep, cat)]
+				h2y = hs_matched["{0}/{1}CatHSeq__meplots__cat_discr/cat{2}".format(s2, lep, cat)]
+				h2n = hs_unmatched["{0}/{1}CatHSeq__meplots__cat_discr/cat{2}".format(s2, lep, cat)]
+				
+				h1y.Scale(1.0 / h1.Integral())
+				h2y.Scale(1.0 / h2.Integral())
+				h1n.Scale(1.0 / h1.Integral())
+				h2n.Scale(1.0 / h2.Integral())
+
+				he.barhist(h1y, color="blue", lw=2, label=(sample_name(s1) + " matched"))
+				he.barhist(h1n, color="blue", lw=2, ls="--", label=(sample_name(s1) + " unmatched"))
+
+				he.barhist(h2y, color="red", lw=2, label=(sample_name(s2) + " matched"))
+				he.barhist(h2n, color="red", lw=2, ls="--", label=(sample_name(s2) + " unmatched"))
+
+				plt.xlabel("$p_s / (p_s + 0.02 p_b)$", fontsize=16)
+				#plt.ylabel("Expected events / 20 $\\mathrm{fb}^{-1}$ / bin")
+				plt.ylabel("Normalized events / bin")
+				plt.grid()
+				plt.legend(loc=2)
+				plt.xticks(np.linspace(0.0, 1.0, 7))
+				plt.savefig(s1 + "_" + s2 + "_" + lep + "cat{0}H_discr_match_split.png".format(cat))
+				plt.close()
+
 		for mismatch in ["cat_n_wqq_matched", "cat_n_bt_matched", "cat_n_bh_matched"]:
 			for s in [s1, s2]:
 				fig = plt.figure(figsize=(16,16))
 				draw_mismatches(tf, s, mismatch)
-				plt.savefig(s + "_" + mismatch + ".png", bbox_inches='tight', pad_inches=0)
+				plt.savefig(s + "_" + mismatch + ".png", bbox_inches='tight', pad_inches=1.0)
 				plt.close()
 
 	# for tostack in [("tthbb_13TeV", "ttjets_13TeV")]:

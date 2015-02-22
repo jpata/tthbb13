@@ -20,7 +20,7 @@ Sequence::Sequence(AnalyzerRegistry &analyzer_registry,
         {
             throw std::runtime_error("could not find analyzer with type " + k);
         }
-        LOG(INFO) << "Booked analyzer " << k << ":" << n;
+        LOG(INFO) << "Booked analyzer " << fullName << ":" << k << ":" << n;
         GenericAnalyzer *a = analyzer_registry[k](fs, this, seq_elem);
 
         analyzers_order.push_back(a->name);

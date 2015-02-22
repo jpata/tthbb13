@@ -64,6 +64,7 @@ AnalyzerRegistry analyzer_registry =
     {"BoolSelector", &createAnalyzerInstance<BoolSelector>},
     {"IntSelector", &createAnalyzerInstance<IntSelector>},
     {"DoubleRangeSelector", &createAnalyzerInstance<DoubleRangeSelector>},
+    {"IntRangeSelector", &createAnalyzerInstance<IntRangeSelector>},
     {"TTHEventPrinterAnalyzer", &createAnalyzerInstance<TTHEventPrinterAnalyzer>},
 };
 

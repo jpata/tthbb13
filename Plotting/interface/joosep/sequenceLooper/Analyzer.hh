@@ -172,3 +172,4 @@ T GenericAnalyzer::getData(EventContainer &event, const std::string dname)
 typedef ValueSelector<bool> BoolSelector;
 typedef ValueSelector<int> IntSelector;
 typedef ValueRangeSelector<double> DoubleRangeSelector;
+typedef ValueRangeSelector<int> IntRangeSelector;
