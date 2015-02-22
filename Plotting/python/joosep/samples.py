@@ -46,7 +46,7 @@ samples = cms.VPSet([
     cms.PSet(
         fileNamesS1=cms.vstring(["/hdfs/cms/store/user/jpata/tth/s1_eb733a1/TTHbb_s1_eb733a1_tth_hbb_13tev.root"]),
         fileNamesS2=cms.vstring(["/hdfs/cms/store/user/jpata/tth/s1_eb733a1__s2_3f71e05/tth_hbb_13tev.root"]),
-        nickName=cms.string("tthbb_13TeV_phys14_s1_eb733a1__s2_3f71e05"),
+        nickName=cms.string("tthbb_13TeV_spring14__s1_eb733a1__s2_3f71e05"),
         fractionToProcess=cms.double(1.0),
         totalEvents=cms.int64(-1),
         type=cms.int32(3), #ME_13TeV
@@ -56,7 +56,7 @@ samples = cms.VPSet([
     cms.PSet(
         fileNamesS1=cms.vstring([]),
         fileNamesS2=cms.vstring(["/home/joosep/tth/gc/GC0b22bb43fb47/ttjets_13tev.root"]),
-        nickName=cms.string("ttjets_13TeV_spring14_s1_eb733a1__s2_repro"),
+        nickName=cms.string("ttjets_13TeV_spring14__s1_eb733a1__s2_3f71e05"),
         fractionToProcess=cms.double(1.0),
         totalEvents=cms.int64(-1),
         type=cms.int32(3), #ME_13TeV
@@ -68,7 +68,7 @@ samples = cms.VPSet([
     cms.PSet(
         fileNamesS1=cms.vstring(["/hdfs/cms/store/user/jpata/tth/s1_eb733a1/TTHbb_s1_eb733a1_tth_hbb_13tev_amcatnlo_pu20bx25_phys14.root"]),
         fileNamesS2=cms.vstring(["/hdfs/cms/store/user/jpata/tth/s1_eb733a1__s2_3f71e05/tth_hbb_13tev_amcatnlo_pu20bx25_phys14.root"]),
-        nickName=cms.string("tthbb_13TeV_spring14_s1_eb733a1__s2_3f71e05"),
+        nickName=cms.string("tthbb_13TeV_phys14"),
         fractionToProcess=cms.double(1.0),
         totalEvents=cms.int64(-1),
         type=cms.int32(3), #ME_13TeV
@@ -90,7 +90,7 @@ samples = cms.VPSet([
     cms.PSet(
        fileNamesS1=cms.vstring([]),
        fileNamesS2=cms.vstring(["/hdfs/cms/store/user/jpata/tth/step2/s1_nov19_3a4602f__s2_b7e13a1/tthbb.root"]),
-       nickName=cms.string("tthbb_13TeV_spring14_3a4602f__s2_b7e13a1"),
+       nickName=cms.string("tthbb_13TeV_spring14__s1_3a4602f__s2_b7e13a1"),
        fractionToProcess=cms.double(1.0),
        totalEvents=cms.int64(-1),
        type=cms.int32(3),
@@ -100,11 +100,11 @@ samples = cms.VPSet([
    cms.PSet(
        fileNamesS1=cms.vstring([]),
        fileNamesS2=cms.vstring(["/hdfs/cms/store/user/jpata/tth/step2/s1_nov19_3a4602f__s2_b7e13a1/ttjets.root"]),
-       nickName=cms.string("tthbb_13TeV_pu20bx25_spring14_3a4602f__s2_b7e13a1"),
+       nickName=cms.string("ttjets_13TeV_spring14__s1_3a4602f__s2_b7e13a1"),
        fractionToProcess=cms.double(1.0),
        totalEvents=cms.int64(-1),
        type=cms.int32(3),
-       process=cms.int32(0),
+       process=cms.int32(1),
        skip=cms.bool(False),
    ),
 ])

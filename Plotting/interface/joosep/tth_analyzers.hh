@@ -53,6 +53,7 @@ class LeptonAnalyzer : public GenericAnalyzer
 
     TH1D *h_leptype = 0;
     TH1D *h_samptype = 0;
+    TH1D *h_syst = 0;
     TH1D *h_pt1 = 0;
     TH1D *h_pt2 = 0;
 
@@ -101,6 +102,7 @@ public:
 
         h_leptype = fsmake<TH1D>("lep_type", "Lepton selection type", 4, 0, 4);
         h_samptype = fsmake<TH1D>("sample_type", "Sample type", 6, 0, 6);
+        h_syst = fsmake<TH1D>("syst", "Systematic", 18, 0, 18);
 
 
         h_pt1 = fsmake<TH1D>("lep1_pt", "Leading lepton p_t", 100, 0, 600);
@@ -163,6 +165,9 @@ public:
         } else {
             h_leptype->Fill(0.0, w);
         }
+
+        h_syst->Fill(t->syst_, w);
+
 
         //h_samptype->Fill(samp, w);
 
