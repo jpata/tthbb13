@@ -677,7 +677,8 @@ public:
 		tree->SetBranchAddress("jet_eta", &jet_eta_);
 		tree->SetBranchAddress("jet_phi", &jet_phi_);
 		tree->SetBranchAddress("jet_m", &jet_m_);
-		tree->SetBranchAddress("jet_id", &jet_id_);
+        tree->SetBranchAddress("jet_id", &jet_id_);
+        tree->SetBranchAddress("jet_csv", &jet_csv_);
 		tree->SetBranchAddress("lepton_pt", &lepton_pt_);
 		
         tree->SetBranchAddress("lepton_rIso", &lepton_rIso_);

@@ -749,7 +749,7 @@ int main(int argc, const char* argv[])
         //const float normUp             = count_Q2 ? count_Q2->GetBinContent(3)/count_Q2->GetBinContent(2) : 1.0;
         TTH::EventHypothesis Vtype;
 
-        cout << "Done!!" << endl;
+        cout << "Done loading input tree" << endl;
 
         //initialize empty structs
         ////FIXME: need to add to input ntuples
@@ -769,12 +769,21 @@ int main(int argc, const char* argv[])
         // loop over entries
         int counter = 0;
         const Long64_t nentries = currentTree->GetEntries();
+        int event_trials  = 0;
+
+        if( evHigh < 0 ) {
+            evHigh = nentries;
+            cout << "evHigh " << evHigh << " < 0 " << endl;
+            evHigh = nentries; 
+        }
+        if( evHigh > nentries ) {
+            cout << "evHigh " << evHigh << " > nentries " << nentries << endl;
+            evHigh = nentries; 
+        }
+
         cout << "Total number of entries: " << nentries << endl;
         cout << " -> This job will process events in the range [ " << evLow << ", " << evHigh << " ]" << endl;
 
-        int event_trials  = 0;
-
-        if( evHigh<0 ) evHigh = nentries;
 
         TStopwatch processing_sw;
         processing_sw.Start();

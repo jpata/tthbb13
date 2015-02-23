@@ -158,10 +158,25 @@ Samples::Samples(bool openAllFiles, string pathToFile, string ordering,
 
             double weight = 1.0;
 
-            if(xSec<0) weight = 1.0;
+            if(xSec < 0) {
+                weight = 1.0;
+            }
+
+            //In case input is split, counter does not know about full number of generated events.
             else if( (TH1F*)f->Get("event_counter") != 0) {
+                const long long ngen = p.exists("nGen") ? p.getParameter<long long>("nGen") : -1;
                 double counter = ((TH1F*)f->Get("event_counter"))->GetBinContent(1);
-                weight = counter>0 ? lumi*1000/(counter/xSec) : 1.0;
+                if (ngen > 0) {
+                    cout << "using pre-supplied nGen " << ngen << " instead of counter " << counter << endl;
+                    counter = ngen;
+                }
+                if (counter > 0) {
+                    weight = lumi*1000/(counter/xSec);
+                }
+                else {
+                    cout << "counter " << counter << " < 0 " << ", setting weight to 1" << endl;
+                    weight = 1.0;
+                } 
             }
 
             mapWeight_[nickName] = weight;
