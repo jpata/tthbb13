@@ -44,8 +44,8 @@ samples = cms.VPSet([
 
 #New Spring14 processing
     cms.PSet(
-        fileNamesS1=cms.vstring(["/hdfs/cms/store/user/jpata/tth/s1_eb733a1/TTHbb_s1_eb733a1_tth_hbb_13tev.root"]),
-        fileNamesS2=cms.vstring(["/hdfs/cms/store/user/jpata/tth/s1_eb733a1__s2_3f71e05/tth_hbb_13tev.root"]),
+        fileNamesS1=cms.vstring([]),
+        fileNamesS2=cms.vstring(["/scratch/joosep/tth_hbb_13tev.root"]),
         nickName=cms.string("tthbb_13TeV_spring14__s1_eb733a1__s2_3f71e05"),
         fractionToProcess=cms.double(1.0),
         totalEvents=cms.int64(-1),
@@ -55,7 +55,7 @@ samples = cms.VPSet([
     ),
     cms.PSet(
         fileNamesS1=cms.vstring([]),
-        fileNamesS2=cms.vstring(["/home/joosep/tth/gc/GC0b22bb43fb47/ttjets_13tev.root"]),
+        fileNamesS2=cms.vstring(["/scratch/joosep/ttjets_13tev.root"]),
         nickName=cms.string("ttjets_13TeV_spring14__s1_eb733a1__s2_3f71e05"),
         fractionToProcess=cms.double(1.0),
         totalEvents=cms.int64(-1),
@@ -67,7 +67,7 @@ samples = cms.VPSet([
 #New phys14 processing
     cms.PSet(
         fileNamesS1=cms.vstring(["/hdfs/cms/store/user/jpata/tth/s1_eb733a1/TTHbb_s1_eb733a1_tth_hbb_13tev_amcatnlo_pu20bx25_phys14.root"]),
-        fileNamesS2=cms.vstring(["/hdfs/cms/store/user/jpata/tth/s1_eb733a1__s2_3f71e05/tth_hbb_13tev_amcatnlo_pu20bx25_phys14.root"]),
+        fileNamesS2=cms.vstring(["/scratch/joosep/tth_hbb_13tev_amcatnlo_pu20bx25_phys14.root"]),
         nickName=cms.string("tthbb_13TeV_phys14"),
         fractionToProcess=cms.double(1.0),
         totalEvents=cms.int64(-1),
@@ -77,7 +77,7 @@ samples = cms.VPSet([
     ),
     cms.PSet(
         fileNamesS1=cms.vstring([]),
-        fileNamesS2=cms.vstring(["/home/joosep/tth/gc/GC0b22bb43fb47/ttjets_13tev_madgraph_pu20bx25_phys14.root"]),
+        fileNamesS2=cms.vstring(["/scratch/joosep/ttjets_13tev_madgraph_pu20bx25_phys14.root"]),
         nickName=cms.string("ttjets_13TeV_phys14"),
         fractionToProcess=cms.double(1.0),
         totalEvents=cms.int64(-1),
@@ -87,6 +87,16 @@ samples = cms.VPSet([
     ),
 
 #Old spring14 samples
+    cms.PSet(
+       fileNamesS1=cms.vstring([]),
+       fileNamesS2=cms.vstring(["/scratch/joosep/tth_hbb_13tev_5b21f5f.root"]),
+       nickName=cms.string("tthbb_13TeV_spring14__s1_3a4602f__s2_new"),
+       fractionToProcess=cms.double(1.0),
+       totalEvents=cms.int64(-1),
+       type=cms.int32(3),
+       process=cms.int32(0),
+       skip=cms.bool(False),
+   ),
     cms.PSet(
        fileNamesS1=cms.vstring([]),
        fileNamesS2=cms.vstring(["/hdfs/cms/store/user/jpata/tth/step2/s1_nov19_3a4602f__s2_b7e13a1/tthbb.root"]),

@@ -846,6 +846,8 @@ public:
 	}
 
     void loop_initialize(void) {
+        nLep_ = 0;
+        nJet_ = 0;
 		Vtype_ = DEF_VAL_INT;
 		type_ = DEF_VAL_INT;
         SET_ZERO(lepton_pt_, NMAXLEPTONS, DEF_VAL_FLOAT);

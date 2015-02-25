@@ -128,7 +128,6 @@ int main(int argc, const char* argv[])
 
 		string currentName = mySampleFiles[sample];
 
-		mySamples->OpenFile( currentName );
 		cout << "Opening file " << currentName << endl;
 		TTree* currentTree		 = mySamples->GetTree( currentName, TTH_TTREE_NAME);
 		TTHTree* it = new TTHTree(currentTree);
@@ -564,8 +563,6 @@ int main(int argc, const char* argv[])
 			}
 
 		} // event loop
-
-		mySamples->GetFile( currentName )->Close();
 
 	} // samples loop
 

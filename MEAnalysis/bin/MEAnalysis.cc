@@ -150,7 +150,7 @@ class CutHistogram {
     }
 };
 
-//#define DO_BTAG_LR_TREE
+#define DO_BTAG_LR_TREE
 
 #ifdef DO_BTAG_LR_TREE
 #include "TTH/MEAnalysis/interface/btag_lr_tree.hh"
@@ -662,6 +662,7 @@ int main(int argc, const char* argv[])
 
 #ifdef DO_BTAG_LR_TREE
     TTree* _btag_tree = new TTree("btag_lr", "");
+    assert(_btag_tree != 0); 
     BTagLRTree btag_tree(_btag_tree);
     btag_tree.make_branches();
 #endif
@@ -673,49 +674,49 @@ int main(int argc, const char* argv[])
     // read input files
     bool openAllFiles  = false;
     Samples* mySamples = new Samples(openAllFiles, pathToFile, ordering, samples, lumi, verbose);
-    vector<string> mySampleFiles;
+    vector<string> mySampleFiles = mySamples->Files();
+    assert(mySampleFiles.size() > 0);
+    //if(mySamples->IsOk()) {
 
-    if(mySamples->IsOk()) {
+    //    cout << "Ok!" << endl;
+    //    mySampleFiles = mySamples->Files();
 
-        cout << "Ok!" << endl;
-        mySampleFiles = mySamples->Files();
+    //    for( unsigned int i = 0 ; i < mySampleFiles.size(); i++) {
+    //        string sampleName = mySampleFiles[i];
 
-        for( unsigned int i = 0 ; i < mySampleFiles.size(); i++) {
-            string sampleName = mySampleFiles[i];
+    //        cout << mySampleFiles[i] << " ==> " << mySamples->GetXSec(sampleName)
+    //             << " pb,"
+    //             << " ==> weight = "            << mySamples->GetWeight(sampleName) << endl;
+    //    }
+    //}
+    //else {
+    //    cout << "Problems... leaving" << endl;
 
-            if(verbose) {
-                cout << mySampleFiles[i] << " ==> " << mySamples->GetXSec(sampleName)
-                     << " pb,"
-                     << " ==> weight = "            << mySamples->GetWeight(sampleName) << endl;
-            }
-        }
-    }
-    else {
-        cout << "Problems... leaving" << endl;
+    //    fout_tmp->Close();
+    //    cout << "Delete meIntegrator..." << endl;
+    //    delete meIntegrator;
+    //    delete clock;
+    //    delete clock2;
+    //    if(ran!=0)       delete ran;
+    //    if(jet_smear!=0) delete jet_smear;
+    //    cout << "Finished!!!" << endl;
+    //    cout << "*******************" << endl;
 
-        fout_tmp->Close();
-        cout << "Delete meIntegrator..." << endl;
-        delete meIntegrator;
-        delete clock;
-        delete clock2;
-        if(ran!=0)       delete ran;
-        if(jet_smear!=0) delete jet_smear;
-        cout << "Finished!!!" << endl;
-        cout << "*******************" << endl;
-
-        return 1;
-    }
+    //    return 1;
+    //}
 
 
     // open first sample for b-energy regression => get pointer to the tree
-    string currentName0     = mySampleFiles[0];
+    //string currentName0     = mySampleFiles[0];
 
-    mySamples->OpenFile( currentName0 );
-    TTree* currentTree_reg  = mySamples->GetTree( currentName0, TTH_TTREE_NAME);
-    if (currentTree_reg == 0) {
-        currentTree_reg  = mySamples->GetTree( currentName0, "events");
-    }
-    cout << "Looping over events " << endl;
+    //TTree* currentTree_reg  = mySamples->GetTree( currentName0, TTH_TTREE_NAME);
+    ////For 8 TeV 
+    //if (currentTree_reg == 0) {
+    //    currentTree_reg  = mySamples->GetTree( currentName0, "events");
+    //}
+    TTree* currentTree_reg = 0;
+
+    cout << "Looping over samples " << endl;
     // loop over input files
     for(unsigned int sample = 0 ; sample < mySampleFiles.size(); sample++) {
         
@@ -727,9 +728,9 @@ int main(int argc, const char* argv[])
 
         //if(currentName.find("Run2012")!=string::npos) isMC = false;
 
-        mySamples->OpenFile( currentName );
         cout << "Opening file " << currentName << endl;
         TTree* currentTree = mySamples->GetTree  (currentName, TTH_TTREE_NAME);
+        //For 8 TeV 
         if (currentTree == 0) {
             currentTree  = mySamples->GetTree( currentName, "events");
         }
@@ -782,11 +783,12 @@ int main(int argc, const char* argv[])
         }
 
         cout << "Total number of entries: " << nentries << endl;
-        cout << " -> This job will process events in the range [ " << evLow << ", " << evHigh << " ]" << endl;
+        cout << " -> This job will process events in the range [ " << evLow << ", " << evHigh << " )" << endl;
 
 
         TStopwatch processing_sw;
         processing_sw.Start();
+        cout << "Looping over samples " << endl;
         //event loop
         for (Long64_t i = evLow; i < evHigh ; i++) {
             // initialize branch variables
@@ -838,7 +840,7 @@ int main(int argc, const char* argv[])
             // read event...
             long nbytes = currentTree->GetEntry(i);
 
-            otree->copy_branches(itree);
+            //otree->copy_branches(itree);
         
             if (is_undef(itree->hypo1)) {
                 cerr << "hypo1 undefined " << itree->hypo1 << " probably there will be issues" << endl;
@@ -2106,12 +2108,12 @@ int main(int argc, const char* argv[])
 
                 // continue if leptons do not satisfy cuts
                 if(!(properEventSL || properEventDL) ) {
-                    if( debug>=2 ) {
-                        cout << "Rejected by lepton selection" << endl ;
-                        cout << " => go to next event!" << endl;
-                        cout << "******************************" << endl;
-                    }
                     if (cutLeptons) {
+                        if( debug>=2 ) {
+                            cout << "Rejected by lepton selection" << endl ;
+                            cout << " => go to next event!" << endl;
+                            cout << "******************************" << endl;
+                        }
                         cuts.fill(CutHistogram::Cuts::LEPTONS);
                         continue;
                     }
@@ -2812,12 +2814,6 @@ int main(int argc, const char* argv[])
                             // if signal (ttbb)
                             if( hyp==0 ) {
                                 p_pos =  p_b_bLep * p_b_bHad * p_b_b1 * p_b_b2 * p_j_w1 * p_j_w2;
-                                // cout << "bbbb perm " << permutList[pos] << " "
-                                //     << p_b_bLep << " " << p_b_bHad
-                                //     << " " << p_b_b1
-                                //     << " " << p_b_b2
-                                //     << " " << p_j_w1
-                                //     << " " << p_j_w2 << endl;
                                 p_bb += p_pos;
 
                                 // look for a global maximum
@@ -2829,13 +2825,6 @@ int main(int argc, const char* argv[])
 
                             // if background (ttjj)
                             if( hyp==1 ) {
-
-                                // cout << "bbjj perm " << permutList[pos] << " "
-                                //     << p_b_bLep << " " << p_b_bHad
-                                //     << " " << p_j_b1
-                                //     << " " << p_j_b2
-                                //     << " " << p_j_w1
-                                //     << " " << p_j_w2 << endl;
                                 p_bb += p_pos;
 
                                 p_pos =  p_b_bLep * p_b_bHad * p_j_b1 * p_j_b2 * p_j_w1 * p_j_w2;
@@ -3126,7 +3115,7 @@ int main(int argc, const char* argv[])
 
                 // if ntuplize all event, then compute the regressed energy per jet...
                 if( ntuplizeAll && useRegression ) {
-
+                    assert(currentTree_reg != 0);
                     // empty the array (was filled with the standard jets)
                     jets_p4_reg.clear();
 
@@ -3207,7 +3196,7 @@ int main(int argc, const char* argv[])
                     // if the event has been accepted, then compute the regressed energy per jet
                     // (if not done before)
                     if( !ntuplizeAll && useRegression ) {
-
+                        assert(currentTree_reg != 0);
                         // empty the array (was filled with the standard jets)
                         jets_p4_reg.clear();
 
@@ -4648,17 +4637,14 @@ int main(int argc, const char* argv[])
                     // if save all events, fill the tree...
                     if(ntuplizeAll) {
 
-                        if(debug>=3) {
-                            for(unsigned int q = 0; q < jets_p4.size() ; q++) {
-                                cout << jets_p4[q].Pt() << endl;
-                            }
-                        }
-
                         unsigned int jets_p4_ind = 0;
 
                         // save jet kinematics into the tree...
                         for(int q = 0; q < otree->nJet_ ; q++ ) {
 
+                            if (debug>2) {
+                                cout << " filling jet " << q << ":" << otree->nJet_ << ":" << jets_p4.size() << endl;
+                            }
                             // fill elem 0th w/ lepton kinematics
                             if( q==0 ) {
                                 otree->jet_pt_    [q] = leptonLV.Pt();
@@ -4725,14 +4711,24 @@ int main(int argc, const char* argv[])
                         } //jet loop
 
                         // fill the tree
+                        if(debug >= 2) {
+                            cout << "@ntuplizeAllFill" << endl;
+                        }
+                        if(debug >= 2) {
+                            cout << otree->nLep_ << ":" << otree->nJet_ << ":" << otree->numJets_ << endl;
+                        }
                         cuts.fill(CutHistogram::Cuts::passes);
-                        otree->tree->Fill();
+                        int nfill = otree->tree->Fill();
+                        assert(nfill > 0);
                         hcounter->SetBinContent(3, hcounter->GetBinContent(3)+1);
                     } //ntuplizeAll
 
                     continue; //continue systematics loop in case ntuplizeAll
                 } //case where matrix element is not calculated
 
+                if(debug >= 2) {
+                    cout << "@notNtuplizeAllFill" << endl; 
+                }
                 // fill the tree in case !ntuplizeAll
                 // FIXME: why is this here twice?
                 cuts.fill(CutHistogram::Cuts::passes);

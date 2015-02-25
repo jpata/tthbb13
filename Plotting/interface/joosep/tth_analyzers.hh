@@ -43,6 +43,7 @@ public:
         bool ret = true;
         ret = ret && (is_sl || is_dl);// && !(is_sl && is_dl);
         ret = ret && (t->syst_ == 0);
+        ret = ret && (t->EVENT_.event > 0);
         //ret = ret && (t->btag_LR >= 0);
         return ret;
     };
