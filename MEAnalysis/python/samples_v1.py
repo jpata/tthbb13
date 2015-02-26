@@ -29,6 +29,8 @@ else:
     print "Warning: host '{0}' VO '{1}' is unknown, using xrootd".format(hn, vo)
     pfPath = "/store/user/jpata/tth/s1_eb733a1/"
     lfPrefix = "root://cmsxrootd.fnal.gov/"
+    def lfn_to_pfn(fn):
+        return fn
 
 pathToFile = cms.string(lfPrefix + pfPath)
 

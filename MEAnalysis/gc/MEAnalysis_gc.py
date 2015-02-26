@@ -1,6 +1,11 @@
 from TTH.MEAnalysis.MEAnalysis_cfg import *
 from TTH.MEAnalysis.samples_v1 import lfn_to_pfn, initialize_from_cfgfile
 import TTH.MEAnalysis.mem_parameters_cff as mempar
+import imp
+
+filename_datacard = os.environ["DATACARD"] + ".py"
+imp.load_source("datacard", os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/" + filename_datacard)
+datacard.configure(process.fwliteInput)
 
 process.fwliteInput.evLimits = cms.vint32([
 	int(os.environ["SKIP_EVENTS"]),

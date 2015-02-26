@@ -133,18 +133,22 @@ def sample_weight(sample):
 		if "8TeV" in sample:
 			return 20.0/12.0
 		else:
-			if "13TeV_spring14" in sample:
-				return 20000 * 0.1293 * 0.569 / 97520.0
 			if "13TeV_phys14" in sample:
-				return 20000 * 0.1293 * 0.569 / 199700.0
+				return 0.1302 / 0.5085
+			if "13TeV_spring14__s1_3a4602f__s2_b7e13a1" in sample:
+				return 20000 * 0.1302 * 0.569 / 97520
+			if "13TeV_spring14" in sample:
+				return 0.1302 / 0.5085
 	elif "ttjets" in sample:
 		if "8TeV" in sample:
-			return 20.0/12.0
+			return 20.0/12.0#20.0/12.0
 		else:
 			if "13TeV_phys14" in sample:
-				return 20000 * 252.89 / 25405611
-			if "13TeV_spring14" in sample:
+				return 252.89 / 508.5
+			if "13TeV_spring14__s1_3a4602f__s2_b7e13a1" in sample:
 				return 20000 * 252.89 / 25360410
+			if "13TeV_spring14" in sample:
+				return 252.89 / 508.5
 
 def axis_label(var):
 	if "lep1_pt" in var:

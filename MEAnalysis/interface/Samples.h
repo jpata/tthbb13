@@ -126,6 +126,7 @@ Samples::Samples(bool openAllFiles, string pathToFile, string ordering,
     for(auto & p : vpset) {
 
         const bool skip       = p.getParameter<bool>("skip");
+        if(skip) continue;
         const string fileName = p.getParameter<string>("name");
         const string nickName = p.getParameter<string>("nickName");
         const int color       = p.getParameter<int>("color");
@@ -135,7 +136,6 @@ Samples::Samples(bool openAllFiles, string pathToFile, string ordering,
         //const string full_fn  = p.exists("fullFilename") ? p.getParameter<string>("fullFilename")  : "";
         const vector<string> subfiles = p.getParameter<vector<string>>("subFiles");
         
-        if(skip) continue;
 
         TChain *chain = 0;
         cout << "Opening chain" << endl;
