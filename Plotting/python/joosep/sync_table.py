@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from collections import OrderedDict
 import ROOT
 ROOT.gROOT.SetBatch(True)
