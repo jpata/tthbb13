@@ -62,8 +62,8 @@ def configure(pi):
 	###############################################
 
 	# central mass values
-	pi.MH          = 125.00
-	pi.MT          = 173.50
+	MH          = 125.00
+	MT          = 173.50
 
 	# whuch mass values to scan
 	#massesH     = cms.vdouble( 125. )
@@ -72,11 +72,11 @@ def configure(pi):
 	pi.massesT     = cms.vdouble( MT )
 
 	# an extra name for the output files
-	pi.extraoutname = ""
-	if len(massesH)>1:
-	    pi.extraoutname = "MHscan_"
-	if len(massesT)>1:
-	    pi.extraoutname = "MTscan_"
+	#extraoutname = ""
+	#if len(massesH)>1:
+	#    pi.extraoutname = "MHscan_"
+	#if len(massesT)>1:
+	#    pi.extraoutname = "MTscan_"
 
 	# normalize weight by xsec (default 0)
 	pi.norm                 = 0
@@ -116,7 +116,7 @@ def configure(pi):
 	pi.integralOption2_nevalfact = 1.0
 
 	# switch off ME calculation
-	pi.speedup              = 0
+	pi.speedup              = 1
 
 	# switch off OL calculation
 	pi.switchoffOL          = 0

@@ -40,6 +40,7 @@ if args.action == "hadd":
 
     for inf in input_filenames:
         spl = inf.split("/")
+        print spl
         dataset = spl[-2]
         fn = inf
         if not datasets.has_key(dataset):

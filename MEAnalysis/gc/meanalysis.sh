@@ -3,6 +3,8 @@
 #CMSSW_BASE=/shome/jpata/TTH/CMSSW
 CMSSW_BASE=/home/joosep/TTH-73X/CMSSW
 
+source config.sh
+
 env
 set -e
 
@@ -26,8 +28,9 @@ echo "MEAnalysis is done"
 
 #back to scratch to copy output
 cd $MY_SCRATCH
-mkdir -p /home/$USER/tth/gc/${TASK_ID}/${DATASETPATH}/
-echo "copying output"
-OFNAME=/home/$USER/tth/gc/${TASK_ID}/${DATASETPATH}/output_${MY_JOBID}.root
-cp $MY_SCRATCH/output.root $OFNAME
-echo $OFNAME > output.txt
+OFPATH=/home/$USER/tth/gc/${TASK_ID}/${DATACARD}/${DATASETPATH}/
+mkdir -p $OFPATH
+echo "copying output to $OFPATH/$OFNAME"
+OFNAME=output_${MY_JOBID}.root
+cp $MY_SCRATCH/output.root $OFPATH/$OFNAME
+echo $OFPATH/$OFNAME > output.txt

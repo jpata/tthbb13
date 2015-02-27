@@ -4,7 +4,7 @@ import TTH.MEAnalysis.mem_parameters_cff as mempar
 import imp
 
 filename_datacard = os.environ["DATACARD"] + ".py"
-imp.load_source("datacard", os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/" + filename_datacard)
+datacard = imp.load_source("datacard", os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/" + filename_datacard)
 datacard.configure(process.fwliteInput)
 
 process.fwliteInput.evLimits = cms.vint32([
