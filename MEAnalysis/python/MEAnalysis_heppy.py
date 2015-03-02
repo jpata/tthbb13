@@ -36,7 +36,7 @@ if os.environ.has_key("ME_CONF"):
     from meconf import Conf
 else:
     print "Loading ME config from TTH.MEAnalysis.MEAnalysis_heppy_cfg"
-    from TTH.MEAnalysis.MEAnalysis_heppy_cfg import Conf
+    from TTH.MEAnalysis.MEAnalysis_cfg_heppy import Conf
 conf = Conf()
 
 import TTH.MEAnalysis.MECoreAnalyzers as MECoreAnalyzers
@@ -148,13 +148,13 @@ from PhysicsTools.HeppyCore.framework.chain import Chain as Events
 config = cfg.Config(
     #Run across these inputs
     components = inputSamples,
-    
+
     #Using this sequence
     sequence = sequence,
-    
+
     #save output to these services
     services = [output_service],
-    
+
     #This defines how events are loaded
     events_class = Events
 )

@@ -131,6 +131,24 @@ samples = cms.VPSet(
 )
 
 def initialize_from_cfgfile(fn, samples):
+    """
+    Sets the subFiles of the input samples,
+    loading the file lists from a flat .cfg file
+    of the format
+    [nickname1]
+    /path/to/file1.root
+    /path/to/file2.root
+
+    [nickname2]
+    /path/to/file1.root
+    /path/to/file2.root
+
+    Arguments:
+    fn (string): path to the config file
+    samples (VPSet of PSet): the input samples, modified in place
+
+    Returns: nothing
+    """
     fi = open(fn)
     section = None
     data = {}
