@@ -2,6 +2,7 @@
 import os
 import PhysicsTools.HeppyCore.framework.config as cfg
 import ROOT
+import imp
 
 import itertools
 
@@ -18,83 +19,24 @@ for s in samples:
         tree_name = "tree"
     )
     inputSample.isMC = s.isMC.value()
-    inputSamples.append(inputSample)
+    if s.skip.value() == False:
+        inputSamples.append(inputSample)
 
-selectedComponents  = inputSamples
-
-from tree import *
+#Event contents are defined here
+from TTH.MEAnalysis.VHbbTree import *
 evs = cfg.Analyzer(
     EventAnalyzer,
     'events',
 )
 
-lep_hists = {}
-for x in ["mu", "good_sl_mu", "good_dl_mu", "el", "good_sl_el", "good_dl_el", "good_sl_lep", "good_dl_lep"]:
-    lep_hists[x] = ROOT.TH1D("n_lep_"+x, "Number of leptons " + x, 5, 0, 5)
-
-class Conf:
-    def __init__(self):
-        self.leptons = {
-            "mu": {
-                "tight": {
-                    "pt": 30,
-                    "eta":2.1,
-                    "iso": 0.12
-                },
-                "tight_veto": {
-                    "pt": 0.0,
-                    "eta": 0.0,
-                    "iso": 0.0,
-                },
-                "loose": {
-                    "pt": 20,
-                    "eta": 2.4,
-                    "iso": 0.2,
-                },
-                "loose_veto": {
-                    "pt": 0.0,
-                    "eta": 0.0,
-                    "iso": 0.0,
-                },
-                "isotype": "relIso03",
-                "dxy": 0.2,
-
-            },
-            "el": {
-                "tight": {
-                    "pt": 30,
-                    "eta": 2.5,
-                    "iso": 0.1
-                },
-                "tight_veto": {
-                    "pt": 20,
-                    "eta": 2.5,
-                    "iso": 0.15,
-                },
-                "loose": {
-                    "pt": 20,
-                    "eta": 2.2,
-                    "iso": 0.15,
-                },
-                "loose_veto": {
-                    "pt": 10,
-                    "eta": 2.2,
-                    "iso": 0.04,
-                },
-                "isotype": "relIso03",
-                "dxy": 0.04,
-            }
-        }
-        self.leptons["mu"]["tight_veto"] = self.leptons["mu"]["loose"]
-
-        self.jets = {
-            "pt": 40,
-            "eta": 2.5,
-            "btagAlgo": "btagCSV",
-            "btagWP": "CSVM",
-            "btagWPs": {"CSVM": ("btagCSV", 0.9)}
-        }
-
+#Create configuration object
+if os.environ.has_key("ME_CONF"):
+    print "Loading ME config from", os.environ["ME_CONF"]
+    meconf = imp.load_source("meconf", os.environ["ME_CONF"])
+    from meconf import Conf
+else:
+    print "Loading ME config from TTH.MEAnalysis.MEAnalysis_heppy_cfg"
+    from TTH.MEAnalysis.MEAnalysis_heppy_cfg import Conf
 conf = Conf()
 
 import TTH.MEAnalysis.MECoreAnalyzers as MECoreAnalyzers
@@ -203,18 +145,27 @@ output_service = cfg.Service(
 
 #finalization of the configuration object.
 from PhysicsTools.HeppyCore.framework.chain import Chain as Events
-config = cfg.Config( components = selectedComponents,
+config = cfg.Config(
+    #Run across these inputs
+    components = inputSamples,
+    
+    #Using this sequence
     sequence = sequence,
+    
+    #save output to these services
     services = [output_service],
+    
+    #This defines how events are loaded
     events_class = Events
 )
 
-print config
+if __name__ == "__main__":
+    print "Running MEAnalysis heppy main loop"
+    from PhysicsTools.HeppyCore.framework.looper import Looper
+    looper = Looper( 'Loop', config, nPrint = 0, nEvents = 1000)
 
-from PhysicsTools.HeppyCore.framework.looper import Looper
-looper = Looper( 'Loop', config, nPrint = 0, nEvents = 1000)
-looper.loop()
-looper.write()
+    looper.loop()
+    looper.write()
 
-for analyzer in looper.analyzers:
-    print analyzer.name, "counters = {\n", analyzer.counters, "}"
+    for analyzer in looper.analyzers:
+        print analyzer.name, "counters = {\n", analyzer.counters, "}"
