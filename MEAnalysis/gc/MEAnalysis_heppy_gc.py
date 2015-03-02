@@ -1,5 +1,6 @@
 import os
 from TTH.MEAnalysis.MEAnalysis_heppy import sequence
+from TTH.MEAnalysis.samples_v1 import samples, lfn_to_pfn
 from TTH.MEAnalysis.samples_vhbb import samples
 
 firstEvent = int(os.environ["SKIP_EVENTS"])
@@ -8,15 +9,19 @@ nEvents = int(os.environ["MAX_EVENTS"])
 fns = os.environ["FILE_NAMES"].split()
 dataset = os.environ["DATASETPATH"]
 
+#Create a list of samples to run
+#fill the subFiles of the samples from
+#the supplied file names
 good_samp = []
 for ns in range(len(samples)):
     if samples[ns].nickName.value() == dataset:
         samples[ns].skip = False
-        samples[ns].subFiles = fns
+        samples[ns].subFiles = map(lfn_to_pfn, fns)
         good_samp += [samples[ns]]
     else:
         samples[ns].skip = True
 
+assert(len(good_samp) == 1)
 outFileName = os.environ["MY_SCRATCH"] + "/output.root"
 
 import PhysicsTools.HeppyCore.framework.config as cfg

@@ -6,6 +6,7 @@ import imp
 
 import itertools
 
+from TTH.MEAnalysis.samples_v1 import lfn_to_pfn
 from TTH.MEAnalysis.samples_vhbb import samples
 
 # input component
@@ -15,11 +16,11 @@ inputSamples = []
 for s in samples:
     inputSample = cfg.Component(
         'tth',
-        files = s.subFiles.value(),
+        files = map(lfn_to_pfn, s.subFiles.value()),
         tree_name = "tree"
     )
     inputSample.isMC = s.isMC.value()
-    if s.skip.value() == False:
+    if s.skip.value() == False and len(s.subFiles.value())>0:
         inputSamples.append(inputSample)
 
 #Event contents are defined here
@@ -77,14 +78,29 @@ wtag = cfg.Analyzer(
 )
 
 from PhysicsTools.Heppy.analyzers.core.AutoFillTreeProducer  import *
+
+jetType = NTupleObjectType("jetType", variables = [
+    # Loose id
+    NTupleVariable("pt", lambda x : x.pt),
+    NTupleVariable("eta", lambda x : x.eta)
+])
+
 treeProducer = cfg.Analyzer(
     class_object=AutoFillTreeProducer,
     verbose=False,
     vectorTree = True,
-    globalVariables	= [
+    globalVariables    = [
         NTupleVariable(
             "Wmass", lambda ev: ev.Wmass,
             help="best W boson mass from untagged pair (untagged by CSVM)"
+        ),
+        NTupleVariable(
+            "is_sl", lambda ev: ev.is_sl,
+            help="event is single-lepton"
+        ),
+        NTupleVariable(
+            "is_dl", lambda ev: ev.is_dl,
+            help="event is di-lepton"
         ),
         NTupleVariable(
             "Wmass2", lambda ev: ev.Wmass2,
@@ -111,7 +127,10 @@ treeProducer = cfg.Analyzer(
         ),
     ],
     globalObjects = {},
-    collections = {}
+    collections = {
+    #standard dumping of objects
+        "good_jets" : NTupleCollection("good_jets", jetType, 8, help="FIXME"),
+    }
 )
 
 #Override the default fillCoreVariables function, which
@@ -162,7 +181,7 @@ config = cfg.Config(
 if __name__ == "__main__":
     print "Running MEAnalysis heppy main loop"
     from PhysicsTools.HeppyCore.framework.looper import Looper
-    looper = Looper( 'Loop', config, nPrint = 0, nEvents = 1000)
+    looper = Looper( 'Loop', config, nPrint = 0, nEvents = 10000)
 
     looper.loop()
     looper.write()
