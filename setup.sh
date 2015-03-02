@@ -12,6 +12,7 @@ git cms-addpkg RecoJets/JetProducers
 
 #get the TTH code
 git clone https://github.com/jpata/tthbb13.git TTH
+git checkout jpata/meanalysis-heppy
 cp TTH/MEAnalysis/libs/*.so ../lib/$SCRAM_ARCH/
 
 #to apply a the top tagger as a patch
