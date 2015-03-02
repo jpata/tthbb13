@@ -80,9 +80,18 @@ wtag = cfg.Analyzer(
 from PhysicsTools.Heppy.analyzers.core.AutoFillTreeProducer  import *
 
 jetType = NTupleObjectType("jetType", variables = [
-    # Loose id
     NTupleVariable("pt", lambda x : x.pt),
-    NTupleVariable("eta", lambda x : x.eta)
+    NTupleVariable("eta", lambda x : x.eta),
+    NTupleVariable("phi", lambda x : x.phi),
+    NTupleVariable("mass", lambda x : x.mass),
+    NTupleVariable("id", lambda x : x.id),
+    NTupleVariable("btagCSV", lambda x : x.btagCSV),
+    NTupleVariable("mcFlavour", lambda x : x.mcFlavour, type=int),
+    NTupleVariable("mcMatchId", lambda x : x.mcMatchId, type=int),
+    NTupleVariable("hadronFlavour", lambda x : x.hadronFlavour, type=int),
+    NTupleVariable("mcPt", lambda x : x.mcPt),
+    NTupleVariable("mcEta", lambda x : x.mcEta),
+    NTupleVariable("mcPhi", lambda x : x.mcPhi),
 ])
 
 treeProducer = cfg.Analyzer(
