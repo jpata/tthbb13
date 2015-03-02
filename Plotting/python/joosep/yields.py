@@ -38,14 +38,14 @@ if __name__ == "__main__":
 		ys1e = ([yt["sl", "H", i][2] for i in range(3)] + [yt["dl", "H", i][2] for i in range(3,6)] +
 		    [yt["sl", "L", i][2] for i in range(3)] + [yt["dl", "L", i][2] for i in range(3,6)])
 
-		ys2 = ([yt["sl", "H", i][1] for i in range(3)] + [yt["dl", "H", i][1] for i in range(3,6)] + 
+		ys2 = ([yt["sl", "H", i][1] for i in range(3)] + [yt["dl", "H", i][1] for i in range(3,6)] +
 		    [yt["sl", "L", i][1] for i in range(3)] + [yt["dl", "L", i][1] for i in range(3,6)])
-		ys2e = ([yt["sl", "H", i][3] for i in range(3)] + [yt["dl", "H", i][3] for i in range(3,6)] + 
+		ys2e = ([yt["sl", "H", i][3] for i in range(3)] + [yt["dl", "H", i][3] for i in range(3,6)] +
 		    [yt["sl", "L", i][3] for i in range(3)] + [yt["dl", "L", i][3] for i in range(3,6)])
 
 		plt.bar(xs+0.1, ys1, 0.3, yerr=ys1e, color="red", ecolor="black", label=sample_name(s1))
 		plt.bar(xs+0.1+0.3+0.1, ys2, 0.3, yerr=ys2e, color="green", ecolor="black", label=sample_name(s2))
-		
+
 		leg = plt.legend(loc=0, frameon=True, fancybox=True, framealpha=0.9)
 		#statsbox(ax, [h1, h2, h3, h4])
 

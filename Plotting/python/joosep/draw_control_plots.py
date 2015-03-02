@@ -134,21 +134,21 @@ def sample_weight(sample):
 			return 20.0/12.0
 		else:
 			if "13TeV_phys14" in sample:
-				return 0.1302 / 0.5085
+				return 20. * 0.1302 / 0.5085
 			if "13TeV_spring14__s1_3a4602f__s2_b7e13a1" in sample:
 				return 20000 * 0.1302 * 0.569 / 97520
 			if "13TeV_spring14" in sample:
-				return 0.1302 / 0.5085
+				return 20. * 0.1302 / 0.5085
 	elif "ttjets" in sample:
 		if "8TeV" in sample:
-			return 20.0/12.0#20.0/12.0
+			return 20.0/12.0
 		else:
 			if "13TeV_phys14" in sample:
-				return 252.89 / 508.5
+				return 20. * 252.89 / 508.5
 			if "13TeV_spring14__s1_3a4602f__s2_b7e13a1" in sample:
 				return 20000 * 252.89 / 25360410
 			if "13TeV_spring14" in sample:
-				return 252.89 / 508.5
+				return 20. * 252.89 / 508.5
 
 def axis_label(var):
 	if "lep1_pt" in var:
@@ -197,8 +197,8 @@ def yield_plot(tf, s1, s2, w1, w2):
     catyields = {}
     for lep in ["sl", "dl"]:
         for cat in ["H", "L"]:
-            _s1 = s1 + "__" + lep + "Cat" + cat + "Seq__cplots" 
-            _s2 = s2 + "__" + lep + "Cat" + cat + "Seq__cplots" 
+            _s1 = s1 + "__" + lep + "Cat" + cat + "Seq__cplots"
+            _s2 = s2 + "__" + lep + "Cat" + cat + "Seq__cplots"
             h1 = tf.Get(_s1 + "__cat")
             h2 = tf.Get(_s2 + "__cat")
 
@@ -369,7 +369,7 @@ if __name__ == "__main__":
 				plt.xlabel(axis_label(var))
 
 				#ax.xaxis.grid(True, which='minor')
-				
+
 				leg = plt.legend(loc=0, frameon=True, fancybox=True, framealpha=0.9)
 				statsbox(ax, [h1, h2])
 
@@ -434,7 +434,7 @@ if __name__ == "__main__":
 	# 			h1n = hs_unmatched["{0}/{1}CatHSeq__meplots__cat_discr/cat{2}".format(s1, lep, cat)]
 	# 			h2y = hs_matched["{0}/{1}CatHSeq__meplots__cat_discr/cat{2}".format(s2, lep, cat)]
 	# 			h2n = hs_unmatched["{0}/{1}CatHSeq__meplots__cat_discr/cat{2}".format(s2, lep, cat)]
-				
+
 	# 			h1y.Scale(1.0 / h1.Integral())
 	# 			h2y.Scale(1.0 / h2.Integral())
 	# 			h1n.Scale(1.0 / h1.Integral())

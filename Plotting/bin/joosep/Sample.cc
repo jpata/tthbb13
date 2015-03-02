@@ -1,6 +1,6 @@
 #include "TTH/Plotting/interface/joosep/Sample.h"
 
-Sample::Sample(const edm::ParameterSet& pars) : 
+Sample::Sample(const edm::ParameterSet& pars) :
 	nickName(pars.getParameter<string>("nickName")),
 	fileNamesS1(pars.getParameter<vector<string>>("fileNamesS1")),
 	fileNamesS2(pars.getParameter<vector<string>>("fileNamesS2")),
