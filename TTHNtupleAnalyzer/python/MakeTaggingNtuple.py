@@ -101,7 +101,8 @@ else:
     initial_miniAOD_filename = list(PSet.process.source.fileNames)[0]
     if "ZPrimeToTTJets" in initial_miniAOD_filename:
         particle_name = "hadtop"
-    elif "TTbarH_HToBB_M" in initial_miniAOD_filename:
+    elif ("TTbarH_HToBB_M" in initial_miniAOD_filename or 
+          "Rad_HHto4b" in initial_miniAOD_filename):
         particle_name = "higgs"
     else:
         particle_name = "parton"

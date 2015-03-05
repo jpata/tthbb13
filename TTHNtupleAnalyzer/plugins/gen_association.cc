@@ -429,10 +429,12 @@ void get_gen_higgs(edm::Handle<edm::View<reco::GenParticle>> pruned,
   // Extract higgs
   for (auto& gp : *pruned){
     if ( (abs(gp.pdgId()) == 25) &&
-	 (gp.status() == 3) &&
+	 ((gp.status() == 3) || (gp.status() == 22)) &&
 	 (gp.pt() > min_higgs_pt) )
       gen_higgs.push_back(&gp);
   } // end loop over gen particles
+
+
 
 } // get_gen_higgs
 

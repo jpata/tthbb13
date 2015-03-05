@@ -6,7 +6,7 @@
 
 import sys
 
-from TTH.TTHNtupleAnalyzer.CrabHelpers import submit, status, kill, download, download_globus, hadd
+from TTH.TTHNtupleAnalyzer.CrabHelpers import submit, status, kill, download, download_globus, hadd, cleanup
 
 
 #######################################
@@ -15,10 +15,12 @@ from TTH.TTHNtupleAnalyzer.CrabHelpers import submit, status, kill, download, do
 
 # Ntuple name/version and samples to include
 name = "nhiggs"
-version = "v5"
+version = "v6"
 li_samples = [
-    "tth_hbb_13tev",
-    "ttj_13tev"
+    "rad_hh4b_m800_13tev_20bx25",
+    #"qcd_170_300_pythia8_13tev_phys14_20bx25",
+    #"qcd_300_470_pythia8_13tev_phys14_20bx25",
+    #"qcd_470_600_pythia8_13tev_phys14_20bx25",
 ]
 
 cmssw_config_path = '/shome/gregor/TTH-73X/CMSSW/src/TTH/TTHNtupleAnalyzer/python/'
@@ -30,7 +32,7 @@ storage_path = '/scratch/gregor/'
 #####################################
 
 # Decide what to do
-actions = ["submit", "status", "kill", "download", "download_globus", "hadd"]
+actions = ["submit", "status", "kill", "download", "download_globus", "hadd", "cleanup"]
 
 if not len(sys.argv) == 2:
     print "Invalid number of arguments"
@@ -75,7 +77,13 @@ elif action == "download":
 
 elif action == "download_globus":
     for sample_shortname in li_samples:
-        download_globus(name, sample_shortname, version, storage_path)    
+        download_globus(name, sample_shortname, version, storage_path, glob_string = "output-tagging*.root")    
+
+
+# Cleanup
+elif action == "cleanup":
+    for sample_shortname in li_samples:
+        cleanup(name, sample_shortname, version, storage_path, infile_glob="*.root")    
 
 
 # Hadd

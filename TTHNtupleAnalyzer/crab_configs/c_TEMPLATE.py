@@ -16,11 +16,12 @@ config.JobType.inputFiles = ["../python/MakeTaggingNtuple.py", "../python/Access
 config.JobType.outputFiles = ["output-tagging.root"]
 
 config.section_("Data")
-config.Data.inputDBS = 'global'
+#config.Data.inputDBS = 'global'
+config.Data.inputDBS = 'phys03'
 config.Data.splitting = 'LumiBased'
 config.Data.publication = False
 
-config.Data.unitsPerJob = 40
+config.Data.unitsPerJob = 60
 #config.Data.totalUnits = 5
 
 config.section_("Site")

@@ -90,8 +90,7 @@ Samples = {
     "qcd_50_80_pythia8_13tev_phys14_20bx25"     : "/QCD_Pt-50to80_Tune4C_13TeV_pythia8/Phys14DR-PU20bx25_trkalmb_castor_PHYS14_25_V1-v2/MINIAODSIM",
     "qcd_80_120_pythia8_13tev_phys14_20bx25"    : "/QCD_Pt-80to120_Tune4C_13TeV_pythia8/Phys14DR-PU20bx25_trkalmb_castor_PHYS14_25_V1-v2/MINIAODSIM",
     "qcd_120_170_pythia8_13tev_phys14_20bx25"   : "/QCD_Pt-120to170_Tune4C_13TeV_pythia8/Phys14DR-PU20bx25_trkalmb_castor_PHYS14_25_V1-v2/MINIAODSIM",
-    # "qcd_170_300_pythia8_13tev_phys14_20bx25"   :170..300 MISSING !!!!
-
+    "qcd_170_300_pythia8_13tev_phys14_20bx25"   : "/QCD_Pt-170to300_Tune4C_13TeV_pythia8/Phys14DR-PU20bx25_trkalmb_castor_PHYS14_25_V1-v2/MINIAODSIM",
     "qcd_300_470_pythia8_13tev_phys14_20bx25"   : "/QCD_Pt-300to470_Tune4C_13TeV_pythia8/Phys14DR-PU20bx25_trkalmb_castor_PHYS14_25_V1-v2/MINIAODSIM",
     "qcd_470_600_pythia8_13tev_phys14_20bx25"   : "/QCD_Pt-470to600_Tune4C_13TeV_pythia8/Phys14DR-PU20bx25_trkalmb_castor_PHYS14_25_V1-v2/MINIAODSIM",
     "qcd_600_800_pythia8_13tev_phys14_20bx25"   : "/QCD_Pt-600to800_Tune4C_13TeV_pythia8/Phys14DR-PU20bx25_trkalmb_castor_PHYS14_25_V1-v1/MINIAODSIM",
@@ -101,6 +100,14 @@ Samples = {
     "qcd_1800_2400_pythia8_13tev_phys14_20bx25" : "/QCD_Pt-1800to2400_Tune4C_13TeV_pythia8/Phys14DR-PU20bx25_trkalmb_PHYS14_25_V1-v2/MINIAODSIM",
     "qcd_2400_3200_pythia8_13tev_phys14_20bx25" : "/QCD_Pt-2400to3200_Tune4C_13TeV_pythia8/Phys14DR-PU20bx25_trkalmb_PHYS14_25_V1-v1/MINIAODSIM",
     "qcd_3200_inf_pythia8_13tev_phys14_20bx25"  : "/QCD_Pt-3200_Tune4C_13TeV_pythia8/Phys14DR-PU20bx25_trkalmb_PHYS14_25_V1-v1/MINIAODSIM",
+
+
+    #######################################
+    # 13 TeV
+    # Private Boosted Higgs
+    #######################################
+
+    "rad_hh4b_m800_13tev_20bx25"  : "/Rad_HHto4b_M800_13TeV/cvernier-miniAOD-f72224f370765110654dede84b5edea6/USER",
 
 
 }
