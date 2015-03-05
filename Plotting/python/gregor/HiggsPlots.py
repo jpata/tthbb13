@@ -34,7 +34,7 @@ else:
 # for the filename: basepath + filename + .root
 full_file_names = {}
 for k,v in files.iteritems():
-    full_file_names[k] = basepath + v + "-weighted.root"
+    full_file_names[k] = basepath + v + "-tagging.root"
 
 output_dir = "results/HiggsPlots/"
 
@@ -44,25 +44,107 @@ output_dir = "results/HiggsPlots/"
 ########################################
 
 
+
+
+samples = [
+    "rad_hh4b_m800_170_300",
+    "rad_hh4b_m800_300_470",
+    "rad_hh4b_m800_470_800",
+    ]
+
+sample_names = {
+    "rad_hh4b_m800_170_300" : "170 < pT < 300",
+    "rad_hh4b_m800_300_470" : "300 < pT < 470",
+    "rad_hh4b_m800_470_800" : "470 < pT < 800",
+}
+
+
+mass_vars = [
+    'ca15_mass',
+    'ca15trimmedr2f6_mass',
+    'ca15softdropz15b00_mass',
+    'ca15softdropz20b10_mass',
+    ]
+
+
+if True:
+    for mass_var in mass_vars:
+        combinedPlot(mass_var,
+                     [plot( sample_names[sample], 
+                            mass_var,
+                            fiducial_cuts[sample].replace("pt","higgs_pt"), 
+                            sample) for sample in samples],
+                     50, 0, 300, 
+                     label_x   = "Mass",
+                     label_y   = "A.U.",
+                     axis_unit = "GeV",
+                     log_y     = False,
+                     normalize = True,
+                     legend_origin_x = 0.65,
+                     legend_origin_y = 0.6,
+                     legend_size_x   = 0.2,
+                     legend_text_size= 0.03,
+                 )
+
+
+combinedPlot("pt",
+             [plot( sample_names[sample], 
+                    "higgs_pt",
+                    fiducial_cuts[sample].replace("pt","higgs_pt"), 
+                    sample) for sample in samples],
+             50, 0, 1000, 
+             label_x   = "Higgs p_{T}",
+             label_y   = "Higgs",
+             axis_unit = "GeV",
+             log_y     = False,
+             normalize = False,
+             legend_origin_x = 0.65,
+             legend_origin_y = 0.6,
+             legend_size_x   = 0.2,
+             legend_text_size= 0.03,
+         )
+
+combinedPlot("eta",
+             [plot( sample_names[sample], 
+                    "higgs_eta",
+                    fiducial_cuts[sample].replace("pt","higgs_pt"), 
+                    sample) for sample in samples],
+             50, -3.5, 3.5, 
+             label_x   = "Higgs #eta",
+             label_y   = "A.U.",
+             axis_unit = "",
+             log_y     = False,
+             normalize = True,
+             legend_origin_x = 0.65,
+             legend_origin_y = 0.6,
+             legend_size_x   = 0.2,
+             legend_text_size= 0.03,
+         )
+
+combinedPlot("npv",
+             [plot( sample_names[sample], 
+                    "npv",
+                    fiducial_cuts[sample].replace("pt","higgs_pt"), 
+                    sample) for sample in samples],
+             41, 0, 40, 
+             label_x   = "NPV",
+             label_y   = "A.U.",
+             axis_unit = "",
+             log_y     = False,
+             normalize = True,
+             legend_origin_x = 0.65,
+             legend_origin_y = 0.6,
+             legend_size_x   = 0.2,
+             legend_text_size= 0.03,
+         )
+
+
+
+
 if False:
     combinedPlot("ca15softdropz20b10_mass",
                  [plot( pair[0], 'ca15softdropz20b10_mass',  fiducial_cuts[pair[0]], pair[0]) for pair in sorted(pairs.values())] + 
                  [plot( pair[1], 'ca15softdropz20b10_mass',  fiducial_cuts[pair[1]], pair[1]) for pair in sorted(pairs.values())],
-                 50, 0, 600, 
-                 label_x   = "Mass",
-                 label_y   = "A.U.",
-                 axis_unit = "GeV",
-                 log_y     = False,
-                 normalize = True,
-                 legend_origin_x = 0.55,
-                 legend_origin_y = 0.4,
-                 legend_size_x   = 0.2,
-                 legend_size_y   = 0.05 * 6)
-
-if False:
-    combinedPlot("ca15trimmedr2f6_mass",
-                 [plot( pair[0], 'ca15trimmedr2f6_mass',  fiducial_cuts[pair[0]], pair[0]) for pair in sorted(pairs.values())] + 
-                 [plot( pair[1], 'ca15trimmedr2f6_mass',  fiducial_cuts[pair[1]], pair[1]) for pair in sorted(pairs.values())],
                  50, 0, 600, 
                  label_x   = "Mass",
                  label_y   = "A.U.",
@@ -102,20 +184,20 @@ if False:
                  legend_origin_y = 0.4,
                  legend_size_x   = 0.2,
                  legend_size_y   = 0.05 * 6)
-
-combinedPlot("ca15_nsub_valid",
-             [plot( pair[0], 'ca15_tau1>0',  fiducial_cuts[pair[0]], pair[0]) for pair in sorted(pairs.values())] + 
-             [plot( pair[1], 'ca15_tau1>0',  fiducial_cuts[pair[1]], pair[1]) for pair in sorted(pairs.values())],
-             15, -.05, 1.05, 
-             label_x   = "#tau_{1} > 0",
-             label_y   = "A.U.",
-             axis_unit = "",
-             log_y     = False,
-             normalize = True,
-             legend_origin_x = 0.22,
-             legend_origin_y = 0.4,
-             legend_size_x   = 0.2,
-             legend_size_y   = 0.05 * 6)
+if False:
+    combinedPlot("ca15_nsub_valid",
+                 [plot( pair[0], 'ca15_tau1>0',  fiducial_cuts[pair[0]], pair[0]) for pair in sorted(pairs.values())] + 
+                 [plot( pair[1], 'ca15_tau1>0',  fiducial_cuts[pair[1]], pair[1]) for pair in sorted(pairs.values())],
+                 15, -.05, 1.05, 
+                 label_x   = "#tau_{1} > 0",
+                 label_y   = "A.U.",
+                 axis_unit = "",
+                 log_y     = False,
+                 normalize = True,
+                 legend_origin_x = 0.22,
+                 legend_origin_y = 0.4,
+                 legend_size_x   = 0.2,
+                 legend_size_y   = 0.05 * 6)
 
 
 

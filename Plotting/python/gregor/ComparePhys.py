@@ -47,11 +47,14 @@ output_dir = "results/CheckPtWeight/"
 
 
 for var in mass_vars_v36: #cmstt_vars_v36 + nsub_vars_v36 + qvol_vars_v36 + 
-    continue
 
-    samples = ['zprime_m1000', 'zprime_m2000_low', 'zprime_m2000', "qcd_300_470", "qcd_470_600", "qcd_600_800"]        
+
+    samples = ['zprime_m1000', "qcd_300_470"]        
     samples = [s for s in samples if ranges[s][4] in var.name]
         
+    if not len(samples):
+        continue
+
     combinedPlot(var.pretty_name.replace("/","_").replace(" ", "_").replace("{","").replace("}",""),
              [plot(sample_names[sample],
                    var.name,                                           
@@ -74,7 +77,7 @@ for var in mass_vars_v36: #cmstt_vars_v36 + nsub_vars_v36 + qvol_vars_v36 +
                  legend_text_size= 0.03)
 
 
-if True:
+if False:
     samples = ['zprime_m1000', "qcd_300_470"]        
 
     if True:
@@ -85,9 +88,9 @@ if True:
                        sample) for sample in samples] +
                  [plot(sample_names[sample]  + ", Phys14", 
                        "npv",                                           
-                       '({0}&&{1})*weight'.format(fiducial_cuts[sample], var.extra_cut),
+                       '({0})*weight'.format(fiducial_cuts[sample]),
                        sample + "_phys14") for sample in samples],
-                     80, 0, 40, 
+                     41, 0, 40, 
                      label_x   = "NPV",
                      label_y   = "A.U.",
                      axis_unit = "",

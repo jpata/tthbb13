@@ -36,8 +36,8 @@ for pair_name, pair in pairs.iteritems():
     #if not pair_name == "pt-470-to-600":
     #    continue
 
-    if not pair_name == "pt-800-to-1000":
-        continue
+    #if not pair_name == "pt-800-to-1000":
+    #    continue
 
     fiducial_cut_and_weight = "(weight*({0}))".format(fiducial_cuts[pair[0]])
 
@@ -46,9 +46,7 @@ for pair_name, pair in pairs.iteritems():
     for k,v in files.iteritems():
         full_filenames[k] = basepath + v + "-weighted.root"
 
-    fatjet_size = ranges[pair[0]][4]
-
-    
+    fatjet_size = ranges[pair[0]][4]    
 
     mis = []
     #mis.append(mi(pair_name + "_htt", 
@@ -56,10 +54,16 @@ for pair_name, pair in pairs.iteritems():
     #              htt_vars_v36,
     #              fiducial_cut_and_weight, fiducial_cut_and_weight, True))
 
-    #mis.append(mi(pair_name + "_mass_vars", 
-    #               pair[0], pair[1], 
-    #               [v for v in mass_vars_v36 if fatjet_size in v.name], 
-    #               fiducial_cut_and_weight, fiducial_cut_and_weight, True))
+    mis.append(mi(pair_name + "_mass_vars", 
+                   pair[0], pair[1],
+                   [v for v in mass_vars_v36 if fatjet_size in v.name], 
+                   fiducial_cut_and_weight, fiducial_cut_and_weight, True))
+
+    mis.append(mi(pair_name + "_mass_vars_phys14", 
+                   pair[0] + "_phys14", pair[1] + "_phys14", 
+                   [v for v in mass_vars_v36 if fatjet_size in v.name], 
+                   fiducial_cut_and_weight, fiducial_cut_and_weight, True))
+
     #mis.append(mi(pair_name + "_support_vars", 
     #               pair[0], pair[1], 
     #               [v for v in qvol_vars_v36+nsub_vars_v36 if fatjet_size in v.name], 
@@ -69,10 +73,10 @@ for pair_name, pair in pairs.iteritems():
     #               [v for v in cmstt_vars_v36 if fatjet_size in v.name], 
     #               fiducial_cut_and_weight, fiducial_cut_and_weight, True))
     
-    mis.append(mi(pair_name + "_interesting", 
-                  pair[0], pair[1], 
-                  ineresting_highpt_vars_v36,
-                  fiducial_cut_and_weight, fiducial_cut_and_weight))
+    #mis.append(mi(pair_name + "_interesting", 
+    #              pair[0], pair[1], 
+    #              ineresting_highpt_vars_v36,
+    #              fiducial_cut_and_weight, fiducial_cut_and_weight))
 
 
     
