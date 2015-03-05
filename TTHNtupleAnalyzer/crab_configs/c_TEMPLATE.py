@@ -21,7 +21,7 @@ config.Data.inputDBS = 'phys03'
 config.Data.splitting = 'LumiBased'
 config.Data.publication = False
 
-config.Data.unitsPerJob = 60
+config.Data.unitsPerJob = 80
 #config.Data.totalUnits = 5
 
 config.section_("Site")

@@ -25,27 +25,16 @@ import ROOT
 # for working on tier 3
 if socket.gethostname() == "t3ui12":
     import TTH.TTHNtupleAnalyzer.AccessHelpers as AH
-    from TTH.TTHNtupleAnalyzer.HiggsTaggers_cfg import li_fatjets_branches as higgs_fj_branches
-    from TTH.TTHNtupleAnalyzer.Taggers_cfg import li_fatjets_branches as top_fj_branches
     from TTH.TTHNtupleAnalyzer.Taggers_cfg import li_htt_branches
 
 # on the Grid
 else:
     import AccessHelpers as AH
-    
-    try:
-        from HiggsTaggers_cfg import li_fatjets_branches as higgs_fj_branches
-    except:
-        higgs_fj_branches = []
 
     try:
-        from Taggers_cfg import li_fatjets_branches as top_fj_branches
         from Taggers_cfg import li_htt_branches
     except:
-        top_fj_branches = []
         li_htt_branches = []
-
-print li_htt_branches
 
 ########################################
 # deltaR
@@ -94,7 +83,7 @@ else:
 # Determine particle species
 # Tier3
 if socket.gethostname() == "t3ui12":
-    particle_name = "hadtop"
+    particle_name = "higgs"
 # Grid
 else:
     import PSet
@@ -110,6 +99,9 @@ else:
 
     print "Initial MiniAOD filename:", initial_miniAOD_filename
     print "Determined particle_name:", particle_name
+
+
+
 
 
 # Event Info
@@ -132,12 +124,30 @@ fj_branches_plus = fj_branches + ["chi", "qvol", "nmj"]
 htt_branches = ["pt", "mass", "fW", "Rmin", "RminExpected", "prunedMass", "ptFiltForRminExp"]
 cmstt_branches = ["pt", "mass", "minMass", "wMass", "topMass", "nSubJets"]
 
-li_fatjets = higgs_fj_branches + top_fj_branches + ['ca08', 'ca15', 'ca08puppi', 'ca15puppi', 'ca08trimmedr2f3', 'ca08trimmedr2f6', 'ca08trimmedr2f10', 'ca08softdropz10b00', 'ca08softdropz15b00', 'ca08softdropz15b10', 'ca08softdropz15b20', 'ca08softdropz20b10', 'ca08softdropz30b10', 'ca08softdropz30b15', 'ca15trimmedr2f3', 'ca15trimmedr2f6', 'ca15trimmedr2f10', 'ca15softdropz10b00', 'ca15softdropz15b00', 'ca15softdropz15b10', 'ca15softdropz15b20', 'ca15softdropz20b10', 'ca15softdropz30b10', 'ca15softdropz30b15', 'ca08puppitrimmedr2f3', 'ca08puppitrimmedr2f6', 'ca08puppitrimmedr2f10', 'ca08puppisoftdropz10b00', 'ca08puppisoftdropz15b00', 'ca08puppisoftdropz15b10', 'ca08puppisoftdropz15b20', 'ca08puppisoftdropz20b10', 'ca08puppisoftdropz30b10', 'ca08puppisoftdropz30b15', 'ca15puppitrimmedr2f3', 'ca15puppitrimmedr2f6', 'ca15puppitrimmedr2f10', 'ca15puppisoftdropz10b00', 'ca15puppisoftdropz15b00', 'ca15puppisoftdropz15b10', 'ca15puppisoftdropz15b20', 'ca15puppisoftdropz20b10', 'ca15puppisoftdropz30b10', 'ca15puppisoftdropz30b15']
 
-li_fatjets = list(set(li_fatjets))
+
 
 li_htt_branches = li_htt_branches + ['looseMultiRHTT', 'softdropz20b10MultiRHTT', 'softdropz15bminus20MultiRHTT', 'softdropz15bminus10MultiRHTT', 'softdropz15b00MultiRHTT', 'softdropz15b10MultiRHTT', 'looseMultiRHTTpuppi', 'softdropz20b10MultiRHTTpuppi', 'softdropz15bminus20MultiRHTTpuppi', 'softdropz15bminus10MultiRHTTpuppi', 'softdropz15b00MultiRHTTpuppi', 'softdropz15b10MultiRHTTpuppi']
 
+
+
+
+########################################
+# Prepare input/output
+########################################
+
+infile = ROOT.TFile(infile_name)
+intree = infile.Get('tthNtupleAnalyzer/events')
+
+branches_in_input = [b.GetName() for b in intree.GetListOfBranches()]
+
+li_fatjets =  [b.replace("jet_","") for b in branches_in_input if len(b.split("__")) > 1 and b.split("__")[1] == "pt" and b.split("_")[0]=="jet"]
+li_fatjets = [b.replace("__pt","") for b in li_fatjets]
+if '_pt' in li_fatjets:
+    li_fatjets.remove("_pt")
+
+
+print li_fatjets
 
 # Generic
 objects = {}
@@ -149,14 +159,13 @@ for htt in li_htt_branches:
     objects[htt]                = htt_branches
 
 # And some extras
-objects["ca08"]                = fj_branches_plus
-objects["ca15"]                = fj_branches_plus
-objects["ca08puppi"]           = fj_branches_plus
-objects["ca15puppi"]           = fj_branches_plus
-objects["ca08cmstt"]           = cmstt_branches
-objects["ca15cmstt"]           = cmstt_branches
-objects["ca08puppicmstt"]      = cmstt_branches
-objects["ca15puppicmstt"]      = cmstt_branches
+for x in ["ca08", "ca15", "ca08puppi", "ca15puppi"]:
+    if x in objects.keys():
+        objects[x] = fj_branches_plus
+
+for x in ["ca08cmstt", "ca15cmstt", "ca08puppicmstt", "ca15puppicmstt"]:
+    if x in objects.keys():
+        objects[x] = cmstt_branches
 
 
 
@@ -176,14 +185,7 @@ for object_name in objects.keys():
 
 
 
-########################################
-# Prepare input/output
-########################################
 
-infile = ROOT.TFile(infile_name)
-intree = infile.Get('tthNtupleAnalyzer/events')
-
-branches_in_input = [b.GetName() for b in intree.GetListOfBranches()]
 
 n_entries = intree.GetEntries()
 
@@ -238,7 +240,7 @@ for object_name, branch_names in objects.iteritems():
                                   [full_branch_out],
                                   datatype = 'float')
         else:
-            print "Warning: Branch {0} not available in input file. Removing full object {1}".format(full_branch_in, object_name)
+            print "Warning: Branch {0} not available in input file. Removing  {1}".format(full_branch_in, object_name)
             objects_to_pop.append(object_name)
 # End of loop over objects and branches
 
