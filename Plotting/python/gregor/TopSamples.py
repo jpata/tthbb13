@@ -47,13 +47,31 @@ files = {}
 #files["zprime_m2000"] = "ntop_v32_zprime_m2000_1p_13tev-tagging"     
 #files["qcd_800_1000"] = "ntop_v32_qcd_800_1000_pythia8_13tev-tagging"
 
-files["zprime_m750"]  = "ntop_v33a_zprime_m750_1p_13tev-tagging"     
-files["zprime_m1250"] = "ntop_v33_zprime_m1250_1p_13tev-tagging"     
-files["zprime_m2000"] = "ntop_v33_zprime_m2000_1p_13tev-tagging"     
-files["qcd_170_300"]  = "ntop_v33_qcd_170_300_pythia8_13tev-tagging"
-files["qcd_470_600"]  = "ntop_v33_qcd_470_600_pythia8_13tev-tagging"
-files["qcd_800_1000"] = "ntop_v33_qcd_800_1000_pythia8_13tev-tagging"
+#files["zprime_m750"]  = "ntop_v33a_zprime_m750_1p_13tev-tagging"     
+#files["zprime_m1250"] = "ntop_v33_zprime_m1250_1p_13tev-tagging"     
+#files["zprime_m2000"] = "ntop_v33_zprime_m2000_1p_13tev-tagging"     
+#files["qcd_170_300"]  = "ntop_v33_qcd_170_300_pythia8_13tev-tagging"
+#files["qcd_470_600"]  = "ntop_v33_qcd_470_600_pythia8_13tev-tagging"
+#files["qcd_800_1000"] = "ntop_v33_qcd_800_1000_pythia8_13tev-tagging"
 
+files["zprime_m750"]  = "ntop_v36_zprime_m750_1p_13tev-tagging"     
+files["zprime_m1000"] = "ntop_v36_zprime_m1000_1p_13tev-tagging"     
+files["zprime_m1250"] = "ntop_v36_zprime_m1250_1p_13tev-tagging"     
+files["zprime_m2000"] = "ntop_v36_zprime_m2000_1p_13tev-tagging"     
+files["zprime_m2000_low"] = "ntop_v36_zprime_m2000_low_1p_13tev-tagging"     
+files["qcd_170_300"]  = "ntop_v36_qcd_170_300_pythia8_13tev-tagging"
+files["qcd_300_470"]  = "ntop_v36_qcd_300_470_pythia8_13tev-tagging"
+files["qcd_470_600"]  = "ntop_v36_qcd_470_600_pythia8_13tev-tagging"
+files["qcd_600_800"]  = "ntop_v36_qcd_600_800_pythia8_13tev-tagging"
+files["qcd_800_1000"] = "ntop_v36_qcd_800_1000_pythia8_13tev-tagging"
+
+files["zprime_m1000_phys14"] = "ntop_v36_zprime_m1000_1p_13tev_phys14_20bx25-tagging"     
+files["zprime_m2000_phys14"] = "ntop_v36_zprime_m2000_1p_13tev_phys14_20bx25-tagging"     
+files["zprime_m2000_low_phys14"] = "ntop_v36_zprime_m2000_low_1p_13tev_phys14_20bx25-tagging"     
+files["qcd_300_470_phys14"]  = "ntop_v36b_qcd_300_470_pythia8_13tev_phys14_20bx25-tagging"
+files["qcd_470_600_phys14"]  = "ntop_v36b_qcd_470_600_pythia8_13tev_phys14_20bx25-tagging"
+files["qcd_600_800_phys14"]  = "ntop_v36b_qcd_600_800_pythia8_13tev_phys14_20bx25-tagging"
+files["qcd_800_1000_phys14"] = "ntop_v36b_qcd_800_1000_pythia8_13tev_phys14_20bx25-tagging"
 
 
 
@@ -62,8 +80,10 @@ for k,v in files.iteritems():
     weighted_files[k] = basepath + v + "-weighted.root"
 
 pairs = { 
-    "pt-200-to-300" : ["zprime_m750", "qcd_170_300"],
-    "pt-470-to-600" : ["zprime_m1250", "qcd_470_600"],
+#    "pt-200-to-300" : ["zprime_m750", "qcd_170_300"],
+    "pt-300-to-470" : ["zprime_m1000", "qcd_300_470"],
+ #   "pt-470-to-600" : ["zprime_m1250", "qcd_470_600"],
+    "pt-600-to-800" : ["zprime_m2000_low", "qcd_600_800"],
     "pt-800-to-1000" : ["zprime_m2000", "qcd_800_1000"],
 }
 
@@ -79,8 +99,26 @@ ranges = {"zprime_m750"      : [201, 299,   2.4, 0.8, "ca15"],
           "qcd_170_300"      : [201, 299, 2.4, 0.8, "ca15"],
           "qcd_300_470"      : [301, 469, 2.4, 0.8, "ca15"],
           "qcd_470_600"      : [471, 599, 2.1, 0.6, "ca08"],
+          "qcd_600_800"      : [601, 799, 2.1, 0.6, "ca08"],
           "qcd_800_1000"     : [801, 999, 1.5, 0.6, "ca08"],
        }
+
+sample_names = {"zprime_m750"      : "Top, 200..300",
+                "zprime_m1000"     : "Top, 300..470",
+                "zprime_m1250"     : "Top, 470..600", 
+                "zprime_m2000_low" : "Top, 600..800",
+                "zprime_m2000"     : "Top, 800..1000",
+                "zprime_m3000"     : "Top, 1000..1400", 
+                "zprime_m4000"     : "Top, 1400..2000",
+                
+                "qcd_170_300"      : "QCD, 200..300",
+                "qcd_300_470"      : "QCD, 300..470",
+                "qcd_470_600"      : "QCD, 470..600",
+                "qcd_600_800"      : "QCD, 600..800",
+                "qcd_800_1000"     : "QCD, 800..10000",
+            }
+
+
 
 fiducial_cuts = {}
 for k,v in ranges.iteritems():

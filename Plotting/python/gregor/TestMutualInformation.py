@@ -51,22 +51,29 @@ for pair_name, pair in pairs.iteritems():
     
 
     mis = []
-    # mis.append(mi(pair_name + "_mass_vars", 
+    #mis.append(mi(pair_name + "_htt", 
+    #              pair[0], pair[1], 
+    #              htt_vars_v36,
+    #              fiducial_cut_and_weight, fiducial_cut_and_weight, True))
+
+    #mis.append(mi(pair_name + "_mass_vars", 
     #               pair[0], pair[1], 
-    #               [v for v in mass_vars_v27 if fatjet_size in v.name], 
+    #               [v for v in mass_vars_v36 if fatjet_size in v.name], 
     #               fiducial_cut_and_weight, fiducial_cut_and_weight, True))
-    # mis.append(mi(pair_name + "_support_vars", 
+    #mis.append(mi(pair_name + "_support_vars", 
     #               pair[0], pair[1], 
-    #               [v for v in qvol_vars_v27+nsub_vars_v27 if fatjet_size in v.name], 
+    #               [v for v in qvol_vars_v36+nsub_vars_v36 if fatjet_size in v.name], 
     #               fiducial_cut_and_weight, fiducial_cut_and_weight, True))
-    # mis.append(mi(pair_name + "_cmstt_vars", 
+    #mis.append(mi(pair_name + "_cmstt_vars", 
     #               pair[0], pair[1], 
-    #               [v for v in cmstt_vars_v27 if fatjet_size in v.name], 
+    #               [v for v in cmstt_vars_v36 if fatjet_size in v.name], 
     #               fiducial_cut_and_weight, fiducial_cut_and_weight, True))
+    
     mis.append(mi(pair_name + "_interesting", 
                   pair[0], pair[1], 
-                  ineresting_highpt_vars_v27,
+                  ineresting_highpt_vars_v36,
                   fiducial_cut_and_weight, fiducial_cut_and_weight))
+
 
     
 

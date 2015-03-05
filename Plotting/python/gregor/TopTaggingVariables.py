@@ -61,6 +61,8 @@ mass_vars_08_v21 = [
     variable('ca08softdropz30b100_mass', "sd 30b100 m (R=0.8)", 0, 1000, unit = "GeV"),
 ]
 
+# V27
+
 groomers_v27 = [
     "",
     "trimmedr2f6",
@@ -107,11 +109,6 @@ for htt in htt_v27:
     htt_vars_v27.append(variable(htt+'_mass', htt+"_m", 0, 400, unit = "GeV"))
     htt_vars_v27.append(variable(htt+'_fW', htt+"_fW", 0, 0.8))
     htt_vars_v27.append(variable('{0}_Rmin-{0}_RminExpected'.format(htt), htt+"_DeltaRmin", -0.8, 1.))
-
-
-
-
-
 
 ineresting_lowpt_vars_v27 = [
     variable.di["ca15trimmedr2f6_mass"],
@@ -165,6 +162,149 @@ ineresting_highpt_vars_v27 = [
     variable.di["ca08puppicmstt_topMass"],
 
 ]
+
+# v36
+
+groomers_v36 = [
+    "",
+    "trimmedr2f3",
+    "trimmedr2f6",
+    "trimmedr2f10",
+    "softdropz10b00",
+    "softdropz15b00",
+    "softdropz15b10",
+    "softdropz15b20",
+    "softdropz20b10",
+    "softdropz30b10",
+    "softdropz30b15",
+]
+
+
+mass_vars_v36 = []
+qvol_vars_v36 = []
+nsub_vars_v36 = []
+cmstt_vars_v36 = []
+
+for fj in ["ca08", 
+           "ca15", 
+           "ca08puppi", 
+           "ca15puppi"]:
+
+    qvol_vars_v36.append(variable(fj+"_qvol", fj+"_qvol", 0, 1.))
+    for groomer in groomers_v36:
+        mass_vars_v36.append(variable(fj+groomer+"_mass", fj+"_"+groomer, 0, 400, unit = "GeV"))
+        nsub_vars_v36.append(variable("{0}{1}_tau3/{0}{1}_tau2".format(fj,groomer), 
+                                      fj+"_"+groomer+"_nsub", 
+                                      0, 1., 
+                                      extra_cut = "({0}{1}_tau2>0)".format(fj,groomer)))
+
+    cmstt_vars_v36.append(variable(fj+'cmstt_minMass', 
+                                   fj+"cmstt_minMass",  
+                                   0, 400, unit = "GeV", 
+                                   extra_cut = "({0}cmstt_nSubJets >= 3)".format(fj)))
+    cmstt_vars_v36.append(variable(fj+'cmstt_topMass', 
+                                   fj+"cmstt_topMass",  
+                                   0, 800, unit = "GeV",
+                                   extra_cut = "({0}cmstt_nSubJets >= 3)".format(fj)))
+
+
+htt_v36 = ["looseMultiRHTT", 
+           "looseMultiRHTTpuppi", 
+           #"softdropz20b10MultiRHTT",
+           #"softdropz15bminus20MultiRHTT",
+           #"softdropz15bminus10MultiRHTT",
+           #"softdropz15b00MultiRHTT",
+           #"softdropz15b10MultiRHTT",
+]
+
+htt_vars_v36 = []
+for htt in htt_v36:
+    htt_vars_v36.append(variable(htt+'_mass', htt+"_m", 0, 400, unit = "GeV"))
+    htt_vars_v36.append(variable(htt+'_fW', htt+"_fW", 0, 0.8))
+    htt_vars_v36.append(variable('{0}_Rmin-{0}_RminExpected'.format(htt), 
+                                 htt+"_DeltaRmin", 
+                                 -0.8, 1., 
+                                 extra_cut = "({0}_mass > 0)".format(htt)
+                             ))
+
+ineresting_lowpt_vars_v36 = [
+    variable.di["ca15trimmedr2f6_mass"],
+    variable.di["ca15puppitrimmedr2f6_mass"],
+    variable.di["ca15softdropz15b10_mass"],
+    variable.di["ca15puppisoftdropz15b10_mass"],
+    variable.di["ca15softdropz30b15_mass"],
+    variable.di["ca15puppisoftdropz30b15_mass"],
+    variable.di["ca15_qvol"],
+    variable.di["ca15puppi_qvol"],
+    variable.di["ca15_tau3/ca15_tau2"],
+    variable.di["ca15puppi_tau3/ca15puppi_tau2"],
+    variable.di["ca15trimmedr2f6_tau3/ca15trimmedr2f6_tau2"],
+    variable.di["ca15puppitrimmedr2f6_tau3/ca15puppitrimmedr2f6_tau2"],
+    variable.di["ca15puppicmstt_minMass"],
+    variable.di["ca15puppicmstt_topMass"],
+    variable.di["looseMultiRHTT_mass"],
+    variable.di["looseMultiRHTT_fW"],
+    variable.di["looseMultiRHTT_Rmin-looseMultiRHTT_RminExpected"],
+]
+
+
+ineresting_midpt_vars_v36 = [
+    variable.di["ca08trimmedr2f6_mass"],
+    variable.di["ca08puppitrimmedr2f6_mass"],
+    variable.di["ca08softdropz15b00_mass"],
+    variable.di["ca08puppisoftdropz15b00_mass"],
+
+    variable.di["ca08_qvol"],
+    variable.di["ca08puppi_qvol"],
+    variable.di["ca08_tau3/ca08_tau2"],
+    variable.di["ca08puppi_tau3/ca08puppi_tau2"],
+
+    variable.di["ca08cmstt_minMass"],
+    variable.di["ca08cmstt_topMass"],
+    variable.di["ca08puppicmstt_minMass"],
+    variable.di["ca08puppicmstt_topMass"],
+
+    variable.di["looseMultiRHTT_mass"],
+    variable.di["looseMultiRHTT_fW"],
+    variable.di["looseMultiRHTT_Rmin-looseMultiRHTT_RminExpected"],
+
+    variable.di["looseMultiRHTTpuppi_mass"],
+    variable.di["looseMultiRHTTpuppi_fW"],
+    variable.di["looseMultiRHTTpuppi_Rmin-looseMultiRHTTpuppi_RminExpected"],
+
+
+]
+
+
+ineresting_highpt_vars_v36 = [
+    variable.di["ca08trimmedr2f6_mass"],
+    variable.di["ca08puppitrimmedr2f6_mass"],
+    variable.di["ca08softdropz15b00_mass"],
+    variable.di["ca08puppisoftdropz15b00_mass"],
+
+    variable.di["ca08_qvol"],
+    variable.di["ca08puppi_qvol"],
+    variable.di["ca08_tau3/ca08_tau2"],
+    variable.di["ca08puppi_tau3/ca08puppi_tau2"],
+
+    variable.di["ca08cmstt_minMass"],
+    variable.di["ca08cmstt_topMass"],
+    variable.di["ca08puppicmstt_minMass"],
+    variable.di["ca08puppicmstt_topMass"],
+
+    variable.di["looseMultiRHTT_mass"],
+    variable.di["looseMultiRHTT_fW"],
+    variable.di["looseMultiRHTT_Rmin-looseMultiRHTT_RminExpected"],
+
+    variable.di["looseMultiRHTTpuppi_mass"],
+    variable.di["looseMultiRHTTpuppi_fW"],
+    variable.di["looseMultiRHTTpuppi_Rmin-looseMultiRHTTpuppi_RminExpected"],
+
+
+]
+
+
+
 
 
 
