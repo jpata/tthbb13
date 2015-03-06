@@ -1,6 +1,7 @@
 from TTH.MEAnalysis.samples_v1 import *
 
 basepath = "/home/joosep/mac-docs/tth/data/ntp/"
+sample_version = "VHbb_V9"
 
 samples = cms.VPSet(
 #tt + jets
