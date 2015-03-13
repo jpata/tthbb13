@@ -3,7 +3,7 @@ import glob, os
 import ConfigParser
 
 #Set the default file path (access via xrootd)
-pathToFile    = cms.string("root://cmsxrootd.fnal.gov//store/user/jpata/tth/s1_eb733a1/")
+pathToFile = cms.string("root://cmsxrootd.fnal.gov/")
 
 #Configure the site-specific file path
 import os
@@ -11,23 +11,26 @@ hn = os.environ["HOSTNAME"]
 vo = os.environ.get("VO_CMS_DEFAULT_SE", "")
 
 def pfn_to_lfn(fn):
+    """
+    Converts a PFN to a LFN. Filename must be of
+    /store/XYZ type.
+    """
     return fn[fn.find("/store"):]
 
-
+#These assume the files are located on the local tier
 if "kbfi" in hn or "comp-" in hn or "kbfi" in vo:
-    storepath = "/hdfs/cms/"
-    pfPath = "/hdfs/cms/store/user/jpata/tth/s1_eb733a1/"
+    pfPath = "/hdfs/cms/"
     lfPrefix = "file://"
     def lfn_to_pfn(fn):
         return "file:///hdfs/cms" + fn
 elif "psi" in hn or "psi" in vo:
-    pfPath = "/pnfs/psi.ch/cms/trivcat/store/user/jpata/tth/s1_eb733a1/"
+    pfPath = "/pnfs/psi.ch/cms/trivcat/"
     lfPrefix = "dcap://t3se01.psi.ch:22125/"
     def lfn_to_pfn(fn):
         return "dcap://t3se01.psi.ch:22125/pnfs/psi.ch/cms/trivcat" + fn
 else:
     print "Warning: host '{0}' VO '{1}' is unknown, using xrootd".format(hn, vo)
-    pfPath = "/store/user/jpata/tth/s1_eb733a1/"
+    pfPath = ""
     lfPrefix = "root://cmsxrootd.fnal.gov/"
     def lfn_to_pfn(fn):
         return fn
@@ -131,6 +134,24 @@ samples = cms.VPSet(
 )
 
 def initialize_from_cfgfile(fn, samples):
+    """
+    Sets the subFiles of the input samples,
+    loading the file lists from a flat .cfg file
+    of the format
+    [nickname1]
+    /path/to/file1.root
+    /path/to/file2.root
+
+    [nickname2]
+    /path/to/file1.root
+    /path/to/file2.root
+
+    Arguments:
+    fn (string): path to the config file
+    samples (VPSet of PSet): the input samples, modified in place
+
+    Returns: nothing
+    """
     fi = open(fn)
     section = None
     data = {}

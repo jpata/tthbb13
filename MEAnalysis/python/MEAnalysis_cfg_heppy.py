@@ -60,3 +60,7 @@ class Conf:
             "btagWP": "CSVM",
             "btagWPs": {"CSVM": ("btagCSV", 0.9)}
         }
+
+        self.general = {
+            "controlPlotsFile": "./root/ControlPlotsTEST.root"
+        }

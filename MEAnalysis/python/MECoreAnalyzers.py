@@ -6,8 +6,8 @@ def lvec(self):
     lv = ROOT.TLorentzVector()
     lv.SetPtEtaPhiM(self.pt, self.eta, self.phi, self.mass)
     return lv
-    
-    
+
+
 class FilterAnalyzer(Analyzer):
     """
     A generic analyzer that may filter events.
@@ -22,8 +22,8 @@ class FilterAnalyzer(Analyzer):
 class LeptonAnalyzer(FilterAnalyzer):
     """
     Analyzes leptons and applies single-lepton and di-lepton selection.
-    
-    Relies on 
+
+    Relies on
     """
     def __init__(self, cfg_ana, cfg_comp, looperName):
         super(LeptonAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
@@ -173,7 +173,7 @@ class BTagLRAnalyzer(FilterAnalyzer):
         super(BTagLRAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
         self.conf = cfg_ana._conf
         self.bTagAlgo = self.conf.jets["btagAlgo"]
-        self.cplots = ROOT.TFile("/home/joosep/mac-docs/tth/sw-slc6/CMSSW_7_2_2_patch2/src/TTH/MEAnalysis/root/ControlPlotsTEST.root")
+        self.cplots = ROOT.TFile(self.conf.general["controlPlotsFile"])
         self.csv_pdfs = {
         }
         for x in ["b", "c", "l"]:
