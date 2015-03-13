@@ -6,13 +6,28 @@ import imp
 
 import itertools
 
-from TTH.MEAnalysis.samples_vhbb import samples, sample_version
+from TTH.MEAnalysis.samples_vhbb import samples, sample_version, lfn_to_pfn
+from TTH.MEAnalysis.samples_local import samples_dict
+
+#Create configuration object
+if os.environ.has_key("ME_CONF"):
+    print "Loading ME config from", os.environ["ME_CONF"]
+    meconf = imp.load_source("meconf", os.environ["ME_CONF"])
+    from meconf import Conf
+else:
+    print "Loading ME config from TTH.MEAnalysis.MEAnalysis_heppy_cfg"
+    from TTH.MEAnalysis.MEAnalysis_cfg_heppy import Conf
+conf = Conf()
+
+print "loading samples from", conf.general["sampleFile"]
+samplefile = imp.load_source("samplefile", conf.general["sampleFile"])
+from samplefile import samples_dict
 
 # input component
 # several input components can be declared,
 # and added to the list of selected components
 inputSamples = []
-for s in samples:
+for s in samples_dict.values():
     inputSample = cfg.Component(
         'tth',
         files = map(lfn_to_pfn, s.subFiles.value()),
@@ -28,17 +43,6 @@ evs = cfg.Analyzer(
     EventAnalyzer,
     'events',
 )
-
-#Create configuration object
-if os.environ.has_key("ME_CONF"):
-    print "Loading ME config from", os.environ["ME_CONF"]
-    meconf = imp.load_source("meconf", os.environ["ME_CONF"])
-    from meconf import Conf
-else:
-    print "Loading ME config from TTH.MEAnalysis.MEAnalysis_heppy_cfg"
-    from TTH.MEAnalysis.MEAnalysis_cfg_heppy import Conf
-conf = Conf()
-conf["sample_version"] = sample_version
 
 import TTH.MEAnalysis.MECoreAnalyzers as MECoreAnalyzers
 
@@ -77,6 +81,12 @@ wtag = cfg.Analyzer(
     _conf = conf
 )
 
+mem_analyzer = cfg.Analyzer(
+    MECoreAnalyzers.MEAnalyzer,
+    'mem',
+    _conf = conf
+)
+
 from PhysicsTools.Heppy.analyzers.core.AutoFillTreeProducer  import *
 
 jetType = NTupleObjectType("jetType", variables = [
@@ -94,11 +104,12 @@ jetType = NTupleObjectType("jetType", variables = [
     NTupleVariable("mcPhi", lambda x : x.mcPhi),
 ])
 
+
 treeProducer = cfg.Analyzer(
-    class_object=AutoFillTreeProducer,
-    verbose=False,
+    class_object = AutoFillTreeProducer,
+    verbose = False,
     vectorTree = True,
-    globalVariables    = [
+    globalVariables = [
         NTupleVariable(
             "Wmass", lambda ev: ev.Wmass,
             help="best W boson mass from untagged pair (untagged by CSVM)"
@@ -134,6 +145,16 @@ treeProducer = cfg.Analyzer(
             type=int,
             help=""
         ),
+        NTupleVariable(
+            "p_hypo_tth", lambda ev: ev.p_hypo_tth if hasattr(ev, "p_hypo_tth") else 0.0,
+            type=float,
+            help=""
+        ),
+        NTupleVariable(
+            "p_hypo_ttbb", lambda ev: ev.p_hypo_ttbb if hasattr(ev, "p_hypo_ttbb") else 0.0,
+            type=float,
+            help=""
+        ),
     ],
     globalObjects = {},
     collections = {
@@ -159,6 +180,7 @@ sequence = cfg.Sequence( [
     btaglr,
     mecat,
     wtag,
+    mem_analyzer,
     treeProducer
 ])
 
@@ -187,6 +209,7 @@ config = cfg.Config(
     events_class = Events
 )
 
+print config.components
 if __name__ == "__main__":
     print "Running MEAnalysis heppy main loop"
     from PhysicsTools.HeppyCore.framework.looper import Looper
