@@ -1,3 +1,4 @@
+import os
 class Conf:
     def __init__(self):
         self.leptons = {
@@ -62,5 +63,6 @@ class Conf:
         }
 
         self.general = {
-            "controlPlotsFile": "./root/ControlPlotsTEST.root"
+            "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsTEST.root",
+            "sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_vhbb.py"
         }

@@ -2,6 +2,20 @@ import ROOT
 import itertools
 from PhysicsTools.HeppyCore.framework.analyzer import Analyzer
 
+
+#Load integrator
+# ROOT.gSystem.Load("libFWCoreFWLite")
+# ROOT.gROOT.ProcessLine('AutoLibraryLoader::enable();')
+# ROOT.gSystem.Load("libFWCoreFWLite")
+ROOT.gSystem.Load("libCintex")
+ROOT.gROOT.ProcessLine('ROOT::Cintex::Cintex::Enable();')
+ROOT.gSystem.Load("libTTHMEIntegratorStandalone")
+
+from ROOT import MEM
+
+CvectorPermutations = getattr(ROOT, "std::vector<MEM::Permutations::Permutations>")
+CvectorPSVar = getattr(ROOT, "std::vector<MEM::PSVar::PSVar>")
+
 def lvec(self):
     lv = ROOT.TLorentzVector()
     lv.SetPtEtaPhiM(self.pt, self.eta, self.phi, self.mass)
@@ -92,7 +106,6 @@ class LeptonAnalyzer(FilterAnalyzer):
                     setattr(event, "n_"+lt, len(leps))
                     self.counters["leptons"].inc(lt, len(leps))
 
-
                 setattr(event, "lep_{0}".format(a+b), sumleps)
                 setattr(event, "n_lep_{0}".format(a+b), len(sumleps))
 
@@ -102,8 +115,10 @@ class LeptonAnalyzer(FilterAnalyzer):
 
         if event.is_sl:
             self.counters["processing"].inc("sl")
+            event.good_leptons = event.mu_tight + event.el_tight
         if event.is_dl:
             self.counters["processing"].inc("dl")
+            event.good_leptons = event.mu_loose + event.el_loose
 
         passes = event.is_sl or event.is_dl
         if event.is_sl and event.is_dl:
@@ -260,7 +275,7 @@ class BTagLRAnalyzer(FilterAnalyzer):
 
         event.buntagged_jets_by_LR_4b_2b = [event.good_jets[i] for i in best_4b_perm[4:]]
 
-        print "N", len(event.good_jets), "uT", len(event.buntagged_jets), "uLR", len(event.buntagged_jets_by_LR_4b_2b)
+        # print "N", len(event.good_jets), "uT", len(event.buntagged_jets), "uLR", len(event.buntagged_jets_by_LR_4b_2b)
         # print "lr={0:.6f}".format(event.btag_LR_4b_2b)
         # s = ""
         #
@@ -306,14 +321,14 @@ class MECategoryAnalyzer(FilterAnalyzer):
                 cat = "cat2"
             else:
                 cat = "cat3"
-        elif event.is_dl:
+        elif event.is_dl and len(event.good_jets)>=4:
             cat = "cat6"
 
         self.counters["processing"].inc(cat)
         event.cat = cat
         event.catn = self.cat_map[cat]
 
-        passes = True
+        passes = event.cat in ["cat2", "cat6"]
         if passes:
             self.counters["processing"].inc("passes")
         return passes
@@ -394,3 +409,92 @@ class GenRadiationModeAnalyzer(FilterAnalyzer):
         if passes:
             self.counters["processing"].inc("passes")
         return passes
+
+class MEAnalyzer(FilterAnalyzer):
+    def __init__(self, cfg_ana, cfg_comp, looperName):
+        self.conf = cfg_ana._conf
+        super(MEAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
+        self.integrator = MEM.Integrand(0)
+        
+        self.permutations = CvectorPermutations()
+        #self.permutations.push_back(MEM.Permutations.BTagged)
+        #self.permutations.push_back(MEM.Permutations.QUntagged)
+        self.permutations.push_back(MEM.Permutations.QQbarSymmetry)
+        self.permutations.push_back(MEM.Permutations.BBbarSymmetry)
+        self.integrator.set_permutation_strategy(self.permutations)
+
+        self.integrator.set_integrand(
+            MEM.IntegrandType.Constant
+            |MEM.IntegrandType.ScattAmpl
+            |MEM.IntegrandType.DecayAmpl
+            |MEM.IntegrandType.Jacobian
+            |MEM.IntegrandType.PDF
+            |MEM.IntegrandType.Transfer
+        )
+        self.integrator.set_ncalls(4000);
+        self.integrator.set_sqrts(13000.);
+        
+        self.vars_to_integrate = CvectorPSVar()
+        
+    def add_obj(self, objtype, **kwargs):
+        if kwargs.has_key("p4s"):
+            pt, eta, phi, mass = kwargs.pop("p4s")
+            v = ROOT.TLorentzVector()
+            v.SetPtEtaPhiM(pt, eta, phi, mass);
+        elif kwargs.has_key("p4c"):
+            v = ROOT.TLorentzVector(*kwargs.pop("p4c"))
+        obsdict = kwargs.pop("obsdict", {})
+        
+        o = MEM.Object(v, objtype)
+        for k, v in obsdict.items():
+            o.addObs(k, v)
+        self.integrator.push_back_object(o)
+
+    def beginLoop(self, setup):
+        super(MEAnalyzer, self).beginLoop(setup)
+
+    def process(self, event):
+        self.counters["processing"].inc("processed")
+        
+        jets = event.good_jets
+        leptons = event.good_leptons
+        met = event.input.met_pt
+        print "MEMINTEG", len(jets), len(leptons)
+        
+        for jet in jets:
+            self.add_obj(
+                MEM.ObjectType.Jet,
+                p4s=(jet.pt, jet.eta, jet.phi, jet.mass),
+                obsdict={MEM.Observable.BTAG: jet.btagCSV}
+            )
+        for lep in leptons:
+            self.add_obj(
+                MEM.ObjectType.Lepton,
+                p4s=(lep.pt, lep.eta, lep.phi, lep.mass),
+                obsdict={MEM.Observable.CHARGE: lep.charge}
+            )
+        self.add_obj(
+            MEM.ObjectType.MET,
+            p4s=(met, 0, 0, met),
+        )
+        
+        fstate = MEM.FinalState.TTH
+        if len(leptons) == 2:
+            fstate = MEM.FinalState.LL
+        if len(leptons) == 1:
+            fstate = MEM.FinalState.LH
+            
+        res = {}
+        for hypo in [MEM.Hypothesis.TTH, MEM.Hypothesis.TTBB]:
+            r = self.integrator.run(
+                fstate,
+                hypo,
+                self.vars_to_integrate
+            )
+            res[hypo] = r
+        
+        event.p_hypo_tth = res[MEM.Hypothesis.TTH]
+        event.p_hypo_ttbb = res[MEM.Hypothesis.TTBB]
+        print res
+        
+        self.integrator.next_event()
