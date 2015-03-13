@@ -6,8 +6,7 @@ import imp
 
 import itertools
 
-from TTH.MEAnalysis.samples_v1 import lfn_to_pfn
-from TTH.MEAnalysis.samples_vhbb import samples
+from TTH.MEAnalysis.samples_vhbb import samples, sample_version
 
 # input component
 # several input components can be declared,
@@ -39,6 +38,7 @@ else:
     print "Loading ME config from TTH.MEAnalysis.MEAnalysis_heppy_cfg"
     from TTH.MEAnalysis.MEAnalysis_cfg_heppy import Conf
 conf = Conf()
+conf["sample_version"] = sample_version
 
 import TTH.MEAnalysis.MECoreAnalyzers as MECoreAnalyzers
 
