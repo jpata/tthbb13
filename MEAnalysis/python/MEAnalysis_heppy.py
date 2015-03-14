@@ -7,7 +7,6 @@ import imp
 import itertools
 
 from TTH.MEAnalysis.samples_vhbb import samples, sample_version, lfn_to_pfn
-from TTH.MEAnalysis.samples_local import samples_dict
 
 #Create configuration object
 if os.environ.has_key("ME_CONF"):
