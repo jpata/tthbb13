@@ -13,7 +13,8 @@ parser.add_argument('--action',
 
 args = parser.parse_args()
 
-jobs = ["meanalysis-tthbb.conf", "meanalysis-bkg.conf"]
+#jobs = ["meanalysis-tthbb.conf", "meanalysis-bkg.conf"]
+jobs = ["meanalysis-heppy.conf"]
 gc = "/shome/jpata/grid-control/GC"
 
 if args.action == "create":
@@ -38,6 +39,7 @@ if args.action == "hadd":
 
     for inf in input_filenames:
         spl = inf.split("/")
+        spl = filter(lambda x: len(x)>0, spl)
         dataset = spl[-2]
         fn = inf
         if not datasets.has_key(dataset):

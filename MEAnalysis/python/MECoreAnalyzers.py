@@ -100,6 +100,7 @@ class LeptonAnalyzer(FilterAnalyzer):
                             lambda x: x.looseIdPOG,
                             leps
                         )
+                    lep = sorted(leps, key=lambda x: x.pt, reverse=True)
                     sumleps += leps
                     lt = l + "_" + a + b
                     setattr(event, lt, leps)
@@ -150,12 +151,14 @@ class JetAnalyzer(FilterAnalyzer):
         self.counters["processing"].inc("processed")
         self.counters["jets"].inc("any", len(event.Jet))
 
-        event.good_jets = filter(
-            lambda x: (
-                x.pt > self.conf.jets["pt"]
-                and abs(x.eta) < self.conf.jets["eta"]
+        event.good_jets = sorted(
+            filter(
+                lambda x: (
+                    x.pt > self.conf.jets["pt"]
+                    and abs(x.eta) < self.conf.jets["eta"]
+                ), event.Jet
             ),
-            event.Jet
+            key=lambda x: x.pt, reverse=True
         )
         self.counters["jets"].inc("good", len(event.good_jets))
 
@@ -328,7 +331,7 @@ class MECategoryAnalyzer(FilterAnalyzer):
         event.cat = cat
         event.catn = self.cat_map[cat]
 
-        passes = event.cat in ["cat2", "cat6"]
+        passes = True
         if passes:
             self.counters["processing"].inc("passes")
         return passes
@@ -414,11 +417,11 @@ class MEAnalyzer(FilterAnalyzer):
     def __init__(self, cfg_ana, cfg_comp, looperName):
         self.conf = cfg_ana._conf
         super(MEAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
-        self.integrator = MEM.Integrand(0)
-        
+        self.integrator = MEM.Integrand(1+2+4)
+
         self.permutations = CvectorPermutations()
-        #self.permutations.push_back(MEM.Permutations.BTagged)
-        #self.permutations.push_back(MEM.Permutations.QUntagged)
+        self.permutations.push_back(MEM.Permutations.BTagged)
+        self.permutations.push_back(MEM.Permutations.QUntagged)
         self.permutations.push_back(MEM.Permutations.QQbarSymmetry)
         self.permutations.push_back(MEM.Permutations.BBbarSymmetry)
         self.integrator.set_permutation_strategy(self.permutations)
@@ -433,9 +436,9 @@ class MEAnalyzer(FilterAnalyzer):
         )
         self.integrator.set_ncalls(4000);
         self.integrator.set_sqrts(13000.);
-        
+
         self.vars_to_integrate = CvectorPSVar()
-        
+
     def add_obj(self, objtype, **kwargs):
         if kwargs.has_key("p4s"):
             pt, eta, phi, mass = kwargs.pop("p4s")
@@ -444,7 +447,7 @@ class MEAnalyzer(FilterAnalyzer):
         elif kwargs.has_key("p4c"):
             v = ROOT.TLorentzVector(*kwargs.pop("p4c"))
         obsdict = kwargs.pop("obsdict", {})
-        
+
         o = MEM.Object(v, objtype)
         for k, v in obsdict.items():
             o.addObs(k, v)
@@ -455,12 +458,12 @@ class MEAnalyzer(FilterAnalyzer):
 
     def process(self, event):
         self.counters["processing"].inc("processed")
-        
+
         jets = event.good_jets
         leptons = event.good_leptons
         met = event.input.met_pt
-        print "MEMINTEG", len(jets), len(leptons)
-        
+        #print "MEMINTEG", len(jets), len(leptons)
+
         for jet in jets:
             self.add_obj(
                 MEM.ObjectType.Jet,
@@ -477,24 +480,24 @@ class MEAnalyzer(FilterAnalyzer):
             MEM.ObjectType.MET,
             p4s=(met, 0, 0, met),
         )
-        
+
         fstate = MEM.FinalState.TTH
         if len(leptons) == 2:
             fstate = MEM.FinalState.LL
         if len(leptons) == 1:
             fstate = MEM.FinalState.LH
-            
+
         res = {}
-        for hypo in [MEM.Hypothesis.TTH, MEM.Hypothesis.TTBB]:
-            r = self.integrator.run(
-                fstate,
-                hypo,
-                self.vars_to_integrate
-            )
-            res[hypo] = r
-        
-        event.p_hypo_tth = res[MEM.Hypothesis.TTH]
-        event.p_hypo_ttbb = res[MEM.Hypothesis.TTBB]
-        print res
-        
+        if event.cat in self.conf.general["calcMECategories"] and event.btag_LR_4b_2b > 0.8:
+            for hypo in [MEM.Hypothesis.TTH, MEM.Hypothesis.TTBB]:
+                r = self.integrator.run(
+                    fstate,
+                    hypo,
+                    self.vars_to_integrate
+                )
+                res[hypo] = r
+            print event.cat, event.btag_LR_4b_2b, res
+            event.p_hypo_tth = res[MEM.Hypothesis.TTH]
+            event.p_hypo_ttbb = res[MEM.Hypothesis.TTBB]
+
         self.integrator.next_event()

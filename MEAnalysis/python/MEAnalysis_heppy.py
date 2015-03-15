@@ -101,6 +101,18 @@ jetType = NTupleObjectType("jetType", variables = [
     NTupleVariable("mcPt", lambda x : x.mcPt),
     NTupleVariable("mcEta", lambda x : x.mcEta),
     NTupleVariable("mcPhi", lambda x : x.mcPhi),
+    NTupleVariable("mcM", lambda x : x.mcM),
+])
+leptonType = NTupleObjectType("leptonType", variables = [
+    NTupleVariable("pt", lambda x : x.pt),
+    NTupleVariable("eta", lambda x : x.eta),
+    NTupleVariable("phi", lambda x : x.phi),
+    NTupleVariable("mass", lambda x : x.mass),
+    NTupleVariable("pdgId", lambda x : x.pdgId),
+    #NTupleVariable("mcPt", lambda x : x.mcPt),
+    #NTupleVariable("mcEta", lambda x : x.mcEta),
+    #NTupleVariable("mcPhi", lambda x : x.mcPhi),
+    #NTupleVariable("mcMass", lambda x : x.mcMass),
 ])
 
 
@@ -158,7 +170,8 @@ treeProducer = cfg.Analyzer(
     globalObjects = {},
     collections = {
     #standard dumping of objects
-        "good_jets" : NTupleCollection("good_jets", jetType, 8, help="FIXME"),
+        "good_jets" : NTupleCollection("jets", jetType, 8, help="Selected jets"),
+        "good_leptons" : NTupleCollection("leps", leptonType, 2, help="Selected leptons"),
     }
 )
 
