@@ -14,6 +14,8 @@ git cms-addpkg RecoJets/JetProducers
 git clone https://github.com/jpata/tthbb13.git TTH
 cd TTH
 git checkout jpata/meanalysis-heppy
+git clone https://github.com/jpata/Code.git MEIntegratorStandalone
+git checkout dev
 cd ..
 cp TTH/MEAnalysis/libs/*.so ../lib/$SCRAM_ARCH/
 
@@ -26,6 +28,9 @@ git commit -am "merged toptagger"
 
 #Get the vhbb-heppy code
 git cms-merge-topic vhbb:vhbbHeppy722patch2
+
+#Get the fixed TChain code
+git cms-merge-topic jpata:heppy-chain-lfn
 
 scram setup lhapdf
 
