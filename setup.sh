@@ -13,7 +13,7 @@ git cms-addpkg RecoJets/JetProducers
 #get the TTH code
 git clone https://github.com/jpata/tthbb13.git TTH
 cd TTH
-git checkout jpata/meanalysis-heppy
+git checkout jpata/dev-meanalysis-heppy
 git clone https://github.com/jpata/Code.git MEIntegratorStandalone
 cd MEIntegratorStandalone
 git checkout mem-output
