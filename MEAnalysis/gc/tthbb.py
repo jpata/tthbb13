@@ -50,6 +50,8 @@ if args.action == "hadd":
     for (dataset, input_filenames) in datasets.items():
         output_filename = "/scratch/" + os.environ["USER"] + "/" + dataset + ".root"
         print "merging {0} files for dataset {1} -> {2}".format(len(input_filenames), dataset, output_filename)
+        for inf in input_filenames:
+            print inf
         subprocess.call(["python", os.environ["CMSSW_BASE"] + "/src/TTH/TTHNtupleAnalyzer/python/ParHadd.py", output_filename] + input_filenames)
         completed_files += [output_filename]
 
