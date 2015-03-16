@@ -483,4 +483,4 @@ class EventAnalyzer(Analyzer):
         event.vLeptons = vLeptons.make_array(event)
         event.aJ3Cidx = aJ3Cidx.make_array(event)
         event.GenWZQuark = GenWZQuark.make_array(event)
-        #event.GenBQuarkFromTop = GenBQuarkFromTop.make_array(event)
+        event.GenBQuarkFromTop = GenBQuarkFromTop.make_array(event)

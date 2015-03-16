@@ -15,8 +15,9 @@ git clone https://github.com/jpata/tthbb13.git TTH
 cd TTH
 git checkout jpata/meanalysis-heppy
 git clone https://github.com/jpata/Code.git MEIntegratorStandalone
+cd MEIntegratorStandalone
 git checkout dev
-cd ..
+cd ../..
 cp TTH/MEAnalysis/libs/*.so ../lib/$SCRAM_ARCH/
 
 #to apply a the top tagger as a patch
@@ -35,7 +36,7 @@ git cms-merge-topic jpata:heppy-chain-lfn
 scram setup lhapdf
 
 #copy fastjet libraries
-cp $CMSSW_BASE/external/$SCRAM_ARCH/lib/* $CMSSW_BASE/lib/$SCRAM_ARCH/
+#cp $CMSSW_BASE/external/$SCRAM_ARCH/lib/* $CMSSW_BASE/lib/$SCRAM_ARCH/
 
 # And build:
 # scram b -j 10

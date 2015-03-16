@@ -3,7 +3,7 @@ import itertools
 from PhysicsTools.HeppyCore.framework.analyzer import Analyzer
 
 
-#Load integrator
+#Load the MEM integrator libraries
 # ROOT.gSystem.Load("libFWCoreFWLite")
 # ROOT.gROOT.ProcessLine('AutoLibraryLoader::enable();')
 # ROOT.gSystem.Load("libFWCoreFWLite")
@@ -13,10 +13,14 @@ ROOT.gSystem.Load("libTTHMEIntegratorStandalone")
 
 from ROOT import MEM
 
+#Pre-define shorthands for permutation and integration variable vectors
 CvectorPermutations = getattr(ROOT, "std::vector<MEM::Permutations::Permutations>")
 CvectorPSVar = getattr(ROOT, "std::vector<MEM::PSVar::PSVar>")
 
 def lvec(self):
+    """
+    Converts an object with pt, eta, phi, mass to a TLorentzVector
+    """
     lv = ROOT.TLorentzVector()
     lv.SetPtEtaPhiM(self.pt, self.eta, self.phi, self.mass)
     return lv
@@ -37,7 +41,17 @@ class LeptonAnalyzer(FilterAnalyzer):
     """
     Analyzes leptons and applies single-lepton and di-lepton selection.
 
-    Relies on
+    Relies on TTH.MEAnalysis.VHbbTree.EventAnalyzer for inputs.
+
+    Configuration:
+    Conf.leptons[channel][cuttype] where channel=mu,ele, cuttype=tight,loose,(+veto)
+    the lepton cuts must specify pt, eta and isolation cuts.
+
+    Returns:
+    event.good_leptons (list of VHbbTree.selLeptons): contains the leptons that pass the SL XOR DL selection.
+        Leptons are ordered by flavour and pt.
+    event.is_sl, is_dl (bool): specifies if the event passes SL or DL selection.
+
     """
     def __init__(self, cfg_ana, cfg_comp, looperName):
         super(LeptonAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
@@ -134,6 +148,10 @@ class LeptonAnalyzer(FilterAnalyzer):
 
 
 class JetAnalyzer(FilterAnalyzer):
+    """
+    Performs jet selection and b-tag counting.
+    FIXME: doc
+    """
     def __init__(self, cfg_ana, cfg_comp, looperName):
         super(JetAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
         self.conf = cfg_ana._conf
@@ -187,6 +205,10 @@ class JetAnalyzer(FilterAnalyzer):
 
 
 class BTagLRAnalyzer(FilterAnalyzer):
+    """
+    Performs b-tag likelihood ratio calculations
+    FIXME: doc
+    """
     def __init__(self, cfg_ana, cfg_comp, looperName):
         super(BTagLRAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
         self.conf = cfg_ana._conf
@@ -302,6 +324,10 @@ class BTagLRAnalyzer(FilterAnalyzer):
         return passes
 
 class MECategoryAnalyzer(FilterAnalyzer):
+    """
+    Performs ME categorization
+    FIXME: doc
+    """
     def __init__(self, cfg_ana, cfg_comp, looperName):
         self.conf = cfg_ana._conf
         super(MECategoryAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
@@ -337,6 +363,10 @@ class MECategoryAnalyzer(FilterAnalyzer):
         return passes
 
 class WTagAnalyzer(FilterAnalyzer):
+    """
+    Performs W-mass calculation
+    FIXME: doc
+    """
     def __init__(self, cfg_ana, cfg_comp, looperName):
         self.conf = cfg_ana._conf
         super(WTagAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
@@ -383,6 +413,10 @@ class WTagAnalyzer(FilterAnalyzer):
         return passes
 
 class GenRadiationModeAnalyzer(FilterAnalyzer):
+    """
+    Performs B/C counting
+    FIXME: doc
+    """
     def __init__(self, cfg_ana, cfg_comp, looperName):
         self.conf = cfg_ana._conf
         super(GenRadiationModeAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
@@ -414,18 +448,41 @@ class GenRadiationModeAnalyzer(FilterAnalyzer):
         return passes
 
 class MEAnalyzer(FilterAnalyzer):
+    """
+    Performs ME calculation using external integrator
+
+    Relies on:
+    event.good_jets, event.good_leptons, event.cat, event.input.met_pt
+
+    Produces:
+    p_hypo_tth (double): probability for the tt+H(bb) hypothesis
+    p_hypo_ttbb (double): probability for the tt+bb hypothesis
+
+    """
     def __init__(self, cfg_ana, cfg_comp, looperName):
         self.conf = cfg_ana._conf
         super(MEAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
+
+        #Create the ME integrator.
+        #Arguments specify the verbosity
         self.integrator = MEM.Integrand(1+2+4)
 
         self.permutations = CvectorPermutations()
+
+        #Assume that only jets passing CSV>0.5 are b quarks
         self.permutations.push_back(MEM.Permutations.BTagged)
+
+        #Assume that only jets passing CSV<0.5 are l quarks
         self.permutations.push_back(MEM.Permutations.QUntagged)
+
+        #Assume q-qbar symmetry
         self.permutations.push_back(MEM.Permutations.QQbarSymmetry)
+
+        #Assume b-bbar symmetry
         self.permutations.push_back(MEM.Permutations.BBbarSymmetry)
         self.integrator.set_permutation_strategy(self.permutations)
 
+        #Pieces of ME to calculate
         self.integrator.set_integrand(
             MEM.IntegrandType.Constant
             |MEM.IntegrandType.ScattAmpl
@@ -437,9 +494,17 @@ class MEAnalyzer(FilterAnalyzer):
         self.integrator.set_ncalls(4000);
         self.integrator.set_sqrts(13000.);
 
+        #Set list of integration variables (FIXME)
         self.vars_to_integrate = CvectorPSVar()
 
     def add_obj(self, objtype, **kwargs):
+        """
+        Add an event object (jet, lepton, MET) to the ME integrator.
+
+        objtype: specifies the object type
+        kwargs: p4s: spherical 4-momentum (pt, eta, phi, M) as a tuple
+                obsdict: dict of additional observables to pass to MEM
+        """
         if kwargs.has_key("p4s"):
             pt, eta, phi, mass = kwargs.pop("p4s")
             v = ROOT.TLorentzVector()
