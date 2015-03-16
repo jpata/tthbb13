@@ -16,7 +16,7 @@ cd TTH
 git checkout jpata/meanalysis-heppy
 git clone https://github.com/jpata/Code.git MEIntegratorStandalone
 cd MEIntegratorStandalone
-git checkout dev
+git checkout mem-output
 cd ../..
 cp TTH/MEAnalysis/libs/*.so ../lib/$SCRAM_ARCH/
 

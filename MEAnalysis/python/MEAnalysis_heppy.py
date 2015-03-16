@@ -180,22 +180,27 @@ treeProducer = cfg.Analyzer(
         NTupleVariable(
             "nMatchSimB", lambda ev: ev.nMatchSimB if hasattr(ev, "nMatchSimB") else 0,
             type=int,
-            help=""
+            help="number of gen B not matched to top decay"
         ),
         NTupleVariable(
             "nMatchSimC", lambda ev: ev.nMatchSimC if hasattr(ev, "nMatchSimC") else 0,
             type=int,
-            help=""
+            help="number of gen C not matched to W decay"
         ),
         NTupleVariable(
             "p_hypo_tth", lambda ev: ev.p_hypo_tth if hasattr(ev, "p_hypo_tth") else 0.0,
             type=float,
-            help=""
+            help="tt+h ME probability"
         ),
         NTupleVariable(
             "p_hypo_ttbb", lambda ev: ev.p_hypo_ttbb if hasattr(ev, "p_hypo_ttbb") else 0.0,
             type=float,
-            help=""
+            help="tt+bb ME probability"
+        ),
+        NTupleVariable(
+            "nBCSVM", lambda ev: ev.nBCSVM if hasattr(ev, "nBCSVM") else 0,
+            type=int,
+            help="Number of good jets passing CSVM"
         ),
     ],
     #FIXME: fill these from the VHbb ntuples

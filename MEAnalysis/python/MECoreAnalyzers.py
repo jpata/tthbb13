@@ -196,6 +196,7 @@ class JetAnalyzer(FilterAnalyzer):
             self.counters["jets"].inc(btag_wp_name,
                 len(event.btagged_jets[btag_wp_name])
             )
+            setattr(event, "nB"+btag_wp_name, len(event.btagged_jets[btag_wp_name]))
         event.buntagged_jets = event.buntagged_jets[self.conf.jets["btagWP"]]
 
         passes = len(event.good_jets) >= 4
@@ -361,7 +362,7 @@ class BTagLRAnalyzer(FilterAnalyzer):
         event.buntagged_jets_by_LR_4b_2b = [event.good_jets[i] for i in best_4b_perm[4:]]
         for i in range(len(event.good_jets)):
             event.good_jets[i].btagFlag = 0.0
-            
+
         for i in best_4b_perm[4:]:
             event.good_jets[i].btagFlag = 1.0
         # print "N", len(event.good_jets), "uT", len(event.buntagged_jets), "uLR", len(event.buntagged_jets_by_LR_4b_2b)
@@ -408,7 +409,7 @@ class MECategoryAnalyzer(FilterAnalyzer):
 
         cat = "NOCAT"
         if event.is_sl:
-            
+
             #at least 6 jets, if 6, Wtag in [60,100], if more Wtag in [72,94]
             if ((len(event.good_jets) == 6 and event.Wmass2 >= 60 and event.Wmass2 < 100) or
                (len(event.good_jets) > 6 and event.Wmass2 >= 72 and event.Wmass2 < 94)):
@@ -595,12 +596,12 @@ class MEAnalyzer(FilterAnalyzer):
         leptons = event.good_leptons
         met = event.input.met_pt
         #print "MEMINTEG", len(jets), len(leptons)
-        
+
         #One W quark missed, integrate over its direction
         if event.cat in ["cat2", "cat3"]:
             self.vars_to_integrate.push_back(MEM.PSVar.cos_qbar1)
             self.vars_to_integrate.push_back(MEM.PSVar.phi_qbar1)
-        
+
         for jet in jets:
             self.add_obj(
                 MEM.ObjectType.Jet,

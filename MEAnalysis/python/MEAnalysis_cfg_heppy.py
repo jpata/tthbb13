@@ -67,4 +67,5 @@ class Conf:
             "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV6.root",
             "sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_vhbb.py",
             "calcMECategories": ["cat1", "cat2", "cat3", "cat6"]
+            #"calcMECategories": []
         }
