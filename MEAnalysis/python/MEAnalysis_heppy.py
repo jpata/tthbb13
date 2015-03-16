@@ -223,8 +223,8 @@ sequence = cfg.Sequence([
     jets,
     genrad,
     btaglr,
-    mecat,
     wtag,
+    mecat,
     mem_analyzer,
     treeProducer
 ])

@@ -12,6 +12,7 @@ ROOT.gROOT.ProcessLine('ROOT::Cintex::Cintex::Enable();')
 ROOT.gSystem.Load("libTTHMEIntegratorStandalone")
 
 from ROOT import MEM
+o = MEM.MEMOutput
 
 #Pre-define shorthands for permutation and integration variable vectors
 CvectorPermutations = getattr(ROOT, "std::vector<MEM::Permutations::Permutations>")
@@ -356,9 +357,13 @@ class BTagLRAnalyzer(FilterAnalyzer):
         event.btag_LR_4b_2b_alt = lratio(event.btag_lr_4b_alt, event.btag_lr_2b_alt)
         #event.btag_LR_4b_2b_alt = 0
 
-        print "LR", event.btag_LR_4b_2b_old, event.btag_LR_4b_2b, event.btag_LR_4b_2b_alt
+        #print "LR", event.btag_LR_4b_2b_old, event.btag_LR_4b_2b, event.btag_LR_4b_2b_alt
         event.buntagged_jets_by_LR_4b_2b = [event.good_jets[i] for i in best_4b_perm[4:]]
-
+        for i in range(len(event.good_jets)):
+            event.good_jets[i].btagFlag = 0.0
+            
+        for i in best_4b_perm[4:]:
+            event.good_jets[i].btagFlag = 1.0
         # print "N", len(event.good_jets), "uT", len(event.buntagged_jets), "uLR", len(event.buntagged_jets_by_LR_4b_2b)
         # print "lr={0:.6f}".format(event.btag_LR_4b_2b)
         # s = ""
@@ -390,31 +395,36 @@ class MECategoryAnalyzer(FilterAnalyzer):
     def __init__(self, cfg_ana, cfg_comp, looperName):
         self.conf = cfg_ana._conf
         super(MECategoryAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
-        self.cat_map = {"cat1": 1, "cat2": 2, "cat3": 3, "cat6":6}
+        self.cat_map = {"NOCAT":-1, "cat1": 1, "cat2": 2, "cat3": 3, "cat6":6}
 
     def beginLoop(self, setup):
         super(MECategoryAnalyzer, self).beginLoop(setup)
 
-        for c in ["cat1", "cat2", "cat3", "cat6"]:
+        for c in ["NOCAT", "cat1", "cat2", "cat3", "cat6"]:
             self.counters["processing"].register(c)
 
     def process(self, event):
         self.counters["processing"].inc("processed")
 
-        cat = ""
+        cat = "NOCAT"
         if event.is_sl:
-            if len(event.good_jets) == 5:
-                cat = "cat1"
-            elif len(event.good_jets) == 6:
+            
+            #at least 6 jets, if 6, Wtag in [60,100], if more Wtag in [72,94]
+            if ((len(event.good_jets) == 6 and event.Wmass2 >= 60 and event.Wmass2 < 100) or
+               (len(event.good_jets) > 6 and event.Wmass2 >= 72 and event.Wmass2 < 94)):
+               cat = "cat1"
+            #at least 6 jets, no W-tag
+            elif len(event.good_jets) >= 6:
                 cat = "cat2"
-            else:
+            #one W daughter missing
+            elif len(event.good_jets) == 5:
                 cat = "cat3"
         elif event.is_dl and len(event.good_jets)>=4:
             cat = "cat6"
 
         self.counters["processing"].inc(cat)
         event.cat = cat
-        event.catn = self.cat_map[cat]
+        event.catn = self.cat_map.get(cat, -1)
 
         passes = True
         if passes:
@@ -432,8 +442,6 @@ class WTagAnalyzer(FilterAnalyzer):
 
     def beginLoop(self, setup):
         super(WTagAnalyzer, self).beginLoop(setup)
-
-
 
     def pair_mass(self, j1, j2):
         lv1, lv2 = [lvec(j) for j in [j1, j2]]
@@ -524,15 +532,15 @@ class MEAnalyzer(FilterAnalyzer):
 
         #Create the ME integrator.
         #Arguments specify the verbosity
-        self.integrator = MEM.Integrand(0)
+        self.integrator = MEM.Integrand(1+2+4, MEM.MEMConfig())
 
         self.permutations = CvectorPermutations()
 
         #Assume that only jets passing CSV>0.5 are b quarks
-        self.permutations.push_back(MEM.Permutations.BTagged)
+        #self.permutations.push_back(MEM.Permutations.BTagged)
 
         #Assume that only jets passing CSV<0.5 are l quarks
-        self.permutations.push_back(MEM.Permutations.QUntagged)
+        #self.permutations.push_back(MEM.Permutations.QUntagged)
 
         #Assume q-qbar symmetry
         self.permutations.push_back(MEM.Permutations.QQbarSymmetry)
@@ -587,12 +595,17 @@ class MEAnalyzer(FilterAnalyzer):
         leptons = event.good_leptons
         met = event.input.met_pt
         #print "MEMINTEG", len(jets), len(leptons)
-
+        
+        #One W quark missed, integrate over its direction
+        if event.cat in ["cat2", "cat3"]:
+            self.vars_to_integrate.push_back(MEM.PSVar.cos_qbar1)
+            self.vars_to_integrate.push_back(MEM.PSVar.phi_qbar1)
+        
         for jet in jets:
             self.add_obj(
                 MEM.ObjectType.Jet,
                 p4s=(jet.pt, jet.eta, jet.phi, jet.mass),
-                obsdict={MEM.Observable.BTAG: jet.btagCSV}
+                obsdict={MEM.Observable.BTAG: jet.btagFlag}
             )
         for lep in leptons:
             self.add_obj(
@@ -612,16 +625,19 @@ class MEAnalyzer(FilterAnalyzer):
             fstate = MEM.FinalState.LH
 
         res = {}
-        if event.cat in self.conf.general["calcMECategories"] and event.btag_LR_4b_2b > 0.8:
+        if event.cat in self.conf.general["calcMECategories"] and event.btag_LR_4b_2b > 0.7:
+            print "MEM", event.cat, event.btag_LR_4b_2b, len(event.good_jets), len(event.good_leptons)
             for hypo in [MEM.Hypothesis.TTH, MEM.Hypothesis.TTBB]:
                 r = self.integrator.run(
                     fstate,
                     hypo,
                     self.vars_to_integrate
                 )
-                res[hypo] = r
-            print event.cat, event.btag_LR_4b_2b, res
+                #print self.integrator.result.p, self.integrator.result.p_err
+                #print r.p, r.p_err
+                res[hypo] = r.p
+            print "RES", res
             event.p_hypo_tth = res[MEM.Hypothesis.TTH]
             event.p_hypo_ttbb = res[MEM.Hypothesis.TTBB]
-
+        self.vars_to_integrate.clear()
         self.integrator.next_event()
