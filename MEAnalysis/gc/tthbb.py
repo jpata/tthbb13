@@ -32,7 +32,7 @@ if args.action == "hadd":
     completed_files = []
     input_filenames = []
     for job in jobs:
-        wd = "work." +job.split(".")[0]
+        wd = "work." +job.split("/")[-1].split(".")[0]
         donefiles = glob.glob(wd + "/output/*/output.txt")
         for df in donefiles:
             input_filenames += map(lambda x: x.strip(), open(df).readlines())
