@@ -213,7 +213,18 @@ class BTagLRAnalyzer(FilterAnalyzer):
         super(BTagLRAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
         self.conf = cfg_ana._conf
         self.bTagAlgo = self.conf.jets["btagAlgo"]
-        self.cplots = ROOT.TFile(self.conf.general["controlPlotsFile"])
+        self.cplots_old = ROOT.TFile(self.conf.general["controlPlotsFile"])
+        self.cplots = ROOT.TFile(self.conf.general["controlPlotsFileOld"])
+        
+        cplots_fmt = self.conf.general.get("controlPlotsFormat", "8tev")
+        self.csv_pdfs_old = {
+        }
+        for x in ["b", "c", "l"]:
+            for b in ["Bin0", "Bin1"]:
+                self.csv_pdfs_old[(x, b)] = self.cplots_old.Get(
+                    "csv_{0}_{1}__csv_rec".format(x, b)
+                )
+            
         self.csv_pdfs = {
         }
         for x in ["b", "c", "l"]:
@@ -221,31 +232,50 @@ class BTagLRAnalyzer(FilterAnalyzer):
                 self.csv_pdfs[(x, b)] = self.cplots.Get(
                     "csv_{0}_{1}__csv_rec".format(x, b)
                 )
+            self.csv_pdfs[(x, "pt_eta")] = self.cplots.Get(
+                "csv_{0}_pt_eta".format(x)
+            )
+        print self.csv_pdfs_old
+        print self.csv_pdfs
 
-    def get_pdf_prob(self, flavour, _bin, csv):
-        h = self.csv_pdfs[(flavour, _bin)]
-
+    def get_pdf_prob(self, flavour, pt, eta, csv, kind):
+        
+        _bin = "Bin1" if abs(eta)>1.0 else "Bin0"
+        
+        if kind == "old":
+            h = self.csv_pdfs_old[(flavour, _bin)]
+        elif kind == "new_eta_1bin":
+            h = self.csv_pdfs[(flavour, _bin)]
+        elif kind == "new_pt_eta_bin_3d":
+            h = self.csv_pdfs[(flavour, "pt_eta")]
+            
+        assert h != None, "flavour={0} kind={1}".format(flavour, kind)
+        
         if csv < 0:
             csv = 0.0
         if csv > 1.0:
             csv = 1.0
-        nb = h.FindBin(csv)
-        #if csv = 1 -> goes into overflow and pdf = 0.0
-        #as a solution, take the next-to-last bin
-        if nb >= h.GetNbinsX():
-            nb = nb - 1
-        ret = h.GetBinContent(nb)
+            
+        if kind == "old" or kind == "new_eta_1bin":
+            nb = h.FindBin(csv)
+            #if csv = 1 -> goes into overflow and pdf = 0.0
+            #as a solution, take the next-to-last bin
+            if nb >= h.GetNbinsX():
+                nb = nb - 1
+            ret = h.GetBinContent(nb)
+        elif kind == "new_pt_eta_bin_3d":
+            nb = h.FindBin(pt, abs(eta), csv)
+            ret = h.GetBinContent(nb)
         return ret
 
     def beginLoop(self, setup):
         super(BTagLRAnalyzer, self).beginLoop(setup)
 
-    def evaluate_jet_prob(self, csv, eta):
-        _bin = "Bin1" if abs(eta)>1.0 else "Bin0"
+    def evaluate_jet_prob(self, pt, eta, csv, kind):
         return (
-            self.get_pdf_prob("b", _bin, csv),
-            self.get_pdf_prob("c", _bin, csv),
-            self.get_pdf_prob("l", _bin, csv)
+            self.get_pdf_prob("b", pt, eta, csv, kind),
+            self.get_pdf_prob("c", pt, eta, csv, kind),
+            self.get_pdf_prob("l", pt, eta, csv, kind)
         )
 
     def btag_likelihood(self, probs, nB, nC):
@@ -256,6 +286,7 @@ class BTagLRAnalyzer(FilterAnalyzer):
         max_p = -1.0
         nperms = 0
         best_perm = None
+
         for perm in perms:
             p = 1.0
 
@@ -273,16 +304,31 @@ class BTagLRAnalyzer(FilterAnalyzer):
             P += p
             nperms += 1
         P = P / float(nperms)
+        assert nperms > 0
         return P, best_perm
         #end permutation loop
 
     def process(self, event):
         self.counters["processing"].inc("processed")
-
-        jet_probs = [
-            self.evaluate_jet_prob(getattr(j, self.bTagAlgo), j.eta)
-            for j in event.good_jets
-        ]
+        
+        #Take first 6 most b-tagged jets for btag LR
+        jets_for_btag_lr = sorted(
+            event.good_jets,
+            key=lambda x: getattr(x, self.bTagAlgo),
+            reverse=True,
+        )[0:6]
+        
+        jet_probs = {
+            kind: [
+                self.evaluate_jet_prob(j.pt, j.eta, getattr(j, self.bTagAlgo), kind)
+                for j in jets_for_btag_lr
+            ]
+            for kind in [
+            "old", "new_eta_1bin",
+            "new_pt_eta_bin_3d"
+            ]
+        }
+        
         jet_csvs = [
             getattr(j, self.bTagAlgo)
             for j in event.good_jets
@@ -290,14 +336,27 @@ class BTagLRAnalyzer(FilterAnalyzer):
 
         best_4b_perm = 0
         best_2b_perm = 0
-        event.btag_lr_4b, best_4b_perm = self.btag_likelihood(jet_probs, 4, 0)
-        event.btag_lr_2b, best_2b_perm = self.btag_likelihood(jet_probs, 2, 0)
+        event.btag_lr_4b_old, best_4b_perm = self.btag_likelihood(jet_probs["old"], 4, 0)
+        event.btag_lr_2b_old, best_2b_perm = self.btag_likelihood(jet_probs["old"], 2, 0)
 
-        # if event.btag_lr_2b == 0:
-        #     for (csv, p) in zip(jet_csvs, jet_probs):
-        #         print csv, p
-        event.btag_LR_4b_2b = event.btag_lr_4b / (event.btag_lr_4b + event.btag_lr_2b)
+        event.btag_lr_4b, best_4b_perm = self.btag_likelihood(jet_probs["new_eta_1bin"], 4, 0)
+        event.btag_lr_2b, best_2b_perm = self.btag_likelihood(jet_probs["new_eta_1bin"], 2, 0)
 
+        event.btag_lr_4b_alt, best_4b_perm_alt = self.btag_likelihood(jet_probs["new_pt_eta_bin_3d"], 4, 0)
+        event.btag_lr_2b_alt, best_2b_perm_alt = self.btag_likelihood(jet_probs["new_pt_eta_bin_3d"], 2, 0)
+        
+        def lratio(l1, l2):
+            if l1+l2>0:
+                return l1/(l1+l2)
+            else:
+                return 0.0
+                
+        event.btag_LR_4b_2b_old = lratio(event.btag_lr_4b_old, event.btag_lr_2b_old)
+        event.btag_LR_4b_2b = lratio(event.btag_lr_4b, event.btag_lr_2b)
+        event.btag_LR_4b_2b_alt = lratio(event.btag_lr_4b_alt, event.btag_lr_2b_alt)
+        #event.btag_LR_4b_2b_alt = 0
+
+        print "LR", event.btag_LR_4b_2b_old, event.btag_LR_4b_2b, event.btag_LR_4b_2b_alt
         event.buntagged_jets_by_LR_4b_2b = [event.good_jets[i] for i in best_4b_perm[4:]]
 
         # print "N", len(event.good_jets), "uT", len(event.buntagged_jets), "uLR", len(event.buntagged_jets_by_LR_4b_2b)
@@ -465,7 +524,7 @@ class MEAnalyzer(FilterAnalyzer):
 
         #Create the ME integrator.
         #Arguments specify the verbosity
-        self.integrator = MEM.Integrand(1+2+4)
+        self.integrator = MEM.Integrand(0)
 
         self.permutations = CvectorPermutations()
 

@@ -166,8 +166,16 @@ treeProducer = cfg.Analyzer(
             help="ME category"
         ),
         NTupleVariable(
+            "btag_LR_4b_2b_old", lambda ev: ev.btag_LR_4b_2b_old,
+            help="B-tagging likelihood ratio: 4b vs 2b (8TeV CSV curves)"
+        ),
+        NTupleVariable(
             "btag_LR_4b_2b", lambda ev: ev.btag_LR_4b_2b,
             help="B-tagging likelihood ratio: 4b vs 2b"
+        ),
+        NTupleVariable(
+            "btag_LR_4b_2b_alt", lambda ev: ev.btag_LR_4b_2b_alt,
+            help="B-tagging likelihood ratio: 4b vs 2b with multi-dimensional pt/eta binning for CSV"
         ),
         NTupleVariable(
             "nMatchSimB", lambda ev: ev.nMatchSimB if hasattr(ev, "nMatchSimB") else 0,
@@ -251,7 +259,7 @@ if __name__ == "__main__":
     print "Running MEAnalysis heppy main loop"
 
     from PhysicsTools.HeppyCore.framework.looper import Looper
-    looper = Looper('Loop', config, nPrint = 0, nEvents = 100)
+    looper = Looper('Loop', config, nPrint = 0, nEvents = 10000)
 
     #execute the code
     looper.loop()
