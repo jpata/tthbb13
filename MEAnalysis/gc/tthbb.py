@@ -1,32 +1,33 @@
 from TTH.TTHNtupleAnalyzer.CrabHelpers import hadd_from_file, replicate
 import argparse, subprocess, glob, os
 
-version = "s1_eb733a1__s2_c084f2b"
+version = "X"
 
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
 parser.add_argument('--action',
-	choices=['create', 'submit', 'report', 'hadd', 'replicate'], type=str,
+    choices=['status', 'submit', 'report', 'hadd', 'replicate'], type=str,
     required=True,
-	help="the action to perform"
+    help="the action to perform"
 )
 
 args = parser.parse_args()
 
-#jobs = ["meanalysis-tthbb.conf", "meanalysis-bkg.conf"]
-jobs = ["meanalysis-heppy.conf"]
-gc = "/shome/jpata/grid-control/GC"
+jobs = ["confs/sig.conf", "confs/bkg.conf"]
+#gc = "/shome/jpata/grid-control/GC"
+gc = "/home/joosep/local-sl6/grid-control/GC"
 
-if args.action == "create":
+if args.action == "status":
     for job in jobs:
+        print job
         subprocess.call([gc, "run", job, "-qs"])
+        subprocess.call([gc, "run", job, "-r"])
 if args.action == "submit":
     for job in jobs:
         subprocess.call([gc, "run", job, "-q"])
 if args.action == "report":
     for job in jobs:
         subprocess.call([gc, "run", job, "-r"])
-
 if args.action == "hadd":
     completed_files = []
     input_filenames = []
