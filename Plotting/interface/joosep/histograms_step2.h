@@ -8,42 +8,6 @@
 
 #include "TTH/Plotting/interface/joosep/Sample.h"
 
-//Skip to avoid multuple definition
-//#include "TTH/TTHNtupleAnalyzer/interface/HypoEnums.hh"
-//#include "TTH/MEAnalysis/interface/MECombination.h"
-
-enum MECategory {
-    UNKNOWN_CAT,
-    CAT1,
-    CAT2,
-    CAT3,
-//    CAT6,
-    CAT6ee,
-    CAT6emu,
-    CAT6mumu,
-};
-
-enum CutReasons {
-    SYST,
-    BTAG_LR,
-    LEPTON
-};
-
-enum FailReason {
-	UNKNOWN_REASON,
-	NO_H_B,
-	NO_W_Q,
-	NO_T_B,
-	NO_LEPTON,
-    DL_AS_SL,
-	MATCHED_ME
-};
-
-//FIXME: manual fwd declaration instead of
-//#include "TTH/TTHNtupleAnalyzer/interface/HypoEnums.hh"
-//void TTH::label_axis(TAxis* ax);
-
-
 class Histograms {
 
 public:

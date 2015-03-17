@@ -4,7 +4,14 @@ import os
 
 process = cms.Process("MEAnalysisNew")
 
-from TTH.MEAnalysis.samples_v1 import samples, pathToFile, samplePrefix
+from TTH.MEAnalysis.samples_v1 import samples, pathToFile, samplePrefix, initialize_from_cfgfile
+initialize_from_cfgfile(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/gc/step1_ganymede.hep.kbfi.ee.dat", samples)
+
+for i in range(len(samples)):
+    samples[i].skip = True
+    if samples[i].nickName.value() == "tth_hbb_13tev":
+        samples[i].skip = False
+
 process.fwliteInput = cms.PSet(
 
     # output file name
@@ -32,7 +39,7 @@ process.fwliteInput = cms.PSet(
     samples = samples,
 
     # the target luminosity (used to calculate the 'weight' variable)
-    lumi          = cms.untracked.double(19.04),
+    lumi          = cms.untracked.double(20.0),
 
     # run both S and B hypotheses
     SoB                       = cms.untracked.int32(1),
@@ -77,7 +84,7 @@ process.fwliteInput = cms.PSet(
     switchoffOL   = cms.untracked.int32(0), ###### CHECK HERE
 
     # skip VEGAS call
-    speedup       = cms.untracked.int32(0), ###### CHECK HERE
+    speedup       = cms.untracked.int32(1), ###### CHECK HERE
 
     # select which analysis to run
     # select with 4-6 jets regardless of btagging

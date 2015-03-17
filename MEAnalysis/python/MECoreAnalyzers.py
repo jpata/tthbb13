@@ -12,6 +12,7 @@ ROOT.gROOT.ProcessLine('ROOT::Cintex::Cintex::Enable();')
 ROOT.gSystem.Load("libTTHMEIntegratorStandalone")
 
 from ROOT import MEM
+o = MEM.MEMOutput
 
 #Pre-define shorthands for permutation and integration variable vectors
 CvectorPermutations = getattr(ROOT, "std::vector<MEM::Permutations::Permutations>")
@@ -195,8 +196,15 @@ class JetAnalyzer(FilterAnalyzer):
             self.counters["jets"].inc(btag_wp_name,
                 len(event.btagged_jets[btag_wp_name])
             )
+            setattr(event, "nB"+btag_wp_name, len(event.btagged_jets[btag_wp_name]))
         event.buntagged_jets = event.buntagged_jets[self.conf.jets["btagWP"]]
-
+        event.btagged_jets = event.btagged_jets[self.conf.jets["btagWP"]]
+        
+        event.n_tagwp_tagged_true_bjets = 0
+        for j in event.btagged_jets:
+            if abs(j.mcFlavour) == 5:
+                event.n_tagwp_tagged_true_bjets += 1
+        
         passes = len(event.good_jets) >= 4
         if passes:
             self.counters["processing"].inc("passes")
@@ -232,11 +240,11 @@ class BTagLRAnalyzer(FilterAnalyzer):
                 self.csv_pdfs[(x, b)] = self.cplots.Get(
                     "csv_{0}_{1}__csv_rec".format(x, b)
                 )
+                self.csv_pdfs[(x, b)].Scale(1.0 / self.csv_pdfs[(x, b)].Integral())
             self.csv_pdfs[(x, "pt_eta")] = self.cplots.Get(
                 "csv_{0}_pt_eta".format(x)
             )
-        print self.csv_pdfs_old
-        print self.csv_pdfs
+            self.csv_pdfs[(x, "pt_eta")].Scale(1.0 / self.csv_pdfs[(x, "pt_eta")].Integral())
 
     def get_pdf_prob(self, flavour, pt, eta, csv, kind):
 
@@ -297,6 +305,7 @@ class BTagLRAnalyzer(FilterAnalyzer):
             for i in range(nB + nC, len(probs)):
                 p *= probs[perm[i]][2]
 
+            #print nperms, p, perm, max_p, best_perm
             if p > max_p:
                 best_perm = perm
                 max_p = p
@@ -317,7 +326,7 @@ class BTagLRAnalyzer(FilterAnalyzer):
             key=lambda x: getattr(x, self.bTagAlgo),
             reverse=True,
         )[0:6]
-
+        
         jet_probs = {
             kind: [
                 self.evaluate_jet_prob(j.pt, j.eta, getattr(j, self.bTagAlgo), kind)
@@ -328,7 +337,10 @@ class BTagLRAnalyzer(FilterAnalyzer):
             "new_pt_eta_bin_3d"
             ]
         }
-
+        
+        # for nj, j in enumerate(jets_for_btag_lr):
+        #     print j.btagCSV, j.mcFlavour, jet_probs["old"][nj], jet_probs["new_eta_1bin"][nj], jet_probs["new_pt_eta_bin_3d"][nj]
+        #     
         jet_csvs = [
             getattr(j, self.bTagAlgo)
             for j in event.good_jets
@@ -356,20 +368,30 @@ class BTagLRAnalyzer(FilterAnalyzer):
         event.btag_LR_4b_2b_alt = lratio(event.btag_lr_4b_alt, event.btag_lr_2b_alt)
         #event.btag_LR_4b_2b_alt = 0
 
-        print "LR", event.btag_LR_4b_2b_old, event.btag_LR_4b_2b, event.btag_LR_4b_2b_alt
-        event.buntagged_jets_by_LR_4b_2b = [event.good_jets[i] for i in best_4b_perm[4:]]
+        #print "LR", event.btag_LR_4b_2b_old, event.btag_LR_4b_2b, event.btag_LR_4b_2b_alt
+        event.buntagged_jets_by_LR_4b_2b = [jets_for_btag_lr[i] for i in best_4b_perm[4:]]
+        for i in range(len(event.good_jets)):
+            event.good_jets[i].btagFlag = 0.0
 
+        event.n_lr_tagged_true_bjets = 0
+        #First 4 jets in the best permutation are counted as b-tagged
+        for i in best_4b_perm[0:4]:
+            idx = event.good_jets.index(jets_for_btag_lr[i])
+            event.good_jets[idx].btagFlag = 1.0
+            if abs(event.good_jets[idx].mcFlavour) == 5:
+                event.n_lr_tagged_true_bjets += 1
+        
         # print "N", len(event.good_jets), "uT", len(event.buntagged_jets), "uLR", len(event.buntagged_jets_by_LR_4b_2b)
         # print "lr={0:.6f}".format(event.btag_LR_4b_2b)
         # s = ""
-        #
-        # if len(event.good_jets)>6:
+        # 
+        # if len(event.good_jets)>=5:
         #     for (nj, j) in enumerate(event.good_jets):
         #         s += "j {0:.4f} {1}".format(getattr(j, self.bTagAlgo), j.mcFlavour)
-        #
+        # 
         #         if nj in best_2b_perm[0:4]:
         #             s += " b"
-        #
+        # 
         #         if nj in best_2b_perm[4:]:
         #             s += " l"
         #         s += "\n"
@@ -390,31 +412,36 @@ class MECategoryAnalyzer(FilterAnalyzer):
     def __init__(self, cfg_ana, cfg_comp, looperName):
         self.conf = cfg_ana._conf
         super(MECategoryAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
-        self.cat_map = {"cat1": 1, "cat2": 2, "cat3": 3, "cat6":6}
+        self.cat_map = {"NOCAT":-1, "cat1": 1, "cat2": 2, "cat3": 3, "cat6":6}
 
     def beginLoop(self, setup):
         super(MECategoryAnalyzer, self).beginLoop(setup)
 
-        for c in ["cat1", "cat2", "cat3", "cat6"]:
+        for c in ["NOCAT", "cat1", "cat2", "cat3", "cat6"]:
             self.counters["processing"].register(c)
 
     def process(self, event):
         self.counters["processing"].inc("processed")
 
-        cat = ""
+        cat = "NOCAT"
         if event.is_sl:
-            if len(event.good_jets) == 5:
-                cat = "cat1"
-            elif len(event.good_jets) == 6:
+
+            #at least 6 jets, if 6, Wtag in [60,100], if more Wtag in [72,94]
+            if ((len(event.good_jets) == 6 and event.Wmass2 >= 60 and event.Wmass2 < 100) or
+               (len(event.good_jets) > 6 and event.Wmass2 >= 72 and event.Wmass2 < 94)):
+               cat = "cat1"
+            #at least 6 jets, no W-tag
+            elif len(event.good_jets) >= 6:
                 cat = "cat2"
-            else:
+            #one W daughter missing
+            elif len(event.good_jets) == 5:
                 cat = "cat3"
         elif event.is_dl and len(event.good_jets)>=4:
             cat = "cat6"
 
         self.counters["processing"].inc(cat)
         event.cat = cat
-        event.catn = self.cat_map[cat]
+        event.catn = self.cat_map.get(cat, -1)
 
         passes = True
         if passes:
@@ -423,8 +450,13 @@ class MECategoryAnalyzer(FilterAnalyzer):
 
 class WTagAnalyzer(FilterAnalyzer):
     """
-    Performs W-mass calculation
-    FIXME: doc
+    Performs W-mass calculation on pairs of untagged jets.
+
+    Two cases are considered: jets untagged by the default b-tagging algo (Wmass)
+    and jets untagged by the b-tagging likelihood (Wmass2).
+
+    Jets are considered untagged according to the b-tagging permutation which
+    gives the highest likelihood of the event being a 4b+Nlight event.
     """
     def __init__(self, cfg_ana, cfg_comp, looperName):
         self.conf = cfg_ana._conf
@@ -433,9 +465,10 @@ class WTagAnalyzer(FilterAnalyzer):
     def beginLoop(self, setup):
         super(WTagAnalyzer, self).beginLoop(setup)
 
-
-
     def pair_mass(self, j1, j2):
+        """
+        Calculates the invariant mass of a two-paritcle system.
+        """
         lv1, lv2 = [lvec(j) for j in [j1, j2]]
         tot = lv1 + lv2
         return tot.M()
@@ -524,7 +557,11 @@ class MEAnalyzer(FilterAnalyzer):
 
         #Create the ME integrator.
         #Arguments specify the verbosity
-        self.integrator = MEM.Integrand(0)
+        self.integrator = MEM.Integrand(
+            0,
+            #MEM.init|MEM.init_more|MEM.event,
+            MEM.MEMConfig()
+        )
 
         self.permutations = CvectorPermutations()
 
@@ -586,14 +623,69 @@ class MEAnalyzer(FilterAnalyzer):
         jets = event.good_jets
         leptons = event.good_leptons
         met = event.input.met_pt
+
+        if event.cat in self.conf.general["calcMECategories"] and event.btag_LR_4b_2b > 0.7:
+            print "MEM", event.cat, event.btag_LR_4b_2b, len(jets), len(leptons)
+        else:
+            return True
         #print "MEMINTEG", len(jets), len(leptons)
+        
+        matched_pairs = {}
+        
+        def match_jets_to_quarks(jetcoll, quarkcoll, label):
+            for ij, j in enumerate(jetcoll):
+                for iq, q in enumerate(quarkcoll):
+                    l1 = lvec(q)
+                    l2 = lvec(j)
+                    dr = l1.DeltaR(l2)
+                    if dr < 0.3:
+                        if matched_pairs.has_key(ij):
+                            if matched_pairs[ij][1] > dr:
+                                matched_pairs[ij] = (label, iq, dr)
+                        else:
+                            matched_pairs[ij] = (label, iq, dr)
+                            
+        match_jets_to_quarks(jets, event.GenWZQuark, "wq")
+        match_jets_to_quarks(jets, event.GenBQuarkFromTop, "tb")
+        match_jets_to_quarks(jets, event.GenBQuarkFromH, "hb")
+        
+        event.nMatch_wq = 0
+        event.nMatch_tb = 0
+        event.nMatch_hb = 0
+        event.nMatch_wq_btag = 0
+        event.nMatch_tb_btag = 0
+        event.nMatch_hb_btag = 0
+        
+        for ij, jet in enumerate(jets):
+            if not matched_pairs.has_key(ij):
+                continue
+            mlabel, midx, mdr = matched_pairs[ij]
+            if mlabel == "wq":
+                event.nMatch_wq += 1
+                if jet.btagFlag < 0.5:
+                    event.nMatch_wq_btag += 1
+            if mlabel == "tb":
+                event.nMatch_tb += 1
+                if jet.btagFlag >= 0.5:
+                    event.nMatch_tb_btag += 1
+            if mlabel == "hb":
+                event.nMatch_hb += 1
+                if jet.btagFlag >= 0.5:
+                    event.nMatch_hb_btag += 1
+
+            
+        #One W quark missed, integrate over its direction
+        if event.cat in ["cat2", "cat3"]:
+            self.vars_to_integrate.push_back(MEM.PSVar.cos_qbar1)
+            self.vars_to_integrate.push_back(MEM.PSVar.phi_qbar1)
 
         for jet in jets:
             self.add_obj(
                 MEM.ObjectType.Jet,
                 p4s=(jet.pt, jet.eta, jet.phi, jet.mass),
-                obsdict={MEM.Observable.BTAG: jet.btagCSV}
+                obsdict={MEM.Observable.BTAG: jet.btagFlag}
             )
+            #print "MEM jet", jet.pt, jet.eta, jet.phi, jet.mass, jet.btagCSV, jet.btagFlag
         for lep in leptons:
             self.add_obj(
                 MEM.ObjectType.Lepton,
@@ -612,16 +704,31 @@ class MEAnalyzer(FilterAnalyzer):
             fstate = MEM.FinalState.LH
 
         res = {}
-        if event.cat in self.conf.general["calcMECategories"] and event.btag_LR_4b_2b > 0.8:
-            for hypo in [MEM.Hypothesis.TTH, MEM.Hypothesis.TTBB]:
+        for hypo in [MEM.Hypothesis.TTH, MEM.Hypothesis.TTBB]:
+            if self.conf.general["runME"]:
                 r = self.integrator.run(
                     fstate,
                     hypo,
                     self.vars_to_integrate
                 )
-                res[hypo] = r
-            print event.cat, event.btag_LR_4b_2b, res
-            event.p_hypo_tth = res[MEM.Hypothesis.TTH]
-            event.p_hypo_ttbb = res[MEM.Hypothesis.TTBB]
+            else:
+                r = MEM.MEMOutput()
+            #print self.integrator.result.p, self.integrator.result.p_err
+            #print r.p, r.p_err
+            res[hypo] = r
+        print "RES", {k:res[k].p for k in res.keys()}
+        event.p_hypo_tth = res[MEM.Hypothesis.TTH].p
+        event.p_hypo_ttbb = res[MEM.Hypothesis.TTBB].p
 
+        event.p_err_hypo_tth = res[MEM.Hypothesis.TTH].p_err
+        event.p_err_hypo_ttbb = res[MEM.Hypothesis.TTBB].p_err
+
+        event.mem_chi2_hypo_tth = res[MEM.Hypothesis.TTH].chi2
+        event.mem_chi2_hypo_ttbb = res[MEM.Hypothesis.TTBB].chi2
+
+        event.mem_time_hypo_tth = res[MEM.Hypothesis.TTH].time
+        event.mem_time_hypo_ttbb = res[MEM.Hypothesis.TTBB].time
+
+
+        self.vars_to_integrate.clear()
         self.integrator.next_event()

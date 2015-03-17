@@ -40,8 +40,8 @@ tier_prefix = '/hdfs/cms/'
 
 # Decide what to do
 actions = ["submit", "status", "download", "hadd", "haddfiles", "replicate", "replicate-direct"]
-#sites = ["T2_EE_Estonia", "T3_CH_PSI"]
-sites = ["T3_CH_PSI"]
+sites = ["T2_EE_Estonia", "T3_CH_PSI"]
+#sites = ["T3_CH_PSI"]
 
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('--action',
@@ -127,21 +127,21 @@ elif action == "replicate":
     #replicate("to-replica.txt", "T3_CH_PSI", "/store/user/jpata/tth/" + version)
 
 elif action == "replicate-direct":
-    #sample_metadata_files = open("sample_metadata_files.dat", "w")
-    #for sample_shortname in li_samples:
-    #    fn = getFileListName(name, sample_shortname, version)
-    #    metadata_fn = "{0}.dat".format(sample_shortname)
-    #    sample_metadata = open(metadata_fn, "w")
+    sample_metadata_files = open("sample_metadata_files.dat", "w")
+    for sample_shortname in li_samples:
+        fn = getFileListName(name, sample_shortname, version)
+        metadata_fn = "{0}.dat".format(sample_shortname)
+        sample_metadata = open(metadata_fn, "w")
 
-    #    for fi in open(fn).readlines():
-    #        fi = fi.strip()
-    #        basename = fi.split("/")[-1]
-    #        sample_metadata.write(sample_shortname + "/" + basename + "\n")
-    #    sample_metadata.close()
-    #    sample_metadata_files.write(os.getcwd() + "/" + metadata_fn + "\n")
-    #    for site in sites:
-    #        replicate(fn, site, "/store/user/jpata/tth/" + version + "/" + sample_shortname, dryRun=args.dryRun)
-    #sample_metadata_files.close()
+        for fi in open(fn).readlines():
+            fi = fi.strip()
+            pfn = fi[fi.index("/store"):]
+            sample_metadata.write(pfn + "\n")
+        sample_metadata.close()
+        sample_metadata_files.write(os.getcwd() + "/" + metadata_fn + "\n")
+        #jfor site in sites:
+        #j    replicate(fn, site, "/store/user/jpata/tth/" + version + "/" + sample_shortname, dryRun=args.dryRun)
+    sample_metadata_files.close()
     for site in sites:
         replicate("sample_metadata_files.dat", site, "/store/user/jpata/tth/" + version + "/", dryRun=args.dryRun)
 

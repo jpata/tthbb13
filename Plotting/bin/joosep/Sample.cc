@@ -1,6 +1,6 @@
 #include "TTH/Plotting/interface/joosep/Sample.h"
 
-Sample::Sample(const edm::ParameterSet& pars) : 
+Sample::Sample(const edm::ParameterSet& pars) :
 	nickName(pars.getParameter<string>("nickName")),
 	fileNamesS1(pars.getParameter<vector<string>>("fileNamesS1")),
 	fileNamesS2(pars.getParameter<vector<string>>("fileNamesS2")),
@@ -26,7 +26,10 @@ Sample::Sample(const edm::ParameterSet& pars) :
 	if (step1Enabled) {
 		for (auto& fn : fileNamesS1) {
 			LOG(INFO) << "Adding S1 file " << fn;
-			chainS1->AddFile(fn.c_str(), -1);
+			int ret = chainS1->AddFile(fn.c_str(), -1);
+			if (ret != 1) {
+				throw std::runtime_error("Could not open file");
+			}
 		}
 		treeS1 = new TTHTree(chainS1);
 		treeS1->set_branch_addresses();
@@ -35,10 +38,14 @@ Sample::Sample(const edm::ParameterSet& pars) :
 	if (step2Enabled) {
 		for (auto& fn : fileNamesS2) {
 			LOG(INFO) << "Adding S2 file " << fn;
-			chainS2->AddFile(fn.c_str(), -1);
+			int ret = chainS2->AddFile(fn.c_str(), -1);
+			if (ret != 1) {
+				throw std::runtime_error("Could not open file");
+			}
 		}
 
 		treeS2 = new METree(chainS2);
+		treeS2->set_branch_addresses(125);
 	}
 
 	if (totalEvents <= 0) {
