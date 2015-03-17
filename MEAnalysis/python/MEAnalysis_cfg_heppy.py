@@ -59,7 +59,7 @@ class Conf:
             "eta": 2.5,
             "btagAlgo": "btagCSV",
             "btagWP": "CSVM",
-            "btagWPs": {"CSVM": ("btagCSV", 0.9)}
+            "btagWPs": {"CSVM": ("btagCSV", 0.814), "CSVL": ("btagCSV", 0.423), "CSVT": ("btagCSV", 0.941)}
         }
 
         self.general = {

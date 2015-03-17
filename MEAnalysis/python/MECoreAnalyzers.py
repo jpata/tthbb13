@@ -366,7 +366,7 @@ class BTagLRAnalyzer(FilterAnalyzer):
         #First 4 jets in the best permutation are counted as b-tagged
         for i in best_4b_perm[0:4]:
             event.good_jets[i].btagFlag = 1.0
-            
+
         # print "N", len(event.good_jets), "uT", len(event.buntagged_jets), "uLR", len(event.buntagged_jets_by_LR_4b_2b)
         # print "lr={0:.6f}".format(event.btag_LR_4b_2b)
         # s = ""
@@ -437,10 +437,10 @@ class MECategoryAnalyzer(FilterAnalyzer):
 class WTagAnalyzer(FilterAnalyzer):
     """
     Performs W-mass calculation on pairs of untagged jets.
-    
+
     Two cases are considered: jets untagged by the default b-tagging algo (Wmass)
     and jets untagged by the b-tagging likelihood (Wmass2).
-    
+
     Jets are considered untagged according to the b-tagging permutation which
     gives the highest likelihood of the event being a 4b+Nlight event.
     """
@@ -544,7 +544,8 @@ class MEAnalyzer(FilterAnalyzer):
         #Create the ME integrator.
         #Arguments specify the verbosity
         self.integrator = MEM.Integrand(
-            MEM.init|MEM.init_more|MEM.event,
+            0,
+            #MEM.init|MEM.init_more|MEM.event,
             MEM.MEMConfig()
         )
 
@@ -608,7 +609,7 @@ class MEAnalyzer(FilterAnalyzer):
         jets = event.good_jets
         leptons = event.good_leptons
         met = event.input.met_pt
-        
+
         if event.cat in self.conf.general["calcMECategories"] and event.btag_LR_4b_2b > 0.7:
             print "MEM", event.cat, event.btag_LR_4b_2b, len(jets), len(leptons)
         else:
@@ -657,16 +658,16 @@ class MEAnalyzer(FilterAnalyzer):
         print "RES", {k:res[k].p for k in res.keys()}
         event.p_hypo_tth = res[MEM.Hypothesis.TTH].p
         event.p_hypo_ttbb = res[MEM.Hypothesis.TTBB].p
-        
+
         event.p_err_hypo_tth = res[MEM.Hypothesis.TTH].p_err
         event.p_err_hypo_ttbb = res[MEM.Hypothesis.TTBB].p_err
 
         event.mem_chi2_hypo_tth = res[MEM.Hypothesis.TTH].chi2
         event.mem_chi2_hypo_ttbb = res[MEM.Hypothesis.TTBB].chi2
-        
+
         event.mem_time_hypo_tth = res[MEM.Hypothesis.TTH].time
         event.mem_time_hypo_ttbb = res[MEM.Hypothesis.TTBB].time
-        
-        
+
+
         self.vars_to_integrate.clear()
         self.integrator.next_event()

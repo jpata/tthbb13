@@ -187,7 +187,7 @@ treeProducer = cfg.Analyzer(
             type=int,
             help="number of gen C not matched to W decay"
         ),
-        
+
         NTupleVariable(
             "p_hypo_tth", lambda ev: ev.p_hypo_tth if hasattr(ev, "p_hypo_tth") else 0.0,
             type=float,
@@ -198,7 +198,7 @@ treeProducer = cfg.Analyzer(
             type=float,
             help="tt+bb ME probability"
         ),
-        
+
         NTupleVariable(
             "p_err_hypo_tth", lambda ev: ev.p_err_hypo_tth if hasattr(ev, "p_err_hypo_tth") else 0.0,
             type=float,
@@ -209,7 +209,7 @@ treeProducer = cfg.Analyzer(
             type=float,
             help="tt+bb ME probability error"
         ),
-        
+
         NTupleVariable(
             "mem_time_hypo_tth", lambda ev: ev.mem_time_hypo_tth if hasattr(ev, "mem_time_hypo_tth") else 0,
             type=int,
@@ -220,30 +220,30 @@ treeProducer = cfg.Analyzer(
             type=int,
             help="tt+bb ME probability error"
         ),
-        
+
         NTupleVariable(
             "mem_chi2_hypo_tth", lambda ev: ev.mem_chi2_hypo_tth if hasattr(ev, "mem_chi2_hypo_tth") else 0,
-            type=int,
+            type=float,
             help="tt+h ME probability error"
         ),
         NTupleVariable(
             "mem_chi2_hypo_ttbb", lambda ev: ev.mem_chi2_hypo_ttbb if hasattr(ev, "mem_chi2_hypo_ttbb") else 0,
-            type=int,
+            type=float,
             help="tt+bb ME probability error"
         ),
-        
+
         NTupleVariable(
             "nBCSVM", lambda ev: ev.nBCSVM if hasattr(ev, "nBCSVM") else 0,
             type=int,
             help="Number of good jets passing CSVM"
         ),
         NTupleVariable(
-            "nBCSVT", lambda ev: ev.nBCSVM if hasattr(ev, "nBCSVT") else 0,
+            "nBCSVT", lambda ev: ev.nBCSVT if hasattr(ev, "nBCSVT") else 0,
             type=int,
             help="Number of good jets passing CSVT"
         ),
         NTupleVariable(
-            "nBCSVL", lambda ev: ev.nBCSVM if hasattr(ev, "nBCSVL") else 0,
+            "nBCSVL", lambda ev: ev.nBCSVT if hasattr(ev, "nBCSVL") else 0,
             type=int,
             help="Number of good jets passing CSVL"
         ),
