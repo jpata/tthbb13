@@ -198,7 +198,13 @@ class JetAnalyzer(FilterAnalyzer):
             )
             setattr(event, "nB"+btag_wp_name, len(event.btagged_jets[btag_wp_name]))
         event.buntagged_jets = event.buntagged_jets[self.conf.jets["btagWP"]]
-
+        event.btagged_jets = event.btagged_jets[self.conf.jets["btagWP"]]
+        
+        event.n_tagwp_tagged_true_bjets = 0
+        for j in event.btagged_jets:
+            if abs(j.mcFlavour) == 5:
+                event.n_tagwp_tagged_true_bjets += 1
+        
         passes = len(event.good_jets) >= 4
         if passes:
             self.counters["processing"].inc("passes")
@@ -234,11 +240,11 @@ class BTagLRAnalyzer(FilterAnalyzer):
                 self.csv_pdfs[(x, b)] = self.cplots.Get(
                     "csv_{0}_{1}__csv_rec".format(x, b)
                 )
+                self.csv_pdfs[(x, b)].Scale(1.0 / self.csv_pdfs[(x, b)].Integral())
             self.csv_pdfs[(x, "pt_eta")] = self.cplots.Get(
                 "csv_{0}_pt_eta".format(x)
             )
-        print self.csv_pdfs_old
-        print self.csv_pdfs
+            self.csv_pdfs[(x, "pt_eta")].Scale(1.0 / self.csv_pdfs[(x, "pt_eta")].Integral())
 
     def get_pdf_prob(self, flavour, pt, eta, csv, kind):
 
@@ -299,6 +305,7 @@ class BTagLRAnalyzer(FilterAnalyzer):
             for i in range(nB + nC, len(probs)):
                 p *= probs[perm[i]][2]
 
+            #print nperms, p, perm, max_p, best_perm
             if p > max_p:
                 best_perm = perm
                 max_p = p
@@ -319,7 +326,7 @@ class BTagLRAnalyzer(FilterAnalyzer):
             key=lambda x: getattr(x, self.bTagAlgo),
             reverse=True,
         )[0:6]
-
+        
         jet_probs = {
             kind: [
                 self.evaluate_jet_prob(j.pt, j.eta, getattr(j, self.bTagAlgo), kind)
@@ -330,7 +337,10 @@ class BTagLRAnalyzer(FilterAnalyzer):
             "new_pt_eta_bin_3d"
             ]
         }
-
+        
+        # for nj, j in enumerate(jets_for_btag_lr):
+        #     print j.btagCSV, j.mcFlavour, jet_probs["old"][nj], jet_probs["new_eta_1bin"][nj], jet_probs["new_pt_eta_bin_3d"][nj]
+        #     
         jet_csvs = [
             getattr(j, self.bTagAlgo)
             for j in event.good_jets
@@ -359,25 +369,29 @@ class BTagLRAnalyzer(FilterAnalyzer):
         #event.btag_LR_4b_2b_alt = 0
 
         #print "LR", event.btag_LR_4b_2b_old, event.btag_LR_4b_2b, event.btag_LR_4b_2b_alt
-        event.buntagged_jets_by_LR_4b_2b = [event.good_jets[i] for i in best_4b_perm[4:]]
+        event.buntagged_jets_by_LR_4b_2b = [jets_for_btag_lr[i] for i in best_4b_perm[4:]]
         for i in range(len(event.good_jets)):
             event.good_jets[i].btagFlag = 0.0
 
+        event.n_lr_tagged_true_bjets = 0
         #First 4 jets in the best permutation are counted as b-tagged
         for i in best_4b_perm[0:4]:
-            event.good_jets[i].btagFlag = 1.0
-
+            idx = event.good_jets.index(jets_for_btag_lr[i])
+            event.good_jets[idx].btagFlag = 1.0
+            if abs(event.good_jets[idx].mcFlavour) == 5:
+                event.n_lr_tagged_true_bjets += 1
+        
         # print "N", len(event.good_jets), "uT", len(event.buntagged_jets), "uLR", len(event.buntagged_jets_by_LR_4b_2b)
         # print "lr={0:.6f}".format(event.btag_LR_4b_2b)
         # s = ""
-        #
-        # if len(event.good_jets)>6:
+        # 
+        # if len(event.good_jets)>=5:
         #     for (nj, j) in enumerate(event.good_jets):
         #         s += "j {0:.4f} {1}".format(getattr(j, self.bTagAlgo), j.mcFlavour)
-        #
+        # 
         #         if nj in best_2b_perm[0:4]:
         #             s += " b"
-        #
+        # 
         #         if nj in best_2b_perm[4:]:
         #             s += " l"
         #         s += "\n"
@@ -615,7 +629,51 @@ class MEAnalyzer(FilterAnalyzer):
         else:
             return True
         #print "MEMINTEG", len(jets), len(leptons)
+        
+        matched_pairs = {}
+        
+        def match_jets_to_quarks(jetcoll, quarkcoll, label):
+            for ij, j in enumerate(jetcoll):
+                for iq, q in enumerate(quarkcoll):
+                    l1 = lvec(q)
+                    l2 = lvec(j)
+                    dr = l1.DeltaR(l2)
+                    if dr < 0.3:
+                        if matched_pairs.has_key(ij):
+                            if matched_pairs[ij][1] > dr:
+                                matched_pairs[ij] = (label, iq, dr)
+                        else:
+                            matched_pairs[ij] = (label, iq, dr)
+                            
+        match_jets_to_quarks(jets, event.GenWZQuark, "wq")
+        match_jets_to_quarks(jets, event.GenBQuarkFromTop, "tb")
+        match_jets_to_quarks(jets, event.GenBQuarkFromH, "hb")
+        
+        event.nMatch_wq = 0
+        event.nMatch_tb = 0
+        event.nMatch_hb = 0
+        event.nMatch_wq_btag = 0
+        event.nMatch_tb_btag = 0
+        event.nMatch_hb_btag = 0
+        
+        for ij, jet in enumerate(jets):
+            if not matched_pairs.has_key(ij):
+                continue
+            mlabel, midx, mdr = matched_pairs[ij]
+            if mlabel == "wq":
+                event.nMatch_wq += 1
+                if jet.btagFlag < 0.5:
+                    event.nMatch_wq_btag += 1
+            if mlabel == "tb":
+                event.nMatch_tb += 1
+                if jet.btagFlag >= 0.5:
+                    event.nMatch_tb_btag += 1
+            if mlabel == "hb":
+                event.nMatch_hb += 1
+                if jet.btagFlag >= 0.5:
+                    event.nMatch_hb_btag += 1
 
+            
         #One W quark missed, integrate over its direction
         if event.cat in ["cat2", "cat3"]:
             self.vars_to_integrate.push_back(MEM.PSVar.cos_qbar1)
@@ -627,7 +685,7 @@ class MEAnalyzer(FilterAnalyzer):
                 p4s=(jet.pt, jet.eta, jet.phi, jet.mass),
                 obsdict={MEM.Observable.BTAG: jet.btagFlag}
             )
-            print "MEM jet", jet.pt, jet.eta, jet.phi, jet.mass, jet.btagCSV, jet.btagFlag
+            #print "MEM jet", jet.pt, jet.eta, jet.phi, jet.mass, jet.btagCSV, jet.btagFlag
         for lep in leptons:
             self.add_obj(
                 MEM.ObjectType.Lepton,
@@ -647,11 +705,14 @@ class MEAnalyzer(FilterAnalyzer):
 
         res = {}
         for hypo in [MEM.Hypothesis.TTH, MEM.Hypothesis.TTBB]:
-            r = self.integrator.run(
-                fstate,
-                hypo,
-                self.vars_to_integrate
-            )
+            if self.conf.general["runME"]:
+                r = self.integrator.run(
+                    fstate,
+                    hypo,
+                    self.vars_to_integrate
+                )
+            else:
+                r = MEM.MEMOutput()
             #print self.integrator.result.p, self.integrator.result.p_err
             #print r.p, r.p_err
             res[hypo] = r

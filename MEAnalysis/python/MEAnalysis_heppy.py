@@ -243,9 +243,54 @@ treeProducer = cfg.Analyzer(
             help="Number of good jets passing CSVT"
         ),
         NTupleVariable(
-            "nBCSVL", lambda ev: ev.nBCSVT if hasattr(ev, "nBCSVL") else 0,
+            "nBCSVL", lambda ev: ev.nBCSVL if hasattr(ev, "nBCSVL") else 0,
             type=int,
             help="Number of good jets passing CSVL"
+        ),
+
+        NTupleVariable(
+            "nTrueBTaggedCSVM", lambda ev: ev.n_tagwp_tagged_true_bjets if hasattr(ev, "n_tagwp_tagged_true_bjets") else 0,
+            type=int,
+            help=""
+        ),
+
+        NTupleVariable(
+            "nTrueBTaggedLR", lambda ev: ev.n_lr_tagged_true_bjets if hasattr(ev, "n_lr_tagged_true_bjets") else 0,
+            type=int,
+            help=""
+        ),
+        
+        NTupleVariable(
+            "nMatch_wq", lambda ev: ev.nMatch_wq if hasattr(ev, "nMatch_wq") else 0,
+            type=int,
+            help=""
+        ),
+        NTupleVariable(
+            "nMatch_wq_btag", lambda ev: ev.nMatch_wq_btag if hasattr(ev, "nMatch_wq_btag") else 0,
+            type=int,
+            help=""
+        ),
+        
+        NTupleVariable(
+            "nMatch_tb", lambda ev: ev.nMatch_tb if hasattr(ev, "nMatch_tb") else 0,
+            type=int,
+            help=""
+        ),
+        NTupleVariable(
+            "nMatch_tb_btag", lambda ev: ev.nMatch_tb_btag if hasattr(ev, "nMatch_tb_btag") else 0,
+            type=int,
+            help=""
+        ),
+        
+        NTupleVariable(
+            "nMatch_hb", lambda ev: ev.nMatch_hb if hasattr(ev, "nMatch_hb") else 0,
+            type=int,
+            help=""
+        ),
+        NTupleVariable(
+            "nMatch_hb_btag", lambda ev: ev.nMatch_hb_btag if hasattr(ev, "nMatch_hb_btag") else 0,
+            type=int,
+            help=""
         ),
     ],
     #FIXME: fill these from the VHbb ntuples
@@ -309,7 +354,7 @@ if __name__ == "__main__":
     print "Running MEAnalysis heppy main loop"
 
     from PhysicsTools.HeppyCore.framework.looper import Looper
-    looper = Looper('Loop', config, nPrint = 0, nEvents = 10000)
+    looper = Looper('Loop', config, nPrint = 0, nEvents = 500)
 
     #execute the code
     looper.loop()
@@ -318,5 +363,5 @@ if __name__ == "__main__":
     looper.write()
 
     #print summaries
-    for analyzer in looper.analyzers:
-        print analyzer.name, "counters = {\n", analyzer.counters, "}"
+    # for analyzer in looper.analyzers:
+    #     print analyzer.name, "counters = {\n", analyzer.counters, "}"
