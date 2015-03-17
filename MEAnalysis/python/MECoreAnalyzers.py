@@ -363,8 +363,10 @@ class BTagLRAnalyzer(FilterAnalyzer):
         for i in range(len(event.good_jets)):
             event.good_jets[i].btagFlag = 0.0
 
-        for i in best_4b_perm[4:]:
+        #First 4 jets in the best permutation are counted as b-tagged
+        for i in best_4b_perm[0:4]:
             event.good_jets[i].btagFlag = 1.0
+            
         # print "N", len(event.good_jets), "uT", len(event.buntagged_jets), "uLR", len(event.buntagged_jets_by_LR_4b_2b)
         # print "lr={0:.6f}".format(event.btag_LR_4b_2b)
         # s = ""
@@ -434,8 +436,13 @@ class MECategoryAnalyzer(FilterAnalyzer):
 
 class WTagAnalyzer(FilterAnalyzer):
     """
-    Performs W-mass calculation
-    FIXME: doc
+    Performs W-mass calculation on pairs of untagged jets.
+    
+    Two cases are considered: jets untagged by the default b-tagging algo (Wmass)
+    and jets untagged by the b-tagging likelihood (Wmass2).
+    
+    Jets are considered untagged according to the b-tagging permutation which
+    gives the highest likelihood of the event being a 4b+Nlight event.
     """
     def __init__(self, cfg_ana, cfg_comp, looperName):
         self.conf = cfg_ana._conf
@@ -445,6 +452,9 @@ class WTagAnalyzer(FilterAnalyzer):
         super(WTagAnalyzer, self).beginLoop(setup)
 
     def pair_mass(self, j1, j2):
+        """
+        Calculates the invariant mass of a two-paritcle system.
+        """
         lv1, lv2 = [lvec(j) for j in [j1, j2]]
         tot = lv1 + lv2
         return tot.M()
@@ -533,15 +543,18 @@ class MEAnalyzer(FilterAnalyzer):
 
         #Create the ME integrator.
         #Arguments specify the verbosity
-        self.integrator = MEM.Integrand(1+2+4, MEM.MEMConfig())
+        self.integrator = MEM.Integrand(
+            MEM.init|MEM.init_more|MEM.event,
+            MEM.MEMConfig()
+        )
 
         self.permutations = CvectorPermutations()
 
         #Assume that only jets passing CSV>0.5 are b quarks
-        #self.permutations.push_back(MEM.Permutations.BTagged)
+        self.permutations.push_back(MEM.Permutations.BTagged)
 
         #Assume that only jets passing CSV<0.5 are l quarks
-        #self.permutations.push_back(MEM.Permutations.QUntagged)
+        self.permutations.push_back(MEM.Permutations.QUntagged)
 
         #Assume q-qbar symmetry
         self.permutations.push_back(MEM.Permutations.QQbarSymmetry)
@@ -595,6 +608,11 @@ class MEAnalyzer(FilterAnalyzer):
         jets = event.good_jets
         leptons = event.good_leptons
         met = event.input.met_pt
+        
+        if event.cat in self.conf.general["calcMECategories"] and event.btag_LR_4b_2b > 0.7:
+            print "MEM", event.cat, event.btag_LR_4b_2b, len(jets), len(leptons)
+        else:
+            return True
         #print "MEMINTEG", len(jets), len(leptons)
 
         #One W quark missed, integrate over its direction
@@ -608,6 +626,7 @@ class MEAnalyzer(FilterAnalyzer):
                 p4s=(jet.pt, jet.eta, jet.phi, jet.mass),
                 obsdict={MEM.Observable.BTAG: jet.btagFlag}
             )
+            print "MEM jet", jet.pt, jet.eta, jet.phi, jet.mass, jet.btagCSV, jet.btagFlag
         for lep in leptons:
             self.add_obj(
                 MEM.ObjectType.Lepton,
@@ -626,19 +645,28 @@ class MEAnalyzer(FilterAnalyzer):
             fstate = MEM.FinalState.LH
 
         res = {}
-        if event.cat in self.conf.general["calcMECategories"] and event.btag_LR_4b_2b > 0.7:
-            print "MEM", event.cat, event.btag_LR_4b_2b, len(event.good_jets), len(event.good_leptons)
-            for hypo in [MEM.Hypothesis.TTH, MEM.Hypothesis.TTBB]:
-                r = self.integrator.run(
-                    fstate,
-                    hypo,
-                    self.vars_to_integrate
-                )
-                #print self.integrator.result.p, self.integrator.result.p_err
-                #print r.p, r.p_err
-                res[hypo] = r.p
-            print "RES", res
-            event.p_hypo_tth = res[MEM.Hypothesis.TTH]
-            event.p_hypo_ttbb = res[MEM.Hypothesis.TTBB]
+        for hypo in [MEM.Hypothesis.TTH, MEM.Hypothesis.TTBB]:
+            r = self.integrator.run(
+                fstate,
+                hypo,
+                self.vars_to_integrate
+            )
+            #print self.integrator.result.p, self.integrator.result.p_err
+            #print r.p, r.p_err
+            res[hypo] = r
+        print "RES", {k:res[k].p for k in res.keys()}
+        event.p_hypo_tth = res[MEM.Hypothesis.TTH].p
+        event.p_hypo_ttbb = res[MEM.Hypothesis.TTBB].p
+        
+        event.p_err_hypo_tth = res[MEM.Hypothesis.TTH].p_err
+        event.p_err_hypo_ttbb = res[MEM.Hypothesis.TTBB].p_err
+
+        event.mem_chi2_hypo_tth = res[MEM.Hypothesis.TTH].chi2
+        event.mem_chi2_hypo_ttbb = res[MEM.Hypothesis.TTBB].chi2
+        
+        event.mem_time_hypo_tth = res[MEM.Hypothesis.TTH].time
+        event.mem_time_hypo_ttbb = res[MEM.Hypothesis.TTBB].time
+        
+        
         self.vars_to_integrate.clear()
         self.integrator.next_event()
