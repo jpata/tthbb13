@@ -215,27 +215,38 @@ void fill_fatjet_branches(const edm::Event& iEvent,
 			  // hard partons for matching
 			  const vector<const reco::Candidate*>  & hard_partons,
 			  // true higgs for matching
-			  const vector<const reco::Candidate*>  & gen_higgs
+			  const vector<const reco::Candidate*>  & gen_higgs,
+			  bool fj_usesubjets
 			  ){
   
-  // Get Fatjet iteself
+  // Get Fatjet iteself  
+  
   edm::Handle<CollectionType>  fatjets;
-  iEvent.getByLabel(fj_object_name, fatjets);
-	  
+  
+
+  
+  if (fj_usesubjets)
+    iEvent.getByLabel(fj_object_name, "SubJets", fatjets);
+  else
+    iEvent.getByLabel(fj_object_name, fatjets);
+
+
+
   // Handles to get the Nsubjettiness
   edm::Handle<edm::ValueMap<float> > fatjet_nsub_tau1;
-  iEvent.getByLabel(fj_nsubs_name, "tau1", fatjet_nsub_tau1);
-
   edm::Handle<edm::ValueMap<float> > fatjet_nsub_tau2;
-  iEvent.getByLabel(fj_nsubs_name, "tau2", fatjet_nsub_tau2);
-	  
   edm::Handle<edm::ValueMap<float> > fatjet_nsub_tau3;
-  iEvent.getByLabel(fj_nsubs_name, "tau3", fatjet_nsub_tau3);
+  if (fj_nsubs_name != "None"){
+    iEvent.getByLabel(fj_nsubs_name, "tau1", fatjet_nsub_tau1);
+    iEvent.getByLabel(fj_nsubs_name, "tau2", fatjet_nsub_tau2);
+    iEvent.getByLabel(fj_nsubs_name, "tau3", fatjet_nsub_tau3);
 
-  // Make sure the fatjets and nsujettiness containers have same size
-  assert(fatjets->size()==fatjet_nsub_tau1->size());
-  assert(fatjets->size()==fatjet_nsub_tau2->size());
-  assert(fatjets->size()==fatjet_nsub_tau3->size());
+    // Make sure the fatjets and nsujettiness containers have same size
+    assert(fatjets->size()==fatjet_nsub_tau1->size());
+    assert(fatjets->size()==fatjet_nsub_tau2->size());
+    assert(fatjets->size()==fatjet_nsub_tau3->size());  
+  }
+
 
   // Handle to get the Shower Deconstruction info
   edm::Handle<edm::ValueMap<double> > fatjet_sd_chi;
@@ -273,9 +284,11 @@ void fill_fatjet_branches(const edm::Event& iEvent,
     tthtree->get_address<float *>(prefix + "mass")[n_fat_jet] = x.mass();
 
     // NSubjettiness
-    tthtree->get_address<float *>(prefix + "tau1")[n_fat_jet] = fatjet_nsub_tau1->get(n_fat_jet);
-    tthtree->get_address<float *>(prefix + "tau2")[n_fat_jet] = fatjet_nsub_tau2->get(n_fat_jet);
-    tthtree->get_address<float *>(prefix + "tau3")[n_fat_jet] = fatjet_nsub_tau3->get(n_fat_jet);
+    if (fj_nsubs_name != "None"){
+      tthtree->get_address<float *>(prefix + "tau1")[n_fat_jet] = fatjet_nsub_tau1->get(n_fat_jet);
+      tthtree->get_address<float *>(prefix + "tau2")[n_fat_jet] = fatjet_nsub_tau2->get(n_fat_jet);
+      tthtree->get_address<float *>(prefix + "tau3")[n_fat_jet] = fatjet_nsub_tau3->get(n_fat_jet);
+    }     
 
     // Shower Deconstruction
     if (fj_sds_name != "None"){
@@ -284,8 +297,9 @@ void fill_fatjet_branches(const edm::Event& iEvent,
     }
 
     // B-tag
-    if (fj_btags_name != "None")
+    if (fj_btags_name != "None"){
       tthtree->get_address<float *>(prefix + "btag")[n_fat_jet] = (*btagDiscriminators)[n_fat_jet].second;
+    }
 
     // Q-jet volatility
     if (fj_qvols_name != "None")
@@ -429,7 +443,7 @@ private:
         // btags = name of the btagger processes (or None) 
         // qvols = name of the QJet volatility processes (or None) 
         // fatjet branches = name of the branches to put this in
-        // isbasicjets = data type of the fat jet (BasicJet or PFJet)
+        // usesubjets = either use that jet object or the "SubJets" field
         // !!the lists have to be in sync!!
 	const std::vector<std::string> fatjet_objects_;
 	const std::vector<std::string> fatjet_nsubs_;
@@ -437,7 +451,7 @@ private:
 	const std::vector<std::string> fatjet_btags_;
 	const std::vector<std::string> fatjet_qvols_;
 	const std::vector<std::string> fatjet_branches_;
-	const std::vector<int> fatjet_isbasicjets_;
+	const std::vector<int> fatjet_usesubjets_;
 
         // HEPTopTagger information
         // objects = name of the input collection
@@ -520,7 +534,7 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
         fatjet_btags_(iConfig.getParameter<std::vector<std::string>>("fatjetsBtags")),
         fatjet_qvols_(iConfig.getParameter<std::vector<std::string>>("fatjetsQvols")),
         fatjet_branches_(iConfig.getParameter<std::vector<std::string>>("fatjetsBranches")),
-        fatjet_isbasicjets_(iConfig.getParameter<std::vector<int>>("fatjetsIsBasicJets")),
+        fatjet_usesubjets_(iConfig.getParameter<std::vector<int>>("fatjetsUsesubjets")),
 
         htt_objects_(iConfig.getParameter<std::vector<std::string>>("httObjects")),
         htt_branches_(iConfig.getParameter<std::vector<std::string>>("httBranches")),
@@ -642,7 +656,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	assert(fatjet_objects_.size()==fatjet_btags_.size());
 	assert(fatjet_objects_.size()==fatjet_qvols_.size());
 	assert(fatjet_objects_.size()==fatjet_branches_.size());
-	assert(fatjet_objects_.size()==fatjet_isbasicjets_.size());
+	assert(fatjet_objects_.size()==fatjet_usesubjets_.size());
 
 	// Sanity check the htt lists-of-names
 	assert(htt_objects_.size()==htt_branches_.size());
@@ -1749,42 +1763,22 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	  std::string fj_btags_name	  = fatjet_btags_[i_fj_coll];
 	  std::string fj_qvols_name	  = fatjet_qvols_[i_fj_coll];
 	  std::string fj_branches_name    = fatjet_branches_[i_fj_coll];
-	  int fj_isbasicjets              = fatjet_isbasicjets_[i_fj_coll];
+	  int fj_usesubjets              = fatjet_usesubjets_[i_fj_coll];
 	  
-	  // Fill PFJets
-	  if (fj_isbasicjets==0){
-	    fill_fatjet_branches<reco::PFJet, reco::PFJetCollection>(iEvent, 
-								     tthtree, 
-								     fj_object_name,
-								     fj_nsubs_name,
-								     fj_sds_name,
-								     fj_btags_name,
-								     fj_qvols_name,
-								     fj_branches_name,
-								     hadronic_ts,
-								     hard_partons,
-								     gen_higgs
-								     );
-	  }
-	  // Fill BasicJets
-	  else if (fj_isbasicjets==1){
-	    fill_fatjet_branches<reco::BasicJet, reco::BasicJetCollection>(iEvent, 
-									   tthtree, 
-									   fj_object_name,
-									   fj_nsubs_name,
-									   fj_sds_name,
-									   fj_btags_name,
-									   fj_qvols_name,
-									   fj_branches_name,
-									   hadronic_ts,
-									   hard_partons,
-									   gen_higgs
-									   );
-	  }
-	  else{
-	    edm::LogError("FJ") << "Invalid value for fj_isbasicjets (can be 0 or 1)" << fj_isbasicjets;
-	    throw std::exception();
-	  }
+
+	  fill_fatjet_branches<reco::PFJet, reco::PFJetCollection>(iEvent, 
+								   tthtree, 
+								   fj_object_name,
+								   fj_nsubs_name,
+								   fj_sds_name,
+								   fj_btags_name,
+								   fj_qvols_name,
+								   fj_branches_name,
+								   hadronic_ts,
+								   hard_partons,
+								   gen_higgs,
+								   fj_usesubjets
+								   );
 	 
 	} // End of loop over fatjet collections
 	// Done filling the fatjet information

@@ -170,6 +170,23 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
 
    ungroomed_fj = getattr(process, ungroomed_fj_name)
 
+   name = "trimmedr2f6forbtag"   
+   fj_name = ungroomed_fj_name + name
+   branch_name = ungroomed_branch_name + name
+   setattr(process, fj_name, ungroomed_fj.clone(
+      useTrimming = cms.bool(True),
+      rFilt = cms.double(0.2),
+      trimPtFracMin = cms.double(0.06),
+      useExplicitGhosts = cms.bool(True),
+      writeCompound = cms.bool(True),
+      jetCollInstanceName=cms.string("SubJets"),
+   ))
+   li_fatjets_objects.append(fj_name)        
+   li_fatjets_branches.append(branch_name)
+
+
+
+
    name = "trimmedr2f3"   
    fj_name = ungroomed_fj_name + name
    branch_name = ungroomed_branch_name + name
@@ -311,24 +328,28 @@ def GetRadiusStringFromName(name):
 li_fatjets_nsubs = []
 for fj_name in li_fatjets_objects:
 
-   nsub_name = fj_name + "Njettiness"
-        
-   r = GetRadiusFromName(fj_name)
+   if "forbtag" in fj_name:
+      li_fatjets_nsubs.append("None")
 
-   setattr(process, nsub_name, cms.EDProducer("NjettinessAdder",
-                                              src=cms.InputTag(fj_name),
-                                              Njets=cms.vuint32(1,2,3),          # compute 1-, 2-, 3- subjettiness
-                                              # variables for measure definition : 
-                                              measureDefinition = cms.uint32( 0 ), # CMS default is normalized measure
-                                              beta = cms.double(1.0),              # CMS default is 1
-                                              R0 = cms.double(r),              # CMS default is jet cone size
-                                              Rcutoff = cms.double( -999.0),       # not used by default
-                                              # variables for axes definition :
-                                              axesDefinition = cms.uint32( 6 ),    # CMS default is 1-pass KT axes
-                                              nPass = cms.int32(-999),             # not used by default
-                                              akAxesR0 = cms.double(-999.0)        # not used by default
-                                      ))
-   li_fatjets_nsubs.append(nsub_name)
+   else:
+      nsub_name = fj_name + "Njettiness"
+
+      r = GetRadiusFromName(fj_name)
+
+      setattr(process, nsub_name, cms.EDProducer("NjettinessAdder",
+                                                 src=cms.InputTag(fj_name),
+                                                 Njets=cms.vuint32(1,2,3),          # compute 1-, 2-, 3- subjettiness
+                                                 # variables for measure definition : 
+                                                 measureDefinition = cms.uint32( 0 ), # CMS default is normalized measure
+                                                 beta = cms.double(1.0),              # CMS default is 1
+                                                 R0 = cms.double(r),              # CMS default is jet cone size
+                                                 Rcutoff = cms.double( -999.0),       # not used by default
+                                                 # variables for axes definition :
+                                                 axesDefinition = cms.uint32( 6 ),    # CMS default is 1-pass KT axes
+                                                 nPass = cms.int32(-999),             # not used by default
+                                                 akAxesR0 = cms.double(-999.0)        # not used by default
+                                         ))
+      li_fatjets_nsubs.append(nsub_name)
 
 
 #####################################
@@ -407,76 +428,72 @@ for i_fj, fj_name in enumerate(li_fatjets_objects):
 
 # Add b-tagging information for all fatjets
 process.my_btagging = cms.Sequence()
-li_fatjets_btags = ["None"] * len(li_fatjets_objects)
+li_fatjets_btags = []
 
 
-#for fatjet_name in li_fatjets_objects:
-#
-#        # Define the names
-#        impact_info_name          = fatjet_name + "ImpactParameterTagInfos"
-#        sv_tag_info_name          = fatjet_name + "SecondaryVertexTagInfos"
-#        isv_info_name             = fatjet_name + "pfInclusiveSecondaryVertexFinderTagInfos"        
-#        csvv2_computer_name       = fatjet_name + "combinedSecondaryVertexV2Computer"
-#        csvv2ivf_name             = fatjet_name + "pfCombinedInclusiveSecondaryVertexV2BJetTags"        
-#
-#        delta_r = GetRadiusFromName(fatjet_name)
-#
-#        # Setup the modules
-#        setattr(process, 
-#                impact_info_name, 
-#                process.pfImpactParameterTagInfos.clone(
-#                        primaryVertex = cms.InputTag("offlineSlimmedPrimaryVertices"),
-#                        candidates = cms.InputTag("packedPFCandidates"),
-#                        jets = cms.InputTag(fatjet_name),
-#                        maxDeltaR= cms.double(delta_r)
-#                ))
-#
-#
-#        setattr(process,
-#                sv_tag_info_name, 
-#                process.pfSecondaryVertexTagInfos.clone(                
-#                        trackIPTagInfos = cms.InputTag(impact_info_name),                        
-#                ))
-#        getattr(process, sv_tag_info_name).trackSelection.jetDeltaRMax = cms.double(delta_r)
-#        getattr(process, sv_tag_info_name).vertexCuts.maxDeltaRToJetAxis = cms.double(delta_r)
-#
-#
-#        setattr(process,
-#                isv_info_name,                
-#                process.pfInclusiveSecondaryVertexFinderTagInfos.clone(
-#                        extSVCollection               = cms.InputTag('slimmedSecondaryVertices'),
-#                        trackIPTagInfos               = cms.InputTag(impact_info_name),
-#                        extSVDeltaRToJet              = cms.double(delta_r)
-#                ))
-#        getattr(process, isv_info_name).vertexCuts.maxDeltaRToJetAxis = cms.double(delta_r)
-#        
-#
-#        setattr(process,
-#                csvv2_computer_name,
-#                process.candidateCombinedSecondaryVertexV2Computer.clone())
-#        getattr(process, csvv2_computer_name).trackSelection.jetDeltaRMax       = cms.double(delta_r) 
-#        getattr(process, csvv2_computer_name).trackPseudoSelection.jetDeltaRMax = cms.double(delta_r) 
-#        
-#        setattr(process,
-#                csvv2ivf_name,
-#                process.pfCombinedInclusiveSecondaryVertexV2BJetTags.clone(
-#                        tagInfos = cms.VInputTag(cms.InputTag(impact_info_name),
-#                                                 cms.InputTag(isv_info_name)),
-#                        jetTagComputer = cms.string(csvv2_computer_name,)
-#                ))
-#
-#        # Add modules to sequence
-#        for module_name in [impact_info_name,
-#                            sv_tag_info_name,         
-#                            isv_info_name,              
-#                            csvv2ivf_name]:              
-#                process.my_btagging += getattr(process, module_name)
-#
-#        # remember the module that actually produces the b-tag
-#        # discriminator so we can pass it to the NTupelizer
-#        li_fatjets_btags.append(csvv2ivf_name)
-#
-## end of loop over fatjets
+for fatjet_name in li_fatjets_objects:
+
+   if "trimmedr2f6forbtag" in fatjet_name:
+
+      # Define the names
+      impact_info_name          = fatjet_name + "ImpactParameterTagInfos"
+      isv_info_name             = fatjet_name + "pfInclusiveSecondaryVertexFinderTagInfos"        
+      csvv2_computer_name       = fatjet_name + "combinedSecondaryVertexV2Computer"
+      csvv2ivf_name             = fatjet_name + "pfCombinedInclusiveSecondaryVertexV2BJetTags"        
+
+      delta_r = GetRadiusFromName(fatjet_name)
+
+      # Setup the modules
+      setattr(process, 
+              impact_info_name, 
+              process.pfImpactParameterTagInfos.clone(
+                 primaryVertex = cms.InputTag("offlineSlimmedPrimaryVertices"),
+                 candidates = cms.InputTag("packedPFCandidates"),
+                 jets = cms.InputTag(fatjet_name, "SubJets"),
+              ))
+      getattr(process, impact_info_name).explicitJTA = cms.bool(True)
+      
+      setattr(process,
+              isv_info_name,                
+              process.pfInclusiveSecondaryVertexFinderTagInfos.clone(
+                 extSVCollection               = cms.InputTag('slimmedSecondaryVertices'),
+                 trackIPTagInfos               = cms.InputTag(impact_info_name),                
+              ))
+      getattr(process, isv_info_name).useSVClustering = cms.bool(True)
+      getattr(process, isv_info_name).jetAlgorithm = cms.string("CambridgeAachen")
+      getattr(process, isv_info_name).rParam = cms.double(delta_r)
+      getattr(process, isv_info_name).fatJets  =  cms.InputTag(fatjet_name.replace("trimmedr2f6forbtag",""))
+      getattr(process, isv_info_name).groomedFatJets  =  cms.InputTag(fatjet_name)
+
+      setattr(process,
+              csvv2_computer_name,
+              process.candidateCombinedSecondaryVertexV2Computer.clone())
+      
+      setattr(process,
+              csvv2ivf_name,
+              process.pfCombinedInclusiveSecondaryVertexV2BJetTags.clone(
+                 tagInfos = cms.VInputTag(cms.InputTag(impact_info_name),
+                                          cms.InputTag(isv_info_name)),
+                 jetTagComputer = cms.string(csvv2_computer_name,)
+              ))
+      
+      # Add modules to sequence
+      for module_name in [impact_info_name,
+                          isv_info_name,              
+                          csvv2ivf_name]:              
+         process.my_btagging += getattr(process, module_name)
+         
+      # remember the module that actually produces the b-tag
+      # discriminator so we can pass it to the NTupelizer
+      li_fatjets_btags.append(csvv2ivf_name)
+         
+   else:
+      li_fatjets_btags.append("None")
+
+
+# end of loop over fatjets
+
+print len(li_fatjets_objects), len(li_fatjets_btags)
 
 
 #####################################
@@ -708,7 +725,13 @@ for input_object in ["chs", "puppi"]:
 # NTupelizer
 #####################################
 
-li_fatjets_is_basic_jets = [0] * len(li_fatjets_objects)
+li_fatjets_use_subjets = []
+for fj in li_fatjets_objects:
+   if "trimmedr2f6forbtag" in fj:
+      li_fatjets_use_subjets.append(1)
+   else:
+      li_fatjets_use_subjets.append(0)
+
 
 process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
 	isMC = cms.bool(True),
@@ -733,7 +756,7 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
         fatjetsBtags    = cms.vstring(li_fatjets_btags),
         fatjetsQvols    = cms.vstring(li_fatjets_qvols),
         fatjetsBranches = cms.vstring(li_fatjets_branches),
-        fatjetsIsBasicJets = cms.vint32(li_fatjets_is_basic_jets),                                           
+        fatjetsUsesubjets = cms.vint32(li_fatjets_use_subjets),                                           
 
         httObjects  = cms.vstring(li_htt_branches), # Using branch names also as object names
         httBranches = cms.vstring(li_htt_branches),                                           

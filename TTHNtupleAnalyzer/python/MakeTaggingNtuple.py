@@ -83,7 +83,7 @@ else:
 # Determine particle species
 # Tier3
 if socket.gethostname() == "t3ui12":
-    particle_name = "higgs"
+    particle_name = "hadtop"
 # Grid
 else:
     import PSet
@@ -121,6 +121,8 @@ fj_branches = ["pt", "mass", "tau1", "tau2", "tau3"]
 # (to expensive to calc for everything)
 fj_branches_plus = fj_branches + ["chi", "qvol", "nmj"]
 
+fj_branches_btag = fj_branches + ["btag"]
+
 htt_branches = ["pt", "mass", "fW", "Rmin", "RminExpected", "prunedMass", "ptFiltForRminExp"]
 cmstt_branches = ["pt", "mass", "minMass", "wMass", "topMass", "nSubJets"]
 
@@ -153,7 +155,7 @@ print li_fatjets
 objects = {}
 for fj in li_fatjets:
     objects[fj] = fj_branches
-
+    
 # HEPTopTagger
 for htt in li_htt_branches:
     objects[htt]                = htt_branches
@@ -166,6 +168,11 @@ for x in ["ca08", "ca15", "ca08puppi", "ca15puppi"]:
 for x in ["ca08cmstt", "ca15cmstt", "ca08puppicmstt", "ca15puppicmstt"]:
     if x in objects.keys():
         objects[x] = cmstt_branches
+
+# Subjet b-tagging
+for k,v in objects.iteritems():
+    if "forbtag" in k:
+        objects[k] = fj_branches_btag
 
 
 
@@ -319,9 +326,10 @@ for i_event in range(n_entries):
             top_size = -1
         variables["top_size"][0] = top_size
             
-
         # Fill fatjets and taggers
         for object_name, branch_names in objects.iteritems():    
+
+            print object_name
 
             # First we two branches for the tagger/jet 
             #  - how far the closest true object was
