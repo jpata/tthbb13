@@ -15,13 +15,13 @@ import TTH.TTHNtupleAnalyzer.CrabHelpers as CH
 
 # Ntuple name/version and samples to include
 name = "ntop"
-version = "v36"
+version = "v37"
 li_samples = [
-    "qcd_170_300_pythia8_13tev",
-    "qcd_300_470_pythia8_13tev",
-    "qcd_470_600_pythia8_13tev",
-    "qcd_600_800_pythia8_13tev",    
-    "qcd_800_1000_pythia8_13tev",    
+#    "qcd_170_300_pythia8_13tev",
+#    "qcd_300_470_pythia8_13tev",
+#    "qcd_470_600_pythia8_13tev",
+#    "qcd_600_800_pythia8_13tev",    
+#    "qcd_800_1000_pythia8_13tev",    
 
     #"zprime_m500_1p_13tev",
 #    "zprime_m750_1p_13tev",
@@ -32,10 +32,10 @@ li_samples = [
     #"zprime_m3000_1p_13tev", 
     #"zprime_m4000_1p_13tev",
 
-#    "zprime_m1000_1p_13tev_phys14_20bx25",
+    "zprime_m1000_1p_13tev_phys14_20bx25",
 #    "zprime_m2000_1p_13tev_phys14_20bx25",
 
-#    "qcd_300_470_pythia8_13tev_phys14_20bx25",
+    "qcd_300_470_pythia8_13tev_phys14_20bx25",
 #    "qcd_470_600_pythia8_13tev_phys14_20bx25",
 #    "qcd_600_800_pythia8_13tev_phys14_20bx25",    
 #    "qcd_800_1000_pythia8_13tev_phys14_20bx25",    
