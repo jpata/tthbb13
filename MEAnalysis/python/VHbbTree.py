@@ -454,33 +454,46 @@ class GenBQuarkFromTop:
     def make_array(event):
         return [GenBQuarkFromTop(event.input, i) for i in range(event.input.nGenBQuarkFromTop)]
 
+class GenNuFromTop:
+    def __init__(self, tree, n):
+        self.pdgId = tree.GenNuFromTop_pdgId[n];
+        self.pt = tree.GenNuFromTop_pt[n];
+        self.eta = tree.GenNuFromTop_eta[n];
+        self.phi = tree.GenNuFromTop_phi[n];
+        self.mass = tree.GenNuFromTop_mass[n];
+        self.charge = tree.GenNuFromTop_charge[n];
+        self.status = tree.GenNuFromTop_status[n];
+    @staticmethod
+    def make_array(event):
+        return [GenNuFromTop(event.input, i) for i in range(event.input.nGenNuFromTop)]
 from PhysicsTools.HeppyCore.framework.analyzer import Analyzer
 class EventAnalyzer(Analyzer):
     def __init__(self, cfg_ana, cfg_comp, looperName):
         super(EventAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
     def process(self, event):
-        event.GenBQuarkFromHafterISR = GenBQuarkFromHafterISR.make_array(event)
-        event.hJidx_sortcsv = hJidx_sortcsv.make_array(event)
-        event.aJCidx = aJCidx.make_array(event)
-        event.GenLepFromTop = GenLepFromTop.make_array(event)
-        event.GenVbosons = GenVbosons.make_array(event)
-        event.GenJet = GenJet.make_array(event)
-        event.GenHiggsBoson = GenHiggsBoson.make_array(event)
+        #event.GenBQuarkFromHafterISR = GenBQuarkFromHafterISR.make_array(event)
+        #event.hJidx_sortcsv = hJidx_sortcsv.make_array(event)
+        #event.aJCidx = aJCidx.make_array(event)
+        #event.GenLepFromTop = GenLepFromTop.make_array(event)
+        #event.GenVbosons = GenVbosons.make_array(event)
+        #event.GenJet = GenJet.make_array(event)
+        #event.GenHiggsBoson = GenHiggsBoson.make_array(event)
         event.GenBQuarkFromH = GenBQuarkFromH.make_array(event)
-        event.hJCidx = hJCidx.make_array(event)
-        event.GenTop = GenTop.make_array(event)
-        event.aJidx = aJidx.make_array(event)
-        event.hJets = hJets.make_array(event)
-        event.GenLepFromTau = GenLepFromTau.make_array(event)
-        event.aLeptons = aLeptons.make_array(event)
-        event.aJets = aJets.make_array(event)
+        #event.hJCidx = hJCidx.make_array(event)
+        #event.GenTop = GenTop.make_array(event)
+        #event.aJidx = aJidx.make_array(event)
+        #event.hJets = hJets.make_array(event)
+        #event.GenLepFromTau = GenLepFromTau.make_array(event)
+        #event.aLeptons = aLeptons.make_array(event)
+        #event.aJets = aJets.make_array(event)
         event.selLeptons = selLeptons.make_array(event)
-        event.hJ3Cidx = hJ3Cidx.make_array(event)
-        event.hJidx = hJidx.make_array(event)
-        event.TauGood = TauGood.make_array(event)
-        event.GenLep = GenLep.make_array(event)
+        #event.hJ3Cidx = hJ3Cidx.make_array(event)
+        #event.hJidx = hJidx.make_array(event)
+        #event.TauGood = TauGood.make_array(event)
+        #event.GenLep = GenLep.make_array(event)
         event.Jet = Jet.make_array(event)
-        event.vLeptons = vLeptons.make_array(event)
-        event.aJ3Cidx = aJ3Cidx.make_array(event)
+        #event.vLeptons = vLeptons.make_array(event)
+        #event.aJ3Cidx = aJ3Cidx.make_array(event)
         event.GenWZQuark = GenWZQuark.make_array(event)
         event.GenBQuarkFromTop = GenBQuarkFromTop.make_array(event)
+        event.GenNuFromTop = GenNuFromTop.make_array(event)

@@ -199,12 +199,10 @@ class JetAnalyzer(FilterAnalyzer):
             setattr(event, "nB"+btag_wp_name, len(event.btagged_jets[btag_wp_name]))
         event.buntagged_jets = event.buntagged_jets[self.conf.jets["btagWP"]]
         event.btagged_jets = event.btagged_jets[self.conf.jets["btagWP"]]
-        
         event.n_tagwp_tagged_true_bjets = 0
         for j in event.btagged_jets:
             if abs(j.mcFlavour) == 5:
                 event.n_tagwp_tagged_true_bjets += 1
-        
         passes = len(event.good_jets) >= 4
         if passes:
             self.counters["processing"].inc("passes")
@@ -326,7 +324,7 @@ class BTagLRAnalyzer(FilterAnalyzer):
             key=lambda x: getattr(x, self.bTagAlgo),
             reverse=True,
         )[0:6]
-        
+
         jet_probs = {
             kind: [
                 self.evaluate_jet_prob(j.pt, j.eta, getattr(j, self.bTagAlgo), kind)
@@ -337,10 +335,10 @@ class BTagLRAnalyzer(FilterAnalyzer):
             "new_pt_eta_bin_3d"
             ]
         }
-        
+
         # for nj, j in enumerate(jets_for_btag_lr):
         #     print j.btagCSV, j.mcFlavour, jet_probs["old"][nj], jet_probs["new_eta_1bin"][nj], jet_probs["new_pt_eta_bin_3d"][nj]
-        #     
+        #
         jet_csvs = [
             getattr(j, self.bTagAlgo)
             for j in event.good_jets
@@ -380,23 +378,6 @@ class BTagLRAnalyzer(FilterAnalyzer):
             event.good_jets[idx].btagFlag = 1.0
             if abs(event.good_jets[idx].mcFlavour) == 5:
                 event.n_lr_tagged_true_bjets += 1
-        
-        # print "N", len(event.good_jets), "uT", len(event.buntagged_jets), "uLR", len(event.buntagged_jets_by_LR_4b_2b)
-        # print "lr={0:.6f}".format(event.btag_LR_4b_2b)
-        # s = ""
-        # 
-        # if len(event.good_jets)>=5:
-        #     for (nj, j) in enumerate(event.good_jets):
-        #         s += "j {0:.4f} {1}".format(getattr(j, self.bTagAlgo), j.mcFlavour)
-        # 
-        #         if nj in best_2b_perm[0:4]:
-        #             s += " b"
-        # 
-        #         if nj in best_2b_perm[4:]:
-        #             s += " l"
-        #         s += "\n"
-        #     s = s[:-1]
-        #     print s
 
         passes = True
         if passes:
@@ -539,6 +520,30 @@ class GenRadiationModeAnalyzer(FilterAnalyzer):
             self.counters["processing"].inc("passes")
         return passes
 
+
+class GenTTHAnalyzer(FilterAnalyzer):
+    """
+    """
+    def __init__(self, cfg_ana, cfg_comp, looperName):
+        self.conf = cfg_ana._conf
+        super(GenTTHAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
+
+    def beginLoop(self, setup):
+        super(GenTTHAnalyzer, self).beginLoop(setup)
+
+    def process(self, event):
+        self.counters["processing"].inc("processed")
+
+        l_quarks_w = event.GenWZQuark
+        b_quarks_t = event.GenBQuarkFromTop
+        b_quarks_h = event.GenBQuarkFromH
+        lep_top = event.GenLepFromTop
+        nu_top = event.GenNuFromTop
+        passes = True
+        if passes:
+            self.counters["processing"].inc("passes")
+        return passes
+
 class MEAnalyzer(FilterAnalyzer):
     """
     Performs ME calculation using external integrator
@@ -558,8 +563,8 @@ class MEAnalyzer(FilterAnalyzer):
         #Create the ME integrator.
         #Arguments specify the verbosity
         self.integrator = MEM.Integrand(
-            0,
-            #MEM.init|MEM.init_more|MEM.event,
+            #0,
+            MEM.init|MEM.init_more|MEM.event,
             MEM.MEMConfig()
         )
 
@@ -622,16 +627,17 @@ class MEAnalyzer(FilterAnalyzer):
 
         jets = event.good_jets
         leptons = event.good_leptons
-        met = event.input.met_pt
+        met_pt = event.input.met_pt
+        met_phi = event.input.met_phi
 
         if event.cat in self.conf.general["calcMECategories"] and event.btag_LR_4b_2b > 0.7:
             print "MEM", event.cat, event.btag_LR_4b_2b, len(jets), len(leptons)
         else:
             return True
         #print "MEMINTEG", len(jets), len(leptons)
-        
+
         matched_pairs = {}
-        
+
         def match_jets_to_quarks(jetcoll, quarkcoll, label):
             for ij, j in enumerate(jetcoll):
                 for iq, q in enumerate(quarkcoll):
@@ -644,18 +650,18 @@ class MEAnalyzer(FilterAnalyzer):
                                 matched_pairs[ij] = (label, iq, dr)
                         else:
                             matched_pairs[ij] = (label, iq, dr)
-                            
+
         match_jets_to_quarks(jets, event.GenWZQuark, "wq")
         match_jets_to_quarks(jets, event.GenBQuarkFromTop, "tb")
         match_jets_to_quarks(jets, event.GenBQuarkFromH, "hb")
-        
+
         event.nMatch_wq = 0
         event.nMatch_tb = 0
         event.nMatch_hb = 0
         event.nMatch_wq_btag = 0
         event.nMatch_tb_btag = 0
         event.nMatch_hb_btag = 0
-        
+
         for ij, jet in enumerate(jets):
             if not matched_pairs.has_key(ij):
                 continue
@@ -673,11 +679,54 @@ class MEAnalyzer(FilterAnalyzer):
                 if jet.btagFlag >= 0.5:
                     event.nMatch_hb_btag += 1
 
-            
+
         #One W quark missed, integrate over its direction
         if event.cat in ["cat2", "cat3"]:
             self.vars_to_integrate.push_back(MEM.PSVar.cos_qbar1)
             self.vars_to_integrate.push_back(MEM.PSVar.phi_qbar1)
+
+        matched_pairs = {}
+
+        def match_jets_to_quarks(jetcoll, quarkcoll, label):
+            for ij, j in enumerate(jetcoll):
+                for iq, q in enumerate(quarkcoll):
+                    l1 = lvec(q)
+                    l2 = lvec(j)
+                    dr = l1.DeltaR(l2)
+                    if dr < 0.3:
+                        if matched_pairs.has_key(ij):
+                            if matched_pairs[ij][1] > dr:
+                                matched_pairs[ij] = (label, iq, dr)
+                        else:
+                            matched_pairs[ij] = (label, iq, dr)
+
+        match_jets_to_quarks(jets, event.GenWZQuark, "wq")
+        match_jets_to_quarks(jets, event.GenBQuarkFromTop, "tb")
+        match_jets_to_quarks(jets, event.GenBQuarkFromH, "hb")
+
+        event.nMatch_wq = 0
+        event.nMatch_tb = 0
+        event.nMatch_hb = 0
+        event.nMatch_wq_btag = 0
+        event.nMatch_tb_btag = 0
+        event.nMatch_hb_btag = 0
+
+        for ij, jet in enumerate(jets):
+            if not matched_pairs.has_key(ij):
+                continue
+            mlabel, midx, mdr = matched_pairs[ij]
+            if mlabel == "wq":
+                event.nMatch_wq += 1
+                if jet.btagFlag < 0.5:
+                    event.nMatch_wq_btag += 1
+            if mlabel == "tb":
+                event.nMatch_tb += 1
+                if jet.btagFlag >= 0.5:
+                    event.nMatch_tb_btag += 1
+            if mlabel == "hb":
+                event.nMatch_hb += 1
+                if jet.btagFlag >= 0.5:
+                    event.nMatch_hb_btag += 1
 
         for jet in jets:
             self.add_obj(
@@ -694,7 +743,7 @@ class MEAnalyzer(FilterAnalyzer):
             )
         self.add_obj(
             MEM.ObjectType.MET,
-            p4s=(met, 0, 0, met),
+            p4s=(met_pt, 0, met_phi, met_pt),
         )
 
         fstate = MEM.FinalState.TTH
@@ -711,11 +760,17 @@ class MEAnalyzer(FilterAnalyzer):
                     hypo,
                     self.vars_to_integrate
                 )
+                res[hypo] = r
             else:
                 r = MEM.MEMOutput()
-            #print self.integrator.result.p, self.integrator.result.p_err
-            #print r.p, r.p_err
             res[hypo] = r
+        if res[MEM.Hypothesis.TTH].p <= 0:
+            print "MEM BADPROB"
+            for jet in jets:
+                print "MEM jet", jet.pt, jet.eta, jet.phi, jet.mass, jet.btagCSV, jet.btagFlag
+            for lep in leptons:
+                print "MEM lep", lep.pt, lep.eta, lep.phi, lep.mass, lep.charge
+            print "MEM met", met_pt, met_phi
         print "RES", {k:res[k].p for k in res.keys()}
         event.p_hypo_tth = res[MEM.Hypothesis.TTH].p
         event.p_hypo_ttbb = res[MEM.Hypothesis.TTBB].p
@@ -728,7 +783,6 @@ class MEAnalyzer(FilterAnalyzer):
 
         event.mem_time_hypo_tth = res[MEM.Hypothesis.TTH].time
         event.mem_time_hypo_ttbb = res[MEM.Hypothesis.TTBB].time
-
 
         self.vars_to_integrate.clear()
         self.integrator.next_event()

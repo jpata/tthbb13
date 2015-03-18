@@ -15,7 +15,7 @@ args = parser.parse_args()
 
 jobs = ["confs/sig.conf", "confs/bkg.conf"]
 #gc = "/shome/jpata/grid-control/GC"
-gc = "/home/joosep/local-sl6/grid-control/GC"
+gc = "grid-control/GC"
 
 if args.action == "status":
     for job in jobs:
