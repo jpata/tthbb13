@@ -329,8 +329,6 @@ for i_event in range(n_entries):
         # Fill fatjets and taggers
         for object_name, branch_names in objects.iteritems():    
 
-            print object_name
-
             # First we two branches for the tagger/jet 
             #  - how far the closest true object was
             #  - and what true_index (i) it had in the list of true objects
@@ -342,26 +340,62 @@ for i_event in range(n_entries):
             # the true_index of is only used to filter out jets that are matched to other tops!            
             i_branch = AH.getter(intree, full_i_branch_name)
             dr_branch = AH.getter(intree, full_dr_branch_name)
-            dr_and_pos = [(dr,pos) for i,dr,pos in zip(i_branch, dr_branch, range(len(i_branch))) if i==i_particle]
 
-            # Apply the Delta R cut
-            dr_and_pos = [(dr,pos) for dr,pos in dr_and_pos if dr < object_drs[object_name]]
+            
+            # Special treatment for b-tagging subjets. Don't take closest but b-likeliest in radius
+            if "forbtag" in object_name:
+                
+                full_btag_branch_name = "jet_{0}__btag".format(object_name)
+                btag_branch = AH.getter(intree, full_btag_branch_name)
 
-            if len(dr_and_pos):
-                # Now extract the closest jet and use it to fill the branches
-                closest_dr_and_pos = sorted(dr_and_pos, key=lambda x:x[0])[0]
-                i_matched = closest_dr_and_pos[1]
+                
+                dr_pos_btag = [(dr,pos,btag) for i,dr,btag,pos in zip(i_branch, dr_branch, btag_branch, range(len(i_branch))) if i==i_particle]
 
-                variables["dr"][0] = closest_dr_and_pos[0]
-                for branch_name in branch_names:
-                    full_branch_in  = "jet_{0}__{1}".format(object_name, branch_name)
-                    full_branch_out = "{0}_{1}".format(object_name, branch_name)
-                    variables[full_branch_out][0] = AH.getter(intree, full_branch_in)[i_matched]                    
+                # Apply the Delta R cut
+                dr_pos_btag = [(dr,pos,btag) for dr,pos,btag in dr_pos_btag if dr < object_drs[object_name]]
+
+                if len(dr_pos_btag):
+
+                    # Now extract the highest b-tag scored jet and use it to fill the branches
+                    closest_dr_pos_btag = sorted(dr_pos_btag, key=lambda x:x[2])[-1]
+                    i_matched = closest_dr_pos_btag[1]
+
+                    variables["dr"][0] = closest_dr_pos_btag[0]
+                    for branch_name in branch_names:
+                        full_branch_in  = "jet_{0}__{1}".format(object_name, branch_name)
+                        full_branch_out = "{0}_{1}".format(object_name, branch_name)
+                        variables[full_branch_out][0] = AH.getter(intree, full_branch_in)[i_matched]                    
+                else:
+                    variables["dr"][0] = 9999.
+                    for branch_name in branch_names:
+                        full_branch_out = "{0}_{1}".format(object_name, branch_name)
+                        variables[full_branch_out][0] = DEF_VAL_FLOAT
+            # Done handling b-tagged subjets
+
             else:
-                variables["dr"][0] = 9999.
-                for branch_name in branch_names:
-                    full_branch_out = "{0}_{1}".format(object_name, branch_name)
-                    variables[full_branch_out][0] = DEF_VAL_FLOAT
+                dr_and_pos = [(dr,pos) for i,dr,pos in zip(i_branch, dr_branch, range(len(i_branch))) if i==i_particle]
+
+                # Apply the Delta R cut
+                dr_and_pos = [(dr,pos) for dr,pos in dr_and_pos if dr < object_drs[object_name]]
+
+                if len(dr_and_pos):
+
+                    # Now extract the closest jet and use it to fill the branches
+                    closest_dr_and_pos = sorted(dr_and_pos, key=lambda x:x[0])[0]
+                    i_matched = closest_dr_and_pos[1]
+
+                    variables["dr"][0] = closest_dr_and_pos[0]
+                    for branch_name in branch_names:
+                        full_branch_in  = "jet_{0}__{1}".format(object_name, branch_name)
+                        full_branch_out = "{0}_{1}".format(object_name, branch_name)
+                        variables[full_branch_out][0] = AH.getter(intree, full_branch_in)[i_matched]                    
+                else:
+                    variables["dr"][0] = 9999.
+                    for branch_name in branch_names:
+                        full_branch_out = "{0}_{1}".format(object_name, branch_name)
+                        variables[full_branch_out][0] = DEF_VAL_FLOAT
+
+        # end of loop over objects
 
         # Fill the tree
         outtree.Fill()    
