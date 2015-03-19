@@ -40,6 +40,7 @@ for s in samples_dict.values():
         tree_name = "tree"
     )
     inputSample.isMC = s.isMC.value()
+    inputSample.perJob = s.perJob.value()
     #use sample only if not skipped and subFiles defined
     if s.skip.value() == False and len(s.subFiles.value())>0:
         inputSamples.append(inputSample)
@@ -138,6 +139,15 @@ leptonType = NTupleObjectType("leptonType", variables = [
     #NTupleVariable("mcMass", lambda x : x.mcMass),
 ])
 
+memType = NTupleObjectType("memType", variables = [
+    NTupleVariable("p", lambda x : x.p),
+    NTupleVariable("p_err", lambda x : x.p_err),
+    NTupleVariable("chi2", lambda x : x.chi2),
+    NTupleVariable("time", lambda x : x.time),
+    NTupleVariable("error_code", lambda x : x.error_code),
+    NTupleVariable("efficiency", lambda x : x.efficiency),
+])
+
 #Create the output TTree writer
 treeProducer = cfg.Analyzer(
     class_object = AutoFillTreeProducer,
@@ -187,50 +197,50 @@ treeProducer = cfg.Analyzer(
             type=int,
             help="number of gen C not matched to W decay"
         ),
-
-        NTupleVariable(
-            "p_hypo_tth", lambda ev: ev.p_hypo_tth if hasattr(ev, "p_hypo_tth") else 0.0,
-            type=float,
-            help="tt+h ME probability"
-        ),
-        NTupleVariable(
-            "p_hypo_ttbb", lambda ev: ev.p_hypo_ttbb if hasattr(ev, "p_hypo_ttbb") else 0.0,
-            type=float,
-            help="tt+bb ME probability"
-        ),
-
-        NTupleVariable(
-            "p_err_hypo_tth", lambda ev: ev.p_err_hypo_tth if hasattr(ev, "p_err_hypo_tth") else 0.0,
-            type=float,
-            help="tt+h ME probability error"
-        ),
-        NTupleVariable(
-            "p_err_hypo_ttbb", lambda ev: ev.p_err_hypo_ttbb if hasattr(ev, "p_err_hypo_ttbb") else 0.0,
-            type=float,
-            help="tt+bb ME probability error"
-        ),
-
-        NTupleVariable(
-            "mem_time_hypo_tth", lambda ev: ev.mem_time_hypo_tth if hasattr(ev, "mem_time_hypo_tth") else 0,
-            type=int,
-            help="tt+h ME probability error"
-        ),
-        NTupleVariable(
-            "mem_time_hypo_ttbb", lambda ev: ev.mem_time_hypo_ttbb if hasattr(ev, "mem_time_hypo_ttbb") else 0,
-            type=int,
-            help="tt+bb ME probability error"
-        ),
-
-        NTupleVariable(
-            "mem_chi2_hypo_tth", lambda ev: ev.mem_chi2_hypo_tth if hasattr(ev, "mem_chi2_hypo_tth") else 0,
-            type=float,
-            help="tt+h ME probability error"
-        ),
-        NTupleVariable(
-            "mem_chi2_hypo_ttbb", lambda ev: ev.mem_chi2_hypo_ttbb if hasattr(ev, "mem_chi2_hypo_ttbb") else 0,
-            type=float,
-            help="tt+bb ME probability error"
-        ),
+        # 
+        # NTupleVariable(
+        #     "p_hypo_tth", lambda ev: ev.p_hypo_tth if hasattr(ev, "p_hypo_tth") else 0.0,
+        #     type=float,
+        #     help="tt+h ME probability"
+        # ),
+        # NTupleVariable(
+        #     "p_hypo_ttbb", lambda ev: ev.p_hypo_ttbb if hasattr(ev, "p_hypo_ttbb") else 0.0,
+        #     type=float,
+        #     help="tt+bb ME probability"
+        # ),
+        # 
+        # NTupleVariable(
+        #     "p_err_hypo_tth", lambda ev: ev.p_err_hypo_tth if hasattr(ev, "p_err_hypo_tth") else 0.0,
+        #     type=float,
+        #     help="tt+h ME probability error"
+        # ),
+        # NTupleVariable(
+        #     "p_err_hypo_ttbb", lambda ev: ev.p_err_hypo_ttbb if hasattr(ev, "p_err_hypo_ttbb") else 0.0,
+        #     type=float,
+        #     help="tt+bb ME probability error"
+        # ),
+        # 
+        # NTupleVariable(
+        #     "mem_time_hypo_tth", lambda ev: ev.mem_time_hypo_tth if hasattr(ev, "mem_time_hypo_tth") else 0,
+        #     type=int,
+        #     help="tt+h ME probability error"
+        # ),
+        # NTupleVariable(
+        #     "mem_time_hypo_ttbb", lambda ev: ev.mem_time_hypo_ttbb if hasattr(ev, "mem_time_hypo_ttbb") else 0,
+        #     type=int,
+        #     help="tt+bb ME probability error"
+        # ),
+        # 
+        # NTupleVariable(
+        #     "mem_chi2_hypo_tth", lambda ev: ev.mem_chi2_hypo_tth if hasattr(ev, "mem_chi2_hypo_tth") else 0,
+        #     type=float,
+        #     help="tt+h ME probability error"
+        # ),
+        # NTupleVariable(
+        #     "mem_chi2_hypo_ttbb", lambda ev: ev.mem_chi2_hypo_ttbb if hasattr(ev, "mem_chi2_hypo_ttbb") else 0,
+        #     type=float,
+        #     help="tt+bb ME probability error"
+        # ),
 
         NTupleVariable(
             "nBCSVM", lambda ev: ev.nBCSVM if hasattr(ev, "nBCSVM") else 0,
@@ -299,6 +309,8 @@ treeProducer = cfg.Analyzer(
     #standard dumping of objects
         "good_jets" : NTupleCollection("jets", jetType, 8, help="Selected jets"),
         "good_leptons" : NTupleCollection("leps", leptonType, 2, help="Selected leptons"),
+        "mem_results_tth" : NTupleCollection("mem_tth", memType, 8, help="MEM tth"),
+        "mem_results_ttbb" : NTupleCollection("mem_ttbb", memType, 8, help="MEM ttbb"),
     }
 )
 
@@ -353,14 +365,29 @@ config = cfg.Config(
 if __name__ == "__main__":
     print "Running MEAnalysis heppy main loop"
 
-    from PhysicsTools.HeppyCore.framework.looper import Looper
-    looper = Looper('Loop', config, nPrint = 0, nEvents = 500)
+    for samp in inputSamples:
+        print "processing sample ", samp
+        config = cfg.Config(
+            #Run across these inputs
+            components = [samp],
 
-    #execute the code
-    looper.loop()
+            #Using this sequence
+            sequence = sequence,
 
-    #write the output
-    looper.write()
+            #save output to these services
+            services = [output_service],
+
+            #This defines how events are loaded
+            events_class = Events
+        )
+        from PhysicsTools.HeppyCore.framework.looper import Looper
+        looper = Looper('Loop_'+samp.name, config, nPrint = 0, nEvents = samp.perJob)
+
+        #execute the code
+        looper.loop()
+
+        #write the output
+        looper.write()
 
     #print summaries
     # for analyzer in looper.analyzers:

@@ -79,7 +79,8 @@ class Conf:
             "calcME": True,
 
             #Which categories to analyze the matrix element in
-            "MECategories": ["cat1", "cat2", "cat3", "cat6"],
+            #"MECategories": ["cat1", "cat2", "cat3", "cat6"],
+            "MECategories": ["cat1"],
 
             #If bLR > cut, calculate ME
             "btagLRCut": {
@@ -99,15 +100,28 @@ class Conf:
                 #    "hb_btag": 2,
                 #    "tb_btag": 2,
                 #},
-                #"cat1": {
-                #    "wq_btag": 2,
-                #    "hb_btag": 2,
-                #    "tb_btag": 2,
-                #},
+                "cat1": {
+                   "wq_btag": 2,
+                   "hb_btag": 2,
+                   "tb_btag": 2,
+                },
                 #"cat3": {
                 #    "wq_btag": 1,
                 #    "hb_btag": 2,
                 #    "tb_btag": 2,
                 #},
-            }
+            },
+            
+            "methodsToRun": [
+                "default",
+                "NumPointsHalf"
+                "NoJacobian",
+                "NoDecayAmpl",
+                "NoPDF",
+                "NoScattAmpl",
+                "QuarkEnergy98",
+                "NuPhiRestriction",
+                "JetsPtOrder"
+            ],
+
         }

@@ -1,7 +1,7 @@
 import ROOT
 import itertools
 from PhysicsTools.HeppyCore.framework.analyzer import Analyzer
-
+import copy
 
 #Load the MEM integrator libraries
 # ROOT.gSystem.Load("libFWCoreFWLite")
@@ -138,7 +138,7 @@ class LeptonAnalyzer(FilterAnalyzer):
 
         passes = event.is_sl or event.is_dl
         if event.is_sl and event.is_dl:
-            print "pathological SL && DL event: {0}".format(event)
+            #print "pathological SL && DL event: {0}".format(event)
             self.counters["processing"].inc("slanddl")
             passes = False
 
@@ -560,12 +560,50 @@ class MEAnalyzer(FilterAnalyzer):
         self.conf = cfg_ana._conf
         super(MEAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
 
+
+        self.configs = {
+            "default": MEM.MEMConfig(),
+            "NumPointsHalf": MEM.MEMConfig(),
+            "NoJacobian": MEM.MEMConfig(),
+            "NoDecayAmpl": MEM.MEMConfig(),
+            "NoPDF": MEM.MEMConfig(),
+            "NoScattAmpl": MEM.MEMConfig(),
+            "QuarkEnergy98": MEM.MEMConfig(),
+            "NuPhiRestriction": MEM.MEMConfig(),
+            "JetsPtOrder": MEM.MEMConfig(),
+        }
+        
+        self.memkeys = self.conf.mem["methodsToRun"]
+        
+        self.configs["default"].defaultCfg()
+        self.configs["NumPointsHalf"].defaultCfg(0.5)
+        self.configs["NoJacobian"].defaultCfg()
+        self.configs["NoDecayAmpl"].defaultCfg()
+        self.configs["NoPDF"].defaultCfg()
+        self.configs["NoScattAmpl"].defaultCfg()
+        self.configs["QuarkEnergy98"].defaultCfg()
+        self.configs["NuPhiRestriction"].defaultCfg()
+        self.configs["JetsPtOrder"].defaultCfg()
+        
+        self.configs["NoJacobian"].int_code &= ~ MEM.IntegrandType.Jacobian
+        self.configs["NoDecayAmpl"].int_code &= ~ MEM.IntegrandType.DecayAmpl
+        self.configs["NoPDF"].int_code &= ~ MEM.IntegrandType.PDF
+        self.configs["NoScattAmpl"].int_code &=  ~ MEM.IntegrandType.ScattAmpl
+        self.configs["QuarkEnergy98"].j_range_CL = 0.98
+        self.configs["QuarkEnergy98"].b_range_CL = 0.98
+        self.configs["NuPhiRestriction"].m_range_CL = 99
+        self.configs["JetsPtOrder"].highpt_first  = 0
+        
+        
+        for cn, conf in self.configs.items():
+            print cn, conf.int_code
+        
         #Create the ME integrator.
         #Arguments specify the verbosity
         self.integrator = MEM.Integrand(
-            0,
+            MEM.output,
             #MEM.init|MEM.init_more|MEM.event,
-            MEM.MEMConfig()
+            self.configs["default"]
         )
 
         #Create an emtpy std::vector<MEM::Permutations::Permutations>
@@ -593,7 +631,6 @@ class MEAnalyzer(FilterAnalyzer):
             |MEM.IntegrandType.PDF
             |MEM.IntegrandType.Transfer
         )
-        self.integrator.set_ncalls(4000);
         self.integrator.set_sqrts(13000.);
 
         #Create an empty vector for the integration variables
@@ -629,6 +666,10 @@ class MEAnalyzer(FilterAnalyzer):
         #Clean up any old MEM state
         self.vars_to_integrate.clear()
         self.integrator.next_event()
+        
+        #Initialize members for tree filler
+        event.mem_results_tth = []
+        event.mem_results_ttbb = []
 
         jets = event.good_jets
         leptons = event.good_leptons
@@ -699,10 +740,16 @@ class MEAnalyzer(FilterAnalyzer):
         #Check if event.nMatch_label >= conf.mem[cat][label]
         def require(label):
             nreq = required_match.get(label, None)
+            if nreq is None:
+                return True
+                
             nmatched = getattr(event, "nMatch_"+label)
-            passes = True
-            if not nreq is None:
-                passes = (nmatched >= nreq)
+            
+            #In case event did not contain b form higgs (e.g. ttbb)
+            if "hb" in label and len(event.GenBQuarkFromH) < nreq:
+                return True
+
+            passes = (nmatched >= nreq)
             return passes
 
         #Calculate all the match booleans
@@ -742,33 +789,32 @@ class MEAnalyzer(FilterAnalyzer):
 
         res = {}
         for hypo in [MEM.Hypothesis.TTH, MEM.Hypothesis.TTBB]:
-            if self.conf.mem["calcME"]:
-                r = self.integrator.run(
-                    fstate,
-                    hypo,
-                    self.vars_to_integrate
-                )
-                res[hypo] = r
+            if self.conf.mem["calcME"]:    
+                for confname in self.memkeys:
+                    conf = self.configs[confname]
+                    print "MEM conf", confname, "hypo", hypo
+                    self.integrator.set_cfg(conf)
+                    r = self.integrator.run(
+                        fstate,
+                        hypo,
+                        self.vars_to_integrate
+                    )
+                    res[(hypo, confname)] = r
             else:
                 r = MEM.MEMOutput()
-            res[hypo] = r
-        if res[MEM.Hypothesis.TTH].p <= 0:
+                res[(hypo, "default")] = r
+        
+        #In case of an erroneous calculation, print out event kinematics
+        if res[(MEM.Hypothesis.TTH, "default")].p <= 0:
             print "MEM BADPROB"
             for jet in jets:
                 print "MEM jet", jet.pt, jet.eta, jet.phi, jet.mass, jet.btagCSV, jet.btagFlag
             for lep in leptons:
                 print "MEM lep", lep.pt, lep.eta, lep.phi, lep.mass, lep.charge
             print "MEM met", met_pt, met_phi
-        print "RES", {k:res[k].p for k in res.keys()}
-        event.p_hypo_tth = res[MEM.Hypothesis.TTH].p
-        event.p_hypo_ttbb = res[MEM.Hypothesis.TTBB].p
-
-        event.p_err_hypo_tth = res[MEM.Hypothesis.TTH].p_err
-        event.p_err_hypo_ttbb = res[MEM.Hypothesis.TTBB].p_err
-
-        event.mem_chi2_hypo_tth = res[MEM.Hypothesis.TTH].chi2
-        event.mem_chi2_hypo_ttbb = res[MEM.Hypothesis.TTBB].chi2
-
-        event.mem_time_hypo_tth = res[MEM.Hypothesis.TTH].time
-        event.mem_time_hypo_ttbb = res[MEM.Hypothesis.TTBB].time
-
+            
+        #print out full MEM result dictionary
+        print "RES", [(k, res[k].p) for k in sorted(res.keys())]
+        
+        event.mem_results_tth = [res[(MEM.Hypothesis.TTH, k)] for k in self.memkeys]
+        event.mem_results_ttbb = [res[(MEM.Hypothesis.TTBB, k)] for k in self.memkeys]
