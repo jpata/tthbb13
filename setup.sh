@@ -14,10 +14,11 @@ git cms-addpkg RecoJets/JetProducers
 git clone https://github.com/jpata/tthbb13.git TTH
 cd TTH
 git checkout jpata/dev-meanalysis-heppy
-git clone https://github.com/jpata/Code.git MEIntegratorStandalone
-cd MEIntegratorStandalone
-git checkout mem-output
-cd ../..
+git clone https://github.com/bianchini/Code.git MEIntegratorStandalone
+#cd MEIntegratorStandalone
+#git checkout mem-output
+#cd ../..
+cd ..
 cp TTH/MEAnalysis/libs/*.so ../lib/$SCRAM_ARCH/
 
 #to apply a the top tagger as a patch
