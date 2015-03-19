@@ -28,21 +28,3 @@
   <lib   name="pphttxcallme2born"/>
   <lib   name="ppttxbbxcallme2born"/>
 </bin>
-
-<bin   file="JetTreeProducer.cc,HelperFunctions.cc" name="JetTreeProducer">
-  <use   name="DataFormats/FWLite"/>
-  <use   name="FWCore/FWLite"/>
-  <use   name="FWCore/PythonParameterSet"/>
-  <use   name="FWCore/Framework"/> 
-  <use   name="FWCore/MessageLogger"/>
-  <use   name="FWCore/Utilities"/>
-  <use   name="FWCore/ParameterSet"/>
-  <use   name="PhysicsTools/FWLite"/>
-  <use   name="PhysicsTools/Utilities"/>
-  <use   name="PhysicsTools/CandUtils"/>
-  <use   name="PhysicsTools/SelectorUtils"/>
-  <use   name="CommonTools/Utils"/>
-  <use   name="root"/>
-  <use   name="classlib"/>
-  <use   name="boost"/>
-</bin>
