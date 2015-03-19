@@ -70,7 +70,44 @@ class Conf:
             "controlPlotsFileOld": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsTEST.root",
             "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV6.root",
             "sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_vhbb.py",
-            "runME": True,
-            "calcMECategories": ["cat1", "cat2", "cat3", "cat6"]
             #"calcMECategories": []
+        }
+
+        self.mem = {
+
+            #Actually run the ME calculation
+            "calcME": True,
+
+            #Which categories to analyze the matrix element in
+            "MECategories": ["cat1", "cat2", "cat3", "cat6"],
+
+            #If bLR > cut, calculate ME
+            "btagLRCut": {
+                "cat1": 0.7,
+                "cat2": 0.7,
+                "cat3": 0.7,
+                "cat6": 0.7
+            },
+
+            #if a number is N specified for wq, tb, hb (+ _btag), require
+            #that reco jets dR matched to quarks from W, top, higgs >= N
+            #in order to calculate the ME.
+            #If disabled, calculate ME regardless of gen-level matching
+            "requireMatched": {
+                #"cat2": {
+                #    "wq_btag": 1,
+                #    "hb_btag": 2,
+                #    "tb_btag": 2,
+                #},
+                #"cat1": {
+                #    "wq_btag": 2,
+                #    "hb_btag": 2,
+                #    "tb_btag": 2,
+                #},
+                #"cat3": {
+                #    "wq_btag": 1,
+                #    "hb_btag": 2,
+                #    "tb_btag": 2,
+                #},
+            }
         }

@@ -563,11 +563,12 @@ class MEAnalyzer(FilterAnalyzer):
         #Create the ME integrator.
         #Arguments specify the verbosity
         self.integrator = MEM.Integrand(
-            #0,
-            MEM.init|MEM.init_more|MEM.event,
+            0,
+            #MEM.init|MEM.init_more|MEM.event,
             MEM.MEMConfig()
         )
 
+        #Create an emtpy std::vector<MEM::Permutations::Permutations>
         self.permutations = CvectorPermutations()
 
         #Assume that only jets passing CSV>0.5 are b quarks
@@ -595,7 +596,7 @@ class MEAnalyzer(FilterAnalyzer):
         self.integrator.set_ncalls(4000);
         self.integrator.set_sqrts(13000.);
 
-        #Set list of integration variables (FIXME)
+        #Create an empty vector for the integration variables
         self.vars_to_integrate = CvectorPSVar()
 
     def add_obj(self, objtype, **kwargs):
@@ -625,17 +626,23 @@ class MEAnalyzer(FilterAnalyzer):
     def process(self, event):
         self.counters["processing"].inc("processed")
 
+        #Clean up any old MEM state
+        self.vars_to_integrate.clear()
+        self.integrator.next_event()
+
         jets = event.good_jets
         leptons = event.good_leptons
         met_pt = event.input.met_pt
         met_phi = event.input.met_phi
 
-        if event.cat in self.conf.general["calcMECategories"] and event.btag_LR_4b_2b > 0.7:
-            print "MEM", event.cat, event.btag_LR_4b_2b, len(jets), len(leptons)
+        #Check if event passes reco-level requirements to calculate ME
+        if event.cat in self.conf.mem["MECategories"] and event.btag_LR_4b_2b > self.conf.mem["btagLRCut"][event.cat]:
+            print "MEM RECO PASS", event.cat, event.btag_LR_4b_2b, len(jets), len(leptons)
         else:
             return True
-        #print "MEMINTEG", len(jets), len(leptons)
 
+        #Store for each jet, specified by it's index in the jet
+        #vector, if it is matched to any gen-level quarks
         matched_pairs = {}
 
         def match_jets_to_quarks(jetcoll, quarkcoll, label):
@@ -655,9 +662,11 @@ class MEAnalyzer(FilterAnalyzer):
         match_jets_to_quarks(jets, event.GenBQuarkFromTop, "tb")
         match_jets_to_quarks(jets, event.GenBQuarkFromH, "hb")
 
+        #Number of reco jets matched to quarks from W, top, higgs
         event.nMatch_wq = 0
         event.nMatch_tb = 0
         event.nMatch_hb = 0
+        #As above, but also required to be tagged/untagged for b/light respectively.
         event.nMatch_wq_btag = 0
         event.nMatch_tb_btag = 0
         event.nMatch_hb_btag = 0
@@ -679,54 +688,33 @@ class MEAnalyzer(FilterAnalyzer):
                 if jet.btagFlag >= 0.5:
                     event.nMatch_hb_btag += 1
 
-
-        #One W quark missed, integrate over its direction
+        #One quark from W missed, integrate over its direction
         if event.cat in ["cat2", "cat3"]:
             self.vars_to_integrate.push_back(MEM.PSVar.cos_qbar1)
             self.vars_to_integrate.push_back(MEM.PSVar.phi_qbar1)
 
-        matched_pairs = {}
+        #Get the conf dict specifying which matches we require
+        required_match = self.conf.mem.get("requireMatched", {}).get(event.cat, {})
 
-        def match_jets_to_quarks(jetcoll, quarkcoll, label):
-            for ij, j in enumerate(jetcoll):
-                for iq, q in enumerate(quarkcoll):
-                    l1 = lvec(q)
-                    l2 = lvec(j)
-                    dr = l1.DeltaR(l2)
-                    if dr < 0.3:
-                        if matched_pairs.has_key(ij):
-                            if matched_pairs[ij][1] > dr:
-                                matched_pairs[ij] = (label, iq, dr)
-                        else:
-                            matched_pairs[ij] = (label, iq, dr)
+        #Check if event.nMatch_label >= conf.mem[cat][label]
+        def require(label):
+            nreq = required_match.get(label, None)
+            nmatched = getattr(event, "nMatch_"+label)
+            passes = True
+            if not nreq is None:
+                passes = (nmatched >= nreq)
+            return passes
 
-        match_jets_to_quarks(jets, event.GenWZQuark, "wq")
-        match_jets_to_quarks(jets, event.GenBQuarkFromTop, "tb")
-        match_jets_to_quarks(jets, event.GenBQuarkFromH, "hb")
+        #Calculate all the match booleans
+        passd = {
+            p: require(p) for p in ["wq", "wq_btag", "tb", "tb_btag", "hb", "hb_btag"]
+        }
+        print "MATCH Wth", event.nMatch_wq, event.nMatch_tb, event.nMatch_hb, "|", event.nMatch_wq_btag, event.nMatch_tb_btag, event.nMatch_hb_btag, "|", passd
 
-        event.nMatch_wq = 0
-        event.nMatch_tb = 0
-        event.nMatch_hb = 0
-        event.nMatch_wq_btag = 0
-        event.nMatch_tb_btag = 0
-        event.nMatch_hb_btag = 0
-
-        for ij, jet in enumerate(jets):
-            if not matched_pairs.has_key(ij):
-                continue
-            mlabel, midx, mdr = matched_pairs[ij]
-            if mlabel == "wq":
-                event.nMatch_wq += 1
-                if jet.btagFlag < 0.5:
-                    event.nMatch_wq_btag += 1
-            if mlabel == "tb":
-                event.nMatch_tb += 1
-                if jet.btagFlag >= 0.5:
-                    event.nMatch_tb_btag += 1
-            if mlabel == "hb":
-                event.nMatch_hb += 1
-                if jet.btagFlag >= 0.5:
-                    event.nMatch_hb_btag += 1
+        for k, v in passd.items():
+            if not v:
+                print "Failed to match", k
+                return True
 
         for jet in jets:
             self.add_obj(
@@ -754,7 +742,7 @@ class MEAnalyzer(FilterAnalyzer):
 
         res = {}
         for hypo in [MEM.Hypothesis.TTH, MEM.Hypothesis.TTBB]:
-            if self.conf.general["runME"]:
+            if self.conf.mem["calcME"]:
                 r = self.integrator.run(
                     fstate,
                     hypo,
@@ -784,5 +772,3 @@ class MEAnalyzer(FilterAnalyzer):
         event.mem_time_hypo_tth = res[MEM.Hypothesis.TTH].time
         event.mem_time_hypo_ttbb = res[MEM.Hypothesis.TTBB].time
 
-        self.vars_to_integrate.clear()
-        self.integrator.next_event()

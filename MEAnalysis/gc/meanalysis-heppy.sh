@@ -16,8 +16,6 @@ eval `scramv1 runtime -sh`
 cd $MY_SCRATCH
 
 #copy control plots
-mkdir root
-mv *.root root/
 python ${CMSSW_BASE}/src/TTH/MEAnalysis/gc/MEAnalysis_heppy_gc.py
 echo "MEAnalysis is done"
 
