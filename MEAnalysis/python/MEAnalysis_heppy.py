@@ -58,6 +58,13 @@ evs = cfg.Analyzer(
 #Here we define all the main analyzers
 import TTH.MEAnalysis.MECoreAnalyzers as MECoreAnalyzers
 
+#
+evtid_filter = cfg.Analyzer(
+    MECoreAnalyzers.EventIDFilterAnalyzer,
+    'eventid',
+    _conf = conf
+)
+
 #This class performs lepton selection and SL/DL disambiguation
 leps = cfg.Analyzer(
     MECoreAnalyzers.LeptonAnalyzer,
@@ -105,6 +112,13 @@ wtag = cfg.Analyzer(
 mem_analyzer = cfg.Analyzer(
     MECoreAnalyzers.MEAnalyzer,
     'mem',
+    _conf = conf
+)
+
+
+gentth = cfg.Analyzer(
+    MECoreAnalyzers.GenTTHAnalyzer,
+    'gentth',
     _conf = conf
 )
 
@@ -166,15 +180,49 @@ treeProducer = cfg.Analyzer(
             "is_dl", lambda ev: ev.is_dl,
             help="event is di-lepton"
         ),
-        NTupleVariable(
-            "Wmass2", lambda ev: ev.Wmass2,
-            help="best W boson mass from untagged pair (untagged by LR)"
-        ),
+
         NTupleVariable(
             "cat", lambda ev: ev.catn,
             type=int,
             help="ME category"
         ),
+
+        NTupleVariable(
+            "cat_gen", lambda ev: ev.n_cat_gen,
+            type=int,
+            help="top decay category (-1 unknown, 0 single-leptonic, 1 di-leptonic, 2 fully hadronic)"
+        ),
+
+        NTupleVariable(
+            "nGenBHiggs", lambda ev: len(ev.b_quarks_h),
+            type=int,
+            help="Number of generated b from higgs"
+        ),
+
+        NTupleVariable(
+            "nGenBTop", lambda ev: len(ev.b_quarks_t),
+            type=int,
+            help="Number of generated b from top"
+        ),
+
+        NTupleVariable(
+            "nGenQW", lambda ev: len(ev.l_quarks_w),
+            type=int,
+            help="Number of generated quarks from W"
+        ),
+
+        NTupleVariable(
+            "nGenNuTop", lambda ev: len(ev.nu_top),
+            type=int,
+            help="Number of generated nu from top"
+        ),
+
+        NTupleVariable(
+            "nGenLepTop", lambda ev: len(ev.lep_top),
+            type=int,
+            help="Number of generated charged leptons from top"
+        ),
+
         NTupleVariable(
             "btag_LR_4b_2b_old", lambda ev: ev.btag_LR_4b_2b_old,
             help="B-tagging likelihood ratio: 4b vs 2b (8TeV CSV curves)"
@@ -197,50 +245,6 @@ treeProducer = cfg.Analyzer(
             type=int,
             help="number of gen C not matched to W decay"
         ),
-        # 
-        # NTupleVariable(
-        #     "p_hypo_tth", lambda ev: ev.p_hypo_tth if hasattr(ev, "p_hypo_tth") else 0.0,
-        #     type=float,
-        #     help="tt+h ME probability"
-        # ),
-        # NTupleVariable(
-        #     "p_hypo_ttbb", lambda ev: ev.p_hypo_ttbb if hasattr(ev, "p_hypo_ttbb") else 0.0,
-        #     type=float,
-        #     help="tt+bb ME probability"
-        # ),
-        # 
-        # NTupleVariable(
-        #     "p_err_hypo_tth", lambda ev: ev.p_err_hypo_tth if hasattr(ev, "p_err_hypo_tth") else 0.0,
-        #     type=float,
-        #     help="tt+h ME probability error"
-        # ),
-        # NTupleVariable(
-        #     "p_err_hypo_ttbb", lambda ev: ev.p_err_hypo_ttbb if hasattr(ev, "p_err_hypo_ttbb") else 0.0,
-        #     type=float,
-        #     help="tt+bb ME probability error"
-        # ),
-        # 
-        # NTupleVariable(
-        #     "mem_time_hypo_tth", lambda ev: ev.mem_time_hypo_tth if hasattr(ev, "mem_time_hypo_tth") else 0,
-        #     type=int,
-        #     help="tt+h ME probability error"
-        # ),
-        # NTupleVariable(
-        #     "mem_time_hypo_ttbb", lambda ev: ev.mem_time_hypo_ttbb if hasattr(ev, "mem_time_hypo_ttbb") else 0,
-        #     type=int,
-        #     help="tt+bb ME probability error"
-        # ),
-        # 
-        # NTupleVariable(
-        #     "mem_chi2_hypo_tth", lambda ev: ev.mem_chi2_hypo_tth if hasattr(ev, "mem_chi2_hypo_tth") else 0,
-        #     type=float,
-        #     help="tt+h ME probability error"
-        # ),
-        # NTupleVariable(
-        #     "mem_chi2_hypo_ttbb", lambda ev: ev.mem_chi2_hypo_ttbb if hasattr(ev, "mem_chi2_hypo_ttbb") else 0,
-        #     type=float,
-        #     help="tt+bb ME probability error"
-        # ),
 
         NTupleVariable(
             "nBCSVM", lambda ev: ev.nBCSVM if hasattr(ev, "nBCSVM") else 0,
@@ -269,7 +273,7 @@ treeProducer = cfg.Analyzer(
             type=int,
             help=""
         ),
-        
+
         NTupleVariable(
             "nMatch_wq", lambda ev: ev.nMatch_wq if hasattr(ev, "nMatch_wq") else 0,
             type=int,
@@ -280,7 +284,7 @@ treeProducer = cfg.Analyzer(
             type=int,
             help=""
         ),
-        
+
         NTupleVariable(
             "nMatch_tb", lambda ev: ev.nMatch_tb if hasattr(ev, "nMatch_tb") else 0,
             type=int,
@@ -291,7 +295,7 @@ treeProducer = cfg.Analyzer(
             type=int,
             help=""
         ),
-        
+
         NTupleVariable(
             "nMatch_hb", lambda ev: ev.nMatch_hb if hasattr(ev, "nMatch_hb") else 0,
             type=int,
@@ -309,8 +313,8 @@ treeProducer = cfg.Analyzer(
     #standard dumping of objects
         "good_jets" : NTupleCollection("jets", jetType, 8, help="Selected jets"),
         "good_leptons" : NTupleCollection("leps", leptonType, 2, help="Selected leptons"),
-        "mem_results_tth" : NTupleCollection("mem_tth", memType, 8, help="MEM tth"),
-        "mem_results_ttbb" : NTupleCollection("mem_ttbb", memType, 8, help="MEM ttbb"),
+        "mem_results_tth" : NTupleCollection("mem_tth", memType, len(conf.mem["methodsToRun"]), help="MEM tth"),
+        "mem_results_ttbb" : NTupleCollection("mem_ttbb", memType, len(conf.mem["methodsToRun"]), help="MEM ttbb"),
     }
 )
 
@@ -325,6 +329,7 @@ AutoFillTreeProducer.fillCoreVariables = fillCoreVariables
 # definition of a sequence of analyzers,
 # the analyzers will process each event in this order
 sequence = cfg.Sequence([
+    evtid_filter,
     evs,
     leps,
     jets,
@@ -332,6 +337,7 @@ sequence = cfg.Sequence([
     btaglr,
     wtag,
     mecat,
+    gentth,
     mem_analyzer,
     treeProducer
 ])
@@ -381,7 +387,17 @@ if __name__ == "__main__":
             events_class = Events
         )
         from PhysicsTools.HeppyCore.framework.looper import Looper
-        looper = Looper('Loop_'+samp.name, config, nPrint = 0, nEvents = samp.perJob)
+        nEvents = samp.perJob
+
+        kwargs = {}
+        if conf.general.get("eventWhitelist", None) is None:
+            kwargs["nEvents"] = nEvents
+        looper = Looper(
+            'Loop_'+samp.name,
+            config,
+            nPrint = 0,
+            **kwargs
+        )
 
         #execute the code
         looper.loop()

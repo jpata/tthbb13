@@ -57,37 +57,50 @@ class Conf:
         self.jets = {
             "pt": 40,
             "eta": 2.5,
+
+            #The default b-tagging algorithm (branch name)
             "btagAlgo": "btagCSV",
+
+            #The default b-tagging WP
             "btagWP": "CSVM",
             "btagWPs": {
                 "CSVM": ("btagCSV", 0.814),
                 "CSVL": ("btagCSV", 0.423),
                 "CSVT": ("btagCSV", 0.941)
-            }
+            },
+            "untaggedSelection": "btagCSV"
         }
 
         self.general = {
             "controlPlotsFileOld": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsTEST.root",
             "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV6.root",
             "sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_vhbb.py",
-            #"calcMECategories": []
+
+            #Process only these events (will scan through file to find)
+            #"eventWhitelist": [
+            #    (1, 467, 46626)
+            #    , (1, 1791, 179025)
+            #    , (1, 1326, 132501)
+            #    , (1, 1470, 146966)
+            #]
         }
 
         self.mem = {
 
             #Actually run the ME calculation
+            #If False, all ME values will be 0
             "calcME": True,
 
             #Which categories to analyze the matrix element in
-            #"MECategories": ["cat1", "cat2", "cat3", "cat6"],
-            "MECategories": ["cat1"],
+            "MECategories": ["cat1", "cat2", "cat3", "cat6"],
+            #"MECategories": ["cat1"],
 
             #If bLR > cut, calculate ME
             "btagLRCut": {
-                "cat1": 0.7,
-                "cat2": 0.7,
-                "cat3": 0.7,
-                "cat6": 0.7
+                "cat1": -100.0,
+                "cat2": -100.0,
+                "cat3": -100.0,
+                "cat6": -100.0
             },
 
             #if a number is N specified for wq, tb, hb (+ _btag), require
@@ -100,26 +113,28 @@ class Conf:
                 #    "hb_btag": 2,
                 #    "tb_btag": 2,
                 #},
-                "cat1": {
-                   "wq_btag": 2,
-                   "hb_btag": 2,
-                   "tb_btag": 2,
-                },
+                #"cat1": {
+                #   "wq_btag": 2,
+                #   "hb_btag": 2,
+                #   "tb_btag": 2,
+                #},
                 #"cat3": {
                 #    "wq_btag": 1,
                 #    "hb_btag": 2,
                 #    "tb_btag": 2,
                 #},
             },
-            
+
             "methodsToRun": [
                 "default",
-                "NumPointsHalf"
+                "NumPointsDouble",
+                "NumPointsHalf",
                 "NoJacobian",
                 "NoDecayAmpl",
                 "NoPDF",
                 "NoScattAmpl",
                 "QuarkEnergy98",
+                #"QuarkEnergy10",
                 "NuPhiRestriction",
                 "JetsPtOrder"
             ],
