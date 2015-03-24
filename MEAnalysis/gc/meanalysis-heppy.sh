@@ -1,6 +1,7 @@
 #!/bin/bash
 
-#CMSSW_BASE=/shome/jpata/TTH/CMSSW
+#on PSI, CMSSW_BASE is not exported with the grid job, need to set manually
+CMSSW_BASE=$HOME/TTH-72X-heppy/CMSSW/
 
 env
 set -e
@@ -15,7 +16,6 @@ source /cvmfs/cms.cern.ch/cmsset_default.sh
 eval `scramv1 runtime -sh`
 cd $MY_SCRATCH
 
-#copy control plots
 python ${CMSSW_BASE}/src/TTH/MEAnalysis/gc/MEAnalysis_heppy_gc.py
 echo "MEAnalysis is done"
 
