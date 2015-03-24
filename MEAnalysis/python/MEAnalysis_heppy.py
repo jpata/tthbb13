@@ -158,8 +158,9 @@ memType = NTupleObjectType("memType", variables = [
     NTupleVariable("p_err", lambda x : x.p_err),
     NTupleVariable("chi2", lambda x : x.chi2),
     NTupleVariable("time", lambda x : x.time),
-    NTupleVariable("error_code", lambda x : x.error_code),
+    NTupleVariable("error_code", lambda x : x.error_code, type=int),
     NTupleVariable("efficiency", lambda x : x.efficiency),
+    NTupleVariable("nperm", lambda x : x.num_perm, type=int),
 ])
 
 #Create the output TTree writer
@@ -303,6 +304,27 @@ treeProducer = cfg.Analyzer(
         ),
         NTupleVariable(
             "nMatch_hb_btag", lambda ev: ev.nMatch_hb_btag if hasattr(ev, "nMatch_hb_btag") else 0,
+            type=int,
+            help=""
+        ),
+
+        NTupleVariable(
+            "lheNj", lambda ev: ev.input.lheNj if hasattr(ev.input, "lheNj") else 0,
+            type=int,
+            help=""
+        ),
+        NTupleVariable(
+            "lheNb", lambda ev: ev.input.lheNb if hasattr(ev.input, "lheNb") else 0,
+            type=int,
+            help=""
+        ),
+        NTupleVariable(
+            "lheNc", lambda ev: ev.input.lheNc if hasattr(ev.input, "lheNc") else 0,
+            type=int,
+            help=""
+        ),
+        NTupleVariable(
+            "lheNg", lambda ev: ev.input.lheNg if hasattr(ev.input, "lheNg") else 0,
             type=int,
             help=""
         ),

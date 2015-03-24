@@ -414,7 +414,10 @@ class BTagLRAnalyzer(FilterAnalyzer):
             event.buntagged_jets = event.buntagged_jets_bdisc
             event.btagged_jets = event.btagged_jets_bdisc
 
-        for jet in event.btagged_jets:
+        #Take first 4 most b-tagged jets
+        btagged = sorted(event.btagged_jets, key=lambda x: x.btagCSV, reverse=True)[0:4]
+        #Set these jets to be used as b-quarks in the MEM
+        for jet in btagged:
             idx = event.good_jets.index(jet)
             event.good_jets[idx].btagFlag = 1.0
 
@@ -510,7 +513,8 @@ class WTagAnalyzer(FilterAnalyzer):
         if len(event.buntagged_jets)>=2:
             bpair = self.find_best_pair(event.buntagged_jets)
             event.Wmass = bpair[0]
-
+            if "reco" in self.conf.general["verbosity"]:
+                print "Wmass", event.Wmass, event.good_jets.index(bpair[1]), event.good_jets.index(bpair[2])
         passes = True
         if passes:
             self.counters["processing"].inc("passes")
@@ -728,8 +732,8 @@ class MEAnalyzer(FilterAnalyzer):
         #Arguments specify the verbosity
         self.integrator = MEM.Integrand(
             #0,
-            MEM.output,
-            #MEM.output | MEM.init | MEM.init_more,# | MEM.event | MEM.integration,
+            #MEM.output,
+            MEM.output | MEM.init | MEM.init_more,# | MEM.event | MEM.integration,
             self.configs["default"]
         )
 
@@ -798,15 +802,15 @@ class MEAnalyzer(FilterAnalyzer):
         event.mem_results_tth = []
         event.mem_results_ttbb = []
 
-        #Sort jets by pt descending, only take up to 7 jets to reduce permutations
-        jets = sorted(event.good_jets, key=lambda x: x.pt, reverse=True)[0:7]
+        #Sort jets by pt descending, only take up to 8 jets to reduce permutations
+        jets = sorted(event.good_jets, key=lambda x: x.pt, reverse=True)
         leptons = event.good_leptons
         met_pt = event.input.met_pt
         met_phi = event.input.met_phi
 
         if "reco" in self.conf.general["verbosity"]:
             for j in jets:
-                print "jet", j.pt, j.eta, j.phi, j.mass, j.btagCSV, j.mcFlavour
+                print "jet", j.pt, j.eta, j.phi, j.mass, j.btagCSV, j.btagFlag, j.mcFlavour
             for l in leptons:
                 print "lep", l.pt, l.eta, l.phi, l.mass, l.charge
 
@@ -868,7 +872,8 @@ class MEAnalyzer(FilterAnalyzer):
                 )
             self.add_obj(
                 MEM.ObjectType.MET,
-                p4s=(met_pt, 0, met_phi, met_pt),
+                #MET is caused by massless object
+                p4s=(met_pt, 0, met_phi, 0),
             )
 
         fstate = MEM.FinalState.TTH

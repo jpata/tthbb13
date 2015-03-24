@@ -63,11 +63,16 @@ class Conf:
 
             #The default b-tagging WP
             "btagWP": "CSVM",
+
+            #These working points are evaluated and stored in the trees as nB* - number of jets passing the WP
             "btagWPs": {
                 "CSVM": ("btagCSV", 0.814),
                 "CSVL": ("btagCSV", 0.423),
                 "CSVT": ("btagCSV", 0.941)
             },
+
+            #if btagCSV, untagged/tagged selection for W mass and MEM is done by CSVM cut
+            #if btagLR, selection is done by the btag likelihood ratio permutation
             "untaggedSelection": "btagCSV"
         }
 
@@ -85,9 +90,9 @@ class Conf:
 
             #Process only these events (will scan through file to find)
             #"eventWhitelist": [
-            #    (1, 737, 73651),
-            #    (1, 1773, 177245),
-            #    (1, 1040, 103998),
+            #    (1, 1201, 120035),
+            #    #(1, 626, 62574),
+            #    #(1, 180, 17914)
             #]
         }
 
@@ -103,6 +108,7 @@ class Conf:
             #"MECategories": ["cat1"],
 
             #If bLR > cut, calculate ME
+            #only used if untaggedSelection=btagLR
             "btagLRCut": {
                 "cat1": -100.0,
                 "cat2": -100.0,
@@ -133,16 +139,22 @@ class Conf:
             },
 
             "methodsToRun": [
+
+                #full ME
                 "default",
-                "NumPointsDouble",
-                "NumPointsHalf",
-                "NoJacobian",
-                "NoDecayAmpl",
-                "NoPDF",
-                "NoScattAmpl",
-                "QuarkEnergy98",
-                "NuPhiRestriction",
-                "JetsPtOrder"
+
+                #These are additional MEM checks, where only part of the MEM is ran.
+                #Switched off by default
+
+                #"NumPointsDouble",
+                #"NumPointsHalf",
+                #"NoJacobian",
+                #"NoDecayAmpl",
+                #"NoPDF",
+                #"NoScattAmpl",
+                #"QuarkEnergy98",
+                #"NuPhiRestriction",
+                #"JetsPtOrder"
             ],
 
         }

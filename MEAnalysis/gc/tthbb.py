@@ -15,7 +15,7 @@ args = parser.parse_args()
 
 jobs = ["confs/sig.conf", "confs/bkg.conf"]
 #gc = "/shome/jpata/grid-control/GC"
-gc = "grid-control/GC"
+gc = "./grid-control/go.py"
 
 if args.action == "status":
     for job in jobs:
