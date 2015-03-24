@@ -311,6 +311,9 @@ treeProducer = cfg.Analyzer(
     globalObjects = {},
     collections = {
     #standard dumping of objects
+        "b_quarks_t" : NTupleCollection("GenBFromTop", leptonType, 3, help=""),
+        "b_quarks_h" : NTupleCollection("GenBFromHiggs", leptonType, 3, help=""),
+        "l_quarks_w" : NTupleCollection("GenQFromW", leptonType, 5, help=""),
         "good_jets" : NTupleCollection("jets", jetType, 8, help="Selected jets"),
         "good_leptons" : NTupleCollection("leps", leptonType, 2, help="Selected leptons"),
         "mem_results_tth" : NTupleCollection("mem_tth", memType, len(conf.mem["methodsToRun"]), help="MEM tth"),

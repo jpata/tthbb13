@@ -59,6 +59,9 @@ class EventIDFilterAnalyzer(FilterAnalyzer):
             if (event.input.run, event.input.lumi, event.input.evt) in self.event_whitelist:
                 print "IDFilter", (event.input.run, event.input.lumi, event.input.evt)
                 passes = True
+
+        if passes and "eventboundary" in self.conf.general["verbosity"]:
+            print "---", event.input.run, event.input.lumi, event.input.evt
         if passes:
             self.counters["processing"].inc("passes")
         return passes
@@ -194,6 +197,11 @@ class JetAnalyzer(FilterAnalyzer):
     def process(self, event):
         self.counters["processing"].inc("processed")
         self.counters["jets"].inc("any", len(event.Jet))
+
+        #pt-descending input jets
+        if "input" in self.conf.general["verbosity"]:
+            for j in event.Jet:
+                print "ijet", j.pt, j.eta, j.phi, j.mass, j.btagCSV, j.mcFlavour
 
         event.good_jets = sorted(
             filter(
@@ -557,7 +565,8 @@ class GenTTHAnalyzer(FilterAnalyzer):
     def process(self, event):
         self.counters["processing"].inc("processed")
 
-        event.l_quarks_w = event.GenWZQuark
+        #Somehow, the GenWZQuark distribution is duplicated
+        event.l_quarks_w = event.GenWZQuark[0:len(event.GenWZQuark)/2]
         event.b_quarks_t = event.GenBQuarkFromTop
         event.b_quarks_h = event.GenBQuarkFromH
         event.lep_top = event.GenLepFromTop
@@ -572,18 +581,87 @@ class GenTTHAnalyzer(FilterAnalyzer):
             len(event.b_quarks_t) == 2):
             event.cat_gen = "sl"
             event.n_cat_gen = 0
-        if (len(event.lep_top) == 2 and
+        elif (len(event.lep_top) == 2 and
             len(event.nu_top) == 2 and
             len(event.l_quarks_w) == 0 and
             len(event.b_quarks_t) == 2):
             event.cat_gen = "dl"
             event.n_cat_gen = 1
-        if (len(event.lep_top) == 0 and
+        elif (len(event.lep_top) == 0 and
             len(event.nu_top) == 0 and
             len(event.l_quarks_w) == 4 and
             len(event.b_quarks_t) == 2):
             event.cat_gen = "fh"
             event.n_cat_gen = 2
+
+        if "gen" in self.conf.general["verbosity"]:
+            for j in event.l_quarks_w:
+                print "q(W)", j.pt, j.eta, j.phi, j.mass, j.pdgId
+            for j in event.b_quarks_t:
+                print "b(t)", j.pt, j.eta, j.phi, j.mass, j.pdgId
+            for j in event.lep_top:
+                print "l(t)", j.pt, j.eta, j.phi, j.mass, j.pdgId
+            for j in event.nu_top:
+                print "n(t)", j.pt, j.eta, j.phi, j.mass, j.pdgId
+            for j in event.b_quarks_h:
+                print "b(h)", j.pt, j.eta, j.phi, j.mass, j.pdgId
+            print "gen cat", event.cat_gen, event.n_cat_gen
+
+        #Store for each jet, specified by it's index in the jet
+        #vector, if it is matched to any gen-level quarks
+        matched_pairs = {}
+
+        def match_jets_to_quarks(jetcoll, quarkcoll, label):
+            for ij, j in enumerate(jetcoll):
+                for iq, q in enumerate(quarkcoll):
+                    l1 = lvec(q)
+                    l2 = lvec(j)
+                    dr = l1.DeltaR(l2)
+                    if dr < 0.3:
+                        if matched_pairs.has_key(ij):
+                            if matched_pairs[ij][1] > dr:
+                                matched_pairs[ij] = (label, iq, dr)
+                        else:
+                            matched_pairs[ij] = (label, iq, dr)
+        #print "GEN", len(event.GenWZQuark), len(event.GenBQuarkFromTop), len(event.GenBQuarkFromH)
+        match_jets_to_quarks(event.good_jets, event.l_quarks_w, "wq")
+        match_jets_to_quarks(event.good_jets, event.b_quarks_t, "tb")
+        match_jets_to_quarks(event.good_jets, event.b_quarks_h, "hb")
+
+        #Number of reco jets matched to quarks from W, top, higgs
+        event.nMatch_wq = 0
+        event.nMatch_tb = 0
+        event.nMatch_hb = 0
+        #As above, but also required to be tagged/untagged for b/light respectively.
+        event.nMatch_wq_btag = 0
+        event.nMatch_tb_btag = 0
+        event.nMatch_hb_btag = 0
+
+        for ij, jet in enumerate(event.good_jets):
+            if not matched_pairs.has_key(ij):
+                continue
+            mlabel, midx, mdr = matched_pairs[ij]
+            if mlabel == "wq":
+                event.nMatch_wq += 1
+                if jet.btagFlag < 0.5:
+                    event.nMatch_wq_btag += 1
+            if mlabel == "tb":
+                event.nMatch_tb += 1
+                if jet.btagFlag >= 0.5:
+                    event.nMatch_tb_btag += 1
+            if mlabel == "hb":
+                event.nMatch_hb += 1
+                if jet.btagFlag >= 0.5:
+                    event.nMatch_hb_btag += 1
+
+        if "matching" in self.conf.general["verbosity"]:
+            matches = {"wq":event.l_quarks_w, "tb": event.b_quarks_t, "hb":event.b_quarks_h}
+
+            for ij, jet in enumerate(event.good_jets):
+                if not matched_pairs.has_key(ij):
+                    continue
+                mlabel, midx, mdr = matched_pairs[ij]
+                print "jet match", ij, mlabel, midx, mdr, jet.pt, matches[mlabel][midx].pt
 
         passes = True
         if passes:
@@ -649,8 +727,8 @@ class MEAnalyzer(FilterAnalyzer):
         #Create the ME integrator.
         #Arguments specify the verbosity
         self.integrator = MEM.Integrand(
-            0,
-            #MEM.output,
+            #0,
+            MEM.output,
             #MEM.output | MEM.init | MEM.init_more,# | MEM.event | MEM.integration,
             self.configs["default"]
         )
@@ -726,63 +804,18 @@ class MEAnalyzer(FilterAnalyzer):
         met_pt = event.input.met_pt
         met_phi = event.input.met_phi
 
+        if "reco" in self.conf.general["verbosity"]:
+            for j in jets:
+                print "jet", j.pt, j.eta, j.phi, j.mass, j.btagCSV, j.mcFlavour
+            for l in leptons:
+                print "lep", l.pt, l.eta, l.phi, l.mass, l.charge
+
         #Check if event passes reco-level requirements to calculate ME
         if event.cat in self.conf.mem["MECategories"] and event.btag_LR_4b_2b > self.conf.mem["btagLRCut"][event.cat] and len(event.btagged_jets)>=4:
             print "MEM RECO PASS", event.cat, event.btag_LR_4b_2b, len(jets), len(leptons), len(event.btagged_jets), len(event.buntagged_jets)
         else:
             return True
 
-        #Store for each jet, specified by it's index in the jet
-        #vector, if it is matched to any gen-level quarks
-        matched_pairs = {}
-
-        def match_jets_to_quarks(jetcoll, quarkcoll, label):
-            for ij, j in enumerate(jetcoll):
-                for iq, q in enumerate(quarkcoll):
-                    l1 = lvec(q)
-                    l2 = lvec(j)
-                    dr = l1.DeltaR(l2)
-                    if dr < 0.3:
-                        if matched_pairs.has_key(ij):
-                            if matched_pairs[ij][1] > dr:
-                                matched_pairs[ij] = (label, iq, dr)
-                        else:
-                            matched_pairs[ij] = (label, iq, dr)
-        #print "GEN", len(event.GenWZQuark), len(event.GenBQuarkFromTop), len(event.GenBQuarkFromH)
-        match_jets_to_quarks(jets, event.GenWZQuark, "wq")
-        match_jets_to_quarks(jets, event.GenBQuarkFromTop, "tb")
-        match_jets_to_quarks(jets, event.GenBQuarkFromH, "hb")
-
-        #Number of reco jets matched to quarks from W, top, higgs
-        event.nMatch_wq = 0
-        event.nMatch_tb = 0
-        event.nMatch_hb = 0
-        #As above, but also required to be tagged/untagged for b/light respectively.
-        event.nMatch_wq_btag = 0
-        event.nMatch_tb_btag = 0
-        event.nMatch_hb_btag = 0
-
-        for ij, jet in enumerate(jets):
-            if not matched_pairs.has_key(ij):
-                continue
-            mlabel, midx, mdr = matched_pairs[ij]
-            if mlabel == "wq":
-                event.nMatch_wq += 1
-                if jet.btagFlag < 0.5:
-                    event.nMatch_wq_btag += 1
-            if mlabel == "tb":
-                event.nMatch_tb += 1
-                if jet.btagFlag >= 0.5:
-                    event.nMatch_tb_btag += 1
-            if mlabel == "hb":
-                event.nMatch_hb += 1
-                if jet.btagFlag >= 0.5:
-                    event.nMatch_hb_btag += 1
-
-        #One quark from W missed, integrate over its direction
-        if event.cat in ["cat2", "cat3"]:
-            self.vars_to_integrate.push_back(MEM.PSVar.cos_qbar1)
-            self.vars_to_integrate.push_back(MEM.PSVar.phi_qbar1)
 
         #Get the conf dict specifying which matches we require
         required_match = self.conf.mem.get("requireMatched", {}).get(event.cat, {})
@@ -816,6 +849,10 @@ class MEAnalyzer(FilterAnalyzer):
         def add_objects():
             self.vars_to_integrate.clear()
             self.integrator.next_event()
+            #One quark from W missed, integrate over its direction
+            if event.cat in ["cat2", "cat3"]:
+                self.vars_to_integrate.push_back(MEM.PSVar.cos_qbar1)
+                self.vars_to_integrate.push_back(MEM.PSVar.phi_qbar1)
             for jet in jets:
                 self.add_obj(
                     MEM.ObjectType.Jet,
@@ -858,14 +895,12 @@ class MEAnalyzer(FilterAnalyzer):
                     r = MEM.MEMOutput()
                     res[(hypo, confname)] = r
 
+        p1 = res[(MEM.Hypothesis.TTH, "default")].p
+        p2 = res[(MEM.Hypothesis.TTBB, "default")].p
+
         #In case of an erroneous calculation, print out event kinematics
-        #if res[(MEM.Hypothesis.TTH, "default")].p <= 0:
-        #    print "MEM BADPROB"
-        #    for jet in jets:
-        #        print "MEM jet", jet.pt, jet.eta, jet.phi, jet.mass, jet.btagCSV, jet.btagFlag
-        #    for lep in leptons:
-        #        print "MEM lep", lep.pt, lep.eta, lep.phi, lep.mass, lep.charge
-        #    print "MEM met", met_pt, met_phi
+        if self.conf.mem["calcME"] and (p1<=0 or p2<=0 or (p1 / (p1+0.02*p2))<0.0001):
+            print "MEM BADPROB", p1, p2
 
         #print out full MEM result dictionary
         #print "RES", [(k, res[k].p) for k in sorted(res.keys())]

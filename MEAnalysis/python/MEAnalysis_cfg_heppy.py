@@ -55,7 +55,7 @@ class Conf:
         self.leptons["mu"]["tight_veto"] = self.leptons["mu"]["loose"]
 
         self.jets = {
-            "pt": 40,
+            "pt": 30,
             "eta": 2.5,
 
             #The default b-tagging algorithm (branch name)
@@ -76,12 +76,18 @@ class Conf:
             "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV6.root",
             "sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_vhbb.py",
 
+            #If the list contains:
+            # "gen" - print out the ttH gen-level particles (b from top, b form higgs, q from W, leptons
+            # "reco" - print out the reco-level selected particles
+            # "matching" - print out the association between gen and reco objects
+            #"verbosity": ["eventboundary", "input", "matching", "gen", "reco"],
+            "verbosity": [],
+
             #Process only these events (will scan through file to find)
             #"eventWhitelist": [
-            #    (1, 467, 46626)
-            #    , (1, 1791, 179025)
-            #    , (1, 1326, 132501)
-            #    , (1, 1470, 146966)
+            #    (1, 737, 73651),
+            #    (1, 1773, 177245),
+            #    (1, 1040, 103998),
             #]
         }
 
@@ -89,6 +95,7 @@ class Conf:
 
             #Actually run the ME calculation
             #If False, all ME values will be 0
+            #"calcME": True,
             "calcME": True,
 
             #Which categories to analyze the matrix element in
@@ -134,7 +141,6 @@ class Conf:
                 "NoPDF",
                 "NoScattAmpl",
                 "QuarkEnergy98",
-                #"QuarkEnergy10",
                 "NuPhiRestriction",
                 "JetsPtOrder"
             ],
