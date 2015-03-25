@@ -474,7 +474,7 @@ class EventAnalyzer(Analyzer):
         #event.GenBQuarkFromHafterISR = GenBQuarkFromHafterISR.make_array(event)
         #event.hJidx_sortcsv = hJidx_sortcsv.make_array(event)
         #event.aJCidx = aJCidx.make_array(event)
-        #event.GenLepFromTop = GenLepFromTop.make_array(event)
+        event.GenLepFromTop = GenLepFromTop.make_array(event)
         #event.GenVbosons = GenVbosons.make_array(event)
         #event.GenJet = GenJet.make_array(event)
         #event.GenHiggsBoson = GenHiggsBoson.make_array(event)
