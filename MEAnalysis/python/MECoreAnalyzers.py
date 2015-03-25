@@ -211,7 +211,7 @@ class JetAnalyzer(FilterAnalyzer):
                 ), event.Jet
             ),
             key=lambda x: x.pt, reverse=True
-        )
+        )[0:8]
         self.counters["jets"].inc("good", len(event.good_jets))
 
         event.btagged_jets_bdisc = {}
@@ -731,9 +731,9 @@ class MEAnalyzer(FilterAnalyzer):
         #Create the ME integrator.
         #Arguments specify the verbosity
         self.integrator = MEM.Integrand(
-            #0,
+            0,
             #MEM.output,
-            MEM.output | MEM.init | MEM.init_more,# | MEM.event | MEM.integration,
+            #MEM.output | MEM.init | MEM.init_more,# | MEM.event | MEM.integration,
             self.configs["default"]
         )
 
