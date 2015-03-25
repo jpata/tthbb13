@@ -19,7 +19,7 @@ samples = cms.VPSet([
         skip     = cms.bool(False),
         name     = cms.string('ttjets_13tev_madgraph_pu20bx25_phys14'),
         nickName = cms.string('ttjets_13tev_madgraph_pu20bx25_phys14'),
-        perJob   = cms.uint32(100000),
+        perJob   = cms.uint32(10000),
         xSec     = cms.double(xsec[("ttjets", "13TeV")]),
         nGen     = cms.int64(-1),
         subFiles = cms.vstring([
@@ -102,7 +102,7 @@ samples = cms.VPSet([
         nickName = cms.string('tth_hbb_13tev'),
         xSec     = cms.double(xsec[("tthbb", "13TeV")]),
         nGen     = cms.int64(-1),
-        perJob   = cms.uint32(1000),
+        perJob   = cms.uint32(10000),
         subFiles = cms.vstring([
             "/store/user/jpata/VHBBHeppyV10/TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola/VHBB_HEPPY_V10_TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola__Phys14DR-PU20bx25_tsg_PHYS14_25_V1-v2/150302_164515/0000/tree_1.root"
         ]),

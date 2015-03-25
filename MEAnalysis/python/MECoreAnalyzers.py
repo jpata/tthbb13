@@ -1,7 +1,7 @@
 import ROOT
 import itertools
 from PhysicsTools.HeppyCore.framework.analyzer import Analyzer
-
+import copy
 
 #Load the MEM integrator libraries
 # ROOT.gSystem.Load("libFWCoreFWLite")
@@ -37,6 +37,34 @@ class FilterAnalyzer(Analyzer):
         self.counters.addCounter("processing")
         self.counters["processing"].register("processed")
         self.counters["processing"].register("passes")
+
+class EventIDFilterAnalyzer(FilterAnalyzer):
+    """
+    """
+
+    def __init__(self, cfg_ana, cfg_comp, looperName):
+        super(EventIDFilterAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
+        self.conf = cfg_ana._conf
+        self.event_whitelist = self.conf.general.get("eventWhitelist", None)
+
+    def beginLoop(self, setup):
+        super(EventIDFilterAnalyzer, self).beginLoop(setup)
+
+    def process(self, event):
+        self.counters["processing"].inc("processed")
+
+        passes = True
+        if not self.event_whitelist is None:
+            passes = False
+            if (event.input.run, event.input.lumi, event.input.evt) in self.event_whitelist:
+                print "IDFilter", (event.input.run, event.input.lumi, event.input.evt)
+                passes = True
+
+        if passes and "eventboundary" in self.conf.general["verbosity"]:
+            print "---", event.input.run, event.input.lumi, event.input.evt
+        if passes:
+            self.counters["processing"].inc("passes")
+        return passes
 
 class LeptonAnalyzer(FilterAnalyzer):
     """
@@ -138,7 +166,7 @@ class LeptonAnalyzer(FilterAnalyzer):
 
         passes = event.is_sl or event.is_dl
         if event.is_sl and event.is_dl:
-            print "pathological SL && DL event: {0}".format(event)
+            #print "pathological SL && DL event: {0}".format(event)
             self.counters["processing"].inc("slanddl")
             passes = False
 
@@ -170,6 +198,11 @@ class JetAnalyzer(FilterAnalyzer):
         self.counters["processing"].inc("processed")
         self.counters["jets"].inc("any", len(event.Jet))
 
+        #pt-descending input jets
+        if "input" in self.conf.general["verbosity"]:
+            for j in event.Jet:
+                print "ijet", j.pt, j.eta, j.phi, j.mass, j.btagCSV, j.mcFlavour
+
         event.good_jets = sorted(
             filter(
                 lambda x: (
@@ -178,29 +211,29 @@ class JetAnalyzer(FilterAnalyzer):
                 ), event.Jet
             ),
             key=lambda x: x.pt, reverse=True
-        )
+        )[0:8]
         self.counters["jets"].inc("good", len(event.good_jets))
 
-        event.btagged_jets = {}
-        event.buntagged_jets = {}
+        event.btagged_jets_bdisc = {}
+        event.buntagged_jets_bdisc = {}
         for (btag_wp_name, btag_wp) in self.conf.jets["btagWPs"].items():
             algo, wp = btag_wp
-            event.btagged_jets[btag_wp_name] = filter(
+            event.btagged_jets_bdisc[btag_wp_name] = filter(
                 lambda x: getattr(x, algo) > wp,
                 event.good_jets
             )
-            event.buntagged_jets[btag_wp_name] = filter(
+            event.buntagged_jets_bdisc[btag_wp_name] = filter(
                 lambda x: getattr(x, algo) <= wp,
                 event.good_jets
             )
             self.counters["jets"].inc(btag_wp_name,
-                len(event.btagged_jets[btag_wp_name])
+                len(event.btagged_jets_bdisc[btag_wp_name])
             )
-            setattr(event, "nB"+btag_wp_name, len(event.btagged_jets[btag_wp_name]))
-        event.buntagged_jets = event.buntagged_jets[self.conf.jets["btagWP"]]
-        event.btagged_jets = event.btagged_jets[self.conf.jets["btagWP"]]
+            setattr(event, "nB"+btag_wp_name, len(event.btagged_jets_bdisc[btag_wp_name]))
+        event.buntagged_jets_bdisc = event.buntagged_jets_bdisc[self.conf.jets["btagWP"]]
+        event.btagged_jets_bdisc = event.btagged_jets_bdisc[self.conf.jets["btagWP"]]
         event.n_tagwp_tagged_true_bjets = 0
-        for j in event.btagged_jets:
+        for j in event.btagged_jets_bdisc:
             if abs(j.mcFlavour) == 5:
                 event.n_tagwp_tagged_true_bjets += 1
         passes = len(event.good_jets) >= 4
@@ -366,18 +399,27 @@ class BTagLRAnalyzer(FilterAnalyzer):
         event.btag_LR_4b_2b_alt = lratio(event.btag_lr_4b_alt, event.btag_lr_2b_alt)
         #event.btag_LR_4b_2b_alt = 0
 
-        #print "LR", event.btag_LR_4b_2b_old, event.btag_LR_4b_2b, event.btag_LR_4b_2b_alt
         event.buntagged_jets_by_LR_4b_2b = [jets_for_btag_lr[i] for i in best_4b_perm[4:]]
+        event.btagged_jets_by_LR_4b_2b = [jets_for_btag_lr[i] for i in best_4b_perm[0:4]]
+
         for i in range(len(event.good_jets)):
             event.good_jets[i].btagFlag = 0.0
 
-        event.n_lr_tagged_true_bjets = 0
-        #First 4 jets in the best permutation are counted as b-tagged
-        for i in best_4b_perm[0:4]:
-            idx = event.good_jets.index(jets_for_btag_lr[i])
+        #Jets are untagged according to the b-tagging likelihood ratio permutation
+        if self.conf.jets["untaggedSelection"] == "btagLR":
+            event.buntagged_jets = event.buntagged_jets_by_LR_4b_2b
+            event.btagged_jets = event.btagged_jets_by_LR_4b_2b
+        #Jets are untagged according to b-discriminatr
+        elif self.conf.jets["untaggedSelection"] == "btagCSV":
+            event.buntagged_jets = event.buntagged_jets_bdisc
+            event.btagged_jets = event.btagged_jets_bdisc
+
+        #Take first 4 most b-tagged jets
+        btagged = sorted(event.btagged_jets, key=lambda x: x.btagCSV, reverse=True)[0:4]
+        #Set these jets to be used as b-quarks in the MEM
+        for jet in btagged:
+            idx = event.good_jets.index(jet)
             event.good_jets[idx].btagFlag = 1.0
-            if abs(event.good_jets[idx].mcFlavour) == 5:
-                event.n_lr_tagged_true_bjets += 1
 
         passes = True
         if passes:
@@ -408,8 +450,8 @@ class MECategoryAnalyzer(FilterAnalyzer):
         if event.is_sl:
 
             #at least 6 jets, if 6, Wtag in [60,100], if more Wtag in [72,94]
-            if ((len(event.good_jets) == 6 and event.Wmass2 >= 60 and event.Wmass2 < 100) or
-               (len(event.good_jets) > 6 and event.Wmass2 >= 72 and event.Wmass2 < 94)):
+            if ((len(event.good_jets) == 6 and event.Wmass >= 60 and event.Wmass < 100) or
+               (len(event.good_jets) > 6 and event.Wmass >= 72 and event.Wmass < 94)):
                cat = "cat1"
             #at least 6 jets, no W-tag
             elif len(event.good_jets) >= 6:
@@ -432,9 +474,6 @@ class MECategoryAnalyzer(FilterAnalyzer):
 class WTagAnalyzer(FilterAnalyzer):
     """
     Performs W-mass calculation on pairs of untagged jets.
-
-    Two cases are considered: jets untagged by the default b-tagging algo (Wmass)
-    and jets untagged by the b-tagging likelihood (Wmass2).
 
     Jets are considered untagged according to the b-tagging permutation which
     gives the highest likelihood of the event being a 4b+Nlight event.
@@ -471,15 +510,11 @@ class WTagAnalyzer(FilterAnalyzer):
         self.counters["processing"].inc("processed")
 
         event.Wmass = 0.0
-        event.Wmass2 = 0.0
         if len(event.buntagged_jets)>=2:
             bpair = self.find_best_pair(event.buntagged_jets)
             event.Wmass = bpair[0]
-
-        if len(event.buntagged_jets_by_LR_4b_2b)>=2:
-            bpair = self.find_best_pair(event.buntagged_jets_by_LR_4b_2b)
-            event.Wmass2 = bpair[0]
-
+            if "reco" in self.conf.general["verbosity"]:
+                print "Wmass", event.Wmass, event.good_jets.index(bpair[1]), event.good_jets.index(bpair[2])
         passes = True
         if passes:
             self.counters["processing"].inc("passes")
@@ -534,11 +569,104 @@ class GenTTHAnalyzer(FilterAnalyzer):
     def process(self, event):
         self.counters["processing"].inc("processed")
 
-        l_quarks_w = event.GenWZQuark
-        b_quarks_t = event.GenBQuarkFromTop
-        b_quarks_h = event.GenBQuarkFromH
-        lep_top = event.GenLepFromTop
-        nu_top = event.GenNuFromTop
+        #Somehow, the GenWZQuark distribution is duplicated
+        event.l_quarks_w = event.GenWZQuark[0:len(event.GenWZQuark)/2]
+        event.b_quarks_t = event.GenBQuarkFromTop
+        event.b_quarks_h = event.GenBQuarkFromH
+        event.lep_top = event.GenLepFromTop
+        event.nu_top = event.GenNuFromTop
+
+        event.cat_gen = None
+        event.n_cat_gen = -1
+
+        if (len(event.lep_top) == 1 and
+            len(event.nu_top) == 1 and
+            len(event.l_quarks_w) == 2 and
+            len(event.b_quarks_t) == 2):
+            event.cat_gen = "sl"
+            event.n_cat_gen = 0
+        elif (len(event.lep_top) == 2 and
+            len(event.nu_top) == 2 and
+            len(event.l_quarks_w) == 0 and
+            len(event.b_quarks_t) == 2):
+            event.cat_gen = "dl"
+            event.n_cat_gen = 1
+        elif (len(event.lep_top) == 0 and
+            len(event.nu_top) == 0 and
+            len(event.l_quarks_w) == 4 and
+            len(event.b_quarks_t) == 2):
+            event.cat_gen = "fh"
+            event.n_cat_gen = 2
+
+        if "gen" in self.conf.general["verbosity"]:
+            for j in event.l_quarks_w:
+                print "q(W)", j.pt, j.eta, j.phi, j.mass, j.pdgId
+            for j in event.b_quarks_t:
+                print "b(t)", j.pt, j.eta, j.phi, j.mass, j.pdgId
+            for j in event.lep_top:
+                print "l(t)", j.pt, j.eta, j.phi, j.mass, j.pdgId
+            for j in event.nu_top:
+                print "n(t)", j.pt, j.eta, j.phi, j.mass, j.pdgId
+            for j in event.b_quarks_h:
+                print "b(h)", j.pt, j.eta, j.phi, j.mass, j.pdgId
+            print "gen cat", event.cat_gen, event.n_cat_gen
+
+        #Store for each jet, specified by it's index in the jet
+        #vector, if it is matched to any gen-level quarks
+        matched_pairs = {}
+
+        def match_jets_to_quarks(jetcoll, quarkcoll, label):
+            for ij, j in enumerate(jetcoll):
+                for iq, q in enumerate(quarkcoll):
+                    l1 = lvec(q)
+                    l2 = lvec(j)
+                    dr = l1.DeltaR(l2)
+                    if dr < 0.3:
+                        if matched_pairs.has_key(ij):
+                            if matched_pairs[ij][1] > dr:
+                                matched_pairs[ij] = (label, iq, dr)
+                        else:
+                            matched_pairs[ij] = (label, iq, dr)
+        #print "GEN", len(event.GenWZQuark), len(event.GenBQuarkFromTop), len(event.GenBQuarkFromH)
+        match_jets_to_quarks(event.good_jets, event.l_quarks_w, "wq")
+        match_jets_to_quarks(event.good_jets, event.b_quarks_t, "tb")
+        match_jets_to_quarks(event.good_jets, event.b_quarks_h, "hb")
+
+        #Number of reco jets matched to quarks from W, top, higgs
+        event.nMatch_wq = 0
+        event.nMatch_tb = 0
+        event.nMatch_hb = 0
+        #As above, but also required to be tagged/untagged for b/light respectively.
+        event.nMatch_wq_btag = 0
+        event.nMatch_tb_btag = 0
+        event.nMatch_hb_btag = 0
+
+        for ij, jet in enumerate(event.good_jets):
+            if not matched_pairs.has_key(ij):
+                continue
+            mlabel, midx, mdr = matched_pairs[ij]
+            if mlabel == "wq":
+                event.nMatch_wq += 1
+                if jet.btagFlag < 0.5:
+                    event.nMatch_wq_btag += 1
+            if mlabel == "tb":
+                event.nMatch_tb += 1
+                if jet.btagFlag >= 0.5:
+                    event.nMatch_tb_btag += 1
+            if mlabel == "hb":
+                event.nMatch_hb += 1
+                if jet.btagFlag >= 0.5:
+                    event.nMatch_hb_btag += 1
+
+        if "matching" in self.conf.general["verbosity"]:
+            matches = {"wq":event.l_quarks_w, "tb": event.b_quarks_t, "hb":event.b_quarks_h}
+
+            for ij, jet in enumerate(event.good_jets):
+                if not matched_pairs.has_key(ij):
+                    continue
+                mlabel, midx, mdr = matched_pairs[ij]
+                print "jet match", ij, mlabel, midx, mdr, jet.pt, matches[mlabel][midx].pt
+
         passes = True
         if passes:
             self.counters["processing"].inc("passes")
@@ -560,12 +688,53 @@ class MEAnalyzer(FilterAnalyzer):
         self.conf = cfg_ana._conf
         super(MEAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
 
+
+        self.configs = {
+            "default": MEM.MEMConfig(),
+            "NumPointsDouble": MEM.MEMConfig(),
+            "NumPointsHalf": MEM.MEMConfig(),
+            "NoJacobian": MEM.MEMConfig(),
+            "NoDecayAmpl": MEM.MEMConfig(),
+            "NoPDF": MEM.MEMConfig(),
+            "NoScattAmpl": MEM.MEMConfig(),
+            "QuarkEnergy98": MEM.MEMConfig(),
+            "QuarkEnergy10": MEM.MEMConfig(),
+            "NuPhiRestriction": MEM.MEMConfig(),
+            "JetsPtOrder": MEM.MEMConfig(),
+        }
+
+        self.memkeys = self.conf.mem["methodsToRun"]
+
+        self.configs["default"].defaultCfg()
+        self.configs["NumPointsDouble"].defaultCfg(2.0)
+        self.configs["NumPointsHalf"].defaultCfg(0.5)
+        self.configs["NoJacobian"].defaultCfg()
+        self.configs["NoDecayAmpl"].defaultCfg()
+        self.configs["NoPDF"].defaultCfg()
+        self.configs["NoScattAmpl"].defaultCfg()
+        self.configs["QuarkEnergy98"].defaultCfg()
+        self.configs["QuarkEnergy10"].defaultCfg()
+        self.configs["NuPhiRestriction"].defaultCfg()
+        self.configs["JetsPtOrder"].defaultCfg()
+
+        self.configs["NoJacobian"].int_code &= ~ MEM.IntegrandType.Jacobian
+        self.configs["NoDecayAmpl"].int_code &= ~ MEM.IntegrandType.DecayAmpl
+        self.configs["NoPDF"].int_code &= ~ MEM.IntegrandType.PDF
+        self.configs["NoScattAmpl"].int_code &=  ~ MEM.IntegrandType.ScattAmpl
+        self.configs["QuarkEnergy98"].j_range_CL = 0.98
+        self.configs["QuarkEnergy98"].b_range_CL = 0.98
+        self.configs["QuarkEnergy10"].j_range_CL = 0.10
+        self.configs["QuarkEnergy10"].b_range_CL = 0.10
+        self.configs["NuPhiRestriction"].m_range_CL = 99
+        self.configs["JetsPtOrder"].highpt_first  = 0
+
         #Create the ME integrator.
         #Arguments specify the verbosity
         self.integrator = MEM.Integrand(
             0,
-            #MEM.init|MEM.init_more|MEM.event,
-            MEM.MEMConfig()
+            #MEM.output,
+            #MEM.output | MEM.init | MEM.init_more,# | MEM.event | MEM.integration,
+            self.configs["default"]
         )
 
         #Create an emtpy std::vector<MEM::Permutations::Permutations>
@@ -593,7 +762,6 @@ class MEAnalyzer(FilterAnalyzer):
             |MEM.IntegrandType.PDF
             |MEM.IntegrandType.Transfer
         )
-        self.integrator.set_ncalls(4000);
         self.integrator.set_sqrts(13000.);
 
         #Create an empty vector for the integration variables
@@ -630,68 +798,28 @@ class MEAnalyzer(FilterAnalyzer):
         self.vars_to_integrate.clear()
         self.integrator.next_event()
 
-        jets = event.good_jets
+        #Initialize members for tree filler
+        event.mem_results_tth = []
+        event.mem_results_ttbb = []
+
+        #Sort jets by pt descending, only take up to 8 jets to reduce permutations
+        jets = sorted(event.good_jets, key=lambda x: x.pt, reverse=True)
         leptons = event.good_leptons
         met_pt = event.input.met_pt
         met_phi = event.input.met_phi
 
+        if "reco" in self.conf.general["verbosity"]:
+            for j in jets:
+                print "jet", j.pt, j.eta, j.phi, j.mass, j.btagCSV, j.btagFlag, j.mcFlavour
+            for l in leptons:
+                print "lep", l.pt, l.eta, l.phi, l.mass, l.charge
+
         #Check if event passes reco-level requirements to calculate ME
-        if event.cat in self.conf.mem["MECategories"] and event.btag_LR_4b_2b > self.conf.mem["btagLRCut"][event.cat]:
-            print "MEM RECO PASS", event.cat, event.btag_LR_4b_2b, len(jets), len(leptons)
+        if event.cat in self.conf.mem["MECategories"] and event.btag_LR_4b_2b > self.conf.mem["btagLRCut"][event.cat] and len(event.btagged_jets)>=4:
+            print "MEM RECO PASS", event.cat, event.btag_LR_4b_2b, len(jets), len(leptons), len(event.btagged_jets), len(event.buntagged_jets)
         else:
             return True
 
-        #Store for each jet, specified by it's index in the jet
-        #vector, if it is matched to any gen-level quarks
-        matched_pairs = {}
-
-        def match_jets_to_quarks(jetcoll, quarkcoll, label):
-            for ij, j in enumerate(jetcoll):
-                for iq, q in enumerate(quarkcoll):
-                    l1 = lvec(q)
-                    l2 = lvec(j)
-                    dr = l1.DeltaR(l2)
-                    if dr < 0.3:
-                        if matched_pairs.has_key(ij):
-                            if matched_pairs[ij][1] > dr:
-                                matched_pairs[ij] = (label, iq, dr)
-                        else:
-                            matched_pairs[ij] = (label, iq, dr)
-
-        match_jets_to_quarks(jets, event.GenWZQuark, "wq")
-        match_jets_to_quarks(jets, event.GenBQuarkFromTop, "tb")
-        match_jets_to_quarks(jets, event.GenBQuarkFromH, "hb")
-
-        #Number of reco jets matched to quarks from W, top, higgs
-        event.nMatch_wq = 0
-        event.nMatch_tb = 0
-        event.nMatch_hb = 0
-        #As above, but also required to be tagged/untagged for b/light respectively.
-        event.nMatch_wq_btag = 0
-        event.nMatch_tb_btag = 0
-        event.nMatch_hb_btag = 0
-
-        for ij, jet in enumerate(jets):
-            if not matched_pairs.has_key(ij):
-                continue
-            mlabel, midx, mdr = matched_pairs[ij]
-            if mlabel == "wq":
-                event.nMatch_wq += 1
-                if jet.btagFlag < 0.5:
-                    event.nMatch_wq_btag += 1
-            if mlabel == "tb":
-                event.nMatch_tb += 1
-                if jet.btagFlag >= 0.5:
-                    event.nMatch_tb_btag += 1
-            if mlabel == "hb":
-                event.nMatch_hb += 1
-                if jet.btagFlag >= 0.5:
-                    event.nMatch_hb_btag += 1
-
-        #One quark from W missed, integrate over its direction
-        if event.cat in ["cat2", "cat3"]:
-            self.vars_to_integrate.push_back(MEM.PSVar.cos_qbar1)
-            self.vars_to_integrate.push_back(MEM.PSVar.phi_qbar1)
 
         #Get the conf dict specifying which matches we require
         required_match = self.conf.mem.get("requireMatched", {}).get(event.cat, {})
@@ -699,40 +827,54 @@ class MEAnalyzer(FilterAnalyzer):
         #Check if event.nMatch_label >= conf.mem[cat][label]
         def require(label):
             nreq = required_match.get(label, None)
+            if nreq is None:
+                return True
+
             nmatched = getattr(event, "nMatch_"+label)
-            passes = True
-            if not nreq is None:
-                passes = (nmatched >= nreq)
+
+            #In case event did not contain b form higgs (e.g. ttbb)
+            if "hb" in label and len(event.GenBQuarkFromH) < nreq:
+                return True
+
+            passes = (nmatched >= nreq)
             return passes
 
         #Calculate all the match booleans
         passd = {
             p: require(p) for p in ["wq", "wq_btag", "tb", "tb_btag", "hb", "hb_btag"]
         }
-        print "MATCH Wth", event.nMatch_wq, event.nMatch_tb, event.nMatch_hb, "|", event.nMatch_wq_btag, event.nMatch_tb_btag, event.nMatch_hb_btag, "|", passd
+        #print "MATCH Wth", event.nMatch_wq, event.nMatch_tb, event.nMatch_hb, "|", event.nMatch_wq_btag, event.nMatch_tb_btag, event.nMatch_hb_btag, "|", passd
 
         for k, v in passd.items():
             if not v:
-                print "Failed to match", k
+                #print "Failed to match", k
                 return True
 
-        for jet in jets:
+        def add_objects():
+            self.vars_to_integrate.clear()
+            self.integrator.next_event()
+            #One quark from W missed, integrate over its direction
+            if event.cat in ["cat2", "cat3"]:
+                self.vars_to_integrate.push_back(MEM.PSVar.cos_qbar1)
+                self.vars_to_integrate.push_back(MEM.PSVar.phi_qbar1)
+            for jet in jets:
+                self.add_obj(
+                    MEM.ObjectType.Jet,
+                    p4s=(jet.pt, jet.eta, jet.phi, jet.mass),
+                    obsdict={MEM.Observable.BTAG: jet.btagFlag}
+                )
+                #print "MEM jet", jet.pt, jet.eta, jet.phi, jet.mass, jet.btagCSV, jet.btagFlag
+            for lep in leptons:
+                self.add_obj(
+                    MEM.ObjectType.Lepton,
+                    p4s=(lep.pt, lep.eta, lep.phi, lep.mass),
+                    obsdict={MEM.Observable.CHARGE: lep.charge}
+                )
             self.add_obj(
-                MEM.ObjectType.Jet,
-                p4s=(jet.pt, jet.eta, jet.phi, jet.mass),
-                obsdict={MEM.Observable.BTAG: jet.btagFlag}
+                MEM.ObjectType.MET,
+                #MET is caused by massless object
+                p4s=(met_pt, 0, met_phi, 0),
             )
-            #print "MEM jet", jet.pt, jet.eta, jet.phi, jet.mass, jet.btagCSV, jet.btagFlag
-        for lep in leptons:
-            self.add_obj(
-                MEM.ObjectType.Lepton,
-                p4s=(lep.pt, lep.eta, lep.phi, lep.mass),
-                obsdict={MEM.Observable.CHARGE: lep.charge}
-            )
-        self.add_obj(
-            MEM.ObjectType.MET,
-            p4s=(met_pt, 0, met_phi, met_pt),
-        )
 
         fstate = MEM.FinalState.TTH
         if len(leptons) == 2:
@@ -742,33 +884,31 @@ class MEAnalyzer(FilterAnalyzer):
 
         res = {}
         for hypo in [MEM.Hypothesis.TTH, MEM.Hypothesis.TTBB]:
-            if self.conf.mem["calcME"]:
-                r = self.integrator.run(
-                    fstate,
-                    hypo,
-                    self.vars_to_integrate
-                )
-                res[hypo] = r
-            else:
-                r = MEM.MEMOutput()
-            res[hypo] = r
-        if res[MEM.Hypothesis.TTH].p <= 0:
-            print "MEM BADPROB"
-            for jet in jets:
-                print "MEM jet", jet.pt, jet.eta, jet.phi, jet.mass, jet.btagCSV, jet.btagFlag
-            for lep in leptons:
-                print "MEM lep", lep.pt, lep.eta, lep.phi, lep.mass, lep.charge
-            print "MEM met", met_pt, met_phi
-        print "RES", {k:res[k].p for k in res.keys()}
-        event.p_hypo_tth = res[MEM.Hypothesis.TTH].p
-        event.p_hypo_ttbb = res[MEM.Hypothesis.TTBB].p
+            for confname in self.memkeys:
+                if self.conf.mem["calcME"]:
+                    conf = self.configs[confname]
+                    #print "MEM conf", confname, "hypo", hypo
+                    self.integrator.set_cfg(conf)
+                    add_objects()
+                    r = self.integrator.run(
+                        fstate,
+                        hypo,
+                        self.vars_to_integrate
+                    )
+                    res[(hypo, confname)] = r
+                else:
+                    r = MEM.MEMOutput()
+                    res[(hypo, confname)] = r
 
-        event.p_err_hypo_tth = res[MEM.Hypothesis.TTH].p_err
-        event.p_err_hypo_ttbb = res[MEM.Hypothesis.TTBB].p_err
+        p1 = res[(MEM.Hypothesis.TTH, "default")].p
+        p2 = res[(MEM.Hypothesis.TTBB, "default")].p
 
-        event.mem_chi2_hypo_tth = res[MEM.Hypothesis.TTH].chi2
-        event.mem_chi2_hypo_ttbb = res[MEM.Hypothesis.TTBB].chi2
+        #In case of an erroneous calculation, print out event kinematics
+        if self.conf.mem["calcME"] and (p1<=0 or p2<=0 or (p1 / (p1+0.02*p2))<0.0001):
+            print "MEM BADPROB", p1, p2
 
-        event.mem_time_hypo_tth = res[MEM.Hypothesis.TTH].time
-        event.mem_time_hypo_ttbb = res[MEM.Hypothesis.TTBB].time
+        #print out full MEM result dictionary
+        #print "RES", [(k, res[k].p) for k in sorted(res.keys())]
 
+        event.mem_results_tth = [res[(MEM.Hypothesis.TTH, k)] for k in self.memkeys]
+        event.mem_results_ttbb = [res[(MEM.Hypothesis.TTBB, k)] for k in self.memkeys]

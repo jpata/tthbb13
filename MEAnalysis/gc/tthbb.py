@@ -15,19 +15,19 @@ args = parser.parse_args()
 
 jobs = ["confs/sig.conf", "confs/bkg.conf"]
 #gc = "/shome/jpata/grid-control/GC"
-gc = "grid-control/GC"
+gc = "./grid-control/go.py"
 
 if args.action == "status":
     for job in jobs:
         print job
-        subprocess.call([gc, "run", job, "-qs"])
-        subprocess.call([gc, "run", job, "-r"])
+        subprocess.call([gc, job, "-qs"])
+        subprocess.call([gc, job, "-r"])
 if args.action == "submit":
     for job in jobs:
-        subprocess.call([gc, "run", job, "-q"])
+        subprocess.call([gc, job, "-q"])
 if args.action == "report":
     for job in jobs:
-        subprocess.call([gc, "run", job, "-r"])
+        subprocess.call([gc, job, "-r"])
 if args.action == "hadd":
     completed_files = []
     input_filenames = []
