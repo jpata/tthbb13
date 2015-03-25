@@ -14,6 +14,7 @@ import sys
 import math
 import glob
 import copy
+import pickle
 
 import ROOT
 
@@ -523,6 +524,10 @@ def MakePlots(mis, files, input_treename = 'tree'):
       h_mi.GetZaxis().SetLabelSize(0.03)
       
       draw_opts = "COLZ TEXT"
+
+      f_pickle = open("{0}_mi.pickle".format(mi.name), "w")
+      pickle.dump(mi_result, f_pickle)
+      f_pickle.close()
 
       h_mi.Draw(draw_opts)
       if mi.diagonal_only:

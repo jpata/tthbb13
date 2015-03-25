@@ -38,7 +38,11 @@ for pair_name, pair in pairs.iteritems():
         #mi("masses_v5_"+pair_name, pair[0], pair[1], mass_vars_v5, fiducial_cuts[pair[0]], fiducial_cuts[pair[1]], diagonal_only = True),
         #mi("taus",   "tth", "ttj", tau_vars,  fiducial_cuts["tth"], fiducial_cuts["ttj"], diagonal_only = True)
         #mi("interesting",   "tth", "ttj", interesting_vars,  fiducial_cuts["tth"], fiducial_cuts["ttj"], diagonal_only = False)
-        mi("interesting_higgs_v5_"+pair_name, pair[0], pair[1], interesting_vars_v5,  fiducial_cuts[pair[0]], fiducial_cuts[pair[1]], diagonal_only = False)
+
+        #mi("mass_vars_v7_"+pair_name, pair[0], pair[1], mass_vars_v7,  fiducial_cuts[pair[0]], fiducial_cuts[pair[1]], diagonal_only = True)
+        mi("interesting_vars_v7_"+pair_name, pair[0], pair[1], interesting_vars_v7,  fiducial_cuts[pair[0]], fiducial_cuts[pair[1]], diagonal_only = False)
+        
+
     ]
 
     MakePlots(mis, full_filenames)

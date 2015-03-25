@@ -98,10 +98,10 @@ for k in to_process:
         print "Using 1.0 as weight"
         print "This only makes sense for tth and ttj for Higgs tagging"
         
-        if k=="tth":            
+        if ("tth" in k or "rad_hh4b" in k):            
             pt_param_name = "higgs_pt"
             eta_param_name = "higgs_eta"
-        elif k=="ttj":
+        elif ("ttj" in k or "qcd" in k):            
             pt_param_name = "parton_pt"
             eta_param_name = "parton_eta"
 

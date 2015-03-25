@@ -36,6 +36,9 @@ for pair_name, pair in pairs.iteritems():
     #if not pair_name == "pt-470-to-600":
     #    continue
 
+    #if not pair_name == "pt-600-to-800":
+    #    continue
+
     #if not pair_name == "pt-800-to-1000":
     #    continue
 
@@ -54,20 +57,26 @@ for pair_name, pair in pairs.iteritems():
     #              htt_vars_v36,
     #              fiducial_cut_and_weight, fiducial_cut_and_weight, True))
 
-    mis.append(mi(pair_name + "_mass_vars", 
-                   pair[0], pair[1],
-                   [v for v in mass_vars_v36 if fatjet_size in v.name], 
-                   fiducial_cut_and_weight, fiducial_cut_and_weight, True))
+    #mis.append(mi(pair_name + "_mass_vars", 
+    #               pair[0], pair[1],
+    #               [v for v in mass_vars_v36 if fatjet_size in v.name], 
+    #               fiducial_cut_and_weight, fiducial_cut_and_weight, True))
 
-    mis.append(mi(pair_name + "_mass_vars_phys14", 
-                   pair[0] + "_phys14", pair[1] + "_phys14", 
-                   [v for v in mass_vars_v36 if fatjet_size in v.name], 
-                   fiducial_cut_and_weight, fiducial_cut_and_weight, True))
+    #mis.append(mi(pair_name + "_mass_vars_phys14", 
+    #               pair[0] + "_phys14", pair[1] + "_phys14", 
+    #               [v for v in mass_vars_v36 if fatjet_size in v.name], 
+    #               fiducial_cut_and_weight, fiducial_cut_and_weight, True))
 
     #mis.append(mi(pair_name + "_support_vars", 
     #               pair[0], pair[1], 
     #               [v for v in qvol_vars_v36+nsub_vars_v36 if fatjet_size in v.name], 
     #               fiducial_cut_and_weight, fiducial_cut_and_weight, True))
+
+    #mis.append(mi(pair_name + "_support_vars_phys14", 
+    #               pair[0] + "_phys14", pair[1] + "_phys14", 
+    #               [v for v in qvol_vars_v36+nsub_vars_v36 if fatjet_size in v.name], 
+    #               fiducial_cut_and_weight, fiducial_cut_and_weight, True))
+
     #mis.append(mi(pair_name + "_cmstt_vars", 
     #               pair[0], pair[1], 
     #               [v for v in cmstt_vars_v36 if fatjet_size in v.name], 
@@ -75,8 +84,13 @@ for pair_name, pair in pairs.iteritems():
     
     #mis.append(mi(pair_name + "_interesting", 
     #              pair[0], pair[1], 
-    #              ineresting_highpt_vars_v36,
+    #              ineresting_midpt_vars_v36,
     #              fiducial_cut_and_weight, fiducial_cut_and_weight))
+
+    mis.append(mi(pair_name + "_interesting_v37", 
+                  pair[0], pair[1],
+                  ineresting_lowpt_vars_v37,
+                  fiducial_cut_and_weight, fiducial_cut_and_weight))
 
 
     

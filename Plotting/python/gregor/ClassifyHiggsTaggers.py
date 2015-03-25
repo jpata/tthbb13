@@ -35,9 +35,9 @@ ROOT.gROOT.ForceStyle()
 # Configuration
 ########################################
 
-run_TMVA = False
+run_TMVA = True
 
-for pair_name in ["pt-150-to-200", "pt-200-to-300", "pt-300-to-800"]:
+for pair_name in ["pt-170-to-300"]:
 
     pair = pairs[pair_name]
 
@@ -73,30 +73,21 @@ for pair_name in ["pt-150-to-200", "pt-200-to-300", "pt-300-to-800"]:
         return li_TMVAs
     # end of create_setups
 
-    setups = create_setups([
-        variable.di["ca15_mass"],
-        variable.di["ca15trimmedr2f6_mass"],
-        variable.di["ca15softdropz20b10_mass"],
-    ])
+    #variable.di["ca15_tau2/ca15_tau1"].pretty_name = "Ungroomed #tau_{3}/#tau_{2}"
 
-    setups.append(TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "sd_tau"),
-                            "Softdrop m + Q-jet Volatility",
-                            ["Cuts"], 
-                            [variable.di['ca15softdropz20b10_mass'],
-                             variable.di['ca15_qvol'],
-                         ],                               
-                            file_name_sig,
-                            file_name_bg,
-                            fiducial_cut_sig = fiducial_cuts[pair[0]],
-                            fiducial_cut_bg  = fiducial_cuts[pair[1]],
-                            weight_sig = "(1)",
-                            weight_bg =  "(1)"))
+    setups = []
+    #create_setups([
+        #variable.di["ca15_mass"],
+    #    variable.di["ca15trimmedr2f6_mass"],
+        #variable.di["ca15softdropz20b10_mass"],
+        #variable.di["ca15_tau2/ca15_tau1"],
+    #])
 
     #setups.append(TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "sd_tau"),
-    #                        "softdrop m + unfiltered tau_{2}/tau_{1}",
+    #                        "Softdrop m + Q-jet Volatility",
     #                        ["Cuts"], 
     #                        [variable.di['ca15softdropz20b10_mass'],
-    #                         variable.di['ca15_tau2/ca15_tau1'],
+    #                         variable.di['ca15_qvol'],
     #                     ],                               
     #                        file_name_sig,
     #                        file_name_bg,
@@ -104,6 +95,19 @@ for pair_name in ["pt-150-to-200", "pt-200-to-300", "pt-300-to-800"]:
     #                        fiducial_cut_bg  = fiducial_cuts[pair[1]],
     #                        weight_sig = "(1)",
     #                        weight_bg =  "(1)"))
+
+    setups.append(TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "sd_tau"),
+                            "trimmed m + tau_{2}/tau_{1}",
+                            ["Cuts"], 
+                            [variable.di['ca15trimmedr2f6_mass'],
+                             variable.di['ca15_tau2/ca15_tau1'],
+                         ],                               
+                            file_name_sig,
+                            file_name_bg,
+                            fiducial_cut_sig = fiducial_cuts[pair[0]],
+                            fiducial_cut_bg  = fiducial_cuts[pair[1]],
+                            weight_sig = "(1)",
+                            weight_bg =  "(1)"))
     #
     #setups.append(TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "sd_tau_qvol"),
     #                        "softdrop m + unfiltered tau_{2}/tau_{1} + Q-vol",

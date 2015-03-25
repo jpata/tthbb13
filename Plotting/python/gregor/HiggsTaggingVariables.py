@@ -68,10 +68,45 @@ mass_vars_v5 = [
     variable('ca15trimmedr2f6_mass', "Trimmed (r=0.2, f=0.06) mass", 0, 800, unit = "GeV"),
     variable('ca15trimmedr2f8_mass', "trim r2f8 m (R=1.5)", 0, 800, unit = "GeV"),
     variable('ca15softdropz15b00_mass', "sd 15b00 m (R=1.5)", 0, 800, unit = "GeV"),
-    variable('ca15softdropz20b10_mass', "Softdrop(z=0.2, #beta=1) mass", 0, 800, unit = "GeV"),
+    variable('ca15softdropz20b10_mass', "Softdrop (z=0.2, #beta=1) mass", 0, 800, unit = "GeV"),
     variable('ca15softdropz30b20_mass', "sd 30b20 m (R=1.5)", 0, 800, unit = "GeV"),
     variable('ca15softdropz30b30_mass', "sd 30b30 m (R=1.5)", 0, 800, unit = "GeV"),
     variable('ca15softdropz30b100_mass', "sd 30b100 m (R=1.5)", 0, 800, unit = "GeV"),
+]
+
+groomers_v7  = ['ca15',
+                'ca15filteredn3r3',
+                'ca15filteredn3r2',
+                'ca15filteredn2r3',
+                'ca15filteredn2r2',
+                'ca15prunedn2z10rfac50',
+                'ca15trimmedr2f3',
+                'ca15trimmedr2f6',
+                'ca15trimmedr2f9',
+                'ca15softdropz10b00',
+                'ca15softdropz15b00',
+                'ca15softdropz15b10',
+                'ca15softdropz20b10',
+                'ca15softdropz30b20',
+                'ca15softdropz30b10',
+                'ca15softdropz30b30',
+                'ca15massdrop',
+                'ca15massdropfiltered'
+]
+
+mass_vars_v7 = [variable(x + '_mass', x +"m", 0, 800, unit = "GeV") for x in groomers_v7]
+
+interesting_vars_v7 = [
+    variable.di['ca15_mass'],
+    variable.di['ca15filteredn3r2_mass'],
+    variable.di['ca15prunedn2z10rfac50_mass'],
+    variable.di['ca15trimmedr2f6_mass'],
+    variable.di['ca15softdropz15b10_mass'],
+    variable.di['ca15massdropfiltered_mass'],
+
+    variable('ca15_tau2/ca15_tau1', "ca15_nsub", 0, 1),
+    variable('ca15_qvol', "ca15_qvol", 0, 1),
+
 ]
 
 

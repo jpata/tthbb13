@@ -305,6 +305,30 @@ ineresting_highpt_vars_v36 = [
 
 
 
+ineresting_lowpt_vars_v37 = [
+
+    variable('ca15trimmedr2f6forbtag_btag', 
+             'ca15trimmedr2f6forbtag_btag', 
+             0, 1, unit = ""),
+    variable.di["ca15trimmedr2f6_mass"],
+    variable.di["ca15puppitrimmedr2f6_mass"],
+    variable.di["ca15softdropz15b10_mass"],
+    variable.di["ca15puppisoftdropz15b10_mass"],
+    variable.di["ca15softdropz30b15_mass"],
+    variable.di["ca15puppisoftdropz30b15_mass"],
+    variable.di["ca15_qvol"],
+    variable.di["ca15puppi_qvol"],
+    variable.di["ca15_tau3/ca15_tau2"],
+    variable.di["ca15puppi_tau3/ca15puppi_tau2"],
+    variable.di["ca15trimmedr2f6_tau3/ca15trimmedr2f6_tau2"],
+    variable.di["ca15puppitrimmedr2f6_tau3/ca15puppitrimmedr2f6_tau2"],
+    variable.di["ca15puppicmstt_minMass"],
+    variable.di["ca15puppicmstt_topMass"],
+    variable.di["looseMultiRHTT_mass"],
+    variable.di["looseMultiRHTT_fW"],
+    variable.di["looseMultiRHTT_Rmin-looseMultiRHTT_RminExpected"],
+]
+
 
 
 

@@ -173,9 +173,9 @@ def doTMVA(setup):
     
     if "Cuts" in setup.li_methods:
 
-        sample_size = { 1 :   10000,
+        sample_size = { 1 :   30000,
                         2 :   80000*4,
-                        3 : 4000000}
+                        3 : 10000000}
 
         factory.BookMethod( ROOT.TMVA.Types.kCuts, 
                             "Cuts",
@@ -289,7 +289,7 @@ def plotROCs(name, li_setups, view="all"):
 
     c = ROOT.TCanvas( "","", 800, 800)
 
-    legend_origin_x     = 0.17
+    legend_origin_x     = 0.21
     legend_origin_y     = 0.18
     legend_size_x       = 0.3
     legend_size_y       = 0.04 * len(li_hs)
@@ -369,6 +369,7 @@ def plotROCs(name, li_setups, view="all"):
     legend.Draw()
 
     c.Print("{0}_{1}.png".format(name, view))
+    c.Print("{0}_{1}.pdf".format(name, view))
 # end of plotROCs
 
 

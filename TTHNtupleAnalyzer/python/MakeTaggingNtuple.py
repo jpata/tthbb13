@@ -129,7 +129,7 @@ cmstt_branches = ["pt", "mass", "minMass", "wMass", "topMass", "nSubJets"]
 
 
 
-li_htt_branches = li_htt_branches + ['looseMultiRHTT', 'softdropz20b10MultiRHTT', 'softdropz15bminus20MultiRHTT', 'softdropz15bminus10MultiRHTT', 'softdropz15b00MultiRHTT', 'softdropz15b10MultiRHTT', 'looseMultiRHTTpuppi', 'softdropz20b10MultiRHTTpuppi', 'softdropz15bminus20MultiRHTTpuppi', 'softdropz15bminus10MultiRHTTpuppi', 'softdropz15b00MultiRHTTpuppi', 'softdropz15b10MultiRHTTpuppi']
+li_htt_branches = li_htt_branches + ['looseMultiRHTT']#'softdropz20b10MultiRHTT', 'softdropz15bminus20MultiRHTT', 'softdropz15bminus10MultiRHTT', 'softdropz15b00MultiRHTT', 'softdropz15b10MultiRHTT', 'looseMultiRHTTpuppi', 'softdropz20b10MultiRHTTpuppi', 'softdropz15bminus20MultiRHTTpuppi', 'softdropz15bminus10MultiRHTTpuppi', 'softdropz15b00MultiRHTTpuppi', 'softdropz15b10MultiRHTTpuppi']
 
 
 
@@ -148,8 +148,6 @@ li_fatjets = [b.replace("__pt","") for b in li_fatjets]
 if '_pt' in li_fatjets:
     li_fatjets.remove("_pt")
 
-
-print li_fatjets
 
 # Generic
 objects = {}

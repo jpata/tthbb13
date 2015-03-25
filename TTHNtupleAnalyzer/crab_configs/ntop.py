@@ -15,7 +15,7 @@ import TTH.TTHNtupleAnalyzer.CrabHelpers as CH
 
 # Ntuple name/version and samples to include
 name = "ntop"
-version = "v37"
+version = "v38"
 li_samples = [
 #    "qcd_170_300_pythia8_13tev",
 #    "qcd_300_470_pythia8_13tev",
@@ -72,7 +72,7 @@ if action == "submit":
                version,
                cmssw_config_path = cmssw_config_path,
                cmssw_config_script = config_script_name,
-               blacklist = ["T1_US_FNAL"])
+               blacklist = [])
 
 # Status
 if action == "status":
@@ -96,7 +96,7 @@ elif action == "download":
 # Download
 elif action == "download_globus":
     for sample_shortname in li_samples:
-        CH.download_globus(name, sample_shortname, version, storage_path, glob_string = "output_*.root")    
+        CH.download_globus(name, sample_shortname, version, storage_path, glob_string = "output*tagging*.root")    
 
 # Cleanup
 elif action == "cleanup":

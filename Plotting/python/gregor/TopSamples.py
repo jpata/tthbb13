@@ -54,37 +54,39 @@ files = {}
 #files["qcd_470_600"]  = "ntop_v33_qcd_470_600_pythia8_13tev-tagging"
 #files["qcd_800_1000"] = "ntop_v33_qcd_800_1000_pythia8_13tev-tagging"
 
-files["zprime_m750"]  = "ntop_v36_zprime_m750_1p_13tev-tagging"     
-files["zprime_m1000"] = "ntop_v36_zprime_m1000_1p_13tev-tagging"     
-files["zprime_m1250"] = "ntop_v36_zprime_m1250_1p_13tev-tagging"     
-files["zprime_m2000"] = "ntop_v36_zprime_m2000_1p_13tev-tagging"     
-files["zprime_m2000_low"] = "ntop_v36_zprime_m2000_low_1p_13tev-tagging"     
-files["qcd_170_300"]  = "ntop_v36_qcd_170_300_pythia8_13tev-tagging"
-files["qcd_300_470"]  = "ntop_v36_qcd_300_470_pythia8_13tev-tagging"
-files["qcd_470_600"]  = "ntop_v36_qcd_470_600_pythia8_13tev-tagging"
-files["qcd_600_800"]  = "ntop_v36_qcd_600_800_pythia8_13tev-tagging"
-files["qcd_800_1000"] = "ntop_v36_qcd_800_1000_pythia8_13tev-tagging"
+#files["zprime_m750"]  = "ntop_v36_zprime_m750_1p_13tev-tagging"     
+#files["zprime_m1000"] = "ntop_v36_zprime_m1000_1p_13tev-tagging"     
+#files["zprime_m1250"] = "ntop_v36_zprime_m1250_1p_13tev-tagging"     
+#files["zprime_m2000"] = "ntop_v36_zprime_m2000_1p_13tev-tagging"     
+#files["zprime_m2000_low"] = "ntop_v36_zprime_m2000_low_1p_13tev-tagging"     
+#files["qcd_170_300"]  = "ntop_v36_qcd_170_300_pythia8_13tev-tagging"
+#files["qcd_300_470"]  = "ntop_v36_qcd_300_470_pythia8_13tev-tagging"
+#files["qcd_470_600"]  = "ntop_v36_qcd_470_600_pythia8_13tev-tagging"
+#files["qcd_600_800"]  = "ntop_v36_qcd_600_800_pythia8_13tev-tagging"
+#files["qcd_800_1000"] = "ntop_v36_qcd_800_1000_pythia8_13tev-tagging"
+#
+#files["zprime_m1000_phys14"] = "ntop_v36_zprime_m1000_1p_13tev_phys14_20bx25-tagging"     
+#files["zprime_m2000_phys14"] = "ntop_v36_zprime_m2000_1p_13tev_phys14_20bx25-tagging"     
+#files["zprime_m2000_low_phys14"] = "ntop_v36_zprime_m2000_low_1p_13tev_phys14_20bx25-tagging"     
+#files["qcd_300_470_phys14"]  = "ntop_v36b_qcd_300_470_pythia8_13tev_phys14_20bx25-tagging"
+#files["qcd_470_600_phys14"]  = "ntop_v36b_qcd_470_600_pythia8_13tev_phys14_20bx25-tagging"
+#files["qcd_600_800_phys14"]  = "ntop_v36b_qcd_600_800_pythia8_13tev_phys14_20bx25-tagging"
+#files["qcd_800_1000_phys14"] = "ntop_v36b_qcd_800_1000_pythia8_13tev_phys14_20bx25-tagging"
 
-files["zprime_m1000_phys14"] = "ntop_v36_zprime_m1000_1p_13tev_phys14_20bx25-tagging"     
-files["zprime_m2000_phys14"] = "ntop_v36_zprime_m2000_1p_13tev_phys14_20bx25-tagging"     
-files["zprime_m2000_low_phys14"] = "ntop_v36_zprime_m2000_low_1p_13tev_phys14_20bx25-tagging"     
-files["qcd_300_470_phys14"]  = "ntop_v36b_qcd_300_470_pythia8_13tev_phys14_20bx25-tagging"
-files["qcd_470_600_phys14"]  = "ntop_v36b_qcd_470_600_pythia8_13tev_phys14_20bx25-tagging"
-files["qcd_600_800_phys14"]  = "ntop_v36b_qcd_600_800_pythia8_13tev_phys14_20bx25-tagging"
-files["qcd_800_1000_phys14"] = "ntop_v36b_qcd_800_1000_pythia8_13tev_phys14_20bx25-tagging"
 
-
+files["zprime_m1000"] = "ntop_v37_zprime_m1000_1p_13tev_phys14_20bx25-tagging"     
+files["qcd_300_470"]  = "ntop_v37_qcd_300_470_pythia8_13tev_phys14_20bx25-tagging"
 
 weighted_files = {}
 for k,v in files.iteritems():
     weighted_files[k] = basepath + v + "-weighted.root"
 
 pairs = { 
-#    "pt-200-to-300" : ["zprime_m750", "qcd_170_300"],
+    #"pt-200-to-300" : ["zprime_m750", "qcd_170_300"],
     "pt-300-to-470" : ["zprime_m1000", "qcd_300_470"],
- #   "pt-470-to-600" : ["zprime_m1250", "qcd_470_600"],
-    "pt-600-to-800" : ["zprime_m2000_low", "qcd_600_800"],
-    "pt-800-to-1000" : ["zprime_m2000", "qcd_800_1000"],
+ ###   "pt-470-to-600" : ["zprime_m1250", "qcd_470_600"],
+    #"pt-600-to-800" : ["zprime_m2000_low", "qcd_600_800"],
+    #"pt-800-to-1000" : ["zprime_m2000", "qcd_800_1000"],
 }
 
 # [Minimal pT, Maximal pT, |eta|]
