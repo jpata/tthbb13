@@ -1,6 +1,6 @@
 import os
 from TTH.MEAnalysis.MEAnalysis_heppy import sequence
-from TTH.MEAnalysis.samples_v1 import samples, lfn_to_pfn
+from TTH.MEAnalysis.samples_base import lfn_to_pfn
 from TTH.MEAnalysis.samples_vhbb import samples
 
 firstEvent = int(os.environ["SKIP_EVENTS"])

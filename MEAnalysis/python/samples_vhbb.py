@@ -1,6 +1,7 @@
 #This file knows about all the TTH samples as produced by the VHbb group
-#LFN to PFN resolution is done with code in samples_v1, the rest of which is obsolete
-from TTH.MEAnalysis.samples_v1 import *
+#LFN to PFN resolution is done with code in samples_base
+#Cross-sections also defined in samples_base
+from TTH.MEAnalysis.samples_base import *
 
 sample_version = "v10"
 
@@ -98,9 +99,9 @@ samples = cms.VPSet([
     #Spring14
     cms.PSet(
         skip     = cms.bool(False),
-        name     = cms.string('tth_hbb_13tev'),
-        nickName = cms.string('tth_hbb_13tev'),
-        xSec     = cms.double(xsec[("tthbb", "13TeV")]),
+        name     = cms.string('tth_13tev'),
+        nickName = cms.string('tth_13tev'),
+        xSec     = cms.double(xsec[("tth", "13TeV")]),
         nGen     = cms.int64(-1),
         perJob   = cms.uint32(10000),
         subFiles = cms.vstring([
