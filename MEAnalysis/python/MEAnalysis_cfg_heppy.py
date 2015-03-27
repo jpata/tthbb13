@@ -154,7 +154,8 @@ class Conf:
                 #"NoScattAmpl",
                 #"QuarkEnergy98",
                 #"NuPhiRestriction",
-                #"JetsPtOrder"
+                #"JetsPtOrder",
+                #"JetsPtOrderIntegrationRange",
             ],
 
         }

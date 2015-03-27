@@ -189,6 +189,12 @@ treeProducer = cfg.Analyzer(
         ),
 
         NTupleVariable(
+            "cat_btag", lambda ev: ev.cat_btag_n,
+            type=int,
+            help="ME category (b-tag)"
+        ),
+
+        NTupleVariable(
             "cat_gen", lambda ev: ev.n_cat_gen,
             type=int,
             help="top decay category (-1 unknown, 0 single-leptonic, 1 di-leptonic, 2 fully hadronic)"
@@ -309,6 +315,12 @@ treeProducer = cfg.Analyzer(
         ),
 
         NTupleVariable(
+            "numJets", lambda ev: ev.input.numJets if hasattr(ev.input, "numJets") else 0,
+            type=int,
+            help="Number of jets passing jet selection"
+        ),
+
+        NTupleVariable(
             "lheNj", lambda ev: ev.input.lheNj if hasattr(ev.input, "lheNj") else 0,
             type=int,
             help=""
@@ -336,7 +348,7 @@ treeProducer = cfg.Analyzer(
         "b_quarks_t" : NTupleCollection("GenBFromTop", leptonType, 3, help=""),
         "b_quarks_h" : NTupleCollection("GenBFromHiggs", leptonType, 3, help=""),
         "l_quarks_w" : NTupleCollection("GenQFromW", leptonType, 5, help=""),
-        "good_jets" : NTupleCollection("jets", jetType, 8, help="Selected jets"),
+        "good_jets" : NTupleCollection("jets", jetType, 12, help="Selected jets"),
         "good_leptons" : NTupleCollection("leps", leptonType, 2, help="Selected leptons"),
         "mem_results_tth" : NTupleCollection("mem_tth", memType, len(conf.mem["methodsToRun"]), help="MEM tth"),
         "mem_results_ttbb" : NTupleCollection("mem_ttbb", memType, len(conf.mem["methodsToRun"]), help="MEM ttbb"),

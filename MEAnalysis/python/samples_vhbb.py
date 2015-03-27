@@ -17,7 +17,7 @@ samples = cms.VPSet([
 
     #tt + jets
     cms.PSet(
-        skip     = cms.bool(False),
+        skip     = cms.bool(True),
         name     = cms.string('ttjets_13tev_madgraph_pu20bx25_phys14'),
         nickName = cms.string('ttjets_13tev_madgraph_pu20bx25_phys14'),
         perJob   = cms.uint32(10000),

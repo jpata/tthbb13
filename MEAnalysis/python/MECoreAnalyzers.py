@@ -211,7 +211,8 @@ class JetAnalyzer(FilterAnalyzer):
                 ), event.Jet
             ),
             key=lambda x: x.pt, reverse=True
-        )[0:8]
+            )[0:9]
+        event.numJets = len(event.good_jets)
         self.counters["jets"].inc("good", len(event.good_jets))
 
         event.btagged_jets_bdisc = {}
@@ -436,6 +437,7 @@ class MECategoryAnalyzer(FilterAnalyzer):
         self.conf = cfg_ana._conf
         super(MECategoryAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
         self.cat_map = {"NOCAT":-1, "cat1": 1, "cat2": 2, "cat3": 3, "cat6":6}
+        self.btag_cat_map = {"NOCAT":-1, "L": 0, "H": 1}
 
     def beginLoop(self, setup):
         super(MECategoryAnalyzer, self).beginLoop(setup)
@@ -447,6 +449,17 @@ class MECategoryAnalyzer(FilterAnalyzer):
         self.counters["processing"].inc("processed")
 
         cat = "NOCAT"
+        pass_btag_lr = (self.conf.jets["untaggedSelection"] == "btagLR" and
+            event.btag_LR_4b_2b > self.conf.mem["btagLRCut"][event.cat]
+        )
+        pass_btag_csv = (self.conf.jets["untaggedSelection"] == "btagCSV" and
+            len(event.btagged_jets) >= 4
+        )
+        cat_btag = "NOCAT"
+
+        if pass_btag_lr or pass_btag_csv:
+            cat_btag = "H"
+
         if event.is_sl:
 
             #at least 6 jets, if 6, Wtag in [60,100], if more Wtag in [72,94]
@@ -464,7 +477,9 @@ class MECategoryAnalyzer(FilterAnalyzer):
 
         self.counters["processing"].inc(cat)
         event.cat = cat
+        event.cat_btag = cat_btag
         event.catn = self.cat_map.get(cat, -1)
+        event.cat_btag_n = self.btag_cat_map.get(cat, -1)
 
         passes = True
         if passes:
@@ -701,6 +716,7 @@ class MEAnalyzer(FilterAnalyzer):
             "QuarkEnergy10": MEM.MEMConfig(),
             "NuPhiRestriction": MEM.MEMConfig(),
             "JetsPtOrder": MEM.MEMConfig(),
+            "JetsPtOrderIntegrationRange": MEM.MEMConfig(),
         }
 
         self.memkeys = self.conf.mem["methodsToRun"]
@@ -716,6 +732,7 @@ class MEAnalyzer(FilterAnalyzer):
         self.configs["QuarkEnergy10"].defaultCfg()
         self.configs["NuPhiRestriction"].defaultCfg()
         self.configs["JetsPtOrder"].defaultCfg()
+        self.configs["JetsPtOrderIntegrationRange"].defaultCfg()
 
         self.configs["NoJacobian"].int_code &= ~ MEM.IntegrandType.Jacobian
         self.configs["NoDecayAmpl"].int_code &= ~ MEM.IntegrandType.DecayAmpl
@@ -727,13 +744,16 @@ class MEAnalyzer(FilterAnalyzer):
         self.configs["QuarkEnergy10"].b_range_CL = 0.10
         self.configs["NuPhiRestriction"].m_range_CL = 99
         self.configs["JetsPtOrder"].highpt_first  = 0
+        self.configs["JetsPtOrderIntegrationRange"].highpt_first  = 0
+        self.configs["JetsPtOrderIntegrationRange"].j_range_CL = 0.99
+        self.configs["JetsPtOrderIntegrationRange"].b_range_CL = 0.99
 
         #Create the ME integrator.
         #Arguments specify the verbosity
         self.integrator = MEM.Integrand(
-            0,
-            #MEM.output,
-            #MEM.output | MEM.init | MEM.init_more,# | MEM.event | MEM.integration,
+            #0,
+            MEM.output,
+            #MEM.output | MEM.init | MEM.event,# | MEM.integration,
             self.configs["default"]
         )
 
@@ -746,11 +766,6 @@ class MEAnalyzer(FilterAnalyzer):
         #Assume that only jets passing CSV<0.5 are l quarks
         self.permutations.push_back(MEM.Permutations.QUntagged)
 
-        #Assume q-qbar symmetry
-        self.permutations.push_back(MEM.Permutations.QQbarSymmetry)
-
-        #Assume b-bbar symmetry
-        self.permutations.push_back(MEM.Permutations.BBbarSymmetry)
         self.integrator.set_permutation_strategy(self.permutations)
 
         #Pieces of ME to calculate
@@ -802,7 +817,6 @@ class MEAnalyzer(FilterAnalyzer):
         event.mem_results_tth = []
         event.mem_results_ttbb = []
 
-        #Sort jets by pt descending, only take up to 8 jets to reduce permutations
         jets = sorted(event.good_jets, key=lambda x: x.pt, reverse=True)
         leptons = event.good_leptons
         met_pt = event.input.met_pt
@@ -815,11 +829,10 @@ class MEAnalyzer(FilterAnalyzer):
                 print "lep", l.pt, l.eta, l.phi, l.mass, l.charge
 
         #Check if event passes reco-level requirements to calculate ME
-        if event.cat in self.conf.mem["MECategories"] and event.btag_LR_4b_2b > self.conf.mem["btagLRCut"][event.cat] and len(event.btagged_jets)>=4:
+        if event.cat in self.conf.mem["MECategories"] and event.cat_btag == "H":
             print "MEM RECO PASS", event.cat, event.btag_LR_4b_2b, len(jets), len(leptons), len(event.btagged_jets), len(event.buntagged_jets)
         else:
             return True
-
 
         #Get the conf dict specifying which matches we require
         required_match = self.conf.mem.get("requireMatched", {}).get(event.cat, {})
@@ -870,6 +883,7 @@ class MEAnalyzer(FilterAnalyzer):
                     p4s=(lep.pt, lep.eta, lep.phi, lep.mass),
                     obsdict={MEM.Observable.CHARGE: lep.charge}
                 )
+                #print "MEM lep", lep.pt, lep.eta, lep.phi, lep.mass, lep.charge
             self.add_obj(
                 MEM.ObjectType.MET,
                 #MET is caused by massless object
@@ -888,6 +902,7 @@ class MEAnalyzer(FilterAnalyzer):
                 if self.conf.mem["calcME"]:
                     conf = self.configs[confname]
                     #print "MEM conf", confname, "hypo", hypo
+                    print "MEM conf", hypo, confname
                     self.integrator.set_cfg(conf)
                     add_objects()
                     r = self.integrator.run(
