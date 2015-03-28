@@ -466,13 +466,16 @@ class MECategoryAnalyzer(FilterAnalyzer):
             if ((len(event.good_jets) == 6 and event.Wmass >= 60 and event.Wmass < 100) or
                (len(event.good_jets) > 6 and event.Wmass >= 72 and event.Wmass < 94)):
                cat = "cat1"
+               #W-tagger fills wquark_candidate_jets
             #at least 6 jets, no W-tag
             elif len(event.good_jets) >= 6:
                 cat = "cat2"
             #one W daughter missing
             elif len(event.good_jets) == 5:
+                event.wquark_candidate_jets = event.buntagged_jets
                 cat = "cat3"
         elif event.is_dl and len(event.good_jets)>=4:
+            event.wquark_candidate_jets = []
             cat = "cat6"
 
         self.counters["processing"].inc(cat)
@@ -502,32 +505,57 @@ class WTagAnalyzer(FilterAnalyzer):
 
     def pair_mass(self, j1, j2):
         """
-        Calculates the invariant mass of a two-paritcle system.
+        Calculates the invariant mass of a two-particle system.
         """
         lv1, lv2 = [lvec(j) for j in [j1, j2]]
         tot = lv1 + lv2
         return tot.M()
 
     def find_best_pair(self, jets):
+        """
+        Finds the pair of jets whose invariant mass is closest to mW=80 GeV.
+        Returns the sorted vector of [(mass, jet1, jet2)], best first.
+        """
         ms = []
+        
+        #Keep track of index pairs already calculated
         done_pairs = set([])
+        
+        #Double loop over all jets
         for i in range(len(jets)):
             for j in range(len(jets)):
+                
+                #Make sure we haven't calculated this index pair yet
                 if (i,j) not in done_pairs and i!=j:
                     m = self.pair_mass(jets[i], jets[j])
                     ms += [(m, jets[i], jets[j])]
+                    
+                    #M(i,j) is symmetric, hence add both pairs
                     done_pairs.add((i,j))
                     done_pairs.add((j,i))
         ms = sorted(ms, key=lambda x: abs(x[0] - 80.0))
-        return ms[0]
+        return ms
 
     def process(self, event):
         self.counters["processing"].inc("processed")
 
         event.Wmass = 0.0
+        
+        #Need at least 2 untagged jets to calculate W mass
         if len(event.buntagged_jets)>=2:
             bpair = self.find_best_pair(event.buntagged_jets)
-            event.Wmass = bpair[0]
+            
+            #Get the best mass
+            event.Wmass = bpair[0][0]
+            
+            #All masses
+            event.Wmasses = [bpair[i][0] for i in range(len(bpair))]
+            
+            event.wquark_candidate_jets = set([])
+            for i in range(min(len(bpair), 2)):
+                event.wquark_candidate_jets.add(bpair[i][1])
+                event.wquark_candidate_jets.add(bpair[i][2])
+            
             if "reco" in self.conf.general["verbosity"]:
                 print "Wmass", event.Wmass, event.good_jets.index(bpair[1]), event.good_jets.index(bpair[2])
         passes = True
@@ -817,7 +845,7 @@ class MEAnalyzer(FilterAnalyzer):
         event.mem_results_tth = []
         event.mem_results_ttbb = []
 
-        jets = sorted(event.good_jets, key=lambda x: x.pt, reverse=True)
+        #jets = sorted(event.good_jets, key=lambda x: x.pt, reverse=True)
         leptons = event.good_leptons
         met_pt = event.input.met_pt
         met_phi = event.input.met_phi
@@ -830,8 +858,9 @@ class MEAnalyzer(FilterAnalyzer):
 
         #Check if event passes reco-level requirements to calculate ME
         if event.cat in self.conf.mem["MECategories"] and event.cat_btag == "H":
-            print "MEM RECO PASS", event.cat, event.btag_LR_4b_2b, len(jets), len(leptons), len(event.btagged_jets), len(event.buntagged_jets)
+            print "MEM RECO PASS", event.cat, event.btag_LR_4b_2b, len(event.btagged_jets), len(event.wquark_candidate_jets), len(leptons), len(event.btagged_jets), len(event.buntagged_jets)
         else:
+            #Don't calculate ME
             return True
 
         #Get the conf dict specifying which matches we require
@@ -856,7 +885,6 @@ class MEAnalyzer(FilterAnalyzer):
         passd = {
             p: require(p) for p in ["wq", "wq_btag", "tb", "tb_btag", "hb", "hb_btag"]
         }
-        #print "MATCH Wth", event.nMatch_wq, event.nMatch_tb, event.nMatch_hb, "|", event.nMatch_wq_btag, event.nMatch_tb_btag, event.nMatch_hb_btag, "|", passd
 
         for k, v in passd.items():
             if not v:
@@ -870,20 +898,24 @@ class MEAnalyzer(FilterAnalyzer):
             if event.cat in ["cat2", "cat3"]:
                 self.vars_to_integrate.push_back(MEM.PSVar.cos_qbar1)
                 self.vars_to_integrate.push_back(MEM.PSVar.phi_qbar1)
-            for jet in jets:
+            for jet in event.btagged_jets:
                 self.add_obj(
                     MEM.ObjectType.Jet,
                     p4s=(jet.pt, jet.eta, jet.phi, jet.mass),
-                    obsdict={MEM.Observable.BTAG: jet.btagFlag}
+                    obsdict={MEM.Observable.BTAG: 1.0}
                 )
-                #print "MEM jet", jet.pt, jet.eta, jet.phi, jet.mass, jet.btagCSV, jet.btagFlag
+            for jet in event.wquark_candidate_jets:
+                self.add_obj(
+                    MEM.ObjectType.Jet,
+                    p4s=(jet.pt, jet.eta, jet.phi, jet.mass),
+                    obsdict={MEM.Observable.BTAG: 0.0}
+                )
             for lep in leptons:
                 self.add_obj(
                     MEM.ObjectType.Lepton,
                     p4s=(lep.pt, lep.eta, lep.phi, lep.mass),
                     obsdict={MEM.Observable.CHARGE: lep.charge}
                 )
-                #print "MEM lep", lep.pt, lep.eta, lep.phi, lep.mass, lep.charge
             self.add_obj(
                 MEM.ObjectType.MET,
                 #MET is caused by massless object
