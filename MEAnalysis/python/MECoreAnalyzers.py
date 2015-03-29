@@ -418,6 +418,7 @@ class BTagLRAnalyzer(FilterAnalyzer):
         #Take first 4 most b-tagged jets
         btagged = sorted(event.btagged_jets, key=lambda x: x.btagCSV, reverse=True)[0:4]
         #Set these jets to be used as b-quarks in the MEM
+        #We don't want to use more than 4 b-quarks in the hypothesis
         for jet in btagged:
             idx = event.good_jets.index(jet)
             event.good_jets[idx].btagFlag = 1.0
@@ -541,6 +542,7 @@ class WTagAnalyzer(FilterAnalyzer):
 
         event.Wmass = 0.0
         
+        event.wquark_candidate_jets = set([])
         #Need at least 2 untagged jets to calculate W mass
         if len(event.buntagged_jets)>=2:
             bpair = self.find_best_pair(event.buntagged_jets)
@@ -551,13 +553,19 @@ class WTagAnalyzer(FilterAnalyzer):
             #All masses
             event.Wmasses = [bpair[i][0] for i in range(len(bpair))]
             
-            event.wquark_candidate_jets = set([])
             for i in range(min(len(bpair), 2)):
                 event.wquark_candidate_jets.add(bpair[i][1])
                 event.wquark_candidate_jets.add(bpair[i][2])
             
             if "reco" in self.conf.general["verbosity"]:
                 print "Wmass", event.Wmass, event.good_jets.index(bpair[1]), event.good_jets.index(bpair[2])
+        
+        #If we can't calculate W mass, untagged jets become the candidate
+        else:
+            for jet in event.buntagged_jets:
+                event.wquark_candidate_jets.add(jet)
+                
+                
         passes = True
         if passes:
             self.counters["processing"].inc("passes")
@@ -858,7 +866,11 @@ class MEAnalyzer(FilterAnalyzer):
 
         #Check if event passes reco-level requirements to calculate ME
         if event.cat in self.conf.mem["MECategories"] and event.cat_btag == "H":
-            print "MEM RECO PASS", event.cat, event.btag_LR_4b_2b, len(event.btagged_jets), len(event.wquark_candidate_jets), len(leptons), len(event.btagged_jets), len(event.buntagged_jets)
+            print "MEM RECO PASS", (event.input.run, event.input.lumi, event.input.evt,
+                event.cat, event.btag_LR_4b_2b, len(event.btagged_jets),
+                len(event.wquark_candidate_jets), len(leptons),
+                len(event.btagged_jets), len(event.buntagged_jets)
+            )
         else:
             #Don't calculate ME
             return True
@@ -902,13 +914,13 @@ class MEAnalyzer(FilterAnalyzer):
                 self.add_obj(
                     MEM.ObjectType.Jet,
                     p4s=(jet.pt, jet.eta, jet.phi, jet.mass),
-                    obsdict={MEM.Observable.BTAG: 1.0}
+                    obsdict={MEM.Observable.BTAG: jet.btagFlag}
                 )
             for jet in event.wquark_candidate_jets:
                 self.add_obj(
                     MEM.ObjectType.Jet,
                     p4s=(jet.pt, jet.eta, jet.phi, jet.mass),
-                    obsdict={MEM.Observable.BTAG: 0.0}
+                    obsdict={MEM.Observable.BTAG: jet.btagFlag}
                 )
             for lep in leptons:
                 self.add_obj(
