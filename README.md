@@ -1,9 +1,9 @@
 TTHBB MEM code
 ==============
 
-https://twiki.cern.ch/twiki/bin/viewauth/CMS/TTHbbAnalysisWithMEM#V5_Recipe
+https://twiki.cern.ch/twiki/bin/viewauth/CMS/TTHbbAnalysisWithMEM#V6_Recipe
 
-Setup on SLC6
+Setup on SLC6 in a clean directory (no CMSSW)
 ~~~
 mkdir TTH
 cd TTH
@@ -11,6 +11,10 @@ wget --no-check-certificate https://raw.githubusercontent.com/jpata/tthbb13/mast
 source setup.sh
 ~~~
 
+Running the MEM code
+~~~
+python TTH/MEAnalysis/python/MEAnalysis_heppy.py
+~~~
 
 Top Tagging Ntuple Making (based on TTH-MEM Ntuple)
 ==============
