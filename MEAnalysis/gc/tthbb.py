@@ -1,36 +1,38 @@
 from TTH.TTHNtupleAnalyzer.CrabHelpers import hadd_from_file, replicate
 import argparse, subprocess, glob, os
 
-version = "s1_eb733a1__s2_c084f2b"
+version = "X"
 
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
 parser.add_argument('--action',
-	choices=['create', 'submit', 'report', 'hadd', 'replicate'], type=str,
+    choices=['status', 'submit', 'report', 'hadd', 'replicate'], type=str,
     required=True,
-	help="the action to perform"
+    help="the action to perform"
 )
 
 args = parser.parse_args()
 
-jobs = ["meanalysis-tthbb.conf", "meanalysis-bkg.conf"]
-gc = "/shome/jpata/grid-control/GC"
+jobs = ["confs/sig.conf", "confs/bkg.conf"]
+#gc = "/shome/jpata/grid-control/GC"
+gc = "./grid-control/go.py"
 
-if args.action == "create":
+if args.action == "status":
     for job in jobs:
-        subprocess.call([gc, "run", job, "-qs"])
+        print job
+        subprocess.call([gc, job, "-qs"])
+        subprocess.call([gc, job, "-r"])
 if args.action == "submit":
     for job in jobs:
-        subprocess.call([gc, "run", job, "-q"])
+        subprocess.call([gc, job, "-q"])
 if args.action == "report":
     for job in jobs:
-        subprocess.call([gc, "run", job, "-r"])
-
+        subprocess.call([gc, job, "-r"])
 if args.action == "hadd":
     completed_files = []
     input_filenames = []
     for job in jobs:
-        wd = "work." +job.split(".")[0]
+        wd = "work." +job.split("/")[-1].split(".")[0]
         donefiles = glob.glob(wd + "/output/*/output.txt")
         for df in donefiles:
             input_filenames += map(lambda x: x.strip(), open(df).readlines())
@@ -38,6 +40,7 @@ if args.action == "hadd":
 
     for inf in input_filenames:
         spl = inf.split("/")
+        spl = filter(lambda x: len(x)>0, spl)
         dataset = spl[-2]
         fn = inf
         if not datasets.has_key(dataset):
@@ -47,6 +50,8 @@ if args.action == "hadd":
     for (dataset, input_filenames) in datasets.items():
         output_filename = "/scratch/" + os.environ["USER"] + "/" + dataset + ".root"
         print "merging {0} files for dataset {1} -> {2}".format(len(input_filenames), dataset, output_filename)
+        for inf in input_filenames:
+            print inf
         subprocess.call(["python", os.environ["CMSSW_BASE"] + "/src/TTH/TTHNtupleAnalyzer/python/ParHadd.py", output_filename] + input_filenames)
         completed_files += [output_filename]
 

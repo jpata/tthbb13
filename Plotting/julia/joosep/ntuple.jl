@@ -384,7 +384,7 @@ function process_sample(fn::ASCIIString)
 	#  in main at /home/joosep/mac-docs/tth/sw-slc6/CMSSW/src/TTH/Plotting/julia/joosep/ntuple.jl:506
 
 
-	for b in ["jet__*", "n__jet*". "n__lep*", "lep__*", "sig_lep*", "hypo1", "event*"]
+	for b in ["jet__*", "n__jet*", "n__lep*", "lep__*", "sig_lep*", "hypo1", "event*"]
 	    #AddBranchToCache(df.tt, "$b")
 	end
 	SetCacheSize(df.tt, 256 * 1024 * 1024)

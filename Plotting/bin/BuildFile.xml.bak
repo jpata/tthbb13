@@ -1,0 +1,26 @@
+<bin file=
+   "joosep/sequenceLooper/sequenceLooper.cc,
+    joosep/Sample.cc,
+    joosep/helpers_step2.cc,
+    ../../../TTH/MEAnalysis/bin/MECombination.cc,
+    joosep/sequenceLooper/Sequence.cc,
+    joosep/sequenceLooper/Analyzer.cc"
+    name="seqLooper">
+    <use name="DataFormats/FWLite"/>
+    <use name="FWCore/FWLite"/>
+    <use name="FWCore/PythonParameterSet"/>
+    <use name="FWCore/Framework"/>
+    <use name="FWCore/MessageLogger"/>
+    <use name="FWCore/Utilities"/>
+    <use name="FWCore/ParameterSet"/>
+    <use name="PhysicsTools/FWLite"/>
+    <use name="root"/>
+    <use name="rootcintex"/>
+    <use name="rootgraphics"/>
+    <use name="roofit"/>
+    <use name="rootminuit"/>
+    <use name="rootminuit2"/>
+    <use name="roottmva"/>
+    <use name="classlib"/>
+    <use name="boost"/>
+</bin>

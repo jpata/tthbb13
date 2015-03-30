@@ -677,7 +677,8 @@ public:
 		tree->SetBranchAddress("jet_eta", &jet_eta_);
 		tree->SetBranchAddress("jet_phi", &jet_phi_);
 		tree->SetBranchAddress("jet_m", &jet_m_);
-		tree->SetBranchAddress("jet_id", &jet_id_);
+        tree->SetBranchAddress("jet_id", &jet_id_);
+        tree->SetBranchAddress("jet_csv", &jet_csv_);
 		tree->SetBranchAddress("lepton_pt", &lepton_pt_);
 		
         tree->SetBranchAddress("lepton_rIso", &lepton_rIso_);
@@ -845,6 +846,8 @@ public:
 	}
 
     void loop_initialize(void) {
+        nLep_ = 0;
+        nJet_ = 0;
 		Vtype_ = DEF_VAL_INT;
 		type_ = DEF_VAL_INT;
         SET_ZERO(lepton_pt_, NMAXLEPTONS, DEF_VAL_FLOAT);
