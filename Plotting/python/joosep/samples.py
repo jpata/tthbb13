@@ -1,4 +1,5 @@
 import FWCore.ParameterSet.Config as cms
+
 samples = cms.VPSet([
 #old 8 TeV samples
     cms.PSet(
@@ -42,28 +43,6 @@ samples = cms.VPSet([
         skip=cms.bool(False),
     ),
 
-#New Spring14 processing
-    cms.PSet(
-        fileNamesS1=cms.vstring([]),
-        fileNamesS2=cms.vstring(["/scratch/joosep/tth_hbb_13tev.root"]),
-        nickName=cms.string("tthbb_13TeV_spring14__s1_eb733a1__s2_3f71e05"),
-        fractionToProcess=cms.double(1.0),
-        totalEvents=cms.int64(-1),
-        type=cms.int32(3), #ME_13TeV
-        process=cms.int32(0), #TTHBB
-        skip=cms.bool(False),
-    ),
-    cms.PSet(
-        fileNamesS1=cms.vstring([]),
-        fileNamesS2=cms.vstring(["/scratch/joosep/ttjets_13tev.root"]),
-        nickName=cms.string("ttjets_13TeV_spring14__s1_eb733a1__s2_3f71e05"),
-        fractionToProcess=cms.double(1.0),
-        totalEvents=cms.int64(-1),
-        type=cms.int32(3), #ME_13TeV
-        process=cms.int32(1), #TTJETS
-        skip=cms.bool(True),
-    ),
-
 #New phys14 processing
     cms.PSet(
         fileNamesS1=cms.vstring(["/hdfs/cms/store/user/jpata/tth/s1_eb733a1/TTHbb_s1_eb733a1_tth_hbb_13tev_amcatnlo_pu20bx25_phys14.root"]),
@@ -85,26 +64,4 @@ samples = cms.VPSet([
         process=cms.int32(1), #TTJETS
         skip=cms.bool(True),
     ),
-
-#Old spring14 samples
-    cms.PSet(
-       fileNamesS1=cms.vstring([]),
-       fileNamesS2=cms.vstring(["/hdfs/cms/store/user/jpata/tth/step2/s1_nov19_3a4602f__s2_b7e13a1/tthbb.root"]),
-       nickName=cms.string("tthbb_13TeV_spring14__s1_3a4602f__s2_b7e13a1"),
-       fractionToProcess=cms.double(1.0),
-       totalEvents=cms.int64(-1),
-       type=cms.int32(3),
-       process=cms.int32(0),
-       skip=cms.bool(False),
-   ),
-   cms.PSet(
-       fileNamesS1=cms.vstring([]),
-       fileNamesS2=cms.vstring(["/hdfs/cms/store/user/jpata/tth/step2/s1_nov19_3a4602f__s2_b7e13a1/ttjets.root"]),
-       nickName=cms.string("ttjets_13TeV_spring14__s1_3a4602f__s2_b7e13a1"),
-       fractionToProcess=cms.double(1.0),
-       totalEvents=cms.int64(-1),
-       type=cms.int32(3),
-       process=cms.int32(1),
-       skip=cms.bool(False),
-   ),
 ])
