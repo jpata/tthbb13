@@ -92,7 +92,7 @@ def project_hist_kwargs_multi(fn, chunksize, kwargs):
 if __name__ == "__main__":
     outhists = {}
     
-    for sample in :
+    for sample in samples:
         sample_name = sample.split(".")[0]    
     
         for selname, sel in [
@@ -211,7 +211,7 @@ if __name__ == "__main__":
                 }
             )
             
-    for sample in ["tth.root", "ttjets.root"]:
+    for sample in samples:
         sample_name = sample.split(".")[0]
         
         for selname, sel in [
