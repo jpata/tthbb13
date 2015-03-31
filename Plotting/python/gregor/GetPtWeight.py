@@ -13,7 +13,7 @@ We want to use flat true-pT distributions
 import pickle
 
 from TTH.Plotting.Helpers.CompareDistributionsHelpers import *
-from TTH.Plotting.gregor.TopSamples import files, ranges, fiducial_cuts
+from TTH.Plotting.gregor.TopSamples import files, ranges, fiducial_cuts, other_sample_names
 
 
 ########################################
@@ -32,7 +32,8 @@ to_process = files.keys()
 basepath = '/scratch/gregor/'
                                          
 fits = {}
-fits["zprime_m750"]      = ROOT.TF1("fit_fun_zprime","pol5",201,299)
+#fits["zprime_m750"]      = ROOT.TF1("fit_fun_zprime","pol5",201,299)
+fits["zprime_m1000_low"] = ROOT.TF1("fit_fun_zprime","pol5",201,299)
 fits["zprime_m1000"]     = ROOT.TF1("fit_fun_zprime","pol5",301,469)
 fits["zprime_m1250"]     = ROOT.TF1("fit_fun_zprime","pol5",471,599)
 fits["zprime_m2000_low"] = ROOT.TF1("fit_fun_zprime","pol5",601,799)
@@ -108,8 +109,8 @@ if True:
                       axis_unit = "GeV",
                       log_y     = False,
                       normalize = True,
-                      legend_origin_x = 0.55,
-                      legend_origin_y = 0.6,
+                      legend_origin_x = 0.35,
+                      legend_origin_y = 0.3,
                       legend_size_x   = 0.2,
                       legend_size_y   = 0.05 * 2)
 
@@ -127,8 +128,8 @@ if True:
                       axis_unit = "GeV",
                       log_y     = False,
                       normalize = True,
-                      legend_origin_x = 0.55,
-                      legend_origin_y = 0.6,
+                      legend_origin_x = 0.35,
+                      legend_origin_y = 0.3,
                       legend_size_x   = 0.2,
                       legend_size_y   = 0.05 * 2)
 

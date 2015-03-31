@@ -51,7 +51,28 @@ for pair_name, pair in pairs.iteritems():
 
     fatjet_size = ranges[pair[0]][4]    
 
+    
     mis = []
+
+    #mis.append(mi(pair_name + "_mass_vars_v40", 
+    #              pair[0], pair[1], 
+    #              [v for v in mass_vars_v40 if fatjet_size in v.name], 
+    #              fiducial_cut_and_weight, fiducial_cut_and_weight, True))
+
+    #mis.append(mi(pair_name + "_interesting_vars_v40", 
+    #              pair[0], pair[1], 
+    #              [v for v in interesting_vars_v40[fatjet_size]], 
+    #              fiducial_cut_and_weight, fiducial_cut_and_weight,
+    #              read_from_pickle = True
+    #          ))
+
+    mis.append(mi(pair_name + "_interesting_vars_puppi_v40", 
+                  pair[0], pair[1], 
+                  [v for v in interesting_puppi_vars_v40[fatjet_size]], 
+                  fiducial_cut_and_weight, fiducial_cut_and_weight,
+              ))
+        
+
     #mis.append(mi(pair_name + "_htt", 
     #              pair[0], pair[1], 
     #              htt_vars_v36,
@@ -87,11 +108,17 @@ for pair_name, pair in pairs.iteritems():
     #              ineresting_midpt_vars_v36,
     #              fiducial_cut_and_weight, fiducial_cut_and_weight))
 
-    mis.append(mi(pair_name + "_interesting_v37", 
-                  pair[0], pair[1],
-                  ineresting_lowpt_vars_v37,
-                  fiducial_cut_and_weight, fiducial_cut_and_weight))
+    #mis.append(mi(pair_name + "_interesting_v37", 
+    #              pair[0], pair[1],
+    #              ineresting_lowpt_vars_v37,
+    #              fiducial_cut_and_weight, fiducial_cut_and_weight))
 
+    #for htt in ["looseOptRHTT", "looseOptRQHTT", "tightOptRQHTT"]:
+    #    mis.append(mi("{0}_{1}_v39".format(pair_name, htt), 
+    #                  pair[0], pair[1],
+    #                  [x for x in htt_vars_v39 if htt in x.name],
+    #                  fiducial_cut_and_weight, fiducial_cut_and_weight))
+        
 
     
 

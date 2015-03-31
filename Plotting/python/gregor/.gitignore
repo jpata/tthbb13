@@ -2,7 +2,8 @@ OutputCorrelations/
 OutputMutualInformation/
 OutputPlot2D/
 OutputProfiles/
-results/
+results*/
+MIPickles/*
 weights
 *.png
 *.pdf

@@ -1589,15 +1589,26 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
 	    tthtree->get_address<float *>(prefix + "unfilteredMass" )[n_top_jet] = jet_info.properties().unfilteredMass;
 	    tthtree->get_address<float *>(prefix + "prunedMass" )[n_top_jet]	 = jet_info.properties().prunedMass;
-	    tthtree->get_address<float *>(prefix + "fW" )[n_top_jet]		 = jet_info.properties().fW;
+	    tthtree->get_address<float *>(prefix + "fRec" )[n_top_jet]		 = jet_info.properties().fRec;
 
 	    tthtree->get_address<float *>(prefix + "massRatioPassed" )[n_top_jet]  = jet_info.properties().massRatioPassed;
-	    tthtree->get_address<int   *>(prefix + "isMultiR" )[n_top_jet]  = (int) jet_info.properties().isMultiR;
 
-	    tthtree->get_address<float *>(prefix + "Rmin" )[n_top_jet]  = jet_info.properties().Rmin;
-	    tthtree->get_address<float *>(prefix + "RminExpected" )[n_top_jet]  = jet_info.properties().RminExpected;
-	    tthtree->get_address<float *>(prefix + "ptFiltForRminExp" )[n_top_jet]  = jet_info.properties().ptFiltForRminExp;
-	   
+	    tthtree->get_address<float *>(prefix + "Ropt" )[n_top_jet]		= jet_info.properties().Ropt;
+	    tthtree->get_address<float *>(prefix + "RoptCalc" )[n_top_jet]	= jet_info.properties().RoptCalc;
+	    tthtree->get_address<float *>(prefix + "ptForRoptCalc" )[n_top_jet] = jet_info.properties().ptForRoptCalc;
+
+	    tthtree->get_address<float *>(prefix + "tau1unfilt" )[n_top_jet]	= jet_info.properties().tau1Unfiltered;
+	    tthtree->get_address<float *>(prefix + "tau2unfilt" )[n_top_jet]	= jet_info.properties().tau2Unfiltered;
+	    tthtree->get_address<float *>(prefix + "tau3unfilt" )[n_top_jet]	= jet_info.properties().tau3Unfiltered;
+
+	    tthtree->get_address<float *>(prefix + "tau1filt" )[n_top_jet]	= jet_info.properties().tau1Filtered;
+	    tthtree->get_address<float *>(prefix + "tau2filt" )[n_top_jet]	= jet_info.properties().tau2Filtered;
+	    tthtree->get_address<float *>(prefix + "tau3filt" )[n_top_jet]	= jet_info.properties().tau3Filtered;
+
+	    tthtree->get_address<float *>(prefix + "qweight" )[n_top_jet]	= jet_info.properties().QWeight;
+	    tthtree->get_address<float *>(prefix + "qepsilon")[n_top_jet]	= jet_info.properties().QEpsilon;
+	    tthtree->get_address<float *>(prefix + "qsigmam" )[n_top_jet]	= jet_info.properties().QSigmaM;
+
 	    tthtree->get_address<int *>(prefix + "n_sj" )[n_top_jet]  = 3;
 	   
 	    // Optional: Fill truth matching information

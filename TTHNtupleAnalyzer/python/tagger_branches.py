@@ -200,8 +200,11 @@ for fj_name in li_fatjets_branches:
 htt_float_branches =  [
     "pt", "mass", "eta", "phi", "energy",       # Kinematics
     "fj_pt", "fj_mass", "fj_eta", "fj_phi",     # Original Fat-jet kinematics
-    "fW", "massRatioPassed",                    # Standard HTT variables 
-    "Rmin", "ptFiltForRminExp", "RminExpected", # MultiR variables
+    "fRec", "massRatioPassed",                  # Standard HTT variables 
+    "Ropt", "ptForRoptCalc", "RoptCalc",        # Optimal R variables
+    "tau1unfilt", "tau2unfilt", "tau3unfilt",   # Unfiltered N-Subjettiness
+    "tau1filt", "tau2filt", "tau3filt",         # Filtered N-Subjettiness
+    "qweight", "qepsilon", "qsigmam",           # Q-jet variables
     "prunedMass", "topMass", "unfilteredMass",  # extra masses
     "close_hadtop_pt", "close_hadtop_dr",       # top truth matching
     "close_parton_pt", "close_parton_dr",       # parton truth matching

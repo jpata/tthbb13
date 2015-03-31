@@ -90,6 +90,7 @@ class mi():
                 fiducial_cut_signal     = "(1)",
                 fiducial_cut_background = "(1)",
                 diagonal_only = False,
+                read_from_pickle = False,
    ):
       """ Constructor. Arguments:
       name                    : (string) name of the mutual information set
@@ -99,6 +100,7 @@ class mi():
       fiducial_cut_signal     : (string) fiducial cut (numerator and denominator)
       fiducial_cut_background : (string) fiducial cut (numerator and denominator)
       diagonal_only           : (bool) only check variable/truth, not variable pairs
+      read_from_pickle        : (bool) use stored input
       """
       
       if ((fiducial_cut_signal == "(1)") and (not (fiducial_cut_background == "(1)")) or
@@ -247,254 +249,262 @@ def MakePlots(mis, files, input_treename = 'tree'):
 
    for mi in mis:
 
-      # open files
-      infile_sig = ROOT.TFile(files[mi.sample_name_signal])
-      infile_bkg = ROOT.TFile(files[mi.sample_name_background])
+      if mi.read_from_pickle:
+      
+         f_pickle = open("{0}/{1}_mi.pickle".format(pickle_directory,mi.name), "r")
+         mi_result = pickle.load(f_pickle)
+         f_pickle.close()
+      
+      else:
+      
+         # open files
+         infile_sig = ROOT.TFile(files[mi.sample_name_signal])
+         infile_bkg = ROOT.TFile(files[mi.sample_name_background])
 
-      # Get the Trees
-      input_tree_sig = infile_sig.Get(input_treename)
-      input_tree_bkg = infile_bkg.Get(input_treename)
+         # Get the Trees
+         input_tree_sig = infile_sig.Get(input_treename)
+         input_tree_bkg = infile_bkg.Get(input_treename)
 
-      # Count events
-      passed_fiducial_sig = Count(input_tree_sig, mi.fiducial_cut_signal)
-      passed_fiducial_bkg = Count(input_tree_bkg, mi.fiducial_cut_background)
+         # Count events
+         passed_fiducial_sig = Count(input_tree_sig, mi.fiducial_cut_signal)
+         passed_fiducial_bkg = Count(input_tree_bkg, mi.fiducial_cut_background)
 
-      # Calculate overall additional background weight so that:
-      # signal / signal+background = f
-      # (set extra weight for signal to 1 as the overall normalization does not matter!)
-      extra_weight_sig = 1.
-      extra_weight_bkg = (passed_fiducial_sig - f * passed_fiducial_sig)/(f * passed_fiducial_bkg)
+         # Calculate overall additional background weight so that:
+         # signal / signal+background = f
+         # (set extra weight for signal to 1 as the overall normalization does not matter!)
+         extra_weight_sig = 1.
+         extra_weight_bkg = (passed_fiducial_sig - f * passed_fiducial_sig)/(f * passed_fiducial_bkg)
 
-      mi_result  = {}
+         mi_result  = {}
 
-      # Loop over pairs of variables:
-      for ivar1, var1 in enumerate(mi.li_vars):
-         
-         mi_result[var1.name] = {}
+         # Loop over pairs of variables:
+         for ivar1, var1 in enumerate(mi.li_vars):
 
-         for ivar2, var2 in enumerate(mi.li_vars):
+            mi_result[var1.name] = {}
 
-            # Diagonal
-            if (ivar1 == ivar2):
+            for ivar2, var2 in enumerate(mi.li_vars):
 
-               # For the diagonal we want to calculate:
-               # I(T;A) = H(sig,bkg)[A] - f * H(sig)[A] - (1-f) * H(bkg)[A]
+               # Diagonal
+               if (ivar1 == ivar2):
 
-               # Total cut is
-               # fiducial + range(var1) + extra cut(var1)
-               cut_and_weight_sig = "("
-               cut_and_weight_sig += "({0})".format(mi.fiducial_cut_signal)
-               cut_and_weight_sig += "&&({0}>={1})".format(var1.name, var1.range_min)
-               cut_and_weight_sig += "&&({0}<={1})".format(var1.name, var1.range_max)
-               cut_and_weight_sig += "&&({0})".format(var1.extra_cut)
-               cut_and_weight_sig += ")*{0}".format(extra_weight_sig)
+                  # For the diagonal we want to calculate:
+                  # I(T;A) = H(sig,bkg)[A] - f * H(sig)[A] - (1-f) * H(bkg)[A]
 
-               cut_and_weight_bkg = "("
-               cut_and_weight_bkg += "({0})".format(mi.fiducial_cut_background)
-               cut_and_weight_bkg += "&&({0}>={1})".format(var1.name, var1.range_min)
-               cut_and_weight_bkg += "&&({0}<={1})".format(var1.name, var1.range_max)
-               cut_and_weight_bkg += "&&({0})".format(var1.extra_cut)
-               cut_and_weight_bkg += ")*{0}".format(extra_weight_bkg)
+                  # Total cut is
+                  # fiducial + range(var1) + extra cut(var1)
+                  cut_and_weight_sig = "("
+                  cut_and_weight_sig += "({0})".format(mi.fiducial_cut_signal)
+                  cut_and_weight_sig += "&&({0}>={1})".format(var1.name, var1.range_min)
+                  cut_and_weight_sig += "&&({0}<={1})".format(var1.name, var1.range_max)
+                  cut_and_weight_sig += "&&({0})".format(var1.extra_cut)
+                  cut_and_weight_sig += ")*{0}".format(extra_weight_sig)
 
-               h_sig = MakeHistogram(input_tree_sig, [var1], n_bins_one_var_one_sample, cut_and_weight_sig)
-               h_bkg = MakeHistogram(input_tree_bkg, [var1], n_bins_one_var_one_sample, cut_and_weight_bkg)
-               h_sigbkg_sig = MakeHistogram(input_tree_sig, [var1], n_bins_one_var_two_sample, cut_and_weight_sig)
-               h_sigbkg_bkg = MakeHistogram(input_tree_bkg, [var1], n_bins_one_var_two_sample, cut_and_weight_bkg)
+                  cut_and_weight_bkg = "("
+                  cut_and_weight_bkg += "({0})".format(mi.fiducial_cut_background)
+                  cut_and_weight_bkg += "&&({0}>={1})".format(var1.name, var1.range_min)
+                  cut_and_weight_bkg += "&&({0}<={1})".format(var1.name, var1.range_max)
+                  cut_and_weight_bkg += "&&({0})".format(var1.extra_cut)
+                  cut_and_weight_bkg += ")*{0}".format(extra_weight_bkg)
 
-               # Combine signal/background
-               h_sigbkg = h_sigbkg_sig
-               h_sigbkg.Add(h_sigbkg_bkg)
+                  h_sig = MakeHistogram(input_tree_sig, [var1], n_bins_one_var_one_sample, cut_and_weight_sig)
+                  h_bkg = MakeHistogram(input_tree_bkg, [var1], n_bins_one_var_one_sample, cut_and_weight_bkg)
+                  h_sigbkg_sig = MakeHistogram(input_tree_sig, [var1], n_bins_one_var_two_sample, cut_and_weight_sig)
+                  h_sigbkg_bkg = MakeHistogram(input_tree_bkg, [var1], n_bins_one_var_two_sample, cut_and_weight_bkg)
 
-               # Also count events that pass fiducial but not variable selection cuts
-               # Inverted cut is 
-               # fiducial + (! range(var1)) + (! extra cut(var1))
-               inverted_cut_and_weight_sig = "("
-               inverted_cut_and_weight_sig += "({0})".format(mi.fiducial_cut_signal)
-               inverted_cut_and_weight_sig += "&&(({0}<{1})".format(var1.name, var1.range_min)
-               inverted_cut_and_weight_sig += " ||({0}>{1})".format(var1.name, var1.range_max)
-               inverted_cut_and_weight_sig += " ||(!({0})))".format(var1.extra_cut)
-               inverted_cut_and_weight_sig += ")*{0}".format(extra_weight_sig)
+                  # Combine signal/background
+                  h_sigbkg = h_sigbkg_sig
+                  h_sigbkg.Add(h_sigbkg_bkg)
 
-               inverted_cut_and_weight_bkg = "("
-               inverted_cut_and_weight_bkg += "({0})".format(mi.fiducial_cut_background)
-               inverted_cut_and_weight_bkg += "&&(({0}<{1})".format(var1.name, var1.range_min)
-               inverted_cut_and_weight_bkg += " ||({0}>{1})".format(var1.name, var1.range_max)
-               inverted_cut_and_weight_bkg += " ||(!({0})))".format(var1.extra_cut)
-               inverted_cut_and_weight_bkg += ")*{0}".format(extra_weight_bkg)
-               
-               # Count events with inverted cut
-               cnt_inv_sig = Count(input_tree_sig, inverted_cut_and_weight_sig)
-               cnt_inv_bkg = Count(input_tree_bkg, inverted_cut_and_weight_bkg)
+                  # Also count events that pass fiducial but not variable selection cuts
+                  # Inverted cut is 
+                  # fiducial + (! range(var1)) + (! extra cut(var1))
+                  inverted_cut_and_weight_sig = "("
+                  inverted_cut_and_weight_sig += "({0})".format(mi.fiducial_cut_signal)
+                  inverted_cut_and_weight_sig += "&&(({0}<{1})".format(var1.name, var1.range_min)
+                  inverted_cut_and_weight_sig += " ||({0}>{1})".format(var1.name, var1.range_max)
+                  inverted_cut_and_weight_sig += " ||(!({0})))".format(var1.extra_cut)
+                  inverted_cut_and_weight_sig += ")*{0}".format(extra_weight_sig)
 
-               # Calculate entropies
-               entropy_sig = CalculateEntropy([h_sig], cnt_inv_sig)
-               entropy_bkg = CalculateEntropy([h_bkg], cnt_inv_bkg)
-               entropy_sigbkg = CalculateEntropy([h_sigbkg], cnt_inv_sig + cnt_inv_bkg)
+                  inverted_cut_and_weight_bkg = "("
+                  inverted_cut_and_weight_bkg += "({0})".format(mi.fiducial_cut_background)
+                  inverted_cut_and_weight_bkg += "&&(({0}<{1})".format(var1.name, var1.range_min)
+                  inverted_cut_and_weight_bkg += " ||({0}>{1})".format(var1.name, var1.range_max)
+                  inverted_cut_and_weight_bkg += " ||(!({0})))".format(var1.extra_cut)
+                  inverted_cut_and_weight_bkg += ")*{0}".format(extra_weight_bkg)
+
+                  # Count events with inverted cut
+                  cnt_inv_sig = Count(input_tree_sig, inverted_cut_and_weight_sig)
+                  cnt_inv_bkg = Count(input_tree_bkg, inverted_cut_and_weight_bkg)
+
+                  # Calculate entropies
+                  entropy_sig = CalculateEntropy([h_sig], cnt_inv_sig)
+                  entropy_bkg = CalculateEntropy([h_bkg], cnt_inv_bkg)
+                  entropy_sigbkg = CalculateEntropy([h_sigbkg], cnt_inv_sig + cnt_inv_bkg)
 
 
-            # Below Diagonal
-            elif ivar2 < ivar1:
+               # Below Diagonal
+               elif ivar2 < ivar1:
 
-               if mi.diagonal_only:
+                  if mi.diagonal_only:
+                     continue
+
+                  # For the off-diagonal we want to calculate:
+                  # I(T;A,B) = H(sig,bkg)[A,B] - f * H(sig)[A,B] - (1-f) * H(bkg)[A,B]
+
+                  # We need to take into account 4 contributions
+                  # var1 and var2 valid        -> cut, this is a TH2
+                  # var1 valid, var2 invalid   -> inverted_cut_v2, this is a TH1
+                  # var1 invalid, var2 valid   -> inverted_cut_v1, this is a TH1
+                  # var1 invalid, var2 invalid -> inverted_cut_v1v2, this is number
+
+
+                  # ----- var1 valid, var2 valid -----
+                  # Total cut is
+                  # fiducial + range(var1) + extra cut(var1) + range(var2) + extra_cut(var2)
+                  cut_and_weight_sig = "("
+                  cut_and_weight_sig += "({0})".format(mi.fiducial_cut_signal)
+                  cut_and_weight_sig += "&&({0}>={1})".format(var1.name, var1.range_min)
+                  cut_and_weight_sig += "&&({0}<={1})".format(var1.name, var1.range_max)
+                  cut_and_weight_sig += "&&({0})".format(var1.extra_cut)
+                  cut_and_weight_sig += "&&({0}>={1})".format(var2.name, var2.range_min)
+                  cut_and_weight_sig += "&&({0}<={1})".format(var2.name, var2.range_max)
+                  cut_and_weight_sig += "&&({0})".format(var2.extra_cut)
+                  cut_and_weight_sig += ")*{0}".format(extra_weight_sig)
+
+                  cut_and_weight_bkg = "("
+                  cut_and_weight_bkg += "({0})".format(mi.fiducial_cut_background)
+                  cut_and_weight_bkg += "&&({0}>={1})".format(var1.name, var1.range_min)
+                  cut_and_weight_bkg += "&&({0}<={1})".format(var1.name, var1.range_max)
+                  cut_and_weight_bkg += "&&({0})".format(var1.extra_cut)
+                  cut_and_weight_bkg += "&&({0}>={1})".format(var2.name, var2.range_min)
+                  cut_and_weight_bkg += "&&({0}<={1})".format(var2.name, var2.range_max)
+                  cut_and_weight_bkg += "&&({0})".format(var2.extra_cut)
+                  cut_and_weight_bkg += ")*{0}".format(extra_weight_bkg)
+
+                  h_sig = MakeHistogram(input_tree_sig, [var1, var2], n_bins_two_var_one_sample, cut_and_weight_sig)
+                  h_bkg = MakeHistogram(input_tree_bkg, [var1, var2], n_bins_two_var_one_sample, cut_and_weight_bkg)
+                  h_sigbkg_sig = MakeHistogram(input_tree_sig, [var1, var2], n_bins_two_var_two_sample, cut_and_weight_sig)
+                  h_sigbkg_bkg = MakeHistogram(input_tree_bkg, [var1, var2], n_bins_two_var_two_sample, cut_and_weight_bkg)
+
+                  # Combine signal/background
+                  h_sigbkg = h_sigbkg_sig
+                  h_sigbkg.Add(h_sigbkg_bkg)
+
+
+                  # ----- var1 invalid, var2 valid -----
+                  # inverted cut var1  is
+                  # fiducial AND (!range(var1) OR !extra_cut(var1)) AND (range(var2) AND extra_cut(var2))
+                  cut_and_weight_sig_inv_var1 = "("
+                  cut_and_weight_sig_inv_var1 += "({0})".format(mi.fiducial_cut_signal)
+                  cut_and_weight_sig_inv_var1 += "&&(({0}<{1})".format(var1.name, var1.range_min)
+                  cut_and_weight_sig_inv_var1 += " ||({0}>{1})".format(var1.name, var1.range_max)
+                  cut_and_weight_sig_inv_var1 += " ||(!({0})))".format(var1.extra_cut)
+                  cut_and_weight_sig_inv_var1 += "&&({0}>={1})".format(var2.name, var2.range_min)
+                  cut_and_weight_sig_inv_var1 += "&&({0}<={1})".format(var2.name, var2.range_max)
+                  cut_and_weight_sig_inv_var1 += "&&(({0}))".format(var2.extra_cut)
+                  cut_and_weight_sig_inv_var1 += ")*{0}".format(extra_weight_sig)
+
+                  cut_and_weight_bkg_inv_var1 = "("
+                  cut_and_weight_bkg_inv_var1 += "({0})".format(mi.fiducial_cut_background)
+                  cut_and_weight_bkg_inv_var1 += "&&(({0}<{1})".format(var1.name, var1.range_min)
+                  cut_and_weight_bkg_inv_var1 += " ||({0}>{1})".format(var1.name, var1.range_max)
+                  cut_and_weight_bkg_inv_var1 += " ||(!({0})))".format(var1.extra_cut)
+                  cut_and_weight_bkg_inv_var1 += "&&({0}>={1})".format(var2.name, var2.range_min)
+                  cut_and_weight_bkg_inv_var1 += "&&({0}<={1})".format(var2.name, var2.range_max)
+                  cut_and_weight_bkg_inv_var1 += "&&(({0}))".format(var2.extra_cut)
+                  cut_and_weight_bkg_inv_var1 += ")*{0}".format(extra_weight_bkg)
+
+                  h_sig_inv1 = MakeHistogram(input_tree_sig, [var2], n_bins_one_var_one_sample, cut_and_weight_sig_inv_var1)
+                  h_bkg_inv1 = MakeHistogram(input_tree_bkg, [var2], n_bins_one_var_one_sample, cut_and_weight_bkg_inv_var1)
+                  h_sigbkg_sig_inv1 = MakeHistogram(input_tree_sig, [var2], n_bins_one_var_two_sample, cut_and_weight_sig_inv_var1)
+                  h_sigbkg_bkg_inv1 = MakeHistogram(input_tree_bkg, [var2], n_bins_one_var_two_sample, cut_and_weight_bkg_inv_var1)
+
+                  # Combine signal/background
+                  h_sigbkg_inv1 = h_sigbkg_sig_inv1
+                  h_sigbkg_inv1.Add(h_sigbkg_bkg_inv1)
+
+
+                  # ----- var1 valid, var2 invalid -----
+                  # fiducial AND (range(var1) AND extra_cut(var1)) AND (!range(var2) OR !extra_cut(var2))
+                  cut_and_weight_sig_inv_var2 = "("
+                  cut_and_weight_sig_inv_var2 += "({0})".format(mi.fiducial_cut_signal)
+                  cut_and_weight_sig_inv_var2 += "&&({0}>={1})".format(var1.name, var1.range_min)
+                  cut_and_weight_sig_inv_var2 += "&&({0}<={1})".format(var1.name, var1.range_max)
+                  cut_and_weight_sig_inv_var2 += "&&(({0}))".format(var1.extra_cut)
+                  cut_and_weight_sig_inv_var2 += "&&(({0}<{1})".format(var2.name, var2.range_min)
+                  cut_and_weight_sig_inv_var2 += " ||({0}>{1})".format(var2.name, var2.range_max)
+                  cut_and_weight_sig_inv_var2 += " ||(!({0})))".format(var2.extra_cut)
+                  cut_and_weight_sig_inv_var2 += ")*{0}".format(extra_weight_sig)
+
+                  cut_and_weight_bkg_inv_var2 = "("
+                  cut_and_weight_bkg_inv_var2 += "({0})".format(mi.fiducial_cut_background)
+                  cut_and_weight_bkg_inv_var2 += "&&({0}>={1})".format(var1.name, var1.range_min)
+                  cut_and_weight_bkg_inv_var2 += "&&({0}<={1})".format(var1.name, var1.range_max)
+                  cut_and_weight_bkg_inv_var2 += "&&(({0}))".format(var1.extra_cut)
+                  cut_and_weight_bkg_inv_var2 += "&&(({0}<{1})".format(var2.name, var2.range_min)
+                  cut_and_weight_bkg_inv_var2 += " ||({0}>{1})".format(var2.name, var2.range_max)
+                  cut_and_weight_bkg_inv_var2 += " ||(!({0})))".format(var2.extra_cut)
+                  cut_and_weight_bkg_inv_var2 += ")*{0}".format(extra_weight_bkg)
+
+                  h_sig_inv2 = MakeHistogram(input_tree_sig, [var1], n_bins_one_var_one_sample, cut_and_weight_sig_inv_var2)
+                  h_bkg_inv2 = MakeHistogram(input_tree_bkg, [var1], n_bins_one_var_one_sample, cut_and_weight_bkg_inv_var2)
+                  h_sigbkg_sig_inv2 = MakeHistogram(input_tree_sig, [var1], n_bins_one_var_two_sample, cut_and_weight_sig_inv_var2)
+                  h_sigbkg_bkg_inv2 = MakeHistogram(input_tree_bkg, [var1], n_bins_one_var_two_sample, cut_and_weight_bkg_inv_var2)
+
+                  h_sigbkg_inv2 = h_sigbkg_sig_inv2
+                  h_sigbkg_inv2.Add(h_sigbkg_bkg_inv2)
+
+
+                  # ----- var1 invalid, var2 invalid -----
+                  # inverted cut  is
+                  # fiducial AND (!range(var1) OR !extra cut(var1)) AND (!range(var2) OR !extra_cut(var2))
+                  inverted_cut_and_weight_sig = "("
+                  inverted_cut_and_weight_sig += "({0})".format(mi.fiducial_cut_signal)
+                  inverted_cut_and_weight_sig += "&&(({0}<{1})".format(var1.name, var1.range_min)
+                  inverted_cut_and_weight_sig += " ||({0}>{1})".format(var1.name, var1.range_max)
+                  inverted_cut_and_weight_sig += " ||(!({0})))".format(var1.extra_cut)
+                  inverted_cut_and_weight_sig += "&&(({0}<{1})".format(var2.name, var2.range_min)
+                  inverted_cut_and_weight_sig += " ||({0}>{1})".format(var2.name, var2.range_max)
+                  inverted_cut_and_weight_sig += " ||(!({0})))".format(var2.extra_cut)
+                  inverted_cut_and_weight_sig += ")*{0}".format(extra_weight_sig)
+
+                  inverted_cut_and_weight_bkg = "("
+                  inverted_cut_and_weight_bkg += "({0})".format(mi.fiducial_cut_background)
+                  inverted_cut_and_weight_bkg += "&&(({0}<{1})".format(var1.name, var1.range_min)
+                  inverted_cut_and_weight_bkg += " ||({0}>{1})".format(var1.name, var1.range_max)
+                  inverted_cut_and_weight_bkg += " ||(!({0})))".format(var1.extra_cut)
+                  inverted_cut_and_weight_bkg += "&&(({0}<{1})".format(var2.name, var2.range_min)
+                  inverted_cut_and_weight_bkg += " ||({0}>{1})".format(var2.name, var2.range_max)
+                  inverted_cut_and_weight_bkg += " ||(!({0})))".format(var2.extra_cut)
+                  inverted_cut_and_weight_bkg += ")*{0}".format(extra_weight_bkg)
+
+                  cnt_inv_sig = Count(input_tree_sig, inverted_cut_and_weight_sig)
+                  cnt_inv_bkg = Count(input_tree_bkg, inverted_cut_and_weight_bkg)               
+
+                  # ----- Put everything together -----
+                  # Calculate entropies
+                  entropy_sig = CalculateEntropy([h_sig, h_sig_inv1, h_sig_inv2], cnt_inv_sig)
+                  entropy_bkg = CalculateEntropy([h_bkg, h_bkg_inv1, h_bkg_inv2], cnt_inv_bkg)
+                  entropy_sigbkg = CalculateEntropy([h_sigbkg, h_sigbkg_inv1, h_sigbkg_inv2], cnt_inv_sig + cnt_inv_bkg)
+
+               # Above Diagonal
+               else:
                   continue
+               # End of Diagonal vs Off-Diagonal difference
 
-               # For the off-diagonal we want to calculate:
-               # I(T;A,B) = H(sig,bkg)[A,B] - f * H(sig)[A,B] - (1-f) * H(bkg)[A,B]
+               # Calculate Mutual Information
+               I = entropy_sigbkg  - f * entropy_sig  - (1-f) * entropy_bkg
 
-               # We need to take into account 4 contributions
-               # var1 and var2 valid        -> cut, this is a TH2
-               # var1 valid, var2 invalid   -> inverted_cut_v2, this is a TH1
-               # var1 invalid, var2 valid   -> inverted_cut_v1, this is a TH1
-               # var1 invalid, var2 invalid -> inverted_cut_v1v2, this is number
+               print "{0} / {1}:\t H_sig = {2:.3f} \t H_bkg = {3:.3f} \t H_sigbkg = {4:.3f} \t I = {5:.3f}".format(var1.name,
+                                                                                                   var2.name,
+                                                                                                   entropy_sig,
+                                                                                                   entropy_bkg,
+                                                                                                   entropy_sigbkg,
+                                                                                                   I)
 
-
-               # ----- var1 valid, var2 valid -----
-               # Total cut is
-               # fiducial + range(var1) + extra cut(var1) + range(var2) + extra_cut(var2)
-               cut_and_weight_sig = "("
-               cut_and_weight_sig += "({0})".format(mi.fiducial_cut_signal)
-               cut_and_weight_sig += "&&({0}>={1})".format(var1.name, var1.range_min)
-               cut_and_weight_sig += "&&({0}<={1})".format(var1.name, var1.range_max)
-               cut_and_weight_sig += "&&({0})".format(var1.extra_cut)
-               cut_and_weight_sig += "&&({0}>={1})".format(var2.name, var2.range_min)
-               cut_and_weight_sig += "&&({0}<={1})".format(var2.name, var2.range_max)
-               cut_and_weight_sig += "&&({0})".format(var2.extra_cut)
-               cut_and_weight_sig += ")*{0}".format(extra_weight_sig)
-
-               cut_and_weight_bkg = "("
-               cut_and_weight_bkg += "({0})".format(mi.fiducial_cut_background)
-               cut_and_weight_bkg += "&&({0}>={1})".format(var1.name, var1.range_min)
-               cut_and_weight_bkg += "&&({0}<={1})".format(var1.name, var1.range_max)
-               cut_and_weight_bkg += "&&({0})".format(var1.extra_cut)
-               cut_and_weight_bkg += "&&({0}>={1})".format(var2.name, var2.range_min)
-               cut_and_weight_bkg += "&&({0}<={1})".format(var2.name, var2.range_max)
-               cut_and_weight_bkg += "&&({0})".format(var2.extra_cut)
-               cut_and_weight_bkg += ")*{0}".format(extra_weight_bkg)
-
-               h_sig = MakeHistogram(input_tree_sig, [var1, var2], n_bins_two_var_one_sample, cut_and_weight_sig)
-               h_bkg = MakeHistogram(input_tree_bkg, [var1, var2], n_bins_two_var_one_sample, cut_and_weight_bkg)
-               h_sigbkg_sig = MakeHistogram(input_tree_sig, [var1, var2], n_bins_two_var_two_sample, cut_and_weight_sig)
-               h_sigbkg_bkg = MakeHistogram(input_tree_bkg, [var1, var2], n_bins_two_var_two_sample, cut_and_weight_bkg)
-               
-               # Combine signal/background
-               h_sigbkg = h_sigbkg_sig
-               h_sigbkg.Add(h_sigbkg_bkg)
-
-               
-               # ----- var1 invalid, var2 valid -----
-               # inverted cut var1  is
-               # fiducial AND (!range(var1) OR !extra_cut(var1)) AND (range(var2) AND extra_cut(var2))
-               cut_and_weight_sig_inv_var1 = "("
-               cut_and_weight_sig_inv_var1 += "({0})".format(mi.fiducial_cut_signal)
-               cut_and_weight_sig_inv_var1 += "&&(({0}<{1})".format(var1.name, var1.range_min)
-               cut_and_weight_sig_inv_var1 += " ||({0}>{1})".format(var1.name, var1.range_max)
-               cut_and_weight_sig_inv_var1 += " ||(!({0})))".format(var1.extra_cut)
-               cut_and_weight_sig_inv_var1 += "&&({0}>={1})".format(var2.name, var2.range_min)
-               cut_and_weight_sig_inv_var1 += "&&({0}<={1})".format(var2.name, var2.range_max)
-               cut_and_weight_sig_inv_var1 += "&&(({0}))".format(var2.extra_cut)
-               cut_and_weight_sig_inv_var1 += ")*{0}".format(extra_weight_sig)
-
-               cut_and_weight_bkg_inv_var1 = "("
-               cut_and_weight_bkg_inv_var1 += "({0})".format(mi.fiducial_cut_background)
-               cut_and_weight_bkg_inv_var1 += "&&(({0}<{1})".format(var1.name, var1.range_min)
-               cut_and_weight_bkg_inv_var1 += " ||({0}>{1})".format(var1.name, var1.range_max)
-               cut_and_weight_bkg_inv_var1 += " ||(!({0})))".format(var1.extra_cut)
-               cut_and_weight_bkg_inv_var1 += "&&({0}>={1})".format(var2.name, var2.range_min)
-               cut_and_weight_bkg_inv_var1 += "&&({0}<={1})".format(var2.name, var2.range_max)
-               cut_and_weight_bkg_inv_var1 += "&&(({0}))".format(var2.extra_cut)
-               cut_and_weight_bkg_inv_var1 += ")*{0}".format(extra_weight_bkg)
-
-               h_sig_inv1 = MakeHistogram(input_tree_sig, [var2], n_bins_one_var_one_sample, cut_and_weight_sig_inv_var1)
-               h_bkg_inv1 = MakeHistogram(input_tree_bkg, [var2], n_bins_one_var_one_sample, cut_and_weight_bkg_inv_var1)
-               h_sigbkg_sig_inv1 = MakeHistogram(input_tree_sig, [var2], n_bins_one_var_two_sample, cut_and_weight_sig_inv_var1)
-               h_sigbkg_bkg_inv1 = MakeHistogram(input_tree_bkg, [var2], n_bins_one_var_two_sample, cut_and_weight_bkg_inv_var1)
-
-               # Combine signal/background
-               h_sigbkg_inv1 = h_sigbkg_sig_inv1
-               h_sigbkg_inv1.Add(h_sigbkg_bkg_inv1)
-
-
-               # ----- var1 valid, var2 invalid -----
-               # fiducial AND (range(var1) AND extra_cut(var1)) AND (!range(var2) OR !extra_cut(var2))
-               cut_and_weight_sig_inv_var2 = "("
-               cut_and_weight_sig_inv_var2 += "({0})".format(mi.fiducial_cut_signal)
-               cut_and_weight_sig_inv_var2 += "&&({0}>={1})".format(var1.name, var1.range_min)
-               cut_and_weight_sig_inv_var2 += "&&({0}<={1})".format(var1.name, var1.range_max)
-               cut_and_weight_sig_inv_var2 += "&&(({0}))".format(var1.extra_cut)
-               cut_and_weight_sig_inv_var2 += "&&(({0}<{1})".format(var2.name, var2.range_min)
-               cut_and_weight_sig_inv_var2 += " ||({0}>{1})".format(var2.name, var2.range_max)
-               cut_and_weight_sig_inv_var2 += " ||(!({0})))".format(var2.extra_cut)
-               cut_and_weight_sig_inv_var2 += ")*{0}".format(extra_weight_sig)
-
-               cut_and_weight_bkg_inv_var2 = "("
-               cut_and_weight_bkg_inv_var2 += "({0})".format(mi.fiducial_cut_background)
-               cut_and_weight_bkg_inv_var2 += "&&({0}>={1})".format(var1.name, var1.range_min)
-               cut_and_weight_bkg_inv_var2 += "&&({0}<={1})".format(var1.name, var1.range_max)
-               cut_and_weight_bkg_inv_var2 += "&&(({0}))".format(var1.extra_cut)
-               cut_and_weight_bkg_inv_var2 += "&&(({0}<{1})".format(var2.name, var2.range_min)
-               cut_and_weight_bkg_inv_var2 += " ||({0}>{1})".format(var2.name, var2.range_max)
-               cut_and_weight_bkg_inv_var2 += " ||(!({0})))".format(var2.extra_cut)
-               cut_and_weight_bkg_inv_var2 += ")*{0}".format(extra_weight_bkg)
-
-               h_sig_inv2 = MakeHistogram(input_tree_sig, [var1], n_bins_one_var_one_sample, cut_and_weight_sig_inv_var2)
-               h_bkg_inv2 = MakeHistogram(input_tree_bkg, [var1], n_bins_one_var_one_sample, cut_and_weight_bkg_inv_var2)
-               h_sigbkg_sig_inv2 = MakeHistogram(input_tree_sig, [var1], n_bins_one_var_two_sample, cut_and_weight_sig_inv_var2)
-               h_sigbkg_bkg_inv2 = MakeHistogram(input_tree_bkg, [var1], n_bins_one_var_two_sample, cut_and_weight_bkg_inv_var2)
-
-               h_sigbkg_inv2 = h_sigbkg_sig_inv2
-               h_sigbkg_inv2.Add(h_sigbkg_bkg_inv2)
-
-
-               # ----- var1 invalid, var2 invalid -----
-               # inverted cut  is
-               # fiducial AND (!range(var1) OR !extra cut(var1)) AND (!range(var2) OR !extra_cut(var2))
-               inverted_cut_and_weight_sig = "("
-               inverted_cut_and_weight_sig += "({0})".format(mi.fiducial_cut_signal)
-               inverted_cut_and_weight_sig += "&&(({0}<{1})".format(var1.name, var1.range_min)
-               inverted_cut_and_weight_sig += " ||({0}>{1})".format(var1.name, var1.range_max)
-               inverted_cut_and_weight_sig += " ||(!({0})))".format(var1.extra_cut)
-               inverted_cut_and_weight_sig += "&&(({0}<{1})".format(var2.name, var2.range_min)
-               inverted_cut_and_weight_sig += " ||({0}>{1})".format(var2.name, var2.range_max)
-               inverted_cut_and_weight_sig += " ||(!({0})))".format(var2.extra_cut)
-               inverted_cut_and_weight_sig += ")*{0}".format(extra_weight_sig)
-
-               inverted_cut_and_weight_bkg = "("
-               inverted_cut_and_weight_bkg += "({0})".format(mi.fiducial_cut_background)
-               inverted_cut_and_weight_bkg += "&&(({0}<{1})".format(var1.name, var1.range_min)
-               inverted_cut_and_weight_bkg += " ||({0}>{1})".format(var1.name, var1.range_max)
-               inverted_cut_and_weight_bkg += " ||(!({0})))".format(var1.extra_cut)
-               inverted_cut_and_weight_bkg += "&&(({0}<{1})".format(var2.name, var2.range_min)
-               inverted_cut_and_weight_bkg += " ||({0}>{1})".format(var2.name, var2.range_max)
-               inverted_cut_and_weight_bkg += " ||(!({0})))".format(var2.extra_cut)
-               inverted_cut_and_weight_bkg += ")*{0}".format(extra_weight_bkg)
-               
-               cnt_inv_sig = Count(input_tree_sig, inverted_cut_and_weight_sig)
-               cnt_inv_bkg = Count(input_tree_bkg, inverted_cut_and_weight_bkg)               
-
-               # ----- Put everything together -----
-               # Calculate entropies
-               entropy_sig = CalculateEntropy([h_sig, h_sig_inv1, h_sig_inv2], cnt_inv_sig)
-               entropy_bkg = CalculateEntropy([h_bkg, h_bkg_inv1, h_bkg_inv2], cnt_inv_bkg)
-               entropy_sigbkg = CalculateEntropy([h_sigbkg, h_sigbkg_inv1, h_sigbkg_inv2], cnt_inv_sig + cnt_inv_bkg)
-            
-            # Above Diagonal
-            else:
-               continue
-            # End of Diagonal vs Off-Diagonal difference
-
-            # Calculate Mutual Information
-            I = entropy_sigbkg  - f * entropy_sig  - (1-f) * entropy_bkg
-            
-            print "{0} / {1}:\t H_sig = {2:.3f} \t H_bkg = {3:.3f} \t H_sigbkg = {4:.3f} \t I = {5:.3f}".format(var1.name,
-                                                                                                var2.name,
-                                                                                                entropy_sig,
-                                                                                                entropy_bkg,
-                                                                                                entropy_sigbkg,
-                                                                                                I)
-
-            mi_result[var1.name][var2.name] = I
-         # End var2 loop
-      # End var1 loop
+               mi_result[var1.name][var2.name] = I
+            # End var2 loop
+         # End var1 loop
 
       ROOT.gStyle.SetPalette(1)   
       
@@ -519,15 +529,20 @@ def MakePlots(mis, files, input_treename = 'tree'):
 
 
       h_mi.LabelsOption("v","X")
-      h_mi.GetXaxis().SetLabelSize(0.035)
-      h_mi.GetYaxis().SetLabelSize(0.035)
+      h_mi.GetXaxis().SetLabelSize(0.038)
+      h_mi.GetYaxis().SetLabelSize(0.038)
       h_mi.GetZaxis().SetLabelSize(0.03)
       
       draw_opts = "COLZ TEXT"
-
-      f_pickle = open("{0}_mi.pickle".format(mi.name), "w")
-      pickle.dump(mi_result, f_pickle)
-      f_pickle.close()
+      
+      if not mi.read_from_pickle:
+         
+         if not os.path.exists(pickle_directory):
+            os.makedirs(pickle_directory)
+         
+         f_pickle = open("{0}/{1}_mi.pickle".format(pickle_directory, mi.name), "w")
+         pickle.dump(mi_result, f_pickle)
+         f_pickle.close()
 
       h_mi.Draw(draw_opts)
       if mi.diagonal_only:

@@ -307,7 +307,7 @@ def plotROCs(name, li_setups, view="all"):
     # High Purity
     if view == "left_top":
         c.SetLogy(0)
-        h_bg = ROOT.TH2F("","",100,0,0.33,100,0.95,1)
+        h_bg = ROOT.TH2F("","",100,0,0.33,100,0.98,1)
     # Top Tagging
     # Medium
     elif view == "middle_top":
@@ -354,7 +354,7 @@ def plotROCs(name, li_setups, view="all"):
 
         h.GetXaxis().SetLimits(0.0,cut_fraction_signal)
 
-        for ibin in range(1, h.GetXaxis().GetNbins()):
+        for ibin in range(1, h.GetXaxis().GetNbins()+1):
             eff_b = 1 - h.GetBinContent(ibin)
             eff_b_new = eff_b * cut_fraction_bg
             h.SetBinContent(ibin, 1-eff_b_new)

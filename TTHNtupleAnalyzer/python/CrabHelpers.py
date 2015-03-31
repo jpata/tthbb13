@@ -260,9 +260,10 @@ def cleanup(name,
         return
 
     broken = []
-    for fn in  input_filenames:
+    for i_fn, fn in  enumerate(input_filenames):
+        print i_fn
         try:
-            f = ROOT.TFile(fn)
+            f = ROOT.TFile(fn, "update")
             t = f.tree
             x = t.GetEntries()
             
@@ -271,6 +272,10 @@ def cleanup(name,
         
             if f.IsZombie():
                 broken.append(fn)
+
+            t.FlushBaskets()
+            t.Write()
+
             f.Close()
         except AttributeError:
             broken.append(fn)

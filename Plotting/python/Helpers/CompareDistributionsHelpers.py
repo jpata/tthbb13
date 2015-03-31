@@ -276,7 +276,7 @@ def doWork( dic_files, output_dir ):
             if cp.log_y:
                 cp.max_y = 2*found_max
             else:
-                cp.max_y = 1.25*found_max
+                cp.max_y = 1.5*found_max
                 # End of cp.max_y == None
 
         # Loop over plots
@@ -315,6 +315,7 @@ def doWork( dic_files, output_dir ):
             # Label the x-axis
             # proper adding of [units] to the x-axis label
             bin_width = h.GetBinWidth( 1 )
+
             if cp.axis_unit:
                 h.GetXaxis().SetTitle( cp.label_x + " (" + cp.axis_unit + ")")
             else:
@@ -322,6 +323,7 @@ def doWork( dic_files, output_dir ):
 
             # Label the y-axis
             #h.GetYaxis().SetTitle( cp.label_y + " / "+str(bin_width) +" "+ cp.axis_unit)
+            h.GetXaxis().SetTitleSize(0.05)
             h.GetYaxis().SetTitle( cp.label_y)
             h.GetYaxis().SetTitleOffset(1.7)
 

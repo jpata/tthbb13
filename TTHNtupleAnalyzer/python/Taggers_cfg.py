@@ -127,37 +127,37 @@ li_fatjets_branches.append(branch_name)
 li_ungroomed_fatjets_objects.append(fj_name)
 li_ungroomed_fatjets_branches.append(branch_name)
 
-# PUPPI: CA, R=0.8, pT > 200 GeV
-fj_name = "ca08PFJetsPUPPI"
-branch_name = 'ca08puppi'
-setattr(process, fj_name, cms.EDProducer(
-        "FastjetJetProducer",
-        PFJetParameters,
-        AnomalousCellParameters,
-        jetAlgorithm = cms.string("CambridgeAachen"),
-        rParam       = cms.double(0.8)))
-getattr(process, fj_name).src = cms.InputTag("puppi")
-getattr(process, fj_name).jetPtMin = cms.double(200)
-li_fatjets_objects.append(fj_name)
-li_fatjets_branches.append(branch_name)
-li_ungroomed_fatjets_objects.append(fj_name)
-li_ungroomed_fatjets_branches.append(branch_name)
-
-# PUPPI: CA, R=1.5, pT > 200 GeV
-fj_name = "ca15PFJetsPUPPI"
-branch_name = 'ca15puppi'
-setattr(process, fj_name, cms.EDProducer(
-        "FastjetJetProducer",
-        PFJetParameters,
-        AnomalousCellParameters,
-        jetAlgorithm = cms.string("CambridgeAachen"),
-        rParam       = cms.double(1.5)))
-getattr(process, fj_name).src = cms.InputTag("puppi")
-getattr(process, fj_name).jetPtMin = cms.double(200)
-li_fatjets_objects.append(fj_name)
-li_fatjets_branches.append(branch_name)
-li_ungroomed_fatjets_objects.append(fj_name)
-li_ungroomed_fatjets_branches.append(branch_name)
+## PUPPI: CA, R=0.8, pT > 200 GeV
+#fj_name = "ca08PFJetsPUPPI"
+#branch_name = 'ca08puppi'
+#setattr(process, fj_name, cms.EDProducer(
+#        "FastjetJetProducer",
+#        PFJetParameters,
+#        AnomalousCellParameters,
+#        jetAlgorithm = cms.string("CambridgeAachen"),
+#        rParam       = cms.double(0.8)))
+#getattr(process, fj_name).src = cms.InputTag("puppi")
+#getattr(process, fj_name).jetPtMin = cms.double(200)
+#li_fatjets_objects.append(fj_name)
+#li_fatjets_branches.append(branch_name)
+#li_ungroomed_fatjets_objects.append(fj_name)
+#li_ungroomed_fatjets_branches.append(branch_name)
+#
+## PUPPI: CA, R=1.5, pT > 200 GeV
+#fj_name = "ca15PFJetsPUPPI"
+#branch_name = 'ca15puppi'
+#setattr(process, fj_name, cms.EDProducer(
+#        "FastjetJetProducer",
+#        PFJetParameters,
+#        AnomalousCellParameters,
+#        jetAlgorithm = cms.string("CambridgeAachen"),
+#        rParam       = cms.double(1.5)))
+#getattr(process, fj_name).src = cms.InputTag("puppi")
+#getattr(process, fj_name).jetPtMin = cms.double(200)
+#li_fatjets_objects.append(fj_name)
+#li_fatjets_branches.append(branch_name)
+#li_ungroomed_fatjets_objects.append(fj_name)
+#li_ungroomed_fatjets_branches.append(branch_name)
 
 
 
@@ -170,34 +170,34 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
 
    ungroomed_fj = getattr(process, ungroomed_fj_name)
 
-   name = "trimmedr2f6forbtag"   
-   fj_name = ungroomed_fj_name + name
-   branch_name = ungroomed_branch_name + name
-   setattr(process, fj_name, ungroomed_fj.clone(
-      useTrimming = cms.bool(True),
-      rFilt = cms.double(0.2),
-      trimPtFracMin = cms.double(0.06),
-      useExplicitGhosts = cms.bool(True),
-      writeCompound = cms.bool(True),
-      jetCollInstanceName=cms.string("SubJets"),
-   ))
-   li_fatjets_objects.append(fj_name)        
-   li_fatjets_branches.append(branch_name)
+   #name = "trimmedr2f6forbtag"   
+   #fj_name = ungroomed_fj_name + name
+   #branch_name = ungroomed_branch_name + name
+   #setattr(process, fj_name, ungroomed_fj.clone(
+   #   useTrimming = cms.bool(True),
+   #   rFilt = cms.double(0.2),
+   #   trimPtFracMin = cms.double(0.06),
+   #   useExplicitGhosts = cms.bool(True),
+   #   writeCompound = cms.bool(True),
+   #   jetCollInstanceName=cms.string("SubJets"),
+   #))
+   #li_fatjets_objects.append(fj_name)        
+   #li_fatjets_branches.append(branch_name)
 
 
 
-
-   name = "trimmedr2f3"   
-   fj_name = ungroomed_fj_name + name
-   branch_name = ungroomed_branch_name + name
-   setattr(process, fj_name, ungroomed_fj.clone(
-      useTrimming = cms.bool(True),
-      rFilt = cms.double(0.2),
-      trimPtFracMin = cms.double(0.03),
-      useExplicitGhosts = cms.bool(True)))
-   li_fatjets_objects.append(fj_name)        
-   li_fatjets_branches.append(branch_name)
-
+#
+#   name = "trimmedr2f3"   
+#   fj_name = ungroomed_fj_name + name
+#   branch_name = ungroomed_branch_name + name
+#   setattr(process, fj_name, ungroomed_fj.clone(
+#      useTrimming = cms.bool(True),
+#      rFilt = cms.double(0.2),
+#      trimPtFracMin = cms.double(0.03),
+#      useExplicitGhosts = cms.bool(True)))
+#   li_fatjets_objects.append(fj_name)        
+#   li_fatjets_branches.append(branch_name)
+#
    name = "trimmedr2f6"   
    fj_name = ungroomed_fj_name + name
    branch_name = ungroomed_branch_name + name
@@ -208,18 +208,18 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
       useExplicitGhosts = cms.bool(True)))
    li_fatjets_objects.append(fj_name)        
    li_fatjets_branches.append(branch_name)
-
-   name = "trimmedr2f10"   
-   fj_name = ungroomed_fj_name + name
-   branch_name = ungroomed_branch_name + name
-   setattr(process, fj_name, ungroomed_fj.clone(
-      useTrimming = cms.bool(True),
-      rFilt = cms.double(0.2),
-      trimPtFracMin = cms.double(0.1),
-      useExplicitGhosts = cms.bool(True)))
-   li_fatjets_objects.append(fj_name)        
-   li_fatjets_branches.append(branch_name)
-
+#
+#   name = "trimmedr2f10"   
+#   fj_name = ungroomed_fj_name + name
+#   branch_name = ungroomed_branch_name + name
+#   setattr(process, fj_name, ungroomed_fj.clone(
+#      useTrimming = cms.bool(True),
+#      rFilt = cms.double(0.2),
+#      trimPtFracMin = cms.double(0.1),
+#      useExplicitGhosts = cms.bool(True)))
+#   li_fatjets_objects.append(fj_name)        
+#   li_fatjets_branches.append(branch_name)
+#
    name = "softdropz10b00"   
    fj_name = ungroomed_fj_name + name
    branch_name = ungroomed_branch_name + name
@@ -231,17 +231,17 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
    li_fatjets_objects.append(fj_name)        
    li_fatjets_branches.append(branch_name)
 
-   name = "softdropz15b00"   
-   fj_name = ungroomed_fj_name + name
-   branch_name = ungroomed_branch_name + name
-   setattr(process, fj_name, ungroomed_fj.clone(
-           useSoftDrop = cms.bool(True),
-           zcut = cms.double(0.15),
-           beta = cms.double(0.0),
-           useExplicitGhosts = cms.bool(True)))
-   li_fatjets_objects.append(fj_name)        
-   li_fatjets_branches.append(branch_name)
-
+#   name = "softdropz15b00"   
+#   fj_name = ungroomed_fj_name + name
+#   branch_name = ungroomed_branch_name + name
+#   setattr(process, fj_name, ungroomed_fj.clone(
+#           useSoftDrop = cms.bool(True),
+#           zcut = cms.double(0.15),
+#           beta = cms.double(0.0),
+#           useExplicitGhosts = cms.bool(True)))
+#   li_fatjets_objects.append(fj_name)        
+#   li_fatjets_branches.append(branch_name)
+#
    name = "softdropz15b10"   
    fj_name = ungroomed_fj_name + name
    branch_name = ungroomed_branch_name + name
@@ -252,51 +252,51 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
            useExplicitGhosts = cms.bool(True)))
    li_fatjets_objects.append(fj_name)        
    li_fatjets_branches.append(branch_name)
-
-   name = "softdropz15b20"   
-   fj_name = ungroomed_fj_name + name
-   branch_name = ungroomed_branch_name + name
-   setattr(process, fj_name, ungroomed_fj.clone(
-           useSoftDrop = cms.bool(True),
-           zcut = cms.double(0.15),
-           beta = cms.double(2.0),
-           useExplicitGhosts = cms.bool(True)))
-   li_fatjets_objects.append(fj_name)        
-   li_fatjets_branches.append(branch_name)
-
-   name = "softdropz20b10"   
-   fj_name = ungroomed_fj_name + name
-   branch_name = ungroomed_branch_name + name
-   setattr(process, fj_name, ungroomed_fj.clone(
-           useSoftDrop = cms.bool(True),
-           zcut = cms.double(0.20),
-           beta = cms.double(0.1),
-           useExplicitGhosts = cms.bool(True)))
-   li_fatjets_objects.append(fj_name)        
-   li_fatjets_branches.append(branch_name)
-
-   name = "softdropz30b10"   
-   fj_name = ungroomed_fj_name + name
-   branch_name = ungroomed_branch_name + name
-   setattr(process, fj_name, ungroomed_fj.clone(
-           useSoftDrop = cms.bool(True),
-           zcut = cms.double(0.30),
-           beta = cms.double(0.1),
-           useExplicitGhosts = cms.bool(True)))
-   li_fatjets_objects.append(fj_name)        
-   li_fatjets_branches.append(branch_name)
-
-   name = "softdropz30b15"   
-   fj_name = ungroomed_fj_name + name
-   branch_name = ungroomed_branch_name + name
-   setattr(process, fj_name, ungroomed_fj.clone(
-           useSoftDrop = cms.bool(True),
-           zcut = cms.double(0.30),
-           beta = cms.double(0.15),
-           useExplicitGhosts = cms.bool(True)))
-   li_fatjets_objects.append(fj_name)        
-   li_fatjets_branches.append(branch_name)
-
+#
+#   name = "softdropz15b20"   
+#   fj_name = ungroomed_fj_name + name
+#   branch_name = ungroomed_branch_name + name
+#   setattr(process, fj_name, ungroomed_fj.clone(
+#           useSoftDrop = cms.bool(True),
+#           zcut = cms.double(0.15),
+#           beta = cms.double(2.0),
+#           useExplicitGhosts = cms.bool(True)))
+#   li_fatjets_objects.append(fj_name)        
+#   li_fatjets_branches.append(branch_name)
+#
+#   name = "softdropz20b10"   
+#   fj_name = ungroomed_fj_name + name
+#   branch_name = ungroomed_branch_name + name
+#   setattr(process, fj_name, ungroomed_fj.clone(
+#           useSoftDrop = cms.bool(True),
+#           zcut = cms.double(0.20),
+#           beta = cms.double(0.1),
+#           useExplicitGhosts = cms.bool(True)))
+#   li_fatjets_objects.append(fj_name)        
+#   li_fatjets_branches.append(branch_name)
+#
+#   name = "softdropz30b10"   
+#   fj_name = ungroomed_fj_name + name
+#   branch_name = ungroomed_branch_name + name
+#   setattr(process, fj_name, ungroomed_fj.clone(
+#           useSoftDrop = cms.bool(True),
+#           zcut = cms.double(0.30),
+#           beta = cms.double(0.1),
+#           useExplicitGhosts = cms.bool(True)))
+#   li_fatjets_objects.append(fj_name)        
+#   li_fatjets_branches.append(branch_name)
+#
+#   name = "softdropz30b15"   
+#   fj_name = ungroomed_fj_name + name
+#   branch_name = ungroomed_branch_name + name
+#   setattr(process, fj_name, ungroomed_fj.clone(
+#           useSoftDrop = cms.bool(True),
+#           zcut = cms.double(0.30),
+#           beta = cms.double(0.15),
+#           useExplicitGhosts = cms.bool(True)))
+#   li_fatjets_objects.append(fj_name)        
+#   li_fatjets_branches.append(branch_name)
+#
 
 #####################################
 # Helpers: GetRadiusFromName / GetRadiusStringFromName
@@ -393,7 +393,7 @@ for i_fj, fj_name in enumerate(li_fatjets_objects):
 
    r = GetRadiusFromName(fj_name)           
         
-   qvol_fatjets = li_ungroomed_fatjets_objects
+   qvol_fatjets = []#li_ungroomed_fatjets_objects
 
    if fj_name in qvol_fatjets:
 
@@ -613,7 +613,7 @@ li_htt_branches = []
 for input_object in ["chs", "puppi"]:
    
 
-   name = "looseMultiRHTT"
+   name = "looseOptRHTT"
    if not input_object == "chs":
       name += input_object
 
@@ -642,6 +642,72 @@ for input_object in ["chs", "puppi"]:
         maxM13Cut = cms.double(2.)))
    li_htt_branches.append(name)
 
+
+#
+#   name = "looseOptRQHTT"
+#   if not input_object == "chs":
+#      name += input_object
+#
+#   setattr(process, name, cms.EDProducer(
+#        "HTTTopJetProducer",
+#        PFJetParameters.clone( src = cms.InputTag(input_object),
+#                               doAreaFastjet = cms.bool(True),
+#                               doRhoFastjet = cms.bool(False),
+#                               jetPtMin = cms.double(100.0)
+#                           ),
+#        AnomalousCellParameters,
+#        optimalR = cms.bool(True),
+#        qJets = cms.bool(True),
+#        algorithm = cms.int32(1),
+#        jetAlgorithm = cms.string("CambridgeAachen"),
+#        rParam = cms.double(1.5),
+#        mode = cms.int32(4),
+#        minFatjetPt = cms.double(200.),
+#        minCandPt = cms.double(200.),
+#        minSubjetPt = cms.double(30.),
+#        writeCompound = cms.bool(True),
+#        minCandMass = cms.double(0.),
+#        maxCandMass = cms.double(1000),
+#        massRatioWidth = cms.double(100.),
+#        minM23Cut = cms.double(0.),
+#        minM13Cut = cms.double(0.),
+#        maxM13Cut = cms.double(2.)))
+#   li_htt_branches.append(name)
+#
+#   setattr(process.RandomNumberGeneratorService, name, cms.PSet(initialSeed = cms.untracked.uint32(99),
+#                                                                engineName = cms.untracked.string('TRandom3')))
+#
+#
+#   name = "tightOptRQHTT"
+#   if not input_object == "chs":
+#      name += input_object
+#
+#   setattr(process, name, cms.EDProducer(
+#        "HTTTopJetProducer",
+#        PFJetParameters.clone( src = cms.InputTag(input_object),
+#                               doAreaFastjet = cms.bool(True),
+#                               doRhoFastjet = cms.bool(False),
+#                               jetPtMin = cms.double(100.0)
+#                           ),
+#        AnomalousCellParameters,
+#        optimalR = cms.bool(True),
+#        qJets = cms.bool(True),
+#        algorithm = cms.int32(1),
+#        jetAlgorithm = cms.string("CambridgeAachen"),
+#        rParam = cms.double(1.5),
+#        mode = cms.int32(4),
+#        minFatjetPt = cms.double(200.),
+#        minCandPt = cms.double(200.),
+#        minSubjetPt = cms.double(30.),
+#        writeCompound = cms.bool(True),
+#        minCandMass = cms.double(120.),
+#        maxCandMass = cms.double(210),
+#        massRatioWidth = cms.double(0.15)))
+#   li_htt_branches.append(name)
+#
+#   setattr(process.RandomNumberGeneratorService, name, cms.PSet(initialSeed = cms.untracked.uint32(99),
+#                                                                engineName = cms.untracked.string('TRandom3')))
+#
 
 #####################################
 # NTupelizer
