@@ -108,6 +108,9 @@ Samples = {
     #######################################
 
     "rad_hh4b_m800_13tev_20bx25"  : "/Rad_HHto4b_M800_13TeV/cvernier-miniAOD-f72224f370765110654dede84b5edea6/USER",
+    "rad_hh4b_m1600_13tev_20bx25"  : "/Rad_HHto4b_M1600_13TeV_PHYS14_25_V1/cvernier-miniAOD-b7ec9eab226684f647ba3bf663cdb8b0/USER",
+
+     
 
 
 }

@@ -83,7 +83,7 @@ else:
 # Determine particle species
 # Tier3
 if socket.gethostname() == "t3ui12":
-    particle_name = "hadtop"
+    particle_name = "higgs"
 # Grid
 else:
     import PSet
@@ -113,13 +113,13 @@ event_infos = {"npv" : ["n__pv", "int"]}
 particle_branches = ["pt", "eta", "phi", "mass"]
 
 # "Normal" branches for most fatjet collections
-fj_branches = ["pt", "mass", "tau1", "tau2", "tau3"]
+fj_branches = ["pt", "mass", "tau1", "tau2", "tau3", "qvol"]
 
 # Extended fj branches, including
 #   shower deconstruction chi
 #   qjets volatility
 # (to expensive to calc for everything)
-fj_branches_plus = fj_branches + ["chi", "qvol", "nmj"]
+fj_branches_plus = fj_branches + ["chi", "nmj"]
 
 fj_branches_btag = fj_branches + ["btag"]
 
@@ -180,7 +180,8 @@ for k,v in objects.iteritems():
 # Matching DeltaR for the varipus object types
 object_drs = {}                      
 for object_name in objects.keys():
-    if "ca08" in object_name:
+    if ("ca08" in object_name or
+        "ak08" in object_name):
         object_drs[object_name] = 0.6
     elif "ca15" in object_name:
         object_drs[object_name] = 1.2

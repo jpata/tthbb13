@@ -179,7 +179,7 @@ for fj_name in li_fatjets_branches:
             ]:
 
         # Don't do chi unless we have the unfiltered fatjets
-        if (branch_name in ["chi", "nmj", "qvol"]) and not (fj_name in li_ungroomed_fatjets_branches):
+        if (branch_name in ["chi", "nmj"]) and not (fj_name in li_ungroomed_fatjets_branches):
             continue
 
 
