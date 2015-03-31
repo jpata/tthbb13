@@ -211,7 +211,18 @@ class JetAnalyzer(FilterAnalyzer):
                 ), event.Jet
             ),
             key=lambda x: x.pt, reverse=True
-            )[0:9]
+            )
+            
+        
+        #Assing jet transfer functions
+        for jet in event.good_jets:
+            jet_eta_bin = 0
+            if abs(jet.eta)>1.0:
+                jet_eta_bin = 1
+            jet.tf_b = self.conf.tf_matrix['b'][jet_eta_bin].Make_Formula()
+            jet.tf_l = self.conf.tf_matrix['l'][jet_eta_bin].Make_Formula()
+            
+        
         event.numJets = len(event.good_jets)
         self.counters["jets"].inc("good", len(event.good_jets))
 
@@ -738,10 +749,10 @@ class MEAnalyzer(FilterAnalyzer):
     def __init__(self, cfg_ana, cfg_comp, looperName):
         self.conf = cfg_ana._conf
         super(MEAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
-
-
+        
         self.configs = {
             "default": MEM.MEMConfig(),
+            "updatedTF": MEM.MEMConfig(),
             "NumPointsDouble": MEM.MEMConfig(),
             "NumPointsHalf": MEM.MEMConfig(),
             "NoJacobian": MEM.MEMConfig(),
@@ -758,6 +769,7 @@ class MEAnalyzer(FilterAnalyzer):
         self.memkeys = self.conf.mem["methodsToRun"]
 
         self.configs["default"].defaultCfg()
+        self.configs["updatedTF"].defaultCfg()
         self.configs["NumPointsDouble"].defaultCfg(2.0)
         self.configs["NumPointsHalf"].defaultCfg(0.5)
         self.configs["NoJacobian"].defaultCfg()
@@ -770,6 +782,7 @@ class MEAnalyzer(FilterAnalyzer):
         self.configs["JetsPtOrder"].defaultCfg()
         self.configs["JetsPtOrderIntegrationRange"].defaultCfg()
 
+        self.configs["updatedTF"].transfer_function_method = MEM.TFMethod.External
         self.configs["NoJacobian"].int_code &= ~ MEM.IntegrandType.Jacobian
         self.configs["NoDecayAmpl"].int_code &= ~ MEM.IntegrandType.DecayAmpl
         self.configs["NoPDF"].int_code &= ~ MEM.IntegrandType.PDF
@@ -825,6 +838,7 @@ class MEAnalyzer(FilterAnalyzer):
         objtype: specifies the object type
         kwargs: p4s: spherical 4-momentum (pt, eta, phi, M) as a tuple
                 obsdict: dict of additional observables to pass to MEM
+                tf_dict: Dictionary of MEM.TFType->TF1 of transfer functions
         """
         if kwargs.has_key("p4s"):
             pt, eta, phi, mass = kwargs.pop("p4s")
@@ -832,11 +846,14 @@ class MEAnalyzer(FilterAnalyzer):
             v.SetPtEtaPhiM(pt, eta, phi, mass);
         elif kwargs.has_key("p4c"):
             v = ROOT.TLorentzVector(*kwargs.pop("p4c"))
-        obsdict = kwargs.pop("obsdict", {})
+        obs_dict = kwargs.pop("obs_dict", {})
+        tf_dict = kwargs.pop("tf_dict", {})
 
         o = MEM.Object(v, objtype)
-        for k, v in obsdict.items():
+        for k, v in obs_dict.items():
             o.addObs(k, v)
+        for k, v in tf_dict.items():
+            o.addTransferFunction(k, v)
         self.integrator.push_back_object(o)
 
     def beginLoop(self, setup):
@@ -910,23 +927,35 @@ class MEAnalyzer(FilterAnalyzer):
             if event.cat in ["cat2", "cat3"]:
                 self.vars_to_integrate.push_back(MEM.PSVar.cos_qbar1)
                 self.vars_to_integrate.push_back(MEM.PSVar.phi_qbar1)
+                
+            #Add heavy flavour jets that are assumed to come from top/higgs decay
             for jet in event.btagged_jets:
                 self.add_obj(
                     MEM.ObjectType.Jet,
                     p4s=(jet.pt, jet.eta, jet.phi, jet.mass),
-                    obsdict={MEM.Observable.BTAG: jet.btagFlag}
+                    obs_dict={MEM.Observable.BTAG: jet.btagFlag},
+                    tf_dict={
+                        MEM.TFType.bReco: jet.tf_b, MEM.TFType.qReco: jet.tf_l,
+                        MEM.TFType.bLost: jet.tf_b, MEM.TFType.qLost: jet.tf_l
+                    }
                 )
+                
+            #Add light jets that are assumed to come from hadronic W decay
             for jet in event.wquark_candidate_jets:
                 self.add_obj(
                     MEM.ObjectType.Jet,
                     p4s=(jet.pt, jet.eta, jet.phi, jet.mass),
-                    obsdict={MEM.Observable.BTAG: jet.btagFlag}
+                    obs_dict={MEM.Observable.BTAG: jet.btagFlag},
+                    tf_dict={
+                        MEM.TFType.bReco: jet.tf_b, MEM.TFType.qReco: jet.tf_l,
+                        MEM.TFType.bLost: jet.tf_b, MEM.TFType.qLost: jet.tf_l
+                    }
                 )
             for lep in leptons:
                 self.add_obj(
                     MEM.ObjectType.Lepton,
                     p4s=(lep.pt, lep.eta, lep.phi, lep.mass),
-                    obsdict={MEM.Observable.CHARGE: lep.charge}
+                    obs_dict={MEM.Observable.CHARGE: lep.charge},
                 )
             self.add_obj(
                 MEM.ObjectType.MET,
@@ -946,7 +975,7 @@ class MEAnalyzer(FilterAnalyzer):
                 if self.conf.mem["calcME"]:
                     conf = self.configs[confname]
                     #print "MEM conf", confname, "hypo", hypo
-                    print "MEM conf", hypo, confname
+                    print "MEM started", ("hypo", hypo), ("conf", confname)
                     self.integrator.set_cfg(conf)
                     add_objects()
                     r = self.integrator.run(
@@ -954,6 +983,8 @@ class MEAnalyzer(FilterAnalyzer):
                         hypo,
                         self.vars_to_integrate
                     )
+                    print "MEM done", ("hypo", hypo), ("conf", confname)
+
                     res[(hypo, confname)] = r
                 else:
                     r = MEM.MEMOutput()

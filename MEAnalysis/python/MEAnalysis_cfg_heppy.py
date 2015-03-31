@@ -80,6 +80,7 @@ class Conf:
             "controlPlotsFileOld": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsTEST.root",
             "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV6.root",
             "sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_vhbb.py",
+            "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions.pickle",
 
             #If the list contains:
             # "gen" - print out the ttH gen-level particles (b from top, b form higgs, q from W, leptons
@@ -142,6 +143,7 @@ class Conf:
 
                 #full ME
                 "default",
+                "updatedTF",
 
                 #These are additional MEM checks, where only part of the MEM is ran.
                 #Switched off by default

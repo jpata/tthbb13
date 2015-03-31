@@ -6,6 +6,10 @@ import imp
 
 import itertools
 
+#pickle and transfer function classes to load transfer functions 
+import cPickle as pickle
+import TTH.MEAnalysis.TFClasses as TFClasses
+
 #Import the default list of samples
 from TTH.MEAnalysis.samples_vhbb import samples, sample_version, lfn_to_pfn
 
@@ -23,6 +27,11 @@ else:
 #Creates a new configuration object
 conf = Conf()
 
+#Load transfer functions from pickle file
+pi_file = open(conf.general["transferFunctionsPickle"] , 'rb')
+conf.tf_matrix = pickle.load(pi_file)
+pi_file.close()
+    
 #Load the input sample dictionary
 #Samples are configured in the Conf object, by default, we use samples_vhbb
 print "loading samples from", conf.general["sampleFile"]
@@ -33,7 +42,8 @@ from samplefile import samples_dict
 #several input components can be declared,
 #and added to the list of selected components
 inputSamples = []
-for s in samples_dict.values():
+for sn in sorted(samples_dict.keys()):
+    s = samples_dict[sn]
     inputSample = cfg.Component(
         s.nickName.value(),
         files = map(lfn_to_pfn, s.subFiles.value()),
@@ -44,6 +54,8 @@ for s in samples_dict.values():
     #use sample only if not skipped and subFiles defined
     if s.skip.value() == False and len(s.subFiles.value())>0:
         inputSamples.append(inputSample)
+
+print "Processing samples", inputSamples
 
 #Event contents are defined here
 #This is work in progress
