@@ -2,6 +2,8 @@ import ROOT
 import itertools
 from PhysicsTools.HeppyCore.framework.analyzer import Analyzer
 import copy
+import math
+from TTH.MEAnalysis.VHbbTree import *
 
 #Load the MEM integrator libraries
 # ROOT.gSystem.Load("libFWCoreFWLite")
@@ -211,7 +213,8 @@ class JetAnalyzer(FilterAnalyzer):
                 ), event.Jet
             ),
             key=lambda x: x.pt, reverse=True
-            )[0:9]
+        )
+        
         event.numJets = len(event.good_jets)
         self.counters["jets"].inc("good", len(event.good_jets))
 
@@ -327,14 +330,15 @@ class BTagLRAnalyzer(FilterAnalyzer):
         nperms = 0
         best_perm = None
 
+        np = len(probs)
         for perm in perms:
             p = 1.0
 
             for i in range(0, nB):
                 p *= probs[perm[i]][0]
-            for i in range(nB, nB + nC):
+            for i in range(nB, min(nB + nC, np)):
                 p *= probs[perm[i]][1]
-            for i in range(nB + nC, len(probs)):
+            for i in range(nB + nC, np):
                 p *= probs[perm[i]][2]
 
             #print nperms, p, perm, max_p, best_perm
@@ -378,13 +382,18 @@ class BTagLRAnalyzer(FilterAnalyzer):
             for j in event.good_jets
         ]
 
+        ph = None
         best_4b_perm = 0
         best_2b_perm = 0
-        event.btag_lr_4b_old, best_4b_perm = self.btag_likelihood(jet_probs["old"], 4, 0)
-        event.btag_lr_2b_old, best_2b_perm = self.btag_likelihood(jet_probs["old"], 2, 0)
-
+        event.btag_lr_4b_old, ph = self.btag_likelihood(jet_probs["old"], 4, 0)
+        event.btag_lr_2b_old, v = self.btag_likelihood(jet_probs["old"], 2, 0)
+        
         event.btag_lr_4b, best_4b_perm = self.btag_likelihood(jet_probs["new_eta_1bin"], 4, 0)
-        event.btag_lr_2b, best_2b_perm = self.btag_likelihood(jet_probs["new_eta_1bin"], 2, 0)
+        event.btag_lr_4b_1c, ph = self.btag_likelihood(jet_probs["new_eta_1bin"], 4, 1)
+        event.btag_lr_2b_2c, ph = self.btag_likelihood(jet_probs["new_eta_1bin"], 2, 2)
+        
+        event.btag_lr_2b, best_2b_perm = self.btag_likelihood(jet_probs["new_eta_1bin"], 2, 1)
+        event.btag_lr_2b_1c, best_2b_perm = self.btag_likelihood(jet_probs["new_eta_1bin"], 2, 1)
 
         event.btag_lr_4b_alt, best_4b_perm_alt = self.btag_likelihood(jet_probs["new_pt_eta_bin_3d"], 4, 0)
         event.btag_lr_2b_alt, best_2b_perm_alt = self.btag_likelihood(jet_probs["new_pt_eta_bin_3d"], 2, 0)
@@ -483,7 +492,7 @@ class MECategoryAnalyzer(FilterAnalyzer):
         event.cat = cat
         event.cat_btag = cat_btag
         event.catn = self.cat_map.get(cat, -1)
-        event.cat_btag_n = self.btag_cat_map.get(cat, -1)
+        event.cat_btag_n = self.btag_cat_map.get(cat_btag, -1)
 
         passes = True
         if passes:
@@ -542,7 +551,9 @@ class WTagAnalyzer(FilterAnalyzer):
 
         event.Wmass = 0.0
         
+        #we keep a set of the Q quark candidate jets
         event.wquark_candidate_jets = set([])
+        
         #Need at least 2 untagged jets to calculate W mass
         if len(event.buntagged_jets)>=2:
             bpair = self.find_best_pair(event.buntagged_jets)
@@ -553,6 +564,7 @@ class WTagAnalyzer(FilterAnalyzer):
             #All masses
             event.Wmasses = [bpair[i][0] for i in range(len(bpair))]
             
+            #Add at most 2 best pairs two W quark candidates
             for i in range(min(len(bpair), 2)):
                 event.wquark_candidate_jets.add(bpair[i][1])
                 event.wquark_candidate_jets.add(bpair[i][2])
@@ -573,8 +585,13 @@ class WTagAnalyzer(FilterAnalyzer):
 
 class GenRadiationModeAnalyzer(FilterAnalyzer):
     """
-    Performs B/C counting
-    FIXME: doc
+    Performs B/C counting in order to classify heavy flavour / light flavour events.
+    
+    We count the number of reconstructed jets which are matched to b/c quarks by CMSSW (ghost clustering).
+    From this, the jets matched to b quarks from tops are subtracted.
+    
+    Therefore, nMatchSimB == 2 corresponds to 2 additional gluon radiation b quarks
+    which are reconstructed as good jets.
     """
     def __init__(self, cfg_ana, cfg_comp, looperName):
         self.conf = cfg_ana._conf
@@ -605,7 +622,6 @@ class GenRadiationModeAnalyzer(FilterAnalyzer):
         if passes:
             self.counters["processing"].inc("passes")
         return passes
-
 
 class GenTTHAnalyzer(FilterAnalyzer):
     """
@@ -648,6 +664,26 @@ class GenTTHAnalyzer(FilterAnalyzer):
             len(event.b_quarks_t) == 2):
             event.cat_gen = "fh"
             event.n_cat_gen = 2
+        
+        #Get the total MET from the neutrinos
+        spx = 0
+        spy = 0
+        for nu in event.nu_top:
+            p4 = lvec(nu)
+            spx += p4.Px()
+            spy += p4.Py()
+        event.tt_met = [MET(px=spx, py=spy)]
+        
+        
+        #Get the total ttH visible pt at gen level
+        spx = 0
+        spy = 0
+        for p in event.l_quarks_w + event.b_quarks_t + event.b_quarks_h + event.lep_top:
+            p4 = lvec(p)
+            spx += p4.Px()
+            spy += p4.Py()
+        event.tth_px_gen = spx
+        event.tth_py_gen = spy
 
         if "gen" in self.conf.general["verbosity"]:
             for j in event.l_quarks_w:
@@ -693,17 +729,32 @@ class GenTTHAnalyzer(FilterAnalyzer):
         event.nMatch_hb_btag = 0
 
         for ij, jet in enumerate(event.good_jets):
+            
+            jet.tth_match_label = None
+            jet.tth_match_index = None
+            jet.tth_match_dr = None
+            
             if not matched_pairs.has_key(ij):
                 continue
             mlabel, midx, mdr = matched_pairs[ij]
+            
+            jet.tth_match_label = mlabel
+            jet.tth_match_index = midx
+            jet.tth_match_dr = mdr
+            
             if mlabel == "wq":
                 event.nMatch_wq += 1
+                
+                #If this jet is considered to be un-tagged (CSV or LR)
                 if jet.btagFlag < 0.5:
                     event.nMatch_wq_btag += 1
             if mlabel == "tb":
                 event.nMatch_tb += 1
+                
+                #If this jet is considered to be b-tagged (CSV or LR)
                 if jet.btagFlag >= 0.5:
                     event.nMatch_tb_btag += 1
+                    
             if mlabel == "hb":
                 event.nMatch_hb += 1
                 if jet.btagFlag >= 0.5:
@@ -718,6 +769,28 @@ class GenTTHAnalyzer(FilterAnalyzer):
                 mlabel, midx, mdr = matched_pairs[ij]
                 print "jet match", ij, mlabel, midx, mdr, jet.pt, matches[mlabel][midx].pt
 
+        spx = 0
+        spy = 0
+        for jet in event.good_jets:
+            if not (jet.tth_match_label is None):
+                p4 = lvec(jet)
+                spx += p4.Px()
+                spy += p4.Py()
+        for lep in event.good_leptons:
+            p4 = lvec(lep)
+            match = False
+            for glep in event.lep_top:
+                p4g = lvec(glep)
+                if p4g.DeltaR(p4) < 0.3:
+                    match = True
+                    break
+            if match:
+                spx += p4.Px()
+                spy += p4.Py()
+        
+        event.tth_px_reco = spx
+        event.tth_py_reco = spy    
+        
         passes = True
         if passes:
             self.counters["processing"].inc("passes")
@@ -725,23 +798,55 @@ class GenTTHAnalyzer(FilterAnalyzer):
 
 class MEAnalyzer(FilterAnalyzer):
     """
-    Performs ME calculation using external integrator
+    Performs ME calculation using the external integrator.
+    It supports multiple MEM algorithms at the same time, configured via the
+    self.configs dictionary. The outputs are stored in a vector in the event.
+    
+    The ME algorithms are run only in case the njet/nlep/Wtag category (event.cat)
+    is in the accepted categories specified in the config.
+    Additionally, we require the b-tagging category (event.cat_btag) to be "H" (high).
+    
+    For each ME configuration on each event, the jets which are counted to be b-tagged
+    in event.btagged_jets are added as the candidates for t->b (W) or h->bb.
+    These jets must be exactly 4, otherwise no permutation is accepted (in case
+    using BTagged/QUntagged assumptions).
+    
+    Any additional jets are assumed to come from the hadronic W decay. These are
+    specified in event.wquark_candidate_jets.
+    
+    Based on the event njet/nlep/Wtag category, if a jet fmor the W is counted as missing,
+    it is integrated over using additional variables set by self.vars_to_integrate.
+    
+    The MEM top pair hypothesis (di-leptonic or single leptonic top pair) is chosen based
+    on the reconstructed lepton multiplicity (event.good_leptons).
+    
+    The algorithm is shortly as follows:
+    1. check if event passes event.cat and event.cat_btag
+    2. loop over all MEM configurations i=[0...Nmem)
+        2a. add all 4 b-tagged jets to integrator
+        2b. add all 0-3 untagged jets to integrator
+        2c. add all leptons to integrator
+        2d. decide SL/DL top pair hypo based on leptons
+        2e. based on event.cat, add additional integration vars
+        2f. run ME integrator for both tth and ttbb hypos
+        2g. save output in event.mem_output_tth[i] (or ttbb)
+        2i. clean up event in integrator
 
     Relies on:
     event.good_jets, event.good_leptons, event.cat, event.input.met_pt
 
     Produces:
-    p_hypo_tth (double): probability for the tt+H(bb) hypothesis
-    p_hypo_ttbb (double): probability for the tt+bb hypothesis
+    mem_results_tth (MEMOutput): probability for the tt+H(bb) hypothesis
+    mem_results_ttbb (MEMOutput): probability for the tt+bb hypothesis
 
     """
     def __init__(self, cfg_ana, cfg_comp, looperName):
         self.conf = cfg_ana._conf
         super(MEAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
-
-
+        
         self.configs = {
             "default": MEM.MEMConfig(),
+            "MultiAssumptionWq": MEM.MEMConfig(),
             "NumPointsDouble": MEM.MEMConfig(),
             "NumPointsHalf": MEM.MEMConfig(),
             "NoJacobian": MEM.MEMConfig(),
@@ -753,11 +858,13 @@ class MEAnalyzer(FilterAnalyzer):
             "NuPhiRestriction": MEM.MEMConfig(),
             "JetsPtOrder": MEM.MEMConfig(),
             "JetsPtOrderIntegrationRange": MEM.MEMConfig(),
+            "Recoil": MEM.MEMConfig(),
         }
 
         self.memkeys = self.conf.mem["methodsToRun"]
 
         self.configs["default"].defaultCfg()
+        self.configs["MultiAssumptionWq"].defaultCfg()
         self.configs["NumPointsDouble"].defaultCfg(2.0)
         self.configs["NumPointsHalf"].defaultCfg(0.5)
         self.configs["NoJacobian"].defaultCfg()
@@ -769,6 +876,7 @@ class MEAnalyzer(FilterAnalyzer):
         self.configs["NuPhiRestriction"].defaultCfg()
         self.configs["JetsPtOrder"].defaultCfg()
         self.configs["JetsPtOrderIntegrationRange"].defaultCfg()
+        self.configs["Recoil"].defaultCfg()
 
         self.configs["NoJacobian"].int_code &= ~ MEM.IntegrandType.Jacobian
         self.configs["NoDecayAmpl"].int_code &= ~ MEM.IntegrandType.DecayAmpl
@@ -783,7 +891,12 @@ class MEAnalyzer(FilterAnalyzer):
         self.configs["JetsPtOrderIntegrationRange"].highpt_first  = 0
         self.configs["JetsPtOrderIntegrationRange"].j_range_CL = 0.99
         self.configs["JetsPtOrderIntegrationRange"].b_range_CL = 0.99
+        self.configs["Recoil"].int_code &= MEM.IntegrandType.Recoil
 
+        for cfn, cfg in self.configs.items():
+            cfg.mem_assumptions = set([])
+        self.configs["MultiAssumptionWq"].mem_assumptions.add("missed_wq")
+        
         #Create the ME integrator.
         #Arguments specify the verbosity
         self.integrator = MEM.Integrand(
@@ -825,6 +938,7 @@ class MEAnalyzer(FilterAnalyzer):
         objtype: specifies the object type
         kwargs: p4s: spherical 4-momentum (pt, eta, phi, M) as a tuple
                 obsdict: dict of additional observables to pass to MEM
+                tf_dict: Dictionary of MEM.TFType->TF1 of transfer functions
         """
         if kwargs.has_key("p4s"):
             pt, eta, phi, mass = kwargs.pop("p4s")
@@ -832,16 +946,72 @@ class MEAnalyzer(FilterAnalyzer):
             v.SetPtEtaPhiM(pt, eta, phi, mass);
         elif kwargs.has_key("p4c"):
             v = ROOT.TLorentzVector(*kwargs.pop("p4c"))
-        obsdict = kwargs.pop("obsdict", {})
+        obs_dict = kwargs.pop("obs_dict", {})
 
         o = MEM.Object(v, objtype)
-        for k, v in obsdict.items():
+        
+        #Add observables from observable dictionary
+        for k, v in obs_dict.items():
             o.addObs(k, v)
         self.integrator.push_back_object(o)
 
     def beginLoop(self, setup):
         super(MEAnalyzer, self).beginLoop(setup)
 
+    def configure_mem(self, event, mem_cfg):
+        self.integrator.set_cfg(mem_cfg)
+        self.vars_to_integrate.clear()
+        self.integrator.next_event()
+        
+        missed_wq_cat = event.cat in ["cat2", "cat3"]
+        #One quark from W missed, integrate over its direction            
+        if missed_wq_cat or (
+            "missed_wq" in mem_cfg.mem_assumptions and not missed_wq_cat):
+            self.vars_to_integrate.push_back(MEM.PSVar.cos_qbar1)
+            self.vars_to_integrate.push_back(MEM.PSVar.phi_qbar1)
+                
+        #Add heavy flavour jets that are assumed to come from top/higgs decay
+        for jet in event.btagged_jets:
+            self.add_obj(
+                MEM.ObjectType.Jet,
+                p4s=(jet.pt, jet.eta, jet.phi, jet.mass),
+                obs_dict={MEM.Observable.BTAG: jet.btagFlag},
+            )
+            
+        #Add light jets that are assumed to come from hadronic W decay
+        for jet in event.wquark_candidate_jets:
+            self.add_obj(
+                MEM.ObjectType.Jet,
+                p4s=(jet.pt, jet.eta, jet.phi, jet.mass),
+                obs_dict={MEM.Observable.BTAG: jet.btagFlag},
+            )
+        for lep in event.good_leptons:
+            self.add_obj(
+                MEM.ObjectType.Lepton,
+                p4s=(lep.pt, lep.eta, lep.phi, lep.mass),
+                obs_dict={MEM.Observable.CHARGE: lep.charge},
+            )
+        self.add_obj(
+            MEM.ObjectType.MET,
+            #MET is caused by massless object
+            p4s=(event.input.met_pt, 0, event.input.met_phi, 0),
+        )
+        
+    #Check if event.nMatch_label >= conf.mem[cat][label]
+    def require(self, required_match, label, event):
+        nreq = required_match.get(label, None)
+        if nreq is None:
+            return True
+
+        nmatched = getattr(event, "nMatch_"+label)
+
+        #In case event did not contain b form higgs (e.g. ttbb)
+        if "hb" in label and len(event.GenBQuarkFromH) < nreq:
+            return True
+
+        passes = (nmatched >= nreq)
+        return passes
+        
     def process(self, event):
         self.counters["processing"].inc("processed")
 
@@ -868,92 +1038,53 @@ class MEAnalyzer(FilterAnalyzer):
         if event.cat in self.conf.mem["MECategories"] and event.cat_btag == "H":
             print "MEM RECO PASS", (event.input.run, event.input.lumi, event.input.evt,
                 event.cat, event.btag_LR_4b_2b, len(event.btagged_jets),
-                len(event.wquark_candidate_jets), len(leptons),
+                len(event.wquark_candidate_jets), len(event.good_leptons),
                 len(event.btagged_jets), len(event.buntagged_jets)
             )
         else:
             #Don't calculate ME
             return True
 
+
+        #Here we optionally restrict the ME calculatiopn to only matched events
         #Get the conf dict specifying which matches we require
         required_match = self.conf.mem.get("requireMatched", {}).get(event.cat, {})
 
-        #Check if event.nMatch_label >= conf.mem[cat][label]
-        def require(label):
-            nreq = required_match.get(label, None)
-            if nreq is None:
-                return True
-
-            nmatched = getattr(event, "nMatch_"+label)
-
-            #In case event did not contain b form higgs (e.g. ttbb)
-            if "hb" in label and len(event.GenBQuarkFromH) < nreq:
-                return True
-
-            passes = (nmatched >= nreq)
-            return passes
-
         #Calculate all the match booleans
+        #match label -> matched boolean
         passd = {
-            p: require(p) for p in ["wq", "wq_btag", "tb", "tb_btag", "hb", "hb_btag"]
+            p: self.require(required_match, p, event) for p in
+            ["wq", "wq_btag", "tb", "tb_btag", "hb", "hb_btag"]
         }
 
+        #Fail if any fails
         for k, v in passd.items():
             if not v:
                 #print "Failed to match", k
                 return True
 
-        def add_objects():
-            self.vars_to_integrate.clear()
-            self.integrator.next_event()
-            #One quark from W missed, integrate over its direction
-            if event.cat in ["cat2", "cat3"]:
-                self.vars_to_integrate.push_back(MEM.PSVar.cos_qbar1)
-                self.vars_to_integrate.push_back(MEM.PSVar.phi_qbar1)
-            for jet in event.btagged_jets:
-                self.add_obj(
-                    MEM.ObjectType.Jet,
-                    p4s=(jet.pt, jet.eta, jet.phi, jet.mass),
-                    obsdict={MEM.Observable.BTAG: jet.btagFlag}
-                )
-            for jet in event.wquark_candidate_jets:
-                self.add_obj(
-                    MEM.ObjectType.Jet,
-                    p4s=(jet.pt, jet.eta, jet.phi, jet.mass),
-                    obsdict={MEM.Observable.BTAG: jet.btagFlag}
-                )
-            for lep in leptons:
-                self.add_obj(
-                    MEM.ObjectType.Lepton,
-                    p4s=(lep.pt, lep.eta, lep.phi, lep.mass),
-                    obsdict={MEM.Observable.CHARGE: lep.charge}
-                )
-            self.add_obj(
-                MEM.ObjectType.MET,
-                #MET is caused by massless object
-                p4s=(met_pt, 0, met_phi, 0),
-            )
-
         fstate = MEM.FinalState.TTH
-        if len(leptons) == 2:
+        if len(event.good_leptons) == 2:
             fstate = MEM.FinalState.LL
-        if len(leptons) == 1:
+        if len(event.good_leptons) == 1:
             fstate = MEM.FinalState.LH
 
         res = {}
         for hypo in [MEM.Hypothesis.TTH, MEM.Hypothesis.TTBB]:
             for confname in self.memkeys:
                 if self.conf.mem["calcME"]:
-                    conf = self.configs[confname]
-                    #print "MEM conf", confname, "hypo", hypo
-                    print "MEM conf", hypo, confname
-                    self.integrator.set_cfg(conf)
-                    add_objects()
+                    print "MEM started", ("hypo", hypo), ("conf", confname)
+                    mem_cfg = self.configs[confname]
+                    
+                    self.configure_mem(event, mem_cfg)
+                    
                     r = self.integrator.run(
                         fstate,
                         hypo,
                         self.vars_to_integrate
                     )
+                    print "MEM done", ("hypo", hypo), ("conf", confname)
+
                     res[(hypo, confname)] = r
                 else:
                     r = MEM.MEMOutput()

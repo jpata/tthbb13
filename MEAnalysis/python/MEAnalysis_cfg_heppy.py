@@ -65,6 +65,7 @@ class Conf:
             "btagWP": "CSVM",
 
             #These working points are evaluated and stored in the trees as nB* - number of jets passing the WP
+            #https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideBTagging#Preliminary_working_or_operating
             "btagWPs": {
                 "CSVM": ("btagCSV", 0.814),
                 "CSVL": ("btagCSV", 0.423),
@@ -142,6 +143,7 @@ class Conf:
 
                 #full ME
                 "default",
+                "MultiAssumptionWq",
 
                 #These are additional MEM checks, where only part of the MEM is ran.
                 #Switched off by default
