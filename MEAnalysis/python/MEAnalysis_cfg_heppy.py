@@ -158,6 +158,7 @@ class Conf:
                 #"NuPhiRestriction",
                 #"JetsPtOrder",
                 #"JetsPtOrderIntegrationRange",
+                "Recoil",
             ],
 
         }

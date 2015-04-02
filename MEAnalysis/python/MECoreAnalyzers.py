@@ -891,18 +891,24 @@ class MEAnalyzer(FilterAnalyzer):
         self.configs["JetsPtOrderIntegrationRange"].highpt_first  = 0
         self.configs["JetsPtOrderIntegrationRange"].j_range_CL = 0.99
         self.configs["JetsPtOrderIntegrationRange"].b_range_CL = 0.99
-        self.configs["Recoil"].int_code &= MEM.IntegrandType.Recoil
-
+        self.configs["Recoil"].int_code |= MEM.IntegrandType.Recoil
+        
         for cfn, cfg in self.configs.items():
             cfg.mem_assumptions = set([])
+            cfg.disabled_categories = set([])
         self.configs["MultiAssumptionWq"].mem_assumptions.add("missed_wq")
+        
+        #Can't integrate in dilepton
+        self.configs["MultiAssumptionWq"].disabled_categories.add("cat6")
+        #No need to integrate in cat2 (already assume Wq missing)
+        self.configs["MultiAssumptionWq"].disabled_categories.add("cat2")
         
         #Create the ME integrator.
         #Arguments specify the verbosity
         self.integrator = MEM.Integrand(
             #0,
             MEM.output,
-            #MEM.output | MEM.init | MEM.event,# | MEM.integration,
+            #MEM.output | MEM.init | MEM.event | MEM.integration,
             self.configs["default"]
         )
 
@@ -964,9 +970,10 @@ class MEAnalyzer(FilterAnalyzer):
         self.integrator.next_event()
         
         missed_wq_cat = event.cat in ["cat2", "cat3"]
-        #One quark from W missed, integrate over its direction            
-        if missed_wq_cat or (
-            "missed_wq" in mem_cfg.mem_assumptions and not missed_wq_cat):
+        can_integrate_wq = event.cat in ["cat1", "cat2", "cat3"]
+        #One quark from W missed, integrate over its direction if possible
+        if can_integrate_wq and (missed_wq_cat or (
+            "missed_wq" in mem_cfg.mem_assumptions and not missed_wq_cat)):
             self.vars_to_integrate.push_back(MEM.PSVar.cos_qbar1)
             self.vars_to_integrate.push_back(MEM.PSVar.phi_qbar1)
                 
@@ -1072,12 +1079,12 @@ class MEAnalyzer(FilterAnalyzer):
         res = {}
         for hypo in [MEM.Hypothesis.TTH, MEM.Hypothesis.TTBB]:
             for confname in self.memkeys:
-                if self.conf.mem["calcME"]:
+                mem_cfg = self.configs[confname]
+                
+                #Run MEM if we did not explicitly disable it
+                if self.conf.mem["calcME"] and not (event.cat in mem_cfg.disabled_categories):
                     print "MEM started", ("hypo", hypo), ("conf", confname)
-                    mem_cfg = self.configs[confname]
-                    
                     self.configure_mem(event, mem_cfg)
-                    
                     r = self.integrator.run(
                         fstate,
                         hypo,
@@ -1089,13 +1096,14 @@ class MEAnalyzer(FilterAnalyzer):
                 else:
                     r = MEM.MEMOutput()
                     res[(hypo, confname)] = r
+        
+        if "default" in self.memkeys:
+            p1 = res[(MEM.Hypothesis.TTH, "default")].p
+            p2 = res[(MEM.Hypothesis.TTBB, "default")].p
 
-        p1 = res[(MEM.Hypothesis.TTH, "default")].p
-        p2 = res[(MEM.Hypothesis.TTBB, "default")].p
-
-        #In case of an erroneous calculation, print out event kinematics
-        if self.conf.mem["calcME"] and (p1<=0 or p2<=0 or (p1 / (p1+0.02*p2))<0.0001):
-            print "MEM BADPROB", p1, p2
+            #In case of an erroneous calculation, print out event kinematics
+            if self.conf.mem["calcME"] and (p1<=0 or p2<=0 or (p1 / (p1+0.02*p2))<0.0001):
+                print "MEM BADPROB", p1, p2
 
         #print out full MEM result dictionary
         #print "RES", [(k, res[k].p) for k in sorted(res.keys())]

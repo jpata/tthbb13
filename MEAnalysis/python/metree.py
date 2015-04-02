@@ -46,6 +46,9 @@ metType = NTupleObjectType("leptonType", variables = [
     NTupleVariable("phi", lambda x : x.phi),
     NTupleVariable("px", lambda x : x.px),
     NTupleVariable("py", lambda x : x.py),
+    NTupleVariable("sumEt", lambda x : x.sumEt),
+    NTupleVariable("genPt", lambda x : x.genPt),
+    NTupleVariable("genPhi", lambda x : x.genPhi),
 ])
 
 memType = NTupleObjectType("memType", variables = [
