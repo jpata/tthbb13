@@ -15,10 +15,10 @@ from TTH.TTHNtupleAnalyzer.CrabHelpers import submit, status, kill, download, do
 
 # Ntuple name/version and samples to include
 name = "nhiggs"
-version = "v8"
+version = "v10"
 li_samples = [
-    #"rad_hh4b_m800_13tev_20bx25",
-    #"rad_hh4b_m1600_13tev_20bx25",
+    "rad_hh4b_m800_13tev_20bx25",
+    "rad_hh4b_m1600_13tev_20bx25",
     "qcd_170_300_pythia8_13tev_phys14_20bx25",
     "qcd_300_470_pythia8_13tev_phys14_20bx25",
     "qcd_470_600_pythia8_13tev_phys14_20bx25",
