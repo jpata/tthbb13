@@ -40,8 +40,12 @@ for pair_name, pair in pairs.iteritems():
         #mi("interesting",   "tth", "ttj", interesting_vars,  fiducial_cuts["tth"], fiducial_cuts["ttj"], diagonal_only = False)
 
         #mi("mass_vars_v7_"+pair_name, pair[0], pair[1], mass_vars_v7,  fiducial_cuts[pair[0]], fiducial_cuts[pair[1]], diagonal_only = True)
-        mi("interesting_vars_v7_"+pair_name, pair[0], pair[1], interesting_vars_v7,  fiducial_cuts[pair[0]], fiducial_cuts[pair[1]], diagonal_only = False)
-        
+        #mi("interesting_vars_v7_"+pair_name, pair[0], pair[1], interesting_vars_v7,  fiducial_cuts[pair[0]], fiducial_cuts[pair[1]], diagonal_only = False)
+
+        #mi("qvol_vars_v8_"+pair_name, pair[0], pair[1], qvol_vars,  fiducial_cuts[pair[0]], fiducial_cuts[pair[1]], diagonal_only = False)
+
+        #mi("mass_vars_ca15_v10_"+pair_name, pair[0], pair[1], mass_vars_ca15_v10, fiducial_cuts[pair[0]], fiducial_cuts[pair[1]], diagonal_only = True)
+        mi("mass_vars_ak08_v10_"+pair_name, pair[0], pair[1], mass_vars_ak08_v10, fiducial_cuts[pair[0]], fiducial_cuts[pair[1]], diagonal_only = True)
 
     ]
 

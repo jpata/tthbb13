@@ -64,6 +64,7 @@ ROOT.gErrorIgnoreLevel = 1
 # Global variable to count drawn histograms for unique naming
 i_draw = 0 
 
+pickle_directory = "MIPickle"
 
 ########################################
 # Define and crate output directory
@@ -251,6 +252,8 @@ def MakePlots(mis, files, input_treename = 'tree'):
 
       if mi.read_from_pickle:
       
+        
+         
          f_pickle = open("{0}/{1}_mi.pickle".format(pickle_directory,mi.name), "r")
          mi_result = pickle.load(f_pickle)
          f_pickle.close()
