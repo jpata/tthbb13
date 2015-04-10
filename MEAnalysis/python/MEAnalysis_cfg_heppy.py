@@ -101,8 +101,8 @@ class Conf:
 
             #Actually run the ME calculation
             #If False, all ME values will be 0
-            #"calcME": True,
             "calcME": True,
+            #"calcME": False,
 
             #Which categories to analyze the matrix element in
             "MECategories": ["cat1", "cat2", "cat3", "cat6"],
@@ -159,6 +159,8 @@ class Conf:
                 #"JetsPtOrder",
                 #"JetsPtOrderIntegrationRange",
                 "Recoil",
+                "Sudakov",
+                #"Minimize",
             ],
 
         }

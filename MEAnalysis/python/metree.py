@@ -130,34 +130,34 @@ def getTreeProducer(conf):
                 type=int,
                 help="Number of generated charged leptons from top"
             ),
-            
+
             ###
             NTupleVariable(
                 "btag_lr_2b_2c", lambda ev: ev.btag_lr_2b_2c,
                 help="B-tagging likelihood ratio: 2b, 2c (13TeV CSV curves)"
             ),
-            
+
             NTupleVariable(
                 "btag_lr_2b_1c", lambda ev: ev.btag_lr_2b_1c,
                 help="B-tagging likelihood ratio: 2b, 1c (13TeV CSV curves)"
             ),
-            
+
             NTupleVariable(
                 "btag_lr_4b_1c", lambda ev: ev.btag_lr_4b_1c,
                 help="B-tagging likelihood ratio: 4b, 1c (13TeV CSV curves)"
             ),
-            
+
             NTupleVariable(
                 "btag_lr_4b", lambda ev: ev.btag_lr_4b,
                 help="B-tagging likelihood ratio: 4b (13TeV CSV curves)"
             ),
-            
+
             NTupleVariable(
                 "btag_lr_2b", lambda ev: ev.btag_lr_2b,
                 help="B-tagging likelihood ratio: 2b (13TeV CSV curves)"
             ),
             ###
-            
+
             NTupleVariable(
                 "btag_LR_4b_2b_old", lambda ev: ev.btag_LR_4b_2b_old,
                 help="B-tagging likelihood ratio: 4b vs 2b (8TeV CSV curves)"
@@ -268,7 +268,7 @@ def getTreeProducer(conf):
                 type=int,
                 help=""
             ),
-            
+
             NTupleVariable(
                 "tth_px_gen", lambda ev: ev.tth_px_gen if hasattr(ev, "tth_px_gen") else 0,
                 help="generator-level ttH system px"
@@ -277,7 +277,7 @@ def getTreeProducer(conf):
                 "tth_py_gen", lambda ev: ev.tth_py_gen if hasattr(ev, "tth_py_gen") else 0,
                 help="generator-level ttH system py"
             ),
-            
+
             NTupleVariable(
                 "tth_px_reco", lambda ev: ev.tth_px_reco if hasattr(ev, "tth_px_reco") else 0,
                 help="reco-level ttH system px from matched jets and leptons"
@@ -292,8 +292,9 @@ def getTreeProducer(conf):
         collections = {
         #standard dumping of objects
             "met" : NTupleCollection("met", metType, 1, help="Reconstructed MET"),
+            "met_jetcorr" : NTupleCollection("met_jetcorr", metType, 1, help="Reconstructed MET, corrected to gen-level jets"),
             "tt_met" : NTupleCollection("met_ttbar_gen", metType, 1, help="Generated MET from ttbar"),
-            
+
             "b_quarks_t" : NTupleCollection("GenBFromTop", leptonType, 3, help=""),
             "b_quarks_h" : NTupleCollection("GenBFromHiggs", leptonType, 3, help=""),
             "l_quarks_w" : NTupleCollection("GenQFromW", leptonType, 5, help=""),

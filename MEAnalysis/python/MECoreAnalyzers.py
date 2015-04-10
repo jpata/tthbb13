@@ -214,7 +214,7 @@ class JetAnalyzer(FilterAnalyzer):
             ),
             key=lambda x: x.pt, reverse=True
         )
-        
+
         event.numJets = len(event.good_jets)
         self.counters["jets"].inc("good", len(event.good_jets))
 
@@ -234,15 +234,41 @@ class JetAnalyzer(FilterAnalyzer):
                 len(event.btagged_jets_bdisc[btag_wp_name])
             )
             setattr(event, "nB"+btag_wp_name, len(event.btagged_jets_bdisc[btag_wp_name]))
+
+        #Find jets that pass/fail the specified default b-tagging algo/working point
         event.buntagged_jets_bdisc = event.buntagged_jets_bdisc[self.conf.jets["btagWP"]]
         event.btagged_jets_bdisc = event.btagged_jets_bdisc[self.conf.jets["btagWP"]]
+
+        #Find how many of these tagged jets are actually true b jets
         event.n_tagwp_tagged_true_bjets = 0
         for j in event.btagged_jets_bdisc:
             if abs(j.mcFlavour) == 5:
                 event.n_tagwp_tagged_true_bjets += 1
+
+        #Require at least 4 good jets in order to continue analysis
         passes = len(event.good_jets) >= 4
         if passes:
             self.counters["processing"].inc("passes")
+
+        corrMet_px = event.met[0].px
+        corrMet_py = event.met[0].py
+        sum_dEx = 0
+        sum_dEy = 0
+        for jet in event.good_jets:
+            Prec = lvec(jet)
+            Pgen = lvec(jet)
+            Pgen.SetPtEtaPhiM(jet.mcPt, jet.mcEta, jet.mcPhi, jet.mcM)
+            Erec = Prec.E()
+            Egen = Pgen.E()
+            dEx = (Erec-Egen) * Prec.Px()/Prec.P()
+            dEy = (Erec-Egen) * Prec.Py()/Prec.P()
+            #print Erec, Egen
+            sum_dEx += dEx
+            sum_dEy += dEy
+        corrMet_px += sum_dEx
+        corrMet_py += sum_dEy
+        #print (sum_dEx, sum_dEy), (corrMet_px, event.met[0].px), (corrMet_py, event.met[0].py)
+        event.met_jetcorr = [MET(px=corrMet_px, py=corrMet_py)]
 
         return passes
 
@@ -387,11 +413,11 @@ class BTagLRAnalyzer(FilterAnalyzer):
         best_2b_perm = 0
         event.btag_lr_4b_old, ph = self.btag_likelihood(jet_probs["old"], 4, 0)
         event.btag_lr_2b_old, v = self.btag_likelihood(jet_probs["old"], 2, 0)
-        
+
         event.btag_lr_4b, best_4b_perm = self.btag_likelihood(jet_probs["new_eta_1bin"], 4, 0)
         event.btag_lr_4b_1c, ph = self.btag_likelihood(jet_probs["new_eta_1bin"], 4, 1)
         event.btag_lr_2b_2c, ph = self.btag_likelihood(jet_probs["new_eta_1bin"], 2, 2)
-        
+
         event.btag_lr_2b, best_2b_perm = self.btag_likelihood(jet_probs["new_eta_1bin"], 2, 1)
         event.btag_lr_2b_1c, best_2b_perm = self.btag_likelihood(jet_probs["new_eta_1bin"], 2, 1)
 
@@ -527,19 +553,19 @@ class WTagAnalyzer(FilterAnalyzer):
         Returns the sorted vector of [(mass, jet1, jet2)], best first.
         """
         ms = []
-        
+
         #Keep track of index pairs already calculated
         done_pairs = set([])
-        
+
         #Double loop over all jets
         for i in range(len(jets)):
             for j in range(len(jets)):
-                
+
                 #Make sure we haven't calculated this index pair yet
                 if (i,j) not in done_pairs and i!=j:
                     m = self.pair_mass(jets[i], jets[j])
                     ms += [(m, jets[i], jets[j])]
-                    
+
                     #M(i,j) is symmetric, hence add both pairs
                     done_pairs.add((i,j))
                     done_pairs.add((j,i))
@@ -550,34 +576,34 @@ class WTagAnalyzer(FilterAnalyzer):
         self.counters["processing"].inc("processed")
 
         event.Wmass = 0.0
-        
+
         #we keep a set of the Q quark candidate jets
         event.wquark_candidate_jets = set([])
-        
+
         #Need at least 2 untagged jets to calculate W mass
         if len(event.buntagged_jets)>=2:
             bpair = self.find_best_pair(event.buntagged_jets)
-            
+
             #Get the best mass
             event.Wmass = bpair[0][0]
-            
+
             #All masses
             event.Wmasses = [bpair[i][0] for i in range(len(bpair))]
-            
+
             #Add at most 2 best pairs two W quark candidates
             for i in range(min(len(bpair), 2)):
                 event.wquark_candidate_jets.add(bpair[i][1])
                 event.wquark_candidate_jets.add(bpair[i][2])
-            
+
             if "reco" in self.conf.general["verbosity"]:
                 print "Wmass", event.Wmass, event.good_jets.index(bpair[1]), event.good_jets.index(bpair[2])
-        
+
         #If we can't calculate W mass, untagged jets become the candidate
         else:
             for jet in event.buntagged_jets:
                 event.wquark_candidate_jets.add(jet)
-                
-                
+
+
         passes = True
         if passes:
             self.counters["processing"].inc("passes")
@@ -586,10 +612,10 @@ class WTagAnalyzer(FilterAnalyzer):
 class GenRadiationModeAnalyzer(FilterAnalyzer):
     """
     Performs B/C counting in order to classify heavy flavour / light flavour events.
-    
+
     We count the number of reconstructed jets which are matched to b/c quarks by CMSSW (ghost clustering).
     From this, the jets matched to b quarks from tops are subtracted.
-    
+
     Therefore, nMatchSimB == 2 corresponds to 2 additional gluon radiation b quarks
     which are reconstructed as good jets.
     """
@@ -664,7 +690,7 @@ class GenTTHAnalyzer(FilterAnalyzer):
             len(event.b_quarks_t) == 2):
             event.cat_gen = "fh"
             event.n_cat_gen = 2
-        
+
         #Get the total MET from the neutrinos
         spx = 0
         spy = 0
@@ -673,8 +699,8 @@ class GenTTHAnalyzer(FilterAnalyzer):
             spx += p4.Px()
             spy += p4.Py()
         event.tt_met = [MET(px=spx, py=spy)]
-        
-        
+
+
         #Get the total ttH visible pt at gen level
         spx = 0
         spy = 0
@@ -729,32 +755,32 @@ class GenTTHAnalyzer(FilterAnalyzer):
         event.nMatch_hb_btag = 0
 
         for ij, jet in enumerate(event.good_jets):
-            
+
             jet.tth_match_label = None
             jet.tth_match_index = None
             jet.tth_match_dr = None
-            
+
             if not matched_pairs.has_key(ij):
                 continue
             mlabel, midx, mdr = matched_pairs[ij]
-            
+
             jet.tth_match_label = mlabel
             jet.tth_match_index = midx
             jet.tth_match_dr = mdr
-            
+
             if mlabel == "wq":
                 event.nMatch_wq += 1
-                
+
                 #If this jet is considered to be un-tagged (CSV or LR)
                 if jet.btagFlag < 0.5:
                     event.nMatch_wq_btag += 1
             if mlabel == "tb":
                 event.nMatch_tb += 1
-                
+
                 #If this jet is considered to be b-tagged (CSV or LR)
                 if jet.btagFlag >= 0.5:
                     event.nMatch_tb_btag += 1
-                    
+
             if mlabel == "hb":
                 event.nMatch_hb += 1
                 if jet.btagFlag >= 0.5:
@@ -787,10 +813,10 @@ class GenTTHAnalyzer(FilterAnalyzer):
             if match:
                 spx += p4.Px()
                 spy += p4.Py()
-        
+
         event.tth_px_reco = spx
-        event.tth_py_reco = spy    
-        
+        event.tth_py_reco = spy
+
         passes = True
         if passes:
             self.counters["processing"].inc("passes")
@@ -801,25 +827,25 @@ class MEAnalyzer(FilterAnalyzer):
     Performs ME calculation using the external integrator.
     It supports multiple MEM algorithms at the same time, configured via the
     self.configs dictionary. The outputs are stored in a vector in the event.
-    
+
     The ME algorithms are run only in case the njet/nlep/Wtag category (event.cat)
     is in the accepted categories specified in the config.
     Additionally, we require the b-tagging category (event.cat_btag) to be "H" (high).
-    
+
     For each ME configuration on each event, the jets which are counted to be b-tagged
     in event.btagged_jets are added as the candidates for t->b (W) or h->bb.
     These jets must be exactly 4, otherwise no permutation is accepted (in case
     using BTagged/QUntagged assumptions).
-    
+
     Any additional jets are assumed to come from the hadronic W decay. These are
     specified in event.wquark_candidate_jets.
-    
+
     Based on the event njet/nlep/Wtag category, if a jet fmor the W is counted as missing,
     it is integrated over using additional variables set by self.vars_to_integrate.
-    
+
     The MEM top pair hypothesis (di-leptonic or single leptonic top pair) is chosen based
     on the reconstructed lepton multiplicity (event.good_leptons).
-    
+
     The algorithm is shortly as follows:
     1. check if event passes event.cat and event.cat_btag
     2. loop over all MEM configurations i=[0...Nmem)
@@ -843,7 +869,7 @@ class MEAnalyzer(FilterAnalyzer):
     def __init__(self, cfg_ana, cfg_comp, looperName):
         self.conf = cfg_ana._conf
         super(MEAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
-        
+
         self.configs = {
             "default": MEM.MEMConfig(),
             "MultiAssumptionWq": MEM.MEMConfig(),
@@ -859,6 +885,8 @@ class MEAnalyzer(FilterAnalyzer):
             "JetsPtOrder": MEM.MEMConfig(),
             "JetsPtOrderIntegrationRange": MEM.MEMConfig(),
             "Recoil": MEM.MEMConfig(),
+            "Sudakov": MEM.MEMConfig(),
+            "Minimize": MEM.MEMConfig(),
         }
 
         self.memkeys = self.conf.mem["methodsToRun"]
@@ -877,6 +905,8 @@ class MEAnalyzer(FilterAnalyzer):
         self.configs["JetsPtOrder"].defaultCfg()
         self.configs["JetsPtOrderIntegrationRange"].defaultCfg()
         self.configs["Recoil"].defaultCfg()
+        self.configs["Sudakov"].defaultCfg()
+        self.configs["Minimize"].defaultCfg()
 
         self.configs["NoJacobian"].int_code &= ~ MEM.IntegrandType.Jacobian
         self.configs["NoDecayAmpl"].int_code &= ~ MEM.IntegrandType.DecayAmpl
@@ -892,17 +922,25 @@ class MEAnalyzer(FilterAnalyzer):
         self.configs["JetsPtOrderIntegrationRange"].j_range_CL = 0.99
         self.configs["JetsPtOrderIntegrationRange"].b_range_CL = 0.99
         self.configs["Recoil"].int_code |= MEM.IntegrandType.Recoil
-        
+        self.configs["Sudakov"].int_code |= MEM.IntegrandType.Sudakov
+        self.configs["Minimize"].do_minimize = 1
+
         for cfn, cfg in self.configs.items():
             cfg.mem_assumptions = set([])
             cfg.disabled_categories = set([])
+            #A function Event -> boolean which returns true if this ME should be calculated
+            cfg.do_calculate = lambda x: True
         self.configs["MultiAssumptionWq"].mem_assumptions.add("missed_wq")
-        
+
         #Can't integrate in dilepton
         self.configs["MultiAssumptionWq"].disabled_categories.add("cat6")
         #No need to integrate in cat2 (already assume Wq missing)
         self.configs["MultiAssumptionWq"].disabled_categories.add("cat2")
-        
+
+        self.configs["Sudakov"].do_calculate = lambda x: len(x.good_jets) == 6
+        self.configs["Sudakov"].disabled_categories.add("cat6")
+        self.configs["Sudakov"].disabled_categories.add("cat3")
+
         #Create the ME integrator.
         #Arguments specify the verbosity
         self.integrator = MEM.Integrand(
@@ -955,7 +993,7 @@ class MEAnalyzer(FilterAnalyzer):
         obs_dict = kwargs.pop("obs_dict", {})
 
         o = MEM.Object(v, objtype)
-        
+
         #Add observables from observable dictionary
         for k, v in obs_dict.items():
             o.addObs(k, v)
@@ -968,7 +1006,7 @@ class MEAnalyzer(FilterAnalyzer):
         self.integrator.set_cfg(mem_cfg)
         self.vars_to_integrate.clear()
         self.integrator.next_event()
-        
+
         missed_wq_cat = event.cat in ["cat2", "cat3"]
         can_integrate_wq = event.cat in ["cat1", "cat2", "cat3"]
         #One quark from W missed, integrate over its direction if possible
@@ -976,7 +1014,7 @@ class MEAnalyzer(FilterAnalyzer):
             "missed_wq" in mem_cfg.mem_assumptions and not missed_wq_cat)):
             self.vars_to_integrate.push_back(MEM.PSVar.cos_qbar1)
             self.vars_to_integrate.push_back(MEM.PSVar.phi_qbar1)
-                
+
         #Add heavy flavour jets that are assumed to come from top/higgs decay
         for jet in event.btagged_jets:
             self.add_obj(
@@ -984,7 +1022,7 @@ class MEAnalyzer(FilterAnalyzer):
                 p4s=(jet.pt, jet.eta, jet.phi, jet.mass),
                 obs_dict={MEM.Observable.BTAG: jet.btagFlag},
             )
-            
+
         #Add light jets that are assumed to come from hadronic W decay
         for jet in event.wquark_candidate_jets:
             self.add_obj(
@@ -1003,7 +1041,7 @@ class MEAnalyzer(FilterAnalyzer):
             #MET is caused by massless object
             p4s=(event.input.met_pt, 0, event.input.met_phi, 0),
         )
-        
+
     #Check if event.nMatch_label >= conf.mem[cat][label]
     def require(self, required_match, label, event):
         nreq = required_match.get(label, None)
@@ -1018,7 +1056,7 @@ class MEAnalyzer(FilterAnalyzer):
 
         passes = (nmatched >= nreq)
         return passes
-        
+
     def process(self, event):
         self.counters["processing"].inc("processed")
 
@@ -1080,9 +1118,12 @@ class MEAnalyzer(FilterAnalyzer):
         for hypo in [MEM.Hypothesis.TTH, MEM.Hypothesis.TTBB]:
             for confname in self.memkeys:
                 mem_cfg = self.configs[confname]
-                
+
                 #Run MEM if we did not explicitly disable it
-                if self.conf.mem["calcME"] and not (event.cat in mem_cfg.disabled_categories):
+                if (self.conf.mem["calcME"] and
+                        not (event.cat in mem_cfg.disabled_categories) and
+                        mem_cfg.do_calculate(event)
+                    ):
                     print "MEM started", ("hypo", hypo), ("conf", confname)
                     self.configure_mem(event, mem_cfg)
                     r = self.integrator.run(
@@ -1096,12 +1137,12 @@ class MEAnalyzer(FilterAnalyzer):
                 else:
                     r = MEM.MEMOutput()
                     res[(hypo, confname)] = r
-        
+
         if "default" in self.memkeys:
             p1 = res[(MEM.Hypothesis.TTH, "default")].p
             p2 = res[(MEM.Hypothesis.TTBB, "default")].p
 
-            #In case of an erroneous calculation, print out event kinematics
+            #In case of an erroneous calculation, print a message
             if self.conf.mem["calcME"] and (p1<=0 or p2<=0 or (p1 / (p1+0.02*p2))<0.0001):
                 print "MEM BADPROB", p1, p2
 
