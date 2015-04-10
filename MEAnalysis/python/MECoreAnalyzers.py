@@ -219,9 +219,19 @@ class JetAnalyzer(FilterAnalyzer):
             jet_eta_bin = 0
             if abs(jet.eta)>1.0:
                 jet_eta_bin = 1
-            jet.tf_b = self.conf.tf_matrix['b'][jet_eta_bin].Make_Formula()
-            jet.tf_l = self.conf.tf_matrix['l'][jet_eta_bin].Make_Formula()
+                
+            #If True, TF [0] - reco, x - gen
+            #If False, TF [0] - gen, x - reco
+            eval_gen = False
+            jet.tf_b = self.conf.tf_matrix['b'][jet_eta_bin].Make_Formula(eval_gen)
+            jet.tf_l = self.conf.tf_matrix['l'][jet_eta_bin].Make_Formula(eval_gen)
+            #If [0] - gen, x - pt cutoff
+            jet.tf_b_lost = self.conf.tf_matrix['b'][jet_eta_bin].Make_CDF()
+            jet.tf_l_lost = self.conf.tf_matrix['l'][jet_eta_bin].Make_CDF()
             
+            #Set jet pt threshold for CDF
+            jet.tf_b_lost.SetParameter(0, self.conf.jets["pt"])        
+            jet.tf_l_lost.SetParameter(0, self.conf.jets["pt"])        
         
         event.numJets = len(event.good_jets)
         self.counters["jets"].inc("good", len(event.good_jets))
@@ -781,7 +791,7 @@ class MEAnalyzer(FilterAnalyzer):
         self.configs["NuPhiRestriction"].defaultCfg()
         self.configs["JetsPtOrder"].defaultCfg()
         self.configs["JetsPtOrderIntegrationRange"].defaultCfg()
-
+        
         self.configs["updatedTF"].transfer_function_method = MEM.TFMethod.External
         self.configs["NoJacobian"].int_code &= ~ MEM.IntegrandType.Jacobian
         self.configs["NoDecayAmpl"].int_code &= ~ MEM.IntegrandType.DecayAmpl
@@ -802,7 +812,7 @@ class MEAnalyzer(FilterAnalyzer):
         self.integrator = MEM.Integrand(
             #0,
             MEM.output,
-            #MEM.output | MEM.init | MEM.event,# | MEM.integration,
+            #MEM.output | MEM.init,# | MEM.event | MEM.integration,
             self.configs["default"]
         )
 
@@ -818,15 +828,15 @@ class MEAnalyzer(FilterAnalyzer):
         self.integrator.set_permutation_strategy(self.permutations)
 
         #Pieces of ME to calculate
-        self.integrator.set_integrand(
-            MEM.IntegrandType.Constant
-            |MEM.IntegrandType.ScattAmpl
-            |MEM.IntegrandType.DecayAmpl
-            |MEM.IntegrandType.Jacobian
-            |MEM.IntegrandType.PDF
-            |MEM.IntegrandType.Transfer
-        )
-        self.integrator.set_sqrts(13000.);
+        # self.integrator.set_integrand(
+        #     MEM.IntegrandType.Constant
+        #     |MEM.IntegrandType.ScattAmpl
+        #     |MEM.IntegrandType.DecayAmpl
+        #     |MEM.IntegrandType.Jacobian
+        #     |MEM.IntegrandType.PDF
+        #     |MEM.IntegrandType.Transfer
+        # )
+        #self.integrator.set_sqrts(13000.);
 
         #Create an empty vector for the integration variables
         self.vars_to_integrate = CvectorPSVar()
@@ -936,7 +946,7 @@ class MEAnalyzer(FilterAnalyzer):
                     obs_dict={MEM.Observable.BTAG: jet.btagFlag},
                     tf_dict={
                         MEM.TFType.bReco: jet.tf_b, MEM.TFType.qReco: jet.tf_l,
-                        MEM.TFType.bLost: jet.tf_b, MEM.TFType.qLost: jet.tf_l
+                        MEM.TFType.bLost: jet.tf_b_lost, MEM.TFType.qLost: jet.tf_l_lost
                     }
                 )
                 

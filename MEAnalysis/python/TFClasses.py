@@ -12,13 +12,11 @@ class TF:
     def __init__(self, particle, i_eta):
         self.i_eta = i_eta
         self.particle = particle
-
-        self.SingleBinFunc = ""
         self.AcrossBinFuncs = []
 
 
     def SetSingleBinFunc( self, single_bin_func ):
-        self.SingleBinFunc = single_bin_func.str
+        self.SingleBinFunc = copy.deepcopy( single_bin_func )
         for i in range( len(single_bin_func.par_initials) ):
             self.AcrossBinFuncs.append( function() )
 
@@ -27,7 +25,7 @@ class TF:
         self.AcrossBinFuncs[i_par] = copy.deepcopy(across_bin_func)
 
 
-    def Make_Fitting( self, fit_dicts, outputdir ): 
+    def Make_Fitting( self, fit_dicts, outputdir, Pt_or_E ): 
 
         # Setup the canvas
         c1 = ROOT.TCanvas("c1","c1",500,400)
@@ -43,20 +41,33 @@ class TF:
             # Creating and filling TGraph object
             ########################################
 
-            gr = ROOT.TGraphErrors( len(fit_dicts) )
+            skip_begin = 2
+            skip_end = 2
+
+            gr = ROOT.TGraphErrors( len(fit_dicts) - skip_begin - skip_end )
 
             for (i_E, dic) in enumerate(fit_dicts):
 
-                gr.SetPoint(
-                    i_E,
-                    dic['E_value'],
-                    abs( dic['single_bin_func'].par_values[par_num] ) )
+                if i_E >= skip_begin and i_E < (len(fit_dicts) - skip_end):
 
-                gr.SetPointError(
-                    i_E,
-                    0.0,
-                    dic['single_bin_func'].par_errors[par_num] )
+                    """
+                    print 'i_E = {0}, E_val = {1}, fit_val = {2}'.format(
+                        i_E,
+                        dic['E_value'],
+                        dic['single_bin_func'].par_values[par_num] )
+                    """
 
+                    gr.SetPoint(
+                        i_E-2,
+                        dic['E_value'],
+                        abs( dic['single_bin_func'].par_values[par_num] ) )
+
+                    gr.SetPointError(
+                        i_E-2,
+                        0.0,
+                        dic['single_bin_func'].par_errors[par_num] )
+
+                
 
             ########################################
             # Fitting: writing fit data to class objects
@@ -65,6 +76,8 @@ class TF:
             # Specify fit across bins
             f1 = self.AcrossBinFuncs[par_num].Initialize_as_TF1()
 
+            gr.Fit(f1,'Q')
+            gr.Fit(f1,'Q')
             gr.Fit(f1,'Q')
 
             # Write fit results to lists in the class:
@@ -79,14 +92,14 @@ class TF:
 
             dic0 = fit_dicts[0]
 
-            plottitle = 'parameter {0} fit for {1}  |  {2} < eta < {3}'.format(
+            plottitle = 'parameter [{0}] fit for {1}  |  {2} < eta < {3}'.format(
             par_num, dic0['type'], dic0['eta_bounds'][0], dic0['eta_bounds'][1])
 
             gr.SetTitle( plottitle )
             gr.SetMarkerColor(4);
             gr.SetMarkerStyle(22);
             gr.SetMarkerSize(0.8);
-            gr.GetXaxis().SetTitle( 'E mc' );
+            gr.GetXaxis().SetTitle( '{0} mc'.format(Pt_or_E) );
             gr.GetYaxis().SetTitle( 'parameter {0}'.format(par_num) );
 
             gr.Draw("AP")
@@ -124,16 +137,25 @@ class TF:
             hf.write('<a href="TFs/{0}.png"><img width="700" src="TFs/{0}.png"></a>\n'.format(filename) )
 
 
-    def Make_Formula(self, print_info = False):
+    def Make_Formula(self, set_reco = True, print_info = False):
 
-        SBF = self.SingleBinFunc
+        SBF = self.SingleBinFunc.str
 
-        # First value is not used (would correspond with the [0]-variable)
+        # First value is not set automatically
+        #   (corresponds with [0], which should be set by the user outside of this class function)
         output_par_values = [0]
 
         # Renumber the formula's in the across-bin-functions
 
         shift = 1
+
+        if set_reco:
+            # Replace all x with [0REPLACED] now, so it won't be replaced twice
+            # Careful not to replace the 'x' in 'exp'
+            SBF = re.sub( r'([^e])x([^p])', r'\1[0REPLACED]\2', SBF )
+
+            # This means [0] is now reconstructed, and x will be mc/gen
+
         for (par_num, func) in enumerate( self.AcrossBinFuncs ):
 
             ABFstr = func.str
@@ -159,8 +181,10 @@ class TF:
                     shift += 1
                     output_par_values.append( func.par_values[i_param] )
 
-                # 'x' in the ABFs will be [0] (the MC energy) in the end:
-                ABFstr = ABFstr.replace( 'x', '[0REPLACED]' )
+                if not set_reco:
+                    # 'x' in the ABFs are the quark/mc/gen variable; should be [0] in end result:
+                    #   ( [0] = gen, x = reco )
+                    ABFstr = ABFstr.replace( 'x', '[0REPLACED]' )
 
                 SBF = SBF.replace('[{0}]'.format(par_num), '({0})'.format(ABFstr) )
 
@@ -168,7 +192,7 @@ class TF:
 
 
         # Construct the TF1 object        
-        f1 = ROOT.TF1( "fit1", SBF, 0, 150 )
+        f1 = ROOT.TF1( "fit1", SBF )
 
         # Set the parameters
         for i in range( 1, len( output_par_values ) ):
@@ -179,30 +203,246 @@ class TF:
             print '    Replaced SingleBinFunc:'
             print '    {0}'.format(SBF)
 
-            print '    x = Reconstructed Energy, [0] = MC energy (or quark energy)'
+            if set_reco: print '    x = MC/Gen variable, [0] = Reconstructed variable (E or Pt)'
+            else: print '    x = Reconstructed variable (E or Pt), [0] = MC/Gen variable'
+
             print '    Other parameters:'
             for i in range( 1, len( output_par_values ) ):
                 print '      [{0}] = {1}'.format( i, f1.GetParameter(i) )
 
         return f1
 
+    
+    def Make_CDF(self):
+
+        SBF = self.SingleBinFunc
+        SBFstr = SBF.str
+        
+        if hasattr( SBF, 'Is_DG' ):
+
+            ########################################
+            # Replacing mean
+            ########################################
+
+            shift = 1
+
+            # First element is ignored (corresponds with [0], which should be set outside
+            #   this function)
+            mean_values = [0]
+
+            DG_mean_list = getattr( SBF, 'DG_mean' )
+
+            # Get list (without duplicates) of the SBF variables used in the rms
+            SBFvars_in_mean = []
+            for DG_mean in DG_mean_list:
+                SBFvars_in_mean.extend( re.findall( r'\[([0-9]+)\]', DG_mean ) )
+            SBFvars_in_mean = list( set( SBFvars_in_mean ) )
+
+            # Get a replacement for every SBF variable used
+            for mean in SBFvars_in_mean:
+
+                # Get the corresponding ABF
+                ABFunc = self.AcrossBinFuncs[ int(mean) ]
+                ABFstr = ABFunc.str
+
+                # Shift parameters in ABF
+                for i_param in range( len( ABFunc.par_initials )):
+
+                    ABFstr = ABFstr.replace(
+                        '[{0}]'.format(i_param), '[{0}REPLACED]'.format(shift) )
+                    shift += 1
+
+                    # Save also the values; need to set parameters right later
+                    mean_values.append( ABFunc.par_values[i_param] )
+
+                # Replace the x by [0] (mc/gen is set, cut-off is evaluated for)
+                ABFstr = ABFstr.replace( 'x', '[0REPLACED]' )
+
+                # Go through original mean list and replace the SBF variables
+                for i in range( len( DG_mean_list )):
+                    DG_mean_list[i] = DG_mean_list[i].replace( '[' + mean + ']' , ABFstr )
+
+            DG_mean_list = [ i.replace( 'REPLACED', '' ) for i in DG_mean_list ]
+
+            ########################################
+            # Replacing RMS
+            ########################################
+
+            RMS_values = []
+
+            DG_rms_list = getattr( SBF, 'DG_rms' )
+
+            # Get list (without duplicates) of the SBF variables used in the rms
+            SBFvars_in_RMS = []
+            for DG_rms in DG_rms_list:
+                SBFvars_in_RMS.extend( re.findall( r'\[([0-9]+)\]', DG_rms ) )
+            SBFvars_in_RMS = list( set( SBFvars_in_RMS ) )
+
+            # Get a replacement for every SBF variable used
+            for RMS in SBFvars_in_RMS:
+
+                # Get the corresponding ABF
+                ABFunc = self.AcrossBinFuncs[ int(RMS) ]
+                ABFstr = ABFunc.str
+
+                # Shift parameters in ABF
+                for i_param in range( len( ABFunc.par_initials )):
+
+                    ABFstr = ABFstr.replace(
+                        '[{0}]'.format(i_param), '[{0}REPLACED]'.format(shift) )
+                    shift += 1
+
+                    # Save also the values; need to set parameters right later
+                    RMS_values.append( ABFunc.par_values[i_param] )
+
+                # Replace the x by [0] (mc/gen is set, cut-off is evaluated for)
+                ABFstr = ABFstr.replace( 'x', '[0REPLACED]' )
+
+                # Go through original rms list and replace the SBF variables
+                for i in range( len( DG_rms_list )):
+                    DG_rms_list[i] = DG_rms_list[i].replace( '[' + RMS + ']' , '(' + ABFstr + ')')
+
+            DG_rms_list = [ i.replace( 'REPLACED', '' ) for i in DG_rms_list ]
+
+
+            # Construct the formula string the final CDF
+            CDFstr = '{0}*ROOT::Math::normal_cdf((x-({1})),{2})+(1-{0})*'\
+                'ROOT::Math::normal_cdf((x-({3})),{4})'.format(
+                getattr( SBF, 'DG_rel_weight' ),
+                DG_mean_list[0],
+                DG_rms_list[0],
+                DG_mean_list[1],
+                DG_rms_list[1] )
+
+            output_TF1 = ROOT.TF1( 'CDF', CDFstr )
+
+            # Set the parameters
+            mean_values.extend( RMS_values )
+            for ( i, value ) in enumerate( mean_values ):
+                if i > 0: output_TF1.SetParameter( i, value )
+                
+                #print '[{0}] = {1}'.format( i, output_TF1.GetParameter(i) )
+            #print '\n{0}'.format( output_TF1.GetTitle() )
+
+            return output_TF1
+
+
+        elif hasattr( SBF, 'Is_SG' ):
+
+            ########################################
+            # Replacing mean
+            ########################################
+
+            shift = 1
+
+            # First element is ignored (corresponds with [0], which should be set outside
+            #   this function)
+            mean_values = [0]
+
+            SG_mean = getattr( SBF, 'SG_mean' )
+
+            # Get list (without duplicates) of the SBF variables used in the mean
+            SBFvars_in_mean = re.findall( r'\[([0-9]+)\]', SG_mean )
+            SBFvars_in_mean = list( set( SBFvars_in_mean ) )
+
+            # Get a replacement for every SBF variable used
+            for mean in SBFvars_in_mean:
+
+                # Get the corresponding ABF
+                ABFunc = self.AcrossBinFuncs[ int(mean) ]
+                ABFstr = ABFunc.str
+
+                # Shift parameters in ABF
+                for i_param in range( len( ABFunc.par_initials )):
+
+                    ABFstr = ABFstr.replace(
+                        '[{0}]'.format(i_param), '[{0}REPLACED]'.format(shift) )
+                    shift += 1
+
+                    # Save also the values; need to set parameters right later
+                    mean_values.append( ABFunc.par_values[i_param] )
+
+                # Replace the x by [0] (mc/gen is set, cut-off is evaluated for)
+                ABFstr = ABFstr.replace( 'x', '[0REPLACED]' )
+
+                # Go through original mean list and replace the SBF variables
+                SG_mean = SG_mean.replace( '[' + mean + ']' , ABFstr )
+
+            SG_mean = SG_mean.replace( 'REPLACED', '' )
+
+            ########################################
+            # Replacing RMS
+            ########################################
+
+            RMS_values = []
+
+            SG_rms = getattr( SBF, 'SG_rms' )
+
+            # Get list (without duplicates) of the SBF variables used in the rms
+            SBFvars_in_RMS = re.findall( r'\[([0-9]+)\]', SG_rms )
+            SBFvars_in_RMS = list( set( SBFvars_in_RMS ) )
+
+            # Get a replacement for every SBF variable used
+            for RMS in SBFvars_in_RMS:
+
+                # Get the corresponding ABF
+                ABFunc = self.AcrossBinFuncs[ int(RMS) ]
+                ABFstr = ABFunc.str
+
+                # Shift parameters in ABF
+                for i_param in range( len( ABFunc.par_initials )):
+
+                    ABFstr = ABFstr.replace(
+                        '[{0}]'.format(i_param), '[{0}REPLACED]'.format(shift) )
+                    shift += 1
+
+                    # Save also the values; need to set parameters right later
+                    RMS_values.append( ABFunc.par_values[i_param] )
+
+                # Replace the x by [0] (mc/gen is set, cut-off is evaluated for)
+                ABFstr = ABFstr.replace( 'x', '[0REPLACED]' )
+
+                # Go through original rms list and replace the SBF variables
+                SG_rms = SG_rms.replace( '[' + RMS + ']' , '(' + ABFstr + ')')
+
+            SG_rms = SG_rms.replace( 'REPLACED', '' )
+
+
+            # Construct the formula string the final CDF
+            CDFstr = 'ROOT::Math::normal_cdf((x-({0})),{1})'.format( SG_mean, SG_rms )
+
+            output_TF1 = ROOT.TF1( 'CDF', CDFstr )
+
+            # Set the parameters
+            mean_values.extend( RMS_values )
+            for ( i, value ) in enumerate( mean_values ):
+                if i > 0: output_TF1.SetParameter( i, value )
+                
+                #print '[{0}] = {1}'.format( i, output_TF1.GetParameter(i) )
+            #print '\n{0}'.format( output_TF1.GetTitle() )
+
+            return output_TF1
+
+        else:
+            print 'Single Bin Function is not a single or double Gaussian; unable to build '\
+                'analytic expression for the CDF.'
+            return 0
 
 
 
 class function:
 
-    counter = 0
-
-    def __init__(self, str = "1", par_initials = [] ):
+    def __init__(self, str = "1", par_initials = [], abspars = [] ):
         self.str = str
         self.par_initials = par_initials
         self.par_values = []
         self.par_errors = []
+        self.abspars = abspars
+
 
     def Initialize_as_TF1( self, hist = 'none' ):
 
-        f1 = ROOT.TF1( "h{0}".format(self.counter), self.str )
-        self.counter +=1
+        f1 = ROOT.TF1( "hfit", self.str )
 
         # Set the initial values for parameters of the fit.
         #   Allowed are numbers, valid python expressions, and the strings
@@ -228,7 +468,15 @@ class function:
 
             f1.SetParameter( i, eval( init_var_str ) )
 
+        # Set parameter limits for the parameters that are specified as absolute:
+        for parameter in self.abspars:
+            f1.SetParLimits( parameter, 0.0, 2000.0 )
+
+        # Set fit range
+        f1.SetRange(30,500)
+
         return f1
+
 
     def Check_function( self ):
 
@@ -237,10 +485,11 @@ class function:
         # Get list of used variables in function
         fitvars = re.findall( r'\[([0-9]+)\]', self.str )
 
-        # Convert to int types and sort
+        # Convert to int types, filter out duplicates, and sort
         index_var = []   
         for var in fitvars:
             index_var.append( int(var) )
+        index_var = list(set(index_var))
         index_var.sort()
 
         for index, name in enumerate(index_var):
