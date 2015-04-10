@@ -24,7 +24,7 @@ else:
     print "Loading ME config from TTH.MEAnalysis.MEAnalysis_cfg_heppy"
     from TTH.MEAnalysis.MEAnalysis_cfg_heppy import Conf
 
-#Creates a new configuration object
+#Creates a new configuration object based on MEAnalysis_cfg_heppy
 conf = Conf()
 
 #Load transfer functions from pickle file
@@ -134,246 +134,8 @@ gentth = cfg.Analyzer(
     _conf = conf
 )
 
-#Defines the output TTree
-from PhysicsTools.Heppy.analyzers.core.AutoFillTreeProducer  import *
-#Specifies what to save for jets
-jetType = NTupleObjectType("jetType", variables = [
-    NTupleVariable("pt", lambda x : x.pt),
-    NTupleVariable("eta", lambda x : x.eta),
-    NTupleVariable("phi", lambda x : x.phi),
-    NTupleVariable("mass", lambda x : x.mass),
-    NTupleVariable("id", lambda x : x.id),
-    NTupleVariable("btagCSV", lambda x : x.btagCSV),
-    NTupleVariable("mcFlavour", lambda x : x.mcFlavour, type=int),
-    NTupleVariable("mcMatchId", lambda x : x.mcMatchId, type=int),
-    NTupleVariable("hadronFlavour", lambda x : x.hadronFlavour, type=int),
-    NTupleVariable("mcPt", lambda x : x.mcPt),
-    NTupleVariable("mcEta", lambda x : x.mcEta),
-    NTupleVariable("mcPhi", lambda x : x.mcPhi),
-    NTupleVariable("mcM", lambda x : x.mcM),
-])
-#Specifies what to save for leptons
-leptonType = NTupleObjectType("leptonType", variables = [
-    NTupleVariable("pt", lambda x : x.pt),
-    NTupleVariable("eta", lambda x : x.eta),
-    NTupleVariable("phi", lambda x : x.phi),
-    NTupleVariable("mass", lambda x : x.mass),
-    NTupleVariable("pdgId", lambda x : x.pdgId),
-    #NTupleVariable("mcPt", lambda x : x.mcPt),
-    #NTupleVariable("mcEta", lambda x : x.mcEta),
-    #NTupleVariable("mcPhi", lambda x : x.mcPhi),
-    #NTupleVariable("mcMass", lambda x : x.mcMass),
-])
-
-memType = NTupleObjectType("memType", variables = [
-    NTupleVariable("p", lambda x : x.p),
-    NTupleVariable("p_err", lambda x : x.p_err),
-    NTupleVariable("chi2", lambda x : x.chi2),
-    NTupleVariable("time", lambda x : x.time),
-    NTupleVariable("error_code", lambda x : x.error_code, type=int),
-    NTupleVariable("efficiency", lambda x : x.efficiency),
-    NTupleVariable("nperm", lambda x : x.num_perm, type=int),
-])
-
-#Create the output TTree writer
-treeProducer = cfg.Analyzer(
-    class_object = AutoFillTreeProducer,
-    verbose = False,
-    vectorTree = True,
-    globalVariables = [
-        NTupleVariable(
-            "Wmass", lambda ev: ev.Wmass,
-            help="best W boson mass from untagged pair (untagged by CSVM)"
-        ),
-        NTupleVariable(
-            "is_sl", lambda ev: ev.is_sl,
-            help="event is single-lepton"
-        ),
-        NTupleVariable(
-            "is_dl", lambda ev: ev.is_dl,
-            help="event is di-lepton"
-        ),
-
-        NTupleVariable(
-            "cat", lambda ev: ev.catn,
-            type=int,
-            help="ME category"
-        ),
-
-        NTupleVariable(
-            "cat_btag", lambda ev: ev.cat_btag_n,
-            type=int,
-            help="ME category (b-tag)"
-        ),
-
-        NTupleVariable(
-            "cat_gen", lambda ev: ev.n_cat_gen,
-            type=int,
-            help="top decay category (-1 unknown, 0 single-leptonic, 1 di-leptonic, 2 fully hadronic)"
-        ),
-
-        NTupleVariable(
-            "nGenBHiggs", lambda ev: len(ev.b_quarks_h),
-            type=int,
-            help="Number of generated b from higgs"
-        ),
-
-        NTupleVariable(
-            "nGenBTop", lambda ev: len(ev.b_quarks_t),
-            type=int,
-            help="Number of generated b from top"
-        ),
-
-        NTupleVariable(
-            "nGenQW", lambda ev: len(ev.l_quarks_w),
-            type=int,
-            help="Number of generated quarks from W"
-        ),
-
-        NTupleVariable(
-            "nGenNuTop", lambda ev: len(ev.nu_top),
-            type=int,
-            help="Number of generated nu from top"
-        ),
-
-        NTupleVariable(
-            "nGenLepTop", lambda ev: len(ev.lep_top),
-            type=int,
-            help="Number of generated charged leptons from top"
-        ),
-
-        NTupleVariable(
-            "btag_LR_4b_2b_old", lambda ev: ev.btag_LR_4b_2b_old,
-            help="B-tagging likelihood ratio: 4b vs 2b (8TeV CSV curves)"
-        ),
-        NTupleVariable(
-            "btag_LR_4b_2b", lambda ev: ev.btag_LR_4b_2b,
-            help="B-tagging likelihood ratio: 4b vs 2b"
-        ),
-        NTupleVariable(
-            "btag_LR_4b_2b_alt", lambda ev: ev.btag_LR_4b_2b_alt,
-            help="B-tagging likelihood ratio: 4b vs 2b with multi-dimensional pt/eta binning for CSV"
-        ),
-        NTupleVariable(
-            "nMatchSimB", lambda ev: ev.nMatchSimB if hasattr(ev, "nMatchSimB") else 0,
-            type=int,
-            help="number of gen B not matched to top decay"
-        ),
-        NTupleVariable(
-            "nMatchSimC", lambda ev: ev.nMatchSimC if hasattr(ev, "nMatchSimC") else 0,
-            type=int,
-            help="number of gen C not matched to W decay"
-        ),
-
-        NTupleVariable(
-            "nBCSVM", lambda ev: ev.nBCSVM if hasattr(ev, "nBCSVM") else 0,
-            type=int,
-            help="Number of good jets passing CSVM"
-        ),
-        NTupleVariable(
-            "nBCSVT", lambda ev: ev.nBCSVT if hasattr(ev, "nBCSVT") else 0,
-            type=int,
-            help="Number of good jets passing CSVT"
-        ),
-        NTupleVariable(
-            "nBCSVL", lambda ev: ev.nBCSVL if hasattr(ev, "nBCSVL") else 0,
-            type=int,
-            help="Number of good jets passing CSVL"
-        ),
-
-        NTupleVariable(
-            "nTrueBTaggedCSVM", lambda ev: ev.n_tagwp_tagged_true_bjets if hasattr(ev, "n_tagwp_tagged_true_bjets") else 0,
-            type=int,
-            help=""
-        ),
-
-        NTupleVariable(
-            "nTrueBTaggedLR", lambda ev: ev.n_lr_tagged_true_bjets if hasattr(ev, "n_lr_tagged_true_bjets") else 0,
-            type=int,
-            help=""
-        ),
-
-        NTupleVariable(
-            "nMatch_wq", lambda ev: ev.nMatch_wq if hasattr(ev, "nMatch_wq") else 0,
-            type=int,
-            help=""
-        ),
-        NTupleVariable(
-            "nMatch_wq_btag", lambda ev: ev.nMatch_wq_btag if hasattr(ev, "nMatch_wq_btag") else 0,
-            type=int,
-            help=""
-        ),
-
-        NTupleVariable(
-            "nMatch_tb", lambda ev: ev.nMatch_tb if hasattr(ev, "nMatch_tb") else 0,
-            type=int,
-            help=""
-        ),
-        NTupleVariable(
-            "nMatch_tb_btag", lambda ev: ev.nMatch_tb_btag if hasattr(ev, "nMatch_tb_btag") else 0,
-            type=int,
-            help=""
-        ),
-
-        NTupleVariable(
-            "nMatch_hb", lambda ev: ev.nMatch_hb if hasattr(ev, "nMatch_hb") else 0,
-            type=int,
-            help=""
-        ),
-        NTupleVariable(
-            "nMatch_hb_btag", lambda ev: ev.nMatch_hb_btag if hasattr(ev, "nMatch_hb_btag") else 0,
-            type=int,
-            help=""
-        ),
-
-        NTupleVariable(
-            "numJets", lambda ev: ev.input.numJets if hasattr(ev.input, "numJets") else 0,
-            type=int,
-            help="Number of jets passing jet selection"
-        ),
-
-        NTupleVariable(
-            "lheNj", lambda ev: ev.input.lheNj if hasattr(ev.input, "lheNj") else 0,
-            type=int,
-            help=""
-        ),
-        NTupleVariable(
-            "lheNb", lambda ev: ev.input.lheNb if hasattr(ev.input, "lheNb") else 0,
-            type=int,
-            help=""
-        ),
-        NTupleVariable(
-            "lheNc", lambda ev: ev.input.lheNc if hasattr(ev.input, "lheNc") else 0,
-            type=int,
-            help=""
-        ),
-        NTupleVariable(
-            "lheNg", lambda ev: ev.input.lheNg if hasattr(ev.input, "lheNg") else 0,
-            type=int,
-            help=""
-        ),
-    ],
-    #FIXME: fill these from the VHbb ntuples
-    globalObjects = {},
-    collections = {
-    #standard dumping of objects
-        "b_quarks_t" : NTupleCollection("GenBFromTop", leptonType, 3, help=""),
-        "b_quarks_h" : NTupleCollection("GenBFromHiggs", leptonType, 3, help=""),
-        "l_quarks_w" : NTupleCollection("GenQFromW", leptonType, 5, help=""),
-        "good_jets" : NTupleCollection("jets", jetType, 12, help="Selected jets"),
-        "good_leptons" : NTupleCollection("leps", leptonType, 2, help="Selected leptons"),
-        "mem_results_tth" : NTupleCollection("mem_tth", memType, len(conf.mem["methodsToRun"]), help="MEM tth"),
-        "mem_results_ttbb" : NTupleCollection("mem_ttbb", memType, len(conf.mem["methodsToRun"]), help="MEM ttbb"),
-    }
-)
-
-#Override the default fillCoreVariables function, which
-#by default looks for FWLite variables
-#FIXME: this is a hack to run heppy on non-EDM formats. Better to propagate it to heppy
-def fillCoreVariables(self, tr, event, isMC):
-    for x in ["run", "lumi", "evt", "xsec", "nTrueInt", "puWeight", "genWeight"]:
-        tr.fill(x, getattr(event.input, x))
-AutoFillTreeProducer.fillCoreVariables = fillCoreVariables
+from TTH.MEAnalysis.metree import getTreeProducer
+treeProducer = getTreeProducer(conf)
 
 # definition of a sequence of analyzers,
 # the analyzers will process each event in this order
@@ -420,7 +182,9 @@ config = cfg.Config(
 if __name__ == "__main__":
     print "Running MEAnalysis heppy main loop"
 
+    #Process all samples in the sample list
     for samp in inputSamples:
+        
         print "processing sample ", samp
         config = cfg.Config(
             #Run across these inputs
@@ -435,9 +199,12 @@ if __name__ == "__main__":
             #This defines how events are loaded
             events_class = Events
         )
+        
+        #Configure the number of events to run
         from PhysicsTools.HeppyCore.framework.looper import Looper
         nEvents = samp.perJob
 
+        
         kwargs = {}
         if conf.general.get("eventWhitelist", None) is None:
             kwargs["nEvents"] = nEvents

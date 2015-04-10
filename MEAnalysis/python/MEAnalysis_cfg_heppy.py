@@ -65,6 +65,7 @@ class Conf:
             "btagWP": "CSVM",
 
             #These working points are evaluated and stored in the trees as nB* - number of jets passing the WP
+            #https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideBTagging#Preliminary_working_or_operating
             "btagWPs": {
                 "CSVM": ("btagCSV", 0.814),
                 "CSVL": ("btagCSV", 0.423),
@@ -101,8 +102,8 @@ class Conf:
 
             #Actually run the ME calculation
             #If False, all ME values will be 0
-            #"calcME": True,
             "calcME": True,
+            #"calcME": False,
 
             #Which categories to analyze the matrix element in
             "MECategories": ["cat1", "cat2", "cat3", "cat6"],
@@ -144,6 +145,7 @@ class Conf:
                 #full ME
                 "default",
                 "updatedTF",
+                "MultiAssumptionWq",
 
                 #These are additional MEM checks, where only part of the MEM is ran.
                 #Switched off by default
@@ -158,6 +160,9 @@ class Conf:
                 #"NuPhiRestriction",
                 #"JetsPtOrder",
                 #"JetsPtOrderIntegrationRange",
+                "Recoil",
+                "Sudakov",
+                #"Minimize",
             ],
 
         }
