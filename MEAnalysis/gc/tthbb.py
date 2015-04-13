@@ -22,6 +22,7 @@ elif "kbf" in vo_se:
 else:
     jobs = ["confs/sig.conf", "confs/bkg.conf"]
 print "Using configs", jobs
+workdirs = ["work.sig", "work.bkg"]
 
 #gc = "/shome/jpata/grid-control/GC"
 gc = "./grid-control/go.py"
@@ -44,8 +45,7 @@ if args.action == "report":
 if args.action == "hadd":
     completed_files = []
     input_filenames = []
-    for job in jobs:
-        wd = "work." +job.split("/")[-1].split(".")[0]
+    for job, wd in zip(jobs, workdirs):
         donefiles = glob.glob(wd + "/output/*/output.txt")
         for df in donefiles:
             input_filenames += map(lambda x: x.strip(), open(df).readlines())
