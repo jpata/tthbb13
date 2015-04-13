@@ -13,9 +13,22 @@ parser.add_argument('--action',
 
 args = parser.parse_args()
 
-jobs = ["confs/sig.conf", "confs/bkg.conf"]
+vo_se = os.environ["VO_CMS_DEFAULT_SE"]
+
+if "psi.ch" in vo_se:
+    jobs = ["confs/sig-psi.conf", "confs/bkg-psi.conf"]
+elif "kbf" in vo_se:
+    jobs = ["confs/sig-kbfi.conf", "confs/bkg-kbfi.conf"]
+else:
+    jobs = ["confs/sig.conf", "confs/bkg.conf"]
+print "Using configs", jobs
+
 #gc = "/shome/jpata/grid-control/GC"
 gc = "./grid-control/go.py"
+if not os.path.isfile(gc):
+    raise Exception("grid-control not found in {0}, please see https://twiki.cern.ch/twiki/bin/view/CMS/TTHbbAnalysisWithMEM#Running_on_the_cluster for instructions.".format(gc))
+
+print "Using grid-control", gc
 
 if args.action == "status":
     for job in jobs:

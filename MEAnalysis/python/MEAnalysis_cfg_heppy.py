@@ -65,6 +65,7 @@ class Conf:
             "btagWP": "CSVM",
 
             #These working points are evaluated and stored in the trees as nB* - number of jets passing the WP
+            #https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideBTagging#Preliminary_working_or_operating
             "btagWPs": {
                 "CSVM": ("btagCSV", 0.814),
                 "CSVL": ("btagCSV", 0.423),
@@ -80,6 +81,7 @@ class Conf:
             "controlPlotsFileOld": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsTEST.root",
             "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV6.root",
             "sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_vhbb.py",
+            "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions.pickle",
 
             #If the list contains:
             # "gen" - print out the ttH gen-level particles (b from top, b form higgs, q from W, leptons
@@ -100,8 +102,8 @@ class Conf:
 
             #Actually run the ME calculation
             #If False, all ME values will be 0
-            #"calcME": True,
             "calcME": True,
+            #"calcME": False,
 
             #Which categories to analyze the matrix element in
             "MECategories": ["cat1", "cat2", "cat3", "cat6"],
@@ -142,6 +144,8 @@ class Conf:
 
                 #full ME
                 "default",
+                "updatedTF",
+                "MissedWQ",
 
                 #These are additional MEM checks, where only part of the MEM is ran.
                 #Switched off by default
@@ -156,6 +160,9 @@ class Conf:
                 #"NuPhiRestriction",
                 #"JetsPtOrder",
                 #"JetsPtOrderIntegrationRange",
+                "Recoil",
+                "Sudakov",
+                "Minimize",
             ],
 
         }

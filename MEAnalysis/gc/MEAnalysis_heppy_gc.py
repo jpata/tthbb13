@@ -1,4 +1,10 @@
 import os
+#pickle and transfer function classes to load transfer functions
+import cPickle as pickle
+import TTH.MEAnalysis.TFClasses as TFClasses
+import sys
+sys.modules["TFClasses"] = TFClasses
+
 from TTH.MEAnalysis.MEAnalysis_heppy import sequence
 from TTH.MEAnalysis.samples_base import lfn_to_pfn
 from TTH.MEAnalysis.samples_vhbb import samples
