@@ -23,6 +23,7 @@ jetType = NTupleObjectType("jetType", variables = [
     NTupleVariable("mcFlavour", lambda x : x.mcFlavour, type=int),
     NTupleVariable("mcMatchId", lambda x : x.mcMatchId, type=int),
     NTupleVariable("hadronFlavour", lambda x : x.hadronFlavour, type=int),
+    NTupleVariable("matchFlag", lambda x : x.tth_match_label_numeric, type=int),
     NTupleVariable("mcPt", lambda x : x.mcPt),
     NTupleVariable("mcEta", lambda x : x.mcEta),
     NTupleVariable("mcPhi", lambda x : x.mcPhi),
@@ -285,6 +286,14 @@ def getTreeProducer(conf):
             NTupleVariable(
                 "tth_py_reco", lambda ev: ev.tth_py_reco if hasattr(ev, "tth_py_reco") else 0,
                 help="reco-level ttH system py from matched jets and leptons"
+            ),
+            NTupleVariable(
+                "tth_rho_px_reco", lambda ev: ev.tth_rho_px_reco if hasattr(ev, "tth_rho_px_reco") else 0,
+                help="reco-level ttH system recoil px"
+            ),
+            NTupleVariable(
+                "tth_rho_py_reco", lambda ev: ev.tth_rho_py_reco if hasattr(ev, "tth_rho_py_reco") else 0,
+                help="reco-level ttH system recoil py"
             ),
         ],
         #FIXME: fill these from the VHbb ntuples

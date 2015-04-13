@@ -145,7 +145,7 @@ class Conf:
                 #full ME
                 "default",
                 "updatedTF",
-                "MultiAssumptionWq",
+                "MissedWQ",
 
                 #These are additional MEM checks, where only part of the MEM is ran.
                 #Switched off by default
@@ -162,7 +162,7 @@ class Conf:
                 #"JetsPtOrderIntegrationRange",
                 "Recoil",
                 "Sudakov",
-                #"Minimize",
+                "Minimize",
             ],
 
         }

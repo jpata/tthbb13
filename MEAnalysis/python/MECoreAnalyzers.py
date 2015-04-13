@@ -214,14 +214,14 @@ class JetAnalyzer(FilterAnalyzer):
             ),
             key=lambda x: x.pt, reverse=True
         )
-            
-        
+
+
         #Assing jet transfer functions
         for jet in event.good_jets:
             jet_eta_bin = 0
             if abs(jet.eta)>1.0:
                 jet_eta_bin = 1
-                
+
             #If True, TF [0] - reco, x - gen
             #If False, TF [0] - gen, x - reco
             eval_gen = False
@@ -230,11 +230,11 @@ class JetAnalyzer(FilterAnalyzer):
             #If [0] - gen, x - pt cutoff
             jet.tf_b_lost = self.conf.tf_matrix['b'][jet_eta_bin].Make_CDF()
             jet.tf_l_lost = self.conf.tf_matrix['l'][jet_eta_bin].Make_CDF()
-            
+
             #Set jet pt threshold for CDF
-            jet.tf_b_lost.SetParameter(0, self.conf.jets["pt"])        
-            jet.tf_l_lost.SetParameter(0, self.conf.jets["pt"])        
-        
+            jet.tf_b_lost.SetParameter(0, self.conf.jets["pt"])
+            jet.tf_l_lost.SetParameter(0, self.conf.jets["pt"])
+
         event.numJets = len(event.good_jets)
         self.counters["jets"].inc("good", len(event.good_jets))
 
@@ -748,7 +748,7 @@ class GenTTHAnalyzer(FilterAnalyzer):
         #vector, if it is matched to any gen-level quarks
         matched_pairs = {}
 
-        def match_jets_to_quarks(jetcoll, quarkcoll, label):
+        def match_jets_to_quarks(jetcoll, quarkcoll, label, label_numeric):
             for ij, j in enumerate(jetcoll):
                 for iq, q in enumerate(quarkcoll):
                     l1 = lvec(q)
@@ -757,13 +757,13 @@ class GenTTHAnalyzer(FilterAnalyzer):
                     if dr < 0.3:
                         if matched_pairs.has_key(ij):
                             if matched_pairs[ij][1] > dr:
-                                matched_pairs[ij] = (label, iq, dr)
+                                matched_pairs[ij] = (label, iq, dr, label_numeric)
                         else:
-                            matched_pairs[ij] = (label, iq, dr)
+                            matched_pairs[ij] = (label, iq, dr, label_numeric)
         #print "GEN", len(event.GenWZQuark), len(event.GenBQuarkFromTop), len(event.GenBQuarkFromH)
-        match_jets_to_quarks(event.good_jets, event.l_quarks_w, "wq")
-        match_jets_to_quarks(event.good_jets, event.b_quarks_t, "tb")
-        match_jets_to_quarks(event.good_jets, event.b_quarks_h, "hb")
+        match_jets_to_quarks(event.good_jets, event.l_quarks_w, "wq", 0)
+        match_jets_to_quarks(event.good_jets, event.b_quarks_t, "tb", 1)
+        match_jets_to_quarks(event.good_jets, event.b_quarks_h, "hb", 2)
 
         #Number of reco jets matched to quarks from W, top, higgs
         event.nMatch_wq = 0
@@ -777,16 +777,18 @@ class GenTTHAnalyzer(FilterAnalyzer):
         for ij, jet in enumerate(event.good_jets):
 
             jet.tth_match_label = None
-            jet.tth_match_index = None
-            jet.tth_match_dr = None
+            jet.tth_match_index = -1
+            jet.tth_match_dr = -1
+            jet.tth_match_label_numeric = -1
 
             if not matched_pairs.has_key(ij):
                 continue
-            mlabel, midx, mdr = matched_pairs[ij]
+            mlabel, midx, mdr, mlabel_num = matched_pairs[ij]
 
             jet.tth_match_label = mlabel
             jet.tth_match_index = midx
             jet.tth_match_dr = mdr
+            jet.tth_match_label_numeric = mlabel_num
 
             if mlabel == "wq":
                 event.nMatch_wq += 1
@@ -815,8 +817,8 @@ class GenTTHAnalyzer(FilterAnalyzer):
                 mlabel, midx, mdr = matched_pairs[ij]
                 print "jet match", ij, mlabel, midx, mdr, jet.pt, matches[mlabel][midx].pt
 
-        spx = 0
-        spy = 0
+        spx = -event.met[0].px
+        spy = -event.met[0].py
         for jet in event.good_jets:
             if not (jet.tth_match_label is None):
                 p4 = lvec(jet)
@@ -836,6 +838,11 @@ class GenTTHAnalyzer(FilterAnalyzer):
 
         event.tth_px_reco = spx
         event.tth_py_reco = spy
+
+        #Calculate tth recoil
+        #rho = -met - tth_matched
+        event.tth_rho_px_reco = -event.met[0].px - event.tth_px_reco
+        event.tth_rho_py_reco = -event.met[0].px - event.tth_px_reco
 
         passes = True
         if passes:
@@ -892,7 +899,7 @@ class MEAnalyzer(FilterAnalyzer):
 
         self.configs = {
             "default": MEM.MEMConfig(),
-            "MultiAssumptionWq": MEM.MEMConfig(),
+            "MissedWQ": MEM.MEMConfig(),
             "updatedTF": MEM.MEMConfig(),
             "NumPointsDouble": MEM.MEMConfig(),
             "NumPointsHalf": MEM.MEMConfig(),
@@ -914,7 +921,7 @@ class MEAnalyzer(FilterAnalyzer):
 
         self.configs["default"].defaultCfg()
         self.configs["updatedTF"].defaultCfg()
-        self.configs["MultiAssumptionWq"].defaultCfg()
+        self.configs["MissedWQ"].defaultCfg()
         self.configs["NumPointsDouble"].defaultCfg(2.0)
         self.configs["NumPointsHalf"].defaultCfg(0.5)
         self.configs["NoJacobian"].defaultCfg()
@@ -929,7 +936,7 @@ class MEAnalyzer(FilterAnalyzer):
         self.configs["Recoil"].defaultCfg()
         self.configs["Sudakov"].defaultCfg()
         self.configs["Minimize"].defaultCfg()
-        
+
         self.configs["updatedTF"].transfer_function_method = MEM.TFMethod.External
         self.configs["NoJacobian"].int_code &= ~ MEM.IntegrandType.Jacobian
         self.configs["NoDecayAmpl"].int_code &= ~ MEM.IntegrandType.DecayAmpl
@@ -947,18 +954,20 @@ class MEAnalyzer(FilterAnalyzer):
         self.configs["Recoil"].int_code |= MEM.IntegrandType.Recoil
         self.configs["Sudakov"].int_code |= MEM.IntegrandType.Sudakov
         self.configs["Minimize"].do_minimize = 1
+        self.configs["Minimize"].int_code = 0
 
         for cfn, cfg in self.configs.items():
             cfg.mem_assumptions = set([])
             cfg.disabled_categories = set([])
             #A function Event -> boolean which returns true if this ME should be calculated
             cfg.do_calculate = lambda x: True
-        self.configs["MultiAssumptionWq"].mem_assumptions.add("missed_wq")
+            cfg.enabled = True
+        self.configs["MissedWQ"].mem_assumptions.add("missed_wq")
 
         #Can't integrate in dilepton
-        self.configs["MultiAssumptionWq"].disabled_categories.add("cat6")
+        self.configs["MissedWQ"].disabled_categories.add("cat6")
         #No need to integrate in cat2 (already assume Wq missing)
-        self.configs["MultiAssumptionWq"].disabled_categories.add("cat2")
+        self.configs["MissedWQ"].disabled_categories.add("cat2")
 
         self.configs["Sudakov"].do_calculate = lambda x: len(x.good_jets) == 6
         self.configs["Sudakov"].disabled_categories.add("cat6")
@@ -1031,15 +1040,17 @@ class MEAnalyzer(FilterAnalyzer):
         self.integrator.set_cfg(mem_cfg)
         self.vars_to_integrate.clear()
         self.integrator.next_event()
+        mem_cfg.enabled = True
 
         missed_wq_cat = event.cat in ["cat2", "cat3"]
         can_integrate_wq = event.cat in ["cat1", "cat2", "cat3"]
         #One quark from W missed, integrate over its direction if possible
-        if can_integrate_wq and (missed_wq_cat or (
-            "missed_wq" in mem_cfg.mem_assumptions and not missed_wq_cat)):
-            self.vars_to_integrate.push_back(MEM.PSVar.cos_qbar1)
-            self.vars_to_integrate.push_back(MEM.PSVar.phi_qbar1)
-
+        if "missed_wq" in mem_cfg.mem_assumptions:
+            if can_integrate_wq:
+                self.vars_to_integrate.push_back(MEM.PSVar.cos_qbar1)
+                self.vars_to_integrate.push_back(MEM.PSVar.phi_qbar1)
+            else:
+                mem_cfg.enabled = False
         #Add heavy flavour jets that are assumed to come from top/higgs decay
         for jet in event.btagged_jets:
             self.add_obj(
@@ -1155,7 +1166,7 @@ class MEAnalyzer(FilterAnalyzer):
                 #Run MEM if we did not explicitly disable it
                 if (self.conf.mem["calcME"] and
                         not (event.cat in mem_cfg.disabled_categories) and
-                        mem_cfg.do_calculate(event)
+                        mem_cfg.do_calculate(event) and mem_cfg.enabled
                     ):
                     print "MEM started", ("hypo", hypo), ("conf", confname)
                     self.configure_mem(event, mem_cfg)
