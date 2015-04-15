@@ -15,7 +15,7 @@ import TTH.TTHNtupleAnalyzer.CrabHelpers as CH
 
 # Ntuple name/version and samples to include
 name = "ntop"
-version = "v42"
+version = "v44"
 li_samples = [
 #    "tth_hbb_13tev",
 #    "qcd_170_300_pythia8_13tev",
@@ -33,14 +33,14 @@ li_samples = [
     #"zprime_m3000_1p_13tev", 
     #"zprime_m4000_1p_13tev",
 
-#    "zprime_m1000_1p_13tev_phys14_20bx25",
-#    "zprime_m2000_1p_13tev_phys14_20bx25",
+    "zprime_m1000_1p_13tev_phys14_20bx25",
+    "zprime_m2000_1p_13tev_phys14_20bx25",
 
- #   "qcd_170_300_pythia8_13tev_phys14_20bx25",
+    "qcd_170_300_pythia8_13tev_phys14_20bx25",
     "qcd_300_470_pythia8_13tev_phys14_20bx25",
- #   "qcd_470_600_pythia8_13tev_phys14_20bx25",
+    #"qcd_470_600_pythia8_13tev_phys14_20bx25",
     "qcd_600_800_pythia8_13tev_phys14_20bx25",    
- #   "qcd_800_1000_pythia8_13tev_phys14_20bx25",    
+    "qcd_800_1000_pythia8_13tev_phys14_20bx25",    
 ]
 
 cmssw_config_path = '/shome/gregor/TTH-73X/CMSSW/src/TTH/TTHNtupleAnalyzer/python/'

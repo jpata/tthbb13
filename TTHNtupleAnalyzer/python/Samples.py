@@ -78,6 +78,9 @@ Samples = {
     # 13 TeV
     # 20 PU, 25 bs Bunch Spacing (PHYS 2014)
     #######################################
+
+    # ttbar
+    "ttbar_13tev_phys14_20bx25" : "/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM",
     
     # Zprime -> ttbar -> jets, Width = 1% of Mass
     "zprime_m1000_1p_13tev_phys14_20bx25" : "/ZPrimeToTTJets_M1000GeV_W10GeV_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM",

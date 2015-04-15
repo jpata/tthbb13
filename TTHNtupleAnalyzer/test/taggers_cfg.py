@@ -12,5 +12,5 @@ process.source.fileNames = cms.untracked.vstring([
 #     'file:///scratch/gregor/QCD_Pt-300to470_TuneZ2star_13TeV_pythia6.root'
 ])
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(2000) )
 process.TFileService.fileName = "ttbar_step1.root"

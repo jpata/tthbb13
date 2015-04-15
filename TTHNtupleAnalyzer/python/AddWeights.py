@@ -15,8 +15,8 @@ import pickle
 import ROOT
 
 import TTH.TTHNtupleAnalyzer.AccessHelpers as AH
-#from TTH.Plotting.gregor.TopSamples import files 
-from TTH.Plotting.gregor.HiggsSamples import files 
+from TTH.Plotting.gregor.TopSamples import files 
+#from TTH.Plotting.gregor.HiggsSamples import files 
 
 
 ########################################

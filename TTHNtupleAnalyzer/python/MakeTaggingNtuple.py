@@ -83,7 +83,8 @@ else:
 # Determine particle species
 # Tier3
 if socket.gethostname() == "t3ui12":
-    particle_name = "higgs"
+    particle_name = "hadtop"
+    r_matching = 1.2
 # Grid
 else:
     import PSet
@@ -95,13 +96,24 @@ else:
         particle_name = "higgs"
     else:
         particle_name = "parton"
+        
+    # Decide matching radius according to sample 
+    # Either use 1.2 or 0.6
+    low_pt_samples = ["qcd_170_300", 
+                      "qcd_300_470", 
+                      "zprime_m1000",
+                      "ttbar",
+                      "rad_hh4b_m800_13tev_20bx25",
+                      "tth_hbb"]
 
-
+    if any([x in initial_miniAOD_filename for x in low_pt_samples]):
+        r_matching = 1.2
+    else:
+        r_matching = 0.6
+        
     print "Initial MiniAOD filename:", initial_miniAOD_filename
     print "Determined particle_name:", particle_name
-
-
-
+    print "Determined matching Radius:", r_matching
 
 
 # Event Info
@@ -132,9 +144,7 @@ htt_branches = ["pt", "mass", "fRec",
 
 cmstt_branches = ["pt", "mass", "minMass", "wMass", "topMass", "nSubJets"]
 
-li_htt_branches = li_htt_branches + ['looseOptRHTT']# 'looseOptRQHTT', 'tightOptRQHTT']
-
-
+li_htt_branches = li_htt_branches + ['looseOptRHTT', 'looseOptRRejRminHTT']# 'looseOptRQHTT', 'tightOptRQHTT']
 
 
 ########################################
@@ -179,21 +189,8 @@ for k,v in objects.iteritems():
 
 # Matching DeltaR for the varipus object types
 object_drs = {}                      
-for object_name in objects.keys():
-    if ("ca08" in object_name or
-        "ak08" in object_name):
-        object_drs[object_name] = 0.6
-    elif "ca15" in object_name:
-        object_drs[object_name] = 1.2
-    elif "HTT" in object_name:
-        object_drs[object_name] = 1.2
-    else:
-        print "No delta R defined for", object_name
-        print "Exiting!"
-        sys.exit()
-
-
-
+for object_name in objects.keys():    
+    object_drs[object_name] = r_matching
 
 
 n_entries = intree.GetEntries()

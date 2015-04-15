@@ -150,7 +150,8 @@ def download_globus(name,
                     version,        
                     basepath,
                     user_name = "gregor",
-                    glob_string = "*.root"):
+                    glob_string = "*.root",
+                    isVHBBHEPPY = False):
     """Download a single job from the Grid using globus-url-copy instead of crab
     """
 
@@ -163,8 +164,13 @@ def download_globus(name,
     local_mount_path = "/scratch/{0}/mount/storage/".format(user_name)
     output_path = os.path.join(basepath, "{0}_{1}_{2}".format(name, version, sample_shortname))
 
-    crab_job_name = "crab_{0}_{1}_{2}".format(name, version, sample_shortname)
     sample_name = Samples[sample_shortname].split("/")[1]
+    sample_name_and_tag = "__".join(Samples[sample_shortname].split("/")[1:3])
+    
+    if isVHBBHEPPY:
+        crab_job_name = "{0}_{1}_{2}".format(name, version, sample_name_and_tag)
+    else:
+        crab_job_name = "crab_{0}_{1}_{2}".format(name, version, sample_shortname)
 
     # Make sure output directory exists
     if not os.path.exists(output_path):
@@ -178,11 +184,30 @@ def download_globus(name,
     # Use glob to get the full path of the files we are interested in.
     # The structure is user_path_on_storage / full sample name / name of crab job / timestamp / i / *.root
     # i starts at 0 and each i-directory holds the output of at most 1k jobs
-    directories_to_process = glob.glob( os.path.join(local_mount_path, 
-                                                     user_path_on_storage, 
-                                                     sample_name,
-                                                     crab_job_name,
-                                                     "*/*"))
+
+    print os.path.join(local_mount_path, 
+                       user_path_on_storage, 
+                       "VHBBHeppy" + version,
+                       sample_name,
+                       crab_job_name,
+                       "*/*")
+
+    #sys.exit()
+
+    if isVHBBHEPPY:
+        directories_to_process = glob.glob( os.path.join(local_mount_path, 
+                                                         user_path_on_storage, 
+                                                         "VHBBHeppy" + version,
+                                                         sample_name,
+                                                         crab_job_name,
+                                                         "*/*"))
+    else:
+        directories_to_process = glob.glob( os.path.join(local_mount_path, 
+                                                         user_path_on_storage, 
+                                                         sample_name,
+                                                         crab_job_name,
+                                                         "*/*"))
+    
 
     # Loop over directories, get full list of files and download them
     for i, directory in enumerate(directories_to_process):
