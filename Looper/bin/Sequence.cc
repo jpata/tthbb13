@@ -1,9 +1,9 @@
-#include "TTH/Plotting/interface/joosep/sequenceLooper/Sequence.hh"
-#include "TTH/Plotting/interface/joosep/sequenceLooper/Analyzer.hh"
+#include "TTH/Looper/interface/Sequence.hh"
+#include "TTH/Looper/interface/Analyzer.hh"
 //#include "TTH/Plotting/interface/joosep/sequenceLooper/Event.hh"
 
 Sequence::Sequence(AnalyzerRegistry &analyzer_registry,
-                   fwlite::TFileService *fs,
+                   TFileDirectory *fs,
                    const std::string _name,
                    const std::string _fullName,
                    const std::vector<std::string> _dependsOn,
@@ -12,6 +12,9 @@ Sequence::Sequence(AnalyzerRegistry &analyzer_registry,
     fullName(_fullName),
     dependsOn(_dependsOn)
 {
+    //seq_fs = fs;
+    seq_fs = fs->mkdir(_name.c_str());
+    
     for (auto &seq_elem : sequence_vpset)
     {
         const auto& k = seq_elem.getParameter<std::string>("type");
@@ -21,7 +24,9 @@ Sequence::Sequence(AnalyzerRegistry &analyzer_registry,
             throw std::runtime_error("could not find analyzer with type " + k);
         }
         LOG(INFO) << "Booked analyzer " << fullName << ":" << k << ":" << n;
-        GenericAnalyzer *a = analyzer_registry[k](fs, this, seq_elem);
+        GenericAnalyzer *a = analyzer_registry[k](
+            &seq_fs, this, seq_elem
+        );
 
         analyzers_order.push_back(a->name);
         analyzers[a->name] = a;
