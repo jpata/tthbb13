@@ -39,15 +39,17 @@ T *GenericAnalyzer::fsmake(Ts... args)
         (std::string(t->GetTitle()) + (
             "(" +
             sequence->fullName +
-            "__" +
+            "_" +
             this->name +
-            "__" +
+            "_" +
             string(t->GetName()) + ")"
         )).c_str()
     );
+    
+    //prepend the analyzer name to the histogram to make it unique
     t->SetName(
         (
-            this->name + "__" +
+            this->name + "_" +
             string(t->GetName())
         ).c_str()
     );

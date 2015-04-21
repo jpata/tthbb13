@@ -134,7 +134,7 @@ int main(int argc, const char *argv[])
                         analyzer_registry,
                         &inp_fs,
                         seq_name, //name
-                        (inp->currentName + "__" + seq_name), //fullName
+                        (inp->currentName + "_" + seq_name), //fullName
                         dependsOn, //dependsOn
                         sequence_pset
                     );

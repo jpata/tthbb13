@@ -44,8 +44,8 @@ process.inputs = cms.VPSet([
 				)
 			)
 		]),
-		firstEvent=cms.int64(100000), #first event index
-		lastEvent=cms.int64(200000-1) #laste event index (inclusive)
+		firstEvent=cms.int64(0), #first event index
+		lastEvent=cms.int64(500000-1) #laste event index (inclusive)
 	)
 		
 ])
@@ -142,19 +142,19 @@ for i in [1,2,3]: #cat 1-3
 seqs = []
 
 #Simple helper function to book sequences in a list
-def addSeq(name, req=[]):
+def addSeq(seqs, name, req=[]):
 	seqs += [cms.PSet(
 		name = cms.string(name),
 		dependsOn = cms.vstring(req),
 	)]
 	
 #Now book the sequences
-addSeq("SL")
-for x in ["match_wq", "match_hb", "match_tb"]
-	addSeq(x, ["SL"])
+addSeq(seqs, "SL")
+for x in ["match_wq", "match_hb", "match_tb"]:
+	addSeq(seqs, x, ["SL"])
 for i in [1,2,3]:
-	addSeq("cat" + str(i) + "H", ["SL"])
-	addSeq("cat" + str(i) + "H" + "_MEM", ["SL"])
+	addSeq(seqs, "cat" + str(i) + "H", ["SL"])
+	addSeq(seqs, "cat" + str(i) + "H" + "_MEM", ["SL"])
 
 #Define the histograms that are drawn after evaluating the ME
 analyzers = [
@@ -246,11 +246,11 @@ for (nj0, nj1, nt0, nt1) in [
 	#dependsOn acts like an AND if-clause
 	#dependsOn names have to match the names used in setattr
 	#i.e. dependsOn(X) <-> process.X = myseq
-	addSeq(name, ["SL"])
+	addSeq(seqs, name, ["SL"])
 	for x in ["wq", "hb", "tb"]:
-		addSeq(name + "_match_" + x, ["SL", "match_" + x])
-	addSeq(name + "_match_full", ["SL", "match_wq", "match_hb", "match_tb"])
-	addSeq(name + "_match_wq_tb", ["SL", "match_wq", "match_tb"])
+		addSeq(seqs, name + "_match_" + x, ["SL", "match_" + x])
+	addSeq(seqs, name + "_match_full", ["SL", "match_wq", "match_hb", "match_tb"])
+	addSeq(seqs, name + "_match_wq_tb", ["SL", "match_wq", "match_tb"])
 
 #Finally, feed all the sequences in to process  
 process.sequences = cms.VPSet(
