@@ -900,7 +900,7 @@ class MEAnalyzer(FilterAnalyzer):
         self.configs = {
             "default": MEM.MEMConfig(),
             "MissedWQ": MEM.MEMConfig(),
-            "updatedTF": MEM.MEMConfig(),
+            "oldTF": MEM.MEMConfig(),
             "NumPointsDouble": MEM.MEMConfig(),
             "NumPointsHalf": MEM.MEMConfig(),
             "NoJacobian": MEM.MEMConfig(),
@@ -916,11 +916,13 @@ class MEAnalyzer(FilterAnalyzer):
             "Sudakov": MEM.MEMConfig(),
             "Minimize": MEM.MEMConfig(),
         }
+        for k in self.configs.keys():
+            self.configs[k].transfer_function_method = MEM.TFMethod.External
 
         self.memkeys = self.conf.mem["methodsToRun"]
 
         self.configs["default"].defaultCfg()
-        self.configs["updatedTF"].defaultCfg()
+        self.configs["oldTF"].defaultCfg()
         self.configs["MissedWQ"].defaultCfg()
         self.configs["NumPointsDouble"].defaultCfg(2.0)
         self.configs["NumPointsHalf"].defaultCfg(0.5)
@@ -937,7 +939,7 @@ class MEAnalyzer(FilterAnalyzer):
         self.configs["Sudakov"].defaultCfg()
         self.configs["Minimize"].defaultCfg()
 
-        self.configs["updatedTF"].transfer_function_method = MEM.TFMethod.External
+        self.configs["oldTF"].transfer_function_method = MEM.TFMethod.External
         self.configs["NoJacobian"].int_code &= ~ MEM.IntegrandType.Jacobian
         self.configs["NoDecayAmpl"].int_code &= ~ MEM.IntegrandType.DecayAmpl
         self.configs["NoPDF"].int_code &= ~ MEM.IntegrandType.PDF
@@ -1165,8 +1167,7 @@ class MEAnalyzer(FilterAnalyzer):
         for hypo in [MEM.Hypothesis.TTH, MEM.Hypothesis.TTBB]:
             for confname in self.memkeys:
                 mem_cfg = self.configs[confname]
-                print mem_cfg.disabled_categories
-                print "Checking MEM", confname, event.cat, len(event.good_jets), mem_cfg.do_calculate(event), mem_cfg.enabled, event.cat in mem_cfg.disabled_categories
+                #print "Checking MEM", confname, event.cat, len(event.good_jets), mem_cfg.do_calculate(event), mem_cfg.enabled, event.cat in mem_cfg.disabled_categories
 
                 #Run MEM if we did not explicitly disable it
                 if (self.conf.mem["calcME"] and
