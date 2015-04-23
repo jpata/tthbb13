@@ -962,12 +962,15 @@ class MEAnalyzer(FilterAnalyzer):
             #A function Event -> boolean which returns true if this ME should be calculated
             cfg.do_calculate = lambda x: True
             cfg.enabled = True
+        
+        self.configs["default"].do_calculate = lambda x: len(x.good_jets) >= 6
         self.configs["MissedWQ"].mem_assumptions.add("missed_wq")
 
         #Can't integrate in dilepton
         self.configs["MissedWQ"].disabled_categories.add("cat6")
         #No need to integrate in cat2 (already assume Wq missing)
         self.configs["MissedWQ"].disabled_categories.add("cat2")
+
 
         self.configs["Sudakov"].do_calculate = lambda x: len(x.good_jets) == 6
         self.configs["Sudakov"].disabled_categories.add("cat6")
@@ -1135,7 +1138,7 @@ class MEAnalyzer(FilterAnalyzer):
             return True
 
 
-        #Here we optionally restrict the ME calculatiopn to only matched events
+        #Here we optionally restrict the ME calculation to only matched events
         #Get the conf dict specifying which matches we require
         required_match = self.conf.mem.get("requireMatched", {}).get(event.cat, {})
 
@@ -1162,6 +1165,8 @@ class MEAnalyzer(FilterAnalyzer):
         for hypo in [MEM.Hypothesis.TTH, MEM.Hypothesis.TTBB]:
             for confname in self.memkeys:
                 mem_cfg = self.configs[confname]
+                print mem_cfg.disabled_categories
+                print "Checking MEM", confname, event.cat, len(event.good_jets), mem_cfg.do_calculate(event), mem_cfg.enabled, event.cat in mem_cfg.disabled_categories
 
                 #Run MEM if we did not explicitly disable it
                 if (self.conf.mem["calcME"] and

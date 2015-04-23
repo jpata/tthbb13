@@ -208,6 +208,7 @@ if __name__ == "__main__":
         kwargs = {}
         if conf.general.get("eventWhitelist", None) is None:
             kwargs["nEvents"] = nEvents
+        kwargs["firstEvent"] = conf.general.get("firstEvent", 0)
         looper = Looper(
             'Loop_'+samp.name,
             config,
