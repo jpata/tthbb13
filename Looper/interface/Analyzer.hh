@@ -17,8 +17,9 @@ class Sequence;
 //Base class for all analyzers
 class GenericAnalyzer
 {
-    TFileDirectory *fs;
     Sequence *sequence;
+    TFileDirectory *fs;
+    TFileDirectory _fd;
 
 public:
     long long processed = 0;
@@ -244,6 +245,9 @@ class MEAnalyzer : public GenericAnalyzer
     
     //Fine ME
     TH1D* h_me_discr2 = 0;
+    
+    TH2D* h_me_discr_tth_ttbb = 0;
+
 
 public:
     MEAnalyzer(
@@ -280,6 +284,23 @@ class MatchAnalyzer : public GenericAnalyzer
     
 public:
     MatchAnalyzer(
+        TFileDirectory *fs,
+        Sequence *_sequence,
+        const edm::ParameterSet &pset
+    );
+
+    virtual bool process(EventContainer &event);
+};
+
+class GenLevelAnalyzer : public GenericAnalyzer
+{
+    TH1D* h_n_wq = 0;
+    TH1D* h_n_hb = 0;
+    TH1D* h_n_tb = 0;
+    TH1D* h_sample = 0;
+
+public:
+    GenLevelAnalyzer(
         TFileDirectory *fs,
         Sequence *_sequence,
         const edm::ParameterSet &pset

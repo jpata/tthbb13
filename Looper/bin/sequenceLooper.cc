@@ -37,7 +37,7 @@ std::map<std::string, GenericInput*(*)(const edm::ParameterSet &pset)> input_reg
   //  {"TTHSampleInput", &createInputInstance<TTHSampleInput>},
 };
 
-//Add all defined Analyzer modules here
+//Add all defined Analyzer modules here so that they would be accessible by name
 AnalyzerRegistry analyzer_registry =
 {
     {"GenericAnalyzer", &createAnalyzerInstance<GenericAnalyzer>},
@@ -50,6 +50,7 @@ AnalyzerRegistry analyzer_registry =
     {"BTagHistogramAnalyzer", &createAnalyzerInstance<BTagHistogramAnalyzer>},
     {"MEAnalyzer", &createAnalyzerInstance<MEAnalyzer>},
     {"MatchAnalyzer", &createAnalyzerInstance<MatchAnalyzer>},
+    {"GenLevelAnalyzer", &createAnalyzerInstance<GenLevelAnalyzer>},
 //    {"TTHEventPrinterAnalyzer", &createAnalyzerInstance<TTHEventPrinterAnalyzer>},
 };
 
@@ -108,7 +109,10 @@ int main(int argc, const char *argv[])
         for (long long i = inp->getFirst(); i <= inp->getLast(); i++)
         {
             EventContainer ev = inp->getEvent(i);
-
+            ev.addData<SampleTypeMajor::SampleTypeMajor>(
+                "sampleTypeMajor", inp->sampleTypeMajor
+            );
+            
             if (inp->remakeSequences)
             {
                 LOG(INFO) << "Remaking sequences for " << inp->currentName;
@@ -145,6 +149,7 @@ int main(int argc, const char *argv[])
                 inp->remakeSequences = false;
             }
 
+            //Process all sequences
             for (auto *seq : cur_sequences)
             {
                 seq->process(ev);

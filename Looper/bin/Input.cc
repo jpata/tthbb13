@@ -2,14 +2,17 @@
 #include "TTH/Looper/interface/Input.hh"
 #include "TTH/Looper/interface/AutoTree.hh"
 
-TChainInput::TChainInput(const edm::ParameterSet &pset) : GenericInput(pset)
+TChainInput::TChainInput(const edm::ParameterSet &pset) :
+    GenericInput(pset),
+    treeName(pset.getParameter<std::string>("treeName")),
+    firstEvent(pset.getParameter<long long>("firstEvent")),
+    lastEvent(pset.getParameter<long long>("lastEvent")),
+    chain(new TChain(treeName.c_str()))
 {
     LOG(DEBUG) << "TChainInput: created TChainInput";
+    LOG(INFO) << "Sample " << name << " type=" << sampleTypeMajor;
 
-    treeName = pset.getParameter<std::string>("treeName");
-    lastEvent = pset.getParameter<long long>("lastEvent");
-    firstEvent = pset.getParameter<long long>("firstEvent");
-    chain = new TChain(treeName.c_str());
+    
     currentName = name;
     
     for (auto &file : pset.getParameter<edm::VParameterSet>("files"))

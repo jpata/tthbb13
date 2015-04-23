@@ -31,7 +31,7 @@ AutoTree::AutoTree(TTree* tree) {
                     //tree->SetBranchAddress(leaf_counter->GetName(), &vints_map[leaf_name].n);
                     tree->SetBranchAddress(leaf_name.c_str(), vints_map[leaf_name]->val);
                 }
-                std::cout << leaf_name << "/" << cn << "[" << length_name << "]" << std::endl;
+                //std::cout << leaf_name << "/" << cn << "[" << length_name << "]" << std::endl;
             } else {
                 if (cn == "Double_t") {
                     doubles_map[leaf_name] = new ScalarBranch<double>();
@@ -45,7 +45,7 @@ AutoTree::AutoTree(TTree* tree) {
                     ints_map[leaf_name] = new ScalarBranch<int>();
                     tree->SetBranchAddress(leaf_name.c_str(), &ints_map[leaf_name]->val);
                 }
-                std::cout << leaf_name << "/" << cn << std::endl;
+                //std::cout << leaf_name << "/" << cn << std::endl;
             }
         }
     }

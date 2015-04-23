@@ -11,10 +11,13 @@ GenericAnalyzer::GenericAnalyzer(
     Sequence *_sequence,
     const edm::ParameterSet &pset
 ) :
-    fs(_fs),
     sequence(_sequence),
     name(pset.getParameter<std::string>("name"))
 {
+    //Create a new local directory
+    _fd = _fs->mkdir(name.c_str());
+    fs = &_fd;
+    
     LOG(DEBUG) << "GenericAnalyzer: created analyzer with name " << name;
 };
 
@@ -46,13 +49,13 @@ T *GenericAnalyzer::fsmake(Ts... args)
         )).c_str()
     );
     
-    //prepend the analyzer name to the histogram to make it unique
-    t->SetName(
-        (
-            this->name + "_" +
-            string(t->GetName())
-        ).c_str()
-    );
+    // prepend the analyzer name to the histogram to make it unique
+    // t->SetName(
+    //     (
+    //         this->name + "_" +
+    //         string(t->GetName())
+    //     ).c_str()
+    // );
     
     //Explicitly set name to be unique in case of flat storage
     // t->SetName(
@@ -291,7 +294,11 @@ MEAnalyzer::MEAnalyzer(
     h_me_discr_btagLR(fsmake<TH2D>("me_discr_btaglr",
         "ME discriminator vs btag LR", 6, 0, 1, 6, 0, 1)
     ),
-    h_me_discr2(fsmake<TH1D>("me_discr2", "ME discriminator", 1000, 0, 1))
+    h_me_discr2(fsmake<TH1D>("me_discr2", "ME discriminator", 1000, 0, 1)),
+    h_me_discr_tth_ttbb(fsmake<TH2D>("me_discr_tth_ttbb",
+        "ME discriminator tth vs ttbb log10", 60, -25, -50, 60, -25, -50)
+    )
+    
 {
     LOG(DEBUG) << "MEAnalyzer: created MEAnalyzer";
 };
@@ -320,6 +327,8 @@ bool MEAnalyzer::process(EventContainer &event)
         double p0 = mem_tth[me_index];
         double p1 = mem_ttbb[me_index];
         
+        h_me_discr_tth_ttbb->Fill(std::log10(p0), std::log10(p1));
+        
         double d = p0 / (p0 + 0.15*p1);
         h_me_discr->Fill(d);
         h_me_discr2->Fill(d);
@@ -330,6 +339,29 @@ bool MEAnalyzer::process(EventContainer &event)
     
     GenericAnalyzer::process(event);
     return true;
+};
+
+
+
+MEMultiHypoAnalyzer::MEMultiHypoAnalyzer(
+    TFileDirectory *fs,
+    Sequence *_sequence,
+    const edm::ParameterSet &pset
+) :
+    GenericAnalyzer(fs, _sequence, pset),
+    label(pset.getParameter<std::string>("label")),
+    me_inds(pset.getParameter<std::vector<int>>("MEindices")),
+    h_me_discr(fsmake<TH1D>("me_discr", "ME discriminator", 6, 0, 1)),
+    h_me_discr_btagLR(fsmake<TH2D>("me_discr_btaglr",
+        "ME discriminator vs btag LR", 6, 0, 1, 6, 0, 1)
+    ),
+    h_me_discr2(fsmake<TH1D>("me_discr2", "ME discriminator", 1000, 0, 1)),
+    h_me_discr_tth_ttbb(fsmake<TH2D>("me_discr_tth_ttbb",
+        "ME discriminator tth vs ttbb log10", 60, -25, -50, 60, -25, -50)
+    )
+    
+{
+    LOG(DEBUG) << "MEAnalyzer: created MEAnalyzer";
 };
 
 MatchAnalyzer::MatchAnalyzer(
@@ -432,4 +464,67 @@ bool MatchAnalyzer::process(EventContainer &event)
 
     GenericAnalyzer::process(event);
     return true;
+};
+
+
+GenLevelAnalyzer::GenLevelAnalyzer(
+    TFileDirectory *fs,
+    Sequence *_sequence,
+    const edm::ParameterSet &pset
+) :
+    GenericAnalyzer(fs, _sequence, pset),
+    h_n_wq(fsmake<TH1D>("n_wq",
+        "Number of l-quarks associated with W", 4, 0, 4)
+    ),
+    h_n_hb(fsmake<TH1D>("n_hb",
+        "Number of b-quarks associated with H", 4, 0, 4)
+    ),
+    h_n_tb(fsmake<TH1D>("n_tb",
+        "Number of b-quarks associated with t", 4, 0, 4)
+    ),
+    h_sample(fsmake<TH1D>("sample",
+        "Sample index", 4, 0, 4)
+    )
+{
+    LOG(DEBUG) << "MEAnalyzer: created MEAnalyzer";
+};
+
+bool GenLevelAnalyzer::process(EventContainer &event)
+{
+    LOG(DEBUG) << "processing " << name << " " << event.i;
+    
+    AutoTree* inp = event.getData<AutoTree*>("input");
+    assert(inp != nullptr);
+    
+    SampleTypeMajor::SampleTypeMajor sampleTypeMajor =
+        event.getData<SampleTypeMajor::SampleTypeMajor>("sampleTypeMajor");
+    
+    h_sample->Fill((int)(sampleTypeMajor));
+    
+    const int nGenQFromW = inp->getValue<int>("nGenQFromW");
+    const int nGenBFromHiggs = inp->getValue<int>("nGenBFromHiggs");
+    const int nGenBFromTop = inp->getValue<int>("nGenBFromTop");
+    
+    bool ret = true;
+    if (sampleTypeMajor == SampleTypeMajor::tth) {
+        ret = ret && (nGenBFromHiggs==2);
+    }
+    
+    const bool has_tops = (
+        (sampleTypeMajor == SampleTypeMajor::tth) ||
+        (sampleTypeMajor == SampleTypeMajor::ttjets)
+    );
+    
+    if (has_tops) {
+        ret = ret && (nGenBFromTop==2);
+    }
+    
+    if (ret) {
+        h_n_wq->Fill(nGenQFromW);
+        h_n_hb->Fill(nGenBFromHiggs);
+        h_n_tb->Fill(nGenBFromTop);
+    }
+    
+    GenericAnalyzer::process(event);
+    return ret;
 };

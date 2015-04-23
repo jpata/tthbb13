@@ -18,12 +18,13 @@ Sequence::Sequence(AnalyzerRegistry &analyzer_registry,
     for (auto &seq_elem : sequence_vpset)
     {
         const auto& k = seq_elem.getParameter<std::string>("type");
-        const auto& n = seq_elem.getParameter<std::string>("name");
+        //const auto& n = seq_elem.getParameter<std::string>("name");
         if (analyzer_registry.find(k) == analyzer_registry.end())
         {
+            LOG(ERROR) << "could not find analyzer with type " << k;
             throw std::runtime_error("could not find analyzer with type " + k);
         }
-        LOG(INFO) << "Booked analyzer " << fullName << ":" << k << ":" << n;
+        //LOG(INFO) << "Booked analyzer " << fullName << ":" << k << ":" << n;
         GenericAnalyzer *a = analyzer_registry[k](
             &seq_fs, this, seq_elem
         );

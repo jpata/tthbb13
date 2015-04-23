@@ -2,29 +2,53 @@
 
 #include "TTH/Looper/interface/AutoTree.hh"
 
-//Base class for all analyzers
+//Represents the physical process
+namespace SampleTypeMajor {
+    enum SampleTypeMajor {
+        data = 0,
+        tth = 1,
+        ttjets = 2,
+    };
+};
+
+//Base class for all inputs
 class GenericInput
 {
 public:
-    long long processed = 0;
+    //name of input
     const std::string name;
+    const SampleTypeMajor::SampleTypeMajor sampleTypeMajor;
+
+    //Number of events processed
+    long long processed = 0;
+    
+    //If true, all Sequences and Analyzers are remade when changing event
     bool remakeSequences = true;
+
     std::string currentName = "";
 
-    GenericInput(const edm::ParameterSet &pset) : name(pset.getParameter<std::string>("name"))
+    GenericInput(const edm::ParameterSet &pset) :
+    name(pset.getParameter<std::string>("name")),
+    sampleTypeMajor(static_cast<SampleTypeMajor::SampleTypeMajor>(
+        pset.getParameter<unsigned int>("sampleTypeMajor")
+    ))
     {
         LOG(DEBUG) << "GenericInput: created analyzer with name " << name;
     };
 
+    //First entry to process
     virtual long long getFirst()
     {
         return 0;
     }
 
+    //Last entry to process
     virtual long long getLast()
     {
         return 0;
     }
+    
+    //returns the current event
     virtual EventContainer getEvent(long long idx)
     {
         return EventContainer(idx);
@@ -33,16 +57,20 @@ public:
 
 class TChainInput : public GenericInput
 {
+private:
+    const std::string treeName = "";
+    const long long firstEvent = 0;
+    const long long lastEvent = 0;
 
+public:
+
+private:
     TChain *chain = 0;
-    std::string treeName = "";
-    long long firstEvent = 0;
-    long long lastEvent = 0;
     AutoTree* itree = 0;
 
 public:
-    TChainInput(const edm::ParameterSet&);
 
+    TChainInput(const edm::ParameterSet&);
     
     /** 
     *   @brief  Returns the first event to be processed.

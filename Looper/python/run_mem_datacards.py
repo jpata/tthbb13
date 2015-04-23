@@ -2,23 +2,27 @@ import FWCore.ParameterSet.Types  as CfgTypes
 import FWCore.ParameterSet.Config as cms
 import os
 import copy
+import ROOT
 
 #configure the job index through the environment
-jobIdx = int(os.environ.get("JOBINDEX", 1))
+JOBINDEX = os.environ.get("JOBINDEX", "all")
+CHUNKSIZE = 500000
+
+if JOBINDEX == "all":
+	runChunks = False
+else:
+	runChunks = True
 
 #Create a process
 process = cms.Process("looper")
 
 #Configures the job output file
 process.outputs = cms.PSet(
-	outFileName = cms.string("output_{0}.root".format(jobIdx)),
+	outFileName = cms.string("output_{0}.root".format(JOBINDEX)),
 )
 
-#Configures the input files
-#if first (last) event == -1, use 0 (Nentries-1)
-#otherwise, process in specified range (inclusive)
-process.inputs = cms.VPSet([
-	cms.PSet(
+samples = {
+	"tth": cms.PSet(
 		type = cms.string("TChainInput"),
 		name = cms.string("tth"),
 		treeName = cms.string("tree"),
@@ -30,10 +34,10 @@ process.inputs = cms.VPSet([
 			)
 		]),
 		firstEvent=cms.int64(-1), #first event index
-		lastEvent=cms.int64(-1) #last event index (inclusive)
-
+		lastEvent=cms.int64(-1), #last event index (inclusive)
+		sampleTypeMajor = cms.uint32(1),
 	),
-	cms.PSet(
+	"ttjets": cms.PSet(
 		type = cms.string("TChainInput"),
 		name = cms.string("ttjets"),
 		treeName = cms.string("tree"),
@@ -45,10 +49,37 @@ process.inputs = cms.VPSet([
 			)
 		]),
 		firstEvent=cms.int64(0), #first event index
-		lastEvent=cms.int64(500000-1) #laste event index (inclusive)
+		lastEvent=cms.int64(5000000-1), #laste event index (inclusive)
+		sampleTypeMajor = cms.uint32(2),
 	)
-		
-])
+}
+
+if runChunks:
+	chunks = []
+	for sample in ["tth", "ttjets"]:
+		samp = samples[sample]
+		fns = map(lambda x: x.fileName.value(), samp.files)
+		tchain = ROOT.TChain("tree")
+		for fn in fns:
+			tchain.AddFile(fn)
+		n = tchain.GetEntries()
+		for i in range(0, n, CHUNKSIZE):
+			samp = copy.deepcopy(samp)
+			samp.firstEvent = i
+			samp.lastEvent = i + CHUNKSIZE - 1
+			chunks += [
+				samp
+			]
+	process.inputs = cms.VPSet([chunks[int(JOBINDEX)]])
+	print "Running job", JOBINDEX, "/", len(chunks)
+else:
+	#Configures the input files
+	#if first (last) event == -1, use 0 (Nentries-1)
+	#otherwise, process in specified range (inclusive)
+	process.inputs = cms.VPSet([
+		samples["tth"],
+		#samples["ttjets"]
+	])
 
 #The analysis is run as a series of Analyzers, each of which is
 #defined through a PSet.
@@ -61,9 +92,68 @@ process.inputs = cms.VPSet([
 #All sequences are run in series as defined in the VPSet process.sequences,
 #which lists the name and dependencies of each sequence to run.
 
+
+#List of all sequences that will be run
+seqs = []
+
+#Simple helper function to book sequences in a list
+def addSeq(seqs, name, req=[]):
+	seqs += [cms.PSet(
+		name = cms.string(name),
+		dependsOn = cms.vstring(req),
+	)]
+
+
+def add_matching(seqs, seq, name):
+	setattr(process, name, copy.deepcopy(seq))
+
+	#Book the histograms that run after requiring matching
+	for x in [
+		"wq", "hb", "tb",
+		"w2_h2_t2",
+		"w2_h0_t2",
+		"w1_h2_t2",
+		"w1_h0_t2",
+		"w0_h2_t2",
+		"w0_h0_t2"
+		]:
+		setattr(process, name + "_match_" + x, copy.deepcopy(seq))
+		setattr(process, name + "_match_" + x + "_btag", copy.deepcopy(seq))
+
+	#Here add the booked histograms to the sequence
+	#dependsOn acts like an AND if-clause
+	#dependsOn names have to match the names used in setattr
+	#i.e. dependsOn(X) <-> process.X = myseq
+	#
+	addSeq(seqs, name, ["SL"])
+	for x in ["wq", "hb", "tb"]:
+		addSeq(seqs, name + "_match_" + x, ["SL", "match2_" + x])
+		addSeq(seqs, name + "_match_" + x + "_btag", ["SL", "match2_" + x + "_btag"])
+	addSeq(seqs, name + "_match_w2_h2_t2", ["SL", "match2_wq", "match2_hb", "match2_tb"])
+	addSeq(seqs, name + "_match_w2_h0_t2", ["SL", "match2_wq", "match2_tb"])
+	
+	#2 quarks from W matched
+	addSeq(seqs, name + "_match_w2_h2_t2_btag", ["SL", "match2_wq_btag", "match2_hb_btag", "match2_tb_btag"])
+	addSeq(seqs, name + "_match_w2_h0_t2_btag", ["SL", "match2_wq_btag", "match2_tb_btag"])
+
+	#1 quark from W matched
+	addSeq(seqs, name + "_match_w1_h2_t2_btag", ["SL", "match1_wq_btag", "match2_hb_btag", "match2_tb_btag"])
+	addSeq(seqs, name + "_match_w1_h0_t2_btag", ["SL", "match1_wq_btag", "match2_tb_btag"])
+
+	#0 quark from W matched
+	addSeq(seqs, name + "_match_w0_h2_t2_btag", ["SL", "match0_wq_btag", "match2_hb_btag", "match2_tb_btag"])
+	addSeq(seqs, name + "_match_w0_h0_t2_btag", ["SL", "match0_wq_btag", "match2_tb_btag"])
+
+
 #Define the single-lepton selection sequence
 process.SL = cms.VPSet([
 
+	#Require gen-level process
+	cms.PSet(
+		type = cms.string("GenLevelAnalyzer"),
+		name = cms.string("gen"),
+	),
+	
 	#Select SL events
 	cms.PSet(
 		type = cms.string("IntSelector"),
@@ -83,78 +173,36 @@ process.SL = cms.VPSet([
 	),
 ])
 
+#Now book the sequence so that it is run
+addSeq(seqs, "SL")
 
 #Define the quark gen-level matching sequences
-#Require exactly 2 matches
-process.match_wq = cms.VPSet([
-	cms.PSet(
-		type = cms.string("IntSelector"),
-		name = cms.string("match_wq"),
-		branch = cms.string("nMatch_wq"),
-		value = cms.int32(2)
-	),
-])
-
-process.match_hb = cms.VPSet([
-	cms.PSet(
-		type = cms.string("IntSelector"),
-		name = cms.string("match_hb"),
-		branch = cms.string("nMatch_hb"),
-		value = cms.int32(2)
-	),
-])
-
-process.match_tb = cms.VPSet([
-	cms.PSet(
-		type = cms.string("IntSelector"),
-		name = cms.string("match_tb"),
-		branch = cms.string("nMatch_tb"),
-		value = cms.int32(2)
-	),
-])
-
-
-#Define the "old" ME categories, requiring
-#successful categorization based on njets, Wmass and number of b-tags
-for i in [1,2,3]: #cat 1-3
-	#btag L and H
-	for btag_cut, btag_name in [
-			(0, "L"), #btag low region (unimplemented)
-			(1, "H") #btag high region
-		]:
-		cat = cms.VPSet([
+for x in ["wq", "hb", "tb"]:
+	
+	#number of required matches
+	for n in [0, 1, 2]:
+		name = "match{1}_{0}".format(x, n)
+		s1 = cms.VPSet([
 			cms.PSet(
 				type = cms.string("IntSelector"),
-				name = cms.string("cat" + str(i)),
-				branch = cms.string("cat"),
-				value = cms.int32(i)
-			),
-			cms.PSet(
-				type = cms.string("IntSelector"),
-				name = cms.string("BTag"+btag_name),
-				branch = cms.string("cat_btag"),
-				value = cms.int32(btag_cut)
+				name = cms.string(name),
+				branch = cms.string("nMatch_{0}".format(x)),
+				value = cms.int32(n)
 			),
 		])
-		setattr(process, "cat"+str(i) + btag_name, cat)
+		setattr(process, name, s1)
+		addSeq(seqs, name)
 
-#List of all sequences that will be run
-seqs = []
-
-#Simple helper function to book sequences in a list
-def addSeq(seqs, name, req=[]):
-	seqs += [cms.PSet(
-		name = cms.string(name),
-		dependsOn = cms.vstring(req),
-	)]
-	
-#Now book the sequences
-addSeq(seqs, "SL")
-for x in ["match_wq", "match_hb", "match_tb"]:
-	addSeq(seqs, x, ["SL"])
-for i in [1,2,3]:
-	addSeq(seqs, "cat" + str(i) + "H", ["SL"])
-	addSeq(seqs, "cat" + str(i) + "H" + "_MEM", ["SL"])
+		s2 = cms.VPSet([
+			cms.PSet(
+				type = cms.string("IntSelector"),
+				name = cms.string(name + "_btag"),
+				branch = cms.string("nMatch_{0}_btag".format(x)),
+				value = cms.int32(n)
+			),
+		])
+		setattr(process, name + "_btag", s2)
+		addSeq(seqs, name + "_btag")
 
 #Define the histograms that are drawn after evaluating the ME
 analyzers = [
@@ -185,11 +233,44 @@ for i in range(6):
 		),
 	]
 
-#Add the ME histograms
-process.cat1H_MEM = cms.VPSet(analyzers)
-process.cat2H_MEM = cms.VPSet(analyzers)
-process.cat3H_MEM = cms.VPSet(analyzers)
+#Define the "old" ME categories, requiring
+#successful categorization based on njets, Wmass and number of b-tags
+for i in [1,2,3]: #cat 1-3
+	#btag L and H
+	for btag_cut, btag_name in [
+		(0, "L"), #btag low region (unimplemented)
+		(1, "H") #btag high region
+	]:
+		procs = [
+			cms.PSet(
+				type = cms.string("IntSelector"),
+				name = cms.string("cat" + str(i)),
+				branch = cms.string("cat"),
+				value = cms.int32(i)
+			),
+			cms.PSet(
+				type = cms.string("IntSelector"),
+				name = cms.string("BTag"+btag_name),
+				branch = cms.string("cat_btag"),
+				value = cms.int32(btag_cut)
+			),
+		]
+		procs += analyzers
+		cat = cms.VPSet(procs)
+		
+		name = "cat" + str(i) + btag_name
+		add_matching(seqs, cat, name)
 
+for x in [
+	"match0_wq", "match0_hb", "match0_tb",
+	"match1_wq", "match1_hb", "match1_tb",
+	"match2_wq", "match2_hb", "match2_tb"
+	]:
+	addSeq(seqs, x, ["SL"])
+for i in [1,2,3]:
+	name = "cat" + str(i) + "H"
+	addSeq(seqs, name, ["SL"])
+	
 for (nj0, nj1, nt0, nt1) in [
 	(5, 6, 2, 3), #5 jets, 2 tags
 	(6, 999, 2, 3), #>= 6 jets, 2 tags
@@ -232,29 +313,13 @@ for (nj0, nj1, nt0, nt1) in [
 	
 	#add the sequence requiring no matching
 	name = "JetTag{0}J{1}T".format(nj0, nt0)
-	setattr(process, name, seq)
+	add_matching(seqs, seq, name)
 	
-	#Book the histograms that run after requiring matching
-	for x in [
-		"wq", "hb", "tb", #2 matches for any W(qq), h(bb), t(b)
-		"full", #H(bb), t(b), W(qq) all matched
-		"wq_tb" #t(b), W(qq) matched
-		]:
-		setattr(process, name + "_match_" + x, copy.deepcopy(seq))
 	
-	#Here add the booked histograms to the sequence
-	#dependsOn acts like an AND if-clause
-	#dependsOn names have to match the names used in setattr
-	#i.e. dependsOn(X) <-> process.X = myseq
-	addSeq(seqs, name, ["SL"])
-	for x in ["wq", "hb", "tb"]:
-		addSeq(seqs, name + "_match_" + x, ["SL", "match_" + x])
-	addSeq(seqs, name + "_match_full", ["SL", "match_wq", "match_hb", "match_tb"])
-	addSeq(seqs, name + "_match_wq_tb", ["SL", "match_wq", "match_tb"])
 
 #Finally, feed all the sequences in to process  
 process.sequences = cms.VPSet(
 	seqs
 )
 
-print process.dumpPython()
+#print process.dumpPython()
