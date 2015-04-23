@@ -343,26 +343,26 @@ bool MEAnalyzer::process(EventContainer &event)
 
 
 
-MEMultiHypoAnalyzer::MEMultiHypoAnalyzer(
-    TFileDirectory *fs,
-    Sequence *_sequence,
-    const edm::ParameterSet &pset
-) :
-    GenericAnalyzer(fs, _sequence, pset),
-    label(pset.getParameter<std::string>("label")),
-    me_inds(pset.getParameter<std::vector<int>>("MEindices")),
-    h_me_discr(fsmake<TH1D>("me_discr", "ME discriminator", 6, 0, 1)),
-    h_me_discr_btagLR(fsmake<TH2D>("me_discr_btaglr",
-        "ME discriminator vs btag LR", 6, 0, 1, 6, 0, 1)
-    ),
-    h_me_discr2(fsmake<TH1D>("me_discr2", "ME discriminator", 1000, 0, 1)),
-    h_me_discr_tth_ttbb(fsmake<TH2D>("me_discr_tth_ttbb",
-        "ME discriminator tth vs ttbb log10", 60, -25, -50, 60, -25, -50)
-    )
-    
-{
-    LOG(DEBUG) << "MEAnalyzer: created MEAnalyzer";
-};
+// MEMultiHypoAnalyzer::MEMultiHypoAnalyzer(
+//     TFileDirectory *fs,
+//     Sequence *_sequence,
+//     const edm::ParameterSet &pset
+// ) :
+//     GenericAnalyzer(fs, _sequence, pset),
+//     label(pset.getParameter<std::string>("label")),
+//     me_inds(pset.getParameter<std::vector<int>>("MEindices")),
+//     h_me_discr(fsmake<TH1D>("me_discr", "ME discriminator", 6, 0, 1)),
+//     h_me_discr_btagLR(fsmake<TH2D>("me_discr_btaglr",
+//         "ME discriminator vs btag LR", 6, 0, 1, 6, 0, 1)
+//     ),
+//     h_me_discr2(fsmake<TH1D>("me_discr2", "ME discriminator", 1000, 0, 1)),
+//     h_me_discr_tth_ttbb(fsmake<TH2D>("me_discr_tth_ttbb",
+//         "ME discriminator tth vs ttbb log10", 60, -25, -50, 60, -25, -50)
+//     )
+//     
+// {
+//     LOG(DEBUG) << "MEAnalyzer: created MEAnalyzer";
+// };
 
 MatchAnalyzer::MatchAnalyzer(
     TFileDirectory *fs,
