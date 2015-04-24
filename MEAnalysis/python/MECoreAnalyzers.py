@@ -817,6 +817,7 @@ class GenTTHAnalyzer(FilterAnalyzer):
                 mlabel, midx, mdr = matched_pairs[ij]
                 print "jet match", ij, mlabel, midx, mdr, jet.pt, matches[mlabel][midx].pt
 
+        #recoil = -met + matched jets + matched leptons
         spx = -event.met[0].px
         spy = -event.met[0].py
         for jet in event.good_jets:
@@ -939,7 +940,7 @@ class MEAnalyzer(FilterAnalyzer):
         self.configs["Sudakov"].defaultCfg()
         self.configs["Minimize"].defaultCfg()
 
-        self.configs["oldTF"].transfer_function_method = MEM.TFMethod.External
+        self.configs["oldTF"].transfer_function_method = MEM.TFMethod.Builtin
         self.configs["NoJacobian"].int_code &= ~ MEM.IntegrandType.Jacobian
         self.configs["NoDecayAmpl"].int_code &= ~ MEM.IntegrandType.DecayAmpl
         self.configs["NoPDF"].int_code &= ~ MEM.IntegrandType.PDF
