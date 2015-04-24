@@ -288,7 +288,6 @@ MEAnalyzer::MEAnalyzer(
     const edm::ParameterSet &pset
 ) :
     GenericAnalyzer(fs, _sequence, pset),
-    label(pset.getParameter<std::string>("label")),
     me_index(pset.getParameter<int>("MEindex")),
     h_me_discr(fsmake<TH1D>("me_discr", "ME discriminator", 6, 0, 1)),
     h_me_discr_btagLR(fsmake<TH2D>("me_discr_btaglr",
@@ -343,26 +342,70 @@ bool MEAnalyzer::process(EventContainer &event)
 
 
 
-// MEMultiHypoAnalyzer::MEMultiHypoAnalyzer(
-//     TFileDirectory *fs,
-//     Sequence *_sequence,
-//     const edm::ParameterSet &pset
-// ) :
-//     GenericAnalyzer(fs, _sequence, pset),
-//     label(pset.getParameter<std::string>("label")),
-//     me_inds(pset.getParameter<std::vector<int>>("MEindices")),
-//     h_me_discr(fsmake<TH1D>("me_discr", "ME discriminator", 6, 0, 1)),
-//     h_me_discr_btagLR(fsmake<TH2D>("me_discr_btaglr",
-//         "ME discriminator vs btag LR", 6, 0, 1, 6, 0, 1)
-//     ),
-//     h_me_discr2(fsmake<TH1D>("me_discr2", "ME discriminator", 1000, 0, 1)),
-//     h_me_discr_tth_ttbb(fsmake<TH2D>("me_discr_tth_ttbb",
-//         "ME discriminator tth vs ttbb log10", 60, -25, -50, 60, -25, -50)
-//     )
-//     
-// {
-//     LOG(DEBUG) << "MEAnalyzer: created MEAnalyzer";
-// };
+MEMultiHypoAnalyzer::MEMultiHypoAnalyzer(
+    TFileDirectory *fs,
+    Sequence *_sequence,
+    const edm::ParameterSet &pset
+) :
+    GenericAnalyzer(fs, _sequence, pset),
+    formula(TFormula("f", pset.getParameter<std::string>("formula").c_str())),
+    h_me_discr(fsmake<TH1D>("me_discr", "ME discriminator", 6, 0, 1)),
+    h_me_discr_btagLR(fsmake<TH2D>("me_discr_btaglr",
+        "ME discriminator vs btag LR", 6, 0, 1, 6, 0, 1)
+    ),
+    h_me_discr2(fsmake<TH1D>("me_discr2", "ME discriminator", 1000, 0, 1))
+    
+{
+    LOG(DEBUG) << "MEAnalyzer: created MEAnalyzer";
+};
+
+bool MEMultiHypoAnalyzer::process(EventContainer &event)
+{
+    LOG(DEBUG) << "processing " << name << " " << event.i;
+    
+    AutoTree* inp = event.getData<AutoTree*>("input");
+    assert(inp != nullptr);
+    
+    int nmem_ttbb = inp->getValue<int>("nmem_ttbb");
+    int nmem_tth = inp->getValue<int>("nmem_tth");
+    int cat = inp->getValue<int>("cat");
+    int njets = inp->getValue<int>("njets");
+    int ntags = inp->getValue<int>("nBCSVM");
+
+    if (nmem_tth>0 && nmem_ttbb>0) {
+        std::vector<double> mem_ttbb = inp->getValue<std::vector<double>>(
+            "mem_ttbb_p"
+        );
+        std::vector<double> mem_tth = inp->getValue<std::vector<double>>(
+            "mem_tth_p"
+        );
+        
+        assert(mem_tth.size() == mem_ttbb.size());
+        
+        for (unsigned int i=0; i < mem_ttbb.size(); i++) {
+            formula.SetParameter(2*i, mem_tth[i]);
+            formula.SetParameter(2*i + 1, mem_ttbb[i]);
+            //std::cout << i << " " << mem_tth[i] << " " << mem_ttbb[i] << std::endl;
+        }
+        
+        const double d0 = mem_tth[0] / (mem_tth[0] + 0.15 * mem_ttbb[0]);
+        const double d1 = formula.Eval(0.0);
+        const double d2 = (mem_tth[0] + mem_tth[2]) /
+            (mem_tth[0] + mem_tth[2] + 0.15 * mem_ttbb[0] + 0.15 * mem_ttbb[2]);
+        cout << name << " " << getSequence()->fullName << " " <<
+            cat << " " << njets << " " << ntags << endl;
+        cout << "p0 " << mem_tth[0] << " " << mem_ttbb[0] << endl;
+        cout << "p2 " << mem_tth[2] << " " << mem_ttbb[2] << endl;
+        cout << "d " << d0 << " " << d1 << " " << d2 << endl;
+        h_me_discr->Fill(d1);
+        h_me_discr2->Fill(d1);
+        
+        double btagLR = inp->getValue<double>("btag_LR_4b_2b");
+        h_me_discr_btagLR->Fill(d1, btagLR);
+    }
+    GenericAnalyzer::process(event);
+    return true;
+};
 
 MatchAnalyzer::MatchAnalyzer(
     TFileDirectory *fs,

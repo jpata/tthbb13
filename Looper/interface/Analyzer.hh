@@ -41,6 +41,10 @@ public:
 
     template <typename T, class ...Ts>
     T *fsmake(Ts... args);
+    
+    Sequence* getSequence() {
+        return sequence;
+    }
 };
 
 class EventPrinterAnalyzer : public GenericAnalyzer
@@ -234,7 +238,6 @@ public:
 
 class MEAnalyzer : public GenericAnalyzer
 {
-    const std::string label;
     const int me_index;
     
     //coarse ME
@@ -259,6 +262,29 @@ public:
     virtual bool process(EventContainer &event);
 };
 
+class MEMultiHypoAnalyzer : public GenericAnalyzer
+{
+    TFormula formula;
+    
+    //coarse ME
+    TH1D* h_me_discr = 0;
+    
+    //coarse ME vs btag LR
+    TH2D* h_me_discr_btagLR = 0;
+    
+    //Fine ME
+    TH1D* h_me_discr2 = 0;
+
+
+public:
+    MEMultiHypoAnalyzer(
+        TFileDirectory *fs,
+        Sequence *_sequence,
+        const edm::ParameterSet &pset
+    );
+
+    virtual bool process(EventContainer &event);
+};
 
 class MatchAnalyzer : public GenericAnalyzer
 {

@@ -228,10 +228,16 @@ for i in range(6):
 		cms.PSet(
 			type = cms.string("MEAnalyzer"),
 			name = cms.string("mem"+str(i)),
-			label = cms.string(str(i)),
 			MEindex = cms.int32(i),
 		),
 	]
+analyzers += [
+	cms.PSet(
+		type = cms.string("MEMultiHypoAnalyzer"),
+		name = cms.string("mem_comb"),
+		formula = cms.string("([0] + [4]) / ([0] + [4] + 0.15*([1] + [5]))"),
+	),
+]
 
 #Define the "old" ME categories, requiring
 #successful categorization based on njets, Wmass and number of b-tags

@@ -49,6 +49,7 @@ AnalyzerRegistry analyzer_registry =
     {"JetHistogramAnalyzer", &createAnalyzerInstance<JetHistogramAnalyzer>},
     {"BTagHistogramAnalyzer", &createAnalyzerInstance<BTagHistogramAnalyzer>},
     {"MEAnalyzer", &createAnalyzerInstance<MEAnalyzer>},
+    {"MEMultiHypoAnalyzer", &createAnalyzerInstance<MEMultiHypoAnalyzer>},
     {"MatchAnalyzer", &createAnalyzerInstance<MatchAnalyzer>},
     {"GenLevelAnalyzer", &createAnalyzerInstance<GenLevelAnalyzer>},
 //    {"TTHEventPrinterAnalyzer", &createAnalyzerInstance<TTHEventPrinterAnalyzer>},
