@@ -960,23 +960,25 @@ class MEAnalyzer(FilterAnalyzer):
 
         for cfn, cfg in self.configs.items():
             cfg.mem_assumptions = set([])
-            cfg.disabled_categories = set([])
             #A function Event -> boolean which returns true if this ME should be calculated
             cfg.do_calculate = lambda x: True
             cfg.enabled = True
         
-        self.configs["default"].do_calculate = lambda x: len(x.good_jets) >= 6
+        self.configs["default"].do_calculate = (
+            lambda x: len(x.wquark_candidate_jets) >= 2
+        )
         self.configs["MissedWQ"].mem_assumptions.add("missed_wq")
 
         #Can't integrate in dilepton
-        self.configs["MissedWQ"].disabled_categories.add("cat6")
-        #No need to integrate in cat2 (already assume Wq missing)
-        self.configs["MissedWQ"].disabled_categories.add("cat2")
-
-
-        self.configs["Sudakov"].do_calculate = lambda x: len(x.good_jets) == 6
-        self.configs["Sudakov"].disabled_categories.add("cat6")
-        self.configs["Sudakov"].disabled_categories.add("cat3")
+        self.configs["MissedWQ"].do_calculate = (
+            lambda x: len(x.good_leptons) == 1 and
+            len(x.wquark_candidate_jets) >= 1
+        )
+        #only in 6J SL
+        self.configs["Sudakov"].do_calculate = (
+            lambda x: len(x.good_jets) == 6 and
+            len(x.good_leptons) == 1
+        )
 
         #Create the ME integrator.
         #Arguments specify the verbosity
@@ -1167,11 +1169,9 @@ class MEAnalyzer(FilterAnalyzer):
         for hypo in [MEM.Hypothesis.TTH, MEM.Hypothesis.TTBB]:
             for confname in self.memkeys:
                 mem_cfg = self.configs[confname]
-                #print "Checking MEM", confname, event.cat, len(event.good_jets), mem_cfg.do_calculate(event), mem_cfg.enabled, event.cat in mem_cfg.disabled_categories
 
                 #Run MEM if we did not explicitly disable it
                 if (self.conf.mem["calcME"] and
-                        not (event.cat in mem_cfg.disabled_categories) and
                         mem_cfg.do_calculate(event) and mem_cfg.enabled
                     ):
                     print "MEM started", ("hypo", hypo), ("conf", confname)
