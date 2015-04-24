@@ -278,7 +278,6 @@ def getTreeProducer(conf):
                 "tth_py_gen", lambda ev: ev.tth_py_gen if hasattr(ev, "tth_py_gen") else 0,
                 help="generator-level ttH system py"
             ),
-
             NTupleVariable(
                 "tth_px_reco", lambda ev: ev.tth_px_reco if hasattr(ev, "tth_px_reco") else 0,
                 help="reco-level ttH system px from matched jets and leptons"
@@ -287,6 +286,7 @@ def getTreeProducer(conf):
                 "tth_py_reco", lambda ev: ev.tth_py_reco if hasattr(ev, "tth_py_reco") else 0,
                 help="reco-level ttH system py from matched jets and leptons"
             ),
+            
             NTupleVariable(
                 "tth_rho_px_reco", lambda ev: ev.tth_rho_px_reco if hasattr(ev, "tth_rho_px_reco") else 0,
                 help="reco-level ttH system recoil px"
@@ -295,14 +295,24 @@ def getTreeProducer(conf):
                 "tth_rho_py_reco", lambda ev: ev.tth_rho_py_reco if hasattr(ev, "tth_rho_py_reco") else 0,
                 help="reco-level ttH system recoil py"
             ),
+            
+            NTupleVariable(
+                "tth_rho_px_gen", lambda ev: ev.tth_rho_px_gen if hasattr(ev, "tth_rho_px_gen") else 0,
+                help="gen-level ttH system recoil px"
+            ),
+            NTupleVariable(
+                "tth_rho_py_gen", lambda ev: ev.tth_rho_py_gen if hasattr(ev, "tth_rho_py_gen") else 0,
+                help="gen-level ttH system recoil py"
+            ),
         ],
         #FIXME: fill these from the VHbb ntuples
         globalObjects = {},
         collections = {
         #standard dumping of objects
             "met" : NTupleCollection("met", metType, 1, help="Reconstructed MET"),
+            "met_gen" : NTupleCollection("met_gen", metType, 1, help="Generated MET"),
             "met_jetcorr" : NTupleCollection("met_jetcorr", metType, 1, help="Reconstructed MET, corrected to gen-level jets"),
-            "tt_met" : NTupleCollection("met_ttbar_gen", metType, 1, help="Generated MET from ttbar"),
+            "tt_met" : NTupleCollection("met_ttbar_gen", metType, 1, help="Generated MET from nu(top)"),
 
             "b_quarks_t" : NTupleCollection("GenBFromTop", leptonType, 3, help=""),
             "b_quarks_h" : NTupleCollection("GenBFromHiggs", leptonType, 3, help=""),

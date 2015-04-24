@@ -289,6 +289,7 @@ class JetAnalyzer(FilterAnalyzer):
         corrMet_py += sum_dEy
         #print (sum_dEx, sum_dEy), (corrMet_px, event.met[0].px), (corrMet_py, event.met[0].py)
         event.met_jetcorr = [MET(px=corrMet_px, py=corrMet_py)]
+        event.met_gen = [MET(pt=event.met[0].genPt, phi=event.met[0].genPhi)]
 
         return passes
 
@@ -724,12 +725,19 @@ class GenTTHAnalyzer(FilterAnalyzer):
         #Get the total ttH visible pt at gen level
         spx = 0
         spy = 0
-        for p in event.l_quarks_w + event.b_quarks_t + event.b_quarks_h + event.lep_top:
+        for p in (event.l_quarks_w + event.b_quarks_t +
+            event.b_quarks_h + event.lep_top):
             p4 = lvec(p)
             spx += p4.Px()
             spy += p4.Py()
         event.tth_px_gen = spx
         event.tth_py_gen = spy
+        
+        #Calculate tth recoil
+        #rho = -met - tth_matched
+        event.tth_rho_px_gen = -event.met_gen[0].px - event.tth_px_gen
+        event.tth_rho_py_gen = -event.met_gen[0].py - event.tth_py_gen
+
 
         if "gen" in self.conf.general["verbosity"]:
             for j in event.l_quarks_w:
@@ -817,9 +825,9 @@ class GenTTHAnalyzer(FilterAnalyzer):
                 mlabel, midx, mdr = matched_pairs[ij]
                 print "jet match", ij, mlabel, midx, mdr, jet.pt, matches[mlabel][midx].pt
 
-        #recoil = -met + matched jets + matched leptons
-        spx = -event.met[0].px
-        spy = -event.met[0].py
+        #reco-level tth-matched system
+        spx = 0.0
+        spy = 0.0
         for jet in event.good_jets:
             if not (jet.tth_match_label is None):
                 p4 = lvec(jet)
@@ -843,7 +851,7 @@ class GenTTHAnalyzer(FilterAnalyzer):
         #Calculate tth recoil
         #rho = -met - tth_matched
         event.tth_rho_px_reco = -event.met[0].px - event.tth_px_reco
-        event.tth_rho_py_reco = -event.met[0].px - event.tth_px_reco
+        event.tth_rho_py_reco = -event.met[0].py - event.tth_px_reco
 
         passes = True
         if passes:
@@ -1132,7 +1140,7 @@ class MEAnalyzer(FilterAnalyzer):
                 print "lep", l.pt, l.eta, l.phi, l.mass, l.charge
 
         #Check if event passes reco-level requirements to calculate ME
-        if event.cat in self.conf.mem["MECategories"] and event.cat_btag == "H":
+        if event.cat_btag == "H":
             print "MEM RECO PASS", (event.input.run, event.input.lumi, event.input.evt,
                 event.cat, event.btag_LR_4b_2b, len(event.btagged_jets),
                 len(event.wquark_candidate_jets), len(event.good_leptons),
