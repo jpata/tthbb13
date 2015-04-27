@@ -294,8 +294,20 @@ MEAnalyzer::MEAnalyzer(
         "ME discriminator vs btag LR", 6, 0, 1, 6, 0, 1)
     ),
     h_me_discr2(fsmake<TH1D>("me_discr2", "ME discriminator", 1000, 0, 1)),
+    h_me_time_0(fsmake<TH1D>("me_time_0",
+        "ME time tth", 60, 0, 1000)
+    ),
+    h_me_time_1(fsmake<TH1D>("me_time_1",
+        "ME time ttbb", 60, 0, 1000)
+    ),
+    h_me_p_0(fsmake<TH1D>("me_p_0",
+        "ME log10(p) tth", 60, -200, 1)
+    ),
+    h_me_p_1(fsmake<TH1D>("me_p_1",
+        "ME log10(p) ttbb", 60, -200, 1)
+    ),
     h_me_discr_tth_ttbb(fsmake<TH2D>("me_discr_tth_ttbb",
-        "ME discriminator tth vs ttbb log10", 60, -25, -50, 60, -25, -50)
+        "ME proba tth vs ttbb log10", 60, -200, 0, 60, -200, 0)
     )
     
 {
@@ -312,6 +324,7 @@ bool MEAnalyzer::process(EventContainer &event)
     int nmem_ttbb = inp->getValue<int>("nmem_ttbb");
     int nmem_tth = inp->getValue<int>("nmem_tth");
 
+
     if (nmem_ttbb > 0 && nmem_tth > 0) {
         std::vector<double> mem_ttbb = inp->getValue<std::vector<double>>(
             "mem_ttbb_p"
@@ -320,12 +333,22 @@ bool MEAnalyzer::process(EventContainer &event)
             "mem_tth_p"
         );
         
+        std::vector<double> me_time_ttbb = inp->getValue<std::vector<double>>("mem_ttbb_time");
+        std::vector<double> me_time_tth = inp->getValue<std::vector<double>>("mem_tth_time");
+    
         assert(me_index < mem_ttbb.size());
         assert(me_index < mem_tth.size());
         //std::cout << nmem_tth << " " << nmem_ttbb << std::endl;
         double p0 = mem_tth[me_index];
         double p1 = mem_ttbb[me_index];
         
+        
+        h_me_time_0->Fill(me_time_tth[me_index] / 1000.0);
+        h_me_time_1->Fill(me_time_ttbb[me_index] / 1000.0);
+        // 
+        // h_me_p_0->Fill(TMath::Log(p0));
+        // h_me_p_1->Fill(TMath::Log(p1));
+        // 
         h_me_discr_tth_ttbb->Fill(std::log10(p0), std::log10(p1));
         
         double d = p0 / (p0 + 0.15*p1);

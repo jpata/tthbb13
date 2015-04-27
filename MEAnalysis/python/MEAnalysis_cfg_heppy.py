@@ -144,14 +144,16 @@ class Conf:
 
                 #full ME
                 "default",
-                "oldTF",
+                "newTF",
+                "gen",
                 "MissedWQ",
+                "genMissedWQ",
 
                 #These are additional MEM checks, where only part of the MEM is ran.
                 #Switched off by default
 
-                "NumPointsDouble",
-                "NumPointsHalf",
+                #"NumPointsDouble",
+                #"NumPointsHalf",
                 #"NoJacobian",
                 #"NoDecayAmpl",
                 #"NoPDF",

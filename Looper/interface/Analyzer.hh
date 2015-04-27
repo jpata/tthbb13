@@ -249,6 +249,12 @@ class MEAnalyzer : public GenericAnalyzer
     //Fine ME
     TH1D* h_me_discr2 = 0;
     
+    TH1D* h_me_time_0 = 0;
+    TH1D* h_me_time_1 = 0;
+    
+    TH1D* h_me_p_0 = 0;
+    TH1D* h_me_p_1 = 0;
+    
     TH2D* h_me_discr_tth_ttbb = 0;
 
 

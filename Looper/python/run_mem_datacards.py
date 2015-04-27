@@ -104,9 +104,9 @@ def addSeq(seqs, name, req=[]):
 	)]
 
 
-def add_matching(seqs, seq, name):
+def add_matching(seqs, seq, name, prereqs):
 	setattr(process, name, copy.deepcopy(seq))
-
+	addSeq(seqs, name, prereqs)
 	#Book the histograms that run after requiring matching
 	for x in [
 		"wq", "hb", "tb",
@@ -125,24 +125,30 @@ def add_matching(seqs, seq, name):
 	#dependsOn names have to match the names used in setattr
 	#i.e. dependsOn(X) <-> process.X = myseq
 	#
-	addSeq(seqs, name, ["SL"])
+	#addSeq(seqs, name, ["SL"])
 	for x in ["wq", "hb", "tb"]:
-		addSeq(seqs, name + "_match_" + x, ["SL", "match2_" + x])
-		addSeq(seqs, name + "_match_" + x + "_btag", ["SL", "match2_" + x + "_btag"])
-	addSeq(seqs, name + "_match_w2_h2_t2", ["SL", "match2_wq", "match2_hb", "match2_tb"])
-	addSeq(seqs, name + "_match_w2_h0_t2", ["SL", "match2_wq", "match2_tb"])
+		addSeq(seqs, name + "_match_" + x, prereqs + [name, "match2_" + x])
+		addSeq(seqs, name + "_match_" + x + "_btag", prereqs + [name, "match2_" + x + "_btag"])
+	addSeq(seqs, name + "_match_w0_h2_t2", prereqs + [name, "match0_wq", "match2_hb", "match2_tb"])
+	addSeq(seqs, name + "_match_w0_h0_t2", prereqs + [name, "match0_wq", "match2_tb"])
+	
+	addSeq(seqs, name + "_match_w1_h2_t2", prereqs + [name, "match1_wq", "match2_hb", "match2_tb"])
+	addSeq(seqs, name + "_match_w1_h0_t2", prereqs + [name, "match1_wq", "match2_tb"])
+		
+	addSeq(seqs, name + "_match_w2_h2_t2", prereqs + [name, "match2_wq", "match2_hb", "match2_tb"])
+	addSeq(seqs, name + "_match_w2_h0_t2", prereqs + [name, "match2_wq", "match2_tb"])
 	
 	#2 quarks from W matched
-	addSeq(seqs, name + "_match_w2_h2_t2_btag", ["SL", "match2_wq_btag", "match2_hb_btag", "match2_tb_btag"])
-	addSeq(seqs, name + "_match_w2_h0_t2_btag", ["SL", "match2_wq_btag", "match2_tb_btag"])
+	addSeq(seqs, name + "_match_w2_h2_t2_btag", prereqs + [name, "match2_wq_btag", "match2_hb_btag", "match2_tb_btag"])
+	addSeq(seqs, name + "_match_w2_h0_t2_btag", prereqs + [name, "match2_wq_btag", "match2_tb_btag"])
 
 	#1 quark from W matched
-	addSeq(seqs, name + "_match_w1_h2_t2_btag", ["SL", "match1_wq_btag", "match2_hb_btag", "match2_tb_btag"])
-	addSeq(seqs, name + "_match_w1_h0_t2_btag", ["SL", "match1_wq_btag", "match2_tb_btag"])
+	addSeq(seqs, name + "_match_w1_h2_t2_btag", prereqs + [name, "match1_wq_btag", "match2_hb_btag", "match2_tb_btag"])
+	addSeq(seqs, name + "_match_w1_h0_t2_btag", prereqs + [name, "match1_wq_btag", "match2_tb_btag"])
 
 	#0 quark from W matched
-	addSeq(seqs, name + "_match_w0_h2_t2_btag", ["SL", "match0_wq_btag", "match2_hb_btag", "match2_tb_btag"])
-	addSeq(seqs, name + "_match_w0_h0_t2_btag", ["SL", "match0_wq_btag", "match2_tb_btag"])
+	addSeq(seqs, name + "_match_w0_h2_t2_btag", prereqs + [name, "match0_wq_btag", "match2_hb_btag", "match2_tb_btag"])
+	addSeq(seqs, name + "_match_w0_h0_t2_btag", prereqs + [name, "match0_wq_btag", "match2_tb_btag"])
 
 
 #Define the single-lepton selection sequence
@@ -173,8 +179,38 @@ process.SL = cms.VPSet([
 	),
 ])
 
+#Define the single-lepton selection sequence
+process.DL = cms.VPSet([
+
+	#Require gen-level process
+	cms.PSet(
+		type = cms.string("GenLevelAnalyzer"),
+		name = cms.string("gen"),
+	),
+	
+	#Select SL events
+	cms.PSet(
+		type = cms.string("IntSelector"),
+		name = cms.string("is_dl"),
+		branch = cms.string("is_dl"),
+		value = cms.int32(1)
+	),
+	
+	#Save jet and b-tag histograms for events passing SL
+	cms.PSet(
+		type = cms.string("JetHistogramAnalyzer"),
+		name = cms.string("jets"),
+	),
+	cms.PSet(
+		type = cms.string("BTagHistogramAnalyzer"),
+		name = cms.string("btags"),
+	),
+])
+
+
 #Now book the sequence so that it is run
 addSeq(seqs, "SL")
+addSeq(seqs, "DL")
 
 #Define the quark gen-level matching sequences
 for x in ["wq", "hb", "tb"]:
@@ -241,7 +277,7 @@ analyzers += [
 
 #Define the "old" ME categories, requiring
 #successful categorization based on njets, Wmass and number of b-tags
-for i in [1,2,3]: #cat 1-3
+for i in [1, 2, 3, 6]: #cat 1-3
 	#btag L and H
 	for btag_cut, btag_name in [
 		(0, "L"), #btag low region (unimplemented)
@@ -265,7 +301,12 @@ for i in [1,2,3]: #cat 1-3
 		cat = cms.VPSet(procs)
 		
 		name = "cat" + str(i) + btag_name
-		add_matching(seqs, cat, name)
+		if i != 6:
+			addSeq(seqs, name, ["SL"])
+			add_matching(seqs, cat, name, ["SL"])
+		else:
+			addSeq(seqs, name, ["DL"])
+			add_matching(seqs, cat, name, ["DL"])
 
 for x in [
 	"match0_wq", "match0_hb", "match0_tb",
@@ -273,12 +314,19 @@ for x in [
 	"match2_wq", "match2_hb", "match2_tb"
 	]:
 	addSeq(seqs, x, ["SL"])
-for i in [1,2,3]:
-	name = "cat" + str(i) + "H"
-	addSeq(seqs, name, ["SL"])
+	
+for x in [
+	"match0_hb", "match0_tb",
+	"match1_hb", "match1_tb",
+	"match2_hb", "match2_tb"
+	]:
+	addSeq(seqs, x, ["DL"])
 	
 for (nj0, nj1, nt0, nt1) in [
+	(4, 5, 1, 2), #4 jets, 1 tags
+	(4, 5, 2, 3), #4 jets, 2 tags
 	(5, 6, 2, 3), #5 jets, 2 tags
+	(5, 6, 3, 4), #5 jets, 3 tags
 	(6, 999, 2, 3), #>= 6 jets, 2 tags
 	(6, 999, 3, 4), #>= 6 jets, 3 tags
 	(6, 999, 4, 999) #>= 6 jets, >=4 tags
@@ -319,7 +367,8 @@ for (nj0, nj1, nt0, nt1) in [
 	
 	#add the sequence requiring no matching
 	name = "JetTag{0}J{1}T".format(nj0, nt0)
-	add_matching(seqs, seq, name)
+	add_matching(seqs, seq, name+"SL", ["SL"])
+	add_matching(seqs, seq, name+"DL", ["DL"])
 	
 	
 
@@ -328,4 +377,4 @@ process.sequences = cms.VPSet(
 	seqs
 )
 
-#print process.dumpPython()
+print process.dumpPython()
