@@ -29,7 +29,7 @@ samples = {
 		files = cms.VPSet([
 			cms.PSet(
 				fileName=cms.string(
-					"/home/joosep/mac-docs/tth/data/ntp/v10/me6/tth_13tev.root"
+					"/home/joosep/mac-docs/tth/data/ntp/v10/me/tth_13tev.root"
 				)
 			)
 		]),
@@ -44,7 +44,7 @@ samples = {
 		files = cms.VPSet([
 			cms.PSet(
 				fileName=cms.string(
-					"/home/joosep/mac-docs/tth/data/ntp/v10/me6/ttjets_13tev_madgraph_pu20bx25_phys14.root"
+					"/home/joosep/mac-docs/tth/data/ntp/v10/me/ttjets_13tev_madgraph_pu20bx25_phys14.root"
 				)
 			)
 		]),

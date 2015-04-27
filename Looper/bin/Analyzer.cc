@@ -368,9 +368,9 @@ bool MEMultiHypoAnalyzer::process(EventContainer &event)
     
     int nmem_ttbb = inp->getValue<int>("nmem_ttbb");
     int nmem_tth = inp->getValue<int>("nmem_tth");
-    int cat = inp->getValue<int>("cat");
-    int njets = inp->getValue<int>("njets");
-    int ntags = inp->getValue<int>("nBCSVM");
+    //int cat = inp->getValue<int>("cat");
+    //int njets = inp->getValue<int>("njets");
+    //int ntags = inp->getValue<int>("nBCSVM");
 
     if (nmem_tth>0 && nmem_ttbb>0) {
         std::vector<double> mem_ttbb = inp->getValue<std::vector<double>>(
@@ -388,15 +388,15 @@ bool MEMultiHypoAnalyzer::process(EventContainer &event)
             //std::cout << i << " " << mem_tth[i] << " " << mem_ttbb[i] << std::endl;
         }
         
-        const double d0 = mem_tth[0] / (mem_tth[0] + 0.15 * mem_ttbb[0]);
+        //const double d0 = mem_tth[0] / (mem_tth[0] + 0.15 * mem_ttbb[0]);
         const double d1 = formula.Eval(0.0);
-        const double d2 = (mem_tth[0] + mem_tth[2]) /
-            (mem_tth[0] + mem_tth[2] + 0.15 * mem_ttbb[0] + 0.15 * mem_ttbb[2]);
-        cout << name << " " << getSequence()->fullName << " " <<
-            cat << " " << njets << " " << ntags << endl;
-        cout << "p0 " << mem_tth[0] << " " << mem_ttbb[0] << endl;
-        cout << "p2 " << mem_tth[2] << " " << mem_ttbb[2] << endl;
-        cout << "d " << d0 << " " << d1 << " " << d2 << endl;
+        //const double d2 = (mem_tth[0] + mem_tth[2]) /
+        //    (mem_tth[0] + mem_tth[2] + 0.15 * mem_ttbb[0] + 0.15 * mem_ttbb[2]);
+        // cout << name << " " << getSequence()->fullName << " " <<
+        //     cat << " " << njets << " " << ntags << endl;
+        // cout << "p0 " << mem_tth[0] << " " << mem_ttbb[0] << endl;
+        // cout << "p2 " << mem_tth[2] << " " << mem_ttbb[2] << endl;
+        // cout << "d " << d0 << " " << d1 << " " << d2 << endl;
         h_me_discr->Fill(d1);
         h_me_discr2->Fill(d1);
         
