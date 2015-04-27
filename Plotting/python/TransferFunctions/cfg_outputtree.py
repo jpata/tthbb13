@@ -2,8 +2,8 @@
 """
 Thomas:
 
-This program creates cfg_outputtree.dat, which contains a dictionary of all relevant input
-and parameters for outputtree.py.
+This program creates cfg_outputtree.dat, which contains a dictionary of all
+relevant input and parameters for outputtree-strict.py.
 
 """
 
@@ -32,10 +32,12 @@ def Make_config():
     ########################################
 
     ts = time.time()
-    config['date'] = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+    config['date'] = datetime.datetime.fromtimestamp(ts).strftime(
+        '%Y-%m-%d %H:%M:%S')
 
     config['info'] = '*** Information on this config.dat ***\n'\
-    'This config file contains the configuration data used for outputtree.py, which translates a VHBB Ntuple to a format readable by readtree.py. \n\n'\
+    'This config file contains the configuration data used for outputtree.py,'\
+    ' which translates a VHBB Ntuple to a format readable by readtree.py. \n\n'\
     'This config.dat was created on: {0}'.format(config['date'])
 
 
@@ -43,15 +45,12 @@ def Make_config():
     # I/O information
     ########################################
 
-    #config['input_root_file_name'] = '/scratch/tklijnsm/VHBB_HEPPY_V11_G01_ttbar_13tev_phys14_20bx25.root'
-    #config['input_root_file_name'] = 'tth_test_tree.root'
-    #config['input_root_file_name'] = '/scratch/tklijnsm/VHBBHeppyV10_TTbarH_M-125_13TeV_PU20bx25.root'
     config['input_root_file_name'] = '/scratch/tklijnsm/VHBBHeppyV10_TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola.root'
 
     config['input_tree_name'] = 'tree'
 
-    # The config file will be copied to 'runs/{config['run_name']}', and will determine
-    # the name of the .root file.
+    # The config file will be copied to 'runs/{config['run_name']}', and will
+    # be used for the name of the output .root file.
     config['run_name'] = 'V10_full_jets_TTJets'
 
     config['output_root_file_name'] = '/scratch/tklijnsm/{0}.root'.format( config['run_name'] )

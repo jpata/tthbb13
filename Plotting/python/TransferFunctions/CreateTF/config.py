@@ -39,7 +39,8 @@ def Make_config():
     config['date'] = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
 
     config['info'] = '*** Information on this config.dat ***\n'\
-    'This config file contains the input parameters (and some output parameters) used in the creation of TFMat.dat, the matrix of transfer functions. \n\n'\
+    'This config file contains the input parameters (and some output parameters)'\
+    ' used in the creation of TFMat.dat, the matrix of transfer functions. \n\n'\
     'Some html-overviews are produced in the output directory.\n'\
     '\n This config.dat was created on: {0}'.format(config['date'])
 
@@ -47,15 +48,12 @@ def Make_config():
     # I/O information
     ########################################
 
-    #config['input_root_file_name'] = '/scratch/tklijnsm/V11_full_subjets_0.3delR.root'
-    #config['input_root_file_name'] = '/scratch/tklijnsm/V10_full_jets_TTBarH.root'
-    #V11_full_jets_0.3delR.root
-
-    config['input_root_file_name'] = '/scratch/tklijnsm/V11_full_jets_0.3delR.root'
+    config['input_root_file_name'] = '/scratch/tklijnsm/V10_full_jets_TTBarH.root'
+    #config['input_root_file_name'] = '/scratch/tklijnsm/V11_full_jets_0.3delR.root'
 
     config['input_tree_name'] = 'tree'
 
-    config['outputdir'] = 'V11_full_TTbar_0.3delR'
+    config['outputdir'] = 'Testrun-V10-full-jets-TTBarH''
 
         
     config['SBF_fitted_hists_pickle_filename'] = \

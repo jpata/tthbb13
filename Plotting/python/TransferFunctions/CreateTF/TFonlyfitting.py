@@ -2,7 +2,7 @@
 """
 Thomas:
 
-This is TFmain.py. This program runs the full chain of creating a matrix of transfer functions from a customized .root file. To create the customized .root file, see 'outputtree.py'
+This is TFfitting.py. This program only performs the fitting of histograms but does not produce the histograms. It runs fit_single_bins.py, fit_across_bins.py and draw_hists_and_fits.py. For the full chain, see TFmain.py
 
 """
 
@@ -45,12 +45,6 @@ def main():
 
     # Fit across the Pt-bins
     Fit_Across_Bins()
-
-    # Fitting the single bins again, taking TFMatrix.dat as initialization
-    #Fit_Single_Bins()
-
-    # Fit across the Pt-bins again
-    #Fit_Across_Bins()
 
     # Drawing the single bin histograms and the ABF results
     Draw_Hists_and_Fits()

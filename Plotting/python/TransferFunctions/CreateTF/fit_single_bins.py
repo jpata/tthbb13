@@ -74,11 +74,13 @@ def Fit_Single_Bins():
     dicts = pickle.load( pickle_f )
     pickle_f.close()
 
+    """
     # Load TF matrix, if it is already produced
     if os.path.isfile( '{0}/TFMatrix.dat'.format( config['outputdir'] ) ):
         pickle_f = open( '{0}/TFMatrix.dat'.format( config['outputdir'] ) , 'rb' )
         TFmat = pickle.load( pickle_f )
         pickle_f.close()
+    """
 
 
     ########################################
@@ -130,6 +132,8 @@ def Fit_Single_Bins():
 
                 # Doing the fit
 
+                """
+                # TODO: buggy behaviour
                 if hasattr( fitfunc, 'Is_DG' ) and \
                     os.path.isfile('{0}/TFMatrix.dat'.format( config['outputdir'] )):
 
@@ -147,6 +151,7 @@ def Fit_Single_Bins():
 
                         #print 'par {0} = {1}'.format(
                         #    i, f_i.Eval( dic['E_values'][i_eta][i_E] ) )
+                """
 
 
                 dic['hist_mat'][i_eta][i_E].Fit(f1,'Q')
