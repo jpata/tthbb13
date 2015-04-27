@@ -16,7 +16,7 @@ import ROOT
 
 import TTH.TTHNtupleAnalyzer.AccessHelpers as AH
 from TTH.Plotting.gregor.TopSamples import files 
-#from TTH.Plotting.gregor.HiggsSamples import files 
+from TTH.Plotting.gregor.HiggsSamples import files 
 
 
 ########################################
@@ -34,7 +34,7 @@ for k in to_process:
     input_name = files[k]
     input_tree_name = "tree"
 
-    input_pickle_file_name = "/shome/gregor/TTH-73X/CMSSW/src/TTH/Plotting/python/gregor/flat_pt_weights.pickle"
+    input_pickle_file_name = "/shome/gregor/TTH-73X/CMSSW/src/TTH/Plotting/python/gregor/flat_pt_weights_higgs.pickle"
 
 
     ########################################
@@ -85,13 +85,13 @@ for k in to_process:
         pickle_file = open(input_pickle_file_name)
 
         functions_and_parameter_pt  = pickle.load(pickle_file)
-        functions_and_parameter_eta = pickle.load(pickle_file)
+        #functions_and_parameter_eta = pickle.load(pickle_file)
 
         pt_fun = functions_and_parameter_pt[input_name][0]
         pt_param_name = functions_and_parameter_pt[input_name][1]
 
-        eta_fun = functions_and_parameter_eta[input_name][0]
-        eta_param_name = functions_and_parameter_eta[input_name][1]
+        #eta_fun = functions_and_parameter_eta[input_name][0]
+        #eta_param_name = functions_and_parameter_eta[input_name][1]
 
     except KeyError:
         print "WARNING: No weight function found for", input_name
@@ -128,15 +128,15 @@ for k in to_process:
 
         # Calculate the weight
         pt = AH.getter(input_tree, pt_param_name)
-        eta = AH.getter(input_tree, eta_param_name)
-        value = pt_fun(pt) * eta_fun(eta)
+        #eta = AH.getter(input_tree, eta_param_name)
+        value = pt_fun(pt) #* eta_fun(eta)
         if value > 0:
             weight = 1/(value)
         else:
             weight = 0
 
         variables["weight"][0] = weight
-        variables["eta"][0]    = eta
+        #variables["eta"][0]    = eta
         variables["pt"][0]     = pt
 
         output_tree.Fill()
