@@ -53,7 +53,7 @@ def Make_config():
 
     config['input_tree_name'] = 'tree'
 
-    config['outputdir'] = 'Testrun-V10-full-jets-TTBarH''
+    config['outputdir'] = 'Testrun-V10-full-jets-TTBarH'
 
         
     config['SBF_fitted_hists_pickle_filename'] = \
