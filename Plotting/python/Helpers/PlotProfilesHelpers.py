@@ -24,6 +24,9 @@ from TTH.Plotting.Helpers.PrepareRootStyle import myStyle
 ROOT.gROOT.SetStyle("myStyle")
 ROOT.gROOT.ForceStyle()
 
+ROOT.gStyle.SetPalette(53)
+ROOT.TH1.SetDefaultSumw2()
+
 ROOT.TH1.SetDefaultSumw2()
 
 
@@ -371,52 +374,91 @@ def makePlots( dic_files,
         # Line width and Coloring
         prof.SetLineColor( ROOT.kRed) 
         prof.SetLineWidth(2)           
+
+        gr = ROOT.TGraph(h2d.GetXaxis().GetNbins())
+
+        for ibin in range(1, h2d.GetXaxis().GetNbins()+1):
+            proj = h2d.ProjectionY("", ibin, ibin)
+            gr.SetPoint(ibin-1, h2d.GetXaxis().GetBinCenter(ibin), proj.GetXaxis().GetBinCenter(proj.GetMaximumBin()))
+
+
+            
+            #OutputDirectoryHelper.ManyPrint( c, output_dir, plot_name.replace("/","_")+"_projection"+str(ibin) )
+
         
         # Draw the Profile
         tmp_h=prof.Clone()
-        tmp_h.Draw("")   
-        prof.SetFillColor( ROOT.kRed-4 )
-        prof.SetFillStyle( 3253 )   
-        prof.Draw("E2 SAME")
-        prof.SetDirectory(0)
-
         
-        f1 = ROOT.TF1("","1.05 + 0.00230*x  -6.44e-06*x^2")
-        f1.SetRange(0,300)
+        h2d.Draw("COLZ")
+        tmp_h.Draw("SAME")   
+        gr.Draw("PSAME")
 
-        f2 = ROOT.TF1("","1.69  -0.00193*x + 6.09e-07*x^2",300,500)
-        f2.SetRange(300,500)
-        f2.SetLineColor(ROOT.kBlue)
-
-        f3 = ROOT.TF1("","1.89  -0.00274*x + 1.43e-06*x^2",500,2000)
-        f3.SetRange(500,2000)
-
+#
+##        prof.SetFillColor( ROOT.kRed-4 )
+##        prof.SetFillStyle( 3253 )   
+##        #prof.Draw("E2 SAME")
+##        prof.SetDirectory(0)
+##
+##        
+##        #f1 = ROOT.TF1("","1.05 + 0.00230*x  -6.44e-06*x^2")
+##        #f1.SetRange(0,300)
+##        #
+##        #f2 = ROOT.TF1("","1.69  -0.00193*x + 6.09e-07*x^2",300,500)
+##        #f2.SetRange(300,500)
+##        #f2.SetLineColor(ROOT.kBlue)
+##        #
+##        #f3 = ROOT.TF1("","1.89  -0.00274*x + 1.43e-06*x^2",500,2000)
+##        #f3.SetRange(500,2000)
+#
+#        
         f = ROOT.TF1("fit_fun_qcd","[0]+[1]*sqrt(x)+[2]/x+[3]/(x*x)+[4]/(x*x*x)",220,2000)
-        f.SetParameter(0,1)  
-        f.SetParameter(1,1)  
-        f.SetParameter(2,0.5)
+        f.SetParameter(0,-4.02290e+00)  
+        f.SetParameter(1, 8.97577e-02)  
+        f.SetParameter(2, 2.10638e+03)  
+        f.SetParameter(3,-4.19572e+05)  
+        f.SetParameter(4, 3.20825e+07)  
+        
+        #f.SetParameter(0,1)  
+        #f.SetParameter(1,1)  
+        #f.SetParameter(2,0.5)
         f.SetLineColor(ROOT.kRed)
-        prof.Fit(f, "R")
-        f.Print()
+        gr.Fit(f, "R")
+        #f.Print()
+        f.Draw("SAME")
+#        
+#        
+#        f_new = ROOT.TF1("","[0]+[1]*sqrt(x)+[2]/x+[3]/(x*x)+[4]/(x*x*x)",220,2000)
+#        f_new.SetParameter(0,-4.02290e+00)  
+#        f_new.SetParameter(1, 8.97577e-02)  
+#        f_new.SetParameter(2, 2.10638e+03)  
+#        f_new.SetParameter(3,-4.19572e+05)  
+#        f_new.SetParameter(4, 3.20825e+07)  
+#
+#        f_new.SetLineColor(ROOT.kGreen)
+#        f_new.Draw("SAME")        
+#
 
-        f1.Draw("SAME")
-        f2.Draw("SAME")
-        f3.Draw("SAME")
-
-        print "adding to dic:", prof
-        dic_all_profiles[ plot_name ] = prof
-    
-        # Add to legend and draw it
-        if plot.do_legend:
-            if isinstance( plot.sample, str):
-                legend.AddEntry( prof, plot.sample, "LF" )
-            else:
-                legend.AddEntry( prof, plot.sample[0]+" / "+plot.sample[1], "LF" )
-                
-        # Draw the legend
-        if plot.do_legend:
-            legend.Draw()
-
+#        
+      
+#
+#        #f1.Draw("SAME")
+#        #f2.Draw("SAME")
+#        #f3.Draw("SAME")
+#
+#        print "adding to dic:", prof
+#        dic_all_profiles[ plot_name ] = prof
+#    
+#        # Add to legend and draw it
+#        if plot.do_legend:
+#            if isinstance( plot.sample, str):
+#                legend.AddEntry( prof, plot.sample, "LF" )
+#            else:
+#                legend.AddEntry( prof, plot.sample[0]+" / "+plot.sample[1], "LF" )
+#                
+#        # Draw the legend
+#        if plot.do_legend:
+#            legend.Draw()
+#
         # Save the results to a file (in different formats)
         OutputDirectoryHelper.ManyPrint( c, output_dir, plot_name.replace("/","_") )
 

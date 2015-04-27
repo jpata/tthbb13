@@ -66,17 +66,17 @@ for pair_name, pair in pairs.iteritems():
     #              read_from_pickle = True
     #          ))
 
-    mis.append(mi(pair_name + "_interesting_vars_puppi_v40", 
-                  pair[0], pair[1], 
-                  [v for v in interesting_puppi_vars_v40[fatjet_size]], 
-                  fiducial_cut_and_weight, fiducial_cut_and_weight,
-              ))
+    #mis.append(mi(pair_name + "_interesting_vars_puppi_v40", 
+    #              pair[0], pair[1], 
+    #              [v for v in interesting_puppi_vars_v40[fatjet_size]], 
+    #              fiducial_cut_and_weight, fiducial_cut_and_weight,
+    #          ))
         
 
-    #mis.append(mi(pair_name + "_htt", 
-    #              pair[0], pair[1], 
-    #              htt_vars_v36,
-    #              fiducial_cut_and_weight, fiducial_cut_and_weight, True))
+    mis.append(mi(pair_name + "_htt", 
+                  pair[0], pair[1], 
+                  htt_vars_v44,
+                  fiducial_cut_and_weight, fiducial_cut_and_weight, True))
 
     #mis.append(mi(pair_name + "_mass_vars", 
     #               pair[0], pair[1],

@@ -330,16 +330,16 @@ variable('top_size', "Top Size", 0, 4.)
 #]
 #
 
-htt_v39 = ["looseOptRHTT"]# "looseOptRQHTT", "tightOptRQHTT"]
+htt_v44 = ["looseOptRHTT", "looseOptRRejRminHTT"]# "looseOptRQHTT", "tightOptRQHTT"]
 
 
 
-htt_vars_v39 = []
-for htt in htt_v39:
-    htt_vars_v39.append(variable(htt+'_mass', "mass", 0, 400, unit = "GeV"))
-    htt_vars_v39.append(variable(htt+'_fRec', "f_{Rec}", 0, 0.8))
-    htt_vars_v39.append(variable('{0}_Ropt-{0}_RoptCalc'.format(htt), 
-                                 "#Delta R_{opt}", 
+htt_vars_v44 = []
+for htt in htt_v44:
+    htt_vars_v44.append(variable(htt+'_mass', htt+ " mass", 0, 400, unit = "GeV"))
+    htt_vars_v44.append(variable(htt+'_fRec', htt+" f_{Rec}", 0, 0.8))
+    htt_vars_v44.append(variable('{0}_Ropt-{0}_RoptCalc'.format(htt), 
+                                 htt+" #Delta R_{opt}", 
                                  -0.8, 1., 
                                  extra_cut = "({0}_mass > 0)".format(htt)
                              ))
@@ -417,7 +417,7 @@ for fj in ["ca08",
 
 
 mass_vars_v40 = mass_vars_v39
-htt_vars_v40 = htt_vars_v39
+#htt_vars_v40 = htt_vars_v39
 
 variable('ca15trimmedr2f6forbtag_btag', "btag", 0, 1.)
 variable('ca08trimmedr2f6forbtag_btag', "btag", 0, 1.)

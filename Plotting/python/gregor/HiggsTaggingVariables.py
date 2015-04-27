@@ -140,26 +140,47 @@ nice_names = {
 
 
 mass_vars_v10 = []
+tau_vars_v10 = []
 for fj in ["ca15","ak08"]:
-    for groomer in ["",
-                    'filteredn3r3',
-                    'filteredn3r2',
-                    'filteredn2r3',
-                    'filteredn2r2',
-                    'prunedn2z10rfac50',
-                    'trimmedr2f3',
-                    'trimmedr2f6',
-                    'trimmedr2f10',
-                    'softdropz10b00',
-                    'softdropz15b00',
-                    'softdropz15b10',
-                    'softdropz20b10',
-                    'softdropz30b10',
-                    'softdropz30b15',
+
+    tau_vars_v10.append(variable("{0}_tau2/{0}_tau1".format(fj), 
+                                 "tau_{2}/tau_{1} (ungroomed/ungroomed)",
+                                 0, 1.2))
+
+    for groomer in [
+            #"",
+            'filteredn3r3',
+            'filteredn3r2',
+            'filteredn2r3',
+            'filteredn2r2',
+            'prunedn2z10rfac50',
+            'trimmedr2f3',
+            'trimmedr2f6',
+            'trimmedr2f10',
+            'softdropz10b00',
+            'softdropz15b00',
+            'softdropz15b10',
+            'softdropz20b10',
+            'softdropz30b10',
+            'softdropz30b15',
     ]:        
         mass_vars_v10.append(variable("{0}{1}_mass".format(fj,groomer), 
                                       "{0} {1}".format(nice_names[fj], nice_names[groomer]),
                                       0, 300))
+        tau_vars_v10.append(variable("{0}{1}_tau2/{0}{1}_tau1".format(fj,groomer), 
+                                     "tau_{2}/tau_{1} (groomed/groomed)",
+                                      0, 1.2))
+        tau_vars_v10.append(variable("{0}_tau2/{0}{1}_tau1".format(fj,groomer), 
+                                     "tau_{2}/tau_{1} (ungroomed/groomed)",
+                                      0, 1.2))
+        tau_vars_v10.append(variable("{0}{1}_tau2/{0}_tau1".format(fj,groomer), 
+                                     "tau_{2}/tau_{1} (groomed/ungroomed)",
+                                      0, 1.2))
+
+variable("pt","pt",0, 800)
+
+
+
 mass_vars_ca15_v10 = [x for x in mass_vars_v10 if "ca15" in x.name]
 mass_vars_ak08_v10 = [x for x in mass_vars_v10 if "ak08" in x.name]
 

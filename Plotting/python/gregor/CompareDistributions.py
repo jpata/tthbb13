@@ -45,18 +45,19 @@ samples = ["zprime_m1000_low",
            "qcd_170_300",
            "qcd_300_470",
            "qcd_600_800",
-           "qcd_800_1000"]
+           "qcd_800_1000"
+]
 
 for var in [
-        "log(X_chi)",
-        #"X_tau3/X_tau2", 
+        #"log(X_chi)",
+        "X_tau3/X_tau2", 
         #"X_qvol",
-        #"X_mass",
+        "X_mass",
         #"Xtrimmedr2f6forbtag_btag",
-        #"Xtrimmedr2f6_mass",
-        #"Xsoftdropz10b00_mass",
+        "Xtrimmedr2f6_mass",
+        "Xsoftdropz10b00_mass",
         #"Xsoftdropz15b00_mass",
-        #"Xsoftdropz15b10_mass",
+        "Xsoftdropz15b10_mass",
         #"Xsoftdropz15b20_mass",
         #"Xpuppi_mass",
         #"Xpuppitrimmedr2f6_mass",
@@ -64,11 +65,12 @@ for var in [
         #"Xpuppisoftdropz15b00_mass",
         #"Xpuppisoftdropz15b10_mass",
         #"Xpuppisoftdropz15b20_mass",
-        #"Xcmstt_minMass",
-        #"Xcmstt_topMass",
-        #"looseOptRHTT_mass",
-        #"looseOptRHTT_fRec",
-        #"looseOptRHTT_Ropt-looseOptRHTT_RoptCalc",
+        "Xcmstt_minMass",
+        "Xcmstt_topMass",
+        "looseOptRHTT_mass",
+        "looseOptRHTT_fRec",
+        "looseOptRHTT_Ropt-looseOptRHTT_RoptCalc",
+        #"looseOptRRejRminHTT_Ropt-looseOptRRejRminHTT_RoptCalc",
 
 ]:
     
@@ -79,7 +81,7 @@ for var in [
     elif  var == "log(X_chi)":
         xpos = 0.23
     else:
-        xpos = 0.55
+        xpos = 0.57
         
         
     if True:

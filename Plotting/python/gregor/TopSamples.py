@@ -101,6 +101,24 @@ files["qcd_470_600"]      = "ntop_v42_qcd_470_600_pythia8_13tev_phys14_20bx25-ta
 files["qcd_600_800"]      = "ntop_v42_qcd_600_800_pythia8_13tev_phys14_20bx25-tagging"
 files["qcd_800_1000"]     = "ntop_v42_qcd_800_1000_pythia8_13tev_phys14_20bx25-tagging"
 
+#files["zprime_m1000_low"] = "ntop_v43_zprime_m1000_low_1p_13tev_phys14_20bx25-tagging"     
+#files["zprime_m1000"]     = "ntop_v43_zprime_m1000_1p_13tev_phys14_20bx25-tagging"     
+#files["zprime_m2000_low"] = "ntop_v43_zprime_m2000_low_1p_13tev_phys14_20bx25-tagging"     
+#files["zprime_m2000"]     = "ntop_v43_zprime_m2000_1p_13tev_phys14_20bx25-tagging"     
+#files["qcd_170_300"]      = "ntop_v43_qcd_170_300_pythia8_13tev_phys14_20bx25-tagging"
+#files["qcd_300_470"]      = "ntop_v43_qcd_300_470_pythia8_13tev_phys14_20bx25-tagging"
+#files["qcd_600_800"]      = "ntop_v43_qcd_600_800_pythia8_13tev_phys14_20bx25-tagging"
+#files["qcd_800_1000"]     = "ntop_v43_qcd_800_1000_pythia8_13tev_phys14_20bx25-tagging"
+
+#files["zprime_m1000_low"] = "ntop_v44_zprime_m1000_low_1p_13tev_phys14_20bx25-tagging"     
+#files["zprime_m1000"]     = "ntop_v44_zprime_m1000_1p_13tev_phys14_20bx25-tagging"     
+#files["zprime_m2000_low"] = "ntop_v44_zprime_m2000_low_1p_13tev_phys14_20bx25-tagging"     
+#files["zprime_m2000"]     = "ntop_v44_zprime_m2000_1p_13tev_phys14_20bx25-tagging"     
+#files["qcd_170_300"]      = "ntop_v44_qcd_170_300_pythia8_13tev_phys14_20bx25-tagging"
+#files["qcd_300_470"]      = "ntop_v44_qcd_300_470_pythia8_13tev_phys14_20bx25-tagging"
+#files["qcd_600_800"]      = "ntop_v44_qcd_600_800_pythia8_13tev_phys14_20bx25-tagging"
+#files["qcd_800_1000"]     = "ntop_v44_qcd_800_1000_pythia8_13tev_phys14_20bx25-tagging"
+
 
 
 weighted_files = {}
