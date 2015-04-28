@@ -552,7 +552,6 @@ GenLevelAnalyzer::GenLevelAnalyzer(
         "Sample index", 4, 0, 4)
     )
 {
-    LOG(DEBUG) << "MEAnalyzer: created MEAnalyzer";
 };
 
 bool GenLevelAnalyzer::process(EventContainer &event)

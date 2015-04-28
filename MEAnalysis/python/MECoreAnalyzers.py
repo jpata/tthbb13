@@ -733,13 +733,6 @@ class GenTTHAnalyzer(FilterAnalyzer):
                 attach_jet_transfer_function(q, self.conf)
                 event.b_quarks_gen += [q]
 
-        if "input" in self.conf.general["verbosity"]:
-            print "gen Q"
-            for q in event.l_quarks_gen:
-                print q.pt, q.eta, q.phi, q.mass, q.pdgId
-            print "gen B"
-            for q in event.b_quarks_gen:
-                print q.pt, q.eta, q.phi, q.mass, q.pdgId
         #Get the total MET from the neutrinos
         spx = 0
         spy = 0
@@ -843,6 +836,18 @@ class GenTTHAnalyzer(FilterAnalyzer):
                 if jet.btagFlag >= 0.5:
                     event.nMatch_hb_btag += 1
 
+        #Add also b-tagged, unmatched jets to gen-level b-quark collection
+        for jet in event.btagged_jets:
+            jet = copy.deepcopy(jet)
+            if jet.tth_match_label not in ["hb", "tb"]:
+                jet.pt = jet.mcPt
+                jet.eta = jet.mcEta
+                jet.phi = jet.mcPhi
+                jet.mass = jet.mcM
+                jet.pdgId = jet.mcFlavour
+                if len(event.b_quarks_gen) < 4:
+                    event.b_quarks_gen += [jet]
+
         if "matching" in self.conf.general["verbosity"]:
             matches = {"wq":event.l_quarks_w, "tb": event.b_quarks_t, "hb":event.b_quarks_h}
 
@@ -878,7 +883,16 @@ class GenTTHAnalyzer(FilterAnalyzer):
         #Calculate tth recoil
         #rho = -met - tth_matched
         event.tth_rho_px_reco = -event.met[0].px - event.tth_px_reco
-        event.tth_rho_py_reco = -event.met[0].py - event.tth_px_reco
+        event.tth_rho_py_reco = -event.met[0].py - event.tth_py_reco
+
+        #print out gen-level quarks
+        if "input" in self.conf.general["verbosity"]:
+            print "gen Q"
+            for q in event.l_quarks_gen:
+                print q.pt, q.eta, q.phi, q.mass, q.pdgId
+            print "gen B"
+            for q in event.b_quarks_gen:
+                print q.pt, q.eta, q.phi, q.mass, q.pdgId
 
         passes = True
         if passes:
@@ -1010,37 +1024,44 @@ class MEAnalyzer(FilterAnalyzer):
             self.configs[k].lepton_candidates = lambda event: event.good_leptons
 
         for x in ["SL_2qW"]:
-            self.configs[x].do_calculate = lambda y: (
+            self.configs[x].do_calculate = lambda y, c: (
                 len(y.good_leptons) == 1 and
-                len(self.configs[x].b_quark_candidates(y)) >= 4 and
-                len(self.configs[x].l_quark_candidates(y)) >= 2
-            )
-        for x in ["SL_2qW_gen"]:
-            self.configs[x].do_calculate = lambda y: (
-                len(y.good_leptons) == 1 and
-                len(self.configs[x].b_quark_candidates(y)) >= 4 and
-                len(self.configs[x].l_quark_candidates(y)) >= 2 and
+                len(c.b_quark_candidates(y)) >= 4 and
+                len(c.l_quark_candidates(y)) >= 2 and
                 y.cat_btag == 1
             )
-        for x in ["SL_1qW"]:
-            self.configs[x].do_calculate = lambda y: (
+        for x in ["SL_2qW_gen"]:
+            self.configs[x].do_calculate = lambda y, c: (
                 len(y.good_leptons) == 1 and
-                len(self.configs[x].b_quark_candidates(y)) >= 4 and
-                len(self.configs[x].l_quark_candidates(y)) >= 1 and
+                len(c.b_quark_candidates(y)) >= 4 and
+                len(c.l_quark_candidates(y)) >= 2
+            )
+        for x in ["SL_1qW"]:
+            self.configs[x].do_calculate = lambda y, c: (
+                len(y.good_leptons) == 1 and
+                len(c.b_quark_candidates(y)) >= 4 and
+                len(c.l_quark_candidates(y)) >= 1 and
                 y.cat_btag == 1
             )
             self.configs[x].mem_assumptions.add("missed_wq")
         for x in ["SL_1qW_gen"]:
-            self.configs[x].do_calculate = lambda y: (
+            self.configs[x].do_calculate = lambda y, c: (
                 len(y.good_leptons) == 1 and
-                len(self.configs[x].b_quark_candidates(y)) >= 4 and
-                len(self.configs[x].l_quark_candidates(y)) >= 1
+                len(c.b_quark_candidates(y)) >= 4 and
+                len(c.l_quark_candidates(y)) >= 1
             )
             self.configs[x].mem_assumptions.add("missed_wq")
-        for x in ["DL", "DL_gen"]:
-            self.configs[x].do_calculate = lambda y: (
+        for x in ["DL"]:
+            self.configs[x].do_calculate = lambda y, c: (
                 len(y.good_leptons) == 2 and
-                len(self.configs[x].b_quark_candidates(y)) >= 4
+                len(c.b_quark_candidates(y)) >= 4 and
+                y.cat_btag == 1
+            )
+            self.configs[x].mem_assumptions.add("dl")
+        for x in ["DL_gen"]:
+            self.configs[x].do_calculate = lambda y, c: (
+                len(y.good_leptons) == 2 and
+                len(c.b_quark_candidates(y)) >= 4
             )
             self.configs[x].mem_assumptions.add("dl")
 
@@ -1246,7 +1267,7 @@ class MEAnalyzer(FilterAnalyzer):
 
                 #Run MEM if we did not explicitly disable it
                 if (self.conf.mem["calcME"] and
-                        mem_cfg.do_calculate(event) and mem_cfg.enabled
+                        mem_cfg.do_calculate(event, mem_cfg) and mem_cfg.enabled
                     ):
 
                     fstate = MEM.FinalState.TTH
