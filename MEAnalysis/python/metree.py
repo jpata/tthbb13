@@ -36,13 +36,24 @@ leptonType = NTupleObjectType("leptonType", variables = [
     NTupleVariable("phi", lambda x : x.phi),
     NTupleVariable("mass", lambda x : x.mass),
     NTupleVariable("pdgId", lambda x : x.pdgId),
+    NTupleVariable("relIso03", lambda x : x.relIso03),
+    NTupleVariable("relIso04", lambda x : x.relIso04),
     #NTupleVariable("mcPt", lambda x : x.mcPt),
     #NTupleVariable("mcEta", lambda x : x.mcEta),
     #NTupleVariable("mcPhi", lambda x : x.mcPhi),
     #NTupleVariable("mcMass", lambda x : x.mcMass),
 ])
 
-metType = NTupleObjectType("leptonType", variables = [
+#Specifies what to save for leptons
+quarkType = NTupleObjectType("quarkType", variables = [
+    NTupleVariable("pt", lambda x : x.pt),
+    NTupleVariable("eta", lambda x : x.eta),
+    NTupleVariable("phi", lambda x : x.phi),
+    NTupleVariable("mass", lambda x : x.mass),
+    NTupleVariable("pdgId", lambda x : x.pdgId),
+])
+
+metType = NTupleObjectType("metType", variables = [
     NTupleVariable("pt", lambda x : x.pt),
     NTupleVariable("phi", lambda x : x.phi),
     NTupleVariable("px", lambda x : x.px),
@@ -271,6 +282,18 @@ def getTreeProducer(conf):
             ),
 
             NTupleVariable(
+                "n_mu", lambda ev: ev.n_mu if hasattr(ev, "n_mu") else 0,
+                type=int,
+                help="Number of tight selected muons"
+            ),
+
+            NTupleVariable(
+                "n_el", lambda ev: ev.n_el if hasattr(ev, "n_el") else 0,
+                type=int,
+                help="Number of tight selected electrons"
+            ),
+
+            NTupleVariable(
                 "tth_px_gen", lambda ev: ev.tth_px_gen if hasattr(ev, "tth_px_gen") else 0,
                 help="generator-level ttH system px"
             ),
@@ -286,7 +309,7 @@ def getTreeProducer(conf):
                 "tth_py_reco", lambda ev: ev.tth_py_reco if hasattr(ev, "tth_py_reco") else 0,
                 help="reco-level ttH system py from matched jets and leptons"
             ),
-            
+
             NTupleVariable(
                 "tth_rho_px_reco", lambda ev: ev.tth_rho_px_reco if hasattr(ev, "tth_rho_px_reco") else 0,
                 help="reco-level ttH system recoil px"
@@ -295,7 +318,7 @@ def getTreeProducer(conf):
                 "tth_rho_py_reco", lambda ev: ev.tth_rho_py_reco if hasattr(ev, "tth_rho_py_reco") else 0,
                 help="reco-level ttH system recoil py"
             ),
-            
+
             NTupleVariable(
                 "tth_rho_px_gen", lambda ev: ev.tth_rho_px_gen if hasattr(ev, "tth_rho_px_gen") else 0,
                 help="gen-level ttH system recoil px"
@@ -314,9 +337,9 @@ def getTreeProducer(conf):
             "met_jetcorr" : NTupleCollection("met_jetcorr", metType, 1, help="Reconstructed MET, corrected to gen-level jets"),
             "tt_met" : NTupleCollection("met_ttbar_gen", metType, 1, help="Generated MET from nu(top)"),
 
-            "b_quarks_t" : NTupleCollection("GenBFromTop", leptonType, 3, help=""),
-            "b_quarks_h" : NTupleCollection("GenBFromHiggs", leptonType, 3, help=""),
-            "l_quarks_w" : NTupleCollection("GenQFromW", leptonType, 5, help=""),
+            "b_quarks_t" : NTupleCollection("GenBFromTop", quarkType, 2, help=""),
+            "b_quarks_h" : NTupleCollection("GenBFromHiggs", quarkType, 2, help=""),
+            "l_quarks_w" : NTupleCollection("GenQFromW", quarkType, 4, help=""),
             "good_jets" : NTupleCollection("jets", jetType, 9, help="Selected jets"),
             "good_leptons" : NTupleCollection("leps", leptonType, 2, help="Selected leptons"),
             "mem_results_tth" : NTupleCollection("mem_tth", memType, len(conf.mem["methodsToRun"]), help="MEM tth"),
