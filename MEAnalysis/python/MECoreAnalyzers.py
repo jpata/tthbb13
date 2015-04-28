@@ -231,7 +231,7 @@ class JetAnalyzer(FilterAnalyzer):
         #Assing jet transfer functions
         for jet in event.good_jets:
             attach_jet_transfer_function(jet, self.conf)
-            
+
         event.numJets = len(event.good_jets)
         self.counters["jets"].inc("good", len(event.good_jets))
 
@@ -676,10 +676,10 @@ class GenTTHAnalyzer(FilterAnalyzer):
 
     def beginLoop(self, setup):
         super(GenTTHAnalyzer, self).beginLoop(setup)
-    
+
     def pass_jet_selection(self, quark):
         return quark.pt > 30 and abs(quark.eta) < 2.5
-        
+
     def process(self, event):
         self.counters["processing"].inc("processed")
 
@@ -711,10 +711,10 @@ class GenTTHAnalyzer(FilterAnalyzer):
             len(event.b_quarks_t) == 2):
             event.cat_gen = "fh"
             event.n_cat_gen = 2
-        
+
         event.l_quarks_gen = []
         event.b_quarks_gen = []
-        
+
         for q in event.l_quarks_w:
             if self.pass_jet_selection(q):
                 q.btagFlag = 0.0
@@ -732,14 +732,7 @@ class GenTTHAnalyzer(FilterAnalyzer):
                 q.btagFlag = 1.0
                 attach_jet_transfer_function(q, self.conf)
                 event.b_quarks_gen += [q]
-        
-        if "input" in self.conf.general["verbosity"]:
-            print "gen Q"
-            for q in event.l_quarks_gen:
-                print q.pt, q.eta, q.phi, q.mass, q.pdgId
-            print "gen B"
-            for q in event.b_quarks_gen:
-                print q.pt, q.eta, q.phi, q.mass, q.pdgId
+
         #Get the total MET from the neutrinos
         spx = 0
         spy = 0
@@ -759,7 +752,7 @@ class GenTTHAnalyzer(FilterAnalyzer):
             spy += p4.Py()
         event.tth_px_gen = spx
         event.tth_py_gen = spy
-        
+
         #Calculate tth recoil
         #rho = -met - tth_matched
         event.tth_rho_px_gen = -event.met_gen[0].px - event.tth_px_gen
@@ -843,6 +836,18 @@ class GenTTHAnalyzer(FilterAnalyzer):
                 if jet.btagFlag >= 0.5:
                     event.nMatch_hb_btag += 1
 
+        #Add also b-tagged, unmatched jets to gen-level b-quark collection
+        for jet in event.btagged_jets:
+            jet = copy.deepcopy(jet)
+            if jet.tth_match_label not in ["hb", "tb"]:
+                jet.pt = jet.mcPt
+                jet.eta = jet.mcEta
+                jet.phi = jet.mcPhi
+                jet.mass = jet.mcM
+                jet.pdgId = jet.mcFlavour
+                if len(event.b_quarks_gen) < 4:
+                    event.b_quarks_gen += [jet]
+
         if "matching" in self.conf.general["verbosity"]:
             matches = {"wq":event.l_quarks_w, "tb": event.b_quarks_t, "hb":event.b_quarks_h}
 
@@ -878,7 +883,16 @@ class GenTTHAnalyzer(FilterAnalyzer):
         #Calculate tth recoil
         #rho = -met - tth_matched
         event.tth_rho_px_reco = -event.met[0].px - event.tth_px_reco
-        event.tth_rho_py_reco = -event.met[0].py - event.tth_px_reco
+        event.tth_rho_py_reco = -event.met[0].py - event.tth_py_reco
+
+        #print out gen-level quarks
+        if "input" in self.conf.general["verbosity"]:
+            print "gen Q"
+            for q in event.l_quarks_gen:
+                print q.pt, q.eta, q.phi, q.mass, q.pdgId
+            print "gen B"
+            for q in event.b_quarks_gen:
+                print q.pt, q.eta, q.phi, q.mass, q.pdgId
 
         passes = True
         if passes:
@@ -979,12 +993,12 @@ class MEAnalyzer(FilterAnalyzer):
         self.configs["Recoil"].defaultCfg()
         self.configs["Sudakov"].defaultCfg()
         self.configs["Minimize"].defaultCfg()
-                    
+
         for (k, v) in self.configs.items():
-            
+
             #By default, assume both q(W) reconstructed
             v.do_calculate = (
-                lambda x: len(x.wquark_candidate_jets) >= 2
+                lambda x: len(x.wquark_candidate_jets) >= 2 and x.cat_btag=="H"
             )
             v.b_quark_candidates = lambda event: event.btagged_jets
             v.l_quark_candidates = lambda event: event.wquark_candidate_jets
@@ -993,22 +1007,21 @@ class MEAnalyzer(FilterAnalyzer):
 
             v.mem_assumptions = set([])
             #A function Event -> boolean which returns true if this ME should be calculated
-            v.do_calculate = lambda x: True
             v.enabled = True
-            
+
             for nb in [0, 1]:
                 for fl1, fl2 in [('b', MEM.TFType.bLost), ('l', MEM.TFType.qLost)]:
                     tf = self.conf.tf_matrix[fl1][nb].Make_CDF()
-                    
+
                     #set pt cut for efficiency function
                     tf.SetParameter(0, self.conf.jets["pt"])
                     v.set_tf_global(fl2, nb, tf)
 
         self.configs["newTF"].transfer_function_method = MEM.TFMethod.External
-        
+
         #Generator-level MEM uses quarks as inputs
-        self.configs["gen"].do_calculate = lambda x: len(x.b_quarks_gen)==4 and len(x.l_quarks_gen)==2
-        self.configs["genMissedWQ"].do_calculate = lambda x: len(x.b_quarks_gen)==4 and len(x.l_quarks_gen)>=1
+        self.configs["gen"].do_calculate = lambda x: len(x.b_quarks_gen)>=4 and len(x.l_quarks_gen)==2
+        self.configs["genMissedWQ"].do_calculate = lambda x: len(x.b_quarks_gen)>=4 and len(x.l_quarks_gen)>=1
         for k in ["gen", "genMissedWQ"]:
             self.configs[k].b_quark_candidates = lambda event: event.b_quarks_gen
             self.configs[k].l_quark_candidates = lambda event: event.l_quarks_gen
@@ -1033,26 +1046,22 @@ class MEAnalyzer(FilterAnalyzer):
         self.configs["Sudakov"].int_code |= MEM.IntegrandType.Sudakov
         self.configs["Minimize"].do_minimize = 1
         self.configs["Minimize"].int_code = 0
-        
-        self.configs["default"].do_calculate = (
-            lambda x: len(x.wquark_candidate_jets) >= 2
-        )
         self.configs["MissedWQ"].mem_assumptions.add("missed_wq")
         self.configs["MissedWQOldTF"].mem_assumptions.add("missed_wq")
 
         #Can't integrate in dilepton
         self.configs["MissedWQ"].do_calculate = (
             lambda x: len(x.good_leptons) == 1 and
-            len(x.wquark_candidate_jets) >= 1
+            len(x.wquark_candidate_jets) >= 1 and x.cat_btag=="H"
         )
         self.configs["MissedWQOldTF"].do_calculate = (
             lambda x: len(x.good_leptons) == 1 and
-            len(x.wquark_candidate_jets) >= 1
+            len(x.wquark_candidate_jets) >= 1 and x.cat_btag=="H"
         )
         #only in 6J SL
         self.configs["Sudakov"].do_calculate = (
             lambda x: len(x.good_jets) == 6 and
-            len(x.good_leptons) == 1
+            len(x.good_leptons) == 1 and x.cat_btag=="H"
         )
 
         #Create the ME integrator.
@@ -1203,16 +1212,6 @@ class MEAnalyzer(FilterAnalyzer):
             for l in leptons:
                 print "lep", l.pt, l.eta, l.phi, l.mass, l.charge
 
-        #Check if event passes reco-level requirements to calculate ME
-        if event.cat_btag == "H":
-            print "MEM RECO PASS", (event.input.run, event.input.lumi, event.input.evt,
-                event.cat, event.btag_LR_4b_2b, len(event.btagged_jets),
-                len(event.wquark_candidate_jets), len(event.good_leptons),
-                len(event.btagged_jets), len(event.buntagged_jets)
-            )
-        else:
-            #Don't calculate ME
-            return True
 
 
         #Here we optionally restrict the ME calculation to only matched events
@@ -1258,6 +1257,7 @@ class MEAnalyzer(FilterAnalyzer):
 
                     res[(hypo, confname)] = r
                 else:
+                    print "Skipped MEM", confname
                     r = MEM.MEMOutput()
                     res[(hypo, confname)] = r
 

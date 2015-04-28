@@ -62,6 +62,14 @@ memType = NTupleObjectType("memType", variables = [
     NTupleVariable("nperm", lambda x : x.num_perm, type=int),
 ])
 
+quarkType = NTupleObjectType("quarkType", variables = [
+    NTupleVariable("pt", lambda x : x.pt),
+    NTupleVariable("eta", lambda x : x.eta),
+    NTupleVariable("phi", lambda x : x.phi),
+    NTupleVariable("mass", lambda x : x.mass),
+    NTupleVariable("id", lambda x : x.pdgId),
+])
+
 
 def getTreeProducer(conf):
     #Create the output TTree writer
@@ -286,7 +294,7 @@ def getTreeProducer(conf):
                 "tth_py_reco", lambda ev: ev.tth_py_reco if hasattr(ev, "tth_py_reco") else 0,
                 help="reco-level ttH system py from matched jets and leptons"
             ),
-            
+
             NTupleVariable(
                 "tth_rho_px_reco", lambda ev: ev.tth_rho_px_reco if hasattr(ev, "tth_rho_px_reco") else 0,
                 help="reco-level ttH system recoil px"
@@ -295,7 +303,7 @@ def getTreeProducer(conf):
                 "tth_rho_py_reco", lambda ev: ev.tth_rho_py_reco if hasattr(ev, "tth_rho_py_reco") else 0,
                 help="reco-level ttH system recoil py"
             ),
-            
+
             NTupleVariable(
                 "tth_rho_px_gen", lambda ev: ev.tth_rho_px_gen if hasattr(ev, "tth_rho_px_gen") else 0,
                 help="gen-level ttH system recoil px"
@@ -314,9 +322,11 @@ def getTreeProducer(conf):
             "met_jetcorr" : NTupleCollection("met_jetcorr", metType, 1, help="Reconstructed MET, corrected to gen-level jets"),
             "tt_met" : NTupleCollection("met_ttbar_gen", metType, 1, help="Generated MET from nu(top)"),
 
-            "b_quarks_t" : NTupleCollection("GenBFromTop", leptonType, 3, help=""),
-            "b_quarks_h" : NTupleCollection("GenBFromHiggs", leptonType, 3, help=""),
-            "l_quarks_w" : NTupleCollection("GenQFromW", leptonType, 5, help=""),
+            "b_quarks_gen" : NTupleCollection("b_quarks_gen", quarkType, 5, help=""),
+            "l_quarks_gen" : NTupleCollection("l_quarks_gen", quarkType, 3, help=""),
+            "b_quarks_t" : NTupleCollection("GenBFromTop", quarkType, 3, help=""),
+            "b_quarks_h" : NTupleCollection("GenBFromHiggs", quarkType, 3, help=""),
+            "l_quarks_w" : NTupleCollection("GenQFromW", quarkType, 5, help=""),
             "good_jets" : NTupleCollection("jets", jetType, 9, help="Selected jets"),
             "good_leptons" : NTupleCollection("leps", leptonType, 2, help="Selected leptons"),
             "mem_results_tth" : NTupleCollection("mem_tth", memType, len(conf.mem["methodsToRun"]), help="MEM tth"),

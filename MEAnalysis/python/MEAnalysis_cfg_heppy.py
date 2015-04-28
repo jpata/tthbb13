@@ -144,7 +144,7 @@ class Conf:
 
                 #full ME
                 "default",
-                "newTF",
+                #"newTF",
                 "gen",
                 "MissedWQ",
                 "genMissedWQ",
@@ -162,9 +162,9 @@ class Conf:
                 #"NuPhiRestriction",
                 #"JetsPtOrder",
                 #"JetsPtOrderIntegrationRange",
-                "Recoil",
-                "Sudakov",
-                "Minimize",
+                #"Recoil",
+                #"Sudakov",
+                #"Minimize",
             ],
 
         }
