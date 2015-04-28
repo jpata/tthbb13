@@ -227,9 +227,11 @@ AH.addScalarBranches(variables,
                      datatype = 'float')
 
 AH.addScalarBranches(variables, variable_types, outtree,
-                     ["top_size"],
+                     ["top_size", 
+                      "b_pt", "b_eta", "b_phi", "b_mass",
+                      "w1_pt", "w1_eta", "w1_phi", "w1_mass",
+                      "w2_pt", "w2_eta", "w2_phi", "w2_mass"],
                      datatype = 'float')
-
 
 # Setup the output branches for tagging variables
 objects_to_pop = []
@@ -306,24 +308,74 @@ for i_event in range(n_entries):
                 true_top_name = "gen_tbar"
         
             # b-quark
-            b_eta = AH.getter(intree, "{0}__b__eta".format(true_top_name))
-            b_phi = AH.getter(intree, "{0}__b__phi".format(true_top_name))
+            b_pt   = AH.getter(intree, "{0}__b__pt".format(true_top_name))
+            b_eta  = AH.getter(intree, "{0}__b__eta".format(true_top_name))
+            b_phi  = AH.getter(intree, "{0}__b__phi".format(true_top_name))
+            b_mass = AH.getter(intree, "{0}__b__mass".format(true_top_name))
+
             # leading w daughter
-            w1_eta = AH.getter(intree, "{0}__w_d1__eta".format(true_top_name))
-            w1_phi = AH.getter(intree, "{0}__w_d1__phi".format(true_top_name))
+            w1_pt   = AH.getter(intree, "{0}__w_d1__pt".format(true_top_name))
+            w1_eta  = AH.getter(intree, "{0}__w_d1__eta".format(true_top_name))
+            w1_phi  = AH.getter(intree, "{0}__w_d1__phi".format(true_top_name))
+            w1_mass = AH.getter(intree, "{0}__w_d1__mass".format(true_top_name))
+
             # sub-leading w daughter
-            w2_eta = AH.getter(intree, "{0}__w_d2__eta".format(true_top_name))
-            w2_phi = AH.getter(intree, "{0}__w_d2__phi".format(true_top_name))
+            w2_pt   = AH.getter(intree, "{0}__w_d2__pt".format(true_top_name))
+            w2_eta  = AH.getter(intree, "{0}__w_d2__eta".format(true_top_name))
+            w2_phi  = AH.getter(intree, "{0}__w_d2__phi".format(true_top_name))
+            w2_mass = AH.getter(intree, "{0}__w_d2__mass".format(true_top_name))
 
             # Take maximal distance of a decay product to the top as the tops size
             x = deltaR(b_eta, b_phi, variables["hadtop_eta"][0], variables["hadtop_phi"][0])
             y = deltaR(w1_eta, w1_phi, variables["hadtop_eta"][0], variables["hadtop_phi"][0])
             z = deltaR(w2_eta, w2_phi, variables["hadtop_eta"][0], variables["hadtop_phi"][0])
+
+            variables["b_pt"][0]   = b_pt
+            variables["b_eta"][0]  = b_eta
+            variables["b_phi"][0]  = b_phi
+            variables["b_mass"][0] = b_mass
+
+            if w1_pt > w2_pt:
+                variables["w1_pt"][0]   = w1_pt
+                variables["w1_eta"][0]  = w1_eta
+                variables["w1_phi"][0]  = w1_phi
+                variables["w1_mass"][0] = w1_mass
+
+                variables["w2_pt"][0]   = w2_pt
+                variables["w2_eta"][0]  = w2_eta
+                variables["w2_phi"][0]  = w2_phi
+                variables["w2_mass"][0] = w2_mass        
+            else:
+                variables["w1_pt"][0]   = w2_pt
+                variables["w1_eta"][0]  = w2_eta
+                variables["w1_phi"][0]  = w2_phi
+                variables["w1_mass"][0] = w2_mass
+
+                variables["w2_pt"][0]   = w1_pt
+                variables["w2_eta"][0]  = w1_eta
+                variables["w2_phi"][0]  = w1_phi
+                variables["w2_mass"][0] = w1_mass        
+
                         
-            top_size = max([x,y,z])
-        else:
-            top_size = -1
-        variables["top_size"][0] = top_size
+            variables["top_size"][0] = max([x,y,z])
+        else:            
+            variables["b_pt"][0]   = -1
+            variables["b_eta"][0]  = -1
+            variables["b_phi"][0]  = -1
+            variables["b_mass"][0] = -1
+
+            variables["w1_pt"][0]   = -1
+            variables["w1_eta"][0]  = -1
+            variables["w1_phi"][0]  = -1
+            variables["w1_mass"][0] = -1
+
+            variables["w2_pt"][0]   = -1
+            variables["w2_eta"][0]  = -1
+            variables["w2_phi"][0]  = -1
+            variables["w2_mass"][0] = -1
+
+            variables["top_size"][0] = -1
+
             
         # Fill fatjets and taggers
         for object_name, branch_names in objects.iteritems():    
