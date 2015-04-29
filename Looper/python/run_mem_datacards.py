@@ -49,14 +49,74 @@ samples = {
             )
         ]),
         firstEvent=cms.int64(0), #first event index
-        lastEvent=cms.int64(5000000-1), #laste event index (inclusive)
+        lastEvent=cms.int64(-1), #laste event index (inclusive)
+        sampleTypeMajor = cms.uint32(2),
+    ),
+    "ttjets_bb": cms.PSet(
+        type = cms.string("TChainInput"),
+        name = cms.string("ttjets_bb"),
+        treeName = cms.string("tree"),
+        files = cms.VPSet([
+            cms.PSet(
+                fileName=cms.string(
+                    "/home/joosep/mac-docs/tth/data/ntp/v10/me/ttjets_13tev_madgraph_pu20bx25_phys14_ttbb.root"
+                )
+            )
+        ]),
+        firstEvent=cms.int64(0), #first event index
+        lastEvent=cms.int64(-1), #laste event index (inclusive)
+        sampleTypeMajor = cms.uint32(2),
+    ),
+    "ttjets_b": cms.PSet(
+        type = cms.string("TChainInput"),
+        name = cms.string("ttjets_b"),
+        treeName = cms.string("tree"),
+        files = cms.VPSet([
+            cms.PSet(
+                fileName=cms.string(
+                    "/home/joosep/mac-docs/tth/data/ntp/v10/me/ttjets_13tev_madgraph_pu20bx25_phys14_ttb.root"
+                )
+            )
+        ]),
+        firstEvent=cms.int64(0), #first event index
+        lastEvent=cms.int64(-1), #laste event index (inclusive)
+        sampleTypeMajor = cms.uint32(2),
+    ),
+    "ttjets_cc": cms.PSet(
+        type = cms.string("TChainInput"),
+        name = cms.string("ttjets_cc"),
+        treeName = cms.string("tree"),
+        files = cms.VPSet([
+            cms.PSet(
+                fileName=cms.string(
+                    "/home/joosep/mac-docs/tth/data/ntp/v10/me/ttjets_13tev_madgraph_pu20bx25_phys14_ttcc.root"
+                )
+            )
+        ]),
+        firstEvent=cms.int64(0), #first event index
+        lastEvent=cms.int64(-1), #laste event index (inclusive)
+        sampleTypeMajor = cms.uint32(2),
+    ),
+    "ttjets_ll": cms.PSet(
+        type = cms.string("TChainInput"),
+        name = cms.string("ttjets_ll"),
+        treeName = cms.string("tree"),
+        files = cms.VPSet([
+            cms.PSet(
+                fileName=cms.string(
+                    "/home/joosep/mac-docs/tth/data/ntp/v10/me/ttjets_13tev_madgraph_pu20bx25_phys14_ttll.root"
+                )
+            )
+        ]),
+        firstEvent=cms.int64(0), #first event index
+        lastEvent=cms.int64(-1), #laste event index (inclusive)
         sampleTypeMajor = cms.uint32(2),
     )
 }
 
 if runChunks:
     chunks = []
-    for sample in ["tth", "ttjets"]:
+    for sample in ["tth", "ttjets", "ttjets_bb", "ttjets_b", "ttjets_cc", "ttjets_ll"]:
         samp = samples[sample]
         fns = map(lambda x: x.fileName.value(), samp.files)
         tchain = ROOT.TChain("tree")
@@ -71,7 +131,7 @@ if runChunks:
                 samp
             ]
     process.inputs = cms.VPSet([chunks[int(JOBINDEX)]])
-    print "Running job", JOBINDEX, "/", len(chunks)
+    print "Running job", JOBINDEX, "/", len(chunks)-1, "(inclusive)"
 else:
     #Configures the input files
     #if first (last) event == -1, use 0 (Nentries-1)
@@ -146,9 +206,9 @@ def add_matching(seqs, seq, name, prereqs):
     addSeq(seqs, name + "_match_w1_h2_t2_btag", prereqs + [name, "match1_wq_btag", "match2_hb_btag", "match2_tb_btag"])
     addSeq(seqs, name + "_match_w1_h0_t2_btag", prereqs + [name, "match1_wq_btag", "match2_tb_btag"])
 
-    ##0 quark from W matched
-    #addSeq(seqs, name + "_match_w0_h2_t2_btag", prereqs + [name, "match0_wq_btag", "match2_hb_btag", "match2_tb_btag"])
-    #addSeq(seqs, name + "_match_w0_h0_t2_btag", prereqs + [name, "match0_wq_btag", "match2_tb_btag"])
+    #0 quark from W matched
+    addSeq(seqs, name + "_match_w0_h2_t2_btag", prereqs + [name, "match0_wq_btag", "match2_hb_btag", "match2_tb_btag"])
+    addSeq(seqs, name + "_match_w0_h0_t2_btag", prereqs + [name, "match0_wq_btag", "match2_tb_btag"])
 
 
 #Define the single-lepton selection sequence
@@ -169,6 +229,10 @@ process.SL = cms.VPSet([
     ),
 
     #Save jet and b-tag histograms for events passing SL
+    cms.PSet(
+        type = cms.string("LeptonHistogramAnalyzer"),
+        name = cms.string("leps"),
+    ),
     cms.PSet(
         type = cms.string("JetHistogramAnalyzer"),
         name = cms.string("jets"),
@@ -209,6 +273,10 @@ for (nmu, nel, name) in [(1,1,"em"), (2,0,"mm"), (0,2,"ee")]:
         ),
 
         #Save jet and b-tag histograms for events passing SL
+        cms.PSet(
+            type = cms.string("LeptonHistogramAnalyzer"),
+            name = cms.string("leps"),
+        ),
         cms.PSet(
             type = cms.string("JetHistogramAnalyzer"),
             name = cms.string("jets"),
@@ -253,6 +321,10 @@ for x in ["wq", "hb", "tb"]:
 #Define the histograms that are drawn after evaluating the ME
 analyzers = [
     cms.PSet(
+        type = cms.string("LeptonHistogramAnalyzer"),
+        name = cms.string("leps"),
+    ),
+    cms.PSet(
         type = cms.string("JetHistogramAnalyzer"),
         name = cms.string("jets"),
     ),
@@ -290,7 +362,7 @@ analyzers += [
 for i in [1, 2, 3, 6]: #cat 1-3
     #btag L and H
     for btag_cut, btag_name in [
-        (0, "L"), #btag low region (unimplemented)
+        (-1, "L"), #btag low region (unimplemented)
         (1, "H") #btag high region
     ]:
         procs = [

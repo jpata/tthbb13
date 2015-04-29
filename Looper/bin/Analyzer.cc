@@ -165,7 +165,9 @@ JetHistogramAnalyzer::JetHistogramAnalyzer(
     h_csv1c(fsmake<TH1D>("jet1_csvc", "Sub-leading jet csv c", 30, 0, 1.0)),
     h_csv1l(fsmake<TH1D>("jet1_csvl", "Sub-leading jet csv uds", 30, 0, 1.0)),
     h_csv1g(fsmake<TH1D>("jet1_csvg", "Sub-leading jet csv g", 30, 0, 1.0)),
-    h_csv1lg(fsmake<TH1D>("jet1_csvlg", "Sub-leading jet csv udsg", 30, 0, 1.0))
+    h_csv1lg(fsmake<TH1D>("jet1_csvlg", "Sub-leading jet csv udsg", 30, 0, 1.0)),
+    h_Wmass(fsmake<TH1D>("Wmass", "Best w-quark candidate mass", 30, 0, 250)),
+    h_njets(fsmake<TH1D>("njets", "Number of good jets", 10, 0, 10))
 {
     LOG(DEBUG) << "JetHistogramAnalyzer: created JetHistogramAnalyzer ";
 };
@@ -182,7 +184,8 @@ bool JetHistogramAnalyzer::process(EventContainer &event)
     std::vector<int> jets_mcFlavour = inp->getValue<std::vector<int>>("jets_mcFlavour");
     std::vector<double> jets_eta = inp->getValue<std::vector<double>>("jets_eta");
     std::vector<double> jets_csv = inp->getValue<std::vector<double>>("jets_btagCSV");
-    
+   
+    h_njets->Fill(jets_pt.size());
     h_pt0->Fill(jets_pt[0]);
     h_pt1->Fill(jets_pt[1]);
     
@@ -224,6 +227,52 @@ bool JetHistogramAnalyzer::process(EventContainer &event)
     
     h0->Fill(jets_csv[0]);
     h1->Fill(jets_csv[1]);
+    
+    GenericAnalyzer::process(event);
+    return true;
+};
+
+//Creates jet-related histograms
+LeptonHistogramAnalyzer::LeptonHistogramAnalyzer(
+    TFileDirectory *fs,
+    Sequence *_sequence,
+    const edm::ParameterSet &pset
+) :
+    GenericAnalyzer(fs, _sequence, pset),
+    h_pt0(fsmake<TH1D>("lepton0_pt", "Leading lepton pt", 30, 0.0, 500.0)),
+    h_pt1(fsmake<TH1D>("lepton1_pt", "Sub-leading lepton pt", 30, 0.0, 500.0)),
+    h_eta0(fsmake<TH1D>("lepton0_eta", "Leading lepton eta", 30, -5.0, 5.0)),
+    h_eta1(fsmake<TH1D>("lepton1_eta", "Sub-leading lepton eta", 30, -5.0, 5.0)),
+    
+    h_abseta0(fsmake<TH1D>("lepton0_abseta", "Leading lepton abs eta", 30, 0.0, 5.0)),
+    h_abseta1(fsmake<TH1D>("lepton1_abseta", "Sub-leading lepton abs eta", 30, 0.0, 5.0)),
+    h_nleps(fsmake<TH1D>("nleps", "Number of good leptons", 3, 0, 3))
+{
+    LOG(DEBUG) << "LeptonHistogramAnalyzer: created LeptonHistogramAnalyzer ";
+};
+
+//Fills jet-related histograms
+bool LeptonHistogramAnalyzer::process(EventContainer &event)
+{
+    LOG(DEBUG) << "processing " << name << " " << event.i;
+    
+    AutoTree* inp = event.getData<AutoTree*>("input");
+    assert(inp != nullptr);
+    
+    std::vector<double> leps_pt = inp->getValue<std::vector<double>>("leps_pt");
+    std::vector<int> leps_mcFlavour = inp->getValue<std::vector<int>>("leps_mcFlavour");
+    std::vector<double> leps_eta = inp->getValue<std::vector<double>>("leps_eta");
+    std::vector<double> leps_csv = inp->getValue<std::vector<double>>("leps_btagCSV");
+   
+    h_nleps->Fill(leps_pt.size());
+    h_pt0->Fill(leps_pt[0]);
+    h_pt1->Fill(leps_pt[1]);
+    
+    h_eta0->Fill(leps_eta[0]);
+    h_eta1->Fill(leps_eta[1]);
+    
+    h_abseta0->Fill(std::abs(leps_eta[0]));
+    h_abseta1->Fill(std::abs(leps_eta[1]));
     
     GenericAnalyzer::process(event);
     return true;

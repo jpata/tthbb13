@@ -290,15 +290,27 @@ def getTreeProducer(conf):
             ),
 
             NTupleVariable(
-                "n_mu", lambda ev: ev.n_mu_tight if hasattr(ev, "n_mu_tight") else 0,
+                "n_mu_tight", lambda ev: ev.n_mu_tight if hasattr(ev, "n_mu_tight") else 0,
                 type=int,
                 help="Number of tight selected muons"
             ),
 
             NTupleVariable(
-                "n_el", lambda ev: ev.n_el_tight if hasattr(ev, "n_el_tight") else 0,
+                "n_el_tight", lambda ev: ev.n_el_tight if hasattr(ev, "n_el_tight") else 0,
                 type=int,
                 help="Number of tight selected electrons"
+            ),
+
+            NTupleVariable(
+                "n_mu_loose", lambda ev: ev.n_mu_loose if hasattr(ev, "n_mu_loose") else 0,
+                type=int,
+                help="Number of loose (DL) selected muons"
+            ),
+
+            NTupleVariable(
+                "n_el_loose", lambda ev: ev.n_el_loose if hasattr(ev, "n_el_loose") else 0,
+                type=int,
+                help="Number of loose (DL) selected electrons"
             ),
 
             NTupleVariable(
