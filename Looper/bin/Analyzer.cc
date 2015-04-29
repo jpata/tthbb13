@@ -185,7 +185,8 @@ bool JetHistogramAnalyzer::process(EventContainer &event)
     std::vector<double> jets_eta = inp->getValue<std::vector<double>>("jets_eta");
     std::vector<double> jets_csv = inp->getValue<std::vector<double>>("jets_btagCSV");
    
-    h_njets->Fill(jets_pt.size());
+    int njets = inp->getValue<int>("njets");
+    h_njets->Fill(njets);
     h_pt0->Fill(jets_pt[0]);
     h_pt1->Fill(jets_pt[1]);
     
@@ -260,9 +261,8 @@ bool LeptonHistogramAnalyzer::process(EventContainer &event)
     assert(inp != nullptr);
     
     std::vector<double> leps_pt = inp->getValue<std::vector<double>>("leps_pt");
-    std::vector<int> leps_mcFlavour = inp->getValue<std::vector<int>>("leps_mcFlavour");
+    //std::vector<int> leps_mcFlavour = inp->getValue<std::vector<int>>("leps_mcFlavour");
     std::vector<double> leps_eta = inp->getValue<std::vector<double>>("leps_eta");
-    std::vector<double> leps_csv = inp->getValue<std::vector<double>>("leps_btagCSV");
    
     h_nleps->Fill(leps_pt.size());
     h_pt0->Fill(leps_pt[0]);

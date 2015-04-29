@@ -261,14 +261,14 @@ for (nmu, nel, name) in [(1,1,"em"), (2,0,"mm"), (0,2,"ee")]:
         ),
         cms.PSet(
             type = cms.string("IntSelector"),
-            name = cms.string("n_mu"),
-            branch = cms.string("n_mu"),
+            name = cms.string("n_mu_tight"),
+            branch = cms.string("n_mu_tight"),
             value = cms.int32(nmu)
         ),
         cms.PSet(
             type = cms.string("IntSelector"),
-            name = cms.string("n_el"),
-            branch = cms.string("n_el"),
+            name = cms.string("n_el_tight"),
+            branch = cms.string("n_el_tight"),
             value = cms.int32(nel)
         ),
 
