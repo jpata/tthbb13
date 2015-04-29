@@ -1028,7 +1028,7 @@ class MEAnalyzer(FilterAnalyzer):
                 len(y.good_leptons) == 1 and
                 len(c.b_quark_candidates(y)) >= 4 and
                 len(c.l_quark_candidates(y)) >= 2 and
-                y.cat_btag == 1
+                y.cat_btag == "H"
             )
         for x in ["SL_2qW_gen"]:
             self.configs[x].do_calculate = lambda y, c: (
@@ -1041,7 +1041,7 @@ class MEAnalyzer(FilterAnalyzer):
                 len(y.good_leptons) == 1 and
                 len(c.b_quark_candidates(y)) >= 4 and
                 len(c.l_quark_candidates(y)) >= 1 and
-                y.cat_btag == 1
+                y.cat_btag == "H"
             )
             self.configs[x].mem_assumptions.add("missed_wq")
         for x in ["SL_1qW_gen"]:
@@ -1055,7 +1055,7 @@ class MEAnalyzer(FilterAnalyzer):
             self.configs[x].do_calculate = lambda y, c: (
                 len(y.good_leptons) == 2 and
                 len(c.b_quark_candidates(y)) >= 4 and
-                y.cat_btag == 1
+                y.cat_btag == "H"
             )
             self.configs[x].mem_assumptions.add("dl")
         for x in ["DL_gen"]:
@@ -1261,21 +1261,24 @@ class MEAnalyzer(FilterAnalyzer):
                 return True
 
         res = {}
+        print event.cat, event.cat_btag, len(event.good_jets), event.nBCSVM, event.n_mu_tight, event.n_el_tight
         for hypo in [MEM.Hypothesis.TTH, MEM.Hypothesis.TTBB]:
+            skipped = []
             for confname in self.memkeys:
                 mem_cfg = self.configs[confname]
 
+                fstate = MEM.FinalState.TTH
+                if "dl" in mem_cfg.mem_assumptions:
+                    fstate = MEM.FinalState.LL
+                elif "sl" in mem_cfg.mem_assumptions:
+                    fstate = MEM.FinalState.LH
+                print "MEM", ("hypo", hypo), ("conf", confname), fstate, len(mem_cfg.b_quark_candidates(event)), len(mem_cfg.l_quark_candidates(event))
                 #Run MEM if we did not explicitly disable it
                 if (self.conf.mem["calcME"] and
                         mem_cfg.do_calculate(event, mem_cfg) and mem_cfg.enabled
                     ):
+                    print "MEM", confname, "started"
 
-                    fstate = MEM.FinalState.TTH
-                    if "dl" in mem_cfg.mem_assumptions:
-                        fstate = MEM.FinalState.LL
-                    elif "sl" in mem_cfg.mem_assumptions:
-                        fstate = MEM.FinalState.LH
-                    print "MEM started", ("hypo", hypo), ("conf", confname), fstate, len(mem_cfg.b_quark_candidates(event)), len(mem_cfg.l_quark_candidates(event))
                     self.configure_mem(event, mem_cfg)
                     r = self.integrator.run(
                         fstate,
@@ -1286,9 +1289,10 @@ class MEAnalyzer(FilterAnalyzer):
 
                     res[(hypo, confname)] = r
                 else:
+                    skipped += [confname]
                     r = MEM.MEMOutput()
                     res[(hypo, confname)] = r
-
+            print "skipped confs", skipped
         if "default" in self.memkeys:
             p1 = res[(MEM.Hypothesis.TTH, "default")].p
             p2 = res[(MEM.Hypothesis.TTBB, "default")].p
