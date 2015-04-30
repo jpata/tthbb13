@@ -46,6 +46,7 @@ AnalyzerRegistry analyzer_registry =
     {"IntSelector", &createAnalyzerInstance<IntSelector>},
     {"DoubleRangeSelector", &createAnalyzerInstance<DoubleRangeSelector>},
     {"IntRangeSelector", &createAnalyzerInstance<IntRangeSelector>},
+    {"LeptonHistogramAnalyzer", &createAnalyzerInstance<LeptonHistogramAnalyzer>},
     {"JetHistogramAnalyzer", &createAnalyzerInstance<JetHistogramAnalyzer>},
     {"BTagHistogramAnalyzer", &createAnalyzerInstance<BTagHistogramAnalyzer>},
     {"MEAnalyzer", &createAnalyzerInstance<MEAnalyzer>},

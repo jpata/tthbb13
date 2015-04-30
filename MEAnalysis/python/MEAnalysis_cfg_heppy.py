@@ -88,13 +88,17 @@ class Conf:
             # "reco" - print out the reco-level selected particles
             # "matching" - print out the association between gen and reco objects
             #"verbosity": ["eventboundary", "input", "matching", "gen", "reco"],
-            "verbosity": [],
+            "verbosity": ["meminput"],
 
             #Process only these events (will scan through file to find)
             #"eventWhitelist": [
-            #    (1, 1201, 120035),
-            #    #(1, 626, 62574),
-            #    #(1, 180, 17914)
+
+            #    #cat6
+            #    (1, 1326, 132576),
+            #    (1, 1001, 100098),
+            #    (1, 1075, 107401),
+            #    (1, 1910, 190937),
+            #    (1, 739, 73869),
             #]
         }
 
@@ -141,30 +145,12 @@ class Conf:
             },
 
             "methodsToRun": [
-
-                #full ME
-                "default",
-                "newTF",
-                "gen",
-                "MissedWQ",
-                "genMissedWQ",
-
-                #These are additional MEM checks, where only part of the MEM is ran.
-                #Switched off by default
-
-                #"NumPointsDouble",
-                #"NumPointsHalf",
-                #"NoJacobian",
-                #"NoDecayAmpl",
-                #"NoPDF",
-                #"NoScattAmpl",
-                #"QuarkEnergy98",
-                #"NuPhiRestriction",
-                #"JetsPtOrder",
-                #"JetsPtOrderIntegrationRange",
-                "Recoil",
-                "Sudakov",
-                "Minimize",
+                "SL_2qW",
+                "SL_1qW",
+                "DL",
+                "SL_2qW_gen",
+                "SL_1qW_gen",
+                "DL_gen",
             ],
 
         }
