@@ -66,24 +66,85 @@ for pair_name, pair in pairs.iteritems():
     
     combined_setups = []
 
-    combined_setups.append(TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "showerdeconstruction"),
-                                 "Shower Deconstruction",
-                                 [["Cuts", "FitMethod=MC:SampleSize=50000"]], 
-                                 [variable.di['log({0}_chi)'.format(fj_size)]],
-                                 [variable.di['log({0}_chi)'.format(other_fj_size)]],
-                                 file_name_sig,
-                                 file_name_bkg,
-                                 fiducial_cut_sig = fiducial_cuts[sample_sig],
-                                 fiducial_cut_bkg  = fiducial_cuts[sample_bkg],
-                                 weight_sig = "weight",
-                                 weight_bkg = "weight",
-                                 draw_roc = DRAW_ROC))
-        
+#    combined_setups.append(TMVASetuap("{0}_{1}_{2}".format(sample_sig, sample_bkg, "showerdeconstruction_plus"),
+#                                 "Shower Deconstruction",
+#                                 [["Cuts", "FitMethod=MC:SampleSize=10000"]], 
+#                                 [variable.di['log({0}_chi)'.format(fj_size)]],
+#                                 [variable.di['log({0}_chi)'.format(other_fj_size)]],
+#                                 file_name_sig,
+#                                 file_name_bkg,
+#                                 fiducial_cut_sig = fiducial_cuts[sample_sig],
+#                                 fiducial_cut_bkg  = fiducial_cuts[sample_bkg],
+#                                 weight_sig = "weight",
+#                                 weight_bkg = "weight",
+#                                 draw_roc = DRAW_ROC))
+#        
 
-
-    combined_setups.append(TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "softdropz10b00_combined"),
-                                     "SD(z=0.1, #beta=0) m, #tau_{3}/#tau_{2}",
-                                     [["Cuts", "FitMethod=MC:SampleSize=1600000"]], 
+#
+##    combined_setups.append(TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "softdropz10b00_combined_plus_20k_0_201"),
+##                                     "20k_0_201",
+##                                     [["Cuts", "V:FitMethod=MC:SampleSize=20000:CutRangeMin[0]=0:CutRangeMax[0]=201:CutRangeMin[1]=0:CutRangeMax[1]=1:VarProp[1]=FSmart"]], 
+##                                     [variable.di['{0}softdropz10b00_mass'.format(fj_size)],
+##                                      variable.di['{0}_tau3/{0}_tau2'.format(fj_size)]],
+##                                     [],
+##                                     file_name_sig,
+##                                     file_name_bkg,
+##                                     fiducial_cut_sig = fiducial_cuts[sample_sig],
+##                                     fiducial_cut_bkg  = fiducial_cuts[sample_bkg],
+##                                     weight_sig = "weight",
+##                                     weight_bkg = "weight",
+##                                     draw_roc = DRAW_ROC,
+##                                     working_points = []))
+##
+#    combined_setups.append(TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "softdropz10b00_combined_plus_40k_0_201"),
+#                                     "40k_0_201",
+#                                     [["Cuts", "V:FitMethod=MC:SampleSize=40000:CutRangeMin[0]=0:CutRangeMax[0]=201:CutRangeMin[1]=0:CutRangeMax[1]=1:VarProp[1]=FSmart"]], 
+#                                     [variable.di['{0}softdropz10b00_mass'.format(fj_size)],
+#                                      variable.di['{0}_tau3/{0}_tau2'.format(fj_size)]],
+#                                     [],
+#                                     file_name_sig,
+#                                     file_name_bkg,
+#                                     fiducial_cut_sig = fiducial_cuts[sample_sig],
+#                                     fiducial_cut_bkg  = fiducial_cuts[sample_bkg],
+#                                     weight_sig = "weight",
+#                                     weight_bkg = "weight",
+#                                     draw_roc = DRAW_ROC,
+#                                     working_points = []))
+#
+#
+#    combined_setups.append(TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "softdropz10b00_combined_plus_40k_0_201_sigma03"),
+#                                     "40k_0_201_sigma03",
+#                                     [["Cuts", "V:FitMethod=MC:SampleSize=40000:Sigma=0.3:CutRangeMin[0]=0:CutRangeMax[0]=201:CutRangeMin[1]=0:CutRangeMax[1]=1:VarProp[1]=FSmart"]], 
+#                                     [variable.di['{0}softdropz10b00_mass'.format(fj_size)],
+#                                      variable.di['{0}_tau3/{0}_tau2'.format(fj_size)]],
+#                                     [],
+#                                     file_name_sig,
+#                                     file_name_bkg,
+#                                     fiducial_cut_sig = fiducial_cuts[sample_sig],
+#                                     fiducial_cut_bkg  = fiducial_cuts[sample_bkg],
+#                                     weight_sig = "weight",
+#                                     weight_bkg = "weight",
+#                                     draw_roc = DRAW_ROC,
+#                                     working_points = []))
+#
+#    combined_setups.append(TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "softdropz10b00_combined_plus_40k_0_201_sigma10"),
+#                                     "40k_0_201_sigma10",
+#                                     [["Cuts", "V:FitMethod=MC:SampleSize=40000:Sigma=1.0:CutRangeMin[0]=0:CutRangeMax[0]=201:CutRangeMin[1]=0:CutRangeMax[1]=1:VarProp[1]=FSmart"]], 
+#                                     [variable.di['{0}softdropz10b00_mass'.format(fj_size)],
+#                                      variable.di['{0}_tau3/{0}_tau2'.format(fj_size)]],
+#                                     [],
+#                                     file_name_sig,
+#                                     file_name_bkg,
+#                                     fiducial_cut_sig = fiducial_cuts[sample_sig],
+#                                     fiducial_cut_bkg  = fiducial_cuts[sample_bkg],
+#                                     weight_sig = "weight",
+#                                     weight_bkg = "weight",
+#                                     draw_roc = DRAW_ROC,
+#                                     working_points = []))
+#
+    combined_setups.append(TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "softdropz10b00_combined_plus_40k_0_301"),
+                                     "40k_0_301",
+                                     [["Cuts", "V:FitMethod=MC:SampleSize=40000:CutRangeMin[0]=0:CutRangeMax[0]=301:CutRangeMin[1]=0:CutRangeMax[1]=1:VarProp[1]=FSmart"]], 
                                      [variable.di['{0}softdropz10b00_mass'.format(fj_size)],
                                       variable.di['{0}_tau3/{0}_tau2'.format(fj_size)]],
                                      [],
@@ -96,12 +157,12 @@ for pair_name, pair in pairs.iteritems():
                                      draw_roc = DRAW_ROC,
                                      working_points = []))
 
-    combined_setups.append(TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "HTT_mass_frec_DeltaRopt"),
-                                     "HEPTopTagger V2",
-                                     [["Cuts", "FitMethod=MC:SampleSize=24000000"]], 
-                                     [variable.di['looseOptRHTT_mass'],
-                                      variable.di['looseOptRHTT_fRec'],
-                                      variable.di['looseOptRHTT_Ropt-looseOptRHTT_RoptCalc']],                               
+
+    combined_setups.append(TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "softdropz10b00_combined_plus_40k_0_301_sigma03"),
+                                     "40k_0_301_sigma03",
+                                     [["Cuts", "V:FitMethod=MC:SampleSize=40000:Sigma=0.3:CutRangeMin[0]=0:CutRangeMax[0]=301:CutRangeMin[1]=0:CutRangeMax[1]=1:VarProp[1]=FSmart"]], 
+                                     [variable.di['{0}softdropz10b00_mass'.format(fj_size)],
+                                      variable.di['{0}_tau3/{0}_tau2'.format(fj_size)]],
                                      [],
                                      file_name_sig,
                                      file_name_bkg,
@@ -110,13 +171,48 @@ for pair_name, pair in pairs.iteritems():
                                      weight_sig = "weight",
                                      weight_bkg = "weight",
                                      draw_roc = DRAW_ROC,
-                                 ))
+                                     working_points = []))
 
-#    combined_setups.append(TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "HTT_mass_frec_NoOptR"),
-#                                     "HEPTopTagger V2 - noOptR",
-#                                     [["Cuts", "FitMethod=MC:SampleSize=3000000"]], 
-#                                     [variable.di['looseHTT_mass'],
-#                                      variable.di['looseHTT_fRec']],
+    combined_setups.append(TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "softdropz10b00_combined_plus_40k_0_301_sigma10"),
+                                     "40k_0_301_sigma03",
+                                     [["Cuts", "V:FitMethod=MC:SampleSize=40000:Sigma=0.3:CutRangeMin[0]=0:CutRangeMax[0]=301:CutRangeMin[1]=0:CutRangeMax[1]=1:VarProp[1]=FSmart"]], 
+                                     [variable.di['{0}softdropz10b00_mass'.format(fj_size)],
+                                      variable.di['{0}_tau3/{0}_tau2'.format(fj_size)]],
+                                     [],
+                                     file_name_sig,
+                                     file_name_bkg,
+                                     fiducial_cut_sig = fiducial_cuts[sample_sig],
+                                     fiducial_cut_bkg  = fiducial_cuts[sample_bkg],
+                                     weight_sig = "weight",
+                                     weight_bkg = "weight",
+                                     draw_roc = DRAW_ROC,
+                                     working_points = []))
+
+
+
+
+#    combined_setups.append(TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "softdropz10b00_combined_plusGA"),
+#                                     "SD(z=0.1, #beta=0) m, #tau_{3}/#tau_{2}",
+#                                     [["Cuts", "V:FitMethod=GA:CutRangeMin[0]=0:CutRangeMax[0]=400:CutRangeMin[1]=0:CutRangeMax[1]=1:VarProp[1]=FSmart"]], 
+#                                     [variable.di['{0}softdropz10b00_mass'.format(fj_size)],
+#                                      variable.di['{0}_tau3/{0}_tau2'.format(fj_size)]],
+#                                     [],
+#                                     file_name_sig,
+#                                     file_name_bkg,
+#                                     fiducial_cut_sig = fiducial_cuts[sample_sig],
+#                                     fiducial_cut_bkg  = fiducial_cuts[sample_bkg],
+#                                     weight_sig = "weight",
+#                                     weight_bkg = "weight",
+#                                     draw_roc = DRAW_ROC,
+#                                     working_points = []))
+#
+#
+#    combined_setups.append(TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "HTT_mass_frec_DeltaRopt_plus"),
+#                                     "HEPTopTagger V2",
+#                                     [["Cuts", "FitMethod=MC:Sigma=0.1:SampleSize=100000:VarProp[1]=FSmart"]], 
+#                                     [variable.di['looseOptRHTT_mass'],
+#                                      variable.di['looseOptRHTT_fRec'],
+#                                      variable.di['looseOptRHTT_Ropt-looseOptRHTT_RoptCalc']],                               
 #                                     [],
 #                                     file_name_sig,
 #                                     file_name_bkg,
@@ -127,32 +223,12 @@ for pair_name, pair in pairs.iteritems():
 #                                     draw_roc = DRAW_ROC,
 #                                 ))
 #
- 
-
-    
-
-    if pair_name in ["pt-300-to-470"]:
-        combined_setups.append(TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "softdropz15b10_combined"),
-                                         "SD(z=0.15, #beta=1) m, #tau_{3}/#tau_{2}",
-                                         [["Cuts", "FitMethod=MC:SampleSize=1600000"]], 
-                                         [variable.di['{0}softdropz15b10_mass'.format(fj_size)],
-                                          variable.di['{0}_tau3/{0}_tau2'.format(fj_size)]],
-                                         [],
-                                         file_name_sig,
-                                         file_name_bkg,
-                                         fiducial_cut_sig = fiducial_cuts[sample_sig],
-                                         fiducial_cut_bkg  = fiducial_cuts[sample_bkg],
-                                         weight_sig = "weight",
-                                         weight_bkg = "weight",
-                                         draw_roc = DRAW_ROC,
-                                         working_points = []))
-
-#        combined_setups.append(TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "trimmed_combined"),
-#                                         "Trimmed (r=0.2, f=0.06) m, #tau_{3}/#tau_{2}",
-#                                         [["Cuts", "FitMethod=MC:SampleSize=200000"]], 
-#                                         [variable.di['{0}trimmedr2f6_mass'.format(fj_size)],
-#                                          variable.di['{0}_tau3/{0}_tau2'.format(fj_size)],
-#                                      ],                               
+#    if pair_name in ["pt-300-to-470"]:
+#        combined_setups.append(TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "softdropz15b10_combined_plus"),
+#                                         "SD(z=0.15, #beta=1) m, #tau_{3}/#tau_{2}",
+#                                         [["Cuts", "V:FitMethod=MC:Sigma=0.1:SampleSize=100000:CutRangeMin[0]=0:CutRangeMax[0]=400:CutRangeMin[1]=0:CutRangeMax[1]=1:VarProp[1]=FSmart"]], 
+#                                         [variable.di['{0}softdropz15b10_mass'.format(fj_size)],
+#                                          variable.di['{0}_tau3/{0}_tau2'.format(fj_size)]],
 #                                         [],
 #                                         file_name_sig,
 #                                         file_name_bkg,
@@ -163,28 +239,14 @@ for pair_name, pair in pairs.iteritems():
 #                                         draw_roc = DRAW_ROC,
 #                                         working_points = []))
 #
-
-
-    if pair_name in ["pt-800-to-1000"]:
-        combined_setups.append(TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "CMSTT_mtop_mmin"),
-                                         "CMSTT(minMass, topMass)",
-                                         [["Cuts", "FitMethod=MC:SampleSize=2000000"]], 
-                                         [variable.di['{0}cmstt_topMass'.format(fj_size)],
-                                          variable.di['{0}cmstt_minMass'.format(fj_size)]], 
-                                         [], 
-                                         file_name_sig,
-                                         file_name_bkg,
-                                         fiducial_cut_sig = fiducial_cuts[sample_sig],
-                                         fiducial_cut_bkg  = fiducial_cuts[sample_bkg],
-                                         weight_sig = "weight",
-                                         weight_bkg = "weight",
-                                         draw_roc = DRAW_ROC))
-
-#        combined_setups.append(TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "softdropz10b00_CMSTT_mmin"),
-#                                         "SD(z=0.1, #beta=0), CMSTT(minMass)",
-#                                         [["Cuts", "FitMethod=MC:SampleSize=600000"]], 
-#                                         [variable.di['{0}cmstt_minMass'.format(fj_size)],
-#                                          variable.di['{0}softdropz10b00_mass'.format(fj_size)]],
+#
+#
+#    if pair_name in ["pt-800-to-1000"]:
+#        combined_setups.append(TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "CMSTT_mtop_mmin"),
+#                                         "CMSTT(minMass, topMass)",
+#                                         [["Cuts", "FitMethod=MC:Sigma=10:SampleSize=10000000"]], 
+#                                         [variable.di['{0}cmstt_topMass'.format(fj_size)],
+#                                          variable.di['{0}cmstt_minMass'.format(fj_size)]], 
 #                                         [], 
 #                                         file_name_sig,
 #                                         file_name_bkg,
@@ -194,47 +256,47 @@ for pair_name, pair in pairs.iteritems():
 #                                         weight_bkg = "weight",
 #                                         draw_roc = DRAW_ROC))
 #
-        combined_setups.append(TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "softdropz10b00_tau3tau2_CMSTT_mmin"),
-                                         "SD(z=0.1, #beta=0), #tau_{3}/#tau_{2}, CMSTT(minMass)",
-                                         [["Cuts", "FitMethod=MC:SampleSize=20000000"]], 
-                                         [variable.di['{0}cmstt_minMass'.format(fj_size)],
-                                          variable.di['{0}softdropz10b00_mass'.format(fj_size)],
-                                          variable.di['{0}_tau3/{0}_tau2'.format(fj_size)]],
-                                         [], 
-                                         file_name_sig,
-                                         file_name_bkg,
-                                         fiducial_cut_sig = fiducial_cuts[sample_sig],
-                                         fiducial_cut_bkg  = fiducial_cuts[sample_bkg],
-                                         weight_sig = "weight",
-                                         weight_bkg = "weight",
-                                         draw_roc = DRAW_ROC))
-
-        combined_setups.append(TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "softdropz10b00_combined_CMSTTWP"),
-                                         "SD(z=0.1, #beta=0) m, #tau_{3}/#tau_{2}, CMSTT WP",
-                                         [["Cuts", "FitMethod=MC:SampleSize=1600000"]], 
-                                         [variable.di['{0}softdropz10b00_mass'.format(fj_size)],
-                                          variable.di['{0}_tau3/{0}_tau2'.format(fj_size)]],
-                                         [],
-                                         file_name_sig,
-                                         file_name_bkg,
-                                         fiducial_cut_sig = fiducial_cuts[sample_sig],
-                                         fiducial_cut_bkg  = fiducial_cuts[sample_bkg],
-                                         extra_cut = "(({0}cmstt_nSubJets>=3)&&({0}cmstt_topMass>140)&&({0}cmstt_topMass<250)&&({0}cmstt_minMass>50))".format(fj_size),
-                                         weight_sig = "weight",
-                                         weight_bkg = "weight",
-                                         draw_roc = DRAW_ROC,
-                                         working_points = []))
-
+#        combined_setups.append(TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "softdropz10b00_tau3tau2_CMSTT_mmin"),
+#                                         "SD(z=0.1, #beta=0), #tau_{3}/#tau_{2}, CMSTT(minMass)",
+#                                         [["Cuts", "FitMethod=MC:Sigma=10:SampleSize=10000000"]], 
+#                                         [variable.di['{0}cmstt_minMass'.format(fj_size)],
+#                                          variable.di['{0}softdropz10b00_mass'.format(fj_size)],
+#                                          variable.di['{0}_tau3/{0}_tau2'.format(fj_size)]],
+#                                         [], 
+#                                         file_name_sig,
+#                                         file_name_bkg,
+#                                         fiducial_cut_sig = fiducial_cuts[sample_sig],
+#                                         fiducial_cut_bkg  = fiducial_cuts[sample_bkg],
+#                                         weight_sig = "weight",
+#                                         weight_bkg = "weight",
+#                                         draw_roc = DRAW_ROC))
+#
+#        combined_setups.append(TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "softdropz10b00_combined_CMSTTWP"),
+#                                         "SD(z=0.1, #beta=0) m, #tau_{3}/#tau_{2}, fix CMSTT(minMass, topMass)",
+#                                         [["Cuts", "FitMethod=MC:Sigma=10:SampleSize=10000000"]], 
+#                                         [variable.di['{0}softdropz10b00_mass'.format(fj_size)],
+#                                          variable.di['{0}_tau3/{0}_tau2'.format(fj_size)]],
+#                                         [],
+#                                         file_name_sig,
+#                                         file_name_bkg,
+#                                         fiducial_cut_sig = fiducial_cuts[sample_sig],
+#                                         fiducial_cut_bkg  = fiducial_cuts[sample_bkg],
+#                                         extra_cut = "(({0}cmstt_nSubJets>=3)&&({0}cmstt_topMass>140)&&({0}cmstt_topMass<250)&&({0}cmstt_minMass>50))".format(fj_size),
+#                                         weight_sig = "weight",
+#                                         weight_bkg = "weight",
+#                                         draw_roc = DRAW_ROC,
+#                                         working_points = []))
+#
 
     
 
 
   
 
-    #plotROCs("ROC_" + pair_name, combined_setups, extra_text = pretty_fiducial_cuts[sample_sig])        
+    plotROCs("ROC_" + pair_name, combined_setups, extra_text = pretty_fiducial_cuts[sample_sig])        
     all_setups += combined_setups
 
-pool.map(doTMVA, all_setups)
+#pool.map(doTMVA, all_setups)
 
 
 
