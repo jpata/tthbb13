@@ -6,6 +6,9 @@ Use to add a weight-branch to the Ntuples for tagging studies.
 Also add a true pt branch (either filled by hadtop_pt or parton_pt).
 """
 
+# Are we interested in top tagging or higgs tagging?
+IS_TOPTAG = True
+
 ########################################
 # Imports
 ########################################
@@ -15,8 +18,11 @@ import pickle
 import ROOT
 
 import TTH.TTHNtupleAnalyzer.AccessHelpers as AH
-from TTH.Plotting.gregor.TopSamples import files 
-from TTH.Plotting.gregor.HiggsSamples import files 
+
+if IS_TOPTAG:
+    from TTH.Plotting.gregor.TopSamples import files 
+else:
+    from TTH.Plotting.gregor.HiggsSamples import files 
 
 
 ########################################
@@ -25,7 +31,6 @@ from TTH.Plotting.gregor.HiggsSamples import files
 
 basepath = '/scratch/gregor/'
 
-#to_process  = ["zprime_m1000"]
 to_process  = files.keys()
 
 for k in to_process:
@@ -34,8 +39,10 @@ for k in to_process:
     input_name = files[k]
     input_tree_name = "tree"
 
-    input_pickle_file_name = "/shome/gregor/TTH-73X/CMSSW/src/TTH/Plotting/python/gregor/flat_pt_weights_higgs.pickle"
-
+    if IS_TOPTAG:
+        input_pickle_file_name = "/shome/gregor/TTH-73X/CMSSW/src/TTH/Plotting/python/gregor/flat_pt_weights.pickle"
+    else:
+        input_pickle_file_name = "/shome/gregor/TTH-73X/CMSSW/src/TTH/Plotting/python/gregor/flat_pt_weights_higgs.pickle"
 
     ########################################
     # Setup I/O
@@ -85,13 +92,18 @@ for k in to_process:
         pickle_file = open(input_pickle_file_name)
 
         functions_and_parameter_pt  = pickle.load(pickle_file)
-        #functions_and_parameter_eta = pickle.load(pickle_file)
+        
+        # Currently no etwa treatment for Higgs tagging
+        if IS_TOPTAG:
+            functions_and_parameter_eta = pickle.load(pickle_file)
 
         pt_fun = functions_and_parameter_pt[input_name][0]
         pt_param_name = functions_and_parameter_pt[input_name][1]
 
-        #eta_fun = functions_and_parameter_eta[input_name][0]
-        #eta_param_name = functions_and_parameter_eta[input_name][1]
+        # Currently no etwa treatment for Higgs tagging
+        if IS_TOPTAG:
+            eta_fun = functions_and_parameter_eta[input_name][0]
+            eta_param_name = functions_and_parameter_eta[input_name][1]
 
     except KeyError:
         print "WARNING: No weight function found for", input_name
@@ -128,15 +140,20 @@ for k in to_process:
 
         # Calculate the weight
         pt = AH.getter(input_tree, pt_param_name)
-        #eta = AH.getter(input_tree, eta_param_name)
-        value = pt_fun(pt) #* eta_fun(eta)
+        if IS_TOPTAG:
+            eta = AH.getter(input_tree, eta_param_name)
+            value = pt_fun(pt) * eta_fun(eta)
+        else:            
+            eta = 1
+            value = pt_fun(pt)
+
         if value > 0:
             weight = 1/(value)
         else:
             weight = 0
 
         variables["weight"][0] = weight
-        #variables["eta"][0]    = eta
+        variables["eta"][0]    = eta
         variables["pt"][0]     = pt
 
         output_tree.Fill()

@@ -104,7 +104,9 @@ else:
                       "zprime_m1000",
                       "ttbar",
                       "rad_hh4b_m800_13tev_20bx25",
-                      "tth_hbb"]
+                      "tth_hbb",
+                      "wjets_lnu",                      
+                  ]
 
     if any([x in initial_miniAOD_filename for x in low_pt_samples]):
         r_matching = 1.2
@@ -144,7 +146,7 @@ htt_branches = ["pt", "mass", "fRec",
 
 cmstt_branches = ["pt", "mass", "minMass", "wMass", "topMass", "nSubJets"]
 
-li_htt_branches = li_htt_branches + ['looseOptRHTT', 'looseOptRRejRminHTT']# 'looseOptRQHTT', 'tightOptRQHTT']
+li_htt_branches = li_htt_branches + ['looseHTT','looseOptRHTT', 'looseOptRRejRminHTT']# 'looseOptRQHTT', 'tightOptRQHTT']
 
 
 ########################################

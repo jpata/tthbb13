@@ -21,7 +21,7 @@ config.Data.inputDBS = 'global'
 config.Data.splitting = 'LumiBased'
 config.Data.publication = False
 
-config.Data.unitsPerJob = 6
+config.Data.unitsPerJob = 100
 #config.Data.totalUnits = 5
 
 config.section_("Site")

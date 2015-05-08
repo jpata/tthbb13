@@ -82,6 +82,15 @@ Samples = {
     # ttbar
     "ttbar_13tev_phys14_20bx25" : "/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM",
     
+    # ttH
+    "tth_13tev_phys14_20bx25" : "/TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola/Phys14DR-PU20bx25_tsg_PHYS14_25_V1-v2/MINIAODSIM",
+
+    # W (l+nu) + Jets    
+    "wjets_lnu_ht_100_200_13tev_phys14_20bx25" : "/WJetsToLNu_HT-100to200_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM",
+    "wjets_lnu_ht_200_400_13tev_phys14_20bx25" : "/WJetsToLNu_HT-200to400_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM",
+    "wjets_lnu_ht_400_600_13tev_phys14_20bx25" : "/WJetsToLNu_HT-400to600_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM",
+    "wjets_lnu_ht_600_inf_13tev_phys14_20bx25" : "/WJetsToLNu_HT-600toInf_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM",
+            
     # Zprime -> ttbar -> jets, Width = 1% of Mass
     "zprime_m1000_1p_13tev_phys14_20bx25" : "/ZPrimeToTTJets_M1000GeV_W10GeV_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM",
     "zprime_m2000_1p_13tev_phys14_20bx25" : "/ZPrimeToTTJets_M2000GeV_W20GeV_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM",
@@ -103,6 +112,8 @@ Samples = {
     "qcd_1800_2400_pythia8_13tev_phys14_20bx25" : "/QCD_Pt-1800to2400_Tune4C_13TeV_pythia8/Phys14DR-PU20bx25_trkalmb_PHYS14_25_V1-v2/MINIAODSIM",
     "qcd_2400_3200_pythia8_13tev_phys14_20bx25" : "/QCD_Pt-2400to3200_Tune4C_13TeV_pythia8/Phys14DR-PU20bx25_trkalmb_PHYS14_25_V1-v1/MINIAODSIM",
     "qcd_3200_inf_pythia8_13tev_phys14_20bx25"  : "/QCD_Pt-3200_Tune4C_13TeV_pythia8/Phys14DR-PU20bx25_trkalmb_PHYS14_25_V1-v1/MINIAODSIM",
+
+
 
 
     #######################################

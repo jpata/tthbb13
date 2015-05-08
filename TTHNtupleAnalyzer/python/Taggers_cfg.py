@@ -443,8 +443,8 @@ for fj_name in li_fatjets_objects:
    # For Grid Submission
    sd_path = "src/TTH/TTHNtupleAnalyzer/data/"
         
-   #sd_fatjets = []
-   sd_fatjets = li_ungroomed_fatjets_objects
+   sd_fatjets = []
+   #sd_fatjets = li_ungroomed_fatjets_objects
    
    r = GetRadiusStringFromName(fj_name)
    input_card = sd_path + "sd_input_card_{0}.dat".format(r)
@@ -472,7 +472,7 @@ for i_fj, fj_name in enumerate(li_fatjets_objects):
 
    r = GetRadiusFromName(fj_name)           
         
-   qvol_fatjets = li_ungroomed_fatjets_objects
+   qvol_fatjets = []#li_ungroomed_fatjets_objects
 
    if fj_name in qvol_fatjets:
 
@@ -499,8 +499,6 @@ for i_fj, fj_name in enumerate(li_fatjets_objects):
 
    else:
            li_fatjets_qvols.append('None')
-
-print li_fatjets_qvols
 
 
 #####################################
@@ -691,8 +689,37 @@ process.ca15puppiCMSTopTagInfos = cms.EDProducer("CATopJetTagger",
 
 li_htt_branches = []
 
-for input_object in ["chs", "puppi"]:
+for input_object in ["chs"]:
    
+
+   name = "looseHTT"
+   if not input_object == "chs":
+      name += input_object
+
+   setattr(process, name, cms.EDProducer(
+        "HTTTopJetProducer",
+        PFJetParameters.clone( src = cms.InputTag(input_object),
+                               doAreaFastjet = cms.bool(True),
+                               doRhoFastjet = cms.bool(False),
+                               jetPtMin = cms.double(100.0)
+                           ),
+        AnomalousCellParameters,
+        optimalR = cms.bool(False),
+        algorithm = cms.int32(1),
+        jetAlgorithm = cms.string("CambridgeAachen"),
+        rParam = cms.double(1.5),
+        mode = cms.int32(4),
+        minFatjetPt = cms.double(200.),
+        minCandPt = cms.double(200.),
+        minSubjetPt = cms.double(30.),
+        writeCompound = cms.bool(True),
+        minCandMass = cms.double(0.),
+        maxCandMass = cms.double(1000),
+        massRatioWidth = cms.double(100.),
+        minM23Cut = cms.double(0.),
+        minM13Cut = cms.double(0.),
+        maxM13Cut = cms.double(2.)))
+   li_htt_branches.append(name)
 
    name = "looseOptRHTT"
    if not input_object == "chs":
@@ -948,4 +975,4 @@ if "TTH_DEBUG" in os.environ:
 	)
 	process.p += process.printTree
 
-print li_fatjets_branches
+
