@@ -22,12 +22,6 @@ from TTH.Plotting.gregor.TopSamples import files, ranges, fiducial_cuts, other_s
 ########################################
 
 to_process = files.keys()
-#[
-    #"zprime_m1000",
-    #"zprime_m2000_low",
-    #"zprime_m3000",    
-    #"zprime_m4000",    
-#]
 
 basepath = '/scratch/gregor/'
                                          
@@ -40,6 +34,11 @@ fits["zprime_m2000_low"] = ROOT.TF1("fit_fun_zprime","pol5",601,799)
 fits["zprime_m2000"]     = ROOT.TF1("fit_fun_zprime","pol5",801,999)
 fits["zprime_m3000"]     = ROOT.TF1("fit_fun_zprime","pol5",1001,1499)
 fits["zprime_m4000"]     = ROOT.TF1("fit_fun_zprime","pol5",1401,1799)
+
+fits["wjets_lnu_ht_600_inf_200_300"]     = ROOT.TF1("fit_fun_w","pol5",201,299)
+fits["wjets_lnu_ht_600_inf_300_470"]     = ROOT.TF1("fit_fun_w","pol5",301,469)
+fits["wjets_lnu_ht_600_inf_600_800"]     = ROOT.TF1("fit_fun_w","pol5",601,799)
+
 
 fits["qcd_170_300"]  = ROOT.TF1("fit_fun_qcd","[0]+[1]*sqrt(x)+[2]/x+[3]/(x*x)+[4]/(x*x*x)",201,299)
 fits["qcd_300_470"]  = ROOT.TF1("fit_fun_qcd","[0]+[1]*sqrt(x)+[2]/x+[3]/(x*x)+[4]/(x*x*x)",301,470)
@@ -72,7 +71,7 @@ full_file_names = {}
 for name in to_process:
     full_file_names[name] = basepath + files[name] + ".root"
 
-output_dir = "results/GetPtWeight/"
+output_dir = "/shome/gregor/new_results/GetPtWeight/"
 
 output_pickle_file_name = "/shome/gregor/TTH-73X/CMSSW/src/TTH/Plotting/python/gregor/flat_pt_weights.pickle"
 

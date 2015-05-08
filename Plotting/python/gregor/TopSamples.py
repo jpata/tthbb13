@@ -91,15 +91,15 @@ files = {}
 #files["qcd_600_800"]      = "ntop_v40_qcd_600_800_pythia8_13tev_phys14_20bx25-tagging"
 #files["qcd_800_1000"]     = "ntop_v40_qcd_800_1000_pythia8_13tev_phys14_20bx25-tagging"
 
-files["zprime_m1000_low"] = "ntop_v42_zprime_m1000_low_1p_13tev_phys14_20bx25-tagging"     
-files["zprime_m1000"]     = "ntop_v42_zprime_m1000_1p_13tev_phys14_20bx25-tagging"     
-files["zprime_m2000_low"] = "ntop_v42_zprime_m2000_low_1p_13tev_phys14_20bx25-tagging"     
-files["zprime_m2000"]     = "ntop_v42_zprime_m2000_1p_13tev_phys14_20bx25-tagging"     
-files["qcd_170_300"]      = "ntop_v42_qcd_170_300_pythia8_13tev_phys14_20bx25-tagging"
-files["qcd_300_470"]      = "ntop_v42_qcd_300_470_pythia8_13tev_phys14_20bx25-tagging"
-files["qcd_470_600"]      = "ntop_v42_qcd_470_600_pythia8_13tev_phys14_20bx25-tagging"
-files["qcd_600_800"]      = "ntop_v42_qcd_600_800_pythia8_13tev_phys14_20bx25-tagging"
-files["qcd_800_1000"]     = "ntop_v42_qcd_800_1000_pythia8_13tev_phys14_20bx25-tagging"
+#files["zprime_m1000_low"] = "ntop_v42_zprime_m1000_low_1p_13tev_phys14_20bx25-tagging"     
+#files["zprime_m1000"]     = "ntop_v42_zprime_m1000_1p_13tev_phys14_20bx25-tagging"     
+#files["zprime_m2000_low"] = "ntop_v42_zprime_m2000_low_1p_13tev_phys14_20bx25-tagging"     
+#files["zprime_m2000"]     = "ntop_v42_zprime_m2000_1p_13tev_phys14_20bx25-tagging"     
+#files["qcd_170_300"]      = "ntop_v42_qcd_170_300_pythia8_13tev_phys14_20bx25-tagging"
+#files["qcd_300_470"]      = "ntop_v42_qcd_300_470_pythia8_13tev_phys14_20bx25-tagging"
+#files["qcd_470_600"]      = "ntop_v42_qcd_470_600_pythia8_13tev_phys14_20bx25-tagging"
+#files["qcd_600_800"]      = "ntop_v42_qcd_600_800_pythia8_13tev_phys14_20bx25-tagging"
+#files["qcd_800_1000"]     = "ntop_v42_qcd_800_1000_pythia8_13tev_phys14_20bx25-tagging"
 
 #files["zprime_m1000_low"] = "ntop_v43_zprime_m1000_low_1p_13tev_phys14_20bx25-tagging"     
 #files["zprime_m1000"]     = "ntop_v43_zprime_m1000_1p_13tev_phys14_20bx25-tagging"     
@@ -119,22 +119,36 @@ files["qcd_800_1000"]     = "ntop_v42_qcd_800_1000_pythia8_13tev_phys14_20bx25-t
 #files["qcd_600_800"]      = "ntop_v44_qcd_600_800_pythia8_13tev_phys14_20bx25-tagging"
 #files["qcd_800_1000"]     = "ntop_v44_qcd_800_1000_pythia8_13tev_phys14_20bx25-tagging"
 
+files["zprime_m1000_low"] = "ntop_v45_zprime_m1000_low_1p_13tev_phys14_20bx25-tagging"     
+files["zprime_m1000"]     = "ntop_v45_zprime_m1000_1p_13tev_phys14_20bx25-tagging"     
+files["zprime_m2000_low"] = "ntop_v45_zprime_m2000_low_1p_13tev_phys14_20bx25-tagging"     
+files["zprime_m2000"]     = "ntop_v45_zprime_m2000_1p_13tev_phys14_20bx25-tagging"     
+files["qcd_170_300"]      = "ntop_v45_qcd_170_300_pythia8_13tev_phys14_20bx25-tagging"
+files["qcd_300_470"]      = "ntop_v45_qcd_300_470_pythia8_13tev_phys14_20bx25-tagging"
+files["qcd_600_800"]      = "ntop_v45_qcd_600_800_pythia8_13tev_phys14_20bx25-tagging"
+files["qcd_800_1000"]     = "ntop_v45_qcd_800_1000_pythia8_13tev_phys14_20bx25-tagging"
 
+files["wjets_lnu_ht_600_inf_200_300"] = "ntop_v45c_wjets_lnu_ht_600_inf_200_300_13tev_phys14_20bx25-tagging"
+files["wjets_lnu_ht_600_inf_300_470"] = "ntop_v45c_wjets_lnu_ht_600_inf_300_470_13tev_phys14_20bx25-tagging"
+files["wjets_lnu_ht_600_inf_600_800"] = "ntop_v45c_wjets_lnu_ht_600_inf_600_800_13tev_phys14_20bx25-tagging"
+
+#files["zprime_m1000"]     = "ntop_v46_zprime_m1000_1p_13tev_phys14_20bx25-tagging"     
+#files["qcd_300_470"]      = "ntop_v46_qcd_300_470_pythia8_13tev_phys14_20bx25-tagging"
 
 weighted_files = {}
 for k,v in files.iteritems():
     weighted_files[k] = basepath + v + "-weighted.root"
 
 pairs = { 
-    "pt-200-to-300" : ["zprime_m1000_low", "qcd_170_300"],
+#    "pt-200-to-300" : ["zprime_m1000_low", "qcd_170_300"],
     "pt-300-to-470" : ["zprime_m1000", "qcd_300_470"],
  ###   "pt-470-to-600" : ["zprime_m1250", "qcd_470_600"],
-    "pt-600-to-800" : ["zprime_m2000_low", "qcd_600_800"],
-    "pt-800-to-1000" : ["zprime_m2000", "qcd_800_1000"],
+ #   "pt-600-to-800" : ["zprime_m2000_low", "qcd_600_800"],
+#    "pt-800-to-1000" : ["zprime_m2000", "qcd_800_1000"],
 }
 
 # [Minimal pT, Maximal pT, |eta|]
-ranges = {#zprime_m750"      : [201, 299,   2.4, 0.8, "ca15"],
+ranges = {
     "zprime_m750"      : [201, 299,   2.4, 0.8, "ca15"],
     "zprime_m1000_low" : [201, 299,   2.4, 0.8, "ca15"],
     "zprime_m1000"     : [301, 469,   2.4, 0.8, "ca15"],
@@ -149,7 +163,11 @@ ranges = {#zprime_m750"      : [201, 299,   2.4, 0.8, "ca15"],
     "qcd_470_600"      : [471, 599, 2.1, 0.6, "ca08"],
     "qcd_600_800"      : [601, 799, 2.1, 0.6, "ca08"],
     "qcd_800_1000"     : [801, 999, 1.5, 0.6, "ca08"],
-       }
+
+    "wjets_lnu_ht_600_inf_200_300" : [201, 299, 2.4, 0.8, "ca15"],
+    "wjets_lnu_ht_600_inf_300_470" : [301, 469, 2.4, 0.8, "ca15"],   
+    "wjets_lnu_ht_600_inf_600_800" : [601, 799, 2.1, 0.6, "ca08"],
+}
 
 sample_names = {"zprime_m750"      : "Top, 200..300",
                 "zprime_m1000"     : "Top, 300..470",
@@ -164,23 +182,32 @@ sample_names = {"zprime_m750"      : "Top, 200..300",
                 "qcd_470_600"      : "QCD, 470..600",
                 "qcd_600_800"      : "QCD, 600..800",
                 "qcd_800_1000"     : "QCD, 800..10000",
-            }
+                
+                "wjets_lnu_ht_600_inf_200_300" : "W+Jets, 200..300",
+                "wjets_lnu_ht_600_inf_300_470" : "W+Jets, 300..470",
+                "wjets_lnu_ht_600_inf_600_800" : "W+Jets, 600..800",
+}
 
 other_sample_names = {
-                      "zprime_m1000_low" : "Signal (200..300 GeV)",                      
-                      "zprime_m1000"     : "Signal (300..470 GeV)",                      
-                      "zprime_m2000_low" : "Signal (600..800 GeV)",                      
-                      "zprime_m2000"     : "Signal (800..1000 GeV)",                      
-                      "qcd_170_300"      : "BG (200..300 GeV)",
-                      "qcd_300_470"      : "BG (300..470 GeV)",
-                      "qcd_600_800"      : "BG (600..800 GeV)",
-                      "qcd_800_1000"      : "BG (800..1000 GeV)",
+    "zprime_m1000_low" : "Signal (200..300 GeV)",                      
+    "zprime_m1000"     : "Signal (300..470 GeV)",                      
+    "zprime_m2000_low" : "Signal (600..800 GeV)",                      
+    "zprime_m2000"     : "Signal (800..1000 GeV)",                      
+    "qcd_170_300"      : "BG (200..300 GeV)",
+    "qcd_300_470"      : "BG (300..470 GeV)",
+    "qcd_600_800"      : "BG (600..800 GeV)",
+    "qcd_800_1000"     : "BG (800..1000 GeV)",
+    "wjets_lnu_ht_600_inf_200_300" : "BG-W (200..300 GeV)", 
+    "wjets_lnu_ht_600_inf_300_470" : "BG-W (300..470 GeV)", 
+    "wjets_lnu_ht_600_inf_600_800" : "BG-W (600..800 GeV)",   
             }
 
 
 
 fiducial_cuts = {}
+pretty_fiducial_cuts = {}
 for k,v in ranges.iteritems():
     fiducial_cuts[k] = "((pt>{0})&&(pt<{1})&&(fabs(eta)<{2})&&(top_size<{3}))".format(v[0], v[1], v[2], v[3])
+    pretty_fiducial_cuts[k] = "{0} < p_{{T}} < {1}, |#eta| < {2}".format(v[0]-1, v[1]+1, v[2])
 
 

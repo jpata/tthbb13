@@ -330,14 +330,14 @@ variable('top_size', "Top Size", 0, 4.)
 #]
 #
 
-htt_v44 = ["looseOptRHTT", "looseOptRRejRminHTT"]# "looseOptRQHTT", "tightOptRQHTT"]
+htt_v44 = ["looseOptRHTT", "looseOptRRejRminHTT", "looseHTT"]# "looseOptRQHTT", "tightOptRQHTT"]
 
 
 
 htt_vars_v44 = []
 for htt in htt_v44:
-    htt_vars_v44.append(variable(htt+'_mass', htt+ " mass", 0, 400, unit = "GeV"))
-    htt_vars_v44.append(variable(htt+'_fRec', htt+" f_{Rec}", 0, 0.8))
+    htt_vars_v44.append(variable(htt+'_mass', htt+ " mass", 0, 300, unit = "GeV"))
+    htt_vars_v44.append(variable(htt+'_fRec', htt+" f_{Rec}", 0, 0.5))
     htt_vars_v44.append(variable('{0}_Ropt-{0}_RoptCalc'.format(htt), 
                                  htt+" #Delta R_{opt}", 
                                  -0.8, 1., 
@@ -359,33 +359,47 @@ for htt in htt_v44:
 #
 
 
-groomers_v39 = [
+groomers_v45 = [
     "",
+    "filteredn3r2",
+    "filteredn5r2",
+    "prunedn3z10rfac50",
+    "trimmedr2f3",
     "trimmedr2f6",
+    "trimmedr2f9",
     "softdropz10b00",
+    "softdropz10b10",
+    "softdropz10b20",
     "softdropz15b00",
     "softdropz15b10",
     "softdropz15b20",
+    "softdropz20b00",
     "softdropz20b10",
-    "softdropz30b10",
-    "softdropz30b15",
+    "softdropz20b20",
 ]
 
-groomer_names_v39 = [
+groomer_names_v45 = [
     "Ungroomed",
+    "Filtered (r=0.2, n=3)",
+    "Filtered (r=0.2, n=5)",
+    "Pruned (z=0.1, rcut=0.5)",
+    "Trimmed (r=0.2, f=0.03)",
     "Trimmed (r=0.2, f=0.06)",
+    "Trimmed (r=0.2, f=0.09)",
     "Softdrop (z=0.1, #beta=0)",
+    "Softdrop (z=0.1, #beta=1)",
+    "Softdrop (z=0.1, #beta=2)",
     "Softdrop (z=0.15, #beta=0)",
     "Softdrop (z=0.15, #beta=1)",
     "Softdrop (z=0.15, #beta=2)",
+    "Softdrop (z=0.2, #beta=0)",
     "Softdrop (z=0.2, #beta=1)",
-    "Softdrop (z=0.3, #beta=1)",
-    "Softdrop (z=0.3, #beta=1.5)",
+    "Softdrop (z=0.2, #beta=2)",
 ]
 
 
-mass_vars_v39 = []
-cmstt_vars_v40 = []
+mass_vars_v45 = []
+cmstt_vars_v45 = []
 
 for fj in ["ca08", 
            "ca15", 
@@ -393,17 +407,19 @@ for fj in ["ca08",
            "ca15puppi"
 ]:
 
-    for groomer, groomer_name in zip(groomers_v39, groomer_names_v39):
-        mass_vars_v39.append(variable(fj+groomer+"_mass", groomer_name, 0, 400, unit = "GeV"))
+    for groomer, groomer_name in zip(groomers_v45, groomer_names_v45):
+        mass_vars_v45.append(variable(fj+groomer+"_mass", groomer_name, 0, 400, unit = "GeV"))
         
-
-    cmstt_vars_v40.append(variable(fj+'cmstt_minMass', 
+    cmstt_vars_v45.append(variable(fj+'cmstt_nSubJets', 
+                                   "number of Subjets",  
+                                   0.9, 5.5))
+    cmstt_vars_v45.append(variable(fj+'cmstt_minMass', 
                                    "min. Mass",  
-                                   0, 400, unit = "GeV", 
+                                   0, 250, unit = "GeV", 
                                    extra_cut = "({0}cmstt_nSubJets >= 3)".format(fj)))
-    cmstt_vars_v40.append(variable(fj+'cmstt_topMass', 
+    cmstt_vars_v45.append(variable(fj+'cmstt_topMass', 
                                    "top Mass",  
-                                   0, 800, unit = "GeV",
+                                   0, 400, unit = "GeV",
                                    extra_cut = "({0}cmstt_nSubJets >= 3)".format(fj)))
 
     variable("{0}_tau3/{0}_tau2".format(fj), 
@@ -413,11 +429,7 @@ for fj in ["ca08",
     
     variable("{0}_qvol".format(fj), 
              "Q-jet volatility", 
-             0, 1.5),
-
-
-mass_vars_v40 = mass_vars_v39
-#htt_vars_v40 = htt_vars_v39
+             0, 1.),
 
 variable('ca15trimmedr2f6forbtag_btag', "btag", 0, 1.)
 variable('ca08trimmedr2f6forbtag_btag', "btag", 0, 1.)

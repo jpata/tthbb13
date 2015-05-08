@@ -36,102 +36,104 @@ full_file_names = {}
 for k,v in files.iteritems():
     full_file_names[k] = basepath + v + "-weighted.root"
 
-output_dir = "results/CheckPtWeight/"
+output_dir = "/shome/gregor/new_results/CheckPtWeight/"
 
 
 ########################################
 # Define plots and do fits
 ########################################
 
-if False:
-    for sample in files.keys():
-
-        combinedPlot("true_pt",
-                     [plot( other_sample_names[sample], 
-                            'pt', 
-                            "(weight*({0}))".format(fiducial_cuts[sample]),
-                            sample) for sample in files.keys()],
-                     80, ranges[sample][0], ranges[sample][1], 
-                     label_x   = "True p_{T}",
-                     label_y   = "Fraction of Partons",
-                     axis_unit = "GeV",
-                     log_y     = False,
-                     normalize = True,
-                     legend_origin_x = 0.35,
-                     legend_origin_y = 0.3,
-                     legend_size_x   = 0.2,
-                     legend_size_y   = 0.05 * 2)
-
-        combinedPlot("true_eta",
-                     [plot( other_sample_names[sample], 
-                            'eta', 
-                            "(weight*({0}))".format(fiducial_cuts[sample]),
-                            sample) for sample in files.keys()],
-                     80, -2.6, 2.6, 
-                     label_x   = "True #eta",
-                     label_y   = "Fraction of Partons",
-                     axis_unit = "",
-                     log_y     = False,
-                     normalize = True,
-                     legend_origin_x = 0.35,
-                     legend_origin_y = 0.3,
-                     legend_size_x   = 0.2,
-                     legend_size_y   = 0.05 * 2)
+if True:
 
 
-        combinedPlot("true_pt_noweight",
-                     [plot( other_sample_names[sample], 
-                            'pt', 
-                            "(({0}))".format(fiducial_cuts[sample]),
-                            sample) for sample in files.keys()],
-                     80, ranges[sample][0], ranges[sample][1], 
-                     label_x   = "True p_{T}",
-                     label_y   = "Fraction of Partons",
-                     axis_unit = "GeV",
-                     log_y     = False,
-                     normalize = True,
-                     legend_origin_x = 0.35,
-                     legend_origin_y = 0.55,
-                     legend_size_x   = 0.2,
-                     legend_size_y   = 0.05 * 2)
-
-        combinedPlot("true_eta_noweight",
-                     [plot( other_sample_names[sample], 
-                            'eta', 
-                            "(({0}))".format(fiducial_cuts[sample]),
-                            sample) for sample in files.keys()],
-                     80, -2.6, 2.6, 
-                     label_x   = "True #eta",
-                     label_y   = "Fraction of Partons",
-                     axis_unit = "",
-                     log_y     = False,
-                     normalize = True,
-                     legend_origin_x = 0.35,
-                     legend_origin_y = 0.3,
-                     legend_size_x   = 0.2,
-                     legend_size_y   = 0.05 * 2)
-
-    samples = [x for x in files.keys() if "zprime" in x]
-    var = variable.di["top_size"]
-    combinedPlot(("top_size"),
-                 [plot(sample,
-                       var.name,                                           
-                       '((pt>{0})&&(pt<{1})&&(abs(eta)<{2})&&({3}))*weight'.format(ranges[sample][0], 
-                                                                                   ranges[sample][1],
-                                                                                   ranges[sample][2],
-                                                                                   var.extra_cut),
-                       sample) for sample in samples],
-                 80, var.range_min, var.range_max, 
-                 label_x   = var.pretty_name,
-                 label_y   = "A.U.",
-                 axis_unit = var.unit,
+    combinedPlot("true_pt",
+                 [plot( other_sample_names[sample], 
+                        'pt', 
+                        "(weight*({0}))".format(fiducial_cuts[sample]),
+                        sample) for sample in files.keys()],
+                 80, 200, 800, 
+                 label_x   = "True p_{T}",
+                 label_y   = "Fraction of Partons",
+                 axis_unit = "GeV",
                  log_y     = False,
                  normalize = True,
-                 legend_origin_x = 0.6,
-                 legend_origin_y = 0.7,
+                 legend_origin_x = 0.35,
+                 legend_origin_y = 0.6,
                  legend_size_x   = 0.2,
-                 legend_size_y   = 0.05*len(samples))
+                 legend_text_size= 0.03
+    )
 
+    combinedPlot("true_eta",
+                 [plot( other_sample_names[sample], 
+                        'eta', 
+                        "(weight*({0}))".format(fiducial_cuts[sample]),
+                        sample) for sample in files.keys()],
+                 80, -2.6, 2.6, 
+                 label_x   = "True #eta",
+                 label_y   = "Fraction of Partons",
+                 axis_unit = "",
+                 log_y     = False,
+                 normalize = True,
+                 legend_origin_x = 0.35,
+                 legend_origin_y = 0.3,
+                 legend_size_x   = 0.2,
+                 legend_text_size= 0.03
+)
+#
+#
+#        combinedPlot("true_pt_noweight",
+#                     [plot( other_sample_names[sample], 
+#                            'pt', 
+#                            "(({0}))".format(fiducial_cuts[sample]),
+#                            sample) for sample in files.keys()],
+#                     80, ranges[sample][0], ranges[sample][1], 
+#                     label_x   = "True p_{T}",
+#                     label_y   = "Fraction of Partons",
+#                     axis_unit = "GeV",
+#                     log_y     = False,
+#                     normalize = True,
+#                     legend_origin_x = 0.35,
+#                     legend_origin_y = 0.55,
+#                     legend_size_x   = 0.2,
+#                     legend_size_y   = 0.05 * 2)
+#
+#        combinedPlot("true_eta_noweight",
+#                     [plot( other_sample_names[sample], 
+#                            'eta', 
+#                            "(({0}))".format(fiducial_cuts[sample]),
+#                            sample) for sample in files.keys()],
+#                     80, -2.6, 2.6, 
+#                     label_x   = "True #eta",
+#                     label_y   = "Fraction of Partons",
+#                     axis_unit = "",
+#                     log_y     = False,
+#                     normalize = True,
+#                     legend_origin_x = 0.35,
+#                     legend_origin_y = 0.3,
+#                     legend_size_x   = 0.2,
+#                     legend_size_y   = 0.05 * 2)
+#
+#    samples = [x for x in files.keys() if "zprime" in x]
+#    var = variable.di["top_size"]
+#    combinedPlot(("top_size"),
+#                 [plot(sample,
+#                       var.name,                                           
+#                       '((pt>{0})&&(pt<{1})&&(abs(eta)<{2})&&({3}))*weight'.format(ranges[sample][0], 
+#                                                                                   ranges[sample][1],
+#                                                                                   ranges[sample][2],
+#                                                                                   var.extra_cut),
+#                       sample) for sample in samples],
+#                 80, var.range_min, var.range_max, 
+#                 label_x   = var.pretty_name,
+#                 label_y   = "A.U.",
+#                 axis_unit = var.unit,
+#                 log_y     = False,
+#                 normalize = True,
+#                 legend_origin_x = 0.6,
+#                 legend_origin_y = 0.7,
+#                 legend_size_x   = 0.2,
+#                 legend_size_y   = 0.05*len(samples))
+#
 doWork(full_file_names, output_dir )
 
 
