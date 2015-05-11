@@ -1,4 +1,5 @@
 import ROOT, math
+from TTH.MEAnalysis.VHbbTree import *
 class GenBQuarkFromHafterISR:
     def __init__(self, tree, n):
         self.pdgId = tree.GenBQuarkFromHafterISR_pdgId[n];
@@ -467,24 +468,24 @@ class GenNuFromTop:
     @staticmethod
     def make_array(event):
         return [GenNuFromTop(event.input, i) for i in range(event.input.nGenNuFromTop)]
-        
+
 class MET:
     def __init__(self, **kwargs):
         self.p4 = ROOT.TLorentzVector()
-        
+
         _px, _py = kwargs.get("px", None), kwargs.get("py", None)
         _pt, _phi = kwargs.get("pt", None), kwargs.get("phi", None)
         tree = kwargs.get("tree", None)
-        
+
         self.sumEt = 0
         self.genPt = 0
         self.genPhi = 0
-        
+
         if not (_px is None or _py is None):
             self.p4.SetPxPyPzE(_px, _py, 0, math.sqrt(_px*_px + _py*_py))
         elif not (_pt is None or _phi is None):
             self.p4.SetPtEtaPhiM(_pt, 0, _phi, 0)
-            
+
         elif tree != None:
             self.pt = tree.met_pt;
             self.phi = tree.met_phi;
@@ -497,7 +498,7 @@ class MET:
         self.phi = self.p4.Phi()
         self.px = self.p4.Px()
         self.py = self.p4.Py()
-            
+
     @staticmethod
     def make_array(event):
         return [MET(tree=event.input)]
@@ -533,5 +534,13 @@ class EventAnalyzer(Analyzer):
         event.GenWZQuark = GenWZQuark.make_array(event)
         event.GenBQuarkFromTop = GenBQuarkFromTop.make_array(event)
         event.GenNuFromTop = GenNuFromTop.make_array(event)
-        
+
         event.met = MET.make_array(event)
+
+def lvec(self):
+    """
+    Converts an object with pt, eta, phi, mass to a TLorentzVector
+    """
+    lv = ROOT.TLorentzVector()
+    lv.SetPtEtaPhiM(self.pt, self.eta, self.phi, self.mass)
+    return lv
