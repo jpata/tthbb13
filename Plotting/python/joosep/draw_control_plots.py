@@ -13,11 +13,15 @@ import numpy as np
 
 from TTH.Plotting.joosep.samples import samples_dict
 
-samples = ["tth_13TeV_phys14", "ttjets_13TeV_phys14"]
+samples = [
+    "tth_13TeV_phys14",
+    "ttjets_13TeV_phys14_bb", "ttjets_13TeV_phys14_b",
+    "ttjets_13TeV_phys14_cc", "ttjets_13TeV_phys14_ll"
+]
 
 of = ROOT.TFile("ControlPlots.root", "RECREATE")
 
-ncores = 1
+ncores = 20
 
 def drawHelper(args):
     tf, hist, cut, nfirst, nev = args
@@ -102,9 +106,11 @@ for sample in samples:
             for match, matchcut in [
                     ("nomatch", "1"),
                     ("tb2_wq2", "nMatch_wq_btag==2 && nMatch_tb_btag==2"),
-                    ("hb2_tb2_wq2", "nMatch_hb_btag==2 && nMatch_wq_btag==2 && nMatch_tb_btag==2")
+                    ("hb2_tb2_wq2", "nMatch_hb_btag==2 && nMatch_wq_btag==2 && nMatch_tb_btag==2"),
+                    ("tb2_wq1", "nMatch_wq_btag==1 && nMatch_tb_btag==2"),
+                    ("hb2_tb2_wq1", "nMatch_hb_btag==2 && nMatch_wq_btag==1 && nMatch_tb_btag==2")
                 ]:
-                for nmem in [0, 1, 2, 3, 4, 5]:
+                for nmem in range(9):
                     Draw(tf, jetd, "mem_tth_p[{0}] / (mem_tth_p[{0}] + 0.02*mem_ttbb_p[{0}]) >> mem_d_{1}_{0}(20,0,1)".format(nmem, match),
                         " && ".join([lepcut, jettagcut, matchcut])
                     )

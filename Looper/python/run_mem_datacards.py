@@ -49,7 +49,7 @@ samples = {
             )
         ]),
         firstEvent=cms.int64(0), #first event index
-        lastEvent=cms.int64(-1), #laste event index (inclusive)
+        lastEvent=cms.int64(-1), #last event index (inclusive)
         sampleTypeMajor = cms.uint32(2),
     ),
     "ttjets_bb": cms.PSet(
@@ -64,7 +64,7 @@ samples = {
             )
         ]),
         firstEvent=cms.int64(0), #first event index
-        lastEvent=cms.int64(-1), #laste event index (inclusive)
+        lastEvent=cms.int64(-1), #last event index (inclusive)
         sampleTypeMajor = cms.uint32(2),
     ),
     "ttjets_b": cms.PSet(
@@ -79,7 +79,7 @@ samples = {
             )
         ]),
         firstEvent=cms.int64(0), #first event index
-        lastEvent=cms.int64(-1), #laste event index (inclusive)
+        lastEvent=cms.int64(-1), #last event index (inclusive)
         sampleTypeMajor = cms.uint32(2),
     ),
     "ttjets_cc": cms.PSet(
@@ -94,7 +94,7 @@ samples = {
             )
         ]),
         firstEvent=cms.int64(0), #first event index
-        lastEvent=cms.int64(-1), #laste event index (inclusive)
+        lastEvent=cms.int64(-1), #last event index (inclusive)
         sampleTypeMajor = cms.uint32(2),
     ),
     "ttjets_ll": cms.PSet(
@@ -109,7 +109,7 @@ samples = {
             )
         ]),
         firstEvent=cms.int64(0), #first event index
-        lastEvent=cms.int64(-1), #laste event index (inclusive)
+        lastEvent=cms.int64(-1), #last event index (inclusive)
         sampleTypeMajor = cms.uint32(2),
     )
 }
@@ -138,7 +138,10 @@ else:
     #otherwise, process in specified range (inclusive)
     process.inputs = cms.VPSet([
         samples["tth"],
-        #samples["ttjets"]
+        samples["ttjets_bb"],
+        samples["ttjets_b"],
+        samples["ttjets_cc"],
+        samples["ttjets_ll"],
     ])
 
 #The analysis is run as a series of Analyzers, each of which is
@@ -447,8 +450,6 @@ for (nj0, nj1, nt0, nt1) in [
     add_matching(seqs, seq, name+"SL", ["SL"])
     for n in ["ee", "em", "mm"]:
         add_matching(seqs, seq, name+n, ["DL"+n])
-
-
 
 #Finally, feed all the sequences in to process
 process.sequences = cms.VPSet(
