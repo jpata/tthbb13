@@ -148,9 +148,15 @@ class Conf:
                 "SL_2qW",
                 "SL_1qW",
                 "DL",
+
                 "SL_2qW_gen",
                 "SL_1qW_gen",
                 "DL_gen",
+
+                "SL_2qW_Sudakov",
+                "SL_1qW_Sudakov",
+                "SL_2qW_Recoil",
+                "SL_1qW_Recoil",
             ],
 
         }
