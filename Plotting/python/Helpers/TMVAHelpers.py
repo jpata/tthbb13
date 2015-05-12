@@ -39,7 +39,6 @@ myStyle.SetPadTopMargin(0.12)
 ROOT.gROOT.SetStyle("myStyle")
 ROOT.gROOT.ForceStyle()
 
-
 ########################################
 # Definitions
 ########################################
@@ -447,7 +446,7 @@ def doROCandWP(setup):
             for wp in setup.working_points:
 
                 # The xml file contains the list of cuts
-                xmldoc = minidom.parse("weights/{0}.weights.xml".format(wp["file_name"]))
+                xmldoc = minidom.parse("weights/{0}.weights.xml".format(wp["file_name"]).replace("TMVA_",""))
                 varlist = xmldoc.getElementsByTagName('Variables')[0].getElementsByTagName("Variable")
                 epxression_and_index = []
                 for var in varlist:
@@ -474,7 +473,7 @@ def doROCandWP(setup):
                 # Correct for this when looking for the correct entry (bin) in the file
                 eff_preselection = other_event_counts["n_sig_cuts"]/other_event_counts["n_sig_fiducial"]
                 if eff_preselection>0:
-                    bin_number = int((100*wp["eff"]/eff_preselection))-1
+                    bin_number = int((100*wp["eff"]/eff_preselection)) + 1
                     print wp['file_name'], bin_number
                     if bin_number > 99:
                         bin_number = 99
@@ -501,6 +500,15 @@ def doROCandWP(setup):
                     li_cuts.append("({0}<{1})".format(expr, max_val))
                 # End of loop over expressions
 
+                print "Cuts (wo/ fiducial and presel) for", wp["name"].replace("[name]", setup.pretty_name)
+                for cut in [setup.extra_cut] +  li_cuts:
+                    print "\t", cut
+                for var in setup.li_vars:        
+                    if var.extra_cut:
+                        print "\t",  var.extra_cut
+                print "-----\n\n"
+
+
                 # We need one additional cut to distinguish signal
                 # from background (these are mixed in the test tree)
                 li_cuts_sig = li_cuts + ["(classID=={0})".format(classid_sig)]
@@ -511,6 +519,7 @@ def doROCandWP(setup):
 
                 [n_pass_sig, e_pass_sig] = countEventsAndError(testTree, cuts_sig, "weight")
                 [n_pass_bkg, e_pass_bkg] = countEventsAndError(testTree, cuts_bkg, "weight")
+
 
                 eff_total_sig, err_total_sig_low, err_total_sig_high = calcEffAndError(n_pass_sig, e_pass_sig, event_counts["n_sig_fiducial"]*test_frac_sig, event_counts["e_sig_fiducial"]*math.sqrt(test_frac_sig))
                 eff_total_bkg, err_total_bkg_low, err_total_bkg_high = calcEffAndError(n_pass_bkg, e_pass_bkg, event_counts["n_bkg_fiducial"]*test_frac_bkg, event_counts["e_bkg_fiducial"]*math.sqrt(test_frac_bkg))
@@ -535,10 +544,10 @@ def doROCandWP(setup):
 # plotROCs
 ########################################
 
-def plotROCs(name, li_setups, nprocs=12, extra_text = ""):
+def plotROCs(name, li_setups, extra_text = ""):
 
     # Loop over setups
-    pool = mp.Pool(processes=nprocs)  
+    pool = mp.Pool(processes=12)  
     outputs = pool.map(doROCandWP, li_setups)
     
     # Extract the outputs
@@ -566,7 +575,7 @@ def plotROCs(name, li_setups, nprocs=12, extra_text = ""):
     legend_origin_x     = 0.21
     legend_origin_y     = 0.18
     legend_size_x       = 0.25
-    legend_size_y       = 0.04 * (len(li_grs)+len(li_wps))
+    legend_size_y       = 0.03 * (len(li_grs)+len(li_wps))
 
 
     for view in ["left_top", "all"]:
@@ -577,7 +586,7 @@ def plotROCs(name, li_setups, nprocs=12, extra_text = ""):
                                legend_origin_y + legend_size_y )
         legend.SetBorderSize(1) 
         legend.SetFillColor(0)
-        legend.SetTextSize(0.035)      
+        legend.SetTextSize(0.025)      
         legend.SetBorderSize(0)
 
         # Top Tagging
