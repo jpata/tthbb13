@@ -64,14 +64,8 @@ process.source = cms.Source("PoolSource",
 
 
 #####################################
-# CHS + PUPPI
+# CHS
 #####################################
-
-from CommonTools.PileupAlgos.Puppi_cff import puppi
-process.puppi = puppi
-process.puppi.candName= cms.InputTag('packedPFCandidates')
-process.puppi.vertexName= cms.InputTag('offlineSlimmedPrimaryVertices')
-
 
 # Select candidates that would pass CHS requirements
 # This can be used as input for HTT and other jet clustering algorithms
@@ -111,6 +105,22 @@ li_fatjets_branches.append(branch_name)
 li_ungroomed_fatjets_objects.append(fj_name)
 li_ungroomed_fatjets_branches.append(branch_name)
 
+# AntiKt, R=0.8, pT > 200 GeV
+fj_name = "ak08PFJetsCHS"
+branch_name = 'ak08'
+setattr(process, fj_name, cms.EDProducer(
+        "FastjetJetProducer",
+        PFJetParameters,
+        AnomalousCellParameters,
+        jetAlgorithm = cms.string("AntiKt"),
+        rParam       = cms.double(0.8)))
+getattr(process, fj_name).src = cms.InputTag("chs")
+getattr(process, fj_name).jetPtMin = cms.double(200)
+li_fatjets_objects.append(fj_name)
+li_fatjets_branches.append(branch_name)
+li_ungroomed_fatjets_objects.append(fj_name)
+li_ungroomed_fatjets_branches.append(branch_name)
+
 # CA, R=1.5, pT > 200 GeV
 fj_name = "ca15PFJetsCHS"
 branch_name = 'ca15'
@@ -126,39 +136,6 @@ li_fatjets_objects.append(fj_name)
 li_fatjets_branches.append(branch_name)
 li_ungroomed_fatjets_objects.append(fj_name)
 li_ungroomed_fatjets_branches.append(branch_name)
-
-## PUPPI: CA, R=0.8, pT > 200 GeV
-#fj_name = "ca08PFJetsPUPPI"
-#branch_name = 'ca08puppi'
-#setattr(process, fj_name, cms.EDProducer(
-#        "FastjetJetProducer",
-#        PFJetParameters,
-#        AnomalousCellParameters,
-#        jetAlgorithm = cms.string("CambridgeAachen"),
-#        rParam       = cms.double(0.8)))
-#getattr(process, fj_name).src = cms.InputTag("puppi")
-#getattr(process, fj_name).jetPtMin = cms.double(200)
-#li_fatjets_objects.append(fj_name)
-#li_fatjets_branches.append(branch_name)
-#li_ungroomed_fatjets_objects.append(fj_name)
-#li_ungroomed_fatjets_branches.append(branch_name)
-#
-## PUPPI: CA, R=1.5, pT > 200 GeV
-#fj_name = "ca15PFJetsPUPPI"
-#branch_name = 'ca15puppi'
-#setattr(process, fj_name, cms.EDProducer(
-#        "FastjetJetProducer",
-#        PFJetParameters,
-#        AnomalousCellParameters,
-#        jetAlgorithm = cms.string("CambridgeAachen"),
-#        rParam       = cms.double(1.5)))
-#getattr(process, fj_name).src = cms.InputTag("puppi")
-#getattr(process, fj_name).jetPtMin = cms.double(200)
-#li_fatjets_objects.append(fj_name)
-#li_fatjets_branches.append(branch_name)
-#li_ungroomed_fatjets_objects.append(fj_name)
-#li_ungroomed_fatjets_branches.append(branch_name)
-
 
 
 #####################################
@@ -400,6 +377,16 @@ def GetRadiusStringFromName(name):
       sys.exit()
 
 
+def GetAlgoFromName(name):       
+   if ("ca08" in fj_name) or ("ca15" in fj_name):
+      return "ca"
+   elif "ak08" in fj_name:
+      return "ak"
+   else:
+      print "Invalid jet algorithm!"
+      sys.exit()
+
+
 #####################################
 # NSubjettiness
 #####################################
@@ -471,7 +458,8 @@ li_fatjets_qvols = []
 for i_fj, fj_name in enumerate(li_fatjets_objects):
 
    r = GetRadiusFromName(fj_name)           
-        
+   algo = GetAlgoFromName(fj_name)           
+   
    qvol_fatjets = []#li_ungroomed_fatjets_objects
 
    if fj_name in qvol_fatjets:
@@ -488,7 +476,7 @@ for i_fj, fj_name in enumerate(li_fatjets_objects):
                                                       ntrial = cms.int32(50),
                                                       cutoff=cms.double(10.0),
                                                       jetRad= cms.double(r),
-                                                      jetAlgo=cms.string("CA"),
+                                                      jetAlgo=cms.string(algo.upper()),
                                                       preclustering = cms.int32(50)))
 
            setattr(process.RandomNumberGeneratorService, qvol_name, cms.PSet(initialSeed = cms.untracked.uint32(i_fj),
@@ -539,7 +527,12 @@ for fatjet_name in li_fatjets_objects:
                  trackIPTagInfos               = cms.InputTag(impact_info_name),                
               ))
       getattr(process, isv_info_name).useSVClustering = cms.bool(True)
-      getattr(process, isv_info_name).jetAlgorithm = cms.string("CambridgeAachen")
+
+      if GetAlgoFromName(fatjet_name) == "ca":
+         getattr(process, isv_info_name).jetAlgorithm = cms.string("CambridgeAachen")
+      elif GetAlgoFromName(fatjet_name) == "ak":
+         getattr(process, isv_info_name).jetAlgorithm = cms.string("AntiKt")
+
       getattr(process, isv_info_name).rParam = cms.double(delta_r)
       getattr(process, isv_info_name).fatJets  =  cms.InputTag(fatjet_name.replace("trimmedr2f6forbtag",""))
       getattr(process, isv_info_name).groomedFatJets  =  cms.InputTag(fatjet_name)
@@ -606,31 +599,7 @@ process.cmsTopTagCa15PFJetsCHS.src = cms.InputTag('chs')
 process.cmsTopTagCa15PFJetsCHS.doAreaFastjet = cms.bool(True)
 process.cmsTopTagCa15PFJetsCHS.jetPtMin = cms.double(200.0)
 
-process.cmsTopTagCa08PFJetsPUPPI = cms.EDProducer(
-        "CATopJetProducer",
-        PFJetParameters,
-        AnomalousCellParameters,
-        CATopJetParameters,
-        jetAlgorithm = cms.string("CambridgeAachen"),
-        rParam = cms.double(0.8),
-        writeCompound = cms.bool(True)
-    )
-process.cmsTopTagCa08PFJetsPUPPI.src = cms.InputTag('puppi')
-process.cmsTopTagCa08PFJetsPUPPI.doAreaFastjet = cms.bool(True)
-process.cmsTopTagCa08PFJetsPUPPI.jetPtMin = cms.double(200.0)
 
-process.cmsTopTagCa15PFJetsPUPPI = cms.EDProducer(
-        "CATopJetProducer",
-        PFJetParameters,
-        AnomalousCellParameters,
-        CATopJetParameters,
-        jetAlgorithm = cms.string("CambridgeAachen"),
-        rParam = cms.double(1.5),
-        writeCompound = cms.bool(True)
-    )
-process.cmsTopTagCa15PFJetsPUPPI.src = cms.InputTag('puppi')
-process.cmsTopTagCa15PFJetsPUPPI.doAreaFastjet = cms.bool(True)
-process.cmsTopTagCa15PFJetsPUPPI.jetPtMin = cms.double(200.0)
 
 
 # CMS Top Tagger Infos
@@ -648,30 +617,6 @@ process.ca08CMSTopTagInfos = cms.EDProducer("CATopJetTagger",
 
 process.ca15CMSTopTagInfos = cms.EDProducer("CATopJetTagger",
                                             src = cms.InputTag("cmsTopTagCa15PFJetsCHS"),
-                                            TopMass = cms.double(173),
-                                            TopMassMin = cms.double(0.),
-                                            TopMassMax = cms.double(250.),
-                                            WMass = cms.double(80.4),
-                                            WMassMin = cms.double(0.0),
-                                            WMassMax = cms.double(200.0),
-                                            MinMassMin = cms.double(0.0),
-                                            MinMassMax = cms.double(200.0),
-                                            verbose = cms.bool(False))
-
-process.ca08puppiCMSTopTagInfos = cms.EDProducer("CATopJetTagger",
-                                            src = cms.InputTag("cmsTopTagCa08PFJetsPUPPI"),
-                                            TopMass = cms.double(173),
-                                            TopMassMin = cms.double(0.),
-                                            TopMassMax = cms.double(250.),
-                                            WMass = cms.double(80.4),
-                                            WMassMin = cms.double(0.0),
-                                            WMassMax = cms.double(200.0),
-                                            MinMassMin = cms.double(0.0),
-                                            MinMassMax = cms.double(200.0),
-                                            verbose = cms.bool(False))
-
-process.ca15puppiCMSTopTagInfos = cms.EDProducer("CATopJetTagger",
-                                            src = cms.InputTag("cmsTopTagCa15PFJetsPUPPI"),
                                             TopMass = cms.double(173),
                                             TopMassMin = cms.double(0.),
                                             TopMassMax = cms.double(250.),
@@ -782,72 +727,6 @@ for input_object in ["chs"]:
    li_htt_branches.append(name)
 
 
-#
-#   name = "looseOptRQHTT"
-#   if not input_object == "chs":
-#      name += input_object
-#
-#   setattr(process, name, cms.EDProducer(
-#        "HTTTopJetProducer",
-#        PFJetParameters.clone( src = cms.InputTag(input_object),
-#                               doAreaFastjet = cms.bool(True),
-#                               doRhoFastjet = cms.bool(False),
-#                               jetPtMin = cms.double(100.0)
-#                           ),
-#        AnomalousCellParameters,
-#        optimalR = cms.bool(True),
-#        qJets = cms.bool(True),
-#        algorithm = cms.int32(1),
-#        jetAlgorithm = cms.string("CambridgeAachen"),
-#        rParam = cms.double(1.5),
-#        mode = cms.int32(4),
-#        minFatjetPt = cms.double(200.),
-#        minCandPt = cms.double(200.),
-#        minSubjetPt = cms.double(30.),
-#        writeCompound = cms.bool(True),
-#        minCandMass = cms.double(0.),
-#        maxCandMass = cms.double(1000),
-#        massRatioWidth = cms.double(100.),
-#        minM23Cut = cms.double(0.),
-#        minM13Cut = cms.double(0.),
-#        maxM13Cut = cms.double(2.)))
-#   li_htt_branches.append(name)
-#
-#   setattr(process.RandomNumberGeneratorService, name, cms.PSet(initialSeed = cms.untracked.uint32(99),
-#                                                                engineName = cms.untracked.string('TRandom3')))
-#
-#
-#   name = "tightOptRQHTT"
-#   if not input_object == "chs":
-#      name += input_object
-#
-#   setattr(process, name, cms.EDProducer(
-#        "HTTTopJetProducer",
-#        PFJetParameters.clone( src = cms.InputTag(input_object),
-#                               doAreaFastjet = cms.bool(True),
-#                               doRhoFastjet = cms.bool(False),
-#                               jetPtMin = cms.double(100.0)
-#                           ),
-#        AnomalousCellParameters,
-#        optimalR = cms.bool(True),
-#        qJets = cms.bool(True),
-#        algorithm = cms.int32(1),
-#        jetAlgorithm = cms.string("CambridgeAachen"),
-#        rParam = cms.double(1.5),
-#        mode = cms.int32(4),
-#        minFatjetPt = cms.double(200.),
-#        minCandPt = cms.double(200.),
-#        minSubjetPt = cms.double(30.),
-#        writeCompound = cms.bool(True),
-#        minCandMass = cms.double(120.),
-#        maxCandMass = cms.double(210),
-#        massRatioWidth = cms.double(0.15)))
-#   li_htt_branches.append(name)
-#
-#   setattr(process.RandomNumberGeneratorService, name, cms.PSet(initialSeed = cms.untracked.uint32(99),
-#                                                                engineName = cms.untracked.string('TRandom3')))
-#
-
 #####################################
 # NTupelizer
 #####################################
@@ -888,9 +767,9 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
         httObjects  = cms.vstring(li_htt_branches), # Using branch names also as object names
         httBranches = cms.vstring(li_htt_branches),                                           
        
-        cmsttObjects  = cms.vstring(['cmsTopTagCa08PFJetsCHS', 'cmsTopTagCa15PFJetsCHS', 'cmsTopTagCa08PFJetsPUPPI', 'cmsTopTagCa15PFJetsPUPPI']),
-        cmsttInfos    = cms.vstring(['ca08CMSTopTagInfos',     'ca15CMSTopTagInfos'    , 'ca08puppiCMSTopTagInfos',  'ca15puppiCMSTopTagInfos']),
-        cmsttBranches = cms.vstring(['ca08cmstt',              'ca15cmstt',              'ca08puppicmstt',           'ca15puppicmstt']),
+        cmsttObjects  = cms.vstring(['cmsTopTagCa08PFJetsCHS', 'cmsTopTagCa15PFJetsCHS']),
+        cmsttInfos    = cms.vstring(['ca08CMSTopTagInfos',     'ca15CMSTopTagInfos'    ]),
+        cmsttBranches = cms.vstring(['ca08cmstt',              'ca15cmstt']),
 
 	jetMult_min   = cms.untracked.int32(-99),
 	jetPt_min     = cms.untracked.double(15.),
@@ -920,7 +799,6 @@ process.TFileService = cms.Service("TFileService",
 #####################################
 
 process.p = cms.Path(process.chs)
-process.p += process.puppi
 
 # Schedule all fatjets
 for fj_name in li_fatjets_objects:
@@ -954,12 +832,8 @@ for htt_name in li_htt_branches:
 # Schedule CMS Top Tagger, HEPTopTagger, b-tagging and Ntupelizer
 for x in [process.cmsTopTagCa08PFJetsCHS,
           process.cmsTopTagCa15PFJetsCHS,
-          process.cmsTopTagCa08PFJetsPUPPI,
-          process.cmsTopTagCa15PFJetsPUPPI,
           process.ca08CMSTopTagInfos,
           process.ca15CMSTopTagInfos,
-          process.ca08puppiCMSTopTagInfos,
-          process.ca15puppiCMSTopTagInfos,
           process.my_btagging,
           process.tthNtupleAnalyzer
   ]:
