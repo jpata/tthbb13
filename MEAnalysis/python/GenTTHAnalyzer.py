@@ -54,18 +54,21 @@ class GenTTHAnalyzer(FilterAnalyzer):
         for q in event.l_quarks_w:
             if self.pass_jet_selection(q):
                 q.btagFlag = 0.0
+                q.tth_match_label = "wq"
                 attach_jet_transfer_function(q, self.conf)
                 event.l_quarks_gen += [q]
 
         for q in event.b_quarks_t:
             if self.pass_jet_selection(q):
                 q.btagFlag = 1.0
+                q.tth_match_label = "tb"
                 attach_jet_transfer_function(q, self.conf)
                 event.b_quarks_gen += [q]
 
         for q in event.b_quarks_h:
             if self.pass_jet_selection(q):
                 q.btagFlag = 1.0
+                q.tth_match_label = "hb"
                 attach_jet_transfer_function(q, self.conf)
                 event.b_quarks_gen += [q]
 

@@ -1,5 +1,6 @@
 from TTH.MEAnalysis.VHbbTree import lvec
 import ROOT
+import copy
 #Load the MEM integrator libraries
 # ROOT.gSystem.Load("libFWCoreFWLite")
 # ROOT.gROOT.ProcessLine('AutoLibraryLoader::enable();')
@@ -76,6 +77,41 @@ class MECategoryAnalyzer(FilterAnalyzer):
             self.counters["processing"].inc("passes")
         return passes
 
+class MEMConfig:
+    def __init__(self):
+        self.cfg = MEM.MEMConfig()
+        self.cfg.defaultCfg()
+        self.b_quark_candidates = lambda event: event.btagged_jets
+        self.l_quark_candidates = lambda event: event.wquark_candidate_jets
+        self.lepton_candidates = lambda event: event.good_leptons
+        self.transfer_function_method = MEM.TFMethod.Builtin
+
+        self.do_calculate = lambda event, config: False
+        self.mem_assumptions = set([])
+        self.enabled = True
+
+    def configure_transfer_function(self, conf):
+        for nb in [0, 1]:
+            for fl1, fl2 in [('b', MEM.TFType.bLost), ('l', MEM.TFType.qLost)]:
+                tf = conf.tf_matrix[fl1][nb].Make_CDF()
+                #set pt cut for efficiency function
+                tf.SetParameter(0, conf.jets["pt"])
+                self.cfg.set_tf_global(fl2, nb, tf)
+
+    def configure_minimize(self, orig_mem):
+        self.cfg.int_code = 0
+        self.cfg.do_minimize = 1
+
+    def configure_sudakov(self, orig_mem):
+        self.cfg.int_code |= MEM.IntegrandType.Sudakov
+        self.do_calculate = lambda event, conf: (
+            orig_mem.do_calculate(event, conf) and
+            len(event.good_jets)==6
+        )
+
+    def configure_recoil(self, orig_mem):
+        self.cfg.int_code |= MEM.IntegrandType.Recoil
+
 class MEAnalyzer(FilterAnalyzer):
     """
     Performs ME calculation using the external integrator.
@@ -125,75 +161,27 @@ class MEAnalyzer(FilterAnalyzer):
         super(MEAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
 
         self.configs = {
-            "SL_2qW": MEM.MEMConfig(),
-            "SL_2qW_gen": MEM.MEMConfig(),
-            "SL_1qW": MEM.MEMConfig(),
-            "SL_1qW_gen": MEM.MEMConfig(),
-            "DL": MEM.MEMConfig(),
-            "DL_gen": MEM.MEMConfig(),
-#            "NumPointsDouble": MEM.MEMConfig(),
-#            "NumPointsHalf": MEM.MEMConfig(),
-#            "NoJacobian": MEM.MEMConfig(),
-#            "NoDecayAmpl": MEM.MEMConfig(),
-#            "NoPDF": MEM.MEMConfig(),
-#            "NoScattAmpl": MEM.MEMConfig(),
-#            "QuarkEnergy98": MEM.MEMConfig(),
-#            "QuarkEnergy10": MEM.MEMConfig(),
-#            "NuPhiRestriction": MEM.MEMConfig(),
-#            "JetsPtOrder": MEM.MEMConfig(),
-#            "JetsPtOrderIntegrationRange": MEM.MEMConfig(),
-#            "Recoil": MEM.MEMConfig(),
-#            "Sudakov": MEM.MEMConfig(),
-#            "Minimize": MEM.MEMConfig(),
+            #"SL_2qW": MEM.MEMConfig(),
+            #"SL_2qW_gen": MEM.MEMConfig(),
+            #"SL_1qW": MEM.MEMConfig(),
+            #"SL_1qW_gen": MEM.MEMConfig(),
+            #"DL": MEM.MEMConfig(),
+            #"DL_gen": MEM.MEMConfig(),
+
+            "SL_2qW": MEMConfig(),
+            "SL_2qW_gen": MEMConfig(),
+            "SL_1qW": MEMConfig(),
+            "SL_1qW_gen": MEMConfig(),
+            "DL": MEMConfig(),
+            "DL_gen": MEMConfig(),
         }
 
         #These MEM configurations will actually be considered for calculation
         self.memkeys = self.conf.mem["methodsToRun"]
 
-        self.configs["SL_2qW"].defaultCfg()
-        self.configs["SL_2qW_gen"].defaultCfg()
-        self.configs["SL_1qW"].defaultCfg()
-        self.configs["SL_1qW_gen"].defaultCfg()
-        self.configs["DL"].defaultCfg()
-        self.configs["DL_gen"].defaultCfg()
-        #self.configs["gen"].defaultCfg()
-        #self.configs["genMissedWQ"].defaultCfg()
-        #self.configs["newTF"].defaultCfg()
-        #self.configs["MissedWQ"].defaultCfg()
-        #self.configs["MissedWQOldTF"].defaultCfg()
-        #self.configs["NumPointsDouble"].defaultCfg(2.0)
-        #self.configs["NumPointsHalf"].defaultCfg(0.5)
-        #self.configs["NoJacobian"].defaultCfg()
-        #self.configs["NoDecayAmpl"].defaultCfg()
-        #self.configs["NoPDF"].defaultCfg()
-        #self.configs["NoScattAmpl"].defaultCfg()
-        #self.configs["QuarkEnergy98"].defaultCfg()
-        #self.configs["QuarkEnergy10"].defaultCfg()
-        #self.configs["NuPhiRestriction"].defaultCfg()
-        #self.configs["JetsPtOrder"].defaultCfg()
-        #self.configs["JetsPtOrderIntegrationRange"].defaultCfg()
-        #self.configs["Recoil"].defaultCfg()
-        #self.configs["Sudakov"].defaultCfg()
-        #self.configs["Minimize"].defaultCfg()
-
+        #Set the MEM
         for (k, v) in self.configs.items():
-            v.b_quark_candidates = lambda event: event.btagged_jets
-            v.l_quark_candidates = lambda event: event.wquark_candidate_jets
-            v.lepton_candidates = lambda event: event.good_leptons
-            v.transfer_function_method = MEM.TFMethod.Builtin
-
-            v.mem_assumptions = set([])
-            v.enabled = True
-
-            for nb in [0, 1]:
-                for fl1, fl2 in [('b', MEM.TFType.bLost), ('l', MEM.TFType.qLost)]:
-                    tf = self.conf.tf_matrix[fl1][nb].Make_CDF()
-
-                    #set pt cut for efficiency function
-                    tf.SetParameter(0, self.conf.jets["pt"])
-                    v.set_tf_global(fl2, nb, tf)
-
-        #self.configs["newTF"].transfer_function_method = MEM.TFMethod.External
+            v.configure_transfer_function(self.conf)
 
         for k in ["SL_2qW_gen", "SL_1qW_gen"]:
             self.configs[k].b_quark_candidates = lambda event: event.b_quarks_gen
@@ -245,23 +233,23 @@ class MEAnalyzer(FilterAnalyzer):
         for k in ["SL_2qW", "SL_1qW", "SL_2qW_gen", "SL_1qW_gen"]:
             self.configs[k].mem_assumptions.add("sl")
 
-        #self.configs["NoJacobian"].int_code &= ~ MEM.IntegrandType.Jacobian
-        #self.configs["NoDecayAmpl"].int_code &= ~ MEM.IntegrandType.DecayAmpl
-        #self.configs["NoPDF"].int_code &= ~ MEM.IntegrandType.PDF
-        #self.configs["NoScattAmpl"].int_code &=  ~ MEM.IntegrandType.ScattAmpl
-        #self.configs["QuarkEnergy98"].j_range_CL = 0.98
-        #self.configs["QuarkEnergy98"].b_range_CL = 0.98
-        #self.configs["QuarkEnergy10"].j_range_CL = 0.10
-        #self.configs["QuarkEnergy10"].b_range_CL = 0.10
-        #self.configs["NuPhiRestriction"].m_range_CL = 99
-        #self.configs["JetsPtOrder"].highpt_first  = 0
-        #self.configs["JetsPtOrderIntegrationRange"].highpt_first  = 0
-        #self.configs["JetsPtOrderIntegrationRange"].j_range_CL = 0.99
-        #self.configs["JetsPtOrderIntegrationRange"].b_range_CL = 0.99
-        #self.configs["Recoil"].int_code |= MEM.IntegrandType.Recoil
-        #self.configs["Sudakov"].int_code |= MEM.IntegrandType.Sudakov
-        #self.configs["Minimize"].do_minimize = 1
-        #self.configs["Minimize"].int_code = 0
+        #Create additional configurations
+        for strat, configure in [
+
+                #Run with recoil instead of met
+                ("Recoil", MEMConfig.configure_recoil),
+
+                #apply sudakov factors
+                ("Sudakov", MEMConfig.configure_sudakov),
+
+                #run minimization
+                ("Minimize", MEMConfig.configure_minimize)
+            ]:
+            for k in ["SL_2qW", "SL_1qW"]:
+                kn = k + "_" + strat
+                self.configs[kn] = copy.deepcopy(self.configs[k])
+                self.configs[kn].cfg.defaultCfg()
+                configure(self.configs[kn], self.configs[k])
 
         #only in 6J SL
         #self.configs["Sudakov"].do_calculate = (
@@ -274,7 +262,7 @@ class MEAnalyzer(FilterAnalyzer):
         self.integrator = MEM.Integrand(
             #0,
             MEM.output,
-            self.configs["SL_2qW"]
+            self.configs["SL_2qW"].cfg
         )
 
         #Create an emtpy std::vector<MEM::Permutations::Permutations>
@@ -333,7 +321,7 @@ class MEAnalyzer(FilterAnalyzer):
         super(MEAnalyzer, self).beginLoop(setup)
 
     def configure_mem(self, event, mem_cfg):
-        self.integrator.set_cfg(mem_cfg)
+        self.integrator.set_cfg(mem_cfg.cfg)
         self.vars_to_integrate.clear()
         self.integrator.next_event()
         mem_cfg.enabled = True
@@ -353,7 +341,7 @@ class MEAnalyzer(FilterAnalyzer):
                 }
             )
             if "meminput" in self.conf.general["verbosity"]:
-                print "bq", jet.pt, jet.eta, jet.phi, jet.mass, jet.btagFlag
+                print "bq", jet.pt, jet.eta, jet.phi, jet.mass, jet.btagFlag, jet.tth_match_label
 
         #Add light jets that are assumed to come from hadronic W decay
         for jet in mem_cfg.l_quark_candidates(event):
@@ -366,7 +354,7 @@ class MEAnalyzer(FilterAnalyzer):
                 }
             )
             if "meminput" in self.conf.general["verbosity"]:
-                print "lq", jet.pt, jet.eta, jet.phi, jet.mass, jet.btagFlag
+                print "lq", jet.pt, jet.eta, jet.phi, jet.mass, jet.btagFlag, jet.tth_match_label
         for lep in mem_cfg.lepton_candidates(event):
             self.add_obj(
                 MEM.ObjectType.Lepton,
@@ -438,7 +426,11 @@ class MEAnalyzer(FilterAnalyzer):
                 return True
 
         res = {}
-        print event.cat, event.cat_btag, len(event.good_jets), event.nBCSVM, event.n_mu_tight, event.n_el_tight
+        print (event.input.run, event.input.lumi, event.input.evt,
+            event.cat, event.cat_btag, len(event.good_jets), event.nBCSVM,
+            event.n_mu_tight, event.n_el_tight
+        )
+
         for hypo in [MEM.Hypothesis.TTH, MEM.Hypothesis.TTBB]:
             skipped = []
             for confname in self.memkeys:

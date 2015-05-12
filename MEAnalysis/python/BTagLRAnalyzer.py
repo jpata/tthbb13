@@ -182,9 +182,10 @@ class BTagLRAnalyzer(FilterAnalyzer):
 
         #Take first 4 most b-tagged jets
         btagged = sorted(event.btagged_jets, key=lambda x: x.btagCSV, reverse=True)[0:4]
+        event.btagged_jets = btagged
         #Set these jets to be used as b-quarks in the MEM
         #We don't want to use more than 4 b-quarks in the hypothesis
-        for jet in btagged:
+        for jet in event.btagged_jets:
             idx = event.good_jets.index(jet)
             event.good_jets[idx].btagFlag = 1.0
 

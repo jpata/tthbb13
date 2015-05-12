@@ -45,9 +45,9 @@ samples = cms.VPSet([
 
 #New phys14 processing
     cms.PSet(
-        fileNamesS1=cms.vstring(["/hdfs/cms/store/user/jpata/tth/s1_eb733a1/TTHbb_s1_eb733a1_tth_hbb_13tev_amcatnlo_pu20bx25_phys14.root"]),
-        fileNamesS2=cms.vstring(["/scratch/joosep/tth_hbb_13tev_amcatnlo_pu20bx25_phys14.root"]),
-        nickName=cms.string("tthbb_13TeV_phys14"),
+        fileNamesS1=cms.vstring([]),
+        fileNamesS2=cms.vstring(["/scratch/joosep/tth_13tev.root"]),
+        nickName=cms.string("tth_13TeV_phys14"),
         fractionToProcess=cms.double(1.0),
         totalEvents=cms.int64(-1),
         type=cms.int32(3), #ME_13TeV
@@ -65,3 +65,5 @@ samples = cms.VPSet([
         skip=cms.bool(True),
     ),
 ])
+
+samples_dict = {s.nickName.value(): s for s in samples}
