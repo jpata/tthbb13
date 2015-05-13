@@ -1,6 +1,6 @@
 export SCRAM_ARCH=slc6_amd64_gcc491
 
-scram project -n CMSSW CMSSW CMSSW_7_3_0
+scram project -n CMSSW CMSSW CMSSW_7_4_1_patch1
 cd CMSSW/src/
 cmsenv
 git cms-addpkg PhysicsTools/PatAlgos
@@ -10,18 +10,16 @@ git cms-addpkg DataFormats/JetReco
 git cms-addpkg RecoJets/JetAlgorithms
 git cms-addpkg RecoJets/JetProducers
 
-#get the TTH code
+# get the TTH code
 git clone https://github.com/jpata/tthbb13.git TTH
 cd TTH
-git checkout dev-73X
+git checkout dev-74X
 cd ..
-cp TTH/MEAnalysis/libs/*.so ../lib/$SCRAM_ARCH/
 
-# to apply a the top tagger as a patch
-git apply -3 --ignore-whitespace --ignore-space-change --exclude DataFormats/PatCandidates/src/classes_def_objects.xml TTH/0001-merged-HepTopTagger.patch
-
-scram setup lhapdf
+# Add HEPTopTagger
+git cms-merge-topic gkasieczka:htt-v2-74X
 
 cp $CMSSW_BASE/external/$SCRAM_ARCH/lib/* $CMSSW_BASE/lib/$SCRAM_ARCH/
+
 # And build:
-# scram b -j 10
+scram b -j 10
