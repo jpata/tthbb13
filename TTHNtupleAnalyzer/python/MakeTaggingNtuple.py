@@ -174,11 +174,11 @@ for htt in li_htt_branches:
     objects[htt]                = htt_branches
 
 # And some extras
-for x in ["ca08", "ca15", "ca08puppi", "ca15puppi"]:
+for x in ["ak08", "ca08", "ca15", "ca08puppi", "ca15puppi"]:
     if x in objects.keys():
         objects[x] = fj_branches_plus
 
-for x in ["ca08cmstt", "ca15cmstt", "ca08puppicmstt", "ca15puppicmstt"]:
+for x in ["ak08cmstt","ca08cmstt", "ca15cmstt"]:
     if x in objects.keys():
         objects[x] = cmstt_branches
 

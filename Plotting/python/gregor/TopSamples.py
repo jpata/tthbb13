@@ -140,10 +140,10 @@ for k,v in files.iteritems():
     weighted_files[k] = basepath + v + "-weighted.root"
 
 pairs = { 
-#    "pt-200-to-300" : ["zprime_m1000_low", "qcd_170_300"],
+    "pt-200-to-300" : ["zprime_m1000_low", "qcd_170_300"],
     "pt-300-to-470" : ["zprime_m1000", "qcd_300_470"],
  ###   "pt-470-to-600" : ["zprime_m1250", "qcd_470_600"],
- #   "pt-600-to-800" : ["zprime_m2000_low", "qcd_600_800"],
+#    "pt-600-to-800" : ["zprime_m2000_low", "qcd_600_800"],
 #    "pt-800-to-1000" : ["zprime_m2000", "qcd_800_1000"],
 }
 
