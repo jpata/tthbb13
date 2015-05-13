@@ -5,7 +5,7 @@ Top Tagging Ntuple Making (based on TTH-MEM Ntuple)
 ~~~
 mkdir TTH
 cd TTH
-wget --no-check-certificate https://raw.githubusercontent.com/jpata/tthbb13/dev-73X/setup.sh
+wget --no-check-certificate https://raw.githubusercontent.com/jpata/tthbb13/dev-74X/setup.sh
 source setup.sh
 ~~~
 
