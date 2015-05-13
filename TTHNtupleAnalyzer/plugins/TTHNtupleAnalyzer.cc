@@ -64,7 +64,7 @@
 #include "DataFormats/PatCandidates/interface/PackedCandidate.h"
 
 //for top taggers
-#include "DataFormats/JetReco/interface/CATopJetTagInfo.h"
+#include "DataFormats/BTauReco/interface/CATopJetTagInfo.h"
 #include "DataFormats/JetReco/interface/HTTTopJetTagInfo.h"
 
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
