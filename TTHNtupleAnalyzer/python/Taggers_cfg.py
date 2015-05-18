@@ -29,12 +29,9 @@ except:
 
 # Load some standard configuration files
 process.load("Configuration.StandardSequences.MagneticField_cff")
-process.load("Configuration.Geometry.GeometryIdeal_cff")
+process.load('Configuration.Geometry.GeometryRecoDB_cff')
 process.load("RecoBTag.Configuration.RecoBTag_cff") # this loads all available b-taggers
 
-# Load the necessary conditions 
-process.load("Configuration.StandardSequences.MagneticField_cff")
-process.load("Configuration.Geometry.GeometryIdeal_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_mc')
@@ -71,10 +68,6 @@ process.source = cms.Source("PoolSource",
 # This can be used as input for HTT and other jet clustering algorithms
 process.chs = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedPFCandidates"), cut = cms.string("fromPV"))
 
-#process.load("CommonTools.ParticleFlow.pfNoPileUpJME_cff")
-#process.pfPileUpJME.src = cms.InputTag("packedPFCandidates")
-#process.pfPileUpJME.Vertices = "offlineSlimmedPrimaryVertices"
-
 
 #####################################
 # Ungroomed Fatjets
@@ -109,7 +102,7 @@ li_fatjets_branches.append(branch_name)
 li_ungroomed_fatjets_objects.append(fj_name)
 li_ungroomed_fatjets_branches.append(branch_name)
 
-# AntiKt, R=0.8, pT > 200 GeV
+## AntiKt, R=0.8, pT > 200 GeV
 fj_name = "ak08PFJetsCHS"
 branch_name = 'ak08'
 setattr(process, fj_name, cms.EDProducer(
@@ -147,20 +140,44 @@ li_ungroomed_fatjets_branches.append(branch_name)
 # AK 0.8 constituents
 #####################################
 
-process.ak5PFJets = cms.EDProducer(
-   "FastjetJetProducer",
-   PFJetParameters,
-   AnomalousCellParameters,
-   jetAlgorithm = cms.string("AntiKt"),
-   rParam       = cms.double(0.5)
-)
-process.ak5PFJets.src = cms.InputTag("chs")
-
-
-process.ak8PFJetsCHSConstituents = cms.EDFilter("PFJetConstituentSelector",
-                                                src = cms.InputTag("ak5PFJets"),
-                                                cut = cms.string("")
+process.ak8PFJetsCHSConstituents = cms.EDFilter("MiniAODJetConstituentSelector",
+                                                src = cms.InputTag("ak08PFJetsCHS"),
+                                                cut = cms.string("pt>0")
                                              )
+
+#####################################
+# Helpers: GetRadiusFromName / GetRadiusStringFromName
+#####################################
+
+def GetRadiusFromName(name):       
+
+   if "08" in name:
+      return 0.8 
+   elif "15" in name:
+      return 1.5
+   else:
+      print "Invalid jet radius!"
+      sys.exit()
+
+def GetRadiusStringFromName(name):        
+   if "08" in name:
+      return "08"
+   elif "15" in name:
+      return "15"
+   else:
+      print "Invalid jet radius!"
+      sys.exit()
+
+
+def GetAlgoFromName(name):       
+   if ("ca08" in name) or ("ca15" in name):
+      return "ca"
+   elif "ak08" in name:
+      return "ak"
+   else:
+      print "Invalid jet algorithm!"
+      sys.exit()
+
 
 #####################################
 # Groomed Fatjets
@@ -170,6 +187,8 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
                                             li_ungroomed_fatjets_branches):
 
    ungroomed_fj = getattr(process, ungroomed_fj_name)
+
+   r = GetRadiusFromName(fj_name)
 
    #####################################
    # Trimming (for btag)
@@ -185,6 +204,21 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
       useExplicitGhosts = cms.bool(True),
       writeCompound = cms.bool(True),
       jetCollInstanceName=cms.string("SubJets"),
+   ))
+   li_fatjets_objects.append(fj_name)        
+   li_fatjets_branches.append(branch_name)
+
+   name = "softdropz10b00forbtag"   
+   fj_name = ungroomed_fj_name + name
+   branch_name = ungroomed_branch_name + name
+   setattr(process, fj_name, ungroomed_fj.clone(
+           useSoftDrop = cms.bool(True),
+           zcut = cms.double(0.1),
+           beta = cms.double(0.0),
+           R0   = cms.double(r),
+           useExplicitGhosts = cms.bool(True),
+           writeCompound = cms.bool(True),
+          jetCollInstanceName=cms.string("SubJets")
    ))
    li_fatjets_objects.append(fj_name)        
    li_fatjets_branches.append(branch_name)
@@ -283,6 +317,7 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
            useSoftDrop = cms.bool(True),
            zcut = cms.double(0.1),
            beta = cms.double(0.0),
+           R0   = cms.double(r),
            useExplicitGhosts = cms.bool(True)))
    li_fatjets_objects.append(fj_name)        
    li_fatjets_branches.append(branch_name)
@@ -294,6 +329,7 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
            useSoftDrop = cms.bool(True),
            zcut = cms.double(0.1),
            beta = cms.double(1.0),
+           R0   = cms.double(r),
            useExplicitGhosts = cms.bool(True)))
    li_fatjets_objects.append(fj_name)        
    li_fatjets_branches.append(branch_name)
@@ -305,6 +341,7 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
            useSoftDrop = cms.bool(True),
            zcut = cms.double(0.1),
            beta = cms.double(2.0),
+           R0   = cms.double(r),
            useExplicitGhosts = cms.bool(True)))
    li_fatjets_objects.append(fj_name)        
    li_fatjets_branches.append(branch_name)
@@ -317,6 +354,7 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
            useSoftDrop = cms.bool(True),
            zcut = cms.double(0.15),
            beta = cms.double(0.0),
+           R0   = cms.double(r),
            useExplicitGhosts = cms.bool(True)))
    li_fatjets_objects.append(fj_name)        
    li_fatjets_branches.append(branch_name)
@@ -328,6 +366,7 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
            useSoftDrop = cms.bool(True),
            zcut = cms.double(0.15),
            beta = cms.double(1.0),
+           R0   = cms.double(r),
            useExplicitGhosts = cms.bool(True)))
    li_fatjets_objects.append(fj_name)        
    li_fatjets_branches.append(branch_name)
@@ -339,6 +378,7 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
            useSoftDrop = cms.bool(True),
            zcut = cms.double(0.15),
            beta = cms.double(2.0),
+           R0   = cms.double(r),
            useExplicitGhosts = cms.bool(True)))
    li_fatjets_objects.append(fj_name)        
    li_fatjets_branches.append(branch_name)
@@ -351,6 +391,7 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
            useSoftDrop = cms.bool(True),
            zcut = cms.double(0.2),
            beta = cms.double(0.0),
+           R0   = cms.double(r),
            useExplicitGhosts = cms.bool(True)))
    li_fatjets_objects.append(fj_name)        
    li_fatjets_branches.append(branch_name)
@@ -362,6 +403,7 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
            useSoftDrop = cms.bool(True),
            zcut = cms.double(0.2),
            beta = cms.double(1.0),
+           R0   = cms.double(r),
            useExplicitGhosts = cms.bool(True)))
    li_fatjets_objects.append(fj_name)        
    li_fatjets_branches.append(branch_name)
@@ -373,42 +415,10 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
            useSoftDrop = cms.bool(True),
            zcut = cms.double(0.2),
            beta = cms.double(2.0),
+           R0   = cms.double(r),
            useExplicitGhosts = cms.bool(True)))
    li_fatjets_objects.append(fj_name)        
    li_fatjets_branches.append(branch_name)
-
-
-#####################################
-# Helpers: GetRadiusFromName / GetRadiusStringFromName
-#####################################
-
-def GetRadiusFromName(name):       
-   if "08" in fj_name:
-      return 0.8 
-   elif "15" in fj_name:
-      return 1.5
-   else:
-      print "Invalid jet radius!"
-      sys.exit()
-
-def GetRadiusStringFromName(name):        
-   if "08" in fj_name:
-      return "08"
-   elif "15" in fj_name:
-      return "15"
-   else:
-      print "Invalid jet radius!"
-      sys.exit()
-
-
-def GetAlgoFromName(name):       
-   if ("ca08" in fj_name) or ("ca15" in fj_name):
-      return "ca"
-   elif "ak08" in fj_name:
-      return "ak"
-   else:
-      print "Invalid jet algorithm!"
-      sys.exit()
 
 
 #####################################
@@ -432,7 +442,7 @@ for fj_name in li_fatjets_objects:
                                                  # variables for measure definition : 
                                                  measureDefinition = cms.uint32( 0 ), # CMS default is normalized measure
                                                  beta = cms.double(1.0),              # CMS default is 1
-                                                 R0 = cms.double(r),              # CMS default is jet cone size
+                                                 R0 = cms.double(r),                  # CMS default is jet cone size
                                                  Rcutoff = cms.double( -999.0),       # not used by default
                                                  # variables for axes definition :
                                                  axesDefinition = cms.uint32( 6 ),    # CMS default is 1-pass KT axes
@@ -557,10 +567,15 @@ for fatjet_name in li_fatjets_objects:
       elif GetAlgoFromName(fatjet_name) == "ak":
          getattr(process, isv_info_name).jetAlgorithm = cms.string("AntiKt")
 
-      getattr(process, isv_info_name).rParam = cms.double(delta_r)
+      original_fatjet_name = fatjet_name
+      original_fatjet_name = original_fatjet_name.replace("trimmedr2f6forbtag","")
+      original_fatjet_name = original_fatjet_name.replace("softdropz10b00forbtag","")
+      
+      print original_fatjet_name
+      
 
-      # !!!!!!!!!!!!! Fix this!
-      getattr(process, isv_info_name).fatJets  =  cms.InputTag(fatjet_name.replace("trimmedr2f6forbtag",""))
+      getattr(process, isv_info_name).rParam = cms.double(delta_r)
+      getattr(process, isv_info_name).fatJets  =  cms.InputTag(original_fatjet_name)
       getattr(process, isv_info_name).groomedFatJets  =  cms.InputTag(fatjet_name)
 
       setattr(process,
@@ -620,11 +635,12 @@ process.cmsTopTagAk08PFJetsCHS = cms.EDProducer(
         CATopJetParameters,
         jetAlgorithm = cms.string("CambridgeAachen"), # CA is correct here! We already run on AK constituents! see below..
         rParam = cms.double(0.8),
-        writeCompound = cms.bool(True)
-    )
+        writeCompound = cms.bool(True))
+
 process.cmsTopTagAk08PFJetsCHS.src = cms.InputTag("ak8PFJetsCHSConstituents", "constituents")
 process.cmsTopTagAk08PFJetsCHS.doAreaFastjet = cms.bool(True)
 process.cmsTopTagAk08PFJetsCHS.jetPtMin = cms.double(200.0)
+
 
 process.cmsTopTagCa15PFJetsCHS = cms.EDProducer(
         "CATopJetProducer",
@@ -688,7 +704,6 @@ li_htt_branches = []
 
 for input_object in ["chs"]:
    
-
    name = "looseHTT"
    if not input_object == "chs":
       name += input_object
@@ -748,6 +763,8 @@ for input_object in ["chs"]:
    li_htt_branches.append(name)
 
 
+
+
 #   name = "looseOptRRejRminHTT"
 #   if not input_object == "chs":
 #      name += input_object
@@ -785,7 +802,7 @@ for input_object in ["chs"]:
 
 li_fatjets_use_subjets = []
 for fj in li_fatjets_objects:
-   if "trimmedr2f6forbtag" in fj:
+   if "forbtag" in fj:
       li_fatjets_use_subjets.append(1)
    else:
       li_fatjets_use_subjets.append(0)
@@ -820,8 +837,8 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
         httBranches = cms.vstring(li_htt_branches),                                           
        
         cmsttObjects  = cms.vstring(['cmsTopTagCa08PFJetsCHS', 'cmsTopTagCa15PFJetsCHS', 'cmsTopTagAk08PFJetsCHS']),
-        cmsttInfos    = cms.vstring(['ca08CMSTopTagInfos',     'ca15CMSTopTagInfos', 'ak08CMSTopTagInfos'    ]),
-        cmsttBranches = cms.vstring(['ca08cmstt',              'ca15cmstt', 'ak08cmstt']),
+        cmsttInfos    = cms.vstring(['ca08CMSTopTagInfos',     'ca15CMSTopTagInfos',     'ak08CMSTopTagInfos'    ]),
+        cmsttBranches = cms.vstring(['ca08cmstt',              'ca15cmstt',              'ak08cmstt']),
 
 	jetMult_min   = cms.untracked.int32(-99),
 	jetPt_min     = cms.untracked.double(15.),
@@ -883,7 +900,6 @@ for htt_name in li_htt_branches:
    process.p += getattr(process, htt_name)
 
 # Schedule AK08 Constituents
-process.p += process.ak5PFJets
 process.p += process.ak8PFJetsCHSConstituents
 
 # Schedule CMS Top Tagger, HEPTopTagger, b-tagging and Ntupelizer

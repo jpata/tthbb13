@@ -146,7 +146,7 @@ htt_branches = ["pt", "mass", "fRec",
 
 cmstt_branches = ["pt", "mass", "minMass", "wMass", "topMass", "nSubJets"]
 
-li_htt_branches = li_htt_branches + ['looseHTT','looseOptRHTT', 'looseOptRRejRminHTT']# 'looseOptRQHTT', 'tightOptRQHTT']
+li_htt_branches = li_htt_branches + ['looseHTT','looseOptRHTT']#, 'looseOptRRejRminHTT', 'looseOptRQHTT', 'tightOptRQHTT']
 
 
 ########################################
