@@ -9,7 +9,7 @@ config.General.transferLogs = True
 
 config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
-config.JobType.allowNonProductionCMSSW = True
+config.JobType.allowUndistributedCMSSW = True
 config.JobType.maxJobRuntimeMin = 60*24 #maximal job runtime in minute
 config.JobType.scriptExe = 'myScript.sh'
 config.JobType.inputFiles = ["../python/MakeTaggingNtuple.py", "../python/AccessHelpers.py"]
