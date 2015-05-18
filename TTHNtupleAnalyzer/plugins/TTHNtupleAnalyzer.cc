@@ -340,10 +340,12 @@ void fill_genparticle_branches(TTHTree* tthtree,
     int n = it - particles.begin();
     
     // Fill the branches
-    tthtree->get_address<float *>(prefix + "pt"  )[n] = (*it)->pt();
-    tthtree->get_address<float *>(prefix + "eta" )[n] = (*it)->eta();
-    tthtree->get_address<float *>(prefix + "phi" )[n] = (*it)->phi();
-    tthtree->get_address<float *>(prefix + "mass")[n] = (*it)->mass();    
+    tthtree->get_address<float *>(prefix + "pt"  )[n]  = (*it)->pt();
+    tthtree->get_address<float *>(prefix + "eta" )[n]  = (*it)->eta();
+    tthtree->get_address<float *>(prefix + "phi" )[n]  = (*it)->phi();
+    tthtree->get_address<float *>(prefix + "mass")[n]  = (*it)->mass();    
+    tthtree->get_address<int   *>(prefix + "pdgid")[n] = (*it)->pdgId();    
+    
   }
   
   // Also count the number of particles

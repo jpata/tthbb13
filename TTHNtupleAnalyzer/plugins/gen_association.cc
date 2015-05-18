@@ -354,6 +354,7 @@ int is_hadronic_top(const reco::Candidate* p) {
 // - Start with all Status==parton_status (=X) particles
 // - Remove the ones that have a daughter that is also Status==parton_status
 // - Remove if pT < min_parton_pt
+// - Remove leptons
 //
 // For Pythia6 parton_status should be 3
 // For Pythia8 parton_status should be 23
@@ -406,7 +407,10 @@ void get_hard_partons(edm::Handle<edm::View<reco::GenParticle>> pruned,
     
     // If no daughter is also status X and particle has enough pt:
     // store it
-    if (keep && (gp->pt() >= min_parton_pt))
+    if ( keep && 
+	 (gp->pt() >= min_parton_pt) && 
+	 ( (abs(gp->pdgId())<11) || (abs(gp->pdgId())>16) )
+	)
       hard_partons.push_back(gp);         
 
   } // end of looping over status X particles

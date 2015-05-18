@@ -35,6 +35,10 @@ for particle in ["hadtop", "higgs", "parton"]:
     for v in ["eta", "mass", "phi", "pt"]:
         full_branch_name = "gen_{0}__{1}".format(particle, v)
         process += [Dynamic1DArray(full_branch_name, "float", counter_name, "N_MAX")]
+
+    for v in ["pdgid"]:
+        full_branch_name = "gen_{0}__{1}".format(particle, v)
+        process += [Dynamic1DArray(full_branch_name, "int", counter_name, "N_MAX")]
 # End of Simple Truth
 
 

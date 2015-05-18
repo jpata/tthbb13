@@ -83,7 +83,7 @@ else:
 # Determine particle species
 # Tier3
 if socket.gethostname() == "t3ui12":
-    particle_name = "hadtop"
+    particle_name = "parton"
     r_matching = 1.2
 # Grid
 else:
@@ -124,7 +124,11 @@ else:
 # value -> list[branch name in input, data type]
 event_infos = {"npv" : ["n__pv", "int"]}
         
-particle_branches = ["pt", "eta", "phi", "mass"]
+# Truth particle information
+particle_branches_float = ["pt", "eta", "phi", "mass"]
+particle_branches_int = ["pdgid"]
+particle_branches = particle_branches_float + particle_branches_int
+
 
 # "Normal" branches for most fatjet collections
 fj_branches = ["pt", "mass", "tau1", "tau2", "tau3", "qvol"]
@@ -225,8 +229,13 @@ for k,v in event_infos.iteritems():
 AH.addScalarBranches(variables,
                      variable_types,
                      outtree,
-                     ["{0}_{1}".format(particle_name, branch_name) for branch_name in particle_branches],
+                     ["{0}_{1}".format(particle_name, branch_name) for branch_name in particle_branches_float],
                      datatype = 'float')
+AH.addScalarBranches(variables,
+                     variable_types,
+                     outtree,
+                     ["{0}_{1}".format(particle_name, branch_name) for branch_name in particle_branches_int],
+                     datatype = 'int')
 
 AH.addScalarBranches(variables, variable_types, outtree,
                      ["top_size", 
