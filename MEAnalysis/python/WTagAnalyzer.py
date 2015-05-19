@@ -71,9 +71,11 @@ class WTagAnalyzer(FilterAnalyzer):
                 event.wquark_candidate_jets.add(bpair[i][1])
                 event.wquark_candidate_jets.add(bpair[i][2])
 
-            if "reco" in self.conf.general["verbosity"]:
-                print "Wmass", event.Wmass, event.good_jets.index(bpair[1]), event.good_jets.index(bpair[2])
-
+                if "reco" in self.conf.general["verbosity"]:
+                    print("Wmass", event.Wmass,
+                        event.good_jets.index(bpair[i][1]),
+                        event.good_jets.index(bpair[i][2])
+                    )
         #If we can't calculate W mass, untagged jets become the candidate
         else:
             for jet in event.buntagged_jets:

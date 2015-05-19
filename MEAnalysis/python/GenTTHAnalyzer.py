@@ -176,16 +176,16 @@ class GenTTHAnalyzer(FilterAnalyzer):
                     event.nMatch_hb_btag += 1
 
         #Add also b-tagged, unmatched jets to gen-level b-quark collection
-        for jet in event.btagged_jets:
-            jet = copy.deepcopy(jet)
-            if jet.tth_match_label not in ["hb", "tb"]:
-                jet.pt = jet.mcPt
-                jet.eta = jet.mcEta
-                jet.phi = jet.mcPhi
-                jet.mass = jet.mcM
-                jet.pdgId = jet.mcFlavour
-                if len(event.b_quarks_gen) < 4:
-                    event.b_quarks_gen += [jet]
+        #for jet in event.btagged_jets:
+        #    jet = copy.deepcopy(jet)
+        #    if jet.tth_match_label not in ["hb", "tb"]:
+        #        jet.pt = jet.mcPt
+        #        jet.eta = jet.mcEta
+        #        jet.phi = jet.mcPhi
+        #        jet.mass = jet.mcM
+        #        jet.pdgId = jet.mcFlavour
+        #        if len(event.b_quarks_gen) < 4:
+        #            event.b_quarks_gen += [jet]
 
         if "matching" in self.conf.general["verbosity"]:
             matches = {"wq":event.l_quarks_w, "tb": event.b_quarks_t, "hb":event.b_quarks_h}
@@ -193,7 +193,7 @@ class GenTTHAnalyzer(FilterAnalyzer):
             for ij, jet in enumerate(event.good_jets):
                 if not matched_pairs.has_key(ij):
                     continue
-                mlabel, midx, mdr = matched_pairs[ij]
+                mlabel, midx, mdr, mlabel_num = matched_pairs[ij]
                 print "jet match", ij, mlabel, midx, mdr, jet.pt, matches[mlabel][midx].pt
 
         #reco-level tth-matched system

@@ -96,6 +96,8 @@ class MEMConfig:
                 tf = conf.tf_matrix[fl1][nb].Make_CDF()
                 #set pt cut for efficiency function
                 tf.SetParameter(0, conf.jets["pt"])
+                tf.SetNpx(10000)
+                tf.SetRange(0, 500)
                 self.cfg.set_tf_global(fl2, nb, tf)
 
     def configure_minimize(self, orig_mem):
@@ -104,10 +106,18 @@ class MEMConfig:
 
     def configure_sudakov(self, orig_mem):
         self.cfg.int_code |= MEM.IntegrandType.Sudakov
-        self.do_calculate = lambda event, conf: (
+        njets = 6
+        if "dl" in orig_mem.mem_assumptions:
+            njets = 4
+        if "missed_wq" in orig_mem.mem_assumptions:
+            njets -= 1
+        self.do_calculate = lambda event, conf, njets=njets: (
             orig_mem.do_calculate(event, conf) and
-            len(event.good_jets)==6
+            len(event.good_jets) == njets
         )
+
+    def configure_newtf(self, orig_mem):
+        self.cfg.transfer_function_method = MEM.TFMethod.External
 
     def configure_recoil(self, orig_mem):
         self.cfg.int_code |= MEM.IntegrandType.Recoil
@@ -187,7 +197,7 @@ class MEAnalyzer(FilterAnalyzer):
             self.configs[k].b_quark_candidates = lambda event: event.b_quarks_gen
             self.configs[k].l_quark_candidates = lambda event: event.l_quarks_gen
             self.configs[k].lepton_candidates = lambda event: event.good_leptons
-
+            self.configs[k].cfg.int_code |= MEM.IntegrandType.Smear
         for x in ["SL_2qW"]:
             self.configs[x].do_calculate = lambda y, c: (
                 len(y.good_leptons) == 1 and
@@ -242,10 +252,13 @@ class MEAnalyzer(FilterAnalyzer):
                 #apply sudakov factors
                 ("Sudakov", MEMConfig.configure_sudakov),
 
+                #apply sudakov factors
+                ("NewTF", MEMConfig.configure_newtf),
+
                 #run minimization
                 ("Minimize", MEMConfig.configure_minimize)
             ]:
-            for k in ["SL_2qW", "SL_1qW"]:
+            for k in ["SL_2qW", "SL_1qW", "DL"]:
                 kn = k + "_" + strat
                 self.configs[kn] = copy.deepcopy(self.configs[k])
                 self.configs[kn].cfg.defaultCfg()
@@ -363,6 +376,8 @@ class MEAnalyzer(FilterAnalyzer):
             )
             if "meminput" in self.conf.general["verbosity"]:
                 print "lp", lep.pt, lep.eta, lep.phi, lep.mass, lep.charge
+        if "meminput" in self.conf.general["verbosity"]:
+            print "mt", event.input.met_pt, event.input.met_phi
         self.add_obj(
             MEM.ObjectType.MET,
             #MET is caused by massless object
@@ -399,14 +414,6 @@ class MEAnalyzer(FilterAnalyzer):
         leptons = event.good_leptons
         met_pt = event.input.met_pt
         met_phi = event.input.met_phi
-
-        if "reco" in self.conf.general["verbosity"]:
-            for j in jets:
-                print "jet", j.pt, j.eta, j.phi, j.mass, j.btagCSV, j.btagFlag, j.mcFlavour
-            for l in leptons:
-                print "lep", l.pt, l.eta, l.phi, l.mass, l.charge
-
-
 
         #Here we optionally restrict the ME calculation to only matched events
         #Get the conf dict specifying which matches we require

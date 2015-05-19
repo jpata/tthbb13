@@ -14,6 +14,11 @@ def attach_jet_transfer_function(jet, conf, eval_gen=False):
         jet_eta_bin = 1
     jet.tf_b = conf.tf_matrix['b'][jet_eta_bin].Make_Formula(eval_gen)
     jet.tf_l = conf.tf_matrix['l'][jet_eta_bin].Make_Formula(eval_gen)
+    jet.tf_b.SetNpx(10000)
+    jet.tf_b.SetRange(0, 500)
+
+    jet.tf_l.SetNpx(10000)
+    jet.tf_l.SetRange(0, 500)
 
 class JetAnalyzer(FilterAnalyzer):
     """

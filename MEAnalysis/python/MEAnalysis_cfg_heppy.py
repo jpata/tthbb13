@@ -87,18 +87,28 @@ class Conf:
             # "gen" - print out the ttH gen-level particles (b from top, b form higgs, q from W, leptons
             # "reco" - print out the reco-level selected particles
             # "matching" - print out the association between gen and reco objects
-            #"verbosity": ["eventboundary", "input", "matching", "gen", "reco"],
-            "verbosity": ["meminput"],
+            "verbosity": ["eventboundary", "input", "matching", "gen", "reco", "meminput"],
+            #"verbosity": ["meminput"],
 
             #Process only these events (will scan through file to find)
             #"eventWhitelist": [
 
-            #    #cat6
-            #    (1, 1326, 132576),
-            #    (1, 1001, 100098),
-            #    (1, 1075, 107401),
-            #    (1, 1910, 190937),
-            #    (1, 739, 73869),
+            ##    #cat6
+            ##    (1, 1326, 132576),
+            ##    (1, 1001, 100098),
+            ##    (1, 1075, 107401),
+            ##    (1, 1910, 190937),
+            ##    (1, 739, 73869),
+
+            ##    #root [2] tree->Scan("run:lumi:evt:mem_tth_p[0]", "njets==6 && nBCSVM==4 && is_sl==1 && mem_tth_p[0]==0")
+            ##    (1,  558,  55798),
+            ##    (1,  566,  56576),
+            ##    (1,   12,   1121),
+            ##    (1,  714,  71316),
+            ##    (1, 1222, 122152),
+            ##    (1,  856,  85542),
+            ##    (1,  300,  29931),
+            ##    (1, 1675, 167428),
             #]
         }
 
@@ -157,6 +167,14 @@ class Conf:
                 "SL_1qW_Sudakov",
                 "SL_2qW_Recoil",
                 "SL_1qW_Recoil",
+                "DL_Recoil",
+
+                "SL_2qW_NewTF",
+                "SL_1qW_NewTF",
+                "DL_NewTF",
+                "SL_2qW_Minimize",
+                "SL_1qW_Minimize",
+                "DL_Minimize",
             ],
 
         }
