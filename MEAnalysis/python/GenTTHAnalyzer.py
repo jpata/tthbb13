@@ -26,6 +26,8 @@ class GenTTHAnalyzer(FilterAnalyzer):
         event.lep_top = event.GenLepFromTop
         event.nu_top = event.GenNuFromTop
 
+
+        event.gen_met = [MET(pt=event.met[0].genPt, phi=event.met[0].genPhi)]
         event.cat_gen = None
         event.n_cat_gen = -1
 
@@ -141,6 +143,7 @@ class GenTTHAnalyzer(FilterAnalyzer):
         event.nMatch_tb_btag = 0
         event.nMatch_hb_btag = 0
 
+        event.unmatched_b_jets_gen = []
         for ij, jet in enumerate(event.good_jets):
 
             jet.tth_match_label = None
@@ -148,8 +151,19 @@ class GenTTHAnalyzer(FilterAnalyzer):
             jet.tth_match_dr = -1
             jet.tth_match_label_numeric = -1
 
+            #Jet did not have a match
             if not matched_pairs.has_key(ij):
+                if jet.btagFlag > 0.5:
+                    jc = copy.deepcopy(jet)
+                    jc.pt = jc.mcPt
+                    jc.eta = jc.mcEta
+                    jc.phi = jc.mcPhi
+                    jc.mass = jc.mcM
+                    #print "unmatched b", jc.pt, jc.eta, jc.phi, jc.mass, jet.pt, jet.eta, jet.phi, jet.mass
+                    event.unmatched_b_jets_gen += [jc]
+                #print "unmatched bs", event.unmatched_b_jets_gen
                 continue
+
             mlabel, midx, mdr, mlabel_num = matched_pairs[ij]
 
             jet.tth_match_label = mlabel
@@ -163,18 +177,17 @@ class GenTTHAnalyzer(FilterAnalyzer):
                 #If this jet is considered to be un-tagged (CSV or LR)
                 if jet.btagFlag < 0.5:
                     event.nMatch_wq_btag += 1
-            if mlabel == "tb":
+            elif mlabel == "tb":
                 event.nMatch_tb += 1
 
                 #If this jet is considered to be b-tagged (CSV or LR)
                 if jet.btagFlag >= 0.5:
                     event.nMatch_tb_btag += 1
 
-            if mlabel == "hb":
+            elif mlabel == "hb":
                 event.nMatch_hb += 1
                 if jet.btagFlag >= 0.5:
                     event.nMatch_hb_btag += 1
-
         #Add also b-tagged, unmatched jets to gen-level b-quark collection
         #for jet in event.btagged_jets:
         #    jet = copy.deepcopy(jet)

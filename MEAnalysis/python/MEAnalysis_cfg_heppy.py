@@ -117,42 +117,10 @@ class Conf:
             #Actually run the ME calculation
             #If False, all ME values will be 0
             "calcME": True,
-            #"calcME": False,
 
-            #Which categories to analyze the matrix element in
-            "MECategories": ["cat1", "cat2", "cat3", "cat6"],
-            #"MECategories": ["cat1"],
-
-            #If bLR > cut, calculate ME
-            #only used if untaggedSelection=btagLR
-            "btagLRCut": {
-                "cat1": -100.0,
-                "cat2": -100.0,
-                "cat3": -100.0,
-                "cat6": -100.0
-            },
-
-            #if a number is N specified for wq, tb, hb (+ _btag), require
-            #that reco jets dR matched to quarks from W, top, higgs >= N
-            #in order to calculate the ME.
-            #If disabled, calculate ME regardless of gen-level matching
-            "requireMatched": {
-                #"cat2": {
-                #    "wq_btag": 1,
-                #    "hb_btag": 2,
-                #    "tb_btag": 2,
-                #},
-                #"cat1": {
-                #   "wq_btag": 2,
-                #   "hb_btag": 2,
-                #   "tb_btag": 2,
-                #},
-                #"cat3": {
-                #    "wq_btag": 1,
-                #    "hb_btag": 2,
-                #    "tb_btag": 2,
-                #},
-            },
+            #Generic event-dependent selection function applied
+            #just before the MEM. If False, MEM is skipped
+            "selection": lambda event: True,
 
             "methodsToRun": [
                 "SL_2qW",
@@ -175,6 +143,10 @@ class Conf:
                 "SL_2qW_Minimize",
                 "SL_1qW_Minimize",
                 "DL_Minimize",
+
+                "SL_2qW_gen_nosmear",
+                "SL_1qW_gen_nosmear",
+                "DL_gen_nosmear",
             ],
 
         }

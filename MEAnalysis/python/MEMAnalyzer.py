@@ -84,6 +84,7 @@ class MEMConfig:
         self.b_quark_candidates = lambda event: event.btagged_jets
         self.l_quark_candidates = lambda event: event.wquark_candidate_jets
         self.lepton_candidates = lambda event: event.good_leptons
+        self.met_candidates = lambda event: event.met
         self.transfer_function_method = MEM.TFMethod.Builtin
 
         self.do_calculate = lambda event, config: False
@@ -101,7 +102,6 @@ class MEMConfig:
                 self.cfg.set_tf_global(fl2, nb, tf)
 
     def configure_minimize(self, orig_mem):
-        self.cfg.int_code = 0
         self.cfg.do_minimize = 1
 
     def configure_sudakov(self, orig_mem):
@@ -180,10 +180,13 @@ class MEAnalyzer(FilterAnalyzer):
 
             "SL_2qW": MEMConfig(),
             "SL_2qW_gen": MEMConfig(),
+            "SL_2qW_gen_nosmear": MEMConfig(),
             "SL_1qW": MEMConfig(),
             "SL_1qW_gen": MEMConfig(),
+            "SL_1qW_gen_nosmear": MEMConfig(),
             "DL": MEMConfig(),
             "DL_gen": MEMConfig(),
+            "DL_gen_nosmear": MEMConfig(),
         }
 
         #These MEM configurations will actually be considered for calculation
@@ -193,54 +196,46 @@ class MEAnalyzer(FilterAnalyzer):
         for (k, v) in self.configs.items():
             v.configure_transfer_function(self.conf)
 
-        for k in ["SL_2qW_gen", "SL_1qW_gen"]:
-            self.configs[k].b_quark_candidates = lambda event: event.b_quarks_gen
+        for k in ["DL_gen", "SL_2qW_gen", "SL_1qW_gen"]:
+            self.configs[k].b_quark_candidates = lambda event: (
+                event.b_quarks_gen if len(event.b_quarks_gen)>=4 else
+                event.b_quarks_gen + event.unmatched_b_jets_gen
+            )
             self.configs[k].l_quark_candidates = lambda event: event.l_quarks_gen
             self.configs[k].lepton_candidates = lambda event: event.good_leptons
-            self.configs[k].cfg.int_code |= MEM.IntegrandType.Smear
-        for x in ["SL_2qW"]:
-            self.configs[x].do_calculate = lambda y, c: (
-                len(y.good_leptons) == 1 and
-                len(c.b_quark_candidates(y)) >= 4 and
-                len(c.l_quark_candidates(y)) >= 2 and
-                y.cat_btag == "H"
+            self.configs[k].met_candidates = lambda event: event.gen_met
+            self.configs[k].cfg.int_code |= MEM.IntegrandType.SmearJets
+            self.configs[k].cfg.int_code |= MEM.IntegrandType.SmearMET
+        for k in ["DL_gen_nosmear", "SL_2qW_gen_nosmear", "SL_1qW_gen_nosmear"]:
+            self.configs[k].b_quark_candidates = lambda event: (
+                event.b_quarks_gen if len(event.b_quarks_gen)>=4 else
+                event.b_quarks_gen + event.unmatched_b_jets_gen
             )
-        for x in ["SL_2qW_gen"]:
+            self.configs[k].l_quark_candidates = lambda event: event.l_quarks_gen
+            self.configs[k].lepton_candidates = lambda event: event.good_leptons
+            self.configs[k].met_candidates = lambda event: event.gen_met
+            #self.configs[k].cfg.int_code |= MEM.IntegrandType.Smear
+        for x in ["SL_2qW", "SL_2qW_gen", "SL_2qW_gen_nosmear"]:
             self.configs[x].do_calculate = lambda y, c: (
-                len(y.good_leptons) == 1 and
+                len(c.lepton_candidates(y)) == 1 and
                 len(c.b_quark_candidates(y)) >= 4 and
                 len(c.l_quark_candidates(y)) >= 2
             )
-        for x in ["SL_1qW"]:
+        for x in ["SL_1qW", "SL_1qW_gen", "SL_1qW_gen_nosmear"]:
             self.configs[x].do_calculate = lambda y, c: (
-                len(y.good_leptons) == 1 and
-                len(c.b_quark_candidates(y)) >= 4 and
-                len(c.l_quark_candidates(y)) >= 1 and
-                y.cat_btag == "H"
-            )
-            self.configs[x].mem_assumptions.add("missed_wq")
-        for x in ["SL_1qW_gen"]:
-            self.configs[x].do_calculate = lambda y, c: (
-                len(y.good_leptons) == 1 and
+                len(c.lepton_candidates(y)) == 1 and
                 len(c.b_quark_candidates(y)) >= 4 and
                 len(c.l_quark_candidates(y)) >= 1
             )
             self.configs[x].mem_assumptions.add("missed_wq")
-        for x in ["DL"]:
+        for x in ["DL", "DL_gen", "DL_gen_nosmear"]:
             self.configs[x].do_calculate = lambda y, c: (
-                len(y.good_leptons) == 2 and
-                len(c.b_quark_candidates(y)) >= 4 and
-                y.cat_btag == "H"
-            )
-            self.configs[x].mem_assumptions.add("dl")
-        for x in ["DL_gen"]:
-            self.configs[x].do_calculate = lambda y, c: (
-                len(y.good_leptons) == 2 and
+                len(c.lepton_candidates(y)) == 2 and
                 len(c.b_quark_candidates(y)) >= 4
             )
             self.configs[x].mem_assumptions.add("dl")
 
-        for k in ["SL_2qW", "SL_1qW", "SL_2qW_gen", "SL_1qW_gen"]:
+        for k in ["SL_2qW", "SL_1qW", "SL_2qW_gen", "SL_1qW_gen", "SL_2qW_gen_nosmear", "SL_1qW_gen_nosmear"]:
             self.configs[k].mem_assumptions.add("sl")
 
         #Create additional configurations
@@ -288,17 +283,6 @@ class MEAnalyzer(FilterAnalyzer):
         self.permutations.push_back(MEM.Permutations.QUntagged)
 
         self.integrator.set_permutation_strategy(self.permutations)
-
-        #Pieces of ME to calculate
-        # self.integrator.set_integrand(
-        #     MEM.IntegrandType.Constant
-        #     |MEM.IntegrandType.ScattAmpl
-        #     |MEM.IntegrandType.DecayAmpl
-        #     |MEM.IntegrandType.Jacobian
-        #     |MEM.IntegrandType.PDF
-        #     |MEM.IntegrandType.Transfer
-        # )
-        #self.integrator.set_sqrts(13000.);
 
         #Create an empty vector for the integration variables
         self.vars_to_integrate = CvectorPSVar()
@@ -376,28 +360,15 @@ class MEAnalyzer(FilterAnalyzer):
             )
             if "meminput" in self.conf.general["verbosity"]:
                 print "lp", lep.pt, lep.eta, lep.phi, lep.mass, lep.charge
+
+        met_cand = mem_cfg.met_candidates(event)[0]
         if "meminput" in self.conf.general["verbosity"]:
-            print "mt", event.input.met_pt, event.input.met_phi
+            print "mt", met_cand.pt, met_cand.phi
         self.add_obj(
             MEM.ObjectType.MET,
             #MET is caused by massless object
-            p4s=(event.input.met_pt, 0, event.input.met_phi, 0),
+            p4s=(met_cand.pt, 0, met_cand.phi, 0),
         )
-
-    #Check if event.nMatch_label >= conf.mem[cat][label]
-    def require(self, required_match, label, event):
-        nreq = required_match.get(label, None)
-        if nreq is None:
-            return True
-
-        nmatched = getattr(event, "nMatch_"+label)
-
-        #In case event did not contain b form higgs (e.g. ttbb)
-        if "hb" in label and len(event.GenBQuarkFromH) < nreq:
-            return True
-
-        passes = (nmatched >= nreq)
-        return passes
 
     def process(self, event):
         self.counters["processing"].inc("processed")
@@ -414,23 +385,6 @@ class MEAnalyzer(FilterAnalyzer):
         leptons = event.good_leptons
         met_pt = event.input.met_pt
         met_phi = event.input.met_phi
-
-        #Here we optionally restrict the ME calculation to only matched events
-        #Get the conf dict specifying which matches we require
-        required_match = self.conf.mem.get("requireMatched", {}).get(event.cat, {})
-
-        #Calculate all the match booleans
-        #match label -> matched boolean
-        passd = {
-            p: self.require(required_match, p, event) for p in
-            ["wq", "wq_btag", "tb", "tb_btag", "hb", "hb_btag"]
-        }
-
-        #Fail if any fails
-        for k, v in passd.items():
-            if not v:
-                #print "Failed to match", k
-                return True
 
         res = {}
         print (event.input.run, event.input.lumi, event.input.evt,
@@ -451,7 +405,9 @@ class MEAnalyzer(FilterAnalyzer):
                 print "MEM", ("hypo", hypo), ("conf", confname), fstate, len(mem_cfg.b_quark_candidates(event)), len(mem_cfg.l_quark_candidates(event))
                 #Run MEM if we did not explicitly disable it
                 if (self.conf.mem["calcME"] and
-                        mem_cfg.do_calculate(event, mem_cfg) and mem_cfg.enabled
+                        mem_cfg.do_calculate(event, mem_cfg) and
+                        mem_cfg.enabled and
+                        self.conf.mem["selection"](event)
                     ):
                     print "MEM", confname, "started"
 
