@@ -86,22 +86,6 @@ li_ungroomed_fatjets_branches = []
 # First create the ungroomed fatjet collections
 # These are the ones that get all the groomers applied to later on
 
-# CA, R=0.8, pT > 200 GeV
-fj_name = "ca08PFJetsCHS"
-branch_name = 'ca08'
-setattr(process, fj_name, cms.EDProducer(
-        "FastjetJetProducer",
-        PFJetParameters,
-        AnomalousCellParameters,
-        jetAlgorithm = cms.string("CambridgeAachen"),
-        rParam       = cms.double(0.8)))
-getattr(process, fj_name).src = cms.InputTag("chs")
-getattr(process, fj_name).jetPtMin = cms.double(200)
-li_fatjets_objects.append(fj_name)
-li_fatjets_branches.append(branch_name)
-li_ungroomed_fatjets_objects.append(fj_name)
-li_ungroomed_fatjets_branches.append(branch_name)
-
 ## AntiKt, R=0.8, pT > 200 GeV
 fj_name = "ak08PFJetsCHS"
 branch_name = 'ak08'
@@ -613,19 +597,6 @@ print len(li_fatjets_objects), len(li_fatjets_btags)
 # CMS Top Tagger
 #####################################
 
-# CMS Top Tagger Jets
-process.cmsTopTagCa08PFJetsCHS = cms.EDProducer(
-        "CATopJetProducer",
-        PFJetParameters,
-        AnomalousCellParameters,
-        CATopJetParameters,
-        jetAlgorithm = cms.string("CambridgeAachen"),
-        rParam = cms.double(0.8),
-        writeCompound = cms.bool(True)
-    )
-process.cmsTopTagCa08PFJetsCHS.src = cms.InputTag('chs')
-process.cmsTopTagCa08PFJetsCHS.doAreaFastjet = cms.bool(True)
-process.cmsTopTagCa08PFJetsCHS.jetPtMin = cms.double(200.0)
 
 # CMS TopTagger run on AK8 constituents!
 process.cmsTopTagAk08PFJetsCHS = cms.EDProducer(
@@ -659,17 +630,6 @@ process.cmsTopTagCa15PFJetsCHS.jetPtMin = cms.double(200.0)
 
 
 # CMS Top Tagger Infos
-process.ca08CMSTopTagInfos = cms.EDProducer("CATopJetTagger",
-                                            src = cms.InputTag("cmsTopTagCa08PFJetsCHS"),
-                                            TopMass = cms.double(173),
-                                            TopMassMin = cms.double(0.),
-                                            TopMassMax = cms.double(250.),
-                                            WMass = cms.double(80.4),
-                                            WMassMin = cms.double(0.0),
-                                            WMassMax = cms.double(200.0),
-                                            MinMassMin = cms.double(0.0),
-                                            MinMassMax = cms.double(200.0),
-                                            verbose = cms.bool(False))
 
 process.ak08CMSTopTagInfos = cms.EDProducer("CATopJetTagger",
                                             src = cms.InputTag("cmsTopTagAk08PFJetsCHS"),
@@ -836,9 +796,9 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
         httObjects  = cms.vstring(li_htt_branches), # Using branch names also as object names
         httBranches = cms.vstring(li_htt_branches),                                           
        
-        cmsttObjects  = cms.vstring(['cmsTopTagCa08PFJetsCHS', 'cmsTopTagCa15PFJetsCHS', 'cmsTopTagAk08PFJetsCHS']),
-        cmsttInfos    = cms.vstring(['ca08CMSTopTagInfos',     'ca15CMSTopTagInfos',     'ak08CMSTopTagInfos'    ]),
-        cmsttBranches = cms.vstring(['ca08cmstt',              'ca15cmstt',              'ak08cmstt']),
+        cmsttObjects  = cms.vstring(['cmsTopTagCa15PFJetsCHS', 'cmsTopTagAk08PFJetsCHS']),
+        cmsttInfos    = cms.vstring(['ca15CMSTopTagInfos',     'ak08CMSTopTagInfos'    ]),
+        cmsttBranches = cms.vstring(['ca15cmstt',              'ak08cmstt']),
 
 	jetMult_min   = cms.untracked.int32(-99),
 	jetPt_min     = cms.untracked.double(15.),
@@ -903,10 +863,8 @@ for htt_name in li_htt_branches:
 process.p += process.ak8PFJetsCHSConstituents
 
 # Schedule CMS Top Tagger, HEPTopTagger, b-tagging and Ntupelizer
-for x in [process.cmsTopTagCa08PFJetsCHS,
-          process.cmsTopTagAk08PFJetsCHS,
-          process.cmsTopTagCa15PFJetsCHS,
-          process.ca08CMSTopTagInfos,
+for x in [process.cmsTopTagAk08PFJetsCHS,
+          process.cmsTopTagCa15PFJetsCHS,          
           process.ak08CMSTopTagInfos,
           process.ca15CMSTopTagInfos,
           process.my_btagging,
