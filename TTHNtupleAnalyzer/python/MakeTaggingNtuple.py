@@ -178,11 +178,11 @@ for htt in li_htt_branches:
     objects[htt]                = htt_branches
 
 # And some extras
-for x in ["ak08", "ca08", "ca15", "ca08puppi", "ca15puppi"]:
+for x in ["ak08", "ca15"]:
     if x in objects.keys():
         objects[x] = fj_branches_plus
 
-for x in ["ak08cmstt","ca08cmstt", "ca15cmstt"]:
+for x in ["ak08cmstt","ca15cmstt"]:
     if x in objects.keys():
         objects[x] = cmstt_branches
 
@@ -285,7 +285,7 @@ for i_event in range(n_entries):
     n_particles = len(AH.getter( intree, "gen_{0}__pt".format(particle_name)))
 
     for i_particle in range(n_particles):
-
+            
         # Reset branches
         AH.resetBranches(variables, variable_types)
 
@@ -387,7 +387,6 @@ for i_event in range(n_entries):
 
             variables["top_size"][0] = -1
 
-            
         # Fill fatjets and taggers
         for object_name, branch_names in objects.iteritems():    
 
@@ -410,7 +409,6 @@ for i_event in range(n_entries):
                 full_btag_branch_name = "jet_{0}__btag".format(object_name)
                 btag_branch = AH.getter(intree, full_btag_branch_name)
 
-                
                 dr_pos_btag = [(dr,pos,btag) for i,dr,btag,pos in zip(i_branch, dr_branch, btag_branch, range(len(i_branch))) if i==i_particle]
 
                 # Apply the Delta R cut

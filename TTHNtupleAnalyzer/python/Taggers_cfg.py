@@ -60,6 +60,9 @@ process.source = cms.Source("PoolSource",
 )
 
 
+#process.SimpleMemoryCheck = cms.Service("SimpleMemoryCheck",ignoreTotal = cms.untracked.int32(1) )
+
+
 #####################################
 # CHS
 #####################################
@@ -202,7 +205,7 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
            R0 = cms.double(r),
            useExplicitGhosts = cms.bool(True),
            writeCompound = cms.bool(True),
-          jetCollInstanceName=cms.string("SubJets")
+           jetCollInstanceName=cms.string("SubJets")
    ))
    li_fatjets_objects.append(fj_name)        
    li_fatjets_branches.append(branch_name)
@@ -478,7 +481,7 @@ for i_fj, fj_name in enumerate(li_fatjets_objects):
    r = GetRadiusFromName(fj_name)           
    algo = GetAlgoFromName(fj_name)           
    
-   qvol_fatjets = li_ungroomed_fatjets_objects
+   qvol_fatjets = []#li_ungroomed_fatjets_objects
 
    if fj_name in qvol_fatjets:
 

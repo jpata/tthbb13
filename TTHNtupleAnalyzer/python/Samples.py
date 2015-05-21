@@ -125,6 +125,13 @@ Samples = {
     "rad_hh4b_m1600_13tev_20bx25"  : "/Rad_HHto4b_M1600_13TeV_PHYS14_25_V1/cvernier-miniAOD-b7ec9eab226684f647ba3bf663cdb8b0/USER",
 
      
+    #######################################
+    # 13 TeV
+    # RunIISpring15DR74-Asympt50ns
+    #######################################
+
+    "qcd_300_470_13tev_spring15dr74_asympt50ns" : "/QCD_Pt_300to470_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM",
+    "zprime_m1000_1p_13tev_spring15dr74_asympt50ns"       : "/ZprimeToTT_M-1000_W-10_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM"
 
 
 }

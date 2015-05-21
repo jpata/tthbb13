@@ -151,16 +151,25 @@ def download_globus(name,
                     basepath,
                     user_name = "gregor",
                     glob_string = "*.root",
+                    site = "T2_CH_CSCS",
                     isVHBBHEPPY = False):
     """Download a single job from the Grid using globus-url-copy instead of crab
     """
 
     timeout = 5 # seconds
     
-    storage_host = "storage01.lcg.cscs.ch"
+    if site == "T2_CH_CSCS":
+        storage_host = "storage01.lcg.cscs.ch"
+        user_path_on_storage = "pnfs/lcg.cscs.ch/cms/trivcat/store/user/{0}/".format(user_name)    
+    elif site == "T3_CH_PSI":
+        storage_host = "t3se01.psi.ch"
+        user_path_on_storage = "pnfs/psi.ch/cms/trivcat/store/user/{0}/".format(user_name)    
+    else:
+        print "Invalid Site:", site
+        return
+
     gsiftp_base = "gsiftp://" + storage_host
     srm_base    = "srm://" + storage_host
-    user_path_on_storage = "pnfs/lcg.cscs.ch/cms/trivcat/store/user/{0}/".format(user_name)    
     local_mount_path = "/scratch/{0}/mount/storage/".format(user_name)
     output_path = os.path.join(basepath, "{0}_{1}_{2}".format(name, version, sample_shortname))
 
@@ -191,8 +200,6 @@ def download_globus(name,
                        sample_name,
                        crab_job_name,
                        "*/*")
-
-    #sys.exit()
 
     if isVHBBHEPPY:
         directories_to_process = glob.glob( os.path.join(local_mount_path, 
