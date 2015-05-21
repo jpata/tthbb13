@@ -81,6 +81,8 @@ for sample in samples:
         Draw(tf, lepd, "njets >> njets(15,0,15)", lepcut)
         Draw(tf, lepd, "nBCSVM >> ntags(15,0,15)", lepcut)
 
+        Draw(tf, lepd, "nBCSVM:njets >> njets_nBCSVM(15,0,15,15,0,15)", lepcut)
+
         Draw(tf, lepd, "jets_pt[0] >> jet0_pt(30,0,600)", lepcut)
         Draw(tf, lepd, "jets_eta[0] >> jet0_eta(30,-5,5)", lepcut)
 
@@ -90,6 +92,8 @@ for sample in samples:
                 ("6j", "njets==6"),
                 ("6j3t", "njets==6 && nBCSVM==3"),
                 ("6j4t", "njets==6 && nBCSVM==4"),
+                ("7j4t", "njets==7 && nBCSVM==4"),
+                ("8plusj4t", "njets>=8 && nBCSVM==4"),
                 ("5j", "njets==5"),
                 ("5j3t", "njets==5 && nBCSVM==3"),
                 ("5j4t", "njets==5 && nBCSVM==4"),
@@ -97,11 +101,14 @@ for sample in samples:
             lepd.cd()
             jetd = lepd.mkdir(jet_tag)
             jetd.cd()
-            Draw(tf, jetd, "btag_LR_4b_2b >> btag_lr(30,0,1)", " && ".join([lepcut, jettagcut]))
 
-            Draw(tf, jetd, "nMatch_wq_btag >> nMatch_wq_btag(4,0,4)", " && ".join([lepcut, jettagcut]))
-            Draw(tf, jetd, "nMatch_hb_btag >> nMatch_hb_btag(4,0,4)", " && ".join([lepcut, jettagcut]))
-            Draw(tf, jetd, "nMatch_tb_btag >> nMatch_tb_btag(4,0,4)", " && ".join([lepcut, jettagcut]))
+            Draw(tf, jetd, "jets_pt[0] >> jet0_pt(30,0,600)", " && ".join([lepcut, jettagcut]))
+            Draw(tf, jetd, "jets_eta[0] >> jet0_eta(30,-5,5)", " && ".join([lepcut, jettagcut]))
+
+            Draw(tf, jetd, "leps_pt[0] >> lep0_pt(30,0,300)", " && ".join([lepcut, jettagcut]))
+            Draw(tf, jetd, "leps_eta[0] >> lep0_eta(30,-5,5)", " && ".join([lepcut, jettagcut]))
+
+            Draw(tf, jetd, "btag_LR_4b_2b >> btag_lr(30,0,1)", " && ".join([lepcut, jettagcut]))
 
             for match, matchcut in [
                     ("nomatch", "1"),
