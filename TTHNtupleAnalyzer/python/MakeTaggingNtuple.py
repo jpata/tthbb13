@@ -89,7 +89,8 @@ if socket.gethostname() == "t3ui12":
 else:
     import PSet
     initial_miniAOD_filename = list(PSet.process.source.fileNames)[0]
-    if "ZPrimeToTTJets" in initial_miniAOD_filename:
+    if ("ZPrimeToTTJets" in initial_miniAOD_filename or 
+        "ZprimeToTT" in initial_miniAOD_filename):
         particle_name = "hadtop"
     elif ("TTbarH_HToBB_M" in initial_miniAOD_filename or 
           "Rad_HHto4b" in initial_miniAOD_filename):
