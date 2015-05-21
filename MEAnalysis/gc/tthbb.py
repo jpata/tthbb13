@@ -17,7 +17,7 @@ vo_se = os.environ["VO_CMS_DEFAULT_SE"]
 
 if "psi.ch" in vo_se:
     jobs = ["confs/sig-psi.conf", "confs/bkg-psi.conf"]
-elif "kbf" in vo_se:
+elif "kbfi" in vo_se:
     jobs = ["confs/sig-kbfi.conf", "confs/bkg-kbfi.conf"]
 else:
     jobs = ["confs/sig.conf", "confs/bkg.conf"]

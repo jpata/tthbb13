@@ -174,18 +174,18 @@ class BTagLRAnalyzer(FilterAnalyzer):
         #Jets are untagged according to the b-tagging likelihood ratio permutation
         if self.conf.jets["untaggedSelection"] == "btagLR":
             event.buntagged_jets = event.buntagged_jets_by_LR_4b_2b
-            event.btagged_jets = event.btagged_jets_by_LR_4b_2b
+            event.selected_btagged_jets = event.btagged_jets_by_LR_4b_2b
         #Jets are untagged according to b-discriminatr
         elif self.conf.jets["untaggedSelection"] == "btagCSV":
             event.buntagged_jets = event.buntagged_jets_bdisc
-            event.btagged_jets = event.btagged_jets_bdisc
+            event.selected_btagged_jets = event.btagged_jets_bdisc
 
         #Take first 4 most b-tagged jets
-        btagged = sorted(event.btagged_jets, key=lambda x: x.btagCSV, reverse=True)[0:4]
-        event.btagged_jets = btagged
+        btagged = sorted(event.selected_btagged_jets, key=lambda x: x.btagCSV, reverse=True)[0:4]
+        event.selected_btagged_jets = btagged
         #Set these jets to be used as b-quarks in the MEM
         #We don't want to use more than 4 b-quarks in the hypothesis
-        for jet in event.btagged_jets:
+        for jet in event.selected_btagged_jets:
             idx = event.good_jets.index(jet)
             event.good_jets[idx].btagFlag = 1.0
 

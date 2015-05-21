@@ -41,7 +41,7 @@ class MECategoryAnalyzer(FilterAnalyzer):
             event.btag_LR_4b_2b > self.conf.mem["btagLRCut"][event.cat]
         )
         pass_btag_csv = (self.conf.jets["untaggedSelection"] == "btagCSV" and
-            len(event.btagged_jets) >= 4
+            len(event.selected_btagged_jets) >= 4
         )
         cat_btag = "NOCAT"
 
@@ -81,7 +81,7 @@ class MEMConfig:
     def __init__(self):
         self.cfg = MEM.MEMConfig()
         self.cfg.defaultCfg()
-        self.b_quark_candidates = lambda event: event.btagged_jets
+        self.b_quark_candidates = lambda event: event.selected_btagged_jets
         self.l_quark_candidates = lambda event: event.wquark_candidate_jets
         self.lepton_candidates = lambda event: event.good_leptons
         self.met_candidates = lambda event: event.met
@@ -133,7 +133,7 @@ class MEAnalyzer(FilterAnalyzer):
     Additionally, we require the b-tagging category (event.cat_btag) to be "H" (high).
 
     For each ME configuration on each event, the jets which are counted to be b-tagged
-    in event.btagged_jets are added as the candidates for t->b (W) or h->bb.
+    in event.selected_btagged_jets are added as the candidates for t->b (W) or h->bb.
     These jets must be exactly 4, otherwise no permutation is accepted (in case
     using BTagged/QUntagged assumptions).
 
@@ -328,7 +328,8 @@ class MEAnalyzer(FilterAnalyzer):
             self.vars_to_integrate.push_back(MEM.PSVar.cos_qbar1)
             self.vars_to_integrate.push_back(MEM.PSVar.phi_qbar1)
         #Add heavy flavour jets that are assumed to come from top/higgs decay
-        for jet in mem_cfg.b_quark_candidates(event):
+        #Only take up to 4 candidates, otherwise runtimes become too great
+        for jet in list(mem_cfg.b_quark_candidates(event))[:4]:
             self.add_obj(
                 MEM.ObjectType.Jet,
                 p4s=(jet.pt, jet.eta, jet.phi, jet.mass),
@@ -341,7 +342,8 @@ class MEAnalyzer(FilterAnalyzer):
                 print "bq", jet.pt, jet.eta, jet.phi, jet.mass, jet.btagFlag, jet.tth_match_label
 
         #Add light jets that are assumed to come from hadronic W decay
-        for jet in mem_cfg.l_quark_candidates(event):
+        #Only take up to 4 candidates, otherwise runtimes become too great
+        for jet in list(mem_cfg.l_quark_candidates(event))[:4]:
             self.add_obj(
                 MEM.ObjectType.Jet,
                 p4s=(jet.pt, jet.eta, jet.phi, jet.mass),
