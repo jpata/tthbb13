@@ -339,7 +339,7 @@ class MEAnalyzer(FilterAnalyzer):
                 }
             )
             if "meminput" in self.conf.general["verbosity"]:
-                print "bq", jet.pt, jet.eta, jet.phi, jet.mass, jet.btagFlag, jet.tth_match_label
+                print "memBQuark", jet.pt, jet.eta, jet.phi, jet.mass, jet.btagFlag, jet.tth_match_label, jet.tth_match_index
 
         #Add light jets that are assumed to come from hadronic W decay
         #Only take up to 4 candidates, otherwise runtimes become too great
@@ -353,7 +353,7 @@ class MEAnalyzer(FilterAnalyzer):
                 }
             )
             if "meminput" in self.conf.general["verbosity"]:
-                print "lq", jet.pt, jet.eta, jet.phi, jet.mass, jet.btagFlag, jet.tth_match_label
+                print "memLQuark", jet.pt, jet.eta, jet.phi, jet.mass, jet.btagFlag, jet.tth_match_label, jet.tth_match_index
         for lep in mem_cfg.lepton_candidates(event):
             self.add_obj(
                 MEM.ObjectType.Lepton,
@@ -361,11 +361,11 @@ class MEAnalyzer(FilterAnalyzer):
                 obs_dict={MEM.Observable.CHARGE: lep.charge},
             )
             if "meminput" in self.conf.general["verbosity"]:
-                print "lp", lep.pt, lep.eta, lep.phi, lep.mass, lep.charge
+                print "memLepton", lep.pt, lep.eta, lep.phi, lep.mass, lep.charge
 
         met_cand = mem_cfg.met_candidates(event)[0]
         if "meminput" in self.conf.general["verbosity"]:
-            print "mt", met_cand.pt, met_cand.phi
+            print "memMET", met_cand.pt, met_cand.phi
         self.add_obj(
             MEM.ObjectType.MET,
             #MET is caused by massless object
@@ -440,3 +440,4 @@ class MEAnalyzer(FilterAnalyzer):
 
         event.mem_results_tth = [res[(MEM.Hypothesis.TTH, k)] for k in self.memkeys]
         event.mem_results_ttbb = [res[(MEM.Hypothesis.TTBB, k)] for k in self.memkeys]
+        print "---MEM done EVENT r:l:e", event.input.run, event.input.lumi, event.input.evt

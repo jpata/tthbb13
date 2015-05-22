@@ -46,7 +46,8 @@ class JetAnalyzer(FilterAnalyzer):
         if "input" in self.conf.general["verbosity"]:
             print "jets"
             for j in event.Jet:
-                print "ijet", j.pt, j.eta, j.phi, j.mass, j.btagCSV, j.mcFlavour
+                print "InJetReco", j.pt, j.eta, j.phi, j.mass, j.btagCSV, j.mcFlavour
+                print "InJetGen", j.mcPt, j.mcEta, j.mcPhi, j.mcM
 
         event.good_jets = sorted(
             filter(

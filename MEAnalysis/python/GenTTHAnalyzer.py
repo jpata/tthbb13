@@ -53,24 +53,31 @@ class GenTTHAnalyzer(FilterAnalyzer):
         event.l_quarks_gen = []
         event.b_quarks_gen = []
 
+        nq = 0
         for q in event.l_quarks_w:
+            nq += 1
             if self.pass_jet_selection(q):
                 q.btagFlag = 0.0
                 q.tth_match_label = "wq"
+                q.tth_match_index = nq
                 attach_jet_transfer_function(q, self.conf)
                 event.l_quarks_gen += [q]
 
         for q in event.b_quarks_t:
+            nq += 1
             if self.pass_jet_selection(q):
                 q.btagFlag = 1.0
                 q.tth_match_label = "tb"
+                q.tth_match_index = nq
                 attach_jet_transfer_function(q, self.conf)
                 event.b_quarks_gen += [q]
 
         for q in event.b_quarks_h:
+            nq += 1
             if self.pass_jet_selection(q):
                 q.btagFlag = 1.0
                 q.tth_match_label = "hb"
+                q.tth_match_index = nq
                 attach_jet_transfer_function(q, self.conf)
                 event.b_quarks_gen += [q]
 
@@ -102,15 +109,15 @@ class GenTTHAnalyzer(FilterAnalyzer):
 
         if "gen" in self.conf.general["verbosity"]:
             for j in event.l_quarks_w:
-                print "q(W)", j.pt, j.eta, j.phi, j.mass, j.pdgId
+                print "gen q(W)", j.pt, j.eta, j.phi, j.mass, j.pdgId
             for j in event.b_quarks_t:
-                print "b(t)", j.pt, j.eta, j.phi, j.mass, j.pdgId
+                print "gen b(t)", j.pt, j.eta, j.phi, j.mass, j.pdgId
             for j in event.lep_top:
-                print "l(t)", j.pt, j.eta, j.phi, j.mass, j.pdgId
+                print "gen l(t)", j.pt, j.eta, j.phi, j.mass, j.pdgId
             for j in event.nu_top:
-                print "n(t)", j.pt, j.eta, j.phi, j.mass, j.pdgId
+                print "gen n(t)", j.pt, j.eta, j.phi, j.mass, j.pdgId
             for j in event.b_quarks_h:
-                print "b(h)", j.pt, j.eta, j.phi, j.mass, j.pdgId
+                print "gen b(h)", j.pt, j.eta, j.phi, j.mass, j.pdgId
             print "gen cat", event.cat_gen, event.n_cat_gen
 
         #Store for each jet, specified by it's index in the jet
@@ -144,6 +151,7 @@ class GenTTHAnalyzer(FilterAnalyzer):
         event.nMatch_hb_btag = 0
 
         event.unmatched_b_jets_gen = []
+        event.unmatched_l_jets_gen = []
         for ij, jet in enumerate(event.good_jets):
 
             jet.tth_match_label = None
@@ -153,16 +161,16 @@ class GenTTHAnalyzer(FilterAnalyzer):
 
             #Jet did not have a match
             if not matched_pairs.has_key(ij):
-                if jet.btagFlag > 0.5:
-                    jc = copy.deepcopy(jet)
-                    jc.pt = jc.mcPt
-                    jc.eta = jc.mcEta
-                    jc.phi = jc.mcPhi
-                    jc.mass = jc.mcM
-                    #print "unmatched b", jc.pt, jc.eta, jc.phi, jc.mass, jet.pt, jet.eta, jet.phi, jet.mass
+                jc = copy.deepcopy(jet)
+                jc.pt = jc.mcPt
+                jc.eta = jc.mcEta
+                jc.phi = jc.mcPhi
+                jc.mass = jc.mcM
+                if abs(jet.mcFlavour) == 5:
                     event.unmatched_b_jets_gen += [jc]
-                #print "unmatched bs", event.unmatched_b_jets_gen
-                continue
+                else:
+                    event.unmatched_l_jets_gen += [jc]
+                continue #continue jet loop
 
             mlabel, midx, mdr, mlabel_num = matched_pairs[ij]
 
