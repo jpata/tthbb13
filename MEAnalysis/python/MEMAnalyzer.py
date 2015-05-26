@@ -109,7 +109,7 @@ class MEMConfig:
         njets = 6
         if "dl" in orig_mem.mem_assumptions:
             njets = 4
-        if "missed_wq" in orig_mem.mem_assumptions:
+        if "1qW" in orig_mem.mem_assumptions:
             njets -= 1
         self.do_calculate = lambda event, conf, njets=njets: (
             orig_mem.do_calculate(event, conf) and
@@ -179,11 +179,16 @@ class MEAnalyzer(FilterAnalyzer):
             #"DL_gen": MEM.MEMConfig(),
 
             "SL_2qW": MEMConfig(),
+            "SL_2qW_notag": MEMConfig(),
             "SL_2qW_gen": MEMConfig(),
             "SL_2qW_gen_nosmear": MEMConfig(),
             "SL_1qW": MEMConfig(),
             "SL_1qW_gen": MEMConfig(),
             "SL_1qW_gen_nosmear": MEMConfig(),
+            "SL_0qW": MEMConfig(),
+            "SL_1bT": MEMConfig(),
+            "SL_1bTbar": MEMConfig(),
+            "SL_1bH": MEMConfig(),
             "DL": MEMConfig(),
             "DL_gen": MEMConfig(),
             "DL_gen_nosmear": MEMConfig(),
@@ -215,7 +220,7 @@ class MEAnalyzer(FilterAnalyzer):
             self.configs[k].lepton_candidates = lambda event: event.good_leptons
             self.configs[k].met_candidates = lambda event: event.gen_met
             #self.configs[k].cfg.int_code |= MEM.IntegrandType.Smear
-        for x in ["SL_2qW", "SL_2qW_gen", "SL_2qW_gen_nosmear"]:
+        for x in ["SL_2qW", "SL_2qW_notag", "SL_2qW_gen", "SL_2qW_gen_nosmear"]:
             self.configs[x].do_calculate = lambda y, c: (
                 len(c.lepton_candidates(y)) == 1 and
                 len(c.b_quark_candidates(y)) >= 4 and
@@ -227,7 +232,22 @@ class MEAnalyzer(FilterAnalyzer):
                 len(c.b_quark_candidates(y)) >= 4 and
                 len(c.l_quark_candidates(y)) >= 1
             )
-            self.configs[x].mem_assumptions.add("missed_wq")
+            self.configs[x].mem_assumptions.add("1qW")
+        for x in ["SL_0qW"]:
+            self.configs[x].do_calculate = lambda y, c: (
+                len(c.lepton_candidates(y)) == 1 and
+                len(c.b_quark_candidates(y)) >= 4 and
+                len(c.l_quark_candidates(y)) >= 1
+            )
+            self.configs[x].mem_assumptions.add("0qW")
+        for x in ["SL_1bT", "SL_1bTbar", "SL_1bH"]:
+            self.configs[x].do_calculate = lambda y, c: (
+                len(c.lepton_candidates(y)) == 1 and
+                len(c.b_quark_candidates(y)) >= 3 and
+                len(c.l_quark_candidates(y)) >= 2
+            )
+            k = x.split("_")[1]
+            self.configs[x].mem_assumptions.add(k)
         for x in ["DL", "DL_gen", "DL_gen_nosmear"]:
             self.configs[x].do_calculate = lambda y, c: (
                 len(c.lepton_candidates(y)) == 2 and
@@ -235,8 +255,17 @@ class MEAnalyzer(FilterAnalyzer):
             )
             self.configs[x].mem_assumptions.add("dl")
 
-        for k in ["SL_2qW", "SL_1qW", "SL_2qW_gen", "SL_1qW_gen", "SL_2qW_gen_nosmear", "SL_1qW_gen_nosmear"]:
+        for k in [
+                "SL_2qW", "SL_2qW_notag", "SL_1qW", "SL_2qW_gen",
+                "SL_1qW_gen", "SL_2qW_gen_nosmear", "SL_1qW_gen_nosmear",
+                "SL_0qW", "SL_1bT", "SL_1bTbar", "SL_1bH"
+            ]:
             self.configs[k].mem_assumptions.add("sl")
+        permutations = CvectorPermutations()
+        #self.permutations.push_back(MEM.Permutations.BTagged)
+        #self.permutations.push_back(MEM.Permutations.QUntagged)
+        #self.permutations.push_back(MEM.Permutations.QQbarBBbarSymmetry)
+        self.configs["SL_2qW_notag"].cfg.perm_pruning = permutations
 
         #Create additional configurations
         for strat, configure in [
@@ -274,15 +303,15 @@ class MEAnalyzer(FilterAnalyzer):
         )
 
         #Create an emtpy std::vector<MEM::Permutations::Permutations>
-        self.permutations = CvectorPermutations()
+        #self.permutations = CvectorPermutations()
 
-        #Assume that only jets passing CSV>0.5 are b quarks
-        self.permutations.push_back(MEM.Permutations.BTagged)
+        ##Assume that only jets passing CSV>0.5 are b quarks
+        #self.permutations.push_back(MEM.Permutations.BTagged)
 
-        #Assume that only jets passing CSV<0.5 are l quarks
-        self.permutations.push_back(MEM.Permutations.QUntagged)
+        ##Assume that only jets passing CSV<0.5 are l quarks
+        #self.permutations.push_back(MEM.Permutations.QUntagged)
 
-        self.integrator.set_permutation_strategy(self.permutations)
+        #self.integrator.set_permutation_strategy(self.permutations)
 
         #Create an empty vector for the integration variables
         self.vars_to_integrate = CvectorPSVar()
@@ -324,9 +353,23 @@ class MEAnalyzer(FilterAnalyzer):
         mem_cfg.enabled = True
 
         #One quark from W missed, integrate over its direction if possible
-        if "missed_wq" in mem_cfg.mem_assumptions:
+        if "1qW" in mem_cfg.mem_assumptions:
             self.vars_to_integrate.push_back(MEM.PSVar.cos_qbar1)
             self.vars_to_integrate.push_back(MEM.PSVar.phi_qbar1)
+        if "0qW" in mem_cfg.mem_assumptions:
+            self.vars_to_integrate.push_back(MEM.PSVar.cos_q1)
+            self.vars_to_integrate.push_back(MEM.PSVar.phi_q1)
+            self.vars_to_integrate.push_back(MEM.PSVar.cos_qbar1)
+            self.vars_to_integrate.push_back(MEM.PSVar.phi_qbar1)
+        if "1bT" in mem_cfg.mem_assumptions:
+            self.vars_to_integrate.push_back(MEM.PSVar.cos_b1)
+            self.vars_to_integrate.push_back(MEM.PSVar.phi_b1)
+        if "1bTbar" in mem_cfg.mem_assumptions:
+            self.vars_to_integrate.push_back(MEM.PSVar.cos_b2)
+            self.vars_to_integrate.push_back(MEM.PSVar.phi_b2)
+        if "1bH" in mem_cfg.mem_assumptions:
+            self.vars_to_integrate.push_back(MEM.PSVar.cos_bbar)
+            self.vars_to_integrate.push_back(MEM.PSVar.phi_bbar)
         #Add heavy flavour jets that are assumed to come from top/higgs decay
         #Only take up to 4 candidates, otherwise runtimes become too great
         for jet in list(mem_cfg.b_quark_candidates(event))[:4]:
