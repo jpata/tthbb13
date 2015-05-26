@@ -196,6 +196,9 @@ class MEAnalyzer(FilterAnalyzer):
 
         #These MEM configurations will actually be considered for calculation
         self.memkeys = self.conf.mem["methodsToRun"]
+        print "Running over MEM configurations"
+        for nmem, memk in enumerate(self.memkeys):
+            print "MEM", nmem, memk
 
         #Set the MEM
         for (k, v) in self.configs.items():
