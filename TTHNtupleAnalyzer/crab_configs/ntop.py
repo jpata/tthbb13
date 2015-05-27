@@ -15,18 +15,25 @@ import TTH.TTHNtupleAnalyzer.CrabHelpers as CH
 
 # Ntuple name/version and samples to include
 name = "ntop"
-version = "v50c"
+version = "v51"
 li_samples = [
-#    "qcd_300_470_13tev_spring15dr74_asympt50ns",
+    "qcd_300_470_13tev_spring15dr74_asympt50ns",    
+    "qcd_600_800_13tev_spring15dr74_asympt50ns",    
+    "qcd_800_1000_13tev_spring15dr74_asympt50ns",   
+                                               
     "zprime_m1000_1p_13tev_spring15dr74_asympt50ns",
+    "zprime_m2000_1p_13tev_spring15dr74_asympt50ns",
 
-#    "zprime_m1000_1p_13tev_phys14_20bx25",
-#    "zprime_m2000_1p_13tev_phys14_20bx25",
-#    "qcd_170_300_pythia8_13tev_phys14_20bx25",
-#    "qcd_300_470_pythia8_13tev_phys14_20bx25",
-#    "qcd_600_800_pythia8_13tev_phys14_20bx25",    
-#    "qcd_800_1000_pythia8_13tev_phys14_20bx25",    
-#    "wjets_lnu_ht_600_inf_13tev_phys14_20bx25",
+    "qcd_170_300_13tev_spring15dr74_asympt25ns",    
+    "qcd_300_470_13tev_spring15dr74_asympt25ns",    
+    "qcd_470_600_13tev_spring15dr74_asympt25ns",    
+    "qcd_600_800_13tev_spring15dr74_asympt25ns",    
+    "qcd_800_1000_13tev_spring15dr74_asympt25ns",   
+                                               
+    "zprime_m750_1p_13tev_spring15dr74_asympt25ns", 
+    "zprime_m1000_1p_13tev_spring15dr74_asympt25ns",
+    "zprime_m1250_1p_13tev_spring15dr74_asympt25ns",
+    "zprime_m2000_1p_13tev_spring15dr74_asympt25ns",
 ]
 
 cmssw_config_path = '/shome/gregor/TTH-74X/CMSSW/src/TTH/TTHNtupleAnalyzer/python/'
@@ -60,7 +67,7 @@ if action == "submit":
                version,
                cmssw_config_path = cmssw_config_path,
                cmssw_config_script = config_script_name,
-               site = "T3_CH_PSI",
+               #site = "T3_CH_PSI",
                blacklist = [])
 
 # Status
@@ -85,7 +92,9 @@ elif action == "download":
 # Download
 elif action == "download_globus":
     for sample_shortname in li_samples:
-        CH.download_globus(name, sample_shortname, version, storage_path, glob_string = "output*tagg*.root", site = "T3_CH_PSI") 
+        CH.download_globus(name, sample_shortname, version, storage_path, glob_string = "output*tagg*.root", 
+                           #site = "T3_CH_PSI"
+        ) 
 
 # Cleanup
 elif action == "cleanup":
