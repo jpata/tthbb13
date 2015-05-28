@@ -40,9 +40,9 @@ for k in to_process:
     input_tree_name = "tree"
 
     if IS_TOPTAG:
-        input_pickle_file_name = "/shome/gregor/TTH-73X/CMSSW/src/TTH/Plotting/python/gregor/flat_pt_weights.pickle"
+        input_pickle_file_name = "/shome/gregor/TTH-74X/CMSSW/src/TTH/Plotting/python/gregor/flat_pt_weights.pickle"
     else:
-        input_pickle_file_name = "/shome/gregor/TTH-73X/CMSSW/src/TTH/Plotting/python/gregor/flat_pt_weights_higgs.pickle"
+        input_pickle_file_name = "/shome/gregor/TTH-74X/CMSSW/src/TTH/Plotting/python/gregor/flat_pt_weights_higgs.pickle"
 
     ########################################
     # Setup I/O

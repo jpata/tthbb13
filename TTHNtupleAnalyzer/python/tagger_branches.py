@@ -268,7 +268,7 @@ cmstt_sj_float_branches =  ["energy", "eta", "mass", "phi", "pt"]
 
 cmstt_sj_int_branches =  ["parent_idx"]
 
-for cmstt_name in ["ak08cmstt", "ca08cmstt", "ca15cmstt"]:
+for cmstt_name in ["ak08cmstt", "ca15cmstt"]:
 
     # How many objects do we have?
     tagger_counter_name = "n__jet_{0}".format(cmstt_name)
