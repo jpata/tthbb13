@@ -29,12 +29,8 @@ if socket.gethostname() == "t3ui12":
 
 # on the Grid
 else:
-    import AccessHelpers as AH
-
-    try:
-        from Taggers_cfg import li_htt_branches
-    except:
-        li_htt_branches = []
+    import AccessHelpers as AH   
+    li_htt_branches = ['looseHTT','looseOptRHTT'] 
 
 ########################################
 # deltaR
@@ -151,9 +147,6 @@ htt_branches = ["pt", "mass", "fRec",
 
 cmstt_branches = ["pt", "mass", "minMass", "wMass", "topMass", "nSubJets"]
 
-li_htt_branches = li_htt_branches + ['looseHTT','looseOptRHTT']#, 'looseOptRRejRminHTT', 'looseOptRQHTT', 'tightOptRQHTT']
-
-
 ########################################
 # Prepare input/output
 ########################################
@@ -179,11 +172,11 @@ for htt in li_htt_branches:
     objects[htt]                = htt_branches
 
 # And some extras
-for x in ["ak08", "ca15"]:
+for x in ["ak08", "ca08", "ca15"]:
     if x in objects.keys():
         objects[x] = fj_branches_plus
 
-for x in ["ak08cmstt","ca15cmstt"]:
+for x in ["ak08cmstt", "ca08cmstt", "ca15cmstt"]:
     if x in objects.keys():
         objects[x] = cmstt_branches
 
@@ -402,18 +395,24 @@ for i_event in range(n_entries):
             # the true_index of is only used to filter out jets that are matched to other tops!            
             i_branch = AH.getter(intree, full_i_branch_name)
             dr_branch = AH.getter(intree, full_dr_branch_name)
-
             
+            # This means the branch was not filled at all, so skip it
+            max_int_32 = 2147483647
+            if len(i_branch) == max_int_32:
+                continue
+        
             # Special treatment for b-tagging subjets. Don't take closest but b-likeliest in radius
             if "forbtag" in object_name:
                 
                 full_btag_branch_name = "jet_{0}__btag".format(object_name)
                 btag_branch = AH.getter(intree, full_btag_branch_name)
 
+
                 dr_pos_btag = [(dr,pos,btag) for i,dr,btag,pos in zip(i_branch, dr_branch, btag_branch, range(len(i_branch))) if i==i_particle]
 
                 # Apply the Delta R cut
                 dr_pos_btag = [(dr,pos,btag) for dr,pos,btag in dr_pos_btag if dr < object_drs[object_name]]
+
 
                 if len(dr_pos_btag):
 
@@ -434,6 +433,7 @@ for i_event in range(n_entries):
             # Done handling b-tagged subjets
 
             else:
+
                 dr_and_pos = [(dr,pos) for i,dr,pos in zip(i_branch, dr_branch, range(len(i_branch))) if i==i_particle]
 
                 # Apply the Delta R cut
