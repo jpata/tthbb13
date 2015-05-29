@@ -63,6 +63,8 @@ process.source = cms.Source("PoolSource",
 #process.SimpleMemoryCheck = cms.Service("SimpleMemoryCheck",ignoreTotal = cms.untracked.int32(1) )
 
 
+
+
 #####################################
 # CHS
 #####################################
@@ -75,6 +77,9 @@ process.chs = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedPFCandid
 #####################################
 # Ungroomed Fatjets
 #####################################
+
+DO_R15 = False
+DO_R08 = True
 
 from RecoJets.JetProducers.AnomalousCellParameters_cfi import *
 from RecoJets.JetProducers.PFJetParameters_cfi import *
@@ -89,48 +94,66 @@ li_ungroomed_fatjets_branches = []
 # First create the ungroomed fatjet collections
 # These are the ones that get all the groomers applied to later on
 
-## AntiKt, R=0.8, pT > 200 GeV
-fj_name = "ak08PFJetsCHS"
-branch_name = 'ak08'
-setattr(process, fj_name, cms.EDProducer(
-        "FastjetJetProducer",
-        PFJetParameters,
-        AnomalousCellParameters,
-        jetAlgorithm = cms.string("AntiKt"),
-        rParam       = cms.double(0.8)))
-getattr(process, fj_name).src = cms.InputTag("chs")
-getattr(process, fj_name).jetPtMin = cms.double(200)
-li_fatjets_objects.append(fj_name)
-li_fatjets_branches.append(branch_name)
-li_ungroomed_fatjets_objects.append(fj_name)
-li_ungroomed_fatjets_branches.append(branch_name)
+if DO_R08:
+   ## AntiKt, R=0.8, pT > 200 GeV
+   fj_name = "ak08PFJetsCHS"
+   branch_name = 'ak08'
+   setattr(process, fj_name, cms.EDProducer(
+           "FastjetJetProducer",
+           PFJetParameters,
+           AnomalousCellParameters,
+           jetAlgorithm = cms.string("AntiKt"),
+           rParam       = cms.double(0.8)))
+   getattr(process, fj_name).src = cms.InputTag("chs")
+   getattr(process, fj_name).jetPtMin = cms.double(200)
+   li_fatjets_objects.append(fj_name)
+   li_fatjets_branches.append(branch_name)
+   li_ungroomed_fatjets_objects.append(fj_name)
+   li_ungroomed_fatjets_branches.append(branch_name)
 
+   ## CA, R=0.8, pT > 200 GeV
+   fj_name = "ca08PFJetsCHS"
+   branch_name = 'ca08'
+   setattr(process, fj_name, cms.EDProducer(
+           "FastjetJetProducer",
+           PFJetParameters,
+           AnomalousCellParameters,
+           jetAlgorithm = cms.string("CambridgeAachen"),
+           rParam       = cms.double(0.8)))
+   getattr(process, fj_name).src = cms.InputTag("chs")
+   getattr(process, fj_name).jetPtMin = cms.double(200)
+   li_fatjets_objects.append(fj_name)
+   li_fatjets_branches.append(branch_name)
+   li_ungroomed_fatjets_objects.append(fj_name)
+   li_ungroomed_fatjets_branches.append(branch_name)
 
-# CA, R=1.5, pT > 200 GeV
-fj_name = "ca15PFJetsCHS"
-branch_name = 'ca15'
-setattr(process, fj_name, cms.EDProducer(
-        "FastjetJetProducer",
-        PFJetParameters,
-        AnomalousCellParameters,
-        jetAlgorithm = cms.string("CambridgeAachen"),
-        rParam       = cms.double(1.5)))
-getattr(process, fj_name).src = cms.InputTag("chs")
-getattr(process, fj_name).jetPtMin = cms.double(200)
-li_fatjets_objects.append(fj_name)
-li_fatjets_branches.append(branch_name)
-li_ungroomed_fatjets_objects.append(fj_name)
-li_ungroomed_fatjets_branches.append(branch_name)
+if DO_R15:
+   # CA, R=1.5, pT > 200 GeV
+   fj_name = "ca15PFJetsCHS"
+   branch_name = 'ca15'
+   setattr(process, fj_name, cms.EDProducer(
+           "FastjetJetProducer",
+           PFJetParameters,
+           AnomalousCellParameters,
+           jetAlgorithm = cms.string("CambridgeAachen"),
+           rParam       = cms.double(1.5)))
+   getattr(process, fj_name).src = cms.InputTag("chs")
+   getattr(process, fj_name).jetPtMin = cms.double(200)
+   li_fatjets_objects.append(fj_name)
+   li_fatjets_branches.append(branch_name)
+   li_ungroomed_fatjets_objects.append(fj_name)
+   li_ungroomed_fatjets_branches.append(branch_name)
 
 
 #####################################
 # AK 0.8 constituents
 #####################################
 
-process.ak8PFJetsCHSConstituents = cms.EDFilter("MiniAODJetConstituentSelector",
-                                                src = cms.InputTag("ak08PFJetsCHS"),
-                                                cut = cms.string("pt>0")
-                                             )
+if DO_R08:
+   process.ak8PFJetsCHSConstituents = cms.EDFilter("MiniAODJetConstituentSelector",
+                                                   src = cms.InputTag("ak08PFJetsCHS"),
+                                                   cut = cms.string("pt>0")
+                                                )
 
 #####################################
 # Helpers: GetRadiusFromName / GetRadiusStringFromName
@@ -206,6 +229,20 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
            useExplicitGhosts = cms.bool(True),
            writeCompound = cms.bool(True),
            jetCollInstanceName=cms.string("SubJets")
+   ))
+   li_fatjets_objects.append(fj_name)        
+   li_fatjets_branches.append(branch_name)
+
+   name = "filteredn3r2forbtag"   
+   fj_name = ungroomed_fj_name + name
+   branch_name = ungroomed_branch_name + name
+   setattr(process, fj_name, ungroomed_fj.clone(
+      useFiltering = cms.bool(True),
+      nFilt = cms.int32(3),
+      rFilt = cms.double(0.2),
+      useExplicitGhosts = cms.bool(True),
+      writeCompound = cms.bool(True),
+      jetCollInstanceName=cms.string("SubJets")
    ))
    li_fatjets_objects.append(fj_name)        
    li_fatjets_branches.append(branch_name)
@@ -447,9 +484,9 @@ li_fatjets_sds = []
 for fj_name in li_fatjets_objects:
         
    # For Local Testing
-   #sd_path = "../data/"
+   sd_path = "../data/"
    # For Grid Submission
-   sd_path = "src/TTH/TTHNtupleAnalyzer/data/"
+   #sd_path = "src/TTH/TTHNtupleAnalyzer/data/"
         
    #sd_fatjets = []
    sd_fatjets = li_ungroomed_fatjets_objects
@@ -557,10 +594,8 @@ for fatjet_name in li_fatjets_objects:
       original_fatjet_name = fatjet_name
       original_fatjet_name = original_fatjet_name.replace("trimmedr2f6forbtag","")
       original_fatjet_name = original_fatjet_name.replace("softdropz10b00forbtag","")
+      original_fatjet_name = original_fatjet_name.replace("filteredn3r2forbtag","")
       
-      print original_fatjet_name
-      
-
       getattr(process, isv_info_name).rParam = cms.double(delta_r)
       getattr(process, isv_info_name).fatJets  =  cms.InputTag(original_fatjet_name)
       getattr(process, isv_info_name).groomedFatJets  =  cms.InputTag(fatjet_name)
@@ -593,70 +628,109 @@ for fatjet_name in li_fatjets_objects:
 
 # end of loop over fatjets
 
-print len(li_fatjets_objects), len(li_fatjets_btags)
-
 
 #####################################
 # CMS Top Tagger
 #####################################
 
+li_cmstt_objects  = []
+li_cmstt_infos    = []
+li_cmstt_branches = []
 
-# CMS TopTagger run on AK8 constituents!
-process.cmsTopTagAk08PFJetsCHS = cms.EDProducer(
-        "CATopJetProducer",
-        PFJetParameters,
-        AnomalousCellParameters,
-        CATopJetParameters,
-        jetAlgorithm = cms.string("CambridgeAachen"), # CA is correct here! We already run on AK constituents! see below..
-        rParam = cms.double(0.8),
-        writeCompound = cms.bool(True))
+if DO_R08:
+   # CMS TopTagger run on AK8 constituents!
+   process.cmsTopTagAk08PFJetsCHS = cms.EDProducer(
+           "CATopJetProducer",
+           PFJetParameters,
+           AnomalousCellParameters,
+           CATopJetParameters,
+           jetAlgorithm = cms.string("CambridgeAachen"), # CA is correct here! We already run on AK constituents! see below..
+           rParam = cms.double(0.8),
+           writeCompound = cms.bool(True))
 
-process.cmsTopTagAk08PFJetsCHS.src = cms.InputTag("ak8PFJetsCHSConstituents", "constituents")
-process.cmsTopTagAk08PFJetsCHS.doAreaFastjet = cms.bool(True)
-process.cmsTopTagAk08PFJetsCHS.jetPtMin = cms.double(200.0)
+   process.cmsTopTagAk08PFJetsCHS.src = cms.InputTag("ak8PFJetsCHSConstituents", "constituents")
+   process.cmsTopTagAk08PFJetsCHS.doAreaFastjet = cms.bool(True)
+   process.cmsTopTagAk08PFJetsCHS.jetPtMin = cms.double(200.0)
+
+   process.ak08CMSTopTagInfos = cms.EDProducer("CATopJetTagger",
+                                               src = cms.InputTag("cmsTopTagAk08PFJetsCHS"),
+                                               TopMass = cms.double(173),
+                                               TopMassMin = cms.double(0.),
+                                               TopMassMax = cms.double(250.),
+                                               WMass = cms.double(80.4),
+                                               WMassMin = cms.double(0.0),
+                                               WMassMax = cms.double(200.0),
+                                               MinMassMin = cms.double(0.0),
+                                               MinMassMax = cms.double(200.0),
+                                               verbose = cms.bool(False))
+
+   li_cmstt_objects.append("cmsTopTagAk08PFJetsCHS")
+   li_cmstt_infos.append("ak08CMSTopTagInfos")
+   li_cmstt_branches.append("ak08cmstt")
 
 
-process.cmsTopTagCa15PFJetsCHS = cms.EDProducer(
-        "CATopJetProducer",
-        PFJetParameters,
-        AnomalousCellParameters,
-        CATopJetParameters,
-        jetAlgorithm = cms.string("CambridgeAachen"),
-        rParam = cms.double(1.5),
-        writeCompound = cms.bool(True)
-    )
-process.cmsTopTagCa15PFJetsCHS.src = cms.InputTag('chs')
-process.cmsTopTagCa15PFJetsCHS.doAreaFastjet = cms.bool(True)
-process.cmsTopTagCa15PFJetsCHS.jetPtMin = cms.double(200.0)
+   # CA, R=0.8 CMSTT
+           
+   process.cmsTopTagCa08PFJetsCHS = cms.EDProducer(
+           "CATopJetProducer",
+           PFJetParameters,
+           AnomalousCellParameters,
+           CATopJetParameters,
+           jetAlgorithm = cms.string("CambridgeAachen"),
+           rParam = cms.double(0.8),
+           writeCompound = cms.bool(True))
+
+   process.cmsTopTagCa08PFJetsCHS.src = cms.InputTag('chs')
+   process.cmsTopTagCa08PFJetsCHS.doAreaFastjet = cms.bool(True)
+   process.cmsTopTagCa08PFJetsCHS.jetPtMin = cms.double(200.0)
+
+   process.ca08CMSTopTagInfos = cms.EDProducer("CATopJetTagger",
+                                               src = cms.InputTag("cmsTopTagCa08PFJetsCHS"),
+                                               TopMass = cms.double(173),
+                                               TopMassMin = cms.double(0.),
+                                               TopMassMax = cms.double(250.),
+                                               WMass = cms.double(80.4),
+                                               WMassMin = cms.double(0.0),
+                                               WMassMax = cms.double(200.0),
+                                               MinMassMin = cms.double(0.0),
+                                               MinMassMax = cms.double(200.0),
+                                               verbose = cms.bool(False))
+
+   li_cmstt_objects.append("cmsTopTagCa08PFJetsCHS")
+   li_cmstt_infos.append("ca08CMSTopTagInfos")
+   li_cmstt_branches.append("ca08cmstt")
 
 
+if DO_R15:
+   process.cmsTopTagCa15PFJetsCHS = cms.EDProducer(
+           "CATopJetProducer",
+           PFJetParameters,
+           AnomalousCellParameters,
+           CATopJetParameters,
+           jetAlgorithm = cms.string("CambridgeAachen"),
+           rParam = cms.double(1.5),
+           writeCompound = cms.bool(True)
+       )
+   process.cmsTopTagCa15PFJetsCHS.src = cms.InputTag('chs')
+   process.cmsTopTagCa15PFJetsCHS.doAreaFastjet = cms.bool(True)
+   process.cmsTopTagCa15PFJetsCHS.jetPtMin = cms.double(200.0)
 
+   process.ca15CMSTopTagInfos = cms.EDProducer("CATopJetTagger",
+                                               src = cms.InputTag("cmsTopTagCa15PFJetsCHS"),
+                                               TopMass = cms.double(173),
+                                               TopMassMin = cms.double(0.),
+                                               TopMassMax = cms.double(250.),
+                                               WMass = cms.double(80.4),
+                                               WMassMin = cms.double(0.0),
+                                               WMassMax = cms.double(200.0),
+                                               MinMassMin = cms.double(0.0),
+                                               MinMassMax = cms.double(200.0),
+                                               verbose = cms.bool(False))
 
-# CMS Top Tagger Infos
+   li_cmstt_objects.append("cmsTopTagCa15PFJetsCHS")
+   li_cmstt_infos.append("ca15CMSTopTagInfos")
+   li_cmstt_branches.append("ca15cmstt")
 
-process.ak08CMSTopTagInfos = cms.EDProducer("CATopJetTagger",
-                                            src = cms.InputTag("cmsTopTagAk08PFJetsCHS"),
-                                            TopMass = cms.double(173),
-                                            TopMassMin = cms.double(0.),
-                                            TopMassMax = cms.double(250.),
-                                            WMass = cms.double(80.4),
-                                            WMassMin = cms.double(0.0),
-                                            WMassMax = cms.double(200.0),
-                                            MinMassMin = cms.double(0.0),
-                                            MinMassMax = cms.double(200.0),
-                                            verbose = cms.bool(False))
-
-process.ca15CMSTopTagInfos = cms.EDProducer("CATopJetTagger",
-                                            src = cms.InputTag("cmsTopTagCa15PFJetsCHS"),
-                                            TopMass = cms.double(173),
-                                            TopMassMin = cms.double(0.),
-                                            TopMassMax = cms.double(250.),
-                                            WMass = cms.double(80.4),
-                                            WMassMin = cms.double(0.0),
-                                            WMassMax = cms.double(200.0),
-                                            MinMassMin = cms.double(0.0),
-                                            MinMassMax = cms.double(200.0),
-                                            verbose = cms.bool(False))
 
 
 #####################################
@@ -798,10 +872,10 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
 
         httObjects  = cms.vstring(li_htt_branches), # Using branch names also as object names
         httBranches = cms.vstring(li_htt_branches),                                           
-       
-        cmsttObjects  = cms.vstring(['cmsTopTagCa15PFJetsCHS', 'cmsTopTagAk08PFJetsCHS']),
-        cmsttInfos    = cms.vstring(['ca15CMSTopTagInfos',     'ak08CMSTopTagInfos'    ]),
-        cmsttBranches = cms.vstring(['ca15cmstt',              'ak08cmstt']),
+                                           
+        cmsttObjects  = cms.vstring(li_cmstt_objects),
+        cmsttInfos    = cms.vstring(li_cmstt_infos),
+        cmsttBranches = cms.vstring(li_cmstt_branches),
 
 	jetMult_min   = cms.untracked.int32(-99),
 	jetPt_min     = cms.untracked.double(15.),
@@ -863,18 +937,18 @@ for htt_name in li_htt_branches:
    process.p += getattr(process, htt_name)
 
 # Schedule AK08 Constituents
-process.p += process.ak8PFJetsCHSConstituents
+if DO_R08:
+   process.p += process.ak8PFJetsCHSConstituents
 
-# Schedule CMS Top Tagger, HEPTopTagger, b-tagging and Ntupelizer
-for x in [process.cmsTopTagAk08PFJetsCHS,
-          process.cmsTopTagCa15PFJetsCHS,          
-          process.ak08CMSTopTagInfos,
-          process.ca15CMSTopTagInfos,
-          process.my_btagging,
-          process.tthNtupleAnalyzer
-  ]:
+# Schedule CMS Top Tagger
+for x in li_cmstt_objects + li_cmstt_infos:
+   process.p += getattr(process, x)
+
+# Schedule HEPTopTagger, b-tagging and Ntupelizer
+for x in [process.my_btagging,
+          process.tthNtupleAnalyzer]:
    process.p += x
-
+   
 
 if "TTH_DEBUG" in os.environ:
 	process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
