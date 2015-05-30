@@ -282,6 +282,12 @@ void fill_fatjet_branches(const edm::Event& iEvent,
     tthtree->get_address<float *>(prefix + "eta" )[n_fat_jet] = x.eta();
     tthtree->get_address<float *>(prefix + "phi" )[n_fat_jet] = x.phi();
     tthtree->get_address<float *>(prefix + "mass")[n_fat_jet] = x.mass();
+    
+    // Constituents
+    tthtree->get_address<int *>(prefix + "nconst")[n_fat_jet] = x.getJetConstituents().size();
+    tthtree->get_address<int *>(prefix + "ncharged")[n_fat_jet] = x.chargedMultiplicity();
+    tthtree->get_address<int *>(prefix + "nneutral")[n_fat_jet] = x.neutralMultiplicity();
+
 
     // NSubjettiness
     if (fj_nsubs_name != "None"){

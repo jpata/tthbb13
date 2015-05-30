@@ -484,9 +484,9 @@ li_fatjets_sds = []
 for fj_name in li_fatjets_objects:
         
    # For Local Testing
-   sd_path = "../data/"
+   #sd_path = "../data/"
    # For Grid Submission
-   #sd_path = "src/TTH/TTHNtupleAnalyzer/data/"
+   sd_path = "src/TTH/TTHNtupleAnalyzer/data/"
         
    #sd_fatjets = []
    sd_fatjets = li_ungroomed_fatjets_objects

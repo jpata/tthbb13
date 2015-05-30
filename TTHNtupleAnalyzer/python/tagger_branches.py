@@ -175,6 +175,7 @@ for fj_name in li_fatjets_branches:
                                          # (only fill for ungroomed)
             "qvol",                      # Qjet volatility
                                          # (only fill for ungroomed)
+            "nconst", "ncharged", "nneutral", # constituent counts
             "close_hadtop_pt",  "close_hadtop_dr", "close_hadtop_i", # top truth matching
             "close_parton_pt",  "close_parton_dr", "close_parton_i", # parton truth matching
             "close_higgs_pt",   "close_higgs_dr",  "close_higgs_i"   # higgs truth matching
@@ -184,7 +185,7 @@ for fj_name in li_fatjets_branches:
         if (branch_name in ["chi", "nmj"]) and not (fj_name in li_ungroomed_fatjets_branches):
             continue
 
-        if branch_name in ["close_higgs_i", "close_hadtop_i", "close_parton_i", "nmj"]:
+        if branch_name in ["close_higgs_i", "close_hadtop_i", "close_parton_i", "nmj", "nconst", "ncharged", "nneutral"]:
             the_type = "int"
         else:
             the_type = "float"

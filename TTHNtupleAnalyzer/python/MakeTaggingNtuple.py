@@ -128,7 +128,7 @@ particle_branches = particle_branches_float + particle_branches_int
 
 
 # "Normal" branches for most fatjet collections
-fj_branches = ["pt", "mass", "tau1", "tau2", "tau3", "qvol"]
+fj_branches = ["pt", "mass", "tau1", "tau2", "tau3", "qvol", "nconst", "ncharged", "nneutral"]
 
 # Extended fj branches, including
 #   shower deconstruction chi
