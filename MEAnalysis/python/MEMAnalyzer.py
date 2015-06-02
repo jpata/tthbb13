@@ -14,7 +14,7 @@ from ROOT import MEM
 #Pre-define shorthands for permutation and integration variable vectors
 CvectorPermutations = getattr(ROOT, "std::vector<MEM::Permutations::Permutations>")
 CvectorPSVar = getattr(ROOT, "std::vector<MEM::PSVar::PSVar>")
-CmapDistributionTypeTF1 = getattr(ROOT, "std::map<MEM::DistributionType::DistributionType,TF1>")
+#CmapDistributionTypeTH3D = getattr(ROOT, "std::map<MEM::DistributionType::DistributionType,TH3D>")
 
 from TTH.MEAnalysis.Analyzer import FilterAnalyzer
 class MECategoryAnalyzer(FilterAnalyzer):
@@ -93,16 +93,21 @@ class MEMConfig:
         self.enabled = True
 
     def configure_btag_pdf(self, conf):
-        btag_map = CmapDistributionTypeTF1()
+        """
+        Add the jet b-tag discriminator distributions to the MEM::MEMConfig object.
+        The distributions are 3D in (pt, |eta|, CSV).
+        """
+        #btag_map = CmapDistributionTypeTH1F()
         
         for x,y in [
             ("b", MEM.DistributionType.csv_b),
             ("c", MEM.DistributionType.csv_c),
             ("l", MEM.DistributionType.csv_l),
         ]:
-            btag_map[y] = conf.BTagLRAnalyzer.csv_pdfs[(x, "Bin0")]
-
-        self.cfg.btag_pdfs = btag_map
+            self.cfg.add_distribution_global(
+                y,
+                conf.BTagLRAnalyzer.csv_pdfs[(x, "pt_eta")]
+            )
 
     def configure_transfer_function(self, conf):
         for nb in [0, 1]:
