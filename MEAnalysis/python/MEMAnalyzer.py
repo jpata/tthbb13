@@ -42,7 +42,7 @@ class MECategoryAnalyzer(FilterAnalyzer):
             event.btag_LR_4b_2b > self.conf.mem["btagLRCut"][event.cat]
         )
         pass_btag_csv = (self.conf.jets["untaggedSelection"] == "btagCSV" and
-            len(event.selected_btagged_jets) >= 4
+            len(event.selected_btagged_jets_high) >= 4
         )
         cat_btag = "NOCAT"
 
@@ -82,7 +82,7 @@ class MEMConfig:
     def __init__(self):
         self.cfg = MEM.MEMConfig()
         self.cfg.defaultCfg()
-        self.b_quark_candidates = lambda event: event.selected_btagged_jets
+        self.b_quark_candidates = lambda event: event.selected_btagged_jets_high
         self.l_quark_candidates = lambda event: event.wquark_candidate_jets
         self.lepton_candidates = lambda event: event.good_leptons
         self.met_candidates = lambda event: event.met
@@ -98,7 +98,7 @@ class MEMConfig:
         The distributions are 3D in (pt, |eta|, CSV).
         """
         #btag_map = CmapDistributionTypeTH1F()
-        
+
         for x,y in [
             ("b", MEM.DistributionType.csv_b),
             ("c", MEM.DistributionType.csv_c),
@@ -151,7 +151,7 @@ class MEAnalyzer(FilterAnalyzer):
     Additionally, we require the b-tagging category (event.cat_btag) to be "H" (high).
 
     For each ME configuration on each event, the jets which are counted to be b-tagged
-    in event.selected_btagged_jets are added as the candidates for t->b (W) or h->bb.
+    in event.selected_btagged_jets_high are added as the candidates for t->b (W) or h->bb.
     These jets must be exactly 4, otherwise no permutation is accepted (in case
     using BTagged/QUntagged assumptions).
 
@@ -160,6 +160,9 @@ class MEAnalyzer(FilterAnalyzer):
 
     Based on the event njet/nlep/Wtag category, if a jet fmor the W is counted as missing,
     it is integrated over using additional variables set by self.vars_to_integrate.
+
+    self.vars_to_integrate_any contains the list of particles which are integrated over assuming
+    perfect reconstruction efficiency.
 
     The MEM top pair hypothesis (di-leptonic or single leptonic top pair) is chosen based
     on the reconstructed lepton multiplicity (event.good_leptons).
@@ -338,6 +341,7 @@ class MEAnalyzer(FilterAnalyzer):
 
         #Create an empty vector for the integration variables
         self.vars_to_integrate = CvectorPSVar()
+        self.vars_to_integrate_any = CvectorPSVar()
 
     def add_obj(self, objtype, **kwargs):
         """
@@ -372,6 +376,7 @@ class MEAnalyzer(FilterAnalyzer):
     def configure_mem(self, event, mem_cfg):
         self.integrator.set_cfg(mem_cfg.cfg)
         self.vars_to_integrate.clear()
+        self.vars_to_integrate_any.clear()
         self.integrator.next_event()
         mem_cfg.enabled = True
 
@@ -443,6 +448,7 @@ class MEAnalyzer(FilterAnalyzer):
 
         #Clean up any old MEM state
         self.vars_to_integrate.clear()
+        self.vars_to_integrate_any.clear()
         self.integrator.next_event()
 
         #Initialize members for tree filler
@@ -483,7 +489,8 @@ class MEAnalyzer(FilterAnalyzer):
                     r = self.integrator.run(
                         fstate,
                         hypo,
-                        self.vars_to_integrate
+                        self.vars_to_integrate, #integrate
+                        self.vars_to_integrate_any #integrate without efficiency curve
                     )
                     print "MEM done", ("hypo", hypo), ("conf", confname)
 

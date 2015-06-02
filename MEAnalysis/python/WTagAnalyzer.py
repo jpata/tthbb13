@@ -56,9 +56,12 @@ class WTagAnalyzer(FilterAnalyzer):
         #we keep a set of the Q quark candidate jets
         event.wquark_candidate_jets = set([])
 
-        #Need at least 2 untagged jets to calculate W mass
-        if len(event.buntagged_jets)>=2:
-            bpair = self.find_best_pair(event.buntagged_jets)
+        #Use untagged jets + any b-tagged jets that are not among the 4 highest by discriminator
+        input_jets = event.buntagged_jets + event.selected_btagged_jets_low
+
+        #Need at least 2 light jets to calculate W mass
+        if len(input_jets)>=2:
+            bpair = self.find_best_pair(input_jets)
 
             #Get the best mass
             event.Wmass = bpair[0][0]
@@ -76,11 +79,10 @@ class WTagAnalyzer(FilterAnalyzer):
                         event.good_jets.index(bpair[i][1]),
                         event.good_jets.index(bpair[i][2])
                     )
-        #If we can't calculate W mass, untagged jets become the candidate
+        #If we can't calculate W mass, any untagged jets become the candidate
         else:
-            for jet in event.buntagged_jets:
+            for jet in input_jets:
                 event.wquark_candidate_jets.add(jet)
-
 
         passes = True
         if passes:
