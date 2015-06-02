@@ -153,27 +153,27 @@ def getTreeProducer(conf):
 
             ###
             NTupleVariable(
-                "btag_lr_2b_2c", lambda ev: ev.btag_lr_2b_2c,
+                "btag_p_2b_2c", lambda ev: ev.btag_lr_2b_2c,
                 help="B-tagging likelihood for the 2b, 2c hypo (13TeV CSV curves)"
             ),
 
             NTupleVariable(
-                "btag_lr_2b_1c", lambda ev: ev.btag_lr_2b_1c,
+                "btag_p_2b_1c", lambda ev: ev.btag_lr_2b_1c,
                 help="B-tagging likelihood for the 2b, 1c hypo (13TeV CSV curves)"
             ),
 
             NTupleVariable(
-                "btag_lr_4b_1c", lambda ev: ev.btag_lr_4b_1c,
+                "btag_p_4b_1c", lambda ev: ev.btag_lr_4b_1c,
                 help="B-tagging likelihood for the 4b, 1c hypo (13TeV CSV curves)"
             ),
 
             NTupleVariable(
-                "btag_lr_4b", lambda ev: ev.btag_lr_4b,
+                "btag_p_4b", lambda ev: ev.btag_lr_4b,
                 help="B-tagging likelihood for the 4b hypo (13TeV CSV curves)"
             ),
 
             NTupleVariable(
-                "btag_lr_2b", lambda ev: ev.btag_lr_2b,
+                "btag_p_2b", lambda ev: ev.btag_lr_2b,
                 help="B-tagging likelihood for the 2b hypo (13TeV CSV curves)"
             ),
             ###
