@@ -65,8 +65,8 @@ for sample in samples:
     of.cd()
     d = of.mkdir(sample)
     d.cd()
-    Draw(tf, d, "is_sl >> sl(2,0,2)", "1")
-    Draw(tf, d, "is_dl >> dl(2,0,2)", "1")
+    Draw(tf, d, "is_sl >> nsl(2,0,2)", "1")
+    Draw(tf, d, "is_dl >> ndl(2,0,2)", "1")
 
     for lep, lepcut in [("sl", "is_sl==1"), ("dl", "is_dl==1")]:
         d.cd()

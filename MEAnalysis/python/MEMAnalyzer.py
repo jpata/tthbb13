@@ -299,8 +299,9 @@ class MEAnalyzer(FilterAnalyzer):
 
         #Create the ME integrator.
         #Arguments specify the verbosity
+        #the first argument:
+        #../MEIntegratorStandalone/interface/Parameters.h:  enum DebugVerbosity { output=1, input=2, init=4, init_more=8, event=16, integration=32};
         self.integrator = MEM.Integrand(
-            #0,
             MEM.output,
             self.configs["SL_2qW"].cfg
         )
