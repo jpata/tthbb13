@@ -87,8 +87,9 @@ class Conf:
             # "gen" - print out the ttH gen-level particles (b from top, b form higgs, q from W, leptons
             # "reco" - print out the reco-level selected particles
             # "matching" - print out the association between gen and reco objects
-            "verbosity": ["eventboundary", "input", "matching", "gen", "reco", "meminput"],
+            #"verbosity": ["eventboundary", "input", "matching", "gen", "reco", "meminput"],
             #"verbosity": ["meminput"],
+            "verbosity": []
 
             #Process only these events (will scan through file to find)
             #"eventWhitelist": [

@@ -127,6 +127,18 @@ mem_analyzer = cfg.Analyzer(
     _conf = conf
 )
 
+#Simple copy in order to run twice
+mem_analyzer_sj = cfg.Analyzer(
+    MECoreAnalyzers.MEAnalyzer,
+    'mem_sj',
+    _conf = conf
+)
+
+subjet_analyzer = cfg.Analyzer(
+    MECoreAnalyzers.SubjetAnalyzer,
+    'subjet',
+    _conf = conf
+)
 
 gentth = cfg.Analyzer(
     MECoreAnalyzers.GenTTHAnalyzer,
@@ -150,6 +162,8 @@ sequence = cfg.Sequence([
     mecat,
     gentth,
     mem_analyzer,
+    subjet_analyzer,
+    mem_analyzer_sj,
     treeProducer
 ])
 

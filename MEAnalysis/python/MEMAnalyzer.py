@@ -385,7 +385,13 @@ class MEAnalyzer(FilterAnalyzer):
                 }
             )
             if "meminput" in self.conf.general["verbosity"]:
-                print "memBQuark", jet.pt, jet.eta, jet.phi, jet.mass, jet.btagFlag, jet.tth_match_label, jet.tth_match_index
+                #print "memBQuark", jet.pt, jet.eta, jet.phi, jet.mass, jet.btagFlag, jet.tth_match_label, jet.tth_match_index
+
+                print 'memBQuark {0:.5f} {1:.5f} {2:.5f}' \
+                    ' {3:.5f} {4} {5:4s} {6}'.format(
+                    jet.pt, jet.eta, jet.phi, jet.mass,
+                    jet.btagFlag, jet.tth_match_label, jet.tth_match_index )
+
 
         #Add light jets that are assumed to come from hadronic W decay
         #Only take up to 4 candidates, otherwise runtimes become too great
@@ -425,9 +431,10 @@ class MEAnalyzer(FilterAnalyzer):
         self.vars_to_integrate.clear()
         self.integrator.next_event()
 
+        #Thomas: Moved to bottom
         #Initialize members for tree filler
-        event.mem_results_tth = []
-        event.mem_results_ttbb = []
+        #event.mem_results_tth = []
+        #event.mem_results_ttbb = []
 
         #jets = sorted(event.good_jets, key=lambda x: x.pt, reverse=True)
         leptons = event.good_leptons
@@ -484,6 +491,16 @@ class MEAnalyzer(FilterAnalyzer):
         #print out full MEM result dictionary
         #print "RES", [(k, res[k].p) for k in sorted(res.keys())]
 
-        event.mem_results_tth = [res[(MEM.Hypothesis.TTH, k)] for k in self.memkeys]
-        event.mem_results_ttbb = [res[(MEM.Hypothesis.TTBB, k)] for k in self.memkeys]
+        # Determine whether the MEMAnalyzer just ran over subjets or regular jets
+        if hasattr( event, 'AfterSubjetAnalyzer' ) and event.AfterSubjetAnalyzer:
+            event.mem_results_sj_tth = \
+                [res[(MEM.Hypothesis.TTH, k)] for k in self.memkeys]
+            event.mem_results_sj_ttbb = \
+                [res[(MEM.Hypothesis.TTBB, k)] for k in self.memkeys]
+        else:
+            event.mem_results_tth = \
+                [res[(MEM.Hypothesis.TTH, k)] for k in self.memkeys]
+            event.mem_results_ttbb = \
+                [res[(MEM.Hypothesis.TTBB, k)] for k in self.memkeys]
+
         print "---MEM done EVENT r:l:e", event.input.run, event.input.lumi, event.input.evt

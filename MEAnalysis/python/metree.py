@@ -366,6 +366,8 @@ def getTreeProducer(conf):
             "good_leptons" : NTupleCollection("leps", leptonType, 2, help="Selected leptons"),
             "mem_results_tth" : NTupleCollection("mem_tth", memType, len(conf.mem["methodsToRun"]), help="MEM tth"),
             "mem_results_ttbb" : NTupleCollection("mem_ttbb", memType, len(conf.mem["methodsToRun"]), help="MEM ttbb"),
+            "mem_results_sj_tth" : NTupleCollection("mem_tth_sj", memType, len(conf.mem["methodsToRun"]), help="MEM tth"),
+            "mem_results_sj_ttbb" : NTupleCollection("mem_ttbb_sj", memType, len(conf.mem["methodsToRun"]), help="MEM ttbb"),
         }
     )
     return treeProducer
