@@ -154,27 +154,27 @@ def getTreeProducer(conf):
             ###
             NTupleVariable(
                 "btag_lr_2b_2c", lambda ev: ev.btag_lr_2b_2c,
-                help="B-tagging likelihood ratio: 2b, 2c (13TeV CSV curves)"
+                help="B-tagging likelihood for the 2b, 2c hypo (13TeV CSV curves)"
             ),
 
             NTupleVariable(
                 "btag_lr_2b_1c", lambda ev: ev.btag_lr_2b_1c,
-                help="B-tagging likelihood ratio: 2b, 1c (13TeV CSV curves)"
+                help="B-tagging likelihood for the 2b, 1c hypo (13TeV CSV curves)"
             ),
 
             NTupleVariable(
                 "btag_lr_4b_1c", lambda ev: ev.btag_lr_4b_1c,
-                help="B-tagging likelihood ratio: 4b, 1c (13TeV CSV curves)"
+                help="B-tagging likelihood for the 4b, 1c hypo (13TeV CSV curves)"
             ),
 
             NTupleVariable(
                 "btag_lr_4b", lambda ev: ev.btag_lr_4b,
-                help="B-tagging likelihood ratio: 4b (13TeV CSV curves)"
+                help="B-tagging likelihood for the 4b hypo (13TeV CSV curves)"
             ),
 
             NTupleVariable(
                 "btag_lr_2b", lambda ev: ev.btag_lr_2b,
-                help="B-tagging likelihood ratio: 2b (13TeV CSV curves)"
+                help="B-tagging likelihood for the 2b hypo (13TeV CSV curves)"
             ),
             ###
 
@@ -184,21 +184,21 @@ def getTreeProducer(conf):
             ),
             NTupleVariable(
                 "btag_LR_4b_2b", lambda ev: ev.btag_LR_4b_2b,
-                help="B-tagging likelihood ratio: 4b vs 2b"
+                help="B-tagging likelihood ratio: 4b vs 2b (8TeV algo, 13 TeV curves)"
             ),
             NTupleVariable(
                 "btag_LR_4b_2b_alt", lambda ev: ev.btag_LR_4b_2b_alt,
-                help="B-tagging likelihood ratio: 4b vs 2b with multi-dimensional pt/eta binning for CSV"
+                help="B-tagging likelihood ratio: 4b vs 2b with 3-dimensional pt/eta binning for CSV"
             ),
             NTupleVariable(
                 "nMatchSimB", lambda ev: ev.nMatchSimB if hasattr(ev, "nMatchSimB") else 0,
                 type=int,
-                help="number of gen B not matched to top decay"
+                help="number of gen B not matched to top decay (after ISR)"
             ),
             NTupleVariable(
                 "nMatchSimC", lambda ev: ev.nMatchSimC if hasattr(ev, "nMatchSimC") else 0,
                 type=int,
-                help="number of gen C not matched to W decay"
+                help="number of gen C not matched to W decay (after ISR)"
             ),
 
             NTupleVariable(
