@@ -46,12 +46,22 @@ samples = cms.VPSet([
 #New phys14 processing
     cms.PSet(
         fileNamesS1=cms.vstring([]),
-        fileNamesS2=cms.vstring(["/scratch/joosep/tth_13tev.root"]),
+        fileNamesS2=cms.vstring(["/home/joosep/mac-docs/tth/data/ntp/v10/me/tth_13tev.root"]),
         nickName=cms.string("tth_13TeV_phys14"),
         fractionToProcess=cms.double(1.0),
         totalEvents=cms.int64(-1),
         type=cms.int32(3), #ME_13TeV
         process=cms.int32(0), #TTHBB
+        skip=cms.bool(False),
+    ),
+    cms.PSet(
+        fileNamesS1=cms.vstring([]),
+        fileNamesS2=cms.vstring(["/home/joosep/mac-docs/tth/data/ntp/v10/me/ttjets_13tev_madgraph_pu20bx25_phys14.root"]),
+        nickName=cms.string("ttjets_13TeV_phys14"),
+        fractionToProcess=cms.double(1.0),
+        totalEvents=cms.int64(-1),
+        type=cms.int32(3), #ME_13TeV
+        process=cms.int32(1), #TTJETS
         skip=cms.bool(False),
     ),
     cms.PSet(
@@ -62,7 +72,7 @@ samples = cms.VPSet([
         totalEvents=cms.int64(-1),
         type=cms.int32(3), #ME_13TeV
         process=cms.int32(1), #TTJETS
-        skip=cms.bool(True),
+        skip=cms.bool(False),
     ),
     cms.PSet(
         fileNamesS1=cms.vstring([]),
@@ -72,7 +82,7 @@ samples = cms.VPSet([
         totalEvents=cms.int64(-1),
         type=cms.int32(3), #ME_13TeV
         process=cms.int32(1), #TTJETS
-        skip=cms.bool(True),
+        skip=cms.bool(False),
     ),
     cms.PSet(
         fileNamesS1=cms.vstring([]),
@@ -82,7 +92,7 @@ samples = cms.VPSet([
         totalEvents=cms.int64(-1),
         type=cms.int32(3), #ME_13TeV
         process=cms.int32(1), #TTJETS
-        skip=cms.bool(True),
+        skip=cms.bool(False),
     ),
     cms.PSet(
         fileNamesS1=cms.vstring([]),
@@ -92,7 +102,7 @@ samples = cms.VPSet([
         totalEvents=cms.int64(-1),
         type=cms.int32(3), #ME_13TeV
         process=cms.int32(1), #TTJETS
-        skip=cms.bool(True),
+        skip=cms.bool(False),
     ),
 ])
 
