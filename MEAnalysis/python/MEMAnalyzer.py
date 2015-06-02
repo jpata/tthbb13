@@ -436,6 +436,15 @@ class MEAnalyzer(FilterAnalyzer):
         #event.mem_results_tth = []
         #event.mem_results_ttbb = []
 
+        # Thomas:
+        # Temporary fix - pass or no pass should be done by categorization
+        if hasattr(event,'PassedSubjetAnalyzer') and not event.PassedSubjetAnalyzer:
+            event.mem_results_sj_tth  = []
+            event.mem_results_sj_ttbb = []
+            #print 'Not passed sj ana: event.mem_results_sj_ttbb:'
+            #print event.mem_results_sj_ttbb
+            return True
+
         #jets = sorted(event.good_jets, key=lambda x: x.pt, reverse=True)
         leptons = event.good_leptons
         met_pt = event.input.met_pt
@@ -492,15 +501,24 @@ class MEAnalyzer(FilterAnalyzer):
         #print "RES", [(k, res[k].p) for k in sorted(res.keys())]
 
         # Determine whether the MEMAnalyzer just ran over subjets or regular jets
-        if hasattr( event, 'AfterSubjetAnalyzer' ) and event.AfterSubjetAnalyzer:
-            event.mem_results_sj_tth = \
-                [res[(MEM.Hypothesis.TTH, k)] for k in self.memkeys]
-            event.mem_results_sj_ttbb = \
-                [res[(MEM.Hypothesis.TTBB, k)] for k in self.memkeys]
-        else:
+        if not hasattr( event, 'PassedSubjetAnalyzer' ):
             event.mem_results_tth = \
                 [res[(MEM.Hypothesis.TTH, k)] for k in self.memkeys]
             event.mem_results_ttbb = \
                 [res[(MEM.Hypothesis.TTBB, k)] for k in self.memkeys]
+        elif event.PassedSubjetAnalyzer == True:
+            event.mem_results_sj_tth = \
+                [res[(MEM.Hypothesis.TTH, k)] for k in self.memkeys]
+            event.mem_results_sj_ttbb = \
+                [res[(MEM.Hypothesis.TTBB, k)] for k in self.memkeys]
+            #print 'Passed sj ana: event.mem_results_sj_ttbb:'
+            #print event.mem_results_sj_ttbb
+        elif event.PassedSubjetAnalyzer == False:
+            # Don't run MEMAnalyzer for subjets
+            event.mem_results_sj_tth  = []
+            event.mem_results_sj_ttbb = []
+            #print 'Not passed sj ana: event.mem_results_sj_ttbb:'
+            #print event.mem_results_sj_ttbb
+            return True
 
         print "---MEM done EVENT r:l:e", event.input.run, event.input.lumi, event.input.evt

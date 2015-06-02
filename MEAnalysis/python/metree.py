@@ -64,13 +64,13 @@ metType = NTupleObjectType("metType", variables = [
 ])
 
 memType = NTupleObjectType("memType", variables = [
-    NTupleVariable("p", lambda x : x.p),
-    NTupleVariable("p_err", lambda x : x.p_err),
-    NTupleVariable("chi2", lambda x : x.chi2),
-    NTupleVariable("time", lambda x : x.time),
-    NTupleVariable("error_code", lambda x : x.error_code, type=int),
-    NTupleVariable("efficiency", lambda x : x.efficiency),
-    NTupleVariable("nperm", lambda x : x.num_perm, type=int),
+    NTupleVariable("p",             lambda x : x.p ),
+    NTupleVariable("p_err",         lambda x : x.p_err ),
+    NTupleVariable("chi2",          lambda x : x.chi2 ),
+    NTupleVariable("time",          lambda x : x.time ),
+    NTupleVariable("error_code",    lambda x : x.error_code ),
+    NTupleVariable("efficiency",    lambda x : x.efficiency ),
+    NTupleVariable("nperm",         lambda x : x.num_perm ),
 ])
 
 quarkType = NTupleObjectType("quarkType", variables = [
@@ -90,6 +90,123 @@ def getTreeProducer(conf):
         verbose = False,
         vectorTree = True,
         globalVariables = [
+
+            # Used by Subjet Analyzer
+
+            NTupleVariable(
+                "nhttCandidate",
+                lambda ev: ev.nhttCandidate \
+                    if hasattr(ev, 'nhttCandidate') else -1,
+                help="Number of original httCandidates in event"
+            ),
+
+            NTupleVariable(
+                "nhttCandidate_passed",
+                lambda ev: ev.nhttCandidate_passed \
+                    if hasattr(ev, 'nhttCandidate_passed') else -1,
+                help="Number of httCandidates that passed the cut"
+            ),
+
+            NTupleVariable(
+                "Matching_subjet_bjet",
+                lambda ev: ev.Matching_subjet_bjet \
+                    if hasattr(ev, 'Matching_subjet_bjet') else -1,
+                help="Number of subjets matched to btagged_jets"
+            ),
+
+            NTupleVariable(
+                "Matching_subjet_ljet",
+                lambda ev: ev.Matching_subjet_ljet \
+                    if hasattr(ev, 'Matching_subjet_ljet') else -1,
+                help="Number of subjets matched to wquark_candidate_jets"
+            ),
+
+            NTupleVariable(
+                "Matching_nr_of_mismatches",
+                lambda ev: ev.Matching_nr_of_mismatches \
+                    if hasattr(ev, 'Matching_nr_of_mismatches') else 0,
+                help="Number of mismatches in the event"
+            ),
+
+            NTupleVariable(
+                "Matching_strategy",
+                lambda ev: ev.Matching_strategy \
+                    if hasattr(ev, 'Matching_strategy') else 0,
+                help="Strategy chosen to tag 1 subjet as a b, and 2 other as a light"
+            ),
+
+            NTupleVariable(
+                "Matching_event_type_number",
+                lambda ev: ev.Matching_event_type_number \
+                    if hasattr(ev, 'Matching_event_type_number') else -1,
+                help="Type number of the event (see doc, todo)"
+            ),
+
+            # Quark matching branches: subjets
+            NTupleVariable(
+                "QMatching_sj_hadr_bquark",
+                lambda ev: ev.QMatching_sj_hadr_bquark \
+                    if hasattr(ev, 'QMatching_sj_hadr_bquark') else -1,
+                help="" ),
+            NTupleVariable(
+                "QMatching_sj_lquark1",
+                lambda ev: ev.QMatching_sj_lquark1 \
+                    if hasattr(ev, 'QMatching_sj_lquark1') else -1,
+                help="" ),
+            NTupleVariable(
+                "QMatching_sj_lquark2",
+                lambda ev: ev.QMatching_sj_lquark2 \
+                    if hasattr(ev, 'QMatching_sj_lquark2') else -1,
+                help="" ),
+            NTupleVariable(
+                "QMatching_sj_lept_bquark",
+                lambda ev: ev.QMatching_sj_lept_bquark \
+                    if hasattr(ev, 'QMatching_sj_lept_bquark') else -1,
+                help="" ),
+            NTupleVariable(
+                "QMatching_sj_bquark_higgs1",
+                lambda ev: ev.QMatching_sj_bquark_higgs1 \
+                    if hasattr(ev, 'QMatching_sj_bquark_higgs1') else -1,
+                help="" ),
+            NTupleVariable(
+                "QMatching_sj_bquark_higgs2",
+                lambda ev: ev.QMatching_sj_bquark_higgs2 \
+                    if hasattr(ev, 'QMatching_sj_bquark_higgs2') else -1,
+                help="" ),
+
+            # Quark matching branches: jets
+            NTupleVariable(
+                "QMatching_jet_hadr_bquark",
+                lambda ev: ev.QMatching_jet_hadr_bquark \
+                    if hasattr(ev, 'QMatching_jet_hadr_bquark') else -1,
+                help="" ),
+            NTupleVariable(
+                "QMatching_jet_lquark1",
+                lambda ev: ev.QMatching_jet_lquark1 \
+                    if hasattr(ev, 'QMatching_jet_lquark1') else -1,
+                help="" ),
+            NTupleVariable(
+                "QMatching_jet_lquark2",
+                lambda ev: ev.QMatching_jet_lquark2 \
+                    if hasattr(ev, 'QMatching_jet_lquark2') else -1,
+                help="" ),
+            NTupleVariable(
+                "QMatching_jet_lept_bquark",
+                lambda ev: ev.QMatching_jet_lept_bquark \
+                    if hasattr(ev, 'QMatching_jet_lept_bquark') else -1,
+                help="" ),
+            NTupleVariable(
+                "QMatching_jet_bquark_higgs1",
+                lambda ev: ev.QMatching_jet_bquark_higgs1 \
+                    if hasattr(ev, 'QMatching_jet_bquark_higgs1') else -1,
+                help="" ),
+            NTupleVariable(
+                "QMatching_jet_bquark_higgs2",
+                lambda ev: ev.QMatching_jet_bquark_higgs2 \
+                    if hasattr(ev, 'QMatching_jet_bquark_higgs2') else -1,
+                help="" ),
+            #--END OF USED BY SUBJETANALYZER--#
+
             NTupleVariable(
                 "Wmass", lambda ev: ev.Wmass,
                 help="best W boson mass from untagged pair (untagged by CSVM)"

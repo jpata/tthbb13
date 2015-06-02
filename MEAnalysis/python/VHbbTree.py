@@ -1,5 +1,29 @@
 import ROOT, math
 from TTH.MEAnalysis.VHbbTree import *
+class httCandidate:
+    def __init__(self, tree, n):
+        self.pt = tree.httCandidates_pt[n];
+        self.eta = tree.httCandidates_eta[n];
+        self.phi = tree.httCandidates_phi[n];
+        self.mass = tree.httCandidates_mass[n];
+        self.fW = tree.httCandidates_fW[n];
+        self.Rmin = tree.httCandidates_Rmin[n];
+        self.RminExpected = tree.httCandidates_RminExpected[n];
+        self.sjW1pt = tree.httCandidates_sjW1pt[n];
+        self.sjW1eta = tree.httCandidates_sjW1eta[n];
+        self.sjW1phi = tree.httCandidates_sjW1phi[n];
+        self.sjW1mass = tree.httCandidates_sjW1mass[n];
+        self.sjW2pt = tree.httCandidates_sjW2pt[n];
+        self.sjW2eta = tree.httCandidates_sjW2eta[n];
+        self.sjW2phi = tree.httCandidates_sjW2phi[n];
+        self.sjW2mass = tree.httCandidates_sjW2mass[n];
+        self.sjNonWpt = tree.httCandidates_sjNonWpt[n];
+        self.sjNonWeta = tree.httCandidates_sjNonWeta[n];
+        self.sjNonWphi = tree.httCandidates_sjNonWphi[n];
+        self.sjNonWmass = tree.httCandidates_sjNonWmass[n];
+    @staticmethod
+    def make_array(event):
+        return [httCandidate(event.input, i) for i in range(event.input.nhttCandidates)]
 class GenBQuarkFromHafterISR:
     def __init__(self, tree, n):
         self.pdgId = tree.GenBQuarkFromHafterISR_pdgId[n];
@@ -534,6 +558,7 @@ class EventAnalyzer(Analyzer):
         event.GenWZQuark = GenWZQuark.make_array(event)
         event.GenBQuarkFromTop = GenBQuarkFromTop.make_array(event)
         event.GenNuFromTop = GenNuFromTop.make_array(event)
+        event.httCandidate = httCandidate.make_array(event)
 
         event.met = MET.make_array(event)
 

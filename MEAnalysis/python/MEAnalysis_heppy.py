@@ -31,6 +31,11 @@ conf = Conf()
 pi_file = open(conf.general["transferFunctionsPickle"] , 'rb')
 conf.tf_matrix = pickle.load(pi_file)
 pi_file.close()
+
+#Load transfer functions from pickle file
+pi_file = open(conf.general["transferFunctions_sj_Pickle"] , 'rb')
+conf.tf_sj_matrix = pickle.load(pi_file)
+pi_file.close()
     
 #Load the input sample dictionary
 #Samples are configured in the Conf object, by default, we use samples_vhbb
