@@ -8,6 +8,7 @@
 #  branchdefs.py -> sample_branches.py
 #
 # author: Joosep Pata (ETHz) joosep.pata@cern.ch
+# useful comments and ideas by Gregor Kasieczka (ETHz)
 import sys, os, imp
 
 #add type mappings from C++ -> ROOT 1-character here
@@ -188,7 +189,6 @@ if __name__ == "__main__":
                 break
             i += 1
         lines.insert(idx, added_lines)
-
 
 
     for branch in branches_to_add:

@@ -14,7 +14,7 @@ class BTagLRAnalyzer(FilterAnalyzer):
         self.bTagAlgo = self.conf.jets["btagAlgo"]
         self.cplots_old = ROOT.TFile(self.conf.general["controlPlotsFileOld"])
         self.cplots = ROOT.TFile(self.conf.general["controlPlotsFile"])
-
+        
         cplots_fmt = self.conf.general.get("controlPlotsFormat", "8tev")
         self.csv_pdfs_old = {
         }
@@ -36,7 +36,8 @@ class BTagLRAnalyzer(FilterAnalyzer):
                 "csv_{0}_pt_eta".format(x)
             )
             self.csv_pdfs[(x, "pt_eta")].Scale(1.0 / self.csv_pdfs[(x, "pt_eta")].Integral())
-
+        self.conf.BTagLRAnalyzer = self
+        
     def get_pdf_prob(self, flavour, pt, eta, csv, kind):
 
         _bin = "Bin1" if abs(eta)>1.0 else "Bin0"
