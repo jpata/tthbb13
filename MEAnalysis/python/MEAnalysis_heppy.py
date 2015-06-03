@@ -6,7 +6,7 @@ import imp
 
 import itertools
 
-#pickle and transfer function classes to load transfer functions 
+#pickle and transfer function classes to load transfer functions
 import cPickle as pickle
 import TTH.MEAnalysis.TFClasses as TFClasses
 
@@ -31,7 +31,7 @@ conf = Conf()
 pi_file = open(conf.general["transferFunctionsPickle"] , 'rb')
 conf.tf_matrix = pickle.load(pi_file)
 pi_file.close()
-    
+
 #Load the input sample dictionary
 #Samples are configured in the Conf object, by default, we use samples_vhbb
 print "loading samples from", conf.general["sampleFile"]
@@ -134,6 +134,12 @@ gentth = cfg.Analyzer(
     _conf = conf
 )
 
+mva = cfg.Analyzer(
+    MECoreAnalyzers.MVAVarAnalyzer,
+    'mva',
+    _conf = conf
+)
+
 from TTH.MEAnalysis.metree import getTreeProducer
 treeProducer = getTreeProducer(conf)
 
@@ -150,6 +156,7 @@ sequence = cfg.Sequence([
     mecat,
     gentth,
     mem_analyzer,
+    mva,
     treeProducer
 ])
 
@@ -184,7 +191,7 @@ if __name__ == "__main__":
 
     #Process all samples in the sample list
     for samp in inputSamples:
-        
+
         print "processing sample ", samp
         config = cfg.Config(
             #Run across these inputs
@@ -199,12 +206,12 @@ if __name__ == "__main__":
             #This defines how events are loaded
             events_class = Events
         )
-        
+
         #Configure the number of events to run
         from PhysicsTools.HeppyCore.framework.looper import Looper
         nEvents = samp.perJob
 
-        
+
         kwargs = {}
         if conf.general.get("eventWhitelist", None) is None:
             kwargs["nEvents"] = nEvents
