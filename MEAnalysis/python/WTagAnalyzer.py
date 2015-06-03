@@ -59,10 +59,10 @@ class WTagAnalyzer(FilterAnalyzer):
         #Use untagged jets + any b-tagged jets that are not among the 4 highest by discriminator
         input_jets = event.buntagged_jets + event.selected_btagged_jets_low
 
-        #Need at least 2 light jets to calculate W mass
-        if len(input_jets)>=2:
-            bpair = self.find_best_pair(input_jets)
-
+        event.wquark_candidate_jet_pairs = []
+        #Need at least 2 untagged jets to calculate W mass
+        if len(event.buntagged_jets)>=2:
+            bpair = self.find_best_pair(event.buntagged_jets)
             #Get the best mass
             event.Wmass = bpair[0][0]
 
@@ -73,6 +73,7 @@ class WTagAnalyzer(FilterAnalyzer):
             for i in range(min(len(bpair), 2)):
                 event.wquark_candidate_jets.add(bpair[i][1])
                 event.wquark_candidate_jets.add(bpair[i][2])
+                event.wquark_candidate_jet_pairs += [(bpair[i][1], bpair[i][2])]
 
                 if "reco" in self.conf.general["verbosity"]:
                     print("Wmass", event.Wmass,
@@ -83,6 +84,9 @@ class WTagAnalyzer(FilterAnalyzer):
         else:
             for jet in input_jets:
                 event.wquark_candidate_jets.add(jet)
+        if "reco" in self.conf.general["verbosity"]:
+            for pair in event.wquark_candidate_jet_pairs:
+                print "wqpair", pair[0].pt, pair[1].pt
 
         passes = True
         if passes:
