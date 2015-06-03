@@ -123,10 +123,15 @@ for sample in samples:
                 #("cat6Lem", "nleps==2 && (abs(leps_pdgId[0]) + abs(leps_pdgId[1]))==24 && cat==6 && cat_btag==0"),
                 #("cat6Lmm", "nleps==2 && (abs(leps_pdgId[0]) + abs(leps_pdgId[1]))==26 && cat==6 && cat_btag==0"),
 
+                ("4j", "njets==4"),
+                ("4j3t", "njets==4 && nBCSVM==3"),
+                ("4j4t", "njets==4 && nBCSVM==4"),
+
                 ("5j", "njets==5"),
                 ("5jL", "njets==5 && nBCSVM<3"),
                 ("5j3t", "njets==5 && nBCSVM==3"),
                 ("5j4t", "njets==5 && nBCSVM==4"),
+                ("5j4plust", "njets==5 && nBCSVM>=4"),
                 ("5jH", "njets==5 && nBCSVM>4"),
 
                 ("6j", "njets==6"),
@@ -134,6 +139,13 @@ for sample in samples:
                 ("6j3t", "njets==6 && nBCSVM==3"),
                 ("6j4t", "njets==6 && nBCSVM==4"),
                 ("6jH", "njets==6 && nBCSVM>4"),
+
+                ("6plusj", "njets>=6"),
+                ("6plusj2t", "njets>=6 && nBCSVM==2"),
+                ("6plusj3t", "njets>=6 && nBCSVM==3"),
+                ("6plusj4t", "njets>=6 && nBCSVM==4"),
+                ("6plusj4plust", "njets>=6 && nBCSVM>=4"),
+                ("6plusjH", "njets>=6 && nBCSVM>4"),
 
                 ("7j", "njets==7"),
                 ("7jL", "njets==7 && nBCSVM<3"),
@@ -193,11 +205,10 @@ for sample in samples:
                 cut = " && ".join([lepcut, jettagcut, matchcut])
                 if tf.GetEntries(cut) == 0:
                     continue
-                tf.Draw(">>elist", lepjetcut, "entrylist")
-                elist = ROOT.gROOT.Get("elist")
                 for nmem in range(3):
-                    Draw(tf, jetd, "mem_tth_p[{0}] / (mem_tth_p[{0}] + 0.15*mem_ttbb_p[{0}]) >> mem_d_{1}_{0}(20,0,1)".format(nmem, match),
-                        elist
+                    Draw(tf, jetd,
+                        "mem_tth_p[{0}] / (mem_tth_p[{0}] + 0.15*mem_ttbb_p[{0}]) >> mem_d_{1}_{0}(20,0,1)".format(nmem, match),
+                        cut
                     )
 
 

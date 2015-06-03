@@ -347,6 +347,74 @@ def getTreeProducer(conf):
                 "tth_rho_py_gen", lambda ev: ev.tth_rho_py_gen if hasattr(ev, "tth_rho_py_gen") else 0,
                 help="gen-level ttH system recoil py"
             ),
+
+            NTupleVariable(
+                "isotropy", lambda ev: ev.isotropy if hasattr(ev, "isotropy") else 0,
+                help=""
+            ),
+
+            NTupleVariable(
+                "sphericity", lambda ev: ev.sphericity if hasattr(ev, "sphericity") else 0,
+                help=""
+            ),
+
+            NTupleVariable(
+                "C", lambda ev: ev.C if hasattr(ev, "C") else 0,
+                help=""
+            ),
+            NTupleVariable(
+                "D", lambda ev: ev.D if hasattr(ev, "D") else 0,
+                help=""
+            ),
+            NTupleVariable(
+                "aplanarity", lambda ev: ev.aplanarity if hasattr(ev, "aplanarity") else 0,
+                help=""
+            ),
+            NTupleVariable(
+                "mean_bdisc", lambda ev: ev.mean_bdisc,
+                help=""
+            ),
+            NTupleVariable(
+                "mean_bdisc_btag", lambda ev: ev.mean_bdisc_btag,
+                help=""
+            ),
+            NTupleVariable(
+                "std_bdisc", lambda ev: ev.std_bdisc,
+                help=""
+            ),
+            NTupleVariable(
+                "std_bdisc_btag", lambda ev: ev.std_bdisc_btag,
+                help=""
+            ),
+
+            NTupleVariable(
+                "mean_dr_btag", lambda ev: ev.mean_dr_btag,
+                help=""
+            ),
+            NTupleVariable(
+                "std_dr_btag", lambda ev: ev.std_dr_btag,
+                help=""
+            ),
+            NTupleVariable(
+                "min_dr_btag", lambda ev: ev.min_dr_btag,
+                help=""
+            ),
+            NTupleVariable(
+                "ht", lambda ev: ev.ht,
+                help=""
+            ),
+            NTupleVariable(
+                "momentum_eig0", lambda ev: ev.momentum_eig0,
+                help=""
+            ),
+            NTupleVariable(
+                "momentum_eig1", lambda ev: ev.momentum_eig1,
+                help=""
+            ),
+            NTupleVariable(
+                "momentum_eig2", lambda ev: ev.momentum_eig2,
+                help=""
+            ),
         ],
         #FIXME: fill these from the VHbb ntuples
         globalObjects = {},

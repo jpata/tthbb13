@@ -125,18 +125,18 @@ class Conf:
             "methodsToRun": [
 
                 # ALL
-                "SL_2w2h2t"   , #0
-                "SL_1w2h2t"   , #1
-                "SL_2w2h1t_h" , #2
-                "SL_2w2h1t_l" , #3
-                "SL_0w2h2t"   , #4
-                "SL_1w2h1t_h" , #5
-                "SL_1w2h1t_l" , #6
-                "SL_2w2h2t_wtag"   , #0
+                "SL_2w2h2t"   ,
+                "SL_1w2h2t"   ,
+                #"SL_2w2h1t_h" ,
+                #"SL_2w2h1t_l" ,
+                "SL_0w2h2t"   ,
+                #"SL_1w2h1t_h" ,
+                #"SL_1w2h1t_l" ,
+                "SL_2w2h2t_wtag",
 
                 #"SL_2qW",
                 #"SL_1qW",
-                #"DL",
+                "DL",
 
                 #"SL_2qW_gen",
                 #"SL_1qW_gen",

@@ -310,7 +310,9 @@ class MEAnalyzer(FilterAnalyzer):
             self.configs[x].mem_assumptions.add("sl")
 
         #use only the best w-tagged pair for w-quark candidates
-        self.configs["SL_2w2h2t_wtag"].l_quark_candidates = lambda event: event.wquark_candidate_jet_pairs[0]
+        self.configs["SL_2w2h2t_wtag"].l_quark_candidates = lambda event: (
+            event.wquark_candidate_jet_pairs[0] if len(event.wquark_candidate_jet_pairs)>0 else []
+        )
 
         for x in ["SL_1w2h2t", "SL_0w2h2t"]:
             self.configs[x].do_calculate = lambda y, c: (
