@@ -35,7 +35,12 @@ def drawHelper(args):
     hname = hist.split(">>")[1].split("(")[0].strip()
     ROOT.gROOT.cd()
     ROOT.TH1.SetDefaultSumw2(True)
-    n = tf.Draw(hist, weight_str(cut), "goff", nev, nfirst)
+    if isinstance(cut, str):
+        n = tf.Draw(hist, weight_str(cut), "goff", nev, nfirst)
+    elif isinstance(cut, ROOT.TEntryList):
+        tf.SetEntryList(cut)
+        n = tf.Draw(hist, weight_str("1"), "goff", nev, nfirst)
+        tf.SetEntryList(0)
     h = ROOT.gROOT.Get(hname)
     assert(h.GetEntries() == n)
     return h
@@ -83,22 +88,22 @@ for sample in samples:
         d.cd()
         lepd = d.mkdir(lep)
         lepd.cd()
-        Draw(tf, lepd, "leps_pt[0] >> lep0_pt(30,0,300)", lepcut)
-        Draw(tf, lepd, "leps_eta[0] >> lep0_eta(30,-5,5)", lepcut)
+        #Draw(tf, lepd, "leps_pt[0] >> lep0_pt(30,0,300)", lepcut)
+        #Draw(tf, lepd, "leps_eta[0] >> lep0_eta(30,-5,5)", lepcut)
 
-        Draw(tf, lepd, "leps_pt[1] >> lep1_pt(30,0,300)", lepcut)
-        Draw(tf, lepd, "leps_eta[1] >> lep1_eta(30,-5,5)", lepcut)
+        #Draw(tf, lepd, "leps_pt[1] >> lep1_pt(30,0,300)", lepcut)
+        #Draw(tf, lepd, "leps_eta[1] >> lep1_eta(30,-5,5)", lepcut)
 
-        Draw(tf, lepd, "njets >> njets(15,0,15)", lepcut)
-        Draw(tf, lepd, "nBCSVM >> ntags(15,0,15)", lepcut)
+        #Draw(tf, lepd, "njets >> njets(15,0,15)", lepcut)
+        #Draw(tf, lepd, "nBCSVM >> ntags(15,0,15)", lepcut)
 
-        Draw(tf, lepd, "nBCSVM:njets >> njets_nBCSVM(15,0,15,15,0,15)", lepcut)
+        #Draw(tf, lepd, "nBCSVM:njets >> njets_nBCSVM(15,0,15,15,0,15)", lepcut)
 
         Draw(tf, lepd, "jets_pt[0] >> jet0_pt(30,0,600)", lepcut)
-        Draw(tf, lepd, "jets_eta[0] >> jet0_eta(30,-5,5)", lepcut)
+        #Draw(tf, lepd, "jets_eta[0] >> jet0_eta(30,-5,5)", lepcut)
 
-        Draw(tf, lepd, "jets_pt[1] >> jet1_pt(30,0,600)", lepcut)
-        Draw(tf, lepd, "jets_eta[1] >> jet1_eta(30,-5,5)", lepcut)
+        #Draw(tf, lepd, "jets_pt[1] >> jet1_pt(30,0,600)", lepcut)
+        #Draw(tf, lepd, "jets_eta[1] >> jet1_eta(30,-5,5)", lepcut)
         Draw(tf, lepd, "(100*nMatch_wq + 10*nMatch_hb + nMatch_tb) >> nMatch(300,0,300)", lepcut)
         Draw(tf, lepd, "(100*nMatch_wq_btag + 10*nMatch_hb_btag + nMatch_tb_btag) >> nMatch_btag(300,0,300)", lepcut)
         for jet_tag, jettagcut in [
@@ -110,13 +115,13 @@ for sample in samples:
                 ("cat6Hem", "nleps==2 && (abs(leps_pdgId[0]) + abs(leps_pdgId[1]))==24 && cat==6 && cat_btag==1"),
                 ("cat6Hmm", "nleps==2 && (abs(leps_pdgId[0]) + abs(leps_pdgId[1]))==26 && cat==6 && cat_btag==1"),
 
-                ("cat1L", "cat==1 && cat_btag==0"),
-                ("cat2L", "cat==2 && cat_btag==0"),
-                ("cat3L", "cat==3 && cat_btag==0"),
+                #("cat1L", "cat==1 && cat_btag==0"),
+                #("cat2L", "cat==2 && cat_btag==0"),
+                #("cat3L", "cat==3 && cat_btag==0"),
 
-                ("cat6Lee", "nleps==2 && (abs(leps_pdgId[0]) + abs(leps_pdgId[1]))==22 && cat==6 && cat_btag==0"),
-                ("cat6Lem", "nleps==2 && (abs(leps_pdgId[0]) + abs(leps_pdgId[1]))==24 && cat==6 && cat_btag==0"),
-                ("cat6Lmm", "nleps==2 && (abs(leps_pdgId[0]) + abs(leps_pdgId[1]))==26 && cat==6 && cat_btag==0"),
+                #("cat6Lee", "nleps==2 && (abs(leps_pdgId[0]) + abs(leps_pdgId[1]))==22 && cat==6 && cat_btag==0"),
+                #("cat6Lem", "nleps==2 && (abs(leps_pdgId[0]) + abs(leps_pdgId[1]))==24 && cat==6 && cat_btag==0"),
+                #("cat6Lmm", "nleps==2 && (abs(leps_pdgId[0]) + abs(leps_pdgId[1]))==26 && cat==6 && cat_btag==0"),
 
                 ("5j", "njets==5"),
                 ("5jL", "njets==5 && nBCSVM<3"),
@@ -154,24 +159,27 @@ for sample in samples:
             lepjetcut = " && ".join([lepcut, jettagcut])
             if tf.GetEntries(lepjetcut)==0:
                 continue
+            ROOT.gROOT.cd()
+            tf.Draw(">>elist", lepjetcut, "entrylist")
+            elist = ROOT.gROOT.Get("elist")
 
             lepd.cd()
             jetd = lepd.mkdir(jet_tag)
             jetd.cd()
 
-            Draw(tf, jetd, "nBCSVM:njets >> njets_nBCSVM(15,0,15,15,0,15)", lepjetcut)
-            Draw(tf, jetd, "nMatchSimB:nMatchSimC >> nMatchSimB_nMatchSimC(6,0,6,6,0,6)", lepjetcut)
+            #Draw(tf, jetd, "nBCSVM:njets >> njets_nBCSVM(15,0,15,15,0,15)", lepjetcut)
+            #Draw(tf, jetd, "nMatchSimB:nMatchSimC >> nMatchSimB_nMatchSimC(6,0,6,6,0,6)", lepjetcut)
 
-            Draw(tf, jetd, "jets_pt[0] >> jet0_pt(30,0,600)", lepjetcut)
-            Draw(tf, jetd, "jets_eta[0] >> jet0_eta(30,-5,5)", lepjetcut)
+            Draw(tf, jetd, "jets_pt[0] >> jet0_pt(30,0,600)", elist)
+            #Draw(tf, jetd, "jets_eta[0] >> jet0_eta(30,-5,5)", lepjetcut)
 
-            Draw(tf, jetd, "leps_pt[0] >> lep0_pt(30,0,300)", lepjetcut)
-            Draw(tf, jetd, "leps_eta[0] >> lep0_eta(30,-5,5)", lepjetcut)
+            #Draw(tf, jetd, "leps_pt[0] >> lep0_pt(30,0,300)", lepjetcut)
+            #Draw(tf, jetd, "leps_eta[0] >> lep0_eta(30,-5,5)", lepjetcut)
 
-            Draw(tf, jetd, "btag_LR_4b_2b >> btag_lr(30,0,1)", lepjetcut)
+            #Draw(tf, jetd, "btag_LR_4b_2b >> btag_lr(30,0,1)", lepjetcut)
 
-            Draw(tf, jetd, "(100*nMatch_wq + 10*nMatch_hb + nMatch_tb) >> nMatch(300,0,300)", lepjetcut)
-            Draw(tf, jetd, "(100*nMatch_wq_btag + 10*nMatch_hb_btag + nMatch_tb_btag) >> nMatch_btag(300,0,300)", lepjetcut)
+            Draw(tf, jetd, "(100*nMatch_wq + 10*nMatch_hb + nMatch_tb) >> nMatch(300,0,300)", elist)
+            Draw(tf, jetd, "(100*nMatch_wq_btag + 10*nMatch_hb_btag + nMatch_tb_btag) >> nMatch_btag(300,0,300)", elist)
 
             for match, matchcut in [
                     ("nomatch", "1"),
@@ -182,11 +190,14 @@ for sample in samples:
                 ]:
                 if "hb2" in match and "ttjets" in sample:
                     continue
-                if tf.GetEntries(" && ".join([lepcut, jettagcut, matchcut])) == 0:
+                cut = " && ".join([lepcut, jettagcut, matchcut])
+                if tf.GetEntries(cut) == 0:
                     continue
-                for nmem in range(9):
-                    Draw(tf, jetd, "mem_tth_p[{0}] / (mem_tth_p[{0}] + 0.02*mem_ttbb_p[{0}]) >> mem_d_{1}_{0}(20,0,1)".format(nmem, match),
-                        " && ".join([lepcut, jettagcut, matchcut])
+                tf.Draw(">>elist", lepjetcut, "entrylist")
+                elist = ROOT.gROOT.Get("elist")
+                for nmem in range(3):
+                    Draw(tf, jetd, "mem_tth_p[{0}] / (mem_tth_p[{0}] + 0.15*mem_ttbb_p[{0}]) >> mem_d_{1}_{0}(20,0,1)".format(nmem, match),
+                        elist
                     )
 
 

@@ -169,7 +169,7 @@ def calc_roc(h1, h2):
             err[i, 1] = e2
     return roc, err
 
-def draw_rocs(tf, pairs, **kwargs):
+def draw_rocs(pairs, **kwargs):
     rebin = kwargs.get("rebin", 1)
 
     c = plt.figure(figsize=(6,6))
@@ -181,7 +181,7 @@ def draw_rocs(tf, pairs, **kwargs):
     rs = []
     es = []
     for pair in pairs:
-        hn1, hn2, label = pair
+        tf, hn1, hn2, label = pair
         h1 = tf.get(hn1).Clone()
         h2 = tf.get(hn2).Clone()
         h1.rebin(rebin)
@@ -191,7 +191,7 @@ def draw_rocs(tf, pairs, **kwargs):
         es += [e]
 
     for (r, e, pair) in zip(rs, es, pairs):
-        hn1, hn2, label = pair
+        tf, hn1, hn2, label = pair
         plt.errorbar(r[:, 0], r[:, 1], e[:, 0], e[:, 1], label=label)
 
     plt.legend(loc=2)
