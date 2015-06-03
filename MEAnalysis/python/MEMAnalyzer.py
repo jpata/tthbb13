@@ -563,14 +563,16 @@ class MEAnalyzer(FilterAnalyzer):
                     fstate = MEM.FinalState.LL
                 elif "sl" in mem_cfg.mem_assumptions:
                     fstate = MEM.FinalState.LH
-                print "MEM", ("hypo", hypo), ("conf", confname), fstate, len(mem_cfg.b_quark_candidates(event)), len(mem_cfg.l_quark_candidates(event))
+                if "meminput" in self.conf.general["verbosity"]:
+                    print "MEM", ("hypo", hypo), ("conf", confname), fstate, len(mem_cfg.b_quark_candidates(event)), len(mem_cfg.l_quark_candidates(event))
                 #Run MEM if we did not explicitly disable it
                 if (self.conf.mem["calcME"] and
                         mem_cfg.do_calculate(event, mem_cfg) and
                         mem_cfg.enabled and
                         self.conf.mem["selection"](event)
                     ):
-                    print "MEM", confname, "started"
+                    if "meminput" in self.conf.general["verbosity"]:
+                        print "MEM", confname, "started"
 
                     self.configure_mem(event, mem_cfg)
                     r = self.integrator.run(
@@ -579,14 +581,16 @@ class MEAnalyzer(FilterAnalyzer):
                         self.vars_to_integrate,
                         self.vars_to_marginalize
                     )
-                    print "MEM done", ("hypo", hypo), ("conf", confname)
+                    if "memoutput" in self.conf.general["verbosity"]:
+                        print "MEM done", ("hypo", hypo), ("conf", confname)
 
                     res[(hypo, confname)] = r
                 else:
                     skipped += [confname]
                     r = MEM.MEMOutput()
                     res[(hypo, confname)] = r
-            print "skipped confs", skipped
+            if "meminput" in self.conf.general["verbosity"]:
+                print "skipped confs", skipped
         if "default" in self.memkeys:
             p1 = res[(MEM.Hypothesis.TTH, "default")].p
             p2 = res[(MEM.Hypothesis.TTBB, "default")].p
@@ -595,9 +599,7 @@ class MEAnalyzer(FilterAnalyzer):
             if self.conf.mem["calcME"] and (p1<=0 or p2<=0 or (p1 / (p1+0.02*p2))<0.0001):
                 print "MEM BADPROB", p1, p2
 
-        #print out full MEM result dictionary
-        #print "RES", [(k, res[k].p) for k in sorted(res.keys())]
-
         event.mem_results_tth = [res[(MEM.Hypothesis.TTH, k)] for k in self.memkeys]
         event.mem_results_ttbb = [res[(MEM.Hypothesis.TTBB, k)] for k in self.memkeys]
-        print "---MEM done EVENT r:l:e", event.input.run, event.input.lumi, event.input.evt
+        if "memoutput" in self.conf.general["verbosity"]:
+            print "---MEM done EVENT r:l:e", event.input.run, event.input.lumi, event.input.evt
