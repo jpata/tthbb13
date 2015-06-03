@@ -127,16 +127,16 @@ class Conf:
             "methodsToRun": [
                 "SL_2qW",
                 "SL_1qW",
-                "DL",
+                #"DL",
 
                 #"SL_2qW_gen",
                 #"SL_1qW_gen",
                 #"DL_gen",
 
-                "SL_0qW",
-                "SL_1bT",
-                "SL_1bTbar",
-                "SL_1bH",
+                #"SL_0qW",
+                #"SL_1bT",
+                #"SL_1bTbar",
+                #"SL_1bH",
                 #"SL_2qW_notag",
 
                 #"SL_2qW_Sudakov",

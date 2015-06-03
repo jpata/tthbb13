@@ -124,24 +124,17 @@ wtag = cfg.Analyzer(
     _conf = conf
 )
 
+subjet_analyzer = cfg.Analyzer(
+    MECoreAnalyzers.SubjetAnalyzer,
+    'subjet',
+    _conf = conf
+)
+
 #Calls the C++ MEM integrator with good_jets, good_leptons and
 #the ME category
 mem_analyzer = cfg.Analyzer(
     MECoreAnalyzers.MEAnalyzer,
     'mem',
-    _conf = conf
-)
-
-#Simple copy in order to run twice
-mem_analyzer_sj = cfg.Analyzer(
-    MECoreAnalyzers.MEAnalyzer,
-    'mem_sj',
-    _conf = conf
-)
-
-subjet_analyzer = cfg.Analyzer(
-    MECoreAnalyzers.SubjetAnalyzer,
-    'subjet',
     _conf = conf
 )
 
@@ -166,9 +159,8 @@ sequence = cfg.Sequence([
     wtag,
     mecat,
     gentth,
-    mem_analyzer,
     subjet_analyzer,
-    mem_analyzer_sj,
+    mem_analyzer,
     treeProducer
 ])
 
