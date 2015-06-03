@@ -1,0 +1,694 @@
+#!/bin/bash
+# Author: Fred Stober <stober@ekp.uni-karlsruhe.de>
+# grid-control: https://ekptrac.physik.uni-karlsruhe.de/trac/grid-control
+
+# Error codes
+# 100 - unspecified error
+
+# 101 - file not found
+# 102 - directory not found
+# 103 - executable not found
+# 104 - variable not found
+
+# 105 - env unpacking failed
+# 106 - se copy error
+# 107 - killed by batch system
+
+# 120 - lower space limit reached
+# 121 - upper space limit reached
+# 122 - min size failure
+
+# 123 - user intervention requested
+
+# >125 - reserved by POSIX
+
+GC_VERSION="$Revision: 848$"
+
+debug_helper() {
+	[ -z "$GC_DEBUG" ] && return
+	echo -n "$$:shell:" 1>&2
+	for i in `seq ${#BASH_LINENO[*]} -1 0`; do
+		[ -n "${BASH_LINENO[$i]}" ] && echo -n "${BASH_LINENO[$i]} " 1>&2
+		[ -n "${BASH_SOURCE[$i]}" ] && echo -n "`basename ${BASH_SOURCE[$i]}`:" 1>&2
+		[ -n "${FUNCNAME[$i]}" ] && echo -n "${FUNCNAME[$i]}:" 1>&2
+	done
+	CMD="$1"
+	shift
+	echo "$LINENO - $CMD($@)" 1>&2
+}
+
+fail() {
+	trap - 0 1 2 3 15
+	[ -n "$1" ] && CODE=$1 || CODE=$?
+	GC_DEBUG="true"
+	debug_helper $FUNCNAME "$@"
+	echo
+	echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+	echo "!! FAIL - FAIL - FAIL - FAIL !!"
+	echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+	echo "Error code $CODE"
+	echo
+	cleanup
+	updatejobinfo $CODE
+	exit $CODE
+}
+
+abort() {
+	trap - 0 1 2 3 15
+	GC_DEBUG="true"
+	debug_helper $FUNCNAME "$@"
+	echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" >> $MY_LANDINGZONE/gc.stderr
+	echo "!!     DEBUG INFORMATION     !!" >> $MY_LANDINGZONE/gc.stderr
+	echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" >> $MY_LANDINGZONE/gc.stderr
+	[ -d "$MY_LANDINGZONE" ] && checkdir "Start directory" "$MY_LANDINGZONE" >> $MY_LANDINGZONE/gc.stderr
+	[ -d "$MY_SCRATCH" ] && checkdir "Scratch directory" "$MY_SCRATCH" >> $MY_LANDINGZONE/gc.stderr
+	set >> $MY_LANDINGZONE/gc.stderr
+	cleanup
+	[ -n "$1" ] && updatejobinfo $1
+	[ -n "$(grep 'EXITCODE=0' $MY_LANDINGZONE/job.info)" ] && updatejobinfo 100
+	trap - 0 1 2 3 15
+	kill4sure $$
+}
+
+kill4sure() {
+	debug_helper $FUNCNAME "$@"
+	DEPTH=${2:-0}
+	if [ $DEPTH -lt 5 ]; then
+		(ps -o pid= --ppid $1 2> /dev/null) | while read XPID; do
+			kill4sure $XPID $[$DEPTH + 1] &> /dev/null
+		done
+	fi
+	echo "Killing process $1" 1>&2
+	kill -15 $1 &> /dev/null
+	sleep 1
+	kill -9 $1 &> /dev/null
+}
+
+updatejobinfo() {
+	debug_helper $FUNCNAME "$@"
+	if [ -d "$MY_LANDINGZONE" ]; then
+		(
+			echo "JOBID=$MY_JOBID"
+			echo "EXITCODE=$1"
+		) > $MY_LANDINGZONE/job.info
+	fi
+}
+
+checkfile() {
+	debug_helper $FUNCNAME "$@"
+	echo -n "Checking for file $1 ... "
+	if [ ! -f "$1" ]; then
+		echo "FAILED"
+		echo "`basename $1` missing" 1>&2
+		fail 101
+	else
+		echo "OK"
+	fi
+}
+
+checkdir() {
+	debug_helper $FUNCNAME "$@"
+	echo -e "$1:\n$2"
+	[ ! -d "$2" ] && echo "$1 not found" 1>&2 && fail 102
+	[ "$2" == "invalid" ] && echo "Directory $1" 1>&2 && fail 102
+	getrealdir $2 && echo "$1 content:" && ls -al $2 && df -hP $2 && echo
+}
+
+checkbin() {
+	debug_helper $FUNCNAME "$@"
+	[ "$(type -t $1)" == "function" ] && return
+	echo -n "Checking for binary $1 ... "
+	if [ -x "$1" ]; then
+		echo "OK"
+	elif [ -x "`getcommand $1`" ]; then
+		echo "OK (`getcommand $1`)"
+	else
+		echo "FAILED"
+		checkfile $1
+		echo "`basename $1` not executable" 1>&2
+		fail 103
+	fi
+}
+
+checkvar() {
+	debug_helper $FUNCNAME "$@"
+	echo -n "Checking for variable \$$1 ... "
+	if [ -z "${!1}" ]; then
+		echo "FAILED"
+		echo "$1 not set" 1>&2
+		fail 104
+	else
+		echo "OK (\$$1 = ${!1})"
+	fi
+}
+
+getrealdir() {
+	debug_helper $FUNCNAME "$@"
+	[ -d "$1" ] && cd $1 && pwd -P && cd $OLDPWD && return `true`;
+	return `false`
+}
+
+getscratch() {
+	debug_helper $FUNCNAME "$@"
+	# find scratch directory with highest amount of disk space
+	MY_SCRATCH="invalid"
+
+	# getscratch_internal <list of variables> 
+	# it will return with the path pointing at the biggest amount of free space
+	# if no none of the directories exist, it returns 1
+	getscratch_internal() {
+		debug_helper $FUNCNAME "$@"
+		MY_SCRATCH="invalid"
+		MY_SCRATCHSIZE=-1
+		# find scratch directory with highest amount of disk space
+		for DIRVAR in $@;
+		do
+			# Is variable defined?
+			if [ -n "${!DIRVAR}" ]; then
+				DIR=${!DIRVAR}
+				# If the variable points to a nonexisting directory continue with the other vars
+				[ ! -d "$DIR" ] && continue
+				# Make sure we can write to the directory
+				rm -Rf "$DIR/$$" &> /dev/null
+				mkdir -p "$DIR/$$" &> /dev/null
+				if [ -d "$DIR/$$" ]; then
+					# Get free space
+					SIZE="`getdiskspace $DIR/$$`" &> /dev/null
+					# If it is the biggest space, use it!
+					[ "$SIZE" -gt "$MY_SCRATCHSIZE" ] && MY_SCRATCH="$DIR/$$" && MY_SCRATCHSIZE="$SIZE" &> /dev/null
+					rm -rf "$DIR/$$" &> /dev/null
+				fi
+			fi
+		done
+		# Was a scratch directory found?
+		if [ "$MY_SCRATCHSIZE" -gt 0 ]; then
+			mkdir -p "$MY_SCRATCH" &> /dev/null
+			echo $MY_SCRATCH
+			return 0;
+		fi
+		return 1;
+	}
+
+	getscratch_internal GC_SCRATCH && return 0
+	getscratch_internal GC_LOCALSCRATCH && return 0
+	getscratch_internal MY_LANDINGZONE && return 0
+	getscratch_internal LOCAL_SCRATCH NODE_SCRATCH USER_SCRATCH EDG_WL_SCRATCH OSG_WN_TMP LCG_TMP DG_WL_SCRATCH && return 0
+
+	echo "Site doesn't define scratch directory variables! Trying other locations..." 1>&2
+	export 1>&2
+
+	# FAIL or continue?
+	#fail 123
+	getscratch_internal MY_LANDINGZONE && return 0
+
+	export GC_TMP="/tmp"
+	getscratch_internal HOME TMPDIR GC_TMP && return 0
+
+	fail 102
+}
+
+# Clean up user area
+cleanup() {
+	[ -z "$GC_DOCLEANUP" ] && return 0
+	debug_helper $FUNCNAME "$@"
+	[ -d "$MY_LANDINGZONE" ] && cd "$MY_LANDINGZONE"
+	[ -f "$MY_MARKER" ] && rm -Rf "$MY_MARKER" &> /dev/null
+	[ -d "$MY_SCRATCH" ] && rm -Rf "$MY_SCRATCH" &> /dev/null
+}
+
+# TODO: choose grid commands
+getcommand() {
+	debug_helper $FUNCNAME "$@"
+	RESULT="$(which $@ 2> /dev/null | head -n 1)"
+	echo ${RESULT:-$1}
+}
+# merge me!
+getexec() {
+	#debug_helper $FUNCNAME "$@"
+	[ -x "$@" ] && RESULT_HERE="./$@" || [ -x "$1" ] && RESULT_HERE="./$1" || RESULT_HERE=""
+	RESULT_WHICH="$(which $@ 2> /dev/null | head -n 1)"
+	echo ${RESULT_HERE:-${RESULT_WHICH:-$1}}
+}
+
+_find() {
+	debug_helper $FUNCNAME "$@"
+	if test -f "`pwd`/$1"; then
+		echo "`pwd`/$1"
+	elif test -f "$MY_SCRATCH/$1"; then
+		echo "$MY_SCRATCH/$1"
+	elif test -f "$MY_LANDINGZONE/$1"; then
+		echo "$MY_LANDINGZONE/$1"
+	else
+		echo "$1 not found" 2>&1
+	fi
+}
+
+var_replacer() {
+	debug_helper $FUNCNAME "$@"
+	j=0
+	for i in $SEEDS; do
+		eval "export SEED_$j=$[i+$MY_JOBID]"
+		j=$[j+1]
+	done
+	REPLACEFILE="${MY_SCRATCH:-.}/_replace.awk"
+	GC_DATE=`date +%F`
+	GC_TIMESTAMP=`date +%s`
+	GC_GUID=`uuidgen 2> /dev/null`
+	if [ -z "$GC_GUID" ]; then
+		FMGUID="%04x%04x-%04x-%04x-%04x-%04x%04x%04x"
+		RINT="int(rand()*2**16), int(rand()*2**16), int(rand()*2**16), int(rand()*2**16)"
+		GC_GUID=`echo | awk "BEGIN{srand($JOB_RANDOM)}{printf \"$FMGUID\", $RINT, $RINT}"`
+	fi
+
+	(
+		XBASE="$(echo $1 | sed -e 's/\(.*\)\(\..*\)$/\1/')"
+		XEXT="$(echo $1 | sed -e 's/\(.*\.\)\(.*\)$/\2/')"
+		echo "BEGIN{srand($JOB_RANDOM)}"
+		echo "{"
+		[ -n "$1" ] && echo "	gsub(\"@X@\", \"$1\")"
+		[ -n "$1" ] && echo "	gsub(\"__X__\", \"$1\")"
+		[ -n "$XBASE" ] && echo "	gsub(\"@XBASE@\", \"$XBASE\")"
+		[ -n "$XBASE" ] && echo "	gsub(\"__XBASE__\", \"$XBASE\")"
+		[ -n "$XEXT" ] && echo "	gsub(\"@XEXT@\", \"$XEXT\")"
+		[ -n "$XEXT" ] && echo "	gsub(\"__XEXT__\", \"$XEXT\")"
+		[ -f "${MY_SCRATCH:-.}/_varmap.dat" ] && cat "${MY_SCRATCH:-.}/_varmap.dat" |
+		while read USER_VARNAME REAL_VARNAME; do
+			VARVALUE="${!REAL_VARNAME}"
+			VARVALUE_ESC=`echo "$VARVALUE" | awk '{ gsub("\"", "\\\\\""); print }'`
+			[ -z "$VARVALUE" ] && echo "	gsub(\"^@IF@${USER_VARNAME}@.*\", \"\")"
+			[ -n "$VARVALUE" ] && echo "	gsub(\"^@IF@${USER_VARNAME}@\", \"\")"
+			echo '	gsub("^@IFEQ@'"${USER_VARNAME}"'@'"${VARVALUE_ESC}"'@", "")'
+			echo '	gsub("@'${USER_VARNAME}'@", "'"$VARVALUE_ESC"'")'
+			echo '	gsub("__'${USER_VARNAME}'__", "'"$VARVALUE_ESC"'")'
+		done
+		echo '	gsub("^@IFEQ.*", "")'
+		echo '	gsub("@RANDOM@", int(rand() * 900000000))'
+		echo '	gsub("__RANDOM__", int(rand() * 900000000))'
+		echo '	print'
+		echo '}'
+	) > "$REPLACEFILE"
+	awk -f "$REPLACEFILE" | awk -f "$REPLACEFILE"
+}
+
+# Get used space in mb
+getdiskusage() {
+	debug_helper $FUNCNAME "$@"
+	TMPVAR="`du --block-size=m -s $1 | awk '{gsub("M", "", $1); print $1}'`"
+	echo ${TMPVAR:-100000000}
+}
+
+# Get free space in mb
+getdiskspace() {
+	debug_helper $FUNCNAME "$@"
+	TMPVAR="`df --block-size=m -P $1 | awk 'END{gsub("M", "", $4); print $4}'`"
+	echo ${TMPVAR:-0}
+}
+
+# Check for disk usage: <env var limit prefix> <dir>
+monitordirlimits() {
+	debug_helper $FUNCNAME "$@"
+	LIMIT_LL="${1}_LL"
+	LIMIT_UL="${1}_UL"
+	[ "$1" == "SCRATCH" ] && DEFAULT_LL=100 || DEFAULT_LL=1000
+	[ "$1" == "SCRATCH" ] && DEFAULT_UL=50 || DEFAULT_UL=100
+	while [ -f "$MY_MARKER" ]; do
+		[ -z "$MDL_CFG" -a -f "$MY_SCRATCH/_config.sh" ] && source "$MY_SCRATCH/_config.sh" && MDL_CFG="set"
+		DISKSPACE="`getdiskspace $2`"
+		if [ $DISKSPACE -lt ${!LIMIT_LL:-$DEFAULT_LL} ]; then
+			echo "Lower space limit reached on $2 ($DISKSPACE < ${!LIMIT_LL:-$DEFAULT_LL})" 1>&2
+			updatejobinfo 120
+			kill -SIGTERM $$
+		fi
+		DISKUSAGE="`getdiskusage $2`"
+		if [ $DISKUSAGE -gt ${!LIMIT_UL:-$DEFAULT_UL} ]; then
+			echo "Upper space limit reached on $2 ($DISKUSAGE > ${!LIMIT_UL:-$DEFAULT_UL})" 1>&2
+			updatejobinfo 121
+			kill -SIGTERM $$
+		fi
+		sleep 20;
+	done
+}
+
+print_and_eval() {
+	debug_helper $FUNCNAME "$@"
+	[ "$1" != " " ] && checkbin "$1" || shift
+	CMD="$1"
+	shift
+	echo "$PAELEVEL`basename $CMD` $@"
+	export PAELEVEL="$PAELEVEL "
+	LOGFILE="${MY_LANDINGZONE:-/tmp}/paqe.$USER.${#BASH_LINENO[*]}.$RANDOM$RANDOM"
+	( eval "$CMD $@" > "$LOGFILE.out" 2> "$LOGFILE.err" )
+	CODE="$?"
+	export PAELEVEL="${PAELEVEL# }"
+	echo "$PAELEVEL returned $CODE"
+	[ "$CODE" != "0" ] && echo "===" && cat "$LOGFILE.out" && cat "$LOGFILE.err" && echo "==="
+	rm -f "$LOGFILE.out" "$LOGFILE.err"
+	return $CODE
+}
+
+url_ls_oneline() {
+	debug_helper $FUNCNAME "$@"
+	checkbin "$1" 1>&2
+	eval "$1 $2" | awk '{sub(/\r$/,"")};1' | while read FILE; do
+		BASEDIR=$(dirname "$2")
+		case "$FILE" in
+			"." | "..") continue ;;
+			$3) echo "${FILE#$BASEDIR}" ;;
+			*) [ -z "$3" ] && echo "${FILE#$BASEDIR}" ;;
+		esac
+	done
+}
+
+url_ls() {
+	debug_helper $FUNCNAME "$@"
+	case "$1" in
+		"rfio://"*)
+			url_ls_oneline "`getcommand nsls`" "${1#rfio://}" $2;;
+		"gsiftp://"*)
+			LSCMD="`getcommand glite-gridftp-ls edg-gridftp-ls lcg-ls`"
+			[ "$(basename $LSCMD)" == "lcg-ls" ] && URL="sfn://${1#gsiftp://}" || URL="$1"
+			url_ls_oneline "$LSCMD" "$URL" "$2"
+			;;
+		"srm://"*)
+			BASE=''
+			LSCMD="`getcommand srmls`"
+			checkbin "$LSCMD" 1>&2
+			eval "$LSCMD $1" | grep -v "WARNING" | while read TMP FILE; do
+				[ -z "$BASE" ] && BASE="$FILE" && continue
+				[ -z "$2" ] && echo ${FILE#$BASE} && continue
+				case "${FILE#$BASE}" in
+					$2) [ "$FILE" == "${FILE%/}" ] && echo "${FILE#$BASE}" ;;
+					*) ;;
+				esac
+			done
+			;;
+		"file://"*)
+			cd "${1#file://}" && ls -1d ${2:-*} && cd "$OLDPWD";;
+		*)	echo "Unsupported URL: $1" >&2 && fail 106;;
+	esac
+}
+
+url_exists() {
+	debug_helper $FUNCNAME "$@"
+	case "$1" in
+		"rfio://"*)
+			print_and_eval "`getcommand nsgetacl`" "/${1#rfio://}";;
+		"gsiftp://"*)
+			EXCMD="`getcommand glite-gridftp-exists edg-gridftp-exists edg-gridftp-ls lcg-ls`"
+			[ "$(basename $EXCMD)" == "lcg-ls" ] && URL="sfn://${1#gsiftp://}" || URL="$1"
+			print_and_eval "$EXCMD" "$URL";;
+		"srm://"*)
+			print_and_eval "`getcommand srm-check-permissions lcg-ls`" "$1";;
+		"file://"*)
+			print_and_eval " " "test" "-s ${1#file://}";;
+		*)
+			echo "Unsupported URL: $1" >&2 && fail 106;;
+	esac
+}
+
+# Remove file from storage element
+url_rm() {
+	debug_helper $FUNCNAME "$@"
+	for PARAM in `seq 1 $#`; do
+		FILE=${!PARAM}
+		case "$FILE" in
+			"rfio://"*)
+				print_and_eval "`getcommand nsrm`" "/${FILE#rfio://}";;
+			"gsiftp://"*)
+				RM_CMD="`getcommand glite-gridftp-rm edg-gridftp-rm lcg-del`"
+				[ "$(basename $RM_CMD)" == "lcg-del" ] && FILE="sfn://${FILE#gsiftp://}"
+				print_and_eval "$RM_CMD" "$FILE";;
+			"srm://"*)
+				RM_CMD="`getcommand srmrm lcg-del`"
+				[ "$(basename $RM_CMD)" == "lcg-del" ] && RM_OPTS="" || RM_OPTS="-2"
+				print_and_eval "$RM_CMD" "${RM_OPTS}" "$FILE";;
+			"file://"*)
+				print_and_eval " " "rm" "${FILE#file://}";;
+			*)
+				echo "Unsupported URL: $FILE" >&2 && fail 106;;
+		esac
+	done
+}
+
+# Create directories on storage element
+url_mkdir() {
+	debug_helper $FUNCNAME "$@"
+	for PARAM in `seq 1 $#`; do
+		FILE=${!PARAM}
+		case "$FILE" in
+			"rfio://"*)
+				print_and_eval "`getcommand nsmkdir`" "-p" "/${FILE#rfio://}";;
+			"gsiftp://"*)
+				print_and_eval "`getcommand edg-gridftp-mkdir`" "$FILE";;
+			"file://"*)
+				print_and_eval " " "mkdir" "-p" "${FILE#file://}";;
+			*)
+				echo "Unsupported URL: $FILE" >&2 && fail 106;;
+		esac
+	done
+}
+
+url_copy_single_local() {
+	debug_helper $FUNCNAME "$@"
+	[ ! -f "${1#file://}" ] && return 101
+	mkdir -p `dirname ${2#file://}`
+	[ -f "${2#file://}" ] && return -101
+	cp -b "${1#file://}" "${2#file://}"
+}
+
+url_copy_single_srm() {
+	debug_helper $FUNCNAME "$@"
+	if [ "$(basename `getcommand srmcp lcg-cp`)" == "lcg-cp" ]; then
+		print_and_eval "lcg-cp" "-v -n 1" "$1" "$2"
+	else
+		print_and_eval "srmcp" "-2 -debug=true -streams_num=1" "$1" "$2"
+	fi
+}
+
+url_copy_connector() {
+	debug_helper $FUNCNAME "$@"
+	TMPCP="$GC_KEEPTMP"
+	[ -z "$GC_KEEPTMP" ] && TMPCP="file://${MY_SCRATCH:-/tmp}/ucc.$USER.$RANDOM$RANDOM"
+	print_and_eval "url_copy_single" "$1" "$TMPCP" || fail 106
+	print_and_eval "url_copy_single" "$TMPCP" "$2" || fail 106
+	[ -z "$GC_KEEPTMP" ] && url_rm "$TMPCP"
+}
+
+# Copy one file at a time (1) -> (2)
+url_copy_single() {
+	debug_helper $FUNCNAME "$@"
+	case "$1" in
+		"rfio://"*)
+			case "$2" in
+				"file://"*)
+					print_and_eval "`getcommand rfcp`" "${1#rfio://} ${2#file://}";;
+				*)
+					print_and_eval "url_copy_connector" "$1" "$2";;
+			esac;;
+
+		"gsiftp://"*)
+			case "$2" in
+				"gsiftp://"* | "file://"*)
+					print_and_eval "`getcommand globus-url-copy`" "$1 $2";;
+				"srm://"*)
+					print_and_eval "url_copy_single_srm" "$1 $2";;
+				*)
+					print_and_eval "url_copy_connector" "$1" "$2";;
+			esac;;
+
+		"srm://"*)
+			case "$2" in
+				"gsiftp://"* | "srm://"* | "file://"*)
+					print_and_eval "url_copy_single_srm" "$1 $2";;
+				*)
+					print_and_eval "url_copy_connector" "$1" "$2";;
+			esac;;
+
+		"file://"*)
+			case "$2" in
+				"rfio://"*)
+					print_and_eval "`getcommand rfcp`" "${1#file://} ${2#rfio://}";;
+				"gsiftp://"*)
+					print_and_eval "`getcommand globus-url-copy`" "$1 $2";;
+				"srm://"*)
+					print_and_eval "url_copy_single_srm" "$1 $2";;
+				"file://"*)
+					print_and_eval "url_copy_single_local" "$1 $2";;
+				*)
+					echo "Unsupported copy from $1 to $2" >&2 && fail 106;;
+			esac;;
+		*)
+			echo "Unsupported copy from $1 to $2" >&2 && fail 106;;
+	esac
+}
+
+# Copy one file at a time (1) -> (2) (overwrite existing files)
+url_copy_single_force() {
+	debug_helper $FUNCNAME "$@"
+	print_and_eval "url_exists" "$2" && echo "File exists! Delete $2" && print_and_eval "url_rm" "$2"
+	print_and_eval "url_copy_single" "$1 $2"
+}
+
+# Copy serveral files with specified pattern
+url_copy() {
+	debug_helper $FUNCNAME "$@"
+	FILENAMES="`echo "$3" | var_replacer ''`"
+	echo "Copy $FILENAMES from $1 to $2"
+
+	SOURCE_FILES=""
+	SOURCE_URL="$1"
+	case "$SOURCE_URL" in
+		"rfio://"* | "gsiftp://"* | "srm://"* | "dir://"*)
+			# copy from SE
+			SOURCE_URL="`echo "$SOURCE_URL" | sed -e 's@dir://@file://@'`"
+			if [[ "$FILENAMES" == *\** ]]; then
+				# Wildcard used => url_ls
+				SOURCE_PATTERN="__X__"
+				for PATTERN_1 in "$FILENAMES"; do
+					PATTERN_2="`echo ${SE_INPUT_PATTERN:-__X__} | var_replacer "$PATTERN_1"`"
+					(url_ls "$SOURCE_URL" "$PATTERN_2" > "$MY_SCRATCH/_url_ls.dat") 2>&1
+					SOURCE_FILES="$SOURCE_FILES $(< "$MY_SCRATCH/_url_ls.dat")"
+				done
+			else
+				SOURCE_PATTERN="${SE_INPUT_PATTERN:-__X__}"
+				SOURCE_FILES="$FILENAMES"
+			fi
+			;;
+		"file://"*)
+			# copy from WN
+			SOURCE_PATTERN="__X__"
+			SOURCE_FILES="$(cd "${SOURCE_URL#file://}"; echo $FILENAMES; cd "$OLDPWD")"
+
+			# Check that file size is larger than SE_MINFILESIZE
+			for file in $SOURCE_FILES; do
+				[ ! -f "$file" ] && continue
+				[ "`getdiskusage ${SOURCE_URL#file://}/$file`" -lt "${SE_MINFILESIZE:-0}" ] && fail 122
+			done
+			;;
+		*)
+			echo "Unsupported URL: $1" && fail 106
+			;;
+	esac
+
+	TARGET_URL="$2"
+	case "$TARGET_URL" in
+		"rfio://"* | "gsiftp://"* | "srm://"* | "dir://"*)
+			# copy to SE
+			TARGET_PATTERN="${SE_OUTPUT_PATTERN:-__X__}"
+			TARGET_URL="`echo "$TARGET_URL" | sed -e 's@dir://@file://@'`"
+			;;
+		"file://"*)
+			# copy to WN
+			TARGET_PATTERN="__X__"
+			;;
+		*)
+			echo "Unsupported URL: $2" && fail 106
+			;;
+	esac
+
+	BADCOUNT=0
+	for file in $SOURCE_FILES; do
+		[ -d "$file" ] && continue
+		SOURCE_FN="`echo ${SOURCE_PATTERN:-__X__} | var_replacer $file`"
+		TARGET_FN="`echo ${TARGET_PATTERN:-__X__} | var_replacer $file`"
+		[ -n "$TRANSFERLOG" ] && echo "$SOURCE_FN $TARGET_FN" >> "$TRANSFERLOG"
+		print_and_eval "url_copy_single" "$SOURCE_URL/$SOURCE_FN $TARGET_URL/$TARGET_FN"
+		if [ "$?" != "0" ]; then
+			print_and_eval "url_copy_single_force" "$SOURCE_URL/$SOURCE_FN $TARGET_URL/$TARGET_FN"
+			if [ "$?" != "0" ]; then
+				print_and_eval "url_exists" "$TARGET_URL/$TARGET_FN" || BADCOUNT=$[$BADCOUNT+1]
+			fi
+ 		fi
+	done
+	[ $BADCOUNT -ne 0 ] && echo "$BADCOUNT errors occurred during SE access" && fail 106
+}
+
+my_move() {
+	debug_helper $FUNCNAME "$@"
+	[ ! -d "$1" ] && fail 102
+	[ ! -d "$2" ] && fail 102
+	[ -z "$(echo $3)" ] && return
+	[ "$1" == "$2" ] && return
+	echo "Move files from $1 to $2:"
+	for file in `(cd $1 && ls $(eval "echo $3") && cd $OLDPWD) 2> /dev/null`; do
+		echo -e " >> $file"
+		test -f "$1/$file" && mv "$1/$file" "$2/$file"
+	done
+}
+
+zip_files() {
+	debug_helper $FUNCNAME "$@"
+
+	for file in $@; do
+		if [ -f "${file%.gz}" ] && [ ! -f "$file" ]; then
+			echo "Zipping ${file%.gz}..."
+			gzip -9f "${file%.gz}"
+		fi
+	done
+}
+
+get_default_se() {
+	export GC_DEFAULT_SE=`hostname | sed 's/.*\.\(.*\)\.\(.*\)$/\1.\2/'`
+	for SE in $1; do
+		export | grep DEFAULT_SE | sed -e "s/.* //;s/=.*//" | while read SE_VAR; do
+			echo $SE | grep "${!SE_VAR}"
+		done
+	done
+}
+
+get_random_se() {
+	[ $# -gt 0 ] && shift $[ $RANDOM % $# ]
+	echo $1
+}
+
+get_best_se() {
+	SE_PATH_VAR="$1"
+	if [ -n "${!SE_PATH_VAR}" ]; then
+		SE_CLOSE="$(get_default_se "${!SE_PATH_VAR}")"
+		[ -n "$SE_CLOSE" ] && export SE_PATH_VAR="SE_CLOSE"
+		echo "$(get_random_se ${!SE_PATH_VAR})"
+	fi
+}
+
+display_short() {
+	BASEAPP="$(which base64 2> /dev/null)"
+	if [ -n "$BASEAPP" ]; then
+		echo -n "(B64) "
+		gzip -9 | $BASEAPP -w 0
+		echo
+	else
+		cat
+	fi
+}
+
+timestamp() {
+	debug_helper $FUNCNAME "$@"
+	if [[ -z "$STARTDATE" ]];then
+		STARTDATE=`date +%s`
+	fi
+	echo "($(date +"%s"),$[ $(date +"%s") - $STARTDATE ],'${@:-NULL}')" >> $MY_LANDINGZONE\job.timestamps
+	echo "[$(date +"%Y:%m:%d-%k:%M:%S")] $@"
+}
+
+timereport() {
+	debug_helper $FUNCNAME "$@"
+	echo "==========================="
+	echo "== ===  Job timing  ==== =="
+	echo "Abs,Rel,TAG"
+	cat $MY_LANDINGZONE\job.timestamps
+	echo "==========================="
+	echo -n "timestamps = [" >> $MY_LANDINGZONE/job.info
+	while read line; do
+		echo -n "$line," >> $MY_LANDINGZONE/job.info
+	done < $MY_LANDINGZONE\job.timestamps
+	echo "]" >> $MY_LANDINGZONE/job.info
+}
+
+timeprocess() {
+	debug_helper $FUNCNAME "$@"
+	if [ -x "`getcommand time`" ]; then
+		`getcommand time` -o $MY_LANDINGZONE\job.timing -f "--Time--\nWall: %e s\nUser: %U s\nSys : %S s\nCPU : %P\n--Memory--\nMax RSS : %M KB\nAvr RSS : %t KB\nTot Mem : %K KB\n--Prog--\nCmd : %C\nExit: %x\n" $@
+	else
+		time $@
+	fi
+}
