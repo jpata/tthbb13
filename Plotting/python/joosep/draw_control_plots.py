@@ -1,195 +1,197 @@
 import ROOT
 ROOT.gROOT.SetBatch(True)
-ROOT.gErrorIgnoreLevel = ROOT.kError
-import sys, os
-#sys.path += ["./heplot/"]
-#import heplot.heplot as he
-#from rootpy.plotting import Hist, Hist2D
-#import matplotlib.pyplot as plt
-import random
-#import matplotlib
-#from rootpy import asrootpy
-#from matplotlib.ticker import NullLocator, LinearLocator, MultipleLocator, FormatStrFormatter, AutoMinorLocator
+
+import matplotlib
+import matplotlib.pyplot as plt
+
 import numpy as np
 
-from TTH.Plotting.joosep.samples import samples_dict
+import rootpy
+import rootpy.io
+from rootpy.plotting.root2matplotlib import errorbar, bar, hist, fill_between
+from collections import OrderedDict
 
-samples = [
-    "tth_13TeV_phys14",
-    "ttjets_13TeV_phys14",
-    "ttjets_13TeV_phys14_bb", "ttjets_13TeV_phys14_b",
-    "ttjets_13TeV_phys14_cc", "ttjets_13TeV_phys14_ll"
-]
+from weighting import get_weight
 
-of = ROOT.TFile("ControlPlots.root", "RECREATE")
+matplotlib.rc("axes", labelsize=24)
+matplotlib.rc("axes", titlesize=20)
 
-#Number of parallel processes to run for the histogram projection
-ncores = 20
+def mc_stack(hlist, colors="auto"):
+    if colors=="auto":
+        coloriter = iter(plt.cm.jet(np.linspace(0,1,len(hlist))))
+        for h in hlist:
+            h.color = next(coloriter)
+    elif isinstance(colors, list) and len(color) == len(hlist):
+        for h, c in zip(hlist, colors):
+            h.color = c
 
-def weight_str(cut):
-    return "genWeight * ({0})".format(cut)
+    for h in hlist:
+        h.fillstyle = "solid"
 
-def drawHelper(args):
-    tf, hist, cut, nfirst, nev = args
-    #print hist, cut, nfirst, nev
-    hname = hist.split(">>")[1].split("(")[0].strip()
-    ROOT.gROOT.cd()
-    ROOT.TH1.SetDefaultSumw2(True)
-    n = tf.Draw(hist, weight_str(cut), "goff", nev, nfirst)
-    h = ROOT.gROOT.Get(hname)
-    assert(h.GetEntries() == n)
-    return h
+    r = hist(hlist, stacked=True)
+    htot = sum(hlist)
+    htot.color="black"
 
-if ncores == 1:
-    def Draw(tf, of, *args):
-        return tf.Draw(*args)
-else:
-    import multiprocessing
-    pool = multiprocessing.Pool(ncores)
+    htot_u = htot.Clone()
+    htot_d = htot.Clone()
+    for i in range(1, htot.nbins()+1):
+        htot_u.set_bin_content(i, htot.get_bin_content(i) + htot.get_bin_error(i))
+        htot_d.set_bin_content(i, htot.get_bin_content(i) - htot.get_bin_error(i))
 
-    def Draw(tf, of, *args):
-        ntot = tf.GetEntriesFast()
-        #how many events to process per core
-        chunksize = max(ntot/ncores, 100000)
-        chunks = range(0, ntot, chunksize)
-        parargs = []
-        for ch in chunks:
-            parargs += [tuple([tf] + list(args)+[ch, min(chunksize, ntot-ch)])]
-        hlist = pool.map(drawHelper, parargs)
-        h = hlist[0].Clone()
-        for h_ in hlist[1:]:
-            h.Add(h_)
-        h.SetDirectory(of)
-        of.Add(h, True)
-        print of.GetPath(), h.GetName(), h.GetEntries(), h.Integral()
-        return h
+    htot_u.color="black"
+    htot_d.color="black"
 
+    fill_between(htot_u, htot_d,
+        color="black", hatch="////",
+        alpha=1.0, linewidth=0, facecolor="none", edgecolor="black", zorder=10,
+    )
 
-for sample in samples:
-    print sample
-    tf = ROOT.TChain("tree")
-    for fn in samples_dict[sample].fileNamesS2:
-        tf.AddFile(fn)
-    print tf.GetEntries()
+    return {"tot":htot, "tot_u":htot_u, "tot_d":htot_d}
 
-    weight = "genWeight"
-    of.cd()
-    d = of.mkdir(sample)
-    d.cd()
-    Draw(tf, d, "is_sl >> nsl(2,0,2)", "1")
-    Draw(tf, d, "is_dl >> ndl(2,0,2)", "1")
+def dice(h, nsigma=1.0):
+    hret = h.clone()
+    for i in range(1, h.nbins()+1):
+        m, e = h.get_bin_content(i), h.get_bin_error(i)
+        if e<=0:
+            e = 1.0
+        n = np.random.normal(m, nsigma*e)
+        hret.set_bin_content(i, n)
+    return hret
 
-    for lep, lepcut in [("sl", "(is_sl==1)"), ("dl", "(is_dl==1)")]:
-        d.cd()
-        lepd = d.mkdir(lep)
-        lepd.cd()
-        Draw(tf, lepd, "leps_pt[0] >> lep0_pt(30,0,300)", lepcut)
-        Draw(tf, lepd, "leps_eta[0] >> lep0_eta(30,-5,5)", lepcut)
+def draw_data_mc(tf, hname, samples, **kwargs):
 
-        Draw(tf, lepd, "leps_pt[1] >> lep1_pt(30,0,300)", lepcut)
-        Draw(tf, lepd, "leps_eta[1] >> lep1_eta(30,-5,5)", lepcut)
+    do_pseudodata = kwargs.get("do_pseudodata", False)
+    xlabel = kwargs.get("xlabel", hname.replace("_", " "))
+    yunit = kwargs.get("yunit", "")
+    ylabel = kwargs.get("ylabel", "auto")
+    rebin = kwargs.get("rebin", 1)
+    title_extended = kwargs.get("title_extended", "")
+    do_legend = kwargs.get("do_legend", True)
 
-        Draw(tf, lepd, "njets >> njets(15,0,15)", lepcut)
-        Draw(tf, lepd, "nBCSVM >> ntags(15,0,15)", lepcut)
+    hs = OrderedDict()
+    for sample, sample_name in samples:
+        hs[sample] = tf.get(sample + "/" + hname).Clone()
+        hs[sample].Scale(get_weight(sample))
+        hs[sample].title = sample_name
+        hs[sample].rebin(rebin)
 
-        Draw(tf, lepd, "nBCSVM:njets >> njets_nBCSVM(15,0,15,15,0,15)", lepcut)
+    c = plt.figure(figsize=(6,6))
+    a1 = plt.axes([0.0,0.2, 1.0, 0.8])
+    plt.grid()
+    plt.title("CMS preliminary simulation\n $\sqrt{s} = 13$ TeV"+title_extended,
+        y=0.96, x=0.04,
+        horizontalalignment="left", verticalalignment="top"
+    )
+    r = mc_stack(hs.values())
 
-        Draw(tf, lepd, "jets_pt[0] >> jet0_pt(30,0,600)", lepcut)
-        Draw(tf, lepd, "jets_eta[0] >> jet0_eta(30,-5,5)", lepcut)
+    tot_mc = sum(hs.values())
+    tot_mc.title = "pseudodata"
+    tot_mc.color = "black"
 
-        Draw(tf, lepd, "jets_pt[1] >> jet1_pt(30,0,600)", lepcut)
-        Draw(tf, lepd, "jets_eta[1] >> jet1_eta(30,-5,5)", lepcut)
-        Draw(tf, lepd, "(100*nMatch_wq + 10*nMatch_hb + nMatch_tb) >> nMatch(300,0,300)", lepcut)
-        Draw(tf, lepd, "(100*nMatch_wq_btag + 10*nMatch_hb_btag + nMatch_tb_btag) >> nMatch_btag(300,0,300)", lepcut)
-        for jet_tag, jettagcut in [
-                ("cat1H", "cat==1 && cat_btag==1"),
-                ("cat2H", "cat==2 && cat_btag==1"),
-                ("cat3H", "cat==3 && cat_btag==1"),
+    tot_bg = sum([hs[k] for k in hs.keys() if "tth" not in k])
 
-                ("cat6Hee", "nleps==2 && (abs(leps_pdgId[0]) + abs(leps_pdgId[1]))==22 && cat==6 && cat_btag==1"),
-                ("cat6Hem", "nleps==2 && (abs(leps_pdgId[0]) + abs(leps_pdgId[1]))==24 && cat==6 && cat_btag==1"),
-                ("cat6Hmm", "nleps==2 && (abs(leps_pdgId[0]) + abs(leps_pdgId[1]))==26 && cat==6 && cat_btag==1"),
+    pseudodata = dice(tot_mc, nsigma=1.0)
 
-                ("cat1L", "cat==1 && cat_btag==0"),
-                ("cat2L", "cat==2 && cat_btag==0"),
-                ("cat3L", "cat==3 && cat_btag==0"),
+    if do_pseudodata:
+        errorbar(pseudodata)
 
-                ("cat6Lee", "nleps==2 && (abs(leps_pdgId[0]) + abs(leps_pdgId[1]))==22 && cat==6 && cat_btag==0"),
-                ("cat6Lem", "nleps==2 && (abs(leps_pdgId[0]) + abs(leps_pdgId[1]))==24 && cat==6 && cat_btag==0"),
-                ("cat6Lmm", "nleps==2 && (abs(leps_pdgId[0]) + abs(leps_pdgId[1]))==26 && cat==6 && cat_btag==0"),
+    if do_legend:
+        plt.legend(loc=1, numpoints=1)
+    if ylabel == "auto":
+        ylabel = "events / {0:.0f} {1}".format(hs.values()[0].get_bin_width(1), yunit)
+    plt.ylabel(ylabel)
 
-                ("5j", "njets==5"),
-                ("5jL", "njets==5 && nBCSVM<3"),
-                ("5j3t", "njets==5 && nBCSVM==3"),
-                ("5j4t", "njets==5 && nBCSVM==4"),
-                ("5jH", "njets==5 && nBCSVM>4"),
+    #hide x ticks on main panel
+    ticks = a1.get_xticks()
+    a1.set_xticklabels([])
 
-                ("6j", "njets==6"),
-                ("6jL", "njets==6 && nBCSVM<3"),
-                ("6j3t", "njets==6 && nBCSVM==3"),
-                ("6j4t", "njets==6 && nBCSVM==4"),
-                ("6jH", "njets==6 && nBCSVM>4"),
+    a1.set_ylim(bottom=0, top=1.1*a1.get_ylim()[1])
 
-                ("7j", "njets==7"),
-                ("7jL", "njets==7 && nBCSVM<3"),
-                ("7j3t", "njets==7 && nBCSVM==3"),
-                ("7j4t", "njets==7 && nBCSVM==4"),
-                ("7jH", "njets==7 && nBCSVM>4"),
+    a2 = plt.axes([0.0,0.0, 1.0, 0.2])
 
-                ("8plusj", "njets>=8"),
-                ("8plusjL", "njets>=8 && nBCSVM<3"),
-                ("8plusj3t", "njets>=8 && nBCSVM==3"),
-                ("8plusj4t", "njets>=8 && nBCSVM==4"),
-                ("8plusjH", "njets>=8 && nBCSVM>4"),
-            ]:
+    plt.xlabel(xlabel)
+    a2.grid()
 
-            if lep == "sl" and "cat6" in jet_tag:
-                continue
-            if lep == "dl" and (
-                "cat1" in jet_tag or
-                "cat2" in jet_tag or
-                "cat3" in jet_tag
-            ):
-                continue
-            lepjetcut = " && ".join([lepcut, jettagcut])
-            if tf.GetEntries(lepjetcut)==0:
-                continue
+    data_minus_bg = pseudodata - tot_mc
+    data_minus_bg.divide(pseudodata)
 
-            lepd.cd()
-            jetd = lepd.mkdir(jet_tag)
-            jetd.cd()
+    bg_unc_u = r["tot"] - r["tot_u"]
+    bg_unc_d = r["tot"] - r["tot_d"]
 
-            Draw(tf, jetd, "nBCSVM:njets >> njets_nBCSVM(15,0,15,15,0,15)", lepjetcut)
-            Draw(tf, jetd, "nMatchSimB:nMatchSimC >> nMatchSimB_nMatchSimC(6,0,6,6,0,6)", lepjetcut)
+    bg_unc_u.divide(pseudodata)
+    bg_unc_d.divide(pseudodata)
 
-            Draw(tf, jetd, "jets_pt[0] >> jet0_pt(30,0,600)", lepjetcut)
-            Draw(tf, jetd, "jets_eta[0] >> jet0_eta(30,-5,5)", lepjetcut)
+    if do_pseudodata:
+        errorbar(data_minus_bg)
 
-            Draw(tf, jetd, "leps_pt[0] >> lep0_pt(30,0,300)", lepjetcut)
-            Draw(tf, jetd, "leps_eta[0] >> lep0_eta(30,-5,5)", lepjetcut)
-
-            Draw(tf, jetd, "btag_LR_4b_2b >> btag_lr(30,0,1)", lepjetcut)
-
-            Draw(tf, jetd, "(100*nMatch_wq + 10*nMatch_hb + nMatch_tb) >> nMatch(300,0,300)", lepjetcut)
-            Draw(tf, jetd, "(100*nMatch_wq_btag + 10*nMatch_hb_btag + nMatch_tb_btag) >> nMatch_btag(300,0,300)", lepjetcut)
-
-            for match, matchcut in [
-                    ("nomatch", "1"),
-                    ("tb2_wq2", "nMatch_wq_btag==2 && nMatch_tb_btag==2"),
-                    ("hb2_tb2_wq2", "nMatch_hb_btag==2 && nMatch_wq_btag==2 && nMatch_tb_btag==2"),
-                    ("tb2_wq1", "nMatch_wq_btag==1 && nMatch_tb_btag==2"),
-                    ("hb2_tb2_wq1", "nMatch_hb_btag==2 && nMatch_wq_btag==1 && nMatch_tb_btag==2")
-                ]:
-                if "hb2" in match and "ttjets" in sample:
-                    continue
-                if tf.GetEntries(" && ".join([lepcut, jettagcut, matchcut])) == 0:
-                    continue
-                for nmem in range(9):
-                    Draw(tf, jetd, "mem_tth_p[{0}] / (mem_tth_p[{0}] + 0.02*mem_ttbb_p[{0}]) >> mem_d_{1}_{0}(20,0,1)".format(nmem, match),
-                        " && ".join([lepcut, jettagcut, matchcut])
-                    )
+    fill_between(bg_unc_u, bg_unc_d,
+        color="black", hatch="////",
+        alpha=1.0, linewidth=0, facecolor="none", edgecolor="black", zorder=10,
+    )
+    plt.ylabel("$\\frac{\mathrm{data} - \mathrm{mc}}{\mathrm{data}}$", fontsize=16)
+    plt.axhline(0.0, color="black")
+    a2.set_ylim(-1,1)
+    #hide last tick on ratio y axes
+    a2.set_yticks(a2.get_yticks()[:-1]);
+    a2.set_xticks(ticks);
+    return a1, a2, hs
 
 
-of.Write()
-of.Close()
+def draw_mem_data_mc(*args, **kwargs):
+    a1, a2, hs = draw_data_mc(*args, **kwargs)
+    plt.sca(a1)
+    h = hs["tth_13TeV_phys14"].Clone()
+    h.fillstyle = "hollow"
+    h.linewidth = 2
+    h.title = h.title + " x10"
+    h.Scale(10)
+    hist(h)
+    plt.legend(loc=(1.01,0.0))
+    a1.set_ylim(bottom=0)
+    return a1, a2, hs
 
+def calc_roc(h1, h2):
+    h1 = h1.Clone()
+    h2 = h2.Clone()
+    h1.Scale(1.0 / h1.Integral())
+    h2.Scale(1.0 / h2.Integral())
+    roc = np.zeros((h1.GetNbinsX()+2, 2))
+    err = np.zeros((h1.GetNbinsX()+2, 2))
+    e1 = ROOT.Double(0)
+    e2 = ROOT.Double(0)
+    for i in range(0, h1.GetNbinsX()+2):
+        I1 = h1.Integral(0, h1.GetNbinsX())
+        I2 = h2.Integral(0, h2.GetNbinsX())
+        if I1>0 and I2>0:
+            roc[i, 0] = float(h1.IntegralAndError(i, h1.GetNbinsX()+2, e1)) / I1
+            roc[i, 1] = float(h2.IntegralAndError(i, h1.GetNbinsX()+2, e2)) / I2
+            err[i, 0] = e1
+            err[i, 1] = e2
+    return roc, err
+
+def draw_rocs(pairs, **kwargs):
+    rebin = kwargs.get("rebin", 1)
+
+    c = plt.figure(figsize=(6,6))
+    plt.axes()
+    plt.plot([0.0,1.0],[0.0,1.0], color="black")
+    plt.xlim(0,1)
+    plt.ylim(0,1)
+
+    rs = []
+    es = []
+    for pair in pairs:
+        tf, hn1, hn2, label = pair
+        h1 = tf.get(hn1).Clone()
+        h2 = tf.get(hn2).Clone()
+        h1.rebin(rebin)
+        h2.rebin(rebin)
+        r, e = calc_roc(h1, h2)
+        rs += [r]
+        es += [e]
+
+    for (r, e, pair) in zip(rs, es, pairs):
+        tf, hn1, hn2, label = pair
+        plt.errorbar(r[:, 0], r[:, 1], e[:, 0], e[:, 1], label=label)
+
+    plt.legend(loc=2)

@@ -14,7 +14,7 @@ class BTagLRAnalyzer(FilterAnalyzer):
         self.bTagAlgo = self.conf.jets["btagAlgo"]
         self.cplots_old = ROOT.TFile(self.conf.general["controlPlotsFileOld"])
         self.cplots = ROOT.TFile(self.conf.general["controlPlotsFile"])
-        
+
         cplots_fmt = self.conf.general.get("controlPlotsFormat", "8tev")
         self.csv_pdfs_old = {
         }
@@ -37,7 +37,7 @@ class BTagLRAnalyzer(FilterAnalyzer):
             )
             self.csv_pdfs[(x, "pt_eta")].Scale(1.0 / self.csv_pdfs[(x, "pt_eta")].Integral())
         self.conf.BTagLRAnalyzer = self
-        
+
     def get_pdf_prob(self, flavour, pt, eta, csv, kind):
 
         _bin = "Bin1" if abs(eta)>1.0 else "Bin0"
@@ -181,12 +181,17 @@ class BTagLRAnalyzer(FilterAnalyzer):
             event.buntagged_jets = event.buntagged_jets_bdisc
             event.selected_btagged_jets = event.btagged_jets_bdisc
 
-        #Take first 4 most b-tagged jets
-        btagged = sorted(event.selected_btagged_jets, key=lambda x: x.btagCSV, reverse=True)[0:4]
-        event.selected_btagged_jets = btagged
+        btagged = sorted(event.selected_btagged_jets, key=lambda x: x.btagCSV, reverse=True)
+
+        #Take first 4 most b-tagged jets, these are used for the top and higgs candidates
+        event.selected_btagged_jets_high = btagged[0:4]
+
+        #any leftover b-tagged jets could be used for the W reconstruction
+        event.selected_btagged_jets_low = btagged[4:]
+
         #Set these jets to be used as b-quarks in the MEM
         #We don't want to use more than 4 b-quarks in the hypothesis
-        for jet in event.selected_btagged_jets:
+        for jet in event.selected_btagged_jets_high:
             idx = event.good_jets.index(jet)
             event.good_jets[idx].btagFlag = 1.0
 
