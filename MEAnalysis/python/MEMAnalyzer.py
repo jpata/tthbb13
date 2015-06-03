@@ -567,7 +567,7 @@ class MEAnalyzer(FilterAnalyzer):
                     r = self.integrator.run(
                         fstate,
                         hypo,
-                        self.vars_to_integrate
+                        self.vars_to_integrate,
                         self.vars_to_marginalize
                     )
                     print "MEM done", ("hypo", hypo), ("conf", confname)
