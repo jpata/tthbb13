@@ -192,6 +192,11 @@ class MEAnalyzer(FilterAnalyzer):
             "DL": MEMConfig(),
             "DL_gen": MEMConfig(),
             "DL_gen_nosmear": MEMConfig(),
+
+            "SL_2qW_sj": MEMConfig(),
+            "SL_1qW_sj": MEMConfig(),
+            "SL_0qW_sj": MEMConfig(),
+
         }
 
         #These MEM configurations will actually be considered for calculation
@@ -203,6 +208,37 @@ class MEAnalyzer(FilterAnalyzer):
         #Set the MEM
         for (k, v) in self.configs.items():
             v.configure_transfer_function(self.conf)
+
+        # ===============================================================
+        # Subjet configuration
+        for k in ["SL_0qW_sj", "SL_1qW_sj", "SL_2qW_sj"]:
+            self.configs[k].b_quark_candidates = lambda event: \
+                                                 event.selected_btagged_jets_sj
+            self.configs[k].l_quark_candidates = lambda event: \
+                                                 event.wquark_candidate_jets_sj
+
+        k = "SL_0qW_sj"
+        self.configs[k].do_calculate = lambda y, c: (
+            len(c.lepton_candidates(y)) == 1 and
+            len(c.b_quark_candidates(y)) >= 4 and
+            len(c.l_quark_candidates(y)) >= 1 and
+            y.PassedSubjetAnalyzer == True
+            )
+        k = "SL_1qW_sj"
+        self.configs[k].do_calculate = lambda y, c: (
+            len(c.lepton_candidates(y)) == 1 and
+            len(c.b_quark_candidates(y)) >= 4 and
+            len(c.l_quark_candidates(y)) >= 1 and
+            y.PassedSubjetAnalyzer == True
+            )
+        k = "SL_2qW_sj"
+        self.configs[k].do_calculate = lambda y, c: (
+            len(c.lepton_candidates(y)) == 1 and
+            len(c.b_quark_candidates(y)) >= 4 and
+            len(c.l_quark_candidates(y)) >= 2 and
+            y.PassedSubjetAnalyzer == True
+            )
+        # ===============================================================
 
         for k in ["DL_gen", "SL_2qW_gen", "SL_1qW_gen"]:
             self.configs[k].b_quark_candidates = lambda event: (
@@ -229,7 +265,7 @@ class MEAnalyzer(FilterAnalyzer):
                 len(c.b_quark_candidates(y)) >= 4 and
                 len(c.l_quark_candidates(y)) >= 2
             )
-        for x in ["SL_1qW", "SL_1qW_gen", "SL_1qW_gen_nosmear"]:
+        for x in ["SL_1qW", "SL_1qW_gen", "SL_1qW_gen_nosmear", "SL_1qW_sj"]:
             self.configs[x].do_calculate = lambda y, c: (
                 len(c.lepton_candidates(y)) == 1 and
                 len(c.b_quark_candidates(y)) >= 4 and
@@ -242,6 +278,7 @@ class MEAnalyzer(FilterAnalyzer):
                 len(c.b_quark_candidates(y)) >= 4 and
                 len(c.l_quark_candidates(y)) >= 1
             )
+        for x in ["SL_0qW", "SL_0qW_sj"]:
             self.configs[x].mem_assumptions.add("0qW")
         for x in ["SL_1bT", "SL_1bTbar", "SL_1bH"]:
             self.configs[x].do_calculate = lambda y, c: (
@@ -261,7 +298,8 @@ class MEAnalyzer(FilterAnalyzer):
         for k in [
                 "SL_2qW", "SL_2qW_notag", "SL_1qW", "SL_2qW_gen",
                 "SL_1qW_gen", "SL_2qW_gen_nosmear", "SL_1qW_gen_nosmear",
-                "SL_0qW", "SL_1bT", "SL_1bTbar", "SL_1bH"
+                "SL_0qW", "SL_1bT", "SL_1bTbar", "SL_1bH",
+                "SL_0qW_sj", "SL_1qW_sj", "SL_2qW_sj",
             ]:
             self.configs[k].mem_assumptions.add("sl")
         permutations = CvectorPermutations()
@@ -431,7 +469,6 @@ class MEAnalyzer(FilterAnalyzer):
         self.vars_to_integrate.clear()
         self.integrator.next_event()
 
-        #Thomas: Moved to bottom
         #Initialize members for tree filler
         event.mem_results_tth = []
         event.mem_results_ttbb = []

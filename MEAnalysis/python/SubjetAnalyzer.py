@@ -1,12 +1,6 @@
 from TTH.MEAnalysis.Analyzer import FilterAnalyzer
-
-
 import ROOT
-#import itertools
-#from PhysicsTools.HeppyCore.framework.analyzer import Analyzer
 import copy
-#import math
-#from TTH.MEAnalysis.VHbbTree import *
 
 class SubjetAnalyzer(FilterAnalyzer):
     """
@@ -44,44 +38,28 @@ class SubjetAnalyzer(FilterAnalyzer):
 
         print 'Printing from SubjetAnalyzer! iEv = {0}'.format(event.iEv)
 
+        # Is set to True only after the event passed all criteria
+        setattr( event, 'PassedSubjetAnalyzer', False )
+
+        # Create two new lists for selected_btagged_jets and wquark_candidate_jets
+        # Needs to be done here because the lists are needed in the mem config
+        setattr( event, 'selected_btagged_jets_sj', [] )
+        setattr( event, 'wquark_candidate_jets_sj', [] )
+
+
         ########################################
         # Minimal event suitability:
         #  - Needs to be single leptonic
         #  - At least 1 httCandidate
         ########################################
 
-        # Is set to True only after the event passed all criteria
-        setattr( event, 'PassedSubjetAnalyzer', False )
-
         # Check if the event is single leptonic
         if not event.is_sl:
             return True
 
-        # Necessary to remove duplicates in GenWZQuark branch
-        # This step can be removed for V12 samples
-        self.CompareWZQuarks( event )
-
-        # Check if event contains the right number of quarks
-        # (Only used to do truth-level comparisons)
-        genquarks_cat1_present = True
-        genhiggs_present = True
-        if len(event.GenWZQuark)<2:
-            genquarks_cat1_present = False
-        if len(event.GenWZQuark)>2:
-            genquarks_cat1_present = False
-        if len(event.GenBQuarkFromTop)<2:
-            genquarks_cat1_present = False
-        if len(event.GenBQuarkFromTop)>2:
-            genquarks_cat1_present = False
-        if len(event.GenBQuarkFromH)<2:
-            genhiggs_present = False
-        if len(event.GenBQuarkFromH)>2:
-            genhiggs_present = False
-
-
-        # Keep track of number of (passed) httCandidates in event
+        # Keep track of number of httCandidates that passed the cut
         setattr( event, 'nhttCandidate', len( event.httCandidate ) )
-        setattr( event, 'nhttCandidate_passed', 0 )
+        setattr( event, 'nhttCandidate_aftercuts', 0 )
 
         # Just run normal mem if there is no httCandidate present
         # Check if there is an httCandidate
@@ -95,7 +73,7 @@ class SubjetAnalyzer(FilterAnalyzer):
                 tops.append( copy.deepcopy(candidate) )
 
         # Keep track of how many httCandidates passed
-        event.nhttCandidate_passed = len( tops )
+        event.nhttCandidate_aftercuts = len( tops )
 
         # Just run normal mem if there is no httCandidate surviving the cuts
         # Check if any candidates survived the cutoff criteria
@@ -125,9 +103,40 @@ class SubjetAnalyzer(FilterAnalyzer):
         # event.wquark_candidate_jets is a set instead of a list (not sure why)
         event.wquark_candidate_jets = list( event.wquark_candidate_jets )
 
+        # Check how many of which quarks are present
+        # ======================================
+
+        # Necessary to remove duplicates in GenWZQuark branch
+        # This step can be removed for V12 samples
+        self.CompareWZQuarks( event )
+
+        # Check if event contains the right number of quarks
+        # (Only used to do truth-level comparisons)
+        genquarks_cat1_present = True
+        genhiggs_present = True
+        if len(event.GenWZQuark)<2:
+            genquarks_cat1_present = False
+        if len(event.GenWZQuark)>2:
+            genquarks_cat1_present = False
+        if len(event.GenBQuarkFromTop)<2:
+            genquarks_cat1_present = False
+        if len(event.GenBQuarkFromTop)>2:
+            genquarks_cat1_present = False
+        if len(event.GenBQuarkFromH)<2:
+            genhiggs_present = False
+        if len(event.GenBQuarkFromH)>2:
+            genhiggs_present = False
+
+
         ########################################
         # Get the lists of particles: quarks, jets and subjets
         ########################################
+
+        # Create two new lists for selected_btagged_jets and wquark_candidate_jets:
+        event.selected_btagged_jets_sj = \
+            copy.deepcopy( event.selected_btagged_jets ) )
+        event.wquark_candidate_jets_sj = \
+            copy.deepcopy( event.wquark_candidate_jets ) )
 
         if genquarks_cat1_present:
             # Get the hadronic & leptonic b-quark and the two light quarks
@@ -157,7 +166,7 @@ class SubjetAnalyzer(FilterAnalyzer):
 
         # Get the list of btagged_jets
         tl_btagged_jets = []
-        for jet in event.selected_btagged_jets:   # (Used to be: event.btagged_jets)
+        for jet in event.selected_btagged_jets_sj:
             x = ROOT.TLorentzVector()
             x.SetPtEtaPhiM( jet.pt, jet.eta, jet.phi, jet.mass )
             setattr( x, 'origin_jet', jet )
@@ -165,7 +174,7 @@ class SubjetAnalyzer(FilterAnalyzer):
 
         # Get list of wquark_candidate_jets
         tl_wquark_candidate_jets = []
-        for jet in event.wquark_candidate_jets:
+        for jet in event.wquark_candidate_jets_sj:
             x = ROOT.TLorentzVector()
             x.SetPtEtaPhiM( jet.pt, jet.eta, jet.phi, jet.mass )
             setattr( x, 'origin_jet', jet )
@@ -412,9 +421,10 @@ class SubjetAnalyzer(FilterAnalyzer):
         print '=====================================\n'
         print 'Input jets:'
         self.Print_particle_lists(
-            ( event.selected_btagged_jets, 'Class', 'event.selected_btagged_jets'),
-            ( event.wquark_candidate_jets, 'Class',
-                'event.wquark_candidate_jets'),
+            ( event.selected_btagged_jets_sj, 'Class', 
+                'event.selected_btagged_jets_sj'),
+            ( event.wquark_candidate_jets_sj, 'Class',
+                'event.wquark_candidate_jets_sj'),
             )
         print '=====================================\n'
         """
@@ -429,30 +439,31 @@ class SubjetAnalyzer(FilterAnalyzer):
                 # Get the original ljet
                 orig_ljet = tl_subjet.ljet_match.origin_jet
                 # Remove it from the ljet list in the event
-                event.wquark_candidate_jets.pop(
-                    event.wquark_candidate_jets.index( orig_ljet ) )
+                event.wquark_candidate_jets_sj.pop(
+                    event.wquark_candidate_jets_sj.index( orig_ljet ) )
             if hasattr( tl_subjet, 'bjet_match' ):
                 # Get the original bjet
                 orig_bjet = tl_subjet.bjet_match.origin_jet
                 # Remove it from the bjet list in the event
-                event.selected_btagged_jets.pop(
-                    event.selected_btagged_jets.index( orig_bjet ) )
+                event.selected_btagged_jets_sj.pop(
+                    event.selected_btagged_jets_sj.index( orig_bjet ) )
 
             if tl_subjet.btagFlag == 1.0:
                 # Append the subjet to btagged_jets list in the event
-                event.selected_btagged_jets.append( tl_subjet )
+                event.selected_btagged_jets_sj.append( tl_subjet )
             elif tl_subjet.btagFlag == 0.0:
                 # Append the subjet to wquark_candidate_jets list in the event
-                event.wquark_candidate_jets.append( tl_subjet )
+                event.wquark_candidate_jets_sj.append( tl_subjet )
 
         """
         # Check up printing - the output jets
         print '=====================================\n'
         print 'Output jets:'
         self.Print_particle_lists(
-            ( event.selected_btagged_jets, 'Class', 'event.selected_btagged_jets'),
-            ( event.wquark_candidate_jets, 'Class',
-                'event.wquark_candidate_jets'),
+            ( event.selected_btagged_jets_sj, 'Class', 
+                'event.selected_btagged_jets_sj'),
+            ( event.wquark_candidate_jets_sj, 'Class',
+                'event.wquark_candidate_jets_sj'),
             )
         print '=====================================\n'
         """
@@ -463,34 +474,15 @@ class SubjetAnalyzer(FilterAnalyzer):
         # Requires work - very quick & dirty at the moment
         ########################################
 
-        if len( event.selected_btagged_jets ) > 4:
+        if len( event.selected_btagged_jets_sj ) > 4:
             # The last added element is the subjet - keep that one, and the next
             # 3 btagged_jets
-            event.selected_btagged_jets = \
-                event.selected_btagged_jets[-1:] + event.selected_btagged_jets[:3]
-        elif len( event.selected_btagged_jets ) < 4:
-            # Unpassable to MEM, needs precisely 4 btagged_jets
-            event.cat_btag = 'NOCAT'
-
-        if len( event.wquark_candidate_jets ) < 1:
-            # Unpassable to MEM, can currently only deal with 1 missing light jet
-            event.cat = 'NOCAT'
-
-        if len( event.selected_btagged_jets ) == 4:
-            event.cat_btag = 'H'
-
-
-        if len( event.selected_btagged_jets ) == 4 and \
-            ( event.cat_btag == 'NOCAT' or event.cat == 'NOCAT' ):
-
-            print 'Interesting event:'
-            print 'This event should pass; nr of btagged_jets = 4, but cat_btag = NOCAT or cat = NOCAT'
-
-            print '\nEvent suitability:'
-            print 'n bjets  = {0}'.format( len( event.selected_btagged_jets ) )
-            print 'n ljets  = {0}'.format( len( event.wquark_candidate_jets ) )
-            print 'cat_btag = {0}'.format( event.cat_btag )
-            print 'cat      = {0}'.format( event.cat )
+            event.selected_btagged_jets_sj = \
+                event.selected_btagged_jets_sj[-1:] + \
+                event.selected_btagged_jets_sj[:3]
+        
+        if len( event.selected_btagged_jets_sj ) >= 4:
+            event.PassedSubjetAnalyzer = True
 
 
         ########################################
@@ -505,8 +497,7 @@ class SubjetAnalyzer(FilterAnalyzer):
         setattr( event, 'Matching_event_type_number', event_type_number )
 
         # This tells the MEMAnalyzer to run
-        event.PassedSubjetAnalyzer = True
-        print 'In SubjetAnalyzer! event.PassedSubjetAnalyzer = {0}'.format(
+        print 'Exiting SubjetAnalyzer! event.PassedSubjetAnalyzer = {0}'.format(
             event.PassedSubjetAnalyzer )
 
 

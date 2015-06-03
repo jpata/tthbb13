@@ -29,6 +29,22 @@ jetType = NTupleObjectType("jetType", variables = [
     NTupleVariable("mcPhi", lambda x : x.mcPhi),
     NTupleVariable("mcM", lambda x : x.mcM),
 ])
+
+"""
+# Maybe implement later
+#Specifies what to save for objects in the subjet lists
+subjetType = NTupleObjectType("subjetType", variables = [
+    NTupleVariable("pt", lambda x : x.pt),
+    NTupleVariable("eta", lambda x : x.eta),
+    NTupleVariable("phi", lambda x : x.phi),
+    NTupleVariable("mass", lambda x : x.mass),
+    NTupleVariable("id", lambda x : x.id),
+    NTupleVariable("btagFlag", lambda x : x.btagFlag),
+    NTupleVariable("origin_subjet", lambda x : x.origin_subjet \
+        if hasattr(x,'origin_subjet') else 0, type=int),
+])
+"""
+
 #Specifies what to save for leptons
 leptonType = NTupleObjectType("leptonType", variables = [
     NTupleVariable("pt", lambda x : x.pt),
@@ -95,15 +111,14 @@ def getTreeProducer(conf):
 
             NTupleVariable(
                 "nhttCandidate",
-                lambda ev: ev.nhttCandidate \
-                    if hasattr(ev, 'nhttCandidate') else -1,
+                lambda ev: ev.nhttCandidate if hasattr(ev,'nhttCandidate') else -1,
                 help="Number of original httCandidates in event"
             ),
 
             NTupleVariable(
-                "nhttCandidate_passed",
-                lambda ev: ev.nhttCandidate_passed \
-                    if hasattr(ev, 'nhttCandidate_passed') else -1,
+                "nhttCandidate_aftercuts",
+                lambda ev: ev.nhttCandidate_aftercuts \
+                    if hasattr(ev,'nhttCandidate_aftercuts') else -1,
                 help="Number of httCandidates that passed the cut"
             ),
 
@@ -481,10 +496,9 @@ def getTreeProducer(conf):
             "l_quarks_w" : NTupleCollection("GenQFromW", quarkType, 5, help=""),
             "good_jets" : NTupleCollection("jets", jetType, 9, help="Selected jets"),
             "good_leptons" : NTupleCollection("leps", leptonType, 2, help="Selected leptons"),
+
             "mem_results_tth" : NTupleCollection("mem_tth", memType, len(conf.mem["methodsToRun"]), help="MEM tth"),
             "mem_results_ttbb" : NTupleCollection("mem_ttbb", memType, len(conf.mem["methodsToRun"]), help="MEM ttbb"),
-            "mem_results_sj_tth" : NTupleCollection("mem_tth_sj", memType, len(conf.mem["methodsToRun"]), help="MEM tth"),
-            "mem_results_sj_ttbb" : NTupleCollection("mem_ttbb_sj", memType, len(conf.mem["methodsToRun"]), help="MEM ttbb"),
         }
     )
     return treeProducer
