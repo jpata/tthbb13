@@ -98,7 +98,7 @@ class MEMConfig:
         The distributions are 3D in (pt, |eta|, CSV).
         """
         #btag_map = CmapDistributionTypeTH1F()
-        
+
         for x,y in [
             ("b", MEM.DistributionType.csv_b),
             ("c", MEM.DistributionType.csv_c),
@@ -205,6 +205,8 @@ class MEAnalyzer(FilterAnalyzer):
             "SL_1w2h1t_h" :  MEMConfig(),
             "SL_1w2h1t_l" :  MEMConfig(),
 
+            "SL_2w2h2t_wtag": MEMConfig(),
+
             "SL_2qW": MEMConfig(),
             "SL_2qW_notag": MEMConfig(),
             "SL_2qW_gen": MEMConfig(),
@@ -293,8 +295,8 @@ class MEAnalyzer(FilterAnalyzer):
             ]:
             self.configs[k].mem_assumptions.add("sl")
 
-        for x in ["SL_2w2h2t", 
-                  "SL_2w2h1t_h", "SL_2w2h1t_l", 
+        for x in ["SL_2w2h2t", "SL_2w2h2t_wtag",
+                  "SL_2w2h1t_h", "SL_2w2h1t_l",
                   "SL_1w2h1t_h", "SL_1w2h1t_l"]:
             self.configs[x].do_calculate = lambda y, c: (
                 len(y.good_leptons) == 1 and
@@ -303,6 +305,9 @@ class MEAnalyzer(FilterAnalyzer):
                 y.cat_btag == "H"
             )
             self.configs[x].mem_assumptions.add("sl")
+
+        #use only the best w-tagged pair for w-quark candidates
+        self.configs["SL_2w2h2t_wtag"].l_quark_candidates = lambda event: event.wquark_candidate_jet_pairs[0]
 
         for x in ["SL_1w2h2t", "SL_0w2h2t"]:
             self.configs[x].do_calculate = lambda y, c: (
@@ -318,12 +323,13 @@ class MEAnalyzer(FilterAnalyzer):
                   "SL_1w2h1t_h", "SL_1w2h1t_l"]:
             self.configs[k].cfg.defaultCfg(1.5)
 
-        for k in ["SL_2w2h2t", 
-                  "SL_1w2h2t", "SL_2w2h1t_h", "SL_2w2h1t_l", 
+        for k in ["SL_2w2h2t","SL_2w2h2t_wtag",
+                  "SL_1w2h2t", "SL_2w2h1t_h", "SL_2w2h1t_l",
                   "SL_0w2h2t", "SL_1w2h1t_h", "SL_1w2h1t_l"]:
             self.configs[k].cfg.do_prefit = 1
 
         self.configs["SL_2w2h2t"].mem_assumptions.add("2w2h2t")
+        self.configs["SL_2w2h2t_wtag"].mem_assumptions.add("2w2h2t")
         self.configs["SL_1w2h2t"].mem_assumptions.add("1w2h2t")
         self.configs["SL_2w2h1t_l"].mem_assumptions.add("2w2h1t_l")
         self.configs["SL_0w2h2t"].mem_assumptions.add("0w2h2t")
