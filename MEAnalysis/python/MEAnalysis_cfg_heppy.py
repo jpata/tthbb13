@@ -123,18 +123,28 @@ class Conf:
             "selection": lambda event: True,
 
             "methodsToRun": [
-                "SL_2qW",
-                "SL_1qW",
-                "DL",
+
+                # ALL 
+                "SL_2w2h2t"   , #0
+                "SL_1w2h2t"   , #1
+                "SL_2w2h1t_h" , #2
+                "SL_2w2h1t_l" , #3
+                "SL_0w2h2t"   , #4
+                "SL_1w2h1t_h" , #5
+                "SL_1w2h1t_l" , #6                              
+
+                #"SL_2qW",
+                #"SL_1qW",
+                #"DL",
 
                 #"SL_2qW_gen",
                 #"SL_1qW_gen",
                 #"DL_gen",
 
-                "SL_0qW",
-                "SL_1bT",
-                "SL_1bTbar",
-                "SL_1bH",
+                #"SL_0qW",
+                #"SL_1bT",
+                #"SL_1bTbar",
+                #"SL_1bH",
                 #"SL_2qW_notag",
 
                 #"SL_2qW_Sudakov",

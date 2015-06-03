@@ -86,7 +86,7 @@ class MEMConfig:
         self.l_quark_candidates = lambda event: event.wquark_candidate_jets
         self.lepton_candidates = lambda event: event.good_leptons
         self.met_candidates = lambda event: event.met
-        self.transfer_function_method = MEM.TFMethod.Builtin
+        self.transfer_function_method = MEM.TFMethod.External
 
         self.do_calculate = lambda event, config: False
         self.mem_assumptions = set([])
@@ -189,12 +189,21 @@ class MEAnalyzer(FilterAnalyzer):
         super(MEAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
 
         self.configs = {
+
             #"SL_2qW": MEM.MEMConfig(),
             #"SL_2qW_gen": MEM.MEMConfig(),
             #"SL_1qW": MEM.MEMConfig(),
             #"SL_1qW_gen": MEM.MEMConfig(),
             #"DL": MEM.MEMConfig(),
             #"DL_gen": MEM.MEMConfig(),
+
+            "SL_2w2h2t"   :  MEMConfig(),
+            "SL_1w2h2t"   :  MEMConfig(),
+            "SL_2w2h1t_h" :  MEMConfig(),
+            "SL_2w2h1t_l" :  MEMConfig(),
+            "SL_0w2h2t"   :  MEMConfig(),
+            "SL_1w2h1t_h" :  MEMConfig(),
+            "SL_1w2h1t_l" :  MEMConfig(),
 
             "SL_2qW": MEMConfig(),
             "SL_2qW_notag": MEMConfig(),
@@ -283,6 +292,45 @@ class MEAnalyzer(FilterAnalyzer):
                 "SL_0qW", "SL_1bT", "SL_1bTbar", "SL_1bH"
             ]:
             self.configs[k].mem_assumptions.add("sl")
+
+        for x in ["SL_2w2h2t", 
+                  "SL_2w2h1t_h", "SL_2w2h1t_l", 
+                  "SL_1w2h1t_h", "SL_1w2h1t_l"]:
+            self.configs[x].do_calculate = lambda y, c: (
+                len(y.good_leptons) == 1 and
+                len(c.b_quark_candidates(y)) >= 4 and
+                len(c.l_quark_candidates(y)) >= 2 and
+                y.cat_btag == "H"
+            )
+            self.configs[x].mem_assumptions.add("sl")
+
+        for x in ["SL_1w2h2t", "SL_0w2h2t"]:
+            self.configs[x].do_calculate = lambda y, c: (
+                len(y.good_leptons) == 1 and
+                len(c.b_quark_candidates(y)) >= 4 and
+                len(c.l_quark_candidates(y)) >= 1 and
+                y.cat_btag == "H"
+            )
+            self.configs[x].mem_assumptions.add("sl")
+
+
+        for k in ["SL_2w2h1t_h", "SL_2w2h1t_l",
+                  "SL_1w2h1t_h", "SL_1w2h1t_l"]:
+            self.configs[k].cfg.defaultCfg(1.5)
+
+        for k in ["SL_2w2h2t", 
+                  "SL_1w2h2t", "SL_2w2h1t_h", "SL_2w2h1t_l", 
+                  "SL_0w2h2t", "SL_1w2h1t_h", "SL_1w2h1t_l"]:
+            self.configs[k].cfg.do_prefit = 1
+
+        self.configs["SL_2w2h2t"].mem_assumptions.add("2w2h2t")
+        self.configs["SL_1w2h2t"].mem_assumptions.add("1w2h2t")
+        self.configs["SL_2w2h1t_l"].mem_assumptions.add("2w2h1t_l")
+        self.configs["SL_0w2h2t"].mem_assumptions.add("0w2h2t")
+        self.configs["SL_1w2h1t_h"].mem_assumptions.add("1w2h1t_h")
+        self.configs["SL_1w2h1t_l"].mem_assumptions.add("1w2h1t_l")
+
+
         permutations = CvectorPermutations()
         #self.permutations.push_back(MEM.Permutations.BTagged)
         #self.permutations.push_back(MEM.Permutations.QUntagged)
@@ -337,7 +385,8 @@ class MEAnalyzer(FilterAnalyzer):
         #self.integrator.set_permutation_strategy(self.permutations)
 
         #Create an empty vector for the integration variables
-        self.vars_to_integrate = CvectorPSVar()
+        self.vars_to_integrate   = CvectorPSVar()
+        self.vars_to_marginalize = CvectorPSVar()
 
     def add_obj(self, objtype, **kwargs):
         """
@@ -372,6 +421,7 @@ class MEAnalyzer(FilterAnalyzer):
     def configure_mem(self, event, mem_cfg):
         self.integrator.set_cfg(mem_cfg.cfg)
         self.vars_to_integrate.clear()
+        self.vars_to_marginalize.clear()
         self.integrator.next_event()
         mem_cfg.enabled = True
 
@@ -393,6 +443,39 @@ class MEAnalyzer(FilterAnalyzer):
         if "1bH" in mem_cfg.mem_assumptions:
             self.vars_to_integrate.push_back(MEM.PSVar.cos_bbar)
             self.vars_to_integrate.push_back(MEM.PSVar.phi_bbar)
+
+        if "1w2h2t" in mem_cfg.mem_assumptions:
+            self.vars_to_marginalize.push_back(MEM.PSVar.cos_qbar1)
+            self.vars_to_marginalize.push_back(MEM.PSVar.phi_qbar1)
+
+        if "2w2h1t_h" in mem_cfg.mem_assumptions:
+            self.vars_to_marginalize.push_back(MEM.PSVar.cos_b1)
+            self.vars_to_marginalize.push_back(MEM.PSVar.phi_b1)
+
+        if "2w2h1t_l" in mem_cfg.mem_assumptions:
+            self.vars_to_marginalize.push_back(MEM.PSVar.cos_b2)
+            self.vars_to_marginalize.push_back(MEM.PSVar.phi_b2)
+
+        if "0w2h2t" in mem_cfg.mem_assumptions:
+            self.vars_to_marginalize.push_back(MEM.PSVar.cos_q1)
+            self.vars_to_marginalize.push_back(MEM.PSVar.phi_q1)
+            self.vars_to_marginalize.push_back(MEM.PSVar.cos_qbar1)
+            self.vars_to_marginalize.push_back(MEM.PSVar.phi_qbar1)
+
+        if "1w2h1t_h" in mem_cfg.mem_assumptions:
+            self.vars_to_marginalize.push_back(MEM.PSVar.cos_qbar1)
+            self.vars_to_marginalize.push_back(MEM.PSVar.phi_qbar1)
+            self.vars_to_marginalize.push_back(MEM.PSVar.cos_b1)
+            self.vars_to_marginalize.push_back(MEM.PSVar.phi_b1)
+
+        if "1w2h1t_l" in mem_cfg.mem_assumptions:
+            self.vars_to_marginalize.push_back(MEM.PSVar.cos_qbar1)
+            self.vars_to_marginalize.push_back(MEM.PSVar.phi_qbar1)
+            self.vars_to_marginalize.push_back(MEM.PSVar.cos_b2)
+            self.vars_to_marginalize.push_back(MEM.PSVar.phi_b2)
+
+
+
         #Add heavy flavour jets that are assumed to come from top/higgs decay
         #Only take up to 4 candidates, otherwise runtimes become too great
         for jet in list(mem_cfg.b_quark_candidates(event))[:4]:
@@ -443,6 +526,7 @@ class MEAnalyzer(FilterAnalyzer):
 
         #Clean up any old MEM state
         self.vars_to_integrate.clear()
+        self.vars_to_marginalize.clear()
         self.integrator.next_event()
 
         #Initialize members for tree filler
@@ -483,7 +567,8 @@ class MEAnalyzer(FilterAnalyzer):
                     r = self.integrator.run(
                         fstate,
                         hypo,
-                        self.vars_to_integrate
+                        self.vars_to_integrate,
+                        self.vars_to_marginalize
                     )
                     print "MEM done", ("hypo", hypo), ("conf", confname)
 
