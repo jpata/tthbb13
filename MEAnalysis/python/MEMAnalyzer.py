@@ -385,7 +385,8 @@ class MEAnalyzer(FilterAnalyzer):
         #self.integrator.set_permutation_strategy(self.permutations)
 
         #Create an empty vector for the integration variables
-        self.vars_to_integrate = CvectorPSVar()
+        self.vars_to_integrate   = CvectorPSVar()
+        self.vars_to_marginalize = CvectorPSVar()
 
     def add_obj(self, objtype, **kwargs):
         """
@@ -420,6 +421,7 @@ class MEAnalyzer(FilterAnalyzer):
     def configure_mem(self, event, mem_cfg):
         self.integrator.set_cfg(mem_cfg.cfg)
         self.vars_to_integrate.clear()
+        self.vars_to_marginalize.clear()
         self.integrator.next_event()
         mem_cfg.enabled = True
 
@@ -443,34 +445,34 @@ class MEAnalyzer(FilterAnalyzer):
             self.vars_to_integrate.push_back(MEM.PSVar.phi_bbar)
 
         if "1w2h2t" in mem_cfg.mem_assumptions:
-            self.vars_to_integrate.push_back(MEM.PSVar.cos_qbar1)
-            self.vars_to_integrate.push_back(MEM.PSVar.phi_qbar1)
+            self.vars_to_marginalize.push_back(MEM.PSVar.cos_qbar1)
+            self.vars_to_marginalize.push_back(MEM.PSVar.phi_qbar1)
 
         if "2w2h1t_h" in mem_cfg.mem_assumptions:
-            self.vars_to_integrate.push_back(MEM.PSVar.cos_b1)
-            self.vars_to_integrate.push_back(MEM.PSVar.phi_b1)
+            self.vars_to_marginalize.push_back(MEM.PSVar.cos_b1)
+            self.vars_to_marginalize.push_back(MEM.PSVar.phi_b1)
 
         if "2w2h1t_l" in mem_cfg.mem_assumptions:
-            self.vars_to_integrate.push_back(MEM.PSVar.cos_b2)
-            self.vars_to_integrate.push_back(MEM.PSVar.phi_b2)
+            self.vars_to_marginalize.push_back(MEM.PSVar.cos_b2)
+            self.vars_to_marginalize.push_back(MEM.PSVar.phi_b2)
 
         if "0w2h2t" in mem_cfg.mem_assumptions:
-            self.vars_to_integrate.push_back(MEM.PSVar.cos_q1)
-            self.vars_to_integrate.push_back(MEM.PSVar.phi_q1)
-            self.vars_to_integrate.push_back(MEM.PSVar.cos_qbar1)
-            self.vars_to_integrate.push_back(MEM.PSVar.phi_qbar1)
+            self.vars_to_marginalize.push_back(MEM.PSVar.cos_q1)
+            self.vars_to_marginalize.push_back(MEM.PSVar.phi_q1)
+            self.vars_to_marginalize.push_back(MEM.PSVar.cos_qbar1)
+            self.vars_to_marginalize.push_back(MEM.PSVar.phi_qbar1)
 
         if "1w2h1t_h" in mem_cfg.mem_assumptions:
-            self.vars_to_integrate.push_back(MEM.PSVar.cos_qbar1)
-            self.vars_to_integrate.push_back(MEM.PSVar.phi_qbar1)
-            self.vars_to_integrate.push_back(MEM.PSVar.cos_b1)
-            self.vars_to_integrate.push_back(MEM.PSVar.phi_b1)
+            self.vars_to_marginalize.push_back(MEM.PSVar.cos_qbar1)
+            self.vars_to_marginalize.push_back(MEM.PSVar.phi_qbar1)
+            self.vars_to_marginalize.push_back(MEM.PSVar.cos_b1)
+            self.vars_to_marginalize.push_back(MEM.PSVar.phi_b1)
 
         if "1w2h1t_l" in mem_cfg.mem_assumptions:
-            self.vars_to_integrate.push_back(MEM.PSVar.cos_qbar1)
-            self.vars_to_integrate.push_back(MEM.PSVar.phi_qbar1)
-            self.vars_to_integrate.push_back(MEM.PSVar.cos_b2)
-            self.vars_to_integrate.push_back(MEM.PSVar.phi_b2)
+            self.vars_to_marginalize.push_back(MEM.PSVar.cos_qbar1)
+            self.vars_to_marginalize.push_back(MEM.PSVar.phi_qbar1)
+            self.vars_to_marginalize.push_back(MEM.PSVar.cos_b2)
+            self.vars_to_marginalize.push_back(MEM.PSVar.phi_b2)
 
 
 
@@ -524,6 +526,7 @@ class MEAnalyzer(FilterAnalyzer):
 
         #Clean up any old MEM state
         self.vars_to_integrate.clear()
+        self.vars_to_marginalize.clear()
         self.integrator.next_event()
 
         #Initialize members for tree filler
@@ -564,8 +567,8 @@ class MEAnalyzer(FilterAnalyzer):
                     r = self.integrator.run(
                         fstate,
                         hypo,
-                        CvectorPSVar(),
                         self.vars_to_integrate
+                        self.vars_to_marginalize
                     )
                     print "MEM done", ("hypo", hypo), ("conf", confname)
 
