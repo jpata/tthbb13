@@ -2,8 +2,6 @@ from TTH.MEAnalysis.VHbbTree import lvec
 import ROOT
 import copy
 import numpy as np
-ROOT.gSystem.Load("libCintex")
-ROOT.gROOT.ProcessLine('ROOT::Cintex::Cintex::Enable();')
 ROOT.gSystem.Load("libTTHMEAnalysis")
 
 from TTH.MEAnalysis.Analyzer import FilterAnalyzer

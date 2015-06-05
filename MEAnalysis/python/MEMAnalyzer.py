@@ -1,12 +1,6 @@
 from TTH.MEAnalysis.VHbbTree import lvec
 import ROOT
 import copy
-#Load the MEM integrator libraries
-# ROOT.gSystem.Load("libFWCoreFWLite")
-# ROOT.gROOT.ProcessLine('AutoLibraryLoader::enable();')
-# ROOT.gSystem.Load("libFWCoreFWLite")
-ROOT.gSystem.Load("libCintex")
-ROOT.gROOT.ProcessLine('ROOT::Cintex::Cintex::Enable();')
 ROOT.gSystem.Load("libTTHMEIntegratorStandalone")
 
 from ROOT import MEM

@@ -1,5 +1,4 @@
 <use   name="root"/>
-<use   name="rootcintex"/>
 <use   name="rootgraphics"/>
 <use   name="classlib"/>
 <use   name="boost"/>

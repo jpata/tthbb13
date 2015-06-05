@@ -14,12 +14,6 @@
     <use name="FWCore/ParameterSet"/>
     <use name="PhysicsTools/FWLite"/>
     <use name="root"/>
-    <use name="rootcintex"/>
-    <use name="rootgraphics"/>
-    <use name="roofit"/>
-    <use name="rootminuit"/>
-    <use name="rootminuit2"/>
-    <use name="roottmva"/>
     <use name="classlib"/>
     <use name="boost"/>
 </bin>
