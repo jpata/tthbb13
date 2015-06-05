@@ -415,6 +415,18 @@ def getTreeProducer(conf):
                 "momentum_eig2", lambda ev: ev.momentum_eig2,
                 help=""
             ),
+            NTupleVariable(
+                "mass_drpair_btag", lambda ev: ev.mass_drpair_btag,
+                help=""
+            ),
+            NTupleVariable(
+                "eta_drpair_btag", lambda ev: ev.eta_drpair_btag,
+                help=""
+            ),
+            NTupleVariable(
+                "pt_drpair_btag", lambda ev: ev.pt_drpair_btag,
+                help=""
+            ),
         ],
         #FIXME: fill these from the VHbb ntuples
         globalObjects = {},
