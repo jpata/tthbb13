@@ -26,16 +26,31 @@ class BTagLRAnalyzer(FilterAnalyzer):
 
         self.csv_pdfs = {
         }
+        print "Need to Fix the BTagLRAnalyzer to return normalised PDFs"
         for x in ["b", "c", "l"]:
             for b in ["Bin0", "Bin1"]:
                 self.csv_pdfs[(x, b)] = self.cplots.Get(
                     "csv_{0}_{1}__csv_rec".format(x, b)
                 )
-                self.csv_pdfs[(x, b)].Scale(1.0 / self.csv_pdfs[(x, b)].Integral())
+                #self.csv_pdfs[(x, b)].Scale(1.0 / self.csv_pdfs[(x, b)].Integral())
             self.csv_pdfs[(x, "pt_eta")] = self.cplots.Get(
                 "csv_{0}_pt_eta".format(x)
             )
-            self.csv_pdfs[(x, "pt_eta")].Scale(1.0 / self.csv_pdfs[(x, "pt_eta")].Integral())
+            #self.csv_pdfs[(x, "pt_eta")].Scale(1.0 / self.csv_pdfs[(x, "pt_eta")].Integral())
+            for i in range(1,  self.csv_pdfs[(x, "pt_eta")].GetNbinsX()+2 ):
+                for j in range(1,  self.csv_pdfs[(x, "pt_eta")].GetNbinsY()+2 ):
+                    h = self.csv_pdfs[(x, "pt_eta")].ProjectionZ("_pz", i,i, j,j)
+                    #print h.GetEntries()
+                    norm = h.Integral()
+                    if norm == 0:
+                        print "Bin ", i ,", " , j, " empty"
+                        continue
+                    for k in range(1,  self.csv_pdfs[(x, "pt_eta")].GetNbinsZ()+2 ):
+                        tot  = self.csv_pdfs[(x, "pt_eta")].GetBinContent(i,j,k)
+                        self.csv_pdfs[(x, "pt_eta")].SetBinContent(i,j,k, tot/norm )
+                    h2 = self.csv_pdfs[(x, "pt_eta")].ProjectionZ("_pz", i,i, j,j)
+                    print "After rescaling: ", h2.Integral()
+
         self.conf.BTagLRAnalyzer = self
 
     def get_pdf_prob(self, flavour, pt, eta, csv, kind):
