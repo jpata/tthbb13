@@ -125,12 +125,16 @@ class Conf:
             "selection": lambda event: True,
 
             "methodsToRun": [
-                "SL_2qW",
-                "SL_1qW",
-                #"DL",
 
+                "SL_2qW",
                 "SL_2qW_sj",
+                "SL_2qW_sj_perm",
+
+                "SL_1qW",
                 "SL_1qW_sj",
+                "SL_1qW_sj_perm",
+
+                #"DL",
 
                 #"SL_2qW_gen",
                 #"SL_1qW_gen",
