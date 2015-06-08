@@ -134,9 +134,13 @@ class SubjetAnalyzer(FilterAnalyzer):
 
         # Create two new lists for selected_btagged_jets and wquark_candidate_jets:
         event.selected_btagged_jets_sj = \
-            copy.deepcopy( event.selected_btagged_jets ) )
+            copy.deepcopy( event.selected_btagged_jets )
         event.wquark_candidate_jets_sj = \
-            copy.deepcopy( event.wquark_candidate_jets ) )
+            copy.deepcopy( event.wquark_candidate_jets )
+
+        # Set 'PDGID' for all jets to 0:
+        for jet in event.selected_btagged_jets_sj: jet.PDGID = 0.0
+        for jet in event.wquark_candidate_jets_sj: jet.PDGID = 0.0
 
         if genquarks_cat1_present:
             # Get the hadronic & leptonic b-quark and the two light quarks
@@ -218,6 +222,7 @@ class SubjetAnalyzer(FilterAnalyzer):
 
             # Quark matching is only done to compare events to truth level.
             # Events are not selected based on successful quark matching.
+            # This entire part can be commented out if so desired.
 
             # Matching quarks with subjets
 
@@ -379,15 +384,9 @@ class SubjetAnalyzer(FilterAnalyzer):
                 else:                           setattr( tl, 'btagFlag', 0.0 )
 
             # Set appropiate ETN for easy accessing later
-            if Match_subjet_bjet==2 and Match_subjet_ljet==0:
-                NOM = 1
-                ETN = 9
-            if Match_subjet_bjet==2 and Match_subjet_ljet==1:
-                NOM = 1
-                ETN = 10
-            if Match_subjet_bjet==3 and Match_subjet_ljet==0:
-                NOM = 2
-                ETN = 11
+            if Match_subjet_bjet==2 and Match_subjet_ljet==0: NOM = 1; ETN = 9
+            if Match_subjet_bjet==2 and Match_subjet_ljet==1: NOM = 1; ETN = 10
+            if Match_subjet_bjet==3 and Match_subjet_ljet==0: NOM = 2; ETN = 11
             ( nr_of_mismatches, strategy, event_type_number ) = ( NOM, 5, ETN )
 
         else:
@@ -395,6 +394,11 @@ class SubjetAnalyzer(FilterAnalyzer):
             print 'subjet-b matches: {0}, subjet-l matches = {1}'.format(
                 Match_subjet_bjet, Match_subjet_ljet )
             return 0
+
+        # Set 'PDGID' to 1 for light, and to 5 for b
+        for subjet in tl_subjets:
+            if subjet.btagFlag == 1.0: setattr( subjet, 'PDGID', 5.0 )
+            if subjet.btagFlag == 0.0: setattr( subjet, 'PDGID', 1.0 )
 
         """
         # Check up printing - the httCandidate
