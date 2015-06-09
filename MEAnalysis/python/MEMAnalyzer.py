@@ -208,6 +208,11 @@ class MEAnalyzer(FilterAnalyzer):
             "SL_1w2h1t_h" :  MEMConfig(),
             "SL_1w2h1t_l" :  MEMConfig(),
 
+            "SL_2w2h2t_btag"   :  MEMConfig(),
+            "SL_0w2h2t_btag"   :  MEMConfig(),
+
+            "SL_0w2h2t_low_btag"   :  MEMConfig(),
+
             "SL_2w2h2t_wtag": MEMConfig(),
 
             "SL_2qW": MEMConfig(),
@@ -298,7 +303,7 @@ class MEAnalyzer(FilterAnalyzer):
             ]:
             self.configs[k].mem_assumptions.add("sl")
 
-        for x in ["SL_2w2h2t", "SL_2w2h2t_wtag",
+        for x in ["SL_2w2h2t","SL_2w2h2t_btag",
                   "SL_2w2h1t_h", "SL_2w2h1t_l",
                   "SL_1w2h1t_h", "SL_1w2h1t_l"]:
             self.configs[x].do_calculate = lambda y, c: (
@@ -309,10 +314,18 @@ class MEAnalyzer(FilterAnalyzer):
             )
             self.configs[x].mem_assumptions.add("sl")
 
-        #use only the best w-tagged pair for w-quark candidates
-        self.configs["SL_2w2h2t_wtag"].l_quark_candidates = lambda event: event.wquark_candidate_jet_pairs[0]
+        self.configs["SL_2w2h2t_wtag"].l_quark_candidates = lambda event: event.wquark_candidate_jet_pairs[0] if len( event.wquark_candidate_jet_pairs )>0 else []
+        for x in ["SL_2w2h2t_wtag"]:
+            self.configs[x].do_calculate = lambda y, c: (
+                len(y.good_leptons) == 1 and
+                len(c.b_quark_candidates(y)) >= 4 and
+                len(c.l_quark_candidates(y)) >= 2 and
+                y.cat_btag == "H"
+            )
+            self.configs[x].mem_assumptions.add("sl")
 
-        for x in ["SL_1w2h2t", "SL_0w2h2t"]:
+
+        for x in ["SL_1w2h2t", "SL_0w2h2t", "SL_0w2h2t_btag"]:
             self.configs[x].do_calculate = lambda y, c: (
                 len(y.good_leptons) == 1 and
                 len(c.b_quark_candidates(y)) >= 4 and
@@ -321,21 +334,44 @@ class MEAnalyzer(FilterAnalyzer):
             )
             self.configs[x].mem_assumptions.add("sl")
 
+        for x in ["SL_0w2h2t_low_btag"]:
+            self.configs[x].do_calculate = lambda y, c: (
+                len(y.good_leptons) == 1 and
+                len(c.b_quark_candidates(y)) == 3 and
+                (len(c.l_quark_candidates(y))+len(c.b_quark_candidates(y))) >= 4 #and
+                #y.cat_btag == "H"
+                )
+            self.configs[x].mem_assumptions.add("sl")
+
+
+        for x in ["SL_2w2h2t_btag", "SL_0w2h2t_btag", "SL_0w2h2t_low_btag"]:
+            strat = CvectorPermutations()
+            strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
+            #strat.push_back(MEM.Permutations.QUntagged)
+            #strat.push_back(MEM.Permutations.BTagged)
+            strat.push_back(MEM.Permutations.FirstRankedByBTAG)
+            #strat.push_back(MEM.Permutations.FirstTwoRankedByBTAG)
+            self.configs[x].cfg.perm_pruning = strat
+            #    self.configs[x].cfg.b_range_CL = 0.9985
+            #    self.configs[x].cfg.j_range_CL = 0.9985
 
         for k in ["SL_2w2h1t_h", "SL_2w2h1t_l",
                   "SL_1w2h1t_h", "SL_1w2h1t_l"]:
             self.configs[k].cfg.defaultCfg(1.5)
 
-        for k in ["SL_2w2h2t","SL_2w2h2t_wtag",
+        for k in ["SL_2w2h2t","SL_2w2h2t_wtag", "SL_2w2h2t_btag",
                   "SL_1w2h2t", "SL_2w2h1t_h", "SL_2w2h1t_l",
-                  "SL_0w2h2t", "SL_1w2h1t_h", "SL_1w2h1t_l"]:
+                  "SL_0w2h2t", "SL_1w2h1t_h", "SL_1w2h1t_l", "SL_0w2h2t_btag", "SL_0w2h2t_low_btag"]:
             self.configs[k].cfg.do_prefit = 1
 
         self.configs["SL_2w2h2t"].mem_assumptions.add("2w2h2t")
+        self.configs["SL_2w2h2t_btag"].mem_assumptions.add("2w2h2t")
         self.configs["SL_2w2h2t_wtag"].mem_assumptions.add("2w2h2t")
         self.configs["SL_1w2h2t"].mem_assumptions.add("1w2h2t")
         self.configs["SL_2w2h1t_l"].mem_assumptions.add("2w2h1t_l")
         self.configs["SL_0w2h2t"].mem_assumptions.add("0w2h2t")
+        self.configs["SL_0w2h2t_btag"].mem_assumptions.add("0w2h2t")
+        self.configs["SL_0w2h2t_low_btag"].mem_assumptions.add("0w2h2t")
         self.configs["SL_1w2h1t_h"].mem_assumptions.add("1w2h1t_h")
         self.configs["SL_1w2h1t_l"].mem_assumptions.add("1w2h1t_l")
 
@@ -379,6 +415,7 @@ class MEAnalyzer(FilterAnalyzer):
         #../MEIntegratorStandalone/interface/Parameters.h:  enum DebugVerbosity { output=1, input=2, init=4, init_more=8, event=16, integration=32};
         self.integrator = MEM.Integrand(
             MEM.output,
+            #1+2+4, #+8, 
             self.configs["SL_2qW"].cfg
         )
 
@@ -491,13 +528,14 @@ class MEAnalyzer(FilterAnalyzer):
             self.add_obj(
                 MEM.ObjectType.Jet,
                 p4s=(jet.pt, jet.eta, jet.phi, jet.mass),
-                obs_dict={MEM.Observable.BTAG: jet.btagFlag},
+                obs_dict={MEM.Observable.BTAG: jet.btagFlag, MEM.Observable.CSV: jet.btagCSV},
+                #obs_dict={MEM.Observable.BTAG: jet.btagFlag},
                 tf_dict={
                     MEM.TFType.bReco: jet.tf_b, MEM.TFType.qReco: jet.tf_l,
                 }
             )
             if "meminput" in self.conf.general["verbosity"]:
-                print "memBQuark", jet.pt, jet.eta, jet.phi, jet.mass, jet.btagFlag, jet.tth_match_label, jet.tth_match_index
+                print "memLBQuark", jet.pt, jet.eta, jet.phi, jet.mass, ", Flag: ", jet.btagFlag, ", CSV: ", jet.btagCSV, ", Match: ", jet.tth_match_label, jet.tth_match_index
 
         #Add light jets that are assumed to come from hadronic W decay
         #Only take up to 4 candidates, otherwise runtimes become too great
@@ -505,13 +543,14 @@ class MEAnalyzer(FilterAnalyzer):
             self.add_obj(
                 MEM.ObjectType.Jet,
                 p4s=(jet.pt, jet.eta, jet.phi, jet.mass),
-                obs_dict={MEM.Observable.BTAG: jet.btagFlag},
+                obs_dict={MEM.Observable.BTAG: jet.btagFlag, MEM.Observable.CSV: jet.btagCSV},
+                #obs_dict={MEM.Observable.BTAG: jet.btagFlag},
                 tf_dict={
                     MEM.TFType.bReco: jet.tf_b, MEM.TFType.qReco: jet.tf_l,
                 }
             )
             if "meminput" in self.conf.general["verbosity"]:
-                print "memLQuark", jet.pt, jet.eta, jet.phi, jet.mass, jet.btagFlag, jet.tth_match_label, jet.tth_match_index
+                print "memLQuark", jet.pt, jet.eta, jet.phi, jet.mass, ", Flag: ", jet.btagFlag, ", CSV: ", jet.btagCSV, ", Match: ", jet.tth_match_label, jet.tth_match_index
         for lep in mem_cfg.lepton_candidates(event):
             self.add_obj(
                 MEM.ObjectType.Lepton,
