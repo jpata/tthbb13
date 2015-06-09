@@ -195,3 +195,23 @@ def draw_rocs(pairs, **kwargs):
         plt.errorbar(r[:, 0], r[:, 1], e[:, 0], e[:, 1], label=label)
 
     plt.legend(loc=2)
+
+def draw_shape(f, samples, hn, **kwargs):
+    rebin = kwargs.get("rebin", 1)
+
+    hs = []
+    for s in samples:
+        h = f.get(s[0] + hn).Clone()
+        h.Scale(1.0 / h.Integral())
+        h.rebin(rebin)
+        h.title = s[1]
+        hs += [h]
+
+    coloriter = iter(plt.cm.jet(np.linspace(0,1,len(hs))))
+
+    for h in hs:
+        h.color = next(coloriter)
+        errorbar(h)
+    plt.legend()
+    for h in hs:
+        hist(h, lw=1, ls="-")
