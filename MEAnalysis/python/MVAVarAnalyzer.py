@@ -48,15 +48,23 @@ class MVAVarAnalyzer(FilterAnalyzer):
                     continue
                 l1 = lvec(j1)
                 l2 = lvec(j2)
-                drs += [l1.DeltaR(l2)]
+                drs += [(l1.DeltaR(l2), l1, l2)]
+        drs = sorted(drs, key=lambda x: x[0])
         if len(drs)>0:
-            event.min_dr_btag = np.min(drs)
-            event.mean_dr_btag = np.mean(drs, -1)
-            event.std_dr_btag = np.std(drs)
+            lv = drs[0][1] + drs[0][2]
+            event.mass_drpair_btag = lv.M()
+            event.eta_drpair_btag = abs(lv.Eta())
+            event.pt_drpair_btag = lv.Pt()
+            event.min_dr_btag = drs[0][0]
+            event.mean_dr_btag = np.mean([dr[0] for dr in drs], -1)
+            event.std_dr_btag = np.std([dr[0] for dr in drs], -1)
         else:
             event.min_dr_btag = -1.0
             event.mean_dr_btag = -1.0
             event.std_dr_btag = -1.0
+            event.mass_drpair_btag = -1.0
+            event.eta_drpair_btag = -99
+            event.pt_drpair_btag = -1.0
 
         for i in range(min(4, len(event.selected_btagged_jets_high))):
             setattr(event, "jet_btag_{0}".format(i), event.selected_btagged_jets_high[i])
