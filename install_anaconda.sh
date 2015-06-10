@@ -14,6 +14,8 @@ source setenv.sh
 #Install library for tables
 pip install tabulate
 
+pip install --upgrade numpy
+
 #upgrade machine learning
 pip install --upgrade scikit-learn
 
