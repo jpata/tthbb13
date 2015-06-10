@@ -553,6 +553,27 @@ class SubjetAnalyzer(FilterAnalyzer):
             event.PassedSubjetAnalyzer )
 
 
+        # TODO: Implement old cats for modified jet lists
+        """
+        if event.is_sl:
+
+            #at least 6 jets, if 6, Wtag in [60,100], if more Wtag in [72,94]
+            if ((len(event.good_jets) == 6 and event.Wmass >= 60 and event.Wmass < 100) or
+               (len(event.good_jets) > 6 and event.Wmass >= 72 and event.Wmass < 94)):
+               cat = "cat1"
+               #W-tagger fills wquark_candidate_jets
+            #at least 6 jets, no W-tag
+            elif len(event.good_jets) >= 6:
+                cat = "cat2"
+            #one W daughter missing
+            elif len(event.good_jets) == 5:
+                event.wquark_candidate_jets = event.buntagged_jets
+                cat = "cat3"
+        elif event.is_dl and len(event.good_jets)>=4:
+            event.wquark_candidate_jets = []
+            cat = "cat6"
+        """
+
 
     ########################################
     # Functions
