@@ -72,7 +72,9 @@ memType = NTupleObjectType("memType", variables = [
     NTupleVariable("efficiency", lambda x : x.efficiency),
     NTupleVariable("nperm", lambda x : x.num_perm, type=int),
     NTupleVariable("prefit_code", lambda x : x.prefit_code),
-    #NTupleVariable("btag_weights", lambda x : x.btag_weights),
+    NTupleVariable("btag_weight_bb", lambda x : x.btag_weights[0]),
+    NTupleVariable("btag_weight_cc", lambda x : x.btag_weights[1]),
+    NTupleVariable("btag_weight_jj", lambda x : x.btag_weights[2]),
 ])
 
 quarkType = NTupleObjectType("quarkType", variables = [
