@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+
+#Need to enable ROOT batch mode to prevent it from importing libXpm, which may cause a crash
+import ROOT
+ROOT.gROOT.SetBatch(True)
+
 import os
 #pickle and transfer function classes to load transfer functions
 import cPickle as pickle
