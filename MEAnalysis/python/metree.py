@@ -73,6 +73,10 @@ memType = NTupleObjectType("memType", variables = [
     NTupleVariable("nperm", lambda x : x.num_perm, type=int),
 ])
 
+FoxWolframType = NTupleObjectType("FoxWolframType", variables = [
+    NTupleVariable("v", lambda x : x),
+])
+
 quarkType = NTupleObjectType("quarkType", variables = [
     NTupleVariable("pt", lambda x : x.pt),
     NTupleVariable("eta", lambda x : x.eta),
@@ -446,6 +450,10 @@ def getTreeProducer(conf):
             "good_leptons" : NTupleCollection("leps", leptonType, 2, help="Selected leptons"),
             "mem_results_tth" : NTupleCollection("mem_tth", memType, len(conf.mem["methodsToRun"]), help="MEM tth results array, element per config.methodsToRun"),
             "mem_results_ttbb" : NTupleCollection("mem_ttbb", memType, len(conf.mem["methodsToRun"]), help="MEM ttbb results array, element per config.methodsToRun"),
+
+            "fw_h_alljets" : NTupleCollection("fw_aj", FoxWolframType, 7, help="Fox-Wolfram momenta calculated with all jets"),
+            "fw_h_btagjets" : NTupleCollection("fw_bj", FoxWolframType, 7, help="Fox-Wolfram momenta calculated with b-tagged jets"),
+            "fw_h_untagjets" : NTupleCollection("fw_uj", FoxWolframType, 7, help="Fox-Wolfram momenta calculated with untagged jets"),
         }
     )
     return treeProducer

@@ -138,9 +138,9 @@ class Conf:
                 #"SL_1qW",
                 "DL",
 
-                #"SL_2qW_gen",
-                #"SL_1qW_gen",
-                #"DL_gen",
+                "SL_2qW_gen",
+                "SL_1qW_gen",
+                "DL_gen",
 
                 #"SL_0qW",
                 #"SL_1bT",
