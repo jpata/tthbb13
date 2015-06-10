@@ -196,6 +196,10 @@ class MEAnalyzer(FilterAnalyzer):
             "SL_2qW_sj": MEMConfig(),
             "SL_1qW_sj": MEMConfig(),
             "SL_0qW_sj": MEMConfig(),
+            "SL_2qW_sj_perm": MEMConfig(),
+            "SL_1qW_sj_perm": MEMConfig(),
+            "SL_0qW_sj_perm": MEMConfig(),
+
 
         }
 
@@ -211,7 +215,8 @@ class MEAnalyzer(FilterAnalyzer):
 
         # ===============================================================
         # Subjet configuration
-        for k in ["SL_0qW_sj", "SL_1qW_sj", "SL_2qW_sj"]:
+        for k in ["SL_0qW_sj", "SL_1qW_sj", "SL_2qW_sj",
+                  "SL_0qW_sj_perm", "SL_1qW_sj_perm", "SL_2qW_sj_perm"]:
 
             # Select the custom jet lists
             self.configs[k].b_quark_candidates = lambda event: \
@@ -221,35 +226,32 @@ class MEAnalyzer(FilterAnalyzer):
 
             # Assume single leptonic
             self.configs[k].mem_assumptions.add("sl")
-            
-        self.configs["SL_0qW_sj"].do_calculate = lambda y, c: (
-            len(c.lepton_candidates(y)) == 1 and
-            len(c.b_quark_candidates(y)) >= 4 and
-            len(c.l_quark_candidates(y)) >= 1 and # Why not 0?
-            y.PassedSubjetAnalyzer == True
-            )
-        self.configs["SL_1qW_sj"].do_calculate = lambda y, c: (
-            len(c.lepton_candidates(y)) == 1 and
-            len(c.b_quark_candidates(y)) >= 4 and
-            len(c.l_quark_candidates(y)) >= 1 and
-            y.PassedSubjetAnalyzer == True
-            )
-        self.configs["SL_2qW_sj"].do_calculate = lambda y, c: (
-            len(c.lepton_candidates(y)) == 1 and
-            len(c.b_quark_candidates(y)) >= 4 and
-            len(c.l_quark_candidates(y)) >= 2 and
-            y.PassedSubjetAnalyzer == True
-            )
 
-        self.configs["SL_0qW_sj"].mem_assumptions.add("0qW")
-        self.configs["SL_1qW_sj"].mem_assumptions.add("1qW")
+        for k in ["SL_0qW_sj", "SL_0qW_sj_perm" ]:
+            self.configs[k].do_calculate = lambda y, c: (
+                len(c.lepton_candidates(y)) == 1 and
+                len(c.b_quark_candidates(y)) >= 4 and
+                len(c.l_quark_candidates(y)) >= 1 and # Why not 0?
+                y.PassedSubjetAnalyzer == True
+                )
+            self.configs[k].mem_assumptions.add("0qW")
+        for k in ["SL_1qW_sj", "SL_1qW_sj_perm" ]:
+            self.configs[k].do_calculate = lambda y, c: (
+                len(c.lepton_candidates(y)) == 1 and
+                len(c.b_quark_candidates(y)) >= 4 and
+                len(c.l_quark_candidates(y)) >= 1 and
+                y.PassedSubjetAnalyzer == True
+                )
+            self.configs[k].mem_assumptions.add("1qW")
+        for k in ["SL_2qW_sj", "SL_2qW_sj_perm" ]:
+            self.configs[k].do_calculate = lambda y, c: (
+                len(c.lepton_candidates(y)) == 1 and
+                len(c.b_quark_candidates(y)) >= 4 and
+                len(c.l_quark_candidates(y)) >= 2 and
+                y.PassedSubjetAnalyzer == True
+                )
 
-        # Copy the subjet configurations
-        self.configs["SL_0qW_sj_perm"] = copy.deepcopy( self.configs["SL_0qW_sj"] )
-        self.configs["SL_1qW_sj_perm"] = copy.deepcopy( self.configs["SL_1qW_sj"] )
-        self.configs["SL_2qW_sj_perm"] = copy.deepcopy( self.configs["SL_2qW_sj"] )
-
-        # Set permutations for the copies - done later
+        # Set permutations for the *_perm configurations: done later
 
         # ===============================================================
 
@@ -315,16 +317,15 @@ class MEAnalyzer(FilterAnalyzer):
             self.configs[k].mem_assumptions.add("sl")
 
         permutations = CvectorPermutations()
-
         #self.permutations.push_back(MEM.Permutations.BTagged)
         #self.permutations.push_back(MEM.Permutations.QUntagged)
         #self.permutations.push_back(MEM.Permutations.QQbarBBbarSymmetry)
         self.configs["SL_2qW_notag"].cfg.perm_pruning = permutations
 
-        # Set HEPTopTagged permutations for subjets
-        permutations.push_back(MEM.Permutations.HEPTopTagged)
+        sj_permutations = CvectorPermutations()
+        sj_permutations.push_back(MEM.Permutations.HEPTopTagged)
         for k in [ "SL_0qW_sj_perm", "SL_1qW_sj_perm", "SL_2qW_sj_perm" ]:
-            self.configs[k].cfg.perm_pruning = permutations
+            self.configs[k].cfg.perm_pruning = sj_permutations
 
         #Create additional configurations
         for strat, configure in [
@@ -435,7 +436,10 @@ class MEAnalyzer(FilterAnalyzer):
             self.add_obj(
                 MEM.ObjectType.Jet,
                 p4s=(jet.pt, jet.eta, jet.phi, jet.mass),
-                obs_dict={MEM.Observable.BTAG: jet.btagFlag},
+                obs_dict={ MEM.Observable.BTAG:  jet.btagFlag,
+                           MEM.Observable.PDGID: jet.PDGID \
+                               if hasattr(jet, 'PDGID') else 0
+                           },
                 tf_dict={
                     MEM.TFType.bReco: jet.tf_b, MEM.TFType.qReco: jet.tf_l,
                 }
@@ -455,7 +459,10 @@ class MEAnalyzer(FilterAnalyzer):
             self.add_obj(
                 MEM.ObjectType.Jet,
                 p4s=(jet.pt, jet.eta, jet.phi, jet.mass),
-                obs_dict={MEM.Observable.BTAG: jet.btagFlag},
+                obs_dict={ MEM.Observable.BTAG:  jet.btagFlag,
+                           MEM.Observable.PDGID: jet.PDGID \
+                               if hasattr(jet, 'PDGID') else 0
+                           },
                 tf_dict={
                     MEM.TFType.bReco: jet.tf_b, MEM.TFType.qReco: jet.tf_l,
                 }
@@ -483,6 +490,9 @@ class MEAnalyzer(FilterAnalyzer):
     def process(self, event):
         self.counters["processing"].inc("processed")
 
+        # Temporary: only do MEM if there is an httCandidate
+        #if not event.PassedSubjetAnalyzer: return 0
+
         #Clean up any old MEM state
         self.vars_to_integrate.clear()
         self.integrator.next_event()
@@ -490,6 +500,9 @@ class MEAnalyzer(FilterAnalyzer):
         #Initialize members for tree filler
         event.mem_results_tth = []
         event.mem_results_ttbb = []
+
+        # Temporary: don't execute MEM right now
+        # return True
 
         #jets = sorted(event.good_jets, key=lambda x: x.pt, reverse=True)
         leptons = event.good_leptons

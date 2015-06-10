@@ -110,6 +110,31 @@ def getTreeProducer(conf):
             # Used by Subjet Analyzer
 
             NTupleVariable(
+                "n_bjets",
+                lambda ev: ev.n_bjets if hasattr(ev,'n_bjets') else -1,
+                help="Number of selected bjets in event"
+            ),
+
+            NTupleVariable(
+                "n_ljets",
+                lambda ev: ev.n_ljets if hasattr(ev,'n_ljets') else -1,
+                help="Number of selected ljets in event"
+            ),
+
+            NTupleVariable(
+                "n_bjets_sj",
+                lambda ev: ev.n_bjets_sj if hasattr(ev,'n_bjets_sj') else -1,
+                help="Number of selected bjets in subjet-modified bjet list"
+            ),
+
+            NTupleVariable(
+                "n_ljets_sj",
+                lambda ev: ev.n_ljets_sj if hasattr(ev,'n_ljets_sj') else -1,
+                help="Number of selected ljets in subjet-modified ljet list"
+            ),
+
+
+            NTupleVariable(
                 "nhttCandidate",
                 lambda ev: ev.nhttCandidate if hasattr(ev,'nhttCandidate') else -1,
                 help="Number of original httCandidates in event"

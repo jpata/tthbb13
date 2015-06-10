@@ -46,6 +46,9 @@ class SubjetAnalyzer(FilterAnalyzer):
         setattr( event, 'selected_btagged_jets_sj', [] )
         setattr( event, 'wquark_candidate_jets_sj', [] )
 
+        # Save current number of bjets and ljets to root file
+        setattr( event, 'n_bjets', len( event.selected_btagged_jets ) )
+        setattr( event, 'n_ljets', len( event.wquark_candidate_jets ) )
 
         ########################################
         # Minimal event suitability:
@@ -139,8 +142,8 @@ class SubjetAnalyzer(FilterAnalyzer):
             copy.deepcopy( event.wquark_candidate_jets )
 
         # Set 'PDGID' for all jets to 0:
-        for jet in event.selected_btagged_jets_sj: jet.PDGID = 0.0
-        for jet in event.wquark_candidate_jets_sj: jet.PDGID = 0.0
+        for jet in event.selected_btagged_jets_sj: jet.PDGID = 0
+        for jet in event.wquark_candidate_jets_sj: jet.PDGID = 0
 
         if genquarks_cat1_present:
             # Get the hadronic & leptonic b-quark and the two light quarks
@@ -294,7 +297,7 @@ class SubjetAnalyzer(FilterAnalyzer):
 
 
         ########################################
-        # Logic
+        # Logic - Setting the btagFlags
         ########################################
 
         # Goal of this section is make sure exactly 1 subjet has btagFlag = 1.0,
@@ -318,17 +321,24 @@ class SubjetAnalyzer(FilterAnalyzer):
         #   | 1 | l-jets (Strategy 4)
         #   | 2 | 
         # --+---+-------------------------------------------------------------------
-        # 2 | 0 | Select the subjet that was matched to a b-jet with the highest
-        #   | 1 | b-likelihood as the b, and set the remaining subjets as the l-jets
-        # 3 | 0 | (Strategy 5)
+        # 2 | 0 | NEW:
+        #   |   | Add the only unmatched subjet to l-jet list (Strategy 5)
+        # --+---+-------------------------------------------------------------------
+        # 2 | 1 | NEW:
+        # 3 | 0 | Do nothing; b- and l-lists remain untouched
+        #   |   | (Result is equal to non-sj MEM) (Strategy 6)
+        # --+---+-------------------------------------------------------------------
+        # 2 | 0 | OLD:
+        #   | 1 | Select the subjet that was matched to a b-jet with the highest
+        # 3 | 0 | b-likelihood as the b, and set the remaining subjets as the l-jets
+        #   |   | (Strategy 5)
         # --+---+-------------------------------------------------------------------
 
         # For every type of event, store the number of mismatches, the applied
         # strategy and the 'event_type_number' (see documentation, TODO):
         # ( nr_of_mismatches, strategy, event_type_number )
 
-        #Do nothing; trust the btagFlags based on prefix
-        if Match_subjet_bjet == 0 and Match_subjet_ljet == 0:
+        if   Match_subjet_bjet == 0 and Match_subjet_ljet == 0:
             ( nr_of_mismatches, strategy, event_type_number ) = ( 0, 1, 1 )
         elif Match_subjet_bjet == 0 and Match_subjet_ljet == 3:
             ( nr_of_mismatches, strategy, event_type_number ) = ( 1, 1, 2 )
@@ -372,6 +382,22 @@ class SubjetAnalyzer(FilterAnalyzer):
             if Match_subjet_ljet==2: ETN = 8
             ( nr_of_mismatches, strategy, event_type_number ) = ( 0, 4, ETN )
 
+        # NEW strategies for >=2 subjet-bjet matches
+        elif Match_subjet_bjet == 2 and Match_subjet_ljet == 0:
+            ( nr_of_mismatches, strategy, event_type_number ) = ( 1, 5, 9 )
+        elif Match_subjet_bjet == 2 and Match_subjet_ljet == 1:
+            ( nr_of_mismatches, strategy, event_type_number ) = ( 1, 6, 10 )
+        elif Match_subjet_bjet == 3 and Match_subjet_ljet == 0:
+            ( nr_of_mismatches, strategy, event_type_number ) = ( 2, 6, 11 )
+
+        else:
+            print 'Unassigned category! Create a strategy for this case.'
+            print 'subjet-b matches: {0}, subjet-l matches = {1}'.format(
+                Match_subjet_bjet, Match_subjet_ljet )
+            return 0
+
+        """
+        # OLD strategies for >=2 subjet-bjet matches
         elif Match_subjet_bjet in [2,3] and Match_subjet_ljet in [0,1]:
 
             tl_b_subjets = [ tl for tl in tl_subjets if hasattr(tl, 'bjet_match') ]
@@ -388,17 +414,13 @@ class SubjetAnalyzer(FilterAnalyzer):
             if Match_subjet_bjet==2 and Match_subjet_ljet==1: NOM = 1; ETN = 10
             if Match_subjet_bjet==3 and Match_subjet_ljet==0: NOM = 2; ETN = 11
             ( nr_of_mismatches, strategy, event_type_number ) = ( NOM, 5, ETN )
-
-        else:
-            print 'Unassigned category! Create a strategy for this case.'
-            print 'subjet-b matches: {0}, subjet-l matches = {1}'.format(
-                Match_subjet_bjet, Match_subjet_ljet )
-            return 0
+        """
 
         # Set 'PDGID' to 1 for light, and to 5 for b
+        # Note: This will be problematic for the new strategy with >=2 b matches
         for subjet in tl_subjets:
-            if subjet.btagFlag == 1.0: setattr( subjet, 'PDGID', 5.0 )
-            if subjet.btagFlag == 0.0: setattr( subjet, 'PDGID', 1.0 )
+            if subjet.btagFlag == 1.0: setattr( subjet, 'PDGID', 5 )
+            if subjet.btagFlag == 0.0: setattr( subjet, 'PDGID', 1 )
 
         """
         # Check up printing - the httCandidate
@@ -433,31 +455,53 @@ class SubjetAnalyzer(FilterAnalyzer):
         print '=====================================\n'
         """
 
+        ########################################
+        # Modifying the bjets and ljets lists
+        ########################################
+
         # Remove all original instances and replace them with their matched subjets
         # If an original bjet is matched with a subjet that has btagFlag=0.0, the
         # original bjet is removed from the btagged_jets, and the subjet is appended
         # to event.wquark_candidate_jets.
         # (Analogous for original ljet matched with a subjet that has btagFlag=1.0)
-        for tl_subjet in tl_subjets:
-            if hasattr( tl_subjet, 'ljet_match' ):
-                # Get the original ljet
-                orig_ljet = tl_subjet.ljet_match.origin_jet
-                # Remove it from the ljet list in the event
-                event.wquark_candidate_jets_sj.pop(
-                    event.wquark_candidate_jets_sj.index( orig_ljet ) )
-            if hasattr( tl_subjet, 'bjet_match' ):
-                # Get the original bjet
-                orig_bjet = tl_subjet.bjet_match.origin_jet
-                # Remove it from the bjet list in the event
-                event.selected_btagged_jets_sj.pop(
-                    event.selected_btagged_jets_sj.index( orig_bjet ) )
+        if Match_subjet_bjet < 2:
+            for tl_subjet in tl_subjets:
+                if hasattr( tl_subjet, 'ljet_match' ):
+                    # Get the original ljet
+                    orig_ljet = tl_subjet.ljet_match.origin_jet
+                    # Remove it from the ljet list in the event
+                    event.wquark_candidate_jets_sj.pop(
+                        event.wquark_candidate_jets_sj.index( orig_ljet ) )
+                if hasattr( tl_subjet, 'bjet_match' ):
+                    # Get the original bjet
+                    orig_bjet = tl_subjet.bjet_match.origin_jet
+                    # Remove it from the bjet list in the event
+                    event.selected_btagged_jets_sj.pop(
+                        event.selected_btagged_jets_sj.index( orig_bjet ) )
 
-            if tl_subjet.btagFlag == 1.0:
-                # Append the subjet to btagged_jets list in the event
-                event.selected_btagged_jets_sj.append( tl_subjet )
-            elif tl_subjet.btagFlag == 0.0:
-                # Append the subjet to wquark_candidate_jets list in the event
-                event.wquark_candidate_jets_sj.append( tl_subjet )
+                if tl_subjet.btagFlag == 1.0:
+                    # Append the subjet to btagged_jets list in the event
+                    event.selected_btagged_jets_sj.append( tl_subjet )
+                elif tl_subjet.btagFlag == 0.0:
+                    # Append the subjet to wquark_candidate_jets list in the event
+                    event.wquark_candidate_jets_sj.append( tl_subjet )
+
+            # Make sure subjet passes
+            if len( event.selected_btagged_jets_sj ) > 4:
+                # The last added element is the subjet - keep that one, and the next
+                # 3 btagged_jets
+                event.selected_btagged_jets_sj = \
+                    event.selected_btagged_jets_sj[-1:] + \
+                    event.selected_btagged_jets_sj[:3]
+            
+        # In this case, only add the unmatched light subjet
+        # (bjets list is unchanged)
+        if Match_subjet_bjet == 2 and Match_subjet_ljet == 0:
+            for tl_subjet in tl_subjets:
+                if not hasattr( tl_subjet, 'bjet_match' ):
+                    event.wquark_candidate_jets_sj.append( tl_subjet )
+
+        event.PassedSubjetAnalyzer = True
 
         """
         # Check up printing - the output jets
@@ -472,7 +516,9 @@ class SubjetAnalyzer(FilterAnalyzer):
         print '=====================================\n'
         """
 
-
+        # Categorization here probably unnecessary; Requirements in MEM configs
+        # should suffice
+        """
         ########################################
         # Categorization
         # Requires work - very quick & dirty at the moment
@@ -487,11 +533,14 @@ class SubjetAnalyzer(FilterAnalyzer):
         
         if len( event.selected_btagged_jets_sj ) >= 4:
             event.PassedSubjetAnalyzer = True
-
+        """
 
         ########################################
         # Write to event
         ########################################
+
+        setattr( event, 'n_bjets_sj', len( event.selected_btagged_jets_sj ) )
+        setattr( event, 'n_ljets_sj', len( event.wquark_candidate_jets_sj ) )
 
         setattr( event, 'Matching_subjet_bjet', Match_subjet_bjet )
         setattr( event, 'Matching_subjet_ljet', Match_subjet_ljet )
@@ -500,7 +549,6 @@ class SubjetAnalyzer(FilterAnalyzer):
         setattr( event, 'Matching_strategy', strategy )
         setattr( event, 'Matching_event_type_number', event_type_number )
 
-        # This tells the MEMAnalyzer to run
         print 'Exiting SubjetAnalyzer! event.PassedSubjetAnalyzer = {0}'.format(
             event.PassedSubjetAnalyzer )
 

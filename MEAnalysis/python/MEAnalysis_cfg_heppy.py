@@ -90,10 +90,12 @@ class Conf:
             # "matching" - print out the association between gen and reco objects
             #"verbosity": ["eventboundary", "input", "matching", "gen", "reco", "meminput"],
             #"verbosity": ["meminput"],
-            "verbosity": []
+            "verbosity": [],
 
             #Process only these events (will scan through file to find)
             #"eventWhitelist": [
+
+            ##(1, 536, 537 ),
 
             ##    #cat6
             ##    (1, 1326, 132576),
@@ -127,12 +129,14 @@ class Conf:
             "methodsToRun": [
 
                 "SL_2qW",
-                "SL_2qW_sj",
-                "SL_2qW_sj_perm",
-
                 "SL_1qW",
+
+                #"SL_2qW_sj_perm",
+
+                "SL_2qW_sj",
                 "SL_1qW_sj",
-                "SL_1qW_sj_perm",
+
+                #"SL_1qW_sj_perm",
 
                 #"DL",
 

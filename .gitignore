@@ -17,3 +17,4 @@ VHbbAnalysis
 __init__.py
 *.log
 /MEIntegratorStandalone
+/MEAnalysis/gc/grid-control
