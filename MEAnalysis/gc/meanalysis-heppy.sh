@@ -2,12 +2,12 @@
 
 #uncomment these to test the script
 #these are all the input parameters that MEAnalysis_heppy_gc.py reads
-export SKIP_EVENTS=0
-export MAX_EVENTS=100
-export DATASETNICK=tth_13tev
-export DATASETPATH=tth_13tev
-export FILE_NAMES=/store/user/jpata/VHBBHeppyV10/TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola/VHBB_HEPPY_V10_TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola__Phys14DR-PU20bx25_tsg_PHYS14_25_V1-v2/150302_164515/0000/tree_1.root
-export MY_SCRATCH=./
+#export SKIP_EVENTS=0
+#export MAX_EVENTS=100
+#export DATASETNICK=tth_13tev
+#export DATASETPATH=tth_13tev
+#export FILE_NAMES=/store/user/jpata/VHBBHeppyV10/TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola/VHBB_HEPPY_V10_TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola__Phys14DR-PU20bx25_tsg_PHYS14_25_V1-v2/150302_164515/0000/tree_1.root
+#export MY_SCRATCH=./
 
 #on PSI, CMSSW_BASE is not exported with the grid job, need to set manually
 CMSSW_BASE=$HOME/TTH-72X-heppy/CMSSW/
