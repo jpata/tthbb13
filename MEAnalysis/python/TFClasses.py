@@ -41,31 +41,56 @@ class TF:
             # Creating and filling TGraph object
             ########################################
 
-            skip_begin = 2
-            skip_end = 2
+            skip_begin = 0
+            skip_end = 0
 
-            gr = ROOT.TGraphErrors( len(fit_dicts) - skip_begin - skip_end )
+            point_x = []
+            point_y = []
+            er_point_y = []
+
 
             for (i_E, dic) in enumerate(fit_dicts):
 
-                if i_E >= skip_begin and i_E < (len(fit_dicts) - skip_end):
+                if i_E >= skip_begin and i_E < (len(fit_dicts) - skip_end) and \
+                    dic['single_bin_func'].par_values[3]>25.0 and \
+                    dic['single_bin_func'].par_values[4]>2.5 :
 
-                    """
-                    print 'i_E = {0}, E_val = {1}, fit_val = {2}'.format(
-                        i_E,
-                        dic['E_value'],
-                        dic['single_bin_func'].par_values[par_num] )
-                    """
-
-                    gr.SetPoint(
-                        i_E-2,
-                        dic['E_value'],
+                    point_y.append(
                         abs( dic['single_bin_func'].par_values[par_num] ) )
 
-                    gr.SetPointError(
-                        i_E-2,
-                        0.0,
-                        dic['single_bin_func'].par_errors[par_num] )
+                    point_x.append( dic['E_value'] )
+
+                    er_point_y.append( dic['single_bin_func'].par_errors[par_num] )
+
+
+            gr = ROOT.TGraphErrors( len(point_y) )
+
+            for ( i, E_value, par_value, par_error ) in zip(
+                range(len(point_y)), point_x, point_y, er_point_y ):
+
+                gr.SetPoint(
+                    i,
+                    E_value,
+                    par_value )
+
+                gr.SetPointError(
+                    i,
+                    0.0,
+                    par_error )
+
+
+
+                """
+                gr.SetPoint(
+                    i_E-2,
+                    dic['E_value'],
+                    abs( dic['single_bin_func'].par_values[par_num] ) )
+
+                gr.SetPointError(
+                    i_E-2,
+                    0.0,
+                    dic['single_bin_func'].par_errors[par_num] )
+                """
 
                 
 
@@ -137,7 +162,7 @@ class TF:
             hf.write('<a href="TFs/{0}.png"><img width="700" src="TFs/{0}.png"></a>\n'.format(filename) )
 
 
-    def Make_Formula(self, set_reco = True, print_info = False):
+    def Make_Formula_OLD(self, set_reco = True, print_info = False):
 
         SBF = self.SingleBinFunc.str
 
@@ -211,6 +236,148 @@ class TF:
                 print '      [{0}] = {1}'.format( i, f1.GetParameter(i) )
 
         return f1
+
+
+##### ADDED 10-06-2015
+
+    def Make_Formula(self, set_reco = True, print_info = False):
+
+        #SBF = copy.deepcopy( self.SingleBinFunc )
+        SBF = self.SingleBinFunc.str
+
+        # Number of variables in the single bin function
+        n_SBF_vars = len( self.SingleBinFunc.par_initials )
+
+        # An example of what a SBF looks like at this point (spaces added):
+
+        # [0]*(  0.7    * exp(-0.5*((x-([1]))/([2]))    **2) +
+        #       (1-0.7) * exp(-0.5*((x-([3]))/([2]+[4]))**2))
+
+        # Variable [0] and x are intended for gen_pt and reco_pt,
+        # the other variables should be numbered from 1 to N
+
+        # In the current form of the SBF, x is the reco_pt
+        # Replace 'x' with '#RECO_PT#', but be careful not to replace the x in 'exp'
+        SBF = re.sub( r'([^e])x([^p])', r'\1#RECO_PT#\2', SBF )
+
+        # Replace all '[i]' by '(#ABFi#)'
+        SBF = re.sub( r'\[(\d+)\]', r'(#ABF\1#)', SBF )
+
+        # List of number of variables for every across bin function
+        n_ABF_vars_list = [ len(ABF.par_values) for ABF in self.AcrossBinFuncs ]
+
+        # For shifting purposes, a 'non-fitted' function still has one parameter
+        # A 'non-fitted' function has 0 par_values, but for shifting it should be
+        # treated as 1 par_value
+        # (This is poorly configured, should be changed at some point)
+        n_ABF_vars = [ x if x!=0 else 1 for x in n_ABF_vars_list ]
+        
+        # Create mapping of variable numbers
+        # ======================================
+
+        # Initialize ABF_varshift
+        #   ABF_varshift contains the number by which parameters in every ABF should
+        #   be shifted
+        ABF_varshift = [ 0 for i in range(n_SBF_vars) ]
+
+        # Shift first function by 1 (so that [0] is free to use)
+        ABF_varshift[0] = 1
+
+        for i in range( 1, n_SBF_vars ):
+            ABF_varshift[i] = ABF_varshift[i-1] + n_ABF_vars[i-1]
+        
+        
+        shifted_ABFs = []
+
+        # Initialize a list from which the parameters will be read
+        # (This list should simply be big enough)
+        SetParameter_list = [ 0 for i in range(100)]
+
+        for i_ABF, ABFunc in enumerate(self.AcrossBinFuncs):
+
+            ABF = ABFunc.str
+
+            # Get the shift for this ABF
+            shift = ABF_varshift[i_ABF]
+
+            if ABF == '1':
+                # This is the poorly configured 'non-fitted' ABF
+                # Simply fill in [shift]
+                shifted_ABFs.append( '[{0}]'.format(shift) )
+                continue
+
+
+            # 'x' in this ABF is the gen_pt
+            # Replace 'x' with '#GEN_PT#'
+            ABF = ABF.replace( 'x' , '#GEN_PT#' )
+
+            # Shift all variables
+            for i in range(n_ABF_vars[i_ABF]):
+
+                # Shift the variable in the function string
+                find_str = '[{0}]'.format(i)
+                repl_str = '[{0}]'.format(i+shift)
+
+                ABF = ABF.replace( find_str, repl_str )
+
+                # Record the value at the shifted index
+                SetParameter_list[i+shift] = ABFunc.par_values[i]
+
+            shifted_ABFs.append( ABF )
+
+
+        # Actually replace the variables in the SBF
+        # ======================================
+        
+        if hasattr( self.SingleBinFunc, 'Is_DG' ):
+            # In this case, #ABF0# is the normalization of the SBF
+            # Analytically, this should be:
+            
+            normalization = '(1.0/(sqrt(2*TMath::Pi())*({0}*abs(#ABF2#)+(1.0-{0})*(abs(#ABF2#)+abs(#ABF4#)))))'.format( self.SingleBinFunc.DG_rel_weight )
+
+            SBF = SBF.replace( '#ABF0#', normalization )
+
+        # TODO: normalization of single Gaussian
+
+
+        # Replacing the ABFs
+        for i in range(n_SBF_vars):
+            SBF = SBF.replace( '#ABF{0}#'.format(i), shifted_ABFs[i] )
+
+
+        # 11-06-2015: REVERSED RECO_PT AND GEN_PT IN CREATION OF TF MATRIX!
+        # Variables in this code are now a bit non-sensical.
+        """
+        if set_reco:
+            SBF = SBF.replace( '#RECO_PT#', '[0]' )
+            SBF = SBF.replace( '#GEN_PT#', 'x' )
+        else:
+            SBF = SBF.replace( '#RECO_PT#', 'x' )
+            SBF = SBF.replace( '#GEN_PT#', '[0]' )
+        """
+        if set_reco:
+            SBF = SBF.replace( '#RECO_PT#', 'x' )
+            SBF = SBF.replace( '#GEN_PT#', '[0]' )
+        else:
+            SBF = SBF.replace( '#RECO_PT#', '[0]' )
+            SBF = SBF.replace( '#GEN_PT#', 'x' )
+
+
+        # Construct the TF1 object        
+        f1 = ROOT.TF1( "fit1", SBF )
+
+        # Set the parameters
+        # (Unused parameters will be 0)
+        for i_par, par in enumerate( SetParameter_list ):
+            f1.SetParameter( i_par, par )
+
+        f1.SetParameter( 1, 1.0 )
+
+        return f1
+
+
+
+##### END OF ADDED 10-06-2015
 
     
     def Make_CDF(self):
@@ -429,15 +596,47 @@ class TF:
             return 0
 
 
+    def Print_content(self):
+
+        print 'Class: i_eta = {0}, particle = {1}'.format(
+            self.i_eta, self.particle )
+
+        print '    Single bin function:'
+        print '    --------------'
+        print '      fun: {0}'.format( self.SingleBinFunc.str )
+        print '      init: {0}'.format( self.SingleBinFunc.par_initials )
+        print '      param: {0}'.format( self.SingleBinFunc.par_values )
+        print '      er par: {0}'.format( self.SingleBinFunc.par_errors )
+        print '    --------------'
+
+        print '    {0} Across bin functions found:'.format(
+            len( self.AcrossBinFuncs ) )
+
+        print '    --------------'
+        for func in self.AcrossBinFuncs:
+            print '      fun: {0}'.format( func.str )
+            print '      init: {0}'.format( func.par_initials )
+            print '      param: {0}'.format( func.par_values )
+            print '      er par: {0}'.format( func.par_errors )
+            print '    --------------'
+
+
+
+
+
+
+
+
+
 
 class function:
 
-    def __init__(self, str = "1", par_initials = [], abspars = [] ):
+    def __init__(self, str = "1", par_initials = [], par_limits = [] ):
         self.str = str
         self.par_initials = par_initials
         self.par_values = []
         self.par_errors = []
-        self.abspars = abspars
+        self.par_limits = par_limits
 
 
     def Initialize_as_TF1( self, hist = 'none' ):
@@ -469,13 +668,33 @@ class function:
             f1.SetParameter( i, eval( init_var_str ) )
 
         # Set parameter limits for the parameters that are specified as absolute:
-        for parameter in self.abspars:
-            f1.SetParLimits( parameter, 0.0, 2000.0 )
+        for (parameter, lower_bound, upper_bound) in self.par_limits:
+            f1.SetParLimits( parameter, lower_bound, upper_bound )
 
         # Set fit range
-        f1.SetRange(30,500)
+        if hasattr( self, 'fitrange' ):
+            f1.SetRange( getattr(self, 'fitrange')[0] , getattr(self, 'fitrange')[1] )
 
         return f1
+
+    def Get_TF1_with_set_parameters( self ):
+
+        f1 = ROOT.TF1( "hfit", self.str )
+
+        for i in range( len( self.par_values ) ):
+            f1.SetParameter( i, self.par_values[i] )
+
+        return f1
+
+
+    def Evaluate( self, x ):
+
+        f1 = ROOT.TF1( "hfit", self.str )
+
+        for i in range( len( self.par_values ) ):
+            f1.SetParameter( i, self.par_values[i] )
+
+        return f1.Eval(x)
 
 
     def Check_function( self ):
