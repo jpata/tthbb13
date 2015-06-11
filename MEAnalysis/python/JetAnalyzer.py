@@ -1,5 +1,7 @@
 from TTH.MEAnalysis.Analyzer import FilterAnalyzer
 from TTH.MEAnalysis.VHbbTree import *
+from copy import deepcopy
+import numpy as np
 
 def attach_jet_transfer_function(jet, conf, eval_gen=False):
     """
@@ -28,20 +30,25 @@ class JetAnalyzer(FilterAnalyzer):
     def __init__(self, cfg_ana, cfg_comp, looperName):
         super(JetAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
         self.conf = cfg_ana._conf
+        
+    def variateJets(self, jets, systematic, sigma):
+        if systematic == "JES":
+            newjets = deepcopy(jets)
+            for i in range(len(jets)):
+                if sigma > 0:
+                    cf = sigma * newjets[i].corr_JECUp
 
-    def beginLoop(self, setup):
-        super(JetAnalyzer, self).beginLoop(setup)
-        self.counters.addCounter("jets")
-        self.counters["jets"].register("any")
-        self.counters["jets"].register("good")
-        for (btag_wp_name, btag_wp) in self.conf.jets["btagWPs"].items():
-            self.counters["jets"].register(btag_wp_name)
+                elif sigma < 0:
+                    cf = abs(sigma) * newjets[i].corr_JECDown
 
+                elif sigma == 0:
+                    cf = newjets[i].corr
+
+                newjets[i].pt *= cf
+                newjets[i].mass *= cf
+        return newjets
 
     def process(self, event):
-        self.counters["processing"].inc("processed")
-        self.counters["jets"].inc("any", len(event.Jet))
-
         #pt-descending input jets
         if "input" in self.conf.general["verbosity"]:
             print "jets"
@@ -49,11 +56,53 @@ class JetAnalyzer(FilterAnalyzer):
                 print "InJetReco", j.pt, j.eta, j.phi, j.mass, j.btagCSV, j.mcFlavour
                 print "InJetGen", j.mcPt, j.mcEta, j.mcPhi, j.mcM
 
+        #pre-create METs so that even if the nominal processing chain does not succeed, they can be ntuplized
+        event.MET = MET(pt=event.met.pt, phi=event.met.phi)
+        event.MET_gen = MET(pt=event.MET.genPt, phi=event.MET.genPhi)
+        event.MET_tt = MET(px=0, py=0)
+
+        event.mem_results_tth = []
+        event.mem_results_ttbb = []
+
+        event.fw_h_alljets = []
+        event.fw_h_btagjets = []
+        event.fw_h_untagjets = []
+            
+        jets_JES = self.variateJets(event.Jet, "JES", 0)
+        jets_JES_Up = self.variateJets(event.Jet, "JES", 1)
+        jets_JES_Down = self.variateJets(event.Jet, "JES", -1)
+        evdict = {}
+        for name, jets in [("JES", jets_JES), ("JESUp", jets_JES_Up), ("JESDown", jets_JES_Up)]:
+            ev = FakeEvent(event)
+            ev.Jet = jets
+            ev.systematic = name
+            evdict[name] = ev
+        evdict["nominal"] = event
+        event.MET_jetcorr = getattr(evdict["nominal"], "MET_jetcorr", MET(px=0, py=0))
+
+        for syst, event_syst in evdict.items():
+            res = self._process(event_syst)
+            for k, v in res.__dict__.items():
+                event.__dict__[k + "_" + syst] = v
+            evdict[syst] = res
+        event.systResults = evdict
+        #event.__dict__.update(event.systResults["nominal"].__dict__)
+
+        return np.any([v.passes_jet for v in event.systResults.values()])
+
+    def _process(self, event_in):
+        event = FakeEvent(event_in)
         event.good_jets = sorted(
             filter(
                 lambda x: (
                     x.pt > self.conf.jets["pt"]
                     and abs(x.eta) < self.conf.jets["eta"]
+                    and x.neHEF < 0.99 
+                    and x.chEmEF < 0.99 
+                    and x.neEmEF < 0.99 
+                    and x.numberOfDaughters > 1
+                    and x.chHEF > 0.0
+                    and x.chMult > 0.0
                 ), event.Jet
             ),
             key=lambda x: x.pt, reverse=True
@@ -65,7 +114,6 @@ class JetAnalyzer(FilterAnalyzer):
             attach_jet_transfer_function(jet, self.conf)
 
         event.numJets = len(event.good_jets)
-        self.counters["jets"].inc("good", len(event.good_jets))
 
         event.btagged_jets_bdisc = {}
         event.buntagged_jets_bdisc = {}
@@ -78,9 +126,6 @@ class JetAnalyzer(FilterAnalyzer):
             event.buntagged_jets_bdisc[btag_wp_name] = filter(
                 lambda x: getattr(x, algo) <= wp,
                 event.good_jets
-            )
-            self.counters["jets"].inc(btag_wp_name,
-                len(event.btagged_jets_bdisc[btag_wp_name])
             )
             setattr(event, "nB"+btag_wp_name, len(event.btagged_jets_bdisc[btag_wp_name]))
 
@@ -96,11 +141,9 @@ class JetAnalyzer(FilterAnalyzer):
 
         #Require at least 4 good jets in order to continue analysis
         passes = len(event.good_jets) >= 4
-        if passes:
-            self.counters["processing"].inc("passes")
 
-        corrMet_px = event.met[0].px
-        corrMet_py = event.met[0].py
+        corrMet_px = event.MET.px
+        corrMet_py = event.MET.py
         sum_dEx = 0
         sum_dEy = 0
         for jet in event.good_jets:
@@ -117,7 +160,6 @@ class JetAnalyzer(FilterAnalyzer):
         corrMet_px += sum_dEx
         corrMet_py += sum_dEy
         #print (sum_dEx, sum_dEy), (corrMet_px, event.met[0].px), (corrMet_py, event.met[0].py)
-        event.met_jetcorr = [MET(px=corrMet_px, py=corrMet_py)]
-        event.met_gen = [MET(pt=event.met[0].genPt, phi=event.met[0].genPhi)]
-
-        return passes
+        event.MET_jetcorr = MET(px=corrMet_px, py=corrMet_py)
+        event.passes_jet = passes
+        return event

@@ -3,6 +3,9 @@ import itertools
 
 from TTH.MEAnalysis.Analyzer import FilterAnalyzer
 from TTH.MEAnalysis.VHbbTree import lvec
+
+import numpy as np
+
 class BTagLRAnalyzer(FilterAnalyzer):
     """
     Performs b-tag likelihood ratio calculations
@@ -111,8 +114,20 @@ class BTagLRAnalyzer(FilterAnalyzer):
         #end permutation loop
 
     def process(self, event):
-        self.counters["processing"].inc("processed")
+        for (syst, event_syst) in event.systResults.items():
+            if event_syst.passes_jet:
+                res = self._process(event_syst)
+                event.systResults[syst] = res
+    
+                for k, v in res.__dict__.items():
+                    event.__dict__[k + "_" + syst] = v
+            else:
+                event.systResults[syst].passes_btag = False
+        #event.__dict__.update(evdict["nominal"].__dict__)
+        #event.__dict__.update(event.systResults["nominal"].__dict__)
+        return np.any([v.passes_btag for v in event.systResults.values()])
 
+    def _process(self, event):
         #Take first 6 most b-tagged jets for btag LR
         jets_for_btag_lr = sorted(
             event.good_jets,
@@ -195,8 +210,5 @@ class BTagLRAnalyzer(FilterAnalyzer):
             idx = event.good_jets.index(jet)
             event.good_jets[idx].btagFlag = 1.0
 
-        passes = True
-        if passes:
-            self.counters["processing"].inc("passes")
-
-        return passes
+        event.passes_btag = len(event.selected_btagged_jets)>=2
+        return event

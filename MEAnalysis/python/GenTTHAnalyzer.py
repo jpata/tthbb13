@@ -17,8 +17,16 @@ class GenTTHAnalyzer(FilterAnalyzer):
         return quark.pt > 30 and abs(quark.eta) < 2.5
 
     def process(self, event):
-        self.counters["processing"].inc("processed")
+        for (syst, event_syst) in event.systResults.items():
+            if event_syst.passes_btag:
+                res = self._process(event_syst)
+                event.systResults[syst] = res
+                for k, v in res.__dict__.items():
+                    event.__dict__[k + "_" + syst] = v
+        #event.__dict__.update(event.systResults["nominal"].__dict__)
+        return True
 
+    def _process(self, event):
         #Somehow, the GenWZQuark distribution is duplicated
         event.l_quarks_w = event.GenWZQuark[0:len(event.GenWZQuark)/2]
         event.b_quarks_t = event.GenBQuarkFromTop
@@ -26,29 +34,27 @@ class GenTTHAnalyzer(FilterAnalyzer):
         event.lep_top = event.GenLepFromTop
         event.nu_top = event.GenNuFromTop
 
-
-        event.gen_met = [MET(pt=event.met[0].genPt, phi=event.met[0].genPhi)]
         event.cat_gen = None
-        event.n_cat_gen = -1
+        event.cat_gen_n = -1
 
         if (len(event.lep_top) == 1 and
             len(event.nu_top) == 1 and
             len(event.l_quarks_w) == 2 and
             len(event.b_quarks_t) == 2):
             event.cat_gen = "sl"
-            event.n_cat_gen = 0
+            event.cat_gen_n = 0
         elif (len(event.lep_top) == 2 and
             len(event.nu_top) == 2 and
             len(event.l_quarks_w) == 0 and
             len(event.b_quarks_t) == 2):
             event.cat_gen = "dl"
-            event.n_cat_gen = 1
+            event.cat_gen_n = 1
         elif (len(event.lep_top) == 0 and
             len(event.nu_top) == 0 and
             len(event.l_quarks_w) == 4 and
             len(event.b_quarks_t) == 2):
             event.cat_gen = "fh"
-            event.n_cat_gen = 2
+            event.cat_gen_n = 2
 
         event.l_quarks_gen = []
         event.b_quarks_gen = []
@@ -88,7 +94,7 @@ class GenTTHAnalyzer(FilterAnalyzer):
             p4 = lvec(nu)
             spx += p4.Px()
             spy += p4.Py()
-        event.tt_met = [MET(px=spx, py=spy)]
+        event.MET_tt = MET(px=spx, py=spy)
 
         #Get the total ttH visible pt at gen level
         spx = 0
@@ -103,8 +109,8 @@ class GenTTHAnalyzer(FilterAnalyzer):
 
         #Calculate tth recoil
         #rho = -met - tth_matched
-        event.tth_rho_px_gen = -event.met_gen[0].px - event.tth_px_gen
-        event.tth_rho_py_gen = -event.met_gen[0].py - event.tth_py_gen
+        event.tth_rho_px_gen = -event.MET_gen.px - event.tth_px_gen
+        event.tth_rho_py_gen = -event.MET_gen.py - event.tth_py_gen
 
 
         if "gen" in self.conf.general["verbosity"]:
@@ -118,7 +124,7 @@ class GenTTHAnalyzer(FilterAnalyzer):
                 print "gen n(t)", j.pt, j.eta, j.phi, j.mass, j.pdgId
             for j in event.b_quarks_h:
                 print "gen b(h)", j.pt, j.eta, j.phi, j.mass, j.pdgId
-            print "gen cat", event.cat_gen, event.n_cat_gen
+            print "gen cat", event.cat_gen, event.cat_gen_n
 
         #Store for each jet, specified by it's index in the jet
         #vector, if it is matched to any gen-level quarks
@@ -242,8 +248,8 @@ class GenTTHAnalyzer(FilterAnalyzer):
 
         #Calculate tth recoil
         #rho = -met - tth_matched
-        event.tth_rho_px_reco = -event.met[0].px - event.tth_px_reco
-        event.tth_rho_py_reco = -event.met[0].py - event.tth_py_reco
+        event.tth_rho_px_reco = -event.MET.px - event.tth_px_reco
+        event.tth_rho_py_reco = -event.MET.py - event.tth_py_reco
 
         #print out gen-level quarks
         if "input" in self.conf.general["verbosity"]:
@@ -254,8 +260,4 @@ class GenTTHAnalyzer(FilterAnalyzer):
             for q in event.b_quarks_gen:
                 print q.pt, q.eta, q.phi, q.mass, q.pdgId
 
-        passes = True
-        if passes:
-            self.counters["processing"].inc("passes")
-        return passes
-
+        return event

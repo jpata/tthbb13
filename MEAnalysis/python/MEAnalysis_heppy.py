@@ -47,7 +47,9 @@ for sn in sorted(samples_dict.keys()):
     inputSample = cfg.Component(
         s.nickName.value(),
         files = map(lfn_to_pfn, s.subFiles.value()),
-        tree_name = "tree"
+        tree_name = "tree",
+        n_gen = s.nGen.value(),
+        xs = s.xSec.value()
     )
     inputSample.isMC = s.isMC.value()
     inputSample.perJob = s.perJob.value()
@@ -55,7 +57,7 @@ for sn in sorted(samples_dict.keys()):
     if s.skip.value() == False and len(s.subFiles.value())>0:
         inputSamples.append(inputSample)
 
-print "Processing samples", inputSamples
+print "Processing samples", [s.name for s in inputSamples]
 
 #Event contents are defined here
 #This is work in progress
@@ -74,6 +76,12 @@ import TTH.MEAnalysis.MECoreAnalyzers as MECoreAnalyzers
 evtid_filter = cfg.Analyzer(
     MECoreAnalyzers.EventIDFilterAnalyzer,
     'eventid',
+    _conf = conf
+)
+
+evtweight = cfg.Analyzer(
+    MECoreAnalyzers.EventWeightAnalyzer,
+    'eventweight',
     _conf = conf
 )
 
@@ -147,16 +155,17 @@ treeProducer = getTreeProducer(conf)
 # the analyzers will process each event in this order
 sequence = cfg.Sequence([
     evtid_filter,
+    evtweight,
     evs,
     leps,
     jets,
-    genrad,
     btaglr,
+    mva,
     wtag,
     mecat,
+    genrad,
     gentth,
     mem_analyzer,
-    mva,
     treeProducer
 ])
 

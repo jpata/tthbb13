@@ -1,62 +1,94 @@
 import os
+
+def mu_baseline(mu):
+    return (
+        mu.tightId and
+        mu.isPFMuon and
+        mu.isGlobalMuon and
+        mu.dxy < 0.2 and
+        mu.dz < 0.5 and
+        mu.globalTrackChi2 < 10 and
+        mu.nMuonHits > 0 and
+        mu.pixelHits > 0 and
+        mu.nStations > 1 #FIXME: is this the same as nMuonHits
+    )
+    
+def el_baseline(el):
+    sca = abs(el.etaSc)
+    return (
+        not(sca > 1.442 and sca < 1.5660) and
+        el.convVeto
+    )
+    
 class Conf:
     def __init__(self):
         self.leptons = {
             "mu": {
+            
+                #SL
                 "tight": {
                     "pt": 30,
                     "eta":2.1,
-                    "iso": 0.12
+                    "iso": 0.12,
+                    "idcut": mu_baseline
                 },
                 "tight_veto": {
-                    "pt": 0.0,
-                    "eta": 0.0,
-                    "iso": 0.0,
+                    "pt": 10.0,
+                    "eta": 2.4,
+                    "iso": 0.2,
+                    "idcut": mu_baseline
                 },
+                
+                #DL
                 "loose": {
                     "pt": 20,
                     "eta": 2.4,
-                    "iso": 0.2,
+                    "iso": 0.12,
+                    "idcut": mu_baseline
                 },
                 "loose_veto": {
-                    "pt": 0.0,
-                    "eta": 0.0,
-                    "iso": 0.0,
+                    "pt": 10.0,
+                    "eta": 2.4,
+                    "iso": 0.2,
+                    "idcut": mu_baseline
                 },
-                "isotype": "relIso03",
-                "dxy": 0.2,
-
+                "isotype": "relIso04",
             },
+            
+            
             "el": {
                 "tight": {
                     "pt": 30,
-                    "eta": 2.5,
-                    "iso": 0.1
+                    "eta": 2.1,
+                    "iso": 0.1,
+                    "idcut": lambda el: el_baseline(el) and el.eleCutIdCSA14_25ns_v1 == 3
                 },
                 "tight_veto": {
                     "pt": 20,
-                    "eta": 2.5,
+                    "eta": 2.4,
                     "iso": 0.15,
+                    "idcut": lambda el: el_baseline(el) and el.eleCutIdCSA14_25ns_v1 == 2
                 },
+                
                 "loose": {
                     "pt": 20,
-                    "eta": 2.2,
+                    "eta": 2.4,
                     "iso": 0.15,
+                    "idcut": lambda el: el_baseline(el) and el.eleCutIdCSA14_25ns_v1 == 3
                 },
                 "loose_veto": {
                     "pt": 10,
-                    "eta": 2.2,
+                    "eta": 2.4,
                     "iso": 0.04,
+                    "idcut": lambda el: el_baseline(el) and el.eleCutIdCSA14_25ns_v1 == 2
                 },
                 "isotype": "relIso03",
-                "dxy": 0.04,
             }
         }
-        self.leptons["mu"]["tight_veto"] = self.leptons["mu"]["loose"]
 
         self.jets = {
             "pt": 30,
-            "eta": 2.5,
+            "eta": 2.4,
 
             #The default b-tagging algorithm (branch name)
             "btagAlgo": "btagCSV",
@@ -80,7 +112,7 @@ class Conf:
         self.general = {
             "controlPlotsFileOld": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsTEST.root",
             "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV6.root",
-            "sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_vhbb.py",
+            "sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_722sync.py",
             "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions.pickle",
 
             #If the list contains:
@@ -116,7 +148,7 @@ class Conf:
 
             #Actually run the ME calculation
             #If False, all ME values will be 0
-            "calcME": True,
+            "calcME": False,
 
             #Generic event-dependent selection function applied
             #just before the MEM. If False, MEM is skipped

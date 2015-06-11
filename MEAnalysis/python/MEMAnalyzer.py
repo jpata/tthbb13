@@ -9,6 +9,8 @@ ROOT.gSystem.Load("libCintex")
 ROOT.gROOT.ProcessLine('ROOT::Cintex::Cintex::Enable();')
 ROOT.gSystem.Load("libTTHMEIntegratorStandalone")
 
+import numpy as np
+
 from ROOT import MEM
 
 #Pre-define shorthands for permutation and integration variable vectors
@@ -27,15 +29,23 @@ class MECategoryAnalyzer(FilterAnalyzer):
         super(MECategoryAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
         self.cat_map = {"NOCAT":-1, "cat1": 1, "cat2": 2, "cat3": 3, "cat6":6}
         self.btag_cat_map = {"NOCAT":-1, "L": 0, "H": 1}
-
-    def beginLoop(self, setup):
-        super(MECategoryAnalyzer, self).beginLoop(setup)
-
-        for c in ["NOCAT", "cat1", "cat2", "cat3", "cat6"]:
-            self.counters["processing"].register(c)
-
+        
     def process(self, event):
-        self.counters["processing"].inc("processed")
+        for (syst, event_syst) in event.systResults.items():
+            if event_syst.passes_wtag:
+                #print syst, event_syst, event_syst.__dict__
+                res = self._process(event_syst)
+                event.systResults[syst] = res
+                
+                for k, v in res.__dict__.items():
+                    event.__dict__[k + "_" + syst] = v
+            else:
+                event.systResults[syst].passes_mecat = False
+        #print "CAT", getattr(event.systResults["JES"], "fw_h_alljets", None)    
+        #event.__dict__.update(event.systResults["nominal"].__dict__)
+        return np.any([v.passes_mecat for v in event.systResults.values()])
+
+    def _process(self, event):
 
         cat = "NOCAT"
         pass_btag_lr = (self.conf.jets["untaggedSelection"] == "btagLR" and
@@ -67,16 +77,13 @@ class MECategoryAnalyzer(FilterAnalyzer):
             event.wquark_candidate_jets = []
             cat = "cat6"
 
-        self.counters["processing"].inc(cat)
         event.cat = cat
         event.cat_btag = cat_btag
         event.catn = self.cat_map.get(cat, -1)
         event.cat_btag_n = self.btag_cat_map.get(cat_btag, -1)
 
-        passes = True
-        if passes:
-            self.counters["processing"].inc("passes")
-        return passes
+        event.passes_mecat = True
+        return event
 
 class MEMConfig:
     def __init__(self):
@@ -85,7 +92,7 @@ class MEMConfig:
         self.b_quark_candidates = lambda event: event.selected_btagged_jets_high
         self.l_quark_candidates = lambda event: event.wquark_candidate_jets
         self.lepton_candidates = lambda event: event.good_leptons
-        self.met_candidates = lambda event: event.met
+        self.met_candidates = lambda event: event.MET
         self.transfer_function_method = MEM.TFMethod.External
 
         self.do_calculate = lambda event, config: False
@@ -244,7 +251,7 @@ class MEAnalyzer(FilterAnalyzer):
             )
             self.configs[k].l_quark_candidates = lambda event: event.l_quarks_gen
             self.configs[k].lepton_candidates = lambda event: event.good_leptons
-            self.configs[k].met_candidates = lambda event: event.gen_met
+            self.configs[k].met_candidates = lambda event: event.gen_MET
             self.configs[k].cfg.int_code |= MEM.IntegrandType.SmearJets
             self.configs[k].cfg.int_code |= MEM.IntegrandType.SmearMET
         for k in ["DL_gen_nosmear", "SL_2qW_gen_nosmear", "SL_1qW_gen_nosmear"]:
@@ -254,7 +261,7 @@ class MEAnalyzer(FilterAnalyzer):
             )
             self.configs[k].l_quark_candidates = lambda event: event.l_quarks_gen
             self.configs[k].lepton_candidates = lambda event: event.good_leptons
-            self.configs[k].met_candidates = lambda event: event.gen_met
+            self.configs[k].met_candidates = lambda event: event.gen_MET
             #self.configs[k].cfg.int_code |= MEM.IntegrandType.Smear
         for x in ["SL_2qW", "SL_2qW_notag", "SL_2qW_gen", "SL_2qW_gen_nosmear"]:
             self.configs[x].do_calculate = lambda y, c: (
@@ -533,8 +540,20 @@ class MEAnalyzer(FilterAnalyzer):
         )
 
     def process(self, event):
-        self.counters["processing"].inc("processed")
+        for (syst, event_syst) in event.systResults.items():
+            if event_syst.passes_btag:
+                res = self._process(event_syst)
+                event.systResults[syst] = res
+                
+                for k, v in res.__dict__.items():
+                    event.__dict__[k + "_" + syst] = v
+            else:
+                event.systResults[syst].passes_mem = False
+        #print "MEM", getattr(event.systResults["JES"], "fw_h_alljets", None)
+        #event.__dict__.update(event.systResults["nominal"].__dict__)
+        return np.any([v.passes_wtag for v in event.systResults.values()])
 
+    def _process(self, event):
         #Clean up any old MEM state
         self.vars_to_integrate.clear()
         self.vars_to_marginalize.clear()
@@ -546,13 +565,13 @@ class MEAnalyzer(FilterAnalyzer):
 
         #jets = sorted(event.good_jets, key=lambda x: x.pt, reverse=True)
         leptons = event.good_leptons
-        met_pt = event.input.met_pt
-        met_phi = event.input.met_phi
+        met_pt = event.MET.pt
+        met_phi = event.MET.phi
 
         res = {}
-        print (event.input.run, event.input.lumi, event.input.evt,
+        print ("MEM", event.input.run, event.input.lumi, event.input.evt,
             event.cat, event.cat_btag, len(event.good_jets), event.nBCSVM,
-            event.n_mu_tight, event.n_el_tight
+            event.n_mu_tight, event.n_el_tight, getattr(event, "systematic", None)
         )
 
         for hypo in [MEM.Hypothesis.TTH, MEM.Hypothesis.TTBB]:
@@ -605,3 +624,5 @@ class MEAnalyzer(FilterAnalyzer):
         event.mem_results_ttbb = [res[(MEM.Hypothesis.TTBB, k)] for k in self.memkeys]
         if "memoutput" in self.conf.general["verbosity"]:
             print "---MEM done EVENT r:l:e", event.input.run, event.input.lumi, event.input.evt
+        event.passes_mem = True
+        return event

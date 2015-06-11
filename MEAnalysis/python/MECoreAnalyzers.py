@@ -12,5 +12,5 @@ from TTH.MEAnalysis.MEMAnalyzer import MEAnalyzer, MECategoryAnalyzer
 from TTH.MEAnalysis.LeptonAnalyzer import LeptonAnalyzer
 from TTH.MEAnalysis.JetAnalyzer import JetAnalyzer
 from TTH.MEAnalysis.BTagLRAnalyzer import BTagLRAnalyzer
-from TTH.MEAnalysis.Analyzer import EventIDFilterAnalyzer
+from TTH.MEAnalysis.Analyzer import EventIDFilterAnalyzer, EventWeightAnalyzer
 from TTH.MEAnalysis.MVAVarAnalyzer import MVAVarAnalyzer

@@ -54,10 +54,21 @@ class MVAVarAnalyzer(FilterAnalyzer):
     def beginLoop(self, setup):
         super(MVAVarAnalyzer, self).beginLoop(setup)
 
-
     def process(self, event):
-        self.counters["processing"].inc("processed")
+        for (syst, event_syst) in event.systResults.items():
+            #print syst, event_syst.__dict__
+            if event_syst.passes_btag:
+                res = self._process(event_syst)
+                event.systResults[syst] = res
+                for k, v in res.__dict__.items():
+                    event.__dict__[k + "_" + syst] = v
+            else:
+                event.systResults[syst].passes_mva = False
+        #print "MVA", getattr(event.systResults["JES"], "fw_h_alljets", None)
+        #event.__dict__.update(event.systResults["nominal"].__dict__)
+        return np.any([v.passes_mva for v in event.systResults.values()])
 
+    def _process(self, event):
         vecs = CvectorTLorentzVector()
         for jet in event.good_jets:
             vecs.push_back(lvec(jet))
@@ -114,3 +125,6 @@ class MVAVarAnalyzer(FilterAnalyzer):
         event.fw_h_alljets = FoxWolfram.calcFoxWolfram(event.good_jets, orders, FoxWolfram.w_s)
         event.fw_h_btagjets = FoxWolfram.calcFoxWolfram(event.selected_btagged_jets_high, orders, FoxWolfram.w_s)
         event.fw_h_untagjets = FoxWolfram.calcFoxWolfram(event.buntagged_jets, orders, FoxWolfram.w_s)
+        event.passes_mva = True
+
+        return event
