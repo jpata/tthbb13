@@ -22,7 +22,7 @@ samples = cms.VPSet([
         nickName = cms.string('ttjets_13tev_madgraph_pu20bx25_phys14'),
         perJob   = cms.uint32(2000),
         xSec     = cms.double(xsec[("ttjets", "13TeV")]),
-        nGen     = cms.int64(-1),
+        nGen     = cms.int64(20858400),
         subFiles = cms.vstring([
             "/store/user/jpata/VHBBHeppy722p2-tthsync-jun9-1/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/VHBB_HEPPY_V11_TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola__Phys14DR-PU20bx25_PHYS14_25_V1-v1/150609_170716/0000/tree_1.root",
             "/store/user/jpata/VHBBHeppy722p2-tthsync-jun9-1/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/VHBB_HEPPY_V11_TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola__Phys14DR-PU20bx25_PHYS14_25_V1-v1/150609_170716/0000/tree_10.root",
@@ -127,7 +127,7 @@ samples = cms.VPSet([
         nickName = cms.string('ttz_13tev_madgraph_pu20bx25_phys14'),
         perJob   = cms.uint32(2000),
         xSec     = cms.double(2.232),
-        nGen     = cms.int64(-1),
+        nGen     = cms.int64(249275),
         subFiles = cms.vstring([
             "/store/user/jpata/VHBBHeppy722p2-tthsync-jun9-1/TTZJets_Tune4C_13TeV-madgraph-tauola/VHBB_HEPPY_V11_TTZJets_Tune4C_13TeV-madgraph-tauola__Phys14DR-PU20bx25_PHYS14_25_V1-v1/150609_170818/0000/tree_1.root",
             "/store/user/jpata/VHBBHeppy722p2-tthsync-jun9-1/TTZJets_Tune4C_13TeV-madgraph-tauola/VHBB_HEPPY_V11_TTZJets_Tune4C_13TeV-madgraph-tauola__Phys14DR-PU20bx25_PHYS14_25_V1-v1/150609_170818/0000/tree_2.root",
@@ -143,7 +143,7 @@ samples = cms.VPSet([
         nickName = cms.string('ttw_13tev_madgraph_pu20bx25_phys14'),
         perJob   = cms.uint32(2000),
         xSec     = cms.double(1.152),
-        nGen     = cms.int64(-1),
+        nGen     = cms.int64(246521),
         subFiles = cms.vstring([
             "/store/user/jpata/VHBBHeppy722p2-tthsync-jun9-1/TTWJets_Tune4C_13TeV-madgraph-tauola/VHBB_HEPPY_V11_TTWJets_Tune4C_13TeV-madgraph-tauola__Phys14DR-PU20bx25_PHYS14_25_V1-v1/150609_170751/0000/tree_1.root",
             "/store/user/jpata/VHBBHeppy722p2-tthsync-jun9-1/TTWJets_Tune4C_13TeV-madgraph-tauola/VHBB_HEPPY_V11_TTWJets_Tune4C_13TeV-madgraph-tauola__Phys14DR-PU20bx25_PHYS14_25_V1-v1/150609_170751/0000/tree_2.root",
@@ -157,7 +157,7 @@ samples = cms.VPSet([
         name     = cms.string('tth_13tev_amcatnlo_pu20bx25'),
         nickName = cms.string('tth_13tev_amcatnlo_pu20bx25'),
         xSec     = cms.double(0.5058),
-        nGen     = cms.int64(-1),
+        nGen     = cms.int64(199699),
         perJob   = cms.uint32(2000),
         subFiles = cms.vstring([
             "/store/user/jpata/VHBBHeppy722p2-tthsync-jun9-1/TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola/VHBB_HEPPY_V11_TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola__Phys14DR-PU20bx25_tsg_PHYS14_25_V1-v2/150609_170651/0000/tree_1.root",
@@ -181,6 +181,7 @@ def getSampleNGen(sample):
         tf = ROOT.TFile.Open(tfn)
         hc = tf.Get("Count")
         n += hc.GetBinContent(1)
+        tf.Close()
         #print tfn, hc.GetBinContent(1)
     return int(n)
 
