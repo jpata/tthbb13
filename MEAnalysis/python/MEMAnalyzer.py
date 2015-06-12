@@ -29,19 +29,19 @@ class MECategoryAnalyzer(FilterAnalyzer):
         super(MECategoryAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
         self.cat_map = {"NOCAT":-1, "cat1": 1, "cat2": 2, "cat3": 3, "cat6":6}
         self.btag_cat_map = {"NOCAT":-1, "L": 0, "H": 1}
-        
+
     def process(self, event):
         for (syst, event_syst) in event.systResults.items():
             if event_syst.passes_wtag:
                 #print syst, event_syst, event_syst.__dict__
                 res = self._process(event_syst)
                 event.systResults[syst] = res
-                
+
                 for k, v in res.__dict__.items():
                     event.__dict__[k + "_" + syst] = v
             else:
                 event.systResults[syst].passes_mecat = False
-        #print "CAT", getattr(event.systResults["JES"], "fw_h_alljets", None)    
+        #print "CAT", getattr(event.systResults["JES"], "fw_h_alljets", None)
         #event.__dict__.update(event.systResults["nominal"].__dict__)
         return np.any([v.passes_mecat for v in event.systResults.values()])
 
@@ -530,7 +530,7 @@ class MEAnalyzer(FilterAnalyzer):
             if "meminput" in self.conf.general["verbosity"]:
                 print "memLepton", lep.pt, lep.eta, lep.phi, lep.mass, lep.charge
 
-        met_cand = mem_cfg.met_candidates(event)[0]
+        met_cand = mem_cfg.met_candidates(event)
         if "meminput" in self.conf.general["verbosity"]:
             print "memMET", met_cand.pt, met_cand.phi
         self.add_obj(
@@ -544,7 +544,7 @@ class MEAnalyzer(FilterAnalyzer):
             if event_syst.passes_btag:
                 res = self._process(event_syst)
                 event.systResults[syst] = res
-                
+
                 for k, v in res.__dict__.items():
                     event.__dict__[k + "_" + syst] = v
             else:

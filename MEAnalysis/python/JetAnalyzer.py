@@ -30,7 +30,7 @@ class JetAnalyzer(FilterAnalyzer):
     def __init__(self, cfg_ana, cfg_comp, looperName):
         super(JetAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
         self.conf = cfg_ana._conf
-        
+
     def variateJets(self, jets, systematic, sigma):
         if systematic == "JES":
             newjets = deepcopy(jets)
@@ -67,12 +67,12 @@ class JetAnalyzer(FilterAnalyzer):
         event.fw_h_alljets = []
         event.fw_h_btagjets = []
         event.fw_h_untagjets = []
-            
+
         jets_JES = self.variateJets(event.Jet, "JES", 0)
         jets_JES_Up = self.variateJets(event.Jet, "JES", 1)
         jets_JES_Down = self.variateJets(event.Jet, "JES", -1)
         evdict = {}
-        for name, jets in [("JES", jets_JES), ("JESUp", jets_JES_Up), ("JESDown", jets_JES_Up)]:
+        for name, jets in [("JES", jets_JES), ("JESUp", jets_JES_Up), ("JESDown", jets_JES_Down)]:
             ev = FakeEvent(event)
             ev.Jet = jets
             ev.systematic = name
@@ -97,9 +97,9 @@ class JetAnalyzer(FilterAnalyzer):
                 lambda x: (
                     x.pt > self.conf.jets["pt"]
                     and abs(x.eta) < self.conf.jets["eta"]
-                    and x.neHEF < 0.99 
-                    and x.chEmEF < 0.99 
-                    and x.neEmEF < 0.99 
+                    and x.neHEF < 0.99
+                    and x.chEmEF < 0.99
+                    and x.neEmEF < 0.99
                     and x.numberOfDaughters > 1
                     and x.chHEF > 0.0
                     and x.chMult > 0.0

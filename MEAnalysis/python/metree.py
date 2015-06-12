@@ -33,9 +33,9 @@ jetType = NTupleObjectType("jetType", variables = [
     NTupleVariable("mcPhi", lambda x : x.mcPhi),
     NTupleVariable("mcM", lambda x : x.mcM),
     NTupleVariable("corr", lambda x : x.corr),
-    NTupleVariable("corr_JECUp", lambda x : x.corr_JECUp),
-    NTupleVariable("corr_JECDown", lambda x : x.corr_JECDown),
-    
+    NTupleVariable("corr_JESUp", lambda x : x.corr_JECUp),
+    NTupleVariable("corr_JESDown", lambda x : x.corr_JECDown),
+
 ])
 #Specifies what to save for leptons
 leptonType = NTupleObjectType("leptonType", variables = [
@@ -98,7 +98,7 @@ def makeGlobalVariable(vtype, systematic="nominal"):
     name = vtype[0]
     typ = vtype[1]
     hlp = vtype[2]
-    
+
     if len(vtype) == 3:
         func = lambda ev, systematic=systematic, name=name: \
             getattr(ev.systResults[systematic], name, -9999)
@@ -114,7 +114,7 @@ def makeGlobalVariable(vtype, systematic="nominal"):
     return NTupleVariable(
         name + syst_suffix, func, type=typ, help=hlp
     )
-    
+
 def getTreeProducer(conf):
     #Create the output TTree writer
     #Here we define all the variables that we want to save in the output TTree
@@ -123,23 +123,23 @@ def getTreeProducer(conf):
         verbose = False,
         vectorTree = True,
         globalVariables = [
-            #NTupleVariable(
-            #    "nGenBHiggs", lambda ev: getattr(ev, "b_quarks_h", -1),
-            #    type=int,
-            #    help="Number of generated b from higgs"
-            #),
+            NTupleVariable(
+               "nGenBHiggs", lambda ev: len(getattr(ev, "b_quarks_h_nominal", [])),
+               type=int,
+               help="Number of generated b from higgs"
+            ),
 
-            #NTupleVariable(
-            #    "nGenBTop", lambda ev: getattr(ev, "b_quarks_t", -1),
-            #    type=int,
-            #    help="Number of generated b from top"
-            #),
+            NTupleVariable(
+               "nGenBTop", lambda ev: len(getattr(ev, "b_quarks_t_nominal", [])),
+               type=int,
+               help="Number of generated b from top"
+            ),
 
-            #NTupleVariable(
-            #    "nGenQW", lambda ev: getattr(ev, "l_quarks_w", -1),
-            #    type=int,
-            #    help="Number of generated quarks from W"
-            #),
+            NTupleVariable(
+               "nGenQW", lambda ev: len(getattr(ev, "l_quarks_w_nominal", [])),
+               type=int,
+               help="Number of generated quarks from W"
+            ),
 
             #NTupleVariable(
             #    "nGenNuTop", lambda ev: getattr(ev, "nu_top", -1),
@@ -202,111 +202,7 @@ def getTreeProducer(conf):
             #    type=int,
             #    help="number of gen C not matched to W decay (after ISR)"
             #),
-            # 
-            # NTupleVariable(
-            #     "nBCSVM", lambda ev: getattr(ev, "nBCSVM"),
-            #     type=int,
-            #     help="Number of good jets passing CSVM"
-            # ),
-            # 
-            # NTupleVariable(
-            #     "nBCSVM_JES", lambda ev: getattr(ev.systResults["JES"], "nBCSVM", -1),
-            #     type=int,
-            #     help="Number of good jets passing CSVM, corrected jets"
-            # ),
-            # 
-            # NTupleVariable(
-            #     "nBCSVM_JES_Up", lambda ev: getattr(ev.systResults["JES_Up"], "nBCSVM", -1),
-            #     type=int,
-            #     help="Number of good jets passing CSVM, corrected jets, variated up"
-            # ),
-            # 
-            # NTupleVariable(
-            #     "nBCSVM_JES_Down", lambda ev: getattr(ev.systResults["JES_Down"], "nBCSVM", -1),
-            #     type=int,
-            #     help="Number of good jets passing CSVM, corrected jets, variated up"
-            # ),
-
-            #NTupleVariable(
-            #    "ngood_jets_JES", lambda ev: len(getattr(ev.systResults["JES"], "good_jets", [])),
-            #    type=int,
-            #    help="Number of good jets, corrected jets"
-            #),
-
-            #NTupleVariable(
-            #    "ngood_jets_JES_Up", lambda ev: len(getattr(ev.systResults["JES_Up"], "good_jets", [])),
-            #    type=int,
-            #    help="Number of good jets, corrected jets, variated up"
-            #),
-
-            #NTupleVariable(
-            #    "ngood_jets_JES_Down", lambda ev: len(getattr(ev.systResults["JES_Down"], "good_jets", [])),
-            #    type=int,
-            #    help="Number of good jets, corrected jets, variated up"
-            #),
-
-            #NTupleVariable(
-            #    "nBCSVT", lambda ev: getattr(ev, "nBCSVT", 0),
-            #    type=int,
-            #    help="Number of good jets passing CSVT"
-            #),
-            #NTupleVariable(
-            #    "nBCSVL", lambda ev: ev.nBCSVL if hasattr(ev, "nBCSVL") else 0,
-            #    type=int,
-            #    help="Number of good jets passing CSVL"
-            #),
-
-            #NTupleVariable(
-            #    "nTrueBTaggedCSVM", lambda ev: ev.n_tagwp_tagged_true_bjets if hasattr(ev, "n_tagwp_tagged_true_bjets") else 0,
-            #    type=int,
-            #    help=""
-            #),
-
-            #NTupleVariable(
-            #    "nTrueBTaggedLR", lambda ev: ev.n_lr_tagged_true_bjets if hasattr(ev, "n_lr_tagged_true_bjets") else 0,
-            #    type=int,
-            #    help=""
-            #),
-
-            #NTupleVariable(
-            #    "nMatch_wq", lambda ev: ev.nMatch_wq if hasattr(ev, "nMatch_wq") else 0,
-            #    type=int,
-            #    help="Number of jets matched to gen-level light quarks from W, without taking into account anti b-tagging"
-            #),
-            #NTupleVariable(
-            #    "nMatch_wq_btag", lambda ev: ev.nMatch_wq_btag if hasattr(ev, "nMatch_wq_btag") else 0,
-            #    type=int,
-            #    help="Number of jets matched to gen-level light quarks from W, taking into account anti b-tagging"
-            #),
-
-            #NTupleVariable(
-            #    "nMatch_tb", lambda ev: ev.nMatch_tb if hasattr(ev, "nMatch_tb") else 0,
-            #    type=int,
-            #    help="Number of jets matched to gen-level b quarks from top, without taking into account b-tagging"
-            #),
-            #NTupleVariable(
-            #    "nMatch_tb_btag", lambda ev: ev.nMatch_tb_btag if hasattr(ev, "nMatch_tb_btag") else 0,
-            #    type=int,
-            #    help="Number of jets matched to gen-level b quarks from top, taking into account b-tagging"
-            #),
-
-            #NTupleVariable(
-            #    "nMatch_hb", lambda ev: ev.nMatch_hb if hasattr(ev, "nMatch_hb") else 0,
-            #    type=int,
-            #    help="Number of jets matched to gen-level b quarks from higgs, without taking into account b-tagging"
-            #),
-            #NTupleVariable(
-            #    "nMatch_hb_btag", lambda ev: ev.nMatch_hb_btag if hasattr(ev, "nMatch_hb_btag") else 0,
-            #    type=int,
-            #    help="Number of jets matched to gen-level b quarks from higgs, taking into account b-tagging"
-            #),
-
-            #NTupleVariable(
-            #    "numJets", lambda ev: ev.numJets if hasattr(ev, "numJets") else 0,
-            #    type=int,
-            #    help="Number of jets passing jet selection"
-            #),
-
+            
             #NTupleVariable(
             #    "lheNj", lambda ev: ev.input.lheNj if hasattr(ev.input, "lheNj") else 0,
             #    type=int,
@@ -408,7 +304,7 @@ def getTreeProducer(conf):
             # ),
         }
     )
-    
+
     for systematic in ["nominal", "JES", "JESUp", "JESDown"]:
         for vtype in [
             ("is_sl",               int,        "Passes single lepton cuts"),
@@ -422,6 +318,8 @@ def getTreeProducer(conf):
             ("btag_LR_4b_2b_alt",   float,      ""),
             ("nBCSVM",              float,      ""),
             ("numJets",             int,        ""),
+            ("nMatchSimB",          int,        ""),
+            ("nMatchSimC",          int,        ""),
             ("nMatch_wq",           int,        ""),
             ("nMatch_wq_btag",      int,        ""),
             ("nMatch_tb",           int,        ""),
@@ -440,7 +338,6 @@ def getTreeProducer(conf):
             ("mean_dr_btag",        float,      ""),
             ("std_dr_btag",         float,      ""),
             ("min_dr_btag",         float,      ""),
-            ("mean_dr_btag",        float,      ""),
             ("ht",                  float,      ""),
             ("momentum_eig0",       float,      ""),
             ("momentum_eig1",       float,      ""),
@@ -452,37 +349,35 @@ def getTreeProducer(conf):
             ("passes_btag",         int,        ""),
         ]:
             treeProducer.globalVariables += [makeGlobalVariable(vtype, systematic)]
-            
+
             syst_suffix = "_" + systematic
+            syst_suffix2 = syst_suffix
             if systematic == "nominal":
-                syst_suffix = ""
+                syst_suffix2 = ""
             treeProducer.collections.update({
                 "mem_results_tth" + syst_suffix: NTupleCollection(
-                    "mem_tth" + syst_suffix, memType, len(conf.mem["methodsToRun"]),
+                    "mem_tth" + syst_suffix2, memType, len(conf.mem["methodsToRun"]),
                     help="MEM tth results array, element per config.methodsToRun"
                 ),
                 "mem_results_ttbb" + syst_suffix: NTupleCollection(
-                    "mem_ttbb" + syst_suffix, memType, len(conf.mem["methodsToRun"]),
+                    "mem_ttbb" + syst_suffix2, memType, len(conf.mem["methodsToRun"]),
                     help="MEM ttbb results array, element per config.methodsToRun"
                 ),
-            
+
                 "fw_h_alljets" + syst_suffix: NTupleCollection(
-                    "fw_aj" + syst_suffix, FoxWolframType, 7,
+                    "fw_aj" + syst_suffix2, FoxWolframType, 8,
                     help="Fox-Wolfram momenta calculated with all jets"
                 ),
                 "fw_h_btagjets" + syst_suffix: NTupleCollection(
-                    "fw_bj" + syst_suffix, FoxWolframType, 7,
+                    "fw_bj" + syst_suffix2, FoxWolframType, 8,
                     help="Fox-Wolfram momenta calculated with b-tagged jets"
                 ),
                 "fw_h_untagjets" + syst_suffix: NTupleCollection(
-                    "fw_uj" + syst_suffix, FoxWolframType, 7,
+                    "fw_uj" + syst_suffix2, FoxWolframType, 8,
                     help="Fox-Wolfram momenta calculated with untagged jets"
                 ),
             })
-            
-            
 
-    
     for systematic in ["nominal"]:
         for vtype in [
             ("weight_xs",               float,  ""),

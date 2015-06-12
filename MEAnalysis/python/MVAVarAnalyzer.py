@@ -121,7 +121,7 @@ class MVAVarAnalyzer(FilterAnalyzer):
         event.centrality = np.sum([l.Pt() / l.E() for l in lvecs])
 
         #orders of momenta to calculate
-        orders = np.array([1, 2, 3, 4, 5, 6, 7])
+        orders = np.array([0, 1, 2, 3, 4, 5, 6, 7])
         event.fw_h_alljets = FoxWolfram.calcFoxWolfram(event.good_jets, orders, FoxWolfram.w_s)
         event.fw_h_btagjets = FoxWolfram.calcFoxWolfram(event.selected_btagged_jets_high, orders, FoxWolfram.w_s)
         event.fw_h_untagjets = FoxWolfram.calcFoxWolfram(event.buntagged_jets, orders, FoxWolfram.w_s)

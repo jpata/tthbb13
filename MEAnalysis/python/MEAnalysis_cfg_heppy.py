@@ -12,19 +12,19 @@ def mu_baseline(mu):
         mu.pixelHits > 0 and
         mu.nStations > 1 #FIXME: is this the same as nMuonHits
     )
-    
+
 def el_baseline(el):
     sca = abs(el.etaSc)
     return (
         not(sca > 1.442 and sca < 1.5660) and
         el.convVeto
     )
-    
+
 class Conf:
     def __init__(self):
         self.leptons = {
             "mu": {
-            
+
                 #SL
                 "tight": {
                     "pt": 30,
@@ -38,7 +38,7 @@ class Conf:
                     "iso": 0.2,
                     "idcut": mu_baseline
                 },
-                
+
                 #DL
                 "loose": {
                     "pt": 20,
@@ -54,8 +54,8 @@ class Conf:
                 },
                 "isotype": "relIso04",
             },
-            
-            
+
+
             "el": {
                 "tight": {
                     "pt": 30,
@@ -69,7 +69,7 @@ class Conf:
                     "iso": 0.15,
                     "idcut": lambda el: el_baseline(el) and el.eleCutIdCSA14_25ns_v1 == 2
                 },
-                
+
                 "loose": {
                     "pt": 20,
                     "eta": 2.4,
@@ -148,7 +148,7 @@ class Conf:
 
             #Actually run the ME calculation
             #If False, all ME values will be 0
-            "calcME": False,
+            "calcME": True,
 
             #Generic event-dependent selection function applied
             #just before the MEM. If False, MEM is skipped
@@ -170,9 +170,9 @@ class Conf:
                 #"SL_1qW",
                 "DL",
 
-                "SL_2qW_gen",
-                "SL_1qW_gen",
-                "DL_gen",
+#                "SL_2qW_gen",
+#                "SL_1qW_gen",
+#                "DL_gen",
 
                 #"SL_0qW",
                 #"SL_1bT",
