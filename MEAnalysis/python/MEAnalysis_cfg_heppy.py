@@ -123,9 +123,9 @@ class Conf:
             "verbosity": [],
 
             #Process only these events (will scan through file to find)
-            "eventWhitelist": [
+            #"eventWhitelist": [
                 #('MEM', 1, 214, 21320, 'cat2', 'H', 7, 5, 1, 0, 'JES')
-                (1, 214, 21320),
+            #    (1, 214, 21320),
             ##    #cat6
             ##    (1, 1326, 132576),
             ##    (1, 1001, 100098),
@@ -142,7 +142,7 @@ class Conf:
             ##    (1,  856,  85542),
             ##    (1,  300,  29931),
             ##    (1, 1675, 167428),
-            ]
+            #]
         }
 
         self.mem = {
