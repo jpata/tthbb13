@@ -51,8 +51,6 @@ class WTagAnalyzer(FilterAnalyzer):
             if event_syst.passes_btag:
                 res = self._process(event_syst)
                 event.systResults[syst] = res
-                for k, v in res.__dict__.items():
-                    event.__dict__[k + "_" + syst] = v
             else:
                 event.systResults[syst].passes_wtag = False
         #event.__dict__.update(event.systResults["nominal"].__dict__)

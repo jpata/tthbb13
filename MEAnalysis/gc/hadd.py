@@ -1,10 +1,12 @@
 #import TTH.MEAnalysis.JobUtils as ju
 from TTH.TTHNtupleAnalyzer.ParHadd import par_hadd
 import glob
+import sys
 
+samps = []
+for x in sys.argv[1:]:
+    samps += glob.glob(x + "/*")
 
-inpath = "/home/joosep/tth/gc/GCd967abb5f926/"
-samps = glob.glob(inpath + "*")
 for samp in samps:
     if len(samp) == 0:
         continue

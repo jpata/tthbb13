@@ -36,9 +36,6 @@ class MECategoryAnalyzer(FilterAnalyzer):
                 #print syst, event_syst, event_syst.__dict__
                 res = self._process(event_syst)
                 event.systResults[syst] = res
-
-                for k, v in res.__dict__.items():
-                    event.__dict__[k + "_" + syst] = v
             else:
                 event.systResults[syst].passes_mecat = False
         #print "CAT", getattr(event.systResults["JES"], "fw_h_alljets", None)
@@ -544,14 +541,15 @@ class MEAnalyzer(FilterAnalyzer):
             if event_syst.passes_btag:
                 res = self._process(event_syst)
                 event.systResults[syst] = res
-
-                for k, v in res.__dict__.items():
-                    event.__dict__[k + "_" + syst] = v
             else:
                 event.systResults[syst].passes_mem = False
+
+        for (k, v) in event.__dict__.items():
+            if "mem_results" in k:
+                print k, [x.p for x in v]
         #print "MEM", getattr(event.systResults["JES"], "fw_h_alljets", None)
         #event.__dict__.update(event.systResults["nominal"].__dict__)
-        return np.any([v.passes_wtag for v in event.systResults.values()])
+        return np.any([v.passes_mem for v in event.systResults.values()])
 
     def _process(self, event):
         #Clean up any old MEM state
@@ -622,6 +620,8 @@ class MEAnalyzer(FilterAnalyzer):
 
         event.mem_results_tth = [res[(MEM.Hypothesis.TTH, k)] for k in self.memkeys]
         event.mem_results_ttbb = [res[(MEM.Hypothesis.TTBB, k)] for k in self.memkeys]
+        print [r.p for r in event.mem_results_tth]
+        print [r.p for r in event.mem_results_ttbb]
         if "memoutput" in self.conf.general["verbosity"]:
             print "---MEM done EVENT r:l:e", event.input.run, event.input.lumi, event.input.evt
         event.passes_mem = True

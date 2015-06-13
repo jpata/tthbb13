@@ -2,6 +2,7 @@ from TTH.MEAnalysis.Analyzer import FilterAnalyzer
 from TTH.MEAnalysis.VHbbTree import *
 from copy import deepcopy
 import numpy as np
+import copy
 
 def attach_jet_transfer_function(jet, conf, eval_gen=False):
     """
@@ -56,18 +57,10 @@ class JetAnalyzer(FilterAnalyzer):
                 print "InJetReco", j.pt, j.eta, j.phi, j.mass, j.btagCSV, j.mcFlavour
                 print "InJetGen", j.mcPt, j.mcEta, j.mcPhi, j.mcM
 
-        #pre-create METs so that even if the nominal processing chain does not succeed, they can be ntuplized
         event.MET = MET(pt=event.met.pt, phi=event.met.phi)
         event.MET_gen = MET(pt=event.MET.genPt, phi=event.MET.genPhi)
         event.MET_tt = MET(px=0, py=0)
-
-        event.mem_results_tth = []
-        event.mem_results_ttbb = []
-
-        event.fw_h_alljets = []
-        event.fw_h_btagjets = []
-        event.fw_h_untagjets = []
-
+        
         jets_JES = self.variateJets(event.Jet, "JES", 0)
         jets_JES_Up = self.variateJets(event.Jet, "JES", 1)
         jets_JES_Down = self.variateJets(event.Jet, "JES", -1)
@@ -77,21 +70,18 @@ class JetAnalyzer(FilterAnalyzer):
             ev.Jet = jets
             ev.systematic = name
             evdict[name] = ev
-        evdict["nominal"] = event
-        event.MET_jetcorr = getattr(evdict["nominal"], "MET_jetcorr", MET(px=0, py=0))
+        evdict["nominal"] = FakeEvent(event)
+        evdict["nominal"].systematic = "nominal"
 
         for syst, event_syst in evdict.items():
             res = self._process(event_syst)
-            for k, v in res.__dict__.items():
-                event.__dict__[k + "_" + syst] = v
             evdict[syst] = res
         event.systResults = evdict
         #event.__dict__.update(event.systResults["nominal"].__dict__)
 
         return np.any([v.passes_jet for v in event.systResults.values()])
 
-    def _process(self, event_in):
-        event = FakeEvent(event_in)
+    def _process(self, event):
         event.good_jets = sorted(
             filter(
                 lambda x: (

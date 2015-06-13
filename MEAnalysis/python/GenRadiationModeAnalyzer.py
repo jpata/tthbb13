@@ -19,9 +19,6 @@ class GenRadiationModeAnalyzer(FilterAnalyzer):
             if event_syst.passes_jet:
                 res = self._process(event_syst)
                 event.systResults[syst] = res
-                
-                for k, v in res.__dict__.items():
-                    event.__dict__[k + "_" + syst] = v
         #event.__dict__.update(event.systResults["nominal"].__dict__)
         return True
 

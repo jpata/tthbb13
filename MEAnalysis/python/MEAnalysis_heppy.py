@@ -148,6 +148,11 @@ mva = cfg.Analyzer(
     _conf = conf
 )
 
+treevar = cfg.Analyzer(
+    MECoreAnalyzers.TreeVarAnalyzer,
+    'treevar',
+    _conf = conf
+)
 from TTH.MEAnalysis.metree import getTreeProducer
 treeProducer = getTreeProducer(conf)
 
@@ -166,6 +171,7 @@ sequence = cfg.Sequence([
     genrad,
     gentth,
     mem_analyzer,
+    treevar,
     treeProducer
 ])
 
