@@ -2,8 +2,6 @@
 <use   name="rootgraphics"/>
 <use   name="classlib"/>
 <use   name="boost"/>
-<Flags CXXFLAGS="-std=c++11 -fPIC -g -I$(CMSSW_BASE)/src/TTH/MEAnalysis -I$(INCLUDE_DIR)"/>
-<Flags GENREFLEX_ARGS="-I$(CMSSW_BASE)/src/TTH/MEAnalysis"/>
 <export>
   <lib   name="1"/>
 </export>
