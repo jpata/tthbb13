@@ -17,10 +17,10 @@ samples = cms.VPSet([
 
     #tt + jets
     cms.PSet(
-        skip     = cms.bool(True),
+        skip     = cms.bool(False),
         name     = cms.string('ttjets_13tev_madgraph_pu20bx25_phys14'),
         nickName = cms.string('ttjets_13tev_madgraph_pu20bx25_phys14'),
-        perJob   = cms.uint32(2000),
+        perJob   = cms.uint32(20000),
         xSec     = cms.double(xsec[("ttjets", "13TeV")]),
         nGen     = cms.int64(20858400),
         subFiles = cms.vstring([
@@ -125,7 +125,7 @@ samples = cms.VPSet([
         skip     = cms.bool(True),
         name     = cms.string('ttz_13tev_madgraph_pu20bx25_phys14'),
         nickName = cms.string('ttz_13tev_madgraph_pu20bx25_phys14'),
-        perJob   = cms.uint32(2000),
+        perJob   = cms.uint32(20000),
         xSec     = cms.double(2.232),
         nGen     = cms.int64(249275),
         subFiles = cms.vstring([
@@ -141,7 +141,7 @@ samples = cms.VPSet([
         skip     = cms.bool(True),
         name     = cms.string('ttw_13tev_madgraph_pu20bx25_phys14'),
         nickName = cms.string('ttw_13tev_madgraph_pu20bx25_phys14'),
-        perJob   = cms.uint32(2000),
+        perJob   = cms.uint32(20000),
         xSec     = cms.double(1.152),
         nGen     = cms.int64(246521),
         subFiles = cms.vstring([
@@ -158,7 +158,7 @@ samples = cms.VPSet([
         nickName = cms.string('tth_13tev_amcatnlo_pu20bx25'),
         xSec     = cms.double(0.5058),
         nGen     = cms.int64(199699),
-        perJob   = cms.uint32(200),
+        perJob   = cms.uint32(20000),
         subFiles = cms.vstring([
             "/store/user/jpata/VHBBHeppy722p2-tthsync-jun9-1/TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola/VHBB_HEPPY_V11_TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola__Phys14DR-PU20bx25_tsg_PHYS14_25_V1-v2/150609_170651/0000/tree_1.root",
             "/store/user/jpata/VHBBHeppy722p2-tthsync-jun9-1/TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola/VHBB_HEPPY_V11_TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola__Phys14DR-PU20bx25_tsg_PHYS14_25_V1-v2/150609_170651/0000/tree_2.root",
