@@ -1,34 +1,46 @@
 import ROOT
 ROOT.gROOT.SetBatch(True)
-ROOT.gErrorIgnoreLevel = ROOT.kError
+#ROOT.gErrorIgnoreLevel = ROOT.kError
 import sys, os
-#sys.path += ["./heplot/"]
-#import heplot.heplot as he
-#from rootpy.plotting import Hist, Hist2D
-#import matplotlib.pyplot as plt
 import random
-#import matplotlib
-#from rootpy import asrootpy
-#from matplotlib.ticker import NullLocator, LinearLocator, MultipleLocator, FormatStrFormatter, AutoMinorLocator
 import numpy as np
+import multiprocessing
 
-from TTH.Plotting.joosep.samples import samples_dict
+class Sample:
+    def __init__(self, filenames):
+        self.fileNamesS2 = filenames
+
+path = "/Users/joosep/Documents/tth/data/ntp/sync_722_1/"
+samples_dict = {
+    "tth_13tev_amcatnlo_pu20bx25": Sample([path + "tth_13tev_amcatnlo_pu20bx25.root"]),
+    "ttjets_13tev_madgraph_pu20bx25_phys14_tt2b": Sample([path + "ttjets_13tev_madgraph_pu20bx25_phys14_tt2b.root"]),
+    "ttjets_13tev_madgraph_pu20bx25_phys14_ttb": Sample([path + "ttjets_13tev_madgraph_pu20bx25_phys14_ttb.root"]),
+    "ttjets_13tev_madgraph_pu20bx25_phys14_ttbb": Sample([path + "ttjets_13tev_madgraph_pu20bx25_phys14_ttbb.root"]),
+    "ttjets_13tev_madgraph_pu20bx25_phys14_ttcc": Sample([path + "ttjets_13tev_madgraph_pu20bx25_phys14_ttcc.root"]),
+    "ttjets_13tev_madgraph_pu20bx25_phys14_ttll": Sample([path + "ttjets_13tev_madgraph_pu20bx25_phys14_ttll.root"]),
+    "ttw_13tev_madgraph_pu20bx25_phys14": Sample([path + "ttw_13tev_madgraph_pu20bx25_phys14.root"]),
+    "ttz_13tev_madgraph_pu20bx25_phys14": Sample([path + "ttz_13tev_madgraph_pu20bx25_phys14.root"]),
+}
 
 samples = [
-    "tth_13TeV_phys14",
-    "ttjets_13TeV_phys14",
-    "ttjets_13TeV_phys14_bb", "ttjets_13TeV_phys14_b",
-    "ttjets_13TeV_phys14_cc", "ttjets_13TeV_phys14_ll"
+    "tth_13tev_amcatnlo_pu20bx25",
+    # "ttjets_13tev_madgraph_pu20bx25_phys14_tt2b",
+    # "ttjets_13tev_madgraph_pu20bx25_phys14_ttb",
+    # "ttjets_13tev_madgraph_pu20bx25_phys14_ttbb",
+    # "ttjets_13tev_madgraph_pu20bx25_phys14_ttcc",
+    # "ttjets_13tev_madgraph_pu20bx25_phys14_ttll",
+    # "ttw_13tev_madgraph_pu20bx25_phys14",
+    # "ttz_13tev_madgraph_pu20bx25_phys14"
 ]
 
 of = ROOT.TFile("ControlPlots.root", "RECREATE")
 
 #Number of parallel processes to run for the histogram projection
-ncores = 20
+ncores = 4
 
-def weight_str(cut):
-    #return "genWeight * ({0})".format(cut)
-    return "1.0 * ({0})".format(cut)
+def weight_str(cut, weight=1.0):
+    return "weight_xs * genWeight * {1} * ({0})".format(cut, weight)
+    #return "1.0 * ({0})".format(cut)
 
 def drawHelper(args):
     tf, hist, cut, nfirst, nev = args
@@ -36,41 +48,133 @@ def drawHelper(args):
     hname = hist.split(">>")[1].split("(")[0].strip()
     ROOT.gROOT.cd()
     ROOT.TH1.SetDefaultSumw2(True)
-    if isinstance(cut, str):
-        n = tf.Draw(hist, weight_str(cut), "goff", nev, nfirst)
-    elif isinstance(cut, ROOT.TEntryList):
-        tf.SetEntryList(cut)
-        n = tf.Draw(hist, weight_str("1"), "goff", nev, nfirst)
-        tf.SetEntryList(0)
+    n = tf.Draw(hist, cut, "goff", nev, nfirst)
     h = ROOT.gROOT.Get(hname)
     assert(h.GetEntries() == n)
     return h
-
-if ncores == 1:
-    def Draw(tf, of, *args):
-        return tf.Draw(*args)
-else:
-    import multiprocessing
-    pool = multiprocessing.Pool(ncores)
-
-    def Draw(tf, of, *args):
+        
+class Systematic(object):
+    def __init__(self, name, **kwargs):
+        self.name = name
+        self.__dict__.update(kwargs)
+        
+    def __str__(self):
+        return "s {0} {1} {2}".format(
+            self.name,
+            getattr(self, "weight", None),
+            getattr(self, "hfunc", None)
+        )
+        
+def gensyst(hfunc, hname, cut):
+    systs = []
+    for sname, weight in [
+            ("unw",             "1.0"),
+            ("bw",              "bTagWeight"),
+            ("JESUp",           "bTagWeight_JESUp"),
+            ("JESDown",         "bTagWeight_JESDown"),
+            ("bwLFUp",          "bTagWeight_LFUp"),
+            ("bwLFDown",        "bTagWeight_LFDown"),
+            ("bwHFUp",          "bTagWeight_HFUp"),
+            ("bwHFDown",        "bTagWeight_HFDown"),
+            ("bwStats1Up",      "bTagWeight_Stats1Up"),
+            ("bwStats1Down",    "bTagWeight_Stats1Down"),
+            ("bwStats2Up",      "bTagWeight_Stats2Up"),
+            ("bwStats2Down",    "bTagWeight_Stats2Down"),
+    ]:
+        s = Systematic(sname, weight=weight, hfunc=hfunc)
+        
+        repllist = [
+        ]
+        
+        def replacer(s, repllist):
+            for r1, r2 in repllist:
+                s = s.replace(r1, r2)
+            return s
+            
+        if "JESUp" in s.name:
+            repllist += [("numJets",    "numJets_JESUp")]
+            repllist += [("nBCSVM",     "nBCSVM_JESUp")]
+            repllist += [("jets_pt[0]", "jets_corr_JESUp[0] * jets_pt[0]")]
+        elif "JESDown" in s.name:
+            repllist += [("numJets",    "numJets_JESDown")]
+            repllist += [("nBCSVM",     "nBCSVM_JESDown")]
+            repllist += [("jets_pt[0]", "jets_corr_JESDown[0] * jets_pt[0]")]
+        else:
+            repllist += [("jets_pt[0]", "jets_corr[0] * jets_pt[0]")]
+        s.repllist = repllist
+        s.varreplacement = lambda cut, r=repllist: replacer(cut, r)
+        
+        systs += [s]
+    return systs
+    
+def Draw(tf, of, gensyst, *args):
+    hist = args[0]
+    cut = args[1]
+    hname = hist.split(">>")[1].split("(")[0].strip()
+    hbins = hist.split(">>")[1].split("(")[1].strip()
+    hfunc = hist.split(">>")[0]
+    
+    ROOT.gROOT.cd()
+    
+    if isinstance(cut, ROOT.TEntryList):
+        tf.SetEntryList(cut)
+    
+    cuts = cut
+    if isinstance(cut, ROOT.TEntryList):
+        cuts = "1.0"
+            
+    for syst in gensyst(hfunc, hname, cuts):
+        
+        replacer = getattr(syst, "varreplacement", lambda c: c)
+        hname_new = hname + "_" + syst.name
+        hfunc_new = replacer(hfunc)
+        cuts_new = replacer(cuts)
+        cut_new = weight_str(cuts_new, getattr(syst, "weight", "1.0"))
+        h = hfunc_new + ">>" + hname_new + "(" + hbins
+        print hname_new
+        print h
+        print cut_new
+        
         ntot = tf.GetEntriesFast()
+
         #how many events to process per core
-        chunksize = max(ntot/ncores, 100000)
+        chunksize = max(ntot/ncores, 500000)
         chunks = range(0, ntot, chunksize)
-        parargs = []
-        for ch in chunks:
-            parargs += [tuple([tf] + list(args)+[ch, min(chunksize, ntot-ch)])]
-        hlist = pool.map(drawHelper, parargs)
-        h = hlist[0].Clone()
-        for h_ in hlist[1:]:
-            h.Add(h_)
-        h.SetDirectory(of)
-        of.Add(h, True)
-        print of.GetPath(), h.GetName(), h.GetEntries(), h.Integral()
-        return h
+        
+        ROOT.gROOT.cd()            
+        if True or ncores == 1 or len(chunks)==1:
+            n = tf.Draw(h, cut_new, "goff")
+            h = ROOT.gROOT.Get(hname_new)
+        else:
+            pool = multiprocessing.Pool(min(ncores, len(chunks)))
+            
+            parargs = []
+            for ch in chunks:
+                parargs += [tuple([tf, h, cut_new, ch, min(chunksize, ntot-ch)])]
+            hlist = pool.map(drawHelper, parargs)
+            
+            #h = sum(h)
+            h = hlist[0].Clone()
+            for h_ in hlist[1:]:
+                h.Add(h_)
+            pool.close()
+        if "njets_nBCSVM_JES" in hname_new:
+            h.Print("ALL")
+        hold = h
+        of.cd()
+        h = h.Clone()    
+        #print of.GetName(), h.GetName()
+        #h.SetDirectory(of)
+        h.Write()
+        #of.Append(h, True)
+        
+        hold.Delete()
+        
+    if isinstance(cut, ROOT.TEntryList):
+        tf.SetEntryList(0)
 
-
+    return 0
+        
 for sample in samples:
     print sample
     tf = ROOT.TChain("tree")
@@ -78,122 +182,107 @@ for sample in samples:
         tf.AddFile(fn)
     print tf.GetEntries()
 
-    weight = "genWeight"
+    #weight = "genWeight"
     of.cd()
     d = of.mkdir(sample)
     d.cd()
-    Draw(tf, d, "is_sl >> nsl(2,0,2)", "1")
-    Draw(tf, d, "is_dl >> ndl(2,0,2)", "1")
+    Draw(tf, d, gensyst, "is_sl >> nsl(2,0,2)", "1")
+    Draw(tf, d, gensyst, "is_dl >> ndl(2,0,2)", "1")
 
     for lep, lepcut in [("sl", "(is_sl==1)"), ("dl", "(is_dl==1)")]:
         d.cd()
         lepd = d.mkdir(lep)
-        lepd.cd()
-        #Draw(tf, lepd, "leps_pt[0] >> lep0_pt(30,0,300)", lepcut)
-        #Draw(tf, lepd, "leps_eta[0] >> lep0_eta(30,-5,5)", lepcut)
+        #lepd.cd()
+        Draw(tf, lepd, gensyst, "leps_pt[0] >> lep0_pt(30,0,300)", lepcut)
+        Draw(tf, lepd, gensyst, "leps_eta[0] >> lep0_eta(30,-5,5)", lepcut)
+        
+        Draw(tf, lepd, gensyst, "leps_pt[1] >> lep1_pt(30,0,300)", lepcut)
+        Draw(tf, lepd, gensyst, "leps_eta[1] >> lep1_eta(30,-5,5)", lepcut)
+        
+        Draw(tf, lepd, gensyst, "numJets >> njets(15,0,15)", lepcut)
+        Draw(tf, lepd, gensyst, "nBCSVM >> ntags(15,0,15)", lepcut)
 
-        #Draw(tf, lepd, "leps_pt[1] >> lep1_pt(30,0,300)", lepcut)
-        #Draw(tf, lepd, "leps_eta[1] >> lep1_eta(30,-5,5)", lepcut)
-
-        #Draw(tf, lepd, "njets >> njets(15,0,15)", lepcut)
-        #Draw(tf, lepd, "nBCSVM >> ntags(15,0,15)", lepcut)
-
-        #Draw(tf, lepd, "nBCSVM:njets >> njets_nBCSVM(15,0,15,15,0,15)", lepcut)
-
-        Draw(tf, lepd, "jets_pt[0] >> jet0_pt(30,0,600)", lepcut)
-        #Draw(tf, lepd, "jets_eta[0] >> jet0_eta(30,-5,5)", lepcut)
-
-        #Draw(tf, lepd, "jets_pt[1] >> jet1_pt(30,0,600)", lepcut)
-        #Draw(tf, lepd, "jets_eta[1] >> jet1_eta(30,-5,5)", lepcut)
-        Draw(tf, lepd, "(100*nMatch_wq + 10*nMatch_hb + nMatch_tb) >> nMatch(300,0,300)", lepcut)
-        Draw(tf, lepd, "(100*nMatch_wq_btag + 10*nMatch_hb_btag + nMatch_tb_btag) >> nMatch_btag(300,0,300)", lepcut)
+        Draw(tf, lepd, gensyst, "nBCSVM:numJets >> njets_nBCSVM(15,0,15,15,0,15)", lepcut)
+        
+        Draw(tf, lepd, gensyst, "jets_pt[0] >> jet0_pt(30,0,600)", lepcut)
+        Draw(tf, lepd, gensyst, "jets_eta[0] >> jet0_eta(30,-5,5)", lepcut)
+        
+        Draw(tf, lepd, gensyst, "jets_pt[1] >> jet1_pt(30,0,600)", lepcut)
+        Draw(tf, lepd, gensyst, "jets_eta[1] >> jet1_eta(30,-5,5)", lepcut)
+        Draw(tf, lepd, gensyst, "(100*nMatch_wq + 10*nMatch_hb + nMatch_tb) >> nMatch(300,0,300)", lepcut)
+        Draw(tf, lepd, gensyst, "(100*nMatch_wq_btag + 10*nMatch_hb_btag + nMatch_tb_btag) >> nMatch_btag(300,0,300)", lepcut)
         for jet_tag, jettagcut in [
-                ("cat1H", "cat==1 && cat_btag==1"),
-                ("cat2H", "cat==2 && cat_btag==1"),
-                ("cat3H", "cat==3 && cat_btag==1"),
-
-                ("cat6Hee", "nleps==2 && (abs(leps_pdgId[0]) + abs(leps_pdgId[1]))==22 && cat==6 && cat_btag==1"),
-                ("cat6Hem", "nleps==2 && (abs(leps_pdgId[0]) + abs(leps_pdgId[1]))==24 && cat==6 && cat_btag==1"),
-                ("cat6Hmm", "nleps==2 && (abs(leps_pdgId[0]) + abs(leps_pdgId[1]))==26 && cat==6 && cat_btag==1"),
-
+                # ("cat1H", "cat==1 && cat_btag==1"),
+                # ("cat2H", "cat==2 && cat_btag==1"),
+                # ("cat3H", "cat==3 && cat_btag==1"),
+                # 
+                # ("cat6Hee", "nleps==2 && (abs(leps_pdgId[0]) + abs(leps_pdgId[1]))==22 && cat==6 && cat_btag==1"),
+                # ("cat6Hem", "nleps==2 && (abs(leps_pdgId[0]) + abs(leps_pdgId[1]))==24 && cat==6 && cat_btag==1"),
+                # ("cat6Hmm", "nleps==2 && (abs(leps_pdgId[0]) + abs(leps_pdgId[1]))==26 && cat==6 && cat_btag==1"),
+        
                 #("cat1L", "cat==1 && cat_btag==0"),
                 #("cat2L", "cat==2 && cat_btag==0"),
                 #("cat3L", "cat==3 && cat_btag==0"),
-
+        
                 #("cat6Lee", "nleps==2 && (abs(leps_pdgId[0]) + abs(leps_pdgId[1]))==22 && cat==6 && cat_btag==0"),
                 #("cat6Lem", "nleps==2 && (abs(leps_pdgId[0]) + abs(leps_pdgId[1]))==24 && cat==6 && cat_btag==0"),
                 #("cat6Lmm", "nleps==2 && (abs(leps_pdgId[0]) + abs(leps_pdgId[1]))==26 && cat==6 && cat_btag==0"),
+        
+                ("4j", "numJets==4"),
+                ("4j3t", "numJets==4 && nBCSVM==3"),
+                ("4j4t", "numJets==4 && nBCSVM==4"),
+                
+                ("5j", "numJets==5"),
+                ("5jL", "numJets==5 && nBCSVM<3"),
+                ("5j3t", "numJets==5 && nBCSVM==3"),
+                ("5j4t", "numJets==5 && nBCSVM==4"),
+                ("5j4plust", "numJets==5 && nBCSVM>=4"),
+                ("5jH", "numJets==5 && nBCSVM>4"),
+                
+                ("6j", "numJets==6"),
+                ("6jL", "numJets==6 && nBCSVM<3"),
+                ("6j3t", "numJets==6 && nBCSVM==3"),
+                ("6j4t", "numJets==6 && nBCSVM==4"),
+                ("6jH", "numJets==6 && nBCSVM>4"),
 
-                ("4j", "njets==4"),
-                ("4j3t", "njets==4 && nBCSVM==3"),
-                ("4j4t", "njets==4 && nBCSVM==4"),
-
-                ("5j", "njets==5"),
-                ("5jL", "njets==5 && nBCSVM<3"),
-                ("5j3t", "njets==5 && nBCSVM==3"),
-                ("5j4t", "njets==5 && nBCSVM==4"),
-                ("5j4plust", "njets==5 && nBCSVM>=4"),
-                ("5jH", "njets==5 && nBCSVM>4"),
-
-                ("6j", "njets==6"),
-                ("6jL", "njets==6 && nBCSVM<3"),
-                ("6j3t", "njets==6 && nBCSVM==3"),
-                ("6j4t", "njets==6 && nBCSVM==4"),
-                ("6jH", "njets==6 && nBCSVM>4"),
-
-                ("6plusj", "njets>=6"),
-                ("6plusj2t", "njets>=6 && nBCSVM==2"),
-                ("6plusj3t", "njets>=6 && nBCSVM==3"),
-                ("6plusj4t", "njets>=6 && nBCSVM==4"),
-                ("6plusj4plust", "njets>=6 && nBCSVM>=4"),
-                ("6plusjH", "njets>=6 && nBCSVM>4"),
-
-                ("7j", "njets==7"),
-                ("7jL", "njets==7 && nBCSVM<3"),
-                ("7j3t", "njets==7 && nBCSVM==3"),
-                ("7j4t", "njets==7 && nBCSVM==4"),
-                ("7jH", "njets==7 && nBCSVM>4"),
-
-                ("8plusj", "njets>=8"),
-                ("8plusjL", "njets>=8 && nBCSVM<3"),
-                ("8plusj3t", "njets>=8 && nBCSVM==3"),
-                ("8plusj4t", "njets>=8 && nBCSVM==4"),
-                ("8plusjH", "njets>=8 && nBCSVM>4"),
+                ("6plusj", "numJets>=6"),
+                ("6plusj2t", "numJets>=6 && nBCSVM==2"),
+                ("6plusj3t", "numJets>=6 && nBCSVM==3"),
+                ("6plusj4t", "numJets>=6 && nBCSVM==4"),
+                ("6plusj4plust", "numJets>=6 && nBCSVM>=4"),
+                ("6plusjH", "numJets>=6 && nBCSVM>4"),
+        
+                ("7j", "numJets==7"),
+                ("7jL", "numJets==7 && nBCSVM<3"),
+                ("7j3t", "numJets==7 && nBCSVM==3"),
+                ("7j4t", "numJets==7 && nBCSVM==4"),
+                ("7jH", "numJets==7 && nBCSVM>4"),
+        
+        #         ("8plusj", "njets>=8"),
+        #         ("8plusjL", "njets>=8 && nBCSVM<3"),
+        #         ("8plusj3t", "njets>=8 && nBCSVM==3"),
+        #         ("8plusj4t", "njets>=8 && nBCSVM==4"),
+        #         ("8plusjH", "njets>=8 && nBCSVM>4"),
             ]:
-
-            if lep == "sl" and "cat6" in jet_tag:
-                continue
-            if lep == "dl" and (
-                "cat1" in jet_tag or
-                "cat2" in jet_tag or
-                "cat3" in jet_tag
-            ):
-                continue
+        
             lepjetcut = " && ".join([lepcut, jettagcut])
-            if tf.GetEntries(lepjetcut)==0:
-                continue
-            ROOT.gROOT.cd()
-            tf.Draw(">>elist", lepjetcut, "entrylist")
-            elist = ROOT.gROOT.Get("elist")
-
             lepd.cd()
             jetd = lepd.mkdir(jet_tag)
-            jetd.cd()
 
-            #Draw(tf, jetd, "nBCSVM:njets >> njets_nBCSVM(15,0,15,15,0,15)", lepjetcut)
-            #Draw(tf, jetd, "nMatchSimB:nMatchSimC >> nMatchSimB_nMatchSimC(6,0,6,6,0,6)", lepjetcut)
+            Draw(tf, jetd, gensyst, "nBCSVM:numJets >> njets_nBCSVM(15,0,15,15,0,15)", lepjetcut)
 
-            Draw(tf, jetd, "jets_pt[0] >> jet0_pt(30,0,600)", elist)
-            #Draw(tf, jetd, "jets_eta[0] >> jet0_eta(30,-5,5)", lepjetcut)
-
-            #Draw(tf, jetd, "leps_pt[0] >> lep0_pt(30,0,300)", lepjetcut)
-            #Draw(tf, jetd, "leps_eta[0] >> lep0_eta(30,-5,5)", lepjetcut)
-
+            Draw(tf, jetd, gensyst, "jets_pt[0] >> jet0_pt(30,0,600)", lepjetcut)
+            Draw(tf, jetd, gensyst, "jets_pt[1] >> jet1_pt(30,0,600)", lepjetcut)
+            Draw(tf, jetd, gensyst, "jets_eta[0] >> jet0_eta(30,-5,5)", lepjetcut)
+        
+            Draw(tf, jetd, gensyst, "leps_pt[0] >> lep0_pt(30,0,300)", lepjetcut)
+            Draw(tf, jetd, gensyst, "leps_eta[0] >> lep0_eta(30,-5,5)", lepjetcut)
+        
             #Draw(tf, jetd, "btag_LR_4b_2b >> btag_lr(30,0,1)", lepjetcut)
-
-            Draw(tf, jetd, "(100*nMatch_wq + 10*nMatch_hb + nMatch_tb) >> nMatch(300,0,300)", elist)
-            Draw(tf, jetd, "(100*nMatch_wq_btag + 10*nMatch_hb_btag + nMatch_tb_btag) >> nMatch_btag(300,0,300)", elist)
-
+        
+            Draw(tf, jetd, gensyst, "(100*nMatch_wq + 10*nMatch_hb + nMatch_tb) >> nMatch(300,0,300)", lepjetcut)
+            Draw(tf, jetd, gensyst, "(100*nMatch_wq_btag + 10*nMatch_hb_btag + nMatch_tb_btag) >> nMatch_btag(300,0,300)", lepjetcut)
+        
             for match, matchcut in [
                     ("nomatch", "1"),
                     ("tb2_wq2", "nMatch_wq_btag==2 && nMatch_tb_btag==2"),
@@ -207,12 +296,18 @@ for sample in samples:
                 if tf.GetEntries(cut) == 0:
                     continue
                 for nmem in range(3):
-                    Draw(tf, jetd,
+                    Draw(tf, jetd, gensyst,
                         "mem_tth_p[{0}] / (mem_tth_p[{0}] + 0.15*mem_ttbb_p[{0}]) >> mem_d_{1}_{0}(20,0,1)".format(nmem, match),
                         cut
                     )
+            
+            jetd.Write()
+
+        
+        lepd.Write()
+    d.Write()
 
 
+print "writing"
 of.Write()
 of.Close()
-
