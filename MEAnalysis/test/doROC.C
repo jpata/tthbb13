@@ -195,9 +195,42 @@ void run_DL( TString gcS1 = "GC3de9cd7caec1", TString gcB1 = "GCa5f687e57337",
 	     ){
 
   TString fS1 = path+gcS1+"/tth_13tev/output-sig.root";
-  TString fB1 = path+gcB1+"/ttjets_13tev_madgraph_pu20bx25_phys14/output_94.root";
+  TString fB1 = path+gcB1+"/ttjets_13tev_madgraph_pu20bx25_phys14/output-bkg.root";
   TString fS2 = path+gcS2+"/tth_13tev/output-sig.root";
-  TString fB2 = path+gcB2+"/ttjets_13tev_madgraph_pu20bx25_phys14/output_94.root";
+  TString fB2 = path+gcB2+"/ttjets_13tev_madgraph_pu20bx25_phys14/output-bkg.root";
+
+  roc_comp_ROC( fS1, fB1, fS2, fB2,                                        
+		"mem_tth_p[0] / (mem_tth_p[0]  + 0.1*mem_ttbb_p[0])",      
+		"btag_LR_4b_2b",
+		dl && TCut("njets>=4 && nBCSVM==2"),
+		dl && TCut("njets>=4 && nBCSVM==2"),
+		"DL, N_{b}==2, N_{j}#geq4",
+		"DL, MEM",                                                 
+		"DL, LR",                                                  
+		"ROC_DL_g4_2_btag-mem.png"                                               
+		);
+
+  roc_comp_ROC( fS1, fB1, fS2, fB2,                                        
+		"mem_tth_p[0] / (mem_tth_p[0]  + 0.1*mem_ttbb_p[0])",      
+		"btag_LR_4b_2b",
+		dl && TCut("njets>=4 && nBCSVM==3"),
+		dl && TCut("njets>=4 && nBCSVM==3"),
+		"DL, N_{b}==3, N_{j}#geq4",
+		"DL, MEM",                                                 
+		"DL, LR",                                                  
+		"ROC_DL_g4_3_btag-mem.png"                                               
+		);
+
+  roc_comp_ROC( fS1, fB1, fS2, fB2,                                        
+		"mem_tth_p[0] / (mem_tth_p[0]  + 0.1*mem_ttbb_p[0])",      
+		"btag_LR_4b_2b",
+		dl && TCut("njets>=4 && nBCSVM>=4"),
+		dl && TCut("njets>=4 && nBCSVM>=4"),
+		"DL, N_{b}#geq4, N_{j}#geq4",
+		"DL, MEM",                                                 
+		"DL, LR",                                                  
+		"ROC_DL_g4_g4_btag-mem.png"                                               
+		);
 
   roc_comp_ROC( fS1, fB1, fS2, fB2,                                        
 		"mem_tth_p[0] / (mem_tth_p[0]  + 0.1*mem_ttbb_p[0])",      
@@ -207,7 +240,7 @@ void run_DL( TString gcS1 = "GC3de9cd7caec1", TString gcB1 = "GCa5f687e57337",
 		"DL, N_{b}#geq2, N_{j}#geq4",
 		"DL, MEM",                                                 
 		"DL, LR",                                                  
-		"ROC_DL.png"                                               
+		"ROC_DL_g4_g2_btag-mem.png"                                               
 		);
   return;
 }
