@@ -131,17 +131,17 @@ class Conf:
                 "SL_2qW",
                 "SL_1qW",
 
-                "SL_2qW_sj",
-                "SL_1qW_sj",
+                #"SL_2qW_sj",
+                #"SL_1qW_sj",
 
-                #"SL_2qW_NewTF",
-                #"SL_1qW_NewTF",
+                "SL_2qW_NewTF",
+                "SL_1qW_NewTF",
 
                 #"SL_2qW_sj_NewTF",
                 #"SL_1qW_sj_NewTF",
 
-                "SL_2qW_sj_perm",
-                "SL_1qW_sj_perm",
+                #"SL_2qW_sj_perm",
+                #"SL_1qW_sj_perm",
 
                 #"DL",
 
