@@ -203,9 +203,9 @@ class MEAnalyzer(FilterAnalyzer):
             "SL_2qW_NewTF": MEMConfig(),
             "SL_1qW_NewTF": MEMConfig(),
             "SL_0qW_NewTF": MEMConfig(),
-            "SL_2qW_sj_NewTF": MEMConfig(),
-            "SL_1qW_sj_NewTF": MEMConfig(),
-            "SL_0qW_sj_NewTF": MEMConfig(),
+            #"SL_2qW_sj_NewTF": MEMConfig(),
+            #"SL_1qW_sj_NewTF": MEMConfig(),
+            #"SL_0qW_sj_NewTF": MEMConfig(),
 
         }
 
@@ -223,7 +223,8 @@ class MEAnalyzer(FilterAnalyzer):
         # Subjet configuration
         for k in ["SL_0qW_sj", "SL_1qW_sj", "SL_2qW_sj",
                   "SL_0qW_sj_perm", "SL_1qW_sj_perm", "SL_2qW_sj_perm",
-                  "SL_0qW_sj_NewTF", "SL_1qW_sj_NewTF", "SL_2qW_sj_NewTF" ]:
+                  #"SL_0qW_sj_NewTF", "SL_1qW_sj_NewTF", "SL_2qW_sj_NewTF"
+                  ]:
 
             # Select the custom jet lists
             self.configs[k].b_quark_candidates = lambda event: \
@@ -239,7 +240,11 @@ class MEAnalyzer(FilterAnalyzer):
 
         # Set up do_calculate for standard sj-hypos and the sj_NewTF-hypos
 
-        for k in ["SL_0qW_sj", "SL_0qW_sj_NewTF" ]:
+
+        for k in [
+                    "SL_0qW_sj",
+                    #"SL_0qW_sj_NewTF",
+                    ]:
             self.configs[k].do_calculate = lambda y, c: (
                 len(c.lepton_candidates(y)) == 1 and
                 len(c.b_quark_candidates(y)) >= 4 and
@@ -247,7 +252,11 @@ class MEAnalyzer(FilterAnalyzer):
                 y.PassedSubjetAnalyzer == True
                 )
             self.configs[k].mem_assumptions.add("0qW")
-        for k in ["SL_1qW_sj", "SL_1qW_sj_NewTF" ]:
+
+        for k in [
+                    "SL_1qW_sj",
+                    #"SL_1qW_sj_NewTF",
+                    ]:
             self.configs[k].do_calculate = lambda y, c: (
                 len(c.lepton_candidates(y)) == 1 and
                 len(c.b_quark_candidates(y)) >= 4 and
@@ -255,7 +264,11 @@ class MEAnalyzer(FilterAnalyzer):
                 y.PassedSubjetAnalyzer == True
                 )
             self.configs[k].mem_assumptions.add("1qW")
-        for k in ["SL_2qW_sj", "SL_2qW_sj_NewTF" ]:
+
+        for k in [
+                    "SL_2qW_sj",
+                    #"SL_2qW_sj_NewTF"
+                    ]:
             self.configs[k].do_calculate = lambda y, c: (
                 len(c.lepton_candidates(y)) == 1 and
                 len(c.b_quark_candidates(y)) >= 4 and
@@ -265,6 +278,7 @@ class MEAnalyzer(FilterAnalyzer):
 
         # ===============================================================
 
+        """
         # Set up New_TF hypotheses without using deepcopy (to be sure)
 
         self.configs["SL_2qW_NewTF"].do_calculate = lambda y, c: (
@@ -298,6 +312,7 @@ class MEAnalyzer(FilterAnalyzer):
             k_oldTF = '_'.join( k.split('_')[:-1] )
 
             MEMConfig.configure_newtf( self.configs[k], self.configs[k_oldTF] )
+        """
 
         # ===============================================================
 
@@ -414,7 +429,7 @@ class MEAnalyzer(FilterAnalyzer):
                 ("Sudakov", MEMConfig.configure_sudakov),
 
                 #apply sudakov factors
-                #("NewTF", MEMConfig.configure_newtf),
+                ("NewTF", MEMConfig.configure_newtf),
 
                 #run minimization
                 ("Minimize", MEMConfig.configure_minimize)
