@@ -200,6 +200,12 @@ class MEAnalyzer(FilterAnalyzer):
             "SL_1qW_sj_perm": MEMConfig(),
             "SL_0qW_sj_perm": MEMConfig(),
 
+            "SL_2qW_NewTF": MEMConfig(),
+            "SL_1qW_NewTF": MEMConfig(),
+            "SL_0qW_NewTF": MEMConfig(),
+            "SL_2qW_sj_NewTF": MEMConfig(),
+            "SL_1qW_sj_NewTF": MEMConfig(),
+            "SL_0qW_sj_NewTF": MEMConfig(),
 
         }
 
@@ -216,7 +222,8 @@ class MEAnalyzer(FilterAnalyzer):
         # ===============================================================
         # Subjet configuration
         for k in ["SL_0qW_sj", "SL_1qW_sj", "SL_2qW_sj",
-                  "SL_0qW_sj_perm", "SL_1qW_sj_perm", "SL_2qW_sj_perm"]:
+                  "SL_0qW_sj_perm", "SL_1qW_sj_perm", "SL_2qW_sj_perm",
+                  "SL_0qW_sj_NewTF", "SL_1qW_sj_NewTF", "SL_2qW_sj_NewTF" ]:
 
             # Select the custom jet lists
             self.configs[k].b_quark_candidates = lambda event: \
@@ -227,7 +234,12 @@ class MEAnalyzer(FilterAnalyzer):
             # Assume single leptonic
             self.configs[k].mem_assumptions.add("sl")
 
-        for k in ["SL_0qW_sj", "SL_0qW_sj_perm" ]:
+
+        # ===============================================================
+
+        # Set up do_calculate for standard sj-hypos and the sj_NewTF-hypos
+
+        for k in ["SL_0qW_sj", "SL_0qW_sj_NewTF" ]:
             self.configs[k].do_calculate = lambda y, c: (
                 len(c.lepton_candidates(y)) == 1 and
                 len(c.b_quark_candidates(y)) >= 4 and
@@ -235,7 +247,7 @@ class MEAnalyzer(FilterAnalyzer):
                 y.PassedSubjetAnalyzer == True
                 )
             self.configs[k].mem_assumptions.add("0qW")
-        for k in ["SL_1qW_sj", "SL_1qW_sj_perm" ]:
+        for k in ["SL_1qW_sj", "SL_1qW_sj_NewTF" ]:
             self.configs[k].do_calculate = lambda y, c: (
                 len(c.lepton_candidates(y)) == 1 and
                 len(c.b_quark_candidates(y)) >= 4 and
@@ -243,7 +255,7 @@ class MEAnalyzer(FilterAnalyzer):
                 y.PassedSubjetAnalyzer == True
                 )
             self.configs[k].mem_assumptions.add("1qW")
-        for k in ["SL_2qW_sj", "SL_2qW_sj_perm" ]:
+        for k in ["SL_2qW_sj", "SL_2qW_sj_NewTF" ]:
             self.configs[k].do_calculate = lambda y, c: (
                 len(c.lepton_candidates(y)) == 1 and
                 len(c.b_quark_candidates(y)) >= 4 and
@@ -251,7 +263,77 @@ class MEAnalyzer(FilterAnalyzer):
                 y.PassedSubjetAnalyzer == True
                 )
 
-        # Set permutations for the *_perm configurations: done later
+        # ===============================================================
+
+        # Set up New_TF hypotheses without using deepcopy (to be sure)
+
+        self.configs["SL_2qW_NewTF"].do_calculate = lambda y, c: (
+            len(c.lepton_candidates(y)) == 1 and
+            len(c.b_quark_candidates(y)) >= 4 and
+            len(c.l_quark_candidates(y)) >= 2
+        )
+
+        self.configs["SL_1qW_NewTF"].do_calculate = lambda y, c: (
+            len(c.lepton_candidates(y)) == 1 and
+            len(c.b_quark_candidates(y)) >= 4 and
+            len(c.l_quark_candidates(y)) >= 1
+        )
+        self.configs["SL_1qW_NewTF"].mem_assumptions.add("1qW")
+
+        self.configs["SL_0qW_NewTF"].do_calculate = lambda y, c: (
+            len(c.lepton_candidates(y)) == 1 and
+            len(c.b_quark_candidates(y)) >= 4 and
+            len(c.l_quark_candidates(y)) >= 1
+        )
+        self.configs["SL_0qW_NewTF"].mem_assumptions.add("0qW")
+
+        for k in ["SL_0qW_NewTF", "SL_1qW_NewTF", "SL_2qW_NewTF",
+                  "SL_0qW_sj_NewTF", "SL_1qW_sj_NewTF", "SL_2qW_sj_NewTF" ]:
+
+            self.configs[k].mem_assumptions.add("sl")
+
+            #self.configs[k].cfg.defaultCfg()
+            #configure(self.configs[kn], self.configs[k])
+
+            k_oldTF = '_'.join( k.split('_')[:-1] )
+
+            MEMConfig.configure_newtf( self.configs[k], self.configs[k_oldTF] )
+
+        # ===============================================================
+
+        # Set up the permutation hypothesis do_calculate functions and perm_pruning
+
+        for k in [ "SL_0qW_sj_perm" ]:
+            self.configs[k].do_calculate = lambda y, c: (
+                len(c.lepton_candidates(y)) == 1 and
+                len(c.b_quark_candidates(y)) >= 4 and
+                len(c.l_quark_candidates(y)) >= 1 and # Why not 0?
+                y.PassedSubjetAnalyzer == True and
+                y.Matching_subjet_bjet < 2 # Permutations impossible for >1 b matches
+                )
+            self.configs[k].mem_assumptions.add("0qW")
+        for k in [ "SL_1qW_sj_perm" ]:
+            self.configs[k].do_calculate = lambda y, c: (
+                len(c.lepton_candidates(y)) == 1 and
+                len(c.b_quark_candidates(y)) >= 4 and
+                len(c.l_quark_candidates(y)) >= 1 and
+                y.PassedSubjetAnalyzer == True and
+                y.Matching_subjet_bjet < 2
+                )
+            self.configs[k].mem_assumptions.add("1qW")
+        for k in [ "SL_2qW_sj_perm" ]:
+            self.configs[k].do_calculate = lambda y, c: (
+                len(c.lepton_candidates(y)) == 1 and
+                len(c.b_quark_candidates(y)) >= 4 and
+                len(c.l_quark_candidates(y)) >= 2 and
+                y.PassedSubjetAnalyzer == True and
+                y.Matching_subjet_bjet < 2
+                )
+
+        sj_permutations = CvectorPermutations()
+        sj_permutations.push_back(MEM.Permutations.HEPTopTagged)
+        for k in [ "SL_0qW_sj_perm", "SL_1qW_sj_perm", "SL_2qW_sj_perm" ]:
+            self.configs[k].cfg.perm_pruning = sj_permutations
 
         # ===============================================================
 
@@ -322,11 +404,6 @@ class MEAnalyzer(FilterAnalyzer):
         #self.permutations.push_back(MEM.Permutations.QQbarBBbarSymmetry)
         self.configs["SL_2qW_notag"].cfg.perm_pruning = permutations
 
-        sj_permutations = CvectorPermutations()
-        sj_permutations.push_back(MEM.Permutations.HEPTopTagged)
-        for k in [ "SL_0qW_sj_perm", "SL_1qW_sj_perm", "SL_2qW_sj_perm" ]:
-            self.configs[k].cfg.perm_pruning = sj_permutations
-
         #Create additional configurations
         for strat, configure in [
 
@@ -337,7 +414,7 @@ class MEAnalyzer(FilterAnalyzer):
                 ("Sudakov", MEMConfig.configure_sudakov),
 
                 #apply sudakov factors
-                ("NewTF", MEMConfig.configure_newtf),
+                #("NewTF", MEMConfig.configure_newtf),
 
                 #run minimization
                 ("Minimize", MEMConfig.configure_minimize)
