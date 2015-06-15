@@ -95,6 +95,8 @@ class Conf:
             #Process only these events (will scan through file to find)
             #"eventWhitelist": [
 
+            #(1, 69, 6898),
+
             ##(1, 536, 537 ),
 
             ##    #cat6
@@ -129,19 +131,23 @@ class Conf:
             "methodsToRun": [
 
                 "SL_2qW",
-                "SL_1qW",
+                #"SL_1qW",
 
-                #"SL_2qW_sj",
+                "SL_2qW_sj",
                 #"SL_1qW_sj",
 
-                "SL_2qW_NewTF",
-                "SL_1qW_NewTF",
+                "SL_2qW_sj_perm",
+                #"SL_1qW_sj_perm",
 
-                #"SL_2qW_sj_NewTF",
+                "SL_2qW_NewTF",
+                #"SL_1qW_NewTF",
+
+                "SL_2qW_sj_NewTF",
                 #"SL_1qW_sj_NewTF",
 
-                #"SL_2qW_sj_perm",
-                #"SL_1qW_sj_perm",
+                "SL_2qW_sj_perm_NewTF",
+                #"SL_1qW_sj_perm_NewTF",
+
 
                 #"DL",
 

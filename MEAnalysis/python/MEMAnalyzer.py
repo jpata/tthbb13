@@ -200,9 +200,9 @@ class MEAnalyzer(FilterAnalyzer):
             "SL_1qW_sj_perm": MEMConfig(),
             "SL_0qW_sj_perm": MEMConfig(),
 
-            "SL_2qW_NewTF": MEMConfig(),
-            "SL_1qW_NewTF": MEMConfig(),
-            "SL_0qW_NewTF": MEMConfig(),
+            #"SL_2qW_NewTF": MEMConfig(),
+            #"SL_1qW_NewTF": MEMConfig(),
+            #"SL_0qW_NewTF": MEMConfig(),
             #"SL_2qW_sj_NewTF": MEMConfig(),
             #"SL_1qW_sj_NewTF": MEMConfig(),
             #"SL_0qW_sj_NewTF": MEMConfig(),
@@ -347,6 +347,8 @@ class MEAnalyzer(FilterAnalyzer):
 
         sj_permutations = CvectorPermutations()
         sj_permutations.push_back(MEM.Permutations.HEPTopTagged)
+        sj_permutations.push_back(MEM.Permutations.QUntagged)
+        sj_permutations.push_back(MEM.Permutations.BTagged)
         for k in [ "SL_0qW_sj_perm", "SL_1qW_sj_perm", "SL_2qW_sj_perm" ]:
             self.configs[k].cfg.perm_pruning = sj_permutations
 
@@ -434,7 +436,12 @@ class MEAnalyzer(FilterAnalyzer):
                 #run minimization
                 ("Minimize", MEMConfig.configure_minimize)
             ]:
-            for k in ["SL_2qW", "SL_1qW", "DL"]:
+            for k in [
+                "SL_2qW", "SL_1qW", "DL",
+                "SL_2qW_sj", "SL_1qW_sj",
+                "SL_2qW_sj_perm", "SL_1qW_sj_perm",
+                ]:
+
                 kn = k + "_" + strat
                 self.configs[kn] = copy.deepcopy(self.configs[k])
                 self.configs[kn].cfg.defaultCfg()

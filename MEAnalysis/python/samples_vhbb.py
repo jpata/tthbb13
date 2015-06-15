@@ -244,7 +244,7 @@ samples = cms.VPSet([
         xSec     = cms.double(xsec[("tth", "13TeV")]),
         nGen     = cms.int64(-1),
         #perJob   = cms.uint32(198500),
-        perJob   = cms.uint32(100),
+        perJob   = cms.uint32(540),
         subFiles = cms.vstring([
             "/store/user/gregor/VHBB_HEPPY_V11_G01_tth_13tev_phys14_20bx25.root"
         ]),

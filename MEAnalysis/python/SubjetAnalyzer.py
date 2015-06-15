@@ -141,6 +141,11 @@ class SubjetAnalyzer(FilterAnalyzer):
         event.wquark_candidate_jets_sj = \
             copy.deepcopy( event.wquark_candidate_jets )
 
+        # Sort wquark_candidate_jets_sj list now according to highest pt
+        # (Prevent needing to deal with it after subjets are added)
+        event.wquark_candidate_jets_sj = \
+            sorted( event.wquark_candidate_jets_sj, key = lambda x: -x.pt )
+
         # Set 'PDGID' for all jets to 0:
         for jet in event.selected_btagged_jets_sj: jet.PDGID = 0
         for jet in event.wquark_candidate_jets_sj: jet.PDGID = 0
@@ -464,6 +469,8 @@ class SubjetAnalyzer(FilterAnalyzer):
         # original bjet is removed from the btagged_jets, and the subjet is appended
         # to event.wquark_candidate_jets.
         # (Analogous for original ljet matched with a subjet that has btagFlag=1.0)
+
+        # Events with 2 or more b-jet matches are treated differently
         if Match_subjet_bjet < 2:
             for tl_subjet in tl_subjets:
                 if hasattr( tl_subjet, 'ljet_match' ):
@@ -480,26 +487,32 @@ class SubjetAnalyzer(FilterAnalyzer):
                         event.selected_btagged_jets_sj.index( orig_bjet ) )
 
                 if tl_subjet.btagFlag == 1.0:
-                    # Append the subjet to btagged_jets list in the event
-                    event.selected_btagged_jets_sj.append( tl_subjet )
+                    # Insert the subjet into btagged_jets list in the event
+                    #event.selected_btagged_jets_sj.append( tl_subjet )
+                    event.selected_btagged_jets_sj.insert( 0, tl_subjet )
                 elif tl_subjet.btagFlag == 0.0:
-                    # Append the subjet to wquark_candidate_jets list in the event
-                    event.wquark_candidate_jets_sj.append( tl_subjet )
+                    # Insert the subjet into wquark_candidate_jets list in the event
+                    #event.wquark_candidate_jets_sj.append( tl_subjet )
+                    event.wquark_candidate_jets_sj.insert( 0, tl_subjet )
 
-            # Make sure subjet passes
+            # Reduce to 4 b-jets to keep runtime in check
             if len( event.selected_btagged_jets_sj ) > 4:
-                # The last added element is the subjet - keep that one, and the next
-                # 3 btagged_jets
-                event.selected_btagged_jets_sj = \
-                    event.selected_btagged_jets_sj[-1:] + \
-                    event.selected_btagged_jets_sj[:3]
-            
+                event.selected_btagged_jets_sj = event.selected_btagged_jets_sj[:4]
+
+            # Reduce to 4 l-jets to keep runtime in check
+            if len( event.wquark_candidate_jets_sj ) > 4:
+                # Select at least 2 subjets, and as second criterium the 4 light 
+                # jets with highest pt
+                event.wquark_candidate_jets_sj = event.wquark_candidate_jets_sj[:4]
+
+
         # In this case, only add the unmatched light subjet
         # (bjets list is unchanged)
         if Match_subjet_bjet == 2 and Match_subjet_ljet == 0:
             for tl_subjet in tl_subjets:
                 if not hasattr( tl_subjet, 'bjet_match' ):
                     event.wquark_candidate_jets_sj.append( tl_subjet )
+
 
         event.PassedSubjetAnalyzer = True
 
