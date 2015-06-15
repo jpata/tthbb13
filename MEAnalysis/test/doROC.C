@@ -1,6 +1,7 @@
 #include "TFile.h"
 #include "TTree.h"
 #include "TH1F.h"
+#include "TH2F.h"
 #include "TF1.h"
 #include "TGraph.h"
 #include "TGraphErrors.h"
@@ -163,7 +164,108 @@ void roc_comp_ROC(TString fname1 = "", TString fname2 = "", TString fname3 = "",
   delete c1; delete leg; delete diag;
 }
 
+void roc_opt_ROC(TString fname1 = "", TString fname2 = "", 
+		 int pos = 0,
+		 TCut cut="is_sl && nBCSVM>=4 && njets>=6",
+		 TString title = "6 jets",		   
+		 TString save_name = "tmp.png",
+		 float step=0.05, float xMin=-0.01, float xMax=2.01
+		 ){
 
+  TCanvas *c1  = new TCanvas("c1","",5,30,650,600);
+  TLegend* leg = new TLegend(0.12,0.72,0.47,0.89,NULL,"brNDC");
+  CanvasAndLegend(c1, leg, 0);
+
+
+  const unsigned int n_k = 4; 
+  const unsigned int n_a = 6; 
+  const float step_k = 0.1;
+  const float step_a = 0.2;
+
+  float k_factor[n_k];
+  float a_factor[n_a];
+  for( unsigned int k = 0 ; k < n_k; ++k ){
+    k_factor[k] = 0.05 + step_k*k;
+  }
+  for( unsigned int a = 0 ; a < n_a; ++a ){
+    a_factor[a] = 0.0 + step_a*a;
+  }
+
+  //TGraphErrors* gROC = 0;
+
+  TH2F* hROC = new TH2F("hROC", title+"; K; A", n_k, k_factor[0]-step_k/2., k_factor[n_k-1]+step_k/2., n_a, a_factor[0]-step_a/2., a_factor[n_a-1]+step_a/2.);
+
+  for(unsigned int k = 0 ; k < n_k; ++k){
+    float K = k_factor[k];
+    for(unsigned int a = 0 ; a < n_a; ++a){
+      float A = a_factor[a];
+
+      cout << "Processing k=" << K << ", a=" << A << endl;
+      TString var1(Form("%f*(mem_tth_p[%d] /(mem_tth_p[%d]  + %f*mem_ttbb_p[%d]))",A,pos,pos,K,pos));
+      TString var2(Form("(1-%f)*btag_LR_4b_2b",A));
+      TString var = var1+"+"+var2;
+
+      cout << "Doing ROC for variable " << string(var.Data()) << endl;
+      TGraphErrors* gROC1 = roc(fname1, step, xMin, xMax, cut, 2, 0,   Form("k=%f,a=%f",K,A), var);
+      TGraphErrors* gROC2 = roc(fname2, step, xMin, xMax, cut, 2, 0,   Form("k=%f,a=%f",K,A), var);
+      if(gROC1==0 || gROC2==0) return;
+      
+      TGraphErrors* gROCtmp = new TGraphErrors( gROC1->GetN() , gROC1->GetY(), gROC2->GetY(), gROC1->GetEY(), gROC2->GetEY());
+      gROCtmp->SetLineWidth(3);
+      gROCtmp->SetLineColor(2);
+      double inttmp = gROCtmp->Integral(); 
+      cout << "Integral = " << inttmp << " filled in bin " << hROC->FindBin(K,A) << endl;
+      hROC->SetBinContent(hROC->FindBin(K,A), 0.5-inttmp);
+      //delete gROC1;
+      //delete gROC2;
+      //delete gROCtmp;
+      cout << "...Done" << endl;
+    }
+  }
+
+  cout << "Print 2D histo..." << endl;
+  hROC->Draw("COLZ");
+  leg->Draw();
+
+  cout << "Save png..." << endl;
+  c1->SaveAs( save_name );
+
+  cout << "Open ROOT file..." << endl;
+  TFile* out = TFile::Open(save_name+".root", "RECREATE");
+  out->cd();
+  c1->Write();
+  hROC->Write();
+  cout << "Write ROOT file..." << endl;
+  out->Write();
+  cout << "Close ROOT file..." << endl;
+  out->Close();
+
+  cout << "Delete and return..." << endl;
+  delete c1; delete leg;
+}
+
+////////////////////////////////////////////////////////////////////
+void run_DL_opt( TString gcS1 = "GC3de9cd7caec1", TString gcB1 = "GCa5f687e57337"
+		 ){
+
+  TString fS1 = path+gcS1+"/tth_13tev/output-sig.root";
+  TString fB1 = path+gcB1+"/ttjets_13tev_madgraph_pu20bx25_phys14/output-bkg.root";
+  
+  roc_opt_ROC( fS1, fB1,
+	       0,
+	       dl && TCut("njets>=4 && nBCSVM==2"),
+	       "DL, N_{b}==2, N_{j}#geq4",
+	       "OPT_DL_g4_2.png"                                               
+	       );
+  
+  roc_opt_ROC( fS1, fB1,
+	       0,
+	       dl && TCut("njets>=4 && nBCSVM==3"),
+	       "DL, N_{b}==3, N_{j}#geq4",
+	       "OPT_DL_g4_3.png"                                               
+	       );
+
+}
 
 ////////////////////////////////////////////////////////////////////
 void run_test( TString gcS1 = "", TString gcB1 = "", 
