@@ -64,7 +64,8 @@ class MECategoryAnalyzer(FilterAnalyzer):
                 event.wquark_candidate_jets = event.buntagged_jets
                 cat = "cat3"
         elif event.is_dl and len(event.good_jets)>=4:
-            event.wquark_candidate_jets = []
+            #event.wquark_candidate_jets = []
+            event.wquark_candidate_jets = event.buntagged_jets
             cat = "cat6"
 
         self.counters["processing"].inc(cat)
@@ -212,6 +213,7 @@ class MEAnalyzer(FilterAnalyzer):
             "SL_0w2h2t_btag"   :  MEMConfig(),
 
             "SL_0w2h2t_low_btag"   :  MEMConfig(),
+            "DL_low_btag"   :  MEMConfig(),
 
             "SL_2w2h2t_wtag": MEMConfig(),
 
@@ -343,8 +345,17 @@ class MEAnalyzer(FilterAnalyzer):
                 )
             self.configs[x].mem_assumptions.add("sl")
 
+        for x in ["DL_low_btag"]:
+            self.configs[x].do_calculate = lambda y, c: (
+                len(y.good_leptons) == 2 and
+                len(c.b_quark_candidates(y)) >= 2 and
+                (len(c.l_quark_candidates(y))+len(c.b_quark_candidates(y))) >= 4 #and
+                #y.cat_btag == "H"
+                )
+            self.configs[x].mem_assumptions.add("dl")
 
-        for x in ["SL_2w2h2t_btag", "SL_0w2h2t_btag", "SL_0w2h2t_low_btag"]:
+
+        for x in ["SL_2w2h2t_btag", "SL_0w2h2t_btag", "SL_0w2h2t_low_btag", "DL_low_btag"]:
             strat = CvectorPermutations()
             strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
             #strat.push_back(MEM.Permutations.QUntagged)
