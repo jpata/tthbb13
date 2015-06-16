@@ -79,6 +79,10 @@ memType = NTupleObjectType("memType", variables = [
     NTupleVariable("error_code", lambda x : x.error_code, type=int),
     NTupleVariable("efficiency", lambda x : x.efficiency),
     NTupleVariable("nperm", lambda x : x.num_perm, type=int),
+    NTupleVariable("prefit_code", lambda x : x.prefit_code),
+    NTupleVariable("btag_weight_bb", lambda x : x.btag_weights[0]),
+    NTupleVariable("btag_weight_cc", lambda x : x.btag_weights[1]),
+    NTupleVariable("btag_weight_jj", lambda x : x.btag_weights[2]),
 ])
 
 FoxWolframType = NTupleObjectType("FoxWolframType", variables = [
@@ -306,6 +310,9 @@ def getTreeProducer(conf):
     )
 
     for systematic in ["nominal", "JES", "JESUp", "JESDown"]:
+        if not (systematic in conf.general["systematics"]):
+            continue
+
         for vtype in [
             ("is_sl",               int,        "Passes single lepton cuts"),
             ("is_dl",               int,        "Passes dilepton cuts"),
@@ -316,6 +323,7 @@ def getTreeProducer(conf):
             ("btag_LR_4b_2b_old",   float,      ""),
             ("btag_LR_4b_2b",       float,      ""),
             ("btag_LR_4b_2b_alt",   float,      ""),
+            ("btag_LR_4b_2b_max4",  float,      ""),
             ("nBCSVM",              float,      ""),
             ("numJets",             int,        ""),
             ("nMatchSimB",          int,        ""),
@@ -356,12 +364,12 @@ def getTreeProducer(conf):
                 syst_suffix2 = ""
             treeProducer.collections.update({
                 "mem_results_tth" + syst_suffix: NTupleCollection(
-                    "mem_tth" + syst_suffix2, memType, len(conf.mem["methodsToRun"]),
-                    help="MEM tth results array, element per config.methodsToRun"
+                    "mem_tth" + syst_suffix2, memType, len(conf.mem["methodOrder"]),
+                    help="MEM tth results array, element per config.methodOrder"
                 ),
                 "mem_results_ttbb" + syst_suffix: NTupleCollection(
-                    "mem_ttbb" + syst_suffix2, memType, len(conf.mem["methodsToRun"]),
-                    help="MEM ttbb results array, element per config.methodsToRun"
+                    "mem_ttbb" + syst_suffix2, memType, len(conf.mem["methodOrder"]),
+                    help="MEM ttbb results array, element per config.methodOrder"
                 ),
 
                 "fw_h_alljets" + syst_suffix: NTupleCollection(

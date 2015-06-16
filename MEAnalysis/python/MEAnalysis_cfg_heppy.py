@@ -1,4 +1,8 @@
 import os
+from collections import OrderedDict
+from TTH.MEAnalysis.MEMConfig import MEMConfig
+import ROOT
+from ROOT import MEM
 
 def mu_baseline(mu):
     return (
@@ -144,182 +148,256 @@ def el_baseline_loose(el):
 
 
 class Conf:
-    def __init__(self):
-        self.leptons = {
-            "mu": {
+    leptons = {
+        "mu": {
 
-                #SL
-                "tight": {
-                    "pt": 30,
-                    "eta":2.1,
-                    "iso": 0.12,
-                    "idcut": mu_baseline
-                },
-                "tight_veto": {
-                    "pt": 10.0,
-                    "eta": 2.4,
-                    "iso": 0.2,
-                    "idcut": mu_baseline
-                },
-
-                #DL
-                "loose": {
-                    "pt": 20,
-                    "eta": 2.4,
-                    "iso": 0.12,
-                    "idcut": mu_baseline
-                },
-                "loose_veto": {
-                    "pt": 10.0,
-                    "eta": 2.4,
-                    "iso": 0.2,
-                    "idcut": mu_baseline
-                },
-                "isotype": "relIso04",
+            #SL
+            "tight": {
+                "pt": 30,
+                "eta":2.1,
+                "iso": 0.12,
+                "idcut": mu_baseline
+            },
+            "tight_veto": {
+                "pt": 10.0,
+                "eta": 2.4,
+                "iso": 0.2,
+                "idcut": mu_baseline
             },
 
+            #DL
+            "loose": {
+                "pt": 20,
+                "eta": 2.4,
+                "iso": 0.12,
+                "idcut": mu_baseline
+            },
+            "loose_veto": {
+                "pt": 10.0,
+                "eta": 2.4,
+                "iso": 0.2,
+                "idcut": mu_baseline
+            },
+            "isotype": "relIso04",
+        },
 
-            "el": {
-                "tight": {
-                    "pt": 30,
-                    "eta": 2.1,
-                    "iso": 0.1,
-                    "idcut": lambda el: el_baseline_medium(el)
-                },
-                "tight_veto": {
-                    "pt": 20,
-                    "eta": 2.4,
-                    "iso": 0.15,
-                    "idcut": lambda el: el_baseline_loose(el)
-                },
 
-                "loose": {
-                    "pt": 20,
-                    "eta": 2.4,
-                    "iso": 0.15,
-                    "idcut": lambda el: el_baseline_medium(el)
-                },
-                "loose_veto": {
-                    "pt": 10,
-                    "eta": 2.4,
-                    "iso": 0.04,
-                    "idcut": lambda el: el_baseline_loose(el)
-                },
-                "isotype": "relIso03",
-            }
-        }
-
-        self.jets = {
-            "pt": 30,
-            "eta": 2.4,
-
-            #The default b-tagging algorithm (branch name)
-            "btagAlgo": "btagCSV",
-
-            #The default b-tagging WP
-            "btagWP": "CSVM",
-
-            #These working points are evaluated and stored in the trees as nB* - number of jets passing the WP
-            #https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideBTagging#Preliminary_working_or_operating
-            "btagWPs": {
-                "CSVM": ("btagCSV", 0.814),
-                "CSVL": ("btagCSV", 0.423),
-                "CSVT": ("btagCSV", 0.941)
+        "el": {
+            "tight": {
+                "pt": 30,
+                "eta": 2.1,
+                "iso": 0.1,
+                "idcut": lambda el: el_baseline_medium(el)
+            },
+            "tight_veto": {
+                "pt": 20,
+                "eta": 2.4,
+                "iso": 0.15,
+                "idcut": lambda el: el_baseline_loose(el)
             },
 
-            #if btagCSV, untagged/tagged selection for W mass and MEM is done by CSVM cut
-            #if btagLR, selection is done by the btag likelihood ratio permutation
-            "untaggedSelection": "btagCSV"
+            "loose": {
+                "pt": 20,
+                "eta": 2.4,
+                "iso": 0.15,
+                "idcut": lambda el: el_baseline_medium(el)
+            },
+            "loose_veto": {
+                "pt": 10,
+                "eta": 2.4,
+                "iso": 0.04,
+                "idcut": lambda el: el_baseline_loose(el)
+            },
+            "isotype": "relIso03",
         }
+    }
 
-        self.general = {
-            "controlPlotsFileOld": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsTEST.root",
-            "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV6.root",
-            "sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_722sync.py",
-            "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions.pickle",
+    jets = {
+        "pt": 30,
+        "eta": 2.4,
 
-            #If the list contains:
-            # "gen" - print out the ttH gen-level particles (b from top, b form higgs, q from W, leptons
-            # "reco" - print out the reco-level selected particles
-            # "matching" - print out the association between gen and reco objects
-            #"verbosity": ["eventboundary", "input", "matching", "gen", "reco", "meminput"],
-            "verbosity": [],
+        #The default b-tagging algorithm (branch name)
+        "btagAlgo": "btagCSV",
 
-            #Process only these events (will scan through file to find)
-            #"eventWhitelist": [
-                #('MEM', 1, 214, 21320, 'cat2', 'H', 7, 5, 1, 0, 'JES')
-            #    (1, 214, 21320),
-            ##    #cat6
-            ##    (1, 1326, 132576),
-            ##    (1, 1001, 100098),
-            ##    (1, 1075, 107401),
-            ##    (1, 1910, 190937),
-            ##    (1, 739, 73869),
+        #The default b-tagging WP
+        "btagWP": "CSVM",
 
-            ##    #root [2] tree->Scan("run:lumi:evt:mem_tth_p[0]", "njets==6 && nBCSVM==4 && is_sl==1 && mem_tth_p[0]==0")
-            ##    (1,  558,  55798),
-            ##    (1,  566,  56576),
-            ##    (1,   12,   1121),
-            ##    (1,  714,  71316),
-            ##    (1, 1222, 122152),
-            ##    (1,  856,  85542),
-            ##    (1,  300,  29931),
-            ##    (1, 1675, 167428),
-            #]
-        }
+        #These working points are evaluated and stored in the trees as nB* - number of jets passing the WP
+        #https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideBTagging#Preliminary_working_or_operating
+        "btagWPs": {
+            "CSVM": ("btagCSV", 0.814),
+            "CSVL": ("btagCSV", 0.423),
+            "CSVT": ("btagCSV", 0.941)
+        },
 
-        self.mem = {
+        #if btagCSV, untagged/tagged selection for W mass and MEM is done by CSVM cut
+        #if btagLR, selection is done by the btag likelihood ratio permutation
+        "untaggedSelection": "btagLR"
+    }
 
-            #Actually run the ME calculation
-            #If False, all ME values will be 0
-            "calcME": False,
+    general = {
+        "controlPlotsFileOld": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsTEST.root",
+        "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV6.root",
+        "sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_722sync.py",
+        "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions.pickle",
+        "systematics": ["nominal"],
+        #"systematics": ["nominal", "JESUp", "JESDown", "JES"],
+        
+        
+        #If the list contains:
+        # "gen" - print out the ttH gen-level particles (b from top, b form higgs, q from W, leptons
+        # "reco" - print out the reco-level selected particles
+        # "matching" - print out the association between gen and reco objects
+        #"verbosity": ["eventboundary", "input", "matching", "gen", "reco", "meminput"],
+        "verbosity": [
+            "meminput"
+        ],
 
-            #Generic event-dependent selection function applied
-            #just before the MEM. If False, MEM is skipped
-            "selection": lambda event: True,
+        #Process only these events (will scan through file to find)
+        #"eventWhitelist": [
 
-            "methodsToRun": [
+        ##    (1,214,21320)
+        ##    (1, 214, 21333),
+        ##    #cat6
+        ##    (1, 1326, 132576),
+        ##    (1, 1001, 100098),
+        ##    (1, 1075, 107401),
+        ##    (1, 1910, 190937),
+        ##    (1, 739, 73869),
 
-                # ALL
-                "SL_2w2h2t"   ,
-                "SL_1w2h2t"   ,
-                #"SL_2w2h1t_h" ,
-                #"SL_2w2h1t_l" ,
-                "SL_0w2h2t"   ,
-                #"SL_1w2h1t_h" ,
-                #"SL_1w2h1t_l" ,
-                "SL_2w2h2t_wtag",
+        ##    #root [2] tree->Scan("run:lumi:evt:mem_tth_p[0]", "njets==6 && nBCSVM==4 && is_sl==1 && mem_tth_p[0]==0")
+        ##    (1,  558,  55798),
+        ##    (1,  566,  56576),
+        ##    (1,   12,   1121),
+        ##    (1,  714,  71316),
+        ##    (1, 1222, 122152),
+        ##    (1,  856,  85542),
+        ##    (1,  300,  29931),
+        ##    (1, 1675, 167428),
+        #]
+    }
 
-                #"SL_2qW",
-                #"SL_1qW",
-                "DL",
+    mem = {
 
-#                "SL_2qW_gen",
-#                "SL_1qW_gen",
-#                "DL_gen",
+        #Actually run the ME calculation
+        #If False, all ME values will be 0
+        "calcME": True,
 
-                #"SL_0qW",
-                #"SL_1bT",
-                #"SL_1bTbar",
-                #"SL_1bH",
-                #"SL_2qW_notag",
+        #Generic event-dependent selection function applied
+        #just before the MEM. If False, MEM is skipped
+        "selection": lambda event: True,
+        
+        #This configures what the array elements mean
+        #Better not change this
+        "methodOrder": [
+            "SL_0w2h2t",
+            "DL_0w2h2t",
+            "SL_2w2h2t",
 
-                #"SL_2qW_Sudakov",
-                #"SL_1qW_Sudakov",
-                #"SL_2qW_Recoil",
-                #"SL_1qW_Recoil",
-                #"DL_Recoil",
+            #with bLR calc by mem code
+            "SL_2w2h2t_memLR",
+            "SL_0w2h2t_memLR",
+        ],
 
-                #"SL_2qW_NewTF",
-                #"SL_1qW_NewTF",
-                #"DL_NewTF",
-                #"SL_2qW_Minimize",
-                #"SL_1qW_Minimize",
-                #"DL_Minimize",
+        #This configures the MEMs to actually run, the rest will be set to 0
+        "methodsToRun": [
+            "SL_0w2h2t",
+            #"DL_0w2h2t",
+            #"SL_2w2h2t",
+            #"SL_2w2h2t_memLR",
+            "SL_0w2h2t_memLR",
+        ],
 
-                #"SL_2qW_gen_nosmear",
-                #"SL_1qW_gen_nosmear",
-                #"DL_gen_nosmear",
-            ],
+    }
+    
+    mem_configs = OrderedDict()
 
-        }
+CvectorPermutations = getattr(ROOT, "std::vector<MEM::Permutations::Permutations>")
+CvectorPSVar = getattr(ROOT, "std::vector<MEM::PSVar::PSVar>")
+
+###
+### SL_2w2h2t
+###
+c = MEMConfig()
+c.do_calculate = lambda ev, mcfg: (
+    len(mcfg.lepton_candidates(ev)) == 1 and
+    len(mcfg.b_quark_candidates(ev)) == 4 and
+    len(mcfg.l_quark_candidates(ev)) == 2
+)
+c.mem_assumptions.add("sl")
+strat = CvectorPermutations()
+strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
+strat.push_back(MEM.Permutations.QUntagged)
+strat.push_back(MEM.Permutations.BTagged)
+c.cfg.perm_pruning = strat
+Conf.mem_configs["SL_2w2h2t"] = c
+
+###
+### SL_0w2h2t
+###
+c = MEMConfig()
+c.l_quark_candidates = lambda ev: []
+c.do_calculate = lambda ev, mcfg: (
+    len(mcfg.lepton_candidates(ev)) == 1 and
+    len(mcfg.b_quark_candidates(ev)) >= 4 and
+    ev.nBCSVM >= 3
+    #(len(mcfg.l_quark_candidates(ev)) + len(mcfg.b_quark_candidates(ev))) >= 4
+)
+c.mem_assumptions.add("sl")
+c.mem_assumptions.add("0w2h2t")
+strat = CvectorPermutations()
+strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
+strat.push_back(MEM.Permutations.QUntagged)
+strat.push_back(MEM.Permutations.BTagged)
+#c.cfg.int_code = 0
+c.cfg.perm_pruning = strat
+Conf.mem_configs["SL_0w2h2t"] = c
+
+###
+### SL_0w2h2t _memLR
+###
+c = MEMConfig()
+c.b_quark_candidates = lambda ev: ev.good_jets
+c.l_quark_candidates = lambda ev: []
+c.do_calculate = lambda ev, mcfg: (
+    len(mcfg.lepton_candidates(ev)) == 1 and
+    len(mcfg.b_quark_candidates(ev)) >= 3 and
+    ev.nBCSVM >= 3
+)
+c.mem_assumptions.add("sl")
+c.mem_assumptions.add("0w2h2t")
+strat = CvectorPermutations()
+strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
+strat.push_back(MEM.Permutations.FirstRankedByBTAG)
+c.cfg.perm_pruning = strat
+#c.cfg.int_code = 1+2+4
+#c.cfg.int_code = 0
+c.maxJets = 8
+Conf.mem_configs["SL_0w2h2t_memLR"] = c
+
+###
+### DL_0w2h2t
+###
+c = MEMConfig()
+c.b_quark_candidates = lambda ev: ev.good_jets
+c.l_quark_candidates = lambda ev: []
+c.do_calculate = lambda ev, mcfg: (
+    len(mcfg.lepton_candidates(ev)) == 2 and
+    len(mcfg.b_quark_candidates(ev)) >= 4 and
+    ev.nBCSVM >= 3
+    #(len(mcfg.l_quark_candidates(ev)) + len(mcfg.b_quark_candidates(ev))) >= 4
+)
+c.mem_assumptions.add("dl")
+strat = CvectorPermutations()
+strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
+strat.push_back(MEM.Permutations.FirstRankedByBTAG)
+c.cfg.perm_pruning = strat
+Conf.mem_configs["DL_0w2h2t"] = c
+
+for cn, c in Conf.mem_configs.items():
+    print "MEM config", cn, c.mem_assumptions
+
+if __name__ == "__main__":
+    import json
+    s = json.dumps(Conf)
+    print s

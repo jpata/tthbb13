@@ -65,19 +65,27 @@ class JetAnalyzer(FilterAnalyzer):
         jets_JES_Up = self.variateJets(event.Jet, "JES", 1)
         jets_JES_Down = self.variateJets(event.Jet, "JES", -1)
         evdict = {}
-        for name, jets in [("JES", jets_JES), ("JESUp", jets_JES_Up), ("JESDown", jets_JES_Down)]:
+        for name, jets in [
+                ("JES", jets_JES),
+                ("JESUp", jets_JES_Up),
+                ("JESDown",
+                jets_JES_Down)
+            ]:
+            if not name in self.conf.general["systematics"]:
+                continue
+
             ev = FakeEvent(event)
             ev.Jet = jets
             ev.systematic = name
             evdict[name] = ev
-        evdict["nominal"] = FakeEvent(event)
-        evdict["nominal"].systematic = "nominal"
+        if "nominal" in self.conf.general["systematics"]:
+            evdict["nominal"] = FakeEvent(event)
+            evdict["nominal"].systematic = "nominal"
 
         for syst, event_syst in evdict.items():
             res = self._process(event_syst)
             evdict[syst] = res
         event.systResults = evdict
-        #event.__dict__.update(event.systResults["nominal"].__dict__)
 
         return np.any([v.passes_jet for v in event.systResults.values()])
 

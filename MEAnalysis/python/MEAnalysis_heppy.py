@@ -25,7 +25,7 @@ else:
     from TTH.MEAnalysis.MEAnalysis_cfg_heppy import Conf
 
 #Creates a new configuration object based on MEAnalysis_cfg_heppy
-conf = Conf()
+conf = Conf
 
 #Load transfer functions from pickle file
 pi_file = open(conf.general["transferFunctionsPickle"] , 'rb')
