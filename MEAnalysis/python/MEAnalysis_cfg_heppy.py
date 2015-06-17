@@ -131,7 +131,8 @@ class Conf:
                 #"SL_0w2h2t"     , 
                 #"SL_0w2h2t_btag", 
 
-                "SL_0w2h2t_low_btag", 
+                #"SL_0w2h2t_low_btag", 
+                "DL_low_btag", 
 
                 #"SL_2w2h2t_wtag",    #1
                 ##"SL_1w2h2t"     ,  #2
