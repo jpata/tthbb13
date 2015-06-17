@@ -1,7 +1,7 @@
 from TTH.TTHNtupleAnalyzer.CrabHelpers import hadd_from_file, replicate
 import argparse, subprocess, glob, os
 
-version = "May21_V10_1bc6d76"
+version = "Jun17_sync722_98a561"
 
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 

@@ -53,6 +53,13 @@ leptonType = NTupleObjectType("leptonType", variables = [
 ])
 
 #Specifies what to save for leptons
+pvType = NTupleObjectType("pvType", variables = [
+    NTupleVariable("z", lambda x : x.z),
+    NTupleVariable("rho", lambda x : x.Rho),
+    NTupleVariable("ndof", lambda x : x.ndof),
+    NTupleVariable("isFake", lambda x : x.isFake),
+])
+
 quarkType = NTupleObjectType("quarkType", variables = [
     NTupleVariable("pt", lambda x : x.pt),
     NTupleVariable("eta", lambda x : x.eta),
@@ -143,6 +150,12 @@ def getTreeProducer(conf):
                "nGenQW", lambda ev: len(getattr(ev, "l_quarks_w_nominal", [])),
                type=int,
                help="Number of generated quarks from W"
+            ),
+            
+            NTupleVariable(
+               "passPV", lambda ev: getattr(ev, "passPV", False),
+               type=int,
+               help="First PV passes selection"
             ),
 
             #NTupleVariable(
@@ -292,6 +305,7 @@ def getTreeProducer(conf):
            "MET_gen_nominal" : NTupleObject("met_gen", metType, help="Generated MET"),
            "MET_jetcorr_nominal" : NTupleObject("met_jetcorr", metType, help="Reconstructed MET, corrected to gen-level jets"),
            "MET_tt_nominal" : NTupleObject("met_ttbar_gen", metType, help="Generated MET from nu(top)"),
+           "primaryVertex" : NTupleObject("pv", pvType, help="First PV"),
         },
         collections = {
         #standard dumping of objects

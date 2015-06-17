@@ -29,6 +29,7 @@ class BTagLRAnalyzer(FilterAnalyzer):
 
         self.csv_pdfs = {
         }
+        
         print "Need to Fix the BTagLRAnalyzer to return normalised PDFs"
         for x in ["b", "c", "l"]:
             for b in ["Bin0", "Bin1"]:
@@ -207,9 +208,6 @@ class BTagLRAnalyzer(FilterAnalyzer):
         if self.conf.jets["untaggedSelection"] == "btagLR":
             event.buntagged_jets = event.buntagged_jets_by_LR_4b_2b
             event.selected_btagged_jets = event.btagged_jets_by_LR_4b_2b
-            print "selected best perm"
-            for jet in event.selected_btagged_jets:
-                print jet.pt, jet.btagCSV
         #Jets are untagged according to b-discriminatr
         elif self.conf.jets["untaggedSelection"] == "btagCSV":
             event.buntagged_jets = event.buntagged_jets_bdisc
@@ -225,12 +223,10 @@ class BTagLRAnalyzer(FilterAnalyzer):
 
         #Set these jets to be used as b-quarks in the MEM
         #We don't want to use more than 4 b-quarks in the hypothesis
-        print "flagging"
         for jet in event.selected_btagged_jets_high:
             #idx = event.good_jets.index(jet)
             #event.good_jets[idx].btagFlag = 1.0
             jet.btagFlag = 1.0
-            print jet.pt, jet.btagFlag
 
         event.passes_btag = len(event.selected_btagged_jets)>=2
         return event
