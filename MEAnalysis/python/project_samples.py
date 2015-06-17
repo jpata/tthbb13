@@ -8,7 +8,7 @@ inf = [
 #        ("ttcc", "nMatchSimB==0 && nMatchSimC>=2"),
 #        ("ttll", "nMatchSimB==0 && nMatchSimC<=1")
 #    ])
-    ("/home/joosep/tth/gc/GC309d86211ddf/ttjets_13tev_madgraph_pu20bx25_phys14.root",
+    ("/home/joosep/tth/gc/GC88e1ff302c9c/ttjets_13tev_madgraph_pu20bx25_phys14.root",
     [
         ("ttb", "ttCls == 51"),
         ("tt2b", "ttCls == 52"),
