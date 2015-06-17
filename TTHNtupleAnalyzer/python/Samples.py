@@ -142,16 +142,19 @@ Samples = {
     # RunIISpring15DR74-Asympt25ns
     #######################################
 
-    "qcd_170_300_13tev_spring15dr74_asympt25ns"     :  "/QCD_Pt_170to300_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM", 
-    "qcd_300_470_13tev_spring15dr74_asympt25ns"     :  "/QCD_Pt_300to470_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM", 
-    "qcd_470_600_13tev_spring15dr74_asympt25ns"     :  "/QCD_Pt_470to600_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM", 
-    "qcd_600_800_13tev_spring15dr74_asympt25ns"     :  "/QCD_Pt_600to800_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM", 
-    "qcd_800_1000_13tev_spring15dr74_asympt25ns"    :  "/QCD_Pt_800to1000_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM",
+                                                                                                                                                                 # Status on June 16, 2015
+    "qcd_170_300_13tev_spring15dr74_asympt25ns"     :  "/QCD_Pt_170to300_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM",    # Valid
+    "qcd_300_470_13tev_spring15dr74_asympt25ns"     :  "/QCD_Pt_300to470_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM",    # No v2..
+    "qcd_470_600_13tev_spring15dr74_asympt25ns"     :  "/QCD_Pt_470to600_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM",    # Valid
+    "qcd_600_800_13tev_spring15dr74_asympt25ns"     :  "/QCD_Pt_600to800_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM",    # Production 
+    "qcd_800_1000_13tev_spring15dr74_asympt25ns"    :  "/QCD_Pt_800to1000_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM",   # Valid                                                        
+    "qcd_1000_1400_13tev_spring15dr74_asympt25ns"    : "/QCD_Pt_1000to1400_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM",  # No v2
 
-    "zprime_m750_1p_13tev_spring15dr74_asympt25ns" : "/ZprimeToTT_M-750_W-7p5_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM",  
-    "zprime_m1000_1p_13tev_spring15dr74_asympt25ns" : "/ZprimeToTT_M-1000_W-10_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM",  
-    "zprime_m1250_1p_13tev_spring15dr74_asympt25ns" : "/ZprimeToTT_M-1250_W-12p5_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM",
-    "zprime_m2000_1p_13tev_spring15dr74_asympt25ns" : "/ZprimeToTT_M-2000_W-20_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM",  
+    "zprime_m750_1p_13tev_spring15dr74_asympt25ns" : "/ZprimeToTT_M-750_W-7p5_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM",  # Valid
+    "zprime_m1000_1p_13tev_spring15dr74_asympt25ns" : "/ZprimeToTT_M-1000_W-10_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM", # Valid
+    "zprime_m1250_1p_13tev_spring15dr74_asympt25ns" : "/ZprimeToTT_M-1250_W-12p5_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM", # No v2
+    "zprime_m2000_1p_13tev_spring15dr74_asympt25ns" : "/ZprimeToTT_M-2000_W-20_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM",  # Valid
+    "zprime_m3000_1p_13tev_spring15dr74_asympt25ns" : "/ZprimeToTT_M-3000_W-30_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM",  # Valid
 
 }
 

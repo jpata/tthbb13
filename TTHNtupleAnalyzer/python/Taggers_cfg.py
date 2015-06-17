@@ -233,6 +233,21 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
    li_fatjets_objects.append(fj_name)        
    li_fatjets_branches.append(branch_name)
 
+   name = "softdropz20b10forbtag"   
+   fj_name = ungroomed_fj_name + name
+   branch_name = ungroomed_branch_name + name
+   setattr(process, fj_name, ungroomed_fj.clone(
+           useSoftDrop = cms.bool(True),
+           zcut = cms.double(0.2),
+           beta = cms.double(1.0),
+           R0 = cms.double(r),
+           useExplicitGhosts = cms.bool(True),
+           writeCompound = cms.bool(True),
+           jetCollInstanceName=cms.string("SubJets")
+   ))
+   li_fatjets_objects.append(fj_name)        
+   li_fatjets_branches.append(branch_name)
+
    name = "filteredn3r2forbtag"   
    fj_name = ungroomed_fj_name + name
    branch_name = ungroomed_branch_name + name
@@ -594,6 +609,7 @@ for fatjet_name in li_fatjets_objects:
       original_fatjet_name = fatjet_name
       original_fatjet_name = original_fatjet_name.replace("trimmedr2f6forbtag","")
       original_fatjet_name = original_fatjet_name.replace("softdropz10b00forbtag","")
+      original_fatjet_name = original_fatjet_name.replace("softdropz20b10forbtag","")
       original_fatjet_name = original_fatjet_name.replace("filteredn3r2forbtag","")
       
       getattr(process, isv_info_name).rParam = cms.double(delta_r)

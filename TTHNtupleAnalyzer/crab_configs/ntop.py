@@ -15,7 +15,7 @@ import TTH.TTHNtupleAnalyzer.CrabHelpers as CH
 
 # Ntuple name/version and samples to include
 name = "ntop"
-version = "v54"
+version = "v55"
 li_samples = [
 #    "qcd_300_470_13tev_spring15dr74_asympt50ns",    
 #    "qcd_600_800_13tev_spring15dr74_asympt50ns",    
@@ -24,16 +24,20 @@ li_samples = [
 #    "zprime_m1000_1p_13tev_spring15dr74_asympt50ns",
 #    "zprime_m2000_1p_13tev_spring15dr74_asympt50ns",
 #
-#    "qcd_170_300_13tev_spring15dr74_asympt25ns",    
-#    "qcd_300_470_13tev_spring15dr74_asympt25ns",    
-#    "qcd_470_600_13tev_spring15dr74_asympt25ns",    
-#    "qcd_600_800_13tev_spring15dr74_asympt25ns",    
+
+
+    "qcd_170_300_13tev_spring15dr74_asympt25ns",    
+    "qcd_300_470_13tev_spring15dr74_asympt25ns",    
+    "qcd_470_600_13tev_spring15dr74_asympt25ns",    
+    "qcd_600_800_13tev_spring15dr74_asympt25ns",    
     "qcd_800_1000_13tev_spring15dr74_asympt25ns",   
+    "qcd_1000_1400_13tev_spring15dr74_asympt25ns",   
                                                
-#    "zprime_m750_1p_13tev_spring15dr74_asympt25ns", 
+    "zprime_m750_1p_13tev_spring15dr74_asympt25ns", 
 #    "zprime_m1000_1p_13tev_spring15dr74_asympt25ns",
-#    "zprime_m1250_1p_13tev_spring15dr74_asympt25ns",
+    "zprime_m1250_1p_13tev_spring15dr74_asympt25ns",
     "zprime_m2000_1p_13tev_spring15dr74_asympt25ns",
+    "zprime_m3000_1p_13tev_spring15dr74_asympt25ns",
 ]
 
 cmssw_config_path = '/shome/gregor/TTH-74X/CMSSW/src/TTH/TTHNtupleAnalyzer/python/'
