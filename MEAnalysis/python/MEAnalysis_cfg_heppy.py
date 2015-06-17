@@ -253,9 +253,8 @@ class Conf:
             "meminput"
         ],
 
-        #Process only these events (will scan through file to find)
-        #"eventWhitelist": [
 
+        #"eventWhitelist": [
         ##    (1,214,21320)
         ##    (1, 214, 21333),
         ##    #cat6
