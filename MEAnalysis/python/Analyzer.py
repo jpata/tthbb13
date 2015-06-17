@@ -59,3 +59,24 @@ class EventWeightAnalyzer(FilterAnalyzer):
         event.weight_xs = self.xs / self.n_gen
 
         return True
+
+class PrimaryVertexAnalyzer(FilterAnalyzer):
+    """
+    """
+
+    def __init__(self, cfg_ana, cfg_comp, looperName):
+        super(PrimaryVertexAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
+        self.conf = cfg_ana._conf
+
+    def beginLoop(self, setup):
+        super(PrimaryVertexAnalyzer, self).beginLoop(setup)
+
+    def process(self, event):
+        pvs = event.primaryVertices
+        if len(pvs) > 0:
+            event.primaryVertex = pvs[0]
+            event.passPV = (not event.primaryVertex.isFake) and (event.primaryVertex.ndof >= 4 and event.primaryVertex.Rho <= 2)
+        else:
+            event.passPV = False
+            return False
+        return True

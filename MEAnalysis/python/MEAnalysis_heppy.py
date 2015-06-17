@@ -73,11 +73,19 @@ evs = cfg.Analyzer(
 import TTH.MEAnalysis.MECoreAnalyzers as MECoreAnalyzers
 
 #
+
 evtid_filter = cfg.Analyzer(
     MECoreAnalyzers.EventIDFilterAnalyzer,
     'eventid',
     _conf = conf
 )
+
+pvana = cfg.Analyzer(
+    MECoreAnalyzers.PrimaryVertexAnalyzer,
+    'pvana',
+    _conf = conf
+)
+
 
 evtweight = cfg.Analyzer(
     MECoreAnalyzers.EventWeightAnalyzer,
@@ -160,8 +168,9 @@ treeProducer = getTreeProducer(conf)
 # the analyzers will process each event in this order
 sequence = cfg.Sequence([
     evtid_filter,
-    evtweight,
     evs,
+    evtweight,
+    pvana,
     leps,
     jets,
     btaglr,
