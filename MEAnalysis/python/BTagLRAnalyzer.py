@@ -111,11 +111,14 @@ class BTagLRAnalyzer(FilterAnalyzer):
             p = 1.0
 
             for i in range(0, nB):
-                p *= probs[perm[i]][0]
+                if i < np:
+                    p *= probs[perm[i]][0]
             for i in range(nB, min(nB + nC, np)):
-                p *= probs[perm[i]][1]
+                if i < np:
+                    p *= probs[perm[i]][1]
             for i in range(nB + nC, np):
-                p *= probs[perm[i]][2]
+                if i < np:
+                    p *= probs[perm[i]][2]
 
             #print nperms, p, perm, max_p, best_perm
             if p > max_p:
@@ -228,5 +231,5 @@ class BTagLRAnalyzer(FilterAnalyzer):
             #event.good_jets[idx].btagFlag = 1.0
             jet.btagFlag = 1.0
 
-        event.passes_btag = len(event.selected_btagged_jets)>=2
+        event.passes_btag = len(event.selected_btagged_jets)>=1
         return event

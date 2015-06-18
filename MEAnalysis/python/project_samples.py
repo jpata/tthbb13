@@ -1,14 +1,12 @@
 import ROOT
 
 inf = [
-#    ("/scratch/joosep/ttjets_13tev_madgraph_pu20bx25_phys14.root",
-#    [
-#        ("ttbb", "nMatchSimB>=2"),
-#        ("ttb", "nMatchSimB==1"),
-#        ("ttcc", "nMatchSimB==0 && nMatchSimC>=2"),
-#        ("ttll", "nMatchSimB==0 && nMatchSimC<=1")
-#    ])
-    ("/home/joosep/tth/gc/GC88e1ff302c9c/ttjets_13tev_madgraph_pu20bx25_phys14.root",
+    ("/home/joosep/tth/gc/GC7241f6a538e0/tth_13tev_amcatnlo_pu20bx25.root",
+    [
+        ("hbb", "nGenBHiggs>=2"),
+        ("hX", "nGenBHiggs<2"),
+    ]),
+    ("/home/joosep/tth/gc/GC7241f6a538e0/ttjets_13tev_madgraph_pu20bx25_phys14.root",
     [
         ("ttb", "ttCls == 51"),
         ("tt2b", "ttCls == 52"),
@@ -23,7 +21,7 @@ inf = [
         #("ttcc", "ttCls == 43"),
         #("ttc2c", "ttCls == 44"),
         #("tt2c2c", "ttCls == 45"),
-        ("ttll", "ttCls == 0")
+        ("ttll", "ttCls == 0 || ttCls<0")
     ])
 ]
 

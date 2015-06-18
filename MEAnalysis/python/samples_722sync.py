@@ -156,7 +156,7 @@ samples = cms.VPSet([
         name     = cms.string('tth_13tev_amcatnlo_pu20bx25'),
         nickName = cms.string('tth_13tev_amcatnlo_pu20bx25'),
         xSec     = cms.double(0.5058),
-        nGen     = cms.int64(199699),
+        nGen     = cms.int64(199699), #FIXME: has to be replaced with the number of effective pos-neg weights
         perJob   = cms.uint32(500),
         subFiles = cms.vstring([
             "/store/user/jpata/VHBBHeppy722p2-tthsync-jun9-1/TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola/VHBB_HEPPY_V11_TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola__Phys14DR-PU20bx25_tsg_PHYS14_25_V1-v2/150609_170651/0000/tree_1.root",

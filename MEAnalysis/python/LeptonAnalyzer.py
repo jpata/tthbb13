@@ -58,7 +58,8 @@ class LeptonAnalyzer(FilterAnalyzer):
                         lambda x: (
                             x.pt > lepcuts["pt"]
                             and abs(x.eta) < lepcuts["eta"]
-                            and abs(getattr(x, self.conf.leptons[l]["isotype"])) < lepcuts["iso"]
+                            #if specified, apply an additional isolation cut
+                            and abs(getattr(x, self.conf.leptons[l]["isotype"])) < lepcuts.get("iso", 99)
                         ), incoll
                     )
 
