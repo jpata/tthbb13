@@ -70,9 +70,9 @@ def el_baseline_medium(el):
             (el.eleHoE          < 0.050537) and
             (abs(el.dxy)        < 0.012235) and
             (abs(el.dz)         < 0.042020) and
-            (el.relIso03        < 0.069537) #and
-            (getattr(el, "eleExpMissingInnerHits", 0)) <= 1 and
-            (getattr(el, "eleooEmooP", 0) < 0.091942) 
+            (el.relIso03        < 0.069537) and
+            (getattr(el, "eleExpMissingInnerHits", 0) <= 1) and
+            (getattr(el, "eleooEmooP", 0) < 0.091942)
         )
     elif sca < 2.5:
         ret = ret and (
@@ -82,8 +82,8 @@ def el_baseline_medium(el):
             (el.eleHoE          < 0.086782) and
             (abs(el.dxy)        < 0.036719) and
             (abs(el.dz)         < 0.138142) and
-            (el.relIso03        < 0.113254) #and
-            (getattr(el, "eleExpMissingInnerHits", 0)) <= 1 and
+            (el.relIso03        < 0.113254) and
+            (getattr(el, "eleExpMissingInnerHits", 0) <= 1) and
             (getattr(el, "eleooEmooP", 0) < 0.100683)
         )
     return ret
@@ -105,8 +105,8 @@ def el_baseline_loose(el):
             (el.eleHoE          < 0.093068) and
             (abs(el.dxy)        < 0.035904) and
             (abs(el.dz)         < 0.075496) and
-            (el.relIso03        < 0.130136) #and
-            (getattr(el, "eleExpMissingInnerHits", 0)) <= 1 and
+            (el.relIso03        < 0.130136) and
+            (getattr(el, "eleExpMissingInnerHits", 0) <= 1) and
             (getattr(el, "eleooEmooP", 0) < 0.189968)
         )
     elif sca < 2.5:
@@ -117,8 +117,8 @@ def el_baseline_loose(el):
             (el.eleHoE          < 0.115754) and
             (abs(el.dxy)        < 0.099266) and
             (abs(el.dz)         < 0.197897) and
-            (el.relIso03        < 0.163368) #and
-            (getattr(el, "eleExpMissingInnerHits", 0)) <= 1 and
+            (el.relIso03        < 0.163368) and
+            (getattr(el, "eleExpMissingInnerHits", 0) <= 1) and
             (getattr(el, "eleooEmooP", 0) < 0.140662)
         )
     return ret
