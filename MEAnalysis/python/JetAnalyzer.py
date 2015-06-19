@@ -90,11 +90,20 @@ class JetAnalyzer(FilterAnalyzer):
         return np.any([v.passes_jet for v in event.systResults.values()])
 
     def _process(self, event):
+        pt_cut  = "pt"
+        eta_cut = "eta"
+        if event.is_sl:
+            pt_cut  = "pt_sl"
+            eta_cut = "eta_sl"
+        if event.is_dl:
+            pt_cut  = "pt_dl"
+            eta_cut = "eta_dl"
+
         event.good_jets = sorted(
             filter(
                 lambda x: (
-                    x.pt > self.conf.jets["pt"]
-                    and abs(x.eta) < self.conf.jets["eta"]
+                    x.pt > self.conf.jets[ pt_cut ]
+                    and abs(x.eta) < self.conf.jets[ eta_cut ]
                     and x.neHEF < 0.99
                     and x.chEmEF < 0.99
                     and x.neEmEF < 0.99
@@ -137,8 +146,18 @@ class JetAnalyzer(FilterAnalyzer):
             if abs(j.mcFlavour) == 5:
                 event.n_tagwp_tagged_true_bjets += 1
 
-        #Require at least 3 good jets in order to continue analysis
-        passes = len(event.good_jets) >= 3
+        #Require at least 3 (if is_sl) or 2 (is_dl) good jets in order to continue analysis
+        passes = True
+        if event.is_sl and len(event.good_jets) < 3:
+            passes = False
+        if event.is_dl:
+            if len(event.good_jets) < 2:
+                passes = False
+            if len(event.good_jets) >=2:
+                if event.good_jets[0].pt<self.conf.jets["pt"] or event.good_jets[1].pt<self.conf.jets["pt"]:
+                    passes = False
+                
+
 
         corrMet_px = event.MET.px
         corrMet_py = event.MET.py

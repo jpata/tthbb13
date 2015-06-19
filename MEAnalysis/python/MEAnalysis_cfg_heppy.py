@@ -213,8 +213,17 @@ class Conf:
     }
 
     jets = {
-        "pt": 30,
-        "eta": 2.4,
+        # pt, |eta| thresholds for **leading two jets** (common between sl and dl channel)
+        "pt":   30,        
+        "eta":  2.4,
+
+        # pt, |eta| thresholds for **trailing jets** specific to sl channel
+        "pt_sl":  30,
+        "eta_sl": 2.4,
+
+        # pt, |eta| thresholds for **trailing jets** specific to dl channel
+        "pt_dl":  20,
+        "eta_dl": 2.4,
 
         #The default b-tagging algorithm (branch name)
         "btagAlgo": "btagCSV",
@@ -301,10 +310,10 @@ class Conf:
         #This configures the MEMs to actually run, the rest will be set to 0
         "methodsToRun": [
             "SL_0w2h2t",
-            #"DL_0w2h2t",
+            "DL_0w2h2t",
             #"SL_2w2h2t",
             #"SL_2w2h2t_memLR",
-            "SL_0w2h2t_memLR",
+            #"SL_0w2h2t_memLR",
         ],
 
     }
