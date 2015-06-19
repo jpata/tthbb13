@@ -189,7 +189,6 @@ class Conf:
             "tight": {
                 "pt": 30,
                 "eta": 2.1,
-                "iso": 0.1,
                 "idcut": lambda el: el_baseline_medium(el)
             },
             "tight_veto": {
@@ -202,13 +201,11 @@ class Conf:
             "loose": {
                 "pt": 20,
                 "eta": 2.4,
-                "iso": 0.15,
                 "idcut": lambda el: el_baseline_medium(el)
             },
             "loose_veto": {
                 "pt": 10,
                 "eta": 2.4,
-                "iso": 0.04,
                 "idcut": lambda el: el_baseline_loose(el)
             },
             "isotype": "relIso03", #Is it deltaBeta or rhoArea?

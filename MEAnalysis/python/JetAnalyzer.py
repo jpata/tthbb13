@@ -137,8 +137,8 @@ class JetAnalyzer(FilterAnalyzer):
             if abs(j.mcFlavour) == 5:
                 event.n_tagwp_tagged_true_bjets += 1
 
-        #Require at least 4 good jets in order to continue analysis
-        passes = len(event.good_jets) >= 4
+        #Require at least 3 good jets in order to continue analysis
+        passes = len(event.good_jets) >= 3
 
         corrMet_px = event.MET.px
         corrMet_py = event.MET.py
