@@ -71,8 +71,8 @@ def el_baseline_medium(el):
             (abs(el.dxy)        < 0.012235) and
             (abs(el.dz)         < 0.042020) and
             (el.relIso03        < 0.069537) #and
-            #(el.eleExpMIHits    < 0.069537) #
-            #(el.ooEmooP         < 0.069537) #
+            (getattr(el, "eleExpMissingInnerHits", 0)) <= 1 and
+            (getattr(el, "eleooEmooP", 0) < 0.091942) 
         )
     elif sca < 2.5:
         ret = ret and (
@@ -83,8 +83,8 @@ def el_baseline_medium(el):
             (abs(el.dxy)        < 0.036719) and
             (abs(el.dz)         < 0.138142) and
             (el.relIso03        < 0.113254) #and
-            #(el.eleExpMIHits    < 0.069537) #
-            #(el.ooEmooP         < 0.069537) #
+            (getattr(el, "eleExpMissingInnerHits", 0)) <= 1 and
+            (getattr(el, "eleooEmooP", 0) < 0.100683)
         )
     return ret
 
@@ -106,8 +106,8 @@ def el_baseline_loose(el):
             (abs(el.dxy)        < 0.035904) and
             (abs(el.dz)         < 0.075496) and
             (el.relIso03        < 0.130136) #and
-            #(el.eleExpMIHits    < 0.069537) #
-            #(el.ooEmooP         < 0.069537) #
+            (getattr(el, "eleExpMissingInnerHits", 0)) <= 1 and
+            (getattr(el, "eleooEmooP", 0) < 0.189968)
         )
     elif sca < 2.5:
         ret = ret and (
@@ -118,8 +118,8 @@ def el_baseline_loose(el):
             (abs(el.dxy)        < 0.099266) and
             (abs(el.dz)         < 0.197897) and
             (el.relIso03        < 0.163368) #and
-            #(el.eleExpMIHits    < 0.069537) #
-            #(el.ooEmooP         < 0.069537) #
+            (getattr(el, "eleExpMissingInnerHits", 0)) <= 1 and
+            (getattr(el, "eleooEmooP", 0) < 0.140662)
         )
     return ret
 
@@ -181,7 +181,7 @@ class Conf:
                 "iso": 0.2,
                 "idcut": mu_baseline
             },
-            "isotype": "relIso04", #Is it deltaBeta or rhoArea?
+            "isotype": "pfRelIso04", #pfRelIso - delta-beta, relIso - rho
         },
 
 
@@ -208,13 +208,13 @@ class Conf:
                 "eta": 2.4,
                 "idcut": lambda el: el_baseline_loose(el)
             },
-            "isotype": "relIso03", #Is it deltaBeta or rhoArea?
+            "isotype": "pfRelIso03", #pfRelIso - delta-beta, relIso - rho
         }
     }
 
     jets = {
         # pt, |eta| thresholds for **leading two jets** (common between sl and dl channel)
-        "pt":   30,        
+        "pt":   30,
         "eta":  2.4,
 
         # pt, |eta| thresholds for **trailing jets** specific to sl channel
@@ -247,7 +247,7 @@ class Conf:
     general = {
         "controlPlotsFileOld": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsTEST.root",
         "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV6.root",
-        "sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_722sync.py",
+        "sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_722minisync.py",
         "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions.pickle",
         "systematics": ["nominal"],
         #"systematics": ["nominal", "JESUp", "JESDown", "JES"],
@@ -259,7 +259,7 @@ class Conf:
         # "matching" - print out the association between gen and reco objects
         #"verbosity": ["eventboundary", "input", "matching", "gen", "reco", "meminput"],
         "verbosity": [
-            "meminput"
+            #"meminput"
         ],
 
 
