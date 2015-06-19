@@ -198,8 +198,9 @@ class BTagLRAnalyzer(FilterAnalyzer):
         event.btag_LR_4b_2b_alt = lratio(event.btag_lr_4b_alt, event.btag_lr_2b_alt)
         event.btag_LR_4b_2b_max4 = lratio(event.btag_lr_4b_max4, event.btag_lr_2b_max4)
 
-        event.buntagged_jets_by_LR_4b_2b = [jets_for_btag_lr[i] for i in best_4b_perm[4:]]
-        event.btagged_jets_by_LR_4b_2b = [jets_for_btag_lr[i] for i in best_4b_perm[0:4]]
+        # LB moved from best_4b_perm to best_4b_perm_alt
+        event.buntagged_jets_by_LR_4b_2b = [jets_for_btag_lr[i] for i in best_4b_perm_alt[4:]]
+        event.btagged_jets_by_LR_4b_2b   = [jets_for_btag_lr[i] for i in best_4b_perm_alt[0:4]]
 
         for i in range(len(event.good_jets)):
             event.good_jets[i].btagFlag = 0.0
