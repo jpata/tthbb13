@@ -182,6 +182,18 @@ def getTreeProducer(conf):
                 help="Type number of the event (see doc, todo)"
             ),
 
+            # Quark matching: attempted or not
+            NTupleVariable(
+                "QMatching_t_attempted",
+                lambda ev: ev.QMatching_t_attempted \
+                    if hasattr(ev, 'QMatching_t_attempted') else -1,
+                help="" ),
+            NTupleVariable(
+                "QMatching_H_attempted",
+                lambda ev: ev.QMatching_H_attempted \
+                    if hasattr(ev, 'QMatching_H_attempted') else -1,
+                help="" ),
+
             # Quark matching branches: subjets
             NTupleVariable(
                 "QMatching_sj_hadr_bquark",
@@ -212,6 +224,38 @@ def getTreeProducer(conf):
                 "QMatching_sj_bquark_higgs2",
                 lambda ev: ev.QMatching_sj_bquark_higgs2 \
                     if hasattr(ev, 'QMatching_sj_bquark_higgs2') else -1,
+                help="" ),
+
+            # Quark matching branches: subjets from other top
+            NTupleVariable(
+                "QMatching_sj_ot_hadr_bquark",
+                lambda ev: ev.QMatching_sj_ot_hadr_bquark \
+                    if hasattr(ev, 'QMatching_sj_ot_hadr_bquark') else -1,
+                help="" ),
+            NTupleVariable(
+                "QMatching_sj_ot_lquark1",
+                lambda ev: ev.QMatching_sj_ot_lquark1 \
+                    if hasattr(ev, 'QMatching_sj_ot_lquark1') else -1,
+                help="" ),
+            NTupleVariable(
+                "QMatching_sj_ot_lquark2",
+                lambda ev: ev.QMatching_sj_ot_lquark2 \
+                    if hasattr(ev, 'QMatching_sj_ot_lquark2') else -1,
+                help="" ),
+            NTupleVariable(
+                "QMatching_sj_ot_lept_bquark",
+                lambda ev: ev.QMatching_sj_ot_lept_bquark \
+                    if hasattr(ev, 'QMatching_sj_ot_lept_bquark') else -1,
+                help="" ),
+            NTupleVariable(
+                "QMatching_sj_ot_bquark_higgs1",
+                lambda ev: ev.QMatching_sj_ot_bquark_higgs1 \
+                    if hasattr(ev, 'QMatching_sj_ot_bquark_higgs1') else -1,
+                help="" ),
+            NTupleVariable(
+                "QMatching_sj_ot_bquark_higgs2",
+                lambda ev: ev.QMatching_sj_ot_bquark_higgs2 \
+                    if hasattr(ev, 'QMatching_sj_ot_bquark_higgs2') else -1,
                 help="" ),
 
             # Quark matching branches: jets

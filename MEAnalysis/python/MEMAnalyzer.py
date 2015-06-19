@@ -345,13 +345,6 @@ class MEAnalyzer(FilterAnalyzer):
                 y.Matching_subjet_bjet < 2
                 )
 
-        sj_permutations = CvectorPermutations()
-        sj_permutations.push_back(MEM.Permutations.HEPTopTagged)
-        sj_permutations.push_back(MEM.Permutations.QUntagged)
-        sj_permutations.push_back(MEM.Permutations.BTagged)
-        for k in [ "SL_0qW_sj_perm", "SL_1qW_sj_perm", "SL_2qW_sj_perm" ]:
-            self.configs[k].cfg.perm_pruning = sj_permutations
-
         # ===============================================================
 
         for k in ["DL_gen", "SL_2qW_gen", "SL_1qW_gen"]:
@@ -446,6 +439,20 @@ class MEAnalyzer(FilterAnalyzer):
                 self.configs[kn] = copy.deepcopy(self.configs[k])
                 self.configs[kn].cfg.defaultCfg()
                 configure(self.configs[kn], self.configs[k])
+
+
+        # Since copy.deepcopy has issues with the C++ vector, set it manually for
+        # NewTF as well
+        sj_permutations = CvectorPermutations()
+        sj_permutations.push_back(MEM.Permutations.HEPTopTagged)
+        sj_permutations.push_back(MEM.Permutations.QUntagged)
+        sj_permutations.push_back(MEM.Permutations.BTagged)
+        for k in [ "SL_0qW_sj_perm", "SL_1qW_sj_perm", "SL_2qW_sj_perm",
+                   #"SL_0qW_sj_perm_NewTF",
+                   "SL_1qW_sj_perm_NewTF",
+                   "SL_2qW_sj_perm_NewTF",
+                   ]:
+            self.configs[k].cfg.perm_pruning = sj_permutations
 
         #only in 6J SL
         #self.configs["Sudakov"].do_calculate = (
@@ -601,7 +608,7 @@ class MEAnalyzer(FilterAnalyzer):
         event.mem_results_ttbb = []
 
         # Temporary: don't execute MEM right now
-        # return True
+        #return True
 
         #jets = sorted(event.good_jets, key=lambda x: x.pt, reverse=True)
         leptons = event.good_leptons

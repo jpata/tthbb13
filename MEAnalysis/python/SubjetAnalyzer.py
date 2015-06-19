@@ -16,6 +16,7 @@ class SubjetAnalyzer(FilterAnalyzer):
 
         self.bTagAlgo = self.conf.jets["btagAlgo"]
 
+        """
         if hasattr( self.conf, 'httCandidatecut' ):
             self.Cut_criteria = self.conf.httCandidatecut
             print 'Using httCandidate cut criteria from configuration file'
@@ -25,6 +26,16 @@ class SubjetAnalyzer(FilterAnalyzer):
                 ( 'mass', '>', '120.0' ),
                 ( 'mass', '<', '220.0' ),
                 ( 'fW'  , '<', '0.175' ) ]
+        """
+
+        #self.Cut_criteria = []
+
+        self.Cut_criteria = [
+            ( 'pt'  , '>', '200.0' ),
+            ( 'mass', '>', '120.0' ),
+            ( 'mass', '<', '220.0' ),
+            ( 'fW'  , '<', '0.175' ) ]
+
 
     def beginLoop(self, setup):
         super(SubjetAnalyzer, self).beginLoop(setup)
@@ -84,6 +95,7 @@ class SubjetAnalyzer(FilterAnalyzer):
             return True
 
         # Calculates the delR with the (single) lepton that was found
+        # (In case of more than 1 candidate, this can be a good selection crit.)
         self.Set_DelRwithLepton( event, tops )
 
         # If exactly 1 survived, simply continue with that candidate
@@ -95,13 +107,14 @@ class SubjetAnalyzer(FilterAnalyzer):
         # one whose delR with the lepton was biggest
         else:
             tops = sorted( tops, key=lambda x: -x.delR_lepton )
+            #tops = sorted( tops, key=lambda x: abs(x.mass-self.top_mass) )
             other_top_present = True
             top = tops[0]
             other_top = tops[1]
 
         # Write delRmin to event
         setattr( event, 'httCandidate_delRmin', abs(top.Rmin-top.RminExpected) )
-        print 'httCandidate_delRmin = {0}'.format( abs(top.Rmin-top.RminExpected) )
+        #print 'httCandidate_delRmin = {0}'.format( abs(top.Rmin-top.RminExpected) )
 
         # event.wquark_candidate_jets is a set instead of a list (not sure why)
         event.wquark_candidate_jets = list( event.wquark_candidate_jets )
@@ -223,16 +236,15 @@ class SubjetAnalyzer(FilterAnalyzer):
                     Match_subjet_bjet -= 1
 
 
-        if genquarks_cat1_present and genhiggs_present:
+        # Quark matching
+        # ==============
 
-            # Quark matching
-            # ==============
+        # Quark matching is only done to compare events to truth level.
+        # Events are not selected based on successful quark matching.
+        # This entire part can be commented out if so desired.
 
-            # Quark matching is only done to compare events to truth level.
-            # Events are not selected based on successful quark matching.
-            # This entire part can be commented out if so desired.
-
-            # Matching quarks with subjets
+        # Matching quarks with subjets
+        if genquarks_cat1_present:
 
             Match_hadr_bquark_subjet = self.Match_two_tl_lists(
                 tl_HadronicBQuark, 'hadr_bquark',
@@ -250,6 +262,31 @@ class SubjetAnalyzer(FilterAnalyzer):
                 tl_LeptonicBQuark, 'lept_bquark',
                 tl_subjets, 'subjet' )
 
+            # Matching quarks with subjets from other top
+            if other_top_present:
+                Match_hadr_bquark_subjet_ot = self.Match_two_tl_lists(
+                    tl_HadronicBQuark, 'hadr_bquark',
+                    tl_subjets_other_top, 'subjet_other_top' )
+
+                Match_lquark1_subjet_ot = self.Match_two_tl_lists(
+                    tl_GenWZQuark1, 'lquark1',
+                    tl_subjets_other_top, 'subjet_other_top' )
+
+                Match_lquark2_subjet_ot = self.Match_two_tl_lists(
+                    tl_GenWZQuark2, 'lquark2',
+                    tl_subjets_other_top, 'subjet_other_top' )
+
+                Match_lept_bquark_subjet_ot = self.Match_two_tl_lists(
+                    tl_LeptonicBQuark, 'lept_bquark',
+                    tl_subjets_other_top, 'subjet_other_top' )
+            else:
+                Match_hadr_bquark_subjet_ot = -1
+                Match_lquark1_subjet_ot = -1
+                Match_lquark2_subjet_ot = -1
+                Match_lept_bquark_subjet_ot = -1
+
+        if genhiggs_present:
+
             Match_bquark_higgs1_subjet = self.Match_two_tl_lists(
                 tl_BQuarksFromH[0], 'bquark_higgs1',
                 tl_subjets, 'subjet' )
@@ -258,7 +295,21 @@ class SubjetAnalyzer(FilterAnalyzer):
                 tl_BQuarksFromH[1], 'bquark_higgs2',
                 tl_subjets, 'subjet' )
 
-            # Matching quarks with jets
+            # Matching quarks with subjets from other top
+            if other_top_present:
+                Match_bquark_higgs1_subjet_ot = self.Match_two_tl_lists(
+                    tl_BQuarksFromH[0], 'bquark_higgs1',
+                    tl_subjets_other_top, 'subjet_other_top' )
+
+                Match_bquark_higgs2_subjet_ot = self.Match_two_tl_lists(
+                    tl_BQuarksFromH[1], 'bquark_higgs2',
+                    tl_subjets_other_top, 'subjet_other_top' )
+            else:
+                Match_bquark_higgs1_subjet_ot = -1
+                Match_bquark_higgs2_subjet_ot = -1
+
+        # Matching quarks with jets
+        if genquarks_cat1_present:
 
             Match_hadr_bquark_jet = self.Match_two_tl_lists(
                 tl_HadronicBQuark, 'hadr_bquark',
@@ -276,6 +327,8 @@ class SubjetAnalyzer(FilterAnalyzer):
                 tl_LeptonicBQuark, 'lept_bquark',
                 tl_btagged_jets, 'jet' )
 
+        if genhiggs_present:
+
             Match_bquark_higgs1_jet = self.Match_two_tl_lists(
                 tl_BQuarksFromH[0], 'bquark_higgs1',
                 tl_btagged_jets, 'jet' )
@@ -284,19 +337,42 @@ class SubjetAnalyzer(FilterAnalyzer):
                 tl_BQuarksFromH[1], 'bquark_higgs2',
                 tl_btagged_jets, 'jet' )
 
+        setattr( event, 'QMatching_t_attempted', genquarks_cat1_present )
+        setattr( event, 'QMatching_H_attempted', genhiggs_present )
+
+        if genquarks_cat1_present:
             setattr( event, 'QMatching_sj_hadr_bquark'  , Match_hadr_bquark_subjet )
             setattr( event, 'QMatching_sj_lquark1'      , Match_lquark1_subjet )
             setattr( event, 'QMatching_sj_lquark2'      , Match_lquark2_subjet )
             setattr( event, 'QMatching_sj_lept_bquark'  , Match_lept_bquark_subjet )
+
+            # Results from other top matching
+            setattr( event, 'QMatching_sj_ot_hadr_bquark'  , 
+                     Match_hadr_bquark_subjet_ot )
+            setattr( event, 'QMatching_sj_ot_lquark1'      ,
+                     Match_lquark1_subjet_ot )
+            setattr( event, 'QMatching_sj_ot_lquark2'      ,
+                     Match_lquark2_subjet_ot )
+            setattr( event, 'QMatching_sj_ot_lept_bquark'  , 
+                     Match_lept_bquark_subjet_ot )
+
+            # Results from jet matching
+            setattr( event, 'QMatching_jet_hadr_bquark'  , Match_hadr_bquark_jet )
+            setattr( event, 'QMatching_jet_lquark1'      , Match_lquark1_jet )
+            setattr( event, 'QMatching_jet_lquark2'      , Match_lquark2_jet )
+            setattr( event, 'QMatching_jet_lept_bquark'  , Match_lept_bquark_jet )
+
+        if genhiggs_present:
             setattr( event, 'QMatching_sj_bquark_higgs1',
                 Match_bquark_higgs1_subjet )
             setattr( event, 'QMatching_sj_bquark_higgs2',
                 Match_bquark_higgs2_subjet )
 
-            setattr( event, 'QMatching_jet_hadr_bquark'  , Match_hadr_bquark_jet )
-            setattr( event, 'QMatching_jet_lquark1'      , Match_lquark1_jet )
-            setattr( event, 'QMatching_jet_lquark2'      , Match_lquark2_jet )
-            setattr( event, 'QMatching_jet_lept_bquark'  , Match_lept_bquark_jet )
+            setattr( event, 'QMatching_sj_ot_bquark_higgs1',
+                     Match_bquark_higgs1_subjet_ot )
+            setattr( event, 'QMatching_sj_ot_bquark_higgs2',
+                     Match_bquark_higgs2_subjet_ot )
+
             setattr( event, 'QMatching_jet_bquark_higgs1', Match_bquark_higgs1_jet )
             setattr( event, 'QMatching_jet_bquark_higgs2', Match_bquark_higgs2_jet )
 
