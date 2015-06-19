@@ -127,7 +127,10 @@ void roc_comp_ROC(TString fname1 = "", TString fname2 = "", TString fname3 = "",
   TGraphErrors* gROC1cut = roc(fname3, step2, xMin2, xMax2, cut2, 3, leg, leg2, var2);
   TGraphErrors* gROC2cut = roc(fname4, step2, xMin2, xMax2, cut2, 3, 0,   leg2, var2);
 
-  if(gROC1==0 || gROC2==0) return;
+  if(gROC1==0 || gROC2==0){
+    cout << "!!!! roc_comp_ROC returned unexpectedly !!!!" << endl;
+    return;
+  }
 
   TGraphErrors* gROC = new TGraphErrors( gROC1->GetN() , gROC1->GetY(), gROC2->GetY(), gROC1->GetEY(), gROC2->GetEY());
   gROC->SetLineWidth(3);
@@ -169,6 +172,7 @@ void roc_opt_ROC(TString fname1 = "", TString fname2 = "",
 		 TCut cut="is_sl && nBCSVM>=4 && njets>=6",
 		 TString title = "6 jets",		   
 		 TString save_name = "tmp.png",
+		 int fom = 0,
 		 float step=0.05, float xMin=-0.01, float xMax=2.01
 		 ){
 
@@ -177,10 +181,10 @@ void roc_opt_ROC(TString fname1 = "", TString fname2 = "",
   CanvasAndLegend(c1, leg, 0);
 
 
-  const unsigned int n_k = 4; 
-  const unsigned int n_a = 6; 
+  const unsigned int n_k = 5; 
+  const unsigned int n_a = 11; 
   const float step_k = 0.1;
-  const float step_a = 0.2;
+  const float step_a = 0.1;
 
   float k_factor[n_k];
   float a_factor[n_a];
@@ -200,7 +204,7 @@ void roc_opt_ROC(TString fname1 = "", TString fname2 = "",
     for(unsigned int a = 0 ; a < n_a; ++a){
       float A = a_factor[a];
 
-      cout << "Processing k=" << K << ", a=" << A << endl;
+      cout << "Processing k=" << K << ", a=" << A << "..." << endl;
       TString var1(Form("%f*(mem_tth_p[%d] /(mem_tth_p[%d]  + %f*mem_ttbb_p[%d]))",A,pos,pos,K,pos));
       TString var2(Form("(1-%f)*btag_LR_4b_2b",A));
       TString var = var1+"+"+var2;
@@ -213,13 +217,16 @@ void roc_opt_ROC(TString fname1 = "", TString fname2 = "",
       TGraphErrors* gROCtmp = new TGraphErrors( gROC1->GetN() , gROC1->GetY(), gROC2->GetY(), gROC1->GetEY(), gROC2->GetEY());
       gROCtmp->SetLineWidth(3);
       gROCtmp->SetLineColor(2);
-      double inttmp = gROCtmp->Integral(); 
-      cout << "Integral = " << inttmp << " filled in bin " << hROC->FindBin(K,A) << endl;
-      hROC->SetBinContent(hROC->FindBin(K,A), 0.5-inttmp);
+      double inttmp = 0.;      
+      if(fom==0) inttmp = 0.5-gROCtmp->Integral(); 
+      if(fom==1) inttmp = gROCtmp->Eval(0.5); 
+      if(fom==2) inttmp = gROCtmp->Eval(0.2); 
+      cout << "Integral = " << inttmp << " (fom: " << fom << ") filled in bin " << hROC->FindBin(K,A) << endl;      
+      hROC->SetBinContent(hROC->FindBin(K,A), inttmp);
       //delete gROC1;
       //delete gROC2;
       //delete gROCtmp;
-      cout << "...Done" << endl;
+      cout << "Done..." << endl;
     }
   }
 
@@ -254,18 +261,179 @@ void run_DL_opt( TString gcS1 = "GC3de9cd7caec1", TString gcB1 = "GCa5f687e57337
   roc_opt_ROC( fS1, fB1,
 	       0,
 	       dl && TCut("njets>=4 && nBCSVM==2"),
-	       "DL, N_{b}==2, N_{j}#geq4",
-	       "OPT_DL_g4_2.png"                                               
+	       "DL, N_{b}==2, N_{j}#geq4, AUC",
+	       "OPT_DL_g4_2_FOM0.png", 0                                               
 	       );
   
   roc_opt_ROC( fS1, fB1,
 	       0,
 	       dl && TCut("njets>=4 && nBCSVM==3"),
-	       "DL, N_{b}==3, N_{j}#geq4",
-	       "OPT_DL_g4_3.png"                                               
+	       "DL, N_{b}==3, N_{j}#geq4, AUC",
+	       "OPT_DL_g4_3_FOM0.png", 0                                               
+	       );
+
+  roc_opt_ROC( fS1, fB1,
+	       0,
+	       dl && TCut("njets>=4 && nBCSVM>=4"),
+	       "DL, N_{b}#geq4, N_{j}#geq4, AUC",
+	       "OPT_DL_g4_g4_FOM0.png", 0                                               
+	       );
+
+  roc_opt_ROC( fS1, fB1,
+	       0,
+	       dl && TCut("njets>=4 && nBCSVM==2"),
+	       "DL, N_{b}==2, N_{j}#geq4, #epsilon_{B} at #epsilon_{S}=0.5",
+	       "OPT_DL_g4_2_FOM1.png", 1                                               
+	       );
+  
+  roc_opt_ROC( fS1, fB1,
+	       0,
+	       dl && TCut("njets>=4 && nBCSVM==3"),
+	       "DL, N_{b}==3, N_{j}#geq4, #epsilon_{B} at #epsilon_{S}=0.5",
+	       "OPT_DL_g4_3_FOM1.png", 1                                               
+	       );
+
+  roc_opt_ROC( fS1, fB1,
+	       0,
+	       dl && TCut("njets>=4 && nBCSVM>=4"),
+	       "DL, N_{b}#geq4, N_{j}#geq4, #epsilon_{B} at #epsilon_{S}=0.5",
+	       "OPT_DL_g4_g4_FOM1.png", 1                                               
+	       );
+
+  roc_opt_ROC( fS1, fB1,
+	       0,
+	       dl && TCut("njets>=4 && nBCSVM==2"),
+	       "DL, N_{b}==2, N_{j}#geq4, #epsilon_{B} at #epsilon_{S}=0.2",
+	       "OPT_DL_g4_2_FOM2.png", 2                                               
+	       );
+  
+  roc_opt_ROC( fS1, fB1,
+	       0,
+	       dl && TCut("njets>=4 && nBCSVM==3"),
+	       "DL, N_{b}==3, N_{j}#geq4, #epsilon_{B} at #epsilon_{S}=0.2",
+	       "OPT_DL_g4_3_FOM2.png", 2                                               
+	       );
+
+  roc_opt_ROC( fS1, fB1,
+	       0,
+	       dl && TCut("njets>=4 && nBCSVM>=4"),
+	       "DL, N_{b}#geq4, N_{j}#geq4, #epsilon_{B} at #epsilon_{S}=0.2",
+	       "OPT_DL_g4_g4_FOM2.png", 2                                               
 	       );
 
 }
+
+////////////////////////////////////////////////////////////////////
+
+void run_SL_opt( TString gcS1 = "GCdd371ba1cc90", TString gcB1 = "GC399bef150c46"
+		 ){
+
+  TString fS1 = path+gcS1+"/tth_13tev/output-sig.root";
+  TString fB1 = path+gcB1+"/ttjets_13tev_madgraph_pu20bx25_phys14/output-bkg.root";
+
+  cout << "################## >=4 tags" << endl;
+  roc_opt_ROC( fS1, fB1,
+	       0,
+	       sl && TCut("njets>=7 && nBCSVM>=4"),
+	       "SL, N_{b}#geq4, N_{j}#geq7",
+	       "OPT_SL_g7_g4.png"                                               
+	       );
+
+  roc_opt_ROC( fS1, fB1,
+	       0,
+	       sl && TCut("njets==4 && nBCSVM>=4"),
+	       "SL, N_{b}#geq4, N_{j}=4",
+	       "OPT_SL_4_g4.png"                                               
+	       );
+
+  roc_opt_ROC( fS1, fB1,
+	       0,
+	       sl && TCut("njets==5 && nBCSVM>=4"),
+	       "SL, N_{b}#geq4, N_{j}=5",
+	       "OPT_SL_5_g4.png"                                               
+	       );
+
+  roc_opt_ROC( fS1, fB1,
+	       0,
+	       sl && TCut("njets==6 && nBCSVM>=4"),
+	       "SL, N_{b}#geq4, N_{j}=6",
+	       "OPT_SL_6_g4.png"                                               
+	       );
+
+  roc_opt_ROC( fS1, fB1,
+	       0,
+	       sl && TCut("njets==6 && nBCSVM>=4 && (Wmass>60 && Wmass<100)"),
+	       "SL, N_{b}#geq4, N_{j}=6, W-tag",
+	       "OPT_SL_6_g4_wtag.png"                                               
+	       );
+
+
+  cout << "################## =3 tags" << endl;
+  roc_opt_ROC( fS1, fB1,
+	       0,
+	       sl && TCut("njets==4 && nBCSVM==3 "),
+	       "SL, N_{b}=3, N_{j}=4, AUC",
+	       "OPT_SL_4_3_FOM0.png", 0
+	       );
+
+  roc_opt_ROC( fS1, fB1,
+	       0,
+	       sl && TCut("njets==5 && nBCSVM==3"),
+	       "SL, N_{b}=3, N_{j}=5, AUC",
+	       "OPT_SL_5_3_FOM0.png", 0                                               
+	       );
+
+  roc_opt_ROC( fS1, fB1,
+	       0,
+	       sl && TCut("njets>=6 && nBCSVM==3"),
+	       "SL, N_{b}=3, N_{j}#geq6, AUC",
+	       "OPT_SL_g6_3_FOM0.png", 0                                              
+	       );
+  roc_opt_ROC( fS1, fB1,
+	       0,
+	       sl && TCut("njets==4 && nBCSVM==3 "),
+	       "SL, N_{b}=3, N_{j}=4, #epsilon_{B} at #epsilon_{S}=0.5",
+	       "OPT_SL_4_3_FOM1.png", 1                                               
+	       );
+
+  roc_opt_ROC( fS1, fB1,
+	       0,
+	       sl && TCut("njets==5 && nBCSVM==3"),
+	       "SL, N_{b}=3, N_{j}=5, #epsilon_{B} at #epsilon_{S}=0.5",
+	       "OPT_SL_5_3_FOM1.png", 1                                               
+	       );
+
+  roc_opt_ROC( fS1, fB1,
+	       0,
+	       sl && TCut("njets>=6 && nBCSVM==3"),
+	       "SL, N_{b}=3, N_{j}#geq6, #epsilon_{B} at #epsilon_{S}=0.5",
+	       "OPT_SL_g6_3_FOM1.png", 1                                              
+	       );
+
+  roc_opt_ROC( fS1, fB1,
+	       0,
+	       sl && TCut("njets==4 && nBCSVM==3 "),
+	       "SL, N_{b}=3, N_{j}=4, #epsilon_{B} at #epsilon_{S}=0.2",
+	       "OPT_SL_4_3_FOM2.png", 2
+	       );
+
+  roc_opt_ROC( fS1, fB1,
+	       0,
+	       sl && TCut("njets==5 && nBCSVM==3"),
+	       "SL, N_{b}=3, N_{j}=5, #epsilon_{B} at #epsilon_{S}=0.2",
+	       "OPT_SL_5_3_FOM2.png", 2                                               
+	       );
+
+  roc_opt_ROC( fS1, fB1,
+	       0,
+	       sl && TCut("njets>=6 && nBCSVM==3"),
+	       "SL, N_{b}=3, N_{j}#geq6, #epsilon_{B} at #epsilon_{S}=0.2",
+	       "OPT_SL_g6_3_FOM2.png", 2                                              
+	       );
+
+    
+}
+
 
 ////////////////////////////////////////////////////////////////////
 void run_test( TString gcS1 = "", TString gcB1 = "", 

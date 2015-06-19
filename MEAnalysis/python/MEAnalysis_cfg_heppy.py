@@ -4,6 +4,9 @@ from TTH.MEAnalysis.MEMConfig import MEMConfig
 import ROOT
 from ROOT import MEM
 
+# LB: in fact,  mu.tightId should contain all the other cuts
+# https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Tight_Muon
+# https://github.com/vhbb/cmssw/blob/vhbbHeppy722patch2/PhysicsTools/Heppy/python/physicsobjects/Muon.py
 def mu_baseline(mu):
     return (
         mu.tightId and
@@ -20,7 +23,7 @@ def mu_baseline(mu):
 def el_baseline_tight(el):
     sca = abs(el.etaSc)
     ret = (
-        not(sca > 1.442 and sca < 1.5660) and
+        not(sca > 1.4442 and sca < 1.5660) and
         el.convVeto
     )
     if not ret:
@@ -53,7 +56,7 @@ def el_baseline_tight(el):
 def el_baseline_medium(el):
     sca = abs(el.etaSc)
     ret = (
-        not(sca > 1.442 and sca < 1.5660) and
+        not(sca > 1.4442 and sca < 1.5660) and
         el.convVeto
     )
     if not ret:
@@ -88,7 +91,7 @@ def el_baseline_medium(el):
 def el_baseline_loose(el):
     sca = abs(el.etaSc)
     ret = (
-        not(sca > 1.442 and sca < 1.5660) and
+        not(sca > 1.4442 and sca < 1.5660) and
         el.convVeto
     )
     if not ret:
@@ -178,7 +181,7 @@ class Conf:
                 "iso": 0.2,
                 "idcut": mu_baseline
             },
-            "isotype": "relIso04",
+            "isotype": "relIso04", #Is it deltaBeta or rhoArea?
         },
 
 
@@ -205,13 +208,22 @@ class Conf:
                 "eta": 2.4,
                 "idcut": lambda el: el_baseline_loose(el)
             },
-            "isotype": "relIso03",
+            "isotype": "relIso03", #Is it deltaBeta or rhoArea?
         }
     }
 
     jets = {
-        "pt": 30,
-        "eta": 2.4,
+        # pt, |eta| thresholds for **leading two jets** (common between sl and dl channel)
+        "pt":   30,        
+        "eta":  2.4,
+
+        # pt, |eta| thresholds for **trailing jets** specific to sl channel
+        "pt_sl":  30,
+        "eta_sl": 2.4,
+
+        # pt, |eta| thresholds for **trailing jets** specific to dl channel
+        "pt_dl":  20,
+        "eta_dl": 2.4,
 
         #The default b-tagging algorithm (branch name)
         "btagAlgo": "btagCSV",
@@ -250,9 +262,8 @@ class Conf:
             "meminput"
         ],
 
-        #Process only these events (will scan through file to find)
-        #"eventWhitelist": [
 
+        #"eventWhitelist": [
         ##    (1,214,21320)
         ##    (1, 214, 21333),
         ##    #cat6
@@ -299,10 +310,10 @@ class Conf:
         #This configures the MEMs to actually run, the rest will be set to 0
         "methodsToRun": [
             "SL_0w2h2t",
-            #"DL_0w2h2t",
+            "DL_0w2h2t",
             #"SL_2w2h2t",
             #"SL_2w2h2t_memLR",
-            "SL_0w2h2t_memLR",
+            #"SL_0w2h2t_memLR",
         ],
 
     }
