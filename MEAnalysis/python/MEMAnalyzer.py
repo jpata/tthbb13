@@ -234,12 +234,13 @@ class MEAnalyzer(FilterAnalyzer):
         event.mem_results_ttbb = []
 
         res = {}
-        print "-----"
-        print "MEM id={0},{1},{2} cat={3} cat_b={4} nj={5} nt={6} nel={7} nmu={8} syst={9}".format(
-            event.input.run, event.input.lumi, event.input.evt,
-            event.cat, event.cat_btag, event.numJets, event.nBCSVM,
-            event.n_mu_tight, event.n_el_tight, getattr(event, "systematic", None),
-        )
+        if "meminput" in self.conf.general["verbosity"]:
+            print "-----"
+            print "MEM id={0},{1},{2} cat={3} cat_b={4} nj={5} nt={6} nel={7} nmu={8} syst={9}".format(
+                event.input.run, event.input.lumi, event.input.evt,
+                event.cat, event.cat_btag, event.numJets, event.nBCSVM,
+                event.n_mu_tight, event.n_el_tight, getattr(event, "systematic", None),
+            )
 
         for hypo in [MEM.Hypothesis.TTH, MEM.Hypothesis.TTBB]:
             skipped = []
@@ -247,7 +248,8 @@ class MEAnalyzer(FilterAnalyzer):
                 if self.mem_configs.has_key(confname):
                     mem_cfg = self.mem_configs[confname]
                 else:
-                    print "skipping", confname
+                    if "meminput" in self.conf.general["verbosity"]:
+                        print "skipping", confname
                     res[(hypo, confname)] = MEM.MEMOutput()
                     continue
 
@@ -264,15 +266,16 @@ class MEAnalyzer(FilterAnalyzer):
                         continue
 
                 #if "meminput" in self.conf.general["verbosity"]:
-                print "MEM conf={0} fs={1} nb={2} nq={3} doCalc={4} sel={5} inRun={6}".format(
-                    confname,
-                    fstate,
-                    len(mem_cfg.b_quark_candidates(event)),
-                    len(mem_cfg.l_quark_candidates(event)),
-                    mem_cfg.do_calculate(event, mem_cfg),
-                    self.conf.mem["selection"](event),
-                    confname in self.memkeysToRun
-                )
+                if "meminput" in self.conf.general["verbosity"]:
+                    print "MEM conf={0} fs={1} nb={2} nq={3} doCalc={4} sel={5} inRun={6}".format(
+                        confname,
+                        fstate,
+                        len(mem_cfg.b_quark_candidates(event)),
+                        len(mem_cfg.l_quark_candidates(event)),
+                        mem_cfg.do_calculate(event, mem_cfg),
+                        self.conf.mem["selection"](event),
+                        confname in self.memkeysToRun
+                    )
                     
                 #Run MEM if we did not explicitly disable it
                 if (self.conf.mem["calcME"] and
@@ -282,7 +285,8 @@ class MEAnalyzer(FilterAnalyzer):
                         confname in self.memkeysToRun
                     ):
                     
-                    print "Integrator::run started hypo={0} conf={1}".format(hypo, confname)
+                    if "meminput" in self.conf.general["verbosity"]:
+                        print "Integrator::run started hypo={0} conf={1}".format(hypo, confname)
                     self.configure_mem(event, mem_cfg)
                     r = self.integrator.run(
                         fstate,
@@ -290,7 +294,8 @@ class MEAnalyzer(FilterAnalyzer):
                         self.vars_to_integrate,
                         self.vars_to_marginalize
                     )
-                    print "Integrator::run done hypo={0} conf={1}".format(hypo, confname)
+                    if "meminput" in self.conf.general["verbosity"]:
+                        print "Integrator::run done hypo={0} conf={1}".format(hypo, confname)
 
                     res[(hypo, confname)] = r
                 else:
