@@ -320,8 +320,8 @@ def main():
 
     
 
-    input_root_file_name = config['input_root_file_name']
-    input_tree_name = config['input_tree_name']
+    #input_root_file_name = config['input_root_file_name']
+    #input_tree_name = config['input_tree_name']
 
     output_root_file_name = config['output_root_file_name']
 
@@ -350,9 +350,9 @@ def main():
     # Setup I/O
     ########################################
 
-    # Input tree
-    input_root_file = ROOT.TFile(input_root_file_name)
-    input_tree = input_root_file.Get(input_tree_name)
+    # Input tree - moved to file loop
+    #input_root_file = ROOT.TFile.Open(input_root_file_name)
+    #input_tree = input_root_file.Get(input_tree_name)
 
     # Output tree
     output_root_file = ROOT.TFile(output_root_file_name,'RECREATE')
@@ -388,45 +388,84 @@ def main():
     ########################################
     # Event loop
     ########################################
-    
-    n_entries = input_tree.GetEntries()
 
-    if config['Use_limited_entries']:
-        n_processed = config['n_entries_limited']
-    else:
-        n_processed = n_entries
-    print "Processing {0} events (out of {1} events)".format(n_processed, n_entries)
+    #config['input_root_file_list'] = config['input_root_file_list'][:2]
 
-    for i_event in range(n_processed):
+    for input_root_file_name in config['input_root_file_list']:
 
-        if not i_event % int(0.001*n_processed+1):
-            print "{0:.1f}% ({1} out of {2})".format(
-                100.*i_event /n_processed, i_event, n_processed )
+        # Input tree
+        input_root_file = ROOT.TFile.Open(
+            config['root_file_base'] + input_root_file_name )
+        input_tree = input_root_file.Get('tree')
+        print 'Processing {0}'.format(input_root_file_name)
+        
+        n_entries = input_tree.GetEntries()
 
-        input_tree.GetEntry( i_event )
+        if config['Use_limited_entries']:
+            n_processed = config['n_entries_limited']
+        else:
+            n_processed = n_entries
+        print "Processing {0} events (out of {1} events)".format(n_processed, n_entries)
 
+        for i_event in range(n_processed):
 
-        # Get quark and jet data - extra vars will be set as attributes
+            if not i_event % int(0.1*n_processed+1):
+                print "{0:.1f}% ({1} out of {2})".format(
+                    100.*i_event /n_processed, i_event, n_processed )
 
-        tl_quarks = []
-
-        for quarktype in quarktypes:
-            tl_quarks.extend( Get_TLorentz( quarktype, input_tree, config ) )
-
-        tl_jets = []
-
-        for jettype in jettypes:
-            tl_jets.extend( Get_TLorentz( jettype, input_tree, config ) )
+            input_tree.GetEntry( i_event )
 
 
-        ########################################
-        # delR combinatorics
-        ########################################
+            # Get quark and jet data - extra vars will be set as attributes
 
-        if Just_Jets == True:
-            # Don't perform linking if 'Just_Jets' parameter is true
-            # In that case, just write all found jet data
-            for jet in tl_jets:
+            tl_quarks = []
+
+            for quarktype in quarktypes:
+                tl_quarks.extend( Get_TLorentz( quarktype, input_tree, config ) )
+
+            tl_jets = []
+
+            for jettype in jettypes:
+                tl_jets.extend( Get_TLorentz( jettype, input_tree, config ) )
+
+
+            ########################################
+            # delR combinatorics
+            ########################################
+
+            if Just_Jets == True:
+                # Don't perform linking if 'Just_Jets' parameter is true
+                # In that case, just write all found jet data
+                for jet in tl_jets:
+
+                    variables['Jet_pt'][0] = jet.Pt()
+                    variables['Jet_eta'][0] = jet.Eta()
+                    variables['Jet_phi'][0] = jet.Phi()
+                    variables['Jet_mass'][0] = jet.M()
+
+                    variables['Jet_E'][0] = jet.E()
+                    variables['Jet_mcE'][0] = jet.mcE
+
+                    # Retrieve the extra variables from set attributes
+                    for var in extra_jet_vars:
+                        variables['Jet_'+var][0] = getattr( jet, var )
+
+                    output_tree.Fill()
+                continue
+            
+            # Otherwise, proceed with linking quarks and jets    
+            [linked_jets, linked_quarks, delRs] = LinkJettoQuark(
+                tl_jets, tl_quarks, config )
+
+            # linked_jets and linked_quarks are (ordered) lists of TLorentzVectors. 
+            # The extra variables are contained in attributes.
+
+
+            ########################################
+            # Write to file
+            ########################################
+
+            for jet, quark, delR in zip( linked_jets, linked_quarks, delRs):
 
                 variables['Jet_pt'][0] = jet.Pt()
                 variables['Jet_eta'][0] = jet.Eta()
@@ -434,58 +473,30 @@ def main():
                 variables['Jet_mass'][0] = jet.M()
 
                 variables['Jet_E'][0] = jet.E()
-                variables['Jet_mcE'][0] = jet.mcE
+
+                if config['Get_MC_for_jets']:
+                    variables['Jet_mcE'][0] = jet.mcE
+
+                variables['Quark_pt'][0] = quark.Pt()
+                variables['Quark_eta'][0] = quark.Eta()
+                variables['Quark_phi'][0] = quark.Phi()
+                variables['Quark_mass'][0] = quark.M()
+
+                variables['Quark_E'][0] = quark.E()
+
+                variables['delR'][0] = delR
 
                 # Retrieve the extra variables from set attributes
-                for var in extra_jet_vars:
-                    variables['Jet_'+var][0] = getattr( jet, var )
+                for var in quark_extra_vars:
+                    var = var.format(particle='')
+                    variables[ 'Quark_'+ var ][0] = getattr( quark, var )
+                    
+                for var in jet_extra_vars:
+                    var = var.format(particle='')
+                    variables[ 'Jet_'+var ][0] = getattr( jet, var )
 
                 output_tree.Fill()
-            continue
-        
-        # Otherwise, proceed with linking quarks and jets    
-        [linked_jets, linked_quarks, delRs] = LinkJettoQuark(
-            tl_jets, tl_quarks, config )
 
-        # linked_jets and linked_quarks are (ordered) lists of TLorentzVectors. The
-        # extra variables are contained in attributes.
-
-
-        ########################################
-        # Write to file
-        ########################################
-
-        for jet, quark, delR in zip( linked_jets, linked_quarks, delRs):
-
-            variables['Jet_pt'][0] = jet.Pt()
-            variables['Jet_eta'][0] = jet.Eta()
-            variables['Jet_phi'][0] = jet.Phi()
-            variables['Jet_mass'][0] = jet.M()
-
-            variables['Jet_E'][0] = jet.E()
-
-            if config['Get_MC_for_jets']:
-                variables['Jet_mcE'][0] = jet.mcE
-
-            variables['Quark_pt'][0] = quark.Pt()
-            variables['Quark_eta'][0] = quark.Eta()
-            variables['Quark_phi'][0] = quark.Phi()
-            variables['Quark_mass'][0] = quark.M()
-
-            variables['Quark_E'][0] = quark.E()
-
-            variables['delR'][0] = delR
-
-            # Retrieve the extra variables from set attributes
-            for var in quark_extra_vars:
-                var = var.format(particle='')
-                variables[ 'Quark_'+ var ][0] = getattr( quark, var )
-                
-            for var in jet_extra_vars:
-                var = var.format(particle='')
-                variables[ 'Jet_'+var ][0] = getattr( jet, var )
-
-            output_tree.Fill()
 
     output_root_file.Write()
     output_root_file.Close()

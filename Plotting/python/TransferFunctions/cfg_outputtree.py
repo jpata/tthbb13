@@ -45,13 +45,23 @@ def Make_config():
     # I/O information
     ########################################
 
-    config['input_root_file_name'] = '/scratch/tklijnsm/VHBBHeppyV10_TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola.root'
+    #config['input_root_file_name'] = '/scratch/tklijnsm/VHBBHeppyV10_TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola.root'
+
+    config['root_file_base'] = 'dcap://t3se01.psi.ch:22125/pnfs/psi.ch/cms/trivcat/'
+
+    config['input_root_file_list'] = \
+        [line.rstrip('\n') for line in open('filelist.txt')]
+
+
+    #config['input_root_file_name'] = 'dcap://t3se01.psi.ch:22125/pnfs/psi.ch/cms/trivcat/' + config['input_root_file_list'][0][1:]
+
+    #print config['input_root_file_name']
 
     config['input_tree_name'] = 'tree'
 
     # The config file will be copied to 'runs/{config['run_name']}', and will
     # be used for the name of the output .root file.
-    config['run_name'] = 'V10_full_jets_TTJets'
+    config['run_name'] = 'CUSTOMTFFILE_V12_LIM_JETS'
 
     config['output_root_file_name'] = '/scratch/tklijnsm/{0}.root'.format( config['run_name'] )
 
@@ -65,7 +75,7 @@ def Make_config():
 
     # Specify the number of entries if only a limited number of entries is used
     #   This number is not used if Use_limited_entries is set to False
-    config['n_entries_limited'] = 2000000
+    config['n_entries_limited'] = 200000
 
     # Specify whether the program should attempt to find MC branches for the jets
     config['Get_MC_for_jets'] = False
@@ -94,7 +104,7 @@ def Make_config():
     #     to add underscores where necessary manually.
 
     config['quarktypes'] = ['GenBQuarkFromTop_', 'GenBQuarkFromH_', 'GenWZQuark_' ]
-    config['jettypes'] = [ 'aJets_' ]
+    config['jettypes'] = [ 'Jet_' ]
     
     #config['jettypes'] = [ 'httCandidates_sjW1', 'httCandidates_sjW2',
     #    'httCandidates_sjNonW']
@@ -107,8 +117,9 @@ def Make_config():
 
     config['quark_extra_vars'] = [
         '{particle}pdgId',
-        '{particle}charge',
-        '{particle}status' ]
+        #'{particle}charge',
+        #'{particle}status',
+        ]
 
     config['jet_extra_vars'] = []
 
