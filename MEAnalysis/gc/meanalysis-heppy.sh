@@ -41,7 +41,8 @@ python ${CMSSW_BASE}/src/TTH/MEAnalysis/gc/MEAnalysis_heppy_gc.py
 echo "MEAnalysis is done"
 
 #copy output
-OUTDIR=$HOME/tth/gc/${TASK_ID}/${DATASETPATH}/
+ME_CONF_NAME=$(basename "$ME_CONF")
+OUTDIR=$HOME/tth/gc/${TASK_ID}/${ME_CONF_NAME%.*}/${DATASETPATH}/
 mkdir -p $OUTDIR 
 echo "copying output"
 OFNAME=$OUTDIR/output_${MY_JOBID}.root
