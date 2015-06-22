@@ -21,7 +21,7 @@ from sklearn.ensemble import GradientBoostingClassifier
 
 
 matplotlib.rc("axes", labelsize=24)
-matplotlib.rc("axes", titlesize=20)
+matplotlib.rc("axes", titlesize=16)
 
 def make_df_hist(bins, x, w=1.0):
     h = rootpy.plotting.Hist(*bins)
@@ -52,8 +52,9 @@ def make_df_hist(bins, x, w=1.0):
 #         
 
 
-def cls_hists(cls, df, var):
-    bins = (21,0.0,1.0)
+def cls_hists(cls, df, var, bins=None):
+    if bins is None:
+        bins = (11,0.0,1.0)
 
     probs1 = cls.predict_proba(df[df["id"]==1][var])[:, 0]
     probs2 = cls.predict_proba(df[df["id"]==2][var])[:, 0]
@@ -72,17 +73,19 @@ def cls_hists(cls, df, var):
     return h1, h2
     
     
-def draw_cls_hists(h1, h2, h1tr, h2tr):
+def draw_cls_hists(cls, d1, d2, var):
+    h1, h2 = cls_hists(cls, d1, var)
+    h1tr, h2tr = cls_hists(cls, d2, var)
+
     h1.color = "red"
     h2.color = "blue"
     h1tr.color = "red"
     h2tr.color = "blue"
 
-    errorbar(h1);
-    errorbar(h2);
-    #hist(h1, ls="-");
-    #hist(h2, ls="-");
-
+    errorbar(h1)
+    errorbar(h2)
+    h1tr.linestyle = "dashed"
+    h2tr.linestyle = "dashed"
     hist(h1tr, ls="--")
     hist(h2tr, ls="--")
     
@@ -103,11 +106,15 @@ def draw_roc(cls, df_test, var, df_train=None):
     plt.yticks(np.linspace(0,1,11));
     plt.ylim(0,1)
     plt.xlim(0,1)
-    return sklearn.metrics.auc(r[:, 0], r[:, 1])
+    try:
+        a = sklearn.metrics.auc(r[:, 0], r[:, 1])
+    except ValueError as e:
+        print "ROC is not sorted, probably negative weights"
+        a = -1
+    return a
     
 
-def draw_cls_importance(cls):
-    plt.figure(figsize=(10,10))
+def draw_cls_importance(cls, var):
     plt.grid()
     labs = []
     imps = []
@@ -174,7 +181,7 @@ def mc_stack(hlist, colors="auto"):
         h.fillstyle = "solid"
 
     #FIXME: Temporary workaround for failed fill, only works when hatch is specified
-    r = hist(hlist, stacked=True, hatch=".")
+    r = hist(hlist, stacked=True, hatch=".", lw=2)
     htot = sum(hlist)
     htot.color="black"
 
@@ -204,6 +211,17 @@ def dice(h, nsigma=1.0):
         hret.set_bin_content(i, n)
     return hret
 
+def make_uoflow(h):
+    widths = list(h.xwidth())
+    edgs = list(h.xedgesl())
+    h2 = rootpy.plotting.Hist(h.nbins()+2, edgs[0] - widths[0], edgs[-1] + widths[-1])
+    nb = h.GetNbinsX()
+    for i in range(0,nb+2):
+        h2.SetBinContent(i+1, h.GetBinContent(i))
+        h2.SetBinError(i+1, h.GetBinError(i))
+    h2.SetEntries(h.GetEntries())
+    return h2
+    
 def draw_data_mc(tf, hname, samples, **kwargs):
 
     do_pseudodata = kwargs.get("do_pseudodata", False)
@@ -216,72 +234,87 @@ def draw_data_mc(tf, hname, samples, **kwargs):
 
     hs = OrderedDict()
     for sample, sample_name in samples:
-        hs[sample] = tf.get(sample + "/" + hname).Clone()
+        h = tf.get(sample + "/" + hname).Clone()
+        hs[sample] = make_uoflow(h)
+        #print hs[sample].GetBinLowEdge(0), hs[sample].GetBinLowEdge(hs[sample].GetNbinsX()+1)
         hs[sample].Scale(get_weight(sample))
-        hs[sample].title = sample_name
+        hs[sample].title = sample_name + " ({0:.1f})".format(hs[sample].Integral())
         hs[sample].rebin(rebin)
 
     c = plt.figure(figsize=(6,6))
-    a1 = plt.axes([0.0,0.22, 1.0, 0.8])
-    plt.grid()
+    if do_pseudodata:
+        a1 = plt.axes([0.0,0.22, 1.0, 0.8])
+    else:
+        a1 = plt.axes()
+        
     plt.title("CMS preliminary simulation\n $\sqrt{s} = 13$ TeV"+title_extended,
         y=0.96, x=0.04,
         horizontalalignment="left", verticalalignment="top"
     )
     r = mc_stack(hs.values())
-
+    
+    hsig = hs[samples[0][0]].Clone()
     tot_mc = sum(hs.values())
+    hsig.Rebin(2)
+    hsig.Scale(0.2 * tot_mc.Integral() / hsig.Integral())
+    hsig.title = samples[0][1] + " norm"
+    hsig.linewidth=2
+    hist([hsig])
+    
     tot_mc.title = "pseudodata"
     tot_mc.color = "black"
 
     tot_bg = sum([hs[k] for k in hs.keys() if "tth" not in k])
 
-    pseudodata = dice(tot_mc, nsigma=1.0)
-
     if do_pseudodata:
+        pseudodata = tot_mc.Clone()#dice(tot_mc, nsigma=1.0)
         errorbar(pseudodata)
 
     if do_legend:
-        plt.legend(loc=1, numpoints=1)
+        plt.legend(loc=(1.1,0.0), numpoints=1)
     if ylabel == "auto":
         ylabel = "events / {0:.0f} {1}".format(hs.values()[0].get_bin_width(1), yunit)
     plt.ylabel(ylabel)
-
+    if not do_pseudodata:
+        plt.xlabel(xlabel)
     #hide x ticks on main panel
     ticks = a1.get_xticks()
-    a1.set_xticklabels([])
+    if do_pseudodata:
+        a1.set_xticklabels([])
 
     a1.set_ylim(bottom=0, top=1.1*a1.get_ylim()[1])
+    a1.grid(zorder=100000)
 
-    a2 = plt.axes([0.0,0.0, 1.0, 0.18])
-
-    plt.xlabel(xlabel)
-    a2.grid()
-
-    data_minus_bg = pseudodata - tot_mc
-    data_minus_bg.Divide(pseudodata)
-
-    bg_unc_u = r["tot"] - r["tot_u"]
-    bg_unc_d = r["tot"] - r["tot_d"]
-
-    bg_unc_u.Divide(r["tot"])
-    bg_unc_d.Divide(r["tot"])
-
+    a2 = a1
     if do_pseudodata:
-        errorbar(data_minus_bg)
+        a2 = plt.axes([0.0,0.0, 1.0, 0.18])
 
-    fill_between(bg_unc_u, bg_unc_d,
-        color="black", hatch="////",
-        alpha=1.0, linewidth=0, facecolor="none", edgecolor="black", zorder=10,
-    )
-    plt.ylabel("$\\frac{\mathrm{data} - \mathrm{mc}}{\mathrm{data}}$", fontsize=16)
-    plt.axhline(0.0, color="black")
-    #a2.set_ylim(-1,1)
-    #hide last tick on ratio y axes
-    a2.set_yticks(a2.get_yticks()[:-1]);
-    a2.set_xticks(ticks);
+        plt.xlabel(xlabel)
+        a2.grid()
+
+        data_minus_bg = pseudodata - tot_mc
+        data_minus_bg.Divide(pseudodata)
+
+        bg_unc_u = r["tot"] - r["tot_u"]
+        bg_unc_d = r["tot"] - r["tot_d"]
+
+        bg_unc_u.Divide(r["tot"])
+        bg_unc_d.Divide(r["tot"])
+
+        if do_pseudodata:
+            errorbar(data_minus_bg)
+
+        fill_between(bg_unc_u, bg_unc_d,
+            color="black", hatch="////",
+            alpha=1.0, linewidth=0, facecolor="none", edgecolor="black", zorder=10,
+        )
+        plt.ylabel("$\\frac{\mathrm{data} - \mathrm{mc}}{\mathrm{data}}$", fontsize=16)
+        plt.axhline(0.0, color="black")
+        #a2.set_ylim(-1,1)
+        #hide last tick on ratio y axes
+        a2.set_yticks(a2.get_yticks()[:-1]);
+        a2.set_xticks(ticks);
     return a1, a2, hs
-
 
 def draw_mem_data_mc(*args, **kwargs):
     a1, a2, hs = draw_data_mc(*args, **kwargs)
@@ -315,21 +348,29 @@ def calc_roc(h1, h2):
             err[i, 1] = e2
     return roc, err
 
-def draw_rocs(pairs, **kwargs):
-    rebin = kwargs.get("rebin", 1)
-
-    c = plt.figure(figsize=(6,6))
-    plt.axes()
-    plt.plot([0.0,1.0],[0.0,1.0], color="black")
-    plt.xlim(0,1)
-    plt.ylim(0,1)
-
-    rs = []
-    es = []
+def draw_rocs_file(pairs, **kwargs):
     for pair in pairs:
         tf, hn1, hn2, label = pair
         h1 = tf.get(hn1).Clone()
         h2 = tf.get(hn2).Clone()
+        ps += [h1, h2, label]
+    return draw_rocs(ps, **kwargs)
+    
+    
+def draw_rocs(pairs, **kwargs):
+    rebin = kwargs.get("rebin", 1)
+
+    #c = plt.figure(figsize=(6,6))
+    #plt.axes()
+    plt.plot([0.0,1.0],[0.0,1.0], color="black")
+    plt.xlim(0,1)
+    plt.ylim(0,1)
+
+    
+    rs = []
+    es = []
+    for pair in pairs:
+        h1, h2, label = pair
         h1.rebin(rebin)
         h2.rebin(rebin)
         r, e = calc_roc(h1, h2)
@@ -337,7 +378,7 @@ def draw_rocs(pairs, **kwargs):
         es += [e]
 
     for (r, e, pair) in zip(rs, es, pairs):
-        tf, hn1, hn2, label = pair
+        h1, h2, label = pair
         plt.errorbar(r[:, 0], r[:, 1], e[:, 0], e[:, 1], label=label)
 
     plt.legend(loc=2)
@@ -366,13 +407,21 @@ def train(df, var, cut, ntrees, rate, depth, min1, min2, sub, **kwargs):
     df_sel = df[df.eval(cut)]
     ntrain_1 = int(sum(df_sel["id"]==1) * 0.5)
     ntrain_2 = int(sum(df_sel["id"]==2) * 0.5)
+    weight = kwargs.get("weight", None)
+
+
     print ntrain_1, ntrain_2
-    
+
+    if weight:
+        print "weighted", sum(df_sel[df_sel["id"]==1][weight]), sum(df_sel[df_sel["id"]==2][weight])
+        print "unweighted", sum(df_sel["id"]==1), sum(df_sel["id"]==2)
+        
     df_train = pandas.concat((df_sel[df_sel["id"]==1][:ntrain_1], df_sel[df_sel["id"]==2][:ntrain_2]))
     df_test = pandas.concat((df_sel[df_sel["id"]==1][ntrain_1:], df_sel[df_sel["id"]==2][ntrain_2:]))
 
     print len(df_train), len(df_test)
     df_train_shuf = df_train.iloc[np.random.permutation(np.arange(len(df_train)))]
+    
     cls = GradientBoostingClassifier(
         n_estimators=ntrees, learning_rate=rate,
         max_depth=depth,
@@ -382,7 +431,6 @@ def train(df, var, cut, ntrees, rate, depth, min1, min2, sub, **kwargs):
         verbose=True
     )
 
-    weight = kwargs.get("weight", None)
     if not weight:
         cls = cls.fit(df_train_shuf[var], df_train_shuf["id"])
     else:
