@@ -12,7 +12,7 @@ for sample_name, sample in samples_dict.items():
     files = sample.subFiles
     print("[{0}]".format(sample_name))
     for f in files:
-        tf = ROOT.TFile(lfn_to_pfn(f))
+        tf = ROOT.TFile.Open(lfn_to_pfn(f))
         if (tf != None):
             tt = tf.Get("tree")
             if (tt != None):
