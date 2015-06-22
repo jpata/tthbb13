@@ -1,5 +1,5 @@
 from __future__ import print_function
-from TTH.MEAnalysis.samples_v1 import lfn_to_pfn
+from TTH.MEAnalysis.samples_base import lfn_to_pfn
 import sys, imp
 import ROOT
 

@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+
+#Need to enable ROOT batch mode to prevent it from importing libXpm, which may cause a crash
+import ROOT
+ROOT.gROOT.SetBatch(True)
+
 import os
 #pickle and transfer function classes to load transfer functions
 import cPickle as pickle
@@ -7,7 +13,7 @@ sys.modules["TFClasses"] = TFClasses
 
 from TTH.MEAnalysis.MEAnalysis_heppy import sequence
 from TTH.MEAnalysis.samples_base import lfn_to_pfn
-from TTH.MEAnalysis.samples_vhbb import samples
+from TTH.MEAnalysis.samples_722sync import samples
 
 firstEvent = int(os.environ["SKIP_EVENTS"])
 nEvents = int(os.environ["MAX_EVENTS"])
@@ -45,7 +51,9 @@ for s in samples:
     inputSample = cfg.Component(
         'tth',
         files = s.subFiles.value(),
-        tree_name = "tree"
+        tree_name = "tree",
+        n_gen = s.nGen.value(),
+        xs = s.xSec.value()
     )
     inputSample.isMC = s.isMC.value()
     if s.skip.value() == False:

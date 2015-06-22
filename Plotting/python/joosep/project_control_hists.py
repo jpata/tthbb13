@@ -27,7 +27,8 @@ of = ROOT.TFile("ControlPlots.root", "RECREATE")
 ncores = 20
 
 def weight_str(cut):
-    return "genWeight * ({0})".format(cut)
+    #return "genWeight * ({0})".format(cut)
+    return "1.0 * ({0})".format(cut)
 
 def drawHelper(args):
     tf, hist, cut, nfirst, nev = args

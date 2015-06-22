@@ -58,25 +58,18 @@ class LeptonAnalyzer(FilterAnalyzer):
                         lambda x: (
                             x.pt > lepcuts["pt"]
                             and abs(x.eta) < lepcuts["eta"]
-                            and abs(getattr(x, self.conf.leptons[l]["isotype"])) < lepcuts["iso"]
+                            #if specified, apply an additional isolation cut
+                            and abs(getattr(x, self.conf.leptons[l]["isotype"])) < lepcuts.get("iso", 99)
                         ), incoll
                     )
 
+                    #remove veto leptons that also pass the good lepton cuts
                     if b == "_veto":
                         good = getattr(event, "{0}_{1}".format(l, a))
                         leps = filter(lambda x: x not in good, leps)
 
-                    if a == "tight":
-                        leps = filter(
-                            lambda x: x.tightId,
-                            leps
-                        )
-                    elif a == "loose":
-                        leps = filter(
-                            lambda x: x.looseIdPOG,
-                            leps
-                        )
-                    lep = sorted(leps, key=lambda x: x.pt, reverse=True)
+                    leps = filter(lepcuts["idcut"], leps)
+                    leps = sorted(leps, key=lambda x: x.pt, reverse=True)
                     sumleps += leps
                     lt = l + "_" + a + b
                     setattr(event, lt, leps)

@@ -1,9 +1,14 @@
 from TTH.MEAnalysis.VHbbTree import lvec
+
 import ROOT
 import copy
 ROOT.gSystem.Load("libTTHMEIntegratorStandalone")
-
 from ROOT import MEM
+
+import numpy as np
+
+from TTH.MEAnalysis.MEMUtils import set_integration_vars, add_obj
+from TTH.MEAnalysis.MEMConfig import MEMConfig
 
 #Pre-define shorthands for permutation and integration variable vectors
 CvectorPermutations = getattr(ROOT, "std::vector<MEM::Permutations::Permutations>")
@@ -22,19 +27,23 @@ class MECategoryAnalyzer(FilterAnalyzer):
         self.cat_map = {"NOCAT":-1, "cat1": 1, "cat2": 2, "cat3": 3, "cat6":6}
         self.btag_cat_map = {"NOCAT":-1, "L": 0, "H": 1}
 
-    def beginLoop(self, setup):
-        super(MECategoryAnalyzer, self).beginLoop(setup)
-
-        for c in ["NOCAT", "cat1", "cat2", "cat3", "cat6"]:
-            self.counters["processing"].register(c)
-
     def process(self, event):
-        self.counters["processing"].inc("processed")
+        for (syst, event_syst) in event.systResults.items():
+            if event_syst.passes_wtag:
+                #print syst, event_syst, event_syst.__dict__
+                res = self._process(event_syst)
+                event.systResults[syst] = res
+            else:
+                event.systResults[syst].passes_mecat = False
+        return np.any([v.passes_mecat for v in event.systResults.values()])
+
+    def _process(self, event):
 
         cat = "NOCAT"
-        pass_btag_lr = (self.conf.jets["untaggedSelection"] == "btagLR" and
-            event.btag_LR_4b_2b > self.conf.mem["btagLRCut"][event.cat]
-        )
+        #pass_btag_lr = (self.conf.jets["untaggedSelection"] == "btagLR" and
+        #    event.btag_LR_4b_2b > self.conf.mem["btagLRCut"][event.cat]
+        #)
+        pass_btag_lr = False
         pass_btag_csv = (self.conf.jets["untaggedSelection"] == "btagCSV" and
             len(event.selected_btagged_jets_high) >= 4
         )
@@ -58,81 +67,17 @@ class MECategoryAnalyzer(FilterAnalyzer):
                 event.wquark_candidate_jets = event.buntagged_jets
                 cat = "cat3"
         elif event.is_dl and len(event.good_jets)>=4:
-            event.wquark_candidate_jets = []
+            #event.wquark_candidate_jets = []
+            event.wquark_candidate_jets = event.buntagged_jets
             cat = "cat6"
 
-        self.counters["processing"].inc(cat)
         event.cat = cat
         event.cat_btag = cat_btag
         event.catn = self.cat_map.get(cat, -1)
         event.cat_btag_n = self.btag_cat_map.get(cat_btag, -1)
 
-        passes = True
-        if passes:
-            self.counters["processing"].inc("passes")
-        return passes
-
-class MEMConfig:
-    def __init__(self):
-        self.cfg = MEM.MEMConfig()
-        self.cfg.defaultCfg()
-        self.b_quark_candidates = lambda event: event.selected_btagged_jets_high
-        self.l_quark_candidates = lambda event: event.wquark_candidate_jets
-        self.lepton_candidates = lambda event: event.good_leptons
-        self.met_candidates = lambda event: event.met
-        self.transfer_function_method = MEM.TFMethod.External
-
-        self.do_calculate = lambda event, config: False
-        self.mem_assumptions = set([])
-        self.enabled = True
-
-    def configure_btag_pdf(self, conf):
-        """
-        Add the jet b-tag discriminator distributions to the MEM::MEMConfig object.
-        The distributions are 3D in (pt, |eta|, CSV).
-        """
-        #btag_map = CmapDistributionTypeTH1F()
-
-        for x,y in [
-            ("b", MEM.DistributionType.csv_b),
-            ("c", MEM.DistributionType.csv_c),
-            ("l", MEM.DistributionType.csv_l),
-        ]:
-            self.cfg.add_distribution_global(
-                y,
-                conf.BTagLRAnalyzer.csv_pdfs[(x, "pt_eta")]
-            )
-
-    def configure_transfer_function(self, conf):
-        for nb in [0, 1]:
-            for fl1, fl2 in [('b', MEM.TFType.bLost), ('l', MEM.TFType.qLost)]:
-                tf = conf.tf_matrix[fl1][nb].Make_CDF()
-                #set pt cut for efficiency function
-                tf.SetParameter(0, conf.jets["pt"])
-                tf.SetNpx(10000)
-                tf.SetRange(0, 500)
-                self.cfg.set_tf_global(fl2, nb, tf)
-
-    def configure_minimize(self, orig_mem):
-        self.cfg.do_minimize = 1
-
-    def configure_sudakov(self, orig_mem):
-        self.cfg.int_code |= MEM.IntegrandType.Sudakov
-        njets = 6
-        if "dl" in orig_mem.mem_assumptions:
-            njets = 4
-        if "1qW" in orig_mem.mem_assumptions:
-            njets -= 1
-        self.do_calculate = lambda event, conf, njets=njets: (
-            orig_mem.do_calculate(event, conf) and
-            len(event.good_jets) == njets
-        )
-
-    def configure_newtf(self, orig_mem):
-        self.cfg.transfer_function_method = MEM.TFMethod.External
-
-    def configure_recoil(self, orig_mem):
-        self.cfg.int_code |= MEM.IntegrandType.Recoil
+        event.passes_mecat = True
+        return event
 
 class MEAnalyzer(FilterAnalyzer):
     """
@@ -185,240 +130,26 @@ class MEAnalyzer(FilterAnalyzer):
         self.conf = cfg_ana._conf
         super(MEAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
 
-        self.configs = {
-
-            #"SL_2qW": MEM.MEMConfig(),
-            #"SL_2qW_gen": MEM.MEMConfig(),
-            #"SL_1qW": MEM.MEMConfig(),
-            #"SL_1qW_gen": MEM.MEMConfig(),
-            #"DL": MEM.MEMConfig(),
-            #"DL_gen": MEM.MEMConfig(),
-
-            "SL_2w2h2t"   :  MEMConfig(),
-            "SL_1w2h2t"   :  MEMConfig(),
-            "SL_2w2h1t_h" :  MEMConfig(),
-            "SL_2w2h1t_l" :  MEMConfig(),
-            "SL_0w2h2t"   :  MEMConfig(),
-            "SL_1w2h1t_h" :  MEMConfig(),
-            "SL_1w2h1t_l" :  MEMConfig(),
-
-            "SL_2w2h2t_wtag": MEMConfig(),
-
-            "SL_2qW": MEMConfig(),
-            "SL_2qW_notag": MEMConfig(),
-            "SL_2qW_gen": MEMConfig(),
-            "SL_2qW_gen_nosmear": MEMConfig(),
-            "SL_1qW": MEMConfig(),
-            "SL_1qW_gen": MEMConfig(),
-            "SL_1qW_gen_nosmear": MEMConfig(),
-            "SL_0qW": MEMConfig(),
-            "SL_1bT": MEMConfig(),
-            "SL_1bTbar": MEMConfig(),
-            "SL_1bH": MEMConfig(),
-            "DL": MEMConfig(),
-            "DL_gen": MEMConfig(),
-            "DL_gen_nosmear": MEMConfig(),
-        }
-
-        #These MEM configurations will actually be considered for calculation
-        self.memkeys = self.conf.mem["methodsToRun"]
-        print "Running over MEM configurations"
-        for nmem, memk in enumerate(self.memkeys):
-            print "MEM", nmem, memk
-
-        #Set the MEM
-        for (k, v) in self.configs.items():
+        self.mem_configs = self.conf.mem_configs
+        for k, v in self.mem_configs.items():
             v.configure_btag_pdf(self.conf)
             v.configure_transfer_function(self.conf)
 
-        for k in ["DL_gen", "SL_2qW_gen", "SL_1qW_gen"]:
-            self.configs[k].b_quark_candidates = lambda event: (
-                event.b_quarks_gen if len(event.b_quarks_gen)>=4 else
-                event.b_quarks_gen + event.unmatched_b_jets_gen
-            )
-            self.configs[k].l_quark_candidates = lambda event: event.l_quarks_gen
-            self.configs[k].lepton_candidates = lambda event: event.good_leptons
-            self.configs[k].met_candidates = lambda event: event.gen_met
-            self.configs[k].cfg.int_code |= MEM.IntegrandType.SmearJets
-            self.configs[k].cfg.int_code |= MEM.IntegrandType.SmearMET
-        for k in ["DL_gen_nosmear", "SL_2qW_gen_nosmear", "SL_1qW_gen_nosmear"]:
-            self.configs[k].b_quark_candidates = lambda event: (
-                event.b_quarks_gen if len(event.b_quarks_gen)>=4 else
-                event.b_quarks_gen + event.unmatched_b_jets_gen
-            )
-            self.configs[k].l_quark_candidates = lambda event: event.l_quarks_gen
-            self.configs[k].lepton_candidates = lambda event: event.good_leptons
-            self.configs[k].met_candidates = lambda event: event.gen_met
-            #self.configs[k].cfg.int_code |= MEM.IntegrandType.Smear
-        for x in ["SL_2qW", "SL_2qW_notag", "SL_2qW_gen", "SL_2qW_gen_nosmear"]:
-            self.configs[x].do_calculate = lambda y, c: (
-                len(c.lepton_candidates(y)) == 1 and
-                len(c.b_quark_candidates(y)) >= 4 and
-                len(c.l_quark_candidates(y)) >= 2
-            )
-        for x in ["SL_1qW", "SL_1qW_gen", "SL_1qW_gen_nosmear"]:
-            self.configs[x].do_calculate = lambda y, c: (
-                len(c.lepton_candidates(y)) == 1 and
-                len(c.b_quark_candidates(y)) >= 4 and
-                len(c.l_quark_candidates(y)) >= 1
-            )
-            self.configs[x].mem_assumptions.add("1qW")
-        for x in ["SL_0qW"]:
-            self.configs[x].do_calculate = lambda y, c: (
-                len(c.lepton_candidates(y)) == 1 and
-                len(c.b_quark_candidates(y)) >= 4 and
-                len(c.l_quark_candidates(y)) >= 1
-            )
-            self.configs[x].mem_assumptions.add("0qW")
-        for x in ["SL_1bT", "SL_1bTbar", "SL_1bH"]:
-            self.configs[x].do_calculate = lambda y, c: (
-                len(c.lepton_candidates(y)) == 1 and
-                len(c.b_quark_candidates(y)) >= 3 and
-                len(c.l_quark_candidates(y)) >= 2
-            )
-            k = x.split("_")[1]
-            self.configs[x].mem_assumptions.add(k)
-        for x in ["DL", "DL_gen", "DL_gen_nosmear"]:
-            self.configs[x].do_calculate = lambda y, c: (
-                len(c.lepton_candidates(y)) == 2 and
-                len(c.b_quark_candidates(y)) >= 4
-            )
-            self.configs[x].mem_assumptions.add("dl")
-
-        for k in [
-                "SL_2qW", "SL_2qW_notag", "SL_1qW", "SL_2qW_gen",
-                "SL_1qW_gen", "SL_2qW_gen_nosmear", "SL_1qW_gen_nosmear",
-                "SL_0qW", "SL_1bT", "SL_1bTbar", "SL_1bH"
-            ]:
-            self.configs[k].mem_assumptions.add("sl")
-
-        for x in ["SL_2w2h2t", "SL_2w2h2t_wtag",
-                  "SL_2w2h1t_h", "SL_2w2h1t_l",
-                  "SL_1w2h1t_h", "SL_1w2h1t_l"]:
-            self.configs[x].do_calculate = lambda y, c: (
-                len(y.good_leptons) == 1 and
-                len(c.b_quark_candidates(y)) >= 4 and
-                len(c.l_quark_candidates(y)) >= 2 and
-                y.cat_btag == "H"
-            )
-            self.configs[x].mem_assumptions.add("sl")
-
-        #use only the best w-tagged pair for w-quark candidates
-        self.configs["SL_2w2h2t_wtag"].l_quark_candidates = lambda event: (
-            event.wquark_candidate_jet_pairs[0] if len(event.wquark_candidate_jet_pairs)>0 else []
-        )
-
-        for x in ["SL_1w2h2t", "SL_0w2h2t"]:
-            self.configs[x].do_calculate = lambda y, c: (
-                len(y.good_leptons) == 1 and
-                len(c.b_quark_candidates(y)) >= 4 and
-                len(c.l_quark_candidates(y)) >= 1 and
-                y.cat_btag == "H"
-            )
-            self.configs[x].mem_assumptions.add("sl")
-
-
-        for k in ["SL_2w2h1t_h", "SL_2w2h1t_l",
-                  "SL_1w2h1t_h", "SL_1w2h1t_l"]:
-            self.configs[k].cfg.defaultCfg(1.5)
-
-        for k in ["SL_2w2h2t","SL_2w2h2t_wtag",
-                  "SL_1w2h2t", "SL_2w2h1t_h", "SL_2w2h1t_l",
-                  "SL_0w2h2t", "SL_1w2h1t_h", "SL_1w2h1t_l"]:
-            self.configs[k].cfg.do_prefit = 1
-
-        self.configs["SL_2w2h2t"].mem_assumptions.add("2w2h2t")
-        self.configs["SL_2w2h2t_wtag"].mem_assumptions.add("2w2h2t")
-        self.configs["SL_1w2h2t"].mem_assumptions.add("1w2h2t")
-        self.configs["SL_2w2h1t_l"].mem_assumptions.add("2w2h1t_l")
-        self.configs["SL_0w2h2t"].mem_assumptions.add("0w2h2t")
-        self.configs["SL_1w2h1t_h"].mem_assumptions.add("1w2h1t_h")
-        self.configs["SL_1w2h1t_l"].mem_assumptions.add("1w2h1t_l")
-
-
-        permutations = CvectorPermutations()
-        #self.permutations.push_back(MEM.Permutations.BTagged)
-        #self.permutations.push_back(MEM.Permutations.QUntagged)
-        #self.permutations.push_back(MEM.Permutations.QQbarBBbarSymmetry)
-        self.configs["SL_2qW_notag"].cfg.perm_pruning = permutations
-
-        #Create additional configurations
-        for strat, configure in [
-
-                #Run with recoil instead of met
-                ("Recoil", MEMConfig.configure_recoil),
-
-                #apply sudakov factors
-                ("Sudakov", MEMConfig.configure_sudakov),
-
-                #apply sudakov factors
-                ("NewTF", MEMConfig.configure_newtf),
-
-                #run minimization
-                ("Minimize", MEMConfig.configure_minimize)
-            ]:
-            for k in ["SL_2qW", "SL_1qW", "DL"]:
-                kn = k + "_" + strat
-                self.configs[kn] = copy.deepcopy(self.configs[k])
-                self.configs[kn].cfg.defaultCfg()
-                configure(self.configs[kn], self.configs[k])
-
-        #only in 6J SL
-        #self.configs["Sudakov"].do_calculate = (
-        #    lambda x: len(x.good_jets) == 6 and
-        #    len(x.good_leptons) == 1
-        #)
-
-        #Create the ME integrator.
-        #Arguments specify the verbosity
-        #the first argument:
-        #../MEIntegratorStandalone/interface/Parameters.h:  enum DebugVerbosity { output=1, input=2, init=4, init_more=8, event=16, integration=32};
-        self.integrator = MEM.Integrand(
-            MEM.output,
-            self.configs["SL_2qW"].cfg
-        )
-
-        #Create an emtpy std::vector<MEM::Permutations::Permutations>
-        #self.permutations = CvectorPermutations()
-
-        ##Assume that only jets passing CSV>0.5 are b quarks
-        #self.permutations.push_back(MEM.Permutations.BTagged)
-
-        ##Assume that only jets passing CSV<0.5 are l quarks
-        #self.permutations.push_back(MEM.Permutations.QUntagged)
-
-        #self.integrator.set_permutation_strategy(self.permutations)
-
+        self.memkeys = self.conf.mem["methodOrder"]
+        self.memkeysToRun = self.conf.mem["methodsToRun"]
+        
         #Create an empty vector for the integration variables
         self.vars_to_integrate   = CvectorPSVar()
         self.vars_to_marginalize = CvectorPSVar()
-
-    def add_obj(self, objtype, **kwargs):
-        """
-        Add an event object (jet, lepton, MET) to the ME integrator.
-
-        objtype: specifies the object type
-        kwargs: p4s: spherical 4-momentum (pt, eta, phi, M) as a tuple
-                obsdict: dict of additional observables to pass to MEM
-                tf_dict: Dictionary of MEM.TFType->TF1 of transfer functions
-        """
-        if kwargs.has_key("p4s"):
-            pt, eta, phi, mass = kwargs.pop("p4s")
-            v = ROOT.TLorentzVector()
-            v.SetPtEtaPhiM(pt, eta, phi, mass);
-        elif kwargs.has_key("p4c"):
-            v = ROOT.TLorentzVector(*kwargs.pop("p4c"))
-        obs_dict = kwargs.pop("obs_dict", {})
-        tf_dict = kwargs.pop("tf_dict", {})
-
-        o = MEM.Object(v, objtype)
-
-        #Add observables from observable dictionary
-        for k, v in obs_dict.items():
-            o.addObs(k, v)
-        for k, v in tf_dict.items():
-            o.addTransferFunction(k, v)
-        self.integrator.push_back_object(o)
+        
+        cfg = MEMConfig()
+        cfg.configure_btag_pdf(self.conf)
+        cfg.configure_transfer_function(self.conf)
+        self.integrator = MEM.Integrand(
+            MEM.output,
+            #MEM.output + MEM.init + MEM.init_more,
+            cfg.cfg
+        )
 
     def beginLoop(self, setup):
         super(MEAnalyzer, self).beginLoop(setup)
@@ -428,88 +159,41 @@ class MEAnalyzer(FilterAnalyzer):
         self.vars_to_integrate.clear()
         self.vars_to_marginalize.clear()
         self.integrator.next_event()
+        
         mem_cfg.enabled = True
 
-        #One quark from W missed, integrate over its direction if possible
-        if "1qW" in mem_cfg.mem_assumptions:
-            self.vars_to_integrate.push_back(MEM.PSVar.cos_qbar1)
-            self.vars_to_integrate.push_back(MEM.PSVar.phi_qbar1)
-        if "0qW" in mem_cfg.mem_assumptions:
-            self.vars_to_integrate.push_back(MEM.PSVar.cos_q1)
-            self.vars_to_integrate.push_back(MEM.PSVar.phi_q1)
-            self.vars_to_integrate.push_back(MEM.PSVar.cos_qbar1)
-            self.vars_to_integrate.push_back(MEM.PSVar.phi_qbar1)
-        if "1bT" in mem_cfg.mem_assumptions:
-            self.vars_to_integrate.push_back(MEM.PSVar.cos_b1)
-            self.vars_to_integrate.push_back(MEM.PSVar.phi_b1)
-        if "1bTbar" in mem_cfg.mem_assumptions:
-            self.vars_to_integrate.push_back(MEM.PSVar.cos_b2)
-            self.vars_to_integrate.push_back(MEM.PSVar.phi_b2)
-        if "1bH" in mem_cfg.mem_assumptions:
-            self.vars_to_integrate.push_back(MEM.PSVar.cos_bbar)
-            self.vars_to_integrate.push_back(MEM.PSVar.phi_bbar)
-
-        if "1w2h2t" in mem_cfg.mem_assumptions:
-            self.vars_to_marginalize.push_back(MEM.PSVar.cos_qbar1)
-            self.vars_to_marginalize.push_back(MEM.PSVar.phi_qbar1)
-
-        if "2w2h1t_h" in mem_cfg.mem_assumptions:
-            self.vars_to_marginalize.push_back(MEM.PSVar.cos_b1)
-            self.vars_to_marginalize.push_back(MEM.PSVar.phi_b1)
-
-        if "2w2h1t_l" in mem_cfg.mem_assumptions:
-            self.vars_to_marginalize.push_back(MEM.PSVar.cos_b2)
-            self.vars_to_marginalize.push_back(MEM.PSVar.phi_b2)
-
-        if "0w2h2t" in mem_cfg.mem_assumptions:
-            self.vars_to_marginalize.push_back(MEM.PSVar.cos_q1)
-            self.vars_to_marginalize.push_back(MEM.PSVar.phi_q1)
-            self.vars_to_marginalize.push_back(MEM.PSVar.cos_qbar1)
-            self.vars_to_marginalize.push_back(MEM.PSVar.phi_qbar1)
-
-        if "1w2h1t_h" in mem_cfg.mem_assumptions:
-            self.vars_to_marginalize.push_back(MEM.PSVar.cos_qbar1)
-            self.vars_to_marginalize.push_back(MEM.PSVar.phi_qbar1)
-            self.vars_to_marginalize.push_back(MEM.PSVar.cos_b1)
-            self.vars_to_marginalize.push_back(MEM.PSVar.phi_b1)
-
-        if "1w2h1t_l" in mem_cfg.mem_assumptions:
-            self.vars_to_marginalize.push_back(MEM.PSVar.cos_qbar1)
-            self.vars_to_marginalize.push_back(MEM.PSVar.phi_qbar1)
-            self.vars_to_marginalize.push_back(MEM.PSVar.cos_b2)
-            self.vars_to_marginalize.push_back(MEM.PSVar.phi_b2)
-
-
-
-        #Add heavy flavour jets that are assumed to come from top/higgs decay
-        #Only take up to 4 candidates, otherwise runtimes become too great
-        for jet in list(mem_cfg.b_quark_candidates(event))[:4]:
-            self.add_obj(
+        set_integration_vars(self.vars_to_integrate, self.vars_to_marginalize, mem_cfg.mem_assumptions)
+        
+        bquarks = list(mem_cfg.b_quark_candidates(event))
+        if len(bquarks)>mem_cfg.maxJets:
+            print "More than {0} b-quarks supplied, dropping last {1} from MEM".format(mem_cfg.maxJets, len(bquarks) - mem_cfg.maxJets)
+        
+        lquarks = list(mem_cfg.l_quark_candidates(event))
+        if len(lquarks)>mem_cfg.maxJets:
+            print "More than {0} l-quarks supplied, dropping last {1} from MEM".format(mem_cfg.maxJets, len(lquarks) - mem_cfg.maxJets)
+        
+        ##Only take up to 4 candidates, otherwise runtimes become too great
+        for jet in bquarks[:mem_cfg.maxJets] + lquarks[:mem_cfg.maxJets]:
+            add_obj(
+                self.integrator,
                 MEM.ObjectType.Jet,
                 p4s=(jet.pt, jet.eta, jet.phi, jet.mass),
-                obs_dict={MEM.Observable.BTAG: jet.btagFlag},
+                obs_dict={MEM.Observable.BTAG: jet.btagFlag, MEM.Observable.CSV: jet.btagCSV},
                 tf_dict={
                     MEM.TFType.bReco: jet.tf_b, MEM.TFType.qReco: jet.tf_l,
                 }
             )
             if "meminput" in self.conf.general["verbosity"]:
-                print "memBQuark", jet.pt, jet.eta, jet.phi, jet.mass, jet.btagFlag, jet.tth_match_label, jet.tth_match_index
-
-        #Add light jets that are assumed to come from hadronic W decay
-        #Only take up to 4 candidates, otherwise runtimes become too great
-        for jet in list(mem_cfg.l_quark_candidates(event))[:4]:
-            self.add_obj(
-                MEM.ObjectType.Jet,
-                p4s=(jet.pt, jet.eta, jet.phi, jet.mass),
-                obs_dict={MEM.Observable.BTAG: jet.btagFlag},
-                tf_dict={
-                    MEM.TFType.bReco: jet.tf_b, MEM.TFType.qReco: jet.tf_l,
-                }
-            )
-            if "meminput" in self.conf.general["verbosity"]:
-                print "memLQuark", jet.pt, jet.eta, jet.phi, jet.mass, jet.btagFlag, jet.tth_match_label, jet.tth_match_index
+                print "memBQuark" if jet in bquarks else "memLQuark",\
+                    jet.pt, jet.eta, jet.phi, jet.mass,\
+                    ", Flag: ", jet.btagFlag,\
+                    ", CSV: ", jet.btagCSV,\
+                    ", Match: ", jet.tth_match_label, jet.tth_match_index\
+                
+                
         for lep in mem_cfg.lepton_candidates(event):
-            self.add_obj(
+            add_obj(
+                self.integrator,
                 MEM.ObjectType.Lepton,
                 p4s=(lep.pt, lep.eta, lep.phi, lep.mass),
                 obs_dict={MEM.Observable.CHARGE: lep.charge},
@@ -517,18 +201,27 @@ class MEAnalyzer(FilterAnalyzer):
             if "meminput" in self.conf.general["verbosity"]:
                 print "memLepton", lep.pt, lep.eta, lep.phi, lep.mass, lep.charge
 
-        met_cand = mem_cfg.met_candidates(event)[0]
+        met_cand = mem_cfg.met_candidates(event)
         if "meminput" in self.conf.general["verbosity"]:
             print "memMET", met_cand.pt, met_cand.phi
-        self.add_obj(
+        add_obj(
+            self.integrator,
             MEM.ObjectType.MET,
             #MET is caused by massless object
             p4s=(met_cand.pt, 0, met_cand.phi, 0),
         )
 
     def process(self, event):
-        self.counters["processing"].inc("processed")
+        for (syst, event_syst) in event.systResults.items():
+            if event_syst.passes_btag:
+                res = self._process(event_syst)
+                event.systResults[syst] = res
+            else:
+                event.systResults[syst].passes_mem = False
 
+        return np.any([v.passes_mem for v in event.systResults.values()])
+
+    def _process(self, event):
         #Clean up any old MEM state
         self.vars_to_integrate.clear()
         self.vars_to_marginalize.clear()
@@ -538,38 +231,60 @@ class MEAnalyzer(FilterAnalyzer):
         event.mem_results_tth = []
         event.mem_results_ttbb = []
 
-        #jets = sorted(event.good_jets, key=lambda x: x.pt, reverse=True)
-        leptons = event.good_leptons
-        met_pt = event.input.met_pt
-        met_phi = event.input.met_phi
-
         res = {}
-        print (event.input.run, event.input.lumi, event.input.evt,
-            event.cat, event.cat_btag, len(event.good_jets), event.nBCSVM,
-            event.n_mu_tight, event.n_el_tight
-        )
+        if "meminput" in self.conf.general["verbosity"]:
+            print "-----"
+            print "MEM id={0},{1},{2} cat={3} cat_b={4} nj={5} nt={6} nel={7} nmu={8} syst={9}".format(
+                event.input.run, event.input.lumi, event.input.evt,
+                event.cat, event.cat_btag, event.numJets, event.nBCSVM,
+                event.n_mu_tight, event.n_el_tight, getattr(event, "systematic", None),
+            )
 
         for hypo in [MEM.Hypothesis.TTH, MEM.Hypothesis.TTBB]:
             skipped = []
             for confname in self.memkeys:
-                mem_cfg = self.configs[confname]
+                if self.mem_configs.has_key(confname):
+                    mem_cfg = self.mem_configs[confname]
+                else:
+                    if "meminput" in self.conf.general["verbosity"]:
+                        print "skipping", confname
+                    res[(hypo, confname)] = MEM.MEMOutput()
+                    continue
 
-                fstate = MEM.FinalState.TTH
+                fstate = MEM.FinalState.Undefined
                 if "dl" in mem_cfg.mem_assumptions:
                     fstate = MEM.FinalState.LL
                 elif "sl" in mem_cfg.mem_assumptions:
                     fstate = MEM.FinalState.LH
+                else:
+                    if confname in self.memkeysToRun:
+                        raise ValueError("Need to specify sl or dl in assumptions but got {0}".format(str(mem_cfg.mem_assumptions)))
+                    else:
+                        res[(hypo, confname)] = MEM.MEMOutput()
+                        continue
+
+                #if "meminput" in self.conf.general["verbosity"]:
                 if "meminput" in self.conf.general["verbosity"]:
-                    print "MEM", ("hypo", hypo), ("conf", confname), fstate, len(mem_cfg.b_quark_candidates(event)), len(mem_cfg.l_quark_candidates(event))
+                    print "MEM conf={0} fs={1} nb={2} nq={3} doCalc={4} sel={5} inRun={6}".format(
+                        confname,
+                        fstate,
+                        len(mem_cfg.b_quark_candidates(event)),
+                        len(mem_cfg.l_quark_candidates(event)),
+                        mem_cfg.do_calculate(event, mem_cfg),
+                        self.conf.mem["selection"](event),
+                        confname in self.memkeysToRun
+                    )
+                    
                 #Run MEM if we did not explicitly disable it
                 if (self.conf.mem["calcME"] and
                         mem_cfg.do_calculate(event, mem_cfg) and
                         mem_cfg.enabled and
-                        self.conf.mem["selection"](event)
+                        self.conf.mem["selection"](event) and
+                        confname in self.memkeysToRun
                     ):
+                    
                     if "meminput" in self.conf.general["verbosity"]:
-                        print "MEM", confname, "started"
-
+                        print "Integrator::run started hypo={0} conf={1}".format(hypo, confname)
                     self.configure_mem(event, mem_cfg)
                     r = self.integrator.run(
                         fstate,
@@ -577,8 +292,8 @@ class MEAnalyzer(FilterAnalyzer):
                         self.vars_to_integrate,
                         self.vars_to_marginalize
                     )
-                    if "memoutput" in self.conf.general["verbosity"]:
-                        print "MEM done", ("hypo", hypo), ("conf", confname)
+                    if "meminput" in self.conf.general["verbosity"]:
+                        print "Integrator::run done hypo={0} conf={1}".format(hypo, confname)
 
                     res[(hypo, confname)] = r
                 else:
@@ -587,15 +302,16 @@ class MEAnalyzer(FilterAnalyzer):
                     res[(hypo, confname)] = r
             if "meminput" in self.conf.general["verbosity"]:
                 print "skipped confs", skipped
+                
         if "default" in self.memkeys:
             p1 = res[(MEM.Hypothesis.TTH, "default")].p
             p2 = res[(MEM.Hypothesis.TTBB, "default")].p
 
-            #In case of an erroneous calculation, print a message
-            if self.conf.mem["calcME"] and (p1<=0 or p2<=0 or (p1 / (p1+0.02*p2))<0.0001):
-                print "MEM BADPROB", p1, p2
-
         event.mem_results_tth = [res[(MEM.Hypothesis.TTH, k)] for k in self.memkeys]
         event.mem_results_ttbb = [res[(MEM.Hypothesis.TTBB, k)] for k in self.memkeys]
         if "memoutput" in self.conf.general["verbosity"]:
+            print [r.p for r in event.mem_results_tth]
+            print [r.p for r in event.mem_results_ttbb]
             print "---MEM done EVENT r:l:e", event.input.run, event.input.lumi, event.input.evt
+        event.passes_mem = True
+        return event

@@ -3,6 +3,9 @@ import itertools
 
 from TTH.MEAnalysis.Analyzer import FilterAnalyzer
 from TTH.MEAnalysis.VHbbTree import lvec
+
+import numpy as np
+
 class BTagLRAnalyzer(FilterAnalyzer):
     """
     Performs b-tag likelihood ratio calculations
@@ -26,16 +29,32 @@ class BTagLRAnalyzer(FilterAnalyzer):
 
         self.csv_pdfs = {
         }
+        
+        print "Need to Fix the BTagLRAnalyzer to return normalised PDFs"
         for x in ["b", "c", "l"]:
             for b in ["Bin0", "Bin1"]:
                 self.csv_pdfs[(x, b)] = self.cplots.Get(
                     "csv_{0}_{1}__csv_rec".format(x, b)
                 )
-                self.csv_pdfs[(x, b)].Scale(1.0 / self.csv_pdfs[(x, b)].Integral())
+                #self.csv_pdfs[(x, b)].Scale(1.0 / self.csv_pdfs[(x, b)].Integral())
             self.csv_pdfs[(x, "pt_eta")] = self.cplots.Get(
                 "csv_{0}_pt_eta".format(x)
             )
-            self.csv_pdfs[(x, "pt_eta")].Scale(1.0 / self.csv_pdfs[(x, "pt_eta")].Integral())
+            #self.csv_pdfs[(x, "pt_eta")].Scale(1.0 / self.csv_pdfs[(x, "pt_eta")].Integral())
+            for i in range(1,  self.csv_pdfs[(x, "pt_eta")].GetNbinsX()+2 ):
+                for j in range(1,  self.csv_pdfs[(x, "pt_eta")].GetNbinsY()+2 ):
+                    h = self.csv_pdfs[(x, "pt_eta")].ProjectionZ("_pz", i,i, j,j)
+                    #print h.GetEntries()
+                    norm = h.Integral()
+                    if norm == 0:
+                        print "Bin ", i ,", " , j, " empty"
+                        continue
+                    for k in range(1,  self.csv_pdfs[(x, "pt_eta")].GetNbinsZ()+2 ):
+                        tot  = self.csv_pdfs[(x, "pt_eta")].GetBinContent(i,j,k)
+                        self.csv_pdfs[(x, "pt_eta")].SetBinContent(i,j,k, tot/norm )
+                    h2 = self.csv_pdfs[(x, "pt_eta")].ProjectionZ("_pz", i,i, j,j)
+                    print "After rescaling: ", h2.Integral()
+
         self.conf.BTagLRAnalyzer = self
 
     def get_pdf_prob(self, flavour, pt, eta, csv, kind):
@@ -92,11 +111,14 @@ class BTagLRAnalyzer(FilterAnalyzer):
             p = 1.0
 
             for i in range(0, nB):
-                p *= probs[perm[i]][0]
+                if i < np:
+                    p *= probs[perm[i]][0]
             for i in range(nB, min(nB + nC, np)):
-                p *= probs[perm[i]][1]
+                if i < np:
+                    p *= probs[perm[i]][1]
             for i in range(nB + nC, np):
-                p *= probs[perm[i]][2]
+                if i < np:
+                    p *= probs[perm[i]][2]
 
             #print nperms, p, perm, max_p, best_perm
             if p > max_p:
@@ -111,8 +133,17 @@ class BTagLRAnalyzer(FilterAnalyzer):
         #end permutation loop
 
     def process(self, event):
-        self.counters["processing"].inc("processed")
+        for (syst, event_syst) in event.systResults.items():
+            if event_syst.passes_jet:
+                res = self._process(event_syst)
+                event.systResults[syst] = res
+            else:
+                event.systResults[syst].passes_btag = False
+        #event.__dict__.update(evdict["nominal"].__dict__)
+        #event.__dict__.update(event.systResults["nominal"].__dict__)
+        return np.any([v.passes_btag for v in event.systResults.values()])
 
+    def _process(self, event):
         #Take first 6 most b-tagged jets for btag LR
         jets_for_btag_lr = sorted(
             event.good_jets,
@@ -130,6 +161,7 @@ class BTagLRAnalyzer(FilterAnalyzer):
             "new_pt_eta_bin_3d"
             ]
         }
+        jet_probs["best_btag"] = [self.evaluate_jet_prob(j.pt, j.eta, getattr(j, self.bTagAlgo), "new_pt_eta_bin_3d") for j in jets_for_btag_lr[:4]]
 
         # for nj, j in enumerate(jets_for_btag_lr):
         #     print j.btagCSV, j.mcFlavour, jet_probs["old"][nj], jet_probs["new_eta_1bin"][nj], jet_probs["new_pt_eta_bin_3d"][nj]
@@ -148,8 +180,11 @@ class BTagLRAnalyzer(FilterAnalyzer):
         event.btag_lr_4b, best_4b_perm = self.btag_likelihood(jet_probs["new_eta_1bin"], 4, 0)
         event.btag_lr_4b_1c, ph = self.btag_likelihood(jet_probs["new_eta_1bin"], 4, 1)
         event.btag_lr_2b_2c, ph = self.btag_likelihood(jet_probs["new_eta_1bin"], 2, 2)
+        
+        event.btag_lr_4b_max4, ph = self.btag_likelihood(jet_probs["best_btag"], 4, 0)
+        event.btag_lr_2b_max4, ph = self.btag_likelihood(jet_probs["best_btag"], 2, 0)
 
-        event.btag_lr_2b, best_2b_perm = self.btag_likelihood(jet_probs["new_eta_1bin"], 2, 1)
+        event.btag_lr_2b, best_2b_perm = self.btag_likelihood(jet_probs["new_eta_1bin"], 2, 0)
         event.btag_lr_2b_1c, best_2b_perm = self.btag_likelihood(jet_probs["new_eta_1bin"], 2, 1)
 
         event.btag_lr_4b_alt, best_4b_perm_alt = self.btag_likelihood(jet_probs["new_pt_eta_bin_3d"], 4, 0)
@@ -164,10 +199,11 @@ class BTagLRAnalyzer(FilterAnalyzer):
         event.btag_LR_4b_2b_old = lratio(event.btag_lr_4b_old, event.btag_lr_2b_old)
         event.btag_LR_4b_2b = lratio(event.btag_lr_4b, event.btag_lr_2b)
         event.btag_LR_4b_2b_alt = lratio(event.btag_lr_4b_alt, event.btag_lr_2b_alt)
-        #event.btag_LR_4b_2b_alt = 0
+        event.btag_LR_4b_2b_max4 = lratio(event.btag_lr_4b_max4, event.btag_lr_2b_max4)
 
-        event.buntagged_jets_by_LR_4b_2b = [jets_for_btag_lr[i] for i in best_4b_perm[4:]]
-        event.btagged_jets_by_LR_4b_2b = [jets_for_btag_lr[i] for i in best_4b_perm[0:4]]
+        # LB moved from best_4b_perm to best_4b_perm_alt
+        event.buntagged_jets_by_LR_4b_2b = [jets_for_btag_lr[i] for i in best_4b_perm_alt[4:]]
+        event.btagged_jets_by_LR_4b_2b   = [jets_for_btag_lr[i] for i in best_4b_perm_alt[0:4]]
 
         for i in range(len(event.good_jets)):
             event.good_jets[i].btagFlag = 0.0
@@ -192,11 +228,9 @@ class BTagLRAnalyzer(FilterAnalyzer):
         #Set these jets to be used as b-quarks in the MEM
         #We don't want to use more than 4 b-quarks in the hypothesis
         for jet in event.selected_btagged_jets_high:
-            idx = event.good_jets.index(jet)
-            event.good_jets[idx].btagFlag = 1.0
+            #idx = event.good_jets.index(jet)
+            #event.good_jets[idx].btagFlag = 1.0
+            jet.btagFlag = 1.0
 
-        passes = True
-        if passes:
-            self.counters["processing"].inc("passes")
-
-        return passes
+        event.passes_btag = len(event.selected_btagged_jets)>=1
+        return event

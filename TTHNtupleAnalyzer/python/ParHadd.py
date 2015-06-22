@@ -95,15 +95,19 @@ def chunked_step(pool, infiles, index, nchunks=20, delete_inputs=False):
 			os.remove(infile)
 	return ret
 
-if __name__ == "__main__":
-	pool = Pool(processes=pargs.njobs)
-	outfile = remaining_args[0]
-	infiles = remaining_args[1:]
+def par_hadd(outfile, infiles, nchunks, njobs, nsteps):
+	pool = Pool(processes=njobs)
 
 	of = infiles
-	for i in range(pargs.nsteps):
+	for i in range(nsteps):
 		print "step {0} running over {1} files".format(i, len(of))
-		of = chunked_step(pool, of, i, nchunks=pargs.nfiles, delete_inputs=i>0)
+		of = chunked_step(pool, of, i, nchunks=nchunks, delete_inputs=i>0)
 		if len(of)==1:
 			break
 	hadd((outfile, of))
+
+if __name__ == "__main__":
+        outfile = remaining_args[0]
+	infiles = remaining_args[1:]
+
+	par_hadd(outfile, infiles, pargs.nfiles, pargs.njobs, pargs.nsteps)
