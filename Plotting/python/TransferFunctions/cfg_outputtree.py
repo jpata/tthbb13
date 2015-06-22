@@ -61,7 +61,7 @@ def Make_config():
 
     # The config file will be copied to 'runs/{config['run_name']}', and will
     # be used for the name of the output .root file.
-    config['run_name'] = 'CUSTOMTFFILE_V12_LIM_JETS'
+    config['run_name'] = 'CUSTOMTFFILE_V12_FULL_SUBJETS'
 
     config['output_root_file_name'] = '/scratch/tklijnsm/{0}.root'.format( config['run_name'] )
 
@@ -104,10 +104,14 @@ def Make_config():
     #     to add underscores where necessary manually.
 
     config['quarktypes'] = ['GenBQuarkFromTop_', 'GenBQuarkFromH_', 'GenWZQuark_' ]
-    config['jettypes'] = [ 'Jet_' ]
-    
-    #config['jettypes'] = [ 'httCandidates_sjW1', 'httCandidates_sjW2',
-    #    'httCandidates_sjNonW']
+
+    #config['jettypes'] = [ 'Jet_' ]
+
+    config['jettypes'] = [
+        'httCandidates_sjW1',
+        'httCandidates_sjW2',
+        'httCandidates_sjNonW',
+        ]
 
     # Specify which branches *other* than pt, eta, phi, mass and E should be 
     # extracted.
@@ -121,14 +125,15 @@ def Make_config():
         #'{particle}status',
         ]
 
-    config['jet_extra_vars'] = []
-
-    """
     config['jet_extra_vars'] = [
+        '{particle}btag',
         'httCandidates_pt',
+        'httCandidates_eta',
+        'httCandidates_phi',
         'httCandidates_mass',
-        'httCandidates_fW' ]
-    """
+        'httCandidates_fRec',
+        ]
+
 
 
     ########################################
@@ -138,17 +143,18 @@ def Make_config():
     # format of 1 cutoff criterium: ( varname, operator sign, cutoff value )
     #   Note: Only defined variable names can be used here!
 
-    """
+    #"""
     config['jet_cutoff_list'] = [
         ( '{particle}pt'       , '>' , 30.0 ),
         ( 'httCandidates_pt'   , '>' , 200.0 ),
         ( 'httCandidates_mass' , '>' , 120.0 ),
         ( 'httCandidates_mass' , '<' , 220.0 ),
-        ( 'httCandidates_fW'   , '<' , 0.175 ) ]
-    """
+        #( 'httCandidates_fW'   , '<' , 0.175 ),
+        ]
+    #"""
 
-    config['jet_cutoff_list'] = [
-        ( '{particle}pt'       , '>' , 30.0 ) ]
+    #config['jet_cutoff_list'] = [
+    #    ( '{particle}pt'       , '>' , 30.0 ) ]
 
     config['quark_cutoff_list'] = [
         ( '{particle}pt'       , '>' , 30.0 ) ]
