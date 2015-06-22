@@ -48,12 +48,13 @@ def Make_config():
     # I/O information
     ########################################
 
-    config['input_root_file_name'] = '/scratch/tklijnsm/V10_full_jets_TTBarH.root'
+    #config['input_root_file_name'] = '/scratch/tklijnsm/V10_full_jets_TTBarH.root'
     #config['input_root_file_name'] = '/scratch/tklijnsm/V11_full_jets_0.3delR.root'
+    config['input_root_file_name'] = '/shome/tklijnsm/Samples/TFsamples/CUSTOMTFFILE_V12_FULL_JETS.root'
 
     config['input_tree_name'] = 'tree'
 
-    config['outputdir'] = 'Testrun-V10-full-jets-TTBarH'
+    config['outputdir'] = 'V12_FULL_JETS'
 
         
     config['SBF_fitted_hists_pickle_filename'] = \
@@ -71,7 +72,7 @@ def Make_config():
 
     # Specify the number of entries if only a limited number of entries is used
     #   This number is not used if Use_limited_entries is set to False
-    config['n_entries_limited'] = 100000
+    config['n_entries_limited'] = 50000
 
     # Specify whether to make a TF from E_mc to E_reco, or Pt_mc to Pt_reco
     config['Use_Pt'] = True
