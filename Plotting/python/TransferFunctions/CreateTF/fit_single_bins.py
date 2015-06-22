@@ -153,10 +153,20 @@ def Fit_Single_Bins():
                         #    i, f_i.Eval( dic['E_values'][i_eta][i_E] ) )
                 """
 
+                if hasattr( fitfunc, 'Is_DG' ):
 
-                dic['hist_mat'][i_eta][i_E].Fit(f1,'Q')
-                dic['hist_mat'][i_eta][i_E].Fit(f1,'Q')
-                dic['hist_mat'][i_eta][i_E].Fit(f1,'Q')
+                    #left = max( 30.1, 0.7*dic['hist_mat'][i_eta][i_E].GetMean() )
+                    left = 30.01
+                    right = 1.7*dic['hist_mat'][i_eta][i_E].GetMean()
+
+                    f1.SetRange( left, right )
+
+                    print 'Range set: {0} to {1}'.format( left, right )
+
+
+                dic['hist_mat'][i_eta][i_E].Fit(f1,'RQ')
+                dic['hist_mat'][i_eta][i_E].Fit(f1,'RQ')
+                dic['hist_mat'][i_eta][i_E].Fit(f1,'RQ')
 
 
                 # Save the fit results in separate dicts; these dicts will be used to

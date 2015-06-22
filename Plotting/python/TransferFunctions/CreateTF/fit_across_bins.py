@@ -113,9 +113,15 @@ def Make_AcrossBinFit( TFobj, fit_dicts, config ):
 
             if i_E >= skip_begin and i_E < (len(fit_dicts) - skip_end):
 
+                #if dic['single_bin_func'].par_values[3] > 30.0 and \
+                #   dic['single_bin_func'].par_values[3] < \
+                #   0.95*dic['single_bin_func'].par_values[1] and \
+                #   dic['single_bin_func'].par_values[2]<100.0 and \
+                #   dic['single_bin_func'].par_values[4]<100.0:
+
                 if dic['single_bin_func'].par_values[3] > 30.0 and \
-                   dic['single_bin_func'].par_values[3] < \
-                   0.9*dic['single_bin_func'].par_values[1] :
+                   dic['single_bin_func'].par_values[2]<100.0 and \
+                   dic['single_bin_func'].par_values[4]<100.0:
 
                     point_y.append(
                         abs( dic['single_bin_func'].par_values[i_abfunc] ) )
