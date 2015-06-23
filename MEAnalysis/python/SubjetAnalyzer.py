@@ -14,7 +14,7 @@ class SubjetAnalyzer(FilterAnalyzer):
         self.R_cut = 0.3
         self.top_mass = 172.04
 
-        self.bTagAlgo = self.conf.jets["btagAlgo"]
+        self.btagAlgo = self.conf.jets["btagAlgo"]
 
         """
         if hasattr( self.conf, 'httCandidatecut' ):
@@ -34,7 +34,8 @@ class SubjetAnalyzer(FilterAnalyzer):
             ( 'pt'  , '>', '200.0' ),
             ( 'mass', '>', '120.0' ),
             ( 'mass', '<', '220.0' ),
-            ( 'fW'  , '<', '0.175' ) ]
+            #( 'fW'  , '<', '0.175' ),
+            ]
 
 
     def beginLoop(self, setup):
@@ -48,6 +49,10 @@ class SubjetAnalyzer(FilterAnalyzer):
     def process(self, event):
 
         print 'Printing from SubjetAnalyzer! iEv = {0}'.format(event.iEv)
+
+        # TEMPORARY
+        if len(event.selected_btagged_jets)>0:
+            print '    Found at least 1 btagged jet'
 
         # Is set to True only after the event passed all criteria
         setattr( event, 'PassedSubjetAnalyzer', False )
@@ -69,6 +74,10 @@ class SubjetAnalyzer(FilterAnalyzer):
 
         # Check if the event is single leptonic
         if not event.is_sl:
+            return True
+
+        # TEMPORARY: skip if event doesn't have a lot of b's
+        if len(event.selected_btagged_jets) < 2:
             return True
 
         # Keep track of number of httCandidates that passed the cut
@@ -112,8 +121,8 @@ class SubjetAnalyzer(FilterAnalyzer):
             top = tops[0]
             other_top = tops[1]
 
-        # Write delRmin to event
-        setattr( event, 'httCandidate_delRmin', abs(top.Rmin-top.RminExpected) )
+        # Write delRmin to event - No longer available in V12 (is now precalc.)
+        #setattr( event, 'httCandidate_delRmin', abs(top.Rmin-top.RminExpected) )
         #print 'httCandidate_delRmin = {0}'.format( abs(top.Rmin-top.RminExpected) )
 
         # event.wquark_candidate_jets is a set instead of a list (not sure why)
@@ -195,6 +204,8 @@ class SubjetAnalyzer(FilterAnalyzer):
             x = ROOT.TLorentzVector()
             x.SetPtEtaPhiM( jet.pt, jet.eta, jet.phi, jet.mass )
             setattr( x, 'origin_jet', jet )
+            setattr( x, 'btag', getattr(jet,self.btagAlgo) )
+            setattr( x, 'btagFlag', 1.0 )
             tl_btagged_jets.append( x )
 
         # Get list of wquark_candidate_jets
@@ -203,6 +214,8 @@ class SubjetAnalyzer(FilterAnalyzer):
             x = ROOT.TLorentzVector()
             x.SetPtEtaPhiM( jet.pt, jet.eta, jet.phi, jet.mass )
             setattr( x, 'origin_jet', jet )
+            setattr( x, 'btag', getattr(jet,self.btagAlgo) )
+            setattr( x, 'btagFlag', 0.0 )
             tl_wquark_candidate_jets.append( x )
 
 
@@ -381,95 +394,82 @@ class SubjetAnalyzer(FilterAnalyzer):
         # Logic - Setting the btagFlags
         ########################################
 
-        # Goal of this section is make sure exactly 1 subjet has btagFlag = 1.0,
-        # and exactly 2 subjets have btagFlag = 0.0.
-
-        # Regarding the strategy: a successful match is always prioritized.
+        trust_subjet_btag = True
 
         # b | l | Strategy
         # --+---+-------------------------------------------------------------------
-        # 0 | 0 | Trust btagFlags based on prefix ('sjNonW'=b) (Strategy 1)
-        # 0 | 3 |
+        # 0 | 0 | Trust subjet btag; all subjets added
         # --+---+-------------------------------------------------------------------
-        # 0 | 1 | If the matched subjet was 'sjW1' or 'sjW2', trust the btagFlags
-        #   |   | based on prefix. (Strategy 1)
-        #   |   | Else, trust the matching, and tag one of the remaining subjets as
-        #   |   | the b, based on highest pt (to be tested) (Strategy 2)
+        # 0 | 3 | Trust subjet btag; all subjets replace jets
         # --+---+-------------------------------------------------------------------
-        # 0 | 2 | Tag the remaining unmatched subjet as the b (Strategy 3)
+        # 0 | 1 | If the matched light jet was not subjet-btagged, trust subjet btag
+        #   |   | Else, trust (1) positive subjet btag (2) negative jet btag
+        #   |   | 
+        # --+---+-------------------------------------------------------------------
+        # 0 | 2 | If the matched light jet was not subjet-btagged, trust subjet btag
+        #   |   | Else, trust (1) positive subjet btag (2) negative jet btag
         # --+---+-------------------------------------------------------------------
         # 1 | 0 | Trust the match with the b-jet, and set the other 2 subjets as the
         #   | 1 | l-jets (Strategy 4)
         #   | 2 | 
         # --+---+-------------------------------------------------------------------
-        # 2 | 0 | NEW:
-        #   |   | Add the only unmatched subjet to l-jet list (Strategy 5)
-        # --+---+-------------------------------------------------------------------
-        # 2 | 1 | NEW:
-        # 3 | 0 | Do nothing; b- and l-lists remain untouched
-        #   |   | (Result is equal to non-sj MEM) (Strategy 6)
-        # --+---+-------------------------------------------------------------------
-        # 2 | 0 | OLD:
-        #   | 1 | Select the subjet that was matched to a b-jet with the highest
-        # 3 | 0 | b-likelihood as the b, and set the remaining subjets as the l-jets
-        #   |   | (Strategy 5)
+        # 2 | 0 | Do nothing; b- and l-lists remain untouched, subjets are not used
+        #   | 1 | 
+        # 3 | 0 | 
         # --+---+-------------------------------------------------------------------
 
-        # For every type of event, store the number of mismatches, the applied
-        # strategy and the 'event_type_number' (see documentation, TODO):
-        # ( nr_of_mismatches, strategy, event_type_number )
+        # NB: Subjets are already ordered by decreasing btag, and first is btagged:
+        #     tl_subjets[0].btagFlag == 1.0
 
-        if   Match_subjet_bjet == 0 and Match_subjet_ljet == 0:
-            ( nr_of_mismatches, strategy, event_type_number ) = ( 0, 1, 1 )
-        elif Match_subjet_bjet == 0 and Match_subjet_ljet == 3:
-            ( nr_of_mismatches, strategy, event_type_number ) = ( 1, 1, 2 )
+        Match_tup = ( Match_subjet_bjet , Match_subjet_ljet )
+        btag_disagreement = 0
 
-        elif Match_subjet_bjet == 0 and Match_subjet_ljet == 1:
+        if Match_tup == (0,0): ETN = 1
+        elif Match_tup == (0,3): ETN = 2
 
-            # Get the subjet that was matched with a light jet
-            tl_l_subjet = [ tl for tl in tl_subjets if hasattr(tl,'ljet_match') ][0]
-            # Get the other two subjets
-            tl_o_subjets = [ tl for tl in tl_subjets if not hasattr( tl,
-                                                                     'ljet_match') ]
-            ( nr_of_mismatches, strategy, event_type_number ) = ( 0, 1, 3 )
+        elif Match_tup == (0,1):
+            ETN = 3
 
-            if tl_l_subjet.prefix == 'sjNonW':
-                # This means the 'sjNonW' subjet was matched with a light jet.
-                # Trust the matching. From the remaining subjets, tag the one with
-                # highest pt as the b
-                ( nr_of_mismatches, strategy, event_type_number ) = ( 0, 2, 4 )
-                setattr( tl_l_subjet, 'btagFlag', 0.0 )
-                if tl_o_subjets[0].Pt() >  tl_o_subjets[1].Pt():
-                    setattr( tl_o_subjets[0], 'btagFlag', 1.0 )
-                    setattr( tl_o_subjets[1], 'btagFlag', 0.0 )
-                else:
-                    setattr( tl_o_subjets[0], 'btagFlag', 0.0 )
-                    setattr( tl_o_subjets[1], 'btagFlag', 1.0 )
-            # else: Trust btagFlags based on prefix
+            # Check if this light jet was not matched to the b-tagged subjet
+            if hasattr( tl_subjets[0], 'ljet_match' ):
+                if not trust_subjet_btag:
+                    tl_subjets[0].btagFlag = 0.0
+                    tl_subjets[1].btagFlag = 1.0
+                ETN = 4
+                btag_disagreement = 1
 
-        elif Match_subjet_bjet == 0 and Match_subjet_ljet == 2:
-            for tl in tl_subjets:
-                if hasattr( tl, 'ljet_match' ): setattr( tl, 'btagFlag', 0.0 )
-                else:                           setattr( tl, 'btagFlag', 1.0 )
-            ( nr_of_mismatches, strategy, event_type_number ) = ( 0, 3, 5 )
+        elif Match_tup == (0,2):
+            ETN = 5
+
+            # Check if one of the light jets was not matched to the b-tagged subjet
+            if hasattr( tl_subjets[0], 'ljet_match' ):
+                if not trust_subjet_btag:
+                    # Assign 0.0 to matched subjets and 1.0 to unmatched
+                    for tl_subjet in tl_subjets:
+                        if hasattr( tl_subjet, 'ljet_match' ):
+                            tl_subjet.btagFlag = 0.0
+                        else:
+                            tl_subjet.btagFlag = 1.0
+                ETN = 6
+                btag_disagreement = 1
+
+        elif Match_tup in [ (1,0), (1,1), (1,2) ]:
+            ETN = 7
             
-        elif Match_subjet_bjet == 1 and Match_subjet_ljet in [0,1,2]:
-            for tl in tl_subjets:
-                if hasattr( tl, 'bjet_match' ): setattr( tl, 'btagFlag', 1.0 )
-                else:                           setattr( tl, 'btagFlag', 0.0 )
-            # Set appropiate ETN for easy accessing later
-            if Match_subjet_ljet==0: ETN = 6
-            if Match_subjet_ljet==1: ETN = 7
-            if Match_subjet_ljet==2: ETN = 8
-            ( nr_of_mismatches, strategy, event_type_number ) = ( 0, 4, ETN )
+            # Check if the 1 matched b-jet is also the b-tagged subjet
+            if not hasattr( tl_subjets[0], 'bjet_match' ):
+                if not trust_subjet_btag:
+                    # Assign 1.0 to  the b-matched subjet and 0.0 to others
+                    for tl_subjet in tl_subjets:
+                        if hasattr( tl_subjet, 'bjet_match' ):
+                            tl_subjet.btagFlag = 1.0
+                        else:
+                            tl_subjet.btagFlag = 0.0
+                ETN = 8
+                btag_disagreement = 1
 
-        # NEW strategies for >=2 subjet-bjet matches
-        elif Match_subjet_bjet == 2 and Match_subjet_ljet == 0:
-            ( nr_of_mismatches, strategy, event_type_number ) = ( 1, 5, 9 )
-        elif Match_subjet_bjet == 2 and Match_subjet_ljet == 1:
-            ( nr_of_mismatches, strategy, event_type_number ) = ( 1, 6, 10 )
-        elif Match_subjet_bjet == 3 and Match_subjet_ljet == 0:
-            ( nr_of_mismatches, strategy, event_type_number ) = ( 2, 6, 11 )
+        elif Match_tup in [ (2,0), (2,1), (3,0) ]:
+            ETN = 9
 
         else:
             print 'Unassigned category! Create a strategy for this case.'
@@ -477,25 +477,6 @@ class SubjetAnalyzer(FilterAnalyzer):
                 Match_subjet_bjet, Match_subjet_ljet )
             return 0
 
-        """
-        # OLD strategies for >=2 subjet-bjet matches
-        elif Match_subjet_bjet in [2,3] and Match_subjet_ljet in [0,1]:
-
-            tl_b_subjets = [ tl for tl in tl_subjets if hasattr(tl, 'bjet_match') ]
-            tl_b_subjet = sorted(
-                tl_b_subjets,
-                key=lambda x: -getattr( x.bjet_match.origin_jet, self.bTagAlgo ))[0]
-
-            for tl in tl_subjets:
-                if tl == tl_b_subjet:           setattr( tl, 'btagFlag', 1.0 )
-                else:                           setattr( tl, 'btagFlag', 0.0 )
-
-            # Set appropiate ETN for easy accessing later
-            if Match_subjet_bjet==2 and Match_subjet_ljet==0: NOM = 1; ETN = 9
-            if Match_subjet_bjet==2 and Match_subjet_ljet==1: NOM = 1; ETN = 10
-            if Match_subjet_bjet==3 and Match_subjet_ljet==0: NOM = 2; ETN = 11
-            ( nr_of_mismatches, strategy, event_type_number ) = ( NOM, 5, ETN )
-        """
 
         # Set 'PDGID' to 1 for light, and to 5 for b
         # Note: This will be problematic for the new strategy with >=2 b matches
@@ -503,26 +484,6 @@ class SubjetAnalyzer(FilterAnalyzer):
             if subjet.btagFlag == 1.0: setattr( subjet, 'PDGID', 5 )
             if subjet.btagFlag == 0.0: setattr( subjet, 'PDGID', 1 )
 
-        """
-        # Check up printing - the httCandidate
-        print '=====================================\nCheck print'
-        for tl_subjet in tl_subjets:
-            print '\nSubjet {0}'.format( tl_subjet.prefix )
-            print '    btagFlag: {0}'.format( tl_subjet.btagFlag )
-            if hasattr( tl_subjet, 'bjet_match' ):
-                btag = getattr( tl_subjet.bjet_match.origin_jet, self.bTagAlgo ) 
-                print '    original btag of the jet: {0}'.format(btag)
-                self.Print_particle_lists(
-                    ( [tl_subjet], 'TL', 'subjet'),
-                    ( [tl_subjet.bjet_match], 'TL', 'Matching bjet')
-                    )
-            if hasattr( tl_subjet, 'ljet_match' ):
-
-                self.Print_particle_lists(
-                    ( [tl_subjet], 'TL', 'subjet'),
-                    ( [tl_subjet.ljet_match], 'TL', 'Matching ljet')
-                    )
-        print '=====================================\n'
 
         # Check up printing - the input jets
         print '=====================================\n'
@@ -534,7 +495,22 @@ class SubjetAnalyzer(FilterAnalyzer):
                 'event.wquark_candidate_jets_sj'),
             )
         print '=====================================\n'
-        """
+
+        # Check up printing - the httCandidate
+        print '=====================================\nCheck print'
+        for tl_subjet in tl_subjets:
+            if hasattr( tl_subjet, 'bjet_match' ):
+                self.Print_particle_lists(
+                    ( [tl_subjet], 'TL', 'Subjet {0}'.format(tl_subjet.prefix) ),
+                    ( [tl_subjet.ljet_match], 'TL', '----> Matching bjet' ) )
+            elif hasattr( tl_subjet, 'ljet_match' ):
+                self.Print_particle_lists(
+                    ( [tl_subjet], 'TL', 'Subjet {0}'.format(tl_subjet.prefix) ),
+                    ( [tl_subjet.ljet_match], 'TL', '----> Matching ljet' ) )
+            else:
+                self.Print_particle_lists(
+                    ([tl_subjet], 'TL', 'Subjet {0}'.format(tl_subjet.prefix) ) )
+        print '=====================================\n'
 
         ########################################
         # Modifying the bjets and ljets lists
@@ -555,20 +531,20 @@ class SubjetAnalyzer(FilterAnalyzer):
                     # Remove it from the ljet list in the event
                     event.wquark_candidate_jets_sj.pop(
                         event.wquark_candidate_jets_sj.index( orig_ljet ) )
+                    orig_jet_btagFlag = 0.0
                 if hasattr( tl_subjet, 'bjet_match' ):
                     # Get the original bjet
                     orig_bjet = tl_subjet.bjet_match.origin_jet
                     # Remove it from the bjet list in the event
                     event.selected_btagged_jets_sj.pop(
                         event.selected_btagged_jets_sj.index( orig_bjet ) )
+                    orig_jet_btagFlag = 1.0
 
                 if tl_subjet.btagFlag == 1.0:
                     # Insert the subjet into btagged_jets list in the event
-                    #event.selected_btagged_jets_sj.append( tl_subjet )
                     event.selected_btagged_jets_sj.insert( 0, tl_subjet )
                 elif tl_subjet.btagFlag == 0.0:
                     # Insert the subjet into wquark_candidate_jets list in the event
-                    #event.wquark_candidate_jets_sj.append( tl_subjet )
                     event.wquark_candidate_jets_sj.insert( 0, tl_subjet )
 
             # Reduce to 4 b-jets to keep runtime in check
@@ -592,7 +568,7 @@ class SubjetAnalyzer(FilterAnalyzer):
 
         event.PassedSubjetAnalyzer = True
 
-        """
+       # """
         # Check up printing - the output jets
         print '=====================================\n'
         print 'Output jets:'
@@ -603,26 +579,7 @@ class SubjetAnalyzer(FilterAnalyzer):
                 'event.wquark_candidate_jets_sj'),
             )
         print '=====================================\n'
-        """
-
-        # Categorization here probably unnecessary; Requirements in MEM configs
-        # should suffice
-        """
-        ########################################
-        # Categorization
-        # Requires work - very quick & dirty at the moment
-        ########################################
-
-        if len( event.selected_btagged_jets_sj ) > 4:
-            # The last added element is the subjet - keep that one, and the next
-            # 3 btagged_jets
-            event.selected_btagged_jets_sj = \
-                event.selected_btagged_jets_sj[-1:] + \
-                event.selected_btagged_jets_sj[:3]
-        
-        if len( event.selected_btagged_jets_sj ) >= 4:
-            event.PassedSubjetAnalyzer = True
-        """
+        #"""
 
         ########################################
         # Write to event
@@ -634,34 +591,11 @@ class SubjetAnalyzer(FilterAnalyzer):
         setattr( event, 'Matching_subjet_bjet', Match_subjet_bjet )
         setattr( event, 'Matching_subjet_ljet', Match_subjet_ljet )
 
-        setattr( event, 'Matching_nr_of_mismatches', nr_of_mismatches )
-        setattr( event, 'Matching_strategy', strategy )
-        setattr( event, 'Matching_event_type_number', event_type_number )
+        setattr( event, 'Matching_event_type_number', ETN )
+        setattr( event, 'Matching_btag_disagreement', btag_disagreement )
 
         print 'Exiting SubjetAnalyzer! event.PassedSubjetAnalyzer = {0}'.format(
             event.PassedSubjetAnalyzer )
-
-
-        # TODO: Implement old cats for modified jet lists
-        """
-        if event.is_sl:
-
-            #at least 6 jets, if 6, Wtag in [60,100], if more Wtag in [72,94]
-            if ((len(event.good_jets) == 6 and event.Wmass >= 60 and event.Wmass < 100) or
-               (len(event.good_jets) > 6 and event.Wmass >= 72 and event.Wmass < 94)):
-               cat = "cat1"
-               #W-tagger fills wquark_candidate_jets
-            #at least 6 jets, no W-tag
-            elif len(event.good_jets) >= 6:
-                cat = "cat2"
-            #one W daughter missing
-            elif len(event.good_jets) == 5:
-                event.wquark_candidate_jets = event.buntagged_jets
-                cat = "cat3"
-        elif event.is_dl and len(event.good_jets)>=4:
-            event.wquark_candidate_jets = []
-            cat = "cat6"
-        """
 
 
     ########################################
@@ -711,11 +645,8 @@ class SubjetAnalyzer(FilterAnalyzer):
                 getattr( top, prefix + 'mass' ) )
             setattr( x, 'prefix', prefix )
 
-            # Set the btagFlag, based on prefix (only used if there is no other tag)
-            if prefix == 'sjNonW':
-                setattr( x, 'btagFlag', 1.0 )
-            else:
-                setattr( x, 'btagFlag', 0.0 )
+            # Also pass the btag to the tl
+            setattr( x, 'btag'  , getattr( top, prefix + 'btag' ) )
 
             # Set pt, eta, phi and mass also as attributes
             # Needed for compatibility with mem
@@ -725,6 +656,12 @@ class SubjetAnalyzer(FilterAnalyzer):
             setattr( x, 'mass', x.M() )
 
             tl_subjets.append( x )
+
+        # Set the btagFlags; order by decreasing btag, highest btag gets btagFlag=1.0
+        tl_subjets = sorted( tl_subjets, key = lambda x: -x.btag )
+        setattr( tl_subjets[0], 'btagFlag', 1.0 )
+        setattr( tl_subjets[1], 'btagFlag', 0.0 )
+        setattr( tl_subjets[2], 'btagFlag', 0.0 )
 
         #Adding subjet transfer functions
         for subjet in tl_subjets:
@@ -761,23 +698,33 @@ class SubjetAnalyzer(FilterAnalyzer):
 
             print '\n    Printing {0}:'.format( name )
 
-            if mode == 'TL':
+            for q in p_list:
 
-                for q in p_list:
-                    print '    [ {0:9s} | {1:9s} | {2:9s} | {3:9s} ]'.format(
-                        '{0:.3f}'.format(q.Pt()),
-                        '{0:.3f}'.format(q.Eta()),
-                        '{0:.3f}'.format(q.Phi()),
-                        '{0:.3f}'.format(q.M()) )
+                if mode == 'TL':
+                    pt = '{0:.2f}'.format(q.Pt())
+                    eta = '{0:.2f}'.format(q.Eta())
+                    phi = '{0:.2f}'.format(q.Phi())
+                    mass = '{0:.2f}'.format(q.M())
 
-            if mode == 'Class':
+                if mode == 'Class':
+                    pt = '{0:.2f}'.format(q.pt)
+                    eta = '{0:.2f}'.format(q.eta)
+                    phi = '{0:.2f}'.format(q.phi)
+                    mass = '{0:.2f}'.format(q.mass)
 
-                for q in p_list:
-                    print '    [ {0:9s} | {1:9s} | {2:9s} | {3:9s} ]'.format(
-                        '{0:.3f}'.format(q.pt),
-                        '{0:.3f}'.format(q.eta),
-                        '{0:.3f}'.format(q.phi),
-                        '{0:.3f}'.format(q.mass) )
+                p4_str = '    [ pt: {0:6s} | eta: {1:5s} | phi: {2:5s} | mass: {3:6s} '.format(
+                    pt, eta, phi, mass )
+
+                if hasattr( q, 'btagFlag' ):
+                    p4_str += '| bFl: {0} '.format( int(q.btagFlag) )
+
+                if hasattr( q, 'btag' ):
+                    p4_str += '| btag: {0} '.format( '{0:.2f}'.format(q.btag) )
+
+                p4_str += ']'
+
+                print p4_str
+
 
         print ''
 
