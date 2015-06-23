@@ -37,13 +37,14 @@ class JetAnalyzer(FilterAnalyzer):
             newjets = deepcopy(jets)
             for i in range(len(jets)):
                 if sigma > 0:
-                    cf = sigma * newjets[i].corr_JECUp
+                    cf = sigma * newjets[i].corr_JECUp / newjets[i].corr
 
                 elif sigma < 0:
-                    cf = abs(sigma) * newjets[i].corr_JECDown
-
+                    cf = abs(sigma) * newjets[i].corr_JECDown / newjets[i].corr
+                
+                #get the uncorrected jets
                 elif sigma == 0:
-                    cf = newjets[i].corr
+                    cf = 1.0 / newjets[i].corr
 
                 newjets[i].pt *= cf
                 newjets[i].mass *= cf
@@ -61,15 +62,14 @@ class JetAnalyzer(FilterAnalyzer):
         event.MET_gen = MET(pt=event.MET.genPt, phi=event.MET.genPhi)
         event.MET_tt = MET(px=0, py=0)
         
-        jets_JES = self.variateJets(event.Jet, "JES", 0)
+        jets_raw = self.variateJets(event.Jet, "JES", 0)
         jets_JES_Up = self.variateJets(event.Jet, "JES", 1)
         jets_JES_Down = self.variateJets(event.Jet, "JES", -1)
         evdict = {}
         for name, jets in [
-                ("JES", jets_JES),
+                ("raw", jets_raw),
                 ("JESUp", jets_JES_Up),
-                ("JESDown",
-                jets_JES_Down)
+                ("JESDown", jets_JES_Down)
             ]:
             if not name in self.conf.general["systematics"]:
                 continue
