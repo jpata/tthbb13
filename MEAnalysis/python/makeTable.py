@@ -3,7 +3,21 @@ import ROOT, sys
 tf = ROOT.TFile(sys.argv[1])
 tt = tf.Get("tree")
 
-print "run,lumi,evt,isSingleLepton,isDiLepton,numJets,numTags,lep0_pt,lep0_eta,lep0_phi,lep0_iso,lep0_id,lep1_pt,lep1_eta,lep1_phi,lep1_iso,lep1_id,jet0_pt,jet0_eta,jet0_phi,jet0_csv,jet0_corr,jet0_corrUp,jet0_corrDown,jet1_pt,jet1_eta,jet1_phi,jet1_csv,jet1_corr,jet1_corrUp,jet1_corrDown,jet2_pt,jet2_eta,jet2_phi,jet2_csv,jet2_corr,jet2_corrUp,jet2_corrDown,ttbarCls"
+
+print "run,lumi,event,\
+is_SL,is_DL,\
+lep1_pt,lep1_eta,lep1_phi,lep1_iso,lep1_pdgId,\
+lep2_pt,lep2_eta,lep2_phi,lep2_iso,lep2_pdgId,\
+jet1_pt,jet2_pt,jet3_pt,jet4_pt,\
+jet1_CSVv2,jet2_CSVv2,jet3_CSVv2,jet4_CSVv2,\
+jet1_corr,jet2_corr,jet3_corr,jet4_corr,\
+jet1_corrUp,jet2_corrUp,jet3_corrUp,jet4_corrUp,\
+jet1_corrDown,jet2_corrDown,jet3_corrDown,jet4_corrDown,\
+MET_pt,MET_phi,\
+n_jets,n_btags,\
+bWeight,bWeightLFUp,bWeightLFDown,\
+ttHFCategory"
+
 
 for ev in range(tt.GetEntries()):
     tt.GetEntry(ev)
@@ -18,7 +32,7 @@ for ev in range(tt.GetEntries()):
     lep0_id = leps_pdgId[0]
     lep0_eta = leps_eta[0]
     lep0_phi = leps_phi[0]
-    lep0_iso = -1
+    lep0_iso = 0
     if abs(lep0_id) == 11:
         lep0_iso = leps_iso03[0]
     elif abs(lep0_id) == 13:
@@ -64,6 +78,14 @@ for ev in range(tt.GetEntries()):
     jet2_corr = 0
     jet2_corrUp = 0
     jet2_corrDown = 0
+    
+    jet3_pt = 0
+    jet3_eta = 0
+    jet3_phi = 0
+    jet3_csv = 0
+    jet3_corr = 0
+    jet3_corrUp = 0
+    jet3_corrDown = 0
 
     i = 0
     jet0_pt = tt.jets_pt[i] 
@@ -92,14 +114,39 @@ for ev in range(tt.GetEntries()):
         jet2_corr = tt.jets_corr[i] 
         jet2_corrUp = tt.jets_corr_JESUp[i] 
         jet2_corrDown = tt.jets_corr_JESDown[i] 
+    
+    if tt.numJets>=4:
+        i = 3
+        jet3_pt = tt.jets_pt[i] 
+        jet3_eta = tt.jets_eta[i] 
+        jet3_phi = tt.jets_phi[i] 
+        jet3_csv = tt.jets_btagCSV[i] 
+        jet3_corr = tt.jets_corr[i] 
+        jet3_corrUp = tt.jets_corr_JESUp[i] 
+        jet3_corrDown = tt.jets_corr_JESDown[i] 
 
 
-    arr = [int(tt.run), int(tt.lumi), int(tt.evt), int(tt.is_sl), int(tt.is_dl), int(tt.numJets), tt.nBCSVM,
+
+    arr = [int(tt.run), int(tt.lumi), int(tt.evt),
+        int(tt.is_sl), int(tt.is_dl),
         lep0_pt, lep0_eta, lep0_phi, lep0_iso, lep0_id,
         lep1_pt, lep1_eta, lep1_phi, lep1_iso, lep1_id,
-        jet0_pt, jet0_eta, jet0_phi, jet0_csv, jet0_corr, jet0_corrUp, jet0_corrDown,
-        jet1_pt, jet1_eta, jet1_phi, jet1_csv, jet1_corr, jet1_corrUp, jet1_corrDown,
-        jet2_pt, jet2_eta, jet2_phi, jet2_csv, jet2_corr, jet2_corrUp, jet2_corrDown,
-        tt.ttCls
+        
+        jet0_pt, jet1_pt, jet2_pt, jet3_pt,
+        jet0_csv, jet1_csv, jet2_csv, jet3_csv,
+        jet0_corr, jet1_corr, jet2_corr, jet3_corr,
+        jet0_corrUp, jet1_corrUp, jet2_corrUp, jet3_corrUp,
+        jet0_corrDown, jet1_corrDown, jet2_corrDown, jet3_corrDown,
+        tt.met_pt, tt.met_phi,
+        int(tt.numJets), int(tt.nBCSVM),
+        tt.bTagWeight, tt.bTagWeight_LFUp, tt.bTagWeight_LFDown,
+        int(tt.ttCls),
     ]
-    print ",".join(map(str, arr))
+
+    s = ""
+    for i in range(len(arr)):
+        if not isinstance(arr[i], int):
+            s += str(round(arr[i], 4)) + ","
+        else:
+            s += str(arr[i]) + ","
+    print s[:-1]
