@@ -247,7 +247,7 @@ class Conf:
     general = {
         "controlPlotsFileOld": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsTEST.root",
         "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV6.root",
-        "sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_vhbb.py",
+        "sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_prev12.py",
         "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions.pickle",
         "systematics": ["nominal"],
         #"systematics": ["nominal", "JESUp", "JESDown", "JES"],
@@ -257,10 +257,10 @@ class Conf:
         # "gen" - print out the ttH gen-level particles (b from top, b form higgs, q from W, leptons
         # "reco" - print out the reco-level selected particles
         # "matching" - print out the association between gen and reco objects
-        #"verbosity": ["eventboundary", "input", "matching", "gen", "reco", "meminput"],
-        "verbosity": [
-            #"meminput"
-        ],
+        "verbosity": ["eventboundary", "input", "matching", "gen", "reco", "meminput"],
+        #"verbosity": [
+        #    #"meminput"
+        #],
 
 
         #"eventWhitelist": [

@@ -59,9 +59,6 @@ for sn in sorted(samples_dict.keys()):
 
 print "Processing samples", [s.name for s in inputSamples]
 
-import pdb
-pdb.set_trace()
-
 #Event contents are defined here
 #This is work in progress
 from TTH.MEAnalysis.VHbbTree import *
