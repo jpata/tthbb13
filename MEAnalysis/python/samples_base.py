@@ -37,15 +37,18 @@ if "kbfi" in hn or "comp-" in hn or "kbfi" in vo:
     pfPath = "/hdfs/cms/"
     lfPrefix = "file://"
     def lfn_to_pfn(fn):
+
+        #fix to replace broken file names
+        fn = fn.replace("/store/user/gregor/store/user/gregor", "/store/user/jpata")
         return "file:///hdfs/cms" + fn
 elif "psi" in hn or "psi" in vo:
-    pfPath = "/pnfs/psi.ch/cms/trivcat/"
-    lfPrefix = "dcap://t3se01.psi.ch:22125/"
+    # pfPath = "/pnfs/psi.ch/cms/trivcat/"
+    # lfPrefix = "dcap://t3se01.psi.ch:22125/"
     def lfn_to_pfn(fn):
         if fn.startswith("file://"):
             return fn
         else:
-            return "dcap://t3se01.psi.ch:22125/pnfs/psi.ch/cms/trivcat" + fn
+            return "dcap://t3se01.psi.ch:22125/pnfs/psi.ch/cms/trivcat/" + fn
 else:
     print "Warning: host '{0}' VO '{1}' is unknown, using xrootd".format(hn, vo)
     pfPath = ""
