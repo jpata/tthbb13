@@ -4,6 +4,9 @@ from TTH.MEAnalysis.MEMConfig import MEMConfig
 import ROOT
 from ROOT import MEM
 
+# LB: in fact,  mu.tightId should contain all the other cuts
+# https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Tight_Muon
+# https://github.com/vhbb/cmssw/blob/vhbbHeppy722patch2/PhysicsTools/Heppy/python/physicsobjects/Muon.py
 def mu_baseline(mu):
     return (
         mu.tightId and
@@ -20,7 +23,7 @@ def mu_baseline(mu):
 def el_baseline_tight(el):
     sca = abs(el.etaSc)
     ret = (
-        not(sca > 1.442 and sca < 1.5660) and
+        not(sca > 1.4442 and sca < 1.5660) and
         el.convVeto
     )
     if not ret:
@@ -53,7 +56,7 @@ def el_baseline_tight(el):
 def el_baseline_medium(el):
     sca = abs(el.etaSc)
     ret = (
-        not(sca > 1.442 and sca < 1.5660) and
+        not(sca > 1.4442 and sca < 1.5660) and
         el.convVeto
     )
     if not ret:
@@ -67,9 +70,9 @@ def el_baseline_medium(el):
             (el.eleHoE          < 0.050537) and
             (abs(el.dxy)        < 0.012235) and
             (abs(el.dz)         < 0.042020) and
-            (el.relIso03        < 0.069537) #and
-            #(el.eleExpMIHits    < 0.069537) #
-            #(el.ooEmooP         < 0.069537) #
+            (el.relIso03        < 0.069537) and
+            (getattr(el, "eleExpMissingInnerHits", 0) <= 1) and
+            (getattr(el, "eleooEmooP", 0) < 0.091942)
         )
     elif sca < 2.5:
         ret = ret and (
@@ -79,16 +82,16 @@ def el_baseline_medium(el):
             (el.eleHoE          < 0.086782) and
             (abs(el.dxy)        < 0.036719) and
             (abs(el.dz)         < 0.138142) and
-            (el.relIso03        < 0.113254) #and
-            #(el.eleExpMIHits    < 0.069537) #
-            #(el.ooEmooP         < 0.069537) #
+            (el.relIso03        < 0.113254) and
+            (getattr(el, "eleExpMissingInnerHits", 0) <= 1) and
+            (getattr(el, "eleooEmooP", 0) < 0.100683)
         )
     return ret
 
 def el_baseline_loose(el):
     sca = abs(el.etaSc)
     ret = (
-        not(sca > 1.442 and sca < 1.5660) and
+        not(sca > 1.4442 and sca < 1.5660) and
         el.convVeto
     )
     if not ret:
@@ -102,9 +105,9 @@ def el_baseline_loose(el):
             (el.eleHoE          < 0.093068) and
             (abs(el.dxy)        < 0.035904) and
             (abs(el.dz)         < 0.075496) and
-            (el.relIso03        < 0.130136) #and
-            #(el.eleExpMIHits    < 0.069537) #
-            #(el.ooEmooP         < 0.069537) #
+            (el.relIso03        < 0.130136) and
+            (getattr(el, "eleExpMissingInnerHits", 0) <= 1) and
+            (getattr(el, "eleooEmooP", 0) < 0.189968)
         )
     elif sca < 2.5:
         ret = ret and (
@@ -114,9 +117,9 @@ def el_baseline_loose(el):
             (el.eleHoE          < 0.115754) and
             (abs(el.dxy)        < 0.099266) and
             (abs(el.dz)         < 0.197897) and
-            (el.relIso03        < 0.163368) #and
-            #(el.eleExpMIHits    < 0.069537) #
-            #(el.ooEmooP         < 0.069537) #
+            (el.relIso03        < 0.163368) and
+            (getattr(el, "eleExpMissingInnerHits", 0) <= 1) and
+            (getattr(el, "eleooEmooP", 0) < 0.140662)
         )
     return ret
 
@@ -178,7 +181,7 @@ class Conf:
                 "iso": 0.2,
                 "idcut": mu_baseline
             },
-            "isotype": "relIso04",
+            "isotype": "pfRelIso04", #pfRelIso - delta-beta, relIso - rho
         },
 
 
@@ -205,13 +208,22 @@ class Conf:
                 "eta": 2.4,
                 "idcut": lambda el: el_baseline_loose(el)
             },
-            "isotype": "relIso03",
+            "isotype": "pfRelIso03", #pfRelIso - delta-beta, relIso - rho
         }
     }
 
     jets = {
-        "pt": 30,
-        "eta": 2.4,
+        # pt, |eta| thresholds for **leading two jets** (common between sl and dl channel)
+        "pt":   30,
+        "eta":  2.4,
+
+        # pt, |eta| thresholds for **trailing jets** specific to sl channel
+        "pt_sl":  30,
+        "eta_sl": 2.4,
+
+        # pt, |eta| thresholds for **trailing jets** specific to dl channel
+        "pt_dl":  20,
+        "eta_dl": 2.4,
 
         #The default b-tagging algorithm (branch name)
         "btagAlgo": "btagCSV",
@@ -238,7 +250,7 @@ class Conf:
         "sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_722sync.py",
         "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions.pickle",
         #"systematics": ["nominal"],
-        "systematics": ["nominal", "JESUp", "JESDown", "JES"],
+        "systematics": ["nominal", "JESUp", "JESDown", "raw"],
         
         
         #If the list contains:
@@ -247,12 +259,11 @@ class Conf:
         # "matching" - print out the association between gen and reco objects
         #"verbosity": ["eventboundary", "input", "matching", "gen", "reco", "meminput"],
         "verbosity": [
-            "meminput"
+            #"meminput"
         ],
 
-        #Process only these events (will scan through file to find)
-        #"eventWhitelist": [
 
+        #"eventWhitelist": [
         ##    (1,214,21320)
         ##    (1, 214, 21333),
         ##    #cat6
@@ -299,10 +310,10 @@ class Conf:
         #This configures the MEMs to actually run, the rest will be set to 0
         "methodsToRun": [
             "SL_0w2h2t",
-            #"DL_0w2h2t",
+            "DL_0w2h2t",
             #"SL_2w2h2t",
             #"SL_2w2h2t_memLR",
-            "SL_0w2h2t_memLR",
+            #"SL_0w2h2t_memLR",
         ],
 
     }

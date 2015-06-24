@@ -249,8 +249,8 @@ class Conf:
         "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV6.root",
         "sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_prev12.py",
         "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions.pickle",
-        "systematics": ["nominal"],
-        #"systematics": ["nominal", "JESUp", "JESDown", "JES"],
+        #"systematics": ["nominal"],
+        "systematics": ["nominal", "JESUp", "JESDown", "raw"],
         
         
         #If the list contains:
@@ -406,6 +406,4 @@ for cn, c in Conf.mem_configs.items():
     print "MEM config", cn, c.mem_assumptions
 
 if __name__ == "__main__":
-    import json
-    s = json.dumps(Conf)
-    print s
+    print Conf.__dict__

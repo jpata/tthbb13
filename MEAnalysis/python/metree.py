@@ -316,14 +316,10 @@ def getTreeProducer(conf):
         #    "l_quarks_w" : NTupleCollection("GenQFromW", quarkType, 5, help=""),
             "good_jets_nominal" : NTupleCollection("jets", jetType, 9, help="Selected jets"),
             "good_leptons_nominal" : NTupleCollection("leps", leptonType, 2, help="Selected leptons"),
-            # "mem_results_tth_JES": NTupleCollection(
-            #     "mem_tth_JES", memType, len(conf.mem["methodsToRun"]),
-            #     help="MEM tth results array, element per config.methodsToRun"
-            # ),
         }
     )
 
-    for systematic in ["nominal", "JES", "JESUp", "JESDown"]:
+    for systematic in ["nominal", "raw", "JESUp", "JESDown"]:
         if not (systematic in conf.general["systematics"]):
             continue
 

@@ -238,7 +238,7 @@ class Conf:
         "sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_722sync.py",
         "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions.pickle",
         "systematics": ["nominal"],
-        #"systematics": ["nominal", "JESUp", "JESDown", "JES"],
+        #"systematics": ["nominal", "JESUp", "JESDown", "raw"],
         
         
         #If the list contains:
