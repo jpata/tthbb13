@@ -1,5 +1,5 @@
 from PhysicsTools.HeppyCore.framework.analyzer import Analyzer
-from TTH.MEAnalysis.VHbbTree import lvec
+from TTH.MEAnalysis.vhbb_utils import lvec
 
 class FilterAnalyzer(Analyzer):
     """

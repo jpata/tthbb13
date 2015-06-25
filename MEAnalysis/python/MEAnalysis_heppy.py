@@ -156,6 +156,12 @@ mva = cfg.Analyzer(
     _conf = conf
 )
 
+brnd = cfg.Analyzer(
+    MECoreAnalyzers.BTagRandomizerAnalyzer,
+    'brand',
+    _conf = conf
+)
+
 treevar = cfg.Analyzer(
     MECoreAnalyzers.TreeVarAnalyzer,
     'treevar',
@@ -175,6 +181,7 @@ sequence = cfg.Sequence([
     jets,
     btaglr,
     mva,
+    brnd,
     wtag,
     mecat,
     genrad,

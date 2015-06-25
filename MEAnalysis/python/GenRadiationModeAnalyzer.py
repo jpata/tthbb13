@@ -1,4 +1,4 @@
-from TTH.MEAnalysis.VHbbTree import lvec
+from TTH.MEAnalysis.vhbb_utils import lvec
 from TTH.MEAnalysis.Analyzer import FilterAnalyzer
 class GenRadiationModeAnalyzer(FilterAnalyzer):
     """

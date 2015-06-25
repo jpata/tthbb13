@@ -1,4 +1,4 @@
-from TTH.MEAnalysis.VHbbTree import lvec
+from TTH.MEAnalysis.vhbb_utils import lvec
 
 import ROOT
 import copy

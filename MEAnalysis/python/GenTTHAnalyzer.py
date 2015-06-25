@@ -1,6 +1,6 @@
 import copy
 
-from TTH.MEAnalysis.VHbbTree import lvec, MET
+from TTH.MEAnalysis.vhbb_utils import lvec, MET
 from TTH.MEAnalysis.Analyzer import FilterAnalyzer
 from TTH.MEAnalysis.JetAnalyzer import attach_jet_transfer_function
 class GenTTHAnalyzer(FilterAnalyzer):

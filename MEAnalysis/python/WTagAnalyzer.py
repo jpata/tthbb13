@@ -1,5 +1,5 @@
 from TTH.MEAnalysis.Analyzer import FilterAnalyzer
-from TTH.MEAnalysis.VHbbTree import lvec
+from TTH.MEAnalysis.vhbb_utils import lvec
 
 import numpy as np
 class WTagAnalyzer(FilterAnalyzer):

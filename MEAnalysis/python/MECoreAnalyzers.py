@@ -14,4 +14,5 @@ from TTH.MEAnalysis.JetAnalyzer import JetAnalyzer
 from TTH.MEAnalysis.BTagLRAnalyzer import BTagLRAnalyzer
 from TTH.MEAnalysis.Analyzer import EventIDFilterAnalyzer, EventWeightAnalyzer, PrimaryVertexAnalyzer
 from TTH.MEAnalysis.MVAVarAnalyzer import MVAVarAnalyzer
+from TTH.MEAnalysis.BTagRandomizerAnalyzer import BTagRandomizerAnalyzer
 from TTH.MEAnalysis.TreeVarAnalyzer import TreeVarAnalyzer
