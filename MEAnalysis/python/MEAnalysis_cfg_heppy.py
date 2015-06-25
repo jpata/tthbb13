@@ -15,8 +15,7 @@ def mu_baseline(mu):
         mu.dxy < 0.2 and
         mu.dz < 0.5 and
         mu.globalTrackChi2 < 10 and
-        #mu.nMuonHits > 0 and
-        mu.nChamberHits > 0 and
+        (getattr(mu, "nMuonHits", 0) > 0 or getattr(mu, "nChamberHits", 0) > 0) and #the name of the branch changed between v11 and v12 
         mu.pixelHits > 0 and
         mu.nStations > 1 #FIXME: is this the same as nMuonHits
     )
@@ -248,7 +247,7 @@ class Conf:
     general = {
         "controlPlotsFileOld": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsTEST.root",
         "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV6.root",
-        "sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_prev12.py",
+        "sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_722sync.py",
         "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions.pickle",
         #"systematics": ["nominal"],
         "systematics": ["nominal", "JESUp", "JESDown", "raw"],
