@@ -145,7 +145,7 @@ htt_branches = ["pt", "mass", "fRec",
                 "tau1filt", "tau2filt", "tau3filt", 
                 "qweight", "qepsilon", "qsigmam"]
 
-cmstt_branches = ["pt", "mass", "minMass", "wMass", "topMass", "nSubJets"]
+cmstt_branches = ["pt", "mass", "minMass", "wMass", "topMass", "nSubJets", "sj__btag"]
 
 ########################################
 # Prepare input/output
@@ -160,29 +160,43 @@ li_fatjets =  [b.replace("jet_","") for b in branches_in_input if len(b.split("_
 li_fatjets = [b.replace("__pt","") for b in li_fatjets]
 if '_pt' in li_fatjets:
     li_fatjets.remove("_pt")
-
+li_fatjets = [x for x in li_fatjets if not "cmstt_sj" in x]
 
 # Generic
 objects = {}
 for fj in li_fatjets:
+    print "Adding", fj
     objects[fj] = fj_branches
+
+
     
 # HEPTopTagger
 for htt in li_htt_branches:
+    print "Adding", htt
     objects[htt]                = htt_branches
+
+print li_htt_branches
 
 # And some extras
 for x in ["ak08", "ca08", "ca15"]:
     if x in objects.keys():
+        print "Adding", x
         objects[x] = fj_branches_plus
+
+print "snip"
 
 for x in ["ak08cmstt", "ca08cmstt", "ca15cmstt"]:
     if x in objects.keys():
+        print "Adding", x
         objects[x] = cmstt_branches
+
+
+print "snip"
 
 # Subjet b-tagging
 for k,v in objects.iteritems():
     if "forbtag" in k:
+        print "Adding", k
         objects[k] = fj_branches_btag
 
 
@@ -238,13 +252,20 @@ AH.addScalarBranches(variables, variable_types, outtree,
                       "w2_pt", "w2_eta", "w2_phi", "w2_mass"],
                      datatype = 'float')
 
+
+
 # Setup the output branches for tagging variables
 objects_to_pop = []
 for object_name, branch_names in objects.iteritems():    
     for branch_name in branch_names:
 
-        full_branch_in  = "jet_{0}__{1}".format(object_name, branch_name)
-        full_branch_out =  "{0}_{1}".format(object_name, branch_name)
+        if "sj__btag" in branch_name:
+            full_branch_in  = "jet_{0}_{1}".format(object_name, branch_name)
+            full_branch_out =  "{0}_sj_btag".format(object_name)
+        else:
+            full_branch_in  = "jet_{0}__{1}".format(object_name, branch_name)
+            full_branch_out =  "{0}_{1}".format(object_name, branch_name)
+
 
         if full_branch_in in branches_in_input:
             AH.addScalarBranches( variables,
@@ -447,13 +468,70 @@ for i_event in range(n_entries):
 
                     variables["dr"][0] = closest_dr_and_pos[0]
                     for branch_name in branch_names:
-                        full_branch_in  = "jet_{0}__{1}".format(object_name, branch_name)
-                        full_branch_out = "{0}_{1}".format(object_name, branch_name)
-                        variables[full_branch_out][0] = AH.getter(intree, full_branch_in)[i_matched]                    
+
+                        #subjet b-tagging for cmstt branches
+                        if "sj__btag" in branch_name:
+                            full_branch_in = "jet_{0}_sj__btag".format(object_name)
+                            full_branch_out = "{0}_sj_btag".format(object_name)
+                            nsub_start = -3
+                            subj_count = 0
+                            btag_max = -1
+
+                            #print ""
+
+                            #looping over cmstt jets
+                            n_cmstt_particles = len(AH.getter( intree, "jet_{0}__pt".format(object_name)))
+
+                            for i_cmstt in range(n_cmstt_particles):
+                                #looping over subjets
+                                n_cmstt_subjets = AH.getter(intree,"jet_{0}__nSubJets".format(object_name))[i_cmstt]
+
+                                #print "Number of particle {0} subjets: {1}".format(i_cmstt, n_cmstt_subjets)
+
+                                for i_cmsttSubj in range(n_cmstt_subjets):
+                                    if ((nsub_start == -3) and i_cmstt == i_matched):
+                                        nsub_start = subj_count
+                                    subj_count+=1
+
+                            n_matched_subjets = AH.getter(intree,"jet_{0}__nSubJets".format(object_name))[i_matched]
+                            matched_subjets_end = nsub_start + n_matched_subjets - 1
+                            
+                            #print "Matched jet is particle number ", i_matched
+                            #print "Number of subjets for matched jet: ",  n_matched_subjets
+                            #print "Matched jet starts with subjet number ", nsub_start
+                            #print "Matched jet ends with subjet number ", matched_subjets_end 
+
+                            #looping over subjet b-tags
+                            if (nsub_start != -3) and (n_matched_subjets > 0):
+                                for i_sub in range(nsub_start,matched_subjets_end + 1):
+                                    cmstt_SubjetBtag = AH.getter(intree,"jet_{0}_sj__btag".format(object_name))[i_sub]
+                                    #print "On subjet ", i_sub
+                                    #print "Subjet {0} has a b-tag score of {1}".format(i_sub,cmstt_SubjetBtag)
+                                    if cmstt_SubjetBtag > btag_max:
+                                        #print "Subjet {0} is winning with a b-tag score of {1}, which is greater than the previous score of {2}".format(i_sub,cmstt_SubjetBtag,btag_max)
+                                        btag_max = cmstt_SubjetBtag
+                                        
+                                #print "The maximum b-tag score for the matched jet is ", btag_max
+                            
+                                #filling cmstt btags
+                                variables[full_branch_out][0] = btag_max
+
+                            else:
+                                variables[full_branch_out][0] = DEF_VAL_FLOAT
+                            # Done handling sj__btag
+                            
+                        else:
+                            full_branch_in  = "jet_{0}__{1}".format(object_name, branch_name)
+                            full_branch_out = "{0}_{1}".format(object_name, branch_name)
+                            variables[full_branch_out][0] = AH.getter(intree, full_branch_in)[i_matched]                    
                 else:
                     variables["dr"][0] = 9999.
                     for branch_name in branch_names:
-                        full_branch_out = "{0}_{1}".format(object_name, branch_name)
+                        if "sj__btag" in branch_name:
+                            full_branch_out = "{0}_sj_btag".format(object_name)
+                        else:
+                            full_branch_out = "{0}_{1}".format(object_name, branch_name)
+
                         variables[full_branch_out][0] = DEF_VAL_FLOAT
 
         # end of loop over objects

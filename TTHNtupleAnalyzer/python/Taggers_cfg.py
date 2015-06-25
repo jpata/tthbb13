@@ -178,11 +178,10 @@ def GetRadiusStringFromName(name):
       print "Invalid jet radius!"
       sys.exit()
 
-
 def GetAlgoFromName(name):       
-   if ("ca08" in name) or ("ca15" in name):
+   if ("ca08" in name.lower()) or ("ca15" in name.lower()):
       return "ca"
-   elif "ak08" in name:
+   elif "ak08" in name.lower():
       return "ak"
    else:
       print "Invalid jet algorithm!"
@@ -203,6 +202,20 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
    #####################################
    # Trimming (for btag)
    #####################################
+
+   name = "trimmedr2f3forbtag"   
+   fj_name = ungroomed_fj_name + name
+   branch_name = ungroomed_branch_name + name
+   setattr(process, fj_name, ungroomed_fj.clone(
+      useTrimming = cms.bool(True),
+      rFilt = cms.double(0.2),
+      trimPtFracMin = cms.double(0.03),
+      useExplicitGhosts = cms.bool(True),
+      writeCompound = cms.bool(True),
+      jetCollInstanceName=cms.string("SubJets"),
+   ))
+   li_fatjets_objects.append(fj_name)        
+   li_fatjets_branches.append(branch_name)
 
    name = "trimmedr2f6forbtag"   
    fj_name = ungroomed_fj_name + name
@@ -262,7 +275,37 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
    li_fatjets_objects.append(fj_name)        
    li_fatjets_branches.append(branch_name)
 
-   
+   name = "filteredn3r3forbtag"   
+   fj_name = ungroomed_fj_name + name
+   branch_name = ungroomed_branch_name + name
+   setattr(process, fj_name, ungroomed_fj.clone(
+      useFiltering = cms.bool(True),
+      nFilt = cms.int32(3),
+      rFilt = cms.double(0.3),
+      useExplicitGhosts = cms.bool(True),
+      writeCompound = cms.bool(True),
+      jetCollInstanceName=cms.string("SubJets")
+   ))
+   li_fatjets_objects.append(fj_name)        
+   li_fatjets_branches.append(branch_name)
+
+   name = "prunedn3z10rfac50forbtag"   
+   fj_name = ungroomed_fj_name + name
+   branch_name = ungroomed_branch_name + name
+   setattr(process, fj_name, ungroomed_fj.clone(
+      usePruning = cms.bool(True),
+      nFilt = cms.int32(3),
+      zcut = cms.double(0.1),
+      rcut_factor = cms.double(0.5),
+      useExplicitGhosts = cms.bool(True),
+      writeCompound = cms.bool(True),
+      jetCollInstanceName=cms.string("SubJets")
+   ))
+   li_fatjets_objects.append(fj_name)        
+   li_fatjets_branches.append(branch_name)
+
+
+
    #####################################
    # Filtering
    #####################################
@@ -274,6 +317,17 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
         useFiltering = cms.bool(True),
         nFilt = cms.int32(3),
         rFilt = cms.double(0.2),
+        useExplicitGhosts = cms.bool(True)))
+   li_fatjets_objects.append(fj_name)        
+   li_fatjets_branches.append(branch_name)
+
+   name = "filteredn3r3"
+   fj_name = ungroomed_fj_name + name
+   branch_name = ungroomed_branch_name + name
+   setattr(process, fj_name, ungroomed_fj.clone(
+        useFiltering = cms.bool(True),
+        nFilt = cms.int32(3),
+        rFilt = cms.double(0.3),
         useExplicitGhosts = cms.bool(True)))
    li_fatjets_objects.append(fj_name)        
    li_fatjets_branches.append(branch_name)
@@ -562,88 +616,6 @@ for i_fj, fj_name in enumerate(li_fatjets_objects):
            li_fatjets_qvols.append('None')
 
 
-#####################################
-# b-tagging
-#####################################
-
-# Add b-tagging information for all fatjets
-process.my_btagging = cms.Sequence()
-li_fatjets_btags = []
-
-
-for fatjet_name in li_fatjets_objects:
-
-   if "forbtag" in fatjet_name:
-
-      # Define the names
-      impact_info_name          = fatjet_name + "ImpactParameterTagInfos"
-      isv_info_name             = fatjet_name + "pfInclusiveSecondaryVertexFinderTagInfos"        
-      csvv2_computer_name       = fatjet_name + "combinedSecondaryVertexV2Computer"
-      csvv2ivf_name             = fatjet_name + "pfCombinedInclusiveSecondaryVertexV2BJetTags"        
-
-      delta_r = GetRadiusFromName(fatjet_name)
-
-      # Setup the modules
-      setattr(process, 
-              impact_info_name, 
-              process.pfImpactParameterTagInfos.clone(
-                 primaryVertex = cms.InputTag("offlineSlimmedPrimaryVertices"),
-                 candidates = cms.InputTag("packedPFCandidates"),
-                 jets = cms.InputTag(fatjet_name, "SubJets"),
-              ))
-      getattr(process, impact_info_name).explicitJTA = cms.bool(True)
-      
-      setattr(process,
-              isv_info_name,                
-              process.pfInclusiveSecondaryVertexFinderTagInfos.clone(
-                 extSVCollection               = cms.InputTag('slimmedSecondaryVertices'),
-                 trackIPTagInfos               = cms.InputTag(impact_info_name),                
-              ))
-      getattr(process, isv_info_name).useSVClustering = cms.bool(True)
-
-      if GetAlgoFromName(fatjet_name) == "ca":
-         getattr(process, isv_info_name).jetAlgorithm = cms.string("CambridgeAachen")
-      elif GetAlgoFromName(fatjet_name) == "ak":
-         getattr(process, isv_info_name).jetAlgorithm = cms.string("AntiKt")
-
-      original_fatjet_name = fatjet_name
-      original_fatjet_name = original_fatjet_name.replace("trimmedr2f6forbtag","")
-      original_fatjet_name = original_fatjet_name.replace("softdropz10b00forbtag","")
-      original_fatjet_name = original_fatjet_name.replace("softdropz20b10forbtag","")
-      original_fatjet_name = original_fatjet_name.replace("filteredn3r2forbtag","")
-      
-      getattr(process, isv_info_name).rParam = cms.double(delta_r)
-      getattr(process, isv_info_name).fatJets  =  cms.InputTag(original_fatjet_name)
-      getattr(process, isv_info_name).groomedFatJets  =  cms.InputTag(fatjet_name)
-
-      setattr(process,
-              csvv2_computer_name,
-              process.candidateCombinedSecondaryVertexV2Computer.clone())
-      
-      setattr(process,
-              csvv2ivf_name,
-              process.pfCombinedInclusiveSecondaryVertexV2BJetTags.clone(
-                 tagInfos = cms.VInputTag(cms.InputTag(impact_info_name),
-                                          cms.InputTag(isv_info_name)),
-                 jetTagComputer = cms.string(csvv2_computer_name,)
-              ))
-      
-      # Add modules to sequence
-      for module_name in [impact_info_name,
-                          isv_info_name,              
-                          csvv2ivf_name]:              
-         process.my_btagging += getattr(process, module_name)
-         
-      # remember the module that actually produces the b-tag
-      # discriminator so we can pass it to the NTupelizer
-      li_fatjets_btags.append(csvv2ivf_name)
-         
-   else:
-      li_fatjets_btags.append("None")
-
-
-# end of loop over fatjets
-
 
 #####################################
 # CMS Top Tagger
@@ -662,8 +634,10 @@ if DO_R08:
            CATopJetParameters,
            jetAlgorithm = cms.string("CambridgeAachen"), # CA is correct here! We already run on AK constituents! see below..
            rParam = cms.double(0.8),
-           writeCompound = cms.bool(True))
+           writeCompound = cms.bool(True),           
+   )
 
+   process.cmsTopTagAk08PFJetsCHS.jetCollInstanceName = cms.string("SubJets")
    process.cmsTopTagAk08PFJetsCHS.src = cms.InputTag("ak8PFJetsCHSConstituents", "constituents")
    process.cmsTopTagAk08PFJetsCHS.doAreaFastjet = cms.bool(True)
    process.cmsTopTagAk08PFJetsCHS.jetPtMin = cms.double(200.0)
@@ -685,8 +659,7 @@ if DO_R08:
    li_cmstt_branches.append("ak08cmstt")
 
 
-   # CA, R=0.8 CMSTT
-           
+   # CA, R=0.8 CMSTT           
    process.cmsTopTagCa08PFJetsCHS = cms.EDProducer(
            "CATopJetProducer",
            PFJetParameters,
@@ -694,11 +667,14 @@ if DO_R08:
            CATopJetParameters,
            jetAlgorithm = cms.string("CambridgeAachen"),
            rParam = cms.double(0.8),
-           writeCompound = cms.bool(True))
+           writeCompound = cms.bool(True),
+   )
 
+   process.cmsTopTagCa08PFJetsCHS.jetCollInstanceName = cms.string("SubJets")
    process.cmsTopTagCa08PFJetsCHS.src = cms.InputTag('chs')
    process.cmsTopTagCa08PFJetsCHS.doAreaFastjet = cms.bool(True)
    process.cmsTopTagCa08PFJetsCHS.jetPtMin = cms.double(200.0)
+
 
    process.ca08CMSTopTagInfos = cms.EDProducer("CATopJetTagger",
                                                src = cms.InputTag("cmsTopTagCa08PFJetsCHS"),
@@ -710,7 +686,8 @@ if DO_R08:
                                                WMassMax = cms.double(200.0),
                                                MinMassMin = cms.double(0.0),
                                                MinMassMax = cms.double(200.0),
-                                               verbose = cms.bool(False))
+                                               verbose = cms.bool(False),
+   )
 
    li_cmstt_objects.append("cmsTopTagCa08PFJetsCHS")
    li_cmstt_infos.append("ca08CMSTopTagInfos")
@@ -725,8 +702,9 @@ if DO_R15:
            CATopJetParameters,
            jetAlgorithm = cms.string("CambridgeAachen"),
            rParam = cms.double(1.5),
-           writeCompound = cms.bool(True)
-       )
+           writeCompound = cms.bool(True),
+    )
+   process.cmsTopTagCa15PFJetsCHS.jetCollInstanceName = cms.string("SubJets")
    process.cmsTopTagCa15PFJetsCHS.src = cms.InputTag('chs')
    process.cmsTopTagCa15PFJetsCHS.doAreaFastjet = cms.bool(True)
    process.cmsTopTagCa15PFJetsCHS.jetPtMin = cms.double(200.0)
@@ -741,13 +719,112 @@ if DO_R15:
                                                WMassMax = cms.double(200.0),
                                                MinMassMin = cms.double(0.0),
                                                MinMassMax = cms.double(200.0),
-                                               verbose = cms.bool(False))
+                                               verbose = cms.bool(False),
+   )
 
    li_cmstt_objects.append("cmsTopTagCa15PFJetsCHS")
    li_cmstt_infos.append("ca15CMSTopTagInfos")
    li_cmstt_branches.append("ca15cmstt")
 
 
+#####################################
+# b-tagging
+#####################################
+
+# Add b-tagging information for all fatjets
+process.my_btagging = cms.Sequence()
+
+
+li_fatjets_btags = []
+li_cmstt_btags = []
+
+
+for collection in ["fatjets", "cmstt"]:
+
+   if collection == "fatjets":
+      input_list = li_fatjets_objects
+      output_list = li_fatjets_btags
+   elif collection == "cmstt":
+      input_list = li_cmstt_objects
+      output_list = li_cmstt_btags
+
+   for fatjet_name in input_list:
+
+      if (collection == "fatjets" and "forbtag" in fatjet_name) or (collection == "cmstt"):
+
+         # Define the names
+         impact_info_name          = fatjet_name + "ImpactParameterTagInfos"
+         isv_info_name             = fatjet_name + "pfInclusiveSecondaryVertexFinderTagInfos"        
+         csvv2_computer_name       = fatjet_name + "combinedSecondaryVertexV2Computer"
+         csvv2ivf_name             = fatjet_name + "pfCombinedInclusiveSecondaryVertexV2BJetTags"        
+
+         delta_r = GetRadiusFromName(fatjet_name)
+
+         # Setup the modules
+         setattr(process, 
+                 impact_info_name, 
+                 process.pfImpactParameterTagInfos.clone(
+                    primaryVertex = cms.InputTag("offlineSlimmedPrimaryVertices"),
+                    candidates = cms.InputTag("packedPFCandidates"),
+                    jets = cms.InputTag(fatjet_name, "SubJets"),
+                 ))
+         getattr(process, impact_info_name).explicitJTA = cms.bool(True)
+
+         setattr(process,
+                 isv_info_name,                
+                 process.pfInclusiveSecondaryVertexFinderTagInfos.clone(
+                    extSVCollection               = cms.InputTag('slimmedSecondaryVertices'),
+                    trackIPTagInfos               = cms.InputTag(impact_info_name),                
+                 ))
+         getattr(process, isv_info_name).useSVClustering = cms.bool(True)
+
+         if GetAlgoFromName(fatjet_name) == "ca":
+            getattr(process, isv_info_name).jetAlgorithm = cms.string("CambridgeAachen")
+         elif GetAlgoFromName(fatjet_name) == "ak":
+            getattr(process, isv_info_name).jetAlgorithm = cms.string("AntiKt")
+
+         original_fatjet_name = fatjet_name
+         original_fatjet_name = original_fatjet_name.replace("trimmedr2f6forbtag","")
+         original_fatjet_name = original_fatjet_name.replace("softdropz10b00forbtag","")
+         original_fatjet_name = original_fatjet_name.replace("softdropz20b10forbtag","")
+         original_fatjet_name = original_fatjet_name.replace("filteredn3r2forbtag","")
+         original_fatjet_name = original_fatjet_name.replace("filteredn3r3forbtag","")
+         original_fatjet_name = original_fatjet_name.replace("prunedn3z10rfac50forbtag","")
+         original_fatjet_name = original_fatjet_name.replace("cmsTopTagCa08PFJetsCHS","ca08PFJetsCHS")
+         original_fatjet_name = original_fatjet_name.replace("cmsTopTagCa15PFJetsCHS","ca15PFJetsCHS")
+         original_fatjet_name = original_fatjet_name.replace("cmsTopTagAk08PFJetsCHS","ak08PFJetsCHS")
+
+         getattr(process, isv_info_name).rParam = cms.double(delta_r)
+         getattr(process, isv_info_name).fatJets  =  cms.InputTag(original_fatjet_name)
+         getattr(process, isv_info_name).groomedFatJets  =  cms.InputTag(fatjet_name)
+
+         setattr(process,
+                 csvv2_computer_name,
+                 process.candidateCombinedSecondaryVertexV2Computer.clone())
+
+         setattr(process,
+                 csvv2ivf_name,
+                 process.pfCombinedInclusiveSecondaryVertexV2BJetTags.clone(
+                    tagInfos = cms.VInputTag(cms.InputTag(impact_info_name),
+                                             cms.InputTag(isv_info_name)),
+                    jetTagComputer = cms.string(csvv2_computer_name,)
+                 ))
+
+         # Add modules to sequence
+         for module_name in [impact_info_name,
+                             isv_info_name,              
+                             csvv2ivf_name]:              
+            process.my_btagging += getattr(process, module_name)
+
+         # remember the module that actually produces the b-tag
+         # discriminator so we can pass it to the NTupelizer
+         output_list.append(csvv2ivf_name)
+
+      else:
+         output_list.append("None")
+
+   # end of loop over fatjets
+# end of loop over collections
 
 #####################################
 #  HEPTopTagger
@@ -892,6 +969,7 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
         cmsttObjects  = cms.vstring(li_cmstt_objects),
         cmsttInfos    = cms.vstring(li_cmstt_infos),
         cmsttBranches = cms.vstring(li_cmstt_branches),
+        cmsttBtags    = cms.vstring(li_cmstt_btags),
 
 	jetMult_min   = cms.untracked.int32(-99),
 	jetPt_min     = cms.untracked.double(15.),
@@ -922,10 +1000,15 @@ process.TFileService = cms.Service("TFileService",
 
 process.p = cms.Path(process.chs)
 
+# Schedule AK08 Constituents
+if DO_R08:
+   process.p += process.ak08PFJetsCHS
+   process.p += process.ak8PFJetsCHSConstituents
 
 # Schedule all fatjets
-for fj_name in li_fatjets_objects:
-   process.p += getattr(process, fj_name)
+for fj_name in li_fatjets_objects:   
+   if not fj_name == "ak08PFJetsCHS": # Already added that before because we need it for AK08 Constituents
+      process.p += getattr(process, fj_name)
 
 # Schedule NSubjettiness
 for nsub_name in li_fatjets_nsubs:
@@ -952,15 +1035,11 @@ for sd_name in li_fatjets_sds:
 for htt_name in li_htt_branches:
    process.p += getattr(process, htt_name)
 
-# Schedule AK08 Constituents
-if DO_R08:
-   process.p += process.ak8PFJetsCHSConstituents
-
 # Schedule CMS Top Tagger
 for x in li_cmstt_objects + li_cmstt_infos:
    process.p += getattr(process, x)
 
-# Schedule HEPTopTagger, b-tagging and Ntupelizer
+# Schedule b-tagging and Ntupelizer
 for x in [process.my_btagging,
           process.tthNtupleAnalyzer]:
    process.p += x

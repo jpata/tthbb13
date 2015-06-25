@@ -258,14 +258,20 @@ void fill_fatjet_branches(const edm::Event& iEvent,
 
   // b-tag discriminators handle
   edm::Handle<reco::JetTagCollection> btagDiscriminators;
-  if (fj_btags_name != "None")
+  if (fj_btags_name != "None"){
     iEvent.getByLabel(fj_btags_name, btagDiscriminators);
+    
+    std::cout << fatjets->size() << "  " << btagDiscriminators->size() << std::endl;
+
+  }
 
   // Q-jet volatility handle
   edm::Handle<edm::ValueMap<float> > QjetVols;
   if (fj_qvols_name != "None")
     iEvent.getByLabel(fj_qvols_name,"QjetsVolatility", QjetVols);
 	  
+
+
   // Loop over fatjets
   for (unsigned n_fat_jet = 0; n_fat_jet != fatjets->size(); n_fat_jet++){
 	    
@@ -476,6 +482,7 @@ private:
 	const std::vector<std::string> cmstt_objects_;
 	const std::vector<std::string> cmstt_infos_;
 	const std::vector<std::string> cmstt_branches_;
+	const std::vector<std::string> cmstt_btags_;
 	
 	// LHE event product (may not be present!!)
 	const edm::EDGetTokenT<LHEEventProduct> lheToken_;
@@ -550,6 +557,7 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
         cmstt_objects_(iConfig.getParameter<std::vector<std::string>>("cmsttObjects")),
         cmstt_infos_(iConfig.getParameter<std::vector<std::string>>("cmsttInfos")),
         cmstt_branches_(iConfig.getParameter<std::vector<std::string>>("cmsttBranches")),
+        cmstt_btags_(iConfig.getParameter<std::vector<std::string>>("cmsttBtags")),
 							  
 	//Gen-level
 	lheToken_( (iConfig.getParameter<edm::InputTag>("lhe")).label()!="" ?
@@ -672,6 +680,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	// Sanity check the cmstt lists-of-names
 	assert(cmstt_objects_.size()==cmstt_branches_.size());
 	assert(cmstt_objects_.size()==cmstt_infos_.size());
+	assert(cmstt_objects_.size()==cmstt_btags_.size());
 	       
 	edm::Handle<edm::TriggerResults> triggerBits;
 	edm::Handle<pat::TriggerObjectStandAloneCollection> triggerObjects;
@@ -1675,6 +1684,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	  std::string cmstt_object_name   = cmstt_objects_[i_cmstt_coll];
 	  std::string cmstt_infos_name    = cmstt_infos_[i_cmstt_coll];
 	  std::string cmstt_branches_name = cmstt_branches_[i_cmstt_coll];
+	  std::string cmstt_btags_name     = cmstt_btags_[i_cmstt_coll];
  	  
 	  // Top tagger jets
 	  edm::Handle<edm::View<reco::BasicJet>> top_jets;
@@ -1683,9 +1693,14 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	  // Extra Info
 	  edm::Handle<edm::View<reco::CATopJetTagInfo>> top_jet_infos;
 	  iEvent.getByLabel(cmstt_infos_name, top_jet_infos);
-
+	  	  
 	  // Make sure both collections have the same size
 	  assert(top_jets->size()==top_jet_infos->size());
+
+	  // b-tag discriminators handle
+	  edm::Handle<reco::JetTagCollection> btagDiscriminators;
+	  if (cmstt_btags_name != "None")
+	    iEvent.getByLabel(cmstt_btags_name, btagDiscriminators);
 
 
 	  // Top jets and subjets are associated by indices. See:
@@ -1712,7 +1727,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	    tthtree->get_address<float *>(prefix + "wMass" )[n_top_jet] = jet_info.properties().wMass;
 	    tthtree->get_address<float *>(prefix + "topMass" )[n_top_jet] = jet_info.properties().topMass;
 	    tthtree->get_address<int   *>(prefix + "nSubJets" )[n_top_jet] = jet_info.properties().nSubJets;
-	   
+	   	    
 	    // Optional: Fill truth matching information
 	    if (ADD_TRUE_TOP_MATCHING_FOR_CMSTT)
 	      fill_truth_matching<reco::BasicJet>(tthtree, x, n_top_jet, hadronic_ts, prefix, "hadtop");
@@ -1740,6 +1755,11 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	      tthtree->get_address<float *>(prefix_sj + "phi" )[n_top_jet_subjet]  = constituent->phi();
 	      tthtree->get_address<float *>(prefix_sj + "mass" )[n_top_jet_subjet]  = constituent->mass();
 	      tthtree->get_address<float *>(prefix_sj + "energy" )[n_top_jet_subjet]  = constituent->energy();
+
+	      // B-tag
+	      if (cmstt_btags_name != "None"){
+		tthtree->get_address<float *>(prefix_sj + "btag")[n_top_jet_subjet] = (*btagDiscriminators)[n_top_jet_subjet].second;
+	      }
 
 	      tthtree->get_address<int *>(prefix_sj + "parent_idx" )[n_top_jet_subjet]  = n_top_jet;
 

@@ -260,12 +260,12 @@ cmstt_float_branches =  [
     "minMass", "wMass", "topMass",            # Standard CMSTT variables     
     "close_hadtop_pt",  "close_hadtop_dr",    # top truth matching
     "close_parton_pt",  "close_parton_dr",    # parton truth matching
-    "close_higgs_pt",   "close_higgs_dr",     # higgs truth matching
+    "close_higgs_pt",   "close_higgs_dr",     # higgs truth matching    
 ]
 
 cmstt_int_branches = ["child_idx", "nSubJets", "close_higgs_i", "close_parton_i", "close_hadtop_i"]
 
-cmstt_sj_float_branches =  ["energy", "eta", "mass", "phi", "pt"]
+cmstt_sj_float_branches =  ["energy", "eta", "mass", "phi", "pt", "btag"]
 
 cmstt_sj_int_branches =  ["parent_idx"]
 
