@@ -8,22 +8,53 @@ import numpy as np
 import multiprocessing
 
 class Sample:
-    def __init__(self, filenames):
+    def __init__(self, name, filenames):
+        self.name = name
         self.fileNamesS2 = filenames
 
 path = "/Users/joosep/Documents/tth/data/ntp/sync722/nome2/"
 
 samples_dict = {
-    "tth_13tev_amcatnlo_pu20bx25": Sample([path + "tth_13tev_amcatnlo_pu20bx25.root"]),
-    "tth_13tev_amcatnlo_pu20bx25_hbb": Sample([path + "tth_13tev_amcatnlo_pu20bx25_hbb.root"]),
-    "tth_13tev_amcatnlo_pu20bx25_hX": Sample([path + "tth_13tev_amcatnlo_pu20bx25_hX.root"]),
-    "ttjets_13tev_madgraph_pu20bx25_phys14_tt2b": Sample([path + "ttjets_13tev_madgraph_pu20bx25_phys14_tt2b.root"]),
-    "ttjets_13tev_madgraph_pu20bx25_phys14_ttb": Sample([path + "ttjets_13tev_madgraph_pu20bx25_phys14_ttb.root"]),
-    "ttjets_13tev_madgraph_pu20bx25_phys14_ttbb": Sample([path + "ttjets_13tev_madgraph_pu20bx25_phys14_ttbb.root"]),
-    "ttjets_13tev_madgraph_pu20bx25_phys14_ttcc": Sample([path + "ttjets_13tev_madgraph_pu20bx25_phys14_ttcc.root"]),
-    "ttjets_13tev_madgraph_pu20bx25_phys14_ttll": Sample([path + "ttjets_13tev_madgraph_pu20bx25_phys14_ttll.root"]),
-    "ttw_13tev_madgraph_pu20bx25_phys14": Sample([path + "ttw_13tev_madgraph_pu20bx25_phys14.root"]),
-    "ttz_13tev_madgraph_pu20bx25_phys14": Sample([path + "ttz_13tev_madgraph_pu20bx25_phys14.root"]),
+    "tth_13tev_amcatnlo_pu20bx25": Sample(
+        "ttH",
+        [path + "tth_13tev_amcatnlo_pu20bx25.root"]
+    ),
+    "tth_13tev_amcatnlo_pu20bx25_hbb": Sample(
+        "ttH_hbb",
+        [path + "tth_13tev_amcatnlo_pu20bx25_hbb.root"]
+    ),
+    "tth_13tev_amcatnlo_pu20bx25_hX": Sample(
+        "ttH_nohbb",
+        [path + "tth_13tev_amcatnlo_pu20bx25_hX.root"]
+    ),
+    "ttjets_13tev_madgraph_pu20bx25_phys14_tt2b": Sample(
+        "ttbarPlus2B",
+        [path + "ttjets_13tev_madgraph_pu20bx25_phys14_tt2b.root"]
+    ),
+    "ttjets_13tev_madgraph_pu20bx25_phys14_ttb": Sample(
+        "ttbarPlusB",
+        [path + "ttjets_13tev_madgraph_pu20bx25_phys14_ttb.root"]
+    ),
+    "ttjets_13tev_madgraph_pu20bx25_phys14_ttbb": Sample(
+        "ttbarPlusBBbar",
+        [path + "ttjets_13tev_madgraph_pu20bx25_phys14_ttbb.root"]
+    ),
+    "ttjets_13tev_madgraph_pu20bx25_phys14_ttcc": Sample(
+        "ttbarPlusCCbar",
+        [path + "ttjets_13tev_madgraph_pu20bx25_phys14_ttcc.root"]
+    ),
+    "ttjets_13tev_madgraph_pu20bx25_phys14_ttll": Sample(
+        "ttbarOther",
+        [path + "ttjets_13tev_madgraph_pu20bx25_phys14_ttll.root"]
+    ),
+    "ttw_13tev_madgraph_pu20bx25_phys14": Sample(
+        "ttbarW",
+        [path + "ttw_13tev_madgraph_pu20bx25_phys14.root"]
+    ),
+    "ttz_13tev_madgraph_pu20bx25_phys14": Sample(
+        "ttbarZ",
+        [path + "ttz_13tev_madgraph_pu20bx25_phys14.root"]
+    ),
 }
 
 samples = [
@@ -74,13 +105,25 @@ class Systematic(object):
 def gensyst(hfunc, hname, cut):
     systs = []
     for sname, weight in [
-            ("unw",             "1.0"),
-            ("bw",              "bTagWeight"),
-            ("corr",            "bTagWeight"),
-            ("JESUp",           "bTagWeight_JESUp"),
-            ("JESDown",         "bTagWeight_JESDown"),
-            ("bwLFUp",          "bTagWeight_LFUp"),
-            ("bwLFDown",        "bTagWeight_LFDown"),
+    
+            #no weights applied
+            ("unweighted",          "1.0"),
+            
+            #only b weight applied
+            #("bw",                  "bTagWeight"),
+            
+            #Use JES-corrected values
+            ("",                    "bTagWeight"),
+            
+            
+            #JES up/down
+            ("CMS_scale_jUp",       "bTagWeight_JESUp"),
+            ("CMS_scale_jDown",     "bTagWeight_JESDown"),
+            
+            #CSV LF up/down
+            ("CMS_ttH_CSVLFUp",     "bTagWeight_LFUp"),
+            ("CMS_ttH_CSVLFDown",   "bTagWeight_LFDown"),
+            #("bwLFDown",        "bTagWeight_LFDown"),
             # ("bwHFUp",          "bTagWeight_HFUp"),
             # ("bwHFDown",        "bTagWeight_HFDown"),
             # ("bwStats1Up",      "bTagWeight_Stats1Up"),
@@ -97,23 +140,23 @@ def gensyst(hfunc, hname, cut):
             for r1, r2 in repllist:
                 s = s.replace(r1, r2)
             return s
-        if s.name == "corr":
+            
+        #default, all corrections enabled
+        if s.name == "":
             repllist += [("mem_tth_p[0]", "mem_tth_JES_p[0]")]
             repllist += [("mem_tth_p[1]", "mem_tth_JES_p[1]")]
             repllist += [("mem_tth_p[2]", "mem_tth_JES_p[2]")]
             repllist += [("mem_ttbb_p[0]", "mem_ttbb_JES_p[0]")]
             repllist += [("mem_ttbb_p[1]", "mem_ttbb_JES_p[1]")]
             repllist += [("mem_ttbb_p[2]", "mem_ttbb_JES_p[2]")]
-        elif "JESUp" in s.name:
+        elif "CMS_scale_jUp" in s.name:
             repllist += [("numJets",    "numJets_JESUp")]
             repllist += [("nBCSVM",     "nBCSVM_JESUp")]
-            repllist += [("jets_pt[0]", "jets_corr_JESUp[0] * jets_pt[0]")]
-        elif "JESDown" in s.name:
+            repllist += [("jets_pt[0]", "jets_corr_JESUp[0]/jets_corr[0] * jets_pt[0]")]
+        elif "CMS_scale_jDown" in s.name:
             repllist += [("numJets",    "numJets_JESDown")]
             repllist += [("nBCSVM",     "nBCSVM_JESDown")]
-            repllist += [("jets_pt[0]", "jets_corr_JESDown[0] * jets_pt[0]")]
-        else:
-            repllist += [("jets_pt[0]", "jets_corr[0] * jets_pt[0]")]
+            repllist += [("jets_pt[0]", "jets_corr_JESDown[0]/jets_corr[0] * jets_pt[0]")]
         s.repllist = repllist
         s.varreplacement = lambda cut, r=repllist: replacer(cut, r)
         
@@ -150,10 +193,13 @@ def Draw(tf, of, gensyst, *args):
     for syst in gensyst(hfunc, hname, cuts):
         
         replacer = getattr(syst, "varreplacement", lambda c: c)
-        hname_new = hname + "_" + syst.name
+        if len(syst.name)>0:
+            hname_new = hname + "_" + syst.name
+        else:
+            hname_new = hname
         hfunc_new = replacer(hfunc)
         cuts_new = replacer(cuts)
-        if syst.name == "unw":
+        if syst.name == "unweighted":
             cut_new = cuts_new
         else:
             cut_new = weight_str(cuts_new, getattr(syst, "weight", "1.0"))
@@ -200,69 +246,27 @@ for sample in samples:
 
     #weight = "genWeight"
     of.cd()
-    d = of.mkdir(sample)
-    d.cd()
-    Draw(tf, d, gensyst, "is_sl >> nsl(2,0,2)", "1")
-    Draw(tf, d, gensyst, "is_dl >> ndl(2,0,2)", "1")
+    
+    sampled = of.mkdir(samples_dict[sample].name)
+    sampled.cd()
 
     for lep, lepcut in [("sl", "(is_sl==1 && passPV==1)"), ("dl", "(is_dl==1 && passPV==1)")]:
-        print lep
-        d.cd()
-        lepd = d.mkdir(lep)
-        lepd.cd()
-        # Draw(tf, lepd, gensyst, "leps_pt[0] >> lep0_pt(30,0,300)", lepcut)
-        # Draw(tf, lepd, gensyst, "leps_eta[0] >> lep0_eta(30,-5,5)", lepcut)
-        # 
-        # Draw(tf, lepd, gensyst, "leps_pt[1] >> lep1_pt(30,0,300)", lepcut)
-        # Draw(tf, lepd, gensyst, "leps_eta[1] >> lep1_eta(30,-5,5)", lepcut)
-        # 
-        # Draw(tf, lepd, gensyst, "leps_pdgId[0] >> lep0_pdgId(32,-16,16)", lepcut)
-        # if lep == "dl":
-        #     Draw(tf, lepd, gensyst, "leps_pdgId[1] >> lep1_pdgId(32,-16,16)", lepcut)
-        # 
-        # Draw(tf, lepd, gensyst, "numJets >> njets(15,0,15)", lepcut)
-        # Draw(tf, lepd, gensyst, "nBCSVM >> ntags(15,0,15)", lepcut)
-        # 
-        Draw(tf, lepd, gensyst, "nBCSVM:numJets >> njets_nBCSVM(15,0,15,15,0,15)", lepcut)
-        # 
-        # Draw(tf, lepd, gensyst, "jets_pt[0] >> jet0_pt(30,0,600)", lepcut)
-        # Draw(tf, lepd, gensyst, "jets_eta[0] >> jet0_eta(30,-5,5)", lepcut)
-        # 
-        # Draw(tf, lepd, gensyst, "jets_pt[1] >> jet1_pt(30,0,600)", lepcut)
-        # Draw(tf, lepd, gensyst, "jets_eta[1] >> jet1_eta(30,-5,5)", lepcut)
-        # Draw(tf, lepd, gensyst, "(100*nMatch_wq + 10*nMatch_hb + nMatch_tb) >> nMatch(300,0,300)", lepcut)
-        # Draw(tf, lepd, gensyst, "(100*nMatch_wq_btag + 10*nMatch_hb_btag + nMatch_tb_btag) >> nMatch_btag(300,0,300)", lepcut)
         for jet_tag, jettagcut in [
-                # ("cat1H", "cat==1 && cat_btag==1"),
-                # ("cat2H", "cat==2 && cat_btag==1"),
-                # ("cat3H", "cat==3 && cat_btag==1"),
-                # 
-                # ("cat6Hee", "nleps==2 && (abs(leps_pdgId[0]) + abs(leps_pdgId[1]))==22 && cat==6 && cat_btag==1"),
-                # ("cat6Hem", "nleps==2 && (abs(leps_pdgId[0]) + abs(leps_pdgId[1]))==24 && cat==6 && cat_btag==1"),
-                # ("cat6Hmm", "nleps==2 && (abs(leps_pdgId[0]) + abs(leps_pdgId[1]))==26 && cat==6 && cat_btag==1"),
-        
-                #("cat1L", "cat==1 && cat_btag==0"),
-                #("cat2L", "cat==2 && cat_btag==0"),
-                #("cat3L", "cat==3 && cat_btag==0"),
-        
-                #("cat6Lee", "nleps==2 && (abs(leps_pdgId[0]) + abs(leps_pdgId[1]))==22 && cat==6 && cat_btag==0"),
-                #("cat6Lem", "nleps==2 && (abs(leps_pdgId[0]) + abs(leps_pdgId[1]))==24 && cat==6 && cat_btag==0"),
-                #("cat6Lmm", "nleps==2 && (abs(leps_pdgId[0]) + abs(leps_pdgId[1]))==26 && cat==6 && cat_btag==0"),
-                
-                ("3j2t", "numJets==3 && nBCSVM==2"),
-                ("3plusj3t", "numJets>=3 && nBCSVM==3"),
-                ("4plusj2t", "numJets>=4 && nBCSVM==2"),
-                ("4plusj4plust", "numJets>=4 && nBCSVM>=4"),
+
+                ("j3_t2", "numJets==3 && nBCSVM==2"),
+                ("jge3_tge3", "numJets>=3 && nBCSVM==3"),
+                ("jge4_t2", "numJets>=4 && nBCSVM==2"),
+                ("jge4_tge4", "numJets>=4 && nBCSVM>=4"),
 
                 #("4j", "numJets==4"),
-                ("4j3t", "numJets==4 && nBCSVM==3"),
-                ("4j4t", "numJets==4 && nBCSVM==4"),
+                ("j4_t3", "numJets==4 && nBCSVM==3"),
+                ("j4_t4", "numJets==4 && nBCSVM==4"),
 
                 #("5j", "numJets==5"),
                 #("5jL", "numJets==5 && nBCSVM<3"),
-                ("5j3t", "numJets==5 && nBCSVM==3"),
+                ("j5_t3", "numJets==5 && nBCSVM==3"),
                 #("5j4t", "numJets==5 && nBCSVM==4"),
-                ("5j4plust", "numJets==5 && nBCSVM>=4"),
+                ("j5_tge4", "numJets==5 && nBCSVM>=4"),
                 #("5jH", "numJets==5 && nBCSVM>4"),
                 
                 #("6j", "numJets==6"),
@@ -272,38 +276,25 @@ for sample in samples:
                 #("6jH", "numJets==6 && nBCSVM>4"),
                 
                 #("6plusj", "numJets>=6"),
-                ("6plusj2t", "numJets>=6 && nBCSVM==2"),
-                ("6plusj3t", "numJets>=6 && nBCSVM==3"),
+                ("jge6_t2", "numJets>=6 && nBCSVM==2"),
+                ("jge6_t3", "numJets>=6 && nBCSVM==3"),
                 #("6plusj4t", "numJets>=6 && nBCSVM==4"),
-                ("6plusj4plust", "numJets>=6 && nBCSVM>=4"),
+                ("jge6_tge4", "numJets>=6 && nBCSVM>=4"),
                 #("6plusjH", "numJets>=6 && nBCSVM>4"),
-                
-                #("7j", "numJets==7"),
-                #("7jL", "numJets==7 && nBCSVM<3"),
-                #("7j3t", "numJets==7 && nBCSVM==3"),
-                #("7j4t", "numJets==7 && nBCSVM==4"),
-                #("7jH", "numJets==7 && nBCSVM>4"),
-        
-        #         ("8plusj", "njets>=8"),
-        #         ("8plusjL", "njets>=8 && nBCSVM<3"),
-        #         ("8plusj3t", "njets>=8 && nBCSVM==3"),
-        #         ("8plusj4t", "njets>=8 && nBCSVM==4"),
-        #         ("8plusjH", "njets>=8 && nBCSVM>4"),
             ]:
             print jet_tag
             
             lepjetcut = " && ".join([lepcut, jettagcut])
-            lepd.cd()
-            jetd = lepd.mkdir(jet_tag)
+            jetd = sampled.mkdir(lep + "_" + jet_tag)
 
-            #Draw(tf, jetd, gensyst, "nBCSVM:numJets >> njets_nBCSVM(15,0,15,15,0,15)", lepjetcut)
+            Draw(tf, jetd, gensyst, "nBCSVM:numJets >> njets_ntags(15,0,15,15,0,15)", lepjetcut)
 
             Draw(tf, jetd, gensyst, "jets_pt[0] >> jet0_pt(20,20,500)", lepjetcut)
             #Draw(tf, jetd, gensyst, "jets_pt[1] >> jet1_pt(20,20,500)", lepjetcut)
 
             #Draw(tf, jetd, gensyst, "jets_eta[0] >> jet0_eta(30,-5,5)", lepjetcut)
 
-            Draw(tf, jetd, gensyst, "jets_btagCSV[0] >> jet0_btagCSV(22, -0.1, 1)", lepjetcut)
+            Draw(tf, jetd, gensyst, "jets_btagCSV[0] >> jet0_csvv2(22, -0.1, 1)", lepjetcut)
         
             #Draw(tf, jetd, gensyst, "leps_pt[0] >> lep0_pt(30,0,300)", lepjetcut)
             #Draw(tf, jetd, gensyst, "leps_eta[0] >> lep0_eta(30,-5,5)", lepjetcut)
@@ -331,11 +322,10 @@ for sample in samples:
             #             cut
             #         )
             # 
-            # jetd.Write()
+            jetd.Write()
 
         
-        lepd.Write()
-    d.Write()
+    sampled.Write()
 
 
 print "writing"
