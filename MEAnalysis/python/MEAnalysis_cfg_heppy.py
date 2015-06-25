@@ -15,7 +15,8 @@ def mu_baseline(mu):
         mu.dxy < 0.2 and
         mu.dz < 0.5 and
         mu.globalTrackChi2 < 10 and
-        mu.nMuonHits > 0 and
+        #mu.nMuonHits > 0 and
+        mu.nChamberHits > 0 and
         mu.pixelHits > 0 and
         mu.nStations > 1 #FIXME: is this the same as nMuonHits
     )
@@ -257,10 +258,10 @@ class Conf:
         # "gen" - print out the ttH gen-level particles (b from top, b form higgs, q from W, leptons
         # "reco" - print out the reco-level selected particles
         # "matching" - print out the association between gen and reco objects
-        "verbosity": ["eventboundary", "input", "matching", "gen", "reco", "meminput"],
-        #"verbosity": [
-        #    #"meminput"
-        #],
+        #"verbosity": ["eventboundary", "input", "matching", "gen", "reco", "meminput"],
+        "verbosity": [
+            #"meminput"
+        ],
 
 
         #"eventWhitelist": [
