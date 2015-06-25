@@ -1,6 +1,6 @@
 export SCRAM_ARCH=slc6_amd64_gcc491
 
-scram project -n CMSSW CMSSW CMSSW_7_4_3
+scram project -n CMSSW CMSSW CMSSW_7_4_5
 cd CMSSW/src/
 cmsenv
 
@@ -18,9 +18,10 @@ cp TTH/MEAnalysis/libs/*.so ../lib/$SCRAM_ARCH/
 git checkout -b merge
 #Get the vhbb-heppy code
 
-git cms-merge-topic vhbb:vhbbHeppy743
+git cms-merge-topic vhbb:vhbbHeppy74X
 ##Get the fixed TChain code for vhbb
-git cms-merge-topic jpata:heppy-tchain-lfn-74x
+#no longer needed in 745
+#git cms-merge-topic jpata:heppy-tchain-lfn-74x
 
 scram setup lhapdf
 
