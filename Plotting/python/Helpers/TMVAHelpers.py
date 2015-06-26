@@ -121,7 +121,9 @@ class TMVASetup:
     weight_sig       - [string]: weight for signal
     weight_bkg       - [string]: weight for bg
     draw_roc         - [bool]: draw the ROC curves
-    draw_wps         - [bool]: draw the working points
+    draw_wps         - [bool]: draw the working points (extract from file)
+    draw_manual_wps  - [bool]: draw the working points (given as cuts)
+    output_dir       - [string]: output directory
     """
 
     @initializer    
@@ -141,8 +143,11 @@ class TMVASetup:
                   weight_sig       = "(1)",
                   weight_bkg       = "(1)",
                   working_points   = [],
+                  manual_working_points   = [],
                   draw_roc         = True,
                   draw_wps         = True,
+                  draw_manual_wps  = True,
+                  output_dir = "/shome/gregor/new_results/ClassifyTaggers/",
               ):
         pass
 
@@ -158,7 +163,10 @@ def doTMVA(setup):
     # Open Files
     # Output
     outfname = "TMVA_{0}.root".format(setup.name)
-    outputFile    = ROOT.TFile( outfname, 'RECREATE' )
+    # add path
+    outfname = os.path.join(setup.output_dir, outfname)
+
+    outputFile    = ROOT.TFile(outfname, 'RECREATE' )
     outputFilePickle = open( outfname.replace(".root",".dat"), "w")
 
     # Input
@@ -308,7 +316,7 @@ def doROCandWP(setup):
     # Extract information from files
     ########################################
 
-    input_filename = "TMVA_{0}.root".format(setup.name)
+    input_filename = os.path.join(setup.output_dir, "TMVA_{0}.root".format(setup.name))
 
     # We need three things:
     # -the pickle that tells us the efficiency/uncertainty of the preselection cut
@@ -321,9 +329,28 @@ def doROCandWP(setup):
     f_pickle.close()
 
     # Get the trees
-    f = ROOT.TFile(input_filename, "READ" )        
-    testTree = f.FindObjectAny("TestTree")
-    trainTree = f.FindObjectAny("TrainTree")
+    if os.path.isfile(input_filename):     
+        f = ROOT.TFile(input_filename, "READ" )        
+        testTree= f.FindObjectAny("TestTree")
+        trainTree = f.FindObjectAny("TrainTree")
+    else:
+        print "File: ", input_filename, "does not exist"
+        print "Skipping..."
+        return ret
+
+    try:
+        testTree.GetEntries()
+    except AttributeError:
+        print "Tree does not exist in: ", input_filename
+        print "Skipping..."
+        return ret
+        
+
+ 
+    if (testTree.GetEntries()==0) or (trainTree.GetEntries()==0):
+        print "Empty tree for ", input_filename
+        print "Skipping"
+        return ret
 
     # Retrieve correct assignment of the signal/background flag
     testTree.Draw("className>>h_clsname_id0", "classID==0")
@@ -383,6 +410,15 @@ def doROCandWP(setup):
 
             gr = ROOT.TGraphAsymmErrors(len(binlist))
 
+            # Interesting points: Look for a WP with bgk efficiency closest to nominal and store the cuts
+            interesting_points = [
+                {"nominal_bkg" : 0.001, "actual_bkg":-1000, "actual_sig":-1000, "cuts" : "(1)"},
+                {"nominal_bkg" : 0.003, "actual_bkg":-1000, "actual_sig":-1000, "cuts" : "(1)"},
+                {"nominal_bkg" : 0.01,  "actual_bkg":-1000, "actual_sig":-1000, "cuts" : "(1)"},
+                {"nominal_bkg" : 0.03,  "actual_bkg":-1000, "actual_sig":-1000, "cuts" : "(1)"},
+                {"nominal_bkg" : 0.1,   "actual_bkg":-1000, "actual_sig":-1000, "cuts" : "(1)"},
+            ]
+
             for ibin, x in enumerate(binlist):
                 print setup.pretty_name, ibin
 
@@ -437,7 +473,19 @@ def doROCandWP(setup):
                 # As we show -e(bg) we have to flip high/low for it 
                 gr.SetPointError(ibin, err_total_sig_low, err_total_sig_high,  err_total_bkg_high, err_total_bkg_low) 
 
+                # Look for working points
+                for point in interesting_points:
+                    # If this point is closer to the BG rejection we want than what we had before: update
+                    if abs(point["nominal_bkg"] - eff_total_bkg) < abs(point["nominal_bkg"] - point["actual_bkg"]):
+                        point["actual_bkg"] = eff_total_bkg
+                        point["actual_sig"] = eff_total_sig
+                        point["cuts"]       = cuts_sig
+
             # End loop over bins
+
+            for point in interesting_points:
+                print point
+
             ret["grs"].append(gr)
             ret["gr_names"].append(setup.pretty_name)
 
@@ -533,6 +581,33 @@ def doROCandWP(setup):
 
             # End loop over working points
         # End draw_wps
+
+
+        if setup.draw_manual_wps:
+
+            for wp in setup.manual_working_points:
+                
+                wp_gr = ROOT.TGraphAsymmErrors(1)
+
+                cuts_sig = "( ({0}) && (classID=={1}) )".format(wp["cuts"], classid_sig)
+                cuts_bkg = "( ({0}) && (classID=={1}) )".format(wp["cuts"], classid_bkg)
+
+                [n_pass_sig, e_pass_sig] = countEventsAndError(testTree, cuts_sig, "weight")
+                [n_pass_bkg, e_pass_bkg] = countEventsAndError(testTree, cuts_bkg, "weight")
+
+                eff_total_sig, err_total_sig_low, err_total_sig_high = calcEffAndError(n_pass_sig, e_pass_sig, event_counts["n_sig_fiducial"]*test_frac_sig, event_counts["e_sig_fiducial"]*math.sqrt(test_frac_sig))
+                eff_total_bkg, err_total_bkg_low, err_total_bkg_high = calcEffAndError(n_pass_bkg, e_pass_bkg, event_counts["n_bkg_fiducial"]*test_frac_bkg, event_counts["e_bkg_fiducial"]*math.sqrt(test_frac_bkg))
+
+                wp_gr.SetPoint(0, eff_total_sig, 1-eff_total_bkg)
+                # As we show -e(bg) we have to flip high/low for it 
+                wp_gr.SetPointError(0, err_total_sig_low, err_total_sig_high,  err_total_bkg_high, err_total_bkg_low) 
+
+                ret["wps"].append(wp_gr)
+                ret["wp_names"].append(wp["name"].replace("[name]", setup.pretty_name))
+
+            # End loop over working points
+        # End draw_manual_wps
+
     # End of loop over methods
 
     return ret
@@ -578,7 +653,7 @@ def plotROCs(name, li_setups, extra_text = ""):
     legend_size_y       = 0.03 * (len(li_grs)+len(li_wps))
 
 
-    for view in ["left_top", "all"]:
+    for view in ["left_top", "all", "weak_left_top", "weak_all"]:
 
         legend = ROOT.TLegend( legend_origin_x, 
                                legend_origin_y,
@@ -594,6 +669,9 @@ def plotROCs(name, li_setups, extra_text = ""):
         if view == "left_top":
             c.SetLogy(0)
             h_bkg = ROOT.TH2F("","",100,0,.4,100,0.99,1)
+        if view == "weak_left_top":
+            c.SetLogy(0)
+            h_bkg = ROOT.TH2F("","",100,0,.4,100,0.98,1)
         # Top Tagging
         # Medium
         elif view == "middle_top":
@@ -623,6 +701,9 @@ def plotROCs(name, li_setups, extra_text = ""):
         elif view == "all":
             c.SetLogy(0)
             h_bkg = ROOT.TH2F("","",100,0,1.,100,0.9,1)
+        elif view == "weak_all":
+            c.SetLogy(0)
+            h_bkg = ROOT.TH2F("","",100,0,1.,100,0.8,1)
         else:
             print "Ivalid view! Exiting.."
             sys.exit()
