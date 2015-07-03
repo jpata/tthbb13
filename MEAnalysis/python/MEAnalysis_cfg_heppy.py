@@ -20,6 +20,10 @@ def mu_baseline(mu):
         mu.nStations > 1 #FIXME: is this the same as nMuonHits
     )
 
+def print_mu(mu):
+    print "Muon: (pt=%s, eta=%s, tight=%s, pf=%s, glo=%s, dxy=%s, dz=%s, chi2=%s, nhits=%s, pix=%s, stat=%s, pfRelIso03=%s)" % (mu.pt, mu.eta, mu.tightId, mu.isPFMuon,  mu.isGlobalMuon, mu.dxy , mu.dz, mu.globalTrackChi2, (getattr(mu, "nMuonHits", 0) > 0 or getattr(mu, "nChamberHits", 0) > 0) , mu.pixelHits , mu.nStations, mu.pfRelIso03)
+
+
 def el_baseline_tight(el):
     sca = abs(el.etaSc)
     ret = (
@@ -70,7 +74,7 @@ def el_baseline_medium(el):
             (el.eleHoE          < 0.050537) and
             (abs(el.dxy)        < 0.012235) and
             (abs(el.dz)         < 0.042020) and
-            (el.relIso03        < 0.069537) and
+            (el.relIso03        < 0.107587) and
             (getattr(el, "eleExpMissingInnerHits", 0) <= 1) and
             (getattr(el, "eleooEmooP", 0) < 0.091942)
         )
@@ -124,6 +128,11 @@ def el_baseline_loose(el):
     return ret
 
 
+def print_el(el):
+    print "Electron: (pt=%s, eta=%s, convVeto=%s, etaSc=%s, dEta=%s, dPhi=%s, sieie=%s, HoE=%s, dxy=%s, dz=%s, iso03=%s, nhits=%s, eOp=%s, pfRelIso03=%s)" % (el.pt, el.eta, el.convVeto, abs(el.etaSc), abs(el.eleDEta) , abs(el.eleDPhi) , el.eleSieie, el.eleHoE , abs(el.dxy) , abs(el.dz) , el.relIso03 , getattr(el, "eleExpMissingInnerHits", 0) , getattr(el, "eleooEmooP", 0), el.pfRelIso03)
+
+
+
 #https://twiki.cern.ch/twiki/bin/viewauth/CMS/CutBasedElectronIdentificationRun2#PHYS14_selection_all_conditions
 #PHYS14 selection, conditions: PU20 bx25, barrel cuts ( |eta supercluster| <= 1.479)
 #                    Veto        Loose           Medium          Tight
@@ -159,13 +168,13 @@ class Conf:
                 "pt": 30,
                 "eta":2.1,
                 "iso": 0.12,
-                "idcut": mu_baseline
+                "idcut": mu_baseline,
             },
             "tight_veto": {
                 "pt": 10.0,
                 "eta": 2.4,
                 "iso": 0.2,
-                "idcut": mu_baseline
+                "idcut": mu_baseline,
             },
 
             #DL
@@ -173,15 +182,16 @@ class Conf:
                 "pt": 20,
                 "eta": 2.4,
                 "iso": 0.12,
-                "idcut": mu_baseline
+                "idcut": mu_baseline,
             },
             "loose_veto": {
                 "pt": 10.0,
                 "eta": 2.4,
                 "iso": 0.2,
-                "idcut": mu_baseline
+                "idcut": mu_baseline,
             },
             "isotype": "pfRelIso04", #pfRelIso - delta-beta, relIso - rho
+            "debug" : print_mu
         },
 
 
@@ -189,26 +199,27 @@ class Conf:
             "tight": {
                 "pt": 30,
                 "eta": 2.1,
-                "idcut": lambda el: el_baseline_medium(el)
+                "idcut": lambda el: el_baseline_medium(el),
             },
             "tight_veto": {
                 "pt": 20,
                 "eta": 2.4,
                 "iso": 0.15,
-                "idcut": lambda el: el_baseline_loose(el)
+                "idcut": lambda el: el_baseline_loose(el),
             },
 
             "loose": {
                 "pt": 20,
                 "eta": 2.4,
-                "idcut": lambda el: el_baseline_medium(el)
+                "idcut": lambda el: el_baseline_medium(el),
             },
             "loose_veto": {
                 "pt": 10,
                 "eta": 2.4,
-                "idcut": lambda el: el_baseline_loose(el)
+                "idcut": lambda el: el_baseline_loose(el),
             },
             "isotype": "pfRelIso03", #pfRelIso - delta-beta, relIso - rho
+            "debug" : print_el
         }
     }
 
@@ -249,8 +260,8 @@ class Conf:
         "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV6.root",
         "sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_722sync.py",
         "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions.pickle",
-        #"systematics": ["nominal"],
-        "systematics": ["nominal", "JESUp", "JESDown", "raw"],
+        "systematics": ["nominal"],
+        #"systematics": ["nominal", "JESUp", "JESDown", "raw"],
         
         
         #If the list contains:
@@ -259,12 +270,20 @@ class Conf:
         # "matching" - print out the association between gen and reco objects
         #"verbosity": ["eventboundary", "input", "matching", "gen", "reco", "meminput"],
         "verbosity": [
+            #"debug"
+            #"reco",
             #"meminput"
         ],
 
 
         #"eventWhitelist": [
-        ##    (1,214,21320)
+        #    (1, 320, 31947),
+        #    (1, 83,   8206),
+        ##     (1,333,33255 ),
+       ##     (1,931,93077),
+       ##     (1,320,31933),
+       ##     (1,628,62736),
+       ##     (1, 627, 62622)
         ##    (1, 214, 21333),
         ##    #cat6
         ##    (1, 1326, 132576),
@@ -284,6 +303,18 @@ class Conf:
         ##    (1, 1675, 167428),
         #]
     }
+
+    bran = {
+      
+        "pdfFile" : 'MEAnalysis/root/ControlPlotsV6_finerPt.root',
+
+        "jetCategories" : {
+            "2t"   : (2, 2, 0),
+            "3t"   : (3, 3, 1),
+            "ge4t" : (4,-1, 2),
+            }
+        }
+
 
     mem = {
 
@@ -309,7 +340,7 @@ class Conf:
 
         #This configures the MEMs to actually run, the rest will be set to 0
         "methodsToRun": [
-            "SL_0w2h2t",
+            #"SL_0w2h2t",
             "DL_0w2h2t",
             #"SL_2w2h2t",
             #"SL_2w2h2t_memLR",
@@ -395,6 +426,8 @@ c.do_calculate = lambda ev, mcfg: (
     ev.nBCSVM >= 3
     #(len(mcfg.l_quark_candidates(ev)) + len(mcfg.b_quark_candidates(ev))) >= 4
 )
+#c.cfg.int_code = 0
+c.maxJets = 8
 c.mem_assumptions.add("dl")
 strat = CvectorPermutations()
 strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)

@@ -15,24 +15,23 @@ class BTagRandomizerAnalyzer(FilterAnalyzer):
     """
     def __init__(self, cfg_ana, cfg_comp, looperName):
         self.conf = cfg_ana._conf
-        tf = ROOT.TFile.Open("MEAnalysis/root/ControlPlotsV6.root","READ");
-        h3_b = tf.Get("csv_b_pt_eta");
-        h3_c = tf.Get("csv_c_pt_eta");
-        h3_l = tf.Get("csv_l_pt_eta");
+        tf = ROOT.TFile.Open( self.conf.bran["pdfFile"], "READ" )
+        h3_b = tf.Get("csv_b_pt_eta")
+        h3_c = tf.Get("csv_c_pt_eta")
+        h3_l = tf.Get("csv_l_pt_eta")
         btag_pdfs = maptype()
         btag_pdfs[MEM.DistributionType.csv_b] = h3_b
         btag_pdfs[MEM.DistributionType.csv_c] = h3_c
         btag_pdfs[MEM.DistributionType.csv_l] = h3_l
-        self.rnd = MEM.BTagRandomizer(0, -1, btag_pdfs, 1)
-        self.btagWP = self.conf.jets["btagWPs"][self.conf.jets["btagWP"]]
+        self.rnd = MEM.BTagRandomizer(0, -1, btag_pdfs, 0)
+        self.btagWP = self.conf.jets["btagWPs"][self.conf.jets["btagWP"]][1]
 
-        self.jet_categories = [
-            MEM.JetCategory(0, 0, 0.879, 0, "6j0t"),
-            MEM.JetCategory(1, 1, 0.879, 1, "6j1t"),
-            MEM.JetCategory(2, 2, 0.879, 2, "6j2t"),
-            MEM.JetCategory(3, 3, 0.879, 3, "6j3t"),
-            MEM.JetCategory(4,-1, 0.879, 4, "6jge4t"),
-        ]
+        self.jet_categories = []
+        for cat in self.conf.bran["jetCategories"].items():
+            print cat[1][0], cat[1][1], self.btagWP, cat[1][2], cat[0]
+            jetcat = MEM.JetCategory(cat[1][0], cat[1][1], self.btagWP, cat[1][2], cat[0] )
+            self.jet_categories.append( jetcat )
+        
         self.vec_jet_categories = vectype()
         for jc in self.jet_categories:
             self.vec_jet_categories.push_back(jc)
@@ -44,15 +43,16 @@ class BTagRandomizerAnalyzer(FilterAnalyzer):
 
     def process(self, event):
         for (syst, event_syst) in event.systResults.items():
-            if event_syst.passes_btag:
-                res = self._process(event_syst)
-                event.systResults[syst] = res
-            else:
-                event.systResults[syst].passes_mva = False
+            res = self._process(event_syst)
+            event.systResults[syst] = res
         return True
 
     def _process(self, event):
-        print "BTagRandomizer"
+        if "debug" in self.conf.general["verbosity"]:  
+            print "BTagRandomizer"
+
+        event.b_ran_results = []
+
         for jet in event.good_jets:
             add_obj(
                 self.rnd,
@@ -64,8 +64,39 @@ class BTagRandomizerAnalyzer(FilterAnalyzer):
                     MEM.Observable.CSV: jet.btagCSV
                 }
             )
-        ret = self.rnd.run_all(self.vec_jet_categories)
-        for r in ret:
-            print r.p, r.ntoys
+
+        tmp_vec_jet_categories = vectype() 
+        for jc in self.vec_jet_categories:
+            if jc.ntags_l <= event.numJets:
+                tmp_vec_jet_categories.push_back(jc)
+
+        ret = self.rnd.run_all(tmp_vec_jet_categories)
+
+        for k in range(3):
+            out = MEM.BTagRandomizerOutput()
+            runpos = -1
+            for h in range(len(ret)):
+                if ret[h].tag_id==k:
+                    runpos = h
+            if runpos>=0 :
+                out = ret[runpos]
+            res = [0,0,0,0,0]
+            res[0] = out.p
+            res[1] = out.ntoys
+            res[2] = out.pass_rnd
+            res[3] = getattr(out,"pass", 0)
+            res[4] = out.tag_id
+            event.b_ran_results.append( res )
+
+            b_ranval_results = []
+            for j in range(out.n_jets):
+                b_ranval_results.append( out.rnd_btag[j] )
+            setattr(event, "b_ranval_results_"+out.tag_name, b_ranval_results)
+
+        #for r in event.b_ran_results:
+        #    print r.p, r.ntoys
+
         self.rnd.next_event();
+
+        event.passes_bran = True
         return event

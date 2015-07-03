@@ -92,6 +92,18 @@ memType = NTupleObjectType("memType", variables = [
     NTupleVariable("btag_weight_jj", lambda x : x.btag_weights[2]),
 ])
 
+branType = NTupleObjectType("branType", variables = [
+    NTupleVariable("p",        lambda x : x[0] ),
+    NTupleVariable("ntoys",    lambda x : x[1], type=int),
+    NTupleVariable("pass_rnd", lambda x : x[2], type=int),
+    NTupleVariable("pass",     lambda x : x[3], type=int),
+    NTupleVariable("tag_id",   lambda x : x[4], type=int),
+])
+
+branvalType = NTupleObjectType("branvalType", variables = [
+    NTupleVariable("btagRnd",        lambda x : x ),
+])
+
 FoxWolframType = NTupleObjectType("FoxWolframType", variables = [
     NTupleVariable("v", lambda x : x),
 ])
@@ -385,7 +397,10 @@ def getTreeProducer(conf):
                     "mem_ttbb" + syst_suffix2, memType, len(conf.mem["methodOrder"]),
                     help="MEM ttbb results array, element per config.methodOrder"
                 ),
-
+                "b_ran_results" + syst_suffix: NTupleCollection(
+                    "b_ran" + syst_suffix2, branType, len(conf.bran["jetCategories"]),
+                    help="BTagrRandomizer results (p,ntoys,pass,tag_id)"
+                ),
                 "fw_h_alljets" + syst_suffix: NTupleCollection(
                     "fw_aj" + syst_suffix2, FoxWolframType, 8,
                     help="Fox-Wolfram momenta calculated with all jets"
@@ -399,6 +414,15 @@ def getTreeProducer(conf):
                     help="Fox-Wolfram momenta calculated with untagged jets"
                 ),
             })
+
+            for cat in conf.bran["jetCategories"].items():
+                treeProducer.collections.update({ 
+                        "b_ranval_results_" +cat[0] + syst_suffix: NTupleCollection(
+                            "jets_"+cat[0] + syst_suffix2, branvalType, 15,
+                            help="BTagRandomizer random values for category "+cat[0]
+                            )
+                        })
+
 
     for systematic in ["nominal"]:
         for vtype in [
