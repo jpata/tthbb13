@@ -74,6 +74,12 @@ process.source = cms.Source("PoolSource",
 process.chs = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedPFCandidates"), cut = cms.string("fromPV"))
 
 
+# Ghost particle collection used for Hadron-Jet association 
+from PhysicsTools.JetMCAlgos.HadronAndPartonSelector_cfi import selectedHadronsAndPartons
+process.selectedHadronsAndPartons = selectedHadronsAndPartons.clone(
+    particles = "prunedGenParticles"
+)
+
 #####################################
 # Ungroomed Fatjets
 #####################################
@@ -110,22 +116,6 @@ if DO_R08:
    li_fatjets_branches.append(branch_name)
    li_ungroomed_fatjets_objects.append(fj_name)
    li_ungroomed_fatjets_branches.append(branch_name)
-
-#   ## CA, R=0.8, pT > 200 GeV
-#   fj_name = "ca08PFJetsCHS"
-#   branch_name = 'ca08'
-#   setattr(process, fj_name, cms.EDProducer(
-#           "FastjetJetProducer",
-#           PFJetParameters,
-#           AnomalousCellParameters,
-#           jetAlgorithm = cms.string("CambridgeAachen"),
-#           rParam       = cms.double(0.8)))
-#   getattr(process, fj_name).src = cms.InputTag("chs")
-#   getattr(process, fj_name).jetPtMin = cms.double(200)
-#   li_fatjets_objects.append(fj_name)
-#   li_fatjets_branches.append(branch_name)
-#   li_ungroomed_fatjets_objects.append(fj_name)
-#   li_ungroomed_fatjets_branches.append(branch_name)
 
 if DO_R15:
    # CA, R=1.5, pT > 200 GeV
@@ -403,6 +393,18 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
    # Softdrop
    #####################################
 
+   name = "softdropz10bm10"   
+   fj_name = ungroomed_fj_name + name
+   branch_name = ungroomed_branch_name + name
+   setattr(process, fj_name, ungroomed_fj.clone(
+           useSoftDrop = cms.bool(True),
+           zcut = cms.double(0.1),
+           beta = cms.double(-1.0),
+           R0 = cms.double(r),
+           useExplicitGhosts = cms.bool(True)))
+   li_fatjets_objects.append(fj_name)        
+   li_fatjets_branches.append(branch_name)
+
    name = "softdropz10b00"   
    fj_name = ungroomed_fj_name + name
    branch_name = ungroomed_branch_name + name
@@ -439,6 +441,17 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
    li_fatjets_objects.append(fj_name)        
    li_fatjets_branches.append(branch_name)
 
+   name = "softdropz15bm10"   
+   fj_name = ungroomed_fj_name + name
+   branch_name = ungroomed_branch_name + name
+   setattr(process, fj_name, ungroomed_fj.clone(
+           useSoftDrop = cms.bool(True),
+           zcut = cms.double(0.15),
+           beta = cms.double(-1.0),
+           R0 = cms.double(r),
+           useExplicitGhosts = cms.bool(True)))
+   li_fatjets_objects.append(fj_name)        
+   li_fatjets_branches.append(branch_name)
 
    name = "softdropz15b00"   
    fj_name = ungroomed_fj_name + name
@@ -489,6 +502,18 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
    li_fatjets_objects.append(fj_name)        
    li_fatjets_branches.append(branch_name)
 
+   name = "softdropz20bm10"   
+   fj_name = ungroomed_fj_name + name
+   branch_name = ungroomed_branch_name + name
+   setattr(process, fj_name, ungroomed_fj.clone(
+           useSoftDrop = cms.bool(True),
+           zcut = cms.double(0.2),
+           beta = cms.double(-1.0),
+           R0 = cms.double(r),
+           useExplicitGhosts = cms.bool(True)))
+   li_fatjets_objects.append(fj_name)        
+   li_fatjets_branches.append(branch_name)
+
    name = "softdropz20b10"   
    fj_name = ungroomed_fj_name + name
    branch_name = ungroomed_branch_name + name
@@ -514,6 +539,63 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
    li_fatjets_branches.append(branch_name)
 
 
+#####################################
+# Flavour Infos
+#####################################
+
+li_fatjets_flavour_infos = []
+
+for fj_obj_name in li_fatjets_objects:
+
+   # These are subjets - don't need the flavour info at the moment
+   if "forbtag" in fj_obj_name:
+         li_fatjets_flavour_infos.append("None")
+         continue
+
+   # First extract algorithm and distance parameter
+   if GetAlgoFromName(fj_obj_name) == "ca":
+      algo = "CambridgeAachen"
+   elif GetAlgoFromName(fj_obj_name) == "ak":
+      algo = "AntiKt"
+   r_param = GetRadiusFromName(fj_obj_name)
+
+   flavour_info_name = fj_obj_name + "FlavourInfo"
+   li_fatjets_flavour_infos.append(flavour_info_name)
+
+   # Ungroomed Fatjet
+   if fj_obj_name in li_ungroomed_fatjets_objects:
+         setattr(process, flavour_info_name, cms.EDProducer("JetFlavourClustering",
+                                                           jets           = cms.InputTag(fj_obj_name),
+                                                           bHadrons       = cms.InputTag("selectedHadronsAndPartons","bHadrons"),
+                                                           cHadrons       = cms.InputTag("selectedHadronsAndPartons","cHadrons"),
+                                                           partons        = cms.InputTag("selectedHadronsAndPartons","partons"),
+                                                           jetAlgorithm   = cms.string(algo),
+                                                           rParam         = cms.double(r_param),
+                                                           ghostRescaling = cms.double(1e-18),
+                                                           hadronFlavourHasPriority = cms.bool(True)))
+   # Ungroomed Fatjet
+   else:
+      for ungroomed_name in  li_ungroomed_fatjets_objects:
+         if ungroomed_name in fj_obj_name:
+            setattr(process, flavour_info_name, cms.EDProducer("JetFlavourClustering",
+                                                              jets           = cms.InputTag(ungroomed_name),
+                                                              groomedJets    = cms.InputTag(fj_obj_name),
+                                                              bHadrons       = cms.InputTag("selectedHadronsAndPartons","bHadrons"),
+                                                              cHadrons       = cms.InputTag("selectedHadronsAndPartons","cHadrons"),
+                                                              partons        = cms.InputTag("selectedHadronsAndPartons","partons"),
+                                                              jetAlgorithm   = cms.string(algo),
+                                                              rParam         = cms.double(r_param),
+                                                              ghostRescaling = cms.double(1e-18),
+                                                              hadronFlavourHasPriority = cms.bool(True)))
+
+
+
+#process.printEvent = cms.EDAnalyzer("printJetFlavourInfo",
+#                                    jetFlavourInfos    = cms.InputTag("jetFlavourInfos"),
+#                                    #subjetFlavourInfos = cms.InputTag("jetFlavourInfosAK8PFJets","SubJets"),
+#                                    #groomedJets        = cms.InputTag("ak8PFJetsPruned"),
+#)
+#
 #####################################
 # NSubjettiness
 #####################################
@@ -558,8 +640,8 @@ for fj_name in li_fatjets_objects:
    # For Grid Submission
    sd_path = "src/TTH/TTHNtupleAnalyzer/data/"
         
-   #sd_fatjets = []
-   sd_fatjets = li_ungroomed_fatjets_objects
+   sd_fatjets = []
+   #sd_fatjets = li_ungroomed_fatjets_objects
    
    r = GetRadiusStringFromName(fj_name)
    input_card = sd_path + "sd_input_card_{0}.dat".format(r)
@@ -671,42 +753,6 @@ if DO_R08:
    li_cmstt_objects.append("cmsTopTagAk08PFJetsCHS")
    li_cmstt_infos.append("ak08CMSTopTagInfos")
    li_cmstt_branches.append("ak08cmstt")
-
-
-   # CA, R=0.8 CMSTT           
-#   process.cmsTopTagCa08PFJetsCHS = cms.EDProducer(
-#           "CATopJetProducer",
-#           PFJetParameters,
-#           AnomalousCellParameters,
-#           CATopJetParameters,
-#           jetAlgorithm = cms.string("CambridgeAachen"),
-#           rParam = cms.double(0.8),
-#           writeCompound = cms.bool(True),
-#   )
-#
-#   process.cmsTopTagCa08PFJetsCHS.jetCollInstanceName = cms.string("SubJets")
-#   process.cmsTopTagCa08PFJetsCHS.src = cms.InputTag('chs')
-#   process.cmsTopTagCa08PFJetsCHS.doAreaFastjet = cms.bool(True)
-#   process.cmsTopTagCa08PFJetsCHS.jetPtMin = cms.double(200.0)
-#
-#
-#   process.ca08CMSTopTagInfos = cms.EDProducer("CATopJetTagger",
-#                                               src = cms.InputTag("cmsTopTagCa08PFJetsCHS"),
-#                                               TopMass = cms.double(173),
-#                                               TopMassMin = cms.double(0.),
-#                                               TopMassMax = cms.double(250.),
-#                                               WMass = cms.double(80.4),
-#                                               WMassMin = cms.double(0.0),
-#                                               WMassMax = cms.double(200.0),
-#                                               MinMassMin = cms.double(0.0),
-#                                               MinMassMax = cms.double(200.0),
-#                                               verbose = cms.bool(False),
-#   )
-#
-#   li_cmstt_objects.append("cmsTopTagCa08PFJetsCHS")
-#   li_cmstt_infos.append("ca08CMSTopTagInfos")
-#   li_cmstt_branches.append("ca08cmstt")
-#
 
 if DO_R15:
    process.cmsTopTagCa15PFJetsCHS = cms.EDProducer(
@@ -976,6 +1022,7 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
         fatjetsQvols    = cms.vstring(li_fatjets_qvols),
         fatjetsBranches = cms.vstring(li_fatjets_branches),
         fatjetsUsesubjets = cms.vint32(li_fatjets_use_subjets),                                           
+        fatjetsFlavourInfos = cms.vstring(li_fatjets_flavour_infos),                                           
 
         httObjects  = cms.vstring(li_htt_branches), # Using branch names also as object names
         httBranches = cms.vstring(li_htt_branches),                                           
@@ -1014,6 +1061,8 @@ process.TFileService = cms.Service("TFileService",
 
 process.p = cms.Path(process.chs)
 
+process.p += process.selectedHadronsAndPartons
+
 # Schedule AK08 Constituents
 if DO_R08:
    process.p += process.ak08PFJetsCHS
@@ -1023,6 +1072,11 @@ if DO_R08:
 for fj_name in li_fatjets_objects:   
    if not fj_name == "ak08PFJetsCHS": # Already added that before because we need it for AK08 Constituents
       process.p += getattr(process, fj_name)
+
+# Schedule flavour info
+for info_name in li_fatjets_flavour_infos:
+   if not info_name == "None":
+      process.p += getattr(process, info_name)
 
 # Schedule NSubjettiness
 for nsub_name in li_fatjets_nsubs:
@@ -1055,11 +1109,15 @@ for htt_name in li_htt_branches:
 for x in li_cmstt_objects + li_cmstt_infos:
    process.p += getattr(process, x)
 
+#process.p += process.jetFlavourInfos
+#process.p += process.printEvent
+
 # Schedule b-tagging and Ntupelizer
 for x in [process.my_btagging,
           process.tthNtupleAnalyzer]:
    process.p += x
    
+
 
 if "TTH_DEBUG" in os.environ:
 	process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
@@ -1071,3 +1129,4 @@ if "TTH_DEBUG" in os.environ:
 	process.p += process.printTree
 
 
+print li_fatjets_flavour_infos

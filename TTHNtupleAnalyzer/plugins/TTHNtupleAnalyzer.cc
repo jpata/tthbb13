@@ -70,6 +70,8 @@
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 #include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
+#include "SimDataFormats/JetMatching/interface/JetFlavourInfo.h"
+#include "SimDataFormats/JetMatching/interface/JetFlavourInfoMatching.h"
 
 //#include "CommonTools/UtilAlgos/interface/PhysObjectMatcher.h"
 //#include "CommonTools/UtilAlgos/interface/MatchByDRDPt.h"
@@ -210,14 +212,14 @@ void fill_fatjet_branches(const edm::Event& iEvent,
 			  std::string fj_btags_name,
 			  std::string fj_qvols_name,
 			  std::string fj_branches_name,
+			  std::string fj_flavour_info_name,
 			  // true top and anti top for optional matching
 			  const vector<const reco::Candidate*>  & true_t,
 			  // hard partons for matching
 			  const vector<const reco::Candidate*>  & hard_partons,
 			  // true higgs for matching
 			  const vector<const reco::Candidate*>  & gen_higgs,
-			  bool fj_usesubjets
-			  ){
+			  bool fj_usesubjets){
   
   // Get Fatjet iteself  
   
@@ -229,8 +231,6 @@ void fill_fatjet_branches(const edm::Event& iEvent,
     iEvent.getByLabel(fj_object_name, "SubJets", fatjets);
   else
     iEvent.getByLabel(fj_object_name, fatjets);
-
-
 
   // Handles to get the Nsubjettiness
   edm::Handle<edm::ValueMap<float> > fatjet_nsub_tau1;
@@ -273,18 +273,19 @@ void fill_fatjet_branches(const edm::Event& iEvent,
   // b-tag discriminators handle
   edm::Handle<reco::JetTagCollection> btagDiscriminators;
   if (fj_btags_name != "None"){
-    iEvent.getByLabel(fj_btags_name, btagDiscriminators);
-    
-    //std::cout << fatjets->size() << "  " << btagDiscriminators->size() << std::endl;
-
+    iEvent.getByLabel(fj_btags_name, btagDiscriminators);    
   }
 
   // Q-jet volatility handle
   edm::Handle<edm::ValueMap<float> > QjetVols;
   if (fj_qvols_name != "None")
     iEvent.getByLabel(fj_qvols_name,"QjetsVolatility", QjetVols);
-	  
 
+  // Flavour Info handle
+  edm::Handle<reco::JetFlavourInfoMatchingCollection> JetFlavourInfos;
+  if (fj_flavour_info_name != "None"){
+    iEvent.getByLabel(fj_flavour_info_name, JetFlavourInfos);
+  }
 
   // Loop over fatjets
   for (unsigned n_fat_jet = 0; n_fat_jet != fatjets->size(); n_fat_jet++){
@@ -337,6 +338,15 @@ void fill_fatjet_branches(const edm::Event& iEvent,
     if (fj_qvols_name != "None")
       tthtree->get_address<float *>(prefix + "qvol")[n_fat_jet] = QjetVols->get(n_fat_jet);
    
+    // Flavour Info
+    if (fj_flavour_info_name != "None"){
+      
+      reco::JetFlavourInfo aInfo = (*JetFlavourInfos)[n_fat_jet].second;
+
+      tthtree->get_address<float *>(prefix + "hadflavour")[n_fat_jet] = aInfo.getHadronFlavour();
+      tthtree->get_address<float *>(prefix + "partflavour")[n_fat_jet] = aInfo.getPartonFlavour();      
+    }
+
     // Optional: Fill truth matching information
     if (ADD_TRUE_TOP_MATCHING_FOR_FJ)
       fill_truth_matching<JetType>(tthtree, x, n_fat_jet, true_t, prefix, "hadtop");
@@ -486,6 +496,7 @@ private:
 	const std::vector<std::string> fatjet_qvols_;
 	const std::vector<std::string> fatjet_branches_;
 	const std::vector<int> fatjet_usesubjets_;
+  	const std::vector<std::string> fatjet_flavour_infos_;
 
         // HEPTopTagger information
         // objects = name of the input collection
@@ -570,6 +581,7 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
         fatjet_qvols_(iConfig.getParameter<std::vector<std::string>>("fatjetsQvols")),
         fatjet_branches_(iConfig.getParameter<std::vector<std::string>>("fatjetsBranches")),
         fatjet_usesubjets_(iConfig.getParameter<std::vector<int>>("fatjetsUsesubjets")),
+        fatjet_flavour_infos_(iConfig.getParameter<std::vector<std::string>>("fatjetsFlavourInfos")),
 
         htt_objects_(iConfig.getParameter<std::vector<std::string>>("httObjects")),
         htt_branches_(iConfig.getParameter<std::vector<std::string>>("httBranches")),
@@ -693,6 +705,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	assert(fatjet_objects_.size()==fatjet_qvols_.size());
 	assert(fatjet_objects_.size()==fatjet_branches_.size());
 	assert(fatjet_objects_.size()==fatjet_usesubjets_.size());
+	assert(fatjet_objects_.size()==fatjet_flavour_infos_.size());
 
 	// Sanity check the htt lists-of-names
 	assert(htt_objects_.size()==htt_branches_.size());
@@ -1816,14 +1829,14 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	for (unsigned i_fj_coll = 0; i_fj_coll < fatjet_objects_.size(); i_fj_coll++){
 
 	  // Get the proper names
-	  std::string fj_object_name	  = fatjet_objects_[i_fj_coll];
-	  std::string fj_nsubs_name	  = fatjet_nsubs_[i_fj_coll];
-	  std::string fj_sds_name	  = fatjet_sds_[i_fj_coll];
-	  std::string fj_btags_name	  = fatjet_btags_[i_fj_coll];
-	  std::string fj_qvols_name	  = fatjet_qvols_[i_fj_coll];
-	  std::string fj_branches_name    = fatjet_branches_[i_fj_coll];
-	  int fj_usesubjets              = fatjet_usesubjets_[i_fj_coll];
-	  
+	  std::string	fj_object_name	     = fatjet_objects_[i_fj_coll];
+	  std::string	fj_nsubs_name	     = fatjet_nsubs_[i_fj_coll];
+	  std::string	fj_sds_name	     = fatjet_sds_[i_fj_coll];
+	  std::string	fj_btags_name	     = fatjet_btags_[i_fj_coll];
+	  std::string	fj_qvols_name	     = fatjet_qvols_[i_fj_coll];
+	  std::string	fj_branches_name     = fatjet_branches_[i_fj_coll];
+	  int		fj_usesubjets        = fatjet_usesubjets_[i_fj_coll];
+	  std::string	fj_flavour_info_name = fatjet_flavour_infos_[i_fj_coll];
 
 	  fill_fatjet_branches<reco::PFJet, reco::PFJetCollection>(iEvent, 
 								   tthtree, 
@@ -1833,11 +1846,11 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 								   fj_btags_name,
 								   fj_qvols_name,
 								   fj_branches_name,
+								   fj_flavour_info_name,
 								   hadronic_ts,
 								   hard_partons,
 								   gen_higgs,
-								   fj_usesubjets
-								   );
+								   fj_usesubjets);
 	 
 	} // End of loop over fatjet collections
 	// Done filling the fatjet information

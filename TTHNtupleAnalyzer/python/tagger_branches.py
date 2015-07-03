@@ -178,6 +178,7 @@ for fj_name in li_fatjets_branches:
             "qvol",                      # Qjet volatility
                                          # (only fill for ungroomed)
             "nconst", "ncharged", "nneutral", # constituent counts
+            "hadflavour", "partflavour",
             "close_hadtop_pt",  "close_hadtop_dr", "close_hadtop_i", # top truth matching
             "close_parton_pt",  "close_parton_dr", "close_parton_i", # parton truth matching
             "close_higgs_pt",   "close_higgs_dr",  "close_higgs_i"   # higgs truth matching
