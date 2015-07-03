@@ -99,6 +99,7 @@ else:
     low_pt_samples = ["qcd_170_300", 
                       "qcd_300_470", 
                       "zprime_m1000",
+                      "zprime_m750",
                       "ttbar",
                       "rad_hh4b_m800_13tev_20bx25",
                       "tth_hbb",
@@ -136,7 +137,7 @@ fj_branches = ["pt", "mass", "tau1", "tau2", "tau3", "qvol", "nconst", "ncharged
 # (to expensive to calc for everything)
 fj_branches_plus = fj_branches + ["chi1", "nmj1", "chi2", "nmj2", "chi3", "nmj3"]
 
-fj_branches_btag = fj_branches + ["btag"]
+fj_branches_btag = fj_branches + ["btag", "sj1m", "sj2m", "sj1dr", "sj2dr"]
 
 htt_branches = ["pt", "mass", "fRec", 
                 "Ropt", "RoptCalc", 
@@ -258,6 +259,9 @@ AH.addScalarBranches(variables, variable_types, outtree,
 objects_to_pop = []
 for object_name, branch_names in objects.iteritems():    
     for branch_name in branch_names:
+        
+        
+
 
         if "sj__btag" in branch_name:
             full_branch_in  = "jet_{0}_{1}".format(object_name, branch_name)
@@ -265,9 +269,13 @@ for object_name, branch_names in objects.iteritems():
         else:
             full_branch_in  = "jet_{0}__{1}".format(object_name, branch_name)
             full_branch_out =  "{0}_{1}".format(object_name, branch_name)
-
-
-        if full_branch_in in branches_in_input:
+            
+            
+        if (full_branch_in in branches_in_input or 
+            "sj1m" in branch_name or 
+            "sj2m" in branch_name or
+            "sj1dr" in branch_name or 
+            "sj2dr" in branch_name):
             AH.addScalarBranches( variables,
                                   variable_types,
                                   outtree,
@@ -428,24 +436,52 @@ for i_event in range(n_entries):
                 full_btag_branch_name = "jet_{0}__btag".format(object_name)
                 btag_branch = AH.getter(intree, full_btag_branch_name)
 
+                full_pt_branch_name = "jet_{0}__pt".format(object_name)
+                pt_branch = AH.getter(intree, full_pt_branch_name)
 
-                dr_pos_btag = [(dr,pos,btag) for i,dr,btag,pos in zip(i_branch, dr_branch, btag_branch, range(len(i_branch))) if i==i_particle]
+                full_mass_branch_name = "jet_{0}__mass".format(object_name)
+                mass_branch = AH.getter(intree, full_mass_branch_name)
+
+
+                dr_pos_btag_pt_mass = [(dr,pos,btag,pt,mass) for i,dr,btag,pt,mass,pos, in zip(i_branch, dr_branch, btag_branch, pt_branch, mass_branch, range(len(i_branch))) if i==i_particle]
 
                 # Apply the Delta R cut
-                dr_pos_btag = [(dr,pos,btag) for dr,pos,btag in dr_pos_btag if dr < object_drs[object_name]]
+                dr_pos_btag_pt_mass = [(dr,pos,btag,pt,mass) for dr,pos,btag,pt,mass in dr_pos_btag_pt_mass if dr < object_drs[object_name]]
 
-
-                if len(dr_pos_btag):
+                if len(dr_pos_btag_pt_mass):
 
                     # Now extract the highest b-tag scored jet and use it to fill the branches
-                    closest_dr_pos_btag = sorted(dr_pos_btag, key=lambda x:x[2])[-1]
-                    i_matched = closest_dr_pos_btag[1]
+                    highest_btag = sorted(dr_pos_btag_pt_mass, key=lambda x:x[2])[-1]
+                    highest_pt   = sorted(dr_pos_btag_pt_mass, key=lambda x:x[3])[-1]
+                
+                    if len(dr_pos_btag_pt_mass) >=2:
+                        second_highest_pt   = sorted(dr_pos_btag_pt_mass, key=lambda x:x[3])[-2]
 
-                    variables["dr"][0] = closest_dr_pos_btag[0]
+                    i_matched = highest_btag[1]
+
+                    variables["dr"][0] = highest_btag[0]
                     for branch_name in branch_names:
-                        full_branch_in  = "jet_{0}__{1}".format(object_name, branch_name)
+
                         full_branch_out = "{0}_{1}".format(object_name, branch_name)
-                        variables[full_branch_out][0] = AH.getter(intree, full_branch_in)[i_matched]                    
+
+                        if "sj1m" in branch_name:
+                            variables[full_branch_out][0] = highest_pt[4] # dr_pos_btag_pt_mass
+                        elif "sj1dr" in branch_name:
+                            variables[full_branch_out][0] = highest_pt[0] # dr_pos_btag_pt_mass
+                        elif "sj2m" in branch_name:
+                            if len(dr_pos_btag_pt_mass) >=2:
+                                variables[full_branch_out][0] = second_highest_pt[4] # dr_pos_btag_pt_mass
+                            else:
+                                variables[full_branch_out][0] = DEF_VAL_FLOAT   
+                        elif "sj2dr" in branch_name:
+                            if len(dr_pos_btag_pt_mass) >=2:
+                                variables[full_branch_out][0] = second_highest_pt[0] # dr_pos_btag_pt_mass
+                            else:
+                                variables[full_branch_out][0] = DEF_VAL_FLOAT   
+                        else:
+                            full_branch_in  = "jet_{0}__{1}".format(object_name, branch_name)
+                            variables[full_branch_out][0] = AH.getter(intree, full_branch_in)[i_matched]                    
+                        
                 else:
                     variables["dr"][0] = 9999.
                     for branch_name in branch_names:
