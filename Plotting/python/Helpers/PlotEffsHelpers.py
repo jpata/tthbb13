@@ -39,7 +39,7 @@ import TTH.Plotting.Helpers.RebinHelper as RebinHelper
 # Define and crate output directory
 ########################################
 
-output_dir = "../OutputPlotsEffs/"
+output_dir = "/shome/gregor/new_results/PlotEffs/"
 
 # Create directory and subdirectories for all filetypes
 OutputDirectoryHelper.CreateOutputDirs( output_dir )
@@ -175,7 +175,7 @@ class plotSettings:
                  legend,
                  ev_weight = "(1)",
                  calc_99_point = False,
-                 input_treename     = "SpartyJet_Tree"
+                 input_treename     = "tree"
                  # rebin = 0,
                  ):
        """ Constructor.
@@ -187,8 +187,6 @@ class plotSettings:
        cuts_denom    : [string] Cuts for the Denominator
        legend        : [string] String to label this curve
        ev_weight     : [string] Branchname to look up per-event weights
-       x_title       : [string] Label to use for the x-axis
-       y_title       : [string] Label to use for the y-axis
        calc_99_point : [bool]   Calculate (and print to terminal) the x-axis
                                 value for which a right-integrated efficiency
                                 of >= 99% is reached.

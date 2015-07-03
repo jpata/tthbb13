@@ -42,7 +42,7 @@ import TTH.Plotting.Helpers.OutputDirectoryHelper as OutputDirectoryHelper
 # Define and crate output directory
 ########################################
 
-output_dir = "OutputPlot2D/"
+output_dir = "/shome/gregor/new_results/OutputPlot2D/"
 
 # Create directory and subdirectories for all filetypes
 OutputDirectoryHelper.CreateOutputDirs( output_dir )

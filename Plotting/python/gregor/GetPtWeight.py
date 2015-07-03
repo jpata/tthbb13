@@ -26,7 +26,7 @@ to_process = files.keys()
 basepath = '/scratch/gregor/'
                                          
 fits = {}
-#fits["zprime_m750"]      = ROOT.TF1("fit_fun_zprime","pol5",201,299)
+fits["zprime_m750"]      = ROOT.TF1("fit_fun_zprime","pol5",201,299)
 fits["zprime_m1000_low"] = ROOT.TF1("fit_fun_zprime","pol5",201,299)
 fits["zprime_m1000"]     = ROOT.TF1("fit_fun_zprime","pol5",301,469)
 fits["zprime_m1250"]     = ROOT.TF1("fit_fun_zprime","pol5",471,599)
@@ -45,6 +45,7 @@ fits["qcd_300_470"]  = ROOT.TF1("fit_fun_qcd","[0]+[1]*sqrt(x)+[2]/x+[3]/(x*x)+[
 fits["qcd_470_600"]  = ROOT.TF1("fit_fun_qcd","[0]+[1]*sqrt(x)+[2]/x + [3]*x",471,599)
 fits["qcd_600_800"]  = ROOT.TF1("fit_fun_qcd","[0]+[1]*sqrt(x)+[2]/x + [3]*x",601,799)
 fits["qcd_800_1000"] = ROOT.TF1("fit_fun_qcd","[0]+[1]*sqrt(x)+[2]/x",801,999)
+fits["qcd_1000_1400"] = ROOT.TF1("fit_fun_qcd","[0]+[1]*sqrt(x)+[2]/x",1001,1399)
 
 for qcd_name in ["qcd_170_300"]:
     fits[qcd_name].SetParameter(0,0)
@@ -54,7 +55,7 @@ for qcd_name in ["qcd_170_300"]:
     fits[qcd_name].SetParameter(4,0.)
     
 
-for qcd_name in ["qcd_300_470", "qcd_470_600", "qcd_600_800", "qcd_800_1000"]:
+for qcd_name in ["qcd_300_470", "qcd_470_600", "qcd_600_800", "qcd_800_1000", "qcd_1000_1400"]:
     fits[qcd_name].SetParameter(0,1)
     fits[qcd_name].SetParameter(1,1)
     fits[qcd_name].SetParameter(2,0.5)
@@ -73,7 +74,7 @@ for name in to_process:
 
 output_dir = "/shome/gregor/new_results/GetPtWeight/"
 
-output_pickle_file_name = "/shome/gregor/TTH-73X/CMSSW/src/TTH/Plotting/python/gregor/flat_pt_weights.pickle"
+output_pickle_file_name = "/shome/gregor/TTH-74X/CMSSW/src/TTH/Plotting/python/gregor/flat_pt_weights.pickle"
 
 
 ########################################
@@ -91,6 +92,7 @@ if True:
         pt_var = "{0}_pt".format(truth_var)
         eta_var = "{0}_eta".format(truth_var)
 
+        #fiducial_cut = "(({0}>{1})&&({0}<{2})&&(fabs({3})<{4})&&(top_size<{5}))".format(pt_var, ranges[k][0], ranges[k][1], eta_var, ranges[k][2], ranges[k][3])
         fiducial_cut = "(({0}>{1})&&({0}<{2})&&(top_size<{3}))".format(pt_var, ranges[k][0], ranges[k][1], ranges[k][3])
 
 

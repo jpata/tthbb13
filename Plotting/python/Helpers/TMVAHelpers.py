@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python
 """
 Helper script for the evaluation of different methods/variables using TMVA.
@@ -246,6 +247,7 @@ def doTMVA(setup):
 
 
     # prepare trees
+    # :nTrain_Background=150000
     factory.PrepareTrainingAndTestTree( mycutSig, mycutBkg,
                                         "SplitMode=Random:NormMode=None:!V" )
 
@@ -408,7 +410,7 @@ def doROCandWP(setup):
             # This should be 100 bins with cuts
             binlist = xmldoc.getElementsByTagName('Weights')[0].getElementsByTagName("Bin")
 
-            gr = ROOT.TGraphAsymmErrors(len(binlist))
+            gr = ROOT.TGraphAsymmErrors()
 
             # Interesting points: Look for a WP with bgk efficiency closest to nominal and store the cuts
             interesting_points = [
@@ -469,17 +471,21 @@ def doROCandWP(setup):
                 #                                                                                           err_total_bkg_high*100,
                 #                                                                                           err_total_bkg_low*100)
 
-                gr.SetPoint(ibin, eff_total_sig, 1-eff_total_bkg)
-                # As we show -e(bg) we have to flip high/low for it 
-                gr.SetPointError(ibin, err_total_sig_low, err_total_sig_high,  err_total_bkg_high, err_total_bkg_low) 
+                print ibin, eff_total_sig, 1-eff_total_bkg
 
-                # Look for working points
-                for point in interesting_points:
-                    # If this point is closer to the BG rejection we want than what we had before: update
-                    if abs(point["nominal_bkg"] - eff_total_bkg) < abs(point["nominal_bkg"] - point["actual_bkg"]):
-                        point["actual_bkg"] = eff_total_bkg
-                        point["actual_sig"] = eff_total_sig
-                        point["cuts"]       = cuts_sig
+                if eff_total_sig > 0.0:
+                    i = gr.GetN()
+                    gr.SetPoint(i, eff_total_sig, 1-eff_total_bkg)
+                    # As we show -e(bg) we have to flip high/low for it 
+                    gr.SetPointError(i, err_total_sig_low, err_total_sig_high,  err_total_bkg_high, err_total_bkg_low) 
+
+                    # Look for working points
+                    for point in interesting_points:
+                        # If this point is closer to the BG rejection we want than what we had before: update
+                        if abs(point["nominal_bkg"] - eff_total_bkg) < abs(point["nominal_bkg"] - point["actual_bkg"]):
+                            point["actual_bkg"] = eff_total_bkg
+                            point["actual_sig"] = eff_total_sig
+                            point["cuts"]       = cuts_sig
 
             # End loop over bins
 
@@ -669,9 +675,9 @@ def plotROCs(name, li_setups, extra_text = ""):
         if view == "left_top":
             c.SetLogy(0)
             h_bkg = ROOT.TH2F("","",100,0,.4,100,0.99,1)
-        if view == "weak_left_top":
+        elif view == "weak_left_top":
             c.SetLogy(0)
-            h_bkg = ROOT.TH2F("","",100,0,.4,100,0.98,1)
+            h_bkg = ROOT.TH2F("","",100,0,.4,100,0.95,1)
         # Top Tagging
         # Medium
         elif view == "middle_top":
@@ -703,9 +709,9 @@ def plotROCs(name, li_setups, extra_text = ""):
             h_bkg = ROOT.TH2F("","",100,0,1.,100,0.9,1)
         elif view == "weak_all":
             c.SetLogy(0)
-            h_bkg = ROOT.TH2F("","",100,0,1.,100,0.8,1)
+            h_bkg = ROOT.TH2F("","",100,0,1.,100,0.6,1)
         else:
-            print "Ivalid view! Exiting.."
+            print "Invalid view! Exiting.."
             sys.exit()
 
 
@@ -744,7 +750,7 @@ def plotROCs(name, li_setups, extra_text = ""):
             gr.SetLineStyle( li_line_styles[i_gr] )
             gr.SetLineWidth( 2)    
             legend.AddEntry( gr, gr_and_name[1], "L" )
-            gr.Draw("3 SAME")
+            gr.Draw("SAME")
 
 
         for i_wp, wp in enumerate(li_wps):

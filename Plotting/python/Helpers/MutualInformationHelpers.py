@@ -32,18 +32,18 @@ else:
    from TTH.Plotting.python.Helpers.HistogramHelpers import Count
    import TTH.Plotting.python.Helpers.OutputDirectoryHelper as OutputDirectoryHelper
 
-ROOT.gStyle.SetPadLeftMargin(0.2)
+ROOT.gStyle.SetPadLeftMargin(0.19)
 ROOT.gStyle.SetPadRightMargin(0.16)
 ROOT.gStyle.SetPadTopMargin(0.05)
-ROOT.gStyle.SetPadBottomMargin(0.25)
+ROOT.gStyle.SetPadBottomMargin(0.21)
 
 ROOT.gROOT.SetStyle("myStyle")
 ROOT.gROOT.ForceStyle()
 
-ROOT.gStyle.SetPadLeftMargin(0.26)
+ROOT.gStyle.SetPadLeftMargin(0.33)
 ROOT.gStyle.SetPadRightMargin(0.1)
 ROOT.gStyle.SetPadTopMargin(0.05)
-ROOT.gStyle.SetPadBottomMargin(0.29)
+ROOT.gStyle.SetPadBottomMargin(0.34)
 
 ROOT.gROOT.ForceStyle()
 
@@ -70,7 +70,7 @@ pickle_directory = "MIPickle"
 # Define and crate output directory
 ########################################
 
-output_dir = "OutputMutualInformation/"
+output_dir = "/shome/gregor/new_results/OutputMutualInformation/"
 
 # Create directory and subdirectories for all filetypes
 OutputDirectoryHelper.CreateOutputDirs( output_dir )

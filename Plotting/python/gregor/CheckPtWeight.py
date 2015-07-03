@@ -57,8 +57,8 @@ if True:
                  axis_unit = "GeV",
                  log_y     = False,
                  normalize = True,
-                 legend_origin_x = 0.35,
-                 legend_origin_y = 0.6,
+                 legend_origin_x = 0.3,
+                 legend_origin_y = 0.2,
                  legend_size_x   = 0.2,
                  legend_text_size= 0.03
     )

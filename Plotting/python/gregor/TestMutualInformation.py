@@ -54,17 +54,69 @@ for pair_name, pair in pairs.iteritems():
     
     mis = []
 
-    #mis.append(mi(pair_name + "_mass_vars_v40", 
+    #mis.append(mi(pair_name + "_mass_vars_ca15", 
     #              pair[0], pair[1], 
-    #              [v for v in mass_vars_v40 if fatjet_size in v.name], 
+    #              [v for v in mass_vars if "ca15" in v.name], 
     #              fiducial_cut_and_weight, fiducial_cut_and_weight, True))
 
-    #mis.append(mi(pair_name + "_interesting_vars_v40", 
-    #              pair[0], pair[1], 
-    #              [v for v in interesting_vars_v40[fatjet_size]], 
-    #              fiducial_cut_and_weight, fiducial_cut_and_weight,
-    #              read_from_pickle = True
-    #          ))
+
+#    interesting_vars_ca15 = [
+#
+#        "ca15_mass",        
+#        
+#        "ca15prunedn3z10rfac50_mass",
+#        "ca15filteredn3r2_mass",
+#        "ca15trimmedr2f3_mass",
+#        "ca15softdropz10b00_mass",
+#        "ca15softdropz20b10_mass",
+#        
+#        "ca15_tau3/ca15_tau2",    
+#        "ca15_qvol",
+#
+#        "looseOptRHTT_mass",
+#        "looseOptRHTT_fRec",
+#        "looseOptRHTT_Ropt-looseOptRHTT_RoptCalc",
+#        
+#        "log(ca15_chi3)",
+#    ]
+#
+#    mis.append(mi(pair_name + "_interesting_vars_ca15", 
+#                  pair[0], pair[1], 
+#                  [ var.di[v] for v in interesting_vars_ca15], 
+#                  fiducial_cut_and_weight, fiducial_cut_and_weight,
+#                  read_from_pickle = True,
+#              ))
+#
+
+    interesting_vars_ak08 = [
+        "ak08_mass",        
+        
+        "ak08prunedn3z10rfac50_mass",
+        "ak08filteredn3r2_mass",
+        "ak08trimmedr2f3_mass",
+        "ak08softdropz10b00_mass",
+        
+        "ak08_tau3/ak08_tau2",    
+        "ak08_qvol",
+
+        "looseOptRHTT_mass",
+        "looseOptRHTT_fRec",
+        "looseOptRHTT_Ropt-looseOptRHTT_RoptCalc",
+
+        "ak08cmstt_minMass",
+        "ak08cmstt_topMass",
+        
+        "log(ak08_chi2)",
+    ]
+
+    mis.append(mi(pair_name + "_interesting_vars_ak08", 
+                  pair[0], pair[1], 
+                  [ var.di[v] for v in interesting_vars_ak08], 
+                  fiducial_cut_and_weight, fiducial_cut_and_weight,
+                  read_from_pickle = False,
+              ))
+    
+
 
     #mis.append(mi(pair_name + "_interesting_vars_puppi_v40", 
     #              pair[0], pair[1], 
@@ -73,10 +125,10 @@ for pair_name, pair in pairs.iteritems():
     #          ))
         
 
-    mis.append(mi(pair_name + "_htt", 
-                  pair[0], pair[1], 
-                  htt_vars_v44,
-                  fiducial_cut_and_weight, fiducial_cut_and_weight, True))
+    #mis.append(mi(pair_name + "_htt", 
+    #              pair[0], pair[1], 
+    #              htt_vars_v44,
+    #              fiducial_cut_and_weight, fiducial_cut_and_weight, True))
 
     #mis.append(mi(pair_name + "_mass_vars", 
     #               pair[0], pair[1],

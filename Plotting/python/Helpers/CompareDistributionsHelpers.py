@@ -62,6 +62,7 @@ class combinedPlot:
                 legend_size_x   = 0.2,
                 legend_size_y   = -1,
                 legend_text_size= 0.05,
+                extra_text      = "",
                 ):
       """ Constructor. Arguments:
       name            : (string) name for output file
@@ -289,9 +290,11 @@ def doWork( dic_files, output_dir ):
             color = li_colors[i_p]
             ls    = li_line_styles[i_p]
 
+
             # Colorize/set linestyle
             h.SetLineWidth( 3 )
             h.SetLineColor( color )
+            h.SetMarkerColor( color )
             h.SetLineStyle( ls )      
             h.SetFillColor(0)
 
@@ -336,22 +339,25 @@ def doWork( dic_files, output_dir ):
 
                 h.GetYaxis().SetNdivisions(410)
 
-                h.Draw()
+                h.Draw("HIST")
 
                 txt = ROOT.TText()
                 txt.SetTextFont(61)
                 txt.SetTextSize(0.05)
-                txt.DrawTextNDC(0.23, 0.88, "CMS")
+                txt.DrawTextNDC(0.2, 0.88, "CMS")
 
                 txt.SetTextFont(52)
                 txt.SetTextSize(0.04)
-                txt.DrawTextNDC(0.23, 0.84, "Simulation Preliminary")
+                txt.DrawTextNDC(0.2, 0.84, "Simulation Preliminary")
 
                 txt.SetTextFont(41)
                 txt.DrawTextNDC(0.85, 0.95, "13 TeV")
 
+                txt.DrawTextNDC(0.2, 0.78, cp.extra_text)
+
+
             else:
-                h.Draw("SAME")
+                h.Draw("HIST SAME")
         
          
         # Draw the legend
