@@ -78,8 +78,8 @@ process.chs = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedPFCandid
 # Ungroomed Fatjets
 #####################################
 
-DO_R15 = False
-DO_R08 = True
+DO_R15 = True
+DO_R08 = False
 
 from RecoJets.JetProducers.AnomalousCellParameters_cfi import *
 from RecoJets.JetProducers.PFJetParameters_cfi import *
@@ -111,21 +111,21 @@ if DO_R08:
    li_ungroomed_fatjets_objects.append(fj_name)
    li_ungroomed_fatjets_branches.append(branch_name)
 
-   ## CA, R=0.8, pT > 200 GeV
-   fj_name = "ca08PFJetsCHS"
-   branch_name = 'ca08'
-   setattr(process, fj_name, cms.EDProducer(
-           "FastjetJetProducer",
-           PFJetParameters,
-           AnomalousCellParameters,
-           jetAlgorithm = cms.string("CambridgeAachen"),
-           rParam       = cms.double(0.8)))
-   getattr(process, fj_name).src = cms.InputTag("chs")
-   getattr(process, fj_name).jetPtMin = cms.double(200)
-   li_fatjets_objects.append(fj_name)
-   li_fatjets_branches.append(branch_name)
-   li_ungroomed_fatjets_objects.append(fj_name)
-   li_ungroomed_fatjets_branches.append(branch_name)
+#   ## CA, R=0.8, pT > 200 GeV
+#   fj_name = "ca08PFJetsCHS"
+#   branch_name = 'ca08'
+#   setattr(process, fj_name, cms.EDProducer(
+#           "FastjetJetProducer",
+#           PFJetParameters,
+#           AnomalousCellParameters,
+#           jetAlgorithm = cms.string("CambridgeAachen"),
+#           rParam       = cms.double(0.8)))
+#   getattr(process, fj_name).src = cms.InputTag("chs")
+#   getattr(process, fj_name).jetPtMin = cms.double(200)
+#   li_fatjets_objects.append(fj_name)
+#   li_fatjets_branches.append(branch_name)
+#   li_ungroomed_fatjets_objects.append(fj_name)
+#   li_ungroomed_fatjets_branches.append(branch_name)
 
 if DO_R15:
    # CA, R=1.5, pT > 200 GeV
@@ -529,6 +529,7 @@ for fj_name in li_fatjets_objects:
 
       r = GetRadiusFromName(fj_name)
 
+
       setattr(process, nsub_name, cms.EDProducer("NjettinessAdder",
                                                  src=cms.InputTag(fj_name),
                                                  Njets=cms.vuint32(1,2,3),          # compute 1-, 2-, 3- subjettiness
@@ -562,13 +563,26 @@ for fj_name in li_fatjets_objects:
    
    r = GetRadiusStringFromName(fj_name)
    input_card = sd_path + "sd_input_card_{0}.dat".format(r)
+
+   
    
    if fj_name in sd_fatjets:
         sd_name = fj_name + "SD"
-        setattr(process, sd_name, cms.EDProducer("SDProducer",
-                                                 FatjetName = cms.string(fj_name),
-                                                 MicrojetCone = cms.double(0.2), 
-                                                 InputCard = cms.string(input_card)))
+        setattr(process, sd_name+"1", cms.EDProducer("SDProducer",
+                                                     FatjetName = cms.string(fj_name),
+                                                     MicrojetCone = cms.double(0.1), 
+                                                     InputCard = cms.string(input_card)))
+
+        setattr(process, sd_name+"2", cms.EDProducer("SDProducer",
+                                                     FatjetName = cms.string(fj_name),
+                                                     MicrojetCone = cms.double(0.2), 
+                                                     InputCard = cms.string(input_card)))
+
+        setattr(process, sd_name+"3", cms.EDProducer("SDProducer",
+                                                     FatjetName = cms.string(fj_name),
+                                                     MicrojetCone = cms.double(0.3), 
+                                                     InputCard = cms.string(input_card)))
+
         li_fatjets_sds.append(sd_name)
    else:
         li_fatjets_sds.append('None')
@@ -587,7 +601,7 @@ for i_fj, fj_name in enumerate(li_fatjets_objects):
    r = GetRadiusFromName(fj_name)           
    algo = GetAlgoFromName(fj_name)           
    
-   qvol_fatjets = []#li_ungroomed_fatjets_objects
+   qvol_fatjets = li_ungroomed_fatjets_objects
 
    if fj_name in qvol_fatjets:
 
@@ -660,39 +674,39 @@ if DO_R08:
 
 
    # CA, R=0.8 CMSTT           
-   process.cmsTopTagCa08PFJetsCHS = cms.EDProducer(
-           "CATopJetProducer",
-           PFJetParameters,
-           AnomalousCellParameters,
-           CATopJetParameters,
-           jetAlgorithm = cms.string("CambridgeAachen"),
-           rParam = cms.double(0.8),
-           writeCompound = cms.bool(True),
-   )
-
-   process.cmsTopTagCa08PFJetsCHS.jetCollInstanceName = cms.string("SubJets")
-   process.cmsTopTagCa08PFJetsCHS.src = cms.InputTag('chs')
-   process.cmsTopTagCa08PFJetsCHS.doAreaFastjet = cms.bool(True)
-   process.cmsTopTagCa08PFJetsCHS.jetPtMin = cms.double(200.0)
-
-
-   process.ca08CMSTopTagInfos = cms.EDProducer("CATopJetTagger",
-                                               src = cms.InputTag("cmsTopTagCa08PFJetsCHS"),
-                                               TopMass = cms.double(173),
-                                               TopMassMin = cms.double(0.),
-                                               TopMassMax = cms.double(250.),
-                                               WMass = cms.double(80.4),
-                                               WMassMin = cms.double(0.0),
-                                               WMassMax = cms.double(200.0),
-                                               MinMassMin = cms.double(0.0),
-                                               MinMassMax = cms.double(200.0),
-                                               verbose = cms.bool(False),
-   )
-
-   li_cmstt_objects.append("cmsTopTagCa08PFJetsCHS")
-   li_cmstt_infos.append("ca08CMSTopTagInfos")
-   li_cmstt_branches.append("ca08cmstt")
-
+#   process.cmsTopTagCa08PFJetsCHS = cms.EDProducer(
+#           "CATopJetProducer",
+#           PFJetParameters,
+#           AnomalousCellParameters,
+#           CATopJetParameters,
+#           jetAlgorithm = cms.string("CambridgeAachen"),
+#           rParam = cms.double(0.8),
+#           writeCompound = cms.bool(True),
+#   )
+#
+#   process.cmsTopTagCa08PFJetsCHS.jetCollInstanceName = cms.string("SubJets")
+#   process.cmsTopTagCa08PFJetsCHS.src = cms.InputTag('chs')
+#   process.cmsTopTagCa08PFJetsCHS.doAreaFastjet = cms.bool(True)
+#   process.cmsTopTagCa08PFJetsCHS.jetPtMin = cms.double(200.0)
+#
+#
+#   process.ca08CMSTopTagInfos = cms.EDProducer("CATopJetTagger",
+#                                               src = cms.InputTag("cmsTopTagCa08PFJetsCHS"),
+#                                               TopMass = cms.double(173),
+#                                               TopMassMin = cms.double(0.),
+#                                               TopMassMax = cms.double(250.),
+#                                               WMass = cms.double(80.4),
+#                                               WMassMin = cms.double(0.0),
+#                                               WMassMax = cms.double(200.0),
+#                                               MinMassMin = cms.double(0.0),
+#                                               MinMassMax = cms.double(200.0),
+#                                               verbose = cms.bool(False),
+#   )
+#
+#   li_cmstt_objects.append("cmsTopTagCa08PFJetsCHS")
+#   li_cmstt_infos.append("ca08CMSTopTagInfos")
+#   li_cmstt_branches.append("ca08cmstt")
+#
 
 if DO_R15:
    process.cmsTopTagCa15PFJetsCHS = cms.EDProducer(
@@ -1029,7 +1043,9 @@ for sd_name in li_fatjets_sds:
    if sd_name == "None":
       continue
    else:
-      process.p += getattr(process, sd_name)
+      process.p += getattr(process, sd_name+"1")
+      process.p += getattr(process, sd_name+"2")
+      process.p += getattr(process, sd_name+"3")
 
 # Schedule HEPTopTagger
 for htt_name in li_htt_branches:

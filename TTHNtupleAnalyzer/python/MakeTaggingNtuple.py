@@ -134,7 +134,7 @@ fj_branches = ["pt", "mass", "tau1", "tau2", "tau3", "qvol", "nconst", "ncharged
 #   shower deconstruction chi
 #   qjets volatility
 # (to expensive to calc for everything)
-fj_branches_plus = fj_branches + ["chi", "nmj"]
+fj_branches_plus = fj_branches + ["chi1", "nmj1", "chi2", "nmj2", "chi3", "nmj3"]
 
 fj_branches_btag = fj_branches + ["btag"]
 
@@ -178,14 +178,14 @@ for htt in li_htt_branches:
 print li_htt_branches
 
 # And some extras
-for x in ["ak08", "ca08", "ca15"]:
+for x in ["ak08", "ca15"]:
     if x in objects.keys():
         print "Adding", x
         objects[x] = fj_branches_plus
 
 print "snip"
 
-for x in ["ak08cmstt", "ca08cmstt", "ca15cmstt"]:
+for x in ["ak08cmstt",  "ca15cmstt"]:
     if x in objects.keys():
         print "Adding", x
         objects[x] = cmstt_branches

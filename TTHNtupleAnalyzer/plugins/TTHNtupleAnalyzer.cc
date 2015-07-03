@@ -249,11 +249,25 @@ void fill_fatjet_branches(const edm::Event& iEvent,
 
 
   // Handle to get the Shower Deconstruction info
-  edm::Handle<edm::ValueMap<double> > fatjet_sd_chi;
-  edm::Handle<edm::ValueMap<int> > fatjet_sd_nmj;
+  edm::Handle<edm::ValueMap<double> > fatjet_sd_chi1;
+  edm::Handle<edm::ValueMap<int> > fatjet_sd_nmj1;
+  edm::Handle<edm::ValueMap<double> > fatjet_sd_chi2;
+  edm::Handle<edm::ValueMap<int> > fatjet_sd_nmj2;
+  edm::Handle<edm::ValueMap<double> > fatjet_sd_chi3;
+  edm::Handle<edm::ValueMap<int> > fatjet_sd_nmj3;
   if (fj_sds_name != "None"){
-    iEvent.getByLabel(fj_sds_name, "chi", fatjet_sd_chi);
-    iEvent.getByLabel(fj_sds_name, "nmicrojets", fatjet_sd_nmj);
+
+
+    iEvent.getByLabel(fj_sds_name + "1", "chi", fatjet_sd_chi1);
+    iEvent.getByLabel(fj_sds_name + "1", "nmicrojets", fatjet_sd_nmj1);
+
+    iEvent.getByLabel(fj_sds_name + "2", "chi", fatjet_sd_chi2);
+    iEvent.getByLabel(fj_sds_name + "2", "nmicrojets", fatjet_sd_nmj2);
+
+    iEvent.getByLabel(fj_sds_name + "3", "chi", fatjet_sd_chi3);
+    iEvent.getByLabel(fj_sds_name + "3", "nmicrojets", fatjet_sd_nmj3);
+
+
   }
 
   // b-tag discriminators handle
@@ -261,7 +275,7 @@ void fill_fatjet_branches(const edm::Event& iEvent,
   if (fj_btags_name != "None"){
     iEvent.getByLabel(fj_btags_name, btagDiscriminators);
     
-    std::cout << fatjets->size() << "  " << btagDiscriminators->size() << std::endl;
+    //std::cout << fatjets->size() << "  " << btagDiscriminators->size() << std::endl;
 
   }
 
@@ -304,8 +318,14 @@ void fill_fatjet_branches(const edm::Event& iEvent,
 
     // Shower Deconstruction
     if (fj_sds_name != "None"){
-      tthtree->get_address<float *>(prefix + "chi")[n_fat_jet] = fatjet_sd_chi->get(n_fat_jet);
-      tthtree->get_address<int *>(prefix   + "nmj")[n_fat_jet] = fatjet_sd_nmj->get(n_fat_jet);
+      tthtree->get_address<float *>(prefix + "chi1")[n_fat_jet] = fatjet_sd_chi1->get(n_fat_jet);
+      tthtree->get_address<int *>(prefix   + "nmj1")[n_fat_jet] = fatjet_sd_nmj1->get(n_fat_jet);
+
+      tthtree->get_address<float *>(prefix + "chi2")[n_fat_jet] = fatjet_sd_chi2->get(n_fat_jet);
+      tthtree->get_address<int *>(prefix   + "nmj2")[n_fat_jet] = fatjet_sd_nmj2->get(n_fat_jet);
+
+      tthtree->get_address<float *>(prefix + "chi3")[n_fat_jet] = fatjet_sd_chi3->get(n_fat_jet);
+      tthtree->get_address<int *>(prefix   + "nmj3")[n_fat_jet] = fatjet_sd_nmj3->get(n_fat_jet);
     }
 
     // B-tag

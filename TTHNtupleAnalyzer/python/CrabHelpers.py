@@ -298,10 +298,12 @@ def cleanup(name,
             f = ROOT.TFile(fn, "update")
             t = f.tree
             x = t.GetEntries()
-            
+
             t.GetEntry(10)
+
+            #m = t.ak08_mass
             m = t.ca15_mass
-        
+
             if f.IsZombie():
                 broken.append(fn)
 

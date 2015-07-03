@@ -171,8 +171,10 @@ for fj_name in li_fatjets_branches:
             "pt", "eta", "phi", "mass",  # Kinematics
             "tau1", "tau2", "tau3",      # N-subjettiness
             "btag",                      # b-tag discriminator
-            "chi", "nmj",                # Shower deconstruction chi and number of microjets
+            "chi1", "nmj1",                # Shower deconstruction chi and number of microjets
                                          # (only fill for ungroomed)
+            "chi2", "nmj2",
+            "chi3", "nmj3",
             "qvol",                      # Qjet volatility
                                          # (only fill for ungroomed)
             "nconst", "ncharged", "nneutral", # constituent counts
@@ -269,7 +271,7 @@ cmstt_sj_float_branches =  ["energy", "eta", "mass", "phi", "pt", "btag"]
 
 cmstt_sj_int_branches =  ["parent_idx"]
 
-for cmstt_name in ["ak08cmstt", "ca08cmstt", "ca15cmstt"]:
+for cmstt_name in ["ak08cmstt", "ca15cmstt"]:
 
     # How many objects do we have?
     tagger_counter_name = "n__jet_{0}".format(cmstt_name)

@@ -131,12 +131,10 @@ Samples = {
     #######################################
 
     "qcd_300_470_13tev_spring15dr74_asympt50ns"     : "/QCD_Pt_300to470_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM",
-    "qcd_600_800_13tev_spring15dr74_asympt50ns"     : "/QCD_Pt_600to800_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM",
-    "qcd_800_1000_13tev_spring15dr74_asympt50ns"    : "/QCD_Pt_800to1000_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM",
+    "qcd_800_1000_13tev_spring15dr74_asympt50ns"    : "/QCD_Pt_800to1000_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2/MINIAODSIM",
 
     "zprime_m1000_1p_13tev_spring15dr74_asympt50ns" : "/ZprimeToTT_M-1000_W-10_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM",
     "zprime_m2000_1p_13tev_spring15dr74_asympt50ns" : "/ZprimeToTT_M-2000_W-20_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM",
-
 
     #######################################
     # 13 TeV
