@@ -306,12 +306,12 @@ class Conf:
 
     bran = {
       
-        "pdfFile" : 'MEAnalysis/root/ControlPlotsV6_finerPt.root',
+        "pdfFile" :  os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV6_finerPt.root",
 
         "jetCategories" : {
-            "2t"   : (2, 2, 0),
-            "3t"   : (3, 3, 1),
-            "ge4t" : (4,-1, 2),
+            #"2t"   : (2, 2, 0),
+            #"3t"   : (3, 3, 1),
+            "ge4t" : (4, 6, 2), # needed for timing 
             }
         }
 
@@ -336,15 +336,19 @@ class Conf:
             #with bLR calc by mem code
             "SL_2w2h2t_memLR",
             "SL_0w2h2t_memLR",
+
+            # with rnd CSV values
+            "DL_0w2h2t_Rndge4t"
         ],
 
         #This configures the MEMs to actually run, the rest will be set to 0
         "methodsToRun": [
             #"SL_0w2h2t",
-            "DL_0w2h2t",
+            #"DL_0w2h2t",
             #"SL_2w2h2t",
             #"SL_2w2h2t_memLR",
             #"SL_0w2h2t_memLR",
+            "DL_0w2h2t_Rndge4t"
         ],
 
     }
@@ -434,6 +438,27 @@ strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
 strat.push_back(MEM.Permutations.FirstRankedByBTAG)
 c.cfg.perm_pruning = strat
 Conf.mem_configs["DL_0w2h2t"] = c
+
+###
+### DL_0w2h2t_Rnd4t
+###
+c = MEMConfig()
+c.b_quark_candidates = lambda ev: ev.good_jets
+c.l_quark_candidates = lambda ev: []
+c.do_calculate = lambda ev, mcfg: (
+    len(mcfg.lepton_candidates(ev)) == 2 and
+    len(mcfg.b_quark_candidates(ev)) >= 4 and
+    ev.nBCSVMRndge4t >= 4
+)
+c.btagMethod = "btagCSVRndge4t"
+c.maxJets = 8
+c.mem_assumptions.add("dl")
+strat = CvectorPermutations()
+strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
+strat.push_back(MEM.Permutations.FirstRankedByBTAG)
+c.cfg.perm_pruning = strat
+Conf.mem_configs["DL_0w2h2t_Rndge4t"] = c
+
 
 for cn, c in Conf.mem_configs.items():
     print "MEM config", cn, c.mem_assumptions
