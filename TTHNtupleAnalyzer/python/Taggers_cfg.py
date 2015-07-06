@@ -84,8 +84,8 @@ process.selectedHadronsAndPartons = selectedHadronsAndPartons.clone(
 # Ungroomed Fatjets
 #####################################
 
-DO_R15 = True
-DO_R08 = False
+DO_R15 = False
+DO_R08 = True
 
 from RecoJets.JetProducers.AnomalousCellParameters_cfi import *
 from RecoJets.JetProducers.PFJetParameters_cfi import *
@@ -640,8 +640,8 @@ for fj_name in li_fatjets_objects:
    # For Grid Submission
    sd_path = "src/TTH/TTHNtupleAnalyzer/data/"
         
-   sd_fatjets = []
-   #sd_fatjets = li_ungroomed_fatjets_objects
+   #sd_fatjets = []
+   sd_fatjets = li_ungroomed_fatjets_objects
    
    r = GetRadiusStringFromName(fj_name)
    input_card = sd_path + "sd_input_card_{0}.dat".format(r)
@@ -946,6 +946,35 @@ for input_object in ["chs"]:
         writeCompound = cms.bool(True),
         minCandMass = cms.double(0.),
         maxCandMass = cms.double(1000),
+        massRatioWidth = cms.double(100.),
+        minM23Cut = cms.double(0.),
+        minM13Cut = cms.double(0.),
+        maxM13Cut = cms.double(2.)))
+   li_htt_branches.append(name)
+
+   name = "msortHTT"
+   if not input_object == "chs":
+      name += input_object
+
+   setattr(process, name, cms.EDProducer(
+        "HTTTopJetProducer",
+        PFJetParameters.clone( src = cms.InputTag(input_object),
+                               doAreaFastjet = cms.bool(True),
+                               doRhoFastjet = cms.bool(False),
+                               jetPtMin = cms.double(100.0)
+                           ),
+        AnomalousCellParameters,
+        optimalR = cms.bool(False),
+        algorithm = cms.int32(1),
+        jetAlgorithm = cms.string("CambridgeAachen"),
+        rParam = cms.double(1.5),
+        mode = cms.int32(1),
+        minFatjetPt = cms.double(200.),
+        minCandPt = cms.double(200.),
+        minSubjetPt = cms.double(0.),
+        writeCompound = cms.bool(True),
+        minCandMass = cms.double(140.),
+        maxCandMass = cms.double(250),
         massRatioWidth = cms.double(100.),
         minM23Cut = cms.double(0.),
         minM13Cut = cms.double(0.),

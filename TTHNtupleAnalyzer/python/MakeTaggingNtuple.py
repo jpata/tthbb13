@@ -30,7 +30,7 @@ if socket.gethostname() == "t3ui12":
 # on the Grid
 else:
     import AccessHelpers as AH   
-    li_htt_branches = ['looseHTT','looseOptRHTT'] 
+    li_htt_branches = ['looseHTT','looseOptRHTT', "msortHTT"] 
 
 ########################################
 # deltaR
