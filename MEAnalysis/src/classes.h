@@ -2,6 +2,6 @@
 
 namespace {
     namespace {
-        std::vector<TLorentzVector> _i1;
+        std::vector<TLorentzVector> _TTHMEAnalysis_i1;
     }
 }

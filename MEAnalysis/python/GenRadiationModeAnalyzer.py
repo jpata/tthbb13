@@ -1,4 +1,4 @@
-from TTH.MEAnalysis.VHbbTree import lvec
+from TTH.MEAnalysis.vhbb_utils import lvec
 from TTH.MEAnalysis.Analyzer import FilterAnalyzer
 class GenRadiationModeAnalyzer(FilterAnalyzer):
     """
@@ -14,11 +14,15 @@ class GenRadiationModeAnalyzer(FilterAnalyzer):
         self.conf = cfg_ana._conf
         super(GenRadiationModeAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
 
-    def beginLoop(self, setup):
-        super(GenRadiationModeAnalyzer, self).beginLoop(setup)
-
     def process(self, event):
-        self.counters["processing"].inc("processed")
+        for (syst, event_syst) in event.systResults.items():
+            if event_syst.passes_jet:
+                res = self._process(event_syst)
+                event.systResults[syst] = res
+        #event.__dict__.update(event.systResults["nominal"].__dict__)
+        return True
+
+    def _process(self, event):
 
         event.nMatchSimB = 0
         event.nMatchSimC = 0
@@ -35,8 +39,4 @@ class GenRadiationModeAnalyzer(FilterAnalyzer):
                 if absid == 4:
                     event.nMatchSimC += 1
 
-        passes = True
-        if passes:
-            self.counters["processing"].inc("passes")
-        return passes
-
+        return event

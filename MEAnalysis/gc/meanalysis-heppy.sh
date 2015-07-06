@@ -4,13 +4,15 @@
 #these are all the input parameters that MEAnalysis_heppy_gc.py reads
 #export SKIP_EVENTS=0
 #export MAX_EVENTS=100
-#export DATASETNICK=tth_13tev
-#export DATASETPATH=tth_13tev
-#export FILE_NAMES=/store/user/jpata/VHBBHeppyV10/TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola/VHBB_HEPPY_V10_TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola__Phys14DR-PU20bx25_tsg_PHYS14_25_V1-v2/150302_164515/0000/tree_1.root
+#export DATASETNICK=tth_13tev_amcatnlo_pu20bx25
+#export DATASETPATH=tth_13tev_amcatnlo_pu20bx25
+#export FILE_NAMES=/store/user/jpata/VHBBHeppy722p2-tthsync-jun9-1/TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola/VHBB_HEPPY_V11_TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola__Phys14DR-PU20bx25_tsg_PHYS14_25_V1-v2/150609_170651/0000/tree_1.root
 #export MY_SCRATCH=./
 
 #on PSI, CMSSW_BASE is not exported with the grid job, need to set manually
 CMSSW_BASE=$HOME/TTH-72X-heppy/CMSSW/
+
+export ME_CONF=$CMSSW_BASE/src/TTH/MEAnalysis/python/@me_conf@
 
 #print out the environment
 #env
@@ -39,7 +41,8 @@ python ${CMSSW_BASE}/src/TTH/MEAnalysis/gc/MEAnalysis_heppy_gc.py
 echo "MEAnalysis is done"
 
 #copy output
-OUTDIR=$HOME/tth/gc/${TASK_ID}/${DATASETPATH}/
+ME_CONF_NAME=$(basename "$ME_CONF")
+OUTDIR=$HOME/tth/gc/${TASK_ID}/${ME_CONF_NAME%.*}/${DATASETPATH}/
 mkdir -p $OUTDIR 
 echo "copying output"
 OFNAME=$OUTDIR/output_${MY_JOBID}.root
