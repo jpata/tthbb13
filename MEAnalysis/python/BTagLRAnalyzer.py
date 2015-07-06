@@ -17,6 +17,7 @@ class BTagLRAnalyzer(FilterAnalyzer):
         self.bTagAlgo = self.conf.jets["btagAlgo"]
         self.cplots_old = ROOT.TFile(self.conf.general["controlPlotsFileOld"])
         self.cplots = ROOT.TFile(self.conf.general["controlPlotsFile"])
+        self.nJetsForPerm = self.conf.jets["NJetsForBTagLR"]
 
         cplots_fmt = self.conf.general.get("controlPlotsFormat", "8tev")
         self.csv_pdfs_old = {
@@ -166,7 +167,7 @@ class BTagLRAnalyzer(FilterAnalyzer):
             event.good_jets,
             key=lambda x: getattr(x, self.bTagAlgo),
             reverse=True,
-        )[0:6]
+        )[:self.nJetsForPerm]
 
         jet_probs = {
             kind: [
