@@ -39,7 +39,7 @@ if "kbfi" in hn or "comp-" in hn or "kbfi" in vo:
     def lfn_to_pfn(fn):
 
         #fix to replace broken file names
-        fn = fn.replace("/store/user/gregor/store/user/gregor", "/store/user/jpata")
+        fn = fn.replace("/store/user/gregor/", "/store/user/jpata/")
         return "file:///hdfs/cms" + fn
 elif "psi" in hn or "psi" in vo:
     # pfPath = "/pnfs/psi.ch/cms/trivcat/"
