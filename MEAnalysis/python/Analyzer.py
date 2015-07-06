@@ -78,5 +78,6 @@ class PrimaryVertexAnalyzer(FilterAnalyzer):
             event.passPV = (not event.primaryVertex.isFake) and (event.primaryVertex.ndof >= 4 and event.primaryVertex.Rho <= 2)
         else:
             event.passPV = False
+            print "PrimaryVertexAnalyzer: number of vertices=", (len(pvs))
             return False
         return True

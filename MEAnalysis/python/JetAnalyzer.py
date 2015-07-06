@@ -117,6 +117,14 @@ class JetAnalyzer(FilterAnalyzer):
         )
 
 
+        if "debug" in self.conf.general["verbosity"]:
+            print "All jets: ", len(event.Jet)
+            for x in event.Jet:
+                print "\t(%s, %s, %s, %s, %s, %s, %s, %s, %s)" % (x.pt, x.eta, x.neHEF, x.chEmEF, x.neEmEF, x.numberOfDaughters, x.chHEF, x.chMult, x.btagCSV)
+            print "Goood jets: ", len(event.good_jets)
+            for x in event.good_jets:
+                print "\t(%s, %s, %s, %s, %s, %s, %s, %s, %s)" % (x.pt, x.eta, x.neHEF, x.chEmEF, x.neEmEF, x.numberOfDaughters, x.chHEF, x.chMult, x.btagCSV)
+
         #Assing jet transfer functions
         for jet in event.good_jets:
             attach_jet_transfer_function(jet, self.conf)

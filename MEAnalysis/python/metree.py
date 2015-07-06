@@ -35,7 +35,12 @@ jetType = NTupleObjectType("jetType", variables = [
     NTupleVariable("corr", lambda x : x.corr),
     NTupleVariable("corr_JESUp", lambda x : x.corr_JECUp),
     NTupleVariable("corr_JESDown", lambda x : x.corr_JECDown),
-
+    NTupleVariable("btagCSVRnd2t",   lambda x : getattr(x, "btagCSVRnd2t",   -99) ),
+    NTupleVariable("btagCSVRnd3t",   lambda x : getattr(x, "btagCSVRnd3t",   -99) ),
+    NTupleVariable("btagCSVRndge4t", lambda x : getattr(x, "btagCSVRndge4t", -99) ),
+    NTupleVariable("btagCSVInp2t",   lambda x : getattr(x, "btagCSVInp2t",   -99) ),
+    NTupleVariable("btagCSVInp3t",   lambda x : getattr(x, "btagCSVInp3t",   -99) ),
+    NTupleVariable("btagCSVInpge4t", lambda x : getattr(x, "btagCSVInpge4t", -99) ),
 ])
 #Specifies what to save for leptons
 leptonType = NTupleObjectType("leptonType", variables = [
@@ -91,6 +96,21 @@ memType = NTupleObjectType("memType", variables = [
     NTupleVariable("btag_weight_cc", lambda x : x.btag_weights[1]),
     NTupleVariable("btag_weight_jj", lambda x : x.btag_weights[2]),
 ])
+
+branType = NTupleObjectType("branType", variables = [
+    NTupleVariable("p",        lambda x : x[0] ),
+    NTupleVariable("ntoys",    lambda x : x[1], type=int),
+    NTupleVariable("pass",     lambda x : x[2], type=int),
+    NTupleVariable("tag_id",   lambda x : x[3], type=int),
+])
+
+#branvalType = NTupleObjectType("branvalType", variables = [
+#    NTupleVariable("btagCSVRnd",        lambda x : x ),
+#])
+
+#binpvalType = NTupleObjectType("branvalType", variables = [
+#    NTupleVariable("btagCSVInp",        lambda x : x ),
+#])
 
 FoxWolframType = NTupleObjectType("FoxWolframType", variables = [
     NTupleVariable("v", lambda x : x),
@@ -385,7 +405,10 @@ def getTreeProducer(conf):
                     "mem_ttbb" + syst_suffix2, memType, len(conf.mem["methodOrder"]),
                     help="MEM ttbb results array, element per config.methodOrder"
                 ),
-
+                #"b_ran_results" + syst_suffix: NTupleCollection(
+                #    "b_ran" + syst_suffix2, branType, len(conf.bran["jetCategories"]),
+                #    help="BTagrRandomizer results (p,ntoys,pass,tag_id)"
+                #),
                 "fw_h_alljets" + syst_suffix: NTupleCollection(
                     "fw_aj" + syst_suffix2, FoxWolframType, 8,
                     help="Fox-Wolfram momenta calculated with all jets"
@@ -399,6 +422,29 @@ def getTreeProducer(conf):
                     help="Fox-Wolfram momenta calculated with untagged jets"
                 ),
             })
+
+            for cat in conf.bran["jetCategories"].items():
+                #treeProducer.collections.update({ 
+                #        "b_rndval_results_" +cat[0] + syst_suffix: NTupleCollection(
+                #            "jets_" + cat[0] + syst_suffix2, branvalType, 15,
+                #            help="BTagRandomizer random values for category "+cat[0]
+                #            ),
+                #        "b_inpval_results_" +cat[0] + syst_suffix: NTupleCollection(
+                #            "jets_" + cat[0] + syst_suffix2, binpvalType, 15,
+                #            help="BTagRandomizer input values for category "+cat[0]
+                #            )
+                #        })
+                treeProducer.globalObjects.update({ 
+                        "b_rnd_results_" + cat[0] + syst_suffix: NTupleObject(
+                            "bRnd_rnd_"+ cat[0] + syst_suffix2, branType,
+                            help="BTagrRandomizer results (p,ntoys,pass,tag_id)"
+                            ),
+                        "b_inp_results_" + cat[0] + syst_suffix: NTupleObject(
+                            "bRnd_inp_"+ cat[0] + syst_suffix2, branType,
+                            help="BTagrRandomizer input results (p,ntoys,pass,tag_id)"
+                            )                                                
+                        })
+
 
     for systematic in ["nominal"]:
         for vtype in [

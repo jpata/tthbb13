@@ -63,6 +63,7 @@ TGraphErrors* roc(TString fname="output_sgn.root", float step=0.01, float xMin=0
   if(t==0) return 0;
 
   TH1F h("h", "", NBIN, xMin, xMax);
+  //t->Draw(var+">>h", cut*"TMath::Abs(genWeight)/genWeight");
   t->Draw(var+">>h", cut);
 
   if(histo){
@@ -263,6 +264,16 @@ void roc_comp3_ROC(TString fname1 = "", TString fname2 = "", TString fname3 = ""
   gROCcut->Draw("LSAME");
   gROCcut2->Draw("LSAME");
 
+  cout << "<" << string(leg1.Data()) << ">: bkg eff. at (0.5, 0.2, 0.1) = " << endl; 
+  cout << "\t(" << gROC->Eval(0.5) << ", " << gROC->Eval(0.2) << "," << gROC->Eval(0.1) << ")" 
+       << endl; 
+  cout << "<" << string(leg2.Data()) << ">: bkg eff. at (0.5, 0.2, 0.1) = " << endl; 
+  cout << "\t(" << gROCcut->Eval(0.5) << ", " << gROCcut->Eval(0.2) << "," << gROCcut->Eval(0.1) << ")" 
+       << endl; 
+  cout << "<" << string(leg3.Data()) << ">: bkg eff. at (0.5, 0.2, 0.1) = " << endl;
+  cout << "\t(" << gROCcut2->Eval(0.5) << ", " << gROCcut2->Eval(0.2) << "," << gROCcut2->Eval(0.1) << ")" 
+       << endl; 
+
   TF1* diag = new TF1("diag", "x", 0.,1.);
   diag->SetLineColor(kBlack);
   diag->SetLineStyle(kDashed);
@@ -298,7 +309,7 @@ void roc_comp3_ROC(TString fname1 = "", TString fname2 = "", TString fname3 = ""
   h_sgn->SetTitle("CMS Simulation #sqrt{s}=13 TeV");
   h_sgn->SetXTitle(discrname);
   h_sgn->SetYTitle("normalised to one");
-  h_sgn->SetMaximum(0.5);
+  h_sgn->SetMaximum(0.6);
   h_sgn->SetMinimum(0.0);
   h_sgn->Draw("HISTE");
   h_bkg->Draw("HISTESAME");
@@ -358,7 +369,7 @@ void roc_opt_ROC(TString fname1 = "", TString fname2 = "",
   const float step_a     = 150;
   */
   const unsigned int n_a = 12;
-  const float step_a     = 15;
+  const float step_a     = 10;
 
   float k_factor[n_k];
   float a_factor[n_a];
@@ -456,9 +467,12 @@ void roc_opt_ROC(TString fname1 = "", TString fname2 = "",
 void run_DL_opt( TString gcS1 = "", TString gcB1 = ""
 		 ){
   
-  TString fS1 = path+gcS1+"/tth_13tev_amcatnlo_pu20bx25.root";
-  TString fB1 = path+gcB1+"/ttjets_13tev_madgraph_pu20bx25_phys14.root";
+  //TString fS1 = path+gcS1+"/tth_13tev_amcatnlo_pu20bx25.root";
+  //TString fB1 = path+gcB1+"/ttjets_13tev_madgraph_pu20bx25_phys14.root";
   
+  TString fS1 = "/shome/bianchi/tth/gc/GCf0e72192040b/MEAnalysis_cfg_heppy/tth_13tev_amcatnlo_pu20bx25/output-DL.root";
+  TString fB1 = "/shome/bianchi/tth/gc/GC56e39869b161/MEAnalysis_cfg_heppy/ttjets_13tev_madgraph_pu20bx25_phys14/output-bkg_tmp.root";
+
   string name = "";
   for( int f = 1 ; f < 2; ++f){  
     
@@ -601,9 +615,10 @@ void run_ROC_SL( TString gcS1 = "", TString gcB1 = "",
   TString fB1 = path+gcB1+"/ttjets_13tev_madgraph_pu20bx25_phys14.root";
 
   bool do6jets = false;
-  bool do5jets = false;
-  bool do4jets = false;
-  bool do3tags = true;
+  bool do5jets = true;
+  bool do4jets = true;
+  bool do3tags = false;
+  bool do2tags = false;
 
   if( do6jets ){
   roc_comp3_ROC( fS1, fB1, fS1, fB1, fS1, fB1,
@@ -679,6 +694,7 @@ void run_ROC_SL( TString gcS1 = "", TString gcB1 = "",
 		 "Combined discr.",
 		 "SL_4_g4"
 		 );
+
   }
 
 
@@ -697,6 +713,21 @@ void run_ROC_SL( TString gcS1 = "", TString gcB1 = "",
 		   "SL_4_3",
 		   1
 		   );
+
+
+    roc_comp3_ROC( fS1, fB1, fS1, fB1, fS1, fB1,
+		   "mem_tth_p[0] /(mem_tth_p[0]  + 0.15*mem_ttbb_p[0])",
+		   "(-log(1./(mem_tth_btag_weight_bb[0]/(mem_tth_btag_weight_bb[0]+mem_tth_btag_weight_jj[0]))-1)+2)/8.",
+		   "-log(1./btag_LR_4b_2b_alt-1)/10.",
+		   sl && TCut("njets==4 && nBCSVM==3"),
+		   sl && TCut("njets==4 && nBCSVM==3"),
+		   sl && TCut("njets==4 && nBCSVM==3"),
+		   "SL channel,  N_{b}=3, N_{j}=4", 		
+		   "ME discr.",
+		   "B-tag discr.",
+		   "B-tag event discr.",
+		   "SL_4_3_v2"
+		 );
 
     roc_comp3_ROC( fS1, fB1, fS1, fB1, fS1, fB1,
 		   "mem_tth_p[0] /(mem_tth_p[0]  + 0.15*mem_ttbb_p[0])",
@@ -774,7 +805,66 @@ void run_ROC_SL( TString gcS1 = "", TString gcB1 = "",
 		   );
 
   }
+  if(do2tags){
+    roc_comp3_ROC( fS1, fB1, fS1, fB1, fS1, fB1,
+		   "btag_LR_4b_2b_alt",
+		   "btag_LR_4b_2b_alt",
+		   "btag_LR_4b_2b_alt",
+		   sl && TCut("njets>=4 && nBCSVM==2"),
+		   sl && TCut("njets>=4 && nBCSVM==2"),
+		   sl && TCut("njets>=4 && nBCSVM==2"),
+		   "SL channel,  N_{b}=2, N_{j}#geq4", 		
+		   "B-tag discr.",
+		   "B-tag discr.",
+		   "B-tag discr.",
+		   "SL_g4_2",
+		   1
+		   );
+    roc_comp3_ROC( fS1, fB1, fS1, fB1, fS1, fB1,
+		   "btag_LR_4b_2b_alt",
+		   "btag_LR_4b_2b_alt",
+		   "btag_LR_4b_2b_alt",
+		   sl && TCut("njets>=6 && nBCSVM==2"),
+		   sl && TCut("njets>=6 && nBCSVM==2"),
+		   sl && TCut("njets>=6 && nBCSVM==2"),
+		   "SL channel,  N_{b}=2, N_{j}#geq6", 		
+		   "B-tag discr.",
+		   "B-tag discr.",
+		   "B-tag discr.",
+		   "SL_g6_2",
+		   1
+		   );
 
+    roc_comp3_ROC( fS1, fB1, fS1, fB1, fS1, fB1,
+		   "btag_LR_4b_2b_alt",
+		   "btag_LR_4b_2b_alt",
+		   "btag_LR_4b_2b_alt",
+		   sl && TCut("njets==5 && nBCSVM==2"),
+		   sl && TCut("njets==5 && nBCSVM==2"),
+		   sl && TCut("njets==5 && nBCSVM==2"),
+		   "SL channel,  N_{b}=2, N_{j}=5", 		
+		   "B-tag discr.",
+		   "B-tag discr.",
+		   "B-tag discr.",
+		   "SL_5_2",
+		   1
+		   );
+
+    roc_comp3_ROC( fS1, fB1, fS1, fB1, fS1, fB1,
+		   "btag_LR_4b_2b_alt",
+		   "btag_LR_4b_2b_alt",
+		   "btag_LR_4b_2b_alt",
+		   sl && TCut("njets==4 && nBCSVM==2"),
+		   sl && TCut("njets==4 && nBCSVM==2"),
+		   sl && TCut("njets==4 && nBCSVM==2"),
+		   "SL channel,  N_{b}=2, N_{j}=4", 		
+		   "B-tag discr.",
+		   "B-tag discr.",
+		   "B-tag discr.",
+		   "SL_4_2",
+		   1
+		   );
+  }
 
   return;
 }
@@ -786,37 +876,57 @@ void run_ROC_DL( TString gcS1 = "", TString gcB1 = "",
 		 TString gcS2 = "", TString gcB2 = ""
 		 ){
   
-  TString fS1 = path+gcS1+"/tth_13tev_amcatnlo_pu20bx25.root";
-  TString fB1 = path+gcB1+"/ttjets_13tev_madgraph_pu20bx25_phys14.root";
+  //TString fS1 = path+gcS1+"/tth_13tev_amcatnlo_pu20bx25.root";
+  //TString fB1 = path+gcB1+"/ttjets_13tev_madgraph_pu20bx25_phys14.root";
+  
+  TString fS1 = "/shome/bianchi/tth/gc/GC242bebe6c5b3/MEAnalysis_cfg_heppy/tth_13tev_amcatnlo_pu20bx25/output-sig.root";
+  TString fB1 = "/shome/bianchi/tth/gc/GC499521aa4b0f/MEAnalysis_cfg_heppy/ttjets_13tev_madgraph_pu20bx25_phys14/output-bkg.root";
 
 
   roc_comp3_ROC( fS1, fB1, fS1, fB1, fS1, fB1,
 		 "mem_tth_p[1] /(mem_tth_p[1]  + 0.15*mem_ttbb_p[1])",
-		 "-log(1./(mem_tth_btag_weight_bb[1]/(mem_tth_btag_weight_bb[1]+mem_tth_btag_weight_jj[1]))-1)/15.",
-		 "(mem_tth_p[1] /(mem_tth_p[1]  + 0.03*mem_ttbb_p[1]*(1+15.*mem_tth_btag_weight_jj[1]/mem_tth_btag_weight_bb[1])))",
+		 "(-log(1./(mem_tth_btag_weight_bb[1]/(mem_tth_btag_weight_bb[1]+mem_tth_btag_weight_jj[1]))-1)+2)/10.",
+		 "(mem_tth_p[1] /(mem_tth_p[1]  + 0.03*mem_ttbb_p[1]*(1+30.*mem_tth_btag_weight_jj[1]/mem_tth_btag_weight_bb[1])))",
 		 dl && TCut("njets>=4 && nBCSVM>=4"),
 		 dl && TCut("njets>=4 && nBCSVM>=4"),
 		 dl && TCut("njets>=4 && nBCSVM>=4"),
-		 "DL,  N_{b}#geq4, N_{j}#geq4", 		
+		 "DL channel,  N_{b}#geq4, N_{j}#geq4", 		
 		 "ME discr.",
-		 "B-tag discr. ()",
+		 "B-tag discr.",
 		 "Combined discr.",
-		 "ROC_DL_g4_g4"
+		 "DL_g4_g4",
+		 2
 		 );
 
 
   roc_comp3_ROC( fS1, fB1, fS1, fB1, fS1, fB1,
 		 "mem_tth_p[1] /(mem_tth_p[1]  + 0.15*mem_ttbb_p[1])",
-		 "-log(1./(mem_tth_btag_weight_bb[1]/(mem_tth_btag_weight_bb[1]+mem_tth_btag_weight_jj[1]))-1)/15.",
-		 "(mem_tth_p[1] /(mem_tth_p[1]  + 0.03*mem_ttbb_p[1]*(1+15.*mem_tth_btag_weight_jj[1]/mem_tth_btag_weight_bb[1])))",
+		 "(-log(1./(mem_tth_btag_weight_bb[1]/(mem_tth_btag_weight_bb[1]+mem_tth_btag_weight_jj[1]))-1)+2)/10.",
+		 "(mem_tth_p[1] /(mem_tth_p[1]  + 0.005*mem_ttbb_p[1]*(1+30.*mem_tth_btag_weight_jj[1]/mem_tth_btag_weight_bb[1])))",
 		 dl && TCut("njets>=4 && nBCSVM==3"),
 		 dl && TCut("njets>=4 && nBCSVM==3"),
 		 dl && TCut("njets>=4 && nBCSVM==3"),
-		 "DL,  N_{b}=3, N_{j}#geq4", 		
+		 "DL channel,  N_{b}=3, N_{j}#geq4", 		
 		 "ME discr.",
-		 "B-tag discr. ()",
+		 "B-tag discr.",
 		 "Combined discr.",
-		 "ROC_DL_g4_3"
+		 "DL_g4_3",
+		 2
+		 );
+
+  roc_comp3_ROC( fS1, fB1, fS1, fB1, fS1, fB1,
+		 "btag_LR_4b_2b_alt",
+		 "btag_LR_4b_2b_alt",
+		 "btag_LR_4b_2b_alt",
+		 dl && TCut("njets>=4 && nBCSVM==2"),
+		 dl && TCut("njets>=4 && nBCSVM==2"),
+		 dl && TCut("njets>=4 && nBCSVM==2"),
+		 "DL channel,  N_{b}=2, N_{j}#geq4", 		
+		 "Combined discr.",
+		 "Combined discr.",
+		 "Combined discr.",
+		 "DL_g4_2",
+		 2
 		 );
 
 

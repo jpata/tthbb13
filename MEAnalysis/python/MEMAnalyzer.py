@@ -165,20 +165,35 @@ class MEAnalyzer(FilterAnalyzer):
         set_integration_vars(self.vars_to_integrate, self.vars_to_marginalize, mem_cfg.mem_assumptions)
         
         bquarks = list(mem_cfg.b_quark_candidates(event))
-        if len(bquarks)>mem_cfg.maxJets:
-            print "More than {0} b-quarks supplied, dropping last {1} from MEM".format(mem_cfg.maxJets, len(bquarks) - mem_cfg.maxJets)
+
+        maxjets = mem_cfg.maxJets
+
+        # take highest pT jets if Dl and njets30 >= 4
+        #if "dl" in mem_cfg.mem_assumptions:
+        #    lastjet = 0
+        #    for jet in bquarks:
+        #        if jet.pt >= self.conf.jets[ "pt" ]:
+        #            lastjet += 1
+        #    if lastjet>=4:
+        #        maxjets = min( mem_cfg.maxJets, lastjet )
+        #        print "%s jets with pt>%s found out of %s: retsrict ME input to first %s jets" % (lastjet, self.conf.jets[ "pt" ], len(bquarks), maxjets)
+        #    else:
+        #        print "%s jets with pt>%s found out of %s: ME will have in input %s jets with pt<%s" % (lastjet, self.conf.jets[ "pt" ], len(bquarks), len(bquarks)-lastjet, self.conf.jets["pt"])
+
+        if len(bquarks)>maxjets:
+            print "More than {0} b-quarks supplied, dropping last {1} from MEM".format(maxjets, len(bquarks) - maxjets)
         
         lquarks = list(mem_cfg.l_quark_candidates(event))
-        if len(lquarks)>mem_cfg.maxJets:
-            print "More than {0} l-quarks supplied, dropping last {1} from MEM".format(mem_cfg.maxJets, len(lquarks) - mem_cfg.maxJets)
+        if len(lquarks)>maxjets:
+            print "More than {0} l-quarks supplied, dropping last {1} from MEM".format(maxjets, len(lquarks) - maxjets)
         
         ##Only take up to 4 candidates, otherwise runtimes become too great
-        for jet in bquarks[:mem_cfg.maxJets] + lquarks[:mem_cfg.maxJets]:
+        for jet in bquarks[:maxjets] + lquarks[:maxjets]:
             add_obj(
                 self.integrator,
                 MEM.ObjectType.Jet,
                 p4s=(jet.pt, jet.eta, jet.phi, jet.mass),
-                obs_dict={MEM.Observable.BTAG: jet.btagFlag, MEM.Observable.CSV: jet.btagCSV},
+                obs_dict={MEM.Observable.BTAG: jet.btagFlag, MEM.Observable.CSV: getattr(jet, mem_cfg.btagMethod)},
                 tf_dict={
                     MEM.TFType.bReco: jet.tf_b, MEM.TFType.qReco: jet.tf_l,
                 }
@@ -187,7 +202,7 @@ class MEAnalyzer(FilterAnalyzer):
                 print "memBQuark" if jet in bquarks else "memLQuark",\
                     jet.pt, jet.eta, jet.phi, jet.mass,\
                     ", Flag: ", jet.btagFlag,\
-                    ", CSV: ", jet.btagCSV,\
+                    ", CSV: ",  getattr(jet, mem_cfg.btagMethod),\
                     ", Match: ", jet.tth_match_label, jet.tth_match_index\
                 
                 

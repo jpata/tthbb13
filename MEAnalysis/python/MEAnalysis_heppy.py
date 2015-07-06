@@ -11,7 +11,9 @@ import cPickle as pickle
 import TTH.MEAnalysis.TFClasses as TFClasses
 
 #Import the default list of samples
-from TTH.MEAnalysis.samples_vhbb import samples, sample_version, lfn_to_pfn
+#from TTH.MEAnalysis.samples_vhbb import samples, sample_version, lfn_to_pfn
+from TTH.MEAnalysis.samples_722sync import samples, sample_version, lfn_to_pfn
+
 
 #Create configuration object based on environment variables
 #if one runs with ME_CONF=/path/to/conffile.py, then the configuration is loaded from that file
