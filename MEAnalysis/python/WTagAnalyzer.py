@@ -1,7 +1,6 @@
-from TTH.MEAnalysis.Analyzer import FilterAnalyzer
-from TTH.MEAnalysis.vhbb_utils import lvec
+from TTH.MEAnalysis.VHbbTree import lvec
 
-import numpy as np
+from TTH.MEAnalysis.Analyzer import FilterAnalyzer
 class WTagAnalyzer(FilterAnalyzer):
     """
     Performs W-mass calculation on pairs of untagged jets.
@@ -12,6 +11,9 @@ class WTagAnalyzer(FilterAnalyzer):
     def __init__(self, cfg_ana, cfg_comp, looperName):
         self.conf = cfg_ana._conf
         super(WTagAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
+
+    def beginLoop(self, setup):
+        super(WTagAnalyzer, self).beginLoop(setup)
 
     def pair_mass(self, j1, j2):
         """
@@ -47,16 +49,8 @@ class WTagAnalyzer(FilterAnalyzer):
         return ms
 
     def process(self, event):
-        for (syst, event_syst) in event.systResults.items():
-            if event_syst.passes_btag:
-                res = self._process(event_syst)
-                event.systResults[syst] = res
-            else:
-                event.systResults[syst].passes_wtag = False
-        #event.__dict__.update(event.systResults["nominal"].__dict__)
-        return np.any([v.passes_wtag for v in event.systResults.values()])
+        self.counters["processing"].inc("processed")
 
-    def _process(self, event):
         event.Wmass = 0.0
 
         #we keep a set of the Q quark candidate jets
@@ -66,10 +60,9 @@ class WTagAnalyzer(FilterAnalyzer):
         input_jets = event.buntagged_jets + event.selected_btagged_jets_low
 
         event.wquark_candidate_jet_pairs = []
-
         #Need at least 2 untagged jets to calculate W mass
-        if len(input_jets)>=2:
-            bpair = self.find_best_pair(input_jets)
+        if len(event.buntagged_jets)>=2:
+            bpair = self.find_best_pair(event.buntagged_jets)
             #Get the best mass
             event.Wmass = bpair[0][0]
 
@@ -95,5 +88,8 @@ class WTagAnalyzer(FilterAnalyzer):
             for pair in event.wquark_candidate_jet_pairs:
                 print "wqpair", pair[0].pt, pair[1].pt
 
-        event.passes_wtag = True
-        return event
+        passes = True
+        if passes:
+            self.counters["processing"].inc("passes")
+        return passes
+

@@ -25,7 +25,7 @@ else:
     from TTH.MEAnalysis.MEAnalysis_cfg_heppy import Conf
 
 #Creates a new configuration object based on MEAnalysis_cfg_heppy
-conf = Conf
+conf = Conf()
 
 #Load transfer functions from pickle file
 pi_file = open(conf.general["transferFunctionsPickle"] , 'rb')
@@ -47,9 +47,7 @@ for sn in sorted(samples_dict.keys()):
     inputSample = cfg.Component(
         s.nickName.value(),
         files = map(lfn_to_pfn, s.subFiles.value()),
-        tree_name = "tree",
-        n_gen = s.nGen.value(),
-        xs = s.xSec.value()
+        tree_name = "tree"
     )
     inputSample.isMC = s.isMC.value()
     inputSample.perJob = s.perJob.value()
@@ -57,7 +55,7 @@ for sn in sorted(samples_dict.keys()):
     if s.skip.value() == False and len(s.subFiles.value())>0:
         inputSamples.append(inputSample)
 
-print "Processing samples", [s.name for s in inputSamples]
+print "Processing samples", inputSamples
 
 #Event contents are defined here
 #This is work in progress
@@ -73,23 +71,9 @@ evs = cfg.Analyzer(
 import TTH.MEAnalysis.MECoreAnalyzers as MECoreAnalyzers
 
 #
-
 evtid_filter = cfg.Analyzer(
     MECoreAnalyzers.EventIDFilterAnalyzer,
     'eventid',
-    _conf = conf
-)
-
-pvana = cfg.Analyzer(
-    MECoreAnalyzers.PrimaryVertexAnalyzer,
-    'pvana',
-    _conf = conf
-)
-
-
-evtweight = cfg.Analyzer(
-    MECoreAnalyzers.EventWeightAnalyzer,
-    'eventweight',
     _conf = conf
 )
 
@@ -156,17 +140,6 @@ mva = cfg.Analyzer(
     _conf = conf
 )
 
-brnd = cfg.Analyzer(
-    MECoreAnalyzers.BTagRandomizerAnalyzer,
-    'brand',
-    _conf = conf
-)
-
-treevar = cfg.Analyzer(
-    MECoreAnalyzers.TreeVarAnalyzer,
-    'treevar',
-    _conf = conf
-)
 from TTH.MEAnalysis.metree import getTreeProducer
 treeProducer = getTreeProducer(conf)
 
@@ -175,19 +148,15 @@ treeProducer = getTreeProducer(conf)
 sequence = cfg.Sequence([
     evtid_filter,
     evs,
-    evtweight,
-    pvana,
     leps,
     jets,
+    genrad,
     btaglr,
-    mva,
-    brnd,
     wtag,
     mecat,
-    genrad,
     gentth,
     mem_analyzer,
-    treevar,
+    mva,
     treeProducer
 ])
 
@@ -200,7 +169,6 @@ output_service = cfg.Service(
     fname='tree.root',
     option='recreate'
 )
-print "Creating TChain"
 
 #finalization of the configuration object.
 from PhysicsTools.HeppyCore.framework.chain import Chain as Events
