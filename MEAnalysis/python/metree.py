@@ -344,20 +344,35 @@ def getTreeProducer(conf):
             continue
 
         for vtype in [
+            #("btag_lr_4b",          float,      "4b, N-4 light, probability"),
+            #("btag_lr_2b",          float,      "2b, N-2 Nlight probability"),
+            #("btag_LR_4b_2b_old",   float,      ""),
+            #("btag_LR_4b_2b",       float,      ""),
+            #("btag_LR_4b_2b_max4",  float,      ""),
+
             ("is_sl",               int,        "Passes single lepton cuts"),
             ("is_dl",               int,        "Passes dilepton cuts"),
             ("Wmass",               float,      "Best reconstructed W candidate mass"),
             ("cat",                 int,        "ME category", "catn"),
             ("cat_btag",            int,        "ME category (b-tag)", "cat_btag_n"),
             ("cat_gen",             int,        "top decay category (-1 unknown, 0 single-leptonic, 1 di-leptonic, 2 fully hadronic)", "cat_gen_n"),
-            ("btag_lr_4b",          float,      "4b, N-4 light, probability"),
-            ("btag_lr_2b",          float,      "2b, N-2 Nlight probability"),
-            ("btag_lr_4b_alt",      float,      "4b, N-4 light, probability, 3D binning"),
-            ("btag_lr_2b_alt",      float,      "2b, N-2 Nlight probability, 3D binning"),
-            ("btag_LR_4b_2b_old",   float,      ""),
-            ("btag_LR_4b_2b",       float,      ""),
-            ("btag_LR_4b_2b_alt",   float,      ""),
-            ("btag_LR_4b_2b_max4",  float,      ""),
+            ("btag_lr_4b",          float,      "4b, N-4 light, probability, 3D binning"),
+            ("btag_lr_2b",          float,      "2b, N-2 Nlight probability, 3D binning"),
+            ("btag_lr_4b_Rndge4t",  float,      "4b, N-4 light, probability, 3D binning, ge4t random"),
+            ("btag_lr_2b_Rndge4t",  float,      "2b, N-2 Nlight probability, 3D binning, ge4t random"),
+            ("btag_lr_4b_Inpge4t",  float,      "4b, N-4 light, probability, 3D binning, ge4t input"),
+            ("btag_lr_2b_Inpge4t",  float,      "2b, N-2 Nlight probability, 3D binning, ge4t input"),
+            ("btag_lr_4b_Rnd3t",    float,      "4b, N-4 light, probability, 3D binning, 3t   random"),
+            ("btag_lr_2b_Rnd3t",    float,      "2b, N-2 Nlight probability, 3D binning, 3t   random"),
+            ("btag_lr_4b_Inp3t",    float,      "4b, N-4 light, probability, 3D binning, 3t   input"),
+            ("btag_lr_2b_Inp3t",    float,      "2b, N-2 Nlight probability, 3D binning, 3t   input"),
+
+            ("btag_LR_4b_2b",        float,      ""),
+            ("btag_LR_4b_2b_Rndge4t",float,      ""),
+            ("btag_LR_4b_2b_Inpge4t",float,      ""),
+            ("btag_LR_4b_2b_Rnd3t",  float,      ""),
+            ("btag_LR_4b_2b_Inp3t",  float,      ""),
+
             ("nBCSVM",              float,      ""),
             ("numJets",             int,        ""),
             ("nMatchSimB",          int,        ""),
@@ -405,10 +420,6 @@ def getTreeProducer(conf):
                     "mem_ttbb" + syst_suffix2, memType, len(conf.mem["methodOrder"]),
                     help="MEM ttbb results array, element per config.methodOrder"
                 ),
-                #"b_ran_results" + syst_suffix: NTupleCollection(
-                #    "b_ran" + syst_suffix2, branType, len(conf.bran["jetCategories"]),
-                #    help="BTagrRandomizer results (p,ntoys,pass,tag_id)"
-                #),
                 "fw_h_alljets" + syst_suffix: NTupleCollection(
                     "fw_aj" + syst_suffix2, FoxWolframType, 8,
                     help="Fox-Wolfram momenta calculated with all jets"
@@ -424,16 +435,6 @@ def getTreeProducer(conf):
             })
 
             for cat in conf.bran["jetCategories"].items():
-                #treeProducer.collections.update({ 
-                #        "b_rndval_results_" +cat[0] + syst_suffix: NTupleCollection(
-                #            "jets_" + cat[0] + syst_suffix2, branvalType, 15,
-                #            help="BTagRandomizer random values for category "+cat[0]
-                #            ),
-                #        "b_inpval_results_" +cat[0] + syst_suffix: NTupleCollection(
-                #            "jets_" + cat[0] + syst_suffix2, binpvalType, 15,
-                #            help="BTagRandomizer input values for category "+cat[0]
-                #            )
-                #        })
                 treeProducer.globalObjects.update({ 
                         "b_rnd_results_" + cat[0] + syst_suffix: NTupleObject(
                             "bRnd_rnd_"+ cat[0] + syst_suffix2, branType,

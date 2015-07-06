@@ -14,7 +14,7 @@ class BTagLRAnalyzer(FilterAnalyzer):
     def __init__(self, cfg_ana, cfg_comp, looperName):
         super(BTagLRAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
         self.conf = cfg_ana._conf
-        self.bTagAlgo = self.conf.jets["btagAlgo"]
+        self.bTagAlgo        = self.conf.jets["btagAlgo"]
         self.cplots_old = ROOT.TFile(self.conf.general["controlPlotsFileOld"])
         self.cplots = ROOT.TFile(self.conf.general["controlPlotsFile"])
 
@@ -161,51 +161,56 @@ class BTagLRAnalyzer(FilterAnalyzer):
         return np.any([v.passes_btag for v in event.systResults.values()])
 
     def _process(self, event):
+
         #Take first 6 most b-tagged jets for btag LR
-        jets_for_btag_lr = sorted(
-            event.good_jets,
-            key=lambda x: getattr(x, self.bTagAlgo),
-            reverse=True,
-        )[0:6]
+        jets_for_btag_lr = {}
+        jet_probs        = {}
+        for pdf in ["new_pt_eta_bin_3d"]:
+            for csv in [self.bTagAlgo, "btagCSVRndge4t", "btagCSVInpge4t", "btagCSVRnd3t", "btagCSVInp3t"]:
+                jets_for_btag_lr[ csv ] =  sorted( event.good_jets, key=lambda x: getattr(x, csv, self.bTagAlgo), reverse=True, )[0:6]
+                jet_probs[ pdf+"-"+csv ] =  [ 
+                    self.evaluate_jet_prob(j.pt, j.eta, getattr(j, csv, self.bTagAlgo), pdf)
+                    for j in jets_for_btag_lr[ csv ]
+                    ]
 
-        jet_probs = {
-            kind: [
-                self.evaluate_jet_prob(j.pt, j.eta, getattr(j, self.bTagAlgo), kind)
-                for j in jets_for_btag_lr
-            ]
-            for kind in [
-            "old", "new_eta_1bin",
-            "new_pt_eta_bin_3d"
-            ]
-        }
-        jet_probs["best_btag"] = [self.evaluate_jet_prob(j.pt, j.eta, getattr(j, self.bTagAlgo), "new_pt_eta_bin_3d") for j in jets_for_btag_lr[:4]]
 
-        # for nj, j in enumerate(jets_for_btag_lr):
-        #     print j.btagCSV, j.mcFlavour, jet_probs["old"][nj], jet_probs["new_eta_1bin"][nj], jet_probs["new_pt_eta_bin_3d"][nj]
-        #
-        jet_csvs = [
-            getattr(j, self.bTagAlgo)
-            for j in event.good_jets
-        ]
+        #jet_probs["best_btag"] = [self.evaluate_jet_prob(j.pt, j.eta, getattr(j, self.bTagAlgo, self.bTagAlgoDefault), "new_pt_eta_bin_3d") for j in jets_for_btag_lr[:4]]
+        #jet_csvs = [
+        #    getattr(j, self.bTagAlgo, self.bTagAlgoDefault)
+        #    for j in event.good_jets
+        #]
+        #ph = None
+        #best_4b_perm = 0
+        #best_2b_perm = 0
+        #event.btag_lr_4b_old, ph = self.btag_likelihood(jet_probs["old"], 4, 0)
+        #event.btag_lr_2b_old, v = self.btag_likelihood(jet_probs["old"], 2, 0)
+        #event.btag_lr_4b, best_4b_perm = self.btag_likelihood(jet_probs["new_eta_1bin"], 4, 0)
+        #event.btag_lr_4b_1c, ph = self.btag_likelihood(jet_probs["new_eta_1bin"], 4, 1)
+        #event.btag_lr_2b_2c, ph = self.btag_likelihood(jet_probs["new_eta_1bin"], 2, 2)    
+        #event.btag_lr_4b_max4, ph = self.btag_likelihood(jet_probs["best_btag"], 4, 0)
+        #event.btag_lr_2b_max4, ph = self.btag_likelihood(jet_probs["best_btag"], 2, 0)
+        #event.btag_lr_2b, best_2b_perm = self.btag_likelihood(jet_probs["new_eta_1bin"], 2, 0)
+        #event.btag_lr_2b_1c, best_2b_perm = self.btag_likelihood(jet_probs["new_eta_1bin"], 2, 1)
 
-        ph = None
-        best_4b_perm = 0
-        best_2b_perm = 0
-        event.btag_lr_4b_old, ph = self.btag_likelihood(jet_probs["old"], 4, 0)
-        event.btag_lr_2b_old, v = self.btag_likelihood(jet_probs["old"], 2, 0)
+        # default
+        event.btag_lr_4b, best_4b_perm = self.btag_likelihood(jet_probs["new_pt_eta_bin_3d-"+self.bTagAlgo], 4, 0)
+        event.btag_lr_2b, best_2b_perm = self.btag_likelihood(jet_probs["new_pt_eta_bin_3d-"+self.bTagAlgo], 2, 0)
 
-        event.btag_lr_4b, best_4b_perm = self.btag_likelihood(jet_probs["new_eta_1bin"], 4, 0)
-        event.btag_lr_4b_1c, ph = self.btag_likelihood(jet_probs["new_eta_1bin"], 4, 1)
-        event.btag_lr_2b_2c, ph = self.btag_likelihood(jet_probs["new_eta_1bin"], 2, 2)
-        
-        event.btag_lr_4b_max4, ph = self.btag_likelihood(jet_probs["best_btag"], 4, 0)
-        event.btag_lr_2b_max4, ph = self.btag_likelihood(jet_probs["best_btag"], 2, 0)
+        # >=4t category
+        event.btag_lr_4b_Rndge4t, best_4b_Rndge4t_perm = self.btag_likelihood(jet_probs["new_pt_eta_bin_3d-btagCSVRndge4t"], 4, 0)
+        event.btag_lr_2b_Rndge4t, best_2b_Rndge4t_perm = self.btag_likelihood(jet_probs["new_pt_eta_bin_3d-btagCSVRndge4t"], 2, 0)
 
-        event.btag_lr_2b, best_2b_perm = self.btag_likelihood(jet_probs["new_eta_1bin"], 2, 0)
-        event.btag_lr_2b_1c, best_2b_perm = self.btag_likelihood(jet_probs["new_eta_1bin"], 2, 1)
+        # >=4t category (closure test)
+        event.btag_lr_4b_Inpge4t, best_4b_Inpge4t_perm = self.btag_likelihood(jet_probs["new_pt_eta_bin_3d-btagCSVInpge4t"], 4, 0)
+        event.btag_lr_2b_Inpge4t, best_2b_Inpge4t_perm = self.btag_likelihood(jet_probs["new_pt_eta_bin_3d-btagCSVInpge4t"], 2, 0)
 
-        event.btag_lr_4b_alt, best_4b_perm_alt = self.btag_likelihood(jet_probs["new_pt_eta_bin_3d"], 4, 0)
-        event.btag_lr_2b_alt, best_2b_perm_alt = self.btag_likelihood(jet_probs["new_pt_eta_bin_3d"], 2, 0)
+        # 3t category
+        event.btag_lr_4b_Rnd3t, best_4b_Rnd3t_perm = self.btag_likelihood(jet_probs["new_pt_eta_bin_3d-btagCSVRnd3t"], 4, 0)
+        event.btag_lr_2b_Rnd3t, best_2b_Rnd3t_perm = self.btag_likelihood(jet_probs["new_pt_eta_bin_3d-btagCSVRnd3t"], 2, 0)
+
+        # 3t category (closure test)
+        event.btag_lr_4b_Inp3t, best_4b_Inp3t_perm = self.btag_likelihood(jet_probs["new_pt_eta_bin_3d-btagCSVInp3t"], 4, 0)
+        event.btag_lr_2b_Inp3t, best_2b_Inp3t_perm = self.btag_likelihood(jet_probs["new_pt_eta_bin_3d-btagCSVInp3t"], 2, 0)
 
         def lratio(l1, l2):
             if l1+l2>0:
@@ -213,14 +218,18 @@ class BTagLRAnalyzer(FilterAnalyzer):
             else:
                 return 0.0
 
-        event.btag_LR_4b_2b_old = lratio(event.btag_lr_4b_old, event.btag_lr_2b_old)
-        event.btag_LR_4b_2b = lratio(event.btag_lr_4b, event.btag_lr_2b)
-        event.btag_LR_4b_2b_alt = lratio(event.btag_lr_4b_alt, event.btag_lr_2b_alt)
-        event.btag_LR_4b_2b_max4 = lratio(event.btag_lr_4b_max4, event.btag_lr_2b_max4)
+        #event.btag_LR_4b_2b_old  = lratio(event.btag_lr_4b_old,   event.btag_lr_2b_old)
+        #event.btag_LR_4b_2b      = lratio(event.btag_lr_4b,       event.btag_lr_2b)
+        #event.btag_LR_4b_2b_max4 = lratio(event.btag_lr_4b_max4,  event.btag_lr_2b_max4)
+        event.btag_LR_4b_2b          = lratio(event.btag_lr_4b,          event.btag_lr_2b)
+        event.btag_LR_4b_2b_Rndge4t  = lratio(event.btag_lr_4b_Rndge4t,  event.btag_lr_2b_Rndge4t)
+        event.btag_LR_4b_2b_Inpge4t  = lratio(event.btag_lr_4b_Inpge4t,  event.btag_lr_2b_Inpge4t)
+        event.btag_LR_4b_2b_Rnd3t    = lratio(event.btag_lr_4b_Rnd3t,    event.btag_lr_2b_Rnd3t)
+        event.btag_LR_4b_2b_Inp3t    = lratio(event.btag_lr_4b_Inp3t,    event.btag_lr_2b_Inp3t)
 
-        # LB moved from best_4b_perm to best_4b_perm_alt
-        event.buntagged_jets_by_LR_4b_2b = [jets_for_btag_lr[i] for i in best_4b_perm_alt[4:]]
-        event.btagged_jets_by_LR_4b_2b   = [jets_for_btag_lr[i] for i in best_4b_perm_alt[0:4]]
+        # use default btag method always
+        event.buntagged_jets_by_LR_4b_2b = [jets_for_btag_lr[self.bTagAlgo][i] for i in best_4b_perm[4:]]
+        event.btagged_jets_by_LR_4b_2b   = [jets_for_btag_lr[self.bTagAlgo][i] for i in best_4b_perm[0:4]]
 
         for i in range(len(event.good_jets)):
             event.good_jets[i].btagFlag = 0.0
@@ -234,7 +243,7 @@ class BTagLRAnalyzer(FilterAnalyzer):
             event.buntagged_jets = event.buntagged_jets_bdisc
             event.selected_btagged_jets = event.btagged_jets_bdisc
 
-        btagged = sorted(event.selected_btagged_jets, key=lambda x: x.btagCSV, reverse=True)
+        btagged = sorted(event.selected_btagged_jets, key=lambda x: getattr(x, self.bTagAlgo) , reverse=True)
 
         #Take first 4 most b-tagged jets, these are used for the top and higgs candidates
         event.selected_btagged_jets_high = btagged[0:4]
@@ -249,5 +258,5 @@ class BTagLRAnalyzer(FilterAnalyzer):
             #event.good_jets[idx].btagFlag = 1.0
             jet.btagFlag = 1.0
 
-        event.passes_btag = len(event.selected_btagged_jets)>=1
+        event.passes_btag = len(event.selected_btagged_jets)>=0
         return event
