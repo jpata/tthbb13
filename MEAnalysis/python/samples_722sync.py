@@ -252,11 +252,12 @@ samples = cms.VPSet([
         nickName = cms.string('tth_13tev_amcatnlo_pu20bx25'),
         xSec     = cms.double(0.5058),
         nGen     = cms.int64(199699), #FIXME: has to be replaced with the number of effective pos-neg weights
-        perJob   = cms.uint32(500),
+        perJob   = cms.uint32(200),
         subFiles = cms.vstring([
-            "/store/user/jpata/VHBB_HEPPY_V11_722sync_v2/TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola/VHBB_HEPPY_V11_722sync_v2_TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola__Phys14DR-PU20bx25_tsg_PHYS14_25_V1-v2/150619_165028/0000/tree_1.root",
-            "/store/user/jpata/VHBB_HEPPY_V11_722sync_v2/TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola/VHBB_HEPPY_V11_722sync_v2_TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola__Phys14DR-PU20bx25_tsg_PHYS14_25_V1-v2/150619_165028/0000/tree_2.root",
-            "/store/user/jpata/VHBB_HEPPY_V11_722sync_v2/TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola/VHBB_HEPPY_V11_722sync_v2_TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola__Phys14DR-PU20bx25_tsg_PHYS14_25_V1-v2/150619_165028/0000/tree_3.root",
+                    #"file:///scratch/bianchi/tree_1.root"
+                    "/store/user/jpata/VHBB_HEPPY_V11_722sync_v2/TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola/VHBB_HEPPY_V11_722sync_v2_TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola__Phys14DR-PU20bx25_tsg_PHYS14_25_V1-v2/150619_165028/0000/tree_1.root",
+                    "/store/user/jpata/VHBB_HEPPY_V11_722sync_v2/TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola/VHBB_HEPPY_V11_722sync_v2_TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola__Phys14DR-PU20bx25_tsg_PHYS14_25_V1-v2/150619_165028/0000/tree_2.root",
+                    "/store/user/jpata/VHBB_HEPPY_V11_722sync_v2/TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola/VHBB_HEPPY_V11_722sync_v2_TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola__Phys14DR-PU20bx25_tsg_PHYS14_25_V1-v2/150619_165028/0000/tree_3.root",
         ]),
         isMC     = cms.bool(True)
     ),

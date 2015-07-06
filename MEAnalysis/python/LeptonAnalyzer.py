@@ -54,6 +54,10 @@ class LeptonAnalyzer(FilterAnalyzer):
                     lepcuts = self.conf.leptons[l][a+b]
                     incoll = getattr(event, l)
 
+                    if "debug" in self.conf.general["verbosity"]:
+                        for it in incoll:
+                            (self.conf.leptons[l]["debug"])(it)
+
                     leps = filter(
                         lambda x: (
                             x.pt > lepcuts["pt"]
@@ -79,6 +83,8 @@ class LeptonAnalyzer(FilterAnalyzer):
                 setattr(event, "lep_{0}".format(a+b), sumleps)
                 setattr(event, "n_lep_{0}".format(a+b), len(sumleps))
 
+        if "debug" in self.conf.general["verbosity"]:
+            print "n_lep_tight=%s, n_lep_loose=%s, n_lep_tight_veto=%s, n_lep_loose_veto=%s" % (event.n_lep_tight, event.n_lep_loose, event.n_lep_tight_veto, event.n_lep_loose_veto)
 
         event.is_sl = (event.n_lep_tight == 1 and event.n_lep_tight_veto == 0)
         event.is_dl = (event.n_lep_loose == 2 and event.n_lep_loose_veto == 0)
@@ -92,10 +98,15 @@ class LeptonAnalyzer(FilterAnalyzer):
 
         passes = event.is_sl or event.is_dl
         if event.is_sl and event.is_dl:
-            #print "pathological SL && DL event: {0}".format(event)
-            self.counters["processing"].inc("slanddl")
+            self.counters["processing"].inc("slanddl")            
+            if "debug" in self.conf.general["verbosity"]:
+                print "DEBUG: The event (%s,%s,%s) is both sl and dl" % (event.input.run,event.input.lumi,event.input.evt)
             passes = False
 
         if passes:
             self.counters["processing"].inc("passes")
+        else:
+            if "debug" in self.conf.general["verbosity"]:
+                print "DEBUG: The event (%s,%s,%s) is neither sl nor dl" % (event.input.run,event.input.lumi,event.input.evt)
+
         return passes

@@ -9,10 +9,18 @@
 #export FILE_NAMES=/store/user/jpata/VHBBHeppy722p2-tthsync-jun9-1/TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola/VHBB_HEPPY_V11_TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola__Phys14DR-PU20bx25_tsg_PHYS14_25_V1-v2/150609_170651/0000/tree_1.root
 #export MY_SCRATCH=./
 
-#on PSI, CMSSW_BASE is not exported with the grid job, need to set manually
-CMSSW_BASE=$HOME/TTH-72X-heppy/CMSSW/
+export me_conf="MEAnalysis_cfg_heppy.py"
+#export DATASETNICK="tth_13tev_amcatnlo_pu20bx25"
+#export MAX_EVENTS=100
+#export FILE_NAMES="/store/user/jpata/VHBB_HEPPY_V11_722sync_v2/TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola/VHBB_HEPPY_V11_722sync_v2_TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola__Phys14DR-PU20bx25_tsg_PHYS14_25_V1-v2/150619_165028/0000/tree_3.root"
+#export SKIP_EVENTS=12410
+#export DATASETPATH="tth_13tev_amcatnlo_pu20bx25"
 
-export ME_CONF=$CMSSW_BASE/src/TTH/MEAnalysis/python/@me_conf@
+#on PSI, CMSSW_BASE is not exported with the grid job, need to set manually
+CMSSW_BASE=$HOME/TTH-74X-heppy/CMSSW/
+
+#export ME_CONF=$CMSSW_BASE/src/TTH/MEAnalysis/python/@me_conf@
+export ME_CONF=$CMSSW_BASE/src/TTH/MEAnalysis/python/$me_conf
 
 #print out the environment
 #env
@@ -20,7 +28,7 @@ set -e
 
 #set env
 cd ${CMSSW_BASE}/src/TTH/MEAnalysis/
-export SCRAM_ARCH="slc6_amd64_gcc481"
+export SCRAM_ARCH="slc6_amd64_gcc491"
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 
 #call cmsenv

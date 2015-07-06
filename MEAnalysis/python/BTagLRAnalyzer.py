@@ -30,7 +30,7 @@ class BTagLRAnalyzer(FilterAnalyzer):
         self.csv_pdfs = {
         }
         
-        print "Need to Fix the BTagLRAnalyzer to return normalised PDFs"
+        #print "Need to Fix the BTagLRAnalyzer to return normalised PDFs"
         for x in ["b", "c", "l"]:
             for b in ["Bin0", "Bin1"]:
                 self.csv_pdfs[(x, b)] = self.cplots.Get(
@@ -40,20 +40,37 @@ class BTagLRAnalyzer(FilterAnalyzer):
             self.csv_pdfs[(x, "pt_eta")] = self.cplots.Get(
                 "csv_{0}_pt_eta".format(x)
             )
-            #self.csv_pdfs[(x, "pt_eta")].Scale(1.0 / self.csv_pdfs[(x, "pt_eta")].Integral())
+         
+            '''
             for i in range(1,  self.csv_pdfs[(x, "pt_eta")].GetNbinsX()+2 ):
                 for j in range(1,  self.csv_pdfs[(x, "pt_eta")].GetNbinsY()+2 ):
-                    h = self.csv_pdfs[(x, "pt_eta")].ProjectionZ("_pz", i,i, j,j)
-                    #print h.GetEntries()
-                    norm = h.Integral()
+                    h = self.csv_pdfs[(x, "pt_eta")].ProjectionZ("_pz", i,i, j,j)        
+                    norm    = h.Integral()
+                    norm_ou = h.Integral(0, h.GetNbinsX()+1)
+                    print "%s -- %s " % (norm, norm_ou)
+                    h.SetDefaultSumw2()
                     if norm == 0:
-                        print "Bin ", i ,", " , j, " empty"
                         continue
                     for k in range(1,  self.csv_pdfs[(x, "pt_eta")].GetNbinsZ()+2 ):
                         tot  = self.csv_pdfs[(x, "pt_eta")].GetBinContent(i,j,k)
                         self.csv_pdfs[(x, "pt_eta")].SetBinContent(i,j,k, tot/norm )
                     h2 = self.csv_pdfs[(x, "pt_eta")].ProjectionZ("_pz", i,i, j,j)
-                    print "After rescaling: ", h2.Integral()
+            '''
+            # consider also underflow and overflow bins (N.B. some jets have csv==1, i.e. they will fall into overflow)
+            h3     = self.csv_pdfs[(x, "pt_eta")]
+            nbinsX = h3.GetNbinsX()
+            nbinsY = h3.GetNbinsY()
+            nbinsZ = h3.GetNbinsZ()
+            for i in range(0, nbinsX+2):
+                for j in range(0, nbinsY+2):
+                    int_ij = 0.
+                    for k in range(0, nbinsZ+2):
+                        int_ij += h3.GetBinContent(i,j,k)
+                    for k in range(0, nbinsZ+2):
+                        unnorm = h3.GetBinContent(i,j,k)
+                        if int_ij>0.:
+                            unnorm /= int_ij
+                        self.csv_pdfs[(x, "pt_eta")].SetBinContent(i,j,k, unnorm)
 
         self.conf.BTagLRAnalyzer = self
 
