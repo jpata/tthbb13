@@ -20,6 +20,7 @@ class MEMConfig:
         self.mem_assumptions = set([])
         self.enabled = True
         self.maxJets = 4
+        self.btagMethod = "btagCSV"
 
     def configure_btag_pdf(self, conf):
         """

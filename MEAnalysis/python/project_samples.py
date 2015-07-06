@@ -3,12 +3,12 @@ import ROOT
 
 
 inf = [
-    ("/home/joosep/tth/gc/GC2d3cce33ccc9/cfg_syncSyst/tth_13tev_amcatnlo_pu20bx25.root",
+    ("/home/joosep/tth/gc/GC3ea3380e2be6/MEAnalysis_cfg_heppy/tth_13tev_amcatnlo_pu20bx25.root",
     [
         ("hbb", "nGenBHiggs>=2"),
         ("hX", "nGenBHiggs<2"),
     ]),
-    ("/home/joosep/tth/gc/GC2d3cce33ccc9/cfg_syncSyst/ttjets_13tev_madgraph_pu20bx25_phys14.root",
+    ("/home/joosep/tth/gc/GC074a27a3c764/MEAnalysis_cfg_heppy/ttjets_13tev_madgraph_pu20bx25_phys14.root",
     [
         ("ttb", "ttCls == 51"),
         ("tt2b", "ttCls == 52"),
