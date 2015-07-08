@@ -497,6 +497,9 @@ def main():
 
                 output_tree.Fill()
 
+        # Otherwise memory overflows!
+        input_root_file.Close()
+
 
     output_root_file.Write()
     output_root_file.Close()
