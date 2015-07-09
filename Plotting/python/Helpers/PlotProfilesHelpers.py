@@ -21,6 +21,11 @@ import ROOT
 
 from TTH.Plotting.Helpers.PrepareRootStyle import myStyle
 
+myStyle.SetPadLeftMargin(0.18)
+myStyle.SetPadRightMargin(0.18)
+myStyle.SetPadTopMargin(0.06)
+
+
 ROOT.gROOT.SetStyle("myStyle")
 ROOT.gROOT.ForceStyle()
 
@@ -247,6 +252,8 @@ def makePlots( dic_files,
         # Initialize a square Canvas
         c = ROOT.TCanvas("","",800,800)
 
+        c.SetLogz(True)
+
         # To be able to add multiple samples we have to have a loop here
         # (in the case of single/friends we just run one iteration)
         # transform the plot.sample member into something we can properly loop over
@@ -375,11 +382,11 @@ def makePlots( dic_files,
         prof.SetLineColor( ROOT.kRed) 
         prof.SetLineWidth(2)           
 
-        gr = ROOT.TGraph(h2d.GetXaxis().GetNbins())
+        #gr = ROOT.TGraph(h2d.GetXaxis().GetNbins())
 
-        for ibin in range(1, h2d.GetXaxis().GetNbins()+1):
-            proj = h2d.ProjectionY("", ibin, ibin)
-            gr.SetPoint(ibin-1, h2d.GetXaxis().GetBinCenter(ibin), proj.GetXaxis().GetBinCenter(proj.GetMaximumBin()))
+        #for ibin in range(1, h2d.GetXaxis().GetNbins()+1):
+        #    proj = h2d.ProjectionY("", ibin, ibin)
+        #    gr.SetPoint(ibin-1, h2d.GetXaxis().GetBinCenter(ibin), proj.GetXaxis().GetBinCenter(proj.GetMaximumBin()))
 
 
             
@@ -389,9 +396,13 @@ def makePlots( dic_files,
         # Draw the Profile
         tmp_h=prof.Clone()
         
+        h2d.GetXaxis().SetTitle(plot.x_variable) 
+        h2d.GetYaxis().SetTitle(plot.y_variable) 
+
+
         h2d.Draw("COLZ")
         tmp_h.Draw("SAME")   
-        gr.Draw("PSAME")
+        #gr.Draw("PSAME")
 
 #
 ##        prof.SetFillColor( ROOT.kRed-4 )
@@ -411,20 +422,20 @@ def makePlots( dic_files,
 ##        #f3.SetRange(500,2000)
 #
 #        
-        f = ROOT.TF1("fit_fun_qcd","[0]+[1]*sqrt(x)+[2]/x+[3]/(x*x)+[4]/(x*x*x)",220,2000)
-        f.SetParameter(0,-4.02290e+00)  
-        f.SetParameter(1, 8.97577e-02)  
-        f.SetParameter(2, 2.10638e+03)  
-        f.SetParameter(3,-4.19572e+05)  
-        f.SetParameter(4, 3.20825e+07)  
+#        f = ROOT.TF1("fit_fun_qcd","[0]+[1]*sqrt(x)+[2]/x+[3]/(x*x)+[4]/(x*x*x)",220,2000)
+#        f.SetParameter(0,-4.02290e+00)  
+#        f.SetParameter(1, 8.97577e-02)  
+#        f.SetParameter(2, 2.10638e+03)  
+#        f.SetParameter(3,-4.19572e+05)  
+#        f.SetParameter(4, 3.20825e+07)  
         
         #f.SetParameter(0,1)  
         #f.SetParameter(1,1)  
         #f.SetParameter(2,0.5)
-        f.SetLineColor(ROOT.kRed)
-        gr.Fit(f, "R")
+ #       f.SetLineColor(ROOT.kRed)
+  #      gr.Fit(f, "R")
         #f.Print()
-        f.Draw("SAME")
+   #     f.Draw("SAME")
 #        
 #        
 #        f_new = ROOT.TF1("","[0]+[1]*sqrt(x)+[2]/x+[3]/(x*x)+[4]/(x*x*x)",220,2000)
