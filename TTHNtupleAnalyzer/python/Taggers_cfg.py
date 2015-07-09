@@ -84,7 +84,7 @@ process.selectedHadronsAndPartons = selectedHadronsAndPartons.clone(
 # Ungroomed Fatjets
 #####################################
 
-DO_R15 = False
+DO_R15 = True
 DO_R08 = True
 
 from RecoJets.JetProducers.AnomalousCellParameters_cfi import *
@@ -640,8 +640,8 @@ for fj_name in li_fatjets_objects:
    # For Grid Submission
    sd_path = "src/TTH/TTHNtupleAnalyzer/data/"
         
-   #sd_fatjets = []
-   sd_fatjets = li_ungroomed_fatjets_objects
+   sd_fatjets = []
+   #sd_fatjets = li_ungroomed_fatjets_objects
    
    r = GetRadiusStringFromName(fj_name)
    input_card = sd_path + "sd_input_card_{0}.dat".format(r)
@@ -683,7 +683,7 @@ for i_fj, fj_name in enumerate(li_fatjets_objects):
    r = GetRadiusFromName(fj_name)           
    algo = GetAlgoFromName(fj_name)           
    
-   qvol_fatjets = li_ungroomed_fatjets_objects
+   qvol_fatjets = [] #li_ungroomed_fatjets_objects
 
    if fj_name in qvol_fatjets:
 
