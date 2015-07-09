@@ -38,8 +38,8 @@ li_samples = [
 #    "zprime_m3000_1p_13tev_spring15dr74_asympt25ns",
 
 
-    "qcd_pythia8_flat_13tev_spring15dr74_asympt25ns",
-
+    #"qcd_pythia8_flat_13tev_spring15dr74_asympt25ns",
+    "qcd_pythia6_flat_13tev_spring15dr74_asympt25ns",
 
 ]
 

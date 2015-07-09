@@ -1074,6 +1074,8 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
 	eleIdentifiers = cms.vstring([]),
 	tauIdentifiers = cms.vstring([]),
 
+        genPartonStatus = cms.untracked.int32(3),
+
         rho = cms.InputTag("fixedGridRhoAll"),
         jecFile = cms.FileInPath("Summer13_V4_DATA_UncertaintySources_AK5PFchs.txt")
 )
