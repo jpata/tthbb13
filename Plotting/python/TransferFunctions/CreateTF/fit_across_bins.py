@@ -134,6 +134,17 @@ def Make_AcrossBinFit( TFobj, fit_dicts, config ):
         # Open TGraphErrors object to fit
         gr = ROOT.TGraphErrors( len(point_y) )
 
+        # Also write the unfitted data points to txt file:
+        if not os.path.isdir( '{0}/unfitteddata_txts'.format(config['outputdir'] )):
+            os.makedirs( '{0}/unfitteddata_txts'.format( config['outputdir'] ) )
+        f_tempdata = open(
+            '{0}/unfitteddata_txts/unfittedpoints_{1}_{2}{3}.txt'.format(
+                config['outputdir'],
+                i_abfunc,
+                particle,
+                i_eta ),
+            'w' )
+
         for ( i, E_value, par_value, par_error ) in zip(
             range(len(point_y)), point_x, point_y, er_point_y ):
 
@@ -147,6 +158,15 @@ def Make_AcrossBinFit( TFobj, fit_dicts, config ):
                 0.0,
                 par_error )
 
+            # Format: x_value,x_error,y_value,y_error
+            f_tempdata.write( '{0},{1},{2},{3}\n'.format(
+                E_value,
+                0.0,
+                par_value,
+                par_error
+                ))
+
+        f_tempdata.close()
 
         ########################################
         # Fitting: writing fit data to class objects

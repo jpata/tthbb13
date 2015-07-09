@@ -9,6 +9,8 @@ Thomas: Reading tree for Transfer Function
 # Imports
 ########################################
 
+import sys
+
 import os
 import ROOT
 import TTH.TTHNtupleAnalyzer.AccessHelpers as AH
@@ -57,7 +59,8 @@ def Make_E_axis( input_tree, eta_axis, n_E_bins, E_bounds, particle, config ):
         hist_name = "H{0}{1}".format( particle, i_eta )
 
         # The more bins chosen, the more precise the bin boundaries will be
-        n_E_hist_bins = 50000
+        #n_E_hist_bins = 50000
+        n_E_hist_bins = 1000
 
         # Store this number also in config
         config['n_E_hist_bins'] = n_E_hist_bins
@@ -75,11 +78,35 @@ def Make_E_axis( input_tree, eta_axis, n_E_bins, E_bounds, particle, config ):
         input_tree.Draw(draw_str, sel_str)
         E_hist = getattr(ROOT, hist_name).Clone()
 
+
+        ########################################
+        # Cut the top off of the histogram (makes last bin less wide)
+        ########################################
+
+        # Dit commenten voor normale versie (ook import sys bovenaan weghalen)
+
+        c1 = ROOT.TCanvas("c1","c1",500,400)
+        c1.SetGrid()
+
+        E_hist.Draw()
+        c1.Print( 'Ehist_beforecut', 'pdf')
+
+        cut_bin_value = int(0.3 * E_hist.GetMaximum())
+
+        for i in range(1, n_E_hist_bins):
+            if E_hist.GetBinContent(i) > cut_bin_value:
+                E_hist.SetBinContent( i, cut_bin_value )
+
+        E_hist.Draw()
+        c1.Print( 'Ehist_aftercut', 'pdf')
+
+
         ########################################
         # Determine the bin boundaries
         ########################################
 
-        E_entries = int(E_hist.GetEntries())
+        #E_entries = int(E_hist.GetEntries())
+        E_entries = int(E_hist.Integral())
 
         entries_per_E_bin = E_entries / n_E_bins
 
@@ -93,6 +120,14 @@ def Make_E_axis( input_tree, eta_axis, n_E_bins, E_bounds, particle, config ):
             while bin_sum < bin_cnt * entries_per_E_bin:
                 bin_sum += E_hist.GetBinContent(i)
                 i += 1
+
+                if i > n_E_hist_bins+1:
+                    print 'Exceeding number of bins in histogram'
+                    print 'bin_sum = {0}'.format(bin_sum)
+                    print 'bin_cnt * entries_per_E_bin = {0}'.format(bin_cnt * entries_per_E_bin)
+                    print 'bin_cnt = {0}'.format(bin_cnt)
+                    print 'entries_per_E_bin = {0}'.format(entries_per_E_bin)
+                    sys.exit()
 
             E_bin_boundaries.append( i )
 

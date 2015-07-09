@@ -51,13 +51,14 @@ def Make_config():
     #config['input_root_file_name'] = '/scratch/tklijnsm/V10_full_jets_TTBarH.root'
     #config['input_root_file_name'] = '/scratch/tklijnsm/V11_full_jets_0.3delR.root'
     #config['input_root_file_name'] = '/shome/tklijnsm/Samples/TFsamples/V11_full_subjets_0.3delR.root'
-    config['input_root_file_name'] = '/shome/tklijnsm/Samples/TFsamples/CUSTOMTFFILE_V12_FULL_SUBJETS.root'
 
+    #config['input_root_file_name'] = '/shome/tklijnsm/Samples/TFsamples/CUSTOMTFFILE_V12_FULL_SUBJETS_NC.root'
+    config['input_root_file_name'] = '/shome/tklijnsm/Samples/V12TFsamples/CUSTOMTFFILE_V12_FULL_JETS.root'
 
     config['input_tree_name'] = 'tree'
 
     #config['outputdir'] = 'V11_full_jets_REVERSED_BRANCHES'
-    config['outputdir'] = 'V12_FULL_SUBJETS'
+    config['outputdir'] = 'V12_REALFULL_JETS'
 
         
     config['SBF_fitted_hists_pickle_filename'] = \
@@ -260,16 +261,26 @@ def Make_config():
     config['ABFunctions']['b'] = [
         function(),
         function( "[0]+[1]*x", [ "0" , "1" ] ),
-        function( "sqrt([0]*[0] + x*[1]*[1] + x*x*[2]*[2])", [ "0", "0", "0" ] ),
+        #function( "sqrt([0]*[0] + x*[1]*[1] + x*x*[2]*[2])", [ "0", "0", "0" ] ),
+        #function( "[0]*1.0/x + [1]*x*x+[2]*x+[3]", [ "0", "0", "0", "0" ] ),
+        function( "[0]*1.0/x + [1]*x*x*x+[2]*x*x+[3]*x+[4]",
+                  [ "0", "0", "0", "0", "0" ] ),
         function( "[0]+[1]*x", [ "0" , "1" ] ),
-        function( "sqrt([0]*[0] + x*[1]*[1] + x*x*[2]*[2])", [ "0", "0", "0" ] ) ]
+        #function( "sqrt([0]*[0] + x*[1]*[1] + x*x*[2]*[2])", [ "0", "0", "0" ] ),
+        function( "[0]*1.0/x + [1]*x*x+[2]*x+[3]", [ "0", "0", "0", "0" ] ),
+        ]
 
     config['ABFunctions']['l'] = [
         function(),
         function( "[0]+[1]*x", [ "0" , "1" ] ),
-        function( "sqrt([0]*[0] + x*[1]*[1] + x*x*[2]*[2])", [ "0", "0", "0" ] ),
+        #function( "sqrt([0]*[0] + x*[1]*[1] + x*x*[2]*[2])", [ "0", "0", "0" ] ),
+        #function( "[0]*1.0/x + [1]*x*x+[2]*x+[3]", [ "0", "0", "0", "0" ] ),
+        function( "[0]*1.0/x + [1]*x*x*x+[2]*x*x+[3]*x+[4]",
+                  [ "0", "0", "0", "0", "0" ] ),
         function( "[0]+[1]*x", [ "0" , "1" ] ),
-        function( "sqrt([0]*[0] + x*[1]*[1] + x*x*[2]*[2])", [ "0", "0", "0" ] ) ]
+        #function( "sqrt([0]*[0] + x*[1]*[1] + x*x*[2]*[2])", [ "0", "0", "0" ] ),
+        function( "[0]*1.0/x + [1]*x*x+[2]*x+[3]", [ "0", "0", "0", "0" ] ),
+        ]
 
     """
     # Standard for Single Gaussian:
