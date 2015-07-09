@@ -44,10 +44,10 @@ for ev in range(tt.GetEntries()):
         lep1_eta = leps_eta[1]
         lep1_phi = leps_phi[1]
         lep1_iso = -1
-        if abs(lep0_id) == 11:
-            lep0_iso = leps_iso03[1]
-        elif abs(lep0_id) == 13:
-            lep0_iso = leps_iso04[1]
+        if abs(lep1_id) == 11:
+            lep1_iso = leps_iso03[1]
+        elif abs(lep1_id) == 13:
+            lep1_iso = leps_iso04[1]
     else:
         lep1_pt = 0
         lep1_id = 0

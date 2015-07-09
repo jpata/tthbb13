@@ -42,10 +42,17 @@ class LeptonAnalyzer(FilterAnalyzer):
             lambda x: abs(x.pdgId) == 13,
             event.selLeptons,
         )
+        if "debug" in self.conf.general["verbosity"]:
+            for it in event.mu:
+                (self.conf.leptons["mu"]["debug"])(it)
+
         event.el = filter(
             lambda x: abs(x.pdgId) == 11,
             event.selLeptons,
         )
+        if "debug" in self.conf.general["verbosity"]:
+            for it in event.el:
+                (self.conf.leptons["el"]["debug"])(it)
 
         for a in ["tight", "loose"]:
             for b in ["", "_veto"]:
@@ -53,10 +60,6 @@ class LeptonAnalyzer(FilterAnalyzer):
                 for l in ["mu", "el"]:
                     lepcuts = self.conf.leptons[l][a+b]
                     incoll = getattr(event, l)
-
-                    if "debug" in self.conf.general["verbosity"]:
-                        for it in incoll:
-                            (self.conf.leptons[l]["debug"])(it)
 
                     leps = filter(
                         lambda x: (
@@ -66,6 +69,10 @@ class LeptonAnalyzer(FilterAnalyzer):
                             and abs(getattr(x, self.conf.leptons[l]["isotype"])) < lepcuts.get("iso", 99)
                         ), incoll
                     )
+                    if "debug" in self.conf.general["verbosity"]:
+                        print a,b,l
+                        for it in leps:
+                            (self.conf.leptons[l]["debug"])(it)
 
                     #remove veto leptons that also pass the good lepton cuts
                     if b == "_veto":

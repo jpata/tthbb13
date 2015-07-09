@@ -21,7 +21,7 @@ def mu_baseline(mu):
     )
 
 def print_mu(mu):
-    print "Muon: (pt=%s, eta=%s, tight=%s, pf=%s, glo=%s, dxy=%s, dz=%s, chi2=%s, nhits=%s, pix=%s, stat=%s, pfRelIso03=%s)" % (mu.pt, mu.eta, mu.tightId, mu.isPFMuon,  mu.isGlobalMuon, mu.dxy , mu.dz, mu.globalTrackChi2, (getattr(mu, "nMuonHits", 0) > 0 or getattr(mu, "nChamberHits", 0) > 0) , mu.pixelHits , mu.nStations, mu.pfRelIso03)
+    print "Muon: (pt=%s, eta=%s, tight=%s, pf=%s, glo=%s, dxy=%s, dz=%s, chi2=%s, nhits=%s, pix=%s, stat=%s, pfRelIso04=%s)" % (mu.pt, mu.eta, mu.tightId, mu.isPFMuon,  mu.isGlobalMuon, mu.dxy , mu.dz, mu.globalTrackChi2, (getattr(mu, "nMuonHits", 0) > 0 or getattr(mu, "nChamberHits", 0) > 0) , mu.pixelHits , mu.nStations, mu.pfRelIso04)
 
 
 def el_baseline_tight(el):
@@ -255,14 +255,14 @@ class Conf:
         "untaggedSelection": "btagLR",
         
         #how many jets to consider for the btag LR permutations
-        "NJetsForBTagLR": 8
+        "NJetsForBTagLR": 6
     }
 
     general = {
         "controlPlotsFileOld": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsTEST.root",
         "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV6.root",
-        "sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_722sync.py",
-        #"sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_prev12.py",
+        #"sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_722minisync.py",
+        "sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_prev12.py",
         "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions.pickle",
         "systematics": ["nominal"],
         #"systematics": ["nominal", "JESUp", "JESDown", "raw"],
@@ -281,30 +281,9 @@ class Conf:
 
 
         #"eventWhitelist": [
-        #    (1, 320, 31947),
-        #    (1, 83,   8206),
-        ##     (1,333,33255 ),
-       ##     (1,931,93077),
-       ##     (1,320,31933),
-       ##     (1,628,62736),
-       ##     (1, 627, 62622)
-        ##    (1, 214, 21333),
-        ##    #cat6
-        ##    (1, 1326, 132576),
-        ##    (1, 1001, 100098),
-        ##    (1, 1075, 107401),
-        ##    (1, 1910, 190937),
-        ##    (1, 739, 73869),
-
-        ##    #root [2] tree->Scan("run:lumi:evt:mem_tth_p[0]", "njets==6 && nBCSVM==4 && is_sl==1 && mem_tth_p[0]==0")
-        ##    (1,  558,  55798),
-        ##    (1,  566,  56576),
-        ##    (1,   12,   1121),
-        ##    (1,  714,  71316),
-        ##    (1, 1222, 122152),
-        ##    (1,  856,  85542),
-        ##    (1,  300,  29931),
-        ##    (1, 1675, 167428),
+        #    (1,9,868),
+        #    (1,9,870),
+        #    (1,14,1351),
         #]
     }
 
@@ -324,7 +303,7 @@ class Conf:
 
         #Actually run the ME calculation
         #If False, all ME values will be 0
-        "calcME": True,
+        "calcME": False,
 
         #Generic event-dependent selection function applied
         #just before the MEM. If False, MEM is skipped
