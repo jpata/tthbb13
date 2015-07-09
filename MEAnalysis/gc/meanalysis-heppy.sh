@@ -13,8 +13,9 @@
 #on PSI, CMSSW_BASE is not exported with the grid job, need to set manually
 CMSSW_BASE=$HOME/TTH-74X/CMSSW/
 
+#here we use @...@ to give grid-control the possibility to substitute the configuration file name
 #export ME_CONF=$CMSSW_BASE/src/TTH/MEAnalysis/python/@me_conf@
-export ME_CONF=$CMSSW_BASE/src/TTH/MEAnalysis/python/$me_conf
+export ME_CONF=$CMSSW_BASE/src/TTH/MEAnalysis/python/@me_conf@
 
 #print out the environment
 #env
@@ -28,7 +29,7 @@ source /cvmfs/cms.cern.ch/cmsset_default.sh
 #call cmsenv
 eval `scramv1 runtime -sh`
 
-#this was a work-around in tallinn
+#this was a work-around in tallinn, no longer needed (probably)
 #make sure we have the correct custom python environment
 #source $CMSSW_BASE/src/TTH/setenv.sh
 #export PYTHONPATH=$CMSSW_BASE/anaconda/lib/python2.7/site-packages:$PYTHONPATH
