@@ -84,7 +84,7 @@ process.selectedHadronsAndPartons = selectedHadronsAndPartons.clone(
 # Ungroomed Fatjets
 #####################################
 
-DO_R15 = True
+DO_R15 = False
 DO_R08 = True
 
 from RecoJets.JetProducers.AnomalousCellParameters_cfi import *
@@ -640,8 +640,8 @@ for fj_name in li_fatjets_objects:
    # For Grid Submission
    sd_path = "src/TTH/TTHNtupleAnalyzer/data/"
         
-   sd_fatjets = []
-   #sd_fatjets = li_ungroomed_fatjets_objects
+   #sd_fatjets = []
+   sd_fatjets = li_ungroomed_fatjets_objects
    
    r = GetRadiusStringFromName(fj_name)
    input_card = sd_path + "sd_input_card_{0}.dat".format(r)
@@ -1074,7 +1074,7 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
 	eleIdentifiers = cms.vstring([]),
 	tauIdentifiers = cms.vstring([]),
 
-        genPartonStatus = cms.untracked.int32(3),
+#        genPartonStatus = cms.untracked.int32(3),
 
         rho = cms.InputTag("fixedGridRhoAll"),
         jecFile = cms.FileInPath("Summer13_V4_DATA_UncertaintySources_AK5PFchs.txt")
