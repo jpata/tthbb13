@@ -236,7 +236,8 @@ class Conf:
         "pt_dl":  20,
         "eta_dl": 2.4,
 
-        #The default b-tagging algorithm (branch name)
+
+        #The b-tagging algorithm used for (branch name)
         "btagAlgo": "btagCSV",
 
         #The default b-tagging WP
@@ -260,7 +261,7 @@ class Conf:
 
     general = {
         "controlPlotsFileOld": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsTEST.root",
-        "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV6.root",
+        "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV6_finerPt_722sync.root",
         "sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_722sync.py",
         #"sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_722minisync.py",
         #"sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_prev12.py",
@@ -290,11 +291,11 @@ class Conf:
 
     bran = {
       
-        "pdfFile" :  os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV6_finerPt.root",
+        "pdfFile" :  general["controlPlotsFile"], #os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV6_finerPt_722sync.root",
 
         "jetCategories" : {
             #"2t"   : (2, 2, 0),
-            #"3t"   : (3, 3, 1),
+            "3t"   : (3, 3, 1),
             "ge4t" : (4, 6, 2), # needed for timing 
             }
         }
@@ -332,7 +333,7 @@ class Conf:
             #"SL_2w2h2t",
             #"SL_2w2h2t_memLR",
             #"SL_0w2h2t_memLR",
-            "DL_0w2h2t_Rndge4t"
+            #"DL_0w2h2t_Rndge4t"
         ],
 
     }
