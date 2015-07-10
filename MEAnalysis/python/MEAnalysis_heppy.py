@@ -183,7 +183,7 @@ sequence = cfg.Sequence([
     jets,
     btaglr,
     mva,
-    brnd,
+    #brnd,
     wtag,
     mecat,
     genrad,

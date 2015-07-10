@@ -32,6 +32,12 @@ jetType = NTupleObjectType("jetType", variables = [
     NTupleVariable("mcEta", lambda x : x.mcEta),
     NTupleVariable("mcPhi", lambda x : x.mcPhi),
     NTupleVariable("mcM", lambda x : x.mcM),
+    NTupleVariable("mcNumBHadrons", lambda x : x.genjet.numBHadrons if hasattr(x, "genjet") else -1),
+    NTupleVariable("mcNumCHadrons", lambda x : x.genjet.numCHadrons if hasattr(x, "genjet") else -1),
+    NTupleVariable("mcNumBHadronsFromTop", lambda x : getattr(x.genjet, "numBHadronsFromTop") if hasattr(x, "genjet") else -1),
+    NTupleVariable("mcNumCHadronsFromTop", lambda x : getattr(x.genjet, "numCHadronsFromTop") if hasattr(x, "genjet") else -1),
+    NTupleVariable("mcNumBHadronsAfterTop", lambda x : getattr(x.genjet, "numBHadronsAfterTop") if hasattr(x, "genjet") else -1),
+    NTupleVariable("mcNumCHadronsAfterTop", lambda x : getattr(x.genjet, "numCHadronsAfterTop") if hasattr(x, "genjet") else -1),
     NTupleVariable("corr", lambda x : x.corr),
     NTupleVariable("corr_JESUp", lambda x : x.corr_JECUp),
     NTupleVariable("corr_JESDown", lambda x : x.corr_JECDown),
@@ -423,27 +429,27 @@ def getTreeProducer(conf):
                 ),
             })
 
-            for cat in conf.bran["jetCategories"].items():
-                #treeProducer.collections.update({ 
-                #        "b_rndval_results_" +cat[0] + syst_suffix: NTupleCollection(
-                #            "jets_" + cat[0] + syst_suffix2, branvalType, 15,
-                #            help="BTagRandomizer random values for category "+cat[0]
-                #            ),
-                #        "b_inpval_results_" +cat[0] + syst_suffix: NTupleCollection(
-                #            "jets_" + cat[0] + syst_suffix2, binpvalType, 15,
-                #            help="BTagRandomizer input values for category "+cat[0]
-                #            )
-                #        })
-                treeProducer.globalObjects.update({ 
-                        "b_rnd_results_" + cat[0] + syst_suffix: NTupleObject(
-                            "bRnd_rnd_"+ cat[0] + syst_suffix2, branType,
-                            help="BTagrRandomizer results (p,ntoys,pass,tag_id)"
-                            ),
-                        "b_inp_results_" + cat[0] + syst_suffix: NTupleObject(
-                            "bRnd_inp_"+ cat[0] + syst_suffix2, branType,
-                            help="BTagrRandomizer input results (p,ntoys,pass,tag_id)"
-                            )                                                
-                        })
+            #for cat in conf.bran["jetCategories"].items():
+            #    #treeProducer.collections.update({ 
+            #    #        "b_rndval_results_" +cat[0] + syst_suffix: NTupleCollection(
+            #    #            "jets_" + cat[0] + syst_suffix2, branvalType, 15,
+            #    #            help="BTagRandomizer random values for category "+cat[0]
+            #    #            ),
+            #    #        "b_inpval_results_" +cat[0] + syst_suffix: NTupleCollection(
+            #    #            "jets_" + cat[0] + syst_suffix2, binpvalType, 15,
+            #    #            help="BTagRandomizer input values for category "+cat[0]
+            #    #            )
+            #    #        })
+            #    treeProducer.globalObjects.update({ 
+            #            "b_rnd_results_" + cat[0] + syst_suffix: NTupleObject(
+            #                "bRnd_rnd_"+ cat[0] + syst_suffix2, branType,
+            #                help="BTagrRandomizer results (p,ntoys,pass,tag_id)"
+            #                ),
+            #            "b_inp_results_" + cat[0] + syst_suffix: NTupleObject(
+            #                "bRnd_inp_"+ cat[0] + syst_suffix2, branType,
+            #                help="BTagrRandomizer input results (p,ntoys,pass,tag_id)"
+            #                )                                                
+            #            })
 
 
     for systematic in ["nominal"]:

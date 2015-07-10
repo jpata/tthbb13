@@ -4,6 +4,22 @@ from TTH.MEAnalysis.MEMConfig import MEMConfig
 import ROOT
 from ROOT import MEM
 
+def jet_baseline(jet, oldpt=None):
+    #in case pt has been rescaled, then need to rescale energy fractions
+    if oldpt is None:
+        oldpt = jet.pt
+    ptfrac = jet.pt / oldpt
+    
+    #X = x / oldpt
+    #Xnew = x / (ptfrac * oldpt) = X / ptfrac
+    return (jet.neHEF/ptfrac < 0.99
+        and jet.chEmEF/ptfrac < 0.99
+        and jet.neEmEF/ptfrac < 0.99
+        and jet.numberOfDaughters > 1
+        and jet.chHEF/ptfrac > 0.0
+        and jet.chMult/ptfrac > 0.0
+    )
+
 # LB: in fact,  mu.tightId should contain all the other cuts
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Tight_Muon
 # https://github.com/vhbb/cmssw/blob/vhbbHeppy722patch2/PhysicsTools/Heppy/python/physicsobjects/Muon.py
@@ -204,7 +220,6 @@ class Conf:
             "tight_veto": {
                 "pt": 20,
                 "eta": 2.4,
-                "iso": 0.15,
                 "idcut": lambda el: el_baseline_loose(el),
             },
 
@@ -255,14 +270,16 @@ class Conf:
         "untaggedSelection": "btagLR",
         
         #how many jets to consider for the btag LR permutations
-        "NJetsForBTagLR": 6
+        "NJetsForBTagLR": 6,
+
+        "selection": jet_baseline
     }
 
     general = {
         "controlPlotsFileOld": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsTEST.root",
         "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV6.root",
-        "sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_722sync.py",
-        #"sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_722minisync.py",
+        #"sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_722sync.py",
+        "sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_722minisync.py",
         #"sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_prev12.py",
         "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions.pickle",
         "systematics": ["nominal"],
@@ -282,9 +299,7 @@ class Conf:
 
 
         #"eventWhitelist": [
-        #    (1,9,868),
-        #    (1,9,870),
-        #    (1,14,1351),
+        #    (1,1131,113058)
         #]
     }
 
