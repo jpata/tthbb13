@@ -41,31 +41,56 @@ class TF:
             # Creating and filling TGraph object
             ########################################
 
-            skip_begin = 2
-            skip_end = 2
+            skip_begin = 0
+            skip_end = 0
 
-            gr = ROOT.TGraphErrors( len(fit_dicts) - skip_begin - skip_end )
+            point_x = []
+            point_y = []
+            er_point_y = []
+
 
             for (i_E, dic) in enumerate(fit_dicts):
 
-                if i_E >= skip_begin and i_E < (len(fit_dicts) - skip_end):
+                if i_E >= skip_begin and i_E < (len(fit_dicts) - skip_end) and \
+                    dic['single_bin_func'].par_values[3]>25.0 and \
+                    dic['single_bin_func'].par_values[4]>2.5 :
 
-                    """
-                    print 'i_E = {0}, E_val = {1}, fit_val = {2}'.format(
-                        i_E,
-                        dic['E_value'],
-                        dic['single_bin_func'].par_values[par_num] )
-                    """
-
-                    gr.SetPoint(
-                        i_E-2,
-                        dic['E_value'],
+                    point_y.append(
                         abs( dic['single_bin_func'].par_values[par_num] ) )
 
-                    gr.SetPointError(
-                        i_E-2,
-                        0.0,
-                        dic['single_bin_func'].par_errors[par_num] )
+                    point_x.append( dic['E_value'] )
+
+                    er_point_y.append( dic['single_bin_func'].par_errors[par_num] )
+
+
+            gr = ROOT.TGraphErrors( len(point_y) )
+
+            for ( i, E_value, par_value, par_error ) in zip(
+                range(len(point_y)), point_x, point_y, er_point_y ):
+
+                gr.SetPoint(
+                    i,
+                    E_value,
+                    par_value )
+
+                gr.SetPointError(
+                    i,
+                    0.0,
+                    par_error )
+
+
+
+                """
+                gr.SetPoint(
+                    i_E-2,
+                    dic['E_value'],
+                    abs( dic['single_bin_func'].par_values[par_num] ) )
+
+                gr.SetPointError(
+                    i_E-2,
+                    0.0,
+                    dic['single_bin_func'].par_errors[par_num] )
+                """
 
                 
 
@@ -429,15 +454,47 @@ class TF:
             return 0
 
 
+    def Print_content(self):
+
+        print 'Class: i_eta = {0}, particle = {1}'.format(
+            self.i_eta, self.particle )
+
+        print '    Single bin function:'
+        print '    --------------'
+        print '      fun: {0}'.format( self.SingleBinFunc.str )
+        print '      init: {0}'.format( self.SingleBinFunc.par_initials )
+        print '      param: {0}'.format( self.SingleBinFunc.par_values )
+        print '      er par: {0}'.format( self.SingleBinFunc.par_errors )
+        print '    --------------'
+
+        print '    {0} Across bin functions found:'.format(
+            len( self.AcrossBinFuncs ) )
+
+        print '    --------------'
+        for func in self.AcrossBinFuncs:
+            print '      fun: {0}'.format( func.str )
+            print '      init: {0}'.format( func.par_initials )
+            print '      param: {0}'.format( func.par_values )
+            print '      er par: {0}'.format( func.par_errors )
+            print '    --------------'
+
+
+
+
+
+
+
+
+
 
 class function:
 
-    def __init__(self, str = "1", par_initials = [], abspars = [] ):
+    def __init__(self, str = "1", par_initials = [], par_limits = [] ):
         self.str = str
         self.par_initials = par_initials
         self.par_values = []
         self.par_errors = []
-        self.abspars = abspars
+        self.par_limits = par_limits
 
 
     def Initialize_as_TF1( self, hist = 'none' ):
@@ -469,11 +526,12 @@ class function:
             f1.SetParameter( i, eval( init_var_str ) )
 
         # Set parameter limits for the parameters that are specified as absolute:
-        for parameter in self.abspars:
-            f1.SetParLimits( parameter, 0.0, 2000.0 )
+        for (parameter, lower_bound, upper_bound) in self.par_limits:
+            f1.SetParLimits( parameter, lower_bound, upper_bound )
 
         # Set fit range
-        f1.SetRange(30,500)
+        if hasattr( self, 'fitrange' ):
+            f1.SetRange( getattr(self, 'fitrange')[0] , getattr(self, 'fitrange')[1] )
 
         return f1
 

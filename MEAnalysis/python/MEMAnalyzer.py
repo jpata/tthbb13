@@ -608,7 +608,7 @@ class MEAnalyzer(FilterAnalyzer):
         event.mem_results_ttbb = []
 
         # Temporary: don't execute MEM right now
-        return True
+        #return True
 
         #jets = sorted(event.good_jets, key=lambda x: x.pt, reverse=True)
         leptons = event.good_leptons

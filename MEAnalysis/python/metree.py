@@ -125,6 +125,11 @@ httCandidateType = NTupleObjectType("httCandidateType", variables = [
     NTupleVariable("sjNonWphi", lambda x: x.sjNonWphi ),
     NTupleVariable("sjNonWmass", lambda x: x.sjNonWmass ),
     NTupleVariable("sjNonWbtag", lambda x: x.sjNonWbtag ),
+    NTupleVariable("tau1", lambda x: x.tau1 ),
+    NTupleVariable("tau2", lambda x: x.tau2 ),
+    NTupleVariable("tau3", lambda x: x.tau3 ),
+    NTupleVariable("bbtag", lambda x: x.bbtag ),
+    NTupleVariable("n_subjetiness", lambda x: x.n_subjetiness ), # Calculated
 ])
 
 FatjetCA15ungroomedType = NTupleObjectType("FatjetCA15ungroomedType", variables = [
@@ -229,8 +234,8 @@ def getTreeProducer(conf):
 
             NTupleVariable(
                 "Matching_btag_disagreement",
-                lambda ev: ev.btag_disagreement \
-                    if hasattr(ev, 'btag_disagreement') else -1,
+                lambda ev: ev.Matching_btag_disagreement \
+                    if hasattr(ev, 'Matching_btag_disagreement') else -1,
                 help="Checks if there was a conflict between the b-tagged subjets and the b-tagged jets"
             ),
 
@@ -620,7 +625,7 @@ def getTreeProducer(conf):
 
             # V11 & V12
             # ==============================
-            "httCandidate" : NTupleCollection("httCandidate", httCandidateType, 23, help=""),
+            "httCandidate_AC" : NTupleCollection("httCandidate_AC", httCandidateType, 28, help=""),
             "FatjetCA15ungroomed" : NTupleCollection("FatjetCA15ungroomed", FatjetCA15ungroomedType, 8, help=""),
             "FatjetCA15pruned" : NTupleCollection("FatjetCA15pruned", FatjetCA15prunedType, 4, help=""),
             "SubjetCA15pruned" : NTupleCollection("SubjetCA15pruned", SubjetCA15prunedType, 5, help=""),

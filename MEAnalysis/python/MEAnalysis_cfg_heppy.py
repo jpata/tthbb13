@@ -81,8 +81,14 @@ class Conf:
             "controlPlotsFileOld": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsTEST.root",
             "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV6.root",
             "sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_vhbb.py",
+
             "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions.pickle",
             "transferFunctions_sj_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions_sj.pickle",
+
+            #"transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions_notfull_oldabfs.pickle",
+            #"transferFunctions_sj_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions_sj_notfull_oldabfs.pickle",
+
+
 
             #If the list contains:
             # "gen" - print out the ttH gen-level particles (b from top, b form higgs, q from W, leptons
@@ -133,10 +139,10 @@ class Conf:
                 "SL_2qW",
                 #"SL_1qW",
 
-                "SL_2qW_sj",
+                #"SL_2qW_sj",
                 #"SL_1qW_sj",
 
-                "SL_2qW_sj_perm",
+                #"SL_2qW_sj_perm",
                 #"SL_1qW_sj_perm",
 
                 "SL_2qW_NewTF",
