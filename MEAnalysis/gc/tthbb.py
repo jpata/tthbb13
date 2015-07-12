@@ -46,6 +46,8 @@ if args.action == "hadd":
     completed_files = []
     input_filenames = []
     for job, wd in zip(jobs, workdirs):
+    #for job, wd in zip( ["confs/sig-psi.conf"], ["work.sig"] ):
+    #for job, wd in zip( ["confs/bkg-psi.conf"], ["work.bkg"] ):
         donefiles = glob.glob(wd + "/output/*/output.txt")
         for df in donefiles:
             input_filenames += map(lambda x: x.strip(), open(df).readlines())
