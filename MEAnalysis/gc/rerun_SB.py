@@ -53,9 +53,9 @@ def Create_Error_Report( workdir ):
 
 def main():
 
-    #key_list = [ 'sig', 'bkg' ]
+    key_list = [ 'sig', 'bkg' ]
     #key_list = [ 'sig' ]
-    key_list = [ 'bkg' ]
+    #key_list = [ 'bkg' ]
 
 
     start_time = time.time()

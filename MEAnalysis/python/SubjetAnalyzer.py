@@ -34,10 +34,10 @@ class SubjetAnalyzer(FilterAnalyzer):
             ( 'pt'  , '>', '200.0' ),
             ( 'mass', '>', '120.0' ),
             ( 'mass', '<', '180.0' ),
-            ( 'fRec'  , '<', '0.39' ),
+            ( 'fRec'  , '<', '0.45' ),
             ]
 
-        self.n_subjetiness_cut = 0.87
+        self.n_subjetiness_cut = 0.97
 
 
     def beginLoop(self, setup):
@@ -700,6 +700,9 @@ class SubjetAnalyzer(FilterAnalyzer):
             setattr( top , 'tau2', fatjet.tau2 )
             setattr( top , 'tau3', fatjet.tau3 )
             setattr( top , 'bbtag', fatjet.bbtag )
+
+            # Calculate delRopt
+            setattr( top, 'delRopt', top.Ropt - top.RoptCalc )
 
             # Append the httCandidate class to the list
             tops_after_nsub_cut.append( top )
