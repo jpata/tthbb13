@@ -125,11 +125,12 @@ httCandidateType = NTupleObjectType("httCandidateType", variables = [
     NTupleVariable("sjNonWphi", lambda x: x.sjNonWphi ),
     NTupleVariable("sjNonWmass", lambda x: x.sjNonWmass ),
     NTupleVariable("sjNonWbtag", lambda x: x.sjNonWbtag ),
-    NTupleVariable("tau1", lambda x: x.tau1 ),
-    NTupleVariable("tau2", lambda x: x.tau2 ),
-    NTupleVariable("tau3", lambda x: x.tau3 ),
-    NTupleVariable("bbtag", lambda x: x.bbtag ),
+    NTupleVariable("tau1", lambda x: x.tau1 ),   # Copied from matched fat jet
+    NTupleVariable("tau2", lambda x: x.tau2 ),   # Copied from matched fat jet
+    NTupleVariable("tau3", lambda x: x.tau3 ),   # Copied from matched fat jet
+    NTupleVariable("bbtag", lambda x: x.bbtag ), # Copied from matched fat jet
     NTupleVariable("n_subjetiness", lambda x: x.n_subjetiness ), # Calculated
+    NTupleVariable("delRopt", lambda x: x.delRopt ),             # Calculated
 ])
 
 FatjetCA15ungroomedType = NTupleObjectType("FatjetCA15ungroomedType", variables = [
