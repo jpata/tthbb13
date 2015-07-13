@@ -165,7 +165,9 @@ JetHistogramAnalyzer::JetHistogramAnalyzer(
     h_csv1c(fsmake<TH1D>("jet1_csvc", "Sub-leading jet csv c", 30, 0, 1.0)),
     h_csv1l(fsmake<TH1D>("jet1_csvl", "Sub-leading jet csv uds", 30, 0, 1.0)),
     h_csv1g(fsmake<TH1D>("jet1_csvg", "Sub-leading jet csv g", 30, 0, 1.0)),
-    h_csv1lg(fsmake<TH1D>("jet1_csvlg", "Sub-leading jet csv udsg", 30, 0, 1.0))
+    h_csv1lg(fsmake<TH1D>("jet1_csvlg", "Sub-leading jet csv udsg", 30, 0, 1.0)),
+    h_Wmass(fsmake<TH1D>("Wmass", "Best w-quark candidate mass", 30, 0, 250)),
+    h_njets(fsmake<TH1D>("njets", "Number of good jets", 10, 0, 10))
 {
     LOG(DEBUG) << "JetHistogramAnalyzer: created JetHistogramAnalyzer ";
 };
@@ -182,7 +184,9 @@ bool JetHistogramAnalyzer::process(EventContainer &event)
     std::vector<int> jets_mcFlavour = inp->getValue<std::vector<int>>("jets_mcFlavour");
     std::vector<double> jets_eta = inp->getValue<std::vector<double>>("jets_eta");
     std::vector<double> jets_csv = inp->getValue<std::vector<double>>("jets_btagCSV");
-    
+   
+    int njets = inp->getValue<int>("njets");
+    h_njets->Fill(njets);
     h_pt0->Fill(jets_pt[0]);
     h_pt1->Fill(jets_pt[1]);
     
@@ -224,6 +228,51 @@ bool JetHistogramAnalyzer::process(EventContainer &event)
     
     h0->Fill(jets_csv[0]);
     h1->Fill(jets_csv[1]);
+    
+    GenericAnalyzer::process(event);
+    return true;
+};
+
+//Creates jet-related histograms
+LeptonHistogramAnalyzer::LeptonHistogramAnalyzer(
+    TFileDirectory *fs,
+    Sequence *_sequence,
+    const edm::ParameterSet &pset
+) :
+    GenericAnalyzer(fs, _sequence, pset),
+    h_pt0(fsmake<TH1D>("lepton0_pt", "Leading lepton pt", 30, 0.0, 500.0)),
+    h_pt1(fsmake<TH1D>("lepton1_pt", "Sub-leading lepton pt", 30, 0.0, 500.0)),
+    h_eta0(fsmake<TH1D>("lepton0_eta", "Leading lepton eta", 30, -5.0, 5.0)),
+    h_eta1(fsmake<TH1D>("lepton1_eta", "Sub-leading lepton eta", 30, -5.0, 5.0)),
+    
+    h_abseta0(fsmake<TH1D>("lepton0_abseta", "Leading lepton abs eta", 30, 0.0, 5.0)),
+    h_abseta1(fsmake<TH1D>("lepton1_abseta", "Sub-leading lepton abs eta", 30, 0.0, 5.0)),
+    h_nleps(fsmake<TH1D>("nleps", "Number of good leptons", 3, 0, 3))
+{
+    LOG(DEBUG) << "LeptonHistogramAnalyzer: created LeptonHistogramAnalyzer ";
+};
+
+//Fills jet-related histograms
+bool LeptonHistogramAnalyzer::process(EventContainer &event)
+{
+    LOG(DEBUG) << "processing " << name << " " << event.i;
+    
+    AutoTree* inp = event.getData<AutoTree*>("input");
+    assert(inp != nullptr);
+    
+    std::vector<double> leps_pt = inp->getValue<std::vector<double>>("leps_pt");
+    //std::vector<int> leps_mcFlavour = inp->getValue<std::vector<int>>("leps_mcFlavour");
+    std::vector<double> leps_eta = inp->getValue<std::vector<double>>("leps_eta");
+   
+    h_nleps->Fill(leps_pt.size());
+    h_pt0->Fill(leps_pt[0]);
+    h_pt1->Fill(leps_pt[1]);
+    
+    h_eta0->Fill(leps_eta[0]);
+    h_eta1->Fill(leps_eta[1]);
+    
+    h_abseta0->Fill(std::abs(leps_eta[0]));
+    h_abseta1->Fill(std::abs(leps_eta[1]));
     
     GenericAnalyzer::process(event);
     return true;
@@ -294,8 +343,20 @@ MEAnalyzer::MEAnalyzer(
         "ME discriminator vs btag LR", 6, 0, 1, 6, 0, 1)
     ),
     h_me_discr2(fsmake<TH1D>("me_discr2", "ME discriminator", 1000, 0, 1)),
+    h_me_time_0(fsmake<TH1D>("me_time_0",
+        "ME time tth", 60, 0, 1000)
+    ),
+    h_me_time_1(fsmake<TH1D>("me_time_1",
+        "ME time ttbb", 60, 0, 1000)
+    ),
+    h_me_p_0(fsmake<TH1D>("me_p_0",
+        "ME log10(p) tth", 60, -200, 1)
+    ),
+    h_me_p_1(fsmake<TH1D>("me_p_1",
+        "ME log10(p) ttbb", 60, -200, 1)
+    ),
     h_me_discr_tth_ttbb(fsmake<TH2D>("me_discr_tth_ttbb",
-        "ME discriminator tth vs ttbb log10", 60, -25, -50, 60, -25, -50)
+        "ME proba tth vs ttbb log10", 60, -200, 0, 60, -200, 0)
     )
     
 {
@@ -312,6 +373,7 @@ bool MEAnalyzer::process(EventContainer &event)
     int nmem_ttbb = inp->getValue<int>("nmem_ttbb");
     int nmem_tth = inp->getValue<int>("nmem_tth");
 
+
     if (nmem_ttbb > 0 && nmem_tth > 0) {
         std::vector<double> mem_ttbb = inp->getValue<std::vector<double>>(
             "mem_ttbb_p"
@@ -320,12 +382,22 @@ bool MEAnalyzer::process(EventContainer &event)
             "mem_tth_p"
         );
         
+        std::vector<double> me_time_ttbb = inp->getValue<std::vector<double>>("mem_ttbb_time");
+        std::vector<double> me_time_tth = inp->getValue<std::vector<double>>("mem_tth_time");
+    
         assert(me_index < mem_ttbb.size());
         assert(me_index < mem_tth.size());
         //std::cout << nmem_tth << " " << nmem_ttbb << std::endl;
         double p0 = mem_tth[me_index];
         double p1 = mem_ttbb[me_index];
         
+        
+        h_me_time_0->Fill(me_time_tth[me_index] / 1000.0);
+        h_me_time_1->Fill(me_time_ttbb[me_index] / 1000.0);
+        // 
+        // h_me_p_0->Fill(TMath::Log(p0));
+        // h_me_p_1->Fill(TMath::Log(p1));
+        // 
         h_me_discr_tth_ttbb->Fill(std::log10(p0), std::log10(p1));
         
         double d = p0 / (p0 + 0.15*p1);
@@ -529,7 +601,6 @@ GenLevelAnalyzer::GenLevelAnalyzer(
         "Sample index", 4, 0, 4)
     )
 {
-    LOG(DEBUG) << "MEAnalyzer: created MEAnalyzer";
 };
 
 bool GenLevelAnalyzer::process(EventContainer &event)

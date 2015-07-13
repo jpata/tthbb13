@@ -81,20 +81,46 @@ class Conf:
             "controlPlotsFileOld": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsTEST.root",
             "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV6.root",
             "sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_vhbb.py",
+
             "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions.pickle",
+            "transferFunctions_sj_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions_sj.pickle",
+
+            #"transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions_notfull_oldabfs.pickle",
+            #"transferFunctions_sj_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions_sj_notfull_oldabfs.pickle",
+
+
 
             #If the list contains:
             # "gen" - print out the ttH gen-level particles (b from top, b form higgs, q from W, leptons
             # "reco" - print out the reco-level selected particles
             # "matching" - print out the association between gen and reco objects
-            #"verbosity": ["eventboundary", "input", "matching", "gen", "reco"],
+            #"verbosity": ["eventboundary", "input", "matching", "gen", "reco", "meminput"],
+            #"verbosity": ["meminput"],
             "verbosity": [],
 
             #Process only these events (will scan through file to find)
             #"eventWhitelist": [
-            #    (1, 1201, 120035),
-            #    #(1, 626, 62574),
-            #    #(1, 180, 17914)
+
+            #(1, 69, 6898),
+
+            ##(1, 536, 537 ),
+
+            ##    #cat6
+            ##    (1, 1326, 132576),
+            ##    (1, 1001, 100098),
+            ##    (1, 1075, 107401),
+            ##    (1, 1910, 190937),
+            ##    (1, 739, 73869),
+
+            ##    #root [2] tree->Scan("run:lumi:evt:mem_tth_p[0]", "njets==6 && nBCSVM==4 && is_sl==1 && mem_tth_p[0]==0")
+            ##    (1,  558,  55798),
+            ##    (1,  566,  56576),
+            ##    (1,   12,   1121),
+            ##    (1,  714,  71316),
+            ##    (1, 1222, 122152),
+            ##    (1,  856,  85542),
+            ##    (1,  300,  29931),
+            ##    (1, 1675, 167428),
             #]
         }
 
@@ -103,66 +129,60 @@ class Conf:
             #Actually run the ME calculation
             #If False, all ME values will be 0
             "calcME": True,
-            #"calcME": False,
 
-            #Which categories to analyze the matrix element in
-            "MECategories": ["cat1", "cat2", "cat3", "cat6"],
-            #"MECategories": ["cat1"],
-
-            #If bLR > cut, calculate ME
-            #only used if untaggedSelection=btagLR
-            "btagLRCut": {
-                "cat1": -100.0,
-                "cat2": -100.0,
-                "cat3": -100.0,
-                "cat6": -100.0
-            },
-
-            #if a number is N specified for wq, tb, hb (+ _btag), require
-            #that reco jets dR matched to quarks from W, top, higgs >= N
-            #in order to calculate the ME.
-            #If disabled, calculate ME regardless of gen-level matching
-            "requireMatched": {
-                #"cat2": {
-                #    "wq_btag": 1,
-                #    "hb_btag": 2,
-                #    "tb_btag": 2,
-                #},
-                #"cat1": {
-                #   "wq_btag": 2,
-                #   "hb_btag": 2,
-                #   "tb_btag": 2,
-                #},
-                #"cat3": {
-                #    "wq_btag": 1,
-                #    "hb_btag": 2,
-                #    "tb_btag": 2,
-                #},
-            },
+            #Generic event-dependent selection function applied
+            #just before the MEM. If False, MEM is skipped
+            "selection": lambda event: True,
 
             "methodsToRun": [
 
-                #full ME
-                "default",
-                "oldTF",
-                "MissedWQ",
+                "SL_2qW",
+                #"SL_1qW",
 
-                #These are additional MEM checks, where only part of the MEM is ran.
-                #Switched off by default
+                #"SL_2qW_sj",
+                #"SL_1qW_sj",
 
-                "NumPointsDouble",
-                "NumPointsHalf",
-                #"NoJacobian",
-                #"NoDecayAmpl",
-                #"NoPDF",
-                #"NoScattAmpl",
-                #"QuarkEnergy98",
-                #"NuPhiRestriction",
-                #"JetsPtOrder",
-                #"JetsPtOrderIntegrationRange",
-                "Recoil",
-                "Sudakov",
-                "Minimize",
+                #"SL_2qW_sj_perm",
+                #"SL_1qW_sj_perm",
+
+                "SL_2qW_NewTF",
+                #"SL_1qW_NewTF",
+
+                "SL_2qW_sj_NewTF",
+                #"SL_1qW_sj_NewTF",
+
+                "SL_2qW_sj_perm_NewTF",
+                #"SL_1qW_sj_perm_NewTF",
+
+
+                #"DL",
+
+                #"SL_2qW_gen",
+                #"SL_1qW_gen",
+                #"DL_gen",
+
+                #"SL_0qW",
+                #"SL_1bT",
+                #"SL_1bTbar",
+                #"SL_1bH",
+                #"SL_2qW_notag",
+
+                #"SL_2qW_Sudakov",
+                #"SL_1qW_Sudakov",
+                #"SL_2qW_Recoil",
+                #"SL_1qW_Recoil",
+                #"DL_Recoil",
+
+                #"SL_2qW_NewTF",
+                #"SL_1qW_NewTF",
+                #"DL_NewTF",
+                #"SL_2qW_Minimize",
+                #"SL_1qW_Minimize",
+                #"DL_Minimize",
+
+                #"SL_2qW_gen_nosmear",
+                #"SL_1qW_gen_nosmear",
+                #"DL_gen_nosmear",
             ],
 
         }

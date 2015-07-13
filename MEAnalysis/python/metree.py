@@ -29,6 +29,22 @@ jetType = NTupleObjectType("jetType", variables = [
     NTupleVariable("mcPhi", lambda x : x.mcPhi),
     NTupleVariable("mcM", lambda x : x.mcM),
 ])
+
+"""
+# Maybe implement later
+#Specifies what to save for objects in the subjet lists
+subjetType = NTupleObjectType("subjetType", variables = [
+    NTupleVariable("pt", lambda x : x.pt),
+    NTupleVariable("eta", lambda x : x.eta),
+    NTupleVariable("phi", lambda x : x.phi),
+    NTupleVariable("mass", lambda x : x.mass),
+    NTupleVariable("id", lambda x : x.id),
+    NTupleVariable("btagFlag", lambda x : x.btagFlag),
+    NTupleVariable("origin_subjet", lambda x : x.origin_subjet \
+        if hasattr(x,'origin_subjet') else 0, type=int),
+])
+"""
+
 #Specifies what to save for leptons
 leptonType = NTupleObjectType("leptonType", variables = [
     NTupleVariable("pt", lambda x : x.pt),
@@ -36,13 +52,24 @@ leptonType = NTupleObjectType("leptonType", variables = [
     NTupleVariable("phi", lambda x : x.phi),
     NTupleVariable("mass", lambda x : x.mass),
     NTupleVariable("pdgId", lambda x : x.pdgId),
+    NTupleVariable("relIso03", lambda x : x.relIso03),
+    NTupleVariable("relIso04", lambda x : x.relIso04),
     #NTupleVariable("mcPt", lambda x : x.mcPt),
     #NTupleVariable("mcEta", lambda x : x.mcEta),
     #NTupleVariable("mcPhi", lambda x : x.mcPhi),
     #NTupleVariable("mcMass", lambda x : x.mcMass),
 ])
 
-metType = NTupleObjectType("leptonType", variables = [
+#Specifies what to save for leptons
+quarkType = NTupleObjectType("quarkType", variables = [
+    NTupleVariable("pt", lambda x : x.pt),
+    NTupleVariable("eta", lambda x : x.eta),
+    NTupleVariable("phi", lambda x : x.phi),
+    NTupleVariable("mass", lambda x : x.mass),
+    NTupleVariable("pdgId", lambda x : x.pdgId),
+])
+
+metType = NTupleObjectType("metType", variables = [
     NTupleVariable("pt", lambda x : x.pt),
     NTupleVariable("phi", lambda x : x.phi),
     NTupleVariable("px", lambda x : x.px),
@@ -53,14 +80,86 @@ metType = NTupleObjectType("leptonType", variables = [
 ])
 
 memType = NTupleObjectType("memType", variables = [
-    NTupleVariable("p", lambda x : x.p),
-    NTupleVariable("p_err", lambda x : x.p_err),
-    NTupleVariable("chi2", lambda x : x.chi2),
-    NTupleVariable("time", lambda x : x.time),
-    NTupleVariable("error_code", lambda x : x.error_code, type=int),
-    NTupleVariable("efficiency", lambda x : x.efficiency),
-    NTupleVariable("nperm", lambda x : x.num_perm, type=int),
+    NTupleVariable("p",             lambda x : x.p ),
+    NTupleVariable("p_err",         lambda x : x.p_err ),
+    NTupleVariable("chi2",          lambda x : x.chi2 ),
+    NTupleVariable("time",          lambda x : x.time ),
+    NTupleVariable("error_code",    lambda x : x.error_code ),
+    NTupleVariable("efficiency",    lambda x : x.efficiency ),
+    NTupleVariable("nperm",         lambda x : x.num_perm ),
 ])
+
+quarkType = NTupleObjectType("quarkType", variables = [
+    NTupleVariable("pt", lambda x : x.pt),
+    NTupleVariable("eta", lambda x : x.eta),
+    NTupleVariable("phi", lambda x : x.phi),
+    NTupleVariable("mass", lambda x : x.mass),
+    NTupleVariable("id", lambda x : x.pdgId),
+])
+
+
+# V11 & V12
+# ==============================
+
+httCandidateType = NTupleObjectType("httCandidateType", variables = [
+    NTupleVariable("fRec", lambda x: x.fRec ),
+    NTupleVariable("Ropt", lambda x: x.Ropt ),
+    NTupleVariable("RoptCalc", lambda x: x.RoptCalc ),
+    NTupleVariable("ptForRoptCalc", lambda x: x.ptForRoptCalc ),
+    NTupleVariable("pt", lambda x: x.pt ),
+    NTupleVariable("eta", lambda x: x.eta ),
+    NTupleVariable("phi", lambda x: x.phi ),
+    NTupleVariable("mass", lambda x: x.mass ),
+    NTupleVariable("sjW1pt", lambda x: x.sjW1pt ),
+    NTupleVariable("sjW1eta", lambda x: x.sjW1eta ),
+    NTupleVariable("sjW1phi", lambda x: x.sjW1phi ),
+    NTupleVariable("sjW1mass", lambda x: x.sjW1mass ),
+    NTupleVariable("sjW1btag", lambda x: x.sjW1btag ),
+    NTupleVariable("sjW2pt", lambda x: x.sjW2pt ),
+    NTupleVariable("sjW2eta", lambda x: x.sjW2eta ),
+    NTupleVariable("sjW2phi", lambda x: x.sjW2phi ),
+    NTupleVariable("sjW2mass", lambda x: x.sjW2mass ),
+    NTupleVariable("sjW2btag", lambda x: x.sjW2btag ),
+    NTupleVariable("sjNonWpt", lambda x: x.sjNonWpt ),
+    NTupleVariable("sjNonWeta", lambda x: x.sjNonWeta ),
+    NTupleVariable("sjNonWphi", lambda x: x.sjNonWphi ),
+    NTupleVariable("sjNonWmass", lambda x: x.sjNonWmass ),
+    NTupleVariable("sjNonWbtag", lambda x: x.sjNonWbtag ),
+    NTupleVariable("tau1", lambda x: x.tau1 ),
+    NTupleVariable("tau2", lambda x: x.tau2 ),
+    NTupleVariable("tau3", lambda x: x.tau3 ),
+    NTupleVariable("bbtag", lambda x: x.bbtag ),
+    NTupleVariable("n_subjetiness", lambda x: x.n_subjetiness ), # Calculated
+])
+
+FatjetCA15ungroomedType = NTupleObjectType("FatjetCA15ungroomedType", variables = [
+    NTupleVariable("pt", lambda x: x.pt ),
+    NTupleVariable("eta", lambda x: x.eta ),
+    NTupleVariable("phi", lambda x: x.phi ),
+    NTupleVariable("mass", lambda x: x.mass ),
+    NTupleVariable("tau1", lambda x: x.tau1 ),
+    NTupleVariable("tau2", lambda x: x.tau2 ),
+    NTupleVariable("tau3", lambda x: x.tau3 ),
+    NTupleVariable("bbtag", lambda x: x.bbtag ),
+])
+
+FatjetCA15prunedType = NTupleObjectType("FatjetCA15prunedType", variables = [
+    NTupleVariable("pt", lambda x: x.pt ),
+    NTupleVariable("eta", lambda x: x.eta ),
+    NTupleVariable("phi", lambda x: x.phi ),
+    NTupleVariable("mass", lambda x: x.mass ),
+])
+
+SubjetCA15prunedType = NTupleObjectType("SubjetCA15prunedType", variables = [
+    NTupleVariable("pt", lambda x: x.pt ),
+    NTupleVariable("eta", lambda x: x.eta ),
+    NTupleVariable("phi", lambda x: x.phi ),
+    NTupleVariable("mass", lambda x: x.mass ),
+    NTupleVariable("btag", lambda x: x.btag ),
+])
+
+# ==============================
+
 
 
 def getTreeProducer(conf):
@@ -71,6 +170,184 @@ def getTreeProducer(conf):
         verbose = False,
         vectorTree = True,
         globalVariables = [
+
+            # Used by Subjet Analyzer
+
+            NTupleVariable(
+                "n_bjets",
+                lambda ev: ev.n_bjets if hasattr(ev,'n_bjets') else -1,
+                help="Number of selected bjets in event"
+            ),
+
+            NTupleVariable(
+                "n_ljets",
+                lambda ev: ev.n_ljets if hasattr(ev,'n_ljets') else -1,
+                help="Number of selected ljets in event"
+            ),
+
+            NTupleVariable(
+                "n_bjets_sj",
+                lambda ev: ev.n_bjets_sj if hasattr(ev,'n_bjets_sj') else -1,
+                help="Number of selected bjets in subjet-modified bjet list"
+            ),
+
+            NTupleVariable(
+                "n_ljets_sj",
+                lambda ev: ev.n_ljets_sj if hasattr(ev,'n_ljets_sj') else -1,
+                help="Number of selected ljets in subjet-modified ljet list"
+            ),
+
+
+            NTupleVariable(
+                "nhttCandidate",
+                lambda ev: ev.nhttCandidate if hasattr(ev,'nhttCandidate') else -1,
+                help="Number of original httCandidates in event"
+            ),
+
+            NTupleVariable(
+                "nhttCandidate_aftercuts",
+                lambda ev: ev.nhttCandidate_aftercuts \
+                    if hasattr(ev,'nhttCandidate_aftercuts') else -1,
+                help="Number of httCandidates that passed the cut"
+            ),
+
+            NTupleVariable(
+                "Matching_subjet_bjet",
+                lambda ev: ev.Matching_subjet_bjet \
+                    if hasattr(ev, 'Matching_subjet_bjet') else -1,
+                help="Number of subjets matched to btagged_jets"
+            ),
+
+            NTupleVariable(
+                "Matching_subjet_ljet",
+                lambda ev: ev.Matching_subjet_ljet \
+                    if hasattr(ev, 'Matching_subjet_ljet') else -1,
+                help="Number of subjets matched to wquark_candidate_jets"
+            ),
+
+            NTupleVariable(
+                "Matching_event_type_number",
+                lambda ev: ev.Matching_event_type_number \
+                    if hasattr(ev, 'Matching_event_type_number') else -1,
+                help="Type number of the event (see doc, todo)"
+            ),
+
+            NTupleVariable(
+                "Matching_btag_disagreement",
+                lambda ev: ev.Matching_btag_disagreement \
+                    if hasattr(ev, 'Matching_btag_disagreement') else -1,
+                help="Checks if there was a conflict between the b-tagged subjets and the b-tagged jets"
+            ),
+
+            # Quark matching: attempted or not
+            NTupleVariable(
+                "QMatching_t_attempted",
+                lambda ev: ev.QMatching_t_attempted \
+                    if hasattr(ev, 'QMatching_t_attempted') else -1,
+                help="" ),
+            NTupleVariable(
+                "QMatching_H_attempted",
+                lambda ev: ev.QMatching_H_attempted \
+                    if hasattr(ev, 'QMatching_H_attempted') else -1,
+                help="" ),
+
+            # Quark matching branches: subjets
+            NTupleVariable(
+                "QMatching_sj_hadr_bquark",
+                lambda ev: ev.QMatching_sj_hadr_bquark \
+                    if hasattr(ev, 'QMatching_sj_hadr_bquark') else -1,
+                help="" ),
+            NTupleVariable(
+                "QMatching_sj_lquark1",
+                lambda ev: ev.QMatching_sj_lquark1 \
+                    if hasattr(ev, 'QMatching_sj_lquark1') else -1,
+                help="" ),
+            NTupleVariable(
+                "QMatching_sj_lquark2",
+                lambda ev: ev.QMatching_sj_lquark2 \
+                    if hasattr(ev, 'QMatching_sj_lquark2') else -1,
+                help="" ),
+            NTupleVariable(
+                "QMatching_sj_lept_bquark",
+                lambda ev: ev.QMatching_sj_lept_bquark \
+                    if hasattr(ev, 'QMatching_sj_lept_bquark') else -1,
+                help="" ),
+            NTupleVariable(
+                "QMatching_sj_bquark_higgs1",
+                lambda ev: ev.QMatching_sj_bquark_higgs1 \
+                    if hasattr(ev, 'QMatching_sj_bquark_higgs1') else -1,
+                help="" ),
+            NTupleVariable(
+                "QMatching_sj_bquark_higgs2",
+                lambda ev: ev.QMatching_sj_bquark_higgs2 \
+                    if hasattr(ev, 'QMatching_sj_bquark_higgs2') else -1,
+                help="" ),
+
+            # Quark matching branches: subjets from other top
+            NTupleVariable(
+                "QMatching_sj_ot_hadr_bquark",
+                lambda ev: ev.QMatching_sj_ot_hadr_bquark \
+                    if hasattr(ev, 'QMatching_sj_ot_hadr_bquark') else -1,
+                help="" ),
+            NTupleVariable(
+                "QMatching_sj_ot_lquark1",
+                lambda ev: ev.QMatching_sj_ot_lquark1 \
+                    if hasattr(ev, 'QMatching_sj_ot_lquark1') else -1,
+                help="" ),
+            NTupleVariable(
+                "QMatching_sj_ot_lquark2",
+                lambda ev: ev.QMatching_sj_ot_lquark2 \
+                    if hasattr(ev, 'QMatching_sj_ot_lquark2') else -1,
+                help="" ),
+            NTupleVariable(
+                "QMatching_sj_ot_lept_bquark",
+                lambda ev: ev.QMatching_sj_ot_lept_bquark \
+                    if hasattr(ev, 'QMatching_sj_ot_lept_bquark') else -1,
+                help="" ),
+            NTupleVariable(
+                "QMatching_sj_ot_bquark_higgs1",
+                lambda ev: ev.QMatching_sj_ot_bquark_higgs1 \
+                    if hasattr(ev, 'QMatching_sj_ot_bquark_higgs1') else -1,
+                help="" ),
+            NTupleVariable(
+                "QMatching_sj_ot_bquark_higgs2",
+                lambda ev: ev.QMatching_sj_ot_bquark_higgs2 \
+                    if hasattr(ev, 'QMatching_sj_ot_bquark_higgs2') else -1,
+                help="" ),
+
+            # Quark matching branches: jets
+            NTupleVariable(
+                "QMatching_jet_hadr_bquark",
+                lambda ev: ev.QMatching_jet_hadr_bquark \
+                    if hasattr(ev, 'QMatching_jet_hadr_bquark') else -1,
+                help="" ),
+            NTupleVariable(
+                "QMatching_jet_lquark1",
+                lambda ev: ev.QMatching_jet_lquark1 \
+                    if hasattr(ev, 'QMatching_jet_lquark1') else -1,
+                help="" ),
+            NTupleVariable(
+                "QMatching_jet_lquark2",
+                lambda ev: ev.QMatching_jet_lquark2 \
+                    if hasattr(ev, 'QMatching_jet_lquark2') else -1,
+                help="" ),
+            NTupleVariable(
+                "QMatching_jet_lept_bquark",
+                lambda ev: ev.QMatching_jet_lept_bquark \
+                    if hasattr(ev, 'QMatching_jet_lept_bquark') else -1,
+                help="" ),
+            NTupleVariable(
+                "QMatching_jet_bquark_higgs1",
+                lambda ev: ev.QMatching_jet_bquark_higgs1 \
+                    if hasattr(ev, 'QMatching_jet_bquark_higgs1') else -1,
+                help="" ),
+            NTupleVariable(
+                "QMatching_jet_bquark_higgs2",
+                lambda ev: ev.QMatching_jet_bquark_higgs2 \
+                    if hasattr(ev, 'QMatching_jet_bquark_higgs2') else -1,
+                help="" ),
+            #--END OF USED BY SUBJETANALYZER--#
+
             NTupleVariable(
                 "Wmass", lambda ev: ev.Wmass,
                 help="best W boson mass from untagged pair (untagged by CSVM)"
@@ -271,6 +548,30 @@ def getTreeProducer(conf):
             ),
 
             NTupleVariable(
+                "n_mu_tight", lambda ev: ev.n_mu_tight if hasattr(ev, "n_mu_tight") else 0,
+                type=int,
+                help="Number of tight selected muons"
+            ),
+
+            NTupleVariable(
+                "n_el_tight", lambda ev: ev.n_el_tight if hasattr(ev, "n_el_tight") else 0,
+                type=int,
+                help="Number of tight selected electrons"
+            ),
+
+            NTupleVariable(
+                "n_mu_loose", lambda ev: ev.n_mu_loose if hasattr(ev, "n_mu_loose") else 0,
+                type=int,
+                help="Number of loose (DL) selected muons"
+            ),
+
+            NTupleVariable(
+                "n_el_loose", lambda ev: ev.n_el_loose if hasattr(ev, "n_el_loose") else 0,
+                type=int,
+                help="Number of loose (DL) selected electrons"
+            ),
+
+            NTupleVariable(
                 "tth_px_gen", lambda ev: ev.tth_px_gen if hasattr(ev, "tth_px_gen") else 0,
                 help="generator-level ttH system px"
             ),
@@ -286,7 +587,7 @@ def getTreeProducer(conf):
                 "tth_py_reco", lambda ev: ev.tth_py_reco if hasattr(ev, "tth_py_reco") else 0,
                 help="reco-level ttH system py from matched jets and leptons"
             ),
-            
+
             NTupleVariable(
                 "tth_rho_px_reco", lambda ev: ev.tth_rho_px_reco if hasattr(ev, "tth_rho_px_reco") else 0,
                 help="reco-level ttH system recoil px"
@@ -295,7 +596,7 @@ def getTreeProducer(conf):
                 "tth_rho_py_reco", lambda ev: ev.tth_rho_py_reco if hasattr(ev, "tth_rho_py_reco") else 0,
                 help="reco-level ttH system recoil py"
             ),
-            
+
             NTupleVariable(
                 "tth_rho_px_gen", lambda ev: ev.tth_rho_px_gen if hasattr(ev, "tth_rho_px_gen") else 0,
                 help="gen-level ttH system recoil px"
@@ -314,11 +615,22 @@ def getTreeProducer(conf):
             "met_jetcorr" : NTupleCollection("met_jetcorr", metType, 1, help="Reconstructed MET, corrected to gen-level jets"),
             "tt_met" : NTupleCollection("met_ttbar_gen", metType, 1, help="Generated MET from nu(top)"),
 
-            "b_quarks_t" : NTupleCollection("GenBFromTop", leptonType, 3, help=""),
-            "b_quarks_h" : NTupleCollection("GenBFromHiggs", leptonType, 3, help=""),
-            "l_quarks_w" : NTupleCollection("GenQFromW", leptonType, 5, help=""),
+            "b_quarks_gen" : NTupleCollection("b_quarks_gen", quarkType, 5, help=""),
+            "l_quarks_gen" : NTupleCollection("l_quarks_gen", quarkType, 3, help=""),
+            "b_quarks_t" : NTupleCollection("GenBFromTop", quarkType, 3, help=""),
+            "b_quarks_h" : NTupleCollection("GenBFromHiggs", quarkType, 3, help=""),
+            "l_quarks_w" : NTupleCollection("GenQFromW", quarkType, 5, help=""),
             "good_jets" : NTupleCollection("jets", jetType, 9, help="Selected jets"),
             "good_leptons" : NTupleCollection("leps", leptonType, 2, help="Selected leptons"),
+
+            # V11 & V12
+            # ==============================
+            "httCandidate_AC" : NTupleCollection("httCandidate_AC", httCandidateType, 28, help=""),
+            "FatjetCA15ungroomed" : NTupleCollection("FatjetCA15ungroomed", FatjetCA15ungroomedType, 8, help=""),
+            "FatjetCA15pruned" : NTupleCollection("FatjetCA15pruned", FatjetCA15prunedType, 4, help=""),
+            "SubjetCA15pruned" : NTupleCollection("SubjetCA15pruned", SubjetCA15prunedType, 5, help=""),
+            # ==============================
+
             "mem_results_tth" : NTupleCollection("mem_tth", memType, len(conf.mem["methodsToRun"]), help="MEM tth"),
             "mem_results_ttbb" : NTupleCollection("mem_ttbb", memType, len(conf.mem["methodsToRun"]), help="MEM ttbb"),
         }

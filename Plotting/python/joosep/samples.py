@@ -45,9 +45,9 @@ samples = cms.VPSet([
 
 #New phys14 processing
     cms.PSet(
-        fileNamesS1=cms.vstring(["/hdfs/cms/store/user/jpata/tth/s1_eb733a1/TTHbb_s1_eb733a1_tth_hbb_13tev_amcatnlo_pu20bx25_phys14.root"]),
-        fileNamesS2=cms.vstring(["/scratch/joosep/tth_hbb_13tev_amcatnlo_pu20bx25_phys14.root"]),
-        nickName=cms.string("tthbb_13TeV_phys14"),
+        fileNamesS1=cms.vstring([]),
+        fileNamesS2=cms.vstring(["/scratch/joosep/tth_13tev.root"]),
+        nickName=cms.string("tth_13TeV_phys14"),
         fractionToProcess=cms.double(1.0),
         totalEvents=cms.int64(-1),
         type=cms.int32(3), #ME_13TeV
@@ -56,8 +56,38 @@ samples = cms.VPSet([
     ),
     cms.PSet(
         fileNamesS1=cms.vstring([]),
-        fileNamesS2=cms.vstring(["/scratch/joosep/ttjets_13tev_madgraph_pu20bx25_phys14.root"]),
-        nickName=cms.string("ttjets_13TeV_phys14"),
+        fileNamesS2=cms.vstring(["/home/joosep/mac-docs/tth/data/ntp/v10/me/ttjets_13tev_madgraph_pu20bx25_phys14_ttbb.root"]),
+        nickName=cms.string("ttjets_13TeV_phys14_bb"),
+        fractionToProcess=cms.double(1.0),
+        totalEvents=cms.int64(-1),
+        type=cms.int32(3), #ME_13TeV
+        process=cms.int32(1), #TTJETS
+        skip=cms.bool(True),
+    ),
+    cms.PSet(
+        fileNamesS1=cms.vstring([]),
+        fileNamesS2=cms.vstring(["/home/joosep/mac-docs/tth/data/ntp/v10/me/ttjets_13tev_madgraph_pu20bx25_phys14_ttb.root"]),
+        nickName=cms.string("ttjets_13TeV_phys14_b"),
+        fractionToProcess=cms.double(1.0),
+        totalEvents=cms.int64(-1),
+        type=cms.int32(3), #ME_13TeV
+        process=cms.int32(1), #TTJETS
+        skip=cms.bool(True),
+    ),
+    cms.PSet(
+        fileNamesS1=cms.vstring([]),
+        fileNamesS2=cms.vstring(["/home/joosep/mac-docs/tth/data/ntp/v10/me/ttjets_13tev_madgraph_pu20bx25_phys14_ttcc.root"]),
+        nickName=cms.string("ttjets_13TeV_phys14_cc"),
+        fractionToProcess=cms.double(1.0),
+        totalEvents=cms.int64(-1),
+        type=cms.int32(3), #ME_13TeV
+        process=cms.int32(1), #TTJETS
+        skip=cms.bool(True),
+    ),
+    cms.PSet(
+        fileNamesS1=cms.vstring([]),
+        fileNamesS2=cms.vstring(["/home/joosep/mac-docs/tth/data/ntp/v10/me/ttjets_13tev_madgraph_pu20bx25_phys14_ttll.root"]),
+        nickName=cms.string("ttjets_13TeV_phys14_ll"),
         fractionToProcess=cms.double(1.0),
         totalEvents=cms.int64(-1),
         type=cms.int32(3), #ME_13TeV
@@ -65,3 +95,5 @@ samples = cms.VPSet([
         skip=cms.bool(True),
     ),
 ])
+
+samples_dict = {s.nickName.value(): s for s in samples}

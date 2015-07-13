@@ -181,6 +181,28 @@ typedef ValueSelector<int> IntSelector;
 typedef ValueRangeSelector<double> DoubleRangeSelector;
 typedef ValueRangeSelector<int> IntRangeSelector;
 
+
+class LeptonHistogramAnalyzer : public GenericAnalyzer
+{
+    TH1D* h_pt0 = 0; //leading jet pt
+    TH1D* h_pt1 = 0; //sub-leading jet pt
+    
+    TH1D* h_eta0 = 0; //leading jet eta
+    TH1D* h_eta1 = 0; //sub-leading jet eta
+    
+    TH1D* h_abseta0 = 0; //leading jet abs eta
+    TH1D* h_abseta1 = 0; //sub-leading jet abs eta
+    TH1D* h_nleps = 0;
+public:
+    LeptonHistogramAnalyzer(
+        TFileDirectory *fs,
+        Sequence *_sequence,
+        const edm::ParameterSet &pset
+    );
+
+    virtual bool process(EventContainer &event);
+};
+
 class JetHistogramAnalyzer : public GenericAnalyzer
 {
     TH1D* h_pt0 = 0; //leading jet pt
@@ -205,6 +227,7 @@ class JetHistogramAnalyzer : public GenericAnalyzer
     TH1D* h_csv1lg = 0;
     
     TH1D* h_Wmass = 0;
+    TH1D* h_njets = 0;
 public:
     JetHistogramAnalyzer(
         TFileDirectory *fs,
@@ -248,6 +271,12 @@ class MEAnalyzer : public GenericAnalyzer
     
     //Fine ME
     TH1D* h_me_discr2 = 0;
+    
+    TH1D* h_me_time_0 = 0;
+    TH1D* h_me_time_1 = 0;
+    
+    TH1D* h_me_p_0 = 0;
+    TH1D* h_me_p_1 = 0;
     
     TH2D* h_me_discr_tth_ttbb = 0;
 

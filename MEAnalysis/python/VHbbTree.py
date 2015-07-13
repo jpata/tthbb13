@@ -1,4 +1,134 @@
 import ROOT, math
+from TTH.MEAnalysis.VHbbTree import *
+
+# Only in V11 (or higher)
+class httCandidate:
+    def __init__(self, tree, n):
+        self.pt = tree.httCandidates_pt[n];
+        self.eta = tree.httCandidates_eta[n];
+        self.phi = tree.httCandidates_phi[n];
+        self.mass = tree.httCandidates_mass[n];
+        #self.fW = tree.httCandidates_fW[n]; # No longer present in V12
+        #self.Rmin = tree.httCandidates_Rmin[n];
+        #self.RminExpected = tree.httCandidates_RminExpected[n];
+        self.sjW1pt = tree.httCandidates_sjW1pt[n];
+        self.sjW1eta = tree.httCandidates_sjW1eta[n];
+        self.sjW1phi = tree.httCandidates_sjW1phi[n];
+        self.sjW1mass = tree.httCandidates_sjW1mass[n];
+        self.sjW2pt = tree.httCandidates_sjW2pt[n];
+        self.sjW2eta = tree.httCandidates_sjW2eta[n];
+        self.sjW2phi = tree.httCandidates_sjW2phi[n];
+        self.sjW2mass = tree.httCandidates_sjW2mass[n];
+        self.sjNonWpt = tree.httCandidates_sjNonWpt[n];
+        self.sjNonWeta = tree.httCandidates_sjNonWeta[n];
+        self.sjNonWphi = tree.httCandidates_sjNonWphi[n];
+        self.sjNonWmass = tree.httCandidates_sjNonWmass[n];
+
+        # New in V12
+        self.fRec = tree.httCandidates_fRec[n];
+        self.Ropt = tree.httCandidates_Ropt[n];
+        self.RoptCalc = tree.httCandidates_RoptCalc[n];
+        self.ptForRoptCalc = tree.httCandidates_ptForRoptCalc[n];
+        self.sjW1btag = tree.httCandidates_sjW1btag[n];
+        self.sjW2btag = tree.httCandidates_sjW2btag[n];
+        self.sjNonWbtag = tree.httCandidates_sjNonWbtag[n];
+
+    @staticmethod
+    def make_array(event):
+        return [httCandidate(event.input, i) for i in range(event.input.nhttCandidates)]
+
+
+# Only in V12 - Fatjet CA15
+class FatjetCA15ungroomed:
+    def __init__(self, tree, n):
+        self.pt = tree.FatjetCA15ungroomed_pt[n];
+        self.eta = tree.FatjetCA15ungroomed_eta[n];
+        self.phi = tree.FatjetCA15ungroomed_phi[n];
+        self.mass = tree.FatjetCA15ungroomed_mass[n];
+        self.tau1 = tree.FatjetCA15ungroomed_tau1[n];
+        self.tau2 = tree.FatjetCA15ungroomed_tau2[n];
+        self.tau3 = tree.FatjetCA15ungroomed_tau3[n];
+        self.bbtag = tree.FatjetCA15ungroomed_bbtag[n];
+    @staticmethod
+    def make_array(event):
+        return [FatjetCA15ungroomed(event.input, i) for i in range(event.input.nFatjetCA15ungroomed)]
+class FatjetCA15pruned:
+    def __init__(self, tree, n):
+        self.pt = tree.FatjetCA15pruned_pt[n];
+        self.eta = tree.FatjetCA15pruned_eta[n];
+        self.phi = tree.FatjetCA15pruned_phi[n];
+        self.mass = tree.FatjetCA15pruned_mass[n];
+    @staticmethod
+    def make_array(event):
+        return [FatjetCA15pruned(event.input, i) for i in range(event.input.nFatjetCA15pruned)]
+class FatjetCA15softdrop:
+    def __init__(self, tree, n):
+        self.pt = tree.FatjetCA15softdrop_pt[n];
+        self.eta = tree.FatjetCA15softdrop_eta[n];
+        self.phi = tree.FatjetCA15softdrop_phi[n];
+        self.mass = tree.FatjetCA15softdrop_mass[n];
+    @staticmethod
+    def make_array(event):
+        return [FatjetCA15softdrop(event.input, i) for i in range(event.input.nFatjetCA15softdrop)]
+class FatjetCA15trimmed:
+    def __init__(self, tree, n):
+        self.pt = tree.FatjetCA15trimmed_pt[n];
+        self.eta = tree.FatjetCA15trimmed_eta[n];
+        self.phi = tree.FatjetCA15trimmed_phi[n];
+        self.mass = tree.FatjetCA15trimmed_mass[n];
+    @staticmethod
+    def make_array(event):
+        return [FatjetCA15trimmed(event.input, i) for i in range(event.input.nFatjetCA15trimmed)]
+class SubjetCA15pruned:
+    def __init__(self, tree, n):
+        self.pt = tree.SubjetCA15pruned_pt[n];
+        self.eta = tree.SubjetCA15pruned_eta[n];
+        self.phi = tree.SubjetCA15pruned_phi[n];
+        self.mass = tree.SubjetCA15pruned_mass[n];
+        self.btag = tree.SubjetCA15pruned_btag[n];
+    @staticmethod
+    def make_array(event):
+        return [SubjetCA15pruned(event.input, i) for i in range(event.input.nSubjetCA15pruned)]
+
+# Only in V12 - Fatjet AK08
+class FatjetAK08ungroomed:
+    def __init__(self, tree, n):
+        self.pt = tree.FatjetAK08ungroomed_pt[n];
+        self.eta = tree.FatjetAK08ungroomed_eta[n];
+        self.phi = tree.FatjetAK08ungroomed_phi[n];
+        self.mass = tree.FatjetAK08ungroomed_mass[n];
+        self.tau1 = tree.FatjetAK08ungroomed_tau1[n];
+        self.tau2 = tree.FatjetAK08ungroomed_tau2[n];
+        self.tau3 = tree.FatjetAK08ungroomed_tau3[n];
+        self.msoftdrop = tree.FatjetAK08ungroomed_msoftdrop[n];
+        self.mpruned = tree.FatjetAK08ungroomed_mpruned[n];
+        self.mtrimmed = tree.FatjetAK08ungroomed_mtrimmed[n];
+        self.mfiltered = tree.FatjetAK08ungroomed_mfiltered[n];
+        self.bbtag = tree.FatjetAK08ungroomed_bbtag[n];
+    @staticmethod
+    def make_array(event):
+        return [FatjetAK08ungroomed(event.input, i) for i in range(event.input.nFatjetAK08ungroomed)]
+class FatjetAK08pruned:
+    def __init__(self, tree, n):
+        self.pt = tree.FatjetAK08pruned_pt[n];
+        self.eta = tree.FatjetAK08pruned_eta[n];
+        self.phi = tree.FatjetAK08pruned_phi[n];
+        self.mass = tree.FatjetAK08pruned_mass[n];
+    @staticmethod
+    def make_array(event):
+        return [FatjetAK08pruned(event.input, i) for i in range(event.input.nFatjetAK08pruned)]
+class SubjetAK08pruned:
+    def __init__(self, tree, n):
+        self.pt = tree.SubjetAK08pruned_pt[n];
+        self.eta = tree.SubjetAK08pruned_eta[n];
+        self.phi = tree.SubjetAK08pruned_phi[n];
+        self.mass = tree.SubjetAK08pruned_mass[n];
+        self.btag = tree.SubjetAK08pruned_btag[n];
+    @staticmethod
+    def make_array(event):
+        return [SubjetAK08pruned(event.input, i) for i in range(event.input.nSubjetAK08pruned)]
+
+
 class GenBQuarkFromHafterISR:
     def __init__(self, tree, n):
         self.pdgId = tree.GenBQuarkFromHafterISR_pdgId[n];
@@ -467,24 +597,24 @@ class GenNuFromTop:
     @staticmethod
     def make_array(event):
         return [GenNuFromTop(event.input, i) for i in range(event.input.nGenNuFromTop)]
-        
+
 class MET:
     def __init__(self, **kwargs):
         self.p4 = ROOT.TLorentzVector()
-        
+
         _px, _py = kwargs.get("px", None), kwargs.get("py", None)
         _pt, _phi = kwargs.get("pt", None), kwargs.get("phi", None)
         tree = kwargs.get("tree", None)
-        
+
         self.sumEt = 0
         self.genPt = 0
         self.genPhi = 0
-        
+
         if not (_px is None or _py is None):
             self.p4.SetPxPyPzE(_px, _py, 0, math.sqrt(_px*_px + _py*_py))
         elif not (_pt is None or _phi is None):
             self.p4.SetPtEtaPhiM(_pt, 0, _phi, 0)
-            
+
         elif tree != None:
             self.pt = tree.met_pt;
             self.phi = tree.met_phi;
@@ -497,7 +627,7 @@ class MET:
         self.phi = self.p4.Phi()
         self.px = self.p4.Px()
         self.py = self.p4.Py()
-            
+
     @staticmethod
     def make_array(event):
         return [MET(tree=event.input)]
@@ -533,5 +663,24 @@ class EventAnalyzer(Analyzer):
         event.GenWZQuark = GenWZQuark.make_array(event)
         event.GenBQuarkFromTop = GenBQuarkFromTop.make_array(event)
         event.GenNuFromTop = GenNuFromTop.make_array(event)
-        
+
+        # V11 & V12 collections
+        event.httCandidate = httCandidate.make_array(event)
+        event.FatjetCA15ungroomed = FatjetCA15ungroomed.make_array(event)
+        event.FatjetCA15pruned = FatjetCA15pruned.make_array(event)
+        event.FatjetCA15softdrop = FatjetCA15softdrop.make_array(event)
+        event.FatjetCA15trimmed = FatjetCA15trimmed.make_array(event)
+        event.SubjetCA15pruned = SubjetCA15pruned.make_array(event)
+        event.FatjetAK08ungroomed = FatjetAK08ungroomed.make_array(event)
+        event.FatjetAK08pruned = FatjetAK08pruned.make_array(event)
+        event.SubjetAK08pruned = SubjetAK08pruned.make_array(event)
+
         event.met = MET.make_array(event)
+
+def lvec(self):
+    """
+    Converts an object with pt, eta, phi, mass to a TLorentzVector
+    """
+    lv = ROOT.TLorentzVector()
+    lv.SetPtEtaPhiM(self.pt, self.eta, self.phi, self.mass)
+    return lv
