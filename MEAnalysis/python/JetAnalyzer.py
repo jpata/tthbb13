@@ -118,8 +118,10 @@ class JetAnalyzer(FilterAnalyzer):
             #    dr = lv1.DeltaR(lv2)
             #    if dr<0.4:
             #        print "deltaR", dr, lep.pt, lep.eta, lep.phi, jet.pt, jet.eta, jet.phi
-
-            idx = int(lep.jetOverlapIdx)
+            if let.jetOverlapIdx is None:
+                idx = -1
+            else:
+                idx = int(lep.jetOverlapIdx)
             if idx != -1:
                 coll = event.Jet
                 if idx >= 1000:
