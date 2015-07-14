@@ -429,27 +429,27 @@ def getTreeProducer(conf):
                 ),
             })
 
-            #for cat in conf.bran["jetCategories"].items():
-            #    #treeProducer.collections.update({ 
-            #    #        "b_rndval_results_" +cat[0] + syst_suffix: NTupleCollection(
-            #    #            "jets_" + cat[0] + syst_suffix2, branvalType, 15,
-            #    #            help="BTagRandomizer random values for category "+cat[0]
-            #    #            ),
-            #    #        "b_inpval_results_" +cat[0] + syst_suffix: NTupleCollection(
-            #    #            "jets_" + cat[0] + syst_suffix2, binpvalType, 15,
-            #    #            help="BTagRandomizer input values for category "+cat[0]
-            #    #            )
-            #    #        })
-            #    treeProducer.globalObjects.update({ 
-            #            "b_rnd_results_" + cat[0] + syst_suffix: NTupleObject(
-            #                "bRnd_rnd_"+ cat[0] + syst_suffix2, branType,
-            #                help="BTagrRandomizer results (p,ntoys,pass,tag_id)"
-            #                ),
-            #            "b_inp_results_" + cat[0] + syst_suffix: NTupleObject(
-            #                "bRnd_inp_"+ cat[0] + syst_suffix2, branType,
-            #                help="BTagrRandomizer input results (p,ntoys,pass,tag_id)"
-            #                )                                                
-            #            })
+            for cat in conf.bran["jetCategories"].items():
+                #treeProducer.collections.update({ 
+                #        "b_rndval_results_" +cat[0] + syst_suffix: NTupleCollection(
+                #            "jets_" + cat[0] + syst_suffix2, branvalType, 15,
+                #            help="BTagRandomizer random values for category "+cat[0]
+                #            ),
+                #        "b_inpval_results_" +cat[0] + syst_suffix: NTupleCollection(
+                #            "jets_" + cat[0] + syst_suffix2, binpvalType, 15,
+                #            help="BTagRandomizer input values for category "+cat[0]
+                #            )
+                #        })
+                treeProducer.globalObjects.update({ 
+                        "b_rnd_results_" + cat[0] + syst_suffix: NTupleObject(
+                            "bRnd_rnd_"+ cat[0] + syst_suffix2, branType,
+                            help="BTagrRandomizer results (p,ntoys,pass,tag_id)"
+                            ),
+                        "b_inp_results_" + cat[0] + syst_suffix: NTupleObject(
+                            "bRnd_inp_"+ cat[0] + syst_suffix2, branType,
+                            help="BTagrRandomizer input results (p,ntoys,pass,tag_id)"
+                            )                                                
+                        })
 
 
     for systematic in ["nominal"]:
