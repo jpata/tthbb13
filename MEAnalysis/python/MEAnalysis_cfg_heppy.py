@@ -40,38 +40,38 @@ def print_mu(mu):
     print "Muon: (pt=%s, eta=%s, tight=%s, pf=%s, glo=%s, dxy=%s, dz=%s, chi2=%s, nhits=%s, pix=%s, stat=%s, pfRelIso04=%s)" % (mu.pt, mu.eta, mu.tightId, mu.isPFMuon,  mu.isGlobalMuon, mu.dxy , mu.dz, mu.globalTrackChi2, (getattr(mu, "nMuonHits", 0) > 0 or getattr(mu, "nChamberHits", 0) > 0) , mu.pixelHits , mu.nStations, mu.pfRelIso04)
 
 
-def el_baseline_tight(el):
-    sca = abs(el.etaSc)
-    ret = (
-        not(sca > 1.4442 and sca < 1.5660) and
-        el.convVeto
-    )
-    if not ret:
-        return False
-
-    if sca <= 1.479:
-        ret = ret and (
-            (abs(el.eleDEta)    < 0.006046) and
-            (abs(el.eleDPhi)    < 0.028092) and
-            (el.eleSieie        < 0.009947) and
-            (el.eleHoE          < 0.045772) and
-            (abs(el.dxy)        < 0.008790) and
-            (abs(el.dz)         < 0.021226) and
-            (el.relIso03        < 0.069537)
-            #FIXME: expectedMissingInnerHits and hOverE 
-        )
-    elif sca < 2.5:
-        ret = ret and (
-            (abs(el.eleDEta)    < 0.007057) and
-            (abs(el.eleDPhi)    < 0.030159) and
-            (el.eleSieie        < 0.028237) and
-            (el.eleHoE          < 0.067778) and
-            (abs(el.dxy)        < 0.027984) and
-            (abs(el.dz)         < 0.133431) and
-            (el.relIso03        < 0.078265)
-            #FIXME: expectedMissingInnerHits and hOverE 
-        )
-    return ret
+#def el_baseline_tight(el):
+#    sca = abs(el.etaSc)
+#    ret = (
+#        not(sca > 1.4442 and sca < 1.5660) and
+#        el.convVeto
+#    )
+#    if not ret:
+#        return False
+#
+#    if sca <= 1.479:
+#        ret = ret and (
+#            (abs(el.eleDEta)    < 0.006046) and
+#            (abs(el.eleDPhi)    < 0.028092) and
+#            (el.eleSieie        < 0.009947) and
+#            (el.eleHoE          < 0.045772) and
+#            (abs(el.dxy)        < 0.008790) and
+#            (abs(el.dz)         < 0.021226) and
+#            (el.pfRelIso03        < 0.069537)
+#            #FIXME: expectedMissingInnerHits and hOverE 
+#        )
+#    elif sca < 2.5:
+#        ret = ret and (
+#            (abs(el.eleDEta)    < 0.007057) and
+#            (abs(el.eleDPhi)    < 0.030159) and
+#            (el.eleSieie        < 0.028237) and
+#            (el.eleHoE          < 0.067778) and
+#            (abs(el.dxy)        < 0.027984) and
+#            (abs(el.dz)         < 0.133431) and
+#            (el.pfRelIso03        < 0.078265)
+#            #FIXME: expectedMissingInnerHits and hOverE 
+#        )
+#    return ret
 
 def el_baseline_medium(el):
     sca = abs(el.etaSc)
@@ -90,7 +90,7 @@ def el_baseline_medium(el):
             (el.eleHoE          < 0.050537) and
             (abs(el.dxy)        < 0.012235) and
             (abs(el.dz)         < 0.042020) and
-            (el.relIso03        < 0.107587) and
+            (el.pfRelIso03      < 0.107587) and #delta-beta corrected relative iso
             (getattr(el, "eleExpMissingInnerHits", 0) <= 1) and
             (getattr(el, "eleooEmooP", 0) < 0.091942)
         )
@@ -102,7 +102,7 @@ def el_baseline_medium(el):
             (el.eleHoE          < 0.086782) and
             (abs(el.dxy)        < 0.036719) and
             (abs(el.dz)         < 0.138142) and
-            (el.relIso03        < 0.113254) and
+            (el.pfRelIso03      < 0.113254) and #delta-beta corrected relative iso
             (getattr(el, "eleExpMissingInnerHits", 0) <= 1) and
             (getattr(el, "eleooEmooP", 0) < 0.100683)
         )
@@ -125,7 +125,7 @@ def el_baseline_loose(el):
             (el.eleHoE          < 0.093068) and
             (abs(el.dxy)        < 0.035904) and
             (abs(el.dz)         < 0.075496) and
-            (el.relIso03        < 0.130136) and
+            (el.pfRelIso03        < 0.130136) and
             (getattr(el, "eleExpMissingInnerHits", 0) <= 1) and
             (getattr(el, "eleooEmooP", 0) < 0.189968)
         )
@@ -137,7 +137,7 @@ def el_baseline_loose(el):
             (el.eleHoE          < 0.115754) and
             (abs(el.dxy)        < 0.099266) and
             (abs(el.dz)         < 0.197897) and
-            (el.relIso03        < 0.163368) and
+            (el.pfRelIso03        < 0.163368) and
             (getattr(el, "eleExpMissingInnerHits", 0) <= 1) and
             (getattr(el, "eleooEmooP", 0) < 0.140662)
         )
@@ -297,9 +297,8 @@ class Conf:
             #"meminput"
         ],
 
-
         #"eventWhitelist": [
-        #    (1,1131,113058)
+        #    (1, 1094, 109371),
         #]
     }
 

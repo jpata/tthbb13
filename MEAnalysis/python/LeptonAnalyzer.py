@@ -30,6 +30,7 @@ class LeptonAnalyzer(FilterAnalyzer):
         )
         if "debug" in self.conf.general["verbosity"]:
             for it in event.mu:
+                print "input muons"
                 print it
                 (self.conf.leptons["mu"]["debug"])(it)
 
@@ -38,6 +39,7 @@ class LeptonAnalyzer(FilterAnalyzer):
             event.selLeptons,
         )
         if "debug" in self.conf.general["verbosity"]:
+            print "input electrons"
             for it in event.el:
                 print it
                 (self.conf.leptons["el"]["debug"])(it)

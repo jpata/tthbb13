@@ -122,17 +122,16 @@ class JetAnalyzer(FilterAnalyzer):
             idx = int(lep.jetOverlapIdx)
             if idx != -1:
                 coll = event.Jet
-                #print idx
                 if idx >= 1000:
                     coll = event.DiscardedJet
-                    idx = idx / 1000
+                    idx = idx - 1000
                 if idx >=0 and idx < len(coll):
                     jet = coll[idx]
                     if jet in event.good_jets:
                         lv1 = lvec(jet)
                         lv2 = lvec(lep)
                         dr = lv1.DeltaR(lv2)
-                        #print "pfoverlap", dr, lep.pt, lep.eta, lep.phi, jet.pt, jet.eta, jet.phi
+                        #print "pfoverlap", event.input.run, event.input.lumi, event.input.evt, int(lep.jetOverlapIdx), dr, lep.pt, lep.eta, lep.phi, jet.pt, jet.eta, jet.phi
                         jets_to_remove += [jet]
                         #jet subtraction
                         #newjet = deepcopy(jet)
