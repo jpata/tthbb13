@@ -18,7 +18,7 @@ CMSSW_BASE=$HOME/TTH-74X/CMSSW/
 export ME_CONF=$CMSSW_BASE/src/TTH/MEAnalysis/python/@me_conf@
 
 #print out the environment
-#env
+env
 set -e
 
 #set env

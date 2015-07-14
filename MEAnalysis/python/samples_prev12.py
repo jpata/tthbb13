@@ -24,7 +24,7 @@ samples = cms.VPSet([
         nickName = cms.string('ttjets_13tev_amcatnlo_pu20bx25_spring15'),
         perJob   = cms.uint32(20000),
         xSec     = cms.double(xsec[("ttjets", "13TeV")]),
-        nGen     = cms.int64(26437549.0 - 13271811.0),
+        nGen     = cms.int64(26437549 - 13271811),
         subFiles = cms.vstring([
             "/store/user/gregor/VHBBHeppypreT12/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/VHBB_HEPPY_preT12_TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150625_084849/0000/tree_538.root",
             "/store/user/gregor/VHBBHeppypreT12/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/VHBB_HEPPY_preT12_TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150625_084849/0000/tree_633.root",
@@ -1067,7 +1067,7 @@ samples = cms.VPSet([
         name     = cms.string('tth_hbb_13tev_powheg_pu20bx25_spring15'),
         nickName = cms.string('tth_hbb_13tev_powheg_pu20bx25_spring15'),
         xSec     = cms.double(0.5058),
-        nGen     = cms.int64(3933403.0), #FIXME: why negative counts not filled?
+        nGen     = cms.int64(3933403), #FIXME: why negative counts not filled?
         perJob   = cms.uint32(20000),
         subFiles = cms.vstring([
             "/store/user/gregor/VHBBHeppypreT12/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_preT12_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150705_102657/0000//tree_72.root",
@@ -1187,7 +1187,6 @@ for s in samples:
         print s.name, "ngen", s.nGen
 #This contains the samples, but accessible by nickName
 samples_dict = {s.name.value(): s for s in samples}
-
 if __name__ == "__main__":
     for sn, sample in samples_dict.items():
         print sample

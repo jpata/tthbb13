@@ -12,7 +12,7 @@ import TTH.MEAnalysis.TFClasses as TFClasses
 
 #Import the default list of samples
 #from TTH.MEAnalysis.samples_vhbb import samples, sample_version, lfn_to_pfn
-from TTH.MEAnalysis.samples_722sync import samples, sample_version, lfn_to_pfn
+from TTH.MEAnalysis.samples_base import lfn_to_pfn
 
 
 #Create configuration object based on environment variables
@@ -38,7 +38,7 @@ pi_file.close()
 #Samples are configured in the Conf object, by default, we use samples_vhbb
 print "loading samples from", conf.general["sampleFile"]
 samplefile = imp.load_source("samplefile", conf.general["sampleFile"])
-from samplefile import samples_dict
+from samplefile import samples_dict, samples
 
 #input component
 #several input components can be declared,

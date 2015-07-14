@@ -11,9 +11,8 @@ import TTH.MEAnalysis.TFClasses as TFClasses
 import sys
 sys.modules["TFClasses"] = TFClasses
 
-from TTH.MEAnalysis.MEAnalysis_heppy import sequence
+from TTH.MEAnalysis.MEAnalysis_heppy import sequence, samples
 from TTH.MEAnalysis.samples_base import lfn_to_pfn
-from TTH.MEAnalysis.samples_722sync import samples
 
 firstEvent = int(os.environ["SKIP_EVENTS"])
 nEvents = int(os.environ["MAX_EVENTS"])
@@ -25,15 +24,20 @@ dataset = os.environ["DATASETPATH"]
 #fill the subFiles of the samples from
 #the supplied file names
 good_samp = []
+print "processing dataset={0}".format(dataset)
+
 for ns in range(len(samples)):
     if samples[ns].nickName.value() == dataset:
         samples[ns].skip = False
         samples[ns].subFiles = map(lfn_to_pfn, fns)
         good_samp += [samples[ns]]
     else:
+        print "skipping", samples[ns].name.value()
         samples[ns].skip = True
 
-assert(len(good_samp) == 1)
+if len(good_samp) != 1:
+    raise Exception("Need to specify at least one sample: dataset={0}, subfiles={1}".format(dataset, fns))
+
 outFileName = os.environ["MY_SCRATCH"] + "/output.root"
 
 import PhysicsTools.HeppyCore.framework.config as cfg
