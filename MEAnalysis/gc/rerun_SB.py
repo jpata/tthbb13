@@ -13,7 +13,6 @@ import os
 import shutil
 import re
 import gzip
-from CreateStatisticsReport import Create_Single_sig_Report
 from time import sleep
 import time
 import datetime
