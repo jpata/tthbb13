@@ -1,6 +1,15 @@
 from TTH.MEAnalysis.Analyzer import FilterAnalyzer
 import ROOT
 import copy
+import sys
+
+class Jet_container:
+    def __init__(self, pt, eta, phi, mass):
+        self.pt = pt
+        self.eta = eta
+        self.phi = phi
+        self.mass = mass
+
 
 class SubjetAnalyzer(FilterAnalyzer):
     """
@@ -12,23 +21,12 @@ class SubjetAnalyzer(FilterAnalyzer):
         self.conf = cfg_ana._conf
 
         self.R_cut = 0.3
+
+        self.R_cut_fatjets = 1.0
+
         self.top_mass = 172.04
 
         self.btagAlgo = self.conf.jets["btagAlgo"]
-
-        """
-        if hasattr( self.conf, 'httCandidatecut' ):
-            self.Cut_criteria = self.conf.httCandidatecut
-            print 'Using httCandidate cut criteria from configuration file'
-        else:
-            self.Cut_criteria = [
-                ( 'pt'  , '>', '200.0' ),
-                ( 'mass', '>', '120.0' ),
-                ( 'mass', '<', '220.0' ),
-                ( 'fW'  , '<', '0.175' ) ]
-        """
-
-        #self.Cut_criteria = []
 
         self.Cut_criteria = [
             ( 'pt'  , '>', '200.0' ),
@@ -38,6 +36,8 @@ class SubjetAnalyzer(FilterAnalyzer):
             ]
 
         self.n_subjetiness_cut = 0.97
+
+        self.bbtag_cut = 0.1
 
 
     def beginLoop(self, setup):
@@ -57,13 +57,11 @@ class SubjetAnalyzer(FilterAnalyzer):
 
         # Create two new lists for selected_btagged_jets and wquark_candidate_jets
         # Needs to be done here because the lists are needed in the mem config
-        setattr( event, 'selected_btagged_jets_sj', [] )
-        setattr( event, 'wquark_candidate_jets_sj', [] )
-        setattr( event, 'httCandidate_AC', [] )
-
-        # Save current number of bjets and ljets to root file
-        setattr( event, 'n_bjets', len( event.selected_btagged_jets ) )
-        setattr( event, 'n_ljets', len( event.wquark_candidate_jets ) )
+        setattr( event, 'boosted_bjets', [] )
+        setattr( event, 'boosted_ljets', [] )
+        setattr( event, 'topCandidate', [] )
+        setattr( event, 'othertopCandidate', [] )
+        setattr( event, 'higgsCandidate', [] )
 
         ########################################
         # Minimal event suitability:
@@ -74,6 +72,9 @@ class SubjetAnalyzer(FilterAnalyzer):
         # Check if the event is single leptonic
         if not event.is_sl:
             return True
+
+        # Get the top candidates
+        # ======================================
 
         # Keep track of number of httCandidates that passed the cut
         setattr( event, 'nhttCandidate', len( event.httCandidate ) )
@@ -90,8 +91,17 @@ class SubjetAnalyzer(FilterAnalyzer):
             if self.Apply_Cut_criteria( candidate ):
                 tops.append( copy.deepcopy(candidate) )
 
-        # Apply the n_subjetiness cut
-        tops = self.Apply_n_subjetiness_cut( event, tops )
+        # Match the top to a fat jet
+        #  - Copies bbtag and tau_N, calculates n_subjettiness
+        #  - Applies the n_subjetiness cut
+        #  - Calculates delR with the single lepton
+        tops = self.Match_top_to_fatjet( event, tops )
+        other_tops = []
+
+        # Calculate delR with the lepton for all tops that survived the cut
+        for top in tops:
+            setattr( top, 'delR_lepton' ,
+                self.Get_DeltaR_two_objects( top, event.good_leptons[0] ) )
 
         # Keep track of how many httCandidates passed
         event.nhttCandidate_aftercuts = len( tops )
@@ -100,109 +110,195 @@ class SubjetAnalyzer(FilterAnalyzer):
         # Check if any candidates survived the cutoff criteria
         if len(tops) == 0:
             return True
-
-        # Calculates the delR with the (single) lepton that was found
-        # (In case of more than 1 candidate, this can be a good selection crit.)
-        self.Set_DelRwithLepton( event, tops )
-
         # If exactly 1 survived, simply continue with that candidate
-        if len(tops) == 1:
+        elif len(tops) == 1:
             top = tops[0]
             other_top_present = False
-
         # If more than 1 candidate survived the cutoff criteria, choose the
         # one whose delR with the lepton was biggest
         else:
             tops = sorted( tops, key=lambda x: -x.delR_lepton )
-            #tops = sorted( tops, key=lambda x: abs(x.mass-self.top_mass) )
-            #tops = sorted( tops, key=lambda x: x.fRec )
-            #tops = sorted( tops, key=lambda x: x.n_subjetiness )
             other_top_present = True
             top = tops[0]
-            other_top = tops[1]
+            other_tops = tops[1:]
 
-        # Save the httCandidates that passed the cuts (AC = After Cuts)
-        event.httCandidate_AC = tops
+        # Get a Higgs candidate
+        # ======================================
 
-        # event.wquark_candidate_jets is a set instead of a list (not sure why)
-        event.wquark_candidate_jets = list( event.wquark_candidate_jets )
+        higgs_present = False
+
+        higgsCandidates = []
+        for fatjet in event.FatjetCA15ungroomed:
+
+            # Check if bbtag is not too low
+            if fatjet.bbtag < self.bbtag_cut:
+                continue
+
+            # Check if the fatjet is not already matched to the chosen top
+            if hasattr(fatjet, 'matched_top') and fatjet == top.matched_fatjet:
+                continue
+
+            fatjet.n_subjetiness = fatjet.tau3 / fatjet.tau2
+
+            higgsCandidates.append( fatjet )
+            higgs_present = True
+
+        # Sort by decreasing bbtag
+        higgsCandidates = sorted( higgsCandidates, key=lambda x: -x.bbtag )
 
 
         ########################################
         # Get the lists of particles: quarks, jets and subjets
         ########################################
 
-        # Create two new lists for selected_btagged_jets and wquark_candidate_jets:
-        event.selected_btagged_jets_sj = \
-            copy.deepcopy( event.selected_btagged_jets )
-        event.wquark_candidate_jets_sj = \
-            copy.deepcopy( event.wquark_candidate_jets )
-
-        # Sort wquark_candidate_jets_sj list now according to highest pt
-        # (Prevent needing to deal with it after subjets are added)
-        event.wquark_candidate_jets_sj = \
-            sorted( event.wquark_candidate_jets_sj, key = lambda x: -x.pt )
-
-        # Set 'PDGID' for all jets to 0:
-        for jet in event.selected_btagged_jets_sj: jet.PDGID = 0
-        for jet in event.wquark_candidate_jets_sj: jet.PDGID = 0
-
         # Get the subjets from the httCandidate
-        # Also sets transfer functions as attributes, and a btagFlag based on kin.
-        tl_subjets = self.Get_Subjets( top )
+        #  - Also sets transfer functions as attributes
+        #  - Returns subjets ordered by decreasing btag
+        #  - First subjet has btagFlag==1.0, the other two btagFlag==0.0
+        top_subjets = self.Get_Subjets( top )
         if other_top_present:
-            tl_subjets_other_top = self.Get_Subjets( other_top )
+            other_top_subjets = self.Get_Subjets( other_top )
 
-        # Get the list of btagged_jets
-        tl_btagged_jets = []
-        for jet in event.selected_btagged_jets_sj:
-            x = ROOT.TLorentzVector()
-            x.SetPtEtaPhiM( jet.pt, jet.eta, jet.phi, jet.mass )
-            setattr( x, 'origin_jet', jet )
-            setattr( x, 'btag', getattr(jet,self.btagAlgo) )
-            setattr( x, 'btagFlag', 1.0 )
-            tl_btagged_jets.append( x )
+        # Set 'PDGID' to 1 for light, and to 5 for b
+        for subjet in top_subjets:
+            if subjet.btagFlag == 1.0: setattr( subjet, 'PDGID', 5 )
+            if subjet.btagFlag == 0.0: setattr( subjet, 'PDGID', 1 )
 
-        # Get list of wquark_candidate_jets
-        tl_wquark_candidate_jets = []
-        for jet in event.wquark_candidate_jets_sj:
-            x = ROOT.TLorentzVector()
-            x.SetPtEtaPhiM( jet.pt, jet.eta, jet.phi, jet.mass )
-            setattr( x, 'origin_jet', jet )
-            setattr( x, 'btag', getattr(jet,self.btagAlgo) )
-            setattr( x, 'btagFlag', 0.0 )
-            tl_wquark_candidate_jets.append( x )
+        # Create two new lists for btagged_jets and wquark_candidate_jets in the
+        # original events
+        reco_btagged_jets = copy.deepcopy( event.selected_btagged_jets )
+        reco_ltagged_jets = copy.deepcopy( list( event.wquark_candidate_jets ) )
+
+        for jet in reco_btagged_jets:
+            setattr( jet, 'btag', getattr(jet,self.btagAlgo) )
+            setattr( jet, 'btagFlag', 1.0 )
+            setattr( jet, 'PDGID', 0 )
+
+        for jet in reco_ltagged_jets:
+            setattr( jet, 'btag', getattr(jet,self.btagAlgo) )
+            setattr( jet, 'btagFlag', 0.0 )
+            setattr( jet, 'PDGID', 0 )
 
 
         ########################################
         # Matching
         ########################################
 
+        # Whenever a subjet has a 'match' (dR < dR_cut), the matched object should
+        # excluded from the event
+
         # Match subjet to a bjet
-        Match_subjet_bjet = self.Match_two_tl_lists(
-            tl_subjets, 'subjet',
-            tl_btagged_jets, 'bjet' )
+        n_excluded_bjets = self.Match_two_lists(
+            top_subjets, 'top_subjet',
+            reco_btagged_jets, 'bjet' )
 
         # Match subjet to a ljet
-        Match_subjet_ljet = self.Match_two_tl_lists(
-            tl_subjets , 'subjet',
-            tl_wquark_candidate_jets, 'ljet' )
+        n_excluded_ljets = self.Match_two_lists(
+            top_subjets , 'top_subjet',
+            reco_ltagged_jets, 'ljet' )
 
         # In case of double matching, choose the match with lowest delR
         # (This is not expected to happen often)
-        for tl_subjet in tl_subjets:
-            if hasattr( tl_subjet, 'bjet_match' ) and \
-                hasattr( tl_subjet, 'ljet_match' ) :
+        for subjet in top_subjets:
+            if hasattr( subjet, 'matched_bjet' ) and \
+                hasattr( subjet, 'matched_ljet' ) :
                 print 'Double match detected'
-                if tl_subjet.bjet_match_delR < tl_subjet.ljet_match_delR:
-                    del tl_subjet.ljet_match
-                    del tl_subjet.ljet_match_delR
-                    Match_subjet_ljet -= 1
+                if subjet.matched_bjet_delR < subjet.matched_ljet_delR:
+                    del subjet.matched_ljet
+                    del subjet.matched_ljet_delR
+                    n_excluded_bjets -= 1
                 else:
-                    del tl_subjet.bjet_match
-                    del tl_subjet.bjet_match_delR
-                    Match_subjet_bjet -= 1
+                    del subjet.matched_bjet
+                    del subjet.matched_bjet_delR
+                    n_excluded_ljets -= 1
 
+
+        ########################################
+        # Modifying the bjets and ljets lists
+        ########################################
+
+        boosted_bjets = []
+        boosted_ljets = []
+
+        # Add the subjets to the final output lists first
+        for subjet in top_subjets:
+            if subjet.btagFlag == 1.0: boosted_bjets.append( subjet )
+            if subjet.btagFlag == 0.0: boosted_ljets.append( subjet )
+
+        # Sort tl btagged jets by decreasing btag (to be sure, but should already 
+        # be done in previous analyzer)
+        reco_btagged_jets = sorted( reco_btagged_jets, key=lambda x: -x.btag )
+
+        # Add up to 4 reco btagged jets to the output lists
+        for bjet in reco_btagged_jets:
+            # Check if the b-jet is not excluded
+            if not hasattr( bjet, 'matched_top_subjet' ):
+                boosted_bjets.append( bjet )
+
+            # Stop adding after 4 b-jets
+            if len(boosted_bjets) == 4: break
+
+        event.PassedSubjetAnalyzer = True
+
+
+        ########################################
+        # Write to event
+        ########################################
+
+        # Store output lists in event
+        event.topCandidate = [ top ]
+        event.othertopCandidate = other_tops
+        event.higgsCandidate = higgsCandidates
+        event.boosted_bjets = boosted_bjets
+        event.boosted_ljets = boosted_ljets
+
+        event.n_bjets = len( reco_btagged_jets )
+        event.n_ljets = len( reco_ltagged_jets )
+
+        event.n_boosted_bjets = len( boosted_bjets )
+        event.n_boosted_ljets = len( boosted_ljets )
+
+        event.n_excluded_bjets = n_excluded_bjets
+        event.n_excluded_ljets = n_excluded_ljets
+
+        print 'Exiting SubjetAnalyzer! event.PassedSubjetAnalyzer = {0}'.format(
+            event.PassedSubjetAnalyzer )
+
+
+        ########################################
+        # Printing particle lists
+        ########################################
+
+        """
+        print '\n====================================='
+        print 'tops (first one = chosen):'
+        self.Print_objs( tops, extra_attrs=['bbtag'] )
+        print 'higgsCandidates:'
+        self.Print_objs( higgsCandidates, extra_attrs=['bbtag'] )
+        print '====================================='
+        print 'reco_btagged_jets:'
+        self.Print_objs( reco_btagged_jets, ['btag'] )
+        print 'reco_ltagged_jets:'
+        self.Print_objs( reco_ltagged_jets, ['btag'] )
+        print '====================================='
+        print 'top_subjets:'
+        for subjet in top_subjets:
+            self.Print_objs( subjet, ['btag'] )
+            if hasattr( subjet, 'matched_bjet'):
+                print '        Matched with bjet, delR = {0}'.format(
+                    subjet.matched_bjet_delR )
+                self.Print_objs( subjet.matched_bjet, ['btag'], tab=True )
+            if hasattr( subjet, 'matched_ljet'):
+                print '        Matched with ljet, delR = {0}'.format(
+                    subjet.matched_ljet_delR )
+                self.Print_objs( subjet.matched_ljet, ['btag'], tab=True )
+        print '====================================='
+        print 'boosted_bjets:'
+        self.Print_objs( boosted_bjets, ['btag'] )
+        print 'boosted_ljets:'
+        self.Print_objs( boosted_ljets, ['btag'] )
+        print '====================================='
+        """
 
         ########################################
         # Quark Matching
@@ -210,414 +306,11 @@ class SubjetAnalyzer(FilterAnalyzer):
 
         # This section is only useful for truth-level comparison, and can be turned
         # off if this is not needed.
-
-        # Check how many of which quarks are present
-        # ======================================
-
-        # Necessary to remove duplicates in GenWZQuark branch
-        # This step can be removed for V12 samples
-        self.CompareWZQuarks( event )
-
-        # Check if event contains the right number of quarks
-        # (Only used to do truth-level comparisons)
-        genquarks_cat1_present = True
-        genhiggs_present = True
-        if len(event.GenWZQuark)<2:
-            genquarks_cat1_present = False
-        if len(event.GenWZQuark)>2:
-            genquarks_cat1_present = False
-        if len(event.GenBQuarkFromTop)<2:
-            genquarks_cat1_present = False
-        if len(event.GenBQuarkFromTop)>2:
-            genquarks_cat1_present = False
-        if len(event.GenBQuarkFromH)<2:
-            genhiggs_present = False
-        if len(event.GenBQuarkFromH)>2:
-            genhiggs_present = False
-
-        # Get the TLorentzVectors for the quarks
-        # ======================================
-
-        if genquarks_cat1_present:
-            # Get the hadronic & leptonic b-quark and the two light quarks
-            ( tl_HadronicBQuark,
-              tl_GenWZQuark1,
-              tl_GenWZQuark2,
-              tl_LeptonicBQuark )  = self.Get_tl_genquarks( event )
-
-            # Some convenient lists of quarks
-            tl_QuarksFromHadrTop = [
-                tl_HadronicBQuark, tl_GenWZQuark1, tl_GenWZQuark2 ]
-            tl_LightQuarks = [ tl_GenWZQuark1, tl_GenWZQuark2 ]
-
-        if genhiggs_present:
-            # Get the 2 b-quarks from Higgs
-            tl_BQuarksFromH = []
-            for q in event.GenBQuarkFromH:
-                tl_q = ROOT.TLorentzVector()
-                tl_q.SetPtEtaPhiM( q.pt, q.eta, q.phi, q.mass )
-                tl_BQuarksFromH.append( tl_q )
-
-        # Quark matching
-        # ==============
-
-        # Quark matching is only done to compare events to truth level.
-        # Events are not selected based on successful quark matching.
-        # This entire part can be commented out if so desired.
-
-        # Matching quarks with subjets
-        if genquarks_cat1_present:
-
-            Match_hadr_bquark_subjet = self.Match_two_tl_lists(
-                tl_HadronicBQuark, 'hadr_bquark',
-                tl_subjets, 'subjet' )
-
-            Match_lquark1_subjet = self.Match_two_tl_lists(
-                tl_GenWZQuark1, 'lquark1',
-                tl_subjets, 'subjet' )
-
-            Match_lquark2_subjet = self.Match_two_tl_lists(
-                tl_GenWZQuark2, 'lquark2',
-                tl_subjets, 'subjet' )
-
-            Match_lept_bquark_subjet = self.Match_two_tl_lists(
-                tl_LeptonicBQuark, 'lept_bquark',
-                tl_subjets, 'subjet' )
-
-            # Matching quarks with subjets from other top
-            if other_top_present:
-                Match_hadr_bquark_subjet_ot = self.Match_two_tl_lists(
-                    tl_HadronicBQuark, 'hadr_bquark',
-                    tl_subjets_other_top, 'subjet_other_top' )
-
-                Match_lquark1_subjet_ot = self.Match_two_tl_lists(
-                    tl_GenWZQuark1, 'lquark1',
-                    tl_subjets_other_top, 'subjet_other_top' )
-
-                Match_lquark2_subjet_ot = self.Match_two_tl_lists(
-                    tl_GenWZQuark2, 'lquark2',
-                    tl_subjets_other_top, 'subjet_other_top' )
-
-                Match_lept_bquark_subjet_ot = self.Match_two_tl_lists(
-                    tl_LeptonicBQuark, 'lept_bquark',
-                    tl_subjets_other_top, 'subjet_other_top' )
-            else:
-                Match_hadr_bquark_subjet_ot = -1
-                Match_lquark1_subjet_ot = -1
-                Match_lquark2_subjet_ot = -1
-                Match_lept_bquark_subjet_ot = -1
-
-        if genhiggs_present:
-
-            Match_bquark_higgs1_subjet = self.Match_two_tl_lists(
-                tl_BQuarksFromH[0], 'bquark_higgs1',
-                tl_subjets, 'subjet' )
-
-            Match_bquark_higgs2_subjet = self.Match_two_tl_lists(
-                tl_BQuarksFromH[1], 'bquark_higgs2',
-                tl_subjets, 'subjet' )
-
-            # Matching quarks with subjets from other top
-            if other_top_present:
-                Match_bquark_higgs1_subjet_ot = self.Match_two_tl_lists(
-                    tl_BQuarksFromH[0], 'bquark_higgs1',
-                    tl_subjets_other_top, 'subjet_other_top' )
-
-                Match_bquark_higgs2_subjet_ot = self.Match_two_tl_lists(
-                    tl_BQuarksFromH[1], 'bquark_higgs2',
-                    tl_subjets_other_top, 'subjet_other_top' )
-            else:
-                Match_bquark_higgs1_subjet_ot = -1
-                Match_bquark_higgs2_subjet_ot = -1
-
-        # Matching quarks with jets
-        if genquarks_cat1_present:
-
-            Match_hadr_bquark_jet = self.Match_two_tl_lists(
-                tl_HadronicBQuark, 'hadr_bquark',
-                tl_btagged_jets, 'jet' )
-
-            Match_lquark1_jet = self.Match_two_tl_lists(
-                tl_GenWZQuark1, 'lquark1',
-                tl_wquark_candidate_jets, 'jet' )
-
-            Match_lquark2_jet = self.Match_two_tl_lists(
-                tl_GenWZQuark2, 'lquark2',
-                tl_wquark_candidate_jets, 'jet' )
-
-            Match_lept_bquark_jet = self.Match_two_tl_lists(
-                tl_LeptonicBQuark, 'lept_bquark',
-                tl_btagged_jets, 'jet' )
-
-        if genhiggs_present:
-
-            Match_bquark_higgs1_jet = self.Match_two_tl_lists(
-                tl_BQuarksFromH[0], 'bquark_higgs1',
-                tl_btagged_jets, 'jet' )
-
-            Match_bquark_higgs2_jet = self.Match_two_tl_lists(
-                tl_BQuarksFromH[1], 'bquark_higgs2',
-                tl_btagged_jets, 'jet' )
-
-        setattr( event, 'QMatching_t_attempted', genquarks_cat1_present )
-        setattr( event, 'QMatching_H_attempted', genhiggs_present )
-
-        if genquarks_cat1_present:
-            setattr( event, 'QMatching_sj_hadr_bquark'  , Match_hadr_bquark_subjet )
-            setattr( event, 'QMatching_sj_lquark1'      , Match_lquark1_subjet )
-            setattr( event, 'QMatching_sj_lquark2'      , Match_lquark2_subjet )
-            setattr( event, 'QMatching_sj_lept_bquark'  , Match_lept_bquark_subjet )
-
-            # Results from other top matching
-            setattr( event, 'QMatching_sj_ot_hadr_bquark'  , 
-                     Match_hadr_bquark_subjet_ot )
-            setattr( event, 'QMatching_sj_ot_lquark1'      ,
-                     Match_lquark1_subjet_ot )
-            setattr( event, 'QMatching_sj_ot_lquark2'      ,
-                     Match_lquark2_subjet_ot )
-            setattr( event, 'QMatching_sj_ot_lept_bquark'  , 
-                     Match_lept_bquark_subjet_ot )
-
-            # Results from jet matching
-            setattr( event, 'QMatching_jet_hadr_bquark'  , Match_hadr_bquark_jet )
-            setattr( event, 'QMatching_jet_lquark1'      , Match_lquark1_jet )
-            setattr( event, 'QMatching_jet_lquark2'      , Match_lquark2_jet )
-            setattr( event, 'QMatching_jet_lept_bquark'  , Match_lept_bquark_jet )
-
-        if genhiggs_present:
-            setattr( event, 'QMatching_sj_bquark_higgs1',
-                Match_bquark_higgs1_subjet )
-            setattr( event, 'QMatching_sj_bquark_higgs2',
-                Match_bquark_higgs2_subjet )
-
-            setattr( event, 'QMatching_sj_ot_bquark_higgs1',
-                     Match_bquark_higgs1_subjet_ot )
-            setattr( event, 'QMatching_sj_ot_bquark_higgs2',
-                     Match_bquark_higgs2_subjet_ot )
-
-            setattr( event, 'QMatching_jet_bquark_higgs1', Match_bquark_higgs1_jet )
-            setattr( event, 'QMatching_jet_bquark_higgs2', Match_bquark_higgs2_jet )
-
-
-        ########################################
-        # Logic - Setting the btagFlags
-        ########################################
-
-        trust_subjet_btag = True
-
-        # b | l | Strategy
-        # --+---+-------------------------------------------------------------------
-        # 0 | 0 | Trust subjet btag; all subjets added
-        # --+---+-------------------------------------------------------------------
-        # 0 | 3 | Trust subjet btag; all subjets replace jets
-        # --+---+-------------------------------------------------------------------
-        # 0 | 1 | If the matched light jet was not subjet-btagged, trust subjet btag
-        #   |   | Else, trust (1) positive subjet btag (2) negative jet btag
-        #   |   | 
-        # --+---+-------------------------------------------------------------------
-        # 0 | 2 | If the matched light jet was not subjet-btagged, trust subjet btag
-        #   |   | Else, trust (1) positive subjet btag (2) negative jet btag
-        # --+---+-------------------------------------------------------------------
-        # 1 | 0 | Trust the match with the b-jet, and set the other 2 subjets as the
-        #   | 1 | l-jets (Strategy 4)
-        #   | 2 | 
-        # --+---+-------------------------------------------------------------------
-        # 2 | 0 | Do nothing; b- and l-lists remain untouched, subjets are not used
-        #   | 1 | 
-        # 3 | 0 | 
-        # --+---+-------------------------------------------------------------------
-
-        # NB: Subjets are already ordered by decreasing btag, and first is btagged:
-        #     tl_subjets[0].btagFlag == 1.0
-
-        Match_tup = ( Match_subjet_bjet , Match_subjet_ljet )
-        btag_disagreement = 0
-
-        if Match_tup == (0,0): ETN = 1
-        elif Match_tup == (0,3): ETN = 2
-
-        elif Match_tup == (0,1):
-            ETN = 3
-
-            # Check if this light jet was not matched to the b-tagged subjet
-            if hasattr( tl_subjets[0], 'ljet_match' ):
-                if not trust_subjet_btag:
-                    tl_subjets[0].btagFlag = 0.0
-                    tl_subjets[1].btagFlag = 1.0
-                ETN = 4
-                btag_disagreement = 1
-
-        elif Match_tup == (0,2):
-            ETN = 5
-
-            # Check if one of the light jets was not matched to the b-tagged subjet
-            if hasattr( tl_subjets[0], 'ljet_match' ):
-                if not trust_subjet_btag:
-                    # Assign 0.0 to matched subjets and 1.0 to unmatched
-                    for tl_subjet in tl_subjets:
-                        if hasattr( tl_subjet, 'ljet_match' ):
-                            tl_subjet.btagFlag = 0.0
-                        else:
-                            tl_subjet.btagFlag = 1.0
-                ETN = 6
-                btag_disagreement = 1
-
-        elif Match_tup in [ (1,0), (1,1), (1,2) ]:
-            ETN = 7
-            
-            # Check if the 1 matched b-jet is also the b-tagged subjet
-            if not hasattr( tl_subjets[0], 'bjet_match' ):
-                if not trust_subjet_btag:
-                    # Assign 1.0 to  the b-matched subjet and 0.0 to others
-                    for tl_subjet in tl_subjets:
-                        if hasattr( tl_subjet, 'bjet_match' ):
-                            tl_subjet.btagFlag = 1.0
-                        else:
-                            tl_subjet.btagFlag = 0.0
-                ETN = 8
-                btag_disagreement = 1
-
-        elif Match_tup in [ (2,0), (2,1), (3,0) ]:
-            ETN = 9
-
-        else:
-            print 'Unassigned category! Create a strategy for this case.'
-            print 'subjet-b matches: {0}, subjet-l matches = {1}'.format(
-                Match_subjet_bjet, Match_subjet_ljet )
-            return 0
-
-
-        # Set 'PDGID' to 1 for light, and to 5 for b
-        # Note: This will be problematic for the new strategy with >=2 b matches
-        for subjet in tl_subjets:
-            if subjet.btagFlag == 1.0: setattr( subjet, 'PDGID', 5 )
-            if subjet.btagFlag == 0.0: setattr( subjet, 'PDGID', 1 )
-
-
-        """
-        # Check-up printing - ETN, btag_disagreement, matches
-        print '=====================================\n'
-        print 'ETN = {0}    btag_disagreement = {1}'.format(ETN, btag_disagreement)
-        print '=====================================\n'
-        for tl_subjet in tl_subjets:
-            b_match = int(hasattr( tl_subjet, 'bjet_match' ))
-            l_match = int(hasattr( tl_subjet, 'ljet_match' ))
-            print 'b_match = {0}   l_match = {1}'.format( b_match, l_match )
-
-        # Check up printing - the input jets
-        print '=====================================\n'
-        print 'Input jets:'
-        self.Print_particle_lists(
-            ( event.selected_btagged_jets_sj, 'Class', 
-                'event.selected_btagged_jets_sj'),
-            ( event.wquark_candidate_jets_sj, 'Class',
-                'event.wquark_candidate_jets_sj'),
-            )
-        print '=====================================\n'
-
-        # Check up printing - the httCandidate
-        print '=====================================\nCheck print'
-        for tl_subjet in tl_subjets:
-            if hasattr( tl_subjet, 'bjet_match' ):
-                self.Print_particle_lists(
-                    ( [tl_subjet], 'TL', 'Subjet {0}'.format(tl_subjet.prefix) ),
-                    ( [tl_subjet.bjet_match], 'TL', '----> Matching bjet' ) )
-            elif hasattr( tl_subjet, 'ljet_match' ):
-                self.Print_particle_lists(
-                    ( [tl_subjet], 'TL', 'Subjet {0}'.format(tl_subjet.prefix) ),
-                    ( [tl_subjet.ljet_match], 'TL', '----> Matching ljet' ) )
-            else:
-                self.Print_particle_lists(
-                    ([tl_subjet], 'TL', 'Subjet {0}'.format(tl_subjet.prefix) ) )
-        print '=====================================\n'
-        """
-
-
-        ########################################
-        # Modifying the bjets and ljets lists
-        ########################################
-
-        # Remove all original instances and replace them with their matched subjets
-        # If an original bjet is matched with a subjet that has btagFlag=0.0, the
-        # original bjet is removed from the btagged_jets, and the subjet is appended
-        # to event.wquark_candidate_jets.
-        # (Analogous for original ljet matched with a subjet that has btagFlag=1.0)
-
-        # Events with 2 or more b-jet matches are treated differently
-        if Match_subjet_bjet < 2:
-            for tl_subjet in tl_subjets:
-                if hasattr( tl_subjet, 'ljet_match' ):
-                    # Get the original ljet
-                    orig_ljet = tl_subjet.ljet_match.origin_jet
-                    # Remove it from the ljet list in the event
-                    event.wquark_candidate_jets_sj.pop(
-                        event.wquark_candidate_jets_sj.index( orig_ljet ) )
-                    orig_jet_btagFlag = 0.0
-                if hasattr( tl_subjet, 'bjet_match' ):
-                    # Get the original bjet
-                    orig_bjet = tl_subjet.bjet_match.origin_jet
-                    # Remove it from the bjet list in the event
-                    event.selected_btagged_jets_sj.pop(
-                        event.selected_btagged_jets_sj.index( orig_bjet ) )
-                    orig_jet_btagFlag = 1.0
-
-                if tl_subjet.btagFlag == 1.0:
-                    # Insert the subjet into btagged_jets list in the event
-                    event.selected_btagged_jets_sj.insert( 0, tl_subjet )
-                elif tl_subjet.btagFlag == 0.0:
-                    # Insert the subjet into wquark_candidate_jets list in the event
-                    event.wquark_candidate_jets_sj.insert( 0, tl_subjet )
-
-            # Reduce to 4 b-jets to keep runtime in check
-            if len( event.selected_btagged_jets_sj ) > 4:
-                event.selected_btagged_jets_sj = event.selected_btagged_jets_sj[:4]
-
-            # Reduce to 4 l-jets to keep runtime in check
-            if len( event.wquark_candidate_jets_sj ) > 4:
-                # Select at least 2 subjets, and as second criterium the 4 light 
-                # jets with highest pt
-                event.wquark_candidate_jets_sj = event.wquark_candidate_jets_sj[:4]
-
-
-        # In this case, only add the unmatched light subjet
-        # (bjets list is unchanged)
-        #if Match_subjet_bjet == 2 and Match_subjet_ljet == 0:
-        #    for tl_subjet in tl_subjets:
-        #        if not hasattr( tl_subjet, 'bjet_match' ):
-        #            event.wquark_candidate_jets_sj.append( tl_subjet )
-        # UPDATE (6-7-2015): Even the light jet is not added, event is ran unchanged
-
-
-        event.PassedSubjetAnalyzer = True
-
-        """
-        # Check up printing - the output jets
-        print '=====================================\n'
-        print 'Output jets:'
-        self.Print_particle_lists(
-            ( event.selected_btagged_jets_sj, 'Class', 
-                'event.selected_btagged_jets_sj'),
-            ( event.wquark_candidate_jets_sj, 'Class',
-                'event.wquark_candidate_jets_sj'),
-            )
-        print '=====================================\n'
-        """
-
-        ########################################
-        # Write to event
-        ########################################
-
-        setattr( event, 'n_bjets_sj', len( event.selected_btagged_jets_sj ) )
-        setattr( event, 'n_ljets_sj', len( event.wquark_candidate_jets_sj ) )
-
-        setattr( event, 'Matching_subjet_bjet', Match_subjet_bjet )
-        setattr( event, 'Matching_subjet_ljet', Match_subjet_ljet )
-
-        setattr( event, 'Matching_event_type_number', ETN )
-        setattr( event, 'Matching_btag_disagreement', btag_disagreement )
-
-        print 'Exiting SubjetAnalyzer! event.PassedSubjetAnalyzer = {0}'.format(
-            event.PassedSubjetAnalyzer )
+        # Do_Quark_Matching( event ) sets number of matches with quarks as branches
+        # in the event, but these branches do not have to be filled (they will be
+        # automatically set to -1 in the final output root file).
+
+        self.Do_Quark_Matching( event )
 
 
     ########################################
@@ -638,64 +331,34 @@ class SubjetAnalyzer(FilterAnalyzer):
     # ==============================================================================
     # Additional httCandidate cut: n-subjetiness
     # Takes a list of tops, returns a (reduced) list of tops with an n_subjetiness
-    def Apply_n_subjetiness_cut( self, event, tops ):
-
-        # Get the tl list of FatjetCA15ungroomed_jets
-        tl_FatjetCA15ungroomed = []
-        for jet in event.FatjetCA15ungroomed:
-            x = ROOT.TLorentzVector()
-            x.SetPtEtaPhiM( jet.pt, jet.eta, jet.phi, jet.mass )
-            setattr( x, 'origin_jet', jet )
-            setattr( x, 'n_subjetiness', jet.tau3/jet.tau2 )
-            tl_FatjetCA15ungroomed.append( x )
-
-        # Get the tl list of tops
-        tl_tops = []
-        for jet in tops:
-            x = ROOT.TLorentzVector()
-            x.SetPtEtaPhiM( jet.pt, jet.eta, jet.phi, jet.mass )
-            setattr( x, 'origin_jet', jet )
-            tl_tops.append( x )
-
-        """
-        # Check up printing - the httCandidates and the fatjets
-        print '====================================='
-        self.Print_particle_lists(
-            ( tl_tops, 'TL', 'tl_httCandidate' ),
-            ( tl_FatjetCA15ungroomed, 'TL', 'tl_FatjetCA15ungroomed' ),
-            )
-        print '=====================================\n'
-        """
+    def Match_top_to_fatjet( self, event, tops ):
 
         # Loosely match the fatjets to the tops
-        Match_httcand_fatjet = self.Match_two_tl_lists(
-            tl_tops, 'httcand',
-            tl_FatjetCA15ungroomed, 'fatjet',
-            R_cut = 1.0 )
+        n_matched_httcand_fatjet = self.Match_two_lists(
+            tops, 'top',
+            event.FatjetCA15ungroomed, 'fatjet',
+            R_cut = self.R_cut_fatjets )
 
         # New list of tops after n_subjetiness cut is applied
         tops_after_nsub_cut = []
 
-        for tl_top in tl_tops:
+        for top in tops:
 
             # Skip unmatched tops
-            if not hasattr( tl_top, 'fatjet_match' ):
+            if not hasattr( top, 'matched_fatjet' ):
                 print 'Warning: httCandidate unmatchable to fatjet!'
                 continue
 
-            top = tl_top.origin_jet
-            fatjet = tl_top.fatjet_match.origin_jet
+            fatjet = top.matched_fatjet
 
             # Get n_subjetiness from the matched fatjet
-            n_subjetiness = tl_top.fatjet_match.n_subjetiness
+            n_subjetiness = fatjet.tau3 / fatjet.tau2
 
-            # Continue if n_subjetiness exceeds the cut
+            # Try next top if n_subjetiness exceeds the cut
             if n_subjetiness > self.n_subjetiness_cut: continue
 
-            # Set n_subjetiness as an attribute to the tl and the class
-            setattr( tl_top.origin_jet , 'n_subjetiness', n_subjetiness )
-
-            # Also set tau1/2/3 and the bbtag
+            # Set n_subjetiness, tau_N and the bbtag
+            setattr( top , 'n_subjetiness', n_subjetiness )
             setattr( top , 'tau1', fatjet.tau1 )
             setattr( top , 'tau2', fatjet.tau2 )
             setattr( top , 'tau3', fatjet.tau3 )
@@ -710,63 +373,34 @@ class SubjetAnalyzer(FilterAnalyzer):
         return tops_after_nsub_cut
 
     # ==============================================================================
-    # Sorts tops - criterium to be tested
-    def Set_DelRwithLepton( self, event, tops ):
-
-        # Get the lepton
-        l = event.good_leptons[0]
-
-        # Create TLorentzVector for lepton
-        tl_lepton = ROOT.TLorentzVector()
-        tl_lepton.SetPtEtaPhiM( l.pt, l.eta, l.phi, l.mass )
-
-        # Create TLorentzVector for tops
-        tl_tops = []
-        for top in tops:
-            tl_top = ROOT.TLorentzVector()
-            tl_top.SetPtEtaPhiM( top.pt, top.eta, top.phi, top.mass )
-            setattr( top, 'delR_lepton', tl_top.DeltaR(tl_lepton) )
-    
-    # ==============================================================================
     def Get_Subjets( self, top ):
 
-        tl_subjets = []
-        prefixes = [ 'sjW1', 'sjW2', 'sjNonW' ]
-        for (i_subjet, prefix) in enumerate( prefixes ):
-            x = ROOT.TLorentzVector()
-            x.SetPtEtaPhiM(
+        top_subjets = []
+        for prefix in [ 'sjW1', 'sjW2', 'sjNonW' ]:
+            x = Jet_container(
                 getattr( top, prefix + 'pt' ),
                 getattr( top, prefix + 'eta' ),
                 getattr( top, prefix + 'phi' ),
                 getattr( top, prefix + 'mass' ) )
             setattr( x, 'prefix', prefix )
-
-            # Also pass the btag to the tl
             setattr( x, 'btag'  , getattr( top, prefix + 'btag' ) )
 
-            # Set pt, eta, phi and mass also as attributes
-            # Needed for compatibility with mem
-            setattr( x, 'pt', x.Pt() )
-            setattr( x, 'eta', x.Eta() )
-            setattr( x, 'phi', x.Phi() )
-            setattr( x, 'mass', x.M() )
-
-            tl_subjets.append( x )
+            top_subjets.append( x )
 
         # Set the btagFlags; order by decreasing btag, highest btag gets btagFlag=1.0
-        tl_subjets = sorted( tl_subjets, key = lambda x: -x.btag )
-        setattr( tl_subjets[0], 'btagFlag', 1.0 )
-        setattr( tl_subjets[1], 'btagFlag', 0.0 )
-        setattr( tl_subjets[2], 'btagFlag', 0.0 )
+        top_subjets = sorted( top_subjets, key = lambda x: -x.btag )
+        setattr( top_subjets[0], 'btagFlag', 1.0 )
+        setattr( top_subjets[1], 'btagFlag', 0.0 )
+        setattr( top_subjets[2], 'btagFlag', 0.0 )
 
-        #Adding subjet transfer functions
-        for subjet in tl_subjets:
+        # Adding subjet transfer functions
+        for subjet in top_subjets:
             jet_eta_bin = 0
-            if abs(subjet.Eta())>1.0:
+            if abs(subjet.eta)>1.0:
                 jet_eta_bin = 1
 
-            #If True, TF [0] - reco, x - gen
-            #If False, TF [0] - gen, x - reco
+            # If True, TF [0] - reco, x - gen
+            # If False, TF [0] - gen, x - reco
             eval_gen = False
             setattr( subjet, 'tf_b' ,
                 self.conf.tf_sj_matrix['b'][jet_eta_bin].Make_Formula(eval_gen) )
@@ -777,81 +411,151 @@ class SubjetAnalyzer(FilterAnalyzer):
             setattr( subjet, 'tf_l_lost' ,
                 self.conf.tf_sj_matrix['l'][jet_eta_bin].Make_CDF() )
 
-            #Set jet pt threshold for CDF
+            # Set jet pt threshold for CDF
             subjet.tf_b_lost.SetParameter(0, self.conf.jets["pt"])
             subjet.tf_l_lost.SetParameter(0, self.conf.jets["pt"])
 
-        return tl_subjets
+        # Create a pointer in the top to its subjets
+        setattr( top, 'subjets', top_subjets )
+
+        return top_subjets
 
     # ==============================================================================
-    # Print a non-predefined number of particle lists
-    # Input is a list of tuples: input_args = [ (tuple), (tuple), ... ]
-    # Every tuple is structured as follows:
-    # (tuple) = ( particle list, TLorentz/Class label, name of the particle )
-    def Print_particle_lists( self, *input_args ):
+    # Calculates angular distance between two objects (needs eta and phi as attr.)
+    def Get_DeltaR_two_objects( self, obj1, obj2 ):
 
-        for ( p_list, mode, name ) in input_args:
+        for obj in [ obj1, obj2 ]:
+            if not ( hasattr( obj, 'phi' ) or hasattr( obj, 'eta' ) ):
+                print "Can't calculate Delta R: objects don't have right attributes"
+                return 0
 
-            print '\n    Printing {0}:'.format( name )
+        pi = 3.1415926535897932
 
-            for q in p_list:
+        del_phi = abs( obj1.phi - obj2.phi )
+        if del_phi > pi: del_phi = 2*pi - del_phi
 
-                if mode == 'TL':
-                    pt = '{0:.2f}'.format(q.Pt())
-                    eta = '{0:.2f}'.format(q.Eta())
-                    phi = '{0:.2f}'.format(q.Phi())
-                    mass = '{0:.2f}'.format(q.M())
+        delR = pow( pow(obj1.eta-obj2.eta,2) + pow(del_phi,2) , 0.5 )
 
-                if mode == 'Class':
-                    pt = '{0:.2f}'.format(q.pt)
-                    eta = '{0:.2f}'.format(q.eta)
-                    phi = '{0:.2f}'.format(q.phi)
-                    mass = '{0:.2f}'.format(q.mass)
+        return delR
 
-                p4_str = '    [ pt: {0:6s} | eta: {1:5s} | phi: {2:5s} | mass: {3:6s} '.format(
-                    pt, eta, phi, mass )
+    # ==============================================================================
+    # Simple algorithm that matches the smallest delta R for two lists of objects
+    def Get_min_delR( self, objs1, objs2, R_cut = 'def' ):
 
-                if hasattr( q, 'btagFlag' ):
-                    p4_str += '| bFl: {0} '.format( int(q.btagFlag) )
+        # Use self.R_cut if R_cut is not specified
+        if R_cut == 'def':
+            R_cut = self.R_cut
 
-                if hasattr( q, 'btag' ):
-                    p4_str += '| btag: {0} '.format( '{0:.2f}'.format(q.btag) )
+        n_objs1 = len(objs1)
+        n_objs2 = len(objs2)
 
-                p4_str += ']'
+        Rmat = [[ self.Get_DeltaR_two_objects(objs1[i], objs2[j]) \
+            for j in range(n_objs2)] for i in range(n_objs1) ]
 
-                print p4_str
+        Rmin = 9999.0
+        
+        for i in range(n_objs1):
+            for j in range(n_objs2):
+                if Rmat[i][j] < Rmin and Rmat[i][j] < R_cut:
+                    Rmin = Rmat[i][j]
+                    i_min = i
+                    j_min = j
 
+        if Rmin == 9999.0: return ( 'No link', 0, 0)
 
-        print ''
+        return (i_min, j_min, Rmin)
+
+    # ==============================================================================
+    def Match_two_lists( self,
+                         objs1_orig, label1,
+                         objs2_orig, label2,
+                         R_cut = 'def' ):
+
+        # Check if object is not a list; if so, convert it to a list
+        # (This allows to conveniently pass single objects to the function as well)
+        if hasattr( objs1_orig, 'eta' ) and hasattr( objs1_orig, 'phi' ):
+            objs1_orig = [ objs1_orig ]
+        if hasattr( objs2_orig, 'eta' ) and hasattr( objs2_orig, 'phi' ):
+            objs2_orig = [ objs2_orig ]
+    
+        # Create copies of the list, since entries will be popped
+        objs1 = copy.deepcopy( objs1_orig )
+        objs2 = copy.deepcopy( objs2_orig )
+
+        # Save the original objecs as attributes of the workable objects
+        for ( obj1, obj1_orig ) in zip( objs1, objs1_orig ):
+            setattr( obj1, 'orig_obj', obj1_orig )
+        for ( obj2, obj2_orig ) in zip( objs2, objs2_orig ):
+            setattr( obj2, 'orig_obj', obj2_orig )
+
+        # Attempt matching until the shortest list is depleted, or until there are
+        # no more matches with delR < delR_cut
+        n_matches = min( len(objs1), len(objs2) )
+
+        for i_match in range(n_matches):
+
+            # Attempt a match
+            (i1, i2, delR) = self.Get_min_delR( objs1, objs2, R_cut )
+
+            # Return the attempt number if no more matches could be made
+            if i1 == 'No link':
+                return i_match
+
+            # Pop the matched objs from the lists for the next iteration
+            matched_obj1 = objs1.pop(i1)
+            matched_obj2 = objs2.pop(i2)
+
+            # Record the match in the original objs
+            setattr( matched_obj1.orig_obj,
+                     'matched_{0}'.format( label2 ),
+                     matched_obj2.orig_obj )
+            setattr( matched_obj2.orig_obj,
+                     'matched_{0}'.format( label1 ),
+                     matched_obj1.orig_obj )
+
+            # Record the delR value in the original objs
+            setattr( matched_obj1.orig_obj,
+                     'matched_{0}_delR'.format( label2 ),
+                     delR )
+            setattr( matched_obj2.orig_obj,
+                     'matched_{0}_delR'.format( label1 ),
+                     delR )
+
+        return n_matches
 
     # ==============================================================================
     # Print exactly 1 particle
 
-    def Print_one_tl( self, q, mode = 'TL' ):
+    def Print_one_obj( self, q, extra_attrs=[], tab=False ):
 
-        if mode == 'TL':
-            pt = '{0:.2f}'.format(q.Pt())
-            eta = '{0:.2f}'.format(q.Eta())
-            phi = '{0:.2f}'.format(q.Phi())
-            mass = '{0:.2f}'.format(q.M())
-
-        if mode == 'Class':
-            pt = '{0:.2f}'.format(q.pt)
-            eta = '{0:.2f}'.format(q.eta)
-            phi = '{0:.2f}'.format(q.phi)
-            mass = '{0:.2f}'.format(q.mass)
+        pt = '{0:.2f}'.format(q.pt)
+        eta = '{0:.2f}'.format(q.eta)
+        phi = '{0:.2f}'.format(q.phi)
+        mass = '{0:.2f}'.format(q.mass)
 
         p4_str = '    [ pt: {0:6s} | eta: {1:5s} | phi: {2:5s} | mass: {3:6s} '.format( pt, eta, phi, mass )
     
-        if hasattr( q, 'btagFlag' ):
-            p4_str += '| bFl: {0} '.format( int(q.btagFlag) )
-
-        if hasattr( q, 'btag' ):
-            p4_str += '| btag: {0} '.format( '{0:.2f}'.format(q.btag) )
+        for a in extra_attrs:
+            if hasattr( q, a ):
+                value = getattr(q,a)
+                if isinstance( value, float ): value = '{0:.2f}'.format(value)
+                p4_str += '| {0}: {1} '.format( a, value )
 
         p4_str += ']'
 
+        if tab: p4_str = '    ' + p4_str
         print p4_str
+
+    # ==============================================================================
+    # Print object or list of objects
+    def Print_objs( self, objs, extra_attrs=[], tab=False ):
+
+        # Check if only 1 object was passed; if so, convert to list
+        if ( hasattr( objs, 'pt' ) and hasattr( objs, 'eta' ) and
+             hasattr( objs, 'phi' ) and hasattr( objs, 'mass' ) ):
+            objs = [ objs ]
+        
+        for obj in objs: self.Print_one_obj( obj, extra_attrs, tab )
 
     # ==============================================================================
     # Deletes duplicate WZ Quarks
@@ -871,16 +575,8 @@ class SubjetAnalyzer(FilterAnalyzer):
         return 0
 
     # ==============================================================================
-    # Gets a list of 3 quarks
-    #  - The first quark is a Gen B quark. This should be the hadronic B quark.
-    #    Which quark is hadronic is determined by adding the light quarks to the
-    #    B quarks, and seeing which combined mass comes closer to the top mass
-    #  - Output looks like: [ BQuark, lightQuark1, lightQuark2 ], where the list
-    #    entries are TLorentzVector objects.
-    #  - Output looks like:
-    #    ( hadronic_BQuark, lightQuark1, lightQuark2, leptonic_BQuark )
-    #    , where the all entries are TLorentzVector objects.
-    def Get_tl_genquarks(self, event ):
+    # Tag one of the bquarks as hadronic, based on mass difference with top
+    def Tag_GenB_as_hadronic(self, event ):
 
         # Make list of TLorentzVector objects for the 2 light quarks
         tl_GenWZQuarks = []
@@ -889,126 +585,208 @@ class SubjetAnalyzer(FilterAnalyzer):
             tl_l.SetPtEtaPhiM( l.pt, l.eta, l.phi, l.mass )
             tl_GenWZQuarks.append( tl_l )
 
-        # Make list for the 2 B quarks, and a list of B quarks + light quarks
-        tl_GenBQuarks = []
         tl_Combined = []
         for (b_i, b) in enumerate(event.GenBQuarkFromTop):
-
             tl_b = ROOT.TLorentzVector()
             tl_b.SetPtEtaPhiM( b.pt, b.eta, b.phi, b.mass )
-
-            tl_GenBQuarks.append( tl_b )
             tl_Combined.append( tl_b + tl_GenWZQuarks[0] + tl_GenWZQuarks[1] )
 
         # Calculate mass difference from top mass
         delmass0 = abs(tl_Combined[0].M() - self.top_mass)
         delmass1 = abs(tl_Combined[1].M() - self.top_mass)
 
-        # Save the mass difference with top mass
-        setattr( event.GenBQuarkFromTop[0], 'delmass_top', delmass0 )
-        setattr( event.GenBQuarkFromTop[1], 'delmass_top', delmass1 )
-
         # Make sure the B quark with lowest del mass to top mass is at index 0
-        # (both for the tl list and in the event)
-        if delmass1 < delmass0:
+        if delmass0 < delmass1:
+            setattr( event.GenBQuarkFromTop[0], 'is_hadr', 1 )
+            setattr( event.GenBQuarkFromTop[1], 'is_hadr', 0 )
+        else:
+            setattr( event.GenBQuarkFromTop[1], 'is_hadr', 1 )
+            setattr( event.GenBQuarkFromTop[0], 'is_hadr', 0 )
 
-            tl_GenBQuarks = [ tl_GenBQuarks[1], tl_GenBQuarks[0] ]
-
-            event.GenBQuarkFromTop = [
-                event.GenBQuarkFromTop[1],
-                event.GenBQuarkFromTop[0] ]
-
-        setattr( tl_GenBQuarks[0], 'is_hadr', 1 )
-        setattr( event.GenBQuarkFromTop[0], 'is_hadr', 1 )
-        setattr( event.GenBQuarkFromTop[1], 'is_hadr', 0 )
-
-        return ( tl_GenBQuarks[0],  # Hadronic
-                 tl_GenWZQuarks[0], # Light 1
-                 tl_GenWZQuarks[1], # Light 2
-                 tl_GenBQuarks[1] ) # Leptonic
+        event.GenBQuarkFromTop = sorted( event.GenBQuarkFromTop,
+                                         key=lambda x: -x.is_hadr )
 
     # ==============================================================================
-    # Simple algorithm that matches the smallest delta R for two lists of TL vectors
-    def Link_smallest_delR( self, tl_quarks, tl_jets, R_cut = 9999.0 ):
+    # Writes matching statistics to event for matching (sub)jets to quarks
+    def Do_Quark_Matching( self, event ):
 
-        # Use self.R_cut if R_cut is not specified
-        if R_cut == 9999.0:
-            R_cut = self.R_cut
+        # Necessary to remove duplicates in GenWZQuark branch
+        # This step can be removed for V12 samples <---- Check dit
+        self.CompareWZQuarks( event )
 
-        n_jets = len(tl_jets)
-        n_quarks = len(tl_quarks)
+        # Check if event contains the right number of quarks
+        # (Only used to do truth-level comparisons)
+        genquarks_top_present = False
+        if len(event.GenWZQuark)==2 and len(event.GenBQuarkFromTop)==2:
+            genquarks_top_present = True
+        genquarks_higgs_present = False
+        if len(event.GenBQuarkFromH)==2:
+            genquarks_higgs_present = True
 
-        Rmat = [[ (tl_quarks[i].DeltaR( tl_jets[j] )) \
-            for j in range(n_jets)] for i in range(n_quarks) ]
+        # Convenient list names
+        if genquarks_top_present:
+            # Sorts event.GenBQuarkFromTop
+            self.Tag_GenB_as_hadronic(event)
+            # Get the hadronic & leptonic b-quark and the two light quarks
+            hadr_bquark = event.GenBQuarkFromTop[0]
+            lept_bquark = event.GenBQuarkFromTop[1]
+            lquarks = event.GenWZQuark
+        if genquarks_higgs_present:
+            higgs_bquarks = event.GenBQuarkFromH
 
-        Rmin = 9999.0
-        
-        for (r, row) in enumerate(Rmat):
-            for (c, ele) in enumerate(row):
-                if ele < Rmin and ele < R_cut:
-                    Rmin = ele
-                    r_min = r
-                    c_min = c
+        reco_btagged_jets = event.selected_btagged_jets
+        reco_ltagged_jets = list( event.wquark_candidate_jets )
 
-        if Rmin == 9999.0: return ( 'No link', 0, 0)
-
-        return (r_min, c_min, Rmin)
+        top = event.topCandidate[0]
+        other_tops = event.othertopCandidate
 
 
-    def Match_two_tl_lists( self, tls1_orig, label1, tls2_orig, label2, R_cut = 9999.0 ):
+        # Quark matching
+        # ==============
 
-        # 'R_cut == 9999.0' means 'use self.R_cut as R_cut'
-        # Overwriting R_cut with some value uses this value instead
+        # Quark matching is only done to compare events to truth level.
+        # Events are not selected based on successful quark matching.
+        # This entire part can be commented out if so desired.
 
-        # If just a single TLorentzVector object was passed, convert it to a list
-        if isinstance( tls1_orig, ROOT.TLorentzVector ):
-            tls1_orig = [ tls1_orig ]
-        if isinstance( tls2_orig, ROOT.TLorentzVector ):
-            tls1_orig = [ tls2_orig ]
+        # Matching GenBQuarkFromTop and GenWZQuark
+        if genquarks_top_present:
 
-        # Create copies of the list, since entries will be popped
-        tls1 = copy.deepcopy( tls1_orig )
-        tls2 = copy.deepcopy( tls2_orig )
+            # To reco_btagged_jets
+            n_hadr_bquark_matched_to_bjet = self.Match_two_lists(
+                hadr_bquark, 'hadr_bquark',
+                reco_btagged_jets, 'bjet' )
 
-        # Save the original tl as an attribute
-        for ( tl1, tl1_orig ) in zip( tls1, tls1_orig ):
-            setattr( tl1, 'tl_origin', tl1_orig )
-        for ( tl2, tl2_orig ) in zip( tls2, tls2_orig ):
-            setattr( tl2, 'tl_origin', tl2_orig )
+            n_lept_bquark_matched_to_bjet = self.Match_two_lists(
+                lept_bquark, 'lept_bquark',
+                reco_btagged_jets, 'bjet' )
 
-        # Attempt matching until the shortest list is depleted, or until there are
-        # no more matches with delR < delR_cut
-        n_matches = min( len(tls1), len(tls2) )
+            n_lquarks_matched_to_bjet = self.Match_two_lists(
+                lquarks, 'lquark',
+                reco_btagged_jets, 'bjet' )
 
-        for i_match in range(n_matches):
+            # To reco_ltagged_jets
+            n_hadr_bquark_matched_to_ljet = self.Match_two_lists(
+                hadr_bquark, 'hadr_bquark',
+                reco_ltagged_jets, 'ljet' )
 
-            # Attempt a match
-            (i1, i2, delR) = self.Link_smallest_delR( tls1, tls2, R_cut )
+            n_lept_bquark_matched_to_ljet = self.Match_two_lists(
+                lept_bquark, 'lept_bquark',
+                reco_ltagged_jets, 'ljet' )
 
-            # Return the attempt number if no more matches could be made
-            if i1 == 'No link':
-                return i_match
+            n_lquarks_matched_to_ljet = self.Match_two_lists(
+                lquarks, 'lquark',
+                reco_ltagged_jets, 'ljet' )
 
-            # Pop the matched tls from the lists for the next iteration
-            matched_tl1 = tls1.pop(i1)
-            matched_tl2 = tls2.pop(i2)
+            # To subjets from chosen top
+            n_hadr_bquark_matched_to_top_subjet = self.Match_two_lists(
+                hadr_bquark, 'hadr_bquark',
+                top.subjets, 'top_subjet' )
 
-            # Record the match in the original tls
-            setattr( matched_tl1.tl_origin,
-                     '{0}_match'.format( label2 ),
-                     matched_tl2.tl_origin )
-            setattr( matched_tl2.tl_origin,
-                     '{0}_match'.format( label1 ),
-                     matched_tl1.tl_origin )
+            n_lept_bquark_matched_to_top_subjet = self.Match_two_lists(
+                lept_bquark, 'lept_bquark',
+                top.subjets, 'top_subjet' )
 
-            # Record the delR value in the original tls
-            setattr( matched_tl1.tl_origin,
-                     '{0}_match_delR'.format( label2 ),
-                     delR )
-            setattr( matched_tl2.tl_origin,
-                     '{0}_match_delR'.format( label1 ),
-                     delR )
+            n_lquarks_matched_to_top_subjet = self.Match_two_lists(
+                lquarks, 'lquark',
+                top.subjets, 'top_subjet' )
 
-        return n_matches
+            # To subjets from other top
+            if len(other_tops) == 0:
+                n_hadr_bquark_matched_to_otop_subjet = -1
+                n_lept_bquark_matched_to_otop_subjet = -1
+                n_lquarks_matched_to_otop_subjet = -1
+            else:
+                n_hadr_bquark_matched_to_otop_subjet = 0
+                n_lept_bquark_matched_to_otop_subjet = 0
+                n_lquarks_matched_to_otop_subjet = 0
+                for top in other_tops:
+
+                    n_hadr_bquark_matched_to_otop_subjet += self.Match_two_lists(
+                        hadr_bquark, 'hadr_bquark',
+                        top.subjets, 'other_top_subjet' )
+
+                    n_lept_bquark_matched_to_otop_subjet += self.Match_two_lists(
+                        lept_bquark, 'lept_bquark',
+                        top.subjets, 'other_top_subjet' )
+
+                    n_lquarks_matched_to_otop_subjet += self.Match_two_lists(
+                        lquarks, 'lquark',
+                        top.subjets, 'other_top_subjet' )
+
+
+        if genquarks_higgs_present:
+
+            # To reco_btagged_jets
+            n_higgs_bquarks_matched_to_bjet = self.Match_two_lists(
+                higgs_bquarks, 'higgs_bquark',
+                reco_btagged_jets, 'bjet' )
+
+            # To reco_ltagged_jets
+            n_higgs_bquarks_matched_to_ljet = self.Match_two_lists(
+                higgs_bquarks, 'higgs_bquark',
+                reco_ltagged_jets, 'ljet' )
+
+            # To subjets from chosen top
+            n_higgs_bquarks_matched_to_top_subjet = self.Match_two_lists(
+                higgs_bquarks, 'higgs_bquark',
+                top.subjets, 'top_subjet' )
+
+            # To subjets from other top
+            if len(other_tops) == 0:
+                n_higgs_bquarks_matched_to_otop_subjet = -1
+            else:
+                n_higgs_bquarks_matched_to_otop_subjet = 0
+                for top in other_tops:
+                    n_higgs_bquarks_matched_to_otop_subjet += self.Match_two_lists(
+                        higgs_bquarks, 'higgs_bquark',
+                        top.subjets, 'other_top_subjet' )
+
+
+        # Write to event
+        # ==============
+
+        setattr( event, 'QMatching_t_attempted', genquarks_top_present )
+        setattr( event, 'QMatching_H_attempted', genquarks_higgs_present )
+
+        if genquarks_top_present:
+
+            event.QMatching_n_hadr_bquark_matched_to_bjet = \
+                n_hadr_bquark_matched_to_bjet
+            event.QMatching_n_lept_bquark_matched_to_bjet = \
+                n_lept_bquark_matched_to_bjet
+            event.QMatching_n_lquarks_matched_to_bjet = \
+                n_lquarks_matched_to_bjet
+
+            event.QMatching_n_hadr_bquark_matched_to_ljet = \
+                n_hadr_bquark_matched_to_ljet
+            event.QMatching_n_lept_bquark_matched_to_ljet = \
+                n_lept_bquark_matched_to_ljet
+            event.QMatching_n_lquarks_matched_to_ljet = \
+                n_lquarks_matched_to_ljet
+
+            event.QMatching_n_hadr_bquark_matched_to_top_subjet = \
+                n_hadr_bquark_matched_to_top_subjet
+            event.QMatching_n_lept_bquark_matched_to_top_subjet = \
+                n_lept_bquark_matched_to_top_subjet
+            event.QMatching_n_lquarks_matched_to_top_subjet = \
+                n_lquarks_matched_to_top_subjet
+
+            event.QMatching_n_hadr_bquark_matched_to_otop_subjet = \
+                n_hadr_bquark_matched_to_otop_subjet
+            event.QMatching_n_lept_bquark_matched_to_otop_subjet = \
+                n_lept_bquark_matched_to_otop_subjet
+            event.QMatching_n_lquarks_matched_to_otop_subjet = \
+                n_lquarks_matched_to_otop_subjet
+
+        if genquarks_higgs_present:
+
+            event.QMatching_n_higgs_bquarks_matched_to_bjet = \
+                n_higgs_bquarks_matched_to_bjet
+            event.QMatching_n_higgs_bquarks_matched_to_ljet = \
+                n_higgs_bquarks_matched_to_ljet
+            event.QMatching_n_higgs_bquarks_matched_to_top_subjet = \
+                n_higgs_bquarks_matched_to_top_subjet
+            event.QMatching_n_higgs_bquarks_matched_to_otop_subjet = \
+                n_higgs_bquarks_matched_to_otop_subjet
 
 #==========================END OF SUBJET ANALYZER==========================#

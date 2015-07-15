@@ -228,9 +228,9 @@ class MEAnalyzer(FilterAnalyzer):
 
             # Select the custom jet lists
             self.configs[k].b_quark_candidates = lambda event: \
-                                                 event.selected_btagged_jets_sj
+                                                 event.boosted_bjets
             self.configs[k].l_quark_candidates = lambda event: \
-                                                 event.wquark_candidate_jets_sj
+                                                 event.boosted_ljets
 
             # Assume single leptonic
             self.configs[k].mem_assumptions.add("sl")
@@ -323,8 +323,8 @@ class MEAnalyzer(FilterAnalyzer):
                 len(c.lepton_candidates(y)) == 1 and
                 len(c.b_quark_candidates(y)) >= 4 and
                 len(c.l_quark_candidates(y)) >= 1 and # Why not 0?
-                y.PassedSubjetAnalyzer == True and
-                y.Matching_subjet_bjet < 2 # Permutations impossible for >1 b matches
+                y.PassedSubjetAnalyzer == True
+                #and y.Matching_subjet_bjet < 2
                 )
             self.configs[k].mem_assumptions.add("0qW")
         for k in [ "SL_1qW_sj_perm" ]:
@@ -332,8 +332,8 @@ class MEAnalyzer(FilterAnalyzer):
                 len(c.lepton_candidates(y)) == 1 and
                 len(c.b_quark_candidates(y)) >= 4 and
                 len(c.l_quark_candidates(y)) >= 1 and
-                y.PassedSubjetAnalyzer == True and
-                y.Matching_subjet_bjet < 2
+                y.PassedSubjetAnalyzer == True
+                #and y.Matching_subjet_bjet < 2
                 )
             self.configs[k].mem_assumptions.add("1qW")
         for k in [ "SL_2qW_sj_perm" ]:
@@ -341,8 +341,8 @@ class MEAnalyzer(FilterAnalyzer):
                 len(c.lepton_candidates(y)) == 1 and
                 len(c.b_quark_candidates(y)) >= 4 and
                 len(c.l_quark_candidates(y)) >= 2 and
-                y.PassedSubjetAnalyzer == True and
-                y.Matching_subjet_bjet < 2
+                y.PassedSubjetAnalyzer == True
+                #and y.Matching_subjet_bjet < 2
                 )
 
         # ===============================================================
@@ -608,7 +608,7 @@ class MEAnalyzer(FilterAnalyzer):
         event.mem_results_ttbb = []
 
         # Temporary: don't execute MEM right now
-        #return True
+        return True
 
         #jets = sorted(event.good_jets, key=lambda x: x.pt, reverse=True)
         leptons = event.good_leptons

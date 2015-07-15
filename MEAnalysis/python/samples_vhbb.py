@@ -1029,7 +1029,7 @@ samples = cms.VPSet([
         xSec     = cms.double(xsec[("tth", "13TeV")]),
         nGen     = cms.int64(-1),
         #perJob   = cms.uint32(198500),
-        perJob   = cms.uint32(67),
+        perJob   = cms.uint32(120),
         subFiles = cms.vstring([
             "/store/user/gregor/VHBBHeppypreT12/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_preT12_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150705_102657/0000//tree_72.root",
             ]),
