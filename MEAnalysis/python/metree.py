@@ -114,7 +114,7 @@ topType = NTupleObjectType("topType", variables = [
     NTupleVariable("tau2", lambda x: x.tau2 ),   # Copied from matched fat jet
     NTupleVariable("tau3", lambda x: x.tau3 ),   # Copied from matched fat jet
     NTupleVariable("bbtag", lambda x: x.bbtag ), # Copied from matched fat jet
-    NTupleVariable("n_subjetiness", lambda x: x.n_subjetiness ), # Calculated
+    NTupleVariable("n_subjettiness", lambda x: x.n_subjettiness ), # Calculated
     NTupleVariable("delRopt", lambda x: x.delRopt ),             # Calculated
 ])
 
@@ -127,7 +127,7 @@ higgsType = NTupleObjectType("higgsType", variables = [
     NTupleVariable("tau2", lambda x: x.tau2 ),
     NTupleVariable("tau3", lambda x: x.tau3 ),
     NTupleVariable("bbtag", lambda x: x.bbtag ),
-    NTupleVariable("n_subjetiness", lambda x: x.n_subjetiness ),
+    NTupleVariable("n_subjettiness", lambda x: x.n_subjettiness ),
 ])
 
 FatjetCA15ungroomedType = NTupleObjectType("FatjetCA15ungroomedType", variables = [

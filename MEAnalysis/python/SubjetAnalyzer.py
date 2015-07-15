@@ -35,7 +35,7 @@ class SubjetAnalyzer(FilterAnalyzer):
             ( 'fRec'  , '<', '0.45' ),
             ]
 
-        self.n_subjetiness_cut = 0.97
+        self.n_subjettiness_cut = 0.97
 
         self.bbtag_cut = 0.1
 
@@ -93,7 +93,7 @@ class SubjetAnalyzer(FilterAnalyzer):
 
         # Match the top to a fat jet
         #  - Copies bbtag and tau_N, calculates n_subjettiness
-        #  - Applies the n_subjetiness cut
+        #  - Applies the n_subjettiness cut
         #  - Calculates delR with the single lepton
         tops = self.Match_top_to_fatjet( event, tops )
         other_tops = []
@@ -131,14 +131,14 @@ class SubjetAnalyzer(FilterAnalyzer):
         for fatjet in event.FatjetCA15ungroomed:
 
             # Check if bbtag is not too low
-            if fatjet.bbtag < self.bbtag_cut:
-                continue
+            #if fatjet.bbtag < self.bbtag_cut:
+            #    continue
 
             # Check if the fatjet is not already matched to the chosen top
             if hasattr(fatjet, 'matched_top') and fatjet == top.matched_fatjet:
                 continue
 
-            fatjet.n_subjetiness = fatjet.tau3 / fatjet.tau2
+            fatjet.n_subjettiness = fatjet.tau2 / fatjet.tau1
 
             higgsCandidates.append( fatjet )
             higgs_present = True
@@ -330,7 +330,7 @@ class SubjetAnalyzer(FilterAnalyzer):
 
     # ==============================================================================
     # Additional httCandidate cut: n-subjetiness
-    # Takes a list of tops, returns a (reduced) list of tops with an n_subjetiness
+    # Takes a list of tops, returns a (reduced) list of tops with an n_subjettiness
     def Match_top_to_fatjet( self, event, tops ):
 
         # Loosely match the fatjets to the tops
@@ -339,7 +339,7 @@ class SubjetAnalyzer(FilterAnalyzer):
             event.FatjetCA15ungroomed, 'fatjet',
             R_cut = self.R_cut_fatjets )
 
-        # New list of tops after n_subjetiness cut is applied
+        # New list of tops after n_subjettiness cut is applied
         tops_after_nsub_cut = []
 
         for top in tops:
@@ -351,14 +351,14 @@ class SubjetAnalyzer(FilterAnalyzer):
 
             fatjet = top.matched_fatjet
 
-            # Get n_subjetiness from the matched fatjet
-            n_subjetiness = fatjet.tau3 / fatjet.tau2
+            # Get n_subjettiness from the matched fatjet
+            n_subjettiness = fatjet.tau3 / fatjet.tau2
 
-            # Try next top if n_subjetiness exceeds the cut
-            if n_subjetiness > self.n_subjetiness_cut: continue
+            # Try next top if n_subjettiness exceeds the cut
+            if n_subjettiness > self.n_subjettiness_cut: continue
 
-            # Set n_subjetiness, tau_N and the bbtag
-            setattr( top , 'n_subjetiness', n_subjetiness )
+            # Set n_subjettiness, tau_N and the bbtag
+            setattr( top , 'n_subjettiness', n_subjettiness )
             setattr( top , 'tau1', fatjet.tau1 )
             setattr( top , 'tau2', fatjet.tau2 )
             setattr( top , 'tau3', fatjet.tau3 )
