@@ -152,7 +152,7 @@ Samples = {
     "qcd_170_300_13tev_spring15dr74_asympt25ns"     :  "/QCD_Pt_170to300_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM",    # Valid
     "qcd_300_470_13tev_spring15dr74_asympt25ns"     :  "/QCD_Pt_300to470_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM",    # No v2..
     "qcd_470_600_13tev_spring15dr74_asympt25ns"     :  "/QCD_Pt_470to600_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM",    # Valid
-    "qcd_600_800_13tev_spring15dr74_asympt25ns"     :  "/QCD_Pt_600to800_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM",    # Production 
+    "qcd_600_800_13tev_spring15dr74_asympt25ns"     :  "/QCD_Pt_600to800_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v3/MINIAODSIM",    # Production 
     "qcd_800_1000_13tev_spring15dr74_asympt25ns"    :  "/QCD_Pt_800to1000_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM",   # Valid                                                        
     "qcd_1000_1400_13tev_spring15dr74_asympt25ns"    : "/QCD_Pt_1000to1400_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM",  # No v2
 
