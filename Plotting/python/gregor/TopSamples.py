@@ -80,23 +80,51 @@ files = {}
 #files["qcd_300_470"]   = "ntop_v57b_qcd_300_470_13tev_spring15dr74_asympt50ns-tagging" 
 #files["qcd_800_1000"]  = "ntop_v57b_qcd_800_1000_13tev_spring15dr74_asympt50ns-tagging" 
 
-files["zprime_m750"]      = "ntop_v58a_zprime_m750_1p_13tev_spring15dr74_asympt25ns-tagging"	
-files["zprime_m1000"]     = "ntop_v58a_zprime_m1000_1p_13tev_spring15dr74_asympt25ns-tagging"	
+# 58 (and previous) had wrong matching at low pT
+# 58a fixes this
+
+#files["zprime_m750"]      = "ntop_v58a_zprime_m750_1p_13tev_spring15dr74_asympt25ns-tagging"	
+#files["zprime_m1000"]     = "ntop_v58a_zprime_m1000_1p_13tev_spring15dr74_asympt25ns-tagging"	
 #files["zprime_m1250"]     = "ntop_v58_zprime_m1250_1p_13tev_spring15dr74_asympt25ns-tagging"	
 #files["zprime_m2000_low"] = "ntop_v58_zprime_m2000_low_1p_13tev_spring15dr74_asympt25ns-tagging"	
-#files["zprime_m2000"]     = "ntop_v58a_zprime_m2000_1p_13tev_spring15dr74_asympt25ns-tagging"	
+#files["zprime_m2000"]     = "ntop_v58_zprime_m2000_1p_13tev_spring15dr74_asympt25ns-tagging"	
 #files["zprime_m3000"]     = "ntop_v58_zprime_m3000_1p_13tev_spring15dr74_asympt25ns-tagging"  
+#files["qcd_170_300"]   = "ntop_v58a_qcd_170_300_13tev_spring15dr74_asympt25ns-tagging" 
+#files["qcd_300_470"]   = "ntop_v58a_qcd_300_470_13tev_spring15dr74_asympt25ns-tagging" 
+#files["qcd_470_600"]   = "ntop_v58_qcd_470_600_13tev_spring15dr74_asympt25ns-tagging"	 
+#files["qcd_600_800"]   = "ntop_v57b_qcd_600_800_13tev_spring15dr74_asympt25ns-tagging"	 # !!!! Still waiting for new MC iteration
+#files["qcd_800_1000"]  = "ntop_v58_qcd_800_1000_13tev_spring15dr74_asympt25ns-tagging" 
+#files["qcd_1000_1400"] = "ntop_v58_qcd_1000_1400_13tev_spring15dr74_asympt25ns-tagging"
 
-files["qcd_170_300"]   = "ntop_v58a_qcd_170_300_13tev_spring15dr74_asympt25ns-tagging" 
-files["qcd_300_470"]   = "ntop_v58a_qcd_300_470_13tev_spring15dr74_asympt25ns-tagging" 
-files["qcd_470_600"]   = "ntop_v58_qcd_470_600_13tev_spring15dr74_asympt25ns-tagging"	 
-files["qcd_600_800"]   = "ntop_v58_qcd_600_800_13tev_spring15dr74_asympt25ns-tagging"	 
-files["qcd_800_1000"]  = "ntop_v58_qcd_800_1000_13tev_spring15dr74_asympt25ns-tagging" 
-files["qcd_1000_1400"] = "ntop_v58_qcd_1000_1400_13tev_spring15dr74_asympt25ns-tagging"
-
+# PUPPI
 files["qcd_300_470_puppi"]   = "ntop_v59b_qcd_300_470_13tev_spring15dr74_asympt25ns-tagging" 
-files["zprime_m1000_puppi"]  = "ntop_v59c_zprime_m1000_1p_13tev_spring15dr74_asympt25ns-tagging"	
+files["zprime_m1000_puppi"]  = "ntop_v59c_zprime_m1000_1p_13tev_spring15dr74_asympt25ns-tagging"
+	
+# Shower Decon Tuning
+#files["zprime_m2000_60"]  = "ntop_v60_zprime_m2000_1p_13tev_spring15dr74_asympt25ns-tagging"	
+#files["qcd_800_1000_60"]  = "ntop_v60_qcd_800_1000_13tev_spring15dr74_asympt25ns-tagging" 
+#files["zprime_m2000_60a"] = "ntop_v60a_zprime_m2000_1p_13tev_spring15dr74_asympt25ns-tagging"	
+#files["qcd_800_1000_60a"] = "ntop_v60a_qcd_800_1000_13tev_spring15dr74_asympt25ns-tagging" 
+#files["zprime_m2000_60b"] = "ntop_v60b_zprime_m2000_1p_13tev_spring15dr74_asympt25ns-tagging"	
+#files["qcd_800_1000_60b"] = "ntop_v60b_qcd_800_1000_13tev_spring15dr74_asympt25ns-tagging" 
+#files["zprime_m2000_60c"] = "ntop_v60c_zprime_m2000_1p_13tev_spring15dr74_asympt25ns-tagging"	
+#files["qcd_800_1000_60c"] = "ntop_v60c_qcd_800_1000_13tev_spring15dr74_asympt25ns-tagging" 
+#files["zprime_m2000_60d"] = "ntop_v60d_zprime_m2000_1p_13tev_spring15dr74_asympt25ns-tagging"	
+#files["qcd_800_1000_60d"] = "ntop_v60d_qcd_800_1000_13tev_spring15dr74_asympt25ns-tagging" 
 
+# 61
+files["zprime_m750"]      = "ntop_v61_zprime_m750_1p_13tev_spring15dr74_asympt25ns-tagging"	
+files["zprime_m1000"]     = "ntop_v61_zprime_m1000_1p_13tev_spring15dr74_asympt25ns-tagging"	
+files["zprime_m1250"]     = "ntop_v61_zprime_m1250_1p_13tev_spring15dr74_asympt25ns-tagging"	
+files["zprime_m2000_low"] = "ntop_v61_zprime_m2000_low_1p_13tev_spring15dr74_asympt25ns-tagging"	
+files["zprime_m2000"]     = "ntop_v61_zprime_m2000_1p_13tev_spring15dr74_asympt25ns-tagging"	
+files["zprime_m3000"]     = "ntop_v61_zprime_m3000_1p_13tev_spring15dr74_asympt25ns-tagging"  
+
+files["qcd_170_300"]      = "ntop_v61_qcd_170_300_13tev_spring15dr74_asympt25ns-tagging" 
+files["qcd_300_470"]      = "ntop_v61_qcd_300_470_13tev_spring15dr74_asympt25ns-tagging" 
+files["qcd_470_600"]      = "ntop_v61_qcd_470_600_13tev_spring15dr74_asympt25ns-tagging"	 
+files["qcd_800_1000"]     = "ntop_v61_qcd_800_1000_13tev_spring15dr74_asympt25ns-tagging" 
+files["qcd_1000_1400"]    = "ntop_v61_qcd_1000_1400_13tev_spring15dr74_asympt25ns-tagging"
 
 
 weighted_files = {}
@@ -105,10 +133,10 @@ for k,v in files.iteritems():
 
 pairs = { 
 #    "pt-200-to-300" : ["zprime_m1000_low", "qcd_170_300"],
-    "pt-300-to-470" : ["zprime_m1000", "qcd_300_470"],
+#    "pt-300-to-470" : ["zprime_m1000", "qcd_300_470"],
 #   "pt-470-to-600" : ["zprime_m1250", "qcd_470_600"],
 #    "pt-600-to-800" : ["zprime_m2000_low", "qcd_600_800"],
-#    "pt-800-to-1000" : ["zprime_m2000", "qcd_800_1000"],
+    "pt-800-to-1000" : ["zprime_m2000", "qcd_800_1000"],
 }
 
 # [Minimal pT, Maximal pT, |eta|]
@@ -187,21 +215,21 @@ other_sample_names = {
             }
 
 other2_sample_names = {
-    "zprime_m750"      : "Top, 200 < p_{T} < 300",                      
-    "zprime_m1000"     : "Top, 300 < p_{T} < 470",                      
-    "zprime_m1000_puppi": "PUPPI, Top, 300 < p_{T} < 470",                      
-    "zprime_m1250"     : "Top, 470 < p_{T} < 600",                      
-    "zprime_m2000_low" : "Top, 600 < p_{T} < 800",                      
-    "zprime_m2000"     : "Top, 800  < p_{T} <1000",                      
-    "zprime_m3000"     : "Top, 1000  < p_{T} <1400",                      
+    "zprime_m750"      : "Top, 200<p_{T}<300",                      
+    "zprime_m1000"     : "Top, 300<p_{T}<470",                      
+    "zprime_m1000_puppi": "PUPPI, Top, 300< p_{T} < 470",                      
+    "zprime_m1250"     : "Top, 470<p_{T}<600",                      
+    "zprime_m2000_low" : "Top, 600<p_{T}<800",                      
+    "zprime_m2000"     : "Top, 800<p_{T}<1000",                      
+    "zprime_m3000"     : "Top, 1000<p_{T}<1400",                      
 
-    "qcd_170_300"      : "QCD, 200 <p_{T} < 300",
-    "qcd_300_470"      : "QCD, 300 <p_{T} < 470",
+    "qcd_170_300"      : "QCD, 200<p_{T}<300",
+    "qcd_300_470"      : "QCD, 300<p_{T}<470",
     "qcd_300_470_puppi": "PUPPI, QCD, 300 <p_{T} < 470",
-    "qcd_470_600"      : "QCD, 470 <p_{T} < 600",
-    "qcd_600_800"      : "QCD, 600 <p_{T} < 800",
-    "qcd_800_1000"     : "QCD, 800 <p_{T} < 1000",
-    "qcd_1000_1400"    : "QCD, 1000 <p_{T} < 1400",
+    "qcd_470_600"      : "QCD, 470<p_{T}<600",
+    "qcd_600_800"      : "QCD, 600<p_{T}<800",
+    "qcd_800_1000"     : "QCD, 800<p_{T}<1000",
+    "qcd_1000_1400"    : "QCD, 1000<p_{T}<1400",
 
 }
 

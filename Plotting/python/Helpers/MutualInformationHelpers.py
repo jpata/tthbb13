@@ -37,13 +37,24 @@ ROOT.gStyle.SetPadRightMargin(0.16)
 ROOT.gStyle.SetPadTopMargin(0.05)
 ROOT.gStyle.SetPadBottomMargin(0.21)
 
+ROOT.gStyle.SetPadTickX(0)
+ROOT.gStyle.SetPadTickY(0)
+
 ROOT.gROOT.SetStyle("myStyle")
 ROOT.gROOT.ForceStyle()
+
+ROOT.gStyle.SetPadTickX(0)
+ROOT.gStyle.SetPadTickY(0)
+ROOT.gStyle.SetTickLength(0)
+ROOT.gStyle.SetTickLength(0,"y")
+
 
 ROOT.gStyle.SetPadLeftMargin(0.33)
 ROOT.gStyle.SetPadRightMargin(0.1)
 ROOT.gStyle.SetPadTopMargin(0.05)
 ROOT.gStyle.SetPadBottomMargin(0.34)
+
+
 
 ROOT.gROOT.ForceStyle()
 
@@ -536,6 +547,9 @@ def MakePlots(mis, files, input_treename = 'tree'):
       h_mi.GetYaxis().SetLabelSize(0.038)
       h_mi.GetZaxis().SetLabelSize(0.03)
       
+      h_mi.GetXaxis().SetNdivisions(0)
+      h_mi.GetYaxis().SetNdivisions(0)
+
       draw_opts = "COLZ TEXT"
       
       if not mi.read_from_pickle:
@@ -548,6 +562,8 @@ def MakePlots(mis, files, input_treename = 'tree'):
          f_pickle.close()
 
       h_mi.Draw(draw_opts)
+      h_mi.Draw("sameaxis")
+
       if mi.diagonal_only:
          OutputDirectoryHelper.ManyPrint(c, output_dir, "{0}_mi_diag".format(mi.name))
       else:

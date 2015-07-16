@@ -131,7 +131,7 @@ for sample in samples:
             cut = "(ca15softdropz10b00_mass>120)"
 
             combinedPlot("nosize_masscut_" + var.replace("/","_"),
-                         [plot(other2_sample_names[sample],
+                         [plot(this_sample_names[sample],
                                variable.di[var].name,                                           
                                '({0}&&{1}&&{2})*weight'.format(nosize_fiducial_cuts[sample], 
                                                                variable.di[var].extra_cut,

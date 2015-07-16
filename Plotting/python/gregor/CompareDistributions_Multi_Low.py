@@ -68,9 +68,9 @@ for name,samples in [ ["low", lows],
               #"Xsoftdropz20b10_mass",
               #"Xsoftdropz20b20_mass",
 
-              #"Xsoftdropz10bm10_mass",
-              #"Xsoftdropz15bm10_mass",
-              #"Xsoftdropz20bm10_mass",
+              "Xsoftdropz10bm10_mass",
+              "Xsoftdropz15bm10_mass",
+              "Xsoftdropz20bm10_mass",
               
               #"Xtrimmedr2f3_mass",
 
@@ -82,7 +82,7 @@ for name,samples in [ ["low", lows],
               #"log(X_chi2)",
               #"log(X_chi3)",
 
-              "looseOptRHTT_mass",
+              #"looseOptRHTT_mass",
 
               #"Xcmstt_minMass",
               #"Xcmstt_topMass",
@@ -99,10 +99,10 @@ for name,samples in [ ["low", lows],
 
     # These need a mass-cut
     others = [
-        #"X_tau3/X_tau2",
-        #"X_qvol",        
-        #"Xsoftdropz10b00forbtag_btag",
-        #"Xsoftdropz20b10forbtag_btag",
+        "X_tau3/X_tau2",
+        "X_qvol",        
+        "Xsoftdropz10b00forbtag_btag",
+        "Xsoftdropz20b10forbtag_btag",
     ]
 
     for groomer in [#"filteredn3r2",
@@ -115,12 +115,12 @@ for name,samples in [ ["low", lows],
         #others.append("X_tau3/X{0}_tau2".format(groomer))
         #others.append("X{0}_tau3/X_tau2".format(groomer))
 
-    if False:
-        for var in masses + others:
+    if True:
+        for var in masses:# + others:
 
             if name == "high":
 
-                xpos = 0.57
+                xpos = 0.6
                 ypos = 0.6
                 ymax = None
                 nbins = 80
@@ -146,20 +146,20 @@ for name,samples in [ ["low", lows],
                     extra_text = "AK08, MJ R=0.3, flat pT"
 
                 if "HTT_mass" in var:
-                    ymax = 0.14
+                    xpos = 0.63
 
                 if "HTT" in var:                    
                     extra_text = "CA15, flat pT"
 
                 if "X_tau3/X_tau2" in var:
-                    ymax = 0.15
+                    ymax = 0.11
 
                 if "Xsoftdropz10b00_tau3/Xsoftdropz10b00_tau2" in var:
                     ymax = 0.11
 
 
             else:
-                xpos = 0.57
+                xpos = 0.6
                 ypos = 0.76
                 ymax = None
                 nbins = 80
@@ -186,9 +186,7 @@ for name,samples in [ ["low", lows],
                          [plot(other2_sample_names[sample],
                                variable.di[var.replace("X",ranges[sample][4])].name,                                           
                                '({0}&&{1})*weight'.format(nosize_fiducial_cuts[sample], variable.di[var.replace("X",ranges[sample][4])].extra_cut),
-                               sample,
-                               extra_fiducial = "(" + nosize_fiducial_cuts[sample] + ")*weight" ,
-                           ) for sample in samples],
+                               sample) for sample in samples],
                          80, variable.di[var.replace("X",ranges[sample][4])].range_min, variable.di[var.replace("X",ranges[sample][4])].range_max, ymax,
                          label_x   = variable.di[var.replace("X",ranges[sample][4])].pretty_name,
                          label_y   = "A.U.",
@@ -206,7 +204,7 @@ for name,samples in [ ["low", lows],
 
             if name == "high":
 
-                xpos = 0.57
+                xpos = 0.6
                 ypos = 0.6
                 ymax = None
                 nbins = 80
@@ -224,7 +222,7 @@ for name,samples in [ ["low", lows],
                     extra_text = "CA15, flat pT"
 
             else:
-                xpos = 0.57
+                xpos = 0.6
                 ypos = 0.76
                 ymax = None
                 nbins = 80
@@ -239,8 +237,7 @@ for name,samples in [ ["low", lows],
                                '({0}&&{1}&&{2})*weight'.format(nosize_fiducial_cuts[sample], 
                                                                variable.di[var.replace("X",ranges[sample][4])].extra_cut,
                                                                cut),
-                               sample,
-                               extra_fiducial = "(" + nosize_fiducial_cuts[sample] + ")*weight") for sample in samples],
+                               sample) for sample in samples],
                          80, variable.di[var.replace("X",ranges[sample][4])].range_min, variable.di[var.replace("X",ranges[sample][4])].range_max, ymax,
                          label_x   = variable.di[var.replace("X",ranges[sample][4])].pretty_name,
                          label_y   = "A.U.",
@@ -254,12 +251,12 @@ for name,samples in [ ["low", lows],
                          extra_text = extra_text)
             
 
-    if True:
+    if False:
         for var in htt_vars:
 
             if name == "high":
 
-                xpos = 0.57
+                xpos = 0.6
                 ypos = 0.6
                 ymax = None
                 nbins = 80
@@ -272,7 +269,7 @@ for name,samples in [ ["low", lows],
                 cut = "((looseOptRHTT_mass>120)&&(looseOptRHTT_mass<180))"
 
             else:
-                xpos = 0.57
+                xpos = 0.6
                 ypos = 0.76
                 ymax = None
                 nbins = 80
@@ -286,11 +283,8 @@ for name,samples in [ ["low", lows],
                                variable.di[var.replace("X",ranges[sample][4])].name,                                           
                                '({0}&&{1}&&{2})*weight'.format(nosize_fiducial_cuts[sample], 
                                                                variable.di[var.replace("X",ranges[sample][4])].extra_cut,
-                                                               cut,                                                               
-                                                           ),
-                               sample,
-                               extra_fiducial = "(" + nosize_fiducial_cuts[sample] + ")*weight")
-                          for sample in samples],
+                                                               cut),
+                               sample) for sample in samples],
                          80, variable.di[var.replace("X",ranges[sample][4])].range_min, variable.di[var.replace("X",ranges[sample][4])].range_max, ymax,
                          label_x   = variable.di[var.replace("X",ranges[sample][4])].pretty_name,
                          label_y   = "A.U.",

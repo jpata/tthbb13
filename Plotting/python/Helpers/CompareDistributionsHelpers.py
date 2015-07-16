@@ -26,6 +26,7 @@ else:
 from Initializer import initializer
 
 myStyle.SetPadLeftMargin(0.18)
+myStyle.SetPadRightMargin(0.04)
 myStyle.SetPadTopMargin(0.06)
 
 ROOT.gROOT.SetStyle("myStyle")
@@ -81,7 +82,7 @@ class combinedPlot:
       legend_origin_y : (float) position of the upper? edge of the legend
       legend_size_x   : (float) horizontal extension of the legen
       legend_size_y   : (float) vertical extension of the legend        
-      legend_text_size: (float) text size of the legend        
+      legend_text_size: (float) text size of the legend
       """
 
       # Add to the static member for keeping track of all objects
@@ -98,6 +99,7 @@ class plot:
                 from_file,
                 scale_cut="",
                 fit = None,
+                extra_fiducial  = "(1)",
              ):
       """ Constructor. Arguments:
       name        : (string) name to use for the legend
@@ -107,6 +109,8 @@ class plot:
       scale_cut   : (string) scale the histogram by 1/#entries passing the cut
       fit         : (TF1) function to fit. Warning: fitting only works if
                             exactly one plot is added to combinedPlots
+      extra_fiducial  : (string) used to calculate the fractions of 
+          events passing the fiducial cut that end up in the plot
       """
       pass
 # End of class plot      
@@ -130,7 +134,7 @@ li_colors = [ROOT.kBlack,
           ]*10
 
 # List of nice line style
-li_line_styles = [1]*len(li_colors) + [4]*len(li_colors) + [2]*len(li_colors)
+li_line_styles = [1,1,2,2]*50+[1]*len(li_colors) + [4]*len(li_colors) + [2]*len(li_colors)
 
 
 
@@ -161,6 +165,8 @@ def doWork( dic_files, output_dir ):
     # key: combinedPlot.name _ plot.name
     # TODO: ensure uniqueness
     dic_histos = {}
+    # Store the selection efficiency: entries in the plot vs stuff that passes fiducial cuts
+    dic_effs = {}
 
     # Count the draw commands. This way wec can
     # assign unique names to the histograms:
@@ -203,14 +209,22 @@ def doWork( dic_files, output_dir ):
 
            draw_string = "".join(li_draw_string)
            # and actually draw
-
-           print input_tree
            
            input_tree.Draw( draw_string, p.cut )
 
            # Retrieve the histogram
            h = ROOT.gDirectory.Get(htmp_name).Clone()
            h.SetDirectory(0)
+
+
+           input_tree.Draw( "1>>h", p.extra_fiducial )
+           if  ROOT.gDirectory.Get("h").Integral() > 0:
+
+              print cp.name + "_" + p.name, ":", h.Integral(), ROOT.gDirectory.Get("h").Integral()
+
+              dic_effs[cp.name + "_" + p.name] = h.Integral() / ROOT.gDirectory.Get("h").Integral()
+           else:
+              dic_effs[cp.name + "_" + p.name] = -1.
 
            # Optional: scale the histogram by 1/#entries passing a cut
            if not(p.scale_cut==""):
@@ -285,6 +299,7 @@ def doWork( dic_files, output_dir ):
 
             # Get the histogram
             h = dic_histos[cp.name + "_" + p.name]
+            eff = dic_effs[cp.name + "_" + p.name]
 
             # Get colors/ls
             color = li_colors[i_p]
@@ -299,7 +314,8 @@ def doWork( dic_files, output_dir ):
             h.SetFillColor(0)
 
             # add to legend
-            leg.AddEntry( h, p.name, "L")
+            leg.AddEntry( h, p.name  , "L")
+            #+ ", {0:2.0f}%".format(eff*100)
 
             # Adjust y-range        
             if cp.log_y:

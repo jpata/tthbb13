@@ -247,7 +247,7 @@ def doTMVA(setup):
 
 
     # prepare trees
-    # :nTrain_Background=150000
+    # :nTrain_Background=250000
     factory.PrepareTrainingAndTestTree( mycutSig, mycutBkg,
                                         "SplitMode=Random:NormMode=None:!V" )
 
@@ -318,7 +318,10 @@ def doROCandWP(setup):
     # Extract information from files
     ########################################
 
+
     input_filename = os.path.join(setup.output_dir, "TMVA_{0}.root".format(setup.name))
+
+    print "input_filename=", input_filename
 
     # We need three things:
     # -the pickle that tells us the efficiency/uncertainty of the preselection cut
@@ -327,7 +330,12 @@ def doROCandWP(setup):
 
     # First get the cut (preselection, not wp) efficiaency + uncertainty 
     f_pickle = open( input_filename.replace(".root",".dat"), "r")
-    event_counts = pickle.load(f_pickle)        
+    try:
+        event_counts = pickle.load(f_pickle)        
+    except EOFError:
+        print "WTF:", input_filename
+        sys.exit()
+
     f_pickle.close()
 
     # Get the trees
@@ -414,16 +422,15 @@ def doROCandWP(setup):
 
             # Interesting points: Look for a WP with bgk efficiency closest to nominal and store the cuts
             interesting_points = [
-                {"nominal_bkg" : 0.001, "actual_bkg":-1000, "actual_sig":-1000, "cuts" : "(1)"},
+                #{"nominal_bkg" : 0.001, "actual_bkg":-1000, "actual_sig":-1000, "cuts" : "(1)"},
                 {"nominal_bkg" : 0.003, "actual_bkg":-1000, "actual_sig":-1000, "cuts" : "(1)"},
-                {"nominal_bkg" : 0.01,  "actual_bkg":-1000, "actual_sig":-1000, "cuts" : "(1)"},
-                {"nominal_bkg" : 0.03,  "actual_bkg":-1000, "actual_sig":-1000, "cuts" : "(1)"},
-                {"nominal_bkg" : 0.1,   "actual_bkg":-1000, "actual_sig":-1000, "cuts" : "(1)"},
+                #{"nominal_bkg" : 0.01,  "actual_bkg":-1000, "actual_sig":-1000, "cuts" : "(1)"},
+                #{"nominal_bkg" : 0.03,  "actual_bkg":-1000, "actual_sig":-1000, "cuts" : "(1)"},
+                #{"nominal_bkg" : 0.1,   "actual_bkg":-1000, "actual_sig":-1000, "cuts" : "(1)"},
             ]
 
             for ibin, x in enumerate(binlist):
-                print setup.pretty_name, ibin
-
+                
                 # We don't need the preselection cuts - they're already applied when making the test tree                
                 li_cuts = ["(1)"]
 
@@ -471,13 +478,12 @@ def doROCandWP(setup):
                 #                                                                                           err_total_bkg_high*100,
                 #                                                                                           err_total_bkg_low*100)
 
-                print ibin, eff_total_sig, 1-eff_total_bkg
-
                 if eff_total_sig > 0.0:
                     i = gr.GetN()
-                    gr.SetPoint(i, eff_total_sig, 1-eff_total_bkg)
-                    # As we show -e(bg) we have to flip high/low for it 
-                    gr.SetPointError(i, err_total_sig_low, err_total_sig_high,  err_total_bkg_high, err_total_bkg_low) 
+                    # !!!
+                    gr.SetPoint(i, eff_total_sig, eff_total_bkg)
+                    # ((((As we show -e(bg) we have to flip high/low for it )))
+                    gr.SetPointError(i, err_total_sig_low, err_total_sig_high,  err_total_bkg_low, err_total_bkg_high) 
 
                     # Look for working points
                     for point in interesting_points:
@@ -490,7 +496,7 @@ def doROCandWP(setup):
             # End loop over bins
 
             for point in interesting_points:
-                print point
+                print "---WP---", setup.name, point
 
             ret["grs"].append(gr)
             ret["gr_names"].append(setup.pretty_name)
@@ -604,9 +610,10 @@ def doROCandWP(setup):
                 eff_total_sig, err_total_sig_low, err_total_sig_high = calcEffAndError(n_pass_sig, e_pass_sig, event_counts["n_sig_fiducial"]*test_frac_sig, event_counts["e_sig_fiducial"]*math.sqrt(test_frac_sig))
                 eff_total_bkg, err_total_bkg_low, err_total_bkg_high = calcEffAndError(n_pass_bkg, e_pass_bkg, event_counts["n_bkg_fiducial"]*test_frac_bkg, event_counts["e_bkg_fiducial"]*math.sqrt(test_frac_bkg))
 
-                wp_gr.SetPoint(0, eff_total_sig, 1-eff_total_bkg)
-                # As we show -e(bg) we have to flip high/low for it 
-                wp_gr.SetPointError(0, err_total_sig_low, err_total_sig_high,  err_total_bkg_high, err_total_bkg_low) 
+                # !!!
+                wp_gr.SetPoint(0, eff_total_sig, eff_total_bkg)
+                # ((((As we show -e(bg) we have to flip high/low for it )))
+                wp_gr.SetPointError(0, err_total_sig_low, err_total_sig_high, err_total_bkg_low, err_total_bkg_high) 
 
                 ret["wps"].append(wp_gr)
                 ret["wp_names"].append(wp["name"].replace("[name]", setup.pretty_name))
@@ -625,10 +632,10 @@ def doROCandWP(setup):
 # plotROCs
 ########################################
 
-def plotROCs(name, li_setups, extra_text = ""):
+def plotROCs(name, li_setups, extra_text = "", x_label = "#varepsilon(S)"):
 
     # Loop over setups
-    pool = mp.Pool(processes=12)  
+    pool = mp.Pool(processes=10)  
     outputs = pool.map(doROCandWP, li_setups)
     
     # Extract the outputs
@@ -659,20 +666,37 @@ def plotROCs(name, li_setups, extra_text = ""):
     legend_size_y       = 0.03 * (len(li_grs)+len(li_wps))
 
 
-    for view in ["left_top", "all", "weak_left_top", "weak_all"]:
-
-        legend = ROOT.TLegend( legend_origin_x, 
-                               legend_origin_y,
-                               legend_origin_x + legend_size_x,
-                               legend_origin_y + legend_size_y )
-        legend.SetBorderSize(1) 
-        legend.SetFillColor(0)
-        legend.SetTextSize(0.025)      
-        legend.SetBorderSize(0)
+    for view in [
+            #"left_top", "all", "weak_left_top", "weak_all", 
+            #"log", 
+            #"loglow", 
+            "loglow2", 
+            #"logpuppi"
+    ]:
 
         # Top Tagging
         # High Purity
-        if view == "left_top":
+        if view == "log":
+            legend_origin_y = 0.15
+            legend_origin_x = 0.48
+            c.SetLogy(1)
+            h_bkg = ROOT.TH2F("","",100,0,1.,100,0.0001,0.1)
+        elif view == "loglow":
+            legend_origin_y = 0.16
+            legend_origin_x = 0.48
+            c.SetLogy(1)
+            h_bkg = ROOT.TH2F("","",100,0,1.,100,0.0001,0.1)
+        elif view == "loglow2":
+            legend_origin_y = 0.16
+            legend_origin_x = 0.52
+            c.SetLogy(1)
+            h_bkg = ROOT.TH2F("","",100,0,1.,100,0.0001,0.3)
+        elif view == "logpuppi":
+            legend_origin_y = 0.15
+            legend_origin_x = 0.32
+            c.SetLogy(1)
+            h_bkg = ROOT.TH2F("","",100,0,1.,100,0.0001,0.1)
+        elif view == "left_top":
             c.SetLogy(0)
             h_bkg = ROOT.TH2F("","",100,0,.4,100,0.99,1)
         elif view == "weak_left_top":
@@ -714,9 +738,18 @@ def plotROCs(name, li_setups, extra_text = ""):
             print "Invalid view! Exiting.."
             sys.exit()
 
+        legend = ROOT.TLegend( legend_origin_x, 
+                               legend_origin_y,
+                               legend_origin_x + legend_size_x,
+                               legend_origin_y + legend_size_y )
+        legend.SetBorderSize(1) 
+        legend.SetFillColor(0)
+        legend.SetTextSize(0.025)      
+        legend.SetBorderSize(0)
 
-        h_bkg.GetXaxis().SetTitle( "#varepsilon(S)" )      
-        h_bkg.GetYaxis().SetTitle( "1-#varepsilon(B)" )      
+
+        h_bkg.GetXaxis().SetTitle( x_label  )      
+        h_bkg.GetYaxis().SetTitle( "#varepsilon(B)" )      
         h_bkg.Draw()
 
         
@@ -732,9 +765,6 @@ def plotROCs(name, li_setups, extra_text = ""):
         txt.SetTextFont(41)
         txt.DrawTextNDC(0.83, 0.90, "13 TeV")
         
-        l_txt = ROOT.TLatex()    
-        l_txt.SetTextSize(0.04)
-        l_txt.DrawLatexNDC(0.22, legend_origin_y + legend_size_y+0.04, extra_text)
         
 
 
@@ -750,6 +780,7 @@ def plotROCs(name, li_setups, extra_text = ""):
             gr.SetLineStyle( li_line_styles[i_gr] )
             gr.SetLineWidth( 2)    
             legend.AddEntry( gr, gr_and_name[1], "L" )
+            #gr.Draw("E3 SAME")
             gr.Draw("SAME")
 
 
@@ -762,7 +793,12 @@ def plotROCs(name, li_setups, extra_text = ""):
             wp.SetLineWidth( 2)    
             wp.SetMarkerSize(2)    
             legend.AddEntry( wp, li_wp_names[i_wp], "LP" )
-            wp.Draw("P2 SAME")
+            wp.Draw("E3 SAME")
+
+        l_txt = ROOT.TLatex()    
+        l_txt.SetTextSize(0.04)
+        l_txt.DrawLatexNDC(0.22, 0.8, extra_text)
+
 
         legend.Draw()
 

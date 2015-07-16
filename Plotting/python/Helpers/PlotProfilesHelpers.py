@@ -90,6 +90,8 @@ class plotSettings:
                  name_prefix      = "",
                  eval_at          = 0,
                  sample_type      = "single", 
+                 x_label          = "",
+                 y_label          = "",
                  ):
 
        """ Constructor
@@ -208,9 +210,14 @@ class plotSettings:
        self.legend_size_x   = legend_size_x
        self.legend_size_y   = legend_size_y
 
+       self.x_label = x_label
+       self.y_label = y_label
+
        self.name_prefix     = name_prefix
 
        self.eval_at         = eval_at
+
+       
 
        # Autogenerate a name from sample and variable names
        if sample_type == "single":
@@ -396,11 +403,25 @@ def makePlots( dic_files,
         # Draw the Profile
         tmp_h=prof.Clone()
         
-        h2d.GetXaxis().SetTitle(plot.x_variable) 
-        h2d.GetYaxis().SetTitle(plot.y_variable) 
+        h2d.GetXaxis().SetTitle(plot.x_label) 
+        h2d.GetYaxis().SetTitle(plot.y_label) 
 
 
         h2d.Draw("COLZ")
+
+        txt = ROOT.TText()
+        txt.SetTextFont(61)
+        txt.SetTextSize(0.05)
+        txt.DrawTextNDC(0.2, 0.88, "CMS")
+
+        txt.SetTextFont(52)
+        txt.SetTextSize(0.04)
+        txt.DrawTextNDC(0.2, 0.84, "Simulation Preliminary")
+        
+        txt.SetTextFont(41)
+        txt.DrawTextNDC(0.81, 0.96, "13 TeV")
+
+
         tmp_h.Draw("SAME")   
         #gr.Draw("PSAME")
 

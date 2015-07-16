@@ -16,8 +16,8 @@ else:
 variable('top_size', "Top Size", 0, 4.)
 
 
-htts = ["looseOptRHTT", "looseHTT"]
-htt_names = ["HTT V2", "HTT V2"]
+htts = ["looseOptRHTT", "looseHTT", "msortHTT"]
+htt_names = ["HTT V2", "HTT V2", "HTT"]
 
 htt_vars = []
 for htt, htt_name in zip(htts, htt_names):
@@ -46,6 +46,11 @@ groomers = [
     "sofbtdropz20b00",
     "softdropz20b10",
     "softdropz20b20",
+    
+    "softdropz10bm10",
+    "softdropz15bm10",
+    "softdropz20bm10",
+
 ]
 
 groomer_names = [
@@ -65,6 +70,9 @@ groomer_names = [
     "Softdrop (z=0.2, #beta=0)",
     "Softdrop (z=0.2, #beta=1)",
     "Softdrop (z=0.2, #beta=2)",
+    "Softdrop (z=0.1, #beta=-1)",
+    "Softdrop (z=0.15, #beta=-1)",
+    "Softdrop (z=0.2, #beta=-1)",
 ]
 
 
@@ -87,6 +95,9 @@ for fj in ["ak08", "ca15"]:
 
 
     for groomer, groomer_name in zip(groomers, groomer_names):
+        mass_limit = 400
+        min_mass   = 0
+
         if groomer == "":
             mass_limit = 500
         elif "trimmed" in groomer:
@@ -97,10 +108,15 @@ for fj in ["ak08", "ca15"]:
             mass_limit = 280
         elif "softdrop" in groomer:
             mass_limit = 280
-        else:
-            mass_limit = 400
+            
+            # Extra treatment for negative beta
+            if "m10" in groomer:
+                min_mass = 1
+                mass_limit = 400
+            
+            
 
-        mass_vars.append(variable(fj+groomer+"_mass", groomer_name + " Mass", 0, mass_limit, unit = "GeV"))
+        mass_vars.append(variable(fj+groomer+"_mass", groomer_name + " Mass", min_mass, mass_limit, unit = "GeV"))
         
         variable("{0}_tau3/{0}{1}_tau2".format(fj, groomer), 
                  groomer_name + "(u/g) #tau_{3}/#tau_{2}", 

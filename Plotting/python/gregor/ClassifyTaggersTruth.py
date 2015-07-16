@@ -37,32 +37,68 @@ myStyle.SetPadBottomMargin(0.13)
 ROOT.gROOT.SetStyle("myStyle")
 ROOT.gROOT.ForceStyle()
 
-pool = mp.Pool(processes=12)  
+pool = mp.Pool(processes=16)  
 
 ########################################
 # Configuration
 ########################################
 
-DRAW_ROC = True
+name = "pt-300-to-470"
+sample_sig = "zprime_m1000"
+sample_bkg = "qcd_300_470"
 
 
-for pair_name, pair in pairs.iteritems():
-    sample_sig = pair[0]
-    sample_bkg = pair[1]
+basepath = '/scratch/gregor/'
+file_name_sig  = basepath + files[sample_sig] + "-weighted.root"
+file_name_bkg  = basepath + files[sample_bkg] + "-weighted.root" 
+li_methods      = ["Cuts"]
 
-    basepath = '/scratch/gregor/'
-    file_name_sig  = basepath + files[sample_sig] + "-weighted.root"
-    file_name_bkg  = basepath + files[sample_bkg] + "-weighted.root"
+setups = {}
+btag_setups = {}
 
-    li_methods      = ["Cuts"]
+for label in ["truth", "forWP", "nosize"]:
     
-    setups = []
-    btag_setups = []
+    if label == "truth":
+        signal_fiducial_cuts = fiducial_cuts[sample_sig]
+        bkgrnd_fiducial_cuts = fiducial_cuts[sample_bkg]    
+        weight = "(weight)"
+    if label == "forWP":
+        signal_fiducial_cuts = "((pt>200)&&(ca15_pt>200)&&(top_size<0.8))"
+        bkgrnd_fiducial_cuts = "((pt>200)&&(ca15_pt>200)&&(top_size<0.8))"
+        weight = "(1)"
+    if label == "nosize":
+        signal_fiducial_cuts = "((pt>200)&&(ca15_pt>200))"
+        bkgrnd_fiducial_cuts = "((pt>200)&&(ca15_pt>200))"
+        weight = "(1)"
+
+    setups[label] = []
+    btag_setups[label] = []
 
 
-    setup = TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "Truth_OptRHTT_mass_frec_dr_tau"),
+
+    # Old HTT Mass + fRec + tau3/tau2
+    setup = TMVASetup("{0}_{1}_{2}_{3}".format(sample_sig, sample_bkg, "OldHTT_mass_tau3tau2", label),
+                       "HTT - m, fRec, tau_{3}/tau_{2}",
+                       [["Cuts", "FitMethod=MC:Sigma=0.3:SampleSize=1000000:VarProp[1]=FSmart:CutRangeMin[1]=0:CutRangeMax[1]=0.5:CutRangeMin[0]=140:CutRangeMax[0]=250.:CutRangeMin[2]=0:CutRangeMax[2]=1."]], 
+                       [variable.di['msortHTT_mass'],
+                        variable.di['msortHTT_fRec'],
+                        variable.di['ca15_tau3/ca15_tau2'],
+                    ],                               
+                       [],
+                       file_name_sig,
+                       file_name_bkg,
+                       fiducial_cut_sig = signal_fiducial_cuts,
+                       fiducial_cut_bkg  = bkgrnd_fiducial_cuts,
+                       weight_sig = weight,
+                       weight_bkg = weight)
+    setups[label].append(setup)
+
+
+
+    # HTT Mass + fRec + DeltaR + tau3/tau2
+    setup = TMVASetup("{0}_{1}_{2}_{3}".format(sample_sig, sample_bkg, "OptRHTT_mass_frec_dr_tau", label),
                        "HTT V2 - m, fRec, #Delta R, #tau_{3}/#tau_{2}",
-                       [["Cuts", "FitMethod=MC:Sigma=0.3:SampleSize=500000:VarProp[1]=FSmart:VarProp[3]=FSmart:CutRangeMin[0]=0:CutRangeMax[0]=150:CutRangeMin[1]=0:CutRangeMax[1]=0.5:CutRangeMin[2]=-0.5:CutRangeMax[2]=0.5:CutRangeMin[3]=0:CutRangeMax[3]=1"]], 
+                       [["Cuts", "FitMethod=MC:Sigma=0.3:SampleSize=1000000:VarProp[1]=FSmart:VarProp[3]=FSmart:CutRangeMin[0]=0:CutRangeMax[0]=130:CutRangeMin[1]=0:CutRangeMax[1]=0.5:CutRangeMin[2]=-0.5:CutRangeMax[2]=0.5:CutRangeMin[3]=0:CutRangeMax[3]=1"]], 
                        [variable.di['looseOptRHTT_mass'],
                         variable.di['looseOptRHTT_fRec'],
                         variable.di['looseOptRHTT_Ropt-looseOptRHTT_RoptCalc'],
@@ -71,17 +107,34 @@ for pair_name, pair in pairs.iteritems():
                        [],
                        file_name_sig,
                        file_name_bkg,
-                       fiducial_cut_sig = fiducial_cuts[sample_sig],
-                       fiducial_cut_bkg  = fiducial_cuts[sample_bkg],
-                       weight_sig = "(weight)",
-                       weight_bkg = "(weight)",
-                       draw_roc = DRAW_ROC)
-    setups.append(setup)
+                       fiducial_cut_sig = signal_fiducial_cuts,
+                       fiducial_cut_bkg  = bkgrnd_fiducial_cuts,
+                       weight_sig = weight,
+                       weight_bkg = weight)
+    setups[label].append(setup)
 
+    # HTT Mass + fRec + DeltaR + groomed tau3/tau2
+    setup = TMVASetup("{0}_{1}_{2}_{3}".format(sample_sig, sample_bkg, "OptRHTT_mass_frec_dr_groomed_tau", label),
+                       "HTT V2 - m, fRec, #Delta R, Groomed #tau_{3}/#tau_{2}",
+                       [["Cuts", "FitMethod=MC:Sigma=0.3:SampleSize=1000000:VarProp[1]=FSmart:VarProp[3]=FSmart:CutRangeMin[0]=0:CutRangeMax[0]=130:CutRangeMin[1]=0:CutRangeMax[1]=0.5:CutRangeMin[2]=-0.5:CutRangeMax[2]=0.5:CutRangeMin[3]=0:CutRangeMax[3]=1"]], 
+                       [variable.di['looseOptRHTT_mass'],
+                        variable.di['looseOptRHTT_fRec'],
+                        variable.di['looseOptRHTT_Ropt-looseOptRHTT_RoptCalc'],
+                        variable.di['ca15softdropz20b10_tau3/ca15softdropz20b10_tau2'],
+                    ],                               
+                       [],
+                       file_name_sig,
+                       file_name_bkg,
+                       fiducial_cut_sig = signal_fiducial_cuts,
+                       fiducial_cut_bkg  = bkgrnd_fiducial_cuts,
+                       weight_sig = weight,
+                       weight_bkg = weight)
+    setups[label].append(setup)
 
-    setup = TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "Truth_OptRHTT_mass_frec_tau"),
+    # HTT Mass + fRec + tau3/tau2
+    setup = TMVASetup("{0}_{1}_{2}_{3}".format(sample_sig, sample_bkg, "OptRHTT_mass_frec_tau", label),
                        "HTT V2 - m, fRec, #tau_{3}/#tau_{2}",
-                       [["Cuts", "FitMethod=MC:Sigma=0.3:SampleSize=500000:VarProp[1]=FSmart:VarProp[2]=FSmart:CutRangeMin[0]=0:CutRangeMax[0]=150:CutRangeMin[1]=0:CutRangeMax[1]=0.5:CutRangeMin[2]=0:CutRangeMax[2]=1"]], 
+                       [["Cuts", "FitMethod=MC:Sigma=0.3:SampleSize=1000000:VarProp[1]=FSmart:VarProp[2]=FSmart:CutRangeMin[0]=0:CutRangeMax[0]=130:CutRangeMin[1]=0:CutRangeMax[1]=0.5:CutRangeMin[2]=0:CutRangeMax[2]=1"]], 
                        [variable.di['looseOptRHTT_mass'],
                         variable.di['looseOptRHTT_fRec'],
                         variable.di['ca15_tau3/ca15_tau2'],
@@ -89,178 +142,234 @@ for pair_name, pair in pairs.iteritems():
                        [],
                        file_name_sig,
                        file_name_bkg,
-                       fiducial_cut_sig = fiducial_cuts[sample_sig],
-                       fiducial_cut_bkg  = fiducial_cuts[sample_bkg],
-                       weight_sig = "(weight)",
-                       weight_bkg = "(weight)",
-                       draw_roc = DRAW_ROC)
-    setups.append(setup)
+                       fiducial_cut_sig = signal_fiducial_cuts,
+                       fiducial_cut_bkg  = bkgrnd_fiducial_cuts,
+                       weight_sig = weight,
+                       weight_bkg = weight)
+    setups[label].append(setup)
 
-    
-    setup = TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "Truth_SD"),
+
+    # HTT Mass + fRec + groomed tau3/tau2
+    setup = TMVASetup("{0}_{1}_{2}_{3}".format(sample_sig, sample_bkg, "OptRHTT_mass_frec_groomed_tau", label),
+                       "HTT V2 - m, fRec, Groomed #tau_{3}/#tau_{2}",
+                       [["Cuts", "FitMethod=MC:Sigma=0.3:SampleSize=1000000:VarProp[1]=FSmart:VarProp[2]=FSmart:CutRangeMin[0]=0:CutRangeMax[0]=130:CutRangeMin[1]=0:CutRangeMax[1]=0.5:CutRangeMin[2]=0:CutRangeMax[2]=1"]], 
+                       [variable.di['looseOptRHTT_mass'],
+                        variable.di['looseOptRHTT_fRec'],
+                        variable.di['ca15softdropz20b10_tau3/ca15softdropz20b10_tau2'],
+                    ],                               
+                       [],
+                       file_name_sig,
+                       file_name_bkg,
+                       fiducial_cut_sig = signal_fiducial_cuts,
+                       fiducial_cut_bkg  = bkgrnd_fiducial_cuts,
+                       weight_sig = weight,
+                       weight_bkg = weight)
+    setups[label].append(setup)
+
+    # Shower Deconstruction
+    setup = TMVASetup("{0}_{1}_{2}_{3}".format(sample_sig, sample_bkg, "SD", label),
                       "log(#chi)",
                       [["Cuts", "V:FitMethod=MC:SampleSize=100000:Sigma=0.3:CutRangeMin[0]=-10:CutRangeMax[0]=8"]], 
-                      [variable.di['log(ca15_chi3)']],
+                      [variable.di['log(ca15_chi2)']],
                       [],
                       file_name_sig,
                       file_name_bkg,
-                       fiducial_cut_sig = fiducial_cuts[sample_sig],
-                       fiducial_cut_bkg  = fiducial_cuts[sample_bkg],
-                      weight_sig = "(weight)",
-                      weight_bkg = "(weight)",
-                      draw_roc = DRAW_ROC,
-                      working_points = [],
-                      manual_working_points = [])
-    setups.append(setup)
+                       fiducial_cut_sig = signal_fiducial_cuts,
+                       fiducial_cut_bkg  = bkgrnd_fiducial_cuts,
+                      weight_sig = weight,
+                      weight_bkg = weight)
+    setups[label].append(setup)
 
-
+    # Softdrop Mass + Ungroomed Tau3/tau2
     mass_var  = "ca15softdropz20b10_mass"
-    setup = TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "Truth_" + mass_var + "Mass_Tau"),
-                      variable.di[mass_var].pretty_name + "+ #tau_{3}/#tau_{2}",
-                      [["Cuts", "V:FitMethod=MC:SampleSize=200000:Sigma=0.3:CutRangeMin[0]=0:CutRangeMax[0]=1:CutRangeMin[1]=0:CutRangeMax[1]=250:VarProp[0]=FSmart"]], 
+    setup = TMVASetup("{0}_{1}_{2}_{3}".format(sample_sig, sample_bkg, "{0}_" + mass_var + "Mass_Tau", label),
+                      variable.di[mass_var].pretty_name + " + #tau_{3}/#tau_{2}",
+                      [["Cuts", "V:FitMethod=MC:SampleSize=200000:Sigma=0.3:CutRangeMin[0]=0:CutRangeMax[0]=1:CutRangeMin[1]=0:CutRangeMax[1]=180:VarProp[0]=FSmart"]], 
                       [variable.di['ca15_tau3/ca15_tau2'],
                        variable.di[mass_var],
                    ],
                       [],
                       file_name_sig,
                       file_name_bkg,
-                      fiducial_cut_sig = fiducial_cuts[sample_sig],
-                      fiducial_cut_bkg  = fiducial_cuts[sample_bkg],
-                      weight_sig = "(weight)",
-                      weight_bkg = "(weight)",
-                      draw_roc = DRAW_ROC,
-                      working_points = [],
-                      manual_working_points = [])
-    setups.append(setup)
+                      fiducial_cut_sig = signal_fiducial_cuts,
+                      fiducial_cut_bkg  = bkgrnd_fiducial_cuts,
+                      weight_sig = weight,
+                      weight_bkg = weight)
+    setups[label].append(setup)
 
+    # Softdrop Mass + groomed Tau3/tau2
     mass_var  = "ca15softdropz20b10_mass"
-    setup = TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "Truth_" + mass_var + "Mass_Groomed_Tau"),
-                      variable.di[mass_var].pretty_name + "+ Groomed #tau_{3}/#tau_{2}",
-                      [["Cuts", "V:FitMethod=MC:SampleSize=400000:Sigma=0.3:CutRangeMin[0]=0:CutRangeMax[0]=1:CutRangeMin[1]=0:CutRangeMax[1]=250:VarProp[0]=FSmart"]], 
+    setup = TMVASetup("{0}_{1}_{2}_{3}".format(sample_sig, sample_bkg, mass_var + "Mass_Groomed_Tau", label),
+                      variable.di[mass_var].pretty_name + " + Groomed #tau_{3}/#tau_{2}",
+                      [["Cuts", "V:FitMethod=MC:SampleSize=400000:Sigma=0.3:CutRangeMin[0]=0:CutRangeMax[0]=1:CutRangeMin[1]=0:CutRangeMax[1]=180:VarProp[0]=FSmart"]], 
                       [variable.di['ca15softdropz20b10_tau3/ca15softdropz20b10_tau2'],
                        variable.di[mass_var],
                    ],
                       [],
                       file_name_sig,
                       file_name_bkg,
-                      fiducial_cut_sig = fiducial_cuts[sample_sig],
-                      fiducial_cut_bkg  = fiducial_cuts[sample_bkg],
-                      weight_sig = "(weight)",
-                      weight_bkg = "(weight)",
-                      draw_roc = DRAW_ROC,
-                      working_points = [],
-                      manual_working_points = [])
-    setups.append(setup)
+                      fiducial_cut_sig = signal_fiducial_cuts,
+                      fiducial_cut_bkg  = bkgrnd_fiducial_cuts,
+                      weight_sig = weight,
+                      weight_bkg = weight)
+    setups[label].append(setup)
+
+    # Softdrop Mass + SD
+    mass_var  = "ca15softdropz20b10_mass"
+    setup = TMVASetup("{0}_{1}_{2}_{3}".format(sample_sig, sample_bkg, mass_var + "Mass_SD", label),
+                      variable.di[mass_var].pretty_name + " + log(#chi)",
+                      [["Cuts", "V:FitMethod=MC:SampleSize=300000:Sigma=0.3:CutRangeMin[0]=-10:CutRangeMax[0]=10:CutRangeMin[1]=0:CutRangeMax[1]=180"]], 
+                      [variable.di['log(ca15_chi2)'],
+                       variable.di[mass_var],
+                   ],
+                      [],
+                      file_name_sig,
+                      file_name_bkg,
+                      fiducial_cut_sig = signal_fiducial_cuts,
+                      fiducial_cut_bkg  = bkgrnd_fiducial_cuts,
+                      weight_sig = weight,
+                      weight_bkg = weight)
+    setups[label].append(setup)
 
 
+    # Softdrop Mass + groomed Tau3/tau2 + SD
+    mass_var  = "ca15softdropz20b10_mass"
+    setup = TMVASetup("{0}_{1}_{2}_{3}".format(sample_sig, sample_bkg, mass_var + "Mass_Groomed_Tau_SD", label),
+                      variable.di[mass_var].pretty_name + ", Groomed #tau_{3}/#tau_{2}, log(#chi)",
+                      [["Cuts", "V:FitMethod=MC:SampleSize=400000:Sigma=0.3:CutRangeMin[0]=0:CutRangeMax[0]=1:CutRangeMin[1]=0:CutRangeMax[1]=180:VarProp[0]=FSmart:CutRangeMin[2]=-10:CutRangeMax[2]=10"]], 
+                      [variable.di['ca15softdropz20b10_tau3/ca15softdropz20b10_tau2'],
+                       variable.di[mass_var],
+                       variable.di['log(ca15_chi2)']
+                   ],
+                      [],
+                      file_name_sig,
+                      file_name_bkg,
+                      fiducial_cut_sig = signal_fiducial_cuts,
+                      fiducial_cut_bkg  = bkgrnd_fiducial_cuts,
+                      weight_sig = weight,
+                      weight_bkg = weight)
+    setups[label].append(setup)
 
-
-
-
-    setup = TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "Truth_btag_OptRHTT_mass_frec_dr_tau"),
-                       "HTT V2 - m, fRec, #Delta R, #tau_{3}/#tau_{2}",
-                       [["Cuts", "FitMethod=MC:Sigma=0.3:SampleSize=500000:VarProp[1]=FSmart:VarProp[3]=FSmart:CutRangeMin[0]=0:CutRangeMax[0]=150:CutRangeMin[1]=0:CutRangeMax[1]=0.5:CutRangeMin[2]=-0.5:CutRangeMax[2]=0.5:CutRangeMin[3]=0:CutRangeMax[3]=1"]], 
+    # HTT Mass + fRec + DeltaR + groomed tau3/tau2 + btag
+    setup = TMVASetup("{0}_{1}_{2}_{3}".format(sample_sig, sample_bkg, "OptRHTT_mass_frec_dr_groomed_tau_btag", label),
+                       "HTT V2 - m, fRec, #Delta R, Groomed #tau_{3}/#tau_{2}, b-tag",
+                       [["Cuts", "FitMethod=MC:Sigma=0.3:SampleSize=1000000:VarProp[1]=FSmart:VarProp[3]=FSmart:VarProp[4]=FSmart:CutRangeMin[0]=0:CutRangeMax[0]=130:CutRangeMin[1]=0:CutRangeMax[1]=0.5:CutRangeMin[2]=-0.5:CutRangeMax[2]=0.5:CutRangeMin[3]=0:CutRangeMax[3]=1:CutRangeMin[4]=0:CutRangeMax[4]=1:"]], 
                        [variable.di['looseOptRHTT_mass'],
                         variable.di['looseOptRHTT_fRec'],
                         variable.di['looseOptRHTT_Ropt-looseOptRHTT_RoptCalc'],
-                        variable.di['ca15_tau3/ca15_tau2'],
+                        variable.di['ca15softdropz20b10_tau3/ca15softdropz20b10_tau2'],
+                        variable.di['ca15softdropz20b10forbtag_btag'],
                     ],                               
                        [],
                        file_name_sig,
                        file_name_bkg,
-                       fiducial_cut_sig = fiducial_cuts[sample_sig],
-                       fiducial_cut_bkg  = fiducial_cuts[sample_bkg],
-                       extra_cut = "ca15softdropz20b10forbtag_btag>0.814",
-                       weight_sig = "(weight)",
-                       weight_bkg = "(weight)",
-                       draw_roc = DRAW_ROC)
-    btag_setups.append(setup)
+                       fiducial_cut_sig = signal_fiducial_cuts,
+                       fiducial_cut_bkg  = bkgrnd_fiducial_cuts,
+                       weight_sig = weight,
+                       weight_bkg = weight)
+    btag_setups[label].append(setup)
 
-
-    setup = TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "Truth_btag_OptRHTT_mass_frec_tau"),
-                       "HTT V2 - m, fRec, #tau_{3}/#tau_{2}",
-                       [["Cuts", "FitMethod=MC:Sigma=0.3:SampleSize=500000:VarProp[1]=FSmart:VarProp[2]=FSmart:CutRangeMin[0]=0:CutRangeMax[0]=150:CutRangeMin[1]=0:CutRangeMax[1]=0.5:CutRangeMin[2]=0:CutRangeMax[2]=1"]], 
+    # HTT Mass + fRec + groomed tau3/tau2 + btag
+    setup = TMVASetup("{0}_{1}_{2}_{3}".format(sample_sig, sample_bkg, "OptRHTT_mass_frec_groomed_tau_btag", label),
+                       "HTT V2 - m, fRec, Groomed #tau_{3}/#tau_{2}, b-tag",
+                       [["Cuts", "FitMethod=MC:Sigma=0.3:SampleSize=1000000:VarProp[1]=FSmart:VarProp[2]=FSmart:VarProp[3]=FSmart:CutRangeMin[0]=0:CutRangeMax[0]=130:CutRangeMin[1]=0:CutRangeMax[1]=0.5:CutRangeMin[2]=0:CutRangeMax[2]=1:CutRangeMin[3]=0:CutRangeMax[3]=1"]], 
                        [variable.di['looseOptRHTT_mass'],
                         variable.di['looseOptRHTT_fRec'],
-                        variable.di['ca15_tau3/ca15_tau2'],
+                        variable.di['ca15softdropz20b10_tau3/ca15softdropz20b10_tau2'],
+                        variable.di['ca15softdropz20b10forbtag_btag'],
                     ],                               
                        [],
                        file_name_sig,
                        file_name_bkg,
-                       fiducial_cut_sig = fiducial_cuts[sample_sig],
-                       fiducial_cut_bkg  = fiducial_cuts[sample_bkg],
-                       extra_cut = "ca15softdropz20b10forbtag_btag>0.814",
-                       weight_sig = "(weight)",
-                       weight_bkg = "(weight)",
-                       draw_roc = DRAW_ROC)
-    btag_setups.append(setup)
+                       fiducial_cut_sig = signal_fiducial_cuts,
+                       fiducial_cut_bkg  = bkgrnd_fiducial_cuts,
+                       weight_sig = weight,
+                       weight_bkg = weight)
+    btag_setups[label].append(setup)
 
-    
-    setup = TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "Truth_btag_SD"),
-                      "log(#chi)",
-                      [["Cuts", "V:FitMethod=MC:SampleSize=50000:Sigma=0.3:CutRangeMin[0]=-10:CutRangeMax[0]=10:VarProp[0]=FSmart"]], 
-                      [variable.di['log(ca15_chi3)']],
+    # Shower Deconstruction + btag
+    setup = TMVASetup("{0}_{1}_{2}_{3}".format(sample_sig, sample_bkg, "SD_btag", label),
+                      "log(#chi), b-tag",
+                      [["Cuts", "V:FitMethod=MC:SampleSize=100000:Sigma=0.3:CutRangeMin[0]=-10:CutRangeMax[0]=8:CutRangeMin[1]=0:CutRangeMax[1]=1.:VarProp[1]=FSmart"]], 
+                      [variable.di['log(ca15_chi2)'],
+                       variable.di['ca15softdropz20b10forbtag_btag'],
+                   ],
                       [],
                       file_name_sig,
                       file_name_bkg,
-                      fiducial_cut_sig = fiducial_cuts[sample_sig],
-                      fiducial_cut_bkg  = fiducial_cuts[sample_bkg],
-                      extra_cut = "ca15softdropz20b10forbtag_btag>0.814",
-                      weight_sig = "(weight)",
-                      weight_bkg = "(weight)",
-                      draw_roc = DRAW_ROC,
-                      working_points = [],
-                      manual_working_points = [])
-    btag_setups.append(setup)
+                       fiducial_cut_sig = signal_fiducial_cuts,
+                       fiducial_cut_bkg  = bkgrnd_fiducial_cuts,
+                      weight_sig = weight,
+                      weight_bkg = weight)
+    btag_setups[label].append(setup)
 
-
+    # Softdrop Mass + Ungroomed Tau3/tau2 + btag
     mass_var  = "ca15softdropz20b10_mass"
-    setup = TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "Truth_btag_" +mass_var + "Mass_Tau"),
-                      variable.di[mass_var].pretty_name + "+ #tau_{3}/#tau_{2}",
-                      [["Cuts", "V:FitMethod=MC:SampleSize=100000:Sigma=0.3:CutRangeMin[0]=0:CutRangeMax[0]=1:CutRangeMin[1]=0:CutRangeMax[1]=250:VarProp[0]=FSmart"]], 
+    setup = TMVASetup("{0}_{1}_{2}_{3}".format(sample_sig, sample_bkg, mass_var + "Mass_Tau_btag", label),
+                      variable.di[mass_var].pretty_name + " + #tau_{3}/#tau_{2}, b-tag",
+                      [["Cuts", "V:FitMethod=MC:SampleSize=200000:Sigma=0.3:CutRangeMin[0]=0:CutRangeMax[0]=1:CutRangeMin[1]=0:CutRangeMax[1]=180:VarProp[0]=FSmart:CutRangeMin[2]=0:CutRangeMax[2]=1.:VarProp[2]=FSmart"]], 
                       [variable.di['ca15_tau3/ca15_tau2'],
                        variable.di[mass_var],
+                       variable.di['ca15softdropz20b10forbtag_btag'],
                    ],
                       [],
                       file_name_sig,
                       file_name_bkg,
-                      fiducial_cut_sig = fiducial_cuts[sample_sig],
-                      fiducial_cut_bkg  = fiducial_cuts[sample_bkg],
-                      extra_cut = "ca15softdropz20b10forbtag_btag>0.814",
-                      weight_sig = "(weight)",
-                      weight_bkg = "(weight)",
-                      draw_roc = DRAW_ROC,
-                      working_points = [],
-                      manual_working_points = [])
-    btag_setups.append(setup)
+                      fiducial_cut_sig = signal_fiducial_cuts,
+                      fiducial_cut_bkg  = bkgrnd_fiducial_cuts,
+                      weight_sig = weight,
+                      weight_bkg = weight)
+    btag_setups[label].append(setup)
 
+    # Softdrop Mass + groomed Tau3/tau2 + b-tag
     mass_var  = "ca15softdropz20b10_mass"
-    setup = TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, "Truth_btag_" + mass_var + "Mass_Groomed_Tau"),
-                      variable.di[mass_var].pretty_name + "+ Groomed #tau_{3}/#tau_{2}",
-                      [["Cuts", "V:FitMethod=MC:SampleSize=100000:Sigma=0.3:CutRangeMin[0]=0:CutRangeMax[0]=1:CutRangeMin[1]=0:CutRangeMax[1]=250:VarProp[0]=FSmart"]], 
+    setup = TMVASetup("{0}_{1}_{2}_{3}".format(sample_sig, sample_bkg, mass_var + "Mass_Groomed_Tau_btag", label),
+                      variable.di[mass_var].pretty_name + " + Groomed #tau_{3}/#tau_{2} + b-tag",
+                      [["Cuts", "V:FitMethod=MC:SampleSize=400000:Sigma=0.3:CutRangeMin[0]=0:CutRangeMax[0]=1:CutRangeMin[1]=0:CutRangeMax[1]=180:VarProp[0]=FSmart:CutRangeMin[2]=0:CutRangeMax[2]=1.:VarProp[2]=FSmart"]], 
                       [variable.di['ca15softdropz20b10_tau3/ca15softdropz20b10_tau2'],
                        variable.di[mass_var],
+                       variable.di['ca15softdropz20b10forbtag_btag'],
                    ],
                       [],
                       file_name_sig,
                       file_name_bkg,
-                      fiducial_cut_sig = fiducial_cuts[sample_sig],
-                      fiducial_cut_bkg  = fiducial_cuts[sample_bkg],
-                      extra_cut = "ca15softdropz20b10forbtag_btag>0.814",
-                      weight_sig = "(weight)",
-                      weight_bkg = "(weight)",
-                      draw_roc = DRAW_ROC,
-                      working_points = [],
-                      manual_working_points = [])
-    btag_setups.append(setup)
+                      fiducial_cut_sig = signal_fiducial_cuts,
+                      fiducial_cut_bkg  = bkgrnd_fiducial_cuts,
+                      weight_sig = weight,
+                      weight_bkg = weight)
+    btag_setups[label].append(setup)
+
+    # Softdrop Mass + groomed Tau3/tau2 + SD + btag
+    mass_var  = "ca15softdropz20b10_mass"
+    setup = TMVASetup("{0}_{1}_{2}_{3}".format(sample_sig, sample_bkg, mass_var + "Mass_Groomed_Tau_SD_btag", label),
+                      variable.di[mass_var].pretty_name + ", Groomed #tau_{3}/#tau_{2}, log(#chi)",
+                      [["Cuts", "V:FitMethod=MC:SampleSize=400000:Sigma=0.3:CutRangeMin[0]=0:CutRangeMax[0]=1:CutRangeMin[1]=0:CutRangeMax[1]=180:VarProp[0]=FSmart:CutRangeMin[2]=-10:CutRangeMax[2]=10:CutRangeMin[3]=0:CutRangeMax[3]=1.:VarProp[3]=FSmart"]], 
+                      [variable.di['ca15softdropz20b10_tau3/ca15softdropz20b10_tau2'],
+                       variable.di[mass_var],
+                       variable.di['log(ca15_chi2)'],
+                       variable.di['ca15softdropz20b10forbtag_btag'],
+                   ],
+                      [],
+                      file_name_sig,
+                      file_name_bkg,
+                      fiducial_cut_sig = signal_fiducial_cuts,
+                      fiducial_cut_bkg  = bkgrnd_fiducial_cuts,
+                      weight_sig = weight,
+                      weight_bkg = weight)
+    btag_setups[label].append(setup)
 
 
+all_setups = []
+for label in ["truth", "forWP", "nosize"]:
+    all_setups.extend( setups[label])
+    all_setups.extend( btag_setups[label])
 
-    pool.map(doTMVA, btag_setups)
+pool.map(doTMVA, all_setups)
 
+for label in ["truth", "forWP", "nosize"]:
 
-    #plotROCs("truth_ROC_" + pair_name, setups, extra_text = pretty_fiducial_cuts[sample_sig])        
-    plotROCs("truth_btag_ROC_" + pair_name, btag_setups, extra_text = "b-tag + " + pretty_fiducial_cuts[sample_sig])        
+    plotROCs(label + "ROC_" + name, setups[label])        
+    plotROCs(label + "btag_ROC_" + name, btag_setups[label])        
 
 
 
