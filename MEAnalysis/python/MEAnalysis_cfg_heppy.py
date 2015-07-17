@@ -341,12 +341,12 @@ class Conf:
 
         #This configures the MEMs to actually run, the rest will be set to 0
         "methodsToRun": [
-            #"SL_0w2h2t",
-            #"DL_0w2h2t",
+            "SL_0w2h2t",
+            "DL_0w2h2t",
             #"SL_2w2h2t",
             #"SL_2w2h2t_memLR",
             #"SL_0w2h2t_memLR",
-            "DL_0w2h2t_Rndge4t"
+            #"DL_0w2h2t_Rndge4t"
         ],
 
     }
