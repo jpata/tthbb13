@@ -255,12 +255,13 @@ class Conf:
         "untaggedSelection": "btagLR",
         
         #how many jets to consider for the btag LR permutations
-        "NJetsForBTagLR": 6
+        "NJetsForBTagLR": 8
     }
 
     general = {
         "controlPlotsFileOld": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsTEST.root",
         "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV6.root",
+        "QGLPlotsFile_flavour": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/Histos_QGL_flavour.root",
         "sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_722sync.py",
         #"sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_722minisync.py",
         #"sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_prev12.py",
@@ -304,7 +305,7 @@ class Conf:
 
         #Actually run the ME calculation
         #If False, all ME values will be 0
-        "calcME": False,
+        "calcME": True,
 
         #Generic event-dependent selection function applied
         #just before the MEM. If False, MEM is skipped
@@ -322,7 +323,10 @@ class Conf:
             "SL_0w2h2t_memLR",
 
             # with rnd CSV values
-            "DL_0w2h2t_Rndge4t"
+            "DL_0w2h2t_Rndge4t",
+
+            #all hadronic
+            "FH"
         ],
 
         #This configures the MEMs to actually run, the rest will be set to 0
@@ -332,7 +336,8 @@ class Conf:
             #"SL_2w2h2t",
             #"SL_2w2h2t_memLR",
             #"SL_0w2h2t_memLR",
-            "DL_0w2h2t_Rndge4t"
+            #"DL_0w2h2t_Rndge4t",
+            "FH" #Fixme - add other AH categories
         ],
 
     }
@@ -443,6 +448,22 @@ strat.push_back(MEM.Permutations.FirstRankedByBTAG)
 c.cfg.perm_pruning = strat
 Conf.mem_configs["DL_0w2h2t_Rndge4t"] = c
 
+###
+### FH
+###
+c = MEMConfig()
+c.do_calculate = lambda ev, mcfg: (
+    len(mcfg.lepton_candidates(ev)) == 0 and
+    len(mcfg.b_quark_candidates(ev)) >= 4 and
+    len(mcfg.l_quark_candidates(ev)) >= 4
+)
+c.mem_assumptions.add("fh")
+strat = CvectorPermutations()
+strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
+strat.push_back(MEM.Permutations.QUntagged)
+strat.push_back(MEM.Permutations.BTagged)
+c.cfg.perm_pruning = strat
+Conf.mem_configs["FH"] = c
 
 for cn, c in Conf.mem_configs.items():
     print "MEM config", cn, c.mem_assumptions

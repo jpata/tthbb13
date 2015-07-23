@@ -165,7 +165,8 @@ class JetAnalyzer(FilterAnalyzer):
             if len(event.good_jets) >=2:
                 if event.good_jets[0].pt<self.conf.jets["pt"] or event.good_jets[1].pt<self.conf.jets["pt"]:
                     passes = False
-                
+        if event.is_fh and len(event.good_jets) < 6:
+            passes = False        
 
 
         corrMet_px = event.MET.px

@@ -24,7 +24,7 @@ class MECategoryAnalyzer(FilterAnalyzer):
     def __init__(self, cfg_ana, cfg_comp, looperName):
         self.conf = cfg_ana._conf
         super(MECategoryAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
-        self.cat_map = {"NOCAT":-1, "cat1": 1, "cat2": 2, "cat3": 3, "cat6":6}
+        self.cat_map = {"NOCAT":-1, "cat1": 1, "cat2": 2, "cat3": 3, "cat6":6, "cat8":8}
         self.btag_cat_map = {"NOCAT":-1, "L": 0, "H": 1}
 
     def process(self, event):
@@ -70,6 +70,12 @@ class MECategoryAnalyzer(FilterAnalyzer):
             #event.wquark_candidate_jets = []
             event.wquark_candidate_jets = event.buntagged_jets
             cat = "cat6"
+        elif event.is_fh:   #AH
+            #exactly 8 jets, Wtag in [60,100]
+            if (len(event.good_jets) == 8 and event.Wmass >= 60 and event.Wmass < 100):
+                event.wquark_candidate_jets = event.buntagged_jets
+                cat = "cat8"
+            #FIXME: add other AH categories
 
         event.cat = cat
         event.cat_btag = cat_btag
@@ -270,10 +276,12 @@ class MEAnalyzer(FilterAnalyzer):
                 if "dl" in mem_cfg.mem_assumptions:
                     fstate = MEM.FinalState.LL
                 elif "sl" in mem_cfg.mem_assumptions:
-                    fstate = MEM.FinalState.LH
+                    fstate = MEM.FinalState.LH 
+                elif "fh" in mem_cfg.mem_assumptions:
+                    fstate = MEM.FinalState.HH
                 else:
                     if confname in self.memkeysToRun:
-                        raise ValueError("Need to specify sl or dl in assumptions but got {0}".format(str(mem_cfg.mem_assumptions)))
+                        raise ValueError("Need to specify sl, dl of fh in assumptions but got {0}".format(str(mem_cfg.mem_assumptions)))
                     else:
                         res[(hypo, confname)] = MEM.MEMOutput()
                         continue

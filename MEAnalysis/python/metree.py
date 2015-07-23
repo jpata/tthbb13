@@ -18,7 +18,8 @@ jetType = NTupleObjectType("jetType", variables = [
     NTupleVariable("eta", lambda x : x.eta),
     NTupleVariable("phi", lambda x : x.phi),
     NTupleVariable("mass", lambda x : x.mass),
-    NTupleVariable("id", lambda x : x.id),
+    NTupleVariable("id", lambda x : x.id),  
+    NTupleVariable("qgl", lambda x : x.qgl),
     NTupleVariable("btagCSV", lambda x : x.btagCSV),
     NTupleVariable("btagCSVV0", lambda x : x.btagCSVV0),
     NTupleVariable("btagProb", lambda x : x.btagProb),
@@ -221,10 +222,10 @@ def getTreeProducer(conf):
             #    "btag_LR_4b_2b_old", lambda ev: getattr(ev, "btag_LR_4b_2b_old", -1),
             #    help="B-tagging likelihood ratio: 4b vs 2b (8TeV CSV curves)"
             #),
-            #NTupleVariable(
-            #    "btag_LR_4b_2b", lambda ev: getattr(ev, "btag_LR_4b_2b", -1),
-            #    help="B-tagging likelihood ratio: 4b vs 2b (8TeV algo, 13 TeV curves)"
-            #),
+            # NTupleVariable(
+            #     "btag_LR_4b_2b", lambda ev: getattr(ev, "btag_LR_4b_2b", -1),
+            #     help="B-tagging likelihood ratio: 4b vs 2b (8TeV algo, 13 TeV curves)"
+            # ),
             #NTupleVariable(
             #    "btag_LR_4b_2b_alt", lambda ev: getattr(ev, "btag_LR_4b_2b_alt", -1),
             #    help="B-tagging likelihood ratio: 4b vs 2b with 3-dimensional pt/eta binning for CSV"
@@ -319,6 +320,9 @@ def getTreeProducer(conf):
             #    "tth_rho_py_gen", lambda ev: ev.tth_rho_py_gen if hasattr(ev, "tth_rho_py_gen") else 0,
             #    help="gen-level ttH system recoil py"
             #),
+
+
+
         ],
         globalObjects = {
            "MET_nominal" : NTupleObject("met", metType, help="Reconstructed MET"),
@@ -346,6 +350,7 @@ def getTreeProducer(conf):
         for vtype in [
             ("is_sl",               int,        "Passes single lepton cuts"),
             ("is_dl",               int,        "Passes dilepton cuts"),
+            ("is_fh",               int,        "Passes all-hadronic cuts"),
             ("Wmass",               float,      "Best reconstructed W candidate mass"),
             ("cat",                 int,        "ME category", "catn"),
             ("cat_btag",            int,        "ME category (b-tag)", "cat_btag_n"),
@@ -357,7 +362,17 @@ def getTreeProducer(conf):
             ("btag_LR_4b_2b_old",   float,      ""),
             ("btag_LR_4b_2b",       float,      ""),
             ("btag_LR_4b_2b_alt",   float,      ""),
-            ("btag_LR_4b_2b_max4",  float,      ""),
+            ("btag_LR_4b_2b_max4",  float,      ""), 
+            ("qg_LR_flavour_4q_0q", float,      ""),
+            ("qg_LR_flavour_4q_1q", float,      ""), 
+            ("qg_LR_flavour_4q_2q", float,      ""),
+            ("qg_LR_flavour_4q_3q", float,      ""),
+            ("qg_LR_flavour_4q_0q_1q", float,      ""), 
+            ("qg_LR_flavour_4q_1q_2q", float,      ""),
+            ("qg_LR_flavour_4q_2q_3q", float,      ""),
+            ("qg_LR_flavour_4q_0q_1q_2q", float,      ""), 
+            ("qg_LR_flavour_4q_1q_2q_3q", float,      ""),
+            ("qg_LR_flavour_4q_0q_1q_2q_3q", float,      ""),
             ("nBCSVM",              float,      ""),
             ("numJets",             int,        ""),
             ("nMatchSimB",          int,        ""),

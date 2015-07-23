@@ -25,6 +25,7 @@ class LeptonAnalyzer(FilterAnalyzer):
         self.counters["processing"].register("sl")
         self.counters["processing"].register("dl")
         self.counters["processing"].register("slanddl")
+        self.counters["processing"].register("fh")
 
         self.counters.addCounter("leptons")
         self.counters["leptons"].register("any")
@@ -95,6 +96,7 @@ class LeptonAnalyzer(FilterAnalyzer):
 
         event.is_sl = (event.n_lep_tight == 1 and event.n_lep_tight_veto == 0)
         event.is_dl = (event.n_lep_loose == 2 and event.n_lep_loose_veto == 0)
+        event.is_fh = (not event.is_sl and not event.is_dl)
 
         if event.is_sl:
             self.counters["processing"].inc("sl")
@@ -102,8 +104,11 @@ class LeptonAnalyzer(FilterAnalyzer):
         if event.is_dl:
             self.counters["processing"].inc("dl")
             event.good_leptons = event.mu_loose + event.el_loose
+        if event.is_fh:
+            self.counters["processing"].inc("fh")
+            event.good_leptons = []
 
-        passes = event.is_sl or event.is_dl
+        passes = event.is_sl or event.is_dl or event.is_fh
         if event.is_sl and event.is_dl:
             self.counters["processing"].inc("slanddl")            
             if "debug" in self.conf.general["verbosity"]:

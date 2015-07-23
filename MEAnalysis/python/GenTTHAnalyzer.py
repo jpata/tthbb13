@@ -26,7 +26,15 @@ class GenTTHAnalyzer(FilterAnalyzer):
 
     def _process(self, event):
         #Somehow, the GenWZQuark distribution is duplicated
-        event.l_quarks_w = event.GenWZQuark[0:len(event.GenWZQuark)/2]
+        #event.l_quarks_w = event.GenWZQuark[0:len(event.GenWZQuark)/2]
+        ##LC: temporary fix for issue with dublicate entries in V10 ntuples
+        event.l_quarks_w=[]
+        pts=[]
+        for i in event.GenWZQuark:
+            if (i.pt not in pts):
+                event.l_quarks_w.append(i)
+                pts.append(i.pt)
+
         event.b_quarks_t = event.GenBQuarkFromTop
         event.b_quarks_h = event.GenBQuarkFromH
         event.lep_top = event.GenLepFromTop

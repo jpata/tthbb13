@@ -123,6 +123,13 @@ btaglr = cfg.Analyzer(
     _conf = conf
 )
 
+#calculates the b-tag likelihood ratio
+qglr = cfg.Analyzer(
+    MECoreAnalyzers.QGLRAnalyzer,
+    'qglr',
+    _conf = conf
+)
+
 #assigns the ME category based on leptons, jets and the bLR
 mecat = cfg.Analyzer(
     MECoreAnalyzers.MECategoryAnalyzer,
@@ -182,6 +189,7 @@ sequence = cfg.Sequence([
     leps,
     jets,
     btaglr,
+    qglr,
     mva,
     brnd,
     wtag,
