@@ -2,7 +2,7 @@
 
 #on PSI, CMSSW_BASE is not exported with the grid job, need to set manually
 #CMSSW_BASE=$HOME/TTH-72X-heppy/CMSSW/
-CMSSW_BASE=/shome/tklijnsm/ME-heppy/TTH/CMSSW/
+CMSSW_BASE=/shome/tklijnsm/ME-heppy/TTH2/CMSSW/
 
 env
 set -e

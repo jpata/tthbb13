@@ -63,6 +63,9 @@ class SubjetAnalyzer(FilterAnalyzer):
         setattr( event, 'othertopCandidate', [] )
         setattr( event, 'higgsCandidate', [] )
 
+        event.n_bjets = len( event.selected_btagged_jets )
+        event.n_ljets = len( list( event.wquark_candidate_jets ) )
+
         ########################################
         # Minimal event suitability:
         #  - Needs to be single leptonic
@@ -157,7 +160,7 @@ class SubjetAnalyzer(FilterAnalyzer):
         #  - First subjet has btagFlag==1.0, the other two btagFlag==0.0
         top_subjets = self.Get_Subjets( top )
         if other_top_present:
-            other_top_subjets = self.Get_Subjets( other_top )
+            for top in other_tops: self.Get_Subjets( top )
 
         # Set 'PDGID' to 1 for light, and to 5 for b
         for subjet in top_subjets:
@@ -220,23 +223,29 @@ class SubjetAnalyzer(FilterAnalyzer):
         boosted_bjets = []
         boosted_ljets = []
 
-        # Add the subjets to the final output lists first
-        for subjet in top_subjets:
-            if subjet.btagFlag == 1.0: boosted_bjets.append( subjet )
-            if subjet.btagFlag == 0.0: boosted_ljets.append( subjet )
+        if n_excluded_bjets <= 1:
+            # Add the subjets to the final output lists first
+            for subjet in top_subjets:
+                if subjet.btagFlag == 1.0: boosted_bjets.append( subjet )
+                if subjet.btagFlag == 0.0: boosted_ljets.append( subjet )
 
-        # Sort tl btagged jets by decreasing btag (to be sure, but should already 
-        # be done in previous analyzer)
-        reco_btagged_jets = sorted( reco_btagged_jets, key=lambda x: -x.btag )
+            # Sort tl btagged jets by decreasing btag (to be sure, but should 
+            # already be done in previous analyzer)
+            reco_btagged_jets = sorted( reco_btagged_jets, key=lambda x: -x.btag )
 
-        # Add up to 4 reco btagged jets to the output lists
-        for bjet in reco_btagged_jets:
-            # Check if the b-jet is not excluded
-            if not hasattr( bjet, 'matched_top_subjet' ):
-                boosted_bjets.append( bjet )
+            # Add up to 4 reco btagged jets to the output lists
+            for bjet in reco_btagged_jets:
+                # Check if the b-jet is not excluded
+                if not hasattr( bjet, 'matched_top_subjet' ):
+                    boosted_bjets.append( bjet )
 
-            # Stop adding after 4 b-jets
-            if len(boosted_bjets) == 4: break
+                # Stop adding after 4 b-jets
+                if len(boosted_bjets) == 4: break
+
+        # If too many events are excluded, just run the default hypothesis
+        else:
+            boosted_bjets = reco_btagged_jets
+            boosted_ljets = reco_ltagged_jets
 
         event.PassedSubjetAnalyzer = True
 
@@ -252,6 +261,7 @@ class SubjetAnalyzer(FilterAnalyzer):
         event.boosted_bjets = boosted_bjets
         event.boosted_ljets = boosted_ljets
 
+        # Also declared at beginning of analyzer, but overwrite just in case
         event.n_bjets = len( reco_btagged_jets )
         event.n_ljets = len( reco_ltagged_jets )
 
