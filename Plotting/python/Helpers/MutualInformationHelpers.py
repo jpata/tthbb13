@@ -103,6 +103,7 @@ class mi():
                 fiducial_cut_background = "(1)",
                 diagonal_only = False,
                 read_from_pickle = False,
+                extra_text = [],
    ):
       """ Constructor. Arguments:
       name                    : (string) name of the mutual information set
@@ -113,6 +114,7 @@ class mi():
       fiducial_cut_background : (string) fiducial cut (numerator and denominator)
       diagonal_only           : (bool) only check variable/truth, not variable pairs
       read_from_pickle        : (bool) use stored input
+      extra_test              : (list of strings) text to put on the canvas
       """
       
       if ((fiducial_cut_signal == "(1)") and (not (fiducial_cut_background == "(1)")) or
@@ -243,7 +245,7 @@ c = ROOT.TCanvas("","",800,800)
 # Make the Plots
 ########################################
 
-def MakePlots(mis, files, input_treename = 'tree'):
+def MakePlots(mis, files, input_treename = 'tree', extra_text = []):
 
    # Some configuration
    f = 0.5 # fraction of signal events in combined samplke
@@ -563,6 +565,32 @@ def MakePlots(mis, files, input_treename = 'tree'):
 
       h_mi.Draw(draw_opts)
       h_mi.Draw("sameaxis")
+
+      txt = ROOT.TText()
+      txt.SetTextFont(61)
+      txt.SetTextSize(0.05)
+      txt.DrawTextNDC(0.35, 0.89, "CMS")
+   
+      txt.SetTextFont(52)
+      txt.SetTextSize(0.04)
+      txt.DrawTextNDC(0.35, 0.85, "Simulation Preliminary")
+      
+      txt.SetTextFont(41)
+      txt.DrawTextNDC(0.83, 0.96, "13 TeV")
+
+
+
+      y_extra_text =  0.8
+      
+      l_txt = ROOT.TLatex()    
+      l_txt.SetTextSize(0.03)
+
+      for line in mi.extra_text:
+         l_txt.DrawLatexNDC(0.35, y_extra_text, line)
+         y_extra_text -= 0.035
+
+
+
 
       if mi.diagonal_only:
          OutputDirectoryHelper.ManyPrint(c, output_dir, "{0}_mi_diag".format(mi.name))

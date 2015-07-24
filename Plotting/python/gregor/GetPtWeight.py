@@ -92,8 +92,8 @@ if True:
         pt_var = "{0}_pt".format(truth_var)
         eta_var = "{0}_eta".format(truth_var)
 
-        #fiducial_cut = "(({0}>{1})&&({0}<{2})&&(fabs({3})<{4})&&(top_size<{5}))".format(pt_var, ranges[k][0], ranges[k][1], eta_var, ranges[k][2], ranges[k][3])
-        fiducial_cut = "(({0}>{1})&&({0}<{2})&&(top_size<{3}))".format(pt_var, ranges[k][0], ranges[k][1], ranges[k][3])
+        #fiducial_cut = "(({0}>{1})&&({0}<{2})&&(top_size<{3}))".format(pt_var, ranges[k][0], ranges[k][1], ranges[k][3])
+        fiducial_cut = "(({0}>{1})&&({0}<{2}))".format(pt_var, ranges[k][0], ranges[k][1])
 
 
         combinedPlot ( k + "_pt_cut",
@@ -165,7 +165,7 @@ pickle_file.close()
 
 # Then add the new ones
 for k in to_process:
-    v = files[k]
+    v = files[k] + "-nosize"
     print "Adding: ", v
 
     if "zprime" in k:

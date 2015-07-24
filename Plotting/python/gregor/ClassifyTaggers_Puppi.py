@@ -119,7 +119,11 @@ for pair_name, pair in pairs.iteritems():
         setups.append(setup)
 
 #pool.map(doTMVA, setups)
-plotROCs("truth_PUPPI_ROC_" + pair_name, setups, pretty_fiducial_cuts[sample_sig])        
+plotROCs("truth_PUPPI_ROC_" + pair_name, setups, 
+         extra_text = [pretty_fiducial_cuts[sample_sig],
+                       "flat p_{T} and #eta",
+                       "#Delta R(top,parton) < 0.8"],
+         error_band = False)
 
 
 

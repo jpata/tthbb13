@@ -91,20 +91,27 @@ for pair_name, pair in pairs.iteritems():
     ]
 
 
-
-    #mis.append(mi(pair_name + "_interesting_vars_ca15_fixedR", 
-    #              pair[0], pair[1], 
-    #              [ var.di[v] for v in interesting_vars_ca15], 
-    #              fiducial_cut_and_weight, fiducial_cut_and_weight,
-    #              read_from_pickle = True,
-    #          ))
-
+#
+#    mis.append(mi(pair_name + "_interesting_vars_ca15_fixedR", 
+#                  pair[0], pair[1], 
+#                  [ var.di[v] for v in interesting_vars_ca15], 
+#                  fiducial_cut_and_weight, fiducial_cut_and_weight,
+#                  read_from_pickle = True,
+#                  extra_text = [pretty_fiducial_cuts[pair[0]],
+#                                "flat p_{T} and #eta",
+#                                "#Delta R(top,parton) < 0.8"],
+#              ))
+#
 
     mis.append(mi(pair_name + "_interesting_vars_ak08", 
                   pair[0], pair[1], 
                   [ var.di[v] for v in interesting_vars_ak08], 
                   fiducial_cut_and_weight, fiducial_cut_and_weight,
-                  read_from_pickle = False,
+                  read_from_pickle = True,
+                  extra_text = [pretty_fiducial_cuts[pair[0]],
+                                "flat p_{T} and #eta",
+                                "#Delta R(top,parton) < 0.6"],
+
               ))
 
     MakePlots(mis, full_filenames)

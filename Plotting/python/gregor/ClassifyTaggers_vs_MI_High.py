@@ -77,7 +77,7 @@ for pair_name, pair in pairs.iteritems():
     for var, extra in interesting_vars:
     
         setup = TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, var.replace("/","_")),
-                                         variable.di[var].pretty_name,
+                                         variable.di[var].pretty_name.replace("Mass", "m"),
                                          [["Cuts", "V:FitMethod=MC:SampleSize=400000:Sigma=0.3:"+extra]], 
                                          [variable.di[var]],
                                          [],
@@ -107,7 +107,7 @@ for pair_name, pair in pairs.iteritems():
 #    for var, extra in interesting_vars:
 #        
 #        setup = TMVASetup("{0}_{1}_{2}".format(sample_sig, sample_bkg, var.replace("/","_"))+"_tau",
-#                          variable.di[var].pretty_name,
+#                          variable.di[var].pretty_name.replace("Mass", "m"),
 #                          [["Cuts", "V:FitMethod=MC:SampleSize=400000:Sigma=0.3:CutRangeMin[1]=0:CutRangeMax[1]=1:VarProp[1]=FSmart:"+extra]], 
 #                          [variable.di[var],
 #                           variable.di["ak08_tau3/ak08_tau2"],                           
@@ -127,7 +127,13 @@ for pair_name, pair in pairs.iteritems():
 
        
     #pool.map(doTMVA, single_setups)
-    plotROCs("MI_ROC_" + pair_name, single_setups, extra_text = pretty_fiducial_cuts[sample_sig])        
+
+    plotROCs("fixedR_MI_ROC_" + pair_name, single_setups, 
+                 extra_text = [pretty_fiducial_cuts[sample_sig],
+                               "flat p_{T} and #eta",
+                               "#Delta R(top,parton) < 0.6"],
+                 error_band = False)
+
 
     #pool.map(doTMVA, tau_setups)
     #plotROCs("MI_ROCtau_" + pair_name, tau_setups, extra_text = pretty_fiducial_cuts[sample_sig])        

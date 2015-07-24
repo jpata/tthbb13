@@ -162,6 +162,7 @@ Samples = {
     "zprime_m1250_1p_13tev_spring15dr74_asympt25ns" : "/ZprimeToTT_M-1250_W-12p5_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM", # No v2
     "zprime_m2000_1p_13tev_spring15dr74_asympt25ns" : "/ZprimeToTT_M-2000_W-20_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM",  # Valid
     "zprime_m3000_1p_13tev_spring15dr74_asympt25ns" : "/ZprimeToTT_M-3000_W-30_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM",  # Valid
+    "zprime_m4000_1p_13tev_spring15dr74_asympt25ns" : "/ZprimeToTT_M-4000_W-40_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM",  # Valid
 
     "qcd_pythia6_flat_13tev_spring15dr74_asympt25ns" : "/QCD_Pt-15TTo7000_TuneZ2star-Flat_13TeV_pythia6/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM",
     "qcd_pythia8_flat_13tev_spring15dr74_asympt25ns" : "/QCD_Pt-15to7000_TuneCUETP8M1_Flat_13TeV_pythia8/RunIISpring15DR74-Asympt25nsRaw_MCRUN2_74_V9-v3/MINIAODSIM",

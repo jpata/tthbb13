@@ -88,7 +88,7 @@ for pair_name, pair in pairs.iteritems():
     for var, extra in interesting_vars:
     
         setup = TMVASetup("{0}_{1}_{2}_vsMI".format(sample_sig, sample_bkg, var.replace("/","_")),
-                                         variable.di[var].pretty_name,
+                                         variable.di[var].pretty_name.replace("Mass", "m").replace("Mass", "m"),
                                          [["Cuts", "V:FitMethod=MC:SampleSize=100000:Sigma=0.3:"+extra]], 
                                          [variable.di[var]],
                                          [],
@@ -115,7 +115,7 @@ for pair_name, pair in pairs.iteritems():
             var_2, extra_2 = interesting_vars[i_var_2]
                 
             setup = TMVASetup("{0}_{1}_{2}_{3}_vsMI".format(sample_sig, sample_bkg, var_1.replace("/","_"), var_2.replace("/","_")),
-                              variable.di[var_1].pretty_name + " " + variable.di[var_2].pretty_name,
+                              variable.di[var_1].pretty_name.replace("Mass", "m").replace("Mass", "m") + " " + variable.di[var_2].pretty_name.replace("Mass", "m").replace("Mass", "m"),
                               [["Cuts", "V:FitMethod=MC:SampleSize=2000000:Sigma=0.3:" + extra_1 + ":" + extra_2.replace("[0]","[1]") ]], 
                               [variable.di[var_1],
                                variable.di[var_2],
@@ -134,7 +134,12 @@ for pair_name, pair in pairs.iteritems():
                
     #pool.map(doTMVA, double_setups)
 
-    plotROCs("fixedR_MI_ROC_" + pair_name, single_setups, extra_text = pretty_fiducial_cuts[sample_sig])        
+    plotROCs("fixedR_MI_ROC_" + pair_name, single_setups, 
+                 extra_text = [pretty_fiducial_cuts[sample_sig],
+                               "flat p_{T} and #eta",
+                               "#Delta R(top,parton) < 0.8"],
+                 error_band = False)
+
     #plotROCs("fixedR_MI_ROCtau_" + pair_name, double_setups, extra_text = pretty_fiducial_cuts[sample_sig])        
 
 

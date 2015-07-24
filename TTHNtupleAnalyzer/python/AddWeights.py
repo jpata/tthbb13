@@ -73,7 +73,7 @@ for k in to_process:
     AH.addScalarBranches(variables,
                          variable_types,
                          output_tree,
-                         ["weight","pt", "eta"],
+                         ["weight","weight_nosize","pt", "eta"],
                          datatype = 'float')
 
 
@@ -98,11 +98,13 @@ for k in to_process:
             functions_and_parameter_eta = pickle.load(pickle_file)
 
         pt_fun = functions_and_parameter_pt[input_name][0]
+        pt_fun_nosize = functions_and_parameter_pt[input_name+"-nosize"][0]
         pt_param_name = functions_and_parameter_pt[input_name][1]
 
         # Currently no etwa treatment for Higgs tagging
         if IS_TOPTAG:
             eta_fun = functions_and_parameter_eta[input_name][0]
+            eta_fun_nosize = functions_and_parameter_eta[input_name+"-nosize"][0]
             eta_param_name = functions_and_parameter_eta[input_name][1]
 
     except KeyError:
@@ -143,16 +145,24 @@ for k in to_process:
         if IS_TOPTAG:
             eta = AH.getter(input_tree, eta_param_name)
             value = pt_fun(pt) * eta_fun(eta)
+            value_nosize = pt_fun_nosize(pt) * eta_fun_nosize(eta)
         else:            
             eta = 1
             value = pt_fun(pt)
+            value_nosize = pt_fun_nosize(pt)
 
         if value > 0:
             weight = 1/(value)
         else:
             weight = 0
 
+        if value_nosize > 0:
+            weight_nosize = 1/(value_nosize)
+        else:
+            weight_nosize = 0
+
         variables["weight"][0] = weight
+        variables["weight_nosize"][0] = weight_nosize
         variables["eta"][0]    = eta
         variables["pt"][0]     = pt
 

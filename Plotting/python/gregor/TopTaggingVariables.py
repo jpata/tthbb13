@@ -181,6 +181,10 @@ variable('log(ca15_chi2)', "log(#chi) (R=0.2)", -10., 10, extra_cut = 'ca15_chi2
 variable('log(ak08_chi3)', "log(#chi) (R=0.3)", -10., 10, extra_cut = 'ak08_chi3>0')
 variable('log(ca15_chi3)', "log(#chi) (R=0.3)", -10., 10, extra_cut = 'ca15_chi3>0')
 
+variable('npv', "Number of primary vertices", -0.5, 39.5)
+variable('pt', "Parton p_{T}", 0, 39.51800)
+variable('eta', "Parton #eta", -2.5, 2.5)
+
 
 
 

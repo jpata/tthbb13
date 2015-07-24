@@ -46,7 +46,7 @@ ROOT.gROOT.ForceStyle()
 
 li_colors = [ROOT.kRed,      ROOT.kBlue+1,     ROOT.kBlack, 
              ROOT.kOrange-1, ROOT.kViolet+1,   ROOT.kGreen+1,
-             ROOT.kGray,     ROOT.kYellow,     ROOT.kTeal]*10
+             ROOT.kGray,     ROOT.kBlue-7]*10
 
 li_marker_styles = [20]*4+[21]*4+[22]*4+[23]*4+[24,25,26,27]*10
 
@@ -483,7 +483,8 @@ def doROCandWP(setup):
                     # !!!
                     gr.SetPoint(i, eff_total_sig, eff_total_bkg)
                     # ((((As we show -e(bg) we have to flip high/low for it )))
-                    gr.SetPointError(i, err_total_sig_low, err_total_sig_high,  err_total_bkg_low, err_total_bkg_high) 
+                    if False:                        
+                        gr.SetPointError(i, err_total_sig_low, err_total_sig_high,  err_total_bkg_low, err_total_bkg_high) 
 
                     # Look for working points
                     for point in interesting_points:
@@ -632,7 +633,12 @@ def doROCandWP(setup):
 # plotROCs
 ########################################
 
-def plotROCs(name, li_setups, extra_text = "", x_label = "#varepsilon(S)"):
+def plotROCs(name, 
+             li_setups, 
+             extra_text = [""], 
+             x_label = "#varepsilon(S)",
+             error_band = True,
+):
 
     # Loop over setups
     pool = mp.Pool(processes=10)  
@@ -668,11 +674,16 @@ def plotROCs(name, li_setups, extra_text = "", x_label = "#varepsilon(S)"):
 
     for view in [
             #"left_top", "all", "weak_left_top", "weak_all", 
-            #"log", 
-            #"loglow", 
+            "log", 
+            "log2", 
+            "loglow", 
             "loglow2", 
+            "loglow3", 
+            "loglow4", 
             #"logpuppi"
     ]:
+
+        y_extra_text =  0.8
 
         # Top Tagging
         # High Purity
@@ -680,7 +691,12 @@ def plotROCs(name, li_setups, extra_text = "", x_label = "#varepsilon(S)"):
             legend_origin_y = 0.15
             legend_origin_x = 0.48
             c.SetLogy(1)
-            h_bkg = ROOT.TH2F("","",100,0,1.,100,0.0001,0.1)
+            h_bkg = ROOT.TH2F("","",100,0,1.1,100,0.0001,0.1)
+        elif view == "log2":
+            legend_origin_y = 0.15
+            legend_origin_x = 0.44
+            c.SetLogy(1)
+            h_bkg = ROOT.TH2F("","",100,0,1.1,100,0.0001,0.1)
         elif view == "loglow":
             legend_origin_y = 0.16
             legend_origin_x = 0.48
@@ -689,6 +705,17 @@ def plotROCs(name, li_setups, extra_text = "", x_label = "#varepsilon(S)"):
         elif view == "loglow2":
             legend_origin_y = 0.16
             legend_origin_x = 0.52
+            c.SetLogy(1)
+            h_bkg = ROOT.TH2F("","",100,0,1.,100,0.0001,0.3)
+        elif view == "loglow3":
+            legend_origin_y = 0.15
+            legend_origin_x = 0.59
+            y_extra_text =  0.83
+            c.SetLogy(1)
+            h_bkg = ROOT.TH2F("","",100,0,1.,100,0.0001,0.8)
+        elif view == "loglow4":
+            legend_origin_y = 0.16
+            legend_origin_x = 0.33
             c.SetLogy(1)
             h_bkg = ROOT.TH2F("","",100,0,1.,100,0.0001,0.3)
         elif view == "logpuppi":
@@ -780,8 +807,11 @@ def plotROCs(name, li_setups, extra_text = "", x_label = "#varepsilon(S)"):
             gr.SetLineStyle( li_line_styles[i_gr] )
             gr.SetLineWidth( 2)    
             legend.AddEntry( gr, gr_and_name[1], "L" )
-            #gr.Draw("E3 SAME")
-            gr.Draw("SAME")
+            
+            if error_band:
+                gr.Draw("E3 SAME")
+            else:
+                gr.Draw("SAME")
 
 
         for i_wp, wp in enumerate(li_wps):
@@ -797,8 +827,10 @@ def plotROCs(name, li_setups, extra_text = "", x_label = "#varepsilon(S)"):
 
         l_txt = ROOT.TLatex()    
         l_txt.SetTextSize(0.04)
-        l_txt.DrawLatexNDC(0.22, 0.8, extra_text)
 
+        for line in extra_text:
+            l_txt.DrawLatexNDC(0.22, y_extra_text, line)
+            y_extra_text -= 0.06
 
         legend.Draw()
 

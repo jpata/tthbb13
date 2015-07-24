@@ -63,7 +63,7 @@ class combinedPlot:
                 legend_size_x   = 0.2,
                 legend_size_y   = -1,
                 legend_text_size= 0.05,
-                extra_text      = "",
+                extra_text      = [""],
                 ):
       """ Constructor. Arguments:
       name            : (string) name for output file
@@ -314,8 +314,8 @@ def doWork( dic_files, output_dir ):
             h.SetFillColor(0)
 
             # add to legend
-            leg.AddEntry( h, p.name  , "L")
-            #+ ", {0:2.0f}%".format(eff*100)
+            leg.AddEntry( h, p.name + ", {0:2.0f}%".format(eff*100)  , "L")
+            #
 
             # Adjust y-range        
             if cp.log_y:
@@ -365,11 +365,20 @@ def doWork( dic_files, output_dir ):
                 txt.SetTextFont(52)
                 txt.SetTextSize(0.04)
                 txt.DrawTextNDC(0.2, 0.84, "Simulation Preliminary")
-
+                
                 txt.SetTextFont(41)
                 txt.DrawTextNDC(0.85, 0.95, "13 TeV")
 
-                txt.DrawTextNDC(0.2, 0.78, cp.extra_text)
+                l_txt = ROOT.TLatex()    
+                l_txt.SetTextSize(0.04)
+                
+                y_extra_text = 0.78
+                for line in cp.extra_text:
+                   l_txt.DrawLatexNDC(0.2, y_extra_text, line)   
+                   y_extra_text -= 0.06
+               
+                #l_txt.DrawLatexNDC(0.2, 0.78, cp.extra_text)
+                
 
 
             else:

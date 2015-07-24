@@ -51,7 +51,7 @@ if True:
                         'pt', 
                         "(weight*({0}))".format(fiducial_cuts[sample]),
                         sample) for sample in files.keys()],
-                 80, 200, 800, 
+                 100, 1000, 2000, 
                  label_x   = "True p_{T}",
                  label_y   = "Fraction of Partons",
                  axis_unit = "GeV",
