@@ -236,6 +236,9 @@ class Conf:
         "pt_dl":  20,
         "eta_dl": 2.4,
 
+        # pt threshold for leading jets in fh channel
+        "pt_fh": 40,
+
         #The default b-tagging algorithm (branch name)
         "btagAlgo": "btagCSV",
 
