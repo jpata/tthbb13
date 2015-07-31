@@ -26,6 +26,7 @@ class MECategoryAnalyzer(FilterAnalyzer):
         super(MECategoryAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
         self.cat_map = {"NOCAT":-1, "cat1": 1, "cat2": 2, "cat3": 3, "cat6":6, "cat8":8}
         self.btag_cat_map = {"NOCAT":-1, "L": 0, "H": 1}
+   
 
     def process(self, event):
         for (syst, event_syst) in event.systResults.items():
@@ -159,6 +160,9 @@ class MEAnalyzer(FilterAnalyzer):
 
     def beginLoop(self, setup):
         super(MEAnalyzer, self).beginLoop(setup)
+        self.inputCounter = ROOT.TH1F("MEAnalyzer_Count","Count",1,0,2)
+        self.inputCounterPosWeight = ROOT.TH1F("MEAnalyzer_CountPosWeight","Count genWeight>0",1,0,2)
+        self.inputCounterNegWeight = ROOT.TH1F("MEAnalyzer_CountNegWeight","Count genWeight<0",1,0,2)
 
     def configure_mem(self, event, mem_cfg):
         self.integrator.set_cfg(mem_cfg.cfg)
@@ -233,6 +237,14 @@ class MEAnalyzer(FilterAnalyzer):
         )
 
     def process(self, event):
+        self.inputCounter.Fill(1)
+        if self.cfg_comp.isMC:
+            genWeight = getattr(event.input, "genWeight")
+            if genWeight > 0:
+                self.inputCounterPosWeight.Fill(1)
+            elif genWeight < 0:
+                self.inputCounterNegWeight.Fill(1)
+
         for (syst, event_syst) in event.systResults.items():
             if event_syst.passes_btag:
                 res = self._process(event_syst)

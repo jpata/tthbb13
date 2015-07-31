@@ -24,8 +24,8 @@ if os.environ.has_key("ME_CONF"):
     meconf = imp.load_source("meconf", os.environ["ME_CONF"])
     from meconf import Conf
 else:
-    print "Loading ME config from TTH.MEAnalysis.MEAnalysis_cfg_heppy"
-    from TTH.MEAnalysis.MEAnalysis_cfg_heppy import Conf
+    print "Loading ME config from TTH.MEAnalysis.MEAnalysis_cfg_heppy_Data"
+    from TTH.MEAnalysis.MEAnalysis_cfg_heppy_Data import Conf
 
 #Creates a new configuration object based on MEAnalysis_cfg_heppy
 conf = Conf
@@ -51,8 +51,8 @@ for sn in sorted(samples_dict.keys()):
         s.nickName.value(),
         files = map(lfn_to_pfn, s.subFiles.value()),
         tree_name = "tree",
-        #n_gen = s.nGen.value(),
-        n_gen = getSampleNGen(s),
+        n_gen = s.nGen.value(),
+        #n_gen = getSampleNGen(s),
         xs = s.xSec.value()
     )
     inputSample.isMC = s.isMC.value()
@@ -200,11 +200,11 @@ sequence = cfg.Sequence([
     btaglr,
     qglr,
     mva,
-    brnd,
+    #brnd,
     wtag,
     mecat,
-    genrad,
-    gentth,
+    #genrad,
+    #gentth,
     mem_analyzer,
     treevar,
     treeProducer

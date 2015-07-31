@@ -13,7 +13,7 @@ sys.modules["TFClasses"] = TFClasses
 
 from TTH.MEAnalysis.MEAnalysis_heppy import sequence
 from TTH.MEAnalysis.samples_base import lfn_to_pfn
-from TTH.MEAnalysis.samples_722sync import samples
+from TTH.MEAnalysis.samples_74X import samples
 
 firstEvent = int(os.environ["SKIP_EVENTS"])
 nEvents = int(os.environ["MAX_EVENTS"])

@@ -11,7 +11,7 @@
 
 
 #on PSI, CMSSW_BASE is not exported with the grid job, need to set manually
-CMSSW_BASE=$HOME/TTH-74X/CMSSW/
+CMSSW_BASE=$HOME/Run2/TTH-74X/CMSSW/
 
 #here we use @...@ to give grid-control the possibility to substitute the configuration file name
 #export ME_CONF=$CMSSW_BASE/src/TTH/MEAnalysis/python/@me_conf@

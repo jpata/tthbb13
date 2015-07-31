@@ -1,4 +1,5 @@
 from TTH.MEAnalysis.Analyzer import FilterAnalyzer
+import ROOT
 class LeptonAnalyzer(FilterAnalyzer):
     """
     Analyzes leptons and applies single-lepton and di-lepton selection.
@@ -21,11 +22,14 @@ class LeptonAnalyzer(FilterAnalyzer):
 
     def beginLoop(self, setup):
         super(LeptonAnalyzer, self).beginLoop(setup)
-
+        
         self.counters["processing"].register("sl")
         self.counters["processing"].register("dl")
         self.counters["processing"].register("slanddl")
         self.counters["processing"].register("fh")
+        self.inputCounter = ROOT.TH1F("LeptonAnalyzer_Count","Count",1,0,2)
+        self.inputCounterPosWeight = ROOT.TH1F("LeptonAnalyzer_CountPosWeight","Count genWeight>0",1,0,2)
+        self.inputCounterNegWeight = ROOT.TH1F("LeptonAnalyzer_CountNegWeight","Count genWeight<0",1,0,2)
 
         self.counters.addCounter("leptons")
         self.counters["leptons"].register("any")
@@ -37,7 +41,14 @@ class LeptonAnalyzer(FilterAnalyzer):
 
     def process(self, event):
         self.counters["processing"].inc("processed")
-        self.counters["leptons"].inc("any", len(event.selLeptons))
+        self.counters["leptons"].inc("any", len(event.selLeptons)) 
+        self.inputCounter.Fill(1)
+        if self.cfg_comp.isMC:
+            genWeight = getattr(event.input, "genWeight")
+            if genWeight > 0:
+                self.inputCounterPosWeight.Fill(1)
+            elif genWeight < 0:
+                self.inputCounterNegWeight.Fill(1) 
 
         event.mu = filter(
             lambda x: abs(x.pdgId) == 13,
@@ -97,6 +108,8 @@ class LeptonAnalyzer(FilterAnalyzer):
         event.is_sl = (event.n_lep_tight == 1 and event.n_lep_tight_veto == 0)
         event.is_dl = (event.n_lep_loose == 2 and event.n_lep_loose_veto == 0)
         event.is_fh = (not event.is_sl and not event.is_dl)
+        if "debug" in self.conf.general["verbosity"]:
+            print "DEBUG: is_sl, is_dl, is_fh", event.is_sl, event.is_dl, event.is_fh
 
         if event.is_sl:
             self.counters["processing"].inc("sl")
