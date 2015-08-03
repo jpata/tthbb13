@@ -295,7 +295,8 @@ class Conf:
         "verbosity": [
             #"debug"
             #"reco",
-            #"meminput"
+            "subjet",
+            "meminput"
         ],
 
         #"eventWhitelist": [
@@ -337,15 +338,16 @@ class Conf:
             "SL_0w2h2t_memLR",
 
             # with rnd CSV values
-            "DL_0w2h2t_Rndge4t"
-            "SL_2qW_sj",
-            "SL_2qW_sj_perm",
+            "DL_0w2h2t_Rndge4t",
+            "SL_2w2h2t_sj",
         ],
 
         #This configures the MEMs to actually run, the rest will be set to 0
         "methodsToRun": [
-            "SL_0w2h2t",
-            "DL_0w2h2t",
+            "SL_2w2h2t",
+            #"SL_0w2h2t",
+            #"DL_0w2h2t",
+            "SL_2w2h2t_sj",
             #"SL_2w2h2t",
             #"SL_2w2h2t_memLR",
             #"SL_0w2h2t_memLR",
@@ -467,37 +469,43 @@ Conf.mem_configs["DL_0w2h2t_Rndge4t"] = c
 
 #SL_2w2h2t_sj
 c = MEMConfig()
+# Select the custom jet lists
+c.b_quark_candidates = lambda event: \
+                                     event.boosted_bjets
+c.l_quark_candidates = lambda event: \
+                                     event.boosted_ljets
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 1 and
-    len(mcfg.b_quark_candidates(ev)) >= 4 and
-    len(mcfg.l_quark_candidates(ev)) == 2
+    len(mcfg.b_quark_candidates(ev)) == 4 and
+    len(mcfg.l_quark_candidates(ev)) == 2 and
+    ev.PassedSubjetAnalyzer == True
 )
 c.mem_assumptions.add("sl")
 strat = CvectorPermutations()
-#FIXME: Thomas, why this is not required?
-#strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
-#sj_permutations.push_back(MEM.Permutations.HEPTopTagged)
+c.mem_assumptions.add("sl")
+strat = CvectorPermutations()
+strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
 strat.push_back(MEM.Permutations.QUntagged)
 strat.push_back(MEM.Permutations.BTagged)
 c.cfg.perm_pruning = strat
 Conf.mem_configs["SL_2w2h2t_sj"] = c
 
-#SL_2w2h2t_sj_perm
-c = MEMConfig()
-c.do_calculate = lambda ev, mcfg: (
-    len(mcfg.lepton_candidates(ev)) == 1 and
-    len(mcfg.b_quark_candidates(ev)) >= 4 and
-    len(mcfg.l_quark_candidates(ev)) == 2
-)
-c.mem_assumptions.add("sl")
-#FIXME: Thomas, why this is not required?
-#strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
-strat = CvectorPermutations()
-strat.push_back(MEM.Permutations.HEPTopTagged)
-strat.push_back(MEM.Permutations.QUntagged)
-strat.push_back(MEM.Permutations.BTagged)
-c.cfg.perm_pruning = strat
-Conf.mem_configs["SL_2w2h2t_sj"] = c
+##SL_2w2h2t_sj_perm
+#c = MEMConfig()
+#c.do_calculate = lambda ev, mcfg: (
+#    len(mcfg.lepton_candidates(ev)) == 1 and
+#    len(mcfg.b_quark_candidates(ev)) >= 4 and
+#    len(mcfg.l_quark_candidates(ev)) == 2
+#)
+#c.mem_assumptions.add("sl")
+##FIXME: Thomas, why this is not required?
+##strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
+#strat = CvectorPermutations()
+#strat.push_back(MEM.Permutations.HEPTopTagged)
+#strat.push_back(MEM.Permutations.QUntagged)
+#strat.push_back(MEM.Permutations.BTagged)
+#c.cfg.perm_pruning = strat
+#Conf.mem_configs["SL_2w2h2t_sj_perm"] = c
 
 for cn, c in Conf.mem_configs.items():
     print "MEM config", cn, c.mem_assumptions

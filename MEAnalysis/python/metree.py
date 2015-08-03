@@ -576,9 +576,9 @@ def getTreeProducer(conf):
         #    "l_quarks_w" : NTupleCollection("GenQFromW", quarkType, 5, help=""),
             "good_jets_nominal" : NTupleCollection("jets", jetType, 9, help="Selected jets"),
             "good_leptons_nominal" : NTupleCollection("leps", leptonType, 2, help="Selected leptons"),
-            "topCandidate" : NTupleCollection("topCandidate", topType, 28, help=""),
-            "othertopCandidate" : NTupleCollection("othertopCandidate", topType, 28, help=""),
-            "higgsCandidate" : NTupleCollection("higgsCandidate", higgsType, 9, help=""),
+            #"topCandidate" : NTupleCollection("topCandidate", topType, 28, help=""),
+            #"othertopCandidate" : NTupleCollection("othertopCandidate", topType, 28, help=""),
+            #"higgsCandidate" : NTupleCollection("higgsCandidate", higgsType, 9, help=""),
         }
     )
 
@@ -664,6 +664,9 @@ def getTreeProducer(conf):
                     "fw_uj" + syst_suffix2, FoxWolframType, 8,
                     help="Fox-Wolfram momenta calculated with untagged jets"
                 ),
+                "topCandidate" + syst_suffix: NTupleCollection("topCandidate" + syst_suffix2 , topType, 28, help=""),
+                "othertopCandidate" + syst_suffix: NTupleCollection("othertopCandidate" + syst_suffix2, topType, 28, help=""),
+                "higgsCandidate" + syst_suffix: NTupleCollection("higgsCandidate" + syst_suffix2, higgsType, 9, help=""),
             })
 
             for cat in conf.bran["jetCategories"].items():

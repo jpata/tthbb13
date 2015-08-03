@@ -2,6 +2,7 @@ from TTH.MEAnalysis.Analyzer import FilterAnalyzer
 import ROOT
 import copy
 import sys
+import numpy as np
 
 class Jet_container:
     def __init__(self, pt, eta, phi, mass):
@@ -49,6 +50,16 @@ class SubjetAnalyzer(FilterAnalyzer):
 
 
     def process(self, event):
+        for (syst, event_syst) in event.systResults.items():
+            if event_syst.passes_btag:
+                res = self._process(event_syst)
+                event.systResults[syst] = res
+            else:
+                event.systResults[syst].passes_subjet = False
+        return np.any([v.passes_subjet for v in event.systResults.values()])
+
+    def _process(self, event):
+        event.passes_subjet = True
 
         print 'Printing from SubjetAnalyzer! iEv = {0}'.format(event.iEv)
 
@@ -74,7 +85,7 @@ class SubjetAnalyzer(FilterAnalyzer):
 
         # Check if the event is single leptonic
         if not event.is_sl:
-            return True
+            return event
 
         # Get the top candidates
         # ======================================
@@ -86,7 +97,7 @@ class SubjetAnalyzer(FilterAnalyzer):
         # Just run normal mem if there is no httCandidate present
         # Check if there is an httCandidate
         if len( event.httCandidate ) == 0:
-            return True
+            return event
 
         # Apply the cuts on the httCandidate
         tops = []
@@ -112,7 +123,7 @@ class SubjetAnalyzer(FilterAnalyzer):
         # Just run normal mem if there is no httCandidate surviving the cuts
         # Check if any candidates survived the cutoff criteria
         if len(tops) == 0:
-            return True
+            return event
         # If exactly 1 survived, simply continue with that candidate
         elif len(tops) == 1:
             top = tops[0]
@@ -159,6 +170,11 @@ class SubjetAnalyzer(FilterAnalyzer):
         #  - Returns subjets ordered by decreasing btag
         #  - First subjet has btagFlag==1.0, the other two btagFlag==0.0
         top_subjets = self.Get_Subjets( top )
+        if "subjet" in self.conf.general["verbosity"]:
+            print "subjets"
+            for subjet in top_subjets:
+                print subjet
+
         if other_top_present:
             for top in other_tops: self.Get_Subjets( top )
 
@@ -199,6 +215,9 @@ class SubjetAnalyzer(FilterAnalyzer):
         n_excluded_ljets = self.Match_two_lists(
             top_subjets , 'top_subjet',
             reco_ltagged_jets, 'ljet' )
+        if "subjet" in self.conf.general["verbosity"]:
+            print "subjet nMatchB={0} nMatchL={1}".format(n_excluded_bjets, n_excluded_ljets)
+
 
         # In case of double matching, choose the match with lowest delR
         # (This is not expected to happen often)
@@ -224,6 +243,8 @@ class SubjetAnalyzer(FilterAnalyzer):
         boosted_ljets = []
 
         if n_excluded_bjets <= 1:
+            if "subjet" in self.conf.general["verbosity"]:
+                print "subjet replacing"
             # Add the subjets to the final output lists first
             for subjet in top_subjets:
                 if subjet.btagFlag == 1.0: boosted_bjets.append( subjet )
@@ -241,13 +262,16 @@ class SubjetAnalyzer(FilterAnalyzer):
 
                 # Stop adding after 4 b-jets
                 if len(boosted_bjets) == 4: break
+            event.PassedSubjetAnalyzer = True
 
         # If too many events are excluded, just run the default hypothesis
         else:
+            if "subjet" in self.conf.general["verbosity"]:
+                print "subjet has too many overlaps, using reco"
             boosted_bjets = reco_btagged_jets
             boosted_ljets = reco_ltagged_jets
+            event.PassedSubjetAnalyzer = False
 
-        event.PassedSubjetAnalyzer = True
 
 
         ########################################
@@ -273,6 +297,7 @@ class SubjetAnalyzer(FilterAnalyzer):
 
         print 'Exiting SubjetAnalyzer! event.PassedSubjetAnalyzer = {0}'.format(
             event.PassedSubjetAnalyzer )
+        return event
 
 
         ########################################
