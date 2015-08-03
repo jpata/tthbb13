@@ -48,12 +48,19 @@ def Make_config():
     # I/O information
     ########################################
 
-    config['input_root_file_name'] = '/scratch/tklijnsm/V10_full_jets_TTBarH.root'
+    #config['input_root_file_name'] = '/scratch/tklijnsm/V10_full_jets_TTBarH.root'
     #config['input_root_file_name'] = '/scratch/tklijnsm/V11_full_jets_0.3delR.root'
+    #config['input_root_file_name'] = '/shome/tklijnsm/Samples/TFsamples/V11_full_subjets_0.3delR.root'
+
+    #config['input_root_file_name'] = '/shome/tklijnsm/Samples/TFsamples/CUSTOMTFFILE_V12_FULL_SUBJETS_NC.root'
+
+    #config['input_root_file_name'] = '/shome/tklijnsm/Samples/V12TFsamples/CUSTOMTFFILE_V12_FULL_JETS.root'
+    config['input_root_file_name'] = '/shome/tklijnsm/Samples/V12TFsamples/CUSTOMTFFILE_V12_FULL_SUBJETS.root'
 
     config['input_tree_name'] = 'tree'
 
-    config['outputdir'] = 'Testrun-V10-full-jets-TTBarH'
+    #config['outputdir'] = 'V12_REALFULL_JETS'
+    config['outputdir'] = 'V12_REALFULL_SUBJETS'
 
         
     config['SBF_fitted_hists_pickle_filename'] = \
@@ -94,6 +101,7 @@ def Make_config():
     # root file branch info
     ########################################
     
+    #"""
     # Branches for the reconstructed jet
     config['reco_E_str'] = 'Jet_E'
     config['reco_Pt_str'] = 'Jet_pt'
@@ -113,11 +121,28 @@ def Make_config():
     config['quark_Pt_str'] = 'Quark_pt'
     config['quark_Phi_str'] = 'Quark_phi'
     config['quark_Flavour_str'] = 'Quark_pdgId'
+    #"""
+
+    """
+    # REVERSED BRANCHES
+
+    config['reco_E_str'] = 'Quark_E'
+    config['reco_Pt_str'] = 'Quark_pt'
+    config['reco_Eta_str'] = 'Quark_eta'
+    config['reco_Phi_str'] = 'Quark_phi'
+
+    config['quark_E_str'] = 'Jet_E'
+    config['quark_Eta_str'] = 'Jet_eta'
+    config['quark_Pt_str'] = 'Jet_pt'
+    config['quark_Phi_str'] = 'Jet_phi'
+    config['quark_Flavour_str'] = 'Quark_pdgId'
+    """
+
 
     # Change branches if using Pt instead of E
     if config['Use_Pt']:
         config['reco_E_str'] = config['reco_Pt_str']
-        config['mc_E_str'] = config['mc_Pt_str']
+        #config['mc_E_str'] = config['mc_Pt_str']
         config['quark_E_str'] = config['quark_Pt_str']    
 
 
@@ -180,7 +205,7 @@ def Make_config():
     DG_rms = [ '[2]', '[2]+[4]' ]
 
     # Set relative weight of the two Gaussians
-    config['DG_rel_weight'] = 0.90
+    config['DG_rel_weight'] = 0.70
     
     # Create the formula
     DG_formula = "[0]*({0}*exp(-0.5*((x-({1}))/({2}))**2)+(1-{0})*exp(-0.5*((x-({3}))/({4}))**2))".format(
@@ -201,7 +226,8 @@ def Make_config():
     # Set proper initialization values
     #   ( high weight, high mean, low rms + low weight, low mean, high rms seems
     #   to work well )
-    DG_init = [ "0", "1.1*mean", "0.5*rms", "0.8*mean", "0*rms" ]
+    #DG_init = [ "0", "1.1*mean", "1.0*rms", "0.7*mean", "1.5*rms" ]
+    DG_init = [ "0", "1.1*mean", "1.0*rms", "0.7*mean", "0.5*rms" ]
 
     # Create the function object
     DG_func = function( DG_formula, DG_init, DG_parlimits )
@@ -237,16 +263,36 @@ def Make_config():
     config['ABFunctions']['b'] = [
         function(),
         function( "[0]+[1]*x", [ "0" , "1" ] ),
+
         function( "sqrt([0]*[0] + x*[1]*[1] + x*x*[2]*[2])", [ "0", "0", "0" ] ),
+        #function( "[0]*1.0/x + [1]*x*x+[2]*x+[3]", [ "0", "0", "0", "0" ] ),
+        #function( "[0]*1.0/x + [1]*x*x*x+[2]*x*x+[3]*x+[4]",
+        #          [ "0", "0", "0", "0", "0" ] ),
+        #function( "[0]*x*x*x+[1]*x*x+[2]*x+[3]", [ "0", "0", "0", "0" ] ),
+
         function( "[0]+[1]*x", [ "0" , "1" ] ),
-        function( "sqrt([0]*[0] + x*[1]*[1] + x*x*[2]*[2])", [ "0", "0", "0" ] ) ]
+
+        function( "sqrt([0]*[0] + x*[1]*[1] + x*x*[2]*[2])", [ "0", "0", "0" ] ),
+        #function( "[0]*1.0/x + [1]*x*x+[2]*x+[3]", [ "0", "0", "0", "0" ] ),
+        #function( "[0]*x*x+[1]*x+[2]", [ "0", "0", "0" ] ),
+        ]
 
     config['ABFunctions']['l'] = [
         function(),
         function( "[0]+[1]*x", [ "0" , "1" ] ),
+
         function( "sqrt([0]*[0] + x*[1]*[1] + x*x*[2]*[2])", [ "0", "0", "0" ] ),
+        #function( "[0]*1.0/x + [1]*x*x+[2]*x+[3]", [ "0", "0", "0", "0" ] ),
+        #function( "[0]*1.0/x + [1]*x*x*x+[2]*x*x+[3]*x+[4]",
+        #          [ "0", "0", "0", "0", "0" ] ),
+        #function( "[0]*x*x*x+[1]*x*x+[2]*x+[3]", [ "0", "0", "0", "0" ] ),
+
         function( "[0]+[1]*x", [ "0" , "1" ] ),
-        function( "sqrt([0]*[0] + x*[1]*[1] + x*x*[2]*[2])", [ "0", "0", "0" ] ) ]
+
+        function( "sqrt([0]*[0] + x*[1]*[1] + x*x*[2]*[2])", [ "0", "0", "0" ] ),
+        #function( "[0]*1.0/x + [1]*x*x+[2]*x+[3]", [ "0", "0", "0", "0" ] ),
+        #function( "[0]*x*x+[1]*x+[2]", [ "0", "0", "0" ] ),
+        ]
 
     """
     # Standard for Single Gaussian:

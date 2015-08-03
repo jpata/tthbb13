@@ -193,7 +193,11 @@ class MEAnalyzer(FilterAnalyzer):
                 self.integrator,
                 MEM.ObjectType.Jet,
                 p4s=(jet.pt, jet.eta, jet.phi, jet.mass),
-                obs_dict={MEM.Observable.BTAG: jet.btagFlag, MEM.Observable.CSV: getattr(jet, mem_cfg.btagMethod)},
+                obs_dict={
+                    MEM.Observable.BTAG: jet.btagFlag,
+                    MEM.Observable.CSV: getattr(jet, mem_cfg.btagMethod),
+                    MEM.Observable.PDGID: getattr(jet, "PDGID", 0)
+                    },
                 tf_dict={
                     MEM.TFType.bReco: jet.tf_b, MEM.TFType.qReco: jet.tf_l,
                 }
@@ -203,6 +207,7 @@ class MEAnalyzer(FilterAnalyzer):
                     jet.pt, jet.eta, jet.phi, jet.mass,\
                     ", Flag: ", jet.btagFlag,\
                     ", CSV: ",  getattr(jet, mem_cfg.btagMethod),\
+                    ", PDGID: ",  getattr(jet, "PDGID", 0),\
                     ", Match: ", jet.tth_match_label, jet.tth_match_index\
                 
                 

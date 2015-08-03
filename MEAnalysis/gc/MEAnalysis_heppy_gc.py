@@ -18,7 +18,16 @@ firstEvent = int(os.environ["SKIP_EVENTS"])
 nEvents = int(os.environ["MAX_EVENTS"])
 
 fns = os.environ["FILE_NAMES"].split()
+
 dataset = os.environ["DATASETPATH"]
+
+# Added by Thomas:
+#dataset = 'V11_tth_13tev'
+
+print 'Dataset:'
+print dataset
+print 'Filenames:'
+print fns
 
 #Create a list of samples to run
 #fill the subFiles of the samples from
@@ -27,7 +36,10 @@ good_samp = []
 print "processing dataset={0}".format(dataset)
 
 for ns in range(len(samples)):
+    print 'Nickname:'
+    print samples[ns].nickName.value()
     if samples[ns].nickName.value() == dataset:
+        print '^ This one passed'
         samples[ns].skip = False
         samples[ns].subFiles = map(lfn_to_pfn, fns)
         good_samp += [samples[ns]]
@@ -37,6 +49,9 @@ for ns in range(len(samples)):
 
 if len(good_samp) != 1:
     raise Exception("Need to specify at least one sample: dataset={0}, subfiles={1}".format(dataset, fns))
+assert(len(good_samp) == 1)
+
+print 'Running over sample: {0}'.format(good_samp)
 
 outFileName = os.environ["MY_SCRATCH"] + "/output.root"
 

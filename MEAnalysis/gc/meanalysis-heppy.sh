@@ -21,6 +21,11 @@ export ME_CONF=$CMSSW_BASE/src/TTH/MEAnalysis/python/@me_conf@
 env
 set -e
 
+pwd
+ls -al
+
+#export DATASETPATH="V11_tth_13tev"
+
 #set env
 cd ${CMSSW_BASE}/src/TTH/MEAnalysis/
 export SCRAM_ARCH="slc6_amd64_gcc491"
@@ -39,7 +44,6 @@ eval `scramv1 runtime -sh`
 #go to work directory
 cd $MY_SCRATCH
 
-#call heppy code
 python ${CMSSW_BASE}/src/TTH/MEAnalysis/gc/MEAnalysis_heppy_gc.py
 echo "MEAnalysis is done"
 
@@ -51,3 +55,4 @@ echo "copying output"
 OFNAME=$OUTDIR/output_${MY_JOBID}.root
 cp $MY_SCRATCH/Loop/tree.root $OFNAME
 echo $OFNAME > output.txt
+#echo "testtext" > test.txt

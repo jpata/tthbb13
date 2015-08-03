@@ -34,6 +34,11 @@ pi_file = open(conf.general["transferFunctionsPickle"] , 'rb')
 conf.tf_matrix = pickle.load(pi_file)
 pi_file.close()
 
+#Load transfer functions from pickle file
+pi_file = open(conf.general["transferFunctions_sj_Pickle"] , 'rb')
+conf.tf_sj_matrix = pickle.load(pi_file)
+pi_file.close()
+    
 #Load the input sample dictionary
 #Samples are configured in the Conf object, by default, we use samples_vhbb
 print "loading samples from", conf.general["sampleFile"]
@@ -137,6 +142,12 @@ wtag = cfg.Analyzer(
     _conf = conf
 )
 
+subjet_analyzer = cfg.Analyzer(
+    MECoreAnalyzers.SubjetAnalyzer,
+    'subjet',
+    _conf = conf
+)
+
 #Calls the C++ MEM integrator with good_jets, good_leptons and
 #the ME category
 mem_analyzer = cfg.Analyzer(
@@ -144,7 +155,6 @@ mem_analyzer = cfg.Analyzer(
     'mem',
     _conf = conf
 )
-
 
 gentth = cfg.Analyzer(
     MECoreAnalyzers.GenTTHAnalyzer,
@@ -188,6 +198,7 @@ sequence = cfg.Sequence([
     mecat,
     genrad,
     gentth,
+    subjet_analyzer,
     mem_analyzer,
     treevar,
     treeProducer
