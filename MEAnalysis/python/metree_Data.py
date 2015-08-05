@@ -29,23 +29,23 @@ jetType = NTupleObjectType("jetType", variables = [
     NTupleVariable("btagProb", lambda x : x.btagProb),
     NTupleVariable("btagSoftEl", lambda x : x.btagSoftEl),
     NTupleVariable("btagSoftMu", lambda x : x.btagSoftMu),
-    NTupleVariable("mcFlavour", lambda x : x.mcFlavour, type=int),
-    NTupleVariable("mcMatchId", lambda x : x.mcMatchId, type=int),
-    NTupleVariable("hadronFlavour", lambda x : x.hadronFlavour, type=int),
-    NTupleVariable("matchFlag", lambda x : getattr(x, "tth_match_label_numeric", -1), type=int),
-    NTupleVariable("mcPt", lambda x : x.mcPt),
-    NTupleVariable("mcEta", lambda x : x.mcEta),
-    NTupleVariable("mcPhi", lambda x : x.mcPhi),
-    NTupleVariable("mcM", lambda x : x.mcM),
-    NTupleVariable("corr", lambda x : x.corr),
-    NTupleVariable("corr_JESUp", lambda x : x.corr_JECUp),
-    NTupleVariable("corr_JESDown", lambda x : x.corr_JECDown),
-    NTupleVariable("btagCSVRnd2t",   lambda x : getattr(x, "btagCSVRnd2t",   -99) ),
-    NTupleVariable("btagCSVRnd3t",   lambda x : getattr(x, "btagCSVRnd3t",   -99) ),
-    NTupleVariable("btagCSVRndge4t", lambda x : getattr(x, "btagCSVRndge4t", -99) ),
-    NTupleVariable("btagCSVInp2t",   lambda x : getattr(x, "btagCSVInp2t",   -99) ),
-    NTupleVariable("btagCSVInp3t",   lambda x : getattr(x, "btagCSVInp3t",   -99) ),
-    NTupleVariable("btagCSVInpge4t", lambda x : getattr(x, "btagCSVInpge4t", -99) ),
+    # NTupleVariable("mcFlavour", lambda x : x.mcFlavour, type=int),
+    # NTupleVariable("mcMatchId", lambda x : x.mcMatchId, type=int),
+    # NTupleVariable("hadronFlavour", lambda x : x.hadronFlavour, type=int),
+    # NTupleVariable("matchFlag", lambda x : getattr(x, "tth_match_label_numeric", -1), type=int),
+    # NTupleVariable("mcPt", lambda x : x.mcPt),
+    # NTupleVariable("mcEta", lambda x : x.mcEta),
+    # NTupleVariable("mcPhi", lambda x : x.mcPhi),
+    # NTupleVariable("mcM", lambda x : x.mcM),
+    # NTupleVariable("corr", lambda x : x.corr),
+    # NTupleVariable("corr_JESUp", lambda x : x.corr_JECUp),
+    # NTupleVariable("corr_JESDown", lambda x : x.corr_JECDown),
+    # NTupleVariable("btagCSVRnd2t",   lambda x : getattr(x, "btagCSVRnd2t",   -99) ),
+    # NTupleVariable("btagCSVRnd3t",   lambda x : getattr(x, "btagCSVRnd3t",   -99) ),
+    # NTupleVariable("btagCSVRndge4t", lambda x : getattr(x, "btagCSVRndge4t", -99) ),
+    # NTupleVariable("btagCSVInp2t",   lambda x : getattr(x, "btagCSVInp2t",   -99) ),
+    # NTupleVariable("btagCSVInp3t",   lambda x : getattr(x, "btagCSVInp3t",   -99) ),
+    # NTupleVariable("btagCSVInpge4t", lambda x : getattr(x, "btagCSVInpge4t", -99) ),
 ])
 #Specifies what to save for leptons
 leptonType = NTupleObjectType("leptonType", variables = [
@@ -181,6 +181,12 @@ def getTreeProducer(conf):
                "passPV", lambda ev: getattr(ev, "passPV", False),
                type=int,
                help="First PV passes selection"
+            ), 
+
+            NTupleVariable(
+               "triggerDecision", lambda ev: getattr(ev, "triggerDecision", False),
+               type=int,
+               help="Trigger selection"
             ),
 
             #NTupleVariable(
@@ -442,44 +448,45 @@ def getTreeProducer(conf):
                 ),
             })
 
-            for cat in conf.bran["jetCategories"].items():
-                #treeProducer.collections.update({ 
-                #        "b_rndval_results_" +cat[0] + syst_suffix: NTupleCollection(
-                #            "jets_" + cat[0] + syst_suffix2, branvalType, 15,
-                #            help="BTagRandomizer random values for category "+cat[0]
-                #            ),
-                #        "b_inpval_results_" +cat[0] + syst_suffix: NTupleCollection(
-                #            "jets_" + cat[0] + syst_suffix2, binpvalType, 15,
-                #            help="BTagRandomizer input values for category "+cat[0]
-                #            )
-                #        })
-                treeProducer.globalObjects.update({ 
-                        "b_rnd_results_" + cat[0] + syst_suffix: NTupleObject(
-                            "bRnd_rnd_"+ cat[0] + syst_suffix2, branType,
-                            help="BTagrRandomizer results (p,ntoys,pass,tag_id)"
-                            ),
-                        "b_inp_results_" + cat[0] + syst_suffix: NTupleObject(
-                            "bRnd_inp_"+ cat[0] + syst_suffix2, branType,
-                            help="BTagrRandomizer input results (p,ntoys,pass,tag_id)"
-                            )                                                
-                        })
+            # for cat in conf.bran["jetCategories"].items():
+            #     #treeProducer.collections.update({ 
+            #     #        "b_rndval_results_" +cat[0] + syst_suffix: NTupleCollection(
+            #     #            "jets_" + cat[0] + syst_suffix2, branvalType, 15,
+            #     #            help="BTagRandomizer random values for category "+cat[0]
+            #     #            ),
+            #     #        "b_inpval_results_" +cat[0] + syst_suffix: NTupleCollection(
+            #     #            "jets_" + cat[0] + syst_suffix2, binpvalType, 15,
+            #     #            help="BTagRandomizer input values for category "+cat[0]
+            #     #            )
+            #     #        })
+            #     treeProducer.globalObjects.update({ 
+            #             "b_rnd_results_" + cat[0] + syst_suffix: NTupleObject(
+            #                 "bRnd_rnd_"+ cat[0] + syst_suffix2, branType,
+            #                 help="BTagrRandomizer results (p,ntoys,pass,tag_id)"
+            #                 ),
+            #             "b_inp_results_" + cat[0] + syst_suffix: NTupleObject(
+            #                 "bRnd_inp_"+ cat[0] + syst_suffix2, branType,
+            #                 help="BTagrRandomizer input results (p,ntoys,pass,tag_id)"
+            #                 )                                                
+            #             })
 
 
-    for systematic in ["nominal"]:
-        for vtype in [
-            ("weight_xs",               float,  ""),
-            ("ttCls",                   int,    ""),
-            ("bTagWeight_LFUp",         float,  ""),
-            ("bTagWeight_Stats2Down",   float,  ""),
-            ("bTagWeight_LFDown",       float,  ""),
-            ("bTagWeight_HFUp",         float,  ""),
-            ("bTagWeight_JESDown",      float,  ""),
-            ("bTagWeight",              float,  ""),
-            ("bTagWeight_HFDown",       float,  ""),
-            ("bTagWeight_Stats2Up",     float,  ""),
-            ("bTagWeight_JESUp",        float,  ""),
-            ("bTagWeight_Stats1Up",     float,  ""),
-            ("bTagWeight_Stats1Down",   float,  ""),
-        ]:
-            treeProducer.globalVariables += [makeGlobalVariable(vtype, systematic)]
+   
+        ### for systematic in ["nominal"]:
+        ###     for vtype in [
+        ###         ("weight_xs",               float,  ""),
+        ###         ("ttCls",                   int,    ""),
+        ###         ("bTagWeight_LFUp",         float,  ""),
+        ###         ("bTagWeight_Stats2Down",   float,  ""),
+        ###         ("bTagWeight_LFDown",       float,  ""),
+        ###         ("bTagWeight_HFUp",         float,  ""),
+        ###         ("bTagWeight_JESDown",      float,  ""),
+        ###         ("bTagWeight",              float,  ""),
+        ###         ("bTagWeight_HFDown",       float,  ""),
+        ###         ("bTagWeight_Stats2Up",     float,  ""),
+        ###         ("bTagWeight_JESUp",        float,  ""),
+        ###         ("bTagWeight_Stats1Up",     float,  ""),
+        ###         ("bTagWeight_Stats1Down",   float,  ""),
+        ###         ]:
+        ###         treeProducer.globalVariables += [makeGlobalVariable(vtype, systematic)]
     return treeProducer

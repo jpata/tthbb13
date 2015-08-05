@@ -17,7 +17,7 @@ samples = cms.VPSet([
 
     #tt + H
     cms.PSet(
-        skip     = cms.bool(True),
+        skip     = cms.bool(False),
         name     = cms.string('tth_13tev_amcatnlo'),
         nickName = cms.string('tth_13tev_amcatnlo'),
         xSec     = cms.double(xsec[("tthbb", "13TeV")]),
@@ -43,7 +43,7 @@ samples = cms.VPSet([
 
     #QCD_HT300to500
     cms.PSet(
-        skip     = cms.bool(False),
+        skip     = cms.bool(True),
         name     = cms.string('qcd_ht300to500'),
         nickName = cms.string('qcd_ht300to500'),
         xSec     = cms.double(xsec[("qcd_ht300to500", "13TeV")]),

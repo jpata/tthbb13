@@ -54,7 +54,7 @@ for sn in sorted(samples_dict.keys()):
         n_gen = s.nGen.value(),
         #n_gen = getSampleNGen(s),
         xs = s.xSec.value(),
-        json = "json/Cert_246908-251883_13TeV_PromptReco_Collisions15_JSON_v2.txt"
+        json = "jsonfile/Cert_246908-251883_13TeV_PromptReco_Collisions15_JSON_v2.txt"
        
     )
     inputSample.isMC = s.isMC.value()
@@ -195,7 +195,7 @@ treevar = cfg.Analyzer(
     'treevar',
     _conf = conf
 )
-from TTH.MEAnalysis.metree import getTreeProducer
+from TTH.MEAnalysis.metree_Data import getTreeProducer
 treeProducer = getTreeProducer(conf)
 
 # definition of a sequence of analyzers,
