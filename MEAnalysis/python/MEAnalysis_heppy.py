@@ -47,12 +47,14 @@ from samplefile import samples_dict
 inputSamples = []
 for sn in sorted(samples_dict.keys()):
     s = samples_dict[sn]
+    sample_ngen = s.nGen.value()
+    if (sample_ngen<0):
+        sample_ngen = getSampleNGen(s)
     inputSample = cfg.Component(
         s.nickName.value(),
         files = map(lfn_to_pfn, s.subFiles.value()),
         tree_name = "tree",
-        #n_gen = s.nGen.value(),
-        n_gen = getSampleNGen(s),
+        n_gen = sample_ngen,
         xs = s.xSec.value()
     )
     inputSample.isMC = s.isMC.value()
@@ -243,7 +245,7 @@ if __name__ == "__main__":
     #Process all samples in the sample list
     for samp in inputSamples:
 
-        print "processing sample ", samp
+        #print "processing sample ", samp
         config = cfg.Config(
             #Run across these inputs
             components = [samp],

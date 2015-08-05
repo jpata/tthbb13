@@ -13,7 +13,7 @@ import TTH.MEAnalysis.TFClasses as TFClasses
 #Import the default list of samples
 #from TTH.MEAnalysis.samples_vhbb import samples, sample_version, lfn_to_pfn
 #from TTH.MEAnalysis.samples_722sync import samples, sample_version, lfn_to_pfn
-from TTH.MEAnalysis.samples_74X import samples, sample_version, lfn_to_pfn, getSampleNGen
+from TTH.MEAnalysis.samples_data import samples, sample_version, lfn_to_pfn, getSampleNGen
 
 
 #Create configuration object based on environment variables
@@ -53,7 +53,9 @@ for sn in sorted(samples_dict.keys()):
         tree_name = "tree",
         n_gen = s.nGen.value(),
         #n_gen = getSampleNGen(s),
-        xs = s.xSec.value()
+        xs = s.xSec.value(),
+        json = "json/Cert_246908-251883_13TeV_PromptReco_Collisions15_JSON_v2.txt"
+       
     )
     inputSample.isMC = s.isMC.value()
     inputSample.perJob = s.perJob.value()
@@ -72,6 +74,15 @@ evs = cfg.Analyzer(
     EventAnalyzer,
     'events',
 )
+
+#Add JSON filter
+from PhysicsTools.Heppy.analyzers.core.JSONAnalyzer import JSONAnalyzer
+jsonAnalyzer = cfg.Analyzer(
+    JSONAnalyzer,
+    'jsonfilter',
+    _conf = conf
+)
+
 
 #Here we define all the main analyzers
 import TTH.MEAnalysis.MECoreAnalyzers as MECoreAnalyzers
@@ -190,6 +201,7 @@ treeProducer = getTreeProducer(conf)
 # definition of a sequence of analyzers,
 # the analyzers will process each event in this order
 sequence = cfg.Sequence([
+    jsonAnalyzer,
     evtid_filter,
     evs,
     evtweight,

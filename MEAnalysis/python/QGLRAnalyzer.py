@@ -21,11 +21,11 @@ class QGLRAnalyzer(FilterAnalyzer):
         for x in ["q","g"]:
             if (x=="q"):
                 self.qgl_flavour_pdfs[x] = self.qglplots_flavour.Get(
-                    "h_qgl_8_0"
+                    "hflavour_qgl_0_3"
                 )
             else:
                 self.qgl_flavour_pdfs[x] = self.qglplots_flavour.Get(
-                    "h_qgl_5_0"
+                    "hflavour_qgl_0_0"
                 )
             self.qgl_flavour_pdfs[x].Scale(1.0 / self.qgl_flavour_pdfs[x].Integral())
 

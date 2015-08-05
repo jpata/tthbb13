@@ -11,9 +11,9 @@ import TTH.MEAnalysis.TFClasses as TFClasses
 import sys
 sys.modules["TFClasses"] = TFClasses
 
-from TTH.MEAnalysis.MEAnalysis_heppy import sequence
+from TTH.MEAnalysis.MEAnalysis_heppy_Data import sequence
 from TTH.MEAnalysis.samples_base import lfn_to_pfn
-from TTH.MEAnalysis.samples_74X import samples
+from TTH.MEAnalysis.samples_data import samples
 
 firstEvent = int(os.environ["SKIP_EVENTS"])
 nEvents = int(os.environ["MAX_EVENTS"])
@@ -48,15 +48,13 @@ output_service = cfg.Service(
 
 inputSamples = []
 for s in samples:
-    sample_ngen = s.nGen.value()
-    if (sample_ngen<0):
-        sample_ngen = getSampleNGen(s)
     inputSample = cfg.Component(
         'tth',
         files = s.subFiles.value(),
         tree_name = "tree",
-        n_gen = sample_ngen,
-        xs = s.xSec.value()
+        n_gen = s.nGen.value(),
+        xs = s.xSec.value(),
+        json = "/shome/leac/Run2/TTH-74X/CMSSW/src/TTH/MEAnalysis/python/json/Cert_246908-251883_13TeV_PromptReco_Collisions15_JSON_v2.txt"
     )
     inputSample.isMC = s.isMC.value()
     if s.skip.value() == False:

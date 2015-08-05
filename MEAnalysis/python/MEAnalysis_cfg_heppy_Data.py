@@ -453,8 +453,8 @@ c.b_quark_candidates = lambda ev: ev.good_jets
 c.l_quark_candidates = lambda ev: []
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 2 and
-    len(mcfg.b_quark_candidates(ev)) >= 4 and
-    ev.nBCSVMRndge4t >= 4
+    len(mcfg.b_quark_candidates(ev)) >= 4 ####and
+###    ev.nBCSVMRndge4t >= 4####FIXME: uncommented to run on data
 )
 c.btagMethod = "btagCSVRndge4t"
 c.maxJets = 8

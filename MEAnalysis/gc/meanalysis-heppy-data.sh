@@ -40,7 +40,7 @@ eval `scramv1 runtime -sh`
 cd $MY_SCRATCH
 
 #call heppy code
-python ${CMSSW_BASE}/src/TTH/MEAnalysis/gc/MEAnalysis_heppy_gc.py
+python ${CMSSW_BASE}/src/TTH/MEAnalysis/gc/MEAnalysis_heppy_gc_Data.py
 echo "MEAnalysis is done"
 
 #copy output
