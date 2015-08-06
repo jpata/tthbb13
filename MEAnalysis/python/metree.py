@@ -183,6 +183,12 @@ def getTreeProducer(conf):
                help="First PV passes selection"
             ),
 
+            NTupleVariable(
+               "triggerDecision", lambda ev: getattr(ev, "triggerDecision", False),
+               type=int,
+               help="Trigger selection"
+            ),
+
             #NTupleVariable(
             #    "nGenNuTop", lambda ev: getattr(ev, "nu_top", -1),
             #    type=int,
