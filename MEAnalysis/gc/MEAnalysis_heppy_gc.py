@@ -13,7 +13,7 @@ sys.modules["TFClasses"] = TFClasses
 
 from TTH.MEAnalysis.MEAnalysis_heppy import sequence
 from TTH.MEAnalysis.samples_base import lfn_to_pfn
-from TTH.MEAnalysis.samples_722sync import samples
+from TTH.MEAnalysis.samples_v12 import samples
 
 firstEvent = int(os.environ["SKIP_EVENTS"])
 nEvents = int(os.environ["MAX_EVENTS"])
@@ -26,7 +26,7 @@ dataset = os.environ["DATASETPATH"]
 #the supplied file names
 good_samp = []
 for ns in range(len(samples)):
-    if samples[ns].nickName.value() == dataset:
+    if samples[ns].name.value() == dataset:
         samples[ns].skip = False
         samples[ns].subFiles = map(lfn_to_pfn, fns)
         good_samp += [samples[ns]]

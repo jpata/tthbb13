@@ -158,7 +158,8 @@ class JetAnalyzer(FilterAnalyzer):
                         #else:
                         #    print "jet does not pass selection after subtraction", jet.pt, newjet.pt, jet.eta, newjet.eta
                 else:
-                    raise ValueError("wrong idx: idx={0} len(coll)={1}".format(idx, len(coll)))
+                    #raise ValueError("wrong idx: idx={0} len(coll)={1}".format(idx, len(coll)))
+                    print "[JetAnalyzer] jet removal, wrong idx: idx={0} len(coll)={1}".format(idx, len(coll))
         for jet in jets_to_remove:
             #print "removing jet", jet.pt, jet.eta
             if jet in event.good_jets:

@@ -60,8 +60,6 @@ class LeptonAnalyzer(FilterAnalyzer):
             for b in ["", "_veto"]:
                 sumleps = []
                 for l in ["mu", "el"]:
-                    if "debug" in self.conf.general["verbosity"]:
-                        print a,b,l
                     lepcuts = self.conf.leptons[l][a+b]
                     incoll = getattr(event, l)
 
@@ -84,9 +82,6 @@ class LeptonAnalyzer(FilterAnalyzer):
                         good = getattr(event, "{0}_{1}".format(l, a))
                         #veto = veto_cuts && !(signal)
                         leps = filter(lambda x: x not in good, leps)
-                    if "debug" in self.conf.general["verbosity"]:
-                        for it in leps:
-                            (self.conf.leptons[l]["debug"])(it)
 
                     sumleps += leps
                     lt = l + "_" + a + b

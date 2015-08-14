@@ -3,7 +3,11 @@
 #Cross-sections also defined in samples_base
 from TTH.MEAnalysis.samples_base import *
 
-sample_version = "preV12"
+#ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8 5838055.0 3788818.0 2049237.0
+#TT_TuneCUETP8M1_13TeV-powheg-pythia8 5261701.0 5261701.0 0.0
+#TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8 31871642.0 21221973.0 10649669.0
+
+sample_version = "V12"
 
 #nickName - string to identify the sample
 #name - full name of the sample, currently same as nickName
@@ -22,7 +26,7 @@ samples = cms.VPSet([
         skip     = cms.bool(False),
         name     = cms.string('TT_TuneCUETP8M1_13TeV-powheg-pythia8'),
         xSec     = cms.double(xsec[("ttjets", "13TeV")]),
-        nGen     = cms.int64(-1),
+        nGen     = cms.int64(5261701),
         subFiles = cms.vstring([
         "/store/user/jpata/VHBBHeppyV12/TT_TuneCUETP8M1_13TeV-powheg-pythia8/VHBB_HEPPY_V12_TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/150723_083110/0000/tree_58.root",
         "/store/user/jpata/VHBBHeppyV12/TT_TuneCUETP8M1_13TeV-powheg-pythia8/VHBB_HEPPY_V12_TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/150723_083110/0000/tree_59.root",
@@ -79,7 +83,7 @@ samples = cms.VPSet([
         skip     = cms.bool(False),
         name     = cms.string('TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8'),
         xSec     = cms.double(xsec[("ttjets", "13TeV")]),
-        nGen     = cms.int64(-1),
+        nGen     = cms.int64(10649669),
         subFiles = cms.vstring([
         "/store/user/jpata/VHBBHeppyV12/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/VHBB_HEPPY_V12_TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150723_082918/0000/tree_1.root",
         "/store/user/jpata/VHBBHeppyV12/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/VHBB_HEPPY_V12_TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150723_082918/0000/tree_10.root",
@@ -394,7 +398,7 @@ samples = cms.VPSet([
         skip     = cms.bool(False),
         name     = cms.string('ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8'),
         xSec     = cms.double(0.5058),
-        nGen     = cms.int64(-1),
+        nGen     = cms.int64(2049237),
         subFiles = cms.vstring([
         "/store/user/jpata/VHBBHeppyV12/ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8/VHBB_HEPPY_V12_ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150723_082106/0000/tree_12.root",
         "/store/user/jpata/VHBBHeppyV12/ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8/VHBB_HEPPY_V12_ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150723_082106/0000/tree_13.root",
