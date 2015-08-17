@@ -4,6 +4,7 @@
 from TTH.MEAnalysis.samples_base import *
 
 #ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8 5838055.0 3788818.0 2049237.0
+#ttHTobb_M125_13TeV_powheg_pythia8 3787313.0 3787313.0 0.0
 #TT_TuneCUETP8M1_13TeV-powheg-pythia8 5261701.0 5261701.0 0.0
 #TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8 31871642.0 21221973.0 10649669.0
 
@@ -477,6 +478,47 @@ samples = cms.VPSet([
         "/store/user/jpata/VHBBHeppyV12/ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8/VHBB_HEPPY_V12_ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9_ext2-v1/150725_152546/0000/tree_8.root",
         "/store/user/jpata/VHBBHeppyV12/ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8/VHBB_HEPPY_V12_ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9_ext2-v1/150725_152546/0000/tree_9.root",
 
+        ]),
+        isMC     = cms.bool(True)
+    ),
+    
+    cms.PSet(
+        skip     = cms.bool(False),
+        name     = cms.string('ttHTobb_M125_13TeV_powheg_pythia8'),
+        xSec     = cms.double(0.5058),
+        nGen     = cms.int64(3787313),
+        subFiles = cms.vstring([
+            "/store/user/jpata/VHBBHeppyV12/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V12_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150723_082022/0000/tree_1.root",
+            "/store/user/jpata/VHBBHeppyV12/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V12_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150723_082022/0000/tree_10.root",
+            "/store/user/jpata/VHBBHeppyV12/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V12_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150723_082022/0000/tree_15.root",
+            "/store/user/jpata/VHBBHeppyV12/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V12_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150723_082022/0000/tree_16.root",
+            "/store/user/jpata/VHBBHeppyV12/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V12_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150723_082022/0000/tree_21.root",
+            "/store/user/jpata/VHBBHeppyV12/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V12_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150723_082022/0000/tree_3.root",
+            "/store/user/jpata/VHBBHeppyV12/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V12_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150723_082022/0000/tree_11.root",
+            "/store/user/jpata/VHBBHeppyV12/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V12_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150723_082022/0000/tree_12.root",
+            "/store/user/jpata/VHBBHeppyV12/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V12_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150723_082022/0000/tree_13.root",
+            "/store/user/jpata/VHBBHeppyV12/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V12_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150723_082022/0000/tree_14.root",
+            "/store/user/jpata/VHBBHeppyV12/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V12_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150723_082022/0000/tree_17.root",
+            "/store/user/jpata/VHBBHeppyV12/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V12_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150723_082022/0000/tree_19.root",
+            "/store/user/jpata/VHBBHeppyV12/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V12_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150723_082022/0000/tree_2.root",
+            "/store/user/jpata/VHBBHeppyV12/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V12_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150723_082022/0000/tree_20.root",
+            "/store/user/jpata/VHBBHeppyV12/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V12_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150723_082022/0000/tree_22.root",
+            "/store/user/jpata/VHBBHeppyV12/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V12_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150723_082022/0000/tree_24.root",
+            "/store/user/jpata/VHBBHeppyV12/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V12_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150723_082022/0000/tree_26.root",
+            "/store/user/jpata/VHBBHeppyV12/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V12_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150723_082022/0000/tree_27.root",
+            "/store/user/jpata/VHBBHeppyV12/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V12_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150723_082022/0000/tree_28.root",
+            "/store/user/jpata/VHBBHeppyV12/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V12_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150723_082022/0000/tree_29.root",
+            "/store/user/jpata/VHBBHeppyV12/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V12_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150723_082022/0000/tree_31.root",
+            "/store/user/jpata/VHBBHeppyV12/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V12_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150723_082022/0000/tree_4.root",
+            "/store/user/jpata/VHBBHeppyV12/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V12_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150723_082022/0000/tree_8.root",
+            "/store/user/jpata/VHBBHeppyV12/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V12_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150723_082022/0000/tree_9.root",
+            "/store/user/jpata/VHBBHeppyV12/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V12_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150723_082022/0000/tree_23.root",
+            "/store/user/jpata/VHBBHeppyV12/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V12_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150723_082022/0000/tree_25.root",
+            "/store/user/jpata/VHBBHeppyV12/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V12_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150723_082022/0000/tree_30.root",
+            "/store/user/jpata/VHBBHeppyV12/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V12_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150723_082022/0000/tree_32.root",
+            "/store/user/jpata/VHBBHeppyV12/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V12_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150723_082022/0000/tree_5.root",
+            "/store/user/jpata/VHBBHeppyV12/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V12_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150723_082022/0000/tree_6.root",
+            "/store/user/jpata/VHBBHeppyV12/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V12_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150723_082022/0000/tree_7.root",
         ]),
         isMC     = cms.bool(True)
     ),
