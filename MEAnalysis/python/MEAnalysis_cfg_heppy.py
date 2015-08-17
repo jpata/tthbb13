@@ -292,10 +292,10 @@ class Conf:
         # "matching" - print out the association between gen and reco objects
         #"verbosity": ["eventboundary", "input", "matching", "gen", "reco", "meminput"],
         "verbosity": [
-            "gen",
-            "debug",
-            "reco",
-            "meminput"
+            #"gen", #print out gen-level info
+            #"debug", #very high-level debug info
+            #"reco", #info about reconstructed final state
+            #"meminput" #info about particles used for MEM input
         ],
 
         #"eventWhitelist": [
