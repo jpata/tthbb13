@@ -11,15 +11,14 @@
 
 
 #on PSI, CMSSW_BASE is not exported with the grid job, need to set manually
-#FIXME: how to not have this hardcoded??
-CMSSW_BASE=$HOME/tth/sw/CMSSW/
+CMSSW_BASE=$HOME/Run2/TTH-74X/CMSSW/
 
 #here we use @...@ to give grid-control the possibility to substitute the configuration file name
 #export ME_CONF=$CMSSW_BASE/src/TTH/MEAnalysis/python/@me_conf@
 export ME_CONF=$CMSSW_BASE/src/TTH/MEAnalysis/python/@me_conf@
 
 #print out the environment
-env
+#env
 set -e
 
 #set env
@@ -41,7 +40,7 @@ eval `scramv1 runtime -sh`
 cd $MY_SCRATCH
 
 #call heppy code
-python ${CMSSW_BASE}/src/TTH/MEAnalysis/gc/MEAnalysis_heppy_gc.py
+python ${CMSSW_BASE}/src/TTH/MEAnalysis/gc/MEAnalysis_heppy_gc_Data.py
 echo "MEAnalysis is done"
 
 #copy output

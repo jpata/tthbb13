@@ -13,7 +13,7 @@ import TTH.MEAnalysis.TFClasses as TFClasses
 #Import the default list of samples
 #from TTH.MEAnalysis.samples_vhbb import samples, sample_version, lfn_to_pfn
 #from TTH.MEAnalysis.samples_722sync import samples, sample_version, lfn_to_pfn
-from TTH.MEAnalysis.samples_74X import samples, sample_version, lfn_to_pfn, getSampleNGen
+from TTH.MEAnalysis.samples_data import samples, sample_version, lfn_to_pfn, getSampleNGen
 
 
 #Create configuration object based on environment variables
@@ -24,8 +24,8 @@ if os.environ.has_key("ME_CONF"):
     meconf = imp.load_source("meconf", os.environ["ME_CONF"])
     from meconf import Conf
 else:
-    print "Loading ME config from TTH.MEAnalysis.MEAnalysis_cfg_heppy"
-    from TTH.MEAnalysis.MEAnalysis_cfg_heppy import Conf
+    print "Loading ME config from TTH.MEAnalysis.MEAnalysis_cfg_heppy_Data"
+    from TTH.MEAnalysis.MEAnalysis_cfg_heppy_Data import Conf
 
 #Creates a new configuration object based on MEAnalysis_cfg_heppy
 conf = Conf
@@ -47,17 +47,18 @@ from samplefile import samples_dict
 inputSamples = []
 for sn in sorted(samples_dict.keys()):
     s = samples_dict[sn]
-    sample_ngen = s.nGen.value()
-    if (sample_ngen<0):
-        sample_ngen = getSampleNGen(s)
     inputSample = cfg.Component(
-        s.name.value(),
+        s.nickName.value(),
         files = map(lfn_to_pfn, s.subFiles.value()),
         tree_name = "tree",
-        n_gen = sample_ngen,
-        xs = s.xSec.value()
+        n_gen = s.nGen.value(),
+        #n_gen = getSampleNGen(s),
+        xs = s.xSec.value(),
+        json = "jsonfile/Cert_246908-251883_13TeV_PromptReco_Collisions15_JSON_v2.txt"
+       
     )
     inputSample.isMC = s.isMC.value()
+    inputSample.perJob = s.perJob.value()
     #use sample only if not skipped and subFiles defined
     if s.skip.value() == False and len(s.subFiles.value())>0:
         inputSamples.append(inputSample)
@@ -73,6 +74,15 @@ evs = cfg.Analyzer(
     EventAnalyzer,
     'events',
 )
+
+#Add JSON filter
+from PhysicsTools.Heppy.analyzers.core.JSONAnalyzer import JSONAnalyzer
+jsonAnalyzer = cfg.Analyzer(
+    JSONAnalyzer,
+    'jsonfilter',
+    _conf = conf
+)
+
 
 #Here we define all the main analyzers
 import TTH.MEAnalysis.MECoreAnalyzers as MECoreAnalyzers
@@ -185,12 +195,13 @@ treevar = cfg.Analyzer(
     'treevar',
     _conf = conf
 )
-from TTH.MEAnalysis.metree import getTreeProducer
+from TTH.MEAnalysis.metree_Data import getTreeProducer
 treeProducer = getTreeProducer(conf)
 
 # definition of a sequence of analyzers,
 # the analyzers will process each event in this order
 sequence = cfg.Sequence([
+    jsonAnalyzer,
     evtid_filter,
     evs,
     evtweight,
@@ -201,11 +212,11 @@ sequence = cfg.Sequence([
     btaglr,
     qglr,
     mva,
-    brnd,
+    #brnd,
     wtag,
     mecat,
-    genrad,
-    gentth,
+    #genrad,
+    #gentth,
     mem_analyzer,
     treevar,
     treeProducer
@@ -244,7 +255,7 @@ if __name__ == "__main__":
     #Process all samples in the sample list
     for samp in inputSamples:
 
-        #print "processing sample ", samp
+        print "processing sample ", samp
         config = cfg.Config(
             #Run across these inputs
             components = [samp],
@@ -261,7 +272,7 @@ if __name__ == "__main__":
 
         #Configure the number of events to run
         from PhysicsTools.HeppyCore.framework.looper import Looper
-        nEvents = 1000
+        nEvents = samp.perJob
 
 
         kwargs = {}

@@ -668,7 +668,7 @@ class Jet:
     def make_array(tree):
         n = getattr(tree, "nJet", 0)
         _id = getattr(tree, "Jet_id", [None]*n)
-        _puId = getattr(tree, "Jet_puId", [None]*n)
+        _puId = getattr(tree, "Jet_puId", [None]*n) 
         _btagCSV = getattr(tree, "Jet_btagCSV", [None]*n)
         _btagCMVA = getattr(tree, "Jet_btagCMVA", [None]*n)
         _rawPt = getattr(tree, "Jet_rawPt", [None]*n)

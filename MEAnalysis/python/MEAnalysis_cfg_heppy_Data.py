@@ -4,22 +4,6 @@ from TTH.MEAnalysis.MEMConfig import MEMConfig
 import ROOT
 from ROOT import MEM
 
-def jet_baseline(jet, oldpt=None):
-    #in case pt has been rescaled, then need to rescale energy fractions
-    if oldpt is None:
-        oldpt = jet.pt
-    ptfrac = jet.pt / oldpt
-    
-    #X = x / oldpt
-    #Xnew = x / (ptfrac * oldpt) = X / ptfrac
-    return (jet.neHEF/ptfrac < 0.99
-        and jet.chEmEF/ptfrac < 0.99
-        and jet.neEmEF/ptfrac < 0.99
-        and jet.numberOfDaughters > 1
-        and jet.chHEF/ptfrac > 0.0
-        and jet.chMult/ptfrac > 0.0
-    )
-
 # LB: in fact,  mu.tightId should contain all the other cuts
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Tight_Muon
 # https://github.com/vhbb/cmssw/blob/vhbbHeppy722patch2/PhysicsTools/Heppy/python/physicsobjects/Muon.py
@@ -40,38 +24,38 @@ def print_mu(mu):
     print "Muon: (pt=%s, eta=%s, tight=%s, pf=%s, glo=%s, dxy=%s, dz=%s, chi2=%s, nhits=%s, pix=%s, stat=%s, pfRelIso04=%s)" % (mu.pt, mu.eta, mu.tightId, mu.isPFMuon,  mu.isGlobalMuon, mu.dxy , mu.dz, mu.globalTrackChi2, (getattr(mu, "nMuonHits", 0) > 0 or getattr(mu, "nChamberHits", 0) > 0) , mu.pixelHits , mu.nStations, mu.pfRelIso04)
 
 
-#def el_baseline_tight(el):
-#    sca = abs(el.etaSc)
-#    ret = (
-#        not(sca > 1.4442 and sca < 1.5660) and
-#        el.convVeto
-#    )
-#    if not ret:
-#        return False
-#
-#    if sca <= 1.479:
-#        ret = ret and (
-#            (abs(el.eleDEta)    < 0.006046) and
-#            (abs(el.eleDPhi)    < 0.028092) and
-#            (el.eleSieie        < 0.009947) and
-#            (el.eleHoE          < 0.045772) and
-#            (abs(el.dxy)        < 0.008790) and
-#            (abs(el.dz)         < 0.021226) and
-#            (el.pfRelIso03        < 0.069537)
-#            #FIXME: expectedMissingInnerHits and hOverE 
-#        )
-#    elif sca < 2.5:
-#        ret = ret and (
-#            (abs(el.eleDEta)    < 0.007057) and
-#            (abs(el.eleDPhi)    < 0.030159) and
-#            (el.eleSieie        < 0.028237) and
-#            (el.eleHoE          < 0.067778) and
-#            (abs(el.dxy)        < 0.027984) and
-#            (abs(el.dz)         < 0.133431) and
-#            (el.pfRelIso03        < 0.078265)
-#            #FIXME: expectedMissingInnerHits and hOverE 
-#        )
-#    return ret
+def el_baseline_tight(el):
+    sca = abs(el.etaSc)
+    ret = (
+        not(sca > 1.4442 and sca < 1.5660) and
+        el.convVeto
+    )
+    if not ret:
+        return False
+
+    if sca <= 1.479:
+        ret = ret and (
+            (abs(el.eleDEta)    < 0.006046) and
+            (abs(el.eleDPhi)    < 0.028092) and
+            (el.eleSieie        < 0.009947) and
+            (el.eleHoE          < 0.045772) and
+            (abs(el.dxy)        < 0.008790) and
+            (abs(el.dz)         < 0.021226) and
+            (el.relIso03        < 0.069537)
+            #FIXME: expectedMissingInnerHits and hOverE 
+        )
+    elif sca < 2.5:
+        ret = ret and (
+            (abs(el.eleDEta)    < 0.007057) and
+            (abs(el.eleDPhi)    < 0.030159) and
+            (el.eleSieie        < 0.028237) and
+            (el.eleHoE          < 0.067778) and
+            (abs(el.dxy)        < 0.027984) and
+            (abs(el.dz)         < 0.133431) and
+            (el.relIso03        < 0.078265)
+            #FIXME: expectedMissingInnerHits and hOverE 
+        )
+    return ret
 
 def el_baseline_medium(el):
     sca = abs(el.etaSc)
@@ -90,7 +74,7 @@ def el_baseline_medium(el):
             (el.eleHoE          < 0.050537) and
             (abs(el.dxy)        < 0.012235) and
             (abs(el.dz)         < 0.042020) and
-            (el.pfRelIso03      < 0.107587) and #delta-beta corrected relative iso
+            (el.relIso03        < 0.107587) and
             (getattr(el, "eleExpMissingInnerHits", 0) <= 1) and
             (getattr(el, "eleooEmooP", 0) < 0.091942)
         )
@@ -102,7 +86,7 @@ def el_baseline_medium(el):
             (el.eleHoE          < 0.086782) and
             (abs(el.dxy)        < 0.036719) and
             (abs(el.dz)         < 0.138142) and
-            (el.pfRelIso03      < 0.113254) and #delta-beta corrected relative iso
+            (el.relIso03        < 0.113254) and
             (getattr(el, "eleExpMissingInnerHits", 0) <= 1) and
             (getattr(el, "eleooEmooP", 0) < 0.100683)
         )
@@ -125,7 +109,7 @@ def el_baseline_loose(el):
             (el.eleHoE          < 0.093068) and
             (abs(el.dxy)        < 0.035904) and
             (abs(el.dz)         < 0.075496) and
-            (el.pfRelIso03        < 0.130136) and
+            (el.relIso03        < 0.130136) and
             (getattr(el, "eleExpMissingInnerHits", 0) <= 1) and
             (getattr(el, "eleooEmooP", 0) < 0.189968)
         )
@@ -137,7 +121,7 @@ def el_baseline_loose(el):
             (el.eleHoE          < 0.115754) and
             (abs(el.dxy)        < 0.099266) and
             (abs(el.dz)         < 0.197897) and
-            (el.pfRelIso03        < 0.163368) and
+            (el.relIso03        < 0.163368) and
             (getattr(el, "eleExpMissingInnerHits", 0) <= 1) and
             (getattr(el, "eleooEmooP", 0) < 0.140662)
         )
@@ -220,6 +204,7 @@ class Conf:
             "tight_veto": {
                 "pt": 20,
                 "eta": 2.4,
+                "iso": 0.15,
                 "idcut": lambda el: el_baseline_loose(el),
             },
 
@@ -274,13 +259,12 @@ class Conf:
         
         #how many jets to consider for the btag LR permutations
         "NJetsForBTagLR": 8
-        "selection": jet_baseline
     }
 
     trigger = {
        
       
-        "filter": False,
+        "filter": True,
         "HLTpaths": [
             "HLT_BIT_HLT_PFHT400_SixJet30_BTagCSV0p5_2PFBTagCSV_v",
             "HLT_BIT_HLT_PFHT450_SixJet40_PFBTagCSV_v",
@@ -289,13 +273,15 @@ class Conf:
       
     }
 
+
+
     general = {
         "controlPlotsFileOld": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsTEST.root",
         "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV6.root",
         "QGLPlotsFile_flavour": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/Histos_QGL_flavour.root",
         #"sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_722sync.py",
-        #"sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_722minisync.py",
-        "sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_v12.py",
+        "sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_data.py",
+        #"sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_prev12.py",
         "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions.pickle",
         "systematics": ["nominal"],
         #"systematics": ["nominal", "JESUp", "JESDown", "raw"],
@@ -307,14 +293,16 @@ class Conf:
         # "matching" - print out the association between gen and reco objects
         #"verbosity": ["eventboundary", "input", "matching", "gen", "reco", "meminput"],
         "verbosity": [
-            #"gen", #print out gen-level info
-            #"debug", #very high-level debug info
-            #"reco", #info about reconstructed final state
-            #"meminput" #info about particles used for MEM input
+            #"debug"
+            #"reco",
+            #"meminput"
         ],
 
+
         #"eventWhitelist": [
-        #    (1, 1094, 109371),
+        #    (1,9,868),
+        #    (1,9,870),
+        #    (1,14,1351),
         #]
     }
 
@@ -334,7 +322,7 @@ class Conf:
 
         #Actually run the ME calculation
         #If False, all ME values will be 0
-        "calcME": False,
+        "calcME": True,
 
         #Generic event-dependent selection function applied
         #just before the MEM. If False, MEM is skipped
@@ -360,9 +348,9 @@ class Conf:
 
         #This configures the MEMs to actually run, the rest will be set to 0
         "methodsToRun": [
-            "SL_0w2h2t",
-            "DL_0w2h2t",
-            "SL_2w2h2t",
+            #"SL_0w2h2t",
+            #"DL_0w2h2t",
+            #"SL_2w2h2t",
             #"SL_2w2h2t_memLR",
             #"SL_0w2h2t_memLR",
             #"DL_0w2h2t_Rndge4t",
@@ -465,8 +453,8 @@ c.b_quark_candidates = lambda ev: ev.good_jets
 c.l_quark_candidates = lambda ev: []
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 2 and
-    len(mcfg.b_quark_candidates(ev)) >= 4 and
-    ev.nBCSVMRndge4t >= 4
+    len(mcfg.b_quark_candidates(ev)) >= 4 ####and
+###    ev.nBCSVMRndge4t >= 4####FIXME: uncommented to run on data
 )
 c.btagMethod = "btagCSVRndge4t"
 c.maxJets = 8
