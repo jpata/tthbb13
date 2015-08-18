@@ -66,4 +66,3 @@ for f, cuts in inf:
         Nt += ni
         otf.Close()
     print Nt
-
