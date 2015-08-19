@@ -111,7 +111,8 @@ class LeptonAnalyzer(FilterAnalyzer):
             event.good_leptons = []
             event.veto_leptons = []
 
-        passes = event.is_sl or event.is_dl or event.is_fh
+        #apply configuration-dependent selection
+        passes = self.conf.leptons["selection"](event)
         if event.is_sl and event.is_dl:
             print "DEBUG: The event (%s,%s,%s) is both sl and dl" % (event.input.run,event.input.lumi,event.input.evt)
             passes = False

@@ -235,7 +235,9 @@ class Conf:
             },
             "isotype": "pfRelIso03", #pfRelIso - delta-beta, relIso - rho
             "debug" : print_el
-        }
+        },
+        "selection": lambda event: event.is_sl or event.is_dl
+        #"selection": lambda event: event.is_fh
     }
 
     jets = {
@@ -273,7 +275,7 @@ class Conf:
         "untaggedSelection": "btagLR",
         
         #how many jets to consider for the btag LR permutations
-        "NJetsForBTagLR": 8
+        "NJetsForBTagLR": 6,
         "selection": jet_baseline
     }
 

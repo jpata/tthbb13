@@ -11,7 +11,6 @@
 
 
 #on PSI, CMSSW_BASE is not exported with the grid job, need to set manually
-#FIXME: how to not have this hardcoded??
 CMSSW_BASE=$HOME/tth/sw/CMSSW/
 
 #here we use @...@ to give grid-control the possibility to substitute the configuration file name
@@ -49,10 +48,6 @@ ME_CONF_NAME=$(basename "$ME_CONF")
 OUTDIR=$HOME/tth/gc/${TASK_ID}/${ME_CONF_NAME%.*}/${DATASETPATH}/
 mkdir -p $OUTDIR 
 echo "copying output"
-#OFNAME=$OUTDIR/output_${MY_JOBID}.root
-OFNAME=output_${MY_JOBID}.root
-#cp $MY_SCRATCH/Loop/tree.root $OFNAME
-SRM_DIR="srm://t3se01.psi.ch:8443/srm/managerv2?SFN=/pnfs/psi.ch/cms/trivcat/store/user/leac/ME_V12"
-SERESULTDIR=$SRM_DIR/${TASK_ID}/${ME_CONF_NAME%.*}/${DATASETPATH}/
-lcg-cp -b -D srmv2 file:$MY_SCRATCH/Loop/tree.root $SERESULTDIR/$OFNAME
+OFNAME=$OUTDIR/output_${MY_JOBID}.root
+cp $MY_SCRATCH/Loop/tree.root $OFNAME
 echo $OFNAME > output.txt
