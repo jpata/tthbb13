@@ -38,16 +38,21 @@ for ev in range(tt.GetEntries()):
     elif abs(lep0_id) == 13:
         lep0_iso = leps_iso04[0]
    
+    if tt.is_sl and (tt.numJets < 3 or tt.nBCSVM < 2):
+        continue
+    if tt.is_dl and (tt.numJets < 2 or tt.nBCSVM < 1):
+        continue
+
     if tt.is_dl:
         lep1_pt = leps_pt[1]
         lep1_id = leps_pdgId[1]
         lep1_eta = leps_eta[1]
         lep1_phi = leps_phi[1]
         lep1_iso = -1
-        if abs(lep0_id) == 11:
-            lep0_iso = leps_iso03[1]
-        elif abs(lep0_id) == 13:
-            lep0_iso = leps_iso04[1]
+        if abs(lep1_id) == 11:
+            lep1_iso = leps_iso03[1]
+        elif abs(lep1_id) == 13:
+            lep1_iso = leps_iso04[1]
     else:
         lep1_pt = 0
         lep1_id = 0

@@ -11,29 +11,46 @@ import TTH.MEAnalysis.TFClasses as TFClasses
 import sys
 sys.modules["TFClasses"] = TFClasses
 
-from TTH.MEAnalysis.MEAnalysis_heppy import sequence
+from TTH.MEAnalysis.MEAnalysis_heppy import sequence, samples
 from TTH.MEAnalysis.samples_base import lfn_to_pfn
-from TTH.MEAnalysis.samples_722sync import samples
+from TTH.MEAnalysis.samples_v12 import samples
 
 firstEvent = int(os.environ["SKIP_EVENTS"])
 nEvents = int(os.environ["MAX_EVENTS"])
 
 fns = os.environ["FILE_NAMES"].split()
+
 dataset = os.environ["DATASETPATH"]
+
+# Added by Thomas:
+#dataset = 'V11_tth_13tev'
+
+print 'Dataset:'
+print dataset
+print 'Filenames:'
+print fns
 
 #Create a list of samples to run
 #fill the subFiles of the samples from
 #the supplied file names
 good_samp = []
+print "processing dataset={0}".format(dataset)
+
 for ns in range(len(samples)):
-    if samples[ns].nickName.value() == dataset:
+    if samples[ns].name.value() == dataset:
         samples[ns].skip = False
         samples[ns].subFiles = map(lfn_to_pfn, fns)
         good_samp += [samples[ns]]
     else:
+        print "skipping", samples[ns].name.value()
         samples[ns].skip = True
 
+if len(good_samp) != 1:
+    raise Exception("Need to specify at least one sample: dataset={0}, subfiles={1}".format(dataset, fns))
 assert(len(good_samp) == 1)
+
+print 'Running over sample: {0}'.format(good_samp)
+
 outFileName = os.environ["MY_SCRATCH"] + "/output.root"
 
 import PhysicsTools.HeppyCore.framework.config as cfg

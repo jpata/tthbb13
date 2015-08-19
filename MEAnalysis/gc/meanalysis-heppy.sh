@@ -11,14 +11,20 @@
 
 
 #on PSI, CMSSW_BASE is not exported with the grid job, need to set manually
-CMSSW_BASE=$HOME/TTH-74X/CMSSW/
+CMSSW_BASE=$HOME/tth/sw/CMSSW/
 
+#here we use @...@ to give grid-control the possibility to substitute the configuration file name
 #export ME_CONF=$CMSSW_BASE/src/TTH/MEAnalysis/python/@me_conf@
-export ME_CONF=$CMSSW_BASE/src/TTH/MEAnalysis/python/$me_conf
+export ME_CONF=$CMSSW_BASE/src/TTH/MEAnalysis/python/@me_conf@
 
 #print out the environment
-#env
+env
 set -e
+
+pwd
+ls -al
+
+#export DATASETPATH="V11_tth_13tev"
 
 #set env
 cd ${CMSSW_BASE}/src/TTH/MEAnalysis/
@@ -28,7 +34,7 @@ source /cvmfs/cms.cern.ch/cmsset_default.sh
 #call cmsenv
 eval `scramv1 runtime -sh`
 
-#this was a work-around in tallinn
+#this was a work-around in tallinn, no longer needed (probably)
 #make sure we have the correct custom python environment
 #source $CMSSW_BASE/src/TTH/setenv.sh
 #export PYTHONPATH=$CMSSW_BASE/anaconda/lib/python2.7/site-packages:$PYTHONPATH
@@ -38,7 +44,6 @@ eval `scramv1 runtime -sh`
 #go to work directory
 cd $MY_SCRATCH
 
-#call heppy code
 python ${CMSSW_BASE}/src/TTH/MEAnalysis/gc/MEAnalysis_heppy_gc.py
 echo "MEAnalysis is done"
 
@@ -50,3 +55,4 @@ echo "copying output"
 OFNAME=$OUTDIR/output_${MY_JOBID}.root
 cp $MY_SCRATCH/Loop/tree.root $OFNAME
 echo $OFNAME > output.txt
+#echo "testtext" > test.txt

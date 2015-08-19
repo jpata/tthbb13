@@ -1,7 +1,7 @@
 from TTH.TTHNtupleAnalyzer.CrabHelpers import hadd_from_file, replicate
 import argparse, subprocess, glob, os
 
-version = "Jun28"
+version = "Jul17"
 
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
@@ -17,7 +17,7 @@ vo_se = os.environ["VO_CMS_DEFAULT_SE"]
 
 if "psi.ch" in vo_se:
     jobs = ["confs/sig-psi.conf", "confs/bkg-psi.conf"]
-elif "kbfi" in vo_se:
+elif "kbf" in vo_se:
     jobs = ["confs/sig-kbfi.conf", "confs/bkg-kbfi.conf"]
 else:
     jobs = ["confs/sig.conf", "confs/bkg.conf"]
@@ -46,6 +46,8 @@ if args.action == "hadd":
     completed_files = []
     input_filenames = []
     for job, wd in zip(jobs, workdirs):
+    #for job, wd in zip( ["confs/sig-psi.conf"], ["work.sig"] ):
+    #for job, wd in zip( ["confs/bkg-psi.conf"], ["work.bkg"] ):
         donefiles = glob.glob(wd + "/output/*/output.txt")
         for df in donefiles:
             input_filenames += map(lambda x: x.strip(), open(df).readlines())

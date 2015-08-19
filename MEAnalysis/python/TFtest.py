@@ -28,7 +28,8 @@ def main():
 
 
     # Open TFMatrix.dat to TFmat
-    pickle_f = open( 'MEAnalysis/root/transfer_functions.pickle', 'rb' )
+    #pickle_f = open( '../root/transfer_functions_notfull_oldabfs.pickle', 'rb' )
+    pickle_f = open( '../root/transfer_functions.pickle', 'rb' )
     TFmat = pickle.load( pickle_f )
     pickle_f.close()
 
@@ -50,7 +51,7 @@ def main():
     f1 = myTF.Make_Formula( set_reconstructed_eval_gen )
 
     # Set gen pt to 58 GeV
-    f1.SetParameter( 0, 58.0 )
+    f1.SetParameter( 0, 18.0 )
 
     print 'Specifics of the TF:'
     print f1.GetTitle()
@@ -77,7 +78,7 @@ def main():
     f2 = myTF.Make_CDF()
 
     # Set the mc/gen/quark pt
-    f2.SetParameter( 0, 58.0 )
+    f2.SetParameter( 0, 18.0 )
 
     print 'Specifics of the CDF:'
     print f2.GetTitle()

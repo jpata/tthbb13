@@ -193,7 +193,11 @@ class MEAnalyzer(FilterAnalyzer):
                 self.integrator,
                 MEM.ObjectType.Jet,
                 p4s=(jet.pt, jet.eta, jet.phi, jet.mass),
-                obs_dict={MEM.Observable.BTAG: jet.btagFlag, MEM.Observable.CSV: getattr(jet, mem_cfg.btagMethod)},
+                obs_dict={
+                    MEM.Observable.BTAG: jet.btagFlag,
+                    MEM.Observable.CSV: getattr(jet, mem_cfg.btagMethod, -1),
+                    MEM.Observable.PDGID: getattr(jet, "PDGID", 0)
+                    },
                 tf_dict={
                     MEM.TFType.bReco: jet.tf_b, MEM.TFType.qReco: jet.tf_l,
                 }
@@ -202,8 +206,9 @@ class MEAnalyzer(FilterAnalyzer):
                 print "memBQuark" if jet in bquarks else "memLQuark",\
                     jet.pt, jet.eta, jet.phi, jet.mass,\
                     ", Flag: ", jet.btagFlag,\
-                    ", CSV: ",  getattr(jet, mem_cfg.btagMethod),\
-                    ", Match: ", jet.tth_match_label, jet.tth_match_index\
+                    ", CSV: ",  getattr(jet, mem_cfg.btagMethod, -1),\
+                    ", PDGID: ",  getattr(jet, "PDGID", 0)
+                    #", Match: ", jet.tth_match_label, jet.tth_match_index\
                 
                 
         for lep in mem_cfg.lepton_candidates(event):
@@ -261,10 +266,15 @@ class MEAnalyzer(FilterAnalyzer):
                 if self.mem_configs.has_key(confname):
                     mem_cfg = self.mem_configs[confname]
                 else:
-                    if "meminput" in self.conf.general["verbosity"]:
-                        print "skipping", confname
-                    res[(hypo, confname)] = MEM.MEMOutput()
-                    continue
+                    if confname in self.memkeysToRun:
+                        raise KeyError(
+                            "Asked for configuration={0} but this was never specified in mem_configs.keys={1}".format(
+                                confname, list(self.mem_configs.keys())
+                            )
+                        )
+                    else:
+                        if "meminput" in self.conf.general["verbosity"]:
+                            print "skipping conf", confname
 
                 fstate = MEM.FinalState.Undefined
                 if "dl" in mem_cfg.mem_assumptions:
@@ -298,8 +308,7 @@ class MEAnalyzer(FilterAnalyzer):
                         confname in self.memkeysToRun
                     ):
                     
-                    if "meminput" in self.conf.general["verbosity"]:
-                        print "Integrator::run started hypo={0} conf={1}".format(hypo, confname)
+                    print "Integrator::run started hypo={0} conf={1}".format(hypo, confname)
                     self.configure_mem(event, mem_cfg)
                     r = self.integrator.run(
                         fstate,
@@ -307,8 +316,7 @@ class MEAnalyzer(FilterAnalyzer):
                         self.vars_to_integrate,
                         self.vars_to_marginalize
                     )
-                    if "meminput" in self.conf.general["verbosity"]:
-                        print "Integrator::run done hypo={0} conf={1}".format(hypo, confname)
+                    print "Integrator::run done hypo={0} conf={1}".format(hypo, confname)
 
                     res[(hypo, confname)] = r
                 else:

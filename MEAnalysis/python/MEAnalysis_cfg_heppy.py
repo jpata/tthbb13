@@ -4,6 +4,22 @@ from TTH.MEAnalysis.MEMConfig import MEMConfig
 import ROOT
 from ROOT import MEM
 
+def jet_baseline(jet, oldpt=None):
+    #in case pt has been rescaled, then need to rescale energy fractions
+    if oldpt is None:
+        oldpt = jet.pt
+    ptfrac = jet.pt / oldpt
+    
+    #X = x / oldpt
+    #Xnew = x / (ptfrac * oldpt) = X / ptfrac
+    return (jet.neHEF/ptfrac < 0.99
+        and jet.chEmEF/ptfrac < 0.99
+        and jet.neEmEF/ptfrac < 0.99
+        and jet.numberOfDaughters > 1
+        and jet.chHEF/ptfrac > 0.0
+        and jet.chMult/ptfrac > 0.0
+    )
+
 # LB: in fact,  mu.tightId should contain all the other cuts
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Tight_Muon
 # https://github.com/vhbb/cmssw/blob/vhbbHeppy722patch2/PhysicsTools/Heppy/python/physicsobjects/Muon.py
@@ -21,41 +37,41 @@ def mu_baseline(mu):
     )
 
 def print_mu(mu):
-    print "Muon: (pt=%s, eta=%s, tight=%s, pf=%s, glo=%s, dxy=%s, dz=%s, chi2=%s, nhits=%s, pix=%s, stat=%s, pfRelIso03=%s)" % (mu.pt, mu.eta, mu.tightId, mu.isPFMuon,  mu.isGlobalMuon, mu.dxy , mu.dz, mu.globalTrackChi2, (getattr(mu, "nMuonHits", 0) > 0 or getattr(mu, "nChamberHits", 0) > 0) , mu.pixelHits , mu.nStations, mu.pfRelIso03)
+    print "Muon: (pt=%s, eta=%s, tight=%s, pf=%s, glo=%s, dxy=%s, dz=%s, chi2=%s, nhits=%s, pix=%s, stat=%s, pfRelIso04=%s)" % (mu.pt, mu.eta, mu.tightId, mu.isPFMuon,  mu.isGlobalMuon, mu.dxy , mu.dz, mu.globalTrackChi2, (getattr(mu, "nMuonHits", 0) > 0 or getattr(mu, "nChamberHits", 0) > 0) , mu.pixelHits , mu.nStations, mu.pfRelIso04)
 
 
-def el_baseline_tight(el):
-    sca = abs(el.etaSc)
-    ret = (
-        not(sca > 1.4442 and sca < 1.5660) and
-        el.convVeto
-    )
-    if not ret:
-        return False
-
-    if sca <= 1.479:
-        ret = ret and (
-            (abs(el.eleDEta)    < 0.006046) and
-            (abs(el.eleDPhi)    < 0.028092) and
-            (el.eleSieie        < 0.009947) and
-            (el.eleHoE          < 0.045772) and
-            (abs(el.dxy)        < 0.008790) and
-            (abs(el.dz)         < 0.021226) and
-            (el.relIso03        < 0.069537)
-            #FIXME: expectedMissingInnerHits and hOverE 
-        )
-    elif sca < 2.5:
-        ret = ret and (
-            (abs(el.eleDEta)    < 0.007057) and
-            (abs(el.eleDPhi)    < 0.030159) and
-            (el.eleSieie        < 0.028237) and
-            (el.eleHoE          < 0.067778) and
-            (abs(el.dxy)        < 0.027984) and
-            (abs(el.dz)         < 0.133431) and
-            (el.relIso03        < 0.078265)
-            #FIXME: expectedMissingInnerHits and hOverE 
-        )
-    return ret
+#def el_baseline_tight(el):
+#    sca = abs(el.etaSc)
+#    ret = (
+#        not(sca > 1.4442 and sca < 1.5660) and
+#        el.convVeto
+#    )
+#    if not ret:
+#        return False
+#
+#    if sca <= 1.479:
+#        ret = ret and (
+#            (abs(el.eleDEta)    < 0.006046) and
+#            (abs(el.eleDPhi)    < 0.028092) and
+#            (el.eleSieie        < 0.009947) and
+#            (el.eleHoE          < 0.045772) and
+#            (abs(el.dxy)        < 0.008790) and
+#            (abs(el.dz)         < 0.021226) and
+#            (el.pfRelIso03        < 0.069537)
+#            #FIXME: expectedMissingInnerHits and hOverE 
+#        )
+#    elif sca < 2.5:
+#        ret = ret and (
+#            (abs(el.eleDEta)    < 0.007057) and
+#            (abs(el.eleDPhi)    < 0.030159) and
+#            (el.eleSieie        < 0.028237) and
+#            (el.eleHoE          < 0.067778) and
+#            (abs(el.dxy)        < 0.027984) and
+#            (abs(el.dz)         < 0.133431) and
+#            (el.pfRelIso03        < 0.078265)
+#            #FIXME: expectedMissingInnerHits and hOverE 
+#        )
+#    return ret
 
 def el_baseline_medium(el):
     sca = abs(el.etaSc)
@@ -74,7 +90,7 @@ def el_baseline_medium(el):
             (el.eleHoE          < 0.050537) and
             (abs(el.dxy)        < 0.012235) and
             (abs(el.dz)         < 0.042020) and
-            (el.relIso03        < 0.107587) and
+            (el.pfRelIso03      < 0.107587) and #delta-beta corrected relative iso
             (getattr(el, "eleExpMissingInnerHits", 0) <= 1) and
             (getattr(el, "eleooEmooP", 0) < 0.091942)
         )
@@ -86,7 +102,7 @@ def el_baseline_medium(el):
             (el.eleHoE          < 0.086782) and
             (abs(el.dxy)        < 0.036719) and
             (abs(el.dz)         < 0.138142) and
-            (el.relIso03        < 0.113254) and
+            (el.pfRelIso03      < 0.113254) and #delta-beta corrected relative iso
             (getattr(el, "eleExpMissingInnerHits", 0) <= 1) and
             (getattr(el, "eleooEmooP", 0) < 0.100683)
         )
@@ -109,7 +125,7 @@ def el_baseline_loose(el):
             (el.eleHoE          < 0.093068) and
             (abs(el.dxy)        < 0.035904) and
             (abs(el.dz)         < 0.075496) and
-            (el.relIso03        < 0.130136) and
+            (el.pfRelIso03        < 0.130136) and
             (getattr(el, "eleExpMissingInnerHits", 0) <= 1) and
             (getattr(el, "eleooEmooP", 0) < 0.189968)
         )
@@ -121,7 +137,7 @@ def el_baseline_loose(el):
             (el.eleHoE          < 0.115754) and
             (abs(el.dxy)        < 0.099266) and
             (abs(el.dz)         < 0.197897) and
-            (el.relIso03        < 0.163368) and
+            (el.pfRelIso03        < 0.163368) and
             (getattr(el, "eleExpMissingInnerHits", 0) <= 1) and
             (getattr(el, "eleooEmooP", 0) < 0.140662)
         )
@@ -204,7 +220,6 @@ class Conf:
             "tight_veto": {
                 "pt": 20,
                 "eta": 2.4,
-                "iso": 0.15,
                 "idcut": lambda el: el_baseline_loose(el),
             },
 
@@ -256,15 +271,19 @@ class Conf:
         "untaggedSelection": "btagLR",
         
         #how many jets to consider for the btag LR permutations
-        "NJetsForBTagLR": 8
+        "NJetsForBTagLR": 6,
+
+        "selection": jet_baseline
     }
 
     general = {
         "controlPlotsFileOld": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsTEST.root",
         "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV6_finerPt_722sync.root",
-        "sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_722sync.py",
-        #"sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_prev12.py",
+        #"sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_722sync.py",
+        #"sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_722minisync.py",
+        "sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_v12.py",
         "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions.pickle",
+        "transferFunctions_sj_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions_sj.pickle",
         "systematics": ["nominal"],
         #"systematics": ["nominal", "JESUp", "JESDown", "raw"],
         
@@ -275,37 +294,14 @@ class Conf:
         # "matching" - print out the association between gen and reco objects
         #"verbosity": ["eventboundary", "input", "matching", "gen", "reco", "meminput"],
         "verbosity": [
-            #"debug"
-            #"reco",
-            #"meminput"
+            #"gen", #print out gen-level info
+            #"debug", #very high-level debug info
+            #"reco", #info about reconstructed final state
+            #"meminput" #info about particles used for MEM input
         ],
 
-
         #"eventWhitelist": [
-        #    (1, 320, 31947),
-        #    (1, 83,   8206),
-        ##     (1,333,33255 ),
-       ##     (1,931,93077),
-       ##     (1,320,31933),
-       ##     (1,628,62736),
-       ##     (1, 627, 62622)
-        ##    (1, 214, 21333),
-        ##    #cat6
-        ##    (1, 1326, 132576),
-        ##    (1, 1001, 100098),
-        ##    (1, 1075, 107401),
-        ##    (1, 1910, 190937),
-        ##    (1, 739, 73869),
-
-        ##    #root [2] tree->Scan("run:lumi:evt:mem_tth_p[0]", "njets==6 && nBCSVM==4 && is_sl==1 && mem_tth_p[0]==0")
-        ##    (1,  558,  55798),
-        ##    (1,  566,  56576),
-        ##    (1,   12,   1121),
-        ##    (1,  714,  71316),
-        ##    (1, 1222, 122152),
-        ##    (1,  856,  85542),
-        ##    (1,  300,  29931),
-        ##    (1, 1675, 167428),
+        #    (1, 1094, 109371),
         #]
     }
 
@@ -325,7 +321,7 @@ class Conf:
 
         #Actually run the ME calculation
         #If False, all ME values will be 0
-        "calcME": True,
+        "calcME": False,
 
         #Generic event-dependent selection function applied
         #just before the MEM. If False, MEM is skipped
@@ -343,14 +339,16 @@ class Conf:
             "SL_0w2h2t_memLR",
 
             # with rnd CSV values
-            "DL_0w2h2t_Rndge4t"
+            "DL_0w2h2t_Rndge4t",
+            "SL_2w2h2t_sj",
         ],
 
         #This configures the MEMs to actually run, the rest will be set to 0
         "methodsToRun": [
-            #"SL_0w2h2t",
-            #"DL_0w2h2t",
-            #"SL_2w2h2t",
+            "SL_0w2h2t",
+            "DL_0w2h2t",
+            "SL_2w2h2t",
+            "SL_2w2h2t_sj",
             #"SL_2w2h2t_memLR",
             #"SL_0w2h2t_memLR",
             #"DL_0w2h2t_Rndge4t"
@@ -366,6 +364,7 @@ CvectorPSVar = getattr(ROOT, "std::vector<MEM::PSVar::PSVar>")
 ###
 ### SL_2w2h2t
 ###
+#FIXME: why == here and not >= ?
 c = MEMConfig()
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 1 and
@@ -464,6 +463,49 @@ strat.push_back(MEM.Permutations.FirstRankedByBTAG)
 c.cfg.perm_pruning = strat
 Conf.mem_configs["DL_0w2h2t_Rndge4t"] = c
 
+#######################
+#Subjet configurations#
+#######################
+
+#SL_2w2h2t_sj
+c = MEMConfig()
+# Select the custom jet lists
+c.b_quark_candidates = lambda event: \
+                                     event.boosted_bjets
+c.l_quark_candidates = lambda event: \
+                                     event.boosted_ljets
+c.do_calculate = lambda ev, mcfg: (
+    len(mcfg.lepton_candidates(ev)) == 1 and
+    len(mcfg.b_quark_candidates(ev)) == 4 and
+    len(mcfg.l_quark_candidates(ev)) == 2 and
+    ev.PassedSubjetAnalyzer == True
+)
+c.mem_assumptions.add("sl")
+strat = CvectorPermutations()
+c.mem_assumptions.add("sl")
+strat = CvectorPermutations()
+strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
+strat.push_back(MEM.Permutations.QUntagged)
+strat.push_back(MEM.Permutations.BTagged)
+c.cfg.perm_pruning = strat
+Conf.mem_configs["SL_2w2h2t_sj"] = c
+
+##SL_2w2h2t_sj_perm
+#c = MEMConfig()
+#c.do_calculate = lambda ev, mcfg: (
+#    len(mcfg.lepton_candidates(ev)) == 1 and
+#    len(mcfg.b_quark_candidates(ev)) >= 4 and
+#    len(mcfg.l_quark_candidates(ev)) == 2
+#)
+#c.mem_assumptions.add("sl")
+##FIXME: Thomas, why this is not required?
+##strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
+#strat = CvectorPermutations()
+#strat.push_back(MEM.Permutations.HEPTopTagged)
+#strat.push_back(MEM.Permutations.QUntagged)
+#strat.push_back(MEM.Permutations.BTagged)
+#c.cfg.perm_pruning = strat
+#Conf.mem_configs["SL_2w2h2t_sj_perm"] = c
 
 for cn, c in Conf.mem_configs.items():
     print "MEM config", cn, c.mem_assumptions

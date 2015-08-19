@@ -12,7 +12,7 @@ import TTH.MEAnalysis.TFClasses as TFClasses
 
 #Import the default list of samples
 #from TTH.MEAnalysis.samples_vhbb import samples, sample_version, lfn_to_pfn
-from TTH.MEAnalysis.samples_722sync import samples, sample_version, lfn_to_pfn
+from TTH.MEAnalysis.samples_base import lfn_to_pfn
 
 
 #Create configuration object based on environment variables
@@ -34,11 +34,16 @@ pi_file = open(conf.general["transferFunctionsPickle"] , 'rb')
 conf.tf_matrix = pickle.load(pi_file)
 pi_file.close()
 
+#Load transfer functions from pickle file
+pi_file = open(conf.general["transferFunctions_sj_Pickle"] , 'rb')
+conf.tf_sj_matrix = pickle.load(pi_file)
+pi_file.close()
+    
 #Load the input sample dictionary
 #Samples are configured in the Conf object, by default, we use samples_vhbb
 print "loading samples from", conf.general["sampleFile"]
 samplefile = imp.load_source("samplefile", conf.general["sampleFile"])
-from samplefile import samples_dict
+from samplefile import samples_dict, samples
 
 #input component
 #several input components can be declared,
@@ -47,14 +52,13 @@ inputSamples = []
 for sn in sorted(samples_dict.keys()):
     s = samples_dict[sn]
     inputSample = cfg.Component(
-        s.nickName.value(),
+        s.name.value(),
         files = map(lfn_to_pfn, s.subFiles.value()),
         tree_name = "tree",
         n_gen = s.nGen.value(),
         xs = s.xSec.value()
     )
     inputSample.isMC = s.isMC.value()
-    inputSample.perJob = s.perJob.value()
     #use sample only if not skipped and subFiles defined
     if s.skip.value() == False and len(s.subFiles.value())>0:
         inputSamples.append(inputSample)
@@ -137,6 +141,12 @@ wtag = cfg.Analyzer(
     _conf = conf
 )
 
+subjet_analyzer = cfg.Analyzer(
+    MECoreAnalyzers.SubjetAnalyzer,
+    'subjet',
+    _conf = conf
+)
+
 #Calls the C++ MEM integrator with good_jets, good_leptons and
 #the ME category
 mem_analyzer = cfg.Analyzer(
@@ -144,7 +154,6 @@ mem_analyzer = cfg.Analyzer(
     'mem',
     _conf = conf
 )
-
 
 gentth = cfg.Analyzer(
     MECoreAnalyzers.GenTTHAnalyzer,
@@ -188,6 +197,7 @@ sequence = cfg.Sequence([
     mecat,
     genrad,
     gentth,
+    subjet_analyzer,
     mem_analyzer,
     treevar,
     treeProducer
@@ -243,7 +253,7 @@ if __name__ == "__main__":
 
         #Configure the number of events to run
         from PhysicsTools.HeppyCore.framework.looper import Looper
-        nEvents = samp.perJob
+        nEvents = 1000
 
 
         kwargs = {}
