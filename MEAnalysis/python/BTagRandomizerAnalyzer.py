@@ -19,15 +19,16 @@ class BTagRandomizerAnalyzer(FilterAnalyzer):
         h3_b = tf.Get("csv_b_pt_eta")
         h3_c = tf.Get("csv_c_pt_eta")
         h3_l = tf.Get("csv_l_pt_eta")
+        #print h3_b, h3_c, h3_l, tf.Get("csv_s_pt_eta"), tf.Get("csv_u_pt_eta"), tf.Get("csv_g_pt_eta")
         btag_pdfs = maptype()
         btag_pdfs[MEM.DistributionType.csv_b] = h3_b
         btag_pdfs[MEM.DistributionType.csv_c] = h3_c
         btag_pdfs[MEM.DistributionType.csv_l] = h3_l
-        if tf.Get("csv_s_pt_eta") != 0:
+        if tf.Get("csv_s_pt_eta") != None:
             btag_pdfs[MEM.DistributionType.csv_s] = tf.Get("csv_s_pt_eta")
-        if tf.Get("csv_u_pt_eta") != 0:
+        if tf.Get("csv_u_pt_eta") != None:
             btag_pdfs[MEM.DistributionType.csv_u] = tf.Get("csv_u_pt_eta")
-        if tf.Get("csv_g_pt_eta") != 0:
+        if tf.Get("csv_g_pt_eta") != None:
             btag_pdfs[MEM.DistributionType.csv_g] = tf.Get("csv_g_pt_eta")
 
         self.rnd = MEM.BTagRandomizer(0, 1, btag_pdfs, 1)
