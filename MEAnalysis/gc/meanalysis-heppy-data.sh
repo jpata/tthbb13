@@ -11,14 +11,14 @@
 
 
 #on PSI, CMSSW_BASE is not exported with the grid job, need to set manually
-CMSSW_BASE=$HOME/tth/sw/CMSSW/
+CMSSW_BASE=$HOME/Run2/TTH-74X/CMSSW/
 
 #here we use @...@ to give grid-control the possibility to substitute the configuration file name
 #export ME_CONF=$CMSSW_BASE/src/TTH/MEAnalysis/python/@me_conf@
 export ME_CONF=$CMSSW_BASE/src/TTH/MEAnalysis/python/@me_conf@
 
 #print out the environment
-env
+#env
 set -e
 
 #set env
@@ -40,7 +40,7 @@ eval `scramv1 runtime -sh`
 cd $MY_SCRATCH
 
 #call heppy code
-python ${CMSSW_BASE}/src/TTH/MEAnalysis/gc/MEAnalysis_heppy_gc.py
+python ${CMSSW_BASE}/src/TTH/MEAnalysis/gc/MEAnalysis_heppy_gc_Data.py
 echo "MEAnalysis is done"
 
 #copy output
@@ -48,6 +48,10 @@ ME_CONF_NAME=$(basename "$ME_CONF")
 OUTDIR=$HOME/tth/gc/${TASK_ID}/${ME_CONF_NAME%.*}/${DATASETPATH}/
 mkdir -p $OUTDIR 
 echo "copying output"
-OFNAME=$OUTDIR/output_${MY_JOBID}.root
-cp $MY_SCRATCH/Loop/tree.root $OFNAME
+#OFNAME=$OUTDIR/output_${MY_JOBID}.root
+OFNAME=output_${MY_JOBID}.root
+#cp $MY_SCRATCH/Loop/tree.root $OFNAME
+SRM_DIR="srm://t3se01.psi.ch:8443/srm/managerv2?SFN=/pnfs/psi.ch/cms/trivcat/store/user/leac/ME_V12"
+SERESULTDIR=$SRM_DIR/${TASK_ID}/${ME_CONF_NAME%.*}/${DATASETPATH}/
+lcg-cp -b -D srmv2 file:$MY_SCRATCH/Loop/tree.root $SERESULTDIR/$OFNAME
 echo $OFNAME > output.txt

@@ -1,4 +1,5 @@
 from TTH.MEAnalysis.Analyzer import FilterAnalyzer
+import ROOT
 class LeptonAnalyzer(FilterAnalyzer):
     """
     Analyzes leptons and applies single-lepton and di-lepton selection.
@@ -60,8 +61,6 @@ class LeptonAnalyzer(FilterAnalyzer):
             for b in ["", "_veto"]:
                 sumleps = []
                 for l in ["mu", "el"]:
-                    if "debug" in self.conf.general["verbosity"]:
-                        print a,b,l
                     lepcuts = self.conf.leptons[l][a+b]
                     incoll = getattr(event, l)
 
@@ -84,9 +83,6 @@ class LeptonAnalyzer(FilterAnalyzer):
                         good = getattr(event, "{0}_{1}".format(l, a))
                         #veto = veto_cuts && !(signal)
                         leps = filter(lambda x: x not in good, leps)
-                    if "debug" in self.conf.general["verbosity"]:
-                        for it in leps:
-                            (self.conf.leptons[l]["debug"])(it)
 
                     sumleps += leps
                     lt = l + "_" + a + b
@@ -101,6 +97,9 @@ class LeptonAnalyzer(FilterAnalyzer):
 
         event.is_sl = (event.n_lep_tight == 1 and event.n_lep_tight_veto == 0)
         event.is_dl = (event.n_lep_loose == 2 and event.n_lep_loose_veto == 0)
+        event.is_fh = (not event.is_sl and not event.is_dl)
+        if "debug" in self.conf.general["verbosity"]:
+            print "DEBUG: is_sl, is_dl, is_fh", event.is_sl, event.is_dl, event.is_fh
 
         if event.is_sl:
             event.good_leptons = event.mu_tight + event.el_tight
@@ -108,8 +107,12 @@ class LeptonAnalyzer(FilterAnalyzer):
         if event.is_dl:
             event.good_leptons = event.mu_loose + event.el_loose
             event.veto_leptons = event.mu_loose_veto + event.el_loose_veto
+        if event.is_fh:
+            event.good_leptons = []
+            event.veto_leptons = []
 
-        passes = event.is_sl or event.is_dl
+        #apply configuration-dependent selection
+        passes = self.conf.leptons["selection"](event)
         if event.is_sl and event.is_dl:
             print "DEBUG: The event (%s,%s,%s) is both sl and dl" % (event.input.run,event.input.lumi,event.input.evt)
             passes = False

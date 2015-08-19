@@ -33,9 +33,15 @@ class JetAnalyzer(FilterAnalyzer):
         super(JetAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
         self.conf = cfg_ana._conf
 
+    def beginLoop(self, setup):
+        super(JetAnalyzer, self).beginLoop(setup)
+        self.inputCounter = ROOT.TH1F("JetAnalyzer_Count","Count",1,0,2)
+        self.inputCounterPosWeight = ROOT.TH1F("JetAnalyzer_CountPosWeight","Count genWeight>0",1,0,2)
+        self.inputCounterNegWeight = ROOT.TH1F("JetAnalyzer_CountNegWeight","Count genWeight<0",1,0,2)
+
     def variateJets(self, jets, systematic, sigma):
-        if systematic == "JES":
-            newjets = deepcopy(jets)
+        newjets = deepcopy(jets)
+        if self.cfg_comp.isMC and systematic == "JES":
             for i in range(len(jets)):
                 if sigma > 0:
                     cf = sigma * newjets[i].corr_JECUp / newjets[i].corr
@@ -52,6 +58,15 @@ class JetAnalyzer(FilterAnalyzer):
         return newjets
 
     def process(self, event):
+
+        self.inputCounter.Fill(1)
+        if self.cfg_comp.isMC:
+            genWeight = getattr(event.input, "genWeight")
+            if genWeight > 0:
+                self.inputCounterPosWeight.Fill(1)
+            elif genWeight < 0:
+                self.inputCounterNegWeight.Fill(1)
+ 
         #pt-descending input jets
         if "input" in self.conf.general["verbosity"]:
             print "jets"
@@ -158,7 +173,8 @@ class JetAnalyzer(FilterAnalyzer):
                         #else:
                         #    print "jet does not pass selection after subtraction", jet.pt, newjet.pt, jet.eta, newjet.eta
                 else:
-                    raise ValueError("wrong idx: idx={0} len(coll)={1}".format(idx, len(coll)))
+                    #raise ValueError("wrong idx: idx={0} len(coll)={1}".format(idx, len(coll)))
+                    print "[JetAnalyzer] jet removal, wrong idx: idx={0} len(coll)={1}".format(idx, len(coll))
         for jet in jets_to_remove:
             #print "removing jet", jet.pt, jet.eta
             if jet in event.good_jets:
@@ -197,10 +213,11 @@ class JetAnalyzer(FilterAnalyzer):
         event.btagged_jets_bdisc = event.btagged_jets_bdisc[self.conf.jets["btagWP"]]
 
         #Find how many of these tagged jets are actually true b jets
-        event.n_tagwp_tagged_true_bjets = 0
-        for j in event.btagged_jets_bdisc:
-            if abs(j.mcFlavour) == 5:
-                event.n_tagwp_tagged_true_bjets += 1
+        if self.cfg_comp.isMC:
+            event.n_tagwp_tagged_true_bjets = 0
+            for j in event.btagged_jets_bdisc:
+                if abs(j.mcFlavour) == 5:
+                    event.n_tagwp_tagged_true_bjets += 1
 
         #Require at least 3 (if is_sl) or 2 (is_dl) good jets in order to continue analysis
         passes = True
@@ -212,24 +229,29 @@ class JetAnalyzer(FilterAnalyzer):
             if len(event.good_jets) >=2:
                 if event.good_jets[0].pt<self.conf.jets["pt"] or event.good_jets[1].pt<self.conf.jets["pt"]:
                     passes = False
-                
-
+        if event.is_fh:
+            if len(event.good_jets) < 6:      
+                passes = False        
+            if len(event.good_jets) >=6:
+                if event.good_jets[5].pt<self.conf.jets["pt_fh"]:
+                    passes = False
 
         corrMet_px = event.MET.px
         corrMet_py = event.MET.py
         sum_dEx = 0
         sum_dEy = 0
-        for jet in event.good_jets:
-            Prec = lvec(jet)
-            Pgen = lvec(jet)
-            Pgen.SetPtEtaPhiM(jet.mcPt, jet.mcEta, jet.mcPhi, jet.mcM)
-            Erec = Prec.E()
-            Egen = Pgen.E()
-            dEx = (Erec-Egen) * Prec.Px()/Prec.P()
-            dEy = (Erec-Egen) * Prec.Py()/Prec.P()
-            #print Erec, Egen
-            sum_dEx += dEx
-            sum_dEy += dEy
+        if self.cfg_comp.isMC:
+            for jet in event.good_jets:
+                Prec = lvec(jet)
+                Pgen = lvec(jet)
+                Pgen.SetPtEtaPhiM(jet.mcPt, jet.mcEta, jet.mcPhi, jet.mcM)
+                Erec = Prec.E()
+                Egen = Pgen.E()
+                dEx = (Erec-Egen) * Prec.Px()/Prec.P()
+                dEy = (Erec-Egen) * Prec.Py()/Prec.P()
+                #print Erec, Egen
+                sum_dEx += dEx
+                sum_dEy += dEy
         corrMet_px += sum_dEx
         corrMet_py += sum_dEy
         #print (sum_dEx, sum_dEy), (corrMet_px, event.met[0].px), (corrMet_py, event.met[0].py)

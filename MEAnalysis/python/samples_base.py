@@ -17,6 +17,12 @@ xsec[("tthbb", "8TeV")] = xsec[("tth", "8TeV")] * br_h_to_bb
 xsec[("tth", "13TeV")] = 0.5085
 xsec[("tthbb", "13TeV")] = xsec[("tth", "13TeV")] * br_h_to_bb
 
+xsec[("qcd_ht300to500", "13TeV")] = 366800.0
+xsec[("qcd_ht500to700", "13TeV")] = 29370.0
+xsec[("qcd_ht700to1000", "13TeV")] = 6524.0
+xsec[("qcd_ht1500to2000", "13TeV")] = 121.5
+xsec[("qcd_ht2000toinf", "13TeV")] = 25.42
+
 #Configure the site-specific file path
 import os
 hn = os.environ["HOSTNAME"]
