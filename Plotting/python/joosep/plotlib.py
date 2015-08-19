@@ -173,7 +173,7 @@ def mc_stack(hlist, colors="auto"):
         coloriter = iter(plt.cm.jet(np.linspace(0,1,len(hlist))))
         for h in hlist:
             h.color = next(coloriter)
-    elif isinstance(colors, list) and len(color) == len(hlist):
+    elif isinstance(colors, list) and len(colors) == len(hlist):
         for h, c in zip(hlist, colors):
             h.color = c
 
@@ -231,6 +231,7 @@ def draw_data_mc(tf, hname, samples, **kwargs):
     rebin = kwargs.get("rebin", 1)
     title_extended = kwargs.get("title_extended", "")
     do_legend = kwargs.get("do_legend", True)
+    colors = kwargs.get("colors", "auto")
 
     hs = OrderedDict()
     for sample, sample_name in samples:
@@ -251,7 +252,7 @@ def draw_data_mc(tf, hname, samples, **kwargs):
         y=0.96, x=0.04,
         horizontalalignment="left", verticalalignment="top"
     )
-    r = mc_stack(hs.values())
+    r = mc_stack(hs.values(), colors=colors)
     
     hsig = hs[samples[0][0]].Clone()
     tot_mc = sum(hs.values())
@@ -259,6 +260,7 @@ def draw_data_mc(tf, hname, samples, **kwargs):
     hsig.Scale(0.2 * tot_mc.Integral() / hsig.Integral())
     hsig.title = samples[0][1] + " norm"
     hsig.linewidth=2
+    hsig.fillstyle = None
     hist([hsig])
     
     tot_mc.title = "pseudodata"

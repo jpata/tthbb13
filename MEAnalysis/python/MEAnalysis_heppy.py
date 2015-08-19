@@ -52,14 +52,13 @@ inputSamples = []
 for sn in sorted(samples_dict.keys()):
     s = samples_dict[sn]
     inputSample = cfg.Component(
-        s.nickName.value(),
+        s.name.value(),
         files = map(lfn_to_pfn, s.subFiles.value()),
         tree_name = "tree",
         n_gen = s.nGen.value(),
         xs = s.xSec.value()
     )
     inputSample.isMC = s.isMC.value()
-    inputSample.perJob = s.perJob.value()
     #use sample only if not skipped and subFiles defined
     if s.skip.value() == False and len(s.subFiles.value())>0:
         inputSamples.append(inputSample)
@@ -254,7 +253,7 @@ if __name__ == "__main__":
 
         #Configure the number of events to run
         from PhysicsTools.HeppyCore.framework.looper import Looper
-        nEvents = samp.perJob
+        nEvents = 1000
 
 
         kwargs = {}

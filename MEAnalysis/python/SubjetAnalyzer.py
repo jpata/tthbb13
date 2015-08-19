@@ -46,7 +46,8 @@ class SubjetAnalyzer(FilterAnalyzer):
 
 
     def endLoop(self, setup):
-        print 'Running endLoop'
+        if "subjet" in self.conf.general["verbosity"]:
+            print 'Running endLoop'
 
 
     def process(self, event):
@@ -61,7 +62,8 @@ class SubjetAnalyzer(FilterAnalyzer):
     def _process(self, event):
         event.passes_subjet = True
 
-        print 'Printing from SubjetAnalyzer! iEv = {0}'.format(event.iEv)
+        if "subjet" in self.conf.general["verbosity"]:
+            print 'Printing from SubjetAnalyzer! iEv = {0}'.format(event.iEv)
 
         # Is set to True only after the event passed all criteria
         setattr( event, 'PassedSubjetAnalyzer', False )
@@ -295,8 +297,10 @@ class SubjetAnalyzer(FilterAnalyzer):
         event.n_excluded_bjets = n_excluded_bjets
         event.n_excluded_ljets = n_excluded_ljets
 
-        print 'Exiting SubjetAnalyzer! event.PassedSubjetAnalyzer = {0}'.format(
-            event.PassedSubjetAnalyzer )
+        if "subjet" in self.conf.general["verbosity"]:
+            print 'Exiting SubjetAnalyzer! event.PassedSubjetAnalyzer = {0}'.format(
+                event.PassedSubjetAnalyzer
+            )
         return event
 
 
