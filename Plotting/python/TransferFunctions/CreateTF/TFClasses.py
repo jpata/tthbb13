@@ -240,7 +240,7 @@ class TF:
     
     def Make_CDF(self):
 
-        SBF = self.SingleBinFunc
+        SBF = copy.deepcopy(self.SingleBinFunc)
         SBFstr = SBF.str
         
         if hasattr( SBF, 'Is_DG' ):
@@ -257,6 +257,7 @@ class TF:
 
             DG_mean_list = getattr( SBF, 'DG_mean' )
 
+
             # Get list (without duplicates) of the SBF variables used in the rms
             SBFvars_in_mean = []
             for DG_mean in DG_mean_list:
@@ -267,7 +268,7 @@ class TF:
             for mean in SBFvars_in_mean:
 
                 # Get the corresponding ABF
-                ABFunc = self.AcrossBinFuncs[ int(mean) ]
+                ABFunc = copy.deepcopy( self.AcrossBinFuncs[ int(mean) ] )
                 ABFstr = ABFunc.str
 
                 # Shift parameters in ABF
@@ -343,13 +344,14 @@ class TF:
 
             # Set the parameters
             mean_values.extend( RMS_values )
+
+
             for ( i, value ) in enumerate( mean_values ):
                 if i > 0: output_TF1.SetParameter( i, value )
-                
                 #print '[{0}] = {1}'.format( i, output_TF1.GetParameter(i) )
             #print '\n{0}'.format( output_TF1.GetTitle() )
 
-            return output_TF1
+            return copy.deepcopy( output_TF1 )
 
 
         elif hasattr( SBF, 'Is_SG' ):

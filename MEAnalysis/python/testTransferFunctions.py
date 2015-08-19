@@ -1,5 +1,5 @@
 import TTH.MEAnalysis.TFClasses as TFClasses
-from TTH.MEAnalysis.MEAnalysis_cfg_heppy_local import Conf
+from TTH.MEAnalysis.MEAnalysis_cfg_heppy import Conf
 import pickle
 import ROOT
 ROOT.gROOT.SetBatch(False)

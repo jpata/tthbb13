@@ -18,7 +18,7 @@ for sample_name, sample in samples_dict.items():
         pfn = lfn_to_pfn(f)
         print("opening", pfn)
         tf = ROOT.TFile.Open(pfn)
-        if (tf == None or tf is None):
+        if (tf == None or tf is None or tf.IsZombie()):
             print("could not read file {0}, {1}, {2}".format(pfn, tf, tf.IsZombie()), file=sys.stderr)
         else:
             tt = tf.Get("tree")

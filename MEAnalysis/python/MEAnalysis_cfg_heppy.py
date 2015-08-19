@@ -282,6 +282,7 @@ class Conf:
         #"sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_722minisync.py",
         "sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_v12.py",
         "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions.pickle",
+        "transferFunctions_sj_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions_sj.pickle",
         "systematics": ["nominal"],
         #"systematics": ["nominal", "JESUp", "JESDown", "raw"],
         
@@ -337,7 +338,8 @@ class Conf:
             "SL_0w2h2t_memLR",
 
             # with rnd CSV values
-            "DL_0w2h2t_Rndge4t"
+            "DL_0w2h2t_Rndge4t",
+            "SL_2w2h2t_sj",
         ],
 
         #This configures the MEMs to actually run, the rest will be set to 0
@@ -345,6 +347,7 @@ class Conf:
             "SL_0w2h2t",
             "DL_0w2h2t",
             "SL_2w2h2t",
+            "SL_2w2h2t_sj",
             #"SL_2w2h2t_memLR",
             #"SL_0w2h2t_memLR",
             #"DL_0w2h2t_Rndge4t"
@@ -360,6 +363,7 @@ CvectorPSVar = getattr(ROOT, "std::vector<MEM::PSVar::PSVar>")
 ###
 ### SL_2w2h2t
 ###
+#FIXME: why == here and not >= ?
 c = MEMConfig()
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 1 and
@@ -458,6 +462,49 @@ strat.push_back(MEM.Permutations.FirstRankedByBTAG)
 c.cfg.perm_pruning = strat
 Conf.mem_configs["DL_0w2h2t_Rndge4t"] = c
 
+#######################
+#Subjet configurations#
+#######################
+
+#SL_2w2h2t_sj
+c = MEMConfig()
+# Select the custom jet lists
+c.b_quark_candidates = lambda event: \
+                                     event.boosted_bjets
+c.l_quark_candidates = lambda event: \
+                                     event.boosted_ljets
+c.do_calculate = lambda ev, mcfg: (
+    len(mcfg.lepton_candidates(ev)) == 1 and
+    len(mcfg.b_quark_candidates(ev)) == 4 and
+    len(mcfg.l_quark_candidates(ev)) == 2 and
+    ev.PassedSubjetAnalyzer == True
+)
+c.mem_assumptions.add("sl")
+strat = CvectorPermutations()
+c.mem_assumptions.add("sl")
+strat = CvectorPermutations()
+strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
+strat.push_back(MEM.Permutations.QUntagged)
+strat.push_back(MEM.Permutations.BTagged)
+c.cfg.perm_pruning = strat
+Conf.mem_configs["SL_2w2h2t_sj"] = c
+
+##SL_2w2h2t_sj_perm
+#c = MEMConfig()
+#c.do_calculate = lambda ev, mcfg: (
+#    len(mcfg.lepton_candidates(ev)) == 1 and
+#    len(mcfg.b_quark_candidates(ev)) >= 4 and
+#    len(mcfg.l_quark_candidates(ev)) == 2
+#)
+#c.mem_assumptions.add("sl")
+##FIXME: Thomas, why this is not required?
+##strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
+#strat = CvectorPermutations()
+#strat.push_back(MEM.Permutations.HEPTopTagged)
+#strat.push_back(MEM.Permutations.QUntagged)
+#strat.push_back(MEM.Permutations.BTagged)
+#c.cfg.perm_pruning = strat
+#Conf.mem_configs["SL_2w2h2t_sj_perm"] = c
 
 for cn, c in Conf.mem_configs.items():
     print "MEM config", cn, c.mem_assumptions
