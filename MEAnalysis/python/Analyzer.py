@@ -56,7 +56,8 @@ class EventWeightAnalyzer(FilterAnalyzer):
 
     def process(self, event):
         self.counters["processing"].inc("processed")
-        event.weight_xs = self.xs / self.n_gen
+        event.weight_xs = self.xs/float(self.n_gen)
+       
 
         return True
 
