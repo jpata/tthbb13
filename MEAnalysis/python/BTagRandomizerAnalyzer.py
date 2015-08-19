@@ -19,16 +19,23 @@ class BTagRandomizerAnalyzer(FilterAnalyzer):
         h3_b = tf.Get("csv_b_pt_eta")
         h3_c = tf.Get("csv_c_pt_eta")
         h3_l = tf.Get("csv_l_pt_eta")
+        #print h3_b, h3_c, h3_l, tf.Get("csv_s_pt_eta"), tf.Get("csv_u_pt_eta"), tf.Get("csv_g_pt_eta")
         btag_pdfs = maptype()
         btag_pdfs[MEM.DistributionType.csv_b] = h3_b
         btag_pdfs[MEM.DistributionType.csv_c] = h3_c
         btag_pdfs[MEM.DistributionType.csv_l] = h3_l
-        self.rnd = MEM.BTagRandomizer(0, -1, btag_pdfs, 1)
+        if tf.Get("csv_s_pt_eta") != None:
+            btag_pdfs[MEM.DistributionType.csv_s] = tf.Get("csv_s_pt_eta")
+        if tf.Get("csv_u_pt_eta") != None:
+            btag_pdfs[MEM.DistributionType.csv_u] = tf.Get("csv_u_pt_eta")
+        if tf.Get("csv_g_pt_eta") != None:
+            btag_pdfs[MEM.DistributionType.csv_g] = tf.Get("csv_g_pt_eta")
+
+        self.rnd = MEM.BTagRandomizer(0, 1, btag_pdfs, 1)
         self.btagWP = self.conf.jets["btagWPs"][self.conf.jets["btagWP"]][1]
 
         self.jet_categories = []
         for cat in self.conf.bran["jetCategories"].items():
-            #print cat[1][0], cat[1][1], self.btagWP, cat[1][2], cat[0]
             jetcat = MEM.JetCategory(cat[1][0], cat[1][1], self.btagWP, cat[1][2], cat[0] )
             self.jet_categories.append( jetcat )
         
@@ -71,10 +78,10 @@ class BTagRandomizerAnalyzer(FilterAnalyzer):
         pos = -1
         for jc in self.vec_jet_categories:
             pos += 1
+            jc.seed = (event.input.evt + event.input.lumi*jc.tag)
             if jc.ntags_l <= event.numJets:
                 run_vec_jet_categories.push_back(jc)
                 posrun.append( pos )
-
         ret = self.rnd.run_all(run_vec_jet_categories)
 
 
@@ -92,20 +99,14 @@ class BTagRandomizerAnalyzer(FilterAnalyzer):
             else:
                 setattr(event, "b_rnd_results_"+catname, [0,0,0,0] )
                 setattr(event, "b_inp_results_"+catname, [0,0,0,0] )
-            #b_rndval_results = []
-            #b_inpval_results = []
             for j in range(event.numJets):
                 inpval = event.good_jets[j].btagCSV
                 rndval = inpval
                 if wasrun:
                     inpval = out.input_btag[j] 
                     rndval = out.rnd_btag[j] 
-                #b_rndval_results.append( rndval )
-                #b_inpval_results.append( inpval )
                 setattr(event.good_jets[j], "btagCSVInp"+catname, inpval )
                 setattr(event.good_jets[j], "btagCSVRnd"+catname, rndval )
-            #setattr(event, "b_rndval_results_"+catname, b_rndval_results)
-            #setattr(event, "b_inpval_results_"+catname, b_inpval_results)
             
             countTags = 0
             for jet in event.good_jets: 
