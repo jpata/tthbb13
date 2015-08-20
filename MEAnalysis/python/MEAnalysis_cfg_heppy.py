@@ -233,7 +233,8 @@ class Conf:
                 "eta": 2.4,
                 "idcut": lambda el: el_baseline_loose(el),
             },
-            "isotype": "pfRelIso03", #pfRelIso - delta-beta, relIso - rho
+            #"isotype": "pfRelIso03", #pfRelIso - delta-beta, relIso - rho
+            "isotype": "relIso03", #pfRelIso - delta-beta, relIso - rho
             "debug" : print_el
         },
         "selection": lambda event: event.is_sl or event.is_dl
@@ -265,7 +266,8 @@ class Conf:
         #These working points are evaluated and stored in the trees as nB* - number of jets passing the WP
         #https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideBTagging#Preliminary_working_or_operating
         "btagWPs": {
-            "CSVM": ("btagCSV", 0.814),
+            #"CSVM": ("btagCSV", 0.814),
+            "CSVM": ("btagCSV", 0.89),
             "CSVL": ("btagCSV", 0.423),
             "CSVT": ("btagCSV", 0.941)
         },
@@ -280,13 +282,14 @@ class Conf:
     }
 
     trigger = {
-       
-      
+
         "filter": False,
         "HLTpaths": [
-            "HLT_BIT_HLT_PFHT400_SixJet30_BTagCSV0p5_2PFBTagCSV_v",
-            "HLT_BIT_HLT_PFHT450_SixJet40_PFBTagCSV_v",
-            "HLT_ttHhardonicLowLumi"
+            "HLT_BIT_HLT_Ele27_eta2p1_WP85_Gsf_HT200_v",
+            "HLT_BIT_HLT_IsoMu24_eta2p1_v"
+            #"HLT_BIT_HLT_PFHT400_SixJet30_BTagCSV0p5_2PFBTagCSV_v",
+            #"HLT_BIT_HLT_PFHT450_SixJet40_PFBTagCSV_v",
+            #"HLT_ttHhardonicLowLumi",
             ],
       
     }
@@ -310,6 +313,7 @@ class Conf:
         # "matching" - print out the association between gen and reco objects
         #"verbosity": ["eventboundary", "input", "matching", "gen", "reco", "meminput"],
         "verbosity": [
+            #"trigger",
             #"gen", #print out gen-level info
             #"debug", #very high-level debug info
             #"reco", #info about reconstructed final state
