@@ -269,7 +269,7 @@ if __name__ == "__main__":
 
         #Configure the number of events to run
         from PhysicsTools.HeppyCore.framework.looper import Looper
-        nEvents = 1000
+        nEvents = 10000
 
 
         kwargs = {}

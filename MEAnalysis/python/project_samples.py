@@ -1,17 +1,17 @@
 import ROOT
 
 inf = [
-    ("/shome/jpata/tth/gc/GC964989a2bd07/MEAnalysis_cfg_heppy/ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8.root",
+    ("/shome/jpata/tth/gc/GCa529bb530c6a/MEAnalysis_cfg_heppy/ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8.root",
     [
         ("hbb", "nGenBHiggs>=2"),
         ("hX", "nGenBHiggs<2"),
     ]),
-    ("/shome/jpata/tth/gc/GC964989a2bd07/MEAnalysis_cfg_heppy/ttHTobb_M125_13TeV_powheg_pythia8.root",
+    ("/shome/jpata/tth/gc/GCa529bb530c6a/MEAnalysis_cfg_heppy/ttHTobb_M125_13TeV_powheg_pythia8.root",
     [
         ("hbb", "nGenBHiggs>=2"),
         ("hX", "nGenBHiggs<2"),
     ]),
-    ("/shome/jpata/tth/gc/GC964989a2bd07/MEAnalysis_cfg_heppy/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.root",
+    ("/shome/jpata/tth/gc/GCa529bb530c6a/MEAnalysis_cfg_heppy/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.root",
     [
         ("ttb", "ttCls == 51"),
         ("tt2b", "ttCls == 52"),
@@ -28,7 +28,7 @@ inf = [
         #("tt2c2c", "ttCls == 45"),
         ("ttll", "ttCls == 0 || ttCls<0")
     ]),
-    ("/shome/jpata/tth/gc/GC964989a2bd07/MEAnalysis_cfg_heppy/TT_TuneCUETP8M1_13TeV-powheg-pythia8.root",
+    ("/shome/jpata/tth/gc/GCa529bb530c6a/MEAnalysis_cfg_heppy/TT_TuneCUETP8M1_13TeV-powheg-pythia8.root",
     [
         ("ttb", "ttCls == 51"),
         ("tt2b", "ttCls == 52"),
