@@ -82,30 +82,33 @@ def el_baseline_medium(el):
     if not ret:
         return False
 
-    if sca <= 1.479:
+    if (sca <= 1.479):
         ret = ret and (
-            (abs(el.eleDEta)    < 0.008925) and
-            (abs(el.eleDPhi)    < 0.035973) and
-            (el.eleSieie        < 0.009996) and
-            (el.eleHoE          < 0.050537) and
-            (abs(el.dxy)        < 0.012235) and
-            (abs(el.dz)         < 0.042020) and
-            (el.pfRelIso03      < 0.107587) and #delta-beta corrected relative iso
-            (getattr(el, "eleExpMissingInnerHits", 0) <= 1) and
-            (getattr(el, "eleooEmooP", 0) < 0.091942)
+            (el.eleSieie < 0.0101) and
+            (abs(el.eleDEta) < 0.0103) and
+            (abs(el.eleDPhi) < 0.0336) and
+            (el.eleHoE < 0.0876) and
+            (el.relIso03 < 0.0766) and
+            (el.eleooEmooP < 0.0174) and
+            (abs(el.dxy) < 0.0118) and
+            (abs(el.dz) < 0.373) and
+            (el.eleExpMissingInnerHits <= 2.0) and
+            (el.convVeto)
         )
-    elif sca < 2.5:
+    elif (sca < 2.5):
         ret = ret and (
-            (abs(el.eleDEta)    < 0.007429) and
-            (abs(el.eleDPhi)    < 0.067879) and
-            (el.eleSieie        < 0.030135) and
-            (el.eleHoE          < 0.086782) and
-            (abs(el.dxy)        < 0.036719) and
-            (abs(el.dz)         < 0.138142) and
-            (el.pfRelIso03      < 0.113254) and #delta-beta corrected relative iso
-            (getattr(el, "eleExpMissingInnerHits", 0) <= 1) and
-            (getattr(el, "eleooEmooP", 0) < 0.100683)
+            (el.eleSieie < 0.0283) and
+            (abs(el.eleDEta) < 0.00733) and
+            (abs(el.eleDPhi) < 0.114) and
+            (el.eleHoE < 0.0678) and
+            (el.relIso03 < 0.0678) and
+            (el.eleooEmooP < 0.0898) and
+            (abs(el.dxy) < 0.0739) and
+            (abs(el.dz) < 0.602) and
+            (el.eleExpMissingInnerHits <= 1.0) and
+            (el.convVeto)
         )
+        
     return ret
 
 def el_baseline_loose(el):
@@ -117,29 +120,31 @@ def el_baseline_loose(el):
     if not ret:
         return False
 
-    if sca <= 1.479:
+    if (sca <= 1.479):
         ret = ret and (
-            (abs(el.eleDEta)    < 0.009277) and
-            (abs(el.eleDPhi)    < 0.094739) and
-            (el.eleSieie        < 0.010331) and
-            (el.eleHoE          < 0.093068) and
-            (abs(el.dxy)        < 0.035904) and
-            (abs(el.dz)         < 0.075496) and
-            (el.pfRelIso03        < 0.130136) and
-            (getattr(el, "eleExpMissingInnerHits", 0) <= 1) and
-            (getattr(el, "eleooEmooP", 0) < 0.189968)
+            (el.eleSieie < 0.0103) and
+            (abs(el.eleDEta) < 0.0105) and
+            (abs(el.eleDPhi) < 0.115) and
+            (el.eleHoE < 0.104) and
+            (el.relIso03 < 0.0893) and
+            (el.eleooEmooP < 0.102) and
+            (abs(el.dxy) < 0.0261) and
+            (abs(el.dz) < 0.41) and
+            (el.eleExpMissingInnerHits <= 2.0) and
+            (el.convVeto)
         )
-    elif sca < 2.5:
+    elif (sca < 2.5):
         ret = ret and (
-            (abs(el.eleDEta)    < 0.009833) and
-            (abs(el.eleDPhi)    < 0.149934) and
-            (el.eleSieie        < 0.031838) and
-            (el.eleHoE          < 0.115754) and
-            (abs(el.dxy)        < 0.099266) and
-            (abs(el.dz)         < 0.197897) and
-            (el.pfRelIso03        < 0.163368) and
-            (getattr(el, "eleExpMissingInnerHits", 0) <= 1) and
-            (getattr(el, "eleooEmooP", 0) < 0.140662)
+            (el.eleSieie < 0.0301) and
+            (abs(el.eleDEta) < 0.00814) and
+            (abs(el.eleDPhi) < 0.182) and
+            (el.eleHoE < 0.0897) and
+            (el.relIso03 < 0.121) and
+            (el.eleooEmooP < 0.126) and
+            (abs(el.dxy) < 0.118) and
+            (abs(el.dz) < 0.822) and
+            (el.eleExpMissingInnerHits <= 1.0) and
+            (el.convVeto)
         )
     return ret
 

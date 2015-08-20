@@ -54,13 +54,13 @@ def make_df_hist(bins, x, w=1.0):
 
 def cls_hists(cls, df, var, bins=None):
     if bins is None:
-        bins = (11,0.0,1.0)
+        bins = (101,0.0,1.0)
 
-    probs1 = cls.predict_proba(df[df["id"]==1][var])[:, 0]
-    probs2 = cls.predict_proba(df[df["id"]==2][var])[:, 0]
+    probs1 = cls.predict_proba(df[df["id"]==1][var])[:, 1]
+    probs2 = cls.predict_proba(df[df["id"]==0][var])[:, 1]
 
     h1 = make_df_hist(bins, probs1, df[df["id"]==1]["genWeight"])
-    h2 = make_df_hist(bins, probs2, df[df["id"]==2]["genWeight"])
+    h2 = make_df_hist(bins, probs2, df[df["id"]==0]["genWeight"])
 
     # h1 = make_df_hist(bins, probs1)
     # h2 = make_df_hist(bins, probs2)
@@ -408,18 +408,18 @@ def draw_shape(f, samples, hn, **kwargs):
 def train(df, var, cut, ntrees, rate, depth, min1, min2, sub, **kwargs):
     df_sel = df[df.eval(cut)]
     ntrain_1 = int(sum(df_sel["id"]==1) * 0.5)
-    ntrain_2 = int(sum(df_sel["id"]==2) * 0.5)
+    ntrain_2 = int(sum(df_sel["id"]==0) * 0.5)
     weight = kwargs.get("weight", None)
 
 
     print ntrain_1, ntrain_2
 
     if weight:
-        print "weighted", sum(df_sel[df_sel["id"]==1][weight]), sum(df_sel[df_sel["id"]==2][weight])
-        print "unweighted", sum(df_sel["id"]==1), sum(df_sel["id"]==2)
+        print "weighted", sum(df_sel[df_sel["id"]==1][weight]), sum(df_sel[df_sel["id"]==0][weight])
+        print "unweighted", sum(df_sel["id"]==1), sum(df_sel["id"]==0)
         
-    df_train = pandas.concat((df_sel[df_sel["id"]==1][:ntrain_1], df_sel[df_sel["id"]==2][:ntrain_2]))
-    df_test = pandas.concat((df_sel[df_sel["id"]==1][ntrain_1:], df_sel[df_sel["id"]==2][ntrain_2:]))
+    df_train = pandas.concat((df_sel[df_sel["id"]==1][:ntrain_1], df_sel[df_sel["id"]==0][:ntrain_2]))
+    df_test = pandas.concat((df_sel[df_sel["id"]==1][ntrain_1:], df_sel[df_sel["id"]==0][ntrain_2:]))
 
     print len(df_train), len(df_test)
     df_train_shuf = df_train.iloc[np.random.permutation(np.arange(len(df_train)))]
