@@ -419,15 +419,20 @@ def getTreeProducer(conf):
             ),
             
             NTupleVariable(
-               "passPV", lambda ev: getattr(ev, "passPV", False),
+               "passPV", lambda ev: getattr(ev, "passPV", -1),
                type=int,
                help="First PV passes selection"
             ),
 
             NTupleVariable(
-               "triggerDecision", lambda ev: getattr(ev, "triggerDecision", False),
+               "triggerDecision", lambda ev: getattr(ev, "triggerDecision", -1),
                type=int,
                help="Trigger selection"
+            ),
+            NTupleVariable(
+               "triggerBitmask", lambda ev: getattr(ev, "triggerBitmask", -1),
+               type=int,
+               help="Bitmask of trigger decisions"
             ),
 
             #NTupleVariable(
