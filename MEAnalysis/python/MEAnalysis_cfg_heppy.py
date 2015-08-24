@@ -350,7 +350,7 @@ class Conf:
 
         #Generic event-dependent selection function applied
         #just before the MEM. If False, MEM is skipped
-        "selection": lambda event: True,
+        "selection": lambda event: event.btag_LR_4b_2b > 0.98 ,
         
         #This configures what the array elements mean
         #Better not change this
@@ -368,7 +368,7 @@ class Conf:
             "SL_2w2h2t_sj",
 
             #fully-hadronic
-            "FH"
+            "FH" #Fixme - add other AH categories
         ],
 
         #This configures the MEMs to actually run, the rest will be set to 0
@@ -380,7 +380,7 @@ class Conf:
             #"SL_2w2h2t_memLR",
             #"SL_0w2h2t_memLR",
             #"DL_0w2h2t_Rndge4t",
-            "FH" #Fixme - add other AH categories
+            #"FH"
         ],
 
     }
@@ -551,8 +551,25 @@ strat.push_back(MEM.Permutations.BTagged)
 c.cfg.perm_pruning = strat
 Conf.mem_configs["FH"] = c
 
-for cn, c in Conf.mem_configs.items():
-    print "MEM config", cn, c.mem_assumptions
-
-if __name__ == "__main__":
-    print Conf.__dict__
+import inspect
+def print_dict(d):
+    s = "(\n"
+    for k, v in sorted(d.items(), key=lambda x: x[0]):
+        if callable(v):
+            v = inspect.getsource(v).strip()
+        elif isinstance(v, dict):
+            s += print_dict(v)
+        s += "  {0}: {1},\n".format(k, v)
+    s += ")"
+    return s
+    
+def conf_to_str(Conf):
+    s = "Conf (\n"
+    for k, v in sorted(Conf.__dict__.items(), key=lambda x: x[0]):
+        s += "{0}: ".format(k)
+        if isinstance(v, dict):
+            s += print_dict(v)
+        else:
+            s += str(v)
+    s += "\n"
+    return s

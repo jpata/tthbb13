@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 print "heppy_crab_script.py started"
+import ROOT
 import os
 import PhysicsTools.HeppyCore.framework.config as cfg
 cfg.Analyzer.nosubdir=True
@@ -12,7 +13,9 @@ JobNumber = sys.argv[1]
 crabFiles = PSet.process.source.fileNames
 print "crabFiles=", crabFiles
 firstInput = crabFiles[0]
-
+tf = ROOT.TFile.Open(firstInput)
+tt = tf.Get("tree")
+print "file entries", tt.GetEntries()
 #print "--------------- using edmFileUtil to convert PFN to LFN -------------------------"
 #for i in xrange(0,len(crabFiles)) :
 #     if os.getenv("GLIDECLIENT_Group","") != "overflow" :

@@ -23,6 +23,7 @@ if os.environ.has_key("ME_CONF"):
 else:
     print "Loading ME config from TTH.MEAnalysis.MEAnalysis_cfg_heppy"
     from TTH.MEAnalysis.MEAnalysis_cfg_heppy import Conf
+from TTH.MEAnalysis.MEAnalysis_cfg_heppy import conf_to_str
 
 #Creates a new configuration object based on MEAnalysis_cfg_heppy
 conf = Conf
@@ -269,7 +270,7 @@ if __name__ == "__main__":
 
         #Configure the number of events to run
         from PhysicsTools.HeppyCore.framework.looper import Looper
-        nEvents = 10000
+        nEvents = 1000
 
 
         kwargs = {}
@@ -286,9 +287,13 @@ if __name__ == "__main__":
         #execute the code
         looper.loop()
 
+        tf = looper.setup.services["outputfile"].file 
+        tf.cd()
+        ts = ROOT.TNamed("config", conf_to_str(Conf))
+        ts.Write("", ROOT.TObject.kOverwrite)
+        
         #write the output
         looper.write()
-
     #print summaries
     # for analyzer in looper.analyzers:
     #     print analyzer.name, "counters = {\n", analyzer.counters, "}"

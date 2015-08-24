@@ -5,6 +5,16 @@ if ROOT.gROOT.GetVersion().startswith("5."):
     ROOT.gROOT.ProcessLine('ROOT::Cintex::Cintex::Enable();')
 ROOT.gSystem.Load("libTTHMEIntegratorStandalone")
 from ROOT import MEM
+import inspect
+
+def ROOT_MEMConfig_str(self):
+    s = "ROOT.MEM.MEMConfig(\n"
+    for k, v in self.__dict__.items():
+        s += "  {0}: {1},\n".format(k, v)
+    s += ")"
+    return s
+ROOT.MEM.MEMConfig.__str__ = ROOT_MEMConfig_str
+ROOT.MEM.MEMConfig.__repr__ = ROOT_MEMConfig_str
 
 class MEMConfig:
     def __init__(self):
@@ -22,6 +32,16 @@ class MEMConfig:
         self.maxJets = 4
         self.btagMethod = "btagCSV"
 
+    def __str__(self):
+        s = "MEMConfig(\n"
+        for k, v in self.__dict__.items():
+            if callable(v):
+                v = inspect.getsource(v).strip()
+            s += "  {0}: {1},\n".format(k, v)
+        s += ")"
+        return s
+    def __repr__(self):
+        return str(self)
     def configure_btag_pdf(self, conf):
         """
         Add the jet b-tag discriminator distributions to the MEM::MEMConfig object.

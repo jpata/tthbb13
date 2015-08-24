@@ -57,6 +57,5 @@ edmProvDump
 #
 #export ROOT_INCLUDE_PATH=.:./src:$ROOT_INCLUDE_PATH
 
+echo "Running python code"
 python heppy_crab_script.py $1
-echo "======================== CMSRUN LOG ============================"
-cat Output/cmsRun.log 

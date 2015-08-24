@@ -10,6 +10,8 @@ config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'heppy_crab_fake_pset.py'
 config.JobType.scriptExe = 'heppy_crab_script.sh'
+config.JobType.maxJobRuntimeMin = 10
+
 import os
 #os.system("tar czf python.tar.gz --dereference --directory $CMSSW_BASE python")
 config.JobType.inputFiles = [
@@ -28,7 +30,7 @@ config.Data.totalUnits = 5
 config.Data.outLFNDirBase = '/store/user/jpata/tthbb13/'
 config.Data.publication = False
 filelist = open("sig.dat").readlines()
-filelist = map(lambda x: "root://cms-xrd-global.cern.ch/" + x, filelist)
+filelist = map(lambda x: "root://t3se01.psi.ch:1094//" + x, filelist)
 filelist = map(lambda x: x.strip(), filelist)
 print "filelist=", filelist
 config.Data.userInputFiles = filelist
