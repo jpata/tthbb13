@@ -61,3 +61,16 @@ else:
     lfPrefix = "root://xrootd-cms.infn.it/"
     def lfn_to_pfn(fn):
         return fn
+
+def getSampleNGen(sample):
+    import ROOT
+    n = 0
+    for f in sample.subFiles:
+        tfn = lfn_to_pfn(f)
+        tf = ROOT.TFile.Open(tfn)
+        hc = tf.Get("Count")
+        n += hc.GetBinContent(1)
+        tf.Close()
+        del tf
+        #print tfn, hc.GetBinContent(1)
+    return int(n)

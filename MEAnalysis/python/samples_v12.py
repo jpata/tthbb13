@@ -524,19 +524,6 @@ samples = cms.VPSet([
     ),
 ])
 
-def getSampleNGen(sample):
-    import ROOT
-    n = 0
-    for f in sample.subFiles:
-        tfn = lfn_to_pfn(f)
-        tf = ROOT.TFile.Open(tfn)
-        hc = tf.Get("Count")
-        n += hc.GetBinContent(1)
-        tf.Close()
-        del tf
-        #print tfn, hc.GetBinContent(1)
-    return int(n)
-
 #fill sample number of generated
 for s in samples:
     if s.nGen.value() < 0:
