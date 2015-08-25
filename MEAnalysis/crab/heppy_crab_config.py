@@ -3,22 +3,25 @@ config = Configuration()
 
 config.section_("General")
 config.General.requestName = 'tthbb13_mem_test1'
-config.General.workArea = 'crab_projects_mem_test1'
-config.General.transferLogs=True
+config.General.workArea = 'crab_projects_mem_test2'
+config.General.transferLogs = True
 
 config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'heppy_crab_fake_pset.py'
 config.JobType.scriptExe = 'heppy_crab_script.sh'
-config.JobType.maxJobRuntimeMin = 10
+config.JobType.maxJobRuntimeMin = 180
 
 import os
-#os.system("tar czf python.tar.gz --dereference --directory $CMSSW_BASE python")
+os.system("tar czf python.tar.gz --dereference --directory $CMSSW_BASE python")
+os.system("tar czf data.tar.gz --dereference --directory $CMSSW_BASE/src/TTH/MEAnalysis root")
 config.JobType.inputFiles = [
     'heppy_crab_script.py',
-    #'python.tar.gz',
+    'python.tar.gz',
+    'data.tar.gz',
     #'combined_cmssw.py',
     #'tthbb.py',
+    "MEAnalysis_heppy.py"
 ]
 #config.JobType.outputFiles = ['tree.root']
 

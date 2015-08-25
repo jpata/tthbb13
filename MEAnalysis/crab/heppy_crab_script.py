@@ -16,6 +16,7 @@ firstInput = crabFiles[0]
 tf = ROOT.TFile.Open(firstInput)
 tt = tf.Get("tree")
 print "file entries", tt.GetEntries()
+tf.Close()
 #print "--------------- using edmFileUtil to convert PFN to LFN -------------------------"
 #for i in xrange(0,len(crabFiles)) :
 #     if os.getenv("GLIDECLIENT_Group","") != "overflow" :
@@ -28,30 +29,32 @@ print "file entries", tt.GetEntries()
 #       print "Data is not local, using AAA/xrootd"
 #       crabFiles[i]="root://cms-xrd-global.cern.ch/"+crabFiles[i]
 
-#import imp
-#handle = open("heppy_config.py", 'r')
-#cfo = imp.load_source("heppy_config", "heppy_config.py", handle)
-#config = cfo.config
-#handle.close()
-#
-##replace files with crab ones
-#config.components[0].files=crabFiles
-#
-#
-#from PhysicsTools.HeppyCore.framework.looper import Looper
-#looper = Looper( 'Output', config, nPrint = 1)
-#looper.loop()
-#looper.write()
-#
-##print PSet.process.output.fileName
-#os.system("ls -lR")
-#os.rename("Output/tree.root", "tree.root")
-#os.system("ls -lR")
-#
-#import ROOT
-#f=ROOT.TFile.Open('tree.root')
-#entries=f.Get('tree').GetEntries()
-entries = 0
+import imp
+import cPickle as pickle
+import TTH.MEAnalysis.TFClasses as TFClasses
+import sys
+sys.modules["TFClasses"] = TFClasses
+
+handle = open("MEAnalysis_heppy.py", 'r')
+cfo = imp.load_source("heppy_config", "MEAnalysis_heppy.py", handle)
+config = cfo.config
+handle.close()
+
+#replace files with crab ones
+config.components[0].files=crabFiles
+
+from PhysicsTools.HeppyCore.framework.looper import Looper
+looper = Looper( 'Output', config, nPrint = 1)
+looper.loop()
+looper.write()
+
+print PSet.process.output.fileName
+os.rename("Output/tree.root", "tree.root")
+
+import ROOT
+f=ROOT.TFile.Open('tree.root')
+entries=f.Get('tree').GetEntries()
+#entries = 0
 
 fwkreport='''<FrameworkJobReport>
 <ReadBranches>

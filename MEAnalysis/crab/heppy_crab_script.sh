@@ -1,7 +1,8 @@
 echo "tthbb crab script started"
 #s -lR
-#tar xvzf python.tar.gz --directory $CMSSW_BASE 
-ls -lR .
+tar xvzf python.tar.gz --directory $CMSSW_BASE 
+tar xvzf data.tar.gz --directory $CMSSW_BASE/src/TTH/MEAnalysis 
+#ls -lR .
 echo "ENV..................................."
 env 
 #echo "VOMS"
@@ -10,23 +11,23 @@ env
 #echo $CMSSW_BASE 
 #echo $PYTHON_PATH
 #echo $PWD 
-#cp lib/slc*/* $CMSSW_BASE/lib/slc*
-#cp lib/slc*/.* $CMSSW_BASE/lib/slc*
-#echo "AFTER COPY content of $CMSSW_BASE/lib/slc*"
+cp lib/slc*/* $CMSSW_BASE/lib/slc*
+cp lib/slc*/.* $CMSSW_BASE/lib/slc*
+echo "AFTER COPY content of $CMSSW_BASE/lib/slc*"
 #ls -lR  $CMSSW_BASE/lib/slc*
 #
-#cp -r interface/* $CMSSW_BASE/interface/
+cp -r interface/* $CMSSW_BASE/interface/
 #echo "AFTER COPY content of $CMSSW_BASE/interface"
 #ls -lR  $CMSSW_BASE/interface/
 #
-#cp -r src/* $CMSSW_BASE/src/
+cp -r src/* $CMSSW_BASE/src/
 #echo "AFTER COPY content of $CMSSW_BASE/src"
 #ls -lR  $CMSSW_BASE/src/
 #
 #PROXYFILE=`grep "BEGIN CERTIFICATE" * | perl -pe 's/:.*//'  | grep -v heppy | tail -n 1`
 #export X509_USER_PROXY=$PWD/$PROXYFILE
 #echo Found Proxy in: $X509_USER_PROXY
-#MD5SUM=`cat python.tar.gz heppy_config.py | md5sum | awk '{print $1}'`
+MD5SUM=`cat python.tar.gz heppy_config.py | md5sum | awk '{print $1}'`
 #
 echo "making fake provenance"
 cat <<EOF > fakeprov.txt
@@ -48,7 +49,7 @@ edmProvDump
 #
 ## Update library path
 ## Needed so recompiled modules are found
-##export LD_LIBRARY_PATH=./lib/slc6_amd64_gcc481:$LD_LIBRARY_PATH 
+export LD_LIBRARY_PATH=./lib/slc6_amd64_gcc491:$LD_LIBRARY_PATH 
 #cd $CMSSW_BASE
 #eval `scram runtime -sh`
 #cd -

@@ -9,6 +9,8 @@ import itertools
 #pickle and transfer function classes to load transfer functions
 import cPickle as pickle
 import TTH.MEAnalysis.TFClasses as TFClasses
+import sys
+sys.modules["TFClasses"] = TFClasses
 
 #Import the default list of samples
 from TTH.MEAnalysis.samples_base import lfn_to_pfn
