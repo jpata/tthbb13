@@ -1,7 +1,7 @@
 echo "tthbb crab script started"
 #s -lR
-tar xvzf python.tar.gz --directory $CMSSW_BASE 
-tar xvzf data.tar.gz --directory $CMSSW_BASE/src/TTH/MEAnalysis 
+tar xzf python.tar.gz --directory $CMSSW_BASE 
+tar xzf data.tar.gz --directory $CMSSW_BASE/src/TTH/MEAnalysis 
 #ls -lR .
 echo "ENV..................................."
 env 

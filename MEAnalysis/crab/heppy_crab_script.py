@@ -13,7 +13,12 @@ JobNumber = sys.argv[1]
 crabFiles = PSet.process.source.fileNames
 print "crabFiles=", crabFiles
 firstInput = crabFiles[0]
-tf = ROOT.TFile.Open(firstInput)
+filename, firstEvent, nEvents = firstInput.split("___")
+rootfilename = "root://xrootd-cms.infn.it//" + filename
+firstEvent = int(firstEvent)
+nEvents = int(nEvents)
+print "checking file",rootfilename
+tf = ROOT.TFile.Open(rootfilename)
 tt = tf.Get("tree")
 print "file entries", tt.GetEntries()
 tf.Close()
@@ -41,10 +46,10 @@ config = cfo.config
 handle.close()
 
 #replace files with crab ones
-config.components[0].files=crabFiles
+config.components[0].files=[rootfilename]
 
 from PhysicsTools.HeppyCore.framework.looper import Looper
-looper = Looper( 'Output', config, nPrint = 1)
+looper = Looper( 'Output', config, nPrint = 1, firstEvent=firstEvent, nEvents=nEvents)
 looper.loop()
 looper.write()
 
@@ -96,7 +101,7 @@ fwkreport='''<FrameworkJobReport>
 <BranchHash>dc90308e392b2fa1e0eff46acbfa24bc</BranchHash>
 </File>
 
-</FrameworkJobReport>''' % (firstInput,entries)
+</FrameworkJobReport>''' % (filename, entries)
 
 f1=open('./FrameworkJobReport.xml', 'w+')
 f1.write(fwkreport)

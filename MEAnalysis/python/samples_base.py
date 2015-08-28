@@ -25,7 +25,7 @@ xsec[("qcd_ht2000toinf", "13TeV")] = 25.42
 
 #Configure the site-specific file path
 import os
-hn = os.environ["HOSTNAME"]
+hn = os.environ.get("HOSTNAME", "")
 vo = os.environ.get("VO_CMS_DEFAULT_SE", "")
 
 def pfn_to_lfn(fn):
@@ -39,7 +39,7 @@ def lfn_to_pfn(fn):
     return fn
 
 #These assume the files are located on the local tier
-if "kbfi" in hn or "comp-" in hn or "kbfi" in vo:
+if "kbfi" in hn or "kbfi" in vo:
     pfPath = "/hdfs/cms/"
     lfPrefix = "file://"
     def lfn_to_pfn(fn):
@@ -58,6 +58,6 @@ elif "psi" in hn or "psi" in vo:
 else:
     print "Warning: host '{0}' VO '{1}' is unknown, using xrootd".format(hn, vo)
     pfPath = ""
-    lfPrefix = "root://cmsxrootd.fnal.gov/"
+    lfPrefix = "root://xrootd-cms.infn.it/"
     def lfn_to_pfn(fn):
         return fn
