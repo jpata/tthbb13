@@ -13,9 +13,15 @@ JobNumber = sys.argv[1]
 crabFiles = PSet.process.source.fileNames
 print "crabFiles=", crabFiles
 firstInput = crabFiles[0]
-tf = ROOT.TFile.Open(firstInput)
+filename, firstEvent, nEvents = firstInput.split("___")
+rootfilename = "root://xrootd-cms.infn.it//" + filename
+firstEvent = int(firstEvent)
+nEvents = int(nEvents)
+print "checking file",rootfilename
+tf = ROOT.TFile.Open(rootfilename)
 tt = tf.Get("tree")
 print "file entries", tt.GetEntries()
+tf.Close()
 #print "--------------- using edmFileUtil to convert PFN to LFN -------------------------"
 #for i in xrange(0,len(crabFiles)) :
 #     if os.getenv("GLIDECLIENT_Group","") != "overflow" :
@@ -28,30 +34,32 @@ print "file entries", tt.GetEntries()
 #       print "Data is not local, using AAA/xrootd"
 #       crabFiles[i]="root://cms-xrd-global.cern.ch/"+crabFiles[i]
 
-#import imp
-#handle = open("heppy_config.py", 'r')
-#cfo = imp.load_source("heppy_config", "heppy_config.py", handle)
-#config = cfo.config
-#handle.close()
-#
-##replace files with crab ones
-#config.components[0].files=crabFiles
-#
-#
-#from PhysicsTools.HeppyCore.framework.looper import Looper
-#looper = Looper( 'Output', config, nPrint = 1)
-#looper.loop()
-#looper.write()
-#
-##print PSet.process.output.fileName
-#os.system("ls -lR")
-#os.rename("Output/tree.root", "tree.root")
-#os.system("ls -lR")
-#
-#import ROOT
-#f=ROOT.TFile.Open('tree.root')
-#entries=f.Get('tree').GetEntries()
-entries = 0
+import imp
+import cPickle as pickle
+import TTH.MEAnalysis.TFClasses as TFClasses
+import sys
+sys.modules["TFClasses"] = TFClasses
+
+handle = open("MEAnalysis_heppy.py", 'r')
+cfo = imp.load_source("heppy_config", "MEAnalysis_heppy.py", handle)
+config = cfo.config
+handle.close()
+
+#replace files with crab ones
+config.components[0].files=[rootfilename]
+
+from PhysicsTools.HeppyCore.framework.looper import Looper
+looper = Looper( 'Output', config, nPrint = 1, firstEvent=firstEvent, nEvents=nEvents)
+looper.loop()
+looper.write()
+
+print PSet.process.output.fileName
+os.rename("Output/tree.root", "tree.root")
+
+import ROOT
+f=ROOT.TFile.Open('tree.root')
+entries=f.Get('tree').GetEntries()
+#entries = 0
 
 fwkreport='''<FrameworkJobReport>
 <ReadBranches>
@@ -93,7 +101,7 @@ fwkreport='''<FrameworkJobReport>
 <BranchHash>dc90308e392b2fa1e0eff46acbfa24bc</BranchHash>
 </File>
 
-</FrameworkJobReport>''' % (firstInput,entries)
+</FrameworkJobReport>''' % (filename, entries)
 
 f1=open('./FrameworkJobReport.xml', 'w+')
 f1.write(fwkreport)

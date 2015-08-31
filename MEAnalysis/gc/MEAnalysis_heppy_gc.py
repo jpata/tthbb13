@@ -7,6 +7,12 @@ ROOT.gROOT.SetBatch(True)
 import os
 #pickle and transfer function classes to load transfer functions
 import cPickle as pickle
+#to prevent pickle import error
+#== CMSSW:    File "MEAnalysis_heppy.py", line 33, in <module>
+#== CMSSW:      conf.tf_matrix = pickle.load(pi_file)
+#== CMSSW:    File "/cvmfs/cms.cern.ch/slc6_amd64_gcc491/lcg/root/6.02.00-odfocd4/lib/ROOT.py", line 353, in _importhook
+#== CMSSW:      return _orig_ihook( name, glbls, lcls, fromlist, level )
+#== CMSSW:  ImportError: No module named TFClasses
 import TTH.MEAnalysis.TFClasses as TFClasses
 import sys
 sys.modules["TFClasses"] = TFClasses

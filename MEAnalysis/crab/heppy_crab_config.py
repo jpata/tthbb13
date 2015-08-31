@@ -2,41 +2,47 @@ from WMCore.Configuration import Configuration
 config = Configuration()
 
 config.section_("General")
-config.General.requestName = 'tthbb13_mem_test1'
-config.General.workArea = 'crab_projects_mem_test1'
-config.General.transferLogs=True
+#this will be used for the crab directory name
+config.General.requestName = DATASET
+config.General.workArea = 'crab_projects_mem'
+config.General.transferLogs = True
 
 config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'heppy_crab_fake_pset.py'
 config.JobType.scriptExe = 'heppy_crab_script.sh'
-config.JobType.maxJobRuntimeMin = 10
+#job maximum runtime in minutes
+config.JobType.maxJobRuntimeMin = 6 * 60
 
 import os
-#os.system("tar czf python.tar.gz --dereference --directory $CMSSW_BASE python")
+#we need to specially ship the python and data directories
+
+os.system("tar czf python.tar.gz --dereference --directory $CMSSW_BASE python")
+os.system("tar czf data.tar.gz --dereference --directory $CMSSW_BASE/src/TTH/MEAnalysis root")
 config.JobType.inputFiles = [
     'heppy_crab_script.py',
-    #'python.tar.gz',
+    'python.tar.gz',
+    'data.tar.gz',
     #'combined_cmssw.py',
     #'tthbb.py',
+    "MEAnalysis_heppy.py"
 ]
+#the output file is automaticalluy configured by the fake PSet
 #config.JobType.outputFiles = ['tree.root']
 
 config.section_("Data")
-config.Data.primaryDataset = 'VHBBHeppyV12'
+#this name will be used for creating the output directory
+config.Data.primaryDataset = DATASET
 config.Data.splitting = 'FileBased'
 config.Data.unitsPerJob = 1
-config.Data.totalUnits = 5
-config.Data.outLFNDirBase = '/store/user/jpata/tthbb13/'
+config.Data.totalUnits = -1
+config.Data.outLFNDirBase = '/store/user/jpata/tthbb13/VHBBHeppyV12/test2'
 config.Data.publication = False
-filelist = open("sig.dat").readlines()
-filelist = map(lambda x: "root://t3se01.psi.ch:1094//" + x, filelist)
-filelist = map(lambda x: x.strip(), filelist)
-print "filelist=", filelist
+filelist = open("datasets/" + DATASET).readlines()
 config.Data.userInputFiles = filelist
-#config.Data.publishDataName = 'VHBB_HEPPY_V12'
 
 config.section_("Site")
-config.Site.storageSite = "T3_CH_PSI"
+config.Site.storageSite = "T2_CH_CSCS"
+#config.Site.storageSite = "T2_EE_Estonia"
 
 #config.Data.ignoreLocality = True
