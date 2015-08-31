@@ -22,33 +22,8 @@ class LeptonAnalyzer(FilterAnalyzer):
 
     def beginLoop(self, setup):
         super(LeptonAnalyzer, self).beginLoop(setup)
-        
-        self.counters["processing"].register("sl")
-        self.counters["processing"].register("dl")
-        self.counters["processing"].register("slanddl")
-        self.counters["processing"].register("fh")
-        self.inputCounter = ROOT.TH1F("LeptonAnalyzer_Count","Count",1,0,2)
-        self.inputCounterPosWeight = ROOT.TH1F("LeptonAnalyzer_CountPosWeight","Count genWeight>0",1,0,2)
-        self.inputCounterNegWeight = ROOT.TH1F("LeptonAnalyzer_CountNegWeight","Count genWeight<0",1,0,2)
-
-        self.counters.addCounter("leptons")
-        self.counters["leptons"].register("any")
-        for l in ["mu", "el"]:
-            for a in ["tight", "loose"]:
-                for b in ["", "_veto"]:
-                    lt = l + "_" + a + b
-                    self.counters["leptons"].register(lt)
 
     def process(self, event):
-        self.counters["processing"].inc("processed")
-        self.counters["leptons"].inc("any", len(event.selLeptons)) 
-        self.inputCounter.Fill(1)
-        if self.cfg_comp.isMC:
-            genWeight = getattr(event.input, "genWeight")
-            if genWeight > 0:
-                self.inputCounterPosWeight.Fill(1)
-            elif genWeight < 0:
-                self.inputCounterNegWeight.Fill(1) 
 
         event.mu = filter(
             lambda x: abs(x.pdgId) == 13,
@@ -56,6 +31,8 @@ class LeptonAnalyzer(FilterAnalyzer):
         )
         if "debug" in self.conf.general["verbosity"]:
             for it in event.mu:
+                print "input muons"
+                print it
                 (self.conf.leptons["mu"]["debug"])(it)
 
         event.el = filter(
@@ -63,8 +40,22 @@ class LeptonAnalyzer(FilterAnalyzer):
             event.selLeptons,
         )
         if "debug" in self.conf.general["verbosity"]:
+            print "input electrons"
             for it in event.el:
+                print it
                 (self.conf.leptons["el"]["debug"])(it)
+    
+        #for SL = tight
+        #event.mu_tight <= SL signal muon
+        #event.el_tight <= SL signal ele
+        #event.mu_tight_veto <= SL veto muon, NOT in mu_tight
+        #event.el_tight_veto <= SL veto ele, NOT in el_tight
+       
+        #DL = loose
+        #event.mu_loose <= DL signal muon
+        #event.el_loose <= DL signal ele
+        #event.mu_loose_veto <= DL veto muon, NOT in mu_loose
+        #event.el_loose_veto <= DL veto ele, NOT in el_loose
 
         for a in ["tight", "loose"]:
             for b in ["", "_veto"]:
@@ -73,31 +64,30 @@ class LeptonAnalyzer(FilterAnalyzer):
                     lepcuts = self.conf.leptons[l][a+b]
                     incoll = getattr(event, l)
 
+                    isotype = self.conf.leptons[l]["isotype"]
+                    isocut = lepcuts.get("iso", 99)
                     leps = filter(
                         lambda x: (
                             x.pt > lepcuts["pt"]
                             and abs(x.eta) < lepcuts["eta"]
                             #if specified, apply an additional isolation cut
-                            and abs(getattr(x, self.conf.leptons[l]["isotype"])) < lepcuts.get("iso", 99)
+                            and abs(getattr(x, isotype)) < isocut
                         ), incoll
                     )
-                    if "debug" in self.conf.general["verbosity"]:
-                        print a,b,l
-                        for it in leps:
-                            (self.conf.leptons[l]["debug"])(it)
-
-                    #remove veto leptons that also pass the good lepton cuts
-                    if b == "_veto":
-                        good = getattr(event, "{0}_{1}".format(l, a))
-                        leps = filter(lambda x: x not in good, leps)
-
                     leps = filter(lepcuts["idcut"], leps)
                     leps = sorted(leps, key=lambda x: x.pt, reverse=True)
+
+                    #veto leptons are defined to pass the veto lepton cuts and fail the signal lepton cuts
+                    if b == "_veto":
+                        #take the signal leptons (not veto)
+                        good = getattr(event, "{0}_{1}".format(l, a))
+                        #veto = veto_cuts && !(signal)
+                        leps = filter(lambda x: x not in good, leps)
+
                     sumleps += leps
                     lt = l + "_" + a + b
                     setattr(event, lt, leps)
                     setattr(event, "n_"+lt, len(leps))
-                    self.counters["leptons"].inc(lt, len(leps))
 
                 setattr(event, "lep_{0}".format(a+b), sumleps)
                 setattr(event, "n_lep_{0}".format(a+b), len(sumleps))
@@ -112,26 +102,19 @@ class LeptonAnalyzer(FilterAnalyzer):
             print "DEBUG: is_sl, is_dl, is_fh", event.is_sl, event.is_dl, event.is_fh
 
         if event.is_sl:
-            self.counters["processing"].inc("sl")
             event.good_leptons = event.mu_tight + event.el_tight
+            event.veto_leptons = event.mu_tight_veto + event.el_tight_veto
         if event.is_dl:
-            self.counters["processing"].inc("dl")
             event.good_leptons = event.mu_loose + event.el_loose
+            event.veto_leptons = event.mu_loose_veto + event.el_loose_veto
         if event.is_fh:
-            self.counters["processing"].inc("fh")
             event.good_leptons = []
+            event.veto_leptons = []
 
-        passes = event.is_sl or event.is_dl or event.is_fh
+        #apply configuration-dependent selection
+        passes = self.conf.leptons["selection"](event)
         if event.is_sl and event.is_dl:
-            self.counters["processing"].inc("slanddl")            
-            if "debug" in self.conf.general["verbosity"]:
-                print "DEBUG: The event (%s,%s,%s) is both sl and dl" % (event.input.run,event.input.lumi,event.input.evt)
+            print "DEBUG: The event (%s,%s,%s) is both sl and dl" % (event.input.run,event.input.lumi,event.input.evt)
             passes = False
-
-        if passes:
-            self.counters["processing"].inc("passes")
-        else:
-            if "debug" in self.conf.general["verbosity"]:
-                print "DEBUG: The event (%s,%s,%s) is neither sl nor dl" % (event.input.run,event.input.lumi,event.input.evt)
 
         return passes
