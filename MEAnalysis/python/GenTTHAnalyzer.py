@@ -166,8 +166,8 @@ class GenTTHAnalyzer(FilterAnalyzer):
                 event.nMatch_hb_btag,
             )
 
-        event.unmatched_b_jets_gen = []
-        event.unmatched_l_jets_gen = []
+        #event.unmatched_b_jets_gen = []
+        #event.unmatched_l_jets_gen = []
         for ij, jet in enumerate(event.good_jets):
 
             jet.tth_match_label = None
@@ -175,17 +175,17 @@ class GenTTHAnalyzer(FilterAnalyzer):
             jet.tth_match_dr = -1
             jet.tth_match_label_numeric = -1
 
-            #Jet did not have a match
+            # #Jet did not have a match
             if not matched_pairs.has_key(ij):
-                jc = copy.deepcopy(jet)
-                jc.pt = jc.mcPt
-                jc.eta = jc.mcEta
-                jc.phi = jc.mcPhi
-                jc.mass = jc.mcM
-                if abs(jet.mcFlavour) == 5:
-                    event.unmatched_b_jets_gen += [jc]
-                else:
-                    event.unmatched_l_jets_gen += [jc]
+                # jc = copy.deepcopy(jet)
+                # jc.pt = jc.mcPt
+                # jc.eta = jc.mcEta
+                # jc.phi = jc.mcPhi
+                # jc.mass = jc.mcM
+                # if abs(jet.mcFlavour) == 5:
+                #     event.unmatched_b_jets_gen += [jc]
+                # else:
+                #     event.unmatched_l_jets_gen += [jc]
                 continue #continue jet loop
 
             mlabel, midx, mdr, mlabel_num = matched_pairs[ij]

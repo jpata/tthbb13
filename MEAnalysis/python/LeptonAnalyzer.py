@@ -1,5 +1,7 @@
 from TTH.MEAnalysis.Analyzer import FilterAnalyzer
 import ROOT
+from TTH.MEAnalysis.vhbb_utils import lvec
+
 class LeptonAnalyzer(FilterAnalyzer):
     """
     Analyzes leptons and applies single-lepton and di-lepton selection.
@@ -44,77 +46,90 @@ class LeptonAnalyzer(FilterAnalyzer):
             for it in event.el:
                 print it
                 (self.conf.leptons["el"]["debug"])(it)
-    
-        #for SL = tight
-        #event.mu_tight <= SL signal muon
-        #event.el_tight <= SL signal ele
-        #event.mu_tight_veto <= SL veto muon, NOT in mu_tight
-        #event.el_tight_veto <= SL veto ele, NOT in el_tight
-       
-        #DL = loose
-        #event.mu_loose <= DL signal muon
-        #event.el_loose <= DL signal ele
-        #event.mu_loose_veto <= DL veto muon, NOT in mu_loose
-        #event.el_loose_veto <= DL veto ele, NOT in el_loose
 
-        for a in ["tight", "loose"]:
-            for b in ["", "_veto"]:
-                sumleps = []
-                for l in ["mu", "el"]:
-                    lepcuts = self.conf.leptons[l][a+b]
-                    incoll = getattr(event, l)
+        for id_type in ["SL", "DL", "veto"]:
+            sumleps = []
+            for lep_flavour in ["mu", "el"]:
+                lepcuts = self.conf.leptons[lep_flavour][id_type]
+                incoll = getattr(event, lep_flavour)
 
-                    isotype = self.conf.leptons[l]["isotype"]
-                    isocut = lepcuts.get("iso", 99)
-                    leps = filter(
-                        lambda x: (
-                            x.pt > lepcuts["pt"]
-                            and abs(x.eta) < lepcuts["eta"]
-                            #if specified, apply an additional isolation cut
-                            and abs(getattr(x, isotype)) < isocut
-                        ), incoll
-                    )
-                    leps = filter(lepcuts["idcut"], leps)
-                    leps = sorted(leps, key=lambda x: x.pt, reverse=True)
+                isotype = self.conf.leptons[lep_flavour]["isotype"]
+                isocut = lepcuts.get("iso", 99)
+                leps = filter(
+                    lambda x: (
+                        x.pt > lepcuts["pt"]
+                        and abs(x.eta) < lepcuts["eta"]
+                        #if specified, apply an additional isolation cut
+                        and abs(getattr(x, isotype)) < isocut
+                    ), incoll
+                )
+                leps = filter(lepcuts["idcut"], leps)
+                leps = sorted(leps, key=lambda x: x.pt, reverse=True)
 
-                    #veto leptons are defined to pass the veto lepton cuts and fail the signal lepton cuts
-                    if b == "_veto":
-                        #take the signal leptons (not veto)
-                        good = getattr(event, "{0}_{1}".format(l, a))
-                        #veto = veto_cuts && !(signal)
-                        leps = filter(lambda x: x not in good, leps)
+                #veto leptons are defined to pass the veto lepton cuts and fail the signal lepton cuts
+                # if id_type == "veto":
+                #     #take the signal leptons (not veto)
+                #     leps_SL = getattr(event, "{0}_SL".format(lep_flavour))
+                #     leps_DL = getattr(event, "{0}_DL".format(lep_flavour))
+                #     #veto = veto_cuts && !(signal)
+                #     leps = filter(lambda x: x not in leps_SL, leps)
+                #     leps = filter(lambda x: x not in leps_DL, leps)
 
-                    sumleps += leps
-                    lt = l + "_" + a + b
-                    setattr(event, lt, leps)
-                    setattr(event, "n_"+lt, len(leps))
+                sumleps += leps
+                lepname = lep_flavour + "_" + id_type
+                setattr(event, lepname, leps)
+                setattr(event, "n_"+  lepname, len(leps))
 
-                setattr(event, "lep_{0}".format(a+b), sumleps)
-                setattr(event, "n_lep_{0}".format(a+b), len(sumleps))
+                setattr(event, "lep_{0}".format(id_type), sumleps)
+                setattr(event, "n_lep_{0}".format(id_type), len(sumleps))
 
         if "debug" in self.conf.general["verbosity"]:
-            print "n_lep_tight=%s, n_lep_loose=%s, n_lep_tight_veto=%s, n_lep_loose_veto=%s" % (event.n_lep_tight, event.n_lep_loose, event.n_lep_tight_veto, event.n_lep_loose_veto)
+            print "n_lep_tight={0}, n_lep_loose={1}, n_lep_tight_veto={2}".format(event.n_lep_SL, event.n_lep_DL, event.n_lep_veto)
 
-        event.is_sl = (event.n_lep_tight == 1 and event.n_lep_tight_veto == 0)
-        event.is_dl = (event.n_lep_loose == 2 and event.n_lep_loose_veto == 0)
+        event.is_sl = (event.n_lep_SL == 1 and event.n_lep_veto == 1)
+        event.is_dl = (event.n_lep_DL == 2 and event.n_lep_veto == 2)
         event.is_fh = (not event.is_sl and not event.is_dl)
         if "debug" in self.conf.general["verbosity"]:
             print "DEBUG: is_sl, is_dl, is_fh", event.is_sl, event.is_dl, event.is_fh
-
+        
+        #Calculate di-lepton system momentum
+        event.dilepton_p4 = ROOT.TLorentzVector()
         if event.is_sl:
-            event.good_leptons = event.mu_tight + event.el_tight
-            event.veto_leptons = event.mu_tight_veto + event.el_tight_veto
-        if event.is_dl:
-            event.good_leptons = event.mu_loose + event.el_loose
-            event.veto_leptons = event.mu_loose_veto + event.el_loose_veto
-        if event.is_fh:
+            event.good_leptons = event.lep_SL
+            event.veto_leptons = event.lep_veto
+        elif event.is_dl:
+            event.good_leptons =event.lep_DL
+            event.veto_leptons = event.lep_veto
+            for lv in [lvec(l) for l in event.good_leptons]:
+                event.dilepton_p4 += lv
+        elif event.is_fh:
             event.good_leptons = []
             event.veto_leptons = []
-
+        
         #apply configuration-dependent selection
         passes = self.conf.leptons["selection"](event)
         if event.is_sl and event.is_dl:
             print "DEBUG: The event (%s,%s,%s) is both sl and dl" % (event.input.run,event.input.lumi,event.input.evt)
+            print "SL mu"
+            for lep in event.mu_SL:
+                (self.conf.leptons["mu"]["debug"])(lep)
+            print "DL mu"
+            for lep in event.mu_DL:
+                (self.conf.leptons["mu"]["debug"])(lep)
+                
+            print "SL el"
+            for lep in event.el_SL:
+                (self.conf.leptons["el"]["debug"])(lep)
+            print "DL el"
+            for lep in event.el_DL:
+                (self.conf.leptons["el"]["debug"])(lep)
+                
+            print "veto mu"
+            for lep in event.mu_veto:
+                (self.conf.leptons["mu"]["debug"])(lep)
+            print "veto el"
+            for lep in event.mu_veto:
+                (self.conf.leptons["el"]["debug"])(lep)
             passes = False
 
         return self.conf.general["passall"] or passes

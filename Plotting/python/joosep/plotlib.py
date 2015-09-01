@@ -18,6 +18,7 @@ from weighting import get_weight
 import sklearn
 import sklearn.metrics
 from sklearn.ensemble import GradientBoostingClassifier
+import math
 
 
 matplotlib.rc("axes", labelsize=24)
@@ -99,9 +100,9 @@ def draw_roc(cls, df_test, var, df_train=None):
     plt.figure(figsize=(6,6))
     plt.grid()
     plt.plot([0,1],[0,1], color="black")
-    plt.errorbar(r[:, 0], r[:, 1], e[:, 0], e[:, 1], marker="o")
+    plt.errorbar(r[:, 0], r[:, 1], e[:, 0], e[:, 1], marker="o", label="test")
     if not df_train is None:
-        plt.errorbar(rtr[:, 0], rtr[:, 1], etr[:, 0], etr[:, 1], marker="o")
+        plt.errorbar(rtr[:, 0], rtr[:, 1], etr[:, 0], etr[:, 1], marker="x", label="train")
     plt.axvline(0.5, color="black", ls="--")
     plt.yticks(np.linspace(0,1,11));
     plt.ylim(0,1)
@@ -211,17 +212,28 @@ def dice(h, nsigma=1.0):
         hret.set_bin_content(i, n)
     return hret
 
+# def make_uoflow(h):
+#     widths = list(h.xwidth())
+#     edgs = list(h.xedgesl())
+#     h2 = rootpy.plotting.Hist(h.nbins()+2, edgs[0] - widths[0], edgs[-1] + widths[-1])
+#     nb = h.GetNbinsX()
+#     for i in range(0,nb+2):
+#         h2.SetBinContent(i+1, h.GetBinContent(i))
+#         h2.SetBinError(i+1, h.GetBinError(i))
+#     h2.SetEntries(h.GetEntries())
+#     return h2
+
+
 def make_uoflow(h):
-    widths = list(h.xwidth())
-    edgs = list(h.xedgesl())
-    h2 = rootpy.plotting.Hist(h.nbins()+2, edgs[0] - widths[0], edgs[-1] + widths[-1])
     nb = h.GetNbinsX()
-    for i in range(0,nb+2):
-        h2.SetBinContent(i+1, h.GetBinContent(i))
-        h2.SetBinError(i+1, h.GetBinError(i))
-    h2.SetEntries(h.GetEntries())
-    return h2
-    
+    #h.SetBinEntries(1, h.GetBinEntries(0) + h.GetBinEntries(1))
+    #h.SetBinEntries(nb+1, h.GetBinEntries(nb) + h.GetBinEntries(nb + 1))
+    h.SetBinContent(1, h.GetBinContent(0) + h.GetBinContent(1))
+    h.SetBinContent(nb+1, h.GetBinContent(nb) + h.GetBinContent(nb + 1))
+    h.SetBinError(1, math.sqrt(h.GetBinError(0)**2 + h.GetBinError(1)**2))
+    h.SetBinError(nb+1, math.sqrt(h.GetBinError(nb)**2 + h.GetBinError(nb + 1)**2))
+    return h
+
 def draw_data_mc(tf, hname, samples, **kwargs):
 
     do_pseudodata = kwargs.get("do_pseudodata", False)
@@ -282,14 +294,15 @@ def draw_data_mc(tf, hname, samples, **kwargs):
     #hide x ticks on main panel
     ticks = a1.get_xticks()
     if do_pseudodata:
-        a1.set_xticklabels([])
-
+        a1.get_xaxis().set_visible(False)
+    print ticks
+    
     a1.set_ylim(bottom=0, top=1.1*a1.get_ylim()[1])
     a1.grid(zorder=100000)
 
     a2 = a1
     if do_pseudodata:
-        a2 = plt.axes([0.0,0.0, 1.0, 0.18])
+        a2 = plt.axes([0.0,0.0, 1.0, 0.18], sharex=a1)
 
         plt.xlabel(xlabel)
         a2.grid()
@@ -405,14 +418,11 @@ def draw_shape(f, samples, hn, **kwargs):
     for h in hs:
         hist(h, lw=1, ls="-")
 
-def train(df, var, cut, ntrees, rate, depth, min1, min2, sub, **kwargs):
+def train(df, var, cut, **kwargs):
     df_sel = df[df.eval(cut)]
     ntrain_1 = int(sum(df_sel["id"]==1) * 0.5)
     ntrain_2 = int(sum(df_sel["id"]==0) * 0.5)
     weight = kwargs.get("weight", None)
-
-
-    print ntrain_1, ntrain_2
 
     if weight:
         print "weighted", sum(df_sel[df_sel["id"]==1][weight]), sum(df_sel[df_sel["id"]==0][weight])
@@ -421,15 +431,15 @@ def train(df, var, cut, ntrees, rate, depth, min1, min2, sub, **kwargs):
     df_train = pandas.concat((df_sel[df_sel["id"]==1][:ntrain_1], df_sel[df_sel["id"]==0][:ntrain_2]))
     df_test = pandas.concat((df_sel[df_sel["id"]==1][ntrain_1:], df_sel[df_sel["id"]==0][ntrain_2:]))
 
-    print len(df_train), len(df_test)
     df_train_shuf = df_train.iloc[np.random.permutation(np.arange(len(df_train)))]
     
     cls = GradientBoostingClassifier(
-        n_estimators=ntrees, learning_rate=rate,
-        max_depth=depth,
-        min_samples_split=min1,
-        min_samples_leaf=min2,
-        subsample=sub,
+        n_estimators=kwargs.get("ntrees", 200),
+        learning_rate=kwargs.get("learning_rate", 0.1),
+        max_depth=kwargs.get("depth", 2),
+        min_samples_split=kwargs.get("min1", 1),
+        min_samples_leaf=kwargs.get("min2", 1),
+        subsample=kwargs.get("subsample", 1.0),
         verbose=True
     )
 

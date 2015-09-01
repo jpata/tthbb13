@@ -160,9 +160,9 @@ class MEAnalyzer(FilterAnalyzer):
 
     def beginLoop(self, setup):
         super(MEAnalyzer, self).beginLoop(setup)
-        self.inputCounter = ROOT.TH1F("MEAnalyzer_Count","Count",1,0,2)
-        self.inputCounterPosWeight = ROOT.TH1F("MEAnalyzer_CountPosWeight","Count genWeight>0",1,0,2)
-        self.inputCounterNegWeight = ROOT.TH1F("MEAnalyzer_CountNegWeight","Count genWeight<0",1,0,2)
+        # self.inputCounter = ROOT.TH1F("MEAnalyzer_Count","Count",1,0,2)
+        # self.inputCounterPosWeight = ROOT.TH1F("MEAnalyzer_CountPosWeight","Count genWeight>0",1,0,2)
+        # self.inputCounterNegWeight = ROOT.TH1F("MEAnalyzer_CountNegWeight","Count genWeight<0",1,0,2)
 
     def configure_mem(self, event, mem_cfg):
         self.integrator.set_cfg(mem_cfg.cfg)
@@ -242,13 +242,13 @@ class MEAnalyzer(FilterAnalyzer):
         )
 
     def process(self, event):
-        self.inputCounter.Fill(1)
-        if self.cfg_comp.isMC:
-            genWeight = getattr(event.input, "genWeight")
-            if genWeight > 0:
-                self.inputCounterPosWeight.Fill(1)
-            elif genWeight < 0:
-                self.inputCounterNegWeight.Fill(1)
+        # #self.inputCounter.Fill(1)
+        # if self.cfg_comp.isMC:
+        #     genWeight = getattr(event.input, "genWeight")
+        #     if genWeight > 0:
+        #         self.inputCounterPosWeight.Fill(1)
+        #     elif genWeight < 0:
+        #         self.inputCounterNegWeight.Fill(1)
 
         for (syst, event_syst) in event.systResults.items():
             if event_syst.passes_btag:

@@ -23,7 +23,7 @@ def jet_baseline(jet, oldpt=None):
 # LB: in fact,  mu.tightId should contain all the other cuts
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Tight_Muon
 # https://github.com/vhbb/cmssw/blob/vhbbHeppy722patch2/PhysicsTools/Heppy/python/physicsobjects/Muon.py
-def mu_baseline(mu):
+def mu_baseline_tight(mu):
     return (
         mu.tightId and
         mu.isPFMuon and
@@ -185,31 +185,24 @@ class Conf:
         "mu": {
 
             #SL
-            "tight": {
+            "SL": {
                 "pt": 30,
                 "eta":2.1,
                 "iso": 0.12,
-                "idcut": mu_baseline,
+                "idcut": mu_baseline_tight,
             },
-            "tight_veto": {
-                "pt": 10.0,
-                "eta": 2.4,
-                "iso": 0.2,
-                "idcut": mu_baseline,
-            },
-
             #DL
-            "loose": {
+            "DL": {
                 "pt": 20,
                 "eta": 2.4,
                 "iso": 0.12,
-                "idcut": mu_baseline,
+                "idcut": mu_baseline_tight,
             },
-            "loose_veto": {
+            "veto": {
                 "pt": 10.0,
                 "eta": 2.4,
                 "iso": 0.2,
-                "idcut": mu_baseline,
+                "idcut": mu_baseline_tight,
             },
             "isotype": "pfRelIso04", #pfRelIso - delta-beta, relIso - rho
             "debug" : print_mu
@@ -217,23 +210,17 @@ class Conf:
 
 
         "el": {
-            "tight": {
+            "SL": {
                 "pt": 30,
                 "eta": 2.1,
                 "idcut": lambda el: el_baseline_medium(el),
             },
-            "tight_veto": {
-                "pt": 20,
-                "eta": 2.4,
-                "idcut": lambda el: el_baseline_loose(el),
-            },
-
-            "loose": {
+            "DL": {
                 "pt": 20,
                 "eta": 2.4,
                 "idcut": lambda el: el_baseline_medium(el),
             },
-            "loose_veto": {
+            "veto": {
                 "pt": 10,
                 "eta": 2.4,
                 "idcut": lambda el: el_baseline_loose(el),
@@ -290,8 +277,24 @@ class Conf:
 
         "filter": False,
         "HLTpaths": [
+        
+            #SL triggers
             "HLT_BIT_HLT_Ele27_eta2p1_WP85_Gsf_HT200_v",
             "HLT_BIT_HLT_IsoMu24_eta2p1_v"
+            
+            #DL triggers
+            #mumu
+            "HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v",
+            "HLT_BIT_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v",
+            
+            #emu
+            "HLT_BIT_HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v",
+            "HLT_BIT_HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v",
+            
+            #ee
+            "HLT_BIT_HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v",
+
+            #FH triggers: in separate config file
             #"HLT_BIT_HLT_PFHT400_SixJet30_BTagCSV0p5_2PFBTagCSV_v",
             #"HLT_BIT_HLT_PFHT450_SixJet40_PFBTagCSV_v",
             #"HLT_ttHhardonicLowLumi",
@@ -301,7 +304,6 @@ class Conf:
 
     general = {
         "passall": True,
-        "controlPlotsFileOld": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsTEST.root",
         "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV6_finerPt.root",
         "QGLPlotsFile_flavour": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/Histos_QGL_flavour.root",
         #"sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_722sync.py",
@@ -351,7 +353,7 @@ class Conf:
 
         #Generic event-dependent selection function applied
         #just before the MEM. If False, MEM is skipped
-        "selection": lambda event: event.btag_LR_4b_2b > 0.98 ,
+        "selection": lambda event: event.btag_LR_4b_2b > 0.95, #optimized for 40% tth(bb) acceptance
         
         #This configures what the array elements mean
         #Better not change this
@@ -556,7 +558,7 @@ import inspect
 def print_dict(d):
     s = "(\n"
     for k, v in sorted(d.items(), key=lambda x: x[0]):
-        if callable(v):
+        if callable(v) and not isinstance(v, ROOT.TF1):
             v = inspect.getsource(v).strip()
         elif isinstance(v, dict):
             s += print_dict(v)
@@ -570,6 +572,8 @@ def conf_to_str(Conf):
         s += "{0}: ".format(k)
         if isinstance(v, dict):
             s += print_dict(v)
+        elif isinstance(v, ROOT.TF1):
+            s += "ROOT.TF1({0}, {1})".format(v.GetName(), v.GetTitle())
         else:
             s += str(v)
     s += "\n"

@@ -226,7 +226,7 @@ class SubjetAnalyzer(FilterAnalyzer):
         for subjet in top_subjets:
             if hasattr( subjet, 'matched_bjet' ) and \
                 hasattr( subjet, 'matched_ljet' ) :
-                print 'Double match detected'
+                print '[SubjetAnalyzer] Double match detected'
                 if subjet.matched_bjet_delR < subjet.matched_ljet_delR:
                     del subjet.matched_ljet
                     del subjet.matched_ljet_delR
@@ -269,7 +269,7 @@ class SubjetAnalyzer(FilterAnalyzer):
         # If too many events are excluded, just run the default hypothesis
         else:
             if "subjet" in self.conf.general["verbosity"]:
-                print "subjet has too many overlaps, using reco"
+                print "[SubjetAnalyzer] subjet has too many overlaps, using reco"
             boosted_bjets = reco_btagged_jets
             boosted_ljets = reco_ltagged_jets
             event.PassedSubjetAnalyzer = False
@@ -298,7 +298,7 @@ class SubjetAnalyzer(FilterAnalyzer):
         event.n_excluded_ljets = n_excluded_ljets
 
         if "subjet" in self.conf.general["verbosity"]:
-            print 'Exiting SubjetAnalyzer! event.PassedSubjetAnalyzer = {0}'.format(
+            print '[SubjetAnalyzer] Exiting SubjetAnalyzer! event.PassedSubjetAnalyzer = {0}'.format(
                 event.PassedSubjetAnalyzer
             )
         return event

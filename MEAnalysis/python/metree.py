@@ -34,16 +34,16 @@ jetType = NTupleObjectType("jetType", variables = [
     NTupleVariable("mcMatchId", lambda x : x.mcMatchId, type=int),
     NTupleVariable("hadronFlavour", lambda x : x.hadronFlavour, type=int),
     NTupleVariable("matchFlag", lambda x : getattr(x, "tth_match_label_numeric", -1), type=int),
-    NTupleVariable("mcPt", lambda x : x.mcPt),
-    NTupleVariable("mcEta", lambda x : x.mcEta),
-    NTupleVariable("mcPhi", lambda x : x.mcPhi),
-    NTupleVariable("mcM", lambda x : x.mcM),
-    NTupleVariable("mcNumBHadrons", lambda x : x.genjet.numBHadrons if hasattr(x, "genjet") else -1),
-    NTupleVariable("mcNumCHadrons", lambda x : x.genjet.numCHadrons if hasattr(x, "genjet") else -1),
-    NTupleVariable("mcNumBHadronsFromTop", lambda x : getattr(x.genjet, "numBHadronsFromTop") if hasattr(x, "genjet") else -1),
-    NTupleVariable("mcNumCHadronsFromTop", lambda x : getattr(x.genjet, "numCHadronsFromTop") if hasattr(x, "genjet") else -1),
-    NTupleVariable("mcNumBHadronsAfterTop", lambda x : getattr(x.genjet, "numBHadronsAfterTop") if hasattr(x, "genjet") else -1),
-    NTupleVariable("mcNumCHadronsAfterTop", lambda x : getattr(x.genjet, "numCHadronsAfterTop") if hasattr(x, "genjet") else -1),
+    NTupleVariable("mcPt", lambda x : x.mcPt, mcOnly=True),
+    NTupleVariable("mcEta", lambda x : x.mcEta, mcOnly=True),
+    NTupleVariable("mcPhi", lambda x : x.mcPhi, mcOnly=True),
+    NTupleVariable("mcM", lambda x : x.mcM, mcOnly=True),
+    NTupleVariable("mcNumBHadrons", lambda x : x.genjet.numBHadrons if hasattr(x, "genjet") else -1, mcOnly=True),
+    NTupleVariable("mcNumCHadrons", lambda x : x.genjet.numCHadrons if hasattr(x, "genjet") else -1, mcOnly=True),
+    NTupleVariable("mcNumBHadronsFromTop", lambda x : getattr(x.genjet, "numBHadronsFromTop") if hasattr(x, "genjet") else -1, mcOnly=True),
+    NTupleVariable("mcNumCHadronsFromTop", lambda x : getattr(x.genjet, "numCHadronsFromTop") if hasattr(x, "genjet") else -1, mcOnly=True),
+    NTupleVariable("mcNumBHadronsAfterTop", lambda x : getattr(x.genjet, "numBHadronsAfterTop") if hasattr(x, "genjet") else -1, mcOnly=True),
+    NTupleVariable("mcNumCHadronsAfterTop", lambda x : getattr(x.genjet, "numCHadronsAfterTop") if hasattr(x, "genjet") else -1, mcOnly=True),
     NTupleVariable("corr", lambda x : x.corr),
     NTupleVariable("corr_JESUp", lambda x : x.corr_JECUp),
     NTupleVariable("corr_JESDown", lambda x : x.corr_JECDown),
@@ -70,6 +70,13 @@ leptonType = NTupleObjectType("leptonType", variables = [
     #NTupleVariable("mcMass", lambda x : x.mcMass),
 ])
 
+p4type = NTupleObjectType("p4Type", variables = [
+    NTupleVariable("pt", lambda x : x.Pt()),
+    NTupleVariable("eta", lambda x : x.Eta()),
+    NTupleVariable("phi", lambda x : x.Phi()),
+    NTupleVariable("mass", lambda x : x.M()),
+])
+
 #Specifies what to save for leptons
 pvType = NTupleObjectType("pvType", variables = [
     NTupleVariable("z", lambda x : x.z),
@@ -92,8 +99,8 @@ metType = NTupleObjectType("metType", variables = [
     NTupleVariable("px", lambda x : x.px),
     NTupleVariable("py", lambda x : x.py),
     NTupleVariable("sumEt", lambda x : x.sumEt),
-    NTupleVariable("genPt", lambda x : x.genPt),
-    NTupleVariable("genPhi", lambda x : x.genPhi),
+    NTupleVariable("genPt", lambda x : x.genPt, mcOnly=True),
+    NTupleVariable("genPhi", lambda x : x.genPhi, mcOnly=True),
 ])
 
 memType = NTupleObjectType("memType", variables = [
@@ -582,10 +589,11 @@ def getTreeProducer(conf):
         ],
         globalObjects = {
            "MET_nominal" : NTupleObject("met", metType, help="Reconstructed MET"),
-           "MET_gen_nominal" : NTupleObject("met_gen", metType, help="Generated MET"),
+           "MET_gen_nominal" : NTupleObject("met_gen", metType, help="Generated MET", mcOnly=True),
            "MET_jetcorr_nominal" : NTupleObject("met_jetcorr", metType, help="Reconstructed MET, corrected to gen-level jets"),
            "MET_tt_nominal" : NTupleObject("met_ttbar_gen", metType, help="Generated MET from nu(top)"),
            "primaryVertex" : NTupleObject("pv", pvType, help="First PV"),
+           "dilepton_p4" : NTupleObject("ll", p4type, help="Dilepton system"),
         },
         collections = {
         #standard dumping of objects
@@ -647,6 +655,8 @@ def getTreeProducer(conf):
             ("qg_LR_flavour_4q_1q_2q_3q", float,      ""),
             ("qg_LR_flavour_4q_0q_1q_2q_3q", float,      ""),
             ("nBCSVM",              float,      ""),
+            ("nBCSVT",              float,      ""),
+            ("nBCSVL",              float,      ""),
             ("numJets",             int,        ""),
             ("nMatchSimB",          int,        ""),
             ("nMatchSimC",          int,        ""),

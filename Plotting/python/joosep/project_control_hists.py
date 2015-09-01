@@ -6,70 +6,12 @@ import sys, os
 import random
 import numpy as np
 import multiprocessing
+import imp
+from samples import samples_dict
 
-class Sample:
-    def __init__(self, name, filenames):
-        self.name = name
-        self.fileNamesS2 = filenames
+datacard_path = sys.argv[1]
 
-path = "/Users/joosep/Documents/tth/data/ntp/sync722/nome2/"
-
-samples_dict = {
-    "tth_13tev_amcatnlo_pu20bx25": Sample(
-        "ttH",
-        [path + "tth_13tev_amcatnlo_pu20bx25.root"]
-    ),
-    "tth_13tev_amcatnlo_pu20bx25_hbb": Sample(
-        "ttH_hbb",
-        [path + "tth_13tev_amcatnlo_pu20bx25_hbb.root"]
-    ),
-    "tth_13tev_amcatnlo_pu20bx25_hX": Sample(
-        "ttH_nohbb",
-        [path + "tth_13tev_amcatnlo_pu20bx25_hX.root"]
-    ),
-    "ttjets_13tev_madgraph_pu20bx25_phys14_tt2b": Sample(
-        "ttbarPlus2B",
-        [path + "ttjets_13tev_madgraph_pu20bx25_phys14_tt2b.root"]
-    ),
-    "ttjets_13tev_madgraph_pu20bx25_phys14_ttb": Sample(
-        "ttbarPlusB",
-        [path + "ttjets_13tev_madgraph_pu20bx25_phys14_ttb.root"]
-    ),
-    "ttjets_13tev_madgraph_pu20bx25_phys14_ttbb": Sample(
-        "ttbarPlusBBbar",
-        [path + "ttjets_13tev_madgraph_pu20bx25_phys14_ttbb.root"]
-    ),
-    "ttjets_13tev_madgraph_pu20bx25_phys14_ttcc": Sample(
-        "ttbarPlusCCbar",
-        [path + "ttjets_13tev_madgraph_pu20bx25_phys14_ttcc.root"]
-    ),
-    "ttjets_13tev_madgraph_pu20bx25_phys14_ttll": Sample(
-        "ttbarOther",
-        [path + "ttjets_13tev_madgraph_pu20bx25_phys14_ttll.root"]
-    ),
-    "ttw_13tev_madgraph_pu20bx25_phys14": Sample(
-        "ttbarW",
-        [path + "ttw_13tev_madgraph_pu20bx25_phys14.root"]
-    ),
-    "ttz_13tev_madgraph_pu20bx25_phys14": Sample(
-        "ttbarZ",
-        [path + "ttz_13tev_madgraph_pu20bx25_phys14.root"]
-    ),
-}
-
-samples = [
-    "tth_13tev_amcatnlo_pu20bx25",
-    "tth_13tev_amcatnlo_pu20bx25_hbb",
-    "tth_13tev_amcatnlo_pu20bx25_hX",
-    "ttjets_13tev_madgraph_pu20bx25_phys14_tt2b",
-    "ttjets_13tev_madgraph_pu20bx25_phys14_ttb",
-    "ttjets_13tev_madgraph_pu20bx25_phys14_ttbb",
-    "ttjets_13tev_madgraph_pu20bx25_phys14_ttcc",
-    "ttjets_13tev_madgraph_pu20bx25_phys14_ttll",
-    "ttw_13tev_madgraph_pu20bx25_phys14",
-    "ttz_13tev_madgraph_pu20bx25_phys14"
-]
-
+dcard = imp.load_source("dcard", datacard_path)
 of = ROOT.TFile("ControlPlots.root", "RECREATE")
 
 #Number of parallel processes to run for the histogram projection
@@ -104,33 +46,7 @@ class Systematic(object):
         
 def gensyst(hfunc, hname, cut):
     systs = []
-    for sname, weight in [
-    
-            #no weights applied
-            ("unweighted",          "1.0"),
-            
-            #only b weight applied
-            #("bw",                  "bTagWeight"),
-            
-            #Use JES-corrected values
-            ("",                    "bTagWeight"),
-            
-            
-            #JES up/down
-            ("CMS_scale_jUp",       "bTagWeight_JESUp"),
-            ("CMS_scale_jDown",     "bTagWeight_JESDown"),
-            
-            #CSV LF up/down
-            ("CMS_ttH_CSVLFUp",     "bTagWeight_LFUp"),
-            ("CMS_ttH_CSVLFDown",   "bTagWeight_LFDown"),
-            #("bwLFDown",        "bTagWeight_LFDown"),
-            # ("bwHFUp",          "bTagWeight_HFUp"),
-            # ("bwHFDown",        "bTagWeight_HFDown"),
-            # ("bwStats1Up",      "bTagWeight_Stats1Up"),
-            # ("bwStats1Down",    "bTagWeight_Stats1Down"),
-            # ("bwStats2Up",      "bTagWeight_Stats2Up"),
-            # ("bwStats2Down",    "bTagWeight_Stats2Down"),
-    ]:
+    for sname, weight in dcard.Datacard.weights:
         s = Systematic(sname, weight=weight, hfunc=hfunc)
         
         repllist = [
@@ -237,7 +153,7 @@ def Draw(tf, of, gensyst, *args):
 
     return 0
         
-for sample in samples:
+for sample in dcard.Datacard.samples:
     print sample
     tf = ROOT.TChain("tree")
     for fn in samples_dict[sample].fileNamesS2:
@@ -251,37 +167,7 @@ for sample in samples:
     sampled.cd()
 
     for lep, lepcut in [("sl", "(is_sl==1 && passPV==1)"), ("dl", "(is_dl==1 && passPV==1)")]:
-        for jet_tag, jettagcut in [
-
-                ("j3_t2", "numJets==3 && nBCSVM==2"),
-                ("jge3_tge3", "numJets>=3 && nBCSVM==3"),
-                ("jge4_t2", "numJets>=4 && nBCSVM==2"),
-                ("jge4_tge4", "numJets>=4 && nBCSVM>=4"),
-
-                #("4j", "numJets==4"),
-                ("j4_t3", "numJets==4 && nBCSVM==3"),
-                ("j4_t4", "numJets==4 && nBCSVM==4"),
-
-                #("5j", "numJets==5"),
-                #("5jL", "numJets==5 && nBCSVM<3"),
-                ("j5_t3", "numJets==5 && nBCSVM==3"),
-                #("5j4t", "numJets==5 && nBCSVM==4"),
-                ("j5_tge4", "numJets==5 && nBCSVM>=4"),
-                #("5jH", "numJets==5 && nBCSVM>4"),
-                
-                #("6j", "numJets==6"),
-                #("6jL", "numJets==6 && nBCSVM<3"),
-                #("6j3t", "numJets==6 && nBCSVM==3"),
-                #("6j4t", "numJets==6 && nBCSVM==4"),
-                #("6jH", "numJets==6 && nBCSVM>4"),
-                
-                #("6plusj", "numJets>=6"),
-                ("jge6_t2", "numJets>=6 && nBCSVM==2"),
-                ("jge6_t3", "numJets>=6 && nBCSVM==3"),
-                #("6plusj4t", "numJets>=6 && nBCSVM==4"),
-                ("jge6_tge4", "numJets>=6 && nBCSVM>=4"),
-                #("6plusjH", "numJets>=6 && nBCSVM>4"),
-            ]:
+        for jet_tag, jettagcut in dcard.Datacard.categories:
             print jet_tag
             
             lepjetcut = " && ".join([lepcut, jettagcut])
