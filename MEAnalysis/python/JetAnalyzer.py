@@ -5,19 +5,17 @@ from copy import deepcopy
 import numpy as np
 import copy
 
-def attach_jet_transfer_function(jet, conf, eval_gen=False):
+def attach_jet_transfer_function(jet, conf):
     """
     Attaches transfer functions to the supplied jet based on the jet eta bin.
 
-    eval_gen:specifies how the transfer functions are interpreted
-        If True, TF [0] - reco, x - gen
-        If False, TF [0] - gen, x - reco
+
     """
     jet_eta_bin = 0
     if abs(jet.eta)>1.0:
         jet_eta_bin = 1
-    jet.tf_b = conf.tf_matrix['b'][jet_eta_bin].Make_Formula(eval_gen)
-    jet.tf_l = conf.tf_matrix['l'][jet_eta_bin].Make_Formula(eval_gen)
+    jet.tf_b = conf.tf_formula['b'][jet_eta_bin]
+    jet.tf_l = conf.tf_formula['l'][jet_eta_bin]
     jet.tf_b.SetNpx(10000)
     jet.tf_b.SetRange(0, 500)
 
@@ -35,9 +33,9 @@ class JetAnalyzer(FilterAnalyzer):
 
     def beginLoop(self, setup):
         super(JetAnalyzer, self).beginLoop(setup)
-        self.inputCounter = ROOT.TH1F("JetAnalyzer_Count","Count",1,0,2)
-        self.inputCounterPosWeight = ROOT.TH1F("JetAnalyzer_CountPosWeight","Count genWeight>0",1,0,2)
-        self.inputCounterNegWeight = ROOT.TH1F("JetAnalyzer_CountNegWeight","Count genWeight<0",1,0,2)
+        # self.inputCounter = ROOT.TH1F("JetAnalyzer_Count","Count",1,0,2)
+        # self.inputCounterPosWeight = ROOT.TH1F("JetAnalyzer_CountPosWeight","Count genWeight>0",1,0,2)
+        # self.inputCounterNegWeight = ROOT.TH1F("JetAnalyzer_CountNegWeight","Count genWeight<0",1,0,2)
 
     def variateJets(self, jets, systematic, sigma):
         newjets = deepcopy(jets)
@@ -59,13 +57,13 @@ class JetAnalyzer(FilterAnalyzer):
 
     def process(self, event):
 
-        self.inputCounter.Fill(1)
-        if self.cfg_comp.isMC:
-            genWeight = getattr(event.input, "genWeight")
-            if genWeight > 0:
-                self.inputCounterPosWeight.Fill(1)
-            elif genWeight < 0:
-                self.inputCounterNegWeight.Fill(1)
+        # self.inputCounter.Fill(1)
+        # if self.cfg_comp.isMC:
+        #     genWeight = getattr(event.input, "genWeight")
+        #     if genWeight > 0:
+        #         self.inputCounterPosWeight.Fill(1)
+        #     elif genWeight < 0:
+        #         self.inputCounterNegWeight.Fill(1)
  
         #pt-descending input jets
         if "input" in self.conf.general["verbosity"]:
@@ -122,7 +120,10 @@ class JetAnalyzer(FilterAnalyzer):
             and self.conf.jets["selection"](x, oldpt)
         )
 
-        event.good_jets = sorted(filter(lambda x: jetsel(x, x.pt), event.Jet+event.DiscardedJet), key=lambda x: x.pt, reverse=True)
+        event.good_jets = sorted(filter(
+                lambda x: jetsel(x, x.pt), event.Jet+event.DiscardedJet
+            ), key=lambda x: x.pt, reverse=True
+        )
 
         #Take care of overlaps between jets and veto leptons
         jets_to_remove = []
@@ -134,8 +135,9 @@ class JetAnalyzer(FilterAnalyzer):
                 lv2 = lvec(lep)
                 dr = lv1.DeltaR(lv2)
                 if dr < 0.4:
-                    print "deltaR", dr, lep.pt, lep.eta, lep.phi, jet.pt, jet.eta, jet.phi
-            
+                    if "jets" in self.conf.general["verbosity"]:
+                        print "[JetAnalyzer: jet lepton cleaning] deltaR", dr, lep.pt, lep.eta, lep.phi, jet.pt, jet.eta, jet.phi
+                    jets_to_remove += [jet]
             #overlaps removed by jet overlap index
             #if lep.jetOverlapIdx is None:
             #    idx = -1
@@ -180,7 +182,8 @@ class JetAnalyzer(FilterAnalyzer):
             #        #raise ValueError("wrong idx: idx={0} len(coll)={1}".format(idx, len(coll)))
             #        print "[JetAnalyzer] jet removal, wrong idx: idx={0} len(coll)={1}".format(idx, len(coll))
         for jet in jets_to_remove:
-            #print "removing jet", jet.pt, jet.eta
+            if "jets" in self.conf.general["verbosity"]:
+                print "removing jet", jet.pt, jet.eta
             if jet in event.good_jets:
                 event.good_jets.remove(jet)
 
