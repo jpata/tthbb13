@@ -94,6 +94,12 @@ samples_dict = {
         "ttbarOther",
         [path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttll.root"]
     ),
+    
+
+    "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttll": Sample(
+        "ttbarOther",
+        [path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttll.root"]
+    ),
     # "ttw_13tev_madgraph_pu20bx25_phys14": Sample(
     #     "ttbarW",
     #     [path + "ttw_13tev_madgraph_pu20bx25_phys14.root"]
