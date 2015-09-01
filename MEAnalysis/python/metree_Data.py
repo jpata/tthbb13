@@ -1,3 +1,4 @@
+raise Exception("This file is deprecated, see https://github.com/jpata/tthbb13/issues/42")
 import PhysicsTools.HeppyCore.framework.config as cfg
 
 
