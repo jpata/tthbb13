@@ -63,7 +63,7 @@ class MVAVarAnalyzer(FilterAnalyzer):
                 event.systResults[syst].passes_mva = False
         #print "MVA", getattr(event.systResults["JES"], "fw_h_alljets", None)
         #event.__dict__.update(event.systResults["nominal"].__dict__)
-        return np.any([v.passes_mva for v in event.systResults.values()])
+        return self.conf.general["passall"] or np.any([v.passes_mva for v in event.systResults.values()])
 
     def _process(self, event):
         vecs = CvectorTLorentzVector()

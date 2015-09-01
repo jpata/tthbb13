@@ -36,7 +36,7 @@ class MECategoryAnalyzer(FilterAnalyzer):
                 event.systResults[syst] = res
             else:
                 event.systResults[syst].passes_mecat = False
-        return np.any([v.passes_mecat for v in event.systResults.values()])
+        return self.conf.general["passall"] or np.any([v.passes_mecat for v in event.systResults.values()])
 
     def _process(self, event):
 
@@ -257,7 +257,7 @@ class MEAnalyzer(FilterAnalyzer):
             else:
                 event.systResults[syst].passes_mem = False
 
-        return np.any([v.passes_mem for v in event.systResults.values()])
+        return self.conf.general["passall"] or np.any([v.passes_mem for v in event.systResults.values()])
 
     def _process(self, event):
         #Clean up any old MEM state

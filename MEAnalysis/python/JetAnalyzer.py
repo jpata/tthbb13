@@ -103,7 +103,7 @@ class JetAnalyzer(FilterAnalyzer):
             evdict[syst] = res
         event.systResults = evdict
 
-        return np.any([v.passes_jet for v in event.systResults.values()])
+        return self.conf.general["passall"] or np.any([v.passes_jet for v in event.systResults.values()])
 
     def _process(self, event):
         pt_cut  = "pt"

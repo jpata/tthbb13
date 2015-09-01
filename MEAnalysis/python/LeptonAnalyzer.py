@@ -117,4 +117,4 @@ class LeptonAnalyzer(FilterAnalyzer):
             print "DEBUG: The event (%s,%s,%s) is both sl and dl" % (event.input.run,event.input.lumi,event.input.evt)
             passes = False
 
-        return passes
+        return self.conf.general["passall"] or passes
