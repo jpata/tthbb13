@@ -67,8 +67,6 @@ for sn in sorted(samples_dict.keys()):
     if s.skip.value() == False and len(s.subFiles.value())>0:
         inputSamples.append(inputSample)
 
-print "Processing samples", [s.name for s in inputSamples]
-
 #Event contents are defined here
 #This is work in progress
 from TTH.MEAnalysis.VHbbTree import *
@@ -231,7 +229,6 @@ output_service = cfg.Service(
     fname='tree.root',
     option='recreate'
 )
-print "Creating TChain"
 
 #finalization of the configuration object.
 from PhysicsTools.HeppyCore.framework.chain import Chain as Events
