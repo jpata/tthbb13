@@ -609,7 +609,10 @@ def getTreeProducer(conf):
             #"higgsCandidate" : NTupleCollection("higgsCandidate", higgsType, 9, help=""),
         }
     )
-
+    
+    for trigname in conf.trigger["paths"]:
+        treeProducer.globalVariables += [makeGlobalVariable((trigname, int, "HLT {0}".format(trigname)), "nominal")]
+        
     for systematic in ["nominal", "raw", "JESUp", "JESDown"]:
         if not (systematic in conf.general["systematics"]):
             continue
@@ -654,9 +657,9 @@ def getTreeProducer(conf):
             ("qg_LR_flavour_4q_0q_1q_2q", float,      ""), 
             ("qg_LR_flavour_4q_1q_2q_3q", float,      ""),
             ("qg_LR_flavour_4q_0q_1q_2q_3q", float,      ""),
-            ("nBCSVM",              float,      ""),
-            ("nBCSVT",              float,      ""),
-            ("nBCSVL",              float,      ""),
+            ("nBCSVM",              int,      ""),
+            ("nBCSVT",              int,      ""),
+            ("nBCSVL",              int,      ""),
             ("numJets",             int,        ""),
             ("nMatchSimB",          int,        ""),
             ("nMatchSimC",          int,        ""),

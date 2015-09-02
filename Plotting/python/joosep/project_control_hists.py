@@ -12,7 +12,7 @@ from samples import samples_dict
 datacard_path = sys.argv[1]
 
 dcard = imp.load_source("dcard", datacard_path)
-of = ROOT.TFile("ControlPlots.root", "RECREATE")
+of = ROOT.TFile(dcard.Datacard.output_filename, "RECREATE")
 
 #Number of parallel processes to run for the histogram projection
 ncores = 4
@@ -58,14 +58,14 @@ def gensyst(hfunc, hname, cut):
             return s
             
         #default, all corrections enabled
-        if s.name == "":
-            repllist += [("mem_tth_p[0]", "mem_tth_JES_p[0]")]
-            repllist += [("mem_tth_p[1]", "mem_tth_JES_p[1]")]
-            repllist += [("mem_tth_p[2]", "mem_tth_JES_p[2]")]
-            repllist += [("mem_ttbb_p[0]", "mem_ttbb_JES_p[0]")]
-            repllist += [("mem_ttbb_p[1]", "mem_ttbb_JES_p[1]")]
-            repllist += [("mem_ttbb_p[2]", "mem_ttbb_JES_p[2]")]
-        elif "CMS_scale_jUp" in s.name:
+        # if s.name == "":
+        #     repllist += [("mem_tth_p[0]", "mem_tth_JES_p[0]")]
+        #     repllist += [("mem_tth_p[1]", "mem_tth_JES_p[1]")]
+        #     repllist += [("mem_tth_p[2]", "mem_tth_JES_p[2]")]
+        #     repllist += [("mem_ttbb_p[0]", "mem_ttbb_JES_p[0]")]
+        #     repllist += [("mem_ttbb_p[1]", "mem_ttbb_JES_p[1]")]
+        #     repllist += [("mem_ttbb_p[2]", "mem_ttbb_JES_p[2]")]
+        if "CMS_scale_jUp" in s.name:
             repllist += [("numJets",    "numJets_JESUp")]
             repllist += [("nBCSVM",     "nBCSVM_JESUp")]
             repllist += [("jets_pt[0]", "jets_corr_JESUp[0]/jets_corr[0] * jets_pt[0]")]
@@ -157,6 +157,8 @@ for sample in dcard.Datacard.samples:
     print sample
     tf = ROOT.TChain("tree")
     for fn in samples_dict[sample].fileNamesS2:
+        if not os.path.isfile(fn):
+            raise FileError("could not open file: {0}".format(fn))
         tf.AddFile(fn)
     print tf.GetEntries()
 
@@ -166,49 +168,46 @@ for sample in dcard.Datacard.samples:
     sampled = of.mkdir(samples_dict[sample].name)
     sampled.cd()
 
-    for lep, lepcut in [("sl", "(is_sl==1 && passPV==1)"), ("dl", "(is_dl==1 && passPV==1)")]:
-        for jet_tag, jettagcut in dcard.Datacard.categories:
-            print jet_tag
-            
-            lepjetcut = " && ".join([lepcut, jettagcut])
-            jetd = sampled.mkdir(lep + "_" + jet_tag)
-
-            Draw(tf, jetd, gensyst, "nBCSVM:numJets >> njets_ntags(15,0,15,15,0,15)", lepjetcut)
-
-            Draw(tf, jetd, gensyst, "jets_pt[0] >> jet0_pt(20,20,500)", lepjetcut)
-            #Draw(tf, jetd, gensyst, "jets_pt[1] >> jet1_pt(20,20,500)", lepjetcut)
-
-            #Draw(tf, jetd, gensyst, "jets_eta[0] >> jet0_eta(30,-5,5)", lepjetcut)
-
-            Draw(tf, jetd, gensyst, "jets_btagCSV[0] >> jet0_csvv2(22, -0.1, 1)", lepjetcut)
+    for cutname, cut in dcard.Datacard.categories:
         
-            #Draw(tf, jetd, gensyst, "leps_pt[0] >> lep0_pt(30,0,300)", lepjetcut)
-            #Draw(tf, jetd, gensyst, "leps_eta[0] >> lep0_eta(30,-5,5)", lepjetcut)
+        jetd = sampled.mkdir(cutname)
+
+        Draw(tf, jetd, gensyst, "nBCSVM:numJets >> njets_ntags(15,0,15,15,0,15)", cut)
+
+        Draw(tf, jetd, gensyst, "jets_pt[0] >> jet0_pt(20,20,500)", cut)
+        #Draw(tf, jetd, gensyst, "jets_pt[1] >> jet1_pt(20,20,500)", cut)
+
+        #Draw(tf, jetd, gensyst, "jets_eta[0] >> jet0_eta(30,-5,5)", cut)
+
+        Draw(tf, jetd, gensyst, "jets_btagCSV[0] >> jet0_csvv2(22, -0.1, 1)", cut)
+    
+        #Draw(tf, jetd, gensyst, "leps_pt[0] >> lep0_pt(30,0,300)", cut)
+        #Draw(tf, jetd, gensyst, "leps_eta[0] >> lep0_eta(30,-5,5)", cut)
+    
+        #Draw(tf, jetd, gensyst, "btag_LR_4b_2b >> btag_lr(30,0,1)", cut)
+        # 
+        # Draw(tf, jetd, gensyst, "(100*nMatch_wq + 10*nMatch_hb + nMatch_tb) >> nMatch(300,0,300)", cut)
+        # Draw(tf, jetd, gensyst, "(100*nMatch_wq_btag + 10*nMatch_hb_btag + nMatch_tb_btag) >> nMatch_btag(300,0,300)", cut)
+        # 
+        for match, matchcut in [
+                ("nomatch", "1"),
+                #("tb2_wq2", "nMatch_wq_btag==2 && nMatch_tb_btag==2"),
+                #("hb2_tb2_wq2", "nMatch_hb_btag==2 && nMatch_wq_btag==2 && nMatch_tb_btag==2"),
+                #("tb2_wq1", "nMatch_wq_btag==1 && nMatch_tb_btag==2"),
+                #("hb2_tb2_wq1", "nMatch_hb_btag==2 && nMatch_wq_btag==1 && nMatch_tb_btag==2")
+            ]:
+            if "hb2" in match and "ttjets" in sample:
+                continue
+            cut = " && ".join([cut, matchcut])
+            if tf.GetEntries(cut) == 0:
+                continue
+            for nmem in range(3):
+                Draw(tf, jetd, gensyst,
+                    "mem_tth_p[{0}] / (mem_tth_p[{0}] + 0.15*mem_ttbb_p[{0}]) >> mem_d_{1}_{0}(12,0,1)".format(nmem, match),
+                    cut
+                )
         
-            #Draw(tf, jetd, gensyst, "btag_LR_4b_2b >> btag_lr(30,0,1)", lepjetcut)
-            # 
-            # Draw(tf, jetd, gensyst, "(100*nMatch_wq + 10*nMatch_hb + nMatch_tb) >> nMatch(300,0,300)", lepjetcut)
-            # Draw(tf, jetd, gensyst, "(100*nMatch_wq_btag + 10*nMatch_hb_btag + nMatch_tb_btag) >> nMatch_btag(300,0,300)", lepjetcut)
-            # 
-            # for match, matchcut in [
-            #         ("nomatch", "1"),
-            #         ("tb2_wq2", "nMatch_wq_btag==2 && nMatch_tb_btag==2"),
-            #         ("hb2_tb2_wq2", "nMatch_hb_btag==2 && nMatch_wq_btag==2 && nMatch_tb_btag==2"),
-            #         ("tb2_wq1", "nMatch_wq_btag==1 && nMatch_tb_btag==2"),
-            #         ("hb2_tb2_wq1", "nMatch_hb_btag==2 && nMatch_wq_btag==1 && nMatch_tb_btag==2")
-            #     ]:
-            #     if "hb2" in match and "ttjets" in sample:
-            #         continue
-            #     cut = " && ".join([lepcut, jettagcut, matchcut])
-            #     if tf.GetEntries(cut) == 0:
-            #         continue
-            #     for nmem in range(3):
-            #         Draw(tf, jetd, gensyst,
-            #             "mem_tth_p[{0}] / (mem_tth_p[{0}] + 0.15*mem_ttbb_p[{0}]) >> mem_d_{1}_{0}(20,0,1)".format(nmem, match),
-            #             cut
-            #         )
-            # 
-            jetd.Write()
+        jetd.Write()
 
         
     sampled.Write()

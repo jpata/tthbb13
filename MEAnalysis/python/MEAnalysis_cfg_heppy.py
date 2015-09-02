@@ -276,7 +276,7 @@ class Conf:
     trigger = {
 
         "filter": False,
-        "HLTpaths": [
+        "paths": [
         
             #SL triggers
             "HLT_BIT_HLT_Ele27_eta2p1_WP85_Gsf_HT200_v",
@@ -378,8 +378,8 @@ class Conf:
         "methodsToRun": [
             "SL_0w2h2t",
             "DL_0w2h2t",
-            "SL_2w2h2t",
-            "SL_2w2h2t_sj",
+            #"SL_2w2h2t",
+            #"SL_2w2h2t_sj",
             #"SL_2w2h2t_memLR",
             #"SL_0w2h2t_memLR",
             #"DL_0w2h2t_Rndge4t",
