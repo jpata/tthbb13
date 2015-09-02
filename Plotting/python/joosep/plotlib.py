@@ -24,6 +24,60 @@ import math
 matplotlib.rc("axes", labelsize=24)
 matplotlib.rc("axes", titlesize=16)
 
+path = "/Users/joosep/Documents/tth/data/ntp/v12/nome/"
+samples = {
+    "tth_amcatnlo": [
+        path + "/ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8_hbb.root",
+        #path + "/ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8_hX.root",
+    ],
+    "tth_phys14": [
+        "/Users/joosep/Documents/tth/data/ntp/v10_phys14/Aug20_564f1b8_phys14_ref1/tth_13tev_amcatnlo_pu20bx25_hbb.root"
+    ],
+    
+    
+    "ttjets_amcatnlo": [
+        path + "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ttbb.root",
+        path + "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_tt2b.root",
+        path + "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ttb.root",
+        path + "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ttcc.root",
+        path + "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ttll.root",
+    ],
+    "ttjets_phys14": [
+        "/Users/joosep/Documents/tth/data/ntp/v10_phys14/Aug20_564f1b8_phys14_ref1/ttjets_13tev_madgraph_pu20bx25_phys14.root"
+    ],
+    "tth_powheg": [
+        path + "ttHTobb_M125_13TeV_powheg_pythia8_hbb.root",
+        #path + "ttHTobb_M125_13TeV_powheg_pythia8_hX.root",
+    ],
+    "ttjets_powheg": [
+        path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttbb.root",
+        path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_tt2b.root",
+        path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttb.root",
+        path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttcc.root",
+        path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttll.root",
+    ],
+}
+
+def process_sample_hist(fnames, hname, func, bins, cut, **kwargs):
+    tt = ROOT.TChain("tree")
+    for fn in fnames:
+        tt.Add(fn)
+    ROOT.gROOT.cd()
+    hs = {}
+    h = ROOT.gROOT.Get(hname)
+    if h:
+        h.Delete()
+    h = ROOT.TH1D(hname, "", bins[0], bins[1], bins[2])
+    hname = h.GetName()
+    h = rootpy.asrootpy(h)
+    h.SetDirectory(ROOT.gROOT)
+    n = tt.Draw("{0} >> {1}".format(func, hname), cut)
+    print n, h.Integral()
+    if kwargs.get("norm", False):
+        if h.Integral()>0:
+            h.Scale(1.0 / h.Integral())
+    return h
+    
 def make_df_hist(bins, x, w=1.0):
     h = rootpy.plotting.Hist(*bins)
     a = np.array(x).astype("float64")
@@ -363,6 +417,29 @@ def calc_roc(h1, h2):
             err[i, 1] = e2
     return roc, err
 
+def match_histogram(sample, var, cut):
+    hs = process_sample_hist(
+        sample, "hs",
+        var,
+        (250,0,250),
+        cut
+    )
+    hs.Scale(1.0 / hs.Integral())
+
+    nb = 0
+    labels = []
+    h = rootpy.plotting.Hist(30,0,30)
+    for i in range(0,3):
+        for j in range(0,3):
+            for k in range(0,3):
+                nb += 1
+                h.SetBinContent(nb, hs.GetBinContent(1 + 100*i+10*j+k))
+                h.SetBinError(nb, hs.GetBinError(1 + 100*i+10*j+k))
+                #print nb, i,j,k,h.GetBinContent(nb)
+                labels += ["%d%d%d"%(i,j,k)]
+    
+    return h
+    
 def draw_rocs_file(pairs, **kwargs):
     for pair in pairs:
         tf, hn1, hn2, label = pair

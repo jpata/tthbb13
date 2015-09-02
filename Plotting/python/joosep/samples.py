@@ -27,7 +27,7 @@ samples_latex = [
     #("ttz_13tev_madgraph_pu20bx25_phys14", "$\\mathrm{t}\\bar{\\mathrm{t}} + \mathrm{Z}$"),
 ]
 
-path = "/Users/joosep/Documents/tth/data/ntp/v12/"
+path = "/Users/joosep/Documents/tth/data/ntp/v12/me/"
 
 class Sample:
     def __init__(self, name, filenames):
