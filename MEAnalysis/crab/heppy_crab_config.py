@@ -4,7 +4,7 @@ config = Configuration()
 config.section_("General")
 #this will be used for the crab directory name
 config.General.requestName = DNAME
-config.General.workArea = 'crab_projects_mem2'
+config.General.workArea = 'crab_projects_mem3'
 config.General.transferLogs = True
 
 config.section_("JobType")
