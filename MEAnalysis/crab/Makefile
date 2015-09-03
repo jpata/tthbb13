@@ -7,4 +7,4 @@ split:
 
 #make crab configuration files
 configs:
-	./makeConfigs.py datasets/*.dat
+	./makeConfigs.py `git rev-parse --short HEAD` datasets/*.dat

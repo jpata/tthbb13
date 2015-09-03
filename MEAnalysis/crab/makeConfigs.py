@@ -3,7 +3,8 @@ import os, sys
 
 username = os.getenv("USER")
 if __name__ == "__main__":
-    datasets = sys.argv[1:]
+    githash = sys.argv[1]
+    datasets = sys.argv[2:]
     
     for dataset in datasets:
         infile = open("heppy_crab_config.py").read()
@@ -15,6 +16,7 @@ if __name__ == "__main__":
         infile = infile.replace("DATASET", '"' + dataset + '"')
         infile = infile.replace("DNAME", '"' + dname + '"')
         infile = infile.replace("USERNAME", username)
+        infile = infile.replace("GITHASH", githash)
         of = open("cfg_{0}.py".format(dname), "w")
         of.write(infile)
         of.close()
