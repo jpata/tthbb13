@@ -80,8 +80,6 @@ for sn in sorted(samples_dict.keys()):
     if s.skip.value() == False and len(s.subFiles.value())>0:
         inputSamples.append(inputSample)
 
-print "Processing samples", [s.name for s in inputSamples]
-
 #Event contents are defined here
 #This is work in progress
 from TTH.MEAnalysis.VHbbTree import *
@@ -96,6 +94,11 @@ evs = cfg.Analyzer(
 import TTH.MEAnalysis.MECoreAnalyzers as MECoreAnalyzers
 
 #
+counter = cfg.Analyzer(
+    MECoreAnalyzers.CounterAnalyzer,
+    'counter',
+    _conf = conf
+)
 
 evtid_filter = cfg.Analyzer(
     MECoreAnalyzers.EventIDFilterAnalyzer,
@@ -214,6 +217,7 @@ treeProducer = getTreeProducer(conf)
 # definition of a sequence of analyzers,
 # the analyzers will process each event in this order
 sequence = cfg.Sequence([
+    counter,
     evtid_filter,
     evs,
     evtweight,
@@ -244,7 +248,6 @@ output_service = cfg.Service(
     fname='tree.root',
     option='recreate'
 )
-print "Creating TChain"
 
 #finalization of the configuration object.
 from PhysicsTools.HeppyCore.framework.chain import Chain as Events

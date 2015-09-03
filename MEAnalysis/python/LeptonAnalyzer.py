@@ -132,4 +132,4 @@ class LeptonAnalyzer(FilterAnalyzer):
                 (self.conf.leptons["el"]["debug"])(lep)
             passes = False
 
-        return passes
+        return self.conf.general["passall"] or passes

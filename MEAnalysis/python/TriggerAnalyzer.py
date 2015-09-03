@@ -34,4 +34,4 @@ class TriggerAnalyzer(FilterAnalyzer):
         if self.conf.trigger["filter"] and not event.triggerDecision:
             passes = False
         
-        return passes
+        return self.conf.general["passall"] or passes

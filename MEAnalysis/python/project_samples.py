@@ -1,50 +1,32 @@
 import ROOT
 
+tth_sel = [
+    ("hbb", "nGenBHiggs>=2"),
+    ("hX", "nGenBHiggs<2"),
+]
+
+ttjets_sel = [
+    ("ttb", "ttCls == 51"),
+    ("tt2b", "ttCls == 52"),
+    ("ttbb", "ttCls == 53 || ttCls == 54 || ttCls == 55 || ttCls==56"),
+    #("ttbb", "ttCls == 53"),
+    #("ttb2b", "ttCls == 54"),
+    #("tt2b2b", "ttCls == 55"),
+
+    ("ttcc", "(ttCls == 41 || ttCls == 42 || ttCls == 43 || ttCls == 44 || ttCls == 45)"),
+    #("ttc", "ttCls == 41"),
+    #("tt2c", "ttCls == 42"),
+    #("ttcc", "ttCls == 43"),
+    #("ttc2c", "ttCls == 44"),
+    #("tt2c2c", "ttCls == 45"),
+    ("ttll", "ttCls == 0 || ttCls<0")
+]
+
 inf = [
-    ("/home/joosep/tth/gc/GC7c47c78e340a/MEAnalysis_cfg_heppy/ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8.root",
-    [
-        ("hbb", "nGenBHiggs>=2"),
-        ("hX", "nGenBHiggs<2"),
-    ]),
-    ("/home/joosep/tth/gc/GC7c47c78e340a/MEAnalysis_cfg_heppy/ttHTobb_M125_13TeV_powheg_pythia8.root",
-    [
-        ("hbb", "nGenBHiggs>=2"),
-        ("hX", "nGenBHiggs<2"),
-    ]),
-    ("/home/joosep/tth/gc/GCc4e12e47bfce/MEAnalysis_cfg_heppy/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.root",
-    [
-        ("ttb", "ttCls == 51"),
-        ("tt2b", "ttCls == 52"),
-        ("ttbb", "ttCls == 53 || ttCls == 54 || ttCls == 55 || ttCls==56"),
-        #("ttbb", "ttCls == 53"),
-        #("ttb2b", "ttCls == 54"),
-        #("tt2b2b", "ttCls == 55"),
-
-        ("ttcc", "(ttCls == 41 || ttCls == 42 || ttCls == 43 || ttCls == 44 || ttCls == 45)"),
-        #("ttc", "ttCls == 41"),
-        #("tt2c", "ttCls == 42"),
-        #("ttcc", "ttCls == 43"),
-        #("ttc2c", "ttCls == 44"),
-        #("tt2c2c", "ttCls == 45"),
-        ("ttll", "ttCls == 0 || ttCls<0")
-    ]),
-    ("/home/joosep/tth/gc/GCc4e12e47bfce/MEAnalysis_cfg_heppy/TT_TuneCUETP8M1_13TeV-powheg-pythia8.root",
-    [
-        ("ttb", "ttCls == 51"),
-        ("tt2b", "ttCls == 52"),
-        ("ttbb", "ttCls == 53 || ttCls == 54 || ttCls == 55 || ttCls==56"),
-        #("ttbb", "ttCls == 53"),
-        #("ttb2b", "ttCls == 54"),
-        #("tt2b2b", "ttCls == 55"),
-
-        ("ttcc", "(ttCls == 41 || ttCls == 42 || ttCls == 43 || ttCls == 44 || ttCls == 45)"),
-        #("ttc", "ttCls == 41"),
-        #("tt2c", "ttCls == 42"),
-        #("ttcc", "ttCls == 43"),
-        #("ttc2c", "ttCls == 44"),
-        #("tt2c2c", "ttCls == 45"),
-        ("ttll", "ttCls == 0 || ttCls<0")
-    ])
+    ("/home/joosep/tth/gc/GC3c2c5704ee07/MEAnalysis_cfg_heppy/ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8.root", tth_sel),
+    ("/home/joosep/tth/gc/GC3c2c5704ee07/MEAnalysis_cfg_heppy/ttHTobb_M125_13TeV_powheg_pythia8.root", tth_sel),
+    ("/home/joosep/tth/gc/GCaeca6a813136/MEAnalysis_cfg_heppy/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.root", ttjets_sel),
+    ("/home/joosep/tth/gc/GCaeca6a813136/MEAnalysis_cfg_heppy/TT_TuneCUETP8M1_13TeV-powheg-pythia8.root", ttjets_sel)
 ]
 
 for f, cuts in inf:
