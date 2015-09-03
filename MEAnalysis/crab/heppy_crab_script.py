@@ -121,7 +121,7 @@ finally:
     </GeneratorInfo>
     
     <InputFile>
-    <LFN>%s</LFN>
+    <LFN>{0}</LFN>
     <PFN></PFN>
     <Catalog></Catalog>
     <InputType>primaryFiles</InputType>
@@ -134,7 +134,7 @@ finally:
     
     <File>
     <LFN></LFN>
-    <PFN>{0}</PFN>
+    <PFN>tree.root</PFN>
     <Catalog></Catalog>
     <ModuleLabel>HEPPY</ModuleLabel>
     <GUID></GUID>
