@@ -20,7 +20,7 @@ nEvents = int(nEvents)
 print "checking file",rootfilename
 tf = ROOT.TFile.Open(rootfilename)
 if not tf or tf.IsZombie():
-    raise FileError("Could not open: {0}".format(rootfilename))
+    raise Exception("Could not open: {0}".format(rootfilename))
 tt = tf.Get("tree")
 nentries = tt.GetEntries()
 print "file entries", tt.GetEntries()

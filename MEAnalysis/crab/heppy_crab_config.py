@@ -4,7 +4,7 @@ config = Configuration()
 config.section_("General")
 #this will be used for the crab directory name
 config.General.requestName = DNAME
-config.General.workArea = 'crab_projects_mem'
+config.General.workArea = 'crab_projects_mem2'
 config.General.transferLogs = True
 
 config.section_("JobType")
@@ -36,7 +36,7 @@ config.Data.primaryDataset = DNAME
 config.Data.splitting = 'FileBased'
 config.Data.unitsPerJob = 1
 config.Data.totalUnits = -1
-config.Data.outLFNDirBase = '/store/user/jpata/tthbb13/VHBBHeppyV12/Sep2_f074b99'
+config.Data.outLFNDirBase = '/store/user/jpata/tthbb13/VHBBHeppyV12/Sep3_0881a04'
 config.Data.publication = False
 filelist = open(DATASET).readlines()
 config.Data.userInputFiles = filelist
