@@ -3,7 +3,7 @@ config = Configuration()
 
 config.section_("General")
 #this will be used for the crab directory name
-config.General.requestName = DATASET
+config.General.requestName = DNAME
 config.General.workArea = 'crab_projects_mem'
 config.General.transferLogs = True
 
@@ -32,13 +32,13 @@ config.JobType.inputFiles = [
 
 config.section_("Data")
 #this name will be used for creating the output directory
-config.Data.primaryDataset = DATASET
+config.Data.primaryDataset = DNAME
 config.Data.splitting = 'FileBased'
 config.Data.unitsPerJob = 1
 config.Data.totalUnits = -1
-config.Data.outLFNDirBase = '/store/user/jpata/tthbb13/VHBBHeppyV12/test2'
+config.Data.outLFNDirBase = '/store/user/jpata/tthbb13/VHBBHeppyV12/Sep2_f074b99'
 config.Data.publication = False
-filelist = open("datasets/" + DATASET).readlines()
+filelist = open(DATASET).readlines()
 config.Data.userInputFiles = filelist
 
 config.section_("Site")

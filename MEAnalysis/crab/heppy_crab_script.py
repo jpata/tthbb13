@@ -19,8 +19,13 @@ firstEvent = int(firstEvent)
 nEvents = int(nEvents)
 print "checking file",rootfilename
 tf = ROOT.TFile.Open(rootfilename)
+if not tf or tf.IsZombie():
+    raise FileError("Could not open: {0}".format(rootfilename))
 tt = tf.Get("tree")
+nentries = tt.GetEntries()
 print "file entries", tt.GetEntries()
+if firstEvent > nentries:
+    raise Exception("wrong entry number: {0}".format(firstEvent))
 tf.Close()
 #print "--------------- using edmFileUtil to convert PFN to LFN -------------------------"
 #for i in xrange(0,len(crabFiles)) :
@@ -49,11 +54,12 @@ handle.close()
 config.components[0].files=[rootfilename]
 
 from PhysicsTools.HeppyCore.framework.looper import Looper
-looper = Looper( 'Output', config, nPrint = 1, firstEvent=firstEvent, nEvents=nEvents)
+print "processing",rootfilename, firstEvent, nEvents
+looper = Looper( 'Output', config, nPrint = 0, firstEvent=firstEvent, nEvents=nEvents)
 looper.loop()
 looper.write()
 
-print PSet.process.output.fileName
+print "output file:", PSet.process.output.fileName
 os.rename("Output/tree.root", "tree.root")
 
 import ROOT
