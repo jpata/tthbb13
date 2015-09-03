@@ -92,6 +92,7 @@ except Exception as e:
     errmsg = str(e) + "\n" + traceback.format_exc()
     if retcode == 0:
         retcode = 8003
+    print "ERROR:", errmsg
 finally:
     fwkerr = ""
     if retcode != 0:
@@ -149,3 +150,4 @@ finally:
     f1.write(fwkreport)
     print "heppy crab script wrote FJR xml"
     print "heppy crab script is done!"
+    print fwkreport

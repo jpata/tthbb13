@@ -311,9 +311,9 @@ class Conf:
         "sampleFile": os.environ["CMSSW_BASE"]+"/python/TTH/MEAnalysis/samples_v12.py",
         "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions.pickle",
         "transferFunctions_sj_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions_sj.pickle",
-        #"systematics": ["nominal"],
+        "systematics": ["nominal"],
         #"systematics": ["nominal", "JESUp", "JESDown", "raw"],
-        "systematics": ["nominal", "JESUp", "JESDown"],
+        #"systematics": ["nominal", "JESUp", "JESDown"],
         
         
         #If the list contains:
