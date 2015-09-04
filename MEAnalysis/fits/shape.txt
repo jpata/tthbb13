@@ -1,0 +1,24 @@
+imax 1
+jmax 5
+kmax *
+---------------
+shapes * sl_jge6_tge4 /home/joosep/joosep-mac/Dropbox/tth/datacards/ref2_spring15/tth_ttjets_powheg_nodlupate_withme.root $PROCESS/$CHANNEL/mem_d_nomatch_0 $PROCESS/$CHANNEL/mem_d_nomatch_0_$SYSTEMATIC
+shapes data_obs sl_jge6_tge4 /home/joosep/joosep-mac/Dropbox/tth/datacards/ref2_spring15/fakeData.root $PROCESS/$CHANNEL/mem_d_nomatch_0 $PROCESS/$CHANNEL/mem_d_nomatch_0_$SYSTEMATIC
+---------------
+bin sl_jge6_tge4
+observation 0.057961
+------------------------------
+bin                     sl_jge6_tge4          sl_jge6_tge4                sl_jge6_tge4               sl_jge6_tge4               sl_jge6_tge4               sl_jge6_tge4
+process                 ttH_hbb    ttbarPlus2B     ttbarPlusB     ttbarPlusBBbar   ttbarPlusCCbar  ttbarOther
+process                 0          1               2              3                4               5
+rate                    0.004128           0.006201               0.008221               0.027473               0.010257           0.005809
+--------------------------------
+lumi     lnN            1.01       1.0              1.0             1.0             1.0             1.0
+#bgnorm   lnN            1.00       1.5              1.3             1.3             1.3             1.3
+#CMS_ttH_CSVLF  shapeN2    1         1               1               1               1               1
+#CMS_ttH_CSVHF  shapeN2    1         1               1               1               1               1
+
+
+#combine -M ProfileLikelihood MEAnalysis/fits/shape.txt -t 100
+#CMS_ttH_CSVHF has bogus normalization
+#do we need to write rates here manually?

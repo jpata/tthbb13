@@ -313,6 +313,7 @@ class Conf:
         "transferFunctions_sj_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions_sj.pickle",
         "systematics": ["nominal"],
         #"systematics": ["nominal", "JESUp", "JESDown", "raw"],
+        #"systematics": ["nominal", "JESUp", "JESDown"],
         
         
         #If the list contains:

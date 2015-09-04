@@ -24,7 +24,7 @@ import math
 matplotlib.rc("axes", labelsize=24)
 matplotlib.rc("axes", titlesize=16)
 
-path = "/Users/joosep/Documents/tth/data/ntp/v12/nome/"
+path = "/Users/joosep/Documents/tth/data/ntp/v12/me/"
 samples = {
     "tth_amcatnlo": [
         path + "/ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8_hbb.root",
@@ -440,13 +440,14 @@ def match_histogram(sample, var, cut):
     
     return h
     
-def draw_rocs_file(pairs, **kwargs):
+def get_pairs_file(pairs, **kwargs):
+    ps = []
     for pair in pairs:
         tf, hn1, hn2, label = pair
         h1 = tf.get(hn1).Clone()
         h2 = tf.get(hn2).Clone()
-        ps += [h1, h2, label]
-    return draw_rocs(ps, **kwargs)
+        ps += [(h1, h2, label)]
+    return ps
     
     
 def draw_rocs(pairs, **kwargs):
@@ -471,7 +472,7 @@ def draw_rocs(pairs, **kwargs):
 
     for (r, e, pair) in zip(rs, es, pairs):
         h1, h2, label = pair
-        plt.errorbar(r[:, 0], r[:, 1], e[:, 0], e[:, 1], label=label)
+        plt.errorbar(r[:, 0], r[:, 1], xerr=e[:, 0], yerr=e[:, 1], label=label)
 
     plt.legend(loc=2)
 
@@ -526,3 +527,53 @@ def train(df, var, cut, **kwargs):
         cls = cls.fit(df_train_shuf[var], df_train_shuf["id"], df_train_shuf[weight])
 
     return cls, df_test, df_train
+
+def syst_comparison(sn, l, **kwargs):
+    h0 = tf.get(sn + l[0]).Clone()
+    h1 = tf.get(sn + l[1]).Clone()
+    h2 = tf.get(sn + l[2]).Clone()
+    
+    for ih, h in enumerate([h0, h1, h2]):
+        h.Scale(10000)
+        h.title = l[ih]
+        h.title = h.title.replace("_", "")
+        h.title += " ({0:.2f})".format(h.Integral())
+    rb = kwargs.get("rebin", 1)
+    h0.rebin(rb)
+    h1.rebin(rb)
+    h2.rebin(rb)
+
+    a1 = plt.axes([0.0,0.52,1.0,0.5])
+    errorbar(h0)
+    h1.linewidth = 2
+    h2.linewidth = 2
+    hist(h1, color="blue")
+    hist(h2, color="red")
+
+    fill_between(h1, h2, hatch="////", facecolor="none", edgecolor="black", lw=0, zorder=10)
+
+    h1n = h1.Clone()
+    h2n = h2.Clone()
+    plt.legend(numpoints=1, loc="best")
+    h1n.Scale(h0.Integral() / h1n.Integral())
+    h2n.Scale(h0.Integral() / h2n.Integral())
+    
+    h1n.linestyle = "dashed"
+    h2n.linestyle = "dashed"
+    hist(h1n, color="blue")
+    hist(h2n, color="red")
+    
+    #plt.ylim(bottom=0)
+    plt.axhline(0.0)
+    a2 = plt.axes([0.0,0.0,1.0,0.48],sharex=a1)
+    
+    h1r = h1.Clone()
+    h1r.Divide(h0)
+    h2r = h2.Clone()
+    h2r.Divide(h0)
+    h1r.color = "blue"
+    h2r.color = "red"
+    errorbar(h1r, color="blue")
+    errorbar(h2r, color="red")
+    plt.axhline(1.0, color="black")
+    #fill_between(h1, h2, hatch="\\\\", facecolor="none", edgecolor="black", lw=0, zorder=10)
