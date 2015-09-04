@@ -361,6 +361,10 @@ class Conf:
         "methodOrder": [
             "SL_0w2h2t",
             "DL_0w2h2t",
+            
+            "SL_1w2h2t",
+            "SL_2w2h1t_l",
+            "SL_2w2h1t_h",
             "SL_2w2h2t",
 
             #with bLR calc by mem code
@@ -401,8 +405,8 @@ CvectorPSVar = getattr(ROOT, "std::vector<MEM::PSVar::PSVar>")
 c = MEMConfig()
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 1 and
-    len(mcfg.b_quark_candidates(ev)) == 4 and
-    len(mcfg.l_quark_candidates(ev)) == 2
+    len(mcfg.b_quark_candidates(ev)) >= 4 and
+    len(mcfg.l_quark_candidates(ev)) >= 2
 )
 c.mem_assumptions.add("sl")
 strat = CvectorPermutations()
@@ -413,14 +417,67 @@ c.cfg.perm_pruning = strat
 Conf.mem_configs["SL_2w2h2t"] = c
 
 ###
+### SL_1w2h2t
+###
+c = MEMConfig()
+c.do_calculate = lambda ev, mcfg: (
+    len(mcfg.lepton_candidates(ev)) == 1 and
+    len(mcfg.b_quark_candidates(ev)) >= 4 and
+    len(mcfg.l_quark_candidates(ev)) >= 1
+)
+c.mem_assumptions.add("sl")
+c.mem_assumptions.add("1w2h2t")
+strat = CvectorPermutations()
+strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
+strat.push_back(MEM.Permutations.QUntagged)
+strat.push_back(MEM.Permutations.BTagged)
+c.cfg.perm_pruning = strat
+Conf.mem_configs["SL_1w2h2t"] = c
+
+###
+### SL_2w2h1t_l
+###
+c = MEMConfig()
+c.do_calculate = lambda ev, mcfg: (
+    len(mcfg.lepton_candidates(ev)) == 1 and
+    len(mcfg.b_quark_candidates(ev)) >= 3 and
+    len(mcfg.l_quark_candidates(ev)) >= 1
+)
+c.mem_assumptions.add("sl")
+c.mem_assumptions.add("2w2h1t_l")
+strat = CvectorPermutations()
+strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
+strat.push_back(MEM.Permutations.QUntagged)
+strat.push_back(MEM.Permutations.BTagged)
+c.cfg.perm_pruning = strat
+Conf.mem_configs["SL_2w2h1t_l"] = c
+
+###
+### SL_2w2h1t_h
+###
+c = MEMConfig()
+c.do_calculate = lambda ev, mcfg: (
+    len(mcfg.lepton_candidates(ev)) == 1 and
+    len(mcfg.b_quark_candidates(ev)) >= 3 and
+    len(mcfg.l_quark_candidates(ev)) >= 1
+)
+c.mem_assumptions.add("sl")
+c.mem_assumptions.add("2w2h1t_h")
+strat = CvectorPermutations()
+strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
+strat.push_back(MEM.Permutations.QUntagged)
+strat.push_back(MEM.Permutations.BTagged)
+c.cfg.perm_pruning = strat
+Conf.mem_configs["SL_2w2h1t_h"] = c
+
+###
 ### SL_0w2h2t
 ###
 c = MEMConfig()
 c.l_quark_candidates = lambda ev: []
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 1 and
-    len(mcfg.b_quark_candidates(ev)) >= 4 and
-    ev.nBCSVM >= 3
+    len(mcfg.b_quark_candidates(ev)) >= 4
     #(len(mcfg.l_quark_candidates(ev)) + len(mcfg.b_quark_candidates(ev))) >= 4
 )
 c.mem_assumptions.add("sl")
