@@ -1,10 +1,11 @@
 from WMCore.Configuration import Configuration
 config = Configuration()
 
+processing_name = "Sep3_GITHASH"
 config.section_("General")
 #this will be used for the crab directory name
 config.General.requestName = DNAME
-config.General.workArea = 'crab_projects_mem4'
+config.General.workArea = 'crab_projects_mem/' + processing_name
 config.General.transferLogs = True
 
 config.section_("JobType")
@@ -12,7 +13,7 @@ config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'heppy_crab_fake_pset.py'
 config.JobType.scriptExe = 'heppy_crab_script.sh'
 #job maximum runtime in minutes
-config.JobType.maxJobRuntimeMin = 12 * 60
+config.JobType.maxJobRuntimeMin = 47 * 60
 
 import os
 #we need to specially ship the python and data directories
@@ -36,7 +37,7 @@ config.Data.primaryDataset = DNAME
 config.Data.splitting = 'FileBased'
 config.Data.unitsPerJob = 1
 config.Data.totalUnits = -1
-config.Data.outLFNDirBase = '/store/user/USERNAME/tthbb13/VHBBHeppyV12/Sep3_GITHASH'
+config.Data.outLFNDirBase = '/store/user/USERNAME/tthbb13/VHBBHeppyV12/' + processing_name
 config.Data.publication = False
 filelist = open(DATASET).readlines()
 config.Data.userInputFiles = filelist
