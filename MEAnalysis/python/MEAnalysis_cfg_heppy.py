@@ -23,7 +23,7 @@ def jet_baseline(jet, oldpt=None):
 # LB: in fact,  mu.tightId should contain all the other cuts
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Tight_Muon
 # https://github.com/vhbb/cmssw/blob/vhbbHeppy722patch2/PhysicsTools/Heppy/python/physicsobjects/Muon.py
-def mu_baseline(mu):
+def mu_baseline_tight(mu):
     return (
         mu.tightId and
         mu.isPFMuon and
@@ -185,31 +185,24 @@ class Conf:
         "mu": {
 
             #SL
-            "tight": {
+            "SL": {
                 "pt": 30,
                 "eta":2.1,
                 "iso": 0.12,
-                "idcut": mu_baseline,
+                "idcut": mu_baseline_tight,
             },
-            "tight_veto": {
-                "pt": 10.0,
-                "eta": 2.4,
-                "iso": 0.2,
-                "idcut": mu_baseline,
-            },
-
             #DL
-            "loose": {
+            "DL": {
                 "pt": 20,
                 "eta": 2.4,
                 "iso": 0.12,
-                "idcut": mu_baseline,
+                "idcut": mu_baseline_tight,
             },
-            "loose_veto": {
+            "veto": {
                 "pt": 10.0,
                 "eta": 2.4,
                 "iso": 0.2,
-                "idcut": mu_baseline,
+                "idcut": mu_baseline_tight,
             },
             "isotype": "pfRelIso04", #pfRelIso - delta-beta, relIso - rho
             "debug" : print_mu
@@ -217,23 +210,17 @@ class Conf:
 
 
         "el": {
-            "tight": {
+            "SL": {
                 "pt": 30,
                 "eta": 2.1,
                 "idcut": lambda el: el_baseline_medium(el),
             },
-            "tight_veto": {
-                "pt": 20,
-                "eta": 2.4,
-                "idcut": lambda el: el_baseline_loose(el),
-            },
-
-            "loose": {
+            "DL": {
                 "pt": 20,
                 "eta": 2.4,
                 "idcut": lambda el: el_baseline_medium(el),
             },
-            "loose_veto": {
+            "veto": {
                 "pt": 10,
                 "eta": 2.4,
                 "idcut": lambda el: el_baseline_loose(el),
@@ -289,9 +276,25 @@ class Conf:
     trigger = {
 
         "filter": False,
-        "HLTpaths": [
+        "paths": [
+        
+            #SL triggers
             "HLT_BIT_HLT_Ele27_eta2p1_WP85_Gsf_HT200_v",
             "HLT_BIT_HLT_IsoMu24_eta2p1_v"
+            
+            #DL triggers
+            #mumu
+            "HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v",
+            "HLT_BIT_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v",
+            
+            #emu
+            "HLT_BIT_HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v",
+            "HLT_BIT_HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v",
+            
+            #ee
+            "HLT_BIT_HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v",
+
+            #FH triggers: in separate config file
             #"HLT_BIT_HLT_PFHT400_SixJet30_BTagCSV0p5_2PFBTagCSV_v",
             #"HLT_BIT_HLT_PFHT450_SixJet40_PFBTagCSV_v",
             #"HLT_ttHhardonicLowLumi",
@@ -300,7 +303,7 @@ class Conf:
     }
 
     general = {
-        "controlPlotsFileOld": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsTEST.root",
+        "passall": True,
         "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV6_finerPt.root",
         "QGLPlotsFile_flavour": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/Histos_QGL_flavour.root",
         #"sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_722sync.py",
@@ -310,6 +313,7 @@ class Conf:
         "transferFunctions_sj_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions_sj.pickle",
         "systematics": ["nominal"],
         #"systematics": ["nominal", "JESUp", "JESDown", "raw"],
+        #"systematics": ["nominal", "JESUp", "JESDown"],
         
         
         #If the list contains:
@@ -350,13 +354,17 @@ class Conf:
 
         #Generic event-dependent selection function applied
         #just before the MEM. If False, MEM is skipped
-        "selection": lambda event: event.btag_LR_4b_2b > 0.98 ,
+        "selection": lambda event: event.btag_LR_4b_2b > 0.95, #optimized for 40% tth(bb) acceptance
         
         #This configures what the array elements mean
         #Better not change this
         "methodOrder": [
             "SL_0w2h2t",
             "DL_0w2h2t",
+            
+            "SL_1w2h2t",
+            "SL_2w2h1t_l",
+            "SL_2w2h1t_h",
             "SL_2w2h2t",
 
             #with bLR calc by mem code
@@ -375,8 +383,12 @@ class Conf:
         "methodsToRun": [
             "SL_0w2h2t",
             "DL_0w2h2t",
+            "SL_1w2h2t",
+            "SL_2w2h1t_l",
+            "SL_2w2h1t_h",
             "SL_2w2h2t",
-            "SL_2w2h2t_sj",
+            #"SL_2w2h2t",
+            #"SL_2w2h2t_sj",
             #"SL_2w2h2t_memLR",
             #"SL_0w2h2t_memLR",
             #"DL_0w2h2t_Rndge4t",
@@ -397,8 +409,8 @@ CvectorPSVar = getattr(ROOT, "std::vector<MEM::PSVar::PSVar>")
 c = MEMConfig()
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 1 and
-    len(mcfg.b_quark_candidates(ev)) == 4 and
-    len(mcfg.l_quark_candidates(ev)) == 2
+    len(mcfg.b_quark_candidates(ev)) >= 4 and
+    len(mcfg.l_quark_candidates(ev)) >= 2
 )
 c.mem_assumptions.add("sl")
 strat = CvectorPermutations()
@@ -409,14 +421,67 @@ c.cfg.perm_pruning = strat
 Conf.mem_configs["SL_2w2h2t"] = c
 
 ###
+### SL_1w2h2t
+###
+c = MEMConfig()
+c.do_calculate = lambda ev, mcfg: (
+    len(mcfg.lepton_candidates(ev)) == 1 and
+    len(mcfg.b_quark_candidates(ev)) >= 4 and
+    len(mcfg.l_quark_candidates(ev)) >= 1
+)
+c.mem_assumptions.add("sl")
+c.mem_assumptions.add("1w2h2t")
+strat = CvectorPermutations()
+strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
+strat.push_back(MEM.Permutations.QUntagged)
+strat.push_back(MEM.Permutations.BTagged)
+c.cfg.perm_pruning = strat
+Conf.mem_configs["SL_1w2h2t"] = c
+
+###
+### SL_2w2h1t_l
+###
+c = MEMConfig()
+c.do_calculate = lambda ev, mcfg: (
+    len(mcfg.lepton_candidates(ev)) == 1 and
+    len(mcfg.b_quark_candidates(ev)) >= 3 and
+    len(mcfg.l_quark_candidates(ev)) >= 1
+)
+c.mem_assumptions.add("sl")
+c.mem_assumptions.add("2w2h1t_l")
+strat = CvectorPermutations()
+strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
+strat.push_back(MEM.Permutations.QUntagged)
+strat.push_back(MEM.Permutations.BTagged)
+c.cfg.perm_pruning = strat
+Conf.mem_configs["SL_2w2h1t_l"] = c
+
+###
+### SL_2w2h1t_h
+###
+c = MEMConfig()
+c.do_calculate = lambda ev, mcfg: (
+    len(mcfg.lepton_candidates(ev)) == 1 and
+    len(mcfg.b_quark_candidates(ev)) >= 3 and
+    len(mcfg.l_quark_candidates(ev)) >= 1
+)
+c.mem_assumptions.add("sl")
+c.mem_assumptions.add("2w2h1t_h")
+strat = CvectorPermutations()
+strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
+strat.push_back(MEM.Permutations.QUntagged)
+strat.push_back(MEM.Permutations.BTagged)
+c.cfg.perm_pruning = strat
+Conf.mem_configs["SL_2w2h1t_h"] = c
+
+###
 ### SL_0w2h2t
 ###
 c = MEMConfig()
 c.l_quark_candidates = lambda ev: []
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 1 and
-    len(mcfg.b_quark_candidates(ev)) >= 4 and
-    ev.nBCSVM >= 3
+    len(mcfg.b_quark_candidates(ev)) >= 4
     #(len(mcfg.l_quark_candidates(ev)) + len(mcfg.b_quark_candidates(ev))) >= 4
 )
 c.mem_assumptions.add("sl")
@@ -555,7 +620,7 @@ import inspect
 def print_dict(d):
     s = "(\n"
     for k, v in sorted(d.items(), key=lambda x: x[0]):
-        if callable(v):
+        if callable(v) and not isinstance(v, ROOT.TF1):
             v = inspect.getsource(v).strip()
         elif isinstance(v, dict):
             s += print_dict(v)
@@ -569,6 +634,8 @@ def conf_to_str(Conf):
         s += "{0}: ".format(k)
         if isinstance(v, dict):
             s += print_dict(v)
+        elif isinstance(v, ROOT.TF1):
+            s += "ROOT.TF1({0}, {1})".format(v.GetName(), v.GetTitle())
         else:
             s += str(v)
     s += "\n"

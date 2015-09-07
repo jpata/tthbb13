@@ -18,8 +18,9 @@ class TriggerAnalyzer(FilterAnalyzer):
         event.triggerDecision = False
        
         event.trigvec = []
-        for name in self.conf.trigger["HLTpaths"]:
+        for name in self.conf.trigger["paths"]:
             bit = int(getattr(event.input, name, 0))
+            setattr(event, name, bit)
             event.trigvec += [bit == 1]
             #print name, bit
             if (bit == 1):
@@ -33,4 +34,4 @@ class TriggerAnalyzer(FilterAnalyzer):
         if self.conf.trigger["filter"] and not event.triggerDecision:
             passes = False
         
-        return passes
+        return self.conf.general["passall"] or passes

@@ -107,14 +107,15 @@ class QGLRAnalyzer(FilterAnalyzer):
         self.counters["processing"].inc("processed")
 
         #Make list of non-btagged jets
-        jets_for_qg_lr = sorted(
-            filter(
-                lambda x: (
-                    getattr(x, self.bTagAlgo) < 0.814
-                ), event.good_jets
-            ),
-            key=lambda x: x.qgl, reverse=True
-            )[0:6]
+        # jets_for_qg_lr = sorted(
+        #     filter(
+        #         lambda x: (
+        #             getattr(x, self.bTagAlgo) < 0.814
+        #         ), event.good_jets
+        #     ),
+        #     key=lambda x: x.qgl, reverse=True
+        #     )[0:6]
+        jets_for_qg_lr = event.buntagged_jets_bdisc[0:6]
       
         #print "----------------"
         #for ijet in jets_for_qg_lr: 

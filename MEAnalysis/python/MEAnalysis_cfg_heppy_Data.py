@@ -1,3 +1,4 @@
+raise Exception("This file is deprecated, see https://github.com/jpata/tthbb13/issues/42")
 import os
 from collections import OrderedDict
 from TTH.MEAnalysis.MEMConfig import MEMConfig
