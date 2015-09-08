@@ -350,7 +350,7 @@ class Conf:
 
         #Actually run the ME calculation
         #If False, all ME values will be 0
-        "calcME": True,
+        "calcME": False,
 
         #Generic event-dependent selection function applied
         #just before the MEM. If False, MEM is skipped
