@@ -1,0 +1,22 @@
+PARCMD=parallel --gnu
+
+.PHONY: clean
+
+download:
+	mkdir -p ~/tth/spring15/sync/TT_TuneCUETP8M1_13TeV-powheg-pythia8__Asympt25ns_MCRUN2_74_V9-v2
+	mkdir -p ~/tth/spring15/sync/ttHTobb_M125_13TeV_powheg_pythia8__Asympt25ns_MCRUN2_74_V9-v1/
+	xrdcp root://cms-xrd-global.cern.ch//store/mc/RunIISpring15DR74/TT_TuneCUETP8M1_13TeV-powheg-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v2/00000/0AB045B5-BB0C-E511-81FD-0025905A60B8.root ~/tth/spring15/sync/TT_TuneCUETP8M1_13TeV-powheg-pythia8__Asympt25ns_MCRUN2_74_V9-v2__0AB045B5-BB0C-E511-81FD-0025905A60B8.root
+
+split:
+	edmLumisInFiles.py  ~/tth/spring15/sync/TT_TuneCUETP8M1_13TeV-powheg-pythia8__Asympt25ns_MCRUN2_74_V9-v2__0AB045B5-BB0C-E511-81FD-0025905A60B8.root > ~/tth/spring15/sync/TT_TuneCUETP8M1_13TeV-powheg-pythia8__Asympt25ns_MCRUN2_74_V9-v2/lumilist.json 
+	python $(CMSSW_BASE)/src/TTH/MEAnalysis/python/splitLumi.py ~/tth/spring15/sync/TT_TuneCUETP8M1_13TeV-powheg-pythia8__Asympt25ns_MCRUN2_74_V9-v2/lumilist.json ~/tth/spring15/sync/TT_TuneCUETP8M1_13TeV-powheg-pythia8__Asympt25ns_MCRUN2_74_V9-v2/
+	ls ~/tth/spring15/sync/TT_TuneCUETP8M1_13TeV-powheg-pythia8__Asympt25ns_MCRUN2_74_V9-v2/block*.json | $(PARCMD) -j10 cmsRun $(CMSSW_BASE)/src/TTH/TTHNtupleAnalyzer/python/pickEvents2_cfg.py inputFiles=file:///shome/jpata/tth/spring15/sync/TT_TuneCUETP8M1_13TeV-powheg-pythia8__Asympt25ns_MCRUN2_74_V9-v2__0AB045B5-BB0C-E511-81FD-0025905A60B8.root lumifile={} outputFile=~/tth/spring15/sync/TT_TuneCUETP8M1_13TeV-powheg-pythia8__Asympt25ns_MCRUN2_74_V9-v2/block_{#}.root 
+step2:
+	cd $(CMSSW_BASE)/src/VHbbAnalysis/Heppy/test && ls  ~/tth/spring15/sync/ttHTobb_M125_13TeV_powheg_pythia8__Asympt25ns_MCRUN2_74_V9-v1/*.root | $(PARCMD) --result out_step2 -j10 python ./vhbb-parallel.py {} tth_{#}
+	cd $(CMSSW_BASE)/src/VHbbAnalysis/Heppy/test && ls  ~/tth/spring15/sync/TT_TuneCUETP8M1_13TeV-powheg-pythia8__Asympt25ns_MCRUN2_74_V9-v2/*.root | $(PARCMD) --result out_step2 -j10 python ./vhbb-parallel.py {} ttjets_{#}
+
+step3:
+	seq 1 75 | $(PARCMD) --result out_step3 -j10 python ./python/MEAnalysis_heppy_parallel.py {}
+
+clean:
+	rm -Rf $(CMSSW_BASE)/src/VHbbAnalysis/Heppy/test/Loop_*
