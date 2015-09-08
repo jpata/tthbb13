@@ -56,7 +56,68 @@ basesamples = cms.VPSet([
         ]),
         isMC     = cms.bool(True)
     ),
+    cms.PSet(
+        skip     = cms.bool(False),
+        name     = cms.string('TT_TuneCUETP8M1_13TeV-powheg-pythia8'),
+        nickName = cms.string('TT_TuneCUETP8M1_13TeV-powheg-pythia8'),
+        xSec     = cms.double(xsec[("ttjets", "13TeV")]),
+        nGen     = cms.int64(-1),
+        perJob   = cms.uint32(1000),
+        subFiles = cms.vstring([
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_10/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_11/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_12/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_13/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_14/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_15/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_16/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_17/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_18/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_19/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_1/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_20/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_21/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_22/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_23/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_24/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_25/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_26/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_27/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_28/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_29/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_2/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_30/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_31/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_32/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_33/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_34/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_35/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_36/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_37/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_38/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_39/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_3/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_40/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_41/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_42/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_43/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_44/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_45/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_46/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_47/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_48/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_49/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_4/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_5/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_6/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_7/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_8/tree.root",
+            "file:///shome/jpata/tth/sw/CMSSW/src/VHbbAnalysis/Heppy/test/Loop_ttjets_9/tree.root",
+        ]),
+        isMC     = cms.bool(True)
+    ),
 ])
+
 
 samples = []
 for sample in basesamples:
@@ -78,3 +139,4 @@ samples_dict = {s.name.value(): s for s in samples}
 if __name__ == "__main__":
     for sn, sample in samples_dict.items():
         print sample
+    print len(samples_dict)
