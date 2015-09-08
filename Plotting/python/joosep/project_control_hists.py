@@ -7,18 +7,31 @@ import random
 import numpy as np
 import multiprocessing
 import imp
+import datetime
 from samples import samples_dict
 
+# Get the input proto-datacard
 datacard_path = sys.argv[1]
-
 dcard = imp.load_source("dcard", datacard_path)
-of = ROOT.TFile(dcard.Datacard.output_filename, "RECREATE")
+
+# Create the output directory
+timestamp = datetime.datetime.now().strftime("%Y-%m-%d-%H%M")
+full_path = os.path.join(dcard.Datacard.output_basepath, "Datacard-" + timestamp)
+os.makedirs(full_path)
+
+# output root file
+of_name = os.path.join(full_path, dcard.Datacard.output_filename)
+of = ROOT.TFile(of_name, "RECREATE")
+# output datacard text file
+dcof_name = os.path.join(full_path, dcard.Datacard.output_datacardname)
+dcof = open(dcof_name, "w")
+
 
 #Number of parallel processes to run for the histogram projection
-ncores = 4
+ncores = 10
 
-def weight_str(cut, weight=1.0):
-    return "weight_xs * sign(genWeight) * {1} * ({0})".format(cut, weight)
+def weight_str(cut, weight=1.0, lumi=1.0):
+    return "weight_xs * sign(genWeight) * {1} * {2} * ({0})".format(cut, weight, lumi)
     #return "1.0 * ({0})".format(cut)
 
 def drawHelper(args):
@@ -118,7 +131,7 @@ def Draw(tf, of, gensyst, *args):
         if syst.name == "unweighted":
             cut_new = cuts_new
         else:
-            cut_new = weight_str(cuts_new, getattr(syst, "weight", "1.0"))
+            cut_new = weight_str(cuts_new, getattr(syst, "weight", "1.0"), dcard.Datacard.lumi)
         h = hfunc_new + ">>" + hname_new + "(" + hbins
         
         ROOT.gROOT.cd()            
@@ -138,6 +151,7 @@ def Draw(tf, of, gensyst, *args):
         hold = h
         of.cd()
         h = h.Clone()    
+
         #print of.GetName(), h.GetName()
         #h.SetDirectory(of)
         h.Write()
@@ -152,26 +166,113 @@ def Draw(tf, of, gensyst, *args):
         pool.close()
 
     return 0
+
         
+def PrintDatacard(event_counts, datacard, dcof):
+
+    number_of_bins = len(datacard.analysis_categories)    
+    number_of_backgrounds = len(datacard.samples) - 1 
+
+    dcof.write("imax {0}\n".format(number_of_bins))
+    dcof.write("jmax {0}\n".format(number_of_backgrounds))
+    dcof.write("kmax *\n".format(number_of_backgrounds))
+    dcof.write("---------------\n")
+
+    for cat in datacard.analysis_categories:                
+        # Loop over the full table of categories and extract the one we're interested in. Pick up the corresponding MEM var
+        analysis_var = [c[2] for c in datacard.categories if c[0]==cat][0]
+        dcof.write("shapes * {0} {1} $PROCESS/$CHANNEL/{2} $PROCESS/$CHANNEL/{2}_$SYSTEMATIC\n".format(cat, of_name, analysis_var))
+
+    # TODO: Automatic handling of 'fake' data
+    dcof.write("shapes data_obs sl_jge6_tge4 /shome/jpata/tth/datacards/Sep7_ref2_spring15/fakeData.root $PROCESS/$CHANNEL/mem_d_nomatch_0 $PROCESS/$CHANNEL/mem_d_nomatch_0_$SYSTEMATIC\n")
+        
+    dcof.write("---------------\n")
+
+    dcof.write("bin\t" +  "\t".join(datacard.analysis_categories) + "\n")
+    dcof.write("observation\t" + "\t".join("-1" for _ in datacard.analysis_categories) + "\n")
+    dcof.write("---------------\n")
+
+    bins        = []
+    processes_0 = []
+    processes_1 = []
+    rates       = []
+
+    # Conversion: 
+    # Example: ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8_hbb -> ttH_hbb
+    samples = [samples_dict[s].name for s in datacard.samples]
+
+    for cat in datacard.analysis_categories:
+        for i_sample, sample in enumerate(samples):
+            bins.append(cat)
+            processes_0.append(sample)
+            processes_1.append(str(i_sample))
+            rates.append(str(event_counts[sample][cat]))
+
+    dcof.write("bin\t"+"\t".join(bins)+"\n")
+    dcof.write("process\t"+"\t".join(processes_0)+"\n")
+    dcof.write("process\t"+"\t".join(processes_1)+"\n")
+    dcof.write("rate\t"+"\t".join(rates)+"\n")
+    dcof.write("---------------\n")
+
+    # Now gather all scale uncerainties
+    all_scale_uncerts = []
+    for k,v in datacard.scale_uncertainties.iteritems():
+        for kk, vv in v.iteritems():
+            all_scale_uncerts.extend(vv.keys())
+            
+    for scale in all_scale_uncerts:
+        dcof.write(scale + "\t lnN \t")
+        for cat in datacard.analysis_categories:
+            for sample in samples:
+                if (cat in datacard.scale_uncertainties.keys() and 
+                    sample in datacard.scale_uncertainties[cat].keys() and 
+                    scale in datacard.scale_uncertainties[cat][sample].keys()):
+                    dcof.write(str(datacard.scale_uncertainties[cat][sample][scale]))
+                else:
+                    dcof.write("-")
+                dcof.write("\t")
+        dcof.write("\n")
+    
+    # TODO: Shape uncertainties
+
+
+    dcof.write("# Execute with:\n")
+    dcof.write("# combine -M Asymptotic -t -1 {0} \n".format(dcof_name))
+    
+# end of PrintDataCard
+
+
+
+# dict of dicts. First key: sample Second key: cut
+# Content: events at given lumi
+event_counts = {}
+
 for sample in dcard.Datacard.samples:
     print sample
+
+    sample_shortname = samples_dict[sample].name
+
+    event_counts[sample_shortname] = {}
+
     tf = ROOT.TChain("tree")
     for fn in samples_dict[sample].fileNamesS2:
+        
         if not os.path.isfile(fn):
             raise FileError("could not open file: {0}".format(fn))
-        tf.AddFile(fn)
-    print tf.GetEntries()
+        tf.AddFile(fn)        
+    print "Read ", tf.GetEntries(), "entries"
 
-    #weight = "genWeight"
     of.cd()
     
-    sampled = of.mkdir(samples_dict[sample].name)
+    sampled = of.mkdir(sample_shortname)
     sampled.cd()
 
-    for cutname, cut in dcard.Datacard.categories:
+    for cutname, cut, analysis_var in dcard.Datacard.categories:
         
-        jetd = sampled.mkdir(cutname)
+        print "At: ", cutname, 
 
+        jetd = sampled.mkdir(cutname)
+        
         Draw(tf, jetd, gensyst, "nBCSVM:numJets >> njets_ntags(15,0,15,15,0,15)", cut)
 
         Draw(tf, jetd, gensyst, "jets_pt[0] >> jet0_pt(20,20,500)", cut)
@@ -206,13 +307,17 @@ for sample in dcard.Datacard.samples:
                     "mem_tth_p[{0}] / (mem_tth_p[{0}] + 0.15*mem_ttbb_p[{0}]) >> mem_d_{1}_{0}(12,0,1)".format(nmem, match),
                     cut
                 )
+                
+        event_counts[sample_shortname][cutname] = jetd.Get(analysis_var).Integral()
         
         jetd.Write()
 
         
     sampled.Write()
-
+# End of loop over samples
 
 print "writing"
 of.Write()
 of.Close()
+
+PrintDatacard(event_counts, dcard.Datacard, dcof)
