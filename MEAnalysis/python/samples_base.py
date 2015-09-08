@@ -65,12 +65,18 @@ else:
 def getSampleNGen(sample):
     import ROOT
     n = 0
+    nneg = 0
+    npos = 0
     for f in sample.subFiles:
         tfn = lfn_to_pfn(f)
         tf = ROOT.TFile.Open(tfn)
         hc = tf.Get("Count")
+        hneg = tf.Get("CountNegWeight")
+        hpos = tf.Get("CountPosWeight")
         n += hc.GetBinContent(1)
+        nneg += hneg.GetBinContent(1)
+        npos += hpos.GetBinContent(1)
         tf.Close()
         del tf
         #print tfn, hc.GetBinContent(1)
-    return int(n)
+    return int(npos-nneg)
