@@ -15,18 +15,18 @@ class BTagLRAnalyzer(FilterAnalyzer):
         super(BTagLRAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
         self.conf = cfg_ana._conf
         self.bTagAlgo        = self.conf.jets["btagAlgo"]
-        self.cplots_old = ROOT.TFile(self.conf.general["controlPlotsFileOld"])
+        #self.cplots_old = ROOT.TFile(self.conf.general["controlPlotsFileOld"])
         self.cplots = ROOT.TFile(self.conf.general["controlPlotsFile"])
         self.nJetsForPerm = self.conf.jets["NJetsForBTagLR"]
 
         cplots_fmt = self.conf.general.get("controlPlotsFormat", "8tev")
-        self.csv_pdfs_old = {
-        }
-        for x in ["b", "c", "l"]:
-            for b in ["Bin0", "Bin1"]:
-                self.csv_pdfs_old[(x, b)] = self.cplots_old.Get(
-                    "csv_{0}_{1}__csv_rec".format(x, b)
-                )
+        # self.csv_pdfs_old = {
+        # }
+        # for x in ["b", "c", "l"]:
+        #     for b in ["Bin0", "Bin1"]:
+        #         self.csv_pdfs_old[(x, b)] = self.cplots_old.Get(
+        #             "csv_{0}_{1}__csv_rec".format(x, b)
+        #         )
 
         self.csv_pdfs = {
         }
@@ -79,9 +79,9 @@ class BTagLRAnalyzer(FilterAnalyzer):
 
         _bin = "Bin1" if abs(eta)>1.0 else "Bin0"
 
-        if kind == "old":
-            h = self.csv_pdfs_old[(flavour, _bin)]
-        elif kind == "new_eta_1bin":
+        # if kind == "old":
+        #     h = self.csv_pdfs_old[(flavour, _bin)]
+        if kind == "new_eta_1bin":
             h = self.csv_pdfs[(flavour, _bin)]
         elif kind == "new_pt_eta_bin_3d":
             h = self.csv_pdfs[(flavour, "pt_eta")]
@@ -159,7 +159,7 @@ class BTagLRAnalyzer(FilterAnalyzer):
                 event.systResults[syst].passes_btag = False
         #event.__dict__.update(evdict["nominal"].__dict__)
         #event.__dict__.update(event.systResults["nominal"].__dict__)
-        return np.any([v.passes_btag for v in event.systResults.values()])
+        return self.conf.general["passall"] or np.any([v.passes_btag for v in event.systResults.values()])
 
     def _process(self, event):
 

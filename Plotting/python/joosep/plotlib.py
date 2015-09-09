@@ -18,11 +18,66 @@ from weighting import get_weight
 import sklearn
 import sklearn.metrics
 from sklearn.ensemble import GradientBoostingClassifier
+import math
 
 
 matplotlib.rc("axes", labelsize=24)
 matplotlib.rc("axes", titlesize=16)
 
+path = "/Users/joosep/Documents/tth/data/ntp/v12/me/"
+samples = {
+    "tth_amcatnlo": [
+        path + "/ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8_hbb.root",
+        #path + "/ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8_hX.root",
+    ],
+    "tth_phys14": [
+        "/Users/joosep/Documents/tth/data/ntp/v10_phys14/Aug20_564f1b8_phys14_ref1/tth_13tev_amcatnlo_pu20bx25_hbb.root"
+    ],
+    
+    
+    "ttjets_amcatnlo": [
+        path + "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ttbb.root",
+        path + "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_tt2b.root",
+        path + "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ttb.root",
+        path + "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ttcc.root",
+        path + "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ttll.root",
+    ],
+    "ttjets_phys14": [
+        "/Users/joosep/Documents/tth/data/ntp/v10_phys14/Aug20_564f1b8_phys14_ref1/ttjets_13tev_madgraph_pu20bx25_phys14.root"
+    ],
+    "tth_powheg": [
+        path + "ttHTobb_M125_13TeV_powheg_pythia8_hbb.root",
+        #path + "ttHTobb_M125_13TeV_powheg_pythia8_hX.root",
+    ],
+    "ttjets_powheg": [
+        path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttbb.root",
+        path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_tt2b.root",
+        path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttb.root",
+        path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttcc.root",
+        path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttll.root",
+    ],
+}
+
+def process_sample_hist(fnames, hname, func, bins, cut, **kwargs):
+    tt = ROOT.TChain("tree")
+    for fn in fnames:
+        tt.Add(fn)
+    ROOT.gROOT.cd()
+    hs = {}
+    h = ROOT.gROOT.Get(hname)
+    if h:
+        h.Delete()
+    h = ROOT.TH1D(hname, "", bins[0], bins[1], bins[2])
+    hname = h.GetName()
+    h = rootpy.asrootpy(h)
+    h.SetDirectory(ROOT.gROOT)
+    n = tt.Draw("{0} >> {1}".format(func, hname), cut)
+    print n, h.Integral()
+    if kwargs.get("norm", False):
+        if h.Integral()>0:
+            h.Scale(1.0 / h.Integral())
+    return h
+    
 def make_df_hist(bins, x, w=1.0):
     h = rootpy.plotting.Hist(*bins)
     a = np.array(x).astype("float64")
@@ -99,9 +154,9 @@ def draw_roc(cls, df_test, var, df_train=None):
     plt.figure(figsize=(6,6))
     plt.grid()
     plt.plot([0,1],[0,1], color="black")
-    plt.errorbar(r[:, 0], r[:, 1], e[:, 0], e[:, 1], marker="o")
+    plt.errorbar(r[:, 0], r[:, 1], e[:, 0], e[:, 1], marker="o", label="test")
     if not df_train is None:
-        plt.errorbar(rtr[:, 0], rtr[:, 1], etr[:, 0], etr[:, 1], marker="o")
+        plt.errorbar(rtr[:, 0], rtr[:, 1], etr[:, 0], etr[:, 1], marker="x", label="train")
     plt.axvline(0.5, color="black", ls="--")
     plt.yticks(np.linspace(0,1,11));
     plt.ylim(0,1)
@@ -211,17 +266,28 @@ def dice(h, nsigma=1.0):
         hret.set_bin_content(i, n)
     return hret
 
+# def make_uoflow(h):
+#     widths = list(h.xwidth())
+#     edgs = list(h.xedgesl())
+#     h2 = rootpy.plotting.Hist(h.nbins()+2, edgs[0] - widths[0], edgs[-1] + widths[-1])
+#     nb = h.GetNbinsX()
+#     for i in range(0,nb+2):
+#         h2.SetBinContent(i+1, h.GetBinContent(i))
+#         h2.SetBinError(i+1, h.GetBinError(i))
+#     h2.SetEntries(h.GetEntries())
+#     return h2
+
+
 def make_uoflow(h):
-    widths = list(h.xwidth())
-    edgs = list(h.xedgesl())
-    h2 = rootpy.plotting.Hist(h.nbins()+2, edgs[0] - widths[0], edgs[-1] + widths[-1])
     nb = h.GetNbinsX()
-    for i in range(0,nb+2):
-        h2.SetBinContent(i+1, h.GetBinContent(i))
-        h2.SetBinError(i+1, h.GetBinError(i))
-    h2.SetEntries(h.GetEntries())
-    return h2
-    
+    #h.SetBinEntries(1, h.GetBinEntries(0) + h.GetBinEntries(1))
+    #h.SetBinEntries(nb+1, h.GetBinEntries(nb) + h.GetBinEntries(nb + 1))
+    h.SetBinContent(1, h.GetBinContent(0) + h.GetBinContent(1))
+    h.SetBinContent(nb+1, h.GetBinContent(nb) + h.GetBinContent(nb + 1))
+    h.SetBinError(1, math.sqrt(h.GetBinError(0)**2 + h.GetBinError(1)**2))
+    h.SetBinError(nb+1, math.sqrt(h.GetBinError(nb)**2 + h.GetBinError(nb + 1)**2))
+    return h
+
 def draw_data_mc(tf, hname, samples, **kwargs):
 
     do_pseudodata = kwargs.get("do_pseudodata", False)
@@ -282,14 +348,15 @@ def draw_data_mc(tf, hname, samples, **kwargs):
     #hide x ticks on main panel
     ticks = a1.get_xticks()
     if do_pseudodata:
-        a1.set_xticklabels([])
-
+        a1.get_xaxis().set_visible(False)
+    print ticks
+    
     a1.set_ylim(bottom=0, top=1.1*a1.get_ylim()[1])
     a1.grid(zorder=100000)
 
     a2 = a1
     if do_pseudodata:
-        a2 = plt.axes([0.0,0.0, 1.0, 0.18])
+        a2 = plt.axes([0.0,0.0, 1.0, 0.18], sharex=a1)
 
         plt.xlabel(xlabel)
         a2.grid()
@@ -350,13 +417,37 @@ def calc_roc(h1, h2):
             err[i, 1] = e2
     return roc, err
 
-def draw_rocs_file(pairs, **kwargs):
+def match_histogram(sample, var, cut):
+    hs = process_sample_hist(
+        sample, "hs",
+        var,
+        (250,0,250),
+        cut
+    )
+    hs.Scale(1.0 / hs.Integral())
+
+    nb = 0
+    labels = []
+    h = rootpy.plotting.Hist(30,0,30)
+    for i in range(0,3):
+        for j in range(0,3):
+            for k in range(0,3):
+                nb += 1
+                h.SetBinContent(nb, hs.GetBinContent(1 + 100*i+10*j+k))
+                h.SetBinError(nb, hs.GetBinError(1 + 100*i+10*j+k))
+                #print nb, i,j,k,h.GetBinContent(nb)
+                labels += ["%d%d%d"%(i,j,k)]
+    
+    return h
+    
+def get_pairs_file(pairs, **kwargs):
+    ps = []
     for pair in pairs:
         tf, hn1, hn2, label = pair
         h1 = tf.get(hn1).Clone()
         h2 = tf.get(hn2).Clone()
-        ps += [h1, h2, label]
-    return draw_rocs(ps, **kwargs)
+        ps += [(h1, h2, label)]
+    return ps
     
     
 def draw_rocs(pairs, **kwargs):
@@ -381,7 +472,7 @@ def draw_rocs(pairs, **kwargs):
 
     for (r, e, pair) in zip(rs, es, pairs):
         h1, h2, label = pair
-        plt.errorbar(r[:, 0], r[:, 1], e[:, 0], e[:, 1], label=label)
+        plt.errorbar(r[:, 0], r[:, 1], xerr=e[:, 0], yerr=e[:, 1], label=label)
 
     plt.legend(loc=2)
 
@@ -405,14 +496,11 @@ def draw_shape(f, samples, hn, **kwargs):
     for h in hs:
         hist(h, lw=1, ls="-")
 
-def train(df, var, cut, ntrees, rate, depth, min1, min2, sub, **kwargs):
+def train(df, var, cut, **kwargs):
     df_sel = df[df.eval(cut)]
     ntrain_1 = int(sum(df_sel["id"]==1) * 0.5)
     ntrain_2 = int(sum(df_sel["id"]==0) * 0.5)
     weight = kwargs.get("weight", None)
-
-
-    print ntrain_1, ntrain_2
 
     if weight:
         print "weighted", sum(df_sel[df_sel["id"]==1][weight]), sum(df_sel[df_sel["id"]==0][weight])
@@ -421,15 +509,15 @@ def train(df, var, cut, ntrees, rate, depth, min1, min2, sub, **kwargs):
     df_train = pandas.concat((df_sel[df_sel["id"]==1][:ntrain_1], df_sel[df_sel["id"]==0][:ntrain_2]))
     df_test = pandas.concat((df_sel[df_sel["id"]==1][ntrain_1:], df_sel[df_sel["id"]==0][ntrain_2:]))
 
-    print len(df_train), len(df_test)
     df_train_shuf = df_train.iloc[np.random.permutation(np.arange(len(df_train)))]
     
     cls = GradientBoostingClassifier(
-        n_estimators=ntrees, learning_rate=rate,
-        max_depth=depth,
-        min_samples_split=min1,
-        min_samples_leaf=min2,
-        subsample=sub,
+        n_estimators=kwargs.get("ntrees", 200),
+        learning_rate=kwargs.get("learning_rate", 0.1),
+        max_depth=kwargs.get("depth", 2),
+        min_samples_split=kwargs.get("min1", 1),
+        min_samples_leaf=kwargs.get("min2", 1),
+        subsample=kwargs.get("subsample", 1.0),
         verbose=True
     )
 
@@ -439,3 +527,53 @@ def train(df, var, cut, ntrees, rate, depth, min1, min2, sub, **kwargs):
         cls = cls.fit(df_train_shuf[var], df_train_shuf["id"], df_train_shuf[weight])
 
     return cls, df_test, df_train
+
+def syst_comparison(sn, l, **kwargs):
+    h0 = tf.get(sn + l[0]).Clone()
+    h1 = tf.get(sn + l[1]).Clone()
+    h2 = tf.get(sn + l[2]).Clone()
+    
+    for ih, h in enumerate([h0, h1, h2]):
+        h.Scale(10000)
+        h.title = l[ih]
+        h.title = h.title.replace("_", "")
+        h.title += " ({0:.2f})".format(h.Integral())
+    rb = kwargs.get("rebin", 1)
+    h0.rebin(rb)
+    h1.rebin(rb)
+    h2.rebin(rb)
+
+    a1 = plt.axes([0.0,0.52,1.0,0.5])
+    errorbar(h0)
+    h1.linewidth = 2
+    h2.linewidth = 2
+    hist(h1, color="blue")
+    hist(h2, color="red")
+
+    fill_between(h1, h2, hatch="////", facecolor="none", edgecolor="black", lw=0, zorder=10)
+
+    h1n = h1.Clone()
+    h2n = h2.Clone()
+    plt.legend(numpoints=1, loc="best")
+    h1n.Scale(h0.Integral() / h1n.Integral())
+    h2n.Scale(h0.Integral() / h2n.Integral())
+    
+    h1n.linestyle = "dashed"
+    h2n.linestyle = "dashed"
+    hist(h1n, color="blue")
+    hist(h2n, color="red")
+    
+    #plt.ylim(bottom=0)
+    plt.axhline(0.0)
+    a2 = plt.axes([0.0,0.0,1.0,0.48],sharex=a1)
+    
+    h1r = h1.Clone()
+    h1r.Divide(h0)
+    h2r = h2.Clone()
+    h2r.Divide(h0)
+    h1r.color = "blue"
+    h2r.color = "red"
+    errorbar(h1r, color="blue")
+    errorbar(h2r, color="red")
+    plt.axhline(1.0, color="black")
+    #fill_between(h1, h2, hatch="\\\\", facecolor="none", edgecolor="black", lw=0, zorder=10)

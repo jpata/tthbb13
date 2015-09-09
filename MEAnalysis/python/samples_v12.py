@@ -398,7 +398,7 @@ samples = cms.VPSet([
     cms.PSet(
         skip     = cms.bool(False),
         name     = cms.string('ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8'),
-        xSec     = cms.double(0.5058),
+        xSec     = cms.double(0.5058 * 0.569),
         nGen     = cms.int64(1739581),
         subFiles = cms.vstring([
         "/store/user/jpata/VHBBHeppyV12/ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8/VHBB_HEPPY_V12_ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150723_082106/0000/tree_12.root",
@@ -485,7 +485,7 @@ samples = cms.VPSet([
     cms.PSet(
         skip     = cms.bool(False),
         name     = cms.string('ttHTobb_M125_13TeV_powheg_pythia8'),
-        xSec     = cms.double(0.5058),
+        xSec     = cms.double(0.5058 * 0.569),
         nGen     = cms.int64(3787313),
         subFiles = cms.vstring([
             "/store/user/jpata/VHBBHeppyV12/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V12_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150723_082022/0000/tree_1.root",
@@ -523,19 +523,6 @@ samples = cms.VPSet([
         isMC     = cms.bool(True)
     ),
 ])
-
-def getSampleNGen(sample):
-    import ROOT
-    n = 0
-    for f in sample.subFiles:
-        tfn = lfn_to_pfn(f)
-        tf = ROOT.TFile.Open(tfn)
-        hc = tf.Get("Count")
-        n += hc.GetBinContent(1)
-        tf.Close()
-        del tf
-        #print tfn, hc.GetBinContent(1)
-    return int(n)
 
 #fill sample number of generated
 for s in samples:

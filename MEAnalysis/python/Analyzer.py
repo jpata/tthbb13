@@ -1,5 +1,6 @@
 from PhysicsTools.HeppyCore.framework.analyzer import Analyzer
 from TTH.MEAnalysis.vhbb_utils import lvec
+import ROOT
 
 class FilterAnalyzer(Analyzer):
     """
@@ -11,6 +12,20 @@ class FilterAnalyzer(Analyzer):
         self.counters.addCounter("processing")
         self.counters["processing"].register("processed")
         self.counters["processing"].register("passes")
+
+
+class CounterAnalyzer(FilterAnalyzer):
+    
+    def __init__(self, cfg_ana, cfg_comp, looperName):
+        super(CounterAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
+    
+    def beginLoop(self, setup):
+        super(CounterAnalyzer, self).beginLoop(setup)
+        self.chist = ROOT.TH1F("CounterAnalyzer_count", "count", 1,0,1)
+    
+    def process(self, event):
+        #super(CounterAnalyzer, self).process(event)
+        self.chist.Fill(0)
 
 class EventIDFilterAnalyzer(FilterAnalyzer):
     """

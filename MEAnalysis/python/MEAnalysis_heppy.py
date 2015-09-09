@@ -2,6 +2,7 @@
 import os
 import PhysicsTools.HeppyCore.framework.config as cfg
 import ROOT
+ROOT.gROOT.SetBatch(True)
 import imp
 
 import itertools
@@ -33,9 +34,21 @@ conf = Conf
 #Load transfer functions from pickle file
 pi_file = open(conf.general["transferFunctionsPickle"] , 'rb')
 conf.tf_matrix = pickle.load(pi_file)
+
+#Pre-compute the TF formulae
+# eval_gen:specifies how the transfer functions are interpreted
+#     If True, TF [0] - reco, x - gen
+#     If False, TF [0] - gen, x - reco
+eval_gen=False
+conf.tf_formula = {}
+for fl in ["b", "l"]:
+    conf.tf_formula[fl] = {}
+    for bin in [0, 1]:
+            conf.tf_formula[fl][bin] = conf.tf_matrix[fl][bin].Make_Formula(eval_gen)
+
 pi_file.close()
 
-#Load transfer functions from pickle file
+#Load the subjet transfer functions from pickle file
 pi_file = open(conf.general["transferFunctions_sj_Pickle"] , 'rb')
 conf.tf_sj_matrix = pickle.load(pi_file)
 pi_file.close()
@@ -67,8 +80,6 @@ for sn in sorted(samples_dict.keys()):
     if s.skip.value() == False and len(s.subFiles.value())>0:
         inputSamples.append(inputSample)
 
-print "Processing samples", [s.name for s in inputSamples]
-
 #Event contents are defined here
 #This is work in progress
 from TTH.MEAnalysis.VHbbTree import *
@@ -83,6 +94,11 @@ evs = cfg.Analyzer(
 import TTH.MEAnalysis.MECoreAnalyzers as MECoreAnalyzers
 
 #
+counter = cfg.Analyzer(
+    MECoreAnalyzers.CounterAnalyzer,
+    'counter',
+    _conf = conf
+)
 
 evtid_filter = cfg.Analyzer(
     MECoreAnalyzers.EventIDFilterAnalyzer,
@@ -201,6 +217,7 @@ treeProducer = getTreeProducer(conf)
 # definition of a sequence of analyzers,
 # the analyzers will process each event in this order
 sequence = cfg.Sequence([
+    counter,
     evtid_filter,
     evs,
     evtweight,
@@ -231,7 +248,6 @@ output_service = cfg.Service(
     fname='tree.root',
     option='recreate'
 )
-print "Creating TChain"
 
 #finalization of the configuration object.
 from PhysicsTools.HeppyCore.framework.chain import Chain as Events
@@ -255,7 +271,7 @@ if __name__ == "__main__":
     #Process all samples in the sample list
     for samp in inputSamples:
 
-        #print "processing sample ", samp
+        print "processing sample ", samp
         config = cfg.Config(
             #Run across these inputs
             components = [samp],
