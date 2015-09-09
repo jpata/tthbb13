@@ -66,7 +66,7 @@ inputSamples = []
 for sn in sorted(samples_dict.keys()):
     s = samples_dict[sn]
     sample_ngen = s.nGen.value()
-    if (sample_ngen<0):
+    if (s.isMC.value() and sample_ngen<0):
         sample_ngen = getSampleNGen(s)
     inputSample = cfg.Component(
         s.name.value(),
@@ -76,6 +76,7 @@ for sn in sorted(samples_dict.keys()):
         xs = s.xSec.value()
     )
     inputSample.isMC = s.isMC.value()
+  
     #use sample only if not skipped and subFiles defined
     if s.skip.value() == False and len(s.subFiles.value())>0:
         inputSamples.append(inputSample)
