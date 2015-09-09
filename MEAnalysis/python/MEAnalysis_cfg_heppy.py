@@ -280,7 +280,7 @@ class Conf:
         
             #SL triggers
             "HLT_BIT_HLT_Ele27_eta2p1_WP85_Gsf_HT200_v",
-            "HLT_BIT_HLT_IsoMu24_eta2p1_v"
+            "HLT_BIT_HLT_IsoMu24_eta2p1_v",
             
             #DL triggers
             #mumu
@@ -313,7 +313,7 @@ class Conf:
         "transferFunctions_sj_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions_sj.pickle",
         #"systematics": ["nominal"],
         #"systematics": ["nominal", "JESUp", "JESDown", "raw"],
-        "systematics": ["nominal", "JESUp", "JESDown"],
+        "systematics": ["nominal", "JESUp", "JESDown", "raw"],
         
         
         #If the list contains:
