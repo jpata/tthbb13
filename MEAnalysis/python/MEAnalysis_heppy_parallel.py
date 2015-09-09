@@ -2,7 +2,7 @@ from MEAnalysis_heppy import *
 import sys
 
 i = int(sys.argv[1])
-inputSamples = prepareInputSamples("python/samples_small.py")
+inputSamples, samples = prepareInputSamples("python/samples_small.py")
 
 if __name__ == "__main__":
     #print "processing sample ", samp

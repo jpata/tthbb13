@@ -80,9 +80,9 @@ def prepareInputSamples(sampleFile=conf.general["sampleFile"]):
         #use sample only if not skipped and subFiles defined
         if s.skip.value() == False and len(s.subFiles.value())>0:
             inputSamples.append(inputSample)
-    return inputSamples
+    return inputSamples, samples
 
-inputSamples = prepareInputSamples(conf.general["sampleFile"])
+inputSamples, samples = prepareInputSamples(conf.general["sampleFile"])
 
 #Event contents are defined here
 #This is work in progress
