@@ -79,11 +79,26 @@ class Datacard:
             ("CMS_ttH_CSVStats2Down",   "bTagWeight_Stats2Down"),
     ]
 
-    # Subset of the reweighted distributions we want to use as syst. shape uncertainties
-    shape_uncertainties = [
-    ]
-    
-    # nested dictionaries:
+    # Subset of the reweighted distributions we want to use as syst. shape uncertainties    
+    # To avoid copy paste
+    common_shape_uncertainties = {
+        "CMS_ttH_CSVLF"       : 1,
+        "CMS_ttH_CSVHF"       : 1,        
+        "CMS_ttH_CSVStats1"   : 1,    
+        "CMS_ttH_CSVStats2"   : 1,    
+    }        
+    # nested dictionaries: category/sample/uncertainty/scale
+    shape_uncertainties = {
+        "sl_jge6_tge4" : {
+            "ttH_hbb" : common_shape_uncertainties,
+            "ttbarPlus2B" : common_shape_uncertainties,
+            "ttbarPlusB" : common_shape_uncertainties,
+            "ttbarPlusBBbar" : common_shape_uncertainties,
+            "ttbarPlusCCbar" : common_shape_uncertainties,
+            "ttbarOther" : common_shape_uncertainties,
+        }
+    }
+
 
     # value: normalization uncertainty
     scale_uncertainties = {
