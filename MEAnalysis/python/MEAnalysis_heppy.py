@@ -55,30 +55,34 @@ pi_file.close()
     
 #Load the input sample dictionary
 #Samples are configured in the Conf object, by default, we use samples_vhbb
-print "loading samples from", conf.general["sampleFile"]
-samplefile = imp.load_source("samplefile", conf.general["sampleFile"])
-from samplefile import samples_dict, samples
 
 #input component
 #several input components can be declared,
 #and added to the list of selected components
-inputSamples = []
-for sn in sorted(samples_dict.keys()):
-    s = samples_dict[sn]
-    sample_ngen = s.nGen.value()
-    if (sample_ngen<0):
-        sample_ngen = getSampleNGen(s)
-    inputSample = cfg.Component(
-        s.name.value(),
-        files = map(lfn_to_pfn, s.subFiles.value()),
-        tree_name = "tree",
-        n_gen = sample_ngen,
-        xs = s.xSec.value()
-    )
-    inputSample.isMC = s.isMC.value()
-    #use sample only if not skipped and subFiles defined
-    if s.skip.value() == False and len(s.subFiles.value())>0:
-        inputSamples.append(inputSample)
+def prepareInputSamples(sampleFile=conf.general["sampleFile"]):
+    print "loading samples from", sampleFile
+    samplefile = imp.load_source("samplefile", sampleFile)
+    from samplefile import samples_dict, samples
+    inputSamples = []
+    for sn in sorted(samples_dict.keys()):
+        s = samples_dict[sn]
+        sample_ngen = s.nGen.value()
+        if (sample_ngen<0):
+            sample_ngen = getSampleNGen(s)
+        inputSample = cfg.Component(
+            s.name.value(),
+            files = map(lfn_to_pfn, s.subFiles.value()),
+            tree_name = "tree",
+            n_gen = sample_ngen,
+            xs = s.xSec.value()
+        )
+        inputSample.isMC = s.isMC.value()
+        #use sample only if not skipped and subFiles defined
+        if s.skip.value() == False and len(s.subFiles.value())>0:
+            inputSamples.append(inputSample)
+    return inputSamples
+
+inputSamples = prepareInputSamples(conf.general["sampleFile"])
 
 #Event contents are defined here
 #This is work in progress

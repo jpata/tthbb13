@@ -214,11 +214,13 @@ def PrintDatacard(event_counts, datacard, dcof):
     dcof.write("rate\t"+"\t".join(rates)+"\n")
     dcof.write("---------------\n")
 
-    # Now gather all scale uncerainties
+    # Gather all scale uncerainties
     all_scale_uncerts = []
     for k,v in datacard.scale_uncertainties.iteritems():
         for kk, vv in v.iteritems():
             all_scale_uncerts.extend(vv.keys())
+    # Uniquify
+    all_scale_uncerts = list(set(all_scale_uncerts))
             
     for scale in all_scale_uncerts:
         dcof.write(scale + "\t lnN \t")
@@ -232,10 +234,29 @@ def PrintDatacard(event_counts, datacard, dcof):
                     dcof.write("-")
                 dcof.write("\t")
         dcof.write("\n")
-    
-    # TODO: Shape uncertainties
+
+    # Gather all shape uncerainties
+    all_shape_uncerts = []
+    for k,v in datacard.shape_uncertainties.iteritems():
+        for kk, vv in v.iteritems():
+            all_shape_uncerts.extend(vv.keys())
+    # Uniquify
+    all_shape_uncerts = list(set(all_shape_uncerts))
 
 
+    for shape in all_shape_uncerts:
+        dcof.write(shape + "\t shape \t")
+        for cat in datacard.analysis_categories:
+            for sample in samples:
+                if (cat in datacard.shape_uncertainties.keys() and 
+                    sample in datacard.shape_uncertainties[cat].keys() and 
+                    shape in datacard.shape_uncertainties[cat][sample].keys()):
+                    dcof.write(str(datacard.shape_uncertainties[cat][sample][shape]))
+                else:
+                    dcof.write("-")
+                dcof.write("\t")
+        dcof.write("\n")
+            
     dcof.write("# Execute with:\n")
     dcof.write("# combine -M Asymptotic -t -1 {0} \n".format(dcof_name))
     

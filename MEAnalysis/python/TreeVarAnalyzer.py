@@ -9,7 +9,13 @@ class TreeVarAnalyzer(FilterAnalyzer):
         self.conf = cfg_ana._conf
 
     def process(self, event):
-        
+       
+
+        setattr( event, 'boosted_bjets', [] )
+        setattr( event, 'boosted_ljets', [] )
+        setattr( event, 'topCandidate', [] )
+        setattr( event, 'othertopCandidate', [] )
+        setattr( event, 'higgsCandidate', [] )
         for syst, event_syst in event.systResults.items():
             event_syst.mem_results_tth = getattr(event_syst, "mem_results_tth", [])
             event_syst.mem_results_ttbb = getattr(event_syst, "mem_results_ttbb", [])
@@ -24,4 +30,9 @@ class TreeVarAnalyzer(FilterAnalyzer):
             #    print syst, k, v 
         #for k, v in event.__dict__.items():
         #    print "Event", k, v 
+        
+        for br in ["boosted_bjets", "boosted_ljets", "topCandidate", "othertopCandidate", "higgsCandidate"]:
+            if not hasattr(event, br+"_nominal"):
+                setattr(event, br + "_nominal", [])
+
         return True

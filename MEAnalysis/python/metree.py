@@ -25,7 +25,17 @@ jetType = NTupleObjectType("jetType", variables = [
     NTupleVariable("id", lambda x : x.id),  
     NTupleVariable("qgl", lambda x : x.qgl),
     NTupleVariable("btagCSV", lambda x : x.btagCSV),
-    NTupleVariable("btagWeight", lambda x : x.bTagWeight),
+    NTupleVariable("bTagWeight", lambda x : x.bTagWeight),
+    NTupleVariable("bTagWeightHFUp", lambda x : x.bTagWeightHFUp),
+    NTupleVariable("bTagWeightHFDown", lambda x : x.bTagWeightHFDown),
+    NTupleVariable("bTagWeightLFUp", lambda x : x.bTagWeightLFUp),
+    NTupleVariable("bTagWeightLFDown", lambda x : x.bTagWeightLFDown),
+    NTupleVariable("bTagWeightStats1Up", lambda x : x.bTagWeightStats1Up),
+    NTupleVariable("bTagWeightStats1Down", lambda x : x.bTagWeightStats1Down),
+    NTupleVariable("bTagWeightStats2Up", lambda x : x.bTagWeightStats2Up),
+    NTupleVariable("bTagWeightStats2Down", lambda x : x.bTagWeightStats2Down),
+    NTupleVariable("bTagWeightJESUp", lambda x : x.bTagWeightJESUp),
+    NTupleVariable("bTagWeightJESDown", lambda x : x.bTagWeightJESDown),
 #    NTupleVariable("btagCSVV0", lambda x : x.btagCSVV0),
     NTupleVariable("btagProb", lambda x : x.btagProb),
     NTupleVariable("btagSoftEl", lambda x : x.btagSoftEl),
@@ -597,6 +607,7 @@ def getTreeProducer(conf):
         },
         collections = {
         #standard dumping of objects
+        #These are collections which are not variated
         #    "b_quarks_gen" : NTupleCollection("b_quarks_gen", quarkType, 5, help=""),
         #    "l_quarks_gen" : NTupleCollection("l_quarks_gen", quarkType, 3, help=""),
         #    "b_quarks_t" : NTupleCollection("GenBFromTop", quarkType, 3, help=""),
@@ -604,6 +615,11 @@ def getTreeProducer(conf):
         #    "l_quarks_w" : NTupleCollection("GenQFromW", quarkType, 5, help=""),
             "good_jets_nominal" : NTupleCollection("jets", jetType, 9, help="Selected jets"),
             "good_leptons_nominal" : NTupleCollection("leps", leptonType, 2, help="Selected leptons"),
+            
+            "topCandidate_nominal": NTupleCollection("topCandidate" , topType, 28, help=""),
+            "othertopCandidate_nominal": NTupleCollection("othertopCandidate", topType, 28, help=""),
+            "higgsCandidate_nominal": NTupleCollection("higgsCandidate", higgsType, 9, help=""),
+
             #"topCandidate" : NTupleCollection("topCandidate", topType, 28, help=""),
             #"othertopCandidate" : NTupleCollection("othertopCandidate", topType, 28, help=""),
             #"higgsCandidate" : NTupleCollection("higgsCandidate", higgsType, 9, help=""),
@@ -697,6 +713,7 @@ def getTreeProducer(conf):
             syst_suffix2 = syst_suffix
             if systematic == "nominal":
                 syst_suffix2 = ""
+            #These are collections which are variated in a systematic loop and saved to the event in TreeVarAnalyzer
             treeProducer.collections.update({
                 "mem_results_tth" + syst_suffix: NTupleCollection(
                     "mem_tth" + syst_suffix2, memType, len(conf.mem["methodOrder"]),
@@ -718,9 +735,6 @@ def getTreeProducer(conf):
                     "fw_uj" + syst_suffix2, FoxWolframType, 8,
                     help="Fox-Wolfram momenta calculated with untagged jets"
                 ),
-                "topCandidate" + syst_suffix: NTupleCollection("topCandidate" + syst_suffix2 , topType, 28, help=""),
-                "othertopCandidate" + syst_suffix: NTupleCollection("othertopCandidate" + syst_suffix2, topType, 28, help=""),
-                "higgsCandidate" + syst_suffix: NTupleCollection("higgsCandidate" + syst_suffix2, higgsType, 9, help=""),
             })
 
             for cat in conf.bran["jetCategories"].items():
@@ -740,17 +754,17 @@ def getTreeProducer(conf):
         for vtype in [
             ("weight_xs",               float,  ""),
             ("ttCls",                   int,    ""),
-            ("bTagWeight_LFUp",         float,  ""),
-            ("bTagWeight_Stats2Down",   float,  ""),
-            ("bTagWeight_LFDown",       float,  ""),
-            ("bTagWeight_HFUp",         float,  ""),
-            ("bTagWeight_JESDown",      float,  ""),
             ("bTagWeight",              float,  ""),
             ("bTagWeight_HFDown",       float,  ""),
-            ("bTagWeight_Stats2Up",     float,  ""),
+            ("bTagWeight_HFUp",         float,  ""),
+            ("bTagWeight_JESDown",      float,  ""),
             ("bTagWeight_JESUp",        float,  ""),
-            ("bTagWeight_Stats1Up",     float,  ""),
+            ("bTagWeight_LFDown",       float,  ""),
+            ("bTagWeight_LFUp",         float,  ""),
             ("bTagWeight_Stats1Down",   float,  ""),
+            ("bTagWeight_Stats1Up",     float,  ""),
+            ("bTagWeight_Stats2Down",   float,  ""),
+            ("bTagWeight_Stats2Up",     float,  ""),
         ]:
             treeProducer.globalVariables += [makeGlobalVariable(vtype, systematic)]
     return treeProducer

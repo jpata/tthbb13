@@ -1,7 +1,8 @@
 from WMCore.Configuration import Configuration
 config = Configuration()
+import os
 
-processing_name = "Sep3_GITHASH"
+processing_name = "Sep4_fullhypo_GITHASH" 
 config.section_("General")
 #this will be used for the crab directory name
 config.General.requestName = DNAME

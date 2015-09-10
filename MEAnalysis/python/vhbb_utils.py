@@ -5,7 +5,11 @@ def lvec(self):
     Converts an object with pt, eta, phi, mass to a TLorentzVector
     """
     lv = ROOT.TLorentzVector()
+    if self.pt < 0 or abs(self.eta) > 6:
+        raise Exception("Invalid values for TLorentzVector")
     lv.SetPtEtaPhiM(self.pt, self.eta, self.phi, self.mass)
+    if abs(lv.Pt()) > 100000 or abs(lv.Eta()) > 100000:
+        raise Exception("Invalid values for TLorentzVector")
     return lv
 
 class MET:
