@@ -25,6 +25,7 @@ jetType = NTupleObjectType("jetType", variables = [
     NTupleVariable("id", lambda x : x.id),  
     NTupleVariable("qgl", lambda x : x.qgl),
     NTupleVariable("btagCSV", lambda x : x.btagCSV),
+    NTupleVariable("btagCMVAV2", lambda x : x.btagBDT),
     NTupleVariable("bTagWeight", lambda x : x.bTagWeight),
     NTupleVariable("bTagWeightHFUp", lambda x : x.bTagWeightHFUp),
     NTupleVariable("bTagWeightHFDown", lambda x : x.bTagWeightHFDown),
@@ -613,7 +614,8 @@ def getTreeProducer(conf):
         #    "b_quarks_t" : NTupleCollection("GenBFromTop", quarkType, 3, help=""),
         #    "b_quarks_h" : NTupleCollection("GenBFromHiggs", quarkType, 3, help=""),
         #    "l_quarks_w" : NTupleCollection("GenQFromW", quarkType, 5, help=""),
-            "good_jets_nominal" : NTupleCollection("jets", jetType, 9, help="Selected jets"),
+            "FatjetCA15ungroomed" : NTupleCollection("fatjets", FatjetCA15ungroomedType, 4, help="Ungroomed CA 1.5 fat jets"),
+            "good_jets_nominal" : NTupleCollection("jets", jetType, 9, help="Selected jets, pt ordered"),
             "good_leptons_nominal" : NTupleCollection("leps", leptonType, 2, help="Selected leptons"),
             
             "topCandidate_nominal": NTupleCollection("topCandidate" , topType, 28, help=""),

@@ -23,15 +23,14 @@ step2:
 	cd $(CMSSW_BASE)/src/VHbbAnalysis/Heppy/test && ls  ~/tth/spring15/sync/TT_TuneCUETP8M1_13TeV-powheg-pythia8__Asympt25ns_MCRUN2_74_V9-v2/block*.root | $(PARCMD) --result out_step2 -j30 python ./vhbb-parallel.py {} ttjets_{#}
 
 step3:
-	#seq 0 75 | $(PARCMD) --result out_step3 -j50 python ./python/MEAnalysis_heppy_parallel.py {}
-	seq 0 75 | $(PARCMD) ./python/MEAnalysis_heppy_parallel.py {}
+	seq 0 75 | $(PARCMD) -j30 ./python/MEAnalysis_heppy_parallel.py {}
 
 step4:
 	python python/makeTable.py tth.root nominal > tth.csv
-	python python/makeTable.py tth.root raw > tth_raw.csv
-	#python python/makeTable.py tth.root JESUp > tth_JESUp.csv
-	#python python/makeTable.py tth.root JESDown > tth_JESDown.csv
 	python python/makeTable.py ttjets.root nominal > ttjets.csv
+	#python python/makeTable.py tth.root raw > tth_raw.csv
+	python python/makeTable.py tth.root JESUp > tth_JESUp.csv
+	python python/makeTable.py tth.root JESDown > tth_JESDown.csv
 	#python python/makeTable.py ttjets.root JESUp > ttjets_JESUp.csv
 	#python python/makeTable.py ttjets.root JESDown > ttjets_JESDown.csv
 

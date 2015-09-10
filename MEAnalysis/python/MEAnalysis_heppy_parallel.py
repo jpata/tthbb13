@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from MEAnalysis_heppy import *
 import sys
 

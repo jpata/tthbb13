@@ -350,11 +350,15 @@ class Conf:
 
         #Actually run the ME calculation
         #If False, all ME values will be 0
-        "calcME": False,
+        "calcME": True,
 
         #Generic event-dependent selection function applied
-        #just before the MEM. If False, MEM is skipped
-        "selection": lambda event: event.btag_LR_4b_2b > 0.95, #optimized for 40% tth(bb) acceptance
+        #just before the MEM. If False, MEM is skipped for all hypos
+        #note that we set hypothesis-specific cuts below
+        "selection": lambda event: (event.btag_LR_4b_2b > 0.95 #optimized for 40% tth(bb) acceptance
+            or (event.is_sl and event.nBCSVM >= 3) #always calculate for tagged events
+            or (event.is_dl and event.nBCSVM >= 2) #always calculate for tagged events
+        ),
         
         #This configures what the array elements mean
         #Better not change this
@@ -383,12 +387,11 @@ class Conf:
         "methodsToRun": [
             "SL_0w2h2t",
             "DL_0w2h2t",
-            "SL_1w2h2t",
-            "SL_2w2h1t_l",
-            "SL_2w2h1t_h",
+            #"SL_1w2h2t",
+            #"SL_2w2h1t_l",
+            #"SL_2w2h1t_h",
             "SL_2w2h2t",
-            #"SL_2w2h2t",
-            #"SL_2w2h2t_sj",
+            "SL_2w2h2t_sj",
             #"SL_2w2h2t_memLR",
             #"SL_0w2h2t_memLR",
             #"DL_0w2h2t_Rndge4t",
