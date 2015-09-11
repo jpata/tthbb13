@@ -304,7 +304,7 @@ def draw_data_mc(tf, hname, samples, **kwargs):
         h = tf.get(sample + "/" + hname).Clone()
         hs[sample] = make_uoflow(h)
         #print hs[sample].GetBinLowEdge(0), hs[sample].GetBinLowEdge(hs[sample].GetNbinsX()+1)
-        hs[sample].Scale(get_weight(sample))
+        #hs[sample].Scale(get_weight(sample))
         hs[sample].title = sample_name + " ({0:.1f})".format(hs[sample].Integral())
         hs[sample].rebin(rebin)
 
@@ -445,7 +445,12 @@ def get_pairs_file(pairs, **kwargs):
     for pair in pairs:
         tf, hn1, hn2, label = pair
         h1 = tf.get(hn1).Clone()
-        h2 = tf.get(hn2).Clone()
+        if isinstance(hn2, str):
+            h2 = tf.get(hn2).Clone()
+        elif isinstance(hn2, list):
+            h2 = tf.get(hn2[0]).Clone()
+            for _hn2 in hn2[1:]:
+                h2 += tf.get(_hn2).Clone()
         ps += [(h1, h2, label)]
     return ps
     
@@ -528,13 +533,12 @@ def train(df, var, cut, **kwargs):
 
     return cls, df_test, df_train
 
-def syst_comparison(sn, l, **kwargs):
+def syst_comparison(tf, sn, l, **kwargs):
     h0 = tf.get(sn + l[0]).Clone()
     h1 = tf.get(sn + l[1]).Clone()
     h2 = tf.get(sn + l[2]).Clone()
     
     for ih, h in enumerate([h0, h1, h2]):
-        h.Scale(10000)
         h.title = l[ih]
         h.title = h.title.replace("_", "")
         h.title += " ({0:.2f})".format(h.Integral())
@@ -573,7 +577,7 @@ def syst_comparison(sn, l, **kwargs):
     h2r.Divide(h0)
     h1r.color = "blue"
     h2r.color = "red"
-    errorbar(h1r, color="blue")
-    errorbar(h2r, color="red")
+    hist(h1r, color="blue")
+    hist(h2r, color="red")
     plt.axhline(1.0, color="black")
     #fill_between(h1, h2, hatch="\\\\", facecolor="none", edgecolor="black", lw=0, zorder=10)

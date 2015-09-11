@@ -10,30 +10,31 @@ import imp
 import datetime
 from samples import samples_dict
 
-# Get the input proto-datacard
-datacard_path = sys.argv[1]
-dcard = imp.load_source("dcard", datacard_path)
-
-# Create the output directory
-timestamp = datetime.datetime.now().strftime("%Y-%m-%d-%H%M")
-full_path = os.path.join(dcard.Datacard.output_basepath, "Datacard-" + timestamp)
-os.makedirs(full_path)
-
-# output root file
-of_name = os.path.join(full_path, dcard.Datacard.output_filename)
-of = ROOT.TFile(of_name, "RECREATE")
-# output datacard text file
-dcof_name = os.path.join(full_path, dcard.Datacard.output_datacardname)
-dcof = open(dcof_name, "w")
-
 #Number of parallel processes to run for the histogram projection
-ncores = multiprocessing.cpu_count()
+#ncores = multiprocessing.cpu_count()
+ncores = 1
 
 def weight_str(cut, weight=1.0, lumi=1.0):
     return "weight_xs * sign(genWeight) * {1} * {2} * ({0})".format(cut, weight, lumi)
     #return "1.0 * ({0})".format(cut)
 
 def drawHelper(args):
+    """
+    Simple draw command that projects out a histogram on a single core.
+    Arguments are a tuple because that allows it to be used transparently in
+    multiprocessing.
+
+    args - tuple of (
+        input ttree (TTree) - TTree with events to project
+        hist command (string) - command for TTree::Draw in the for [func >> name(bins)]
+        cut string (string) - cut string for the TTree::Draw method
+        nfirst (int) - first event to process (index)
+        nev (int) - how many indices to process
+    )
+
+    NB: the histogram is created in the !!globa!! ROOT "memory directory"
+    Returns: resulting histogram
+    """
     tf, hist, cut, nfirst, nev = args
     #print hist, cut, nfirst, nev
     hname = hist.split(">>")[1].split("(")[0].strip()
@@ -77,22 +78,26 @@ def gensyst(hfunc, hname, cut):
                 s = s.replace(r1, r2)
             return s
             
-        #default, all corrections enabled
-        # if s.name == "":
-        #     repllist += [("mem_tth_p[0]", "mem_tth_JES_p[0]")]
-        #     repllist += [("mem_tth_p[1]", "mem_tth_JES_p[1]")]
-        #     repllist += [("mem_tth_p[2]", "mem_tth_JES_p[2]")]
-        #     repllist += [("mem_ttbb_p[0]", "mem_ttbb_JES_p[0]")]
-        #     repllist += [("mem_ttbb_p[1]", "mem_ttbb_JES_p[1]")]
-        #     repllist += [("mem_ttbb_p[2]", "mem_ttbb_JES_p[2]")]
+        #Here we list all replacement rules for the TTree variables that
+        #need to be done for a particular systematic
+        
+        #JES variations need replacements of the numJets, nBCSVM and pretty much every
+        #jet-containing variable down the line (e.g. Fox-Wolfram momenta)
+        #FIXME: Type1 propagation to MET
         if "CMS_scale_jUp" in s.name:
             repllist += [("numJets",    "numJets_JESUp")]
             repllist += [("nBCSVM",     "nBCSVM_JESUp")]
-            repllist += [("jets_pt[0]", "jets_corr_JESUp[0]/jets_corr[0] * jets_pt[0]")]
+            for ij in range(5):
+                repllist += [("jets_pt[{0}]".format(ij), "jets_corr_JESUp[{0}]/jets_corr[{0}] * jets_pt[{0}]".format(ij))]
+            repllist += [("mem_tth_p", "mem_tth_JESUp_p")]
+            repllist += [("mem_ttbb_p", "mem_ttbb_JESUp_p")]
         elif "CMS_scale_jDown" in s.name:
             repllist += [("numJets",    "numJets_JESDown")]
             repllist += [("nBCSVM",     "nBCSVM_JESDown")]
-            repllist += [("jets_pt[0]", "jets_corr_JESDown[0]/jets_corr[0] * jets_pt[0]")]
+            for ij in range(5):
+                repllist += [("jets_pt[{0}]".format(ij), "jets_corr_JESUp[{0}]/jets_corr[{0}] * jets_pt[{0}]".format(ij))]
+            repllist += [("mem_tth_p", "mem_tth_JESDown_p")]
+            repllist += [("mem_ttbb_p", "mem_ttbb_JESDown_p")]
         s.repllist = repllist
         s.varreplacement = lambda cut, r=repllist: replacer(cut, r)
         
@@ -128,7 +133,7 @@ def Draw(tf, of, gensyst, *args):
     ntot = tf.GetEntriesFast()
 
     #how many events to process per core
-    chunksize = max(ntot/ncores, 100000)
+    chunksize = max(ntot/ncores, 10000)
     chunks = range(0, ntot, chunksize)
     #print args, len(chunks)
     
@@ -281,6 +286,24 @@ def PrintDatacard(event_counts, datacard, dcof):
 
 
 if __name__ == "__main__":
+
+
+    # Get the input proto-datacard
+    datacard_path = sys.argv[1]
+    dcard = imp.load_source("dcard", datacard_path)
+
+    # Create the output directory
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d-%H%M")
+    full_path = os.path.join(dcard.Datacard.output_basepath, "Datacard-" + timestamp)
+    os.makedirs(full_path)
+
+    # output root file
+    of_name = os.path.join(full_path, dcard.Datacard.output_filename)
+    of = ROOT.TFile(of_name, "RECREATE")
+    # output datacard text file
+    dcof_name = os.path.join(full_path, dcard.Datacard.output_datacardname)
+    dcof = open(dcof_name, "w")
+
     # dict of dicts. First key: sample Second key: cut
     # Content: events at given lumi
     event_counts = {}
@@ -296,7 +319,7 @@ if __name__ == "__main__":
         for fn in samples_dict[sample].fileNamesS2:
             
             if not os.path.isfile(fn):
-                raise FileError("could not open file: {0}".format(fn))
+                raise Exception("could not open ROOT file: {0}".format(fn))
             tf.AddFile(fn)        
         print "Read ", tf.GetEntries(), "entries"
 
@@ -307,14 +330,14 @@ if __name__ == "__main__":
 
         for cutname, cut, analysis_var in dcard.Datacard.categories:
             
-            print "At: ", cutname
+            print "cut:", cutname
 
             jetd = sampled.mkdir(cutname)
             
-            Draw(tf, jetd, gensyst, "nBCSVM:numJets >> njets_ntags(15,0,15,15,0,15)", cut)
+            #Draw(tf, jetd, gensyst, "nBCSVM:numJets >> njets_ntags(15,0,15,15,0,15)", cut)
 
             Draw(tf, jetd, gensyst, "jets_pt[0] >> jet0_pt(20,20,500)", cut)
-            #Draw(tf, jetd, gensyst, "jets_pt[1] >> jet1_pt(20,20,500)", cut)
+            Draw(tf, jetd, gensyst, "jets_pt[1] >> jet1_pt(20,20,500)", cut)
 
             #Draw(tf, jetd, gensyst, "jets_eta[0] >> jet0_eta(30,-5,5)", cut)
 
@@ -327,22 +350,41 @@ if __name__ == "__main__":
             # 
             # Draw(tf, jetd, gensyst, "(100*nMatch_wq + 10*nMatch_hb + nMatch_tb) >> nMatch(300,0,300)", cut)
             # Draw(tf, jetd, gensyst, "(100*nMatch_wq_btag + 10*nMatch_hb_btag + nMatch_tb_btag) >> nMatch_btag(300,0,300)", cut)
-            # 
-            for match, matchcut in [
-                    ("nomatch", "1"),
-                    #("tb2_wq2", "nMatch_wq_btag==2 && nMatch_tb_btag==2"),
-                    #("hb2_tb2_wq2", "nMatch_hb_btag==2 && nMatch_wq_btag==2 && nMatch_tb_btag==2"),
-                    #("tb2_wq1", "nMatch_wq_btag==1 && nMatch_tb_btag==2"),
-                    #("hb2_tb2_wq1", "nMatch_hb_btag==2 && nMatch_wq_btag==1 && nMatch_tb_btag==2")
+            #
+
+            #MEM distributions
+            for matchname, matchcut in [
+                    ("", "1"), #no matching criteria applied
+                    #("_tb2_wq2", "nMatch_wq_btag==2 && nMatch_tb_btag==2"),
+                    #("_hb2_tb2_wq2", "nMatch_hb_btag==2 && nMatch_wq_btag==2 && nMatch_tb_btag==2"),
+                    #("_tb2_wq1", "nMatch_wq_btag==1 && nMatch_tb_btag==2"),
+                    #("_hb2_tb2_wq1", "nMatch_hb_btag==2 && nMatch_wq_btag==1 && nMatch_tb_btag==2")
                 ]:
-                if "hb2" in match and "ttjets" in sample:
+                if "hb2" in matchname and "ttjets" in sample:
                     continue
                 cut = " && ".join([cut, matchcut])
                 if tf.GetEntries(cut) == 0:
                     continue
-                for nmem in range(3):
+
+                #Various mem hypotheses
+                #memname - suffix of the created histogram
+                #memidx - index into the MEM results array (see MEAnalysis_cfg_heppy -> Conf.mem["methodOrder"])
+                for memname, memidx in [
+                    ("SL_0w2h2t", 0),
+                    ("DL_0w2h2t", 1),
+                    ]:
+
+                    #skip unnecessary MEM distributions
+                    if not (
+                        ("dl" in cutname and "DL" in memname) or
+                        ("sl" in cutname and "SL" in memname)
+                        ):
+                        continue
+
                     Draw(tf, jetd, gensyst,
-                        "mem_tth_p[{0}] / (mem_tth_p[{0}] + 0.15*mem_ttbb_p[{0}]) >> mem_d_{1}_{0}(12,0,1)".format(nmem, match),
+                        "mem_tth_p[{0}] / (mem_tth_p[{0}] + 0.15*mem_ttbb_p[{0}]) >> mem_{1}{2}(12,0,1)".format(
+                            memidx, memname, matchname
+                        ),
                         cut
                     )
                     
