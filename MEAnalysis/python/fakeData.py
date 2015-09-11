@@ -11,7 +11,7 @@ processes = [
 ]
 
 channels = ["sl_jge6_tge4"]
-hist = "mem_d_nomatch_0"
+hist = "mem_SL_0w2h2t"
 
 
 of = ROOT.TFile("fakeData.root", "RECREATE")

@@ -18,3 +18,4 @@ __init__.py
 *.log
 /MEIntegratorStandalone
 /MEAnalysis/gc/grid-control
+Plotting/Datacard-2015-09-08-1834
