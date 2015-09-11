@@ -27,7 +27,17 @@ samples_latex = [
     #("ttz_13tev_madgraph_pu20bx25_phys14", "$\\mathrm{t}\\bar{\\mathrm{t}} + \mathrm{Z}$"),
 ]
 
-path = "/Users/joosep/Documents/tth/data/ntp/v12/Sep4_fullrun/"
+
+import os
+hostname = os.environ.get("HOSTNAME", "")
+if hostname == "t3ui12":
+    path = "/scratch/jpata/tth/Sep9_jec_jer/"
+else:
+    path = "/Users/joosep/Documents/tth/data/ntp/v12/Sep9_jec_jer"
+
+if not os.path.isdir(path):
+    raise Exception("Could not find sample base path {0}".format(path))
+print "Loading samples from", path
 
 class Sample:
     def __init__(self, name, filenames):
@@ -35,70 +45,82 @@ class Sample:
         self.fileNamesS2 = filenames
 
 samples_dict = {
-    "ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8_hbb": Sample(
-        "ttH_hbb",
-        [path + "ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8_hbb.root"]
-    ),
-    "ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8_hX": Sample(
+    #"ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8_hbb": Sample(
+    #    "ttH_hbb",
+    #    [path + "ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8_hbb.root"]
+    #),
+    #"ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8_hX": Sample(
+    #    "ttH_nohbb",
+    #    [path + "ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8_hX.root"]
+    #),
+    
+    #"ttHTobb_M125_13TeV_powheg_pythia8_hbb": Sample(
+    #    "ttH_hbb",
+    #    [path + "ttHTobb_M125_13TeV_powheg_pythia8_hbb.root"]
+    #),
+    "ttHToNonbb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns": Sample(
         "ttH_nohbb",
-        [path + "ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8_hX.root"]
+        [path + "ttHToNonbb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns.root"]
     ),
     
-    "ttHTobb_M125_13TeV_powheg_pythia8_hbb": Sample(
-        "ttH_hbb",
-        [path + "ttHTobb_M125_13TeV_powheg_pythia8_hbb.root"]
-    ),
-    "ttHTobb_M125_13TeV_powheg_pythia8_hX": Sample(
-        "ttH_nohbb",
-        [path + "ttHTobb_M125_13TeV_powheg_pythia8_hX.root"]
-    ),
+    #"TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_tt2b": Sample(
+    #    "ttbarPlus2B",
+    #    [path + "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_tt2b.root"]
+    #),
+    #"TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ttb": Sample(
+    #    "ttbarPlusB",
+    #    [path + "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ttb.root"]
+    #),
+    #"TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ttbb": Sample(
+    #    "ttbarPlusBBbar",
+    #    [path + "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ttbb.root"]
+    #),
+    #"TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ttcc": Sample(
+    #    "ttbarPlusCCbar",
+    #    [path + "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ttcc.root"]
+    #),
+    #"TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ttll": Sample(
+    #    "ttbarOther",
+    #    [path + "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ttll.root"]
+    #),
     
-    "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_tt2b": Sample(
+    "TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_tt2b": Sample(
         "ttbarPlus2B",
-        [path + "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_tt2b.root"]
+        [path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_tt2b.root"]
     ),
-    "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ttb": Sample(
+    "TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_ttb": Sample(
         "ttbarPlusB",
-        [path + "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ttb.root"]
+        [path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_ttb.root"]
     ),
-    "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ttbb": Sample(
+    "TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_ttbb": Sample(
         "ttbarPlusBBbar",
-        [path + "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ttbb.root"]
+        [path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_ttbb.root"]
     ),
-    "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ttcc": Sample(
+    "TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_ttcc": Sample(
         "ttbarPlusCCbar",
-        [path + "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ttcc.root"]
+        [path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_ttcc.root"]
     ),
-    "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ttll": Sample(
+    "TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_ttll": Sample(
         "ttbarOther",
-        [path + "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ttll.root"]
-    ),
-    
-    "TT_TuneCUETP8M1_13TeV-powheg-pythia8_tt2b": Sample(
-        "ttbarPlus2B",
-        [path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_tt2b.root"]
-    ),
-    "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttb": Sample(
-        "ttbarPlusB",
-        [path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttb.root"]
-    ),
-    "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttbb": Sample(
-        "ttbarPlusBBbar",
-        [path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttbb.root"]
-    ),
-    "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttcc": Sample(
-        "ttbarPlusCCbar",
-        [path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttcc.root"]
-    ),
-    "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttll": Sample(
-        "ttbarOther",
-        [path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttll.root"]
+        [path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_ttll.root"]
     ),
     
 
-    "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttll": Sample(
-        "ttbarOther",
-        [path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttll.root"]
+    "TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8__RunIISpring15DR74-Asympt25ns": Sample(
+        "ttw_lnu",
+        [path + "TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8__RunIISpring15DR74-Asympt25ns.root"]
+    ),
+    "TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8__RunIISpring15DR74-Asympt25ns": Sample(
+        "ttw_qq",
+        [path + "TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8__RunIISpring15DR74-Asympt25ns.root"]
+    ),
+    "TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8__RunIISpring15DR74-Asympt25ns": Sample(
+        "ttz_llnunu",
+        [path + "TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8__RunIISpring15DR74-Asympt25ns.root"]
+    ),
+    "TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8__RunIISpring15DR74-Asympt25ns": Sample(
+        "ttz_qq",
+        [path + "TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8__RunIISpring15DR74-Asympt25ns.root"]
     ),
     # "ttw_13tev_madgraph_pu20bx25_phys14": Sample(
     #     "ttbarW",
@@ -110,7 +132,7 @@ samples_dict = {
     # ),
 }
 
-#Extracted using apple color picker from CMS combination paper
+#Extracted using the apple color picker from CMS combination paper
 colors = {
     "ttbarOther": (251, 102, 102),
     "ttbarPlusCCbar": (204, 2, -0),
