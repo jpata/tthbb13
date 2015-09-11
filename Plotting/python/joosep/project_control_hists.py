@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 import ROOT
 ROOT.gROOT.SetBatch(True)
 #ROOT.gErrorIgnoreLevel = ROOT.kError
@@ -26,9 +26,8 @@ of = ROOT.TFile(of_name, "RECREATE")
 dcof_name = os.path.join(full_path, dcard.Datacard.output_datacardname)
 dcof = open(dcof_name, "w")
 
-
 #Number of parallel processes to run for the histogram projection
-ncores = 10
+ncores = multiprocessing.cpu_count()
 
 def weight_str(cut, weight=1.0, lumi=1.0):
     return "weight_xs * sign(genWeight) * {1} * {2} * ({0})".format(cut, weight, lumi)
@@ -58,6 +57,11 @@ class Systematic(object):
         )
         
 def gensyst(hfunc, hname, cut):
+    """
+    hfunc (string): 
+    hname (string):  
+    cut (string): 
+    """
     systs = []
     for sname, weight in dcard.Datacard.weights:
         s = Systematic(sname, weight=weight, hfunc=hfunc)
@@ -66,6 +70,9 @@ def gensyst(hfunc, hname, cut):
         ]
         
         def replacer(s, repllist):
+            """
+            Mini-function that performs in-place replacements for systematics
+            """
             for r1, r2 in repllist:
                 s = s.replace(r1, r2)
             return s
@@ -93,6 +100,16 @@ def gensyst(hfunc, hname, cut):
     return systs
     
 def Draw(tf, of, gensyst, *args):
+    """
+    tf (TFile): Input file
+    of (TFile): output file
+    gensyst (method): function to generate systematics 
+    args (list): (hist, cut)
+        hist (string): TTree::Draw type command of the form "jet_pt >> h(10,0,100)"
+        cut (string): cutstring for TTree::Draw
+        OR
+        cut (TEntryList): pre-determined entry list with the events passing the cut
+    """
     hist = args[0]
     cut = args[1]
     hname = hist.split(">>")[1].split("(")[0].strip()
@@ -263,82 +280,82 @@ def PrintDatacard(event_counts, datacard, dcof):
 # end of PrintDataCard
 
 
+if __name__ == "__main__":
+    # dict of dicts. First key: sample Second key: cut
+    # Content: events at given lumi
+    event_counts = {}
 
-# dict of dicts. First key: sample Second key: cut
-# Content: events at given lumi
-event_counts = {}
+    for sample in dcard.Datacard.samples:
+        print sample
 
-for sample in dcard.Datacard.samples:
-    print sample
+        sample_shortname = samples_dict[sample].name
 
-    sample_shortname = samples_dict[sample].name
+        event_counts[sample_shortname] = {}
 
-    event_counts[sample_shortname] = {}
+        tf = ROOT.TChain("tree")
+        for fn in samples_dict[sample].fileNamesS2:
+            
+            if not os.path.isfile(fn):
+                raise FileError("could not open file: {0}".format(fn))
+            tf.AddFile(fn)        
+        print "Read ", tf.GetEntries(), "entries"
 
-    tf = ROOT.TChain("tree")
-    for fn in samples_dict[sample].fileNamesS2:
+        of.cd()
         
-        if not os.path.isfile(fn):
-            raise FileError("could not open file: {0}".format(fn))
-        tf.AddFile(fn)        
-    print "Read ", tf.GetEntries(), "entries"
+        sampled = of.mkdir(sample_shortname)
+        sampled.cd()
 
-    of.cd()
-    
-    sampled = of.mkdir(sample_shortname)
-    sampled.cd()
+        for cutname, cut, analysis_var in dcard.Datacard.categories:
+            
+            print "At: ", cutname
 
-    for cutname, cut, analysis_var in dcard.Datacard.categories:
+            jetd = sampled.mkdir(cutname)
+            
+            Draw(tf, jetd, gensyst, "nBCSVM:numJets >> njets_ntags(15,0,15,15,0,15)", cut)
+
+            Draw(tf, jetd, gensyst, "jets_pt[0] >> jet0_pt(20,20,500)", cut)
+            #Draw(tf, jetd, gensyst, "jets_pt[1] >> jet1_pt(20,20,500)", cut)
+
+            #Draw(tf, jetd, gensyst, "jets_eta[0] >> jet0_eta(30,-5,5)", cut)
+
+            Draw(tf, jetd, gensyst, "jets_btagCSV[0] >> jet0_csvv2(22, -0.1, 1)", cut)
         
-        print "At: ", cutname, 
-
-        jetd = sampled.mkdir(cutname)
+            #Draw(tf, jetd, gensyst, "leps_pt[0] >> lep0_pt(30,0,300)", cut)
+            #Draw(tf, jetd, gensyst, "leps_eta[0] >> lep0_eta(30,-5,5)", cut)
         
-        Draw(tf, jetd, gensyst, "nBCSVM:numJets >> njets_ntags(15,0,15,15,0,15)", cut)
+            #Draw(tf, jetd, gensyst, "btag_LR_4b_2b >> btag_lr(30,0,1)", cut)
+            # 
+            # Draw(tf, jetd, gensyst, "(100*nMatch_wq + 10*nMatch_hb + nMatch_tb) >> nMatch(300,0,300)", cut)
+            # Draw(tf, jetd, gensyst, "(100*nMatch_wq_btag + 10*nMatch_hb_btag + nMatch_tb_btag) >> nMatch_btag(300,0,300)", cut)
+            # 
+            for match, matchcut in [
+                    ("nomatch", "1"),
+                    #("tb2_wq2", "nMatch_wq_btag==2 && nMatch_tb_btag==2"),
+                    #("hb2_tb2_wq2", "nMatch_hb_btag==2 && nMatch_wq_btag==2 && nMatch_tb_btag==2"),
+                    #("tb2_wq1", "nMatch_wq_btag==1 && nMatch_tb_btag==2"),
+                    #("hb2_tb2_wq1", "nMatch_hb_btag==2 && nMatch_wq_btag==1 && nMatch_tb_btag==2")
+                ]:
+                if "hb2" in match and "ttjets" in sample:
+                    continue
+                cut = " && ".join([cut, matchcut])
+                if tf.GetEntries(cut) == 0:
+                    continue
+                for nmem in range(3):
+                    Draw(tf, jetd, gensyst,
+                        "mem_tth_p[{0}] / (mem_tth_p[{0}] + 0.15*mem_ttbb_p[{0}]) >> mem_d_{1}_{0}(12,0,1)".format(nmem, match),
+                        cut
+                    )
+                    
+            event_counts[sample_shortname][cutname] = jetd.Get(analysis_var).Integral()
+            
+            jetd.Write()
 
-        Draw(tf, jetd, gensyst, "jets_pt[0] >> jet0_pt(20,20,500)", cut)
-        #Draw(tf, jetd, gensyst, "jets_pt[1] >> jet1_pt(20,20,500)", cut)
+            
+        sampled.Write()
+    # End of loop over samples
 
-        #Draw(tf, jetd, gensyst, "jets_eta[0] >> jet0_eta(30,-5,5)", cut)
+    print "writing"
+    of.Write()
+    of.Close()
 
-        Draw(tf, jetd, gensyst, "jets_btagCSV[0] >> jet0_csvv2(22, -0.1, 1)", cut)
-    
-        #Draw(tf, jetd, gensyst, "leps_pt[0] >> lep0_pt(30,0,300)", cut)
-        #Draw(tf, jetd, gensyst, "leps_eta[0] >> lep0_eta(30,-5,5)", cut)
-    
-        #Draw(tf, jetd, gensyst, "btag_LR_4b_2b >> btag_lr(30,0,1)", cut)
-        # 
-        # Draw(tf, jetd, gensyst, "(100*nMatch_wq + 10*nMatch_hb + nMatch_tb) >> nMatch(300,0,300)", cut)
-        # Draw(tf, jetd, gensyst, "(100*nMatch_wq_btag + 10*nMatch_hb_btag + nMatch_tb_btag) >> nMatch_btag(300,0,300)", cut)
-        # 
-        for match, matchcut in [
-                ("nomatch", "1"),
-                #("tb2_wq2", "nMatch_wq_btag==2 && nMatch_tb_btag==2"),
-                #("hb2_tb2_wq2", "nMatch_hb_btag==2 && nMatch_wq_btag==2 && nMatch_tb_btag==2"),
-                #("tb2_wq1", "nMatch_wq_btag==1 && nMatch_tb_btag==2"),
-                #("hb2_tb2_wq1", "nMatch_hb_btag==2 && nMatch_wq_btag==1 && nMatch_tb_btag==2")
-            ]:
-            if "hb2" in match and "ttjets" in sample:
-                continue
-            cut = " && ".join([cut, matchcut])
-            if tf.GetEntries(cut) == 0:
-                continue
-            for nmem in range(3):
-                Draw(tf, jetd, gensyst,
-                    "mem_tth_p[{0}] / (mem_tth_p[{0}] + 0.15*mem_ttbb_p[{0}]) >> mem_d_{1}_{0}(12,0,1)".format(nmem, match),
-                    cut
-                )
-                
-        event_counts[sample_shortname][cutname] = jetd.Get(analysis_var).Integral()
-        
-        jetd.Write()
-
-        
-    sampled.Write()
-# End of loop over samples
-
-print "writing"
-of.Write()
-of.Close()
-
-PrintDatacard(event_counts, dcard.Datacard, dcof)
+    PrintDatacard(event_counts, dcard.Datacard, dcof)

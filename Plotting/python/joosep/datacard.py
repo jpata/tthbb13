@@ -10,42 +10,29 @@
 # Step6: MET>=40 for ee and mumu
 # Step7: >=1 medium WP b-tagged jet
 
-#dl_cuts = "is_dl==1 && ll_mass>20 && passPV==1 && abs(ll_mass-91.2)>8 && (abs(leps_pdgId[0])==abs(leps_pdgId[1]) ? met_pt>40 : 1) && sign(leps_pdgId[0])!=sign(leps_pdgId[1])"
-dl_cuts = "is_dl==1 && passPV==1 && (abs(leps_pdgId[0])==abs(leps_pdgId[1]) ? met_pt>40 : 1) && sign(leps_pdgId[0])!=sign(leps_pdgId[1])"
+dl_cuts = "is_dl==1 && ll_mass>20 && passPV==1 && abs(ll_mass-91.2)>8 && (abs(leps_pdgId[0])==abs(leps_pdgId[1]) ? met_pt>40 : 1) && sign(leps_pdgId[0])!=sign(leps_pdgId[1])"
+#dl_cuts = "is_dl==1 && passPV==1 && (abs(leps_pdgId[0])==abs(leps_pdgId[1]) ? met_pt>40 : 1) && sign(leps_pdgId[0])!=sign(leps_pdgId[1])"
 sl_cuts = "is_sl==1 && passPV==1"
 
 class Datacard:
     #draw in these categories
     # (name, cut-string, decision variable to use)
     categories = [
-        #("dl_j3_t2", dl_cuts + " && numJets==3 && nBCSVM==2"),
-        #("dl_jge3_tge3", dl_cuts + "&& numJets>=3 && nBCSVM==3"),
-        #("dl_jge4_t2", dl_cuts + "&& numJets>=4 && nBCSVM==2"),
-        #("dl_jge4_tge4", dl_cuts + "&& numJets>=4 && nBCSVM>=4"),
+        ("dl_j3_t2", dl_cuts + " && numJets==3 && nBCSVM==2", "mem_d_nomatch_0"),
+        ("dl_jge3_tge3", dl_cuts + "&& numJets>=3 && nBCSVM==3", "mem_d_nomatch_0"),
+        ("dl_jge4_t2", dl_cuts + "&& numJets>=4 && nBCSVM==2", "mem_d_nomatch_0"),
+        ("dl_jge4_tge4", dl_cuts + "&& numJets>=4 && nBCSVM>=4", "mem_d_nomatch_0"),
 
-        #("4j", "numJets==4"),
-        #("sl_j4_t3", sl_cuts + " && numJets==4 && nBCSVM==3"),
-        #("sl_j4_t4", "numJets==4 && nBCSVM==4"),
+        ("sl_j4_t3", sl_cuts + " && numJets==4 && nBCSVM==3", "mem_d_nomatch_0"),
+        ("sl_j4_t4", "numJets==4 && nBCSVM==4", "mem_d_nomatch_0"),
 
-        #("5j", "numJets==5"),
-        #("5jL", "numJets==5 && nBCSVM<3"),
-        #("sl_j5_t3", sl_cuts + " && numJets==5 && nBCSVM==3"),
-        #("5j4t", "numJets==5 && nBCSVM==4"),
-        #("sl_j5_tge4", sl_cuts + " && numJets==5 && nBCSVM>=4"),
-        #("5jH", "numJets==5 && nBCSVM>4"),
+        ("sl_j5_t3", sl_cuts + " && numJets==5 && nBCSVM==3", "mem_d_nomatch_0"),
+        ("sl_j5_tge4", sl_cuts + " && numJets==5 && nBCSVM>=4", "mem_d_nomatch_0"),
 
-        #("6j", "numJets==6"),
-        #("6jL", "numJets==6 && nBCSVM<3"),
-        #("6j3t", "numJets==6 && nBCSVM==3"),
-        #("6j4t", "numJets==6 && nBCSVM==4"),
-        #("6jH", "numJets==6 && nBCSVM>4"),
 
-        #("6plusj", "numJets>=6"),
-        #("sl_jge6_t2", sl_cuts + " && numJets>=6 && nBCSVM==2"),
-        #("sl_jge6_t3", sl_cuts + " && numJets>=6 && nBCSVM==3"),
-        #("6plusj4t", "numJets>=6 && nBCSVM==4"),
+        ("sl_jge6_t2", sl_cuts + " && numJets>=6 && nBCSVM==2", "mem_d_nomatch_0"),
+        ("sl_jge6_t3", sl_cuts + " && numJets>=6 && nBCSVM==3", "mem_d_nomatch_0"),
         ("sl_jge6_tge4", sl_cuts + " && numJets>=6 && nBCSVM>=4", "mem_d_nomatch_0"),
-        #("6plusjH", "numJets>=6 && nBCSVM>4"),
     ]
 
     # Subset of categories we want to use for limit setting
@@ -142,7 +129,7 @@ class Datacard:
     output_filename = "ControlPlots.root"
     output_datacardname = "shapes.txt"
 
-    output_basepath = "/shome/gregor/VHBB-745/CMSSW_7_4_5/src/tthbb13/Plotting/python/joosep/"
+    output_basepath = "./"
 
     # luminosity we're interested in (measure in pb-1)
     lumi = 10000. # 10fb-1

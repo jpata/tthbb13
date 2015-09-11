@@ -24,7 +24,7 @@ import math
 matplotlib.rc("axes", labelsize=24)
 matplotlib.rc("axes", titlesize=16)
 
-path = "/Users/joosep/Documents/tth/data/ntp/v12/me/"
+path = "/Users/joosep/Documents/tth/data/ntp/v12/Sep4_fullrun/"
 samples = {
     "tth_amcatnlo": [
         path + "/ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8_hbb.root",
