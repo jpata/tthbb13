@@ -54,10 +54,10 @@ samples_dict = {
     #    [path + "ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8_hX.root"]
     #),
     
-    #"ttHTobb_M125_13TeV_powheg_pythia8_hbb": Sample(
-    #    "ttH_hbb",
-    #    [path + "ttHTobb_M125_13TeV_powheg_pythia8_hbb.root"]
-    #),
+    "ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9": Sample(
+        "ttH_hbb",
+        [path + "ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9.root"]
+    ),
     "ttHToNonbb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns": Sample(
         "ttH_nohbb",
         [path + "ttHToNonbb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns.root"]
