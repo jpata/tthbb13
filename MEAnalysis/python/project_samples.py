@@ -26,7 +26,7 @@ inf = [
 #    ("/home/joosep/tth/gc/GC3c2c5704ee07/MEAnalysis_cfg_heppy/ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8.root", tth_sel),
 #    ("/home/joosep/tth/gc/GC3c2c5704ee07/MEAnalysis_cfg_heppy/ttHTobb_M125_13TeV_powheg_pythia8.root", tth_sel),
 #    ("/home/joosep/tth/gc/GCaeca6a813136/MEAnalysis_cfg_heppy/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.root", ttjets_sel),
-    ("/home/joosep/tth/gc/TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns.root", ttjets_sel)
+    ("/home/joosep/tth/gc/TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9.root", ttjets_sel)
 ]
 
 for f, cuts in inf:
