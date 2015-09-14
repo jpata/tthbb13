@@ -308,8 +308,17 @@ if __name__ == "__main__":
                         ):
                         continue
 
+                    #1D mem distribution
                     Draw(tf, jetd, gensyst,
                         "mem_tth_p[{0}] / (mem_tth_p[{0}] + 0.15*mem_ttbb_p[{0}]) >> mem_{1}{2}(12,0,1)".format(
+                            memidx, memname, matchname
+                        ),
+                        cut
+                    )
+
+                    #1D bLR X mem distribution
+                    Draw(tf, jetd, gensyst,
+                        "mem_tth_p[{0}] / (mem_tth_p[{0}] + 0.15*mem_ttbb_p[{0}]*(1 + 1200*btag_lr_2b/btag_lr_4b)) >> blrXmem_{1}{2}(12,0,1)".format(
                             memidx, memname, matchname
                         ),
                         cut
@@ -332,7 +341,7 @@ if __name__ == "__main__":
     ]
 
     channels = ["sl_jge6_tge4", "sl_jge6_tge4_blrH", "sl_jge6_tge4_blrL"]
-    hists = ["mem_SL_0w2h2t"]
+    hists = ["mem_SL_0w2h2t", "blrXmem_SL_0w2h2t"]
 
     makeFakeData(of, processes, channels, hists)
     print "writing"
