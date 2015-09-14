@@ -10,7 +10,7 @@ processes = [
     "ttbarOther",
 ]
 
-channels = ["sl_jge6_tge4"]
+channels = ["sl_jge6_tge4", "sl_jge6_tge4_blrH", "sl_jge6_tge4_blrL"]
 hist = "mem_SL_0w2h2t"
 
 
@@ -28,5 +28,6 @@ for ch in channels:
     of.mkdir(outdir)
     outdir = of.Get(outdir)
     h.SetDirectory(outdir)
-of.Write()
+    outdir.Write()
+#of.Write()
 of.Close()

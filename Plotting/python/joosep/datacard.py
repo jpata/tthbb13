@@ -18,28 +18,45 @@ class Datacard:
     #draw in these categories
     # (name, cut-string, decision variable to use)
     categories = [
-        ("dl_j3_t2",        dl_cuts + " && numJets==3 && nBCSVM==2",    "mem_DL_0w2h2t"),
-        ("dl_jge3_tge3",    dl_cuts + " && numJets>=3 && nBCSVM==3",    "mem_DL_0w2h2t"),
-        ("dl_jge4_t2",      dl_cuts + " && numJets>=4 && nBCSVM==2",    "mem_DL_0w2h2t"),
-        ("dl_jge4_tge4",    dl_cuts + " && numJets>=4 && nBCSVM>=4",    "mem_DL_0w2h2t"),
-
-        ("sl_j4_t3",        sl_cuts + " && numJets==4 && nBCSVM==3",    "mem_SL_0w2h2t"),
-        ("sl_j4_t4",        sl_cuts + " && numJets==4 && nBCSVM==4",    "mem_SL_0w2h2t"),
-
-        ("sl_j5_t3",        sl_cuts + " && numJets==5 && nBCSVM==3",    "mem_SL_0w2h2t"),
-        ("sl_j5_tge4",      sl_cuts + " && numJets==5 && nBCSVM>=4",    "mem_SL_0w2h2t"),
-
-
-        ("sl_jge6_t2",      sl_cuts + " && numJets>=6 && nBCSVM==2",    "mem_SL_0w2h2t"),
-        ("sl_jge6_t3",      sl_cuts + " && numJets>=6 && nBCSVM==3",    "mem_SL_0w2h2t"),
+        # ("dl_j3_t2",        dl_cuts + " && numJets==3 && nBCSVM==2",    "mem_DL_0w2h2t"),
+        # ("dl_jge3_tge3",    dl_cuts + " && numJets>=3 && nBCSVM==3",    "mem_DL_0w2h2t"),
+        # ("dl_jge4_t2",      dl_cuts + " && numJets>=4 && nBCSVM==2",    "mem_DL_0w2h2t"),
+        # ("dl_jge4_tge4",    dl_cuts + " && numJets>=4 && nBCSVM>=4",    "mem_DL_0w2h2t"),
+        # 
+        # ("sl_j4_t3",        sl_cuts + " && numJets==4 && nBCSVM==3",    "mem_SL_0w2h2t"),
+        # ("sl_j4_t4",        sl_cuts + " && numJets==4 && nBCSVM==4",    "mem_SL_0w2h2t"),
+        # 
+        # ("sl_j5_t3",        sl_cuts + " && numJets==5 && nBCSVM==3",    "mem_SL_0w2h2t"),
+        # ("sl_j5_tge4",      sl_cuts + " && numJets==5 && nBCSVM>=4",    "mem_SL_0w2h2t"),
+        # 
+        # 
+        # ("sl_jge6_t2",      sl_cuts + " && numJets>=6 && nBCSVM==2",    "mem_SL_0w2h2t"),
+        # ("sl_jge6_t3",      sl_cuts + " && numJets>=6 && nBCSVM==3",    "mem_SL_0w2h2t"),
         ("sl_jge6_tge4",    sl_cuts + " && numJets>=6 && nBCSVM>=4",    "mem_SL_0w2h2t"),
     ]
+
+    #derived for 50% tt+H efficiency
+    #variable is logit(bLR) = log(bLR/(1-bLR))
+    blr_cuts = {
+     'dl_j3_t2': 0.2,
+     'dl_jge3_tge3': 4.4,
+     'dl_jge4_t2': 0.5,
+     'dl_jge4_tge4': 8.9,
+     'sl_j4_t3': 4.1,
+     'sl_j4_t4': 9.8,
+     'sl_j5_t3': 4.4,
+     'sl_j5_tge4': 8.9,
+     'sl_jge6_t2': 0.8,
+     'sl_jge6_t3': 4.4,
+     'sl_jge6_tge4': 8.3}
 
     # Subset of categories we want to use for limit setting
     analysis_categories = [
         #"sl_jge6_t2",
         #"sl_jge6_t3",
-        "sl_jge6_tge4"
+        "sl_jge6_tge4",
+        #"sl_jge6_tge4_blrH",
+        #"sl_jge6_tge4_blrL"
     ]
 
     #Draw histograms with these systematic weights
@@ -64,8 +81,8 @@ class Datacard:
             #CSV variations
             #("CMS_ttH_CSVLFUp",         "bTagWeight_LFUp"),
             #("CMS_ttH_CSVLFDown",       "bTagWeight_LFDown"),
-            ("CMS_ttH_CSVHFUp",         "bTagWeight_HFUp"),
-            ("CMS_ttH_CSVHFDown",       "bTagWeight_HFDown"),
+            #("CMS_ttH_CSVHFUp",         "bTagWeight_HFUp"),
+            #("CMS_ttH_CSVHFDown",       "bTagWeight_HFDown"),
             #("CMS_ttH_CSVStats1Up",     "bTagWeight_Stats1Up"),
             #("CMS_ttH_CSVStats1Down",   "bTagWeight_Stats1Down"),
             #("CMS_ttH_CSVStats2Up",     "bTagWeight_Stats2Up"),
@@ -80,57 +97,63 @@ class Datacard:
         "CMS_ttH_CSVHF"       : 1,        
         "CMS_ttH_CSVStats1"   : 1,    
         "CMS_ttH_CSVStats2"   : 1,    
-    }        
+    }
+
+    total_shape_uncert = {
+        "ttH_hbb" : common_shape_uncertainties,
+        "ttbarPlus2B" : common_shape_uncertainties,
+        "ttbarPlusB" : common_shape_uncertainties,
+        "ttbarPlusBBbar" : common_shape_uncertainties,
+        "ttbarPlusCCbar" : common_shape_uncertainties,
+        "ttbarOther" : common_shape_uncertainties,
+    }
+
     # nested dictionaries: category/sample/uncertainty/scale
     shape_uncertainties = {
-        "sl_jge6_tge4" : {
-            "ttH_hbb" : common_shape_uncertainties,
-            "ttbarPlus2B" : common_shape_uncertainties,
-            "ttbarPlusB" : common_shape_uncertainties,
-            "ttbarPlusBBbar" : common_shape_uncertainties,
-            "ttbarPlusCCbar" : common_shape_uncertainties,
-            "ttbarOther" : common_shape_uncertainties,
-        }
+        "sl_jge6_tge4" : total_shape_uncert
     }
 
 
+    common_scale_uncertainties = {
+        "ttH_hbb" : {
+            "lumi" : 1.05
+        },
+        "ttbarPlus2B" : {
+            "bgnorm_ttbarPlus2B" : 1.5
+        },
+        "ttbarPlusB" : {
+            "bgnorm_ttbarPlusB" : 1.3
+        },
+        "ttbarPlusBBbar" : {
+            "bgnorm_ttbarPlusBBbar" : 1.3
+        },
+        "ttbarPlusCCbar" : {
+            "bgnorm_ttbarPlusCCbar" : 1.3
+        },
+        "ttbarOther" : {
+            "bgnorm_ttbarOther" : 1.3
+        },
+    }
     # value: normalization uncertainty
     scale_uncertainties = {
-        "sl_jge6_tge4" : {
-            "ttH_hbb" : {
-                "lumi" : 1.05
-            },
-            "ttbarPlus2B" : {
-                "bgnorm_ttbarPlus2B" : 1.5
-            },
-            "ttbarPlusB" : {
-                "bgnorm_ttbarPlusB" : 1.3
-            },
-            "ttbarPlusBBbar" : {
-                "bgnorm_ttbarPlusBBbar" : 1.3
-            },
-            "ttbarPlusCCbar" : {
-                "bgnorm_ttbarPlusCCbar" : 1.3
-            },
-            "ttbarOther" : {
-                "bgnorm_ttbarOther" : 1.3
-            },
-    }}
+        "sl_jge6_tge4" : common_scale_uncertainties
+    }
 
 
     #Enable the plotting of these samples
     # !!!Important: Signal has to be the first one!!!!
     samples = [
-        "ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8_hbb",
-        #"tth_13tev_amcatnlo_pu20bx25_hbb",
-        #"tth_13tev_amcatnlo_pu20bx25_hX",
-        "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_tt2b",
-        "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ttb",
-        "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ttbb",
-        "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ttcc",
-        "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ttll",
-        #"ttw_13tev_madgraph_pu20bx25_phys14",
-        #"ttz_13tev_madgraph_pu20bx25_phys14"
+        "ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9",
+        "ttHToNonbb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns",
+        "TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_tt2b",
+        "TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_ttb",
+        "TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_ttbb",
+        "TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_ttcc",
+        "TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_ttll",
+        "TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8__RunIISpring15DR74-Asympt25ns",
+        "TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8__RunIISpring15DR74-Asympt25ns",
+        "TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8__RunIISpring15DR74-Asympt25ns",
+        "TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8__RunIISpring15DR74-Asympt25ns",
     ]
 
     output_filename = "ControlPlots.root"
@@ -140,3 +163,13 @@ class Datacard:
 
     # luminosity we're interested in (measure in pb-1)
     lumi = 10000. # 10fb-1
+
+newcats = []
+for cat in Datacard.categories:
+    for cutsign, cutname in [("<", "L"), (">=", "H")]:
+        newcat = list(cat)
+        newcat[0] += "_blr" + cutname    
+        newcat[1] += " && (log(btag_LR_4b_2b / (1.0 - btag_LR_4b_2b)) {1} {0})".format(Datacard.blr_cuts[cat[0]], cutsign)
+        newcats += [tuple(newcat)]
+
+Datacard.categories += newcats

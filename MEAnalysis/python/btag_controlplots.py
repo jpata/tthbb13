@@ -42,7 +42,7 @@ hists = {
 }
 
 for iev in range(tt.GetEntries()):
-#for iev in range(50000):
+#for iev in range(10000):
     tt.GetEntry(iev)
     ev = tt
     if iev%10000 == 0:
@@ -68,20 +68,24 @@ for k in hists.keys():
         hists[k][k2].Scale(1.0 / hists[k][k2].Integral())
 
 for h3 in [hists[fl]["pt_eta"] for fl in ["b", "c", "l"]]:
-    h3     = self.csv_pdfs[(x, "pt_eta")]
-    nbinsX = h3.GetNbinsX()
-    nbinsY = h3.GetNbinsY()
-    nbinsZ = h3.GetNbinsZ()
+    nbinsX = h3.GetNbinsX() #X -> pt distribution
+    nbinsY = h3.GetNbinsY() #Y -> eta distribution
+    nbinsZ = h3.GetNbinsZ() #Z -> CSV distribution
     for i in range(0, nbinsX+2):
         for j in range(0, nbinsY+2):
-            int_ij = 0.
-            for k in range(0, nbinsZ+2):
-                int_ij += h3.GetBinContent(i,j,k)
-            for k in range(0, nbinsZ+2):
-                unnorm = h3.GetBinContent(i,j,k)
-                if int_ij>0.:
-                    unnorm /= int_ij
-                h3.SetBinContent(i,j,k, unnorm)
+
+            #find integral of csv distribution in this pt/eta bin
+            #int_ij = 0.
+            #for k in range(0, nbinsZ + 2):
+            #    int_ij += h3.GetBinContent(i,j,k)
+            int_ij = float(h3.ProjectionZ("asd", i, i, j, j).Integral())
+            #normalize csv histogram
+            for k in range(0, nbinsZ + 2):
+                unnorm = float(h3.GetBinContent(i,j,k))
+                if int_ij > 0.0:
+                    unnorm = unnorm / int_ij
+                h3.SetBinContent(i, j, k, unnorm)
+            print i, j, h3.ProjectionZ("asd", i, i, j, j).Integral()
 
 of.Write("", ROOT.TObject.kOverwrite)
 of.Close()
