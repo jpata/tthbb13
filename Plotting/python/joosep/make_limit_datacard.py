@@ -12,7 +12,7 @@ def PrintDatacard(event_counts, datacard, dcof):
 
     dcof.write("imax {0}\n".format(number_of_bins))
     dcof.write("jmax {0}\n".format(number_of_backgrounds))
-    dcof.write("kmax *\n".format(number_of_backgrounds))
+    dcof.write("kmax *\n")
     dcof.write("---------------\n")
 
     for cat in datacard.analysis_categories:                
@@ -23,7 +23,6 @@ def PrintDatacard(event_counts, datacard, dcof):
         analysis_var = matchcats[0]
         dcof.write("shapes * {0} {1} $PROCESS/$CHANNEL/{2} $PROCESS/$CHANNEL/{2}_$SYSTEMATIC\n".format(cat, of_name, analysis_var))
 
-    # TODO: Automatic handling of 'fake' data
     #dcof.write("shapes data_obs sl_jge6_tge4 /shome/jpata/tth/datacards/Sep7_ref2_spring15/fakeData.root $PROCESS/$CHANNEL/mem_d_nomatch_0 $PROCESS/$CHANNEL/mem_d_nomatch_0_$SYSTEMATIC\n")
         
     dcof.write("---------------\n")
@@ -104,6 +103,12 @@ def PrintDatacard(event_counts, datacard, dcof):
     
 # end of PrintDataCard
 def MakeDatacard(histfile, dcard):
+    """
+    Reads histograms from histfile and prints out a datacard.txt according
+    to the configuration given in dcard
+    histfile (TFile): file with histograms for fit
+    dcad (Datacard): Datacard configuration
+    """
     dcof = open(dcard.output_datacardname, "w")
 
     # dict of dicts. First key: sample Second key: cut
@@ -128,8 +133,16 @@ def MakeDatacard(histfile, dcard):
             event_counts[sample_shortname][cutname] = I
 
     PrintDatacard(event_counts, dcard, dcof)
+# end of MakeDatacard
 
 def ConfigureDatacard(dcard, categories, ofname):
+    """
+    Configures a Datacard object to use the specified categories.
+    dcard (Datacard): input datacard
+    categories (list of strings): categories to combine in fit
+    ofname (string): output filename for the datacard.txt
+    """
+
     dcard_new = copy.deepcopy(dcard)
     dcard_new.analysis_categories = categories
     dcard_new.shape_uncertainties = {}
@@ -139,20 +152,24 @@ def ConfigureDatacard(dcard, categories, ofname):
         dcard_new.scale_uncertainties[cat] = dcard_new.common_scale_uncertainties
     dcard_new.output_datacardname = ofname
     return dcard_new
+# end of ConfigureDatacard
 
 if __name__ == "__main__":
     # Get the input proto-datacard
     datacard_path = sys.argv[1]
     dcard = imp.load_source("dcard", datacard_path)
+
+    #path to datacard directory
     full_path = sys.argv[2]
     of_name = os.path.join(full_path, dcard.Datacard.output_filename)
     histfile = ROOT.TFile.Open(of_name)
     
+    #Loop over individual categories
     for cat in [x[0] for x in dcard.Datacard.categories]:
         print cat
         # output datacard text file
         dcof_name = os.path.join(full_path, "shapes_{0}.txt".format(cat))
         dcard_new = ConfigureDatacard(dcard.Datacard, [cat], dcof_name)
         MakeDatacard(histfile, dcard_new)
-
+    #FIXME: add loop over combined categories here
     

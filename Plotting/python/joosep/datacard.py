@@ -51,6 +51,7 @@ class Datacard:
      'sl_jge6_tge4': 8.3}
 
     # Subset of categories we want to use for limit setting
+    # This is re-configured automatically by make_limit_datacards.py
     analysis_categories = [
         #"sl_jge6_t2",
         #"sl_jge6_t3",
@@ -79,14 +80,14 @@ class Datacard:
             ("CMS_scale_jDown",     "bTagWeight_JESDown"),
             
             #CSV variations
-            #("CMS_ttH_CSVLFUp",         "bTagWeight_LFUp"),
-            #("CMS_ttH_CSVLFDown",       "bTagWeight_LFDown"),
-            #("CMS_ttH_CSVHFUp",         "bTagWeight_HFUp"),
-            #("CMS_ttH_CSVHFDown",       "bTagWeight_HFDown"),
-            #("CMS_ttH_CSVStats1Up",     "bTagWeight_Stats1Up"),
-            #("CMS_ttH_CSVStats1Down",   "bTagWeight_Stats1Down"),
-            #("CMS_ttH_CSVStats2Up",     "bTagWeight_Stats2Up"),
-            #("CMS_ttH_CSVStats2Down",   "bTagWeight_Stats2Down"),
+            ("CMS_ttH_CSVLFUp",         "bTagWeight_LFUp"),
+            ("CMS_ttH_CSVLFDown",       "bTagWeight_LFDown"),
+            ("CMS_ttH_CSVHFUp",         "bTagWeight_HFUp"),
+            ("CMS_ttH_CSVHFDown",       "bTagWeight_HFDown"),
+            ("CMS_ttH_CSVStats1Up",     "bTagWeight_Stats1Up"),
+            ("CMS_ttH_CSVStats1Down",   "bTagWeight_Stats1Down"),
+            ("CMS_ttH_CSVStats2Up",     "bTagWeight_Stats2Up"),
+            ("CMS_ttH_CSVStats2Down",   "bTagWeight_Stats2Down"),
     ]
 
     # Subset of the reweighted distributions we want to use as syst. shape uncertainties    
@@ -148,6 +149,7 @@ class Datacard:
         "sl_jge6_tge4" : common_scale_uncertainties
     }
 
+    #These processes will be considered as signal in the limit setting
     signal_processes = [
         "ttH_hbb",
         "ttH_nohbb"
@@ -162,6 +164,7 @@ class Datacard:
         "TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_ttbb",
         "TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_ttcc",
         "TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_ttll",
+        #Currently disable tt+V because of normalization bugs
         #"TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8__RunIISpring15DR74-Asympt25ns",
         #"TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8__RunIISpring15DR74-Asympt25ns",
         #"TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8__RunIISpring15DR74-Asympt25ns",
@@ -176,6 +179,8 @@ class Datacard:
     # luminosity we're interested in (measure in pb-1)
     lumi = 10000. # 10fb-1
 
+
+#create categories with b-likelihood low/high
 newcats = []
 for cat in Datacard.categories:
     for cutsign, cutname in [("<", "L"), (">=", "H")]:
