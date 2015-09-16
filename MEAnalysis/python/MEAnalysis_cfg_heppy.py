@@ -580,7 +580,6 @@ c.do_calculate = lambda ev, mcfg: (
 )
 c.mem_assumptions.add("sl")
 strat = CvectorPermutations()
-strat = CvectorPermutations()
 strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
 strat.push_back(MEM.Permutations.QUntagged)
 strat.push_back(MEM.Permutations.BTagged)

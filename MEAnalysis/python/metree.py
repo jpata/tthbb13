@@ -260,17 +260,17 @@ def getTreeProducer(conf):
 
             # Used by Subjet Analyzer
 
-            NTupleVariable(
-                "nhttCandidate",
-                lambda ev: getattr(ev, "nhttCandidate_nominal", -1),
-                help="Number of original httCandidates in event"
-            ),
-
-            NTupleVariable(
-                "nhttCandidate_aftercuts",
-                lambda ev: getattr(ev, "nhttCandidate_aftercuts_nominal", -1),
-                help="Number of httCandidates that passed the cut"
-            ),
+            # NTupleVariable(
+            #     "nhttCandidate",
+            #     lambda ev: getattr(ev, "nhttCandidate_nominal", -1),
+            #     help="Number of original httCandidates in event"
+            # ),
+            # 
+            # NTupleVariable(
+            #     "nhttCandidate_aftercuts",
+            #     lambda ev: getattr(ev, "nhttCandidate_aftercuts_nominal", -1),
+            #     help="Number of httCandidates that passed the cut"
+            # ),
 
             NTupleVariable(
                 "n_bjets",
@@ -299,115 +299,115 @@ def getTreeProducer(conf):
             NTupleVariable(
                 "n_excluded_bjets",
                 lambda ev: getattr(ev, "n_excluded_bjets_nominal", -1),
-                help="Number of excluded bjets"
+                help="Number of excluded bjets: reco resolved b-jets that match a subjet in the HTT-candidate"
             ),
 
             NTupleVariable(
                 "n_excluded_ljets",
                 lambda ev: getattr(ev, "n_excluded_ljets_nominal", -1),
-                help="Number of excluded ljets"
+                help="Number of excluded ljets: "
             ),
 
-
-            # Quark matching: attempted or not
-            NTupleVariable(
-                "QMatching_t_attempted",
-                lambda ev: getattr(ev, "QMatching_t_attempted_nominal", -1),
-                help="" ),
-            NTupleVariable(
-                "QMatching_H_attempted",
-                lambda ev: getattr(ev, "QMatching_H_attempted_nominal", -1),
-                help="" ),
-
-            # Top quark matching branches: bjets
-            NTupleVariable(
-                "QMatching_n_hadr_bquark_matched_to_bjet",
-                lambda ev: getattr(ev, "QMatching_n_hadr_bquark_matched_to_bjet_nominal", -1),
-                help=""
-            ),
-            NTupleVariable(
-                "QMatching_n_lept_bquark_matched_to_bjet",
-                lambda ev: getattr(ev, "QMatching_n_lept_bquark_matched_to_bjet_nominal", -1),
-                help=""
-            ),
-            NTupleVariable(
-                "QMatching_n_lquarks_matched_to_bjet",
-                lambda ev: getattr(ev, "QMatching_n_lquarks_matched_to_bjet_nominal", -1),
-                help=""
-            ),
-
-            # Top quark matching branches: ljets
-            NTupleVariable(
-                "QMatching_n_hadr_bquark_matched_to_ljet",
-                lambda ev: getattr(ev, "QMatching_n_hadr_bquark_matched_to_ljet_nominal", -1),
-                help=""
-            ),
-            NTupleVariable(
-                "QMatching_n_lept_bquark_matched_to_ljet",
-                lambda ev: getattr(ev, "QMatching_n_lept_bquark_matched_to_ljet_nominal", -1),
-                help=""
-            ),
-            NTupleVariable(
-                "QMatching_n_lquarks_matched_to_ljet",
-                lambda ev: getattr(ev, "QMatching_n_lquarks_matched_to_ljet_nominal", -1),
-                help=""
-            ),
-
-            # Top quark matching branches: subjets chosen top
-            NTupleVariable(
-                "QMatching_n_hadr_bquark_matched_to_top_subjet",
-                lambda ev: getattr(ev, "QMatching_n_hadr_bquark_matched_to_top_subjet_nominal", -1),
-                help=""
-            ),
-            NTupleVariable(
-                "QMatching_n_lept_bquark_matched_to_top_subjet",
-                lambda ev: getattr(ev, "QMatching_n_lept_bquark_matched_to_top_subjet_nominal", -1),
-                help=""
-            ),
-            NTupleVariable(
-                "QMatching_n_lquarks_matched_to_top_subjet",
-                lambda ev: getattr(ev, "QMatching_n_lquarks_matched_to_top_subjet_nominal", -1),
-                help=""
-            ),
-
-            # Top quark matching branches: subjets other top
-            NTupleVariable(
-                "QMatching_n_hadr_bquark_matched_to_otop_subjet",
-                lambda ev: getattr(ev, "QMatching_n_hadr_bquark_matched_to_otop_subjet_nominal", -1),
-                help=""
-            ),
-            NTupleVariable(
-                "QMatching_n_lept_bquark_matched_to_otop_subjet",
-                lambda ev: getattr(ev, "QMatching_n_lept_bquark_matched_to_otop_subjet_nominal", -1),
-                help=""
-            ),
-            NTupleVariable(
-                "QMatching_n_lquarks_matched_to_otop_subjet",
-                lambda ev: getattr(ev, "QMatching_n_lquarks_matched_to_otop_subjet_nominal", -1),
-                help=""
-            ),
-
-            # Higgs quark matching
-            NTupleVariable(
-                "QMatching_n_higgs_bquarks_matched_to_bjet",
-                lambda ev: getattr(ev, "QMatching_n_higgs_bquarks_matched_to_bjet_nominal", -1),
-                help=""
-            ),
-            NTupleVariable(
-                "QMatching_n_higgs_bquarks_matched_to_ljet",
-                lambda ev: getattr(ev, "QMatching_n_higgs_bquarks_matched_to_ljet_nominal", -1),
-                help=""
-            ),
-            NTupleVariable(
-                "QMatching_n_higgs_bquarks_matched_to_top_subjet",
-                lambda ev: getattr(ev, "QMatching_n_higgs_bquarks_matched_to_top_subjet_nominal", -1),
-                help=""
-            ),
-            NTupleVariable(
-                "QMatching_n_higgs_bquarks_matched_to_otop_subjet",
-                lambda ev: getattr(ev, "QMatching_n_higgs_bquarks_matched_to_otop_subjet_nominal", -1),
-                help=""
-            ),
+            # 
+            # # Quark matching: attempted or not
+            # NTupleVariable(
+            #     "QMatching_t_attempted",
+            #     lambda ev: getattr(ev, "QMatching_t_attempted_nominal", -1),
+            #     help="" ),
+            # NTupleVariable(
+            #     "QMatching_H_attempted",
+            #     lambda ev: getattr(ev, "QMatching_H_attempted_nominal", -1),
+            #     help="" ),
+            # 
+            # # Top quark matching branches: bjets
+            # NTupleVariable(
+            #     "QMatching_n_hadr_bquark_matched_to_bjet",
+            #     lambda ev: getattr(ev, "QMatching_n_hadr_bquark_matched_to_bjet_nominal", -1),
+            #     help=""
+            # ),
+            # NTupleVariable(
+            #     "QMatching_n_lept_bquark_matched_to_bjet",
+            #     lambda ev: getattr(ev, "QMatching_n_lept_bquark_matched_to_bjet_nominal", -1),
+            #     help=""
+            # ),
+            # NTupleVariable(
+            #     "QMatching_n_lquarks_matched_to_bjet",
+            #     lambda ev: getattr(ev, "QMatching_n_lquarks_matched_to_bjet_nominal", -1),
+            #     help=""
+            # ),
+            # 
+            # # Top quark matching branches: ljets
+            # NTupleVariable(
+            #     "QMatching_n_hadr_bquark_matched_to_ljet",
+            #     lambda ev: getattr(ev, "QMatching_n_hadr_bquark_matched_to_ljet_nominal", -1),
+            #     help=""
+            # ),
+            # NTupleVariable(
+            #     "QMatching_n_lept_bquark_matched_to_ljet",
+            #     lambda ev: getattr(ev, "QMatching_n_lept_bquark_matched_to_ljet_nominal", -1),
+            #     help=""
+            # ),
+            # NTupleVariable(
+            #     "QMatching_n_lquarks_matched_to_ljet",
+            #     lambda ev: getattr(ev, "QMatching_n_lquarks_matched_to_ljet_nominal", -1),
+            #     help=""
+            # ),
+            # 
+            # # Top quark matching branches: subjets chosen top
+            # NTupleVariable(
+            #     "QMatching_n_hadr_bquark_matched_to_top_subjet",
+            #     lambda ev: getattr(ev, "QMatching_n_hadr_bquark_matched_to_top_subjet_nominal", -1),
+            #     help=""
+            # ),
+            # NTupleVariable(
+            #     "QMatching_n_lept_bquark_matched_to_top_subjet",
+            #     lambda ev: getattr(ev, "QMatching_n_lept_bquark_matched_to_top_subjet_nominal", -1),
+            #     help=""
+            # ),
+            # NTupleVariable(
+            #     "QMatching_n_lquarks_matched_to_top_subjet",
+            #     lambda ev: getattr(ev, "QMatching_n_lquarks_matched_to_top_subjet_nominal", -1),
+            #     help=""
+            # ),
+            # 
+            # # Top quark matching branches: subjets other top
+            # NTupleVariable(
+            #     "QMatching_n_hadr_bquark_matched_to_otop_subjet",
+            #     lambda ev: getattr(ev, "QMatching_n_hadr_bquark_matched_to_otop_subjet_nominal", -1),
+            #     help=""
+            # ),
+            # NTupleVariable(
+            #     "QMatching_n_lept_bquark_matched_to_otop_subjet",
+            #     lambda ev: getattr(ev, "QMatching_n_lept_bquark_matched_to_otop_subjet_nominal", -1),
+            #     help=""
+            # ),
+            # NTupleVariable(
+            #     "QMatching_n_lquarks_matched_to_otop_subjet",
+            #     lambda ev: getattr(ev, "QMatching_n_lquarks_matched_to_otop_subjet_nominal", -1),
+            #     help=""
+            # ),
+            # 
+            # # Higgs quark matching
+            # NTupleVariable(
+            #     "QMatching_n_higgs_bquarks_matched_to_bjet",
+            #     lambda ev: getattr(ev, "QMatching_n_higgs_bquarks_matched_to_bjet_nominal", -1),
+            #     help=""
+            # ),
+            # NTupleVariable(
+            #     "QMatching_n_higgs_bquarks_matched_to_ljet",
+            #     lambda ev: getattr(ev, "QMatching_n_higgs_bquarks_matched_to_ljet_nominal", -1),
+            #     help=""
+            # ),
+            # NTupleVariable(
+            #     "QMatching_n_higgs_bquarks_matched_to_top_subjet",
+            #     lambda ev: getattr(ev, "QMatching_n_higgs_bquarks_matched_to_top_subjet_nominal", -1),
+            #     help=""
+            # ),
+            # NTupleVariable(
+            #     "QMatching_n_higgs_bquarks_matched_to_otop_subjet",
+            #     lambda ev: getattr(ev, "QMatching_n_higgs_bquarks_matched_to_otop_subjet_nominal", -1),
+            #     help=""
+            # ),
 
             #--END OF USED BY SUBJETANALYZER--#
 
@@ -611,7 +611,7 @@ def getTreeProducer(conf):
             "good_jets_nominal" : NTupleCollection("jets", jetType, 9, help="Selected jets, pt ordered"),
             "good_leptons_nominal" : NTupleCollection("leps", leptonType, 2, help="Selected leptons"),
             
-            "topCandidate_nominal": NTupleCollection("topCandidate" , topType, 28, help=""),
+            "topCandidate_nominal": NTupleCollection("topCandidate" , topType, 28, help="Best top candidate in event"),
             "othertopCandidate_nominal": NTupleCollection("othertopCandidate", topType, 28, help=""),
             "higgsCandidate_nominal": NTupleCollection("higgsCandidate", higgsType, 9, help=""),
 

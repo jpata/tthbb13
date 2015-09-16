@@ -59,7 +59,7 @@ function parse_branches{P <: Jet}(
     return particles
 end
 
-function parse_event(df::TreeDataFrame)
+function parse_event{T}(df::TreeDataFrame{T})
     jets = parse_branches(df, Jet)
     #leps = parse_branches(df, i, Lepton)
     #sig_leps = parse_branches(df, i, SignalLepton)
@@ -79,6 +79,34 @@ function parse_event(df::TreeDataFrame)
         df.row.lumi(),
         df.row.evt(),
     )
+end
+
+
+@generated function parse_event{T, S}(df::TreeDataFrame{T}, s::Type{Val{S}})
+    println("generating parse_event{$df, $s}")
+
+    syst = s.parameters[1].parameters[1]
+    println("s=$s syst=$syst")
+    ex = quote
+        jets = parse_branches(df, Jet)
+        $syst
+        Event(
+            jets,
+            $(symbol("df.row.numJets_", syst))(),
+            df.row.nBCSVM_$syst(),
+
+            df.row.is_sl(),
+            df.row.is_dl(),
+            df.row.weight_xs(),
+            df.row.genWeight(),
+
+            df.row.run(),
+            df.row.lumi(),
+            df.row.evt(),
+        )
+    end
+    println(ex)
+    return ex
 end
 
 
@@ -124,6 +152,7 @@ function process_sample(fn::ASCIIString; do_cache=true)
 
         #Get the primary event interpretation
         const ev = parse_event(df)
+        const ev_JESUp = parse_event(df, Val{:JESUp})
 
         if ev.is_sl && ev.numJets>=6  && ev.nBCSVM>=4
             push!(
