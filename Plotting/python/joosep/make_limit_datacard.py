@@ -2,7 +2,7 @@
 import ROOT
 ROOT.gROOT.SetBatch(True)
 #ROOT.gErrorIgnoreLevel = ROOT.kError
-import sys, imp, os
+import sys, imp, os, copy
 from samples import samples_dict
 
 def PrintDatacard(event_counts, datacard, dcof):
@@ -45,6 +45,8 @@ def PrintDatacard(event_counts, datacard, dcof):
         for i_sample, sample in enumerate(samples):
             bins.append(cat)
             processes_0.append(sample)
+            if sample in datacard.signal_processes:
+                i_sample = -i_sample
             processes_1.append(str(i_sample))
             rates.append(str(event_counts[sample][cat]))
 
@@ -101,32 +103,21 @@ def PrintDatacard(event_counts, datacard, dcof):
     dcof.write("# combine -M Asymptotic -t -1 {0} \n".format(dcof_name))
     
 # end of PrintDataCard
-
-if __name__ == "__main__":
-    # Get the input proto-datacard
-    datacard_path = sys.argv[1]
-    dcard = imp.load_source("dcard", datacard_path)
-
-    full_path = sys.argv[2]
-    
-    of_name = os.path.join(full_path, dcard.Datacard.output_filename)
-    of = ROOT.TFile.Open(of_name)
-    # output datacard text file
-    dcof_name = os.path.join(full_path, dcard.Datacard.output_datacardname)
-    dcof = open(dcof_name, "w")
+def MakeDatacard(histfile, dcard):
+    dcof = open(dcard.output_datacardname, "w")
 
     # dict of dicts. First key: sample Second key: cut
     # Content: events at given lumi
     event_counts = {}
     
-    for sample in dcard.Datacard.samples:
+    for sample in dcard.samples:
         sample_shortname = samples_dict[sample].name
-        sampled = of.Get(sample_shortname)
+        sampled = histfile.Get(sample_shortname)
         assert(sampled != None)
         sampled.cd()
         event_counts[sample_shortname] = {}
 
-        for cutname, cut, analysis_var in dcard.Datacard.categories:
+        for cutname, cut, analysis_var in dcard.categories:
             jetd = sampled.Get(cutname)
             assert(jetd != None)
             
@@ -136,4 +127,32 @@ if __name__ == "__main__":
                 I = h.Integral()
             event_counts[sample_shortname][cutname] = I
 
-    PrintDatacard(event_counts, dcard.Datacard, dcof)
+    PrintDatacard(event_counts, dcard, dcof)
+
+def ConfigureDatacard(dcard, categories, ofname):
+    dcard_new = copy.deepcopy(dcard)
+    dcard_new.analysis_categories = categories
+    dcard_new.shape_uncertainties = {}
+    dcard_new.scale_uncertainties = {}
+    for cat in dcard_new.analysis_categories:
+        dcard_new.shape_uncertainties[cat] = dcard_new.total_shape_uncert
+        dcard_new.scale_uncertainties[cat] = dcard_new.common_scale_uncertainties
+    dcard_new.output_datacardname = ofname
+    return dcard_new
+
+if __name__ == "__main__":
+    # Get the input proto-datacard
+    datacard_path = sys.argv[1]
+    dcard = imp.load_source("dcard", datacard_path)
+    full_path = sys.argv[2]
+    of_name = os.path.join(full_path, dcard.Datacard.output_filename)
+    histfile = ROOT.TFile.Open(of_name)
+    
+    for cat in [x[0] for x in dcard.Datacard.categories]:
+        print cat
+        # output datacard text file
+        dcof_name = os.path.join(full_path, "shapes_{0}.txt".format(cat))
+        dcard_new = ConfigureDatacard(dcard.Datacard, [cat], dcof_name)
+        MakeDatacard(histfile, dcard_new)
+
+    

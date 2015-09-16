@@ -10,7 +10,16 @@ processes = [
     "ttbarOther",
 ]
 
-channels = ["sl_jge6_tge4", "sl_jge6_tge4_blrH", "sl_jge6_tge4_blrL"]
+channels = [
+    "sl_j4_t3_blrH",
+    "sl_j4_t3_blrL",
+    "sl_j5_t3_blrH",
+    "sl_j5_t3_blrL",
+    "sl_jge6_t3_blrH",
+    "sl_jge6_t3_blrL",
+    "sl_jge6_tge4_blrH",
+    "sl_jge6_tge4_blrL"
+]
 hist = "mem_SL_0w2h2t"
 
 

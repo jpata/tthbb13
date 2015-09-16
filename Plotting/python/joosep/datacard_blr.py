@@ -1,6 +1,12 @@
 from datacard import Datacard
 
 Datacard.analysis_categories = [
+    "sl_j4_t3_blrH",
+    "sl_j4_t3_blrL",
+    "sl_j5_t3_blrH",
+    "sl_j5_t3_blrL",
+    "sl_jge6_t3_blrH",
+    "sl_jge6_t3_blrL",
     "sl_jge6_tge4_blrH",
     "sl_jge6_tge4_blrL"
 ]

@@ -1,4 +1,5 @@
 #!/usr/bin/env julia
 include("ntuple.jl")
 
-Analysis.main()
+ret = Analysis.main()
+println(ret)

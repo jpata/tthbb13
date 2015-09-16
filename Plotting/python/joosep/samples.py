@@ -36,6 +36,8 @@ import os
 hostname = os.environ.get("HOSTNAME", "")
 if hostname == "t3ui12":
     path = "/scratch/jpata/tth/Sep9_jec_jer/"
+elif hostname == "pata-slc6":
+    path = "/home/joosep/joosep-mac/Documents/tth/data/ntp/v12/Sep9_jec_jer/"
 else:
     path = "/Users/joosep/Documents/tth/data/ntp/v12/Sep9_jec_jer/"
 

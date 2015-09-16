@@ -18,20 +18,20 @@ class Datacard:
     #draw in these categories
     # (name, cut-string, decision variable to use)
     categories = [
-        # ("dl_j3_t2",        dl_cuts + " && numJets==3 && nBCSVM==2",    "mem_DL_0w2h2t"),
-        # ("dl_jge3_tge3",    dl_cuts + " && numJets>=3 && nBCSVM==3",    "mem_DL_0w2h2t"),
-        # ("dl_jge4_t2",      dl_cuts + " && numJets>=4 && nBCSVM==2",    "mem_DL_0w2h2t"),
-        # ("dl_jge4_tge4",    dl_cuts + " && numJets>=4 && nBCSVM>=4",    "mem_DL_0w2h2t"),
-        # 
-        # ("sl_j4_t3",        sl_cuts + " && numJets==4 && nBCSVM==3",    "mem_SL_0w2h2t"),
-        # ("sl_j4_t4",        sl_cuts + " && numJets==4 && nBCSVM==4",    "mem_SL_0w2h2t"),
-        # 
-        # ("sl_j5_t3",        sl_cuts + " && numJets==5 && nBCSVM==3",    "mem_SL_0w2h2t"),
-        # ("sl_j5_tge4",      sl_cuts + " && numJets==5 && nBCSVM>=4",    "mem_SL_0w2h2t"),
-        # 
-        # 
-        # ("sl_jge6_t2",      sl_cuts + " && numJets>=6 && nBCSVM==2",    "mem_SL_0w2h2t"),
-        # ("sl_jge6_t3",      sl_cuts + " && numJets>=6 && nBCSVM==3",    "mem_SL_0w2h2t"),
+        #("dl_j3_t2",        dl_cuts + " && numJets==3 && nBCSVM==2",    "mem_DL_0w2h2t"),
+        ("dl_jge3_tge3",    dl_cuts + " && numJets>=3 && nBCSVM==3",    "mem_DL_0w2h2t"),
+        #("dl_jge4_t2",      dl_cuts + " && numJets>=4 && nBCSVM==2",    "mem_DL_0w2h2t"),
+        ("dl_jge4_tge4",    dl_cuts + " && numJets>=4 && nBCSVM>=4",    "mem_DL_0w2h2t"),
+        
+        ("sl_j4_t3",        sl_cuts + " && numJets==4 && nBCSVM==3",    "mem_SL_0w2h2t"),
+        ("sl_j4_t4",        sl_cuts + " && numJets==4 && nBCSVM==4",    "mem_SL_0w2h2t"),
+        
+        ("sl_j5_t3",        sl_cuts + " && numJets==5 && nBCSVM==3",    "mem_SL_0w2h2t"),
+        ("sl_j5_tge4",      sl_cuts + " && numJets==5 && nBCSVM>=4",    "mem_SL_0w2h2t"),
+        
+        
+        #("sl_jge6_t2",      sl_cuts + " && numJets>=6 && nBCSVM==2",    "mem_SL_0w2h2t"),
+        ("sl_jge6_t3",      sl_cuts + " && numJets>=6 && nBCSVM==3",    "mem_SL_0w2h2t"),
         ("sl_jge6_tge4",    sl_cuts + " && numJets>=6 && nBCSVM>=4",    "mem_SL_0w2h2t"),
     ]
 
@@ -101,6 +101,7 @@ class Datacard:
 
     total_shape_uncert = {
         "ttH_hbb" : common_shape_uncertainties,
+        "ttH_nohbb" : common_shape_uncertainties,
         "ttbarPlus2B" : common_shape_uncertainties,
         "ttbarPlusB" : common_shape_uncertainties,
         "ttbarPlusBBbar" : common_shape_uncertainties,
@@ -118,20 +119,28 @@ class Datacard:
         "ttH_hbb" : {
             "lumi" : 1.05
         },
+        "ttH_nohbb" : {
+            "lumi" : 1.05
+        },
         "ttbarPlus2B" : {
-            "bgnorm_ttbarPlus2B" : 1.5
+            "bgnorm_ttbarPlus2B" : 1.5,
+            "lumi": 1.05
         },
         "ttbarPlusB" : {
-            "bgnorm_ttbarPlusB" : 1.3
+            "bgnorm_ttbarPlusB" : 1.3,
+            "lumi": 1.05
         },
         "ttbarPlusBBbar" : {
-            "bgnorm_ttbarPlusBBbar" : 1.3
+            "bgnorm_ttbarPlusBBbar" : 1.3,
+            "lumi": 1.05
         },
         "ttbarPlusCCbar" : {
-            "bgnorm_ttbarPlusCCbar" : 1.3
+            "bgnorm_ttbarPlusCCbar" : 1.3,
+            "lumi": 1.05
         },
         "ttbarOther" : {
-            "bgnorm_ttbarOther" : 1.3
+            "bgnorm_ttbarOther" : 1.3,
+            "lumi": 1.05
         },
     }
     # value: normalization uncertainty
@@ -139,7 +148,10 @@ class Datacard:
         "sl_jge6_tge4" : common_scale_uncertainties
     }
 
-
+    signal_processes = [
+        "ttH_hbb",
+        "ttH_nohbb"
+    ]
     #Enable the plotting of these samples
     # !!!Important: Signal has to be the first one!!!!
     samples = [
@@ -150,10 +162,10 @@ class Datacard:
         "TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_ttbb",
         "TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_ttcc",
         "TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_ttll",
-        "TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8__RunIISpring15DR74-Asympt25ns",
-        "TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8__RunIISpring15DR74-Asympt25ns",
-        "TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8__RunIISpring15DR74-Asympt25ns",
-        "TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8__RunIISpring15DR74-Asympt25ns",
+        #"TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8__RunIISpring15DR74-Asympt25ns",
+        #"TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8__RunIISpring15DR74-Asympt25ns",
+        #"TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8__RunIISpring15DR74-Asympt25ns",
+        #"TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8__RunIISpring15DR74-Asympt25ns",
     ]
 
     output_filename = "ControlPlots.root"
@@ -173,3 +185,6 @@ for cat in Datacard.categories:
         newcats += [tuple(newcat)]
 
 Datacard.categories += newcats
+# 
+# import json
+# print json.dumps(Datacard.__dict__, indent=2)
