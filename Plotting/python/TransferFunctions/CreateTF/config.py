@@ -55,12 +55,15 @@ def Make_config():
     #config['input_root_file_name'] = '/shome/tklijnsm/Samples/TFsamples/CUSTOMTFFILE_V12_FULL_SUBJETS_NC.root'
 
     #config['input_root_file_name'] = '/shome/tklijnsm/Samples/V12TFsamples/CUSTOMTFFILE_V12_FULL_JETS.root'
-    config['input_root_file_name'] = '/shome/tklijnsm/Samples/V12TFsamples/CUSTOMTFFILE_V12_FULL_SUBJETS.root'
+    config['input_root_file_name'] = '/shome/tklijnsm/Samples/TF_V13/CUSTOMTFFILE_V13_FULL_JETS.root'
+    #config['input_root_file_name'] = '/shome/tklijnsm/Samples/TF_V13/CUSTOMTFFILE_V13_FULL_SUBJETS.root'
 
     config['input_tree_name'] = 'tree'
 
-    #config['outputdir'] = 'V12_REALFULL_JETS'
-    config['outputdir'] = 'V12_REALFULL_SUBJETS'
+    #config['outputdir'] = 'V12_REALFULL_JETS_throwaway'
+    #config['outputdir'] = 'V12_REALFULL_SUBJETS_throwaway'
+    #config['outputdir'] = 'V13_SUBJETS'
+    config['outputdir'] = 'V13_JETS'
 
         
     config['SBF_fitted_hists_pickle_filename'] = \
