@@ -186,6 +186,7 @@ def Fit_Single_Bins():
                     config['eta_axis'][i_eta+1] ]
 
                 fit_dict['E_value'] = dic['E_values'][i_eta][i_E]
+                fit_dict['E_bounds'] = [ dic['E_axis'][i_eta][i_E], dic['E_axis'][i_eta][i_E+1] ]
 
                 for i in range( n_fit_params ):
                     fitfunc.par_values.append( f1.GetParameter(i) )
