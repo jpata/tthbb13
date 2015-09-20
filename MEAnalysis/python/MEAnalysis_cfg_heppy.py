@@ -308,12 +308,12 @@ class Conf:
         "QGLPlotsFile_flavour": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/Histos_QGL_flavour.root",
         #"sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_722sync.py",
         #"sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_722minisync.py",
-        "sampleFile": os.environ["CMSSW_BASE"]+"/python/TTH/MEAnalysis/samples_v13.py",
+        #"sampleFile": os.environ["CMSSW_BASE"]+"/python/TTH/MEAnalysis/samples_v13.py",
+        "sampleFile": os.environ["CMSSW_BASE"]+"/python/TTH/MEAnalysis/samples_pick.py",
         "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions.pickle",
         "transferFunctions_sj_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions_sj.pickle",
-        #"systematics": ["nominal"],
+        "systematics": ["nominal"],
         #"systematics": ["nominal", "JESUp", "JESDown", "raw"],
-        "systematics": ["nominal", "JESUp", "JESDown", "raw"],
         
         
         #If the list contains:
@@ -322,9 +322,11 @@ class Conf:
         # "matching" - print out the association between gen and reco objects
         #"verbosity": ["eventboundary", "input", "matching", "gen", "reco", "meminput"],
         "verbosity": [
+            "eventboundary", #print run:lumi:event
             #"trigger",
+            "input", #print input particles
             #"gen", #print out gen-level info
-            #"debug", #very high-level debug info
+            "debug", #very high-level debug info
             #"reco", #info about reconstructed final state
             #"meminput" #info about particles used for MEM input
         ],
@@ -350,7 +352,7 @@ class Conf:
 
         #Actually run the ME calculation
         #If False, all ME values will be 0
-        "calcME": True,
+        "calcME": False,
 
         #Generic event-dependent selection function applied
         #just before the MEM. If False, MEM is skipped for all hypos

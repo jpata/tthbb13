@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import ROOT
 ROOT.gROOT.SetBatch(True)
-#ROOT.gErrorIgnoreLevel = ROOT.kError
+ROOT.gErrorIgnoreLevel = ROOT.kError
 import sys, os
 import random
 import numpy as np
@@ -12,10 +12,13 @@ from samples import samples_dict
 
 #Number of parallel processes to run for the histogram projection
 #ncores = multiprocessing.cpu_count()
-ncores = 1
+ncores = 20
 
-def weight_str(cut, weight=1.0, lumi=1.0):
-    return "weight_xs * sign(genWeight) * {1} * {2} * ({0})".format(cut, weight, lumi)
+def weight_str(cut, sample, weight=1.0, lumi=1.0):
+    w = 1.0
+    if "ttbar" in sample:
+        w = 0.5
+    return "weight_xs * sign(genWeight) * {1} * {2} * {3} * ({0})".format(cut, weight, lumi, w)
     #return "1.0 * ({0})".format(cut)
 
 def drawHelper(args):
@@ -38,10 +41,14 @@ def drawHelper(args):
     tf, hist, cut, nfirst, nev = args
     #print hist, cut, nfirst, nev
     hname = hist.split(">>")[1].split("(")[0].strip()
+    hfunc = hist.split(">>")[0]
+    x = hist.split(">>")[1]
+    hbins = x[x.find("(")+1:-1].split(",")
     ROOT.gROOT.cd()
     ROOT.TH1.SetDefaultSumw2(True)
-    n = tf.Draw(hist, cut, "goff", nev, nfirst)
-    h = ROOT.gROOT.Get(hname)
+    h = ROOT.TH1D(hname, hname, int(hbins[0]), float(hbins[1]), float(hbins[2]))
+    n = tf.Draw(hfunc + ">>" + hname, cut, "goff", nev, nfirst)
+    #h = ROOT.gROOT.Get(hname)
     assert(h.GetEntries() == n)
     return h
         
@@ -104,7 +111,7 @@ def gensyst(hfunc, hname, cut):
         systs += [s]
     return systs
     
-def Draw(tf, of, gensyst, *args):
+def Draw(tf, of, gensyst, sample, *args):
     """
     tf (TFile): Input file
     of (TFile): output file
@@ -133,7 +140,7 @@ def Draw(tf, of, gensyst, *args):
     ntot = tf.GetEntriesFast()
 
     #how many events to process per core
-    chunksize = max(ntot/ncores, 10000)
+    chunksize = max(ntot/ncores, 50000)
     chunks = range(0, ntot, chunksize)
     #print args, len(chunks)
     
@@ -153,7 +160,7 @@ def Draw(tf, of, gensyst, *args):
         if syst.name == "unweighted":
             cut_new = cuts_new
         else:
-            cut_new = weight_str(cuts_new, getattr(syst, "weight", "1.0"), dcard.Datacard.lumi)
+            cut_new = weight_str(cuts_new, sample, getattr(syst, "weight", "1.0"), dcard.Datacard.lumi)
         h = hfunc_new + ">>" + hname_new + "(" + hbins
         
         ROOT.gROOT.cd()            
@@ -190,27 +197,29 @@ def Draw(tf, of, gensyst, *args):
     return 0
 
 
-def makeFakeData(tf, processes, channels, hists):
+def makeFakeData(tf, processes, channel, hists):
     
-    for ch in channels:
-        histd = {}
+    histd = {}
+    for hist in hists:
+        histd[hist] = None
+    for proc in processes:
         for hist in hists:
-            histd[hist] = None
-        for proc in processes:
-            for hist in hists:
-                h2 = tf.Get("{0}/{1}/{2}".format(proc, ch, hist))
-                h = histd[hist]
-                if not h:
-                    h = h2.Clone()
-                else:
-                    h.Add(h2)
-                histd[hist] = h
-        outdir = "data_obs/{0}".format(ch)
-        tf.mkdir(outdir)
-        outdir = tf.Get(outdir)
-        for h in histd.values():
-            h.SetDirectory(outdir)
-        outdir.Write()
+            hn = "{0}/{1}/{2}".format(proc, channel, hist)
+            h2 = tf.Get(hn)
+            if not h2:
+                raise Exception("could not get histogram: {0}".format(hn))
+            h = histd[hist]
+            if not h:
+                h = h2.Clone()
+            else:
+                h.Add(h2)
+            histd[hist] = h
+    outdir = "data_obs/{0}".format(channel)
+    tf.mkdir(outdir)
+    outdir = tf.Get(outdir)
+    for h in histd.values():
+        h.SetDirectory(outdir)
+    outdir.Write()
 
 if __name__ == "__main__":
 
@@ -262,8 +271,8 @@ if __name__ == "__main__":
             jetd = sampled.mkdir(cutname)
             
             #Draw(tf, jetd, gensyst, "nBCSVM:numJets >> njets_ntags(15,0,15,15,0,15)", cut)
-
-            #Draw(tf, jetd, gensyst, "jets_pt[0] >> jet0_pt(20,20,500)", cut)
+            if not "blr" in cutname:
+                Draw(tf, jetd, gensyst, sample_shortname, "jets_pt[0] >> jet0_pt(20,20,500)", cut)
             #Draw(tf, jetd, gensyst, "jets_pt[1] >> jet1_pt(20,20,500)", cut)
 
             #Draw(tf, jetd, gensyst, "jets_eta[0] >> jet0_eta(30,-5,5)", cut)
@@ -309,20 +318,20 @@ if __name__ == "__main__":
                         continue
 
                     #1D mem distribution
-                    Draw(tf, jetd, gensyst,
+                    Draw(tf, jetd, gensyst, sample_shortname,
                         "mem_tth_p[{0}] / (mem_tth_p[{0}] + 0.15*mem_ttbb_p[{0}]) >> mem_{1}{2}(12,0,1)".format(
                             memidx, memname, matchname
                         ),
                         cut
                     )
-
-                    #1D bLR X mem distribution
-                    Draw(tf, jetd, gensyst,
-                        "mem_tth_p[{0}] / (mem_tth_p[{0}] + 0.15*mem_ttbb_p[{0}]*(1 + 1200*btag_lr_2b/btag_lr_4b)) >> blrXmem_{1}{2}(12,0,1)".format(
-                            memidx, memname, matchname
-                        ),
-                        cut
-                    )
+                    if not "blr" in cutname:
+                        #1D bLR X mem distribution
+                        Draw(tf, jetd, gensyst, sample_shortname,
+                            "mem_tth_p[{0}] / (mem_tth_p[{0}] + 0.15*mem_ttbb_p[{0}]*(1 + 1200*btag_lr_2b/btag_lr_4b)) >> blrXmem_{1}{2}(12,0,1)".format(
+                                memidx, memname, matchname
+                            ),
+                            cut
+                        )
                     
             #event_counts[sample_shortname][cutname] = jetd.Get(analysis_var).Integral()
             
@@ -341,11 +350,43 @@ if __name__ == "__main__":
     ]
 
     channels = ["sl_jge6_tge4", "sl_jge6_tge4_blrH", "sl_jge6_tge4_blrL"]
-    hists = ["mem_SL_0w2h2t", "blrXmem_SL_0w2h2t"]
-
-    makeFakeData(of, processes, channels, hists)
     print "writing"
-    #of.Write()
+    for channels, hists in [
+        ([
+                "sl_j4_t3", "sl_j4_t4",
+                "sl_j4_t3", "sl_j4_t4",
+                "sl_j5_t3", "sl_j5_tge4",
+                "sl_jge6_t2", "sl_jge6_t3",
+                "sl_jge6_tge4"
+            ],
+            ["mem_SL_0w2h2t", "blrXmem_SL_0w2h2t"]
+        ),
+        ([
+                "sl_j4_t3_blrH", "sl_j4_t4_blrH",
+                "sl_j4_t3_blrH", "sl_j4_t4_blrH",
+                "sl_j5_t3_blrH", "sl_j5_tge4_blrH",
+                "sl_jge6_t2_blrH", "sl_jge6_t3_blrH",
+                "sl_jge6_tge4_blrH"
+            ],
+            ["mem_SL_0w2h2t"]
+        ),
+        ([
+                "dl_jge3_tge3", "dl_jge4_t2", "dl_jge4_tge4"
+            ],
+            ["mem_DL_0w2h2t", "blrXmem_DL_0w2h2t"]
+        ),
+        ([
+                "dl_jge3_tge3_blrH", "dl_jge4_t2_blrH", "dl_jge4_tge4_blrH"
+            ],
+            ["mem_DL_0w2h2t"]
+        ),
+        ]:
+        for channel in channels:
+            makeFakeData(of, processes, channel, hists)
+            if "blrH" in channel:
+                channel = channel.replace("blrH", "blrL")
+                makeFakeData(of, processes, channel, hists)
+    of.Write()
     of.Close()
 
     #PrintDatacard(event_counts, dcard.Datacard, dcof)
