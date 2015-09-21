@@ -31,8 +31,8 @@ class SubjetAnalyzer(FilterAnalyzer):
 
         self.Cut_criteria = [
             ( 'pt'  , '>', '200.0' ),
-            ( 'mass', '>', '120.0' ),
-            ( 'mass', '<', '180.0' ),
+            ( 'mass', '>', '80.0' ),
+            ( 'mass', '<', '250.0' ),
             ( 'fRec'  , '<', '0.45' ),
             ]
 
