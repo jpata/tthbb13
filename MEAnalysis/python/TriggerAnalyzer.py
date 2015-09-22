@@ -23,10 +23,10 @@ class TriggerAnalyzer(FilterAnalyzer):
             setattr(event, name, bit)
             event.trigvec += [bit == 1]
             #print name, bit
+            if "trigger" in self.conf.general["verbosity"]:
+                print "[trigger]", name, bit
             if (bit == 1):
                 event.triggerDecision = True
-                if "trigger" in self.conf.general["verbosity"]:
-                    print "[trigger]", name, bit
         event.triggerBitmask = int(sum(1<<i for i, b in enumerate(event.trigvec) if b))
         if "trigger" in self.conf.general["verbosity"]:
             print "[trigger] bitmask", event.triggerBitmask

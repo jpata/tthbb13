@@ -323,7 +323,7 @@ class Conf:
         #"verbosity": ["eventboundary", "input", "matching", "gen", "reco", "meminput"],
         "verbosity": [
             "eventboundary", #print run:lumi:event
-            #"trigger",
+            "trigger", #print trigger bits
             "input", #print input particles
             #"gen", #print out gen-level info
             "debug", #very high-level debug info
