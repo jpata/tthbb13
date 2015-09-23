@@ -19,7 +19,7 @@ class TriggerAnalyzer(FilterAnalyzer):
        
         event.trigvec = []
         for name in self.conf.trigger["paths"]:
-            bit = int(getattr(event.input, name, 0))
+            bit = int(getattr(event.input, name, -1))
             setattr(event, name, bit)
             event.trigvec += [bit == 1]
             #print name, bit

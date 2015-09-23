@@ -112,8 +112,8 @@ for ev in range(tt.GetEntries()):
         elif abs(lep1_id) == 13:
             lep1_iso = leps_iso04[1]
     
-    #if not trig:
-    #    continue
+    if not trig:
+        continue
     jet0_pt = 0
     jet0_eta = 0
     jet0_phi = 0
