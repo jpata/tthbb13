@@ -199,7 +199,7 @@ void saveResults(ResultMap& res, const string& prefix, const string& filename) {
         }
         TDirectory* dir = (TDirectory*)(of.Get(dirname.c_str()));
         assert(dir != nullptr);
-
+        
         //rename histogram
         stringstream ss2;
         ss2 << HistogramKey::to_string(histKey);
@@ -209,6 +209,7 @@ void saveResults(ResultMap& res, const string& prefix, const string& filename) {
             ss2 << "_" << SystematicKey::to_string(systKey);
         }
         const string histname = ss2.str();
+        assert(dir->Get(histname.c_str()) == nullptr);
         cout << dirname << "/ " << histname << endl;
 
         //We need to make a copy of the histogram here, otherwise ROOT scoping goes crazy
@@ -249,7 +250,8 @@ Event::Event(
     double _bTagWeight_LFUp,
     double _bTagWeight_LFDown,
     double _bTagWeight_HFUp,
-    double _bTagWeight_HFDown
+    double _bTagWeight_HFDown,
+    double _btag_LR_4b_2b
     ) :
     is_sl(_is_sl),
     is_dl(_is_dl),
@@ -273,7 +275,8 @@ Event::Event(
     bTagWeight_LFUp(_bTagWeight_LFUp),
     bTagWeight_LFDown(_bTagWeight_LFDown),
     bTagWeight_HFUp(_bTagWeight_HFUp),
-    bTagWeight_HFDown(_bTagWeight_HFDown)
+    bTagWeight_HFDown(_bTagWeight_HFDown),
+    btag_LR_4b_2b(_btag_LR_4b_2b)
 {
 }
 
@@ -391,7 +394,8 @@ const Event EventFactory::makeNominal(const TreeData& data) {
         data.bTagWeight_LFUp,
         data.bTagWeight_LFDown,
         data.bTagWeight_HFUp,
-        data.bTagWeight_HFDown
+        data.bTagWeight_HFDown,
+        data.btag_LR_4b_2b
     );
     return ev;
 }
@@ -422,7 +426,8 @@ const Event EventFactory::makeJESUp(const TreeData& data) {
         0,
         0,
         0,
-        0
+        0,
+        data.btag_LR_4b_2b
     );
 }
 
@@ -452,7 +457,8 @@ const Event EventFactory::makeJESDown(const TreeData& data) {
         0,
         0,
         0,
-        0
+        0,
+        data.btag_LR_4b_2b
     );
 }
 
@@ -537,32 +543,49 @@ void CategoryProcessor::fillHistograms(
         results[jet0_pt_key] = TH1D("jet0_pt", "Leading jet pt", 100, 0, 500);
     }
     results[jet0_pt_key].Fill(event.jets[0].p4.Pt(), weight);
-    // cout << "CategoryProcessor::fillHistograms " <<
-    //     to_string(jet0_pt_key) << " " <<
-    //     event.jets[0].p4.Pt() << " " << weight << endl;
+    //cout << "    fill "  << to_string(jet0_pt_key) << endl;
+
 }
 
-void CategoryProcessor::process(const Event& event, const Configuration& conf, const vector<CategoryKey::CategoryKey>& catKey, SystematicKey::SystematicKey systKey) {
-    const bool passes = (*kvCat.second)(event);
+void CategoryProcessor::process(
+    const Event& event,
+    const Configuration& conf,
+    ResultMap& results,
+    const vector<CategoryKey::CategoryKey>& catKeys,
+    SystematicKey::SystematicKey systKey
+    ) const {
+    const bool passes = (*this)(event);
     if (passes) {
+
+        // cout << "  processing ";
+        // for (auto& k : this->keys) {
+        //     cout << CategoryKey::to_string(k) << " ";
+        // }
+        // cout << endl;
+
+        vector<CategoryKey::CategoryKey> _catKeys(catKeys);
+        for (auto& k : this->keys) {
+            _catKeys.push_back(k);
+        }
+
         for (auto& kvWeight : event.weightFuncs) {
+            //cout << "   weight " << SystematicKey::to_string(kvWeight.first) << endl;
             const double weight = conf.lumi * kvWeight.second(event);
-            if (do_print) {
-                cout << "w " << SystematicKey::to_string(kvWeight.first) << " " << weight << endl;;
-            }
             SystematicKey::SystematicKey _systKey = systKey;
             if (systKey == SystematicKey::nominal) {
                 _systKey = kvWeight.first;
             }
             this->fillHistograms(
                 event, results,
-                make_tuple(catKey, _systKey),
+                make_tuple(_catKeys, _systKey),
                 weight
             );
-            for (auto& subcat : this->subCategories) {
-                subcat.process(event, conf, catKey, systKey)
-            }
         } // weightFuncs
+        
+        //Process subcategories
+        for (auto& subcat : this->subCategories) {
+            subcat->process(event, conf, results, _catKeys, systKey);
+        }
     } // passes
 }
 

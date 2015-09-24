@@ -194,6 +194,7 @@ typedef unordered_map<
     double bTagWeight_HFUp;
     double bTagWeight_HFDown;
 
+    double btag_LR_4b_2b;
     Event(
         bool _is_sl,
         bool _is_dl,
@@ -217,7 +218,8 @@ typedef unordered_map<
         double _bTagWeight_LFUp,
         double _bTagWeight_LFDown,
         double _bTagWeight_HFUp,
-        double _bTagWeight_HFDown
+        double _bTagWeight_HFDown,
+        double _btag_LR_4b_2b
     );
 
     const string to_string() const;
@@ -245,9 +247,11 @@ class CategoryProcessor {
 public:
     CategoryProcessor(
         bool (*_cutFunc)(const Event&),
+        const vector<CategoryKey::CategoryKey>& _keys,
         const vector<CategoryProcessor*>& _subCategories={}
     ) :
     cutFunc(_cutFunc),
+    keys(_keys),
     subCategories(_subCategories)
     {}
 
@@ -255,7 +259,8 @@ public:
         return cutFunc(ev);
     }
 
-    vector<CategoryProcessor*> subCategories;
+    const vector<CategoryKey::CategoryKey> keys;
+    const vector<CategoryProcessor*> subCategories;
      
     virtual void fillHistograms(
         const Event& event,
@@ -267,15 +272,25 @@ public:
         double weight
     ) const;
 
-    void process(const Event& event, const Configuration& conf);
+    void process(
+        const Event& event,
+        const Configuration& conf,
+        ResultMap& results,
+        const vector<CategoryKey::CategoryKey>& catKeys,
+        SystematicKey::SystematicKey systKey
+    ) const;
 private:
     bool (*cutFunc)(const Event&);
 };
 
 class MEMCategoryProcessor : public CategoryProcessor {
 public:
-    MEMCategoryProcessor(bool (*_cutFunc)(const Event&)) :
-      CategoryProcessor(_cutFunc) {};
+    MEMCategoryProcessor(
+        bool (*_cutFunc)(const Event&),
+        const vector<CategoryKey::CategoryKey>& _keys,
+        const vector<CategoryProcessor*>& _subCategories={}
+    ) :
+      CategoryProcessor(_cutFunc, _keys, _subCategories) {};
      
     virtual void fillHistograms(
         const Event& event,

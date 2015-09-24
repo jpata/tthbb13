@@ -44,111 +44,124 @@ namespace BaseCuts {
     }
 }
 
-namespace std {
-  template <> struct hash<vector<CategoryKey::CategoryKey>>
-  {
-    //const static std::hash<unsigned long> ResultKey_hash_fn;
-    size_t operator()(const vector<CategoryKey::CategoryKey> & x) const
-    {
-        //make a compound hash
-        unsigned long long r = 0;
-        int ninc = 8; // how many bits to shift each
-        int ic = 0; //shift counter
+// namespace std {
+//   template <> struct hash<vector<CategoryKey::CategoryKey>>
+//   {
+//     //const static std::hash<unsigned long> ResultKey_hash_fn;
+//     size_t operator()(const vector<CategoryKey::CategoryKey> & x) const
+//     {
+//         //make a compound hash
+//         unsigned long long r = 0;
+//         int ninc = 8; // how many bits to shift each
+//         int ic = 0; //shift counter
+// 
+//         //shift vector of category keys
+//         for (auto& v : x) {
+//             r += static_cast<int>(v) << (ninc*ic);        
+//         }
+//         std::hash<unsigned long long> _hash_fn;
+//         return _hash_fn(r);
+//     }
+//   };
+// }
 
-        //shift vector of category keys
-        for (auto& v : x) {
-            r += static_cast<int>(v) << (ninc*ic);        
-        }
-        std::hash<unsigned long long> _hash_fn;
-        return _hash_fn(r);
-    }
-  };
-}
-
-const unordered_map<
-    vector<CategoryKey::CategoryKey>,
-    const CategoryProcessor*,
-    std::hash<vector<CategoryKey::CategoryKey>>
-> categorymap = {
-    {
-    {CategoryKey::dl, CategoryKey::j3_t2},
+const vector<const CategoryProcessor*> categorymap = {
     new MEMCategoryProcessor(
         [](const Event& ev){
             return BaseCuts::dl(ev) && (ev.numJets==3) && (ev.nBCSVM==2);
-        }
-    )
-    },
-
-    {
-    {CategoryKey::dl, CategoryKey::jge4_t2},
+        },
+        {CategoryKey::dl, CategoryKey::j3_t2}
+    ),
     new MEMCategoryProcessor(
         [](const Event& ev){
             return BaseCuts::dl(ev) && (ev.numJets>=4) && (ev.nBCSVM==2);
-        }
-    )
-    },
-
-
-    {
-    {CategoryKey::dl, CategoryKey::jge3_tge3},
+        },
+        {CategoryKey::dl, CategoryKey::jge4_t2}
+    ),
     new MEMCategoryProcessor(
         [](const Event& ev){
             return BaseCuts::dl(ev) && (ev.numJets>=3) && (ev.nBCSVM>=3);
-        }
-    )
-    },
-
-    {
-    {CategoryKey::dl, CategoryKey::jge4_tge4},
+        },
+        {CategoryKey::dl, CategoryKey::jge3_tge3}
+    ),
     new MEMCategoryProcessor(
         [](const Event& ev){
             return BaseCuts::dl(ev) && (ev.numJets>=4) && (ev.nBCSVM>=4);
-        }
-    )
-    },
-    {
-    {CategoryKey::sl, CategoryKey::j5_t3},
+        },
+        {CategoryKey::dl, CategoryKey::jge4_tge4}
+    ),
     new MEMCategoryProcessor(
         [](const Event& ev){
             return BaseCuts::sl(ev) && (ev.numJets==5) && (ev.nBCSVM==3);
-        }
-    )
-    },
-
-    {
-    {CategoryKey::sl, CategoryKey::j5_tge4},
+        },
+        {CategoryKey::sl, CategoryKey::j5_t3}
+    ),
     new MEMCategoryProcessor(
         [](const Event& ev){
             return BaseCuts::sl(ev) && (ev.numJets==5) && (ev.nBCSVM>=4);
-        }
-    )
-    },
-    {
-    {CategoryKey::sl, CategoryKey::jge6_t2},
+        },
+        {CategoryKey::sl, CategoryKey::j5_tge4}
+    ),
     new CategoryProcessor(
         [](const Event& ev){
             return BaseCuts::sl(ev) && (ev.numJets>=6) && (ev.nBCSVM==2);
+        },
+        {CategoryKey::sl, CategoryKey::jge6_t2},
+        {
+            new CategoryProcessor(
+                [](const Event& ev){
+                    return ev.btag_LR_4b_2b<0.98;
+                },
+                {CategoryKey::blrL}
+            ),
+            new CategoryProcessor(
+                [](const Event& ev){
+                    return ev.btag_LR_4b_2b>=0.98;
+                },
+                {CategoryKey::blrH}
+            )
         }
-    )
-    },
-
-    {
-    {CategoryKey::sl, CategoryKey::jge6_t3},
+    ),
     new MEMCategoryProcessor(
         [](const Event& ev){
             return BaseCuts::sl(ev) && (ev.numJets>=6) && (ev.nBCSVM==3);
+        },
+        {CategoryKey::sl, CategoryKey::jge6_t3},
+        {
+            new CategoryProcessor(
+                [](const Event& ev){
+                    return ev.btag_LR_4b_2b<0.95;
+                },
+                {CategoryKey::blrL}
+            ),
+            new CategoryProcessor(
+                [](const Event& ev){
+                    return ev.btag_LR_4b_2b>=0.95;
+                },
+                {CategoryKey::blrH}
+            )
         }
-    )
-    },
-
-    {
-    {CategoryKey::sl, CategoryKey::jge6_tge4},
+    ),
     new MEMCategoryProcessor(
         [](const Event& ev){
             return BaseCuts::sl(ev) && (ev.numJets>=6) && (ev.nBCSVM>=4);
+        },
+        {CategoryKey::sl, CategoryKey::jge6_tge4},
+        {
+            new CategoryProcessor(
+                [](const Event& ev){
+                    return ev.btag_LR_4b_2b<0.92;
+                },
+                {CategoryKey::blrL}
+            ),
+            new CategoryProcessor(
+                [](const Event& ev){
+                    return ev.btag_LR_4b_2b>=0.92;
+                },
+                {CategoryKey::blrH}
+            )
         }
     )
-    },
 };
 
 int main(int argc, const char** argv) {
@@ -185,30 +198,13 @@ int main(int argc, const char** argv) {
         };
 
         for (auto& kvSyst : systmap) {
+            //cout << " syst " << SystematicKey::to_string(kvSyst.first) << endl;
             const Event& event = kvSyst.second;
             if (do_print) {
                 cout << SystematicKey::to_string(kvSyst.first) << " " << event.to_string();
             }
-            for (auto& kvCat : categorymap) {
-                const bool passes = (*kvCat.second)(event);
-                if (passes) {
-                    for (auto& kvWeight : event.weightFuncs) {
-                        const double weight = conf.lumi * kvWeight.second(event);
-                        if (do_print) {
-                            cout << "w " << SystematicKey::to_string(kvWeight.first) << " " << weight << endl;;
-                        }
-
-                        SystematicKey::SystematicKey systKey = kvSyst.first;
-                        if (kvSyst.first == SystematicKey::nominal) {
-                            systKey = kvWeight.first;
-                        }
-                        kvCat.second->fillHistograms(
-                            event, results,
-                            make_tuple(kvCat.first, systKey),
-                            weight
-                        );
-                    } // weightFuncs
-                } // passes
+            for (auto& cat : categorymap) {
+                cat->process(event, conf, results, {}, kvSyst.first);
             } //categorymap
         } // systmap
     } //entries
