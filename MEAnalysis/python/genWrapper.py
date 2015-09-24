@@ -24,6 +24,7 @@ def makeWrapper(classname, data):
         vars, maxlen = coll
         #print collname, maxlen
         #print classFromColl(collname, vars, maxlen)
+        treeclass += "  int n{0};\n".format(collname)
         for vname, v in vars.items():
             vtype, vhelp = v
             treeclass += "  {0} {1}_{2}[{3}]; //{4}\n".format(typemap[vtype], collname, vname, maxlen, vhelp)
@@ -37,6 +38,7 @@ def makeWrapper(classname, data):
     treeclass += "  void loadTree(TTree* tree) {\n"
     for collname, coll in data["collections"].items() + data["globalObjects"].items():
         vars, maxlen = coll
+        treeclass += '    tree->SetBranchAddress(\"n{0}\", &(this->n{0}));\n'.format(collname)
         for vname, v in vars.items():
             treeclass += '    tree->SetBranchAddress(\"{0}_{1}\", this->{0}_{1});\n'.format(collname, vname)
 
@@ -46,8 +48,15 @@ def makeWrapper(classname, data):
 
     treeclass += "  } //loadTree\n"
     treeclass += "}; //class\n"
-
-    return treeclass
+    
+    prefix = """
+#ifndef METREE_H
+#define METREE_H
+#include "TTree.h"
+{0}
+#endif
+""".format(treeclass)
+    return prefix
 
 
 if __name__ == "__main__":
