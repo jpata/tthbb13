@@ -41,7 +41,7 @@ elif hostname == "pata-slc6":
 elif "hep.kbfi.ee" in hostname:
     path = "/home/joosep/tth/spring15/Sep14_spring15_preV13_9a1f781/"
 else:
-    path = "/Users/joosep/Documents/tth/data/ntp/v12/Sep9_jec_jer/"
+    path = "/Users/joosep/Documents/tth/data/ntp/v12/Sep14/"
 
 if not os.path.isdir(path):
     raise Exception("Could not find sample base path {0}".format(path))

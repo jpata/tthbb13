@@ -36,7 +36,8 @@ Configuration::Configuration(
     long _firstEntry,
     long _numEntries,
     int _printEvery,
-    CutValMap _btag_LR
+    CutValMap _btag_LR,
+    string _outputFile
     ) :
     filenames(_filenames),
     lumi(_lumi),
@@ -44,7 +45,8 @@ Configuration::Configuration(
     firstEntry(_firstEntry),
     numEntries(_numEntries),
     printEvery(_printEvery),
-    btag_LR(_btag_LR)
+    btag_LR(_btag_LR),
+    outputFile(_outputFile)
 {
 }
 
@@ -52,6 +54,7 @@ const Configuration Configuration::makeConfiguration(JsonValue& value) {
     vector<string> filenames;
     double lumi = -1.0;
     string process = "UNDEFINED";
+    string outputFile = "UNDEFINED";
     long firstEntry = -1;
     long numEntries = -1;
     long printEvery = -1;
@@ -81,6 +84,9 @@ const Configuration Configuration::makeConfiguration(JsonValue& value) {
         else if (ks == "printEvery") {
             printEvery = (long)(lev1->value.toNumber());
         }
+        else if (ks == "outputFile") {
+            outputFile = lev1->value.toString();
+        }
         else if (ks == "btagLRCuts") {
             for (auto lev2 : lev1->value) {
                 vector<string> tokens = split(string(lev2->key), ':');
@@ -95,7 +101,8 @@ const Configuration Configuration::makeConfiguration(JsonValue& value) {
     }
     return Configuration(
         filenames, lumi, process, firstEntry, numEntries, printEvery,
-        btagLRCuts
+        btagLRCuts,
+        outputFile
     );
 }
 

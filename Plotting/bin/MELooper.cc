@@ -67,7 +67,7 @@ namespace BaseCuts {
 
 const vector<CategoryKey::CategoryKey> emptykey;
 
-
+// Subdivide category to blr L/H
 const vector<const CategoryProcessor*> makeBTagLRCategory(double blr) {
     return {
         //No blR cut applied
@@ -92,6 +92,8 @@ const vector<const CategoryProcessor*> makeBTagLRCategory(double blr) {
     };
 }
 
+// Subdivides the category to boosted and nonboosted
+// Each of these is further subdivided to bLR H/L
 const vector<const CategoryProcessor*> makeBoostedCategory(double blr) {
     return {
         // new CategoryProcessor(
@@ -125,7 +127,24 @@ int main(int argc, const char** argv) {
     const Configuration conf = parseArgs(argc, argv);
     TChain* tree = loadFiles(conf);
 
-    vector<const CategoryProcessor*> categorymap = {
+    // Here a tree of categories is defined
+    // Each category is specified by a list of CategoryKeys (called name) which form the name
+    // in the output root file.
+    // A category is only processed if it passes a cut, specified by a lambda function
+    // of the form cutFunc: const Event& -> bool
+    // Different CategoryProcessors may be created, each with their own fillHistograms
+    // method, which fill different histograms depending on need.
+    // As an example, we have CategoryProcessor, which fills jet0_pt
+    // and MEMCategoryProcessor which fills, in addition, the MEM histograms.
+    // Each category can contain subcategories, which are processed only if
+    // the parent category cut passed. The subcategories need only specify the additional
+    // names, which will be added to the parent category name to create the final
+    // output directory of the histogram.
+
+    // Note: this vector is made const, so that it is fully known and will not change at runtime.
+    const vector<const CategoryProcessor*> categorymap = {
+
+        //Here we define a simple category for saving the MEM
         new MEMCategoryProcessor(
             [](const Event& ev){
                 return BaseCuts::dl(ev) && (ev.numJets==3) && (ev.nBCSVM==2);
@@ -232,6 +251,6 @@ int main(int argc, const char** argv) {
     //Finalize with output
     cout << "Read " << nbytes/1024/1024 << " Mb" << endl;
     cout << to_string(results) << endl;
-    saveResults(results, conf.process, "ControlPlots.root");
+    saveResults(results, conf.process, conf.outputFile);
     return 0;
 }

@@ -154,6 +154,7 @@ public:
     long numEntries;
     int printEvery;
     CutValMap btag_LR;
+    string outputFile;
 
     Configuration(
         vector<string>& _filenames,
@@ -162,7 +163,8 @@ public:
         long _firstEntry,
         long _numEntries,
         int _printEvery,
-        CutValMap _btag_LR
+        CutValMap _btag_LR,
+        string _outputFile
     );
     static const Configuration makeConfiguration(JsonValue& value);
     string to_string() const;
