@@ -1,0 +1,24 @@
+{
+    "filenames": [
+        "/Users/joosep/Documents/tth/data/ntp/v12/Sep14/ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.root",
+    ],
+    "lumi": 10000.0,
+    "process": "ttH_hbb",
+    "outputFile": "ControlPlots.root"
+    "firstEntry": 0
+    "numEntries": 100000,
+    "printEvery": 0,
+    "btagLRCuts": {
+        "dl:j3_t2": 0.2,
+        "dl:jge3_tge3": 4.4,
+        "dl:jge4_t2": 0.5,
+        "dl:jge4_tge4": 8.9,
+        "sl:j4_t3": 4.1,
+        "sl:j4_t4": 9.8,
+        "sl:j5_t3": 4.4,
+        "sl:j5_tge4": 8.9,
+        "sl:jge6_t2": 0.8,
+        "sl:jge6_t3": 4.4,
+        "sl:jge6_tge4": 8.3
+    }
+}

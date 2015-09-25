@@ -103,14 +103,14 @@ const vector<const CategoryProcessor*> makeBoostedCategory(double blr) {
         //     emptykey,
         //     makeBTagLRCategory(blr)
         // ),
-        new CategoryProcessor(
+        new MEMCategoryProcessor(
             [blr](const Event& ev){
                 return ev.n_excluded_bjets<2 && ev.ntopCandidate==1;
             },
             {CategoryKey::boosted},
             makeBTagLRCategory(blr)
         ),
-        new CategoryProcessor(
+        new MEMCategoryProcessor(
             [blr](const Event& ev){
                 return !(ev.n_excluded_bjets<2 && ev.ntopCandidate==1);
             },
@@ -173,6 +173,21 @@ int main(int argc, const char** argv) {
             {CategoryKey::dl, CategoryKey::jge4_tge4},
             makeBoostedCategory(conf.btag_LR.at({CategoryKey::dl, CategoryKey::jge4_tge4}))
         ),
+
+        new MEMCategoryProcessor(
+            [](const Event& ev){
+                return BaseCuts::sl(ev) && (ev.numJets==4) && (ev.nBCSVM==3);
+            },
+            {CategoryKey::sl, CategoryKey::j4_t3},
+            makeBoostedCategory(conf.btag_LR.at({CategoryKey::sl, CategoryKey::j4_t3}))
+        ),
+        new MEMCategoryProcessor(
+            [](const Event& ev){
+                return BaseCuts::sl(ev) && (ev.numJets==4) && (ev.nBCSVM==4);
+            },
+            {CategoryKey::sl, CategoryKey::j4_t4},
+            makeBoostedCategory(conf.btag_LR.at({CategoryKey::sl, CategoryKey::j4_t4}))
+        ),
         new MEMCategoryProcessor(
             [](const Event& ev){
                 return BaseCuts::sl(ev) && (ev.numJets==5) && (ev.nBCSVM==3);
@@ -187,7 +202,7 @@ int main(int argc, const char** argv) {
             {CategoryKey::sl, CategoryKey::j5_tge4},
             makeBoostedCategory(conf.btag_LR.at({CategoryKey::sl, CategoryKey::j5_tge4}))
         ),
-        new CategoryProcessor(
+        new MEMCategoryProcessor(
             [](const Event& ev){
                 return BaseCuts::sl(ev) && (ev.numJets>=6) && (ev.nBCSVM==2);
             },
