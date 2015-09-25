@@ -18,27 +18,6 @@
 
 using namespace std;
 
-class Configuration {
-public:
-    vector<string> filenames;
-    double lumi;
-    string process;
-    long firstEntry;
-    long numEntries;
-    int printEvery;
-
-    Configuration(
-        vector<string>& _filenames,
-        double _lumi,
-        string _process,
-        long _firstEntry,
-        long _numEntries,
-        int _printEvery
-    );
-    static const Configuration makeConfiguration(JsonValue& value);
-    string to_string() const;
-};
-
 namespace SystematicKey {
 enum SystematicKey {
     nominal,
@@ -68,6 +47,8 @@ enum CategoryKey {
     jge4_tge4,
 
     //SL
+    j4_t3,
+    j4_t4,
     j5_t3,
     j5_tge4,
     jge6_t2,
@@ -76,8 +57,12 @@ enum CategoryKey {
     
     blrL,
     blrH,
+    boosted,
+    nonboosted
+
 };
 const string to_string(CategoryKey k);
+const CategoryKey from_string(const string& k);
 }
 
 //Names of all possible histograms we want to save
@@ -128,11 +113,60 @@ namespace std {
         r += static_cast<int>(get<1>(x)) << (ninc*ic);
         ic++;
         r += static_cast<int>(get<2>(x)) << (ninc*ic);
-        std::hash<unsigned long long> ResultKey_hash_fn;
-        return ResultKey_hash_fn(r);
+        std::hash<unsigned long long> _hash_fn;
+        return _hash_fn(r);
     }
   };
+
+template <> struct hash<vector<CategoryKey::CategoryKey>>
+{
+  //const static std::hash<unsigned long> ResultKey_hash_fn;
+  size_t operator()(const vector<CategoryKey::CategoryKey> & x) const
+  {
+        //make a compound hash
+        unsigned long long r = 0;
+        int ninc = 8; // how many bits to shift each
+        int ic = 0; //shift counter
+
+        //shift vector of category keys
+        for (auto& v : x) {
+          r += static_cast<int>(v) << (ninc*ic);        
+        }
+        std::hash<unsigned long long> _hash_fn;
+        return _hash_fn(r);
+  }
+};
 }
+
+
+class Configuration {
+public:
+    typedef unordered_map<
+        const vector<CategoryKey::CategoryKey>,
+        double,
+        hash<vector<CategoryKey::CategoryKey>>
+    > CutValMap;
+
+    vector<string> filenames;
+    double lumi;
+    string process;
+    long firstEntry;
+    long numEntries;
+    int printEvery;
+    CutValMap btag_LR;
+
+    Configuration(
+        vector<string>& _filenames,
+        double _lumi,
+        string _process,
+        long _firstEntry,
+        long _numEntries,
+        int _printEvery,
+        CutValMap _btag_LR
+    );
+    static const Configuration makeConfiguration(JsonValue& value);
+    string to_string() const;
+};
 
 //A map for ResultKey -> TH1D for all the output histograms
 typedef unordered_map<
@@ -175,15 +209,23 @@ typedef unordered_map<
 
     int numJets;
     int nBCSVM;
+
+    //list of all jets
     vector<Jet> jets;
+
+    //map of SystematicKey -> weight func(event) of all syst. weights to evaluate
     WeightMap weightFuncs;
+
+    //cross-section weight
     double weight_xs;
     
+    //mem hypotheses
     double mem_SL_0w2h2t;
     double mem_SL_2w2h2t;
     double mem_SL_2w2h2t_sj;
     double mem_DL_0w2h2t;
 
+    //btag weights
     double bTagWeight;
     double bTagWeight_Stats1Up;
     double bTagWeight_Stats1Down;
@@ -194,7 +236,14 @@ typedef unordered_map<
     double bTagWeight_HFUp;
     double bTagWeight_HFDown;
 
+    //btag likelihood
     double btag_LR_4b_2b;
+    double btag_LR_4b_2b_logit; // log(x/(1 - x))
+
+    //boosted variables
+    int n_excluded_bjets;
+    int ntopCandidate;
+
     Event(
         bool _is_sl,
         bool _is_dl,
@@ -219,7 +268,9 @@ typedef unordered_map<
         double _bTagWeight_LFDown,
         double _bTagWeight_HFUp,
         double _bTagWeight_HFDown,
-        double _btag_LR_4b_2b
+        double _btag_LR_4b_2b,
+        int _n_excluded_bjets,
+        int _ntopCandidate
     );
 
     const string to_string() const;
@@ -246,9 +297,9 @@ public:
 class CategoryProcessor {
 public:
     CategoryProcessor(
-        bool (*_cutFunc)(const Event&),
+        std::function<int(const Event& ev)> _cutFunc,
         const vector<CategoryKey::CategoryKey>& _keys,
-        const vector<CategoryProcessor*>& _subCategories={}
+        const vector<const CategoryProcessor*>& _subCategories={}
     ) :
     cutFunc(_cutFunc),
     keys(_keys),
@@ -260,7 +311,7 @@ public:
     }
 
     const vector<CategoryKey::CategoryKey> keys;
-    const vector<CategoryProcessor*> subCategories;
+    const vector<const CategoryProcessor*> subCategories;
      
     virtual void fillHistograms(
         const Event& event,
@@ -280,15 +331,15 @@ public:
         SystematicKey::SystematicKey systKey
     ) const;
 private:
-    bool (*cutFunc)(const Event&);
+    std::function<int(const Event& ev)> cutFunc;
 };
 
 class MEMCategoryProcessor : public CategoryProcessor {
 public:
     MEMCategoryProcessor(
-        bool (*_cutFunc)(const Event&),
+        std::function<int(const Event& ev)> _cutFunc,
         const vector<CategoryKey::CategoryKey>& _keys,
-        const vector<CategoryProcessor*>& _subCategories={}
+        const vector<const CategoryProcessor*>& _subCategories={}
     ) :
       CategoryProcessor(_cutFunc, _keys, _subCategories) {};
      

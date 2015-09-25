@@ -3,20 +3,48 @@
 
 using namespace std;
 
+//http://stackoverflow.com/questions/236129/split-a-string-in-c
+std::vector<std::string>& split(const std::string &s, char delim, std::vector<std::string> &elems) {
+    std::stringstream ss(s);
+    std::string item;
+    while (std::getline(ss, item, delim)) {
+        elems.push_back(item);
+    }
+    return elems;
+}
+
+
+std::vector<std::string> split(const std::string &s, char delim) {
+    std::vector<std::string> elems;
+    split(s, delim, elems);
+    return elems;
+}
+
+template <class A, class B, class H1, class H2>
+const unordered_map<A, B, H1> reverse_map(const unordered_map<B, A, H2>& src) {
+    unordered_map<A, B, H1> ret;
+    for (auto& kv : src) {
+        ret.insert(make_pair(kv.second, kv.first));
+    }
+    return ret;
+} 
+
 Configuration::Configuration(
     vector<string>& _filenames,
     double _lumi,
     string _process,
     long _firstEntry,
     long _numEntries,
-    int _printEvery
+    int _printEvery,
+    CutValMap _btag_LR
     ) :
     filenames(_filenames),
     lumi(_lumi),
     process(_process),
     firstEntry(_firstEntry),
     numEntries(_numEntries),
-    printEvery(_printEvery)
+    printEvery(_printEvery),
+    btag_LR(_btag_LR)
 {
 }
 
@@ -28,6 +56,7 @@ const Configuration Configuration::makeConfiguration(JsonValue& value) {
     long numEntries = -1;
     long printEvery = -1;
 
+    Configuration::CutValMap btagLRCuts;
     for (auto lev1 : value) {
         const string ks = string(lev1->key);
         if (ks == "filenames") {
@@ -52,9 +81,22 @@ const Configuration Configuration::makeConfiguration(JsonValue& value) {
         else if (ks == "printEvery") {
             printEvery = (long)(lev1->value.toNumber());
         }
-
+        else if (ks == "btagLRCuts") {
+            for (auto lev2 : lev1->value) {
+                vector<string> tokens = split(string(lev2->key), ':');
+                vector<CategoryKey::CategoryKey> keyvec;
+                for (auto& tok : tokens) {
+                    keyvec.push_back(CategoryKey::from_string(tok));
+                }
+                btagLRCuts.insert(make_pair(keyvec, lev2->value.toNumber()));  
+                cout << "inserted " << string(lev2->key) << ":" << lev2->value.toNumber() << endl;
+            }
+        }
     }
-    return Configuration(filenames, lumi, process, firstEntry, numEntries, printEvery);
+    return Configuration(
+        filenames, lumi, process, firstEntry, numEntries, printEvery,
+        btagLRCuts
+    );
 }
 
 string Configuration::to_string() const {
@@ -70,92 +112,99 @@ string Configuration::to_string() const {
     ss << ")" << endl;
     return ss.str();
 }
-
+//["n_excluded_bjets<2", "ntopCandidate==1"]
 
 namespace SystematicKey {
-const string to_string(SystematicKey k) {
-    switch (k) {
-        case nominal:
-            return "nominal";
-        case CMS_scale_jUp:
-            return "CMS_scale_jUp";
-        case CMS_scale_jDown:
-            return "CMS_scale_jDown";
-        case CMS_ttH_CSVStats1Up:
-            return "CMS_ttH_CSVStats1Up";
-        case CMS_ttH_CSVStats1Down:
-            return "CMS_ttH_CSVStats1Down";
-        case CMS_ttH_CSVStats2Up:
-            return "CMS_ttH_CSVStats2Up";
-        case CMS_ttH_CSVStats2Down:
-            return "CMS_ttH_CSVStats2Down";
-        case CMS_ttH_CSVLFUp:
-            return "CMS_ttH_CSVLFUp";
-        case CMS_ttH_CSVLFDown:
-            return "CMS_ttH_CSVLFDown";
-        case CMS_ttH_CSVHFUp:
-            return "CMS_ttH_CSVHFUp";
-        case CMS_ttH_CSVHFDown:
-            return "CMS_ttH_CSVHFDown";
+const unordered_map<const string, SystematicKey, hash<string>> map_from_string = {
+    {"nominal", nominal},
+    {"CMS_scale_jUp", CMS_scale_jUp},
+    {"CMS_scale_jDown", CMS_scale_jDown},
+    {"CMS_ttH_CSVStats1Up", CMS_ttH_CSVStats1Up},
+    {"CMS_ttH_CSVStats1Down", CMS_ttH_CSVStats1Down},
+    {"CMS_ttH_CSVStats2Up", CMS_ttH_CSVStats2Up},
+    {"CMS_ttH_CSVStats2Down", CMS_ttH_CSVStats2Down},
+    {"CMS_ttH_CSVLFUp", CMS_ttH_CSVLFUp},
+    {"CMS_ttH_CSVLFDown", CMS_ttH_CSVLFDown},
+    {"CMS_ttH_CSVHFUp", CMS_ttH_CSVHFUp},
+    {"CMS_ttH_CSVHFDown", CMS_ttH_CSVHFDown}
+};
+const unordered_map<SystematicKey, const string, hash<int>> map_to_string =
+    reverse_map<SystematicKey, const string, hash<int>, hash<string>>(
+        map_from_string
+    );
 
-        default:
-            return "UNKNOWN";
+const string to_string(SystematicKey k) {
+    if (map_to_string.find(k) == map_to_string.end()) {
+        cerr << "Could not find SystematicKey " << k << endl;
+        throw 1;
     }
+    return map_to_string.at(k); 
 }
 }
 
 namespace HistogramKey {
+const unordered_map<const string, HistogramKey, hash<string>> map_from_string = {
+    {"jet0_pt", jet0_pt},
+    {"mem_SL_0w2h2t", mem_SL_0w2h2t},
+    {"mem_DL_0w2h2t", mem_DL_0w2h2t},
+    {"mem_SL_2w2h2t", mem_SL_2w2h2t},
+    {"mem_SL_2w2h2t_sj", mem_SL_2w2h2t_sj}
+};
+const unordered_map<HistogramKey, const string, hash<int>> map_to_string =
+    reverse_map<HistogramKey, const string, hash<int>, hash<string>>(
+        map_from_string
+    );
 const string to_string(HistogramKey k) {
-    switch (k) {
-        case jet0_pt:
-            return "jet0_pt";
-        case mem_SL_0w2h2t:
-            return "mem_SL_0w2h2t";
-        case mem_SL_2w2h2t:
-            return "mem_SL_2w2h2t";
-        case mem_SL_2w2h2t_sj:
-            return "mem_SL_2w2h2t_sj";
-        case mem_DL_0w2h2t:
-            return "mem_DL_0w2h2t";
-        default:
-            return "UNKNOWN";
+    if (map_to_string.find(k) == map_to_string.end()) {
+        cerr << "Could not find SystematicKey " << k << endl;
+        throw 1;
     }
-}
+    return map_to_string.at(k); 
+    }
 }
 
 namespace CategoryKey {
+const unordered_map<const string, CategoryKey, hash<string>> map_from_string = {
+    {"sl", sl},
+    {"dl", dl},
+    {"j3_t2", j3_t2},
+    {"jge4_t2", jge4_t2},
+    {"jge3_tge3", jge3_tge3},
+    {"jge4_tge4", jge4_tge4},
+
+    {"j4_t3", j4_t3},
+    {"j4_t4", j4_t4},
+    {"j5_t3", j5_t3},
+    {"j5_tge4", j5_tge4},
+    {"jge6_t2", jge6_t2},
+    {"jge6_t3", jge6_t3},
+    {"jge6_tge4", jge6_tge4},
+
+    {"blrL", blrL},
+    {"blrH", blrH},
+    {"boosted", boosted},
+    {"nonboosted", nonboosted}
+};
+
+unordered_map<CategoryKey, const string, hash<int>> map_to_string =
+    reverse_map<CategoryKey, const string, hash<int>, hash<string>>(
+        map_from_string
+    );
+
 const string to_string(CategoryKey k) {
-    switch (k) {
-        
-        case sl:
-            return "sl";
-        case dl:
-            return "dl";
-        case j3_t2:
-            return "j3_t2";
-        case jge4_t2:
-            return "jge4_t2";
-        case jge3_tge3:
-            return "jge3_tge3";
-        case jge4_tge4:
-            return "jge4_tge4";
-        case j5_t3:
-            return "j5_t3";
-        case j5_tge4:
-            return "j5_tge4";
-        case jge6_t2:
-            return "jge6_t2";
-        case jge6_t3:
-            return "jge6_t3";
-        case jge6_tge4:
-            return "jge6_tge4";
-        case blrL:
-            return "blrL";
-        case blrH:
-            return "blrH";
-        default:
-            return "UNKNOWN";
+    if (map_to_string.find(k) == map_to_string.end()) {
+        cerr << "Could not find CategoryKey " << k << endl;
+        throw 1;
     }
+    return map_to_string.at(k);
+}
+
+const CategoryKey from_string(const string& k) {
+    if (map_from_string.find(k) == map_from_string.end()) {
+        cerr << "Could not find CategoryKey " << k << endl;
+        throw 1;
+    }
+    return map_from_string.at(k);
 }
 bool is_sl(vector<CategoryKey> k) {
     return k[0] == sl;
@@ -251,7 +300,9 @@ Event::Event(
     double _bTagWeight_LFDown,
     double _bTagWeight_HFUp,
     double _bTagWeight_HFDown,
-    double _btag_LR_4b_2b
+    double _btag_LR_4b_2b,
+    int _n_excluded_bjets,
+    int _ntopCandidate
     ) :
     is_sl(_is_sl),
     is_dl(_is_dl),
@@ -276,8 +327,12 @@ Event::Event(
     bTagWeight_LFDown(_bTagWeight_LFDown),
     bTagWeight_HFUp(_bTagWeight_HFUp),
     bTagWeight_HFDown(_bTagWeight_HFDown),
-    btag_LR_4b_2b(_btag_LR_4b_2b)
+    btag_LR_4b_2b(_btag_LR_4b_2b),
+    btag_LR_4b_2b_logit(log(_btag_LR_4b_2b / (1.0 - _btag_LR_4b_2b))),
+    n_excluded_bjets(_n_excluded_bjets),
+    ntopCandidate(_ntopCandidate)
 {
+    
 }
 
 
@@ -364,8 +419,9 @@ bool pass_trig_sl(const TreeData& data) {
     );
 }
 
+//Evaluate mem probability
 double mem_p(double p_tth, double p_ttbb) {
-    return p_tth / (p_tth + 0.02 * p_ttbb);
+    return p_tth / (p_tth + 0.15 * p_ttbb);
 }
 
 const Event EventFactory::makeNominal(const TreeData& data) {
@@ -395,7 +451,9 @@ const Event EventFactory::makeNominal(const TreeData& data) {
         data.bTagWeight_LFDown,
         data.bTagWeight_HFUp,
         data.bTagWeight_HFDown,
-        data.btag_LR_4b_2b
+        data.btag_LR_4b_2b,
+        data.n_excluded_bjets,
+        data.ntopCandidate
     );
     return ev;
 }
@@ -427,7 +485,9 @@ const Event EventFactory::makeJESUp(const TreeData& data) {
         0,
         0,
         0,
-        data.btag_LR_4b_2b
+        data.btag_LR_4b_2b,
+        data.n_excluded_bjets,
+        data.ntopCandidate
     );
 }
 
@@ -458,7 +518,9 @@ const Event EventFactory::makeJESDown(const TreeData& data) {
         0,
         0,
         0,
-        data.btag_LR_4b_2b
+        data.btag_LR_4b_2b,
+        data.n_excluded_bjets,
+        data.ntopCandidate
     );
 }
 

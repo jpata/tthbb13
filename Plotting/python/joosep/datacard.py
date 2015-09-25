@@ -48,7 +48,8 @@ class Datacard:
      'sl_j5_tge4': 8.9,
      'sl_jge6_t2': 0.8,
      'sl_jge6_t3': 4.4,
-     'sl_jge6_tge4': 8.3}
+     'sl_jge6_tge4': 8.3
+    }
 
     # Subset of categories we want to use for limit setting
     # This is re-configured automatically by make_limit_datacards.py

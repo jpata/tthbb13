@@ -65,104 +65,58 @@ namespace BaseCuts {
 //   };
 // }
 
-const vector<const CategoryProcessor*> categorymap = {
-    new MEMCategoryProcessor(
-        [](const Event& ev){
-            return BaseCuts::dl(ev) && (ev.numJets==3) && (ev.nBCSVM==2);
-        },
-        {CategoryKey::dl, CategoryKey::j3_t2}
-    ),
-    new MEMCategoryProcessor(
-        [](const Event& ev){
-            return BaseCuts::dl(ev) && (ev.numJets>=4) && (ev.nBCSVM==2);
-        },
-        {CategoryKey::dl, CategoryKey::jge4_t2}
-    ),
-    new MEMCategoryProcessor(
-        [](const Event& ev){
-            return BaseCuts::dl(ev) && (ev.numJets>=3) && (ev.nBCSVM>=3);
-        },
-        {CategoryKey::dl, CategoryKey::jge3_tge3}
-    ),
-    new MEMCategoryProcessor(
-        [](const Event& ev){
-            return BaseCuts::dl(ev) && (ev.numJets>=4) && (ev.nBCSVM>=4);
-        },
-        {CategoryKey::dl, CategoryKey::jge4_tge4}
-    ),
-    new MEMCategoryProcessor(
-        [](const Event& ev){
-            return BaseCuts::sl(ev) && (ev.numJets==5) && (ev.nBCSVM==3);
-        },
-        {CategoryKey::sl, CategoryKey::j5_t3}
-    ),
-    new MEMCategoryProcessor(
-        [](const Event& ev){
-            return BaseCuts::sl(ev) && (ev.numJets==5) && (ev.nBCSVM>=4);
-        },
-        {CategoryKey::sl, CategoryKey::j5_tge4}
-    ),
-    new CategoryProcessor(
-        [](const Event& ev){
-            return BaseCuts::sl(ev) && (ev.numJets>=6) && (ev.nBCSVM==2);
-        },
-        {CategoryKey::sl, CategoryKey::jge6_t2},
-        {
-            new CategoryProcessor(
-                [](const Event& ev){
-                    return ev.btag_LR_4b_2b<0.98;
-                },
-                {CategoryKey::blrL}
-            ),
-            new CategoryProcessor(
-                [](const Event& ev){
-                    return ev.btag_LR_4b_2b>=0.98;
-                },
-                {CategoryKey::blrH}
-            )
-        }
-    ),
-    new MEMCategoryProcessor(
-        [](const Event& ev){
-            return BaseCuts::sl(ev) && (ev.numJets>=6) && (ev.nBCSVM==3);
-        },
-        {CategoryKey::sl, CategoryKey::jge6_t3},
-        {
-            new CategoryProcessor(
-                [](const Event& ev){
-                    return ev.btag_LR_4b_2b<0.95;
-                },
-                {CategoryKey::blrL}
-            ),
-            new CategoryProcessor(
-                [](const Event& ev){
-                    return ev.btag_LR_4b_2b>=0.95;
-                },
-                {CategoryKey::blrH}
-            )
-        }
-    ),
-    new MEMCategoryProcessor(
-        [](const Event& ev){
-            return BaseCuts::sl(ev) && (ev.numJets>=6) && (ev.nBCSVM>=4);
-        },
-        {CategoryKey::sl, CategoryKey::jge6_tge4},
-        {
-            new CategoryProcessor(
-                [](const Event& ev){
-                    return ev.btag_LR_4b_2b<0.92;
-                },
-                {CategoryKey::blrL}
-            ),
-            new CategoryProcessor(
-                [](const Event& ev){
-                    return ev.btag_LR_4b_2b>=0.92;
-                },
-                {CategoryKey::blrH}
-            )
-        }
-    )
-};
+const vector<CategoryKey::CategoryKey> emptykey;
+
+
+const vector<const CategoryProcessor*> makeBTagLRCategory(double blr) {
+    return {
+        //No blR cut applied
+        // new CategoryProcessor(
+        //     [blr](const Event& ev){
+        //         return true;
+        //     },
+        //     emptykey
+        // ),
+        new CategoryProcessor(
+            [blr](const Event& ev){
+                return ev.btag_LR_4b_2b_logit<blr;
+            },
+            {CategoryKey::blrL}
+        ),
+        new CategoryProcessor(
+            [blr](const Event& ev){
+                return ev.btag_LR_4b_2b_logit>=blr;
+            },
+            {CategoryKey::blrH}
+        )
+    };
+}
+
+const vector<const CategoryProcessor*> makeBoostedCategory(double blr) {
+    return {
+        // new CategoryProcessor(
+        //     [blr](const Event& ev){
+        //         return true;
+        //     },
+        //     emptykey,
+        //     makeBTagLRCategory(blr)
+        // ),
+        new CategoryProcessor(
+            [blr](const Event& ev){
+                return ev.n_excluded_bjets<2 && ev.ntopCandidate==1;
+            },
+            {CategoryKey::boosted},
+            makeBTagLRCategory(blr)
+        ),
+        new CategoryProcessor(
+            [blr](const Event& ev){
+                return !(ev.n_excluded_bjets<2 && ev.ntopCandidate==1);
+            },
+            {CategoryKey::nonboosted},
+            makeBTagLRCategory(blr)
+        )
+    };
+}
 
 int main(int argc, const char** argv) {
     //Switch off histogram naming for memory management
@@ -170,6 +124,72 @@ int main(int argc, const char** argv) {
 
     const Configuration conf = parseArgs(argc, argv);
     TChain* tree = loadFiles(conf);
+
+    vector<const CategoryProcessor*> categorymap = {
+        new MEMCategoryProcessor(
+            [](const Event& ev){
+                return BaseCuts::dl(ev) && (ev.numJets==3) && (ev.nBCSVM==2);
+            },
+            {CategoryKey::dl, CategoryKey::j3_t2},
+            makeBoostedCategory(conf.btag_LR.at({CategoryKey::dl, CategoryKey::j3_t2}))
+        ),
+        new MEMCategoryProcessor(
+            [](const Event& ev){
+                return BaseCuts::dl(ev) && (ev.numJets>=4) && (ev.nBCSVM==2);
+            },
+            {CategoryKey::dl, CategoryKey::jge4_t2},
+            makeBoostedCategory(conf.btag_LR.at({CategoryKey::dl, CategoryKey::jge4_t2}))
+        ),
+        new MEMCategoryProcessor(
+            [](const Event& ev){
+                return BaseCuts::dl(ev) && (ev.numJets>=3) && (ev.nBCSVM>=3);
+            },
+            {CategoryKey::dl, CategoryKey::jge3_tge3},
+            makeBoostedCategory(conf.btag_LR.at({CategoryKey::dl, CategoryKey::jge4_t2}))
+        ),
+        new MEMCategoryProcessor(
+            [](const Event& ev){
+                return BaseCuts::dl(ev) && (ev.numJets>=4) && (ev.nBCSVM>=4);
+            },
+            {CategoryKey::dl, CategoryKey::jge4_tge4},
+            makeBoostedCategory(conf.btag_LR.at({CategoryKey::dl, CategoryKey::jge4_tge4}))
+        ),
+        new MEMCategoryProcessor(
+            [](const Event& ev){
+                return BaseCuts::sl(ev) && (ev.numJets==5) && (ev.nBCSVM==3);
+            },
+            {CategoryKey::sl, CategoryKey::j5_t3},
+            makeBoostedCategory(conf.btag_LR.at({CategoryKey::sl, CategoryKey::j5_t3}))
+        ),
+        new MEMCategoryProcessor(
+            [](const Event& ev){
+                return BaseCuts::sl(ev) && (ev.numJets==5) && (ev.nBCSVM>=4);
+            },
+            {CategoryKey::sl, CategoryKey::j5_tge4},
+            makeBoostedCategory(conf.btag_LR.at({CategoryKey::sl, CategoryKey::j5_tge4}))
+        ),
+        new CategoryProcessor(
+            [](const Event& ev){
+                return BaseCuts::sl(ev) && (ev.numJets>=6) && (ev.nBCSVM==2);
+            },
+            {CategoryKey::sl, CategoryKey::jge6_t2},
+            makeBoostedCategory(conf.btag_LR.at({CategoryKey::sl, CategoryKey::jge6_t2}))
+        ),
+        new MEMCategoryProcessor(
+            [](const Event& ev){
+                return BaseCuts::sl(ev) && (ev.numJets>=6) && (ev.nBCSVM==3);
+            },
+            {CategoryKey::sl, CategoryKey::jge6_t3},
+            makeBoostedCategory(conf.btag_LR.at({CategoryKey::sl, CategoryKey::jge6_t3}))
+        ),
+        new MEMCategoryProcessor(
+            [](const Event& ev){
+                return BaseCuts::sl(ev) && (ev.numJets>=6) && (ev.nBCSVM>=4);
+            },
+            {CategoryKey::sl, CategoryKey::jge6_tge4},
+            makeBoostedCategory(conf.btag_LR.at({CategoryKey::sl, CategoryKey::jge6_tge4}))
+        ),
+    };
 
     cout << "Attaching branches..." << endl;
     TreeData data;
