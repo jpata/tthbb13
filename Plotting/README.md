@@ -11,7 +11,7 @@ The main code is in `TTH/Plotting/bin/MELooper.cc`. The code can be compiled usi
 
 You can create a list of steering files using the command:
 ~~~
-python TTH/Plotting/python/makeJobfiles.py
+python TTH/Plotting/python/joosep/makeJobfiles.py
 ~~~
 In the `makeJobfiles.py` script, the variable `sampstorun` configures which samples are enabled. Each file will be opened and split into chunks across jobfiles. The script will create a list of `job_{N}.json` files, which should all be run. The output of these jobs should be merged together.
 
