@@ -35,7 +35,7 @@ sample_shortname = {
 import os
 hostname = os.environ.get("HOSTNAME", "")
 if hostname == "t3ui12":
-    path = "/scratch/jpata/tth/Sep9_jec_jer/"
+    path = "/scratch/jpata/tth/Sep14_spring15_preV13_9a1f781/"
 elif hostname == "pata-slc6":
     path = "/home/joosep/joosep-mac/Documents/tth/data/ntp/v12/Sep9_jec_jer/"
 elif "hep.kbfi.ee" in hostname:
