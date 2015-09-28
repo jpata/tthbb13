@@ -31,6 +31,9 @@ TChain* loadFiles(const Configuration& conf) {
             exit(EXIT_FAILURE);
         }
     }
+    //https://root.cern.ch/doc/master/classTTreeCache.html
+    tree->SetCacheSize(10 * 1024 * 1024);
+    tree->AddBranchToCache("*");
     return tree;
 }
 
@@ -77,13 +80,13 @@ const vector<const CategoryProcessor*> makeBTagLRCategory(double blr) {
         //     },
         //     emptykey
         // ),
-        new CategoryProcessor(
+        new MEMCategoryProcessor(
             [blr](const Event& ev){
                 return ev.btag_LR_4b_2b_logit<blr;
             },
             {CategoryKey::blrL}
         ),
-        new CategoryProcessor(
+        new MEMCategoryProcessor(
             [blr](const Event& ev){
                 return ev.btag_LR_4b_2b_logit>=blr;
             },
