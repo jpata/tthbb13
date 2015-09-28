@@ -11,12 +11,24 @@ Also Create the FakeData file
 import ROOT
 import sys
 
+def defaultHistogram(hname):
+    """
+    In case a histogram was not found for a specific cut, we need to provide a default 0-histogram.
+    """
+    if hname.startswith("mem_"):
+        return ROOT.TH1D("mem", "mem", 12, 0, 1)
+    elif hname.startswith("jet0_pt"):
+        return ROOT.TH1D("pt", "pt", 20, 0, 500)
+    return None
+
+
+
 ########################################
 # Copy existing, needed histograms
 #  into new file 
 ########################################
 def copyHistograms(tf, of, hists, channels, processes): 
-    print "Copying existing histograms..."
+    #print "Copying existing histograms..."
     
     for hist in hists:
         for ch in channels:
@@ -24,10 +36,11 @@ def copyHistograms(tf, of, hists, channels, processes):
     
                 h = tf.Get("{0}/{1}/{2}".format(proc, ch, hist)).Clone()
                 outdir = "{0}/{1}".format(proc, ch)
-                of.mkdir(outdir)
+                if of.Get(outdir) == None:
+                    of.mkdir(outdir)
                 outdir = of.Get(outdir)
                 h.SetDirectory(outdir)
-                of.Write()
+                outdir.Write()
     
             # End of loop over processes
         # End of loop over channels
@@ -43,20 +56,28 @@ def fakeData(tf, of, hists, channels, processes):
     print "Creating fake data..."
     
     for hist in hists:
+        #print " hist=", hist
         for ch in channels:
+            #print "  channel=", ch
             h = None
             for proc in processes:
-    
+                #print "   proc=", proc
+
                 h2 = tf.Get("{0}/{1}/{2}".format(proc, ch, hist))
-                if not h:
-                    h = h2.Clone()
-                else:
-                    h.Add(h2)
+                if h2:
+                    if not h:
+                        h = h2.Clone()
+                    else:
+                        h.Add(h2)
+            if h == None:
+                h = defaultHistogram(hist)
+
             outdir = "data_obs/{0}".format(ch)
-            of.mkdir(outdir)
+            if of.Get(outdir) == None:
+                of.mkdir(outdir)
             outdir = of.Get(outdir)
             h.SetDirectory(outdir)
-            of.Write()
+            outdir.Write()
         # End of loop over channels
     # End of loop over histograms
     
@@ -68,28 +89,36 @@ def fakeData(tf, of, hists, channels, processes):
 ########################################
 
 def combineCategories(tf, of, hists, mergers, processes):
-    print "Combining categories..."
+    #print "Combining categories..."
     
     for hist in hists:
         for proc in processes:
-            print " combining", hist, proc
+            #print " combining", hist, proc
             for name, channels in mergers.iteritems():
-                print "  {0} <= {1}".format(name, channels)
+                #print "  {0} <= {1}".format(name, channels)
                 h = None
     
                 for ch in channels:
                     hn = "{0}/{1}/{2}".format(proc, ch, hist)
                     h2 = tf.Get(hn)
-                    if not h:
-                        h = h2.Clone()
-                    else:
-                        h.Add(h2)
-    
+                    if h2:
+                        if not h:
+                            h = h2.Clone()
+                        else:
+                            h.Add(h2)
+                if h == None:
+                    h = defaultHistogram(hist)
+
+                #it can happen that no category had this histogram defined
+                
+                if h == None:
+                    h = defaultHistogram(hist)
                 outdir = "{0}/{1}".format(proc,name)
-                of.mkdir(outdir)
+                if of.Get(outdir) == None:
+                    of.mkdir(outdir)
                 outdir = of.Get(outdir)
                 h.SetDirectory(outdir)
-                of.Write()
+                outdir.Write()
             # End of loop over things to merge
          # End of loop over processes
     # End of loop over histograms

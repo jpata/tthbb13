@@ -72,7 +72,6 @@ def process_sample_hist(fnames, hname, func, bins, cut, **kwargs):
     h = rootpy.asrootpy(h)
     h.SetDirectory(ROOT.gROOT)
     n = tt.Draw("{0} >> {1}".format(func, hname), cut)
-    print n, h.Integral()
     if kwargs.get("norm", False):
         if h.Integral()>0:
             h.Scale(1.0 / h.Integral())
@@ -559,8 +558,10 @@ def syst_comparison(tf, sn, l, **kwargs):
     h1n = h1.Clone()
     h2n = h2.Clone()
     plt.legend(numpoints=1, loc="best")
-    h1n.Scale(h0.Integral() / h1n.Integral())
-    h2n.Scale(h0.Integral() / h2n.Integral())
+    if h1n.Integral() > 0:
+        h1n.Scale(h0.Integral() / h1n.Integral())
+    if h2n.Integral() > 0:
+        h2n.Scale(h0.Integral() / h2n.Integral())
     
     h1n.linestyle = "dashed"
     h2n.linestyle = "dashed"
@@ -570,14 +571,15 @@ def syst_comparison(tf, sn, l, **kwargs):
     #plt.ylim(bottom=0)
     plt.axhline(0.0)
     a2 = plt.axes([0.0,0.0,1.0,0.48],sharex=a1)
-    
-    h1r = h1.Clone()
+
+    h1r = h1n.Clone()
     h1r.Divide(h0)
-    h2r = h2.Clone()
+    h2r = h2n.Clone()
     h2r.Divide(h0)
     h1r.color = "blue"
     h2r.color = "red"
     hist(h1r, color="blue")
     hist(h2r, color="red")
+    a2.set_ylim(0.9, 1.1)
     plt.axhline(1.0, color="black")
     #fill_between(h1, h2, hatch="\\\\", facecolor="none", edgecolor="black", lw=0, zorder=10)

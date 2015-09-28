@@ -17,23 +17,20 @@ dl_cuts = "is_dl==1 && passPV==1 && ll_mass>20 && passPV==1 && abs(ll_mass-91.2)
 class Datacard:
     #draw in these categories
     # (name, cut-string, decision variable to use)
-    categories = [
-        #("dl_j3_t2",        dl_cuts + " && numJets==3 && nBCSVM==2",    "mem_DL_0w2h2t"),
-        ("dl_jge3_tge3",    dl_cuts + " && numJets>=3 && nBCSVM==3",    "mem_DL_0w2h2t"),
-        #("dl_jge4_t2",      dl_cuts + " && numJets>=4 && nBCSVM==2",    "mem_DL_0w2h2t"),
-        ("dl_jge4_tge4",    dl_cuts + " && numJets>=4 && nBCSVM>=4",    "mem_DL_0w2h2t"),
+    categories = dict([
+        ("dl_j3_t2",     "mem_DL_0w2h2t"),
+        ("dl_jge3_tge3", "mem_DL_0w2h2t"),
+        ("dl_jge4_t2",   "mem_DL_0w2h2t"),
+        ("dl_jge4_tge4", "mem_DL_0w2h2t"),
         
-        ("sl_j4_t3",        sl_cuts + " && numJets==4 && nBCSVM==3",    "mem_SL_0w2h2t"),
-        ("sl_j4_t4",        sl_cuts + " && numJets==4 && nBCSVM==4",    "mem_SL_0w2h2t"),
-        
-        ("sl_j5_t3",        sl_cuts + " && numJets==5 && nBCSVM==3",    "mem_SL_0w2h2t"),
-        ("sl_j5_tge4",      sl_cuts + " && numJets==5 && nBCSVM>=4",    "mem_SL_0w2h2t"),
-        
-        
-        #("sl_jge6_t2",      sl_cuts + " && numJets>=6 && nBCSVM==2",    "mem_SL_0w2h2t"),
-        ("sl_jge6_t3",      sl_cuts + " && numJets>=6 && nBCSVM==3",    "mem_SL_0w2h2t"),
-        ("sl_jge6_tge4",    sl_cuts + " && numJets>=6 && nBCSVM>=4",    "mem_SL_0w2h2t"),
-    ]
+        ("sl_j4_t3",     "mem_SL_0w2h2t"),
+        ("sl_j4_t4",     "mem_SL_0w2h2t"),
+        ("sl_j5_t3",     "mem_SL_0w2h2t"),
+        ("sl_j5_tge4",   "mem_SL_0w2h2t"),
+        ("sl_jge6_t2",   "mem_SL_0w2h2t"),
+        ("sl_jge6_t3",   "mem_SL_0w2h2t"),
+        ("sl_jge6_tge4", "mem_SL_0w2h2t"),
+    ])
 
     #derived for 50% tt+H efficiency
     #variable is logit(bLR) = log(bLR/(1-bLR))
@@ -50,16 +47,6 @@ class Datacard:
      'sl_jge6_t3': 4.4,
      'sl_jge6_tge4': 8.3
     }
-
-    # Subset of categories we want to use for limit setting
-    # This is re-configured automatically by make_limit_datacards.py
-    analysis_categories = [
-        #"sl_jge6_t2",
-        #"sl_jge6_t3",
-        "sl_jge6_tge4",
-        #"sl_jge6_tge4_blrH",
-        #"sl_jge6_tge4_blrL"
-    ]
 
     #Draw histograms with these systematic weights
     #The list consists of all systematic weight scenarios that will be evaluated
@@ -157,29 +144,38 @@ class Datacard:
     ]
     #Enable the plotting of these samples
     # !!!Important: Signal has to be the first one!!!!
-    samples = [
-        "ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
-        "ttHToNonbb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2",
-        #"TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9", #inclusive
-        "TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9_tt2b",
-        "TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9_ttbb",
-        "TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9_ttb",
-        "TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9_ttcc",
-        "TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9_ttll",
-        "TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
-        "TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
-        "TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
-        "TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
+    # samples = [
+    #     "ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
+    #     "ttHToNonbb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2",
+    #     #"TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9", #inclusive
+    #     "TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9_tt2b",
+    #     "TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9_ttbb",
+    #     "TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9_ttb",
+    #     "TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9_ttcc",
+    #     "TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9_ttll",
+    #     "TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
+    #     "TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
+    #     "TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
+    #     "TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
+    # ]
+    processes = [
+        "ttH_hbb",
+        "ttH_nohbb",
+        "ttbarPlus2B",
+        "ttbarPlusB",
+        "ttbarPlusBBbar",
+        "ttbarPlusCCbar",
+        "ttbarOther",
     ]
 
-    output_filename = "ControlPlots.root"
+
+    histfilename = "ControlPlots.root"
     output_datacardname = "shapes.txt"
 
     output_basepath = "./"
 
     # luminosity we're interested in (measure in pb-1)
     lumi = 10000. # 10fb-1
-
 
 # #create categories with b-likelihood low/high
 # newcats = []

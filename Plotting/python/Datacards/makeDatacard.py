@@ -7,28 +7,24 @@ from Samples import samples_dict
 
 def PrintDatacard(event_counts, datacard, dcof):
 
-    number_of_bins = len(datacard.analysis_categories)    
-    number_of_backgrounds = len(datacard.samples) - 1 
+    number_of_bins = len(datacard.categories)    
+    number_of_backgrounds = len(datacard.processes) - 1 
+    analysis_categories = list(datacard.categories.keys())
 
     dcof.write("imax {0}\n".format(number_of_bins))
     dcof.write("jmax {0}\n".format(number_of_backgrounds))
     dcof.write("kmax *\n")
     dcof.write("---------------\n")
 
-    for cat in datacard.analysis_categories:                
-        # Loop over the full table of categories and extract the one we're interested in. Pick up the corresponding MEM var
-        matchcats = [c[2] for c in datacard.categories if c[0]==cat]
-        if len(matchcats) != 1:
-            raise Exception("Could not match category {0}: {1}".format(cat, matchcats))
-        analysis_var = matchcats[0]
-        dcof.write("shapes * {0} {1} $PROCESS/$CHANNEL/{2} $PROCESS/$CHANNEL/{2}_$SYSTEMATIC\n".format(cat, of_name, analysis_var))
+    for cat, analysis_var in datacard.categories.items():                
+        dcof.write("shapes * {0} {1} $PROCESS/$CHANNEL/{2} $PROCESS/$CHANNEL/{2}_$SYSTEMATIC\n".format(cat, datacard.histfilename, analysis_var))
 
     #dcof.write("shapes data_obs sl_jge6_tge4 /shome/jpata/tth/datacards/Sep7_ref2_spring15/fakeData.root $PROCESS/$CHANNEL/mem_d_nomatch_0 $PROCESS/$CHANNEL/mem_d_nomatch_0_$SYSTEMATIC\n")
         
     dcof.write("---------------\n")
 
-    dcof.write("bin\t" +  "\t".join(datacard.analysis_categories) + "\n")
-    dcof.write("observation\t" + "\t".join("-1" for _ in datacard.analysis_categories) + "\n")
+    dcof.write("bin\t" +  "\t".join(analysis_categories) + "\n")
+    dcof.write("observation\t" + "\t".join("-1" for _ in analysis_categories) + "\n")
     dcof.write("---------------\n")
 
     bins        = []
@@ -38,10 +34,9 @@ def PrintDatacard(event_counts, datacard, dcof):
 
     # Conversion: 
     # Example: ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8_hbb -> ttH_hbb
-    samples = [samples_dict[s].name for s in datacard.samples]
 
-    for cat in datacard.analysis_categories:
-        for i_sample, sample in enumerate(samples):
+    for cat in datacard.categories:
+        for i_sample, sample in enumerate(datacard.processes):
             bins.append(cat)
             processes_0.append(sample)
             if sample in datacard.signal_processes:
@@ -65,8 +60,8 @@ def PrintDatacard(event_counts, datacard, dcof):
             
     for scale in all_scale_uncerts:
         dcof.write(scale + "\t lnN \t")
-        for cat in datacard.analysis_categories:
-            for sample in samples:
+        for cat in analysis_categories:
+            for sample in datacard.processes:
                 if (cat in datacard.scale_uncertainties.keys() and 
                     sample in datacard.scale_uncertainties[cat].keys() and 
                     scale in datacard.scale_uncertainties[cat][sample].keys()):
@@ -87,8 +82,8 @@ def PrintDatacard(event_counts, datacard, dcof):
 
     for shape in all_shape_uncerts:
         dcof.write(shape + "\t shape \t")
-        for cat in datacard.analysis_categories:
-            for sample in samples:
+        for cat in analysis_categories:
+            for sample in datacard.processes:
                 if (cat in datacard.shape_uncertainties.keys() and 
                     sample in datacard.shape_uncertainties[cat].keys() and 
                     shape in datacard.shape_uncertainties[cat][sample].keys()):
@@ -99,7 +94,7 @@ def PrintDatacard(event_counts, datacard, dcof):
         dcof.write("\n")
             
     dcof.write("# Execute with:\n")
-    dcof.write("# combine -M Asymptotic -t -1 {0} \n".format(dcof_name))
+    dcof.write("# combine -M Asymptotic -t -1 {0} \n".format(datacard.output_datacardname))
     
 # end of PrintDataCard
 def MakeDatacard(histfile, dcard):
@@ -115,22 +110,24 @@ def MakeDatacard(histfile, dcard):
     # Content: events at given lumi
     event_counts = {}
     
-    for sample in dcard.samples:
-        sample_shortname = samples_dict[sample].name
-        sampled = histfile.Get(sample_shortname)
+    for sample in dcard.processes:
+        #print " sample", sample
+        sampled = histfile.Get(sample)
         assert(sampled != None)
         sampled.cd()
-        event_counts[sample_shortname] = {}
-
-        for cutname, cut, analysis_var in dcard.categories:
+        event_counts[sample] = {}
+        for cutname, analysis_var in dcard.categories.items():
+            #print "  cutname={0} var={1}".format(cutname, analysis_var)
             jetd = sampled.Get(cutname)
-            assert(jetd != None)
-            
-            h = jetd.Get(analysis_var)
-            I = 0
-            if h != None:
-                I = h.Integral()
-            event_counts[sample_shortname][cutname] = I
+            if jetd != None:
+                
+                h = jetd.Get(analysis_var)
+                I = 0
+                if h != None:
+                    I = h.Integral()
+                event_counts[sample][cutname] = I
+            else:
+                event_counts[sample][cutname] = 0
 
     PrintDatacard(event_counts, dcard, dcof)
 # end of MakeDatacard
@@ -144,10 +141,10 @@ def ConfigureDatacard(dcard, categories, ofname):
     """
 
     dcard_new = copy.deepcopy(dcard)
-    dcard_new.analysis_categories = categories
+    dcard_new.categories = categories
     dcard_new.shape_uncertainties = {}
     dcard_new.scale_uncertainties = {}
-    for cat in dcard_new.analysis_categories:
+    for cat in dcard_new.categories:
         dcard_new.shape_uncertainties[cat] = dcard_new.total_shape_uncert
         dcard_new.scale_uncertainties[cat] = dcard_new.common_scale_uncertainties
     dcard_new.output_datacardname = ofname
@@ -161,7 +158,7 @@ if __name__ == "__main__":
 
     #path to datacard directory
     full_path = sys.argv[2]
-    of_name = os.path.join(full_path, dcard.Datacard.output_filename)
+    of_name = os.path.join(full_path, dcard.Datacard.histfilename)
     histfile = ROOT.TFile.Open(of_name)
     
     #Loop over individual categories
