@@ -190,7 +190,16 @@ const unordered_map<const string, CategoryKey, hash<string>> map_from_string = {
     {"blrL", blrL},
     {"blrH", blrH},
     {"boosted", boosted},
-    {"nonboosted", nonboosted}
+    {"nonboosted", nonboosted},
+    {"boostedMass120_180", boostedMass120_180},
+    {"nonboostedMass120_180", nonboostedMass120_180},
+    {"boostedMass140_180", boostedMass140_180},
+    {"nonboostedMass140_180", nonboostedMass140_180},
+    {"boostedTau_07", boostedTau_07},
+    {"nonboostedTau_07", nonboostedTau_07},
+    {"boostedfRec_02", boostedfRec_02},
+    {"nonboostedfRec_02", nonboostedfRec_02},
+
 };
 
 unordered_map<CategoryKey, const string, hash<int>> map_to_string =
@@ -309,7 +318,10 @@ Event::Event(
     double _bTagWeight_HFDown,
     double _btag_LR_4b_2b,
     int _n_excluded_bjets,
-    int _ntopCandidate
+    int _ntopCandidate,
+    double _topCandidate_mass,
+    double _topCandidate_fRec,
+    double _topCandidate_n_subjettiness    
     ) :
     is_sl(_is_sl),
     is_dl(_is_dl),
@@ -337,7 +349,11 @@ Event::Event(
     btag_LR_4b_2b(_btag_LR_4b_2b),
     btag_LR_4b_2b_logit(log(_btag_LR_4b_2b / (1.0 - _btag_LR_4b_2b))),
     n_excluded_bjets(_n_excluded_bjets),
-    ntopCandidate(_ntopCandidate)
+    ntopCandidate(_ntopCandidate),
+    topCandidate_mass(_topCandidate_mass),
+    topCandidate_fRec(_topCandidate_fRec),
+    topCandidate_n_subjettiness(_topCandidate_n_subjettiness)
+
 {
     
 }
@@ -460,7 +476,10 @@ const Event EventFactory::makeNominal(const TreeData& data) {
         data.bTagWeight_HFDown,
         data.btag_LR_4b_2b,
         data.n_excluded_bjets,
-        data.ntopCandidate
+        data.ntopCandidate,
+        data.topCandidate_mass[0],	
+	data.topCandidate_fRec[0],
+	data.topCandidate_n_subjettiness[0]
     );
     return ev;
 }
@@ -494,7 +513,10 @@ const Event EventFactory::makeJESUp(const TreeData& data) {
         0,
         data.btag_LR_4b_2b,
         data.n_excluded_bjets,
-        data.ntopCandidate
+        data.ntopCandidate,
+        data.topCandidate_mass[0],
+	data.topCandidate_fRec[0],
+	data.topCandidate_n_subjettiness[0]
     );
 }
 
@@ -527,7 +549,10 @@ const Event EventFactory::makeJESDown(const TreeData& data) {
         0,
         data.btag_LR_4b_2b,
         data.n_excluded_bjets,
-        data.ntopCandidate
+        data.ntopCandidate,
+	data.topCandidate_mass[0],
+	data.topCandidate_fRec[0],
+	data.topCandidate_n_subjettiness[0]
     );
 }
 

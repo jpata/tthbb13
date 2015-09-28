@@ -119,7 +119,57 @@ const vector<const CategoryProcessor*> makeBoostedCategory(double blr) {
             },
             {CategoryKey::nonboosted},
             makeBTagLRCategory(blr)
-        )
+        ),	
+        new MEMCategoryProcessor(
+            [](const Event& ev){
+	      return ev.n_excluded_bjets<2 && ev.ntopCandidate==1 && (ev.topCandidate_mass > 120) && (ev.topCandidate_mass < 180) ;
+            },
+            {CategoryKey::boostedMass120_180}
+        ),
+        new MEMCategoryProcessor(
+            [](const Event& ev){
+	      return !(ev.n_excluded_bjets<2 && ev.ntopCandidate==1 && (ev.topCandidate_mass > 120) && (ev.topCandidate_mass < 180)) ;
+            },
+            {CategoryKey::nonboostedMass120_180}
+        ),
+        new MEMCategoryProcessor(
+            [](const Event& ev){
+	      return ev.n_excluded_bjets<2 && ev.ntopCandidate==1 && (ev.topCandidate_mass > 140) && (ev.topCandidate_mass < 180) ;
+            },
+            {CategoryKey::boostedMass140_180}
+        ),
+        new MEMCategoryProcessor(
+            [](const Event& ev){
+	      return !(ev.n_excluded_bjets<2 && ev.ntopCandidate==1 && (ev.topCandidate_mass > 140) && (ev.topCandidate_mass < 180)) ;
+            },
+            {CategoryKey::nonboostedMass140_180}
+        ),
+        new MEMCategoryProcessor(
+            [](const Event& ev){
+	      return ev.n_excluded_bjets<2 && ev.ntopCandidate==1 && (ev.topCandidate_n_subjettiness < 0.7);
+            },
+            {CategoryKey::boostedTau_07}
+        ),
+	new MEMCategoryProcessor(
+            [](const Event& ev){
+	      return !(ev.n_excluded_bjets<2 && ev.ntopCandidate==1 && (ev.topCandidate_n_subjettiness < 0.7));
+            },
+            {CategoryKey::nonboostedTau_07}
+        ),
+        new MEMCategoryProcessor(
+            [](const Event& ev){
+	      return ev.n_excluded_bjets<2 && ev.ntopCandidate==1 && (ev.topCandidate_fRec < 0.2);
+            },
+            {CategoryKey::boostedfRec_02}
+        ),
+        new MEMCategoryProcessor(
+            [](const Event& ev){
+	      return !(ev.n_excluded_bjets<2 && ev.ntopCandidate==1 && (ev.topCandidate_fRec < 0.2));
+            },
+            {CategoryKey::nonboostedfRec_02}
+        ),
+
+
     };
 }
 

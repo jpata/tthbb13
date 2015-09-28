@@ -57,9 +57,17 @@ enum CategoryKey {
     
     blrL,
     blrH,
-    boosted,
-    nonboosted
 
+    boosted,
+    nonboosted,
+    boostedMass120_180,
+    nonboostedMass120_180,
+    boostedMass140_180,
+    nonboostedMass140_180,
+    boostedTau_07,
+    nonboostedTau_07,
+    boostedfRec_02,
+    nonboostedfRec_02            
 };
 const string to_string(CategoryKey k);
 const CategoryKey from_string(const string& k);
@@ -245,6 +253,9 @@ typedef unordered_map<
     //boosted variables
     int n_excluded_bjets;
     int ntopCandidate;
+    double topCandidate_mass;
+    double topCandidate_fRec;
+    double topCandidate_n_subjettiness;
 
     Event(
         bool _is_sl,
@@ -272,7 +283,10 @@ typedef unordered_map<
         double _bTagWeight_HFDown,
         double _btag_LR_4b_2b,
         int _n_excluded_bjets,
-        int _ntopCandidate
+        int _ntopCandidate,
+	double _topCandidate_mass,
+	double _topCandidate_fRec,
+	double _topCandidate_n_subjettiness
     );
 
     const string to_string() const;
