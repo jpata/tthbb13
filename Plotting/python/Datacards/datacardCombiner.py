@@ -16,9 +16,9 @@ def defaultHistogram(hname):
     In case a histogram was not found for a specific cut, we need to provide a default 0-histogram.
     """
     if hname.startswith("mem_"):
-        return ROOT.TH1D("mem", "mem", 12, 0, 1)
+        return ROOT.TH1D(hname, "mem", 12, 0, 1)
     elif hname.startswith("jet0_pt"):
-        return ROOT.TH1D("pt", "pt", 20, 0, 500)
+        return ROOT.TH1D(hname, "pt", 20, 0, 500)
     return None
 
 

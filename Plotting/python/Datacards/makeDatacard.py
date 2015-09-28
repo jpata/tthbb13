@@ -120,7 +120,6 @@ def MakeDatacard(histfile, dcard):
             #print "  cutname={0} var={1}".format(cutname, analysis_var)
             jetd = sampled.Get(cutname)
             if jetd != None:
-                
                 h = jetd.Get(analysis_var)
                 I = 0
                 if h != None:
