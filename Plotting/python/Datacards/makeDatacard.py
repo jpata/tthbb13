@@ -3,7 +3,7 @@ import ROOT
 ROOT.gROOT.SetBatch(True)
 #ROOT.gErrorIgnoreLevel = ROOT.kError
 import sys, imp, os, copy
-from samples import samples_dict
+from Samples import samples_dict
 
 def PrintDatacard(event_counts, datacard, dcof):
 

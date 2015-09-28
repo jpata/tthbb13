@@ -43,9 +43,9 @@ elif "hep.kbfi.ee" in hostname:
 else:
     path = "/Users/joosep/Documents/tth/data/ntp/v12/Sep14/"
 
-if not os.path.isdir(path):
-    raise Exception("Could not find sample base path {0}".format(path))
-print "Loading samples from", path
+# if not os.path.isdir(path):
+#     raise Exception("Could not find sample base path {0}".format(path))
+# print "Loading samples from", path
 
 class Sample:
     def __init__(self, name, filenames):
