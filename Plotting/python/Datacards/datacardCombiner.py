@@ -15,7 +15,7 @@ import sys
 # Copy existing, needed histograms
 #  into new file 
 ########################################
-def copyHistograms(of, hists, channels, processes): 
+def copyHistograms(tf, of, hists, channels, processes): 
     print "Copying existing histograms..."
     
     for hist in hists:
@@ -39,7 +39,7 @@ def copyHistograms(of, hists, channels, processes):
 ########################################
 # Create fake data
 ########################################
-def fakeData(of, hists, channels, processes):
+def fakeData(tf, of, hists, channels, processes):
     print "Creating fake data..."
     
     for hist in hists:
@@ -67,18 +67,19 @@ def fakeData(of, hists, channels, processes):
 # Combine categories
 ########################################
 
-def combineCategories(of, hists, channels, processes):
+def combineCategories(tf, of, hists, mergers, processes):
     print "Combining categories..."
     
     for hist in hists:
         for proc in processes:
+            print " combining", hist, proc
             for name, channels in mergers.iteritems():
-            
+                print "  {0} <= {1}".format(name, channels)
                 h = None
     
                 for ch in channels:
-    
-                    h2 = tf.Get("{0}/{1}/{2}".format(proc, ch, hist))
+                    hn = "{0}/{1}/{2}".format(proc, ch, hist)
+                    h2 = tf.Get(hn)
                     if not h:
                         h = h2.Clone()
                     else:
@@ -98,7 +99,6 @@ def combineCategories(of, hists, channels, processes):
 if __name__ == "__main__":
     inf = sys.argv[1]
     tf = ROOT.TFile(inf)
-    
     
     ########################################
     # Configuration
@@ -125,6 +125,6 @@ if __name__ == "__main__":
     }
     
     of = ROOT.TFile("combinedDatacards.root", "RECREATE")
-    copyHistograms(of, hists, channels, processes)
-    fakeData(of, hists, channels, processes)
-    combineCategories(of, hists, channels, processes)
+    copyHistograms(tf, of, hists, channels, processes)
+    fakeData(tf, of, hists, channels, processes)
+    combineCategories(tf, of, hists, mergers, processes)
