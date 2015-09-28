@@ -181,16 +181,16 @@ class Datacard:
     lumi = 10000. # 10fb-1
 
 
-#create categories with b-likelihood low/high
-newcats = []
-for cat in Datacard.categories:
-    for cutsign, cutname in [("<", "L"), (">=", "H")]:
-        newcat = list(cat)
-        newcat[0] += "_blr" + cutname    
-        newcat[1] += " && (log(btag_LR_4b_2b / (1.0 - btag_LR_4b_2b)) {1} {0})".format(Datacard.blr_cuts[cat[0]], cutsign)
-        newcats += [tuple(newcat)]
+# #create categories with b-likelihood low/high
+# newcats = []
+# for cat in Datacard.categories:
+#     for cutsign, cutname in [("<", "L"), (">=", "H")]:
+#         newcat = list(cat)
+#         newcat[0] += "_blr" + cutname    
+#         newcat[1] += " && (log(btag_LR_4b_2b / (1.0 - btag_LR_4b_2b)) {1} {0})".format(Datacard.blr_cuts[cat[0]], cutsign)
+#         newcats += [tuple(newcat)]
 
-Datacard.categories += newcats
+#Datacard.categories += newcats
 # 
 # import json
 # print json.dumps(Datacard.__dict__, indent=2)
