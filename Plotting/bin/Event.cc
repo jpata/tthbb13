@@ -702,11 +702,32 @@ void MEMCategoryProcessor::fillHistograms(
             get<1>(key),
             HistogramKey::mem_SL_0w2h2t
         );
+        
+        const auto mem_SL_2w2h2t_sj_key = make_tuple(
+            get<0>(key),
+            get<1>(key),
+            HistogramKey::mem_SL_2w2h2t_sj
+        );
+        
+        const auto mem_SL_2w2h2t_key = make_tuple(
+            get<0>(key),
+            get<1>(key),
+            HistogramKey::mem_SL_2w2h2t
+        );
+
 
         if (!results.count(mem_SL_0w2h2t_key)) {
             results[mem_SL_0w2h2t_key] = TH1D("mem_SL_0w2h2t", "mem SL 0w2h2t", 12, 0, 1);
         }
+        if (!results.count(mem_SL_2w2h2t_sj_key)) {
+            results[mem_SL_2w2h2t_sj_key] = TH1D("mem_SL_2w2h2t_sj", "mem SL 0w2h2t subjet", 12, 0, 1);
+        }
+        if (!results.count(mem_SL_2w2h2t_key)) {
+            results[mem_SL_2w2h2t_key] = TH1D("mem_SL_2w2h2t", "mem SL 2w2h2t", 12, 0, 1);
+        }
         results[mem_SL_0w2h2t_key].Fill(event.mem_SL_0w2h2t, weight);
+        results[mem_SL_2w2h2t_key].Fill(event.mem_SL_2w2h2t, weight);
+        results[mem_SL_2w2h2t_sj_key].Fill(event.mem_SL_2w2h2t_sj, weight);
     } else if (CategoryKey::is_dl(get<0>(key))) {
         const auto mem_DL_0w2h2t_key = make_tuple(
             get<0>(key),
