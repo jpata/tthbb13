@@ -57,6 +57,9 @@ enum CategoryKey {
     
     blrL,
     blrH,
+    
+    Wmass60_100,
+    nonWmass60_100,
 
     boosted,
     nonboosted,
@@ -229,6 +232,8 @@ typedef unordered_map<
     //cross-section weight
     double weight_xs;
     
+    double Wmass;
+    
     //mem hypotheses
     double mem_SL_0w2h2t;
     double mem_SL_2w2h2t;
@@ -268,6 +273,7 @@ typedef unordered_map<
         const vector<Jet>& _jets,
         const WeightMap& _weightFuncs,
         double _weight_xs,
+        double _Wmass,
         double _mem_SL_0w2h2t,
         double _mem_SL_2w2h2t,
         double _mem_SL_2w2h2t_sj,
@@ -284,9 +290,9 @@ typedef unordered_map<
         double _btag_LR_4b_2b,
         int _n_excluded_bjets,
         int _ntopCandidate,
-	double _topCandidate_mass,
-	double _topCandidate_fRec,
-	double _topCandidate_n_subjettiness
+        double _topCandidate_mass,
+        double _topCandidate_fRec,
+        double _topCandidate_n_subjettiness
     );
 
     const string to_string() const;

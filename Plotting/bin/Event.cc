@@ -189,6 +189,8 @@ const unordered_map<const string, CategoryKey, hash<string>> map_from_string = {
 
     {"blrL", blrL},
     {"blrH", blrH},
+    {"Wmass60_100", Wmass60_100},
+    {"nonWmass60_100", nonWmass60_100},
     {"boosted", boosted},
     {"nonboosted", nonboosted},
     {"boostedMass120_180", boostedMass120_180},
@@ -303,6 +305,7 @@ Event::Event(
     const vector<Jet>& _jets,
     const Event::WeightMap& _weightFuncs,
     double _weight_xs,
+    double _Wmass,
     double _mem_SL_0w2h2t,
     double _mem_SL_2w2h2t,
     double _mem_SL_2w2h2t_sj,
@@ -333,6 +336,7 @@ Event::Event(
     jets(_jets),
     weightFuncs(_weightFuncs),
     weight_xs(_weight_xs),
+    Wmass(_Wmass),
     mem_SL_0w2h2t(_mem_SL_0w2h2t),
     mem_SL_2w2h2t(_mem_SL_2w2h2t),
     mem_SL_2w2h2t_sj(_mem_SL_2w2h2t_sj),
@@ -444,7 +448,7 @@ bool pass_trig_sl(const TreeData& data) {
 
 //Evaluate mem probability
 double mem_p(double p_tth, double p_ttbb) {
-    return p_tth / (p_tth + 0.15 * p_ttbb);
+    return p_tth > 0.0 ? p_tth / (p_tth + 0.15 * p_ttbb) : 0.0;
 }
 
 const Event EventFactory::makeNominal(const TreeData& data) {
@@ -461,6 +465,7 @@ const Event EventFactory::makeNominal(const TreeData& data) {
         jets,
         systWeights,
         data.weight_xs,
+        data.Wmass,
         mem_p(data.mem_tth_p[0], data.mem_ttbb_p[0]), //SL 022
         mem_p(data.mem_tth_p[5], data.mem_ttbb_p[5]), //SL 222
         mem_p(data.mem_tth_p[9], data.mem_ttbb_p[9]), //SL 222 sj
@@ -498,6 +503,7 @@ const Event EventFactory::makeJESUp(const TreeData& data) {
         jets,
         nominalWeights,
         data.weight_xs,
+        data.Wmass,
         mem_p(data.mem_tth_JESUp_p[0], data.mem_ttbb_JESUp_p[0]), //SL 022
         mem_p(data.mem_tth_JESUp_p[5], data.mem_ttbb_JESUp_p[5]), //SL 222
         mem_p(data.mem_tth_JESUp_p[9], data.mem_ttbb_JESUp_p[9]), //SL 222 sj
@@ -534,6 +540,7 @@ const Event EventFactory::makeJESDown(const TreeData& data) {
         jets,
         nominalWeights,
         data.weight_xs,
+        data.Wmass,
         mem_p(data.mem_tth_JESDown_p[0], data.mem_ttbb_JESDown_p[0]), //SL 022
         mem_p(data.mem_tth_JESDown_p[5], data.mem_ttbb_JESDown_p[5]), //SL 222
         mem_p(data.mem_tth_JESDown_p[9], data.mem_ttbb_JESDown_p[9]), //SL 222 sj
