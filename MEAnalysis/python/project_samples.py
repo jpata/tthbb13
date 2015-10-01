@@ -25,7 +25,7 @@ ttjets_sel = [
 inf = [
 #    ("/home/joosep/tth/gc/GC3c2c5704ee07/MEAnalysis_cfg_heppy/ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8.root", tth_sel),
 #    ("/home/joosep/tth/gc/GC3c2c5704ee07/MEAnalysis_cfg_heppy/ttHTobb_M125_13TeV_powheg_pythia8.root", tth_sel),
-    ("/home/joosep/tth/gc/TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2.root", ttjets_sel),
+    ("/scratch/joosep/TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9.root", ttjets_sel),
     #("/home/joosep/tth/gc/TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9.root", ttjets_sel)
 ]
 
@@ -53,7 +53,7 @@ def SelectTree_par(args):
 
 import multiprocessing, os
 from TTH.TTHNtupleAnalyzer.ParHadd import hadd 
-pool = multiprocessing.Pool(20)
+pool = multiprocessing.Pool(40)
 
 for infile, cuts in inf:
     tf = ROOT.TFile(infile)

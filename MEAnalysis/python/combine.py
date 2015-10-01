@@ -14,5 +14,5 @@ for f in files:
     name = "_ttH_leptonic_" + name.replace(".txt", "")
     arglist += [(f, name)]
 
-pool = multiprocessing.Pool(4)
+pool = multiprocessing.Pool(40)
 pool.map(runCombined_par, arglist)

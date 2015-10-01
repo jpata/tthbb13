@@ -32,7 +32,7 @@ const unordered_map<A, B, H1> reverse_map(const unordered_map<B, A, H2>& src) {
 Configuration::Configuration(
     vector<string>& _filenames,
     double _lumi,
-    string _process,
+    ProcessKey::ProcessKey _process,
     long _firstEntry,
     long _numEntries,
     int _printEvery,
@@ -53,7 +53,7 @@ Configuration::Configuration(
 const Configuration Configuration::makeConfiguration(JsonValue& value) {
     vector<string> filenames;
     double lumi = -1.0;
-    string process = "UNDEFINED";
+    ProcessKey::ProcessKey process = ProcessKey::UNKNOWN;
     string outputFile = "UNDEFINED";
     long firstEntry = -1;
     long numEntries = -1;
@@ -73,7 +73,7 @@ const Configuration Configuration::makeConfiguration(JsonValue& value) {
             lumi = lev1->value.toNumber();
         }
         else if (ks == "process") {
-            process = lev1->value.toString();
+            process = ProcessKey::from_string(lev1->value.toString());
         }
         else if (ks == "firstEntry") {
             firstEntry = (long)(lev1->value.toNumber());
@@ -135,6 +135,7 @@ const unordered_map<const string, SystematicKey, hash<string>> map_from_string =
     {"CMS_ttH_CSVHFUp", CMS_ttH_CSVHFUp},
     {"CMS_ttH_CSVHFDown", CMS_ttH_CSVHFDown}
 };
+
 const unordered_map<SystematicKey, const string, hash<int>> map_to_string =
     reverse_map<SystematicKey, const string, hash<int>, hash<string>>(
         map_from_string
@@ -146,6 +147,43 @@ const string to_string(SystematicKey k) {
         throw 1;
     }
     return map_to_string.at(k); 
+}
+}
+
+namespace ProcessKey {
+const unordered_map<const string, ProcessKey, hash<string>> map_from_string = {
+    {"ttH", ttH},
+    {"ttH_hbb", ttH_hbb},
+    {"ttbarPlusBBbar", ttbarPlusBBbar},
+    {"ttbarPlusB", ttbarPlusB},
+    {"ttbarPlus2B", ttbarPlus2B},
+    {"ttbarPlusCCbar", ttbarPlusCCbar},
+    {"ttbarOther", ttbarOther},
+    {"ttH_nohbb", ttH_nohbb},
+    {"ttw_wlnu", ttw_wlnu},
+    {"ttw_wqq", ttw_wqq},
+    {"ttz_zqq", ttz_zqq},
+    {"ttz_zllnunu", ttz_zllnunu},
+    {"UNKNOWN",  UNKNOWN}
+};
+const unordered_map<ProcessKey, const string, hash<int>> map_to_string =
+    reverse_map<ProcessKey, const string, hash<int>, hash<string>>(
+        map_from_string
+    );
+
+const string to_string(ProcessKey k) {
+    if (map_to_string.find(k) == map_to_string.end()) {
+        cerr << "Could not find ProcessKey " << k << endl;
+        throw 1;
+    }
+    return map_to_string.at(k); 
+}
+const ProcessKey from_string(const string& k) {
+    if (map_from_string.find(k) == map_from_string.end()) {
+        cerr << "Could not find ProcessKey " << k << endl;
+        throw 1;
+    }
+    return map_from_string.at(k);
 }
 }
 
@@ -176,7 +214,7 @@ const unordered_map<const string, CategoryKey, hash<string>> map_from_string = {
     {"dl", dl},
     {"j3_t2", j3_t2},
     {"jge4_t2", jge4_t2},
-    {"jge3_tge3", jge3_tge3},
+    {"jge3_t3", jge3_t3},
     {"jge4_tge4", jge4_tge4},
 
     {"j4_t3", j4_t3},
@@ -451,7 +489,20 @@ double mem_p(double p_tth, double p_ttbb) {
     return p_tth > 0.0 ? p_tth / (p_tth + 0.15 * p_ttbb) : 0.0;
 }
 
-const Event EventFactory::makeNominal(const TreeData& data) {
+double process_weight(ProcessKey::ProcessKey proc) {
+    switch(proc) {
+        case ProcessKey::ttbarPlusBBbar:
+        case ProcessKey::ttbarPlusB:
+        case ProcessKey::ttbarPlus2B:
+        case ProcessKey::ttbarPlusCCbar:
+        case ProcessKey::ttbarOther:
+            return 0.5;
+        default:
+            return 1.0;
+    }
+}
+
+const Event EventFactory::makeNominal(const TreeData& data, const Configuration& conf) {
     
     const vector<Jet> jets = makeAllJets(data, &(JetFactory::makeNominal));
     const Event ev(
@@ -464,7 +515,7 @@ const Event EventFactory::makeNominal(const TreeData& data) {
         data.nBCSVM,
         jets,
         systWeights,
-        data.weight_xs,
+        data.weight_xs * process_weight(conf.process),
         data.Wmass,
         mem_p(data.mem_tth_p[0], data.mem_ttbb_p[0]), //SL 022
         mem_p(data.mem_tth_p[5], data.mem_ttbb_p[5]), //SL 222
@@ -489,7 +540,7 @@ const Event EventFactory::makeNominal(const TreeData& data) {
     return ev;
 }
 
-const Event EventFactory::makeJESUp(const TreeData& data) {
+const Event EventFactory::makeJESUp(const TreeData& data, const Configuration& conf) {
     const vector<Jet> jets = makeAllJets(data, &(JetFactory::makeJESUp));
 
     return Event(
@@ -502,7 +553,7 @@ const Event EventFactory::makeJESUp(const TreeData& data) {
         data.nBCSVM_JESUp,
         jets,
         nominalWeights,
-        data.weight_xs,
+        data.weight_xs * process_weight(conf.process),
         data.Wmass,
         mem_p(data.mem_tth_JESUp_p[0], data.mem_ttbb_JESUp_p[0]), //SL 022
         mem_p(data.mem_tth_JESUp_p[5], data.mem_ttbb_JESUp_p[5]), //SL 222
@@ -526,7 +577,7 @@ const Event EventFactory::makeJESUp(const TreeData& data) {
     );
 }
 
-const Event EventFactory::makeJESDown(const TreeData& data) {
+const Event EventFactory::makeJESDown(const TreeData& data, const Configuration& conf) {
     const vector<Jet> jets = makeAllJets(data, &(JetFactory::makeJESDown));
 
     return Event(
@@ -539,7 +590,7 @@ const Event EventFactory::makeJESDown(const TreeData& data) {
         data.nBCSVM_JESDown,
         jets,
         nominalWeights,
-        data.weight_xs,
+        data.weight_xs * process_weight(conf.process),
         data.Wmass,
         mem_p(data.mem_tth_JESDown_p[0], data.mem_ttbb_JESDown_p[0]), //SL 022
         mem_p(data.mem_tth_JESDown_p[5], data.mem_ttbb_JESDown_p[5]), //SL 222
@@ -724,13 +775,13 @@ void MEMCategoryProcessor::fillHistograms(
 
 
         if (!results.count(mem_SL_0w2h2t_key)) {
-            results[mem_SL_0w2h2t_key] = TH1D("mem_SL_0w2h2t", "mem SL 0w2h2t", 12, 0, 1);
+            results[mem_SL_0w2h2t_key] = TH1D("mem_SL_0w2h2t", "mem SL 0w2h2t", 6, 0, 1);
         }
         if (!results.count(mem_SL_2w2h2t_sj_key)) {
-            results[mem_SL_2w2h2t_sj_key] = TH1D("mem_SL_2w2h2t_sj", "mem SL 0w2h2t subjet", 12, 0, 1);
+            results[mem_SL_2w2h2t_sj_key] = TH1D("mem_SL_2w2h2t_sj", "mem SL 0w2h2t subjet", 6, 0, 1);
         }
         if (!results.count(mem_SL_2w2h2t_key)) {
-            results[mem_SL_2w2h2t_key] = TH1D("mem_SL_2w2h2t", "mem SL 2w2h2t", 12, 0, 1);
+            results[mem_SL_2w2h2t_key] = TH1D("mem_SL_2w2h2t", "mem SL 2w2h2t", 6, 0, 1);
         }
         results[mem_SL_0w2h2t_key].Fill(event.mem_SL_0w2h2t, weight);
         results[mem_SL_2w2h2t_key].Fill(event.mem_SL_2w2h2t, weight);
@@ -743,7 +794,7 @@ void MEMCategoryProcessor::fillHistograms(
         );
 
         if (!results.count(mem_DL_0w2h2t_key)) {
-            results[mem_DL_0w2h2t_key] = TH1D("mem_DL_0w2h2t", "mem DL 0w2h2t", 12, 0, 1);
+            results[mem_DL_0w2h2t_key] = TH1D("mem_DL_0w2h2t", "mem DL 0w2h2t", 6, 0, 1);
         }
         results[mem_DL_0w2h2t_key].Fill(event.mem_DL_0w2h2t, weight);
     }

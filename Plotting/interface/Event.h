@@ -35,6 +35,26 @@ enum SystematicKey {
 const string to_string(SystematicKey k);
 }
 
+namespace ProcessKey {
+enum ProcessKey {
+  ttH,
+  ttH_hbb,
+  ttbarPlusBBbar,
+  ttbarPlusB,
+  ttbarPlus2B,
+  ttbarPlusCCbar,
+  ttbarOther,
+  ttH_nohbb,
+  ttw_wlnu,
+  ttw_wqq,
+  ttz_zqq,
+  ttz_zllnunu,
+  UNKNOWN
+};
+const string to_string(ProcessKey k);
+const ProcessKey from_string(const string& k);
+}
+
 namespace CategoryKey {
 enum CategoryKey {
     sl,
@@ -43,7 +63,7 @@ enum CategoryKey {
     //DL
     j3_t2,
     jge4_t2,
-    jge3_tge3,
+    jge3_t3,
     jge4_tge4,
 
     //SL
@@ -160,7 +180,7 @@ public:
 
     vector<string> filenames;
     double lumi;
-    string process;
+    ProcessKey::ProcessKey process;
     long firstEntry;
     long numEntries;
     int printEvery;
@@ -170,7 +190,7 @@ public:
     Configuration(
         vector<string>& _filenames,
         double _lumi,
-        string _process,
+        ProcessKey::ProcessKey _process,
         long _firstEntry,
         long _numEntries,
         int _printEvery,
@@ -309,9 +329,9 @@ public:
 //Helper class to make various variated Event representations from TreeData
 class EventFactory {
 public:
-    static const Event makeNominal(const TreeData& data);
-    static const Event makeJESUp(const TreeData& data);
-    static const Event makeJESDown(const TreeData& data);
+    static const Event makeNominal(const TreeData& data, const Configuration& conf);
+    static const Event makeJESUp(const TreeData& data, const Configuration& conf);
+    static const Event makeJESDown(const TreeData& data, const Configuration& conf);
 };
 
 //A class combining a cut function, evaluated with this() along

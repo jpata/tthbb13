@@ -1,7 +1,7 @@
 from TTH.TTHNtupleAnalyzer.CrabHelpers import hadd_from_file, replicate
 import argparse, subprocess, glob, os
 
-version = "Sep14_spring15_preV13_9a1f781"
+version = "Sep28_spring15_prev13_f6c61f"
 
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
@@ -14,13 +14,13 @@ parser.add_argument('--action',
 args = parser.parse_args()
 
 jobs = [
+    "confs/tth.conf",
     "confs/ttw1.conf",
     "confs/ttw2.conf",
     "confs/ttz1.conf",
     "confs/ttz2.conf",
-    "confs/ttjets.conf",
     "confs/tth_nohbb.conf",
-    "confs/tth.conf"
+    "confs/ttjets.conf",
 ]
 print "Using configs", jobs
 #workdirs = ["work.sig", "work.bkg"]

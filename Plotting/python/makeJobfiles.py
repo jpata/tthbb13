@@ -1,4 +1,5 @@
-import samples, ROOT, json
+import TTH.Plotting.Samples as Samples
+import ROOT, json
 
 sampstorun = [
     "ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
@@ -22,7 +23,7 @@ def chunks(l, n):
 
 ijob = 0
 for samp in sampstorun:
-    s = samples.samples_dict[samp]
+    s = Samples.samples_dict[samp]
     tf = ROOT.TChain("tree")
     for fn in s.fileNamesS2:
         tf.AddFile(fn)

@@ -119,55 +119,55 @@ const vector<const CategoryProcessor*> makeBoostedCategory(double blr) {
             },
             {CategoryKey::nonboosted},
             makeBTagLRCategory(blr)
-        ),	
-        new MEMCategoryProcessor(
-            [](const Event& ev){
-	      return ev.n_excluded_bjets<2 && ev.ntopCandidate==1 && (ev.topCandidate_mass > 120) && (ev.topCandidate_mass < 180) ;
-            },
-            {CategoryKey::boostedMass120_180}
-        ),
-        new MEMCategoryProcessor(
-            [](const Event& ev){
-	      return !(ev.n_excluded_bjets<2 && ev.ntopCandidate==1 && (ev.topCandidate_mass > 120) && (ev.topCandidate_mass < 180)) ;
-            },
-            {CategoryKey::nonboostedMass120_180}
-        ),
-        new MEMCategoryProcessor(
-            [](const Event& ev){
-	      return ev.n_excluded_bjets<2 && ev.ntopCandidate==1 && (ev.topCandidate_mass > 140) && (ev.topCandidate_mass < 180) ;
-            },
-            {CategoryKey::boostedMass140_180}
-        ),
-        new MEMCategoryProcessor(
-            [](const Event& ev){
-	      return !(ev.n_excluded_bjets<2 && ev.ntopCandidate==1 && (ev.topCandidate_mass > 140) && (ev.topCandidate_mass < 180)) ;
-            },
-            {CategoryKey::nonboostedMass140_180}
-        ),
-        new MEMCategoryProcessor(
-            [](const Event& ev){
-	      return ev.n_excluded_bjets<2 && ev.ntopCandidate==1 && (ev.topCandidate_n_subjettiness < 0.7);
-            },
-            {CategoryKey::boostedTau_07}
-        ),
-	new MEMCategoryProcessor(
-            [](const Event& ev){
-	      return !(ev.n_excluded_bjets<2 && ev.ntopCandidate==1 && (ev.topCandidate_n_subjettiness < 0.7));
-            },
-            {CategoryKey::nonboostedTau_07}
-        ),
-        new MEMCategoryProcessor(
-            [](const Event& ev){
-	      return ev.n_excluded_bjets<2 && ev.ntopCandidate==1 && (ev.topCandidate_fRec < 0.2);
-            },
-            {CategoryKey::boostedfRec_02}
-        ),
-        new MEMCategoryProcessor(
-            [](const Event& ev){
-	      return !(ev.n_excluded_bjets<2 && ev.ntopCandidate==1 && (ev.topCandidate_fRec < 0.2));
-            },
-            {CategoryKey::nonboostedfRec_02}
-        ),
+        ),    
+        //new MEMCategoryProcessor(
+        //    [](const Event& ev){
+        //      return ev.n_excluded_bjets<2 && ev.ntopCandidate==1 && (ev.topCandidate_mass > 120) && (ev.topCandidate_mass < 180) ;
+        //    },
+        //    {CategoryKey::boostedMass120_180}
+        //),
+        //new MEMCategoryProcessor(
+        //    [](const Event& ev){
+        //      return !(ev.n_excluded_bjets<2 && ev.ntopCandidate==1 && (ev.topCandidate_mass > 120) && (ev.topCandidate_mass < 180)) ;
+        //    },
+        //    {CategoryKey::nonboostedMass120_180}
+        //),
+        //new MEMCategoryProcessor(
+        //    [](const Event& ev){
+        //      return ev.n_excluded_bjets<2 && ev.ntopCandidate==1 && (ev.topCandidate_mass > 140) && (ev.topCandidate_mass < 180) ;
+        //    },
+        //    {CategoryKey::boostedMass140_180}
+        //),
+        //new MEMCategoryProcessor(
+        //    [](const Event& ev){
+        //      return !(ev.n_excluded_bjets<2 && ev.ntopCandidate==1 && (ev.topCandidate_mass > 140) && (ev.topCandidate_mass < 180)) ;
+        //    },
+        //    {CategoryKey::nonboostedMass140_180}
+        //),
+        //new MEMCategoryProcessor(
+        //    [](const Event& ev){
+        //      return ev.n_excluded_bjets<2 && ev.ntopCandidate==1 && (ev.topCandidate_n_subjettiness < 0.7);
+        //    },
+        //    {CategoryKey::boostedTau_07}
+        //),
+        //new MEMCategoryProcessor(
+        //    [](const Event& ev){
+        //      return !(ev.n_excluded_bjets<2 && ev.ntopCandidate==1 && (ev.topCandidate_n_subjettiness < 0.7));
+        //    },
+        //    {CategoryKey::nonboostedTau_07}
+        //),
+        //new MEMCategoryProcessor(
+        //    [](const Event& ev){
+        //      return ev.n_excluded_bjets<2 && ev.ntopCandidate==1 && (ev.topCandidate_fRec < 0.2);
+        //    },
+        //    {CategoryKey::boostedfRec_02}
+        //),
+        //new MEMCategoryProcessor(
+        //    [](const Event& ev){
+        //      return !(ev.n_excluded_bjets<2 && ev.ntopCandidate==1 && (ev.topCandidate_fRec < 0.2));
+        //    },
+        //    {CategoryKey::nonboostedfRec_02}
+        //),
 
 
     };
@@ -198,26 +198,26 @@ int main(int argc, const char** argv) {
     const vector<const CategoryProcessor*> categorymap = {
 
         //Here we define a simple category for saving the MEM
+        //new MEMCategoryProcessor(
+        //    [](const Event& ev){
+        //        return BaseCuts::dl(ev) && (ev.numJets==3) && (ev.nBCSVM==2) && ev.btag_LR_4b_2b>0.95;
+        //    },
+        //    {CategoryKey::dl, CategoryKey::j3_t2},
+        //    makeBoostedCategory(conf.btag_LR.at({CategoryKey::dl, CategoryKey::j3_t2}))
+        //),
+        //new MEMCategoryProcessor(
+        //    [](const Event& ev){
+        //        return BaseCuts::dl(ev) && (ev.numJets>=4) && (ev.nBCSVM==2) && ev.btag_LR_4b_2b>0.95;
+        //    },
+        //    {CategoryKey::dl, CategoryKey::jge4_t2},
+        //    makeBoostedCategory(conf.btag_LR.at({CategoryKey::dl, CategoryKey::jge4_t2}))
+        //),
         new MEMCategoryProcessor(
             [](const Event& ev){
-                return BaseCuts::dl(ev) && (ev.numJets==3) && (ev.nBCSVM==2) && ev.btag_LR_4b_2b>0.95;
+                return BaseCuts::dl(ev) && (ev.numJets>=3) && (ev.nBCSVM==3) && ev.btag_LR_4b_2b>0.95;
             },
-            {CategoryKey::dl, CategoryKey::j3_t2},
-            makeBoostedCategory(conf.btag_LR.at({CategoryKey::dl, CategoryKey::j3_t2}))
-        ),
-        new MEMCategoryProcessor(
-            [](const Event& ev){
-                return BaseCuts::dl(ev) && (ev.numJets>=4) && (ev.nBCSVM==2) && ev.btag_LR_4b_2b>0.95;
-            },
-            {CategoryKey::dl, CategoryKey::jge4_t2},
-            makeBoostedCategory(conf.btag_LR.at({CategoryKey::dl, CategoryKey::jge4_t2}))
-        ),
-        new MEMCategoryProcessor(
-            [](const Event& ev){
-                return BaseCuts::dl(ev) && (ev.numJets>=3) && (ev.nBCSVM>=3) && ev.btag_LR_4b_2b>0.95;
-            },
-            {CategoryKey::dl, CategoryKey::jge3_tge3},
-            makeBoostedCategory(conf.btag_LR.at({CategoryKey::dl, CategoryKey::jge4_t2}))
+            {CategoryKey::dl, CategoryKey::jge3_t3},
+            makeBoostedCategory(conf.btag_LR.at({CategoryKey::dl, CategoryKey::jge3_t3}))
         ),
         new MEMCategoryProcessor(
             [](const Event& ev){
@@ -236,11 +236,39 @@ int main(int argc, const char** argv) {
         ),
         new MEMCategoryProcessor(
             [](const Event& ev){
+                return BaseCuts::sl(ev) && (ev.numJets==4) && (ev.nBCSVM==3) && ev.btag_LR_4b_2b>0.95 && (ev.Wmass > 60 && ev.Wmass < 100);
+            },
+            {CategoryKey::sl, CategoryKey::j4_t3, CategoryKey::Wmass60_100}
+        ),
+        new MEMCategoryProcessor(
+            [](const Event& ev){
+                return BaseCuts::sl(ev) && (ev.numJets==4) && (ev.nBCSVM==3) && ev.btag_LR_4b_2b>0.95 && !(ev.Wmass > 60 && ev.Wmass < 100);
+            },
+            {CategoryKey::sl, CategoryKey::j4_t3, CategoryKey::nonWmass60_100}
+        ),
+
+
+        new MEMCategoryProcessor(
+            [](const Event& ev){
                 return BaseCuts::sl(ev) && (ev.numJets==4) && (ev.nBCSVM==4) && ev.btag_LR_4b_2b>0.95;
             },
             {CategoryKey::sl, CategoryKey::j4_t4},
             makeBoostedCategory(conf.btag_LR.at({CategoryKey::sl, CategoryKey::j4_t4}))
         ),
+        new MEMCategoryProcessor(
+            [](const Event& ev){
+                return BaseCuts::sl(ev) && (ev.numJets==4) && (ev.nBCSVM==4) && ev.btag_LR_4b_2b>0.95 && (ev.Wmass > 60 && ev.Wmass < 100);
+            },
+            {CategoryKey::sl, CategoryKey::j4_t4, CategoryKey::Wmass60_100}
+        ),
+        new MEMCategoryProcessor(
+            [](const Event& ev){
+                return BaseCuts::sl(ev) && (ev.numJets==4) && (ev.nBCSVM==4) && ev.btag_LR_4b_2b>0.95 && !(ev.Wmass > 60 && ev.Wmass < 100);
+            },
+            {CategoryKey::sl, CategoryKey::j4_t4, CategoryKey::nonWmass60_100}
+        ),
+
+
         new MEMCategoryProcessor(
             [](const Event& ev){
                 return BaseCuts::sl(ev) && (ev.numJets==5) && (ev.nBCSVM==3) && ev.btag_LR_4b_2b>0.95;
@@ -250,6 +278,20 @@ int main(int argc, const char** argv) {
         ),
         new MEMCategoryProcessor(
             [](const Event& ev){
+                return BaseCuts::sl(ev) && (ev.numJets==5) && (ev.nBCSVM==3) && ev.btag_LR_4b_2b>0.95 && (ev.Wmass > 60 && ev.Wmass < 100);
+            },
+            {CategoryKey::sl, CategoryKey::j5_t3, CategoryKey::Wmass60_100}
+        ),
+        new MEMCategoryProcessor(
+            [](const Event& ev){
+                return BaseCuts::sl(ev) && (ev.numJets==5) && (ev.nBCSVM==3) && ev.btag_LR_4b_2b>0.95 && !(ev.Wmass > 60 && ev.Wmass < 100);
+            },
+            {CategoryKey::sl, CategoryKey::j5_t3, CategoryKey::nonWmass60_100}
+        ),
+        
+        
+        new MEMCategoryProcessor(
+            [](const Event& ev){
                 return BaseCuts::sl(ev) && (ev.numJets==5) && (ev.nBCSVM>=4) && ev.btag_LR_4b_2b>0.95;
             },
             {CategoryKey::sl, CategoryKey::j5_tge4},
@@ -257,11 +299,25 @@ int main(int argc, const char** argv) {
         ),
         new MEMCategoryProcessor(
             [](const Event& ev){
-                return BaseCuts::sl(ev) && (ev.numJets>=6) && (ev.nBCSVM==2) && ev.btag_LR_4b_2b>0.95;
+                return BaseCuts::sl(ev) && (ev.numJets==5) && (ev.nBCSVM>=4) && ev.btag_LR_4b_2b>0.95 && (ev.Wmass > 60 && ev.Wmass < 100);
             },
-            {CategoryKey::sl, CategoryKey::jge6_t2},
-            makeBoostedCategory(conf.btag_LR.at({CategoryKey::sl, CategoryKey::jge6_t2}))
+            {CategoryKey::sl, CategoryKey::j5_tge4, CategoryKey::Wmass60_100}
         ),
+        new MEMCategoryProcessor(
+            [](const Event& ev){
+                return BaseCuts::sl(ev) && (ev.numJets==5) && (ev.nBCSVM>=4) && ev.btag_LR_4b_2b>0.95 && !(ev.Wmass > 60 && ev.Wmass < 100);
+            },
+            {CategoryKey::sl, CategoryKey::j5_tge4, CategoryKey::nonWmass60_100}
+        ),
+
+
+        //new MEMCategoryProcessor(
+        //    [](const Event& ev){
+        //        return BaseCuts::sl(ev) && (ev.numJets>=6) && (ev.nBCSVM==2) && ev.btag_LR_4b_2b>0.95;
+        //    },
+        //    {CategoryKey::sl, CategoryKey::jge6_t2},
+        //    makeBoostedCategory(conf.btag_LR.at({CategoryKey::sl, CategoryKey::jge6_t2}))
+        //),
         new MEMCategoryProcessor(
             [](const Event& ev){
                 return BaseCuts::sl(ev) && (ev.numJets>=6) && (ev.nBCSVM==3) && ev.btag_LR_4b_2b>0.95;
@@ -269,6 +325,19 @@ int main(int argc, const char** argv) {
             {CategoryKey::sl, CategoryKey::jge6_t3},
             makeBoostedCategory(conf.btag_LR.at({CategoryKey::sl, CategoryKey::jge6_t3}))
         ),
+        new MEMCategoryProcessor(
+            [](const Event& ev){
+                return BaseCuts::sl(ev) && (ev.numJets>=6) && (ev.nBCSVM==3) && ev.btag_LR_4b_2b>0.95 && (ev.Wmass > 60 && ev.Wmass < 100);
+            },
+            {CategoryKey::sl, CategoryKey::jge6_t3, CategoryKey::Wmass60_100}
+        ),
+        new MEMCategoryProcessor(
+            [](const Event& ev){
+                return BaseCuts::sl(ev) && (ev.numJets>=6) && (ev.nBCSVM==3) && ev.btag_LR_4b_2b>0.95 && !(ev.Wmass > 60 && ev.Wmass < 100);
+            },
+            {CategoryKey::sl, CategoryKey::jge6_t3, CategoryKey::nonWmass60_100}
+        ),
+
         new MEMCategoryProcessor(
             [](const Event& ev){
                 return BaseCuts::sl(ev) && (ev.numJets>=6) && (ev.nBCSVM>=4) && ev.btag_LR_4b_2b>0.95;
@@ -280,15 +349,13 @@ int main(int argc, const char** argv) {
             [](const Event& ev){
                 return BaseCuts::sl(ev) && (ev.numJets>=6) && (ev.nBCSVM>=4) && ev.btag_LR_4b_2b>0.95 && (ev.Wmass > 60 && ev.Wmass < 100) ;
             },
-            {CategoryKey::sl, CategoryKey::jge6_tge4, CategoryKey::Wmass60_100},
-            makeBoostedCategory(conf.btag_LR.at({CategoryKey::sl, CategoryKey::jge6_tge4}))
+            {CategoryKey::sl, CategoryKey::jge6_tge4, CategoryKey::Wmass60_100}
         ),
         new MEMCategoryProcessor(
             [](const Event& ev){
                 return BaseCuts::sl(ev) && (ev.numJets>=6) && (ev.nBCSVM>=4) && ev.btag_LR_4b_2b>0.95 && !(ev.Wmass > 60 && ev.Wmass < 100) ;
             },
-            {CategoryKey::sl, CategoryKey::jge6_tge4, CategoryKey::nonWmass60_100},
-            makeBoostedCategory(conf.btag_LR.at({CategoryKey::sl, CategoryKey::jge6_tge4}))
+            {CategoryKey::sl, CategoryKey::jge6_tge4, CategoryKey::nonWmass60_100}
         ),
     };
 
@@ -313,9 +380,9 @@ int main(int argc, const char** argv) {
         }
 
         const unordered_map<SystematicKey::SystematicKey, Event, std::hash<int> > systmap = {
-            {SystematicKey::nominal, EventFactory::makeNominal(data)},
-            {SystematicKey::CMS_scale_jUp, EventFactory::makeJESUp(data)},
-            {SystematicKey::CMS_scale_jDown, EventFactory::makeJESDown(data)}
+            {SystematicKey::nominal, EventFactory::makeNominal(data, conf)},
+            {SystematicKey::CMS_scale_jUp, EventFactory::makeJESUp(data, conf)},
+            {SystematicKey::CMS_scale_jDown, EventFactory::makeJESDown(data, conf)}
         };
 
         for (auto& kvSyst : systmap) {
@@ -333,6 +400,6 @@ int main(int argc, const char** argv) {
     //Finalize with output
     cout << "Read " << nbytes/1024/1024 << " Mb" << endl;
     cout << to_string(results) << endl;
-    saveResults(results, conf.process, conf.outputFile);
+    saveResults(results, ProcessKey::to_string(conf.process), conf.outputFile);
     return 0;
 }
