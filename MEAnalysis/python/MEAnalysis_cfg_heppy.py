@@ -352,7 +352,7 @@ class Conf:
 
         #Actually run the ME calculation
         #If False, all ME values will be 0
-        "calcME": False,
+        "calcME": True,
 
         #Generic event-dependent selection function applied
         #just before the MEM. If False, MEM is skipped for all hypos
@@ -391,12 +391,12 @@ class Conf:
 
         #This configures the MEMs to actually run, the rest will be set to 0
         "methodsToRun": [
-            #"SL_0w2h2t",
-            #"DL_0w2h2t",
-            #"SL_1w2h2t",
+            "SL_0w2h2t",
+            "DL_0w2h2t",
+            "SL_1w2h2t",
             #"SL_2w2h1t_l",
             #"SL_2w2h1t_h",
-            #"SL_2w2h2t",
+            "SL_2w2h2t",
             "SL_2w2h2t_sj",
             "SL_0w2h2t_sj",
             #"SL_2w2h2t_memLR",
