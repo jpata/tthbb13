@@ -169,7 +169,7 @@ cut_map = {
     "sl_jge6_t3": r"SL, $N_j\geq 6\ N_t=3$",
     "sl_jge6_tge4": r"SL, $N_j\geq 6\ N_t\geq4$",
     "dl_j3_t2": r"DL, $N_j=3\ N_t=2$",
-    "dl_jge3_tge3": r"DL, $N_j\geq3\ N_t\geq3$",
+    "dl_jge3_t3": r"DL, $N_j\geq3\ N_t=3$",
     "dl_jge4_t2": r"DL, $N_j\geq4\ N_t=2$",
     "dl_jge4_tge4": r"DL, $N_j\geq4\ N_t\geq4$",
 }

@@ -313,7 +313,7 @@ def draw_data_mc(tf, hname, samples, **kwargs):
     else:
         a1 = plt.axes()
         
-    plt.title("CMS preliminary simulation\n $\sqrt{s} = 13$ TeV"+title_extended,
+    plt.title("CMS simulation\n $\sqrt{s} = 13$ TeV"+title_extended,
         y=0.96, x=0.04,
         horizontalalignment="left", verticalalignment="top"
     )
@@ -400,8 +400,10 @@ def draw_mem_data_mc(*args, **kwargs):
 def calc_roc(h1, h2):
     h1 = h1.Clone()
     h2 = h2.Clone()
-    h1.Scale(1.0 / h1.Integral())
-    h2.Scale(1.0 / h2.Integral())
+    if h1.Integral()>0:
+        h1.Scale(1.0 / h1.Integral())
+    if h2.Integral()>0:
+        h2.Scale(1.0 / h2.Integral())
     roc = np.zeros((h1.GetNbinsX()+2, 2))
     err = np.zeros((h1.GetNbinsX()+2, 2))
     e1 = ROOT.Double(0)

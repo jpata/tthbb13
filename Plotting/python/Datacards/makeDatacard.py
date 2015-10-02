@@ -4,10 +4,11 @@ ROOT.gROOT.SetBatch(True)
 #ROOT.gErrorIgnoreLevel = ROOT.kError
 import sys, imp, os, copy
 from Samples import samples_dict
+from datacardCombiner import makeStatVariations, copyHistograms, defaultHistogram, fakeData, combineCategories
 
 def PrintDatacard(event_counts, datacard, dcof):
 
-    number_of_bins = len(datacard.categories)    
+    number_of_bins = len(datacard.categories)
     number_of_backgrounds = len(datacard.processes) - 1 
     analysis_categories = list(datacard.categories.keys())
 
@@ -57,7 +58,7 @@ def PrintDatacard(event_counts, datacard, dcof):
             all_scale_uncerts.extend(vv.keys())
     # Uniquify
     all_scale_uncerts = list(set(all_scale_uncerts))
-            
+
     for scale in all_scale_uncerts:
         dcof.write(scale + "\t lnN \t")
         for cat in analysis_categories:
@@ -79,7 +80,6 @@ def PrintDatacard(event_counts, datacard, dcof):
     # Uniquify
     all_shape_uncerts = list(set(all_shape_uncerts))
 
-
     for shape in all_shape_uncerts:
         dcof.write(shape + "\t shape \t")
         for cat in analysis_categories:
@@ -92,9 +92,11 @@ def PrintDatacard(event_counts, datacard, dcof):
                     dcof.write("-")
                 dcof.write("\t")
         dcof.write("\n")
-            
+    
+    shapename = os.path.basename(datacard.output_datacardname)
+    shapename_base = shapename.split(".")[0]
     dcof.write("# Execute with:\n")
-    dcof.write("# combine -M Asymptotic -t -1 {0} \n".format(datacard.output_datacardname))
+    dcof.write("# combine -n {0} -M Asymptotic -t -1 {1} \n".format(shapename_base, shapename))
     
 # end of PrintDataCard
 def MakeDatacard(histfile, dcard):
@@ -110,9 +112,39 @@ def MakeDatacard(histfile, dcard):
     # Content: events at given lumi
     event_counts = {}
     
+    dcard_histfilename = dcard.output_datacardname.replace("txt", "root")
+    ofile = ROOT.TFile(dcard_histfilename, "RECREATE")
+    dcard.histfilename = os.path.basename(dcard_histfilename)
+    hists = []
+    hists_nom = []
+    analysischannels = []
+    basechannels = []
+
+    for cutname, analysis_var in dcard.categories.items() + dcard.basecategories.items():
+        if analysis_var not in hists:
+            hists += [analysis_var]
+            hists_nom += [analysis_var]
+            for syst in dcard.common_shape_uncertainties.keys():
+                for sdir in ["Up", "Down"]:
+                    hists += [analysis_var + "_" + syst + sdir]
+        if dcard.basecategories.has_key(cutname) and cutname not in basechannels:
+            basechannels += [cutname]
+        if dcard.categories.has_key(cutname) and cutname not in analysischannels:
+            analysischannels += [cutname]
+
+    # for name, combchannels in dcard.combines.items():
+    #     for cutname in combchannels:
+    #         if cutname not in channels:
+    #             channels += [cutname]
+    copyHistograms(histfile, ofile, hists, analysischannels, dcard.processes)
+    combineCategories(histfile, ofile, filter(lambda x: "Bin" not in x, hists), dcard.combines, dcard.processes)
+    makeStatVariations(ofile, ofile, hists_nom, analysischannels, dcard.processes)
+    dcard.addStatVariations()
+    fakeData(ofile, ofile, hists_nom, analysischannels, dcard.processes)
+
     for sample in dcard.processes:
         #print " sample", sample
-        sampled = histfile.Get(sample)
+        sampled = ofile.Get(sample)
         assert(sampled != None)
         sampled.cd()
         event_counts[sample] = {}
@@ -128,44 +160,120 @@ def MakeDatacard(histfile, dcard):
             else:
                 event_counts[sample][cutname] = 0
 
+    categories = {}
+    for cutname, analysis_var in dcard.categories.items():
+        s = 0
+        sbg = 0
+        for sample in dcard.processes:
+            s += event_counts[sample][cutname]
+            if "ttH" not in sample:
+                sbg += event_counts[sample][cutname]
+        if s > 0 and sbg > 0:
+            categories[cutname] = analysis_var
+        else:
+            print "removing category", cutname, s, sbg
+    dcard.categories = categories
     PrintDatacard(event_counts, dcard, dcof)
 # end of MakeDatacard
 
-def ConfigureDatacard(dcard, categories, ofname):
-    """
-    Configures a Datacard object to use the specified categories.
-    dcard (Datacard): input datacard
-    categories (list of strings): categories to combine in fit
-    ofname (string): output filename for the datacard.txt
-    """
-
-    dcard_new = copy.deepcopy(dcard)
-    dcard_new.categories = categories
-    dcard_new.shape_uncertainties = {}
-    dcard_new.scale_uncertainties = {}
-    for cat in dcard_new.categories:
-        dcard_new.shape_uncertainties[cat] = dcard_new.total_shape_uncert
-        dcard_new.scale_uncertainties[cat] = dcard_new.common_scale_uncertainties
-    dcard_new.output_datacardname = ofname
-    return dcard_new
+# def ConfigureDatacard(dcard, categories, ofname):
+#     """
+#     Configures a Datacard object to use the specified categories.
+#     dcard (Datacard): input datacard
+#     categories (list of strings): categories to combine in fit
+#     ofname (string): output filename for the datacard.txt
+#     """
+# 
+#     dcard_new = copy.deepcopy(dcard)
+#     dcard_new.categories = categories
+#     dcard_new.shape_uncertainties = {}
+#     dcard_new.scale_uncertainties = {}
+# 
+#     for cat in dcard_new.categories:
+#         dcard_new.shape_uncertainties[cat] = dcard_new.total_shape_uncert
+#         dcard_new.scale_uncertainties[cat] = dcard_new.common_scale_uncertainties
+#     dcard_new.output_datacardname = ofname
+#     return dcard_new
 # end of ConfigureDatacard
+
+import datacard as datacard
 
 if __name__ == "__main__":
     # Get the input proto-datacard
-    datacard_path = sys.argv[1]
-    dcard = imp.load_source("dcard", datacard_path)
 
     #path to datacard directory
-    full_path = sys.argv[2]
-    of_name = os.path.join(full_path, dcard.Datacard.histfilename)
-    histfile = ROOT.TFile.Open(of_name)
+    full_path = sys.argv[1]
     
-    #Loop over individual categories
-    for cat in [x[0] for x in dcard.Datacard.categories]:
-        print cat
-        # output datacard text file
-        dcof_name = os.path.join(full_path, "shapes_{0}.txt".format(cat))
-        dcard_new = ConfigureDatacard(dcard.Datacard, [cat], dcof_name)
-        MakeDatacard(histfile, dcard_new)
-    #FIXME: add loop over combined categories here
+    catmap = {
+
+        "sl_jge6_tge4_mem_SL_0w2h2t": [("sl_jge6_tge4", "mem_SL_0w2h2t")],
+        "sl_jge6_tge4_mem_SL_2w2h2t": [("sl_jge6_tge4", "mem_SL_2w2h2t")],
+        "sl_jge6_tge4_mem_SL_2w2h2t_sj": [("sl_jge6_tge4", "mem_SL_2w2h2t")], #_sj will be added by makeBoosted
+         
+        "sl_jge6_t3_mem_SL_0w2h2t": [("sl_jge6_t3", "mem_SL_0w2h2t")],
+        "sl_jge6_t3_mem_SL_2w2h2t": [("sl_jge6_t3", "mem_SL_2w2h2t")],
+        "sl_jge6_t3_mem_SL_2w2h2t_sj": [("sl_jge6_t3", "mem_SL_2w2h2t")],
+        
+        "sl_j5_t3_mem_SL_0w2h2t": [("sl_j5_t3", "mem_SL_0w2h2t")],
+        "sl_j5_t3_mem_SL_2w2h2t": [("sl_j5_t3", "mem_SL_2w2h2t")],
+        "sl_j5_t3_mem_SL_2w2h2t_sj": [("sl_j5_t3", "mem_SL_2w2h2t")],
+        
+        "sl_j5_tge4_mem_SL_0w2h2t": [("sl_j5_tge4", "mem_SL_0w2h2t")],
+        "sl_j5_tge4_mem_SL_2w2h2t": [("sl_j5_tge4", "mem_SL_2w2h2t")],
+        "sl_j5_tge4_mem_SL_2w2h2t_sj": [("sl_j5_tge4", "mem_SL_2w2h2t")],
+        
+        "sl_j4_t4_mem_SL_0w2h2t": [("sl_j4_t4", "mem_SL_0w2h2t")],
+        "sl_j4_t4_mem_SL_2w2h2t": [("sl_j4_t4", "mem_SL_2w2h2t")],
+        "sl_j4_t4_mem_SL_2w2h2t_sj": [("sl_j4_t4", "mem_SL_2w2h2t")],
+        
+        "sl_j4_t3_mem_SL_0w2h2t": [("sl_j4_t3", "mem_SL_0w2h2t")],
+        "sl_j4_t3_mem_SL_2w2h2t": [("sl_j4_t3", "mem_SL_2w2h2t")],
+        "sl_j4_t3_mem_SL_2w2h2t_sj": [("sl_j4_t3", "mem_SL_2w2h2t")],
+        
+        
+        "dl_jge3_t3_mem_DL_0w2h2t": [("dl_jge3_t3", "mem_DL_0w2h2t")],
+        "dl_jge4_tge4_mem_DL_0w2h2t": [("dl_jge4_tge4", "mem_DL_0w2h2t")],
+        
+        "sl_mem_SL_0w2h2t": [
+            ("sl_j5_t3", "mem_SL_0w2h2t"),
+            ("sl_j5_tge4", "mem_SL_0w2h2t"),
+            ("sl_jge6_t3", "mem_SL_0w2h2t"),
+            ("sl_jge6_tge4", "mem_SL_0w2h2t")
+        ],
+        
+        "dl_mem_DL_0w2h2t": [
+            ("dl_jge3_t3", "mem_DL_0w2h2t"),
+            ("dl_jge4_tge4", "mem_DL_0w2h2t"),
+        ],
+        
+        "total": [
+            ("sl_j4_t3", "mem_SL_0w2h2t"),
+            ("sl_j4_t4", "mem_SL_0w2h2t"),
+            ("sl_j5_t3", "mem_SL_0w2h2t"),
+            ("sl_j5_tge4", "mem_SL_0w2h2t"),
+            ("sl_jge6_t3", "mem_SL_0w2h2t"),
+            ("sl_jge6_tge4", "mem_SL_0w2h2t"),
+            ("dl_jge3_t3", "mem_DL_0w2h2t"),
+            ("dl_jge4_tge4", "mem_DL_0w2h2t"),
+        ]
+    }
+
     
+    for do_select, func in [
+        (lambda x: True, datacard.makeCardBtagLR),
+        (lambda x: "sl" in x, datacard.makeCardBoosted),
+        (lambda x: "sl" in x, datacard.makeCardBoostedXblr),
+        (lambda x: "sl" in x, datacard.makeCardWMass),
+        (lambda x: True, datacard.makeCard)
+        ]:
+        for catname, catvars in catmap.items():
+            if not do_select(catname):
+                continue
+            dc = func(catname, dict(catvars))
+            of_name = os.path.join(full_path, dc.histfilename)
+            histfile = ROOT.TFile.Open(of_name)
+            
+            dc.output_datacardname = full_path + "/" + dc.output_datacardname
+            MakeDatacard(histfile, dc)
+            histfile.Close()
+        
