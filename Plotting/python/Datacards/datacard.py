@@ -1,3 +1,95 @@
+def makeCardBtagLR(name, basecats):
+    card = Datacard()
+
+    suffix = ""
+    if "_sj" in name:
+        suffix += "_sj"
+
+    for basecat, var in basecats.items():
+        card.basecategories[basecat + "_boosted_blrH"] = var + suffix
+        card.basecategories[basecat + "_nonboosted_blrH"] = var
+        card.basecategories[basecat + "_boosted_blrL"] = var + suffix
+        card.basecategories[basecat + "_nonboosted_blrL"] = var
+        card.categories[basecat + "_blrH"] = var
+        card.categories[basecat + "_blrL"] = var
+        card.combines[basecat + "_blrH"] = [basecat + "_boosted_blrH", basecat + "_nonboosted_blrH"]
+        card.combines[basecat + "_blrL"] = [basecat + "_boosted_blrL", basecat + "_nonboosted_blrL"]
+        card.shape_uncertainties[basecat + "_blrH"] = copy.deepcopy(card.total_shape_uncert)
+        card.shape_uncertainties[basecat + "_blrL"] = copy.deepcopy(card.total_shape_uncert)
+        card.scale_uncertainties[basecat + "_blrH"] = copy.deepcopy(card.common_scale_uncertainties)
+        card.scale_uncertainties[basecat + "_blrL"] = copy.deepcopy(card.common_scale_uncertainties)
+    card.output_datacardname = "shapes_Cblr_{0}.txt".format(name)
+    return card
+
+def makeCardBoosted(name, basecats):
+    card = Datacard()
+    
+    suffix = ""
+    if "_sj" in name:
+        suffix += "_sj"
+
+    for basecat, var in basecats.items():
+        card.basecategories[basecat + "_boosted"] = var + suffix
+        card.basecategories[basecat + "_nonboosted"] = var
+        card.categories[basecat + "_boosted"] = var + suffix
+        card.categories[basecat + "_nonboosted"] = var
+        card.shape_uncertainties[basecat + "_boosted"] = copy.deepcopy(card.total_shape_uncert)
+        card.shape_uncertainties[basecat + "_nonboosted"] = copy.deepcopy(card.total_shape_uncert)
+        card.scale_uncertainties[basecat + "_boosted"] = copy.deepcopy(card.common_scale_uncertainties)
+        card.scale_uncertainties[basecat + "_nonboosted"] = copy.deepcopy(card.common_scale_uncertainties)
+    card.output_datacardname = "shapes_Cboost_{0}.txt".format(name)
+    return card
+
+def makeCardBoostedXblr(name, basecats):
+    card = Datacard()
+
+    suffix = ""
+    if "_sj" in name:
+        suffix += "_sj"
+    for basecat, var in basecats.items():
+        for blr in ["_blrL", "_blrH"]:
+            card.basecategories[basecat + "_boosted" + blr] = var + suffix
+            card.basecategories[basecat + "_nonboosted" + blr] = var
+            card.categories[basecat + "_boosted" + blr] = var + suffix
+            card.categories[basecat + "_nonboosted" + blr] = var
+            card.shape_uncertainties[basecat + "_boosted" + blr] = copy.deepcopy(card.total_shape_uncert)
+            card.shape_uncertainties[basecat + "_nonboosted" + blr] = copy.deepcopy(card.total_shape_uncert)
+            card.scale_uncertainties[basecat + "_boosted" + blr] = copy.deepcopy(card.common_scale_uncertainties)
+            card.scale_uncertainties[basecat + "_nonboosted" + blr] = copy.deepcopy(card.common_scale_uncertainties)
+    card.output_datacardname = "shapes_Cboost_Cblr_{0}.txt".format(name)
+    return card
+
+def makeCard(name, basecats):
+    card = Datacard()
+
+    suffix = ""
+    if "_sj" in name:
+        suffix += "_sj"
+
+    for basecat, var in basecats.items():
+        card.basecategories[basecat] = var + suffix
+        card.categories[basecat] = var + suffix
+        card.shape_uncertainties[basecat] = copy.deepcopy(card.total_shape_uncert)
+        card.scale_uncertainties[basecat] = copy.deepcopy(card.common_scale_uncertainties)
+
+    card.output_datacardname = "shapes_{0}.txt".format(name)
+    return card
+
+def makeCardWMass(name, basecats):
+    card = Datacard()
+
+    suffix = ""
+    if "_sj" in name:
+        suffix += "_sj"
+    for basecat, var in basecats.items():
+        for c in ["_Wmass60_100", "_nonWmass60_100"]:
+            card.basecategories[basecat + c] = var + suffix
+            card.shape_uncertainties[basecat + c] = copy.deepcopy(card.total_shape_uncert)
+            card.scale_uncertainties[basecat + c] = copy.deepcopy(card.common_scale_uncertainties)
+    card.categories = copy.deepcopy(card.basecategories)
+    card.output_datacardname = "shapes_CWmass_{0}.txt".format(name)
+    return card
+
 class Datacard:
     def __init__(self):
         #these exist in the input file
@@ -155,94 +247,70 @@ class Datacard:
         #print self.shape_uncertainties
 import copy
 
-def makeCardBtagLR(name, basecats):
-    card = Datacard()
 
-    suffix = ""
-    if "_sj" in name:
-        suffix += "_sj"
+#functions that take a default datacard and configure it
+#with specific merge rules
+splitfuncs = [
+    makeCardBtagLR,
+    makeCardBoosted,
+    makeCardBoostedXblr,
+    makeCard,
+    makeCardWMass
+]
 
-    for basecat, var in basecats.items():
-        card.basecategories[basecat + "_boosted_blrH"] = var + suffix
-        card.basecategories[basecat + "_nonboosted_blrH"] = var
-        card.basecategories[basecat + "_boosted_blrL"] = var + suffix
-        card.basecategories[basecat + "_nonboosted_blrL"] = var
-        card.categories[basecat + "_blrH"] = var
-        card.categories[basecat + "_blrL"] = var
-        card.combines[basecat + "_blrH"] = [basecat + "_boosted_blrH", basecat + "_nonboosted_blrH"]
-        card.combines[basecat + "_blrL"] = [basecat + "_boosted_blrL", basecat + "_nonboosted_blrL"]
-        card.shape_uncertainties[basecat + "_blrH"] = copy.deepcopy(card.total_shape_uncert)
-        card.shape_uncertainties[basecat + "_blrL"] = copy.deepcopy(card.total_shape_uncert)
-        card.scale_uncertainties[basecat + "_blrH"] = copy.deepcopy(card.common_scale_uncertainties)
-        card.scale_uncertainties[basecat + "_blrL"] = copy.deepcopy(card.common_scale_uncertainties)
-    card.output_datacardname = "shapes_Cblr_{0}.txt".format(name)
-    return card
-
-def makeCardBoosted(name, basecats):
-    card = Datacard()
+#final analysis configurations
+# key is the final combined category name, value is a tuple of (
+# list of (source category, MEM distribution) categories to statistically combine,
+# list of functions which specify how you want to additionally split this category
+# )
+catmap = {
+    "sl_jge6_tge4_mem_SL_0w2h2t": ([("sl_jge6_tge4", "mem_SL_0w2h2t")], splitfuncs),
+    "sl_jge6_tge4_mem_SL_2w2h2t": ([("sl_jge6_tge4", "mem_SL_2w2h2t")], splitfuncs),
+    "sl_jge6_tge4_mem_SL_2w2h2t_sj": ([("sl_jge6_tge4", "mem_SL_2w2h2t")], splitfuncs),
+     
+    "sl_jge6_t3_mem_SL_0w2h2t": ([("sl_jge6_t3", "mem_SL_0w2h2t")], splitfuncs),
+    "sl_jge6_t3_mem_SL_2w2h2t": ([("sl_jge6_t3", "mem_SL_2w2h2t")], splitfuncs),
+    "sl_jge6_t3_mem_SL_2w2h2t_sj": ([("sl_jge6_t3", "mem_SL_2w2h2t")], splitfuncs),
     
-    suffix = ""
-    if "_sj" in name:
-        suffix += "_sj"
-
-    for basecat, var in basecats.items():
-        card.basecategories[basecat + "_boosted"] = var + suffix
-        card.basecategories[basecat + "_nonboosted"] = var
-        card.categories[basecat + "_boosted"] = var + suffix
-        card.categories[basecat + "_nonboosted"] = var
-        card.shape_uncertainties[basecat + "_boosted"] = copy.deepcopy(card.total_shape_uncert)
-        card.shape_uncertainties[basecat + "_nonboosted"] = copy.deepcopy(card.total_shape_uncert)
-        card.scale_uncertainties[basecat + "_boosted"] = copy.deepcopy(card.common_scale_uncertainties)
-        card.scale_uncertainties[basecat + "_nonboosted"] = copy.deepcopy(card.common_scale_uncertainties)
-    card.output_datacardname = "shapes_Cboost_{0}.txt".format(name)
-    return card
-
-def makeCardBoostedXblr(name, basecats):
-    card = Datacard()
-
-    suffix = ""
-    if "_sj" in name:
-        suffix += "_sj"
-    for basecat, var in basecats.items():
-        for blr in ["_blrL", "_blrH"]:
-            card.basecategories[basecat + "_boosted" + blr] = var + suffix
-            card.basecategories[basecat + "_nonboosted" + blr] = var
-            card.categories[basecat + "_boosted" + blr] = var + suffix
-            card.categories[basecat + "_nonboosted" + blr] = var
-            card.shape_uncertainties[basecat + "_boosted" + blr] = copy.deepcopy(card.total_shape_uncert)
-            card.shape_uncertainties[basecat + "_nonboosted" + blr] = copy.deepcopy(card.total_shape_uncert)
-            card.scale_uncertainties[basecat + "_boosted" + blr] = copy.deepcopy(card.common_scale_uncertainties)
-            card.scale_uncertainties[basecat + "_nonboosted" + blr] = copy.deepcopy(card.common_scale_uncertainties)
-    card.output_datacardname = "shapes_Cboost_Cblr_{0}.txt".format(name)
-    return card
-
-def makeCard(name, basecats):
-    card = Datacard()
-
-    suffix = ""
-    if "_sj" in name:
-        suffix += "_sj"
-
-    for basecat, var in basecats.items():
-        card.basecategories[basecat] = var + suffix
-        card.categories[basecat] = var + suffix
-        card.shape_uncertainties[basecat] = copy.deepcopy(card.total_shape_uncert)
-        card.scale_uncertainties[basecat] = copy.deepcopy(card.common_scale_uncertainties)
-
-    card.output_datacardname = "shapes_{0}.txt".format(name)
-    return card
-
-def makeCardWMass(name, basecats):
-    card = Datacard()
-
-    suffix = ""
-    if "_sj" in name:
-        suffix += "_sj"
-    for basecat, var in basecats.items():
-        for c in ["_Wmass60_100", "_nonWmass60_100"]:
-            card.basecategories[basecat + c] = var + suffix
-            card.shape_uncertainties[basecat + c] = copy.deepcopy(card.total_shape_uncert)
-            card.scale_uncertainties[basecat + c] = copy.deepcopy(card.common_scale_uncertainties)
-    card.categories = copy.deepcopy(card.basecategories)
-    card.output_datacardname = "shapes_CWmass_{0}.txt".format(name)
-    return card
+    "sl_j5_t3_mem_SL_0w2h2t": ([("sl_j5_t3", "mem_SL_0w2h2t")], splitfuncs),
+    "sl_j5_t3_mem_SL_2w2h2t": ([("sl_j5_t3", "mem_SL_2w2h2t")], splitfuncs),
+    "sl_j5_t3_mem_SL_2w2h2t_sj": ([("sl_j5_t3", "mem_SL_2w2h2t")], splitfuncs),
+    
+    "sl_j5_tge4_mem_SL_0w2h2t": ([("sl_j5_tge4", "mem_SL_0w2h2t")], splitfuncs),
+    "sl_j5_tge4_mem_SL_2w2h2t": ([("sl_j5_tge4", "mem_SL_2w2h2t")], splitfuncs),
+    "sl_j5_tge4_mem_SL_2w2h2t_sj": ([("sl_j5_tge4", "mem_SL_2w2h2t")], splitfuncs),
+    
+    "sl_j4_t4_mem_SL_0w2h2t": ([("sl_j4_t4", "mem_SL_0w2h2t")], splitfuncs),
+    "sl_j4_t4_mem_SL_2w2h2t": ([("sl_j4_t4", "mem_SL_2w2h2t")], splitfuncs),
+    "sl_j4_t4_mem_SL_2w2h2t_sj": ([("sl_j4_t4", "mem_SL_2w2h2t")], splitfuncs),
+    
+    "sl_j4_t3_mem_SL_0w2h2t": ([("sl_j4_t3", "mem_SL_0w2h2t")], splitfuncs),
+    "sl_j4_t3_mem_SL_2w2h2t": ([("sl_j4_t3", "mem_SL_2w2h2t")], splitfuncs),
+    "sl_j4_t3_mem_SL_2w2h2t_sj": ([("sl_j4_t3", "mem_SL_2w2h2t")], splitfuncs),
+    
+    "dl_jge3_t3_mem_DL_0w2h2t": ([("dl_jge3_t3", "mem_DL_0w2h2t")], splitfuncs),
+    "dl_jge4_tge4_mem_DL_0w2h2t": ([("dl_jge4_tge4", "mem_DL_0w2h2t")], splitfuncs),
+    
+    "sl_mem_SL_0w2h2t": ([
+        ("sl_j5_t3", "mem_SL_0w2h2t"),
+        ("sl_j5_tge4", "mem_SL_0w2h2t"),
+        ("sl_jge6_t3", "mem_SL_0w2h2t"),
+        ("sl_jge6_tge4", "mem_SL_0w2h2t")
+    ], splitfuncs),
+    
+    "dl_mem_DL_0w2h2t": ([
+        ("dl_jge3_t3", "mem_DL_0w2h2t"),
+        ("dl_jge4_tge4", "mem_DL_0w2h2t"),
+    ], splitfuncs),
+    
+    "total": ([
+        ("sl_j4_t3", "mem_SL_0w2h2t"),
+        ("sl_j4_t4", "mem_SL_0w2h2t"),
+        ("sl_j5_t3", "mem_SL_0w2h2t"),
+        ("sl_j5_tge4", "mem_SL_0w2h2t"),
+        ("sl_jge6_t3", "mem_SL_0w2h2t"),
+        ("sl_jge6_tge4", "mem_SL_0w2h2t"),
+        ("dl_jge3_t3", "mem_DL_0w2h2t"),
+        ("dl_jge4_tge4", "mem_DL_0w2h2t"),
+    ], splitfuncs)
+}

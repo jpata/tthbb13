@@ -176,26 +176,6 @@ def MakeDatacard(histfile, dcard):
     PrintDatacard(event_counts, dcard, dcof)
 # end of MakeDatacard
 
-# def ConfigureDatacard(dcard, categories, ofname):
-#     """
-#     Configures a Datacard object to use the specified categories.
-#     dcard (Datacard): input datacard
-#     categories (list of strings): categories to combine in fit
-#     ofname (string): output filename for the datacard.txt
-#     """
-# 
-#     dcard_new = copy.deepcopy(dcard)
-#     dcard_new.categories = categories
-#     dcard_new.shape_uncertainties = {}
-#     dcard_new.scale_uncertainties = {}
-# 
-#     for cat in dcard_new.categories:
-#         dcard_new.shape_uncertainties[cat] = dcard_new.total_shape_uncert
-#         dcard_new.scale_uncertainties[cat] = dcard_new.common_scale_uncertainties
-#     dcard_new.output_datacardname = ofname
-#     return dcard_new
-# end of ConfigureDatacard
-
 import datacard as datacard
 
 if __name__ == "__main__":
@@ -203,72 +183,9 @@ if __name__ == "__main__":
 
     #path to datacard directory
     full_path = sys.argv[1]
-    
-    catmap = {
 
-        "sl_jge6_tge4_mem_SL_0w2h2t": [("sl_jge6_tge4", "mem_SL_0w2h2t")],
-        "sl_jge6_tge4_mem_SL_2w2h2t": [("sl_jge6_tge4", "mem_SL_2w2h2t")],
-        "sl_jge6_tge4_mem_SL_2w2h2t_sj": [("sl_jge6_tge4", "mem_SL_2w2h2t")], #_sj will be added by makeBoosted
-         
-        "sl_jge6_t3_mem_SL_0w2h2t": [("sl_jge6_t3", "mem_SL_0w2h2t")],
-        "sl_jge6_t3_mem_SL_2w2h2t": [("sl_jge6_t3", "mem_SL_2w2h2t")],
-        "sl_jge6_t3_mem_SL_2w2h2t_sj": [("sl_jge6_t3", "mem_SL_2w2h2t")],
-        
-        "sl_j5_t3_mem_SL_0w2h2t": [("sl_j5_t3", "mem_SL_0w2h2t")],
-        "sl_j5_t3_mem_SL_2w2h2t": [("sl_j5_t3", "mem_SL_2w2h2t")],
-        "sl_j5_t3_mem_SL_2w2h2t_sj": [("sl_j5_t3", "mem_SL_2w2h2t")],
-        
-        "sl_j5_tge4_mem_SL_0w2h2t": [("sl_j5_tge4", "mem_SL_0w2h2t")],
-        "sl_j5_tge4_mem_SL_2w2h2t": [("sl_j5_tge4", "mem_SL_2w2h2t")],
-        "sl_j5_tge4_mem_SL_2w2h2t_sj": [("sl_j5_tge4", "mem_SL_2w2h2t")],
-        
-        "sl_j4_t4_mem_SL_0w2h2t": [("sl_j4_t4", "mem_SL_0w2h2t")],
-        "sl_j4_t4_mem_SL_2w2h2t": [("sl_j4_t4", "mem_SL_2w2h2t")],
-        "sl_j4_t4_mem_SL_2w2h2t_sj": [("sl_j4_t4", "mem_SL_2w2h2t")],
-        
-        "sl_j4_t3_mem_SL_0w2h2t": [("sl_j4_t3", "mem_SL_0w2h2t")],
-        "sl_j4_t3_mem_SL_2w2h2t": [("sl_j4_t3", "mem_SL_2w2h2t")],
-        "sl_j4_t3_mem_SL_2w2h2t_sj": [("sl_j4_t3", "mem_SL_2w2h2t")],
-        
-        
-        "dl_jge3_t3_mem_DL_0w2h2t": [("dl_jge3_t3", "mem_DL_0w2h2t")],
-        "dl_jge4_tge4_mem_DL_0w2h2t": [("dl_jge4_tge4", "mem_DL_0w2h2t")],
-        
-        "sl_mem_SL_0w2h2t": [
-            ("sl_j5_t3", "mem_SL_0w2h2t"),
-            ("sl_j5_tge4", "mem_SL_0w2h2t"),
-            ("sl_jge6_t3", "mem_SL_0w2h2t"),
-            ("sl_jge6_tge4", "mem_SL_0w2h2t")
-        ],
-        
-        "dl_mem_DL_0w2h2t": [
-            ("dl_jge3_t3", "mem_DL_0w2h2t"),
-            ("dl_jge4_tge4", "mem_DL_0w2h2t"),
-        ],
-        
-        "total": [
-            ("sl_j4_t3", "mem_SL_0w2h2t"),
-            ("sl_j4_t4", "mem_SL_0w2h2t"),
-            ("sl_j5_t3", "mem_SL_0w2h2t"),
-            ("sl_j5_tge4", "mem_SL_0w2h2t"),
-            ("sl_jge6_t3", "mem_SL_0w2h2t"),
-            ("sl_jge6_tge4", "mem_SL_0w2h2t"),
-            ("dl_jge3_t3", "mem_DL_0w2h2t"),
-            ("dl_jge4_tge4", "mem_DL_0w2h2t"),
-        ]
-    }
-
-    
-    for do_select, func in [
-        (lambda x: True, datacard.makeCardBtagLR),
-        (lambda x: "sl" in x, datacard.makeCardBoosted),
-        (lambda x: "sl" in x, datacard.makeCardBoostedXblr),
-        (lambda x: "sl" in x, datacard.makeCardWMass),
-        (lambda x: True, datacard.makeCard)
-        ]:
-        for catname, catvars in catmap.items():
-            if not do_select(catname):
-                continue
+    for catname, (catvars, funcs) in datacard.catmap.items():
+        for func in funcs:
             dc = func(catname, dict(catvars))
             of_name = os.path.join(full_path, dc.histfilename)
             histfile = ROOT.TFile.Open(of_name)
