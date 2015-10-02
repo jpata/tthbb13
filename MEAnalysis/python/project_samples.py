@@ -1,10 +1,18 @@
 import ROOT
 
+#select only high jet-multiplicity events
+sel = [
+    ("sl_highjet", "is_sl== 1 && (((numJets==4 || numJets==5) && nBCSVM >= 3) || (numJets>=6 && nBCSVM>=2))"),
+    ("dl_highjet", "is_dl== 1 && (numJets>=3 && nBCSVM>=2)")
+]
+
+#ttH classification by decay channel
 tth_sel = [
     ("hbb", "nGenBHiggs>=2"),
     ("hX", "nGenBHiggs<2"),
 ]
 
+#ttbar heavy-light classification
 ttjets_sel = [
     ("ttb", "ttCls == 51"),
     ("tt2b", "ttCls == 52"),
@@ -22,11 +30,11 @@ ttjets_sel = [
     ("ttll", "ttCls == 0 || ttCls<0")
 ]
 
+
+#list of filename -> selection that you want to project
 inf = [
-#    ("/home/joosep/tth/gc/GC3c2c5704ee07/MEAnalysis_cfg_heppy/ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8.root", tth_sel),
-#    ("/home/joosep/tth/gc/GC3c2c5704ee07/MEAnalysis_cfg_heppy/ttHTobb_M125_13TeV_powheg_pythia8.root", tth_sel),
-    ("/scratch/joosep/TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9.root", ttjets_sel),
-    #("/home/joosep/tth/gc/TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9.root", ttjets_sel)
+    ("/scratch/joosep/ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.root", sel),
+    ("/scratch/joosep/TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9.root", sel)
 ]
 
 def chunks(l, n):
