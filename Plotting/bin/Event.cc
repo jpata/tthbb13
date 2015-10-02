@@ -485,8 +485,8 @@ bool pass_trig_sl(const TreeData& data) {
 }
 
 //Evaluate mem probability
-double mem_p(double p_tth, double p_ttbb) {
-    return p_tth > 0.0 ? p_tth / (p_tth + 0.15 * p_ttbb) : 0.0;
+double mem_p(double p_tth, double p_ttbb, double w=0.15) {
+    return p_tth > 0.0 ? p_tth / (p_tth + w * p_ttbb) : 0.0;
 }
 
 double process_weight(ProcessKey::ProcessKey proc) {
@@ -519,7 +519,7 @@ const Event EventFactory::makeNominal(const TreeData& data, const Configuration&
         data.Wmass,
         mem_p(data.mem_tth_p[0], data.mem_ttbb_p[0]), //SL 022
         mem_p(data.mem_tth_p[5], data.mem_ttbb_p[5]), //SL 222
-        mem_p(data.mem_tth_p[9], data.mem_ttbb_p[9]), //SL 222 sj
+        mem_p(data.mem_tth_p[9], data.mem_ttbb_p[9], 0.05), //SL 222 sj
         mem_p(data.mem_tth_p[1], data.mem_ttbb_p[1]), //DL 022,
         data.bTagWeight,
         data.bTagWeight_Stats1Up,
@@ -557,7 +557,7 @@ const Event EventFactory::makeJESUp(const TreeData& data, const Configuration& c
         data.Wmass,
         mem_p(data.mem_tth_JESUp_p[0], data.mem_ttbb_JESUp_p[0]), //SL 022
         mem_p(data.mem_tth_JESUp_p[5], data.mem_ttbb_JESUp_p[5]), //SL 222
-        mem_p(data.mem_tth_JESUp_p[9], data.mem_ttbb_JESUp_p[9]), //SL 222 sj
+        mem_p(data.mem_tth_JESUp_p[9], data.mem_ttbb_JESUp_p[9], 0.05), //SL 222 sj
         mem_p(data.mem_tth_JESUp_p[1], data.mem_ttbb_JESUp_p[1]), //DL 022,
         data.bTagWeight,
         0,
@@ -594,7 +594,7 @@ const Event EventFactory::makeJESDown(const TreeData& data, const Configuration&
         data.Wmass,
         mem_p(data.mem_tth_JESDown_p[0], data.mem_ttbb_JESDown_p[0]), //SL 022
         mem_p(data.mem_tth_JESDown_p[5], data.mem_ttbb_JESDown_p[5]), //SL 222
-        mem_p(data.mem_tth_JESDown_p[9], data.mem_ttbb_JESDown_p[9]), //SL 222 sj
+        mem_p(data.mem_tth_JESDown_p[9], data.mem_ttbb_JESDown_p[9], 0.05), //SL 222 sj
         mem_p(data.mem_tth_JESDown_p[1], data.mem_ttbb_JESDown_p[1]), //DL 022,
         data.bTagWeight,
         0,
