@@ -393,13 +393,13 @@ class Conf:
         #Generic event-dependent selection function applied
         #just before the MEM. If False, MEM is skipped for all hypos
         #note that we set hypothesis-specific cuts below
-        #"selection": lambda event: (event.btag_LR_4b_2b > 0.95 #optimized for 40% tth(bb) acceptance
-        #    or (event.is_sl and event.nBCSVM >= 3) #always calculate for tagged events
-        #    or (event.is_dl and event.nBCSVM >= 2) #always calculate for tagged events
-        #),
         "selection": lambda event: (event.btag_LR_4b_2b > 0.95 #optimized for 40% tth(bb) acceptance
-            and (event.is_sl and event.numJets >= 6 and event.nBCSVM >= 4) #always calculate for tagged events
+            or (event.is_sl and event.nBCSVM >= 3) #always calculate for tagged events
+            or (event.is_dl and event.nBCSVM >= 2) #always calculate for tagged events
         ),
+        #"selection": lambda event: (event.btag_LR_4b_2b > 0.95 #optimized for 40% tth(bb) acceptance
+        #    and (event.is_sl and event.numJets >= 6 and event.nBCSVM >= 4) #always calculate for tagged events
+        #),
         
         #This configures what the array elements mean
         #Better not change this

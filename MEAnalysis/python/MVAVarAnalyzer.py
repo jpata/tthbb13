@@ -125,6 +125,11 @@ class MVAVarAnalyzer(FilterAnalyzer):
         event.fw_h_btagjets = FoxWolfram.calcFoxWolfram(event.selected_btagged_jets_high, orders, FoxWolfram.w_s)
         event.fw_h_untagjets = FoxWolfram.calcFoxWolfram(event.buntagged_jets, orders, FoxWolfram.w_s)
         
+        for ij in range(6):
+            setattr(event, "jet{0}_pt".format(ij), 0)
+            setattr(event, "jet{0}_aeta".format(ij), 0)
+            setattr(event, "jet{0}_btag".format(ij), 0)
+
         for ij, jet in enumerate(event.good_jets):
             setattr(event, "jet{0}_pt".format(ij), jet.pt)
             setattr(event, "jet{0}_aeta".format(ij), abs(jet.eta))
