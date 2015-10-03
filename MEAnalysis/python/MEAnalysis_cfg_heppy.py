@@ -344,15 +344,51 @@ class Conf:
             #"2t"   : (2, 2, 0),
             "3t"   : (3, 3, 1),
             "ge4t" : (4, 6, 2), # needed for timing 
-            }
         }
+    }
 
-
+    tth_mva = {
+        "filename": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/tth_bdt.pkl",
+        "varlist": [
+            "is_sl",
+            "is_dl",
+            "lep0_pt",
+            "lep0_aeta",
+            "lep1_pt",
+            "lep1_aeta",
+            "jet0_pt",
+            "jet0_btag",
+            "jet0_aeta",
+            "jet1_pt",
+            "jet1_btag",
+            "jet1_aeta",
+            "jet2_pt",
+            "jet2_btag",
+            "jet2_aeta",
+            "mean_bdisc",
+            "mean_bdisc_btag",
+            "min_dr_btag",
+            "mean_dr_btag",
+            "std_dr_btag",
+            "momentum_eig0",
+            "momentum_eig1",
+            "momentum_eig2",
+            "fw_h0",
+            "fw_h1",
+            "fw_h2",
+            "aplanarity",
+            "isotropy",
+            "numJets",
+            "nBCSVM",
+            "Wmass"
+        ]
+    }
+    
     mem = {
 
         #Actually run the ME calculation
         #If False, all ME values will be 0
-        "calcME": True,
+        "calcME": False,
 
         #Generic event-dependent selection function applied
         #just before the MEM. If False, MEM is skipped for all hypos

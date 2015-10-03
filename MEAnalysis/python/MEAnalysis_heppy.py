@@ -232,13 +232,13 @@ sequence = cfg.Sequence([
     brnd,
     btaglr,
     qglr,
-    mva,
     wtag,
     mecat,
     genrad,
     gentth,
     subjet_analyzer,
     mem_analyzer,
+    mva,
     treevar,
     treeProducer
 ])

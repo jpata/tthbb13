@@ -25,7 +25,7 @@ jetType = NTupleObjectType("jetType", variables = [
     NTupleVariable("id", lambda x : x.id),  
     NTupleVariable("qgl", lambda x : x.qgl),
     NTupleVariable("btagCSV", lambda x : x.btagCSV),
-    NTupleVariable("btagCMVAV2", lambda x : x.btagBDT),
+    NTupleVariable("btagBDT", lambda x : x.btagBDT),
     NTupleVariable("bTagWeight", lambda x : x.bTagWeight),
     NTupleVariable("bTagWeightHFUp", lambda x : x.bTagWeightHFUp),
     NTupleVariable("bTagWeightHFDown", lambda x : x.bTagWeightHFDown),
@@ -38,9 +38,9 @@ jetType = NTupleObjectType("jetType", variables = [
     NTupleVariable("bTagWeightJESUp", lambda x : x.bTagWeightJESUp),
     NTupleVariable("bTagWeightJESDown", lambda x : x.bTagWeightJESDown),
 #    NTupleVariable("btagCSVV0", lambda x : x.btagCSVV0),
-    NTupleVariable("btagProb", lambda x : x.btagProb),
-    NTupleVariable("btagSoftEl", lambda x : x.btagSoftEl),
-    NTupleVariable("btagSoftMu", lambda x : x.btagSoftMu),
+    #NTupleVariable("btagProb", lambda x : x.btagProb),
+    #NTupleVariable("btagSoftEl", lambda x : x.btagSoftEl),
+    #NTupleVariable("btagSoftMu", lambda x : x.btagSoftMu),
     NTupleVariable("mcFlavour", lambda x : x.mcFlavour, type=int),
     NTupleVariable("mcMatchId", lambda x : x.mcMatchId, type=int),
     NTupleVariable("hadronFlavour", lambda x : x.hadronFlavour, type=int),
@@ -51,19 +51,19 @@ jetType = NTupleObjectType("jetType", variables = [
     NTupleVariable("mcM", lambda x : x.mcM, mcOnly=True),
     NTupleVariable("mcNumBHadrons", lambda x : x.genjet.numBHadrons if hasattr(x, "genjet") else -1, mcOnly=True),
     NTupleVariable("mcNumCHadrons", lambda x : x.genjet.numCHadrons if hasattr(x, "genjet") else -1, mcOnly=True),
-    NTupleVariable("mcNumBHadronsFromTop", lambda x : getattr(x.genjet, "numBHadronsFromTop") if hasattr(x, "genjet") else -1, mcOnly=True),
-    NTupleVariable("mcNumCHadronsFromTop", lambda x : getattr(x.genjet, "numCHadronsFromTop") if hasattr(x, "genjet") else -1, mcOnly=True),
-    NTupleVariable("mcNumBHadronsAfterTop", lambda x : getattr(x.genjet, "numBHadronsAfterTop") if hasattr(x, "genjet") else -1, mcOnly=True),
-    NTupleVariable("mcNumCHadronsAfterTop", lambda x : getattr(x.genjet, "numCHadronsAfterTop") if hasattr(x, "genjet") else -1, mcOnly=True),
+    #NTupleVariable("mcNumBHadronsFromTop", lambda x : getattr(x.genjet, "numBHadronsFromTop") if hasattr(x, "genjet") else -1, mcOnly=True),
+    #NTupleVariable("mcNumCHadronsFromTop", lambda x : getattr(x.genjet, "numCHadronsFromTop") if hasattr(x, "genjet") else -1, mcOnly=True),
+    #NTupleVariable("mcNumBHadronsAfterTop", lambda x : getattr(x.genjet, "numBHadronsAfterTop") if hasattr(x, "genjet") else -1, mcOnly=True),
+    #NTupleVariable("mcNumCHadronsAfterTop", lambda x : getattr(x.genjet, "numCHadronsAfterTop") if hasattr(x, "genjet") else -1, mcOnly=True),
     NTupleVariable("corr", lambda x : x.corr),
     NTupleVariable("corr_JESUp", lambda x : x.corr_JECUp),
     NTupleVariable("corr_JESDown", lambda x : x.corr_JECDown),
-    NTupleVariable("btagCSVRnd2t",   lambda x : getattr(x, "btagCSVRnd2t",   -99) ),
-    NTupleVariable("btagCSVRnd3t",   lambda x : getattr(x, "btagCSVRnd3t",   -99) ),
-    NTupleVariable("btagCSVRndge4t", lambda x : getattr(x, "btagCSVRndge4t", -99) ),
-    NTupleVariable("btagCSVInp2t",   lambda x : getattr(x, "btagCSVInp2t",   -99) ),
-    NTupleVariable("btagCSVInp3t",   lambda x : getattr(x, "btagCSVInp3t",   -99) ),
-    NTupleVariable("btagCSVInpge4t", lambda x : getattr(x, "btagCSVInpge4t", -99) ),
+    #NTupleVariable("btagCSVRnd2t",   lambda x : getattr(x, "btagCSVRnd2t",   -99) ),
+    #NTupleVariable("btagCSVRnd3t",   lambda x : getattr(x, "btagCSVRnd3t",   -99) ),
+    #NTupleVariable("btagCSVRndge4t", lambda x : getattr(x, "btagCSVRndge4t", -99) ),
+    #NTupleVariable("btagCSVInp2t",   lambda x : getattr(x, "btagCSVInp2t",   -99) ),
+    #NTupleVariable("btagCSVInp3t",   lambda x : getattr(x, "btagCSVInp3t",   -99) ),
+    #NTupleVariable("btagCSVInpge4t", lambda x : getattr(x, "btagCSVInpge4t", -99) ),
 ])
 
 #Specifies what to save for leptons
@@ -122,10 +122,10 @@ memType = NTupleObjectType("memType", variables = [
     NTupleVariable("error_code", lambda x : x.error_code, type=int),
     NTupleVariable("efficiency", lambda x : x.efficiency),
     NTupleVariable("nperm", lambda x : x.num_perm, type=int),
-    NTupleVariable("prefit_code", lambda x : x.prefit_code),
-    NTupleVariable("btag_weight_bb", lambda x : x.btag_weights[0]),
-    NTupleVariable("btag_weight_cc", lambda x : x.btag_weights[1]),
-    NTupleVariable("btag_weight_jj", lambda x : x.btag_weights[2]),
+    #NTupleVariable("prefit_code", lambda x : x.prefit_code),
+    #NTupleVariable("btag_weight_bb", lambda x : x.btag_weights[0]),
+    #NTupleVariable("btag_weight_cc", lambda x : x.btag_weights[1]),
+    #NTupleVariable("btag_weight_jj", lambda x : x.btag_weights[2]),
 ])
 
 branType = NTupleObjectType("branType", variables = [
@@ -628,6 +628,7 @@ def getTreeProducer(conf):
         if not (systematic in conf.general["systematics"]):
             continue
 
+        #scalar variables that have systematic variations
         for vtype in [
             #("btag_lr_4b",          float,      "4b, N-4 light, probability"),
             #("btag_lr_2b",          float,      "2b, N-2 Nlight probability"),
@@ -701,6 +702,8 @@ def getTreeProducer(conf):
             ("pt_drpair_btag",      float,      ""),
             ("passes_jet",          int,        ""),
             ("passes_btag",         int,        ""),
+            ("passes_mem",          int,        "MEM was evaluated"),
+            ("tth_mva",             float,      "ttH vs tt+jets bdt"),
         ]:
             treeProducer.globalVariables += [makeGlobalVariable(vtype, systematic)]
 
