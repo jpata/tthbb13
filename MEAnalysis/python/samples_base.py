@@ -46,8 +46,10 @@ if "kbfi" in hn or "kbfi" in vo:
     def lfn_to_pfn(fn):
 
         #fix to replace broken file names
-        fn = fn.replace("/store/user/gregor/", "/store/user/jpata/")
-        return "file:///hdfs/cms" + fn
+        if fn.startswith("/home"):
+            return fn
+        else:
+            return "file:///hdfs/cms" + fn
 elif "psi" in hn or "psi" in vo:
     # pfPath = "/pnfs/psi.ch/cms/trivcat/"
     # lfPrefix = "dcap://t3se01.psi.ch:22125/"

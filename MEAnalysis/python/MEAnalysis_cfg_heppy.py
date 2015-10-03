@@ -280,7 +280,7 @@ class Conf:
         
             #SL triggers
             "HLT_BIT_HLT_Ele27_eta2p1_WP85_Gsf_HT200_v",
-            "HLT_BIT_HLT_IsoMu24_eta2p1_v"
+            "HLT_BIT_HLT_IsoMu24_eta2p1_v",
             
             #DL triggers
             #mumu
@@ -304,16 +304,16 @@ class Conf:
 
     general = {
         "passall": True,
-        "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV6_finerPt.root",
+        "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV13.root",
         "QGLPlotsFile_flavour": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/Histos_QGL_flavour.root",
         #"sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_722sync.py",
         #"sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_722minisync.py",
         "sampleFile": os.environ["CMSSW_BASE"]+"/python/TTH/MEAnalysis/samples_v13.py",
+        #"sampleFile": os.environ["CMSSW_BASE"]+"/python/TTH/MEAnalysis/samples_pick.py",
         "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions.pickle",
         "transferFunctions_sj_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions_sj.pickle",
-        #"systematics": ["nominal"],
+        "systematics": ["nominal"],
         #"systematics": ["nominal", "JESUp", "JESDown", "raw"],
-        "systematics": ["nominal", "JESUp", "JESDown"],
         
         
         #If the list contains:
@@ -322,7 +322,9 @@ class Conf:
         # "matching" - print out the association between gen and reco objects
         #"verbosity": ["eventboundary", "input", "matching", "gen", "reco", "meminput"],
         "verbosity": [
-            #"trigger",
+            #"eventboundary", #print run:lumi:event
+            #"trigger", #print trigger bits
+            #"input", #print input particles
             #"gen", #print out gen-level info
             #"debug", #very high-level debug info
             #"reco", #info about reconstructed final state
@@ -350,11 +352,18 @@ class Conf:
 
         #Actually run the ME calculation
         #If False, all ME values will be 0
-        "calcME": False,
+        "calcME": True,
 
         #Generic event-dependent selection function applied
-        #just before the MEM. If False, MEM is skipped
-        "selection": lambda event: event.btag_LR_4b_2b > 0.95, #optimized for 40% tth(bb) acceptance
+        #just before the MEM. If False, MEM is skipped for all hypos
+        #note that we set hypothesis-specific cuts below
+        #"selection": lambda event: (event.btag_LR_4b_2b > 0.95 #optimized for 40% tth(bb) acceptance
+        #    or (event.is_sl and event.nBCSVM >= 3) #always calculate for tagged events
+        #    or (event.is_dl and event.nBCSVM >= 2) #always calculate for tagged events
+        #),
+        "selection": lambda event: (event.btag_LR_4b_2b > 0.95 #optimized for 40% tth(bb) acceptance
+            and (event.is_sl and event.numJets >= 6 and event.nBCSVM >= 4) #always calculate for tagged events
+        ),
         
         #This configures what the array elements mean
         #Better not change this
@@ -374,6 +383,7 @@ class Conf:
             # with rnd CSV values
             "DL_0w2h2t_Rndge4t",
             "SL_2w2h2t_sj",
+            "SL_0w2h2t_sj",
 
             #fully-hadronic
             "FH" #Fixme - add other AH categories
@@ -384,11 +394,11 @@ class Conf:
             "SL_0w2h2t",
             "DL_0w2h2t",
             "SL_1w2h2t",
-            "SL_2w2h1t_l",
-            "SL_2w2h1t_h",
+            #"SL_2w2h1t_l",
+            #"SL_2w2h1t_h",
             "SL_2w2h2t",
-            #"SL_2w2h2t",
-            #"SL_2w2h2t_sj",
+            "SL_2w2h2t_sj",
+            "SL_0w2h2t_sj",
             #"SL_2w2h2t_memLR",
             #"SL_0w2h2t_memLR",
             #"DL_0w2h2t_Rndge4t",
@@ -573,12 +583,31 @@ c.do_calculate = lambda ev, mcfg: (
 )
 c.mem_assumptions.add("sl")
 strat = CvectorPermutations()
-strat = CvectorPermutations()
 strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
 strat.push_back(MEM.Permutations.QUntagged)
 strat.push_back(MEM.Permutations.BTagged)
 c.cfg.perm_pruning = strat
 Conf.mem_configs["SL_2w2h2t_sj"] = c
+
+#SL_0w2h2t_sj
+c = MEMConfig()
+# Select the custom jet lists
+c.b_quark_candidates = lambda event: \
+                                     event.boosted_bjets
+c.l_quark_candidates = lambda event: \
+                                     event.boosted_ljets
+c.do_calculate = lambda ev, mcfg: (
+    len(mcfg.lepton_candidates(ev)) == 1 and
+    len(mcfg.b_quark_candidates(ev)) >= 4 and
+    len(mcfg.l_quark_candidates(ev)) >= 0
+)
+c.mem_assumptions.add("sl")
+strat = CvectorPermutations()
+strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
+strat.push_back(MEM.Permutations.QUntagged)
+strat.push_back(MEM.Permutations.BTagged)
+c.cfg.perm_pruning = strat
+Conf.mem_configs["SL_0w2h2t_sj"] = c
 
 ##SL_2w2h2t_sj_perm
 #c = MEMConfig()

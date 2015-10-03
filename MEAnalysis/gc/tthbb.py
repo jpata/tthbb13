@@ -1,7 +1,7 @@
 from TTH.TTHNtupleAnalyzer.CrabHelpers import hadd_from_file, replicate
 import argparse, subprocess, glob, os
 
-version = "Aug31_sync_spring15_V12_65f2f5e"
+version = "Sep28_spring15_prev13_f6c61f"
 
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
@@ -13,16 +13,17 @@ parser.add_argument('--action',
 
 args = parser.parse_args()
 
-vo_se = os.environ["VO_CMS_DEFAULT_SE"]
-
-if "psi.ch" in vo_se:
-    jobs = ["confs/sig-psi.conf", "confs/bkg-psi.conf"]
-elif "kbf" in vo_se:
-    jobs = ["confs/sig-kbfi.conf", "confs/bkg-kbfi.conf"]
-else:
-    jobs = ["confs/sig.conf", "confs/bkg.conf"]
+jobs = [
+    "confs/tth.conf",
+    "confs/ttw1.conf",
+    "confs/ttw2.conf",
+    "confs/ttz1.conf",
+    "confs/ttz2.conf",
+    "confs/tth_nohbb.conf",
+    "confs/ttjets.conf",
+]
 print "Using configs", jobs
-workdirs = ["work.sig", "work.bkg"]
+#workdirs = ["work.sig", "work.bkg"]
 
 #gc = "/shome/jpata/grid-control/GC"
 gc = "./grid-control/go.py"
