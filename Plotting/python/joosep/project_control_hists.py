@@ -27,7 +27,8 @@ dcof_name = os.path.join(full_path, dcard.Datacard.output_datacardname)
 dcof = open(dcof_name, "w")
 
 #Number of parallel processes to run for the histogram projection
-ncores = multiprocessing.cpu_count()
+#ncores = multiprocessing.cpu_count()
+ncores = 10
 
 def weight_str(cut, weight=1.0, lumi=1.0):
     return "weight_xs * sign(genWeight) * {1} * {2} * ({0})".format(cut, weight, lumi)
@@ -128,7 +129,7 @@ def Draw(tf, of, gensyst, *args):
     ntot = tf.GetEntriesFast()
 
     #how many events to process per core
-    chunksize = max(ntot/ncores, 100000)
+    chunksize = max(ntot/ncores, 10000)
     chunks = range(0, ntot, chunksize)
     #print args, len(chunks)
     

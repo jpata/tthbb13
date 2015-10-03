@@ -502,8 +502,7 @@ c.b_quark_candidates = lambda ev: ev.good_jets
 c.l_quark_candidates = lambda ev: []
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 1 and
-    len(mcfg.b_quark_candidates(ev)) >= 3 and
-    ev.nBCSVM >= 3
+    len(mcfg.b_quark_candidates(ev)) >= 3
 )
 c.mem_assumptions.add("sl")
 c.mem_assumptions.add("0w2h2t")
@@ -524,8 +523,7 @@ c.b_quark_candidates = lambda ev: ev.good_jets
 c.l_quark_candidates = lambda ev: []
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 2 and
-    len(mcfg.b_quark_candidates(ev)) >= 4 and
-    ev.nBCSVM >= 3
+    len(mcfg.b_quark_candidates(ev)) >= 4
     #(len(mcfg.l_quark_candidates(ev)) + len(mcfg.b_quark_candidates(ev))) >= 4
 )
 #c.cfg.int_code = 0
