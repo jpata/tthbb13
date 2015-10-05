@@ -638,6 +638,7 @@ c.do_calculate = lambda ev, mcfg: (
     len(mcfg.l_quark_candidates(ev)) >= 0
 )
 c.mem_assumptions.add("sl")
+c.mem_assumptions.add("0w2h2t")
 strat = CvectorPermutations()
 strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
 strat.push_back(MEM.Permutations.QUntagged)
