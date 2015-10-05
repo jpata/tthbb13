@@ -5,19 +5,17 @@ from copy import deepcopy
 import numpy as np
 import copy
 
-def attach_jet_transfer_function(jet, conf, eval_gen=False):
+def attach_jet_transfer_function(jet, conf):
     """
     Attaches transfer functions to the supplied jet based on the jet eta bin.
 
-    eval_gen:specifies how the transfer functions are interpreted
-        If True, TF [0] - reco, x - gen
-        If False, TF [0] - gen, x - reco
+
     """
     jet_eta_bin = 0
     if abs(jet.eta)>1.0:
         jet_eta_bin = 1
-    jet.tf_b = conf.tf_matrix['b'][jet_eta_bin].Make_Formula(eval_gen)
-    jet.tf_l = conf.tf_matrix['l'][jet_eta_bin].Make_Formula(eval_gen)
+    jet.tf_b = conf.tf_formula['b'][jet_eta_bin]
+    jet.tf_l = conf.tf_formula['l'][jet_eta_bin]
     jet.tf_b.SetNpx(10000)
     jet.tf_b.SetRange(0, 500)
 
@@ -35,9 +33,9 @@ class JetAnalyzer(FilterAnalyzer):
 
     def beginLoop(self, setup):
         super(JetAnalyzer, self).beginLoop(setup)
-        self.inputCounter = ROOT.TH1F("JetAnalyzer_Count","Count",1,0,2)
-        self.inputCounterPosWeight = ROOT.TH1F("JetAnalyzer_CountPosWeight","Count genWeight>0",1,0,2)
-        self.inputCounterNegWeight = ROOT.TH1F("JetAnalyzer_CountNegWeight","Count genWeight<0",1,0,2)
+        # self.inputCounter = ROOT.TH1F("JetAnalyzer_Count","Count",1,0,2)
+        # self.inputCounterPosWeight = ROOT.TH1F("JetAnalyzer_CountPosWeight","Count genWeight>0",1,0,2)
+        # self.inputCounterNegWeight = ROOT.TH1F("JetAnalyzer_CountNegWeight","Count genWeight<0",1,0,2)
 
     def variateJets(self, jets, systematic, sigma):
         newjets = deepcopy(jets)
@@ -59,13 +57,13 @@ class JetAnalyzer(FilterAnalyzer):
 
     def process(self, event):
 
-        self.inputCounter.Fill(1)
-        if self.cfg_comp.isMC:
-            genWeight = getattr(event.input, "genWeight")
-            if genWeight > 0:
-                self.inputCounterPosWeight.Fill(1)
-            elif genWeight < 0:
-                self.inputCounterNegWeight.Fill(1)
+        # self.inputCounter.Fill(1)
+        # if self.cfg_comp.isMC:
+        #     genWeight = getattr(event.input, "genWeight")
+        #     if genWeight > 0:
+        #         self.inputCounterPosWeight.Fill(1)
+        #     elif genWeight < 0:
+        #         self.inputCounterNegWeight.Fill(1)
  
         #pt-descending input jets
         if "input" in self.conf.general["verbosity"]:
@@ -103,7 +101,7 @@ class JetAnalyzer(FilterAnalyzer):
             evdict[syst] = res
         event.systResults = evdict
 
-        return np.any([v.passes_jet for v in event.systResults.values()])
+        return self.conf.general["passall"] or np.any([v.passes_jet for v in event.systResults.values()])
 
     def _process(self, event):
         pt_cut  = "pt"
@@ -111,26 +109,83 @@ class JetAnalyzer(FilterAnalyzer):
         if event.is_sl:
             pt_cut  = "pt_sl"
             eta_cut = "eta_sl"
-        if event.is_dl:
+        elif event.is_dl:
             pt_cut  = "pt_dl"
             eta_cut = "eta_dl"
 
-        event.good_jets = sorted(
-            filter(
-                lambda x: (
-                    x.pt > self.conf.jets[ pt_cut ]
-                    and abs(x.eta) < self.conf.jets[ eta_cut ]
-                    and x.neHEF < 0.99
-                    and x.chEmEF < 0.99
-                    and x.neEmEF < 0.99
-                    and x.numberOfDaughters > 1
-                    and x.chHEF > 0.0
-                    and x.chMult > 0.0
-                ), event.Jet
-            ),
-            key=lambda x: x.pt, reverse=True
+        #define lepton-channel specific selection function
+        jetsel = lambda x, oldpt: (
+            x.pt > self.conf.jets[ pt_cut ]
+            and abs(x.eta) < self.conf.jets[ eta_cut ]
+            and self.conf.jets["selection"](x, oldpt)
         )
 
+        event.good_jets = sorted(filter(
+                lambda x: jetsel(x, x.pt), event.Jet+event.DiscardedJet
+            ), key=lambda x: x.pt, reverse=True
+        )
+
+        #Take care of overlaps between jets and veto leptons
+        jets_to_remove = []
+        for lep in event.veto_leptons:
+        
+            #overlaps removed by delta R
+            for jet in event.good_jets:
+                lv1 = lvec(jet)
+                lv2 = lvec(lep)
+                dr = lv1.DeltaR(lv2)
+                if dr < 0.4:
+                    if "jets" in self.conf.general["verbosity"]:
+                        print "[JetAnalyzer: jet lepton cleaning] deltaR", dr, lep.pt, lep.eta, lep.phi, jet.pt, jet.eta, jet.phi
+                    jets_to_remove += [jet]
+            #overlaps removed by jet overlap index
+            #if lep.jetOverlapIdx is None:
+            #    idx = -1
+            #else:
+            #    idx = int(lep.jetOverlapIdx)
+            #if idx != -1:
+            #    coll = event.Jet
+            #    if idx >= 1000:
+            #        coll = event.DiscardedJet
+            #        idx = idx - 1000
+            #    if idx >=0 and idx < len(coll):
+            #        jet = coll[idx]
+            #        if jet in event.good_jets:
+            #            lv1 = lvec(jet)
+            #            lv2 = lvec(lep)
+            #            dr = lv1.DeltaR(lv2)
+            #            #print "pfoverlap", event.input.run, event.input.lumi, event.input.evt, int(lep.jetOverlapIdx), dr, lep.pt, lep.eta, lep.phi, jet.pt, jet.eta, jet.phi
+            #            jets_to_remove += [jet]
+            #            #jet subtraction
+            #            #newjet = deepcopy(jet)
+            #            #p1 = lvec(jet)
+            #            #p2 = lvec(lep)
+
+            #            ##lepton was harder than jet
+            #            #if p1.Pt() < p2.Pt():
+            #            #    print "lepton was harder than jet", p1.Pt(), p2.Pt()
+            #            #    continue
+            #            #p1 = p1 - p2
+            #            #print p1.Pt()
+            #            #newjet.pt = p1.Pt()
+            #            #newjet.eta = p1.Eta()
+            #            #newjet.phi = p1.Phi()
+            #            #newjet.mass = p1.M()
+
+            #            ##apply consistent jet selection, rescaling energy fractions by pt ratio
+            #            #if jetsel(newjet, jet.pt):
+            #            #    print "jet subtracted", jet.pt, newjet.pt, jet.eta, newjet.eta
+            #            #    event.good_jets[event.good_jets.index(jet)] = newjet
+            #            #else:
+            #            #    print "jet does not pass selection after subtraction", jet.pt, newjet.pt, jet.eta, newjet.eta
+            #    else:
+            #        #raise ValueError("wrong idx: idx={0} len(coll)={1}".format(idx, len(coll)))
+            #        print "[JetAnalyzer] jet removal, wrong idx: idx={0} len(coll)={1}".format(idx, len(coll))
+        for jet in jets_to_remove:
+            if "jets" in self.conf.general["verbosity"]:
+                print "removing jet", jet.pt, jet.eta
+            if jet in event.good_jets:
+                event.good_jets.remove(jet)
 
         if "debug" in self.conf.general["verbosity"]:
             print "All jets: ", len(event.Jet)
@@ -209,4 +264,20 @@ class JetAnalyzer(FilterAnalyzer):
         #print (sum_dEx, sum_dEy), (corrMet_px, event.met[0].px), (corrMet_py, event.met[0].py)
         event.MET_jetcorr = MET(px=corrMet_px, py=corrMet_py)
         event.passes_jet = passes
+
+        genjets = event.GenJet
+        for jet in event.good_jets:
+            pt1 = jet.mcPt
+            eta1 = jet.mcEta
+            phi1 = jet.mcPhi
+            mass1 = jet.mcM
+            lv1 = ROOT.TLorentzVector()
+            lv1.SetPtEtaPhiM(pt1, eta1, phi1, mass1)
+            for gj in genjets:
+                lv2 = lvec(gj)
+                if lv1.DeltaR(lv2) < 0.01:
+                    jet.genjet = gj
+                    genjets.remove(gj)
+                    break
+
         return event

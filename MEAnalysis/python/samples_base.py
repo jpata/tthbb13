@@ -9,7 +9,7 @@ xsec = {}
 xsec[("ttjets", "8TeV")] = 252.89
 xsec[("ttjets", "13TeV")] = 831.76
 
-br_h_to_bb = 0.569 ##FIXME should be 0.577 @ mH=125GeV (0.569 is for mH=125.5)
+br_h_to_bb = 0.577
 xsec[("tth", "8TeV")] = 0.1302
 xsec[("tthbb", "8TeV")] = xsec[("tth", "8TeV")] * br_h_to_bb
 
@@ -20,13 +20,13 @@ xsec[("tthbb", "13TeV")] = xsec[("tth", "13TeV")] * br_h_to_bb
 xsec[("qcd_ht300to500", "13TeV")] = 366800.0
 xsec[("qcd_ht500to700", "13TeV")] = 29370.0
 xsec[("qcd_ht700to1000", "13TeV")] = 6524.0
-xsec[("qcd_ht1000to1500", "13TeV")] = 1064.0 #DS
+xsec[("qcd_ht1000to1500", "13TeV")] = 1064.0
 xsec[("qcd_ht1500to2000", "13TeV")] = 121.5
 xsec[("qcd_ht2000toinf", "13TeV")] = 25.42
 
 #Configure the site-specific file path
 import os
-hn = os.environ["HOSTNAME"]
+hn = os.environ.get("HOSTNAME", "")
 vo = os.environ.get("VO_CMS_DEFAULT_SE", "")
 
 def pfn_to_lfn(fn):
@@ -40,7 +40,7 @@ def lfn_to_pfn(fn):
     return fn
 
 #These assume the files are located on the local tier
-if "kbfi" in hn or "comp-" in hn or "kbfi" in vo:
+if "kbfi" in hn or "kbfi" in vo:
     pfPath = "/hdfs/cms/"
     lfPrefix = "file://"
     def lfn_to_pfn(fn):
@@ -59,6 +59,27 @@ elif "psi" in hn or "psi" in vo:
 else:
     print "Warning: host '{0}' VO '{1}' is unknown, using xrootd".format(hn, vo)
     pfPath = ""
-    lfPrefix = "root://cmsxrootd.fnal.gov/"
+    lfPrefix = "root://xrootd-cms.infn.it/"
     def lfn_to_pfn(fn):
         return fn
+
+
+
+def getSampleNGen(sample):
+    import ROOT
+    n = 0
+    ntot = 0
+    for f in sample.subFiles:
+        tfn = lfn_to_pfn(f)
+        tf = ROOT.TFile.Open(tfn)
+        hc = tf.Get("Count")
+        hcpos = tf.Get("CountPosWeight")
+        hcneg = tf.Get("CountNegWeight")
+        n += hcpos.GetBinContent(1)
+        n -= hcneg.GetBinContent(1)
+        ntot += hcpos.GetBinContent(1) 
+        ntot += hcneg.GetBinContent(1) 
+        #print tfn    
+        tf.Close()
+    #print sample.name, ": number of gen events: ",n, ntot
+    return int(n)

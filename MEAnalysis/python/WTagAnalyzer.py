@@ -54,7 +54,7 @@ class WTagAnalyzer(FilterAnalyzer):
             else:
                 event.systResults[syst].passes_wtag = False
         #event.__dict__.update(event.systResults["nominal"].__dict__)
-        return np.any([v.passes_wtag for v in event.systResults.values()])
+        return self.conf.general["passall"] or np.any([v.passes_wtag for v in event.systResults.values()])
 
     def _process(self, event):
         event.Wmass = 0.0

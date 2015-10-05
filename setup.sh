@@ -20,7 +20,7 @@ cd TTH
 git checkout meanalysis-74x
 git clone https://github.com/bianchini/Code.git MEIntegratorStandalone
 cd MEIntegratorStandalone
-git checkout 74x
+
 cd ../..
 #after scram b clean, these need to be copied again
 cp TTH/MEAnalysis/libs/*.so ../lib/$SCRAM_ARCH/

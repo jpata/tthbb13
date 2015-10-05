@@ -2,6 +2,7 @@
 import os
 import PhysicsTools.HeppyCore.framework.config as cfg
 import ROOT
+ROOT.gROOT.SetBatch(True)
 import imp
 
 import itertools
@@ -9,12 +10,11 @@ import itertools
 #pickle and transfer function classes to load transfer functions
 import cPickle as pickle
 import TTH.MEAnalysis.TFClasses as TFClasses
+import sys
+sys.modules["TFClasses"] = TFClasses
 
 #Import the default list of samples
-#from TTH.MEAnalysis.samples_vhbb import samples, sample_version, lfn_to_pfn
-#from TTH.MEAnalysis.samples_722sync import samples, sample_version, lfn_to_pfn
-from TTH.MEAnalysis.samples_74X import samples, sample_version, lfn_to_pfn, getSampleNGen
-
+from TTH.MEAnalysis.samples_base import lfn_to_pfn
 
 #Create configuration object based on environment variables
 #if one runs with ME_CONF=/path/to/conffile.py, then the configuration is loaded from that file
@@ -26,6 +26,7 @@ if os.environ.has_key("ME_CONF"):
 else:
     print "Loading ME config from TTH.MEAnalysis.MEAnalysis_cfg_heppy"
     from TTH.MEAnalysis.MEAnalysis_cfg_heppy import Conf
+from TTH.MEAnalysis.MEAnalysis_cfg_heppy import conf_to_str
 
 #Creates a new configuration object based on MEAnalysis_cfg_heppy
 conf = Conf
@@ -33,13 +34,30 @@ conf = Conf
 #Load transfer functions from pickle file
 pi_file = open(conf.general["transferFunctionsPickle"] , 'rb')
 conf.tf_matrix = pickle.load(pi_file)
+
+#Pre-compute the TF formulae
+# eval_gen:specifies how the transfer functions are interpreted
+#     If True, TF [0] - reco, x - gen
+#     If False, TF [0] - gen, x - reco
+eval_gen=False
+conf.tf_formula = {}
+for fl in ["b", "l"]:
+    conf.tf_formula[fl] = {}
+    for bin in [0, 1]:
+            conf.tf_formula[fl][bin] = conf.tf_matrix[fl][bin].Make_Formula(eval_gen)
+
 pi_file.close()
 
+#Load the subjet transfer functions from pickle file
+pi_file = open(conf.general["transferFunctions_sj_Pickle"] , 'rb')
+conf.tf_sj_matrix = pickle.load(pi_file)
+pi_file.close()
+    
 #Load the input sample dictionary
 #Samples are configured in the Conf object, by default, we use samples_vhbb
 print "loading samples from", conf.general["sampleFile"]
 samplefile = imp.load_source("samplefile", conf.general["sampleFile"])
-from samplefile import samples_dict
+from samplefile import samples_dict, samples
 
 #input component
 #several input components can be declared,
@@ -48,22 +66,20 @@ inputSamples = []
 for sn in sorted(samples_dict.keys()):
     s = samples_dict[sn]
     sample_ngen = s.nGen.value()
-    if (sample_ngen<0):
+    if (s.isMC.value() and sample_ngen<0):
         sample_ngen = getSampleNGen(s)
     inputSample = cfg.Component(
-        s.nickName.value(),
+        s.name.value(),
         files = map(lfn_to_pfn, s.subFiles.value()),
         tree_name = "tree",
         n_gen = sample_ngen,
         xs = s.xSec.value()
     )
     inputSample.isMC = s.isMC.value()
-    inputSample.perJob = s.perJob.value()
+  
     #use sample only if not skipped and subFiles defined
     if s.skip.value() == False and len(s.subFiles.value())>0:
         inputSamples.append(inputSample)
-
-print "Processing samples", [s.name for s in inputSamples]
 
 #Event contents are defined here
 #This is work in progress
@@ -79,6 +95,11 @@ evs = cfg.Analyzer(
 import TTH.MEAnalysis.MECoreAnalyzers as MECoreAnalyzers
 
 #
+counter = cfg.Analyzer(
+    MECoreAnalyzers.CounterAnalyzer,
+    'counter',
+    _conf = conf
+)
 
 evtid_filter = cfg.Analyzer(
     MECoreAnalyzers.EventIDFilterAnalyzer,
@@ -154,6 +175,12 @@ wtag = cfg.Analyzer(
     _conf = conf
 )
 
+subjet_analyzer = cfg.Analyzer(
+    MECoreAnalyzers.SubjetAnalyzer,
+    'subjet',
+    _conf = conf
+)
+
 #Calls the C++ MEM integrator with good_jets, good_leptons and
 #the ME category
 mem_analyzer = cfg.Analyzer(
@@ -161,7 +188,6 @@ mem_analyzer = cfg.Analyzer(
     'mem',
     _conf = conf
 )
-
 
 gentth = cfg.Analyzer(
     MECoreAnalyzers.GenTTHAnalyzer,
@@ -192,6 +218,7 @@ treeProducer = getTreeProducer(conf)
 # definition of a sequence of analyzers,
 # the analyzers will process each event in this order
 sequence = cfg.Sequence([
+    counter,
     evtid_filter,
     evs,
     evtweight,
@@ -199,14 +226,15 @@ sequence = cfg.Sequence([
     trigger,
     leps,
     jets,
+    brnd,
     btaglr,
     qglr,
     mva,
-    brnd,
     wtag,
     mecat,
     genrad,
     gentth,
+    subjet_analyzer,
     mem_analyzer,
     treevar,
     treeProducer
@@ -221,7 +249,6 @@ output_service = cfg.Service(
     fname='tree.root',
     option='recreate'
 )
-print "Creating TChain"
 
 #finalization of the configuration object.
 from PhysicsTools.HeppyCore.framework.chain import Chain as Events
@@ -245,7 +272,7 @@ if __name__ == "__main__":
     #Process all samples in the sample list
     for samp in inputSamples:
 
-        #print "processing sample ", samp
+        print "processing sample ", samp
         config = cfg.Config(
             #Run across these inputs
             components = [samp],
@@ -262,7 +289,7 @@ if __name__ == "__main__":
 
         #Configure the number of events to run
         from PhysicsTools.HeppyCore.framework.looper import Looper
-        nEvents = samp.perJob
+        nEvents = 1000
 
 
         kwargs = {}
@@ -279,9 +306,13 @@ if __name__ == "__main__":
         #execute the code
         looper.loop()
 
+        tf = looper.setup.services["outputfile"].file 
+        tf.cd()
+        ts = ROOT.TNamed("config", conf_to_str(Conf))
+        ts.Write("", ROOT.TObject.kOverwrite)
+        
         #write the output
         looper.write()
-
     #print summaries
     # for analyzer in looper.analyzers:
     #     print analyzer.name, "counters = {\n", analyzer.counters, "}"

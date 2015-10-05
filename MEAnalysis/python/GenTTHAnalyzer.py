@@ -25,21 +25,15 @@ class GenTTHAnalyzer(FilterAnalyzer):
         return True
 
     def _process(self, event):
-        #Somehow, the GenWZQuark distribution is duplicated
+        #FIXME: Somehow, the GenWZQuark distribution is duplicated:
+        #JP: no longer the case in V12
         #event.l_quarks_w = event.GenWZQuark[0:len(event.GenWZQuark)/2]
-        ##LC: temporary fix for issue with dublicate entries in V10 ntuples
-        event.l_quarks_w=[]
-        pts=[]
-        for i in event.GenWZQuark:
-            if (i.pt not in pts):
-                event.l_quarks_w.append(i)
-                pts.append(i.pt)
-
+        event.l_quarks_w = event.GenWZQuark
         event.b_quarks_t = event.GenBQuarkFromTop
         event.b_quarks_h = event.GenBQuarkFromH
         event.lep_top = event.GenLepFromTop
         event.nu_top = event.GenNuFromTop
-
+        
         event.cat_gen = None
         event.cat_gen_n = -1
 
@@ -161,9 +155,19 @@ class GenTTHAnalyzer(FilterAnalyzer):
         event.nMatch_wq_btag = 0
         event.nMatch_tb_btag = 0
         event.nMatch_hb_btag = 0
+        
+        if "debug" in self.conf.general["verbosity"]:
+            print "nMatch {0}_{1}_{2} nMatch_btag {3}_{4}_{5}".format(
+                event.nMatch_wq,
+                event.nMatch_tb,
+                event.nMatch_hb,
+                event.nMatch_wq_btag,
+                event.nMatch_tb_btag,
+                event.nMatch_hb_btag,
+            )
 
-        event.unmatched_b_jets_gen = []
-        event.unmatched_l_jets_gen = []
+        #event.unmatched_b_jets_gen = []
+        #event.unmatched_l_jets_gen = []
         for ij, jet in enumerate(event.good_jets):
 
             jet.tth_match_label = None
@@ -171,17 +175,17 @@ class GenTTHAnalyzer(FilterAnalyzer):
             jet.tth_match_dr = -1
             jet.tth_match_label_numeric = -1
 
-            #Jet did not have a match
+            # #Jet did not have a match
             if not matched_pairs.has_key(ij):
-                jc = copy.deepcopy(jet)
-                jc.pt = jc.mcPt
-                jc.eta = jc.mcEta
-                jc.phi = jc.mcPhi
-                jc.mass = jc.mcM
-                if abs(jet.mcFlavour) == 5:
-                    event.unmatched_b_jets_gen += [jc]
-                else:
-                    event.unmatched_l_jets_gen += [jc]
+                # jc = copy.deepcopy(jet)
+                # jc.pt = jc.mcPt
+                # jc.eta = jc.mcEta
+                # jc.phi = jc.mcPhi
+                # jc.mass = jc.mcM
+                # if abs(jet.mcFlavour) == 5:
+                #     event.unmatched_b_jets_gen += [jc]
+                # else:
+                #     event.unmatched_l_jets_gen += [jc]
                 continue #continue jet loop
 
             mlabel, midx, mdr, mlabel_num = matched_pairs[ij]
