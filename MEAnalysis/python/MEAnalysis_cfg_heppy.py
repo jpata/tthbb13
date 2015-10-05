@@ -320,7 +320,7 @@ class Conf:
 
         #Actually run the ME calculation
         #If False, all ME values will be 0
-        "calcME": False,
+        "calcME": True, #DS
 
         #Generic event-dependent selection function applied
         #just before the MEM. If False, MEM is skipped
@@ -469,8 +469,8 @@ Conf.mem_configs["DL_0w2h2t_Rndge4t"] = c
 c = MEMConfig()
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 0 and
-    len(mcfg.b_quark_candidates(ev)) >= 4 and
-    len(mcfg.l_quark_candidates(ev)) >= 4
+    len(mcfg.b_quark_candidates(ev)) == 4 and #DS
+    len(mcfg.l_quark_candidates(ev)) == 4 #DS
 )
 c.mem_assumptions.add("fh")
 strat = CvectorPermutations()

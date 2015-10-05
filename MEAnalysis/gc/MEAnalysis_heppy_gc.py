@@ -18,7 +18,7 @@ from TTH.MEAnalysis.samples_74X import samples
 firstEvent = int(os.environ["SKIP_EVENTS"])
 nEvents = int(os.environ["MAX_EVENTS"])
 
-fns = os.environ["FILE_NAMES"].split()
+# fns = os.environ["FILE_NAMES"].split()
 dataset = os.environ["DATASETPATH"]
 
 #Create a list of samples to run
@@ -28,7 +28,7 @@ good_samp = []
 for ns in range(len(samples)):
     if samples[ns].nickName.value() == dataset:
         samples[ns].skip = False
-        samples[ns].subFiles = map(lfn_to_pfn, fns)
+        samples[ns].subFiles = map(lfn_to_pfn, samples[ns].subFiles ) #DS
         good_samp += [samples[ns]]
     else:
         samples[ns].skip = True
