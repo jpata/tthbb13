@@ -16,20 +16,6 @@ immutable Jet <: AbstractParticle
 	id::Int64
 	bdisc::Float64
 end
-# 
-# immutable Lepton <: AbstractParticle
-# 	p::FourVectorSph
-# 	id::Int64
-# 	iso::Float64
-# end
-# 
-# immutable Top <: AbstractParticle
-# 	p::FourVectorSph
-# end
-# 
-# immutable SignalLepton <: AbstractParticle
-# 	idx::Int64
-# end
 
 abstract AbstractEvent
 
@@ -44,6 +30,8 @@ immutable Event <: AbstractEvent
 	is_dl::Bool
 	weight_xs::Float64
 	weight_gen::Float64
+	mem_tth_p::Vector{Float64}
+	mem_ttbb_p::Vector{Float64}
 	run::Int64
 	lumi::Int64
 	evt::Int64
@@ -78,32 +66,14 @@ function parse_branches{P <: Jet}(
     return particles
 end
 
-function parse_event{T}(df::TreeDataFrame{T})
-    jets = parse_branches(df, Jet)
-    #leps = parse_branches(df, i, Lepton)
-    #sig_leps = parse_branches(df, i, SignalLepton)
-
-    #vtype_ = df[i, :hypo1]
-    Event(
-        jets,
-        df.row.numJets(),
-        df.row.nBCSVM(),
-
-        df.row.is_sl(),
-        df.row.is_dl(),
-        df.row.weight_xs(),
-        df.row.genWeight(),
-
-        df.row.run(),
-        df.row.lumi(),
-        df.row.evt(),
-    )
-end
-
 @generated function parse_event{T, S}(df::TreeDataFrame{T}, s::Type{Val{S}})
     #println("generating parse_event{$df, $s}")
 
-    syst = string("_", s.parameters[1].parameters[1])
+	if s == Type{Val{:nominal}}
+		syst = ""
+	else
+    	syst = string("_", s.parameters[1].parameters[1])
+	end
     ex = quote
         jets = parse_branches(df, Jet)
         Event(
@@ -116,6 +86,9 @@ end
             df.row.weight_xs(),
             df.row.genWeight(),
 
+			df.row.mem_tth_p(),
+			df.row.mem_ttbb_p(),
+
             df.row.run(),
             df.row.lumi(),
             df.row.evt(),
@@ -123,6 +96,9 @@ end
     end
     #println(ex)
     return ex
+end
+
+@generated function systweight{T}(ev::Event, lumi, t::Val{T})
 end
 
 weight(ev::Event, lumi) = lumi * ev.weight_xs * ev.weight_gen

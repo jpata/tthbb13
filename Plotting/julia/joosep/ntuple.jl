@@ -8,8 +8,6 @@ using Kinematics, HEP, Histograms, ROOT, ROOTDataFrames, ROOTHistograms, DataFra
 
 const LUMI = 10000.0
 
-fill! = push!
-
 function process_event!(results, ev, prefix, syst)
     if ev.numJets == 5
         if ev.nBCSVM == 2
@@ -33,18 +31,24 @@ end
 
 function make_results(prefix, syst)
 
-    jet_pt_bins = linspace(0, 500, 100)
+    jet_pt_bins = [-Inf, linspace(0, 500, 100)..., Inf]
+    mem_bins = [-Inf, linspace(0, 1, 7)..., Inf]
 
     results = Dict{Any, ErrorHistogram}()
     for k in [:sl_j5_t2, :sl_j5_t3, :sl_j5_tge4, :sl_jge6_t2, :sl_jge6_t3, :sl_jge6_tge4]
         results[tuple(prefix, k, :jet0_pt, syst)] = ErrorHistogram(jet_pt_bins)
+        results[tuple(prefix, k, :mem_SL_0w2h2t, syst)] = ErrorHistogram(mem_bins)
+        results[tuple(prefix, k, :mem_SL_2w2h2t, syst)] = ErrorHistogram(mem_bins)
+        results[tuple(prefix, k, :mem_DL_0w2h2t, syst)] = ErrorHistogram(mem_bins)
+        results[tuple(prefix, k, :mem_SL_0w2h2t_sj, syst)] = ErrorHistogram(mem_bins)
+        results[tuple(prefix, k, :mem_SL_2w2h2t_sj, syst)] = ErrorHistogram(mem_bins)
     end
 
     return results
 end
 
 function fill_histograms_1!(results, ev, key, syst)
-    fill!(
+    push!(
         results[tuple(key..., :jet0_pt, syst)],
         pt(ev.jets[1]),
         weight(ev, LUMI)
@@ -52,8 +56,8 @@ function fill_histograms_1!(results, ev, key, syst)
 end
 
 const ResultDict = Dict{Any, ErrorHistogram}
-function process_sample(fn, prefix;range=nothing, do_cache=true, nprint=5)
-    println("processing $fn")
+function process_sample(fn, prefix;range=nothing, do_cache=true, nprint=0)
+    #println("processing $fn")
     isfile(fn) || error("file not found: $fn")
     df = TreeDataFrame([fn]; treename="tree")
     if range == nothing
@@ -83,10 +87,10 @@ function process_sample(fn, prefix;range=nothing, do_cache=true, nprint=5)
     fail_lep = 0
     idx1 = 1
     idx2 = 1
-    println("looping $range")
+    #println("looping $range")
     for idx1 in range
 
-        idx1%10000==0 && println("ev=$idx1 dt(10k)=", Int64(round(idx1/(time()-t0))))
+        #idx1%10000==0 && println("ev=$idx1 dt(10k)=", Int64(round(idx1/(time()-t0))))
 
         #Load the TTree row
         nloaded += load_row(df, idx1)
@@ -98,14 +102,13 @@ function process_sample(fn, prefix;range=nothing, do_cache=true, nprint=5)
         df.row.numJets() >= 3 || continue
         df.row.nBCSVM() >= 1 || continue
 
-        #Get the primary event interpretation
-        const ev = parse_event(df)
-        if idx1<=nprint
-            println("$(ev.run):$(ev.lumi):$(ev.evt)")
-        end
-        const ev_JESUp = parse_event(df, Val{:JESUp})
-        const ev_JESDown = parse_event(df, Val{:JESDown})
-        evd = Dict(:nominal=>ev, :JESUp=>ev_JESUp, :JESDown=>ev_JESDown)
+        #const ev_JESUp = parse_event(df, Val{:JESUp})
+        #const ev_JESDown = parse_event(df, Val{:JESDown})
+        const evd = Dict{Symbol, Event}(
+            :nominal => parse_event(df, Val{:nominal}),
+            #:JESUp=>ev_JESUp,
+            #:JESDown=>ev_JESDown
+        )
         
         if idx1<=nprint
             for (syst, ev) in evd
@@ -123,7 +126,7 @@ function process_sample(fn, prefix;range=nothing, do_cache=true, nprint=5)
     dt = t1 - t0
     nloaded = nloaded / 1024 / 1024
     const speed = length(range) / dt
-    println("processed $range total, $idx2 passed, $(round(speed, 0)) ev/s, $(round(nloaded/dt)) Mb/s")
+    #println("processed $range total, $idx2 passed, $(round(speed, 0)) ev/s, $(round(nloaded/dt)) Mb/s")
     return results
 end
 
