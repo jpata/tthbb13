@@ -12,7 +12,12 @@ import ROOT
 ROOT.gSystem.Load("libTTHMEAnalysis")
 
 from TTH.MEAnalysis.Analyzer import FilterAnalyzer
-from sklearn.externals import joblib
+try:
+    from sklearn.externals import joblib
+except Exception as e:
+    print "Could not load scikit-learn. Please configure PYTHONPATH=/path/to/anaconda/lib/python2.7/site-packages:$PYTHONPATH PATH=/path/to/anaconda/bin/:$PATH"
+    raise e
+
 CvectorTLorentzVector = getattr(ROOT, "std::vector<TLorentzVector>")
 EventShapeVariables = getattr(ROOT, "EventShapeVariables")
 
