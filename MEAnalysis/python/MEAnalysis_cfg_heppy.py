@@ -304,7 +304,7 @@ class Conf:
 
     general = {
         "passall": True,
-        "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV13.root",
+        "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV13_Oct5.root",
         "QGLPlotsFile_flavour": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/Histos_QGL_flavour.root",
         #"sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_722sync.py",
         #"sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_722minisync.py",
@@ -388,7 +388,7 @@ class Conf:
 
         #Actually run the ME calculation
         #If False, all ME values will be 0
-        "calcME": True,
+        "calcME": False,
 
         #Generic event-dependent selection function applied
         #just before the MEM. If False, MEM is skipped for all hypos
@@ -429,7 +429,7 @@ class Conf:
         "methodsToRun": [
             "SL_0w2h2t",
             "DL_0w2h2t",
-            "SL_1w2h2t",
+            #"SL_1w2h2t",
             #"SL_2w2h1t_l",
             #"SL_2w2h1t_h",
             "SL_2w2h2t",

@@ -28,13 +28,7 @@ cd ${CMSSW_BASE}/src/TTH/MEAnalysis/
 export SCRAM_ARCH="slc6_amd64_gcc491"
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 
-#call cmsenv
-eval `scramv1 runtime -sh`
-
-#make sure we have the correct custom python environment
-export PYTHONPATH=~joosep/anaconda/lib/python2.7/site-packages:$PYTHONPATH
-export LD_LIBRARY_PATH=~joosep/anaconda/lib/:$LD_LIBRARY_PATH
-export PATH=~joosep/anaconda/bin/:$PATH
+source ${CMSSW_BASE}/src/TTH/setenv_kbfi.sh
 
 #go to work directory
 cd $MY_SCRATCH
