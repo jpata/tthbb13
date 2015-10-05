@@ -1,6 +1,8 @@
 
 using ROOT, ROOTDataFrames, DataFrames, ROOTHistograms, Histograms
 
+const OUTFILE = ARGS[1]
+
 function process(df, ofname, maxev=-1)
     t0 = time()
     out = TreeDataFrame(
@@ -64,4 +66,4 @@ df = TreeDataFrame([
     "$path/TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9_ttll.root",
 ]; treename="tree")
 
-process(df, "jets.root")
+process(df, OUTFILE)
