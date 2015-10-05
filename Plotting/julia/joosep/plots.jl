@@ -16,41 +16,25 @@ function process_sample(name, file)
     df = TreeDataFrame([file]; treename="tree")
 
     hists = Dict(
-        :mem1=>ErrorHistogram([-Inf, linspace(0.0, 1.0, 7)..., Inf]),
-        :mem2=>ErrorHistogram([-Inf, linspace(0.0, 1.0, 7)..., Inf]),
-        :mem3=>ErrorHistogram([-Inf, linspace(0.0, 1.0, 7)..., Inf]),
+        :mem_SL_0w2h2t=>ErrorHistogram([-Inf, linspace(0.0, 1.0, 7)..., Inf]),
+        :mem_SL_0w2h2t_sj=>ErrorHistogram([-Inf, linspace(0.0, 1.0, 7)..., Inf]),
+        :mem_SL_2w2h2t=>ErrorHistogram([-Inf, linspace(0.0, 1.0, 7)..., Inf]),
         :mem4=>ErrorHistogram([-Inf, linspace(0.0, 1.0, 7)..., Inf]),
         :mva=>ErrorHistogram([-Inf, linspace(0.0, 1.0, 21)..., Inf]),
     )
     
     memfn(row, i, w=0.2) = row.mem_tth_p()[i] > 0 ? row.mem_tth_p()[i] / (row.mem_tth_p()[i] + w*row.mem_ttbb_p()[i]) : 0.0
     function fillfunc(row)
-        push!(
-            hists[:mem1],
-            memfn(row, 1, 0.2)
-        )
-        push!(
-            hists[:mem2],
-            memfn(row, 11, 0.2)
-        )
-        push!(
-            hists[:mem3],
-            memfn(row, 6, 0.2)
-        )
-        push!(
-            hists[:mem4],
-            memfn(row, 10, 0.2)
-        )
-        push!(
-            hists[:mva],
-            row.tth_mva()
-        )
+        push!(hists[:mem_SL_0w2h2t], memfn(row, 1, 0.2))
+        push!(hists[:mem_SL_0w2h2t_sj], memfn(row, 11, 0.2))
+        push!(hists[:mem_SL_2w2h2t], memfn(row, 6, 0.2))
+        push!(hists[:mem_SL_2w2h2t_sj], memfn(row, 10, 0.2))
+        push!(hists[:mva], row.tth_mva())
     end
 
     loop(df,
         fillfunc,
         #row-> row.is_sl() == 1 && row.numJets() == 4 && row.nBCSVM() == 2 && row.btag_LR_4b_2b() > 0.95 && row.n_excluded_bjets() < 2 && row.ntopCandidate() == 1,
-        row-> row.is_sl() == 1 && row.numJets() == 4 && row.nBCSVM() == 2 && row.btag_LR_4b_2b() > 0.95,
         row-> row.is_sl() == 1 && row.numJets() == 4 && row.nBCSVM() == 2 && row.btag_LR_4b_2b() > 0.95,
         [:is_sl, :is_dl, :mem_tth_p, :mem_ttbb_p, :numJets, :nBCSVM, :btag_LR_4b_2b, :njets, :jets_pt, :n_excluded_bjets, :ntopCandidate, :tth_mva],
         1:length(df),
