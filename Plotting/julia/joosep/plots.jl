@@ -15,45 +15,50 @@ samples = Dict(
 function process_sample(name, file)
     df = TreeDataFrame([file]; treename="tree")
 
-    hmem1 = ErrorHistogram([-Inf, linspace(0.0, 1.0, 7)..., Inf])
-    hmem2 = ErrorHistogram([-Inf, linspace(0.0, 1.0, 7)..., Inf])
-    hmem3 = ErrorHistogram([-Inf, linspace(0.0, 1.0, 7)..., Inf])
-    hmem4 = ErrorHistogram([-Inf, linspace(0.0, 1.0, 7)..., Inf])
-    hpt = ErrorHistogram([-Inf, linspace(0.0, 500, 100)..., Inf])
-
+    hists = Dict(
+        :mem1=>ErrorHistogram([-Inf, linspace(0.0, 1.0, 7)..., Inf]),
+        :mem2=>ErrorHistogram([-Inf, linspace(0.0, 1.0, 7)..., Inf]),
+        :mem3=>ErrorHistogram([-Inf, linspace(0.0, 1.0, 7)..., Inf]),
+        :mem4=>ErrorHistogram([-Inf, linspace(0.0, 1.0, 7)..., Inf]),
+        :mva=>ErrorHistogram([-Inf, linspace(0.0, 1.0, 21)..., Inf]),
+    )
+    
     memfn(row, i, w=0.2) = row.mem_tth_p()[i] > 0 ? row.mem_tth_p()[i] / (row.mem_tth_p()[i] + w*row.mem_ttbb_p()[i]) : 0.0
     function fillfunc(row)
         push!(
-            hmem1,
+            hists[:mem1],
             memfn(row, 1, 0.2)
         )
         push!(
-            hmem2,
+            hists[:mem2],
             memfn(row, 11, 0.2)
         )
         push!(
-            hmem3,
+            hists[:mem3],
             memfn(row, 6, 0.2)
         )
         push!(
-            hmem4,
+            hists[:mem4],
             memfn(row, 10, 0.2)
         )
-        push!(hpt, df.row.jets_pt()[1])
+        push!(
+            hists[:mva],
+            row.tth_mva()
+        )
     end
 
     loop(df,
         fillfunc,
         row-> row.is_sl() == 1 && row.numJets() >= 6 && row.nBCSVM() >= 4 && row.btag_LR_4b_2b() > 0.95 && row.n_excluded_bjets() < 2 && row.ntopCandidate() == 1,
-        [:is_sl, :mem_tth_p, :mem_ttbb_p, :numJets, :nBCSVM, :btag_LR_4b_2b, :njets, :jets_pt, :n_excluded_bjets, :ntopCandidate],
+        [:is_sl, :mem_tth_p, :mem_ttbb_p, :numJets, :nBCSVM, :btag_LR_4b_2b, :njets, :jets_pt, :n_excluded_bjets, :ntopCandidate, :tth_mva],
         1:length(df),
     )
     return Dict(
-        "$name/mem_SL_0w2h2t"=>hmem1,
-        "$name/mem_SL_0w2h2t_sj"=>hmem2,
-        "$name/mem_SL_2w2h2t"=>hmem3,
-        "$name/mem_SL_2w2h2t_sj"=>hmem4,
-        "$name/jet0_pt"=>hpt
+        "$name/mem_SL_0w2h2t"=>hists[:mem1],
+        "$name/mem_SL_0w2h2t_sj"=>hists[:mem2],
+        "$name/mem_SL_2w2h2t"=>hists[:mem3],
+        "$name/mem_SL_2w2h2t_sj"=>hists[:mem4],
+        "$name/mva"=>hists[:mva],
     )
 end
 
