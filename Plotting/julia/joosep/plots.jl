@@ -49,9 +49,10 @@ function process_sample(name, file)
 
     loop(df,
         fillfunc,
-        row-> row.is_sl() == 1 && row.numJets() == 6 && row.nBCSVM() == 3 && row.btag_LR_4b_2b() > 0.95 && row.n_excluded_bjets() < 2 && row.ntopCandidate() == 1,
-        #row-> row.is_sl() == 1 && row.numJets() == 5 && row.nBCSVM() == 3 && row.btag_LR_4b_2b() > 0.95,
-        [:is_sl, :mem_tth_p, :mem_ttbb_p, :numJets, :nBCSVM, :btag_LR_4b_2b, :njets, :jets_pt, :n_excluded_bjets, :ntopCandidate, :tth_mva],
+        #row-> row.is_sl() == 1 && row.numJets() == 4 && row.nBCSVM() == 2 && row.btag_LR_4b_2b() > 0.95 && row.n_excluded_bjets() < 2 && row.ntopCandidate() == 1,
+        row-> row.is_sl() == 1 && row.numJets() == 4 && row.nBCSVM() == 2 && row.btag_LR_4b_2b() > 0.95,
+        row-> row.is_sl() == 1 && row.numJets() == 4 && row.nBCSVM() == 2 && row.btag_LR_4b_2b() > 0.95,
+        [:is_sl, :is_dl, :mem_tth_p, :mem_ttbb_p, :numJets, :nBCSVM, :btag_LR_4b_2b, :njets, :jets_pt, :n_excluded_bjets, :ntopCandidate, :tth_mva],
         1:length(df),
     )
     return Dict(
