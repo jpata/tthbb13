@@ -2,6 +2,8 @@ from TTH.MEAnalysis.Analyzer import FilterAnalyzer
 
 class TreeVarAnalyzer(FilterAnalyzer):
     """
+    Flattens the systematic dictionary into the event.
+    {"JESUp": res} => event.res_JESUp
     """
 
     def __init__(self, cfg_ana, cfg_comp, looperName):
@@ -26,13 +28,7 @@ class TreeVarAnalyzer(FilterAnalyzer):
             for k, v in event_syst.__dict__.items():
                 event.__dict__[k + "_" + syst] = v
         
-            #for k, v in event_syst.__dict__.items():
-            #    print syst, k, v 
-        #for k, v in event.__dict__.items():
-        #    print "Event", k, v 
-        
         for br in ["boosted_bjets", "boosted_ljets", "topCandidate", "othertopCandidate", "higgsCandidate"]:
             if not hasattr(event, br+"_nominal"):
                 setattr(event, br + "_nominal", [])
-
         return True

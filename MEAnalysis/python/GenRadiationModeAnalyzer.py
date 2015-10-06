@@ -15,11 +15,11 @@ class GenRadiationModeAnalyzer(FilterAnalyzer):
         super(GenRadiationModeAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
 
     def process(self, event):
-        for (syst, event_syst) in event.systResults.items():
-            if event_syst.passes_jet:
-                res = self._process(event_syst)
-                event.systResults[syst] = res
-        #event.__dict__.update(event.systResults["nominal"].__dict__)
+        if self.cfg_comp.isMC:
+            for (syst, event_syst) in event.systResults.items():
+                if event_syst.passes_jet:
+                    res = self._process(event_syst)
+                    event.systResults[syst] = res
         return True
 
     def _process(self, event):

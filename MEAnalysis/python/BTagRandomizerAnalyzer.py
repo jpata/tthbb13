@@ -50,9 +50,10 @@ class BTagRandomizerAnalyzer(FilterAnalyzer):
         super(BTagRandomizerAnalyzer, self).beginLoop(setup)
 
     def process(self, event):
-        for (syst, event_syst) in event.systResults.items():
-            res = self._process(event_syst)
-            event.systResults[syst] = res
+        if self.cfg_comp.isMC:
+            for (syst, event_syst) in event.systResults.items():
+                res = self._process(event_syst)
+                event.systResults[syst] = res
         return True
 
     def _process(self, event):

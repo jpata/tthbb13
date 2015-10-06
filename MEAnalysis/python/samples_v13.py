@@ -18,7 +18,7 @@ sample_version = "V13_pre"
 samples = cms.VPSet([
 
     cms.PSet(
-        skip     = cms.bool(False),
+        skip     = cms.bool(True),
         name     = cms.string('ttHToNonbb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2'),
         nickname = cms.string("ttH_nohbb"),
         xSec     = cms.double(xsec[("tth_nonbb", "13TeV")]),
@@ -61,17 +61,17 @@ samples = cms.VPSet([
             "/store/t3groups/ethz-higgs/run2/VHBBHeppyV13/ttHToNonbb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V13_ttHToNonbb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/151002_060008/0000/tree_13.root",
             "/store/t3groups/ethz-higgs/run2/VHBBHeppyV13/ttHToNonbb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V13_ttHToNonbb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/151002_060008/0000/tree_15.root",
             "/store/t3groups/ethz-higgs/run2/VHBBHeppyV13/ttHToNonbb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V13_ttHToNonbb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/151002_060008/0000/tree_31.root",
-                    ]),
-                    isMC     = cms.bool(True)
-                ),
+       ]),
+       isMC     = cms.bool(True)
+   ),
                 
-                cms.PSet(
-                    skip     = cms.bool(False),
-                    name     = cms.string('ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1'),
-                    nickname = cms.string("ttH_hbb"),
-                    xSec     = cms.double(xsec[("tthbb", "13TeV")]),
-                    nGen     = cms.int64(1397430),
-                    subFiles = cms.vstring([
+   cms.PSet(
+       skip     = cms.bool(False),
+       name     = cms.string('ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1'),
+       nickname = cms.string("ttH_hbb"),
+       xSec     = cms.double(xsec[("tthbb", "13TeV")]),
+       nGen     = cms.int64(1397430),
+       subFiles = cms.vstring([
             "/store/t3groups/ethz-higgs/run2/VHBBHeppyV13/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V13_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/151002_055808/0000/tree_43.root",
             "/store/t3groups/ethz-higgs/run2/VHBBHeppyV13/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V13_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/151002_055808/0000/tree_47.root",
             "/store/t3groups/ethz-higgs/run2/VHBBHeppyV13/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V13_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/151002_055808/0000/tree_11.root",
@@ -98,7 +98,7 @@ samples = cms.VPSet([
     ),
 
     cms.PSet(
-        skip     = cms.bool(False),
+        skip     = cms.bool(True),
         name     = cms.string('TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1'),
         nickname = cms.string("ttw_wlnu"),
         xSec     = cms.double(1.152 * (1.0 - 0.676)),
@@ -109,7 +109,7 @@ samples = cms.VPSet([
     ),
 
     cms.PSet(
-        skip     = cms.bool(False),
+        skip     = cms.bool(True),
         name     = cms.string('TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1'),
         nickname = cms.string("ttw_wqq"),
         xSec     = cms.double(1.152 * 0.676),
@@ -121,7 +121,7 @@ samples = cms.VPSet([
             
             
     cms.PSet(
-        skip     = cms.bool(False),
+        skip     = cms.bool(True),
         name     = cms.string('TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1'),
         nickname = cms.string("ttz_zllnunu"),
         xSec     = cms.double(2.232 * (3 * 0.03365 + 0.2)),
@@ -132,7 +132,7 @@ samples = cms.VPSet([
     ),
 
     cms.PSet(
-        skip     = cms.bool(False),
+        skip     = cms.bool(True),
         name     = cms.string('TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1'),
         nickname = cms.string("ttz_zqq"),
         xSec     = cms.double(2.232 * 0.699),
@@ -143,7 +143,7 @@ samples = cms.VPSet([
     ),
 
     cms.PSet(
-        skip     = cms.bool(False),
+        skip     = cms.bool(True),
         name     = cms.string('TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2'),
         nickname = cms.string("ttjets"),
         xSec     = cms.double(xsec[("ttjets", "13TeV")]),
@@ -390,7 +390,7 @@ samples = cms.VPSet([
     ),
     
     cms.PSet(
-        skip     = cms.bool(False),
+        skip     = cms.bool(True),
         name     = cms.string('TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9_ext3-v1'),
         nickname = cms.string("ttjets"),
         xSec     = cms.double(xsec[("ttjets", "13TeV")]),
@@ -1521,7 +1521,7 @@ samples = cms.VPSet([
             "/store/t3groups/ethz-higgs/run2/VHBBHeppyV13/SingleMuon/VHBB_HEPPY_V13_SingleMuon__Run2015C-PromptReco-v1/151002_085004/0000/tree_98.root",
             "/store/t3groups/ethz-higgs/run2/VHBBHeppyV13/SingleMuon/VHBB_HEPPY_V13_SingleMuon__Run2015C-PromptReco-v1/151002_085004/0000/tree_99.root",
         ]),
-        isMC     = cms.bool(True)
+        isMC     = cms.bool(False)
     ),
     
     cms.PSet(
@@ -1592,7 +1592,7 @@ samples = cms.VPSet([
             "/store/t3groups/ethz-higgs/run2/VHBBHeppyV13/SingleElectron/VHBB_HEPPY_V13_SingleElectron__Run2015C-PromptReco-v1/151002_101048/0000/tree_8.root",
             "/store/t3groups/ethz-higgs/run2/VHBBHeppyV13/SingleElectron/VHBB_HEPPY_V13_SingleElectron__Run2015C-PromptReco-v1/151002_101048/0000/tree_9.root",
         ]),
-        isMC     = cms.bool(True)
+        isMC     = cms.bool(False)
     ),
     cms.PSet(
         skip     = cms.bool(False),
@@ -1693,7 +1693,7 @@ samples = cms.VPSet([
             "/store/t3groups/ethz-higgs/run2/VHBBHeppyV13/DoubleMuon/VHBB_HEPPY_V13_DoubleMuon__Run2015C-PromptReco-v1/151002_100859/0000/tree_93.root",
             "/store/t3groups/ethz-higgs/run2/VHBBHeppyV13/DoubleMuon/VHBB_HEPPY_V13_DoubleMuon__Run2015C-PromptReco-v1/151002_100859/0000/tree_94.root",
         ]),
-        isMC     = cms.bool(True)
+        isMC     = cms.bool(False)
     ),
     
 ])
