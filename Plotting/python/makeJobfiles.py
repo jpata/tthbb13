@@ -1,6 +1,7 @@
 import TTH.Plotting.Samples as Samples
 import ROOT, json
 
+#these samples will be enabled
 sampstorun = [
     "ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
     "ttHToNonbb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2",
@@ -15,6 +16,8 @@ sampstorun = [
     "TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
     "TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
 ]
+#entries per job
+perjob = 500000
 
 def chunks(l, n):
     """Yield successive n-sized chunks from l."""
@@ -28,7 +31,9 @@ for samp in sampstorun:
     for fn in s.fileNamesS2:
         tf.AddFile(fn)
     nEntries = tf.GetEntries()
-    for ch in chunks(range(nEntries), 500000):
+    for ch in chunks(range(nEntries), perjob):
+
+        #default configuration
         ret = {
             "filenames": s.fileNamesS2,
             "lumi": 10000.0,
@@ -39,7 +44,7 @@ for samp in sampstorun:
             "printEvery": 0,
             "btagLRCuts": {
                 "dl:j3_t2": 0.2,
-                "dl:jge3_tge3": 4.4,
+                "dl:jge3_t3": 4.4,
                 "dl:jge4_t2": 0.5,
                 "dl:jge4_tge4": 8.9,
                 "sl:j4_t3": 4.1,

@@ -16,6 +16,7 @@ xsec[("tthbb", "8TeV")] = xsec[("tth", "8TeV")] * br_h_to_bb
 #https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageAt1314TeV#s_13_0_TeV
 xsec[("tth", "13TeV")] = 0.5085
 xsec[("tthbb", "13TeV")] = xsec[("tth", "13TeV")] * br_h_to_bb
+xsec[("tth_nonbb", "13TeV")] = xsec[("tth", "13TeV")] * (1.0 - br_h_to_bb)
 
 xsec[("qcd_ht300to500", "13TeV")] = 366800.0
 xsec[("qcd_ht500to700", "13TeV")] = 29370.0

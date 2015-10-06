@@ -20,43 +20,8 @@ import sklearn.metrics
 from sklearn.ensemble import GradientBoostingClassifier
 import math
 
-
 matplotlib.rc("axes", labelsize=24)
 matplotlib.rc("axes", titlesize=16)
-
-path = "/Users/joosep/Documents/tth/data/ntp/v12/Sep4_fullrun/"
-samples = {
-    "tth_amcatnlo": [
-        path + "/ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8_hbb.root",
-        #path + "/ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8_hX.root",
-    ],
-    "tth_phys14": [
-        "/Users/joosep/Documents/tth/data/ntp/v10_phys14/Aug20_564f1b8_phys14_ref1/tth_13tev_amcatnlo_pu20bx25_hbb.root"
-    ],
-    
-    
-    "ttjets_amcatnlo": [
-        path + "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ttbb.root",
-        path + "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_tt2b.root",
-        path + "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ttb.root",
-        path + "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ttcc.root",
-        path + "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ttll.root",
-    ],
-    "ttjets_phys14": [
-        "/Users/joosep/Documents/tth/data/ntp/v10_phys14/Aug20_564f1b8_phys14_ref1/ttjets_13tev_madgraph_pu20bx25_phys14.root"
-    ],
-    "tth_powheg": [
-        path + "ttHTobb_M125_13TeV_powheg_pythia8_hbb.root",
-        #path + "ttHTobb_M125_13TeV_powheg_pythia8_hX.root",
-    ],
-    "ttjets_powheg": [
-        path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttbb.root",
-        path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_tt2b.root",
-        path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttb.root",
-        path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttcc.root",
-        path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttll.root",
-    ],
-}
 
 def process_sample_hist(fnames, hname, func, bins, cut, **kwargs):
     tt = ROOT.TChain("tree")
@@ -313,7 +278,7 @@ def draw_data_mc(tf, hname, samples, **kwargs):
     else:
         a1 = plt.axes()
         
-    plt.title("CMS preliminary simulation\n $\sqrt{s} = 13$ TeV"+title_extended,
+    plt.title("CMS simulation\n $\sqrt{s} = 13$ TeV"+title_extended,
         y=0.96, x=0.04,
         horizontalalignment="left", verticalalignment="top"
     )
@@ -400,8 +365,10 @@ def draw_mem_data_mc(*args, **kwargs):
 def calc_roc(h1, h2):
     h1 = h1.Clone()
     h2 = h2.Clone()
-    h1.Scale(1.0 / h1.Integral())
-    h2.Scale(1.0 / h2.Integral())
+    if h1.Integral()>0:
+        h1.Scale(1.0 / h1.Integral())
+    if h2.Integral()>0:
+        h2.Scale(1.0 / h2.Integral())
     roc = np.zeros((h1.GetNbinsX()+2, 2))
     err = np.zeros((h1.GetNbinsX()+2, 2))
     e1 = ROOT.Double(0)
@@ -583,3 +550,8 @@ def syst_comparison(tf, sn, l, **kwargs):
     a2.set_ylim(0.9, 1.1)
     plt.axhline(1.0, color="black")
     #fill_between(h1, h2, hatch="\\\\", facecolor="none", edgecolor="black", lw=0, zorder=10)
+
+
+def svfg(fn):
+    plt.savefig(fn, pad_inches=0.5, bbox_inches='tight')
+    plt.clf()

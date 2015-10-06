@@ -154,8 +154,17 @@ genrad = cfg.Analyzer(
 btaglr = cfg.Analyzer(
     MECoreAnalyzers.BTagLRAnalyzer,
     'btaglr',
-    _conf = conf
+    _conf = conf,
+    btagAlgo = "btagCSV"
 )
+
+##calculates the b-tag likelihood ratio
+#btaglr_bdt = cfg.Analyzer(
+#    MECoreAnalyzers.BTagLRAnalyzer,
+#    'btaglr_bdt',
+#    _conf = conf,
+#    btagAlgo = "btagBDT"
+#)
 
 #calculates the b-tag likelihood ratio
 qglr = cfg.Analyzer(
@@ -231,14 +240,15 @@ sequence = cfg.Sequence([
     jets,
     brnd,
     btaglr,
+    #btaglr_bdt,
     qglr,
-    mva,
     wtag,
     mecat,
     genrad,
     gentth,
     subjet_analyzer,
     mem_analyzer,
+    mva,
     treevar,
     treeProducer
 ])
@@ -275,7 +285,6 @@ if __name__ == "__main__":
     #Process all samples in the sample list
     for samp in inputSamples:
 
-        print "processing sample ", samp
         config = cfg.Config(
             #Run across these inputs
             components = [samp],

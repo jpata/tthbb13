@@ -16,10 +16,10 @@ def defaultHistogram(hname):
     In case a histogram was not found for a specific cut, we need to provide a default 0-histogram.
     """
     if hname.startswith("mem_"):
-        return ROOT.TH1D(hname, "mem", 12, 0, 1)
+        return ROOT.TH1D(hname, "mem", 6, 0, 1)
     elif hname.startswith("jet0_pt"):
         return ROOT.TH1D(hname, "pt", 20, 0, 500)
-    return None
+    raise Exception("Undefined default histogram {0}".format(hname))
 
 
 
@@ -30,39 +30,72 @@ def defaultHistogram(hname):
 def copyHistograms(tf, of, hists, channels, processes): 
     #print "Copying existing histograms..."
     
+    #print "copying", processes, channels, hists
     for hist in hists:
         for ch in channels:
             for proc in processes:
     
-                h = tf.Get("{0}/{1}/{2}".format(proc, ch, hist)).Clone()
+                h = tf.Get("{0}/{1}/{2}".format(proc, ch, hist))
+                if h == None:
+                    h = defaultHistogram(hist)
+                h = h.Clone()
                 outdir = "{0}/{1}".format(proc, ch)
                 if of.Get(outdir) == None:
                     of.mkdir(outdir)
                 outdir = of.Get(outdir)
+                #outdir.Add(h)
+                #h.Write("", ROOT.TObject.kOverwrite)
                 h.SetDirectory(outdir)
-                outdir.Write()
+                outdir.Write("", ROOT.TObject.kOverwrite)
     
             # End of loop over processes
         # End of loop over channels
     # End of loop over histograms
-    
-    print "Done."
 
+########################################
+# Copy existing, needed histograms
+#  into new file 
+########################################
+def makeStatVariations(tf, of, hists, channels, processes): 
+    #print "Copying existing histograms..."
+    
+    for hist in hists:
+        for ch in channels:
+            for proc in processes:
+                hn = "{0}/{1}/{2}".format(proc, ch, hist)
+                h = tf.Get(hn)
+                if not h:
+                    h = defaultHistogram(hist)
+                h = h.Clone()
+                outdir = "{0}/{1}".format(proc, ch)
+                if of.Get(outdir) == None:
+                    of.mkdir(outdir)
+                outdir = of.Get(outdir)
+                for ibin in range(1, h.GetNbinsX() + 1):
+                    for sigma, sdir in [(+1, "Up"), (-1, "Down")]:
+                        outdir.cd()
+                        hvar = h.Clone(h.GetName() + "_{0}_{1}_Bin{2}{3}".format(proc, ch, ibin, sdir))
+                        delta = hvar.GetBinError(ibin)
+                        c = hvar.GetBinContent(ibin) + sigma*delta
+                        if c <= 10**-5 and h.Integral()>0:
+                            c = 10**-5
+                        hvar.SetBinContent(ibin, c)
+                        #outdir.Add(hvar)
+                        #hvar.Write("", ROOT.TObject.kOverwrite)
+                        outdir.Write("", ROOT.TObject.kOverwrite)
+    
+            # End of loop over processes
+        # End of loop over channels
+    # End of loop over histograms
 
 ########################################
 # Create fake data
 ########################################
 def fakeData(tf, of, hists, channels, processes):
-    print "Creating fake data..."
-    
     for hist in hists:
-        #print " hist=", hist
         for ch in channels:
-            #print "  channel=", ch
             h = None
             for proc in processes:
-                #print "   proc=", proc
-
                 h2 = tf.Get("{0}/{1}/{2}".format(proc, ch, hist))
                 if h2:
                     if not h:
@@ -76,12 +109,12 @@ def fakeData(tf, of, hists, channels, processes):
             if of.Get(outdir) == None:
                 of.mkdir(outdir)
             outdir = of.Get(outdir)
+            #outdir.Add(h)
+            #h.Write("", ROOT.TObject.kOverwrite)
             h.SetDirectory(outdir)
-            outdir.Write()
+            outdir.Write("", ROOT.TObject.kOverwrite)
         # End of loop over channels
     # End of loop over histograms
-    
-    print "Done."
 
 
 ########################################
@@ -89,13 +122,12 @@ def fakeData(tf, of, hists, channels, processes):
 ########################################
 
 def combineCategories(tf, of, hists, mergers, processes):
-    #print "Combining categories..."
+    #print "Combining categories...", tf, of
     
     for hist in hists:
         for proc in processes:
             #print " combining", hist, proc
             for name, channels in mergers.iteritems():
-                #print "  {0} <= {1}".format(name, channels)
                 h = None
     
                 for ch in channels:
@@ -106,24 +138,23 @@ def combineCategories(tf, of, hists, mergers, processes):
                             h = h2.Clone()
                         else:
                             h.Add(h2)
-                if h == None:
-                    h = defaultHistogram(hist)
-
+                    else:
+                        #print "could not find", hn, tf
+                        pass
                 #it can happen that no category had this histogram defined
-                
                 if h == None:
                     h = defaultHistogram(hist)
                 outdir = "{0}/{1}".format(proc,name)
                 if of.Get(outdir) == None:
                     of.mkdir(outdir)
                 outdir = of.Get(outdir)
+                #outdir.Add(h)
+                #h.Write("", ROOT.TObject.kOverwrite)
                 h.SetDirectory(outdir)
-                outdir.Write()
+                outdir.Write("", ROOT.TObject.kOverwrite)
             # End of loop over things to merge
          # End of loop over processes
     # End of loop over histograms
-    
-    print "Done."
 
 if __name__ == "__main__":
     inf = sys.argv[1]

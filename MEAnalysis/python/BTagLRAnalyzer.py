@@ -14,19 +14,10 @@ class BTagLRAnalyzer(FilterAnalyzer):
     def __init__(self, cfg_ana, cfg_comp, looperName):
         super(BTagLRAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
         self.conf = cfg_ana._conf
-        self.bTagAlgo        = self.conf.jets["btagAlgo"]
+        self.bTagAlgo        = getattr(cfg_ana, "btagAlgo", self.conf.jets["btagAlgo"])
         #self.cplots_old = ROOT.TFile(self.conf.general["controlPlotsFileOld"])
         self.cplots = ROOT.TFile(self.conf.general["controlPlotsFile"])
         self.nJetsForPerm = self.conf.jets["NJetsForBTagLR"]
-
-        cplots_fmt = self.conf.general.get("controlPlotsFormat", "8tev")
-        # self.csv_pdfs_old = {
-        # }
-        # for x in ["b", "c", "l"]:
-        #     for b in ["Bin0", "Bin1"]:
-        #         self.csv_pdfs_old[(x, b)] = self.cplots_old.Get(
-        #             "csv_{0}_{1}__csv_rec".format(x, b)
-        #         )
 
         self.csv_pdfs = {
         }
@@ -35,28 +26,13 @@ class BTagLRAnalyzer(FilterAnalyzer):
         for x in ["b", "c", "l"]:
             for b in ["Bin0", "Bin1"]:
                 self.csv_pdfs[(x, b)] = self.cplots.Get(
-                    "csv_{0}_{1}__csv_rec".format(x, b)
+                    "{2}_{0}_{1}__rec".format(x, b, self.bTagAlgo)
                 )
                 #self.csv_pdfs[(x, b)].Scale(1.0 / self.csv_pdfs[(x, b)].Integral())
             self.csv_pdfs[(x, "pt_eta")] = self.cplots.Get(
-                "csv_{0}_pt_eta".format(x)
+                "{1}_{0}_pt_eta".format(x, self.bTagAlgo)
             )
          
-            '''
-            for i in range(1,  self.csv_pdfs[(x, "pt_eta")].GetNbinsX()+2 ):
-                for j in range(1,  self.csv_pdfs[(x, "pt_eta")].GetNbinsY()+2 ):
-                    h = self.csv_pdfs[(x, "pt_eta")].ProjectionZ("_pz", i,i, j,j)        
-                    norm    = h.Integral()
-                    norm_ou = h.Integral(0, h.GetNbinsX()+1)
-                    print "%s -- %s " % (norm, norm_ou)
-                    h.SetDefaultSumw2()
-                    if norm == 0:
-                        continue
-                    for k in range(1,  self.csv_pdfs[(x, "pt_eta")].GetNbinsZ()+2 ):
-                        tot  = self.csv_pdfs[(x, "pt_eta")].GetBinContent(i,j,k)
-                        self.csv_pdfs[(x, "pt_eta")].SetBinContent(i,j,k, tot/norm )
-                    h2 = self.csv_pdfs[(x, "pt_eta")].ProjectionZ("_pz", i,i, j,j)
-            '''
             # consider also underflow and overflow bins (N.B. some jets have csv==1, i.e. they will fall into overflow)
             h3     = self.csv_pdfs[(x, "pt_eta")]
             nbinsX = h3.GetNbinsX()
@@ -72,6 +48,8 @@ class BTagLRAnalyzer(FilterAnalyzer):
                         if int_ij>0.:
                             unnorm /= int_ij
                         self.csv_pdfs[(x, "pt_eta")].SetBinContent(i,j,k, unnorm)
+        
+        #print self.csv_pdfs
 
         self.conf.BTagLRAnalyzer = self
 
@@ -198,20 +176,20 @@ class BTagLRAnalyzer(FilterAnalyzer):
         event.btag_lr_2b, best_2b_perm = self.btag_likelihood(jet_probs["new_pt_eta_bin_3d-"+self.bTagAlgo], 2, 0)
 
         # >=4t category
-        event.btag_lr_4b_Rndge4t, best_4b_Rndge4t_perm = self.btag_likelihood(jet_probs["new_pt_eta_bin_3d-btagCSVRndge4t"], 4, 0)
-        event.btag_lr_2b_Rndge4t, best_2b_Rndge4t_perm = self.btag_likelihood(jet_probs["new_pt_eta_bin_3d-btagCSVRndge4t"], 2, 0)
+        #event.btag_lr_4b_Rndge4t, best_4b_Rndge4t_perm = self.btag_likelihood(jet_probs["new_pt_eta_bin_3d-btagCSVRndge4t"], 4, 0)
+        #event.btag_lr_2b_Rndge4t, best_2b_Rndge4t_perm = self.btag_likelihood(jet_probs["new_pt_eta_bin_3d-btagCSVRndge4t"], 2, 0)
 
         # >=4t category (closure test)
-        event.btag_lr_4b_Inpge4t, best_4b_Inpge4t_perm = self.btag_likelihood(jet_probs["new_pt_eta_bin_3d-btagCSVInpge4t"], 4, 0)
-        event.btag_lr_2b_Inpge4t, best_2b_Inpge4t_perm = self.btag_likelihood(jet_probs["new_pt_eta_bin_3d-btagCSVInpge4t"], 2, 0)
+        #event.btag_lr_4b_Inpge4t, best_4b_Inpge4t_perm = self.btag_likelihood(jet_probs["new_pt_eta_bin_3d-btagCSVInpge4t"], 4, 0)
+        #event.btag_lr_2b_Inpge4t, best_2b_Inpge4t_perm = self.btag_likelihood(jet_probs["new_pt_eta_bin_3d-btagCSVInpge4t"], 2, 0)
 
         # 3t category
-        event.btag_lr_4b_Rnd3t, best_4b_Rnd3t_perm = self.btag_likelihood(jet_probs["new_pt_eta_bin_3d-btagCSVRnd3t"], 4, 0)
-        event.btag_lr_2b_Rnd3t, best_2b_Rnd3t_perm = self.btag_likelihood(jet_probs["new_pt_eta_bin_3d-btagCSVRnd3t"], 2, 0)
+        #event.btag_lr_4b_Rnd3t, best_4b_Rnd3t_perm = self.btag_likelihood(jet_probs["new_pt_eta_bin_3d-btagCSVRnd3t"], 4, 0)
+        #event.btag_lr_2b_Rnd3t, best_2b_Rnd3t_perm = self.btag_likelihood(jet_probs["new_pt_eta_bin_3d-btagCSVRnd3t"], 2, 0)
 
         # 3t category (closure test)
-        event.btag_lr_4b_Inp3t, best_4b_Inp3t_perm = self.btag_likelihood(jet_probs["new_pt_eta_bin_3d-btagCSVInp3t"], 4, 0)
-        event.btag_lr_2b_Inp3t, best_2b_Inp3t_perm = self.btag_likelihood(jet_probs["new_pt_eta_bin_3d-btagCSVInp3t"], 2, 0)
+        #event.btag_lr_4b_Inp3t, best_4b_Inp3t_perm = self.btag_likelihood(jet_probs["new_pt_eta_bin_3d-btagCSVInp3t"], 4, 0)
+        #event.btag_lr_2b_Inp3t, best_2b_Inp3t_perm = self.btag_likelihood(jet_probs["new_pt_eta_bin_3d-btagCSVInp3t"], 2, 0)
 
         def lratio(l1, l2):
             if l1+l2>0:
@@ -223,10 +201,10 @@ class BTagLRAnalyzer(FilterAnalyzer):
         #event.btag_LR_4b_2b      = lratio(event.btag_lr_4b,       event.btag_lr_2b)
         #event.btag_LR_4b_2b_max4 = lratio(event.btag_lr_4b_max4,  event.btag_lr_2b_max4)
         event.btag_LR_4b_2b          = lratio(event.btag_lr_4b,          event.btag_lr_2b)
-        event.btag_LR_4b_2b_Rndge4t  = lratio(event.btag_lr_4b_Rndge4t,  event.btag_lr_2b_Rndge4t)
-        event.btag_LR_4b_2b_Inpge4t  = lratio(event.btag_lr_4b_Inpge4t,  event.btag_lr_2b_Inpge4t)
-        event.btag_LR_4b_2b_Rnd3t    = lratio(event.btag_lr_4b_Rnd3t,    event.btag_lr_2b_Rnd3t)
-        event.btag_LR_4b_2b_Inp3t    = lratio(event.btag_lr_4b_Inp3t,    event.btag_lr_2b_Inp3t)
+        #event.btag_LR_4b_2b_Rndge4t  = lratio(event.btag_lr_4b_Rndge4t,  event.btag_lr_2b_Rndge4t)
+        #event.btag_LR_4b_2b_Inpge4t  = lratio(event.btag_lr_4b_Inpge4t,  event.btag_lr_2b_Inpge4t)
+        #event.btag_LR_4b_2b_Rnd3t    = lratio(event.btag_lr_4b_Rnd3t,    event.btag_lr_2b_Rnd3t)
+        #event.btag_LR_4b_2b_Inp3t    = lratio(event.btag_lr_4b_Inp3t,    event.btag_lr_2b_Inp3t)
 
         # use default btag method always
         event.buntagged_jets_by_LR_4b_2b = [jets_for_btag_lr[self.bTagAlgo][i] for i in best_4b_perm[4:]]
