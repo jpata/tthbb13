@@ -6,14 +6,14 @@ const TIME0 = time()
 const wd = dirname(Base.source_path())
 
 include("utils.jl")
-@everywhere using ROOT, ROOTDataFrames, ROOTHistograms, HEP, DataFrames
+using ROOT, ROOTDataFrames, ROOTHistograms, HEP, DataFrames
 
 # Go to work dir on all workers
 sendto(workers(), wd=wd)
 @everywhere cd(wd)
 
-@everywhere include("$wd/ntuple.jl")
-@everywhere using Analysis, ROOTHistograms
+include("$wd/ntuple.jl")
+using Analysis, ROOTHistograms
 
 @everywhere process(args) = Analysis.process_sample(args[1], args[2]; range=args[3]:args[4])
 
