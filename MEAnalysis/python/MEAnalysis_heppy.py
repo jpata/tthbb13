@@ -55,31 +55,34 @@ pi_file.close()
     
 #Load the input sample dictionary
 #Samples are configured in the Conf object, by default, we use samples_vhbb
-print "loading samples from", conf.general["sampleFile"]
-samplefile = imp.load_source("samplefile", conf.general["sampleFile"])
-from samplefile import samples_dict, samples
 
 #input component
 #several input components can be declared,
 #and added to the list of selected components
-inputSamples = []
-for sn in sorted(samples_dict.keys()):
-    s = samples_dict[sn]
-    sample_ngen = s.nGen.value()
-    if (s.isMC.value() and sample_ngen<0):
-        sample_ngen = getSampleNGen(s)
-    inputSample = cfg.Component(
-        s.name.value(),
-        files = map(lfn_to_pfn, s.subFiles.value()),
-        tree_name = "tree",
-        n_gen = sample_ngen,
-        xs = s.xSec.value()
-    )
-    inputSample.isMC = s.isMC.value()
-  
-    #use sample only if not skipped and subFiles defined
-    if s.skip.value() == False and len(s.subFiles.value())>0:
-        inputSamples.append(inputSample)
+def prepareInputSamples(sampleFile=conf.general["sampleFile"]):
+    print "loading samples from", sampleFile
+    samplefile = imp.load_source("samplefile", sampleFile)
+    from samplefile import samples_dict, samples
+    inputSamples = []
+    for sn in sorted(samples_dict.keys()):
+        s = samples_dict[sn]
+        sample_ngen = s.nGen.value()
+        if (s.isMC.value() and sample_ngen<0):
+            sample_ngen = getSampleNGen(s)
+        inputSample = cfg.Component(
+            s.name.value(),
+            files = map(lfn_to_pfn, s.subFiles.value()),
+            tree_name = "tree",
+            n_gen = sample_ngen,
+            xs = s.xSec.value()
+        )
+        inputSample.isMC = s.isMC.value()
+        #use sample only if not skipped and subFiles defined
+        if s.skip.value() == False and len(s.subFiles.value())>0:
+            inputSamples.append(inputSample)
+    return inputSamples, samples
+
+inputSamples, samples = prepareInputSamples(conf.general["sampleFile"])
 
 #Event contents are defined here
 #This is work in progress
@@ -151,8 +154,17 @@ genrad = cfg.Analyzer(
 btaglr = cfg.Analyzer(
     MECoreAnalyzers.BTagLRAnalyzer,
     'btaglr',
-    _conf = conf
+    _conf = conf,
+    btagAlgo = "btagCSV"
 )
+
+##calculates the b-tag likelihood ratio
+#btaglr_bdt = cfg.Analyzer(
+#    MECoreAnalyzers.BTagLRAnalyzer,
+#    'btaglr_bdt',
+#    _conf = conf,
+#    btagAlgo = "btagBDT"
+#)
 
 #calculates the b-tag likelihood ratio
 qglr = cfg.Analyzer(
@@ -228,14 +240,15 @@ sequence = cfg.Sequence([
     jets,
     brnd,
     btaglr,
+    #btaglr_bdt,
     qglr,
-    mva,
     wtag,
     mecat,
     genrad,
     gentth,
     subjet_analyzer,
     mem_analyzer,
+    mva,
     treevar,
     treeProducer
 ])
@@ -272,7 +285,6 @@ if __name__ == "__main__":
     #Process all samples in the sample list
     for samp in inputSamples:
 
-        print "processing sample ", samp
         config = cfg.Config(
             #Run across these inputs
             components = [samp],

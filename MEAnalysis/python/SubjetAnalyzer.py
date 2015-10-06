@@ -31,8 +31,8 @@ class SubjetAnalyzer(FilterAnalyzer):
 
         self.Cut_criteria = [
             ( 'pt'  , '>', '200.0' ),
-            ( 'mass', '>', '120.0' ),
-            ( 'mass', '<', '180.0' ),
+            ( 'mass', '>', '80.0' ),
+            ( 'mass', '<', '250.0' ),
             ( 'fRec'  , '<', '0.45' ),
             ]
 
@@ -254,6 +254,7 @@ class SubjetAnalyzer(FilterAnalyzer):
 
             # Sort tl btagged jets by decreasing btag (to be sure, but should 
             # already be done in previous analyzer)
+            # Only resolved b-jets
             reco_btagged_jets = sorted( reco_btagged_jets, key=lambda x: -x.btag )
 
             # Add up to 4 reco btagged jets to the output lists

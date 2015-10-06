@@ -12,6 +12,12 @@ import ROOT
 ROOT.gSystem.Load("libTTHMEAnalysis")
 
 from TTH.MEAnalysis.Analyzer import FilterAnalyzer
+try:
+    from sklearn.externals import joblib
+except Exception as e:
+    print "Could not load scikit-learn. Please configure PYTHONPATH=/path/to/anaconda/lib/python2.7/site-packages:$PYTHONPATH PATH=/path/to/anaconda/bin/:$PATH"
+    raise e
+
 CvectorTLorentzVector = getattr(ROOT, "std::vector<TLorentzVector>")
 EventShapeVariables = getattr(ROOT, "EventShapeVariables")
 
@@ -49,6 +55,7 @@ class MVAVarAnalyzer(FilterAnalyzer):
     def __init__(self, cfg_ana, cfg_comp, looperName):
         self.conf = cfg_ana._conf
         super(MVAVarAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
+        self.cls = joblib.load(self.conf.tth_mva["filename"])
 
     def beginLoop(self, setup):
         super(MVAVarAnalyzer, self).beginLoop(setup)
@@ -122,6 +129,32 @@ class MVAVarAnalyzer(FilterAnalyzer):
         event.fw_h_alljets = FoxWolfram.calcFoxWolfram(event.good_jets, orders, FoxWolfram.w_s)
         event.fw_h_btagjets = FoxWolfram.calcFoxWolfram(event.selected_btagged_jets_high, orders, FoxWolfram.w_s)
         event.fw_h_untagjets = FoxWolfram.calcFoxWolfram(event.buntagged_jets, orders, FoxWolfram.w_s)
+        
+        for ij in range(6):
+            setattr(event, "jet{0}_pt".format(ij), 0)
+            setattr(event, "jet{0}_aeta".format(ij), 0)
+            setattr(event, "jet{0}_btag".format(ij), 0)
+
+        for ij, jet in enumerate(event.good_jets):
+            setattr(event, "jet{0}_pt".format(ij), jet.pt)
+            setattr(event, "jet{0}_aeta".format(ij), abs(jet.eta))
+            setattr(event, "jet{0}_btag".format(ij), jet.btagCSV)
+       
+        for i in range(2):
+            setattr(event, "lep{0}_pt".format(i), 0.0)
+            setattr(event, "lep{0}_aeta".format(i), 0.0)
+
+        for ij, lep in enumerate(event.good_leptons):
+            setattr(event, "lep{0}_pt".format(ij), lep.pt)
+            setattr(event, "lep{0}_aeta".format(ij), abs(lep.eta))
+        
+        for io in orders:
+            setattr(event, "fw_h{0}".format(io), event.fw_h_alljets[io])
+        
+        vararray = np.array([getattr(event, vname) for vname in self.conf.tth_mva["varlist"]])
+        vararray[np.isnan(vararray)] = 0
+        
+        event.tth_mva = self.cls.predict_proba(vararray)[0,1]
         event.passes_mva = True
 
         return event

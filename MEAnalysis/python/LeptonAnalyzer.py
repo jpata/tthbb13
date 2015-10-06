@@ -32,9 +32,8 @@ class LeptonAnalyzer(FilterAnalyzer):
             event.selLeptons,
         )
         if "debug" in self.conf.general["verbosity"]:
+            print "input muons"
             for it in event.mu:
-                print "input muons"
-                print it
                 (self.conf.leptons["mu"]["debug"])(it)
 
         event.el = filter(
@@ -44,7 +43,6 @@ class LeptonAnalyzer(FilterAnalyzer):
         if "debug" in self.conf.general["verbosity"]:
             print "input electrons"
             for it in event.el:
-                print it
                 (self.conf.leptons["el"]["debug"])(it)
 
         for id_type in ["SL", "DL", "veto"]:
@@ -84,6 +82,25 @@ class LeptonAnalyzer(FilterAnalyzer):
                 setattr(event, "n_lep_{0}".format(id_type), len(sumleps))
 
         if "debug" in self.conf.general["verbosity"]:
+            print "SL mu"
+            for l in event.mu_SL:
+                (self.conf.leptons["mu"]["debug"])(l)
+            print "DL mu"
+            for l in event.mu_DL:
+                (self.conf.leptons["mu"]["debug"])(l)
+            print "SL el"
+            for l in event.el_SL:
+                (self.conf.leptons["el"]["debug"])(l)
+            print "DL el"
+            for l in event.el_DL:
+                (self.conf.leptons["el"]["debug"])(l)
+            print "veto mu"
+            for l in event.mu_veto:
+                (self.conf.leptons["mu"]["debug"])(l)
+            print "veto el"
+            for l in event.el_veto:
+                (self.conf.leptons["el"]["debug"])(l)
+
             print "n_lep_tight={0}, n_lep_loose={1}, n_lep_tight_veto={2}".format(event.n_lep_SL, event.n_lep_DL, event.n_lep_veto)
 
         event.is_sl = (event.n_lep_SL == 1 and event.n_lep_veto == 1)

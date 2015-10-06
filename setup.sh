@@ -9,10 +9,6 @@ git checkout -b merge
 #Get the vhbb-heppy code
 
 git cms-merge-topic vhbb:vhbbHeppy74X
-git cms-merge-topic gkasieczka:dev-hbbtag-heppy745
-##Get the fixed TChain code for vhbb
-#no longer needed in 745
-#git cms-merge-topic jpata:heppy-tchain-lfn-74x
 
 #get the TTH code
 git clone https://github.com/jpata/tthbb13.git TTH

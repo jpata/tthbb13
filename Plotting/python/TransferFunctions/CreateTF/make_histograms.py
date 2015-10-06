@@ -60,7 +60,7 @@ def Make_E_axis( input_tree, eta_axis, n_E_bins, E_bounds, particle, config ):
 
         # The more bins chosen, the more precise the bin boundaries will be
         #n_E_hist_bins = 50000
-        n_E_hist_bins = 1000
+        n_E_hist_bins = 200
 
         # Store this number also in config
         config['n_E_hist_bins'] = n_E_hist_bins
@@ -88,8 +88,12 @@ def Make_E_axis( input_tree, eta_axis, n_E_bins, E_bounds, particle, config ):
         c1 = ROOT.TCanvas("c1","c1",500,400)
         c1.SetGrid()
 
-        E_hist.Draw()
-        c1.Print( 'Ehist_beforecut', 'pdf')
+        #E_hist.Draw()
+        #c1.Print( 'Ehist_beforecut', 'pdf')
+        f_pthist_bc = open( 'histogramming_output/pt_hist_bc_{0}{1}.pickle'.format(
+            particle, i_eta ), 'wb' )
+        pickle.dump( E_hist, f_pthist_bc )
+        f_pthist_bc.close()
 
         cut_bin_value = int(0.3 * E_hist.GetMaximum())
 
@@ -97,9 +101,12 @@ def Make_E_axis( input_tree, eta_axis, n_E_bins, E_bounds, particle, config ):
             if E_hist.GetBinContent(i) > cut_bin_value:
                 E_hist.SetBinContent( i, cut_bin_value )
 
-        E_hist.Draw()
-        c1.Print( 'Ehist_aftercut', 'pdf')
-
+        #E_hist.Draw()
+        #c1.Print( 'Ehist_aftercut', 'pdf')
+        f_pthist_ac = open( 'histogramming_output/pt_hist_ac_{0}{1}.pickle'.format(
+            particle, i_eta ), 'wb' )
+        pickle.dump( E_hist, f_pthist_ac )
+        f_pthist_ac.close()
 
         ########################################
         # Determine the bin boundaries
@@ -139,6 +146,13 @@ def Make_E_axis( input_tree, eta_axis, n_E_bins, E_bounds, particle, config ):
         E_axis_this_eta.append( E_bounds[1] )
 
         E_axis.append( E_axis_this_eta )
+
+        f_pt_bins = open( 'histogramming_output/pt_bins_{0}{1}.txt'.format(particle,i_eta) , 'w' )
+        f_pt_bins.write( '###\n{0}\n{1}\n'.format( particle, i_eta ) )
+        for val in E_axis_this_eta:
+            f_pt_bins.write( '{0}\n'.format(val) )
+        f_pt_bins.close()
+        
 
         ########################################
         # Determine the central or mean value of E bin
@@ -404,6 +418,8 @@ def Make_Histograms():
 
         dicts[particle] = dic
         
+    # Temporary
+    #return
 
     ########################################
     # Event loop

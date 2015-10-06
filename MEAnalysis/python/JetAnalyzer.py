@@ -68,7 +68,7 @@ class JetAnalyzer(FilterAnalyzer):
         #pt-descending input jets
         if "input" in self.conf.general["verbosity"]:
             print "jets"
-            for j in event.Jet:
+            for j in event.Jet+event.DiscardedJet:
                 print "InJetReco", j.pt, j.eta, j.phi, j.mass, j.btagCSV, j.mcFlavour
                 print "InJetGen", j.mcPt, j.mcEta, j.mcPhi, j.mcM
 
