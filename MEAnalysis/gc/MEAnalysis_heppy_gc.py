@@ -45,7 +45,7 @@ print "processing dataset={0}".format(dataset)
 for ns in range(len(samples)):
     if samples[ns].name.value() == dataset:
         samples[ns].skip = False
-        samples[ns].subFiles = map(lfn_to_pfn, fns)
+        samples[ns].subFiles = map(lfn_to_pfn, samples[ns].subFiles ) #DS
         good_samp += [samples[ns]]
     else:
         print "skipping", samples[ns].name.value()

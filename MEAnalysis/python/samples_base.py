@@ -9,7 +9,7 @@ xsec = {}
 xsec[("ttjets", "8TeV")] = 252.89
 xsec[("ttjets", "13TeV")] = 831.76
 
-br_h_to_bb = 0.569
+br_h_to_bb = 0.577
 xsec[("tth", "8TeV")] = 0.1302
 xsec[("tthbb", "8TeV")] = xsec[("tth", "8TeV")] * br_h_to_bb
 
@@ -20,6 +20,7 @@ xsec[("tthbb", "13TeV")] = xsec[("tth", "13TeV")] * br_h_to_bb
 xsec[("qcd_ht300to500", "13TeV")] = 366800.0
 xsec[("qcd_ht500to700", "13TeV")] = 29370.0
 xsec[("qcd_ht700to1000", "13TeV")] = 6524.0
+xsec[("qcd_ht1000to1500", "13TeV")] = 1064.0
 xsec[("qcd_ht1500to2000", "13TeV")] = 121.5
 xsec[("qcd_ht2000toinf", "13TeV")] = 25.42
 
@@ -62,15 +63,23 @@ else:
     def lfn_to_pfn(fn):
         return fn
 
+
+
 def getSampleNGen(sample):
     import ROOT
     n = 0
+    ntot = 0
     for f in sample.subFiles:
         tfn = lfn_to_pfn(f)
         tf = ROOT.TFile.Open(tfn)
         hc = tf.Get("Count")
-        n += hc.GetBinContent(1)
+        hcpos = tf.Get("CountPosWeight")
+        hcneg = tf.Get("CountNegWeight")
+        n += hcpos.GetBinContent(1)
+        n -= hcneg.GetBinContent(1)
+        ntot += hcpos.GetBinContent(1) 
+        ntot += hcneg.GetBinContent(1) 
+        #print tfn    
         tf.Close()
-        del tf
-        #print tfn, hc.GetBinContent(1)
+    #print sample.name, ": number of gen events: ",n, ntot
     return int(n)

@@ -605,8 +605,8 @@ Conf.mem_configs["SL_2w2h2t_sj"] = c
 c = MEMConfig()
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 0 and
-    len(mcfg.b_quark_candidates(ev)) >= 4 and
-    len(mcfg.l_quark_candidates(ev)) >= 4
+    len(mcfg.b_quark_candidates(ev)) == 4 and #DS
+    len(mcfg.l_quark_candidates(ev)) == 4 #DS
 )
 c.mem_assumptions.add("fh")
 strat = CvectorPermutations()
