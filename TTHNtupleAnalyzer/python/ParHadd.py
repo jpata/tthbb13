@@ -20,7 +20,7 @@ parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFo
 
 parser.add_argument('--njobs',
 	type=int,
-	default=5,
+	default=20,
 	help="Number of concurrent jobs"
 )
 

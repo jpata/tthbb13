@@ -16,6 +16,7 @@ xsec[("tthbb", "8TeV")] = xsec[("tth", "8TeV")] * br_h_to_bb
 #https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageAt1314TeV#s_13_0_TeV
 xsec[("tth", "13TeV")] = 0.5085
 xsec[("tthbb", "13TeV")] = xsec[("tth", "13TeV")] * br_h_to_bb
+xsec[("tth_nonbb", "13TeV")] = xsec[("tth", "13TeV")] * (1.0 - br_h_to_bb)
 
 xsec[("qcd_ht300to500", "13TeV")] = 366800.0
 xsec[("qcd_ht500to700", "13TeV")] = 29370.0
@@ -46,8 +47,10 @@ if "kbfi" in hn or "kbfi" in vo:
     def lfn_to_pfn(fn):
 
         #fix to replace broken file names
-        fn = fn.replace("/store/user/gregor/", "/store/user/jpata/")
-        return "file:///hdfs/cms" + fn
+        if fn.startswith("/home"):
+            return fn
+        else:
+            return "file:///hdfs/cms" + fn
 elif "psi" in hn or "psi" in vo:
     # pfPath = "/pnfs/psi.ch/cms/trivcat/"
     # lfPrefix = "dcap://t3se01.psi.ch:22125/"
@@ -68,18 +71,18 @@ else:
 def getSampleNGen(sample):
     import ROOT
     n = 0
-    ntot = 0
+    nneg = 0
+    npos = 0
     for f in sample.subFiles:
         tfn = lfn_to_pfn(f)
         tf = ROOT.TFile.Open(tfn)
         hc = tf.Get("Count")
-        hcpos = tf.Get("CountPosWeight")
-        hcneg = tf.Get("CountNegWeight")
-        n += hcpos.GetBinContent(1)
-        n -= hcneg.GetBinContent(1)
-        ntot += hcpos.GetBinContent(1) 
-        ntot += hcneg.GetBinContent(1) 
-        #print tfn    
+        hneg = tf.Get("CountNegWeight")
+        hpos = tf.Get("CountPosWeight")
+        n += hc.GetBinContent(1)
+        nneg += hneg.GetBinContent(1)
+        npos += hpos.GetBinContent(1)
         tf.Close()
-    #print sample.name, ": number of gen events: ",n, ntot
-    return int(n)
+        del tf
+        #print tfn, hc.GetBinContent(1)
+    return int(npos-nneg)

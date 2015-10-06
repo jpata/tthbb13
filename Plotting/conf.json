@@ -1,0 +1,43 @@
+{
+    "filenames": [
+        "/Users/joosep/Documents/tth/data/ntp/v13/ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.root",
+    ],
+    "lumi": 10000.0,
+    "process": "ttH_hbb",
+    "outputFile": "ControlPlots.root"
+    "firstEntry": 0
+    "numEntries": 100000,
+    "printEvery": 0,
+    "sparseAxes": [
+        {
+            "func": "numJets",
+            "xMin": 3,
+            "xMax": 6,
+            "nBins": 3
+        },
+        {
+            "func": "nBCSVM",
+            "xMin": 2,
+            "xMax": 4,
+            "nBins": 2
+        },
+        {
+            "func": "nBoosted",
+            "xMin": 0,
+            "xMax": 2,
+            "nBins": 2
+        },
+        {
+            "func": "btag_LR_4b_2b_logit",
+            "xMin": -20,
+            "xMax": 20,
+            "nBins": 80
+        },
+        {
+            "func": "mem_SL_0w2h2t",
+            "xMin": 0,
+            "xMax": 1,
+            "nBins": 6
+        }
+    ]   
+}

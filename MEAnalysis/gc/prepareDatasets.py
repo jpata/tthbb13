@@ -4,7 +4,6 @@ import sys, imp
 import ROOT
 
 samplefile = sys.argv[1]
-outfile = open("out.dat", "w")
 samplefile = imp.load_source("samplefile", samplefile)
 from samplefile import samples_dict
 
@@ -18,10 +17,11 @@ for sample_name, sample in samples_dict.items():
     ngenPos2 = 0
 
     files = sample.subFiles
+    outfile = open(sample.nickname.value()+".dat", "a")
     outfile.write("[{0}]\n".format(sample_name))
     for f in files:
         pfn = lfn_to_pfn(f)
-        print("opening", pfn)
+        #print("opening", pfn)
         tf = ROOT.TFile.Open(pfn)
         if (tf == None or tf is None or tf.IsZombie()):
             print("could not read file {0}, {1}, {2}".format(pfn, tf, tf.IsZombie()), file=sys.stderr)
@@ -51,4 +51,5 @@ for sample_name, sample in samples_dict.items():
         sys.stdout.flush()
         sys.stderr.flush()
     print("{0} {1} {2} {3} {4} {5} {6}".format(sample_name, ngen, ngenPos, ngenNeg, ngen2, ngenNeg2, ngenPos2))
-outfile.close()
+    print(sample_name, ngenPos-ngenNeg)
+    outfile.close()

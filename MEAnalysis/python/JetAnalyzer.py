@@ -68,7 +68,7 @@ class JetAnalyzer(FilterAnalyzer):
         #pt-descending input jets
         if "input" in self.conf.general["verbosity"]:
             print "jets"
-            for j in event.Jet:
+            for j in event.Jet+event.DiscardedJet:
                 print "InJetReco", j.pt, j.eta, j.phi, j.mass, j.btagCSV, j.mcFlavour
                 print "InJetGen", j.mcPt, j.mcEta, j.mcPhi, j.mcM
 
@@ -264,20 +264,21 @@ class JetAnalyzer(FilterAnalyzer):
         #print (sum_dEx, sum_dEy), (corrMet_px, event.met[0].px), (corrMet_py, event.met[0].py)
         event.MET_jetcorr = MET(px=corrMet_px, py=corrMet_py)
         event.passes_jet = passes
-
-        genjets = event.GenJet
-        for jet in event.good_jets:
-            pt1 = jet.mcPt
-            eta1 = jet.mcEta
-            phi1 = jet.mcPhi
-            mass1 = jet.mcM
-            lv1 = ROOT.TLorentzVector()
-            lv1.SetPtEtaPhiM(pt1, eta1, phi1, mass1)
-            for gj in genjets:
-                lv2 = lvec(gj)
-                if lv1.DeltaR(lv2) < 0.01:
-                    jet.genjet = gj
-                    genjets.remove(gj)
-                    break
+        
+        if self.cfg_comp.isMC:
+            genjets = event.GenJet
+            for jet in event.good_jets:
+                pt1 = jet.mcPt
+                eta1 = jet.mcEta
+                phi1 = jet.mcPhi
+                mass1 = jet.mcM
+                lv1 = ROOT.TLorentzVector()
+                lv1.SetPtEtaPhiM(pt1, eta1, phi1, mass1)
+                for gj in genjets:
+                    lv2 = lvec(gj)
+                    if lv1.DeltaR(lv2) < 0.01:
+                        jet.genjet = gj
+                        genjets.remove(gj)
+                        break
 
         return event

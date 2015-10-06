@@ -20,43 +20,8 @@ import sklearn.metrics
 from sklearn.ensemble import GradientBoostingClassifier
 import math
 
-
 matplotlib.rc("axes", labelsize=24)
 matplotlib.rc("axes", titlesize=16)
-
-path = "/Users/joosep/Documents/tth/data/ntp/v12/me/"
-samples = {
-    "tth_amcatnlo": [
-        path + "/ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8_hbb.root",
-        #path + "/ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8_hX.root",
-    ],
-    "tth_phys14": [
-        "/Users/joosep/Documents/tth/data/ntp/v10_phys14/Aug20_564f1b8_phys14_ref1/tth_13tev_amcatnlo_pu20bx25_hbb.root"
-    ],
-    
-    
-    "ttjets_amcatnlo": [
-        path + "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ttbb.root",
-        path + "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_tt2b.root",
-        path + "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ttb.root",
-        path + "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ttcc.root",
-        path + "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ttll.root",
-    ],
-    "ttjets_phys14": [
-        "/Users/joosep/Documents/tth/data/ntp/v10_phys14/Aug20_564f1b8_phys14_ref1/ttjets_13tev_madgraph_pu20bx25_phys14.root"
-    ],
-    "tth_powheg": [
-        path + "ttHTobb_M125_13TeV_powheg_pythia8_hbb.root",
-        #path + "ttHTobb_M125_13TeV_powheg_pythia8_hX.root",
-    ],
-    "ttjets_powheg": [
-        path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttbb.root",
-        path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_tt2b.root",
-        path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttb.root",
-        path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttcc.root",
-        path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttll.root",
-    ],
-}
 
 def process_sample_hist(fnames, hname, func, bins, cut, **kwargs):
     tt = ROOT.TChain("tree")
@@ -72,7 +37,6 @@ def process_sample_hist(fnames, hname, func, bins, cut, **kwargs):
     h = rootpy.asrootpy(h)
     h.SetDirectory(ROOT.gROOT)
     n = tt.Draw("{0} >> {1}".format(func, hname), cut)
-    print n, h.Integral()
     if kwargs.get("norm", False):
         if h.Integral()>0:
             h.Scale(1.0 / h.Integral())
@@ -304,7 +268,7 @@ def draw_data_mc(tf, hname, samples, **kwargs):
         h = tf.get(sample + "/" + hname).Clone()
         hs[sample] = make_uoflow(h)
         #print hs[sample].GetBinLowEdge(0), hs[sample].GetBinLowEdge(hs[sample].GetNbinsX()+1)
-        hs[sample].Scale(get_weight(sample))
+        #hs[sample].Scale(get_weight(sample))
         hs[sample].title = sample_name + " ({0:.1f})".format(hs[sample].Integral())
         hs[sample].rebin(rebin)
 
@@ -314,7 +278,7 @@ def draw_data_mc(tf, hname, samples, **kwargs):
     else:
         a1 = plt.axes()
         
-    plt.title("CMS preliminary simulation\n $\sqrt{s} = 13$ TeV"+title_extended,
+    plt.title("CMS simulation\n $\sqrt{s} = 13$ TeV"+title_extended,
         y=0.96, x=0.04,
         horizontalalignment="left", verticalalignment="top"
     )
@@ -401,8 +365,10 @@ def draw_mem_data_mc(*args, **kwargs):
 def calc_roc(h1, h2):
     h1 = h1.Clone()
     h2 = h2.Clone()
-    h1.Scale(1.0 / h1.Integral())
-    h2.Scale(1.0 / h2.Integral())
+    if h1.Integral()>0:
+        h1.Scale(1.0 / h1.Integral())
+    if h2.Integral()>0:
+        h2.Scale(1.0 / h2.Integral())
     roc = np.zeros((h1.GetNbinsX()+2, 2))
     err = np.zeros((h1.GetNbinsX()+2, 2))
     e1 = ROOT.Double(0)
@@ -445,7 +411,12 @@ def get_pairs_file(pairs, **kwargs):
     for pair in pairs:
         tf, hn1, hn2, label = pair
         h1 = tf.get(hn1).Clone()
-        h2 = tf.get(hn2).Clone()
+        if isinstance(hn2, str):
+            h2 = tf.get(hn2).Clone()
+        elif isinstance(hn2, list):
+            h2 = tf.get(hn2[0]).Clone()
+            for _hn2 in hn2[1:]:
+                h2 += tf.get(_hn2).Clone()
         ps += [(h1, h2, label)]
     return ps
     
@@ -528,13 +499,12 @@ def train(df, var, cut, **kwargs):
 
     return cls, df_test, df_train
 
-def syst_comparison(sn, l, **kwargs):
+def syst_comparison(tf, sn, l, **kwargs):
     h0 = tf.get(sn + l[0]).Clone()
     h1 = tf.get(sn + l[1]).Clone()
     h2 = tf.get(sn + l[2]).Clone()
     
     for ih, h in enumerate([h0, h1, h2]):
-        h.Scale(10000)
         h.title = l[ih]
         h.title = h.title.replace("_", "")
         h.title += " ({0:.2f})".format(h.Integral())
@@ -555,8 +525,10 @@ def syst_comparison(sn, l, **kwargs):
     h1n = h1.Clone()
     h2n = h2.Clone()
     plt.legend(numpoints=1, loc="best")
-    h1n.Scale(h0.Integral() / h1n.Integral())
-    h2n.Scale(h0.Integral() / h2n.Integral())
+    if h1n.Integral() > 0:
+        h1n.Scale(h0.Integral() / h1n.Integral())
+    if h2n.Integral() > 0:
+        h2n.Scale(h0.Integral() / h2n.Integral())
     
     h1n.linestyle = "dashed"
     h2n.linestyle = "dashed"
@@ -566,14 +538,20 @@ def syst_comparison(sn, l, **kwargs):
     #plt.ylim(bottom=0)
     plt.axhline(0.0)
     a2 = plt.axes([0.0,0.0,1.0,0.48],sharex=a1)
-    
-    h1r = h1.Clone()
+
+    h1r = h1n.Clone()
     h1r.Divide(h0)
-    h2r = h2.Clone()
+    h2r = h2n.Clone()
     h2r.Divide(h0)
     h1r.color = "blue"
     h2r.color = "red"
-    errorbar(h1r, color="blue")
-    errorbar(h2r, color="red")
+    hist(h1r, color="blue")
+    hist(h2r, color="red")
+    a2.set_ylim(0.9, 1.1)
     plt.axhline(1.0, color="black")
     #fill_between(h1, h2, hatch="\\\\", facecolor="none", edgecolor="black", lw=0, zorder=10)
+
+
+def svfg(fn):
+    plt.savefig(fn, pad_inches=0.5, bbox_inches='tight')
+    plt.clf()
