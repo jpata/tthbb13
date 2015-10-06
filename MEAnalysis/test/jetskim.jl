@@ -1,7 +1,9 @@
 
 using ROOT, ROOTDataFrames, DataFrames, ROOTHistograms, Histograms
 
-function process(df, ofname, maxev=1000000)
+const OUTFILE = ARGS[1]
+
+function process(df, ofname, maxev=-1)
     t0 = time()
     out = TreeDataFrame(
         ofname,
@@ -19,11 +21,11 @@ function process(df, ofname, maxev=1000000)
     )
 
 
-    println("looping over $(nrow(df)) rows")
     ntot = 0
     if maxev < 0
         maxev = nrow(df)
     end
+    println("looping over $(maxev) rows")
     #loop over shuffled events in sorted order
 
     for iev=sort(randperm(nrow(df)))[1:maxev]
@@ -64,4 +66,4 @@ df = TreeDataFrame([
     "$path/TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9_ttll.root",
 ]; treename="tree")
 
-process(df, "jets.root")
+process(df, OUTFILE)

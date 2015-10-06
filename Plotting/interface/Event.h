@@ -7,6 +7,7 @@
 #include "TLorentzVector.h"
 
 #include "TH1D.h"
+#include "THnSparse.h"
 #include "TFile.h"
 #include <tuple>
 #include <unordered_map>
@@ -105,6 +106,7 @@ enum HistogramKey {
     mem_DL_0w2h2t,
     mem_SL_2w2h2t,
     mem_SL_2w2h2t_sj,
+    sparse,
 };
 //convert enum to the corresponding string
 //NB: Have to add all these to Event.cc/HistogramKey::to_string manually!!!
@@ -169,51 +171,6 @@ template <> struct hash<vector<CategoryKey::CategoryKey>>
 };
 }
 
-
-class Configuration {
-public:
-    typedef unordered_map<
-        const vector<CategoryKey::CategoryKey>,
-        double,
-        hash<vector<CategoryKey::CategoryKey>>
-    > CutValMap;
-
-    vector<string> filenames;
-    double lumi;
-    ProcessKey::ProcessKey process;
-    long firstEntry;
-    long numEntries;
-    int printEvery;
-    CutValMap btag_LR;
-    string outputFile;
-
-    Configuration(
-        vector<string>& _filenames,
-        double _lumi,
-        ProcessKey::ProcessKey _process,
-        long _firstEntry,
-        long _numEntries,
-        int _printEvery,
-        CutValMap _btag_LR,
-        string _outputFile
-    );
-    static const Configuration makeConfiguration(JsonValue& value);
-    string to_string() const;
-};
-
-//A map for ResultKey -> TH1D for all the output histograms
-typedef unordered_map<
-    ResultKey,
-    TH1D,
-    std::hash<ResultKey>
-> ResultMap;
-
-//Saves all results into a ROOT file in a structured way
-void saveResults(ResultMap& res, const string& prefix, const string& filename);
-
-//Writes the results into a string for debugging
-string to_string(const ResultMap& res);
-
 //Simple representation of a jet
 class Jet {
 public:
@@ -223,6 +180,7 @@ public:
     Jet(const TLorentzVector& _p4, int _btagCSV);
     const string to_string() const;
 };
+
 
 //Simple event representation
 //Designed to be immutable
@@ -318,6 +276,80 @@ typedef unordered_map<
     const string to_string() const;
 };
 
+class SparseAxis {
+public:
+    SparseAxis(
+        const string& _name,
+        std::function<float(const Event& ev)> _evalFunc,
+        int _nBins,
+        float _xMin,
+        float _xMax
+        ) : 
+        name(_name),
+        evalFunc(_evalFunc),
+        nBins(_nBins),
+        xMin(_xMin),
+        xMax(_xMax) {};
+    string name;
+    std::function<float(const Event& ev)> evalFunc;
+    int nBins;
+    float xMin, xMax;
+};
+
+class Configuration {
+public:
+    typedef unordered_map<
+        const vector<CategoryKey::CategoryKey>,
+        double,
+        hash<vector<CategoryKey::CategoryKey>>
+    > CutValMap;
+
+    vector<string> filenames;
+    double lumi;
+    ProcessKey::ProcessKey process;
+    long firstEntry;
+    long numEntries;
+    int printEvery;
+    string outputFile;
+    vector<SparseAxis> sparseAxes;
+
+    Configuration(
+        vector<string>& _filenames,
+        double _lumi,
+        ProcessKey::ProcessKey _process,
+        long _firstEntry,
+        long _numEntries,
+        int _printEvery,
+        string _outputFile,
+        vector<SparseAxis> _sparseAxes
+        ) :
+        filenames(_filenames),
+        lumi(_lumi),
+        process(_process),
+        firstEntry(_firstEntry),
+        numEntries(_numEntries),
+        printEvery(_printEvery),
+        outputFile(_outputFile),
+        sparseAxes(_sparseAxes)
+    {
+    }
+    static const Configuration makeConfiguration(JsonValue& value);
+    string to_string() const;
+};
+
+//A map for ResultKey -> TH1D for all the output histograms
+typedef unordered_map<
+    ResultKey,
+    TObject*,
+    std::hash<ResultKey>
+> ResultMap;
+
+//Saves all results into a ROOT file in a structured way
+void saveResults(ResultMap& res, const string& prefix, const string& filename);
+
+//Writes the results into a string for debugging
+string to_string(const ResultMap& res);
+
 //Helper class to make various variated jet collections from TreeData
 class JetFactory {
 public:
@@ -341,10 +373,12 @@ public:
     CategoryProcessor(
         std::function<int(const Event& ev)> _cutFunc,
         const vector<CategoryKey::CategoryKey>& _keys,
+        const Configuration& _conf,
         const vector<const CategoryProcessor*>& _subCategories={}
     ) :
     cutFunc(_cutFunc),
     keys(_keys),
+    conf(_conf),
     subCategories(_subCategories)
     {}
 
@@ -353,6 +387,7 @@ public:
     }
 
     const vector<CategoryKey::CategoryKey> keys;
+    const Configuration& conf;
     const vector<const CategoryProcessor*> subCategories;
      
     virtual void fillHistograms(
@@ -381,10 +416,59 @@ public:
     MEMCategoryProcessor(
         std::function<int(const Event& ev)> _cutFunc,
         const vector<CategoryKey::CategoryKey>& _keys,
+        const Configuration& _conf,
         const vector<const CategoryProcessor*>& _subCategories={}
     ) :
-      CategoryProcessor(_cutFunc, _keys, _subCategories) {};
+      CategoryProcessor(_cutFunc, _keys, _conf, _subCategories) {};
      
+    virtual void fillHistograms(
+        const Event& event,
+        ResultMap& results,
+        const tuple<
+            vector<CategoryKey::CategoryKey>,
+            SystematicKey::SystematicKey
+        >,
+        double weight
+    ) const;
+};
+
+class SparseCategoryProcessor : public CategoryProcessor {
+public:
+    SparseCategoryProcessor(
+        std::function<int(const Event& ev)> _cutFunc,
+        const vector<CategoryKey::CategoryKey>& _keys,
+        const Configuration& _conf,
+        const vector<const CategoryProcessor*>& _subCategories={}
+    ) :
+    CategoryProcessor(_cutFunc, _keys, _conf, _subCategories),
+    axes(_conf.sparseAxes)
+    {
+        nAxes = axes.size();
+        for (auto& ax : _conf.sparseAxes) {
+            nBinVec.push_back(ax.nBins);
+            xMinVec.push_back(ax.xMin);
+            xMaxVec.push_back(ax.xMax);
+        }
+    };
+    
+    vector<SparseAxis> axes;
+    int nAxes;
+    vector<int> nBinVec;
+    vector<double> xMinVec;
+    vector<double> xMaxVec;
+
+    THnSparseF* makeHist() const {
+        THnSparseF* h = new THnSparseF("sparse", "sparse events", nAxes, &(nBinVec[0]), &(xMinVec[0]), &(xMaxVec[0]));
+        
+        int iax = 0;
+        for (auto& ax : axes) {
+            h->GetAxis(iax)->SetName(ax.name.c_str());
+            h->GetAxis(iax)->SetTitle(ax.name.c_str());
+            iax += 1;
+        }
+        return h;
+    }
+
     virtual void fillHistograms(
         const Event& event,
         ResultMap& results,

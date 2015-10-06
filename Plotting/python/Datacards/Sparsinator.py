@@ -23,7 +23,7 @@ import pickle
 import ROOT
 
 from MiniSamples import samples_dict
-
+from Axis import axis
 
 ########################################
 # Configuration
@@ -34,17 +34,17 @@ max_entries = -1
 lumi = 10000 # 10 fb-1 in pb
 
 samples = [
-#    "ttH_hbb",
+    "ttH_hbb",
 #    "ttH_nohbb",
     "ttbarPlus2B",
     "ttbarPlusB",
     "ttbarPlusBBbar",
     "ttbarPlusCCbar",
     "ttbarOther",
-    "ttw_wlnu",       
-    "ttw_wqq",        
-    "ttz_zllnunu",    
-    "ttz_zqq",
+#    "ttw_wlnu",       
+#    "ttw_wqq",        
+#    "ttz_zllnunu",    
+#    "ttz_zqq",
 ]        
 
 
@@ -55,43 +55,13 @@ def calc_mem(t):
     mem_tth_p  = getattr(t, "mem_tth_p")
     mem_ttbb_p = getattr(t, "mem_ttbb_p")
                     
-    denom = mem_tth_p[5] + 0.15 * mem_ttbb_p[5]
+    denom = mem_tth_p[0] + 0.15 * mem_ttbb_p[0]
     if denom == 0:
         mem = 0
     else:
-        mem = mem_tth_p[5] / (mem_tth_p[5] + 0.15 * mem_ttbb_p[5])
+        mem = mem_tth_p[0] / (mem_tth_p[0] + 0.15 * mem_ttbb_p[0])
     return mem
 # end of calc_mem
-
-
-########################################
-# Axes
-########################################
-
-class axis:
-    def __init__(self,
-                 nbins,
-                 xmin,
-                 xmax,
-                 fun,
-                 addUnderflow,
-                 addOverflow):
-        """" Defines an axis for a multi-dimensional histogram
-        nbins        : number of bins
-        xmin         : lower boundary of axis
-        xmax         : upper boundary of axis
-        fun          : function to evaluate, will receive a TTree as argument
-        addUnderflow : if True - put values into lowest bin instead of underflow
-        addOverflow  : if True - put values into highest bin instead of overflow
-        """
-
-        self.nbins        = nbins
-        self.xmin         = xmin
-        self.xmax         = xmax
-        self.fun          = fun
-        self.addUnderflow = addUnderflow
-        self.addOverflow  = addOverflow
-# end of class axis        
 
 
 ########################################
@@ -102,15 +72,22 @@ def sparsinate(samples):
 
     # Define the axes
     axes = [ 
-        axis(20, 0, 1, calc_mem, 1, 1),
-        axis(3,  3.5, 6.5, lambda t : getattr(t, "numJets"), 0, 1),
-        axis(3, 1.5, 4.5,  lambda t : getattr(t, "nBCSVM"), 0, 1)
+        axis("mem", 20, 0, 1, calc_mem, 1, 1),
+        axis("nJet", 3,  3.5, 6.5, lambda t : getattr(t, "numJets"), 0, 1),
+        axis("nBJet", 3, 1.5, 4.5,  lambda t : getattr(t, "nBCSVM"), 0, 1),
+        axis("nTop", 2, -0.5, 1.5,  lambda t : getattr(t, "ntopCandidate"), 1, 1),
+        axis("btagLR", 20, 0, 1,  lambda t : getattr(t, "btag_LR_4b_2b"), 1, 1),
     ]
 
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d-%H%M")
     outdir = "/scratch/gregor/SparseMEM_{0}".format(timestamp)
     os.makedirs(outdir)
 
+    # Dump the axes to a pickle file
+    of_axis = open(outdir+"/axes.pickle","wb")
+    pickle.dump(axes, of_axis)
+    of_axis.close()
+    
     for sample_shortname in samples:
 
         fn = samples_dict[sample_shortname]
@@ -130,7 +107,12 @@ def sparsinate(samples):
         form_basic_cut = ROOT.TTreeFormula("basic_cut", 
                                       "is_sl && passPV && (HLT_BIT_HLT_Ele27_eta2p1_WP85_Gsf_HT200_v || HLT_BIT_HLT_IsoMu24_eta2p1_v) && btag_LR_4b_2b > 0.95", 
                                       t)
-        form_weight = ROOT.TTreeFormula("weight", "weight_xs * bTagWeight * {0}".format(lumi), t)
+        
+        # !!!!!!!!!!!!!! TEMPORARY FIX AS weight_xs is WRONG FOR TTBAR SAMPLES !!!!!!!!!!!        
+        if sample_shortname in ["ttbarPlus2B", "ttbarPlusB", "ttbarPlusBBbar", "ttbarPlusCCbar", "ttbarOther"]:
+            form_weight = ROOT.TTreeFormula("weight", "weight_xs * bTagWeight * {0}".format(lumi/2.), t)
+        else:
+            form_weight = ROOT.TTreeFormula("weight", "weight_xs * bTagWeight * {0}".format(lumi), t)
 
         print "Entries in file:", t.GetEntries()
         if max_entries == -1:
@@ -180,4 +162,3 @@ if __name__ == "__main__":
     
     ROOT.gROOT.SetBatch(True)
     sparsinate(samples)
-

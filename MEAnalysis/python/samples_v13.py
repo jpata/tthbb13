@@ -147,7 +147,7 @@ samples = cms.VPSet([
         name     = cms.string('TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2'),
         nickname = cms.string("ttjets"),
         xSec     = cms.double(xsec[("ttjets", "13TeV")]),
-        nGen     = cms.int64(18643272),
+        nGen     = cms.int64(18643272 + 89836026),
         subFiles = cms.vstring([
 "/store/t3groups/ethz-higgs/run2/VHBBHeppyV13/TT_TuneCUETP8M1_13TeV-powheg-pythia8/VHBB_HEPPY_V13_TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/151002_060618/0000/tree_125.root",
 "/store/t3groups/ethz-higgs/run2/VHBBHeppyV13/TT_TuneCUETP8M1_13TeV-powheg-pythia8/VHBB_HEPPY_V13_TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/151002_060618/0000/tree_137.root",
@@ -394,7 +394,7 @@ samples = cms.VPSet([
         name     = cms.string('TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9_ext3-v1'),
         nickname = cms.string("ttjets"),
         xSec     = cms.double(xsec[("ttjets", "13TeV")]),
-        nGen     = cms.int64(89836026),
+        nGen     = cms.int64(18643272 + 89836026),
         subFiles = cms.vstring([
 "/store/t3groups/ethz-higgs/run2/VHBBHeppyV13/TT_TuneCUETP8M1_13TeV-powheg-pythia8/VHBB_HEPPY_V13_TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9_ext3-v1/151002_060637/0000/tree_113.root",
 "/store/t3groups/ethz-higgs/run2/VHBBHeppyV13/TT_TuneCUETP8M1_13TeV-powheg-pythia8/VHBB_HEPPY_V13_TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9_ext3-v1/151002_060637/0000/tree_118.root",

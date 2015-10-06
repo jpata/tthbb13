@@ -3,7 +3,10 @@ ROOT.gROOT.SetBatch(True)
 ROOT.TH1.SetDefaultSumw2(True)
 ROOT.TH1.AddDirectory(False)
 
-tf = ROOT.TFile(sys.argv[1])
+INFILE = sys.argv[1]
+OUTFILE = sys.argv[2]
+
+tf = ROOT.TFile(INFILE)
 tt = tf.Get("tree")
 
 def hist(of, x, disc, low):
@@ -20,7 +23,7 @@ def hist3d(of, x, disc, low):
     of.Add(h)
     return h
 
-of = ROOT.TFile("ControlPlots.root", "RECREATE")
+of = ROOT.TFile(OUTFILE, "RECREATE")
 of.cd()
 
 def makeControlPlots(discname, low):

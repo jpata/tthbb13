@@ -3,6 +3,27 @@
 
 using namespace std;
 
+bool pass_trig_dl(const TreeData& data) {
+    return (
+        data.HLT_BIT_HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v ||
+        data.HLT_BIT_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v ||
+        data.HLT_BIT_HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v ||
+        data.HLT_BIT_HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v
+    );
+}
+
+bool pass_trig_sl(const TreeData& data) {
+    return (
+        data.HLT_BIT_HLT_Ele27_eta2p1_WP85_Gsf_HT200_v ||
+        data.HLT_BIT_HLT_IsoMu24_eta2p1_v
+    );
+}
+
+//Evaluate mem probability
+double mem_p(double p_tth, double p_ttbb, double w=0.15) {
+    return p_tth > 0.0 ? p_tth / (p_tth + w * p_ttbb) : 0.0;
+}
+
 //http://stackoverflow.com/questions/236129/split-a-string-in-c
 std::vector<std::string>& split(const std::string &s, char delim, std::vector<std::string> &elems) {
     std::stringstream ss(s);
@@ -29,26 +50,15 @@ const unordered_map<A, B, H1> reverse_map(const unordered_map<B, A, H2>& src) {
     return ret;
 } 
 
-Configuration::Configuration(
-    vector<string>& _filenames,
-    double _lumi,
-    ProcessKey::ProcessKey _process,
-    long _firstEntry,
-    long _numEntries,
-    int _printEvery,
-    CutValMap _btag_LR,
-    string _outputFile
-    ) :
-    filenames(_filenames),
-    lumi(_lumi),
-    process(_process),
-    firstEntry(_firstEntry),
-    numEntries(_numEntries),
-    printEvery(_printEvery),
-    btag_LR(_btag_LR),
-    outputFile(_outputFile)
-{
-}
+const map<string, function<float(const Event& ev)>> AxisFunctions = {
+    {"mem_SL_0w2h2t", [](const Event& ev) { return ev.mem_SL_0w2h2t;}},
+    {"mem_SL_2w2h2t", [](const Event& ev) { return ev.mem_SL_2w2h2t;}},
+    {"mem_SL_2w2h2t_sj", [](const Event& ev) { return ev.mem_SL_2w2h2t_sj;}},
+    {"numJets", [](const Event& ev) { return ev.numJets;}},
+    {"nBCSVM", [](const Event& ev) { return ev.nBCSVM;}},
+    {"btag_LR_4b_2b_logit", [](const Event& ev) { return ev.btag_LR_4b_2b_logit;}},
+    {"nBoosted", [](const Event& ev) { return ev.n_excluded_bjets<2 && ev.ntopCandidate==1;}}
+};
 
 const Configuration Configuration::makeConfiguration(JsonValue& value) {
     vector<string> filenames;
@@ -59,7 +69,7 @@ const Configuration Configuration::makeConfiguration(JsonValue& value) {
     long numEntries = -1;
     long printEvery = -1;
 
-    Configuration::CutValMap btagLRCuts;
+    vector<SparseAxis> sparseAxes;
     for (auto lev1 : value) {
         const string ks = string(lev1->key);
         if (ks == "filenames") {
@@ -87,22 +97,41 @@ const Configuration Configuration::makeConfiguration(JsonValue& value) {
         else if (ks == "outputFile") {
             outputFile = lev1->value.toString();
         }
-        else if (ks == "btagLRCuts") {
+        else if (ks == "sparseAxes") {
+            //loop over list of sparse
             for (auto lev2 : lev1->value) {
-                vector<string> tokens = split(string(lev2->key), ':');
-                vector<CategoryKey::CategoryKey> keyvec;
-                for (auto& tok : tokens) {
-                    keyvec.push_back(CategoryKey::from_string(tok));
+
+                function<float(const Event& _ev)> _func;
+                int nBins = -1;
+                float xMin = 0.0;
+                float xMax = 0.0;
+                string name;
+                //loop over keys in one sparse axis
+                for (auto lev3 : lev2->value) {
+                    const string spk = string(lev3->key);
+                    if (spk == "func") {
+                        name = lev3->value.toString();
+                        _func = AxisFunctions.at(name);
+                    } else if (spk == "nBins") {
+                        nBins = (int)(lev3->value.toNumber());
+                        assert(nBins > 0);
+                    } else if (spk == "xMin") {
+                        xMin = (float)(lev3->value.toNumber());
+                    } else if (spk == "xMax") {
+                        xMax = (float)(lev3->value.toNumber());
+                    }
                 }
-                btagLRCuts.insert(make_pair(keyvec, lev2->value.toNumber()));  
-                cout << "inserted " << string(lev2->key) << ":" << lev2->value.toNumber() << endl;
+                assert(xMax>xMin);
+                sparseAxes.push_back(
+                    SparseAxis(name, _func, nBins, xMin, xMax)
+                );
             }
         }
     }
     return Configuration(
         filenames, lumi, process, firstEntry, numEntries, printEvery,
-        btagLRCuts,
-        outputFile
+        outputFile,
+        sparseAxes
     );
 }
 
@@ -193,7 +222,8 @@ const unordered_map<const string, HistogramKey, hash<string>> map_from_string = 
     {"mem_SL_0w2h2t", mem_SL_0w2h2t},
     {"mem_DL_0w2h2t", mem_DL_0w2h2t},
     {"mem_SL_2w2h2t", mem_SL_2w2h2t},
-    {"mem_SL_2w2h2t_sj", mem_SL_2w2h2t_sj}
+    {"mem_SL_2w2h2t_sj", mem_SL_2w2h2t_sj},
+    {"sparse", sparse}
 };
 const unordered_map<HistogramKey, const string, hash<int>> map_to_string =
     reverse_map<HistogramKey, const string, hash<int>, hash<string>>(
@@ -201,7 +231,7 @@ const unordered_map<HistogramKey, const string, hash<int>> map_to_string =
     );
 const string to_string(HistogramKey k) {
     if (map_to_string.find(k) == map_to_string.end()) {
-        cerr << "Could not find SystematicKey " << k << endl;
+        cerr << "Could not find HistogramKey " << k << endl;
         throw 1;
     }
     return map_to_string.at(k); 
@@ -315,18 +345,20 @@ void saveResults(ResultMap& res, const string& prefix, const string& filename) {
         }
         const string histname = ss2.str();
         assert(dir->Get(histname.c_str()) == nullptr);
-        cout << dirname << "/ " << histname << endl;
+        cout << dirname << "/" << histname << endl;
 
         //We need to make a copy of the histogram here, otherwise ROOT scoping goes crazy
         //and of.Close() segfaults later
-        TH1D hist = TH1D(res.at(rk));
-        hist.SetName(histname.c_str());
-        hist.SetDirectory(dir);
-        dir->Write();
+        TNamed* obj = (TNamed*)(res.at(rk))->Clone();
+        obj->SetName(histname.c_str());
+        //obj->SetDirectory(dir);
+        dir->Add(obj);
+        //obj->Write();
+        dir->Write("", TObject::kOverwrite);
         //hist.Write();
     }
     cout << "writing..." << endl;
-    of.Write();
+    //of.Write();
     of.Close();
     cout << "done..." << endl;
 }
@@ -467,27 +499,6 @@ static const Event::WeightMap systWeights = {
         [](const Event& ev){ return nominal_weight(ev)/ev.bTagWeight * ev.bTagWeight_HFDown;}
     },
 };
-
-bool pass_trig_dl(const TreeData& data) {
-    return (
-        data.HLT_BIT_HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v ||
-        data.HLT_BIT_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v ||
-        data.HLT_BIT_HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v ||
-        data.HLT_BIT_HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v
-    );
-}
-
-bool pass_trig_sl(const TreeData& data) {
-    return (
-        data.HLT_BIT_HLT_Ele27_eta2p1_WP85_Gsf_HT200_v ||
-        data.HLT_BIT_HLT_IsoMu24_eta2p1_v
-    );
-}
-
-//Evaluate mem probability
-double mem_p(double p_tth, double p_ttbb, double w=0.15) {
-    return p_tth > 0.0 ? p_tth / (p_tth + w * p_ttbb) : 0.0;
-}
 
 double process_weight(ProcessKey::ProcessKey proc) {
     switch(proc) {
@@ -692,9 +703,9 @@ void CategoryProcessor::fillHistograms(
         HistogramKey::jet0_pt
     );
     if (!results.count(jet0_pt_key)) {
-        results[jet0_pt_key] = TH1D("jet0_pt", "Leading jet pt", 100, 0, 500);
+        results[jet0_pt_key] = new TH1D("jet0_pt", "Leading jet pt", 100, 0, 500);
     }
-    results[jet0_pt_key].Fill(event.jets[0].p4.Pt(), weight);
+    static_cast<TH1D*>(results[jet0_pt_key])->Fill(event.jets[0].p4.Pt(), weight);
     //cout << "    fill "  << to_string(jet0_pt_key) << endl;
 
 }
@@ -775,17 +786,17 @@ void MEMCategoryProcessor::fillHistograms(
 
 
         if (!results.count(mem_SL_0w2h2t_key)) {
-            results[mem_SL_0w2h2t_key] = TH1D("mem_SL_0w2h2t", "mem SL 0w2h2t", 6, 0, 1);
+            results[mem_SL_0w2h2t_key] = new TH1D("mem_SL_0w2h2t", "mem SL 0w2h2t", 6, 0, 1);
         }
         if (!results.count(mem_SL_2w2h2t_sj_key)) {
-            results[mem_SL_2w2h2t_sj_key] = TH1D("mem_SL_2w2h2t_sj", "mem SL 0w2h2t subjet", 6, 0, 1);
+            results[mem_SL_2w2h2t_sj_key] = new TH1D("mem_SL_2w2h2t_sj", "mem SL 0w2h2t subjet", 6, 0, 1);
         }
         if (!results.count(mem_SL_2w2h2t_key)) {
-            results[mem_SL_2w2h2t_key] = TH1D("mem_SL_2w2h2t", "mem SL 2w2h2t", 6, 0, 1);
+            results[mem_SL_2w2h2t_key] = new TH1D("mem_SL_2w2h2t", "mem SL 2w2h2t", 6, 0, 1);
         }
-        results[mem_SL_0w2h2t_key].Fill(event.mem_SL_0w2h2t, weight);
-        results[mem_SL_2w2h2t_key].Fill(event.mem_SL_2w2h2t, weight);
-        results[mem_SL_2w2h2t_sj_key].Fill(event.mem_SL_2w2h2t_sj, weight);
+        static_cast<TH1D*>(results[mem_SL_0w2h2t_key])->Fill(event.mem_SL_0w2h2t, weight);
+        static_cast<TH1D*>(results[mem_SL_2w2h2t_key])->Fill(event.mem_SL_2w2h2t, weight);
+        static_cast<TH1D*>(results[mem_SL_2w2h2t_sj_key])->Fill(event.mem_SL_2w2h2t_sj, weight);
     } else if (CategoryKey::is_dl(get<0>(key))) {
         const auto mem_DL_0w2h2t_key = make_tuple(
             get<0>(key),
@@ -794,11 +805,62 @@ void MEMCategoryProcessor::fillHistograms(
         );
 
         if (!results.count(mem_DL_0w2h2t_key)) {
-            results[mem_DL_0w2h2t_key] = TH1D("mem_DL_0w2h2t", "mem DL 0w2h2t", 6, 0, 1);
+            results[mem_DL_0w2h2t_key] = new TH1D("mem_DL_0w2h2t", "mem DL 0w2h2t", 6, 0, 1);
         }
-        results[mem_DL_0w2h2t_key].Fill(event.mem_DL_0w2h2t, weight);
+        static_cast<TH1D*>(results[mem_DL_0w2h2t_key])->Fill(event.mem_DL_0w2h2t, weight);
     }
 }
+
+void SparseCategoryProcessor::fillHistograms(
+    const Event& event,
+    ResultMap& results,
+    const tuple<
+        vector<CategoryKey::CategoryKey>,
+        SystematicKey::SystematicKey
+    > key,
+    double weight
+    ) const {
+
+    //fill base histograms
+    CategoryProcessor::fillHistograms(event, results, key, weight);
+
+    THnSparseF* h = nullptr;
+    if (CategoryKey::is_sl(get<0>(key))) {
+        const auto hkey = make_tuple(
+            get<0>(key),
+            get<1>(key),
+            HistogramKey::sparse
+        );
+        
+        if (!results.count(hkey)) {
+            h = makeHist();
+            results[hkey] = static_cast<TObject*>(h);
+        } else {
+            h = static_cast<THnSparseF*>(results.at(hkey));
+        }
+    } else if (CategoryKey::is_dl(get<0>(key))) {
+        const auto hkey = make_tuple(
+            get<0>(key),
+            get<1>(key),
+            HistogramKey::sparse
+        );
+        if (!results.count(hkey)) {
+            h = makeHist();
+            results[hkey] = static_cast<TObject*>(h);
+        } else {
+            h = static_cast<THnSparseF*>(results.at(hkey));
+        }
+    }
+    if (h != nullptr) {
+        vector<double> vals;
+        for (auto& ax : axes) {
+            vals.push_back(ax.evalFunc(event));
+        }
+
+        h->Fill(&vals[0], weight);
+    }
+}
+
 
 string to_string(const ResultKey& k) {
     stringstream ss;
@@ -814,13 +876,13 @@ string to_string(const ResultKey& k) {
 string to_string(const ResultMap& res) {
     stringstream ss;
     ss << "ResultMap[" << endl;
-    for (auto& kv : res) {
-        ss << " " << to_string(kv.first)
-            << " " << kv.second.GetName()
-            << " N=" << kv.second.GetEntries()
-            << " I=" << kv.second.Integral()
-            << " mu=" << kv.second.GetMean() << endl;
-    }
+    // for (auto& kv : res) {
+    //     ss << " " << to_string(kv.first)
+    //         << " " << kv.second.GetName()
+    //         << " N=" << kv.second.GetEntries()
+    //         << " I=" << kv.second.Integral()
+    //         << " mu=" << kv.second.GetMean() << endl;
+    // }
     ss << "]" << endl;
     return ss.str();
 }
