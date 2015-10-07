@@ -32,7 +32,7 @@ for samp in sampstorun:
         tf.AddFile(fn)
     nEntries = tf.GetEntries()
     for ch in chunks(range(nEntries), perjob):
-
+        print s.name, ch[0], len(ch)
         #default configuration
         ret = {
             "filenames": s.fileNamesS2,
@@ -43,6 +43,12 @@ for samp in sampstorun:
             "numEntries": len(ch),
             "printEvery": 0,
             "sparseAxes": [
+                {
+                    "func": "mem_SL_0w2h2t",
+                    "xMin": 0,
+                    "xMax": 1,
+                    "nBins": 6
+                },
                 {
                     "func": "numJets",
                     "xMin": 3,
@@ -65,13 +71,19 @@ for samp in sampstorun:
                     "func": "btag_LR_4b_2b_logit",
                     "xMin": -20,
                     "xMax": 20,
-                    "nBins": 80
+                    "nBins": 20 
                 },
                 {
-                    "func": "mem_SL_0w2h2t",
-                    "xMin": 0,
-                    "xMax": 1,
-                    "nBins": 6
+                    "func": "topCandidate_mass",
+                    "xMin": 100,
+                    "xMax": 200,
+                    "nBins": 20 
+                },
+                {
+                    "func": "Wmass",
+                    "xMin": 40,
+                    "xMax": 120,
+                    "nBins": 20 
                 }
             ]
         }

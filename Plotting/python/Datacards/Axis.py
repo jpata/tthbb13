@@ -14,9 +14,9 @@ class axis:
                  nbins,
                  xmin,
                  xmax,
-                 fun,
-                 addUnderflow,
-                 addOverflow):
+                 fun = None,
+                 addUnderflow = 0,
+                 addOverflow = 0):
         """" Defines an axis for a multi-dimensional histogram
         name         : name of the axis
         nbins        : number of bins

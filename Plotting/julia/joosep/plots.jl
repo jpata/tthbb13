@@ -1,16 +1,12 @@
-using ROOT, ROOTDataFrames, Histograms, ROOTHistograms
+using ROOT, ROOTDataFrames, Histograms, ROOTHistograms, PyCall
+@pyimport TTH.Plotting.Datacards.MiniSamples as minisamples
 
-const path = "/hdfs/cms/store/user/jpata/tth/Oct5_bdt_022sj_V13_47cdf50"
+samples = Dict{Symbol, ASCIIString}()
+for (k, v) in minisamples.samples_dict
+    samples[symbol(k)] = v
+end
 
-samples = Dict(
-    :ttH_hbb => "$path/ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.root",
-
-    :ttbarPlus2B => "$path/TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9_tt2b.root",
-    :ttbarPlusB => "$path/TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9_ttb.root",
-    :ttbarPlusBBbar => "$path/TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9_ttbb.root",
-)
-
-function process_sample(name, file)
+function process_sample(name, cutfunc, file)
     df = TreeDataFrame([file]; treename="tree")
 
     hists = Dict(
@@ -29,21 +25,20 @@ function process_sample(name, file)
         push!(hists[:mem_SL_2w2h2t_sj], memfn(row, 10, 0.2))
         push!(hists[:mva], row.tth_mva())
     end
-
+    
+    branches = [
+        :is_sl, :is_dl,
+        :mem_tth_p, :mem_ttbb_p,
+        :numJets, :nBCSVM,
+        :btag_LR_4b_2b,
+        :njets,
+        :jets_pt,
+        :n_excluded_bjets, :ntopCandidate, :tth_mva
+    ]
     loop(df,
         fillfunc,
-        #row-> row.is_sl() == 1 && row.numJets() == 4 && row.nBCSVM() == 2 && row.btag_LR_4b_2b() > 0.95 && row.n_excluded_bjets() < 2 && row.ntopCandidate() == 1,
-        row-> row.is_sl() == 1 && row.numJets() == 4 && row.nBCSVM() == 2 && row.btag_LR_4b_2b() > 0.95,
-        [
-            :is_sl, :is_dl,
-            :mem_tth_p, :mem_ttbb_p,
-            :numJets, :nBCSVM,
-            :btag_LR_4b_2b,
-            :njets,
-            :jets_pt,
-            :n_excluded_bjets, :ntopCandidate, :tth_mva
-        ],
-        1:length(df),
+        cutfunc,
+        branches
     )
 
     ret = Dict()
@@ -53,10 +48,27 @@ function process_sample(name, file)
     return ret
 end
 
+cutfuncs = Dict(
+    :sl_jge6_tge4_boosted => row -> (
+        row.is_sl() == 1 &&
+        row.numJets() >= 6 &&
+        row.nBCSVM() >= 4 &&
+        row.btag_LR_4b_2b() > 0.95 && row.n_excluded_bjets() < 2 && row.ntopCandidate() == 1
+    ),
+    :sl_jge6_t3_boosted => row -> (
+        row.is_sl() == 1 &&
+        row.numJets() >= 6 &&
+        row.nBCSVM() == 3 &&
+        row.btag_LR_4b_2b() > 0.95 && row.n_excluded_bjets() < 2 && row.ntopCandidate() == 1
+    ),
+)
+
 res = Dict()
 for sn in keys(samples)
-    r = process_sample(sn, samples[sn])
-    merge!(res, r)
+    for (cutname, cutfunc) in cutfuncs
+        r = process_sample("$sn/$cutname", cutfunc, samples[sn])
+        merge!(res, r)
+    end
 end
 
 write_hists_to_file("hists.root", res; verbose=false)
