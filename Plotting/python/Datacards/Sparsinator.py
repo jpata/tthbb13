@@ -162,4 +162,3 @@ if __name__ == "__main__":
     
     ROOT.gROOT.SetBatch(True)
     sparsinate(samples)
-

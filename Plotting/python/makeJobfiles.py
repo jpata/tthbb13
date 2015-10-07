@@ -11,10 +11,10 @@ sampstorun = [
     "TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9_ttb",
     "TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9_ttcc",
     "TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9_ttll",
-    "TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
-    "TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
-    "TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
-    "TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
+#    "TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
+#    "TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
+#    "TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
+#    "TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
 ]
 #entries per job
 perjob = 500000
@@ -42,19 +42,38 @@ for samp in sampstorun:
             "firstEntry": ch[0],
             "numEntries": len(ch),
             "printEvery": 0,
-            "btagLRCuts": {
-                "dl:j3_t2": 0.2,
-                "dl:jge3_t3": 4.4,
-                "dl:jge4_t2": 0.5,
-                "dl:jge4_tge4": 8.9,
-                "sl:j4_t3": 4.1,
-                "sl:j4_t4": 9.8,
-                "sl:j5_t3": 4.4,
-                "sl:j5_tge4": 8.9,
-                "sl:jge6_t2": 0.8,
-                "sl:jge6_t3": 4.4,
-                "sl:jge6_tge4": 8.3
-            }
+            "sparseAxes": [
+                {
+                    "func": "numJets",
+                    "xMin": 3,
+                    "xMax": 6,
+                    "nBins": 3
+                },
+                {
+                    "func": "nBCSVM",
+                    "xMin": 2,
+                    "xMax": 4,
+                    "nBins": 2
+                },
+                {
+                    "func": "nBoosted",
+                    "xMin": 0,
+                    "xMax": 2,
+                    "nBins": 2
+                },
+                {
+                    "func": "btag_LR_4b_2b_logit",
+                    "xMin": -20,
+                    "xMax": 20,
+                    "nBins": 80
+                },
+                {
+                    "func": "mem_SL_0w2h2t",
+                    "xMin": 0,
+                    "xMax": 1,
+                    "nBins": 6
+                }
+            ]
         }
         of = open("job_{0}.json".format(ijob), "w")
         of.write(json.dumps(ret, indent=2))
