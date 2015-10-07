@@ -7,15 +7,17 @@ class Sample:
 
 
 hostname = os.environ.get("HOSTNAME", "")
-if hostname == "t3ui12":
+#PSI
+if "t3ui12" in hostname:
     path = "/scratch/gregor/jpata/tth/Oct5_bdt_022sj_V13_47cdf50/"
-elif hostname == "pata-slc6":
+#Jooseps laptop
+elif "pata-slc6" in hostname:
     path = "/home/joosep/joosep-mac/Documents/tth/data/ntp/v12/Sep9_jec_jer/"
+#Tallinn
 elif "hep.kbfi.ee" in hostname:
-    path = "/home/joosep/tth/spring15/Sep14_spring15_preV13_9a1f781/"
+    path = "/home/joosep/tth/gc/"
 else:
-    path = "/Users/joosep/Documents/tth/data/ntp/v12/Sep14/"
-
+    raise Exception("Sample path not defined for hostname={0}!".format(hostname))
 
 samples_dict = {    
     "ttH_hbb"        : path + "ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.root",
