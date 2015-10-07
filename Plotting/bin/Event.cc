@@ -57,7 +57,9 @@ const map<string, function<float(const Event& ev)>> AxisFunctions = {
     {"numJets", [](const Event& ev) { return ev.numJets;}},
     {"nBCSVM", [](const Event& ev) { return ev.nBCSVM;}},
     {"btag_LR_4b_2b_logit", [](const Event& ev) { return ev.btag_LR_4b_2b_logit;}},
-    {"nBoosted", [](const Event& ev) { return ev.n_excluded_bjets<2 && ev.ntopCandidate==1;}}
+    {"nBoosted", [](const Event& ev) { return ev.n_excluded_bjets<2 && ev.ntopCandidate==1;}},
+    {"topCandidate_mass", [](const Event& ev) { return ev.topCandidate_mass;}},
+    {"Wmass", [](const Event& ev) { return ev.Wmass;}}
 };
 
 const Configuration Configuration::makeConfiguration(JsonValue& value) {
@@ -705,7 +707,9 @@ void CategoryProcessor::fillHistograms(
     if (!results.count(jet0_pt_key)) {
         results[jet0_pt_key] = new TH1D("jet0_pt", "Leading jet pt", 100, 0, 500);
     }
-    static_cast<TH1D*>(results[jet0_pt_key])->Fill(event.jets[0].p4.Pt(), weight);
+    if (event.jets.size()>0) {
+        static_cast<TH1D*>(results[jet0_pt_key])->Fill(event.jets.at(0).p4.Pt(), weight);
+    } 
     //cout << "    fill "  << to_string(jet0_pt_key) << endl;
 
 }
@@ -854,7 +858,13 @@ void SparseCategoryProcessor::fillHistograms(
     if (h != nullptr) {
         vector<double> vals;
         for (auto& ax : axes) {
-            vals.push_back(ax.evalFunc(event));
+            double x = ax.evalFunc(event);
+            if (x < ax.xMin) {
+                x = ax.xMin;
+            } else if (x >= ax.xMax) {
+                x = ax.xMax - (ax.xMax-ax.xMin)/(double)ax.nBins;
+            }
+            vals.push_back(x);
         }
 
         h->Fill(&vals[0], weight);

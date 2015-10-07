@@ -18,12 +18,12 @@ from Axis import axis
 
 ROOT.TH1.AddDirectory(0)
 
+
 ########################################
 # Configuration
 ########################################
 
-#SparseMEM_2015-10-02-1431
-input_path = "/scratch/gregor/SparseMEM_2015-10-06-0941/"
+input_file = "/shome/jpata/tth//datacards/Oct7_sparse/ControlPlots.root"
 
 signals = [
     "ttH_hbb", 
@@ -44,6 +44,50 @@ backgrounds = [
 
 
 ########################################
+# Cut
+########################################
+
+class Cut(object):
+    """ Helper class: simple cut that knows the number of the axis
+    (wrt/ to the static axes list) and the low (lo) and high (hi) bin
+    to include.
+    """
+    
+    axes = None
+
+    def __init__(self, axis=-1, lo=-1, hi=-1):            
+        self.axis = axis
+        self.lo = lo
+        self.hi = hi
+        
+    def __nonzero__(self):
+        if self.axis == -1:
+            return False
+        else:
+            return True
+
+    def __repr__(self):
+
+        if self.axis >= 0:
+            axis = self.axes[self.axis]            
+            binsize = (axis.xmax - axis.xmin)/(1.*axis.nbins)
+            lower = axis.xmin + (self.lo-1)*binsize
+            upper = axis.xmin + (self.hi)*binsize
+            
+            # Binsize of 1 means we have integer bins 
+            if binsize==1.:
+                lower = int(lower)
+                upper = int(upper)
+            
+            return "{0}__{1}__{2}".format(axis.name, lower, upper).replace(".","_").replace("-","m")
+                
+        else:
+            return ""
+
+
+        
+        
+########################################
 # Categorization
 ########################################
 
@@ -51,17 +95,18 @@ class Categorization(object):
 
     """ Categorization: class for finding analysis categories.
 
-    Three associated static objects:
-    h_sig, h_bkg: Dictionaries of signal/background sparse histograms (THN objects)
+    Associated static objects:
+    h_sig, h_bkg: Dictionaries of signal/background sparse histograms
+        (THN objects): key = sample
+    h_sig_sys, h_bkg_sys: Nested Dictionaries of signal/background
+        sparse histograms (THN objects) keys = sample, syst
     axes: A list of axis objects
 
-    The cutflow is implemented as a binary tree. The cut member is
-    the additional cut to perform for a given node. The total cut for
-    a node is the sum of it's own cut and the cuts on all it's
-    ancestors. The root node will not have any cut associated to it.
-
-    A cut is a list of three numbers: 
-    the axis, the leftmost included bin, the rightmost included bin
+    The cutflow is implemented as a binary tree. The cut member is the
+    additional cut to perform for a given node (Cut type object).  The
+    total cut for a node is the sum of it's own cut and the cuts on
+    all it's ancestors. The root node will not have any cut associated
+    to it.
 
     Children are always created in pairs (d'uh - it's a binary tree) -
     one with a cut, the other one with it's inversion.
@@ -69,6 +114,10 @@ class Categorization(object):
         
     h_sig = None
     h_bkg = None
+
+    h_sig_sys = None
+    h_bkg_sys = None
+
     axes = None
 
     def __init__(self, cut, parent=None):
@@ -111,17 +160,17 @@ class Categorization(object):
         for c in all_previous_cuts:
             # Make sure the cut is defined (ignore the root node) and
             # modifies the axis we are testing right now
-            if c and c[0] == iaxis:
+            if c and c.axis == iaxis:
 
-                if c[1] > leftmost_of_left_bins:
-                    leftmost_of_left_bins = c[1]
-                if c[1] > rightmost_of_left_bins:
-                    rightmost_of_left_bins = c[1]
+                if c.lo > leftmost_of_left_bins:
+                    leftmost_of_left_bins = c.lo
+                if c.lo > rightmost_of_left_bins:
+                    rightmost_of_left_bins = c.lo
 
-                if c[2] < leftmost_of_right_bins:
-                    leftmost_of_right_bins = c[2]
-                if c[2] < rightmost_of_right_bins:
-                    rightmost_of_right_bins = c[2]
+                if c.hi < leftmost_of_right_bins:
+                    leftmost_of_right_bins = c.hi
+                if c.hi < rightmost_of_right_bins:
+                    rightmost_of_right_bins = c.hi
         # End of loop over cuts
         
         # Sanity check: make sure our cut is still doable after the
@@ -134,39 +183,28 @@ class Categorization(object):
             return -1
 
         # And finally: actually spawn two new children and add the Nodes to the tree
-        child_pass = Categorization([iaxis, leftmost_of_left_bins, rightmost_of_left_bins], parent=self)
-        child_fail = Categorization([iaxis, leftmost_of_right_bins, rightmost_of_right_bins], parent=self)
+        child_pass = Categorization(Cut(iaxis, leftmost_of_left_bins, rightmost_of_left_bins), parent=self)
+        child_fail = Categorization(Cut(iaxis, leftmost_of_right_bins, rightmost_of_right_bins), parent=self)
         self.children = [child_pass, child_fail]
 
 
-    def printTree(self, depth=0):    
+    def print_tree(self, depth=0):    
         """ Print the node and all it's children recursively in a pretty way """
 
-        if self.cut:
-            axis = self.axes[self.cut[0]]
-            
-            binsize = (axis.xmax - axis.xmin)/(1.*axis.nbins)
-            lower = axis.xmin + (self.cut[1]-1)*binsize
-            upper = axis.xmin + (self.cut[2])*binsize
-
-            print_string = "{0}: {1}..{2}".format(axis.name, lower, upper)
-                                                  
-        else:
-            print_string = ""
-
-        S,B = self.getSB()
-        print "  " * depth,  print_string, "\t S={0:.1f}, B={1:.1f}, S/B={2:.2f} S/sqrt(S+B)={3:.2f}".format(S,B,S/B,S/math.sqrt(S+B))
+        S,B = self.get_sb()
+        print "   " * depth, self.cut, "S={0:.1f}, B={1:.1f}, S/sqrt(S+B)={2:.2f}".format(S,B,S/math.sqrt(S+B))
         for c in self.children:
-            c.printTree(depth+1)
+            c.print_tree(depth+1)
 
 
-    def getSB(self):
-        """ Get the total signal and background counts after applying the cuts (+ancestors) for all the associated THNs. 
+    def get_sb(self):
+        """ Get the total signal and background counts after applying
+        the cuts (+ancestors) for all the associated THNs.
 
         Return a tuple of numbers: signal and background counts
         """
 
-        self.prepareAllTHNs()        
+        self.prepare_nominal_thns()        
         S = sum([x.Projection(0).Integral() for x in h_sig.values()])
         B = sum([x.Projection(0).Integral() for x in h_bkg.values()])
         return S,B
@@ -196,8 +234,28 @@ class Categorization(object):
             return []
         
 
-    def prepareAllTHNs(self):
-        """ Prime all THN so a Projection call return the the
+    def prepare_nominal_thns(self):
+        """ Prime nominal (no systematics) THNs for projection """
+        thns = h_sig.values() + h_bkg.values()
+        self.prepare_thns(thns)
+
+
+    def prepare_all_thns(self):
+        """ Prime nominal and systematic variation THNs for projection """
+        
+        # Nominal
+        thns = h_sig.values() + h_bkg.values() 
+        
+        # Systematic variations
+        # (these nested dictionaries)
+        for v in h_sig_sys.values() + h_bkg_sys.values():
+            thns.extend(v.values())
+
+        self.prepare_thns(thns)
+
+
+    def prepare_thns(self, thns):
+        """ Prime THNs so a Projection call return the the
         histogram after all cuts (and all ancestors cuts) have been
         applied """
     
@@ -207,7 +265,7 @@ class Categorization(object):
         all_cuts = [p.cut for p in self.all_parents()] + [self.cut]
 
         # Loop over all histograms
-        for thn in h_sig.values() + h_bkg.values():
+        for thn in thns:
 
             # First cut on the axes but ignore the overflow bin
             for iaxis, axis in enumerate(self.axes):            
@@ -219,7 +277,7 @@ class Categorization(object):
             for c in all_cuts:
                 if c: # this is just to handle the ROOT node
                     # And restirct the axis range
-                    thn.GetAxis(c[0]).SetRange(c[1], c[2])
+                    thn.GetAxis(c.axis).SetRange(c.lo, c.hi)
         # End of loop over histograms
 
 
@@ -232,7 +290,7 @@ class Categorization(object):
         """ Calculate the cost function of the tree. Squared sum of
         S/sqrt(S+B) over all leaves that are children/grand-children
         of this node """
-        SBs = [l.getSB() for l in self.get_leaves()]
+        SBs = [l.get_sb() for l in self.get_leaves()]
 
         # Make sure the denominators are all >0
         if any([sum(SB)==0 for SB in SBs]):
@@ -241,102 +299,198 @@ class Categorization(object):
         sig  = math.sqrt(sum([math.pow(x[0],2)/(x[0]+x[1]) for x in SBs]))
         return sig
 
+    
+    def find_categories(self, n=6):
+        """Define binning, maximizing eval() at each step """
+
+        for i_iter in range(n):
+            print "Doing iteration", i_iter
+
+            best_sig = self.eval()        
+            best_split = None
+            second_best_sig = None
+
+            # Loop over axes
+            for iaxis, axis in enumerate(self.axes):
+
+                print "Testing axis", iaxis
+
+                # We don't want to split by the MEM variable
+                if iaxis==0:
+                    continue
+
+                # Loop over bins on the axis
+                # (ROOT Histogram bin counting starts at 1)
+                for split_bin in range(1, axis.nbins):
+
+                    # Loop over all leaves - these are the categories that we
+                    # could split further
+                    for l in self.get_leaves():
+
+                        # The split function executes the split
+                        # If it failed (return value of -1) - for example because the requested range is already excluded
+                        # we go to the next one
+                        if l.split(iaxis, split_bin)==-1:
+                            continue
+
+                        # Test if the splitting increased the significance
+                        # Store if it helped
+                        sig = self.eval()
+                        if  sig > best_sig:
+                            second_best_sig = best_sig
+                            best_sig = sig                                        
+                            best_split = [l, iaxis, split_bin] # remeber which category to split, on which axis, at which bin 
+
+                        # Undo the split
+                        l.merge()
+
+                    # End of loop over leaves
+                # End of loop over histogram bins
+            # End of loop over axes
+
+            print "New Split:", best_sig, second_best_sig
+            best_split[0].split(best_split[1],best_split[2])
+            self.print_tree()
+        # End of loop over iterations
+
+
+    def __repr__(self):
+        """Printing a category returns its name. The name is built
+        from the cuts of this category and its ancestors"""
+        
+        all_cuts = [p.cut for p in self.all_parents()] + [self.cut]
+        
+        # The name of a bin is the sum of all cuts
+        # -we want the axes in the order the cutflow goes
+        # -BUT only list the tightest cut
+        
+        # First just extract the order of axes
+        axes_order = [c.axis for c in all_cuts if c]
+        unique_axes = []
+        for ia, a in enumerate(axes_order):
+            if not a in axes_order[:ia]:
+                unique_axes.append(a)
+        
+        unique_cuts = []
+        for a in unique_axes:
+            unique_cuts.append( [c for c in all_cuts if c.axis == a][-1])
+        
+        return "__".join([c.__repr__() for c in unique_cuts])
+
         
 ########################################
 # Get All Sparse Histograms
 ########################################
 
+f = ROOT.TFile(input_file)
+
 h_sig = {}
 h_bkg = {}
+h_sig_sys = {}
+h_bkg_sys = {}
 
-for signal in signals:
-    f = ROOT.TFile(input_path + signal + ".root")
-    h_sig[signal] = f.Get("foo")
+for processes, h, h_sys in zip( [signals,   backgrounds],
+                                [h_sig,     h_bkg],
+                                [h_sig_sys, h_bkg_sys] ):
+    for process in processes:
 
-for background in backgrounds:
-    f = ROOT.TFile(input_path + background + ".root")
-    h_bkg[background] = f.Get("foo")
+        # Nominal Histograms
+        h[process] = f.Get("{0}/sl/sparse".format(process))
+        print process, h[process].GetEntries()
 
-for k,v in h_sig.iteritems():
-    print k, v.GetEntries()
-for k,v in h_bkg.iteritems():
-    print k, v.GetEntries()
+        # Systematic Variations
+        h_sys[process] = {}     
+        for key in f.Get("{0}/sl".format(process)).GetListOfKeys():
+
+            if not "sparse_" in key.GetName():
+                continue
+             
+            syst_name = key.GetName().replace("sparse_", "")
+            h_sys[process][syst_name] = f.Get("{0}/sl/{1}".format(process, key.GetName()))
+
+        # End loop over keys
+    # End loop over processes
+# End Signal/Background loop
+            
+
+########################################
+# Extract axes from a histogram
+########################################
+
+axes = []
+n_dim = h_sig["ttH_hbb"].GetNdimensions()
+print "We have", n_dim, "dimensions"
+for i_axis in range(n_dim):
+    a = h_sig["ttH_hbb"].GetAxis(i_axis)
+    new_axis = axis(a.GetName(), a.GetNbins(), a.GetXmin(), a.GetXmax())
+    axes.append(new_axis)
+    print i_axis, new_axis
 
 
 ########################################
-# Get the axes
+# Categorization
 ########################################
 
-if_axis = open(input_path + "axes.pickle","rb")
-axes = pickle.load(if_axis)
-if_axis.close()
-
-for iaxis, axis in enumerate(axes):
-    print iaxis, axis
-
-
-########################################
-# Init Categorization
-########################################
-
+Cut.axes = axes
 Categorization.axes = axes
 Categorization.h_sig = h_sig
 Categorization.h_bkg = h_bkg
+Categorization.h_sig_sys = h_sig_sys
+Categorization.h_bkg_sys = h_bkg_sys
 
-r = Categorization([])
+r = Categorization(Cut())
+#r.find_categories()
+
+r.split(4, 15)
+r.children[0].split(1,1)
+r.children[1].split(1,1)
+
 
 
 ########################################
-# Do actual work
+# Create ControlPlots file
 ########################################
 
-for i_iter in range(12):
+of = ROOT.TFile("ControlPlots.root", "RECREATE")
 
-    print "Doing iteration", i_iter
+# Loop over categories
+for l in r.get_leaves():
 
-    best_sig = r.eval()        
-    best_split = None
-    second_best_sig = None
+    print l
+    l.prepare_all_thns()
+    
+    # Nominal
+    for process, thn in h_sig.items() + h_bkg.items():        
 
-    # Loop over axes
-    for iaxis, axis in enumerate(axes):
+        # Get the output directory (inside the TFile)
+        outdir = "{0}/{1}".format(process, l)
+        if of.Get(outdir) == None:
+            of.mkdir(outdir)
+        outdir = of.Get(outdir)
 
-        print "Testing axis", iaxis
+        
+        h = thn.Projection(0).Clone()
+        h.SetName(axes[0].name)
+        h.SetDirectory(outdir)
+        outdir.Write("", ROOT.TObject.kOverwrite)
+    # End of loop over processes
 
-        # We don't want to split by the MEM variable
-        if iaxis==0:
-            continue
+    # Systematic Variations
+    for process, hs in h_sig_sys.items() + h_bkg_sys.items():
 
-        # Loop over bins on the axis
-        # (ROOT Histogram bin counting starts at 1)
-        for split_bin in range(1, axis.nbins):
+        # Get the output directory  (inside the TFile)
+        outdir = "{0}/{1}".format(process, l)
+        if of.Get(outdir) == None:
+            of.mkdir(outdir)
+        outdir = of.Get(outdir)
 
-            # Loop over all leaves - these are the categories that we
-            # could split further
-            for l in r.get_leaves():
+        for sys_name, thn in hs.items():
 
-                # The split function executes the split
-                # If it failed (return value of -1) - for example because the requested range is already excluded
-                # we go to the next one
-                if l.split(iaxis, split_bin)==-1:
-                    continue
-
-                # Test if the splitting increased the significance
-                # Store if it helped
-                sig = r.eval()
-                if  sig > best_sig:
-                    second_best_sig = best_sig
-                    best_sig = sig                                        
-                    best_split = [l, iaxis, split_bin] # remeber which category to split, on which axis, at which bin 
-
-                # Undo the split
-                l.merge()
-            
-            # End of loop over leaves
-        # End of loop over histogram bins
-    # End of loop over axes
-
-    print "New Split:", best_sig, second_best_sig
-    best_split[0].split(best_split[1],best_split[2])
-    r.printTree()
-# End if loop over iterations
+            h = thn.Projection(0).Clone()
+            h.SetName(axes[0].name + "_" + sys_name)
+            h.SetDirectory(outdir)
+            outdir.Write("", ROOT.TObject.kOverwrite)
+        
+        # End of loop over systematics
+    # End of loop over processes
+# End of loop over categories
