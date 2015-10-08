@@ -299,4 +299,11 @@ if __name__ == "__main__":
     # cProfile.run("f()")
     
     # timeit.timeit("g()", number=10)
-    MakeDatacard(sys.argv[1], "shapes.root", "shapes.txt", do_stat_variations=False)
+    import time
+
+    n = 10
+    t0 = time.time()
+    for i in range(n):
+        MakeDatacard(sys.argv[1], "shapes.root", "shapes.txt", do_stat_variations=False)
+    t1 = time.time()
+    print (t1-t0)/float(n)
