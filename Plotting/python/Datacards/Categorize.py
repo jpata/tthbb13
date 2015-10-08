@@ -26,11 +26,11 @@ ROOT.TH1.AddDirectory(0)
 # Configuration
 ########################################
 
-input_file = "/shome/jpata/tth//datacards/Oct7_sparse/ControlPlots.root"
+input_file = "/shome/jpata/tth/datacards/Oct7_sparse/ControlPlots.root"
 output_path = "/scratch/gregor/foobar"
 
 n_proc = 15
-n_iter = 4
+n_iter = 10
 
 signals = [
     "ttH_hbb", 
@@ -344,7 +344,7 @@ class Categorization(object):
                 print "Preparing axis", iaxis
 
                 # We don't want to split by the MEM variable
-                if iaxis==0 or iaxis > 3:
+                if iaxis==0:
                     continue
 
                 # Loop over bins on the axis
