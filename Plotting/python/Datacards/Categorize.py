@@ -16,7 +16,7 @@ from multiprocessing import Pool
 import ROOT
 
 from Axis import axis
-from CombineHelper import get_limit
+import CombineHelper
 from makeDatacard import MakeDatacard
 
 ROOT.TH1.AddDirectory(0)
@@ -27,6 +27,10 @@ ROOT.TH1.AddDirectory(0)
 ########################################
 
 input_file = "/shome/jpata/tth//datacards/Oct7_sparse/ControlPlots.root"
+output_path = "/scratch/gregor/foobar"
+
+n_proc = 15
+n_iter = 4
 
 signals = [
     "ttH_hbb", 
@@ -44,8 +48,6 @@ backgrounds = [
 #    "ttz_zllnunu",    
 #    "ttz_zqq",
 ]        
-
-
 
 
 ########################################
@@ -125,7 +127,8 @@ class Categorization(object):
 
     axes = None
 
-    pool = Pool(10)
+    pool = None
+    output_path = None
 
     def __init__(self, cut, parent=None):
         """ Create a new node """        
@@ -314,62 +317,20 @@ class Categorization(object):
         sig  = math.sqrt(sum([math.pow(x[0],2)/(x[0]+x[1]) for x in SBs]))
         return sig
 
-    
-    def find_categories(self, n=6):
-        """Define binning, maximizing eval() at each step """
-
-        for i_iter in range(n):
-            print "Doing iteration", i_iter
-
-            best_sig = self.eval()        
-            best_split = None
-            second_best_sig = None
-
-            # Loop over axes
-            for iaxis, axis in enumerate(self.axes):
-
-                print "Testing axis", iaxis
-
-                # We don't want to split by the MEM variable
-                if iaxis==0:
-                    continue
-
-                # Loop over bins on the axis
-                # (ROOT Histogram bin counting starts at 1)
-                for split_bin in range(1, axis.nbins):
-
-                    # Loop over all leaves - these are the categories that we
-                    # could split further
-                    for l in self.get_leaves():
-
-                        # The split function executes the split
-                        # If it failed (return value of -1) - for example because the requested range is already excluded
-                        # we go to the next one
-                        if l.split(iaxis, split_bin)==-1:
-                            continue
-
-                        # Test if the splitting increased the significance
-                        # Store if it helped
-                        sig = self.eval()
-                        if  sig > best_sig:
-                            second_best_sig = best_sig
-                            best_sig = sig                                        
-                            best_split = [l, iaxis, split_bin] # remeber which category to split, on which axis, at which bin 
-
-                        # Undo the split
-                        l.merge()
-
-                    # End of loop over leaves
-                # End of loop over histogram bins
-            # End of loop over axes
-
-            print "New Split:", best_sig, second_best_sig
-            best_split[0].split(best_split[1],best_split[2])
-            self.print_tree()
-        # End of loop over iterations
-
-
     def find_categories_async(self, n, limit_fun):
+
+        # Start by calculating the limit without splitting
+        splitting_name = "whole"                
+        control_plots_filename = "{0}/ControlPlots_{1}.root".format(self.output_path, splitting_name)
+        shapes_txt_filename    = "{0}/shapes_{1}.txt".format(self.output_path, splitting_name)
+        shapes_root_filename   = "{0}/shapes_{1}.root".format(self.output_path, splitting_name)
+        
+        self.create_control_plots(control_plots_filename)                        
+        MakeDatacard(control_plots_filename, 
+                     shapes_root_filename,
+                     shapes_txt_filename,
+                     do_stat_variations=False)
+        last_limit = limit_fun(shapes_txt_filename)
 
         for i_iter in range(n):
             print "Doing iteration", i_iter
@@ -380,10 +341,10 @@ class Categorization(object):
             # Loop over axes
             for iaxis, axis in enumerate(self.axes):
 
-                print "Testing axis", iaxis
+                print "Preparing axis", iaxis
 
                 # We don't want to split by the MEM variable
-                if iaxis==0 or iaxis>3:
+                if iaxis==0 or iaxis > 3:
                     continue
 
                 # Loop over bins on the axis
@@ -402,25 +363,20 @@ class Categorization(object):
                             
                         splitting_name = "iter_{0}_cats_{1}".format(i_iter, i_splitting)
                             
-                        # make the datacard here
                         # create control plots creates the control plots for the whole tree 
-                        control_plots_filename = "/scratch/gregor/foobar/ControlPlots_{0}.root".format(splitting_name)
-                        shapes_root_filename   = "/scratch/gregor/foobar/shapes_{0}.txt".format(splitting_name)
-                        shapes_txt_filename    = "/scratch/gregor/foobar/shapes_{0}.root".format(splitting_name)
+                        control_plots_filename = "{0}/ControlPlots_{1}.root".format(self.output_path, splitting_name)
+                        shapes_txt_filename    = "{0}/shapes_{1}.txt".format(self.output_path, splitting_name)
+                        shapes_root_filename   = "{0}/shapes_{1}.root".format(self.output_path, splitting_name)
 
-                        l.create_control_plots(control_plots_filename)
-                        
-                        print "Make datacard"
-
+                        l.create_control_plots(control_plots_filename)                        
                         MakeDatacard(control_plots_filename, 
                                      shapes_root_filename,
                                      shapes_txt_filename,
-                                     do_stat_variations=True)
-
-                        print "done making datacard"
+                                     do_stat_variations=False)
                             
                         splittings[shapes_txt_filename] = [l, iaxis, split_bin]
-      
+                        i_splitting += 1
+
                         # Undo the split
                         l.merge()
 
@@ -435,11 +391,13 @@ class Categorization(object):
             # build a list of tuples with limit name and numerical value
             li_name_limits = [(name,limit) for name,limit in zip(li_splittings, li_limits)]
             # sort by limit and take the lowest/best one
+
             best_splitting_name, best_limit = sorted(li_name_limits, key = lambda x:x[1])[0]
             best_split = splittings[best_splitting_name]
 
-            print "New Split:", best_limit
+            print "New Split:", best_limit, "(previous best was {0})".format(last_limit)
             best_split[0].split(best_split[1],best_split[2])
+            last_limit = best_limit
             self.print_tree()
         # End of loop over iterations
 
@@ -465,26 +423,25 @@ class Categorization(object):
         unique_cuts = []
         for a in unique_axes:
             unique_cuts.append( [c for c in all_cuts if c.axis == a][-1])
+
+        name = "__".join([c.__repr__() for c in unique_cuts])
+        if not name:
+            name = "Whole"
         
-        return "__".join([c.__repr__() for c in unique_cuts])
+        return name
 
 
     def create_control_plots(self, name):
-
-        print "Entering create.."
 
         of = ROOT.TFile(name, "RECREATE")
 
         root = self.get_root()
 
         dirs = {}
-        
-        print "Projecting"
-        
+                
         # Loop over categories
         for l in root.get_leaves():
 
-            print l
             l.prepare_all_thns()
 
             # Nominal
@@ -516,8 +473,6 @@ class Categorization(object):
                 # End of loop over systematics
             # End of loop over processes
         # End of loop over categories
-        
-        print "Storing"
 
         for outdir_str, hs in dirs.iteritems():
                         
@@ -529,7 +484,6 @@ class Categorization(object):
             outdir.Write("", ROOT.TObject.kOverwrite)
         of.Close()
 
-        print "Done storing histos"    
         
 ########################################
 # Get All Sparse Histograms
@@ -584,6 +538,9 @@ for i_axis in range(n_dim):
 # Categorization
 ########################################
 
+def get_limit(x):
+    return CombineHelper.get_limit(x, output_path)
+
 Cut.axes = axes
 Categorization.axes = axes
 Categorization.h_sig = h_sig
@@ -591,8 +548,12 @@ Categorization.h_bkg = h_bkg
 Categorization.h_sig_sys = h_sig_sys
 Categorization.h_bkg_sys = h_bkg_sys
 
+Categorization.output_path = output_path
+Categorization.pool = Pool(n_proc)
+
 r = Categorization(Cut())
-r.find_categories_async(3, get_limit)
+r.find_categories_async(n_iter, get_limit)
+
 
 #r.split(4, 15)
 #r.children[0].split(1,1)
