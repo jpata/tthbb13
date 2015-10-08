@@ -383,7 +383,7 @@ class Categorization(object):
                 print "Testing axis", iaxis
 
                 # We don't want to split by the MEM variable
-                if iaxis==0:
+                if iaxis==0 or iaxis>3:
                     continue
 
                 # Loop over bins on the axis
@@ -430,7 +430,7 @@ class Categorization(object):
 
             # Extract a list todo and pass them to the limit calculation
             li_splittings = splittings.keys()
-            li_limits = pool.map(limit_fun, li_splittings)
+            li_limits = self.pool.map(limit_fun, li_splittings)
             
             # build a list of tuples with limit name and numerical value
             li_name_limits = [(name,limit) for name,limit in zip(li_splittings, li_limits)]
