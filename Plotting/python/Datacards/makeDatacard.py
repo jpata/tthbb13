@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import ROOT
+import ROOT, shutil
 ROOT.gROOT.SetBatch(True)
 #ROOT.gErrorIgnoreLevel = ROOT.kError
 import sys, imp, os, copy
@@ -143,37 +143,38 @@ def MakeDatacard(infile_path, outfile_path, shapefile_path, do_stat_variations=F
     do_stat_variations (bool) : enable or disable statistical bin-by-bin variations
     """
     infile = ROOT.TFile(infile_path)
+    shutil.copy(infile_path, outfile_path)
 
     #datacard root file
-    outfile = ROOT.TFile(outfile_path, "RECREATE")
+    outfile = ROOT.TFile(outfile_path, "UPDATE")
 
     #get all processes in input file
     processes = getProcesses(infile)
 
     ####Step 1
     #get all histograms in input file, put to dict.
-    histmap = {}
-    for proc in processes:
-        histmap[proc] = {}
-        categories = getCategories(infile, proc)
-        for cat in categories:
-            distributions = getDistributions(infile, proc, cat)
-            histmap[proc][cat] = {}
-            for distr in distributions:
-                histmap[proc][cat][distr] = infile.Get("{0}/{1}/{2}".format(proc, cat, distr)) 
+    # histmap = {}
+    # for proc in processes:
+    #     histmap[proc] = {}
+    #     categories = getCategories(infile, proc)
+    #     for cat in categories:
+    #         distributions = getDistributions(infile, proc, cat)
+    #         histmap[proc][cat] = {}
+    #         for distr in distributions:
+    #             histmap[proc][cat][distr] = infile.Get("{0}/{1}/{2}".format(proc, cat, distr)) 
 
     #get the first process and all categories 
     proc_first = processes[0]
 
     #currently just assume that tt+H has the same categories as every other process
-    allcats = sorted(list(histmap[proc_first].keys()))
+    allcats = getCategories(infile, proc_first)
 
     ####Step 2
     #get the nominal histograms in each category
     hists_nominal = {}
     for cat in allcats:
         #get all histo names
-        allhists = list(histmap[proc_first][cat].keys())
+        allhists = getDistributions(infile, proc_first, cat)
 
         #assume all systematics have "CMS" in them
         cat_hists_nominal = filter(lambda x: "CMS" not in x, allhists)
@@ -183,7 +184,7 @@ def MakeDatacard(infile_path, outfile_path, shapefile_path, do_stat_variations=F
         hists_nominal[cat] = hist_nominal
 
         #copy all histograms to output file
-        copyHistograms(infile, outfile, allhists, [cat], processes)
+        #copyHistograms(infile, outfile, allhists, [cat], processes)
         if do_stat_variations:
             makeStatVariations(outfile, outfile, [hist_nominal], [cat], processes)
 
@@ -199,9 +200,8 @@ def MakeDatacard(infile_path, outfile_path, shapefile_path, do_stat_variations=F
     if do_stat_variations:
         for cat in allcats:
             #number of bins depends on distribution
-            nbins = histmap[proc_first][cat][hists_nominal[cat]].GetNbinsX()
+            nbins = infile.Get("{0}/{1}/{2}".format(proc_first, cat, hists_nominal[cat])).GetNbinsX()
             dcard.addStatVariations(cat, nbins)
-
 
     #output shapes.txt
     shapefile = open(shapefile_path, "w")
@@ -289,5 +289,14 @@ def getDistributions(ofile, process, category):
 if __name__ == "__main__":
     # Get the input proto-datacard
 
-    #finalize datacard to txt file
-    MakeDatacard(sys.argv[1], "shapes.root", "shapes.txt", do_stat_variations=True)
+    # import cProfile
+    # 
+    # def f():
+    #     #finalize datacard to txt file
+    #     for i in range(10):
+    #         MakeDatacard(sys.argv[1], "shapes.root", "shapes.txt", do_stat_variations=False)
+    # 
+    # cProfile.run("f()")
+    
+    # timeit.timeit("g()", number=10)
+    MakeDatacard(sys.argv[1], "shapes.root", "shapes.txt", do_stat_variations=False)
