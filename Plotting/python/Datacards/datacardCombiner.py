@@ -93,30 +93,27 @@ def makeStatVariations(tf, of, hists, channels, processes):
 # Create fake data
 ########################################
 def fakeData(tf, of, hists, channels, processes):
+    dircache = {}
     for hist in hists:
         for ch in channels:
-            h = None
-            for proc in processes:
+            h = tf.Get("{0}/{1}/{2}".format(processes[0], ch, hist)).Clone()
+            for proc in processes[1:]:
                 h2 = tf.Get("{0}/{1}/{2}".format(proc, ch, hist))
-                if h2:
-                    if not h:
-                        h = h2.Clone()
-                    else:
-                        h.Add(h2)
-            if h == None:
-                h = defaultHistogram(hist)
-
+                h.Add(h2)
+    
             outdir = "data_obs/{0}".format(ch)
-            if of.Get(outdir) == None:
-                of.mkdir(outdir)
-            outdir = of.Get(outdir)
-            #outdir.Add(h)
-            #h.Write("", ROOT.TObject.kOverwrite)
-            h.SetDirectory(outdir)
-            outdir.Write("", ROOT.TObject.kOverwrite)
+            dircache[outdir] = h 
+
         # End of loop over channels
     # End of loop over histograms
-
+    for (k, v) in dircache.items():
+        if of.Get(k) == None:
+            of.mkdir(k)
+        k = of.Get(k)
+        #outdir.Add(h)
+        #h.Write("", ROOT.TObject.kOverwrite)
+        v.SetDirectory(k)
+        k.Write("", ROOT.TObject.kOverwrite)
 
 ########################################
 # Combine categories
