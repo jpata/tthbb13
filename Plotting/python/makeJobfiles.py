@@ -1,21 +1,6 @@
-import TTH.Plotting.Samples as Samples
+import TTH.Plotting.Datacards.MiniSamples as Samples
 import ROOT, json
 
-#these samples will be enabled
-sampstorun = [
-    "ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
-    "ttHToNonbb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2",
-    # #"TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9", #inclusive
-    "TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9_tt2b",
-    "TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9_ttbb",
-    "TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9_ttb",
-    "TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9_ttcc",
-    "TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9_ttll",
-#    "TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
-#    "TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
-#    "TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
-#    "TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
-]
 #entries per job
 perjob = 500000
 
@@ -25,19 +10,17 @@ def chunks(l, n):
         yield l[i:i+n]
 
 ijob = 0
-for samp in sampstorun:
+for samp in Samples.samples_dict.keys():
     s = Samples.samples_dict[samp]
     tf = ROOT.TChain("tree")
-    for fn in s.fileNamesS2:
-        tf.AddFile(fn)
+    tf.AddFile(s)
     nEntries = tf.GetEntries()
     for ch in chunks(range(nEntries), perjob):
-        print s.name, ch[0], len(ch)
         #default configuration
         ret = {
-            "filenames": s.fileNamesS2,
+            "filenames": [s],
             "lumi": 10000.0,
-            "process": s.name,
+            "process": samp,
             "outputFile": "ControlPlotsSparse_{0}.root".format(ijob),
             "firstEntry": ch[0],
             "numEntries": len(ch),
@@ -52,14 +35,14 @@ for samp in sampstorun:
                 {
                     "func": "numJets",
                     "xMin": 3,
-                    "xMax": 6,
-                    "nBins": 3
+                    "xMax": 7,
+                    "nBins": 4
                 },
                 {
                     "func": "nBCSVM",
                     "xMin": 2,
-                    "xMax": 4,
-                    "nBins": 2
+                    "xMax": 5,
+                    "nBins": 3
                 },
                 {
                     "func": "nBoosted",
@@ -71,19 +54,19 @@ for samp in sampstorun:
                     "func": "btag_LR_4b_2b_logit",
                     "xMin": -20,
                     "xMax": 20,
-                    "nBins": 20 
+                    "nBins": 10
                 },
                 {
                     "func": "topCandidate_mass",
                     "xMin": 100,
                     "xMax": 200,
-                    "nBins": 20 
+                    "nBins": 6
                 },
                 {
                     "func": "Wmass",
                     "xMin": 40,
                     "xMax": 120,
-                    "nBins": 20 
+                    "nBins": 6
                 }
             ]
         }
