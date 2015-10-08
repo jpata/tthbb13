@@ -154,4 +154,5 @@ function +(d1::Dict, d2::Dict)
     return ret
 end
 
+export process_sample
 end #module Analysis

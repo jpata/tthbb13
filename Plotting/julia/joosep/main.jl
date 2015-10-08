@@ -15,10 +15,11 @@ sendto(workers(), wd=wd)
 include("$wd/ntuple.jl")
 using Analysis, ROOTHistograms
 
-@everywhere process(args) = Analysis.process_sample(args[1], args[2]; range=args[3]:args[4])
+@everywhere process(args) = process_sample(args[1], args[2]; range=args[3]:args[4])
 
-function main()
+function main(args)
     res = pmap(process, args)
+    println(res)
     ret = reduce(+,
         Dict(),
         res 
@@ -75,7 +76,7 @@ end
 
 const args = make_args(samples, chunksize)
 
-const ret = main()
+const ret = main(args[1:5])
 const newret = systematize_output(ret)
 
 write_hists_to_file("hists_main.root", newret; verbose=false)
