@@ -179,11 +179,11 @@ def doWork( dic_files, output_dir ):
            # or a tuple: (filename, treename)
            # ONLY FILENAME GIVEN
            if isinstance( dic_files[p.from_file], str ):          
-              input_file = ROOT.TFile( dic_files[p.from_file], "READ" )
+              input_file = ROOT.TFile.Open( dic_files[p.from_file], "READ" )
               input_tree = getattr(input_file, "tree")
            # FILENAME AND TREENAME FIVEN
            else:
-              input_file = ROOT.TFile( dic_files[p.from_file][0], "READ" )
+              input_file = ROOT.TFile.Open( dic_files[p.from_file][0], "READ" )
               input_tree = getattr(input_file, dic_files[p.from_file][1])
            # end openeing input file
 
@@ -324,6 +324,8 @@ def doWork( dic_files, output_dir ):
             #h.GetYaxis().SetTitle( cp.label_y + " / "+str(bin_width) +" "+ cp.axis_unit)
             h.GetYaxis().SetTitle( cp.label_y)
             h.GetYaxis().SetTitleOffset(1.7)
+
+            print p.name, h.GetEntries()
 
             # Optional fit            
             if p.fit is not None:
