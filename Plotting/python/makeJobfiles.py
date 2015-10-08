@@ -38,7 +38,7 @@ for samp in sampstorun:
             "filenames": s.fileNamesS2,
             "lumi": 10000.0,
             "process": s.name,
-            "outputFile": "ControlPlots_{0}.root".format(ijob),
+            "outputFile": "ControlPlotsSparse_{0}.root".format(ijob),
             "firstEntry": ch[0],
             "numEntries": len(ch),
             "printEvery": 0,
