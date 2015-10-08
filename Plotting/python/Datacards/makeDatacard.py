@@ -151,6 +151,14 @@ def MakeDatacard(infile_path, outfile_path, shapefile_path, do_stat_variations=F
     #get all processes in input file
     processes = getProcesses(infile)
 
+    #reorder categories
+    processes_new = []
+    for proc in ["ttH_hbb"]:
+        if proc in processes:
+            processes.remove(proc)
+            processes_new += [proc]
+    processes_new += processes
+    processes = processes_new
     ####Step 1
     #get all histograms in input file, put to dict.
     # histmap = {}
@@ -289,6 +297,9 @@ def getDistributions(ofile, process, category):
 if __name__ == "__main__":
     # Get the input proto-datacard
 
+    MakeDatacard(sys.argv[1], "shapes.root", "shapes.txt", do_stat_variations=False)
+
+
     # import cProfile
     # 
     # def f():
@@ -300,10 +311,10 @@ if __name__ == "__main__":
     
     # timeit.timeit("g()", number=10)
     import time
-
-    n = 10
-    t0 = time.time()
-    for i in range(n):
-        MakeDatacard(sys.argv[1], "shapes.root", "shapes.txt", do_stat_variations=False)
-    t1 = time.time()
-    print (t1-t0)/float(n)
+    # 
+    # n = 10
+    # t0 = time.time()
+    # for i in range(n):
+    #     MakeDatacard(sys.argv[1], "shapes.root", "shapes.txt", do_stat_variations=False)
+    # t1 = time.time()
+    # print (t1-t0)/float(n)
