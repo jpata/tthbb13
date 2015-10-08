@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import ROOT
+import ROOT, shutil
 ROOT.gROOT.SetBatch(True)
 #ROOT.gErrorIgnoreLevel = ROOT.kError
 import sys, imp, os, copy
@@ -143,9 +143,10 @@ def MakeDatacard(infile_path, outfile_path, shapefile_path, do_stat_variations=F
     do_stat_variations (bool) : enable or disable statistical bin-by-bin variations
     """
     infile = ROOT.TFile(infile_path)
+    shutil.copy(infile_path, outfile_path)
 
     #datacard root file
-    outfile = ROOT.TFile(outfile_path, "RECREATE")
+    outfile = ROOT.TFile(outfile_path, "UPDATE")
 
     #get all processes in input file
     processes = getProcesses(infile)
@@ -183,7 +184,7 @@ def MakeDatacard(infile_path, outfile_path, shapefile_path, do_stat_variations=F
         hists_nominal[cat] = hist_nominal
 
         #copy all histograms to output file
-        copyHistograms(infile, outfile, allhists, [cat], processes)
+        #copyHistograms(infile, outfile, allhists, [cat], processes)
         if do_stat_variations:
             makeStatVariations(outfile, outfile, [hist_nominal], [cat], processes)
 
