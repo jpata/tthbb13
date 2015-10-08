@@ -26,10 +26,10 @@ ROOT.TH1.AddDirectory(0)
 # Configuration
 ########################################
 
-input_file = "/shome/jpata/tth/datacards/Oct7_sparse/ControlPlots.root"
+input_file = "~jpata/tth//datacards/Oct8_sparse_lessbins/ControlPlotsSparse.root"
 output_path = "/scratch/gregor/foobar"
 
-n_proc = 15
+n_proc = 10
 n_iter = 10
 
 signals = [
@@ -329,9 +329,10 @@ class Categorization(object):
         MakeDatacard(control_plots_filename, 
                      shapes_root_filename,
                      shapes_txt_filename,
-                     do_stat_variations=False)
+                     do_stat_variations=True)
         last_limit = limit_fun(shapes_txt_filename)
 
+        
         for i_iter in range(n):
             print "Doing iteration", i_iter
 
@@ -553,11 +554,30 @@ Categorization.output_path = output_path
 Categorization.pool = Pool(n_proc)
 
 r = Categorization(Cut())
-r.find_categories_async(n_iter, get_limit)
+#r.find_categories_async(10, get_limit)
 
 
-#r.split(4, 15)
-#r.children[0].split(1,1)
-#r.children[1].split(1,1)
+
+def testOldSplitting(r): 
+
+    r.split(1,1) # Split into j=4 and j=5,6
+    # J=4
+    r.children[0].split(2,2) # Split into Tag=2,3 and Tag=4
+    r.children[0].children[0].split(2,1) # Split into Tag=2 and Tag=3
+
+    # J=5,6
+    r.children[1].split(1,2) # Split into J=5 and J=6
+
+    # J=5
+    r.children[1].children[0].split(2,2) # Split into Tag=2,3 and Tag=4
+    r.children[1].children[0].children[0].split(2,1) # Split into Tag=2 and Tag=3
+    # J=6
+    r.children[1].children[1].split(2,2) # Split into Tag=2,3 and Tag=4
+    r.children[1].children[1].children[0].split(2,1) # Split into Tag=2 and Tag=3
+
+    r.find_categories_async(0, get_limit)
+
+testOldSplitting(r)
+
 
 
