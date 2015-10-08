@@ -396,6 +396,7 @@ class Categorization(object):
             best_split = splittings[best_splitting_name]
 
             print "New Split:", best_limit, "(previous best was {0})".format(last_limit)
+            print "(File: ", best_splitting_name, ")"
             best_split[0].split(best_split[1],best_split[2])
             last_limit = best_limit
             self.print_tree()
