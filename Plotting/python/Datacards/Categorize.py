@@ -11,10 +11,13 @@ import os
 import sys     
 import math
 import pickle
+from multiprocessing import Pool
 
 import ROOT
 
 from Axis import axis
+from CombineHelper import get_limit
+from makeDatacard import MakeDatacard
 
 ROOT.TH1.AddDirectory(0)
 
@@ -41,6 +44,8 @@ backgrounds = [
 #    "ttz_zllnunu",    
 #    "ttz_zqq",
 ]        
+
+
 
 
 ########################################
@@ -119,6 +124,8 @@ class Categorization(object):
     h_bkg_sys = None
 
     axes = None
+
+    pool = Pool(10)
 
     def __init__(self, cut, parent=None):
         """ Create a new node """        
@@ -221,6 +228,14 @@ class Categorization(object):
             leaves.append(self)
             
         return leaves
+
+    def get_root(self):
+        """ Return the root node of the tree"""
+
+        if self.parent is not None:
+            return self.parent.get_root()
+        else:
+            return self
 
 
     def all_parents(self):        
@@ -354,6 +369,82 @@ class Categorization(object):
         # End of loop over iterations
 
 
+    def find_categories_async(self, n, limit_fun):
+
+        for i_iter in range(n):
+            print "Doing iteration", i_iter
+
+            splittings = {}
+            i_splitting = 0
+
+            # Loop over axes
+            for iaxis, axis in enumerate(self.axes):
+
+                print "Testing axis", iaxis
+
+                # We don't want to split by the MEM variable
+                if iaxis==0:
+                    continue
+
+                # Loop over bins on the axis
+                # (ROOT Histogram bin counting starts at 1)
+                for split_bin in range(1, axis.nbins):
+
+                    # Loop over all leaves - these are the categories that we
+                    # could split further
+                    for l in self.get_leaves():
+
+                        # The split function executes the split
+                        # If it failed (return value of -1) - for example because the requested range is already excluded
+                        # we go to the next one
+                        if l.split(iaxis, split_bin)==-1:
+                            continue
+                            
+                        splitting_name = "iter_{0}_cats_{1}".format(i_iter, i_splitting)
+                            
+                        # make the datacard here
+                        # create control plots creates the control plots for the whole tree 
+                        control_plots_filename = "/scratch/gregor/foobar/ControlPlots_{0}.root".format(splitting_name)
+                        shapes_root_filename   = "/scratch/gregor/foobar/shapes_{0}.txt".format(splitting_name)
+                        shapes_txt_filename    = "/scratch/gregor/foobar/shapes_{0}.root".format(splitting_name)
+
+                        l.create_control_plots(control_plots_filename)
+                        
+                        print "Make datacard"
+
+                        MakeDatacard(control_plots_filename, 
+                                     shapes_root_filename,
+                                     shapes_txt_filename,
+                                     do_stat_variations=True)
+
+                        print "done making datacard"
+                            
+                        splittings[shapes_txt_filename] = [l, iaxis, split_bin]
+      
+                        # Undo the split
+                        l.merge()
+
+                    # End of loop over leaves
+                # End of loop over histogram bins
+            # End of loop over axes
+
+            # Extract a list todo and pass them to the limit calculation
+            li_splittings = splittings.keys()
+            li_limits = pool.map(limit_fun, li_splittings)
+            
+            # build a list of tuples with limit name and numerical value
+            li_name_limits = [(name,limit) for name,limit in zip(li_splittings, li_limits)]
+            # sort by limit and take the lowest/best one
+            best_splitting_name, best_limit = sorted(li_name_limits, key = lambda x:x[1])[0]
+            best_split = splittings[best_splitting_name]
+
+            print "New Split:", best_limit
+            best_split[0].split(best_split[1],best_split[2])
+            self.print_tree()
+        # End of loop over iterations
+
+
+
     def __repr__(self):
         """Printing a category returns its name. The name is built
         from the cuts of this category and its ancestors"""
@@ -377,6 +468,68 @@ class Categorization(object):
         
         return "__".join([c.__repr__() for c in unique_cuts])
 
+
+    def create_control_plots(self, name):
+
+        print "Entering create.."
+
+        of = ROOT.TFile(name, "RECREATE")
+
+        root = self.get_root()
+
+        dirs = {}
+        
+        print "Projecting"
+        
+        # Loop over categories
+        for l in root.get_leaves():
+
+            print l
+            l.prepare_all_thns()
+
+            # Nominal
+            for process, thn in self.h_sig.items() + self.h_bkg.items():        
+
+                # Get the output directory (inside the TFile)
+                outdir_str = "{0}/{1}".format(process, l)
+                if not outdir_str in dirs.keys():
+                    dirs[outdir_str] = []
+                
+                h = thn.Projection(0).Clone()
+                h.SetName(axes[0].name)
+                dirs[outdir_str].append(h)                
+            # End of loop over processes
+
+            # Systematic Variations
+            for process, hs in self.h_sig_sys.items() + self.h_bkg_sys.items():
+
+                # Get the output directory (inside the TFile)
+                outdir_str = "{0}/{1}".format(process, l)
+                if not outdir_str in dirs.keys():
+                    dirs[outdir_str] = []
+
+                for sys_name, thn in hs.items():
+                    h = thn.Projection(0).Clone()
+                    h.SetName(axes[0].name + "_" + sys_name)
+                    dirs[outdir_str].append(h)
+
+                # End of loop over systematics
+            # End of loop over processes
+        # End of loop over categories
+        
+        print "Storing"
+
+        for outdir_str, hs in dirs.iteritems():
+                        
+            of.mkdir(outdir_str)
+            outdir = of.Get(outdir_str)
+
+            for h in hs:
+                h.SetDirectory(outdir)
+            outdir.Write("", ROOT.TObject.kOverwrite)
+        of.Close()
+
+        print "Done storing histos"    
         
 ########################################
 # Get All Sparse Histograms
@@ -439,58 +592,10 @@ Categorization.h_sig_sys = h_sig_sys
 Categorization.h_bkg_sys = h_bkg_sys
 
 r = Categorization(Cut())
-#r.find_categories()
+r.find_categories_async(3, get_limit)
 
-r.split(4, 15)
-r.children[0].split(1,1)
-r.children[1].split(1,1)
+#r.split(4, 15)
+#r.children[0].split(1,1)
+#r.children[1].split(1,1)
 
 
-
-########################################
-# Create ControlPlots file
-########################################
-
-of = ROOT.TFile("ControlPlots.root", "RECREATE")
-
-# Loop over categories
-for l in r.get_leaves():
-
-    print l
-    l.prepare_all_thns()
-    
-    # Nominal
-    for process, thn in h_sig.items() + h_bkg.items():        
-
-        # Get the output directory (inside the TFile)
-        outdir = "{0}/{1}".format(process, l)
-        if of.Get(outdir) == None:
-            of.mkdir(outdir)
-        outdir = of.Get(outdir)
-
-        
-        h = thn.Projection(0).Clone()
-        h.SetName(axes[0].name)
-        h.SetDirectory(outdir)
-        outdir.Write("", ROOT.TObject.kOverwrite)
-    # End of loop over processes
-
-    # Systematic Variations
-    for process, hs in h_sig_sys.items() + h_bkg_sys.items():
-
-        # Get the output directory  (inside the TFile)
-        outdir = "{0}/{1}".format(process, l)
-        if of.Get(outdir) == None:
-            of.mkdir(outdir)
-        outdir = of.Get(outdir)
-
-        for sys_name, thn in hs.items():
-
-            h = thn.Projection(0).Clone()
-            h.SetName(axes[0].name + "_" + sys_name)
-            h.SetDirectory(outdir)
-            outdir.Write("", ROOT.TObject.kOverwrite)
-        
-        # End of loop over systematics
-    # End of loop over processes
-# End of loop over categories
