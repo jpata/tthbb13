@@ -46,6 +46,7 @@ def copyHistograms(tf, of, hists, channels, processes):
                 #outdir.Add(h)
                 #h.Write("", ROOT.TObject.kOverwrite)
                 h.SetDirectory(outdir)
+                #h.Write()
                 outdir.Write("", ROOT.TObject.kOverwrite)
     
             # End of loop over processes
@@ -59,9 +60,9 @@ def copyHistograms(tf, of, hists, channels, processes):
 def makeStatVariations(tf, of, hists, channels, processes): 
     #print "Copying existing histograms..."
     
-    for hist in hists:
-        for ch in channels:
-            for proc in processes:
+    for proc in processes:
+        for hist in hists:
+            for ch in channels:
                 hn = "{0}/{1}/{2}".format(proc, ch, hist)
                 h = tf.Get(hn)
                 if not h:
