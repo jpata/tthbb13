@@ -6,14 +6,15 @@ for (k, v) in minisamples.samples_dict
     samples[symbol(k)] = v
 end
 
+mem_bins = [-Inf, linspace(0.0, 1.0, 7)..., Inf]
 function process_sample(name, cutfunc, file)
     df = TreeDataFrame([file]; treename="tree")
 
     hists = Dict(
-        :mem_SL_0w2h2t=>ErrorHistogram([-Inf, linspace(0.0, 1.0, 7)..., Inf]),
-        :mem_SL_0w2h2t_sj=>ErrorHistogram([-Inf, linspace(0.0, 1.0, 7)..., Inf]),
-        :mem_SL_2w2h2t=>ErrorHistogram([-Inf, linspace(0.0, 1.0, 7)..., Inf]),
-        :mem_SL_2w2h2t_sj=>ErrorHistogram([-Inf, linspace(0.0, 1.0, 7)..., Inf]),
+        :mem_SL_0w2h2t=>ErrorHistogram(mem_bins),
+        :mem_SL_0w2h2t_sj=>ErrorHistogram(mem_bins),
+        :mem_SL_2w2h2t=>ErrorHistogram(mem_bins),
+        :mem_SL_2w2h2t_sj=>ErrorHistogram(mem_bins),
         :mva=>ErrorHistogram([-Inf, linspace(0.0, 1.0, 21)..., Inf]),
     )
     
