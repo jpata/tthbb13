@@ -26,7 +26,7 @@ ROOT.TH1.AddDirectory(0)
 # Configuration
 ########################################
 
-input_file = "~jpata/tth//datacards/Oct8_sparse_lessbins/ControlPlotsSparse.root"
+input_file = "~jpata/tth/datacards/Oct8_sparse_lessbins/ControlPlotsSparse.root"
 output_path = "/scratch/gregor/foobar"
 
 n_proc = 10
@@ -62,11 +62,59 @@ class Cut(object):
     
     axes = None
 
-    def __init__(self, axis=-1, lo=-1, hi=-1):            
-        self.axis = axis
-        self.lo = lo
-        self.hi = hi
+    def __init__(self, *args):
+        """ Constructor:
+        - 0 arguments: default constructor
+        - 1 argument: construct from string (inverse of repr)
+        - 3 arguments: construct from numbers [axis number, low, high]
+        """
         
+        # Default constructor
+        if len(args) == 0:
+            self.axis = -1
+            self.lo   = -1
+            self.hi   = -1
+        # From String
+        elif len(args) == 1 and isinstance(args[0], str):
+            
+            # Example: btag_LR_4b_2b_logit__m20_0__8_0
+            # First split according to __
+            atoms = args[0].split("__")
+            
+            # Extract the variable name and convert back the numbers
+            axis_name = atoms[0]
+            low  = float(atoms[1].replace("m","-").replace("_","."))
+            high = float(atoms[2].replace("m","-").replace("_","."))
+
+            # Loop over the axis and see if one of the name is available
+            axis_found = False
+            for ia, ax in enumerate(self.axes):
+                if ax.name == axis_name:
+                    self.axis = ia
+                    axis_found = True
+                    break
+            if not axis_found:
+                raise Exception('Cut Constructor', 'Axis not found')
+                                        
+            # Go from cut values to bins
+            axis = self.axes[self.axis]
+            binsize = (axis.xmax - axis.xmin)/(1.*axis.nbins)            
+            self.lo = int( round((low-axis.xmin)/binsize) ) + 1 # Start bin counting at 1
+            self.hi = int( round((high-axis.xmin)/binsize) ) # The upper edge is not included (so basically +1-1=0)
+            
+            # Make sure the conversion worked
+            if not str(self) == args[0]:
+                raise Exception('Cut Constructor', 'Building from string failed')
+
+        # From numbers
+        elif len(args) == 3 and all([isinstance(a,float) or isinstance(a,int) for a in args]):            
+            self.axis = args[0]
+            self.lo   = args[1]
+            self.hi   = args[2]
+        else:
+             raise Exception('Cut Constructor', 'Invalid number/type of arguments')
+            
+                
     def __nonzero__(self):
         if self.axis == -1:
             return False
@@ -90,7 +138,6 @@ class Cut(object):
                 
         else:
             return ""
-
 
         
         
@@ -202,7 +249,13 @@ class Categorization(object):
         """ Print the node and all it's children recursively in a pretty way """
 
         S,B = self.get_sb()
-        print "   " * depth, self.cut, "S={0:.1f}, B={1:.1f}, S/sqrt(S+B)={2:.2f}".format(S,B,S/math.sqrt(S+B))
+        
+        if S+B>0:
+            SsqrtB = S/math.sqrt(S+B)
+        else:
+            SsqrtB = -1
+
+        print "   " * depth, self.cut, "S={0:.1f}, B={1:.1f}, S/sqrt(S+B)={2:.2f}".format(S,B,SsqrtB)
         for c in self.children:
             c.print_tree(depth+1)
 
@@ -317,21 +370,24 @@ class Categorization(object):
         sig  = math.sqrt(sum([math.pow(x[0],2)/(x[0]+x[1]) for x in SBs]))
         return sig
 
-    def find_categories_async(self, n, limit_fun):
-
-        # Start by calculating the limit without splitting
-        splitting_name = "whole"                
-        control_plots_filename = "{0}/ControlPlots_{1}.root".format(self.output_path, splitting_name)
-        shapes_txt_filename    = "{0}/shapes_{1}.txt".format(self.output_path, splitting_name)
-        shapes_root_filename   = "{0}/shapes_{1}.root".format(self.output_path, splitting_name)
+    def eval_limit(self, name, limit_fun):
+        
+        control_plots_filename = "{0}/ControlPlots_{1}.root".format(self.output_path, name)
+        shapes_txt_filename    = "{0}/shapes_{1}.txt".format(self.output_path, name)
+        shapes_root_filename   = "{0}/shapes_{1}.root".format(self.output_path, name)
         
         self.create_control_plots(control_plots_filename)                        
         MakeDatacard(control_plots_filename, 
                      shapes_root_filename,
                      shapes_txt_filename,
-                     do_stat_variations=True)
-        last_limit = limit_fun(shapes_txt_filename)
+                     do_stat_variations=False)
+        return limit_fun(shapes_txt_filename)
+        
 
+    def find_categories_async(self, n, limit_fun):
+
+        # Start by calculating the limit without splitting
+        last_limit = self.eval_limit("whole", limit_fun)
         
         for i_iter in range(n):
             print "Doing iteration", i_iter
@@ -488,6 +544,69 @@ class Categorization(object):
 
         
 ########################################
+# CategorizationFromString
+########################################
+
+def CategorizationFromString(string):
+    """Build the whole cutflow tree from a string and return the root
+    node. Works with the output of print_tree.    
+    """
+
+    r = Categorization(Cut())
+
+    last_depth = 0
+    last_node = r
+
+    for line in string.split("\n"):
+
+        # remove the first character - it's usually a space (we count
+        # the depth by how indented the line is and one space is extra
+        # offset)
+        line = line[1:]
+        depth = line.count("   ")
+
+        # Now split by spaces, if nothing remains, ignore this line
+        line_atoms = [x for x in line.split(' ') if x]
+        if not line_atoms:
+            continue
+
+        # Take the first piece of the text - this should now be the cutstring
+        cut_string = line_atoms[0]
+        # Ignore first and second line (having either File or just the
+        # total S,...)
+        if "File" in cut_string or "S=" in cut_string:
+            continue
+
+        # Build the cut object from the string
+        cut = Cut(cut_string)
+
+        # Here the real fun starts
+        # - if the depth icreased by one, we do a splitting
+        if depth > last_depth:
+            last_node.split(cut.axis, cut.hi)
+            last_node = last_node.children[0]
+            last_depth = depth
+        # - if the depth stayed the same we go to the other child
+        elif depth == last_depth:
+            last_node = last_node.parent.children[1]
+        # - and if the depth decreased
+        #     we first go out the appropriate amount
+        #     and then switch to the other child
+        elif depth < last_depth:
+            for _ in range(last_depth-depth):
+                last_node = last_node.parent
+            last_node = last_node.parent.children[1]
+            last_depth = depth
+    # End of loop over lines
+    
+    return r
+
+# End of CategorizationFromString
+
+
+
+
+########################################
 # Get All Sparse Histograms
 ########################################
 
@@ -553,31 +672,12 @@ Categorization.h_bkg_sys = h_bkg_sys
 Categorization.output_path = output_path
 Categorization.pool = Pool(n_proc)
 
-r = Categorization(Cut())
-#r.find_categories_async(10, get_limit)
 
+if __name__ == "__main__":
+    r = Categorization(Cut())    
+    r.find_categories_async(10, get_limit)    
+    r.print_tree()
 
-
-def testOldSplitting(r): 
-
-    r.split(1,1) # Split into j=4 and j=5,6
-    # J=4
-    r.children[0].split(2,2) # Split into Tag=2,3 and Tag=4
-    r.children[0].children[0].split(2,1) # Split into Tag=2 and Tag=3
-
-    # J=5,6
-    r.children[1].split(1,2) # Split into J=5 and J=6
-
-    # J=5
-    r.children[1].children[0].split(2,2) # Split into Tag=2,3 and Tag=4
-    r.children[1].children[0].children[0].split(2,1) # Split into Tag=2 and Tag=3
-    # J=6
-    r.children[1].children[1].split(2,2) # Split into Tag=2,3 and Tag=4
-    r.children[1].children[1].children[0].split(2,1) # Split into Tag=2 and Tag=3
-
-    r.find_categories_async(0, get_limit)
-
-testOldSplitting(r)
 
 
 
