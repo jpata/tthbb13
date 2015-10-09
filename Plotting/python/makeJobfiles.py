@@ -34,9 +34,9 @@ for samp in Samples.samples_dict.keys():
                 },
                 {
                     "func": "numJets",
-                    "xMin": 3,
+                    "xMin": 4,
                     "xMax": 7,
-                    "nBins": 4
+                    "nBins": 3
                 },
                 {
                     "func": "nBCSVM",
