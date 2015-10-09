@@ -16,7 +16,7 @@ from multiprocessing import Pool
 import ROOT
 
 from Axis import axis
-import CombineHelper
+from CombineHelper import LimitGetter
 from makeDatacard import MakeDatacard
 
 ROOT.TH1.AddDirectory(0)
@@ -26,7 +26,7 @@ ROOT.TH1.AddDirectory(0)
 # Configuration
 ########################################
 
-input_file = "~jpata/tth/datacards/Oct8_sparse_lessbins/ControlPlotsSparse.root"
+input_file = "/shome/gregor/ControlPlotsSparse.root"
 output_path = "/scratch/gregor/foobar"
 
 n_proc = 10
@@ -48,7 +48,6 @@ backgrounds = [
 #    "ttz_zllnunu",    
 #    "ttz_zqq",
 ]        
-
 
 ########################################
 # Cut
@@ -139,6 +138,29 @@ class Cut(object):
         else:
             return ""
 
+    def latex_string(self):
+
+        if self.axis >= 0:
+            axis = self.axes[self.axis]            
+            binsize = (axis.xmax - axis.xmin)/(1.*axis.nbins)
+            lower = axis.xmin + (self.lo-1)*binsize
+            upper = axis.xmin + (self.hi)*binsize
+            
+            # Binsize of 1 means we have integer bins 
+            if binsize==1.:
+                lower = int(lower)
+                upper = int(upper)
+
+            if self.lo == 1:                
+                return r"${0} < {1} $".format(axis.name, upper)
+            elif self.hi == axis.nbins:
+                return r"${0} \le {1}$".format(lower, axis.name)
+            else:
+                return r"${0} \le {1} < {2} $".format(lower, axis.name, upper)
+                
+        else:
+            return "Preselection"
+
         
         
 ########################################
@@ -176,6 +198,8 @@ class Categorization(object):
 
     pool = None
     output_path = None
+
+    lg = None
 
     def __init__(self, cut, parent=None):
         """ Create a new node """        
@@ -258,6 +282,41 @@ class Categorization(object):
         print "   " * depth, self.cut, "S={0:.1f}, B={1:.1f}, S/sqrt(S+B)={2:.2f}".format(S,B,SsqrtB)
         for c in self.children:
             c.print_tree(depth+1)
+
+    def print_tree_latex(self, depth=0):    
+        """  """
+
+        S,B = self.get_sb()
+
+        ret = ""        
+        
+        if depth == 0:
+            ret += self.latex_preamble() + "["
+
+        ret += "{" 
+        ret += self.cut.latex_string() + r"\\"
+        ret += "S={0:.1f}".format(S) + r"\\"
+        ret += "B={0:.1f}".format(B) 
+
+        if depth == 0:
+            ret += r"\\"
+            ret += r"$\mu_{Comb.} = " + "{0}$".format(self.eval_limit(str(self)))
+
+        if not self.children:
+            ret += r"\\"
+            ret += r"$\mu = " + "{0}$".format(self.eval_limit(str(self)))
+
+        ret += "}"
+
+        for c in self.children:
+            ret += "[\n"
+            ret += c.print_tree_latex(depth+1)
+            ret += "\n]"
+
+        if depth == 0:
+            ret += "]" + self.latex_postamble()
+
+        return ret
 
 
     def get_sb(self):
@@ -370,7 +429,7 @@ class Categorization(object):
         sig  = math.sqrt(sum([math.pow(x[0],2)/(x[0]+x[1]) for x in SBs]))
         return sig
 
-    def eval_limit(self, name, limit_fun):
+    def eval_limit(self, name):
         
         control_plots_filename = "{0}/ControlPlots_{1}.root".format(self.output_path, name)
         shapes_txt_filename    = "{0}/shapes_{1}.txt".format(self.output_path, name)
@@ -381,13 +440,13 @@ class Categorization(object):
                      shapes_root_filename,
                      shapes_txt_filename,
                      do_stat_variations=False)
-        return limit_fun(shapes_txt_filename)
         
+        return self.lg(shapes_txt_filename)
 
-    def find_categories_async(self, n, limit_fun):
+    def find_categories_async(self, n):
 
         # Start by calculating the limit without splitting
-        last_limit = self.eval_limit("whole", limit_fun)
+        last_limit = self.eval_limit("whole")
         
         for i_iter in range(n):
             print "Doing iteration", i_iter
@@ -425,7 +484,9 @@ class Categorization(object):
                         shapes_txt_filename    = "{0}/shapes_{1}.txt".format(self.output_path, splitting_name)
                         shapes_root_filename   = "{0}/shapes_{1}.root".format(self.output_path, splitting_name)
 
-                        l.create_control_plots(control_plots_filename)                        
+                        # Here always evaluate the fool tree!
+                        root = self.get_root()
+                        root.create_control_plots(control_plots_filename)                        
                         MakeDatacard(control_plots_filename, 
                                      shapes_root_filename,
                                      shapes_txt_filename,
@@ -442,8 +503,10 @@ class Categorization(object):
             # End of loop over axes
 
             # Extract a list todo and pass them to the limit calculation
-            li_splittings = splittings.keys()
-            li_limits = self.pool.map(limit_fun, li_splittings)
+            li_splittings = splittings.keys()        
+
+
+            li_limits = self.pool.map(self.lg, li_splittings)
             
             # build a list of tuples with limit name and numerical value
             li_name_limits = [(name,limit) for name,limit in zip(li_splittings, li_limits)]
@@ -493,12 +556,10 @@ class Categorization(object):
 
         of = ROOT.TFile(name, "RECREATE")
 
-        root = self.get_root()
-
         dirs = {}
                 
         # Loop over categories
-        for l in root.get_leaves():
+        for l in self.get_leaves():
 
             l.prepare_all_thns()
 
@@ -541,6 +602,32 @@ class Categorization(object):
                 h.SetDirectory(outdir)
             outdir.Write("", ROOT.TObject.kOverwrite)
         of.Close()
+
+    def latex_preamble(self):
+        return r"""\documentclass[border=5pt]{standalone}
+        \usepackage{forest}
+
+        \begin{document}
+        
+        \begin{forest}
+        for tree={
+        draw,
+        minimum height=2cm,
+        anchor=north,
+        align=center,
+        child anchor=north
+        },
+        """
+    
+    def latex_postamble(self):
+        return r"""\end{forest}
+        \end{document}
+        """
+
+    
+
+
+
 
         
 ########################################
@@ -659,9 +746,6 @@ for i_axis in range(n_dim):
 # Categorization
 ########################################
 
-def get_limit(x):
-    return CombineHelper.get_limit(x, output_path)
-
 Cut.axes = axes
 Categorization.axes = axes
 Categorization.h_sig = h_sig
@@ -672,10 +756,11 @@ Categorization.h_bkg_sys = h_bkg_sys
 Categorization.output_path = output_path
 Categorization.pool = Pool(n_proc)
 
+Categorization.lg = LimitGetter(output_path)
 
 if __name__ == "__main__":
     r = Categorization(Cut())    
-    r.find_categories_async(10, get_limit)    
+    r.find_categories_async(10)    
     r.print_tree()
 
 
