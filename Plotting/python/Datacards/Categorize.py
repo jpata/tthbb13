@@ -30,7 +30,7 @@ input_file = "/shome/gregor/ControlPlotsSparse.root"
 output_path = "/scratch/gregor/foobar"
 
 n_proc = 10
-n_iter = 10
+n_iter = 2
 
 signals = [
     "ttH_hbb", 
@@ -151,12 +151,16 @@ class Cut(object):
                 lower = int(lower)
                 upper = int(upper)
 
+            axis_name = axis.name
+            if axis_name == "btag_LR_4b_2b_logit":
+                axis_name = "btag LR"
+
             if self.lo == 1:                
-                return r"${0} < {1} $".format(axis.name, upper)
+                return r"${0} < {1} $".format(axis_name, upper)
             elif self.hi == axis.nbins:
-                return r"${0} \le {1}$".format(lower, axis.name)
+                return r"${0} \le {1}$".format(lower, axis_name)
             else:
-                return r"${0} \le {1} < {2} $".format(lower, axis.name, upper)
+                return r"${0} \le {1} < {2} $".format(lower, axis_name, upper)
                 
         else:
             return "Preselection"
@@ -760,7 +764,7 @@ Categorization.lg = LimitGetter(output_path)
 
 if __name__ == "__main__":
     r = Categorization(Cut())    
-    r.find_categories_async(10)    
+    r.find_categories_async(n_iter)    
     r.print_tree()
 
 
