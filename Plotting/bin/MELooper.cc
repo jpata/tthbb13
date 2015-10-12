@@ -39,7 +39,7 @@ TChain* loadFiles(const Configuration& conf) {
 
 namespace BaseCuts {
     bool sl(const Event& ev) {
-        return ev.is_sl && ev.passPV && ev.pass_trig_sl;
+        return ev.is_sl && ev.passPV && ev.pass_trig_sl && ev.numJets >=4 && ev.btag_LR_4b_2b > 0.95;
     }
 
     bool dl(const Event& ev) {
