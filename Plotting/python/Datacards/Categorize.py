@@ -92,12 +92,12 @@ class Categorization(object):
 
     verbose = 0
 
-    def __init__(self, cut, parent=None, discrimanator_axis=0):
+    def __init__(self, cut, parent=None, discriminator_axis=0):
         """ Create a new node """        
         self.parent = parent
         self.children = []
         self.cut = cut
-        self.discrimanator_axis = discrimanator_axis
+        self.discriminator_axis = discriminator_axis
         
     # Allow directly accessing the children
     def __getitem__(self, key):
@@ -186,10 +186,10 @@ class Categorization(object):
         # And finally: actually spawn two new children and add the Nodes to the tree
         child_pass = Categorization(Cut(iaxis, leftmost_of_left_bins, rightmost_of_left_bins), 
                                     parent = self,
-                                    discrimanator_axis = discriminator_axis_child_0)
+                                    discriminator_axis = discriminator_axis_child_0)
         child_fail = Categorization(Cut(iaxis, leftmost_of_right_bins, rightmost_of_right_bins), 
                                     parent = self,
-                                    discrimanator_axis = discriminator_axis_child_1)
+                                    discriminator_axis = discriminator_axis_child_1)
         self.children = [child_pass, child_fail]
         
 
@@ -203,7 +203,7 @@ class Categorization(object):
         else:
             SsqrtB = -1
 
-        print "   " * depth, self.cut, "Discr={0}".format(self.discrimanator_axis), "S={0:.1f}, B={1:.1f}, S/sqrt(S+B)={2:.2f}".format(S,B,SsqrtB)
+        print "   " * depth, self.cut, "Discr={0}".format(self.discriminator_axis), "S={0:.1f}, B={1:.1f}, S/sqrt(S+B)={2:.2f}".format(S,B,SsqrtB)
         for c in self.children:
             c.print_tree(depth+1)
 
@@ -224,19 +224,24 @@ class Categorization(object):
 
         ret += r"\\"
         ret += "Discr: "
-        ret += self.axes[self.discrimanator_axis].name.replace("_", " ")
+        ret += self.axes[self.discriminator_axis].name.replace("_", " ")
 
         if depth == 0:
             ret += r"\\"
             ret += r"$\mu_{Comb.} = " + "{0}$".format(self.eval_limit(str(self)))
 
-        if not self.children:
+        if not self.children: 
             ret += r"\\"
             ret += r"$\mu = " + "{0}$".format(self.eval_limit(str(self)))
 
         ret += "}"
 
         for c in self.children:
+            
+            # Ignore pruned away leaves
+            if len(c.children)==0 and c.discriminator_axis == -1:
+                continue
+
             ret += "[\n"
             ret += c.print_tree_latex(depth+1)
             ret += "\n]"
@@ -467,6 +472,37 @@ class Categorization(object):
             self.print_tree()
         # End of loop over iterations
 
+    def prune(self, threshold = 0.2):
+        """Go through all leave nodes. If not including this leave in
+        the total limit only makes the limit worse within the
+        threshold then deactivate the node. The node is not removed
+        but rather the discriminator for this node is set to -1"""
+
+        total_limit = self.eval_limit("prune_whole")
+        
+        n_pruned_away = 0
+
+        for l in self.get_leaves():
+                        
+            # Store the discriminator axis
+            original_discriminator = l.discriminator_axis
+            # Deactivate for now
+            l.discriminator_axis = -1
+            
+            # Important - eval the limit starting from the node under
+            # study - not just the leave limit
+            limit = self.eval_limit("prune_" + str(l))
+            
+            # Deactivating this category is too costly so we turn it
+            # back on
+            if (limit-total_limit)/total_limit > threshold:
+                l.discriminator_axis = original_discriminator
+            else:
+                n_pruned_away += 1
+        # End of loop over leaves
+        
+        print "Pruned away", n_pruned_away, "leaves"
+        self.print_tree()
 
 
     def __repr__(self):
@@ -494,19 +530,22 @@ class Categorization(object):
         if not name:
             name = "Whole"
         
-        name += "__discr_" + str(self.discrimanator_axis)
+        name += "__discr_" + str(self.discriminator_axis)
 
         return name
 
 
     def create_control_plots(self, name):
-
+        
         of = ROOT.TFile(name, "RECREATE")
 
         dirs = {}
                 
         # Loop over categories
         for l in self.get_leaves():
+
+            if  l.discriminator_axis == -1:
+                continue
 
             l.prepare_all_thns()
 
@@ -518,8 +557,8 @@ class Categorization(object):
                 if not outdir_str in dirs.keys():
                     dirs[outdir_str] = []
                 
-                h = thn.Projection(l.discrimanator_axis).Clone()
-                h.SetName(axes[l.discrimanator_axis].name)
+                h = thn.Projection(l.discriminator_axis).Clone()
+                h.SetName(axes[l.discriminator_axis].name)
                 dirs[outdir_str].append(h)                
             # End of loop over processes
 
@@ -532,8 +571,8 @@ class Categorization(object):
                     dirs[outdir_str] = []
 
                 for sys_name, thn in hs.items():
-                    h = thn.Projection(l.discrimanator_axis).Clone()
-                    h.SetName(axes[l.discrimanator_axis].name + "_" + sys_name)
+                    h = thn.Projection(l.discriminator_axis).Clone()
+                    h.SetName(axes[l.discriminator_axis].name + "_" + sys_name)
                     dirs[outdir_str].append(h)
 
                 # End of loop over systematics
@@ -607,7 +646,7 @@ def CategorizationFromString(string):
         # just set the discriminator variable of the ROOT node correctly
         if "Discr" in cut_string:
             discriminator = int(cut_string.split("=")[1])
-            last_node.discrimanator_axis = discriminator
+            last_node.discriminator_axis = discriminator
             continue
 
         # Otherwise the discriminator will be the second item
@@ -633,7 +672,7 @@ def CategorizationFromString(string):
                 last_node = last_node.parent
             last_node = last_node.parent[1]
             last_depth = depth
-        last_node.discrimanator_axis = discriminator
+        last_node.discriminator_axis = discriminator
             
     # End of loop over lines
     
@@ -712,10 +751,7 @@ Categorization.lg = LimitGetter(output_path)
 
 if __name__ == "__main__":
     #r = CategorizationFromString(c)
-    r = Categorization(Cut(), discrimanator_axis=2)
-
-    cut_axes = [3,4,6,7,8,9]
-    discriminator_axes = [0,1,2]
+    r = Categorization(Cut(), discriminator_axis=2)
 
     # TODO: something clever for boosted prereq - it can be
     # conditional on mass or other variables... For now we just
@@ -723,6 +759,9 @@ if __name__ == "__main__":
     # computing but should be safe physics wise
     axes[0].discPrereq = [Cut(3,3,3)]
     axes[1].discPrereq = [Cut(3,3,3)]
+
+    cut_axes = [3,4,6,7,8,9]
+    discriminator_axes = [0,1,2]
     
     r.find_categories_async(n_iter, 
                             cut_axes, 
