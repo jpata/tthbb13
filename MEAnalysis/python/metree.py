@@ -465,6 +465,7 @@ def getTreeProducer(conf):
         for vtype in [
             ("weight_xs",               float,  ""),
             ("ttCls",                   int,    ""),
+            ("rho",                     float,  ""),
             ("bTagWeight",              float,  ""),
             ("bTagWeight_HFDown",       float,  ""),
             ("bTagWeight_HFUp",         float,  ""),
@@ -476,6 +477,9 @@ def getTreeProducer(conf):
             ("bTagWeight_Stats1Up",     float,  ""),
             ("bTagWeight_Stats2Down",   float,  ""),
             ("bTagWeight_Stats2Up",     float,  ""),
+            ("json",                    float,  ""),
+            ("nPU0",                    float,  ""),
+            ("nPVs",                    float,  ""),
         ]:
             treeProducer.globalVariables += [makeGlobalVariable(vtype, systematic, mcOnly=True)]
     return treeProducer
