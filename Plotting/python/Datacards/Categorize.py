@@ -16,6 +16,7 @@ from multiprocessing import Pool
 import ROOT
 
 from Axis import axis
+from Cut import Cut
 from CombineHelper import LimitGetter
 from makeDatacard import MakeDatacard
 
@@ -26,11 +27,11 @@ ROOT.TH1.AddDirectory(0)
 # Configuration
 ########################################
 
-input_file = "/shome/gregor/ControlPlotsSparse.root"
+input_file = "/shome/gregor/ControlPlotsSparse_2015_10_12.root"
 output_path = "/scratch/gregor/foobar"
 
 n_proc = 10
-n_iter = 2
+n_iter = 6
 
 signals = [
     "ttH_hbb", 
@@ -48,122 +49,6 @@ backgrounds = [
 #    "ttz_zllnunu",    
 #    "ttz_zqq",
 ]        
-
-########################################
-# Cut
-########################################
-
-class Cut(object):
-    """ Helper class: simple cut that knows the number of the axis
-    (wrt/ to the static axes list) and the low (lo) and high (hi) bin
-    to include.
-    """
-    
-    axes = None
-
-    def __init__(self, *args):
-        """ Constructor:
-        - 0 arguments: default constructor
-        - 1 argument: construct from string (inverse of repr)
-        - 3 arguments: construct from numbers [axis number, low, high]
-        """
-        
-        # Default constructor
-        if len(args) == 0:
-            self.axis = -1
-            self.lo   = -1
-            self.hi   = -1
-        # From String
-        elif len(args) == 1 and isinstance(args[0], str):
-            
-            # Example: btag_LR_4b_2b_logit__m20_0__8_0
-            # First split according to __
-            atoms = args[0].split("__")
-            
-            # Extract the variable name and convert back the numbers
-            axis_name = atoms[0]
-            low  = float(atoms[1].replace("m","-").replace("_","."))
-            high = float(atoms[2].replace("m","-").replace("_","."))
-
-            # Loop over the axis and see if one of the name is available
-            axis_found = False
-            for ia, ax in enumerate(self.axes):
-                if ax.name == axis_name:
-                    self.axis = ia
-                    axis_found = True
-                    break
-            if not axis_found:
-                raise Exception('Cut Constructor', 'Axis not found')
-                                        
-            # Go from cut values to bins
-            axis = self.axes[self.axis]
-            binsize = (axis.xmax - axis.xmin)/(1.*axis.nbins)            
-            self.lo = int( round((low-axis.xmin)/binsize) ) + 1 # Start bin counting at 1
-            self.hi = int( round((high-axis.xmin)/binsize) ) # The upper edge is not included (so basically +1-1=0)
-            
-            # Make sure the conversion worked
-            if not str(self) == args[0]:
-                raise Exception('Cut Constructor', 'Building from string failed')
-
-        # From numbers
-        elif len(args) == 3 and all([isinstance(a,float) or isinstance(a,int) for a in args]):            
-            self.axis = args[0]
-            self.lo   = args[1]
-            self.hi   = args[2]
-        else:
-             raise Exception('Cut Constructor', 'Invalid number/type of arguments')
-            
-                
-    def __nonzero__(self):
-        if self.axis == -1:
-            return False
-        else:
-            return True
-
-    def __repr__(self):
-
-        if self.axis >= 0:
-            axis = self.axes[self.axis]            
-            binsize = (axis.xmax - axis.xmin)/(1.*axis.nbins)
-            lower = axis.xmin + (self.lo-1)*binsize
-            upper = axis.xmin + (self.hi)*binsize
-            
-            # Binsize of 1 means we have integer bins 
-            if binsize==1.:
-                lower = int(lower)
-                upper = int(upper)
-            
-            return "{0}__{1}__{2}".format(axis.name, lower, upper).replace(".","_").replace("-","m")
-                
-        else:
-            return ""
-
-    def latex_string(self):
-
-        if self.axis >= 0:
-            axis = self.axes[self.axis]            
-            binsize = (axis.xmax - axis.xmin)/(1.*axis.nbins)
-            lower = axis.xmin + (self.lo-1)*binsize
-            upper = axis.xmin + (self.hi)*binsize
-            
-            # Binsize of 1 means we have integer bins 
-            if binsize==1.:
-                lower = int(lower)
-                upper = int(upper)
-
-            axis_name = axis.name
-            if axis_name == "btag_LR_4b_2b_logit":
-                axis_name = "btag LR"
-
-            if self.lo == 1:                
-                return r"${0} < {1} $".format(axis_name, upper)
-            elif self.hi == axis.nbins:
-                return r"${0} \le {1}$".format(lower, axis_name)
-            else:
-                return r"${0} \le {1} < {2} $".format(lower, axis_name, upper)
-                
-        else:
-            return "Preselection"
 
         
         
@@ -205,14 +90,24 @@ class Categorization(object):
 
     lg = None
 
-    def __init__(self, cut, parent=None):
+    verbose = 0
+
+    def __init__(self, cut, parent=None, discrimanator_axis=0):
         """ Create a new node """        
         self.parent = parent
         self.children = []
         self.cut = cut
+        self.discrimanator_axis = discrimanator_axis
         
+    # Allow directly accessing the children
+    def __getitem__(self, key):
+        return self.children[key]
 
-    def split(self, iaxis, rightmost_of_left_bins):        
+    def split(self, 
+              iaxis, 
+              rightmost_of_left_bins, 
+              discriminator_axis_child_0 = 0,
+              discriminator_axis_child_1 = 0):        
         """ Split a node using a cut on axis iaxis (index with respect
         to the list of axes: axes) at the bin number
         rightmost_of_left_bins. As the name implies the bin will be
@@ -226,21 +121,23 @@ class Categorization(object):
         (because it is out of range or because previous cuts on
         ancestors of the node already exclude the requested region)
         """
-
+        
         # Init all other boundaries with sanity check
         leftmost_of_left_bins = 1
         leftmost_of_right_bins = rightmost_of_left_bins + 1        
         if leftmost_of_right_bins > self.axes[iaxis].nbins:
-            print "Invalid subdivision, leftmost_of_right_bins > self.axes[iaxis].nbins"
+            if self.verbose:
+                print "Invalid subdivision, leftmost_of_right_bins > self.axes[iaxis].nbins"
             return -1    
         rightmost_of_right_bins =  self.axes[iaxis].nbins
-        
+
         # Get the list of all previous cuts on the ancestors
         # the order here is imporant - we have to execute the cuts from
         # TOP to BOTTOM
         # so the TIGHTEST cut on a given axis comes LAST
         all_previous_cuts = [p.cut for p in self.all_parents()] + [self.cut]
 
+        
         # Loop over cuts to apply previous constraints
         for c in all_previous_cuts:
             # Make sure the cut is defined (ignore the root node) and
@@ -261,17 +158,40 @@ class Categorization(object):
         # Sanity check: make sure our cut is still doable after the
         # preselections have been applied
         if leftmost_of_right_bins <= rightmost_of_left_bins:
-            print "leftmost_of_right_bins <= rightmost_of_left_bins"
+            if self.verbose:
+                print "leftmost_of_right_bins <= rightmost_of_left_bins"
             return -1
         if leftmost_of_right_bins > self.axes[iaxis].nbins:
-            print "Invalid subdivision, leftmost_of_right_bins > self.axes[iaxis].nbins"
+            if self.verbose:
+                print "Invalid subdivision, leftmost_of_right_bins > self.axes[iaxis].nbins"
             return -1
 
-        # And finally: actually spawn two new children and add the Nodes to the tree
-        child_pass = Categorization(Cut(iaxis, leftmost_of_left_bins, rightmost_of_left_bins), parent=self)
-        child_fail = Categorization(Cut(iaxis, leftmost_of_right_bins, rightmost_of_right_bins), parent=self)
-        self.children = [child_pass, child_fail]
 
+        # Sanity check if the requested discriminator variable is defined for both children
+        # First get all the cuts, including the one we would apply for the children
+        all_cuts_child_0 = all_previous_cuts + [Cut(iaxis, leftmost_of_left_bins, rightmost_of_left_bins)  ]
+        all_cuts_child_1 = all_previous_cuts + [Cut(iaxis, leftmost_of_right_bins, rightmost_of_right_bins)]
+
+        # Get the prerequisites for the requested discriminators
+        prereqs_for_child_0 = self.axes[discriminator_axis_child_0].discPrereq
+        prereqs_for_child_1 = self.axes[discriminator_axis_child_1].discPrereq
+
+        # We want for ALL prerequisits that at LEAST ONE is as tight as the prerequiste
+        # all([]) returns True - so this also works if there are no prerequs        
+        if not all([any([c.is_subset_of(p) for c in all_cuts_child_0]) for p in prereqs_for_child_0]):
+            return -1
+        if not all([any([c.is_subset_of(p) for c in all_cuts_child_1]) for p in prereqs_for_child_1]):
+            return -1
+                
+        # And finally: actually spawn two new children and add the Nodes to the tree
+        child_pass = Categorization(Cut(iaxis, leftmost_of_left_bins, rightmost_of_left_bins), 
+                                    parent = self,
+                                    discrimanator_axis = discriminator_axis_child_0)
+        child_fail = Categorization(Cut(iaxis, leftmost_of_right_bins, rightmost_of_right_bins), 
+                                    parent = self,
+                                    discrimanator_axis = discriminator_axis_child_1)
+        self.children = [child_pass, child_fail]
+        
 
     def print_tree(self, depth=0):    
         """ Print the node and all it's children recursively in a pretty way """
@@ -283,7 +203,7 @@ class Categorization(object):
         else:
             SsqrtB = -1
 
-        print "   " * depth, self.cut, "S={0:.1f}, B={1:.1f}, S/sqrt(S+B)={2:.2f}".format(S,B,SsqrtB)
+        print "   " * depth, self.cut, "Discr={0}".format(self.discrimanator_axis), "S={0:.1f}, B={1:.1f}, S/sqrt(S+B)={2:.2f}".format(S,B,SsqrtB)
         for c in self.children:
             c.print_tree(depth+1)
 
@@ -301,6 +221,10 @@ class Categorization(object):
         ret += self.cut.latex_string() + r"\\"
         ret += "S={0:.1f}".format(S) + r"\\"
         ret += "B={0:.1f}".format(B) 
+
+        ret += r"\\"
+        ret += "Discr: "
+        ret += self.axes[self.discrimanator_axis].name.replace("_", " ")
 
         if depth == 0:
             ret += r"\\"
@@ -447,7 +371,10 @@ class Categorization(object):
         
         return self.lg(shapes_txt_filename)
 
-    def find_categories_async(self, n):
+    def find_categories_async(self, 
+                              n, 
+                              cut_axes, 
+                              discriminator_axes):
 
         # Start by calculating the limit without splitting
         last_limit = self.eval_limit("whole")
@@ -459,13 +386,11 @@ class Categorization(object):
             i_splitting = 0
 
             # Loop over axes
-            for iaxis, axis in enumerate(self.axes):
+            for iaxis in cut_axes:
+                
+                axis = self.axes[iaxis]
 
                 print "Preparing axis", iaxis
-
-                # We don't want to split by the MEM variable
-                if iaxis==0:
-                    continue
 
                 # Loop over bins on the axis
                 # (ROOT Histogram bin counting starts at 1)
@@ -474,33 +399,43 @@ class Categorization(object):
                     # Loop over all leaves - these are the categories that we
                     # could split further
                     for l in self.get_leaves():
-
-                        # The split function executes the split
-                        # If it failed (return value of -1) - for example because the requested range is already excluded
-                        # we go to the next one
-                        if l.split(iaxis, split_bin)==-1:
-                            continue
                             
-                        splitting_name = "iter_{0}_cats_{1}".format(i_iter, i_splitting)
-                            
-                        # create control plots creates the control plots for the whole tree 
-                        control_plots_filename = "{0}/ControlPlots_{1}.root".format(self.output_path, splitting_name)
-                        shapes_txt_filename    = "{0}/shapes_{1}.txt".format(self.output_path, splitting_name)
-                        shapes_root_filename   = "{0}/shapes_{1}.root".format(self.output_path, splitting_name)
+                        for discriminator_axis_for_child_0  in discriminator_axes:
+                            for discriminator_axis_for_child_1 in discriminator_axes:
 
-                        # Here always evaluate the fool tree!
-                        root = self.get_root()
-                        root.create_control_plots(control_plots_filename)                        
-                        MakeDatacard(control_plots_filename, 
-                                     shapes_root_filename,
-                                     shapes_txt_filename,
-                                     do_stat_variations=False)
-                            
-                        splittings[shapes_txt_filename] = [l, iaxis, split_bin]
-                        i_splitting += 1
+                                # The split function executes the split
+                                # If it failed (return value of -1) - for example because the requested range is already excluded
+                                # we go to the next one
+                                if l.split(iaxis, 
+                                           split_bin,
+                                           discriminator_axis_for_child_0,
+                                           discriminator_axis_for_child_1)==-1:
+                                    continue
+                        
+                                splitting_name = "iter_{0}_cats_{1}".format(i_iter, i_splitting)
 
-                        # Undo the split
-                        l.merge()
+                                # create control plots creates the control plots for the whole tree 
+                                control_plots_filename = "{0}/ControlPlots_{1}.root".format(self.output_path, splitting_name)
+                                shapes_txt_filename    = "{0}/shapes_{1}.txt".format(self.output_path, splitting_name)
+                                shapes_root_filename   = "{0}/shapes_{1}.root".format(self.output_path, splitting_name)
+
+                                # Here always evaluate the full tree!
+                                root = self.get_root()
+                                root.create_control_plots(control_plots_filename)                        
+                                MakeDatacard(control_plots_filename, 
+                                             shapes_root_filename,
+                                             shapes_txt_filename,
+                                             do_stat_variations=False)
+
+                                splittings[shapes_txt_filename] = [l, 
+                                                                   iaxis, 
+                                                                   split_bin,
+                                                                   discriminator_axis_for_child_0,
+                                                                   discriminator_axis_for_child_1]
+                                i_splitting += 1
+
+                                # Undo the split
+                                l.merge()
 
                     # End of loop over leaves
                 # End of loop over histogram bins
@@ -521,7 +456,13 @@ class Categorization(object):
 
             print "New Split:", best_limit, "(previous best was {0})".format(last_limit)
             print "(File: ", best_splitting_name, ")"
-            best_split[0].split(best_split[1],best_split[2])
+            split_retval = best_split[0].split(best_split[1], # iaxis
+                                               best_split[2], # split_bin
+                                               best_split[3], # discriminator_axis_for_child_0
+                                               best_split[4]) # discriminator_axis_for_child_1
+            if split_retval == -1:
+                raise Exception('SplittingError', 'Invalid splitting selected as best splitting')
+
             last_limit = best_limit
             self.print_tree()
         # End of loop over iterations
@@ -553,6 +494,8 @@ class Categorization(object):
         if not name:
             name = "Whole"
         
+        name += "__discr_" + str(self.discrimanator_axis)
+
         return name
 
 
@@ -575,8 +518,8 @@ class Categorization(object):
                 if not outdir_str in dirs.keys():
                     dirs[outdir_str] = []
                 
-                h = thn.Projection(0).Clone()
-                h.SetName(axes[0].name)
+                h = thn.Projection(l.discrimanator_axis).Clone()
+                h.SetName(axes[l.discrimanator_axis].name)
                 dirs[outdir_str].append(h)                
             # End of loop over processes
 
@@ -589,8 +532,8 @@ class Categorization(object):
                     dirs[outdir_str] = []
 
                 for sys_name, thn in hs.items():
-                    h = thn.Projection(0).Clone()
-                    h.SetName(axes[0].name + "_" + sys_name)
+                    h = thn.Projection(l.discrimanator_axis).Clone()
+                    h.SetName(axes[l.discrimanator_axis].name + "_" + sys_name)
                     dirs[outdir_str].append(h)
 
                 # End of loop over systematics
@@ -629,10 +572,6 @@ class Categorization(object):
         """
 
     
-
-
-
-
         
 ########################################
 # CategorizationFromString
@@ -663,10 +602,16 @@ def CategorizationFromString(string):
 
         # Take the first piece of the text - this should now be the cutstring
         cut_string = line_atoms[0]
-        # Ignore first and second line (having either File or just the
-        # total S,...)
-        if "File" in cut_string or "S=" in cut_string:
+
+        # For the first entry we don't have a cutstring
+        # just set the discriminator variable of the ROOT node correctly
+        if "Discr" in cut_string:
+            discriminator = int(cut_string.split("=")[1])
+            last_node.discrimanator_axis = discriminator
             continue
+
+        # Otherwise the discriminator will be the second item
+        discriminator = int(line_atoms[1].split("=")[1])
 
         # Build the cut object from the string
         cut = Cut(cut_string)
@@ -675,19 +620,21 @@ def CategorizationFromString(string):
         # - if the depth icreased by one, we do a splitting
         if depth > last_depth:
             last_node.split(cut.axis, cut.hi)
-            last_node = last_node.children[0]
+            last_node = last_node[0]
             last_depth = depth
         # - if the depth stayed the same we go to the other child
         elif depth == last_depth:
-            last_node = last_node.parent.children[1]
+            last_node = last_node.parent[1]
         # - and if the depth decreased
         #     we first go out the appropriate amount
         #     and then switch to the other child
         elif depth < last_depth:
             for _ in range(last_depth-depth):
                 last_node = last_node.parent
-            last_node = last_node.parent.children[1]
+            last_node = last_node.parent[1]
             last_depth = depth
+        last_node.discrimanator_axis = discriminator
+            
     # End of loop over lines
     
     return r
@@ -761,11 +708,26 @@ Categorization.output_path = output_path
 Categorization.pool = Pool(n_proc)
 
 Categorization.lg = LimitGetter(output_path)
+    
 
 if __name__ == "__main__":
-    r = Categorization(Cut())    
-    r.find_categories_async(n_iter)    
-    r.print_tree()
+    #r = CategorizationFromString(c)
+    r = Categorization(Cut(), discrimanator_axis=2)
+
+    cut_axes = [3,4,6,7,8,9]
+    discriminator_axes = [0,1,2]
+
+    # TODO: something clever for boosted prereq - it can be
+    # conditional on mass or other variables... For now we just
+    # evaluate it for more events than we should - costs a bit in
+    # computing but should be safe physics wise
+    axes[0].discPrereq = [Cut(3,3,3)]
+    axes[1].discPrereq = [Cut(3,3,3)]
+    
+    r.find_categories_async(n_iter, 
+                            cut_axes, 
+                            discriminator_axes)    
+
 
 
 

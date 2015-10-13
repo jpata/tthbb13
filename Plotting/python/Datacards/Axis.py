@@ -3,7 +3,6 @@
 Axis: Helper class for Sparsinator/Categorization
 """
 
-
 ########################################
 # Axes
 ########################################
@@ -16,7 +15,9 @@ class axis:
                  xmax,
                  fun = None,
                  addUnderflow = 0,
-                 addOverflow = 0):
+                 addOverflow = 0,
+                 discPrereq = []
+    ):
         """" Defines an axis for a multi-dimensional histogram
         name         : name of the axis
         nbins        : number of bins
@@ -25,6 +26,10 @@ class axis:
         fun          : function to evaluate, will receive a TTree as argument (not stored when pickled!!!)
         addUnderflow : if True - put values into lowest bin instead of underflow
         addOverflow  : if True - put values into highest bin instead of overflow
+        discPrereq   : if the axis is used as a discriminator variable
+                         (so MEM/BDT instead of nJets) then this should
+                         hold a list of Cut objects corresponding to
+                         minimal cut for it to be well defined.
         """
 
         self.name         = name
@@ -34,6 +39,8 @@ class axis:
         self.fun          = fun
         self.addUnderflow = addUnderflow
         self.addOverflow  = addOverflow
+        self.discPrereq   = discPrereq
+        
 
     def __repr__(self):
         return "axis object: {0} with {1} bins, range: {2}..{3}".format(self.name,
