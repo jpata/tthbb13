@@ -1,878 +1,4 @@
-# | Col # | Name                                                                            | Eltype           | sizes                   |
-# |-------|---------------------------------------------------------------------------------|------------------|-------------------------|
-# | 1     | run                                                                             | UInt32           | 1                       |
-# | 2     | lumi                                                                            | UInt32           | 1                       |
-# | 3     | evt                                                                             | UInt64           | 1                       |
-# | 4     | isData                                                                          | Int32            | 1                       |
-# | 5     | xsec                                                                            | Float32          | 1                       |
-# | 6     | puWeight                                                                        | Float32          | 1                       |
-# | 7     | nTrueInt                                                                        | Int32            | 1                       |
-# | 8     | genWeight                                                                       | Float32          | 1                       |
-# | 9     | json                                                                            | Float32          | 1                       |
-# | 10    | nPU0                                                                            | Float32          | 1                       |
-# | 11    | nPVs                                                                            | Float32          | 1                       |
-# | 12    | Vtype                                                                           | Float32          | 1                       |
-# | 13    | VtypeSim                                                                        | Float32          | 1                       |
-# | 14    | VMt                                                                             | Float32          | 1                       |
-# | 15    | HVdPhi                                                                          | Float32          | 1                       |
-# | 16    | fakeMET_sumet                                                                   | Float32          | 1                       |
-# | 17    | rho                                                                             | Float32          | 1                       |
-# | 18    | deltaR_jj                                                                       | Float32          | 1                       |
-# | 19    | lheNj                                                                           | Float32          | 1                       |
-# | 20    | lheNb                                                                           | Float32          | 1                       |
-# | 21    | lheNc                                                                           | Float32          | 1                       |
-# | 22    | lheNg                                                                           | Float32          | 1                       |
-# | 23    | lheNl                                                                           | Float32          | 1                       |
-# | 24    | lheV_pt                                                                         | Float32          | 1                       |
-# | 25    | lheHT                                                                           | Float32          | 1                       |
-# | 26    | genTTHtoTauTauDecayMode                                                         | Int32            | 1                       |
-# | 27    | ttCls                                                                           | Float32          | 1                       |
-# | 28    | mhtJet30                                                                        | Float32          | 1                       |
-# | 29    | mhtPhiJet30                                                                     | Float32          | 1                       |
-# | 30    | htJet30                                                                         | Float32          | 1                       |
-# | 31    | met_rawpt                                                                       | Float32          | 1                       |
-# | 32    | metPuppi_pt                                                                     | Float32          | 1                       |
-# | 33    | metPuppi_phi                                                                    | Float32          | 1                       |
-# | 34    | metPuppi_rawpt                                                                  | Float32          | 1                       |
-# | 35    | metType1p2_pt                                                                   | Float32          | 1                       |
-# | 36    | tkMet_pt                                                                        | Float32          | 1                       |
-# | 37    | tkMet_phi                                                                       | Float32          | 1                       |
-# | 38    | tkMetPVchs_pt                                                                   | Float32          | 1                       |
-# | 39    | tkMetPVchs_phi                                                                  | Float32          | 1                       |
-# | 40    | isrJetVH                                                                        | Float32          | 1                       |
-# | 41    | simPrimaryVertex_z                                                              | Float32          | 1                       |
-# | 42    | bTagWeight_LFUp                                                                 | Float32          | 1                       |
-# | 43    | bTagWeight_Stats2Down                                                           | Float32          | 1                       |
-# | 44    | bTagWeight_LFDown                                                               | Float32          | 1                       |
-# | 45    | bTagWeight_HFUp                                                                 | Float32          | 1                       |
-# | 46    | bTagWeight_JESDown                                                              | Float32          | 1                       |
-# | 47    | bTagWeight                                                                      | Float32          | 1                       |
-# | 48    | bTagWeight_HFDown                                                               | Float32          | 1                       |
-# | 49    | bTagWeight_Stats2Up                                                             | Float32          | 1                       |
-# | 50    | bTagWeight_JESUp                                                                | Float32          | 1                       |
-# | 51    | bTagWeight_Stats1Up                                                             | Float32          | 1                       |
-# | 52    | bTagWeight_Stats1Down                                                           | Float32          | 1                       |
-# | 53    | Flag_EcalDeadCellTriggerPrimitiveFilter                                         | Float32          | 1                       |
-# | 54    | Flag_trkPOG_manystripclus53X                                                    | Float32          | 1                       |
-# | 55    | Flag_ecalLaserCorrFilter                                                        | Float32          | 1                       |
-# | 56    | Flag_trkPOG_toomanystripclus53X                                                 | Float32          | 1                       |
-# | 57    | Flag_hcalLaserEventFilter                                                       | Float32          | 1                       |
-# | 58    | Flag_trkPOG_logErrorTooManyClusters                                             | Float32          | 1                       |
-# | 59    | Flag_trkPOGFilters                                                              | Float32          | 1                       |
-# | 60    | Flag_trackingFailureFilter                                                      | Float32          | 1                       |
-# | 61    | Flag_CSCTightHaloFilter                                                         | Float32          | 1                       |
-# | 62    | Flag_HBHENoiseFilter                                                            | Float32          | 1                       |
-# | 63    | Flag_goodVertices                                                               | Float32          | 1                       |
-# | 64    | Flag_METFilters                                                                 | Float32          | 1                       |
-# | 65    | Flag_eeBadScFilter                                                              | Float32          | 1                       |
-# | 66    | HLT_BIT_HLT_CaloMHTNoPU90_PFMET90_PFMHT90_IDLoose_BTagCSV0p7_v                  | Float32          | 1                       |
-# | 67    | HLT_BIT_HLT_CaloMHTNoPU90_PFMET90_PFMHT90_IDLoose_v                             | Float32          | 1                       |
-# | 68    | HLT_BIT_HLT_PFMET90_PFMHT90_IDLoose_v                                           | Float32          | 1                       |
-# | 69    | HLT_BIT_HLT_PFMET100_PFMHT100_IDLoose_v                                         | Float32          | 1                       |
-# | 70    | HLT_BIT_HLT_PFMET110_PFMHT110_IDLoose_v                                         | Float32          | 1                       |
-# | 71    | HLT_BIT_HLT_PFMET120_PFMHT120_IDLoose_v                                         | Float32          | 1                       |
-# | 72    | HLT_BIT_HLT_PFMET170_NoiseCleaned_v                                             | Float32          | 1                       |
-# | 73    | HLT_BIT_HLT_DiCentralPFJet70_PFMET120_NoiseCleaned_v                            | Float32          | 1                       |
-# | 74    | HLT_BIT_HLT_PFHT350_PFMET120_NoiseCleaned_v                                     | Float32          | 1                       |
-# | 75    | HLT_ZnnHbbAll                                                                   | Float32          | 1                       |
-# | 76    | HLT_BIT_HLT_QuadPFJet_DoubleBTagCSV_VBF_Mqq200_v                                | Float32          | 1                       |
-# | 77    | HLT_BIT_HLT_QuadPFJet_SingleBTagCSV_VBF_Mqq460_v                                | Float32          | 1                       |
-# | 78    | HLT_VBFHbbLowLumi                                                               | Float32          | 1                       |
-# | 79    | HLT_BIT_HLT_PFHT750_4Jet_v                                                      | Float32          | 1                       |
-# | 80    | HLT_BIT_HLT_PFHT900_v                                                           | Float32          | 1                       |
-# | 81    | HLT_BIT_HLT_PFJet40_v                                                           | Float32          | 1                       |
-# | 82    | HLT_BIT_HLT_PFJet60_v                                                           | Float32          | 1                       |
-# | 83    | HLT_BIT_HLT_PFJet80_v                                                           | Float32          | 1                       |
-# | 84    | HLT_BIT_HLT_PFJet140_v                                                          | Float32          | 1                       |
-# | 85    | HLT_BIT_HLT_PFJet200_v                                                          | Float32          | 1                       |
-# | 86    | HLT_BIT_HLT_PFJet260_v                                                          | Float32          | 1                       |
-# | 87    | HLT_BIT_HLT_PFJet320_v                                                          | Float32          | 1                       |
-# | 88    | HLT_BIT_HLT_PFJet400_v                                                          | Float32          | 1                       |
-# | 89    | HLT_BIT_HLT_PFJet450_v                                                          | Float32          | 1                       |
-# | 90    | HLT_hadronic                                                                    | Float32          | 1                       |
-# | 91    | HLT_BIT_HLT_PFHT400_SixJet30_BTagCSV0p5_2PFBTagCSV_v                            | Float32          | 1                       |
-# | 92    | HLT_BIT_HLT_PFHT450_SixJet40_PFBTagCSV_v                                        | Float32          | 1                       |
-# | 93    | HLT_ttHhardonicLowLumi                                                          | Float32          | 1                       |
-# | 94    | HLT_BIT_HLT_QuadJet45_TripleCSV0p5_v                                            | Float32          | 1                       |
-# | 95    | HLT_BIT_HLT_QuadJet45_DoubleCSV0p5_v                                            | Float32          | 1                       |
-# | 96    | HLT_BIT_HLT_DoubleJet90_Double30_TripleCSV0p5_v                                 | Float32          | 1                       |
-# | 97    | HLT_BIT_HLT_DoubleJet90_Double30_DoubleCSV0p5_v                                 | Float32          | 1                       |
-# | 98    | HLT_HH4bAll                                                                     | Float32          | 1                       |
-# | 99    | HLT_BIT_HLT_LooseIsoPFTau50_Trk30_eta2p1_MET80_v                                | Float32          | 1                       |
-# | 100   | HLT_WtaunHbbLowLumi                                                             | Float32          | 1                       |
-# | 101   | HLT_BIT_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v                             | Float32          | 1                       |
-# | 102   | HLT_BIT_HLT_DoubleEle24_22_eta2p1_WP75_Gsf_v                                    | Float32          | 1                       |
-# | 103   | HLT_ZeeHbbHighLumi                                                              | Float32          | 1                       |
-# | 104   | HLT_HH4bHighLumi                                                                | Float32          | 1                       |
-# | 105   | HLT_ZnnHbbHighLumi                                                              | Float32          | 1                       |
-# | 106   | HLT_BIT_HLT_QuadPFJet_DoubleBTagCSV_VBF_Mqq240_v                                | Float32          | 1                       |
-# | 107   | HLT_BIT_HLT_QuadPFJet_SingleBTagCSV_VBF_Mqq500_v                                | Float32          | 1                       |
-# | 108   | HLT_BIT_HLT_QuadPFJet_VBF_v                                                     | Float32          | 1                       |
-# | 109   | HLT_BIT_HLT_L1_TripleJet_VBF_v                                                  | Float32          | 1                       |
-# | 110   | HLT_BIT_HLT_PFHT650_WideJetMJJ900DEtaJJ1p5_v                                    | Float32          | 1                       |
-# | 111   | HLT_BIT_HLT_PFHT650_WideJetMJJ950DEtaJJ1p5_v                                    | Float32          | 1                       |
-# | 112   | HLT_VBFHbbAll                                                                   | Float32          | 1                       |
-# | 113   | HLT_BIT_HLT_Ele27_eta2p1_WP75_Gsf_v                                             | Float32          | 1                       |
-# | 114   | HLT_BIT_HLT_Ele27_eta2p1_WP85_Gsf_HT200_v                                       | Float32          | 1                       |
-# | 115   | HLT_WenHbbLowLumi                                                               | Float32          | 1                       |
-# | 116   | HLT_BIT_HLT_Ele32_eta2p1_WP75_Gsf_v                                             | Float32          | 1                       |
-# | 117   | HLT_BIT_HLT_Ele32_eta2p1_WP75_Gsf_CentralPFJet30_BTagCSV07_v                    | Float32          | 1                       |
-# | 118   | HLT_BIT_HLT_Ele27_WP85_Gsf_v                                                    | Float32          | 1                       |
-# | 119   | HLT_BIT_HLT_Ele27_eta2p1_WP75_Gsf_CentralPFJet30_BTagCSV07_v                    | Float32          | 1                       |
-# | 120   | HLT_BIT_HLT_Ele105_CaloIdVT_GsfTrkIdT_v                                         | Float32          | 1                       |
-# | 121   | HLT_BIT_HLT_Ele45_CaloIdVT_GsfTrkIdT_PFJet200_PFJet50_v                         | Float32          | 1                       |
-# | 122   | HLT_WenHbbAll                                                                   | Float32          | 1                       |
-# | 123   | HLT_BIT_HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v                             | Float32          | 1                       |
-# | 124   | HLT_ZeeHbbLowLumi                                                               | Float32          | 1                       |
-# | 125   | HLT_BIT_HLT_IsoMu24_eta2p1_v                                                    | Float32          | 1                       |
-# | 126   | HLT_BIT_HLT_IsoMu24_eta2p1_CentralPFJet30_BTagCSV07_v                           | Float32          | 1                       |
-# | 127   | HLT_BIT_HLT_Mu24_eta2p1_v                                                       | Float32          | 1                       |
-# | 128   | HLT_BIT_HLT_TkMu24_eta2p1_v                                                     | Float32          | 1                       |
-# | 129   | HLT_BIT_HLT_Mu24_v                                                              | Float32          | 1                       |
-# | 130   | HLT_BIT_HLT_IsoMu27_v                                                           | Float32          | 1                       |
-# | 131   | HLT_BIT_HLT_IsoTkMu27_v                                                         | Float32          | 1                       |
-# | 132   | HLT_BIT_HLT_TkMu27_v                                                            | Float32          | 1                       |
-# | 133   | HLT_BIT_HLT_Mu27_v                                                              | Float32          | 1                       |
-# | 134   | HLT_BIT_HLT_IsoMu20_eta2p1_v                                                    | Float32          | 1                       |
-# | 135   | HLT_BIT_HLT_IsoMu20_eta2p1_CentralPFJet30_BTagCSV07_v                           | Float32          | 1                       |
-# | 136   | HLT_BIT_HLT_Mu20_v                                                              | Float32          | 1                       |
-# | 137   | HLT_BIT_HLT_TkMu20_v                                                            | Float32          | 1                       |
-# | 138   | HLT_BIT_HLT_IsoMu20_v                                                           | Float32          | 1                       |
-# | 139   | HLT_BIT_HLT_IsoTkMu20_v                                                         | Float32          | 1                       |
-# | 140   | HLT_BIT_HLT_Mu40_eta2p1_PFJet200_PFJet50_v                                      | Float32          | 1                       |
-# | 141   | HLT_BIT_HLT_IsoMu16_eta2p1_CaloMET30_v                                          | Float32          | 1                       |
-# | 142   | HLT_BIT_HLT_Mu16_eta2p1_CaloMET30_v                                             | Float32          | 1                       |
-# | 143   | HLT_BIT_HLT_PFMET120_NoiseCleaned_Mu5_v                                         | Float32          | 1                       |
-# | 144   | HLT_BIT_HLT_MonoCentralPFJet80_PFMETNoMu120_NoiseCleaned_PFMHTNoMu120_IDTight_v | Float32          | 1                       |
-# | 145   | HLT_BIT_HLT_MonoCentralPFJet80_PFMETNoMu90_NoiseCleaned_PFMHTNoMu90_IDTight_v   | Float32          | 1                       |
-# | 146   | HLT_BIT_HLT_PFMETNoMu120_NoiseCleaned_PFMHTNoMu120_IDTight_v                    | Float32          | 1                       |
-# | 147   | HLT_BIT_HLT_PFMETNoMu90_NoiseCleaned_PFMHTNoMu90_IDTight_v                      | Float32          | 1                       |
-# | 148   | HLT_WmnHbbAll                                                                   | Float32          | 1                       |
-# | 149   | HLT_BIT_HLT_LooseIsoPFTau50_Trk30_eta2p1_MET120_v                               | Float32          | 1                       |
-# | 150   | HLT_BIT_HLT_LooseIsoPFTau50_Trk30_eta2p1_v                                      | Float32          | 1                       |
-# | 151   | HLT_WtaunHbbAll                                                                 | Float32          | 1                       |
-# | 152   | HLT_BIT_HLT_PFHT450_SixJet40_v                                                  | Float32          | 1                       |
-# | 153   | HLT_BIT_HLT_PFHT400_SixJet30_v                                                  | Float32          | 1                       |
-# | 154   | HLT_ttHhardonicAll                                                              | Float32          | 1                       |
-# | 155   | HLT_BIT_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_v                                | Float32          | 1                       |
-# | 156   | HLT_BIT_HLT_Ele23_CaloIdL_TrackIdL_IsoVL_v                                      | Float32          | 1                       |
-# | 157   | HLT_BIT_HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_v                                | Float32          | 1                       |
-# | 158   | HLT_BIT_HLT_Ele12_CaloIdL_TrackIdL_IsoVL_v                                      | Float32          | 1                       |
-# | 159   | HLT_ZeeHbbAll                                                                   | Float32          | 1                       |
-# | 160   | HLT_WmnHbbLowLumi                                                               | Float32          | 1                       |
-# | 161   | HLT_BIT_HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v                       | Float32          | 1                       |
-# | 162   | HLT_BIT_HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v                        | Float32          | 1                       |
-# | 163   | HLT_ttHleptonic                                                                 | Float32          | 1                       |
-# | 164   | HLT_VBFHbbHighLumi                                                              | Float32          | 1                       |
-# | 165   | HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v                                   | Float32          | 1                       |
-# | 166   | HLT_BIT_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v                                 | Float32          | 1                       |
-# | 167   | HLT_ZmmHbbLowLumi                                                               | Float32          | 1                       |
-# | 168   | HLT_WmnHbbHighLumi                                                              | Float32          | 1                       |
-# | 169   | HLT_BIT_HLT_Mu17_TkMu8_DZ_v                                                     | Float32          | 1                       |
-# | 170   | HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v                                      | Float32          | 1                       |
-# | 171   | HLT_BIT_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v                                    | Float32          | 1                       |
-# | 172   | HLT_BIT_HLT_DoubleIsoMu17_eta2p1_v                                              | Float32          | 1                       |
-# | 173   | HLT_ZmmHbbAll                                                                   | Float32          | 1                       |
-# | 174   | HLT_ZnnHbbLowLumi                                                               | Float32          | 1                       |
-# | 175   | HLT_WenHbbHighLumi                                                              | Float32          | 1                       |
-# | 176   | HLT_HH4bLowLumi                                                                 | Float32          | 1                       |
-# | 177   | HLT_ZmmHbbHighLumi                                                              | Float32          | 1                       |
-# | 178   | HLT_ttHhardonicHighLumi                                                         | Float32          | 1                       |
-# | 179   | HLT_WtaunHbbHighLumi                                                            | Float32          | 1                       |
-# | 180   | V_pt                                                                            | Float32          | 1                       |
-# | 181   | V_eta                                                                           | Float32          | 1                       |
-# | 182   | V_phi                                                                           | Float32          | 1                       |
-# | 183   | V_mass                                                                          | Float32          | 1                       |
-# | 184   | HaddJetsdR08_pt                                                                 | Float32          | 1                       |
-# | 185   | HaddJetsdR08_eta                                                                | Float32          | 1                       |
-# | 186   | HaddJetsdR08_phi                                                                | Float32          | 1                       |
-# | 187   | HaddJetsdR08_mass                                                               | Float32          | 1                       |
-# | 188   | H_pt                                                                            | Float32          | 1                       |
-# | 189   | H_eta                                                                           | Float32          | 1                       |
-# | 190   | H_phi                                                                           | Float32          | 1                       |
-# | 191   | H_mass                                                                          | Float32          | 1                       |
-# | 192   | softActivityVH_njets2                                                           | Int32            | 1                       |
-# | 193   | softActivityVH_njets5                                                           | Int32            | 1                       |
-# | 194   | softActivityVH_njets10                                                          | Int32            | 1                       |
-# | 195   | softActivityVH_HT                                                               | Float32          | 1                       |
-# | 196   | met_shifted_JetEnUp_pt                                                          | Float32          | 1                       |
-# | 197   | met_shifted_JetEnUp_phi                                                         | Float32          | 1                       |
-# | 198   | met_shifted_JetEnUp_sumEt                                                       | Float32          | 1                       |
-# | 199   | met_pt                                                                          | Float32          | 1                       |
-# | 200   | met_eta                                                                         | Float32          | 1                       |
-# | 201   | met_phi                                                                         | Float32          | 1                       |
-# | 202   | met_mass                                                                        | Float32          | 1                       |
-# | 203   | met_sumEt                                                                       | Float32          | 1                       |
-# | 204   | met_genPt                                                                       | Float32          | 1                       |
-# | 205   | met_genPhi                                                                      | Float32          | 1                       |
-# | 206   | met_genEta                                                                      | Float32          | 1                       |
-# | 207   | H_reg_pt                                                                        | Float32          | 1                       |
-# | 208   | H_reg_eta                                                                       | Float32          | 1                       |
-# | 209   | H_reg_phi                                                                       | Float32          | 1                       |
-# | 210   | H_reg_mass                                                                      | Float32          | 1                       |
-# | 211   | met_shifted_JetResDown_pt                                                       | Float32          | 1                       |
-# | 212   | met_shifted_JetResDown_phi                                                      | Float32          | 1                       |
-# | 213   | met_shifted_JetResDown_sumEt                                                    | Float32          | 1                       |
-# | 214   | HCSV_pt                                                                         | Float32          | 1                       |
-# | 215   | HCSV_eta                                                                        | Float32          | 1                       |
-# | 216   | HCSV_phi                                                                        | Float32          | 1                       |
-# | 217   | HCSV_mass                                                                       | Float32          | 1                       |
-# | 218   | met_shifted_MuonEnDown_pt                                                       | Float32          | 1                       |
-# | 219   | met_shifted_MuonEnDown_phi                                                      | Float32          | 1                       |
-# | 220   | met_shifted_MuonEnDown_sumEt                                                    | Float32          | 1                       |
-# | 221   | met_shifted_ElectronEnUp_pt                                                     | Float32          | 1                       |
-# | 222   | met_shifted_ElectronEnUp_phi                                                    | Float32          | 1                       |
-# | 223   | met_shifted_ElectronEnUp_sumEt                                                  | Float32          | 1                       |
-# | 224   | met_shifted_ElectronEnDown_pt                                                   | Float32          | 1                       |
-# | 225   | met_shifted_ElectronEnDown_phi                                                  | Float32          | 1                       |
-# | 226   | met_shifted_ElectronEnDown_sumEt                                                | Float32          | 1                       |
-# | 227   | fakeMET_pt                                                                      | Float32          | 1                       |
-# | 228   | fakeMET_eta                                                                     | Float32          | 1                       |
-# | 229   | fakeMET_phi                                                                     | Float32          | 1                       |
-# | 230   | fakeMET_mass                                                                    | Float32          | 1                       |
-# | 231   | met_shifted_TauEnDown_pt                                                        | Float32          | 1                       |
-# | 232   | met_shifted_TauEnDown_phi                                                       | Float32          | 1                       |
-# | 233   | met_shifted_TauEnDown_sumEt                                                     | Float32          | 1                       |
-# | 234   | met_shifted_TauEnUp_pt                                                          | Float32          | 1                       |
-# | 235   | met_shifted_TauEnUp_phi                                                         | Float32          | 1                       |
-# | 236   | met_shifted_TauEnUp_sumEt                                                       | Float32          | 1                       |
-# | 237   | HCSV_reg_pt                                                                     | Float32          | 1                       |
-# | 238   | HCSV_reg_eta                                                                    | Float32          | 1                       |
-# | 239   | HCSV_reg_phi                                                                    | Float32          | 1                       |
-# | 240   | HCSV_reg_mass                                                                   | Float32          | 1                       |
-# | 241   | met_shifted_UnclusteredEnUp_pt                                                  | Float32          | 1                       |
-# | 242   | met_shifted_UnclusteredEnUp_phi                                                 | Float32          | 1                       |
-# | 243   | met_shifted_UnclusteredEnUp_sumEt                                               | Float32          | 1                       |
-# | 244   | met_shifted_UnclusteredEnDown_pt                                                | Float32          | 1                       |
-# | 245   | met_shifted_UnclusteredEnDown_phi                                               | Float32          | 1                       |
-# | 246   | met_shifted_UnclusteredEnDown_sumEt                                             | Float32          | 1                       |
-# | 247   | met_shifted_JetResUp_pt                                                         | Float32          | 1                       |
-# | 248   | met_shifted_JetResUp_phi                                                        | Float32          | 1                       |
-# | 249   | met_shifted_JetResUp_sumEt                                                      | Float32          | 1                       |
-# | 250   | met_shifted_JetEnDown_pt                                                        | Float32          | 1                       |
-# | 251   | met_shifted_JetEnDown_phi                                                       | Float32          | 1                       |
-# | 252   | met_shifted_JetEnDown_sumEt                                                     | Float32          | 1                       |
-# | 253   | softActivity_njets2                                                             | Int32            | 1                       |
-# | 254   | softActivity_njets5                                                             | Int32            | 1                       |
-# | 255   | softActivity_njets10                                                            | Int32            | 1                       |
-# | 256   | softActivity_HT                                                                 | Float32          | 1                       |
-# | 257   | met_shifted_MuonEnUp_pt                                                         | Float32          | 1                       |
-# | 258   | met_shifted_MuonEnUp_phi                                                        | Float32          | 1                       |
-# | 259   | met_shifted_MuonEnUp_sumEt                                                      | Float32          | 1                       |
-# | 260   | nGenBQuarkFromHafterISR                                                         | Int32            | 1                       |
-# | 261   | GenBQuarkFromHafterISR_pdgId                                                    | Array{Int32,1}   | nGenBQuarkFromHafterISR |
-# | 262   | GenBQuarkFromHafterISR_pt                                                       | Array{Float32,1} | nGenBQuarkFromHafterISR |
-# | 263   | GenBQuarkFromHafterISR_eta                                                      | Array{Float32,1} | nGenBQuarkFromHafterISR |
-# | 264   | GenBQuarkFromHafterISR_phi                                                      | Array{Float32,1} | nGenBQuarkFromHafterISR |
-# | 265   | GenBQuarkFromHafterISR_mass                                                     | Array{Float32,1} | nGenBQuarkFromHafterISR |
-# | 266   | GenBQuarkFromHafterISR_charge                                                   | Array{Float32,1} | nGenBQuarkFromHafterISR |
-# | 267   | GenBQuarkFromHafterISR_status                                                   | Array{Int32,1}   | nGenBQuarkFromHafterISR |
-# | 268   | npileUpVertex_ptHat                                                             | Int32            | 1                       |
-# | 269   | pileUpVertex_ptHat                                                              | Array{Float32,1} | npileUpVertex_ptHat     |
-# | 270   | nGenHiggsBoson                                                                  | Int32            | 1                       |
-# | 271   | GenHiggsBoson_pdgId                                                             | Array{Int32,1}   | nGenHiggsBoson          |
-# | 272   | GenHiggsBoson_pt                                                                | Array{Float32,1} | nGenHiggsBoson          |
-# | 273   | GenHiggsBoson_eta                                                               | Array{Float32,1} | nGenHiggsBoson          |
-# | 274   | GenHiggsBoson_phi                                                               | Array{Float32,1} | nGenHiggsBoson          |
-# | 275   | GenHiggsBoson_mass                                                              | Array{Float32,1} | nGenHiggsBoson          |
-# | 276   | GenHiggsBoson_charge                                                            | Array{Float32,1} | nGenHiggsBoson          |
-# | 277   | GenHiggsBoson_status                                                            | Array{Int32,1}   | nGenHiggsBoson          |
-# | 278   | nhJidx_sortcsv                                                                  | Int32            | 1                       |
-# | 279   | hJidx_sortcsv                                                                   | Array{Int32,1}   | nhJidx_sortcsv          |
-# | 280   | naJCidx                                                                         | Int32            | 1                       |
-# | 281   | aJCidx                                                                          | Array{Int32,1}   | naJCidx                 |
-# | 282   | nFatjetCA15pruned                                                               | Int32            | 1                       |
-# | 283   | FatjetCA15pruned_pt                                                             | Array{Float32,1} | nFatjetCA15pruned       |
-# | 284   | FatjetCA15pruned_eta                                                            | Array{Float32,1} | nFatjetCA15pruned       |
-# | 285   | FatjetCA15pruned_phi                                                            | Array{Float32,1} | nFatjetCA15pruned       |
-# | 286   | FatjetCA15pruned_mass                                                           | Array{Float32,1} | nFatjetCA15pruned       |
-# | 287   | nGenLepFromTop                                                                  | Int32            | 1                       |
-# | 288   | GenLepFromTop_pdgId                                                             | Array{Int32,1}   | nGenLepFromTop          |
-# | 289   | GenLepFromTop_pt                                                                | Array{Float32,1} | nGenLepFromTop          |
-# | 290   | GenLepFromTop_eta                                                               | Array{Float32,1} | nGenLepFromTop          |
-# | 291   | GenLepFromTop_phi                                                               | Array{Float32,1} | nGenLepFromTop          |
-# | 292   | GenLepFromTop_mass                                                              | Array{Float32,1} | nGenLepFromTop          |
-# | 293   | GenLepFromTop_charge                                                            | Array{Float32,1} | nGenLepFromTop          |
-# | 294   | GenLepFromTop_status                                                            | Array{Int32,1}   | nGenLepFromTop          |
-# | 295   | nGenVbosons                                                                     | Int32            | 1                       |
-# | 296   | GenVbosons_pdgId                                                                | Array{Int32,1}   | nGenVbosons             |
-# | 297   | GenVbosons_pt                                                                   | Array{Float32,1} | nGenVbosons             |
-# | 298   | GenVbosons_eta                                                                  | Array{Float32,1} | nGenVbosons             |
-# | 299   | GenVbosons_phi                                                                  | Array{Float32,1} | nGenVbosons             |
-# | 300   | GenVbosons_mass                                                                 | Array{Float32,1} | nGenVbosons             |
-# | 301   | GenVbosons_charge                                                               | Array{Float32,1} | nGenVbosons             |
-# | 302   | GenVbosons_status                                                               | Array{Int32,1}   | nGenVbosons             |
-# | 303   | najidxaddJetsdR08                                                               | Int32            | 1                       |
-# | 304   | ajidxaddJetsdR08                                                                | Array{Int32,1}   | najidxaddJetsdR08       |
-# | 305   | nFatjetAK08pruned                                                               | Int32            | 1                       |
-# | 306   | FatjetAK08pruned_pt                                                             | Array{Float32,1} | nFatjetAK08pruned       |
-# | 307   | FatjetAK08pruned_eta                                                            | Array{Float32,1} | nFatjetAK08pruned       |
-# | 308   | FatjetAK08pruned_phi                                                            | Array{Float32,1} | nFatjetAK08pruned       |
-# | 309   | FatjetAK08pruned_mass                                                           | Array{Float32,1} | nFatjetAK08pruned       |
-# | 310   | nGenJet                                                                         | Int32            | 1                       |
-# | 311   | GenJet_charge                                                                   | Array{Float32,1} | nGenJet                 |
-# | 312   | GenJet_status                                                                   | Array{Int32,1}   | nGenJet                 |
-# | 313   | GenJet_pdgId                                                                    | Array{Int32,1}   | nGenJet                 |
-# | 314   | GenJet_pt                                                                       | Array{Float32,1} | nGenJet                 |
-# | 315   | GenJet_eta                                                                      | Array{Float32,1} | nGenJet                 |
-# | 316   | GenJet_phi                                                                      | Array{Float32,1} | nGenJet                 |
-# | 317   | GenJet_mass                                                                     | Array{Float32,1} | nGenJet                 |
-# | 318   | GenJet_numBHadrons                                                              | Array{Int32,1}   | nGenJet                 |
-# | 319   | GenJet_numCHadrons                                                              | Array{Int32,1}   | nGenJet                 |
-# | 320   | GenJet_numBHadronsFromTop                                                       | Array{Int32,1}   | nGenJet                 |
-# | 321   | GenJet_numCHadronsFromTop                                                       | Array{Int32,1}   | nGenJet                 |
-# | 322   | GenJet_numBHadronsAfterTop                                                      | Array{Int32,1}   | nGenJet                 |
-# | 323   | GenJet_numCHadronsAfterTop                                                      | Array{Int32,1}   | nGenJet                 |
-# | 324   | GenJet_wNuPt                                                                    | Array{Float32,1} | nGenJet                 |
-# | 325   | GenJet_wNuEta                                                                   | Array{Float32,1} | nGenJet                 |
-# | 326   | GenJet_wNuPhi                                                                   | Array{Float32,1} | nGenJet                 |
-# | 327   | GenJet_wNuM                                                                     | Array{Float32,1} | nGenJet                 |
-# | 328   | nSubjetCA15pruned                                                               | Int32            | 1                       |
-# | 329   | SubjetCA15pruned_pt                                                             | Array{Float32,1} | nSubjetCA15pruned       |
-# | 330   | SubjetCA15pruned_eta                                                            | Array{Float32,1} | nSubjetCA15pruned       |
-# | 331   | SubjetCA15pruned_phi                                                            | Array{Float32,1} | nSubjetCA15pruned       |
-# | 332   | SubjetCA15pruned_mass                                                           | Array{Float32,1} | nSubjetCA15pruned       |
-# | 333   | SubjetCA15pruned_btag                                                           | Array{Float32,1} | nSubjetCA15pruned       |
-# | 334   | nFatjetCA15ungroomed                                                            | Int32            | 1                       |
-# | 335   | FatjetCA15ungroomed_pt                                                          | Array{Float32,1} | nFatjetCA15ungroomed    |
-# | 336   | FatjetCA15ungroomed_eta                                                         | Array{Float32,1} | nFatjetCA15ungroomed    |
-# | 337   | FatjetCA15ungroomed_phi                                                         | Array{Float32,1} | nFatjetCA15ungroomed    |
-# | 338   | FatjetCA15ungroomed_mass                                                        | Array{Float32,1} | nFatjetCA15ungroomed    |
-# | 339   | FatjetCA15ungroomed_tau1                                                        | Array{Float32,1} | nFatjetCA15ungroomed    |
-# | 340   | FatjetCA15ungroomed_tau2                                                        | Array{Float32,1} | nFatjetCA15ungroomed    |
-# | 341   | FatjetCA15ungroomed_tau3                                                        | Array{Float32,1} | nFatjetCA15ungroomed    |
-# | 342   | FatjetCA15ungroomed_bbtag                                                       | Array{Float32,1} | nFatjetCA15ungroomed    |
-# | 343   | FatjetCA15ungroomed_PFLepton_ptrel                                              | Array{Float32,1} | nFatjetCA15ungroomed    |
-# | 344   | FatjetCA15ungroomed_z_ratio                                                     | Array{Float32,1} | nFatjetCA15ungroomed    |
-# | 345   | FatjetCA15ungroomed_tau_dot                                                     | Array{Float32,1} | nFatjetCA15ungroomed    |
-# | 346   | FatjetCA15ungroomed_SV_mass_0                                                   | Array{Float32,1} | nFatjetCA15ungroomed    |
-# | 347   | FatjetCA15ungroomed_SV_EnergyRatio_0                                            | Array{Float32,1} | nFatjetCA15ungroomed    |
-# | 348   | FatjetCA15ungroomed_SV_EnergyRatio_1                                            | Array{Float32,1} | nFatjetCA15ungroomed    |
-# | 349   | FatjetCA15ungroomed_PFLepton_IP2D                                               | Array{Float32,1} | nFatjetCA15ungroomed    |
-# | 350   | FatjetCA15ungroomed_tau_21                                                      | Array{Float32,1} | nFatjetCA15ungroomed    |
-# | 351   | FatjetCA15ungroomed_nSL                                                         | Array{Float32,1} | nFatjetCA15ungroomed    |
-# | 352   | FatjetCA15ungroomed_vertexNTracks                                               | Array{Float32,1} | nFatjetCA15ungroomed    |
-# | 353   | ndRaddJetsdR08                                                                  | Int32            | 1                       |
-# | 354   | dRaddJetsdR08                                                                   | Array{Float32,1} | ndRaddJetsdR08          |
-# | 355   | nGenBQuarkFromH                                                                 | Int32            | 1                       |
-# | 356   | GenBQuarkFromH_pdgId                                                            | Array{Int32,1}   | nGenBQuarkFromH         |
-# | 357   | GenBQuarkFromH_pt                                                               | Array{Float32,1} | nGenBQuarkFromH         |
-# | 358   | GenBQuarkFromH_eta                                                              | Array{Float32,1} | nGenBQuarkFromH         |
-# | 359   | GenBQuarkFromH_phi                                                              | Array{Float32,1} | nGenBQuarkFromH         |
-# | 360   | GenBQuarkFromH_mass                                                             | Array{Float32,1} | nGenBQuarkFromH         |
-# | 361   | GenBQuarkFromH_charge                                                           | Array{Float32,1} | nGenBQuarkFromH         |
-# | 362   | GenBQuarkFromH_status                                                           | Array{Int32,1}   | nGenBQuarkFromH         |
-# | 363   | nGenStatus2bHad                                                                 | Int32            | 1                       |
-# | 364   | GenStatus2bHad_pdgId                                                            | Array{Int32,1}   | nGenStatus2bHad         |
-# | 365   | GenStatus2bHad_pt                                                               | Array{Float32,1} | nGenStatus2bHad         |
-# | 366   | GenStatus2bHad_eta                                                              | Array{Float32,1} | nGenStatus2bHad         |
-# | 367   | GenStatus2bHad_phi                                                              | Array{Float32,1} | nGenStatus2bHad         |
-# | 368   | GenStatus2bHad_mass                                                             | Array{Float32,1} | nGenStatus2bHad         |
-# | 369   | GenStatus2bHad_charge                                                           | Array{Float32,1} | nGenStatus2bHad         |
-# | 370   | GenStatus2bHad_status                                                           | Array{Int32,1}   | nGenStatus2bHad         |
-# | 371   | nhJCidx                                                                         | Int32            | 1                       |
-# | 372   | hJCidx                                                                          | Array{Int32,1}   | nhJCidx                 |
-# | 373   | nGenTop                                                                         | Int32            | 1                       |
-# | 374   | GenTop_pdgId                                                                    | Array{Int32,1}   | nGenTop                 |
-# | 375   | GenTop_pt                                                                       | Array{Float32,1} | nGenTop                 |
-# | 376   | GenTop_eta                                                                      | Array{Float32,1} | nGenTop                 |
-# | 377   | GenTop_phi                                                                      | Array{Float32,1} | nGenTop                 |
-# | 378   | GenTop_mass                                                                     | Array{Float32,1} | nGenTop                 |
-# | 379   | GenTop_charge                                                                   | Array{Float32,1} | nGenTop                 |
-# | 380   | GenTop_status                                                                   | Array{Int32,1}   | nGenTop                 |
-# | 381   | naJidx                                                                          | Int32            | 1                       |
-# | 382   | aJidx                                                                           | Array{Int32,1}   | naJidx                  |
-# | 383   | nFatjetCA15trimmed                                                              | Int32            | 1                       |
-# | 384   | FatjetCA15trimmed_pt                                                            | Array{Float32,1} | nFatjetCA15trimmed      |
-# | 385   | FatjetCA15trimmed_eta                                                           | Array{Float32,1} | nFatjetCA15trimmed      |
-# | 386   | FatjetCA15trimmed_phi                                                           | Array{Float32,1} | nFatjetCA15trimmed      |
-# | 387   | FatjetCA15trimmed_mass                                                          | Array{Float32,1} | nFatjetCA15trimmed      |
-# | 388   | nGenLepFromTau                                                                  | Int32            | 1                       |
-# | 389   | GenLepFromTau_pdgId                                                             | Array{Int32,1}   | nGenLepFromTau          |
-# | 390   | GenLepFromTau_pt                                                                | Array{Float32,1} | nGenLepFromTau          |
-# | 391   | GenLepFromTau_eta                                                               | Array{Float32,1} | nGenLepFromTau          |
-# | 392   | GenLepFromTau_phi                                                               | Array{Float32,1} | nGenLepFromTau          |
-# | 393   | GenLepFromTau_mass                                                              | Array{Float32,1} | nGenLepFromTau          |
-# | 394   | GenLepFromTau_charge                                                            | Array{Float32,1} | nGenLepFromTau          |
-# | 395   | GenLepFromTau_status                                                            | Array{Int32,1}   | nGenLepFromTau          |
-# | 396   | naLeptons                                                                       | Int32            | 1                       |
-# | 397   | aLeptons_charge                                                                 | Array{Int32,1}   | naLeptons               |
-# | 398   | aLeptons_tightId                                                                | Array{Int32,1}   | naLeptons               |
-# | 399   | aLeptons_eleCutIdCSA14_25ns_v1                                                  | Array{Int32,1}   | naLeptons               |
-# | 400   | aLeptons_eleCutIdCSA14_50ns_v1                                                  | Array{Int32,1}   | naLeptons               |
-# | 401   | aLeptons_dxy                                                                    | Array{Float32,1} | naLeptons               |
-# | 402   | aLeptons_dz                                                                     | Array{Float32,1} | naLeptons               |
-# | 403   | aLeptons_edxy                                                                   | Array{Float32,1} | naLeptons               |
-# | 404   | aLeptons_edz                                                                    | Array{Float32,1} | naLeptons               |
-# | 405   | aLeptons_ip3d                                                                   | Array{Float32,1} | naLeptons               |
-# | 406   | aLeptons_sip3d                                                                  | Array{Float32,1} | naLeptons               |
-# | 407   | aLeptons_convVeto                                                               | Array{Int32,1}   | naLeptons               |
-# | 408   | aLeptons_lostHits                                                               | Array{Int32,1}   | naLeptons               |
-# | 409   | aLeptons_relIso03                                                               | Array{Float32,1} | naLeptons               |
-# | 410   | aLeptons_relIso04                                                               | Array{Float32,1} | naLeptons               |
-# | 411   | aLeptons_miniRelIso                                                             | Array{Float32,1} | naLeptons               |
-# | 412   | aLeptons_tightCharge                                                            | Array{Int32,1}   | naLeptons               |
-# | 413   | aLeptons_mcMatchId                                                              | Array{Int32,1}   | naLeptons               |
-# | 414   | aLeptons_mcMatchAny                                                             | Array{Int32,1}   | naLeptons               |
-# | 415   | aLeptons_mcMatchTau                                                             | Array{Int32,1}   | naLeptons               |
-# | 416   | aLeptons_mcPt                                                                   | Array{Float32,1} | naLeptons               |
-# | 417   | aLeptons_mediumMuonId                                                           | Array{Int32,1}   | naLeptons               |
-# | 418   | aLeptons_pdgId                                                                  | Array{Int32,1}   | naLeptons               |
-# | 419   | aLeptons_pt                                                                     | Array{Float32,1} | naLeptons               |
-# | 420   | aLeptons_eta                                                                    | Array{Float32,1} | naLeptons               |
-# | 421   | aLeptons_phi                                                                    | Array{Float32,1} | naLeptons               |
-# | 422   | aLeptons_mass                                                                   | Array{Float32,1} | naLeptons               |
-# | 423   | aLeptons_looseIdSusy                                                            | Array{Int32,1}   | naLeptons               |
-# | 424   | aLeptons_looseIdPOG                                                             | Array{Int32,1}   | naLeptons               |
-# | 425   | aLeptons_chargedHadRelIso03                                                     | Array{Float32,1} | naLeptons               |
-# | 426   | aLeptons_chargedHadRelIso04                                                     | Array{Float32,1} | naLeptons               |
-# | 427   | aLeptons_eleSieie                                                               | Array{Float32,1} | naLeptons               |
-# | 428   | aLeptons_eleDEta                                                                | Array{Float32,1} | naLeptons               |
-# | 429   | aLeptons_eleDPhi                                                                | Array{Float32,1} | naLeptons               |
-# | 430   | aLeptons_eleHoE                                                                 | Array{Float32,1} | naLeptons               |
-# | 431   | aLeptons_eleMissingHits                                                         | Array{Float32,1} | naLeptons               |
-# | 432   | aLeptons_eleChi2                                                                | Array{Float32,1} | naLeptons               |
-# | 433   | aLeptons_nStations                                                              | Array{Float32,1} | naLeptons               |
-# | 434   | aLeptons_trkKink                                                                | Array{Float32,1} | naLeptons               |
-# | 435   | aLeptons_caloCompatibility                                                      | Array{Float32,1} | naLeptons               |
-# | 436   | aLeptons_globalTrackChi2                                                        | Array{Float32,1} | naLeptons               |
-# | 437   | aLeptons_nChamberHits                                                           | Array{Float32,1} | naLeptons               |
-# | 438   | aLeptons_isPFMuon                                                               | Array{Float32,1} | naLeptons               |
-# | 439   | aLeptons_isGlobalMuon                                                           | Array{Float32,1} | naLeptons               |
-# | 440   | aLeptons_isTrackerMuon                                                          | Array{Float32,1} | naLeptons               |
-# | 441   | aLeptons_pixelHits                                                              | Array{Float32,1} | naLeptons               |
-# | 442   | aLeptons_trackerLayers                                                          | Array{Int32,1}   | naLeptons               |
-# | 443   | aLeptons_pixelLayers                                                            | Array{Int32,1}   | naLeptons               |
-# | 444   | aLeptons_mvaTTH                                                                 | Array{Float32,1} | naLeptons               |
-# | 445   | aLeptons_jetOverlapIdx                                                          | Array{Int32,1}   | naLeptons               |
-# | 446   | aLeptons_jetPtRatio                                                             | Array{Float32,1} | naLeptons               |
-# | 447   | aLeptons_jetBTagCSV                                                             | Array{Float32,1} | naLeptons               |
-# | 448   | aLeptons_jetDR                                                                  | Array{Float32,1} | naLeptons               |
-# | 449   | aLeptons_pfRelIso03                                                             | Array{Float32,1} | naLeptons               |
-# | 450   | aLeptons_pfRelIso04                                                             | Array{Float32,1} | naLeptons               |
-# | 451   | aLeptons_etaSc                                                                  | Array{Float32,1} | naLeptons               |
-# | 452   | aLeptons_eleExpMissingInnerHits                                                 | Array{Float32,1} | naLeptons               |
-# | 453   | aLeptons_eleooEmooP                                                             | Array{Float32,1} | naLeptons               |
-# | 454   | nGenNuFromTop                                                                   | Int32            | 1                       |
-# | 455   | GenNuFromTop_pdgId                                                              | Array{Int32,1}   | nGenNuFromTop           |
-# | 456   | GenNuFromTop_pt                                                                 | Array{Float32,1} | nGenNuFromTop           |
-# | 457   | GenNuFromTop_eta                                                                | Array{Float32,1} | nGenNuFromTop           |
-# | 458   | GenNuFromTop_phi                                                                | Array{Float32,1} | nGenNuFromTop           |
-# | 459   | GenNuFromTop_mass                                                               | Array{Float32,1} | nGenNuFromTop           |
-# | 460   | GenNuFromTop_charge                                                             | Array{Float32,1} | nGenNuFromTop           |
-# | 461   | GenNuFromTop_status                                                             | Array{Int32,1}   | nGenNuFromTop           |
-# | 462   | nFatjetAK08ungroomed                                                            | Int32            | 1                       |
-# | 463   | FatjetAK08ungroomed_pt                                                          | Array{Float32,1} | nFatjetAK08ungroomed    |
-# | 464   | FatjetAK08ungroomed_eta                                                         | Array{Float32,1} | nFatjetAK08ungroomed    |
-# | 465   | FatjetAK08ungroomed_phi                                                         | Array{Float32,1} | nFatjetAK08ungroomed    |
-# | 466   | FatjetAK08ungroomed_mass                                                        | Array{Float32,1} | nFatjetAK08ungroomed    |
-# | 467   | FatjetAK08ungroomed_tau1                                                        | Array{Float32,1} | nFatjetAK08ungroomed    |
-# | 468   | FatjetAK08ungroomed_tau2                                                        | Array{Float32,1} | nFatjetAK08ungroomed    |
-# | 469   | FatjetAK08ungroomed_tau3                                                        | Array{Float32,1} | nFatjetAK08ungroomed    |
-# | 470   | FatjetAK08ungroomed_msoftdrop                                                   | Array{Float32,1} | nFatjetAK08ungroomed    |
-# | 471   | FatjetAK08ungroomed_mpruned                                                     | Array{Float32,1} | nFatjetAK08ungroomed    |
-# | 472   | FatjetAK08ungroomed_mtrimmed                                                    | Array{Float32,1} | nFatjetAK08ungroomed    |
-# | 473   | FatjetAK08ungroomed_mfiltered                                                   | Array{Float32,1} | nFatjetAK08ungroomed    |
-# | 474   | FatjetAK08ungroomed_bbtag                                                       | Array{Float32,1} | nFatjetAK08ungroomed    |
-# | 475   | FatjetAK08ungroomed_PFLepton_ptrel                                              | Array{Float32,1} | nFatjetAK08ungroomed    |
-# | 476   | FatjetAK08ungroomed_z_ratio                                                     | Array{Float32,1} | nFatjetAK08ungroomed    |
-# | 477   | FatjetAK08ungroomed_tau_dot                                                     | Array{Float32,1} | nFatjetAK08ungroomed    |
-# | 478   | FatjetAK08ungroomed_SV_mass_0                                                   | Array{Float32,1} | nFatjetAK08ungroomed    |
-# | 479   | FatjetAK08ungroomed_SV_EnergyRatio_0                                            | Array{Float32,1} | nFatjetAK08ungroomed    |
-# | 480   | FatjetAK08ungroomed_SV_EnergyRatio_1                                            | Array{Float32,1} | nFatjetAK08ungroomed    |
-# | 481   | FatjetAK08ungroomed_PFLepton_IP2D                                               | Array{Float32,1} | nFatjetAK08ungroomed    |
-# | 482   | FatjetAK08ungroomed_tau_21                                                      | Array{Float32,1} | nFatjetAK08ungroomed    |
-# | 483   | FatjetAK08ungroomed_nSL                                                         | Array{Float32,1} | nFatjetAK08ungroomed    |
-# | 484   | FatjetAK08ungroomed_vertexNTracks                                               | Array{Float32,1} | nFatjetAK08ungroomed    |
-# | 485   | nselLeptons                                                                     | Int32            | 1                       |
-# | 486   | selLeptons_charge                                                               | Array{Int32,1}   | nselLeptons             |
-# | 487   | selLeptons_tightId                                                              | Array{Int32,1}   | nselLeptons             |
-# | 488   | selLeptons_eleCutIdCSA14_25ns_v1                                                | Array{Int32,1}   | nselLeptons             |
-# | 489   | selLeptons_eleCutIdCSA14_50ns_v1                                                | Array{Int32,1}   | nselLeptons             |
-# | 490   | selLeptons_dxy                                                                  | Array{Float32,1} | nselLeptons             |
-# | 491   | selLeptons_dz                                                                   | Array{Float32,1} | nselLeptons             |
-# | 492   | selLeptons_edxy                                                                 | Array{Float32,1} | nselLeptons             |
-# | 493   | selLeptons_edz                                                                  | Array{Float32,1} | nselLeptons             |
-# | 494   | selLeptons_ip3d                                                                 | Array{Float32,1} | nselLeptons             |
-# | 495   | selLeptons_sip3d                                                                | Array{Float32,1} | nselLeptons             |
-# | 496   | selLeptons_convVeto                                                             | Array{Int32,1}   | nselLeptons             |
-# | 497   | selLeptons_lostHits                                                             | Array{Int32,1}   | nselLeptons             |
-# | 498   | selLeptons_relIso03                                                             | Array{Float32,1} | nselLeptons             |
-# | 499   | selLeptons_relIso04                                                             | Array{Float32,1} | nselLeptons             |
-# | 500   | selLeptons_miniRelIso                                                           | Array{Float32,1} | nselLeptons             |
-# | 501   | selLeptons_tightCharge                                                          | Array{Int32,1}   | nselLeptons             |
-# | 502   | selLeptons_mcMatchId                                                            | Array{Int32,1}   | nselLeptons             |
-# | 503   | selLeptons_mcMatchAny                                                           | Array{Int32,1}   | nselLeptons             |
-# | 504   | selLeptons_mcMatchTau                                                           | Array{Int32,1}   | nselLeptons             |
-# | 505   | selLeptons_mcPt                                                                 | Array{Float32,1} | nselLeptons             |
-# | 506   | selLeptons_mediumMuonId                                                         | Array{Int32,1}   | nselLeptons             |
-# | 507   | selLeptons_pdgId                                                                | Array{Int32,1}   | nselLeptons             |
-# | 508   | selLeptons_pt                                                                   | Array{Float32,1} | nselLeptons             |
-# | 509   | selLeptons_eta                                                                  | Array{Float32,1} | nselLeptons             |
-# | 510   | selLeptons_phi                                                                  | Array{Float32,1} | nselLeptons             |
-# | 511   | selLeptons_mass                                                                 | Array{Float32,1} | nselLeptons             |
-# | 512   | selLeptons_looseIdSusy                                                          | Array{Int32,1}   | nselLeptons             |
-# | 513   | selLeptons_looseIdPOG                                                           | Array{Int32,1}   | nselLeptons             |
-# | 514   | selLeptons_chargedHadRelIso03                                                   | Array{Float32,1} | nselLeptons             |
-# | 515   | selLeptons_chargedHadRelIso04                                                   | Array{Float32,1} | nselLeptons             |
-# | 516   | selLeptons_eleSieie                                                             | Array{Float32,1} | nselLeptons             |
-# | 517   | selLeptons_eleDEta                                                              | Array{Float32,1} | nselLeptons             |
-# | 518   | selLeptons_eleDPhi                                                              | Array{Float32,1} | nselLeptons             |
-# | 519   | selLeptons_eleHoE                                                               | Array{Float32,1} | nselLeptons             |
-# | 520   | selLeptons_eleMissingHits                                                       | Array{Float32,1} | nselLeptons             |
-# | 521   | selLeptons_eleChi2                                                              | Array{Float32,1} | nselLeptons             |
-# | 522   | selLeptons_nStations                                                            | Array{Float32,1} | nselLeptons             |
-# | 523   | selLeptons_trkKink                                                              | Array{Float32,1} | nselLeptons             |
-# | 524   | selLeptons_caloCompatibility                                                    | Array{Float32,1} | nselLeptons             |
-# | 525   | selLeptons_globalTrackChi2                                                      | Array{Float32,1} | nselLeptons             |
-# | 526   | selLeptons_nChamberHits                                                         | Array{Float32,1} | nselLeptons             |
-# | 527   | selLeptons_isPFMuon                                                             | Array{Float32,1} | nselLeptons             |
-# | 528   | selLeptons_isGlobalMuon                                                         | Array{Float32,1} | nselLeptons             |
-# | 529   | selLeptons_isTrackerMuon                                                        | Array{Float32,1} | nselLeptons             |
-# | 530   | selLeptons_pixelHits                                                            | Array{Float32,1} | nselLeptons             |
-# | 531   | selLeptons_trackerLayers                                                        | Array{Int32,1}   | nselLeptons             |
-# | 532   | selLeptons_pixelLayers                                                          | Array{Int32,1}   | nselLeptons             |
-# | 533   | selLeptons_mvaTTH                                                               | Array{Float32,1} | nselLeptons             |
-# | 534   | selLeptons_jetOverlapIdx                                                        | Array{Int32,1}   | nselLeptons             |
-# | 535   | selLeptons_jetPtRatio                                                           | Array{Float32,1} | nselLeptons             |
-# | 536   | selLeptons_jetBTagCSV                                                           | Array{Float32,1} | nselLeptons             |
-# | 537   | selLeptons_jetDR                                                                | Array{Float32,1} | nselLeptons             |
-# | 538   | selLeptons_pfRelIso03                                                           | Array{Float32,1} | nselLeptons             |
-# | 539   | selLeptons_pfRelIso04                                                           | Array{Float32,1} | nselLeptons             |
-# | 540   | selLeptons_etaSc                                                                | Array{Float32,1} | nselLeptons             |
-# | 541   | selLeptons_eleExpMissingInnerHits                                               | Array{Float32,1} | nselLeptons             |
-# | 542   | selLeptons_eleooEmooP                                                           | Array{Float32,1} | nselLeptons             |
-# | 543   | nGenHiggsSisters                                                                | Int32            | 1                       |
-# | 544   | GenHiggsSisters_pdgId                                                           | Array{Int32,1}   | nGenHiggsSisters        |
-# | 545   | GenHiggsSisters_pt                                                              | Array{Float32,1} | nGenHiggsSisters        |
-# | 546   | GenHiggsSisters_eta                                                             | Array{Float32,1} | nGenHiggsSisters        |
-# | 547   | GenHiggsSisters_phi                                                             | Array{Float32,1} | nGenHiggsSisters        |
-# | 548   | GenHiggsSisters_mass                                                            | Array{Float32,1} | nGenHiggsSisters        |
-# | 549   | GenHiggsSisters_charge                                                          | Array{Float32,1} | nGenHiggsSisters        |
-# | 550   | GenHiggsSisters_status                                                          | Array{Int32,1}   | nGenHiggsSisters        |
-# | 551   | nhjidxaddJetsdR08                                                               | Int32            | 1                       |
-# | 552   | hjidxaddJetsdR08                                                                | Array{Int32,1}   | nhjidxaddJetsdR08       |
-# | 553   | nsoftActivityVHJets                                                             | Int32            | 1                       |
-# | 554   | softActivityVHJets_pt                                                           | Array{Float32,1} | nsoftActivityVHJets     |
-# | 555   | softActivityVHJets_eta                                                          | Array{Float32,1} | nsoftActivityVHJets     |
-# | 556   | softActivityVHJets_phi                                                          | Array{Float32,1} | nsoftActivityVHJets     |
-# | 557   | softActivityVHJets_mass                                                         | Array{Float32,1} | nsoftActivityVHJets     |
-# | 558   | nDiscardedJet                                                                   | Int32            | 1                       |
-# | 559   | DiscardedJet_id                                                                 | Array{Int32,1}   | nDiscardedJet           |
-# | 560   | DiscardedJet_puId                                                               | Array{Int32,1}   | nDiscardedJet           |
-# | 561   | DiscardedJet_btagCSV                                                            | Array{Float32,1} | nDiscardedJet           |
-# | 562   | DiscardedJet_btagCMVA                                                           | Array{Float32,1} | nDiscardedJet           |
-# | 563   | DiscardedJet_rawPt                                                              | Array{Float32,1} | nDiscardedJet           |
-# | 564   | DiscardedJet_mcPt                                                               | Array{Float32,1} | nDiscardedJet           |
-# | 565   | DiscardedJet_mcFlavour                                                          | Array{Int32,1}   | nDiscardedJet           |
-# | 566   | DiscardedJet_mcMatchId                                                          | Array{Int32,1}   | nDiscardedJet           |
-# | 567   | DiscardedJet_corr_JECUp                                                         | Array{Float32,1} | nDiscardedJet           |
-# | 568   | DiscardedJet_corr_JECDown                                                       | Array{Float32,1} | nDiscardedJet           |
-# | 569   | DiscardedJet_corr                                                               | Array{Float32,1} | nDiscardedJet           |
-# | 570   | DiscardedJet_pt                                                                 | Array{Float32,1} | nDiscardedJet           |
-# | 571   | DiscardedJet_eta                                                                | Array{Float32,1} | nDiscardedJet           |
-# | 572   | DiscardedJet_phi                                                                | Array{Float32,1} | nDiscardedJet           |
-# | 573   | DiscardedJet_mass                                                               | Array{Float32,1} | nDiscardedJet           |
-# | 574   | DiscardedJet_idxFirstTauMatch                                                   | Array{Int32,1}   | nDiscardedJet           |
-# | 575   | DiscardedJet_hadronFlavour                                                      | Array{Int32,1}   | nDiscardedJet           |
-# | 576   | DiscardedJet_btagBDT                                                            | Array{Float32,1} | nDiscardedJet           |
-# | 577   | DiscardedJet_btagProb                                                           | Array{Float32,1} | nDiscardedJet           |
-# | 578   | DiscardedJet_btagBProb                                                          | Array{Float32,1} | nDiscardedJet           |
-# | 579   | DiscardedJet_btagSoftEl                                                         | Array{Float32,1} | nDiscardedJet           |
-# | 580   | DiscardedJet_btagSoftMu                                                         | Array{Float32,1} | nDiscardedJet           |
-# | 581   | DiscardedJet_btagnew                                                            | Array{Float32,1} | nDiscardedJet           |
-# | 582   | DiscardedJet_btagCSVV0                                                          | Array{Float32,1} | nDiscardedJet           |
-# | 583   | DiscardedJet_chHEF                                                              | Array{Float32,1} | nDiscardedJet           |
-# | 584   | DiscardedJet_neHEF                                                              | Array{Float32,1} | nDiscardedJet           |
-# | 585   | DiscardedJet_chEmEF                                                             | Array{Float32,1} | nDiscardedJet           |
-# | 586   | DiscardedJet_neEmEF                                                             | Array{Float32,1} | nDiscardedJet           |
-# | 587   | DiscardedJet_chMult                                                             | Array{Int32,1}   | nDiscardedJet           |
-# | 588   | DiscardedJet_leadTrackPt                                                        | Array{Float32,1} | nDiscardedJet           |
-# | 589   | DiscardedJet_mcEta                                                              | Array{Float32,1} | nDiscardedJet           |
-# | 590   | DiscardedJet_mcPhi                                                              | Array{Float32,1} | nDiscardedJet           |
-# | 591   | DiscardedJet_mcM                                                                | Array{Float32,1} | nDiscardedJet           |
-# | 592   | DiscardedJet_leptonPdgId                                                        | Array{Float32,1} | nDiscardedJet           |
-# | 593   | DiscardedJet_leptonPt                                                           | Array{Float32,1} | nDiscardedJet           |
-# | 594   | DiscardedJet_leptonPtRel                                                        | Array{Float32,1} | nDiscardedJet           |
-# | 595   | DiscardedJet_leptonPtRelInv                                                     | Array{Float32,1} | nDiscardedJet           |
-# | 596   | DiscardedJet_leptonDeltaR                                                       | Array{Float32,1} | nDiscardedJet           |
-# | 597   | DiscardedJet_vtxMass                                                            | Array{Float32,1} | nDiscardedJet           |
-# | 598   | DiscardedJet_vtxNtracks                                                         | Array{Float32,1} | nDiscardedJet           |
-# | 599   | DiscardedJet_vtxPt                                                              | Array{Float32,1} | nDiscardedJet           |
-# | 600   | DiscardedJet_vtx3DSig                                                           | Array{Float32,1} | nDiscardedJet           |
-# | 601   | DiscardedJet_vtx3DVal                                                           | Array{Float32,1} | nDiscardedJet           |
-# | 602   | DiscardedJet_vtxPosX                                                            | Array{Float32,1} | nDiscardedJet           |
-# | 603   | DiscardedJet_vtxPosY                                                            | Array{Float32,1} | nDiscardedJet           |
-# | 604   | DiscardedJet_vtxPosZ                                                            | Array{Float32,1} | nDiscardedJet           |
-# | 605   | DiscardedJet_qgl                                                                | Array{Float32,1} | nDiscardedJet           |
-# | 606   | DiscardedJet_ptd                                                                | Array{Float32,1} | nDiscardedJet           |
-# | 607   | DiscardedJet_axis2                                                              | Array{Float32,1} | nDiscardedJet           |
-# | 608   | DiscardedJet_mult                                                               | Array{Int32,1}   | nDiscardedJet           |
-# | 609   | DiscardedJet_numberOfDaughters                                                  | Array{Int32,1}   | nDiscardedJet           |
-# | 610   | DiscardedJet_btagIdx                                                            | Array{Int32,1}   | nDiscardedJet           |
-# | 611   | DiscardedJet_mcIdx                                                              | Array{Int32,1}   | nDiscardedJet           |
-# | 612   | DiscardedJet_pt_reg                                                             | Array{Float32,1} | nDiscardedJet           |
-# | 613   | DiscardedJet_pt_regVBF                                                          | Array{Float32,1} | nDiscardedJet           |
-# | 614   | DiscardedJet_bTagWeightJESUp                                                    | Array{Float32,1} | nDiscardedJet           |
-# | 615   | DiscardedJet_bTagWeightJESDown                                                  | Array{Float32,1} | nDiscardedJet           |
-# | 616   | DiscardedJet_bTagWeightLFUp                                                     | Array{Float32,1} | nDiscardedJet           |
-# | 617   | DiscardedJet_bTagWeightLFDown                                                   | Array{Float32,1} | nDiscardedJet           |
-# | 618   | DiscardedJet_bTagWeightHFUp                                                     | Array{Float32,1} | nDiscardedJet           |
-# | 619   | DiscardedJet_bTagWeightHFDown                                                   | Array{Float32,1} | nDiscardedJet           |
-# | 620   | DiscardedJet_bTagWeightStats1Up                                                 | Array{Float32,1} | nDiscardedJet           |
-# | 621   | DiscardedJet_bTagWeightStats1Down                                               | Array{Float32,1} | nDiscardedJet           |
-# | 622   | DiscardedJet_bTagWeightStats2Up                                                 | Array{Float32,1} | nDiscardedJet           |
-# | 623   | DiscardedJet_bTagWeightStats2Down                                               | Array{Float32,1} | nDiscardedJet           |
-# | 624   | DiscardedJet_bTagWeight                                                         | Array{Float32,1} | nDiscardedJet           |
-# | 625   | nSubjetAK08pruned                                                               | Int32            | 1                       |
-# | 626   | SubjetAK08pruned_pt                                                             | Array{Float32,1} | nSubjetAK08pruned       |
-# | 627   | SubjetAK08pruned_eta                                                            | Array{Float32,1} | nSubjetAK08pruned       |
-# | 628   | SubjetAK08pruned_phi                                                            | Array{Float32,1} | nSubjetAK08pruned       |
-# | 629   | SubjetAK08pruned_mass                                                           | Array{Float32,1} | nSubjetAK08pruned       |
-# | 630   | SubjetAK08pruned_btag                                                           | Array{Float32,1} | nSubjetAK08pruned       |
-# | 631   | nTauGood                                                                        | Int32            | 1                       |
-# | 632   | TauGood_charge                                                                  | Array{Int32,1}   | nTauGood                |
-# | 633   | TauGood_decayMode                                                               | Array{Int32,1}   | nTauGood                |
-# | 634   | TauGood_idDecayMode                                                             | Array{Int32,1}   | nTauGood                |
-# | 635   | TauGood_idDecayModeNewDMs                                                       | Array{Int32,1}   | nTauGood                |
-# | 636   | TauGood_dxy                                                                     | Array{Float32,1} | nTauGood                |
-# | 637   | TauGood_dz                                                                      | Array{Float32,1} | nTauGood                |
-# | 638   | TauGood_idMVA                                                                   | Array{Int32,1}   | nTauGood                |
-# | 639   | TauGood_idMVANewDM                                                              | Array{Int32,1}   | nTauGood                |
-# | 640   | TauGood_idCI3hit                                                                | Array{Int32,1}   | nTauGood                |
-# | 641   | TauGood_idAntiMu                                                                | Array{Int32,1}   | nTauGood                |
-# | 642   | TauGood_idAntiE                                                                 | Array{Int32,1}   | nTauGood                |
-# | 643   | TauGood_isoCI3hit                                                               | Array{Float32,1} | nTauGood                |
-# | 644   | TauGood_mcMatchId                                                               | Array{Int32,1}   | nTauGood                |
-# | 645   | TauGood_pdgId                                                                   | Array{Int32,1}   | nTauGood                |
-# | 646   | TauGood_pt                                                                      | Array{Float32,1} | nTauGood                |
-# | 647   | TauGood_eta                                                                     | Array{Float32,1} | nTauGood                |
-# | 648   | TauGood_phi                                                                     | Array{Float32,1} | nTauGood                |
-# | 649   | TauGood_mass                                                                    | Array{Float32,1} | nTauGood                |
-# | 650   | TauGood_idxJetMatch                                                             | Array{Int32,1}   | nTauGood                |
-# | 651   | TauGood_genMatchType                                                            | Array{Int32,1}   | nTauGood                |
-# | 652   | nhJidx                                                                          | Int32            | 1                       |
-# | 653   | hJidx                                                                           | Array{Int32,1}   | nhJidx                  |
-# | 654   | nGenLep                                                                         | Int32            | 1                       |
-# | 655   | GenLep_pdgId                                                                    | Array{Int32,1}   | nGenLep                 |
-# | 656   | GenLep_pt                                                                       | Array{Float32,1} | nGenLep                 |
-# | 657   | GenLep_eta                                                                      | Array{Float32,1} | nGenLep                 |
-# | 658   | GenLep_phi                                                                      | Array{Float32,1} | nGenLep                 |
-# | 659   | GenLep_mass                                                                     | Array{Float32,1} | nGenLep                 |
-# | 660   | GenLep_charge                                                                   | Array{Float32,1} | nGenLep                 |
-# | 661   | GenLep_status                                                                   | Array{Int32,1}   | nGenLep                 |
-# | 662   | nSubjetAK08softdrop                                                             | Int32            | 1                       |
-# | 663   | SubjetAK08softdrop_pt                                                           | Array{Float32,1} | nSubjetAK08softdrop     |
-# | 664   | SubjetAK08softdrop_eta                                                          | Array{Float32,1} | nSubjetAK08softdrop     |
-# | 665   | SubjetAK08softdrop_phi                                                          | Array{Float32,1} | nSubjetAK08softdrop     |
-# | 666   | SubjetAK08softdrop_mass                                                         | Array{Float32,1} | nSubjetAK08softdrop     |
-# | 667   | SubjetAK08softdrop_btag                                                         | Array{Float32,1} | nSubjetAK08softdrop     |
-# | 668   | nGenHadTaus                                                                     | Int32            | 1                       |
-# | 669   | GenHadTaus_charge                                                               | Array{Float32,1} | nGenHadTaus             |
-# | 670   | GenHadTaus_status                                                               | Array{Int32,1}   | nGenHadTaus             |
-# | 671   | GenHadTaus_pdgId                                                                | Array{Int32,1}   | nGenHadTaus             |
-# | 672   | GenHadTaus_pt                                                                   | Array{Float32,1} | nGenHadTaus             |
-# | 673   | GenHadTaus_eta                                                                  | Array{Float32,1} | nGenHadTaus             |
-# | 674   | GenHadTaus_phi                                                                  | Array{Float32,1} | nGenHadTaus             |
-# | 675   | GenHadTaus_mass                                                                 | Array{Float32,1} | nGenHadTaus             |
-# | 676   | GenHadTaus_decayMode                                                            | Array{Int32,1}   | nGenHadTaus             |
-# | 677   | nhttCandidates                                                                  | Int32            | 1                       |
-# | 678   | httCandidates_pt                                                                | Array{Float32,1} | nhttCandidates          |
-# | 679   | httCandidates_eta                                                               | Array{Float32,1} | nhttCandidates          |
-# | 680   | httCandidates_phi                                                               | Array{Float32,1} | nhttCandidates          |
-# | 681   | httCandidates_mass                                                              | Array{Float32,1} | nhttCandidates          |
-# | 682   | httCandidates_fRec                                                              | Array{Float32,1} | nhttCandidates          |
-# | 683   | httCandidates_Ropt                                                              | Array{Float32,1} | nhttCandidates          |
-# | 684   | httCandidates_RoptCalc                                                          | Array{Float32,1} | nhttCandidates          |
-# | 685   | httCandidates_ptForRoptCalc                                                     | Array{Float32,1} | nhttCandidates          |
-# | 686   | httCandidates_sjW1pt                                                            | Array{Float32,1} | nhttCandidates          |
-# | 687   | httCandidates_sjW1eta                                                           | Array{Float32,1} | nhttCandidates          |
-# | 688   | httCandidates_sjW1phi                                                           | Array{Float32,1} | nhttCandidates          |
-# | 689   | httCandidates_sjW1mass                                                          | Array{Float32,1} | nhttCandidates          |
-# | 690   | httCandidates_sjW1btag                                                          | Array{Float32,1} | nhttCandidates          |
-# | 691   | httCandidates_sjW2pt                                                            | Array{Float32,1} | nhttCandidates          |
-# | 692   | httCandidates_sjW2eta                                                           | Array{Float32,1} | nhttCandidates          |
-# | 693   | httCandidates_sjW2phi                                                           | Array{Float32,1} | nhttCandidates          |
-# | 694   | httCandidates_sjW2mass                                                          | Array{Float32,1} | nhttCandidates          |
-# | 695   | httCandidates_sjW2btag                                                          | Array{Float32,1} | nhttCandidates          |
-# | 696   | httCandidates_sjNonWpt                                                          | Array{Float32,1} | nhttCandidates          |
-# | 697   | httCandidates_sjNonWeta                                                         | Array{Float32,1} | nhttCandidates          |
-# | 698   | httCandidates_sjNonWphi                                                         | Array{Float32,1} | nhttCandidates          |
-# | 699   | httCandidates_sjNonWmass                                                        | Array{Float32,1} | nhttCandidates          |
-# | 700   | httCandidates_sjNonWbtag                                                        | Array{Float32,1} | nhttCandidates          |
-# | 701   | nJet                                                                            | Int32            | 1                       |
-# | 702   | Jet_id                                                                          | Array{Int32,1}   | nJet                    |
-# | 703   | Jet_puId                                                                        | Array{Int32,1}   | nJet                    |
-# | 704   | Jet_btagCSV                                                                     | Array{Float32,1} | nJet                    |
-# | 705   | Jet_btagCMVA                                                                    | Array{Float32,1} | nJet                    |
-# | 706   | Jet_rawPt                                                                       | Array{Float32,1} | nJet                    |
-# | 707   | Jet_mcPt                                                                        | Array{Float32,1} | nJet                    |
-# | 708   | Jet_mcFlavour                                                                   | Array{Int32,1}   | nJet                    |
-# | 709   | Jet_mcMatchId                                                                   | Array{Int32,1}   | nJet                    |
-# | 710   | Jet_corr_JECUp                                                                  | Array{Float32,1} | nJet                    |
-# | 711   | Jet_corr_JECDown                                                                | Array{Float32,1} | nJet                    |
-# | 712   | Jet_corr                                                                        | Array{Float32,1} | nJet                    |
-# | 713   | Jet_pt                                                                          | Array{Float32,1} | nJet                    |
-# | 714   | Jet_eta                                                                         | Array{Float32,1} | nJet                    |
-# | 715   | Jet_phi                                                                         | Array{Float32,1} | nJet                    |
-# | 716   | Jet_mass                                                                        | Array{Float32,1} | nJet                    |
-# | 717   | Jet_idxFirstTauMatch                                                            | Array{Int32,1}   | nJet                    |
-# | 718   | Jet_hadronFlavour                                                               | Array{Int32,1}   | nJet                    |
-# | 719   | Jet_btagBDT                                                                     | Array{Float32,1} | nJet                    |
-# | 720   | Jet_btagProb                                                                    | Array{Float32,1} | nJet                    |
-# | 721   | Jet_btagBProb                                                                   | Array{Float32,1} | nJet                    |
-# | 722   | Jet_btagSoftEl                                                                  | Array{Float32,1} | nJet                    |
-# | 723   | Jet_btagSoftMu                                                                  | Array{Float32,1} | nJet                    |
-# | 724   | Jet_btagnew                                                                     | Array{Float32,1} | nJet                    |
-# | 725   | Jet_btagCSVV0                                                                   | Array{Float32,1} | nJet                    |
-# | 726   | Jet_chHEF                                                                       | Array{Float32,1} | nJet                    |
-# | 727   | Jet_neHEF                                                                       | Array{Float32,1} | nJet                    |
-# | 728   | Jet_chEmEF                                                                      | Array{Float32,1} | nJet                    |
-# | 729   | Jet_neEmEF                                                                      | Array{Float32,1} | nJet                    |
-# | 730   | Jet_chMult                                                                      | Array{Int32,1}   | nJet                    |
-# | 731   | Jet_leadTrackPt                                                                 | Array{Float32,1} | nJet                    |
-# | 732   | Jet_mcEta                                                                       | Array{Float32,1} | nJet                    |
-# | 733   | Jet_mcPhi                                                                       | Array{Float32,1} | nJet                    |
-# | 734   | Jet_mcM                                                                         | Array{Float32,1} | nJet                    |
-# | 735   | Jet_leptonPdgId                                                                 | Array{Float32,1} | nJet                    |
-# | 736   | Jet_leptonPt                                                                    | Array{Float32,1} | nJet                    |
-# | 737   | Jet_leptonPtRel                                                                 | Array{Float32,1} | nJet                    |
-# | 738   | Jet_leptonPtRelInv                                                              | Array{Float32,1} | nJet                    |
-# | 739   | Jet_leptonDeltaR                                                                | Array{Float32,1} | nJet                    |
-# | 740   | Jet_vtxMass                                                                     | Array{Float32,1} | nJet                    |
-# | 741   | Jet_vtxNtracks                                                                  | Array{Float32,1} | nJet                    |
-# | 742   | Jet_vtxPt                                                                       | Array{Float32,1} | nJet                    |
-# | 743   | Jet_vtx3DSig                                                                    | Array{Float32,1} | nJet                    |
-# | 744   | Jet_vtx3DVal                                                                    | Array{Float32,1} | nJet                    |
-# | 745   | Jet_vtxPosX                                                                     | Array{Float32,1} | nJet                    |
-# | 746   | Jet_vtxPosY                                                                     | Array{Float32,1} | nJet                    |
-# | 747   | Jet_vtxPosZ                                                                     | Array{Float32,1} | nJet                    |
-# | 748   | Jet_qgl                                                                         | Array{Float32,1} | nJet                    |
-# | 749   | Jet_ptd                                                                         | Array{Float32,1} | nJet                    |
-# | 750   | Jet_axis2                                                                       | Array{Float32,1} | nJet                    |
-# | 751   | Jet_mult                                                                        | Array{Int32,1}   | nJet                    |
-# | 752   | Jet_numberOfDaughters                                                           | Array{Int32,1}   | nJet                    |
-# | 753   | Jet_btagIdx                                                                     | Array{Int32,1}   | nJet                    |
-# | 754   | Jet_mcIdx                                                                       | Array{Int32,1}   | nJet                    |
-# | 755   | Jet_pt_reg                                                                      | Array{Float32,1} | nJet                    |
-# | 756   | Jet_pt_regVBF                                                                   | Array{Float32,1} | nJet                    |
-# | 757   | Jet_bTagWeightJESUp                                                             | Array{Float32,1} | nJet                    |
-# | 758   | Jet_bTagWeightJESDown                                                           | Array{Float32,1} | nJet                    |
-# | 759   | Jet_bTagWeightLFUp                                                              | Array{Float32,1} | nJet                    |
-# | 760   | Jet_bTagWeightLFDown                                                            | Array{Float32,1} | nJet                    |
-# | 761   | Jet_bTagWeightHFUp                                                              | Array{Float32,1} | nJet                    |
-# | 762   | Jet_bTagWeightHFDown                                                            | Array{Float32,1} | nJet                    |
-# | 763   | Jet_bTagWeightStats1Up                                                          | Array{Float32,1} | nJet                    |
-# | 764   | Jet_bTagWeightStats1Down                                                        | Array{Float32,1} | nJet                    |
-# | 765   | Jet_bTagWeightStats2Up                                                          | Array{Float32,1} | nJet                    |
-# | 766   | Jet_bTagWeightStats2Down                                                        | Array{Float32,1} | nJet                    |
-# | 767   | Jet_bTagWeight                                                                  | Array{Float32,1} | nJet                    |
-# | 768   | nFatjetCA15softdrop                                                             | Int32            | 1                       |
-# | 769   | FatjetCA15softdrop_pt                                                           | Array{Float32,1} | nFatjetCA15softdrop     |
-# | 770   | FatjetCA15softdrop_eta                                                          | Array{Float32,1} | nFatjetCA15softdrop     |
-# | 771   | FatjetCA15softdrop_phi                                                          | Array{Float32,1} | nFatjetCA15softdrop     |
-# | 772   | FatjetCA15softdrop_mass                                                         | Array{Float32,1} | nFatjetCA15softdrop     |
-# | 773   | nvLeptons                                                                       | Int32            | 1                       |
-# | 774   | vLeptons_charge                                                                 | Array{Int32,1}   | nvLeptons               |
-# | 775   | vLeptons_tightId                                                                | Array{Int32,1}   | nvLeptons               |
-# | 776   | vLeptons_eleCutIdCSA14_25ns_v1                                                  | Array{Int32,1}   | nvLeptons               |
-# | 777   | vLeptons_eleCutIdCSA14_50ns_v1                                                  | Array{Int32,1}   | nvLeptons               |
-# | 778   | vLeptons_dxy                                                                    | Array{Float32,1} | nvLeptons               |
-# | 779   | vLeptons_dz                                                                     | Array{Float32,1} | nvLeptons               |
-# | 780   | vLeptons_edxy                                                                   | Array{Float32,1} | nvLeptons               |
-# | 781   | vLeptons_edz                                                                    | Array{Float32,1} | nvLeptons               |
-# | 782   | vLeptons_ip3d                                                                   | Array{Float32,1} | nvLeptons               |
-# | 783   | vLeptons_sip3d                                                                  | Array{Float32,1} | nvLeptons               |
-# | 784   | vLeptons_convVeto                                                               | Array{Int32,1}   | nvLeptons               |
-# | 785   | vLeptons_lostHits                                                               | Array{Int32,1}   | nvLeptons               |
-# | 786   | vLeptons_relIso03                                                               | Array{Float32,1} | nvLeptons               |
-# | 787   | vLeptons_relIso04                                                               | Array{Float32,1} | nvLeptons               |
-# | 788   | vLeptons_miniRelIso                                                             | Array{Float32,1} | nvLeptons               |
-# | 789   | vLeptons_tightCharge                                                            | Array{Int32,1}   | nvLeptons               |
-# | 790   | vLeptons_mcMatchId                                                              | Array{Int32,1}   | nvLeptons               |
-# | 791   | vLeptons_mcMatchAny                                                             | Array{Int32,1}   | nvLeptons               |
-# | 792   | vLeptons_mcMatchTau                                                             | Array{Int32,1}   | nvLeptons               |
-# | 793   | vLeptons_mcPt                                                                   | Array{Float32,1} | nvLeptons               |
-# | 794   | vLeptons_mediumMuonId                                                           | Array{Int32,1}   | nvLeptons               |
-# | 795   | vLeptons_pdgId                                                                  | Array{Int32,1}   | nvLeptons               |
-# | 796   | vLeptons_pt                                                                     | Array{Float32,1} | nvLeptons               |
-# | 797   | vLeptons_eta                                                                    | Array{Float32,1} | nvLeptons               |
-# | 798   | vLeptons_phi                                                                    | Array{Float32,1} | nvLeptons               |
-# | 799   | vLeptons_mass                                                                   | Array{Float32,1} | nvLeptons               |
-# | 800   | vLeptons_looseIdSusy                                                            | Array{Int32,1}   | nvLeptons               |
-# | 801   | vLeptons_looseIdPOG                                                             | Array{Int32,1}   | nvLeptons               |
-# | 802   | vLeptons_chargedHadRelIso03                                                     | Array{Float32,1} | nvLeptons               |
-# | 803   | vLeptons_chargedHadRelIso04                                                     | Array{Float32,1} | nvLeptons               |
-# | 804   | vLeptons_eleSieie                                                               | Array{Float32,1} | nvLeptons               |
-# | 805   | vLeptons_eleDEta                                                                | Array{Float32,1} | nvLeptons               |
-# | 806   | vLeptons_eleDPhi                                                                | Array{Float32,1} | nvLeptons               |
-# | 807   | vLeptons_eleHoE                                                                 | Array{Float32,1} | nvLeptons               |
-# | 808   | vLeptons_eleMissingHits                                                         | Array{Float32,1} | nvLeptons               |
-# | 809   | vLeptons_eleChi2                                                                | Array{Float32,1} | nvLeptons               |
-# | 810   | vLeptons_nStations                                                              | Array{Float32,1} | nvLeptons               |
-# | 811   | vLeptons_trkKink                                                                | Array{Float32,1} | nvLeptons               |
-# | 812   | vLeptons_caloCompatibility                                                      | Array{Float32,1} | nvLeptons               |
-# | 813   | vLeptons_globalTrackChi2                                                        | Array{Float32,1} | nvLeptons               |
-# | 814   | vLeptons_nChamberHits                                                           | Array{Float32,1} | nvLeptons               |
-# | 815   | vLeptons_isPFMuon                                                               | Array{Float32,1} | nvLeptons               |
-# | 816   | vLeptons_isGlobalMuon                                                           | Array{Float32,1} | nvLeptons               |
-# | 817   | vLeptons_isTrackerMuon                                                          | Array{Float32,1} | nvLeptons               |
-# | 818   | vLeptons_pixelHits                                                              | Array{Float32,1} | nvLeptons               |
-# | 819   | vLeptons_trackerLayers                                                          | Array{Int32,1}   | nvLeptons               |
-# | 820   | vLeptons_pixelLayers                                                            | Array{Int32,1}   | nvLeptons               |
-# | 821   | vLeptons_mvaTTH                                                                 | Array{Float32,1} | nvLeptons               |
-# | 822   | vLeptons_jetOverlapIdx                                                          | Array{Int32,1}   | nvLeptons               |
-# | 823   | vLeptons_jetPtRatio                                                             | Array{Float32,1} | nvLeptons               |
-# | 824   | vLeptons_jetBTagCSV                                                             | Array{Float32,1} | nvLeptons               |
-# | 825   | vLeptons_jetDR                                                                  | Array{Float32,1} | nvLeptons               |
-# | 826   | vLeptons_pfRelIso03                                                             | Array{Float32,1} | nvLeptons               |
-# | 827   | vLeptons_pfRelIso04                                                             | Array{Float32,1} | nvLeptons               |
-# | 828   | vLeptons_etaSc                                                                  | Array{Float32,1} | nvLeptons               |
-# | 829   | vLeptons_eleExpMissingInnerHits                                                 | Array{Float32,1} | nvLeptons               |
-# | 830   | vLeptons_eleooEmooP                                                             | Array{Float32,1} | nvLeptons               |
-# | 831   | npileUpVertex_z                                                                 | Int32            | 1                       |
-# | 832   | pileUpVertex_z                                                                  | Array{Float32,1} | npileUpVertex_z         |
-# | 833   | nprimaryVertices                                                                | Int32            | 1                       |
-# | 834   | primaryVertices_x                                                               | Array{Float32,1} | nprimaryVertices        |
-# | 835   | primaryVertices_y                                                               | Array{Float32,1} | nprimaryVertices        |
-# | 836   | primaryVertices_z                                                               | Array{Float32,1} | nprimaryVertices        |
-# | 837   | primaryVertices_isFake                                                          | Array{Float32,1} | nprimaryVertices        |
-# | 838   | primaryVertices_ndof                                                            | Array{Float32,1} | nprimaryVertices        |
-# | 839   | primaryVertices_Rho                                                             | Array{Float32,1} | nprimaryVertices        |
-# | 840   | nsoftActivityJets                                                               | Int32            | 1                       |
-# | 841   | softActivityJets_pt                                                             | Array{Float32,1} | nsoftActivityJets       |
-# | 842   | softActivityJets_eta                                                            | Array{Float32,1} | nsoftActivityJets       |
-# | 843   | softActivityJets_phi                                                            | Array{Float32,1} | nsoftActivityJets       |
-# | 844   | softActivityJets_mass                                                           | Array{Float32,1} | nsoftActivityJets       |
-# | 845   | nFatjetCA15softdropz2b1                                                         | Int32            | 1                       |
-# | 846   | FatjetCA15softdropz2b1_pt                                                       | Array{Float32,1} | nFatjetCA15softdropz2b1 |
-# | 847   | FatjetCA15softdropz2b1_eta                                                      | Array{Float32,1} | nFatjetCA15softdropz2b1 |
-# | 848   | FatjetCA15softdropz2b1_phi                                                      | Array{Float32,1} | nFatjetCA15softdropz2b1 |
-# | 849   | FatjetCA15softdropz2b1_mass                                                     | Array{Float32,1} | nFatjetCA15softdropz2b1 |
-# | 850   | FatjetCA15softdropz2b1_tau1                                                     | Array{Float32,1} | nFatjetCA15softdropz2b1 |
-# | 851   | FatjetCA15softdropz2b1_tau2                                                     | Array{Float32,1} | nFatjetCA15softdropz2b1 |
-# | 852   | FatjetCA15softdropz2b1_tau3                                                     | Array{Float32,1} | nFatjetCA15softdropz2b1 |
-# | 853   | nGenWZQuark                                                                     | Int32            | 1                       |
-# | 854   | GenWZQuark_pdgId                                                                | Array{Int32,1}   | nGenWZQuark             |
-# | 855   | GenWZQuark_pt                                                                   | Array{Float32,1} | nGenWZQuark             |
-# | 856   | GenWZQuark_eta                                                                  | Array{Float32,1} | nGenWZQuark             |
-# | 857   | GenWZQuark_phi                                                                  | Array{Float32,1} | nGenWZQuark             |
-# | 858   | GenWZQuark_mass                                                                 | Array{Float32,1} | nGenWZQuark             |
-# | 859   | GenWZQuark_charge                                                               | Array{Float32,1} | nGenWZQuark             |
-# | 860   | GenWZQuark_status                                                               | Array{Int32,1}   | nGenWZQuark             |
-# | 861   | nGenBQuarkFromTop                                                               | Int32            | 1                       |
-# | 862   | GenBQuarkFromTop_pdgId                                                          | Array{Int32,1}   | nGenBQuarkFromTop       |
-# | 863   | GenBQuarkFromTop_pt                                                             | Array{Float32,1} | nGenBQuarkFromTop       |
-# | 864   | GenBQuarkFromTop_eta                                                            | Array{Float32,1} | nGenBQuarkFromTop       |
-# | 865   | GenBQuarkFromTop_phi                                                            | Array{Float32,1} | nGenBQuarkFromTop       |
-# | 866   | GenBQuarkFromTop_mass                                                           | Array{Float32,1} | nGenBQuarkFromTop       |
-# | 867   | GenBQuarkFromTop_charge                                                         | Array{Float32,1} | nGenBQuarkFromTop       |
-# | 868   | GenBQuarkFromTop_status                                                         | Array{Int32,1}   | nGenBQuarkFromTop       |
-
-using ROOTDataFrames, DataFrames, ROOTHistograms, Histograms
-
-df = TreeDataFrame(["/Users/joosep/Documents/tth/data/ntp/v13/vhbb/ttjets.root"]; treename="tree")
-println("looping over $(nrow(df)) rows")
+using ROOT, ROOTDataFrames, DataFrames, ROOTHistograms, Histograms
 
 pad(x) = [-Inf, x..., Inf]
 
@@ -886,48 +12,143 @@ function jetFlavour(x)
     return :l
 end
 
-function process(df)
-    ret = Dict(
-        (:btag1, :l)=>ErrorHistogram(linspace(0, 1, 1000) |> pad),
-        (:btag1, :c)=>ErrorHistogram(linspace(0, 1, 1000) |> pad),
-        (:btag1, :b)=>ErrorHistogram(linspace(0, 1, 1000) |> pad),
+type Jet
+    pt::Float64
+    eta::Float64 
+    btag_csv::Float64
+    btag_bdt::Float64
+    id::Symbol
+end
 
-        (:btag2, :l)=>ErrorHistogram(linspace(-1, 1, 1000) |> pad),
-        (:btag2, :c)=>ErrorHistogram(linspace(-1, 1, 1000) |> pad),
-        (:btag2, :b)=>ErrorHistogram(linspace(-1, 1, 1000) |> pad),
 
-    )
+type Lepton
+    pt::Float64
+    eta::Float64 
+    relIso::Float64
+    pdgId::Int64
+end
+
+function makeLeptons(row)
+    nlep = row.nselLeptons()
+    leptons = Array(Lepton, nlep)
+
+    pt = row.selLeptons_pt()
+    eta = row.selLeptons_eta()
+    iso = row.selLeptons_relIso03()
+    pdgid = row.selLeptons_pdgId()
+    for i=1:nlep
+        leptons[i] = Lepton(pt[i], eta[i], iso[i], pdgid[i])
+    end
+    return leptons
+end
+
+function process(df; isMC=true, weight=1.0)
+
+    flavours = isMC ? [:l, :c, :b] : [:any]
+
+    ret = Dict()
+    for sel in [:nosel, :jge6_tge2]
+        for fl in flavours
+            ret[(sel, :btag1, fl)] = ErrorHistogram(linspace(0, 1, 101) |> pad)
+            ret[(sel, :btag2, fl)] = ErrorHistogram(linspace(-1, 1, 101) |> pad)
+        end
+    end
+
+    enabled_rows = [
+    :json,
+    :nJet,
+    :Jet_pt, :Jet_eta,
+    :Jet_btagCSV, :Jet_btagBDT,
+    :nselLeptons, :selLeptons_pt, :selLeptons_eta, :selLeptons_relIso03, :selLeptons_pdgId
+    ]
+    if isMC
+        push!(enabled_rows, :Jet_mcFlavour)
+    end
+
+    println("processing $(nrow(df)) events")
     for iev=1:nrow(df)
-        load_row(df, iev, 
-            [:nJet,
-            :Jet_pt, :Jet_eta,
-            :Jet_btagCSV, :Jet_btagBDT, :Jet_mcFlavour
-        ])
+        load_row(df, iev, enabled_rows)
+
+        df.row.json() == 1 || continue
+        leptons = makeLeptons(df.row)
+        goodmuons = filter(
+            x->x.pt>20 && abs(x.eta)<2.5 && x.relIso < 0.15 && abs(x.pdgId)==13,
+            leptons
+        )
 
         nj = df.row.nJet()
-        ids = df.row.Jet_mcFlavour()
+        if isMC
+            ids = df.row.Jet_mcFlavour()
+        end
         pt = df.row.Jet_pt()
         eta = df.row.Jet_eta()
         btag_1 = df.row.Jet_btagCSV()
         btag_2 = df.row.Jet_btagBDT()
-
+        
+        jets = Array(Jet, nj)
         for ijet=1:nj
-            id = jetFlavour(ids[ijet])
+            if isMC
+                id = jetFlavour(ids[ijet])
+            else
+                id = :any
+            end
+            jets[ijet] = Jet(pt[ijet], eta[ijet], btag_1[ijet], btag_2[ijet], id)
             if pt[ijet] > 30 && abs(eta[ijet]) < 2.5
                 #println(btag_1[ijet], " ", btag_2[ijet])
-                push!(ret[(:btag1, id)], btag_1[ijet])
-                push!(ret[(:btag2, id)], btag_2[ijet])
+                push!(ret[(:nosel, :btag1, id)], btag_1[ijet], weight)
+                push!(ret[(:nosel, :btag2, id)], btag_2[ijet], weight)
             end
         end
+
+        goodjets = filter(x->x.pt>30 && abs(x.eta)<4.0, jets)
+        bjets = filter(x->x.btag_csv > 0.85, goodjets)
+
+        if length(goodmuons)==1 && length(goodjets)>=5 && length(bjets)>=2
+            for jet in goodjets
+                push!(ret[(:jge6_tge2, :btag1, jet.id)], jet.btag_csv, weight)
+                push!(ret[(:jge6_tge2, :btag2, jet.id)], jet.btag_bdt, weight)
+            end
+        end
+
     end
     return ret
 end
 
-ret = process(df)
+const path = "/Users/joosep/Documents/tth/data/ntp/v13/vhbb/"
+const samples = Dict(
+    :SingleMuon => ("$path/SingleMuon.root", false),
+    :JetHT => ("$path/JetHT.root", false),
+    :BTagCSV => ("$path/BTagCSV.root", false),
+    :ttjets => ("$path/ttjets.root", true),
+)
 
-newret = Dict()
-for (k, v) in ret
-    newret["$(k[1])_$(k[2])"] = v
+function getCount(fn)
+    rfile = TFile(fn)
+    hcount = root_cast(TH1D, Get(rfile, "Count"))
+    bc = GetBinContent(hcount, 1)
+    Close(rfile)
+    return bc
 end
 
-write_hists_to_file("btag.root", newret; verbose=false)
+const XS = Dict(
+    :ttjets => 831.76,
+)
+
+totret = Dict()
+for (name, (file, isMC)) in samples
+    df = TreeDataFrame([file]; treename="tree")
+
+    fi = open("df.txt", "w")
+    print(fi, df)
+    close(fi)
+
+    ngen = isMC ? getCount(file) : 1.0
+    xs = get(XS, name, 1.0)
+    ret = process(df; isMC=isMC, weight=xs/ngen)
+    for (k,v) in ret
+        ks = join(k, "_")
+        totret["$name/$ks"] = v
+    end
+end
+
+write_hists_to_file("hists_vhbb.root", totret; verbose=false)

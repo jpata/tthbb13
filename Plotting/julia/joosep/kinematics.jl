@@ -32,6 +32,8 @@ immutable Event <: AbstractEvent
 	weight_gen::Float64
 	mem_tth_p::Vector{Float64}
 	mem_ttbb_p::Vector{Float64}
+	btag_LR_4b_2b::Float64
+	btag_LR_4b_2b_logit::Float64
 	run::Int64
 	lumi::Int64
 	evt::Int64
@@ -66,10 +68,13 @@ function parse_branches{P <: Jet}(
     return particles
 end
 
+logit(x) = log(x/(1-x))
+
 @generated function parse_event{T, S}(df::TreeDataFrame{T}, s::Type{Val{S}})
     #println("generating parse_event{$df, $s}")
 
 	if s == Type{Val{:nominal}}
+		#no suffix if nominal
 		syst = ""
 	else
     	syst = string("_", s.parameters[1].parameters[1])
@@ -86,8 +91,11 @@ end
             df.row.weight_xs(),
             df.row.genWeight(),
 
-			df.row.mem_tth_p(),
-			df.row.mem_ttbb_p(),
+            getfield(df.row, $(QuoteNode(symbol("mem_tth_p", syst))))(),
+            getfield(df.row, $(QuoteNode(symbol("mem_ttbb_p", syst))))(),
+
+            df.row.btag_LR_4b_2b(),
+            df.row.btag_LR_4b_2b() |> logit,
 
             df.row.run(),
             df.row.lumi(),
@@ -97,6 +105,8 @@ end
     #println(ex)
     return ex
 end
+
+mem_p(ev::Event, nmem, w) = ev.mem_tth_p[nmem]>0.0 ? ev.mem_tth_p[nmem] / (ev.mem_tth_p[nmem] + w * ev.mem_ttbb_p[nmem]) : 0.0
 
 @generated function systweight{T}(ev::Event, lumi, t::Val{T})
 end
@@ -133,6 +143,7 @@ function string(ev::Event, l::Int64=0)
     return s
 end
 
+export mem_p
 export pt, et, phi, mass, weight
 export parse_event
 
