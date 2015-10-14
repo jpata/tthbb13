@@ -18,7 +18,7 @@ sample_version = "V13_pre"
 samples = cms.VPSet([
 
     cms.PSet(
-        skip     = cms.bool(True),
+        skip     = cms.bool(False),
         name     = cms.string('ttHToNonbb_M125_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2'),
         nickname = cms.string("ttH_nohbb"),
         xSec     = cms.double(xsec[("tth_nonbb", "13TeV")]),
@@ -143,7 +143,7 @@ samples = cms.VPSet([
     ),
 
     cms.PSet(
-        skip     = cms.bool(True),
+        skip     = cms.bool(False),
         name     = cms.string('TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2'),
         nickname = cms.string("ttjets"),
         xSec     = cms.double(xsec[("ttjets", "13TeV")]),
@@ -390,7 +390,7 @@ samples = cms.VPSet([
     ),
     
     cms.PSet(
-        skip     = cms.bool(True),
+        skip     = cms.bool(False),
         name     = cms.string('TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9_ext3-v1'),
         nickname = cms.string("ttjets"),
         xSec     = cms.double(xsec[("ttjets", "13TeV")]),
@@ -1404,7 +1404,7 @@ samples = cms.VPSet([
     ),
 
     cms.PSet(
-        skip     = cms.bool(False),
+        skip     = cms.bool(True),
         name     = cms.string('SingleMuon__Run2015C-PromptReco-v1'),
         nickname = cms.string("SingleMuon__Run2015C"),
         xSec     = cms.double(1),
@@ -1525,7 +1525,7 @@ samples = cms.VPSet([
     ),
     
     cms.PSet(
-        skip     = cms.bool(False),
+        skip     = cms.bool(True),
         name     = cms.string('SingleElectron__Run2015C-PromptReco-v1'),
         nickname = cms.string("SingleElectron__Run2015C"),
         xSec     = cms.double(1),
@@ -1595,7 +1595,7 @@ samples = cms.VPSet([
         isMC     = cms.bool(False)
     ),
     cms.PSet(
-        skip     = cms.bool(False),
+        skip     = cms.bool(True),
         name     = cms.string('DoubleMuon__Run2015C-PromptReco-v1'),
         nickname = cms.string("DoubleMuon__Run2015C"),
         xSec     = cms.double(1),

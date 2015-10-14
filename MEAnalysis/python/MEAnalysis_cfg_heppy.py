@@ -312,8 +312,8 @@ class Conf:
         #"sampleFile": os.environ["CMSSW_BASE"]+"/python/TTH/MEAnalysis/samples_pick.py",
         "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions.pickle",
         "transferFunctions_sj_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions_sj.pickle",
-        "systematics": ["nominal"],
-        #"systematics": ["nominal", "JESUp", "JESDown", "raw"],
+        #"systematics": ["nominal"],
+        "systematics": ["nominal", "JESUp", "JESDown"],
         
         
         #If the list contains:
@@ -388,12 +388,12 @@ class Conf:
 
         #Actually run the ME calculation
         #If False, all ME values will be 0
-        "calcME": False,
+        "calcME": True,
 
         #Generic event-dependent selection function applied
         #just before the MEM. If False, MEM is skipped for all hypos
         #note that we set hypothesis-specific cuts below
-        "selection": lambda event: (event.btag_LR_4b_2b > 0.95 #optimized for 40% tth(bb) acceptance
+        "selection": lambda event: (event.btag_LR_4b_2b > 0.90
             or (event.is_sl and event.nBCSVM >= 3) #always calculate for tagged events
             or (event.is_dl and event.nBCSVM >= 2) #always calculate for tagged events
         ),
