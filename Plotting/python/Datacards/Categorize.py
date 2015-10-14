@@ -472,7 +472,7 @@ class Categorization(object):
             self.print_tree()
         # End of loop over iterations
 
-    def prune(self, threshold = 0.2):
+    def prune(self, threshold = 0.02):
         """Go through all leave nodes. If not including this leave in
         the total limit only makes the limit worse within the
         threshold then deactivate the node. The node is not removed
@@ -750,7 +750,7 @@ Categorization.lg = LimitGetter(output_path)
     
 
 if __name__ == "__main__":
-    #r = CategorizationFromString(c)
+
     r = Categorization(Cut(), discriminator_axis=2)
 
     # TODO: something clever for boosted prereq - it can be

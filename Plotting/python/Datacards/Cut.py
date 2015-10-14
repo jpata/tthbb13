@@ -116,12 +116,29 @@ class Cut(object):
             if axis_name == "btag_LR_4b_2b_logit":
                 axis_name = "btag LR"
 
-            if self.lo == 1:                
-                return r"${0} < {1} $".format(axis_name, upper)
-            elif self.hi == axis.nbins:
-                return r"${0} \le {1}$".format(lower, axis_name)
+            if axis_name == "topCandidate_n_subjettiness":
+                axis_name = r"top\; \tau_{3}/\tau_{2}"
+
+            if axis_name == "topCandidate_fRec":
+                axis_name = r"top\; f_{Rec}"
+
+            if upper == int(upper):
+                string_upper = "{0}".format(upper)
             else:
-                return r"${0} \le {1} < {2} $".format(lower, axis_name, upper)
+                string_upper = "{0:.2f}".format(upper)
+
+            if lower == int(lower):
+                string_lower = "{0}".format(lower)
+            else:
+                string_lower = "{0:.2f}".format(lower)
+
+
+            if self.lo == 1:       
+                return r"${0} < {1:} $".format(axis_name, string_upper)
+            elif self.hi == axis.nbins:
+                return r"${0:} \le {1}$".format(string_lower, axis_name)
+            else:
+                return r"${0:} \le {1} < {2:} $".format(string_lower, axis_name, string_upper)
                 
         else:
             return "Preselection"
