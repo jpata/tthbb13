@@ -54,12 +54,17 @@ const map<string, function<float(const Event& ev)>> AxisFunctions = {
     {"mem_SL_0w2h2t", [](const Event& ev) { return ev.mem_SL_0w2h2t;}},
     {"mem_SL_2w2h2t", [](const Event& ev) { return ev.mem_SL_2w2h2t;}},
     {"mem_SL_2w2h2t_sj", [](const Event& ev) { return ev.mem_SL_2w2h2t_sj;}},
+    {"tth_mva", [](const Event& ev) { return ev.tth_mva;}},
     {"numJets", [](const Event& ev) { return ev.numJets;}},
     {"nBCSVM", [](const Event& ev) { return ev.nBCSVM;}},
     {"btag_LR_4b_2b_logit", [](const Event& ev) { return ev.btag_LR_4b_2b_logit;}},
     {"nBoosted", [](const Event& ev) { return ev.n_excluded_bjets<2 && ev.ntopCandidate==1;}},
     {"topCandidate_mass", [](const Event& ev) { return ev.topCandidate_mass;}},
-    {"Wmass", [](const Event& ev) { return ev.Wmass;}}
+    {"topCandidate_fRec", [](const Event& ev) { return ev.topCandidate_fRec;}},
+    {"topCandidate_n_subjettiness", [](const Event& ev) { return ev.topCandidate_n_subjettiness;}},
+    {"Wmass", [](const Event& ev) { return ev.Wmass;}},
+    {"n_excluded_bjets", [](const Event& ev) { return ev.n_excluded_bjets;}},
+    {"n_excluded_ljets", [](const Event& ev) { return ev.n_excluded_ljets;}}
 };
 
 const Configuration Configuration::makeConfiguration(JsonValue& value) {
@@ -382,6 +387,7 @@ Event::Event(
     double _mem_SL_2w2h2t,
     double _mem_SL_2w2h2t_sj,
     double _mem_DL_0w2h2t,
+    double _tth_mva,
     double _bTagWeight,
     double _bTagWeight_Stats1Up,
     double _bTagWeight_Stats1Down,
@@ -393,6 +399,7 @@ Event::Event(
     double _bTagWeight_HFDown,
     double _btag_LR_4b_2b,
     int _n_excluded_bjets,
+    int _n_excluded_ljets,
     int _ntopCandidate,
     double _topCandidate_mass,
     double _topCandidate_fRec,
@@ -413,6 +420,7 @@ Event::Event(
     mem_SL_2w2h2t(_mem_SL_2w2h2t),
     mem_SL_2w2h2t_sj(_mem_SL_2w2h2t_sj),
     mem_DL_0w2h2t(_mem_DL_0w2h2t),
+    tth_mva(_tth_mva),			 
     bTagWeight(_bTagWeight),
     bTagWeight_Stats1Up(_bTagWeight_Stats1Up),
     bTagWeight_Stats1Down(_bTagWeight_Stats1Down),
@@ -425,6 +433,7 @@ Event::Event(
     btag_LR_4b_2b(_btag_LR_4b_2b),
     btag_LR_4b_2b_logit(log(_btag_LR_4b_2b / (1.0 - _btag_LR_4b_2b))),
     n_excluded_bjets(_n_excluded_bjets),
+    n_excluded_ljets(_n_excluded_ljets),
     ntopCandidate(_ntopCandidate),
     topCandidate_mass(_topCandidate_mass),
     topCandidate_fRec(_topCandidate_fRec),
@@ -503,16 +512,18 @@ static const Event::WeightMap systWeights = {
 };
 
 double process_weight(ProcessKey::ProcessKey proc) {
-    switch(proc) {
-        case ProcessKey::ttbarPlusBBbar:
-        case ProcessKey::ttbarPlusB:
-        case ProcessKey::ttbarPlus2B:
-        case ProcessKey::ttbarPlusCCbar:
-        case ProcessKey::ttbarOther:
-            return 0.5;
-        default:
-            return 1.0;
-    }
+  return 1.0;
+
+//    switch(proc) {
+//        case ProcessKey::ttbarPlusBBbar:
+//        case ProcessKey::ttbarPlusB:
+//        case ProcessKey::ttbarPlus2B:
+//        case ProcessKey::ttbarPlusCCbar:
+//        case ProcessKey::ttbarOther:
+//            return 0.5;
+//        default:
+//            return 1.0;
+//    }
 }
 
 const Event EventFactory::makeNominal(const TreeData& data, const Configuration& conf) {
@@ -534,6 +545,7 @@ const Event EventFactory::makeNominal(const TreeData& data, const Configuration&
         mem_p(data.mem_tth_p[5], data.mem_ttbb_p[5]), //SL 222
         mem_p(data.mem_tth_p[9], data.mem_ttbb_p[9], 0.05), //SL 222 sj
         mem_p(data.mem_tth_p[1], data.mem_ttbb_p[1]), //DL 022,
+	data.tth_mva,
         data.bTagWeight,
         data.bTagWeight_Stats1Up,
         data.bTagWeight_Stats1Down,
@@ -545,6 +557,7 @@ const Event EventFactory::makeNominal(const TreeData& data, const Configuration&
         data.bTagWeight_HFDown,
         data.btag_LR_4b_2b,
         data.n_excluded_bjets,
+        data.n_excluded_ljets,
         data.ntopCandidate,
         data.topCandidate_mass[0],	
 	data.topCandidate_fRec[0],
@@ -572,6 +585,7 @@ const Event EventFactory::makeJESUp(const TreeData& data, const Configuration& c
         mem_p(data.mem_tth_JESUp_p[5], data.mem_ttbb_JESUp_p[5]), //SL 222
         mem_p(data.mem_tth_JESUp_p[9], data.mem_ttbb_JESUp_p[9], 0.05), //SL 222 sj
         mem_p(data.mem_tth_JESUp_p[1], data.mem_ttbb_JESUp_p[1]), //DL 022,
+	data.tth_mva, 
         data.bTagWeight,
         0,
         0,
@@ -583,6 +597,7 @@ const Event EventFactory::makeJESUp(const TreeData& data, const Configuration& c
         0,
         data.btag_LR_4b_2b,
         data.n_excluded_bjets,
+        data.n_excluded_ljets,
         data.ntopCandidate,
         data.topCandidate_mass[0],
 	data.topCandidate_fRec[0],
@@ -609,6 +624,7 @@ const Event EventFactory::makeJESDown(const TreeData& data, const Configuration&
         mem_p(data.mem_tth_JESDown_p[5], data.mem_ttbb_JESDown_p[5]), //SL 222
         mem_p(data.mem_tth_JESDown_p[9], data.mem_ttbb_JESDown_p[9], 0.05), //SL 222 sj
         mem_p(data.mem_tth_JESDown_p[1], data.mem_ttbb_JESDown_p[1]), //DL 022,
+	data.tth_mva,
         data.bTagWeight,
         0,
         0,
@@ -620,6 +636,7 @@ const Event EventFactory::makeJESDown(const TreeData& data, const Configuration&
         0,
         data.btag_LR_4b_2b,
         data.n_excluded_bjets,
+        data.n_excluded_ljets,
         data.ntopCandidate,
 	data.topCandidate_mass[0],
 	data.topCandidate_fRec[0],

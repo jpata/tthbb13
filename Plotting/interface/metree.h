@@ -503,6 +503,7 @@ public:
   int numJets_JESUp;
   int passes_btag_raw;
   int is_sl;
+  double tth_mva;
   double mean_bdisc_btag_raw;
   double qg_LR_flavour_4q_1q_2q_3q_JESDown;
   double std_bdisc;
@@ -1171,6 +1172,7 @@ public:
     tree->SetBranchAddress("numJets_JESUp", &(this->numJets_JESUp));
     tree->SetBranchAddress("passes_btag_raw", &(this->passes_btag_raw));
     tree->SetBranchAddress("is_sl", &(this->is_sl));
+    tree->SetBranchAddress("tth_mva", &(this->tth_mva));    
     tree->SetBranchAddress("mean_bdisc_btag_raw", &(this->mean_bdisc_btag_raw));
     tree->SetBranchAddress("qg_LR_flavour_4q_1q_2q_3q_JESDown", &(this->qg_LR_flavour_4q_1q_2q_3q_JESDown));
     tree->SetBranchAddress("std_bdisc", &(this->std_bdisc));

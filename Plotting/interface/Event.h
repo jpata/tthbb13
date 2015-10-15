@@ -218,6 +218,9 @@ typedef unordered_map<
     double mem_SL_2w2h2t_sj;
     double mem_DL_0w2h2t;
 
+    // Our BDT
+    double tth_mva;
+
     //btag weights
     double bTagWeight;
     double bTagWeight_Stats1Up;
@@ -235,6 +238,7 @@ typedef unordered_map<
 
     //boosted variables
     int n_excluded_bjets;
+    int n_excluded_ljets;
     int ntopCandidate;
     double topCandidate_mass;
     double topCandidate_fRec;
@@ -256,6 +260,7 @@ typedef unordered_map<
         double _mem_SL_2w2h2t,
         double _mem_SL_2w2h2t_sj,
         double _mem_DL_0w2h2t,
+	double _tth_mva,
         double _bTagWeight,
         double _bTagWeight_Stats1Up,
         double _bTagWeight_Stats1Down,
@@ -267,6 +272,7 @@ typedef unordered_map<
         double _bTagWeight_HFDown,
         double _btag_LR_4b_2b,
         int _n_excluded_bjets,
+        int _n_excluded_ljets,
         int _ntopCandidate,
         double _topCandidate_mass,
         double _topCandidate_fRec,
