@@ -27,11 +27,13 @@ ROOT.TH1.AddDirectory(0)
 # Configuration
 ########################################
 
-input_file = "/shome/gregor/ControlPlotsSparse_2015_10_12.root"
+
+input_file = "/home/gregor/dev-747/CMSSW/src/TTH/Plotting/ControlPlotsSparse.root"
 output_path = "/scratch/gregor/foobar"
 
-n_proc = 10
+n_proc = 40
 n_iter = 6
+
 
 signals = [
     "ttH_hbb", 
@@ -193,19 +195,29 @@ class Categorization(object):
         self.children = [child_pass, child_fail]
         
 
-    def print_tree(self, depth=0):    
-        """ Print the node and all it's children recursively in a pretty way """
+    def print_tree(self, depth=0, of=None):    
+        """ Print the node and all it's children recursively in a pretty way.
+        depth tells us the level of the node we're currently at (root=0)
+        of is the output file. Either a file object or None. If None,
+        we just print the tree to the terminal.        
+        """
 
-        S,B = self.get_sb()
-        
+        S,B = self.get_sb()        
         if S+B>0:
             SsqrtB = S/math.sqrt(S+B)
         else:
             SsqrtB = -1
 
-        print "   " * depth, self.cut, "Discr={0}".format(self.discriminator_axis), "S={0:.1f}, B={1:.1f}, S/sqrt(S+B)={2:.2f}".format(S,B,SsqrtB)
+        string = "   " * depth + " {0} Discr={1} S={2:.1f}, B={3:.1f}, S/sqrt(S+B)={4:.2f}".format(self.cut, self.discriminator_axis, S, B, SsqrtB)
+
+        if of is None:
+            print string
+        else:
+            of.write(string + "\n")
+            
         for c in self.children:
-            c.print_tree(depth+1)
+            c.print_tree(depth+1, of)
+
 
     def print_tree_latex(self, depth=0):    
         """  """
@@ -251,6 +263,68 @@ class Categorization(object):
 
         return ret
 
+    def get_yields(self):
+        """ Return a dictionary of yields for this node.
+        Keys: sample names (same as in h_sig and h_bkg
+        Values: yields        
+        """
+        
+        yields = {}
+        keys = self.h_sig.keys() + self.h_bkg.keys()
+
+        self.prepare_nominal_thns()
+
+        # For the yield we don't really care which axis is used - the
+        # projections should all be the same.
+        # Just make sure we don't try to project unto -1..
+        if self.discriminator_axis ==-1:
+            projection_axis = 0
+        else:
+            projection_axis = self.discriminator_axis
+
+        for k in keys:
+
+            if k in self.h_sig.keys():
+                thn = self.h_sig[k]
+            else:
+                thn = self.h_bkg[k]
+            
+            yields[k] = thn.Projection(projection_axis).Integral()
+
+        return yields
+                        
+        
+    def print_yield_table(self):
+        """ Print a breakdown of yields for all leaves below this node
+        - or for this node if it is a leaf itself"""
+
+        # Nested dic: key1 = category name, key2 = sample name
+
+        yield_table = {}
+        for l in self.get_leaves():
+            yield_table[str(l)] = l.get_yields()
+        
+        # Get the list of all sample names
+        samples = yield_table.values()[0].keys()
+
+
+        names = {
+            "numJets__4__5__nBCSVM__2__3__discr_-1"	: "t2j4",
+            "numJets__4__5__nBCSVM__3__4__discr_2"	: "t3j4",
+            "numJets__4__5__nBCSVM__4__5__discr_2"	: "t4j4",
+            "numJets__5__6__nBCSVM__2__3__discr_-1"	: "t2j5",
+            "numJets__5__6__nBCSVM__3__4__discr_2"	: "t3j5",
+            "numJets__5__6__nBCSVM__4__5__discr_2"	: "t4j5",
+            "numJets__6__7__nBCSVM__2__3__discr_2"	: "t2j6",
+            "numJets__6__7__nBCSVM__3__4__discr_2"	: "t3j6",
+            "numJets__6__7__nBCSVM__4__5__discr_2"      : "t4j6",
+        }
+
+        print "\t\t" + "\t".join(names[str(l)] for l in self.get_leaves() if not l.discriminator_axis ==-1)
+
+        for sample in samples:
+            print sample + "\t" + "\t".join(["{0:.1f}".format(yield_table[str(l)][sample]) for l in self.get_leaves() if not l.discriminator_axis ==-1])
+                        
 
     def get_sb(self):
         """ Get the total signal and background counts after applying
@@ -470,6 +544,12 @@ class Categorization(object):
 
             last_limit = best_limit
             self.print_tree()
+            
+            # Also write the latest tree to disk
+            of = open("best_tree_iter_{0}.txt".format(i_iter), "w")
+            self.print_tree(of=of)
+            of.close()
+            
         # End of loop over iterations
 
     def prune(self, threshold = 0.02):
@@ -571,6 +651,10 @@ class Categorization(object):
                     dirs[outdir_str] = []
 
                 for sys_name, thn in hs.items():
+                    
+                    if "jDown" in sys_name or "jUp" in sys_name:
+                        continue
+
                     h = thn.Projection(l.discriminator_axis).Clone()
                     h.SetName(axes[l.discriminator_axis].name + "_" + sys_name)
                     dirs[outdir_str].append(h)
@@ -749,9 +833,36 @@ Categorization.pool = Pool(n_proc)
 Categorization.lg = LimitGetter(output_path)
     
 
+old = """
+  Discr=2
+    numJets__4__5 Discr=2 
+       nBCSVM__2__4 Discr=2
+          nBCSVM__2__3 Discr=-1
+          nBCSVM__3__4 Discr=2
+       nBCSVM__4__5 Discr=2
+    numJets__5__7 Discr=2
+       numJets__5__6 Discr=2
+          nBCSVM__2__4 Discr=2
+             nBCSVM__2__3 Discr=-1
+             nBCSVM__3__4 Discr=2
+          nBCSVM__4__5 Discr=2
+       numJets__6__7 Discr=2
+          nBCSVM__2__4 Discr=2
+             nBCSVM__2__3 Discr=2
+             nBCSVM__3__4 Discr=2
+          nBCSVM__4__5 Discr=2
+"""
+
+
 if __name__ == "__main__":
 
     r = Categorization(Cut(), discriminator_axis=2)
+
+    #r = CategorizationFromString(old)
+    #r.print_tree() 
+    #r.print_yield_table()     
+    #print r.eval_limit("test")   
+    
 
     # TODO: something clever for boosted prereq - it can be
     # conditional on mass or other variables... For now we just
@@ -760,8 +871,8 @@ if __name__ == "__main__":
     axes[0].discPrereq = [Cut(3,3,3)]
     axes[1].discPrereq = [Cut(3,3,3)]
 
-    cut_axes = [3,4,6,7,8,9]
-    discriminator_axes = [0,1,2]
+    cut_axes = range(4,14)
+    discriminator_axes = [0,1,2,3]
     
     r.find_categories_async(n_iter, 
                             cut_axes, 
