@@ -98,7 +98,8 @@ for k in to_process:
             functions_and_parameter_eta = pickle.load(pickle_file)
 
         pt_fun = functions_and_parameter_pt[input_name][0]
-        pt_fun_nosize = functions_and_parameter_pt[input_name+"-nosize"][0]
+        # TODO - properly treat qcd here!!!
+        pt_fun_nosize = functions_and_parameter_pt[input_name][0] #functions_and_parameter_pt[input_name+"-nosize"][0]
         pt_param_name = functions_and_parameter_pt[input_name][1]
 
         # Currently no etwa treatment for Higgs tagging
@@ -145,7 +146,8 @@ for k in to_process:
         if IS_TOPTAG:
             eta = AH.getter(input_tree, eta_param_name)
             value = pt_fun(pt) * eta_fun(eta)
-            value_nosize = pt_fun_nosize(pt) * eta_fun_nosize(eta)
+            # proper treat qcd here
+            value_nosize = value # pt_fun_nosize(pt) * eta_fun_nosize(eta)
         else:            
             eta = 1
             value = pt_fun(pt)

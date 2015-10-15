@@ -87,16 +87,16 @@ for name,samples in [ ["low", lows],
     masses = ["X_mass",
               "Xsoftdropz10b00_mass",
               "Xsoftdropz20b10_mass",
-              "Xsoftdropz20b20_mass",
+              #"Xsoftdropz20b20_mass",
 
-              "Xsoftdropz10bm10_mass",
-              "Xsoftdropz15bm10_mass",
-              "Xsoftdropz20bm10_mass",
+              #"Xsoftdropz10bm10_mass",
+              #"Xsoftdropz15bm10_mass",
+              #"Xsoftdropz20bm10_mass",
               
               "Xtrimmedr2f3_mass",
 
-              "Xfilteredn3r2_mass",     
-              "Xfilteredn5r2_mass",     
+              #"Xfilteredn3r2_mass",     
+              #"Xfilteredn5r2_mass",     
               "Xprunedn3z10rfac50_mass",
 
               "log(X_chi1)",
@@ -120,17 +120,17 @@ for name,samples in [ ["low", lows],
 
     # These need a mass-cut
     others = [
-        "X_tau3/X_tau2",
+        #"X_tau3/X_tau2",
         "X_qvol",        
-        "Xsoftdropz10b00forbtag_btag",
-        "Xsoftdropz20b10forbtag_btag",
+        #"Xsoftdropz10b00forbtag_btag",
+        #"Xsoftdropz20b10forbtag_btag",
     ]
 
     for groomer in [#"filteredn3r2",
                     #"prunedn3z10rfac50",
                     #"trimmedr2f3",
-                    "softdropz10b00",            
-                    "softdropz20b10"
+                    #"softdropz10b00",            
+                    #"softdropz20b10"
     ]:
         others.append("X{0}_tau3/X{0}_tau2".format(groomer))
         #others.append("X_tau3/X{0}_tau2".format(groomer))
@@ -158,7 +158,7 @@ for name,samples in [ ["low", lows],
     )
 
 
-    if True:
+    if False:
         for var in others:
 
             if name == "high":
@@ -167,9 +167,8 @@ for name,samples in [ ["low", lows],
                 ypos = 0.6
                 ymax = None
                 nbins = 80
-                extra_text = ["AK08, flat p_{T}, #eta"]
-                
-                
+                extra_text = ["AK08, flat p_{T}, #eta", "<#mu>=20, 25ns"]
+                                
                 if var in others:
                     extra_text.append("No mass cut")
 
@@ -185,18 +184,21 @@ for name,samples in [ ["low", lows],
                 if "chi" in var:                    
                     ymax = 0.12
                     
+                if "qvol" in var:                    
+                    ymax = 0.15
+                    
                 if "chi1" in var:
-                    extra_text = ["AK08, flat p_{T}, #eta", "MJ R=0.1"]
+                    extra_text = ["AK08, flat p_{T}, #eta", "<#mu>=20, 25ns", "MJ R=0.1"]
                 if "chi2" in var:
-                    extra_text = ["AK08, flat p_{T}, #eta", "MJ R=0.2"]
+                    extra_text = ["AK08, flat p_{T}, #eta", "<#mu>=20, 25ns", "MJ R=0.2"]
                 if "chi3" in var:
-                    extra_text = ["AK08, flat p_{T}, #eta", "MJ R=0.3"]
+                    extra_text = ["AK08, flat p_{T}, #eta", "<#mu>=20, 25ns", "MJ R=0.3"]
 
                 if "HTT_mass" in var:
                     ymax = 0.14
 
                 if "HTT" in var:                    
-                    extra_text = ["CA15, flat p_{T}, #eta"]
+                    extra_text = ["CA15, flat p_{T}, #eta", "<#mu>=20, 25ns"]
 
                 if "X_tau3/X_tau2" in var:
                     ymax = 0.15
@@ -210,7 +212,7 @@ for name,samples in [ ["low", lows],
                 ypos = 0.76
                 ymax = None
                 nbins = 80
-                extra_text = ["CA15, flat p_{T}, #eta"]
+                extra_text = ["CA15, flat p_{T}, #eta", "<#mu>=20, 25ns"]
 
                 if var in others:
                     extra_text.append("No mass cut")
@@ -220,11 +222,14 @@ for name,samples in [ ["low", lows],
                     ymax = 0.2
 
                 if "chi1" in var:
-                    extra_text = ["CA15, flat p_{T}, #eta", "MJ R=0.1"]
+                    extra_text = ["CA15, flat p_{T}, #eta", "MJ R=0.1", "<#mu>=20, 25ns"]
                 if "chi2" in var:
-                    extra_text = ["CA15, flat p_{T}, #eta", "MJ R=0.2"]
+                    extra_text = ["CA15, flat p_{T}, #eta", "MJ R=0.2", "<#mu>=20, 25ns"]
                 if "chi3" in var:
-                    extra_text = ["CA15, flat p_{T}, #eta", "MJ R=0.3"]
+                    extra_text = ["CA15, flat p_{T}, #eta", "MJ R=0.3", "<#mu>=20, 25ns"]
+
+                if "qvol" in var:                    
+                    ymax = 0.11
 
 
                 if "softdrop" in var and ("b10" in var or "b20" in var):
@@ -262,9 +267,14 @@ for name,samples in [ ["low", lows],
                 ymax = None
                 nbins = 80
                 extra_text = ["AK08, flat p_{T}, #eta",
+                              "<#mu>=20, 25ns",
                               "110 < m_{SD} < 210"]
                 
                 cut = "((ak08softdropz10b00_mass>110)&&(ak08softdropz10b00_mass<210))"
+
+                if "qvol" in var:                    
+                    ymax = 0.19
+
 
                 if "X_tau3/X_tau2" in var:
                     ymax = 0.11
@@ -273,7 +283,7 @@ for name,samples in [ ["low", lows],
                     ymax = 0.11
 
                 if "HTT" in var:                    
-                    extra_text = ["CA15, flat p_{T}, #eta"]
+                    extra_text = ["CA15, flat p_{T}, #eta", "<#mu>=20, 25ns"]
 
             else:
                 xpos = 0.57
@@ -281,9 +291,14 @@ for name,samples in [ ["low", lows],
                 ymax = None
                 nbins = 80
                 extra_text = ["CA15, flat p_{T}, #eta", 
+                              "<#mu>=20, 25ns",
                               "150 < m_{SD} < 240"]
 
                 cut = "((ca15softdropz20b10_mass>150)&&(ca15softdropz20b10_mass<240))"
+
+                if "qvol" in var:                    
+                    ymax = 0.14
+
 
 
             combinedPlot("fixedMatch_nosize_masscut_" + var.replace("/","_")+"_"+name,
@@ -309,7 +324,7 @@ for name,samples in [ ["low", lows],
                          extra_text = extra_text)
             
 
-    if False:
+    if True:
         for var in htt_vars:
 
             if name == "high":
@@ -318,10 +333,14 @@ for name,samples in [ ["low", lows],
                 ypos = 0.6
                 ymax = None
                 nbins = 80
-                extra_text = ["AK08, flat p_{T}, #eta", "120 < m < 180"]
+                extra_text = ["AK08, flat p_{T}, #eta", 
+                              "<#mu>=20, 25ns",
+                              "120 < m < 180"]
 
                 if "HTT" in var:                    
-                    extra_text = ["CA15, flat p_{T}, #eta", "120 < m < 180"]
+                    extra_text = ["CA15, flat p_{T}, #eta", 
+                                  "<#mu>=20, 25ns",
+                                  "120 < m < 180"]
 
 
                 cut = "((looseOptRHTT_mass>120)&&(looseOptRHTT_mass<180))"
@@ -331,7 +350,9 @@ for name,samples in [ ["low", lows],
                 ypos = 0.76
                 ymax = None
                 nbins = 80
-                extra_text = ["CA15, flat p_{T}, #eta", "120 < m < 180"]
+                extra_text = ["CA15, flat p_{T}, #eta", 
+                              "<#mu>=20, 25ns",
+                              "120 < m < 180"]
                                 
                 cut = "((looseOptRHTT_mass>120)&&(looseOptRHTT_mass<180))"
 
