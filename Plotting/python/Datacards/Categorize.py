@@ -11,48 +11,16 @@ import os
 import sys     
 import math
 import pickle
-from multiprocessing import Pool
 
 import ROOT
 
 from Axis import axis
 from Cut import Cut
-from CombineHelper import LimitGetter
+
 from makeDatacard import MakeDatacard
 
 ROOT.TH1.AddDirectory(0)
 
-
-########################################
-# Configuration
-########################################
-
-
-input_file = "/home/gregor/dev-747/CMSSW/src/TTH/Plotting/ControlPlotsSparse.root"
-output_path = "/scratch/gregor/foobar"
-
-n_proc = 40
-n_iter = 6
-
-
-signals = [
-    "ttH_hbb", 
-#    "ttH_nohbb"
-]
-
-backgrounds = [
-    "ttbarPlus2B",
-    "ttbarPlusB",
-    "ttbarPlusBBbar",
-    "ttbarPlusCCbar",
-    "ttbarOther",
-#    "ttw_wlnu",       
-#    "ttw_wqq",        
-#    "ttz_zllnunu",    
-#    "ttz_zqq",
-]        
-
-        
         
 ########################################
 # Categorization
@@ -68,6 +36,11 @@ class Categorization(object):
     h_sig_sys, h_bkg_sys: Nested Dictionaries of signal/background
         sparse histograms (THN objects) keys = sample, syst
     axes: A list of axis objects
+    pool: A pool of workers (multiprocessing module)
+    output_path: Pathname where to store temporary files
+    lg: LimitGetter object (takes care of calling combine)
+    verbose: Verbosity level (int)
+
 
     The cutflow is implemented as a binary tree. The cut member is the
     additional cut to perform for a given node (Cut type object).  The
@@ -76,7 +49,8 @@ class Categorization(object):
     to it.
 
     Children are always created in pairs (d'uh - it's a binary tree) -
-    one with a cut, the other one with it's inversion.
+    one with a cut, the other one with it's inversion. However we can
+    set the discriminator variable to -1 so the node is not evaluated
     """
         
     h_sig = None
@@ -195,7 +169,7 @@ class Categorization(object):
         self.children = [child_pass, child_fail]
         
 
-    def print_tree(self, depth=0, of=None):    
+    def print_tree(self, depth=0, of=None, verbose=False):    
         """ Print the node and all it's children recursively in a pretty way.
         depth tells us the level of the node we're currently at (root=0)
         of is the output file. Either a file object or None. If None,
@@ -208,7 +182,10 @@ class Categorization(object):
         else:
             SsqrtB = -1
 
-        string = "   " * depth + " {0} Discr={1} S={2:.1f}, B={3:.1f}, S/sqrt(S+B)={4:.2f}".format(self.cut, self.discriminator_axis, S, B, SsqrtB)
+        if verbose:
+            string = "   " * depth + " {0} Discr={1} S={2:.1f}, B={3:.1f}, S/sqrt(S+B)={4:.2f}".format(self.cut, self.discriminator_axis, S, B, SsqrtB)
+        else:
+            string = "   " * depth + " {0} Discr={1}".format(self.cut, self.discriminator_axis)
 
         if of is None:
             print string
@@ -216,13 +193,45 @@ class Categorization(object):
             of.write(string + "\n")
             
         for c in self.children:
-            c.print_tree(depth+1, of)
+            c.print_tree(depth+1, of, verbose)
 
 
-    def print_tree_latex(self, depth=0):    
+    def print_tree_latex(self, depth=0, limits = {}):    
         """  """
 
         S,B = self.get_sb()
+
+        # Pre-calculate all the limits so we can paralellize
+        if depth == 0:
+                                    
+            nodes_to_eval = [n for n in self.get_offspring() if not n.discriminator_axis == -1]
+            #nodes_to_eval = [self]
+            filenames = []
+
+            for ignore_splitting in [True,False]:
+
+                for n in nodes_to_eval:
+
+                    control_plots_filename = "{0}/ControlPlots_{1}_NS{2}.root".format(n.output_path, str(n), ignore_splitting)
+                    shapes_txt_filename    = "{0}/shapes_{1}_NS{2}.txt".format(n.output_path, str(n), ignore_splitting)
+                    shapes_root_filename   = "{0}/shapes_{1}_NS{2}.root".format(n.output_path, str(n), ignore_splitting)
+
+                    filenames.append(shapes_txt_filename)
+
+                    n.create_control_plots(control_plots_filename, ignore_splitting = ignore_splitting)                        
+                    MakeDatacard(control_plots_filename, 
+                                 shapes_root_filename,
+                                 shapes_txt_filename,
+                                 do_stat_variations=False)
+
+            li_limits = self.pool.map(self.lg, [f for f in filenames])
+            
+            limits = {}
+            for ignore_splitting in [True,False]:
+                for n in nodes_to_eval:
+                    l = li_limits.pop(0)
+                    limits[str(n)+str(ignore_splitting)] = l
+        
 
         ret = ""        
         
@@ -234,17 +243,16 @@ class Categorization(object):
         ret += "S={0:.1f}".format(S) + r"\\"
         ret += "B={0:.1f}".format(B) 
 
+        if self.children: 
+            ret += r"\\"
+            ret += r"$\mu_{Comb.} = " + "{0:.2f}$".format(limits[str(self)+str(False)])
+
+
+        #ret += r"\\"
+        #ret += "Discr: "
+        #ret += self.axes[self.discriminator_axis].name.replace("_", " ")
         ret += r"\\"
-        ret += "Discr: "
-        ret += self.axes[self.discriminator_axis].name.replace("_", " ")
-
-        if depth == 0:
-            ret += r"\\"
-            ret += r"$\mu_{Comb.} = " + "{0}$".format(self.eval_limit(str(self)))
-
-        if not self.children: 
-            ret += r"\\"
-            ret += r"$\mu = " + "{0}$".format(self.eval_limit(str(self)))
+        ret += r"$\mu_{Self} = " + "{0:.2f}$".format(limits[str(self)+str(True)])
 
         ret += "}"
 
@@ -255,7 +263,7 @@ class Categorization(object):
                 continue
 
             ret += "[\n"
-            ret += c.print_tree_latex(depth+1)
+            ret += c.print_tree_latex(depth+1, limits)
             ret += "\n]"
 
         if depth == 0:
@@ -351,6 +359,19 @@ class Categorization(object):
             
         return leaves
 
+
+    def get_offspring(self):
+        """ Return a list of all nodes below and including the current one. """
+
+        offspring = []
+        if self.children:
+            for c in self.children:
+                offspring.extend(c.get_offspring())
+
+        offspring.append(self)
+            
+        return offspring
+
     def get_root(self):
         """ Return the root node of the tree"""
 
@@ -381,11 +402,11 @@ class Categorization(object):
         """ Prime nominal and systematic variation THNs for projection """
         
         # Nominal
-        thns = h_sig.values() + h_bkg.values() 
+        thns = self.h_sig.values() + self.h_bkg.values() 
         
         # Systematic variations
         # (these nested dictionaries)
-        for v in h_sig_sys.values() + h_bkg_sys.values():
+        for v in self.h_sig_sys.values() + self.h_bkg_sys.values():
             thns.extend(v.values())
 
         self.prepare_thns(thns)
@@ -437,7 +458,7 @@ class Categorization(object):
         return sig
 
     def eval_limit(self, name):
-        
+
         control_plots_filename = "{0}/ControlPlots_{1}.root".format(self.output_path, name)
         shapes_txt_filename    = "{0}/shapes_{1}.txt".format(self.output_path, name)
         shapes_root_filename   = "{0}/shapes_{1}.root".format(self.output_path, name)
@@ -493,7 +514,6 @@ class Categorization(object):
                         
                                 splitting_name = "iter_{0}_cats_{1}".format(i_iter, i_splitting)
 
-                                # create control plots creates the control plots for the whole tree 
                                 control_plots_filename = "{0}/ControlPlots_{1}.root".format(self.output_path, splitting_name)
                                 shapes_txt_filename    = "{0}/shapes_{1}.txt".format(self.output_path, splitting_name)
                                 shapes_root_filename   = "{0}/shapes_{1}.root".format(self.output_path, splitting_name)
@@ -523,7 +543,6 @@ class Categorization(object):
             # Extract a list todo and pass them to the limit calculation
             li_splittings = splittings.keys()        
 
-
             li_limits = self.pool.map(self.lg, li_splittings)
             
             # build a list of tuples with limit name and numerical value
@@ -543,7 +562,7 @@ class Categorization(object):
                 raise Exception('SplittingError', 'Invalid splitting selected as best splitting')
 
             last_limit = best_limit
-            self.print_tree()
+            self.print_tree(verbose=True)
             
             # Also write the latest tree to disk
             of = open("best_tree_iter_{0}.txt".format(i_iter), "w")
@@ -582,7 +601,7 @@ class Categorization(object):
         # End of loop over leaves
         
         print "Pruned away", n_pruned_away, "leaves"
-        self.print_tree()
+        self.print_tree(verbose=True)
 
 
     def __repr__(self):
@@ -615,14 +634,19 @@ class Categorization(object):
         return name
 
 
-    def create_control_plots(self, name):
+    def create_control_plots(self, name, ignore_splitting = False):
         
         of = ROOT.TFile(name, "RECREATE")
 
         dirs = {}
                 
+        if ignore_splitting:
+            leaves = [self]
+        else:
+            leaves = self.get_leaves()
+
         # Loop over categories
-        for l in self.get_leaves():
+        for l in leaves:
 
             if  l.discriminator_axis == -1:
                 continue
@@ -638,7 +662,7 @@ class Categorization(object):
                     dirs[outdir_str] = []
                 
                 h = thn.Projection(l.discriminator_axis).Clone()
-                h.SetName(axes[l.discriminator_axis].name)
+                h.SetName(self.axes[l.discriminator_axis].name)
                 dirs[outdir_str].append(h)                
             # End of loop over processes
 
@@ -656,7 +680,7 @@ class Categorization(object):
                         continue
 
                     h = thn.Projection(l.discriminator_axis).Clone()
-                    h.SetName(axes[l.discriminator_axis].name + "_" + sys_name)
+                    h.SetName(self.axes[l.discriminator_axis].name + "_" + sys_name)
                     dirs[outdir_str].append(h)
 
                 # End of loop over systematics
@@ -694,8 +718,6 @@ class Categorization(object):
         \end{document}
         """
 
-    
-        
 ########################################
 # CategorizationFromString
 ########################################
@@ -765,120 +787,60 @@ def CategorizationFromString(string):
 # End of CategorizationFromString
 
 
+########################################
+# GetSparseHistograms
+########################################
+
+def GetSparseHistograms(input_file,
+        signals, backgrounds):
+    """ Get All Sparse Histograms """
+
+    f = ROOT.TFile(input_file)
+
+    h_sig = {}
+    h_bkg = {}
+    h_sig_sys = {}
+    h_bkg_sys = {}
+         
+    for processes, h, h_sys in zip( [signals,   backgrounds],
+                                    [h_sig,     h_bkg],
+                                    [h_sig_sys, h_bkg_sys] ):
+        for process in processes:
+
+            # Nominal Histograms
+            h[process] = f.Get("{0}/sl/sparse".format(process))
+            print process, h[process].GetEntries()
+
+            # Systematic Variations
+            h_sys[process] = {}     
+            for key in f.Get("{0}/sl".format(process)).GetListOfKeys():
+
+                if not "sparse_" in key.GetName():
+                    continue
+
+                syst_name = key.GetName().replace("sparse_", "")
+                h_sys[process][syst_name] = f.Get("{0}/sl/{1}".format(process, key.GetName()))
+
+            # End loop over keys
+        # End loop over processes
+    # End Signal/Background loop
+
+    return h_sig, h_bkg, h_sig_sys, h_bkg_sys
+# End of GetSparseHistograms
 
 
 ########################################
-# Get All Sparse Histograms
+# GetAxes
 ########################################
 
-f = ROOT.TFile(input_file)
-
-h_sig = {}
-h_bkg = {}
-h_sig_sys = {}
-h_bkg_sys = {}
-
-for processes, h, h_sys in zip( [signals,   backgrounds],
-                                [h_sig,     h_bkg],
-                                [h_sig_sys, h_bkg_sys] ):
-    for process in processes:
-
-        # Nominal Histograms
-        h[process] = f.Get("{0}/sl/sparse".format(process))
-        print process, h[process].GetEntries()
-
-        # Systematic Variations
-        h_sys[process] = {}     
-        for key in f.Get("{0}/sl".format(process)).GetListOfKeys():
-
-            if not "sparse_" in key.GetName():
-                continue
-             
-            syst_name = key.GetName().replace("sparse_", "")
-            h_sys[process][syst_name] = f.Get("{0}/sl/{1}".format(process, key.GetName()))
-
-        # End loop over keys
-    # End loop over processes
-# End Signal/Background loop
-            
-
-########################################
-# Extract axes from a histogram
-########################################
-
-axes = []
-n_dim = h_sig["ttH_hbb"].GetNdimensions()
-print "We have", n_dim, "dimensions"
-for i_axis in range(n_dim):
-    a = h_sig["ttH_hbb"].GetAxis(i_axis)
-    new_axis = axis(a.GetName(), a.GetNbins(), a.GetXmin(), a.GetXmax())
-    axes.append(new_axis)
-    print i_axis, new_axis
-
-
-########################################
-# Categorization
-########################################
-
-Cut.axes = axes
-Categorization.axes = axes
-Categorization.h_sig = h_sig
-Categorization.h_bkg = h_bkg
-Categorization.h_sig_sys = h_sig_sys
-Categorization.h_bkg_sys = h_bkg_sys
-
-Categorization.output_path = output_path
-Categorization.pool = Pool(n_proc)
-
-Categorization.lg = LimitGetter(output_path)
-    
-
-old = """
-  Discr=2
-    numJets__4__5 Discr=2 
-       nBCSVM__2__4 Discr=2
-          nBCSVM__2__3 Discr=-1
-          nBCSVM__3__4 Discr=2
-       nBCSVM__4__5 Discr=2
-    numJets__5__7 Discr=2
-       numJets__5__6 Discr=2
-          nBCSVM__2__4 Discr=2
-             nBCSVM__2__3 Discr=-1
-             nBCSVM__3__4 Discr=2
-          nBCSVM__4__5 Discr=2
-       numJets__6__7 Discr=2
-          nBCSVM__2__4 Discr=2
-             nBCSVM__2__3 Discr=2
-             nBCSVM__3__4 Discr=2
-          nBCSVM__4__5 Discr=2
-"""
-
-
-if __name__ == "__main__":
-
-    r = Categorization(Cut(), discriminator_axis=2)
-
-    #r = CategorizationFromString(old)
-    #r.print_tree() 
-    #r.print_yield_table()     
-    #print r.eval_limit("test")   
-    
-
-    # TODO: something clever for boosted prereq - it can be
-    # conditional on mass or other variables... For now we just
-    # evaluate it for more events than we should - costs a bit in
-    # computing but should be safe physics wise
-    axes[0].discPrereq = [Cut(3,3,3)]
-    axes[1].discPrereq = [Cut(3,3,3)]
-
-    cut_axes = range(4,14)
-    discriminator_axes = [0,1,2,3]
-    
-    r.find_categories_async(n_iter, 
-                            cut_axes, 
-                            discriminator_axes)    
-
-
-
-
-
+def GetAxes(h):
+    """ Extract axes from a sparse histogram"""
+    axes = []
+    n_dim = h.GetNdimensions()
+    print "We have", n_dim, "dimensions"
+    for i_axis in range(n_dim):
+        a = h.GetAxis(i_axis)
+        new_axis = axis(a.GetName(), a.GetNbins(), a.GetXmin(), a.GetXmax())
+        axes.append(new_axis)
+        print i_axis, new_axis
+    return axes

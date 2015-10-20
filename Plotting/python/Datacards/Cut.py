@@ -122,6 +122,13 @@ class Cut(object):
             if axis_name == "topCandidate_fRec":
                 axis_name = r"top\; f_{Rec}"
 
+            if axis_name == "n_excluded_bjets":
+                axis_name = r"n_{boost}\; b"
+
+            if axis_name == "n_excluded_ljets":
+                axis_name = r"n_{boost}\; l"
+
+
             if upper == int(upper):
                 string_upper = "{0}".format(upper)
             else:
