@@ -30,6 +30,7 @@ class MEMConfig:
         self.mem_assumptions = set([])
         self.enabled = True
         self.maxJets = 4
+        self.maxlJets = 5 #DS
         self.btagMethod = "btagCSV"
 
     def __str__(self):

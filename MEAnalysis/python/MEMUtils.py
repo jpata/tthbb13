@@ -55,6 +55,14 @@ def set_integration_vars(vars_to_integrate, vars_to_marginalize, mem_assumptions
         vars_to_marginalize.push_back(MEM.PSVar.cos_b2)
         vars_to_marginalize.push_back(MEM.PSVar.phi_b2)
 
+    if "3w2h2t" in mem_assumptions:  #DS
+        vars_to_marginalize.push_back(MEM.PSVar.cos_qbar1)
+        vars_to_marginalize.push_back(MEM.PSVar.phi_qbar1)
+
+    if "4w2h1t" in mem_assumptions:  #DS
+        vars_to_marginalize.push_back(MEM.PSVar.cos_b1)
+        vars_to_marginalize.push_back(MEM.PSVar.phi_b1)
+
 
 def add_obj(integrator, objtype, **kwargs):
     """

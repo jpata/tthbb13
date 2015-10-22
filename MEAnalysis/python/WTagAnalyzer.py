@@ -78,12 +78,12 @@ class WTagAnalyzer(FilterAnalyzer):
 
             #Add at most 2 best pairs two W quark candidates
             for i in range(min(len(bpair), 2)):
-                event.wquark_candidate_jets.add(bpair[i][1])
+                event.wquark_candidate_jets.add(bpair[i][1]) #DS could the same jet end up here from i=0 and i=1?
                 event.wquark_candidate_jets.add(bpair[i][2])
                 event.wquark_candidate_jet_pairs += [(bpair[i][1], bpair[i][2])]
 
                 if "reco" in self.conf.general["verbosity"]:
-                    print("Wmass", event.Wmass,
+                    print("Wmass", event.Wmasses[i], #DS
                         event.good_jets.index(bpair[i][1]),
                         event.good_jets.index(bpair[i][2])
                     )

@@ -249,6 +249,12 @@ class Conf:
         # pt threshold for leading jets in fh channel
         "pt_fh": 40,
 
+        # nhard'th jet is used for pt threshold
+        "nhard_fh": 6,
+
+        # minimum number of jets to save event in tree
+        "minjets_fh": 6,
+
         #The default b-tagging algorithm (branch name)
         "btagAlgo": "btagCSV",
 
@@ -376,7 +382,9 @@ class Conf:
             "SL_2w2h2t_sj",
 
             #fully-hadronic
-            "FH" #Fixme - add other AH categories
+            "FH_4w2h2t", #8j,4b & 9j,4b
+            "FH_3w2h2t", #7j,4b
+            "FH_4w2h1t"  #7j,3b & 8j,3b
         ],
 
         #This configures the MEMs to actually run, the rest will be set to 0
@@ -387,12 +395,13 @@ class Conf:
             "SL_2w2h1t_l",
             "SL_2w2h1t_h",
             "SL_2w2h2t",
-            #"SL_2w2h2t",
             #"SL_2w2h2t_sj",
             #"SL_2w2h2t_memLR",
             #"SL_0w2h2t_memLR",
             #"DL_0w2h2t_Rndge4t",
-            #"FH"
+            #"FH_4w2h2t", #8j,4b
+            #"FH_3w2h2t", #7j,4b
+            #"FH_4w2h1t"  #7j,3b & 8j,3b
         ],
 
     }
@@ -599,22 +608,63 @@ Conf.mem_configs["SL_2w2h2t_sj"] = c
 #c.cfg.perm_pruning = strat
 #Conf.mem_configs["SL_2w2h2t_sj_perm"] = c
 
+
 ###
-### FH
+### FH_4w2h2t #8j,4b, 9j,4b
 ###
 c = MEMConfig()
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 0 and
-    len(mcfg.b_quark_candidates(ev)) == 4 and #DS
-    len(mcfg.l_quark_candidates(ev)) == 4 #DS
+    len(mcfg.b_quark_candidates(ev)) >= 4 and #DS #although from BTagLRAnalyzer there are max 4 candidates
+    ( (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==8 or
+      (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==9 ) #DS do not consider 10 jet events
 )
 c.mem_assumptions.add("fh")
+c.mem_assumptions.add("4w2h2t")
 strat = CvectorPermutations()
-strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
+strat.push_back(MEM.Permutations.QQbarBBbarSymmetry) #FIXME: add t-tbar symmetry, but then add _l,_h for all missing-q methods
 strat.push_back(MEM.Permutations.QUntagged)
 strat.push_back(MEM.Permutations.BTagged)
 c.cfg.perm_pruning = strat
-Conf.mem_configs["FH"] = c
+Conf.mem_configs["FH_4w2h2t"] = c
+
+###
+### FH_3w2h2t #7j,4b
+###
+c = MEMConfig()
+c.do_calculate = lambda ev, mcfg: (
+    len(mcfg.lepton_candidates(ev)) == 0 and
+    len(mcfg.b_quark_candidates(ev)) >= 4 and #DS
+    ( (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==7 or
+      (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==8 ) #DS run two methods for 8j,4b category
+)
+c.mem_assumptions.add("fh")
+c.mem_assumptions.add("3w2h2t")
+strat = CvectorPermutations()
+strat.push_back(MEM.Permutations.QQbarBBbarSymmetry) #FIXME: add t-tbar symmetry
+strat.push_back(MEM.Permutations.QUntagged)
+strat.push_back(MEM.Permutations.BTagged)
+c.cfg.perm_pruning = strat
+Conf.mem_configs["FH_3w2h2t"] = c
+
+###
+### FH_4w2h1t #7j,3b, 8j,3b #do not need _l,_h if not imposing t-tbar symmetry
+###
+c = MEMConfig()
+c.do_calculate = lambda ev, mcfg: (
+    len(mcfg.lepton_candidates(ev)) == 0 and
+    len(mcfg.b_quark_candidates(ev)) == 3 and #DS
+    ( len(mcfg.l_quark_candidates(ev)) == 4 or len(mcfg.l_quark_candidates(ev)) == 5 ) #DS
+)
+c.mem_assumptions.add("fh")
+c.mem_assumptions.add("4w2h1t")
+strat = CvectorPermutations()
+strat.push_back(MEM.Permutations.QQbarBBbarSymmetry) #FIXME: add t-tbar symmetry
+strat.push_back(MEM.Permutations.QUntagged)
+strat.push_back(MEM.Permutations.BTagged)
+c.cfg.perm_pruning = strat
+Conf.mem_configs["FH_4w2h1t"] = c
+
 
 import inspect
 def print_dict(d):

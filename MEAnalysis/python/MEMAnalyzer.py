@@ -24,7 +24,7 @@ class MECategoryAnalyzer(FilterAnalyzer):
     def __init__(self, cfg_ana, cfg_comp, looperName):
         self.conf = cfg_ana._conf
         super(MECategoryAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
-        self.cat_map = {"NOCAT":-1, "cat1": 1, "cat2": 2, "cat3": 3, "cat6":6, "cat8":8}
+        self.cat_map = {"NOCAT":-1, "cat1": 1, "cat2": 2, "cat3": 3, "cat6":6, "cat7":7, "cat8":8, "cat9":9, "cat10":10, "cat11":11 }
         self.btag_cat_map = {"NOCAT":-1, "L": 0, "H": 1}
    
 
@@ -74,16 +74,33 @@ class MECategoryAnalyzer(FilterAnalyzer):
         elif event.is_fh:   #AH
             #exactly 8 jets, Wtag in [60,100]
             if (len(event.good_jets) == 8 and event.Wmass >= 60 and event.Wmass < 100):
-                event.wquark_candidate_jets = event.buntagged_jets
-                cat = "cat8"
-            #FIXME: add other AH categories
+                event.wquark_candidate_jets = event.buntagged_jets + event.selected_btagged_jets_low #DS adds 5th,6th,... btags
+                if(len(event.selected_btagged_jets_high) == 4):
+                    cat = "cat8"
+                elif(len(event.selected_btagged_jets_high) == 3):
+                    cat = "cat10"
+            #exactly 7 jets, Wtag in [60,100]
+            if (len(event.good_jets) == 7 and event.Wmass >= 60 and event.Wmass < 100):
+                event.wquark_candidate_jets = event.buntagged_jets + event.selected_btagged_jets_low
+                if(len(event.selected_btagged_jets_high) == 4):
+                    cat = "cat7"
+                if(len(event.selected_btagged_jets_high) == 3):
+                    cat = "cat11"
+            #exactly 9 jets, Wtag in [72,94]
+            if (len(event.good_jets) == 9 and event.Wmass >= 72 and event.Wmass < 94):
+                event.wquark_candidate_jets = event.buntagged_jets + event.selected_btagged_jets_low
+                if(len(event.selected_btagged_jets_high) == 4):
+                    cat = "cat9"
+            #DS
 
         event.cat = cat
         event.cat_btag = cat_btag
         event.catn = self.cat_map.get(cat, -1)
         event.cat_btag_n = self.btag_cat_map.get(cat_btag, -1)
-
+        
         event.passes_mecat = True
+        if(cat == "NOCAT"):
+            event.passes_mecat = False
         return event
 
 class MEAnalyzer(FilterAnalyzer):
@@ -177,6 +194,9 @@ class MEAnalyzer(FilterAnalyzer):
         bquarks = list(mem_cfg.b_quark_candidates(event))
 
         maxjets = mem_cfg.maxJets
+        maxljets = maxjets #DS
+        if event.is_fh:
+            maxljets = mem_cfg.maxlJets #DS #allow up to 5 light jets for AH 9j,4b and 8j,3b categories
 
         # take highest pT jets if Dl and njets30 >= 4
         #if "dl" in mem_cfg.mem_assumptions:
@@ -194,11 +214,11 @@ class MEAnalyzer(FilterAnalyzer):
             print "More than {0} b-quarks supplied, dropping last {1} from MEM".format(maxjets, len(bquarks) - maxjets)
         
         lquarks = list(mem_cfg.l_quark_candidates(event))
-        if len(lquarks)>maxjets:
-            print "More than {0} l-quarks supplied, dropping last {1} from MEM".format(maxjets, len(lquarks) - maxjets)
+        if len(lquarks)>maxljets:
+            print "More than {0} l-quarks supplied, dropping last {1} from MEM".format(maxljets, len(lquarks) - maxljets)
         
         ##Only take up to 4 candidates, otherwise runtimes become too great
-        for jet in bquarks[:maxjets] + lquarks[:maxjets]:
+        for jet in bquarks[:maxjets] + lquarks[:maxljets]:
             add_obj(
                 self.integrator,
                 MEM.ObjectType.Jet,
@@ -275,7 +295,7 @@ class MEAnalyzer(FilterAnalyzer):
             print "MEM id={0},{1},{2} cat={3} cat_b={4} nj={5} nt={6} nel={7} nmu={8} syst={9}".format(
                 event.input.run, event.input.lumi, event.input.evt,
                 event.cat, event.cat_btag, event.numJets, event.nBCSVM,
-                event.n_mu_tight, event.n_el_tight, getattr(event, "systematic", None),
+                event.n_el_SL, event.n_mu_SL, getattr(event, "systematic", None),
             )
 
         for hypo in [MEM.Hypothesis.TTH, MEM.Hypothesis.TTBB]:
@@ -328,7 +348,7 @@ class MEAnalyzer(FilterAnalyzer):
                         confname in self.memkeysToRun
                     ):
                     
-                    print "Integrator::run started hypo={0} conf={1}".format(hypo, confname)
+                    print "Integrator::run started hypo={0} conf={1} cat={2}".format(hypo, confname, event.cat) #DS
                     self.configure_mem(event, mem_cfg)
                     r = self.integrator.run(
                         fstate,
@@ -336,7 +356,7 @@ class MEAnalyzer(FilterAnalyzer):
                         self.vars_to_integrate,
                         self.vars_to_marginalize
                     )
-                    print "Integrator::run done hypo={0} conf={1}".format(hypo, confname)
+                    print "Integrator::run done hypo={0} conf={1} cat={2}".format(hypo, confname, event.cat) #DS
 
                     res[(hypo, confname)] = r
                 else:

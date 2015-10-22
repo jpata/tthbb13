@@ -1,8 +1,8 @@
 from TTH.MEAnalysis.MEAnalysis_cfg_heppy import Conf
 
-#Conf.mem["calcME"] = True
 Conf.general["passall"] = False
 Conf.leptons["selection"] = lambda event: event.is_fh
+Conf.jets["untaggedSelection"] = "btagCSV"
 Conf.jets["NJetsForBTagLR"] = 8
         
 
@@ -13,26 +13,28 @@ Conf.trigger["paths"] =  (
             "HLT_ttHhardonicLowLumi",
             )
 
-Conf.mem["calcME"] = False
+Conf.mem["calcME"] = True
 Conf.mem["methodsToRun"] = (
-            #"SL_0w2h2t",
-            #"DL_0w2h2t",
-            #"SL_1w2h2t",
-            #"SL_2w2h1t_l",
-            #"SL_2w2h1t_h",
-            #"SL_2w2h2t",
-            #"SL_2w2h2t",
-            #"SL_2w2h2t_sj",
-            #"SL_2w2h2t_memLR",
-            #"SL_0w2h2t_memLR",
-            #"DL_0w2h2t_Rndge4t",
-            "FH"
+            #"SL_0w2h2t",                 #[0]
+            #"DL_0w2h2t",                 #[1]
+            #"SL_1w2h2t",                 #[2]
+            #"SL_2w2h1t_l",               #[3]
+            #"SL_2w2h1t_h",               #[4]
+            #"SL_2w2h2t",                 #[5]
+            #"SL_2w2h2t_sj",              #[6]
+            #"SL_2w2h2t_memLR",           #[7]
+            #"SL_0w2h2t_memLR",           #[8]
+            #"DL_0w2h2t_Rndge4t",         #[9]
+            "FH_4w2h2t", #8j,4b & 9j,4b  #[10]
+            "FH_3w2h2t", #7j,4b          #[11]
+            "FH_4w2h1t"  #7j,3b & 8j,3b  #[12]
         )
 
 Conf.general["verbosity"] = (
-            #"trigger",
+            "trigger",
+            "jets",
             #"gen", #print out gen-level info
             #"debug", #very high-level debug info
-            #"reco", #info about reconstructed final state
+            "reco", #info about reconstructed final state
             #"meminput" #info about particles used for MEM input
        )
