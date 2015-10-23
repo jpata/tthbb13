@@ -24,7 +24,7 @@ samples = cms.VPSet([
 
     #tt + jets
     cms.PSet(
-        skip     = cms.bool(False),
+        skip     = cms.bool(True), #DS skip for now
         name     = cms.string('TT_TuneCUETP8M1_13TeV-powheg-pythia8'),
         xSec     = cms.double(xsec[("ttjets", "13TeV")]),
         nGen     = cms.int64(5261701),
@@ -81,7 +81,7 @@ samples = cms.VPSet([
 
     #tt + jets
     cms.PSet(
-        skip     = cms.bool(False),
+        skip     = cms.bool(True),
         name     = cms.string('TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8'),
         xSec     = cms.double(xsec[("ttjets", "13TeV")]),
         nGen     = cms.int64(10572304),
@@ -396,7 +396,7 @@ samples = cms.VPSet([
     ##tt + H
     #tth_hbb_13tev_amcatnlo_pu20bx25_spring15 3933403.0 3933403.0 0.0
     cms.PSet(
-        skip     = cms.bool(False),
+        skip     = cms.bool(True),
         name     = cms.string('ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8'),
         xSec     = cms.double(0.5058 * 0.569),
         nGen     = cms.int64(1739581),
@@ -482,6 +482,7 @@ samples = cms.VPSet([
         isMC     = cms.bool(True)
     ),
     
+    ##ttH - poweheg
     cms.PSet(
         skip     = cms.bool(False),
         name     = cms.string('ttHTobb_M125_13TeV_powheg_pythia8'),
