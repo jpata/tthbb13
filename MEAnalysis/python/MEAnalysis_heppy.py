@@ -62,7 +62,7 @@ pi_file.close()
 def prepareInputSamples(sampleFile=conf.general["sampleFile"]):
     print "loading samples from", sampleFile
     samplefile = imp.load_source("samplefile", sampleFile)
-    from samplefile import samples_dict, samples
+    from samplefile import samples_dict
     inputSamples = []
     for sn in sorted(samples_dict.keys()):
         s = samples_dict[sn]
@@ -80,9 +80,9 @@ def prepareInputSamples(sampleFile=conf.general["sampleFile"]):
         #use sample only if not skipped and subFiles defined
         if s.skip.value() == False and len(s.subFiles.value())>0:
             inputSamples.append(inputSample)
-    return inputSamples, samples
+    return inputSamples, samples_dict
 
-inputSamples, samples = prepareInputSamples(conf.general["sampleFile"])
+inputSamples, samples_dict = prepareInputSamples(conf.general["sampleFile"])
 
 #Event contents are defined here
 #This is work in progress

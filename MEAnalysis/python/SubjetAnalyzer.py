@@ -36,9 +36,9 @@ class SubjetAnalyzer(FilterAnalyzer):
             ( 'fRec'  , '<', '0.45' ),
             ]
 
+        #should be a NOOP
         self.n_subjettiness_cut = 0.97
-
-        self.bbtag_cut = 0.1
+        #self.bbtag_cut = 0.1
 
 
     def beginLoop(self, setup):
@@ -93,17 +93,17 @@ class SubjetAnalyzer(FilterAnalyzer):
         # ======================================
 
         # Keep track of number of httCandidates that passed the cut
-        setattr( event, 'nhttCandidate', len( event.httCandidate ) )
+        setattr( event, 'nhttCandidate', len( event.httCandidates ) )
         setattr( event, 'nhttCandidate_aftercuts', 0 )
 
         # Just run normal mem if there is no httCandidate present
         # Check if there is an httCandidate
-        if len( event.httCandidate ) == 0:
+        if len( event.httCandidates ) == 0:
             return event
 
         # Apply the cuts on the httCandidate
         tops = []
-        for candidate in event.httCandidate:
+        for candidate in event.httCandidates:
             if self.Apply_Cut_criteria( candidate ):
                 tops.append( copy.deepcopy(candidate) )
 
@@ -309,36 +309,36 @@ class SubjetAnalyzer(FilterAnalyzer):
         # Printing particle lists
         ########################################
 
-        """
-        print '\n====================================='
-        print 'tops (first one = chosen):'
-        self.Print_objs( tops, extra_attrs=['bbtag'] )
-        print 'higgsCandidates:'
-        self.Print_objs( higgsCandidates, extra_attrs=['bbtag'] )
-        print '====================================='
-        print 'reco_btagged_jets:'
-        self.Print_objs( reco_btagged_jets, ['btag'] )
-        print 'reco_ltagged_jets:'
-        self.Print_objs( reco_ltagged_jets, ['btag'] )
-        print '====================================='
-        print 'top_subjets:'
-        for subjet in top_subjets:
-            self.Print_objs( subjet, ['btag'] )
-            if hasattr( subjet, 'matched_bjet'):
-                print '        Matched with bjet, delR = {0}'.format(
-                    subjet.matched_bjet_delR )
-                self.Print_objs( subjet.matched_bjet, ['btag'], tab=True )
-            if hasattr( subjet, 'matched_ljet'):
-                print '        Matched with ljet, delR = {0}'.format(
-                    subjet.matched_ljet_delR )
-                self.Print_objs( subjet.matched_ljet, ['btag'], tab=True )
-        print '====================================='
-        print 'boosted_bjets:'
-        self.Print_objs( boosted_bjets, ['btag'] )
-        print 'boosted_ljets:'
-        self.Print_objs( boosted_ljets, ['btag'] )
-        print '====================================='
-        """
+        #"""
+        #print '\n====================================='
+        #print 'tops (first one = chosen):'
+        #self.Print_objs( tops, extra_attrs=['bbtag'] )
+        #print 'higgsCandidates:'
+        #self.Print_objs( higgsCandidates, extra_attrs=['bbtag'] )
+        #print '====================================='
+        #print 'reco_btagged_jets:'
+        #self.Print_objs( reco_btagged_jets, ['btag'] )
+        #print 'reco_ltagged_jets:'
+        #self.Print_objs( reco_ltagged_jets, ['btag'] )
+        #print '====================================='
+        #print 'top_subjets:'
+        #for subjet in top_subjets:
+        #    self.Print_objs( subjet, ['btag'] )
+        #    if hasattr( subjet, 'matched_bjet'):
+        #        print '        Matched with bjet, delR = {0}'.format(
+        #            subjet.matched_bjet_delR )
+        #        self.Print_objs( subjet.matched_bjet, ['btag'], tab=True )
+        #    if hasattr( subjet, 'matched_ljet'):
+        #        print '        Matched with ljet, delR = {0}'.format(
+        #            subjet.matched_ljet_delR )
+        #        self.Print_objs( subjet.matched_ljet, ['btag'], tab=True )
+        #print '====================================='
+        #print 'boosted_bjets:'
+        #self.Print_objs( boosted_bjets, ['btag'] )
+        #print 'boosted_ljets:'
+        #self.Print_objs( boosted_ljets, ['btag'] )
+        #print '====================================='
+        #"""
 
         ########################################
         # Quark Matching
@@ -378,6 +378,11 @@ class SubjetAnalyzer(FilterAnalyzer):
             tops, 'top',
             event.FatjetCA15ungroomed, 'fatjet',
             R_cut = self.R_cut_fatjets )
+        
+        n_matched_httcand_fatjet_softdrop = self.Match_two_lists(
+            tops, 'top',
+            event.FatjetCA15softdropz2b1, 'fatjet_softdrop',
+            R_cut = self.R_cut_fatjets )
 
         # New list of tops after n_subjettiness cut is applied
         tops_after_nsub_cut = []
@@ -390,18 +395,22 @@ class SubjetAnalyzer(FilterAnalyzer):
                 continue
 
             fatjet = top.matched_fatjet
+            fatjet_softdrop = top.matched_fatjet_softdrop
 
             # Get n_subjettiness from the matched fatjet
-            n_subjettiness = fatjet.tau3 / fatjet.tau2
+            n_subjettiness = fatjet.tau3 / fatjet.tau2 if fatjet.tau2 > 0.0 else 0.0 
+            n_subjettiness_groomed = fatjet_softdrop.tau3 / fatjet_softdrop.tau2 if fatjet_softdrop.tau2 > 0.0 else 0.0 
 
             # Try next top if n_subjettiness exceeds the cut
             if n_subjettiness > self.n_subjettiness_cut: continue
 
             # Set n_subjettiness, tau_N and the bbtag
             setattr( top , 'n_subjettiness', n_subjettiness )
+            setattr( top , 'n_subjettiness_groomed', n_subjettiness_groomed )
             setattr( top , 'tau1', fatjet.tau1 )
             setattr( top , 'tau2', fatjet.tau2 )
             setattr( top , 'tau3', fatjet.tau3 )
+            
             setattr( top , 'bbtag', fatjet.bbtag )
 
             # Calculate delRopt

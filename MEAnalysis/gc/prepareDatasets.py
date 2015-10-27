@@ -43,8 +43,9 @@ for sample_name, sample in samples_dict.items():
                     ngenPos += hc.GetBinContent(1)
                 
                 ngen2 += tt.GetEntries()
-                ngenNeg2 += tt.GetEntries("genWeight < 0")
-                ngenPos2 += tt.GetEntries("genWeight > 0")
+                if sample.isMC:
+                    ngenNeg2 += tt.GetEntries("genWeight < 0")
+                    ngenPos2 += tt.GetEntries("genWeight > 0")
                     
         tf.Close()
         del tf

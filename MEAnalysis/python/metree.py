@@ -186,6 +186,7 @@ topType = NTupleObjectType("topType", variables = [
     NTupleVariable("tau3", lambda x: x.tau3 ),   # Copied from matched fat jet
     NTupleVariable("bbtag", lambda x: x.bbtag ), # Copied from matched fat jet
     NTupleVariable("n_subjettiness", lambda x: x.n_subjettiness ), # Calculated
+    NTupleVariable("n_subjettiness_groomed", lambda x: x.n_subjettiness_groomed ), # Calculated
     NTupleVariable("delRopt", lambda x: x.delRopt ),             # Calculated
 ])
 
@@ -418,7 +419,14 @@ def getTreeProducer(conf):
             ("passes_mem",          int,        "MEM was evaluated"),
             ("tth_mva",             float,      "ttH vs tt+jets bdt"),
         ]:
-            treeProducer.globalVariables += [makeGlobalVariable(vtype, systematic, mcOnly="match" in vtype[0].lower())]
+
+            is_mc_only = False
+            if "match" in vtype[0].lower():
+                is_mc_only = True
+            if systematic != "raw":
+                is_mc_only = True
+
+            treeProducer.globalVariables += [makeGlobalVariable(vtype, systematic, mcOnly=is_mc_only)]
 
             syst_suffix = "_" + systematic
             syst_suffix2 = syst_suffix
@@ -428,23 +436,23 @@ def getTreeProducer(conf):
             treeProducer.collections.update({
                 "mem_results_tth" + syst_suffix: NTupleCollection(
                     "mem_tth" + syst_suffix2, memType, len(conf.mem["methodOrder"]),
-                    help="MEM tth results array, element per config.methodOrder"
+                    help="MEM tth results array, element per config.methodOrder", mcOnly=is_mc_only
                 ),
                 "mem_results_ttbb" + syst_suffix: NTupleCollection(
                     "mem_ttbb" + syst_suffix2, memType, len(conf.mem["methodOrder"]),
-                    help="MEM ttbb results array, element per config.methodOrder"
+                    help="MEM ttbb results array, element per config.methodOrder", mcOnly=is_mc_only
                 ),
                 "fw_h_alljets" + syst_suffix: NTupleCollection(
                     "fw_aj" + syst_suffix2, FoxWolframType, 8,
-                    help="Fox-Wolfram momenta calculated with all jets"
+                    help="Fox-Wolfram momenta calculated with all jets", mcOnly=is_mc_only
                 ),
                 "fw_h_btagjets" + syst_suffix: NTupleCollection(
                     "fw_bj" + syst_suffix2, FoxWolframType, 8,
-                    help="Fox-Wolfram momenta calculated with b-tagged jets"
+                    help="Fox-Wolfram momenta calculated with b-tagged jets", mcOnly=is_mc_only
                 ),
                 "fw_h_untagjets" + syst_suffix: NTupleCollection(
                     "fw_uj" + syst_suffix2, FoxWolframType, 8,
-                    help="Fox-Wolfram momenta calculated with untagged jets"
+                    help="Fox-Wolfram momenta calculated with untagged jets", mcOnly=is_mc_only
                 ),
             })
 
