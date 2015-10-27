@@ -144,6 +144,79 @@ trees["no_blrcut_with_bdt"] = """
 
 # Opt on tree without BLR preselection cut
 # BDT NOT included as discriminator
+# 1 categories
+trees["1cat"] = """
+  Discr=2
+"""
+
+# Opt on tree without BLR preselection cut
+# BDT NOT included as discriminator
+# 2 categories
+trees["2cat"] = """
+  Discr=2
+    numJets__4__5 Discr=2
+    numJets__5__7 Discr=2
+"""
+
+
+# Opt on tree without BLR preselection cut
+# BDT NOT included as discriminator
+# 3 categories
+trees["3cat"] = """
+  Discr=2
+    numJets__4__5 Discr=2
+    numJets__5__7 Discr=2
+       btag_LR_4b_2b_logit__m20_0__8_0 Discr=2
+       btag_LR_4b_2b_logit__8_0__20_0 Discr=2
+"""
+
+# Opt on tree without BLR preselection cut
+# BDT NOT included as discriminator
+# 4 categories
+trees["4cat"] = """
+  Discr=2
+    numJets__4__5 Discr=2
+       nBCSVM__2__3 Discr=2
+       nBCSVM__3__5 Discr=2
+    numJets__5__7 Discr=2
+       btag_LR_4b_2b_logit__m20_0__8_0 Discr=2
+       btag_LR_4b_2b_logit__8_0__20_0 Discr=2
+"""
+
+# Opt on tree without BLR preselection cut
+# BDT NOT included as discriminator
+# 5 categories
+trees["5cat"] = """
+  Discr=2
+    numJets__4__5 Discr=2
+       nBCSVM__2__3 Discr=2
+       nBCSVM__3__5 Discr=2
+    numJets__5__7 Discr=2
+       btag_LR_4b_2b_logit__m20_0__8_0 Discr=2
+          btag_LR_4b_2b_logit__m20_0__4_0 Discr=2
+          btag_LR_4b_2b_logit__4_0__8_0 Discr=2
+       btag_LR_4b_2b_logit__8_0__20_0 Discr=2
+"""
+
+# Opt on tree without BLR preselection cut
+# BDT NOT included as discriminator
+# 6 categories
+trees["6cat"] = """
+  Discr=2
+    numJets__4__5 Discr=2
+       nBCSVM__2__3 Discr=2
+       nBCSVM__3__5 Discr=2
+    numJets__5__7 Discr=2
+       btag_LR_4b_2b_logit__m20_0__8_0 Discr=2
+          btag_LR_4b_2b_logit__m20_0__4_0 Discr=2
+          btag_LR_4b_2b_logit__4_0__8_0 Discr=2
+       btag_LR_4b_2b_logit__8_0__20_0 Discr=2
+          n_excluded_bjets__0__1 Discr=2
+          n_excluded_bjets__1__4 Discr=2
+"""
+
+# Opt on tree without BLR preselection cut
+# BDT NOT included as discriminator
 # 7 categories
 trees["7cat"] = """
   Discr=2

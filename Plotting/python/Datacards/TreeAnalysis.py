@@ -114,10 +114,13 @@ def make_latex(name):
 
 if __name__ == "__main__":
 
-    r = Categorize.Categorization(Cut(), discriminator_axis=2)
-    optimize(r)
+    #r = Categorize.CategorizationFromString(trees["3cat"])
+    #optimize(r)
 
-    #for i in range(14,16):
-    #    r = Categorize.CategorizationFromString(trees["{0}cat".format(i)])    
-    #    print i, r.eval_limit("{0}cat".format(i))
+    make_latex("15cat")
+
+    #for i in range(5,7):
+    #    make_latex("{0}cat".format(i))
+    #    r = Categorize.CategorizationFromString(trees["{0}cat".format(i)])
+    #    print r.eval_limit("{0}cat".format(i))
         

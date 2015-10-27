@@ -208,13 +208,15 @@ class Categorization(object):
             #nodes_to_eval = [self]
             filenames = []
 
+            i_split = 0
+
             for ignore_splitting in [True,False]:
 
                 for n in nodes_to_eval:
 
-                    control_plots_filename = "{0}/ControlPlots_{1}_NS{2}.root".format(n.output_path, str(n), ignore_splitting)
-                    shapes_txt_filename    = "{0}/shapes_{1}_NS{2}.txt".format(n.output_path, str(n), ignore_splitting)
-                    shapes_root_filename   = "{0}/shapes_{1}_NS{2}.root".format(n.output_path, str(n), ignore_splitting)
+                    control_plots_filename = "{0}/ControlPlots_{1}_NS{2}.root".format(n.output_path, i_split, ignore_splitting)
+                    shapes_txt_filename    = "{0}/shapes_{1}_NS{2}.txt".format(n.output_path, i_split, ignore_splitting)
+                    shapes_root_filename   = "{0}/shapes_{1}_NS{2}.root".format(n.output_path, i_split, ignore_splitting)
 
                     filenames.append(shapes_txt_filename)
 
@@ -223,6 +225,8 @@ class Categorization(object):
                                  shapes_root_filename,
                                  shapes_txt_filename,
                                  do_stat_variations=False)
+
+                    i_split += 1
 
             li_limits = self.pool.map(self.lg, [f for f in filenames])
             
@@ -342,8 +346,8 @@ class Categorization(object):
         """
 
         self.prepare_nominal_thns()        
-        S = sum([x.Projection(0).Integral() for x in h_sig.values()])
-        B = sum([x.Projection(0).Integral() for x in h_bkg.values()])
+        S = sum([x.Projection(0).Integral() for x in self.h_sig.values()])
+        B = sum([x.Projection(0).Integral() for x in self.h_bkg.values()])
         return S,B
 
 
@@ -394,7 +398,7 @@ class Categorization(object):
 
     def prepare_nominal_thns(self):
         """ Prime nominal (no systematics) THNs for projection """
-        thns = h_sig.values() + h_bkg.values()
+        thns = self.h_sig.values() + self.h_bkg.values()
         self.prepare_thns(thns)
 
 
