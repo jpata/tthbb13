@@ -45,30 +45,12 @@ def Make_config():
     # I/O information
     ########################################
 
-    #config['input_root_file_name'] = '/scratch/tklijnsm/VHBBHeppyV10_TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola.root'
-
-    #config['root_file_base'] = 'dcap://t3se01.psi.ch:22125/pnfs/psi.ch/cms/trivcat/'
-    config['root_file_base'] = 'dcap://t3se01.psi.ch:22125/pnfs/psi.ch/cms/trivcat/store/user/jpata/VHBBHeppyV13_test_Sep9_jec_jer/TT_TuneCUETP8M1_13TeV-powheg-pythia8/VHBBHeppyV13_test_Sep9_jec_jer_TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9_ext3-v1/150910_112840/0000/'
-
-    #config['input_root_file_list'] = \
-    #    [line.rstrip('\n') for line in open('plain_bkg.txt')]
-    config['input_root_file_list'] = \
-        [line.rstrip('\n') for line in open('V13_samples.txt')]
-
-
-
-    #config['input_root_file_name'] = 'dcap://t3se01.psi.ch:22125/pnfs/psi.ch/cms/trivcat/' + config['input_root_file_list'][0][1:]
-
-    #print config['input_root_file_name']
-
     config['input_tree_name'] = 'tree'
 
-    # The config file will be copied to 'runs/{config['run_name']}', and will
-    # be used for the name of the output .root file.
-    #config['run_name'] = 'CUSTOMTFFILE_V12_FULL_JETS_NC'
-    config['run_name'] = 'CUSTOMTFFILE_V13_FULL_SUBJETS'
+    # The config file will be copied to 'runs/{config['run_name']}'
+    config['run_name'] = 'GKTEST_0'
 
-    config['output_root_file_name'] = '/scratch/tklijnsm/{0}.root'.format( config['run_name'] )
+    config['output_root_file_name'] = 'out.root'
 
 
     ########################################
@@ -80,7 +62,7 @@ def Make_config():
 
     # Specify the number of entries if only a limited number of entries is used
     #   This number is not used if Use_limited_entries is set to False
-    config['n_entries_limited'] = 200000
+    config['n_entries_limited'] = 10000
 
     # Specify whether the program should attempt to find MC branches for the jets
     config['Get_MC_for_jets'] = False

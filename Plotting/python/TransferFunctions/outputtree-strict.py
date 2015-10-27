@@ -15,8 +15,10 @@ import os
 import pickle
 import time
 import datetime
-import TTH.TTHNtupleAnalyzer.AccessHelpers as AH
-from cfg_outputtree import Make_config
+try: 
+    import AccessHelpers as AH
+except:
+    import TTH.TTHNtupleAnalyzer.AccessHelpers as AH
 
 
 ########################################
@@ -306,22 +308,22 @@ def main():
     # Get the configuration file
     ########################################
 
-    Make_config()
-
     if not os.path.isfile('cfg_outputtree.dat'):
         print "Error: Can't find configuration file cfg_outputtree.dat"
         return 0
 
     print 'Importing configuration data'
-    pickle_f = open( 'cfg_outputtree.dat', 'rb' )
-    config = pickle.load( pickle_f )
-    pickle_f.close()
-
-
     
+    try:
+        pickle_f = open( 'cfg_outputtree.dat', 'rb' )
+        config = pickle.load( pickle_f )
+        pickle_f.close()
+    except:
+        print "Unable to open cfg_outputtree.dat"
+        print "Please create using cfg_outputtree.py"
+        return
 
-    #input_root_file_name = config['input_root_file_name']
-    #input_tree_name = config['input_tree_name']
+    print 'Imported configuration data'
 
     output_root_file_name = config['output_root_file_name']
 
@@ -329,8 +331,6 @@ def main():
     # Linking switch: If Just_Jets=True, .root file will simply contain (unlinked)
     # jets.
     Just_Jets = False
-
-
 
     quarktypes = config['quarktypes']
     jettypes = config['jettypes']
@@ -350,9 +350,14 @@ def main():
     # Setup I/O
     ########################################
 
-    # Input tree - moved to file loop
-    #input_root_file = ROOT.TFile.Open(input_root_file_name)
-    #input_tree = input_root_file.Get(input_tree_name)
+    print 'Setting up IO'
+
+    # Input (environment set by grid control)
+    if "FILE_NAMES" in os.environ.keys() and os.environ["FILE_NAMES"]:
+        config['input_root_file_list'] = os.environ["FILE_NAMES"].split(" ")
+    else:
+        print "No files received. Quitting..."
+        return()
 
     # Output tree
     output_root_file = ROOT.TFile(output_root_file_name,'RECREATE')
@@ -389,13 +394,14 @@ def main():
     # Event loop
     ########################################
 
-    #config['input_root_file_list'] = config['input_root_file_list'][:2]
-
     for input_root_file_name in config['input_root_file_list']:
 
+        root_file_base = 'dcap://t3se01.psi.ch:22125/pnfs/psi.ch/cms/trivcat'
+
         # Input tree
-        input_root_file = ROOT.TFile.Open(
-            config['root_file_base'] + input_root_file_name )
+        print root_file_base+input_root_file_name
+        input_root_file = ROOT.TFile.Open(root_file_base+input_root_file_name)
+        print input_root_file
         input_tree = input_root_file.Get('tree')
         print 'Processing {0}'.format(input_root_file_name)
         
@@ -409,9 +415,9 @@ def main():
 
         for i_event in range(n_processed):
 
-            if not i_event % int(0.1*n_processed+1):
-                print "{0:.1f}% ({1} out of {2})".format(
-                    100.*i_event /n_processed, i_event, n_processed )
+            if not i_event % int(0.05*n_processed+1):
+                
+                print "{0:.1f}% ({1} out of {2})".format(100.*i_event /n_processed, i_event, n_processed )
 
             input_tree.GetEntry( i_event )
 
@@ -422,7 +428,7 @@ def main():
 
             for quarktype in quarktypes:
                 tl_quarks.extend( Get_TLorentz( quarktype, input_tree, config ) )
-
+                                
             tl_jets = []
 
             for jettype in jettypes:
@@ -510,6 +516,8 @@ def main():
     print config['info']
     print 'Analysis end time:              {0}'.format(end_date)
     print '.root file: {0}'.format( config['output_root_file_name'] )
+
+
 
 
 ########################################
