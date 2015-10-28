@@ -4,181 +4,51 @@ from TTH.MEAnalysis.MEMConfig import MEMConfig
 import ROOT
 from ROOT import MEM
 
-def jet_baseline(jet, oldpt=None):
-    #in case pt has been rescaled, then need to rescale energy fractions
-    if oldpt is None:
-        oldpt = jet.pt
-    ptfrac = jet.pt / oldpt
-    
-    #X = x / oldpt
-    #Xnew = x / (ptfrac * oldpt) = X / ptfrac
-    return (jet.neHEF/ptfrac < 0.99
-        and jet.chEmEF/ptfrac < 0.99
-        and jet.neEmEF/ptfrac < 0.99
-        and jet.numberOfDaughters > 1
-        and jet.chHEF/ptfrac > 0.0
-        and jet.chMult/ptfrac > 0.0
-    )
+def jet_baseline(jet):
+    #Require that jet must have at least loose POG_PFID
+    #Look in Heppy autophobj.py and Jet.py 
+    return (jet.id >= 1)
 
 # LB: in fact,  mu.tightId should contain all the other cuts
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Tight_Muon
 # https://github.com/vhbb/cmssw/blob/vhbbHeppy722patch2/PhysicsTools/Heppy/python/physicsobjects/Muon.py
 def mu_baseline_tight(mu):
     return (
-        mu.tightId and
-        mu.isPFMuon and
-        mu.isGlobalMuon and
-        mu.dxy < 0.2 and
-        mu.dz < 0.5 and
-        mu.globalTrackChi2 < 10 and
-        (getattr(mu, "nMuonHits", 0) > 0 or getattr(mu, "nChamberHits", 0) > 0) and #the name of the branch changed between v11 and v12 
-        mu.pixelHits > 0 and
-        mu.nStations > 1 #FIXME: is this the same as nMuonHits
+        mu.tightId == 1
+        # these are already applied for the tight ID
+        # mu.isPFMuon and
+        # mu.isGlobalMuon and
+        # mu.dxy < 0.2 and
+        # mu.dz < 0.5 and
+        # mu.globalTrackChi2 < 10 and
+        # mu.nChamberHits > 0 and
+        # mu.pixelHits > 0 and
+        # mu.nStations > 1
     )
 
 def print_mu(mu):
     print "Muon: (pt=%s, eta=%s, tight=%s, pf=%s, glo=%s, dxy=%s, dz=%s, chi2=%s, nhits=%s, pix=%s, stat=%s, pfRelIso04=%s)" % (mu.pt, mu.eta, mu.tightId, mu.isPFMuon,  mu.isGlobalMuon, mu.dxy , mu.dz, mu.globalTrackChi2, (getattr(mu, "nMuonHits", 0) > 0 or getattr(mu, "nChamberHits", 0) > 0) , mu.pixelHits , mu.nStations, mu.pfRelIso04)
 
-
-#def el_baseline_tight(el):
-#    sca = abs(el.etaSc)
-#    ret = (
-#        not(sca > 1.4442 and sca < 1.5660) and
-#        el.convVeto
-#    )
-#    if not ret:
-#        return False
-#
-#    if sca <= 1.479:
-#        ret = ret and (
-#            (abs(el.eleDEta)    < 0.006046) and
-#            (abs(el.eleDPhi)    < 0.028092) and
-#            (el.eleSieie        < 0.009947) and
-#            (el.eleHoE          < 0.045772) and
-#            (abs(el.dxy)        < 0.008790) and
-#            (abs(el.dz)         < 0.021226) and
-#            (el.pfRelIso03        < 0.069537)
-#            #FIXME: expectedMissingInnerHits and hOverE 
-#        )
-#    elif sca < 2.5:
-#        ret = ret and (
-#            (abs(el.eleDEta)    < 0.007057) and
-#            (abs(el.eleDPhi)    < 0.030159) and
-#            (el.eleSieie        < 0.028237) and
-#            (el.eleHoE          < 0.067778) and
-#            (abs(el.dxy)        < 0.027984) and
-#            (abs(el.dz)         < 0.133431) and
-#            (el.pfRelIso03        < 0.078265)
-#            #FIXME: expectedMissingInnerHits and hOverE 
-#        )
-#    return ret
-
 def el_baseline_medium(el):
-    sca = abs(el.etaSc)
-    ret = (
-        not(sca > 1.4442 and sca < 1.5660) and
-        el.convVeto
-    )
-    if not ret:
-        return False
 
-    if (sca <= 1.479):
-        ret = ret and (
-            (el.eleSieie < 0.0101) and
-            (abs(el.eleDEta) < 0.0103) and
-            (abs(el.eleDPhi) < 0.0336) and
-            (el.eleHoE < 0.0876) and
-            (el.relIso03 < 0.0766) and
-            (el.eleooEmooP < 0.0174) and
-            (abs(el.dxy) < 0.0118) and
-            (abs(el.dz) < 0.373) and
-            (el.eleExpMissingInnerHits <= 2.0) and
-            (el.convVeto)
-        )
-    elif (sca < 2.5):
-        ret = ret and (
-            (el.eleSieie < 0.0283) and
-            (abs(el.eleDEta) < 0.00733) and
-            (abs(el.eleDPhi) < 0.114) and
-            (el.eleHoE < 0.0678) and
-            (el.relIso03 < 0.0678) and
-            (el.eleooEmooP < 0.0898) and
-            (abs(el.dxy) < 0.0739) and
-            (abs(el.dz) < 0.602) and
-            (el.eleExpMissingInnerHits <= 1.0) and
-            (el.convVeto)
-        )
-        
+    sca = abs(el.etaSc)
+    ret = not (sca > 1.4442 and sca < 1.5660)
+
+    #medium ID
+    ret = ret and el.eleCutIdSpring15_25ns_v1 >= 3
     return ret
 
 def el_baseline_loose(el):
+
     sca = abs(el.etaSc)
-    ret = (
-        not(sca > 1.4442 and sca < 1.5660) and
-        el.convVeto
-    )
-    if not ret:
-        return False
+    ret = not (sca > 1.4442 and sca < 1.5660)
 
-    if (sca <= 1.479):
-        ret = ret and (
-            (el.eleSieie < 0.0103) and
-            (abs(el.eleDEta) < 0.0105) and
-            (abs(el.eleDPhi) < 0.115) and
-            (el.eleHoE < 0.104) and
-            (el.relIso03 < 0.0893) and
-            (el.eleooEmooP < 0.102) and
-            (abs(el.dxy) < 0.0261) and
-            (abs(el.dz) < 0.41) and
-            (el.eleExpMissingInnerHits <= 2.0) and
-            (el.convVeto)
-        )
-    elif (sca < 2.5):
-        ret = ret and (
-            (el.eleSieie < 0.0301) and
-            (abs(el.eleDEta) < 0.00814) and
-            (abs(el.eleDPhi) < 0.182) and
-            (el.eleHoE < 0.0897) and
-            (el.relIso03 < 0.121) and
-            (el.eleooEmooP < 0.126) and
-            (abs(el.dxy) < 0.118) and
-            (abs(el.dz) < 0.822) and
-            (el.eleExpMissingInnerHits <= 1.0) and
-            (el.convVeto)
-        )
+    #Loose ID
+    ret = ret and el.eleCutIdSpring15_25ns_v1 >= 2
     return ret
-
 
 def print_el(el):
     print "Electron: (pt=%s, eta=%s, convVeto=%s, etaSc=%s, dEta=%s, dPhi=%s, sieie=%s, HoE=%s, dxy=%s, dz=%s, iso03=%s, nhits=%s, eOp=%s, pfRelIso03=%s)" % (el.pt, el.eta, el.convVeto, abs(el.etaSc), abs(el.eleDEta) , abs(el.eleDPhi) , el.eleSieie, el.eleHoE , abs(el.dxy) , abs(el.dz) , el.relIso03 , getattr(el, "eleExpMissingInnerHits", 0) , getattr(el, "eleooEmooP", 0), el.pfRelIso03)
-
-
-
-#https://twiki.cern.ch/twiki/bin/viewauth/CMS/CutBasedElectronIdentificationRun2#PHYS14_selection_all_conditions
-#PHYS14 selection, conditions: PU20 bx25, barrel cuts ( |eta supercluster| <= 1.479)
-#                    Veto        Loose           Medium          Tight
-#abs(dEtaIn) <   0.013625        0.009277        0.008925        0.006046
-#abs(dPhiIn) <   0.230374        0.094739        0.035973        0.028092
-#sieie <         0.011586        0.010331        0.009996        0.009947
-#hOverE <        0.181130        0.093068        0.050537        0.045772
-#abs(d0) <       0.094095        0.035904        0.012235        0.008790
-#abs(dz) <       0.713070        0.075496        0.042020        0.021226
-#ooEmooP <       0.295751        0.189968        0.091942        0.020118
-#iso             0.158721        0.130136        0.107587        0.069537
-#expectedMissingInnerHits <=     2       1       1       1
-#
-#PHYS14 selection, conditions: PU20 bx25, endcap cuts (1.479 < |eta supercluster| < 2.5)
-#    Veto        Loose   Medium  Tight
-#abs(dEtaIn) <   0.011932        0.009833        0.007429        0.007057
-#abs(dPhiIn) <   0.255450        0.149934        0.067879        0.030159
-#sie <           0.031849        0.031838        0.030135        0.028237
-#hOverE <        0.223870        0.115754        0.086782        0.067778
-#abs(d0) <       0.342293        0.099266        0.036719        0.027984
-#abs(dz) <       0.953461        0.197897        0.138142        0.133431
-#ooEmooP <       0.155501        0.140662        0.100683        0.098919
-#iso             0.177032        0.163368        0.113254        0.078265
-#h <=             3       1       1       1
-
 
 class Conf:
     leptons = {
@@ -213,12 +83,12 @@ class Conf:
             "SL": {
                 "pt": 30,
                 "eta": 2.1,
-                "idcut": lambda el: el_baseline_medium(el),
+                "idcut": lambda el: el_baseline_medium(el) and el.convVeto,
             },
             "DL": {
                 "pt": 20,
                 "eta": 2.4,
-                "idcut": lambda el: el_baseline_medium(el),
+                "idcut": lambda el: el_baseline_medium(el) and el.convVeto,
             },
             "veto": {
                 "pt": 10,
@@ -226,7 +96,7 @@ class Conf:
                 "idcut": lambda el: el_baseline_loose(el),
             },
             #"isotype": "pfRelIso03", #pfRelIso - delta-beta, relIso - rho
-            "isotype": "relIso03", #pfRelIso - delta-beta, relIso - rho
+            "isotype": "relIso03", #pfRelIso - delta-beta, relIso - rho (Heppy.LeptonAnalyzer.ele/mu_isoCorr)
             "debug" : print_el
         },
         "selection": lambda event: event.is_sl or event.is_dl
@@ -258,7 +128,6 @@ class Conf:
         #These working points are evaluated and stored in the trees as nB* - number of jets passing the WP
         #https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideBTagging#Preliminary_working_or_operating
         "btagWPs": {
-            #"CSVM": ("btagCSV", 0.814),
             "CSVM": ("btagCSV", 0.89),
             "CSVL": ("btagCSV", 0.423),
             "CSVT": ("btagCSV", 0.941)
@@ -266,10 +135,13 @@ class Conf:
 
         #if btagCSV, untagged/tagged selection for W mass and MEM is done by CSVM cut
         #if btagLR, selection is done by the btag likelihood ratio permutation
+        #"untaggedSelection": "btagCSV",
         "untaggedSelection": "btagLR",
         
         #how many jets to consider for the btag LR permutations
         "NJetsForBTagLR": 6,
+
+        #base jet selection
         "selection": jet_baseline
     }
 
@@ -293,11 +165,6 @@ class Conf:
             
             #ee
             "HLT_BIT_HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v",
-
-            #FH triggers: in separate config file
-            #"HLT_BIT_HLT_PFHT400_SixJet30_BTagCSV0p5_2PFBTagCSV_v",
-            #"HLT_BIT_HLT_PFHT450_SixJet40_PFBTagCSV_v",
-            #"HLT_ttHhardonicLowLumi",
             ],
       
     }

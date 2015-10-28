@@ -64,15 +64,6 @@ class LeptonAnalyzer(FilterAnalyzer):
                 leps = filter(lepcuts["idcut"], leps)
                 leps = sorted(leps, key=lambda x: x.pt, reverse=True)
 
-                #veto leptons are defined to pass the veto lepton cuts and fail the signal lepton cuts
-                # if id_type == "veto":
-                #     #take the signal leptons (not veto)
-                #     leps_SL = getattr(event, "{0}_SL".format(lep_flavour))
-                #     leps_DL = getattr(event, "{0}_DL".format(lep_flavour))
-                #     #veto = veto_cuts && !(signal)
-                #     leps = filter(lambda x: x not in leps_SL, leps)
-                #     leps = filter(lambda x: x not in leps_DL, leps)
-
                 sumleps += leps
                 lepname = lep_flavour + "_" + id_type
                 setattr(event, lepname, leps)
