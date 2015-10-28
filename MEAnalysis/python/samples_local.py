@@ -8,11 +8,21 @@ path = "/home/joosep/joosep-mac/Documents/tth/data/ntp/v14/vhbb"
 samples = cms.VPSet([
     cms.PSet(
         skip     = cms.bool(False),
-        name     = cms.string('ttHTobb_M125_13TeV_powheg_pythia8'),
+        name     = cms.string('ttH'),
         xSec     = cms.double(0.5058),
-        nGen     = cms.int64(92298),
+        nGen     = cms.int64(-1),
         subFiles = cms.vstring([
             path + "/tth.root",
+        ]),
+        isMC     = cms.bool(True)
+    ),
+    cms.PSet(
+        skip     = cms.bool(False),
+        name     = cms.string('ttjets'),
+        xSec     = cms.double(0.5058),
+        nGen     = cms.int64(-1),
+        subFiles = cms.vstring([
+            path + "/ttjets.root",
         ]),
         isMC     = cms.bool(True)
     ),
