@@ -84,42 +84,37 @@ class BTagRandomizerAnalyzer(FilterAnalyzer):
             if jc.ntags_l <= event.numJets:
                 run_vec_jet_categories.push_back(jc)
                 posrun.append( pos )
-        ret = self.rnd.run_all(run_vec_jet_categories)
-
-
-        pos    = -1
-        for jc in self.vec_jet_categories:            
-            pos += 1
-            catname = jc.name_tag
-            catid   = jc.tag
-            out     = MEM.BTagRandomizerOutput()
-            wasrun  = pos in posrun
-            if wasrun:
-                out = ret[ posrun.index(pos) ]
-                setattr(event, "b_rnd_results_"+catname, [out.p, out.ntoys, out.pass_rnd,           out.tag_id] )
-                setattr(event, "b_inp_results_"+catname, [1.0,           0, getattr(out,"pass",0),  out.tag_id] )
-            else:
-                setattr(event, "b_rnd_results_"+catname, [0,0,0,0] )
-                setattr(event, "b_inp_results_"+catname, [0,0,0,0] )
-            for j in range(event.numJets):
-                inpval = getattr(event.good_jets[j], self.algo)
-                rndval = inpval
+        if self.conf.bran["enabled"]:
+            ret = self.rnd.run_all(run_vec_jet_categories)
+            pos    = -1
+            for jc in self.vec_jet_categories:            
+                pos += 1
+                catname = jc.name_tag
+                catid   = jc.tag
+                out     = MEM.BTagRandomizerOutput()
+                wasrun  = pos in posrun
                 if wasrun:
-                    inpval = out.input_btag[j] 
-                    rndval = out.rnd_btag[j] 
-                setattr(event.good_jets[j], "btagCSVInp"+catname, inpval )
-                setattr(event.good_jets[j], "btagCSVRnd"+catname, rndval )
-            
-            countTags = 0
-            for jet in event.good_jets: 
-                if wasrun and getattr( jet,  "btagCSVRnd"+catname ) > self.btagWP:
-                    countTags += 1
-            setattr(event, "nBCSVMRnd"+catname, countTags)            
-
-        #for r in event.b_ran_results:
-        #    print r.p, r.ntoys
-
-        self.rnd.next_event();
+                    out = ret[ posrun.index(pos) ]
+                    setattr(event, "b_rnd_results_"+catname, [out.p, out.ntoys, out.pass_rnd,           out.tag_id] )
+                    setattr(event, "b_inp_results_"+catname, [1.0,           0, getattr(out,"pass",0),  out.tag_id] )
+                else:
+                    setattr(event, "b_rnd_results_"+catname, [0,0,0,0] )
+                    setattr(event, "b_inp_results_"+catname, [0,0,0,0] )
+                for j in range(event.numJets):
+                    inpval = getattr(event.good_jets[j], self.algo)
+                    rndval = inpval
+                    if wasrun:
+                        inpval = out.input_btag[j] 
+                        rndval = out.rnd_btag[j] 
+                    setattr(event.good_jets[j], "btagCSVInp"+catname, inpval )
+                    setattr(event.good_jets[j], "btagCSVRnd"+catname, rndval )
+                
+                countTags = 0
+                for jet in event.good_jets: 
+                    if wasrun and getattr( jet,  "btagCSVRnd"+catname ) > self.btagWP:
+                        countTags += 1
+                setattr(event, "nBCSVMRnd"+catname, countTags)            
+            self.rnd.next_event();
 
         event.passes_bran = True
         return event

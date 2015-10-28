@@ -11,12 +11,13 @@ from scipy.special import eval_legendre
 import ROOT
 ROOT.gSystem.Load("libTTHMEAnalysis")
 
+mva_enabled = True
 from TTH.MEAnalysis.Analyzer import FilterAnalyzer
 try:
     from sklearn.externals import joblib
 except Exception as e:
     print "Could not load scikit-learn. Please configure PYTHONPATH=/path/to/anaconda/lib/python2.7/site-packages:$PYTHONPATH PATH=/path/to/anaconda/bin/:$PATH"
-    raise e
+    mva_enabled = False
 
 CvectorTLorentzVector = getattr(ROOT, "std::vector<TLorentzVector>")
 EventShapeVariables = getattr(ROOT, "EventShapeVariables")
@@ -55,7 +56,9 @@ class MVAVarAnalyzer(FilterAnalyzer):
     def __init__(self, cfg_ana, cfg_comp, looperName):
         self.conf = cfg_ana._conf
         super(MVAVarAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
-        self.cls = joblib.load(self.conf.tth_mva["filename"])
+
+        if mva_enabled:
+            self.cls = joblib.load(self.conf.tth_mva["filename"])
 
     def beginLoop(self, setup):
         super(MVAVarAnalyzer, self).beginLoop(setup)
@@ -154,7 +157,9 @@ class MVAVarAnalyzer(FilterAnalyzer):
         vararray = np.array([getattr(event, vname) for vname in self.conf.tth_mva["varlist"]])
         vararray[np.isnan(vararray)] = 0
         
-        event.tth_mva = self.cls.predict_proba(vararray)[0,1]
+        event.tth_mva = 0
+        if mva_enabled:
+            event.tth_mva = self.cls.predict_proba(vararray)[0,1]
         event.passes_mva = True
 
         return event

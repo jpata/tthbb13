@@ -304,6 +304,7 @@ class Conf:
 
     general = {
         "passall": True,
+        "doQGL": False,
         "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV13_Oct5.root",
         "QGLPlotsFile_flavour": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/Histos_QGL_flavour.root",
         "sampleFile": os.environ["CMSSW_BASE"]+"/python/TTH/MEAnalysis/samples_v14.py",
@@ -335,6 +336,7 @@ class Conf:
 
     bran = {
       
+        "enabled": False,
         "pdfFile" :  general["controlPlotsFile"], #os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV6_finerPt_722sync.root",
 
         "jetCategories" : {

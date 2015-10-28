@@ -315,8 +315,14 @@ if __name__ == "__main__":
             **kwargs
         )
 
-        #execute the code
-        looper.loop()
+
+        import cProfile, time
+        p = cProfile.Profile(time.clock)
+        p.runcall(looper.loop)
+        p.print_stats()
+
+        # #execute the code
+        # looper.loop()
 
         tf = looper.setup.services["outputfile"].file 
         tf.cd()

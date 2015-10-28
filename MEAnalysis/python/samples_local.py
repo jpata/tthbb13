@@ -3,55 +3,16 @@
 #Cross-sections also defined in samples_base
 from TTH.MEAnalysis.samples_base import *
 
-sample_version = "V12"
-path = "/home/joosep/joosep-mac/Documents/tth/data/ntp/v12/vhbb"
+sample_version = "V14"
+path = "/home/joosep/joosep-mac/Documents/tth/data/ntp/v14/vhbb"
 samples = cms.VPSet([
-
-    #tt + jets
     cms.PSet(
         skip     = cms.bool(False),
-        name     = cms.string('TT_TuneCUETP8M1_13TeV-powheg-pythia8'),
-        xSec     = cms.double(xsec[("ttjets", "13TeV")]),
-        nGen     = cms.int64(-1),
-        subFiles = cms.vstring([
-        path + "/ttjets_powheg.root",
-        ]),
-        isMC     = cms.bool(True)
-    ),
-
-    #tt + jets
-    cms.PSet(
-        skip     = cms.bool(True),
-        name     = cms.string('TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8'),
-        xSec     = cms.double(xsec[("ttjets", "13TeV")]),
-        nGen     = cms.int64(-1),
-        subFiles = cms.vstring([
-        path + "/ttjets_amcatnlo.root",
-        ]),
-        isMC     = cms.bool(True)
-    ),
-
-
-    ##tt + H
-    #tth_hbb_13tev_amcatnlo_pu20bx25_spring15 3933403.0 3933403.0 0.0
-    cms.PSet(
-        skip     = cms.bool(True),
-        name     = cms.string('ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8'),
-        xSec     = cms.double(0.5058),
-        nGen     = cms.int64(-1),
-        subFiles = cms.vstring([
-        path + "/tth_amcatnlo.root",
-        ]),
-        isMC     = cms.bool(True)
-    ),
-    
-    cms.PSet(
-        skip     = cms.bool(True),
         name     = cms.string('ttHTobb_M125_13TeV_powheg_pythia8'),
         xSec     = cms.double(0.5058),
-        nGen     = cms.int64(-1),
+        nGen     = cms.int64(92298),
         subFiles = cms.vstring([
-            path + "/tth_powheg.root",
+            path + "/tth.root",
         ]),
         isMC     = cms.bool(True)
     ),

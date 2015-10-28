@@ -369,6 +369,7 @@ def getTreeProducer(conf):
             ("btag_lr_2b_Inp3t",    float,      "2b, N-2 Nlight probability, 3D binning, 3t   input"),
 
             ("btag_LR_4b_2b",        float,      ""),
+            ("btag_LR_4b_2b_ded",        float,      ""),
             ("btag_LR_4b_2b_Rndge4t",float,      ""),
             ("btag_LR_4b_2b_Inpge4t",float,      ""),
             ("btag_LR_4b_2b_Rnd3t",  float,      ""),
@@ -456,17 +457,18 @@ def getTreeProducer(conf):
                 ),
             })
 
-            for cat in conf.bran["jetCategories"].items():
-                treeProducer.globalObjects.update({ 
-                        "b_rnd_results_" + cat[0] + syst_suffix: NTupleObject(
-                            "bRnd_rnd_"+ cat[0] + syst_suffix2, branType,
-                            help="BTagrRandomizer results (p,ntoys,pass,tag_id)", mcOnly=True
-                            ),
-                        "b_inp_results_" + cat[0] + syst_suffix: NTupleObject(
-                            "bRnd_inp_"+ cat[0] + syst_suffix2, branType,
-                            help="BTagrRandomizer input results (p,ntoys,pass,tag_id)", mcOnly=True
-                            )                                                
-                        })
+            if conf.bran["enabled"]:
+                for cat in conf.bran["jetCategories"].items():
+                    treeProducer.globalObjects.update({ 
+                            "b_rnd_results_" + cat[0] + syst_suffix: NTupleObject(
+                                "bRnd_rnd_"+ cat[0] + syst_suffix2, branType,
+                                help="BTagrRandomizer results (p,ntoys,pass,tag_id)", mcOnly=True
+                                ),
+                            "b_inp_results_" + cat[0] + syst_suffix: NTupleObject(
+                                "bRnd_inp_"+ cat[0] + syst_suffix2, branType,
+                                help="BTagrRandomizer input results (p,ntoys,pass,tag_id)", mcOnly=True
+                                )                                                
+                            })
 
 
     for systematic in ["nominal"]:
