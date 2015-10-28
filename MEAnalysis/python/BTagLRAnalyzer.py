@@ -187,8 +187,7 @@ class BTagLRAnalyzer(FilterAnalyzer):
         #Take first 6 most b-tagged jets for btag LR
         jets_for_btag_lr, jet_probs = self.getJetProbs(
             event,
-            #[self.bTagAlgo, "btagCSVRndge4t", "btagCSVInpge4t", "btagCSVRnd3t", "btagCSVInp3t"]
-            [self.bTagAlgo]
+            [self.bTagAlgo, "btagCSVRndge4t", "btagCSVInpge4t", "btagCSVRnd3t", "btagCSVInp3t"] if self.conf.bran["enabled"] else [self.bTagAlgo]
         )
 
         # default

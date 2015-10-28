@@ -105,7 +105,7 @@ class QGLRAnalyzer(FilterAnalyzer):
 
     def _process(self, event): 
         self.counters["processing"].inc("processed")
-        event.passes_qgl = False
+        event.passes_qgl = True
         if not self.conf.general["doQGL"]:
             return event
 
