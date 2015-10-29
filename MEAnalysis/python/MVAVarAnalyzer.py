@@ -88,7 +88,7 @@ class MVAVarAnalyzer(FilterAnalyzer):
         event.isotropy = evshape.isotropy()
         event.sphericity = evshape.sphericity(eigs)
         event.aplanarity = evshape.aplanarity(eigs)
-        event.C = evshape.D(eigs)
+        event.C = evshape.C(eigs)
         event.D = evshape.D(eigs)
 
         event.mean_bdisc = np.mean([j.btagCSV for j in event.good_jets])

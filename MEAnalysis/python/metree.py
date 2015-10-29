@@ -47,9 +47,12 @@ jetType = NTupleObjectType("jetType", variables = [
     NTupleVariable("mcM", lambda x : x.mcM, mcOnly=True),
     NTupleVariable("mcNumBHadrons", lambda x : x.genjet.numBHadrons if hasattr(x, "genjet") else -1, mcOnly=True),
     NTupleVariable("mcNumCHadrons", lambda x : x.genjet.numCHadrons if hasattr(x, "genjet") else -1, mcOnly=True),
-    NTupleVariable("corr", lambda x : x.corr),
+    NTupleVariable("corr", lambda x : x.corr, mcOnly=True),
+    NTupleVariable("corr_JER", lambda x : x.corr_JER, mcOnly=True),
     NTupleVariable("corr_JESUp", lambda x : x.corr_JECUp, mcOnly=True),
     NTupleVariable("corr_JESDown", lambda x : x.corr_JECDown, mcOnly=True),
+    NTupleVariable("corr_JERUp", lambda x : x.corr_JERUp, mcOnly=True),
+    NTupleVariable("corr_JERDown", lambda x : x.corr_JERDown, mcOnly=True),
 ])
 
 #Specifies what to save for leptons
@@ -199,8 +202,12 @@ higgsType = NTupleObjectType("higgsType", variables = [
     NTupleVariable("tau2", lambda x: x.tau2 ),
     NTupleVariable("tau3", lambda x: x.tau3 ),
     NTupleVariable("bbtag", lambda x: x.bbtag ),
+    NTupleVariable("mass_softdrop", lambda x: x.mass_softdrop, help="mass of the matched softdrop jet" ),
+    NTupleVariable("mass_softdropz2b1", lambda x: x.mass_softdropz2b1, help="mass of the matched softdropz2b1 jet" ),
+    NTupleVariable("mass_pruned", lambda x: x.mass_pruned, help="mass of the matched pruned jet" ),
     NTupleVariable("n_subjettiness", lambda x: x.n_subjettiness ),
-    NTupleVariable("dr_top", lambda x: x.dr_top, help="deltaR to the best HTT candidate"),
+    NTupleVariable("dr_top", lambda x: getattr(x, "dr_top", -1), help="deltaR to the best HTT candidate"),
+    NTupleVariable("dr_genHiggs", lambda x: getattr(x, "dr_genHiggs", -1), help="deltaR to gen higgs"),
 ])
 
 FatjetCA15ungroomedType = NTupleObjectType("FatjetCA15ungroomedType", variables = [
