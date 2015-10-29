@@ -26,6 +26,16 @@ samples = cms.VPSet([
         ]),
         isMC     = cms.bool(True)
     ),
+    cms.PSet(
+        skip     = cms.bool(False),
+        name     = cms.string('singlemu'),
+        xSec     = cms.double(1),
+        nGen     = cms.int64(-1),
+        subFiles = cms.vstring([
+            path + "/singlemu.root",
+        ]),
+        isMC     = cms.bool(False)
+    ),
 ])
 
 #fill sample number of generated
