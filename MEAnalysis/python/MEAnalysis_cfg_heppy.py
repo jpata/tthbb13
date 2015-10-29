@@ -309,12 +309,13 @@ class Conf:
     }
 
     general = {
-        "passall": True,
+        "passall": False, #DS temp
         "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV6_finerPt.root",
         "QGLPlotsFile_flavour": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/Histos_QGL_flavour.root",
         #"sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_722sync.py",
         #"sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_722minisync.py",
-        "sampleFile": os.environ["CMSSW_BASE"]+"/python/TTH/MEAnalysis/samples_v12.py",
+        #"sampleFile": os.environ["CMSSW_BASE"]+"/python/TTH/MEAnalysis/samples_v12.py",
+        "sampleFile": os.environ["CMSSW_BASE"]+"/python/TTH/MEAnalysis/samples_v14.py",
         "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions.pickle",
         "transferFunctions_sj_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions_sj.pickle",
         "systematics": ["nominal"],
@@ -361,7 +362,20 @@ class Conf:
         #Generic event-dependent selection function applied
         #just before the MEM. If False, MEM is skipped
         "selection": lambda event: event.btag_LR_4b_2b > 0.95, #optimized for 40% tth(bb) acceptance
-        
+
+        #categories to run the mem
+        "categories": [
+            #"cat1",
+            #"cat2",
+            #"cat3",
+            #"cat6",
+            "cat7",
+            "cat8",
+            #"cat9",
+            "cat10",
+            "cat11",
+        ],
+
         #This configures what the array elements mean
         #Better not change this
         "methodOrder": [

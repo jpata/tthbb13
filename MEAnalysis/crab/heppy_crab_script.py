@@ -21,7 +21,10 @@ try:
     crabFiles = PSet.process.source.fileNames
     print "crabFiles=", crabFiles
     firstInput = crabFiles[0]
-    filename, firstEvent, nEvents = firstInput.split("___")
+    #filename, firstEvent, nEvents = firstInput.split("___") #DS
+    filename = firstInput
+    firstEvent = 0
+    nEvents = 100 #None
     rootfilename = "root://xrootd-cms.infn.it//" + filename
     firstEvent = int(firstEvent)
     nEvents = int(nEvents)

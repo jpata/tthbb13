@@ -29,9 +29,20 @@ Conf.mem["methodsToRun"] = (
             "FH_3w2h2t", #7j,4b          #[11]
             "FH_4w2h1t"  #7j,3b & 8j,3b  #[12]
         )
+Conf.mem["categories"] = (
+            #"cat1",
+            #"cat2",
+            #"cat3",
+            #"cat6",
+            "cat7",
+            "cat8",
+            #"cat9",
+            "cat10",
+            "cat11",
+        )
 
 Conf.general["verbosity"] = (
-            "trigger",
+            #"trigger",
             "jets",
             #"gen", #print out gen-level info
             #"debug", #very high-level debug info

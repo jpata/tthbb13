@@ -98,9 +98,10 @@ class MECategoryAnalyzer(FilterAnalyzer):
         event.catn = self.cat_map.get(cat, -1)
         event.cat_btag_n = self.btag_cat_map.get(cat_btag, -1)
         
-        event.passes_mecat = True
-        if(cat == "NOCAT"):
-            event.passes_mecat = False
+        event.passes_mecat = False
+        if cat in self.conf.mem["categories"]:    
+            event.passes_mecat = True
+
         return event
 
 class MEAnalyzer(FilterAnalyzer):
