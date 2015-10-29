@@ -3,6 +3,7 @@ import ROOT
 import copy
 import sys
 import numpy as np
+import math
 
 class Jet_container:
     def __init__(self, pt, eta, phi, mass):
@@ -155,6 +156,7 @@ class SubjetAnalyzer(FilterAnalyzer):
                 continue
 
             fatjet.n_subjettiness = fatjet.tau2 / fatjet.tau1
+            fatjet.dr_top = self.Get_DeltaR_two_objects(fatjet, top)
 
             higgsCandidates.append( fatjet )
             higgs_present = True
@@ -478,7 +480,7 @@ class SubjetAnalyzer(FilterAnalyzer):
                 print "Can't calculate Delta R: objects don't have right attributes"
                 return 0
 
-        pi = 3.1415926535897932
+        pi = math.pi
 
         del_phi = abs( obj1.phi - obj2.phi )
         if del_phi > pi: del_phi = 2*pi - del_phi

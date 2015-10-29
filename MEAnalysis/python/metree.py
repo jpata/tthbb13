@@ -200,6 +200,7 @@ higgsType = NTupleObjectType("higgsType", variables = [
     NTupleVariable("tau3", lambda x: x.tau3 ),
     NTupleVariable("bbtag", lambda x: x.bbtag ),
     NTupleVariable("n_subjettiness", lambda x: x.n_subjettiness ),
+    NTupleVariable("dr_top", lambda x: x.dr_top, help="deltaR to the best HTT candidate"),
 ])
 
 FatjetCA15ungroomedType = NTupleObjectType("FatjetCA15ungroomedType", variables = [
@@ -327,13 +328,15 @@ def getTreeProducer(conf):
         #    "b_quarks_t" : NTupleCollection("GenBFromTop", quarkType, 3, help=""),
         #    "b_quarks_h" : NTupleCollection("GenBFromHiggs", quarkType, 3, help=""),
         #    "l_quarks_w" : NTupleCollection("GenQFromW", quarkType, 5, help=""),
+            "GenHiggsBoson" : NTupleCollection("genHiggs", quarkType, 2, help="Generated Higgs boson"),
+            "GenTop" : NTupleCollection("genTop", quarkType, 4, help="Generated top quark"),
             "FatjetCA15ungroomed" : NTupleCollection("fatjets", FatjetCA15ungroomedType, 4, help="Ungroomed CA 1.5 fat jets"),
             "good_jets_nominal" : NTupleCollection("jets", jetType, 9, help="Selected jets, pt ordered"),
             "good_leptons_nominal" : NTupleCollection("leps", leptonType, 2, help="Selected leptons"),
             
-            "topCandidate_nominal": NTupleCollection("topCandidate" , topType, 28, help="Best top candidate in event"),
-            "othertopCandidate_nominal": NTupleCollection("othertopCandidate", topType, 28, help=""),
-            "higgsCandidate_nominal": NTupleCollection("higgsCandidate", higgsType, 9, help=""),
+            "topCandidate_nominal": NTupleCollection("topCandidate" , topType, 4, help="Best top candidate in event"),
+            "othertopCandidate_nominal": NTupleCollection("othertopCandidate", topType, 4, help=""),
+            "higgsCandidate_nominal": NTupleCollection("higgsCandidate", higgsType, 4, help=""),
 
             #"topCandidate" : NTupleCollection("topCandidate", topType, 28, help=""),
             #"othertopCandidate" : NTupleCollection("othertopCandidate", topType, 28, help=""),
