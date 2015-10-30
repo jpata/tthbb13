@@ -12,7 +12,7 @@ Reads VHBB Ntuple, outputs events with 1 quark and 1 jet which had minimal delR
 
 import ROOT
 import os
-import pickle
+import pickle, json
 import time
 import datetime
 try: 
@@ -315,11 +315,11 @@ def main():
     print 'Importing configuration data'
     
     try:
-        pickle_f = open( 'cfg_outputtree.dat', 'rb' )
-        config = pickle.load( pickle_f )
-        pickle_f.close()
-    except:
-        print "Unable to open cfg_outputtree.dat"
+        infile = open( 'cfg_outputtree.dat', 'rb' )
+        config = json.load( infile )
+        infile.close()
+    except Exception as e:
+        print "Unable to open cfg_outputtree.dat", e
         print "Please create using cfg_outputtree.py"
         return
 
@@ -367,17 +367,17 @@ def main():
     branches = []
 
     branches.extend( [ 'Jet_' + var for var in standard_vars ] )
-    branches.extend( [ 'Jet_' + var.format(particle='') for var in jet_extra_vars ] )
+    branches.extend( [ 'Jet_' + str(var.format(particle='')) for var in jet_extra_vars ] )
 
     branches.extend( [ 'Quark_' + var for var in standard_vars ] )
-    branches.extend( [ 'Quark_' + var.format(particle='') \
+    branches.extend( [ 'Quark_' + str(var.format(particle='')) \
         for var in quark_extra_vars ] )
 
     branches.extend( [ var for var in separate_vars ] )
 
 
 
-    # Create dicitionaries to hold the information that will be
+    # Create dictionaries to hold the information that will be
     # written as new branches
     variables      = {}
     variable_types = {}
@@ -396,7 +396,7 @@ def main():
 
     for input_root_file_name in config['input_root_file_list']:
 
-        root_file_base = 'dcap://t3se01.psi.ch:22125/pnfs/psi.ch/cms/trivcat'
+        root_file_base = config["root_file_base"]
 
         # Input tree
         print root_file_base+input_root_file_name
