@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #on PSI, CMSSW_BASE is not exported with the grid job, need to set manually
-export CMSSW_BASE=/shome/gregor/dev-745/CMSSW_7_4_5
+export CMSSW_BASE=$HOME/tth/sw/CMSSW/
 
 #print out the environment
 env

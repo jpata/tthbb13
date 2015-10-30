@@ -48,7 +48,8 @@ def Make_config():
     config['input_tree_name'] = 'tree'
 
     #the path to the root files
-    config["root_file_base"] = 'file://'
+    #config["root_file_base"] = 'file://'
+    config["root_file_base"] = "dcap:///pnfs/psi.ch/cms/trivcat/"
 
     # The config file will be copied to 'runs/{config['run_name']}'
     config['run_name'] = 'JP_V14_resolvedjet'
