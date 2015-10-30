@@ -1,8 +1,10 @@
 import sys,os,shutil,ROOT
 
 # TO BE CUSTOMIZED
-indir = 'gsiftp://stormgf2.pi.infn.it/gpfs/ddn/srm/cms/store/user/arizzi/VHBBHeppyV13/'
-outdir = 'gsiftp://t3se01.psi.ch/pnfs/psi.ch/cms/trivcat/store/t3groups/ethz-higgs/run2/VHBBHeppyV13/'
+indir = 'gsiftp://stormgf2.pi.infn.it/gpfs/ddn/srm/cms/store/user/arizzi/VHBBHeppyV15/'
+outdir = 'gsiftp://t3se01.psi.ch/pnfs/psi.ch/cms/trivcat/store/t3groups/ethz-higgs/run2/VHBBHeppyV15/'
+localfiledir = outdir.replace("gsiftp://t3se01.psi.ch", "")
+das = "/shome/jpata/util/das_cli.py"
 
 def replacerule(x):
     return x.replace("/store/user/arizzi", "/store/t3groups/ethz-higgs/run2")
@@ -18,7 +20,7 @@ def cleanList(l):
 datasets = cleanList(datasets)
 
 def getFiles(dataset):
-    files = os.popen('python ./das_cli.py --query=\"file dataset='+dataset+' instance=prod/phys03\" --limit=0').read().split("\n")
+    files = os.popen('python {0} --query=\"file dataset={1} instance=prod/phys03\" --limit=0'.format(das, dataset)).read().split("\n")
     return sorted(cleanList(files))
 
 def getCopyDump(inpath, outpath):
@@ -51,7 +53,7 @@ of = open("files_src", "w")
 of.write("\n".join(srcFiles))
 of.close()
 
-existingFiles = getExistingFiles("/pnfs/psi.ch/cms/trivcat/store/t3groups/ethz-higgs/run2/VHBBHeppyV13/")
+existingFiles = getExistingFiles(localfiledir)
 of = open("files_dst", "w")
 of.write("\n".join(existingFiles))
 of.close()
