@@ -1,9 +1,11 @@
 import ROOT, multiprocessing, rootpy
 ROOT.TH1.SetDefaultSumw2(True)
+ROOT.TH1.AddDirectory(False)
 from copy import deepcopy, copy
 
-samples = ["tth.root", "ttjets.root"]
-sample_sizes = {"tth.root":10000, "ttjets.root":10000}
+samplepath = "/Users/joosep/Documents/tth/data/ntp/v14/"
+samples = ["ttHTobb_M125_13TeV_powheg_pythia8.root"]
+sample_sizes = {"ttHTobb_M125_13TeV_powheg_pythia8.root":50000, "ttjets.root":50000}
 
 def chunks(l, n):
     """ Yield successive n-sized chunks from l.
@@ -18,7 +20,7 @@ def project_hist(tree,
     first_entry=None, n_entries=None
     ):
 
-    tf = ROOT.TFile(tree[0])
+    tf = ROOT.TFile(samplepath + tree[0])
     tt = tf.Get(tree[1])
     if n_entries is None:
         n_entries = tt.GetEntries()
@@ -28,13 +30,12 @@ def project_hist(tree,
     nbins, low, high = binning
     
     ROOT.gROOT.cd()
-    n = tt.Draw("{func} >> {hist}({nbins}, {low}, {high})".format(
-        func=func, hist=histname, nbins=nbins, low=low, high=high
-    ), selection, "goff", n_entries, first_entry
-    )
-    assert n >= 0, (histname, func, sel)
-    h = ROOT.gROOT.Get(histname).Clone(histname)
+    h = ROOT.TH1D(histname, histname, nbins, low, high)
     h.SetDirectory(ROOT.gROOT)
+    cmd = "{func} >> {hist}".format(func=func, hist=histname)
+    n = tt.Draw(cmd, selection, "goff", n_entries, first_entry)
+    assert n >= 0, (histname, func, sel)
+    #h = ROOT.gROOT.Get(histname).Clone(histname)
     assert(h != None)
     assert(h is not None)
     tf.Close()
@@ -59,14 +60,12 @@ def project_hist_kwargs(kwargs):
     )
     
 def project_hist_kwargs_multi(fn, chunksize, kwargs):
-    
-    
     args = deepcopy(kwargs)
     args["tree"] = (fn, "tree")
 
     arglist = []
     
-    tf = ROOT.TFile(fn)
+    tf = ROOT.TFile(samplepath + fn)
     tt = tf.Get("tree")
     
     chs = chunks(range(tt.GetEntries()), chunksize)
@@ -80,7 +79,7 @@ def project_hist_kwargs_multi(fn, chunksize, kwargs):
         arglist.append(d)
 
     pool = multiprocessing.Pool(4)
-    hs = map(rootpy.asrootpy, pool.map(project_hist_kwargs, arglist))
+    hs = map(rootpy.asrootpy, map(project_hist_kwargs, arglist))
     pool.close()
     pool.join()
     pool.terminate()
