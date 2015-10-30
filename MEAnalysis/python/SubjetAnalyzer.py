@@ -3,6 +3,8 @@ import ROOT
 import copy
 import sys
 import numpy as np
+import math
+from TTH.MEAnalysis.vhbb_utils import lvec
 
 class Jet_container:
     def __init__(self, pt, eta, phi, mass):
@@ -141,8 +143,10 @@ class SubjetAnalyzer(FilterAnalyzer):
         # Get a Higgs candidate
         # ======================================
 
-        higgs_present = False
+        #Types of fatjets to match to Higgs candidate
+        fatjets_to_match = ["softdropz2b1", "softdrop", "pruned"]
 
+        higgs_present = False
         higgsCandidates = []
         for fatjet in event.FatjetCA15ungroomed:
 
@@ -155,14 +159,37 @@ class SubjetAnalyzer(FilterAnalyzer):
                 continue
 
             fatjet.n_subjettiness = fatjet.tau2 / fatjet.tau1
+            fatjet.dr_top = self.Get_DeltaR_two_objects(fatjet, top)
+
+            #set default masses for all fatjet types
+            for fatjetkind in fatjets_to_match:
+                setattr(fatjet, "mass_" + fatjetkind, 0)
+            
+            genhiggs = getattr(event, "GenHiggsBoson", [])
+            #match higgs candidate to generated higgs
+            if self.cfg_comp.isMC and len(genhiggs) >= 1:
+                lv1 = lvec(fatjet)
+                lv2 = lvec(genhiggs[0])
+                fatjet.dr_genHiggs = lv1.DeltaR(lv2)
 
             higgsCandidates.append( fatjet )
             higgs_present = True
 
         # Sort by decreasing bbtag
         higgsCandidates = sorted( higgsCandidates, key=lambda x: -x.bbtag )
-
-
+        
+        #Match higgs candidates to various fat jets
+        for fatjetkind in fatjets_to_match:
+            nmatch = self.Match_two_lists(
+                higgsCandidates, 'higgs',
+                getattr(event, "FatjetCA15" + fatjetkind), 'fatjet_' + fatjetkind,
+                R_cut = self.R_cut_fatjets
+            )
+        for higgsCandidate in higgsCandidates:
+            for fatjetkind in fatjets_to_match:
+                matchjet = getattr(higgsCandidate, "matched_fatjet_" + fatjetkind, None)
+                if matchjet != None:
+                    setattr(higgsCandidate, "mass_" + fatjetkind, matchjet.mass)
         ########################################
         # Get the lists of particles: quarks, jets and subjets
         ########################################
@@ -478,7 +505,7 @@ class SubjetAnalyzer(FilterAnalyzer):
                 print "Can't calculate Delta R: objects don't have right attributes"
                 return 0
 
-        pi = 3.1415926535897932
+        pi = math.pi
 
         del_phi = abs( obj1.phi - obj2.phi )
         if del_phi > pi: del_phi = 2*pi - del_phi

@@ -25,8 +25,6 @@ class GenTTHAnalyzer(FilterAnalyzer):
         return True
 
     def _process(self, event):
-        #FIXME: Somehow, the GenWZQuark distribution is duplicated:
-        #JP: no longer the case in V12
         #event.l_quarks_w = event.GenWZQuark[0:len(event.GenWZQuark)/2]
         event.l_quarks_w = event.GenWZQuark
         event.b_quarks_t = event.GenBQuarkFromTop

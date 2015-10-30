@@ -55,7 +55,7 @@ def Make_config():
     #config['input_root_file_name'] = '/shome/tklijnsm/Samples/TFsamples/CUSTOMTFFILE_V12_FULL_SUBJETS_NC.root'
 
     #config['input_root_file_name'] = '/shome/tklijnsm/Samples/V12TFsamples/CUSTOMTFFILE_V12_FULL_JETS.root'
-    config['input_root_file_name'] = '/shome/tklijnsm/Samples/TF_V13/CUSTOMTFFILE_V13_FULL_JETS.root'
+    config['input_root_file_name'] = '/home/joosep/joosep-mac/Documents/tth/data/V14_jet_ntuple.root'
     #config['input_root_file_name'] = '/shome/tklijnsm/Samples/TF_V13/CUSTOMTFFILE_V13_FULL_SUBJETS.root'
 
     config['input_tree_name'] = 'tree'
@@ -63,7 +63,7 @@ def Make_config():
     #config['outputdir'] = 'V12_REALFULL_JETS_throwaway'
     #config['outputdir'] = 'V12_REALFULL_SUBJETS_throwaway'
     #config['outputdir'] = 'V13_SUBJETS'
-    config['outputdir'] = 'V13_JETS'
+    config['outputdir'] = 'V14_JETS'
 
         
     config['SBF_fitted_hists_pickle_filename'] = \
@@ -81,7 +81,7 @@ def Make_config():
 
     # Specify the number of entries if only a limited number of entries is used
     #   This number is not used if Use_limited_entries is set to False
-    config['n_entries_limited'] = 100000
+    config['n_entries_limited'] = 10000
 
     # Specify whether to make a TF from E_mc to E_reco, or Pt_mc to Pt_reco
     config['Use_Pt'] = True

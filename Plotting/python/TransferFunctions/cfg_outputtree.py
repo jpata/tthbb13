@@ -11,7 +11,7 @@ relevant input and parameters for outputtree-strict.py.
 # Imports
 ########################################
 
-import pickle
+import pickle, json
 import os
 import shutil
 import sys
@@ -47,8 +47,11 @@ def Make_config():
 
     config['input_tree_name'] = 'tree'
 
+    #the path to the root files
+    config["root_file_base"] = 'file://'
+
     # The config file will be copied to 'runs/{config['run_name']}'
-    config['run_name'] = 'GKTEST_0'
+    config['run_name'] = 'JP_V14_resolvedjet'
 
     config['output_root_file_name'] = 'out.root'
 
@@ -91,10 +94,10 @@ def Make_config():
     #     to add underscores where necessary manually.
 
     config['quarktypes'] = ['GenBQuarkFromTop_', 'GenBQuarkFromH_', 'GenWZQuark_' ]
-    #config['jettypes'] = [ 'Jet_' ]
+    config['jettypes'] = [ 'Jet_' ]
     
-    config['jettypes'] = [ 'httCandidates_sjW1', 'httCandidates_sjW2',
-        'httCandidates_sjNonW']
+    #config['jettypes'] = [ 'httCandidates_sjW1', 'httCandidates_sjW2',
+    #    'httCandidates_sjNonW']
 
     # Specify which branches *other* than pt, eta, phi, mass and E should be 
     # extracted.
@@ -108,16 +111,16 @@ def Make_config():
         #'{particle}status',
         ]
 
-    #config['jet_extra_vars'] = []
-
-    config['jet_extra_vars'] = [
-        '{particle}btag',
-        'httCandidates_pt',
-        'httCandidates_eta',
-        'httCandidates_phi',
-        'httCandidates_mass',
-        'httCandidates_fRec',
-        ]
+    config['jet_extra_vars'] = []
+    # 
+    # config['jet_extra_vars'] = [
+    #     '{particle}btag',
+    #     'httCandidates_pt',
+    #     'httCandidates_eta',
+    #     'httCandidates_phi',
+    #     'httCandidates_mass',
+    #     'httCandidates_fRec',
+    #     ]
 
 
     ########################################
@@ -130,22 +133,21 @@ def Make_config():
 
     config['jet_cutoff_list'] = [
         ( '{particle}pt'       , '>' , 30.0 ),
-        ( 'httCandidates_pt'   , '>' , 200.0 ),
-        ( 'httCandidates_mass' , '>' , 120.0 ),
-        ( 'httCandidates_mass' , '<' , 220.0 ),
+        #( 'httCandidates_pt'   , '>' , 200.0 ),
+        #( 'httCandidates_mass' , '>' , 120.0 ),
+        #( 'httCandidates_mass' , '<' , 220.0 ),
         #( 'httCandidates_fW'   , '<' , 0.175 ),
         ]
-
-    #config['jet_cutoff_list'] = [
-    #    ( '{particle}pt'       , '>' , 30.0 ) ]
 
     config['quark_cutoff_list'] = [
         ( '{particle}pt'       , '>' , 30.0 ) ]
 
 
+    #matching dR between gen and reco
     config['max_link_delR'] = 0.3
     
     # Only used if config['Remove_double_match'] is set to True
+    # if another match closer than dR, remove entire jet
     config['max_sec_delR'] = 0.5
 
 
@@ -154,10 +156,10 @@ def Make_config():
     ########################################
 
     f = open( 'cfg_outputtree.dat', 'wb' )
-    pickle.dump( config , f )
+    json.dump( config , f, indent=2)
     f.close()
-
-
+    
+    
     if not os.path.isdir( 'runs/{0}'.format(config['run_name'] ) ):
         os.makedirs('runs/{0}'.format(config['run_name'] ))
     else:
@@ -165,7 +167,7 @@ def Make_config():
             config['run_name'] )
         print '(no argument = overwrite, n = new dir, append a tag, l = load the original cfg_outputtree.dat instead, c = cancel)'
         dec = raw_input()
-
+    
         if dec == 'n':
             counter = 1
             while os.path.isdir( 'runs/{0}_{1}'.format(
@@ -174,22 +176,22 @@ def Make_config():
             config['run_name'] = config['run_name'] + '_{0}'.format(counter)
             os.makedirs( 'runs/{0}'.format( config['run_name'] ) )
             print 'Created runs/{0}'.format( config['run_name'] )
-
+    
         if dec == 'c':
             sys.exit
-
+    
         if dec == 'l':
             shutil.copyfile(
                 'runs/{0}/cfg_outputtree.dat'.format( config['run_name'] ),
                 'cfg_outputtree.dat' )
-
-
+    
+    
     shutil.copyfile( 'cfg_outputtree.dat',
         'runs/{0}/cfg_outputtree.dat'.format( config['run_name'] ) )
-
+    
     shutil.copyfile( 'cfg_outputtree.py',
         'runs/{0}/cfg_outputtree.py'.format( config['run_name'] ) )
-
+    
     print "cfg_outputtree.dat created"
 
 

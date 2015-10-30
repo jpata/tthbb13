@@ -115,21 +115,20 @@ class JetAnalyzer(FilterAnalyzer):
             eta_cut = "eta_dl"
 
         #define lepton-channel specific selection function
-        jetsel = lambda x, oldpt: (
+        jetsel = lambda x: (
             x.pt > self.conf.jets[ pt_cut ]
             and abs(x.eta) < self.conf.jets[ eta_cut ]
-            and self.conf.jets["selection"](x, oldpt)
+            and self.conf.jets["selection"](x)
         )
 
         event.good_jets = sorted(filter(
-                lambda x: jetsel(x, x.pt), event.Jet+event.DiscardedJet
+                lambda x: jetsel(x), event.Jet+event.DiscardedJet
             ), key=lambda x: x.pt, reverse=True
         )
 
         #Take care of overlaps between jets and veto leptons
         jets_to_remove = []
         for lep in event.veto_leptons:
-        
             #overlaps removed by delta R
             for jet in event.good_jets:
                 lv1 = lvec(jet)
@@ -139,49 +138,7 @@ class JetAnalyzer(FilterAnalyzer):
                     if "jets" in self.conf.general["verbosity"]:
                         print "[JetAnalyzer: jet lepton cleaning] deltaR", dr, lep.pt, lep.eta, lep.phi, jet.pt, jet.eta, jet.phi
                     jets_to_remove += [jet]
-            #overlaps removed by jet overlap index
-            #if lep.jetOverlapIdx is None:
-            #    idx = -1
-            #else:
-            #    idx = int(lep.jetOverlapIdx)
-            #if idx != -1:
-            #    coll = event.Jet
-            #    if idx >= 1000:
-            #        coll = event.DiscardedJet
-            #        idx = idx - 1000
-            #    if idx >=0 and idx < len(coll):
-            #        jet = coll[idx]
-            #        if jet in event.good_jets:
-            #            lv1 = lvec(jet)
-            #            lv2 = lvec(lep)
-            #            dr = lv1.DeltaR(lv2)
-            #            #print "pfoverlap", event.input.run, event.input.lumi, event.input.evt, int(lep.jetOverlapIdx), dr, lep.pt, lep.eta, lep.phi, jet.pt, jet.eta, jet.phi
-            #            jets_to_remove += [jet]
-            #            #jet subtraction
-            #            #newjet = deepcopy(jet)
-            #            #p1 = lvec(jet)
-            #            #p2 = lvec(lep)
 
-            #            ##lepton was harder than jet
-            #            #if p1.Pt() < p2.Pt():
-            #            #    print "lepton was harder than jet", p1.Pt(), p2.Pt()
-            #            #    continue
-            #            #p1 = p1 - p2
-            #            #print p1.Pt()
-            #            #newjet.pt = p1.Pt()
-            #            #newjet.eta = p1.Eta()
-            #            #newjet.phi = p1.Phi()
-            #            #newjet.mass = p1.M()
-
-            #            ##apply consistent jet selection, rescaling energy fractions by pt ratio
-            #            #if jetsel(newjet, jet.pt):
-            #            #    print "jet subtracted", jet.pt, newjet.pt, jet.eta, newjet.eta
-            #            #    event.good_jets[event.good_jets.index(jet)] = newjet
-            #            #else:
-            #            #    print "jet does not pass selection after subtraction", jet.pt, newjet.pt, jet.eta, newjet.eta
-            #    else:
-            #        #raise ValueError("wrong idx: idx={0} len(coll)={1}".format(idx, len(coll)))
-            #        print "[JetAnalyzer] jet removal, wrong idx: idx={0} len(coll)={1}".format(idx, len(coll))
         for jet in jets_to_remove:
             if "jets" in self.conf.general["verbosity"]:
                 print "removing jet", jet.pt, jet.eta
