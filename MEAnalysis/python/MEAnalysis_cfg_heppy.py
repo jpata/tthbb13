@@ -151,7 +151,8 @@ class Conf:
         "paths": [
         
             #SL triggers
-            "HLT_BIT_HLT_Ele27_eta2p1_WP85_Gsf_HT200_v",
+            "HLT_BIT_HLT_Ele27_eta2p1_WP85_Gsf_HT200_v", #not in data (V15)
+            "HLT_BIT_HLT_Ele27_eta2p1_WPLoose_Gsf_HT200_v", #in data
             "HLT_BIT_HLT_IsoMu24_eta2p1_v",
             
             #DL triggers
