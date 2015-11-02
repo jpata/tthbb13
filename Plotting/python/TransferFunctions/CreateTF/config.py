@@ -14,7 +14,7 @@ config.dat.
 # Imports
 ########################################
 
-import pickle
+import pickle, json
 import os
 import shutil
 import copy
@@ -55,7 +55,7 @@ def Make_config():
     #config['input_root_file_name'] = '/shome/tklijnsm/Samples/TFsamples/CUSTOMTFFILE_V12_FULL_SUBJETS_NC.root'
 
     #config['input_root_file_name'] = '/shome/tklijnsm/Samples/V12TFsamples/CUSTOMTFFILE_V12_FULL_JETS.root'
-    config['input_root_file_name'] = '/home/joosep/joosep-mac/Documents/tth/data/V14_jet_ntuple.root'
+    config['input_root_file_name'] = '/shome/jpata/tth/gc/JetTree_V14.root'
     #config['input_root_file_name'] = '/shome/tklijnsm/Samples/TF_V13/CUSTOMTFFILE_V13_FULL_SUBJETS.root'
 
     config['input_tree_name'] = 'tree'
@@ -342,7 +342,7 @@ def Make_config():
     ########################################
 
     f = open( 'config.dat', 'wb' )
-    pickle.dump( config , f )
+    pickle.dump( config , f)
 
     print "config.dat created"
 
