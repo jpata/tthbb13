@@ -26,7 +26,7 @@ step2:
 	cd $(CMSSW_BASE)/src/VHbbAnalysis/Heppy/test && ls  ~/tth/spring15/sync/ttjets/block*.root | $(PARCMD) --result out_ttjets_step2 -j30 python ./vhbb_parallel.py {} ttjets_block{#}
 
 step3:
-	seq 0 75 | $(PARCMD) -j30 ./python/MEAnalysis_heppy_parallel.py {}
+	seq 0 41 | $(PARCMD) -j30 ./python/MEAnalysis_heppy_parallel.py {}
 
 step4:
 	python python/makeTable.py tth.root nominal > tth.csv

@@ -28,6 +28,7 @@ xsec[("qcd_ht2000toinf", "13TeV")] = 25.42
 xsec_sample = {
     "TT_TuneCUETP8M1_13TeV-powheg-pythia8": xsec[("ttjets", "13TeV")],
     "ttHTobb_M125_13TeV_powheg_pythia8": xsec[("tthbb", "13TeV")],
+    "ttHToNonbb_M125_13TeV_powheg_pythia8": xsec[("tth_nonbb", "13TeV")],
 }
 
 #Configure the site-specific file path
