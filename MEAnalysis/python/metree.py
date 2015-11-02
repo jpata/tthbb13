@@ -369,21 +369,21 @@ def getTreeProducer(conf):
             ("cat_gen",             int,        "top decay category (-1 unknown, 0 single-leptonic, 1 di-leptonic, 2 fully hadronic)", "cat_gen_n"),
             ("btag_lr_4b",          float,      "4b, N-4 light, probability, 3D binning"),
             ("btag_lr_2b",          float,      "2b, N-2 Nlight probability, 3D binning"),
-            ("btag_lr_4b_Rndge4t",  float,      "4b, N-4 light, probability, 3D binning, ge4t random"),
-            ("btag_lr_2b_Rndge4t",  float,      "2b, N-2 Nlight probability, 3D binning, ge4t random"),
-            ("btag_lr_4b_Inpge4t",  float,      "4b, N-4 light, probability, 3D binning, ge4t input"),
-            ("btag_lr_2b_Inpge4t",  float,      "2b, N-2 Nlight probability, 3D binning, ge4t input"),
-            ("btag_lr_4b_Rnd3t",    float,      "4b, N-4 light, probability, 3D binning, 3t   random"),
-            ("btag_lr_2b_Rnd3t",    float,      "2b, N-2 Nlight probability, 3D binning, 3t   random"),
-            ("btag_lr_4b_Inp3t",    float,      "4b, N-4 light, probability, 3D binning, 3t   input"),
-            ("btag_lr_2b_Inp3t",    float,      "2b, N-2 Nlight probability, 3D binning, 3t   input"),
+            #("btag_lr_4b_Rndge4t",  float,      "4b, N-4 light, probability, 3D binning, ge4t random"),
+            #("btag_lr_2b_Rndge4t",  float,      "2b, N-2 Nlight probability, 3D binning, ge4t random"),
+            #("btag_lr_4b_Inpge4t",  float,      "4b, N-4 light, probability, 3D binning, ge4t input"),
+            #("btag_lr_2b_Inpge4t",  float,      "2b, N-2 Nlight probability, 3D binning, ge4t input"),
+            #("btag_lr_4b_Rnd3t",    float,      "4b, N-4 light, probability, 3D binning, 3t   random"),
+            #("btag_lr_2b_Rnd3t",    float,      "2b, N-2 Nlight probability, 3D binning, 3t   random"),
+            #("btag_lr_4b_Inp3t",    float,      "4b, N-4 light, probability, 3D binning, 3t   input"),
+            #("btag_lr_2b_Inp3t",    float,      "2b, N-2 Nlight probability, 3D binning, 3t   input"),
 
             ("btag_LR_4b_2b",        float,      ""),
-            ("btag_LR_4b_2b_ded",        float,      ""),
-            ("btag_LR_4b_2b_Rndge4t",float,      ""),
-            ("btag_LR_4b_2b_Inpge4t",float,      ""),
-            ("btag_LR_4b_2b_Rnd3t",  float,      ""),
-            ("btag_LR_4b_2b_Inp3t",  float,      ""),
+            #("btag_LR_4b_2b_ded",        float,      ""),
+            #("btag_LR_4b_2b_Rndge4t",float,      ""),
+            #("btag_LR_4b_2b_Inpge4t",float,      ""),
+            #("btag_LR_4b_2b_Rnd3t",  float,      ""),
+            #("btag_LR_4b_2b_Inp3t",  float,      ""),
             ("qg_LR_flavour_4q_0q", float,      ""),
             ("qg_LR_flavour_4q_1q", float,      ""), 
             ("qg_LR_flavour_4q_2q", float,      ""),
@@ -488,7 +488,6 @@ def getTreeProducer(conf):
         for vtype in [
             ("weight_xs",               float,  ""),
             ("ttCls",                   int,    ""),
-            ("rho",                     float,  ""),
             ("bTagWeight",              float,  ""),
             ("bTagWeight_HFDown",       float,  ""),
             ("bTagWeight_HFUp",         float,  ""),
@@ -500,9 +499,13 @@ def getTreeProducer(conf):
             ("bTagWeight_Stats1Up",     float,  ""),
             ("bTagWeight_Stats2Down",   float,  ""),
             ("bTagWeight_Stats2Up",     float,  ""),
-            ("json",                    float,  ""),
             ("nPU0",                    float,  ""),
             ("nPVs",                    float,  ""),
         ]:
             treeProducer.globalVariables += [makeGlobalVariable(vtype, systematic, mcOnly=True)]
+    for vtype in [
+        ("rho",                     float,  ""),
+        ("json",                    float,  ""),
+    ]:
+        treeProducer.globalVariables += [makeGlobalVariable(vtype, "nominal", mcOnly=False)]
     return treeProducer
