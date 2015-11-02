@@ -113,15 +113,17 @@ def Make_config():
         ]
 
     config['jet_extra_vars'] = []
-    # 
-    # config['jet_extra_vars'] = [
-    #     '{particle}btag',
+     
+    config['jet_extra_vars'] = [
+        '{particle}hadronFlavour',
+        '{particle}btagCSV',
+        '{particle}btagBDT',
     #     'httCandidates_pt',
     #     'httCandidates_eta',
     #     'httCandidates_phi',
     #     'httCandidates_mass',
     #     'httCandidates_fRec',
-    #     ]
+    ]
 
 
     ########################################
