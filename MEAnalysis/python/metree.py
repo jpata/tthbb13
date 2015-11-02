@@ -432,9 +432,12 @@ def getTreeProducer(conf):
         ]:
 
             is_mc_only = False
+
+            #Matching variables only defined for MC
             if "match" in vtype[0].lower():
                 is_mc_only = True
-            if systematic != "raw":
+            #only define the nominal values for data
+            if systematic != "nominal":
                 is_mc_only = True
 
             treeProducer.globalVariables += [makeGlobalVariable(vtype, systematic, mcOnly=is_mc_only)]
