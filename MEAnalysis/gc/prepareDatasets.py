@@ -15,7 +15,8 @@ for sample_name, sample in samples_dict.items():
     ngen2 = 0
     ngenNeg2 = 0
     ngenPos2 = 0
-
+    if sample.skip:
+        continue
     files = sample.subFiles
     outfile = open(sample.nickname.value()+".dat", "a")
     outfile.write("[{0}]\n".format(sample_name))
