@@ -13,15 +13,26 @@ import datetime
 #ncores = multiprocessing.cpu_count()
 ncores = 4
 
-samplepath = "/Users/joosep/Documents/tth/data/ntp/v14/"
-samples = ["ttHTobb_M125_13TeV_powheg_pythia8.root", "TT_TuneCUETP8M1_13TeV-powheg-pythia8.root"]
+samplepath = "/Users/joosep/Documents/tth/data/ntp/v14/small/"
+samples = [
+    "ttHTobb_M125_13TeV_powheg_pythia8.root",
+    "ttHToNonbb_M125_13TeV_powheg_pythia8.root",
+    "TT_TuneCUETP8M1_13TeV-powheg-pythia8.root", 
+    "SingleMuon.root",
+    #"SingleElectron.root"
+    ]
 
-def weight_str(cut, sample, weight=1.0, lumi=1.0):
+def is_data(sample):
+    if "Single" in sample:
+        return True
+    return False
+
+def weight_str(cut, sample, weight=1.0, lumi=1000.0):
     w = 1.0
-    if "ttbar" in sample:
-        w = 0.5
-    return "weight_xs * sign(genWeight) * {1} * {2} * {3} * ({0})".format(cut, weight, lumi, w)
-    #return "1.0 * ({0})".format(cut)
+    if not is_data(sample):
+        return "weight_xs * sign(genWeight) * {1} * {2} * {3} * ({0})".format(cut, weight, lumi, w)
+    else:
+        return cut
 
 def drawHelper(args):
     """
@@ -66,6 +77,7 @@ def Draw(tf, of, sample, *args):
     """
     hist = args[0]
     cut = args[1]
+    cut = weight_str(cut, sample)
     hname = hist.split(">>")[1].split("(")[0].strip()
     hbins = hist.split(">>")[1].split("(")[1].strip()
     hfunc = hist.split(">>")[0]
@@ -95,7 +107,7 @@ def Draw(tf, of, sample, *args):
     ROOT.gROOT.cd()            
     if npool == 1:
         n = tf.Draw(h, cuts, "goff")
-        h = ROOT.gROOT.Get(hname_new)
+        h = ROOT.gROOT.Get(hname)
     else:
         parargs = []
         for ch in chunks:
@@ -136,6 +148,7 @@ if __name__ == "__main__":
     event_counts = {}
     
     for sample in samples:
+        print sample
         sample_shortname = sample.replace(".root", "")
 
         event_counts[sample_shortname] = {}
@@ -152,7 +165,7 @@ if __name__ == "__main__":
         
         sampled = of.mkdir(sample_shortname)
         sampled.cd()
-        
+
         for cutname, cut in [
             ("sl", "is_sl"),
             ("sl_jge6_t2", "is_sl && numJets>=6 && nBCSVM==2"),
@@ -161,20 +174,29 @@ if __name__ == "__main__":
             ]:
             
             print "cut:", cutname
-
+            
+            trig = "(1)"
+            if "sl" in cutname:
+                trig = "(HLT_BIT_HLT_Ele27_eta2p1_WPLoose_Gsf_HT200_v || HLT_BIT_HLT_IsoMu24_eta2p1_v)"
+            cut = "{0} && {1}".format(cut, trig)
             jetd = sampled.mkdir(cutname)
+            Draw(tf, jetd, sample_shortname, "nBCSVM:numJets >> njets_ntags(15,0,15,15,0,15)", cut)
             
             Draw(tf, jetd, sample_shortname, "leps_pt[0] >> lep0_pt(20,0,500)", cut)
-            Draw(tf, jetd, sample_shortname, "leps_pt[1] >> lep1_pt(20,0,500)", cut)
+            if "dl" in cutname:
+                Draw(tf, jetd, sample_shortname, "leps_pt[1] >> lep1_pt(20,0,500)", cut)
 
             Draw(tf, jetd, sample_shortname, "leps_pdgId[0] >> lep0_pdgId(100,-50,50)", cut)
-            Draw(tf, jetd, sample_shortname, "leps_pdgId[1] >> lep1_pdgId(100,-50,50)", cut)
+            if "dl" in cutname:
+                Draw(tf, jetd, sample_shortname, "leps_pdgId[1] >> lep1_pdgId(100,-50,50)", cut)
 
             Draw(tf, jetd, sample_shortname, "leps_relIso03[0] >> lep0_relIso03(100,0,0.5)", cut)
-            Draw(tf, jetd, sample_shortname, "leps_relIso03[1] >> lep1_relIso03(100,0,0.5)", cut)
+            if "dl" in cutname:
+                Draw(tf, jetd, sample_shortname, "leps_relIso03[1] >> lep1_relIso03(100,0,0.5)", cut)
 
             Draw(tf, jetd, sample_shortname, "leps_relIso04[0] >> lep0_relIso04(100,0,0.5)", cut)
-            Draw(tf, jetd, sample_shortname, "leps_relIso04[1] >> lep1_relIso04(100,0,0.5)", cut)
+            if "dl" in cutname:
+                Draw(tf, jetd, sample_shortname, "leps_relIso04[1] >> lep1_relIso04(100,0,0.5)", cut)
 
             #Draw(tf, jetd, gensyst, "nBCSVM:numJets >> njets_ntags(15,0,15,15,0,15)", cut)
             Draw(tf, jetd, sample_shortname, "jets_pt[0] >> jet0_pt(20,0,500)", cut)
@@ -191,6 +213,14 @@ if __name__ == "__main__":
             
             Draw(tf, jetd, sample_shortname, "btag_LR_4b_2b >> btag_LR_4b_2b(200,0,1)", cut)
             Draw(tf, jetd, sample_shortname, "log(btag_LR_4b_2b/(1.0-btag_LR_4b_2b)) >> btag_LR_4b_2b_logit(60,-20,20)", cut)
+
+            Draw(tf, jetd, sample_shortname, "higgsCandidate_mass >> higgsCandidate_mass(60, 0, 500)", cut)
+
+            Draw(tf, jetd, sample_shortname, "higgsCandidate_tau1 >> higgsCandidate_tau1(60, 0, 1)", cut)
+            Draw(tf, jetd, sample_shortname, "higgsCandidate_tau2 >> higgsCandidate_tau2(60, 0, 1)", cut)
+            Draw(tf, jetd, sample_shortname, "higgsCandidate_tau3 >> higgsCandidate_tau3(60, 0, 1)", cut)
+            Draw(tf, jetd, sample_shortname, "higgsCandidate_bbtag >> higgsCandidate_bbtag(60, -1, 1)", cut)
+            Draw(tf, jetd, sample_shortname, "higgsCandidate_n_subjettiness >> higgsCandidate_n_subjettiness(60, -1, 1)", cut)
 
             #MEM distributions
             for matchname, matchcut in [

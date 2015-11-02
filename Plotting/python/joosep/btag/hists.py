@@ -45,19 +45,19 @@ def makeControlPlots(discname, low):
         }
     }
 
-    tt.Draw("{0} >> {0}_b_Bin0__rec".format(discname), "abs(eta)<=1.0 && abs(id)==5")
-    tt.Draw("{0} >> {0}_b_Bin1__rec".format(discname), "abs(eta)>1.0 && abs(id)==5")
+    tt.Draw("Jet_{0} >> {0}_b_Bin0__rec".format(discname), "abs(Jet_eta)<=1.0 && abs(Jet_hadronFlavour)==5")
+    tt.Draw("Jet_{0} >> {0}_b_Bin1__rec".format(discname), "abs(Jet_eta)>1.0 && abs(Jet_hadronFlavour)==5")
 
-    tt.Draw("{0} >> {0}_c_Bin0__rec".format(discname), "abs(eta)<=1.0 && abs(id)==4")
-    tt.Draw("{0} >> {0}_c_Bin1__rec".format(discname), "abs(eta)>1.0 && abs(id)==4")
+    tt.Draw("Jet_{0} >> {0}_c_Bin0__rec".format(discname), "abs(Jet_eta)<=1.0 && abs(Jet_hadronFlavour)==4")
+    tt.Draw("Jet_{0} >> {0}_c_Bin1__rec".format(discname), "abs(Jet_eta)>1.0 && abs(Jet_hadronFlavour)==4")
 
-    tt.Draw("{0} >> {0}_l_Bin0__rec".format(discname), "abs(eta)<=1.0 && abs(id)!=4 && abs(id)!=5")
-    tt.Draw("{0} >> {0}_l_Bin1__rec".format(discname), "abs(eta)>1.0 && abs(id)!=4 && abs(id)!=5")
+    tt.Draw("Jet_{0} >> {0}_l_Bin0__rec".format(discname), "abs(Jet_eta)<=1.0 && abs(Jet_hadronFlavour)!=4 && abs(Jet_hadronFlavour)!=5")
+    tt.Draw("Jet_{0} >> {0}_l_Bin1__rec".format(discname), "abs(Jet_eta)>1.0 && abs(Jet_hadronFlavour)!=4 && abs(Jet_hadronFlavour)!=5")
 
 
-    tt.Draw("{0}:abs(eta):pt >> {0}_b_pt_eta".format(discname), "abs(id)==5")
-    tt.Draw("{0}:abs(eta):pt >> {0}_c_pt_eta".format(discname), "abs(id)==4")
-    tt.Draw("{0}:abs(eta):pt >> {0}_l_pt_eta".format(discname), "abs(id)!=4 && abs(id)!=5")
+    tt.Draw("Jet_{0}:abs(Jet_eta):Jet_pt >> {0}_b_pt_eta".format(discname), "abs(Jet_hadronFlavour)==5")
+    tt.Draw("Jet_{0}:abs(Jet_eta):Jet_pt >> {0}_c_pt_eta".format(discname), "abs(Jet_hadronFlavour)==4")
+    tt.Draw("Jet_{0}:abs(Jet_eta):Jet_pt >> {0}_l_pt_eta".format(discname), "abs(Jet_hadronFlavour)!=4 && abs(Jet_hadronFlavour)!=5")
 
     #normalize 1D distributions
     for k in hists.keys():
