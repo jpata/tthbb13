@@ -274,8 +274,9 @@ class MEAnalyzer(FilterAnalyzer):
             print "-----"
             print "MEM id={0},{1},{2} cat={3} cat_b={4} nj={5} nt={6} nel={7} nmu={8} syst={9}".format(
                 event.input.run, event.input.lumi, event.input.evt,
+                event.is_sl, event.is_dl,
                 event.cat, event.cat_btag, event.numJets, event.nBCSVM,
-                event.n_mu_tight, event.n_el_tight, getattr(event, "systematic", None),
+                getattr(event, "systematic", None),
             )
 
         for hypo in [MEM.Hypothesis.TTH, MEM.Hypothesis.TTBB]:
@@ -310,14 +311,18 @@ class MEAnalyzer(FilterAnalyzer):
 
                 #if "meminput" in self.conf.general["verbosity"]:
                 if "meminput" in self.conf.general["verbosity"]:
-                    print "MEM conf={0} fs={1} nb={2} nq={3} doCalc={4} sel={5} inRun={6}".format(
+                    print "MEM conf={0} fs={1} nl={2} nb={3} nq={4} numJets={5} nBCSVM={6} bLR={7} doCalc={8} enabled={9} selection={10} inRun={11} isMC={12}".format(
                         confname,
                         fstate,
+                        len(mem_cfg.lepton_candidates(event)),
                         len(mem_cfg.b_quark_candidates(event)),
                         len(mem_cfg.l_quark_candidates(event)),
+                        event.numJets, event.nBCSVM, event.btag_LR_4b_2b,
                         mem_cfg.do_calculate(event, mem_cfg),
+                        mem_cfg.enabled,
                         self.conf.mem["selection"](event),
-                        confname in self.memkeysToRun
+                        confname in self.memkeysToRun,
+                        self.cfg_comp.isMC
                     )
                     
                 #Run MEM if we did not explicitly disable it

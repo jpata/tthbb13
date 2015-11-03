@@ -5,6 +5,16 @@ retcode = 0
 filename = ""
 entries = 0
 
+def findSampleName(n):
+    spl = n.split("/")
+    ibase = 0
+    #find index of VHBBHeppyV*
+    for s in spl:
+        if "VHBBHeppy" in s:
+            break
+        ibase += 1
+    #sample name is the next one
+    return spl[ibase+1]
 try:
     print "heppy_crab_script.py started"
     import ROOT
@@ -66,10 +76,27 @@ try:
     except AttributeError as e:
         retcode = 8001
         raise e
+
+    from TTH.MEAnalysis.MEAnalysis_cfg_heppy import conf_to_str
+    print "MEM config", conf_to_str(cfo.conf)
     
     #replace files with crab ones
-    config.components[0].files=[rootfilename]
-    
+    #Also get the correct sample (xsec) based on the file name
+    #config.components[0].files=[rootfilename]
+    sampleName = findSampleName(rootfilename)
+    sample = cfo.samples_dict[sampleName]
+    sample.subFiles = [rootfilename]
+    print "Running over sample", sample
+    config.components = [cfg.Component(
+        sample.name.value(),
+        files = [rootfilename],
+        tree_name = "tree",
+        n_gen = sample.nGen.value(),
+        xs = sample.xSec.value(),
+    )]
+    #need to set isMC like this for heppy to find it
+    config.components[0].isMC = sample.isMC.value()
+
     from PhysicsTools.HeppyCore.framework.looper import Looper
     print "processing",rootfilename, firstEvent, nEvents
     looper = Looper( 'Output', config, nPrint = 0, firstEvent=firstEvent, nEvents=nEvents)

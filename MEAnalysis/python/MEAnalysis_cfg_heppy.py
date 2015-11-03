@@ -261,7 +261,8 @@ class Conf:
         #Generic event-dependent selection function applied
         #just before the MEM. If False, MEM is skipped for all hypos
         #note that we set hypothesis-specific cuts below
-        "selection": lambda event: (event.btag_LR_4b_2b > 0.95
+        "selection": lambda event: (
+            event.btag_LR_4b_2b > 0.80
             or (event.is_sl and event.nBCSVM >= 3) #always calculate for tagged events
             or (event.is_dl and event.nBCSVM >= 2) #always calculate for tagged events
         ),
@@ -565,10 +566,10 @@ def conf_to_str(Conf):
     for k, v in sorted(Conf.__dict__.items(), key=lambda x: x[0]):
         s += "{0}: ".format(k)
         if isinstance(v, dict):
-            s += print_dict(v)
+            s += print_dict(v) + ",\n"
         elif isinstance(v, ROOT.TF1):
-            s += "ROOT.TF1({0}, {1})".format(v.GetName(), v.GetTitle())
+            s += "ROOT.TF1({0}, {1})".format(v.GetName(), v.GetTitle()) + ",\n"
         else:
-            s += str(v)
+            s += str(v) + ",\n"
     s += "\n"
     return s

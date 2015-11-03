@@ -2,7 +2,7 @@ print "loaded heppy_crab_fake_pset.py"
 import FWCore.ParameterSet.Config as cms
 process = cms.Process('FAKE')
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring("/store/user/jpata/VHBBHeppyV12/TT_TuneCUETP8M1_13TeV-powheg-pythia8/VHBB_HEPPY_V12_TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/150723_083110/0000/tree_60.root___0___5000"
+    fileNames = cms.untracked.vstring("/store/t3groups/ethz-higgs/run2/VHBBHeppyV14/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V14_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/151025_084144/0000/tree_1.root___0___500"
 ))
 process.output = cms.OutputModule("PoolOutputModule", fileName = cms.untracked.string('tree.root'))
 process.out = cms.EndPath(process.output)
