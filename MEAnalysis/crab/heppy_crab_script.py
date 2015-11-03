@@ -97,14 +97,13 @@ finally:
     fwkerr = ""
     if retcode != 0:
         fwkerr = '''
-    <FrameworkError ExitStatus="{0}" Type="Fatal Exception" >
-    <![CDATA[
-    {1}
-    ]]>
-    </FrameworkError>
-   '''.format(retcode, errmsg)
+<FrameworkError ExitStatus="{0}" Type="Fatal Exception" >
+<![CDATA[{1}]]>
+</FrameworkError>
+'''.format(retcode, retcode)
 
     fwkreport='''<FrameworkJobReport>
+    {2}
     <ReadBranches>
     </ReadBranches>
     <PerformanceReport>
@@ -143,7 +142,6 @@ finally:
     <TotalEvents>{1}</TotalEvents>
     <BranchHash>dc90308e392b2fa1e0eff46acbfa24bc</BranchHash>
     </File>
-    {2}
     </FrameworkJobReport>'''.format(filename, entries, fwkerr)
      
     f1=open('./FrameworkJobReport.xml', 'w+')

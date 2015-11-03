@@ -55,7 +55,7 @@ def Make_config():
     #config['input_root_file_name'] = '/shome/tklijnsm/Samples/TFsamples/CUSTOMTFFILE_V12_FULL_SUBJETS_NC.root'
 
     #config['input_root_file_name'] = '/shome/tklijnsm/Samples/V12TFsamples/CUSTOMTFFILE_V12_FULL_JETS.root'
-    config['input_root_file_name'] = '/shome/jpata/tth/gc/JetTree_V14.root'
+    config['input_root_file_name'] = '/shome/jpata/tth/gc/JetTree_V14_subjet.root'
     #config['input_root_file_name'] = '/shome/tklijnsm/Samples/TF_V13/CUSTOMTFFILE_V13_FULL_SUBJETS.root'
 
     config['input_tree_name'] = 'tree'

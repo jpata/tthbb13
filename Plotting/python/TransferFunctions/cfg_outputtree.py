@@ -95,10 +95,10 @@ def Make_config():
     #     to add underscores where necessary manually.
 
     config['quarktypes'] = ['GenBQuarkFromTop_', 'GenBQuarkFromH_', 'GenWZQuark_' ]
-    config['jettypes'] = [ 'Jet_' ]
+    #config['jettypes'] = [ 'Jet_' ]
     
-    #config['jettypes'] = [ 'httCandidates_sjW1', 'httCandidates_sjW2',
-    #    'httCandidates_sjNonW']
+    config['jettypes'] = [ 'httCandidates_sjW1', 'httCandidates_sjW2',
+        'httCandidates_sjNonW']
 
     # Specify which branches *other* than pt, eta, phi, mass and E should be 
     # extracted.
@@ -115,14 +115,14 @@ def Make_config():
     config['jet_extra_vars'] = []
      
     config['jet_extra_vars'] = [
-        '{particle}hadronFlavour',
-        '{particle}btagCSV',
-        '{particle}btagBDT',
-    #     'httCandidates_pt',
-    #     'httCandidates_eta',
-    #     'httCandidates_phi',
-    #     'httCandidates_mass',
-    #     'httCandidates_fRec',
+    #    '{particle}hadronFlavour',
+    #    '{particle}btagCSV',
+    #    '{particle}btagBDT',
+         'httCandidates_pt',
+         'httCandidates_eta',
+         'httCandidates_phi',
+         'httCandidates_mass',
+         'httCandidates_fRec',
     ]
 
 
@@ -135,10 +135,10 @@ def Make_config():
 
 
     config['jet_cutoff_list'] = [
-        ( '{particle}pt'       , '>' , 30.0 ),
-        #( 'httCandidates_pt'   , '>' , 200.0 ),
-        #( 'httCandidates_mass' , '>' , 120.0 ),
-        #( 'httCandidates_mass' , '<' , 220.0 ),
+        #( '{particle}pt'       , '>' , 30.0 ),
+        ( 'httCandidates_pt'   , '>' , 200.0 ),
+        ( 'httCandidates_mass' , '>' , 120.0 ),
+        ( 'httCandidates_mass' , '<' , 220.0 ),
         #( 'httCandidates_fW'   , '<' , 0.175 ),
         ]
 
