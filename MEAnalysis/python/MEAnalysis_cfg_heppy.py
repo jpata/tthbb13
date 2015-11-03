@@ -261,7 +261,7 @@ class Conf:
         #Generic event-dependent selection function applied
         #just before the MEM. If False, MEM is skipped for all hypos
         #note that we set hypothesis-specific cuts below
-        "selection": lambda event: (event.btag_LR_4b_2b > 0.90
+        "selection": lambda event: (event.btag_LR_4b_2b > 0.95
             or (event.is_sl and event.nBCSVM >= 3) #always calculate for tagged events
             or (event.is_dl and event.nBCSVM >= 2) #always calculate for tagged events
         ),
@@ -301,8 +301,8 @@ class Conf:
             #"SL_2w2h1t_l",
             #"SL_2w2h1t_h",
             "SL_2w2h2t",
-            "SL_2w2h2t_sj",
-            "SL_0w2h2t_sj",
+            #"SL_2w2h2t_sj",
+            #"SL_0w2h2t_sj",
             #"SL_2w2h2t_memLR",
             #"SL_0w2h2t_memLR",
             #"DL_0w2h2t_Rndge4t",
