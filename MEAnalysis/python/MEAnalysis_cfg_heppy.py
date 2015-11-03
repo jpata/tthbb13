@@ -262,7 +262,7 @@ class Conf:
         #just before the MEM. If False, MEM is skipped for all hypos
         #note that we set hypothesis-specific cuts below
         "selection": lambda event: (
-            event.btag_LR_4b_2b > 0.80
+            event.btag_LR_4b_2b > 0.95
             or (event.is_sl and event.nBCSVM >= 3) #always calculate for tagged events
             or (event.is_dl and event.nBCSVM >= 2) #always calculate for tagged events
         ),
