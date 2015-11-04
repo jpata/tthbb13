@@ -20,8 +20,67 @@ import sklearn.metrics
 from sklearn.ensemble import GradientBoostingClassifier
 import math
 
+import matplotlib.patches as mpatches
+import matplotlib.lines as mlines
+
+matplotlib.rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
+
 matplotlib.rc("axes", labelsize=24)
 matplotlib.rc("axes", titlesize=16)
+
+colors = {
+    "ttbarOther": (251, 102, 102),
+    "ttbarPlusCCbar": (204, 2, -0),
+    "ttbarPlusB": (153, 51, 51),
+    "ttbarPlusBBbar": (102, 0, 0),
+    "ttbarPlus2B": (80, 0, 0),
+    "ttH": (44, 62, 167),
+    "ttHbb": (44, 62, 167),
+    "ttHnonbb": (39, 57, 162),
+    "other": (251, 73, 255),
+}
+
+
+#List of sample filenames -> short names
+samplelist = [
+    ("ttHTobb_M125_13TeV_powheg_pythia8", "ttHbb"),
+    ("TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttbb", "ttbarPlusBBbar"),
+    ("TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttb", "ttbarPlusB"),
+    ("TT_TuneCUETP8M1_13TeV-powheg-pythia8_tt2b", "ttbarPlus2B"),
+    ("TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttcc", "ttbarPlusCCbar"),
+    ("TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttll", "ttbarOther"),
+]
+samplecolors = [colors[sn[1]] for sn in samplelist]
+
+varnames = {
+    "jet0_pt": "leading jet $p_T$ [GeV]",
+    "jet1_pt": "subleading jet $p_T$ [GeV]",
+
+    "jet0_btagCSV": "leading jet $b_{\\mathrm{CSV}}$",
+    "jet1_btagCSV": "subleading jet $b_{\\mathrm{CSV}}$",
+
+    "jet0_eta": "leading jet $\eta$",
+    "jet1_eta": "subleading jet $\eta$",
+
+    "jet0_aeta": "leading jet $|\eta|$",
+    "jet1_aeta": "subleading jet $|\eta|$",
+
+    "lep0_pt": "leading lepton $p_T$ [GeV]",
+    "lep1_pt": "subleading jet $p_T$ [GeV]",
+
+    "lep0_eta": "leading lepton $|\eta|$ [GeV]",
+    "lep1_eta": "subleading jet $|\eta|$ [GeV]",
+
+    "njets": "$N_{\\mathrm{jets}}$",
+    "ntags": "$N_{\\mathrm{CSVM}}$",
+
+    "btag_LR_4b_2b_logit": "$\\log{\\mathcal{F} / (1 - \\mathcal{F})}$",
+}
+
+varunits = {
+    "jet0_pt": "GeV",
+    "jet1_pt": "GeV"
+}
 
 def process_sample_hist(fnames, hname, func, bins, cut, **kwargs):
     tt = ROOT.TChain("tree")
@@ -33,6 +92,7 @@ def process_sample_hist(fnames, hname, func, bins, cut, **kwargs):
     if h:
         h.Delete()
     h = ROOT.TH1D(hname, "", bins[0], bins[1], bins[2])
+    h.Sumw2()
     hname = h.GetName()
     h = rootpy.asrootpy(h)
     h.SetDirectory(ROOT.gROOT)
@@ -218,7 +278,7 @@ def mc_stack(hlist, colors="auto"):
         alpha=1.0, linewidth=0, facecolor="none", edgecolor="black", zorder=10,
     )
 
-    return {"tot":htot, "tot_u":htot_u, "tot_d":htot_d}
+    return {"hists":r, "tot":htot, "tot_u":htot_u, "tot_d":htot_d}
 
 def dice(h, nsigma=1.0):
     hret = h.clone()
@@ -252,16 +312,34 @@ def make_uoflow(h):
     h.SetBinError(nb+1, math.sqrt(h.GetBinError(nb)**2 + h.GetBinError(nb + 1)**2))
     return h
 
+def fill_overflow(hist):
+    """
+    Puts the contents of the overflow bin in the last visible bin
+    """
+    nb = hist.GetNbinsX()
+    o = hist.GetBinContent(nb + 1)
+    oe = hist.GetBinError(nb + 1)
+    hist.SetBinContent(nb, hist.GetBinContent(nb) + o)
+    hist.SetBinError(nb, math.sqrt(hist.GetBinError(nb)**2 + oe**2))
+    
+    #fixme recalculate error
+    hist.SetBinContent(nb+1, 0)
+    hist.SetBinError(nb+1, 0)
+
 def draw_data_mc(tf, hname, samples, **kwargs):
 
     do_pseudodata = kwargs.get("do_pseudodata", False)
+    dataname = kwargs.get("dataname", None)
     xlabel = kwargs.get("xlabel", hname.replace("_", " "))
-    yunit = kwargs.get("yunit", "")
+    xunit = kwargs.get("xunit", "XUNIT")
     ylabel = kwargs.get("ylabel", "auto")
     rebin = kwargs.get("rebin", 1)
     title_extended = kwargs.get("title_extended", "")
     do_legend = kwargs.get("do_legend", True)
+    legend_loc = kwargs.get("legend_loc", (1.1,0.1))
+    legend_fontsize = kwargs.get("legend_fontsize", 6)
     colors = kwargs.get("colors", "auto")
+    show_overflow = kwargs.get("show_overflow", False)
 
     hs = OrderedDict()
     for sample, sample_name in samples:
@@ -271,22 +349,25 @@ def draw_data_mc(tf, hname, samples, **kwargs):
         #hs[sample].Scale(get_weight(sample))
         hs[sample].title = sample_name + " ({0:.1f})".format(hs[sample].Integral())
         hs[sample].rebin(rebin)
-
+        if show_overflow:
+            fill_overflow(hs[sample])
+            
     c = plt.figure(figsize=(6,6))
-    if do_pseudodata:
+    if do_pseudodata or dataname:
         a1 = plt.axes([0.0,0.22, 1.0, 0.8])
     else:
         a1 = plt.axes()
         
-    plt.title("CMS simulation\n $\sqrt{s} = 13$ TeV"+title_extended,
+    plt.title("$\\textbf{CMS}$ preliminary\n $\sqrt{s} = 13$ TeV"+title_extended,
         y=0.96, x=0.04,
         horizontalalignment="left", verticalalignment="top"
     )
     r = mc_stack(hs.values(), colors=colors)
     
+    #Create the normalized signal shape
     hsig = hs[samples[0][0]].Clone()
     tot_mc = sum(hs.values())
-    hsig.Rebin(2)
+    #hsig.Rebin(2)
     hsig.Scale(0.2 * tot_mc.Integral() / hsig.Integral())
     hsig.title = samples[0][1] + " norm"
     hsig.linewidth=2
@@ -297,21 +378,37 @@ def draw_data_mc(tf, hname, samples, **kwargs):
     tot_mc.color = "black"
 
     tot_bg = sum([hs[k] for k in hs.keys() if "tth" not in k])
-
+    
+    data = None
     if do_pseudodata:
-        pseudodata = tot_mc.Clone()#dice(tot_mc, nsigma=1.0)
-        errorbar(pseudodata)
+        data = tot_mc.Clone()#dice(tot_mc, nsigma=1.0)
+        data.title = "pseudodata"
+    elif dataname:
+        data = tf.get(dataname + "/" + hname).Clone()
+        data.title = "data ({0})".format(data.Integral())
+
+    if data:
+        if show_overflow:
+            fill_overflow(data)
+        errorbar(data)
 
     if do_legend:
-        plt.legend(loc=(1.1,0.0), numpoints=1)
+        patches = []
+        dataline = mlines.Line2D([], [], color='black', marker='o', label=data.title)
+        patches += [dataline]
+        for line, h in zip(r["hists"], hs.values()):
+            print h.title, line.get_color()
+            patch = mpatches.Patch(color=line.get_color(), label=h.title)
+            patches += [patch]
+        plt.legend(handles=patches, loc=legend_loc, numpoints=1, prop={'size':legend_fontsize})
     if ylabel == "auto":
-        ylabel = "events / {0:.0f} {1}".format(hs.values()[0].get_bin_width(1), yunit)
+        ylabel = "events / {0:.0f} {1}".format(hs.values()[0].get_bin_width(1), xunit)
     plt.ylabel(ylabel)
-    if not do_pseudodata:
+    if not data:
         plt.xlabel(xlabel)
     #hide x ticks on main panel
     ticks = a1.get_xticks()
-    if do_pseudodata:
+    if data:
         a1.get_xaxis().set_visible(False)
     print ticks
     
@@ -319,35 +416,39 @@ def draw_data_mc(tf, hname, samples, **kwargs):
     a1.grid(zorder=100000)
 
     a2 = a1
-    if do_pseudodata:
+    
+    #do ratio panel
+    if data:
         a2 = plt.axes([0.0,0.0, 1.0, 0.18], sharex=a1)
 
         plt.xlabel(xlabel)
         a2.grid()
-
-        data_minus_bg = pseudodata - tot_mc
-        data_minus_bg.Divide(pseudodata)
-
-        bg_unc_u = r["tot"] - r["tot_u"]
-        bg_unc_d = r["tot"] - r["tot_d"]
+        
+        data.Divide(tot_mc)
+        for ibin in range(data.GetNbinsX()):
+            bc = tot_mc.GetBinContent(ibin)
+            if bc==0:
+                data.SetBinContent(ibin, 0)
+        bg_unc_u = r["tot_u"]
+        bg_unc_d = r["tot_d"]
 
         bg_unc_u.Divide(r["tot"])
         bg_unc_d.Divide(r["tot"])
 
-        if do_pseudodata:
-            errorbar(data_minus_bg)
+        errorbar(data)
 
-        fill_between(bg_unc_u, bg_unc_d,
+        fill_between(
+            bg_unc_u, bg_unc_d,
             color="black", hatch="////",
             alpha=1.0, linewidth=0, facecolor="none", edgecolor="black", zorder=10,
         )
-        plt.ylabel("$\\frac{\mathrm{data} - \mathrm{mc}}{\mathrm{data}}$", fontsize=16)
-        plt.axhline(0.0, color="black")
-        #a2.set_ylim(-1,1)
+        plt.ylabel("$\\frac{\mathrm{data}}{\mathrm{pred.}}$", fontsize=16)
+        plt.axhline(1.0, color="black")
+        a2.set_ylim(0, 2)
         #hide last tick on ratio y axes
         a2.set_yticks(a2.get_yticks()[:-1]);
         a2.set_xticks(ticks);
-    return a1, a2, hs
+    return a1, a2, hs, r
 
 def draw_mem_data_mc(*args, **kwargs):
     a1, a2, hs = draw_data_mc(*args, **kwargs)
@@ -552,6 +653,6 @@ def syst_comparison(tf, sn, l, **kwargs):
     #fill_between(h1, h2, hatch="\\\\", facecolor="none", edgecolor="black", lw=0, zorder=10)
 
 
-def svfg(fn):
-    plt.savefig(fn, pad_inches=0.5, bbox_inches='tight')
+def svfg(fn, **kwargs):
+    plt.savefig(fn, pad_inches=0.5, bbox_inches='tight', **kwargs)
     plt.clf()
