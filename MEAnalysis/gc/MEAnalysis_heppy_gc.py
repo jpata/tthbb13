@@ -44,7 +44,7 @@ print "processing dataset={0}".format(dataset)
 for ns in samples_dict.keys():
     if samples_dict[ns].name.value() == dataset:
         samples_dict[ns].skip = False
-        samples_dict[ns].subFiles = map(lfn_to_pfn, samples_dict[ns].subFiles ) #DS
+        samples_dict[ns].subFiles = map(lfn_to_pfn, fns ) #DS
         good_samp += [samples_dict[ns]]
     else:
         print "skipping", samples_dict[ns].name.value()
