@@ -14,6 +14,11 @@ def fillCoreVariables(self, tr, event, isMC):
     else:
         for x in ["run", "lumi", "evt"]:
             tr.fill(x, getattr(event.input, x))
+    #attrs = dir(event.input)
+    #print attrs 
+    #for attr in attrs:
+    #    if attr.startswith("HLT"):
+    #        tr.fill(attr, getattr(event.input, attr))
 AutoFillTreeProducer.fillCoreVariables = fillCoreVariables
 
 #Specifies what to save for jets
@@ -351,8 +356,23 @@ def getTreeProducer(conf):
         }
     )
     
-    for trigname in conf.trigger["paths"]:
-        treeProducer.globalVariables += [makeGlobalVariable((trigname, int, "HLT {0}".format(trigname)), "nominal")]
+
+    trignames = []
+    for pathname, trigs in list(conf.trigger["trigTable"].items()) + list(conf.trigger["trigTableData"].items()):
+        pathname = "HLT_" + pathname 
+        if not pathname in trignames:
+            trignames += [pathname]
+        for tn in trigs:
+            #strip the star
+            tn = "HLT_BIT_" + tn[:-1]
+            if not tn in trignames:
+                trignames += [tn]
+    
+    print trignames
+    for trig in trignames:
+        treeProducer.globalVariables += [NTupleVariable(
+            trig, lambda ev, name=trig: getattr(ev.input, name, -1), type=int, mcOnly=False
+        )]
         
     for systematic in ["nominal", "raw", "JESUp", "JESDown"]:
         if not (systematic in conf.general["systematics"]):

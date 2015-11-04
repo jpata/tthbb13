@@ -16,22 +16,28 @@ class TriggerAnalyzer(FilterAnalyzer):
     def process(self, event):
 
         event.triggerDecision = False
-       
         event.trigvec = []
-        for name in self.conf.trigger["paths"]:
-            bit = int(getattr(event.input, name, -1))
-            setattr(event, name, bit)
-            event.trigvec += [bit == 1]
-            #print name, bit
-            if "trigger" in self.conf.general["verbosity"]:
-                print "[trigger]", name, bit
-            if (bit == 1):
-                event.triggerDecision = True
-        event.triggerBitmask = int(sum(1<<i for i, b in enumerate(event.trigvec) if b))
-        if "trigger" in self.conf.general["verbosity"]:
-            print "[trigger] bitmask", event.triggerBitmask
-        passes = True
-        if self.conf.trigger["filter"] and not event.triggerDecision:
-            passes = False
+        if self.cfg_comp.isMC:
+            triglist = self.conf.trigger["trigTable"]
+        else:
+            triglist = self.conf.trigger["trigTableData"]
+
+        for pathname, trigs in triglist.items():
+            for name in trigs:
+                bit = int(getattr(event.input, name, -1))
+                setattr(event, name, bit)
+                event.trigvec += [bit == 1]
+                #print name, bit
+                if "trigger" in self.conf.general["verbosity"]:
+                    print "[trigger]", name, bit
+                if (bit == 1):
+                    event.triggerDecision = True
+
+        #event.triggerBitmask = int(sum(1<<i for i, b in enumerate(event.trigvec) if b))
+        #if "trigger" in self.conf.general["verbosity"]:
+        #    print "[trigger] bitmask", event.triggerBitmask
+        #passes = True
+        #if self.conf.trigger["filter"] and not event.triggerDecision:
+        #    passes = False
         
         return self.conf.general["passall"] or passes

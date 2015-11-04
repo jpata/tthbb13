@@ -316,13 +316,13 @@ if __name__ == "__main__":
         )
 
 
-        import cProfile, time
-        p = cProfile.Profile(time.clock)
-        p.runcall(looper.loop)
-        p.print_stats()
+        #import cProfile, time
+        #p = cProfile.Profile(time.clock)
+        #p.runcall(looper.loop)
+        #p.print_stats()
 
-        # #execute the code
-        # looper.loop()
+        #execute the code
+        looper.loop()
 
         tf = looper.setup.services["outputfile"].file 
         tf.cd()

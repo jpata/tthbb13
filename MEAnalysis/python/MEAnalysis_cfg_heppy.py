@@ -3,6 +3,8 @@ from collections import OrderedDict
 from TTH.MEAnalysis.MEMConfig import MEMConfig
 import ROOT
 from ROOT import MEM
+import VHbbAnalysis.Heppy.TriggerTableData as trigData
+import VHbbAnalysis.Heppy.TriggerTable as trig
 
 def jet_baseline(jet):
     #Require that jet must have at least loose POG_PFID
@@ -148,26 +150,8 @@ class Conf:
     trigger = {
 
         "filter": False,
-        "paths": [
-        
-            #SL triggers
-            "HLT_BIT_HLT_Ele27_eta2p1_WP85_Gsf_HT200_v", #not in data (V15)
-            "HLT_BIT_HLT_Ele27_eta2p1_WPLoose_Gsf_HT200_v", #in data
-            "HLT_BIT_HLT_IsoMu24_eta2p1_v",
-            
-            #DL triggers
-            #mumu
-            "HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v",
-            "HLT_BIT_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v",
-            
-            #emu
-            "HLT_BIT_HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v",
-            "HLT_BIT_HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v",
-            
-            #ee
-            "HLT_BIT_HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v",
-            ],
-      
+        "trigTable": trig.triggerTable, 
+        "trigTableData": trigData.triggerTable, 
     }
 
     general = {
