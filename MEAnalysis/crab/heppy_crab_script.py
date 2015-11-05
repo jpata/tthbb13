@@ -32,7 +32,8 @@ try:
     print "crabFiles=", crabFiles
     firstInput = crabFiles[0]
     filename, firstEvent, nEvents = firstInput.split("___")
-    rootfilename = "root://xrootd-cms.infn.it//" + filename
+    #rootfilename = "root://xrootd-cms.infn.it//" + filename
+    rootfilename = "root://t3se01.psi.ch:1094//" + filename
     firstEvent = int(firstEvent)
     nEvents = int(nEvents)
     print "checking file",rootfilename
