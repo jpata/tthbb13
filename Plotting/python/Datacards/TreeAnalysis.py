@@ -19,8 +19,8 @@ import json
 ########################################
 
 #ControlPlotsSparse_2015_10_15_withBLR.root
-input_file = "/home/joosep/joosep-mac/Dropbox/tth/datacards/v14/ControlPlotsSparse.root"
-output_path = "/tmp/"
+input_file = "ControlPlotsSparse.root"
+output_path = "/scratch/joosep/"
 
 n_proc = 1
 n_iter = 6
