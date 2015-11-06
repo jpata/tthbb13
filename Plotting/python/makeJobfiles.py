@@ -27,10 +27,28 @@ for samp in Samples.samples_dict.keys():
             "printEvery": 0,
             "sparseAxes": [
                 {
+                    "func": "mem_SL_2w2h2t",
+                    "xMin": 0,
+                    "xMax": 1,
+                    "nBins": 12
+                },
+                {
+                    "func": "mem_SL_2w2h2t_sj",
+                    "xMin": 0,
+                    "xMax": 1,
+                    "nBins": 12
+                },
+                {
                     "func": "mem_SL_0w2h2t",
                     "xMin": 0,
                     "xMax": 1,
-                    "nBins": 6
+                    "nBins": 12
+                },
+                {
+                    "func": "tth_mva",
+                    "xMin": 0,
+                    "xMax": 1,
+                    "nBins": 12
                 },
                 {
                     "func": "numJets",
@@ -63,10 +81,34 @@ for samp in Samples.samples_dict.keys():
                     "nBins": 6
                 },
                 {
+                    "func": "topCandidate_fRec",
+                    "xMin": 0,
+                    "xMax": 0.4,
+                    "nBins": 6
+                },
+                {
+                    "func": "topCandidate_n_subjettiness",
+                    "xMin": 0,
+                    "xMax": 1,
+                    "nBins": 6
+                },
+                {
                     "func": "Wmass",
                     "xMin": 40,
                     "xMax": 120,
                     "nBins": 6
+                },
+                {
+                    "func": "n_excluded_bjets",
+                    "xMin": 0,
+                    "xMax": 4,
+                    "nBins": 4
+                },
+                {
+                    "func": "n_excluded_ljets",
+                    "xMin": 0,
+                    "xMax": 4,
+                    "nBins": 4
                 }
             ]
         }
