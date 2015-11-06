@@ -40,6 +40,22 @@ colors = {
     "other": (251, 73, 255),
 }
 
+cats = {
+    'dl_j3_t2': "(is_dl==1) & (numJets==3) & (nBCSVM==2)",
+    'dl_jge3_t3': "(is_dl==1) & (numJets>=3) & (nBCSVM==3)",
+    'dl_jge4_t2': "(is_dl==1) & (numJets>=4) & (nBCSVM==2)",
+    'dl_jge4_tge4': "(is_dl==1) & (numJets>=4) & (nBCSVM>=4)",
+    
+    'sl_j4_t3': "(is_sl==1) & (numJets==4) & (nBCSVM==3)",
+    'sl_j4_t4': "(is_sl==1) & (numJets==4) & (nBCSVM==4)",
+    'sl_j5_t3': "(is_sl==1) & (numJets==5) & (nBCSVM==3)",
+    'sl_j5_tge4': "(is_sl==1) & (numJets==5) & (nBCSVM>=4)",
+    'sl_jge6_t2': "(is_sl==1) & (numJets>=6) & (nBCSVM==2)",
+    'sl_jge6_t3': "(is_sl==1) & (numJets>=6) & (nBCSVM==3)",
+    'sl_jge6_tge4': "(is_sl==1) & (numJets>=6) & (nBCSVM>=4)",
+}
+memcut = "& ((btag_LR_4b_2b>0.95) | ((is_sl==1) & (nBCSVM>=3)) | ((is_dl==1) & (nBCSVM>=2)))"
+
 
 #List of sample filenames -> short names
 samplelist = [
@@ -74,12 +90,34 @@ varnames = {
     "njets": "$N_{\\mathrm{jets}}$",
     "ntags": "$N_{\\mathrm{CSVM}}$",
 
-    "btag_LR_4b_2b_logit": "$\\log{\\mathcal{F} / (1 - \\mathcal{F})}$",
+    "btag_LR_4b_2b_logit": "$\\log{[\\mathcal{F} / (1 - \\mathcal{F})]}$",
+
+    "topCandidate_pt": "top candidate $p_T$ [GeV]",
+    "topCandidate_mass": "top candidate $M$ [GeV]",
+    "topCandidate_fRec": "top candidate $f_{\\mathrm{rec}}$",
+    "topCandidate_Ropt": "top candidate $R_{\\mathrm{opt}}$",
+    "topCandidate_RoptCalc": "top candidate $R_{\\mathrm{opt}}, calc$",
+    "topCandidate_n_subjettiness": "top candidate n-subjettiness$",
+
+    "higgsCandidate_pt": "H candidate $p_T$ [GeV]",
+    "higgsCandidate_mass": "H candidate $M$ [GeV]",
+    "higgsCandidate_mass_pruned": "H candidate pruned $M$ [GeV]",
+    "higgsCandidate_mass_softdrop": "H candidate softdrop $M$ [GeV]",
+    "higgsCandidate_bbtag": "H candidate bbtag",
+    "higgsCandidate_n_subjettiness": "H candidate n-subjettiness",
+    "higgsCandidate_dr_top":  "$\\Delta R_{h,t}$",
+
 }
 
 varunits = {
     "jet0_pt": "GeV",
-    "jet1_pt": "GeV"
+    "jet1_pt": "GeV",
+    "topCandidate_pt": "GeV",
+    "topCandidate_mass": "GeV",
+    "higgsCandidate_pt": "GeV",
+    "higgsCandidate_mass": "GeV",
+    "higgsCandidate_mass_pruned": "GeV",
+    "higgsCandidate_mass_softdrop": "GeV",
 }
 
 def process_sample_hist(fnames, hname, func, bins, cut, **kwargs):
@@ -390,6 +428,9 @@ def draw_data_mc(tf, hname, samples, **kwargs):
     if data:
         if show_overflow:
             fill_overflow(data)
+        for ibin in range(data.GetNbinsX()):
+            if data.GetBinContent(ibin) == 0:
+                data.SetBinError(ibin, 1)
         errorbar(data)
 
     if do_legend:
@@ -402,7 +443,7 @@ def draw_data_mc(tf, hname, samples, **kwargs):
             patches += [patch]
         plt.legend(handles=patches, loc=legend_loc, numpoints=1, prop={'size':legend_fontsize})
     if ylabel == "auto":
-        ylabel = "events / {0:.0f} {1}".format(hs.values()[0].get_bin_width(1), xunit)
+        ylabel = "events / {0:.2f} {1}".format(hs.values()[0].get_bin_width(1), xunit)
     plt.ylabel(ylabel)
     if not data:
         plt.xlabel(xlabel)

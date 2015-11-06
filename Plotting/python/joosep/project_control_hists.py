@@ -18,17 +18,18 @@ ncores = 4
 
 samplepath = "/Users/joosep/Documents/tth/data/ntp/v14/"
 samples = {
-    "ttHTobb_M125_13TeV_powheg_pythia8": samplepath + "/nome/ttHTobb_M125_13TeV_powheg_pythia8.root",
-    "TT_TuneCUETP8M1_13TeV-powheg-pythia8_tt2b": samplepath + "/nome/TT_TuneCUETP8M1_13TeV-powheg-pythia8_tt2b.root",
-    "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttb": samplepath + "/nome/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttb.root",
-    "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttbb": samplepath + "/nome/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttbb.root",
-    "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttcc": samplepath + "/nome/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttcc.root",
-    "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttll": samplepath + "/nome/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttll.root",
+    "ttHTobb_M125_13TeV_powheg_pythia8": samplepath + "/me/ttHTobb_M125_13TeV_powheg_pythia8.root",
+    "TT_TuneCUETP8M1_13TeV-powheg-pythia8_tt2b": samplepath + "/me/TT_TuneCUETP8M1_13TeV-powheg-pythia8_tt2b.root",
+    "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttb": samplepath + "/me/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttb.root",
+    "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttbb": samplepath + "/me/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttbb.root",
+    "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttcc": samplepath + "/me/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttcc.root",
+    "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttll": samplepath + "/me/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttll.root",
     "SingleMuon": samplepath + "/nome/SingleMuon.root",
     "SingleElectron": samplepath + "/nome/SingleElectron.root",
 }
 
 lumi = 1280.23
+#lumi = 10000.0
 
 def is_data(sample):
     if "Single" in sample:
@@ -40,7 +41,7 @@ def weight_str(cut, sample, weight=1.0, lumi=lumi):
     if not is_data(sample):
         return "weight_xs * sign(genWeight) * bTagWeight * {1} * {2} * {3} * ({0})".format(cut, weight, lumi, w)
     else:
-        return cut
+        return "json==1 && ({0})".format(cut)
 
 def drawHelper(args):
     """
@@ -202,7 +203,16 @@ if __name__ == "__main__":
             ("sl_jge6_t3_mu", "is_sl && numJets>=6 && nBCSVM==3 && abs(leps_pdgId[0])==13"),
             ("sl_jge6_tge4_mu", "is_sl && numJets>=6 && nBCSVM>=4 && abs(leps_pdgId[0])==13"),
             
+
             ("sl_el", "is_sl && abs(leps_pdgId[0])==11"),
+            ("sl_jge4_el", "is_sl && numJets>=4 && abs(leps_pdgId[0])==11"),
+            
+            ("sl_j4_t3_el", "is_sl && numJets==4 && nBCSVM==3 && abs(leps_pdgId[0])==11"),
+            ("sl_j4_t4_el", "is_sl && numJets==4 && nBCSVM==4 && abs(leps_pdgId[0])==11"),
+
+            ("sl_j5_t3_el", "is_sl && numJets==5 && nBCSVM==3 && abs(leps_pdgId[0])==11"),
+            ("sl_j5_tge4_el", "is_sl && numJets==5 && nBCSVM>=4 && abs(leps_pdgId[0])==11"),
+
             ("sl_jge6_el", "is_sl && numJets>=6 && abs(leps_pdgId[0])==11"),
             ("sl_jge6_t2_el", "is_sl && numJets>=6 && nBCSVM==2 && abs(leps_pdgId[0])==11"),
             ("sl_jge6_t3_el", "is_sl && numJets>=6 && nBCSVM==3 && abs(leps_pdgId[0])==11"),
@@ -225,7 +235,7 @@ if __name__ == "__main__":
 
             jetd = sampled.mkdir(cutname)
             Draw(tf, jetd, samplename, "nBCSVM:numJets >> njets_ntags(15,0,15,15,0,15)", cut)
-            Draw(tf, jetd, samplename, "nBCSVM >> ntags(4,2,6)", cut)
+            Draw(tf, jetd, samplename, "nBCSVM >> ntags(5,2,7)", cut)
             if "sl" in cutname:
                 Draw(tf, jetd, samplename, "numJets >> njets(7,4,11)", cut)
             elif "dl" in cutname:
@@ -261,28 +271,34 @@ if __name__ == "__main__":
             Draw(tf, jetd, samplename, "jets_btagBDT[0] >> jet0_btagBDT(20,-1,1)", cut)
             Draw(tf, jetd, samplename, "jets_btagBDT[1] >> jet1_btagBDT(20,-1,1)", cut)
                         
-            # Draw(tf, jetd, samplename, "abs(jets_eta[0]) >> jet0_aeta(20, 0, 5)", cut)
-            # Draw(tf, jetd, samplename, "abs(jets_eta[1]) >> jet1_aeta(20, 0, 5)", cut)
+            Draw(tf, jetd, samplename, "abs(jets_eta[0]) >> jet0_aeta(20, 0, 5)", cut)
+            Draw(tf, jetd, samplename, "abs(jets_eta[1]) >> jet1_aeta(20, 0, 5)", cut)
             
             Draw(tf, jetd, samplename, "btag_LR_4b_2b >> btag_LR_4b_2b(20,0,1)", cut)
             Draw(tf, jetd, samplename, "log(btag_LR_4b_2b/(1.0-btag_LR_4b_2b)) >> btag_LR_4b_2b_logit(20,-10,10)", cut)
             
-            # Draw(tf, jetd, samplename, "fatjets_pt[0] >> fatjet0_pt(20,0,500)", cut)
-            # Draw(tf, jetd, samplename, "fatjets_pt[1] >> fatjet1_pt(20,0,500)", cut)
-            # Draw(tf, jetd, samplename, "fatjets_eta[0] >> fatjet0_eta(20,-5,5)", cut)
-            # Draw(tf, jetd, samplename, "fatjets_eta[1] >> fatjet1_eta(20,-5,5)", cut)
-
+            Draw(tf, jetd, samplename, "fatjets_pt[0] >> fatjet0_pt(20,0,500)", cut)
+            Draw(tf, jetd, samplename, "fatjets_pt[1] >> fatjet1_pt(20,0,500)", cut)
+            Draw(tf, jetd, samplename, "fatjets_eta[0] >> fatjet0_eta(20,-5,5)", cut)
+            Draw(tf, jetd, samplename, "fatjets_eta[1] >> fatjet1_eta(20,-5,5)", cut)
+            #fixme fatjet mass
             # Draw(tf, jetd, samplename, "topCandidate_pt[0] >> topCandidate_pt(20, 200, 800)", cut)
             # Draw(tf, jetd, samplename, "topCandidate_mass[0] >> topCandidate_mass(20, 80, 250)", cut)
+
+            # #fixme low frec -> top cand mass and vice versa
             # Draw(tf, jetd, samplename, "topCandidate_fRec[0] >> topCandidate_fRec(20, 0, 0.5)", cut)
+            # #fix binning 0.1
             # Draw(tf, jetd, samplename, "topCandidate_Ropt[0] >> topCandidate_Ropt(20, 0.4, 2)", cut)
             # Draw(tf, jetd, samplename, "topCandidate_RoptCalc[0] >> topCandidate_RoptCalc(20, 0.4, 2)", cut)
             # Draw(tf, jetd, samplename, "topCandidate_bbtag[0] >> topCandidate_bbtag(20, -1, 1)", cut)
             # Draw(tf, jetd, samplename, "topCandidate_tau1[0] >> topCandidate_tau1(20, 0, 1)", cut)
             # Draw(tf, jetd, samplename, "topCandidate_tau2[0] >> topCandidate_tau2(20, 0, 1)", cut)
             # Draw(tf, jetd, samplename, "topCandidate_tau3[0] >> topCandidate_tau3(20, 0, 1)", cut)
+            # #top can mass peak
+            # #groomed nsubjettiness only for tops
             # Draw(tf, jetd, samplename, "topCandidate_n_subjettiness[0] >> topCandidate_n_subjettiness(20, 0, 1)", cut)
             # 
+            # #pt>400 as well
             # Draw(tf, jetd, samplename, "higgsCandidate_pt >> higgsCandidate_pt(20, 200, 800)", cut)
             # Draw(tf, jetd, samplename, "higgsCandidate_mass >> higgsCandidate_mass(20, 0, 500)", cut)
             # Draw(tf, jetd, samplename, "higgsCandidate_mass_pruned >> higgsCandidate_mass_pruned(20, 0, 500)", cut)
@@ -314,6 +330,7 @@ if __name__ == "__main__":
                 #memidx - index into the MEM results array (see MEAnalysis_cfg_heppy -> Conf.mem["methodOrder"])
                 for memname, memidx in [
                     ("SL_0w2h2t", 0),
+                    ("SL_2w2h2t", 5),
                     ("DL_0w2h2t", 1),
                     ]:
 
@@ -325,12 +342,12 @@ if __name__ == "__main__":
                         continue
 
                     #1D mem distribution
-                    # Draw(tf, jetd, samplename,
-                    #     "mem_tth_p[{0}] / (mem_tth_p[{0}] + 0.15*mem_ttbb_p[{0}]) >> mem_{1}{2}(12,0,1)".format(
-                    #         memidx, memname, matchname
-                    #     ),
-                    #     cut
-                    # )
+                    Draw(tf, jetd, samplename,
+                        "mem_tth_p[{0}] / (mem_tth_p[{0}] + 0.15*mem_ttbb_p[{0}]) >> mem_{1}{2}(12,0,1)".format(
+                            memidx, memname, matchname
+                        ),
+                        cut
+                    )
             
             jetd.Write()
 

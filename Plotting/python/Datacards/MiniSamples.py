@@ -14,10 +14,10 @@ if "t3ui12" in hostname:
 elif "pata-slc6" in hostname:
     path = "/home/joosep/joosep-mac/Documents/tth/data/ntp/v12/Sep9_jec_jer/"
 #Tallinn
-#elif "hep.kbfi.ee" in hostname:
-#    path = "/home/joosep/tth/gc/"
 elif "hep.kbfi.ee" in hostname:
-    path = "/hdfs/cms/store/user/jpata/tth/Sep28_spring15_prev13_f6c61f/"
+    path = "/home/joosep/tth/gc/"
+#elif "hep.kbfi.ee" in hostname:
+#    path = "/hdfs/cms/store/user/jpata/tth/Sep28_spring15_prev13_f6c61f/"
 else:
     raise Exception("Sample path not defined for hostname={0}!".format(hostname))
 

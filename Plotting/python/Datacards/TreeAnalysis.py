@@ -12,15 +12,17 @@ from CombineHelper import LimitGetter
 from Axis import axis
 from Cut import Cut
 
+import json
+
 ########################################
 # Configuration
 ########################################
 
 #ControlPlotsSparse_2015_10_15_withBLR.root
-input_file = "/shome/gregor/ControlPlotsSparse_2015_10_16_noBLR.root"
-output_path = "/scratch/gregor/foobar"
+input_file = "/home/joosep/joosep-mac/Dropbox/tth/datacards/v14/ControlPlotsSparse.root"
+output_path = "/tmp/"
 
-n_proc = 8
+n_proc = 1
 n_iter = 6
 
 
@@ -105,9 +107,13 @@ def make_latex(name):
     """ Get name of tree (in trees), produce the latex version and
     safe it to a tex file """
 
-    r = Categorize.CategorizationFromString(trees[name])    
+    r = Categorize.CategorizationFromString(trees[name])
+    #r.print_yield_table()
     of = open( name + ".tex","w")
     of.write(r.print_tree_latex())
+    of.close()
+    of = open(name + ".pickle", "w")
+    of.write(json.dumps(r))
     of.close()
 # End of make_latex
 
@@ -117,7 +123,7 @@ if __name__ == "__main__":
     #r = Categorize.CategorizationFromString(trees["3cat"])
     #optimize(r)
 
-    make_latex("15cat")
+    make_latex("old")
 
     #for i in range(5,7):
     #    make_latex("{0}cat".format(i))

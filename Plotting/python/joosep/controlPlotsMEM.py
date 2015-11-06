@@ -41,7 +41,21 @@ for channel in [
         "btag_LR_4b_2b_logit",
         "jet0_btagCSV",
         "jet1_btagCSV",
-        "lep0_pt", "lep1_pt"
+        "topCandidate_pt",
+        "topCandidate_mass",
+        "topCandidate_fRec",
+        "topCandidate_Ropt",
+        "topCandidate_RoptCalc",
+        "topCandidate_n_subjettiness",
+        "higgsCandidate_pt",
+        "higgsCandidate_mass",
+        "higgsCandidate_mass_pruned",
+        "higgsCandidate_mass_softdrop",
+        "higgsCandidate_bbtag",
+        "higgsCandidate_n_subjettiness",
+        "higgsCandidate_dr_top"
+        
+        #"lep0_pt", "lep1_pt"
         ]:
         r = plotlib.draw_data_mc(
             inf,
@@ -52,4 +66,7 @@ for channel in [
             show_overflow = True,
             title_extended="\n$\\mathcal{L}=1.28\\ \\mathrm{fb}^{-1}$"
         )
+        if var in ["njets", "ntags"]:
+            r[0].set_yscale("log")
+            r[0].set_ylim(bottom=10)
         plotlib.svfg(channel + "_" + var + ".png", dpi=400)

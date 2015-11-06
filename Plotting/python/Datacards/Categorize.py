@@ -213,13 +213,14 @@ class Categorization(object):
             for ignore_splitting in [True,False]:
 
                 for n in nodes_to_eval:
-
+                    #import pdb
+                    #pdb.set_trace()
                     control_plots_filename = "{0}/ControlPlots_{1}_NS{2}.root".format(n.output_path, i_split, ignore_splitting)
                     shapes_txt_filename    = "{0}/shapes_{1}_NS{2}.txt".format(n.output_path, i_split, ignore_splitting)
                     shapes_root_filename   = "{0}/shapes_{1}_NS{2}.root".format(n.output_path, i_split, ignore_splitting)
 
                     filenames.append(shapes_txt_filename)
-
+                    print n, shapes_root_filename
                     n.create_control_plots(control_plots_filename, ignore_splitting = ignore_splitting)                        
                     MakeDatacard(control_plots_filename, 
                                  shapes_root_filename,
@@ -680,9 +681,6 @@ class Categorization(object):
 
                 for sys_name, thn in hs.items():
                     
-                    if "jDown" in sys_name or "jUp" in sys_name:
-                        continue
-
                     h = thn.Projection(l.discriminator_axis).Clone()
                     h.SetName(self.axes[l.discriminator_axis].name + "_" + sys_name)
                     dirs[outdir_str].append(h)
