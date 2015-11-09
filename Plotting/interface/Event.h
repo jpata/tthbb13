@@ -465,7 +465,7 @@ public:
 
     THnSparseF* makeHist() const {
         THnSparseF* h = new THnSparseF("sparse", "sparse events", nAxes, &(nBinVec[0]), &(xMinVec[0]), &(xMaxVec[0]));
-        
+        h->CalculateErrors(true); //Enable THnSparse error accounting (otherwise wrong) 
         int iax = 0;
         for (auto& ax : axes) {
             h->GetAxis(iax)->SetName(ax.name.c_str());

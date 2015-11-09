@@ -14,6 +14,8 @@ if "t3ui12" in hostname:
 elif "pata-slc6" in hostname:
     path = "/home/joosep/joosep-mac/Documents/tth/data/ntp/v12/Sep9_jec_jer/"
 #Tallinn
+elif "quasar" in hostname:
+    path = "/dev/shm/joosep/"
 elif "hep.kbfi.ee" in hostname:
     path = "/home/joosep/tth/gc/"
 else:
