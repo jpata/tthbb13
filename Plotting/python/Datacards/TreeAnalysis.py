@@ -12,7 +12,7 @@ from CombineHelper import LimitGetter
 from Axis import axis
 from Cut import Cut
 
-import json
+import pickle
 
 ########################################
 # Configuration
@@ -22,9 +22,8 @@ import json
 input_file = "ControlPlotsSparse.root"
 output_path = "/scratch/joosep/"
 
-n_proc = 1
+n_proc = 4
 n_iter = 6
-
 
 signals = [
     "ttH_hbb", 
@@ -42,28 +41,6 @@ backgrounds = [
 #    "ttz_zllnunu",    
 #    "ttz_zqq",
 ]        
-
-
-########################################
-# Setup Categorization
-########################################
-
-h_sig, h_bkg, h_sig_sys, h_bkg_sys = Categorize.GetSparseHistograms(input_file, 
-                                                                   signals, 
-                                                                   backgrounds)
-axes = Categorize.GetAxes(h_sig["ttH_hbb"])
-
-Cut.axes = axes
-Categorize.Categorization.axes = axes
-Categorize.Categorization.h_sig = h_sig
-Categorize.Categorization.h_bkg = h_bkg
-Categorize.Categorization.h_sig_sys = h_sig_sys
-Categorize.Categorization.h_bkg_sys = h_bkg_sys
-
-Categorize.Categorization.output_path = output_path
-Categorize.Categorization.pool = Pool(n_proc)
-
-Categorize.Categorization.lg = LimitGetter(output_path)
 
 
 ########################################
@@ -108,22 +85,45 @@ def make_latex(name):
     safe it to a tex file """
 
     r = Categorize.CategorizationFromString(trees[name])
+    r.axes = Categorize.Categorization.axes
+
     #r.print_yield_table()
     of = open( name + ".tex","w")
     of.write(r.print_tree_latex())
     of.close()
     of = open(name + ".pickle", "w")
-    of.write(json.dumps(r))
+    of.write(pickle.dumps(r))
     of.close()
 # End of make_latex
 
 
 if __name__ == "__main__":
 
-    #r = Categorize.CategorizationFromString(trees["3cat"])
-    #optimize(r)
+    ########################################
+    # Setup Categorization
+    ########################################
 
-    make_latex("old")
+    h_sig, h_bkg, h_sig_sys, h_bkg_sys = Categorize.GetSparseHistograms(input_file, 
+                                                                       signals, 
+                                                                       backgrounds)
+    axes = Categorize.GetAxes(h_sig["ttH_hbb"])
+
+    Cut.axes = axes
+    Categorize.Categorization.axes = axes
+    Categorize.Categorization.h_sig = h_sig
+    Categorize.Categorization.h_bkg = h_bkg
+    Categorize.Categorization.h_sig_sys = h_sig_sys
+    Categorize.Categorization.h_bkg_sys = h_bkg_sys
+
+    Categorize.Categorization.output_path = output_path
+    Categorize.Categorization.pool = Pool(n_proc)
+
+    Categorize.Categorization.lg = LimitGetter(output_path)
+
+    r = Categorize.CategorizationFromString(trees["3cat"])
+    optimize(r)
+
+    #make_latex("old")
 
     #for i in range(5,7):
     #    make_latex("{0}cat".format(i))
