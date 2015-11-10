@@ -11,6 +11,7 @@ import os
 import sys     
 import math
 import pickle
+import copy
 
 import ROOT
 
@@ -20,7 +21,7 @@ from Cut import Cut
 from makeDatacard import MakeDatacard
 
 ROOT.TH1.AddDirectory(0)
-
+ROOT.TH1.SetDefaultSumw2(True)
         
 ########################################
 # Categorization
@@ -74,6 +75,7 @@ class Categorization(object):
         self.children = []
         self.cut = cut
         self.discriminator_axis = discriminator_axis
+        self.allhists = {}
         
     # Allow directly accessing the children
     def __getitem__(self, key):
@@ -220,7 +222,17 @@ class Categorization(object):
                     shapes_root_filename   = "{0}/shapes_{1}_NS{2}.root".format(n.output_path, i_split, ignore_splitting)
 
                     filenames.append(shapes_txt_filename)
-                    print n, shapes_root_filename
+                    if ignore_splitting:
+                        n.control_plots_filename_self = control_plots_filename
+                        n.shapes_txt_filename_self = shapes_txt_filename
+                        n.shapes_root_filename_self = shapes_root_filename
+                        n.i_split_self = i_split
+                    else:
+                        n.control_plots_filename_comb = control_plots_filename
+                        n.shapes_txt_filename_comb = shapes_txt_filename
+                        n.shapes_root_filename_comb = shapes_root_filename
+                        n.i_split_comb = i_split
+
                     n.create_control_plots(control_plots_filename, ignore_splitting = ignore_splitting)                        
                     MakeDatacard(control_plots_filename, 
                                  shapes_root_filename,
@@ -230,13 +242,22 @@ class Categorization(object):
                     i_split += 1
 
             li_limits = self.pool.map(self.lg, [f for f in filenames])
-            
+            self.li_limits = copy.deepcopy(li_limits)
+
+            for n in nodes_to_eval:
+                n.limits_self = li_limits[n.i_split_self]
+                n.limits_comb = li_limits[n.i_split_comb]
+
+            # import pdb
+            # pdb.set_trace()
+
             limits = {}
             for ignore_splitting in [True,False]:
                 for n in nodes_to_eval:
-                    l = li_limits.pop(0)
+                    _limits, _quantiles = li_limits.pop(0)
+                    l = _limits[2]
                     limits[str(n)+str(ignore_splitting)] = l
-        
+                    print n.i_split_self, n.i_split_comb, n, l
 
         ret = ""        
         
@@ -330,7 +351,7 @@ class Categorization(object):
             "numJets__5__6__nBCSVM__4__5__discr_2"	: "t4j5",
             "numJets__6__7__nBCSVM__2__3__discr_2"	: "t2j6",
             "numJets__6__7__nBCSVM__3__4__discr_2"	: "t3j6",
-            "numJets__6__7__nBCSVM__4__5__discr_2"      : "t4j6",
+            "numJets__6__7__nBCSVM__4__5__discr_2"  : "t4j6",
         }
 
         print "\t\t" + "\t".join(names[str(l)] for l in self.get_leaves() if not l.discriminator_axis ==-1)
@@ -549,9 +570,11 @@ class Categorization(object):
             li_splittings = splittings.keys()        
 
             li_limits = self.pool.map(self.lg, li_splittings)
-            
+            #import pdb
+            #pdb.set_trace()
+
             # build a list of tuples with limit name and numerical value
-            li_name_limits = [(name,limit) for name,limit in zip(li_splittings, li_limits)]
+            li_name_limits = [(name,limit[0][2]) for name,limit in zip(li_splittings, li_limits)]
             # sort by limit and take the lowest/best one
 
             best_splitting_name, best_limit = sorted(li_name_limits, key = lambda x:x[1])[0]
@@ -582,8 +605,10 @@ class Categorization(object):
         threshold then deactivate the node. The node is not removed
         but rather the discriminator for this node is set to -1"""
 
-        total_limit = self.eval_limit("prune_whole")
-        
+
+        limits, quantiles = self.eval_limit("prune_whole")
+        total_limit = limits[2]
+
         n_pruned_away = 0
 
         for l in self.get_leaves():
@@ -595,8 +620,9 @@ class Categorization(object):
             
             # Important - eval the limit starting from the node under
             # study - not just the leave limit
-            limit = self.eval_limit("prune_" + str(l))
-            
+            limits, quantiles = self.eval_limit("prune_" + str(l))
+            limit = limits[2]
+
             # Deactivating this category is too costly so we turn it
             # back on
             if (limit-total_limit)/total_limit > threshold:
@@ -666,8 +692,10 @@ class Categorization(object):
                 if not outdir_str in dirs.keys():
                     dirs[outdir_str] = []
                 
-                h = thn.Projection(l.discriminator_axis).Clone()
+                h = thn.Projection(l.discriminator_axis, "E").Clone()
                 h.SetName(self.axes[l.discriminator_axis].name)
+                self.allhists[(name, process, l, h.GetName())] = h.Clone()
+                self.allhists[(name, process, l, h.GetName())].SetDirectory(ROOT.gROOT)
                 dirs[outdir_str].append(h)                
             # End of loop over processes
 
@@ -681,8 +709,11 @@ class Categorization(object):
 
                 for sys_name, thn in hs.items():
                     
-                    h = thn.Projection(l.discriminator_axis).Clone()
+                    h = thn.Projection(l.discriminator_axis, "E").Clone()
                     h.SetName(self.axes[l.discriminator_axis].name + "_" + sys_name)
+                    #print name, outdir_str, h.GetName()
+                    self.allhists[(name, process, l, h.GetName())] = h.Clone()
+                    self.allhists[(name, process, l, h.GetName())].SetDirectory(ROOT.gROOT)
                     dirs[outdir_str].append(h)
 
                 # End of loop over systematics

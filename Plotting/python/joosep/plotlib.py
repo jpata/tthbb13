@@ -40,6 +40,9 @@ colors = {
     "other": (251, 73, 255),
 }
 
+for cn, c in colors.items():
+    colors[cn] = (c[0]/255.0, c[1]/255.0, c[2]/255.0)
+
 cats = {
     'dl_j3_t2': "(is_dl==1) & (numJets==3) & (nBCSVM==2)",
     'dl_jge3_t3': "(is_dl==1) & (numJets>=3) & (nBCSVM==3)",
@@ -75,6 +78,9 @@ varnames = {
     "jet0_btagCSV": "leading jet $b_{\\mathrm{CSV}}$",
     "jet1_btagCSV": "subleading jet $b_{\\mathrm{CSV}}$",
 
+    "jet0_btagBDT": "leading jet $b_{\\mathrm{cMVAv2}}$",
+    "jet1_btagBDT": "subleading jet $b_{\\mathrm{cMVAv2}}$",
+
     "jet0_eta": "leading jet $\eta$",
     "jet1_eta": "subleading jet $\eta$",
 
@@ -91,7 +97,7 @@ varnames = {
     "ntags": "$N_{\\mathrm{CSVM}}$",
 
     "btag_LR_4b_2b_logit": "$\\log{[\\mathcal{F} / (1 - \\mathcal{F})]}$",
-
+    "nfatjets": r"$N_{\mathcal{fatjets}}$",
     "topCandidate_pt": "top candidate $p_T$ [GeV]",
     "topCandidate_mass": "top candidate $M$ [GeV]",
     "topCandidate_fRec": "top candidate $f_{\\mathrm{rec}}$",
@@ -422,7 +428,10 @@ def draw_data_mc(tf, hname, samples, **kwargs):
         data = tot_mc.Clone()#dice(tot_mc, nsigma=1.0)
         data.title = "pseudodata"
     elif dataname:
-        data = tf.get(dataname + "/" + hname).Clone()
+        datas = []
+        for dn in dataname:
+            datas += [tf.get(dn + "/" + hname).Clone()]
+        data = sum(datas)
         data.title = "data ({0})".format(data.Integral())
 
     if data:
@@ -520,7 +529,7 @@ def calc_roc(h1, h2):
         I2 = h2.Integral(0, h2.GetNbinsX())
         if I1>0 and I2>0:
             roc[i, 0] = float(h1.IntegralAndError(i, h1.GetNbinsX()+2, e1)) / I1
-            roc[i, 1] = float(h2.IntegralAndError(i, h1.GetNbinsX()+2, e2)) / I2
+            roc[i, 1] = float(h2.IntegralAndError(i, h2.GetNbinsX()+2, e2)) / I2
             err[i, 0] = e1
             err[i, 1] = e2
     return roc, err

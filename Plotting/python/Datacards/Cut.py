@@ -148,5 +148,4 @@ class Cut(object):
                 return r"${0:} \le {1} < {2:} $".format(string_lower, axis_name, string_upper)
                 
         else:
-            return "Preselection"
-
+            return "Combined"

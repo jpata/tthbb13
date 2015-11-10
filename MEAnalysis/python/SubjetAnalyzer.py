@@ -31,6 +31,7 @@ class SubjetAnalyzer(FilterAnalyzer):
 
         self.btagAlgo = self.conf.jets["btagAlgo"]
 
+        #Cuts that are applied on fat jets to get top candidates
         self.Cut_criteria = [
             ( 'pt'  , '>', '200.0' ),
             ( 'mass', '>', '80.0' ),
@@ -154,7 +155,7 @@ class SubjetAnalyzer(FilterAnalyzer):
             #if fatjet.bbtag < self.bbtag_cut:
             #    continue
 
-            # Check if the fatjet is not already matched to the chosen top
+            # Check if the fatjet is not already matched to the chosen top candidate
             if hasattr(fatjet, 'matched_top') and fatjet == top.matched_fatjet:
                 continue
 

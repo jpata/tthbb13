@@ -120,10 +120,10 @@ if __name__ == "__main__":
 
     Categorize.Categorization.lg = LimitGetter(output_path)
 
-    r = Categorize.CategorizationFromString(trees["3cat"])
-    optimize(r)
+    #r = Categorize.CategorizationFromString(trees["3cat"])
+    #optimize(r)
 
-    #make_latex("old")
+    make_latex("old")
 
     #for i in range(5,7):
     #    make_latex("{0}cat".format(i))

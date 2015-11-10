@@ -5,23 +5,23 @@ trees = {}
 # Based on jet and tagged jet multiplicity
 # 7 categories
 trees["old"] = """
-  Discr=0
-    numJets__4__5 Discr=0 
-       nBCSVM__2__4 Discr=0
-          nBCSVM__2__3 Discr=0
-          nBCSVM__3__4 Discr=0
-       nBCSVM__4__5 Discr=0
-    numJets__5__7 Discr=0
-       numJets__5__6 Discr=0
-          nBCSVM__2__4 Discr=0
-             nBCSVM__2__3 Discr=0
-             nBCSVM__3__4 Discr=0
-          nBCSVM__4__5 Discr=0
-       numJets__6__7 Discr=0
-          nBCSVM__2__4 Discr=0
-             nBCSVM__2__3 Discr=0
-             nBCSVM__3__4 Discr=0
-          nBCSVM__4__5 Discr=0
+  Discr=2
+    numJets__4__5 Discr=2 
+       nBCSVM__2__4 Discr=2
+          nBCSVM__2__3 Discr=2
+          nBCSVM__3__4 Discr=2
+       nBCSVM__4__5 Discr=2
+    numJets__5__7 Discr=2
+       numJets__5__6 Discr=2
+          nBCSVM__2__4 Discr=2
+             nBCSVM__2__3 Discr=2
+             nBCSVM__3__4 Discr=2
+          nBCSVM__4__5 Discr=2
+       numJets__6__7 Discr=2
+          nBCSVM__2__4 Discr=2
+             nBCSVM__2__3 Discr=2
+             nBCSVM__3__4 Discr=2
+          nBCSVM__4__5 Discr=2
 """
 
 # Classic categorization:
