@@ -350,22 +350,24 @@ class GenTop:
     @staticmethod
     def make_array(tree):
         n = getattr(tree, "nGenTop", 0)
+        _charge = getattr(tree, "GenTop_charge", [None]*n)
+        _status = getattr(tree, "GenTop_status", [None]*n)
         _pdgId = getattr(tree, "GenTop_pdgId", [None]*n)
         _pt = getattr(tree, "GenTop_pt", [None]*n)
         _eta = getattr(tree, "GenTop_eta", [None]*n)
         _phi = getattr(tree, "GenTop_phi", [None]*n)
         _mass = getattr(tree, "GenTop_mass", [None]*n)
-        _charge = getattr(tree, "GenTop_charge", [None]*n)
-        _status = getattr(tree, "GenTop_status", [None]*n)
-        return [GenTop(_pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _charge[n], _status[n]) for n in range(n)]
-    def __init__(self, pdgId,pt,eta,phi,mass,charge,status):
+        _decayMode = getattr(tree, "GenTop_decayMode", [None]*n)
+        return [GenTop(_charge[n], _status[n], _pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _decayMode[n]) for n in range(n)]
+    def __init__(self, charge,status,pdgId,pt,eta,phi,mass,decayMode):
+        self.charge = charge #
+        self.status = status #
         self.pdgId = pdgId #
         self.pt = pt #
         self.eta = eta #
         self.phi = phi #
         self.mass = mass #
-        self.charge = charge #
-        self.status = status #
+        self.decayMode = decayMode #Generator level top decay mode: 0=leptonic, 1=hadronic, -1=not known
 class aJidx:
     """
     additional jet indices
@@ -461,6 +463,8 @@ class aLeptons:
         _eleHoE = getattr(tree, "aLeptons_eleHoE", [None]*n)
         _eleMissingHits = getattr(tree, "aLeptons_eleMissingHits", [None]*n)
         _eleChi2 = getattr(tree, "aLeptons_eleChi2", [None]*n)
+        _mvaIdTrig = getattr(tree, "aLeptons_mvaIdTrig", [None]*n)
+        _mvaIdTrigMediumResult = getattr(tree, "aLeptons_mvaIdTrigMediumResult", [None]*n)
         _nStations = getattr(tree, "aLeptons_nStations", [None]*n)
         _trkKink = getattr(tree, "aLeptons_trkKink", [None]*n)
         _caloCompatibility = getattr(tree, "aLeptons_caloCompatibility", [None]*n)
@@ -482,8 +486,11 @@ class aLeptons:
         _etaSc = getattr(tree, "aLeptons_etaSc", [None]*n)
         _eleExpMissingInnerHits = getattr(tree, "aLeptons_eleExpMissingInnerHits", [None]*n)
         _eleooEmooP = getattr(tree, "aLeptons_eleooEmooP", [None]*n)
-        return [aLeptons(_charge[n], _tightId[n], _eleCutIdCSA14_25ns_v1[n], _eleCutIdCSA14_50ns_v1[n], _eleCutIdSpring15_25ns_v1[n], _dxy[n], _dz[n], _edxy[n], _edz[n], _ip3d[n], _sip3d[n], _convVeto[n], _lostHits[n], _relIso03[n], _relIso04[n], _miniRelIso[n], _tightCharge[n], _mcMatchId[n], _mcMatchAny[n], _mcMatchTau[n], _mcPt[n], _mediumMuonId[n], _pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _looseIdSusy[n], _looseIdPOG[n], _chargedHadRelIso03[n], _chargedHadRelIso04[n], _eleSieie[n], _eleDEta[n], _eleDPhi[n], _eleHoE[n], _eleMissingHits[n], _eleChi2[n], _nStations[n], _trkKink[n], _caloCompatibility[n], _globalTrackChi2[n], _nChamberHits[n], _isPFMuon[n], _isGlobalMuon[n], _isTrackerMuon[n], _pixelHits[n], _trackerLayers[n], _pixelLayers[n], _mvaTTH[n], _jetOverlapIdx[n], _jetPtRatio[n], _jetBTagCSV[n], _jetDR[n], _pfRelIso03[n], _pfRelIso04[n], _etaSc[n], _eleExpMissingInnerHits[n], _eleooEmooP[n]) for n in range(n)]
-    def __init__(self, charge,tightId,eleCutIdCSA14_25ns_v1,eleCutIdCSA14_50ns_v1,eleCutIdSpring15_25ns_v1,dxy,dz,edxy,edz,ip3d,sip3d,convVeto,lostHits,relIso03,relIso04,miniRelIso,tightCharge,mcMatchId,mcMatchAny,mcMatchTau,mcPt,mediumMuonId,pdgId,pt,eta,phi,mass,looseIdSusy,looseIdPOG,chargedHadRelIso03,chargedHadRelIso04,eleSieie,eleDEta,eleDPhi,eleHoE,eleMissingHits,eleChi2,nStations,trkKink,caloCompatibility,globalTrackChi2,nChamberHits,isPFMuon,isGlobalMuon,isTrackerMuon,pixelHits,trackerLayers,pixelLayers,mvaTTH,jetOverlapIdx,jetPtRatio,jetBTagCSV,jetDR,pfRelIso03,pfRelIso04,etaSc,eleExpMissingInnerHits,eleooEmooP):
+        _dr03TkSumPt = getattr(tree, "aLeptons_dr03TkSumPt", [None]*n)
+        _eleEcalClusterIso = getattr(tree, "aLeptons_eleEcalClusterIso", [None]*n)
+        _eleHcalClusterIso = getattr(tree, "aLeptons_eleHcalClusterIso", [None]*n)
+        return [aLeptons(_charge[n], _tightId[n], _eleCutIdCSA14_25ns_v1[n], _eleCutIdCSA14_50ns_v1[n], _eleCutIdSpring15_25ns_v1[n], _dxy[n], _dz[n], _edxy[n], _edz[n], _ip3d[n], _sip3d[n], _convVeto[n], _lostHits[n], _relIso03[n], _relIso04[n], _miniRelIso[n], _tightCharge[n], _mcMatchId[n], _mcMatchAny[n], _mcMatchTau[n], _mcPt[n], _mediumMuonId[n], _pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _looseIdSusy[n], _looseIdPOG[n], _chargedHadRelIso03[n], _chargedHadRelIso04[n], _eleSieie[n], _eleDEta[n], _eleDPhi[n], _eleHoE[n], _eleMissingHits[n], _eleChi2[n], _mvaIdTrig[n], _mvaIdTrigMediumResult[n], _nStations[n], _trkKink[n], _caloCompatibility[n], _globalTrackChi2[n], _nChamberHits[n], _isPFMuon[n], _isGlobalMuon[n], _isTrackerMuon[n], _pixelHits[n], _trackerLayers[n], _pixelLayers[n], _mvaTTH[n], _jetOverlapIdx[n], _jetPtRatio[n], _jetBTagCSV[n], _jetDR[n], _pfRelIso03[n], _pfRelIso04[n], _etaSc[n], _eleExpMissingInnerHits[n], _eleooEmooP[n], _dr03TkSumPt[n], _eleEcalClusterIso[n], _eleHcalClusterIso[n]) for n in range(n)]
+    def __init__(self, charge,tightId,eleCutIdCSA14_25ns_v1,eleCutIdCSA14_50ns_v1,eleCutIdSpring15_25ns_v1,dxy,dz,edxy,edz,ip3d,sip3d,convVeto,lostHits,relIso03,relIso04,miniRelIso,tightCharge,mcMatchId,mcMatchAny,mcMatchTau,mcPt,mediumMuonId,pdgId,pt,eta,phi,mass,looseIdSusy,looseIdPOG,chargedHadRelIso03,chargedHadRelIso04,eleSieie,eleDEta,eleDPhi,eleHoE,eleMissingHits,eleChi2,mvaIdTrig,mvaIdTrigMediumResult,nStations,trkKink,caloCompatibility,globalTrackChi2,nChamberHits,isPFMuon,isGlobalMuon,isTrackerMuon,pixelHits,trackerLayers,pixelLayers,mvaTTH,jetOverlapIdx,jetPtRatio,jetBTagCSV,jetDR,pfRelIso03,pfRelIso04,etaSc,eleExpMissingInnerHits,eleooEmooP,dr03TkSumPt,eleEcalClusterIso,eleHcalClusterIso):
         self.charge = charge #
         self.tightId = tightId #POG Tight ID (for electrons it's configured in the analyzer)
         self.eleCutIdCSA14_25ns_v1 = eleCutIdCSA14_25ns_v1 #Electron cut-based id (POG CSA14_25ns_v1): 0=none, 1=veto, 2=loose, 3=medium, 4=tight
@@ -521,6 +528,8 @@ class aLeptons:
         self.eleHoE = eleHoE #H/E for electrons
         self.eleMissingHits = eleMissingHits #Missing hits for electrons
         self.eleChi2 = eleChi2 #Track chi squared for electrons' gsf tracks
+        self.mvaIdTrig = mvaIdTrig #EGamma POG MVA ID for triggering electrons; 1 for muons
+        self.mvaIdTrigMediumResult = mvaIdTrigMediumResult #True if passes EGamma POG MVA ID for triggering electrons; True for muons
         self.nStations = nStations #Number of matched muons stations (4 for electrons)
         self.trkKink = trkKink #Tracker kink-finder
         self.caloCompatibility = caloCompatibility #Calorimetric compatibility
@@ -542,6 +551,9 @@ class aLeptons:
         self.etaSc = etaSc #Electron supercluster pseudorapidity
         self.eleExpMissingInnerHits = eleExpMissingInnerHits #Electron expected missing inner hits
         self.eleooEmooP = eleooEmooP #Electron 1/E - 1/P
+        self.dr03TkSumPt = dr03TkSumPt #Electron track sum pt
+        self.eleEcalClusterIso = eleEcalClusterIso #Electron ecal cluster iso
+        self.eleHcalClusterIso = eleHcalClusterIso #Electron hcal cluster iso
 class GenNuFromTop:
     """
     Generated neutrino from t->W decay
@@ -662,6 +674,8 @@ class selLeptons:
         _eleHoE = getattr(tree, "selLeptons_eleHoE", [None]*n)
         _eleMissingHits = getattr(tree, "selLeptons_eleMissingHits", [None]*n)
         _eleChi2 = getattr(tree, "selLeptons_eleChi2", [None]*n)
+        _mvaIdTrig = getattr(tree, "selLeptons_mvaIdTrig", [None]*n)
+        _mvaIdTrigMediumResult = getattr(tree, "selLeptons_mvaIdTrigMediumResult", [None]*n)
         _nStations = getattr(tree, "selLeptons_nStations", [None]*n)
         _trkKink = getattr(tree, "selLeptons_trkKink", [None]*n)
         _caloCompatibility = getattr(tree, "selLeptons_caloCompatibility", [None]*n)
@@ -683,8 +697,11 @@ class selLeptons:
         _etaSc = getattr(tree, "selLeptons_etaSc", [None]*n)
         _eleExpMissingInnerHits = getattr(tree, "selLeptons_eleExpMissingInnerHits", [None]*n)
         _eleooEmooP = getattr(tree, "selLeptons_eleooEmooP", [None]*n)
-        return [selLeptons(_charge[n], _tightId[n], _eleCutIdCSA14_25ns_v1[n], _eleCutIdCSA14_50ns_v1[n], _eleCutIdSpring15_25ns_v1[n], _dxy[n], _dz[n], _edxy[n], _edz[n], _ip3d[n], _sip3d[n], _convVeto[n], _lostHits[n], _relIso03[n], _relIso04[n], _miniRelIso[n], _tightCharge[n], _mcMatchId[n], _mcMatchAny[n], _mcMatchTau[n], _mcPt[n], _mediumMuonId[n], _pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _looseIdSusy[n], _looseIdPOG[n], _chargedHadRelIso03[n], _chargedHadRelIso04[n], _eleSieie[n], _eleDEta[n], _eleDPhi[n], _eleHoE[n], _eleMissingHits[n], _eleChi2[n], _nStations[n], _trkKink[n], _caloCompatibility[n], _globalTrackChi2[n], _nChamberHits[n], _isPFMuon[n], _isGlobalMuon[n], _isTrackerMuon[n], _pixelHits[n], _trackerLayers[n], _pixelLayers[n], _mvaTTH[n], _jetOverlapIdx[n], _jetPtRatio[n], _jetBTagCSV[n], _jetDR[n], _pfRelIso03[n], _pfRelIso04[n], _etaSc[n], _eleExpMissingInnerHits[n], _eleooEmooP[n]) for n in range(n)]
-    def __init__(self, charge,tightId,eleCutIdCSA14_25ns_v1,eleCutIdCSA14_50ns_v1,eleCutIdSpring15_25ns_v1,dxy,dz,edxy,edz,ip3d,sip3d,convVeto,lostHits,relIso03,relIso04,miniRelIso,tightCharge,mcMatchId,mcMatchAny,mcMatchTau,mcPt,mediumMuonId,pdgId,pt,eta,phi,mass,looseIdSusy,looseIdPOG,chargedHadRelIso03,chargedHadRelIso04,eleSieie,eleDEta,eleDPhi,eleHoE,eleMissingHits,eleChi2,nStations,trkKink,caloCompatibility,globalTrackChi2,nChamberHits,isPFMuon,isGlobalMuon,isTrackerMuon,pixelHits,trackerLayers,pixelLayers,mvaTTH,jetOverlapIdx,jetPtRatio,jetBTagCSV,jetDR,pfRelIso03,pfRelIso04,etaSc,eleExpMissingInnerHits,eleooEmooP):
+        _dr03TkSumPt = getattr(tree, "selLeptons_dr03TkSumPt", [None]*n)
+        _eleEcalClusterIso = getattr(tree, "selLeptons_eleEcalClusterIso", [None]*n)
+        _eleHcalClusterIso = getattr(tree, "selLeptons_eleHcalClusterIso", [None]*n)
+        return [selLeptons(_charge[n], _tightId[n], _eleCutIdCSA14_25ns_v1[n], _eleCutIdCSA14_50ns_v1[n], _eleCutIdSpring15_25ns_v1[n], _dxy[n], _dz[n], _edxy[n], _edz[n], _ip3d[n], _sip3d[n], _convVeto[n], _lostHits[n], _relIso03[n], _relIso04[n], _miniRelIso[n], _tightCharge[n], _mcMatchId[n], _mcMatchAny[n], _mcMatchTau[n], _mcPt[n], _mediumMuonId[n], _pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _looseIdSusy[n], _looseIdPOG[n], _chargedHadRelIso03[n], _chargedHadRelIso04[n], _eleSieie[n], _eleDEta[n], _eleDPhi[n], _eleHoE[n], _eleMissingHits[n], _eleChi2[n], _mvaIdTrig[n], _mvaIdTrigMediumResult[n], _nStations[n], _trkKink[n], _caloCompatibility[n], _globalTrackChi2[n], _nChamberHits[n], _isPFMuon[n], _isGlobalMuon[n], _isTrackerMuon[n], _pixelHits[n], _trackerLayers[n], _pixelLayers[n], _mvaTTH[n], _jetOverlapIdx[n], _jetPtRatio[n], _jetBTagCSV[n], _jetDR[n], _pfRelIso03[n], _pfRelIso04[n], _etaSc[n], _eleExpMissingInnerHits[n], _eleooEmooP[n], _dr03TkSumPt[n], _eleEcalClusterIso[n], _eleHcalClusterIso[n]) for n in range(n)]
+    def __init__(self, charge,tightId,eleCutIdCSA14_25ns_v1,eleCutIdCSA14_50ns_v1,eleCutIdSpring15_25ns_v1,dxy,dz,edxy,edz,ip3d,sip3d,convVeto,lostHits,relIso03,relIso04,miniRelIso,tightCharge,mcMatchId,mcMatchAny,mcMatchTau,mcPt,mediumMuonId,pdgId,pt,eta,phi,mass,looseIdSusy,looseIdPOG,chargedHadRelIso03,chargedHadRelIso04,eleSieie,eleDEta,eleDPhi,eleHoE,eleMissingHits,eleChi2,mvaIdTrig,mvaIdTrigMediumResult,nStations,trkKink,caloCompatibility,globalTrackChi2,nChamberHits,isPFMuon,isGlobalMuon,isTrackerMuon,pixelHits,trackerLayers,pixelLayers,mvaTTH,jetOverlapIdx,jetPtRatio,jetBTagCSV,jetDR,pfRelIso03,pfRelIso04,etaSc,eleExpMissingInnerHits,eleooEmooP,dr03TkSumPt,eleEcalClusterIso,eleHcalClusterIso):
         self.charge = charge #
         self.tightId = tightId #POG Tight ID (for electrons it's configured in the analyzer)
         self.eleCutIdCSA14_25ns_v1 = eleCutIdCSA14_25ns_v1 #Electron cut-based id (POG CSA14_25ns_v1): 0=none, 1=veto, 2=loose, 3=medium, 4=tight
@@ -722,6 +739,8 @@ class selLeptons:
         self.eleHoE = eleHoE #H/E for electrons
         self.eleMissingHits = eleMissingHits #Missing hits for electrons
         self.eleChi2 = eleChi2 #Track chi squared for electrons' gsf tracks
+        self.mvaIdTrig = mvaIdTrig #EGamma POG MVA ID for triggering electrons; 1 for muons
+        self.mvaIdTrigMediumResult = mvaIdTrigMediumResult #True if passes EGamma POG MVA ID for triggering electrons; True for muons
         self.nStations = nStations #Number of matched muons stations (4 for electrons)
         self.trkKink = trkKink #Tracker kink-finder
         self.caloCompatibility = caloCompatibility #Calorimetric compatibility
@@ -743,6 +762,9 @@ class selLeptons:
         self.etaSc = etaSc #Electron supercluster pseudorapidity
         self.eleExpMissingInnerHits = eleExpMissingInnerHits #Electron expected missing inner hits
         self.eleooEmooP = eleooEmooP #Electron 1/E - 1/P
+        self.dr03TkSumPt = dr03TkSumPt #Electron track sum pt
+        self.eleEcalClusterIso = eleEcalClusterIso #Electron ecal cluster iso
+        self.eleHcalClusterIso = eleHcalClusterIso #Electron hcal cluster iso
 class GenHiggsSisters:
     """
     Sisters of the Higgs bosons
@@ -833,7 +855,9 @@ class DiscardedJet:
         _neHEF = getattr(tree, "DiscardedJet_neHEF", [None]*n)
         _chEmEF = getattr(tree, "DiscardedJet_chEmEF", [None]*n)
         _neEmEF = getattr(tree, "DiscardedJet_neEmEF", [None]*n)
+        _muEF = getattr(tree, "DiscardedJet_muEF", [None]*n)
         _chMult = getattr(tree, "DiscardedJet_chMult", [None]*n)
+        _neMult = getattr(tree, "DiscardedJet_neMult", [None]*n)
         _leadTrackPt = getattr(tree, "DiscardedJet_leadTrackPt", [None]*n)
         _mcEta = getattr(tree, "DiscardedJet_mcEta", [None]*n)
         _mcPhi = getattr(tree, "DiscardedJet_mcPhi", [None]*n)
@@ -880,8 +904,8 @@ class DiscardedJet:
         _bTagWeightcErr2Up = getattr(tree, "DiscardedJet_bTagWeightcErr2Up", [None]*n)
         _bTagWeightcErr2Down = getattr(tree, "DiscardedJet_bTagWeightcErr2Down", [None]*n)
         _bTagWeight = getattr(tree, "DiscardedJet_bTagWeight", [None]*n)
-        return [DiscardedJet(_id[n], _puId[n], _btagCSV[n], _btagCMVA[n], _rawPt[n], _mcPt[n], _mcFlavour[n], _mcMatchId[n], _corr_JECUp[n], _corr_JECDown[n], _corr[n], _corr_JERUp[n], _corr_JERDown[n], _corr_JER[n], _pt[n], _eta[n], _phi[n], _mass[n], _idxFirstTauMatch[n], _heppyFlavour[n], _hadronFlavour[n], _btagBDT[n], _btagProb[n], _btagBProb[n], _btagSoftEl[n], _btagSoftMu[n], _btagnew[n], _btagCSVV0[n], _chHEF[n], _neHEF[n], _chEmEF[n], _neEmEF[n], _chMult[n], _leadTrackPt[n], _mcEta[n], _mcPhi[n], _mcM[n], _leptonPdgId[n], _leptonPt[n], _leptonPtRel[n], _leptonPtRelInv[n], _leptonDeltaR[n], _leptonDeltaPhi[n], _leptonDeltaEta[n], _vtxMass[n], _vtxNtracks[n], _vtxPt[n], _vtx3DSig[n], _vtx3DVal[n], _vtxPosX[n], _vtxPosY[n], _vtxPosZ[n], _pullVectorPhi[n], _pullVectorMag[n], _qgl[n], _ptd[n], _axis2[n], _mult[n], _numberOfDaughters[n], _btagIdx[n], _mcIdx[n], _pt_reg[n], _pt_regVBF[n], _blike_VBF[n], _bTagWeightJESUp[n], _bTagWeightJESDown[n], _bTagWeightLFUp[n], _bTagWeightLFDown[n], _bTagWeightHFUp[n], _bTagWeightHFDown[n], _bTagWeightStats1Up[n], _bTagWeightStats1Down[n], _bTagWeightStats2Up[n], _bTagWeightStats2Down[n], _bTagWeightcErr1Up[n], _bTagWeightcErr1Down[n], _bTagWeightcErr2Up[n], _bTagWeightcErr2Down[n], _bTagWeight[n]) for n in range(n)]
-    def __init__(self, id,puId,btagCSV,btagCMVA,rawPt,mcPt,mcFlavour,mcMatchId,corr_JECUp,corr_JECDown,corr,corr_JERUp,corr_JERDown,corr_JER,pt,eta,phi,mass,idxFirstTauMatch,heppyFlavour,hadronFlavour,btagBDT,btagProb,btagBProb,btagSoftEl,btagSoftMu,btagnew,btagCSVV0,chHEF,neHEF,chEmEF,neEmEF,chMult,leadTrackPt,mcEta,mcPhi,mcM,leptonPdgId,leptonPt,leptonPtRel,leptonPtRelInv,leptonDeltaR,leptonDeltaPhi,leptonDeltaEta,vtxMass,vtxNtracks,vtxPt,vtx3DSig,vtx3DVal,vtxPosX,vtxPosY,vtxPosZ,pullVectorPhi,pullVectorMag,qgl,ptd,axis2,mult,numberOfDaughters,btagIdx,mcIdx,pt_reg,pt_regVBF,blike_VBF,bTagWeightJESUp,bTagWeightJESDown,bTagWeightLFUp,bTagWeightLFDown,bTagWeightHFUp,bTagWeightHFDown,bTagWeightStats1Up,bTagWeightStats1Down,bTagWeightStats2Up,bTagWeightStats2Down,bTagWeightcErr1Up,bTagWeightcErr1Down,bTagWeightcErr2Up,bTagWeightcErr2Down,bTagWeight):
+        return [DiscardedJet(_id[n], _puId[n], _btagCSV[n], _btagCMVA[n], _rawPt[n], _mcPt[n], _mcFlavour[n], _mcMatchId[n], _corr_JECUp[n], _corr_JECDown[n], _corr[n], _corr_JERUp[n], _corr_JERDown[n], _corr_JER[n], _pt[n], _eta[n], _phi[n], _mass[n], _idxFirstTauMatch[n], _heppyFlavour[n], _hadronFlavour[n], _btagBDT[n], _btagProb[n], _btagBProb[n], _btagSoftEl[n], _btagSoftMu[n], _btagnew[n], _btagCSVV0[n], _chHEF[n], _neHEF[n], _chEmEF[n], _neEmEF[n], _muEF[n], _chMult[n], _neMult[n], _leadTrackPt[n], _mcEta[n], _mcPhi[n], _mcM[n], _leptonPdgId[n], _leptonPt[n], _leptonPtRel[n], _leptonPtRelInv[n], _leptonDeltaR[n], _leptonDeltaPhi[n], _leptonDeltaEta[n], _vtxMass[n], _vtxNtracks[n], _vtxPt[n], _vtx3DSig[n], _vtx3DVal[n], _vtxPosX[n], _vtxPosY[n], _vtxPosZ[n], _pullVectorPhi[n], _pullVectorMag[n], _qgl[n], _ptd[n], _axis2[n], _mult[n], _numberOfDaughters[n], _btagIdx[n], _mcIdx[n], _pt_reg[n], _pt_regVBF[n], _blike_VBF[n], _bTagWeightJESUp[n], _bTagWeightJESDown[n], _bTagWeightLFUp[n], _bTagWeightLFDown[n], _bTagWeightHFUp[n], _bTagWeightHFDown[n], _bTagWeightStats1Up[n], _bTagWeightStats1Down[n], _bTagWeightStats2Up[n], _bTagWeightStats2Down[n], _bTagWeightcErr1Up[n], _bTagWeightcErr1Down[n], _bTagWeightcErr2Up[n], _bTagWeightcErr2Down[n], _bTagWeight[n]) for n in range(n)]
+    def __init__(self, id,puId,btagCSV,btagCMVA,rawPt,mcPt,mcFlavour,mcMatchId,corr_JECUp,corr_JECDown,corr,corr_JERUp,corr_JERDown,corr_JER,pt,eta,phi,mass,idxFirstTauMatch,heppyFlavour,hadronFlavour,btagBDT,btagProb,btagBProb,btagSoftEl,btagSoftMu,btagnew,btagCSVV0,chHEF,neHEF,chEmEF,neEmEF,muEF,chMult,neMult,leadTrackPt,mcEta,mcPhi,mcM,leptonPdgId,leptonPt,leptonPtRel,leptonPtRelInv,leptonDeltaR,leptonDeltaPhi,leptonDeltaEta,vtxMass,vtxNtracks,vtxPt,vtx3DSig,vtx3DVal,vtxPosX,vtxPosY,vtxPosZ,pullVectorPhi,pullVectorMag,qgl,ptd,axis2,mult,numberOfDaughters,btagIdx,mcIdx,pt_reg,pt_regVBF,blike_VBF,bTagWeightJESUp,bTagWeightJESDown,bTagWeightLFUp,bTagWeightLFDown,bTagWeightHFUp,bTagWeightHFDown,bTagWeightStats1Up,bTagWeightStats1Down,bTagWeightStats2Up,bTagWeightStats2Down,bTagWeightcErr1Up,bTagWeightcErr1Down,bTagWeightcErr2Up,bTagWeightcErr2Down,bTagWeight):
         self.id = id #POG Loose jet ID
         self.puId = puId #puId (full MVA, loose WP, 5.3.X training on AK5PFchs: the only thing that is available now)
         self.btagCSV = btagCSV #CSV-IVF v2 discriminator
@@ -890,12 +914,12 @@ class DiscardedJet:
         self.mcPt = mcPt #p_{T} of associated gen jet
         self.mcFlavour = mcFlavour #parton flavour (physics definition, i.e. including b's from shower)
         self.mcMatchId = mcMatchId #Match to source from hard scatter (pdgId of heaviest particle in chain, 25 for H, 6 for t, 23/24 for W/Z), zero if non-prompt or fake
-        self.corr_JECUp = corr_JECUp #
-        self.corr_JECDown = corr_JECDown #
-        self.corr = corr #
-        self.corr_JERUp = corr_JERUp #
-        self.corr_JERDown = corr_JERDown #
-        self.corr_JER = corr_JER #
+        self.corr_JECUp = corr_JECUp #pt correction from JEC up
+        self.corr_JECDown = corr_JECDown #pt correction from JEC down
+        self.corr = corr #pt correction from JEC
+        self.corr_JERUp = corr_JERUp #pt correction from JER up
+        self.corr_JERDown = corr_JERDown #pt correction from JER down 
+        self.corr_JER = corr_JER #pt correction from JER
         self.pt = pt #
         self.eta = eta #
         self.phi = phi #
@@ -914,7 +938,9 @@ class DiscardedJet:
         self.neHEF = neHEF #neutralHadronEnergyFraction (relative to uncorrected jet energy)
         self.chEmEF = chEmEF #chargedEmEnergyFraction (relative to uncorrected jet energy)
         self.neEmEF = neEmEF #neutralEmEnergyFraction (relative to uncorrected jet energy)
+        self.muEF = muEF #muon energy fraction (relative to uncorrected jet energy)
         self.chMult = chMult #chargedMultiplicity from PFJet.h
+        self.neMult = neMult #neutralMultiplicity from PFJet.h
         self.leadTrackPt = leadTrackPt #pt of the leading track in the jet
         self.mcEta = mcEta #eta of associated gen jet
         self.mcPhi = mcPhi #phi of associated gen jet
@@ -1201,7 +1227,9 @@ class Jet:
         _neHEF = getattr(tree, "Jet_neHEF", [None]*n)
         _chEmEF = getattr(tree, "Jet_chEmEF", [None]*n)
         _neEmEF = getattr(tree, "Jet_neEmEF", [None]*n)
+        _muEF = getattr(tree, "Jet_muEF", [None]*n)
         _chMult = getattr(tree, "Jet_chMult", [None]*n)
+        _neMult = getattr(tree, "Jet_neMult", [None]*n)
         _leadTrackPt = getattr(tree, "Jet_leadTrackPt", [None]*n)
         _mcEta = getattr(tree, "Jet_mcEta", [None]*n)
         _mcPhi = getattr(tree, "Jet_mcPhi", [None]*n)
@@ -1248,8 +1276,8 @@ class Jet:
         _bTagWeightcErr2Up = getattr(tree, "Jet_bTagWeightcErr2Up", [None]*n)
         _bTagWeightcErr2Down = getattr(tree, "Jet_bTagWeightcErr2Down", [None]*n)
         _bTagWeight = getattr(tree, "Jet_bTagWeight", [None]*n)
-        return [Jet(_id[n], _puId[n], _btagCSV[n], _btagCMVA[n], _rawPt[n], _mcPt[n], _mcFlavour[n], _mcMatchId[n], _corr_JECUp[n], _corr_JECDown[n], _corr[n], _corr_JERUp[n], _corr_JERDown[n], _corr_JER[n], _pt[n], _eta[n], _phi[n], _mass[n], _idxFirstTauMatch[n], _heppyFlavour[n], _hadronFlavour[n], _btagBDT[n], _btagProb[n], _btagBProb[n], _btagSoftEl[n], _btagSoftMu[n], _btagnew[n], _btagCSVV0[n], _chHEF[n], _neHEF[n], _chEmEF[n], _neEmEF[n], _chMult[n], _leadTrackPt[n], _mcEta[n], _mcPhi[n], _mcM[n], _leptonPdgId[n], _leptonPt[n], _leptonPtRel[n], _leptonPtRelInv[n], _leptonDeltaR[n], _leptonDeltaPhi[n], _leptonDeltaEta[n], _vtxMass[n], _vtxNtracks[n], _vtxPt[n], _vtx3DSig[n], _vtx3DVal[n], _vtxPosX[n], _vtxPosY[n], _vtxPosZ[n], _pullVectorPhi[n], _pullVectorMag[n], _qgl[n], _ptd[n], _axis2[n], _mult[n], _numberOfDaughters[n], _btagIdx[n], _mcIdx[n], _pt_reg[n], _pt_regVBF[n], _blike_VBF[n], _bTagWeightJESUp[n], _bTagWeightJESDown[n], _bTagWeightLFUp[n], _bTagWeightLFDown[n], _bTagWeightHFUp[n], _bTagWeightHFDown[n], _bTagWeightStats1Up[n], _bTagWeightStats1Down[n], _bTagWeightStats2Up[n], _bTagWeightStats2Down[n], _bTagWeightcErr1Up[n], _bTagWeightcErr1Down[n], _bTagWeightcErr2Up[n], _bTagWeightcErr2Down[n], _bTagWeight[n]) for n in range(n)]
-    def __init__(self, id,puId,btagCSV,btagCMVA,rawPt,mcPt,mcFlavour,mcMatchId,corr_JECUp,corr_JECDown,corr,corr_JERUp,corr_JERDown,corr_JER,pt,eta,phi,mass,idxFirstTauMatch,heppyFlavour,hadronFlavour,btagBDT,btagProb,btagBProb,btagSoftEl,btagSoftMu,btagnew,btagCSVV0,chHEF,neHEF,chEmEF,neEmEF,chMult,leadTrackPt,mcEta,mcPhi,mcM,leptonPdgId,leptonPt,leptonPtRel,leptonPtRelInv,leptonDeltaR,leptonDeltaPhi,leptonDeltaEta,vtxMass,vtxNtracks,vtxPt,vtx3DSig,vtx3DVal,vtxPosX,vtxPosY,vtxPosZ,pullVectorPhi,pullVectorMag,qgl,ptd,axis2,mult,numberOfDaughters,btagIdx,mcIdx,pt_reg,pt_regVBF,blike_VBF,bTagWeightJESUp,bTagWeightJESDown,bTagWeightLFUp,bTagWeightLFDown,bTagWeightHFUp,bTagWeightHFDown,bTagWeightStats1Up,bTagWeightStats1Down,bTagWeightStats2Up,bTagWeightStats2Down,bTagWeightcErr1Up,bTagWeightcErr1Down,bTagWeightcErr2Up,bTagWeightcErr2Down,bTagWeight):
+        return [Jet(_id[n], _puId[n], _btagCSV[n], _btagCMVA[n], _rawPt[n], _mcPt[n], _mcFlavour[n], _mcMatchId[n], _corr_JECUp[n], _corr_JECDown[n], _corr[n], _corr_JERUp[n], _corr_JERDown[n], _corr_JER[n], _pt[n], _eta[n], _phi[n], _mass[n], _idxFirstTauMatch[n], _heppyFlavour[n], _hadronFlavour[n], _btagBDT[n], _btagProb[n], _btagBProb[n], _btagSoftEl[n], _btagSoftMu[n], _btagnew[n], _btagCSVV0[n], _chHEF[n], _neHEF[n], _chEmEF[n], _neEmEF[n], _muEF[n], _chMult[n], _neMult[n], _leadTrackPt[n], _mcEta[n], _mcPhi[n], _mcM[n], _leptonPdgId[n], _leptonPt[n], _leptonPtRel[n], _leptonPtRelInv[n], _leptonDeltaR[n], _leptonDeltaPhi[n], _leptonDeltaEta[n], _vtxMass[n], _vtxNtracks[n], _vtxPt[n], _vtx3DSig[n], _vtx3DVal[n], _vtxPosX[n], _vtxPosY[n], _vtxPosZ[n], _pullVectorPhi[n], _pullVectorMag[n], _qgl[n], _ptd[n], _axis2[n], _mult[n], _numberOfDaughters[n], _btagIdx[n], _mcIdx[n], _pt_reg[n], _pt_regVBF[n], _blike_VBF[n], _bTagWeightJESUp[n], _bTagWeightJESDown[n], _bTagWeightLFUp[n], _bTagWeightLFDown[n], _bTagWeightHFUp[n], _bTagWeightHFDown[n], _bTagWeightStats1Up[n], _bTagWeightStats1Down[n], _bTagWeightStats2Up[n], _bTagWeightStats2Down[n], _bTagWeightcErr1Up[n], _bTagWeightcErr1Down[n], _bTagWeightcErr2Up[n], _bTagWeightcErr2Down[n], _bTagWeight[n]) for n in range(n)]
+    def __init__(self, id,puId,btagCSV,btagCMVA,rawPt,mcPt,mcFlavour,mcMatchId,corr_JECUp,corr_JECDown,corr,corr_JERUp,corr_JERDown,corr_JER,pt,eta,phi,mass,idxFirstTauMatch,heppyFlavour,hadronFlavour,btagBDT,btagProb,btagBProb,btagSoftEl,btagSoftMu,btagnew,btagCSVV0,chHEF,neHEF,chEmEF,neEmEF,muEF,chMult,neMult,leadTrackPt,mcEta,mcPhi,mcM,leptonPdgId,leptonPt,leptonPtRel,leptonPtRelInv,leptonDeltaR,leptonDeltaPhi,leptonDeltaEta,vtxMass,vtxNtracks,vtxPt,vtx3DSig,vtx3DVal,vtxPosX,vtxPosY,vtxPosZ,pullVectorPhi,pullVectorMag,qgl,ptd,axis2,mult,numberOfDaughters,btagIdx,mcIdx,pt_reg,pt_regVBF,blike_VBF,bTagWeightJESUp,bTagWeightJESDown,bTagWeightLFUp,bTagWeightLFDown,bTagWeightHFUp,bTagWeightHFDown,bTagWeightStats1Up,bTagWeightStats1Down,bTagWeightStats2Up,bTagWeightStats2Down,bTagWeightcErr1Up,bTagWeightcErr1Down,bTagWeightcErr2Up,bTagWeightcErr2Down,bTagWeight):
         self.id = id #POG Loose jet ID
         self.puId = puId #puId (full MVA, loose WP, 5.3.X training on AK5PFchs: the only thing that is available now)
         self.btagCSV = btagCSV #CSV-IVF v2 discriminator
@@ -1258,12 +1286,12 @@ class Jet:
         self.mcPt = mcPt #p_{T} of associated gen jet
         self.mcFlavour = mcFlavour #parton flavour (physics definition, i.e. including b's from shower)
         self.mcMatchId = mcMatchId #Match to source from hard scatter (pdgId of heaviest particle in chain, 25 for H, 6 for t, 23/24 for W/Z), zero if non-prompt or fake
-        self.corr_JECUp = corr_JECUp #
-        self.corr_JECDown = corr_JECDown #
-        self.corr = corr #
-        self.corr_JERUp = corr_JERUp #
-        self.corr_JERDown = corr_JERDown #
-        self.corr_JER = corr_JER #
+        self.corr_JECUp = corr_JECUp #pt correction from JEC up
+        self.corr_JECDown = corr_JECDown #pt correction from JEC down
+        self.corr = corr #pt correction from JEC
+        self.corr_JERUp = corr_JERUp #pt correction from JER up
+        self.corr_JERDown = corr_JERDown #pt correction from JER down 
+        self.corr_JER = corr_JER #pt correction from JER
         self.pt = pt #
         self.eta = eta #
         self.phi = phi #
@@ -1282,7 +1310,9 @@ class Jet:
         self.neHEF = neHEF #neutralHadronEnergyFraction (relative to uncorrected jet energy)
         self.chEmEF = chEmEF #chargedEmEnergyFraction (relative to uncorrected jet energy)
         self.neEmEF = neEmEF #neutralEmEnergyFraction (relative to uncorrected jet energy)
+        self.muEF = muEF #muon energy fraction (relative to uncorrected jet energy)
         self.chMult = chMult #chargedMultiplicity from PFJet.h
+        self.neMult = neMult #neutralMultiplicity from PFJet.h
         self.leadTrackPt = leadTrackPt #pt of the leading track in the jet
         self.mcEta = mcEta #eta of associated gen jet
         self.mcPhi = mcPhi #phi of associated gen jet
@@ -1390,6 +1420,8 @@ class vLeptons:
         _eleHoE = getattr(tree, "vLeptons_eleHoE", [None]*n)
         _eleMissingHits = getattr(tree, "vLeptons_eleMissingHits", [None]*n)
         _eleChi2 = getattr(tree, "vLeptons_eleChi2", [None]*n)
+        _mvaIdTrig = getattr(tree, "vLeptons_mvaIdTrig", [None]*n)
+        _mvaIdTrigMediumResult = getattr(tree, "vLeptons_mvaIdTrigMediumResult", [None]*n)
         _nStations = getattr(tree, "vLeptons_nStations", [None]*n)
         _trkKink = getattr(tree, "vLeptons_trkKink", [None]*n)
         _caloCompatibility = getattr(tree, "vLeptons_caloCompatibility", [None]*n)
@@ -1411,8 +1443,11 @@ class vLeptons:
         _etaSc = getattr(tree, "vLeptons_etaSc", [None]*n)
         _eleExpMissingInnerHits = getattr(tree, "vLeptons_eleExpMissingInnerHits", [None]*n)
         _eleooEmooP = getattr(tree, "vLeptons_eleooEmooP", [None]*n)
-        return [vLeptons(_charge[n], _tightId[n], _eleCutIdCSA14_25ns_v1[n], _eleCutIdCSA14_50ns_v1[n], _eleCutIdSpring15_25ns_v1[n], _dxy[n], _dz[n], _edxy[n], _edz[n], _ip3d[n], _sip3d[n], _convVeto[n], _lostHits[n], _relIso03[n], _relIso04[n], _miniRelIso[n], _tightCharge[n], _mcMatchId[n], _mcMatchAny[n], _mcMatchTau[n], _mcPt[n], _mediumMuonId[n], _pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _looseIdSusy[n], _looseIdPOG[n], _chargedHadRelIso03[n], _chargedHadRelIso04[n], _eleSieie[n], _eleDEta[n], _eleDPhi[n], _eleHoE[n], _eleMissingHits[n], _eleChi2[n], _nStations[n], _trkKink[n], _caloCompatibility[n], _globalTrackChi2[n], _nChamberHits[n], _isPFMuon[n], _isGlobalMuon[n], _isTrackerMuon[n], _pixelHits[n], _trackerLayers[n], _pixelLayers[n], _mvaTTH[n], _jetOverlapIdx[n], _jetPtRatio[n], _jetBTagCSV[n], _jetDR[n], _pfRelIso03[n], _pfRelIso04[n], _etaSc[n], _eleExpMissingInnerHits[n], _eleooEmooP[n]) for n in range(n)]
-    def __init__(self, charge,tightId,eleCutIdCSA14_25ns_v1,eleCutIdCSA14_50ns_v1,eleCutIdSpring15_25ns_v1,dxy,dz,edxy,edz,ip3d,sip3d,convVeto,lostHits,relIso03,relIso04,miniRelIso,tightCharge,mcMatchId,mcMatchAny,mcMatchTau,mcPt,mediumMuonId,pdgId,pt,eta,phi,mass,looseIdSusy,looseIdPOG,chargedHadRelIso03,chargedHadRelIso04,eleSieie,eleDEta,eleDPhi,eleHoE,eleMissingHits,eleChi2,nStations,trkKink,caloCompatibility,globalTrackChi2,nChamberHits,isPFMuon,isGlobalMuon,isTrackerMuon,pixelHits,trackerLayers,pixelLayers,mvaTTH,jetOverlapIdx,jetPtRatio,jetBTagCSV,jetDR,pfRelIso03,pfRelIso04,etaSc,eleExpMissingInnerHits,eleooEmooP):
+        _dr03TkSumPt = getattr(tree, "vLeptons_dr03TkSumPt", [None]*n)
+        _eleEcalClusterIso = getattr(tree, "vLeptons_eleEcalClusterIso", [None]*n)
+        _eleHcalClusterIso = getattr(tree, "vLeptons_eleHcalClusterIso", [None]*n)
+        return [vLeptons(_charge[n], _tightId[n], _eleCutIdCSA14_25ns_v1[n], _eleCutIdCSA14_50ns_v1[n], _eleCutIdSpring15_25ns_v1[n], _dxy[n], _dz[n], _edxy[n], _edz[n], _ip3d[n], _sip3d[n], _convVeto[n], _lostHits[n], _relIso03[n], _relIso04[n], _miniRelIso[n], _tightCharge[n], _mcMatchId[n], _mcMatchAny[n], _mcMatchTau[n], _mcPt[n], _mediumMuonId[n], _pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _looseIdSusy[n], _looseIdPOG[n], _chargedHadRelIso03[n], _chargedHadRelIso04[n], _eleSieie[n], _eleDEta[n], _eleDPhi[n], _eleHoE[n], _eleMissingHits[n], _eleChi2[n], _mvaIdTrig[n], _mvaIdTrigMediumResult[n], _nStations[n], _trkKink[n], _caloCompatibility[n], _globalTrackChi2[n], _nChamberHits[n], _isPFMuon[n], _isGlobalMuon[n], _isTrackerMuon[n], _pixelHits[n], _trackerLayers[n], _pixelLayers[n], _mvaTTH[n], _jetOverlapIdx[n], _jetPtRatio[n], _jetBTagCSV[n], _jetDR[n], _pfRelIso03[n], _pfRelIso04[n], _etaSc[n], _eleExpMissingInnerHits[n], _eleooEmooP[n], _dr03TkSumPt[n], _eleEcalClusterIso[n], _eleHcalClusterIso[n]) for n in range(n)]
+    def __init__(self, charge,tightId,eleCutIdCSA14_25ns_v1,eleCutIdCSA14_50ns_v1,eleCutIdSpring15_25ns_v1,dxy,dz,edxy,edz,ip3d,sip3d,convVeto,lostHits,relIso03,relIso04,miniRelIso,tightCharge,mcMatchId,mcMatchAny,mcMatchTau,mcPt,mediumMuonId,pdgId,pt,eta,phi,mass,looseIdSusy,looseIdPOG,chargedHadRelIso03,chargedHadRelIso04,eleSieie,eleDEta,eleDPhi,eleHoE,eleMissingHits,eleChi2,mvaIdTrig,mvaIdTrigMediumResult,nStations,trkKink,caloCompatibility,globalTrackChi2,nChamberHits,isPFMuon,isGlobalMuon,isTrackerMuon,pixelHits,trackerLayers,pixelLayers,mvaTTH,jetOverlapIdx,jetPtRatio,jetBTagCSV,jetDR,pfRelIso03,pfRelIso04,etaSc,eleExpMissingInnerHits,eleooEmooP,dr03TkSumPt,eleEcalClusterIso,eleHcalClusterIso):
         self.charge = charge #
         self.tightId = tightId #POG Tight ID (for electrons it's configured in the analyzer)
         self.eleCutIdCSA14_25ns_v1 = eleCutIdCSA14_25ns_v1 #Electron cut-based id (POG CSA14_25ns_v1): 0=none, 1=veto, 2=loose, 3=medium, 4=tight
@@ -1450,6 +1485,8 @@ class vLeptons:
         self.eleHoE = eleHoE #H/E for electrons
         self.eleMissingHits = eleMissingHits #Missing hits for electrons
         self.eleChi2 = eleChi2 #Track chi squared for electrons' gsf tracks
+        self.mvaIdTrig = mvaIdTrig #EGamma POG MVA ID for triggering electrons; 1 for muons
+        self.mvaIdTrigMediumResult = mvaIdTrigMediumResult #True if passes EGamma POG MVA ID for triggering electrons; True for muons
         self.nStations = nStations #Number of matched muons stations (4 for electrons)
         self.trkKink = trkKink #Tracker kink-finder
         self.caloCompatibility = caloCompatibility #Calorimetric compatibility
@@ -1471,6 +1508,9 @@ class vLeptons:
         self.etaSc = etaSc #Electron supercluster pseudorapidity
         self.eleExpMissingInnerHits = eleExpMissingInnerHits #Electron expected missing inner hits
         self.eleooEmooP = eleooEmooP #Electron 1/E - 1/P
+        self.dr03TkSumPt = dr03TkSumPt #Electron track sum pt
+        self.eleEcalClusterIso = eleEcalClusterIso #Electron ecal cluster iso
+        self.eleHcalClusterIso = eleHcalClusterIso #Electron hcal cluster iso
 class pileUpVertex_z:
     """
     z position of hardest pile-up collisions

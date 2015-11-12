@@ -215,8 +215,6 @@ class Categorization(object):
             for ignore_splitting in [True,False]:
 
                 for n in nodes_to_eval:
-                    #import pdb
-                    #pdb.set_trace()
                     control_plots_filename = "{0}/ControlPlots_{1}_NS{2}.root".format(n.output_path, i_split, ignore_splitting)
                     shapes_txt_filename    = "{0}/shapes_{1}_NS{2}.txt".format(n.output_path, i_split, ignore_splitting)
                     shapes_root_filename   = "{0}/shapes_{1}_NS{2}.root".format(n.output_path, i_split, ignore_splitting)
@@ -247,9 +245,6 @@ class Categorization(object):
             for n in nodes_to_eval:
                 n.limits_self = li_limits[n.i_split_self]
                 n.limits_comb = li_limits[n.i_split_comb]
-
-            # import pdb
-            # pdb.set_trace()
 
             limits = {}
             for ignore_splitting in [True,False]:
@@ -503,7 +498,7 @@ class Categorization(object):
                               discriminator_axes):
 
         # Start by calculating the limit without splitting
-        last_limit = self.eval_limit("whole")
+        last_limit = self.eval_limit("whole")[0][2]
         
         for i_iter in range(n):
             print "Doing iteration", i_iter
@@ -570,13 +565,11 @@ class Categorization(object):
             li_splittings = splittings.keys()        
 
             li_limits = self.pool.map(self.lg, li_splittings)
-            #import pdb
-            #pdb.set_trace()
 
             # build a list of tuples with limit name and numerical value
             li_name_limits = [(name,limit[0][2]) for name,limit in zip(li_splittings, li_limits)]
+            
             # sort by limit and take the lowest/best one
-
             best_splitting_name, best_limit = sorted(li_name_limits, key = lambda x:x[1])[0]
             best_split = splittings[best_splitting_name]
 
