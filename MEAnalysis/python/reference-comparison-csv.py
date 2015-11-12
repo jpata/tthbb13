@@ -171,7 +171,7 @@ commons_dl = [compare(d1, d2, cut) for cut in cuts_dl]
 # In[80]:
 
 import matplotlib.pyplot as plt
-get_ipython().magic(u'matplotlib inline')
+#get_ipython().magic(u'matplotlib inline')
 import numpy as np
 
 
@@ -273,9 +273,6 @@ compare_events(d1, d2, list(commons_dl[0][0]), vars)
 # ### Not in D1
 
 # In[ ]:
-
-sel
-
 
 # In[258]:
 
