@@ -10,13 +10,13 @@ trig,\
 is_SL,is_DL,\
 lep1_pt,lep1_eta,lep1_phi,lep1_iso,lep1_pdgId,\
 lep2_pt,lep2_eta,lep2_phi,lep2_iso,lep2_pdgId,\
-mll,\
+mll,mll_passed,\
 jet1_pt,jet2_pt,jet3_pt,jet4_pt,\
 jet1_CSVv2,jet2_CSVv2,jet3_CSVv2,jet4_CSVv2,\
-jet1_corr,jet2_corr,jet3_corr,jet4_corr,\
-jet1_corrUp,jet2_corrUp,jet3_corrUp,jet4_corrUp,\
-jet1_corrDown,jet2_corrDown,jet3_corrDown,jet4_corrDown,\
+jet1_JesSF, jet2_JesSF,jet3_JesSF,jet4_JesSF,\
+jet1_JerSF,jet2_JerSF,jet3_JerSF,jet4_JerSF,\
 MET_pt,MET_phi,\
+met_passed,\
 n_jets,n_btags,\
 bWeight,\
 ttHFCategory,\
@@ -37,6 +37,7 @@ def getVar(tt, var, syst):
     else:
         return getattr(tt, var + "_" + syst)
 
+lines = []
 for ev in range(tt.GetEntries()):
     tt.GetEntry(ev)
    
@@ -49,10 +50,10 @@ for ev in range(tt.GetEntries()):
     if not (tt.is_sl or tt.is_dl):
         continue
 
-    if tt.is_sl and (nj < 3 or nt < 2):
+    if tt.is_sl and (nj < 4 or nt < 2):
         continue
 
-    if tt.is_dl and (nj < 2 or nt < 1):
+    if tt.is_dl and (nj < 3 or nt < 1):
         continue
 
     nleps = tt.nleps
@@ -75,8 +76,13 @@ for ev in range(tt.GetEntries()):
         lep0_iso = leps_iso04[0]
     
     mll = 0
+    mll_passed = True
+    met_passed = True
     if tt.is_sl:
-        trig = tt.HLT_BIT_HLT_Ele27_eta2p1_WP85_Gsf_HT200_v or tt.HLT_BIT_HLT_IsoMu24_eta2p1_v
+        trig = (
+            tt.HLT_BIT_HLT_Ele27_WP85_Gsf_v or
+            tt.HLT_BIT_HLT_IsoMu17_eta2p1_v
+        )
         lep1_pt = 0
         lep1_id = 0
         lep1_eta = 0
@@ -86,11 +92,11 @@ for ev in range(tt.GetEntries()):
 
         trig = False
         for tr in [
-            "HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v",
-            "HLT_BIT_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v",
+            "HLT_BIT_HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v",
             "HLT_BIT_HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v",
             "HLT_BIT_HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v",
-            "HLT_BIT_HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v",
+            "HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v",
+            "HLT_BIT_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v",
         ]:
             trig = trig or getattr(tt, tr)
         lep1_pt = leps_pt[1]
@@ -99,18 +105,26 @@ for ev in range(tt.GetEntries()):
         lep1_phi = leps_phi[1]
         lep1_iso = -1
         mll = tt.ll_mass
-        if not (lep0_pt > 20 and lep1_pt > 20 and abs(lep0_eta)<2.4 and abs(lep1_eta)<2.4):
-            continue
+        
+        #if not (lep0_pt > 20 and lep1_pt > 20 and abs(lep0_eta)<2.4 and abs(lep1_eta)<2.4):
+        #    continue
         if not mll > 20:
-            continue
+            mll_passed = False
+            #continue
         if (abs(lep0_id)==abs(lep1_id) and (tt.ll_mass > 76 and tt.ll_mass < 106)):
-            continue
-        if not (tt.met_pt > 40):
-            continue
+            mll_passed = False
+            #continue
+        if (abs(lep0_id)==abs(lep1_id)) and not (tt.met_pt > 40):
+            met_passed = False
+            #continue
+        
         if abs(lep1_id) == 11:
             lep1_iso = leps_iso03[1]
         elif abs(lep1_id) == 13:
             lep1_iso = leps_iso04[1]
+        #same sign
+        if lep0_id * lep1_id > 0:
+            continue
     
     if not trig:
         continue
@@ -118,51 +132,43 @@ for ev in range(tt.GetEntries()):
     jet0_eta = 0
     jet0_phi = 0
     jet0_csv = 0
-    jet0_corr = 0
-    jet0_corrUp = 0
-    jet0_corrDown = 0
+    jet0_JesSF = 0
     
     jet1_pt = 0
     jet1_eta = 0
     jet1_phi = 0
     jet1_csv = 0
-    jet1_corr = 0
-    jet1_corrUp = 0
-    jet1_corrDown = 0
+    jet1_JesSF = 0
     
     jet2_pt = 0
     jet2_eta = 0
     jet2_phi = 0
     jet2_csv = 0
-    jet2_corr = 0
-    jet2_corrUp = 0
-    jet2_corrDown = 0
+    jet2_JesSF = 0
     
     jet3_pt = 0
     jet3_eta = 0
     jet3_phi = 0
     jet3_csv = 0
-    jet3_corr = 0
-    jet3_corrUp = 0
-    jet3_corrDown = 0
+    jet3_JesSF = 0
 
     i = 0
     jet0_pt = tt.jets_pt[i] 
     jet0_eta = tt.jets_eta[i] 
     jet0_phi = tt.jets_phi[i] 
     jet0_csv = tt.jets_btagCSV[i] 
-    jet0_corr = tt.jets_corr[i] 
-    jet0_corrUp = tt.jets_corr_JESUp[i] 
-    jet0_corrDown = tt.jets_corr_JESDown[i] 
+    jet0_JesSF = tt.jets_corr[i] 
+    jet0_JerSF = tt.jets_corr_JER[i] 
     
     i = 1
     jet1_pt = tt.jets_pt[i] 
     jet1_eta = tt.jets_eta[i] 
     jet1_phi = tt.jets_phi[i] 
     jet1_csv = tt.jets_btagCSV[i] 
-    jet1_corr = tt.jets_corr[i] 
-    jet1_corrUp = tt.jets_corr_JESUp[i] 
-    jet1_corrDown = tt.jets_corr_JESDown[i] 
+    jet1_JesSF = tt.jets_corr[i] 
+    jet1_JerSF = tt.jets_corr_JER[i] 
+    #jet1_corrUp = tt.jets_corr_JESUp[i] 
+    #jet1_corrDown = tt.jets_corr_JESDown[i] 
    
     if nj>=3:
         i = 2
@@ -170,9 +176,10 @@ for ev in range(tt.GetEntries()):
         jet2_eta = tt.jets_eta[i] 
         jet2_phi = tt.jets_phi[i] 
         jet2_csv = tt.jets_btagCSV[i] 
-        jet2_corr = tt.jets_corr[i] 
-        jet2_corrUp = tt.jets_corr_JESUp[i] 
-        jet2_corrDown = tt.jets_corr_JESDown[i] 
+        jet2_JesSF = tt.jets_corr[i] 
+        jet2_JerSF = tt.jets_corr_JER[i] 
+        #jet2_corrUp = tt.jets_corr_JESUp[i] 
+        #jet2_corrDown = tt.jets_corr_JESDown[i] 
     
     if nj>=4:
         i = 3
@@ -180,9 +187,10 @@ for ev in range(tt.GetEntries()):
         jet3_eta = tt.jets_eta[i] 
         jet3_phi = tt.jets_phi[i] 
         jet3_csv = tt.jets_btagCSV[i] 
-        jet3_corr = tt.jets_corr[i] 
-        jet3_corrUp = tt.jets_corr_JESUp[i] 
-        jet3_corrDown = tt.jets_corr_JESDown[i] 
+        jet3_JesSF = tt.jets_corr[i] 
+        jet3_JerSF = tt.jets_corr_JER[i] 
+        #jet3_corrUp = tt.jets_corr_JESUp[i] 
+        #jet3_corrDown = tt.jets_corr_JESDown[i] 
     
     if syst == "raw":
         jet0_pt = jet0_pt / jet0_corr
@@ -220,13 +228,13 @@ for ev in range(tt.GetEntries()):
         int(tt.is_sl), int(tt.is_dl),
         lep0_pt, lep0_eta, lep0_phi, lep0_iso, lep0_id,
         lep1_pt, lep1_eta, lep1_phi, lep1_iso, lep1_id,
-        float(mll), 
+        float(mll), int(mll_passed),
         jet0_pt, jet1_pt, jet2_pt, jet3_pt,
         jet0_csv, jet1_csv, jet2_csv, jet3_csv,
-        jet0_corr, jet1_corr, jet2_corr, jet3_corr,
-        jet0_corrUp, jet1_corrUp, jet2_corrUp, jet3_corrUp,
-        jet0_corrDown, jet1_corrDown, jet2_corrDown, jet3_corrDown,
+        jet0_JesSF, jet1_JesSF, jet2_JesSF, jet3_JesSF,
+        jet0_JerSF, jet1_JerSF, jet2_JerSF, jet3_JerSF,
         tt.met_pt, tt.met_phi,
+        int(met_passed),
         int(nj), int(nt),
         tt.bTagWeight,
         int(tt.ttCls),
@@ -247,4 +255,8 @@ for ev in range(tt.GetEntries()):
             s += str(round(arr[i], 4)) + ","
         else:
             s += str(arr[i]) + ","
-    print s[:-1]
+    lines += [(int(tt.evt), s[:-1])]
+
+lines = sorted(lines, key=lambda x: x[0])
+for line in lines:
+    print line[1]

@@ -20,11 +20,19 @@ def get_limits(fn):
     combine root file.
     """
     f = ROOT.TFile(fn)
+
+    #No root file created, fit failed
     if f==None or f.IsZombie():
-        return np.zeros(6), np.zeros(6)
+        lims = np.zeros(6)
+        quantiles = np.zeros(6)
+        lims[:] = 99999
+        return lims, quantiles
     tt = f.Get("limit")
     if tt==None or tt.IsZombie():
-        return np.zeros(6), np.zeros(6)
+        lims = np.zeros(6)
+        quantiles = np.zeros(6)
+        lims[:] = 99999
+        return lims, quantiles
     lims = np.zeros(tt.GetEntries())
     quantiles = np.zeros(tt.GetEntries())
     for i in range(tt.GetEntries()):
