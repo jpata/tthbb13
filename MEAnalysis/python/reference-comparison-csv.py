@@ -1,42 +1,39 @@
 
 # coding: utf-8
 
-# In[1]:
+# In[29]:
 
 import pandas
 
 
-# In[2]:
+# In[30]:
 
 data = {}
-for x in ["osu", "eth", "ethv2", "desy", "desyv2", "ihep", "kit"]:
+for x in ["osu", "eth", "desy", "desyv2", "ihep", "kit"]:
     data[x] = {}
 
 
-# In[21]:
+# In[50]:
 
 #data["osu"]["sig"] =pandas.read_csv("/Users/joosep/Documents/tth/sync/")
-data["eth"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/ref2/ETH/tth.csv")
-data["eth"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/ref2/ETH/ttjets.csv")
+data["eth"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/eth/v1/tth.csv")
+data["eth"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/eth/v1/ttjets.csv")
 
-data["ethv2"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/ref2/ETH/cmg//tth.csv")
-data["ethv2"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/ref2/ETH/cmg/ttjets.csv")
+# data["ihep"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/ref2/IHEP/tth.csv")
+# data["ihep"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/ref2/IHEP/ttjets.csv")
 
-data["ihep"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/ref2/IHEP/tth.csv")
-data["ihep"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/ref2/IHEP/ttjets.csv")
+data["desy"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/desy_sync_round3/tth.csv")
+data["desy"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/desy_sync_round3/ttjets.csv")
 
-data["desy"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/ref2/DESYv2/tth.csv")
-data["desy"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/ref2/DESYv2/tth.csv")
-
-data["kit"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/ref2/KIT/tth.csv")
-data["kit"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/ref2/KIT/ttjets.csv")
+# data["kit"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/ref2/KIT/tth.csv")
+# data["kit"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/ref2/KIT/ttjets.csv")
 
 
-data["osu"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/ref2/OSU/tth.csv")
-data["osu"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/ref2/OSU/ttjets.csv")
+# data["osu"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/ref2/OSU/tth.csv")
+# data["osu"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/ref2/OSU/ttjets.csv")
 
 
-# In[22]:
+# In[51]:
 
 def get_event_set(d):
     s1 = set([])
@@ -53,7 +50,7 @@ def get_event_set(d):
 # $$d_1 = s_1 \setminus s_2$$
 # $$d_2 = s_2 \setminus s_1$$
 
-# In[23]:
+# In[52]:
 
 def compare(d1, d2, sel):
     s1 = d1.eval(sel)
@@ -73,7 +70,7 @@ def compare(d1, d2, sel):
     return common, missing_s1, missing_s2
 
 
-# In[24]:
+# In[53]:
 
 def compare_events(d1, d2, evids, varlist):
     for (run, lumi, event) in evids:
@@ -100,13 +97,13 @@ def compare_events(d1, d2, evids, varlist):
 
 # ### Define datasets and comparison variables
 
-# In[38]:
+# In[54]:
 
 nd1 = "eth"
-nd2 = "kit"
+nd2 = "desy"
 
 
-# In[39]:
+# In[73]:
 
 d1 = data[nd1]["sig"]
 d2 = data[nd2]["sig"]
@@ -115,7 +112,7 @@ vars = ["n_jets", "n_btags", "lep1_pt", "lep1_iso", "jet1_pt", "jet2_pt", "jet3_
 
 # ### How many events are common, in D1 only, in D2 only?
 
-# In[40]:
+# In[74]:
 
 cuts_sl = [
     "(is_SL==1) & (n_jets==4) & (n_btags==3)",
@@ -128,7 +125,7 @@ cuts_sl = [
 ]
 
 
-# In[41]:
+# In[75]:
 
 cuts_names_sl = [
     "4J 3T",
@@ -141,17 +138,12 @@ cuts_names_sl = [
 ]
 
 
-# In[42]:
+# In[76]:
 
 commons_sl = [compare(d1, d2, cut) for cut in cuts_sl]
 
 
-# In[43]:
-
-commons_sl = [compare(d1, d2, cut) for cut in cuts_sl]
-
-
-# In[44]:
+# In[77]:
 
 cuts_dl = [
     "(is_DL==1) & (n_jets==3) & (n_btags==2)",
@@ -161,7 +153,7 @@ cuts_dl = [
 ]
 
 
-# In[45]:
+# In[78]:
 
 cuts_names_dl = [
     "3J 2T",
@@ -171,24 +163,19 @@ cuts_names_dl = [
 ]
 
 
-# In[46]:
+# In[79]:
 
 commons_dl = [compare(d1, d2, cut) for cut in cuts_dl]
 
 
-# In[47]:
-
-commons_dl = [compare(d1, d2, cut) for cut in cuts_dl]
-
-
-# In[48]:
+# In[80]:
 
 import matplotlib.pyplot as plt
 get_ipython().magic(u'matplotlib inline')
 import numpy as np
 
 
-# In[53]:
+# In[81]:
 
 plt.figure(figsize=(4,5))
 a1 = plt.axes((0.0,0.5, 1.0,0.5))
@@ -215,7 +202,7 @@ plt.xlabel("category", fontsize=16)
 plt.ylabel("difference / common", fontsize=16)
 
 
-# In[55]:
+# In[82]:
 
 plt.figure(figsize=(4,5))
 a1 = plt.axes((0.0,0.5, 1.0,0.5))
@@ -240,45 +227,45 @@ plt.xlabel("(Njets, Ntags)", fontsize=16)
 plt.ylabel("difference / common", fontsize=16)
 
 
-# In[346]:
+# In[66]:
 
-plt.figure(figsize=(6,6))
-a1 = plt.axes((0.0,0.5, 1.0,0.5))
-xs = np.array(range(len(cuts)))
-plt.bar(xs, map(lambda x: len(x[0]), commons2), label="common in A and B")
-plt.errorbar(xs+0.2, map(lambda x: len(x[0]), commons2), map(lambda x: len(x[1]), commons2), label="in B, not in A", color="black", lw=0, elinewidth=2)
-plt.errorbar(xs+0.6, map(lambda x: len(x[0]), commons2), map(lambda x: len(x[2]), commons2), label="in A, not in B", color="red", lw=0, elinewidth=2)
-plt.xticks(xs, []);
-#plt.grid()
-#plt.ylim(0,1000)
-plt.ylabel("number of MC events", fontsize=16)
-plt.title("A={0} B={1}".format(nd1, nd2), fontsize=20)
-plt.legend()
+# plt.figure(figsize=(6,6))
+# a1 = plt.axes((0.0,0.5, 1.0,0.5))
+# xs = np.array(range(len(cuts)))
+# plt.bar(xs, map(lambda x: len(x[0]), commons2), label="common in A and B")
+# plt.errorbar(xs+0.2, map(lambda x: len(x[0]), commons2), map(lambda x: len(x[1]), commons2), label="in B, not in A", color="black", lw=0, elinewidth=2)
+# plt.errorbar(xs+0.6, map(lambda x: len(x[0]), commons2), map(lambda x: len(x[2]), commons2), label="in A, not in B", color="red", lw=0, elinewidth=2)
+# plt.xticks(xs, []);
+# #plt.grid()
+# #plt.ylim(0,1000)
+# plt.ylabel("number of MC events", fontsize=16)
+# plt.title("A={0} B={1}".format(nd1, nd2), fontsize=20)
+# plt.legend()
 
-a2 = plt.axes((0.0,0.0, 1.0,0.45))
-plt.plot(xs+0.2, map(lambda x: float(len(x[1]))/float(len(x[0])) if len(x[0])>0 else 0, commons2), color="black", lw=0, marker="o")
-plt.plot(xs+0.6, map(lambda x: float(len(x[2]))/float(len(x[0])) if len(x[0])>0 else 0, commons2), color="red", lw=0, marker="o")
-#plt.ylim(0.0,0.1)
-plt.xticks(xs+0.4, cuts, rotation=90);
-plt.axhline(0.0, color="blue")
-plt.grid()
-plt.xlabel("(Njets, Ntags)", fontsize=16)
-plt.ylabel("difference / common", fontsize=16)
+# a2 = plt.axes((0.0,0.0, 1.0,0.45))
+# plt.plot(xs+0.2, map(lambda x: float(len(x[1]))/float(len(x[0])) if len(x[0])>0 else 0, commons2), color="black", lw=0, marker="o")
+# plt.plot(xs+0.6, map(lambda x: float(len(x[2]))/float(len(x[0])) if len(x[0])>0 else 0, commons2), color="red", lw=0, marker="o")
+# #plt.ylim(0.0,0.1)
+# plt.xticks(xs+0.4, cuts, rotation=90);
+# plt.axhline(0.0, color="blue")
+# plt.grid()
+# plt.xlabel("(Njets, Ntags)", fontsize=16)
+# plt.ylabel("difference / common", fontsize=16)
 
 
 # ### Events common in datasets
 
-# In[ ]:
+# In[67]:
 
 list(commons_sl[0][1])[:2]
 
 
-# In[273]:
+# In[68]:
 
 list(commons_sl[0][2])[:2]
 
 
-# In[297]:
+# In[69]:
 
 compare_events(d1, d2, list(commons_dl[0][0]), vars)
 
@@ -302,27 +289,7 @@ compare_events(d1, d2, list(commons_dl[1][1])[:5], vars)
 compare_events(d1, d2, list(commons_dl[0][2]), vars)
 
 
-# In[461]:
+# In[90]:
 
-d1[d1["event"] == 862][["run", "lumi", "event", "lep1_pdgId", "lep2_pdgId", "lep1_iso", "lep2_iso"]].head()
-
-
-# In[444]:
-
-d2[d2.eval("(run==1) & (lumi==1096) & (event==109590)")][["run", "lumi", "event", "lep1_pdgId", "lep2_pdgId", "lep1_iso", "lep2_iso"]]
-
-
-# In[299]:
-
-d1[d1.eval("(event==2532028)")]
-
-
-# In[801]:
-
-d2[d2.eval("(is_DL==1)")]["jet4_pt"].hist(bins=np.linspace(0,100,100))
-
-
-# In[ ]:
-
-
+d1[d1["event"] == 275234][["is_SL", "is_DL", "event", "lep1_pdgId", "lep2_pdgId", "lep1_pt", "lep2_pt"]].head()
 
