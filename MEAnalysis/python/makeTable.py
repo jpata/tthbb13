@@ -13,9 +13,8 @@ lep2_pt,lep2_eta,lep2_phi,lep2_iso,lep2_pdgId,\
 mll,\
 jet1_pt,jet2_pt,jet3_pt,jet4_pt,\
 jet1_CSVv2,jet2_CSVv2,jet3_CSVv2,jet4_CSVv2,\
-jet1_corr,jet2_corr,jet3_corr,jet4_corr,\
-jet1_corrUp,jet2_corrUp,jet3_corrUp,jet4_corrUp,\
-jet1_corrDown,jet2_corrDown,jet3_corrDown,jet4_corrDown,\
+jet1_JesSF, jet2_JesSF,jet3_JesSF,jet4_JesSF,\
+jet1_JerSF,jet2_JerSF,jet3_JerSF,jet4_JerSF,\
 MET_pt,MET_phi,\
 n_jets,n_btags,\
 bWeight,\
@@ -37,6 +36,7 @@ def getVar(tt, var, syst):
     else:
         return getattr(tt, var + "_" + syst)
 
+lines = []
 for ev in range(tt.GetEntries()):
     tt.GetEntry(ev)
    
@@ -118,51 +118,43 @@ for ev in range(tt.GetEntries()):
     jet0_eta = 0
     jet0_phi = 0
     jet0_csv = 0
-    jet0_corr = 0
-    jet0_corrUp = 0
-    jet0_corrDown = 0
+    jet0_JesSF = 0
     
     jet1_pt = 0
     jet1_eta = 0
     jet1_phi = 0
     jet1_csv = 0
-    jet1_corr = 0
-    jet1_corrUp = 0
-    jet1_corrDown = 0
+    jet1_JesSF = 0
     
     jet2_pt = 0
     jet2_eta = 0
     jet2_phi = 0
     jet2_csv = 0
-    jet2_corr = 0
-    jet2_corrUp = 0
-    jet2_corrDown = 0
+    jet2_JesSF = 0
     
     jet3_pt = 0
     jet3_eta = 0
     jet3_phi = 0
     jet3_csv = 0
-    jet3_corr = 0
-    jet3_corrUp = 0
-    jet3_corrDown = 0
+    jet3_JesSF = 0
 
     i = 0
     jet0_pt = tt.jets_pt[i] 
     jet0_eta = tt.jets_eta[i] 
     jet0_phi = tt.jets_phi[i] 
     jet0_csv = tt.jets_btagCSV[i] 
-    jet0_corr = tt.jets_corr[i] 
-    jet0_corrUp = tt.jets_corr_JESUp[i] 
-    jet0_corrDown = tt.jets_corr_JESDown[i] 
+    jet0_JesSF = tt.jets_corr[i] 
+    jet0_JerSF = tt.jets_corr_JER[i] 
     
     i = 1
     jet1_pt = tt.jets_pt[i] 
     jet1_eta = tt.jets_eta[i] 
     jet1_phi = tt.jets_phi[i] 
     jet1_csv = tt.jets_btagCSV[i] 
-    jet1_corr = tt.jets_corr[i] 
-    jet1_corrUp = tt.jets_corr_JESUp[i] 
-    jet1_corrDown = tt.jets_corr_JESDown[i] 
+    jet1_JesSF = tt.jets_corr[i] 
+    jet1_JerSF = tt.jets_corr_JER[i] 
+    #jet1_corrUp = tt.jets_corr_JESUp[i] 
+    #jet1_corrDown = tt.jets_corr_JESDown[i] 
    
     if nj>=3:
         i = 2
@@ -170,9 +162,10 @@ for ev in range(tt.GetEntries()):
         jet2_eta = tt.jets_eta[i] 
         jet2_phi = tt.jets_phi[i] 
         jet2_csv = tt.jets_btagCSV[i] 
-        jet2_corr = tt.jets_corr[i] 
-        jet2_corrUp = tt.jets_corr_JESUp[i] 
-        jet2_corrDown = tt.jets_corr_JESDown[i] 
+        jet2_JesSF = tt.jets_corr[i] 
+        jet2_JerSF = tt.jets_corr_JER[i] 
+        #jet2_corrUp = tt.jets_corr_JESUp[i] 
+        #jet2_corrDown = tt.jets_corr_JESDown[i] 
     
     if nj>=4:
         i = 3
@@ -180,9 +173,10 @@ for ev in range(tt.GetEntries()):
         jet3_eta = tt.jets_eta[i] 
         jet3_phi = tt.jets_phi[i] 
         jet3_csv = tt.jets_btagCSV[i] 
-        jet3_corr = tt.jets_corr[i] 
-        jet3_corrUp = tt.jets_corr_JESUp[i] 
-        jet3_corrDown = tt.jets_corr_JESDown[i] 
+        jet3_JesSF = tt.jets_corr[i] 
+        jet3_JerSF = tt.jets_corr_JER[i] 
+        #jet3_corrUp = tt.jets_corr_JESUp[i] 
+        #jet3_corrDown = tt.jets_corr_JESDown[i] 
     
     if syst == "raw":
         jet0_pt = jet0_pt / jet0_corr
@@ -223,9 +217,8 @@ for ev in range(tt.GetEntries()):
         float(mll), 
         jet0_pt, jet1_pt, jet2_pt, jet3_pt,
         jet0_csv, jet1_csv, jet2_csv, jet3_csv,
-        jet0_corr, jet1_corr, jet2_corr, jet3_corr,
-        jet0_corrUp, jet1_corrUp, jet2_corrUp, jet3_corrUp,
-        jet0_corrDown, jet1_corrDown, jet2_corrDown, jet3_corrDown,
+        jet0_JesSF, jet1_JesSF, jet2_JesSF, jet3_JesSF,
+        jet0_JerSF, jet1_JerSF, jet2_JerSF, jet3_JerSF,
         tt.met_pt, tt.met_phi,
         int(nj), int(nt),
         tt.bTagWeight,
@@ -247,4 +240,8 @@ for ev in range(tt.GetEntries()):
             s += str(round(arr[i], 4)) + ","
         else:
             s += str(arr[i]) + ","
-    print s[:-1]
+    lines += [(int(tt.evt), s[:-1])]
+
+lines = sorted(lines, key=lambda x: x[0])
+for line in lines:
+    print line[1]

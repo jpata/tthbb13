@@ -17,25 +17,24 @@ def jet_baseline(jet):
 def mu_baseline_tight(mu):
     return (
         mu.tightId == 1
-        # these are already applied for the tight ID
-        # mu.isPFMuon and
-        # mu.isGlobalMuon and
-        # mu.dxy < 0.2 and
-        # mu.dz < 0.5 and
-        # mu.globalTrackChi2 < 10 and
-        # mu.nChamberHits > 0 and
-        # mu.pixelHits > 0 and
-        # mu.nStations > 1
     )
 
 def print_mu(mu):
     print "Muon: (pt=%s, eta=%s, tight=%s, pf=%s, glo=%s, dxy=%s, dz=%s, chi2=%s, nhits=%s, pix=%s, stat=%s, pfRelIso04=%s)" % (mu.pt, mu.eta, mu.tightId, mu.isPFMuon,  mu.isGlobalMuon, mu.dxy , mu.dz, mu.globalTrackChi2, (getattr(mu, "nMuonHits", 0) > 0 or getattr(mu, "nChamberHits", 0) > 0) , mu.pixelHits , mu.nStations, mu.pfRelIso04)
 
+#pt>15 && ( ( abs(superCluster().eta) < 1.4442 && full5x5_sigmaIetaIeta < 0.012 && hcalOverEcal < 0.09 && (ecalPFClusterIso / pt) < 0.37 && (hcalPFClusterIso / pt) < 0.25 && (dr03TkSumPt / pt) < 0.18 && abs(deltaEtaSuperClusterTrackAtVtx) < 0.0095 && abs(deltaPhiSuperClusterTrackAtVtx) < 0.065 ) || ( abs(superCluster().eta) > 1.5660 && full5x5_sigmaIetaIeta < 0.033 && hcalOverEcal <0.09 && (ecalPFClusterIso / pt) < 0.45 && (hcalPFClusterIso / pt) < 0.28 && (dr03TkSumPt / pt) < 0.18 ) )
+
 def el_baseline_medium(el):
 
     sca = abs(el.etaSc)
     ret = not (sca > 1.4442 and sca < 1.5660)
-
+#            (abs(el.eleDEta)    < 0.007057) and
+#            (abs(el.eleDPhi)    < 0.030159) and
+#            (el.eleSieie        < 0.028237) and
+#            (el.eleHoE          < 0.067778) and
+#            (abs(el.dxy)        < 0.027984) and
+#            (abs(el.dz)         < 0.133431) and
+#            (el.pfRelIso03        < 0.078265)
     #medium ID
     ret = ret and el.eleCutIdSpring15_25ns_v1 >= 3
     return ret
@@ -58,22 +57,23 @@ class Conf:
 
             #SL
             "SL": {
-                "pt": 30,
+                "pt": 25,
                 "eta":2.1,
-                "iso": 0.12,
+                "iso": 0.15,
                 "idcut": mu_baseline_tight,
             },
             #DL
             "DL": {
-                "pt": 20,
+                "pt_leading": 20,
+                "pt_subleading": 15,
                 "eta": 2.4,
-                "iso": 0.12,
+                "iso": 0.15,
                 "idcut": mu_baseline_tight,
             },
             "veto": {
-                "pt": 10.0,
+                "pt": 15.0,
                 "eta": 2.4,
-                "iso": 0.2,
+                "iso": 0.15,
                 "idcut": mu_baseline_tight,
             },
             "isotype": "pfRelIso04", #pfRelIso - delta-beta, relIso - rho
@@ -88,12 +88,13 @@ class Conf:
                 "idcut": lambda el: el_baseline_medium(el) and el.convVeto,
             },
             "DL": {
-                "pt": 20,
+                "pt_leading": 20,
+                "pt_subleading": 15,
                 "eta": 2.4,
                 "idcut": lambda el: el_baseline_medium(el) and el.convVeto,
             },
             "veto": {
-                "pt": 10,
+                "pt": 15,
                 "eta": 2.4,
                 "idcut": lambda el: el_baseline_loose(el),
             },
@@ -183,7 +184,8 @@ class Conf:
         ],
 
         #"eventWhitelist": [
-        #    (1, 1094, 109371),
+        #    (1, 19169, 3821537), #jet pt=39
+        #    (1, 15819, 3153740) #lepton?
         #]
     }
 

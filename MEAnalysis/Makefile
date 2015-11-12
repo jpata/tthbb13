@@ -31,13 +31,8 @@ step3:
 	seq 0 41 | $(PARCMD) -j30 ./python/MEAnalysis_heppy_parallel.py {}
 
 step4:
-	python python/makeTable.py tth.root nominal > tth.csv
-	python python/makeTable.py ttjets.root nominal > ttjets.csv
-	#python python/makeTable.py tth.root raw > tth_raw.csv
-	#python python/makeTable.py tth.root JESUp > tth_JESUp.csv
-	#python python/makeTable.py tth.root JESDown > tth_JESDown.csv
-	#python python/makeTable.py ttjets.root JESUp > ttjets_JESUp.csv
-	#python python/makeTable.py ttjets.root JESDown > ttjets_JESDown.csv
+	python python/makeTable.py /home/joosep/tth/spring15/sync/tthbb/v4/tth.root nominal > tth.csv
+	python python/makeTable.py /home/joosep/tth/spring15/sync/tthbb/v4/ttjets.root nominal > ttjets.csv
 
 clean:
 	rm -Rf $(CMSSW_BASE)/src/VHbbAnalysis/Heppy/test/Loop_*

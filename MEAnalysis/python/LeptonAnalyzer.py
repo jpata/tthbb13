@@ -55,14 +55,26 @@ class LeptonAnalyzer(FilterAnalyzer):
                 isocut = lepcuts.get("iso", 99)
                 leps = filter(
                     lambda x: (
-                        x.pt > lepcuts["pt"]
+                        x.pt > lepcuts.get("pt", 0)
                         and abs(x.eta) < lepcuts["eta"]
                         #if specified, apply an additional isolation cut
                         and abs(getattr(x, isotype)) < isocut
                     ), incoll
                 )
-                leps = filter(lepcuts["idcut"], leps)
                 leps = sorted(leps, key=lambda x: x.pt, reverse=True)
+                leps = filter(lepcuts["idcut"], leps)
+                newleps = [] 
+                c0 = lepcuts.get("pt_leading", 0)
+                c1 = lepcuts.get("pt_subleading", 0)
+                for ilep, lep in enumerate(leps):
+                    if len(newleps) == 0:
+                        cut = c0
+                    else:
+                        cut = c1
+                    if lep.pt > cut: 
+                        newleps += [lep]
+                print [l.pt for l in leps], [l.pt for l in newleps] 
+                leps = newleps
 
                 sumleps += leps
                 lepname = lep_flavour + "_" + id_type
