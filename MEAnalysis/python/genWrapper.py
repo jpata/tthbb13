@@ -1,13 +1,5 @@
 import json, sys
 
-# def classFromColl(collname, vars, maxlen):
-#     s = "class %s{\n" % collname
-#     for vname, v in vars.items():
-#         vtype, vhelp = v
-#         s += "  {0} {1}; //{2}\n".format(vtype, vname, vhelp)
-#     s += "};\n"
-#     return s
-
 #map python typenames to C++ types
 typemap = {
     "float": "double",

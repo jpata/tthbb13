@@ -12,7 +12,7 @@ if "t3ui12" in hostname:
     path = "/scratch/gregor/jpata/tth/Oct5_bdt_022sj_V13_47cdf50/"
 #Jooseps laptop
 elif "pata-slc6" in hostname:
-    path = "/home/joosep/joosep-mac/Documents/tth/data/ntp/v12/Sep9_jec_jer/"
+    path = "/home/joosep/joosep-mac/Documents/tth/data/ntp/v14/me/"
 #Tallinn
 elif "quasar" in hostname:
     path = "/dev/shm/joosep/"

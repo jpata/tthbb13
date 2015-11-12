@@ -1,13 +1,8 @@
 from MEAnalysis_heppy import config
 from PhysicsTools.HeppyCore.framework.looper import Looper
-#looper = Looper('Loop', config)
 
 treean = config.sequence[-1]
 colls = treean.collections
-
-print treean.collections
-print treean.globalObjects
-print treean.globalVariables
 
 ret = {}
 ret["collections"] = {}

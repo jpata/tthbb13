@@ -165,7 +165,7 @@ def makeGlobalVariable(vtype, systematic="nominal", mcOnly=False):
 # V11 & V12
 # ==============================
 
-topType = NTupleObjectType("topType", variables = [
+topCandidateType = NTupleObjectType("topCandidateType", variables = [
     NTupleVariable("fRec", lambda x: x.fRec ),
     NTupleVariable("Ropt", lambda x: x.Ropt ),
     NTupleVariable("RoptCalc", lambda x: x.RoptCalc ),
@@ -196,9 +196,11 @@ topType = NTupleObjectType("topType", variables = [
     NTupleVariable("n_subjettiness", lambda x: x.n_subjettiness ), # Calculated
     NTupleVariable("n_subjettiness_groomed", lambda x: x.n_subjettiness_groomed ), # Calculated
     NTupleVariable("delRopt", lambda x: x.delRopt ),             # Calculated
+    NTupleVariable("genTopHad_dr", lambda x: getattr(x, "genTopHad_dr", -1), help="DeltaR to the closest hadronic gen top" ),
+    NTupleVariable("genTopHad_index", lambda x: getattr(x, "genTopHad_index", -1), type=int, help="Index of the matched genTopHad" ),
 ])
 
-higgsType = NTupleObjectType("higgsType", variables = [
+higgsCandidateType = NTupleObjectType("higgsCandidateType", variables = [
     NTupleVariable("pt", lambda x: x.pt ),
     NTupleVariable("eta", lambda x: x.eta ),
     NTupleVariable("phi", lambda x: x.phi ),
@@ -207,6 +209,18 @@ higgsType = NTupleObjectType("higgsType", variables = [
     NTupleVariable("tau2", lambda x: x.tau2 ),
     NTupleVariable("tau3", lambda x: x.tau3 ),
     NTupleVariable("bbtag", lambda x: x.bbtag ),
+    # FIXME: see SubjetAnalyzer
+    # NTupleVariable("sj1pt", lambda x: x.sj1pt ),
+    # NTupleVariable("sj1eta", lambda x: x.sj1eta ),
+    # NTupleVariable("sj1phi", lambda x: x.sj1phi ),
+    # NTupleVariable("sj1mass", lambda x: x.sj1mass ),
+    # NTupleVariable("sj1btag", lambda x: x.sj1btag ),
+    # NTupleVariable("sj2pt", lambda x: x.sj2pt ),
+    # NTupleVariable("sj2eta", lambda x: x.sj2eta ),
+    # NTupleVariable("sj2phi", lambda x: x.sj2phi ),
+    # NTupleVariable("sj2mass", lambda x: x.sj2mass ),
+    # NTupleVariable("sj2btag", lambda x: x.sj2btag ),
+
     NTupleVariable("mass_softdrop", lambda x: x.mass_softdrop, help="mass of the matched softdrop jet" ),
     NTupleVariable("mass_softdropz2b1", lambda x: x.mass_softdropz2b1, help="mass of the matched softdropz2b1 jet" ),
     NTupleVariable("mass_pruned", lambda x: x.mass_pruned, help="mass of the matched pruned jet" ),
@@ -335,24 +349,22 @@ def getTreeProducer(conf):
         collections = {
         #standard dumping of objects
         #These are collections which are not variated
-        #    "b_quarks_gen" : NTupleCollection("b_quarks_gen", quarkType, 5, help=""),
-        #    "l_quarks_gen" : NTupleCollection("l_quarks_gen", quarkType, 3, help=""),
-        #    "b_quarks_t" : NTupleCollection("GenBFromTop", quarkType, 3, help=""),
-        #    "b_quarks_h" : NTupleCollection("GenBFromHiggs", quarkType, 3, help=""),
-        #    "l_quarks_w" : NTupleCollection("GenQFromW", quarkType, 5, help=""),
-            "GenHiggsBoson" : NTupleCollection("genHiggs", quarkType, 2, help="Generated Higgs boson"),
-            "GenTop" : NTupleCollection("genTop", quarkType, 4, help="Generated top quark"),
+            # "b_quarks_gen_nominal" : NTupleCollection("b_quarks_gen", quarkType, 5, help="generated b quarks", mcOnly=True),
+            # "l_quarks_gen_nominal" : NTupleCollection("l_quarks_gen", quarkType, 3, help="generated light quarks", mcOnly=True),
+            # "b_quarks_t_nominal" : NTupleCollection("GenBFromTop", quarkType, 3, help="generated b quarks from top", mcOnly=True),
+            # "b_quarks_h_nominal" : NTupleCollection("GenBFromHiggs", quarkType, 3, help="generated b quarks from higgs", mcOnly=True),
+            # "l_quarks_w_nominal" : NTupleCollection("GenQFromW", quarkType, 5, help="generated light quarks from W", mcOnly=True),
+            "GenHiggsBoson" : NTupleCollection("genHiggs", quarkType, 2, help="Generated Higgs boson", mcOnly=True),
+            "genTopLep" : NTupleCollection("genTopLep", quarkType, 2, help="Generated top quark (leptonic)", mcOnly=True),
+            "genTopHad" : NTupleCollection("genTopHad", quarkType, 2, help="Generated top quark (hadronic)", mcOnly=True),
+
             "FatjetCA15ungroomed" : NTupleCollection("fatjets", FatjetCA15ungroomedType, 4, help="Ungroomed CA 1.5 fat jets"),
-            "good_jets_nominal" : NTupleCollection("jets", jetType, 9, help="Selected jets, pt ordered"),
+            "good_jets_nominal" : NTupleCollection("jets", jetType, 9, help="Selected resolved jets, pt ordered"),
             "good_leptons_nominal" : NTupleCollection("leps", leptonType, 2, help="Selected leptons"),
             
-            "topCandidate_nominal": NTupleCollection("topCandidate" , topType, 4, help="Best top candidate in event"),
-            "othertopCandidate_nominal": NTupleCollection("othertopCandidate", topType, 4, help=""),
-            "higgsCandidate_nominal": NTupleCollection("higgsCandidate", higgsType, 4, help=""),
-
-            #"topCandidate" : NTupleCollection("topCandidate", topType, 28, help=""),
-            #"othertopCandidate" : NTupleCollection("othertopCandidate", topType, 28, help=""),
-            #"higgsCandidate" : NTupleCollection("higgsCandidate", higgsType, 9, help=""),
+            "topCandidate_nominal": NTupleCollection("topCandidate" , topCandidateType, 1, help="Best top candidate in event. Currently chosen by max deltaR wrt. lepton"),
+            "othertopCandidate_nominal": NTupleCollection("othertopCandidate", topCandidateType, 4, help="All other top candidates that pass HTTv2 cuts"),
+            "higgsCandidate_nominal": NTupleCollection("higgsCandidate", higgsCandidateType, 4, help="Boosted Higgs candidates"),
         }
     )
     
@@ -454,7 +466,7 @@ def getTreeProducer(conf):
             is_mc_only = False
 
             #Matching variables only defined for MC
-            if "match" in vtype[0].lower():
+            if "match" in vtype[0].lower() or "gen" in vtype[0].lower():
                 is_mc_only = True
             #only define the nominal values for data
             if systematic != "nominal":

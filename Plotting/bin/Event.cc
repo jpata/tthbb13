@@ -226,6 +226,29 @@ const ProcessKey from_string(const string& k) {
 namespace HistogramKey {
 const unordered_map<const string, HistogramKey, hash<string>> map_from_string = {
     {"jet0_pt", jet0_pt},
+    {"jet1_pt", jet1_pt},
+    {"jet0_eta", jet0_eta},
+    {"jet1_eta", jet1_eta},
+    {"jet0_phi", jet0_phi},
+    {"jet1_phi", jet1_phi},
+    {"jet0_etaphi", jet0_etaphi},
+    {"jet1_etaphi", jet1_etaphi},
+    {"jet0_btagCSV", jet0_btagCSV},
+    {"jet1_btagCSV", jet1_btagCSV},
+    {"jet0_btagBDT", jet0_btagBDT},
+    {"jet1_btagBDT", jet1_btagBDT},
+
+    {"lep0_pt", lep0_pt},
+    {"lep1_pt", lep1_pt},
+    {"lep0_eta", lep0_eta},
+    {"lep1_eta", lep1_eta},
+    {"lep0_relIso", lep0_relIso},
+    {"lep1_relIso", lep1_relIso},
+
+    {"nPV", nPV},
+    {"numJets", numJets},
+    {"nBCSVM", nBCSVM},
+
     {"mem_SL_0w2h2t", mem_SL_0w2h2t},
     {"mem_DL_0w2h2t", mem_DL_0w2h2t},
     {"mem_SL_2w2h2t", mem_SL_2w2h2t},
@@ -264,19 +287,6 @@ const unordered_map<const string, CategoryKey, hash<string>> map_from_string = {
 
     {"blrL", blrL},
     {"blrH", blrH},
-    {"Wmass60_100", Wmass60_100},
-    {"nonWmass60_100", nonWmass60_100},
-    {"boosted", boosted},
-    {"nonboosted", nonboosted},
-    {"boostedMass120_180", boostedMass120_180},
-    {"nonboostedMass120_180", nonboostedMass120_180},
-    {"boostedMass140_180", boostedMass140_180},
-    {"nonboostedMass140_180", nonboostedMass140_180},
-    {"boostedTau_07", boostedTau_07},
-    {"nonboostedTau_07", nonboostedTau_07},
-    {"boostedfRec_02", boostedfRec_02},
-    {"nonboostedfRec_02", nonboostedfRec_02},
-
 };
 
 unordered_map<CategoryKey, const string, hash<int>> map_to_string =
@@ -545,7 +555,7 @@ const Event EventFactory::makeNominal(const TreeData& data, const Configuration&
         mem_p(data.mem_tth_p[5], data.mem_ttbb_p[5]), //SL 222
         mem_p(data.mem_tth_p[9], data.mem_ttbb_p[9], 0.05), //SL 222 sj
         mem_p(data.mem_tth_p[1], data.mem_ttbb_p[1]), //DL 022,
-	data.tth_mva,
+        data.tth_mva,
         data.bTagWeight,
         data.bTagWeight_Stats1Up,
         data.bTagWeight_Stats1Down,
@@ -715,18 +725,48 @@ void CategoryProcessor::fillHistograms(
     double weight
     ) const {
 
-
     const auto jet0_pt_key = make_tuple(
         get<0>(key),
         get<1>(key),
         HistogramKey::jet0_pt
     );
     if (!results.count(jet0_pt_key)) {
-        results[jet0_pt_key] = new TH1D("jet0_pt", "Leading jet pt", 100, 0, 500);
+        results[jet0_pt_key] = new TH1D("jet0_pt", "Leading jet pt", 100, 0, 600);
     }
+    const auto jet0_eta_key = make_tuple(
+        get<0>(key),
+        get<1>(key),
+        HistogramKey::jet0_eta
+    );
+    if (!results.count(jet0_eta_key)) {
+        results[jet0_eta_key] = new TH1D("jet0_pt", "Leading jet eta", 100, -3, 3);
+    }
+
+    const auto jet1_pt_key = make_tuple(
+        get<0>(key),
+        get<1>(key),
+        HistogramKey::jet1_pt
+    );
+    if (!results.count(jet0_pt_key)) {
+        results[jet0_pt_key] = new TH1D("jet1_pt", "Subleading jet pt", 100, 0, 600);
+    }
+    const auto jet1_eta_key = make_tuple(
+        get<0>(key),
+        get<1>(key),
+        HistogramKey::jet1_eta
+    );
+    if (!results.count(jet0_eta_key)) {
+        results[jet0_eta_key] = new TH1D("jet1_eta", "Subleading jet eta", 100, -3, 3);
+    }
+
     if (event.jets.size()>0) {
         static_cast<TH1D*>(results[jet0_pt_key])->Fill(event.jets.at(0).p4.Pt(), weight);
-    } 
+        static_cast<TH1D*>(results[jet0_eta_key])->Fill(event.jets.at(0).p4.Eta(), weight);
+        if (event.jets.size()>1) {
+            static_cast<TH1D*>(results[jet1_pt_key])->Fill(event.jets.at(1).p4.Pt(), weight);
+            static_cast<TH1D*>(results[jet1_eta_key])->Fill(event.jets.at(1).p4.Eta(), weight);
+        } 
+    }
     //cout << "    fill "  << to_string(jet0_pt_key) << endl;
 
 }
@@ -887,7 +927,6 @@ void SparseCategoryProcessor::fillHistograms(
         h->Fill(&vals[0], weight);
     }
 }
-
 
 string to_string(const ResultKey& k) {
     stringstream ss;

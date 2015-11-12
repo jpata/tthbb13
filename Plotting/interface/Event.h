@@ -77,21 +77,7 @@ enum CategoryKey {
     jge6_tge4,
     
     blrL,
-    blrH,
-    
-    Wmass60_100,
-    nonWmass60_100,
-
-    boosted,
-    nonboosted,
-    boostedMass120_180,
-    nonboostedMass120_180,
-    boostedMass140_180,
-    nonboostedMass140_180,
-    boostedTau_07,
-    nonboostedTau_07,
-    boostedfRec_02,
-    nonboostedfRec_02            
+    blrH,        
 };
 const string to_string(CategoryKey k);
 const CategoryKey from_string(const string& k);
@@ -101,7 +87,31 @@ const CategoryKey from_string(const string& k);
 //without systematic variation suffix
 namespace HistogramKey {
 enum HistogramKey {
+    lep0_pt,
+    lep1_pt,
+    lep0_eta,
+    lep1_eta,
+    lep0_relIso,
+    lep1_relIso,
+
     jet0_pt,
+    jet1_pt,
+    jet0_eta,
+    jet1_eta,
+    jet0_phi,
+    jet1_phi,
+    jet0_etaphi,
+    jet1_etaphi,
+
+    jet0_btagCSV,
+    jet1_btagCSV,
+    jet0_btagBDT,
+    jet1_btagBDT,
+
+    nPV,
+    numJets,
+    nBCSVM,
+
     mem_SL_0w2h2t,
     mem_DL_0w2h2t,
     mem_SL_2w2h2t,
@@ -437,6 +447,7 @@ public:
         double weight
     ) const;
 };
+
 
 class SparseCategoryProcessor : public CategoryProcessor {
 public:

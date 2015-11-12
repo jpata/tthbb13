@@ -43,9 +43,21 @@ class JetAnalyzer(FilterAnalyzer):
             for i in range(len(jets)):
                 if sigma > 0:
                     cf = sigma * newjets[i].corr_JECUp / newjets[i].corr
-
                 elif sigma < 0:
                     cf = abs(sigma) * newjets[i].corr_JECDown / newjets[i].corr
+                
+                #get the uncorrected jets
+                elif sigma == 0:
+                    cf = 1.0 / newjets[i].corr
+
+                newjets[i].pt *= cf
+                newjets[i].mass *= cf
+        elif self.cfg_comp.isMC and systematic == "JER":
+            for i in range(len(jets)):
+                if sigma > 0:
+                    cf = sigma * newjets[i].corr_JERUp / newjets[i].corr_JER
+                elif sigma < 0:
+                    cf = abs(sigma) * newjets[i].corr_JERDown / newjets[i].corr_JER
                 
                 #get the uncorrected jets
                 elif sigma == 0:
@@ -184,16 +196,13 @@ class JetAnalyzer(FilterAnalyzer):
                 if abs(j.mcFlavour) == 5:
                     event.n_tagwp_tagged_true_bjets += 1
 
-        #Require at least 3 (if is_sl) or 2 (is_dl) good jets in order to continue analysis
+        #Require at least 2 good resolved jets to continue analysis
         passes = True
-        if event.is_sl and len(event.good_jets) < 3:
+        if event.is_sl and len(event.good_jets) < 2:
             passes = False
         if event.is_dl:
             if len(event.good_jets) < 2:
                 passes = False
-            if len(event.good_jets) >=2:
-                if event.good_jets[0].pt<self.conf.jets["pt"] or event.good_jets[1].pt<self.conf.jets["pt"]:
-                    passes = False
         if event.is_fh:
             if len(event.good_jets) < 6:      
                 passes = False        

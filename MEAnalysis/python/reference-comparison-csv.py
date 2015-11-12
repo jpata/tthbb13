@@ -10,7 +10,7 @@ d2 = pandas.read_csv(file1)
 
 print "D1", d1.shape
 print "D2", d2.shape
-print_detail = False
+print_detail = True
 
 def get_event_set(d):
     s1 = set([])
@@ -63,7 +63,7 @@ vars = [
     "lep1_pt", "lep1_iso",
     "jet1_pt", "jet2_pt", "jet3_pt", "jet4_pt",
     "jet1_CSVv2", "jet2_CSVv2", "jet3_CSVv2", "jet4_CSVv2",
-    "MET_pt"
+    "MET_pt", "MET_phi"
 ]
 
 cuts = [
@@ -140,6 +140,8 @@ for icat in range(len(commons)):
         print "******************************************************************"
 
     if print_detail:
+        print "Printing first 3 events that are common"
+
         print "Printing first 3 events that are only in A"
         print "-------------------------------------------"
         for ev in inA[:3]:
