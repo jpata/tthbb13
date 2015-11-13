@@ -1,16 +1,10 @@
 import pandas, sys
 import matplotlib.pyplot as plt
 import numpy as np
-
-file0 = sys.argv[1]
-file1 = sys.argv[2]
-
-d1 = pandas.read_csv(file0)
-d2 = pandas.read_csv(file1)
-
-print "D1", d1.shape
-print "D2", d2.shape
-print_detail = True
+#pandas.set_option('display.height', 1000)
+pandas.set_option('display.max_rows', 500)
+pandas.set_option('display.max_columns', 500)
+pandas.set_option('display.width', 1000)
 
 def get_event_set(d):
     s1 = set([])
@@ -35,27 +29,40 @@ def compare(d1, d2, sel):
     #print "c) not in {0}, in {1}".format(nd1, nd2), len(missing_s2)
     return common, missing_s1, missing_s2, evs1, evs2
 
-def compare_events(d1, d2, evids, varlist):
+def get_events(d, evlist):
+    s = []
+    for run, lumi, event in evlist:
+        evstr = "(run=={0}) & (lumi=={1}) & (event=={2})".format(run, lumi, event)
+        s1 = d.eval(evstr)
+        s += [s1]
+    tot = np.zeros(len(d), dtype=np.bool)
+    if len(s) > 0:
+        tot = s[0]
+        for x in s[1:]:
+            tot = tot | x
+    return tot
+
+def compare_events(d1, d2, evids, varlist, fi):
     for (run, lumi, event) in evids:
         evstr = "(run=={0}) & (lumi=={1}) & (event=={2})".format(run, lumi, event)
         s1 = d1.eval(evstr)
         s2 = d2.eval(evstr)
         in_d1 = sum(s1) == 1
         in_d2 = sum(s2) == 1
-        print "{0}:{1}:{2}".format(run, lumi, event)
-        print "in D1={0} D2={1}".format(in_d1, in_d2)
+        fi.write("{0}:{1}:{2}\n".format(run, lumi, event))
+        fi.write("in D1={0} D2={1}\n".format(in_d1, in_d2))
         if in_d1 and in_d2:
             #print "common ({0}, {1}, {2}),".format(run, lumi, event)
             for v in varlist:
-                print "*", v, d1[s1][v].as_matrix()[0], d2[s2][v].as_matrix()[0]
+                fi.write("C* {0} {1} {2}\n".format(v, d1[s1][v].as_matrix()[0], d2[s2][v].as_matrix()[0]))
         elif in_d1:
             #print "d1 ({0}, {1}, {2}),".format(run, lumi, event)
             for v in varlist:
-                print "*", v, d1[s1][v].as_matrix()[0]
+                fi.write("D1* {0} {1}\n".format(v, d1[s1][v].as_matrix()[0]))
         elif in_d2:
             #print "d2 ({0}, {1}, {2}),".format(run, lumi, event)
             for v in varlist:
-                print "*", v, d2[s2][v].as_matrix()[0]
+                fi.write("D2* {0} {1}\n".format(v, d2[s2][v].as_matrix()[0]))
 
 vars = [
     "n_jets", "n_btags",
@@ -63,7 +70,9 @@ vars = [
     "lep1_pt", "lep1_iso",
     "jet1_pt", "jet2_pt", "jet3_pt", "jet4_pt",
     "jet1_CSVv2", "jet2_CSVv2", "jet3_CSVv2", "jet4_CSVv2",
-    "MET_pt", "MET_phi"
+    "MET_pt", "MET_phi",
+    "bWeight",
+    "ttHFCategory"
 ]
 
 cuts = [
@@ -100,86 +109,114 @@ cuts_names = [
     "DL 4+J 4+T"
 ]
 
-commons = [compare(d1, d2, cut) for cut in cuts]
+def compareTwo(d1, d2, d1Name, d2Name):
+    print_detail = False
+    commons = [compare(d1, d2, cut) for cut in cuts]
+    prefix = d1Name + "_" + d2Name
+    
+    plt.figure(figsize=(4,5))
+    a1 = plt.axes((0.0,0.5, 1.0,0.5))
+    xs = np.array(range(len(cuts)))
+    plt.bar(xs, map(lambda x: len(x[0]), commons), label="common in A and B", color="gray")
+    plt.errorbar(xs+0.2, map(lambda x: len(x[0]), commons), map(lambda x: len(x[1]), commons), label="in B, not in A", color="black", lw=0, elinewidth=2)
+    plt.errorbar(xs+0.6, map(lambda x: len(x[0]), commons), map(lambda x: len(x[2]), commons), label="in A, not in B", color="red", lw=0, elinewidth=2)
+    plt.xticks(xs, []);
+    #plt.grid()
+    #plt.ylim(bottom=1)
+    #plt.yscale("log")
+    plt.ylabel("number of MC events", fontsize=16)
+    plt.title("A={0} B={1}".format("file1", "file2"), fontsize=20)
+    plt.legend(loc="best", frameon=False)
+    a2 = plt.axes((0.0,0.0, 1.0,0.45))
+    plt.plot(xs+0.2, map(lambda x: float(len(x[1]))/float(len(x[0])) if len(x[0])>0 else 0, commons), color="black", lw=0, marker="o")
+    plt.plot(xs+0.6, map(lambda x: float(len(x[2]))/float(len(x[0])) if len(x[0])>0 else 0, commons), color="red", lw=0, marker="o")
+    #plt.ylim(0.0,0.1)
+    plt.xticks(xs+0.4, cuts_names, rotation=90);
+    plt.axhline(0.0, color="blue")
+    plt.grid()
+    plt.xlabel("category", fontsize=16)
+    plt.ylabel("difference / common", fontsize=16)
+    plt.savefig(prefix+"_sl.pdf")
+    plt.clf()
 
-plt.figure(figsize=(4,5))
-a1 = plt.axes((0.0,0.5, 1.0,0.5))
-xs = np.array(range(len(cuts)))
-plt.bar(xs, map(lambda x: len(x[0]), commons), label="common in A and B", color="gray")
-plt.errorbar(xs+0.2, map(lambda x: len(x[0]), commons), map(lambda x: len(x[1]), commons), label="in B, not in A", color="black", lw=0, elinewidth=2)
-plt.errorbar(xs+0.6, map(lambda x: len(x[0]), commons), map(lambda x: len(x[2]), commons), label="in A, not in B", color="red", lw=0, elinewidth=2)
-plt.xticks(xs, []);
-#plt.grid()
-#plt.ylim(bottom=1)
-#plt.yscale("log")
-plt.ylabel("number of MC events", fontsize=16)
-plt.title("A={0} B={1}".format("file1", "file2"), fontsize=20)
-plt.legend(loc="best", frameon=False)
-a2 = plt.axes((0.0,0.0, 1.0,0.45))
-plt.plot(xs+0.2, map(lambda x: float(len(x[1]))/float(len(x[0])) if len(x[0])>0 else 0, commons), color="black", lw=0, marker="o")
-plt.plot(xs+0.6, map(lambda x: float(len(x[2]))/float(len(x[0])) if len(x[0])>0 else 0, commons), color="red", lw=0, marker="o")
-#plt.ylim(0.0,0.1)
-plt.xticks(xs+0.4, cuts_names, rotation=90);
-plt.axhline(0.0, color="blue")
-plt.grid()
-plt.xlabel("category", fontsize=16)
-plt.ylabel("difference / common", fontsize=16)
-plt.savefig("sl.pdf")
-plt.clf()
+    outfile = open(prefix + "_results.txt", "w")
+    for icat in range(len(commons)):
 
-for icat in range(len(commons)):
-    c = list(commons[icat][0])
-    inA = list(commons[icat][1])
-    inB = list(commons[icat][2])
-    sel_d1 = list(commons[icat][3])
-    sel_d2 = list(commons[icat][4])
-    if print_detail:
-        print "******************************************************************"
-    print cuts[icat], "A", len(sel_d1), "B", len(sel_d2), "common", len(c), "Aonly", len(inA), "Bonly", len(inB)
-    if print_detail:
-        print "******************************************************************"
+        newvars_A = [(v, pairA + "_" + v) for v in vars]
+        newvars_B = [(v, pairB + "_" + v) for v in vars]
+        d1_renamed = d1.rename(columns=dict(newvars_A))
+        d1_renamed = d1_renamed[["run", "lumi", "event"]+[v[1] for v in newvars_A]]
+        d2_renamed = d2.rename(columns=dict(newvars_B))
+        d2_renamed = d2_renamed[["run", "lumi", "event"]+[v[1] for v in newvars_B]]
 
-    if print_detail:
-        print "Printing first 3 events that are common"
+        c = list(commons[icat][0])
+        inB = list(commons[icat][1])
+        inA = list(commons[icat][2])
+        sel_d1 = list(commons[icat][3])
+        sel_d2 = list(commons[icat][4])
+        outfile.write("******************************************************************\n")
+        outfile.write("{0} D1={1} D2={2} C={3} inA={4} inB={5}\n".format(
+            cuts[icat], len(sel_d1), len(sel_d2), len(c), len(inA), len(inB))
+        )
+        outfile.write("******************************************************************\n")
 
-        print "Printing first 3 events that are only in A"
-        print "-------------------------------------------"
-        for ev in inA[:3]:
-            compare_events(d1, d2, [ev], vars)
-        print "Printing first 3 events that are only in B"
-        print "-------------------------------------------"
-        for ev in inB[:3]:
-            print "#####"
-            compare_events(d1, d2, [ev], vars)
-# list(commons_sl[0][1])[:2]
-# 
-# 
-# # In[68]:
-# 
-# list(commons_sl[0][2])[:2]
-# 
-# 
-# # In[69]:
-# 
-# compare_events(d1, d2, list(commons_dl[0][0]), vars)
-# 
-# 
-# # ### Not in D1
-# 
-# # In[ ]:
-# 
-# # In[258]:
-# 
-# compare_events(d1, d2, list(commons_dl[1][1])[:5], vars)
-# 
-# 
-# # ### Not in D2
-# 
-# # In[300]:
-# 
-# compare_events(d1, d2, list(commons_dl[0][2]), vars)
-# 
-# 
-# # In[90]:
-# 
-# d1[d1["event"] == 275234][["is_SL", "is_DL", "event", "lep1_pdgId", "lep2_pdgId", "lep1_pt", "lep2_pt"]].head()
+        conc = pandas.merge(d1_renamed, d2_renamed, on=["run", "lumi", "event"], how='outer')
+        totvars = ["run", "lumi", "event"]
+        for ivar in range(len(vars)):
+            totvars += [newvars_A[ivar][1], newvars_B[ivar][1]]
+        conc = conc[totvars]
+        if len(c)>0:
+            ec1 = get_events(conc, c[:10])
+            outfile.write("Printing first 10 events that are common\n")
+            outfile.write(str(conc[ec1]) + "\n")
+            outfile.write("-------------------------------------------\n")
+
+
+        if len(inA)>0:
+            ec1 = get_events(conc, inA[:10])
+            outfile.write("Printing first 10 events that are only in A\n")
+            outfile.write(str(conc[ec1]) + "\n")
+            outfile.write("-------------------------------------------\n")
+
+        if len(inB)>0:
+            ec1 = get_events(conc, inB[:10])
+            outfile.write("Printing first 10 events that are only in B\n")
+            outfile.write(str(conc[ec1]) + "\n")
+            outfile.write("-------------------------------------------\n")
+
+        # if print_detail:
+        #     outfile.write("Printing first 3 events that are common\n")
+        #     ec = get_events(d1, c[:3])
+        #     for v in vars:
+        #         outfile.write(d1.loc[get_events(d1, c[:3]), v] + "\n")
+        #         d2.loc[get_events(d2, c[:3]), c]
+        #     outfile.write("{0}\n".format(d1.loc[get_events(d1, c[:3]), vars]))
+        #     outfile.write("Printing first 3 events that are only in A\n")
+        #     #outfile.write("{0}\n".format(d1.loc[get_events(d1, inA[:3]), vars]))
+        #     outfile.write("-------------------------------------------\n")
+        #     # for ev in inA[:3]:
+        #     #     compare_events(d1, d2, [ev], vars)
+        #     outfile.write("Printing first 3 events that are only in B\n")
+        #     outfile.write("-------------------------------------------\n")
+        #     # for ev in inB[:3]:
+        #     #     outfile.write("#####\n")
+        #     #     compare_events(d1, d2, [ev], vars, outfile)
+    outfile.close()
+
+data = {}
+for x in ["eth", "desy", "kit"]:
+    data[x] = {}
+data["eth"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/eth/v5/tth.csv")
+data["eth"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/eth/v5/ttjets.csv")
+
+data["desy"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/desy_sync_round3/v3/tth.csv")
+data["desy"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/desy_sync_round3/v3/ttjets.csv")
+
+data["kit"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/kit/tth.csv")
+data["kit"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/kit/ttjets.csv")
+
+for sample in ["sig", "bkg"]:
+    for pairA, pairB in [("eth", "desy"), ("eth", "kit"), ("desy", "kit")]:
+        d1 = data[pairA][sample]
+        d2 = data[pairB][sample]
+        compareTwo(d1, d2, pairA, pairB)
