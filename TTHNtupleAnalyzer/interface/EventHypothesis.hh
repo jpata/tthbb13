@@ -224,8 +224,8 @@ bool is_loose_muon(const pat::Muon& mu) {
 
 bool is_good_tau(const pat::Tau& tau) {
     return (tau.pt() > 20 &&
-        tau.tauID("byTightCombinedIsolationDeltaBetaCorr3Hits") &&
-        tau.tauID("againstMuonTight2") &&
+        tau.tauID("byTightCombinedIsolationDeltaBetaCorr3Hits") &&	  
+	    tau.tauID("againstMuonTight3") && // Needed to change for MiniAodV2/7_4_15 running
         //MVA3 is not in CMSSW7
         //pat::Tau: the ID againstElectronMediumMVA3 can't be found in this pat::Tau.
         tau.tauID("againstElectronMediumMVA5")

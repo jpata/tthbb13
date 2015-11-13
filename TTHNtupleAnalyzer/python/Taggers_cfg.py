@@ -546,7 +546,7 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
 li_fatjets_flavour_infos = []
 
 for fj_obj_name in li_fatjets_objects:
-
+   
    # These are subjets - don't need the flavour info at the moment
    if "forbtag" in fj_obj_name:
          li_fatjets_flavour_infos.append("None")
@@ -568,7 +568,7 @@ for fj_obj_name in li_fatjets_objects:
                                                            jets           = cms.InputTag(fj_obj_name),
                                                            bHadrons       = cms.InputTag("selectedHadronsAndPartons","bHadrons"),
                                                            cHadrons       = cms.InputTag("selectedHadronsAndPartons","cHadrons"),
-                                                           partons        = cms.InputTag("selectedHadronsAndPartons","partons"),
+                                                           partons        = cms.InputTag("selectedHadronsAndPartons","algorithmicPartons"),
                                                            jetAlgorithm   = cms.string(algo),
                                                            rParam         = cms.double(r_param),
                                                            ghostRescaling = cms.double(1e-18),
@@ -582,7 +582,7 @@ for fj_obj_name in li_fatjets_objects:
                                                               groomedJets    = cms.InputTag(fj_obj_name),
                                                               bHadrons       = cms.InputTag("selectedHadronsAndPartons","bHadrons"),
                                                               cHadrons       = cms.InputTag("selectedHadronsAndPartons","cHadrons"),
-                                                              partons        = cms.InputTag("selectedHadronsAndPartons","partons"),
+                                                              partons        = cms.InputTag("selectedHadronsAndPartons","algorithmicPartons"),
                                                               jetAlgorithm   = cms.string(algo),
                                                               rParam         = cms.double(r_param),
                                                               ghostRescaling = cms.double(1e-18),

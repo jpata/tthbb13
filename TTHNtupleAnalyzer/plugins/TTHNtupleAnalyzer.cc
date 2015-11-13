@@ -680,7 +680,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	
 	//Pileup and genparticles
 		Handle<std::vector<PileupSummaryInfo>> PupInfo;
-		iEvent.getByLabel(edm::InputTag("addPileupInfo"), PupInfo);
+		iEvent.getByLabel(edm::InputTag("slimmedAddPileupInfo"), PupInfo);
 		std::vector<PileupSummaryInfo>::const_iterator PVI;
 		tthtree->n__pvi = PupInfo->size();
 		int n_pu = 0;
