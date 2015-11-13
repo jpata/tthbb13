@@ -28,11 +28,12 @@ step2:
 	cd $(CMSSW_BASE)/src/VHbbAnalysis/Heppy/test && ls  ~/tth/spring15/sync/ttjets_1/block*.root | $(PARCMD) --result out_ttjets_step2 -j30 python ./vhbb_parallel.py {} ttjets_block_{#}
 
 step3:
-	seq 0 41 | $(PARCMD) -j30 ./python/MEAnalysis_heppy_parallel.py {}
+	hadd -f ~/tth/spring15/sync/tthbb/ttjets.root ~/tth/gc/GCbd9b961cd7c0/cfg_noME/TT_TuneCUETP8M1_13TeV-powheg-pythia8/output_*.root
+	hadd -f ~/tth/spring15/sync/tthbb/tth.root ~/tth/gc/GCbd9b961cd7c0/cfg_noME/ttHTobb_M125_13TeV_powheg_pythia8/output_*.root
 
 step4:
-	python python/makeTable.py /home/joosep/tth/spring15/sync/tthbb/v4/tth.root nominal > tth.csv
-	python python/makeTable.py /home/joosep/tth/spring15/sync/tthbb/v4/ttjets.root nominal > ttjets.csv
+	python python/makeTable.py /home/joosep/tth/spring15/sync/tthbb/tth.root nominal > tth.csv
+	python python/makeTable.py /home/joosep/tth/spring15/sync/tthbb/ttjets.root nominal > ttjets.csv
 
 clean:
 	rm -Rf $(CMSSW_BASE)/src/VHbbAnalysis/Heppy/test/Loop_*

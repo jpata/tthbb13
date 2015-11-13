@@ -22,34 +22,48 @@ def mu_baseline_tight(mu):
 def print_mu(mu):
     print "Muon: (pt=%s, eta=%s, tight=%s, pf=%s, glo=%s, dxy=%s, dz=%s, chi2=%s, nhits=%s, pix=%s, stat=%s, pfRelIso04=%s)" % (mu.pt, mu.eta, mu.tightId, mu.isPFMuon,  mu.isGlobalMuon, mu.dxy , mu.dz, mu.globalTrackChi2, (getattr(mu, "nMuonHits", 0) > 0 or getattr(mu, "nChamberHits", 0) > 0) , mu.pixelHits , mu.nStations, mu.pfRelIso04)
 
-#pt>15 && ( ( abs(superCluster().eta) < 1.4442 && full5x5_sigmaIetaIeta < 0.012 && hcalOverEcal < 0.09 && (ecalPFClusterIso / pt) < 0.37 && (hcalPFClusterIso / pt) < 0.25 && (dr03TkSumPt / pt) < 0.18 && abs(deltaEtaSuperClusterTrackAtVtx) < 0.0095 && abs(deltaPhiSuperClusterTrackAtVtx) < 0.065 ) || ( abs(superCluster().eta) > 1.5660 && full5x5_sigmaIetaIeta < 0.033 && hcalOverEcal <0.09 && (ecalPFClusterIso / pt) < 0.45 && (hcalPFClusterIso / pt) < 0.28 && (dr03TkSumPt / pt) < 0.18 ) )
-
 def el_baseline_medium(el):
 
     sca = abs(el.etaSc)
-    ret = not (sca > 1.4442 and sca < 1.5660)
-#            (abs(el.eleDEta)    < 0.007057) and
-#            (abs(el.eleDPhi)    < 0.030159) and
-#            (el.eleSieie        < 0.028237) and
-#            (el.eleHoE          < 0.067778) and
-#            (abs(el.dxy)        < 0.027984) and
-#            (abs(el.dz)         < 0.133431) and
-#            (el.pfRelIso03        < 0.078265)
-    #medium ID
-    ret = ret and el.eleCutIdSpring15_25ns_v1 >= 3
+    ret = ((sca < 1.4442 and
+        el.eleSieie < 0.012 and
+        el.eleHoE < 0.09 and
+        el.eleEcalClusterIso/ el.pt < 0.37 and
+        el.eleHcalClusterIso / el.pt < 0.25 and
+        abs(el.eleDEta) < 0.0095 and
+        abs(el.eleDPhi) < 0.065 and
+        el.dr03TkSumPt/el.pt < 0.18) or
+        (sca > 1.5660 and
+        el.eleSieie < 0.033 and
+        el.eleHoE < 0.09 and
+        el.eleEcalClusterIso / el.pt < 0.45 and
+        el.eleHcalClusterIso / el.pt < 0.28 and
+        el.dr03TkSumPt/el.pt < 0.18)
+    )
+    
+    #medium ID (cut-based)
+    #ret = ret and el.eleCutIdSpring15_25ns_v1 >= 3
+    
+    ret = ret and el.mvaIdTrigMediumResult == 1
     return ret
 
-def el_baseline_loose(el):
-
-    sca = abs(el.etaSc)
-    ret = not (sca > 1.4442 and sca < 1.5660)
-
-    #Loose ID
-    ret = ret and el.eleCutIdSpring15_25ns_v1 >= 2
-    return ret
+#def el_baseline_loose(el):
+#
+#    sca = abs(el.etaSc)
+#    ret = not (sca > 1.4442 and sca < 1.5660)
+#
+#    #Loose ID
+#    ret = ret and el.eleCutIdSpring15_25ns_v1 >= 2
+#    return ret
 
 def print_el(el):
-    print "Electron: (pt=%s, eta=%s, convVeto=%s, etaSc=%s, dEta=%s, dPhi=%s, sieie=%s, HoE=%s, dxy=%s, dz=%s, iso03=%s, nhits=%s, eOp=%s, pfRelIso03=%s)" % (el.pt, el.eta, el.convVeto, abs(el.etaSc), abs(el.eleDEta) , abs(el.eleDPhi) , el.eleSieie, el.eleHoE , abs(el.dxy) , abs(el.dz) , el.relIso03 , getattr(el, "eleExpMissingInnerHits", 0) , getattr(el, "eleooEmooP", 0), el.pfRelIso03)
+    print "Electron: (pt=%s, eta=%s, convVeto=%s, etaSc=%s, dEta=%s, dPhi=%s, sieie=%s, HoE=%s, dxy=%s, dz=%s, iso03=%s, nhits=%s, eOp=%s, pfRelIso03=%s mvaId=%s ecalIso=%s hcalIso=%s)" % (
+        el.pt, el.eta, el.convVeto, abs(el.etaSc), abs(el.eleDEta),
+        abs(el.eleDPhi), el.eleSieie, el.eleHoE, abs(el.dxy),
+        abs(el.dz), el.relIso03 , getattr(el, "eleExpMissingInnerHits", 0),
+        getattr(el, "eleooEmooP", 0), el.pfRelIso03, el.mvaIdTrigMediumResult,
+        el.eleEcalClusterIso/el.pt, el.eleHcalClusterIso/el.pt
+    )
 
 class Conf:
     leptons = {
@@ -85,21 +99,21 @@ class Conf:
             "SL": {
                 "pt": 30,
                 "eta": 2.1,
-                "idcut": lambda el: el_baseline_medium(el) and el.convVeto,
+                "idcut": lambda el: el_baseline_medium(el),
             },
             "DL": {
                 "pt_leading": 20,
                 "pt_subleading": 15,
                 "eta": 2.4,
-                "idcut": lambda el: el_baseline_medium(el) and el.convVeto,
+                "idcut": lambda el: el_baseline_medium(el),
             },
             "veto": {
                 "pt": 15,
                 "eta": 2.4,
-                "idcut": lambda el: el_baseline_loose(el),
+                "idcut": lambda el: el_baseline_medium(el),
             },
             #"isotype": "pfRelIso03", #pfRelIso - delta-beta, relIso - rho
-            "isotype": "relIso03", #pfRelIso - delta-beta, relIso - rho (Heppy.LeptonAnalyzer.ele/mu_isoCorr)
+            "isotype": "none", #pfRelIso - delta-beta, relIso - rho (Heppy.LeptonAnalyzer.ele/mu_isoCorr), none
             "debug" : print_el
         },
         "selection": lambda event: event.is_sl or event.is_dl
@@ -178,14 +192,19 @@ class Conf:
             #"trigger", #print trigger bits
             #"input", #print input particles
             #"gen", #print out gen-level info
-            #"debug", #very high-level debug info
+            "debug", #very high-level debug info
             #"reco", #info about reconstructed final state
             #"meminput" #info about particles used for MEM input
         ],
 
         #"eventWhitelist": [
-        #    (1, 19169, 3821537), #jet pt=39
-        #    (1, 15819, 3153740) #lepton?
+        #    #KIT
+        #    (1, 1386, 276274),
+        #    (1, 15709, 3131733),
+
+        #    #DESY
+        #    (1, 11333, 2259327),
+        #    (1, 15646, 3119109),
         #]
     }
 

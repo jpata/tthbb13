@@ -57,10 +57,13 @@ class LeptonAnalyzer(FilterAnalyzer):
                     lambda x: (
                         x.pt > lepcuts.get("pt", 0)
                         and abs(x.eta) < lepcuts["eta"]
-                        #if specified, apply an additional isolation cut
-                        and abs(getattr(x, isotype)) < isocut
                     ), incoll
                 )
+                #Apply isolation cut
+                if isotype != "none":
+                    leps = filter(
+                        lambda x: abs(getattr(x, isotype)) < isocut, incoll
+                    )
                 leps = sorted(leps, key=lambda x: x.pt, reverse=True)
                 leps = filter(lepcuts["idcut"], leps)
                 newleps = [] 
