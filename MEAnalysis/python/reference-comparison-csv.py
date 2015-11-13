@@ -67,7 +67,12 @@ def compare_events(d1, d2, evids, varlist, fi):
 vars = [
     "n_jets", "n_btags",
     "is_SL", "is_DL",
-    "lep1_pt", "lep1_iso",
+    "lep1_pt",
+    "lep1_iso",
+    "lep1_pdgId",
+    "lep2_pt",
+    "lep2_iso",
+    "lep2_pdgId",
     "jet1_pt", "jet2_pt", "jet3_pt", "jet4_pt",
     "jet1_CSVv2", "jet2_CSVv2", "jet3_CSVv2", "jet4_CSVv2",
     "MET_pt", "MET_phi",
@@ -109,37 +114,38 @@ cuts_names = [
     "DL 4+J 4+T"
 ]
 
-def compareTwo(d1, d2, d1Name, d2Name):
+def compareTwo(d1, d2, d1Name, d2Name, sample):
     print_detail = False
     commons = [compare(d1, d2, cut) for cut in cuts]
-    prefix = d1Name + "_" + d2Name
-    
-    plt.figure(figsize=(4,5))
-    a1 = plt.axes((0.0,0.5, 1.0,0.5))
-    xs = np.array(range(len(cuts)))
-    plt.bar(xs, map(lambda x: len(x[0]), commons), label="common in A and B", color="gray")
-    plt.errorbar(xs+0.2, map(lambda x: len(x[0]), commons), map(lambda x: len(x[1]), commons), label="in B, not in A", color="black", lw=0, elinewidth=2)
-    plt.errorbar(xs+0.6, map(lambda x: len(x[0]), commons), map(lambda x: len(x[2]), commons), label="in A, not in B", color="red", lw=0, elinewidth=2)
-    plt.xticks(xs, []);
-    #plt.grid()
-    #plt.ylim(bottom=1)
-    #plt.yscale("log")
-    plt.ylabel("number of MC events", fontsize=16)
-    plt.title("A={0} B={1}".format("file1", "file2"), fontsize=20)
-    plt.legend(loc="best", frameon=False)
-    a2 = plt.axes((0.0,0.0, 1.0,0.45))
-    plt.plot(xs+0.2, map(lambda x: float(len(x[1]))/float(len(x[0])) if len(x[0])>0 else 0, commons), color="black", lw=0, marker="o")
-    plt.plot(xs+0.6, map(lambda x: float(len(x[2]))/float(len(x[0])) if len(x[0])>0 else 0, commons), color="red", lw=0, marker="o")
-    #plt.ylim(0.0,0.1)
-    plt.xticks(xs+0.4, cuts_names, rotation=90);
-    plt.axhline(0.0, color="blue")
-    plt.grid()
-    plt.xlabel("category", fontsize=16)
-    plt.ylabel("difference / common", fontsize=16)
-    plt.savefig(prefix+"_sl.pdf")
-    plt.clf()
+    prefix = d1Name + "_" + d2Name + "_" + sample
+    # 
+    # plt.figure(figsize=(4,5))
+    # a1 = plt.axes((0.0,0.5, 1.0,0.5))
+    # xs = np.array(range(len(cuts)))
+    # plt.bar(xs, map(lambda x: len(x[0]), commons), label="common in A and B", color="gray")
+    # plt.errorbar(xs+0.2, map(lambda x: len(x[0]), commons), map(lambda x: len(x[1]), commons), label="in B, not in A", color="black", lw=0, elinewidth=2)
+    # plt.errorbar(xs+0.6, map(lambda x: len(x[0]), commons), map(lambda x: len(x[2]), commons), label="in A, not in B", color="red", lw=0, elinewidth=2)
+    # plt.xticks(xs, []);
+    # #plt.grid()
+    # #plt.ylim(bottom=1)
+    # #plt.yscale("log")
+    # plt.ylabel("number of MC events", fontsize=16)
+    # plt.title("A={0} B={1}".format("file1", "file2"), fontsize=20)
+    # plt.legend(loc="best", frameon=False)
+    # a2 = plt.axes((0.0,0.0, 1.0,0.45))
+    # plt.plot(xs+0.2, map(lambda x: float(len(x[1]))/float(len(x[0])) if len(x[0])>0 else 0, commons), color="black", lw=0, marker="o")
+    # plt.plot(xs+0.6, map(lambda x: float(len(x[2]))/float(len(x[0])) if len(x[0])>0 else 0, commons), color="red", lw=0, marker="o")
+    # #plt.ylim(0.0,0.1)
+    # plt.xticks(xs+0.4, cuts_names, rotation=90);
+    # plt.axhline(0.0, color="blue")
+    # plt.grid()
+    # plt.xlabel("category", fontsize=16)
+    # plt.ylabel("difference / common", fontsize=16)
+    # plt.savefig(prefix+"_sl.pdf")
+    # plt.clf()
 
-    outfile = open(prefix + "_results.txt", "w")
+    outfile = open(prefix + "_results.html", "w")
+    outfile.write("<h1>A={0} B={1} sample={2}</h1>".format(d1Name, d2Name, sample))
     for icat in range(len(commons)):
 
         newvars_A = [(v, pairA + "_" + v) for v in vars]
@@ -150,15 +156,18 @@ def compareTwo(d1, d2, d1Name, d2Name):
         d2_renamed = d2_renamed[["run", "lumi", "event"]+[v[1] for v in newvars_B]]
 
         c = list(commons[icat][0])
+        if len(c) == 0:
+            outfile.write("Nothing common in {0}<br>".format(cuts[icat]))
+            continue
         inB = list(commons[icat][1])
         inA = list(commons[icat][2])
         sel_d1 = list(commons[icat][3])
         sel_d2 = list(commons[icat][4])
-        outfile.write("******************************************************************\n")
-        outfile.write("{0} D1={1} D2={2} C={3} inA={4} inB={5}\n".format(
+        #outfile.write("******************************************************************<br>")
+        outfile.write("<h2>{0} A={1} B={2} common={3} inAonly={4} inBonly={5}</h2>".format(
             cuts[icat], len(sel_d1), len(sel_d2), len(c), len(inA), len(inB))
         )
-        outfile.write("******************************************************************\n")
+        #outfile.write("******************************************************************<br>")
 
         conc = pandas.merge(d1_renamed, d2_renamed, on=["run", "lumi", "event"], how='outer')
         totvars = ["run", "lumi", "event"]
@@ -167,22 +176,22 @@ def compareTwo(d1, d2, d1Name, d2Name):
         conc = conc[totvars]
         if len(c)>0:
             ec1 = get_events(conc, c[:10])
-            outfile.write("Printing first 10 events that are common\n")
-            outfile.write(str(conc[ec1]) + "\n")
-            outfile.write("-------------------------------------------\n")
+            outfile.write("<h3>Printing first 10 events that are common</h3>")
+            outfile.write(str(conc[ec1].to_html()) + "<br>")
+            #outfile.write("-------------------------------------------<br>")
 
 
         if len(inA)>0:
             ec1 = get_events(conc, inA[:10])
-            outfile.write("Printing first 10 events that are only in A\n")
-            outfile.write(str(conc[ec1]) + "\n")
-            outfile.write("-------------------------------------------\n")
+            outfile.write("<h3>Printing first 10 events that are only in A</h3>")
+            outfile.write(str(conc[ec1].to_html()) + "<br>")
+            #outfile.write("-------------------------------------------<br>")
 
         if len(inB)>0:
             ec1 = get_events(conc, inB[:10])
-            outfile.write("Printing first 10 events that are only in B\n")
-            outfile.write(str(conc[ec1]) + "\n")
-            outfile.write("-------------------------------------------\n")
+            outfile.write("<h3>Printing first 10 events that are only in B</h3>")
+            outfile.write(str(conc[ec1].to_html()) + "<br>")
+            #outfile.write("-------------------------------------------<br>")
 
         # if print_detail:
         #     outfile.write("Printing first 3 events that are common\n")
@@ -204,10 +213,11 @@ def compareTwo(d1, d2, d1Name, d2Name):
     outfile.close()
 
 data = {}
-for x in ["eth", "desy", "kit"]:
+for x in ["eth", "desy", "kit", "ihep"]:
     data[x] = {}
-data["eth"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/eth/v5/tth.csv")
-data["eth"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/eth/v5/ttjets.csv")
+
+data["eth"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/eth/v6/tth.csv")
+data["eth"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/eth/v6/ttjets.csv")
 
 data["desy"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/desy_sync_round3/v3/tth.csv")
 data["desy"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/desy_sync_round3/v3/ttjets.csv")
@@ -215,8 +225,12 @@ data["desy"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/
 data["kit"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/kit/tth.csv")
 data["kit"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/kit/ttjets.csv")
 
+data["ihep"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/ihep/tth.csv")
+data["ihep"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/ihep/ttjets.csv")
+
+
 for sample in ["sig", "bkg"]:
-    for pairA, pairB in [("eth", "desy"), ("eth", "kit"), ("desy", "kit")]:
+    for pairA, pairB in [("eth", "desy"), ("eth", "kit"), ("desy", "kit"), ("eth", "ihep"), ("desy", "ihep"), ("kit", "ihep")]:
         d1 = data[pairA][sample]
         d2 = data[pairB][sample]
-        compareTwo(d1, d2, pairA, pairB)
+        compareTwo(d1, d2, pairA, pairB, sample)
