@@ -15,5 +15,5 @@ process.source.fileNames = cms.untracked.vstring([
 #     'file:///scratch/gregor/RunIISpring15DR74_ZprimeToTT_M-1000_W-10_TuneCUETP8M1_13TeV_Asympt50ns.root'    
 ])
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(2000) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 process.TFileService.fileName = "ttbar_step1.root"

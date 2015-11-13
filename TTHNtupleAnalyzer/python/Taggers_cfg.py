@@ -66,12 +66,18 @@ process.source = cms.Source("PoolSource",
 
 
 #####################################
-# CHS
+# Input Objects
 #####################################
 
 # Select candidates that would pass CHS requirements
 # This can be used as input for HTT and other jet clustering algorithms
 process.chs = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedPFCandidates"), cut = cms.string("fromPV"))
+
+
+process.load('CommonTools/PileupAlgos/Puppi_cff')
+## e.g. to run on miniAOD
+process.puppi.candName = cms.InputTag('packedPFCandidates')
+process.puppi.vertexName = cms.InputTag('offlineSlimmedPrimaryVertices')
 
 
 # Ghost particle collection used for Hadron-Jet association 
@@ -101,7 +107,7 @@ li_ungroomed_fatjets_branches = []
 # These are the ones that get all the groomers applied to later on
 
 if DO_R08:
-   ## AntiKt, R=0.8, pT > 200 GeV
+   ## AntiKt, R=0.8, pT > 200 GeV, CHS
    fj_name = "ak08PFJetsCHS"
    branch_name = 'ak08'
    setattr(process, fj_name, cms.EDProducer(
@@ -117,8 +123,24 @@ if DO_R08:
    li_ungroomed_fatjets_objects.append(fj_name)
    li_ungroomed_fatjets_branches.append(branch_name)
 
+   ## AntiKt, R=0.8, pT > 200 GeV, PUPPI
+   fj_name = "ak08PFJetsPUPPI"
+   branch_name = 'ak08puppi'
+   setattr(process, fj_name, cms.EDProducer(
+           "FastjetJetProducer",
+           PFJetParameters,
+           AnomalousCellParameters,
+           jetAlgorithm = cms.string("AntiKt"),
+           rParam       = cms.double(0.8)))
+   getattr(process, fj_name).src = cms.InputTag("puppi")
+   getattr(process, fj_name).jetPtMin = cms.double(200)
+   li_fatjets_objects.append(fj_name)
+   li_fatjets_branches.append(branch_name)
+   li_ungroomed_fatjets_objects.append(fj_name)
+   li_ungroomed_fatjets_branches.append(branch_name)
+
 if DO_R15:
-   # CA, R=1.5, pT > 200 GeV
+   # CA, R=1.5, pT > 200 GeV, CHS
    fj_name = "ca15PFJetsCHS"
    branch_name = 'ca15'
    setattr(process, fj_name, cms.EDProducer(
@@ -134,6 +156,22 @@ if DO_R15:
    li_ungroomed_fatjets_objects.append(fj_name)
    li_ungroomed_fatjets_branches.append(branch_name)
 
+   # CA, R=1.5, pT > 200 GeV, PUPPI
+   fj_name = "ca15PFJetsPUPPI"
+   branch_name = 'ca15puppi'
+   setattr(process, fj_name, cms.EDProducer(
+           "FastjetJetProducer",
+           PFJetParameters,
+           AnomalousCellParameters,
+           jetAlgorithm = cms.string("CambridgeAachen"),
+           rParam       = cms.double(1.5)))
+   getattr(process, fj_name).src = cms.InputTag("puppi")
+   getattr(process, fj_name).jetPtMin = cms.double(200)
+   li_fatjets_objects.append(fj_name)
+   li_fatjets_branches.append(branch_name)
+   li_ungroomed_fatjets_objects.append(fj_name)
+   li_ungroomed_fatjets_branches.append(branch_name)
+
 
 #####################################
 # AK 0.8 constituents
@@ -142,6 +180,11 @@ if DO_R15:
 if DO_R08:
    process.ak8PFJetsCHSConstituents = cms.EDFilter("MiniAODJetConstituentSelector",
                                                    src = cms.InputTag("ak08PFJetsCHS"),
+                                                   cut = cms.string("pt>0")
+                                                )
+
+   process.ak8PFJetsPUPPIConstituents = cms.EDFilter("MiniAODJetConstituentSelector",
+                                                   src = cms.InputTag("ak08PFJetsPUPPI"),
                                                    cut = cms.string("pt>0")
                                                 )
 
@@ -754,6 +797,39 @@ if DO_R08:
    li_cmstt_infos.append("ak08CMSTopTagInfos")
    li_cmstt_branches.append("ak08cmstt")
 
+
+
+   process.cmsTopTagAk08PFJetsPUPPI = cms.EDProducer(
+           "CATopJetProducer",
+           PFJetParameters,
+           AnomalousCellParameters,
+           CATopJetParameters,
+           jetAlgorithm = cms.string("CambridgeAachen"), # CA is correct here! We already run on AK constituents! see below..
+           rParam = cms.double(0.8),
+           writeCompound = cms.bool(True),           
+   )
+
+   process.cmsTopTagAk08PFJetsPUPPI.jetCollInstanceName = cms.string("SubJets")
+   process.cmsTopTagAk08PFJetsPUPPI.src = cms.InputTag("ak8PFJetsPUPPIConstituents", "constituents")
+   process.cmsTopTagAk08PFJetsPUPPI.doAreaFastjet = cms.bool(True)
+   process.cmsTopTagAk08PFJetsPUPPI.jetPtMin = cms.double(200.0)
+
+   process.ak08PUPPICMSTopTagInfos = cms.EDProducer("CATopJetTagger",
+                                               src = cms.InputTag("cmsTopTagAk08PFJetsPUPPI"),
+                                               TopMass = cms.double(173),
+                                               TopMassMin = cms.double(0.),
+                                               TopMassMax = cms.double(250.),
+                                               WMass = cms.double(80.4),
+                                               WMassMin = cms.double(0.0),
+                                               WMassMax = cms.double(200.0),
+                                               MinMassMin = cms.double(0.0),
+                                               MinMassMax = cms.double(200.0),
+                                               verbose = cms.bool(False))
+
+   li_cmstt_objects.append("cmsTopTagAk08PFJetsPUPPI")
+   li_cmstt_infos.append("ak08PUPPICMSTopTagInfos")
+   li_cmstt_branches.append("ak08puppicmstt")
+
 if DO_R15:
    process.cmsTopTagCa15PFJetsCHS = cms.EDProducer(
            "CATopJetProducer",
@@ -785,6 +861,39 @@ if DO_R15:
    li_cmstt_objects.append("cmsTopTagCa15PFJetsCHS")
    li_cmstt_infos.append("ca15CMSTopTagInfos")
    li_cmstt_branches.append("ca15cmstt")
+
+
+
+   process.cmsTopTagCa15PFJetsPUPPI = cms.EDProducer(
+           "CATopJetProducer",
+           PFJetParameters,
+           AnomalousCellParameters,
+           CATopJetParameters,
+           jetAlgorithm = cms.string("CambridgeAachen"),
+           rParam = cms.double(1.5),
+           writeCompound = cms.bool(True),
+    )
+   process.cmsTopTagCa15PFJetsPUPPI.jetCollInstanceName = cms.string("SubJets")
+   process.cmsTopTagCa15PFJetsPUPPI.src = cms.InputTag('puppi')
+   process.cmsTopTagCa15PFJetsPUPPI.doAreaFastjet = cms.bool(True)
+   process.cmsTopTagCa15PFJetsPUPPI.jetPtMin = cms.double(200.0)
+
+   process.ca15PUPPICMSTopTagInfos = cms.EDProducer("CATopJetTagger",
+                                                    src = cms.InputTag("cmsTopTagCa15PFJetsPUPPI"),
+                                                    TopMass = cms.double(173),
+                                                    TopMassMin = cms.double(0.),
+                                                    TopMassMax = cms.double(250.),
+                                                    WMass = cms.double(80.4),
+                                                    WMassMin = cms.double(0.0),
+                                                    WMassMax = cms.double(200.0),
+                                                    MinMassMin = cms.double(0.0),
+                                                    MinMassMax = cms.double(200.0),
+                                                    verbose = cms.bool(False),
+   )
+
+   li_cmstt_objects.append("cmsTopTagCa15PFJetsPUPPI")
+   li_cmstt_infos.append("ca15PUPPICMSTopTagInfos")
+   li_cmstt_branches.append("ca15puppicmstt")
 
 
 #####################################
@@ -853,6 +962,9 @@ for collection in ["fatjets", "cmstt"]:
          original_fatjet_name = original_fatjet_name.replace("cmsTopTagCa08PFJetsCHS","ca08PFJetsCHS")
          original_fatjet_name = original_fatjet_name.replace("cmsTopTagCa15PFJetsCHS","ca15PFJetsCHS")
          original_fatjet_name = original_fatjet_name.replace("cmsTopTagAk08PFJetsCHS","ak08PFJetsCHS")
+         original_fatjet_name = original_fatjet_name.replace("cmsTopTagCa08PFJetsPUPPI","ca08PFJetsPUPPI")
+         original_fatjet_name = original_fatjet_name.replace("cmsTopTagCa15PFJetsPUPPI","ca15PFJetsPUPPI")
+         original_fatjet_name = original_fatjet_name.replace("cmsTopTagAk08PFJetsPUPPI","ak08PFJetsPUPPI")
 
          getattr(process, isv_info_name).rParam = cms.double(delta_r)
          getattr(process, isv_info_name).fatJets  =  cms.InputTag(original_fatjet_name)
@@ -892,7 +1004,7 @@ for collection in ["fatjets", "cmstt"]:
 
 li_htt_branches = []
 
-for input_object in ["chs"]:
+for input_object in ["chs", "puppi"]:
    
    name = "looseHTT"
    if not input_object == "chs":
@@ -955,64 +1067,6 @@ for input_object in ["chs"]:
    name = "msortHTT"
    if not input_object == "chs":
       name += input_object
-
-   setattr(process, name, cms.EDProducer(
-        "HTTTopJetProducer",
-        PFJetParameters.clone( src = cms.InputTag(input_object),
-                               doAreaFastjet = cms.bool(True),
-                               doRhoFastjet = cms.bool(False),
-                               jetPtMin = cms.double(100.0)
-                           ),
-        AnomalousCellParameters,
-        optimalR = cms.bool(False),
-        algorithm = cms.int32(1),
-        jetAlgorithm = cms.string("CambridgeAachen"),
-        rParam = cms.double(1.5),
-        mode = cms.int32(1),
-        minFatjetPt = cms.double(200.),
-        minCandPt = cms.double(200.),
-        minSubjetPt = cms.double(0.),
-        writeCompound = cms.bool(True),
-        minCandMass = cms.double(140.),
-        maxCandMass = cms.double(250),
-        massRatioWidth = cms.double(100.),
-        minM23Cut = cms.double(0.),
-        minM13Cut = cms.double(0.),
-        maxM13Cut = cms.double(2.)))
-   li_htt_branches.append(name)
-
-
-
-
-#   name = "looseOptRRejRminHTT"
-#   if not input_object == "chs":
-#      name += input_object
-#
-#   setattr(process, name, cms.EDProducer(
-#        "HTTTopJetProducer",
-#        PFJetParameters.clone( src = cms.InputTag(input_object),
-#                               doAreaFastjet = cms.bool(True),
-#                               doRhoFastjet = cms.bool(False),
-#                               jetPtMin = cms.double(100.0)
-#                           ),
-#        AnomalousCellParameters,
-#        optimalR = cms.bool(True),
-#        algorithm = cms.int32(1),
-#        jetAlgorithm = cms.string("CambridgeAachen"),
-#        rParam = cms.double(1.5),
-#        mode = cms.int32(4),
-#        minFatjetPt = cms.double(200.),
-#        minCandPt = cms.double(200.),
-#        minSubjetPt = cms.double(30.),
-#        writeCompound = cms.bool(True),
-#        minCandMass = cms.double(0.),
-#        maxCandMass = cms.double(1000),
-#        massRatioWidth = cms.double(100.),
-#        minM23Cut = cms.double(0.),
-#        minM13Cut = cms.double(0.),
-#        maxM13Cut = cms.double(2.),
-#        rejectMinR = cms.bool(True)))
-#   li_htt_branches.append(name)
 
 
 #####################################
@@ -1092,16 +1146,22 @@ process.TFileService = cms.Service("TFileService",
 
 process.p = cms.Path(process.chs)
 
+process.p += process.puppi
+
 process.p += process.selectedHadronsAndPartons
 
 # Schedule AK08 Constituents
 if DO_R08:
    process.p += process.ak08PFJetsCHS
    process.p += process.ak8PFJetsCHSConstituents
+   process.p += process.ak08PFJetsPUPPI
+   process.p += process.ak8PFJetsPUPPIConstituents
+
+
 
 # Schedule all fatjets
 for fj_name in li_fatjets_objects:   
-   if not fj_name == "ak08PFJetsCHS": # Already added that before because we need it for AK08 Constituents
+   if not fj_name in ["ak08PFJetsCHS", "ak08PFJetsPUPPI"]: # Already added that before because we need it for AK08 Constituents
       process.p += getattr(process, fj_name)
 
 # Schedule flavour info
