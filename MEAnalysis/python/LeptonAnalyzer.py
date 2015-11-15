@@ -32,7 +32,7 @@ class LeptonAnalyzer(FilterAnalyzer):
             event.selLeptons,
         )
         if "debug" in self.conf.general["verbosity"]:
-            print "input muons"
+            print "input muons: ", len(event.mu)
             for it in event.mu:
                 (self.conf.leptons["mu"]["debug"])(it)
 
@@ -41,7 +41,7 @@ class LeptonAnalyzer(FilterAnalyzer):
             event.selLeptons,
         )
         if "debug" in self.conf.general["verbosity"]:
-            print "input electrons"
+            print "input electrons: ", len(event.el)
             for it in event.el:
                 (self.conf.leptons["el"]["debug"])(it)
 
@@ -50,11 +50,12 @@ class LeptonAnalyzer(FilterAnalyzer):
             for lep_flavour in ["mu", "el"]:
                 lepcuts = self.conf.leptons[lep_flavour][id_type]
                 incoll = getattr(event, lep_flavour)
-
+                
+                
                 isotype = self.conf.leptons[lep_flavour]["isotype"]
                 isocut = lepcuts.get("iso", 99)
                 leps = filter(
-                    lambda x: (
+                    lambda x, lepcuts=lepcuts: (
                         x.pt > lepcuts.get("pt", 0)
                         and abs(x.eta) < lepcuts["eta"]
                     ), incoll
@@ -62,10 +63,12 @@ class LeptonAnalyzer(FilterAnalyzer):
                 #Apply isolation cut
                 if isotype != "none":
                     leps = filter(
-                        lambda x: abs(getattr(x, isotype)) < isocut, incoll
+                        lambda x, isotype=isotype, isocut=isocut: abs(getattr(x, isotype)) < isocut, leps
                     )
                 leps = sorted(leps, key=lambda x: x.pt, reverse=True)
                 leps = filter(lepcuts["idcut"], leps)
+
+                #if defined additional pt cuts in DL
                 newleps = [] 
                 c0 = lepcuts.get("pt_leading", 0)
                 c1 = lepcuts.get("pt_subleading", 0)
@@ -76,7 +79,6 @@ class LeptonAnalyzer(FilterAnalyzer):
                         cut = c1
                     if lep.pt > cut: 
                         newleps += [lep]
-                print [l.pt for l in leps], [l.pt for l in newleps] 
                 leps = newleps
 
                 sumleps += leps
@@ -129,8 +131,13 @@ class LeptonAnalyzer(FilterAnalyzer):
             event.good_leptons = []
             event.veto_leptons = []
         
+        event.good_leptons = sorted(event.good_leptons, key=lambda x: x.pt, reverse=True)
+        event.veto_leptons = sorted(event.veto_leptons, key=lambda x: x.pt, reverse=True)
+
         #apply configuration-dependent selection
         passes = self.conf.leptons["selection"](event)
+        if "debug" in self.conf.general["verbosity"]:
+            print "LeptonAnalyzer selection", passes
         if event.is_sl and event.is_dl:
             print "DEBUG: The event (%s,%s,%s) is both sl and dl" % (event.input.run,event.input.lumi,event.input.evt)
             print "SL mu"
@@ -154,5 +161,6 @@ class LeptonAnalyzer(FilterAnalyzer):
             for lep in event.mu_veto:
                 (self.conf.leptons["el"]["debug"])(lep)
             passes = False
+            print "WARNING: Overlapping event"
 
         return self.conf.general["passall"] or passes

@@ -57,11 +57,11 @@ def el_baseline_medium(el):
 #    return ret
 
 def print_el(el):
-    print "Electron: (pt=%s, eta=%s, convVeto=%s, etaSc=%s, dEta=%s, dPhi=%s, sieie=%s, HoE=%s, dxy=%s, dz=%s, iso03=%s, nhits=%s, eOp=%s, pfRelIso03=%s mvaId=%s ecalIso=%s hcalIso=%s)" % (
+    print "Electron: (pt=%s, eta=%s, convVeto=%s, etaSc=%s, dEta=%s, dPhi=%s, sieie=%s, HoE=%s, dxy=%s, dz=%s, iso03=%s, nhits=%s, eOp=%s, pfRelIso03=%s, mvaIdFlag=%s, mvaId=%s, ecalIso=%s, hcalIso=%s)" % (
         el.pt, el.eta, el.convVeto, abs(el.etaSc), abs(el.eleDEta),
         abs(el.eleDPhi), el.eleSieie, el.eleHoE, abs(el.dxy),
         abs(el.dz), el.relIso03 , getattr(el, "eleExpMissingInnerHits", 0),
-        getattr(el, "eleooEmooP", 0), el.pfRelIso03, el.mvaIdTrigMediumResult,
+        getattr(el, "eleooEmooP", 0), el.pfRelIso03, el.mvaIdTrigMediumResult, el.mvaIdTrig,
         el.eleEcalClusterIso/el.pt, el.eleHcalClusterIso/el.pt
     )
 
@@ -76,11 +76,7 @@ class Conf:
                 "iso": 0.15,
                 "idcut": mu_baseline_tight,
             },
-            #DL
             "DL": {
-                "pt_leading": 20,
-                "pt_subleading": 15,
-                "eta": 2.4,
                 "iso": 0.15,
                 "idcut": mu_baseline_tight,
             },
@@ -94,7 +90,6 @@ class Conf:
             "debug" : print_mu
         },
 
-
         "el": {
             "SL": {
                 "pt": 30,
@@ -102,19 +97,21 @@ class Conf:
                 "idcut": lambda el: el_baseline_medium(el),
             },
             "DL": {
-                "pt_leading": 20,
-                "pt_subleading": 15,
-                "eta": 2.4,
-                "idcut": lambda el: el_baseline_medium(el),
+                "idcut": el_baseline_medium,
             },
             "veto": {
-                "pt": 15,
+                "pt": 15.0,
                 "eta": 2.4,
                 "idcut": lambda el: el_baseline_medium(el),
             },
             #"isotype": "pfRelIso03", #pfRelIso - delta-beta, relIso - rho
             "isotype": "none", #pfRelIso - delta-beta, relIso - rho (Heppy.LeptonAnalyzer.ele/mu_isoCorr), none
             "debug" : print_el
+        },
+        "DL": {
+            "pt_leading": 20,
+            "pt_subleading": 15,
+            "eta": 2.4,
         },
         "selection": lambda event: event.is_sl or event.is_dl
         #"selection": lambda event: event.is_fh
@@ -175,11 +172,11 @@ class Conf:
         "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV14.root",
         #"controlPlotsFileNew": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV14.root",
         "QGLPlotsFile_flavour": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/Histos_QGL_flavour.root",
-        "sampleFile": os.environ["CMSSW_BASE"]+"/python/TTH/MEAnalysis/samples_v14.py",
+        "sampleFile": os.environ["CMSSW_BASE"]+"/python/TTH/MEAnalysis/samples_sync.py",
         "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions.pickle",
         "transferFunctions_sj_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions_sj.pickle",
-        #"systematics": ["nominal"],
-        "systematics": ["nominal", "JESUp", "JESDown"],
+        "systematics": ["nominal"],
+        #"systematics": ["nominal", "JESUp", "JESDown"],
         
         
         #If the list contains:
@@ -188,23 +185,18 @@ class Conf:
         # "matching" - print out the association between gen and reco objects
         #"verbosity": ["eventboundary", "input", "matching", "gen", "reco", "meminput"],
         "verbosity": [
-            #"eventboundary", #print run:lumi:event
-            #"trigger", #print trigger bits
-            #"input", #print input particles
+            "eventboundary", #print run:lumi:event
+            "trigger", #print trigger bits
+            "input", #print input particles
             #"gen", #print out gen-level info
             "debug", #very high-level debug info
-            #"reco", #info about reconstructed final state
+            "reco", #info about reconstructed final state
             #"meminput" #info about particles used for MEM input
         ],
 
         #"eventWhitelist": [
-        #    #KIT
-        #    (1, 1386, 276274),
-        #    (1, 15709, 3131733),
-
-        #    #DESY
-        #    (1, 11333, 2259327),
-        #    (1, 15646, 3119109),
+        #    (1, 1391, 277260),
+        #    (1, 1641, 326987),
         #]
     }
 
@@ -261,7 +253,7 @@ class Conf:
 
         #Actually run the ME calculation
         #If False, all ME values will be 0
-        "calcME": True,
+        "calcME": False,
 
         #Generic event-dependent selection function applied
         #just before the MEM. If False, MEM is skipped for all hypos
