@@ -225,11 +225,11 @@ data = {}
 for x in ["eth", "desy", "kit", "ihep", "osu"]:
     data[x] = {}
 
-data["eth"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/eth/v10/tth.csv")
-data["eth"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/eth/v10/ttjets.csv")
+data["eth"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/eth/v11/tth.csv")
+data["eth"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/eth/v11/ttjets.csv")
 
-data["desy"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/desy/v4/tth.csv")
-data["desy"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/desy/v4/ttjets.csv")
+data["desy"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/desy/v5/tth.csv")
+data["desy"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/desy/v5/ttjets.csv")
 
 data["kit"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/kit/tth.csv")
 data["kit"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/kit/ttjets.csv")

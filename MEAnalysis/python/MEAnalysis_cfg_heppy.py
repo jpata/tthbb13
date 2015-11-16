@@ -17,15 +17,6 @@ def jet_baseline(jet):
 def mu_baseline_tight(mu):
     return (
         mu.tightId == 1
-        # these are already applied for the tight ID
-        # mu.isPFMuon and
-        # mu.isGlobalMuon and
-        # mu.dxy < 0.2 and
-        # mu.dz < 0.5 and
-        # mu.globalTrackChi2 < 10 and
-        # mu.nChamberHits > 0 and
-        # mu.pixelHits > 0 and
-        # mu.nStations > 1
     )
 
 def print_mu(mu):
@@ -34,23 +25,45 @@ def print_mu(mu):
 def el_baseline_medium(el):
 
     sca = abs(el.etaSc)
-    ret = not (sca > 1.4442 and sca < 1.5660)
-
-    #medium ID
-    ret = ret and el.eleCutIdSpring15_25ns_v1 >= 3
+    ret = ((sca < 1.4442 and
+        el.eleSieie < 0.012 and
+        el.eleHoE < 0.09 and
+        el.eleEcalClusterIso/ el.pt < 0.37 and
+        el.eleHcalClusterIso / el.pt < 0.25 and
+        abs(el.eleDEta) < 0.0095 and
+        abs(el.eleDPhi) < 0.065 and
+        el.dr03TkSumPt/el.pt < 0.18) or
+        (sca > 1.5660 and
+        el.eleSieie < 0.033 and
+        el.eleHoE < 0.09 and
+        el.eleEcalClusterIso / el.pt < 0.45 and
+        el.eleHcalClusterIso / el.pt < 0.28 and
+        el.dr03TkSumPt/el.pt < 0.18)
+    )
+    
+    #medium ID (cut-based)
+    #ret = ret and el.eleCutIdSpring15_25ns_v1 >= 3
+    
+    ret = ret and el.mvaIdTrigMediumResult == 1
     return ret
 
-def el_baseline_loose(el):
-
-    sca = abs(el.etaSc)
-    ret = not (sca > 1.4442 and sca < 1.5660)
-
-    #Loose ID
-    ret = ret and el.eleCutIdSpring15_25ns_v1 >= 2
-    return ret
+#def el_baseline_loose(el):
+#
+#    sca = abs(el.etaSc)
+#    ret = not (sca > 1.4442 and sca < 1.5660)
+#
+#    #Loose ID
+#    ret = ret and el.eleCutIdSpring15_25ns_v1 >= 2
+#    return ret
 
 def print_el(el):
-    print "Electron: (pt=%s, eta=%s, convVeto=%s, etaSc=%s, dEta=%s, dPhi=%s, sieie=%s, HoE=%s, dxy=%s, dz=%s, iso03=%s, nhits=%s, eOp=%s, pfRelIso03=%s)" % (el.pt, el.eta, el.convVeto, abs(el.etaSc), abs(el.eleDEta) , abs(el.eleDPhi) , el.eleSieie, el.eleHoE , abs(el.dxy) , abs(el.dz) , el.relIso03 , getattr(el, "eleExpMissingInnerHits", 0) , getattr(el, "eleooEmooP", 0), el.pfRelIso03)
+    print "Electron: (pt=%s, eta=%s, convVeto=%s, etaSc=%s, dEta=%s, dPhi=%s, sieie=%s, HoE=%s, dxy=%s, dz=%s, iso03=%s, nhits=%s, eOp=%s, pfRelIso03=%s, mvaIdFlag=%s, mvaId=%s, ecalIso=%s, hcalIso=%s)" % (
+        el.pt, el.eta, el.convVeto, abs(el.etaSc), abs(el.eleDEta),
+        abs(el.eleDPhi), el.eleSieie, el.eleHoE, abs(el.dxy),
+        abs(el.dz), el.relIso03 , getattr(el, "eleExpMissingInnerHits", 0),
+        getattr(el, "eleooEmooP", 0), el.pfRelIso03, el.mvaIdTrigMediumResult, el.mvaIdTrig,
+        el.eleEcalClusterIso/el.pt, el.eleHcalClusterIso/el.pt
+    )
 
 class Conf:
     leptons = {
@@ -58,48 +71,48 @@ class Conf:
 
             #SL
             "SL": {
-                "pt": 30,
+                "pt": 25,
                 "eta":2.1,
-                "iso": 0.12,
+                "iso": 0.15,
                 "idcut": mu_baseline_tight,
             },
-            #DL
             "DL": {
-                "pt": 20,
+                "iso": 0.15,
                 "eta": 2.4,
-                "iso": 0.12,
                 "idcut": mu_baseline_tight,
             },
             "veto": {
-                "pt": 10.0,
+                "pt": 15.0,
                 "eta": 2.4,
-                "iso": 0.2,
+                "iso": 0.15,
                 "idcut": mu_baseline_tight,
             },
             "isotype": "pfRelIso04", #pfRelIso - delta-beta, relIso - rho
             "debug" : print_mu
         },
 
-
         "el": {
             "SL": {
                 "pt": 30,
                 "eta": 2.1,
-                "idcut": lambda el: el_baseline_medium(el) and el.convVeto,
+                "idcut": lambda el: el_baseline_medium(el),
             },
             "DL": {
-                "pt": 20,
                 "eta": 2.4,
-                "idcut": lambda el: el_baseline_medium(el) and el.convVeto,
+                "idcut": el_baseline_medium,
             },
             "veto": {
-                "pt": 10,
+                "pt": 15.0,
                 "eta": 2.4,
-                "idcut": lambda el: el_baseline_loose(el),
+                "idcut": lambda el: el_baseline_medium(el),
             },
             #"isotype": "pfRelIso03", #pfRelIso - delta-beta, relIso - rho
-            "isotype": "relIso03", #pfRelIso - delta-beta, relIso - rho (Heppy.LeptonAnalyzer.ele/mu_isoCorr)
+            "isotype": "none", #pfRelIso - delta-beta, relIso - rho (Heppy.LeptonAnalyzer.ele/mu_isoCorr), none
             "debug" : print_el
+        },
+        "DL": {
+            "pt_leading": 20,
+            "pt_subleading": 15,
         },
         "selection": lambda event: event.is_sl or event.is_dl
         #"selection": lambda event: event.is_fh
@@ -160,11 +173,11 @@ class Conf:
         "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV14.root",
         #"controlPlotsFileNew": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV14.root",
         "QGLPlotsFile_flavour": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/Histos_QGL_flavour.root",
-        "sampleFile": os.environ["CMSSW_BASE"]+"/python/TTH/MEAnalysis/samples_v14.py",
+        "sampleFile": os.environ["CMSSW_BASE"]+"/python/TTH/MEAnalysis/samples_sync.py",
         "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions.pickle",
         "transferFunctions_sj_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions_sj.pickle",
-        #"systematics": ["nominal"],
-        "systematics": ["nominal", "JESUp", "JESDown"],
+        "systematics": ["nominal"],
+        #"systematics": ["nominal", "JESUp", "JESDown"],
         
         
         #If the list contains:
@@ -173,17 +186,18 @@ class Conf:
         # "matching" - print out the association between gen and reco objects
         #"verbosity": ["eventboundary", "input", "matching", "gen", "reco", "meminput"],
         "verbosity": [
-            #"eventboundary", #print run:lumi:event
-            #"trigger", #print trigger bits
-            #"input", #print input particles
+            "eventboundary", #print run:lumi:event
+            "trigger", #print trigger bits
+            "input", #print input particles
             #"gen", #print out gen-level info
-            #"debug", #very high-level debug info
-            #"reco", #info about reconstructed final state
+            "debug", #very high-level debug info
+            "reco", #info about reconstructed final state
             #"meminput" #info about particles used for MEM input
         ],
 
         #"eventWhitelist": [
-        #    (1, 1094, 109371),
+        #    (1, 1391, 277260),
+        #    (1, 1641, 326987),
         #]
     }
 

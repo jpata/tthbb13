@@ -10,7 +10,7 @@ def chunks(l, n):
     for i in xrange(0, len(l), n):
         yield l[i:i+n]
 
-for lumiblock in chunks(lumis, 10):
+for lumiblock in chunks(lumis, 5):
     print lumiblock
     nblock += 1
     ll2 = LumiList(lumis=lumiblock)
