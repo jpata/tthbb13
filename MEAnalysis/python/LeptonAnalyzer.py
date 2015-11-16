@@ -50,65 +50,83 @@ class LeptonAnalyzer(FilterAnalyzer):
             for lep_flavour in ["mu", "el"]:
                 lepcuts = self.conf.leptons[lep_flavour][id_type]
                 incoll = getattr(event, lep_flavour)
-                
-                
                 isotype = self.conf.leptons[lep_flavour]["isotype"]
                 isocut = lepcuts.get("iso", 99)
+                if "debug" in self.conf.general["verbosity"]:
+                    print "input collection", id_type, lep_flavour
+                    for lep in incoll:
+                        print lep.pt, lep.eta, lep.pdgId
+
                 leps = filter(
                     lambda x, lepcuts=lepcuts: (
-                        x.pt > lepcuts.get("pt", 0)
+                        x.pt > lepcuts.get("pt", 0) #pt cut may be optional in case of DL
                         and abs(x.eta) < lepcuts["eta"]
                     ), incoll
                 )
+                if "debug" in self.conf.general["verbosity"]:
+                    print "after eta"
+                    for lep in leps:
+                        print lep.pt, lep.eta, lep.pdgId
+
                 #Apply isolation cut
                 if isotype != "none":
                     leps = filter(
                         lambda x, isotype=isotype, isocut=isocut: abs(getattr(x, isotype)) < isocut, leps
                     )
-                leps = sorted(leps, key=lambda x: x.pt, reverse=True)
+                if "debug" in self.conf.general["verbosity"]:
+                    print "after iso", isotype
+                    for lep in leps:
+                        print lep.pt, lep.eta, lep.pdgId
+                #Apply ID cut 
                 leps = filter(lepcuts["idcut"], leps)
-
-                #if defined additional pt cuts in DL
-                newleps = [] 
-                c0 = lepcuts.get("pt_leading", 0)
-                c1 = lepcuts.get("pt_subleading", 0)
-                for ilep, lep in enumerate(leps):
-                    if len(newleps) == 0:
-                        cut = c0
-                    else:
-                        cut = c1
-                    if lep.pt > cut: 
-                        newleps += [lep]
-                leps = newleps
+                if "debug" in self.conf.general["verbosity"]:
+                    print "after id"
+                    for lep in leps:
+                        print lep.pt, lep.eta, lep.pdgId
 
                 sumleps += leps
                 lepname = lep_flavour + "_" + id_type
                 setattr(event, lepname, leps)
                 setattr(event, "n_"+  lepname, len(leps))
+            #end of lep_flavour loop
+            setattr(event, "lep_{0}".format(id_type), sumleps)
+            setattr(event, "n_lep_{0}".format(id_type), len(sumleps))
+        #end of id_type loop
 
-                setattr(event, "lep_{0}".format(id_type), sumleps)
-                setattr(event, "n_lep_{0}".format(id_type), len(sumleps))
+        event.lep_SL = sorted(event.lep_SL, key=lambda x: x.pt, reverse=True)
+        event.lep_DL = sorted(event.lep_DL, key=lambda x: x.pt, reverse=True)
+        event.lep_veto = sorted(event.lep_veto, key=lambda x: x.pt, reverse=True)
+
+        #Apply two-stage pt cut on DL leptons
+        print "before pt cut", [l.pt for l in event.lep_DL]
+        lep_DL_afterpt = []
+        for lep in event.lep_DL:
+            if len(lep_DL_afterpt) == 0:
+                ptcut = self.conf.leptons["DL"]["pt_leading"]
+            else: 
+                ptcut = self.conf.leptons["DL"]["pt_subleading"]
+            if lep.pt > ptcut:
+                lep_DL_afterpt += [lep]
+        event.lep_DL = lep_DL_afterpt
+        print "after pt cut", [l.pt for l in event.lep_DL]
 
         if "debug" in self.conf.general["verbosity"]:
-            print "SL mu"
-            for l in event.mu_SL:
-                (self.conf.leptons["mu"]["debug"])(l)
-            print "DL mu"
-            for l in event.mu_DL:
-                (self.conf.leptons["mu"]["debug"])(l)
-            print "SL el"
-            for l in event.el_SL:
-                (self.conf.leptons["el"]["debug"])(l)
-            print "DL el"
-            for l in event.el_DL:
-                (self.conf.leptons["el"]["debug"])(l)
-            print "veto mu"
-            for l in event.mu_veto:
-                (self.conf.leptons["mu"]["debug"])(l)
-            print "veto el"
-            for l in event.el_veto:
-                (self.conf.leptons["el"]["debug"])(l)
-
+            for lep in event.lep_SL + event.lep_DL + event.lep_veto:
+                if lep in event.mu:
+                    f = self.conf.leptons["mu"]["debug"]
+                elif lep in event.el:
+                    f = self.conf.leptons["el"]["debug"]
+                else:
+                    f = lambda x: x
+                prefix = ""
+                if lep in event.lep_SL:
+                    prefix += "SL "
+                if lep in event.lep_DL:
+                    prefix += "DL "
+                if lep in event.lep_DL:
+                    prefix += "veto "
+                print prefix
+                f(lep)
             print "n_lep_tight={0}, n_lep_loose={1}, n_lep_tight_veto={2}".format(event.n_lep_SL, event.n_lep_DL, event.n_lep_veto)
 
         event.is_sl = (event.n_lep_SL == 1 and event.n_lep_veto == 1)

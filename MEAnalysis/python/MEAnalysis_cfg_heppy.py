@@ -78,6 +78,7 @@ class Conf:
             },
             "DL": {
                 "iso": 0.15,
+                "eta": 2.4,
                 "idcut": mu_baseline_tight,
             },
             "veto": {
@@ -97,6 +98,7 @@ class Conf:
                 "idcut": lambda el: el_baseline_medium(el),
             },
             "DL": {
+                "eta": 2.4,
                 "idcut": el_baseline_medium,
             },
             "veto": {
@@ -111,7 +113,6 @@ class Conf:
         "DL": {
             "pt_leading": 20,
             "pt_subleading": 15,
-            "eta": 2.4,
         },
         "selection": lambda event: event.is_sl or event.is_dl
         #"selection": lambda event: event.is_fh
