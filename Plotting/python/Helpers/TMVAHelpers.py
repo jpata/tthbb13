@@ -12,6 +12,7 @@ import os
 import sys
 import math
 import pickle
+import array
 import multiprocessing as mp
 
 from xml.dom import minidom
@@ -46,12 +47,12 @@ ROOT.gROOT.ForceStyle()
 
 li_colors = [ROOT.kRed,      ROOT.kBlue+1,     ROOT.kBlack, 
              ROOT.kOrange-1, ROOT.kViolet+1,   ROOT.kGreen+1,
-             ROOT.kGray,     ROOT.kBlue-7]*10
+             ROOT.kGray,     ROOT.kBlue-7]*20
 
-li_marker_styles = [20]*4+[21]*4+[22]*4+[23]*4+[24,25,26,27]*10
+li_marker_styles = [20]*4+[21]*4+[22]*4+[23]*4+[24,25,26,27]*100
 
-li_line_styles = [1]*(len(li_colors)/10) + [2]*(len(li_colors)/10) + [3]*(len(li_colors)/10)
-
+tmp = [1]*(len(li_colors)/10) + [2]*(len(li_colors)/10) + [3]*(len(li_colors)/10)
+li_line_styles = tmp*20
 
 ########################################
 # Helper: CalcEffAndError
@@ -85,6 +86,15 @@ def calcEffAndError(n_pass, e_pass, n_total, e_total):
 ROOT.TH1.SetDefaultSumw2()
 
 def countEventsAndError(tree, cut, weight):
+
+    # Draw events into a dummy histogram so we don't have to calculate
+    # the uncertainty on a bunch of weigthed events ourselved
+    tree.Draw("1>>h_tmp(1,0.5,1.5)", "({0})*{1}".format(cut, weight))
+    h_tmp = ROOT.gDirectory.Get("h_tmp").Clone()
+    return h_tmp.GetBinContent(1), h_tmp.GetBinError(1)
+
+
+def countEventsAndErrorClassifier(tree, cut, weight):
 
     # Draw events into a dummy histogram so we don't have to calculate
     # the uncertainty on a bunch of weigthed events ourselved
@@ -304,7 +314,7 @@ def doTMVA(setup):
 
 
 def doROCandWP(setup):
-
+    
     # Initialize to-return object
     ret = {
         "grs"      : [],
@@ -398,6 +408,8 @@ def doROCandWP(setup):
         method = method_and_options[0]
 
         if setup.draw_roc:
+            
+
 
             # The xml file contains the list of cuts
             xmldoc = minidom.parse("weights/{0}_{1}.weights.xml".format(setup.name, method))
@@ -415,15 +427,23 @@ def doROCandWP(setup):
             expressions = [x.replace("/","_D_") for x in expressions]
             expressions = [x.replace("-","_M_") for x in expressions]
 
-            # This should be 100 bins with cuts
-            binlist = xmldoc.getElementsByTagName('Weights')[0].getElementsByTagName("Bin")
+            
+            if method == "Cuts":
+                # This should be 100 bins with cuts
+                binlist = xmldoc.getElementsByTagName('Weights')[0].getElementsByTagName("Bin")
+            elif method == "Likelihood":
+                binlist = [1.-x/100. for x in range(100)]
+                binlist.extend( [1. - x/1000. for x in range(100)])
+                binlist.extend( [1. - x/10000. for x in range(20)])
+                binlist = sorted(list(set(binlist)))
+                               
 
             gr = ROOT.TGraphAsymmErrors()
 
             # Interesting points: Look for a WP with bgk efficiency closest to nominal and store the cuts
             interesting_points = [
                 #{"nominal_bkg" : 0.001, "actual_bkg":-1000, "actual_sig":-1000, "cuts" : "(1)"},
-                {"nominal_bkg" : 0.003, "actual_bkg":-1000, "actual_sig":-1000, "cuts" : "(1)"},
+                #{"nominal_bkg" : 0.003, "actual_bkg":-1000, "actual_sig":-1000, "cuts" : "(1)"},
                 #{"nominal_bkg" : 0.01,  "actual_bkg":-1000, "actual_sig":-1000, "cuts" : "(1)"},
                 #{"nominal_bkg" : 0.03,  "actual_bkg":-1000, "actual_sig":-1000, "cuts" : "(1)"},
                 #{"nominal_bkg" : 0.1,   "actual_bkg":-1000, "actual_sig":-1000, "cuts" : "(1)"},
@@ -435,13 +455,16 @@ def doROCandWP(setup):
                 li_cuts = ["(1)"]
 
                 # Turn the ranges into cuts
-                for i_expr, expr in enumerate(expressions):                                        
-                    min_val =  x.getElementsByTagName("Cuts")[0].attributes["cutMin_{0}".format(i_expr)].value
-                    max_val =  x.getElementsByTagName("Cuts")[0].attributes["cutMax_{0}".format(i_expr)].value
+                if method == "Cuts":
+                    for i_expr, expr in enumerate(expressions):                                        
+                        min_val =  x.getElementsByTagName("Cuts")[0].attributes["cutMin_{0}".format(i_expr)].value
+                        max_val =  x.getElementsByTagName("Cuts")[0].attributes["cutMax_{0}".format(i_expr)].value
 
-                    li_cuts.append("({0}>{1})".format(expr, min_val))
-                    li_cuts.append("({0}<{1})".format(expr, max_val))
+                        li_cuts.append("({0}>{1})".format(expr, min_val))
+                        li_cuts.append("({0}<{1})".format(expr, max_val))
                     # End of loop over expressions
+                elif method == "Likelihood":
+                    li_cuts.append("(Likelihood > {0})".format(x))
 
                 # We need one additional cut to distinguish signal
                 # from background (these are mixed in the test tree)
@@ -480,9 +503,8 @@ def doROCandWP(setup):
 
                 if eff_total_sig > 0.0:
                     i = gr.GetN()
-                    # !!!
+
                     gr.SetPoint(i, eff_total_sig, eff_total_bkg)
-                    # ((((As we show -e(bg) we have to flip high/low for it )))
                     if False:                        
                         gr.SetPointError(i, err_total_sig_low, err_total_sig_high,  err_total_bkg_low, err_total_bkg_high) 
 
@@ -680,6 +702,7 @@ def plotROCs(name,
             "loglow2", 
             "loglow3", 
             "loglow4", 
+            "loglow5", 
             #"logpuppi"
     ]:
 
@@ -718,6 +741,11 @@ def plotROCs(name,
             legend_origin_x = 0.33
             c.SetLogy(1)
             h_bkg = ROOT.TH2F("","",100,0,1.,100,0.0001,0.3)
+        elif view == "loglow5":
+            legend_origin_y = 0.16
+            legend_origin_x = 0.33
+            c.SetLogy(1)
+            h_bkg = ROOT.TH2F("","",100,0,1.,100,0.0001,1.2)
         elif view == "logpuppi":
             legend_origin_y = 0.15
             legend_origin_x = 0.32
@@ -799,7 +827,12 @@ def plotROCs(name,
         gr_and_name.sort(key = lambda x:x[1])
 
 
+        f_out_gr = open(name + "_out_gr.dat","wb")
+        pickle.dump(gr_and_name, f_out_gr)
+        f_out_gr.close()
+
         for i_gr, gr_and_name in enumerate(gr_and_name):    
+                        
             gr = gr_and_name[0]
 
             gr.SetLineColor( li_colors[i_gr] )
@@ -808,8 +841,9 @@ def plotROCs(name,
             gr.SetLineWidth( 2)    
             legend.AddEntry( gr, gr_and_name[1], "L" )
             
+
             if error_band:
-                gr.Draw("E3 SAME")
+                gr.Draw("SAME E3")
             else:
                 gr.Draw("SAME")
 

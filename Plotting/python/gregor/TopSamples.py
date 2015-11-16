@@ -113,20 +113,20 @@ files = {}
 #files["qcd_800_1000_60d"] = "ntop_v60d_qcd_800_1000_13tev_spring15dr74_asympt25ns-tagging" 
 
 # 61
-#files["zprime_m750"]      = "ntop_v61_zprime_m750_1p_13tev_spring15dr74_asympt25ns-tagging"	
-#files["zprime_m1000"]     = "ntop_v61_zprime_m1000_1p_13tev_spring15dr74_asympt25ns-tagging"	
-#files["zprime_m1250"]     = "ntop_v61_zprime_m1250_1p_13tev_spring15dr74_asympt25ns-tagging"	
-#files["zprime_m2000_low"] = "ntop_v61_zprime_m2000_low_1p_13tev_spring15dr74_asympt25ns-tagging"	
-#files["zprime_m2000"]     = "ntop_v61_zprime_m2000_1p_13tev_spring15dr74_asympt25ns-tagging"	
-#files["zprime_m3000"]     = "ntop_v61c_zprime_m3000_1p_13tev_spring15dr74_asympt25ns-tagging"  
-#files["zprime_m4000"]     = "ntop_v61c_zprime_m4000_1p_13tev_spring15dr74_asympt25ns-tagging"  
+files["zprime_m750"]      = "ntop_v61_zprime_m750_1p_13tev_spring15dr74_asympt25ns-tagging"	
+files["zprime_m1000"]     = "ntop_v61_zprime_m1000_1p_13tev_spring15dr74_asympt25ns-tagging"	
+files["zprime_m1250"]     = "ntop_v61_zprime_m1250_1p_13tev_spring15dr74_asympt25ns-tagging"	
+files["zprime_m2000_low"] = "ntop_v61_zprime_m2000_low_1p_13tev_spring15dr74_asympt25ns-tagging"	
+files["zprime_m2000"]     = "ntop_v61_zprime_m2000_1p_13tev_spring15dr74_asympt25ns-tagging"	
+files["zprime_m3000"]     = "ntop_v61c_zprime_m3000_1p_13tev_spring15dr74_asympt25ns-tagging"  
+files["zprime_m4000"]     = "ntop_v61c_zprime_m4000_1p_13tev_spring15dr74_asympt25ns-tagging"  
 
-#files["qcd_170_300"]      = "ntop_v61_qcd_170_300_13tev_spring15dr74_asympt25ns-tagging" 
-#files["qcd_300_470"]      = "ntop_v61_qcd_300_470_13tev_spring15dr74_asympt25ns-tagging" 
-#files["qcd_470_600"]      = "ntop_v61_qcd_470_600_13tev_spring15dr74_asympt25ns-tagging"	 
+files["qcd_170_300"]      = "ntop_v61_qcd_170_300_13tev_spring15dr74_asympt25ns-tagging" 
+files["qcd_300_470"]      = "ntop_v61_qcd_300_470_13tev_spring15dr74_asympt25ns-tagging" 
+files["qcd_470_600"]      = "ntop_v61_qcd_470_600_13tev_spring15dr74_asympt25ns-tagging"	 
 files["qcd_600_800"]      = "ntop_v61e_qcd_600_800_13tev_spring15dr74_asympt25ns-tagging"	 
-#files["qcd_800_1000"]     = "ntop_v61_qcd_800_1000_13tev_spring15dr74_asympt25ns-tagging" 
-#files["qcd_1000_1400"]    = "ntop_v61_qcd_1000_1400_13tev_spring15dr74_asympt25ns-tagging"
+files["qcd_800_1000"]     = "ntop_v61_qcd_800_1000_13tev_spring15dr74_asympt25ns-tagging" 
+files["qcd_1000_1400"]    = "ntop_v61_qcd_1000_1400_13tev_spring15dr74_asympt25ns-tagging"
 
 
 
@@ -201,7 +201,7 @@ sample_names = {"zprime_m750"      : "Top, 200..300",
 other_sample_names = {
     "zprime_m750"     : "Spring15, Signal (200..300 GeV)",                      
     "zprime_m1000_low" : "Signal (200..300 GeV)",                      
-    "zprime_m1000"     : "Spring15, Signal (300..470 GeV)",                      
+    "zprime_m1000"     : "Signal (300..470 GeV)",                      
     "zprime_m1000_phys14"  : "Phys14, Signal (300..470 GeV)",                      
     "zprime_m1000_v1"  : "Spring15 (v1), Signal (300..470 GeV)",                 
     "zprime_m1250"     : "Spring15, Signal (470..600 GeV)",                      
@@ -210,8 +210,9 @@ other_sample_names = {
     "zprime_m3000"     : "Spring15, Signal (1000..1400 GeV)",                      
     "zprime_m4000"     : "Spring15, Signal (1400..1800 GeV)",                      
     "qcd_170_300"      : "BG (200..300 GeV)",
-    "qcd_300_470"      : "Spring15, BG (300..470 GeV)",
+    "qcd_300_470"      : "BG (300..470 GeV)",
     "qcd_300_470_phys14"  : "Phys14, BG (300..470 GeV)",
+    "qcd_470_600"      : "BG (470..600 GeV)",
     "qcd_600_800"      : "BG (600..800 GeV)",
     "qcd_800_1000"     : "BG (800..1000 GeV)",
     "qcd_1000_1400"     : "BG (1000..1400 GeV)",

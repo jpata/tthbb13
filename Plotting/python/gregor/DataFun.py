@@ -11,7 +11,7 @@ ROOT.gROOT.ForceStyle()
 
 
 fns = {
-    "data" : "/scratch/gregor/t/foo.root",
+    "data" : "/scratch/gregor/SingleMuon_VHBB_HEPPY_T12_D005.root",
     "mc"   : "root://t3dcachedb.psi.ch:1094//pnfs/psi.ch/cms/trivcat/store/user/gregor/VHBBHeppypreT12/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/VHBB_HEPPY_preT12_TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150625_084849/0000/tree_568.root"
 }
 
@@ -35,19 +35,45 @@ plots = [
     ["ca15_trimmass", "FatjetCA15trimmed_mass[0]", "nselLeptons==1 && abs(selLeptons_pdgId)==13 && fabs(FatjetCA15ungroomed_eta[0])<1.5 && httCandidates_mass > 110 && httCandidates_fRec < 0.2", "(40,0,400)", "Trimmed CA15 Jet mass [GeV]"],
     ["ca15_prunedmass", "FatjetCA15pruned_mass[0]", "nselLeptons==1 && abs(selLeptons_pdgId)==13 && fabs(FatjetCA15ungroomed_eta[0])<1.5 && httCandidates_mass > 110 && httCandidates_fRec < 0.2", "(40,0,400)", "Pruned CA15 Jet mass [GeV]"],
 
+    ["ca15_bbtag", "FatjetCA15ungroomed_bbtag[0]", "nselLeptons==1 && abs(selLeptons_pdgId)==13 && fabs(FatjetCA15ungroomed_eta[0])<1.5 && httCandidates_mass > 110 && httCandidates_fRec < 0.2", "(40,-1,1)", "Pruned CA15 bb tag"],
 
-    ["ak08_pt", "FatjetAK08ungroomed_pt[0]", "nselLeptons==1 && abs(selLeptons_pdgId)==13 && httCandidates_mass > 110 && httCandidates_fRec < 0.2", "(40,200,500)",   "Ungroomed AK08 Jet p_{T} [GeV]"],
-    ["ak08_mass", "FatjetAK08ungroomed_mass[0]", "nselLeptons==1 && abs(selLeptons_pdgId)==13 && httCandidates_mass > 110 && httCandidates_fRec < 0.2", "(40,0,500)", "Ungroomed AK08 Jet mass [GeV]"],
-    ["ak08_eta", "FatjetAK08ungroomed_eta[0]", "nselLeptons==1 && abs(selLeptons_pdgId)==13 && httCandidates_mass > 110 && httCandidates_fRec < 0.2", "(30,-3,3)", "Ungroomed AK08 Jet #eta"],
+    ["ak08_bbtag", "FatjetAK08ungroomed_bbtag[0]", "nselLeptons==1 && abs(selLeptons_pdgId)==13 && fabs(FatjetAK08ungroomed_eta[0])<1.5 && httCandidates_mass > 110 && httCandidates_fRec < 0.2", "(40,-1,1)", "Pruned AK08 bb tag"],
 
-    ["ak08_tau1", "FatjetAK08ungroomed_tau1[0]", "nselLeptons==1 && abs(selLeptons_pdgId)==13 && fabs(FatjetAK08ungroomed_eta[0]) < 1.5 && httCandidates_mass > 110 && httCandidates_fRec < 0.2", "(40,0,1.)", "Ungroomed AK08 Jet #tau_{1}"],
-    ["ak08_tau2", "FatjetAK08ungroomed_tau2[0]", "nselLeptons==1 && abs(selLeptons_pdgId)==13 && fabs(FatjetAK08ungroomed_eta[0]) < 1.5 && httCandidates_mass > 110 && httCandidates_fRec < 0.2", "(40,0,.6)", "Ungroomed AK08 Jet #tau_{2}"],
-    ["ak08_tau3", "FatjetAK08ungroomed_tau3[0]", "nselLeptons==1 && abs(selLeptons_pdgId)==13 && fabs(FatjetAK08ungroomed_eta[0]) < 1.5 && httCandidates_mass > 110 && httCandidates_fRec < 0.2", "(40,0,.4)", "Ungroomed AK08 Jet #tau_{3}"],
-    ["ak08_tau32", "FatjetAK08ungroomed_tau3[0]/FatjetAK08ungroomed_tau2[0]", "nselLeptons==1 && abs(selLeptons_pdgId)==13 && fabs(FatjetAK08ungroomed_eta[0]) < 1.5 && httCandidates_mass > 110 && httCandidates_fRec < 0.2 && FatjetAK08ungroomed_tau2[0] > 0", "(40,0,1.)", "Ungroomed AK08 Jet #tau_{3}/#tau_{2}"],
+    ["ca15_PFLepton_ptrel", "FatjetCA15ungroomed_PFLepton_ptrel[0]", "nselLeptons==1 && abs(selLeptons_pdgId)==13 && fabs(FatjetCA15ungroomed_eta[0])<1.5 && httCandidates_mass > 110 && httCandidates_fRec < 0.2", "(40,0,120)", "Pruned CA15 PFLepton_ptrel"],
 
-    ["ak08_sdmass", "FatjetAK08ungroomed_msoftdrop[0]", "nselLeptons==1 && abs(selLeptons_pdgId)==13 && fabs(FatjetAK08ungroomed_eta[0]) < 1.5 && httCandidates_mass > 110 && httCandidates_fRec < 0.2", "(40,0,400)", "Softdrop (z=0.1, #beta=0) AK08 Jet mass [GeV]"],
-    ["ak08_trimmass", "FatjetAK08ungroomed_mtrimmed[0]", "nselLeptons==1 && abs(selLeptons_pdgId)==13 && fabs(FatjetAK08ungroomed_eta[0]) < 1.5 && httCandidates_mass > 110 && httCandidates_fRec < 0.2", "(40,0,400)", "Trimmed AK08 Jet mass [GeV]"],
-    ["ak08_prunedmass", "FatjetAK08ungroomed_mpruned[0]", "nselLeptons==1 && abs(selLeptons_pdgId)==13 && fabs(FatjetAK08ungroomed_eta[0]) < 1.5 && httCandidates_mass > 110 && httCandidates_fRec < 0.2", "(40,0,400)", "Pruned AK08 Jet mass [GeV]"],
+    ["ak08_PFLepton_ptrel", "FatjetAK08ungroomed_PFLepton_ptrel[0]", "nselLeptons==1 && abs(selLeptons_pdgId)==13 && fabs(FatjetAK08ungroomed_eta[0])<1.5 && httCandidates_mass > 110 && httCandidates_fRec < 0.2", "(40,0,120)", "Pruned AK08 PFLepton_ptrel"],
+
+    ["ca15_z_ratio", "FatjetCA15ungroomed_z_ratio[0]", "nselLeptons==1 && abs(selLeptons_pdgId)==13 && fabs(FatjetCA15ungroomed_eta[0])<1.5 && httCandidates_mass > 110 && httCandidates_fRec < 0.2", "(40,-1,1)", "Pruned CA15 z-ratio"],
+
+
+    ["ca15_z_ratio", "FatjetCA15ungroomed_z_ratio[0]", "nselLeptons==1 && abs(selLeptons_pdgId)==13 && fabs(FatjetCA15ungroomed_eta[0])<1.5 && httCandidates_mass > 110 && httCandidates_fRec < 0.2", "(40,-1,1)", "Pruned CA15 z-ratio"],
+
+
+ 
+#    jet.tau_dot              = tau_dot            
+#    jet.SV_mass_0            = SV_mass_0          
+#    jet.SV_EnergyRatio_0     = SV_EnergyRatio_0   
+#    jet.SV_EnergyRatio_1     = SV_EnergyRatio_1   
+#    jet.PFLepton_IP2D        = PFLepton_IP2D      
+#    jet.tau_21               = tau_21             
+#    jet.nSL                  = nSL                
+#    jet.vertexNTracks        = vertexNTracks       
+
+
+
+
+#    ["ak08_pt", "FatjetAK08ungroomed_pt[0]", "nselLeptons==1 && abs(selLeptons_pdgId)==13 && httCandidates_mass > 110 && httCandidates_fRec < 0.2", "(40,200,500)",   "Ungroomed AK08 Jet p_{T} [GeV]"],
+#    ["ak08_mass", "FatjetAK08ungroomed_mass[0]", "nselLeptons==1 && abs(selLeptons_pdgId)==13 && httCandidates_mass > 110 && httCandidates_fRec < 0.2", "(40,0,500)", "Ungroomed AK08 Jet mass [GeV]"],
+#    ["ak08_eta", "FatjetAK08ungroomed_eta[0]", "nselLeptons==1 && abs(selLeptons_pdgId)==13 && httCandidates_mass > 110 && httCandidates_fRec < 0.2", "(30,-3,3)", "Ungroomed AK08 Jet #eta"],
+#
+#    ["ak08_tau1", "FatjetAK08ungroomed_tau1[0]", "nselLeptons==1 && abs(selLeptons_pdgId)==13 && fabs(FatjetAK08ungroomed_eta[0]) < 1.5 && httCandidates_mass > 110 && httCandidates_fRec < 0.2", "(40,0,1.)", "Ungroomed AK08 Jet #tau_{1}"],
+#    ["ak08_tau2", "FatjetAK08ungroomed_tau2[0]", "nselLeptons==1 && abs(selLeptons_pdgId)==13 && fabs(FatjetAK08ungroomed_eta[0]) < 1.5 && httCandidates_mass > 110 && httCandidates_fRec < 0.2", "(40,0,.6)", "Ungroomed AK08 Jet #tau_{2}"],
+#    ["ak08_tau3", "FatjetAK08ungroomed_tau3[0]", "nselLeptons==1 && abs(selLeptons_pdgId)==13 && fabs(FatjetAK08ungroomed_eta[0]) < 1.5 && httCandidates_mass > 110 && httCandidates_fRec < 0.2", "(40,0,.4)", "Ungroomed AK08 Jet #tau_{3}"],
+#    ["ak08_tau32", "FatjetAK08ungroomed_tau3[0]/FatjetAK08ungroomed_tau2[0]", "nselLeptons==1 && abs(selLeptons_pdgId)==13 && fabs(FatjetAK08ungroomed_eta[0]) < 1.5 && httCandidates_mass > 110 && httCandidates_fRec < 0.2 && FatjetAK08ungroomed_tau2[0] > 0", "(40,0,1.)", "Ungroomed AK08 Jet #tau_{3}/#tau_{2}"],
+#
+#    ["ak08_sdmass", "FatjetAK08ungroomed_msoftdrop[0]", "nselLeptons==1 && abs(selLeptons_pdgId)==13 && fabs(FatjetAK08ungroomed_eta[0]) < 1.5 && httCandidates_mass > 110 && httCandidates_fRec < 0.2", "(40,0,400)", "Softdrop (z=0.1, #beta=0) AK08 Jet mass [GeV]"],
+#    ["ak08_trimmass", "FatjetAK08ungroomed_mtrimmed[0]", "nselLeptons==1 && abs(selLeptons_pdgId)==13 && fabs(FatjetAK08ungroomed_eta[0]) < 1.5 && httCandidates_mass > 110 && httCandidates_fRec < 0.2", "(40,0,400)", "Trimmed AK08 Jet mass [GeV]"],
+#    ["ak08_prunedmass", "FatjetAK08ungroomed_mpruned[0]", "nselLeptons==1 && abs(selLeptons_pdgId)==13 && fabs(FatjetAK08ungroomed_eta[0]) < 1.5 && httCandidates_mass > 110 && httCandidates_fRec < 0.2", "(40,0,400)", "Pruned AK08 Jet mass [GeV]"],
 
 
 #    Ropt

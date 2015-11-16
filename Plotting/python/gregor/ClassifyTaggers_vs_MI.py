@@ -37,7 +37,7 @@ myStyle.SetPadBottomMargin(0.13)
 ROOT.gROOT.SetStyle("myStyle")
 ROOT.gROOT.ForceStyle()
 
-pool = mp.Pool(processes=16)  
+pool = mp.Pool(processes=10)  
 
 ########################################
 # Configuration
@@ -57,8 +57,6 @@ for pair_name, pair in pairs.iteritems():
     basepath = '/scratch/gregor/'
     file_name_sig  = basepath + files[sample_sig] + "-weighted.root"
     file_name_bkg  = basepath + files[sample_bkg] + "-weighted.root"
-
-    li_methods      = ["Cuts"]
 
     single_setups = []
     double_setups = []
@@ -89,7 +87,8 @@ for pair_name, pair in pairs.iteritems():
     
         setup = TMVASetup("{0}_{1}_{2}_vsMI".format(sample_sig, sample_bkg, var.replace("/","_")),
                                          variable.di[var].pretty_name.replace("Mass", "m").replace("Mass", "m"),
-                                         [["Cuts", "V:FitMethod=MC:SampleSize=100000:Sigma=0.3:"+extra]], 
+                                         # FitMethod=MC:SampleSize=100000:Sigma=0.3:"+extra
+                                         [["Likelihood", "V"]], 
                                          [variable.di[var]],
                                          [],
                                          file_name_sig,
@@ -113,10 +112,29 @@ for pair_name, pair in pairs.iteritems():
 
             var_1, extra_1 = interesting_vars[i_var_1]
             var_2, extra_2 = interesting_vars[i_var_2]
+
+            print "Preparing ", var_1, var_2
                 
+            #setup = TMVASetup("{0}_{1}_{2}_{3}_vsMI".format(sample_sig, sample_bkg, var_1.replace("/","_"), var_2.replace("/","_")),
+            #                  variable.di[var_1].pretty_name.replace("Mass", "m").replace("Mass", "m") + " " + variable.di[var_2].pretty_name.replace("Mass", "m").replace("Mass", "m"),
+            #                  [["Cuts", "V:FitMethod=MC:SampleSize=2000000:Sigma=0.3:" + extra_1 + ":" + extra_2.replace("[0]","[1]") ]], 
+            #                  [variable.di[var_1],
+            #                   variable.di[var_2],
+            #               ],
+            #                  [],
+            #                  file_name_sig,
+            #                  file_name_bkg,
+            #                  fiducial_cut_sig = fiducial_cuts[sample_sig],
+            #                  fiducial_cut_bkg  = fiducial_cuts[sample_bkg],
+            #                  weight_sig = "weight",
+            #                  weight_bkg = "weight",
+            #                  draw_roc = DRAW_ROC,
+            #                  working_points = [],
+            #                  manual_working_points = [])
+
             setup = TMVASetup("{0}_{1}_{2}_{3}_vsMI".format(sample_sig, sample_bkg, var_1.replace("/","_"), var_2.replace("/","_")),
                               variable.di[var_1].pretty_name.replace("Mass", "m").replace("Mass", "m") + " " + variable.di[var_2].pretty_name.replace("Mass", "m").replace("Mass", "m"),
-                              [["Cuts", "V:FitMethod=MC:SampleSize=2000000:Sigma=0.3:" + extra_1 + ":" + extra_2.replace("[0]","[1]") ]], 
+                              [["Likelihood", "V"]], 
                               [variable.di[var_1],
                                variable.di[var_2],
                            ],
@@ -130,17 +148,20 @@ for pair_name, pair in pairs.iteritems():
                               draw_roc = DRAW_ROC,
                               working_points = [],
                               manual_working_points = [])
+
+            
             double_setups.append(setup)
                
-    #pool.map(doTMVA, double_setups)
+    pool.map(doTMVA, double_setups)
 
-    plotROCs("fixedR_MI_ROC_" + pair_name, single_setups, 
-                 extra_text = [pretty_fiducial_cuts[sample_sig],
-                               "flat p_{T} and #eta",
-                               "#Delta R(top,parton) < 0.8"],
-                 error_band = False)
+    #plotROCs("fixedR_MI_ROC_" + pair_name, single_setups, 
+    #             extra_text = [pretty_fiducial_cuts[sample_sig],
+    #                           "flat p_{T} and #eta",
+    #                           "#Delta R(top,parton) < 0.8"],
+    #             error_band = False)
 
-    #plotROCs("fixedR_MI_ROCtau_" + pair_name, double_setups, extra_text = pretty_fiducial_cuts[sample_sig])        
+    #plotROCs("fixedR_MI_ROC_single_" + pair_name, single_setups, error_band = False)        
+    plotROCs("fixedR_MI_ROC_double_" + pair_name, double_setups, error_band = False)        
 
 
 

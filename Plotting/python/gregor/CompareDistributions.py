@@ -70,7 +70,7 @@ weight_vars = {"zprime_m750"     : "weight_nosize",
 }
 
 
-for name,samples in [ ["low", lows], 
+for name,samples in [ #["low", lows], 
                       ["high", highs]
 ]:
 
@@ -84,29 +84,29 @@ for name,samples in [ ["low", lows],
     ]
 
     # Everything that does not need a previous mass cut is a mass (-;
-    masses = ["X_mass",
-              "Xsoftdropz10b00_mass",
-              "Xsoftdropz20b10_mass",
+    masses = [#"X_mass",
+              #"Xsoftdropz10b00_mass",
+              #"Xsoftdropz20b10_mass",
               #"Xsoftdropz20b20_mass",
 
               #"Xsoftdropz10bm10_mass",
               #"Xsoftdropz15bm10_mass",
               #"Xsoftdropz20bm10_mass",
               
-              "Xtrimmedr2f3_mass",
+              #"Xtrimmedr2f3_mass",
 
               #"Xfilteredn3r2_mass",     
               #"Xfilteredn5r2_mass",     
-              "Xprunedn3z10rfac50_mass",
+              #"Xprunedn3z10rfac50_mass",
 
-              "log(X_chi1)",
-              "log(X_chi2)",
-              "log(X_chi3)",
+              #"log(X_chi1)",
+              #"log(X_chi2)",
+              #"log(X_chi3)",
 
-              "looseOptRHTT_mass",
+              #"looseOptRHTT_mass",
 
-              "Xcmstt_minMass",
-              "Xcmstt_topMass",
+              #"Xcmstt_minMass",
+              #"Xcmstt_topMass",
               "Xcmstt_nSubJets"
     ]
 
@@ -114,7 +114,7 @@ for name,samples in [ ["low", lows],
 
     # These need a cut on the HTT mass
     htt_vars = [
-        "looseOptRHTT_fRec",
+        #"looseOptRHTT_fRec",
         "looseOptRHTT_Ropt-looseOptRHTT_RoptCalc",
         ]
 
@@ -159,7 +159,7 @@ for name,samples in [ ["low", lows],
 
 
     if False:
-        for var in others:
+        for var in masses:
 
             if name == "high":
 
@@ -205,6 +205,10 @@ for name,samples in [ ["low", lows],
 
                 if "Xsoftdropz10b00_tau3/Xsoftdropz10b00_tau2" in var:
                     ymax = 0.11
+                    
+                if "Xcmstt_nSubJets" in var:
+                    nbins = 5
+                    ymax = 1.5
 
 
             else:
@@ -238,6 +242,10 @@ for name,samples in [ ["low", lows],
                 if "trimmed" in var:
                     ymax = 0.15
 
+                if "Xcmstt_nSubJets" in var:
+                    nbins = 5
+
+
             combinedPlot("fixedMatch_nosize_" + var.replace("/","_")+"_"+name,
                          [plot(other2_sample_names[sample],
                                variable.di[var.replace("X",ranges[sample][4])].name,                                           
@@ -245,7 +253,7 @@ for name,samples in [ ["low", lows],
                                sample,
                                extra_fiducial = "(" + nosize_fiducial_cuts[sample] + ")*" + weight_vars[sample] ,
                            ) for sample in samples],
-                         80, variable.di[var.replace("X",ranges[sample][4])].range_min, variable.di[var.replace("X",ranges[sample][4])].range_max, ymax,
+                         nbins, variable.di[var.replace("X",ranges[sample][4])].range_min, variable.di[var.replace("X",ranges[sample][4])].range_max, ymax,
                          label_x   = variable.di[var.replace("X",ranges[sample][4])].pretty_name,
                          label_y   = "A.U.",
                          axis_unit = variable.di[var.replace("X",ranges[sample][4])].unit,
@@ -328,7 +336,8 @@ for name,samples in [ ["low", lows],
         for var in htt_vars:
 
             if name == "high":
-
+                
+                logy = False
                 xpos = 0.57
                 ypos = 0.6
                 ymax = None
@@ -342,10 +351,17 @@ for name,samples in [ ["low", lows],
                                   "<#mu>=20, 25ns",
                                   "120 < m < 180"]
 
+                if "looseOptRHTT_Ropt-looseOptRHTT_RoptCalc" in var:
+                    logy = True
+                    ymax = 14
+                    ypos = 0.65
 
                 cut = "((looseOptRHTT_mass>120)&&(looseOptRHTT_mass<180))"
 
+
+
             else:
+                logy = False
                 xpos = 0.57
                 ypos = 0.76
                 ymax = None
@@ -372,7 +388,7 @@ for name,samples in [ ["low", lows],
                          label_x   = variable.di[var.replace("X",ranges[sample][4])].pretty_name,
                          label_y   = "A.U.",
                          axis_unit = variable.di[var.replace("X",ranges[sample][4])].unit,
-                         log_y     = False,
+                         log_y     = logy,
                          normalize = True,
                          legend_origin_x = xpos,
                          legend_origin_y = ypos,

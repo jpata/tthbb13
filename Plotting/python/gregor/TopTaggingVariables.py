@@ -137,7 +137,7 @@ for fj in ["ak08", "ca15"]:
         
     cmstt_vars.append(variable(fj+'cmstt_nSubJets', 
                                    "CMSTT number of Subjets",  
-                                   0.9, 5.5))
+                                   0.5, 5.5))
 
     cmstt_vars.append(variable(fj+'cmstt_minMass', 
                                    "CMSTT min. Mass",  

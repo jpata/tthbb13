@@ -47,37 +47,47 @@ if True:
 
 
     combinedPlot("true_pt",
-                 [plot( other_sample_names[sample], 
+                 [plot( other_sample_names[sample] + " (Flat)", 
                         'pt', 
                         "(weight*({0}))".format(fiducial_cuts[sample]),
+                        sample) for sample in files.keys()] + 
+                 [plot( other_sample_names[sample], 
+                        'pt', 
+                        "(({0}))".format(fiducial_cuts[sample]),
                         sample) for sample in files.keys()],
-                 100, 1000, 2000, 
+                 30, 300, 470, 0.24,
                  label_x   = "True p_{T}",
                  label_y   = "Fraction of Partons",
                  axis_unit = "GeV",
                  log_y     = False,
                  normalize = True,
-                 legend_origin_x = 0.3,
-                 legend_origin_y = 0.2,
+                 legend_origin_x = 0.45,
+                 legend_origin_y = 0.6,
                  legend_size_x   = 0.2,
-                 legend_text_size= 0.03
+                 legend_text_size= 0.03,
+                 add_eff         = False,
     )
 
     combinedPlot("true_eta",
-                 [plot( other_sample_names[sample], 
+                 [plot( other_sample_names[sample] + " (Flat)", 
                         'eta', 
                         "(weight*({0}))".format(fiducial_cuts[sample]),
+                        sample) for sample in files.keys()] + 
+                 [plot( other_sample_names[sample],
+                        'eta', 
+                        "(({0}))".format(fiducial_cuts[sample]),
                         sample) for sample in files.keys()],
-                 80, -2.6, 2.6, 
+                 80, -2.6, 2.6, 0.04,
                  label_x   = "True #eta",
                  label_y   = "Fraction of Partons",
                  axis_unit = "",
                  log_y     = False,
                  normalize = True,
-                 legend_origin_x = 0.35,
-                 legend_origin_y = 0.3,
+                 legend_origin_x = 0.45,
+                 legend_origin_y = 0.6,
                  legend_size_x   = 0.2,
-                 legend_text_size= 0.03
+                 legend_text_size= 0.03,
+                 add_eff         = False,
 )
 #
 #

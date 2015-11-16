@@ -64,6 +64,7 @@ class combinedPlot:
                 legend_size_y   = -1,
                 legend_text_size= 0.05,
                 extra_text      = [""],
+                add_eff         = True,
                 ):
       """ Constructor. Arguments:
       name            : (string) name for output file
@@ -314,7 +315,10 @@ def doWork( dic_files, output_dir ):
             h.SetFillColor(0)
 
             # add to legend
-            leg.AddEntry( h, p.name + ", {0:2.0f}%".format(eff*100)  , "L")
+            if cp.add_eff:
+               leg.AddEntry( h, p.name + ", {0:2.0f}%".format(eff*100)  , "L")
+            else:
+               leg.AddEntry( h, p.name, "L")
             #
 
             # Adjust y-range        
