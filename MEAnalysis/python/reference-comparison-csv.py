@@ -1,12 +1,17 @@
+#!/usr/bin/env python
+
+## To run this script, you need to install pandas (http://pandas.pydata.org/)
 import pandas, sys
 import matplotlib.pyplot as plt
 import numpy as np
-#pandas.set_option('display.height', 1000)
-pandas.set_option('display.max_rows', 500)
-pandas.set_option('display.max_columns', 500)
-pandas.set_option('display.width', 1000)
 
 def get_event_set(d):
+    """
+    Returns the set of events in a DataFrame.
+
+    d - pandas DataFrame
+    returns: set of (run, lumi, event) triplets.
+    """
     s1 = set([])
     for r in d[["run", "lumi", "event"]].iterrows():
         s1.add((int(r[1][0]), int(r[1][1]), int(r[1][2])))
@@ -76,31 +81,34 @@ vars = [
     "jet1_pt", "jet2_pt", "jet3_pt", "jet4_pt",
     "jet1_CSVv2", "jet2_CSVv2", "jet3_CSVv2", "jet4_CSVv2",
     "MET_pt", "MET_phi",
+    "met_passed",
     "bWeight",
-    "ttHFCategory"
+    "ttHFCategory",
+    "mll",
+    "mll_passed",
 ]
 
 cuts = [
-    "(is_SL==1) | (is_DL==1)",
-    "(is_SL==1)",
-    "(is_DL==1)",
-    "(is_SL==1) & (n_jets==4) & (n_btags==3)",
-    "(is_SL==1) & (n_jets==4) & (n_btags==4)",
-    "(is_SL==1) & (n_jets==5) & (n_btags==3)",
-    "(is_SL==1) & (n_jets==5) & (n_btags>=4)",
-    "(is_SL==1) & (n_jets>=6) & (n_btags==2)",
-    "(is_SL==1) & (n_jets>=6) & (n_btags==3)",
-    "(is_SL==1) & (n_jets>=6) & (n_btags>=4)",
-    "(is_DL==1) & (n_jets==3) & (n_btags==2)",
-    "(is_DL==1) & (n_jets>=3) & (n_btags==3)",
-    "(is_DL==1) & (n_jets>=4) & (n_btags==2)",
-    "(is_DL==1) & (n_jets>=4) & (n_btags>=4)",
+#    "(is_SL==1) | (is_DL==1)",
+#    "(is_SL==1)",
+#    "(is_DL==1)",
+    "(is_SL==1) & (n_jets==4) & (n_btags==3) & (mll_passed==1) & (met_passed==1)",
+    "(is_SL==1) & (n_jets==4) & (n_btags==4) & (mll_passed==1) & (met_passed==1)",
+    "(is_SL==1) & (n_jets==5) & (n_btags==3) & (mll_passed==1) & (met_passed==1)",
+    "(is_SL==1) & (n_jets==5) & (n_btags>=4) & (mll_passed==1) & (met_passed==1)",
+    "(is_SL==1) & (n_jets>=6) & (n_btags==2) & (mll_passed==1) & (met_passed==1)",
+    "(is_SL==1) & (n_jets>=6) & (n_btags==3) & (mll_passed==1) & (met_passed==1)",
+    "(is_SL==1) & (n_jets>=6) & (n_btags>=4) & (mll_passed==1) & (met_passed==1)",
+    "(is_DL==1) & (n_jets==3) & (n_btags==2) & (mll_passed==1) & (met_passed==1)",
+    "(is_DL==1) & (n_jets>=3) & (n_btags==3) & (mll_passed==1) & (met_passed==1)",
+    "(is_DL==1) & (n_jets>=4) & (n_btags==2) & (mll_passed==1) & (met_passed==1)",
+    "(is_DL==1) & (n_jets>=4) & (n_btags>=4) & (mll_passed==1) & (met_passed==1)",
 ]
 
 cuts_names = [
-    "inclusive",
-    "SL",
-    "DL",
+#    "inclusive",
+#    "SL",
+#    "DL",
     "SL 4J 3T",
     "SL 4J 4T",
     "SL 5J 3T",
@@ -119,7 +127,7 @@ def compareTwo(d1, d2, d1Name, d2Name, sample):
     commons = [compare(d1, d2, cut) for cut in cuts]
     prefix = d1Name + "_" + d2Name + "_" + sample
     
-    plt.figure(figsize=(4,5))
+    plt.figure(figsize=(6,5))
     a1 = plt.axes((0.0,0.5, 1.0,0.5))
     xs = np.array(range(len(cuts)))
     plt.bar(xs, map(lambda x: len(x[0]), commons), label="common in A and B", color="gray")
@@ -131,7 +139,7 @@ def compareTwo(d1, d2, d1Name, d2Name, sample):
     #plt.yscale("log")
     plt.ylabel("number of MC events", fontsize=16)
     plt.title("A={0} B={1}".format("file1", "file2"), fontsize=20)
-    plt.legend(loc="best", frameon=False)
+    plt.legend(loc=(1.1,1.0), frameon=False)
     a2 = plt.axes((0.0,0.0, 1.0,0.45))
     plt.plot(xs+0.2, map(lambda x: float(len(x[1]))/float(len(x[0])) if len(x[0])>0 else 0, commons), color="black", lw=0, marker="o")
     plt.plot(xs+0.6, map(lambda x: float(len(x[2]))/float(len(x[0])) if len(x[0])>0 else 0, commons), color="red", lw=0, marker="o")
@@ -145,7 +153,7 @@ def compareTwo(d1, d2, d1Name, d2Name, sample):
 
     outfile = open(prefix + "_results.html", "w")
     outfile.write("<h1>A={0} B={1} sample={2}</h1>".format(d1Name, d2Name, sample))
-    outfile.write("<br><img src=\"{0}.png\" style=\"width:400px;height:500px;\"> <br>".format(prefix))
+    outfile.write("<br><img src=\"{0}.png\" style=\"width:600px;height:500px;\"> <br>".format(prefix))
     for icat in range(len(commons)):
 
         newvars_A = [(v, pairA + "_" + v) for v in vars]
@@ -185,13 +193,13 @@ def compareTwo(d1, d2, d1Name, d2Name, sample):
         if len(inA)>0:
             ec1 = get_events(conc, inA[:10])
             outfile.write("<h3>Printing first 10 events that are only in A</h3>")
-            outfile.write(str(conc[ec1][["run", "lumi", "event"] + [v[1] for v in newvars_A]].to_html()) + "<br>")
+            outfile.write(str(conc[ec1].to_html()) + "<br>")
             #outfile.write("-------------------------------------------<br>")
 
         if len(inB)>0:
             ec1 = get_events(conc, inB[:10])
             outfile.write("<h3>Printing first 10 events that are only in B</h3>")
-            outfile.write(str(conc[ec1][["run", "lumi", "event"] + [v[1] for v in newvars_B]].to_html()) + "<br>")
+            outfile.write(str(conc[ec1].to_html()) + "<br>")
             #outfile.write("-------------------------------------------<br>")
 
         # if print_detail:
@@ -214,27 +222,36 @@ def compareTwo(d1, d2, d1Name, d2Name, sample):
     outfile.close()
 
 data = {}
-for x in ["eth", "desy", "kit", "ihep"]:
+for x in ["eth", "desy", "kit", "ihep", "osu"]:
     data[x] = {}
 
-data["eth"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/eth/v6/tth.csv")
-data["eth"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/eth/v6/ttjets.csv")
+data["eth"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/eth/v10/tth.csv")
+data["eth"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/eth/v10/ttjets.csv")
 
-data["desy"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/desy_sync_round3/v3/tth.csv")
-data["desy"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/desy_sync_round3/v3/ttjets.csv")
+data["desy"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/desy/v4/tth.csv")
+data["desy"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/desy/v4/ttjets.csv")
 
 data["kit"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/kit/tth.csv")
 data["kit"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/kit/ttjets.csv")
 
-data["ihep"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/ihep/tth.csv")
-data["ihep"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/ihep/ttjets.csv")
+data["ihep"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/ihep/v3/tth.csv")
+data["ihep"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/ihep/v3/ttjets.csv")
 
+data["osu"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/osu/tth.csv")
+data["osu"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/osu/ttjets.csv")
 
 for sample in ["sig", "bkg"]:
     for pairA, pairB in [
     ("eth", "desy"),
-    ("eth", "kit"),
-    ("desy", "kit"), ("eth", "ihep"), ("desy", "ihep"), ("kit", "ihep")
+    #("eth", "kit"),
+    #("eth", "osu"),
+    ("eth", "ihep"),
+    # ("desy", "kit"),
+    ("desy", "ihep"),
+    # ("kit", "ihep"),
+    # ("osu", "kit"),
+    # ("osu", "desy"),
+    # ("osu", "ihep"),
     ]:
         d1 = data[pairA][sample]
         d2 = data[pairB][sample]
