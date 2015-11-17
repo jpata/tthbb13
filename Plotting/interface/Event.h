@@ -237,7 +237,7 @@ typedef unordered_map<
     double higgsCandidate_mass;
     double higgsCandidate_bbtag;
     double higgsCandidate_n_subjettiness;
-
+    double higgsCandidate_dr_genHiggs;
 
     Event(
         bool _is_sl,
@@ -283,7 +283,8 @@ typedef unordered_map<
         double _higgsCandidate_eta,
         double _higgsCandidate_mass,
         double _higgsCandidate_bbtag,
-        double _higgsCandidate_n_subjettiness
+        double _higgsCandidate_n_subjettiness,
+        double _higgsCandidate_dr_genHiggs
     );
 
     const string to_string() const;

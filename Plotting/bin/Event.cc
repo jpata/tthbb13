@@ -257,7 +257,8 @@ Event::Event(
     double _higgsCandidate_eta,
     double _higgsCandidate_mass,
     double _higgsCandidate_bbtag,
-    double _higgsCandidate_n_subjettiness
+    double _higgsCandidate_n_subjettiness,
+    double _higgsCandidate_dr_genHiggs
     ) :
     is_sl(_is_sl),
     is_dl(_is_dl),
@@ -276,7 +277,7 @@ Event::Event(
     mem_SL_2w2h2t(_mem_SL_2w2h2t),
     mem_SL_2w2h2t_sj(_mem_SL_2w2h2t_sj),
     mem_DL_0w2h2t(_mem_DL_0w2h2t),
-    tth_mva(_tth_mva),			 
+    tth_mva(_tth_mva),
     bTagWeight(_bTagWeight),
     bTagWeight_Stats1Up(_bTagWeight_Stats1Up),
     bTagWeight_Stats1Down(_bTagWeight_Stats1Down),
@@ -301,7 +302,8 @@ Event::Event(
     higgsCandidate_eta(_higgsCandidate_eta),
     higgsCandidate_mass(_higgsCandidate_mass),
     higgsCandidate_bbtag(_higgsCandidate_bbtag),
-    higgsCandidate_n_subjettiness(_higgsCandidate_n_subjettiness)
+    higgsCandidate_n_subjettiness(_higgsCandidate_n_subjettiness),
+    higgsCandidate_dr_genHiggs(_higgsCandidate_dr_genHiggs)
 {
     
 }
@@ -349,7 +351,7 @@ const vector<Lepton> makeAllLeptons(const TreeData& data) {
 
 double nominal_weight(const Event& ev, const Configuration& conf) {
     if (!(conf.process == ProcessKey::SingleMuon || conf.process == ProcessKey::SingleElectron)) {
-        return conf.lumi * ev.weight_xs * ev.bTagWeight * ev.puWeight;
+        return conf.lumi * ev.weight_xs * ev.puWeight;
     }
     return 1.0;
 }
@@ -460,7 +462,8 @@ const Event EventFactory::makeNominal(const TreeData& data, const Configuration&
         data.higgsCandidate_eta[0],
         data.higgsCandidate_mass[0],
         data.higgsCandidate_bbtag[0],
-        data.higgsCandidate_n_subjettiness[0]
+        data.higgsCandidate_n_subjettiness[0],
+        data.higgsCandidate_dr_genHiggs[0]
     );
     return ev;
 }
@@ -513,7 +516,8 @@ const Event EventFactory::makeJESUp(const TreeData& data, const Configuration& c
         data.higgsCandidate_eta[0],
         data.higgsCandidate_mass[0],
         data.higgsCandidate_bbtag[0],
-        data.higgsCandidate_n_subjettiness[0]
+        data.higgsCandidate_n_subjettiness[0],
+        data.higgsCandidate_dr_genHiggs[0]
     );
 }
 
@@ -565,7 +569,8 @@ const Event EventFactory::makeJESDown(const TreeData& data, const Configuration&
         data.higgsCandidate_eta[0],
         data.higgsCandidate_mass[0],
         data.higgsCandidate_bbtag[0],
-        data.higgsCandidate_n_subjettiness[0]
+        data.higgsCandidate_n_subjettiness[0],
+        data.higgsCandidate_dr_genHiggs[0]
     );
 }
 
