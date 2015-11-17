@@ -2,7 +2,7 @@ import TTH.Plotting.Datacards.MiniSamples as Samples
 import ROOT, json
 
 #entries per job
-perjob = 500000
+perjob = 250000
 
 def chunks(l, n):
     """Yield successive n-sized chunks from l."""
@@ -19,7 +19,7 @@ for samp in Samples.samples_dict.keys():
         #default configuration
         ret = {
             "filenames": [s],
-            "lumi": 10000.0,
+            "lumi": 1280.0,
             "process": samp,
             "outputFile": "ControlPlotsSparse_{0}.root".format(ijob),
             "firstEntry": ch[0],

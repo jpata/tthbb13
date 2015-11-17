@@ -83,120 +83,22 @@ public:
     const TLorentzVector p4;
     const float btagCSV;
 
-    Jet(const TLorentzVector& _p4, int _btagCSV);
+    Jet(const TLorentzVector& _p4, float _btagCSV);
     const string to_string() const;
 };
 
-
-//Simple event representation
-//Designed to be immutable
-class Event {
+//Simple representation of a jet
+class Lepton {
 public:
-typedef unordered_map<
-    SystematicKey::SystematicKey,
-    double (*)(const Event&),
-    hash<int>
-> WeightMap;
+    const TLorentzVector p4;
+    int pdgId;
 
-    bool is_sl;
-    bool is_dl;
-    bool pass_trig_sl;
-    bool pass_trig_dl;
-    bool passPV;
-
-    int numJets;
-    int nBCSVM;
-
-    //list of all jets
-    vector<Jet> jets;
-
-    //map of SystematicKey -> weight func(event) of all syst. weights to evaluate
-    WeightMap weightFuncs;
-
-    //cross-section weight
-    double weight_xs;
-    
-    double Wmass;
-    
-    //mem hypotheses
-    double mem_SL_0w2h2t;
-    double mem_SL_2w2h2t;
-    double mem_SL_2w2h2t_sj;
-    double mem_DL_0w2h2t;
-
-    // Our BDT
-    double tth_mva;
-
-    //btag weights
-    double bTagWeight;
-    double bTagWeight_Stats1Up;
-    double bTagWeight_Stats1Down;
-    double bTagWeight_Stats2Up;
-    double bTagWeight_Stats2Down;
-    double bTagWeight_LFUp;
-    double bTagWeight_LFDown;
-    double bTagWeight_HFUp;
-    double bTagWeight_HFDown;
-
-    //btag likelihood
-    double btag_LR_4b_2b;
-    double btag_LR_4b_2b_logit; // log(x/(1 - x))
-
-    //boosted variables
-    int n_excluded_bjets;
-    int n_excluded_ljets;
-    int ntopCandidate;
-    double topCandidate_mass;
-    double topCandidate_fRec;
-    double topCandidate_n_subjettiness;
-
-    int nhiggsCandidate;
-    double higgsCandidate_mass;
-    double higgsCandidate_bbtag;
-    double higgsCandidate_n_subjettiness;
-
-
-    Event(
-        bool _is_sl,
-        bool _is_dl,
-        bool _pass_trig_sl,
-        bool _pass_trig_dl,
-        bool _passPV,
-        int _numJets,
-        int _nBCSVM,
-        const vector<Jet>& _jets,
-        const WeightMap& _weightFuncs,
-        double _weight_xs,
-        double _Wmass,
-        double _mem_SL_0w2h2t,
-        double _mem_SL_2w2h2t,
-        double _mem_SL_2w2h2t_sj,
-        double _mem_DL_0w2h2t,
-        double _tth_mva,
-        double _bTagWeight,
-        double _bTagWeight_Stats1Up,
-        double _bTagWeight_Stats1Down,
-        double _bTagWeight_Stats2Up,
-        double _bTagWeight_Stats2Down,
-        double _bTagWeight_LFUp,
-        double _bTagWeight_LFDown,
-        double _bTagWeight_HFUp,
-        double _bTagWeight_HFDown,
-        double _btag_LR_4b_2b,
-        int _n_excluded_bjets,
-        int _n_excluded_ljets,
-        int _ntopCandidate,
-        double _topCandidate_mass,
-        double _topCandidate_fRec,
-        double _topCandidate_n_subjettiness,
-        int _nhiggsCandidate,
-        double _higgsCandidate_mass,
-        double _higgsCandidate_bbtag,
-        double _higgsCandidate_n_subjettiness
-    );
-
+    Lepton(const TLorentzVector& _p4, int _pdgId);
     const string to_string() const;
 };
+
+//fwd decl
+class Event;
 
 class SparseAxis {
 public:
@@ -258,6 +160,135 @@ public:
     static const Configuration makeConfiguration(JsonValue& value);
     string to_string() const;
 };
+
+//Simple event representation
+//Designed to be immutable
+class Event {
+public:
+typedef unordered_map<
+    SystematicKey::SystematicKey,
+    double (*)(const Event&, const Configuration& conf),
+    hash<int>
+> WeightMap;
+
+    bool is_sl;
+    bool is_dl;
+    bool pass_trig_sl;
+    bool pass_trig_dl;
+    bool passPV;
+
+    int numJets;
+    int nBCSVM;
+
+    //list of all jets
+    vector<Jet> jets;
+    
+    //list of all jets
+    vector<Lepton> leptons;
+
+    //map of SystematicKey -> weight func(event) of all syst. weights to evaluate
+    WeightMap weightFuncs;
+
+    //cross-section weight
+    double weight_xs;
+
+    double puWeight;
+    
+    double Wmass;
+    
+    //mem hypotheses
+    double mem_SL_0w2h2t;
+    double mem_SL_2w2h2t;
+    double mem_SL_2w2h2t_sj;
+    double mem_DL_0w2h2t;
+
+    // Our BDT
+    double tth_mva;
+
+    //btag weights
+    double bTagWeight;
+    double bTagWeight_Stats1Up;
+    double bTagWeight_Stats1Down;
+    double bTagWeight_Stats2Up;
+    double bTagWeight_Stats2Down;
+    double bTagWeight_LFUp;
+    double bTagWeight_LFDown;
+    double bTagWeight_HFUp;
+    double bTagWeight_HFDown;
+
+    //btag likelihood
+    double btag_LR_4b_2b;
+    double btag_LR_4b_2b_logit; // log(x/(1 - x))
+
+    //boosted variables
+    int n_excluded_bjets;
+    int n_excluded_ljets;
+
+    int ntopCandidate;
+    double topCandidate_pt;
+    double topCandidate_eta;
+    double topCandidate_mass;
+    double topCandidate_fRec;
+    double topCandidate_n_subjettiness;
+
+    int nhiggsCandidate;
+    double higgsCandidate_pt;
+    double higgsCandidate_eta;
+    double higgsCandidate_mass;
+    double higgsCandidate_bbtag;
+    double higgsCandidate_n_subjettiness;
+
+
+    Event(
+        bool _is_sl,
+        bool _is_dl,
+        bool _pass_trig_sl,
+        bool _pass_trig_dl,
+        bool _passPV,
+        int _numJets,
+        int _nBCSVM,
+        const vector<Jet>& _jets,
+        const vector<Lepton>& _leptons,
+        const WeightMap& _weightFuncs,
+        double _weight_xs,
+        double _puWeight,
+        double _Wmass,
+        double _mem_SL_0w2h2t,
+        double _mem_SL_2w2h2t,
+        double _mem_SL_2w2h2t_sj,
+        double _mem_DL_0w2h2t,
+        double _tth_mva,
+        double _bTagWeight,
+        double _bTagWeight_Stats1Up,
+        double _bTagWeight_Stats1Down,
+        double _bTagWeight_Stats2Up,
+        double _bTagWeight_Stats2Down,
+        double _bTagWeight_LFUp,
+        double _bTagWeight_LFDown,
+        double _bTagWeight_HFUp,
+        double _bTagWeight_HFDown,
+        double _btag_LR_4b_2b,
+        int _n_excluded_bjets,
+        int _n_excluded_ljets,
+        
+        int _ntopCandidate,
+        double _topCandidate_pt,
+        double _topCandidate_eta,
+        double _topCandidate_mass,
+        double _topCandidate_fRec,
+        double _topCandidate_n_subjettiness,
+
+        int _nhiggsCandidate,
+        double _higgsCandidate_pt,
+        double _higgsCandidate_eta,
+        double _higgsCandidate_mass,
+        double _higgsCandidate_bbtag,
+        double _higgsCandidate_n_subjettiness
+    );
+
+    const string to_string() const;
+};
+
 
 //A map for ResultKey -> TH1D for all the output histograms
 typedef unordered_map<
@@ -407,6 +438,8 @@ Configuration parseJsonConf(const string& infile);
 
 namespace BaseCuts {
     bool sl(const Event& ev);
+    bool sl_mu(const Event& ev);
+    bool sl_el(const Event& ev);
     bool dl(const Event& ev);
 }
 

@@ -388,6 +388,7 @@ public:
   int is_sl_JESDown;
   int HLT_BIT_HLT_PFHT900_v;
   double weight_xs;
+  double puWeight;
   int nMatch_hb_btag_JESUp;
   double qg_LR_flavour_4q_1q_2q_3q_JESDown;
   double std_bdisc;
@@ -999,6 +1000,7 @@ public:
     tree->SetBranchAddress("is_sl_JESDown", &(this->is_sl_JESDown));
     tree->SetBranchAddress("HLT_BIT_HLT_PFHT900_v", &(this->HLT_BIT_HLT_PFHT900_v));
     tree->SetBranchAddress("weight_xs", &(this->weight_xs));
+    tree->SetBranchAddress("puWeight", &(this->puWeight));
     tree->SetBranchAddress("nMatch_hb_btag_JESUp", &(this->nMatch_hb_btag_JESUp));
     tree->SetBranchAddress("qg_LR_flavour_4q_1q_2q_3q_JESDown", &(this->qg_LR_flavour_4q_1q_2q_3q_JESDown));
     tree->SetBranchAddress("std_bdisc", &(this->std_bdisc));
