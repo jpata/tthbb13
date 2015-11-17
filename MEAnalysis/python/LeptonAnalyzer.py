@@ -108,6 +108,7 @@ class LeptonAnalyzer(FilterAnalyzer):
             if lep.pt > ptcut:
                 lep_DL_afterpt += [lep]
         event.lep_DL = lep_DL_afterpt
+        event.n_lep_DL = len(event.lep_DL)
         print "after pt cut", [l.pt for l in event.lep_DL]
 
         if "debug" in self.conf.general["verbosity"]:

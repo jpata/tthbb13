@@ -28,8 +28,8 @@ step2:
 	cd $(CMSSW_BASE)/src/VHbbAnalysis/Heppy/test && ls  ~/tth/spring15/sync/ttjets_1/block*.root | $(PARCMD) --result out_ttjets_step2 -j30 python ./vhbb_parallel.py {} ttjets_block_{#}
 
 step3:
-	hadd -f ~/tth/spring15/sync/tthbb/ttjets.root ~/tth/gc/GC85e1bf4a7327/cfg_noME/ttjets/output_*.root
-	hadd -f ~/tth/spring15/sync/tthbb/tth.root ~/tth/gc/GC85e1bf4a7327/cfg_noME/ttH/output_*.root
+	hadd -f ~/tth/spring15/sync/tthbb/ttjets.root ~/tth/gc/GC4635dcd58fdc/cfg_noME/ttjets/output_*.root
+	hadd -f ~/tth/spring15/sync/tthbb/tth.root ~/tth/gc/GC4635dcd58fdc/cfg_noME/ttH/output_*.root
 
 step4:
 	python python/makeTable.py /home/joosep/tth/spring15/sync/tthbb/tth.root nominal > tth.csv

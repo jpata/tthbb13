@@ -123,7 +123,7 @@ class Conf:
         "pt":   30,
         "eta":  2.4,
 
-        # pt, |eta| thresholds for **trailing jets** specific to sl channel
+        # pt, |eta| thresholds for **leading jets** specific to sl channel
         "pt_sl":  30,
         "eta_sl": 2.4,
 
@@ -196,8 +196,6 @@ class Conf:
         ],
 
         #"eventWhitelist": [
-        #    (1, 1391, 277260),
-        #    (1, 1641, 326987),
         #]
     }
 

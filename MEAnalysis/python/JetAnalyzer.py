@@ -136,6 +136,7 @@ class JetAnalyzer(FilterAnalyzer):
             )
             event.good_jets = good_jets_leading + event.good_jets[2:]
 
+
         #Take care of overlaps between jets and veto leptons
         jets_to_remove = []
         for lep in event.veto_leptons:
@@ -149,19 +150,33 @@ class JetAnalyzer(FilterAnalyzer):
                         print "[JetAnalyzer: jet lepton cleaning] deltaR", dr, lep.pt, lep.eta, lep.phi, jet.pt, jet.eta, jet.phi
                     jets_to_remove += [jet]
 
+        #Now actually remove the overlapping jets
         for jet in jets_to_remove:
             if "jets" in self.conf.general["verbosity"] or "debug" in self.conf.general["verbosity"]:
                 print "removing jet", jet.pt, jet.eta
             if jet in event.good_jets:
                 event.good_jets.remove(jet)
+        
+        #in DL apply two-stage pt cuts
+        #Since this relies on jet counting, needs to be done **after** any other jet filtering
+        if event.is_dl:
+            good_jets = []
+            for jet in event.good_jets:
+                if len(good_jets) < 2:
+                    ptcut = self.conf.jets["pt_sl"]
+                else:
+                    ptcut = self.conf.jets["pt_dl"]
+                if jet.pt > ptcut:
+                    good_jets += [jet]
+            event.good_jets = good_jets
 
         if "debug" in self.conf.general["verbosity"]:
             print "All jets: ", len(event.Jet)+len(event.DiscardedJet)
             for x in event.Jet+event.DiscardedJet:
-                print "\t(%s, %s, neHEF=%s, chEmEF=%s, neEmEF=%s, nod=%s, chHEF=%s, chMult=%s, csv=%s id=%d)" % (x.pt, x.eta, x.neHEF, x.chEmEF, x.neEmEF, x.numberOfDaughters, x.chHEF, x.chMult, x.btagCSV, x.id)
+                print "\t(%s, %s, neHEF=%s, chEmEF=%s, neEmEF=%s, nod=%s, chHEF=%s, chMult=%s, neMult=%s, muEF=%s, csv=%s id=%d jec=%s jer=%s)" % (x.pt, x.eta, x.neHEF, x.chEmEF, x.neEmEF, x.numberOfDaughters, x.chHEF, x.chMult, x.neMult, x.muEF, x.btagCSV, x.id, x.corr, x.corr_JER)
             print "Good jets: ", len(event.good_jets)
             for x in event.good_jets:
-                print "\t(%s, %s, neHEF=%s, chEmEF=%s, neEmEF=%s, nod=%s, chHEF=%s, chMult=%s, csv=%s id=%d)" % (x.pt, x.eta, x.neHEF, x.chEmEF, x.neEmEF, x.numberOfDaughters, x.chHEF, x.chMult, x.btagCSV, x.id)
+                print "\t(%s, %s, neHEF=%s, chEmEF=%s, neEmEF=%s, nod=%s, chHEF=%s, chMult=%s, neMult=%s, muEF=%s, csv=%s id=%d jec=%s jer=%s)" % (x.pt, x.eta, x.neHEF, x.chEmEF, x.neEmEF, x.numberOfDaughters, x.chHEF, x.chMult, x.neMult, x.muEF, x.btagCSV, x.id, x.corr, x.corr_JER)
 
         #Assing jet transfer functions
         for jet in event.good_jets:

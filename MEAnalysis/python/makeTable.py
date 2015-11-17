@@ -106,8 +106,8 @@ for ev in range(tt.GetEntries()):
         lep1_iso = -1
         mll = tt.ll_mass
         
-        if not (lep0_pt > 20 and lep1_pt > 20 and abs(lep0_eta)<2.4 and abs(lep1_eta)<2.4):
-            continue
+        #if not (lep0_pt > 20 and lep1_pt > 20 and abs(lep0_eta)<2.4 and abs(lep1_eta)<2.4):
+        #    continue
         if not mll > 20:
             mll_passed = False
             #continue
