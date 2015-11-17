@@ -4,6 +4,7 @@
 #include "TTH/Plotting/interface/metree.h"
 //JSON parser https://github.com/vivkin/gason
 #include "TTH/Plotting/interface/gason.h"
+#include "TTH/Plotting/interface/gen.h"
 #include "TLorentzVector.h"
 
 #include "TH1D.h"
@@ -18,111 +19,6 @@
 #include <fstream>
 
 using namespace std;
-
-namespace SystematicKey {
-enum SystematicKey {
-    nominal,
-    CMS_scale_jUp,
-    CMS_scale_jDown,
-    CMS_ttH_CSVStats1Up,
-    CMS_ttH_CSVStats1Down,
-    CMS_ttH_CSVStats2Up,
-    CMS_ttH_CSVStats2Down,
-    CMS_ttH_CSVLFUp,
-    CMS_ttH_CSVLFDown,
-    CMS_ttH_CSVHFUp,
-    CMS_ttH_CSVHFDown,
-};
-const string to_string(SystematicKey k);
-}
-
-namespace ProcessKey {
-enum ProcessKey {
-  ttH,
-  ttH_hbb,
-  ttbarPlusBBbar,
-  ttbarPlusB,
-  ttbarPlus2B,
-  ttbarPlusCCbar,
-  ttbarOther,
-  ttH_nohbb,
-  ttw_wlnu,
-  ttw_wqq,
-  ttz_zqq,
-  ttz_zllnunu,
-  UNKNOWN
-};
-const string to_string(ProcessKey k);
-const ProcessKey from_string(const string& k);
-}
-
-namespace CategoryKey {
-enum CategoryKey {
-    sl,
-    dl,
-
-    //DL
-    j3_t2,
-    jge4_t2,
-    jge3_t3,
-    jge4_tge4,
-
-    //SL
-    j4_t3,
-    j4_t4,
-    j5_t3,
-    j5_tge4,
-    jge6_t2,
-    jge6_t3,
-    jge6_tge4,
-    
-    blrL,
-    blrH,        
-};
-const string to_string(CategoryKey k);
-const CategoryKey from_string(const string& k);
-}
-
-//Names of all possible histograms we want to save
-//without systematic variation suffix
-namespace HistogramKey {
-enum HistogramKey {
-    lep0_pt,
-    lep1_pt,
-    lep0_eta,
-    lep1_eta,
-    lep0_relIso,
-    lep1_relIso,
-
-    jet0_pt,
-    jet1_pt,
-    jet0_eta,
-    jet1_eta,
-    jet0_phi,
-    jet1_phi,
-    jet0_etaphi,
-    jet1_etaphi,
-
-    jet0_btagCSV,
-    jet1_btagCSV,
-    jet0_btagBDT,
-    jet1_btagBDT,
-
-    nPV,
-    numJets,
-    nBCSVM,
-
-    mem_SL_0w2h2t,
-    mem_DL_0w2h2t,
-    mem_SL_2w2h2t,
-    mem_SL_2w2h2t_sj,
-    sparse,
-};
-//convert enum to the corresponding string
-//NB: Have to add all these to Event.cc/HistogramKey::to_string manually!!!
-//This could be auto-generated with C++ macro magic but here we are explicit
-const string to_string(HistogramKey k);
-}
 
 //Simple 3-tuple of (category, systematic, histname) to keep track of
 //final histograms.
@@ -254,6 +150,12 @@ typedef unordered_map<
     double topCandidate_fRec;
     double topCandidate_n_subjettiness;
 
+    int nhiggsCandidate;
+    double higgsCandidate_mass;
+    double higgsCandidate_bbtag;
+    double higgsCandidate_n_subjettiness;
+
+
     Event(
         bool _is_sl,
         bool _is_dl,
@@ -270,7 +172,7 @@ typedef unordered_map<
         double _mem_SL_2w2h2t,
         double _mem_SL_2w2h2t_sj,
         double _mem_DL_0w2h2t,
-	double _tth_mva,
+        double _tth_mva,
         double _bTagWeight,
         double _bTagWeight_Stats1Up,
         double _bTagWeight_Stats1Down,
@@ -286,7 +188,11 @@ typedef unordered_map<
         int _ntopCandidate,
         double _topCandidate_mass,
         double _topCandidate_fRec,
-        double _topCandidate_n_subjettiness
+        double _topCandidate_n_subjettiness,
+        int _nhiggsCandidate,
+        double _higgsCandidate_mass,
+        double _higgsCandidate_bbtag,
+        double _higgsCandidate_n_subjettiness
     );
 
     const string to_string() const;
@@ -498,4 +404,10 @@ public:
 };
 
 Configuration parseJsonConf(const string& infile);
+
+namespace BaseCuts {
+    bool sl(const Event& ev);
+    bool dl(const Event& ev);
+}
+
 #endif

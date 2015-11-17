@@ -41,15 +41,6 @@ std::vector<std::string> split(const std::string &s, char delim) {
     return elems;
 }
 
-template <class A, class B, class H1, class H2>
-const unordered_map<A, B, H1> reverse_map(const unordered_map<B, A, H2>& src) {
-    unordered_map<A, B, H1> ret;
-    for (auto& kv : src) {
-        ret.insert(make_pair(kv.second, kv.first));
-    }
-    return ret;
-} 
-
 const map<string, function<float(const Event& ev)>> AxisFunctions = {
     {"mem_SL_0w2h2t", [](const Event& ev) { return ev.mem_SL_0w2h2t;}},
     {"mem_SL_2w2h2t", [](const Event& ev) { return ev.mem_SL_2w2h2t;}},
@@ -157,166 +148,14 @@ string Configuration::to_string() const {
 }
 //["n_excluded_bjets<2", "ntopCandidate==1"]
 
-namespace SystematicKey {
-const unordered_map<const string, SystematicKey, hash<string>> map_from_string = {
-    {"nominal", nominal},
-    {"CMS_scale_jUp", CMS_scale_jUp},
-    {"CMS_scale_jDown", CMS_scale_jDown},
-    {"CMS_ttH_CSVStats1Up", CMS_ttH_CSVStats1Up},
-    {"CMS_ttH_CSVStats1Down", CMS_ttH_CSVStats1Down},
-    {"CMS_ttH_CSVStats2Up", CMS_ttH_CSVStats2Up},
-    {"CMS_ttH_CSVStats2Down", CMS_ttH_CSVStats2Down},
-    {"CMS_ttH_CSVLFUp", CMS_ttH_CSVLFUp},
-    {"CMS_ttH_CSVLFDown", CMS_ttH_CSVLFDown},
-    {"CMS_ttH_CSVHFUp", CMS_ttH_CSVHFUp},
-    {"CMS_ttH_CSVHFDown", CMS_ttH_CSVHFDown}
-};
-
-const unordered_map<SystematicKey, const string, hash<int>> map_to_string =
-    reverse_map<SystematicKey, const string, hash<int>, hash<string>>(
-        map_from_string
-    );
-
-const string to_string(SystematicKey k) {
-    if (map_to_string.find(k) == map_to_string.end()) {
-        cerr << "Could not find SystematicKey " << k << endl;
-        throw 1;
-    }
-    return map_to_string.at(k); 
-}
-}
-
-namespace ProcessKey {
-const unordered_map<const string, ProcessKey, hash<string>> map_from_string = {
-    {"ttH", ttH},
-    {"ttH_hbb", ttH_hbb},
-    {"ttbarPlusBBbar", ttbarPlusBBbar},
-    {"ttbarPlusB", ttbarPlusB},
-    {"ttbarPlus2B", ttbarPlus2B},
-    {"ttbarPlusCCbar", ttbarPlusCCbar},
-    {"ttbarOther", ttbarOther},
-    {"ttH_nohbb", ttH_nohbb},
-    {"ttw_wlnu", ttw_wlnu},
-    {"ttw_wqq", ttw_wqq},
-    {"ttz_zqq", ttz_zqq},
-    {"ttz_zllnunu", ttz_zllnunu},
-    {"UNKNOWN",  UNKNOWN}
-};
-const unordered_map<ProcessKey, const string, hash<int>> map_to_string =
-    reverse_map<ProcessKey, const string, hash<int>, hash<string>>(
-        map_from_string
-    );
-
-const string to_string(ProcessKey k) {
-    if (map_to_string.find(k) == map_to_string.end()) {
-        cerr << "Could not find ProcessKey " << k << endl;
-        throw 1;
-    }
-    return map_to_string.at(k); 
-}
-const ProcessKey from_string(const string& k) {
-    if (map_from_string.find(k) == map_from_string.end()) {
-        cerr << "Could not find ProcessKey " << k << endl;
-        throw 1;
-    }
-    return map_from_string.at(k);
-}
-}
-
-namespace HistogramKey {
-const unordered_map<const string, HistogramKey, hash<string>> map_from_string = {
-    {"jet0_pt", jet0_pt},
-    {"jet1_pt", jet1_pt},
-    {"jet0_eta", jet0_eta},
-    {"jet1_eta", jet1_eta},
-    {"jet0_phi", jet0_phi},
-    {"jet1_phi", jet1_phi},
-    {"jet0_etaphi", jet0_etaphi},
-    {"jet1_etaphi", jet1_etaphi},
-    {"jet0_btagCSV", jet0_btagCSV},
-    {"jet1_btagCSV", jet1_btagCSV},
-    {"jet0_btagBDT", jet0_btagBDT},
-    {"jet1_btagBDT", jet1_btagBDT},
-
-    {"lep0_pt", lep0_pt},
-    {"lep1_pt", lep1_pt},
-    {"lep0_eta", lep0_eta},
-    {"lep1_eta", lep1_eta},
-    {"lep0_relIso", lep0_relIso},
-    {"lep1_relIso", lep1_relIso},
-
-    {"nPV", nPV},
-    {"numJets", numJets},
-    {"nBCSVM", nBCSVM},
-
-    {"mem_SL_0w2h2t", mem_SL_0w2h2t},
-    {"mem_DL_0w2h2t", mem_DL_0w2h2t},
-    {"mem_SL_2w2h2t", mem_SL_2w2h2t},
-    {"mem_SL_2w2h2t_sj", mem_SL_2w2h2t_sj},
-    {"sparse", sparse}
-};
-const unordered_map<HistogramKey, const string, hash<int>> map_to_string =
-    reverse_map<HistogramKey, const string, hash<int>, hash<string>>(
-        map_from_string
-    );
-const string to_string(HistogramKey k) {
-    if (map_to_string.find(k) == map_to_string.end()) {
-        cerr << "Could not find HistogramKey " << k << endl;
-        throw 1;
-    }
-    return map_to_string.at(k); 
-    }
-}
-
 namespace CategoryKey {
-const unordered_map<const string, CategoryKey, hash<string>> map_from_string = {
-    {"sl", sl},
-    {"dl", dl},
-    {"j3_t2", j3_t2},
-    {"jge4_t2", jge4_t2},
-    {"jge3_t3", jge3_t3},
-    {"jge4_tge4", jge4_tge4},
-
-    {"j4_t3", j4_t3},
-    {"j4_t4", j4_t4},
-    {"j5_t3", j5_t3},
-    {"j5_tge4", j5_tge4},
-    {"jge6_t2", jge6_t2},
-    {"jge6_t3", jge6_t3},
-    {"jge6_tge4", jge6_tge4},
-
-    {"blrL", blrL},
-    {"blrH", blrH},
-};
-
-unordered_map<CategoryKey, const string, hash<int>> map_to_string =
-    reverse_map<CategoryKey, const string, hash<int>, hash<string>>(
-        map_from_string
-    );
-
-const string to_string(CategoryKey k) {
-    if (map_to_string.find(k) == map_to_string.end()) {
-        cerr << "Could not find CategoryKey " << k << endl;
-        throw 1;
+    bool is_sl(vector<CategoryKey> k) {
+        return k[0] == sl;
     }
-    return map_to_string.at(k);
-}
 
-const CategoryKey from_string(const string& k) {
-    if (map_from_string.find(k) == map_from_string.end()) {
-        cerr << "Could not find CategoryKey " << k << endl;
-        throw 1;
+    bool is_dl(vector<CategoryKey> k) {
+        return k[0] == dl;
     }
-    return map_from_string.at(k);
-}
-bool is_sl(vector<CategoryKey> k) {
-    return k[0] == sl;
-}
-
-bool is_dl(vector<CategoryKey> k) {
-    return k[0] == dl;
-
-}
 }
 
 void saveResults(ResultMap& res, const string& prefix, const string& filename) {
@@ -413,7 +252,11 @@ Event::Event(
     int _ntopCandidate,
     double _topCandidate_mass,
     double _topCandidate_fRec,
-    double _topCandidate_n_subjettiness    
+    double _topCandidate_n_subjettiness,
+    int _nhiggsCandidate,
+    double _higgsCandidate_mass,
+    double _higgsCandidate_bbtag,
+    double _higgsCandidate_n_subjettiness
     ) :
     is_sl(_is_sl),
     is_dl(_is_dl),
@@ -447,8 +290,11 @@ Event::Event(
     ntopCandidate(_ntopCandidate),
     topCandidate_mass(_topCandidate_mass),
     topCandidate_fRec(_topCandidate_fRec),
-    topCandidate_n_subjettiness(_topCandidate_n_subjettiness)
-
+    topCandidate_n_subjettiness(_topCandidate_n_subjettiness),
+    nhiggsCandidate(_nhiggsCandidate),
+    higgsCandidate_mass(_higgsCandidate_mass),
+    higgsCandidate_bbtag(_higgsCandidate_bbtag),
+    higgsCandidate_n_subjettiness(_higgsCandidate_n_subjettiness)
 {
     
 }
@@ -568,10 +414,16 @@ const Event EventFactory::makeNominal(const TreeData& data, const Configuration&
         data.btag_LR_4b_2b,
         data.n_excluded_bjets,
         data.n_excluded_ljets,
+        
         data.ntopCandidate,
-        data.topCandidate_mass[0],	
-	data.topCandidate_fRec[0],
-	data.topCandidate_n_subjettiness[0]
+        data.topCandidate_mass[0],
+        data.topCandidate_fRec[0],
+        data.topCandidate_n_subjettiness[0],
+        
+        data.nhiggsCandidate,
+        data.higgsCandidate_mass[0],
+        data.higgsCandidate_bbtag[0],
+        data.higgsCandidate_n_subjettiness[0]
     );
     return ev;
 }
@@ -595,7 +447,7 @@ const Event EventFactory::makeJESUp(const TreeData& data, const Configuration& c
         mem_p(data.mem_tth_JESUp_p[5], data.mem_ttbb_JESUp_p[5]), //SL 222
         mem_p(data.mem_tth_JESUp_p[9], data.mem_ttbb_JESUp_p[9], 0.05), //SL 222 sj
         mem_p(data.mem_tth_JESUp_p[1], data.mem_ttbb_JESUp_p[1]), //DL 022,
-	data.tth_mva, 
+        data.tth_mva, 
         data.bTagWeight,
         0,
         0,
@@ -609,9 +461,15 @@ const Event EventFactory::makeJESUp(const TreeData& data, const Configuration& c
         data.n_excluded_bjets,
         data.n_excluded_ljets,
         data.ntopCandidate,
+        
         data.topCandidate_mass[0],
-	data.topCandidate_fRec[0],
-	data.topCandidate_n_subjettiness[0]
+        data.topCandidate_fRec[0],
+        data.topCandidate_n_subjettiness[0],
+
+        data.nhiggsCandidate,
+        data.higgsCandidate_mass[0],
+        data.higgsCandidate_bbtag[0],
+        data.higgsCandidate_n_subjettiness[0]
     );
 }
 
@@ -634,7 +492,7 @@ const Event EventFactory::makeJESDown(const TreeData& data, const Configuration&
         mem_p(data.mem_tth_JESDown_p[5], data.mem_ttbb_JESDown_p[5]), //SL 222
         mem_p(data.mem_tth_JESDown_p[9], data.mem_ttbb_JESDown_p[9], 0.05), //SL 222 sj
         mem_p(data.mem_tth_JESDown_p[1], data.mem_ttbb_JESDown_p[1]), //DL 022,
-	data.tth_mva,
+        data.tth_mva,
         data.bTagWeight,
         0,
         0,
@@ -648,9 +506,15 @@ const Event EventFactory::makeJESDown(const TreeData& data, const Configuration&
         data.n_excluded_bjets,
         data.n_excluded_ljets,
         data.ntopCandidate,
-	data.topCandidate_mass[0],
-	data.topCandidate_fRec[0],
-	data.topCandidate_n_subjettiness[0]
+
+        data.topCandidate_mass[0],
+        data.topCandidate_fRec[0],
+        data.topCandidate_n_subjettiness[0],
+
+        data.nhiggsCandidate,
+        data.higgsCandidate_mass[0],
+        data.higgsCandidate_bbtag[0],
+        data.higgsCandidate_n_subjettiness[0]
     );
 }
 
@@ -724,51 +588,6 @@ void CategoryProcessor::fillHistograms(
     > key,
     double weight
     ) const {
-
-    const auto jet0_pt_key = make_tuple(
-        get<0>(key),
-        get<1>(key),
-        HistogramKey::jet0_pt
-    );
-    if (!results.count(jet0_pt_key)) {
-        results[jet0_pt_key] = new TH1D("jet0_pt", "Leading jet pt", 100, 0, 600);
-    }
-    const auto jet0_eta_key = make_tuple(
-        get<0>(key),
-        get<1>(key),
-        HistogramKey::jet0_eta
-    );
-    if (!results.count(jet0_eta_key)) {
-        results[jet0_eta_key] = new TH1D("jet0_pt", "Leading jet eta", 100, -3, 3);
-    }
-
-    const auto jet1_pt_key = make_tuple(
-        get<0>(key),
-        get<1>(key),
-        HistogramKey::jet1_pt
-    );
-    if (!results.count(jet0_pt_key)) {
-        results[jet0_pt_key] = new TH1D("jet1_pt", "Subleading jet pt", 100, 0, 600);
-    }
-    const auto jet1_eta_key = make_tuple(
-        get<0>(key),
-        get<1>(key),
-        HistogramKey::jet1_eta
-    );
-    if (!results.count(jet0_eta_key)) {
-        results[jet0_eta_key] = new TH1D("jet1_eta", "Subleading jet eta", 100, -3, 3);
-    }
-
-    if (event.jets.size()>0) {
-        static_cast<TH1D*>(results[jet0_pt_key])->Fill(event.jets.at(0).p4.Pt(), weight);
-        static_cast<TH1D*>(results[jet0_eta_key])->Fill(event.jets.at(0).p4.Eta(), weight);
-        if (event.jets.size()>1) {
-            static_cast<TH1D*>(results[jet1_pt_key])->Fill(event.jets.at(1).p4.Pt(), weight);
-            static_cast<TH1D*>(results[jet1_eta_key])->Fill(event.jets.at(1).p4.Eta(), weight);
-        } 
-    }
-    //cout << "    fill "  << to_string(jet0_pt_key) << endl;
-
 }
 
 void CategoryProcessor::process(
@@ -780,12 +599,6 @@ void CategoryProcessor::process(
     ) const {
     const bool passes = (*this)(event);
     if (passes) {
-
-        // cout << "  processing ";
-        // for (auto& k : this->keys) {
-        //     cout << CategoryKey::to_string(k) << " ";
-        // }
-        // cout << endl;
 
         vector<CategoryKey::CategoryKey> _catKeys(catKeys);
         for (auto& k : this->keys) {
@@ -979,4 +792,14 @@ Configuration parseJsonConf(const string& infile) {
     }
     
     return Configuration::makeConfiguration(value);
+}
+
+namespace BaseCuts {
+    bool sl(const Event& ev) {
+        return ev.is_sl && ev.passPV && ev.pass_trig_sl && ev.numJets>=4;
+    }
+
+    bool dl(const Event& ev) {
+        return ev.is_dl && ev.passPV && ev.pass_trig_dl;
+    }
 }

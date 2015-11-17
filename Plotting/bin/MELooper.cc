@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "TTH/Plotting/interface/Event.h"
+#include "TTH/Plotting/interface/categories.h"
 
 using namespace std;
 
@@ -37,16 +38,6 @@ TChain* loadFiles(const Configuration& conf) {
     return tree;
 }
 
-namespace BaseCuts {
-    bool sl(const Event& ev) {
-        return ev.is_sl && ev.passPV && ev.pass_trig_sl && ev.numJets>=4;
-    }
-
-    bool dl(const Event& ev) {
-        return ev.is_dl && ev.passPV && ev.pass_trig_dl;
-    }
-}
-
 const vector<CategoryKey::CategoryKey> emptykey;
 
 int main(int argc, const char** argv) {
@@ -71,36 +62,7 @@ int main(int argc, const char** argv) {
     // output directory of the histogram.
 
     // Note: this vector is made const, so that it is fully known and will not change at runtime.
-    const vector<const CategoryProcessor*> categorymap = {
-        new SparseCategoryProcessor(
-            [](const Event& ev){
-                return BaseCuts::sl(ev) && ev.btag_LR_4b_2b > 0.95;
-            },
-            {CategoryKey::sl},
-            conf
-        ),
-        new MEMCategoryProcessor(
-            [](const Event& ev){
-                return BaseCuts::sl(ev) && ev.numJets>=6 && ev.nBCSVM>=4;
-            },
-            {CategoryKey::sl, CategoryKey::jge6_tge4},
-            conf
-        ),
-        new MEMCategoryProcessor(
-            [](const Event& ev){
-                return BaseCuts::sl(ev) && ev.btag_LR_4b_2b > 0.95 && ev.numJets>=6 && ev.nBCSVM>=4;
-            },
-            {CategoryKey::sl, CategoryKey::jge6_tge4, CategoryKey::blrH},
-            conf
-        ),
-        new SparseCategoryProcessor(
-            [](const Event& ev){
-                return BaseCuts::dl(ev);
-            },
-            {CategoryKey::dl},
-            conf
-        )
-    };
+    const vector<const CategoryProcessor*> categorymap = makeCategories(conf);
 
     cout << "Attaching branches..." << endl;
     TreeData data;
