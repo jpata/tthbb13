@@ -153,7 +153,7 @@ class ajidxaddJetsdR08:
         self.ajidxaddJetsdR08 = ajidxaddJetsdR08 #additional jet indices with Higgs formed adding cen jets if dR<0.8 from hJetsCSV
 class FatjetAK08pruned:
     """
-    AK, R=0.8, pT > 200 GeV, pruned zcut=0.1, rcut=0.5, n=2
+    AK, R=0.8, pT > 200 GeV, pruned zcut=0.1, rcut=0.5, n=2, uncalibrated
     """
     @staticmethod
     def make_array(tree):
@@ -309,29 +309,23 @@ class GenBQuarkFromH:
         self.mass = mass #
         self.charge = charge #
         self.status = status #
-class GenStatus2bHad:
+class FatjetAK08prunedCal:
     """
-    Generated Status 2 b Hadrons
+    AK, R=0.8, pT > 200 GeV, pruned zcut=0.1, rcut=0.5, n=2, calibrated
     """
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nGenStatus2bHad", 0)
-        _pdgId = getattr(tree, "GenStatus2bHad_pdgId", [None]*n)
-        _pt = getattr(tree, "GenStatus2bHad_pt", [None]*n)
-        _eta = getattr(tree, "GenStatus2bHad_eta", [None]*n)
-        _phi = getattr(tree, "GenStatus2bHad_phi", [None]*n)
-        _mass = getattr(tree, "GenStatus2bHad_mass", [None]*n)
-        _charge = getattr(tree, "GenStatus2bHad_charge", [None]*n)
-        _status = getattr(tree, "GenStatus2bHad_status", [None]*n)
-        return [GenStatus2bHad(_pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _charge[n], _status[n]) for n in range(n)]
-    def __init__(self, pdgId,pt,eta,phi,mass,charge,status):
-        self.pdgId = pdgId #
+        n = getattr(tree, "nFatjetAK08prunedCal", 0)
+        _pt = getattr(tree, "FatjetAK08prunedCal_pt", [None]*n)
+        _eta = getattr(tree, "FatjetAK08prunedCal_eta", [None]*n)
+        _phi = getattr(tree, "FatjetAK08prunedCal_phi", [None]*n)
+        _mass = getattr(tree, "FatjetAK08prunedCal_mass", [None]*n)
+        return [FatjetAK08prunedCal(_pt[n], _eta[n], _phi[n], _mass[n]) for n in range(n)]
+    def __init__(self, pt,eta,phi,mass):
         self.pt = pt #
         self.eta = eta #
         self.phi = phi #
         self.mass = mass #
-        self.charge = charge #
-        self.status = status #
 class hJCidx:
     """
     Higgs jet indices CSV
@@ -529,7 +523,7 @@ class aLeptons:
         self.eleMissingHits = eleMissingHits #Missing hits for electrons
         self.eleChi2 = eleChi2 #Track chi squared for electrons' gsf tracks
         self.mvaIdTrig = mvaIdTrig #EGamma POG MVA ID for triggering electrons; 1 for muons
-        self.mvaIdTrigMediumResult = mvaIdTrigMediumResult #True if passes EGamma POG MVA ID for triggering electrons; True for muons
+        self.mvaIdTrigMediumResult = mvaIdTrigMediumResult #True if passes EGamma POG MVA ID for triggering electrons
         self.nStations = nStations #Number of matched muons stations (4 for electrons)
         self.trkKink = trkKink #Tracker kink-finder
         self.caloCompatibility = caloCompatibility #Calorimetric compatibility
@@ -579,7 +573,7 @@ class GenNuFromTop:
         self.status = status #
 class FatjetAK08ungroomed:
     """
-    AK, R=0.8, pT > 200 GeV, no grooming
+    AK, R=0.8, pT > 200 GeV, no grooming, calibrated
     """
     @staticmethod
     def make_array(tree):
@@ -740,7 +734,7 @@ class selLeptons:
         self.eleMissingHits = eleMissingHits #Missing hits for electrons
         self.eleChi2 = eleChi2 #Track chi squared for electrons' gsf tracks
         self.mvaIdTrig = mvaIdTrig #EGamma POG MVA ID for triggering electrons; 1 for muons
-        self.mvaIdTrigMediumResult = mvaIdTrigMediumResult #True if passes EGamma POG MVA ID for triggering electrons; True for muons
+        self.mvaIdTrigMediumResult = mvaIdTrigMediumResult #True if passes EGamma POG MVA ID for triggering electrons
         self.nStations = nStations #Number of matched muons stations (4 for electrons)
         self.trkKink = trkKink #Tracker kink-finder
         self.caloCompatibility = caloCompatibility #Calorimetric compatibility
@@ -914,12 +908,12 @@ class DiscardedJet:
         self.mcPt = mcPt #p_{T} of associated gen jet
         self.mcFlavour = mcFlavour #parton flavour (physics definition, i.e. including b's from shower)
         self.mcMatchId = mcMatchId #Match to source from hard scatter (pdgId of heaviest particle in chain, 25 for H, 6 for t, 23/24 for W/Z), zero if non-prompt or fake
-        self.corr_JECUp = corr_JECUp #pt correction from JEC up
-        self.corr_JECDown = corr_JECDown #pt correction from JEC down
-        self.corr = corr #pt correction from JEC
-        self.corr_JERUp = corr_JERUp #pt correction from JER up
-        self.corr_JERDown = corr_JERDown #pt correction from JER down 
-        self.corr_JER = corr_JER #pt correction from JER
+        self.corr_JECUp = corr_JECUp #
+        self.corr_JECDown = corr_JECDown #
+        self.corr = corr #
+        self.corr_JERUp = corr_JERUp #
+        self.corr_JERDown = corr_JERDown #
+        self.corr_JER = corr_JER #
         self.pt = pt #
         self.eta = eta #
         self.phi = phi #
@@ -1108,6 +1102,29 @@ class SubjetAK08softdrop:
         self.phi = phi #
         self.mass = mass #
         self.btag = btag #CVS IVF V2 btag-score
+class GenStatus2bHad:
+    """
+    Generated Status 2 b Hadrons
+    """
+    @staticmethod
+    def make_array(tree):
+        n = getattr(tree, "nGenStatus2bHad", 0)
+        _pdgId = getattr(tree, "GenStatus2bHad_pdgId", [None]*n)
+        _pt = getattr(tree, "GenStatus2bHad_pt", [None]*n)
+        _eta = getattr(tree, "GenStatus2bHad_eta", [None]*n)
+        _phi = getattr(tree, "GenStatus2bHad_phi", [None]*n)
+        _mass = getattr(tree, "GenStatus2bHad_mass", [None]*n)
+        _charge = getattr(tree, "GenStatus2bHad_charge", [None]*n)
+        _status = getattr(tree, "GenStatus2bHad_status", [None]*n)
+        return [GenStatus2bHad(_pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _charge[n], _status[n]) for n in range(n)]
+    def __init__(self, pdgId,pt,eta,phi,mass,charge,status):
+        self.pdgId = pdgId #
+        self.pt = pt #
+        self.eta = eta #
+        self.phi = phi #
+        self.mass = mass #
+        self.charge = charge #
+        self.status = status #
 class GenHadTaus:
     """
     Generator level hadronic tau decays
@@ -1144,48 +1161,68 @@ class httCandidates:
         _eta = getattr(tree, "httCandidates_eta", [None]*n)
         _phi = getattr(tree, "httCandidates_phi", [None]*n)
         _mass = getattr(tree, "httCandidates_mass", [None]*n)
+        _ptcal = getattr(tree, "httCandidates_ptcal", [None]*n)
+        _etacal = getattr(tree, "httCandidates_etacal", [None]*n)
+        _phical = getattr(tree, "httCandidates_phical", [None]*n)
+        _masscal = getattr(tree, "httCandidates_masscal", [None]*n)
         _fRec = getattr(tree, "httCandidates_fRec", [None]*n)
         _Ropt = getattr(tree, "httCandidates_Ropt", [None]*n)
         _RoptCalc = getattr(tree, "httCandidates_RoptCalc", [None]*n)
         _ptForRoptCalc = getattr(tree, "httCandidates_ptForRoptCalc", [None]*n)
+        _sjW1ptcal = getattr(tree, "httCandidates_sjW1ptcal", [None]*n)
         _sjW1pt = getattr(tree, "httCandidates_sjW1pt", [None]*n)
         _sjW1eta = getattr(tree, "httCandidates_sjW1eta", [None]*n)
         _sjW1phi = getattr(tree, "httCandidates_sjW1phi", [None]*n)
+        _sjW1masscal = getattr(tree, "httCandidates_sjW1masscal", [None]*n)
         _sjW1mass = getattr(tree, "httCandidates_sjW1mass", [None]*n)
         _sjW1btag = getattr(tree, "httCandidates_sjW1btag", [None]*n)
+        _sjW2ptcal = getattr(tree, "httCandidates_sjW2ptcal", [None]*n)
         _sjW2pt = getattr(tree, "httCandidates_sjW2pt", [None]*n)
         _sjW2eta = getattr(tree, "httCandidates_sjW2eta", [None]*n)
         _sjW2phi = getattr(tree, "httCandidates_sjW2phi", [None]*n)
+        _sjW2masscal = getattr(tree, "httCandidates_sjW2masscal", [None]*n)
         _sjW2mass = getattr(tree, "httCandidates_sjW2mass", [None]*n)
         _sjW2btag = getattr(tree, "httCandidates_sjW2btag", [None]*n)
+        _sjNonWptcal = getattr(tree, "httCandidates_sjNonWptcal", [None]*n)
         _sjNonWpt = getattr(tree, "httCandidates_sjNonWpt", [None]*n)
         _sjNonWeta = getattr(tree, "httCandidates_sjNonWeta", [None]*n)
         _sjNonWphi = getattr(tree, "httCandidates_sjNonWphi", [None]*n)
+        _sjNonWmasscal = getattr(tree, "httCandidates_sjNonWmasscal", [None]*n)
         _sjNonWmass = getattr(tree, "httCandidates_sjNonWmass", [None]*n)
         _sjNonWbtag = getattr(tree, "httCandidates_sjNonWbtag", [None]*n)
-        return [httCandidates(_pt[n], _eta[n], _phi[n], _mass[n], _fRec[n], _Ropt[n], _RoptCalc[n], _ptForRoptCalc[n], _sjW1pt[n], _sjW1eta[n], _sjW1phi[n], _sjW1mass[n], _sjW1btag[n], _sjW2pt[n], _sjW2eta[n], _sjW2phi[n], _sjW2mass[n], _sjW2btag[n], _sjNonWpt[n], _sjNonWeta[n], _sjNonWphi[n], _sjNonWmass[n], _sjNonWbtag[n]) for n in range(n)]
-    def __init__(self, pt,eta,phi,mass,fRec,Ropt,RoptCalc,ptForRoptCalc,sjW1pt,sjW1eta,sjW1phi,sjW1mass,sjW1btag,sjW2pt,sjW2eta,sjW2phi,sjW2mass,sjW2btag,sjNonWpt,sjNonWeta,sjNonWphi,sjNonWmass,sjNonWbtag):
+        return [httCandidates(_pt[n], _eta[n], _phi[n], _mass[n], _ptcal[n], _etacal[n], _phical[n], _masscal[n], _fRec[n], _Ropt[n], _RoptCalc[n], _ptForRoptCalc[n], _sjW1ptcal[n], _sjW1pt[n], _sjW1eta[n], _sjW1phi[n], _sjW1masscal[n], _sjW1mass[n], _sjW1btag[n], _sjW2ptcal[n], _sjW2pt[n], _sjW2eta[n], _sjW2phi[n], _sjW2masscal[n], _sjW2mass[n], _sjW2btag[n], _sjNonWptcal[n], _sjNonWpt[n], _sjNonWeta[n], _sjNonWphi[n], _sjNonWmasscal[n], _sjNonWmass[n], _sjNonWbtag[n]) for n in range(n)]
+    def __init__(self, pt,eta,phi,mass,ptcal,etacal,phical,masscal,fRec,Ropt,RoptCalc,ptForRoptCalc,sjW1ptcal,sjW1pt,sjW1eta,sjW1phi,sjW1masscal,sjW1mass,sjW1btag,sjW2ptcal,sjW2pt,sjW2eta,sjW2phi,sjW2masscal,sjW2mass,sjW2btag,sjNonWptcal,sjNonWpt,sjNonWeta,sjNonWphi,sjNonWmasscal,sjNonWmass,sjNonWbtag):
         self.pt = pt #
         self.eta = eta #
         self.phi = phi #
         self.mass = mass #
+        self.ptcal = ptcal #pT (calibrated)
+        self.etacal = etacal #eta (calibrated)
+        self.phical = phical #phi (calibrated)
+        self.masscal = masscal #mass (calibrated)
         self.fRec = fRec #relative W width
         self.Ropt = Ropt #optimal value of R
         self.RoptCalc = RoptCalc #expected value of optimal R
         self.ptForRoptCalc = ptForRoptCalc #pT used for calculation of RoptCalc
+        self.sjW1ptcal = sjW1ptcal #Leading W Subjet pT (calibrated)
         self.sjW1pt = sjW1pt #Leading W Subjet pT
         self.sjW1eta = sjW1eta #Leading W Subjet eta
         self.sjW1phi = sjW1phi #Leading W Subjet phi
+        self.sjW1masscal = sjW1masscal #Leading W Subjet mass (calibrated)
         self.sjW1mass = sjW1mass #Leading W Subjet mass
         self.sjW1btag = sjW1btag #Leading W Subjet btag
+        self.sjW2ptcal = sjW2ptcal #Second Subjet pT (calibrated)
         self.sjW2pt = sjW2pt #Second Subjet pT
         self.sjW2eta = sjW2eta #Second Subjet eta
         self.sjW2phi = sjW2phi #Second Subjet phi
+        self.sjW2masscal = sjW2masscal #Second Subjet mass (calibrated)
         self.sjW2mass = sjW2mass #Second Subjet mass
         self.sjW2btag = sjW2btag #Second Subjet btag
+        self.sjNonWptcal = sjNonWptcal #Non-W Subjet pT (calibrated)
         self.sjNonWpt = sjNonWpt #Non-W Subjet pT
         self.sjNonWeta = sjNonWeta #Non-W Subjet eta
         self.sjNonWphi = sjNonWphi #Non-W Subjet phi
+        self.sjNonWmasscal = sjNonWmasscal #Non-W Subjet mass (calibrated)
         self.sjNonWmass = sjNonWmass #Non-W Subjet mass
         self.sjNonWbtag = sjNonWbtag #Non-W Subjet btag
 class Jet:
@@ -1286,12 +1323,12 @@ class Jet:
         self.mcPt = mcPt #p_{T} of associated gen jet
         self.mcFlavour = mcFlavour #parton flavour (physics definition, i.e. including b's from shower)
         self.mcMatchId = mcMatchId #Match to source from hard scatter (pdgId of heaviest particle in chain, 25 for H, 6 for t, 23/24 for W/Z), zero if non-prompt or fake
-        self.corr_JECUp = corr_JECUp #pt correction from JEC up
-        self.corr_JECDown = corr_JECDown #pt correction from JEC down
-        self.corr = corr #pt correction from JEC
-        self.corr_JERUp = corr_JERUp #pt correction from JER up
-        self.corr_JERDown = corr_JERDown #pt correction from JER down 
-        self.corr_JER = corr_JER #pt correction from JER
+        self.corr_JECUp = corr_JECUp #
+        self.corr_JECDown = corr_JECDown #
+        self.corr = corr #
+        self.corr_JERUp = corr_JERUp #
+        self.corr_JERDown = corr_JERDown #
+        self.corr_JER = corr_JER #
         self.pt = pt #
         self.eta = eta #
         self.phi = phi #
@@ -1486,7 +1523,7 @@ class vLeptons:
         self.eleMissingHits = eleMissingHits #Missing hits for electrons
         self.eleChi2 = eleChi2 #Track chi squared for electrons' gsf tracks
         self.mvaIdTrig = mvaIdTrig #EGamma POG MVA ID for triggering electrons; 1 for muons
-        self.mvaIdTrigMediumResult = mvaIdTrigMediumResult #True if passes EGamma POG MVA ID for triggering electrons; True for muons
+        self.mvaIdTrigMediumResult = mvaIdTrigMediumResult #True if passes EGamma POG MVA ID for triggering electrons
         self.nStations = nStations #Number of matched muons stations (4 for electrons)
         self.trkKink = trkKink #Tracker kink-finder
         self.caloCompatibility = caloCompatibility #Calorimetric compatibility
@@ -1986,7 +2023,7 @@ class EventAnalyzer(Analyzer):
         event.FatjetCA15ungroomed = FatjetCA15ungroomed.make_array(event.input)
         event.dRaddJetsdR08 = dRaddJetsdR08.make_array(event.input)
         event.GenBQuarkFromH = GenBQuarkFromH.make_array(event.input)
-        event.GenStatus2bHad = GenStatus2bHad.make_array(event.input)
+        event.FatjetAK08prunedCal = FatjetAK08prunedCal.make_array(event.input)
         event.hJCidx = hJCidx.make_array(event.input)
         event.GenTop = GenTop.make_array(event.input)
         event.aJidx = aJidx.make_array(event.input)
@@ -2005,6 +2042,7 @@ class EventAnalyzer(Analyzer):
         event.hJidx = hJidx.make_array(event.input)
         event.GenLep = GenLep.make_array(event.input)
         event.SubjetAK08softdrop = SubjetAK08softdrop.make_array(event.input)
+        event.GenStatus2bHad = GenStatus2bHad.make_array(event.input)
         event.GenHadTaus = GenHadTaus.make_array(event.input)
         event.httCandidates = httCandidates.make_array(event.input)
         event.Jet = Jet.make_array(event.input)
