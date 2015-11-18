@@ -142,12 +142,14 @@ namespace {0} {{
     return r
 
 
-def makeCategoryProcessorHeader(name):
+def makeCategoryProcessorHeader(name, parentname):
     """
-    Create a new category processor class
+    Create a new category processor class.
+    name - name of the class
+    parentname - name of the parent class
     """
     r = """
-class {0} : public CategoryProcessor {{
+class {0} : public {1} {{
 public:
     {0}(
         std::function<int(const Event& ev)> _cutFunc,
@@ -155,7 +157,7 @@ public:
         const Configuration& _conf,
         const vector<const CategoryProcessor*>& _subCategories={{}}
     ) :
-      CategoryProcessor(_cutFunc, _keys, _conf, _subCategories) {{}};
+      {1}(_cutFunc, _keys, _conf, _subCategories) {{}};
      
     virtual void fillHistograms(
         const Event& event,
@@ -168,11 +170,11 @@ public:
     ) const;
 }};
 """.format(
-    name
+    name, parentname
 )
     return r
 
-def makeCategoryProcessorImpl(name, histograms):
+def makeCategoryProcessorImpl(name, parentname, histograms):
     """
     Create the fill function for the category processor based on the histograms
     """
@@ -186,10 +188,13 @@ void {0}::fillHistograms(
     > key,
     double weight
     ) const {{
-{1}
+    //fill base histograms
+    {1}::fillHistograms(event, results, key, weight);
+{2}
 }}
 """.format(
     name,
+    parentname,
     "\n".join([makeHistogram(h).replace("\n", "\n        ") for h in histograms])
 )
     return r
@@ -224,12 +229,16 @@ processes = [
     "ttw_wqq",
     "ttz_zqq",
     "ttz_zllnunu",
+    "SingleMuon",
+    "SingleElectron",
     "UNKNOWN"
 ]
 
 #List of all individual category "bits"
 categories = [
     "sl",
+    "sl_mu",
+    "sl_el",
     "dl",
 
     "j3_t2",
@@ -239,6 +248,7 @@ categories = [
 
     "j4_t3",
     "j4_t4",
+    "j5_t2",
     "j5_t3",
     "j5_tge4",
     "jge6_t2",
@@ -249,11 +259,16 @@ categories = [
     "blrH",
 
     "boostedHiggs",
+    "boostedHiggsGenMatch",
+    "boostedHiggsGenNoMatch",
+    "boostedTop",
 ]
 
 #Map categories to their respective C++ cuts. The Event is available as "ev"
 cuts = {
     "sl": "BaseCuts::sl(ev)",
+    "sl_mu": "BaseCuts::sl_mu(ev)",
+    "sl_el": "BaseCuts::sl_el(ev)",
     "dl": "BaseCuts::dl(ev)",
     "jge6_tge4": "ev.numJets>=6 && ev.nBCSVM>=4",
     "jge6_t3": "ev.numJets>=6 && ev.nBCSVM==3",
@@ -261,32 +276,77 @@ cuts = {
     "jge6_t3": "ev.numJets>=6 && ev.nBCSVM==3",
     "j5_tge4": "ev.numJets==5 && ev.nBCSVM>=4",
     "j5_t3": "ev.numJets==5 && ev.nBCSVM==3",
+    "j5_t2": "ev.numJets==5 && ev.nBCSVM==2",
     "blrH": "ev.btag_LR_4b_2b > 0.95",
     "boostedHiggs": "ev.nhiggsCandidate >= 1",
+    "boostedHiggsGenMatch": "(ev.nhiggsCandidate >= 1) && (ev.higgsCandidate_dr_genHiggs < 0.5)",
+    "boostedHiggsGenNoMatch": "(ev.nhiggsCandidate >= 1) && (ev.higgsCandidate_dr_genHiggs > 0.5)",
+    "boostedTop": "ev.ntopCandidate >= 1",
 }
 
 #Nested list of (name, type, subcategory) triplets, corresponding to the
 #category tree to create
 categories_tree = [
-    ("sl", "ControlCategoryProcessor", [
+    ("sl_mu", "ControlCategoryProcessor", [
         ("jge6_tge4", "ControlCategoryProcessor", []),
         ("jge6_t3", "ControlCategoryProcessor", [
-            ("boostedHiggs", "BoostedCategoryProcessor", [])
+            ("boostedHiggs", "BoostedCategoryProcessor", []),
+            ("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
+            ("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
         ]),
         ("jge6_t2", "ControlCategoryProcessor", [
-            ("boostedHiggs", "BoostedCategoryProcessor", [])
+            ("boostedHiggs", "BoostedCategoryProcessor", []),
+            ("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
+            ("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
         ]),
         ("j5_tge4", "ControlCategoryProcessor", [
-            ("boostedHiggs", "BoostedCategoryProcessor", [])
+            ("boostedHiggs", "BoostedCategoryProcessor", []),
+            ("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
+            ("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
         ]),
         ("j5_t3", "ControlCategoryProcessor", [
-            ("boostedHiggs", "BoostedCategoryProcessor", [])
+            ("boostedHiggs", "BoostedCategoryProcessor", []),
+            ("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
+            ("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
+        ]),
+        ("j5_t2", "ControlCategoryProcessor", [
+            ("boostedHiggs", "BoostedCategoryProcessor", []),
+            ("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
+            ("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
         ]),
     ]),
-    ("sl", "SparseCategoryProcessor", [
+    ("sl_el", "ControlCategoryProcessor", [
+        ("jge6_tge4", "ControlCategoryProcessor", []),
+        ("jge6_t3", "ControlCategoryProcessor", [
+            ("boostedHiggs", "BoostedCategoryProcessor", []),
+            ("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
+            ("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
+        ]),
+        ("jge6_t2", "ControlCategoryProcessor", [
+            ("boostedHiggs", "BoostedCategoryProcessor", []),
+            ("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
+            ("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
+        ]),
+        ("j5_tge4", "ControlCategoryProcessor", [
+            ("boostedHiggs", "BoostedCategoryProcessor", []),
+            ("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
+            ("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
+        ]),
+        ("j5_t3", "ControlCategoryProcessor", [
+            ("boostedHiggs", "BoostedCategoryProcessor", []),
+            ("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
+            ("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
+        ]),
+        ("j5_t2", "ControlCategoryProcessor", [
+            ("boostedHiggs", "BoostedCategoryProcessor", []),
+            ("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
+            ("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
+        ]),
     ]),
-    ("dl", "SparseCategoryProcessor", [
-    ])
+    #("sl", "SparseCategoryProcessor", [
+    #]),
+    #("dl", "SparseCategoryProcessor", [
+    #])
 ]
 
 #Kinematic control histograms
@@ -296,12 +356,19 @@ histograms_control = [
     ("jet1_pt", 100, 0, 600, "event.jets.at(1).p4.Pt()", "event.jets.size()>1", "Subleading jet pt"),
     ("jet0_eta", 100, -3, 3, "event.jets.at(0).p4.Eta()", "event.jets.size()>0", "Leading jet eta"),
     ("jet1_eta", 100, -3, 3, "event.jets.at(1).p4.Eta()", "event.jets.size()>1", "Subleading jet eta"),
+    ("jet0_btagCSV", 100, 0, 1, "event.jets.at(0).btagCSV", "event.jets.size()>0", "Leading jet CSV"),
+    ("jet1_btagCSV", 100, 0, 1, "event.jets.at(1).btagCSV", "event.jets.size()>1", "Subleading jet CSV"),
+    ("nhiggsCandidate", 4, 0, 4, "event.nhiggsCandidate", "event.nhiggsCandidate>=0", "Number of higgs candidates"),
 ]
 
 #Kinematic control histograms
 #name, nbins, low, high, fillFunction, cutFunction, title
 histograms_boosted = [
-    ("higgsCandidate_pt", 100, 200, 600, "event.jets.at(0).p4.Pt()", "event.jets.size()>0", "Leading jet pt"),
+    ("higgsCandidate_pt", 100, 200, 600, "event.higgsCandidate_pt", "event.nhiggsCandidate>0", "Leading higgs candidate pt"),
+    ("higgsCandidate_eta", 100, -3, 3, "event.higgsCandidate_eta", "event.nhiggsCandidate>0", "Leading higgs candidate eta"),
+    ("higgsCandidate_bbtag", 100, -1, 1, "event.higgsCandidate_bbtag", "event.nhiggsCandidate>0", "Leading higgs candidate bbtag"),
+    ("topCandidate_pt", 100, 200, 600, "event.topCandidate_pt", "event.nhiggsCandidate>0", "Leading top candidate pt"),
+    ("topCandidate_eta", 100, -3, 3, "event.topCandidate_eta", "event.nhiggsCandidate>0", "Leading top candidate eta"),
 ]
 
 #MEM histograms
@@ -319,8 +386,8 @@ additional_histograms = [
 
 #Pairs of all new category processors along with the histograms to plot there
 category_processors = [
-    ("ControlCategoryProcessor", histograms_control),
-    ("BoostedCategoryProcessor", histograms_boosted)
+    ("ControlCategoryProcessor", "CategoryProcessor", histograms_control),
+    ("BoostedCategoryProcessor", "ControlCategoryProcessor", histograms_boosted)
 ]
 
 #List of all histograms to create (for enum HistogramKey)
@@ -385,8 +452,8 @@ if __name__ == "__main__":
         of_c.write(makeEnumImpl(enumname, procs) + "\n")
 
     #create all CategoryProcessors
-    for name, hists in category_processors:
-        categories_h.write(makeCategoryProcessorHeader(name))
+    for name, parentname, hists in category_processors:
+        categories_h.write(makeCategoryProcessorHeader(name, parentname))
 
     categories_h.write("const vector<const CategoryProcessor*> makeCategories(const Configuration& conf);\n")
 
@@ -398,8 +465,8 @@ if __name__ == "__main__":
         "\n} // makeCategories"
     )
     #create all CategoryProcessors
-    for name, hists in category_processors:
-        categories_c.write(makeCategoryProcessorImpl(name, hists))
+    for name, parentname, hists in category_processors:
+        categories_c.write(makeCategoryProcessorImpl(name, parentname, hists))
 
     #Done
     categories_h.close()
