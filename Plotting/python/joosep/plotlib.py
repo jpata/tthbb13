@@ -106,6 +106,7 @@ varnames = {
     "topCandidate_n_subjettiness": "top candidate n-subjettiness$",
 
     "higgsCandidate_pt": "H candidate $p_T$ [GeV]",
+    "higgsCandidate_eta": "H candidate $\eta$",
     "higgsCandidate_mass": "H candidate $M$ [GeV]",
     "higgsCandidate_mass_pruned": "H candidate pruned $M$ [GeV]",
     "higgsCandidate_mass_softdrop": "H candidate softdrop $M$ [GeV]",
@@ -430,8 +431,15 @@ def draw_data_mc(tf, hname, samples, **kwargs):
     elif dataname:
         datas = []
         for dn in dataname:
-            datas += [tf.get(dn + "/" + hname).Clone()]
-        data = sum(datas)
+            h = tf.get(dn + "/" + hname)
+            if h:
+                datas += [tf.get(dn + "/" + hname).Clone()]
+        if len(datas)>0:
+            data = sum(datas)
+        else:
+            data = tot_bg.Clone()
+            data.Scale(0.0)
+        data.rebin(rebin)
         data.title = "data ({0})".format(data.Integral())
 
     if data:
@@ -447,7 +455,7 @@ def draw_data_mc(tf, hname, samples, **kwargs):
         dataline = mlines.Line2D([], [], color='black', marker='o', label=data.title)
         patches += [dataline]
         for line, h in zip(r["hists"], hs.values()):
-            print h.title, line.get_color()
+            #print h.title, line.get_color()
             patch = mpatches.Patch(color=line.get_color(), label=h.title)
             patches += [patch]
         plt.legend(handles=patches, loc=legend_loc, numpoints=1, prop={'size':legend_fontsize})
@@ -460,7 +468,7 @@ def draw_data_mc(tf, hname, samples, **kwargs):
     ticks = a1.get_xticks()
     if data:
         a1.get_xaxis().set_visible(False)
-    print ticks
+    #print ticks
     
     a1.set_ylim(bottom=0, top=1.1*a1.get_ylim()[1])
     a1.grid(zorder=100000)
@@ -705,4 +713,4 @@ def syst_comparison(tf, sn, l, **kwargs):
 
 def svfg(fn, **kwargs):
     plt.savefig(fn, pad_inches=0.5, bbox_inches='tight', **kwargs)
-    plt.clf()
+    #plt.clf()

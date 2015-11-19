@@ -92,13 +92,13 @@ cuts = [
 #    "(is_SL==1) | (is_DL==1)",
 #    "(is_SL==1)",
 #    "(is_DL==1)",
-    "(is_SL==1) & (n_jets==4) & (n_btags==3) & (mll_passed==1) & (met_passed==1)",
-    "(is_SL==1) & (n_jets==4) & (n_btags==4) & (mll_passed==1) & (met_passed==1)",
-    "(is_SL==1) & (n_jets==5) & (n_btags==3) & (mll_passed==1) & (met_passed==1)",
-    "(is_SL==1) & (n_jets==5) & (n_btags>=4) & (mll_passed==1) & (met_passed==1)",
-    "(is_SL==1) & (n_jets>=6) & (n_btags==2) & (mll_passed==1) & (met_passed==1)",
-    "(is_SL==1) & (n_jets>=6) & (n_btags==3) & (mll_passed==1) & (met_passed==1)",
-    "(is_SL==1) & (n_jets>=6) & (n_btags>=4) & (mll_passed==1) & (met_passed==1)",
+    "(is_SL==1) & (n_jets==4) & (n_btags==3)",
+    "(is_SL==1) & (n_jets==4) & (n_btags==4)",
+    "(is_SL==1) & (n_jets==5) & (n_btags==3)",
+    "(is_SL==1) & (n_jets==5) & (n_btags>=4)",
+    "(is_SL==1) & (n_jets>=6) & (n_btags==2)",
+    "(is_SL==1) & (n_jets>=6) & (n_btags==3)",
+    "(is_SL==1) & (n_jets>=6) & (n_btags>=4)",
     "(is_DL==1) & (n_jets==3) & (n_btags==2) & (mll_passed==1) & (met_passed==1)",
     "(is_DL==1) & (n_jets>=3) & (n_btags==3) & (mll_passed==1) & (met_passed==1)",
     "(is_DL==1) & (n_jets>=4) & (n_btags==2) & (mll_passed==1) & (met_passed==1)",
@@ -222,7 +222,7 @@ def compareTwo(d1, d2, d1Name, d2Name, sample):
     outfile.close()
 
 data = {}
-for x in ["eth", "desy", "kit", "ihep", "osu"]:
+for x in ["eth", "desy", "kit", "ihep", "osu", "rwth"]:
     data[x] = {}
 
 data["eth"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/eth/v13/tth.csv")
@@ -231,8 +231,8 @@ data["eth"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/e
 data["desy"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/desy/v5/tth.csv")
 data["desy"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/desy/v5/ttjets.csv")
 # 
-# data["kit"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/kit/tth.csv")
-# data["kit"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/kit/ttjets.csv")
+data["kit"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/kit/tth.csv")
+data["kit"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/kit/ttjets.csv")
 
 data["ihep"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/ihep/v3/tth.csv")
 data["ihep"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/ihep/v3/ttjets.csv")
@@ -240,19 +240,31 @@ data["ihep"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/
 # data["osu"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/osu/tth.csv")
 # data["osu"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/osu/ttjets.csv")
 
+
+data["rwth"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/rwth/tth.csv")
+data["rwth"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/rwth/ttjets.csv")
+
+
 for sample in ["sig", "bkg"]:
     for pairA, pairB in [
-    ("eth", "desy"),
-    #("eth", "kit"),
+    #("eth", "desy"),
+    ("eth", "kit"),
     #("eth", "osu"),
-    ("eth", "ihep"),
-    # ("desy", "kit"),
-    ("desy", "ihep"),
-    # ("kit", "ihep"),
+    #("eth", "ihep"),
+    ("desy", "kit"),
+    #("desy", "ihep"),
+    ("kit", "ihep"),
     # ("osu", "kit"),
     # ("osu", "desy"),
-    # ("osu", "ihep"),
+
+    #("eth", "rwth"),
+    ("rwth", "kit"),
+    #("rwth", "desy"),
+    #("rwth", "ihep"),
+
+
     ]:
+        print pairA, pairB
         d1 = data[pairA][sample]
         d2 = data[pairB][sample]
         compareTwo(d1, d2, pairA, pairB, sample)
