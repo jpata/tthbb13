@@ -177,7 +177,7 @@ class Conf:
         "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions.pickle",
         "transferFunctions_sj_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions_sj.pickle",
         "systematics": ["nominal"],
-        #"systematics": ["nominal", "JESUp", "JESDown"],
+        #"systematics": ["nominal", "JESUp", "JESDown", "JESUp", "JESDown"],
         
         
         #If the list contains:
@@ -186,12 +186,12 @@ class Conf:
         # "matching" - print out the association between gen and reco objects
         #"verbosity": ["eventboundary", "input", "matching", "gen", "reco", "meminput"],
         "verbosity": [
-            "eventboundary", #print run:lumi:event
-            "trigger", #print trigger bits
-            "input", #print input particles
+            #"eventboundary", #print run:lumi:event
+            #"trigger", #print trigger bits
+            #"input", #print input particles
             #"gen", #print out gen-level info
-            "debug", #very high-level debug info
-            "reco", #info about reconstructed final state
+            #"debug", #very high-level debug info
+            #"reco", #info about reconstructed final state
             #"meminput" #info about particles used for MEM input
         ],
 

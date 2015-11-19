@@ -47,7 +47,7 @@ def lfn_to_pfn(fn):
     return fn
 
 #These assume the files are located on the local tier
-if "kbfi" in hn or "kbfi" in vo:
+if "kbfi" in hn or "kbfi" in vo or "comp" in hn:
     pfPath = "/hdfs/cms/"
     lfPrefix = "file://"
     def lfn_to_pfn(fn):

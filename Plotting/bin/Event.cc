@@ -4,13 +4,19 @@
 using namespace std;
 
 bool pass_trig_dl(const TreeData& data) {
-    return (false);
+    return (
+        data.HLT_BIT_HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v ||
+        data.HLT_BIT_HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v ||
+        data.HLT_BIT_HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v ||
+        data.HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v ||
+        data.HLT_BIT_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v
+    );
 }
 
 bool pass_trig_sl(const TreeData& data) {
     return (
-        data.HLT_WmnHbbAll ||
-        data.HLT_WenHbbAll
+        data.HLT_BIT_HLT_Ele27_WP85_Gsf_v ||
+        data.HLT_BIT_HLT_IsoMu17_eta2p1_v
     );
 }
 
@@ -216,6 +222,7 @@ void saveResults(ResultMap& res, const string& prefix, const string& filename) {
 
 
 Event::Event(
+    const TreeData *_data,
     bool _is_sl,
     bool _is_dl,
     bool _pass_trig_sl,
@@ -250,6 +257,7 @@ Event::Event(
     double _topCandidate_pt,
     double _topCandidate_eta,
     double _topCandidate_mass,
+    double _topCandidate_masscal,
     double _topCandidate_fRec,
     double _topCandidate_n_subjettiness,
     int _nhiggsCandidate,
@@ -260,6 +268,7 @@ Event::Event(
     double _higgsCandidate_n_subjettiness,
     double _higgsCandidate_dr_genHiggs
     ) :
+    data(_data),
     is_sl(_is_sl),
     is_dl(_is_dl),
     pass_trig_sl(_pass_trig_sl),
@@ -291,10 +300,12 @@ Event::Event(
     btag_LR_4b_2b_logit(log(_btag_LR_4b_2b / (1.0 - _btag_LR_4b_2b))),
     n_excluded_bjets(_n_excluded_bjets),
     n_excluded_ljets(_n_excluded_ljets),
+
     ntopCandidate(_ntopCandidate),
     topCandidate_pt(_topCandidate_pt),
     topCandidate_eta(_topCandidate_eta),
     topCandidate_mass(_topCandidate_mass),
+    topCandidate_masscal(_topCandidate_masscal),
     topCandidate_fRec(_topCandidate_fRec),
     topCandidate_n_subjettiness(_topCandidate_n_subjettiness),
     nhiggsCandidate(_nhiggsCandidate),
@@ -349,8 +360,26 @@ const vector<Lepton> makeAllLeptons(const TreeData& data) {
     return leps;
 }
 
+bool isData(ProcessKey::ProcessKey proc) {
+    return (
+        proc == ProcessKey::SingleMuon ||
+        proc == ProcessKey::SingleElectron
+    );
+}
+
+bool isMC(ProcessKey::ProcessKey proc) {
+    return !isData(proc);
+}
+
+bool isSignalMC(ProcessKey::ProcessKey proc) {
+    return (
+        proc == ProcessKey::ttH ||
+        proc == ProcessKey::ttH_hbb
+    );
+}
+
 double nominal_weight(const Event& ev, const Configuration& conf) {
-    if (!(conf.process == ProcessKey::SingleMuon || conf.process == ProcessKey::SingleElectron)) {
+    if (isMC(conf.process)) {
         return conf.lumi * ev.weight_xs * ev.puWeight;
     }
     return 1.0;
@@ -419,6 +448,7 @@ const Event EventFactory::makeNominal(const TreeData& data, const Configuration&
     const vector<Lepton> leptons = makeAllLeptons(data);
 
     const Event ev(
+        &data,
         data.is_sl,
         data.is_dl,
         pass_trig_sl(data),
@@ -454,6 +484,7 @@ const Event EventFactory::makeNominal(const TreeData& data, const Configuration&
         data.topCandidate_pt[0],
         data.topCandidate_eta[0],
         data.topCandidate_mass[0],
+        data.topCandidate_masscal[0],
         data.topCandidate_fRec[0],
         data.topCandidate_n_subjettiness[0],
         
@@ -473,6 +504,7 @@ const Event EventFactory::makeJESUp(const TreeData& data, const Configuration& c
     const vector<Lepton> leptons = makeAllLeptons(data);
 
     return Event(
+        &data,
         data.is_sl,
         data.is_dl,
         pass_trig_sl(data),
@@ -508,6 +540,7 @@ const Event EventFactory::makeJESUp(const TreeData& data, const Configuration& c
         data.topCandidate_pt[0],
         data.topCandidate_eta[0],
         data.topCandidate_mass[0],
+        data.topCandidate_masscal[0],
         data.topCandidate_fRec[0],
         data.topCandidate_n_subjettiness[0],
 
@@ -526,6 +559,7 @@ const Event EventFactory::makeJESDown(const TreeData& data, const Configuration&
     const vector<Lepton> leptons = makeAllLeptons(data);
 
     return Event(
+        &data,
         data.is_sl,
         data.is_dl,
         pass_trig_sl(data),
@@ -561,6 +595,7 @@ const Event EventFactory::makeJESDown(const TreeData& data, const Configuration&
         data.topCandidate_pt[0],
         data.topCandidate_eta[0],
         data.topCandidate_mass[0],
+        data.topCandidate_masscal[0],
         data.topCandidate_fRec[0],
         data.topCandidate_n_subjettiness[0],
 
@@ -575,9 +610,10 @@ const Event EventFactory::makeJESDown(const TreeData& data, const Configuration&
 }
 
 
-Jet::Jet(const TLorentzVector& _p4, float _btagCSV) : 
+Jet::Jet(const TLorentzVector& _p4, float _btagCSV, float _btagBDT) :
     p4(_p4),
-    btagCSV(_btagCSV)
+    btagCSV(_btagCSV),
+    btagBDT(_btagBDT)
 {
 }
 
@@ -596,7 +632,11 @@ const Jet JetFactory::makeNominal(const TreeData& data, int njet) {
         data.jets_phi[njet],
         data.jets_mass[njet]
     );
-    return Jet(p4, data.jets_btagCSV[njet]);
+    return Jet(
+        p4,
+        data.jets_btagCSV[njet],
+        data.jets_btagBDT[njet]
+    );
 }
 
 const Jet JetFactory::makeJESUp(const TreeData& data, int njet) {
@@ -611,7 +651,11 @@ const Jet JetFactory::makeJESUp(const TreeData& data, int njet) {
     //Undo nominal correction, re-do JESUp correction
     const double corr = data.jets_corr_JESUp[njet] / data.jets_corr[njet];
     p4 *= (1.0 / corr);
-    return Jet(p4, data.jets_btagCSV[njet]);
+    return Jet(
+        p4,
+        data.jets_btagCSV[njet],
+        data.jets_btagBDT[njet]
+    );
 }
 
 
@@ -627,7 +671,11 @@ const Jet JetFactory::makeJESDown(const TreeData& data, int njet) {
     //Undo nominal correction, re-do JESDown correction
     const double corr = data.jets_corr_JESDown[njet] / data.jets_corr[njet];
     p4 *= (1.0 / corr);
-    return Jet(p4, data.jets_btagCSV[njet]);
+    return Jet(
+        p4,
+        data.jets_btagCSV[njet],
+        data.jets_btagBDT[njet]
+    );
 }
 
 
@@ -870,6 +918,27 @@ namespace BaseCuts {
     }
 
     bool dl(const Event& ev) {
-        return ev.is_dl && ev.passPV && ev.pass_trig_dl;
+        return (ev.is_dl && ev.passPV && ev.pass_trig_dl && true);
+        //    ev.leptons.at(0).pdgId * ev.leptons.at(1).pdgId < 0 && (ev.data->ll_mass[0] > 20) && (
+        //        //Z peak veto
+        //        abs(ev.leptons.at(0).pdgId) == abs(ev.leptons.at(1).pdgId) ? !(ev.data->ll_mass[0] > 76 && ev.data->ll_mass[0] < 106) : true
+        //    ) && (
+        //        abs(ev.leptons.at(0).pdgId) == abs(ev.leptons.at(1).pdgId) ? (ev.data->met_pt[0] > 40) : true
+        //    )
+        //);
+    }
+    
+    bool dl_mumu(const Event& ev) {
+        return dl(ev) && abs(ev.leptons.at(0).pdgId)==13 && abs(ev.leptons.at(1).pdgId)==13;
+    }
+
+    bool dl_ee(const Event& ev) {
+        return dl(ev) && abs(ev.leptons.at(0).pdgId)==11 && abs(ev.leptons.at(1).pdgId)==11;
+    }
+    bool dl_emu(const Event& ev) {
+        return dl(ev) && (
+            (abs(ev.leptons.at(0).pdgId)==13 && abs(ev.leptons.at(1).pdgId)==11) ||
+            (abs(ev.leptons.at(0).pdgId)==11 && abs(ev.leptons.at(1).pdgId)==13)
+        );
     }
 }

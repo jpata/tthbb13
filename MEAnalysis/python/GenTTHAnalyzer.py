@@ -60,57 +60,26 @@ class GenTTHAnalyzer(FilterAnalyzer):
             gt2 = event.GenTop[1]
             dm1 = getattr(gt1, "decayMode", -1)
             dm2 = getattr(gt2, "decayMode", -1)
-            #Require exactly 1 neutrino (from leptonic top)
-            if (len(event.nu_top) == 1 and
-                len(event.l_quarks_w) == 2 and
-                len(event.b_quarks_t) == 2) or (
-                (dm1 == 0 and dm2==1) or (dm2==0 and dm1==1)):
+            #single-leptonic
+            if ((dm1 == 0 and dm2==1) or (dm2==0 and dm1==1)):
                 
                 #First top is leptonic
                 if dm1 == 0:
                     event.genTopLep = [gt1]
                     event.genTopHad = [gt2]
                 #Second top is leptonic
-                elif dm2 == 0:
+                else:
                     event.genTopLep = [gt2]
                     event.genTopHad = [gt1]
-                else:
-                    #manually check which b quark and hadrons give a hadronic top
-                    hadronic_W = lvec(event.l_quarks_w[0]) + lvec(event.l_quarks_w[1])
-                    hadronic_top_cands = []
-                    #need to check all b quarks, make gen top candidates
-                    for ibq, bq in enumerate(event.GenBQuarkFromTop):
-                        hadronic_top_cand = hadronic_W + lvec(bq)
-                        #Calculate dR, dPt of this top candidate to all gen tops
-                        for itop, top in enumerate(event.GenTop):
-                            dr = hadronic_top_cand.DeltaR(lvec(top))
-                            dpt2 = (hadronic_top_cand.Pt() - top.pt)**2
-                            drpt = math.sqrt(dr**2 + dpt2)
-                            hadronic_top_cands += [(drpt, ibq, itop)]
-                    
-                    #Get the gen top candidate which best matches a real gen top
-                    hadronic_top_cands = sorted(hadronic_top_cands, key=lambda x: x[0])
-                    best_cand = hadronic_top_cands[0]
-
-                    dr, ibq, itop = best_cand
-                    event.genTopHad = [event.GenTop[itop]]
-                    event.genTopLep = [event.GenTop[0 if itop==1 else 1]]
                         
                 event.cat_gen = "sl"
                 event.cat_gen_n = 0
-            elif (len(event.nu_top) == 2 and
-                len(event.l_quarks_w) == 0 and
-                len(event.b_quarks_t) == 2) or (
-                (dm1 == 0 and dm2 == 0)):
+            elif (dm1 == 0 and dm2 == 0):
                 event.cat_gen = "dl"
                 event.cat_gen_n = 1
                 event.genTopLep = [gt1, gt2]
                 event.genTopHad = []
-            elif (len(event.lep_top) == 0 and
-                len(event.nu_top) == 0 and
-                len(event.l_quarks_w) == 4 and
-                len(event.b_quarks_t) == 2) or (
-                (dm1 == 1 and dm2 == 1)):
+            elif (dm1 == 1 and dm2 == 1):
                 event.cat_gen = "fh"
                 event.cat_gen_n = 2
                 event.genTopHad = [gt1, gt2]

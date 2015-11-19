@@ -240,6 +240,9 @@ categories = [
     "sl_mu",
     "sl_el",
     "dl",
+    "dl_mumu",
+    "dl_emu",
+    "dl_ee",
 
     "j3_t2",
     "jge4_t2",
@@ -270,6 +273,10 @@ cuts = {
     "sl": "BaseCuts::sl(ev)",
     "sl_mu": "BaseCuts::sl_mu(ev)",
     "sl_el": "BaseCuts::sl_el(ev)",
+    "dl_mumu": "BaseCuts::dl_mumu(ev)",
+    "dl_ee": "BaseCuts::dl_ee(ev)",
+    "dl_emu": "BaseCuts::dl_emu(ev)",
+
     "dl": "BaseCuts::dl(ev)",
     "jge6_tge4": "ev.numJets>=6 && ev.nBCSVM>=4",
     "jge6_t3": "ev.numJets>=6 && ev.nBCSVM==3",
@@ -355,22 +362,59 @@ categories_tree = [
             ("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
         ]),
     ]),
-    #("sl", "SparseCategoryProcessor", [
-    #]),
-    #("dl", "SparseCategoryProcessor", [
-    #])
+    ("sl", "SparseCategoryProcessor", []),
+    ("dl", "SparseCategoryProcessor", []),
+    
+    ("dl_mumu", "ControlCategoryProcessor", []),
+    ("dl_emu", "ControlCategoryProcessor", []),
+    ("dl_ee", "ControlCategoryProcessor", []),
+
+    ("dl_mumu", "SparseCategoryProcessor", []),
+    ("dl_emu", "SparseCategoryProcessor", []),
+    ("dl_ee", "SparseCategoryProcessor", [])
 ]
 
 #Kinematic control histograms
 #name, nbins, low, high, fillFunction, cutFunction, title
 histograms_control = [
+    ("nPVs", 30, 0, 30, "event.data->nPVs", "true", "Number of primary vertices (reco)"),
+    
+    ("numJets", 8, 2, 10, "event.numJets", "true", "Number of resolved jets"),
+    
+    ("nBCSVM", 5, 0, 5, "event.nBCSVM", "true", "Number of CSVM jets"),
+    #("nBCSVL", 8, 0, 8, "event.nBCSVL", "true", "Number of CSVL jets"),
+
+    ("lep0_pt", 100, 0, 600, "event.leptons.at(0).p4.Pt()", "event.leptons.size()>0", "Leading lepton pt"),
+    ("lep0_eta", 100, -3, 3, "event.leptons.at(0).p4.Eta()", "event.leptons.size()>0", "Leading lepton pt"),
+    
+    ("lep1_pt", 100, 0, 600, "event.leptons.at(1).p4.Pt()", "event.leptons.size()>1", "Sub-leading lepton pt"),
+    ("lep1_eta", 100, -3, 3, "event.leptons.at(1).p4.Eta()", "event.leptons.size()>1", "Sub-leading lepton pt"),
+    
     ("jet0_pt", 100, 0, 600, "event.jets.at(0).p4.Pt()", "event.jets.size()>0", "Leading jet pt"),
     ("jet1_pt", 100, 0, 600, "event.jets.at(1).p4.Pt()", "event.jets.size()>1", "Subleading jet pt"),
+
     ("jet0_eta", 100, -3, 3, "event.jets.at(0).p4.Eta()", "event.jets.size()>0", "Leading jet eta"),
     ("jet1_eta", 100, -3, 3, "event.jets.at(1).p4.Eta()", "event.jets.size()>1", "Subleading jet eta"),
+    
     ("jet0_btagCSV", 100, 0, 1, "event.jets.at(0).btagCSV", "event.jets.size()>0", "Leading jet CSV"),
     ("jet1_btagCSV", 100, 0, 1, "event.jets.at(1).btagCSV", "event.jets.size()>1", "Subleading jet CSV"),
+
+    ("jet0_btagBDT", 100, -1, 1, "event.jets.at(0).btagBDT", "event.jets.size()>0", "Leading jet BDT"),
+    ("jet1_btagBDT", 100, -1, 1, "event.jets.at(1).btagBDT", "event.jets.size()>1", "Subleading jet BDT"),
+    
+    ("btag_LR_4b_2b", 100, 0, 1, "event.btag_LR_4b_2b", "event.jets.size()>=3", "btag likelihood"),
+    ("btag_LR_4b_2b_logit", 100, -10, 10, "event.btag_LR_4b_2b_logit", "event.jets.size()>=3", "btag likelihood"),
+
+    ("ntopCandidates", 4, 0, 4, "event.ntopCandidate + event.data->nothertopCandidate", "event.ntopCandidate>=0", "Number of HTTv2 candidates"),
     ("nhiggsCandidate", 4, 0, 4, "event.nhiggsCandidate", "event.nhiggsCandidate>=0", "Number of higgs candidates"),
+    
+    ("nMatch_wq", 4, 0, 4, "event.data->nMatch_wq", "isMC(conf.process)", "Number of jets matched to quarks from W"),
+    ("nMatch_wq_btag", 4, 0, 4, "event.data->nMatch_wq_btag", "isMC(conf.process)", "Number of jets matched to quarks from W with b-tagging"),
+    ("nMatch_hb", 4, 0, 4, "event.data->nMatch_hb", "isMC(conf.process)", "Number of jets matched to quarks from W"),
+    ("nMatch_hb_btag", 4, 0, 4, "event.data->nMatch_hb_btag", "isMC(conf.process)", "Number of jets matched to quarks from W with b-tagging"),
+    ("nMatch_tb", 4, 0, 4, "event.data->nMatch_tb", "isMC(conf.process)", "Number of jets matched to quarks from W"),
+    ("nMatch_tb_btag", 4, 0, 4, "event.data->nMatch_tb_btag", "isMC(conf.process)", "Number of jets matched to quarks from W with b-tagging"),
+    ("fullMatch", 2, 0, 2, "(event.data->nMatch_tb_btag >= 2 && event.data->nMatch_wq_btag >=2) && (isSignalMC(conf.process) ? event.data->nMatch_hb_btag>=2 : true)", "isMC(conf.process)", "Number of events with full match"),
 ]
 
 #Kinematic control histograms
@@ -379,8 +423,10 @@ histograms_boosted = [
     ("higgsCandidate_pt", 100, 200, 600, "event.higgsCandidate_pt", "event.nhiggsCandidate>0", "Leading higgs candidate pt"),
     ("higgsCandidate_eta", 100, -3, 3, "event.higgsCandidate_eta", "event.nhiggsCandidate>0", "Leading higgs candidate eta"),
     ("higgsCandidate_bbtag", 100, -1, 1, "event.higgsCandidate_bbtag", "event.nhiggsCandidate>0", "Leading higgs candidate bbtag"),
-    ("topCandidate_pt", 100, 200, 600, "event.topCandidate_pt", "event.nhiggsCandidate>0", "Leading top candidate pt"),
-    ("topCandidate_eta", 100, -3, 3, "event.topCandidate_eta", "event.nhiggsCandidate>0", "Leading top candidate eta"),
+    ("topCandidate_pt", 100, 200, 600, "event.topCandidate_pt", "event.ntopCandidate>=1", "Leading top candidate pt"),
+    ("topCandidate_eta", 100, -3, 3, "event.topCandidate_eta", "event.ntopCandidate>=1", "Leading top candidate eta"),
+    ("topCandidate_mass", 100, -3, 3, "event.topCandidate_mass", "event.ntopCandidate>=1", "Leading top candidate mass"),
+    ("topCandidate_masscal", 100, -3, 3, "event.topCandidate_masscal", "event.ntopCandidate>=1", "Leading top candidate mass (calibrated)"),
 ]
 
 #MEM histograms

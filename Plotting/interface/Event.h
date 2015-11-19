@@ -82,8 +82,9 @@ class Jet {
 public:
     const TLorentzVector p4;
     const float btagCSV;
+    const float btagBDT;
 
-    Jet(const TLorentzVector& _p4, float _btagCSV);
+    Jet(const TLorentzVector& _p4, float _btagCSV, float _btagBDT);
     const string to_string() const;
 };
 
@@ -228,6 +229,7 @@ typedef unordered_map<
     double topCandidate_pt;
     double topCandidate_eta;
     double topCandidate_mass;
+    double topCandidate_masscal;
     double topCandidate_fRec;
     double topCandidate_n_subjettiness;
 
@@ -238,8 +240,10 @@ typedef unordered_map<
     double higgsCandidate_bbtag;
     double higgsCandidate_n_subjettiness;
     double higgsCandidate_dr_genHiggs;
+    const TreeData *data;
 
     Event(
+        const TreeData *_data,
         bool _is_sl,
         bool _is_dl,
         bool _pass_trig_sl,
@@ -275,6 +279,7 @@ typedef unordered_map<
         double _topCandidate_pt,
         double _topCandidate_eta,
         double _topCandidate_mass,
+        double _topCandidate_masscal,
         double _topCandidate_fRec,
         double _topCandidate_n_subjettiness,
 
@@ -442,6 +447,13 @@ namespace BaseCuts {
     bool sl_mu(const Event& ev);
     bool sl_el(const Event& ev);
     bool dl(const Event& ev);
+    bool dl_mumu(const Event& ev);
+    bool dl_ee(const Event& ev);
+    bool dl_emu(const Event& ev);
 }
+
+bool isMC(ProcessKey::ProcessKey proc);
+bool isSignalMC(ProcessKey::ProcessKey proc);
+bool isData(ProcessKey::ProcessKey proc);
 
 #endif

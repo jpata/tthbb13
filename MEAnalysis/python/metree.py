@@ -95,6 +95,14 @@ quarkType = NTupleObjectType("quarkType", variables = [
     NTupleVariable("pdgId", lambda x : x.pdgId),
 ])
 
+genTopType = NTupleObjectType("genTopType", variables = [
+    NTupleVariable("pt", lambda x : x.pt),
+    NTupleVariable("eta", lambda x : x.eta),
+    NTupleVariable("phi", lambda x : x.phi),
+    NTupleVariable("mass", lambda x : x.mass),
+    NTupleVariable("decayMode", lambda x : x.decayMode),
+])
+
 metType = NTupleObjectType("metType", variables = [
     NTupleVariable("pt", lambda x : x.pt),
     NTupleVariable("phi", lambda x : x.phi),
@@ -172,9 +180,13 @@ topCandidateType = NTupleObjectType("topCandidateType", variables = [
     NTupleVariable("RoptCalc", lambda x: x.RoptCalc ),
     NTupleVariable("ptForRoptCalc", lambda x: x.ptForRoptCalc ),
     NTupleVariable("pt", lambda x: x.pt ),
+    NTupleVariable("ptcal", lambda x: x.ptcal ),
     NTupleVariable("eta", lambda x: x.eta ),
+    NTupleVariable("etacal", lambda x: x.etacal ),
     NTupleVariable("phi", lambda x: x.phi ),
+    NTupleVariable("phical", lambda x: x.phical ),
     NTupleVariable("mass", lambda x: x.mass ),
+    NTupleVariable("masscal", lambda x: x.masscal ),
     NTupleVariable("sjW1pt", lambda x: x.sjW1pt ),
     NTupleVariable("sjW1eta", lambda x: x.sjW1eta ),
     NTupleVariable("sjW1phi", lambda x: x.sjW1phi ),
@@ -198,7 +210,7 @@ topCandidateType = NTupleObjectType("topCandidateType", variables = [
     NTupleVariable("n_subjettiness_groomed", lambda x: x.n_subjettiness_groomed ), # Calculated
     NTupleVariable("delRopt", lambda x: x.delRopt ),             # Calculated
     NTupleVariable("genTopHad_dr", lambda x: getattr(x, "genTopHad_dr", -1), help="DeltaR to the closest hadronic gen top" ),
-    NTupleVariable("genTopHad_index", lambda x: getattr(x, "genTopHad_index", -1), type=int, help="Index of the matched genTopHad" ),
+    #NTupleVariable("genTopHad_index", lambda x: getattr(x, "genTopHad_index", -1), type=int, help="Index of the matched genTopHad" ),
 ])
 
 higgsCandidateType = NTupleObjectType("higgsCandidateType", variables = [
@@ -356,8 +368,8 @@ def getTreeProducer(conf):
             # "b_quarks_h_nominal" : NTupleCollection("GenBFromHiggs", quarkType, 3, help="generated b quarks from higgs", mcOnly=True),
             # "l_quarks_w_nominal" : NTupleCollection("GenQFromW", quarkType, 5, help="generated light quarks from W", mcOnly=True),
             "GenHiggsBoson" : NTupleCollection("genHiggs", quarkType, 2, help="Generated Higgs boson", mcOnly=True),
-            "genTopLep" : NTupleCollection("genTopLep", quarkType, 2, help="Generated top quark (leptonic)", mcOnly=True),
-            "genTopHad" : NTupleCollection("genTopHad", quarkType, 2, help="Generated top quark (hadronic)", mcOnly=True),
+            "genTopLep" : NTupleCollection("genTopLep", genTopType, 2, help="Generated top quark (leptonic)", mcOnly=True),
+            "genTopHad" : NTupleCollection("genTopHad", genTopType, 2, help="Generated top quark (hadronic)", mcOnly=True),
 
             "FatjetCA15ungroomed" : NTupleCollection("fatjets", FatjetCA15ungroomedType, 4, help="Ungroomed CA 1.5 fat jets"),
             "good_jets_nominal" : NTupleCollection("jets", jetType, 9, help="Selected resolved jets, pt ordered"),
@@ -387,7 +399,7 @@ def getTreeProducer(conf):
             trig, lambda ev, name=trig: getattr(ev.input, name, -1), type=int, mcOnly=False
         )]
         
-    for systematic in ["nominal", "raw", "JESUp", "JESDown"]:
+    for systematic in ["nominal", "raw", "JESUp", "JESDown", "JERUp", "JERDown"]:
         if not (systematic in conf.general["systematics"]):
             continue
 
