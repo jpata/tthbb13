@@ -44,7 +44,8 @@ filelist = open(DATASET).readlines()
 config.Data.userInputFiles = filelist
 
 config.section_("Site")
+config.Site.storageSite = "T3_CH_PSI"
 #config.Site.storageSite = "T2_CH_CSCS"
-config.Site.storageSite = "T2_EE_Estonia"
+#config.Site.storageSite = "T2_EE_Estonia"
 
 #config.Data.ignoreLocality = True
