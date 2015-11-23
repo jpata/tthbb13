@@ -16,26 +16,26 @@ samples = cms.VPSet([
         ]),
         isMC     = cms.bool(True)
     ),
-    cms.PSet(
-        skip     = cms.bool(False),
-        name     = cms.string('ttjets'),
-        xSec     = cms.double(0.5058),
-        nGen     = cms.int64(-1),
-        subFiles = cms.vstring([
-            path + "/ttjets.root",
-        ]),
-        isMC     = cms.bool(True)
-    ),
-    cms.PSet(
-        skip     = cms.bool(False),
-        name     = cms.string('singlemu'),
-        xSec     = cms.double(1),
-        nGen     = cms.int64(-1),
-        subFiles = cms.vstring([
-            path + "/singlemu.root",
-        ]),
-        isMC     = cms.bool(False)
-    ),
+    # cms.PSet(
+    #     skip     = cms.bool(False),
+    #     name     = cms.string('ttjets'),
+    #     xSec     = cms.double(0.5058),
+    #     nGen     = cms.int64(-1),
+    #     subFiles = cms.vstring([
+    #         path + "/ttjets.root",
+    #     ]),
+    #     isMC     = cms.bool(True)
+    # ),
+    # cms.PSet(
+    #     skip     = cms.bool(False),
+    #     name     = cms.string('singlemu'),
+    #     xSec     = cms.double(1),
+    #     nGen     = cms.int64(-1),
+    #     subFiles = cms.vstring([
+    #         path + "/singlemu.root",
+    #     ]),
+    #     isMC     = cms.bool(False)
+    # ),
 ])
 
 #fill sample number of generated

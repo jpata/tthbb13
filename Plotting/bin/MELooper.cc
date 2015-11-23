@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "TTH/Plotting/interface/Event.h"
+#include "TTH/Plotting/interface/categories.h"
 
 using namespace std;
 
@@ -37,37 +38,6 @@ TChain* loadFiles(const Configuration& conf) {
     return tree;
 }
 
-namespace BaseCuts {
-    bool sl(const Event& ev) {
-        return ev.is_sl && ev.passPV && ev.pass_trig_sl && ev.numJets >=4 && ev.btag_LR_4b_2b > 0.95;
-    }
-
-    bool dl(const Event& ev) {
-        return ev.is_dl && ev.passPV && ev.pass_trig_dl;
-    }
-}
-
-// namespace std {
-//   template <> struct hash<vector<CategoryKey::CategoryKey>>
-//   {
-//     //const static std::hash<unsigned long> ResultKey_hash_fn;
-//     size_t operator()(const vector<CategoryKey::CategoryKey> & x) const
-//     {
-//         //make a compound hash
-//         unsigned long long r = 0;
-//         int ninc = 8; // how many bits to shift each
-//         int ic = 0; //shift counter
-// 
-//         //shift vector of category keys
-//         for (auto& v : x) {
-//             r += static_cast<int>(v) << (ninc*ic);        
-//         }
-//         std::hash<unsigned long long> _hash_fn;
-//         return _hash_fn(r);
-//     }
-//   };
-// }
-
 const vector<CategoryKey::CategoryKey> emptykey;
 
 int main(int argc, const char** argv) {
@@ -92,22 +62,7 @@ int main(int argc, const char** argv) {
     // output directory of the histogram.
 
     // Note: this vector is made const, so that it is fully known and will not change at runtime.
-    const vector<const CategoryProcessor*> categorymap = {
-        new SparseCategoryProcessor(
-            [](const Event& ev){
-                return BaseCuts::sl(ev);
-            },
-            {CategoryKey::sl},
-            conf
-        ),
-        new SparseCategoryProcessor(
-            [](const Event& ev){
-                return BaseCuts::dl(ev);
-            },
-            {CategoryKey::dl},
-            conf
-        )
-    };
+    const vector<const CategoryProcessor*> categorymap = makeCategories(conf);
 
     cout << "Attaching branches..." << endl;
     TreeData data;
@@ -131,8 +86,8 @@ int main(int argc, const char** argv) {
 
         const unordered_map<SystematicKey::SystematicKey, Event, std::hash<int> > systmap = {
             {SystematicKey::nominal, EventFactory::makeNominal(data, conf)},
-            {SystematicKey::CMS_scale_jUp, EventFactory::makeJESUp(data, conf)},
-            {SystematicKey::CMS_scale_jDown, EventFactory::makeJESDown(data, conf)}
+            //{SystematicKey::CMS_scale_jUp, EventFactory::makeJESUp(data, conf)},
+            //{SystematicKey::CMS_scale_jDown, EventFactory::makeJESDown(data, conf)}
         };
 
         for (auto& kvSyst : systmap) {

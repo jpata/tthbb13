@@ -11,7 +11,36 @@ import os
 import shutil
 import datetime
 import subprocess
+import ROOT
+import numpy as np
 
+def get_limits(fn):
+    """
+    Returns a length 6 vector with the expected limits and quantiles based on the
+    combine root file.
+    """
+    f = ROOT.TFile(fn)
+
+    #No root file created, fit failed
+    if f==None or f.IsZombie():
+        lims = np.zeros(6)
+        quantiles = np.zeros(6)
+        lims[:] = 99999
+        return lims, quantiles
+    tt = f.Get("limit")
+    if tt==None or tt.IsZombie():
+        lims = np.zeros(6)
+        quantiles = np.zeros(6)
+        lims[:] = 99999
+        return lims, quantiles
+    lims = np.zeros(tt.GetEntries())
+    quantiles = np.zeros(tt.GetEntries())
+    for i in range(tt.GetEntries()):
+        tt.GetEntry(i)
+        lims[i] = tt.limit
+        quantiles[i] = tt.quantileExpected
+    f.Close()
+    return lims, quantiles
 
 class LimitGetter(object):
     
@@ -24,8 +53,8 @@ class LimitGetter(object):
         datacard_path = "/".join(datacard.split("/")[:-1])
 
         # Add a timestamp to the name
-        timestamp = datetime.datetime.now().strftime("%Y-%m-%d-%H%M")
-        process_name = "{0}_{1}".format(datacard_name, timestamp)
+        #timestamp = datetime.datetime.now().strftime("%Y-%m-%d-%H%M")
+        process_name = "{0}".format(datacard_name)
 
         # Run combine
         combine_command = ["combine", 
@@ -33,32 +62,28 @@ class LimitGetter(object):
                            "-M", "Asymptotic",
                            "-t", "-1",
                            datacard_name + ".txt"]
-
+        
         process = subprocess.Popen(combine_command,
                                    stdout=subprocess.PIPE,
                                    cwd=datacard_path)
-
+        
         output = process.communicate()[0]
-
+        
         # Put the output file in the corrrect place..
         # ..root file
         output_rootfile_name = "higgsCombine{0}.Asymptotic.mH120.root".format(process_name)
+        targetpath = os.path.join(self.output_path, output_rootfile_name)
         shutil.move(os.path.join(datacard_path, output_rootfile_name),
-                    os.path.join(self.output_path, output_rootfile_name))
+                   targetpath)
         # ..text file
         output_textfile_name = "out_{0}.log".format(process_name)
         of = open(os.path.join(self.output_path, output_textfile_name), "w")
         of.write(output)
-
+        
         # And extact the lmit
         limit = 1000
-        for line in output.split("\n"):
-            if "Expected 50.0%" in line:
-                limit = float(line.split("<")[-1].strip())
-
+        lims, quantiles = get_limits(targetpath)
+        limit = lims[2]
         print datacard_name, ":", limit
-
-        return limit
+        return lims, quantiles
     # End of get_limit
-
-

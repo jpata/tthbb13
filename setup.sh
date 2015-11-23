@@ -22,6 +22,12 @@ git clone https://github.com/bianchini/Code.git MEIntegratorStandalone
 cd MEIntegratorStandalone
 
 cd ../..
+
+git clone https://github.com/cms-analysis/HiggsAnalysis-CombinedLimit.git HiggsAnalysis/CombinedLimit
+cd HiggsAnalysis/CombinedLimit
+git checkout 74x-root6
+cd ../..
+
 #after scram b clean, these need to be copied again
 cp TTH/MEAnalysis/libs/*.so ../lib/$SCRAM_ARCH/
 scram setup lhapdf

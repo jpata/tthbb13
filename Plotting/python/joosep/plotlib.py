@@ -40,6 +40,25 @@ colors = {
     "other": (251, 73, 255),
 }
 
+for cn, c in colors.items():
+    colors[cn] = (c[0]/255.0, c[1]/255.0, c[2]/255.0)
+
+cats = {
+    'dl_j3_t2': "(is_dl==1) & (numJets==3) & (nBCSVM==2)",
+    'dl_jge3_t3': "(is_dl==1) & (numJets>=3) & (nBCSVM==3)",
+    'dl_jge4_t2': "(is_dl==1) & (numJets>=4) & (nBCSVM==2)",
+    'dl_jge4_tge4': "(is_dl==1) & (numJets>=4) & (nBCSVM>=4)",
+    
+    'sl_j4_t3': "(is_sl==1) & (numJets==4) & (nBCSVM==3)",
+    'sl_j4_t4': "(is_sl==1) & (numJets==4) & (nBCSVM==4)",
+    'sl_j5_t3': "(is_sl==1) & (numJets==5) & (nBCSVM==3)",
+    'sl_j5_tge4': "(is_sl==1) & (numJets==5) & (nBCSVM>=4)",
+    'sl_jge6_t2': "(is_sl==1) & (numJets>=6) & (nBCSVM==2)",
+    'sl_jge6_t3': "(is_sl==1) & (numJets>=6) & (nBCSVM==3)",
+    'sl_jge6_tge4': "(is_sl==1) & (numJets>=6) & (nBCSVM>=4)",
+}
+memcut = "& ((btag_LR_4b_2b>0.95) | ((is_sl==1) & (nBCSVM>=3)) | ((is_dl==1) & (nBCSVM>=2)))"
+
 
 #List of sample filenames -> short names
 samplelist = [
@@ -59,6 +78,9 @@ varnames = {
     "jet0_btagCSV": "leading jet $b_{\\mathrm{CSV}}$",
     "jet1_btagCSV": "subleading jet $b_{\\mathrm{CSV}}$",
 
+    "jet0_btagBDT": "leading jet $b_{\\mathrm{cMVAv2}}$",
+    "jet1_btagBDT": "subleading jet $b_{\\mathrm{cMVAv2}}$",
+
     "jet0_eta": "leading jet $\eta$",
     "jet1_eta": "subleading jet $\eta$",
 
@@ -74,12 +96,35 @@ varnames = {
     "njets": "$N_{\\mathrm{jets}}$",
     "ntags": "$N_{\\mathrm{CSVM}}$",
 
-    "btag_LR_4b_2b_logit": "$\\log{\\mathcal{F} / (1 - \\mathcal{F})}$",
+    "btag_LR_4b_2b_logit": "$\\log{[\\mathcal{F} / (1 - \\mathcal{F})]}$",
+    "nfatjets": r"$N_{\mathcal{fatjets}}$",
+    "topCandidate_pt": "top candidate $p_T$ [GeV]",
+    "topCandidate_mass": "top candidate $M$ [GeV]",
+    "topCandidate_fRec": "top candidate $f_{\\mathrm{rec}}$",
+    "topCandidate_Ropt": "top candidate $R_{\\mathrm{opt}}$",
+    "topCandidate_RoptCalc": "top candidate $R_{\\mathrm{opt}}, calc$",
+    "topCandidate_n_subjettiness": "top candidate n-subjettiness$",
+
+    "higgsCandidate_pt": "H candidate $p_T$ [GeV]",
+    "higgsCandidate_eta": "H candidate $\eta$",
+    "higgsCandidate_mass": "H candidate $M$ [GeV]",
+    "higgsCandidate_mass_pruned": "H candidate pruned $M$ [GeV]",
+    "higgsCandidate_mass_softdrop": "H candidate softdrop $M$ [GeV]",
+    "higgsCandidate_bbtag": "H candidate bbtag",
+    "higgsCandidate_n_subjettiness": "H candidate n-subjettiness",
+    "higgsCandidate_dr_top":  "$\\Delta R_{h,t}$",
+
 }
 
 varunits = {
     "jet0_pt": "GeV",
-    "jet1_pt": "GeV"
+    "jet1_pt": "GeV",
+    "topCandidate_pt": "GeV",
+    "topCandidate_mass": "GeV",
+    "higgsCandidate_pt": "GeV",
+    "higgsCandidate_mass": "GeV",
+    "higgsCandidate_mass_pruned": "GeV",
+    "higgsCandidate_mass_softdrop": "GeV",
 }
 
 def process_sample_hist(fnames, hname, func, bins, cut, **kwargs):
@@ -384,12 +429,25 @@ def draw_data_mc(tf, hname, samples, **kwargs):
         data = tot_mc.Clone()#dice(tot_mc, nsigma=1.0)
         data.title = "pseudodata"
     elif dataname:
-        data = tf.get(dataname + "/" + hname).Clone()
+        datas = []
+        for dn in dataname:
+            h = tf.get(dn + "/" + hname)
+            if h:
+                datas += [tf.get(dn + "/" + hname).Clone()]
+        if len(datas)>0:
+            data = sum(datas)
+        else:
+            data = tot_bg.Clone()
+            data.Scale(0.0)
+        data.rebin(rebin)
         data.title = "data ({0})".format(data.Integral())
 
     if data:
         if show_overflow:
             fill_overflow(data)
+        for ibin in range(data.GetNbinsX()):
+            if data.GetBinContent(ibin) == 0:
+                data.SetBinError(ibin, 1)
         errorbar(data)
 
     if do_legend:
@@ -397,12 +455,12 @@ def draw_data_mc(tf, hname, samples, **kwargs):
         dataline = mlines.Line2D([], [], color='black', marker='o', label=data.title)
         patches += [dataline]
         for line, h in zip(r["hists"], hs.values()):
-            print h.title, line.get_color()
+            #print h.title, line.get_color()
             patch = mpatches.Patch(color=line.get_color(), label=h.title)
             patches += [patch]
         plt.legend(handles=patches, loc=legend_loc, numpoints=1, prop={'size':legend_fontsize})
     if ylabel == "auto":
-        ylabel = "events / {0:.0f} {1}".format(hs.values()[0].get_bin_width(1), xunit)
+        ylabel = "events / {0:.2f} {1}".format(hs.values()[0].get_bin_width(1), xunit)
     plt.ylabel(ylabel)
     if not data:
         plt.xlabel(xlabel)
@@ -410,7 +468,7 @@ def draw_data_mc(tf, hname, samples, **kwargs):
     ticks = a1.get_xticks()
     if data:
         a1.get_xaxis().set_visible(False)
-    print ticks
+    #print ticks
     
     a1.set_ylim(bottom=0, top=1.1*a1.get_ylim()[1])
     a1.grid(zorder=100000)
@@ -479,7 +537,7 @@ def calc_roc(h1, h2):
         I2 = h2.Integral(0, h2.GetNbinsX())
         if I1>0 and I2>0:
             roc[i, 0] = float(h1.IntegralAndError(i, h1.GetNbinsX()+2, e1)) / I1
-            roc[i, 1] = float(h2.IntegralAndError(i, h1.GetNbinsX()+2, e2)) / I2
+            roc[i, 1] = float(h2.IntegralAndError(i, h2.GetNbinsX()+2, e2)) / I2
             err[i, 0] = e1
             err[i, 1] = e2
     return roc, err
@@ -655,4 +713,4 @@ def syst_comparison(tf, sn, l, **kwargs):
 
 def svfg(fn, **kwargs):
     plt.savefig(fn, pad_inches=0.5, bbox_inches='tight', **kwargs)
-    plt.clf()
+    #plt.clf()

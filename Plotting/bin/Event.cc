@@ -6,16 +6,17 @@ using namespace std;
 bool pass_trig_dl(const TreeData& data) {
     return (
         data.HLT_BIT_HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v ||
-        data.HLT_BIT_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v ||
+        data.HLT_BIT_HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v ||
         data.HLT_BIT_HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v ||
-        data.HLT_BIT_HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v
+        data.HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v ||
+        data.HLT_BIT_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v
     );
 }
 
 bool pass_trig_sl(const TreeData& data) {
     return (
-        data.HLT_BIT_HLT_Ele27_eta2p1_WP85_Gsf_HT200_v ||
-        data.HLT_BIT_HLT_IsoMu24_eta2p1_v
+        data.HLT_BIT_HLT_Ele27_WP85_Gsf_v ||
+        data.HLT_BIT_HLT_IsoMu17_eta2p1_v
     );
 }
 
@@ -40,15 +41,6 @@ std::vector<std::string> split(const std::string &s, char delim) {
     split(s, delim, elems);
     return elems;
 }
-
-template <class A, class B, class H1, class H2>
-const unordered_map<A, B, H1> reverse_map(const unordered_map<B, A, H2>& src) {
-    unordered_map<A, B, H1> ret;
-    for (auto& kv : src) {
-        ret.insert(make_pair(kv.second, kv.first));
-    }
-    return ret;
-} 
 
 const map<string, function<float(const Event& ev)>> AxisFunctions = {
     {"mem_SL_0w2h2t", [](const Event& ev) { return ev.mem_SL_0w2h2t;}},
@@ -157,156 +149,14 @@ string Configuration::to_string() const {
 }
 //["n_excluded_bjets<2", "ntopCandidate==1"]
 
-namespace SystematicKey {
-const unordered_map<const string, SystematicKey, hash<string>> map_from_string = {
-    {"nominal", nominal},
-    {"CMS_scale_jUp", CMS_scale_jUp},
-    {"CMS_scale_jDown", CMS_scale_jDown},
-    {"CMS_ttH_CSVStats1Up", CMS_ttH_CSVStats1Up},
-    {"CMS_ttH_CSVStats1Down", CMS_ttH_CSVStats1Down},
-    {"CMS_ttH_CSVStats2Up", CMS_ttH_CSVStats2Up},
-    {"CMS_ttH_CSVStats2Down", CMS_ttH_CSVStats2Down},
-    {"CMS_ttH_CSVLFUp", CMS_ttH_CSVLFUp},
-    {"CMS_ttH_CSVLFDown", CMS_ttH_CSVLFDown},
-    {"CMS_ttH_CSVHFUp", CMS_ttH_CSVHFUp},
-    {"CMS_ttH_CSVHFDown", CMS_ttH_CSVHFDown}
-};
-
-const unordered_map<SystematicKey, const string, hash<int>> map_to_string =
-    reverse_map<SystematicKey, const string, hash<int>, hash<string>>(
-        map_from_string
-    );
-
-const string to_string(SystematicKey k) {
-    if (map_to_string.find(k) == map_to_string.end()) {
-        cerr << "Could not find SystematicKey " << k << endl;
-        throw 1;
-    }
-    return map_to_string.at(k); 
-}
-}
-
-namespace ProcessKey {
-const unordered_map<const string, ProcessKey, hash<string>> map_from_string = {
-    {"ttH", ttH},
-    {"ttH_hbb", ttH_hbb},
-    {"ttbarPlusBBbar", ttbarPlusBBbar},
-    {"ttbarPlusB", ttbarPlusB},
-    {"ttbarPlus2B", ttbarPlus2B},
-    {"ttbarPlusCCbar", ttbarPlusCCbar},
-    {"ttbarOther", ttbarOther},
-    {"ttH_nohbb", ttH_nohbb},
-    {"ttw_wlnu", ttw_wlnu},
-    {"ttw_wqq", ttw_wqq},
-    {"ttz_zqq", ttz_zqq},
-    {"ttz_zllnunu", ttz_zllnunu},
-    {"UNKNOWN",  UNKNOWN}
-};
-const unordered_map<ProcessKey, const string, hash<int>> map_to_string =
-    reverse_map<ProcessKey, const string, hash<int>, hash<string>>(
-        map_from_string
-    );
-
-const string to_string(ProcessKey k) {
-    if (map_to_string.find(k) == map_to_string.end()) {
-        cerr << "Could not find ProcessKey " << k << endl;
-        throw 1;
-    }
-    return map_to_string.at(k); 
-}
-const ProcessKey from_string(const string& k) {
-    if (map_from_string.find(k) == map_from_string.end()) {
-        cerr << "Could not find ProcessKey " << k << endl;
-        throw 1;
-    }
-    return map_from_string.at(k);
-}
-}
-
-namespace HistogramKey {
-const unordered_map<const string, HistogramKey, hash<string>> map_from_string = {
-    {"jet0_pt", jet0_pt},
-    {"mem_SL_0w2h2t", mem_SL_0w2h2t},
-    {"mem_DL_0w2h2t", mem_DL_0w2h2t},
-    {"mem_SL_2w2h2t", mem_SL_2w2h2t},
-    {"mem_SL_2w2h2t_sj", mem_SL_2w2h2t_sj},
-    {"sparse", sparse}
-};
-const unordered_map<HistogramKey, const string, hash<int>> map_to_string =
-    reverse_map<HistogramKey, const string, hash<int>, hash<string>>(
-        map_from_string
-    );
-const string to_string(HistogramKey k) {
-    if (map_to_string.find(k) == map_to_string.end()) {
-        cerr << "Could not find HistogramKey " << k << endl;
-        throw 1;
-    }
-    return map_to_string.at(k); 
-    }
-}
-
 namespace CategoryKey {
-const unordered_map<const string, CategoryKey, hash<string>> map_from_string = {
-    {"sl", sl},
-    {"dl", dl},
-    {"j3_t2", j3_t2},
-    {"jge4_t2", jge4_t2},
-    {"jge3_t3", jge3_t3},
-    {"jge4_tge4", jge4_tge4},
-
-    {"j4_t3", j4_t3},
-    {"j4_t4", j4_t4},
-    {"j5_t3", j5_t3},
-    {"j5_tge4", j5_tge4},
-    {"jge6_t2", jge6_t2},
-    {"jge6_t3", jge6_t3},
-    {"jge6_tge4", jge6_tge4},
-
-    {"blrL", blrL},
-    {"blrH", blrH},
-    {"Wmass60_100", Wmass60_100},
-    {"nonWmass60_100", nonWmass60_100},
-    {"boosted", boosted},
-    {"nonboosted", nonboosted},
-    {"boostedMass120_180", boostedMass120_180},
-    {"nonboostedMass120_180", nonboostedMass120_180},
-    {"boostedMass140_180", boostedMass140_180},
-    {"nonboostedMass140_180", nonboostedMass140_180},
-    {"boostedTau_07", boostedTau_07},
-    {"nonboostedTau_07", nonboostedTau_07},
-    {"boostedfRec_02", boostedfRec_02},
-    {"nonboostedfRec_02", nonboostedfRec_02},
-
-};
-
-unordered_map<CategoryKey, const string, hash<int>> map_to_string =
-    reverse_map<CategoryKey, const string, hash<int>, hash<string>>(
-        map_from_string
-    );
-
-const string to_string(CategoryKey k) {
-    if (map_to_string.find(k) == map_to_string.end()) {
-        cerr << "Could not find CategoryKey " << k << endl;
-        throw 1;
+    bool is_sl(vector<CategoryKey> k) {
+        return k[0] == sl;
     }
-    return map_to_string.at(k);
-}
 
-const CategoryKey from_string(const string& k) {
-    if (map_from_string.find(k) == map_from_string.end()) {
-        cerr << "Could not find CategoryKey " << k << endl;
-        throw 1;
+    bool is_dl(vector<CategoryKey> k) {
+        return k[0] == dl;
     }
-    return map_from_string.at(k);
-}
-bool is_sl(vector<CategoryKey> k) {
-    return k[0] == sl;
-}
-
-bool is_dl(vector<CategoryKey> k) {
-    return k[0] == dl;
-
-}
 }
 
 void saveResults(ResultMap& res, const string& prefix, const string& filename) {
@@ -336,10 +186,11 @@ void saveResults(ResultMap& res, const string& prefix, const string& filename) {
         }
         //make root dir if doesn't exist
         const string dirname = ss.str();
-        if (of.Get(dirname.c_str()) == nullptr) {
-            of.mkdir(dirname.c_str());
-        }
         TDirectory* dir = (TDirectory*)(of.Get(dirname.c_str()));
+        if (dir == nullptr) {
+            of.mkdir(dirname.c_str());
+            dir = (TDirectory*)(of.Get(dirname.c_str()));
+        }
         assert(dir != nullptr);
         
         //rename histogram
@@ -358,20 +209,20 @@ void saveResults(ResultMap& res, const string& prefix, const string& filename) {
         //and of.Close() segfaults later
         TNamed* obj = (TNamed*)(res.at(rk))->Clone();
         obj->SetName(histname.c_str());
-        //obj->SetDirectory(dir);
         dir->Add(obj);
-        //obj->Write();
-        dir->Write("", TObject::kOverwrite);
-        //hist.Write();
+        //cout << "writing... ";
+        //dir->Write("", TObject::kOverwrite);
+        //cout << "done" << endl;
     }
     cout << "writing..." << endl;
-    //of.Write();
+    of.Write();
     of.Close();
     cout << "done..." << endl;
 }
 
 
 Event::Event(
+    const TreeData *_data,
     bool _is_sl,
     bool _is_dl,
     bool _pass_trig_sl,
@@ -380,8 +231,10 @@ Event::Event(
     int _numJets,
     int _nBCSVM,
     const vector<Jet>& _jets,
+    const vector<Lepton>& _leptons,
     const Event::WeightMap& _weightFuncs,
     double _weight_xs,
+    double _puWeight,
     double _Wmass,
     double _mem_SL_0w2h2t,
     double _mem_SL_2w2h2t,
@@ -401,10 +254,21 @@ Event::Event(
     int _n_excluded_bjets,
     int _n_excluded_ljets,
     int _ntopCandidate,
+    double _topCandidate_pt,
+    double _topCandidate_eta,
     double _topCandidate_mass,
+    double _topCandidate_masscal,
     double _topCandidate_fRec,
-    double _topCandidate_n_subjettiness    
+    double _topCandidate_n_subjettiness,
+    int _nhiggsCandidate,
+    double _higgsCandidate_pt,
+    double _higgsCandidate_eta,
+    double _higgsCandidate_mass,
+    double _higgsCandidate_bbtag,
+    double _higgsCandidate_n_subjettiness,
+    double _higgsCandidate_dr_genHiggs
     ) :
+    data(_data),
     is_sl(_is_sl),
     is_dl(_is_dl),
     pass_trig_sl(_pass_trig_sl),
@@ -413,14 +277,16 @@ Event::Event(
     numJets(_numJets),
     nBCSVM(_nBCSVM),
     jets(_jets),
+    leptons(_leptons),
     weightFuncs(_weightFuncs),
     weight_xs(_weight_xs),
+    puWeight(_puWeight),
     Wmass(_Wmass),
     mem_SL_0w2h2t(_mem_SL_0w2h2t),
     mem_SL_2w2h2t(_mem_SL_2w2h2t),
     mem_SL_2w2h2t_sj(_mem_SL_2w2h2t_sj),
     mem_DL_0w2h2t(_mem_DL_0w2h2t),
-    tth_mva(_tth_mva),			 
+    tth_mva(_tth_mva),
     bTagWeight(_bTagWeight),
     bTagWeight_Stats1Up(_bTagWeight_Stats1Up),
     bTagWeight_Stats1Down(_bTagWeight_Stats1Down),
@@ -434,11 +300,21 @@ Event::Event(
     btag_LR_4b_2b_logit(log(_btag_LR_4b_2b / (1.0 - _btag_LR_4b_2b))),
     n_excluded_bjets(_n_excluded_bjets),
     n_excluded_ljets(_n_excluded_ljets),
-    ntopCandidate(_ntopCandidate),
-    topCandidate_mass(_topCandidate_mass),
-    topCandidate_fRec(_topCandidate_fRec),
-    topCandidate_n_subjettiness(_topCandidate_n_subjettiness)
 
+    ntopCandidate(_ntopCandidate),
+    topCandidate_pt(_topCandidate_pt),
+    topCandidate_eta(_topCandidate_eta),
+    topCandidate_mass(_topCandidate_mass),
+    topCandidate_masscal(_topCandidate_masscal),
+    topCandidate_fRec(_topCandidate_fRec),
+    topCandidate_n_subjettiness(_topCandidate_n_subjettiness),
+    nhiggsCandidate(_nhiggsCandidate),
+    higgsCandidate_pt(_higgsCandidate_pt),
+    higgsCandidate_eta(_higgsCandidate_eta),
+    higgsCandidate_mass(_higgsCandidate_mass),
+    higgsCandidate_bbtag(_higgsCandidate_bbtag),
+    higgsCandidate_n_subjettiness(_higgsCandidate_n_subjettiness),
+    higgsCandidate_dr_genHiggs(_higgsCandidate_dr_genHiggs)
 {
     
 }
@@ -467,48 +343,88 @@ const vector<Jet> makeAllJets(const TreeData& data,
     return jets;
 }
 
-double nominal_weight(const Event& ev) {
-    return ev.weight_xs * ev.bTagWeight;
+
+const vector<Lepton> makeAllLeptons(const TreeData& data) {
+    vector<Lepton> leps;
+    for (int n=0; n<data.nleps; n++) {
+        TLorentzVector p4;
+        p4.SetPtEtaPhiM(
+            data.leps_pt[n],
+            data.leps_eta[n],
+            data.leps_phi[n],
+            data.leps_mass[n]
+        );
+        Lepton lep(p4, (int)(data.leps_pdgId[n]));
+        leps.push_back(lep);
+    }
+    return leps;
 }
+
+bool isData(ProcessKey::ProcessKey proc) {
+    return (
+        proc == ProcessKey::SingleMuon ||
+        proc == ProcessKey::SingleElectron
+    );
+}
+
+bool isMC(ProcessKey::ProcessKey proc) {
+    return !isData(proc);
+}
+
+bool isSignalMC(ProcessKey::ProcessKey proc) {
+    return (
+        proc == ProcessKey::ttH ||
+        proc == ProcessKey::ttH_hbb
+    );
+}
+
+double nominal_weight(const Event& ev, const Configuration& conf) {
+    if (isMC(conf.process)) {
+        return conf.lumi * ev.weight_xs * ev.puWeight;
+    }
+    return 1.0;
+}
+
 //Vector of nominal weight functions
 static const Event::WeightMap nominalWeights = {
     {SystematicKey::nominal, nominal_weight}
 };
 
+//Systematically variated weights, applied only in case of nominal event
 static const Event::WeightMap systWeights = {
     {SystematicKey::nominal, nominal_weight},
-    {
-        SystematicKey::CMS_ttH_CSVStats1Up,
-        [](const Event& ev){ return nominal_weight(ev)/ev.bTagWeight * ev.bTagWeight_Stats1Up;}
-    },
-    {
-        SystematicKey::CMS_ttH_CSVStats1Down,
-        [](const Event& ev){ return nominal_weight(ev)/ev.bTagWeight * ev.bTagWeight_Stats1Down;}
-    },
-    {
-        SystematicKey::CMS_ttH_CSVStats2Up,
-        [](const Event& ev){ return nominal_weight(ev)/ev.bTagWeight * ev.bTagWeight_Stats2Up;}
-    },
-    {
-        SystematicKey::CMS_ttH_CSVStats2Down,
-        [](const Event& ev){ return nominal_weight(ev)/ev.bTagWeight * ev.bTagWeight_Stats2Down;}
-    },
-    {
-        SystematicKey::CMS_ttH_CSVLFUp,
-        [](const Event& ev){ return nominal_weight(ev)/ev.bTagWeight * ev.bTagWeight_LFUp;}
-    },
-    {
-        SystematicKey::CMS_ttH_CSVLFDown,
-        [](const Event& ev){ return nominal_weight(ev)/ev.bTagWeight * ev.bTagWeight_LFDown;}
-    },
-    {
-        SystematicKey::CMS_ttH_CSVHFUp,
-        [](const Event& ev){ return nominal_weight(ev)/ev.bTagWeight * ev.bTagWeight_HFUp;}
-    },
-    {
-        SystematicKey::CMS_ttH_CSVHFDown,
-        [](const Event& ev){ return nominal_weight(ev)/ev.bTagWeight * ev.bTagWeight_HFDown;}
-    },
+//    {
+//        SystematicKey::CMS_ttH_CSVStats1Up,
+//        [](const Event& ev){ return nominal_weight(ev)/ev.bTagWeight * ev.bTagWeight_Stats1Up;}
+//    },
+//    {
+//        SystematicKey::CMS_ttH_CSVStats1Down,
+//        [](const Event& ev){ return nominal_weight(ev)/ev.bTagWeight * ev.bTagWeight_Stats1Down;}
+//    },
+//    {
+//        SystematicKey::CMS_ttH_CSVStats2Up,
+//        [](const Event& ev){ return nominal_weight(ev)/ev.bTagWeight * ev.bTagWeight_Stats2Up;}
+//    },
+//    {
+//        SystematicKey::CMS_ttH_CSVStats2Down,
+//        [](const Event& ev){ return nominal_weight(ev)/ev.bTagWeight * ev.bTagWeight_Stats2Down;}
+//    },
+//    {
+//        SystematicKey::CMS_ttH_CSVLFUp,
+//        [](const Event& ev){ return nominal_weight(ev)/ev.bTagWeight * ev.bTagWeight_LFUp;}
+//    },
+//    {
+//        SystematicKey::CMS_ttH_CSVLFDown,
+//        [](const Event& ev){ return nominal_weight(ev)/ev.bTagWeight * ev.bTagWeight_LFDown;}
+//    },
+//    {
+//        SystematicKey::CMS_ttH_CSVHFUp,
+//        [](const Event& ev){ return nominal_weight(ev)/ev.bTagWeight * ev.bTagWeight_HFUp;}
+//    },
+//    {
+//        SystematicKey::CMS_ttH_CSVHFDown,
+//        [](const Event& ev){ return nominal_weight(ev)/ev.bTagWeight * ev.bTagWeight_HFDown;}
+//    },
 };
 
 double process_weight(ProcessKey::ProcessKey proc) {
@@ -529,7 +445,10 @@ double process_weight(ProcessKey::ProcessKey proc) {
 const Event EventFactory::makeNominal(const TreeData& data, const Configuration& conf) {
     
     const vector<Jet> jets = makeAllJets(data, &(JetFactory::makeNominal));
+    const vector<Lepton> leptons = makeAllLeptons(data);
+
     const Event ev(
+        &data,
         data.is_sl,
         data.is_dl,
         pass_trig_sl(data),
@@ -538,14 +457,16 @@ const Event EventFactory::makeNominal(const TreeData& data, const Configuration&
         data.numJets,
         data.nBCSVM,
         jets,
+        leptons,
         systWeights,
-        data.weight_xs * process_weight(conf.process),
+        data.weight_xs,
+        data.puWeight,
         data.Wmass,
         mem_p(data.mem_tth_p[0], data.mem_ttbb_p[0]), //SL 022
         mem_p(data.mem_tth_p[5], data.mem_ttbb_p[5]), //SL 222
         mem_p(data.mem_tth_p[9], data.mem_ttbb_p[9], 0.05), //SL 222 sj
         mem_p(data.mem_tth_p[1], data.mem_ttbb_p[1]), //DL 022,
-	data.tth_mva,
+        data.tth_mva,
         data.bTagWeight,
         data.bTagWeight_Stats1Up,
         data.bTagWeight_Stats1Down,
@@ -558,18 +479,32 @@ const Event EventFactory::makeNominal(const TreeData& data, const Configuration&
         data.btag_LR_4b_2b,
         data.n_excluded_bjets,
         data.n_excluded_ljets,
+        
         data.ntopCandidate,
-        data.topCandidate_mass[0],	
-	data.topCandidate_fRec[0],
-	data.topCandidate_n_subjettiness[0]
+        data.topCandidate_pt[0],
+        data.topCandidate_eta[0],
+        data.topCandidate_mass[0],
+        data.topCandidate_masscal[0],
+        data.topCandidate_fRec[0],
+        data.topCandidate_n_subjettiness[0],
+        
+        data.nhiggsCandidate,
+        data.higgsCandidate_pt[0],
+        data.higgsCandidate_eta[0],
+        data.higgsCandidate_mass[0],
+        data.higgsCandidate_bbtag[0],
+        data.higgsCandidate_n_subjettiness[0],
+        data.higgsCandidate_dr_genHiggs[0]
     );
     return ev;
 }
 
 const Event EventFactory::makeJESUp(const TreeData& data, const Configuration& conf) {
     const vector<Jet> jets = makeAllJets(data, &(JetFactory::makeJESUp));
+    const vector<Lepton> leptons = makeAllLeptons(data);
 
     return Event(
+        &data,
         data.is_sl,
         data.is_dl,
         pass_trig_sl(data),
@@ -578,14 +513,16 @@ const Event EventFactory::makeJESUp(const TreeData& data, const Configuration& c
         data.numJets_JESUp,
         data.nBCSVM_JESUp,
         jets,
+        leptons,
         nominalWeights,
-        data.weight_xs * process_weight(conf.process),
+        data.weight_xs,
+        data.puWeight,
         data.Wmass,
         mem_p(data.mem_tth_JESUp_p[0], data.mem_ttbb_JESUp_p[0]), //SL 022
         mem_p(data.mem_tth_JESUp_p[5], data.mem_ttbb_JESUp_p[5]), //SL 222
         mem_p(data.mem_tth_JESUp_p[9], data.mem_ttbb_JESUp_p[9], 0.05), //SL 222 sj
         mem_p(data.mem_tth_JESUp_p[1], data.mem_ttbb_JESUp_p[1]), //DL 022,
-	data.tth_mva, 
+        data.tth_mva, 
         data.bTagWeight,
         0,
         0,
@@ -598,17 +535,31 @@ const Event EventFactory::makeJESUp(const TreeData& data, const Configuration& c
         data.btag_LR_4b_2b,
         data.n_excluded_bjets,
         data.n_excluded_ljets,
+        
         data.ntopCandidate,
+        data.topCandidate_pt[0],
+        data.topCandidate_eta[0],
         data.topCandidate_mass[0],
-	data.topCandidate_fRec[0],
-	data.topCandidate_n_subjettiness[0]
+        data.topCandidate_masscal[0],
+        data.topCandidate_fRec[0],
+        data.topCandidate_n_subjettiness[0],
+
+        data.nhiggsCandidate,
+        data.higgsCandidate_pt[0],
+        data.higgsCandidate_eta[0],
+        data.higgsCandidate_mass[0],
+        data.higgsCandidate_bbtag[0],
+        data.higgsCandidate_n_subjettiness[0],
+        data.higgsCandidate_dr_genHiggs[0]
     );
 }
 
 const Event EventFactory::makeJESDown(const TreeData& data, const Configuration& conf) {
     const vector<Jet> jets = makeAllJets(data, &(JetFactory::makeJESDown));
+    const vector<Lepton> leptons = makeAllLeptons(data);
 
     return Event(
+        &data,
         data.is_sl,
         data.is_dl,
         pass_trig_sl(data),
@@ -617,14 +568,16 @@ const Event EventFactory::makeJESDown(const TreeData& data, const Configuration&
         data.numJets_JESDown,
         data.nBCSVM_JESDown,
         jets,
+        leptons,
         nominalWeights,
-        data.weight_xs * process_weight(conf.process),
+        data.weight_xs,
+        data.puWeight,
         data.Wmass,
         mem_p(data.mem_tth_JESDown_p[0], data.mem_ttbb_JESDown_p[0]), //SL 022
         mem_p(data.mem_tth_JESDown_p[5], data.mem_ttbb_JESDown_p[5]), //SL 222
         mem_p(data.mem_tth_JESDown_p[9], data.mem_ttbb_JESDown_p[9], 0.05), //SL 222 sj
         mem_p(data.mem_tth_JESDown_p[1], data.mem_ttbb_JESDown_p[1]), //DL 022,
-	data.tth_mva,
+        data.tth_mva,
         data.bTagWeight,
         0,
         0,
@@ -637,17 +590,36 @@ const Event EventFactory::makeJESDown(const TreeData& data, const Configuration&
         data.btag_LR_4b_2b,
         data.n_excluded_bjets,
         data.n_excluded_ljets,
+        
         data.ntopCandidate,
-	data.topCandidate_mass[0],
-	data.topCandidate_fRec[0],
-	data.topCandidate_n_subjettiness[0]
+        data.topCandidate_pt[0],
+        data.topCandidate_eta[0],
+        data.topCandidate_mass[0],
+        data.topCandidate_masscal[0],
+        data.topCandidate_fRec[0],
+        data.topCandidate_n_subjettiness[0],
+
+        data.nhiggsCandidate,
+        data.higgsCandidate_pt[0],
+        data.higgsCandidate_eta[0],
+        data.higgsCandidate_mass[0],
+        data.higgsCandidate_bbtag[0],
+        data.higgsCandidate_n_subjettiness[0],
+        data.higgsCandidate_dr_genHiggs[0]
     );
 }
 
 
-Jet::Jet(const TLorentzVector& _p4, int _btagCSV) : 
+Jet::Jet(const TLorentzVector& _p4, float _btagCSV, float _btagBDT) :
     p4(_p4),
-    btagCSV(_btagCSV)
+    btagCSV(_btagCSV),
+    btagBDT(_btagBDT)
+{
+}
+
+Lepton::Lepton(const TLorentzVector& _p4, int _pdgId) : 
+    p4(_p4),
+    pdgId(_pdgId)
 {
 }
 
@@ -660,7 +632,11 @@ const Jet JetFactory::makeNominal(const TreeData& data, int njet) {
         data.jets_phi[njet],
         data.jets_mass[njet]
     );
-    return Jet(p4, data.jets_btagCSV[njet]);
+    return Jet(
+        p4,
+        data.jets_btagCSV[njet],
+        data.jets_btagBDT[njet]
+    );
 }
 
 const Jet JetFactory::makeJESUp(const TreeData& data, int njet) {
@@ -675,7 +651,11 @@ const Jet JetFactory::makeJESUp(const TreeData& data, int njet) {
     //Undo nominal correction, re-do JESUp correction
     const double corr = data.jets_corr_JESUp[njet] / data.jets_corr[njet];
     p4 *= (1.0 / corr);
-    return Jet(p4, data.jets_btagCSV[njet]);
+    return Jet(
+        p4,
+        data.jets_btagCSV[njet],
+        data.jets_btagBDT[njet]
+    );
 }
 
 
@@ -691,7 +671,11 @@ const Jet JetFactory::makeJESDown(const TreeData& data, int njet) {
     //Undo nominal correction, re-do JESDown correction
     const double corr = data.jets_corr_JESDown[njet] / data.jets_corr[njet];
     p4 *= (1.0 / corr);
-    return Jet(p4, data.jets_btagCSV[njet]);
+    return Jet(
+        p4,
+        data.jets_btagCSV[njet],
+        data.jets_btagBDT[njet]
+    );
 }
 
 
@@ -714,21 +698,6 @@ void CategoryProcessor::fillHistograms(
     > key,
     double weight
     ) const {
-
-
-    const auto jet0_pt_key = make_tuple(
-        get<0>(key),
-        get<1>(key),
-        HistogramKey::jet0_pt
-    );
-    if (!results.count(jet0_pt_key)) {
-        results[jet0_pt_key] = new TH1D("jet0_pt", "Leading jet pt", 100, 0, 500);
-    }
-    if (event.jets.size()>0) {
-        static_cast<TH1D*>(results[jet0_pt_key])->Fill(event.jets.at(0).p4.Pt(), weight);
-    } 
-    //cout << "    fill "  << to_string(jet0_pt_key) << endl;
-
 }
 
 void CategoryProcessor::process(
@@ -741,12 +710,6 @@ void CategoryProcessor::process(
     const bool passes = (*this)(event);
     if (passes) {
 
-        // cout << "  processing ";
-        // for (auto& k : this->keys) {
-        //     cout << CategoryKey::to_string(k) << " ";
-        // }
-        // cout << endl;
-
         vector<CategoryKey::CategoryKey> _catKeys(catKeys);
         for (auto& k : this->keys) {
             _catKeys.push_back(k);
@@ -754,7 +717,7 @@ void CategoryProcessor::process(
 
         for (auto& kvWeight : event.weightFuncs) {
             //cout << "   weight " << SystematicKey::to_string(kvWeight.first) << endl;
-            const double weight = conf.lumi * kvWeight.second(event);
+            const double weight = kvWeight.second(event, conf);
             SystematicKey::SystematicKey _systKey = systKey;
             if (systKey == SystematicKey::nominal) {
                 _systKey = kvWeight.first;
@@ -888,7 +851,6 @@ void SparseCategoryProcessor::fillHistograms(
     }
 }
 
-
 string to_string(const ResultKey& k) {
     stringstream ss;
     ss << "ResultKey(";
@@ -940,4 +902,43 @@ Configuration parseJsonConf(const string& infile) {
     }
     
     return Configuration::makeConfiguration(value);
+}
+
+namespace BaseCuts {
+    bool sl(const Event& ev) {
+        return ev.is_sl && ev.passPV && ev.pass_trig_sl && ev.numJets>=4;
+    }
+    
+    bool sl_mu(const Event& ev) {
+        return sl(ev) && abs(ev.leptons.at(0).pdgId) == 13;
+    }
+    
+    bool sl_el(const Event& ev) {
+        return sl(ev) && abs(ev.leptons.at(0).pdgId) == 11;
+    }
+
+    bool dl(const Event& ev) {
+        return (ev.is_dl && ev.passPV && ev.pass_trig_dl && true);
+        //    ev.leptons.at(0).pdgId * ev.leptons.at(1).pdgId < 0 && (ev.data->ll_mass[0] > 20) && (
+        //        //Z peak veto
+        //        abs(ev.leptons.at(0).pdgId) == abs(ev.leptons.at(1).pdgId) ? !(ev.data->ll_mass[0] > 76 && ev.data->ll_mass[0] < 106) : true
+        //    ) && (
+        //        abs(ev.leptons.at(0).pdgId) == abs(ev.leptons.at(1).pdgId) ? (ev.data->met_pt[0] > 40) : true
+        //    )
+        //);
+    }
+    
+    bool dl_mumu(const Event& ev) {
+        return dl(ev) && abs(ev.leptons.at(0).pdgId)==13 && abs(ev.leptons.at(1).pdgId)==13;
+    }
+
+    bool dl_ee(const Event& ev) {
+        return dl(ev) && abs(ev.leptons.at(0).pdgId)==11 && abs(ev.leptons.at(1).pdgId)==11;
+    }
+    bool dl_emu(const Event& ev) {
+        return dl(ev) && (
+            (abs(ev.leptons.at(0).pdgId)==13 && abs(ev.leptons.at(1).pdgId)==11) ||
+            (abs(ev.leptons.at(0).pdgId)==11 && abs(ev.leptons.at(1).pdgId)==13)
+        );
+    }
 }

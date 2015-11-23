@@ -11,13 +11,17 @@ class TreeVarAnalyzer(FilterAnalyzer):
         self.conf = cfg_ana._conf
 
     def process(self, event):
-       
-
         setattr( event, 'boosted_bjets', [] )
         setattr( event, 'boosted_ljets', [] )
         setattr( event, 'topCandidate', [] )
         setattr( event, 'othertopCandidate', [] )
         setattr( event, 'higgsCandidate', [] )
+        
+        #FIXME: currently, gen-level analysis is redone for systematic variations
+        #in order to correctly ntuplize, we need to define event.genTopLep = event.systResults["nominal"].genTopLep etc
+        event.genTopLep = getattr(event.systResults["nominal"], "genTopLep", [])
+        event.genTopHad = getattr(event.systResults["nominal"], "genTopHad", [])
+
         for syst, event_syst in event.systResults.items():
             event_syst.mem_results_tth = getattr(event_syst, "mem_results_tth", [])
             event_syst.mem_results_ttbb = getattr(event_syst, "mem_results_ttbb", [])
@@ -25,6 +29,7 @@ class TreeVarAnalyzer(FilterAnalyzer):
             event_syst.fw_h_btagjets = getattr(event_syst, "fw_h_btagjets", [])
             event_syst.fw_h_untagjets = getattr(event_syst, "fw_h_untagjets", [])
             
+            #add all variated quantities to event with a suffix
             for k, v in event_syst.__dict__.items():
                 event.__dict__[k + "_" + syst] = v
         

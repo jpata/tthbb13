@@ -2,7 +2,7 @@ import TTH.Plotting.Datacards.MiniSamples as Samples
 import ROOT, json
 
 #entries per job
-perjob = 500000
+perjob = 250000
 
 def chunks(l, n):
     """Yield successive n-sized chunks from l."""
@@ -19,7 +19,7 @@ for samp in Samples.samples_dict.keys():
         #default configuration
         ret = {
             "filenames": [s],
-            "lumi": 10000.0,
+            "lumi": 1280.0,
             "process": samp,
             "outputFile": "ControlPlotsSparse_{0}.root".format(ijob),
             "firstEntry": ch[0],
@@ -27,10 +27,28 @@ for samp in Samples.samples_dict.keys():
             "printEvery": 0,
             "sparseAxes": [
                 {
+                    "func": "mem_SL_2w2h2t",
+                    "xMin": 0,
+                    "xMax": 1,
+                    "nBins": 12
+                },
+                {
+                    "func": "mem_SL_2w2h2t_sj",
+                    "xMin": 0,
+                    "xMax": 1,
+                    "nBins": 12
+                },
+                {
                     "func": "mem_SL_0w2h2t",
                     "xMin": 0,
                     "xMax": 1,
-                    "nBins": 6
+                    "nBins": 12
+                },
+                {
+                    "func": "tth_mva",
+                    "xMin": 0,
+                    "xMax": 1,
+                    "nBins": 12
                 },
                 {
                     "func": "numJets",
@@ -63,10 +81,34 @@ for samp in Samples.samples_dict.keys():
                     "nBins": 6
                 },
                 {
+                    "func": "topCandidate_fRec",
+                    "xMin": 0,
+                    "xMax": 0.4,
+                    "nBins": 6
+                },
+                {
+                    "func": "topCandidate_n_subjettiness",
+                    "xMin": 0,
+                    "xMax": 1,
+                    "nBins": 6
+                },
+                {
                     "func": "Wmass",
                     "xMin": 40,
                     "xMax": 120,
                     "nBins": 6
+                },
+                {
+                    "func": "n_excluded_bjets",
+                    "xMin": 0,
+                    "xMax": 4,
+                    "nBins": 4
+                },
+                {
+                    "func": "n_excluded_ljets",
+                    "xMin": 0,
+                    "xMax": 4,
+                    "nBins": 4
                 }
             ]
         }

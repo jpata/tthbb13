@@ -303,7 +303,6 @@ if __name__ == "__main__":
         from PhysicsTools.HeppyCore.framework.looper import Looper
         nEvents = 1000
 
-
         kwargs = {}
         if conf.general.get("eventWhitelist", None) is None:
             kwargs["nEvents"] = nEvents

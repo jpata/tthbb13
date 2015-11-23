@@ -31,6 +31,7 @@ class SubjetAnalyzer(FilterAnalyzer):
 
         self.btagAlgo = self.conf.jets["btagAlgo"]
 
+        #Cuts that are applied on fat jets to get top candidates
         self.Cut_criteria = [
             ( 'pt'  , '>', '200.0' ),
             ( 'mass', '>', '80.0' ),
@@ -53,6 +54,7 @@ class SubjetAnalyzer(FilterAnalyzer):
 
 
     def process(self, event):
+        #Process subjets with variated systematics
         for (syst, event_syst) in event.systResults.items():
             if event_syst.passes_btag:
                 res = self._process(event_syst)
@@ -124,8 +126,25 @@ class SubjetAnalyzer(FilterAnalyzer):
         # Keep track of how many httCandidates passed
         event.nhttCandidate_aftercuts = len( tops )
 
+        #Find the best hadronic gen top match for each top candidate
+        if self.cfg_comp.isMC:
+            gentops = getattr(event, "genTopHad", [])
+            if len(gentops)>0:
+                for topcandidate in tops:
+                    lv1 = lvec(topcandidate)
+                    drs = []
+                    for igentop, gentop in enumerate(gentops):
+                        lv2 = lvec(gentop)
+                        drs += [(lv1.DeltaR(lv2), gentop, igentop)]
+                    drs = sorted(drs, key=lambda x: x[0])
+                    best = drs[0]
+                    topcandidate.genTopHad_dr = best[0]
+                    topcandidate.genTop = best[1]
+                    topcandidate.genTopHad_index = best[2]
+
         # Just run normal mem if there is no httCandidate surviving the cuts
         # Check if any candidates survived the cutoff criteria
+
         if len(tops) == 0:
             return event
         # If exactly 1 survived, simply continue with that candidate
@@ -150,11 +169,8 @@ class SubjetAnalyzer(FilterAnalyzer):
         higgsCandidates = []
         for fatjet in event.FatjetCA15ungroomed:
 
-            # Check if bbtag is not too low
-            #if fatjet.bbtag < self.bbtag_cut:
-            #    continue
-
-            # Check if the fatjet is not already matched to the chosen top
+            # Choose only fatjets that were not HTTv2 candidates for the higgs reco
+            # Check if the fatjet is not already matched to the chosen top candidate
             if hasattr(fatjet, 'matched_top') and fatjet == top.matched_fatjet:
                 continue
 
@@ -171,7 +187,14 @@ class SubjetAnalyzer(FilterAnalyzer):
                 lv1 = lvec(fatjet)
                 lv2 = lvec(genhiggs[0])
                 fatjet.dr_genHiggs = lv1.DeltaR(lv2)
-
+            # FIXME: to associate higgs candidates to subjets, need fatjet to subjet association
+            # higgs_subjets = self.Get_Subjets( fatjet ) <-- does not work like this
+            # for (isj, subjet) in enumerate(higgs_subjets):
+            #     setattr(fatjet, "sj{0}pt", subjet.pt)
+            #     setattr(fatjet, "sj{0}eta", subjet.eta)
+            #     setattr(fatjet, "sj{0}phi", subjet.phi)
+            #     setattr(fatjet, "sj{0}mass", subjet.mass)
+            #     setattr(fatjet, "sj{0}btag", subjet.btagCSV)
             higgsCandidates.append( fatjet )
             higgs_present = True
 
@@ -331,42 +354,6 @@ class SubjetAnalyzer(FilterAnalyzer):
             )
         return event
 
-
-        ########################################
-        # Printing particle lists
-        ########################################
-
-        #"""
-        #print '\n====================================='
-        #print 'tops (first one = chosen):'
-        #self.Print_objs( tops, extra_attrs=['bbtag'] )
-        #print 'higgsCandidates:'
-        #self.Print_objs( higgsCandidates, extra_attrs=['bbtag'] )
-        #print '====================================='
-        #print 'reco_btagged_jets:'
-        #self.Print_objs( reco_btagged_jets, ['btag'] )
-        #print 'reco_ltagged_jets:'
-        #self.Print_objs( reco_ltagged_jets, ['btag'] )
-        #print '====================================='
-        #print 'top_subjets:'
-        #for subjet in top_subjets:
-        #    self.Print_objs( subjet, ['btag'] )
-        #    if hasattr( subjet, 'matched_bjet'):
-        #        print '        Matched with bjet, delR = {0}'.format(
-        #            subjet.matched_bjet_delR )
-        #        self.Print_objs( subjet.matched_bjet, ['btag'], tab=True )
-        #    if hasattr( subjet, 'matched_ljet'):
-        #        print '        Matched with ljet, delR = {0}'.format(
-        #            subjet.matched_ljet_delR )
-        #        self.Print_objs( subjet.matched_ljet, ['btag'], tab=True )
-        #print '====================================='
-        #print 'boosted_bjets:'
-        #self.Print_objs( boosted_bjets, ['btag'] )
-        #print 'boosted_ljets:'
-        #self.Print_objs( boosted_ljets, ['btag'] )
-        #print '====================================='
-        #"""
-
         ########################################
         # Quark Matching
         ########################################
@@ -432,16 +419,16 @@ class SubjetAnalyzer(FilterAnalyzer):
             if n_subjettiness > self.n_subjettiness_cut: continue
 
             # Set n_subjettiness, tau_N and the bbtag
-            setattr( top , 'n_subjettiness', n_subjettiness )
-            setattr( top , 'n_subjettiness_groomed', n_subjettiness_groomed )
-            setattr( top , 'tau1', fatjet.tau1 )
-            setattr( top , 'tau2', fatjet.tau2 )
-            setattr( top , 'tau3', fatjet.tau3 )
+            top.n_subjettiness = n_subjettiness
+            top.n_subjettiness_groomed = n_subjettiness_groomed
+            top.tau1 = fatjet.tau1
+            top.tau2 = fatjet.tau2
+            top.tau3 = fatjet.tau3
             
-            setattr( top , 'bbtag', fatjet.bbtag )
+            top.bbtag = fatjet.bbtag
 
             # Calculate delRopt
-            setattr( top, 'delRopt', top.Ropt - top.RoptCalc )
+            top.delRopt = top.Ropt - top.RoptCalc
 
             # Append the httCandidate class to the list
             tops_after_nsub_cut.append( top )

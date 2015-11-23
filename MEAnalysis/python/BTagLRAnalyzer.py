@@ -151,8 +151,6 @@ class BTagLRAnalyzer(FilterAnalyzer):
                 event.systResults[syst] = res
             else:
                 event.systResults[syst].passes_btag = False
-        #event.__dict__.update(evdict["nominal"].__dict__)
-        #event.__dict__.update(event.systResults["nominal"].__dict__)
         return self.conf.general["passall"] or np.any([v.passes_btag for v in event.systResults.values()])
 
     def getJetProbs(self, pdfs, event, taggers):
@@ -162,7 +160,7 @@ class BTagLRAnalyzer(FilterAnalyzer):
         for pdf in ["new_pt_eta_bin_3d"]:
             for csv in taggers:
                 jets_for_btag_lr[ csv ] =  sorted(
-                    event.good_jets, key=lambda x: getattr(x, csv, self.bTagAlgo), reverse=True
+                    event.good_jets, key=lambda x, csv=csv, self=self: getattr(x, csv, self.bTagAlgo), reverse=True
                 )[0:self.conf.jets["NJetsForBTagLR"]]
                 jet_probs[ pdf+"-"+csv ] =  [ 
                     self.evaluate_jet_prob(pdfs, j.pt, j.eta, getattr(j, csv, self.bTagAlgo), pdf)
@@ -215,7 +213,7 @@ class BTagLRAnalyzer(FilterAnalyzer):
             event.buntagged_jets = event.buntagged_jets_bdisc
             event.selected_btagged_jets = event.btagged_jets_bdisc
 
-        btagged = sorted(event.selected_btagged_jets, key=lambda x: getattr(x, self.bTagAlgo) , reverse=True)
+        btagged = sorted(event.selected_btagged_jets, key=lambda x, self=self: getattr(x, self.bTagAlgo) , reverse=True)
 
         #Take first 4 most b-tagged jets, these are used for the top and higgs candidates
         event.selected_btagged_jets_high = btagged[0:4]
@@ -231,4 +229,6 @@ class BTagLRAnalyzer(FilterAnalyzer):
             jet.btagFlag = 1.0
 
         event.passes_btag = len(event.selected_btagged_jets)>=0
+        if "debug" in self.conf.general["verbosity"]:
+            print "Passes btag", event.passes_btag, event.selected_btagged_jets
         return event

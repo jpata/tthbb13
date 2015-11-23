@@ -49,7 +49,10 @@ class EventIDFilterAnalyzer(FilterAnalyzer):
                 print "IDFilter", (event.input.run, event.input.lumi, event.input.evt)
                 passes = True
 
-        if passes and "eventboundary" in self.conf.general["verbosity"]:
+        if passes and (
+            "eventboundary" in self.conf.general["verbosity"] or
+            "debug" in self.conf.general["verbosity"]
+            ):
             print "---starting EVENT r:l:e", event.input.run, event.input.lumi, event.input.evt
         if passes:
             self.counters["processing"].inc("passes")

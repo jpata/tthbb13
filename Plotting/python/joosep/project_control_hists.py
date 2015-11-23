@@ -14,24 +14,28 @@ import datetime
 
 #Number of parallel processes to run for the histogram projection
 #ncores = multiprocessing.cpu_count()
-ncores = 4
+ncores = 30
 
-samplepath = "/Users/joosep/Documents/tth/data/ntp/v14/"
+samplepath = "/dev/shm/joosep/"
 samples = {
-    "ttHTobb_M125_13TeV_powheg_pythia8": samplepath + "/nome/ttHTobb_M125_13TeV_powheg_pythia8.root",
-    "TT_TuneCUETP8M1_13TeV-powheg-pythia8_tt2b": samplepath + "/nome/TT_TuneCUETP8M1_13TeV-powheg-pythia8_tt2b.root",
-    "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttb": samplepath + "/nome/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttb.root",
-    "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttbb": samplepath + "/nome/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttbb.root",
-    "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttcc": samplepath + "/nome/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttcc.root",
-    "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttll": samplepath + "/nome/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttll.root",
-    "SingleMuon": samplepath + "/nome/SingleMuon.root",
-    "SingleElectron": samplepath + "/nome/SingleElectron.root",
+    "ttHTobb_M125_13TeV_powheg_pythia8": samplepath + "/ttHTobb_M125_13TeV_powheg_pythia8.root",
+    "TT_TuneCUETP8M1_13TeV-powheg-pythia8_tt2b": samplepath + "/TT_TuneCUETP8M1_13TeV-powheg-pythia8_tt2b.root",
+    "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttb": samplepath + "/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttb.root",
+    "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttbb": samplepath + "/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttbb.root",
+    "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttcc": samplepath + "/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttcc.root",
+    "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttll": samplepath + "/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttll.root",
+    "SingleMuon": samplepath + "/SingleMuon.root",
+    "SingleElectron": samplepath + "/SingleElectron.root",
+    "DoubleEG": samplepath + "/DoubleEG.root",
+    "DoubleMuon": samplepath + "/DoubleMuon.root",
+    "MuonEG": samplepath + "/MuonEG.root",
 }
 
 lumi = 1280.23
+#lumi = 10000.0
 
 def is_data(sample):
-    if "Single" in sample:
+    if "Single" in sample or "Double" in sample or "Muon" in sample:
         return True
     return False
 
@@ -40,7 +44,7 @@ def weight_str(cut, sample, weight=1.0, lumi=lumi):
     if not is_data(sample):
         return "weight_xs * sign(genWeight) * bTagWeight * {1} * {2} * {3} * ({0})".format(cut, weight, lumi, w)
     else:
-        return cut
+        return "json==1 && ({0})".format(cut)
 
 def drawHelper(args):
     """
@@ -113,7 +117,7 @@ def Draw(tf, of, sample, *args):
     ntot = tf.GetEntriesFast()
 
     #how many events to process per core
-    chunksize = max(ntot/ncores, 100000)
+    chunksize = max(ntot/ncores, 10000)
     chunks = range(0, ntot, chunksize)
     #print args, len(chunks)
     
@@ -137,6 +141,8 @@ def Draw(tf, of, sample, *args):
         #h = sum(h)
         h = hlist[0].Clone()
         for h_ in hlist[1:]:
+            if h.GetNbinsX() != h_.GetNbinsX():
+                raise Exception("bin error: " + h.GetName())
             h.Add(h_)
     hold = h
     of.cd()
@@ -186,24 +192,39 @@ if __name__ == "__main__":
         sampled.cd()
 
         for cutname, cut in [
-            ("sl", "is_sl"),
+            #("dl", "is_dl"),
+            ('dl_j3_t2', "(is_dl==1) & (numJets==3) & (nBCSVM==2)"),
+            ('dl_jge3_t3', "(is_dl==1) & (numJets>=3) & (nBCSVM==3)"),
+            ('dl_jge4_t2', "(is_dl==1) & (numJets>=4) & (nBCSVM==2)"),
+            ('dl_jge4_tge4', "(is_dl==1) & (numJets>=4) & (nBCSVM>=4)"),
+     
+            #("sl", "is_sl"),
 
-            ("sl_mu", "is_sl && abs(leps_pdgId[0])==13"),
-            ("sl_jge4_mu", "is_sl && numJets>=4 && abs(leps_pdgId[0])==13"),
+            #("sl_mu", "is_sl && abs(leps_pdgId[0])==13"),
+            #("sl_jge4_mu", "is_sl && numJets>=4 && abs(leps_pdgId[0])==13"),
             
             ("sl_j4_t3_mu", "is_sl && numJets==4 && nBCSVM==3 && abs(leps_pdgId[0])==13"),
-            ("sl_j4_t4_mu", "is_sl && numJets==4 && nBCSVM==4 && abs(leps_pdgId[0])==13"),
+            #("sl_j4_t4_mu", "is_sl && numJets==4 && nBCSVM==4 && abs(leps_pdgId[0])==13"),
 
             ("sl_j5_t3_mu", "is_sl && numJets==5 && nBCSVM==3 && abs(leps_pdgId[0])==13"),
             ("sl_j5_tge4_mu", "is_sl && numJets==5 && nBCSVM>=4 && abs(leps_pdgId[0])==13"),
 
-            ("sl_jge6_mu", "is_sl && numJets>=6 && abs(leps_pdgId[0])==13"),
+            #("sl_jge6_mu", "is_sl && numJets>=6 && abs(leps_pdgId[0])==13"),
             ("sl_jge6_t2_mu", "is_sl && numJets>=6 && nBCSVM==2 && abs(leps_pdgId[0])==13"),
             ("sl_jge6_t3_mu", "is_sl && numJets>=6 && nBCSVM==3 && abs(leps_pdgId[0])==13"),
             ("sl_jge6_tge4_mu", "is_sl && numJets>=6 && nBCSVM>=4 && abs(leps_pdgId[0])==13"),
             
-            ("sl_el", "is_sl && abs(leps_pdgId[0])==11"),
-            ("sl_jge6_el", "is_sl && numJets>=6 && abs(leps_pdgId[0])==11"),
+
+            #("sl_el", "is_sl && abs(leps_pdgId[0])==11"),
+            #("sl_jge4_el", "is_sl && numJets>=4 && abs(leps_pdgId[0])==11"),
+            
+            ("sl_j4_t3_el", "is_sl && numJets==4 && nBCSVM==3 && abs(leps_pdgId[0])==11"),
+            #("sl_j4_t4_el", "is_sl && numJets==4 && nBCSVM==4 && abs(leps_pdgId[0])==11"),
+
+            ("sl_j5_t3_el", "is_sl && numJets==5 && nBCSVM==3 && abs(leps_pdgId[0])==11"),
+            #("sl_j5_tge4_el", "is_sl && numJets==5 && nBCSVM>=4 && abs(leps_pdgId[0])==11"),
+
+            #("sl_jge6_el", "is_sl && numJets>=6 && abs(leps_pdgId[0])==11"),
             ("sl_jge6_t2_el", "is_sl && numJets>=6 && nBCSVM==2 && abs(leps_pdgId[0])==11"),
             ("sl_jge6_t3_el", "is_sl && numJets>=6 && nBCSVM==3 && abs(leps_pdgId[0])==11"),
             ("sl_jge6_tge4_el", "is_sl && numJets>=6 && nBCSVM>=4 && abs(leps_pdgId[0])==11"),
@@ -211,10 +232,12 @@ if __name__ == "__main__":
 
         
             #add the trigger flags
-            # trig = "(1)"
-            # if "sl" in cutname:
-            #     trig = "(HLT_BIT_HLT_Ele27_eta2p1_WPLoose_Gsf_HT200_v || HLT_BIT_HLT_IsoMu24_eta2p1_v)"
-            # cut = "{0} && {1}".format(cut, trig)
+            trig = "(1)"
+            if "sl" in cutname:
+                trig = "(HLT_WmnHbbAll) | (HLT_WenHbbAll)"
+            elif "dl" in cutname:
+                trig = "(HLT_ZmmHbbAll) | (HLT_ZeeHbbAll) | (HLT_ttHleptonic)"
+            cut = "{0} && {1}".format(cut, trig)
 
             print "cut:", cutname, tf.GetEntries(cut)
             #ROOT.gROOT.cd()
@@ -224,29 +247,29 @@ if __name__ == "__main__":
             #tf.SetEventList(elist)
 
             jetd = sampled.mkdir(cutname)
-            Draw(tf, jetd, samplename, "nBCSVM:numJets >> njets_ntags(15,0,15,15,0,15)", cut)
-            Draw(tf, jetd, samplename, "nBCSVM >> ntags(4,2,6)", cut)
+            #Draw(tf, jetd, samplename, "nBCSVM:numJets >> njets_ntags(15,0,15,15,0,15)", cut)
+            Draw(tf, jetd, samplename, "nBCSVM >> ntags(5,2,7)", cut)
             if "sl" in cutname:
                 Draw(tf, jetd, samplename, "numJets >> njets(7,4,11)", cut)
             elif "dl" in cutname:
                 Draw(tf, jetd, samplename, "numJets >> njets(7,2,9)", cut)
-            #Draw(tf, jetd, samplename, "nfatjets >> nfatjets(5,0,5)", cut)
+            Draw(tf, jetd, samplename, "nfatjets >> nfatjets(5,0,5)", cut)
             
             Draw(tf, jetd, samplename, "leps_pt[0] >> lep0_pt(20,0,500)", cut)
             if "dl" in cutname:
                 Draw(tf, jetd, samplename, "leps_pt[1] >> lep1_pt(20,0,500)", cut)
-            # 
-            # Draw(tf, jetd, samplename, "leps_pdgId[0] >> lep0_pdgId(100,-50,50)", cut)
-            # if "dl" in cutname:
-            #     Draw(tf, jetd, samplename, "leps_pdgId[1] >> lep1_pdgId(100,-50,50)", cut)
-            # 
-            # Draw(tf, jetd, samplename, "leps_relIso03[0] >> lep0_relIso03(100,0,0.5)", cut)
-            # if "dl" in cutname:
-            #     Draw(tf, jetd, samplename, "leps_relIso03[1] >> lep1_relIso03(100,0,0.5)", cut)
-            # 
-            # Draw(tf, jetd, samplename, "leps_relIso04[0] >> lep0_relIso04(100,0,0.5)", cut)
-            # if "dl" in cutname:
-            #     Draw(tf, jetd, samplename, "leps_relIso04[1] >> lep1_relIso04(100,0,0.5)", cut)
+            
+            Draw(tf, jetd, samplename, "leps_pdgId[0] >> lep0_pdgId(100,-50,50)", cut)
+            if "dl" in cutname:
+                Draw(tf, jetd, samplename, "leps_pdgId[1] >> lep1_pdgId(100,-50,50)", cut)
+            
+            Draw(tf, jetd, samplename, "leps_relIso03[0] >> lep0_relIso03(100,0,0.5)", cut)
+            if "dl" in cutname:
+                Draw(tf, jetd, samplename, "leps_relIso03[1] >> lep1_relIso03(100,0,0.5)", cut)
+            
+            Draw(tf, jetd, samplename, "leps_relIso04[0] >> lep0_relIso04(100,0,0.5)", cut)
+            if "dl" in cutname:
+                Draw(tf, jetd, samplename, "leps_relIso04[1] >> lep1_relIso04(100,0,0.5)", cut)
 
             #Draw(tf, jetd, gensyst, "nBCSVM:numJets >> njets_ntags(15,0,15,15,0,15)", cut)
             Draw(tf, jetd, samplename, "jets_pt[0] >> jet0_pt(20,0,500)", cut)
@@ -261,39 +284,54 @@ if __name__ == "__main__":
             Draw(tf, jetd, samplename, "jets_btagBDT[0] >> jet0_btagBDT(20,-1,1)", cut)
             Draw(tf, jetd, samplename, "jets_btagBDT[1] >> jet1_btagBDT(20,-1,1)", cut)
                         
-            # Draw(tf, jetd, samplename, "abs(jets_eta[0]) >> jet0_aeta(20, 0, 5)", cut)
-            # Draw(tf, jetd, samplename, "abs(jets_eta[1]) >> jet1_aeta(20, 0, 5)", cut)
+            Draw(tf, jetd, samplename, "abs(jets_eta[0]) >> jet0_aeta(20, 0, 5)", cut)
+            Draw(tf, jetd, samplename, "abs(jets_eta[1]) >> jet1_aeta(20, 0, 5)", cut)
             
             Draw(tf, jetd, samplename, "btag_LR_4b_2b >> btag_LR_4b_2b(20,0,1)", cut)
             Draw(tf, jetd, samplename, "log(btag_LR_4b_2b/(1.0-btag_LR_4b_2b)) >> btag_LR_4b_2b_logit(20,-10,10)", cut)
-            
-            # Draw(tf, jetd, samplename, "fatjets_pt[0] >> fatjet0_pt(20,0,500)", cut)
-            # Draw(tf, jetd, samplename, "fatjets_pt[1] >> fatjet1_pt(20,0,500)", cut)
-            # Draw(tf, jetd, samplename, "fatjets_eta[0] >> fatjet0_eta(20,-5,5)", cut)
-            # Draw(tf, jetd, samplename, "fatjets_eta[1] >> fatjet1_eta(20,-5,5)", cut)
+            if "sl" in cutname: 
+                Draw(tf, jetd, samplename, "fatjets_pt[0] >> fatjet0_pt(20,0,500)", cut)
+                Draw(tf, jetd, samplename, "fatjets_pt[1] >> fatjet1_pt(20,0,500)", cut)
+                Draw(tf, jetd, samplename, "fatjets_eta[0] >> fatjet0_eta(20,-5,5)", cut)
+                Draw(tf, jetd, samplename, "fatjets_eta[1] >> fatjet1_eta(20,-5,5)", cut)
+                Draw(tf, jetd, samplename, "fatjets_mass[0] >> fatjet0_mass(20,0,300)", cut)
+                Draw(tf, jetd, samplename, "fatjets_mass[1] >> fatjet1_mass(20,0,300)", cut)
+                Draw(tf, jetd, samplename, "topCandidate_pt[0] >> topCandidate_pt(20, 200, 800)", cut)
+                Draw(tf, jetd, samplename, "topCandidate_mass[0] >> topCandidate_mass(20, 80, 250)", cut)
 
-            # Draw(tf, jetd, samplename, "topCandidate_pt[0] >> topCandidate_pt(20, 200, 800)", cut)
-            # Draw(tf, jetd, samplename, "topCandidate_mass[0] >> topCandidate_mass(20, 80, 250)", cut)
-            # Draw(tf, jetd, samplename, "topCandidate_fRec[0] >> topCandidate_fRec(20, 0, 0.5)", cut)
-            # Draw(tf, jetd, samplename, "topCandidate_Ropt[0] >> topCandidate_Ropt(20, 0.4, 2)", cut)
-            # Draw(tf, jetd, samplename, "topCandidate_RoptCalc[0] >> topCandidate_RoptCalc(20, 0.4, 2)", cut)
-            # Draw(tf, jetd, samplename, "topCandidate_bbtag[0] >> topCandidate_bbtag(20, -1, 1)", cut)
-            # Draw(tf, jetd, samplename, "topCandidate_tau1[0] >> topCandidate_tau1(20, 0, 1)", cut)
-            # Draw(tf, jetd, samplename, "topCandidate_tau2[0] >> topCandidate_tau2(20, 0, 1)", cut)
-            # Draw(tf, jetd, samplename, "topCandidate_tau3[0] >> topCandidate_tau3(20, 0, 1)", cut)
-            # Draw(tf, jetd, samplename, "topCandidate_n_subjettiness[0] >> topCandidate_n_subjettiness(20, 0, 1)", cut)
-            # 
-            # Draw(tf, jetd, samplename, "higgsCandidate_pt >> higgsCandidate_pt(20, 200, 800)", cut)
-            # Draw(tf, jetd, samplename, "higgsCandidate_mass >> higgsCandidate_mass(20, 0, 500)", cut)
-            # Draw(tf, jetd, samplename, "higgsCandidate_mass_pruned >> higgsCandidate_mass_pruned(20, 0, 500)", cut)
-            # Draw(tf, jetd, samplename, "higgsCandidate_mass_softdrop >> higgsCandidate_mass_softdrop(20, 0, 500)", cut)
-            # Draw(tf, jetd, samplename, "higgsCandidate_tau1 >> higgsCandidate_tau1(20, 0, 1)", cut)
-            # Draw(tf, jetd, samplename, "higgsCandidate_tau2 >> higgsCandidate_tau2(20, 0, 1)", cut)
-            # Draw(tf, jetd, samplename, "higgsCandidate_tau3 >> higgsCandidate_tau3(20, 0, 1)", cut)
-            # Draw(tf, jetd, samplename, "higgsCandidate_bbtag >> higgsCandidate_bbtag(20, -1, 1)", cut)
-            # Draw(tf, jetd, samplename, "higgsCandidate_n_subjettiness >> higgsCandidate_n_subjettiness(20, -1, 1)", cut)
-            # Draw(tf, jetd, samplename, "higgsCandidate_dr_top >> higgsCandidate_dr_top(20, 0, 5)", cut)
-            # Draw(tf, jetd, samplename, "higgsCandidate_dr_genHiggs >> higgsCandidate_dr_genHiggs(20, 0, 5)", cut)
+                #fixme low frec -> top cand mass and vice versa
+                for (addcutname, addcut) in [
+                    ("inclusive", "1"),
+                    ("_fRecless02", "topCandidate_fRec[0]<0.2"),
+                    ("_fRecgeq02", "topCandidate_fRec[0]>=0.2"),
+                    ("_massOn", "topCandidate_mass[0]>120 && topCandidate_mass[0]<200"),
+                    ("_massOff", "topCandidate_mass[0]>120 && topCandidate_mass[0]<200"),
+                ]:
+                    _cut = cut + "&&" + addcut
+                    Draw(tf, jetd, samplename, "topCandidate_fRec[0] >> topCandidate_fRec_{0}(50, 0, 0.5)".format(addcutname), _cut)
+                    Draw(tf, jetd, samplename, "topCandidate_Ropt[0] >> topCandidate_Ropt_{0}(20, 0.4, 2)".format(addcutname), _cut)
+                    Draw(tf, jetd, samplename, "topCandidate_RoptCalc[0] >> topCandidate_RoptCalc_{0}(20, 0.4, 2)".format(addcutname), _cut)
+                    Draw(tf, jetd, samplename, "topCandidate_bbtag[0] >> topCandidate_bbtag_{0}(20, -1, 1)".format(addcutname), _cut)
+                    Draw(tf, jetd, samplename, "topCandidate_tau1[0] >> topCandidate_tau1_{0}(20, 0, 1)".format(addcutname), _cut)
+                    Draw(tf, jetd, samplename, "topCandidate_tau2[0] >> topCandidate_tau2_{0}(20, 0, 1)".format(addcutname), _cut)
+                    Draw(tf, jetd, samplename, "topCandidate_tau3[0] >> topCandidate_tau3_{0}(20, 0, 1)".format(addcutname), _cut)
+                    Draw(tf, jetd, samplename, "topCandidate_n_subjettiness[0] >> topCandidate_n_subjettiness_{0}(20, 0, 1)".format(addcutname), _cut)
+                    Draw(tf, jetd, samplename, "topCandidate_n_subjettiness_groomed[0] >> topCandidate_n_subjettiness_groomed_{0}(20, 0, 1)".format(addcutname), _cut)
+                
+                for (addcutname, addcut) in [
+                    ("inclusive", "1"),
+                    ("_ptless400", "higgsCandidate_pt<400"),
+                    ("_ptgeq400", "higgsCandidate_pt>=400"),
+                ]:
+                    _cut = cut + "&&" + addcut
+                    Draw(tf, jetd, samplename, "higgsCandidate_pt >> higgsCandidate_pt_{0}(20, 200, 800)".format(addcutname), _cut)
+                    Draw(tf, jetd, samplename, "higgsCandidate_mass >> higgsCandidate_mass_{0}(20, 0, 500)".format(addcutname), _cut)
+                    Draw(tf, jetd, samplename, "higgsCandidate_mass_pruned >> higgsCandidate_mass_pruned_{0}(20, 0, 500)".format(addcutname), _cut)
+                    Draw(tf, jetd, samplename, "higgsCandidate_mass_softdrop >> higgsCandidate_mass_softdrop_{0}(20, 0, 500)".format(addcutname), _cut)
+                    Draw(tf, jetd, samplename, "higgsCandidate_bbtag >> higgsCandidate_bbtag_{0}(20, -1, 1)".format(addcutname), _cut)
+                    Draw(tf, jetd, samplename, "higgsCandidate_n_subjettiness >> higgsCandidate_n_subjettiness_{0}(20, -1, 1)".format(addcutname), _cut)
+                    Draw(tf, jetd, samplename, "higgsCandidate_dr_top >> higgsCandidate_dr_top_{0}(20, 0, 5)".format(addcutname), _cut)
+                    Draw(tf, jetd, samplename, "higgsCandidate_dr_genHiggs >> higgsCandidate_dr_genHiggs_{0}(20, 0, 5)".format(addcutname), _cut)
 
             #MEM distributions
             for matchname, matchcut in [
@@ -314,6 +352,7 @@ if __name__ == "__main__":
                 #memidx - index into the MEM results array (see MEAnalysis_cfg_heppy -> Conf.mem["methodOrder"])
                 for memname, memidx in [
                     ("SL_0w2h2t", 0),
+                    ("SL_2w2h2t", 5),
                     ("DL_0w2h2t", 1),
                     ]:
 
@@ -325,12 +364,12 @@ if __name__ == "__main__":
                         continue
 
                     #1D mem distribution
-                    # Draw(tf, jetd, samplename,
-                    #     "mem_tth_p[{0}] / (mem_tth_p[{0}] + 0.15*mem_ttbb_p[{0}]) >> mem_{1}{2}(12,0,1)".format(
-                    #         memidx, memname, matchname
-                    #     ),
-                    #     cut
-                    # )
+                    Draw(tf, jetd, samplename,
+                        "mem_tth_p[{0}] / (mem_tth_p[{0}] + 0.15*mem_ttbb_p[{0}]) >> mem_{1}{2}(12,0,1)".format(
+                            memidx, memname, matchname
+                        ),
+                        cut
+                    )
             
             jetd.Write()
 
@@ -339,9 +378,6 @@ if __name__ == "__main__":
         del tf
     # End of loop over samples
 
-    channels = ["sl_jge6_tge4", "sl_jge6_tge4_blrH", "sl_jge6_tge4_blrL"]
     print "writing"
     of.Write()
     of.Close()
-
-    #PrintDatacard(event_counts, dcard.Datacard, dcof)
