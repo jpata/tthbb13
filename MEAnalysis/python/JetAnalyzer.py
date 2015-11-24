@@ -85,10 +85,14 @@ class JetAnalyzer(FilterAnalyzer):
             jets_raw = self.variateJets(event.Jet, "JES", 0)
             jets_JES_Up = self.variateJets(event.Jet, "JES", 1)
             jets_JES_Down = self.variateJets(event.Jet, "JES", -1)
+            jets_JER_Up = self.variateJets(event.Jet, "JER", 1)
+            jets_JER_Down = self.variateJets(event.Jet, "JER", -1)
             for name, jets in [
                     ("raw", jets_raw),
                     ("JESUp", jets_JES_Up),
-                    ("JESDown", jets_JES_Down)
+                    ("JESDown", jets_JES_Down),
+                    ("JERUp", jets_JER_Up),
+                    ("JERDown", jets_JER_Down)
                 ]:
                 if not name in self.conf.general["systematics"]:
                     continue
