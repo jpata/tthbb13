@@ -105,6 +105,7 @@ int main(int argc, const char** argv) {
     //Finalize with output
     cout << "Read " << nbytes/1024/1024 << " Mb" << endl;
     cout << to_string(results) << endl;
-    saveResults(results, ProcessKey::to_string(conf.process), conf.outputFile);
+    const string outname = ProcessKey::to_string(conf.process) + conf.prefix;
+    saveResults(results, outname, conf.outputFile);
     return 0;
 }

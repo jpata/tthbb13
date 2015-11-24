@@ -5,16 +5,13 @@ retcode = 0
 filename = ""
 entries = 0
 
+rootprefix = "root://eoscms.cern.ch//eos/cms/"
+siteprefix = "/store/group/phys_higgs/hbb/ntuples/V16pre/"
+
 def findSampleName(n):
+    n = n.replace(rootprefix + siteprefix, "")
     spl = n.split("/")
-    ibase = 0
-    #find index of VHBBHeppyV*
-    for s in spl:
-        if "VHBBHeppy" in s:
-            break
-        ibase += 1
-    #sample name is the next one
-    return spl[ibase+1]
+    return spl[0]
 try:
     print "heppy_crab_script.py started"
     import ROOT
@@ -33,7 +30,8 @@ try:
     firstInput = crabFiles[0]
     filename, firstEvent, nEvents = firstInput.split("___")
     #rootfilename = "root://xrootd-cms.infn.it//" + filename
-    rootfilename = "root://t3se01.psi.ch:1094//" + filename
+    #rootfilename = "root://148.187.64.51:1094//pnfs/lcg.cscs.ch/cms/trivcat/" + filename
+    rootfilename = rootprefix + filename
     firstEvent = int(firstEvent)
     nEvents = int(nEvents)
     print "checking file",rootfilename

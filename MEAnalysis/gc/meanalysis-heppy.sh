@@ -2,19 +2,19 @@
 
 #uncomment these to test the script
 #these are all the input parameters that MEAnalysis_heppy_gc.py reads
-#export SKIP_EVENTS=0
-#export MAX_EVENTS=100
-#export DATASETPATH=TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2
-#export FILE_NAMES=/store/t3groups/ethz-higgs/run2/VHBBHeppyV13/TT_TuneCUETP8M1_13TeV-powheg-pythia8/VHBB_HEPPY_V13_TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/151002_060618/0000/tree_172.root
-#export MY_SCRATCH=./
+export SKIP_EVENTS=0
+export MAX_EVENTS=10000
+export DATASETPATH=ttHTobb_M125_13TeV_powheg_pythia8
+export FILE_NAMES=/store/user/jpata/VHBBHeppyV16pre/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V16pre_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/151117_175129/0000/tree_1.root
+export MY_SCRATCH=./
 
 
 #on PSI, CMSSW_BASE is not exported with the grid job, need to set manually
 #CMSSW_BASE=$HOME/tth/sw/CMSSW/
 
 #here we use @...@ to give grid-control the possibility to substitute the configuration file name
-#export ME_CONF=$CMSSW_BASE/src/TTH/MEAnalysis/python/MEAnalysis_cfg_heppy.py
-export ME_CONF=$CMSSW_BASE/src/TTH/MEAnalysis/python/@me_conf@
+export ME_CONF=$CMSSW_BASE/src/TTH/MEAnalysis/python/cfg_withME.py
+#export ME_CONF=$CMSSW_BASE/src/TTH/MEAnalysis/python/@me_conf@
 
 #print out the environment
 env

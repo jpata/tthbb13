@@ -37,7 +37,7 @@ class BTagLRAnalyzer(FilterAnalyzer):
     def __init__(self, cfg_ana, cfg_comp, looperName):
         super(BTagLRAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
         self.conf = cfg_ana._conf
-        self.bTagAlgo        = getattr(cfg_ana, "btagAlgo", self.conf.jets["btagAlgo"])
+        self.bTagAlgo        = self.conf.jets["btagAlgo"]
         #self.cplots_old = ROOT.TFile(self.conf.general["controlPlotsFileOld"])
         self.cplots = ROOT.TFile(self.conf.general["controlPlotsFile"])
         #self.cplots_new = ROOT.TFile(self.conf.general["controlPlotsFileNew"])

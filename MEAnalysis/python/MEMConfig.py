@@ -19,7 +19,7 @@ ROOT.MEM.MEMConfig.__repr__ = ROOT_MEMConfig_str
 class MEMConfig:
     def __init__(self):
         self.cfg = MEM.MEMConfig()
-        self.cfg.defaultCfg()
+        self.cfg.defaultCfg(0.5)
         self.b_quark_candidates = lambda event: event.selected_btagged_jets_high
         self.l_quark_candidates = lambda event: event.wquark_candidate_jets
         self.lepton_candidates = lambda event: event.good_leptons

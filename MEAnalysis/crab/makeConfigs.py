@@ -2,8 +2,8 @@
 import os, sys
 
 dname_dict = {
-    "ttHTobb_M125_13TeV_powheg_pythia8_2000": "/ttHTobb_M125_13TeV_powheg_pythia8/arizzi-VHBB_HEPPY_V14_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1-c2fe7dabe0847de4b91e3409460df03d/USER",
-    "TT_TuneCUETP8M1_13TeV-powheg-pythia8_10000": "/TT_TuneCUETP8M1_13TeV-powheg-pythia8/arizzi-VHBB_HEPPY_V14_TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1-c768f5d1cdee91c788d0c4b7fd93ee3e/USER"
+    "ttHTobb_M125_13TeV_powheg_pythia8_1000": "ttHTobb_M125_13TeV_powheg_pythia8",
+    "TT_TuneCUETP8M1_13TeV-powheg-pythia8_10000": "TT_TuneCUETP8M1_13TeV-powheg-pythia8_10000",
 }
 
 username = os.getenv("USER")

@@ -19,7 +19,7 @@ import pickle
 ########################################
 
 #ControlPlotsSparse_2015_10_15_withBLR.root
-input_file = "../../ControlPlotsSparse.root"
+input_file = "ControlPlotsSparse.root"
 output_path = "/scratch/joosep/"
 
 n_proc = 20
@@ -119,8 +119,13 @@ if __name__ == "__main__":
     Categorize.Categorization.pool = Pool(n_proc)
 
     Categorize.Categorization.lg = LimitGetter(output_path)
+   
+    print "Old categorization"
+    make_latex("old")
 
+    print "Optimization"
     r = Categorize.CategorizationFromString(trees["3cat"])
+    name = "opt"
     optimize(r)
     of = open( name + ".tex","w")
     of.write(r.print_tree_latex())
@@ -129,7 +134,6 @@ if __name__ == "__main__":
     of.write(pickle.dumps(r))
     of.close()
 
-    #make_latex("old")
 
     #for i in range(5,7):
     #    make_latex("{0}cat".format(i))

@@ -63,6 +63,7 @@ const Configuration Configuration::makeConfiguration(JsonValue& value) {
     vector<string> filenames;
     double lumi = -1.0;
     ProcessKey::ProcessKey process = ProcessKey::UNKNOWN;
+    string prefix;
     string outputFile = "UNDEFINED";
     long firstEntry = -1;
     long numEntries = -1;
@@ -83,6 +84,10 @@ const Configuration Configuration::makeConfiguration(JsonValue& value) {
         }
         else if (ks == "process") {
             process = ProcessKey::from_string(lev1->value.toString());
+        }
+        else if (ks == "prefix") {
+            prefix = lev1->value.toString();
+            cout << "json deserialized prefix " << prefix << endl;
         }
         else if (ks == "firstEntry") {
             firstEntry = (long)(lev1->value.toNumber());
@@ -128,7 +133,10 @@ const Configuration Configuration::makeConfiguration(JsonValue& value) {
         }
     }
     return Configuration(
-        filenames, lumi, process, firstEntry, numEntries, printEvery,
+        filenames, lumi,
+        process,
+        prefix,
+        firstEntry, numEntries, printEvery,
         outputFile,
         sparseAxes
     );
@@ -142,6 +150,7 @@ string Configuration::to_string() const {
     }
     ss << "  lumi=" << this->lumi << endl;
     ss << "  process=" << this->process << endl;
+    ss << "  prefix=" << this->prefix << endl;
     ss << "  firstEntry=" << this->firstEntry << endl;
     ss << "  numEntries=" << this->numEntries << endl;
     ss << ")" << endl;

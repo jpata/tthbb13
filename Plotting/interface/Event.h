@@ -132,6 +132,7 @@ public:
     vector<string> filenames;
     double lumi;
     ProcessKey::ProcessKey process;
+    string prefix;
     long firstEntry;
     long numEntries;
     int printEvery;
@@ -142,6 +143,7 @@ public:
         vector<string>& _filenames,
         double _lumi,
         ProcessKey::ProcessKey _process,
+        string _prefix,
         long _firstEntry,
         long _numEntries,
         int _printEvery,
@@ -151,6 +153,7 @@ public:
         filenames(_filenames),
         lumi(_lumi),
         process(_process),
+        prefix(_prefix),
         firstEntry(_firstEntry),
         numEntries(_numEntries),
         printEvery(_printEvery),

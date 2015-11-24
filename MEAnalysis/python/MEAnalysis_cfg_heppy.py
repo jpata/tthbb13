@@ -176,8 +176,8 @@ class Conf:
         "sampleFile": os.environ["CMSSW_BASE"]+"/python/TTH/MEAnalysis/samples_v16.py",
         "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions.pickle",
         "transferFunctions_sj_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions_sj.pickle",
-        "systematics": ["nominal"],
-        #"systematics": ["nominal", "JESUp", "JESDown", "JESUp", "JESDown"],
+        #"systematics": ["nominal"],
+        "systematics": ["nominal", "JESUp", "JESDown", "JERUp", "JERDown"],
         
         
         #If the list contains:

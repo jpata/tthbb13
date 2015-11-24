@@ -2,7 +2,7 @@ from WMCore.Configuration import Configuration
 config = Configuration()
 import os
 
-processing_name = "Nov3_GITHASH" 
+processing_name = "Nov23_GITHASH" 
 config.section_("General")
 #this will be used for the crab directory name
 config.General.requestName = DNAME
@@ -34,11 +34,11 @@ config.JobType.inputFiles = [
 
 config.section_("Data")
 #this name will be used for creating the output directory
-config.Data.primaryDataset = FULLDAS
+config.Data.outputPrimaryDataset = FULLDAS
 config.Data.splitting = 'FileBased'
 config.Data.unitsPerJob = 1
-config.Data.totalUnits = -1
-config.Data.outLFNDirBase = '/store/user/USERNAME/tthbb13/VHBBHeppyV14/' + processing_name
+config.Data.totalUnits = 5
+config.Data.outLFNDirBase = '/store/user/jpata/tthbb13/VHBBHeppyV16pre/' + processing_name
 config.Data.publication = False
 filelist = open(DATASET).readlines()
 config.Data.userInputFiles = filelist
@@ -46,6 +46,6 @@ config.Data.userInputFiles = filelist
 config.section_("Site")
 config.Site.storageSite = "T3_CH_PSI"
 #config.Site.storageSite = "T2_CH_CSCS"
-#config.Site.storageSite = "T2_EE_Estonia"
-
+config.Site.storageSite = "T2_EE_Estonia"
+config.Site.blacklist = ["T2_UA_KIPT", "T3_US_FIT"]
 #config.Data.ignoreLocality = True
