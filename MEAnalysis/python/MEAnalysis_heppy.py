@@ -284,7 +284,8 @@ if __name__ == "__main__":
 
     #Process all samples in the sample list
     for samp in inputSamples:
-
+        if not samp.isMC:
+            continue
         config = cfg.Config(
             #Run across these inputs
             components = [samp],

@@ -54,14 +54,18 @@ class JetAnalyzer(FilterAnalyzer):
                 newjets[i].mass *= cf
         elif self.cfg_comp.isMC and systematic == "JER":
             for i in range(len(jets)):
-                if sigma > 0:
-                    cf = sigma * newjets[i].corr_JERUp / newjets[i].corr_JER
-                elif sigma < 0:
-                    cf = abs(sigma) * newjets[i].corr_JERDown / newjets[i].corr_JER
-                
-                #get the uncorrected jets
-                elif sigma == 0:
-                    cf = 1.0 / newjets[i].corr
+                if newjets[i].corr_JER > 0:
+                    if sigma > 0:
+                        cf =  sigma * newjets[i].corr_JERUp / newjets[i].corr_JER
+                    elif sigma < 0:
+                        cf = abs(sigma) * newjets[i].corr_JERDown / newjets[i].corr_JER
+                    
+                    #get the uncorrected jets
+                    elif sigma == 0:
+                        cf = 1.0 / newjets[i].corr_JER
+                else:
+                    print "jet JER corr = 0", newjets[i].pt
+                    cf = 0.0
 
                 newjets[i].pt *= cf
                 newjets[i].mass *= cf
