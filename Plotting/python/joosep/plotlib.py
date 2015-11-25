@@ -105,6 +105,7 @@ varnames = {
     "topCandidate_RoptCalc": "top candidate $R_{\\mathrm{opt}}, calc$",
     "topCandidate_n_subjettiness": "top candidate n-subjettiness$",
 
+    "nhiggsCandidate": "Number of higgs candidates",
     "higgsCandidate_pt": "H candidate $p_T$ [GeV]",
     "higgsCandidate_eta": "H candidate $\eta$",
     "higgsCandidate_mass": "H candidate $M$ [GeV]",
@@ -113,6 +114,9 @@ varnames = {
     "higgsCandidate_bbtag": "H candidate bbtag",
     "higgsCandidate_n_subjettiness": "H candidate n-subjettiness",
     "higgsCandidate_dr_top":  "$\\Delta R_{h,t}$",
+    "numJets": "$N_{\\mathrm{jets}}$",
+    "nBCSVM": "$N_{\\mathrm{CSVM}}$",
+    "btag_LR_4b_2b_logit": "$\\log{\\mathcal{F} / (1 - \\mathcal{F})}$",
 
 }
 
@@ -403,8 +407,8 @@ def draw_data_mc(tf, hname, samples, **kwargs):
     else:
         a1 = plt.axes()
         
-    plt.title("$\\textbf{CMS}$ preliminary\n $\sqrt{s} = 13$ TeV"+title_extended,
-        y=0.96, x=0.04,
+    c.suptitle("$\\textbf{CMS}$ preliminary\n $\sqrt{s} = 13$ TeV"+title_extended,
+        y=0.98, x=0.02,
         horizontalalignment="left", verticalalignment="top"
     )
     r = mc_stack(hs.values(), colors=colors)
@@ -431,15 +435,17 @@ def draw_data_mc(tf, hname, samples, **kwargs):
     elif dataname:
         datas = []
         for dn in dataname:
-            h = tf.get(dn + "/" + hname)
-            if h:
+            try:
+                h = tf.get(dn + "/" + hname)
                 datas += [tf.get(dn + "/" + hname).Clone()]
+            except rootpy.io.file.DoesNotExist:
+                print "missing", dn, hname
         if len(datas)>0:
             data = sum(datas)
+            data.rebin(rebin)
         else:
-            data = tot_bg.Clone()
+            data = tot_mc.Clone()
             data.Scale(0.0)
-        data.rebin(rebin)
         data.title = "data ({0})".format(data.Integral())
 
     if data:
@@ -458,7 +464,7 @@ def draw_data_mc(tf, hname, samples, **kwargs):
             #print h.title, line.get_color()
             patch = mpatches.Patch(color=line.get_color(), label=h.title)
             patches += [patch]
-        plt.legend(handles=patches, loc=legend_loc, numpoints=1, prop={'size':legend_fontsize})
+        plt.legend(handles=patches, loc=legend_loc, numpoints=1, prop={'size':legend_fontsize}, ncol=2, frameon=False)
     if ylabel == "auto":
         ylabel = "events / {0:.2f} {1}".format(hs.values()[0].get_bin_width(1), xunit)
     plt.ylabel(ylabel)
@@ -714,3 +720,55 @@ def syst_comparison(tf, sn, l, **kwargs):
 def svfg(fn, **kwargs):
     plt.savefig(fn, pad_inches=0.5, bbox_inches='tight', **kwargs)
     #plt.clf()
+
+
+def get_yields(inf, cat, suffix, samples):
+    hs = []
+    for x in samples:
+        try:
+            h = inf.get("{0}{2}/{1}/jet0_pt".format(x, cat, suffix))
+            hs += [h]
+        except rootpy.io.DoesNotExist as e:
+            pass
+    if len(hs)==0:
+        hs = [rootpy.plotting.Hist(10, 0, 1)]
+    hs = sum(hs)
+    
+    e1 = ROOT.Double(0)
+    i1 = hs.IntegralAndError(0, hs.GetNbinsX()+1, e1)
+    return i1, e1
+
+def get_sb(inf, cat, suffix):
+    """
+    Returns the S/sqrt(B) [sob] and error in a category.
+    inf - input file (rootpy.io.File)
+    cat - category string (e.g. "sl_mu_jge6_tge4")
+    suffix - optional suffix string to append to samples (e.g. "_cfg_noME_jetPt20")
+
+    returns (sob, error_sob)
+    """
+
+    signal = "ttH_hbb"
+    backgrounds = ["ttbarOther", "ttbarPlusCCbar", "ttbarPlus2B", "ttbarPlusB", "ttbarPlusBBbar"]
+    
+    i1, e1 = get_yields(inf, cat, suffix, [signal])
+    i2, e2 = get_yields(inf, cat, suffix, backgrounds)
+
+    sob = i1/np.sqrt(i2) if i2>0 else 0.0
+    if i1>0 and i2>0:
+        err_sob = sob * np.sqrt((e1/i1)**2 + (e2/i2)**2)
+    else:
+        err_sob = 0
+    return i1/np.sqrt(i2), err_sob
+
+def get_sb_cats(inf, categories, suffix=""):
+    ys = []
+    es = []
+    xs = []
+    for cat in categories:
+        y, e = get_sb(inf, cat, suffix)
+        xs += [cat]
+        ys += [y]
+        es += [e]
+    xs_num = np.array(range(len(xs)))+0.5
+    return xs, xs_num, ys, es
