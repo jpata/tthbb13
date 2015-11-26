@@ -392,7 +392,7 @@ bool isSignalMC(ProcessKey::ProcessKey proc) {
 
 double nominal_weight(const Event& ev, const Configuration& conf) {
     if (isMC(conf.process)) {
-        return conf.lumi * ev.weight_xs * ev.puWeight;
+        return conf.lumi * ev.weight_xs * ev.puWeight * process_weight(conf.process);
     }
     return 1.0;
 }
@@ -405,53 +405,54 @@ static const Event::WeightMap nominalWeights = {
 //Systematically variated weights, applied only in case of nominal event
 static const Event::WeightMap systWeights = {
     {SystematicKey::nominal, nominal_weight},
-//    {
-//        SystematicKey::CMS_ttH_CSVStats1Up,
-//        [](const Event& ev){ return nominal_weight(ev)/ev.bTagWeight * ev.bTagWeight_Stats1Up;}
-//    },
-//    {
-//        SystematicKey::CMS_ttH_CSVStats1Down,
-//        [](const Event& ev){ return nominal_weight(ev)/ev.bTagWeight * ev.bTagWeight_Stats1Down;}
-//    },
-//    {
-//        SystematicKey::CMS_ttH_CSVStats2Up,
-//        [](const Event& ev){ return nominal_weight(ev)/ev.bTagWeight * ev.bTagWeight_Stats2Up;}
-//    },
-//    {
-//        SystematicKey::CMS_ttH_CSVStats2Down,
-//        [](const Event& ev){ return nominal_weight(ev)/ev.bTagWeight * ev.bTagWeight_Stats2Down;}
-//    },
-//    {
-//        SystematicKey::CMS_ttH_CSVLFUp,
-//        [](const Event& ev){ return nominal_weight(ev)/ev.bTagWeight * ev.bTagWeight_LFUp;}
-//    },
-//    {
-//        SystematicKey::CMS_ttH_CSVLFDown,
-//        [](const Event& ev){ return nominal_weight(ev)/ev.bTagWeight * ev.bTagWeight_LFDown;}
-//    },
-//    {
-//        SystematicKey::CMS_ttH_CSVHFUp,
-//        [](const Event& ev){ return nominal_weight(ev)/ev.bTagWeight * ev.bTagWeight_HFUp;}
-//    },
-//    {
-//        SystematicKey::CMS_ttH_CSVHFDown,
-//        [](const Event& ev){ return nominal_weight(ev)/ev.bTagWeight * ev.bTagWeight_HFDown;}
-//    },
+    {
+        SystematicKey::CMS_ttH_CSVStats1Up,
+        [](const Event& ev, const Configuration& conf){ return nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_Stats1Up;}
+    },
+    {
+        SystematicKey::CMS_ttH_CSVStats1Down,
+        [](const Event& ev, const Configuration& conf){ return nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_Stats1Down;}
+    },
+    {
+        SystematicKey::CMS_ttH_CSVStats2Up,
+        [](const Event& ev, const Configuration& conf){ return nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_Stats2Up;}
+    },
+    {
+        SystematicKey::CMS_ttH_CSVStats2Down,
+        [](const Event& ev, const Configuration& conf){ return nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_Stats2Down;}
+    },
+    {
+        SystematicKey::CMS_ttH_CSVLFUp,
+        [](const Event& ev, const Configuration& conf){ return nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_LFUp;}
+    },
+    {
+        SystematicKey::CMS_ttH_CSVLFDown,
+        [](const Event& ev, const Configuration& conf){ return nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_LFDown;}
+    },
+    {
+        SystematicKey::CMS_ttH_CSVHFUp,
+        [](const Event& ev, const Configuration& conf){ return nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_HFUp;}
+    },
+    {
+        SystematicKey::CMS_ttH_CSVHFDown,
+        [](const Event& ev, const Configuration& conf){ return nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_HFDown;}
+    },
 };
 
+///FIXME: these ad-hoc process weights are here to fix a wrong value of nGen in processing
 double process_weight(ProcessKey::ProcessKey proc) {
-  return 1.0;
-
-//    switch(proc) {
-//        case ProcessKey::ttbarPlusBBbar:
-//        case ProcessKey::ttbarPlusB:
-//        case ProcessKey::ttbarPlus2B:
-//        case ProcessKey::ttbarPlusCCbar:
-//        case ProcessKey::ttbarOther:
-//            return 0.5;
-//        default:
-//            return 1.0;
-//    }
+    switch(proc) {
+        case ProcessKey::ttbarPlusBBbar:
+        case ProcessKey::ttbarPlusB:
+        case ProcessKey::ttbarPlus2B:
+        case ProcessKey::ttbarPlusCCbar:
+        case ProcessKey::ttbarOther:
+            return 39383772.0 / 19714839.0;
+        case ProcessKey::ttH_hbb:
+            return 7596287.0 / 3930444.0;
+        default:
+            return 1.0;
+    }
 }
 
 const Event EventFactory::makeNominal(const TreeData& data, const Configuration& conf) {

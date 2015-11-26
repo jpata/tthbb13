@@ -458,5 +458,6 @@ namespace BaseCuts {
 bool isMC(ProcessKey::ProcessKey proc);
 bool isSignalMC(ProcessKey::ProcessKey proc);
 bool isData(ProcessKey::ProcessKey proc);
+double process_weight(ProcessKey::ProcessKey proc);
 
 #endif

@@ -20,7 +20,6 @@ class BTagLRAnalyzer(FilterAnalyzer):
         """
         Returns a dictionary with the b-tagging PDF-s
         """
-        #print "Need to Fix the BTagLRAnalyzer to return normalised PDFs"
         csv_pdfs = {}
 
         for x in ["b", "c", "l"]:
@@ -28,7 +27,6 @@ class BTagLRAnalyzer(FilterAnalyzer):
                 csv_pdfs[(x, b)] = cplots.Get(
                     "{2}_{0}_{1}__rec".format(x, b, self.bTagAlgo)
                 )
-                #self.csv_pdfs[(x, b)].Scale(1.0 / self.csv_pdfs[(x, b)].Integral())
             csv_pdfs[(x, "pt_eta")] = cplots.Get(
                 "{1}_{0}_pt_eta".format(x, self.bTagAlgo)
             )
@@ -83,43 +81,43 @@ class BTagLRAnalyzer(FilterAnalyzer):
             self.get_pdf_prob(pdfs, "l", pt, eta, taggerval, kind)
         )
 
-    def btag_likelihood(self, probs, nB, nC):
-        """
-        This is the outdated python function for evaluating the b-tag likelihood.
-        """
+    #def btag_likelihood(self, probs, nB, nC):
+    #    """
+    #    This is the outdated python function for evaluating the b-tag likelihood.
+    #    """
 
-        perms = itertools.permutations(range(len(probs)))
+    #    perms = itertools.permutations(range(len(probs)))
 
-        P = 0.0
-        max_p = -1.0
-        nperms = 0
-        best_perm = None
+    #    P = 0.0
+    #    max_p = -1.0
+    #    nperms = 0
+    #    best_perm = None
 
-        np = len(probs)
-        for perm in perms:
-            p = 1.0
+    #    np = len(probs)
+    #    for perm in perms:
+    #        p = 1.0
 
-            for i in range(0, nB):
-                if i < np:
-                    p *= probs[perm[i]][0]
-            for i in range(nB, min(nB + nC, np)):
-                if i < np:
-                    p *= probs[perm[i]][1]
-            for i in range(nB + nC, np):
-                if i < np:
-                    p *= probs[perm[i]][2]
+    #        for i in range(0, nB):
+    #            if i < np:
+    #                p *= probs[perm[i]][0]
+    #        for i in range(nB, min(nB + nC, np)):
+    #            if i < np:
+    #                p *= probs[perm[i]][1]
+    #        for i in range(nB + nC, np):
+    #            if i < np:
+    #                p *= probs[perm[i]][2]
 
-            #print nperms, p, perm, max_p, best_perm
-            if p > max_p:
-                best_perm = perm
-                max_p = p
+    #        #print nperms, p, perm, max_p, best_perm
+    #        if p > max_p:
+    #            best_perm = perm
+    #            max_p = p
 
-            P += p
-            nperms += 1
-        P = P / float(nperms)
-        assert nperms > 0
-        return P, best_perm
-        #end permutation loop
+    #        P += p
+    #        nperms += 1
+    #    P = P / float(nperms)
+    #    assert nperms > 0
+    #    return P, best_perm
+    #    #end permutation loop
 
 
     def btag_likelihood2(self, probs, nB):
@@ -131,6 +129,7 @@ class BTagLRAnalyzer(FilterAnalyzer):
             jp.setProbability(MEM.JetInterpretation.c, probs[ijet][1])
             jp.setProbability(MEM.JetInterpretation.l, probs[ijet][2])
             self.jlh.push_back_object(jp)
+            print "probas", ijet, probs[ijet]
 
         bperm = Cvectoruint()
         P = self.jlh.calcProbability(MEM.JetInterpretation.b, MEM.JetInterpretation.l, nB, bperm)
@@ -180,15 +179,18 @@ class BTagLRAnalyzer(FilterAnalyzer):
         if self.conf.bran["enabled"]:
             btagalgos += ["btagCSVRndge4t", "btagCSVInpge4t", "btagCSVRnd3t", "btagCSVInp3t"]
         jets_for_btag_lr, jet_probs = self.getJetProbs(self.csv_pdfs, event, btagalgos )
-        #jets_for_btag_lr2, jet_probs2 = self.getJetProbs(self.csv_pdfs_new, event, btagalgos )
+        for j in jets_for_btag_lr[self.bTagAlgo]:
+            print "jet", j.pt, j.btagCSV, j.btagBDT, j.mcFlavour
 
         btag_likelihood_results = {}
         btag_likelihood_ratio_results = {}
         for btagalgo in btagalgos:
             btag_lr_4b, best_4b_perm = self.btag_likelihood2(jet_probs["new_pt_eta_bin_3d-" + btagalgo], 4)
             btag_lr_2b, best_2b_perm = self.btag_likelihood2(jet_probs["new_pt_eta_bin_3d-" + btagalgo], 2)
+            print "likelihoods", btagalgo, btag_lr_4b, btag_lr_2b
             btag_likelihood_results[btagalgo] = (btag_lr_4b, btag_lr_2b, best_4b_perm, best_2b_perm)
             btag_likelihood_ratio_results[btagalgo] = self.lratio(btag_lr_4b, btag_lr_2b)
+            print "LR", btag_likelihood_ratio_results[btagalgo]
         
         #default btagger used
         event.btag_lr_4b = btag_likelihood_results[self.bTagAlgo][0]

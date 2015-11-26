@@ -1,7 +1,8 @@
 from TTH.MEAnalysis.samples_base import *
 samples_dict = {'ttHTobb_M125_13TeV_powheg_pythia8': cms.PSet(
     isMC = cms.bool(True),
-    nGen = cms.int64(7596287),
+    #nGen = cms.int64(7596287),
+    nGen = cms.int64(3930444),
     name = cms.string('ttHTobb_M125_13TeV_powheg_pythia8'),
     nickname = cms.string('ttHTobb_M125_13TeV_powheg_pythia8'),
     skip = cms.bool(False),
@@ -98,7 +99,8 @@ samples_dict = {'ttHTobb_M125_13TeV_powheg_pythia8': cms.PSet(
     xSec = cms.double(0.2934045)
 ), 'TT_TuneCUETP8M1_13TeV-powheg-pythia8': cms.PSet(
     isMC = cms.bool(True),
-    nGen = cms.int64(39383772),
+    #nGen = cms.int64(39383772),
+    nGen = cms.int64(19714839),
     name = cms.string('TT_TuneCUETP8M1_13TeV-powheg-pythia8'),
     nickname = cms.string('TT_TuneCUETP8M1_13TeV-powheg-pythia8'),
     skip = cms.bool(False),
@@ -7420,3 +7422,10 @@ samples_dict = {'ttHTobb_M125_13TeV_powheg_pythia8': cms.PSet(
         '/store/user/jpata/VHBBHeppyV16pre/MuonEG/VHBB_HEPPY_V16pre_MuonEG__Run2015D-PromptReco-v4/151121_225106/0000/tree_99.root' ) ),
     xSec = cms.double(1)
 )}
+
+if __name__ == "__main__":
+    #fill sample number of generated
+    for sn, s in samples_dict.items():
+        if s.nGen.value() < 0:
+            s.nGen = cms.int64(getSampleNGen(s))
+            print s.name, "ngen", s.nGen
