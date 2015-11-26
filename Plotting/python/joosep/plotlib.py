@@ -117,6 +117,11 @@ varnames = {
     "numJets": "$N_{\\mathrm{jets}}$",
     "nBCSVM": "$N_{\\mathrm{CSVM}}$",
     "btag_LR_4b_2b_logit": "$\\log{\\mathcal{F} / (1 - \\mathcal{F})}$",
+    "mem_SL_0w2h2t": "mem SL 0w2h2t",
+    "mem_SL_2w2h2t": "mem SL 2w2h2t",
+    "mem_SL_2w2h2t_sj": "mem SL 2w2h2t sj",
+    "mem_DL_0w2h2t": "mem DL 0w2h2t",
+    "nPVs": "$N_{\\mathrm{PV}}$",
 
 }
 
@@ -392,7 +397,14 @@ def draw_data_mc(tf, hname, samples, **kwargs):
 
     hs = OrderedDict()
     for sample, sample_name in samples:
-        h = tf.get(sample + "/" + hname).Clone()
+        try:
+            h = tf.get(sample + "/" + hname).Clone()
+        except rootpy.io.file.DoesNotExist as e:
+            continue
+            # if len(hs.values())>0:
+            #     h = 0.0 * hs.values()[0].Clone()
+            # else:
+            #     h = rootpy.plotting.Hist(1, 0, 1)
         hs[sample] = make_uoflow(h)
         #print hs[sample].GetBinLowEdge(0), hs[sample].GetBinLowEdge(hs[sample].GetNbinsX()+1)
         #hs[sample].Scale(get_weight(sample))
@@ -458,8 +470,9 @@ def draw_data_mc(tf, hname, samples, **kwargs):
 
     if do_legend:
         patches = []
-        dataline = mlines.Line2D([], [], color='black', marker='o', label=data.title)
-        patches += [dataline]
+        if data:
+            dataline = mlines.Line2D([], [], color='black', marker='o', label=data.title)
+            patches += [dataline]
         for line, h in zip(r["hists"], hs.values()):
             #print h.title, line.get_color()
             patch = mpatches.Patch(color=line.get_color(), label=h.title)
@@ -772,3 +785,56 @@ def get_sb_cats(inf, categories, suffix=""):
         es += [e]
     xs_num = np.array(range(len(xs)))+0.5
     return xs, xs_num, ys, es
+
+
+def getDataname(cat):
+    if "sl_mu" in cat:
+        return ["SingleMuon"]
+    elif "sl_el" in cat:
+        return ["SingleElectron"]
+    elif "dl_mumu" in cat:
+        return ["DoubleMuon"]
+    elif "dl_ee" in cat:
+        return ["DoubleEG"]
+    elif "dl_emu" in cat:
+        return ["MuonEG"]
+    raise Exception("not recognized {0}".format(cat))
+
+
+def sync_table(inf, cats, bkg):
+    hd = {}
+    for ic, cat in enumerate(cats):
+        for sample in ["ttH_hbb"] + bkg + ["data"]:
+            k = sample + "/" + "yields"
+            if hd.has_key(k):
+                h = hd[k]
+            else:
+                h = rootpy.plotting.Hist(len(cats), 0, len(cats))
+            if sample == "data":
+                categories_to_get = getDataname(cat)
+            else:
+                categories_to_get = [sample]
+            y, e = get_yields(inf, cat, "", categories_to_get)
+            h.SetBinContent(ic+1, y)
+            h.SetBinError(ic+1, e)
+            hd[k] = h
+
+    table = []
+    for sample in ["ttH_hbb"] + bkg + ["data"]:
+        row = [sample]
+        for ic, cat in enumerate(cats):
+            i = hd[sample + "/yields"].GetBinContent(ic+1)
+            row += [i]
+        table += [row]
+        
+    d = np.array(table)[:, 1:].astype("f")
+    table.insert(-1, ["total"] + [f for f in np.sum(d[0:-1, :], axis=0)])
+    return hd, table
+
+def get_cut_at_eff(h, eff):
+    h = h.Clone()
+    h.Scale(1.0 / h.Integral())
+    hc = h.GetCumulative()
+    bins = np.array([hc.GetBinContent(i) for i in range(1, hc.GetNbinsX()+1)])
+    idx = np.searchsorted(bins, eff)
+    return idx

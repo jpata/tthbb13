@@ -16,7 +16,7 @@ def hist(of, x, disc, low):
     return h
     
 def hist3d(of, x, disc, low):
-    h = ROOT.TH3D(x, x, 6, 20, 400, 6, 0, 4.5, 100, low, 1)
+    h = ROOT.TH3D(x, x, 6, 20, 400, 6, 0, 4.5, 100, -10, 5)
     h.GetXaxis().SetTitle("Jet pt")
     h.GetYaxis().SetTitle("Jet |eta|")
     h.GetZaxis().SetTitle(disc + " b-discriminator")
