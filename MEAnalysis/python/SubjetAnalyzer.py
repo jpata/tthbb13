@@ -173,7 +173,7 @@ class SubjetAnalyzer(FilterAnalyzer):
 
             # Choose only fatjets that were not HTTv2 candidates for the higgs reco
             # Check if the fatjet is not already matched to the chosen top candidate
-            if hasattr(fatjet, 'matched_top') and fatjet == top.matched_fatjet:
+            if top and hasattr(fatjet, 'matched_top') and fatjet == top.matched_fatjet:
                 continue
 
             fatjet.n_subjettiness = fatjet.tau2 / fatjet.tau1

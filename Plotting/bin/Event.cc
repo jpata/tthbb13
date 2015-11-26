@@ -372,7 +372,10 @@ const vector<Lepton> makeAllLeptons(const TreeData& data) {
 bool isData(ProcessKey::ProcessKey proc) {
     return (
         proc == ProcessKey::SingleMuon ||
-        proc == ProcessKey::SingleElectron
+        proc == ProcessKey::SingleElectron ||
+        proc == ProcessKey::DoubleMuon ||
+        proc == ProcessKey::DoubleEG ||
+        proc == ProcessKey::MuonEG
     );
 }
 
@@ -915,7 +918,7 @@ Configuration parseJsonConf(const string& infile) {
 
 namespace BaseCuts {
     bool sl(const Event& ev) {
-        return ev.is_sl && ev.passPV && ev.pass_trig_sl && ev.numJets>=4;
+        return ev.is_sl && ev.passPV && ev.pass_trig_sl && ev.numJets>=4 && ev.data->json==1.0;
     }
     
     bool sl_mu(const Event& ev) {
@@ -927,14 +930,14 @@ namespace BaseCuts {
     }
 
     bool dl(const Event& ev) {
-        return (ev.is_dl && ev.passPV && ev.pass_trig_dl && true);
-        //    ev.leptons.at(0).pdgId * ev.leptons.at(1).pdgId < 0 && (ev.data->ll_mass[0] > 20) && (
-        //        //Z peak veto
-        //        abs(ev.leptons.at(0).pdgId) == abs(ev.leptons.at(1).pdgId) ? !(ev.data->ll_mass[0] > 76 && ev.data->ll_mass[0] < 106) : true
-        //    ) && (
-        //        abs(ev.leptons.at(0).pdgId) == abs(ev.leptons.at(1).pdgId) ? (ev.data->met_pt[0] > 40) : true
-        //    )
-        //);
+        return (ev.is_dl && ev.passPV && ev.pass_trig_dl &&
+            ev.leptons.at(0).pdgId * ev.leptons.at(1).pdgId < 0 && (ev.data->ll_mass[0] > 20) && (
+                //Z peak veto
+                abs(ev.leptons.at(0).pdgId) == abs(ev.leptons.at(1).pdgId) ? !(ev.data->ll_mass[0] > 76 && ev.data->ll_mass[0] < 106) : true
+            ) && (
+                abs(ev.leptons.at(0).pdgId) == abs(ev.leptons.at(1).pdgId) ? (ev.data->met_pt[0] > 40) : true
+            ) && ev.data->json==1.0
+        );
     }
     
     bool dl_mumu(const Event& ev) {

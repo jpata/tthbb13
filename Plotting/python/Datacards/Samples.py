@@ -7,34 +7,60 @@ class Sample:
         self.prefix = prefix 
 
 samples_dict = {
-    "ttH_hbb_cfg_noME": Sample(
-        "ttH_hbb",
-        [path + "cfg_noME/ttHTobb_M125_13TeV_powheg_pythia8.root"],
+    "SingleMuon": Sample(
+        "SingleMuon",
+        [path + "cfg_noME/SingleMuon.root"],
         ""
     ),
-    "ttbarPlus2B_cfg_noME": Sample(
+    "SingleElectron": Sample(
+        "SingleElectron",
+        [path + "cfg_noME/SingleElectron.root"],
+        ""
+    ),
+    "DoubleMuon": Sample(
+        "DoubleMuon",
+        [path + "cfg_noME/DoubleMuon.root"],
+        ""
+    ),
+    "DoubleEG": Sample(
+        "DoubleEG",
+        [path + "cfg_noME/DoubleEG.root"],
+        ""
+    ),
+    "MuonEG": Sample(
+        "MuonEG",
+        [path + "cfg_noME/MuonEG.root"],
+        ""
+    ),
+
+    "ttH_hbb": Sample(
+        "ttH_hbb",
+        [path + "cfg_withME/ttHTobb_M125_13TeV_powheg_pythia8.root"],
+        ""
+    ),
+    "ttbarPlus2B": Sample(
         "ttbarPlus2B", 
-        [path + "cfg_noME/TT_TuneCUETP8M1_13TeV-powheg-pythia8_tt2b.root"],
+        [path + "cfg_withME/TT_TuneCUETP8M1_13TeV-powheg-pythia8_tt2b.root"],
         "",
     ),
-    "ttbarPlusB_cfg_noME": Sample(
+    "ttbarPlusB": Sample(
         "ttbarPlusB", 
-        [path + "cfg_noME/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttb.root"],
+        [path + "cfg_withME/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttb.root"],
         "",
     ),
-    "ttbarPlusBBbar_cfg_noME": Sample(
+    "ttbarPlusBBbar": Sample(
         "ttbarPlusBBbar", 
-        [path + "cfg_noME/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttbb.root"],
+        [path + "cfg_withME/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttbb.root"],
         "",
     ),
-    "ttbarPlusCCbar_cfg_noME": Sample(
+    "ttbarPlusCCbar": Sample(
         "ttbarPlusCCbar", 
-        [path + "cfg_noME/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttcc.root"],
+        [path + "cfg_withME/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttcc.root"],
         "",
     ),
-    "ttbarOther_cfg_noME": Sample(
+    "ttbarOther": Sample(
         "ttbarOther", 
-        [path + "cfg_noME/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttll.root"],
+        [path + "cfg_withME/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttll.root"],
         "",
     ),
     
