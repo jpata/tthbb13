@@ -9,14 +9,14 @@ OUTFILE = sys.argv[2]
 tf = ROOT.TFile(INFILE)
 tt = tf.Get("tree")
 
-def hist(of, x, disc, low):
-    h = ROOT.TH1D(x, x, 100, low, 1)
+def hist(of, x, disc, low=0, high=1):
+    h = ROOT.TH1D(x, x, 100, low, high)
     h.GetXaxis().SetTitle(disc + " b-discriminator")
     of.Add(h)
     return h
     
-def hist3d(of, x, disc, low):
-    h = ROOT.TH3D(x, x, 6, 20, 400, 6, 0, 4.5, 100, low, 1)
+def hist3d(of, x, disc, low=0, high=1):
+    h = ROOT.TH3D(x, x, 6, 20, 400, 6, 0, 4.5, 100, low, high)
     h.GetXaxis().SetTitle("Jet pt")
     h.GetYaxis().SetTitle("Jet |eta|")
     h.GetZaxis().SetTitle(disc + " b-discriminator")
@@ -26,38 +26,38 @@ def hist3d(of, x, disc, low):
 of = ROOT.TFile(OUTFILE, "RECREATE")
 of.cd()
 
-def makeControlPlots(discname, low):
+def makeControlPlots(discname, functoplot, low, high):
     hists = {
         "b": {
-            "Bin0": hist(of, "{0}_b_Bin0__rec".format(discname), discname, low),
-            "Bin1": hist(of, "{0}_b_Bin1__rec".format(discname), discname, low),
-            "pt_eta": hist3d(of, "{0}_b_pt_eta".format(discname), discname, low)
+            "Bin0": hist(of, "{0}_b_Bin0__rec".format(discname), discname, low, high),
+            "Bin1": hist(of, "{0}_b_Bin1__rec".format(discname), discname, low, high),
+            "pt_eta": hist3d(of, "{0}_b_pt_eta".format(discname), discname, low, high)
         },
         "c": {
-            "Bin0": hist(of, "{0}_c_Bin0__rec".format(discname), discname, low),
-            "Bin1": hist(of, "{0}_c_Bin1__rec".format(discname), discname, low),
-            "pt_eta": hist3d(of, "{0}_c_pt_eta".format(discname), discname, low)
+            "Bin0": hist(of, "{0}_c_Bin0__rec".format(discname), discname, low, high),
+            "Bin1": hist(of, "{0}_c_Bin1__rec".format(discname), discname, low, high),
+            "pt_eta": hist3d(of, "{0}_c_pt_eta".format(discname), discname, low, high)
         },
         "l": {
-            "Bin0": hist(of, "{0}_l_Bin0__rec".format(discname), discname, low),
-            "Bin1": hist(of, "{0}_l_Bin1__rec".format(discname), discname, low),
-            "pt_eta": hist3d(of, "{0}_l_pt_eta".format(discname), discname, low)
+            "Bin0": hist(of, "{0}_l_Bin0__rec".format(discname), discname, low, high),
+            "Bin1": hist(of, "{0}_l_Bin1__rec".format(discname), discname, low, high),
+            "pt_eta": hist3d(of, "{0}_l_pt_eta".format(discname), discname, low, high)
         }
     }
+    
+    tt.Draw("{1} >> {0}_b_Bin0__rec".format(discname, functoplot), "abs(Jet_eta)<=1.0 && abs(Jet_hadronFlavour)==5")
+    tt.Draw("{1} >> {0}_b_Bin1__rec".format(discname, functoplot), "abs(Jet_eta)>1.0 && abs(Jet_hadronFlavour)==5")
 
-    tt.Draw("Jet_{0} >> {0}_b_Bin0__rec".format(discname), "abs(Jet_eta)<=1.0 && abs(Jet_hadronFlavour)==5")
-    tt.Draw("Jet_{0} >> {0}_b_Bin1__rec".format(discname), "abs(Jet_eta)>1.0 && abs(Jet_hadronFlavour)==5")
+    tt.Draw("{1} >> {0}_c_Bin0__rec".format(discname, functoplot), "abs(Jet_eta)<=1.0 && abs(Jet_hadronFlavour)==4")
+    tt.Draw("{1} >> {0}_c_Bin1__rec".format(discname, functoplot), "abs(Jet_eta)>1.0 && abs(Jet_hadronFlavour)==4")
 
-    tt.Draw("Jet_{0} >> {0}_c_Bin0__rec".format(discname), "abs(Jet_eta)<=1.0 && abs(Jet_hadronFlavour)==4")
-    tt.Draw("Jet_{0} >> {0}_c_Bin1__rec".format(discname), "abs(Jet_eta)>1.0 && abs(Jet_hadronFlavour)==4")
-
-    tt.Draw("Jet_{0} >> {0}_l_Bin0__rec".format(discname), "abs(Jet_eta)<=1.0 && abs(Jet_hadronFlavour)!=4 && abs(Jet_hadronFlavour)!=5")
-    tt.Draw("Jet_{0} >> {0}_l_Bin1__rec".format(discname), "abs(Jet_eta)>1.0 && abs(Jet_hadronFlavour)!=4 && abs(Jet_hadronFlavour)!=5")
+    tt.Draw("{1} >> {0}_l_Bin0__rec".format(discname, functoplot), "abs(Jet_eta)<=1.0 && abs(Jet_hadronFlavour)!=4 && abs(Jet_hadronFlavour)!=5")
+    tt.Draw("{1} >> {0}_l_Bin1__rec".format(discname, functoplot), "abs(Jet_eta)>1.0 && abs(Jet_hadronFlavour)!=4 && abs(Jet_hadronFlavour)!=5")
 
 
-    tt.Draw("Jet_{0}:abs(Jet_eta):Jet_pt >> {0}_b_pt_eta".format(discname), "abs(Jet_hadronFlavour)==5")
-    tt.Draw("Jet_{0}:abs(Jet_eta):Jet_pt >> {0}_c_pt_eta".format(discname), "abs(Jet_hadronFlavour)==4")
-    tt.Draw("Jet_{0}:abs(Jet_eta):Jet_pt >> {0}_l_pt_eta".format(discname), "abs(Jet_hadronFlavour)!=4 && abs(Jet_hadronFlavour)!=5")
+    tt.Draw("{1}:abs(Jet_eta):Jet_pt >> {0}_b_pt_eta".format(discname, functoplot), "abs(Jet_hadronFlavour)==5")
+    tt.Draw("{1}:abs(Jet_eta):Jet_pt >> {0}_c_pt_eta".format(discname, functoplot), "abs(Jet_hadronFlavour)==4")
+    tt.Draw("{1}:abs(Jet_eta):Jet_pt >> {0}_l_pt_eta".format(discname, functoplot), "abs(Jet_hadronFlavour)!=4 && abs(Jet_hadronFlavour)!=5")
 
     #normalize 1D distributions
     for k in hists.keys():
@@ -85,8 +85,8 @@ def makeControlPlots(discname, low):
                     h3.SetBinContent(i, j, k, unnorm)
                 #print i, j, h3.ProjectionZ("", i, i, j, j).Integral()
 
-makeControlPlots("btagCSV", 0.0)
-makeControlPlots("btagBDT", -1.0)
+makeControlPlots("btagCSV", "Jet_btagCSV", 0.0, 1.0)
+makeControlPlots("btagBDT", "log((1.0 + Jet_btagBDT)/(1.0 - Jet_btagBDT))", -10.0, 15.0)
 
 of.Write()
 of.Close()
