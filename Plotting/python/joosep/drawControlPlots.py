@@ -135,7 +135,7 @@ for cat in [
     heplot.barhist(hb4, color="purple", label="tt+2b", lw=2, scaling="normed", rebin=4)
     heplot.barhist(hb5, color="black", label="tt+b", lw=2, scaling="normed", rebin=4)
     plt.legend(loc="best")
-    fname = "{0}_btag_lr.png".format(cat)
+    fname = "plots/{0}_btag_lr.png".format(cat)
     plotlib.svfg(fname)
     outfile.write("<br><img src=\"{0}\" style=\"width:600px;height:600px;\"> <br>\n".format(fname))
 
@@ -185,7 +185,7 @@ for cat, var in [
     plt.xlabel(plotlib.varnames[var])
     plt.ylabel("fraction of events")
     plt.legend(loc="best")
-    fname = "{0}_{1}.png".format(cat, var)
+    fname = "plots/{0}_{1}.png".format(cat, var)
     plotlib.svfg(fname)
     outfile.write("<br><img src=\"{0}\" style=\"width:600px;height:600px;\"> <br>\n".format(fname))
 
