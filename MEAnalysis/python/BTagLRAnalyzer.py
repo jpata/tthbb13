@@ -2,6 +2,7 @@ import ROOT
 ROOT.gSystem.Load("libTTHMEIntegratorStandalone")
 from ROOT import MEM
 import itertools
+import math
 
 from TTH.MEAnalysis.Analyzer import FilterAnalyzer
 from TTH.MEAnalysis.vhbb_utils import lvec
@@ -50,42 +51,36 @@ class BTagLRAnalyzer(FilterAnalyzer):
         self.conf.BTagLRAnalyzer = self
         self.jlh = MEM.JetLikelihood()
 
-    def get_pdf_prob(self, csv_pdfs, flavour, pt, eta, csv, kind):
-
-        _bin = "Bin1" if abs(eta)>1.0 else "Bin0"
+    def get_pdf_prob(self, csv_pdfs, flavour, pt, eta, taggerval, kind):
 
         if kind == "new_eta_1bin":
+            _bin = "Bin1" if abs(eta)>1.0 else "Bin0"
             h = csv_pdfs[(flavour, _bin)]
         elif kind == "new_pt_eta_bin_3d":
             h = csv_pdfs[(flavour, "pt_eta")]
 
         assert h != None, "flavour={0} kind={1}".format(flavour, kind)
 
-        if csv < 0:
-            csv = 0.0
-        if csv > 1.0:
-            csv = 1.0
-
-        if kind == "old" or kind == "new_eta_1bin":
-            nb = h.FindBin(csv)
-            #if csv = 1 -> goes into overflow and pdf = 0.0
-            #as a solution, take the next-to-last bin
+        if kind == "new_eta_1bin":
+            nb = h.FindBin(taggerval)
             if nb >= h.GetNbinsX():
-                nb = nb - 1
+                nb = h.GetNbinsX()
+            elif nb < 1:
+                nb = 1
             ret = h.GetBinContent(nb)
         elif kind == "new_pt_eta_bin_3d":
-            nb = h.FindBin(pt, abs(eta), csv)
+            nb = h.FindBin(pt, abs(eta), taggerval)
             ret = h.GetBinContent(nb)
         return ret
 
     def beginLoop(self, setup):
         super(BTagLRAnalyzer, self).beginLoop(setup)
 
-    def evaluate_jet_prob(self, pdfs, pt, eta, csv, kind):
+    def evaluate_jet_prob(self, pdfs, pt, eta, taggerval, kind):
         return (
-            self.get_pdf_prob(pdfs, "b", pt, eta, csv, kind),
-            self.get_pdf_prob(pdfs, "c", pt, eta, csv, kind),
-            self.get_pdf_prob(pdfs, "l", pt, eta, csv, kind)
+            self.get_pdf_prob(pdfs, "b", pt, eta, taggerval, kind),
+            self.get_pdf_prob(pdfs, "c", pt, eta, taggerval, kind),
+            self.get_pdf_prob(pdfs, "l", pt, eta, taggerval, kind)
         )
 
     def btag_likelihood(self, probs, nB, nC):
@@ -158,12 +153,16 @@ class BTagLRAnalyzer(FilterAnalyzer):
         jet_probs        = {}
         
         for pdf in ["new_pt_eta_bin_3d"]:
-            for csv in taggers:
-                jets_for_btag_lr[ csv ] =  sorted(
-                    event.good_jets, key=lambda x, csv=csv, self=self: getattr(x, csv, self.bTagAlgo), reverse=True
+            for tagger in taggers:
+                jets_for_btag_lr[tagger] =  sorted(
+                    event.good_jets, key=lambda x, tagger=tagger: getattr(x, tagger), reverse=True
                 )[0:self.conf.jets["NJetsForBTagLR"]]
-                jet_probs[ pdf+"-"+csv ] =  [ 
-                    self.evaluate_jet_prob(pdfs, j.pt, j.eta, getattr(j, csv, self.bTagAlgo), pdf)
+                if tagger == "btagBDT":
+                    tagtransform = lambda x: math.log((1.0 + x)/(1.0 - x))
+                else:
+                    tagtransform = lambda x: x
+                jet_probs[pdf+"-"+tagger] =  [ 
+                    self.evaluate_jet_prob(pdfs, j.pt, j.eta, tagtransform(getattr(j, tagger)), pdf)
                     for j in jets_for_btag_lr[ csv ]
                 ]
         return jets_for_btag_lr, jet_probs
