@@ -284,7 +284,8 @@ if __name__ == "__main__":
 
     #Process all samples in the sample list
     for samp in inputSamples:
-
+        if not samp.isMC:
+            continue
         config = cfg.Config(
             #Run across these inputs
             components = [samp],
@@ -301,7 +302,7 @@ if __name__ == "__main__":
 
         #Configure the number of events to run
         from PhysicsTools.HeppyCore.framework.looper import Looper
-        nEvents = 10000
+        nEvents = 1000
 
         kwargs = {}
         if conf.general.get("eventWhitelist", None) is None:

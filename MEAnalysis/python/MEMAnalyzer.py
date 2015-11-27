@@ -334,7 +334,10 @@ class MEAnalyzer(FilterAnalyzer):
                         #self.cfg_comp.isMC #only run MEM on MC
                     ):
                     
-                    print "Integrator::run started hypo={0} conf={1}".format(hypo, confname)
+                    print "Integrator::run started hypo={0} conf={1} run:lumi:evt={2}:{3}:{4}".format(
+                        hypo, confname,
+                        event.input.run, event.input.lumi, event.input.evt
+                    )
                     self.configure_mem(event, mem_cfg)
                     r = self.integrator.run(
                         fstate,

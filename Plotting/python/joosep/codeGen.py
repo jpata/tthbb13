@@ -231,6 +231,9 @@ processes = [
     "ttz_zllnunu",
     "SingleMuon",
     "SingleElectron",
+    "DoubleMuon",
+    "DoubleEG",
+    "MuonEG",
     "UNKNOWN"
 ]
 
@@ -240,6 +243,9 @@ categories = [
     "sl_mu",
     "sl_el",
     "dl",
+    "dl_mumu",
+    "dl_emu",
+    "dl_ee",
 
     "j3_t2",
     "jge4_t2",
@@ -259,9 +265,13 @@ categories = [
     "blrH",
 
     "boostedHiggs",
-    "boostedHiggsGenMatch",
-    "boostedHiggsGenNoMatch",
+    "boostedHiggsOnly",
+    #"boostedHiggsHighPt",
+    #"boostedHiggsGenMatch",
+    #"boostedHiggsGenNoMatch",
     "boostedTop",
+    "boostedTopOnly",
+    "boostedHiggsTop",
 ]
 
 #Map categories to their respective C++ cuts. The Event is available as "ev"
@@ -269,7 +279,18 @@ cuts = {
     "sl": "BaseCuts::sl(ev)",
     "sl_mu": "BaseCuts::sl_mu(ev)",
     "sl_el": "BaseCuts::sl_el(ev)",
+    
+    "dl_mumu": "BaseCuts::dl_mumu(ev)",
+    "dl_ee": "BaseCuts::dl_ee(ev)",
+    "dl_emu": "BaseCuts::dl_emu(ev)",
+
     "dl": "BaseCuts::dl(ev)",
+    
+    "j3_t2": "ev.numJets==3 && ev.nBCSVM==2",
+    "jge3_t3": "ev.numJets>=3 && ev.nBCSVM==3",
+    "jge4_t2": "ev.numJets>=4 && ev.nBCSVM==2",
+    "jge4_tge4": "ev.numJets>=4 && ev.nBCSVM>=4",
+    
     "jge6_tge4": "ev.numJets>=6 && ev.nBCSVM>=4",
     "jge6_t3": "ev.numJets>=6 && ev.nBCSVM==3",
     "jge6_t2": "ev.numJets>=6 && ev.nBCSVM==2",
@@ -279,96 +300,267 @@ cuts = {
     "j5_t2": "ev.numJets==5 && ev.nBCSVM==2",
     "blrH": "ev.btag_LR_4b_2b > 0.95",
     "boostedHiggs": "ev.nhiggsCandidate >= 1",
-    "boostedHiggsGenMatch": "(ev.nhiggsCandidate >= 1) && (ev.higgsCandidate_dr_genHiggs < 0.5)",
-    "boostedHiggsGenNoMatch": "(ev.nhiggsCandidate >= 1) && (ev.higgsCandidate_dr_genHiggs > 0.5)",
+    "boostedHiggsOnly": "ev.nhiggsCandidate >= 1 && ev.ntopCandidate==0",
+    #"boostedHiggsHighPt": "ev.nhiggsCandidate >= 1 && ev.higgsCandidate_pt > 300",
+    #"boostedHiggsGenMatch": "(ev.nhiggsCandidate >= 1) && (ev.higgsCandidate_dr_genHiggs < 0.5)",
+    #"boostedHiggsGenNoMatch": "(ev.nhiggsCandidate >= 1) && (ev.higgsCandidate_dr_genHiggs > 0.5)",
     "boostedTop": "ev.ntopCandidate >= 1",
+    "boostedTopOnly": "ev.ntopCandidate >= 1 && ev.nhiggsCandidate==0",
+    "boostedHiggsTop": "ev.ntopCandidate >= 1 && ev.nhiggsCandidate>=1",
 }
 
 #Nested list of (name, type, subcategory) triplets, corresponding to the
 #category tree to create
 categories_tree = [
-    ("sl_mu", "ControlCategoryProcessor", [
-        ("jge6_tge4", "ControlCategoryProcessor", []),
+    ("sl", "ControlCategoryProcessor", [
+        ("jge6_tge4", "ControlCategoryProcessor", [
+            ("blrH", "ControlCategoryProcessor", []), 
+        ]),
         ("jge6_t3", "ControlCategoryProcessor", [
-            ("boostedHiggs", "BoostedCategoryProcessor", []),
-            ("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
-            ("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
+            ("blrH", "ControlCategoryProcessor", []), 
         ]),
         ("jge6_t2", "ControlCategoryProcessor", [
-            ("boostedHiggs", "BoostedCategoryProcessor", []),
-            ("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
-            ("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
+            ("blrH", "ControlCategoryProcessor", []), 
         ]),
         ("j5_tge4", "ControlCategoryProcessor", [
-            ("boostedHiggs", "BoostedCategoryProcessor", []),
-            ("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
-            ("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
+            ("blrH", "ControlCategoryProcessor", []), 
         ]),
         ("j5_t3", "ControlCategoryProcessor", [
-            ("boostedHiggs", "BoostedCategoryProcessor", []),
-            ("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
-            ("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
+            ("blrH", "ControlCategoryProcessor", []), 
         ]),
         ("j5_t2", "ControlCategoryProcessor", [
+            ("blrH", "ControlCategoryProcessor", []), 
+        ]),
+    ]),
+    ("sl_mu", "ControlCategoryProcessor", [
+        ("jge6_tge4", "ControlCategoryProcessor", [
+            ("blrH", "ControlCategoryProcessor", []), 
+        ]),
+        ("jge6_t3", "ControlCategoryProcessor", [
+            ("blrH", "ControlCategoryProcessor", []), 
             ("boostedHiggs", "BoostedCategoryProcessor", []),
-            ("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
-            ("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
+            ("boostedTop", "BoostedCategoryProcessor", []),
+            ("boostedHiggsOnly", "BoostedCategoryProcessor", []),
+            ("boostedTopOnly", "BoostedCategoryProcessor", []),
+            ("boostedHiggsTop", "BoostedCategoryProcessor", []),
+            #("boostedHiggsHighPt", "BoostedCategoryProcessor", []),
+            #("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
+            #("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
+        ]),
+        ("jge6_t2", "ControlCategoryProcessor", [
+            ("blrH", "ControlCategoryProcessor", []), 
+            ("boostedHiggs", "BoostedCategoryProcessor", []),
+            ("boostedTop", "BoostedCategoryProcessor", []),
+            ("boostedHiggsOnly", "BoostedCategoryProcessor", []),
+            ("boostedTopOnly", "BoostedCategoryProcessor", []),
+            ("boostedHiggsTop", "BoostedCategoryProcessor", []),
+            #("boostedHiggsHighPt", "BoostedCategoryProcessor", []),
+            #("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
+            #("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
+        ]),
+        ("j5_tge4", "ControlCategoryProcessor", [
+            ("blrH", "ControlCategoryProcessor", []), 
+            ("boostedHiggs", "BoostedCategoryProcessor", []),
+            ("boostedTop", "BoostedCategoryProcessor", []),
+            ("boostedHiggsOnly", "BoostedCategoryProcessor", []),
+            ("boostedTopOnly", "BoostedCategoryProcessor", []),
+            ("boostedHiggsTop", "BoostedCategoryProcessor", []),
+            #("boostedHiggsHighPt", "BoostedCategoryProcessor", []),
+            #("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
+            #("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
+        ]),
+        ("j5_t3", "ControlCategoryProcessor", [
+            ("blrH", "ControlCategoryProcessor", []), 
+            ("boostedHiggs", "BoostedCategoryProcessor", []),
+            ("boostedTop", "BoostedCategoryProcessor", []),
+            ("boostedHiggsOnly", "BoostedCategoryProcessor", []),
+            ("boostedTopOnly", "BoostedCategoryProcessor", []),
+            ("boostedHiggsTop", "BoostedCategoryProcessor", []),
+            #("boostedHiggsHighPt", "BoostedCategoryProcessor", []),
+            #("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
+            #("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
+        ]),
+        ("j5_t2", "ControlCategoryProcessor", [
+            ("blrH", "ControlCategoryProcessor", []), 
+            ("boostedHiggs", "BoostedCategoryProcessor", []),
+            ("boostedTop", "BoostedCategoryProcessor", []),
+            ("boostedHiggsOnly", "BoostedCategoryProcessor", []),
+            ("boostedTopOnly", "BoostedCategoryProcessor", []),
+            ("boostedHiggsTop", "BoostedCategoryProcessor", []),
+            #("boostedHiggsHighPt", "BoostedCategoryProcessor", []),
+            #("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
+            #("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
         ]),
     ]),
     ("sl_el", "ControlCategoryProcessor", [
-        ("jge6_tge4", "ControlCategoryProcessor", []),
+        ("jge6_tge4", "ControlCategoryProcessor", [
+            ("blrH", "ControlCategoryProcessor", []), 
+        ]),
         ("jge6_t3", "ControlCategoryProcessor", [
+            ("blrH", "ControlCategoryProcessor", []), 
             ("boostedHiggs", "BoostedCategoryProcessor", []),
-            ("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
-            ("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
+            ("boostedTop", "BoostedCategoryProcessor", []),
+            ("boostedHiggsOnly", "BoostedCategoryProcessor", []),
+            ("boostedTopOnly", "BoostedCategoryProcessor", []),
+            ("boostedHiggsTop", "BoostedCategoryProcessor", []),
+            #("boostedHiggsHighPt", "BoostedCategoryProcessor", []),
+            #("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
+            #("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
         ]),
         ("jge6_t2", "ControlCategoryProcessor", [
+            ("blrH", "ControlCategoryProcessor", []), 
             ("boostedHiggs", "BoostedCategoryProcessor", []),
-            ("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
-            ("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
+            ("boostedTop", "BoostedCategoryProcessor", []),
+            ("boostedHiggsOnly", "BoostedCategoryProcessor", []),
+            ("boostedTopOnly", "BoostedCategoryProcessor", []),
+            ("boostedHiggsTop", "BoostedCategoryProcessor", []),
+            #("boostedHiggsHighPt", "BoostedCategoryProcessor", []),
+            #("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
+            #("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
         ]),
         ("j5_tge4", "ControlCategoryProcessor", [
             ("boostedHiggs", "BoostedCategoryProcessor", []),
-            ("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
-            ("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
+            ("boostedTop", "BoostedCategoryProcessor", []),
+            ("boostedHiggsOnly", "BoostedCategoryProcessor", []),
+            ("boostedTopOnly", "BoostedCategoryProcessor", []),
+            ("boostedHiggsTop", "BoostedCategoryProcessor", []),
+            #("boostedHiggsHighPt", "BoostedCategoryProcessor", []),
+            #("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
+            #("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
         ]),
         ("j5_t3", "ControlCategoryProcessor", [
+            ("blrH", "ControlCategoryProcessor", []), 
             ("boostedHiggs", "BoostedCategoryProcessor", []),
-            ("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
-            ("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
+            ("boostedTop", "BoostedCategoryProcessor", []),
+            ("boostedHiggsOnly", "BoostedCategoryProcessor", []),
+            ("boostedTopOnly", "BoostedCategoryProcessor", []),
+            ("boostedHiggsTop", "BoostedCategoryProcessor", []),
+            #("boostedHiggsHighPt", "BoostedCategoryProcessor", []),
+            #("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
+            #("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
         ]),
         ("j5_t2", "ControlCategoryProcessor", [
+            ("blrH", "ControlCategoryProcessor", []), 
             ("boostedHiggs", "BoostedCategoryProcessor", []),
-            ("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
-            ("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
+            ("boostedTop", "BoostedCategoryProcessor", []),
+            ("boostedHiggsOnly", "BoostedCategoryProcessor", []),
+            ("boostedTopOnly", "BoostedCategoryProcessor", []),
+            ("boostedHiggsTop", "BoostedCategoryProcessor", []),
+            #("boostedHiggsHighPt", "BoostedCategoryProcessor", []),
+            #("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
+            #("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
         ]),
     ]),
-    #("sl", "SparseCategoryProcessor", [
-    #]),
-    #("dl", "SparseCategoryProcessor", [
-    #])
+    ("sl", "SparseCategoryProcessor", []),
+    ("dl", "SparseCategoryProcessor", [
+        ("j3_t2", "ControlCategoryProcessor", []),
+        ("jge3_t3", "ControlCategoryProcessor", []),
+        ("jge4_t2", "ControlCategoryProcessor", []),
+        ("jge4_tge4", "ControlCategoryProcessor", []),
+    ]),
+    
+    ("dl_mumu", "ControlCategoryProcessor", [
+        ("j3_t2", "ControlCategoryProcessor", [
+            ("blrH", "ControlCategoryProcessor", []), 
+        ]),
+        ("jge3_t3", "ControlCategoryProcessor", [
+            ("blrH", "ControlCategoryProcessor", []), 
+        ]),
+        ("jge4_t2", "ControlCategoryProcessor", [
+            ("blrH", "ControlCategoryProcessor", []), 
+        ]),
+        ("jge4_tge4", "ControlCategoryProcessor", [
+            ("blrH", "ControlCategoryProcessor", []), 
+        ]),
+    ]),
+
+    ("dl_emu", "ControlCategoryProcessor", [
+        ("j3_t2", "ControlCategoryProcessor", [
+            ("blrH", "ControlCategoryProcessor", []), 
+        ]),
+        ("jge3_t3", "ControlCategoryProcessor", [
+            ("blrH", "ControlCategoryProcessor", []), 
+        ]),
+        ("jge4_t2", "ControlCategoryProcessor", [
+            ("blrH", "ControlCategoryProcessor", []), 
+        ]),
+        ("jge4_tge4", "ControlCategoryProcessor", [
+            ("blrH", "ControlCategoryProcessor", []), 
+        ]),
+    ]),
+    ("dl_ee", "ControlCategoryProcessor", [
+        ("j3_t2", "ControlCategoryProcessor", [
+            ("blrH", "ControlCategoryProcessor", []), 
+        ]),
+        ("jge3_t3", "ControlCategoryProcessor", [
+            ("blrH", "ControlCategoryProcessor", []), 
+        ]),
+        ("jge4_t2", "ControlCategoryProcessor", [
+            ("blrH", "ControlCategoryProcessor", []), 
+        ]),
+        ("jge4_tge4", "ControlCategoryProcessor", [
+            ("blrH", "ControlCategoryProcessor", []), 
+        ]),
+    ]),
+
+    ("dl_mumu", "SparseCategoryProcessor", []),
+    ("dl_emu", "SparseCategoryProcessor", []),
+    ("dl_ee", "SparseCategoryProcessor", [])
 ]
 
 #Kinematic control histograms
 #name, nbins, low, high, fillFunction, cutFunction, title
 histograms_control = [
+    ("nPVs", 30, 0, 30, "event.data->nPVs", "true", "Number of primary vertices (reco)"),
+    
+    ("numJets", 8, 2, 10, "event.numJets", "true", "Number of resolved jets"),
+    
+    ("nBCSVM", 5, 0, 5, "event.nBCSVM", "true", "Number of CSVM jets"),
+    #("nBCSVL", 8, 0, 8, "event.nBCSVL", "true", "Number of CSVL jets"),
+
+    ("lep0_pt", 100, 0, 600, "event.leptons.at(0).p4.Pt()", "event.leptons.size()>0", "Leading lepton pt"),
+    ("lep0_eta", 100, -3, 3, "event.leptons.at(0).p4.Eta()", "event.leptons.size()>0", "Leading lepton pt"),
+    
+    ("lep1_pt", 100, 0, 600, "event.leptons.at(1).p4.Pt()", "event.leptons.size()>1", "Sub-leading lepton pt"),
+    ("lep1_eta", 100, -3, 3, "event.leptons.at(1).p4.Eta()", "event.leptons.size()>1", "Sub-leading lepton pt"),
+    
     ("jet0_pt", 100, 0, 600, "event.jets.at(0).p4.Pt()", "event.jets.size()>0", "Leading jet pt"),
     ("jet1_pt", 100, 0, 600, "event.jets.at(1).p4.Pt()", "event.jets.size()>1", "Subleading jet pt"),
+
     ("jet0_eta", 100, -3, 3, "event.jets.at(0).p4.Eta()", "event.jets.size()>0", "Leading jet eta"),
     ("jet1_eta", 100, -3, 3, "event.jets.at(1).p4.Eta()", "event.jets.size()>1", "Subleading jet eta"),
+    
     ("jet0_btagCSV", 100, 0, 1, "event.jets.at(0).btagCSV", "event.jets.size()>0", "Leading jet CSV"),
     ("jet1_btagCSV", 100, 0, 1, "event.jets.at(1).btagCSV", "event.jets.size()>1", "Subleading jet CSV"),
+
+    ("jet0_btagBDT", 100, -1, 1, "event.jets.at(0).btagBDT", "event.jets.size()>0", "Leading jet BDT"),
+    ("jet1_btagBDT", 100, -1, 1, "event.jets.at(1).btagBDT", "event.jets.size()>1", "Subleading jet BDT"),
+    
+    ("btag_LR_4b_2b", 100, 0, 1, "event.btag_LR_4b_2b", "event.jets.size()>=3", "btag likelihood"),
+    ("btag_LR_4b_2b_logit", 100, -10, 10, "event.btag_LR_4b_2b_logit", "event.jets.size()>=3", "btag likelihood"),
+
+    ("ntopCandidates", 4, 0, 4, "event.ntopCandidate + event.data->nothertopCandidate", "event.ntopCandidate>=0", "Number of HTTv2 candidates"),
     ("nhiggsCandidate", 4, 0, 4, "event.nhiggsCandidate", "event.nhiggsCandidate>=0", "Number of higgs candidates"),
+    
+    ("nMatch_wq", 4, 0, 4, "event.data->nMatch_wq", "isMC(conf.process)", "Number of jets matched to quarks from W"),
+    ("nMatch_wq_btag", 4, 0, 4, "event.data->nMatch_wq_btag", "isMC(conf.process)", "Number of jets matched to quarks from W with b-tagging"),
+    ("nMatch_hb", 4, 0, 4, "event.data->nMatch_hb", "isMC(conf.process)", "Number of jets matched to quarks from W"),
+    ("nMatch_hb_btag", 4, 0, 4, "event.data->nMatch_hb_btag", "isMC(conf.process)", "Number of jets matched to quarks from W with b-tagging"),
+    ("nMatch_tb", 4, 0, 4, "event.data->nMatch_tb", "isMC(conf.process)", "Number of jets matched to quarks from W"),
+    ("nMatch_tb_btag", 4, 0, 4, "event.data->nMatch_tb_btag", "isMC(conf.process)", "Number of jets matched to quarks from W with b-tagging"),
+    ("fullMatch", 2, 0, 2, "(event.data->nMatch_tb_btag >= 2 && event.data->nMatch_wq_btag >=2) && (isSignalMC(conf.process) ? event.data->nMatch_hb_btag>=2 : true)", "isMC(conf.process)", "Number of events with full match"),
 ]
 
 #Kinematic control histograms
 #name, nbins, low, high, fillFunction, cutFunction, title
 histograms_boosted = [
-    ("higgsCandidate_pt", 100, 200, 600, "event.higgsCandidate_pt", "event.nhiggsCandidate>0", "Leading higgs candidate pt"),
-    ("higgsCandidate_eta", 100, -3, 3, "event.higgsCandidate_eta", "event.nhiggsCandidate>0", "Leading higgs candidate eta"),
-    ("higgsCandidate_bbtag", 100, -1, 1, "event.higgsCandidate_bbtag", "event.nhiggsCandidate>0", "Leading higgs candidate bbtag"),
-    ("topCandidate_pt", 100, 200, 600, "event.topCandidate_pt", "event.nhiggsCandidate>0", "Leading top candidate pt"),
-    ("topCandidate_eta", 100, -3, 3, "event.topCandidate_eta", "event.nhiggsCandidate>0", "Leading top candidate eta"),
+    ("higgsCandidate_pt", 100, 200, 600, "event.nhiggsCandidate>0 ? event.higgsCandidate_pt : 0.0", "true", "Leading higgs candidate pt"),
+    ("higgsCandidate_eta", 100, -3, 3, "event.nhiggsCandidate>0 ? event.higgsCandidate_eta : 0.0", "true", "Leading higgs candidate eta"),
+    ("higgsCandidate_bbtag", 100, -1, 1, "event.nhiggsCandidate>0 ? event.higgsCandidate_bbtag : 0.0", "true", "Leading higgs candidate bbtag"),
+    ("topCandidate_pt", 100, 200, 600, "event.ntopCandidate>0 ? event.topCandidate_pt : 0.0", "true", "Leading top candidate pt"),
+    ("topCandidate_eta", 100, -3, 3, "event.ntopCandidate>0 ? event.topCandidate_eta : 0.0", "true", "Leading top candidate eta"),
+    ("topCandidate_mass", 100, 0, 300, "event.ntopCandidate>0 ? event.topCandidate_mass : 0.0", "true", "Leading top candidate mass"),
+    ("topCandidate_masscal", 100, 0, 300, "event.ntopCandidate>0 ? event.topCandidate_masscal : 0.0", "true", "Leading top candidate mass (calibrated)"),
 ]
 
 #MEM histograms
@@ -386,7 +578,7 @@ additional_histograms = [
 
 #Pairs of all new category processors along with the histograms to plot there
 category_processors = [
-    ("ControlCategoryProcessor", "CategoryProcessor", histograms_control),
+    ("ControlCategoryProcessor", "CategoryProcessor", histograms_control+histograms_mem),
     ("BoostedCategoryProcessor", "ControlCategoryProcessor", histograms_boosted)
 ]
 

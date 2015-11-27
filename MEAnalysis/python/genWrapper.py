@@ -1,9 +1,14 @@
+#!/usr/bin/env python
+#This script takes a heppy tree description as a json and dumps a C++ header file
+#encapsulating the TTree structure.
+#To generate the json from heppy, see dumpTree.py
 import json, sys
 
 #map python typenames to C++ types
 typemap = {
     "float": "double",
-    "int": "int"
+    "int": "int",
+    "long": "long"
 }
 
 def makeWrapper(classname, data):
@@ -12,7 +17,10 @@ def makeWrapper(classname, data):
 
     treeclass = "class %s {\n" % tree_classname
     treeclass += "public:\n"
-    for collname, coll in data["collections"].items() + data["globalObjects"].items():
+    for collname, coll in (
+            sorted(data["collections"].items(), key=lambda x:x[0]) +
+            sorted(data["globalObjects"].items(), key=lambda x:x[0])
+        ):
         vars, maxlen = coll
         #print collname, maxlen
         #print classFromColl(collname, vars, maxlen)
@@ -22,20 +30,23 @@ def makeWrapper(classname, data):
             treeclass += "  {0} {1}_{2}[{3}]; //{4}\n".format(typemap[vtype], collname, vname, maxlen, vhelp)
         #treeclass += "  {0} _{1}[{2}];\n".format(collname, collname, maxlen)
 
-    for collname, dtype in data["globalVariables"].items():
+    for collname, dtype in sorted(data["globalVariables"].items(), key=lambda x: x[0]):
         treeclass += "  {0} {1};\n".format(typemap[dtype], collname)
         #treeclass += "  {0} _{1}[{2}];\n".format(collname, collname, maxlen)
 
 
     treeclass += "  void loadTree(TTree* tree) {\n"
-    for collname, coll in data["collections"].items() + data["globalObjects"].items():
+    for collname, coll in (
+            sorted(data["collections"].items(), key=lambda x: x[0]) +
+            sorted(data["globalObjects"].items(), key=lambda x: x[0])
+        ):
         vars, maxlen = coll
         treeclass += '    tree->SetBranchAddress(\"n{0}\", &(this->n{0}));\n'.format(collname)
         for vname, v in vars.items():
             treeclass += '    tree->SetBranchAddress(\"{0}_{1}\", this->{0}_{1});\n'.format(collname, vname)
 
 
-    for collname, dtype in data["globalVariables"].items():
+    for collname, dtype in sorted(data["globalVariables"].items(), key=lambda x: x[0]):
         treeclass += '    tree->SetBranchAddress(\"{0}\", &(this->{0}));\n'.format(collname, collname)
 
     treeclass += "  } //loadTree\n"

@@ -102,8 +102,8 @@ class SubjetAnalyzer(FilterAnalyzer):
 
         # Just run normal mem if there is no httCandidate present
         # Check if there is an httCandidate
-        if len( event.httCandidates ) == 0:
-            return event
+        # if len( event.httCandidates ) == 0:
+        #    return event
 
         # Apply the cuts on the httCandidate
         tops = []
@@ -145,15 +145,17 @@ class SubjetAnalyzer(FilterAnalyzer):
         # Just run normal mem if there is no httCandidate surviving the cuts
         # Check if any candidates survived the cutoff criteria
 
-        if len(tops) == 0:
-            return event
+        # if len(tops) == 0:
+        #     return event
         # If exactly 1 survived, simply continue with that candidate
-        elif len(tops) == 1:
+        other_top_present = False
+        top = None
+        if len(tops) == 1:
             top = tops[0]
             other_top_present = False
         # If more than 1 candidate survived the cutoff criteria, choose the
         # one whose delR with the lepton was biggest
-        else:
+        elif len(tops)>1:
             tops = sorted( tops, key=lambda x: -x.delR_lepton )
             other_top_present = True
             top = tops[0]
@@ -171,11 +173,12 @@ class SubjetAnalyzer(FilterAnalyzer):
 
             # Choose only fatjets that were not HTTv2 candidates for the higgs reco
             # Check if the fatjet is not already matched to the chosen top candidate
-            if hasattr(fatjet, 'matched_top') and fatjet == top.matched_fatjet:
+            if top and hasattr(fatjet, 'matched_top') and fatjet == top.matched_fatjet:
                 continue
 
             fatjet.n_subjettiness = fatjet.tau2 / fatjet.tau1
-            fatjet.dr_top = self.Get_DeltaR_two_objects(fatjet, top)
+            if top:
+                fatjet.dr_top = self.Get_DeltaR_two_objects(fatjet, top)
 
             #set default masses for all fatjet types
             for fatjetkind in fatjets_to_match:
@@ -221,109 +224,110 @@ class SubjetAnalyzer(FilterAnalyzer):
         #  - Also sets transfer functions as attributes
         #  - Returns subjets ordered by decreasing btag
         #  - First subjet has btagFlag==1.0, the other two btagFlag==0.0
-        top_subjets = self.Get_Subjets( top )
-        if "subjet" in self.conf.general["verbosity"]:
-            print "subjets"
-            for subjet in top_subjets:
-                print subjet
-
-        if other_top_present:
-            for top in other_tops: self.Get_Subjets( top )
-
-        # Set 'PDGID' to 1 for light, and to 5 for b
-        for subjet in top_subjets:
-            if subjet.btagFlag == 1.0: setattr( subjet, 'PDGID', 5 )
-            if subjet.btagFlag == 0.0: setattr( subjet, 'PDGID', 1 )
-
-        # Create two new lists for btagged_jets and wquark_candidate_jets in the
-        # original events
-        reco_btagged_jets = copy.deepcopy( event.selected_btagged_jets_high )
-        reco_ltagged_jets = copy.deepcopy( list( event.wquark_candidate_jets ) )
-
-        for jet in reco_btagged_jets:
-            setattr( jet, 'btag', getattr(jet,self.btagAlgo) )
-            setattr( jet, 'btagFlag', 1.0 )
-            setattr( jet, 'PDGID', 0 )
-
-        for jet in reco_ltagged_jets:
-            setattr( jet, 'btag', getattr(jet,self.btagAlgo) )
-            setattr( jet, 'btagFlag', 0.0 )
-            setattr( jet, 'PDGID', 0 )
-
-
-        ########################################
-        # Matching
-        ########################################
-
-        # Whenever a subjet has a 'match' (dR < dR_cut), the matched object should
-        # excluded from the event
-
-        # Match subjet to a bjet
-        n_excluded_bjets = self.Match_two_lists(
-            top_subjets, 'top_subjet',
-            reco_btagged_jets, 'bjet' )
-
-        # Match subjet to a ljet
-        n_excluded_ljets = self.Match_two_lists(
-            top_subjets , 'top_subjet',
-            reco_ltagged_jets, 'ljet' )
-        if "subjet" in self.conf.general["verbosity"]:
-            print "subjet nMatchB={0} nMatchL={1}".format(n_excluded_bjets, n_excluded_ljets)
-
-
-        # In case of double matching, choose the match with lowest delR
-        # (This is not expected to happen often)
-        for subjet in top_subjets:
-            if hasattr( subjet, 'matched_bjet' ) and \
-                hasattr( subjet, 'matched_ljet' ) :
-                print '[SubjetAnalyzer] Double match detected'
-                if subjet.matched_bjet_delR < subjet.matched_ljet_delR:
-                    del subjet.matched_ljet
-                    del subjet.matched_ljet_delR
-                    n_excluded_bjets -= 1
-                else:
-                    del subjet.matched_bjet
-                    del subjet.matched_bjet_delR
-                    n_excluded_ljets -= 1
-
-
-        ########################################
-        # Modifying the bjets and ljets lists
-        ########################################
-
-        boosted_bjets = []
-        boosted_ljets = []
-
-        if n_excluded_bjets <= 1:
+        if len(tops) > 0:
+            top_subjets = self.Get_Subjets( top )
             if "subjet" in self.conf.general["verbosity"]:
-                print "subjet replacing"
-            # Add the subjets to the final output lists first
+                print "subjets"
+                for subjet in top_subjets:
+                    print subjet
+
+            if other_top_present:
+                for top in other_tops: self.Get_Subjets( top )
+
+            # Set 'PDGID' to 1 for light, and to 5 for b
             for subjet in top_subjets:
-                if subjet.btagFlag == 1.0: boosted_bjets.append( subjet )
-                if subjet.btagFlag == 0.0: boosted_ljets.append( subjet )
+                if subjet.btagFlag == 1.0: setattr( subjet, 'PDGID', 5 )
+                if subjet.btagFlag == 0.0: setattr( subjet, 'PDGID', 1 )
 
-            # Sort tl btagged jets by decreasing btag (to be sure, but should 
-            # already be done in previous analyzer)
-            # Only resolved b-jets
-            reco_btagged_jets = sorted( reco_btagged_jets, key=lambda x: -x.btag )
+            # Create two new lists for btagged_jets and wquark_candidate_jets in the
+            # original events
+            reco_btagged_jets = copy.deepcopy( event.selected_btagged_jets_high )
+            reco_ltagged_jets = copy.deepcopy( list( event.wquark_candidate_jets ) )
 
-            # Add up to 4 reco btagged jets to the output lists
-            for bjet in reco_btagged_jets:
-                # Check if the b-jet is not excluded
-                if not hasattr( bjet, 'matched_top_subjet' ):
-                    boosted_bjets.append( bjet )
+            for jet in reco_btagged_jets:
+                setattr( jet, 'btag', getattr(jet,self.btagAlgo) )
+                setattr( jet, 'btagFlag', 1.0 )
+                setattr( jet, 'PDGID', 0 )
 
-                # Stop adding after 4 b-jets
-                if len(boosted_bjets) == 4: break
-            event.PassedSubjetAnalyzer = True
+            for jet in reco_ltagged_jets:
+                setattr( jet, 'btag', getattr(jet,self.btagAlgo) )
+                setattr( jet, 'btagFlag', 0.0 )
+                setattr( jet, 'PDGID', 0 )
 
-        # If too many events are excluded, just run the default hypothesis
-        else:
+
+            ########################################
+            # Matching
+            ########################################
+
+            # Whenever a subjet has a 'match' (dR < dR_cut), the matched object should
+            # excluded from the event
+
+            # Match subjet to a bjet
+            n_excluded_bjets = self.Match_two_lists(
+                top_subjets, 'top_subjet',
+                reco_btagged_jets, 'bjet' )
+
+            # Match subjet to a ljet
+            n_excluded_ljets = self.Match_two_lists(
+                top_subjets , 'top_subjet',
+                reco_ltagged_jets, 'ljet' )
             if "subjet" in self.conf.general["verbosity"]:
-                print "[SubjetAnalyzer] subjet has too many overlaps, using reco"
-            boosted_bjets = reco_btagged_jets
-            boosted_ljets = reco_ltagged_jets
-            event.PassedSubjetAnalyzer = False
+                print "subjet nMatchB={0} nMatchL={1}".format(n_excluded_bjets, n_excluded_ljets)
+
+
+            # In case of double matching, choose the match with lowest delR
+            # (This is not expected to happen often)
+            for subjet in top_subjets:
+                if hasattr( subjet, 'matched_bjet' ) and \
+                    hasattr( subjet, 'matched_ljet' ) :
+                    print '[SubjetAnalyzer] Double match detected'
+                    if subjet.matched_bjet_delR < subjet.matched_ljet_delR:
+                        del subjet.matched_ljet
+                        del subjet.matched_ljet_delR
+                        n_excluded_bjets -= 1
+                    else:
+                        del subjet.matched_bjet
+                        del subjet.matched_bjet_delR
+                        n_excluded_ljets -= 1
+
+
+            ########################################
+            # Modifying the bjets and ljets lists
+            ########################################
+
+            boosted_bjets = []
+            boosted_ljets = []
+
+            if n_excluded_bjets <= 1:
+                if "subjet" in self.conf.general["verbosity"]:
+                    print "subjet replacing"
+                # Add the subjets to the final output lists first
+                for subjet in top_subjets:
+                    if subjet.btagFlag == 1.0: boosted_bjets.append( subjet )
+                    if subjet.btagFlag == 0.0: boosted_ljets.append( subjet )
+
+                # Sort tl btagged jets by decreasing btag (to be sure, but should 
+                # already be done in previous analyzer)
+                # Only resolved b-jets
+                reco_btagged_jets = sorted( reco_btagged_jets, key=lambda x: -x.btag )
+
+                # Add up to 4 reco btagged jets to the output lists
+                for bjet in reco_btagged_jets:
+                    # Check if the b-jet is not excluded
+                    if not hasattr( bjet, 'matched_top_subjet' ):
+                        boosted_bjets.append( bjet )
+
+                    # Stop adding after 4 b-jets
+                    if len(boosted_bjets) == 4: break
+                event.PassedSubjetAnalyzer = True
+
+            # If too many events are excluded, just run the default hypothesis
+            else:
+                if "subjet" in self.conf.general["verbosity"]:
+                    print "[SubjetAnalyzer] subjet has too many overlaps, using reco"
+                boosted_bjets = reco_btagged_jets
+                boosted_ljets = reco_ltagged_jets
+                event.PassedSubjetAnalyzer = False
 
 
 
@@ -332,21 +336,18 @@ class SubjetAnalyzer(FilterAnalyzer):
         ########################################
 
         # Store output lists in event
-        event.topCandidate = [ top ]
-        event.othertopCandidate = other_tops
         event.higgsCandidate = higgsCandidates
-        event.boosted_bjets = boosted_bjets
-        event.boosted_ljets = boosted_ljets
+        if len(tops)>0:
+            event.topCandidate = [ top ]
+            event.othertopCandidate = other_tops
+            event.boosted_bjets = boosted_bjets
+            event.boosted_ljets = boosted_ljets
 
-        # Also declared at beginning of analyzer, but overwrite just in case
-        event.n_bjets = len( reco_btagged_jets )
-        event.n_ljets = len( reco_ltagged_jets )
+            event.n_boosted_bjets = len( boosted_bjets )
+            event.n_boosted_ljets = len( boosted_ljets )
 
-        event.n_boosted_bjets = len( boosted_bjets )
-        event.n_boosted_ljets = len( boosted_ljets )
-
-        event.n_excluded_bjets = n_excluded_bjets
-        event.n_excluded_ljets = n_excluded_ljets
+            event.n_excluded_bjets = n_excluded_bjets
+            event.n_excluded_ljets = n_excluded_ljets
 
         if "subjet" in self.conf.general["verbosity"]:
             print '[SubjetAnalyzer] Exiting SubjetAnalyzer! event.PassedSubjetAnalyzer = {0}'.format(

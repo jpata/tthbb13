@@ -98,7 +98,6 @@ class LeptonAnalyzer(FilterAnalyzer):
         event.lep_veto = sorted(event.lep_veto, key=lambda x: x.pt, reverse=True)
 
         #Apply two-stage pt cut on DL leptons
-        print "before pt cut", [l.pt for l in event.lep_DL]
         lep_DL_afterpt = []
         for lep in event.lep_DL:
             if len(lep_DL_afterpt) == 0:
@@ -109,7 +108,6 @@ class LeptonAnalyzer(FilterAnalyzer):
                 lep_DL_afterpt += [lep]
         event.lep_DL = lep_DL_afterpt
         event.n_lep_DL = len(event.lep_DL)
-        print "after pt cut", [l.pt for l in event.lep_DL]
 
         if "debug" in self.conf.general["verbosity"]:
             for lep in event.lep_SL + event.lep_DL + event.lep_veto:

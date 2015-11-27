@@ -1,4 +1,4 @@
-import TTH.Plotting.Datacards.MiniSamples as Samples
+import TTH.Plotting.Datacards.Samples as Samples
 import ROOT, json
 
 #entries per job
@@ -13,14 +13,17 @@ ijob = 0
 for samp in Samples.samples_dict.keys():
     s = Samples.samples_dict[samp]
     tf = ROOT.TChain("tree")
-    tf.AddFile(s)
+    filenames = getattr(s, "filenames", [s])
+    for f in s.filenames:
+        tf.AddFile(f)
     nEntries = tf.GetEntries()
     for ch in chunks(range(nEntries), perjob):
         #default configuration
         ret = {
-            "filenames": [s],
-            "lumi": 1280.0,
-            "process": samp,
+            "filenames": filenames,
+            "lumi": 2120,
+            "process": getattr(s, "name", samp),
+            "prefix": getattr(s, "prefix", ""),
             "outputFile": "ControlPlotsSparse_{0}.root".format(ijob),
             "firstEntry": ch[0],
             "numEntries": len(ch),
