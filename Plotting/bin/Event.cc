@@ -68,6 +68,8 @@ const Configuration Configuration::makeConfiguration(JsonValue& value) {
     long firstEntry = -1;
     long numEntries = -1;
     long printEvery = -1;
+    
+    vector<vector<CategoryKey::CategoryKey>> enabledCategories;
 
     vector<SparseAxis> sparseAxes;
     for (auto lev1 : value) {
@@ -81,6 +83,18 @@ const Configuration Configuration::makeConfiguration(JsonValue& value) {
         }
         else if (ks == "lumi") {
             lumi = lev1->value.toNumber();
+        }
+        else if (ks == "enabledCategories") {
+            //loop over list of enabled categories
+
+            for (auto lev2 : lev1->value) {
+                vector<CategoryKey::CategoryKey> keys;
+                //Loop over category keys
+                for (auto lev3 : lev2->value) {
+                    keys.push_back(CategoryKey::from_string(lev3->value.toString()));
+                }
+                enabledCategories.push_back(keys);
+            }
         }
         else if (ks == "process") {
             process = ProcessKey::from_string(lev1->value.toString());
@@ -138,7 +152,8 @@ const Configuration Configuration::makeConfiguration(JsonValue& value) {
         prefix,
         firstEntry, numEntries, printEvery,
         outputFile,
-        sparseAxes
+        sparseAxes,
+        enabledCategories
     );
 }
 
@@ -405,38 +420,38 @@ static const Event::WeightMap nominalWeights = {
 //Systematically variated weights, applied only in case of nominal event
 static const Event::WeightMap systWeights = {
     {SystematicKey::nominal, nominal_weight},
-    {
-        SystematicKey::CMS_ttH_CSVStats1Up,
-        [](const Event& ev, const Configuration& conf){ return nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_Stats1Up;}
-    },
-    {
-        SystematicKey::CMS_ttH_CSVStats1Down,
-        [](const Event& ev, const Configuration& conf){ return nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_Stats1Down;}
-    },
-    {
-        SystematicKey::CMS_ttH_CSVStats2Up,
-        [](const Event& ev, const Configuration& conf){ return nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_Stats2Up;}
-    },
-    {
-        SystematicKey::CMS_ttH_CSVStats2Down,
-        [](const Event& ev, const Configuration& conf){ return nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_Stats2Down;}
-    },
-    {
-        SystematicKey::CMS_ttH_CSVLFUp,
-        [](const Event& ev, const Configuration& conf){ return nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_LFUp;}
-    },
-    {
-        SystematicKey::CMS_ttH_CSVLFDown,
-        [](const Event& ev, const Configuration& conf){ return nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_LFDown;}
-    },
-    {
-        SystematicKey::CMS_ttH_CSVHFUp,
-        [](const Event& ev, const Configuration& conf){ return nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_HFUp;}
-    },
-    {
-        SystematicKey::CMS_ttH_CSVHFDown,
-        [](const Event& ev, const Configuration& conf){ return nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_HFDown;}
-    },
+    //{
+    //    SystematicKey::CMS_ttH_CSVStats1Up,
+    //    [](const Event& ev, const Configuration& conf){ return nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_Stats1Up;}
+    //},
+    //{
+    //    SystematicKey::CMS_ttH_CSVStats1Down,
+    //    [](const Event& ev, const Configuration& conf){ return nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_Stats1Down;}
+    //},
+    //{
+    //    SystematicKey::CMS_ttH_CSVStats2Up,
+    //    [](const Event& ev, const Configuration& conf){ return nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_Stats2Up;}
+    //},
+    //{
+    //    SystematicKey::CMS_ttH_CSVStats2Down,
+    //    [](const Event& ev, const Configuration& conf){ return nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_Stats2Down;}
+    //},
+    //{
+    //    SystematicKey::CMS_ttH_CSVLFUp,
+    //    [](const Event& ev, const Configuration& conf){ return nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_LFUp;}
+    //},
+    //{
+    //    SystematicKey::CMS_ttH_CSVLFDown,
+    //    [](const Event& ev, const Configuration& conf){ return nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_LFDown;}
+    //},
+    //{
+    //    SystematicKey::CMS_ttH_CSVHFUp,
+    //    [](const Event& ev, const Configuration& conf){ return nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_HFUp;}
+    //},
+    //{
+    //    SystematicKey::CMS_ttH_CSVHFDown,
+    //    [](const Event& ev, const Configuration& conf){ return nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_HFDown;}
+    //},
 };
 
 ///FIXME: these ad-hoc process weights are here to fix a wrong value of nGen in processing
@@ -720,7 +735,13 @@ void CategoryProcessor::process(
     const vector<CategoryKey::CategoryKey>& catKeys,
     SystematicKey::SystematicKey systKey
     ) const {
-    const bool passes = (*this)(event);
+
+    //Check if event passes cuts
+    bool passes = isCategoryEnabled(conf, catKeys);
+    if (passes) {
+        passes = passes && (*this)(event);
+    } 
+
     if (passes) {
 
         vector<CategoryKey::CategoryKey> _catKeys(catKeys);
@@ -954,4 +975,16 @@ namespace BaseCuts {
             (abs(ev.leptons.at(0).pdgId)==11 && abs(ev.leptons.at(1).pdgId)==13)
         );
     }
+}
+
+bool isCategoryEnabled(const Configuration& conf, const vector<CategoryKey::CategoryKey>& catKeys) {
+    if (conf.enabledCategories.size() == 0) {
+        return true;
+    }
+    for (auto& ec : conf.enabledCategories) {
+        if (ec == catKeys) {
+            return true;
+        }
+    }
+    return false;
 }

@@ -138,6 +138,7 @@ public:
     int printEvery;
     string outputFile;
     vector<SparseAxis> sparseAxes;
+    vector<vector<CategoryKey::CategoryKey>> enabledCategories;
 
     Configuration(
         vector<string>& _filenames,
@@ -148,7 +149,8 @@ public:
         long _numEntries,
         int _printEvery,
         string _outputFile,
-        vector<SparseAxis> _sparseAxes
+        vector<SparseAxis> _sparseAxes,
+        vector<vector<CategoryKey::CategoryKey>> _enabledCategories
         ) :
         filenames(_filenames),
         lumi(_lumi),
@@ -158,7 +160,8 @@ public:
         numEntries(_numEntries),
         printEvery(_printEvery),
         outputFile(_outputFile),
-        sparseAxes(_sparseAxes)
+        sparseAxes(_sparseAxes),
+        enabledCategories(_enabledCategories)
     {
     }
     static const Configuration makeConfiguration(JsonValue& value);
@@ -459,5 +462,8 @@ bool isMC(ProcessKey::ProcessKey proc);
 bool isSignalMC(ProcessKey::ProcessKey proc);
 bool isData(ProcessKey::ProcessKey proc);
 double process_weight(ProcessKey::ProcessKey proc);
+
+//Checks if this category, specified by a list of keys, was enabled in the JSON
+bool isCategoryEnabled(const Configuration& conf, const vector<CategoryKey::CategoryKey>& catKeys);
 
 #endif

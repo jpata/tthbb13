@@ -21,7 +21,7 @@ for samp in Samples.samples_dict.keys():
         #default configuration
         ret = {
             "filenames": filenames,
-            "lumi": 2120,
+            "lumi": 2500,
             "process": getattr(s, "name", samp),
             "prefix": getattr(s, "prefix", ""),
             "outputFile": "ControlPlotsSparse_{0}.root".format(ijob),

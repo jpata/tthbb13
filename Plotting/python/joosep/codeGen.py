@@ -451,8 +451,7 @@ categories_tree = [
             #("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
         ]),
     ]),
-    ("sl", "SparseCategoryProcessor", []),
-    ("dl", "SparseCategoryProcessor", [
+    ("dl", "ControlCategoryProcessor", [
         ("j3_t2", "ControlCategoryProcessor", []),
         ("jge3_t3", "ControlCategoryProcessor", []),
         ("jge4_t2", "ControlCategoryProcessor", []),
@@ -503,9 +502,8 @@ categories_tree = [
         ]),
     ]),
 
-    ("dl_mumu", "SparseCategoryProcessor", []),
-    ("dl_emu", "SparseCategoryProcessor", []),
-    ("dl_ee", "SparseCategoryProcessor", [])
+    ("sl", "SparseCategoryProcessor", []),
+    ("dl", "SparseCategoryProcessor", []),
 ]
 
 #Kinematic control histograms

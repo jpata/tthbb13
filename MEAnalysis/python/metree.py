@@ -1,5 +1,6 @@
 import PhysicsTools.HeppyCore.framework.config as cfg
-
+import os
+from PhysicsTools.Heppy.physicsutils.BTagWeightCalculator import BTagWeightCalculator
 
 #Defines the output TTree branch structures
 from PhysicsTools.Heppy.analyzers.core.AutoFillTreeProducer import *
@@ -31,17 +32,17 @@ jetType = NTupleObjectType("jetType", variables = [
     NTupleVariable("qgl", lambda x : x.qgl),
     NTupleVariable("btagCSV", lambda x : x.btagCSV),
     NTupleVariable("btagBDT", lambda x : x.btagBDT),
-    NTupleVariable("bTagWeight", lambda x : x.bTagWeight, mcOnly=True),
-    NTupleVariable("bTagWeightHFUp", lambda x : x.bTagWeightHFUp, mcOnly=True),
-    NTupleVariable("bTagWeightHFDown", lambda x : x.bTagWeightHFDown, mcOnly=True),
-    NTupleVariable("bTagWeightLFUp", lambda x : x.bTagWeightLFUp, mcOnly=True),
-    NTupleVariable("bTagWeightLFDown", lambda x : x.bTagWeightLFDown, mcOnly=True),
-    NTupleVariable("bTagWeightStats1Up", lambda x : x.bTagWeightStats1Up, mcOnly=True),
-    NTupleVariable("bTagWeightStats1Down", lambda x : x.bTagWeightStats1Down, mcOnly=True),
-    NTupleVariable("bTagWeightStats2Up", lambda x : x.bTagWeightStats2Up, mcOnly=True),
-    NTupleVariable("bTagWeightStats2Down", lambda x : x.bTagWeightStats2Down, mcOnly=True),
-    NTupleVariable("bTagWeightJESUp", lambda x : x.bTagWeightJESUp, mcOnly=True),
-    NTupleVariable("bTagWeightJESDown", lambda x : x.bTagWeightJESDown, mcOnly=True),
+    #NTupleVariable("bTagWeight", lambda x : x.bTagWeight, mcOnly=True),
+    #NTupleVariable("bTagWeightHFUp", lambda x : x.bTagWeightHFUp, mcOnly=True),
+    #NTupleVariable("bTagWeightHFDown", lambda x : x.bTagWeightHFDown, mcOnly=True),
+    #NTupleVariable("bTagWeightLFUp", lambda x : x.bTagWeightLFUp, mcOnly=True),
+    #NTupleVariable("bTagWeightLFDown", lambda x : x.bTagWeightLFDown, mcOnly=True),
+    #NTupleVariable("bTagWeightStats1Up", lambda x : x.bTagWeightStats1Up, mcOnly=True),
+    #NTupleVariable("bTagWeightStats1Down", lambda x : x.bTagWeightStats1Down, mcOnly=True),
+    #NTupleVariable("bTagWeightStats2Up", lambda x : x.bTagWeightStats2Up, mcOnly=True),
+    #NTupleVariable("bTagWeightStats2Down", lambda x : x.bTagWeightStats2Down, mcOnly=True),
+    #NTupleVariable("bTagWeightJESUp", lambda x : x.bTagWeightJESUp, mcOnly=True),
+    #NTupleVariable("bTagWeightJESDown", lambda x : x.bTagWeightJESDown, mcOnly=True),
     NTupleVariable("mcFlavour", lambda x : x.mcFlavour, type=int, mcOnly=True),
     NTupleVariable("mcMatchId", lambda x : x.mcMatchId, type=int, mcOnly=True),
     NTupleVariable("hadronFlavour", lambda x : x.hadronFlavour, type=int, mcOnly=True),
@@ -59,6 +60,27 @@ jetType = NTupleObjectType("jetType", variables = [
     NTupleVariable("corr_JERUp", lambda x : x.corr_JERUp, mcOnly=True),
     NTupleVariable("corr_JERDown", lambda x : x.corr_JERDown, mcOnly=True),
 ])
+
+#Set up offline b-weight calculation
+csvpath = os.environ['CMSSW_BASE']+"/src/VHbbAnalysis/Heppy/data/csv"
+bweightcalc = BTagWeightCalculator(
+    csvpath + "/csv_rwt_fit_hf_2015_11_20.root",
+    csvpath + "/csv_rwt_fit_lf_2015_11_20.root"
+)
+bweightcalc.btag = "btagCSV"
+
+for syst in ["JES", "LF", "HF", "Stats1", "Stats2", "cErr1", "cErr2"]:
+    for sdir in ["Up", "Down"]:
+        jetType.variables += [NTupleVariable("bTagWeight"+syst+sdir,
+            lambda jet, sname=syst+sdir,bweightcalc=bweightcalc: bweightcalc.calcJetWeight(
+                jet, kind="final", systematic=sname
+            ), float, mcOnly=True, help="b-tag CSV weight, variating "+syst + " "+sdir
+        )]
+jetType.variables += [NTupleVariable("bTagWeight",
+    lambda jet, bweightcalc=bweightcalc: bweightcalc.calcJetWeight(
+        jet, kind="final", systematic="nominal",
+    ), float, mcOnly=True, help="b-tag CSV weight, nominal"
+)]
 
 #Specifies what to save for leptons
 leptonType = NTupleObjectType("leptonType", variables = [
