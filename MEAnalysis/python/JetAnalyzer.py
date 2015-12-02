@@ -64,7 +64,7 @@ class JetAnalyzer(FilterAnalyzer):
                     elif sigma == 0:
                         cf = 1.0 / newjets[i].corr_JER
                 else:
-                    print "jet JER corr = 0", newjets[i].pt
+                    #print "jet JER corr = 0", newjets[i].pt
                     cf = 0.0
 
                 newjets[i].pt *= cf
