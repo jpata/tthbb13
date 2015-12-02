@@ -255,24 +255,25 @@ for cat in [
     outfile.write("<h2>Category: {0}</h2>\n".format(cat))
 
     for distr, kdict in [
-        #("nhiggsCandidate", {"log":True}),
-        ("numJets", {}),
-        ("nBCSVM", {}),
+        ("nhiggsCandidate", {"log":True}),
+        ("ntopCandidate", {"log":True}),
+        #("numJets", {}),
+        #("nBCSVM", {}),
         #("nPVs", {}),
-        ("btag_LR_4b_2b_logit", {"rebin":5}),
+        #("btag_LR_4b_2b_logit", {"rebin":5}),
 
-        ("jet0_pt", {"rebin":5, "log":True, "xunit":"GeV"}),
-        ("jet0_btagCSV", {"rebin":5, "log":True}),
+        #("jet0_pt", {"rebin":5, "log":True, "xunit":"GeV"}),
+        #("jet0_btagCSV", {"rebin":5, "log":True}),
         #("jet0_btagBDT", {"rebin":1, "log":True}),
 
-        ("jet1_pt", {"rebin":5, "log":True, "xunit":"GeV"}),
-        ("jet1_btagCSV", {"rebin":5, "log":True}),
+        #("jet1_pt", {"rebin":5, "log":True, "xunit":"GeV"}),
+        #("jet1_btagCSV", {"rebin":5, "log":True}),
         #("jet1_btagBDT", {"rebin":1, "log":True}),
 
-        ("higgsCandidate_pt", {"rebin":5, "log":True, "xunit":"GeV"}),
-        ("higgsCandidate_bbtag", {"rebin":5}),
-        ("topCandidate_pt", {"rebin":5, "log":True, "xunit":"GeV"}),
-        ("topCandidate_mass", {"rebin":5, "xunit":"GeV"}),
+        #("higgsCandidate_pt", {"rebin":5, "log":True, "xunit":"GeV"}),
+        #("higgsCandidate_bbtag", {"rebin":5}),
+        #("topCandidate_pt", {"rebin":5, "log":True, "xunit":"GeV"}),
+        #("topCandidate_mass", {"rebin":5, "xunit":"GeV"}),
 
     ]:
         if not "boosted" in cat and "Candidate" in distr:

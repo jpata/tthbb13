@@ -122,6 +122,7 @@ varnames = {
     "mem_SL_2w2h2t_sj": "mem SL 2w2h2t sj",
     "mem_DL_0w2h2t": "mem DL 0w2h2t",
     "nPVs": "$N_{\\mathrm{PV}}$",
+    "ntopCandidate": "$N_{\\mathrm{HTTv2}}$",
 
 }
 
