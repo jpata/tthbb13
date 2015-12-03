@@ -19,7 +19,7 @@ def dataname(channel):
         return "Dilepton"
 
 for channel in [
-    #"sl_mu",
+    "sl_mu",
     
     #"sl_jge4_mu",
     "sl_j4_t3_mu",
@@ -33,7 +33,7 @@ for channel in [
     "sl_jge6_t3_mu",
     "sl_jge6_tge4_mu",
 
-    #"sl_el",
+    "sl_el",
     
     #"sl_jge4_el",
     "sl_j4_t3_el",

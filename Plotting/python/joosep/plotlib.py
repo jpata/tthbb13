@@ -13,8 +13,6 @@ from collections import OrderedDict
 
 import pandas
 
-from weighting import get_weight
-
 import sklearn
 import sklearn.metrics
 from sklearn.ensemble import GradientBoostingClassifier
@@ -100,6 +98,7 @@ varnames = {
     "nfatjets": r"$N_{\mathcal{fatjets}}$",
     "topCandidate_pt": "top candidate $p_T$ [GeV]",
     "topCandidate_mass": "top candidate $M$ [GeV]",
+    "topCandidate_masscal": "top candidate $M$ [GeV]",
     "topCandidate_fRec": "top candidate $f_{\\mathrm{rec}}$",
     "topCandidate_Ropt": "top candidate $R_{\\mathrm{opt}}$",
     "topCandidate_RoptCalc": "top candidate $R_{\\mathrm{opt}}, calc$",
@@ -302,7 +301,12 @@ def compare(df, bins, v):
     hist(h1, ls="-")
     hist(h2, ls="-")
     
-def mc_stack(hlist, colors="auto"):
+
+def hist_abs(h):
+    for i in range(1, h.GetNbinsX()+1):
+        h.SetBinContent(i, abs(h.GetBinContent(i)))
+
+def mc_stack(hlist, hs_syst, systematics, colors="auto"):
     if colors=="auto":
         coloriter = iter(plt.cm.jet(np.linspace(0,1,len(hlist))))
         for h in hlist:
@@ -329,11 +333,33 @@ def mc_stack(hlist, colors="auto"):
     htot_d.color="black"
 
     fill_between(htot_u, htot_d,
-        color="black", hatch="////",
+        color="black", hatch="////////",
         alpha=1.0, linewidth=0, facecolor="none", edgecolor="black", zorder=10,
     )
 
-    return {"hists":r, "tot":htot, "tot_u":htot_u, "tot_d":htot_d}
+    #add systematic uncertainties
+    hstat = htot_u - htot_d
+    errs = np.array([y for y in hstat.y()])
+    errs = np.abs(errs)
+
+    htot_usyst = htot.Clone()
+    htot_dsyst = htot.Clone()
+    for systUp, systDown in systematics:
+        errs_syst_up = np.array([y for y in sum(hs_syst[systUp].values()).y()])
+        errs_syst_down = np.array([y for y in sum(hs_syst[systDown].values()).y()])
+        errs_syst = np.abs(errs_syst_up - errs_syst_down)
+        errs = np.power(errs, 2) + np.power(errs_syst, 2)
+        errs = np.sqrt(errs)
+    for i in range(len(errs)):
+        htot_usyst.SetBinContent(i+1, htot_usyst.GetBinContent(i+1) + errs[i]/2)
+        htot_dsyst.SetBinContent(i+1, htot_dsyst.GetBinContent(i+1) - errs[i]/2)
+
+    fill_between(htot_usyst, htot_dsyst,
+        color="gray", hatch="\\\\\\\\",
+        alpha=1.0, linewidth=0, facecolor="none", edgecolor="gray", zorder=10,
+    )
+
+    return {"hists":r, "tot":htot, "tot_u":htot_u, "tot_d":htot_d, "tot_usyst":htot_usyst, "tot_dsyst":htot_dsyst}
 
 def dice(h, nsigma=1.0):
     hret = h.clone()
@@ -365,7 +391,6 @@ def make_uoflow(h):
     h.SetBinContent(nb+1, h.GetBinContent(nb) + h.GetBinContent(nb + 1))
     h.SetBinError(1, math.sqrt(h.GetBinError(0)**2 + h.GetBinError(1)**2))
     h.SetBinError(nb+1, math.sqrt(h.GetBinError(nb)**2 + h.GetBinError(nb + 1)**2))
-    return h
 
 def fill_overflow(hist):
     """
@@ -381,6 +406,23 @@ def fill_overflow(hist):
     hist.SetBinContent(nb+1, 0)
     hist.SetBinError(nb+1, 0)
 
+
+def getHistograms(tf, samples, hname):
+    hs = OrderedDict()
+    for sample, sample_name in samples:
+        try:
+            h = tf.get(sample + "/" + hname).Clone()
+        except rootpy.io.file.DoesNotExist as e:
+            continue
+        hs[sample] = h
+    for sample, sample_name in samples:
+        if not hs.has_key(sample):
+            if len(hs)>0:
+                hs[sample] = 0.0*hs.values()[0].Clone()
+            else:
+                return hs
+    return hs
+
 def draw_data_mc(tf, hname, samples, **kwargs):
 
     do_pseudodata = kwargs.get("do_pseudodata", False)
@@ -395,24 +437,28 @@ def draw_data_mc(tf, hname, samples, **kwargs):
     legend_fontsize = kwargs.get("legend_fontsize", 6)
     colors = kwargs.get("colors", "auto")
     show_overflow = kwargs.get("show_overflow", False)
+    blindFunc = kwargs.get("blindFunc", None)
+
+    #array of up-down pairs for systematic names, e.g. _CMS_scale_jUp/Down
+    systematics = kwargs.get("systematics", [])
 
     hs = OrderedDict()
-    for sample, sample_name in samples:
-        try:
-            h = tf.get(sample + "/" + hname).Clone()
-        except rootpy.io.file.DoesNotExist as e:
-            continue
-            # if len(hs.values())>0:
-            #     h = 0.0 * hs.values()[0].Clone()
-            # else:
-            #     h = rootpy.plotting.Hist(1, 0, 1)
-        hs[sample] = make_uoflow(h)
-        #print hs[sample].GetBinLowEdge(0), hs[sample].GetBinLowEdge(hs[sample].GetNbinsX()+1)
-        #hs[sample].Scale(get_weight(sample))
-        hs[sample].title = sample_name + " ({0:.1f})".format(hs[sample].Integral())
-        hs[sample].rebin(rebin)
-        if show_overflow:
-            fill_overflow(hs[sample])
+    hs_syst = OrderedDict()
+    hs = getHistograms(tf, samples, hname)
+    for systUp, systDown in systematics:
+        hs_syst[systUp] = getHistograms(tf, samples, hname+systUp)
+        hs_syst[systDown] = getHistograms(tf, samples, hname+systDown)
+
+    sample_d = dict(samples)
+    for hd in [hs] + hs_syst.values():
+        for (sample, h) in hd.items():
+            make_uoflow(h)
+            #print hs[sample].GetBinLowEdge(0), hs[sample].GetBinLowEdge(hs[sample].GetNbinsX()+1)
+            #hs[sample].Scale(get_weight(sample))
+            h.title = sample_d[sample] + " ({0:.1f})".format(h.Integral())
+            h.rebin(rebin)
+            if show_overflow:
+                fill_overflow(h)
             
     c = plt.figure(figsize=(6,6))
     if do_pseudodata or dataname:
@@ -420,17 +466,20 @@ def draw_data_mc(tf, hname, samples, **kwargs):
     else:
         a1 = plt.axes()
         
-    c.suptitle("$\\textbf{CMS}$ preliminary\n $\sqrt{s} = 13$ TeV"+title_extended,
-        y=0.98, x=0.02,
-        horizontalalignment="left", verticalalignment="top"
+    c.suptitle("$\\textbf{CMS}$ preliminary $\sqrt{s} = 13$ TeV"+title_extended,
+        y=1.02, x=0.02,
+        horizontalalignment="left", verticalalignment="bottom", fontsize=16
     )
-    r = mc_stack(hs.values(), colors=colors)
+    if len(hs) == 0:
+        raise KeyError("did not find any histograms for MC")
+    r = mc_stack(hs.values(), hs_syst, systematics, colors=colors)
     
     #Create the normalized signal shape
     hsig = hs[samples[0][0]].Clone()
     tot_mc = sum(hs.values())
     #hsig.Rebin(2)
-    hsig.Scale(0.2 * tot_mc.Integral() / hsig.Integral())
+    if hsig.Integral()>0:
+        hsig.Scale(0.2 * tot_mc.Integral() / hsig.Integral())
     hsig.title = samples[0][1] + " norm"
     hsig.linewidth=2
     hsig.fillstyle = None
@@ -459,7 +508,10 @@ def draw_data_mc(tf, hname, samples, **kwargs):
         else:
             data = tot_mc.Clone()
             data.Scale(0.0)
+        if blindFunc:
+            data = blindFunc(data)
         data.title = "data ({0})".format(data.Integral())
+        idata = data.Integral()
 
     if data:
         if show_overflow:
@@ -478,6 +530,8 @@ def draw_data_mc(tf, hname, samples, **kwargs):
             #print h.title, line.get_color()
             patch = mpatches.Patch(color=line.get_color(), label=h.title)
             patches += [patch]
+        patches += [mpatches.Patch(facecolor="none", edgecolor="black", label="stat", hatch="////////")]
+        patches += [mpatches.Patch(facecolor="none", edgecolor="gray", label="stat+syst", hatch="\\\\\\\\")]
         plt.legend(handles=patches, loc=legend_loc, numpoints=1, prop={'size':legend_fontsize}, ncol=2, frameon=False)
     if ylabel == "auto":
         ylabel = "events / {0:.2f} {1}".format(hs.values()[0].get_bin_width(1), xunit)
@@ -513,20 +567,34 @@ def draw_data_mc(tf, hname, samples, **kwargs):
         bg_unc_u.Divide(r["tot"])
         bg_unc_d.Divide(r["tot"])
 
+        bg_unc_usyst = r["tot_usyst"]
+        bg_unc_dsyst = r["tot_dsyst"]
+
+        bg_unc_usyst.Divide(r["tot"])
+        bg_unc_dsyst.Divide(r["tot"])
+        if blindFunc:
+            data = blindFunc(data)
         errorbar(data)
 
         fill_between(
             bg_unc_u, bg_unc_d,
-            color="black", hatch="////",
+            color="black", hatch="////////",
             alpha=1.0, linewidth=0, facecolor="none", edgecolor="black", zorder=10,
         )
+
+        fill_between(
+            bg_unc_usyst, bg_unc_dsyst,
+            color="gray", hatch="\\\\\\\\",
+            alpha=1.0, linewidth=0, facecolor="none", edgecolor="gray", zorder=10,
+        )
+        plt.title("data={0:.1f}\ MC={1:.1f}".format(idata, r["tot"].Integral()), x=0.01, y=0.8, fontsize=10, horizontalalignment="left")
         plt.ylabel("$\\frac{\mathrm{data}}{\mathrm{pred.}}$", fontsize=16)
         plt.axhline(1.0, color="black")
         a2.set_ylim(0, 2)
         #hide last tick on ratio y axes
         a2.set_yticks(a2.get_yticks()[:-1]);
         a2.set_xticks(ticks);
-    return a1, a2, hs, r
+    return a1, a2, hs, r, hs_syst
 
 def draw_mem_data_mc(*args, **kwargs):
     a1, a2, hs = draw_data_mc(*args, **kwargs)

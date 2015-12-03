@@ -22,7 +22,9 @@ slist = [
  ('ttbarOther', 'ttbarOther')
 ]
 
-input_file = "/Users/joosep/Dropbox/tth/ControlPlotsSparse.root"
+#input_file = "/Users/joosep/Dropbox/tth/datacards/prev16/Nov30.root"
+#input_file = "/Users/joosep/Dropbox/tth/ControlPlotsSparse_puweight.root"
+input_file = "/Users/joosep/Dropbox/tth/ControlPlotsSparse_corr.root"
 
 outfile = open("report.html", "w")
 outfile.write("<h1>ttH report</h1>\n")
@@ -93,6 +95,7 @@ plt.errorbar(xs_num+0.25, ys, es, color="black", ls="none", elinewidth=2)
 plt.xlim(0,len(xs))
 plt.xticks(xs_num+0.25, [x.replace("_", " ") for x in xs], rotation=90, fontsize=16);
 plt.ylabel("$S / \sqrt{B}$")
+plotlib.svfg("plots/sob_boosted.png")
 outfile.write("<br><img src=\"plots/sob_boosted.png\" style=\"width:600px;height:600px;\"> <br>\n")
 plt.clf()
 
@@ -108,7 +111,7 @@ for cat in [
     "sl_jge6_t3",
     "sl_jge6_tge4",
 
-    #"dl",
+    "dl",
     "dl_j3_t2",
     "dl_jge3_t3",
     "dl_jge4_t2",
@@ -135,6 +138,9 @@ for cat in [
     heplot.barhist(hb4, color="purple", label="tt+2b", lw=2, scaling="normed", rebin=4)
     heplot.barhist(hb5, color="black", label="tt+b", lw=2, scaling="normed", rebin=4)
     plt.legend(loc="best")
+    plt.xlabel(plotlib.varnames["btag_LR_4b_2b_logit"])
+    plt.ylabel("fraction of events")
+    plt.title(cat.replace("_", " "))
     fname = "plots/{0}_btag_lr.png".format(cat)
     plotlib.svfg(fname)
     outfile.write("<br><img src=\"{0}\" style=\"width:600px;height:600px;\"> <br>\n".format(fname))
@@ -158,6 +164,7 @@ for cat in [
 
     plt.xlabel("tt+H(bb) efficiency")
     plt.ylabel("tt+X efficiency")
+    plt.title(cat.replace("_", " "))
     plt.legend(loc="best")
     fname = "plots/{0}_btag_lr_roc.png".format(cat)
     plotlib.svfg(fname)
@@ -184,6 +191,7 @@ for cat, var in [
     heplot.barhist(hbkg, scaling="normed", color="blue", label="bkg", lw=2)
     plt.xlabel(plotlib.varnames[var])
     plt.ylabel("fraction of events")
+    plt.title(cat.replace("_", " "))
     plt.legend(loc="best")
     fname = "plots/{0}_{1}.png".format(cat, var)
     plotlib.svfg(fname)
@@ -200,10 +208,16 @@ for cat, var in [
     plt.legend(loc="best")
     plt.xlabel("tt+H(bb) eff.")
     plt.ylabel("tt+jets eff.")
+    plt.title(cat.replace("_", " "))
     fname = "plots/{0}_{1}_roc.png".format(cat, var)
     plotlib.svfg(fname)
     outfile.write("<br><img src=\"{0}\" style=\"width:600px;height:600px;\"> <br>\n".format(fname))
 
+def blindMEM(h):
+    for i in range(4,7):
+        h.SetBinContent(i, 0)
+        h.SetBinError(i, 0)
+    return h
 for cat in [
     # "sl_mu_j5_t2_boostedHiggs",
     # "sl_mu_j5_t3_boostedHiggs",
@@ -218,91 +232,141 @@ for cat in [
 
     #"sl_mu",
     "sl_mu_j5_t2",
+    "sl_mu_j5_t2_blrH",
     "sl_mu_j5_t2_boostedHiggsOnly",
     "sl_mu_j5_t2_boostedTopOnly",
     "sl_mu_j5_t2_boostedHiggsTop",
     "sl_mu_j5_t3",
+    "sl_mu_j5_t3_blrH",
     "sl_mu_j5_tge4",
+    "sl_mu_j5_tge4_blrH",
     "sl_mu_jge6_t2",
+    "sl_mu_jge6_t2_blrH",
     "sl_mu_jge6_t3",
+    "sl_mu_jge6_t3_blrH",
     "sl_mu_jge6_tge4",
-    # 
-    # #"sl_el",
+    "sl_mu_jge6_tge4_blrH",
+
+    #"sl_el",
     "sl_el_j5_t2",
+    "sl_el_j5_t2_blrH",
     "sl_el_j5_t3",
+    "sl_el_j5_t3_blrH",
     "sl_el_j5_tge4",
+    "sl_el_j5_tge4_blrH",
     "sl_el_jge6_t2",
+    "sl_el_jge6_t2_blrH",
     "sl_el_jge6_t3",
+    "sl_el_jge6_t3_blrH",
     "sl_el_jge6_tge4",
-    # 
+    "sl_el_jge6_tge4_blrH",
+    
     "dl_mumu_j3_t2",
+    "dl_mumu_j3_t2_blrH",
     "dl_ee_j3_t2",
+    "dl_ee_j3_t2_blrH",
     "dl_emu_j3_t2",
+    "dl_emu_j3_t2_blrH",
     # 
     "dl_mumu_jge3_t3",
+    "dl_mumu_jge3_t3_blrH",
     "dl_ee_jge3_t3",
+    "dl_ee_jge3_t3_blrH",
     "dl_emu_jge3_t3",
+    "dl_emu_jge3_t3_blrH",
     # 
     "dl_mumu_jge4_t2",
+    "dl_mumu_jge4_t2_blrH",
     "dl_ee_jge4_t2",
+    "dl_ee_jge4_t2_blrH",
     "dl_emu_jge4_t2",
+    "dl_emu_jge4_t2_blrH",
     # 
     "dl_mumu_jge4_tge4",
+    "dl_mumu_jge4_tge4_blrH",
     "dl_ee_jge4_tge4",
+    "dl_ee_jge4_tge4_blrH",
     "dl_emu_jge4_tge4",
+    "dl_emu_jge4_tge4_blrH",
     ]:
     print cat
     outfile.write("<h2>Category: {0}</h2>\n".format(cat))
 
     for distr, kdict in [
-        ("nhiggsCandidate", {"log":True}),
-        ("ntopCandidate", {"log":True}),
-        #("numJets", {}),
-        #("nBCSVM", {}),
-        #("nPVs", {}),
-        #("btag_LR_4b_2b_logit", {"rebin":5}),
+        #("nhiggsCandidate", {"log":True}),
+        #("ntopCandidate", {"log":True}),
+        ("numJets", {}),
+        ("nBCSVM", {}),
+        ("nPVs", {}),
+        ("btag_LR_4b_2b_logit", {"rebin":5}),
 
-        #("jet0_pt", {"rebin":5, "log":True, "xunit":"GeV"}),
-        #("jet0_btagCSV", {"rebin":5, "log":True}),
-        #("jet0_btagBDT", {"rebin":1, "log":True}),
-
-        #("jet1_pt", {"rebin":5, "log":True, "xunit":"GeV"}),
-        #("jet1_btagCSV", {"rebin":5, "log":True}),
-        #("jet1_btagBDT", {"rebin":1, "log":True}),
-
-        #("higgsCandidate_pt", {"rebin":5, "log":True, "xunit":"GeV"}),
-        #("higgsCandidate_bbtag", {"rebin":5}),
-        #("topCandidate_pt", {"rebin":5, "log":True, "xunit":"GeV"}),
-        #("topCandidate_mass", {"rebin":5, "xunit":"GeV"}),
+        ("jet0_pt", {"rebin":5, "log":True, "xunit":"GeV"}),
+        ("jet0_btagCSV", {"rebin":5, "log":True}),
+        ("jet0_btagBDT", {"rebin":5, "log":True}),
+        # 
+        ("jet1_pt", {"rebin":5, "log":True, "xunit":"GeV"}),
+        ("jet1_btagCSV", {"rebin":5, "log":True}),
+        ("jet1_btagBDT", {"rebin":5, "log":True}),
+        # 
+        # ("higgsCandidate_pt", {"rebin":5, "log":True, "xunit":"GeV"}),
+        # ("higgsCandidate_bbtag", {"rebin":5}),
+        # ("topCandidate_pt", {"rebin":5, "log":True, "xunit":"GeV"}),
+        # ("topCandidate_mass", {"rebin":5, "xunit":"GeV"}),
+        # ("topCandidate_masscal", {"rebin":5, "xunit":"GeV"}),
+        ("mem_SL_0w2h2t", {"rebin":1, "xunit":""}),
+        ("mem_DL_0w2h2t", {"rebin":1, "xunit":""}),
+        ("mem_SL_2w2h2t", {"rebin":1, "xunit":""}),
+        ("mem_SL_2w2h2t_sj", {"rebin":1, "xunit":""}),
 
     ]:
         if not "boosted" in cat and "Candidate" in distr:
             continue
-        outfile.write("<h3>Variable: {0}</h2>\n".format(distr))
-        r = plotlib.draw_data_mc(
-            inf,
-            cat + "/" + distr,
-            slist,
-            dataname=plotlib.getDataname(cat), xlabel=plotlib.varnames[distr],
-            xunit=kdict.get("xunit", ""),
-            legend_fontsize=10, legend_loc="best", colors=plotlib.samplecolors,
-            do_legend=True,
-            rebin=kdict.get("rebin", 1),
-            show_overflow = True, title_extended="\n$\\mathcal{L}=2.12\\ \\mathrm{fb}^{-1}$"
-        )
-        if kdict.get("log", False):
-            r[0].set_yscale("log")
-            r[0].set_ylim(bottom=1, top=r[3]["tot"].GetMaximum()*10)
         
-        #plt.rc('text', usetex=False)
-        r[0].set_title(cat.replace("_", " "), x=0.98, y=1.01, ha="right", va="bottom", fontsize=18)
-        #plt.rc('text', usetex=True)
+        if "mem" in distr and not "blrH" in cat:
+            continue
+        if "mem_DL" in distr and not "dl" in cat:
+            continue
+        if "mem_SL" in distr and not "sl" in cat:
+            continue
 
-        #plotlib.svfg("{0}_{1}.pdf".format(distr, cat))
-        fname = "plots/{0}_{1}.png".format(cat, distr)
-        plotlib.svfg(fname)
-        outfile.write("<br><img src=\"{0}\" style=\"width:600px;height:600px;\"> <br>\n".format(fname))
-        plt.clf()
-        del r
+        outfile.write("<h3>Variable: {0}</h2>\n".format(distr))
+        if "mem" in distr:
+            blindFunc = blindMEM
+        else:
+            blindFunc = None
+        try:
+            r = plotlib.draw_data_mc(
+                inf,
+                cat + "/" + distr,
+                slist,
+                dataname=plotlib.getDataname(cat), xlabel=plotlib.varnames[distr],
+                xunit=kdict.get("xunit", ""),
+                legend_fontsize=10, legend_loc="best", colors=plotlib.samplecolors,
+                do_legend=True,
+                rebin=kdict.get("rebin", 1),
+                show_overflow = True, title_extended="$,\\ \\mathcal{L}=2.12,\\ \\mathrm{fb}^{-1}$",
+                systematics=[
+                    ("_CMS_scale_jUp", "_CMS_scale_jDown"),
+                    ("_CMS_ttH_CSVLFUp", "_CMS_ttH_CSVLFDown"),
+                    ("_CMS_ttH_CSVHFUp", "_CMS_ttH_CSVHFDown"),
+                    ("_CMS_ttH_CSVStats1Up", "_CMS_ttH_CSVStats1Down"),
+                    ("_CMS_ttH_CSVStats2Up", "_CMS_ttH_CSVStats2Down"),
+                ],
+                blindFunc=blindFunc
+            )
+            if kdict.get("log", False):
+                r[0].set_yscale("log")
+                r[0].set_ylim(bottom=1, top=r[3]["tot"].GetMaximum()*10)
+            
+            r[0].set_title(cat.replace("_", " "), x=0.5, ha="center", y=1.05, va="bottom")
+            r[0].text(1.01, 0.99, "$\mu = {0:.2f}$\n $\sigma = {1:.2f}$".format(r[3]["tot"].GetMean(), r[3]["tot"].GetRMS()), transform=r[0].transAxes, ha="left", va="top")
 
+            #plotlib.svfg("{0}_{1}.pdf".format(distr, cat))
+            fname = "plots/{0}_{1}.png".format(cat, distr)
+            plotlib.svfg(fname)
+            outfile.write("<br><img src=\"{0}\" style=\"width:600px;height:600px;\"> <br>\n".format(fname))
+            plt.clf()
+            del r
+        except KeyError as e:
+            print "skipping", cat, distr, str(e)
 outfile.close()
