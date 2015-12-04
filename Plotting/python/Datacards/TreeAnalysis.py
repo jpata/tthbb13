@@ -22,7 +22,7 @@ import pickle
 #input_file = "/home/joosep/tth/datacards/prev16/Nov27.root"
 #input_file = "/home/joosep/tth/datacards/prev16/Dec3.root"
 input_file = "/dev/shm/joosep/ControlPlotsSparse_corr.root"
-output_path = "/dev/shm/joosep/categorization/"
+output_path = "/dev/shm/joosep/categorization2/"
 
 n_proc = 50
 n_iter = 8
@@ -110,7 +110,7 @@ if __name__ == "__main__":
         input_file,
         signals,
         backgrounds,
-        "sl"
+        "dl"
     )
     axes = Categorize.GetAxes(h_sig["ttH_hbb"])
 
@@ -128,7 +128,7 @@ if __name__ == "__main__":
     Categorize.Categorization.lg = LimitGetter(output_path)
    
     #print "Old categorization"
-    #make_latex("old_dl")
+    make_latex("old_dl")
     #make_latex("old_2t")
 
     #r = split_leaves_by_BLR()
@@ -136,19 +136,19 @@ if __name__ == "__main__":
     #of.write(r.print_tree_latex())
     #of.close()
 
-    print "Optimization"
-    r = Categorize.CategorizationFromString(trees["3cat"])
-    name = "opt"
+    #print "Optimization"
+    #r = Categorize.CategorizationFromString(trees["3cat"])
+    #name = "opt"
 
-    import cProfile, time
-    def f(): optimize(r)
-    p = cProfile.Profile(time.clock)
-    p.runcall(f)
-    p.print_stats()
-    
-    of = open( name + ".tex","w")
-    of.write(r.print_tree_latex())
-    of.close()
+    #import cProfile, time
+    #def f(): optimize(r)
+    #p = cProfile.Profile(time.clock)
+    #p.runcall(f)
+    #p.print_stats()
+    #
+    #of = open( name + ".tex","w")
+    #of.write(r.print_tree_latex())
+    #of.close()
     #of = open(name + ".pickle", "w")
     #of.write(pickle.dumps(r))
     #of.close()
