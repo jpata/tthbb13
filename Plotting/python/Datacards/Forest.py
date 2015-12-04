@@ -7,44 +7,56 @@ trees = {}
 trees["old"] = """
   Discr=2
     numJets__4__5 Discr=2 
+       nBCSVM__3__4 Discr=2
+       nBCSVM__4__5 Discr=2
+    numJets__5__8 Discr=2
+       numJets__5__6 Discr=2
+          nBCSVM__3__4 Discr=2
+          nBCSVM__4__5 Discr=2
+       numJets__6__8 Discr=2
+          nBCSVM__2__4 Discr=2
+             nBCSVM__2__3 Discr=2
+             nBCSVM__3__4 Discr=2
+          nBCSVM__4__8 Discr=2
+"""
+
+trees["old_dl"] = """
+  Discr=14
+     nBCSVM__2__3 Discr=14
+        numJets__2__3 Discr=-1
+        numJets__3__6 Discr=14
+           numJets__3__4 Discr=14
+           numJets__4__6 Discr=14
+     nBCSVM__3__6 Discr=14
+        nBCSVM__3__4 Discr=14
+           numJets__2__3 Discr=-1
+           numJets__3__6 Discr=14
+        nBCSVM__4__6 Discr=14
+           numJets__1__4 Discr=-1
+           numJets__4__6 Discr=14
+"""
+
+# Classic categorization:
+# Based on jet and tagged jet multiplicity. Also include the 2tag bins.
+# 7 categories + 2 categories (4j2t, 5j2t)
+trees["old_2t"] = """
+  Discr=2
+    numJets__4__5 Discr=2 
        nBCSVM__2__4 Discr=2
           nBCSVM__2__3 Discr=2
           nBCSVM__3__4 Discr=2
        nBCSVM__4__5 Discr=2
-    numJets__5__7 Discr=2
+    numJets__5__8 Discr=2
        numJets__5__6 Discr=2
           nBCSVM__2__4 Discr=2
              nBCSVM__2__3 Discr=2
              nBCSVM__3__4 Discr=2
           nBCSVM__4__5 Discr=2
-       numJets__6__7 Discr=2
+       numJets__6__8 Discr=2
           nBCSVM__2__4 Discr=2
              nBCSVM__2__3 Discr=2
              nBCSVM__3__4 Discr=2
-          nBCSVM__4__5 Discr=2
-"""
-
-# Classic categorization:
-# Based on jet and tagged jet multiplicity. Also include the 2tag bins.
-# 9 categories
-trees["old_2t"] = """
-  Discr=0
-    numJets__4__5 Discr=0
-       nBCSVM__2__4 Discr=0
-          nBCSVM__2__3 Discr=0
-          nBCSVM__3__4 Discr=0
-       nBCSVM__4__5 Discr=0
-    numJets__5__7 Discr=0
-       numJets__5__6 Discr=0
-          nBCSVM__2__4 Discr=0
-             nBCSVM__2__3 Discr=0
-             nBCSVM__3__4 Discr=0
-          nBCSVM__4__5 Discr=0
-       numJets__6__7 Discr=0
-          nBCSVM__2__4 Discr=0
-             nBCSVM__2__3 Discr=0
-             nBCSVM__3__4 Discr=0
-          nBCSVM__4__5 Discr=0
+          nBCSVM__4__8 Discr=2
 """
 
 # Classic categorization using jets and tagged jet multiplicity
@@ -152,23 +164,33 @@ trees["1cat"] = """
 # Opt on tree without BLR preselection cut
 # BDT NOT included as discriminator
 # 2 categories
-trees["2cat"] = """
+#trees["3cat"] = """
+#  Discr=2
+#    numJets__4__5 Discr=2
+#    numJets__5__8 Discr=2
+#       numJets__5__6 Discr=2
+#       numJets__6__8 Discr=2
+#"""
+
+trees["3cat"] = """
   Discr=2
     numJets__4__5 Discr=2
-    numJets__5__7 Discr=2
+    numJets__5__8 Discr=2
+       numJets__5__6 Discr=2
+       numJets__6__8 Discr=2
 """
 
 
 # Opt on tree without BLR preselection cut
 # BDT NOT included as discriminator
 # 3 categories
-trees["3cat"] = """
-  Discr=2
-    numJets__4__5 Discr=2
-    numJets__5__7 Discr=2
-       btag_LR_4b_2b_logit__m20_0__8_0 Discr=2
-       btag_LR_4b_2b_logit__8_0__20_0 Discr=2
-"""
+#trees["3cat"] = """
+#  Discr=2
+#    numJets__4__5 Discr=2
+#    numJets__5__7 Discr=2
+#       btag_LR_4b_2b_logit__m20_0__8_0 Discr=2
+#       btag_LR_4b_2b_logit__8_0__20_0 Discr=2
+#"""
 
 # Opt on tree without BLR preselection cut
 # BDT NOT included as discriminator

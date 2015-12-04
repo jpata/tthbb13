@@ -87,3 +87,13 @@ class LimitGetter(object):
         print datacard_name, ":", limit
         return lims, quantiles
     # End of get_limit
+
+class DummyLimitGetter(object):
+    
+    def __init__(self, output_path = "."):
+        self.output_path = output_path
+
+    def __call__(self, datacard):
+        print "calling limit on datacard", datacard
+        return np.array([0,0,0,0,0,0]), None
+    # End of get_limit

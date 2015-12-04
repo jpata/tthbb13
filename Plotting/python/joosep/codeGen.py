@@ -43,7 +43,10 @@ new {catkind}(
       return {cuts};
     }},
     {catid},
-    conf)
+    conf,
+    {{}},
+    {weightfunc}
+)
 """
     else:
         s = r"""
@@ -53,14 +56,23 @@ new {catkind}(
     }},
     {catid},
     conf,
-    {subcats}
-)"""
+    {subcats},
+    {weightfunc}
+)
+"""
+
+    #do re-weighting only for sparse categories
+    wfunc = "getNominalWeights()"
+    if catkind == "SparseCategoryProcessor":
+        wfunc = "getSystWeights()"
 
     s = s.format(**{
     "catkind": catkind,
     "cuts": parseCut(catname),
     "catid": "{" + parseId(catname) + "}",
-    "subcats": "{"+", ".join([makeCategory(c, ids) for c in subcats])+"}"}
+    "weightfunc": wfunc,
+    "subcats": "{"+", ".join([makeCategory(c, ids) for c in subcats])+"}"
+    }
 )
     depth = len(ids) - 1
     s = s.replace("\n", "\n" + depth*"    ")
@@ -155,9 +167,10 @@ public:
         std::function<int(const Event& ev)> _cutFunc,
         const vector<CategoryKey::CategoryKey>& _keys,
         const Configuration& _conf,
-        const vector<const CategoryProcessor*>& _subCategories={{}}
+        const vector<const CategoryProcessor*>& _subCategories={{}},
+        const WeightMap& _weightFuncs=getNominalWeights()
     ) :
-      {1}(_cutFunc, _keys, _conf, _subCategories) {{}};
+      {1}(_cutFunc, _keys, _conf, _subCategories, _weightFuncs) {{}};
      
     virtual void fillHistograms(
         const Event& event,
@@ -199,6 +212,11 @@ void {0}::fillHistograms(
 )
     return r
 
+def makeSystWeightFunction(name, func):
+    return "{{SystematicKey::{0}, [](const Event& ev, const Configuration& conf) {{ return {1}; }} }}".format(
+        name, func
+    )
+
 
 #List of all systematics that we want to consider
 systematics = [
@@ -213,6 +231,18 @@ systematics = [
     "CMS_ttH_CSVLFDown",
     "CMS_ttH_CSVHFUp",
     "CMS_ttH_CSVHFDown",
+]
+
+systematic_weights = [
+    ("CMS_ttH_CSVStats1Up",     "nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_Stats1Up"),
+    ("CMS_ttH_CSVStats1Down",   "nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_Stats1Down"),
+    ("CMS_ttH_CSVStats2Up",     "nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_Stats2Up"),
+    ("CMS_ttH_CSVStats2Down",   "nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_Stats2Down"),
+    ("CMS_ttH_CSVStats2Up",     "nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_Stats2Up"),
+    ("CMS_ttH_CSVLFUp",         "nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_LFUp"),
+    ("CMS_ttH_CSVLFDown",       "nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_LFDown"),
+    ("CMS_ttH_CSVHFUp",         "nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_HFUp"),
+    ("CMS_ttH_CSVHFDown",       "nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_HFDown"),
 ]
 
 #List of all processes
@@ -513,7 +543,7 @@ histograms_control = [
     
     ("numJets", 8, 2, 10, "event.numJets", "true", "Number of resolved jets"),
     
-    ("nBCSVM", 5, 0, 5, "event.nBCSVM", "true", "Number of CSVM jets"),
+    ("nBCSVM", 5, 2, 7, "event.nBCSVM", "true", "Number of CSVM jets"),
     #("nBCSVL", 8, 0, 8, "event.nBCSVL", "true", "Number of CSVL jets"),
 
     ("lep0_pt", 100, 0, 600, "event.leptons.at(0).p4.Pt()", "event.leptons.size()>0", "Leading lepton pt"),
@@ -657,6 +687,24 @@ if __name__ == "__main__":
     #create all CategoryProcessors
     for name, parentname, hists in category_processors:
         categories_c.write(makeCategoryProcessorImpl(name, parentname, hists))
+
+    categories_c.write("""
+WeightMap getNominalWeights() {
+    return {
+        {SystematicKey::nominal, nominal_weight},
+    };
+}
+""")
+
+    categories_c.write("""
+WeightMap getSystWeights() {
+    return {
+        {SystematicKey::nominal, nominal_weight},
+""")
+    for wname, wfunc in systematic_weights:
+        categories_c.write("        " + makeSystWeightFunction(wname, wfunc) + ",\n")
+    categories_c.write("    };\n")
+    categories_c.write("}\n")
 
     #Done
     categories_h.close()

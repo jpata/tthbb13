@@ -555,20 +555,37 @@ def getTreeProducer(conf):
         for vtype in [
             ("weight_xs",               float,  ""),
             ("ttCls",                   int,    ""),
-            ("bTagWeight",              float,  ""),
-            ("bTagWeight_HFDown",       float,  ""),
-            ("bTagWeight_HFUp",         float,  ""),
-            ("bTagWeight_JESDown",      float,  ""),
-            ("bTagWeight_JESUp",        float,  ""),
-            ("bTagWeight_LFDown",       float,  ""),
-            ("bTagWeight_LFUp",         float,  ""),
-            ("bTagWeight_Stats1Down",   float,  ""),
-            ("bTagWeight_Stats1Up",     float,  ""),
-            ("bTagWeight_Stats2Down",   float,  ""),
-            ("bTagWeight_Stats2Up",     float,  ""),
+            #("bTagWeight",              float,  ""),
+            #("bTagWeight_HFDown",       float,  ""),
+            #("bTagWeight_HFUp",         float,  ""),
+            #("bTagWeight_JESDown",      float,  ""),
+            #("bTagWeight_JESUp",        float,  ""),
+            #("bTagWeight_LFDown",       float,  ""),
+            #("bTagWeight_LFUp",         float,  ""),
+            #("bTagWeight_Stats1Down",   float,  ""),
+            #("bTagWeight_Stats1Up",     float,  ""),
+            #("bTagWeight_Stats2Down",   float,  ""),
+            #("bTagWeight_Stats2Up",     float,  ""),
             ("nPU0",                    float,  ""),
         ]:
             treeProducer.globalVariables += [makeGlobalVariable(vtype, systematic, mcOnly=True)]
+
+        #Update b-tag weights locally
+        btag_weights = {}
+        for syst in ["JES", "LF", "HF", "Stats1", "Stats2", "cErr1", "cErr2"]:
+            for sdir in ["Up", "Down"]:
+                name = "bTagWeight"+syst+sdir
+                btag_weights[name] = NTupleVariable("bTagWeight_" + syst + sdir,
+                    lambda ev, sname=syst+sdir: bweightcalc.calcEventWeight(
+                        ev.systResults["nominal"].good_jets, kind="final", systematic=sname
+                    ), float, mcOnly=True, help="b-tag CSV weight, variating "+syst+" "+sdir
+                )
+        btag_weights["bTagWeight"] = NTupleVariable("bTagWeight",
+            lambda ev: bweightcalc.calcEventWeight(
+                ev.systResults["nominal"].good_jets, kind="final", systematic="nominal"
+            ), float ,mcOnly=True, help="b-tag CSV weight, nominal"
+        )
+        treeProducer.globalVariables += list(btag_weights.values())
     for vtype in [
         ("rho",                     float,  ""),
         ("json",                    float,  ""),

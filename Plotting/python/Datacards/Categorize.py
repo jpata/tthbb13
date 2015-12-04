@@ -68,6 +68,10 @@ class Categorization(object):
     lg = None
 
     verbose = 0
+    #Cache of all projected histograms
+    allhists = {}
+    memdir = ROOT.TFile("/dev/shm/memdir.root", "RECREATE")
+    do_stat_variations = False
 
     def __init__(self, cut, parent=None, discriminator_axis=0):
         """ Create a new node """        
@@ -75,7 +79,6 @@ class Categorization(object):
         self.children = []
         self.cut = cut
         self.discriminator_axis = discriminator_axis
-        self.allhists = {}
         
     # Allow directly accessing the children
     def __getitem__(self, key):
@@ -235,7 +238,7 @@ class Categorization(object):
                     MakeDatacard(control_plots_filename, 
                                  shapes_root_filename,
                                  shapes_txt_filename,
-                                 do_stat_variations=False)
+                                 do_stat_variations=self.do_stat_variations)
 
                     i_split += 1
 
@@ -488,7 +491,7 @@ class Categorization(object):
         MakeDatacard(control_plots_filename, 
                      shapes_root_filename,
                      shapes_txt_filename,
-                     do_stat_variations=False)
+                     do_stat_variations=self.do_stat_variations)
         
         return self.lg(shapes_txt_filename)
 
@@ -510,7 +513,6 @@ class Categorization(object):
             for iaxis in cut_axes:
                 
                 axis = self.axes[iaxis]
-
                 print "Preparing axis", iaxis
 
                 # Loop over bins on the axis
@@ -545,7 +547,7 @@ class Categorization(object):
                                 MakeDatacard(control_plots_filename, 
                                              shapes_root_filename,
                                              shapes_txt_filename,
-                                             do_stat_variations=False)
+                                             do_stat_variations=self.do_stat_variations)
 
                                 splittings[shapes_txt_filename] = [l, 
                                                                    iaxis, 
@@ -659,7 +661,7 @@ class Categorization(object):
 
 
     def create_control_plots(self, name, ignore_splitting = False):
-        
+        #print "create_control_plots", name, ignore_splitting 
         of = ROOT.TFile(name, "RECREATE")
 
         dirs = {}
@@ -670,29 +672,43 @@ class Categorization(object):
             leaves = self.get_leaves()
 
         # Loop over categories
+        #print "looping over leaves"
         for l in leaves:
+            #print "leaf", l
 
             if  l.discriminator_axis == -1:
                 continue
 
             l.prepare_all_thns()
 
+            ROOT.gROOT.ls()
             # Nominal
-            for process, thn in self.h_sig.items() + self.h_bkg.items():        
+            #print "looping over nom"
+            for process, thn in self.h_sig.items() + self.h_bkg.items():
+                #print "process", process
 
                 # Get the output directory (inside the TFile)
                 outdir_str = "{0}/{1}".format(process, l)
                 if not outdir_str in dirs.keys():
                     dirs[outdir_str] = []
                 
-                h = thn.Projection(l.discriminator_axis, "E").Clone()
-                h.SetName(self.axes[l.discriminator_axis].name)
-                self.allhists[(name, process, l, h.GetName())] = h.Clone()
-                self.allhists[(name, process, l, h.GetName())].SetDirectory(ROOT.gROOT)
-                dirs[outdir_str].append(h)                
+                hname = self.axes[l.discriminator_axis].name
+                k = (process, l.__repr__(), hname)
+                if Categorization.allhists.has_key(k):
+                    h = Categorization.allhists[k]
+                else:
+                    h = thn.Projection(l.discriminator_axis, "E")
+                    h.SetName(hname)
+                    #Categorization.allhists[k] = h.Clone("_".join(k))
+                    Categorization.allhists[k] = h
+                    #Categorization.allhists[k].SetDirectory(Categorization.memdir)
+                    #h.SetName(hname)
+                #print k, h.Integral()
+                dirs[outdir_str].append(h.Clone())
             # End of loop over processes
 
             # Systematic Variations
+            #print "looping over syst"
             for process, hs in self.h_sig_sys.items() + self.h_bkg_sys.items():
 
                 # Get the output directory (inside the TFile)
@@ -701,18 +717,27 @@ class Categorization(object):
                     dirs[outdir_str] = []
 
                 for sys_name, thn in hs.items():
-                    
-                    h = thn.Projection(l.discriminator_axis, "E").Clone()
-                    h.SetName(self.axes[l.discriminator_axis].name + "_" + sys_name)
-                    #print name, outdir_str, h.GetName()
-                    self.allhists[(name, process, l, h.GetName())] = h.Clone()
-                    self.allhists[(name, process, l, h.GetName())].SetDirectory(ROOT.gROOT)
-                    dirs[outdir_str].append(h)
+                   
+                    hname = self.axes[l.discriminator_axis].name + "_" + sys_name
+                    k = (process, l.__repr__(), hname)
+                    if Categorization.allhists.has_key(k):
+                        h = Categorization.allhists[k]
+                    else:
+                        h = thn.Projection(l.discriminator_axis, "E")
+                        h.SetName(hname)
+                        #Categorization.allhists[k] = h.Clone("_".join(k))
+                        Categorization.allhists[k] = h
+                        #Categorization.allhists[k].SetDirectory(Categorization.memdir)
+                        #h.SetName(hname)
+                    #print k, h.Integral()
+                    dirs[outdir_str].append(h.Clone())
 
                 # End of loop over systematics
             # End of loop over processes
+            #print "end of loop over categories"
         # End of loop over categories
-
+            
+        #print "writing histograms"
         for outdir_str, hs in dirs.iteritems():
                         
             of.mkdir(outdir_str)
@@ -722,6 +747,8 @@ class Categorization(object):
                 h.SetDirectory(outdir)
             outdir.Write("", ROOT.TObject.kOverwrite)
         of.Close()
+        #print "done writing histograms"
+        #print Categorization.allhists
 
     def latex_preamble(self):
         return r"""\documentclass[border=5pt]{standalone}
@@ -818,7 +845,7 @@ def CategorizationFromString(string):
 ########################################
 
 def GetSparseHistograms(input_file,
-        signals, backgrounds):
+        signals, backgrounds, basecat="sl"):
     """ Get All Sparse Histograms """
 
     f = ROOT.TFile(input_file)
@@ -834,18 +861,18 @@ def GetSparseHistograms(input_file,
         for process in processes:
 
             # Nominal Histograms
-            h[process] = f.Get("{0}/sl/sparse".format(process))
+            h[process] = f.Get("{0}/{1}/sparse".format(process, basecat))
             print process, h[process].GetEntries()
 
             # Systematic Variations
             h_sys[process] = {}     
-            for key in f.Get("{0}/sl".format(process)).GetListOfKeys():
+            for key in f.Get("{0}/{1}".format(process, basecat)).GetListOfKeys():
 
                 if not "sparse_" in key.GetName():
                     continue
 
                 syst_name = key.GetName().replace("sparse_", "")
-                h_sys[process][syst_name] = f.Get("{0}/sl/{1}".format(process, key.GetName()))
+                h_sys[process][syst_name] = f.Get("{0}/{1}/{2}".format(process, basecat, key.GetName()))
 
             # End loop over keys
         # End loop over processes

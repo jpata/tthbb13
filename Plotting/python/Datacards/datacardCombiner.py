@@ -81,9 +81,9 @@ def makeStatVariations(tf, of, hists, channels, processes):
                         if c <= 10**-5 and h.Integral()>0:
                             c = 10**-5
                         hvar.SetBinContent(ibin, c)
-                        #outdir.Add(hvar)
-                        #hvar.Write("", ROOT.TObject.kOverwrite)
-                        outdir.Write("", ROOT.TObject.kOverwrite)
+                        outdir.Add(hvar)
+                        hvar.Write("", ROOT.TObject.kOverwrite)
+                        #outdir.Write("", ROOT.TObject.kOverwrite)
     
             # End of loop over processes
         # End of loop over channels

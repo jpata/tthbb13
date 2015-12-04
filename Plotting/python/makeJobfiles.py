@@ -55,9 +55,9 @@ for samp in Samples.samples_dict.keys():
                 },
                 {
                     "func": "numJets",
-                    "xMin": 4,
+                    "xMin": 3,
                     "xMax": 7,
-                    "nBins": 3
+                    "nBins": 4
                 },
                 {
                     "func": "nBCSVM",
@@ -112,7 +112,13 @@ for samp in Samples.samples_dict.keys():
                     "xMin": 0,
                     "xMax": 4,
                     "nBins": 4
-                }
+                },
+                {
+                    "func": "mem_DL_0w2h2t",
+                    "xMin": 0,
+                    "xMax": 1,
+                    "nBins": 12
+                },
             ]
         }
         of = open("job_{0}.json".format(ijob), "w")

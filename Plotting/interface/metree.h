@@ -68,37 +68,41 @@ public:
   double jets_mcPt[9]; //
   double jets_mcEta[9]; //
   double jets_id[9]; //
-  double jets_bTagWeightLFUp[9]; //
+  double jets_bTagWeightLFUp[9]; //b-tag CSV weight, variating LF Up
   double jets_pt[9]; //
   double jets_mcNumBHadrons[9]; //
   double jets_corr_JERDown[9]; //
-  double jets_bTagWeightStats2Up[9]; //
+  double jets_bTagWeightStats2Up[9]; //b-tag CSV weight, variating Stats2 Up
   double jets_qgl[9]; //
+  double jets_bTagWeightcErr2Up[9]; //b-tag CSV weight, variating cErr2 Up
   double jets_mcPhi[9]; //
-  double jets_bTagWeightStats1Up[9]; //
-  double jets_bTagWeightStats1Down[9]; //
-  double jets_mcNumCHadrons[9]; //
+  double jets_bTagWeightStats1Up[9]; //b-tag CSV weight, variating Stats1 Up
+  double jets_bTagWeightStats1Down[9]; //b-tag CSV weight, variating Stats1 Down
+  double jets_bTagWeightcErr2Down[9]; //b-tag CSV weight, variating cErr2 Down
   int jets_matchFlag[9]; //
   double jets_phi[9]; //
-  double jets_bTagWeightStats2Down[9]; //
-  double jets_bTagWeightLFDown[9]; //
+  double jets_bTagWeightStats2Down[9]; //b-tag CSV weight, variating Stats2 Down
+  double jets_bTagWeightLFDown[9]; //b-tag CSV weight, variating LF Down
   int jets_hadronFlavour[9]; //
   double jets_corr_JESUp[9]; //
-  double jets_bTagWeightJESDown[9]; //
-  double jets_bTagWeightHFDown[9]; //
+  double jets_bTagWeightJESDown[9]; //b-tag CSV weight, variating JES Down
+  double jets_bTagWeightHFDown[9]; //b-tag CSV weight, variating HF Down
   double jets_corr_JERUp[9]; //
   double jets_corr[9]; //
   double jets_corr_JER[9]; //
   double jets_corr_JESDown[9]; //
   double jets_btagCSV[9]; //
   double jets_mcM[9]; //
-  double jets_bTagWeightHFUp[9]; //
+  double jets_bTagWeightHFUp[9]; //b-tag CSV weight, variating HF Up
+  double jets_bTagWeightcErr1Down[9]; //b-tag CSV weight, variating cErr1 Down
   int jets_mcMatchId[9]; //
   double jets_btagBDT[9]; //
-  double jets_bTagWeight[9]; //
+  double jets_bTagWeightcErr1Up[9]; //b-tag CSV weight, variating cErr1 Up
+  double jets_bTagWeight[9]; //b-tag CSV weight, nominal
   double jets_eta[9]; //
   double jets_mass[9]; //
-  double jets_bTagWeightJESUp[9]; //
+  double jets_bTagWeightJESUp[9]; //b-tag CSV weight, variating JES Up
+  double jets_mcNumCHadrons[9]; //
   int jets_mcFlavour[9]; //
   int nleps;
   double leps_phi[2]; //
@@ -451,6 +455,10 @@ public:
   double bTagWeight_Stats1Up;
   double bTagWeight_Stats2Down;
   double bTagWeight_Stats2Up;
+  double bTagWeight_cErr1Down;
+  double bTagWeight_cErr1Up;
+  double bTagWeight_cErr2Down;
+  double bTagWeight_cErr2Up;
   double btag_LR_4b_2b;
   double btag_LR_4b_2b_JESDown;
   double btag_LR_4b_2b_JESUp;
@@ -700,10 +708,11 @@ public:
     tree->SetBranchAddress("jets_corr_JERDown", this->jets_corr_JERDown);
     tree->SetBranchAddress("jets_bTagWeightStats2Up", this->jets_bTagWeightStats2Up);
     tree->SetBranchAddress("jets_qgl", this->jets_qgl);
+    tree->SetBranchAddress("jets_bTagWeightcErr2Up", this->jets_bTagWeightcErr2Up);
     tree->SetBranchAddress("jets_mcPhi", this->jets_mcPhi);
     tree->SetBranchAddress("jets_bTagWeightStats1Up", this->jets_bTagWeightStats1Up);
     tree->SetBranchAddress("jets_bTagWeightStats1Down", this->jets_bTagWeightStats1Down);
-    tree->SetBranchAddress("jets_mcNumCHadrons", this->jets_mcNumCHadrons);
+    tree->SetBranchAddress("jets_bTagWeightcErr2Down", this->jets_bTagWeightcErr2Down);
     tree->SetBranchAddress("jets_matchFlag", this->jets_matchFlag);
     tree->SetBranchAddress("jets_phi", this->jets_phi);
     tree->SetBranchAddress("jets_bTagWeightStats2Down", this->jets_bTagWeightStats2Down);
@@ -719,12 +728,15 @@ public:
     tree->SetBranchAddress("jets_btagCSV", this->jets_btagCSV);
     tree->SetBranchAddress("jets_mcM", this->jets_mcM);
     tree->SetBranchAddress("jets_bTagWeightHFUp", this->jets_bTagWeightHFUp);
+    tree->SetBranchAddress("jets_bTagWeightcErr1Down", this->jets_bTagWeightcErr1Down);
     tree->SetBranchAddress("jets_mcMatchId", this->jets_mcMatchId);
     tree->SetBranchAddress("jets_btagBDT", this->jets_btagBDT);
+    tree->SetBranchAddress("jets_bTagWeightcErr1Up", this->jets_bTagWeightcErr1Up);
     tree->SetBranchAddress("jets_bTagWeight", this->jets_bTagWeight);
     tree->SetBranchAddress("jets_eta", this->jets_eta);
     tree->SetBranchAddress("jets_mass", this->jets_mass);
     tree->SetBranchAddress("jets_bTagWeightJESUp", this->jets_bTagWeightJESUp);
+    tree->SetBranchAddress("jets_mcNumCHadrons", this->jets_mcNumCHadrons);
     tree->SetBranchAddress("jets_mcFlavour", this->jets_mcFlavour);
     tree->SetBranchAddress("nleps", &(this->nleps));
     tree->SetBranchAddress("leps_phi", this->leps_phi);
@@ -1077,6 +1089,10 @@ public:
     tree->SetBranchAddress("bTagWeight_Stats1Up", &(this->bTagWeight_Stats1Up));
     tree->SetBranchAddress("bTagWeight_Stats2Down", &(this->bTagWeight_Stats2Down));
     tree->SetBranchAddress("bTagWeight_Stats2Up", &(this->bTagWeight_Stats2Up));
+    tree->SetBranchAddress("bTagWeight_cErr1Down", &(this->bTagWeight_cErr1Down));
+    tree->SetBranchAddress("bTagWeight_cErr1Up", &(this->bTagWeight_cErr1Up));
+    tree->SetBranchAddress("bTagWeight_cErr2Down", &(this->bTagWeight_cErr2Down));
+    tree->SetBranchAddress("bTagWeight_cErr2Up", &(this->bTagWeight_cErr2Up));
     tree->SetBranchAddress("btag_LR_4b_2b", &(this->btag_LR_4b_2b));
     tree->SetBranchAddress("btag_LR_4b_2b_JESDown", &(this->btag_LR_4b_2b_JESDown));
     tree->SetBranchAddress("btag_LR_4b_2b_JESUp", &(this->btag_LR_4b_2b_JESUp));

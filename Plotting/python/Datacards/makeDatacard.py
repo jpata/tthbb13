@@ -194,8 +194,9 @@ def MakeDatacard(infile_path, outfile_path, shapefile_path, do_stat_variations=F
         #copy all histograms to output file
         #copyHistograms(infile, outfile, allhists, [cat], processes)
         if do_stat_variations:
+            #print "doing stat variations for",cat
             makeStatVariations(outfile, outfile, [hist_nominal], [cat], processes)
-
+        #outfile.ls()
         fakeData(outfile, outfile, [hist_nominal], [cat], processes)
     
     #now make a datacard object which knows about systematics
@@ -209,6 +210,7 @@ def MakeDatacard(infile_path, outfile_path, shapefile_path, do_stat_variations=F
         for cat in allcats:
             #number of bins depends on distribution
             nbins = infile.Get("{0}/{1}/{2}".format(proc_first, cat, hists_nominal[cat])).GetNbinsX()
+            #print "adding stat variations for", cat
             dcard.addStatVariations(cat, nbins)
 
     #output shapes.txt
@@ -243,12 +245,13 @@ def MakeDatacard(infile_path, outfile_path, shapefile_path, do_stat_variations=F
         sbg = 0
         for sample in dcard.processes:
             s += event_counts[sample][cutname]
+            #FIXME: hardcoded signal process name
             if "ttH" not in sample:
                 sbg += event_counts[sample][cutname]
         if s > 0 and sbg > 0:
             categories += [cutname]
         else:
-            print "removing category", cutname, s, sbg
+            print "removing category name={0} signal={1} bkg={2}".format(cutname, s, sbg)
 
     #override with list of good categories
     dcard.categories = categories

@@ -7,60 +7,60 @@ class Sample:
         self.prefix = prefix 
 
 samples_dict = {
-#    "SingleMuon": Sample(
-#        "SingleMuon",
-#        [path + "cfg_noME/SingleMuon.root"],
-#        ""
-#    ),
-#    "SingleElectron": Sample(
-#        "SingleElectron",
-#        [path + "cfg_noME/SingleElectron.root"],
-#        ""
-#    ),
-#    "DoubleMuon": Sample(
-#        "DoubleMuon",
-#        [path + "cfg_noME/DoubleMuon.root"],
-#        ""
-#    ),
-#    "DoubleEG": Sample(
-#        "DoubleEG",
-#        [path + "cfg_noME/DoubleEG.root"],
-#        ""
-#    ),
-#    "MuonEG": Sample(
-#        "MuonEG",
-#        [path + "cfg_noME/MuonEG.root"],
-#        ""
-#    ),
+    "SingleMuon": Sample(
+        "SingleMuon",
+        [path + "cfg_withME_updateBWeight/SingleMuon.root"],
+        ""
+    ),
+    "SingleElectron": Sample(
+        "SingleElectron",
+        [path + "cfg_withME_updateBWeight/SingleElectron.root"],
+        ""
+    ),
+    "DoubleMuon": Sample(
+        "DoubleMuon",
+        [path + "cfg_withME_updateBWeight/DoubleMuon.root"],
+        ""
+    ),
+    "DoubleEG": Sample(
+        "DoubleEG",
+        [path + "cfg_withME_updateBWeight/DoubleEG.root"],
+        ""
+    ),
+    "MuonEG": Sample(
+        "MuonEG",
+        [path + "cfg_withME_updateBWeight/MuonEG.root"],
+        ""
+    ),
 
     "ttH_hbb": Sample(
         "ttH_hbb",
-        [path + "cfg_noME_newBTagWeight/ttHTobb_M125_13TeV_powheg_pythia8.root"],
+        [path + "cfg_withME_updateBWeight/ttHTobb_M125_13TeV_powheg_pythia8.root"],
         ""
     ),
     "ttbarPlus2B": Sample(
         "ttbarPlus2B", 
-        [path + "cfg_noME_newBTagWeight/TT_TuneCUETP8M1_13TeV-powheg-pythia8_tt2b.root"],
+        [path + "cfg_withME_updateBWeight/TT_TuneCUETP8M1_13TeV-powheg-pythia8_tt2b.root"],
         "",
     ),
     "ttbarPlusB": Sample(
         "ttbarPlusB", 
-        [path + "cfg_noME_newBTagWeight/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttb.root"],
+        [path + "cfg_withME_updateBWeight/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttb.root"],
         "",
     ),
     "ttbarPlusBBbar": Sample(
         "ttbarPlusBBbar", 
-        [path + "cfg_noME_newBTagWeight/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttbb.root"],
+        [path + "cfg_withME_updateBWeight/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttbb.root"],
         "",
     ),
     "ttbarPlusCCbar": Sample(
         "ttbarPlusCCbar", 
-        [path + "cfg_noME_newBTagWeight/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttcc.root"],
+        [path + "cfg_withME_updateBWeight/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttcc.root"],
         "",
     ),
     "ttbarOther": Sample(
         "ttbarOther", 
-        [path + "cfg_noME_newBTagWeight/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttll.root"],
+        [path + "cfg_withME_updateBWeight/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttll.root"],
         "",
     ),
     

@@ -168,20 +168,23 @@ public:
     string to_string() const;
 };
 
-//Simple event representation
-//Designed to be immutable
-class Event {
-public:
+//maps systematics to function(event, conf)->double
 typedef unordered_map<
     SystematicKey::SystematicKey,
     double (*)(const Event&, const Configuration& conf),
     hash<int>
 > WeightMap;
+double nominal_weight(const Event& ev, const Configuration& conf);
+WeightMap getSystWeights();
+WeightMap getNominalWeights();
+
+//Simple event representation
+//Designed to be immutable
+class Event {
+public:
 
     bool is_sl;
     bool is_dl;
-    bool pass_trig_sl;
-    bool pass_trig_dl;
     bool passPV;
 
     int numJets;
@@ -194,7 +197,7 @@ typedef unordered_map<
     vector<Lepton> leptons;
 
     //map of SystematicKey -> weight func(event) of all syst. weights to evaluate
-    WeightMap weightFuncs;
+    //WeightMap weightFuncs;
 
     //cross-section weight
     double weight_xs;
@@ -252,14 +255,12 @@ typedef unordered_map<
         const TreeData *_data,
         bool _is_sl,
         bool _is_dl,
-        bool _pass_trig_sl,
-        bool _pass_trig_dl,
         bool _passPV,
         int _numJets,
         int _nBCSVM,
         const vector<Jet>& _jets,
         const vector<Lepton>& _leptons,
-        const WeightMap& _weightFuncs,
+        //const WeightMap& _weightFuncs,
         double _weight_xs,
         double _puWeight,
         double _Wmass,
@@ -339,12 +340,16 @@ public:
         std::function<int(const Event& ev)> _cutFunc,
         const vector<CategoryKey::CategoryKey>& _keys,
         const Configuration& _conf,
-        const vector<const CategoryProcessor*>& _subCategories={}
+        const vector<const CategoryProcessor*>& _subCategories={},
+        const WeightMap _weightFuncs={
+            {SystematicKey::nominal, nominal_weight}
+        }
     ) :
     cutFunc(_cutFunc),
     keys(_keys),
     conf(_conf),
-    subCategories(_subCategories)
+    subCategories(_subCategories),
+    weightFuncs(_weightFuncs)
     {}
 
     const bool operator()(const Event& ev) const {
@@ -354,7 +359,8 @@ public:
     const vector<CategoryKey::CategoryKey> keys;
     const Configuration& conf;
     const vector<const CategoryProcessor*> subCategories;
-     
+    const WeightMap weightFuncs;
+
     virtual void fillHistograms(
         const Event& event,
         ResultMap& results,
@@ -404,9 +410,10 @@ public:
         std::function<int(const Event& ev)> _cutFunc,
         const vector<CategoryKey::CategoryKey>& _keys,
         const Configuration& _conf,
-        const vector<const CategoryProcessor*>& _subCategories={}
+        const vector<const CategoryProcessor*>& _subCategories={},
+        const WeightMap _weightFuncs=getSystWeights()
     ) :
-    CategoryProcessor(_cutFunc, _keys, _conf, _subCategories),
+    CategoryProcessor(_cutFunc, _keys, _conf, _subCategories, _weightFuncs),
     axes(_conf.sparseAxes)
     {
         nAxes = axes.size();

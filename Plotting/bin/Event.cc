@@ -3,21 +3,36 @@
 
 using namespace std;
 
-bool pass_trig_dl(const TreeData& data) {
-    return (
-        data.HLT_BIT_HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v ||
-        data.HLT_BIT_HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v ||
-        data.HLT_BIT_HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v ||
-        data.HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v ||
-        data.HLT_BIT_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v
-    );
-}
-
-bool pass_trig_sl(const TreeData& data) {
-    return (
-        data.HLT_BIT_HLT_Ele27_WP85_Gsf_v ||
-        data.HLT_BIT_HLT_IsoMu17_eta2p1_v
-    );
+namespace trigger {
+    bool mumu(const TreeData& data) {
+        return (
+            data.HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v ||
+            data.HLT_BIT_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v
+        );
+    }
+    bool emu(const TreeData& data) {
+        return (
+            data.HLT_BIT_HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v ||
+            data.HLT_BIT_HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v
+        );
+    }
+    bool ee(const TreeData& data) {
+        return (
+            data.HLT_BIT_HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v
+        );
+    }
+    
+    bool sl_el(const TreeData& data) {
+        return (
+            data.HLT_BIT_HLT_Ele27_WP85_Gsf_v
+        );
+    }
+    
+    bool sl_mu(const TreeData& data) {
+        return (
+            data.HLT_BIT_HLT_IsoMu17_eta2p1_v
+        );
+    }
 }
 
 //Evaluate mem probability
@@ -46,6 +61,7 @@ const map<string, function<float(const Event& ev)>> AxisFunctions = {
     {"mem_SL_0w2h2t", [](const Event& ev) { return ev.mem_SL_0w2h2t;}},
     {"mem_SL_2w2h2t", [](const Event& ev) { return ev.mem_SL_2w2h2t;}},
     {"mem_SL_2w2h2t_sj", [](const Event& ev) { return ev.mem_SL_2w2h2t_sj;}},
+    {"mem_DL_0w2h2t", [](const Event& ev) { return ev.mem_DL_0w2h2t;}},
     {"tth_mva", [](const Event& ev) { return ev.tth_mva;}},
     {"numJets", [](const Event& ev) { return ev.numJets;}},
     {"nBCSVM", [](const Event& ev) { return ev.nBCSVM;}},
@@ -249,14 +265,11 @@ Event::Event(
     const TreeData *_data,
     bool _is_sl,
     bool _is_dl,
-    bool _pass_trig_sl,
-    bool _pass_trig_dl,
     bool _passPV,
     int _numJets,
     int _nBCSVM,
     const vector<Jet>& _jets,
     const vector<Lepton>& _leptons,
-    const Event::WeightMap& _weightFuncs,
     double _weight_xs,
     double _puWeight,
     double _Wmass,
@@ -295,14 +308,11 @@ Event::Event(
     data(_data),
     is_sl(_is_sl),
     is_dl(_is_dl),
-    pass_trig_sl(_pass_trig_sl),
-    pass_trig_dl(_pass_trig_dl),
     passPV(_passPV),
     numJets(_numJets),
     nBCSVM(_nBCSVM),
     jets(_jets),
     leptons(_leptons),
-    weightFuncs(_weightFuncs),
     weight_xs(_weight_xs),
     puWeight(_puWeight),
     Wmass(_Wmass),
@@ -407,52 +417,10 @@ bool isSignalMC(ProcessKey::ProcessKey proc) {
 
 double nominal_weight(const Event& ev, const Configuration& conf) {
     if (isMC(conf.process)) {
-        return conf.lumi * ev.weight_xs * ev.puWeight * process_weight(conf.process);
+        return conf.lumi * ev.weight_xs * ev.puWeight * ev.bTagWeight * process_weight(conf.process);
     }
     return 1.0;
 }
-
-//Vector of nominal weight functions
-static const Event::WeightMap nominalWeights = {
-    {SystematicKey::nominal, nominal_weight}
-};
-
-//Systematically variated weights, applied only in case of nominal event
-static const Event::WeightMap systWeights = {
-    {SystematicKey::nominal, nominal_weight},
-    //{
-    //    SystematicKey::CMS_ttH_CSVStats1Up,
-    //    [](const Event& ev, const Configuration& conf){ return nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_Stats1Up;}
-    //},
-    //{
-    //    SystematicKey::CMS_ttH_CSVStats1Down,
-    //    [](const Event& ev, const Configuration& conf){ return nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_Stats1Down;}
-    //},
-    //{
-    //    SystematicKey::CMS_ttH_CSVStats2Up,
-    //    [](const Event& ev, const Configuration& conf){ return nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_Stats2Up;}
-    //},
-    //{
-    //    SystematicKey::CMS_ttH_CSVStats2Down,
-    //    [](const Event& ev, const Configuration& conf){ return nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_Stats2Down;}
-    //},
-    //{
-    //    SystematicKey::CMS_ttH_CSVLFUp,
-    //    [](const Event& ev, const Configuration& conf){ return nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_LFUp;}
-    //},
-    //{
-    //    SystematicKey::CMS_ttH_CSVLFDown,
-    //    [](const Event& ev, const Configuration& conf){ return nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_LFDown;}
-    //},
-    //{
-    //    SystematicKey::CMS_ttH_CSVHFUp,
-    //    [](const Event& ev, const Configuration& conf){ return nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_HFUp;}
-    //},
-    //{
-    //    SystematicKey::CMS_ttH_CSVHFDown,
-    //    [](const Event& ev, const Configuration& conf){ return nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_HFDown;}
-    //},
-};
 
 ///FIXME: these ad-hoc process weights are here to fix a wrong value of nGen in processing
 double process_weight(ProcessKey::ProcessKey proc) {
@@ -462,9 +430,9 @@ double process_weight(ProcessKey::ProcessKey proc) {
         case ProcessKey::ttbarPlus2B:
         case ProcessKey::ttbarPlusCCbar:
         case ProcessKey::ttbarOther:
-            return 39383772.0 / 19714839.0;
+        //    return 39383772.0 / 19714839.0;
         case ProcessKey::ttH_hbb:
-            return 7596287.0 / 3930444.0;
+        //    return 7596287.0 / 3930444.0;
         default:
             return 1.0;
     }
@@ -479,14 +447,11 @@ const Event EventFactory::makeNominal(const TreeData& data, const Configuration&
         &data,
         data.is_sl,
         data.is_dl,
-        pass_trig_sl(data),
-        pass_trig_dl(data),
         data.passPV,
         data.numJets,
         data.nBCSVM,
         jets,
         leptons,
-        systWeights,
         data.weight_xs,
         data.puWeight,
         data.Wmass,
@@ -535,14 +500,11 @@ const Event EventFactory::makeJESUp(const TreeData& data, const Configuration& c
         &data,
         data.is_sl,
         data.is_dl,
-        pass_trig_sl(data),
-        pass_trig_dl(data),
         data.passPV,
         data.numJets_JESUp,
         data.nBCSVM_JESUp,
         jets,
         leptons,
-        nominalWeights,
         data.weight_xs,
         data.puWeight,
         data.Wmass,
@@ -590,14 +552,11 @@ const Event EventFactory::makeJESDown(const TreeData& data, const Configuration&
         &data,
         data.is_sl,
         data.is_dl,
-        pass_trig_sl(data),
-        pass_trig_dl(data),
         data.passPV,
         data.numJets_JESDown,
         data.nBCSVM_JESDown,
         jets,
         leptons,
-        nominalWeights,
         data.weight_xs,
         data.puWeight,
         data.Wmass,
@@ -749,7 +708,16 @@ void CategoryProcessor::process(
             _catKeys.push_back(k);
         }
 
-        for (auto& kvWeight : event.weightFuncs) {
+        WeightMap _weightFuncs;
+
+        //in case it's not a nominal event (instead e.g. JESUp) we use only nominal weights
+        if (systKey != SystematicKey::nominal || isData(conf.process)) {
+            _weightFuncs = getNominalWeights();
+        //if it's a nominal event, can also use variated weights
+        } else {
+            _weightFuncs = this->weightFuncs;
+        }
+        for (auto& kvWeight : _weightFuncs) {
             //cout << "   weight " << SystematicKey::to_string(kvWeight.first) << endl;
             const double weight = kvWeight.second(event, conf);
             SystematicKey::SystematicKey _systKey = systKey;
@@ -940,19 +908,19 @@ Configuration parseJsonConf(const string& infile) {
 
 namespace BaseCuts {
     bool sl(const Event& ev) {
-        return ev.is_sl && ev.passPV && ev.pass_trig_sl && ev.numJets>=4 && ev.data->json==1.0;
+        return ev.is_sl && ev.passPV && ev.numJets>=4 && ev.data->json==1.0;
     }
     
     bool sl_mu(const Event& ev) {
-        return sl(ev) && abs(ev.leptons.at(0).pdgId) == 13;
+        return sl(ev) && abs(ev.leptons.at(0).pdgId) == 13 && trigger::sl_mu(*(ev.data));
     }
     
     bool sl_el(const Event& ev) {
-        return sl(ev) && abs(ev.leptons.at(0).pdgId) == 11;
+        return sl(ev) && abs(ev.leptons.at(0).pdgId) == 11 && trigger::sl_el(*(ev.data));
     }
 
     bool dl(const Event& ev) {
-        return (ev.is_dl && ev.passPV && ev.pass_trig_dl &&
+        return (ev.is_dl && ev.passPV &&
             ev.leptons.at(0).pdgId * ev.leptons.at(1).pdgId < 0 && (ev.data->ll_mass[0] > 20) && (
                 //Z peak veto
                 abs(ev.leptons.at(0).pdgId) == abs(ev.leptons.at(1).pdgId) ? !(ev.data->ll_mass[0] > 76 && ev.data->ll_mass[0] < 106) : true
@@ -963,17 +931,17 @@ namespace BaseCuts {
     }
     
     bool dl_mumu(const Event& ev) {
-        return dl(ev) && abs(ev.leptons.at(0).pdgId)==13 && abs(ev.leptons.at(1).pdgId)==13;
+        return dl(ev) && abs(ev.leptons.at(0).pdgId)==13 && abs(ev.leptons.at(1).pdgId)==13 && trigger::mumu(*(ev.data));
     }
 
     bool dl_ee(const Event& ev) {
-        return dl(ev) && abs(ev.leptons.at(0).pdgId)==11 && abs(ev.leptons.at(1).pdgId)==11;
+        return dl(ev) && abs(ev.leptons.at(0).pdgId)==11 && abs(ev.leptons.at(1).pdgId)==11 && trigger::ee(*(ev.data));
     }
     bool dl_emu(const Event& ev) {
         return dl(ev) && (
             (abs(ev.leptons.at(0).pdgId)==13 && abs(ev.leptons.at(1).pdgId)==11) ||
             (abs(ev.leptons.at(0).pdgId)==11 && abs(ev.leptons.at(1).pdgId)==13)
-        );
+        ) && trigger::emu(*(ev.data));
     }
 }
 
