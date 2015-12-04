@@ -54,8 +54,8 @@ def split_leaves_by_BLR():
 
     r = Categorize.CategorizationFromString(trees["old"])
     initial_leaves = r.get_leaves()
-    cut_axes = [4, 5, 6, 7, 8, 9] #btag LR axis
-    discriminator_axes = [1,2] #MEM SL 022 axis
+    cut_axes = [8] #btag LR axis
+    discriminator_axes = [0, 1, 2] #MEM SL 022 axis
     for l in initial_leaves:
         l.find_categories_async(1, 
                                 cut_axes, 
@@ -74,8 +74,8 @@ def optimize(r):
     #axes[0].discPrereq = [Cut(3,3,3)]
     #axes[1].discPrereq = [Cut(3,3,3)]
 
-    cut_axes = [4, 5, 6, 7, 8, 9] #btag LR axis
-    discriminator_axes = [1,2] #MEM SL 022 axis
+    cut_axes = ["numJets", "nBCSVM", "btag_LR_4b_2b_logit", "Wmass"]
+    discriminator_axes = ["mem_SL_2w2h2t", "mem_SL_0w2h2t"]
     
     r.find_categories_async(n_iter, 
                             cut_axes, 
@@ -110,7 +110,7 @@ if __name__ == "__main__":
         input_file,
         signals,
         backgrounds,
-        "dl"
+        "sl"
     )
     axes = Categorize.GetAxes(h_sig["ttH_hbb"])
 
@@ -128,7 +128,7 @@ if __name__ == "__main__":
     Categorize.Categorization.lg = LimitGetter(output_path)
    
     #print "Old categorization"
-    make_latex("old_dl")
+    #make_latex("old_dl")
     #make_latex("old_2t")
 
     #r = split_leaves_by_BLR()
@@ -136,22 +136,22 @@ if __name__ == "__main__":
     #of.write(r.print_tree_latex())
     #of.close()
 
-    #print "Optimization"
-    #r = Categorize.CategorizationFromString(trees["3cat"])
-    #name = "opt"
+    print "Optimization"
+    r = Categorize.CategorizationFromString(trees["3cat"])
+    name = "opt"
 
-    #import cProfile, time
-    #def f(): optimize(r)
-    #p = cProfile.Profile(time.clock)
-    #p.runcall(f)
-    #p.print_stats()
-    #
-    #of = open( name + ".tex","w")
-    #of.write(r.print_tree_latex())
-    #of.close()
-    #of = open(name + ".pickle", "w")
-    #of.write(pickle.dumps(r))
-    #of.close()
+    import cProfile, time
+    def f(): optimize(r)
+    p = cProfile.Profile(time.clock)
+    p.runcall(f)
+    p.print_stats()
+    
+    of = open( name + ".tex","w")
+    of.write(r.print_tree_latex())
+    of.close()
+    of = open(name + ".pickle", "w")
+    of.write(pickle.dumps(r))
+    of.close()
 
 
     #for i in range(5,7):

@@ -5,35 +5,35 @@ trees = {}
 # Based on jet and tagged jet multiplicity
 # 7 categories
 trees["old"] = """
-  Discr=2
-    numJets__4__5 Discr=2 
-       nBCSVM__3__4 Discr=2
-       nBCSVM__4__5 Discr=2
-    numJets__5__8 Discr=2
-       numJets__5__6 Discr=2
-          nBCSVM__3__4 Discr=2
-          nBCSVM__4__5 Discr=2
-       numJets__6__8 Discr=2
-          nBCSVM__2__4 Discr=2
-             nBCSVM__2__3 Discr=2
-             nBCSVM__3__4 Discr=2
-          nBCSVM__4__8 Discr=2
+  Discr=mem_SL_0w2h2t
+    numJets__4__5 Discr=mem_SL_0w2h2t 
+       nBCSVM__3__4 Discr=mem_SL_0w2h2t
+       nBCSVM__4__5 Discr=mem_SL_0w2h2t
+    numJets__5__8 Discr=mem_SL_0w2h2t
+       numJets__5__6 Discr=mem_SL_0w2h2t
+          nBCSVM__3__4 Discr=mem_SL_0w2h2t
+          nBCSVM__4__5 Discr=mem_SL_0w2h2t
+       numJets__6__8 Discr=mem_SL_0w2h2t
+          nBCSVM__2__4 Discr=mem_SL_0w2h2t
+             nBCSVM__2__3 Discr=mem_SL_0w2h2t
+             nBCSVM__3__4 Discr=mem_SL_0w2h2t
+          nBCSVM__4__8 Discr=mem_SL_0w2h2t
 """
 
 trees["old_dl"] = """
-  Discr=14
-     nBCSVM__2__3 Discr=14
-        numJets__2__3 Discr=-1
-        numJets__3__6 Discr=14
-           numJets__3__4 Discr=14
-           numJets__4__6 Discr=14
-     nBCSVM__3__6 Discr=14
-        nBCSVM__3__4 Discr=14
-           numJets__2__3 Discr=-1
-           numJets__3__6 Discr=14
-        nBCSVM__4__6 Discr=14
-           numJets__1__4 Discr=-1
-           numJets__4__6 Discr=14
+  Discr=mem_DL_0w2h2t
+     nBCSVM__2__3 Discr=mem_DL_0w2h2t
+        numJets__2__3 Discr=None
+        numJets__3__6 Discr=mem_DL_0w2h2t
+           numJets__3__4 Discr=mem_DL_0w2h2t
+           numJets__4__6 Discr=mem_DL_0w2h2t
+     nBCSVM__3__6 Discr=mem_DL_0w2h2t
+        nBCSVM__3__4 Discr=mem_DL_0w2h2t
+           numJets__2__3 Discr=None
+           numJets__3__6 Discr=mem_DL_0w2h2t
+        nBCSVM__4__6 Discr=mem_DL_0w2h2t
+           numJets__1__4 Discr=None
+           numJets__4__6 Discr=mem_DL_0w2h2t
 """
 
 # Classic categorization:
@@ -173,11 +173,11 @@ trees["1cat"] = """
 #"""
 
 trees["3cat"] = """
-  Discr=2
-    numJets__4__5 Discr=2
-    numJets__5__8 Discr=2
-       numJets__5__6 Discr=2
-       numJets__6__8 Discr=2
+  Discr=mem_SL_0w2h2t
+    numJets__4__5 Discr=mem_SL_0w2h2t
+    numJets__5__8 Discr=mem_SL_0w2h2t
+       numJets__5__6 Discr=mem_SL_0w2h2t
+       numJets__6__8 Discr=mem_SL_0w2h2t
 """
 
 

@@ -65,6 +65,7 @@ const map<string, function<float(const Event& ev)>> AxisFunctions = {
     {"tth_mva", [](const Event& ev) { return ev.tth_mva;}},
     {"numJets", [](const Event& ev) { return ev.numJets;}},
     {"nBCSVM", [](const Event& ev) { return ev.nBCSVM;}},
+    {"nBCSVL", [](const Event& ev) { return ev.nBCSVL;}},
     {"btag_LR_4b_2b_logit", [](const Event& ev) { return ev.btag_LR_4b_2b_logit;}},
     {"nBoosted", [](const Event& ev) { return ev.n_excluded_bjets<2 && ev.ntopCandidate==1;}},
     {"topCandidate_mass", [](const Event& ev) { return ev.topCandidate_mass;}},
@@ -72,7 +73,21 @@ const map<string, function<float(const Event& ev)>> AxisFunctions = {
     {"topCandidate_n_subjettiness", [](const Event& ev) { return ev.topCandidate_n_subjettiness;}},
     {"Wmass", [](const Event& ev) { return ev.Wmass;}},
     {"n_excluded_bjets", [](const Event& ev) { return ev.n_excluded_bjets;}},
-    {"n_excluded_ljets", [](const Event& ev) { return ev.n_excluded_ljets;}}
+    {"n_excluded_ljets", [](const Event& ev) { return ev.n_excluded_ljets;}},
+
+    //Top candidate working points from GK-s PAS
+    {"nBoostedTop_Mass120_180", [](const Event& event) { return (
+        event.topCandidate_mass<180) && (event.topCandidate_mass>120);
+    }},
+    {"nBoostedTop_Mass120_180_fRec02", [](const Event& event) { return (
+        event.topCandidate_mass<180) && (event.topCandidate_mass>120) && (event.topCandidate_fRec<0.2);
+    }},
+    {"nBoostedTopWP1", [](const Event& event) { return (
+        event.topCandidate_mass<180) && (event.topCandidate_mass>120) && (event.topCandidate_fRec<0.2) && (event.topCandidate_n_subjettiness<0.55);
+    }},
+    {"nBoostedTopWP2", [](const Event& event) { return (
+        event.topCandidate_mass<180) && (event.topCandidate_mass>120) && (event.topCandidate_fRec<0.22) && (event.topCandidate_n_subjettiness<0.56);
+    }}
 };
 
 const Configuration Configuration::makeConfiguration(JsonValue& value) {
@@ -268,6 +283,7 @@ Event::Event(
     bool _passPV,
     int _numJets,
     int _nBCSVM,
+    int _nBCSVL,
     const vector<Jet>& _jets,
     const vector<Lepton>& _leptons,
     double _weight_xs,
@@ -311,6 +327,7 @@ Event::Event(
     passPV(_passPV),
     numJets(_numJets),
     nBCSVM(_nBCSVM),
+    nBCSVL(_nBCSVL),
     jets(_jets),
     leptons(_leptons),
     weight_xs(_weight_xs),
@@ -450,6 +467,7 @@ const Event EventFactory::makeNominal(const TreeData& data, const Configuration&
         data.passPV,
         data.numJets,
         data.nBCSVM,
+        data.nBCSVL,
         jets,
         leptons,
         data.weight_xs,
@@ -503,6 +521,7 @@ const Event EventFactory::makeJESUp(const TreeData& data, const Configuration& c
         data.passPV,
         data.numJets_JESUp,
         data.nBCSVM_JESUp,
+        data.nBCSVL_JESUp,
         jets,
         leptons,
         data.weight_xs,
@@ -555,6 +574,7 @@ const Event EventFactory::makeJESDown(const TreeData& data, const Configuration&
         data.passPV,
         data.numJets_JESDown,
         data.nBCSVM_JESDown,
+        data.nBCSVL_JESDown,
         jets,
         leptons,
         data.weight_xs,

@@ -13,6 +13,8 @@ import math
 import pickle
 import copy
 
+from collections import OrderedDict
+
 import ROOT
 
 from Axis import axis
@@ -60,6 +62,7 @@ class Categorization(object):
     h_sig_sys = None
     h_bkg_sys = None
 
+    #OrderedDict
     axes = None
 
     pool = None
@@ -85,10 +88,10 @@ class Categorization(object):
         return self.children[key]
 
     def split(self, 
-              iaxis, 
+              axis_name, 
               rightmost_of_left_bins, 
-              discriminator_axis_child_0 = 0,
-              discriminator_axis_child_1 = 0):        
+              discriminator_axis_child_0,
+              discriminator_axis_child_1):        
         """ Split a node using a cut on axis iaxis (index with respect
         to the list of axes: axes) at the bin number
         rightmost_of_left_bins. As the name implies the bin will be
@@ -105,12 +108,12 @@ class Categorization(object):
         
         # Init all other boundaries with sanity check
         leftmost_of_left_bins = 1
-        leftmost_of_right_bins = rightmost_of_left_bins + 1        
-        if leftmost_of_right_bins > self.axes[iaxis].nbins:
+        leftmost_of_right_bins = rightmost_of_left_bins + 1
+        if leftmost_of_right_bins > self.axes[axis_name].nbins:
             if self.verbose:
-                print "Invalid subdivision, leftmost_of_right_bins > self.axes[iaxis].nbins"
+                print "Invalid subdivision, leftmost_of_right_bins > self.axes[axis_name].nbins"
             return -1    
-        rightmost_of_right_bins =  self.axes[iaxis].nbins
+        rightmost_of_right_bins =  self.axes[axis_name].nbins
 
         # Get the list of all previous cuts on the ancestors
         # the order here is imporant - we have to execute the cuts from
@@ -123,7 +126,7 @@ class Categorization(object):
         for c in all_previous_cuts:
             # Make sure the cut is defined (ignore the root node) and
             # modifies the axis we are testing right now
-            if c and c.axis == iaxis:
+            if c and c.axis == axis_name:
 
                 if c.lo > leftmost_of_left_bins:
                     leftmost_of_left_bins = c.lo
@@ -142,33 +145,35 @@ class Categorization(object):
             if self.verbose:
                 print "leftmost_of_right_bins <= rightmost_of_left_bins"
             return -1
-        if leftmost_of_right_bins > self.axes[iaxis].nbins:
+        if leftmost_of_right_bins > self.axes[axis_name].nbins:
             if self.verbose:
-                print "Invalid subdivision, leftmost_of_right_bins > self.axes[iaxis].nbins"
+                print "Invalid subdivision, leftmost_of_right_bins > self.axes[axis_name].nbins"
             return -1
 
 
         # Sanity check if the requested discriminator variable is defined for both children
         # First get all the cuts, including the one we would apply for the children
-        all_cuts_child_0 = all_previous_cuts + [Cut(iaxis, leftmost_of_left_bins, rightmost_of_left_bins)  ]
-        all_cuts_child_1 = all_previous_cuts + [Cut(iaxis, leftmost_of_right_bins, rightmost_of_right_bins)]
-
+        all_cuts_child_0 = all_previous_cuts + [Cut(axis_name, leftmost_of_left_bins, rightmost_of_left_bins)  ]
+        all_cuts_child_1 = all_previous_cuts + [Cut(axis_name, leftmost_of_right_bins, rightmost_of_right_bins)]
+        
         # Get the prerequisites for the requested discriminators
-        prereqs_for_child_0 = self.axes[discriminator_axis_child_0].discPrereq
-        prereqs_for_child_1 = self.axes[discriminator_axis_child_1].discPrereq
+        if not discriminator_axis_child_0 is None:
+            prereqs_for_child_0 = self.axes[discriminator_axis_child_0].discPrereq
+            if not all([any([c.is_subset_of(p) for c in all_cuts_child_0]) for p in prereqs_for_child_0]):
+                return -1
+        if not discriminator_axis_child_1 is None:
+            prereqs_for_child_1 = self.axes[discriminator_axis_child_1].discPrereq
+            if not all([any([c.is_subset_of(p) for c in all_cuts_child_1]) for p in prereqs_for_child_1]):
+                return -1
 
         # We want for ALL prerequisits that at LEAST ONE is as tight as the prerequiste
         # all([]) returns True - so this also works if there are no prerequs        
-        if not all([any([c.is_subset_of(p) for c in all_cuts_child_0]) for p in prereqs_for_child_0]):
-            return -1
-        if not all([any([c.is_subset_of(p) for c in all_cuts_child_1]) for p in prereqs_for_child_1]):
-            return -1
                 
         # And finally: actually spawn two new children and add the Nodes to the tree
-        child_pass = Categorization(Cut(iaxis, leftmost_of_left_bins, rightmost_of_left_bins), 
+        child_pass = Categorization(Cut(axis_name, leftmost_of_left_bins, rightmost_of_left_bins), 
                                     parent = self,
                                     discriminator_axis = discriminator_axis_child_0)
-        child_fail = Categorization(Cut(iaxis, leftmost_of_right_bins, rightmost_of_right_bins), 
+        child_fail = Categorization(Cut(axis_name, leftmost_of_right_bins, rightmost_of_right_bins), 
                                     parent = self,
                                     discriminator_axis = discriminator_axis_child_1)
         self.children = [child_pass, child_fail]
@@ -209,7 +214,7 @@ class Categorization(object):
         # Pre-calculate all the limits so we can paralellize
         if depth == 0:
                                     
-            nodes_to_eval = [n for n in self.get_offspring() if not n.discriminator_axis == -1]
+            nodes_to_eval = [n for n in self.get_offspring() if not n.discriminator_axis is None]
             #nodes_to_eval = [self]
             filenames = []
 
@@ -256,7 +261,7 @@ class Categorization(object):
                     l = _limits[2]
                     limits[str(n)+str(ignore_splitting)] = l
                     print n.i_split_self, n.i_split_comb, n, l
-
+        print limits
         ret = ""        
         
         if depth == 0:
@@ -276,14 +281,14 @@ class Categorization(object):
         #ret += "Discr: "
         #ret += self.axes[self.discriminator_axis].name.replace("_", " ")
         ret += r"\\"
-        ret += r"$\mu_{Self} = " + "{0:.2f}$".format(limits[str(self)+str(True)])
+        ret += r"$\mu_{Self} = " + "{0:.2f}$".format(limits.get(str(self)+str(True), -1))
 
         ret += "}"
 
         for c in self.children:
             
             # Ignore pruned away leaves
-            if len(c.children)==0 and c.discriminator_axis == -1:
+            if len(c.children)==0 and not c.discriminator_axis is None:
                 continue
 
             ret += "[\n"
@@ -309,7 +314,7 @@ class Categorization(object):
         # For the yield we don't really care which axis is used - the
         # projections should all be the same.
         # Just make sure we don't try to project unto -1..
-        if self.discriminator_axis ==-1:
+        if self.discriminator_axis is None:
             projection_axis = 0
         else:
             projection_axis = self.discriminator_axis
@@ -321,7 +326,7 @@ class Categorization(object):
             else:
                 thn = self.h_bkg[k]
             
-            yields[k] = thn.Projection(projection_axis).Integral()
+            yields[k] = thn.Projection(self.axes.keys().index(projection_axis)).Integral()
 
         return yields
                         
@@ -341,10 +346,10 @@ class Categorization(object):
 
 
         names = {
-            "numJets__4__5__nBCSVM__2__3__discr_-1"	: "t2j4",
+            "numJets__4__5__nBCSVM__2__3__discr_None"	: "t2j4",
             "numJets__4__5__nBCSVM__3__4__discr_2"	: "t3j4",
             "numJets__4__5__nBCSVM__4__5__discr_2"	: "t4j4",
-            "numJets__5__6__nBCSVM__2__3__discr_-1"	: "t2j5",
+            "numJets__5__6__nBCSVM__2__3__discr_None"	: "t2j5",
             "numJets__5__6__nBCSVM__3__4__discr_2"	: "t3j5",
             "numJets__5__6__nBCSVM__4__5__discr_2"	: "t4j5",
             "numJets__6__7__nBCSVM__2__3__discr_2"	: "t2j6",
@@ -352,10 +357,10 @@ class Categorization(object):
             "numJets__6__7__nBCSVM__4__5__discr_2"  : "t4j6",
         }
 
-        print "\t\t" + "\t".join(names[str(l)] for l in self.get_leaves() if not l.discriminator_axis ==-1)
+        print "\t\t" + "\t".join(names[str(l)] for l in self.get_leaves() if not l.discriminator_axis is None)
 
         for sample in samples:
-            print sample + "\t" + "\t".join(["{0:.1f}".format(yield_table[str(l)][sample]) for l in self.get_leaves() if not l.discriminator_axis ==-1])
+            print sample + "\t" + "\t".join(["{0:.1f}".format(yield_table[str(l)][sample]) for l in self.get_leaves() if not l.discriminator_axis is None])
                         
 
     def get_sb(self):
@@ -450,7 +455,7 @@ class Categorization(object):
         for thn in thns:
 
             # First cut on the axes but ignore the overflow bin
-            for iaxis, axis in enumerate(self.axes):            
+            for iaxis, (axis_name, axis) in enumerate(self.axes.items()):            
                 thn.GetAxis(iaxis).SetRange(1, axis.nbins)
                 thn.GetAxis(iaxis).SetBit(ROOT.TAxis.kAxisRange)
             # end of loop over axes
@@ -459,7 +464,7 @@ class Categorization(object):
             for c in all_cuts:
                 if c: # this is just to handle the ROOT node
                     # And restirct the axis range
-                    thn.GetAxis(c.axis).SetRange(c.lo, c.hi)
+                    thn.GetAxis(c.iaxis).SetRange(c.lo, c.hi)
         # End of loop over histograms
 
 
@@ -510,10 +515,10 @@ class Categorization(object):
             i_splitting = 0
 
             # Loop over axes
-            for iaxis in cut_axes:
+            for axis_name in cut_axes:
                 
-                axis = self.axes[iaxis]
-                print "Preparing axis", iaxis
+                axis = self.axes[axis_name]
+                print "Preparing axis", axis_name
 
                 # Loop over bins on the axis
                 # (ROOT Histogram bin counting starts at 1)
@@ -529,7 +534,7 @@ class Categorization(object):
                                 # The split function executes the split
                                 # If it failed (return value of -1) - for example because the requested range is already excluded
                                 # we go to the next one
-                                if l.split(iaxis, 
+                                if l.split(axis_name, 
                                            split_bin,
                                            discriminator_axis_for_child_0,
                                            discriminator_axis_for_child_1)==-1:
@@ -550,7 +555,7 @@ class Categorization(object):
                                              do_stat_variations=self.do_stat_variations)
 
                                 splittings[shapes_txt_filename] = [l, 
-                                                                   iaxis, 
+                                                                   axis_name, 
                                                                    split_bin,
                                                                    discriminator_axis_for_child_0,
                                                                    discriminator_axis_for_child_1]
@@ -611,7 +616,7 @@ class Categorization(object):
             # Store the discriminator axis
             original_discriminator = l.discriminator_axis
             # Deactivate for now
-            l.discriminator_axis = -1
+            l.discriminator_axis = None
             
             # Important - eval the limit starting from the node under
             # study - not just the leave limit
@@ -676,7 +681,7 @@ class Categorization(object):
         for l in leaves:
             #print "leaf", l
 
-            if  l.discriminator_axis == -1:
+            if  l.discriminator_axis is None:
                 continue
 
             l.prepare_all_thns()
@@ -697,7 +702,7 @@ class Categorization(object):
                 if Categorization.allhists.has_key(k):
                     h = Categorization.allhists[k]
                 else:
-                    h = thn.Projection(l.discriminator_axis, "E")
+                    h = thn.Projection(self.axes.keys().index(l.discriminator_axis), "E")
                     h.SetName(hname)
                     #Categorization.allhists[k] = h.Clone("_".join(k))
                     Categorization.allhists[k] = h
@@ -723,7 +728,7 @@ class Categorization(object):
                     if Categorization.allhists.has_key(k):
                         h = Categorization.allhists[k]
                     else:
-                        h = thn.Projection(l.discriminator_axis, "E")
+                        h = thn.Projection(self.axes.keys().index(l.discriminator_axis), "E")
                         h.SetName(hname)
                         #Categorization.allhists[k] = h.Clone("_".join(k))
                         Categorization.allhists[k] = h
@@ -804,12 +809,14 @@ def CategorizationFromString(string):
         # For the first entry we don't have a cutstring
         # just set the discriminator variable of the ROOT node correctly
         if "Discr" in cut_string:
-            discriminator = int(cut_string.split("=")[1])
+            discriminator = cut_string.split("=")[1]
             last_node.discriminator_axis = discriminator
             continue
 
         # Otherwise the discriminator will be the second item
-        discriminator = int(line_atoms[1].split("=")[1])
+        discriminator = line_atoms[1].split("=")[1]
+        if discriminator == "None":
+            discriminator = None
 
         # Build the cut object from the string
         cut = Cut(cut_string)
@@ -817,7 +824,7 @@ def CategorizationFromString(string):
         # Here the real fun starts
         # - if the depth icreased by one, we do a splitting
         if depth > last_depth:
-            last_node.split(cut.axis, cut.hi)
+            last_node.split(cut.axis.name, cut.hi, discriminator, discriminator)
             last_node = last_node[0]
             last_depth = depth
         # - if the depth stayed the same we go to the other child
@@ -862,7 +869,6 @@ def GetSparseHistograms(input_file,
 
             # Nominal Histograms
             h[process] = f.Get("{0}/{1}/sparse".format(process, basecat))
-            print process, h[process].GetEntries()
 
             # Systematic Variations
             h_sys[process] = {}     
@@ -888,12 +894,12 @@ def GetSparseHistograms(input_file,
 
 def GetAxes(h):
     """ Extract axes from a sparse histogram"""
-    axes = []
+    axes = OrderedDict()
     n_dim = h.GetNdimensions()
     print "We have", n_dim, "dimensions"
     for i_axis in range(n_dim):
         a = h.GetAxis(i_axis)
         new_axis = axis(a.GetName(), a.GetNbins(), a.GetXmin(), a.GetXmax())
-        axes.append(new_axis)
+        axes[new_axis.name] = new_axis 
         print i_axis, new_axis
     return axes

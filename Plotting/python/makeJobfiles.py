@@ -48,6 +48,12 @@ for samp in Samples.samples_dict.keys():
                     "nBins": 12
                 },
                 {
+                    "func": "mem_DL_0w2h2t",
+                    "xMin": 0,
+                    "xMax": 1,
+                    "nBins": 12
+                },
+                {
                     "func": "tth_mva",
                     "xMin": 0,
                     "xMax": 1,
@@ -114,10 +120,28 @@ for samp in Samples.samples_dict.keys():
                     "nBins": 4
                 },
                 {
-                    "func": "mem_DL_0w2h2t",
+                    "func": "nBoostedTop_Mass120_180",
                     "xMin": 0,
-                    "xMax": 1,
-                    "nBins": 12
+                    "xMax": 2,
+                    "nBins": 2
+                },
+                {
+                    "func": "nBoostedTop_Mass120_180_fRec02",
+                    "xMin": 0,
+                    "xMax": 2,
+                    "nBins": 2
+                },
+                {
+                    "func": "nBoostedTopWP1",
+                    "xMin": 0,
+                    "xMax": 2,
+                    "nBins": 2
+                },
+                {
+                    "func": "nBoostedTopWP2",
+                    "xMin": 0,
+                    "xMax": 2,
+                    "nBins": 2
                 },
             ]
         }
