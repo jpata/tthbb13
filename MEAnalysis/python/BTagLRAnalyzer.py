@@ -252,6 +252,8 @@ class BTagLRAnalyzer(FilterAnalyzer):
                 cat += "t3"
             elif event.nBCSVM >= 4:
                 cat += "tge4"
+            else:
+                cat = "unknown"
         elif event.is_dl:
             cat += "dl_"
             if len(event.good_jets)==3 and event.nBCSVM==2:
@@ -262,10 +264,15 @@ class BTagLRAnalyzer(FilterAnalyzer):
                 cat += "jge4_t2"
             elif len(event.good_jets)>=4 and event.nBCSVM>=4:
                 cat += "jge4_tge4"
+            else:
+                cat = "unknown"
         else:
             cat = "unknown"
 
         event.category_string = cat
-        event.pass_category_blr = logit(event.btag_LR_4b_2b) > self.conf.mem["blr_cuts"].get(cat, -10)
-        
+        if cat != "unknown":
+            event.pass_category_blr = logit(event.btag_LR_4b_2b) > self.conf.mem["blr_cuts"].get(cat, -10)
+        else:
+            event.pass_category_blr = False
+
         return event

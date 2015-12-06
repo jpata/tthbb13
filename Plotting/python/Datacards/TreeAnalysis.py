@@ -19,12 +19,12 @@ import pickle
 ########################################
 
 #ControlPlotsSparse_2015_10_15_withBLR.root
-#input_file = "/home/joosep/tth/datacards/prev16/Nov27.root"
-#input_file = "/home/joosep/tth/datacards/prev16/Dec3.root"
-input_file = "/dev/shm/joosep/ControlPlotsSparse_corr.root"
-output_path = "/dev/shm/joosep/categorization2/"
+input_file = "ControlPlotsSparse.root"
+output_path = "/scratch/joosep/"
+#input_file = "/dev/shm/joosep/ControlPlotsSparse_corr.root"
+#output_path = "/dev/shm/joosep/categorization2/"
 
-n_proc = 50
+n_proc = 10
 n_iter = 8
 
 signals = [
