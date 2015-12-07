@@ -56,12 +56,12 @@ li_methods      = ["Cuts"]
 setups = {}
 btag_setups = {}
 
-for label in ["xxtruth",
-              "xxnosize", 
+for label in ["xxtruth10",
+              #"xxnosize", 
               #"forWP"
 ]:
     
-    if label == "xxtruth":
+    if label == "xxtruth10":
         signal_fiducial_cuts = fiducial_cuts[sample_sig]
         bkgrnd_fiducial_cuts = fiducial_cuts[sample_bkg]    
         weight = "(weight)"
@@ -364,20 +364,21 @@ for label in ["xxtruth",
 
 
 all_setups = []
-for label in ["xxtruth", 
-              "xxnosize"
+for label in ["xxtruth10", 
+              #"xxnosize"
           ]:
     all_setups.extend( setups[label])
 
-#pool.map(doTMVA, all_setups)
+pool.map(doTMVA, all_setups)
+
 
 for label in [
-        "xxtruth", 
+        "xxtruth10", 
         #"forWP", 
-        "xxnosize"
+        #"xxnosize"
 ]:
     
-    if label == "xxtruth":
+    if label == "xxtruth10":
         plotROCs(label + "ROC_" + name, 
                  setups[label], 
                  extra_text = [pretty_fiducial_cuts[sample_sig],
