@@ -1,4 +1,9 @@
 #!/usr/bin/env julia
+
+
+#Samples by the Pozzorini group at http://www.physik.uzh.ch/data/ttHsim/TTBBV1/
+#Implemented after https://github.com/bianchini/TTHStudies/blob/master/bin/HepMCtoStep2Converter.cc
+
 module GenAnalysis
 
 using Cxx, HEP, ROOT, Histograms, ROOTHistograms, ROOTDataFrames
@@ -6,7 +11,7 @@ using Cxx, HEP, ROOT, Histograms, ROOTHistograms, ROOTDataFrames
 addHeaderDir("/usr/local/include/", kind=C_System)
 Libdl.dlopen("/usr/local/lib/libfastjet.dylib", Libdl.RTLD_GLOBAL)
 
-const VERBOSE = true
+    const VERBOSE = true
 
 cxx"""
 #include <fastjet/ClusterSequence.hh>
@@ -223,9 +228,15 @@ function main()
         "gen.root",
 
         #branch names
-        [:nGenJet, :GenJet_pt, :GenJet_eta, :GenJet_phi, :GenJet_mass, :GenJet_flavour],
-        [Int64, Float64, Float64, Float64, Float64, Int64],
-        [Val{1}, :nGenJet, :nGenJet, :nGenJet, :nGenJet, :nGenJet];
+        [
+            :nGenJet, :GenJet_pt, :GenJet_eta, :GenJet_phi, :GenJet_mass, :GenJet_flavour,
+            :nGenLepton, :GenLepton_pt, :GenLepton_eta
+        ],
+        [
+            Int64, Float64, Float64, Float64, Float64, Int64,
+            Int64, Float64, Float64
+        ],
+        [Val{1}, :nGenJet, :nGenJet, :nGenJet, :nGenJet, :nGenJet, Val{1}, :nGenLepton, :nGenLepton];
 
         treename="tree"
     )
@@ -244,21 +255,29 @@ function main()
         finalstateparticles = filter(
             isGoodFinalStateParticle, genparticles
         )
-        # for fs in genparticles
-        #     println("genp ", fs.pdgid, " ", fs.status, " ", fs in finalstateparticles ? "*" : "-")
-        # end
+
+        if VERBOSE
+            for fs in genparticles
+                println("genp ", fs.pdgid, " ", fs.status, " fs=", fs in finalstateparticles ? "1" : "0")
+            end
+        end
 
         leptons = filter(
             isChargedLepton, finalstateparticles
         )
-        
+        out[irow, :nGenLepton] = length(leptons)
+        out[irow, :GenLepton_pt] = Float64[HEP.perp(l.p4) for l in leptons]
+        out[irow, :GenLepton_eta] = Float64[HEP.eta(l.p4) for l in leptons]
+
         if VERBOSE && length(leptons)>0
             println("lepton ", leptons)
         end
 
         pseudojets = [PseudoJet(gp.p4) for gp in finalstateparticles]
-        println("N[pj]=", length(pseudojets))
-        
+        if VERBOSE
+            println("N[pj]=", length(pseudojets))
+        end
+
         jets = cluster(pseudojets, 0.5)
         jets = filter(
             x->perp(x.p4)>20, jets
@@ -296,6 +315,6 @@ function main()
     )
 end
 
-end #module
+end #module GenAnalysis
 
 GenAnalysis.main()

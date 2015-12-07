@@ -70,7 +70,7 @@ class Categorization(object):
     verbose = 0
     #Cache of all projected histograms
     allhists = {}
-    memdir = ROOT.TFile("/dev/shm/memdir.root", "RECREATE")
+    #memdir = ROOT.TFile("/dev/shm/memdir.root", "RECREATE")
     do_stat_variations = False
 
     def __init__(self, cut, parent=None, discriminator_axis=0):
