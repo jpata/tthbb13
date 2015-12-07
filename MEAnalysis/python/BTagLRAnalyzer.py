@@ -10,6 +10,9 @@ from TTH.MEAnalysis.vhbb_utils import lvec
 import numpy as np
 Cvectoruint = getattr(ROOT, "std::vector<unsigned int>")
 
+def logit(x):
+    return math.log(x/(1.0 - x)) if x > 0 else -10
+
 class BTagLRAnalyzer(FilterAnalyzer):
     """
     Performs b-tag likelihood ratio calculations
@@ -230,4 +233,46 @@ class BTagLRAnalyzer(FilterAnalyzer):
         event.passes_btag = len(event.selected_btagged_jets)>=0
         if "debug" in self.conf.general["verbosity"]:
             print "Passes btag", event.passes_btag, event.selected_btagged_jets
+
+        #do category-specific blr cuts
+        cat = ""
+        if event.is_sl:
+            cat += "sl_"
+
+            if len(event.good_jets) == 4:
+                cat += "j4_"
+            elif len(event.good_jets) == 5:
+                cat += "j5_"
+            elif len(event.good_jets) >= 6:
+                cat += "jge6_"
+
+            if event.nBCSVM == 2:
+                cat += "t2"
+            elif event.nBCSVM == 3:
+                cat += "t3"
+            elif event.nBCSVM >= 4:
+                cat += "tge4"
+            else:
+                cat = "unknown"
+        elif event.is_dl:
+            cat += "dl_"
+            if len(event.good_jets)==3 and event.nBCSVM==2:
+                cat += "j3_t2"
+            elif len(event.good_jets)>=3 and event.nBCSVM==3:
+                cat += "jge3_t3"
+            elif len(event.good_jets)>=4 and event.nBCSVM==2:
+                cat += "jge4_t2"
+            elif len(event.good_jets)>=4 and event.nBCSVM>=4:
+                cat += "jge4_tge4"
+            else:
+                cat = "unknown"
+        else:
+            cat = "unknown"
+
+        event.category_string = cat
+        if cat != "unknown":
+            event.pass_category_blr = logit(event.btag_LR_4b_2b) > self.conf.mem["blr_cuts"].get(cat, -10)
+        else:
+            event.pass_category_blr = False
+
         return event

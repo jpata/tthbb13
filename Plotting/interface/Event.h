@@ -189,6 +189,7 @@ public:
 
     int numJets;
     int nBCSVM;
+    int nBCSVL;
 
     //list of all jets
     vector<Jet> jets;
@@ -258,6 +259,7 @@ public:
         bool _passPV,
         int _numJets,
         int _nBCSVM,
+        int _nBCSVL,
         const vector<Jet>& _jets,
         const vector<Lepton>& _leptons,
         //const WeightMap& _weightFuncs,

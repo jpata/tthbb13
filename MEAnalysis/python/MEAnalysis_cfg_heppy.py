@@ -252,13 +252,26 @@ class Conf:
 
         #Actually run the ME calculation
         #If False, all ME values will be 0
-        "calcME": False,
+        "calcME": True,
+
+        "blr_cuts": {
+            "sl_j5_t2": -0.8,
+            "sl_j5_t3": 3.2,
+            "sl_j5_tge4": 7.4,
+            "sl_jge6_t2": 0.2,
+            "sl_jge6_t3": 3.8,
+            "sl_jge6_tge4": 7.4,
+            "dl_j3_t2": -1.0,
+            "dl_jge3_t3": 3.4,
+            "dl_jge4_t2": -0.6,
+            "dl_jge4_tge4": 7.4,
+        },
 
         #Generic event-dependent selection function applied
         #just before the MEM. If False, MEM is skipped for all hypos
         #note that we set hypothesis-specific cuts below
         "selection": lambda event: (
-            event.btag_LR_4b_2b > 0.95
+            event.pass_category_blr
             or (event.is_sl and event.nBCSVM >= 3) #always calculate for tagged events
             or (event.is_dl and event.nBCSVM >= 2) #always calculate for tagged events
         ),
@@ -299,7 +312,7 @@ class Conf:
             #"SL_2w2h1t_h",
             "SL_2w2h2t",
             "SL_2w2h2t_sj",
-            #"SL_0w2h2t_sj",
+            "SL_0w2h2t_sj",
             #"SL_2w2h2t_memLR",
             #"SL_0w2h2t_memLR",
             #"DL_0w2h2t_Rndge4t",

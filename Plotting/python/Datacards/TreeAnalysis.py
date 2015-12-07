@@ -19,12 +19,12 @@ import pickle
 ########################################
 
 #ControlPlotsSparse_2015_10_15_withBLR.root
-#input_file = "/home/joosep/tth/datacards/prev16/Nov27.root"
-#input_file = "/home/joosep/tth/datacards/prev16/Dec3.root"
-input_file = "/dev/shm/joosep/ControlPlotsSparse_corr.root"
-output_path = "/dev/shm/joosep/categorization/"
+input_file = "ControlPlotsSparse.root"
+output_path = "/scratch/joosep/"
+#input_file = "/dev/shm/joosep/ControlPlotsSparse_corr.root"
+#output_path = "/dev/shm/joosep/categorization2/"
 
-n_proc = 50
+n_proc = 10
 n_iter = 8
 
 signals = [
@@ -54,8 +54,8 @@ def split_leaves_by_BLR():
 
     r = Categorize.CategorizationFromString(trees["old"])
     initial_leaves = r.get_leaves()
-    cut_axes = [4, 5, 6, 7, 8, 9] #btag LR axis
-    discriminator_axes = [1,2] #MEM SL 022 axis
+    cut_axes = [8] #btag LR axis
+    discriminator_axes = [0, 1, 2] #MEM SL 022 axis
     for l in initial_leaves:
         l.find_categories_async(1, 
                                 cut_axes, 
@@ -74,8 +74,8 @@ def optimize(r):
     #axes[0].discPrereq = [Cut(3,3,3)]
     #axes[1].discPrereq = [Cut(3,3,3)]
 
-    cut_axes = [4, 5, 6, 7, 8, 9] #btag LR axis
-    discriminator_axes = [1,2] #MEM SL 022 axis
+    cut_axes = ["numJets", "nBCSVM", "btag_LR_4b_2b_logit", "Wmass"]
+    discriminator_axes = ["mem_SL_2w2h2t", "mem_SL_0w2h2t"]
     
     r.find_categories_async(n_iter, 
                             cut_axes, 
@@ -149,9 +149,9 @@ if __name__ == "__main__":
     of = open( name + ".tex","w")
     of.write(r.print_tree_latex())
     of.close()
-    #of = open(name + ".pickle", "w")
-    #of.write(pickle.dumps(r))
-    #of.close()
+    of = open(name + ".pickle", "w")
+    of.write(pickle.dumps(r))
+    of.close()
 
 
     #for i in range(5,7):

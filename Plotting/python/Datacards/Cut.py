@@ -20,7 +20,8 @@ class Cut(object):
         
         # Default constructor
         if len(args) == 0:
-            self.axis = -1
+            self.axis = None
+            self.iaxis = -1
             self.lo   = -1
             self.hi   = -1
 
@@ -38,35 +39,40 @@ class Cut(object):
 
             # Loop over the axis and see if one of the name is available
             axis_found = False
-            for ia, ax in enumerate(self.axes):
+            for iax, ax in enumerate(self.axes.values()):
                 if ax.name == axis_name:
-                    self.axis = ia
+                    self.axis = ax
+                    self.iaxis = iax
                     axis_found = True
                     break
             if not axis_found:
-                raise Exception('Cut Constructor', 'Axis not found')
+                raise Exception('Cut Constructor', 'Axis not found', axis_name, self.axes.keys())
                                         
             # Go from cut values to bins
-            axis = self.axes[self.axis]
+            axis = self.axis
             binsize = (axis.xmax - axis.xmin)/(1.*axis.nbins)            
             self.lo = int( round((low-axis.xmin)/binsize) ) + 1 # Start bin counting at 1
             self.hi = int( round((high-axis.xmin)/binsize) ) # The upper edge is not included (so basically +1-1=0)
             
             # Make sure the conversion worked
             if not str(self) == args[0]:
-                raise Exception('Cut Constructor', 'Building from string failed')
+                raise Exception('Cut Constructor', 'Building from string failed', str(self), args[0])
 
         # From numbers
-        elif len(args) == 3 and all([isinstance(a,float) or isinstance(a,int) for a in args]):            
-            self.axis = args[0]
-            self.lo   = args[1]
-            self.hi   = args[2]
+        elif len(args) == 3:
+            try: 
+                self.axis = self.axes[args[0]]
+                self.iaxis = self.axes.keys().index(self.axis.name)
+                self.lo   = int(args[1])
+                self.hi   = int(args[2])
+            except Exception as e:
+                raise Exception("Could not parse 3-argument constructor", e)
         else:
              raise Exception('Cut Constructor', 'Invalid number/type of arguments')
             
                 
     def __nonzero__(self):
-        if self.axis == -1:
+        if self.axis is None:
             return False
         else:
             return True
@@ -74,8 +80,8 @@ class Cut(object):
 
     def __repr__(self):
 
-        if self.axis >= 0:
-            axis = self.axes[self.axis]            
+        if self.axis:
+            axis = self.axis
             binsize = (axis.xmax - axis.xmin)/(1.*axis.nbins)
             lower = axis.xmin + (self.lo-1)*binsize
             upper = axis.xmin + (self.hi)*binsize
