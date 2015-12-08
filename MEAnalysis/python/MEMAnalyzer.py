@@ -170,6 +170,10 @@ class MEAnalyzer(FilterAnalyzer):
         self.vars_to_marginalize.clear()
         self.integrator.next_event()
         
+        input_objects_jets = []
+        input_objects_leptons = []
+        input_objects_met = []
+
         mem_cfg.enabled = True
 
         set_integration_vars(self.vars_to_integrate, self.vars_to_marginalize, mem_cfg.mem_assumptions)
@@ -177,18 +181,6 @@ class MEAnalyzer(FilterAnalyzer):
         bquarks = list(mem_cfg.b_quark_candidates(event))
 
         maxjets = mem_cfg.maxJets
-
-        # take highest pT jets if Dl and njets30 >= 4
-        #if "dl" in mem_cfg.mem_assumptions:
-        #    lastjet = 0
-        #    for jet in bquarks:
-        #        if jet.pt >= self.conf.jets[ "pt" ]:
-        #            lastjet += 1
-        #    if lastjet>=4:
-        #        maxjets = min( mem_cfg.maxJets, lastjet )
-        #        print "%s jets with pt>%s found out of %s: retsrict ME input to first %s jets" % (lastjet, self.conf.jets[ "pt" ], len(bquarks), maxjets)
-        #    else:
-        #        print "%s jets with pt>%s found out of %s: ME will have in input %s jets with pt<%s" % (lastjet, self.conf.jets[ "pt" ], len(bquarks), len(bquarks)-lastjet, self.conf.jets["pt"])
 
         if len(bquarks)>maxjets:
             print "More than {0} b-quarks supplied, dropping last {1} from MEM".format(maxjets, len(bquarks) - maxjets)
@@ -212,6 +204,7 @@ class MEAnalyzer(FilterAnalyzer):
                     MEM.TFType.bReco: jet.tf_b, MEM.TFType.qReco: jet.tf_l,
                 }
             )
+            input_objects_jets += [jet]
             if "meminput" in self.conf.general["verbosity"]:
                 print "memBQuark" if jet in bquarks else "memLQuark",\
                     jet.pt, jet.eta, jet.phi, jet.mass,\
@@ -228,6 +221,7 @@ class MEAnalyzer(FilterAnalyzer):
                 p4s=(lep.pt, lep.eta, lep.phi, lep.mass),
                 obs_dict={MEM.Observable.CHARGE: lep.charge},
             )
+            input_objects_leptons += [lep]
             if "meminput" in self.conf.general["verbosity"]:
                 print "memLepton", lep.pt, lep.eta, lep.phi, lep.mass, lep.charge
 
@@ -240,6 +234,17 @@ class MEAnalyzer(FilterAnalyzer):
             #MET is caused by massless object
             p4s=(met_cand.pt, 0, met_cand.phi, 0),
         )
+        input_objects_met += [met_cand]
+        if "commoninput" in self.conf.general["verbosity"]:
+            outdict = {
+                "selectedJetsP4": [
+                    (j.pt, j.eta, j.phi, j.mass) for j in input_objects_jets
+                ],
+                "selectedJetsCSV": [
+                    (j.btagCSV) for j in input_objects_jets
+                ]
+            }
+            print json.dumps(outdict, indent=2)
 
     def process(self, event):
         # #self.inputCounter.Fill(1)
@@ -346,6 +351,8 @@ class MEAnalyzer(FilterAnalyzer):
                         self.vars_to_integrate,
                         self.vars_to_marginalize
                     )
+                    if "commoninput" in self.conf.general["verbosity"]:
+                        print "output = {0}".format(r.p)
                     print "Integrator::run done hypo={0} conf={1}".format(hypo, confname)
 
                     res[(hypo, confname)] = r
