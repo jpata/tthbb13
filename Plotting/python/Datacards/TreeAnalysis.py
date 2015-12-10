@@ -20,7 +20,7 @@ import pickle
 
 #ControlPlotsSparse_2015_10_15_withBLR.root
 input_file = "ControlPlotsSparse.root"
-output_path = "/scratch/joosep/"
+output_path = "/scratch/joosep/test/"
 #input_file = "/dev/shm/joosep/ControlPlotsSparse_corr.root"
 #output_path = "/dev/shm/joosep/categorization2/"
 

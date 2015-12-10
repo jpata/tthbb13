@@ -19,9 +19,11 @@ def PrintDatacard(event_counts, datacard, dcof):
 
     for cat in datacard.categories:
         analysis_var = datacard.distributions[cat]
-        dcof.write("shapes * {0} {1} $PROCESS/$CHANNEL/{2} $PROCESS/$CHANNEL/{2}_$SYSTEMATIC\n".format(cat, datacard.histfilename, analysis_var))
-
-    #dcof.write("shapes data_obs sl_jge6_tge4 /shome/jpata/tth/datacards/Sep7_ref2_spring15/fakeData.root $PROCESS/$CHANNEL/mem_d_nomatch_0 $PROCESS/$CHANNEL/mem_d_nomatch_0_$SYSTEMATIC\n")
+        dcof.write("shapes * {0} {1} $PROCESS/$CHANNEL/{2} $PROCESS/$CHANNEL/{2}_$SYSTEMATIC\n".format(
+            cat,
+            datacard.histfilenames_cat.get(cat, datacard.histfilename),
+            analysis_var)
+        )
         
     dcof.write("---------------\n")
 
@@ -100,7 +102,7 @@ def PrintDatacard(event_counts, datacard, dcof):
     dcof.write("# combine -n {0} -M Asymptotic -t -1 {1} \n".format(shapename_base, shapename))
     
 # end of PrintDataCard
-def MakeDatacard(infile_path, outfile_path, shapefile_path, do_stat_variations=False):
+def MakeDatacard(infile_paths, outfile_path, shapefile_path, do_stat_variations=False):
     """
     Makes shape.root and shape.txt for combine from an input root file with multiple categories.
 
@@ -136,18 +138,12 @@ def MakeDatacard(infile_path, outfile_path, shapefile_path, do_stat_variations=F
 
     All categories must exist for all processes.
 
-    infile_path (string): path to ControlPlots.root with processes and categories
+    infile_path (list of strings): input files with histograms
     outfile_path (string): path to output root file for combine (must be writable)
     shapefile_path (string): path to output txt file for combine (must be writable)
 
     do_stat_variations (bool) : enable or disable statistical bin-by-bin variations
     """
-    infile = ROOT.TFile(infile_path)
-    shutil.copy(infile_path, outfile_path)
-
-    #datacard root file
-    outfile = ROOT.TFile(outfile_path, "UPDATE")
-
     #get all processes in input file
     processes = getProcesses(infile)
 
@@ -159,17 +155,6 @@ def MakeDatacard(infile_path, outfile_path, shapefile_path, do_stat_variations=F
             processes_new += [proc]
     processes_new += processes
     processes = processes_new
-    ####Step 1
-    #get all histograms in input file, put to dict.
-    # histmap = {}
-    # for proc in processes:
-    #     histmap[proc] = {}
-    #     categories = getCategories(infile, proc)
-    #     for cat in categories:
-    #         distributions = getDistributions(infile, proc, cat)
-    #         histmap[proc][cat] = {}
-    #         for distr in distributions:
-    #             histmap[proc][cat][distr] = infile.Get("{0}/{1}/{2}".format(proc, cat, distr)) 
 
     #get the first process and all categories 
     proc_first = processes[0]
@@ -177,7 +162,6 @@ def MakeDatacard(infile_path, outfile_path, shapefile_path, do_stat_variations=F
     #currently just assume that tt+H has the same categories as every other process
     allcats = getCategories(infile, proc_first)
 
-    ####Step 2
     #get the nominal histograms in each category
     hists_nominal = {}
     for cat in allcats:
@@ -237,8 +221,6 @@ def MakeDatacard(infile_path, outfile_path, shapefile_path, do_stat_variations=F
                 event_counts[process][category] = 0
 
     #remove empty categories from fit to prevent combine error
-    # if np_bin == 0: raise RuntimeError, "Bin %s has no processes contributing to it" % b
-    #    RuntimeError: Bin btag_LR_4b_2b_logit__10_0__20_0__numJets__3__4 has no processes contributing to it
     categories = []
     for cutname in dcard.categories:
         s = 0
@@ -262,6 +244,18 @@ def MakeDatacard(infile_path, outfile_path, shapefile_path, do_stat_variations=F
     outfile.Close()
 
 # end of MakeDatacard
+
+
+def MakeDatacard2(
+    processes,
+    allcats,
+    hists_per_category,
+    infile_paths,
+    shapefile_path,
+    do_stat_variations=False
+    ):
+    dcard = Datacard(processes, allcats, hists_per_category)
+    shapefile = open(shapefile_path, "w")
 
 import datacard as datacard
 

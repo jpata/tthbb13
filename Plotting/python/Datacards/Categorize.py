@@ -22,6 +22,7 @@ from Axis import axis
 from Cut import Cut
 
 from makeDatacard import MakeDatacard
+from datacardCombiner import makeStatVariations, fakeData
 
 ROOT.TH1.AddDirectory(0)
 ROOT.TH1.SetDefaultSumw2(True)
@@ -72,10 +73,12 @@ class Categorization(object):
     lg = None
 
     verbose = 0
+
     #Cache of all projected histograms
     allhists = {}
-    memdir = ROOT.TFile("/dev/shm/memdir.root", "RECREATE")
     do_stat_variations = False
+
+    leaf_files = {}
 
     def __init__(self, cut, parent=None, discriminator_axis=0):
         """ Create a new node """        
@@ -241,11 +244,15 @@ class Categorization(object):
                         n.shapes_root_filename_comb = shapes_root_filename
                         n.i_split_comb = i_split
 
-                    n.create_control_plots(control_plots_filename, ignore_splitting = ignore_splitting)                        
-                    MakeDatacard(control_plots_filename, 
-                                 shapes_root_filename,
-                                 shapes_txt_filename,
-                                 do_stat_variations=self.do_stat_variations)
+                    n.create_control_plots(control_plots_filename, ignore_splitting = ignore_splitting)
+#                    MakeDatacard2(
+#                        processes,
+#                        allcats,
+#                        hists_per_category,
+#                        infile_paths,
+#                        shapefile_path,
+#                        do_stat_variations=False
+#                    )
 
                     i_split += 1
 
@@ -493,17 +500,18 @@ class Categorization(object):
         shapes_txt_filename    = "{0}/shapes_{1}.txt".format(self.output_path, name)
         shapes_root_filename   = "{0}/shapes_{1}.root".format(self.output_path, name)
         
-        self.create_control_plots(control_plots_filename)                        
-        MakeDatacard(control_plots_filename, 
-                     shapes_root_filename,
-                     shapes_txt_filename,
-                     do_stat_variations=self.do_stat_variations)
+        self.create_control_plots(self.output_path)
+        leaves = self.get_leaves()
+        #MakeDatacard([self.leaf_files[l] for l in leaves],
+        #             shapes_root_filename,
+        #             shapes_txt_filename,
+        #             do_stat_variations=self.do_stat_variations)
         
         return self.lg(shapes_txt_filename)
 
-    def find_categories_async(self, 
-                              n, 
-                              cut_axes, 
+    def find_categories_async(self,
+                              n,
+                              cut_axes,
                               discriminator_axes):
 
         # Start by calculating the limit without splitting
@@ -549,11 +557,15 @@ class Categorization(object):
 
                                 # Here always evaluate the full tree!
                                 root = self.get_root()
-                                root.create_control_plots(control_plots_filename)                        
-                                MakeDatacard(control_plots_filename, 
-                                             shapes_root_filename,
-                                             shapes_txt_filename,
-                                             do_stat_variations=self.do_stat_variations)
+                                root.create_control_plots(self.output_path)                        
+                                MakeDatacard2(
+                                    self.getProcesses(),
+                                    self.get_leaves(),
+                                    hists_per_category,
+                                    infile_paths,
+                                    shapefile_path,
+                                    do_stat_variations=False
+                                )
 
                                 splittings[shapes_txt_filename] = [leaf, 
                                                                    axis_name, 
@@ -684,9 +696,8 @@ class Categorization(object):
         return name
 
 
-    def create_control_plots(self, name, ignore_splitting = False):
-        of = ROOT.TFile(name, "RECREATE")
-
+    def create_control_plots(self, path, ignore_splitting = False):
+        print "create_control_plots", path, ignore_splitting
         dirs = {}
                 
         if ignore_splitting:
@@ -696,13 +707,24 @@ class Categorization(object):
 
         # Loop over categories
         for l in leaves:
+            leaf_fname = path + "/" + l.__repr__() + ".root"
+            
+            #leaf already created
+            if self.leaf_files.has_key(leaf_fname):
+                print "leaf exists", leaf_fname
+                continue
 
+            print "creating", leaf_fname
+            of = ROOT.TFile(leaf_fname, "RECREATE")
+            self.leaf_files[l] = leaf_fname
+            
+            #This leaf is specified to be removed from the fit
             if  l.discriminator_axis is None:
                 continue
 
             l.prepare_all_thns()
-
-            ROOT.gROOT.ls()
+            
+            processes = []
             # Nominal
             for process, thn in self.h_sig.items() + self.h_bkg.items():
 
@@ -718,11 +740,9 @@ class Categorization(object):
                 else:
                     h = thn.Projection(self.axes.keys().index(l.discriminator_axis), "E")
                     h.SetName(hname)
-                    #Categorization.allhists[k] = h.Clone("_".join(k))
                     Categorization.allhists[k] = h
-                    #Categorization.allhists[k].SetDirectory(Categorization.memdir)
-                    #h.SetName(hname)
                 dirs[outdir_str].append(h.Clone())
+                processes += [process]
             # End of loop over processes
 
             # Systematic Variations
@@ -742,25 +762,30 @@ class Categorization(object):
                     else:
                         h = thn.Projection(self.axes.keys().index(l.discriminator_axis), "E")
                         h.SetName(hname)
-                        #Categorization.allhists[k] = h.Clone("_".join(k))
                         Categorization.allhists[k] = h
-                        #Categorization.allhists[k].SetDirectory(Categorization.memdir)
-                        #h.SetName(hname)
                     dirs[outdir_str].append(h.Clone())
 
                 # End of loop over systematics
             # End of loop over processes
-        # End of loop over categories
-            
-        for outdir_str, hs in dirs.iteritems():
-                        
-            of.mkdir(outdir_str)
-            outdir = of.Get(outdir_str)
+            for outdir_str, hs in dirs.iteritems():
 
-            for h in hs:
-                h.SetDirectory(outdir)
-            outdir.Write("", ROOT.TObject.kOverwrite)
-        of.Close()
+                of.mkdir(outdir_str)
+                outdir = of.Get(outdir_str)
+
+                for h in hs:
+                    h.SetDirectory(outdir)
+                outdir.Write("", ROOT.TObject.kOverwrite)
+            if self.do_stat_variations:
+                makeStatVariations(of, of, [l.discriminator_axis], [l.__repr__()], processes)
+            fakeData(of, of, [l.discriminator_axis], [l.__repr__()], processes)
+            of.Close()
+        # End of loop over categories
+           
+    def getProcesses(self):
+        return self.h_sig.keys() + self.h_bkg.keys()
+    
+    def getLeaf(self):
+        return self.h_sig.keys() + self.h_bkg.keys()
 
     def latex_preamble(self):
         return r"""\documentclass[border=5pt]{standalone}
