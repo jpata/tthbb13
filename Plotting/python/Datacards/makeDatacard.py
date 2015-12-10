@@ -21,7 +21,7 @@ def PrintDatacard(event_counts, datacard, dcof):
         analysis_var = datacard.distributions[cat]
         dcof.write("shapes * {0} {1} $PROCESS/$CHANNEL/{2} $PROCESS/$CHANNEL/{2}_$SYSTEMATIC\n".format(
             cat,
-            datacard.histfilenames_cat.get(cat, datacard.histfilename),
+            datacard.filenames_cat[cat],
             analysis_var)
         )
         
@@ -247,15 +247,33 @@ def MakeDatacard(infile_paths, outfile_path, shapefile_path, do_stat_variations=
 
 
 def MakeDatacard2(
-    processes,
-    allcats,
-    hists_per_category,
+    categorization,
     infile_paths,
     shapefile_path,
     do_stat_variations=False
     ):
-    dcard = Datacard(processes, allcats, hists_per_category)
+    categories = categorization.getCategories()
+    #FIXME: hardcoded signal process name
+
+    #Find yields per category
+    badcats = []
+    for cat in categories:
+        sig = categorization.event_counts["ttH_hbb"][cat]
+        bkg = sum([categorization.event_counts[k][cat] for k in categorization.getProcesses() if k!="ttH_hbb"])
+        if sig == 0 and bkg == 0:
+            badcats += [cat]
+
+    for cat in badcats:
+        print "removing category", cat
+        categories.pop(categories.index(cat))
+    dcard = Datacard(
+        categorization.getProcesses(),
+        categories,
+        categorization.getLeafDiscriminators()
+    )
+    dcard.filenames_cat = infile_paths
     shapefile = open(shapefile_path, "w")
+    PrintDatacard(categorization.event_counts, dcard, shapefile)
 
 import datacard as datacard
 
@@ -290,28 +308,3 @@ def getDistributions(ofile, process, category):
     for k in d.GetListOfKeys():
         distributions += [k.GetName()]
     return distributions
-
-if __name__ == "__main__":
-    # Get the input proto-datacard
-
-    MakeDatacard(sys.argv[1], "shapes.root", "shapes.txt", do_stat_variations=False)
-
-
-    # import cProfile
-    # 
-    # def f():
-    #     #finalize datacard to txt file
-    #     for i in range(10):
-    #         MakeDatacard(sys.argv[1], "shapes.root", "shapes.txt", do_stat_variations=False)
-    # 
-    # cProfile.run("f()")
-    
-    # timeit.timeit("g()", number=10)
-    import time
-    # 
-    # n = 10
-    # t0 = time.time()
-    # for i in range(n):
-    #     MakeDatacard(sys.argv[1], "shapes.root", "shapes.txt", do_stat_variations=False)
-    # t1 = time.time()
-    # print (t1-t0)/float(n)

@@ -1,4 +1,19 @@
-from TTH.Plotting.Datacards.MiniSamples import path
+import os
+
+hostname = os.environ.get("HOSTNAME", "")
+#PSI
+if "t3ui12" in hostname:
+    path = "/scratch/gregor/jpata/tth/Oct5_bdt_022sj_V13_47cdf50/"
+#Jooseps laptop
+elif "pata-slc6" in hostname:
+    path = "/home/joosep/joosep-mac/Documents/tth/data/ntp/v14/me/"
+#Tallinn
+elif "quasar" in hostname:
+    path = "/dev/shm/joosep/"
+elif "hep.kbfi.ee" in hostname:
+    path = "/home/joosep/tth/gc/"
+else:
+    raise Exception("Sample path not defined for hostname={0}!".format(hostname))
 
 class Sample:
     def __init__(self, name, filenames, prefix):
