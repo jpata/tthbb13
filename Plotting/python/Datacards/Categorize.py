@@ -728,6 +728,7 @@ class Categorization(object):
             
             processes = []
             # Nominal
+            print "nom loop"
             for process, thn in self.h_sig.items() + self.h_bkg.items():
 
                 # Get the output directory (inside the TFile)
@@ -748,11 +749,12 @@ class Categorization(object):
                     self.event_counts[process] = {}
                 self.event_counts[process][leaf.__repr__()] = h.Integral()
 
-                dirs[outdir_str].append(h.Clone())
+                dirs[outdir_str].append(h)
                 processes += [process]
             # End of loop over processes
 
             # Systematic Variations
+            print "syst loop"
             for process, hs in self.h_sig_sys.items() + self.h_bkg_sys.items():
 
                 # Get the output directory (inside the TFile)
@@ -770,7 +772,7 @@ class Categorization(object):
                         h = thn.Projection(self.axes.keys().index(leaf.discriminator_axis), "E")
                         h.SetName(hname)
                         Categorization.allhists[k] = h
-                    dirs[outdir_str].append(h.Clone())
+                    dirs[outdir_str].append(h)
 
             # End of loop over systematics
             # End of loop over processes
