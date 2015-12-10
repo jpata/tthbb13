@@ -20,6 +20,13 @@ trees["old"] = """
           nBCSVM__4__8 Discr=mem_SL_0w2h2t
 """
 
+#trees["old"] = """
+#  Discr=mem_SL_0w2h2t
+#    numJets__4__5 Discr=mem_SL_0w2h2t 
+#       nBCSVM__3__4 Discr=mem_SL_0w2h2t
+#       nBCSVM__4__5 Discr=mem_SL_0w2h2t
+#"""
+
 trees["old_dl"] = """
   Discr=mem_DL_0w2h2t
      nBCSVM__2__3 Discr=mem_DL_0w2h2t

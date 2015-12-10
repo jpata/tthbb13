@@ -117,6 +117,8 @@ class JetAnalyzer(FilterAnalyzer):
         return self.conf.general["passall"] or np.any([v.passes_jet for v in event.systResults.values()])
 
     def _process(self, event):
+
+        #choose pt cut key based on lepton channel
         pt_cut  = "pt"
         eta_cut = "eta"
         if event.is_sl:
@@ -128,28 +130,38 @@ class JetAnalyzer(FilterAnalyzer):
 
         #define lepton-channel specific selection function
         jetsel = lambda x, self=self: (
-            x.pt > self.conf.jets[ pt_cut ]
-            and abs(x.eta) < self.conf.jets[ eta_cut ]
+            x.pt > self.conf.jets[pt_cut]
+            and abs(x.eta) < self.conf.jets[eta_cut]
+            and self.conf.jets["selection"](x)
+        )
+        
+        jetsel_loose_pt = lambda x, self=self: (
+            x.pt > 20
+            and abs(x.eta) < self.conf.jets[eta_cut]
             and self.conf.jets["selection"](x)
         )
 
-        event.good_jets = sorted(filter(
-            lambda x, jetsel=jetsel: jetsel(x), event.Jet+event.DiscardedJet
+        #Identify loose jets by (pt, eta)
+        loose_jets = sorted(filter(
+            jetsel_loose_pt, event.Jet+event.DiscardedJet
             ), key=lambda x: x.pt, reverse=True
         )
-        if event.is_dl:
-            good_jets_leading = filter(
-                lambda x, self=self: x.pt > self.conf.jets["pt_sl"],
-                event.good_jets[:2]
-            )
-            event.good_jets = good_jets_leading + event.good_jets[2:]
+
+        #In DL, the leading two jets must pass the tighter pt cut,
+        #whereas the trailing can pass the looser
+        #if event.is_dl:
+        #    good_jets_leading = filter(
+        #        lambda x, self=self: x.pt > self.conf.jets["pt_sl"],
+        #        event.good_jets[:2]
+        #    )
+        #    event.good_jets = good_jets_leading + event.good_jets[2:]
 
 
         #Take care of overlaps between jets and veto leptons
         jets_to_remove = []
         for lep in event.veto_leptons:
             #overlaps removed by delta R
-            for jet in event.good_jets:
+            for jet in loose_jets:
                 lv1 = lvec(jet)
                 lv2 = lvec(lep)
                 dr = lv1.DeltaR(lv2)
@@ -162,32 +174,41 @@ class JetAnalyzer(FilterAnalyzer):
         for jet in jets_to_remove:
             if "jets" in self.conf.general["verbosity"] or "debug" in self.conf.general["verbosity"]:
                 print "removing jet", jet.pt, jet.eta
-            if jet in event.good_jets:
-                event.good_jets.remove(jet)
+            if jet in loose_jets:
+                loose_jets.remove(jet)
         
         #in DL apply two-stage pt cuts
         #Since this relies on jet counting, needs to be done **after** any other jet filtering
         if event.is_dl:
-            good_jets = []
-            for jet in event.good_jets:
-                if len(good_jets) < 2:
+            good_jets_dl = []
+            for jet in loose_jets:
+                if len(good_jets_dl) < 2:
                     ptcut = self.conf.jets["pt_sl"]
                 else:
                     ptcut = self.conf.jets["pt_dl"]
                 if jet.pt > ptcut:
-                    good_jets += [jet]
-            event.good_jets = good_jets
+                    good_jets_dl += [jet]
+            loose_jets = good_jets_dl
+
+        #Now apply true pt cuts to identify analysis jets
+        event.good_jets = filter(jetsel, loose_jets)
+        event.loose_jets = filter(lambda x, event=event: x not in event.good_jets, loose_jets) 
 
         if "debug" in self.conf.general["verbosity"]:
             print "All jets: ", len(event.Jet)+len(event.DiscardedJet)
             for x in event.Jet+event.DiscardedJet:
                 print "\t(%s, %s, neHEF=%s, chEmEF=%s, neEmEF=%s, nod=%s, chHEF=%s, chMult=%s, neMult=%s, muEF=%s, csv=%s id=%d jec=%s jer=%s)" % (x.pt, x.eta, x.neHEF, x.chEmEF, x.neEmEF, x.numberOfDaughters, x.chHEF, x.chMult, x.neMult, x.muEF, x.btagCSV, x.id, x.corr, x.corr_JER)
+            
+            print "Loose jets: ", len(event.loose_jets)
+            for x in event.loose_jets:
+                print "\t(%s, %s, neHEF=%s, chEmEF=%s, neEmEF=%s, nod=%s, chHEF=%s, chMult=%s, neMult=%s, muEF=%s, csv=%s id=%d jec=%s jer=%s)" % (x.pt, x.eta, x.neHEF, x.chEmEF, x.neEmEF, x.numberOfDaughters, x.chHEF, x.chMult, x.neMult, x.muEF, x.btagCSV, x.id, x.corr, x.corr_JER)
+            
             print "Good jets: ", len(event.good_jets)
             for x in event.good_jets:
                 print "\t(%s, %s, neHEF=%s, chEmEF=%s, neEmEF=%s, nod=%s, chHEF=%s, chMult=%s, neMult=%s, muEF=%s, csv=%s id=%d jec=%s jer=%s)" % (x.pt, x.eta, x.neHEF, x.chEmEF, x.neEmEF, x.numberOfDaughters, x.chHEF, x.chMult, x.neMult, x.muEF, x.btagCSV, x.id, x.corr, x.corr_JER)
 
         #Assing jet transfer functions
-        for jet in event.good_jets:
+        for jet in event.loose_jets + event.good_jets:
             attach_jet_transfer_function(jet, self.conf)
 
         event.numJets = len(event.good_jets)
@@ -237,6 +258,8 @@ class JetAnalyzer(FilterAnalyzer):
                 if event.good_jets[5].pt<self.conf.jets["pt_fh"]:
                     passes = False
 
+
+        #Calculate jet corrections to MET
         corrMet_px = event.MET.px
         corrMet_py = event.MET.py
         sum_dEx = 0
@@ -259,6 +282,7 @@ class JetAnalyzer(FilterAnalyzer):
         event.MET_jetcorr = MET(px=corrMet_px, py=corrMet_py)
         event.passes_jet = passes
         
+        #Do gen-jet analysis
         if self.cfg_comp.isMC:
             genjets = event.GenJet
             for jet in event.good_jets:

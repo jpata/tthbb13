@@ -12,6 +12,7 @@ import sys
 import math
 import pickle
 import copy
+import numpy as np
 
 from collections import OrderedDict
 
@@ -82,6 +83,7 @@ class Categorization(object):
         self.children = []
         self.cut = cut
         self.discriminator_axis = discriminator_axis
+        self.iteration_results = []
         
     # Allow directly accessing the children
     def __getitem__(self, key):
@@ -260,8 +262,6 @@ class Categorization(object):
                     _limits, _quantiles = li_limits.pop(0)
                     l = _limits[2]
                     limits[str(n)+str(ignore_splitting)] = l
-                    print n.i_split_self, n.i_split_comb, n, l
-        print limits
         ret = ""        
         
         if depth == 0:
@@ -288,7 +288,8 @@ class Categorization(object):
         for c in self.children:
             
             # Ignore pruned away leaves
-            if len(c.children)==0 and not c.discriminator_axis is None:
+            if len(c.children)==0 and c.discriminator_axis is None:
+                print "Ignoring leaf", c
                 continue
 
             ret += "[\n"
@@ -526,15 +527,15 @@ class Categorization(object):
 
                     # Loop over all leaves - these are the categories that we
                     # could split further
-                    for l in self.get_leaves():
+                    for leaf in self.get_leaves():
                             
-                        for discriminator_axis_for_child_0  in discriminator_axes:
-                            for discriminator_axis_for_child_1 in discriminator_axes:
+                        for discriminator_axis_for_child_0 in getattr(leaf, "disc_axes_child_left", discriminator_axes):
+                            for discriminator_axis_for_child_1 in getattr(leaf, "disc_axes_child_right", discriminator_axes):
 
                                 # The split function executes the split
                                 # If it failed (return value of -1) - for example because the requested range is already excluded
                                 # we go to the next one
-                                if l.split(axis_name, 
+                                if leaf.split(axis_name, 
                                            split_bin,
                                            discriminator_axis_for_child_0,
                                            discriminator_axis_for_child_1)==-1:
@@ -554,7 +555,7 @@ class Categorization(object):
                                              shapes_txt_filename,
                                              do_stat_variations=self.do_stat_variations)
 
-                                splittings[shapes_txt_filename] = [l, 
+                                splittings[shapes_txt_filename] = [leaf, 
                                                                    axis_name, 
                                                                    split_bin,
                                                                    discriminator_axis_for_child_0,
@@ -562,20 +563,38 @@ class Categorization(object):
                                 i_splitting += 1
 
                                 # Undo the split
-                                l.merge()
+                                leaf.merge()
 
                     # End of loop over leaves
                 # End of loop over histogram bins
             # End of loop over axes
 
             # Extract a list todo and pass them to the limit calculation
-            li_splittings = splittings.keys()        
+            li_splittings = splittings.keys()
 
             li_limits = self.pool.map(self.lg, li_splittings)
 
             # build a list of tuples with limit name and numerical value
             li_name_limits = [(name,limit[0][2]) for name,limit in zip(li_splittings, li_limits)]
-            
+           
+            split_limits = {}
+            for (spl_filename, spl), lim in zip(splittings.items(), li_limits):
+                spl = tuple(spl)
+                ax = self.axes[spl[1]]
+                bins = np.linspace(ax.xmin, ax.xmax, ax.nbins+1)
+                bin_x = bins[spl[2]]
+                split_limits[spl] = (bin_x, lim[0])
+
+          
+            #store x-y coordinates of all split optimizations
+            li_plots = {}
+            for spl in sorted(split_limits.keys()):
+                li_plots[(spl[0], spl[1], spl[3], spl[4])] = []
+
+            for spl in sorted(split_limits.keys()):
+                li_plots[(spl[0], spl[1], spl[3], spl[4])] += [split_limits[spl]]
+            self.iteration_results += [li_plots]
+
             # sort by limit and take the lowest/best one
             best_splitting_name, best_limit = sorted(li_name_limits, key = lambda x:x[1])[0]
             best_split = splittings[best_splitting_name]
@@ -666,7 +685,6 @@ class Categorization(object):
 
 
     def create_control_plots(self, name, ignore_splitting = False):
-        #print "create_control_plots", name, ignore_splitting 
         of = ROOT.TFile(name, "RECREATE")
 
         dirs = {}
@@ -677,9 +695,7 @@ class Categorization(object):
             leaves = self.get_leaves()
 
         # Loop over categories
-        #print "looping over leaves"
         for l in leaves:
-            #print "leaf", l
 
             if  l.discriminator_axis is None:
                 continue
@@ -688,9 +704,7 @@ class Categorization(object):
 
             ROOT.gROOT.ls()
             # Nominal
-            #print "looping over nom"
             for process, thn in self.h_sig.items() + self.h_bkg.items():
-                #print "process", process
 
                 # Get the output directory (inside the TFile)
                 outdir_str = "{0}/{1}".format(process, l)
@@ -708,12 +722,10 @@ class Categorization(object):
                     Categorization.allhists[k] = h
                     #Categorization.allhists[k].SetDirectory(Categorization.memdir)
                     #h.SetName(hname)
-                #print k, h.Integral()
                 dirs[outdir_str].append(h.Clone())
             # End of loop over processes
 
             # Systematic Variations
-            #print "looping over syst"
             for process, hs in self.h_sig_sys.items() + self.h_bkg_sys.items():
 
                 # Get the output directory (inside the TFile)
@@ -734,15 +746,12 @@ class Categorization(object):
                         Categorization.allhists[k] = h
                         #Categorization.allhists[k].SetDirectory(Categorization.memdir)
                         #h.SetName(hname)
-                    #print k, h.Integral()
                     dirs[outdir_str].append(h.Clone())
 
                 # End of loop over systematics
             # End of loop over processes
-            #print "end of loop over categories"
         # End of loop over categories
             
-        #print "writing histograms"
         for outdir_str, hs in dirs.iteritems():
                         
             of.mkdir(outdir_str)
@@ -752,8 +761,6 @@ class Categorization(object):
                 h.SetDirectory(outdir)
             outdir.Write("", ROOT.TObject.kOverwrite)
         of.Close()
-        #print "done writing histograms"
-        #print Categorization.allhists
 
     def latex_preamble(self):
         return r"""\documentclass[border=5pt]{standalone}

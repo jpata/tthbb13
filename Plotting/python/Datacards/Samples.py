@@ -9,120 +9,58 @@ class Sample:
 samples_dict = {
     "SingleMuon": Sample(
         "SingleMuon",
-        [path + "cfg_withME_updateBWeight/SingleMuon.root"],
+        [path + "cfg_withME/SingleMuon.root"],
         ""
     ),
     "SingleElectron": Sample(
         "SingleElectron",
-        [path + "cfg_withME_updateBWeight/SingleElectron.root"],
+        [path + "cfg_withME/SingleElectron.root"],
         ""
     ),
     "DoubleMuon": Sample(
         "DoubleMuon",
-        [path + "cfg_withME_updateBWeight/DoubleMuon.root"],
+        [path + "cfg_withME/DoubleMuon.root"],
         ""
     ),
     "DoubleEG": Sample(
         "DoubleEG",
-        [path + "cfg_withME_updateBWeight/DoubleEG.root"],
+        [path + "cfg_withME/DoubleEG.root"],
         ""
     ),
     "MuonEG": Sample(
         "MuonEG",
-        [path + "cfg_withME_updateBWeight/MuonEG.root"],
+        [path + "cfg_withME/MuonEG.root"],
         ""
     ),
 
     "ttH_hbb": Sample(
         "ttH_hbb",
-        [path + "cfg_withME_updateBWeight/ttHTobb_M125_13TeV_powheg_pythia8.root"],
+        [path + "cfg_withME/ttHTobb_M125_13TeV_powheg_pythia8.root"],
         ""
     ),
     "ttbarPlus2B": Sample(
         "ttbarPlus2B", 
-        [path + "cfg_withME_updateBWeight/TT_TuneCUETP8M1_13TeV-powheg-pythia8_tt2b.root"],
+        [path + "cfg_withME/TT_TuneCUETP8M1_13TeV-powheg-pythia8_tt2b.root"],
         "",
     ),
     "ttbarPlusB": Sample(
         "ttbarPlusB", 
-        [path + "cfg_withME_updateBWeight/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttb.root"],
+        [path + "cfg_withME/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttb.root"],
         "",
     ),
     "ttbarPlusBBbar": Sample(
         "ttbarPlusBBbar", 
-        [path + "cfg_withME_updateBWeight/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttbb.root"],
+        [path + "cfg_withME/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttbb.root"],
         "",
     ),
     "ttbarPlusCCbar": Sample(
         "ttbarPlusCCbar", 
-        [path + "cfg_withME_updateBWeight/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttcc.root"],
+        [path + "cfg_withME/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttcc.root"],
         "",
     ),
     "ttbarOther": Sample(
         "ttbarOther", 
-        [path + "cfg_withME_updateBWeight/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttll.root"],
+        [path + "cfg_withME/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttll.root"],
         "",
     ),
-    
-#    "ttH_hbb_cfg_noME_jetPt20": Sample(
-#        "ttH_hbb",
-#        [path + "cfg_noME_jetPt20/ttHTobb_M125_13TeV_powheg_pythia8.root"],
-#        "_cfg_noME_jetPt20"
-#    ),
-#    "ttbarPlus2B_cfg_noME_jetPt20": Sample(
-#        "ttbarPlus2B", 
-#        [path + "cfg_noME_jetPt20/TT_TuneCUETP8M1_13TeV-powheg-pythia8_tt2b.root"],
-#        "_cfg_noME_jetPt20"
-#    ),
-#    "ttbarPlusB_cfg_noME_jetPt20": Sample(
-#        "ttbarPlusB", 
-#        [path + "cfg_noME_jetPt20/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttb.root"],
-#        "_cfg_noME_jetPt20"
-#    ),
-#    "ttbarPlusBBbar_cfg_noME_jetPt20": Sample(
-#        "ttbarPlusBBbar", 
-#        [path + "cfg_noME_jetPt20/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttbb.root"],
-#        "_cfg_noME_jetPt20"
-#    ),
-#    "ttbarPlusCCbar_cfg_noME_jetPt20": Sample(
-#        "ttbarPlusCCbar", 
-#        [path + "cfg_noME_jetPt20/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttcc.root"],
-#        "_cfg_noME_jetPt20"
-#    ),
-#    "ttbarOther_cfg_noME_jetPt20": Sample(
-#        "ttbarOther", 
-#        [path + "cfg_noME_jetPt20/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttll.root"],
-#        "_cfg_noME_jetPt20"
-#    ),
-#    
-#    "ttH_hbb_cfg_noME_btagBDT": Sample(
-#        "ttH_hbb",
-#        [path + "cfg_noME_btagBDT/ttHTobb_M125_13TeV_powheg_pythia8.root"],
-#        "_cfg_noME_btagBDT"
-#    ),
-#    "ttbarPlus2B_cfg_noME_btagBDT": Sample(
-#        "ttbarPlus2B", 
-#        [path + "cfg_noME_btagBDT/TT_TuneCUETP8M1_13TeV-powheg-pythia8_tt2b.root"],
-#        "_cfg_noME_btagBDT"
-#    ),
-#    "ttbarPlusB_cfg_noME_btagBDT": Sample(
-#        "ttbarPlusB", 
-#        [path + "cfg_noME_btagBDT/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttb.root"],
-#        "_cfg_noME_btagBDT"
-#    ),
-#    "ttbarPlusBBbar_cfg_noME_btagBDT": Sample(
-#        "ttbarPlusBBbar", 
-#        [path + "cfg_noME_btagBDT/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttbb.root"],
-#        "_cfg_noME_btagBDT"
-#    ),
-#    "ttbarPlusCCbar_cfg_noME_btagBDT": Sample(
-#        "ttbarPlusCCbar", 
-#        [path + "cfg_noME_btagBDT/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttcc.root"],
-#        "_cfg_noME_btagBDT"
-#    ),
-#    "ttbarOther_cfg_noME_btagBDT": Sample(
-#        "ttbarOther", 
-#        [path + "cfg_noME_btagBDT/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttll.root"],
-#        "_cfg_noME_btagBDT"
-#    )
 }

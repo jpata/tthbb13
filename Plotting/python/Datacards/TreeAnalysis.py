@@ -49,17 +49,25 @@ backgrounds = [
 # Analysis helper functions
 ########################################
 
-def split_leaves_by_BLR():
+def split_leaves_by_BLR(original):
     """ Attempt to optimize BLR splitting of classic analysis categories """
 
-    r = Categorize.CategorizationFromString(trees["old"])
+    r = Categorize.CategorizationFromString(original)
     initial_leaves = r.get_leaves()
-    cut_axes = [8] #btag LR axis
-    discriminator_axes = [0, 1, 2] #MEM SL 022 axis
+    cut_axes = ["btag_LR_4b_2b_logit"]
+    discriminator_axes = ["mem_SL_0w2h2t"] #MEM SL 022 axis
     for l in initial_leaves:
-        l.find_categories_async(1, 
-                                cut_axes, 
-                                discriminator_axes)
+        print "Optimizing leaf", l
+
+        #for left-handed child (bg-like), don't use MEM discriminator, just a counting experiment
+        l.disc_axes_child_left = ["counting"]
+        l.find_categories_async(
+            1,
+            cut_axes,
+            discriminator_axes
+        )
+        #import pdb
+        #pdb.set_trace()
     return r
 # End of split_leaves_by_BLR
 
@@ -75,7 +83,7 @@ def optimize(r):
     #axes[1].discPrereq = [Cut(3,3,3)]
 
     cut_axes = ["numJets", "nBCSVM", "btag_LR_4b_2b_logit", "Wmass"]
-    discriminator_axes = ["mem_SL_2w2h2t", "mem_SL_0w2h2t"]
+    discriminator_axes = ["mem_SL_2w2h2t"]
     
     r.find_categories_async(n_iter, 
                             cut_axes, 
@@ -131,27 +139,31 @@ if __name__ == "__main__":
     #make_latex("old_dl")
     #make_latex("old_2t")
 
-    #r = split_leaves_by_BLR()
-    #of = open("old_blr.tex", "w")
-    #of.write(r.print_tree_latex())
-    #of.close()
-
-    print "Optimization"
-    r = Categorize.CategorizationFromString(trees["3cat"])
-    name = "opt"
-
-    import cProfile, time
-    def f(): optimize(r)
-    p = cProfile.Profile(time.clock)
-    p.runcall(f)
-    p.print_stats()
-    
-    of = open( name + ".tex","w")
+    r = split_leaves_by_BLR(trees["old"])
+    of = open("old_blr.tex", "w")
+    print r.print_tree()
     of.write(r.print_tree_latex())
     of.close()
-    of = open(name + ".pickle", "w")
+    of = open("old_blr.pickle", "w")
     of.write(pickle.dumps(r))
     of.close()
+
+    #print "Optimization"
+    #r = Categorize.CategorizationFromString(trees["3cat"])
+    #name = "opt"
+
+    #import cProfile, time
+    #def f(): optimize(r)
+    #p = cProfile.Profile(time.clock)
+    #p.runcall(f)
+    #p.print_stats()
+    #
+    #of = open( name + ".tex","w")
+    #of.write(r.print_tree_latex())
+    #of.close()
+    #of = open(name + ".pickle", "w")
+    #of.write(pickle.dumps(r))
+    #of.close()
 
 
     #for i in range(5,7):
