@@ -8,7 +8,7 @@ if "t3ui12" in hostname:
 elif "pata-slc6" in hostname:
     path = "/home/joosep/joosep-mac/Documents/tth/data/ntp/v14/me/"
 elif "pata-macbook" in hostname:
-    path = "/Users/joosep/Documents/tth/data/ntp/v14/me/"
+    path = "/Users/joosep/Documents/tth/data/ntp/v16/me/"
 #Tallinn
 elif "quasar" in hostname:
     path = "/dev/shm/joosep/"

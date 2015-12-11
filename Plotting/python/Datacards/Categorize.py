@@ -224,25 +224,26 @@ class Categorization(object):
 
             i_split = 0
 
-            for ignore_splitting in [True,False]:
+            for ignore_splittings in [True,False]:
 
                 for node in nodes_to_eval:
-                    shapes_txt_filename    = "{0}/shapes_tree_{1}_NS{2}.txt".format(node.output_path, i_split, ignore_splitting)
+                    shapes_txt_filename    = "{0}/shapes_tree_{1}_NS{2}.txt".format(node.output_path, i_split, ignore_splittings)
 
                     filenames.append(shapes_txt_filename)
-                    if ignore_splitting:
+                    if ignore_splittings:
                         node.shapes_txt_filename_self = shapes_txt_filename
                         node.i_split_self = i_split
                     else:
                         node.shapes_txt_filename_comb = shapes_txt_filename
                         node.i_split_comb = i_split
 
-                    n.create_control_plots(self.output_path, ignore_splitting = ignore_splitting)
+                    node.create_control_plots(self.output_path, ignore_splittings = ignore_splittings)
                     MakeDatacard2(
                         node,
                         self.leaf_files,
                         shapes_txt_filename,
-                        do_stat_variations=self.do_stat_variations
+                        do_stat_variations = self.do_stat_variations,
+                        ignore_splittings = ignore_splittings
                     )
                     i_split += 1
                 #end of loop over nodes
@@ -375,10 +376,13 @@ class Categorization(object):
         return S,B
 
 
-    def get_leaves(self):
+    def get_leaves(self, ignore_splittings=False):
         """ Return a list of leaves at or below the current node"""
 
         leaves = []
+        if ignore_splittings:
+            return [self]
+
         if self.children:
             for c in self.children:
                 leaves.extend(c.get_leaves())
@@ -686,22 +690,22 @@ class Categorization(object):
         return name
 
 
-    def create_control_plots(self, path, ignore_splitting = False):
+    def create_control_plots(self, path, ignore_splittings = False):
         """
         Creates the root files containing the 1D templates for this categorization.
         Each category will be saved into a separate file. If a control plot for a category
         has already been created, it is not recreated and is instead read from self.leaf_files
 
         path (string) - output path, e.g. /scratch/$USER
-        ignore_splitting (bool) - if True, nodes will be merged (FIXME).
+        ignore_splittings (bool) - if True, nodes will be merged (FIXME).
 
         returns: nothing
         """
-        if ignore_splitting:
+        if ignore_splittings:
             leaves = [self]
         else:
             leaves = self.get_leaves()
-
+        print "create_control_plots", leaves
         event_counts = {}
 
         # Loop over categories
@@ -789,12 +793,12 @@ class Categorization(object):
     def getProcesses(self):
         return self.h_sig.keys() + self.h_bkg.keys()
 
-    def getCategories(self):
-        return [l.__repr__() for l in self.get_leaves()]   
+    def getCategories(self, ignore_splittings):
+        return [l.__repr__() for l in self.get_leaves(ignore_splittings)]   
 
-    def getLeafDiscriminators(self):
+    def getLeafDiscriminators(self, ignore_splittings):
         ret = {}
-        for leaf in self.get_leaves():
+        for leaf in self.get_leaves(ignore_splittings):
             ret[leaf.__repr__()] = leaf.discriminator_axis
         return ret
 

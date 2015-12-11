@@ -24,7 +24,7 @@ class MEMConfig:
         self.l_quark_candidates = lambda event: event.wquark_candidate_jets
         self.lepton_candidates = lambda event: event.good_leptons
         self.met_candidates = lambda event: event.MET
-        self.transfer_function_method = MEM.TFMethod.External
+        self.cfg.transfer_function_method = MEM.TFMethod.External
 
         self.do_calculate = lambda event, config: False
         self.mem_assumptions = set([])

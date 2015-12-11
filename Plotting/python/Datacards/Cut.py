@@ -134,6 +134,11 @@ class Cut(object):
             if axis_name == "n_excluded_ljets":
                 axis_name = r"n_{boost}\; l"
 
+            if axis_name == "numJets":
+                axis_name = r"n_{j}"
+
+            if axis_name == "nBCSVM":
+                axis_name = r"n_{b}"
 
             if upper == int(upper):
                 string_upper = "{0}".format(upper)

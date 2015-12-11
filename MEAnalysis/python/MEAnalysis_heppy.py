@@ -39,6 +39,7 @@ conf.tf_matrix = pickle.load(pi_file)
 # eval_gen:specifies how the transfer functions are interpreted
 #     If True, TF [0] - reco, x - gen
 #     If False, TF [0] - gen, x - reco
+#FIXME!!!: remove this flag in future versions!
 eval_gen=False
 conf.tf_formula = {}
 for fl in ["b", "l"]:
