@@ -21,7 +21,7 @@ import ROOT
 from Axis import axis
 from Cut import Cut
 
-from makeDatacard import MakeDatacard, MakeDatacard2
+from makeDatacard import MakeDatacard2
 from datacardCombiner import makeStatVariations, fakeData
 
 ROOT.TH1.AddDirectory(0)
@@ -245,15 +245,12 @@ class Categorization(object):
                         n.i_split_comb = i_split
 
                     n.create_control_plots(control_plots_filename, ignore_splitting = ignore_splitting)
-#                    MakeDatacard2(
-#                        processes,
-#                        allcats,
-#                        hists_per_category,
-#                        infile_paths,
-#                        shapefile_path,
-#                        do_stat_variations=False
-#                    )
-
+                    MakeDatacard2(
+                        self,
+                        self.leaf_files,
+                        shapes_txt_filename,
+                        do_stat_variations=self.do_stat_variations
+                    )
                     i_split += 1
 
             li_limits = self.pool.map(self.lg, [f for f in filenames])
@@ -713,14 +710,12 @@ class Categorization(object):
             
             #leaf already created
             if self.leaf_files.has_key(leaf.__repr__()):
-                print "leaf exists", leaf_fname
                 continue
 
             #This leaf is specified to be removed from the fit
             if leaf.discriminator_axis is None:
                 continue
 
-            print "creating", leaf_fname
             of = ROOT.TFile(leaf_fname, "RECREATE")
             self.leaf_files[leaf.__repr__()] = leaf_fname
 
@@ -728,7 +723,6 @@ class Categorization(object):
             
             processes = []
             # Nominal
-            print "nom loop"
             for process, thn in self.h_sig.items() + self.h_bkg.items():
 
                 # Get the output directory (inside the TFile)
@@ -754,7 +748,6 @@ class Categorization(object):
             # End of loop over processes
 
             # Systematic Variations
-            print "syst loop"
             for process, hs in self.h_sig_sys.items() + self.h_bkg_sys.items():
 
                 # Get the output directory (inside the TFile)
@@ -776,7 +769,6 @@ class Categorization(object):
 
             # End of loop over systematics
             # End of loop over processes
-            print "writing"
             for outdir_str, hs in dirs.iteritems():
 
                 of.mkdir(outdir_str)
@@ -789,7 +781,6 @@ class Categorization(object):
                 makeStatVariations(of, of, [leaf.discriminator_axis], [leaf.__repr__()], processes)
             fakeData(of, of, [leaf.discriminator_axis], [leaf.__repr__()], processes)
             of.Close()
-            print "done writing"
 
         # End of loop over categories
            
