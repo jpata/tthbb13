@@ -213,7 +213,6 @@ class Categorization(object):
 
     def print_tree_latex(self, depth=0, limits = {}):    
         """  """
-        print "print_latex_tree"
 
         S,B = self.get_sb()
 
@@ -221,42 +220,36 @@ class Categorization(object):
         if depth == 0:
                                     
             nodes_to_eval = [n for n in self.get_offspring() if not n.discriminator_axis is None]
-            #nodes_to_eval = [self]
             filenames = []
 
             i_split = 0
 
             for ignore_splitting in [True,False]:
 
-                for n in nodes_to_eval:
-                    control_plots_filename = "{0}/ControlPlots_{1}_NS{2}.root".format(n.output_path, i_split, ignore_splitting)
-                    shapes_txt_filename    = "{0}/shapes_{1}_NS{2}.txt".format(n.output_path, i_split, ignore_splitting)
-                    shapes_root_filename   = "{0}/shapes_{1}_NS{2}.root".format(n.output_path, i_split, ignore_splitting)
+                for node in nodes_to_eval:
+                    shapes_txt_filename    = "{0}/shapes_tree_{1}_NS{2}.txt".format(node.output_path, i_split, ignore_splitting)
 
                     filenames.append(shapes_txt_filename)
                     if ignore_splitting:
-                        n.control_plots_filename_self = control_plots_filename
-                        n.shapes_txt_filename_self = shapes_txt_filename
-                        n.shapes_root_filename_self = shapes_root_filename
-                        n.i_split_self = i_split
+                        node.shapes_txt_filename_self = shapes_txt_filename
+                        node.i_split_self = i_split
                     else:
-                        n.control_plots_filename_comb = control_plots_filename
-                        n.shapes_txt_filename_comb = shapes_txt_filename
-                        n.shapes_root_filename_comb = shapes_root_filename
-                        n.i_split_comb = i_split
+                        node.shapes_txt_filename_comb = shapes_txt_filename
+                        node.i_split_comb = i_split
 
                     n.create_control_plots(self.output_path, ignore_splitting = ignore_splitting)
                     MakeDatacard2(
-                        self,
+                        node,
                         self.leaf_files,
                         shapes_txt_filename,
                         do_stat_variations=self.do_stat_variations
                     )
                     i_split += 1
+                #end of loop over nodes
+            #end of loop over split/not split
 
             li_limits = self.pool.map(self.lg, [f for f in filenames])
             self.li_limits = copy.deepcopy(li_limits)
-
             for n in nodes_to_eval:
                 n.limits_self = li_limits[n.i_split_self]
                 n.limits_comb = li_limits[n.i_split_comb]
