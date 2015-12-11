@@ -213,6 +213,7 @@ class Categorization(object):
 
     def print_tree_latex(self, depth=0, limits = {}):    
         """  """
+        print "print_latex_tree"
 
         S,B = self.get_sb()
 
@@ -244,7 +245,7 @@ class Categorization(object):
                         n.shapes_root_filename_comb = shapes_root_filename
                         n.i_split_comb = i_split
 
-                    n.create_control_plots(control_plots_filename, ignore_splitting = ignore_splitting)
+                    n.create_control_plots(self.output_path, ignore_splitting = ignore_splitting)
                     MakeDatacard2(
                         self,
                         self.leaf_files,
@@ -266,7 +267,7 @@ class Categorization(object):
                     _limits, _quantiles = li_limits.pop(0)
                     l = _limits[2]
                     limits[str(n)+str(ignore_splitting)] = l
-        ret = ""        
+        ret = ""
         
         if depth == 0:
             ret += self.latex_preamble() + "["
@@ -555,7 +556,7 @@ class Categorization(object):
 
                                 # Here always evaluate the full tree!
                                 root = self.get_root()
-                                root.create_control_plots(self.output_path)                        
+                                root.create_control_plots(self.output_path)
                                 MakeDatacard2(
                                     self,
                                     self.leaf_files,
@@ -693,8 +694,16 @@ class Categorization(object):
 
 
     def create_control_plots(self, path, ignore_splitting = False):
-        print "create_control_plots", path, ignore_splitting
-                
+        """
+        Creates the root files containing the 1D templates for this categorization.
+        Each category will be saved into a separate file. If a control plot for a category
+        has already been created, it is not recreated and is instead read from self.leaf_files
+
+        path (string) - output path, e.g. /scratch/$USER
+        ignore_splitting (bool) - if True, nodes will be merged (FIXME).
+
+        returns: nothing
+        """
         if ignore_splitting:
             leaves = [self]
         else:

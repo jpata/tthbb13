@@ -24,7 +24,7 @@ output_path = "/scratch/joosep/test/"
 #input_file = "/dev/shm/joosep/ControlPlotsSparse_corr.root"
 #output_path = "/dev/shm/joosep/categorization2/"
 
-n_proc = 10
+n_proc = 40
 n_iter = 8
 
 signals = [
