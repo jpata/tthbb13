@@ -190,10 +190,10 @@ class Conf:
             #"trigger", #print trigger bits
             #"input", #print input particles
             #"gen", #print out gen-level info
-            "debug", #very high-level debug info
+            #"debug", #very high-level debug info
             #"reco", #info about reconstructed final state
             #"meminput" #info about particles used for MEM input
-            #"commoninput" #print out inputs for CommonClassifier
+            "commoninput" #print out inputs for CommonClassifier
         ],
 
         #"eventWhitelist": [
@@ -253,7 +253,7 @@ class Conf:
 
         #Actually run the ME calculation
         #If False, all ME values will be 0
-        "calcME": False,
+        "calcME": True,
 
         "blr_cuts": {
             "sl_j5_t2": -0.8,
