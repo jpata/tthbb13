@@ -4,7 +4,7 @@
 from TTH.MEAnalysis.samples_base import *
 
 sample_version = "V14"
-path = "/home/joosep/joosep-mac/Documents/tth/data/ntp/v14/vhbb"
+path = "/home/joosep/joosep-mac/Documents/tth/data/ntp/v16/vhbb"
 samples = cms.VPSet([
     cms.PSet(
         skip     = cms.bool(False),

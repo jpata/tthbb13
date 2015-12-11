@@ -5,11 +5,11 @@ from copy import deepcopy
 import numpy as np
 import copy
 
+
+#FIXME: understand the effect of cropping the transfer functions
 def attach_jet_transfer_function(jet, conf):
     """
     Attaches transfer functions to the supplied jet based on the jet eta bin.
-
-
     """
     jet_eta_bin = 0
     if abs(jet.eta)>1.0:

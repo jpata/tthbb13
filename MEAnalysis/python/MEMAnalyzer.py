@@ -6,6 +6,7 @@ ROOT.gSystem.Load("libTTHMEIntegratorStandalone")
 from ROOT import MEM
 
 import numpy as np
+import json
 
 from TTH.MEAnalysis.MEMUtils import set_integration_vars, add_obj
 from TTH.MEAnalysis.MEMConfig import MEMConfig
@@ -26,7 +27,6 @@ class MECategoryAnalyzer(FilterAnalyzer):
         super(MECategoryAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
         self.cat_map = {"NOCAT":-1, "cat1": 1, "cat2": 2, "cat3": 3, "cat6":6, "cat8":8}
         self.btag_cat_map = {"NOCAT":-1, "L": 0, "H": 1}
-   
 
     def process(self, event):
         for (syst, event_syst) in event.systResults.items():
@@ -154,9 +154,13 @@ class MEAnalyzer(FilterAnalyzer):
         cfg.configure_transfer_function(self.conf)
         self.integrator = MEM.Integrand(
             MEM.output,
-            #MEM.output + MEM.init + MEM.init_more,
+            #MEM.output + MEM.input + MEM.init + MEM.init_more,
             cfg.cfg
         )
+
+        if "commoninput" in self.conf.general["verbosity"]:
+            self.outobjects = None
+            self.jsonout = open("events.json", "w")
 
     def beginLoop(self, setup):
         super(MEAnalyzer, self).beginLoop(setup)
@@ -242,9 +246,19 @@ class MEAnalyzer(FilterAnalyzer):
                 ],
                 "selectedJetsCSV": [
                     (j.btagCSV) for j in input_objects_jets
-                ]
+                ],
+                "selectedJetsBTag": [
+                    (j.btagFlag) for j in input_objects_jets
+                ],
+                "selectedLeptonsP4": [
+                    (l.pt, l.eta, l.phi, l.mass) for l in input_objects_leptons
+                ],
+                "selectedLeptonsCharge": [
+                    (l.charge) for l in input_objects_leptons
+                ],
+                "metP4": (met_cand.pt, met_cand.phi)
             }
-            print json.dumps(outdict, indent=2)
+            self.outobjects = {"input": outdict}
 
     def process(self, event):
         # #self.inputCounter.Fill(1)
@@ -352,7 +366,19 @@ class MEAnalyzer(FilterAnalyzer):
                         self.vars_to_marginalize
                     )
                     if "commoninput" in self.conf.general["verbosity"]:
-                        print "output = {0}".format(r.p)
+                        self.outobjects["event"] = {
+                            "run": event.input.run,
+                            "lumi":event.input.lumi,
+                            "event": event.input.evt,
+                            "cat": event.category_string,
+                            "blr": event.btag_LR_4b_2b
+                        }
+                        self.outobjects["output"] = {"hypo":hypo, "conf":confname, "p":r.p}
+                        self.jsonout.write(
+                            json.dumps(self.outobjects, indent=2) + "\n\n\n"
+                        )
+                        self.jsonout.flush()
+                        self.outobjects = {}
                     print "Integrator::run done hypo={0} conf={1}".format(hypo, confname)
 
                     res[(hypo, confname)] = r
