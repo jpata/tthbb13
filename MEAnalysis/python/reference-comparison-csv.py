@@ -225,8 +225,8 @@ data = {}
 for x in ["eth", "desy", "kit", "ihep", "osu", "rwth"]:
     data[x] = {}
 
-data["eth"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/eth/v13/tth.csv")
-data["eth"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/eth/v13/ttjets.csv")
+data["eth"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/eth/v14/tth.csv")
+data["eth"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/eth/v14/ttjets.csv")
 
 data["desy"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/desy/v5/tth.csv")
 data["desy"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/desy/v5/ttjets.csv")
@@ -247,18 +247,18 @@ data["rwth"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/
 
 for sample in ["sig", "bkg"]:
     for pairA, pairB in [
-    #("eth", "desy"),
+    ("eth", "desy"),
     ("eth", "kit"),
     #("eth", "osu"),
     #("eth", "ihep"),
-    ("desy", "kit"),
+    #("desy", "kit"),
     #("desy", "ihep"),
-    ("kit", "ihep"),
+    #("kit", "ihep"),
     # ("osu", "kit"),
     # ("osu", "desy"),
 
     #("eth", "rwth"),
-    ("rwth", "kit"),
+    #("rwth", "kit"),
     #("rwth", "desy"),
     #("rwth", "ihep"),
 

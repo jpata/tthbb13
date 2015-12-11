@@ -105,13 +105,15 @@ def MakeDatacard2(
     categorization,
     infile_paths,
     shapefile_path,
-    do_stat_variations=False
+    do_stat_variations=False,
+    ignore_splittings=False
     ):
-    categories = categorization.getCategories()
+    categories = categorization.getCategories(ignore_splittings)
     #FIXME: hardcoded signal process name
 
     #Find yields per category
     badcats = []
+
     for cat in categories:
         sig = categorization.event_counts["ttH_hbb"][cat]
         bkg = sum([categorization.event_counts[k][cat] for k in categorization.getProcesses() if k!="ttH_hbb"])
@@ -121,10 +123,11 @@ def MakeDatacard2(
     for cat in badcats:
         print "removing category", cat
         categories.pop(categories.index(cat))
+
     dcard = Datacard(
         categorization.getProcesses(),
         categories,
-        categorization.getLeafDiscriminators()
+        categorization.getLeafDiscriminators(ignore_splittings)
     )
     dcard.filenames_cat = infile_paths
     shapefile = open(shapefile_path, "w")
