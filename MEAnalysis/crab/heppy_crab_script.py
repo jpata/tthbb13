@@ -21,13 +21,13 @@ try:
     crabFiles = PSet.process.source.fileNames
     print "crabFiles=", crabFiles
     firstInput = crabFiles[0]
-    #filename, firstEvent, nEvents = firstInput.split("___") #DS
+    #filename, firstEvent, nEvents = firstInput.split("W") #DS was "___"
     filename = firstInput
     firstEvent = 0
-    nEvents = 100 #None
+    nEvents = None
     rootfilename = "root://xrootd-cms.infn.it//" + filename
-    firstEvent = int(firstEvent)
-    nEvents = int(nEvents)
+    #firstEvent = int(firstEvent) #DS
+    #nEvents = int(nEvents) #DS
     print "checking file",rootfilename
     tf = ROOT.TFile.Open(rootfilename)
     if not tf or tf.IsZombie():
@@ -69,7 +69,7 @@ try:
     except AttributeError as e:
         retcode = 8001
         raise e
-    
+
     #replace files with crab ones
     config.components[0].files=[rootfilename]
     
