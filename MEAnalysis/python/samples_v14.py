@@ -18,8 +18,9 @@ samples = cms.VPSet([
 
     #tt + jets
     cms.PSet(
-        skip     = cms.bool(False), #DS skip for now
+        skip     = cms.bool(True), #DS skip for now
         name     = cms.string('TT_TuneCUETP8M1_13TeV-powheg-pythia8'),
+        nickName = cms.string('TTJets'),
         xSec     = cms.double(xsec[("ttjets", "13TeV")]),
         nGen     = cms.int64(19757190),
         subFiles = cms.vstring([
@@ -295,8 +296,9 @@ samples = cms.VPSet([
 
     ##ttH - poweheg
     cms.PSet(
-        skip     = cms.bool(True),
+        skip     = cms.bool(False),
         name     = cms.string('ttHTobb_M125_13TeV_powheg_pythia8'),
+        nickName = cms.string('TTH'),
         xSec     = cms.double(xsec[("tthbb", "13TeV")]),
         nGen     = cms.int64(3933404),
         subFiles = cms.vstring([
@@ -354,7 +356,7 @@ samples = cms.VPSet([
     cms.PSet(
         skip     = cms.bool(True),
         name     = cms.string('qcd_ht300to500'),
-        nickName = cms.string('qcd_ht300to500'),
+        nickName = cms.string('QCD300'),
         xSec     = cms.double(xsec[("qcd_ht300to500", "13TeV")]),
         nGen     = cms.int64(19466760), 
         subFiles = cms.vstring([
@@ -598,7 +600,7 @@ samples = cms.VPSet([
     cms.PSet(
         skip     = cms.bool(True),
         name     = cms.string('qcd_ht500to700'),
-        nickName = cms.string('qcd_ht500to700'),
+        nickName = cms.string('QCD500'),
         xSec     = cms.double(xsec[("qcd_ht500to700", "13TeV")]),
         nGen     = cms.int64(19664159),
         subFiles = cms.vstring([
@@ -836,7 +838,7 @@ samples = cms.VPSet([
     cms.PSet(
         skip     = cms.bool(True),
         name     = cms.string('qcd_ht700to1000'),
-        nickName = cms.string('qcd_ht700to1000'),
+        nickName = cms.string('QCD700'),
         xSec     = cms.double(xsec[("qcd_ht700to1000", "13TeV")]),
         nGen     = cms.int64(15165288),
         subFiles = cms.vstring([
@@ -1020,10 +1022,10 @@ samples = cms.VPSet([
   #QCD_HT1000to1500
     cms.PSet(
         skip     = cms.bool(True),
-        name     = cms.string('qcd_ht1500to2000'),
-        nickName = cms.string('qcd_ht1500to2000'),
-        xSec     = cms.double(xsec[("qcd_ht1500to2000", "13TeV")]),
-        nGen     = cms.int64(-1),
+        name     = cms.string('qcd_ht1000to1500'),
+        nickName = cms.string('QCD1000'),
+        xSec     = cms.double(xsec[("qcd_ht1000to1500", "13TeV")]),
+        nGen     = cms.int64(4963895),
         subFiles = cms.vstring([
 "/store/user/arizzi/VHBBHeppyV14/QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/VHBB_HEPPY_V14_QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/151025_083753/0000/tree_1.root",
 "/store/user/arizzi/VHBBHeppyV14/QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/VHBB_HEPPY_V14_QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/151025_083753/0000/tree_2.root",
@@ -1095,9 +1097,9 @@ samples = cms.VPSet([
     cms.PSet(
         skip     = cms.bool(True),
         name     = cms.string('qcd_ht1500to2000'),
-        nickName = cms.string('qcd_ht1500to2000'),
+        nickName = cms.string('QCD1500'),
         xSec     = cms.double(xsec[("qcd_ht1500to2000", "13TeV")]),
-        nGen     = cms.int64(2),
+        nGen     = cms.int64(3691495),
         subFiles = cms.vstring([
 "/store/user/arizzi/VHBBHeppyV14/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/VHBB_HEPPY_V14_QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/151025_093151/0000/tree_1.root",
 "/store/user/arizzi/VHBBHeppyV14/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/VHBB_HEPPY_V14_QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/151025_093151/0000/tree_2.root",
@@ -1152,9 +1154,9 @@ samples = cms.VPSet([
     cms.PSet(
         skip     = cms.bool(True),
         name     = cms.string('qcd_ht2000toinf'),
-        nickName = cms.string('qcd_ht2000toinf'),
+        nickName = cms.string('QCD2000'),
         xSec     = cms.double(xsec[("qcd_ht2000toinf", "13TeV")]),
-        nGen     = cms.int64(2),
+        nGen     = cms.int64(1912529),
         subFiles = cms.vstring([
 "/store/user/arizzi/VHBBHeppyV14/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/VHBB_HEPPY_V14_QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/151024_184123/0000/tree_1.root",
 "/store/user/arizzi/VHBBHeppyV14/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/VHBB_HEPPY_V14_QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/151024_184123/0000/tree_2.root",

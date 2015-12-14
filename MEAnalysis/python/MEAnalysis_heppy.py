@@ -79,7 +79,7 @@ for sn in sorted(samples_dict.keys()):
         xs = s.xSec.value()
     )
     inputSample.isMC = s.isMC.value()
-  
+ 
     #use sample only if not skipped and subFiles defined
     if s.skip.value() == False and len(s.subFiles.value())>0:
         inputSamples.append(inputSample)
@@ -292,7 +292,7 @@ if __name__ == "__main__":
 
         #Configure the number of events to run
         from PhysicsTools.HeppyCore.framework.looper import Looper
-        nEvents = 400 #DS temp
+        nEvents = 1000 #DS temp
 
 
         kwargs = {}

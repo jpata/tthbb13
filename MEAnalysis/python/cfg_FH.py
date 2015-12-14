@@ -13,7 +13,7 @@ Conf.trigger["paths"] =  (
             "HLT_ttHhardonicLowLumi",
             )
 
-Conf.mem["calcME"] = True
+Conf.mem["calcME"] = False #DS TEMP
 Conf.mem["methodsToRun"] = (
             #"SL_0w2h2t",                 #[0]
             #"DL_0w2h2t",                 #[1]
@@ -43,9 +43,9 @@ Conf.mem["categories"] = (
 
 Conf.general["verbosity"] = (
             #"trigger",
-            "jets",
+            #"jets",
             #"gen", #print out gen-level info
             #"debug", #very high-level debug info
-            "reco", #info about reconstructed final state
+            #"reco", #info about reconstructed final state
             #"meminput" #info about particles used for MEM input
        )
