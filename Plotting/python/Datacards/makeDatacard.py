@@ -19,9 +19,11 @@ def PrintDatacard(event_counts, datacard, dcof):
 
     for cat in datacard.categories:
         analysis_var = datacard.distributions[cat]
-        dcof.write("shapes * {0} {1} $PROCESS/$CHANNEL/{2} $PROCESS/$CHANNEL/{2}_$SYSTEMATIC\n".format(cat, datacard.histfilename, analysis_var))
-
-    #dcof.write("shapes data_obs sl_jge6_tge4 /shome/jpata/tth/datacards/Sep7_ref2_spring15/fakeData.root $PROCESS/$CHANNEL/mem_d_nomatch_0 $PROCESS/$CHANNEL/mem_d_nomatch_0_$SYSTEMATIC\n")
+        dcof.write("shapes * {0} {1} $PROCESS/$CHANNEL/{2} $PROCESS/$CHANNEL/{2}_$SYSTEMATIC\n".format(
+            cat,
+            datacard.filenames_cat[cat],
+            analysis_var)
+        )
         
     dcof.write("---------------\n")
 
@@ -98,170 +100,38 @@ def PrintDatacard(event_counts, datacard, dcof):
     shapename_base = shapename.split(".")[0]
     dcof.write("# Execute with:\n")
     dcof.write("# combine -n {0} -M Asymptotic -t -1 {1} \n".format(shapename_base, shapename))
-    
-# end of PrintDataCard
-def MakeDatacard(infile_path, outfile_path, shapefile_path, do_stat_variations=False):
-    """
-    Makes shape.root and shape.txt for combine from an input root file with multiple categories.
 
-    Different distributions can be defined for different categories, but only one
-    must be defined for each category.
+def MakeDatacard2(
+    categorization,
+    infile_paths,
+    shapefile_path,
+    do_stat_variations=False,
+    ignore_splittings=False
+    ):
+    categories = categorization.getCategories(ignore_splittings)
+    #FIXME: hardcoded signal process name
 
-    Process 1 (first in TFile) defines the distribution names.
+    #Find yields per category
+    badcats = []
 
-    All systematics must exist for all processes and categories.
+    for cat in categories:
+        sig = categorization.event_counts["ttH_hbb"][cat]
+        bkg = sum([categorization.event_counts[k][cat] for k in categorization.getProcesses() if k!="ttH_hbb"])
+        if sig == 0 and bkg == 0:
+            badcats += [cat]
 
-    Example file structure:
-        #process 1
-        proc1/cat1/distr1
-        proc1/cat1/distr1_CMS_syst1Up
-        proc1/cat1/distr1_CMS_syst1Down
-        ... (other systematics)
+    for cat in badcats:
+        print "removing category", cat
+        categories.pop(categories.index(cat))
 
-        proc1/cat2/distr1
-        proc1/cat2/distr1_CMS_syst1Up
-        proc1/cat2/distr1_CMS_syst1Down
-        ...
-
-        proc1/cat3/distr2
-        proc1/cat3/distr2_CMS_syst1Up
-        proc1/cat3/distr2_CMS_syst1Down
-        
-        #process 2
-        proc2/cat1/distr1... (all systematics)
-        proc2/cat2/distr1...
-        proc2/cat3/distr2...
-
-    Fit will be made combining cat1, cat2, cat3.
-
-    All categories must exist for all processes.
-
-    infile_path (string): path to ControlPlots.root with processes and categories
-    outfile_path (string): path to output root file for combine (must be writable)
-    shapefile_path (string): path to output txt file for combine (must be writable)
-
-    do_stat_variations (bool) : enable or disable statistical bin-by-bin variations
-    """
-    infile = ROOT.TFile(infile_path)
-    shutil.copy(infile_path, outfile_path)
-
-    #datacard root file
-    outfile = ROOT.TFile(outfile_path, "UPDATE")
-
-    #get all processes in input file
-    processes = getProcesses(infile)
-
-    #reorder categories
-    processes_new = []
-    for proc in ["ttH_hbb"]:
-        if proc in processes:
-            processes.remove(proc)
-            processes_new += [proc]
-    processes_new += processes
-    processes = processes_new
-    ####Step 1
-    #get all histograms in input file, put to dict.
-    # histmap = {}
-    # for proc in processes:
-    #     histmap[proc] = {}
-    #     categories = getCategories(infile, proc)
-    #     for cat in categories:
-    #         distributions = getDistributions(infile, proc, cat)
-    #         histmap[proc][cat] = {}
-    #         for distr in distributions:
-    #             histmap[proc][cat][distr] = infile.Get("{0}/{1}/{2}".format(proc, cat, distr)) 
-
-    #get the first process and all categories 
-    proc_first = processes[0]
-
-    #currently just assume that tt+H has the same categories as every other process
-    allcats = getCategories(infile, proc_first)
-
-    ####Step 2
-    #get the nominal histograms in each category
-    hists_nominal = {}
-    for cat in allcats:
-        #get all histo names
-        allhists = getDistributions(infile, proc_first, cat)
-
-        #assume all systematics have "CMS" in them
-        cat_hists_nominal = filter(lambda x: "CMS" not in x, allhists)
-        if len(cat_hists_nominal) != 1:
-            raise Exception("multiple nominal histogram per category")
-        hist_nominal = cat_hists_nominal[0]
-        hists_nominal[cat] = hist_nominal
-
-        #copy all histograms to output file
-        #copyHistograms(infile, outfile, allhists, [cat], processes)
-        if do_stat_variations:
-            #print "doing stat variations for",cat
-            makeStatVariations(outfile, outfile, [hist_nominal], [cat], processes)
-        #outfile.ls()
-        fakeData(outfile, outfile, [hist_nominal], [cat], processes)
-    
-    #now make a datacard object which knows about systematics
-    dcard = Datacard(processes, allcats, hists_nominal)
-
-    #configure root file name for shapes.txt
-    dcard.histfilename = outfile_path
-
-    #Need to also add statistical variations to Datacard.shape_uncertainties
-    if do_stat_variations:
-        for cat in allcats:
-            #number of bins depends on distribution
-            nbins = infile.Get("{0}/{1}/{2}".format(proc_first, cat, hists_nominal[cat])).GetNbinsX()
-            #print "adding stat variations for", cat
-            dcard.addStatVariations(cat, nbins)
-
-    #output shapes.txt
+    dcard = Datacard(
+        categorization.getProcesses(),
+        categories,
+        categorization.getLeafDiscriminators(ignore_splittings)
+    )
+    dcard.filenames_cat = infile_paths
     shapefile = open(shapefile_path, "w")
-
-    #Step 3: the total yields per processes
-    event_counts = {}
-    for process in dcard.processes:
-        #print " sample", sample
-        sampled = outfile.Get(process)
-        assert(sampled != None)
-        sampled.cd()
-        event_counts[process] = {}
-        for category in dcard.categories:
-            histname = dcard.distributions[category]
-            cat_dir = sampled.Get(category)
-            if cat_dir != None:
-                h = cat_dir.Get(histname)
-                I = 0
-                if h != None:
-                    I = h.Integral()
-                event_counts[process][category] = I
-            else:
-                event_counts[process][category] = 0
-
-    #remove empty categories from fit to prevent combine error
-    # if np_bin == 0: raise RuntimeError, "Bin %s has no processes contributing to it" % b
-    #    RuntimeError: Bin btag_LR_4b_2b_logit__10_0__20_0__numJets__3__4 has no processes contributing to it
-    categories = []
-    for cutname in dcard.categories:
-        s = 0
-        sbg = 0
-        for sample in dcard.processes:
-            s += event_counts[sample][cutname]
-            #FIXME: hardcoded signal process name
-            if "ttH" not in sample:
-                sbg += event_counts[sample][cutname]
-        if s > 0 and sbg > 0:
-            categories += [cutname]
-        else:
-            print "removing category name={0} signal={1} bkg={2}".format(cutname, s, sbg)
-
-    #override with list of good categories
-    dcard.categories = categories
-
-    PrintDatacard(event_counts, dcard, shapefile)
-    shapefile.close()
-    infile.Close()
-    outfile.Close()
-
-# end of MakeDatacard
+    PrintDatacard(categorization.event_counts, dcard, shapefile)
 
 import datacard as datacard
 
@@ -296,28 +166,3 @@ def getDistributions(ofile, process, category):
     for k in d.GetListOfKeys():
         distributions += [k.GetName()]
     return distributions
-
-if __name__ == "__main__":
-    # Get the input proto-datacard
-
-    MakeDatacard(sys.argv[1], "shapes.root", "shapes.txt", do_stat_variations=False)
-
-
-    # import cProfile
-    # 
-    # def f():
-    #     #finalize datacard to txt file
-    #     for i in range(10):
-    #         MakeDatacard(sys.argv[1], "shapes.root", "shapes.txt", do_stat_variations=False)
-    # 
-    # cProfile.run("f()")
-    
-    # timeit.timeit("g()", number=10)
-    import time
-    # 
-    # n = 10
-    # t0 = time.time()
-    # for i in range(n):
-    #     MakeDatacard(sys.argv[1], "shapes.root", "shapes.txt", do_stat_variations=False)
-    # t1 = time.time()
-    # print (t1-t0)/float(n)

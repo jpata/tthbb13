@@ -20,6 +20,29 @@ trees["old"] = """
           nBCSVM__4__8 Discr=mem_SL_0w2h2t
 """
 
+trees["old_blr"] = """
+  Discr=mem_SL_0w2h2t
+    numJets__4__5 Discr=mem_SL_0w2h2t 
+       nBCSVM__3__4 Discr=btag_LR_4b_2b_logit
+       nBCSVM__4__5 Discr=mem_SL_0w2h2t
+    numJets__5__8 Discr=mem_SL_0w2h2t
+       numJets__5__6 Discr=mem_SL_0w2h2t
+          nBCSVM__3__4 Discr=btag_LR_4b_2b_logit
+          nBCSVM__4__5 Discr=mem_SL_0w2h2t
+       numJets__6__8 Discr=mem_SL_0w2h2t
+          nBCSVM__2__4 Discr=mem_SL_0w2h2t
+             nBCSVM__2__3 Discr=btag_LR_4b_2b_logit
+             nBCSVM__3__4 Discr=mem_SL_0w2h2t
+          nBCSVM__4__8 Discr=mem_SL_0w2h2t
+"""
+
+#trees["old"] = """
+#  Discr=mem_SL_0w2h2t
+#    numJets__4__5 Discr=mem_SL_0w2h2t 
+#       nBCSVM__3__4 Discr=mem_SL_0w2h2t
+#       nBCSVM__4__5 Discr=mem_SL_0w2h2t
+#"""
+
 trees["old_dl"] = """
   Discr=mem_DL_0w2h2t
      nBCSVM__2__3 Discr=mem_DL_0w2h2t

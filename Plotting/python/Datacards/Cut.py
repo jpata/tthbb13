@@ -107,8 +107,8 @@ class Cut(object):
 
     def latex_string(self):
 
-        if self.axis >= 0:
-            axis = self.axes[self.axis]            
+        if self.axis:
+            axis = self.axis
             binsize = (axis.xmax - axis.xmin)/(1.*axis.nbins)
             lower = axis.xmin + (self.lo-1)*binsize
             upper = axis.xmin + (self.hi)*binsize

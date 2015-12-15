@@ -76,7 +76,7 @@ class WTagAnalyzer(FilterAnalyzer):
             #All masses
             event.Wmasses = [bpair[i][0] for i in range(len(bpair))]
 
-            #Add at most 2 best pairs two W quark candidates
+            #Add at most 2 best pairs
             for i in range(min(len(bpair), 2)):
                 event.wquark_candidate_jets.add(bpair[i][1])
                 event.wquark_candidate_jets.add(bpair[i][2])
