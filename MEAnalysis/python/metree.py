@@ -397,6 +397,8 @@ def getTreeProducer(conf):
             "good_jets_nominal" : NTupleCollection("jets", jetType, 9, help="Selected resolved jets, pt ordered"),
             "good_leptons_nominal" : NTupleCollection("leps", leptonType, 2, help="Selected leptons"),
             
+            "loose_jets_nominal" : NTupleCollection("loose_jets", jetType, 4, help="Additional jets with 20<pt<30"),
+            
             "topCandidate_nominal": NTupleCollection("topCandidate" , topCandidateType, 1, help="Best top candidate in event. Currently chosen by max deltaR wrt. lepton"),
             "othertopCandidate_nominal": NTupleCollection("othertopCandidate", topCandidateType, 4, help="All other top candidates that pass HTTv2 cuts"),
             "higgsCandidate_nominal": NTupleCollection("higgsCandidate", higgsCandidateType, 4, help="Boosted Higgs candidates"),

@@ -158,10 +158,6 @@ class MEAnalyzer(FilterAnalyzer):
             cfg.cfg
         )
 
-        if "commoninput" in self.conf.general["verbosity"]:
-            self.outobjects = None
-            self.jsonout = open("events.json", "w")
-
     def beginLoop(self, setup):
         super(MEAnalyzer, self).beginLoop(setup)
         # self.inputCounter = ROOT.TH1F("MEAnalyzer_Count","Count",1,0,2)
@@ -173,26 +169,23 @@ class MEAnalyzer(FilterAnalyzer):
         self.vars_to_integrate.clear()
         self.vars_to_marginalize.clear()
         self.integrator.next_event()
-        
-        input_objects_jets = []
-        input_objects_leptons = []
-        input_objects_met = []
 
         mem_cfg.enabled = True
 
         set_integration_vars(self.vars_to_integrate, self.vars_to_marginalize, mem_cfg.mem_assumptions)
         
-        bquarks = list(mem_cfg.b_quark_candidates(event))
+        bquarks = sorted(list(mem_cfg.b_quark_candidates(event)), key=lambda x: x.pt, reverse=True)
 
         maxjets = mem_cfg.maxJets
 
         if len(bquarks)>maxjets:
             print "More than {0} b-quarks supplied, dropping last {1} from MEM".format(maxjets, len(bquarks) - maxjets)
         
-        lquarks = list(mem_cfg.l_quark_candidates(event))
+        lquarks = sorted(list(mem_cfg.l_quark_candidates(event)), key=lambda x: x.pt, reverse=True)
+
         if len(lquarks)>maxjets:
             print "More than {0} l-quarks supplied, dropping last {1} from MEM".format(maxjets, len(lquarks) - maxjets)
-        
+        print "lquarks", lquarks 
         ##Only take up to 4 candidates, otherwise runtimes become too great
         for jet in bquarks[:maxjets] + lquarks[:maxjets]:
             add_obj(
@@ -208,7 +201,7 @@ class MEAnalyzer(FilterAnalyzer):
                     MEM.TFType.bReco: jet.tf_b, MEM.TFType.qReco: jet.tf_l,
                 }
             )
-            input_objects_jets += [jet]
+            print "adding jet", jet.pt, jet.btagFlag 
             if "meminput" in self.conf.general["verbosity"]:
                 print "memBQuark" if jet in bquarks else "memLQuark",\
                     jet.pt, jet.eta, jet.phi, jet.mass,\
@@ -225,7 +218,7 @@ class MEAnalyzer(FilterAnalyzer):
                 p4s=(lep.pt, lep.eta, lep.phi, lep.mass),
                 obs_dict={MEM.Observable.CHARGE: lep.charge},
             )
-            input_objects_leptons += [lep]
+            print "adding lepton", lep.pt, lep.charge
             if "meminput" in self.conf.general["verbosity"]:
                 print "memLepton", lep.pt, lep.eta, lep.phi, lep.mass, lep.charge
 
@@ -238,27 +231,7 @@ class MEAnalyzer(FilterAnalyzer):
             #MET is caused by massless object
             p4s=(met_cand.pt, 0, met_cand.phi, 0),
         )
-        input_objects_met += [met_cand]
-        if "commoninput" in self.conf.general["verbosity"]:
-            outdict = {
-                "selectedJetsP4": [
-                    (j.pt, j.eta, j.phi, j.mass) for j in input_objects_jets
-                ],
-                "selectedJetsCSV": [
-                    (j.btagCSV) for j in input_objects_jets
-                ],
-                "selectedJetsBTag": [
-                    (j.btagFlag) for j in input_objects_jets
-                ],
-                "selectedLeptonsP4": [
-                    (l.pt, l.eta, l.phi, l.mass) for l in input_objects_leptons
-                ],
-                "selectedLeptonsCharge": [
-                    (l.charge) for l in input_objects_leptons
-                ],
-                "metP4": (met_cand.pt, met_cand.phi)
-            }
-            self.outobjects = {"input": outdict}
+        print "adding met", met_cand.pt, met_cand.phi
 
     def process(self, event):
         # #self.inputCounter.Fill(1)
@@ -278,6 +251,48 @@ class MEAnalyzer(FilterAnalyzer):
 
         return self.conf.general["passall"] or np.any([v.passes_mem for v in event.systResults.values()])
 
+    def printInputs(self, event):
+        inputs = {
+            "selectedJetsP4": [
+                (j.pt, j.eta, j.phi, j.mass) for j in event.good_jets
+            ],
+            "selectedJetsCSV": [
+                (j.btagCSV) for j in event.good_jets
+            ],
+            "selectedJetsBTag": [
+                (j.btagFlag) for j in event.good_jets
+            ],
+            "selectedLeptonsP4": [
+                (l.pt, l.eta, l.phi, l.mass) for l in event.good_leptons
+            ],
+            "selectedLeptonsCharge": [
+                (l.charge) for l in event.good_leptons
+            ],
+            "metP4": (event.MET.pt, event.MET.phi)
+        }
+        outobjects = {"input": inputs}
+        outobjects["event"] = {
+            "run": event.input.run,
+            "lumi":event.input.lumi,
+            "event": event.input.evt,
+            "cat": event.category_string,
+            "blr": event.btag_LR_4b_2b
+        }
+        memidx = self.conf.mem["methodOrder"].index("SL_0w2h2t")
+        outobjects["output"] = {
+            "p_tth": event.mem_results_tth[memidx].p,
+            "p_ttbb": event.mem_results_ttbb[memidx].p,
+            "p": event.mem_results_tth[memidx].p / (
+                event.mem_results_tth[memidx].p + 0.1*event.mem_results_ttbb[memidx].p
+            ) if event.mem_results_tth[memidx].p > 0 else 0.0
+        }
+        print json.dumps(outobjects, indent=2)
+        self.jsonout = open("events.json", "w+")
+        self.jsonout.write(
+            json.dumps(outobjects, indent=2) + "\n\n\n"
+        )
+        self.jsonout.close()
+
     def _process(self, event):
         #Clean up any old MEM state
         self.vars_to_integrate.clear()
@@ -289,6 +304,7 @@ class MEAnalyzer(FilterAnalyzer):
         event.mem_results_ttbb = []
 
         res = {}
+        
         if "meminput" in self.conf.general["verbosity"]:
             print "-----"
             print "MEM id={0},{1},{2} cat={3} cat_b={4} nj={5} nt={6} nel={7} nmu={8} syst={9}".format(
@@ -365,20 +381,6 @@ class MEAnalyzer(FilterAnalyzer):
                         self.vars_to_integrate,
                         self.vars_to_marginalize
                     )
-                    if "commoninput" in self.conf.general["verbosity"]:
-                        self.outobjects["event"] = {
-                            "run": event.input.run,
-                            "lumi":event.input.lumi,
-                            "event": event.input.evt,
-                            "cat": event.category_string,
-                            "blr": event.btag_LR_4b_2b
-                        }
-                        self.outobjects["output"] = {"hypo":hypo, "conf":confname, "p":r.p}
-                        self.jsonout.write(
-                            json.dumps(self.outobjects, indent=2) + "\n\n\n"
-                        )
-                        self.jsonout.flush()
-                        self.outobjects = {}
                     print "Integrator::run done hypo={0} conf={1}".format(hypo, confname)
 
                     res[(hypo, confname)] = r
@@ -399,5 +401,10 @@ class MEAnalyzer(FilterAnalyzer):
             print [r.p for r in event.mem_results_tth]
             print [r.p for r in event.mem_results_ttbb]
             print "---MEM done EVENT r:l:e", event.input.run, event.input.lumi, event.input.evt
+        
+        print skipped
+        if "SL_0w2h2t" not in skipped and "commoninput" in self.conf.general["verbosity"]:
+            self.printInputs(event)
+
         event.passes_mem = True
         return event

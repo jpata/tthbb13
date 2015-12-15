@@ -313,10 +313,10 @@ for cat in [
         # ("topCandidate_pt", {"rebin":5, "log":True, "xunit":"GeV"}),
         # ("topCandidate_mass", {"rebin":5, "xunit":"GeV"}),
         # ("topCandidate_masscal", {"rebin":5, "xunit":"GeV"}),
-        ("mem_SL_0w2h2t", {"rebin":1, "xunit":""}),
-        ("mem_DL_0w2h2t", {"rebin":1, "xunit":""}),
-        ("mem_SL_2w2h2t", {"rebin":1, "xunit":""}),
-        ("mem_SL_2w2h2t_sj", {"rebin":1, "xunit":""}),
+        ("mem_SL_0w2h2t", {"rebin":1, "xunit": ""}),
+        ("mem_DL_0w2h2t", {"rebin":1, "xunit": ""}),
+        ("mem_SL_2w2h2t", {"rebin":1, "xunit": ""}),
+        ("mem_SL_2w2h2t_sj", {"rebin":1, "xunit": ""}),
 
     ]:
         if not "boosted" in cat and "Candidate" in distr:

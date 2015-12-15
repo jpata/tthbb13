@@ -58,6 +58,7 @@ std::vector<std::string> split(const std::string &s, char delim) {
 }
 
 const map<string, function<float(const Event& ev)>> AxisFunctions = {
+    {"counting", [](const Event& ev) { return 1;}},
     {"mem_SL_0w2h2t", [](const Event& ev) { return ev.mem_SL_0w2h2t;}},
     {"mem_SL_2w2h2t", [](const Event& ev) { return ev.mem_SL_2w2h2t;}},
     {"mem_SL_2w2h2t_sj", [](const Event& ev) { return ev.mem_SL_2w2h2t_sj;}},

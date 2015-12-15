@@ -247,18 +247,18 @@ data["rwth"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/
 
 for sample in ["sig", "bkg"]:
     for pairA, pairB in [
-    #("eth", "desy"),
+    ("eth", "desy"),
     ("eth", "kit"),
     #("eth", "osu"),
     #("eth", "ihep"),
-    ("desy", "kit"),
+    #("desy", "kit"),
     #("desy", "ihep"),
-    ("kit", "ihep"),
+    #("kit", "ihep"),
     # ("osu", "kit"),
     # ("osu", "desy"),
 
     #("eth", "rwth"),
-    ("rwth", "kit"),
+    #("rwth", "kit"),
     #("rwth", "desy"),
     #("rwth", "ihep"),
 

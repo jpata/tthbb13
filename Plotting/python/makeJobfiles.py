@@ -30,6 +30,12 @@ for samp in Samples.samples_dict.keys():
             "printEvery": 0,
             "sparseAxes": [
                 {
+                    "func": "counting",
+                    "xMin": 0,
+                    "xMax": 1,
+                    "nBins": 1 
+                },
+                {
                     "func": "mem_SL_2w2h2t",
                     "xMin": 0,
                     "xMax": 1,
@@ -81,7 +87,7 @@ for samp in Samples.samples_dict.keys():
                     "func": "btag_LR_4b_2b_logit",
                     "xMin": -20,
                     "xMax": 20,
-                    "nBins": 10
+                    "nBins": 50
                 },
                 {
                     "func": "topCandidate_mass",
