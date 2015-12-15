@@ -13,6 +13,9 @@ download:
 	#xrdcp root://xrootd.unl.edu//store/mc/RunIISpring15MiniAODv2/TT_TuneCUETP8M1_13TeV-powheg-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/40000/0EE7E064-BE6F-E511-BB41-E4115BB4C4BC.root $(SYNCPATH)/ttjets_1.root
 	#xrdcp root://xrootd.unl.edu//store/data/Run2015D/SingleMuon/MINIAOD/05Oct2015-v1/10000/021FD3F0-876F-E511-99D2-0025905A6060.root $(SYNCPATH)/singlemu.root
 	#xrdcp root://xrootd.unl.edu//store/data/Run2015D/MuonEG/MINIAOD/05Oct2015-v2/60000/00D43A12-C573-E511-8F4C-0025905A60E0.root $(SYNCPATH)/muoneg.root
+	xrdcp root://cmsxrootd.fnal.gov///store/user/hmildner/el_skim_3loosejets.root $(SYNCPATH)/el_skim_3loosejets.root
+	xrdcp root://cmsxrootd.fnal.gov///store/user/hmildner/mu_skim_3loosejets.root $(SYNCPATH)/mu_skim_3loosejets.root
+	xrdcp root://cmsxrootd.fnal.gov///store/user/hmildner/muel_skim_2loosejets.root $(SYNCPATH)/muel_skim_2loosejets.root
 
 split:
 	mkdir -p ~/tth/spring15/sync/ttjets_1/
@@ -25,25 +28,32 @@ split:
 	python $(CMSSW_BASE)/src/TTH/MEAnalysis/python/splitLumi.py ~/tth/spring15/sync/tth/lumilist.json ~/tth/spring15/sync/tth/
 	ls ~/tth/spring15/sync/tth/block*.json | $(PARCMD) -j40 cmsRun $(CMSSW_BASE)/src/TTH/TTHNtupleAnalyzer/python/pickEvents2_cfg.py inputFiles=file://$(HOME)/tth/spring15/sync/tth.root lumifile={} outputFile=~/tth/spring15/sync/tth/block_{#}.root 
 	
-	mkdir -p ~/tth/spring15/sync/singlemu/
-	edmLumisInFiles.py ~/tth/spring15/sync/singlemu.root > ~/tth/spring15/sync/singlemu/lumilist.json 
-	python $(CMSSW_BASE)/src/TTH/MEAnalysis/python/splitLumi.py ~/tth/spring15/sync/tth/lumilist.json ~/tth/spring15/sync/singlemu/
-	ls ~/tth/spring15/sync/tth/block*.json | $(PARCMD) -j40 cmsRun $(CMSSW_BASE)/src/TTH/TTHNtupleAnalyzer/python/pickEvents2_cfg.py inputFiles=file://$(HOME)/tth/spring15/sync/singlemu.root lumifile={} outputFile=~/tth/spring15/sync/singlemu/block_{#}.root 
+	mkdir -p ~/tth/spring15/sync/el_skim/
+	edmLumisInFiles.py ~/tth/spring15/sync/el_skim_3loosejets.root > ~/tth/spring15/sync/el_skim/lumilist.json
+	python $(CMSSW_BASE)/src/TTH/MEAnalysis/python/splitLumi.py ~/tth/spring15/sync/el_skim/lumilist.json ~/tth/spring15/sync/el_skim/
+	ls ~/tth/spring15/sync/el_skim/block*.json | $(PARCMD) -j40 cmsRun $(CMSSW_BASE)/src/TTH/TTHNtupleAnalyzer/python/pickEvents2_cfg.py inputFiles=file://$(HOME)/tth/spring15/sync/el_skim_3loosejets.root lumifile={} outputFile=~/tth/spring15/sync/el_skim/block_{#}.root
 	
-	mkdir -p ~/tth/spring15/sync/muoneg/
-	edmLumisInFiles.py ~/tth/spring15/sync/muoneg.root > ~/tth/spring15/sync/muoneg/lumilist.json 
-	python $(CMSSW_BASE)/src/TTH/MEAnalysis/python/splitLumi.py ~/tth/spring15/sync/tth/lumilist.json ~/tth/spring15/sync/muoneg/
-	ls ~/tth/spring15/sync/tth/block*.json | $(PARCMD) -j40 cmsRun $(CMSSW_BASE)/src/TTH/TTHNtupleAnalyzer/python/pickEvents2_cfg.py inputFiles=file://$(HOME)/tth/spring15/sync/muoneg.root lumifile={} outputFile=~/tth/spring15/sync/muoneg/block_{#}.root 
+	mkdir -p ~/tth/spring15/sync/mu_skim/
+	edmLumisInFiles.py ~/tth/spring15/sync/mu_skim_3loosejets.root > ~/tth/spring15/sync/mu_skim/lumilist.json
+	python $(CMSSW_BASE)/src/TTH/MEAnalysis/python/splitLumi.py ~/tth/spring15/sync/mu_skim/lumilist.json ~/tth/spring15/sync/mu_skim/
+	ls ~/tth/spring15/sync/mu_skim/block*.json | $(PARCMD) -j40 cmsRun $(CMSSW_BASE)/src/TTH/TTHNtupleAnalyzer/python/pickEvents2_cfg.py inputFiles=file://$(HOME)/tth/spring15/sync/mu_skim_3loosejets.root lumifile={} outputFile=~/tth/spring15/sync/mu_skim/block_{#}.root
+	
+	mkdir -p ~/tth/spring15/sync/muel_skim/
+	edmLumisInFiles.py ~/tth/spring15/sync/muel_skim_2loosejets.root > ~/tth/spring15/sync/muel_skim/lumilist.json
+	python $(CMSSW_BASE)/src/TTH/MEAnalysis/python/splitLumi.py ~/tth/spring15/sync/muel_skim/lumilist.json ~/tth/spring15/sync/muel_skim/
+	ls ~/tth/spring15/sync/muel_skim/block*.json | $(PARCMD) -j40 cmsRun $(CMSSW_BASE)/src/TTH/TTHNtupleAnalyzer/python/pickEvents2_cfg.py inputFiles=file://$(HOME)/tth/spring15/sync/muel_skim_2loosejets.root lumifile={} outputFile=~/tth/spring15/sync/muel_skim/block_{#}.root
 
 step2:
-	cd $(CMSSW_BASE)/src/VHbbAnalysis/Heppy/test && ls  ~/tth/spring15/sync/tth/block_*.root | $(PARCMD) --result out_tth_step2 -j30 python ./vhbb_parallel.py {} tth_block_{#}
-	cd $(CMSSW_BASE)/src/VHbbAnalysis/Heppy/test && ls  ~/tth/spring15/sync/ttjets_1/block*.root | $(PARCMD) --result out_ttjets_step2 -j30 python ./vhbb_parallel.py {} ttjets_block_{#}
-	cd $(CMSSW_BASE)/src/VHbbAnalysis/Heppy/test && ls  ~/tth/spring15/sync/singlemu/block*.root | $(PARCMD) --result out_singlemu_step2 -j30 python ./vhbb_parallel_data.py {} singlemu_block_{#}
-	cd $(CMSSW_BASE)/src/VHbbAnalysis/Heppy/test && ls  ~/tth/spring15/sync/muoneg/block*.root | $(PARCMD) --result out_muoneg_step2 -j30 python ./vhbb_parallel_data.py {} muoneg_block_{#}
+	#mkdir -p ~/tth/spring15/sync/vhbb/v10/
+	hadd -f ~/tth/spring15/sync/vhbb/v10/ttjets.root ~/tth/sw/CMSSW_7_4_15/src/VHbbAnalysis/Heppy/test/Loop_task_ttjets_*_1/tree.root
+	hadd -f ~/tth/spring15/sync/vhbb/v10/tth.root ~/tth/sw/CMSSW_7_4_15/src/VHbbAnalysis/Heppy/test/Loop_task_tth_*_1/tree.root
+	hadd -f ~/tth/spring15/sync/vhbb/v10/mu_skim.root ~/tth/sw/CMSSW_7_4_15/src/VHbbAnalysis/Heppy/test/Loop_task_mu_skim_*/tree.root
+	hadd -f ~/tth/spring15/sync/vhbb/v10/el_skim.root ~/tth/sw/CMSSW_7_4_15/src/VHbbAnalysis/Heppy/test/Loop_task_el_skim_*/tree.root
+	hadd -f ~/tth/spring15/sync/vhbb/v10/muel_skim.root ~/tth/sw/CMSSW_7_4_15/src/VHbbAnalysis/Heppy/test/Loop_task_muel_skim_*/tree.root
 
 step3:
-	hadd -f ~/tth/spring15/sync/tthbb/ttjets.root ~/tth/gc/GCaadac5e70139/cfg_sync/ttjets/output_*.root
-	hadd -f ~/tth/spring15/sync/tthbb/tth.root ~/tth/gc/GCaadac5e70139/cfg_sync/ttH/output_*.root
+	hadd -f ~/tth/spring15/sync/tthbb/ttjets.root ~/tth/gc/GCb043a9d6bed0/cfg_sync/ttjets/output_*.root
+	hadd -f ~/tth/spring15/sync/tthbb/tth.root ~/tth/gc/GCb043a9d6bed0/cfg_sync/ttH/output_*.root
 
 step4:
 	python python/makeTable.py /home/joosep/tth/spring15/sync/tthbb/tth.root nominal > tth.csv

@@ -71,6 +71,37 @@ def split_leaves_by_BLR(original):
     return r
 # End of split_leaves_by_BLR
 
+highpurity = [
+    "numJets__6__7__nBCSVM__4__5__discr_mem_SL_0w2h2t",
+    "numJets__6__7__nBCSVM__3__5__discr_mem_SL_0w2h2t",
+    "numJets__3__6__nBCSVM__4__5__discr_mem_SL_0w2h2t",
+    "numJets__3__5__nBCSVM__4__5__discr_mem_SL_0w2h2t"
+]
+
+def split_leaves_by_BLR_highpurity(original):
+    """ Attempt to optimize BLR splitting of classic analysis categories """
+
+    r = Categorize.CategorizationFromString(original)
+    initial_leaves = r.get_leaves()
+    cut_axes = ["btag_LR_4b_2b_logit", "Wmass"]
+    discriminator_axes = ["mem_SL_0w2h2t"] #MEM SL 022 axis
+    for l in initial_leaves:
+        if not l.__repr__() in highpurity:
+            continue
+        print "Optimizing leaf", l
+
+        #for left-handed child (bg-like), don't use MEM discriminator, just a counting experiment
+        l.disc_axes_child_left = ["btag_LR_4b_2b_logit", "Wmass"]
+        l.find_categories_async(
+            1,
+            cut_axes,
+            discriminator_axes
+        )
+        #import pdb
+        #pdb.set_trace()
+    return r
+# End of split_leaves_by_BLR
+
 
 def optimize(r):
     """ Further optimize a given tree r """    
@@ -139,12 +170,23 @@ if __name__ == "__main__":
     #make_latex("old_dl")
     #make_latex("old_2t")
 
-    r = split_leaves_by_BLR(trees["old"])
-    of = open("old_blr.tex", "w")
+    #r = split_leaves_by_BLR(trees["old"])
+    #of = open("old_blr_opt.tex", "w")
+    #print r.print_tree()
+    #of.write(r.print_tree_latex())
+    #of.close()
+    #of = open("old_blr_opt.pickle", "w")
+    #of.write(pickle.dumps(r))
+    #of.close()
+    
+    make_latex("old_blr")
+
+    r = split_leaves_by_BLR_highpurity(trees["old_blr"])
+    of = open("old_blr_highpurity_opt.tex", "w")
     print r.print_tree()
     of.write(r.print_tree_latex())
     of.close()
-    of = open("old_blr.pickle", "w")
+    of = open("old_blr_highpurity_opt.pickle", "w")
     of.write(pickle.dumps(r))
     of.close()
 

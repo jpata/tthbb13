@@ -555,17 +555,19 @@ class Categorization(object):
                                 root = self.get_root()
                                 root.create_control_plots(self.output_path)
                                 MakeDatacard2(
-                                    self,
+                                    root,
                                     self.leaf_files,
                                     shapes_txt_filename,
                                     do_stat_variations=self.do_stat_variations
                                 )
 
-                                splittings[shapes_txt_filename] = [leaf, 
-                                                                   axis_name, 
-                                                                   split_bin,
-                                                                   discriminator_axis_for_child_0,
-                                                                   discriminator_axis_for_child_1]
+                                splittings[shapes_txt_filename] = [
+                                    leaf,
+                                    axis_name,
+                                    split_bin,
+                                    discriminator_axis_for_child_0,
+                                    discriminator_axis_for_child_1
+                                ]
                                 i_splitting += 1
 
                                 # Undo the split
@@ -581,7 +583,7 @@ class Categorization(object):
             li_limits = self.pool.map(self.lg, li_splittings)
 
             # build a list of tuples with limit name and numerical value
-            li_name_limits = [(name,limit[0][2]) for name,limit in zip(li_splittings, li_limits)]
+            li_name_limits = [(name, limit[0][2]) for name, limit in zip(li_splittings, li_limits)]
            
             split_limits = {}
             for (spl_filename, spl), lim in zip(splittings.items(), li_limits):
@@ -705,7 +707,6 @@ class Categorization(object):
             leaves = [self]
         else:
             leaves = self.get_leaves()
-        print "create_control_plots", leaves
         event_counts = {}
 
         # Loop over categories
