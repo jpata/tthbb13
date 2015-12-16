@@ -225,8 +225,8 @@ data = {}
 for x in ["eth", "desy", "kit", "ihep", "osu", "rwth"]:
     data[x] = {}
 
-data["eth"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/eth/v14/tth.csv")
-data["eth"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/eth/v14/ttjets.csv")
+data["eth"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/eth/v15/tth.csv")
+data["eth"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/eth/v15/ttjets.csv")
 
 data["desy"]["sig"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/desy/v5/tth.csv")
 data["desy"]["bkg"] = pandas.read_csv("/Users/joosep/Dropbox/tth/sync/endof2015/desy/v5/ttjets.csv")

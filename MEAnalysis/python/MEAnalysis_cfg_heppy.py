@@ -196,8 +196,9 @@ class Conf:
             "commoninput" #print out inputs for CommonClassifier
         ],
 
-        #"eventWhitelist": [
-        #]
+        # "eventWhitelist": [
+        #     (1, 3372, 672071)
+        # ]
     }
 
     bran = {
@@ -253,7 +254,9 @@ class Conf:
 
         #Actually run the ME calculation
         #If False, all ME values will be 0
-        "calcME": True,
+        "calcME": False,
+        
+        "weight": 0.15,
 
         "blr_cuts": {
             "sl_j5_t2": 20,
