@@ -399,7 +399,6 @@ class MEAnalyzer(FilterAnalyzer):
             print [r.p for r in event.mem_results_ttbb]
             print "---MEM done EVENT r:l:e", event.input.run, event.input.lumi, event.input.evt
         
-        print skipped
         if "SL_0w2h2t" not in skipped and "commoninput" in self.conf.general["verbosity"]:
             self.printInputs(event)
 

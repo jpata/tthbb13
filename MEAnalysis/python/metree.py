@@ -145,6 +145,15 @@ memType = NTupleObjectType("memType", variables = [
     NTupleVariable("nperm", lambda x : x.num_perm, type=int),
 ])
 
+commonMemType = NTupleObjectType("commonMemType", variables = [
+    NTupleVariable("p", lambda x : x.p),
+    NTupleVariable("p_sig", lambda x : x.p_sig),
+    NTupleVariable("p_bkg", lambda x : x.p_bkg),
+    NTupleVariable("blr_4b", lambda x : x.blr_4b),
+    NTupleVariable("blr_2b", lambda x : x.blr_2b),
+])
+
+
 branType = NTupleObjectType("branType", variables = [
     NTupleVariable("p",        lambda x : x[0] ),
     NTupleVariable("ntoys",    lambda x : x[1], type=int),
@@ -498,6 +507,7 @@ def getTreeProducer(conf):
             ("passes_btag",         int,        ""),
             ("passes_mem",          int,        "MEM was evaluated"),
             ("tth_mva",             float,      "ttH vs tt+jets bdt"),
+            ("common_bdt",          float,      "KIT BDT"),
         ]:
 
             is_mc_only = False
@@ -517,6 +527,10 @@ def getTreeProducer(conf):
                 syst_suffix2 = ""
             #These are collections which are variated in a systematic loop and saved to the event in TreeVarAnalyzer
             treeProducer.collections.update({
+                "common_mem" + syst_suffix: NTupleCollection(
+                    "common_mem" + syst_suffix2, commonMemType, 1,
+                    help="Single common MEM result array", mcOnly=is_mc_only
+                ),
                 "mem_results_tth" + syst_suffix: NTupleCollection(
                     "mem_tth" + syst_suffix2, memType, len(conf.mem["methodOrder"]),
                     help="MEM tth results array, element per config.methodOrder", mcOnly=is_mc_only

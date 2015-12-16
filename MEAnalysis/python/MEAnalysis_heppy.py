@@ -220,6 +220,12 @@ brnd = cfg.Analyzer(
     _conf = conf
 )
 
+commoncls = cfg.Analyzer(
+    MECoreAnalyzers.CommonClassifierAnalyzer,
+    'brand',
+    _conf = conf
+)
+
 treevar = cfg.Analyzer(
     MECoreAnalyzers.TreeVarAnalyzer,
     'treevar',
@@ -250,6 +256,7 @@ sequence = cfg.Sequence([
     subjet_analyzer,
     mem_analyzer,
     mva,
+    commoncls,
     treevar,
     treeProducer
 ])
