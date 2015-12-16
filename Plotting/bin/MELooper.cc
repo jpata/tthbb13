@@ -1,5 +1,6 @@
 #include "TFile.h"
 #include "TChain.h"
+#include "TStopwatch.h"
 #include <iostream>
 
 #include "TTH/Plotting/interface/Event.h"
@@ -33,8 +34,8 @@ TChain* loadFiles(const Configuration& conf) {
         }
     }
     //https://root.cern.ch/doc/master/classTTreeCache.html
-    tree->SetCacheSize(10 * 1024 * 1024);
-    tree->AddBranchToCache("*");
+    //tree->SetCacheSize(10 * 1024 * 1024);
+    //tree->AddBranchToCache("*");
     return tree;
 }
 
@@ -68,17 +69,25 @@ int main(int argc, const char** argv) {
     TreeData data;
     data.loadTree(tree);
 
-    int njtot = 0;
+    long nentries = 0;
     long nbytes = 0;
     
     ResultMap results;
 
     cout << "Looping over events [" << conf.firstEntry << "," << conf.firstEntry+conf.numEntries << ")" << endl;
+    TStopwatch timer;
+    timer.Start();
 
     for (long iEntry=conf.firstEntry; iEntry<conf.firstEntry+conf.numEntries; iEntry++) {
 
         const bool do_print = (conf.printEvery>0 && iEntry % conf.printEvery == 0);
+        //std::vector<long> randoms;
+        //
+        //for (int ir=0; ir<1000; ir++) {
+        //}
+
         nbytes += tree->GetEntry(iEntry);
+        nentries += 1;
         if (do_print) {
             cout << "------" << endl;
             cout << "entry " << iEntry << endl;
@@ -101,9 +110,14 @@ int main(int argc, const char** argv) {
             } //categorymap
         } // systmap
     } //entries
+    timer.Stop();
+    double t_real = timer.RealTime();
+    double t_cpu = timer.CpuTime();
 
     //Finalize with output
-    cout << "Read " << nbytes/1024/1024 << " Mb" << endl;
+    cout << "Read " << nbytes/1024/1024 << " MB" << endl;
+    cout << "speedMB " << (double)nbytes/1024.0/1024.0 / t_real << " MB/s (real) " << (double)nbytes/1024.0/1024.0 / t_cpu << " MB/s (cpu)" << endl; 
+    cout << "speedEV " << (double)nentries / t_real << " ev/s (real) " << (double)nentries / t_cpu << " ev/s (cpu)" << endl; 
     cout << to_string(results) << endl;
     const string outname = ProcessKey::to_string(conf.process) + conf.prefix;
     saveResults(results, outname, conf.outputFile);
