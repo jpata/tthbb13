@@ -201,7 +201,6 @@ class MEAnalyzer(FilterAnalyzer):
                     MEM.TFType.bReco: jet.tf_b, MEM.TFType.qReco: jet.tf_l,
                 }
             )
-            print "adding jet", jet.pt, jet.btagFlag 
             if "meminput" in self.conf.general["verbosity"]:
                 print "memBQuark" if jet in bquarks else "memLQuark",\
                     jet.pt, jet.eta, jet.phi, jet.mass,\
@@ -218,7 +217,6 @@ class MEAnalyzer(FilterAnalyzer):
                 p4s=(lep.pt, lep.eta, lep.phi, lep.mass),
                 obs_dict={MEM.Observable.CHARGE: lep.charge},
             )
-            print "adding lepton", lep.pt, lep.charge
             if "meminput" in self.conf.general["verbosity"]:
                 print "memLepton", lep.pt, lep.eta, lep.phi, lep.mass, lep.charge
 
@@ -231,7 +229,6 @@ class MEAnalyzer(FilterAnalyzer):
             #MET is caused by massless object
             p4s=(met_cand.pt, 0, met_cand.phi, 0),
         )
-        print "adding met", met_cand.pt, met_cand.phi
 
     def process(self, event):
         # #self.inputCounter.Fill(1)
@@ -283,11 +280,11 @@ class MEAnalyzer(FilterAnalyzer):
             "p_tth": event.mem_results_tth[memidx].p,
             "p_ttbb": event.mem_results_ttbb[memidx].p,
             "p": event.mem_results_tth[memidx].p / (
-                event.mem_results_tth[memidx].p + 0.1*event.mem_results_ttbb[memidx].p
+                event.mem_results_tth[memidx].p + self.conf.mem["weight"]*event.mem_results_ttbb[memidx].p
             ) if event.mem_results_tth[memidx].p > 0 else 0.0
         }
         print json.dumps(outobjects, indent=2)
-        self.jsonout = open("events.json", "w+")
+        self.jsonout = open("events.json", "a")
         self.jsonout.write(
             json.dumps(outobjects, indent=2) + "\n\n\n"
         )
