@@ -60,11 +60,14 @@ class CommonClassifierAnalyzer(FilterAnalyzer):
 
         event.common_mem = []
         event.common_bdt = -2.0
+        
+        if not event.pass_category_blr:
+            return event
 
         if event.category_string.startswith("sl_"):
             bdt = self.bdtcalc.GetBDTOutput(selectedLeptonP4, selectedJetsP4, selectedJetsCSV, looseJetsP4, looseJetsCSV, met_p4)
-            #mem = self.memcalc.GetOutput(selectedLeptonP4, selectedLeptonCharge, selectedJetsP4, selectedJetsCSV, looseJetsP4, looseJetsCSV, met_p4)
             event.common_bdt = bdt
-            #event.common_mem = [mem]
+            mem = self.memcalc.GetOutput(selectedLeptonP4, selectedLeptonCharge, selectedJetsP4, selectedJetsCSV, looseJetsP4, looseJetsCSV, met_p4)
+            event.common_mem = [mem]
 
         return event

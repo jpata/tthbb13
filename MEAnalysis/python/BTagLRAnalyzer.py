@@ -42,7 +42,6 @@ class BTagLRAnalyzer(FilterAnalyzer):
         #self.cplots_old = ROOT.TFile(self.conf.general["controlPlotsFileOld"])
         self.cplots = ROOT.TFile(self.conf.general["controlPlotsFile"])
         #self.cplots_new = ROOT.TFile(self.conf.general["controlPlotsFileNew"])
-        self.nJetsForPerm = self.conf.jets["NJetsForBTagLR"]
 
         self.csv_pdfs = self.getPdfs(self.cplots)
         #self.csv_pdfs_new = self.getPdfs(self.cplots_new)
@@ -154,6 +153,7 @@ class BTagLRAnalyzer(FilterAnalyzer):
         
         for pdf in ["new_pt_eta_bin_3d"]:
             for tagger in taggers:
+                #Use only the first N jets by blr for likelihood ratio calculation 
                 jets_for_btag_lr[tagger] =  sorted(
                     event.good_jets, key=lambda x, tagger=tagger: getattr(x, tagger), reverse=True
                 )[0:self.conf.jets["NJetsForBTagLR"]]
@@ -271,7 +271,7 @@ class BTagLRAnalyzer(FilterAnalyzer):
 
         event.category_string = cat
         if cat != "unknown":
-            event.pass_category_blr = logit(event.btag_LR_4b_2b) > self.conf.mem["blr_cuts"].get(cat, -10)
+            event.pass_category_blr = logit(event.btag_LR_4b_2b) > self.conf.mem["blr_cuts"].get(cat, -20)
         else:
             event.pass_category_blr = False
 
