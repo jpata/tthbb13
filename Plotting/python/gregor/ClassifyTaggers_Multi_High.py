@@ -80,7 +80,7 @@ for label in ["xtruth",
 
     # HTT Mass + fRec + DeltaR + tau3/tau2
     setup = TMVASetup("{0}_{1}_{2}_{3}".format(sample_sig, sample_bkg, "OptRHTT_mass_frec_dr_tau", label),
-                       "HTT V2 - m, fRec, #Delta R, #tau_{3}/#tau_{2}",
+                       "HTT V2 - m, f_{Rec}, #Delta R, #tau_{3}/#tau_{2}",
                        [["Cuts", "FitMethod=MC:Sigma=0.3:SampleSize=2000000:VarProp[1]=FSmart:VarProp[3]=FSmart:CutRangeMin[0]=0:CutRangeMax[0]=130:CutRangeMin[1]=0:CutRangeMax[1]=0.5:CutRangeMin[2]=-0.5:CutRangeMax[2]=0.5:CutRangeMin[3]=0:CutRangeMax[3]=1"]], 
                        [variable.di['looseOptRHTT_mass'],
                         variable.di['looseOptRHTT_fRec'],
@@ -248,7 +248,7 @@ for label in ["xtruth",
 
     # HTT Mass + fRec + DeltaR +  tau3/tau2 + btag
     setup = TMVASetup("{0}_{1}_{2}_{3}".format(sample_sig, sample_bkg, "OptRHTT_mass_frec_dr_tau_btag", label),
-                       "HTT V2 - m, fRec, #Delta R, #tau_{3}/#tau_{2}, b",
+                       "HTT V2 - m, f_{Rec}, #Delta R, #tau_{3}/#tau_{2}, b",
                        [["Cuts", "FitMethod=MC:Sigma=0.3:SampleSize=2000000:VarProp[1]=FSmart:VarProp[3]=FSmart:VarProp[4]=FSmart:CutRangeMin[0]=0:CutRangeMax[0]=130:CutRangeMin[1]=0:CutRangeMax[1]=0.5:CutRangeMin[2]=-0.5:CutRangeMax[2]=0.5:CutRangeMin[3]=0:CutRangeMax[3]=1:CutRangeMin[4]=0:CutRangeMax[4]=1"]], 
                        [variable.di['looseOptRHTT_mass'],
                         variable.di['looseOptRHTT_fRec'],

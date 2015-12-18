@@ -54,9 +54,9 @@ echo "Done with cmsRun"
 echo "Doing ls"
 ls -lactrh .
 
-echo "Running MakeTaggingNtuple.py"
-python MakeTaggingNtuple.py
-echo "Done with MakeTaggingNtuple.py"
+#echo "Running MakeTaggingNtuple.py"
+#python MakeTaggingNtuple.py
+#echo "Done with MakeTaggingNtuple.py"
 
 echo "Doing ls"
 ls -lactrh .

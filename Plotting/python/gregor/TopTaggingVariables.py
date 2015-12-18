@@ -28,6 +28,17 @@ for htt, htt_name in zip(htts, htt_names):
                              -0.8, 1., 
                              extra_cut = "({0}_mass > 0)".format(htt)
                          ))
+    htt_vars.append(variable('{0}_Ropt'.format(htt), 
+                             htt_name + "R_{opt}", 
+                             0, 1.5, 
+                             extra_cut = "({0}_mass > 0)".format(htt)
+                         ))
+    htt_vars.append(variable('{0}_RoptCalc'.format(htt), 
+                             htt_name + "R_{opt, Calc.}", 
+                             0, 1.5, 
+                             extra_cut = "({0}_mass > 0)".format(htt)
+                         ))
+
 
 groomers = [
     "",
@@ -57,7 +68,7 @@ groomer_names = [
     "Ungroomed",
     "Filtered (r=0.2, n=3)",
     "Filtered (r=0.2, n=5)",
-    "Pruned (z=0.1, rcut=0.5)",
+    "Pruned (z=0.1, r_{cut}=0.5)",
     "Trimmed (r=0.2, f=0.03)",
     "Trimmed (r=0.2, f=0.06)",
     "Trimmed (r=0.2, f=0.09)",
@@ -74,6 +85,14 @@ groomer_names = [
     "Softdrop (z=0.15, #beta=-1)",
     "Softdrop (z=0.2, #beta=-1)",
 ]
+
+shorters = {
+    "Ungroomed" : "Ung.",
+    "Filtered"  : "Filt.",
+    "Pruned"    : "Pr.",
+    "Trimmed"   : "Tr.",
+    "Softdrop"  : "SD.",
+}
 
 
 mass_vars = []
@@ -115,8 +134,21 @@ for fj in ["ak08", "ca15"]:
                 mass_limit = 400
             
             
+                
+        nice_short_name = groomer_name
+        for k,v in shorters.iteritems():
+            #print nice_short_name,
+            nice_short_name = nice_short_name.replace(k, "m_{"+v+"}")
+            #print nice_short_name
 
-        mass_vars.append(variable(fj+groomer+"_mass", groomer_name + " Mass", min_mass, mass_limit, unit = "GeV"))
+        mass_vars.append(variable(fj+groomer+"_mass", 
+                                  groomer_name + " Mass", 
+                                  min_mass, 
+                                  mass_limit, 
+                                  unit = "GeV",
+                                  pretty_name_short = nice_short_name
+                              ),                         
+        )
         
         variable("{0}_tau3/{0}{1}_tau2".format(fj, groomer), 
                  groomer_name + "(u/g) #tau_{3}/#tau_{2}", 
@@ -131,7 +163,9 @@ for fj in ["ak08", "ca15"]:
         variable("{0}{1}_tau3/{0}{1}_tau2".format(fj, groomer), 
                  groomer_name + " #tau_{3}/#tau_{2}", 
                  0, 1., 
-                 extra_cut = "({0}{1}_tau2>0)".format(fj,groomer))
+                 extra_cut = "({0}{1}_tau2>0)".format(fj,groomer),
+                 pretty_name_short = groomer_name.replace("Softdrop","SD.") + " #tau_{3}/#tau_{2}", 
+        )
 
 
         
@@ -153,19 +187,22 @@ for fj in ["ak08", "ca15"]:
     
     variable("{0}_qvol".format(fj), "Q-jet volatility", 0, .5)
 
+variable('(ca15_tau3/ca15_tau2-ca15softdropz20b10_tau3/ca15softdropz20b10_tau2)/(ca15_tau3/ca15_tau2)','tau ratio',-1,1)
+variable('(ca15_tau3/ca15_tau2-ca15softdropz20b10_tau3/ca15softdropz20b10_tau2)','tau diff',-1,1)
+
 variable('ak08trimmedr2f6forbtag_btag', "btag", 0, 1.)
 
 
 variable('ca15trimmedr2f6forbtag_btag', "Trimmed (r=0.2, f=0.06) btag", 0, 1.)
 variable('ca15trimmedr2f3forbtag_btag', "Trimmed (r=0.2, f=0.03) btag", 0, 1.)
 variable('ca15softdropz10b00forbtag_btag', "Softdrop (z=0.1, #beta=0) btag", 0, 1.)
-variable('ca15softdropz20b10forbtag_btag', "Softdrop (z=0.2, #beta=1) btag", 0, 1.)
+variable('ca15softdropz20b10forbtag_btag', "Softdrop (z=0.2, #beta=1) btag", 0, 1., pretty_name_short = "subjet b-tag")
 variable('ca15filteredn3r2forbtag_btag', "Filtered btag", 0, 1.)
 variable('ca15prunedn3z10rfac50forbtag_btag', "Pruned btag", 0, 1.)
 
 variable('ak08trimmedr2f6forbtag_btag', "Trimmed (r=0.2, f=0.06) btag", 0, 1.)
 variable('ak08trimmedr2f3forbtag_btag', "Trimmed (r=0.2, f=0.03) btag", 0, 1.)
-variable('ak08softdropz10b00forbtag_btag', "Softdrop (z=0.1, #beta=0) btag", 0, 1.)
+variable('ak08softdropz10b00forbtag_btag', "Softdrop (z=0.1, #beta=0) btag", 0, 1., pretty_name_short = "subjet b-tag")
 variable('ak08softdropz20b10forbtag_btag', "Softdrop (z=0.2, #beta=1) btag", 0, 1.)
 variable('ak08filteredn3r2forbtag_btag', "Filtered btag", 0, 1.)
 variable('ak08prunedn3z10rfac50forbtag_btag', "Pruned btag", 0, 1.)

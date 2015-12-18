@@ -35,7 +35,7 @@ else:
     from TTH.Plotting.python.Helpers.PrepareRootStyle import myStyle
 
 
-myStyle.SetPadLeftMargin(0.18)
+myStyle.SetPadLeftMargin(0.15)
 myStyle.SetPadTopMargin(0.12)
 
 ROOT.gROOT.SetStyle("myStyle")
@@ -51,7 +51,7 @@ li_colors = [ROOT.kRed,      ROOT.kBlue+1,     ROOT.kBlack,
 
 li_marker_styles = [20]*4+[21]*4+[22]*4+[23]*4+[24,25,26,27]*100
 
-tmp = [1]*(len(li_colors)/10) + [2]*(len(li_colors)/10) + [3]*(len(li_colors)/10)
+tmp = [1]*(len(li_colors)/20) + [2]*(len(li_colors)/20) + [3]*(len(li_colors)/20)
 li_line_styles = tmp*20
 
 ########################################
@@ -214,12 +214,17 @@ def doTMVA(setup):
     event_counts = {}
     [event_counts["n_sig_fiducial"], event_counts["e_sig_fiducial"]]   = countEventsAndError(signal, setup.fiducial_cut_sig, setup.weight_sig)
     [event_counts["n_bkg_fiducial"],  event_counts["e_bkg_fiducial"]]  = countEventsAndError(background, setup.fiducial_cut_bkg, setup.weight_bkg)
-    [event_counts["n_sig_cuts"],     event_counts["e_sig_cuts"]]       = countEventsAndError(signal, cut_signal, setup.weight_sig)
-    [event_counts["n_bkg_cuts"],      event_counts["e_bkg_cuts"]]      = countEventsAndError(background, cut_bkg, setup.weight_bkg)
-
+    
     pickle.dump(event_counts, outputFilePickle)
     outputFilePickle.close()
 
+    # Count unweighted events 
+    n_sig_cuts_noweight = countEventsAndError(signal, cut_signal, "1")[0]
+    n_bkg_cuts_noweight = countEventsAndError(background, cut_bkg, "1")[0]
+    
+    n_training_events = int(min(n_sig_cuts_noweight, n_bkg_cuts_noweight)/2.)
+
+    print "Number of events for training: ", n_training_events
 
     ########################################
     # TMVA starts here
@@ -229,7 +234,7 @@ def doTMVA(setup):
 
     # Create instance of TMVA factory
     factory = ROOT.TMVA.Factory( setup.name, outputFile, 
-                            "!V:!Silent:Color:DrawProgressBar:Transformations=I:AnalysisType=Classification" )
+                            "!V:!Silent:Color:DrawProgressBar:Transformations=I:AnalysisType=Classification:" )
     factory.SetVerbose( False )
 
     # Add variables to factory
@@ -259,7 +264,7 @@ def doTMVA(setup):
     # prepare trees
     # :nTrain_Background=250000
     factory.PrepareTrainingAndTestTree( mycutSig, mycutBkg,
-                                        "SplitMode=Random:NormMode=None:!V" )
+                                        "SplitMode=Random:NormMode=None:!V:nTrain_Signal={0}:nTrain_Background={1}".format(n_training_events, 2*n_training_events) )
 
 
     ########################################
@@ -431,12 +436,59 @@ def doROCandWP(setup):
             if method == "Cuts":
                 # This should be 100 bins with cuts
                 binlist = xmldoc.getElementsByTagName('Weights')[0].getElementsByTagName("Bin")
-            elif method == "Likelihood":
-                binlist = [1.-x/100. for x in range(100)]
-                binlist.extend( [1. - x/1000. for x in range(100)])
-                binlist.extend( [1. - x/10000. for x in range(20)])
-                binlist = sorted(list(set(binlist)))
-                               
+
+            elif method in ["BDT", "Likelihood"] :
+
+                binlist = []
+
+                for target_es in [0.29, 0.3, 0.31]:
+                
+                    x = 0
+                    delta = 0.1
+
+                    repeats = 0
+
+                    # Get intial efficiency
+                    cuts_sig = "(({0} > {1}) && (classID=={2}))".format(method, x,classid_sig)
+                    [n_pass_sig, e_pass_sig] = countEventsAndError(testTree, cuts_sig, "weight")
+                    last_es = calcEffAndError(n_pass_sig, e_pass_sig, event_counts["n_sig_fiducial"]*test_frac_sig, event_counts["e_sig_fiducial"]*math.sqrt(test_frac_sig))[0]
+
+                    while True:
+
+                        print "Searching for", target_es, ":", x, delta, last_es
+
+                        # Efficiency too small, make cut looser
+                        if last_es < target_es:                        
+                            x -= delta
+                        # Efficiency too large, make cut tighter
+                        else:
+                            x += delta
+
+                        # Recalculate efficiency
+                        cuts_sig = "(({0} > {1}) && (classID=={2}))".format(method, x,classid_sig)
+                        [n_pass_sig, e_pass_sig] = countEventsAndError(testTree, cuts_sig, "weight")
+                        es = calcEffAndError(n_pass_sig, e_pass_sig, event_counts["n_sig_fiducial"]*test_frac_sig, event_counts["e_sig_fiducial"]*math.sqrt(test_frac_sig))[0]
+
+                        # If we switched to the other side of target es, half the step-width
+                        if (es < target_es and last_es > target_es) or (es > target_es and last_es < target_es):
+                            delta /= 2.
+                        
+                        if es==last_es:
+                            repeats += 1
+                        else:
+                            repeats = 0
+                            
+                        # We found it
+                        if abs(last_es - target_es) < 0.001 or repeats == 10: 
+                            binlist.extend([x-2*delta, x-delta, x-delta/2, x, x+delta/2, x + delta, x+2*delta])
+                            print "Done here!"
+                            break
+
+                        # Update last efficiency
+                        last_es = es
+                    # 
+                # End loop over target_es
+                binlist = list(set(binlist))
 
             gr = ROOT.TGraphAsymmErrors()
 
@@ -449,8 +501,10 @@ def doROCandWP(setup):
                 #{"nominal_bkg" : 0.1,   "actual_bkg":-1000, "actual_sig":-1000, "cuts" : "(1)"},
             ]
 
+
+            last_eff_bkg = -1
             for ibin, x in enumerate(binlist):
-                
+
                 # We don't need the preselection cuts - they're already applied when making the test tree                
                 li_cuts = ["(1)"]
 
@@ -463,8 +517,10 @@ def doROCandWP(setup):
                         li_cuts.append("({0}>{1})".format(expr, min_val))
                         li_cuts.append("({0}<{1})".format(expr, max_val))
                     # End of loop over expressions
-                elif method == "Likelihood":
-                    li_cuts.append("(Likelihood > {0})".format(x))
+                elif method in ["Likelihood", "BDT"]:
+                    li_cuts.append("({0} > {1})".format(method, x))
+
+
 
                 # We need one additional cut to distinguish signal
                 # from background (these are mixed in the test tree)
@@ -494,6 +550,8 @@ def doROCandWP(setup):
                 eff_total_sig, err_total_sig_low, err_total_sig_high = calcEffAndError(n_pass_sig, e_pass_sig, event_counts["n_sig_fiducial"]*test_frac_sig, event_counts["e_sig_fiducial"]*math.sqrt(test_frac_sig))
                 eff_total_bkg, err_total_bkg_low, err_total_bkg_high = calcEffAndError(n_pass_bkg, e_pass_bkg, event_counts["n_bkg_fiducial"]*test_frac_bkg, event_counts["e_bkg_fiducial"]*math.sqrt(test_frac_bkg))
 
+                print x, eff_total_sig, eff_total_bkg
+
                 #print "Sig: {0:5<.3f} +{1:5<.3f} -{2:5<.3f}   Bkg: {3:5<.3f} +{4:5<.3f} -{5:5<.3f}".format(eff_total_sig*100,
                 #                                                                                           err_total_sig_high*100,
                 #                                                                                           err_total_sig_low*100,
@@ -501,12 +559,14 @@ def doROCandWP(setup):
                 #                                                                                           err_total_bkg_high*100,
                 #                                                                                           err_total_bkg_low*100)
 
-                if eff_total_sig > 0.0:
+                if eff_total_sig > 0.0 and eff_total_bkg > last_eff_bkg:
+                    
+                    last_eff_bkg = eff_total_bkg
+
                     i = gr.GetN()
 
                     gr.SetPoint(i, eff_total_sig, eff_total_bkg)
-                    if False:                        
-                        gr.SetPointError(i, err_total_sig_low, err_total_sig_high,  err_total_bkg_low, err_total_bkg_high) 
+                    gr.SetPointError(i, err_total_sig_low, err_total_sig_high,  err_total_bkg_low, err_total_bkg_high) 
 
                     # Look for working points
                     for point in interesting_points:
@@ -607,9 +667,8 @@ def doROCandWP(setup):
                 eff_total_sig, err_total_sig_low, err_total_sig_high = calcEffAndError(n_pass_sig, e_pass_sig, event_counts["n_sig_fiducial"]*test_frac_sig, event_counts["e_sig_fiducial"]*math.sqrt(test_frac_sig))
                 eff_total_bkg, err_total_bkg_low, err_total_bkg_high = calcEffAndError(n_pass_bkg, e_pass_bkg, event_counts["n_bkg_fiducial"]*test_frac_bkg, event_counts["e_bkg_fiducial"]*math.sqrt(test_frac_bkg))
 
-                wp_gr.SetPoint(0, eff_total_sig, 1-eff_total_bkg)
-                # As we show -e(bg) we have to flip high/low for it 
-                wp_gr.SetPointError(0, err_total_sig_low, err_total_sig_high,  err_total_bkg_high, err_total_bkg_low) 
+                wp_gr.SetPoint(0, eff_total_sig, eff_total_bkg)
+                wp_gr.SetPointError(0, err_total_sig_low, err_total_sig_high, err_total_bkg_low, err_total_bkg_high) 
 
                 ret["wps"].append(wp_gr)
                 ret["wp_names"].append(wp["name"].replace("[name]", setup.pretty_name))
@@ -633,9 +692,8 @@ def doROCandWP(setup):
                 eff_total_sig, err_total_sig_low, err_total_sig_high = calcEffAndError(n_pass_sig, e_pass_sig, event_counts["n_sig_fiducial"]*test_frac_sig, event_counts["e_sig_fiducial"]*math.sqrt(test_frac_sig))
                 eff_total_bkg, err_total_bkg_low, err_total_bkg_high = calcEffAndError(n_pass_bkg, e_pass_bkg, event_counts["n_bkg_fiducial"]*test_frac_bkg, event_counts["e_bkg_fiducial"]*math.sqrt(test_frac_bkg))
 
-                # !!!
+
                 wp_gr.SetPoint(0, eff_total_sig, eff_total_bkg)
-                # ((((As we show -e(bg) we have to flip high/low for it )))
                 wp_gr.SetPointError(0, err_total_sig_low, err_total_sig_high, err_total_bkg_low, err_total_bkg_high) 
 
                 ret["wps"].append(wp_gr)
@@ -658,7 +716,7 @@ def doROCandWP(setup):
 def plotROCs(name, 
              li_setups, 
              extra_text = [""], 
-             x_label = "#varepsilon(S)",
+             x_label = "#varepsilon_{S}",
              error_band = True,
 ):
 
@@ -697,16 +755,20 @@ def plotROCs(name,
     for view in [
             #"left_top", "all", "weak_left_top", "weak_all", 
             "log", 
-            "log2", 
+            "log2",
+            "log3",  
             "loglow", 
             "loglow2", 
             "loglow3", 
             "loglow4", 
             "loglow5", 
+            "loglow6", 
             #"logpuppi"
     ]:
 
+        x_extra_text = 0.22
         y_extra_text =  0.8
+
 
         # Top Tagging
         # High Purity
@@ -718,6 +780,13 @@ def plotROCs(name,
         elif view == "log2":
             legend_origin_y = 0.15
             legend_origin_x = 0.44
+            c.SetLogy(1)
+            h_bkg = ROOT.TH2F("","",100,0,1.1,100,0.0001,0.1)
+        elif view == "log3":
+            legend_origin_y = 0.155
+            legend_origin_x = 0.48
+            x_extra_text = 0.214
+            y_extra_text =  0.823
             c.SetLogy(1)
             h_bkg = ROOT.TH2F("","",100,0,1.1,100,0.0001,0.1)
         elif view == "loglow":
@@ -746,6 +815,12 @@ def plotROCs(name,
             legend_origin_x = 0.33
             c.SetLogy(1)
             h_bkg = ROOT.TH2F("","",100,0,1.,100,0.0001,1.2)
+        elif view == "loglow6":
+            legend_origin_y = 0.145
+            legend_origin_x = 0.605
+            y_extra_text =  0.83
+            c.SetLogy(1)
+            h_bkg = ROOT.TH2F("","",100,0,1.,100,0.0001,0.8)
         elif view == "logpuppi":
             legend_origin_y = 0.15
             legend_origin_x = 0.32
@@ -804,7 +879,8 @@ def plotROCs(name,
 
 
         h_bkg.GetXaxis().SetTitle( x_label  )      
-        h_bkg.GetYaxis().SetTitle( "#varepsilon(B)" )      
+        h_bkg.GetXaxis().SetNdivisions(508)
+        h_bkg.GetYaxis().SetTitle( "#varepsilon_{B}" )      
         h_bkg.Draw()
 
         
@@ -863,7 +939,7 @@ def plotROCs(name,
         l_txt.SetTextSize(0.04)
 
         for line in extra_text:
-            l_txt.DrawLatexNDC(0.22, y_extra_text, line)
+            l_txt.DrawLatexNDC(x_extra_text, y_extra_text, line)
             y_extra_text -= 0.06
 
         legend.Draw()

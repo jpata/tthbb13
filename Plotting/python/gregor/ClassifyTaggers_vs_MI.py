@@ -79,6 +79,7 @@ for pair_name, pair in pairs.iteritems():
         ["ca15_tau3/ca15_tau2", "CutRangeMin[0]=0:CutRangeMax[0]=1:VarProp[0]=FSmart"],
         ["ca15softdropz20b10_tau3/ca15softdropz20b10_tau2", "CutRangeMin[0]=0.2:CutRangeMax[0]=0.8"],
 
+        ["ca15softdropz20b10forbtag_btag", "CutRangeMin[0]=0:CutRangeMax[0]=1:VarProp[0]=FSmart"],
         ["log(ca15_chi2)", "CutRangeMin[0]=-10:CutRangeMax[0]=10:VarProp[0]=FSmart"],        
     
     ]
@@ -89,6 +90,7 @@ for pair_name, pair in pairs.iteritems():
                                          variable.di[var].pretty_name.replace("Mass", "m").replace("Mass", "m"),
                                          # FitMethod=MC:SampleSize=100000:Sigma=0.3:"+extra
                                          [["Likelihood", "V"]], 
+                                         #[["BDT", "NTrees=100"]], 
                                          [variable.di[var]],
                                          [],
                                          file_name_sig,
@@ -134,7 +136,9 @@ for pair_name, pair in pairs.iteritems():
 
             setup = TMVASetup("{0}_{1}_{2}_{3}_vsMI".format(sample_sig, sample_bkg, var_1.replace("/","_"), var_2.replace("/","_")),
                               variable.di[var_1].pretty_name.replace("Mass", "m").replace("Mass", "m") + " " + variable.di[var_2].pretty_name.replace("Mass", "m").replace("Mass", "m"),
-                              [["Likelihood", "V"]], 
+                              #[["Likelihood", "V"]], 
+                              #[["BDT", "NTrees=100:MaxDepth=4"]],
+                              [["BDT", "NTrees=1000:MaxDepth=3:BoostType=Grad:Shrinkage=0.3"]], 
                               [variable.di[var_1],
                                variable.di[var_2],
                            ],
@@ -152,7 +156,10 @@ for pair_name, pair in pairs.iteritems():
             
             double_setups.append(setup)
                
-    pool.map(doTMVA, double_setups)
+
+    pool.map(doTMVA, single_setups + double_setups)
+    plotROCs("fixedR_MI_ROC_LikBDT4_" + pair_name, single_setups + double_setups, error_band = False)        
+    #plotROCs("WTF_" + pair_name, single_setups + double_setups, error_band = False)        
 
     #plotROCs("fixedR_MI_ROC_" + pair_name, single_setups, 
     #             extra_text = [pretty_fiducial_cuts[sample_sig],
@@ -160,8 +167,14 @@ for pair_name, pair in pairs.iteritems():
     #                           "#Delta R(top,parton) < 0.8"],
     #             error_band = False)
 
+    # fixedR_MI_ROC_LikBDT_: Likelihood + BDT (100 trees, depth=3)
+    # fixedR_MI_ROC_LikBDT2_: Likelihood + BDT (100 trees, depth=2)
+    # fixedR_MI_ROC_LikBDT3_: Likelihood + BDT (100 trees, depth=4)
+
+
+
     #plotROCs("fixedR_MI_ROC_single_" + pair_name, single_setups, error_band = False)        
-    plotROCs("fixedR_MI_ROC_double_" + pair_name, double_setups, error_band = False)        
+    #plotROCs("fixedR_MI_ROC_double_" + pair_name, double_setups, error_band = False)        
 
 
 

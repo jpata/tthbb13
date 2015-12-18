@@ -84,7 +84,7 @@ process.selectedHadronsAndPartons = selectedHadronsAndPartons.clone(
 # Ungroomed Fatjets
 #####################################
 
-DO_R15 = False
+DO_R15 = True
 DO_R08 = True
 
 from RecoJets.JetProducers.AnomalousCellParameters_cfi import *

@@ -13,7 +13,8 @@ config.JobType.allowUndistributedCMSSW = True
 config.JobType.maxJobRuntimeMin = 60*24 #maximal job runtime in minute
 config.JobType.scriptExe = 'myScript.sh'
 config.JobType.inputFiles = ["../python/MakeTaggingNtuple.py", "../python/AccessHelpers.py"]
-config.JobType.outputFiles = ["output-tagging.root"]
+#config.JobType.outputFiles = ["output-tagging.root"]
+config.JobType.outputFiles = ["output.root"]
 
 config.section_("Data")
 config.Data.inputDBS = 'global'

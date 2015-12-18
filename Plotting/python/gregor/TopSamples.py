@@ -169,8 +169,8 @@ ranges = {
     "qcd_1000_1400"     : [1001, 1399, 1.3, 0.6, "ak08"],
     "qcd_1000_1400_phys14"     : [1001, 1399, 1.3, 0.6, "ak08"],
 
-    "wjets_lnu_ht_600_inf_200_300" : [201, 299, 2.4, 0.8, "ca15"],
-    "wjets_lnu_ht_600_inf_300_470" : [301, 469, 2.4, 0.8, "ca15"],   
+    "wjets_lnu_ht_600_inf_200_300" : [201, 299, 2.4, 1.0, "ca15"],
+    "wjets_lnu_ht_600_inf_300_470" : [301, 469, 2.4, 1.0, "ca15"],   
     "wjets_lnu_ht_600_inf_600_800" : [601, 799, 2.1, 0.6, "ak08"],
 }
 
@@ -223,21 +223,21 @@ other_sample_names = {
             }
 
 other2_sample_names = {
-    "zprime_m750"      : "Top, 200<p_{T}<300",                      
-    "zprime_m1000"     : "Top, 300<p_{T}<470",                      
-    "zprime_m1000_puppi": "PUPPI, Top, 300< p_{T} < 470",                      
-    "zprime_m1250"     : "Top, 470<p_{T}<600",                      
-    "zprime_m2000_low" : "Top, 600<p_{T}<800",                      
-    "zprime_m2000"     : "Top, 800<p_{T}<1000",                      
-    "zprime_m3000"     : "Top, 1000<p_{T}<1400",                      
+    "zprime_m750"      : "Top, 200<p_{T}<300 GeV",                      
+    "zprime_m1000"     : "Top, 300<p_{T}<470 GeV",                      
+    "zprime_m1000_puppi": "PUPPI, Top, 300< p_{T} < 470 GeV",                      
+    "zprime_m1250"     : "Top, 470<p_{T}<600 GeV",                      
+    "zprime_m2000_low" : "Top, 600<p_{T}<800 GeV",                      
+    "zprime_m2000"     : "Top, 800<p_{T}<1000 GeV",                      
+    "zprime_m3000"     : "Top, 1000<p_{T}<1400 GeV",                      
 
-    "qcd_170_300"      : "QCD, 200<p_{T}<300",
-    "qcd_300_470"      : "QCD, 300<p_{T}<470",
-    "qcd_300_470_puppi": "PUPPI, QCD, 300 <p_{T} < 470",
-    "qcd_470_600"      : "QCD, 470<p_{T}<600",
-    "qcd_600_800"      : "QCD, 600<p_{T}<800",
-    "qcd_800_1000"     : "QCD, 800<p_{T}<1000",
-    "qcd_1000_1400"    : "QCD, 1000<p_{T}<1400",
+    "qcd_170_300"      : "QCD, 200<p_{T}<300 GeV",
+    "qcd_300_470"      : "QCD, 300<p_{T}<470 GeV",
+    "qcd_300_470_puppi": "PUPPI, QCD, 300 <p_{T} < 470 GeV",
+    "qcd_470_600"      : "QCD, 470<p_{T}<600 GeV",
+    "qcd_600_800"      : "QCD, 600<p_{T}<800 GeV",
+    "qcd_800_1000"     : "QCD, 800<p_{T}<1000 GeV",
+    "qcd_1000_1400"    : "QCD, 1000<p_{T}<1400 GeV",
 
 }
 
@@ -265,6 +265,6 @@ nosize_fiducial_cuts = {}
 for k,v in ranges.iteritems():
     fiducial_cuts[k] = "((pt>{0})&&(pt<{1})&&(fabs(eta)<{2})&&(top_size<{3}))".format(v[0], v[1], v[2], v[3])
     nosize_fiducial_cuts[k] = "((pt>{0})&&(pt<{1})&&(fabs(eta)<{2}))".format(v[0], v[1], v[2])
-    pretty_fiducial_cuts[k] = "{0} < p_{{T}} < {1}, |#eta| < {2}".format(v[0]-1, v[1]+1, v[2])
+    pretty_fiducial_cuts[k] = "{0} < p_{{T}} < {1} GeV, |#eta| < {2}".format(v[0]-1, v[1]+1, v[2])
 
 

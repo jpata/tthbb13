@@ -30,6 +30,7 @@ basepath = '/scratch/gregor/'
 
 pairs = { 
     "pt-300-to-470" : ["zprime_m1000", "qcd_300_470"],
+    "pt-800-to-1000" : ["zprime_m2000", "qcd_800_1000"],
 }
 
 for pair_name, pair in pairs.iteritems():
@@ -47,36 +48,61 @@ for pair_name, pair in pairs.iteritems():
     mis = []
 
 
+    if pair_name == "pt-300-to-470":
+        interesting_vars = [
+            "ca15prunedn3z10rfac50_mass",
+            "ca15filteredn3r2_mass", 
+            "ca15softdropz10b00_mass",
+            "ca15trimmedr2f3_mass", 
+            "ca15softdropz20b10_mass",
 
-    interesting_vars = [
+            "looseOptRHTT_mass",
+            "looseOptRHTT_fRec",
+            "looseOptRHTT_Ropt-looseOptRHTT_RoptCalc", 
 
-        "ca15prunedn3z10rfac50_mass",
-        "ca15filteredn3r2_mass", 
-        "ca15softdropz10b00_mass",
-        "ca15trimmedr2f3_mass", 
-        "ca15softdropz20b10_mass",
+            "ca15_qvol", 
 
-        "looseOptRHTT_mass",
-        "looseOptRHTT_fRec",
-        "looseOptRHTT_Ropt-looseOptRHTT_RoptCalc", 
+            "ca15_tau3/ca15_tau2",
+            "ca15softdropz20b10_tau3/ca15softdropz20b10_tau2", 
 
-        "ca15_qvol", 
+            "ca15softdropz20b10forbtag_btag",
+            "log(ca15_chi2)", 
+        ]
+        dr_text = "#Delta R(top,parton) < 0.8"
+        fn = "fixedR_MI_ROC_LikBDT4_pt-300-to-470_out_gr.dat"
+        
+    else:
+        interesting_vars = [
+            "ak08prunedn3z10rfac50_mass",
+            "ak08filteredn3r2_mass", 
+            "ak08softdropz10b00_mass",
+            "ak08trimmedr2f3_mass", 
 
-        "ca15_tau3/ca15_tau2",
-        "ca15softdropz20b10_tau3/ca15softdropz20b10_tau2", 
+            "ak08_tau3/ak08_tau2",
+            "ak08_qvol", 
 
-        "log(ca15_chi2)", 
-    ]
+            "looseOptRHTT_mass",
+            "looseOptRHTT_fRec",
+            "looseOptRHTT_Ropt-looseOptRHTT_RoptCalc", 
 
+
+
+            "ak08cmstt_minMass",
+            "ak08cmstt_topMass",
+            
+            "ak08softdropz10b00forbtag_btag",
+            "log(ak08_chi1)", 
+        ]
+        dr_text = "#Delta R(top,parton) < 0.6"        
+  #      fn = "fixedR_MI_ROC_high_LikBDT3_pt-800-to-1000_out_gr.dat"
+        #fn = "fixedR_MI_ROC_high_TestLikBDT3_pt-800-to-1000_out_gr.dat"
+        fn = "fixedR_MI_ROC_high_TestLikBDT4_pt-800-to-1000_out_gr.dat"
+        
     mis.append(mi(pair_name + "_interesting_vars", 
-                  pair[0], pair[1], 
-                  [ var.di[v] for v in interesting_vars], 
-                  fiducial_cut_and_weight, fiducial_cut_and_weight,
-                  read_from_pickle = False,
-                  extra_text = [pretty_fiducial_cuts[pair[0]],
-                                "flat p_{T} and #eta",
-                                "#Delta R(top,parton) < 0.6"],
-
+                  [var.di[v] for v in interesting_vars],     
+                  fn,
+                  [pretty_fiducial_cuts[pair[0]],"flat p_{T} and #eta", dr_text],
+                  error = False
               ))
 
-    MakePlots(mis, full_filenames)
+    MakePlots(mis)

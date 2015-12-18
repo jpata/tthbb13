@@ -142,7 +142,7 @@ class plotList:
         self.do_write_thresholds = do_write_thresholds
 
         if not li_colors:
-            self.li_colors = [ROOT.kRed,      ROOT.kBlue+1,     ROOT.kBlack, 
+            self.li_colors = [ROOT.kBlack,  ROOT.kRed,      ROOT.kBlue+1,     
                               ROOT.kOrange-1, ROOT.kViolet+1,   ROOT.kGreen+1,
                               ROOT.kGray,     ROOT.kYellow,
                               ]*10
@@ -292,41 +292,45 @@ def doPlots( dic_files ):
           input_tree = getattr(input_file, plot.input_treename)
 
           # draw the numerator and save into h_num
-          htmp_name = "htmp"+str(i_draw)
-
+          htmp_name_num = "htmp"+str(i_draw)
           # Force TH1D or we'll get TH1F !!!
-          tmp_num =  ROOT.TH1D(htmp_name,htmp_name,plot_list.nbins_x,plot_list.min_x,plot_list.max_x)
-
-          # build the drawing-string from a list
-          # (easier to read than '+' clutter)
-          li_draw_string = [plot.var, 
-                            ">>", htmp_name]
-          # and actually draw
-          # weight is applied by multiplying with cutstring
-          draw_string = "".join(li_draw_string)
-          input_tree.Draw( draw_string, plot.ev_weight+"*("+plot.cuts_num+")")
-          h_num = ROOT.gDirectory.Get(htmp_name)
-          h_num.SetDirectory(0)
-          i_draw += 1
-
-          # draw the denominator and save into h_denom
-          htmp_name = "htmp"+str(i_draw)
-
-          # Force TH1D or we'll get TH1F !!!
-          tmp_denom =  ROOT.TH1D(htmp_name,htmp_name,plot_list.nbins_x,plot_list.min_x,plot_list.max_x)
-
-          # build the drawing-string from a list
-          # (easier to read than '+' clutter)
-          li_draw_string = [plot.var, 
-                            ">>", htmp_name]
-          draw_string = "".join(li_draw_string)
-          # and actually draw
-          # weight is applied by multiplying with cutstring
-          input_tree.Draw(  draw_string, plot.ev_weight+"*("+plot.cuts_denom+")") 
-          h_denom = ROOT.gDirectory.Get(htmp_name)
-          h_denom.SetDirectory(0)
+          tmp_num =  ROOT.TH1D(htmp_name_num,htmp_name_num,plot_list.nbins_x,plot_list.min_x,plot_list.max_x)
           i_draw += 1
           
+          # draw the denominator and save into h_denom
+          htmp_name_denom = "htmp"+str(i_draw)
+          # Force TH1D or we'll get TH1F !!!
+          tmp_denom =  ROOT.TH1D(htmp_name_denom,htmp_name_denom,plot_list.nbins_x,plot_list.min_x,plot_list.max_x)
+          i_draw += 1
+
+          for cut_num, cut_denom, weight in zip(plot.cuts_num, plot.cuts_denom, plot.ev_weight):
+              
+              # build the drawing-string from a list
+              # (easier to read than '+' clutter)
+              li_draw_string = [plot.var, ">>+", htmp_name_num]
+              # and actually draw
+              # weight is applied by multiplying with cutstring
+              draw_string = "".join(li_draw_string)
+              input_tree.Draw( draw_string, weight+"*("+cut_num+")")
+
+
+              # build the drawing-string from a list
+              # (easier to read than '+' clutter)
+              li_draw_string = [plot.var, ">>+", htmp_name_denom]
+              draw_string = "".join(li_draw_string)
+              # and actually draw
+              # weight is applied by multiplying with cutstring
+              input_tree.Draw(  draw_string, weight+"*("+cut_denom+")") 
+
+
+
+
+          h_num = ROOT.gDirectory.Get(htmp_name_num)
+          h_denom = ROOT.gDirectory.Get(htmp_name_denom)
+
+          h_num.SetDirectory(0)
+          h_denom.SetDirectory(0)
+
           input_file.Close()
           
           # Optional: Rebinning (with irregular bins)
@@ -337,27 +341,28 @@ def doPlots( dic_files ):
     
                         
           max_bin = h_num.GetNbinsX()
-          
-          # Optional: calculate the x-value after which
-          # the right-integrated efficiency exceeds 99%
-          
-          if plot.calc_99_point:
 
-              max_bin = h_num.GetNbinsX()
-              
-              eff_bin = -1
-              
-              for i_bin in range(max_bin+2):
-                  integral_num   = float(h_num.Integral(i_bin, max_bin+1))
-                  integral_denom = float(h_denom.Integral(i_bin, max_bin+1))
-
-                  if integral_denom >0:
-                      if integral_num/integral_denom >= 0.99:
-                          eff_bin= i_bin
-                          break
-              if eff_bin>=0:
-                  print plot.sample, plot.cuts_num,">= 99% at: ", h_num.GetBinCenter(eff_bin) - h_num.GetBinWidth(eff_bin)/2.
-              
+# Deactivated for now          
+#          # Optional: calculate the x-value after which
+#          # the right-integrated efficiency exceeds 99%
+#          
+#          if plot.calc_99_point:
+#
+#              max_bin = h_num.GetNbinsX()
+#              
+#              eff_bin = -1
+#              
+#              for i_bin in range(max_bin+2):
+#                  integral_num   = float(h_num.Integral(i_bin, max_bin+1))
+#                  integral_denom = float(h_denom.Integral(i_bin, max_bin+1))
+#
+#                  if integral_denom >0:
+#                      if integral_num/integral_denom >= 0.99:
+#                          eff_bin= i_bin
+#                          break
+#              if eff_bin>=0:
+#                  print plot.sample, plot.cuts_num,">= 99% at: ", h_num.GetBinCenter(eff_bin) - h_num.GetBinWidth(eff_bin)/2.
+#              
           # y-scale logarithmic yes/no
           c.SetLogy( plot_list.log_y )
 
@@ -480,6 +485,22 @@ def doPlots( dic_files ):
               # Add the legend
               if plot_list.do_legend:
                   legend.Draw()
+                  
+              txt = ROOT.TText()
+              txt.SetTextFont(61)
+              txt.SetTextSize(0.05)
+              txt.DrawTextNDC(0.2, 0.88, "CMS")
+
+              txt.SetTextFont(52)
+              txt.SetTextSize(0.04)
+              txt.DrawTextNDC(0.2, 0.84, "Simulation Preliminary")
+                
+              txt.SetTextFont(41)
+              txt.DrawTextNDC(0.85, 0.96, "13 TeV")
+
+              l_txt = ROOT.TLatex()    
+              l_txt.SetTextSize(0.04)
+
 
               # Save the results to a file (in different formats)
               OutputDirectoryHelper.ManyPrint( c, output_dir, plot_list.outname.replace("/","_") )

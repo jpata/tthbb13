@@ -25,12 +25,13 @@ class variable:
 
     @initializer
     def __init__(self,
-                 name,              # (string) name of the variable in the n-tuple
-                 pretty_name,       # (string) nicer name (for printing)
-                 range_min,         # (float) minimal reasonable value
-                 range_max,         # (float) maximal reasonable value 
-                 unit = "",         # (string) for axis labels
-                 extra_cut = "(1)"  # additional cut to apply
+                 name,                   # (string) name of the variable in the n-tuple
+                 pretty_name,            # (string) nicer name (for printing)
+                 range_min,              # (float) minimal reasonable value
+                 range_max,              # (float) maximal reasonable value 
+                 unit = "",              # (string) for axis labels
+                 extra_cut = "(1)",      # additional cut to apply
+                 pretty_name_short = "", # (string) nicer name (for printing) - a bit shorter
              ):
         variable.di[self.name] = self
     # end __init__

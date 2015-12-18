@@ -21,53 +21,44 @@ else:
     from TTH.Plotting.python.gregor.TopTaggingVariables import *
     from TTH.Plotting.python.gregor.TopSamples import *
 
+
 ########################################
 # Define Input Files and
 # output directory
 ########################################
 
-if socket.gethostname() == "t3ui12":
-    basepath = '/scratch/gregor/'
-else:
-    basepath = '/Users/gregor/'
-                                         
-# for the filename: basepath + filename + .root
-full_file_names = {"tth" : basepath + "tree.root"}
+
+basepath = '/scratch/gregor/'
+full_file_names = {}
+full_file_names["zprime_m1000"] = [basepath + "ntop_v64_zprime_m1000_1p_13tev_spring15dr74_asympt25ns.root",
+                                   "tthNtupleAnalyzer/events"]
 
 output_dir = "results/CompareDistributionsDelR/"
-
-
-        
-        
-
+               
 combinedPlot("del_r",
-             [plot("#Delta R(jet, light)",
-                   "GenQFromW_jet_delR",                                           
+             [plot("CA15",
+                   "jet_ca15__close_hadtop_dr",                                           
                    "(1)",
-                   "tth"),
-              plot("#Delta R(subjet, light)",
-                   "GenQFromW_subjet_delR",                                           
+                   "zprime_m1000"),
+              plot("AK8",
+                   "jet_ak08__close_hadtop_dr",                                           
                    "(1)",
-                   "tth"),
-              plot("#Delta R(jet, b)",
-                   "GenBFromTop_jet_delR",                                           
-                   "(1)",
-                   "tth"),
-              plot("#Delta R(subjet, b)",
-                   "GenBFromTop_subjet_delR",                                           
-                   "(1)",
-                   "tth"),
+                   "zprime_m1000"),
+
           ],
-             50, 0, .3, 
-             label_x   = "#Delta R",
+             39, 0, 1.3, 1.,
+             label_x   = "#DeltaR (Jet, Top Quark)",
              label_y   = "A.U.",
              axis_unit = "",
-             log_y     = False,
+             log_y     = True,
              normalize = True,
-             legend_origin_x = 0.55,
-             legend_origin_y = 0.5,
+             legend_origin_x = 0.7,
+             legend_origin_y = 0.7,
              legend_size_x   = 0.2,
-             legend_text_size= 0.04)
+             legend_text_size= 0.04,
+             add_eff = False,
+             
+)
 
 doWork(full_file_names, output_dir )
 
