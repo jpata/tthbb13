@@ -39,6 +39,8 @@ class SubjetAnalyzer(FilterAnalyzer):
         self.n_subjettiness_cut = 0.97
 
         self.bbtag_cut = 0.1
+        
+        self.GenTop_pt_cut = 150
 
 
     def beginLoop(self, setup):
@@ -64,6 +66,7 @@ class SubjetAnalyzer(FilterAnalyzer):
 
         if "subjet" in self.conf.general["verbosity"]:
             print 'Printing from SubjetAnalyzer! iEv = {0}'.format(event.iEv)
+            
 
         # Is set to True only after the event passed all criteria
         setattr( event, 'PassedSubjetAnalyzer', False )
@@ -79,6 +82,7 @@ class SubjetAnalyzer(FilterAnalyzer):
         event.n_bjets = len( event.selected_btagged_jets_high )
         event.n_ljets = len( list( event.wquark_candidate_jets ) )
 
+
         ########################################
         # Minimal event suitability:
         #  - Needs to be single leptonic
@@ -86,7 +90,7 @@ class SubjetAnalyzer(FilterAnalyzer):
         ########################################
 
         # Check if the event is single leptonic
-        if not event.is_sl:
+        if not (event.is_sl or event.is_fh): #LC
             return event
 
         # Get the top candidates
@@ -101,11 +105,13 @@ class SubjetAnalyzer(FilterAnalyzer):
         if len( event.httCandidate ) == 0:
             return event
 
+
         # Apply the cuts on the httCandidate
         tops = []
         for candidate in event.httCandidate:
             if self.Apply_Cut_criteria( candidate ):
                 tops.append( copy.deepcopy(candidate) )
+
 
         # Match the top to a fat jet
         #  - Copies bbtag and tau_N, calculates n_subjettiness
@@ -115,12 +121,17 @@ class SubjetAnalyzer(FilterAnalyzer):
         other_tops = []
 
         # Calculate delR with the lepton for all tops that survived the cut
-        for top in tops:
-            setattr( top, 'delR_lepton' ,
-                self.Get_DeltaR_two_objects( top, event.good_leptons[0] ) )
+        if event.is_sl: #LC
+            for top in tops:
+                setattr( top, 'delR_lepton' ,
+                          self.Get_DeltaR_two_objects( top, event.good_leptons[0] ) )
+        else:
+            for top in tops:
+                setattr( top, 'delR_lepton' , -1 )
 
         # Keep track of how many httCandidates passed
         event.nhttCandidate_aftercuts = len( tops )
+
 
         # Just run normal mem if there is no httCandidate surviving the cuts
         # Check if any candidates survived the cutoff criteria
@@ -133,10 +144,16 @@ class SubjetAnalyzer(FilterAnalyzer):
         # If more than 1 candidate survived the cutoff criteria, choose the
         # one whose delR with the lepton was biggest
         else:
-            tops = sorted( tops, key=lambda x: -x.delR_lepton )
+            if event.is_sl: #LC
+                tops = sorted( tops, key=lambda x: -x.delR_lepton )
+            else:
+                tops = sorted( tops, key=lambda x: x.pt)
             other_top_present = True
             top = tops[0]
             other_tops = tops[1:]
+
+        if "subjet" in self.conf.general["verbosity"]:
+            print "Number of top candidates ", len(tops)
 
         # Get a Higgs candidate
         # ======================================
@@ -187,8 +204,15 @@ class SubjetAnalyzer(FilterAnalyzer):
 
         # Create two new lists for btagged_jets and wquark_candidate_jets in the
         # original events
-        reco_btagged_jets = copy.deepcopy( event.selected_btagged_jets_high )
-        reco_ltagged_jets = copy.deepcopy( list( event.wquark_candidate_jets ) )
+        if event.is_sl: #LC
+            reco_btagged_jets = copy.deepcopy( event.selected_btagged_jets_high )
+            reco_ltagged_jets = copy.deepcopy( list( event.wquark_candidate_jets ) )
+        else: #LC
+            reco_ltagged_jets = event.buntagged_jets_bdisc
+            reco_btagged_jets = event.btagged_jets_bdisc
+
+
+     
 
         for jet in reco_btagged_jets:
             setattr( jet, 'btag', getattr(jet,self.btagAlgo) )
@@ -263,8 +287,18 @@ class SubjetAnalyzer(FilterAnalyzer):
                     boosted_bjets.append( bjet )
 
                 # Stop adding after 4 b-jets
-                if len(boosted_bjets) == 4: break
+                if event.is_sl:#LC
+                    if len(boosted_bjets) == 4: break
             event.PassedSubjetAnalyzer = True
+
+            if event.is_fh: #LC: also add other light jets
+                for ljet in reco_ltagged_jets:
+                    # Check if the l-jet is not excluded
+                    if not hasattr( ljet, 'matched_top_subjet' ):
+                        boosted_ljets.append( ljet )
+
+                
+            
 
         # If too many events are excluded, just run the default hypothesis
         else:
@@ -274,6 +308,7 @@ class SubjetAnalyzer(FilterAnalyzer):
             boosted_ljets = reco_ltagged_jets
             event.PassedSubjetAnalyzer = False
 
+     
 
 
         ########################################
@@ -301,7 +336,21 @@ class SubjetAnalyzer(FilterAnalyzer):
             print '[SubjetAnalyzer] Exiting SubjetAnalyzer! event.PassedSubjetAnalyzer = {0}'.format(
                 event.PassedSubjetAnalyzer
             )
-        return event
+
+
+        ########################################
+        # Matching to Gen top
+        ###########################################
+
+        event.n_matched_TTgentop = -1
+        event.matched_TTgentop_pt = -1
+        event.n_matched_TTgenb = -1
+        event.n_matched_TTgenW = -1
+
+        if len(tops)>0:
+            self.Do_GenTop_Matching(event)
+
+        return event 
 
 
         ########################################
@@ -349,9 +398,10 @@ class SubjetAnalyzer(FilterAnalyzer):
         # in the event, but these branches do not have to be filled (they will be
         # automatically set to -1 in the final output root file).
 
+       
         self.Do_Quark_Matching( event )
 
-
+       
     ########################################
     # Functions
     ########################################
@@ -658,9 +708,14 @@ class SubjetAnalyzer(FilterAnalyzer):
         genquarks_top_present = False
         if len(event.GenWZQuark)==2 and len(event.GenBQuarkFromTop)==2:
             genquarks_top_present = True
+       
+      
+            
         genquarks_higgs_present = False
         if len(event.GenBQuarkFromH)==2:
             genquarks_higgs_present = True
+
+      
 
         # Convenient list names
         if genquarks_top_present:
@@ -827,5 +882,77 @@ class SubjetAnalyzer(FilterAnalyzer):
                 n_higgs_bquarks_matched_to_top_subjet
             event.QMatching_n_higgs_bquarks_matched_to_otop_subjet = \
                 n_higgs_bquarks_matched_to_otop_subjet
+
+    # ==============================================================================
+    # Writes matching statistics to event for matching (sub)jets to quarks
+    def Do_GenTop_Matching( self, event ):
+      
+        gentops = []
+        for l in event.GenTop:
+            if l.pt>self.GenTop_pt_cut:
+                gentops.append(l)
+
+        # Loosely match the top candidate to the gen tops
+        n_matched_gentop = self.Match_two_lists(
+            event.topCandidate, 'topcand',
+            gentops, 'gentop',
+            R_cut = self.R_cut_fatjets )
+
+        #print "nmatched ", n_matched_gentop
+
+        #for l in event.topCandidate:
+        #    print "BOOSTED TOP                 " , l.pt, l.eta, l.phi, hasattr( l, 'matched_gentop' )
+
+        for l in gentops:
+         #   print "GENTOP PT ETA PHI PDG match " , l.pt, l.eta, l.phi, l.pdgId, hasattr( l, 'matched_topcand' )
+            if hasattr( l, 'matched_topcand' ):
+                event.matched_TTgentop_pt= l.pt
+        
+        event.n_matched_TTgentop = n_matched_gentop
+        
+
+        #if there is a match: try to match also the subjets
+        if (n_matched_gentop>0):
+            
+            top_subjets = self.Get_Subjets( event.topCandidate[0] )
+            top_subjets_b = []
+            top_subjets_W = []
+            for s in top_subjets:
+                if s.btagFlag == 1.0: 
+                    top_subjets_b.append(s)
+                else:
+                    top_subjets_W.append(s)
+                
+            
+            # match the b subjet to GenBQuarkFromTop
+            n_matched_genb = self.Match_two_lists(
+                top_subjets_b, 'top_subjet_b',
+                event.GenBQuarkFromTop, 'genb',
+                R_cut = self.R_cut )
+
+          #  print "nmatchedgenb ", n_matched_genb
+           # for s in top_subjets_b:
+            #    print "top subjet b          ",  s.pt, s.eta, s.phi, hasattr( s, 'matched_genb' ) 
+            #for s in event.GenBQuarkFromTop:
+            #    print "GENB PT ETA PHI PDG match " , s.pt, s.eta, s.phi, s.pdgId, hasattr( s, 'matched_top_subjet_b' )
+
+            # match the W subjets to GenWZQuark
+            n_matched_genW = self.Match_two_lists(
+                top_subjets_W, 'top_subjet_W',
+                event.GenWZQuark, 'genW',
+                R_cut = self.R_cut )
+
+            #print "nmatchedgenW ", n_matched_genW
+            #for s in top_subjets_W:
+            #    print "top subjet W          ",  s.pt, s.eta, s.phi, hasattr( s, 'matched_genW' ) 
+            #for s in event.GenWZQuark:
+            #    print "GENW PT ETA PHI PDG match " , s.pt, s.eta, s.phi, s.pdgId, hasattr( s, 'matched_top_subjet_W' )
+       
+
+        
+            event.n_matched_TTgenb = n_matched_genb
+            event.n_matched_TTgenW = n_matched_genW
+     
+      
 
 #==========================END OF SUBJET ANALYZER==========================#
