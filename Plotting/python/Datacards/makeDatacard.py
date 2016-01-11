@@ -129,6 +129,14 @@ def MakeDatacard2(
         categories,
         categorization.getLeafDiscriminators(ignore_splittings)
     )
+    leaves = categorization.get_leaves(ignore_splittings)
+
+    if do_stat_variations:
+        #add statistical variations to datacard based on categorization
+        for leaf in leaves:
+            nbins = categorization.axes[leaf.discriminator_axis].nbins
+            dcard.addStatVariations(str(leaf), nbins)
+
     dcard.filenames_cat = infile_paths
     shapefile = open(shapefile_path, "w")
     PrintDatacard(categorization.event_counts, dcard, shapefile)

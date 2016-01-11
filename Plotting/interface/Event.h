@@ -175,7 +175,12 @@ typedef unordered_map<
     hash<int>
 > WeightMap;
 double nominal_weight(const Event& ev, const Configuration& conf);
+
+//These functions return the list of weights used
+//all systematic weights
 WeightMap getSystWeights();
+
+//only nominal weights
 WeightMap getNominalWeights();
 
 //Simple event representation

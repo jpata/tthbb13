@@ -25,6 +25,8 @@ class TreeVarAnalyzer(FilterAnalyzer):
         for syst, event_syst in event.systResults.items():
             event_syst.mem_results_tth = getattr(event_syst, "mem_results_tth", [])
             event_syst.mem_results_ttbb = getattr(event_syst, "mem_results_ttbb", [])
+            event_syst.common_mem = getattr(event_syst, "common_mem", [])
+            event_syst.common_bdt = getattr(event_syst, "common_bdt", -1)
             event_syst.fw_h_alljets = getattr(event_syst, "fw_h_alljets", [])
             event_syst.fw_h_btagjets = getattr(event_syst, "fw_h_btagjets", [])
             event_syst.fw_h_untagjets = getattr(event_syst, "fw_h_untagjets", [])

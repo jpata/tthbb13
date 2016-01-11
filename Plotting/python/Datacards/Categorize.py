@@ -496,7 +496,6 @@ class Categorization(object):
         shapes_root_filename   = "{0}/shapes_{1}.root".format(self.output_path, name)
         
         self.create_control_plots(self.output_path)
-
         MakeDatacard2(
             self,
             self.leaf_files,
@@ -785,6 +784,7 @@ class Categorization(object):
                     h.SetDirectory(outdir)
                 outdir.Write("", ROOT.TObject.kOverwrite)
             if self.do_stat_variations:
+                print "making statistical variations"
                 makeStatVariations(of, of, [leaf.discriminator_axis], [leaf.__repr__()], processes)
             fakeData(of, of, [leaf.discriminator_axis], [leaf.__repr__()], processes)
             of.Close()

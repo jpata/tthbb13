@@ -62,9 +62,12 @@ new {catkind}(
 """
 
     #do re-weighting only for sparse categories
-    wfunc = "getNominalWeights()"
-    if catkind == "SparseCategoryProcessor":
-        wfunc = "getSystWeights()"
+    #FIXME: here we specify what kind of weights to use for histogram projection
+    #replace with getSystWeights() to have systematic variations of all control histograms
+    #replace with getNominalWeights() to make running faster
+    wfunc = "getSystWeights()"
+    #if catkind == "SparseCategoryProcessor" or catkind == "ControlCategoryProcessor":
+    #    wfunc = "getSystWeights()"
 
     s = s.format(**{
     "catkind": catkind,

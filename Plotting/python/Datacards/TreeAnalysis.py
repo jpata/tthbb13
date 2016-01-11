@@ -162,12 +162,12 @@ if __name__ == "__main__":
 
     Categorize.Categorization.output_path = output_path
     Categorize.Categorization.pool = Pool(n_proc)
-    Categorize.do_stat_variations = False
+    Categorize.Categorization.do_stat_variations = True
 
     Categorize.Categorization.lg = LimitGetter(output_path)
    
     #print "Old categorization"
-    #make_latex("old_dl")
+    make_latex("old")
     #make_latex("old_2t")
 
     #r = split_leaves_by_BLR(trees["old"])
@@ -179,16 +179,16 @@ if __name__ == "__main__":
     #of.write(pickle.dumps(r))
     #of.close()
     
-    make_latex("old_blr")
-
-    r = split_leaves_by_BLR_highpurity(trees["old_blr"])
-    of = open("old_blr_highpurity_opt.tex", "w")
-    print r.print_tree()
-    of.write(r.print_tree_latex())
-    of.close()
-    of = open("old_blr_highpurity_opt.pickle", "w")
-    of.write(pickle.dumps(r))
-    of.close()
+#    make_latex("old_blr")
+#
+#    r = split_leaves_by_BLR_highpurity(trees["old_blr"])
+#    of = open("old_blr_highpurity_opt.tex", "w")
+#    print r.print_tree()
+#    of.write(r.print_tree_latex())
+#    of.close()
+#    of = open("old_blr_highpurity_opt.pickle", "w")
+#    of.write(pickle.dumps(r))
+#    of.close()
 
     #print "Optimization"
     #r = Categorize.CategorizationFromString(trees["3cat"])
