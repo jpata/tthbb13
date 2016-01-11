@@ -15,6 +15,11 @@ python TTH/Plotting/python/joosep/makeJobfiles.py
 ~~~
 In the `makeJobfiles.py` script, the variable `sampstorun` configures which samples are enabled. Each file will be opened and split into chunks across jobfiles. The script will create a list of `job_{N}.json` files, which should all be run. The output of these jobs should be merged together.
 
+Command for running on 20 json files in parallel (needs http://www.gnu.org/software/parallel/):
+~~~
+parallel -j 20  ./melooper  ::: *.json
+~~~
+
 The categories are currently configured by a compiled list, which is specified in https://github.com/jpata/tthbb13/blob/sync_spring15/Plotting/bin/MELooper.cc#L145
 
 There you will also find documentation on the category syntax.
