@@ -19,12 +19,12 @@ import pickle
 ########################################
 
 #ControlPlotsSparse_2015_10_15_withBLR.root
-input_file = "ControlPlotsSparse.root"
-output_path = "/scratch/joosep/test/"
+input_file = "/shome/gregor/ControlPlotsSparse.root"
+output_path = "/scratch/gregor/categories/"
 #input_file = "/dev/shm/joosep/ControlPlotsSparse_corr.root"
 #output_path = "/dev/shm/joosep/categorization2/"
 
-n_proc = 40
+n_proc = 10
 n_iter = 8
 
 signals = [
@@ -60,7 +60,7 @@ def split_leaves_by_BLR(original):
         print "Optimizing leaf", l
 
         #for left-handed child (bg-like), don't use MEM discriminator, just a counting experiment
-        l.disc_axes_child_left = ["counting"]
+        #l.disc_axes_child_left = ["counting"]
         l.find_categories_async(
             1,
             cut_axes,
@@ -128,8 +128,12 @@ def make_latex(name):
 
     r = Categorize.CategorizationFromString(trees[name])
     r.axes = Categorize.Categorization.axes
+
+    #r.create_control_plots("/scratch/gregor/testfoo")
+
+
     #r.print_yield_table()
-    of = open( name + ".tex","w")
+    of = open( name + "_nostat.tex","w")
     of.write(r.print_tree_latex())
    
     #save per-leaf control plots in a root file
@@ -144,7 +148,7 @@ def make_latex(name):
     rof.Close()
 
     of.close()
-    of = open(name + ".pickle", "w")
+    of = open(name + "_nostat.pickle", "w")
     of.write(pickle.dumps(r))
     of.close()
 # End of make_latex
@@ -173,34 +177,46 @@ if __name__ == "__main__":
 
     Categorize.Categorization.output_path = output_path
     Categorize.Categorization.pool = Pool(n_proc)
-    Categorize.Categorization.do_stat_variations = True
+    Categorize.Categorization.do_stat_variations = False
 
     Categorize.Categorization.lg = LimitGetter(output_path)
    
+    #r = Categorize.CategorizationFromString(trees["old_2t_blr_A"])
+    #r.axes = Categorize.Categorization.axes
+
+    #r.eval_limit("old_2t_blr_A")
+
     #print "Old categorization"
-    make_latex("old")
+
+    #make_latex("old")
     #make_latex("old_dl")
     #make_latex("old_2t")
 
-    #r = split_leaves_by_BLR(trees["old"])
-    #of = open("old_blr_opt.tex", "w")
-    #print r.print_tree()
-    #of.write(r.print_tree_latex())
-    #of.close()
-    #of = open("old_blr_opt.pickle", "w")
-    #of.write(pickle.dumps(r))
-    #of.close()
-    
-#    make_latex("old_blr")
-#
-#    r = split_leaves_by_BLR_highpurity(trees["old_blr"])
-#    of = open("old_blr_highpurity_opt.tex", "w")
+    #make_latex("old")
+    make_latex("old_2t_blr_A")
+
+
+#    r = split_leaves_by_BLR(trees["old_2t"])
+#    of = open("old_2t_blr_opt.tex", "w")
 #    print r.print_tree()
 #    of.write(r.print_tree_latex())
 #    of.close()
-#    of = open("old_blr_highpurity_opt.pickle", "w")
+#    of = open("old_2t_blr_opt.pickle", "w")
 #    of.write(pickle.dumps(r))
 #    of.close()
+    
+
+    #make_latex("old")
+
+    #r = split_leaves_by_BLR_highpurity(trees["old_blr"])
+    #of = open("old_blr_highpurity_opt.tex", "w")
+    #print r.print_tree()
+    #of.write(r.print_tree_latex())
+    #of.close()
+    #of = open("old_blr_highpurity_opt.pickle", "w")
+    #of.write(pickle.dumps(r))
+    #of.close()
+
 
     #print "Optimization"
     #r = Categorize.CategorizationFromString(trees["3cat"])
