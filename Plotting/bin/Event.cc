@@ -929,7 +929,10 @@ Configuration parseJsonConf(const string& infile) {
 
 namespace BaseCuts {
     bool sl(const Event& ev) {
-        return ev.is_sl && ev.passPV && ev.numJets>=4 && ev.data->json==1.0;
+        return ev.is_sl && ev.passPV && ev.numJets>=4 && ev.data->json==1.0 && (
+            (abs(ev.leptons.at(0).pdgId) == 13 && trigger::sl_mu(*(ev.data))) ||
+            (abs(ev.leptons.at(0).pdgId) == 11 && trigger::sl_el(*(ev.data)))
+        );
     }
     
     bool sl_mu(const Event& ev) {
@@ -947,7 +950,14 @@ namespace BaseCuts {
                 abs(ev.leptons.at(0).pdgId) == abs(ev.leptons.at(1).pdgId) ? !(ev.data->ll_mass[0] > 76 && ev.data->ll_mass[0] < 106) : true
             ) && (
                 abs(ev.leptons.at(0).pdgId) == abs(ev.leptons.at(1).pdgId) ? (ev.data->met_pt[0] > 40) : true
-            ) && ev.data->json==1.0
+            ) && ev.data->json==1.0 && (
+                (abs(ev.leptons.at(0).pdgId)==13 && abs(ev.leptons.at(1).pdgId)==13 && trigger::mumu(*(ev.data))) ||
+                (abs(ev.leptons.at(0).pdgId)==11 && abs(ev.leptons.at(1).pdgId)==11 && trigger::ee(*(ev.data))) || (
+                (
+                    (abs(ev.leptons.at(0).pdgId)==13 && abs(ev.leptons.at(1).pdgId)==11) ||
+                    (abs(ev.leptons.at(0).pdgId)==11 && abs(ev.leptons.at(1).pdgId)==13)
+                ) && trigger::emu(*(ev.data))
+                )
         );
     }
     
