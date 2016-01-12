@@ -128,10 +128,21 @@ def make_latex(name):
 
     r = Categorize.CategorizationFromString(trees[name])
     r.axes = Categorize.Categorization.axes
-
     #r.print_yield_table()
     of = open( name + ".tex","w")
     of.write(r.print_tree_latex())
+   
+    #save per-leaf control plots in a root file
+    rof = ROOT.TFile(name + ".root", "RECREATE")
+    for k, v in r.allhists.items():
+        outdir_str = "/".join(k[:-1])
+        if rof.Get(outdir_str) == None:
+            rof.mkdir(outdir_str)
+        outdir = rof.Get(outdir_str)
+        v.SetDirectory(outdir)
+        outdir.Write("", ROOT.TObject.kOverwrite)
+    rof.Close()
+
     of.close()
     of = open(name + ".pickle", "w")
     of.write(pickle.dumps(r))
@@ -168,6 +179,7 @@ if __name__ == "__main__":
    
     #print "Old categorization"
     make_latex("old")
+    #make_latex("old_dl")
     #make_latex("old_2t")
 
     #r = split_leaves_by_BLR(trees["old"])

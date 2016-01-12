@@ -115,6 +115,8 @@ def MakeDatacard2(
     badcats = []
 
     for cat in categories:
+        #FIXME: if category discriminator is None, this will crash as event_counts is not evaluated for skipped categories
+        #need to skip category here as well if disc==None
         sig = categorization.event_counts["ttH_hbb"][cat]
         bkg = sum([categorization.event_counts[k][cat] for k in categorization.getProcesses() if k!="ttH_hbb"])
         if sig == 0 and bkg == 0:

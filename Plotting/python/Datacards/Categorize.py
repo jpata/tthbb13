@@ -740,12 +740,12 @@ class Categorization(object):
                 
                 hname = self.axes[leaf.discriminator_axis].name
                 k = (process, leaf.__repr__(), hname)
-                if Categorization.allhists.has_key(k):
-                    h = Categorization.allhists[k]
+                if self.allhists.has_key(k):
+                    h = self.allhists[k]
                 else:
                     h = thn.Projection(self.axes.keys().index(leaf.discriminator_axis), "E")
                     h.SetName(hname)
-                    Categorization.allhists[k] = h
+                    self.allhists[k] = h.Clone()
 
                 if not self.event_counts.has_key(process):
                     self.event_counts[process] = {}
@@ -767,12 +767,12 @@ class Categorization(object):
                    
                     hname = self.axes[leaf.discriminator_axis].name + "_" + sys_name
                     k = (process, leaf.__repr__(), hname)
-                    if Categorization.allhists.has_key(k):
-                        h = Categorization.allhists[k]
+                    if self.allhists.has_key(k):
+                        h = self.allhists[k]
                     else:
                         h = thn.Projection(self.axes.keys().index(leaf.discriminator_axis), "E")
                         h.SetName(hname)
-                        Categorization.allhists[k] = h
+                        self.allhists[k] = h.Clone()
                     dirs[outdir_str].append(h)
 
             # End of loop over systematics
@@ -786,13 +786,12 @@ class Categorization(object):
                     h.SetDirectory(outdir)
                 outdir.Write("", ROOT.TObject.kOverwrite)
             if self.do_stat_variations:
-                print "making statistical variations"
                 makeStatVariations(of, of, [leaf.discriminator_axis], [leaf.__repr__()], processes)
             fakeData(of, of, [leaf.discriminator_axis], [leaf.__repr__()], processes)
             of.Close()
-
         # End of loop over categories
-           
+    #end of create_control_plots
+
     def getProcesses(self):
         return self.h_sig.keys() + self.h_bkg.keys()
 
