@@ -19,8 +19,8 @@ import pickle
 ########################################
 
 #ControlPlotsSparse_2015_10_15_withBLR.root
-input_file = "/shome/gregor/ControlPlotsSparse.root"
-output_path = "/scratch/gregor/categories/"
+input_file = "ControlPlotsSparse.root"
+output_path = "/scratch/joosep/test/"
 #input_file = "/dev/shm/joosep/ControlPlotsSparse_corr.root"
 #output_path = "/dev/shm/joosep/categorization2/"
 
@@ -125,28 +125,15 @@ def optimize(r):
 def make_latex(name):
     """ Get name of tree (in trees), produce the latex version and
     safe it to a tex file """
-
+    
+    print "make_latex", name
     r = Categorize.CategorizationFromString(trees[name])
     r.axes = Categorize.Categorization.axes
-
-    #r.create_control_plots("/scratch/gregor/testfoo")
-
 
     #r.print_yield_table()
     of = open( name + "_nostat.tex","w")
     of.write(r.print_tree_latex())
-   
-    #save per-leaf control plots in a root file
-    rof = ROOT.TFile(name + ".root", "RECREATE")
-    for k, v in r.allhists.items():
-        outdir_str = "/".join(k[:-1])
-        if rof.Get(outdir_str) == None:
-            rof.mkdir(outdir_str)
-        outdir = rof.Get(outdir_str)
-        v.SetDirectory(outdir)
-        outdir.Write("", ROOT.TObject.kOverwrite)
-    rof.Close()
-
+    r.SaveControlPlots(name)
     of.close()
     of = open(name + "_nostat.pickle", "w")
     of.write(pickle.dumps(r))
@@ -159,41 +146,61 @@ if __name__ == "__main__":
     ########################################
     # Setup Categorization
     ########################################
-
-    h_sig, h_bkg, h_sig_sys, h_bkg_sys = Categorize.GetSparseHistograms(
+    
+    Categorize.Categorization.output_path = output_path
+    Categorize.Categorization.pool = Pool(n_proc)
+    Categorize.Categorization.do_stat_variations = False
+    Categorize.Categorization.lg = LimitGetter(output_path)
+    
+    #SL
+    #h_sig, h_bkg, h_sig_sys, h_bkg_sys = Categorize.GetSparseHistograms(
+    h_sl = Categorize.GetSparseHistograms(
         input_file,
         signals,
         backgrounds,
         "sl"
     )
-    axes = Categorize.GetAxes(h_sig["ttH_hbb"])
+    axes = Categorize.GetAxes(h_sl[0]["ttH_hbb"])
 
     Cut.axes = axes
     Categorize.Categorization.axes = axes
-    Categorize.Categorization.h_sig = h_sig
-    Categorize.Categorization.h_bkg = h_bkg
-    Categorize.Categorization.h_sig_sys = h_sig_sys
-    Categorize.Categorization.h_bkg_sys = h_bkg_sys
+    Categorize.Categorization.h_sig = h_sl[0]
+    Categorize.Categorization.h_bkg = h_sl[1]
+    Categorize.Categorization.h_sig_sys = h_sl[2]
+    Categorize.Categorization.h_bkg_sys = h_sl[3]
 
-    Categorize.Categorization.output_path = output_path
-    Categorize.Categorization.pool = Pool(n_proc)
-    Categorize.Categorization.do_stat_variations = False
+    make_latex("old")
+    make_latex("old_2t_blr_A")
+  
+    #DL
+    h_dl = Categorize.GetSparseHistograms(
+        input_file,
+        signals,
+        backgrounds,
+        "dl"
+    )
+    axes = Categorize.GetAxes(h_dl[0]["ttH_hbb"])
 
-    Categorize.Categorization.lg = LimitGetter(output_path)
-   
+    Cut.axes = axes
+    Categorize.Categorization.axes = axes
+    Categorize.Categorization.h_sig = h_dl[0]
+    Categorize.Categorization.h_bkg = h_dl[1]
+    Categorize.Categorization.h_sig_sys = h_dl[2]
+    Categorize.Categorization.h_bkg_sys = h_dl[3]
+
+    make_latex("old_dl")
+
     #r = Categorize.CategorizationFromString(trees["old_2t_blr_A"])
     #r.axes = Categorize.Categorization.axes
 
     #r.eval_limit("old_2t_blr_A")
 
     #print "Old categorization"
-
     #make_latex("old")
-    #make_latex("old_dl")
     #make_latex("old_2t")
 
     #make_latex("old")
-    make_latex("old_2t_blr_A")
+    #make_latex("old_2t_blr_A")
 
 
 #    r = split_leaves_by_BLR(trees["old_2t"])

@@ -113,12 +113,16 @@ def MakeDatacard2(
 
     #Find yields per category
     badcats = []
+    signal = "ttH_hbb"
 
     for cat in categories:
         #FIXME: if category discriminator is None, this will crash as event_counts is not evaluated for skipped categories
         #need to skip category here as well if disc==None
-        sig = categorization.event_counts["ttH_hbb"][cat]
-        bkg = sum([categorization.event_counts[k][cat] for k in categorization.getProcesses() if k!="ttH_hbb"])
+        if not categorization.event_counts[signal].has_key(cat):
+            badcats += [cat]
+            continue
+        sig = categorization.event_counts[signal][cat]
+        bkg = sum([categorization.event_counts[k][cat] for k in categorization.getProcesses() if k!=signal])
         if sig == 0 and bkg == 0:
             badcats += [cat]
 
@@ -136,6 +140,8 @@ def MakeDatacard2(
     if do_stat_variations:
         #add statistical variations to datacard based on categorization
         for leaf in leaves:
+            if leaf.discriminator_axis is None:
+                continue
             nbins = categorization.axes[leaf.discriminator_axis].nbins
             dcard.addStatVariations(str(leaf), nbins)
 

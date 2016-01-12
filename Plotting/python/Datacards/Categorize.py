@@ -824,6 +824,21 @@ class Categorization(object):
         return r"""\end{forest}
         \end{document}
         """
+    
+    #save per-leaf control plots in a root file
+    def SaveControlPlots(self, name):
+        rof = ROOT.TFile(name + ".root", "RECREATE")
+        for k, v in self.allhists.items():
+            outdir_str = "/".join(k[:-1])
+            if rof.Get(outdir_str) == None:
+                rof.mkdir(outdir_str)
+            outdir = rof.Get(outdir_str)
+            v = v.Clone()
+            v.SetDirectory(outdir)
+        rof.Write("", ROOT.TObject.kOverwrite)
+        rof.Close()
+
+#End of Categorization
 
 ########################################
 # CategorizationFromString
@@ -935,7 +950,7 @@ def GetSparseHistograms(input_file,
 
     return h_sig, h_bkg, h_sig_sys, h_bkg_sys
 # End of GetSparseHistograms
-
+   
 
 ########################################
 # GetAxes
