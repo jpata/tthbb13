@@ -76,7 +76,7 @@ class Categorization(object):
 
     #Cache of all projected histograms
     allhists = {}
-    do_stat_variations = False
+    do_stat_variations = True
     leaf_files = {}
     event_counts = {}
 
@@ -131,7 +131,7 @@ class Categorization(object):
         for c in all_previous_cuts:
             # Make sure the cut is defined (ignore the root node) and
             # modifies the axis we are testing right now
-            if c and c.axis == axis_name:
+            if c and c.axis.name == axis_name:
 
                 if c.lo > leftmost_of_left_bins:
                     leftmost_of_left_bins = c.lo
@@ -181,6 +181,8 @@ class Categorization(object):
         child_fail = Categorization(Cut(axis_name, leftmost_of_right_bins, rightmost_of_right_bins), 
                                     parent = self,
                                     discriminator_axis = discriminator_axis_child_1)
+
+
         self.children = [child_pass, child_fail]
         
 

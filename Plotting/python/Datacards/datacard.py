@@ -75,9 +75,6 @@ class Datacard:
 
         self.output_datacardname = "shapes.txt"
 
-        # luminosity we're interested in (measure in pb-1)
-        self.lumi = 10000. # 10fb-1
-
         # nested dictionaries: category/sample/uncertainty/scale
         self.shape_uncertainties = {}
 
