@@ -44,7 +44,7 @@ eval `scramv1 runtime -sh`
 #go to work directory
 cd $MY_SCRATCH
 
-python ${CMSSW_BASE}/src/TTH/MEAnalysis/gc/MEAnalysis_heppy_gc.py
+python ${CMSSW_BASE}/src/TTH/MEAnalysis/gc/MEAnalysis_heppy_data_gc.py
 echo "MEAnalysis is done"
 
 #copy output

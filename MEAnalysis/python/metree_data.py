@@ -30,29 +30,29 @@ jetType = NTupleObjectType("jetType", variables = [
     NTupleVariable("btagProb", lambda x : x.btagProb),
     NTupleVariable("btagSoftEl", lambda x : x.btagSoftEl),
     NTupleVariable("btagSoftMu", lambda x : x.btagSoftMu),
-    NTupleVariable("mcFlavour", lambda x : x.mcFlavour, type=int),
-    NTupleVariable("mcMatchId", lambda x : x.mcMatchId, type=int),
-    NTupleVariable("hadronFlavour", lambda x : x.hadronFlavour, type=int),
-    NTupleVariable("matchFlag", lambda x : getattr(x, "tth_match_label_numeric", -1), type=int),
-    NTupleVariable("mcPt", lambda x : x.mcPt, mcOnly=True),
-    NTupleVariable("mcEta", lambda x : x.mcEta, mcOnly=True),
-    NTupleVariable("mcPhi", lambda x : x.mcPhi, mcOnly=True),
-    NTupleVariable("mcM", lambda x : x.mcM, mcOnly=True),
-    NTupleVariable("mcNumBHadrons", lambda x : x.genjet.numBHadrons if hasattr(x, "genjet") else -1, mcOnly=True),
-    NTupleVariable("mcNumCHadrons", lambda x : x.genjet.numCHadrons if hasattr(x, "genjet") else -1, mcOnly=True),
-    NTupleVariable("mcNumBHadronsFromTop", lambda x : getattr(x.genjet, "numBHadronsFromTop") if hasattr(x, "genjet") else -1, mcOnly=True),
-    NTupleVariable("mcNumCHadronsFromTop", lambda x : getattr(x.genjet, "numCHadronsFromTop") if hasattr(x, "genjet") else -1, mcOnly=True),
-    NTupleVariable("mcNumBHadronsAfterTop", lambda x : getattr(x.genjet, "numBHadronsAfterTop") if hasattr(x, "genjet") else -1, mcOnly=True),
-    NTupleVariable("mcNumCHadronsAfterTop", lambda x : getattr(x.genjet, "numCHadronsAfterTop") if hasattr(x, "genjet") else -1, mcOnly=True),
-    NTupleVariable("corr", lambda x : x.corr),
-    NTupleVariable("corr_JESUp", lambda x : x.corr_JECUp),
-    NTupleVariable("corr_JESDown", lambda x : x.corr_JECDown),
-    NTupleVariable("btagCSVRnd2t",   lambda x : getattr(x, "btagCSVRnd2t",   -99) ),
-    NTupleVariable("btagCSVRnd3t",   lambda x : getattr(x, "btagCSVRnd3t",   -99) ),
-    NTupleVariable("btagCSVRndge4t", lambda x : getattr(x, "btagCSVRndge4t", -99) ),
-    NTupleVariable("btagCSVInp2t",   lambda x : getattr(x, "btagCSVInp2t",   -99) ),
-    NTupleVariable("btagCSVInp3t",   lambda x : getattr(x, "btagCSVInp3t",   -99) ),
-    NTupleVariable("btagCSVInpge4t", lambda x : getattr(x, "btagCSVInpge4t", -99) ),
+    #NTupleVariable("mcFlavour", lambda x : x.mcFlavour, type=int),
+    #NTupleVariable("mcMatchId", lambda x : x.mcMatchId, type=int),
+    #NTupleVariable("hadronFlavour", lambda x : x.hadronFlavour, type=int),
+    #NTupleVariable("matchFlag", lambda x : getattr(x, "tth_match_label_numeric", -1), type=int),
+    #NTupleVariable("mcPt", lambda x : x.mcPt, mcOnly=True),
+    #NTupleVariable("mcEta", lambda x : x.mcEta, mcOnly=True),
+    #NTupleVariable("mcPhi", lambda x : x.mcPhi, mcOnly=True),
+    #NTupleVariable("mcM", lambda x : x.mcM, mcOnly=True),
+    #NTupleVariable("mcNumBHadrons", lambda x : x.genjet.numBHadrons if hasattr(x, "genjet") else -1, mcOnly=True),
+    #NTupleVariable("mcNumCHadrons", lambda x : x.genjet.numCHadrons if hasattr(x, "genjet") else -1, mcOnly=True),
+    #NTupleVariable("mcNumBHadronsFromTop", lambda x : getattr(x.genjet, "numBHadronsFromTop") if hasattr(x, "genjet") else -1, mcOnly=True),
+    #NTupleVariable("mcNumCHadronsFromTop", lambda x : getattr(x.genjet, "numCHadronsFromTop") if hasattr(x, "genjet") else -1, mcOnly=True),
+    #NTupleVariable("mcNumBHadronsAfterTop", lambda x : getattr(x.genjet, "numBHadronsAfterTop") if hasattr(x, "genjet") else -1, mcOnly=True),
+    #NTupleVariable("mcNumCHadronsAfterTop", lambda x : getattr(x.genjet, "numCHadronsAfterTop") if hasattr(x, "genjet") else -1, mcOnly=True),
+    #NTupleVariable("corr", lambda x : x.corr),
+    #NTupleVariable("corr_JESUp", lambda x : x.corr_JECUp),
+    #NTupleVariable("corr_JESDown", lambda x : x.corr_JECDown),
+    #NTupleVariable("btagCSVRnd2t",   lambda x : getattr(x, "btagCSVRnd2t",   -99) ),
+    #NTupleVariable("btagCSVRnd3t",   lambda x : getattr(x, "btagCSVRnd3t",   -99) ),
+    #NTupleVariable("btagCSVRndge4t", lambda x : getattr(x, "btagCSVRndge4t", -99) ),
+    #NTupleVariable("btagCSVInp2t",   lambda x : getattr(x, "btagCSVInp2t",   -99) ),
+    #NTupleVariable("btagCSVInp3t",   lambda x : getattr(x, "btagCSVInp3t",   -99) ),
+    #NTupleVariable("btagCSVInpge4t", lambda x : getattr(x, "btagCSVInpge4t", -99) ),
 ])
 
 #Specifies what to save for leptons
@@ -410,23 +410,23 @@ def getTreeProducer(conf):
 
             #--END OF USED BY SUBJETANALYZER--#
 
-            NTupleVariable(
-               "nGenBHiggs", lambda ev: len(getattr(ev, "b_quarks_h_nominal", [])),
-               type=int,
-               help="Number of generated b from higgs"
-            ),
+            # NTupleVariable(
+            #    "nGenBHiggs", lambda ev: len(getattr(ev, "b_quarks_h_nominal", [])),
+            #    type=int,
+            #    help="Number of generated b from higgs"
+            # ),              
 
-            NTupleVariable(
-               "nGenBTop", lambda ev: len(getattr(ev, "b_quarks_t_nominal", [])),
-               type=int,
-               help="Number of generated b from top"
-            ),
+            # NTupleVariable(
+            #    "nGenBTop", lambda ev: len(getattr(ev, "b_quarks_t_nominal", [])),
+            #    type=int,
+            #    help="Number of generated b from top"
+            # ),
 
-            NTupleVariable(
-               "nGenQW", lambda ev: len(getattr(ev, "l_quarks_w_nominal", [])),
-               type=int,
-               help="Number of generated quarks from W"
-            ),
+            # NTupleVariable(
+            #    "nGenQW", lambda ev: len(getattr(ev, "l_quarks_w_nominal", [])),
+            #    type=int,
+            #    help="Number of generated quarks from W"
+            # ),
             
             NTupleVariable(
                "passPV", lambda ev: getattr(ev, "passPV", -1),
@@ -591,12 +591,12 @@ def getTreeProducer(conf):
 
         ],
         globalObjects = {
-           "MET_nominal" : NTupleObject("met", metType, help="Reconstructed MET"),
-           "MET_gen_nominal" : NTupleObject("met_gen", metType, help="Generated MET", mcOnly=True),
-           "MET_jetcorr_nominal" : NTupleObject("met_jetcorr", metType, help="Reconstructed MET, corrected to gen-level jets"),
-           "MET_tt_nominal" : NTupleObject("met_ttbar_gen", metType, help="Generated MET from nu(top)"),
-           "primaryVertex" : NTupleObject("pv", pvType, help="First PV"),
-           "dilepton_p4" : NTupleObject("ll", p4type, help="Dilepton system"),
+            "MET_nominal" : NTupleObject("met", metType, help="Reconstructed MET"),
+           # #"MET_gen_nominal" : NTupleObject("met_gen", metType, help="Generated MET", mcOnly=True), 
+           # "MET_jetcorr_nominal" : NTupleObject("met_jetcorr", metType, help="Reconstructed MET, corrected to gen-level jets"),
+           # "MET_tt_nominal" : NTupleObject("met_ttbar_gen", metType, help="Generated MET from nu(top)"),
+            "primaryVertex" : NTupleObject("pv", pvType, help="First PV"),
+           # "dilepton_p4" : NTupleObject("ll", p4type, help="Dilepton system"),
         },
         collections = {
         #standard dumping of objects
@@ -607,14 +607,14 @@ def getTreeProducer(conf):
         #    "l_quarks_w" : NTupleCollection("GenQFromW", quarkType, 5, help=""),
             "good_jets_nominal" : NTupleCollection("jets", jetType, 9, help="Selected jets"),
             "good_leptons_nominal" : NTupleCollection("leps", leptonType, 2, help="Selected leptons"),
-            "GenTop" : NTupleCollection("GenTop", quarkType, 2, help="Gen Tops"),
+            #"GenTop" : NTupleCollection("GenTop", quarkType, 2, help="Gen Tops"),
             #"topCandidate" : NTupleCollection("topCandidate", topType, 28, help=""),
             #"othertopCandidate" : NTupleCollection("othertopCandidate", topType, 28, help=""),
             #"higgsCandidate" : NTupleCollection("higgsCandidate", higgsType, 9, help=""),
         }
     )
     
-    for trigname in conf.trigger["paths"]:
+    for trigname in conf.trigger["paths"]: 
         treeProducer.globalVariables += [makeGlobalVariable((trigname, int, "HLT {0}".format(trigname)), "nominal")]
         
     for systematic in ["nominal", "raw", "JESUp", "JESDown"]:
@@ -622,11 +622,11 @@ def getTreeProducer(conf):
             continue
 
         for vtype in [
-            #("btag_lr_4b",          float,      "4b, N-4 light, probability"),
-            #("btag_lr_2b",          float,      "2b, N-2 Nlight probability"),
-            #("btag_LR_4b_2b_old",   float,      ""),
-            #("btag_LR_4b_2b",       float,      ""),
-            #("btag_LR_4b_2b_max4",  float,      ""),
+    #         #("btag_lr_4b",          float,      "4b, N-4 light, probability"),
+    #         #("btag_lr_2b",          float,      "2b, N-2 Nlight probability"),
+    #         #("btag_LR_4b_2b_old",   float,      ""),
+    #         #("btag_LR_4b_2b",       float,      ""),
+    #         #("btag_LR_4b_2b_max4",  float,      ""),
 
             ("is_sl",               int,        "Passes single lepton cuts"),
             ("is_dl",               int,        "Passes dilepton cuts"),
@@ -634,23 +634,23 @@ def getTreeProducer(conf):
             ("Wmass",               float,      "Best reconstructed W candidate mass"),
             ("cat",                 int,        "ME category", "catn"),
             ("cat_btag",            int,        "ME category (b-tag)", "cat_btag_n"),
-            ("cat_gen",             int,        "top decay category (-1 unknown, 0 single-leptonic, 1 di-leptonic, 2 fully hadronic)", "cat_gen_n"),
+    #         ("cat_gen",             int,        "top decay category (-1 unknown, 0 single-leptonic, 1 di-leptonic, 2 fully hadronic)", "cat_gen_n"),
             ("btag_lr_4b",          float,      "4b, N-4 light, probability, 3D binning"),
             ("btag_lr_2b",          float,      "2b, N-2 Nlight probability, 3D binning"),
-            ("btag_lr_4b_Rndge4t",  float,      "4b, N-4 light, probability, 3D binning, ge4t random"),
-            ("btag_lr_2b_Rndge4t",  float,      "2b, N-2 Nlight probability, 3D binning, ge4t random"),
-            ("btag_lr_4b_Inpge4t",  float,      "4b, N-4 light, probability, 3D binning, ge4t input"),
-            ("btag_lr_2b_Inpge4t",  float,      "2b, N-2 Nlight probability, 3D binning, ge4t input"),
-            ("btag_lr_4b_Rnd3t",    float,      "4b, N-4 light, probability, 3D binning, 3t   random"),
-            ("btag_lr_2b_Rnd3t",    float,      "2b, N-2 Nlight probability, 3D binning, 3t   random"),
-            ("btag_lr_4b_Inp3t",    float,      "4b, N-4 light, probability, 3D binning, 3t   input"),
-            ("btag_lr_2b_Inp3t",    float,      "2b, N-2 Nlight probability, 3D binning, 3t   input"),
+    #         # ("btag_lr_4b_Rndge4t",  float,      "4b, N-4 light, probability, 3D binning, ge4t random"),
+    #         # ("btag_lr_2b_Rndge4t",  float,      "2b, N-2 Nlight probability, 3D binning, ge4t random"),
+    #         # ("btag_lr_4b_Inpge4t",  float,      "4b, N-4 light, probability, 3D binning, ge4t input"),
+    #         # ("btag_lr_2b_Inpge4t",  float,      "2b, N-2 Nlight probability, 3D binning, ge4t input"),
+    #         # ("btag_lr_4b_Rnd3t",    float,      "4b, N-4 light, probability, 3D binning, 3t   random"),
+    #         # ("btag_lr_2b_Rnd3t",    float,      "2b, N-2 Nlight probability, 3D binning, 3t   random"),
+    #         # ("btag_lr_4b_Inp3t",    float,      "4b, N-4 light, probability, 3D binning, 3t   input"),
+    #         # ("btag_lr_2b_Inp3t",    float,      "2b, N-2 Nlight probability, 3D binning, 3t   input"),
 
             ("btag_LR_4b_2b",        float,      ""),
-            ("btag_LR_4b_2b_Rndge4t",float,      ""),
-            ("btag_LR_4b_2b_Inpge4t",float,      ""),
-            ("btag_LR_4b_2b_Rnd3t",  float,      ""),
-            ("btag_LR_4b_2b_Inp3t",  float,      ""),
+    #         # ("btag_LR_4b_2b_Rndge4t",float,      ""),
+    #         # ("btag_LR_4b_2b_Inpge4t",float,      ""),
+    #         # ("btag_LR_4b_2b_Rnd3t",  float,      ""),
+    #         # ("btag_LR_4b_2b_Inp3t",  float,      ""),
             ("qg_LR_flavour_4q_0q", float,      ""),
             ("qg_LR_flavour_4q_1q", float,      ""), 
             ("qg_LR_flavour_4q_2q", float,      ""),
@@ -665,14 +665,14 @@ def getTreeProducer(conf):
             ("nBCSVT",              int,      ""),
             ("nBCSVL",              int,      ""),
             ("numJets",             int,        ""),
-            ("nMatchSimB",          int,        ""),
-            ("nMatchSimC",          int,        ""),
-            ("nMatch_wq",           int,        ""),
-            ("nMatch_wq_btag",      int,        ""),
-            ("nMatch_tb",           int,        ""),
-            ("nMatch_tb_btag",      int,        ""),
-            ("nMatch_hb",           int,        ""),
-            ("nMatch_hb_btag",      int,        ""),
+    #         # ("nMatchSimB",          int,        ""),
+    #         # ("nMatchSimC",          int,        ""),
+    #         # ("nMatch_wq",           int,        ""),
+    #         # ("nMatch_wq_btag",      int,        ""),
+    #         # ("nMatch_tb",           int,        ""),
+    #         # ("nMatch_tb_btag",      int,        ""),
+    #         # ("nMatch_hb",           int,        ""),
+    #         # ("nMatch_hb_btag",      int,        ""),
             ("isotropy",            float,      ""),
             ("sphericity",          float,      ""),
             ("C",                   float,      ""),
@@ -703,28 +703,28 @@ def getTreeProducer(conf):
             ("n_boosted_ljets",         int,        ""),
             ("n_excluded_bjets",         int,        ""),
             ("n_excluded_ljets",         int,        ""),
-            ("QMatching_t_attempted",         int,        ""),
-            ("QMatching_H_attempted",         int,        ""),
-            ("QMatching_n_hadr_bquark_matched_to_bjet",         int,        ""),
-            ("QMatching_n_lept_bquark_matched_to_bjet",         int,        ""),
-            ("QMatching_n_lquarks_matched_to_bjet",         int,        ""),
-            ("QMatching_n_hadr_bquark_matched_to_ljet",         int,        ""),
-            ("QMatching_n_lept_bquark_matched_to_ljet",         int,        ""),
-            ("QMatching_n_lquarks_matched_to_ljet",         int,        ""),
-            ("QMatching_n_hadr_bquark_matched_to_top_subjet",         int,        ""),
-            ("QMatching_n_lept_bquark_matched_to_top_subjet",         int,        ""),
-            ("QMatching_n_lquarks_matched_to_top_subjet",         int,        ""), 
-            ("QMatching_n_hadr_bquark_matched_to_otop_subjet",         int,        ""),
-            ("QMatching_n_lept_bquark_matched_to_otop_subjet",         int,        ""),
-            ("QMatching_n_lquarks_matched_to_otop_subjet",         int,        ""),
-            ("QMatching_n_higgs_bquarks_matched_to_bjet",         int,        ""),
-            ("QMatching_n_higgs_bquarks_matched_to_ljet",         int,        ""),
-            ("QMatching_n_higgs_bquarks_matched_to_top_subjet",         int,        ""),
-            ("QMatching_n_higgs_bquarks_matched_to_otop_subjet",         int,        ""),
-            ("n_matched_TTgentop",         int,        ""),
-            ("n_matched_TTgenb",         int,        ""),
-            ("n_matched_TTgenW",         int,        ""),
-            ("matched_TTgentop_pt",         float,        ""),
+    #         # ("QMatching_t_attempted",         int,        ""),
+    #         # ("QMatching_H_attempted",         int,        ""),
+    #         # ("QMatching_n_hadr_bquark_matched_to_bjet",         int,        ""),
+    #         # ("QMatching_n_lept_bquark_matched_to_bjet",         int,        ""),
+    #         # ("QMatching_n_lquarks_matched_to_bjet",         int,        ""),
+    #         # ("QMatching_n_hadr_bquark_matched_to_ljet",         int,        ""),
+    #         # ("QMatching_n_lept_bquark_matched_to_ljet",         int,        ""),
+    #         # ("QMatching_n_lquarks_matched_to_ljet",         int,        ""),
+    #         # ("QMatching_n_hadr_bquark_matched_to_top_subjet",         int,        ""),
+    #         # ("QMatching_n_lept_bquark_matched_to_top_subjet",         int,        ""),
+    #         # ("QMatching_n_lquarks_matched_to_top_subjet",         int,        ""), 
+    #         # ("QMatching_n_hadr_bquark_matched_to_otop_subjet",         int,        ""),
+    #         # ("QMatching_n_lept_bquark_matched_to_otop_subjet",         int,        ""),
+    #         # ("QMatching_n_lquarks_matched_to_otop_subjet",         int,        ""),
+    #         # ("QMatching_n_higgs_bquarks_matched_to_bjet",         int,        ""),
+    #         # ("QMatching_n_higgs_bquarks_matched_to_ljet",         int,        ""),
+    #         # ("QMatching_n_higgs_bquarks_matched_to_top_subjet",         int,        ""),
+    #         # ("QMatching_n_higgs_bquarks_matched_to_otop_subjet",         int,        ""),
+    #         # ("n_matched_TTgentop",         int,        ""),
+    #         # ("n_matched_TTgenb",         int,        ""),
+    #         # ("n_matched_TTgenW",         int,        ""),
+    #         # ("matched_TTgentop_pt",         float,        ""),
 
             
 
@@ -761,34 +761,34 @@ def getTreeProducer(conf):
                 "higgsCandidate" + syst_suffix: NTupleCollection("higgsCandidate" + syst_suffix2, higgsType, 9, help=""),
             })
 
-            for cat in conf.bran["jetCategories"].items():
-                treeProducer.globalObjects.update({ 
-                        "b_rnd_results_" + cat[0] + syst_suffix: NTupleObject(
-                            "bRnd_rnd_"+ cat[0] + syst_suffix2, branType,
-                            help="BTagrRandomizer results (p,ntoys,pass,tag_id)"
-                            ),
-                        "b_inp_results_" + cat[0] + syst_suffix: NTupleObject(
-                            "bRnd_inp_"+ cat[0] + syst_suffix2, branType,
-                            help="BTagrRandomizer input results (p,ntoys,pass,tag_id)"
-                            )                                                
-                        })
+    #         for cat in conf.bran["jetCategories"].items():
+    #             treeProducer.globalObjects.update({ 
+    #                     "b_rnd_results_" + cat[0] + syst_suffix: NTupleObject(
+    #                         "bRnd_rnd_"+ cat[0] + syst_suffix2, branType,
+    #                         help="BTagrRandomizer results (p,ntoys,pass,tag_id)"
+    #                         ),
+    #                     "b_inp_results_" + cat[0] + syst_suffix: NTupleObject(
+    #                         "bRnd_inp_"+ cat[0] + syst_suffix2, branType,
+    #                         help="BTagrRandomizer input results (p,ntoys,pass,tag_id)"
+    #                         )                                                
+    #                     })
 
 
-    for systematic in ["nominal"]:
-        for vtype in [
-            ("weight_xs",               float,  ""),
-            ("ttCls",                   int,    ""),
-            ("bTagWeight_LFUp",         float,  ""),
-            ("bTagWeight_Stats2Down",   float,  ""),
-            ("bTagWeight_LFDown",       float,  ""),
-            ("bTagWeight_HFUp",         float,  ""),
-            ("bTagWeight_JESDown",      float,  ""),
-            ("bTagWeight",              float,  ""),
-            ("bTagWeight_HFDown",       float,  ""),
-            ("bTagWeight_Stats2Up",     float,  ""),
-            ("bTagWeight_JESUp",        float,  ""),
-            ("bTagWeight_Stats1Up",     float,  ""),
-            ("bTagWeight_Stats1Down",   float,  ""),
-        ]:
-            treeProducer.globalVariables += [makeGlobalVariable(vtype, systematic)]
+    # for systematic in ["nominal"]:
+    #     for vtype in [
+    #         ("weight_xs",               float,  ""),
+    #         ("ttCls",                   int,    ""),
+    #         ("bTagWeight_LFUp",         float,  ""),
+    #         ("bTagWeight_Stats2Down",   float,  ""),
+    #         ("bTagWeight_LFDown",       float,  ""),
+    #         ("bTagWeight_HFUp",         float,  ""),
+    #         ("bTagWeight_JESDown",      float,  ""),
+    #         ("bTagWeight",              float,  ""),
+    #         ("bTagWeight_HFDown",       float,  ""),
+    #         ("bTagWeight_Stats2Up",     float,  ""),
+    #         ("bTagWeight_JESUp",        float,  ""),
+    #         ("bTagWeight_Stats1Up",     float,  ""),
+    #         ("bTagWeight_Stats1Down",   float,  ""),
+    #     ]:
+    #         treeProducer.globalVariables += [makeGlobalVariable(vtype, systematic)]
     return treeProducer
