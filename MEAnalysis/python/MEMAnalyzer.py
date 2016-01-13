@@ -162,6 +162,7 @@ class MEAnalyzer(FilterAnalyzer):
 
         self.memkeys = self.conf.mem["methodOrder"]
         self.memkeysToRun = self.conf.mem["methodsToRun"]
+        self.catsToRun = self.conf.mem["categories"] #DS
         
         #Create an empty vector for the integration variables
         self.vars_to_integrate   = CvectorPSVar()
@@ -346,7 +347,8 @@ class MEAnalyzer(FilterAnalyzer):
                         mem_cfg.do_calculate(event, mem_cfg) and
                         mem_cfg.enabled and
                         self.conf.mem["selection"](event) and
-                        confname in self.memkeysToRun
+                        confname in self.memkeysToRun and
+                        event.cat in self.catsToRun #DS
                     ):
                     
                     print "Integrator::run started hypo={0} conf={1} cat={2}".format(hypo, confname, event.cat) #DS
