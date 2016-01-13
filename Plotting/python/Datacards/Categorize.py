@@ -692,6 +692,35 @@ class Categorization(object):
 
         return name
 
+    def latex_string(self):
+        """Printing a category returns its name. The name is built
+        from the cuts of this category and its ancestors"""
+
+        all_cuts = [p.cut for p in self.all_parents()] + [self.cut]
+
+        # The name of a bin is the sum of all cuts
+        # -we want the axes in the order the cutflow goes
+        # -BUT only list the tightest cut
+
+        # First just extract the order of axes
+        axes_order = [c.axis for c in all_cuts if c]
+        unique_axes = []
+        for ia, a in enumerate(axes_order):
+            if not a in axes_order[:ia]:
+                unique_axes.append(a)
+
+        unique_cuts = []
+        for a in unique_axes:
+            unique_cuts.append( [c for c in all_cuts if c.axis == a][-1])
+
+        name = ", ".join([c.latex_string() for c in unique_cuts])
+        if not name:
+            name = "Whole"
+
+        #name += "__discr_" + str(self.discriminator_axis)
+
+        return name
+
 
     def create_control_plots(self, path, ignore_splittings = False):
         """
@@ -965,3 +994,17 @@ def GetAxes(h):
         new_axis = axis(a.GetName(), a.GetNbins(), a.GetXmin(), a.GetXmax())
         axes[new_axis.name] = new_axis 
     return axes
+
+
+def Recurse(categorization, depth=0, leaves=[], nodes=[]):
+    """
+    Recursively iterate over all the nodes of a Categorization.
+    Returns all the leaves and nodes.
+    """
+    categorization.depth = depth
+    if len(categorization.children) == 0:
+        leaves += [categorization]
+    nodes += [categorization]
+    categorization.name = categorization.__repr__()
+    for ch in categorization.children:
+        Recurse(ch, depth+1, leaves, nodes)

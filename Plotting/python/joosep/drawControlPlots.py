@@ -9,7 +9,18 @@ import pandas
 import rootpy.plotting.root2matplotlib as rplt
 import ROOT, plotlib, heplot
 import tabulate
+import cPickle as pickle
 from collections import OrderedDict
+
+#Categorizer
+sys.path.append("/Users/joosep/Documents/tth/sw-slc6/CMSSW_7_4_15/src/TTH/Plotting/python/Datacards/")
+import Categorize, Forest, TreeAnalysis
+import Cut
+
+def integral_and_error(h):
+    e = ROOT.Double()
+    i = h.IntegralAndError(1, h.GetNbinsX(), e)
+    return i, e
 
 backgrounds = ["ttbarOther", "ttbarPlusBBbar", "ttbarPlusB", "ttbarPlus2B", "ttbarPlusCCbar"]
 
@@ -22,20 +33,23 @@ slist = [
  ('ttbarOther', 'ttbarOther')
 ]
 
-#input_file = "/Users/joosep/Dropbox/tth/datacards/prev16/Nov30.root"
-#input_file = "/Users/joosep/Dropbox/tth/ControlPlotsSparse_puweight.root"
-input_file = "/Users/joosep/Dropbox/tth/ControlPlotsSparse_corr.root"
+systematics=[
+    ("_CMS_scale_jUp", "_CMS_scale_jDown"),
+    ("_CMS_ttH_CSVLFUp", "_CMS_ttH_CSVLFDown"),
+    ("_CMS_ttH_CSVHFUp", "_CMS_ttH_CSVHFDown"),
+    ("_CMS_ttH_CSVStats1Up", "_CMS_ttH_CSVStats1Down"),
+    ("_CMS_ttH_CSVStats2Up", "_CMS_ttH_CSVStats2Down"),
+]
+
+input_file = "/Users/joosep/Dropbox/tth/ControlPlotsSparse.root"
+
 
 outfile = open("report.html", "w")
 outfile.write("<h1>ttH report</h1>\n")
 outfile.write("input file: {0}<br>\n".format(input_file))
 
-for sample in slist:
-    outfile.write("sample {0}<br>\n".format(sample[0]))
-
 sys.path.append("/Users/joosep/Documents/tth/sw-slc6/CMSSW_7_4_15/src/TTH/Plotting/python/joosep/")
 inf = rootpy.io.File(input_file)
-
 
 sl_channels = ["sl_mu_j5_t2", "sl_mu_j5_t3", "sl_mu_j5_tge4", "sl_mu_jge6_t2", "sl_mu_jge6_t3", "sl_mu_jge6_tge4"]
 dl_channels = ["dl_mumu_j3_t2", "dl_mumu_jge3_t3", "dl_mumu_jge4_t2", "dl_mumu_jge4_tge4"]
@@ -347,10 +361,10 @@ for cat in [
                 show_overflow = True, title_extended="$,\\ \\mathcal{L}=2.12,\\ \\mathrm{fb}^{-1}$",
                 systematics=[
                     ("_CMS_scale_jUp", "_CMS_scale_jDown"),
-                    ("_CMS_ttH_CSVLFUp", "_CMS_ttH_CSVLFDown"),
-                    ("_CMS_ttH_CSVHFUp", "_CMS_ttH_CSVHFDown"),
-                    ("_CMS_ttH_CSVStats1Up", "_CMS_ttH_CSVStats1Down"),
-                    ("_CMS_ttH_CSVStats2Up", "_CMS_ttH_CSVStats2Down"),
+                    #("_CMS_ttH_CSVLFUp", "_CMS_ttH_CSVLFDown"),
+                    #("_CMS_ttH_CSVHFUp", "_CMS_ttH_CSVHFDown"),
+                    #("_CMS_ttH_CSVStats1Up", "_CMS_ttH_CSVStats1Down"),
+                    #("_CMS_ttH_CSVStats2Up", "_CMS_ttH_CSVStats2Down"),
                 ],
                 blindFunc=blindFunc
             )

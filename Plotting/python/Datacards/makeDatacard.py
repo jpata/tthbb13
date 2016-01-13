@@ -3,9 +3,9 @@ import ROOT, shutil
 ROOT.gROOT.SetBatch(True)
 #ROOT.gErrorIgnoreLevel = ROOT.kError
 import sys, imp, os, copy
-from Samples import samples_dict
 from datacardCombiner import makeStatVariations, copyHistograms, defaultHistogram, fakeData, combineCategories
 from datacard import Datacard
+
 def PrintDatacard(event_counts, datacard, dcof):
 
     number_of_bins = len(datacard.categories)

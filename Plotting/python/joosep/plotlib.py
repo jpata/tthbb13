@@ -345,6 +345,9 @@ def mc_stack(hlist, hs_syst, systematics, colors="auto"):
     htot_usyst = htot.Clone()
     htot_dsyst = htot.Clone()
     for systUp, systDown in systematics:
+        #import pdb
+        #pdb.set_trace()
+        hs_syst[systUp]
         errs_syst_up = np.array([y for y in sum(hs_syst[systUp].values()).y()])
         errs_syst_down = np.array([y for y in sum(hs_syst[systDown].values()).y()])
         errs_syst = np.abs(errs_syst_up - errs_syst_down)
@@ -448,6 +451,8 @@ def draw_data_mc(tf, hname, samples, **kwargs):
     for systUp, systDown in systematics:
         hs_syst[systUp] = getHistograms(tf, samples, hname+systUp)
         hs_syst[systDown] = getHistograms(tf, samples, hname+systDown)
+        if len(hs_syst[systUp])==0 or len(hs_syst[systDown])==0:
+            print "Could not read histograms for {0}".format(hname+systUp)
 
     sample_d = dict(samples)
     for hd in [hs] + hs_syst.values():
@@ -867,10 +872,19 @@ def getDataname(cat):
         return ["DoubleEG"]
     elif "dl_emu" in cat:
         return ["MuonEG"]
+    #FIXME: for flavour-unsplit data bins, need to make sure all data categories are exclusive
+    elif "sl" in cat:
+        return ["SingleMuon", "SingleElectron"]
+    elif "dl" in cat:
+        return ["DoubleMuon", "DoubleEG", "MuonEG"]
     raise Exception("not recognized {0}".format(cat))
 
 
 def sync_table(inf, cats, bkg):
+    """
+    inf - input file (ControlPlotsSparse.root)
+    cats - list of category strings (["sl_jge6_tge4", ...])
+    """
     hd = {}
     for ic, cat in enumerate(cats):
         for sample in ["ttH_hbb"] + bkg + ["data"]:
@@ -878,6 +892,7 @@ def sync_table(inf, cats, bkg):
             if hd.has_key(k):
                 h = hd[k]
             else:
+                #hist not found, create default empty 
                 h = rootpy.plotting.Hist(len(cats), 0, len(cats))
             if sample == "data":
                 categories_to_get = getDataname(cat)
@@ -907,3 +922,36 @@ def get_cut_at_eff(h, eff):
     bins = np.array([hc.GetBinContent(i) for i in range(1, hc.GetNbinsX()+1)])
     idx = np.searchsorted(bins, eff)
     return idx
+
+def brazilplot(lims, ks, knames):
+    ax = plt.axes()
+    ls = []
+    errs = np.zeros((len(ks), 4))
+    i = 0
+    for k in ks:
+        l = lims[k][0][2]
+        ls += [l]
+        errs[i,0] = lims[k][0][1]
+        errs[i,1] = lims[k][0][3]
+        errs[i,2] = lims[k][0][0]
+        errs[i,3] = lims[k][0][4]
+        #print k, ls[i], errs[i,0], errs[i,1]
+        i += 1
+    #print ls
+    ys = np.array(range(len(ks)))
+    for y, l, e1, e2, e3, e4 in zip(ys, ls, errs[:, 0], errs[:, 1], errs[:, 2], errs[:, 3]):
+        ax.add_line(plt.Line2D([l, l], [y, y+1.0], lw=2, color="black", ls="-"))
+        #print l, y
+        plt.text(l*1.1, y+0.5, "{0:.2f}".format(l), horizontalalignment="left", verticalalignment="center")
+        ax.barh(y+0.1, (e4-e3), left=e3, color=np.array([254, 247, 2])/255.0, lw=0)
+        ax.barh(y+0.1, (e2-e1), left=e1, color=np.array([51, 247, 2])/255.0 , lw=0)
+    plt.xlim(0, len(ks))
+    plt.ylim(ys[0], ys[-1]+1)
+    plt.yticks(ys+0.5, knames, verticalalignment="center", fontsize=18, ha="left")
+    plt.xlabel("$\mu$")
+    yax = ax.get_yaxis()
+    # find the maximum width of the label on the major ticks
+    pad = 200
+    yax.set_tick_params(pad=pad)
+
+    #plt.grid()

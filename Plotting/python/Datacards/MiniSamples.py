@@ -15,7 +15,8 @@ elif "quasar" in hostname:
 elif "hep.kbfi.ee" in hostname:
     path = "/home/joosep/tth/gc/"
 else:
-    raise Exception("Sample path not defined for hostname={0}!".format(hostname))
+    print "Sample path not defined for hostname={0}!".format(hostname)
+    path = ""
 
 samples_dict = {
     "SingleMuon"     : path + "SingleMuon.root",
