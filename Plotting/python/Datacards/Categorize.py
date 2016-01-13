@@ -229,8 +229,7 @@ class Categorization(object):
             for ignore_splittings in [True,False]:
 
                 for node in nodes_to_eval:
-                    shapes_txt_filename    = "{0}/shapes_tree_{1}_NS{2}.txt".format(node.output_path, i_split, ignore_splittings)
-
+                    shapes_txt_filename    = "{0}/shapes_tree_{1}_{2}_NS{3}.txt".format(node.output_path, str(node), i_split, ignore_splittings)
                     filenames.append(shapes_txt_filename)
                     if ignore_splittings:
                         node.shapes_txt_filename_self = shapes_txt_filename

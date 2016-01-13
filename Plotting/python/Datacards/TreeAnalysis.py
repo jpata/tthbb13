@@ -12,8 +12,7 @@ from CombineHelper import LimitGetter, DummyLimitGetter
 from Axis import axis
 from Cut import Cut
 
-import pickle
-
+import pickle, os
 ########################################
 # Configuration
 ########################################
@@ -123,6 +122,8 @@ def make_latex(name):
     safe it to a tex file """
     
     print "make_latex", name
+    Categorize.Categorization.output_path = output_path + "/" + name
+    os.mkdir(Categorize.Categorization.output_path)
     r = Categorize.CategorizationFromString(trees[name])
     r.axes = Categorize.Categorization.axes
 
@@ -185,6 +186,8 @@ if __name__ == "__main__":
     Categorize.Categorization.h_bkg_sys = h_dl[3]
 
     make_latex("old_dl")
+    Categorize.Categorization.output_path = output_path + "/old_dl_blr_opt"
+    os.mkdir(Categorize.Categorization.output_path)
     r = split_leaves_by_BLR(trees["old_dl"], disc="mem_DL_0w2h2t")
     of = open("old_dl_blr_opt.tex", "w")
     of.write(r.print_tree_latex())
