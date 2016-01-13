@@ -958,6 +958,7 @@ namespace BaseCuts {
                     (abs(ev.leptons.at(0).pdgId)==11 && abs(ev.leptons.at(1).pdgId)==13)
                 ) && trigger::emu(*(ev.data))
                 )
+            )
         );
     }
     

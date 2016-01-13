@@ -49,13 +49,13 @@ backgrounds = [
 # Analysis helper functions
 ########################################
 
-def split_leaves_by_BLR(original):
+def split_leaves_by_BLR(original, disc="mem_SL_0w2h2t"):
     """ Attempt to optimize BLR splitting of classic analysis categories """
 
     r = Categorize.CategorizationFromString(original)
     initial_leaves = r.get_leaves()
     cut_axes = ["btag_LR_4b_2b_logit"]
-    discriminator_axes = ["mem_SL_0w2h2t"] #MEM SL 022 axis
+    discriminator_axes = [disc] #MEM SL 022 axis
     for l in initial_leaves:
         print "Optimizing leaf", l
 
@@ -66,8 +66,6 @@ def split_leaves_by_BLR(original):
             cut_axes,
             discriminator_axes
         )
-        #import pdb
-        #pdb.set_trace()
     return r
 # End of split_leaves_by_BLR
 
@@ -97,8 +95,6 @@ def split_leaves_by_BLR_highpurity(original):
             cut_axes,
             discriminator_axes
         )
-        #import pdb
-        #pdb.set_trace()
     return r
 # End of split_leaves_by_BLR
 
@@ -131,11 +127,11 @@ def make_latex(name):
     r.axes = Categorize.Categorization.axes
 
     #r.print_yield_table()
-    of = open( name + "_nostat.tex","w")
+    of = open( name + ".tex","w")
     of.write(r.print_tree_latex())
     r.SaveControlPlots(name)
     of.close()
-    of = open(name + "_nostat.pickle", "w")
+    of = open(name + ".pickle", "w")
     of.write(pickle.dumps(r))
     of.close()
 # End of make_latex
@@ -149,7 +145,7 @@ if __name__ == "__main__":
     
     Categorize.Categorization.output_path = output_path
     Categorize.Categorization.pool = Pool(n_proc)
-    Categorize.Categorization.do_stat_variations = False
+    Categorize.Categorization.do_stat_variations = True
     Categorize.Categorization.lg = LimitGetter(output_path)
     
     #SL
@@ -189,6 +185,13 @@ if __name__ == "__main__":
     Categorize.Categorization.h_bkg_sys = h_dl[3]
 
     make_latex("old_dl")
+    r = split_leaves_by_BLR(trees["old_dl"], disc="mem_DL_0w2h2t")
+    of = open("old_dl_blr_opt.tex", "w")
+    of.write(r.print_tree_latex())
+    of.close()
+    of = open("old_dl_blr_opt.pickle", "w")
+    of.write(pickle.dumps(r))
+    of.close()
 
     #r = Categorize.CategorizationFromString(trees["old_2t_blr_A"])
     #r.axes = Categorize.Categorization.axes

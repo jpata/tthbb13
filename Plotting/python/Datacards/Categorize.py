@@ -264,6 +264,9 @@ class Categorization(object):
                     l = _limits[2]
                     limits[str(n)+str(ignore_splitting)] = l
         ret = ""
+        print str(self)
+        if self.discriminator_axis is None:
+            return "{}"
         
         if depth == 0:
             ret += self.latex_preamble() + "["
@@ -272,8 +275,8 @@ class Categorization(object):
         ret += self.cut.latex_string() + r"\\"
         ret += "S={0:.1f}".format(S) + r"\\"
         ret += "B={0:.1f}".format(B) 
-
-        if self.children: 
+        
+        if self.children:
             ret += r"\\"
             ret += r"$\mu_{Comb.} = " + "{0:.2f}$".format(limits[str(self)+str(False)])
 
@@ -835,7 +838,7 @@ class Categorization(object):
             outdir = rof.Get(outdir_str)
             v = v.Clone()
             v.SetDirectory(outdir)
-        rof.Write("", ROOT.TObject.kOverwrite)
+            outdir.Write("", ROOT.TObject.kOverwrite)
         rof.Close()
 
 #End of Categorization
