@@ -75,8 +75,7 @@ class Categorization(object):
     verbose = 0
 
     #Cache of all projected histograms
-    allhists = {}
-    do_stat_variations = True
+    allhists = {}    
     leaf_files = {}
     event_counts = {}
 

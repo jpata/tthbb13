@@ -16,7 +16,7 @@ class Datacard:
         # Subset of the reweighted distributions we want to use as syst. shape uncertainties    
         # To avoid copy paste
         self.common_shape_uncertainties = {
-            "CMS_scale_j"       : 1,
+            #"CMS_scale_j"       : 1,
             "CMS_ttH_CSVLF"       : 1,
             "CMS_ttH_CSVHF"       : 1,
             "CMS_ttH_CSVStats1"   : 1,
@@ -36,30 +36,41 @@ class Datacard:
 
         self.common_scale_uncertainties = {
             "ttH_hbb" : {
-                "lumi" : 1.05
+                "lumi" : 1.045,
+                "QCDscale_ttH" : 1.133,
+                "pdf_gg" : 1.083,
             },
             "ttH_nohbb" : {
-                "lumi" : 1.05
+                "lumi" : 1.045
             },
             "ttbarPlus2B" : {
                 "bgnorm_ttbarPlus2B" : 1.5,
-                "lumi": 1.05
+                "QCDscale_ttbar" : 1.030,
+                "pdf_gg" : 1.026,
+                "lumi": 1.045
             },
             "ttbarPlusB" : {
-                "bgnorm_ttbarPlusB" : 1.3,
-                "lumi": 1.05
+                "bgnorm_ttbarPlusB" : 1.5,
+                "QCDscale_ttbar" : 1.030,
+                "pdf_gg" : 1.026,
+                "lumi": 1.045
             },
             "ttbarPlusBBbar" : {
-                "bgnorm_ttbarPlusBBbar" : 1.3,
-                "lumi": 1.05
+                "bgnorm_ttbarPlusBBbar" : 1.5,
+                "QCDscale_ttbar" : 1.030,
+                "pdf_gg" : 1.026,
+                "lumi": 1.045
             },
             "ttbarPlusCCbar" : {
-                "bgnorm_ttbarPlusCCbar" : 1.3,
-                "lumi": 1.05
+                "bgnorm_ttbarPlusCCbar" : 1.5,
+                "QCDscale_ttbar" : 1.030,
+                "pdf_gg" : 1.026,
+                "lumi": 1.045
             },
             "ttbarOther" : {
-                "bgnorm_ttbarOther" : 1.3,
-                "lumi": 1.05
+                "lumi": 1.045,
+                "QCDscale_ttbar" : 1.030,
+                "pdf_gg" : 1.026,
             },
         }
         # value: normalization uncertainty
