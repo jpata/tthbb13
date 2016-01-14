@@ -10,6 +10,7 @@
 #include "TH1D.h"
 #include "THnSparse.h"
 #include "TFile.h"
+#include "TPython.h"
 #include <tuple>
 #include <unordered_map>
 #include <functional>
@@ -80,11 +81,12 @@ template <> struct hash<vector<CategoryKey::CategoryKey>>
 //Simple representation of a jet
 class Jet {
 public:
-    const TLorentzVector p4;
-    const float btagCSV;
-    const float btagBDT;
+    TLorentzVector p4;
+    float btagCSV;
+    float btagBDT;
+    int hadronFlavour;
 
-    Jet(const TLorentzVector& _p4, float _btagCSV, float _btagBDT);
+    Jet(TLorentzVector& _p4, float _btagCSV, float _btagBDT, int _hadronFlavour);
     const string to_string() const;
 };
 
@@ -139,6 +141,7 @@ public:
     string outputFile;
     vector<SparseAxis> sparseAxes;
     vector<vector<CategoryKey::CategoryKey>> enabledCategories;
+    bool recalculateBTagWeight;
 
     Configuration(
         vector<string>& _filenames,
@@ -161,7 +164,8 @@ public:
         printEvery(_printEvery),
         outputFile(_outputFile),
         sparseAxes(_sparseAxes),
-        enabledCategories(_enabledCategories)
+        enabledCategories(_enabledCategories),
+        recalculateBTagWeight(false)
     {
     }
     static const Configuration makeConfiguration(JsonValue& value);

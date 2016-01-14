@@ -79,9 +79,9 @@ for samp in Samples.samples_dict.keys():
                 },
                 {
                     "func": "nBCSVM",
-                    "xMin": 2,
+                    "xMin": 1,
                     "xMax": 5,
-                    "nBins": 3
+                    "nBins": 4
                 },
                 {
                     "func": "nBoosted",

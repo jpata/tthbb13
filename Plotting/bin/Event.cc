@@ -447,6 +447,19 @@ const Event EventFactory::makeNominal(const TreeData& data, const Configuration&
     
     const vector<Jet> jets = makeAllJets(data, &(JetFactory::makeNominal));
     const vector<Lepton> leptons = makeAllLeptons(data);
+   
+    if (conf.recalculateBTagWeight) {
+        double w = 1.0;
+        for (auto & jet : jets) {
+            stringstream s;
+            s << "bweightcalc.calcJetWeightImpl("
+                << jet.p4.Pt() <<"," << std::abs(jet.p4.Eta()) << "," << jet.hadronFlavour << "," << jet.btagCSV << ",\"final\",\"nominal\")";
+            double ret = (double)(TPython::Eval(s.str().c_str()));
+            w *= ret;
+        }
+        //data.bTagWeight = w;
+        //std::cout << jets.size() << " " << data.bTagWeight << " " << w << std::endl;
+    }
 
     const Event ev(
         &data,
@@ -584,10 +597,11 @@ const Event EventFactory::makeJESDown(const TreeData& data, const Configuration&
 }
 
 
-Jet::Jet(const TLorentzVector& _p4, float _btagCSV, float _btagBDT) :
+Jet::Jet(TLorentzVector& _p4, float _btagCSV, float _btagBDT, int _hadronFlavour) :
     p4(_p4),
     btagCSV(_btagCSV),
-    btagBDT(_btagBDT)
+    btagBDT(_btagBDT),
+    hadronFlavour(_hadronFlavour)
 {
 }
 
@@ -609,7 +623,8 @@ const Jet JetFactory::makeNominal(const TreeData& data, int njet) {
     return Jet(
         p4,
         data.jets_btagCSV[njet],
-        data.jets_btagBDT[njet]
+        data.jets_btagBDT[njet],
+        data.jets_hadronFlavour[njet]
     );
 }
 
@@ -628,7 +643,8 @@ const Jet JetFactory::makeJESUp(const TreeData& data, int njet) {
     return Jet(
         p4,
         data.jets_btagCSV[njet],
-        data.jets_btagBDT[njet]
+        data.jets_btagBDT[njet],
+        data.jets_hadronFlavour[njet]
     );
 }
 
@@ -648,7 +664,8 @@ const Jet JetFactory::makeJESDown(const TreeData& data, int njet) {
     return Jet(
         p4,
         data.jets_btagCSV[njet],
-        data.jets_btagBDT[njet]
+        data.jets_btagBDT[njet],
+        data.jets_hadronFlavour[njet]
     );
 }
 
