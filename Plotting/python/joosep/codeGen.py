@@ -230,6 +230,10 @@ systematics = [
     "CMS_ttH_CSVStats1Down",
     "CMS_ttH_CSVStats2Up",
     "CMS_ttH_CSVStats2Down",
+    "CMS_ttH_CSVcErr1Up",
+    "CMS_ttH_CSVcErr1Down",
+    "CMS_ttH_CSVcErr2Up",
+    "CMS_ttH_CSVcErr2Down",
     "CMS_ttH_CSVLFUp",
     "CMS_ttH_CSVLFDown",
     "CMS_ttH_CSVHFUp",
@@ -237,15 +241,20 @@ systematics = [
 ]
 
 systematic_weights = [
-    ("CMS_ttH_CSVStats1Up",     "nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_Stats1Up"),
-    ("CMS_ttH_CSVStats1Down",   "nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_Stats1Down"),
-    ("CMS_ttH_CSVStats2Up",     "nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_Stats2Up"),
-    ("CMS_ttH_CSVStats2Down",   "nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_Stats2Down"),
-    ("CMS_ttH_CSVStats2Up",     "nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_Stats2Up"),
-    ("CMS_ttH_CSVLFUp",         "nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_LFUp"),
-    ("CMS_ttH_CSVLFDown",       "nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_LFDown"),
-    ("CMS_ttH_CSVHFUp",         "nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_HFUp"),
-    ("CMS_ttH_CSVHFDown",       "nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_HFDown"),
+    ("CMS_ttH_CSVStats1Up",     "nominal_weight(ev, conf)/ev.bTagWeight * ev.data->bTagWeight_Stats1Up"),
+    ("CMS_ttH_CSVStats1Down",   "nominal_weight(ev, conf)/ev.bTagWeight * ev.data->bTagWeight_Stats1Down"),
+    ("CMS_ttH_CSVStats2Up",     "nominal_weight(ev, conf)/ev.bTagWeight * ev.data->bTagWeight_Stats2Up"),
+    ("CMS_ttH_CSVStats2Down",   "nominal_weight(ev, conf)/ev.bTagWeight * ev.data->bTagWeight_Stats2Down"),
+    ("CMS_ttH_CSVStats2Up",     "nominal_weight(ev, conf)/ev.bTagWeight * ev.data->bTagWeight_Stats2Up"),
+    ("CMS_ttH_CSVcErr1Up",     "nominal_weight(ev, conf)/ev.bTagWeight * ev.data->bTagWeight_cErr1Up"),
+    ("CMS_ttH_CSVcErr1Down",   "nominal_weight(ev, conf)/ev.bTagWeight * ev.data->bTagWeight_cErr1Down"),
+    ("CMS_ttH_CSVcErr2Up",     "nominal_weight(ev, conf)/ev.bTagWeight * ev.data->bTagWeight_cErr2Up"),
+    ("CMS_ttH_CSVcErr2Down",   "nominal_weight(ev, conf)/ev.bTagWeight * ev.data->bTagWeight_cErr2Down"),
+    ("CMS_ttH_CSVcErr2Up",     "nominal_weight(ev, conf)/ev.bTagWeight * ev.data->bTagWeight_cErr2Up"),
+    ("CMS_ttH_CSVLFUp",         "nominal_weight(ev, conf)/ev.bTagWeight * ev.data->bTagWeight_LFUp"),
+    ("CMS_ttH_CSVLFDown",       "nominal_weight(ev, conf)/ev.bTagWeight * ev.data->bTagWeight_LFDown"),
+    ("CMS_ttH_CSVHFUp",         "nominal_weight(ev, conf)/ev.bTagWeight * ev.data->bTagWeight_HFUp"),
+    ("CMS_ttH_CSVHFDown",       "nominal_weight(ev, conf)/ev.bTagWeight * ev.data->bTagWeight_HFDown"),
 ]
 
 #List of all processes

@@ -4,6 +4,36 @@
 #include "TTree.h"
 class TreeData {
 public:
+  int ncommon_mem;
+  double common_mem_p_bkg[1]; //
+  double common_mem_p[1]; //
+  double common_mem_blr_4b[1]; //
+  double common_mem_blr_2b[1]; //
+  double common_mem_p_sig[1]; //
+  int ncommon_mem_JERDown;
+  double common_mem_JERDown_p_bkg[1]; //
+  double common_mem_JERDown_p[1]; //
+  double common_mem_JERDown_blr_4b[1]; //
+  double common_mem_JERDown_blr_2b[1]; //
+  double common_mem_JERDown_p_sig[1]; //
+  int ncommon_mem_JERUp;
+  double common_mem_JERUp_p_bkg[1]; //
+  double common_mem_JERUp_p[1]; //
+  double common_mem_JERUp_blr_4b[1]; //
+  double common_mem_JERUp_blr_2b[1]; //
+  double common_mem_JERUp_p_sig[1]; //
+  int ncommon_mem_JESDown;
+  double common_mem_JESDown_p_bkg[1]; //
+  double common_mem_JESDown_p[1]; //
+  double common_mem_JESDown_blr_4b[1]; //
+  double common_mem_JESDown_blr_2b[1]; //
+  double common_mem_JESDown_p_sig[1]; //
+  int ncommon_mem_JESUp;
+  double common_mem_JESUp_p_bkg[1]; //
+  double common_mem_JESUp_p[1]; //
+  double common_mem_JESUp_blr_4b[1]; //
+  double common_mem_JESUp_blr_2b[1]; //
+  double common_mem_JESUp_p_sig[1]; //
   int nfatjets;
   double fatjets_phi[4]; //
   double fatjets_pt[4]; //
@@ -15,18 +45,30 @@ public:
   double fatjets_bbtag[4]; //
   int nfw_aj;
   double fw_aj_fw_h_alljets_nominal[8]; //
+  int nfw_aj_JERDown;
+  double fw_aj_JERDown_fw_h_alljets_JERDown[8]; //
+  int nfw_aj_JERUp;
+  double fw_aj_JERUp_fw_h_alljets_JERUp[8]; //
   int nfw_aj_JESDown;
   double fw_aj_JESDown_fw_h_alljets_JESDown[8]; //
   int nfw_aj_JESUp;
   double fw_aj_JESUp_fw_h_alljets_JESUp[8]; //
   int nfw_bj;
   double fw_bj_fw_h_btagjets_nominal[8]; //
+  int nfw_bj_JERDown;
+  double fw_bj_JERDown_fw_h_btagjets_JERDown[8]; //
+  int nfw_bj_JERUp;
+  double fw_bj_JERUp_fw_h_btagjets_JERUp[8]; //
   int nfw_bj_JESDown;
   double fw_bj_JESDown_fw_h_btagjets_JESDown[8]; //
   int nfw_bj_JESUp;
   double fw_bj_JESUp_fw_h_btagjets_JESUp[8]; //
   int nfw_uj;
   double fw_uj_fw_h_untagjets_nominal[8]; //
+  int nfw_uj_JERDown;
+  double fw_uj_JERDown_fw_h_untagjets_JERDown[8]; //
+  int nfw_uj_JERUp;
+  double fw_uj_JERUp_fw_h_untagjets_JERUp[8]; //
   int nfw_uj_JESDown;
   double fw_uj_JESDown_fw_h_untagjets_JESDown[8]; //
   int nfw_uj_JESUp;
@@ -113,6 +155,46 @@ public:
   double leps_mass[2]; //
   double leps_relIso03[2]; //
   double leps_mvaId[2]; //
+  int nloose_jets;
+  double loose_jets_mcPt[4]; //
+  double loose_jets_mcEta[4]; //
+  double loose_jets_id[4]; //
+  double loose_jets_bTagWeightLFUp[4]; //b-tag CSV weight, variating LF Up
+  double loose_jets_pt[4]; //
+  double loose_jets_mcNumBHadrons[4]; //
+  double loose_jets_corr_JERDown[4]; //
+  double loose_jets_bTagWeightStats2Up[4]; //b-tag CSV weight, variating Stats2 Up
+  double loose_jets_qgl[4]; //
+  double loose_jets_bTagWeightcErr2Up[4]; //b-tag CSV weight, variating cErr2 Up
+  double loose_jets_mcPhi[4]; //
+  double loose_jets_bTagWeightStats1Up[4]; //b-tag CSV weight, variating Stats1 Up
+  double loose_jets_bTagWeightStats1Down[4]; //b-tag CSV weight, variating Stats1 Down
+  double loose_jets_bTagWeightcErr2Down[4]; //b-tag CSV weight, variating cErr2 Down
+  int loose_jets_matchFlag[4]; //
+  double loose_jets_phi[4]; //
+  double loose_jets_bTagWeightStats2Down[4]; //b-tag CSV weight, variating Stats2 Down
+  double loose_jets_bTagWeightLFDown[4]; //b-tag CSV weight, variating LF Down
+  int loose_jets_hadronFlavour[4]; //
+  double loose_jets_corr_JESUp[4]; //
+  double loose_jets_bTagWeightJESDown[4]; //b-tag CSV weight, variating JES Down
+  double loose_jets_bTagWeightHFDown[4]; //b-tag CSV weight, variating HF Down
+  double loose_jets_corr_JERUp[4]; //
+  double loose_jets_corr[4]; //
+  double loose_jets_corr_JER[4]; //
+  double loose_jets_corr_JESDown[4]; //
+  double loose_jets_btagCSV[4]; //
+  double loose_jets_mcM[4]; //
+  double loose_jets_bTagWeightHFUp[4]; //b-tag CSV weight, variating HF Up
+  double loose_jets_bTagWeightcErr1Down[4]; //b-tag CSV weight, variating cErr1 Down
+  int loose_jets_mcMatchId[4]; //
+  double loose_jets_btagBDT[4]; //
+  double loose_jets_bTagWeightcErr1Up[4]; //b-tag CSV weight, variating cErr1 Up
+  double loose_jets_bTagWeight[4]; //b-tag CSV weight, nominal
+  double loose_jets_eta[4]; //
+  double loose_jets_mass[4]; //
+  double loose_jets_bTagWeightJESUp[4]; //b-tag CSV weight, variating JES Up
+  double loose_jets_mcNumCHadrons[4]; //
+  int loose_jets_mcFlavour[4]; //
   int nmem_ttbb;
   double mem_ttbb_p[12]; //
   double mem_ttbb_chi2[12]; //
@@ -121,6 +203,22 @@ public:
   int mem_ttbb_nperm[12]; //
   double mem_ttbb_time[12]; //
   int mem_ttbb_error_code[12]; //
+  int nmem_ttbb_JERDown;
+  double mem_ttbb_JERDown_p[12]; //
+  double mem_ttbb_JERDown_chi2[12]; //
+  double mem_ttbb_JERDown_p_err[12]; //
+  double mem_ttbb_JERDown_efficiency[12]; //
+  int mem_ttbb_JERDown_nperm[12]; //
+  double mem_ttbb_JERDown_time[12]; //
+  int mem_ttbb_JERDown_error_code[12]; //
+  int nmem_ttbb_JERUp;
+  double mem_ttbb_JERUp_p[12]; //
+  double mem_ttbb_JERUp_chi2[12]; //
+  double mem_ttbb_JERUp_p_err[12]; //
+  double mem_ttbb_JERUp_efficiency[12]; //
+  int mem_ttbb_JERUp_nperm[12]; //
+  double mem_ttbb_JERUp_time[12]; //
+  int mem_ttbb_JERUp_error_code[12]; //
   int nmem_ttbb_JESDown;
   double mem_ttbb_JESDown_p[12]; //
   double mem_ttbb_JESDown_chi2[12]; //
@@ -145,6 +243,22 @@ public:
   int mem_tth_nperm[12]; //
   double mem_tth_time[12]; //
   int mem_tth_error_code[12]; //
+  int nmem_tth_JERDown;
+  double mem_tth_JERDown_p[12]; //
+  double mem_tth_JERDown_chi2[12]; //
+  double mem_tth_JERDown_p_err[12]; //
+  double mem_tth_JERDown_efficiency[12]; //
+  int mem_tth_JERDown_nperm[12]; //
+  double mem_tth_JERDown_time[12]; //
+  int mem_tth_JERDown_error_code[12]; //
+  int nmem_tth_JERUp;
+  double mem_tth_JERUp_p[12]; //
+  double mem_tth_JERUp_chi2[12]; //
+  double mem_tth_JERUp_p_err[12]; //
+  double mem_tth_JERUp_efficiency[12]; //
+  int mem_tth_JERUp_nperm[12]; //
+  double mem_tth_JERUp_time[12]; //
+  int mem_tth_JERUp_error_code[12]; //
   int nmem_tth_JESDown;
   double mem_tth_JESDown_p[12]; //
   double mem_tth_JESDown_chi2[12]; //
@@ -276,9 +390,13 @@ public:
   double pv_rho[1]; //
   double pv_ndof[1]; //
   double C;
+  double C_JERDown;
+  double C_JERUp;
   double C_JESDown;
   double C_JESUp;
   double D;
+  double D_JERDown;
+  double D_JERUp;
   double D_JESDown;
   double D_JESUp;
   int HLT_BIT_HLT_CaloMHTNoPU90_PFMET90_PFMHT90_IDLoose_BTagCSV0p7_v;
@@ -439,9 +557,13 @@ public:
   int HLT_ttHhardonicLowLumi;
   int HLT_ttHleptonic;
   double Wmass;
+  double Wmass_JERDown;
+  double Wmass_JERUp;
   double Wmass_JESDown;
   double Wmass_JESUp;
   double aplanarity;
+  double aplanarity_JERDown;
+  double aplanarity_JERUp;
   double aplanarity_JESDown;
   double aplanarity_JESUp;
   double bTagWeight;
@@ -460,103 +582,170 @@ public:
   double bTagWeight_cErr2Down;
   double bTagWeight_cErr2Up;
   double btag_LR_4b_2b;
+  double btag_LR_4b_2b_JERDown;
+  double btag_LR_4b_2b_JERUp;
   double btag_LR_4b_2b_JESDown;
   double btag_LR_4b_2b_JESUp;
   double btag_lr_2b;
+  double btag_lr_2b_JERDown;
+  double btag_lr_2b_JERUp;
   double btag_lr_2b_JESDown;
   double btag_lr_2b_JESUp;
   double btag_lr_4b;
+  double btag_lr_4b_JERDown;
+  double btag_lr_4b_JERUp;
   double btag_lr_4b_JESDown;
   double btag_lr_4b_JESUp;
   int cat;
+  int cat_JERDown;
+  int cat_JERUp;
   int cat_JESDown;
   int cat_JESUp;
   int cat_btag;
+  int cat_btag_JERDown;
+  int cat_btag_JERUp;
   int cat_btag_JESDown;
   int cat_btag_JESUp;
   int cat_gen;
+  int cat_gen_JERDown;
+  int cat_gen_JERUp;
   int cat_gen_JESDown;
   int cat_gen_JESUp;
+  double common_bdt;
+  double common_bdt_JERDown;
+  double common_bdt_JERUp;
+  double common_bdt_JESDown;
+  double common_bdt_JESUp;
   double eta_drpair_btag;
+  double eta_drpair_btag_JERDown;
+  double eta_drpair_btag_JERUp;
   double eta_drpair_btag_JESDown;
   double eta_drpair_btag_JESUp;
   long evt;
   double genWeight;
   double ht;
+  double ht_JERDown;
+  double ht_JERUp;
   double ht_JESDown;
   double ht_JESUp;
   int is_dl;
+  int is_dl_JERDown;
+  int is_dl_JERUp;
   int is_dl_JESDown;
   int is_dl_JESUp;
   int is_fh;
+  int is_fh_JERDown;
+  int is_fh_JERUp;
   int is_fh_JESDown;
   int is_fh_JESUp;
   int is_sl;
+  int is_sl_JERDown;
+  int is_sl_JERUp;
   int is_sl_JESDown;
   int is_sl_JESUp;
   double isotropy;
+  double isotropy_JERDown;
+  double isotropy_JERUp;
   double isotropy_JESDown;
   double isotropy_JESUp;
   double json;
   long lumi;
   double mass_drpair_btag;
+  double mass_drpair_btag_JERDown;
+  double mass_drpair_btag_JERUp;
   double mass_drpair_btag_JESDown;
   double mass_drpair_btag_JESUp;
   double mean_bdisc;
+  double mean_bdisc_JERDown;
+  double mean_bdisc_JERUp;
   double mean_bdisc_JESDown;
   double mean_bdisc_JESUp;
   double mean_bdisc_btag;
+  double mean_bdisc_btag_JERDown;
+  double mean_bdisc_btag_JERUp;
   double mean_bdisc_btag_JESDown;
   double mean_bdisc_btag_JESUp;
   double mean_dr_btag;
+  double mean_dr_btag_JERDown;
+  double mean_dr_btag_JERUp;
   double mean_dr_btag_JESDown;
   double mean_dr_btag_JESUp;
   double min_dr_btag;
+  double min_dr_btag_JERDown;
+  double min_dr_btag_JERUp;
   double min_dr_btag_JESDown;
   double min_dr_btag_JESUp;
   double momentum_eig0;
+  double momentum_eig0_JERDown;
+  double momentum_eig0_JERUp;
   double momentum_eig0_JESDown;
   double momentum_eig0_JESUp;
   double momentum_eig1;
+  double momentum_eig1_JERDown;
+  double momentum_eig1_JERUp;
   double momentum_eig1_JESDown;
   double momentum_eig1_JESUp;
   double momentum_eig2;
+  double momentum_eig2_JERDown;
+  double momentum_eig2_JERUp;
   double momentum_eig2_JESDown;
   double momentum_eig2_JESUp;
   int nBCSVL;
+  int nBCSVL_JERDown;
+  int nBCSVL_JERUp;
   int nBCSVL_JESDown;
   int nBCSVL_JESUp;
   int nBCSVM;
+  int nBCSVM_JERDown;
+  int nBCSVM_JERUp;
   int nBCSVM_JESDown;
   int nBCSVM_JESUp;
   int nBCSVT;
+  int nBCSVT_JERDown;
+  int nBCSVT_JERUp;
   int nBCSVT_JESDown;
   int nBCSVT_JESUp;
   int nGenBHiggs;
   int nGenBTop;
   int nGenQW;
   int nMatchSimB;
+  int nMatchSimB_JERDown;
+  int nMatchSimB_JERUp;
   int nMatchSimB_JESDown;
   int nMatchSimB_JESUp;
   int nMatchSimC;
+  int nMatchSimC_JERDown;
+  int nMatchSimC_JERUp;
   int nMatchSimC_JESDown;
   int nMatchSimC_JESUp;
   int nMatch_hb;
+  int nMatch_hb_JERDown;
+  int nMatch_hb_JERUp;
   int nMatch_hb_JESDown;
   int nMatch_hb_JESUp;
   int nMatch_hb_btag;
+  int nMatch_hb_btag_JERDown;
+  int nMatch_hb_btag_JERUp;
   int nMatch_hb_btag_JESDown;
   int nMatch_hb_btag_JESUp;
   int nMatch_tb;
+  int nMatch_tb_JERDown;
+  int nMatch_tb_JERUp;
   int nMatch_tb_JESDown;
   int nMatch_tb_JESUp;
   int nMatch_tb_btag;
+  int nMatch_tb_btag_JERDown;
+  int nMatch_tb_btag_JERUp;
   int nMatch_tb_btag_JESDown;
   int nMatch_tb_btag_JESUp;
   int nMatch_wq;
+  int nMatch_wq_JERDown;
+  int nMatch_wq_JERUp;
   int nMatch_wq_JESDown;
   int nMatch_wq_JESUp;
   int nMatch_wq_btag;
+  int nMatch_wq_btag_JERDown;
+  int nMatch_wq_btag_JERUp;
   int nMatch_wq_btag_JESDown;
   int nMatch_wq_btag_JESUp;
   double nPU0;
@@ -569,19 +758,29 @@ public:
   double n_excluded_ljets;
   double n_ljets;
   int numJets;
+  int numJets_JERDown;
+  int numJets_JERUp;
   int numJets_JESDown;
   int numJets_JESUp;
   int passPV;
   int passes_btag;
+  int passes_btag_JERDown;
+  int passes_btag_JERUp;
   int passes_btag_JESDown;
   int passes_btag_JESUp;
   int passes_jet;
+  int passes_jet_JERDown;
+  int passes_jet_JERUp;
   int passes_jet_JESDown;
   int passes_jet_JESUp;
   int passes_mem;
+  int passes_mem_JERDown;
+  int passes_mem_JERUp;
   int passes_mem_JESDown;
   int passes_mem_JESUp;
   double pt_drpair_btag;
+  double pt_drpair_btag_JERDown;
+  double pt_drpair_btag_JERUp;
   double pt_drpair_btag_JESDown;
   double pt_drpair_btag_JESUp;
   double puWeight;
@@ -589,55 +788,115 @@ public:
   double qg_LR_flavour_4q_0q_1q;
   double qg_LR_flavour_4q_0q_1q_2q;
   double qg_LR_flavour_4q_0q_1q_2q_3q;
+  double qg_LR_flavour_4q_0q_1q_2q_3q_JERDown;
+  double qg_LR_flavour_4q_0q_1q_2q_3q_JERUp;
   double qg_LR_flavour_4q_0q_1q_2q_3q_JESDown;
   double qg_LR_flavour_4q_0q_1q_2q_3q_JESUp;
+  double qg_LR_flavour_4q_0q_1q_2q_JERDown;
+  double qg_LR_flavour_4q_0q_1q_2q_JERUp;
   double qg_LR_flavour_4q_0q_1q_2q_JESDown;
   double qg_LR_flavour_4q_0q_1q_2q_JESUp;
+  double qg_LR_flavour_4q_0q_1q_JERDown;
+  double qg_LR_flavour_4q_0q_1q_JERUp;
   double qg_LR_flavour_4q_0q_1q_JESDown;
   double qg_LR_flavour_4q_0q_1q_JESUp;
+  double qg_LR_flavour_4q_0q_JERDown;
+  double qg_LR_flavour_4q_0q_JERUp;
   double qg_LR_flavour_4q_0q_JESDown;
   double qg_LR_flavour_4q_0q_JESUp;
   double qg_LR_flavour_4q_1q;
   double qg_LR_flavour_4q_1q_2q;
   double qg_LR_flavour_4q_1q_2q_3q;
+  double qg_LR_flavour_4q_1q_2q_3q_JERDown;
+  double qg_LR_flavour_4q_1q_2q_3q_JERUp;
   double qg_LR_flavour_4q_1q_2q_3q_JESDown;
   double qg_LR_flavour_4q_1q_2q_3q_JESUp;
+  double qg_LR_flavour_4q_1q_2q_JERDown;
+  double qg_LR_flavour_4q_1q_2q_JERUp;
   double qg_LR_flavour_4q_1q_2q_JESDown;
   double qg_LR_flavour_4q_1q_2q_JESUp;
+  double qg_LR_flavour_4q_1q_JERDown;
+  double qg_LR_flavour_4q_1q_JERUp;
   double qg_LR_flavour_4q_1q_JESDown;
   double qg_LR_flavour_4q_1q_JESUp;
   double qg_LR_flavour_4q_2q;
   double qg_LR_flavour_4q_2q_3q;
+  double qg_LR_flavour_4q_2q_3q_JERDown;
+  double qg_LR_flavour_4q_2q_3q_JERUp;
   double qg_LR_flavour_4q_2q_3q_JESDown;
   double qg_LR_flavour_4q_2q_3q_JESUp;
+  double qg_LR_flavour_4q_2q_JERDown;
+  double qg_LR_flavour_4q_2q_JERUp;
   double qg_LR_flavour_4q_2q_JESDown;
   double qg_LR_flavour_4q_2q_JESUp;
   double qg_LR_flavour_4q_3q;
+  double qg_LR_flavour_4q_3q_JERDown;
+  double qg_LR_flavour_4q_3q_JERUp;
   double qg_LR_flavour_4q_3q_JESDown;
   double qg_LR_flavour_4q_3q_JESUp;
   double rho;
   long run;
   double sphericity;
+  double sphericity_JERDown;
+  double sphericity_JERUp;
   double sphericity_JESDown;
   double sphericity_JESUp;
   double std_bdisc;
+  double std_bdisc_JERDown;
+  double std_bdisc_JERUp;
   double std_bdisc_JESDown;
   double std_bdisc_JESUp;
   double std_bdisc_btag;
+  double std_bdisc_btag_JERDown;
+  double std_bdisc_btag_JERUp;
   double std_bdisc_btag_JESDown;
   double std_bdisc_btag_JESUp;
   double std_dr_btag;
+  double std_dr_btag_JERDown;
+  double std_dr_btag_JERUp;
   double std_dr_btag_JESDown;
   double std_dr_btag_JESUp;
   int triggerBitmask;
   int triggerDecision;
   int ttCls;
   double tth_mva;
+  double tth_mva_JERDown;
+  double tth_mva_JERUp;
   double tth_mva_JESDown;
   double tth_mva_JESUp;
   double weight_xs;
   double xsec;
   void loadTree(TTree* tree) {
+    tree->SetBranchAddress("ncommon_mem", &(this->ncommon_mem));
+    tree->SetBranchAddress("common_mem_p_bkg", this->common_mem_p_bkg);
+    tree->SetBranchAddress("common_mem_p", this->common_mem_p);
+    tree->SetBranchAddress("common_mem_blr_4b", this->common_mem_blr_4b);
+    tree->SetBranchAddress("common_mem_blr_2b", this->common_mem_blr_2b);
+    tree->SetBranchAddress("common_mem_p_sig", this->common_mem_p_sig);
+    tree->SetBranchAddress("ncommon_mem_JERDown", &(this->ncommon_mem_JERDown));
+    tree->SetBranchAddress("common_mem_JERDown_p_bkg", this->common_mem_JERDown_p_bkg);
+    tree->SetBranchAddress("common_mem_JERDown_p", this->common_mem_JERDown_p);
+    tree->SetBranchAddress("common_mem_JERDown_blr_4b", this->common_mem_JERDown_blr_4b);
+    tree->SetBranchAddress("common_mem_JERDown_blr_2b", this->common_mem_JERDown_blr_2b);
+    tree->SetBranchAddress("common_mem_JERDown_p_sig", this->common_mem_JERDown_p_sig);
+    tree->SetBranchAddress("ncommon_mem_JERUp", &(this->ncommon_mem_JERUp));
+    tree->SetBranchAddress("common_mem_JERUp_p_bkg", this->common_mem_JERUp_p_bkg);
+    tree->SetBranchAddress("common_mem_JERUp_p", this->common_mem_JERUp_p);
+    tree->SetBranchAddress("common_mem_JERUp_blr_4b", this->common_mem_JERUp_blr_4b);
+    tree->SetBranchAddress("common_mem_JERUp_blr_2b", this->common_mem_JERUp_blr_2b);
+    tree->SetBranchAddress("common_mem_JERUp_p_sig", this->common_mem_JERUp_p_sig);
+    tree->SetBranchAddress("ncommon_mem_JESDown", &(this->ncommon_mem_JESDown));
+    tree->SetBranchAddress("common_mem_JESDown_p_bkg", this->common_mem_JESDown_p_bkg);
+    tree->SetBranchAddress("common_mem_JESDown_p", this->common_mem_JESDown_p);
+    tree->SetBranchAddress("common_mem_JESDown_blr_4b", this->common_mem_JESDown_blr_4b);
+    tree->SetBranchAddress("common_mem_JESDown_blr_2b", this->common_mem_JESDown_blr_2b);
+    tree->SetBranchAddress("common_mem_JESDown_p_sig", this->common_mem_JESDown_p_sig);
+    tree->SetBranchAddress("ncommon_mem_JESUp", &(this->ncommon_mem_JESUp));
+    tree->SetBranchAddress("common_mem_JESUp_p_bkg", this->common_mem_JESUp_p_bkg);
+    tree->SetBranchAddress("common_mem_JESUp_p", this->common_mem_JESUp_p);
+    tree->SetBranchAddress("common_mem_JESUp_blr_4b", this->common_mem_JESUp_blr_4b);
+    tree->SetBranchAddress("common_mem_JESUp_blr_2b", this->common_mem_JESUp_blr_2b);
+    tree->SetBranchAddress("common_mem_JESUp_p_sig", this->common_mem_JESUp_p_sig);
     tree->SetBranchAddress("nfatjets", &(this->nfatjets));
     tree->SetBranchAddress("fatjets_phi", this->fatjets_phi);
     tree->SetBranchAddress("fatjets_pt", this->fatjets_pt);
@@ -649,18 +908,30 @@ public:
     tree->SetBranchAddress("fatjets_bbtag", this->fatjets_bbtag);
     tree->SetBranchAddress("nfw_aj", &(this->nfw_aj));
     tree->SetBranchAddress("fw_aj_fw_h_alljets_nominal", this->fw_aj_fw_h_alljets_nominal);
+    tree->SetBranchAddress("nfw_aj_JERDown", &(this->nfw_aj_JERDown));
+    tree->SetBranchAddress("fw_aj_JERDown_fw_h_alljets_JERDown", this->fw_aj_JERDown_fw_h_alljets_JERDown);
+    tree->SetBranchAddress("nfw_aj_JERUp", &(this->nfw_aj_JERUp));
+    tree->SetBranchAddress("fw_aj_JERUp_fw_h_alljets_JERUp", this->fw_aj_JERUp_fw_h_alljets_JERUp);
     tree->SetBranchAddress("nfw_aj_JESDown", &(this->nfw_aj_JESDown));
     tree->SetBranchAddress("fw_aj_JESDown_fw_h_alljets_JESDown", this->fw_aj_JESDown_fw_h_alljets_JESDown);
     tree->SetBranchAddress("nfw_aj_JESUp", &(this->nfw_aj_JESUp));
     tree->SetBranchAddress("fw_aj_JESUp_fw_h_alljets_JESUp", this->fw_aj_JESUp_fw_h_alljets_JESUp);
     tree->SetBranchAddress("nfw_bj", &(this->nfw_bj));
     tree->SetBranchAddress("fw_bj_fw_h_btagjets_nominal", this->fw_bj_fw_h_btagjets_nominal);
+    tree->SetBranchAddress("nfw_bj_JERDown", &(this->nfw_bj_JERDown));
+    tree->SetBranchAddress("fw_bj_JERDown_fw_h_btagjets_JERDown", this->fw_bj_JERDown_fw_h_btagjets_JERDown);
+    tree->SetBranchAddress("nfw_bj_JERUp", &(this->nfw_bj_JERUp));
+    tree->SetBranchAddress("fw_bj_JERUp_fw_h_btagjets_JERUp", this->fw_bj_JERUp_fw_h_btagjets_JERUp);
     tree->SetBranchAddress("nfw_bj_JESDown", &(this->nfw_bj_JESDown));
     tree->SetBranchAddress("fw_bj_JESDown_fw_h_btagjets_JESDown", this->fw_bj_JESDown_fw_h_btagjets_JESDown);
     tree->SetBranchAddress("nfw_bj_JESUp", &(this->nfw_bj_JESUp));
     tree->SetBranchAddress("fw_bj_JESUp_fw_h_btagjets_JESUp", this->fw_bj_JESUp_fw_h_btagjets_JESUp);
     tree->SetBranchAddress("nfw_uj", &(this->nfw_uj));
     tree->SetBranchAddress("fw_uj_fw_h_untagjets_nominal", this->fw_uj_fw_h_untagjets_nominal);
+    tree->SetBranchAddress("nfw_uj_JERDown", &(this->nfw_uj_JERDown));
+    tree->SetBranchAddress("fw_uj_JERDown_fw_h_untagjets_JERDown", this->fw_uj_JERDown_fw_h_untagjets_JERDown);
+    tree->SetBranchAddress("nfw_uj_JERUp", &(this->nfw_uj_JERUp));
+    tree->SetBranchAddress("fw_uj_JERUp_fw_h_untagjets_JERUp", this->fw_uj_JERUp_fw_h_untagjets_JERUp);
     tree->SetBranchAddress("nfw_uj_JESDown", &(this->nfw_uj_JESDown));
     tree->SetBranchAddress("fw_uj_JESDown_fw_h_untagjets_JESDown", this->fw_uj_JESDown_fw_h_untagjets_JESDown);
     tree->SetBranchAddress("nfw_uj_JESUp", &(this->nfw_uj_JESUp));
@@ -747,6 +1018,46 @@ public:
     tree->SetBranchAddress("leps_mass", this->leps_mass);
     tree->SetBranchAddress("leps_relIso03", this->leps_relIso03);
     tree->SetBranchAddress("leps_mvaId", this->leps_mvaId);
+    tree->SetBranchAddress("nloose_jets", &(this->nloose_jets));
+    tree->SetBranchAddress("loose_jets_mcPt", this->loose_jets_mcPt);
+    tree->SetBranchAddress("loose_jets_mcEta", this->loose_jets_mcEta);
+    tree->SetBranchAddress("loose_jets_id", this->loose_jets_id);
+    tree->SetBranchAddress("loose_jets_bTagWeightLFUp", this->loose_jets_bTagWeightLFUp);
+    tree->SetBranchAddress("loose_jets_pt", this->loose_jets_pt);
+    tree->SetBranchAddress("loose_jets_mcNumBHadrons", this->loose_jets_mcNumBHadrons);
+    tree->SetBranchAddress("loose_jets_corr_JERDown", this->loose_jets_corr_JERDown);
+    tree->SetBranchAddress("loose_jets_bTagWeightStats2Up", this->loose_jets_bTagWeightStats2Up);
+    tree->SetBranchAddress("loose_jets_qgl", this->loose_jets_qgl);
+    tree->SetBranchAddress("loose_jets_bTagWeightcErr2Up", this->loose_jets_bTagWeightcErr2Up);
+    tree->SetBranchAddress("loose_jets_mcPhi", this->loose_jets_mcPhi);
+    tree->SetBranchAddress("loose_jets_bTagWeightStats1Up", this->loose_jets_bTagWeightStats1Up);
+    tree->SetBranchAddress("loose_jets_bTagWeightStats1Down", this->loose_jets_bTagWeightStats1Down);
+    tree->SetBranchAddress("loose_jets_bTagWeightcErr2Down", this->loose_jets_bTagWeightcErr2Down);
+    tree->SetBranchAddress("loose_jets_matchFlag", this->loose_jets_matchFlag);
+    tree->SetBranchAddress("loose_jets_phi", this->loose_jets_phi);
+    tree->SetBranchAddress("loose_jets_bTagWeightStats2Down", this->loose_jets_bTagWeightStats2Down);
+    tree->SetBranchAddress("loose_jets_bTagWeightLFDown", this->loose_jets_bTagWeightLFDown);
+    tree->SetBranchAddress("loose_jets_hadronFlavour", this->loose_jets_hadronFlavour);
+    tree->SetBranchAddress("loose_jets_corr_JESUp", this->loose_jets_corr_JESUp);
+    tree->SetBranchAddress("loose_jets_bTagWeightJESDown", this->loose_jets_bTagWeightJESDown);
+    tree->SetBranchAddress("loose_jets_bTagWeightHFDown", this->loose_jets_bTagWeightHFDown);
+    tree->SetBranchAddress("loose_jets_corr_JERUp", this->loose_jets_corr_JERUp);
+    tree->SetBranchAddress("loose_jets_corr", this->loose_jets_corr);
+    tree->SetBranchAddress("loose_jets_corr_JER", this->loose_jets_corr_JER);
+    tree->SetBranchAddress("loose_jets_corr_JESDown", this->loose_jets_corr_JESDown);
+    tree->SetBranchAddress("loose_jets_btagCSV", this->loose_jets_btagCSV);
+    tree->SetBranchAddress("loose_jets_mcM", this->loose_jets_mcM);
+    tree->SetBranchAddress("loose_jets_bTagWeightHFUp", this->loose_jets_bTagWeightHFUp);
+    tree->SetBranchAddress("loose_jets_bTagWeightcErr1Down", this->loose_jets_bTagWeightcErr1Down);
+    tree->SetBranchAddress("loose_jets_mcMatchId", this->loose_jets_mcMatchId);
+    tree->SetBranchAddress("loose_jets_btagBDT", this->loose_jets_btagBDT);
+    tree->SetBranchAddress("loose_jets_bTagWeightcErr1Up", this->loose_jets_bTagWeightcErr1Up);
+    tree->SetBranchAddress("loose_jets_bTagWeight", this->loose_jets_bTagWeight);
+    tree->SetBranchAddress("loose_jets_eta", this->loose_jets_eta);
+    tree->SetBranchAddress("loose_jets_mass", this->loose_jets_mass);
+    tree->SetBranchAddress("loose_jets_bTagWeightJESUp", this->loose_jets_bTagWeightJESUp);
+    tree->SetBranchAddress("loose_jets_mcNumCHadrons", this->loose_jets_mcNumCHadrons);
+    tree->SetBranchAddress("loose_jets_mcFlavour", this->loose_jets_mcFlavour);
     tree->SetBranchAddress("nmem_ttbb", &(this->nmem_ttbb));
     tree->SetBranchAddress("mem_ttbb_p", this->mem_ttbb_p);
     tree->SetBranchAddress("mem_ttbb_chi2", this->mem_ttbb_chi2);
@@ -755,6 +1066,22 @@ public:
     tree->SetBranchAddress("mem_ttbb_nperm", this->mem_ttbb_nperm);
     tree->SetBranchAddress("mem_ttbb_time", this->mem_ttbb_time);
     tree->SetBranchAddress("mem_ttbb_error_code", this->mem_ttbb_error_code);
+    tree->SetBranchAddress("nmem_ttbb_JERDown", &(this->nmem_ttbb_JERDown));
+    tree->SetBranchAddress("mem_ttbb_JERDown_p", this->mem_ttbb_JERDown_p);
+    tree->SetBranchAddress("mem_ttbb_JERDown_chi2", this->mem_ttbb_JERDown_chi2);
+    tree->SetBranchAddress("mem_ttbb_JERDown_p_err", this->mem_ttbb_JERDown_p_err);
+    tree->SetBranchAddress("mem_ttbb_JERDown_efficiency", this->mem_ttbb_JERDown_efficiency);
+    tree->SetBranchAddress("mem_ttbb_JERDown_nperm", this->mem_ttbb_JERDown_nperm);
+    tree->SetBranchAddress("mem_ttbb_JERDown_time", this->mem_ttbb_JERDown_time);
+    tree->SetBranchAddress("mem_ttbb_JERDown_error_code", this->mem_ttbb_JERDown_error_code);
+    tree->SetBranchAddress("nmem_ttbb_JERUp", &(this->nmem_ttbb_JERUp));
+    tree->SetBranchAddress("mem_ttbb_JERUp_p", this->mem_ttbb_JERUp_p);
+    tree->SetBranchAddress("mem_ttbb_JERUp_chi2", this->mem_ttbb_JERUp_chi2);
+    tree->SetBranchAddress("mem_ttbb_JERUp_p_err", this->mem_ttbb_JERUp_p_err);
+    tree->SetBranchAddress("mem_ttbb_JERUp_efficiency", this->mem_ttbb_JERUp_efficiency);
+    tree->SetBranchAddress("mem_ttbb_JERUp_nperm", this->mem_ttbb_JERUp_nperm);
+    tree->SetBranchAddress("mem_ttbb_JERUp_time", this->mem_ttbb_JERUp_time);
+    tree->SetBranchAddress("mem_ttbb_JERUp_error_code", this->mem_ttbb_JERUp_error_code);
     tree->SetBranchAddress("nmem_ttbb_JESDown", &(this->nmem_ttbb_JESDown));
     tree->SetBranchAddress("mem_ttbb_JESDown_p", this->mem_ttbb_JESDown_p);
     tree->SetBranchAddress("mem_ttbb_JESDown_chi2", this->mem_ttbb_JESDown_chi2);
@@ -779,6 +1106,22 @@ public:
     tree->SetBranchAddress("mem_tth_nperm", this->mem_tth_nperm);
     tree->SetBranchAddress("mem_tth_time", this->mem_tth_time);
     tree->SetBranchAddress("mem_tth_error_code", this->mem_tth_error_code);
+    tree->SetBranchAddress("nmem_tth_JERDown", &(this->nmem_tth_JERDown));
+    tree->SetBranchAddress("mem_tth_JERDown_p", this->mem_tth_JERDown_p);
+    tree->SetBranchAddress("mem_tth_JERDown_chi2", this->mem_tth_JERDown_chi2);
+    tree->SetBranchAddress("mem_tth_JERDown_p_err", this->mem_tth_JERDown_p_err);
+    tree->SetBranchAddress("mem_tth_JERDown_efficiency", this->mem_tth_JERDown_efficiency);
+    tree->SetBranchAddress("mem_tth_JERDown_nperm", this->mem_tth_JERDown_nperm);
+    tree->SetBranchAddress("mem_tth_JERDown_time", this->mem_tth_JERDown_time);
+    tree->SetBranchAddress("mem_tth_JERDown_error_code", this->mem_tth_JERDown_error_code);
+    tree->SetBranchAddress("nmem_tth_JERUp", &(this->nmem_tth_JERUp));
+    tree->SetBranchAddress("mem_tth_JERUp_p", this->mem_tth_JERUp_p);
+    tree->SetBranchAddress("mem_tth_JERUp_chi2", this->mem_tth_JERUp_chi2);
+    tree->SetBranchAddress("mem_tth_JERUp_p_err", this->mem_tth_JERUp_p_err);
+    tree->SetBranchAddress("mem_tth_JERUp_efficiency", this->mem_tth_JERUp_efficiency);
+    tree->SetBranchAddress("mem_tth_JERUp_nperm", this->mem_tth_JERUp_nperm);
+    tree->SetBranchAddress("mem_tth_JERUp_time", this->mem_tth_JERUp_time);
+    tree->SetBranchAddress("mem_tth_JERUp_error_code", this->mem_tth_JERUp_error_code);
     tree->SetBranchAddress("nmem_tth_JESDown", &(this->nmem_tth_JESDown));
     tree->SetBranchAddress("mem_tth_JESDown_p", this->mem_tth_JESDown_p);
     tree->SetBranchAddress("mem_tth_JESDown_chi2", this->mem_tth_JESDown_chi2);
@@ -910,9 +1253,13 @@ public:
     tree->SetBranchAddress("pv_rho", this->pv_rho);
     tree->SetBranchAddress("pv_ndof", this->pv_ndof);
     tree->SetBranchAddress("C", &(this->C));
+    tree->SetBranchAddress("C_JERDown", &(this->C_JERDown));
+    tree->SetBranchAddress("C_JERUp", &(this->C_JERUp));
     tree->SetBranchAddress("C_JESDown", &(this->C_JESDown));
     tree->SetBranchAddress("C_JESUp", &(this->C_JESUp));
     tree->SetBranchAddress("D", &(this->D));
+    tree->SetBranchAddress("D_JERDown", &(this->D_JERDown));
+    tree->SetBranchAddress("D_JERUp", &(this->D_JERUp));
     tree->SetBranchAddress("D_JESDown", &(this->D_JESDown));
     tree->SetBranchAddress("D_JESUp", &(this->D_JESUp));
     tree->SetBranchAddress("HLT_BIT_HLT_CaloMHTNoPU90_PFMET90_PFMHT90_IDLoose_BTagCSV0p7_v", &(this->HLT_BIT_HLT_CaloMHTNoPU90_PFMET90_PFMHT90_IDLoose_BTagCSV0p7_v));
@@ -1073,9 +1420,13 @@ public:
     tree->SetBranchAddress("HLT_ttHhardonicLowLumi", &(this->HLT_ttHhardonicLowLumi));
     tree->SetBranchAddress("HLT_ttHleptonic", &(this->HLT_ttHleptonic));
     tree->SetBranchAddress("Wmass", &(this->Wmass));
+    tree->SetBranchAddress("Wmass_JERDown", &(this->Wmass_JERDown));
+    tree->SetBranchAddress("Wmass_JERUp", &(this->Wmass_JERUp));
     tree->SetBranchAddress("Wmass_JESDown", &(this->Wmass_JESDown));
     tree->SetBranchAddress("Wmass_JESUp", &(this->Wmass_JESUp));
     tree->SetBranchAddress("aplanarity", &(this->aplanarity));
+    tree->SetBranchAddress("aplanarity_JERDown", &(this->aplanarity_JERDown));
+    tree->SetBranchAddress("aplanarity_JERUp", &(this->aplanarity_JERUp));
     tree->SetBranchAddress("aplanarity_JESDown", &(this->aplanarity_JESDown));
     tree->SetBranchAddress("aplanarity_JESUp", &(this->aplanarity_JESUp));
     tree->SetBranchAddress("bTagWeight", &(this->bTagWeight));
@@ -1094,103 +1445,170 @@ public:
     tree->SetBranchAddress("bTagWeight_cErr2Down", &(this->bTagWeight_cErr2Down));
     tree->SetBranchAddress("bTagWeight_cErr2Up", &(this->bTagWeight_cErr2Up));
     tree->SetBranchAddress("btag_LR_4b_2b", &(this->btag_LR_4b_2b));
+    tree->SetBranchAddress("btag_LR_4b_2b_JERDown", &(this->btag_LR_4b_2b_JERDown));
+    tree->SetBranchAddress("btag_LR_4b_2b_JERUp", &(this->btag_LR_4b_2b_JERUp));
     tree->SetBranchAddress("btag_LR_4b_2b_JESDown", &(this->btag_LR_4b_2b_JESDown));
     tree->SetBranchAddress("btag_LR_4b_2b_JESUp", &(this->btag_LR_4b_2b_JESUp));
     tree->SetBranchAddress("btag_lr_2b", &(this->btag_lr_2b));
+    tree->SetBranchAddress("btag_lr_2b_JERDown", &(this->btag_lr_2b_JERDown));
+    tree->SetBranchAddress("btag_lr_2b_JERUp", &(this->btag_lr_2b_JERUp));
     tree->SetBranchAddress("btag_lr_2b_JESDown", &(this->btag_lr_2b_JESDown));
     tree->SetBranchAddress("btag_lr_2b_JESUp", &(this->btag_lr_2b_JESUp));
     tree->SetBranchAddress("btag_lr_4b", &(this->btag_lr_4b));
+    tree->SetBranchAddress("btag_lr_4b_JERDown", &(this->btag_lr_4b_JERDown));
+    tree->SetBranchAddress("btag_lr_4b_JERUp", &(this->btag_lr_4b_JERUp));
     tree->SetBranchAddress("btag_lr_4b_JESDown", &(this->btag_lr_4b_JESDown));
     tree->SetBranchAddress("btag_lr_4b_JESUp", &(this->btag_lr_4b_JESUp));
     tree->SetBranchAddress("cat", &(this->cat));
+    tree->SetBranchAddress("cat_JERDown", &(this->cat_JERDown));
+    tree->SetBranchAddress("cat_JERUp", &(this->cat_JERUp));
     tree->SetBranchAddress("cat_JESDown", &(this->cat_JESDown));
     tree->SetBranchAddress("cat_JESUp", &(this->cat_JESUp));
     tree->SetBranchAddress("cat_btag", &(this->cat_btag));
+    tree->SetBranchAddress("cat_btag_JERDown", &(this->cat_btag_JERDown));
+    tree->SetBranchAddress("cat_btag_JERUp", &(this->cat_btag_JERUp));
     tree->SetBranchAddress("cat_btag_JESDown", &(this->cat_btag_JESDown));
     tree->SetBranchAddress("cat_btag_JESUp", &(this->cat_btag_JESUp));
     tree->SetBranchAddress("cat_gen", &(this->cat_gen));
+    tree->SetBranchAddress("cat_gen_JERDown", &(this->cat_gen_JERDown));
+    tree->SetBranchAddress("cat_gen_JERUp", &(this->cat_gen_JERUp));
     tree->SetBranchAddress("cat_gen_JESDown", &(this->cat_gen_JESDown));
     tree->SetBranchAddress("cat_gen_JESUp", &(this->cat_gen_JESUp));
+    tree->SetBranchAddress("common_bdt", &(this->common_bdt));
+    tree->SetBranchAddress("common_bdt_JERDown", &(this->common_bdt_JERDown));
+    tree->SetBranchAddress("common_bdt_JERUp", &(this->common_bdt_JERUp));
+    tree->SetBranchAddress("common_bdt_JESDown", &(this->common_bdt_JESDown));
+    tree->SetBranchAddress("common_bdt_JESUp", &(this->common_bdt_JESUp));
     tree->SetBranchAddress("eta_drpair_btag", &(this->eta_drpair_btag));
+    tree->SetBranchAddress("eta_drpair_btag_JERDown", &(this->eta_drpair_btag_JERDown));
+    tree->SetBranchAddress("eta_drpair_btag_JERUp", &(this->eta_drpair_btag_JERUp));
     tree->SetBranchAddress("eta_drpair_btag_JESDown", &(this->eta_drpair_btag_JESDown));
     tree->SetBranchAddress("eta_drpair_btag_JESUp", &(this->eta_drpair_btag_JESUp));
     tree->SetBranchAddress("evt", &(this->evt));
     tree->SetBranchAddress("genWeight", &(this->genWeight));
     tree->SetBranchAddress("ht", &(this->ht));
+    tree->SetBranchAddress("ht_JERDown", &(this->ht_JERDown));
+    tree->SetBranchAddress("ht_JERUp", &(this->ht_JERUp));
     tree->SetBranchAddress("ht_JESDown", &(this->ht_JESDown));
     tree->SetBranchAddress("ht_JESUp", &(this->ht_JESUp));
     tree->SetBranchAddress("is_dl", &(this->is_dl));
+    tree->SetBranchAddress("is_dl_JERDown", &(this->is_dl_JERDown));
+    tree->SetBranchAddress("is_dl_JERUp", &(this->is_dl_JERUp));
     tree->SetBranchAddress("is_dl_JESDown", &(this->is_dl_JESDown));
     tree->SetBranchAddress("is_dl_JESUp", &(this->is_dl_JESUp));
     tree->SetBranchAddress("is_fh", &(this->is_fh));
+    tree->SetBranchAddress("is_fh_JERDown", &(this->is_fh_JERDown));
+    tree->SetBranchAddress("is_fh_JERUp", &(this->is_fh_JERUp));
     tree->SetBranchAddress("is_fh_JESDown", &(this->is_fh_JESDown));
     tree->SetBranchAddress("is_fh_JESUp", &(this->is_fh_JESUp));
     tree->SetBranchAddress("is_sl", &(this->is_sl));
+    tree->SetBranchAddress("is_sl_JERDown", &(this->is_sl_JERDown));
+    tree->SetBranchAddress("is_sl_JERUp", &(this->is_sl_JERUp));
     tree->SetBranchAddress("is_sl_JESDown", &(this->is_sl_JESDown));
     tree->SetBranchAddress("is_sl_JESUp", &(this->is_sl_JESUp));
     tree->SetBranchAddress("isotropy", &(this->isotropy));
+    tree->SetBranchAddress("isotropy_JERDown", &(this->isotropy_JERDown));
+    tree->SetBranchAddress("isotropy_JERUp", &(this->isotropy_JERUp));
     tree->SetBranchAddress("isotropy_JESDown", &(this->isotropy_JESDown));
     tree->SetBranchAddress("isotropy_JESUp", &(this->isotropy_JESUp));
     tree->SetBranchAddress("json", &(this->json));
     tree->SetBranchAddress("lumi", &(this->lumi));
     tree->SetBranchAddress("mass_drpair_btag", &(this->mass_drpair_btag));
+    tree->SetBranchAddress("mass_drpair_btag_JERDown", &(this->mass_drpair_btag_JERDown));
+    tree->SetBranchAddress("mass_drpair_btag_JERUp", &(this->mass_drpair_btag_JERUp));
     tree->SetBranchAddress("mass_drpair_btag_JESDown", &(this->mass_drpair_btag_JESDown));
     tree->SetBranchAddress("mass_drpair_btag_JESUp", &(this->mass_drpair_btag_JESUp));
     tree->SetBranchAddress("mean_bdisc", &(this->mean_bdisc));
+    tree->SetBranchAddress("mean_bdisc_JERDown", &(this->mean_bdisc_JERDown));
+    tree->SetBranchAddress("mean_bdisc_JERUp", &(this->mean_bdisc_JERUp));
     tree->SetBranchAddress("mean_bdisc_JESDown", &(this->mean_bdisc_JESDown));
     tree->SetBranchAddress("mean_bdisc_JESUp", &(this->mean_bdisc_JESUp));
     tree->SetBranchAddress("mean_bdisc_btag", &(this->mean_bdisc_btag));
+    tree->SetBranchAddress("mean_bdisc_btag_JERDown", &(this->mean_bdisc_btag_JERDown));
+    tree->SetBranchAddress("mean_bdisc_btag_JERUp", &(this->mean_bdisc_btag_JERUp));
     tree->SetBranchAddress("mean_bdisc_btag_JESDown", &(this->mean_bdisc_btag_JESDown));
     tree->SetBranchAddress("mean_bdisc_btag_JESUp", &(this->mean_bdisc_btag_JESUp));
     tree->SetBranchAddress("mean_dr_btag", &(this->mean_dr_btag));
+    tree->SetBranchAddress("mean_dr_btag_JERDown", &(this->mean_dr_btag_JERDown));
+    tree->SetBranchAddress("mean_dr_btag_JERUp", &(this->mean_dr_btag_JERUp));
     tree->SetBranchAddress("mean_dr_btag_JESDown", &(this->mean_dr_btag_JESDown));
     tree->SetBranchAddress("mean_dr_btag_JESUp", &(this->mean_dr_btag_JESUp));
     tree->SetBranchAddress("min_dr_btag", &(this->min_dr_btag));
+    tree->SetBranchAddress("min_dr_btag_JERDown", &(this->min_dr_btag_JERDown));
+    tree->SetBranchAddress("min_dr_btag_JERUp", &(this->min_dr_btag_JERUp));
     tree->SetBranchAddress("min_dr_btag_JESDown", &(this->min_dr_btag_JESDown));
     tree->SetBranchAddress("min_dr_btag_JESUp", &(this->min_dr_btag_JESUp));
     tree->SetBranchAddress("momentum_eig0", &(this->momentum_eig0));
+    tree->SetBranchAddress("momentum_eig0_JERDown", &(this->momentum_eig0_JERDown));
+    tree->SetBranchAddress("momentum_eig0_JERUp", &(this->momentum_eig0_JERUp));
     tree->SetBranchAddress("momentum_eig0_JESDown", &(this->momentum_eig0_JESDown));
     tree->SetBranchAddress("momentum_eig0_JESUp", &(this->momentum_eig0_JESUp));
     tree->SetBranchAddress("momentum_eig1", &(this->momentum_eig1));
+    tree->SetBranchAddress("momentum_eig1_JERDown", &(this->momentum_eig1_JERDown));
+    tree->SetBranchAddress("momentum_eig1_JERUp", &(this->momentum_eig1_JERUp));
     tree->SetBranchAddress("momentum_eig1_JESDown", &(this->momentum_eig1_JESDown));
     tree->SetBranchAddress("momentum_eig1_JESUp", &(this->momentum_eig1_JESUp));
     tree->SetBranchAddress("momentum_eig2", &(this->momentum_eig2));
+    tree->SetBranchAddress("momentum_eig2_JERDown", &(this->momentum_eig2_JERDown));
+    tree->SetBranchAddress("momentum_eig2_JERUp", &(this->momentum_eig2_JERUp));
     tree->SetBranchAddress("momentum_eig2_JESDown", &(this->momentum_eig2_JESDown));
     tree->SetBranchAddress("momentum_eig2_JESUp", &(this->momentum_eig2_JESUp));
     tree->SetBranchAddress("nBCSVL", &(this->nBCSVL));
+    tree->SetBranchAddress("nBCSVL_JERDown", &(this->nBCSVL_JERDown));
+    tree->SetBranchAddress("nBCSVL_JERUp", &(this->nBCSVL_JERUp));
     tree->SetBranchAddress("nBCSVL_JESDown", &(this->nBCSVL_JESDown));
     tree->SetBranchAddress("nBCSVL_JESUp", &(this->nBCSVL_JESUp));
     tree->SetBranchAddress("nBCSVM", &(this->nBCSVM));
+    tree->SetBranchAddress("nBCSVM_JERDown", &(this->nBCSVM_JERDown));
+    tree->SetBranchAddress("nBCSVM_JERUp", &(this->nBCSVM_JERUp));
     tree->SetBranchAddress("nBCSVM_JESDown", &(this->nBCSVM_JESDown));
     tree->SetBranchAddress("nBCSVM_JESUp", &(this->nBCSVM_JESUp));
     tree->SetBranchAddress("nBCSVT", &(this->nBCSVT));
+    tree->SetBranchAddress("nBCSVT_JERDown", &(this->nBCSVT_JERDown));
+    tree->SetBranchAddress("nBCSVT_JERUp", &(this->nBCSVT_JERUp));
     tree->SetBranchAddress("nBCSVT_JESDown", &(this->nBCSVT_JESDown));
     tree->SetBranchAddress("nBCSVT_JESUp", &(this->nBCSVT_JESUp));
     tree->SetBranchAddress("nGenBHiggs", &(this->nGenBHiggs));
     tree->SetBranchAddress("nGenBTop", &(this->nGenBTop));
     tree->SetBranchAddress("nGenQW", &(this->nGenQW));
     tree->SetBranchAddress("nMatchSimB", &(this->nMatchSimB));
+    tree->SetBranchAddress("nMatchSimB_JERDown", &(this->nMatchSimB_JERDown));
+    tree->SetBranchAddress("nMatchSimB_JERUp", &(this->nMatchSimB_JERUp));
     tree->SetBranchAddress("nMatchSimB_JESDown", &(this->nMatchSimB_JESDown));
     tree->SetBranchAddress("nMatchSimB_JESUp", &(this->nMatchSimB_JESUp));
     tree->SetBranchAddress("nMatchSimC", &(this->nMatchSimC));
+    tree->SetBranchAddress("nMatchSimC_JERDown", &(this->nMatchSimC_JERDown));
+    tree->SetBranchAddress("nMatchSimC_JERUp", &(this->nMatchSimC_JERUp));
     tree->SetBranchAddress("nMatchSimC_JESDown", &(this->nMatchSimC_JESDown));
     tree->SetBranchAddress("nMatchSimC_JESUp", &(this->nMatchSimC_JESUp));
     tree->SetBranchAddress("nMatch_hb", &(this->nMatch_hb));
+    tree->SetBranchAddress("nMatch_hb_JERDown", &(this->nMatch_hb_JERDown));
+    tree->SetBranchAddress("nMatch_hb_JERUp", &(this->nMatch_hb_JERUp));
     tree->SetBranchAddress("nMatch_hb_JESDown", &(this->nMatch_hb_JESDown));
     tree->SetBranchAddress("nMatch_hb_JESUp", &(this->nMatch_hb_JESUp));
     tree->SetBranchAddress("nMatch_hb_btag", &(this->nMatch_hb_btag));
+    tree->SetBranchAddress("nMatch_hb_btag_JERDown", &(this->nMatch_hb_btag_JERDown));
+    tree->SetBranchAddress("nMatch_hb_btag_JERUp", &(this->nMatch_hb_btag_JERUp));
     tree->SetBranchAddress("nMatch_hb_btag_JESDown", &(this->nMatch_hb_btag_JESDown));
     tree->SetBranchAddress("nMatch_hb_btag_JESUp", &(this->nMatch_hb_btag_JESUp));
     tree->SetBranchAddress("nMatch_tb", &(this->nMatch_tb));
+    tree->SetBranchAddress("nMatch_tb_JERDown", &(this->nMatch_tb_JERDown));
+    tree->SetBranchAddress("nMatch_tb_JERUp", &(this->nMatch_tb_JERUp));
     tree->SetBranchAddress("nMatch_tb_JESDown", &(this->nMatch_tb_JESDown));
     tree->SetBranchAddress("nMatch_tb_JESUp", &(this->nMatch_tb_JESUp));
     tree->SetBranchAddress("nMatch_tb_btag", &(this->nMatch_tb_btag));
+    tree->SetBranchAddress("nMatch_tb_btag_JERDown", &(this->nMatch_tb_btag_JERDown));
+    tree->SetBranchAddress("nMatch_tb_btag_JERUp", &(this->nMatch_tb_btag_JERUp));
     tree->SetBranchAddress("nMatch_tb_btag_JESDown", &(this->nMatch_tb_btag_JESDown));
     tree->SetBranchAddress("nMatch_tb_btag_JESUp", &(this->nMatch_tb_btag_JESUp));
     tree->SetBranchAddress("nMatch_wq", &(this->nMatch_wq));
+    tree->SetBranchAddress("nMatch_wq_JERDown", &(this->nMatch_wq_JERDown));
+    tree->SetBranchAddress("nMatch_wq_JERUp", &(this->nMatch_wq_JERUp));
     tree->SetBranchAddress("nMatch_wq_JESDown", &(this->nMatch_wq_JESDown));
     tree->SetBranchAddress("nMatch_wq_JESUp", &(this->nMatch_wq_JESUp));
     tree->SetBranchAddress("nMatch_wq_btag", &(this->nMatch_wq_btag));
+    tree->SetBranchAddress("nMatch_wq_btag_JERDown", &(this->nMatch_wq_btag_JERDown));
+    tree->SetBranchAddress("nMatch_wq_btag_JERUp", &(this->nMatch_wq_btag_JERUp));
     tree->SetBranchAddress("nMatch_wq_btag_JESDown", &(this->nMatch_wq_btag_JESDown));
     tree->SetBranchAddress("nMatch_wq_btag_JESUp", &(this->nMatch_wq_btag_JESUp));
     tree->SetBranchAddress("nPU0", &(this->nPU0));
@@ -1203,19 +1621,29 @@ public:
     tree->SetBranchAddress("n_excluded_ljets", &(this->n_excluded_ljets));
     tree->SetBranchAddress("n_ljets", &(this->n_ljets));
     tree->SetBranchAddress("numJets", &(this->numJets));
+    tree->SetBranchAddress("numJets_JERDown", &(this->numJets_JERDown));
+    tree->SetBranchAddress("numJets_JERUp", &(this->numJets_JERUp));
     tree->SetBranchAddress("numJets_JESDown", &(this->numJets_JESDown));
     tree->SetBranchAddress("numJets_JESUp", &(this->numJets_JESUp));
     tree->SetBranchAddress("passPV", &(this->passPV));
     tree->SetBranchAddress("passes_btag", &(this->passes_btag));
+    tree->SetBranchAddress("passes_btag_JERDown", &(this->passes_btag_JERDown));
+    tree->SetBranchAddress("passes_btag_JERUp", &(this->passes_btag_JERUp));
     tree->SetBranchAddress("passes_btag_JESDown", &(this->passes_btag_JESDown));
     tree->SetBranchAddress("passes_btag_JESUp", &(this->passes_btag_JESUp));
     tree->SetBranchAddress("passes_jet", &(this->passes_jet));
+    tree->SetBranchAddress("passes_jet_JERDown", &(this->passes_jet_JERDown));
+    tree->SetBranchAddress("passes_jet_JERUp", &(this->passes_jet_JERUp));
     tree->SetBranchAddress("passes_jet_JESDown", &(this->passes_jet_JESDown));
     tree->SetBranchAddress("passes_jet_JESUp", &(this->passes_jet_JESUp));
     tree->SetBranchAddress("passes_mem", &(this->passes_mem));
+    tree->SetBranchAddress("passes_mem_JERDown", &(this->passes_mem_JERDown));
+    tree->SetBranchAddress("passes_mem_JERUp", &(this->passes_mem_JERUp));
     tree->SetBranchAddress("passes_mem_JESDown", &(this->passes_mem_JESDown));
     tree->SetBranchAddress("passes_mem_JESUp", &(this->passes_mem_JESUp));
     tree->SetBranchAddress("pt_drpair_btag", &(this->pt_drpair_btag));
+    tree->SetBranchAddress("pt_drpair_btag_JERDown", &(this->pt_drpair_btag_JERDown));
+    tree->SetBranchAddress("pt_drpair_btag_JERUp", &(this->pt_drpair_btag_JERUp));
     tree->SetBranchAddress("pt_drpair_btag_JESDown", &(this->pt_drpair_btag_JESDown));
     tree->SetBranchAddress("pt_drpair_btag_JESUp", &(this->pt_drpair_btag_JESUp));
     tree->SetBranchAddress("puWeight", &(this->puWeight));
@@ -1223,50 +1651,80 @@ public:
     tree->SetBranchAddress("qg_LR_flavour_4q_0q_1q", &(this->qg_LR_flavour_4q_0q_1q));
     tree->SetBranchAddress("qg_LR_flavour_4q_0q_1q_2q", &(this->qg_LR_flavour_4q_0q_1q_2q));
     tree->SetBranchAddress("qg_LR_flavour_4q_0q_1q_2q_3q", &(this->qg_LR_flavour_4q_0q_1q_2q_3q));
+    tree->SetBranchAddress("qg_LR_flavour_4q_0q_1q_2q_3q_JERDown", &(this->qg_LR_flavour_4q_0q_1q_2q_3q_JERDown));
+    tree->SetBranchAddress("qg_LR_flavour_4q_0q_1q_2q_3q_JERUp", &(this->qg_LR_flavour_4q_0q_1q_2q_3q_JERUp));
     tree->SetBranchAddress("qg_LR_flavour_4q_0q_1q_2q_3q_JESDown", &(this->qg_LR_flavour_4q_0q_1q_2q_3q_JESDown));
     tree->SetBranchAddress("qg_LR_flavour_4q_0q_1q_2q_3q_JESUp", &(this->qg_LR_flavour_4q_0q_1q_2q_3q_JESUp));
+    tree->SetBranchAddress("qg_LR_flavour_4q_0q_1q_2q_JERDown", &(this->qg_LR_flavour_4q_0q_1q_2q_JERDown));
+    tree->SetBranchAddress("qg_LR_flavour_4q_0q_1q_2q_JERUp", &(this->qg_LR_flavour_4q_0q_1q_2q_JERUp));
     tree->SetBranchAddress("qg_LR_flavour_4q_0q_1q_2q_JESDown", &(this->qg_LR_flavour_4q_0q_1q_2q_JESDown));
     tree->SetBranchAddress("qg_LR_flavour_4q_0q_1q_2q_JESUp", &(this->qg_LR_flavour_4q_0q_1q_2q_JESUp));
+    tree->SetBranchAddress("qg_LR_flavour_4q_0q_1q_JERDown", &(this->qg_LR_flavour_4q_0q_1q_JERDown));
+    tree->SetBranchAddress("qg_LR_flavour_4q_0q_1q_JERUp", &(this->qg_LR_flavour_4q_0q_1q_JERUp));
     tree->SetBranchAddress("qg_LR_flavour_4q_0q_1q_JESDown", &(this->qg_LR_flavour_4q_0q_1q_JESDown));
     tree->SetBranchAddress("qg_LR_flavour_4q_0q_1q_JESUp", &(this->qg_LR_flavour_4q_0q_1q_JESUp));
+    tree->SetBranchAddress("qg_LR_flavour_4q_0q_JERDown", &(this->qg_LR_flavour_4q_0q_JERDown));
+    tree->SetBranchAddress("qg_LR_flavour_4q_0q_JERUp", &(this->qg_LR_flavour_4q_0q_JERUp));
     tree->SetBranchAddress("qg_LR_flavour_4q_0q_JESDown", &(this->qg_LR_flavour_4q_0q_JESDown));
     tree->SetBranchAddress("qg_LR_flavour_4q_0q_JESUp", &(this->qg_LR_flavour_4q_0q_JESUp));
     tree->SetBranchAddress("qg_LR_flavour_4q_1q", &(this->qg_LR_flavour_4q_1q));
     tree->SetBranchAddress("qg_LR_flavour_4q_1q_2q", &(this->qg_LR_flavour_4q_1q_2q));
     tree->SetBranchAddress("qg_LR_flavour_4q_1q_2q_3q", &(this->qg_LR_flavour_4q_1q_2q_3q));
+    tree->SetBranchAddress("qg_LR_flavour_4q_1q_2q_3q_JERDown", &(this->qg_LR_flavour_4q_1q_2q_3q_JERDown));
+    tree->SetBranchAddress("qg_LR_flavour_4q_1q_2q_3q_JERUp", &(this->qg_LR_flavour_4q_1q_2q_3q_JERUp));
     tree->SetBranchAddress("qg_LR_flavour_4q_1q_2q_3q_JESDown", &(this->qg_LR_flavour_4q_1q_2q_3q_JESDown));
     tree->SetBranchAddress("qg_LR_flavour_4q_1q_2q_3q_JESUp", &(this->qg_LR_flavour_4q_1q_2q_3q_JESUp));
+    tree->SetBranchAddress("qg_LR_flavour_4q_1q_2q_JERDown", &(this->qg_LR_flavour_4q_1q_2q_JERDown));
+    tree->SetBranchAddress("qg_LR_flavour_4q_1q_2q_JERUp", &(this->qg_LR_flavour_4q_1q_2q_JERUp));
     tree->SetBranchAddress("qg_LR_flavour_4q_1q_2q_JESDown", &(this->qg_LR_flavour_4q_1q_2q_JESDown));
     tree->SetBranchAddress("qg_LR_flavour_4q_1q_2q_JESUp", &(this->qg_LR_flavour_4q_1q_2q_JESUp));
+    tree->SetBranchAddress("qg_LR_flavour_4q_1q_JERDown", &(this->qg_LR_flavour_4q_1q_JERDown));
+    tree->SetBranchAddress("qg_LR_flavour_4q_1q_JERUp", &(this->qg_LR_flavour_4q_1q_JERUp));
     tree->SetBranchAddress("qg_LR_flavour_4q_1q_JESDown", &(this->qg_LR_flavour_4q_1q_JESDown));
     tree->SetBranchAddress("qg_LR_flavour_4q_1q_JESUp", &(this->qg_LR_flavour_4q_1q_JESUp));
     tree->SetBranchAddress("qg_LR_flavour_4q_2q", &(this->qg_LR_flavour_4q_2q));
     tree->SetBranchAddress("qg_LR_flavour_4q_2q_3q", &(this->qg_LR_flavour_4q_2q_3q));
+    tree->SetBranchAddress("qg_LR_flavour_4q_2q_3q_JERDown", &(this->qg_LR_flavour_4q_2q_3q_JERDown));
+    tree->SetBranchAddress("qg_LR_flavour_4q_2q_3q_JERUp", &(this->qg_LR_flavour_4q_2q_3q_JERUp));
     tree->SetBranchAddress("qg_LR_flavour_4q_2q_3q_JESDown", &(this->qg_LR_flavour_4q_2q_3q_JESDown));
     tree->SetBranchAddress("qg_LR_flavour_4q_2q_3q_JESUp", &(this->qg_LR_flavour_4q_2q_3q_JESUp));
+    tree->SetBranchAddress("qg_LR_flavour_4q_2q_JERDown", &(this->qg_LR_flavour_4q_2q_JERDown));
+    tree->SetBranchAddress("qg_LR_flavour_4q_2q_JERUp", &(this->qg_LR_flavour_4q_2q_JERUp));
     tree->SetBranchAddress("qg_LR_flavour_4q_2q_JESDown", &(this->qg_LR_flavour_4q_2q_JESDown));
     tree->SetBranchAddress("qg_LR_flavour_4q_2q_JESUp", &(this->qg_LR_flavour_4q_2q_JESUp));
     tree->SetBranchAddress("qg_LR_flavour_4q_3q", &(this->qg_LR_flavour_4q_3q));
+    tree->SetBranchAddress("qg_LR_flavour_4q_3q_JERDown", &(this->qg_LR_flavour_4q_3q_JERDown));
+    tree->SetBranchAddress("qg_LR_flavour_4q_3q_JERUp", &(this->qg_LR_flavour_4q_3q_JERUp));
     tree->SetBranchAddress("qg_LR_flavour_4q_3q_JESDown", &(this->qg_LR_flavour_4q_3q_JESDown));
     tree->SetBranchAddress("qg_LR_flavour_4q_3q_JESUp", &(this->qg_LR_flavour_4q_3q_JESUp));
     tree->SetBranchAddress("rho", &(this->rho));
     tree->SetBranchAddress("run", &(this->run));
     tree->SetBranchAddress("sphericity", &(this->sphericity));
+    tree->SetBranchAddress("sphericity_JERDown", &(this->sphericity_JERDown));
+    tree->SetBranchAddress("sphericity_JERUp", &(this->sphericity_JERUp));
     tree->SetBranchAddress("sphericity_JESDown", &(this->sphericity_JESDown));
     tree->SetBranchAddress("sphericity_JESUp", &(this->sphericity_JESUp));
     tree->SetBranchAddress("std_bdisc", &(this->std_bdisc));
+    tree->SetBranchAddress("std_bdisc_JERDown", &(this->std_bdisc_JERDown));
+    tree->SetBranchAddress("std_bdisc_JERUp", &(this->std_bdisc_JERUp));
     tree->SetBranchAddress("std_bdisc_JESDown", &(this->std_bdisc_JESDown));
     tree->SetBranchAddress("std_bdisc_JESUp", &(this->std_bdisc_JESUp));
     tree->SetBranchAddress("std_bdisc_btag", &(this->std_bdisc_btag));
+    tree->SetBranchAddress("std_bdisc_btag_JERDown", &(this->std_bdisc_btag_JERDown));
+    tree->SetBranchAddress("std_bdisc_btag_JERUp", &(this->std_bdisc_btag_JERUp));
     tree->SetBranchAddress("std_bdisc_btag_JESDown", &(this->std_bdisc_btag_JESDown));
     tree->SetBranchAddress("std_bdisc_btag_JESUp", &(this->std_bdisc_btag_JESUp));
     tree->SetBranchAddress("std_dr_btag", &(this->std_dr_btag));
+    tree->SetBranchAddress("std_dr_btag_JERDown", &(this->std_dr_btag_JERDown));
+    tree->SetBranchAddress("std_dr_btag_JERUp", &(this->std_dr_btag_JERUp));
     tree->SetBranchAddress("std_dr_btag_JESDown", &(this->std_dr_btag_JESDown));
     tree->SetBranchAddress("std_dr_btag_JESUp", &(this->std_dr_btag_JESUp));
     tree->SetBranchAddress("triggerBitmask", &(this->triggerBitmask));
     tree->SetBranchAddress("triggerDecision", &(this->triggerDecision));
     tree->SetBranchAddress("ttCls", &(this->ttCls));
     tree->SetBranchAddress("tth_mva", &(this->tth_mva));
+    tree->SetBranchAddress("tth_mva_JERDown", &(this->tth_mva_JERDown));
+    tree->SetBranchAddress("tth_mva_JERUp", &(this->tth_mva_JERUp));
     tree->SetBranchAddress("tth_mva_JESDown", &(this->tth_mva_JESDown));
     tree->SetBranchAddress("tth_mva_JESUp", &(this->tth_mva_JESUp));
     tree->SetBranchAddress("weight_xs", &(this->weight_xs));

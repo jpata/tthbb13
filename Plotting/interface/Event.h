@@ -221,16 +221,11 @@ public:
     // Our BDT
     double tth_mva;
 
+    //KIT BDT
+    double common_bdt;
+
     //btag weights
     double bTagWeight;
-    double bTagWeight_Stats1Up;
-    double bTagWeight_Stats1Down;
-    double bTagWeight_Stats2Up;
-    double bTagWeight_Stats2Down;
-    double bTagWeight_LFUp;
-    double bTagWeight_LFDown;
-    double bTagWeight_HFUp;
-    double bTagWeight_HFDown;
 
     //btag likelihood
     double btag_LR_4b_2b;
@@ -276,15 +271,8 @@ public:
         double _mem_SL_2w2h2t_sj,
         double _mem_DL_0w2h2t,
         double _tth_mva,
+        double _common_bdt,
         double _bTagWeight,
-        double _bTagWeight_Stats1Up,
-        double _bTagWeight_Stats1Down,
-        double _bTagWeight_Stats2Up,
-        double _bTagWeight_Stats2Down,
-        double _bTagWeight_LFUp,
-        double _bTagWeight_LFDown,
-        double _bTagWeight_HFUp,
-        double _bTagWeight_HFDown,
         double _btag_LR_4b_2b,
         int _n_excluded_bjets,
         int _n_excluded_ljets,

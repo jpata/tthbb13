@@ -54,6 +54,21 @@ trees["old_2t"] = """
           nBCSVM__4__8 Discr=mem_SL_0w2h2t
 """
 
+trees["old_bdt"] = """
+  Discr=common_bdt
+    numJets__4__5 Discr=common_bdt 
+       nBCSVM__3__4 Discr=common_bdt
+       nBCSVM__4__5 Discr=common_bdt
+    numJets__5__7 Discr=common_bdt
+       numJets__5__6 Discr=common_bdt
+          nBCSVM__3__4 Discr=common_bdt
+          nBCSVM__4__5 Discr=common_bdt
+       numJets__6__7 Discr=common_bdt
+          nBCSVM__2__4 Discr=common_bdt
+             nBCSVM__2__3 Discr=common_bdt
+             nBCSVM__3__4 Discr=common_bdt
+          nBCSVM__4__5 Discr=common_bdt
+"""
 
 trees["old_blr"] = """
   Discr=mem_SL_0w2h2t

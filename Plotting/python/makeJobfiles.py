@@ -66,6 +66,12 @@ for samp in Samples.samples_dict.keys():
                     "nBins": 12
                 },
                 {
+                    "func": "common_bdt",
+                    "xMin": -1,
+                    "xMax": 1,
+                    "nBins": 12
+                },
+                {
                     "func": "numJets",
                     "xMin": 3,
                     "xMax": 7,
