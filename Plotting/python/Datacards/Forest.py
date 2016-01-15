@@ -49,7 +49,9 @@ trees["old_2t"] = """
           nBCSVM__4__5 Discr=mem_SL_0w2h2t
        numJets__6__8 Discr=mem_SL_0w2h2t
           nBCSVM__1__4 Discr=mem_SL_0w2h2t
-             nBCSVM__2__3 Discr=mem_SL_0w2h2t
+             nBCSVM__1__3 Discr=mem_SL_0w2h2t
+                nBCSVM__1__2 Discr=None
+                nBCSVM__2__3 Discr=mem_SL_0w2h2t
              nBCSVM__3__4 Discr=mem_SL_0w2h2t
           nBCSVM__4__8 Discr=mem_SL_0w2h2t
 """
@@ -481,29 +483,6 @@ trees["old_dl"] = """
         nBCSVM__4__6 Discr=mem_DL_0w2h2t
            numJets__1__4 Discr=None
            numJets__4__6 Discr=mem_DL_0w2h2t
-"""
-
-# Classic categorization:
-# Based on jet and tagged jet multiplicity. Also include the 2tag bins.
-# 7 categories + 2 categories (4j2t, 5j2t)
-trees["old_2t"] = """
-  Discr=mem_SL_0w2h2t 
-    numJets__4__5 Discr=mem_SL_0w2h2t 
-       nBCSVM__2__4 Discr=mem_SL_0w2h2t
-          nBCSVM__2__3 Discr=mem_SL_0w2h2t
-          nBCSVM__3__4 Discr=mem_SL_0w2h2t
-       nBCSVM__4__5 Discr=mem_SL_0w2h2t
-    numJets__5__8 Discr=mem_SL_0w2h2t
-       numJets__5__6 Discr=mem_SL_0w2h2t
-          nBCSVM__2__4 Discr=mem_SL_0w2h2t
-             nBCSVM__2__3 Discr=mem_SL_0w2h2t
-             nBCSVM__3__4 Discr=mem_SL_0w2h2t
-          nBCSVM__4__5 Discr=mem_SL_0w2h2t
-       numJets__6__8 Discr=mem_SL_0w2h2t
-          nBCSVM__2__4 Discr=mem_SL_0w2h2t
-             nBCSVM__2__3 Discr=mem_SL_0w2h2t
-             nBCSVM__3__4 Discr=mem_SL_0w2h2t
-          nBCSVM__4__8 Discr=mem_SL_0w2h2t
 """
 
 # Classic categorization using jets and tagged jet multiplicity
