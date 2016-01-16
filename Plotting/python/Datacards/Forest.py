@@ -26,6 +26,113 @@ trees["old"] = """
            nBCSVM__4__8 Discr=mem_SL_0w2h2t
 """
 
+# Result of running leaf optimization using BLR and counting on 7 category old tree
+trees["old_blrsplit"] = """
+  Discr=mem_SL_0w2h2t
+    numJets__3__5 Discr=mem_SL_0w2h2t
+       nBCSVM__1__4 Discr=mem_SL_0w2h2t
+          nBCSVM__1__3 Discr=None
+          nBCSVM__3__4 Discr=mem_SL_0w2h2t
+             btag_LR_4b_2b_logit__m20_0__7_2 Discr=mem_SL_0w2h2t
+             btag_LR_4b_2b_logit__7_2__20_0 Discr=mem_SL_0w2h2t
+       nBCSVM__4__5 Discr=mem_SL_0w2h2t
+          btag_LR_4b_2b_logit__m20_0__6_4 Discr=mem_SL_0w2h2t
+          btag_LR_4b_2b_logit__6_4__20_0 Discr=mem_SL_0w2h2t
+    numJets__5__7 Discr=mem_SL_0w2h2t
+       numJets__5__6 Discr=mem_SL_0w2h2t
+          nBCSVM__1__4 Discr=mem_SL_0w2h2t
+             nBCSVM__1__3 Discr=None
+             nBCSVM__3__4 Discr=mem_SL_0w2h2t
+                btag_LR_4b_2b_logit__m20_0__5_6 Discr=mem_SL_0w2h2t
+                btag_LR_4b_2b_logit__5_6__20_0 Discr=mem_SL_0w2h2t
+          nBCSVM__4__5 Discr=mem_SL_0w2h2t
+             btag_LR_4b_2b_logit__m20_0__8_8 Discr=mem_SL_0w2h2t
+             btag_LR_4b_2b_logit__8_8__20_0 Discr=mem_SL_0w2h2t
+       numJets__6__7 Discr=mem_SL_0w2h2t
+          nBCSVM__1__4 Discr=mem_SL_0w2h2t
+             nBCSVM__1__3 Discr=mem_SL_0w2h2t
+                nBCSVM__1__2 Discr=None
+                nBCSVM__2__3 Discr=mem_SL_0w2h2t
+                   btag_LR_4b_2b_logit__m20_0__m18_4 Discr=counting
+                   btag_LR_4b_2b_logit__m18_4__20_0 Discr=mem_SL_0w2h2t
+             nBCSVM__3__4 Discr=mem_SL_0w2h2t
+                btag_LR_4b_2b_logit__m20_0__5_6 Discr=mem_SL_0w2h2t
+                btag_LR_4b_2b_logit__5_6__20_0 Discr=mem_SL_0w2h2t
+          nBCSVM__4__5 Discr=mem_SL_0w2h2t
+             btag_LR_4b_2b_logit__m20_0__7_2 Discr=mem_SL_0w2h2t
+             btag_LR_4b_2b_logit__7_2__20_0 Discr=mem_SL_0w2h2t
+"""
+
+# Removed the splitting of the 6j2b category - it was useless (0 Signal, 1 of 5k BG events)
+trees["old_blrsplit_A"] = """
+  Discr=mem_SL_0w2h2t
+    numJets__3__5 Discr=mem_SL_0w2h2t
+       nBCSVM__1__4 Discr=mem_SL_0w2h2t
+          nBCSVM__1__3 Discr=None
+          nBCSVM__3__4 Discr=mem_SL_0w2h2t
+             btag_LR_4b_2b_logit__m20_0__7_2 Discr=mem_SL_0w2h2t
+             btag_LR_4b_2b_logit__7_2__20_0 Discr=mem_SL_0w2h2t
+       nBCSVM__4__5 Discr=mem_SL_0w2h2t
+          btag_LR_4b_2b_logit__m20_0__6_4 Discr=mem_SL_0w2h2t
+          btag_LR_4b_2b_logit__6_4__20_0 Discr=mem_SL_0w2h2t
+    numJets__5__7 Discr=mem_SL_0w2h2t
+       numJets__5__6 Discr=mem_SL_0w2h2t
+          nBCSVM__1__4 Discr=mem_SL_0w2h2t
+             nBCSVM__1__3 Discr=None
+             nBCSVM__3__4 Discr=mem_SL_0w2h2t
+                btag_LR_4b_2b_logit__m20_0__5_6 Discr=mem_SL_0w2h2t
+                btag_LR_4b_2b_logit__5_6__20_0 Discr=mem_SL_0w2h2t
+          nBCSVM__4__5 Discr=mem_SL_0w2h2t
+             btag_LR_4b_2b_logit__m20_0__8_8 Discr=mem_SL_0w2h2t
+             btag_LR_4b_2b_logit__8_8__20_0 Discr=mem_SL_0w2h2t
+       numJets__6__7 Discr=mem_SL_0w2h2t
+          nBCSVM__1__4 Discr=mem_SL_0w2h2t
+             nBCSVM__1__3 Discr=mem_SL_0w2h2t
+                nBCSVM__1__2 Discr=None
+                nBCSVM__2__3 Discr=mem_SL_0w2h2t
+             nBCSVM__3__4 Discr=mem_SL_0w2h2t
+                btag_LR_4b_2b_logit__m20_0__5_6 Discr=mem_SL_0w2h2t
+                btag_LR_4b_2b_logit__5_6__20_0 Discr=mem_SL_0w2h2t
+          nBCSVM__4__5 Discr=mem_SL_0w2h2t
+             btag_LR_4b_2b_logit__m20_0__7_2 Discr=mem_SL_0w2h2t
+             btag_LR_4b_2b_logit__7_2__20_0 Discr=mem_SL_0w2h2t
+"""
+
+# Set a few of the categories to use counting
+trees["old_blrsplit_B"] = """
+  Discr=mem_SL_0w2h2t
+    numJets__3__5 Discr=mem_SL_0w2h2t
+       nBCSVM__1__4 Discr=mem_SL_0w2h2t
+          nBCSVM__1__3 Discr=None
+          nBCSVM__3__4 Discr=mem_SL_0w2h2t
+             btag_LR_4b_2b_logit__m20_0__7_2 Discr=counting
+             btag_LR_4b_2b_logit__7_2__20_0 Discr=mem_SL_0w2h2t
+       nBCSVM__4__5 Discr=mem_SL_0w2h2t
+          btag_LR_4b_2b_logit__m20_0__6_4 Discr=mem_SL_0w2h2t
+          btag_LR_4b_2b_logit__6_4__20_0 Discr=mem_SL_0w2h2t
+    numJets__5__7 Discr=mem_SL_0w2h2t
+       numJets__5__6 Discr=mem_SL_0w2h2t
+          nBCSVM__1__4 Discr=mem_SL_0w2h2t
+             nBCSVM__1__3 Discr=None
+             nBCSVM__3__4 Discr=mem_SL_0w2h2t
+                btag_LR_4b_2b_logit__m20_0__5_6 Discr=counting
+                btag_LR_4b_2b_logit__5_6__20_0 Discr=mem_SL_0w2h2t
+          nBCSVM__4__5 Discr=mem_SL_0w2h2t
+             btag_LR_4b_2b_logit__m20_0__8_8 Discr=mem_SL_0w2h2t
+             btag_LR_4b_2b_logit__8_8__20_0 Discr=mem_SL_0w2h2t
+       numJets__6__7 Discr=mem_SL_0w2h2t
+          nBCSVM__1__4 Discr=mem_SL_0w2h2t
+             nBCSVM__1__3 Discr=mem_SL_0w2h2t
+                nBCSVM__1__2 Discr=None
+                nBCSVM__2__3 Discr=mem_SL_0w2h2t
+             nBCSVM__3__4 Discr=mem_SL_0w2h2t
+                btag_LR_4b_2b_logit__m20_0__5_6 Discr=mem_SL_0w2h2t
+                btag_LR_4b_2b_logit__5_6__20_0 Discr=mem_SL_0w2h2t
+          nBCSVM__4__5 Discr=mem_SL_0w2h2t
+             btag_LR_4b_2b_logit__m20_0__7_2 Discr=mem_SL_0w2h2t
+             btag_LR_4b_2b_logit__7_2__20_0 Discr=mem_SL_0w2h2t
+"""
+
 
 # Classic categorization:
 # Based on jet and tagged jet multiplicity. Also include the 2tag bins.
@@ -485,42 +592,6 @@ trees["old_dl"] = """
            numJets__4__6 Discr=mem_DL_0w2h2t
 """
 
-# Classic categorization using jets and tagged jet multiplicity
-# Each final category is subdivded by BLR
-# 14 categories
-trees["old_blrsplit"] = """
-  Discr=2
-    numJets__4__5 Discr=2 
-       nBCSVM__2__4 Discr=2
-          nBCSVM__2__3 Discr=-1
-          nBCSVM__3__4 Discr=2
-             btag_LR_4b_2b_logit__m20_0__4_0 Discr=2 
-             btag_LR_4b_2b_logit__4_0__20_0 Discr=2 
-       nBCSVM__4__5 Discr=2 j4t4
-          btag_LR_4b_2b_logit__m20_0__8_0 Discr=2 
-          btag_LR_4b_2b_logit__8_0__20_0 Discr=2 
-    numJets__5__7 Discr=2
-       numJets__5__6 Discr=2
-          nBCSVM__2__4 Discr=2 
-             nBCSVM__2__3 Discr=-1
-             nBCSVM__3__4 Discr=2 j5t3
-                btag_LR_4b_2b_logit__m20_0__4_0 Discr=2 
-                btag_LR_4b_2b_logit__4_0__20_0 Discr=2 
-          nBCSVM__4__5 Discr=2 j5t4
-             btag_LR_4b_2b_logit__m20_0__8_0 Discr=2
-             btag_LR_4b_2b_logit__8_0__20_0 Discr=2
-       numJets__6__7 Discr=2
-          nBCSVM__2__4 Discr=2
-             nBCSVM__2__3 Discr=2
-                btag_LR_4b_2b_logit__m20_0__0_0 Discr=2
-                btag_LR_4b_2b_logit__0_0__20_0 Discr=2
-             nBCSVM__3__4 Discr=2
-                btag_LR_4b_2b_logit__m20_0__4_0 Discr=2
-                btag_LR_4b_2b_logit__4_0__20_0 Discr=2
-          nBCSVM__4__5 Discr=2
-             btag_LR_4b_2b_logit__m20_0__8_0 Discr=2
-             btag_LR_4b_2b_logit__8_0__20_0 Discr=2
-"""
 
 # Optimization on tree with BLR < 0.95 preselection cut
 # BDT not included as discriminator
