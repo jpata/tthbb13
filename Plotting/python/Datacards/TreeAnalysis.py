@@ -68,6 +68,24 @@ def split_leaves_by_BLR(original, disc="mem_SL_0w2h2t"):
     return r
 # End of split_leaves_by_BLR
 
+def run_opt(original,
+    cuts=["common_bdt", "btag_LR_4b_2b_logit"],
+    discs=["mem_SL_0w2h2t", "common_bdt"]
+    ):
+    """ Attempt to optimize BLR splitting of classic analysis categories """
+
+    r = Categorize.CategorizationFromString(original)
+    initial_leaves = r.get_leaves()
+    for l in initial_leaves:
+        print "Optimizing leaf", l
+        l.find_categories_async(
+            0,
+            [],
+            discs 
+        )
+    return r
+# End of choose_discriminator
+
 highpurity = [
     "numJets__6__7__nBCSVM__4__5__discr_mem_SL_0w2h2t",
     "numJets__6__7__nBCSVM__3__5__discr_mem_SL_0w2h2t",
@@ -166,9 +184,12 @@ if __name__ == "__main__":
     Categorize.Categorization.h_sig_sys = h_sl[2]
     Categorize.Categorization.h_bkg_sys = h_sl[3]
 
-    make_latex("old")
-    make_latex("old_bdt")
-    #make_latex("old_2t_blr_A")
+    #make_latex("old")
+    #make_latex("old_bdt")
+    #make_latex("old_bdt_mem")
+    make_latex("old_bdt_mem_blrsplit")
+    #make_latex("old_blrsplit_B")
+    #make_latex("old_blrsplit_B_bdt")
   
     ##DL
     #h_dl = Categorize.GetSparseHistograms(
