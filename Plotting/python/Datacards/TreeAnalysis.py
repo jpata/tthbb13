@@ -69,6 +69,7 @@ def split_leaves_by_BLR(original, disc="mem_SL_0w2h2t"):
 # End of split_leaves_by_BLR
 
 def run_opt(original,
+    n_iters,
     cuts=["common_bdt", "btag_LR_4b_2b_logit"],
     discs=["mem_SL_0w2h2t", "common_bdt"]
     ):
@@ -79,8 +80,8 @@ def run_opt(original,
     for l in initial_leaves:
         print "Optimizing leaf", l
         l.find_categories_async(
-            0,
-            [],
+            n_iters,
+            cuts,
             discs 
         )
     return r
@@ -164,7 +165,7 @@ if __name__ == "__main__":
     
     Categorize.Categorization.output_path = output_path
     Categorize.Categorization.pool = Pool(n_proc)
-    Categorize.Categorization.do_stat_variations = True
+    Categorize.Categorization.do_stat_variations = False
     Categorize.Categorization.lg = LimitGetter(output_path)
     
     #SL
@@ -185,11 +186,17 @@ if __name__ == "__main__":
     Categorize.Categorization.h_bkg_sys = h_sl[3]
 
     #make_latex("old")
+    #ret = run_opt("old", 5, ["common_bdt", "btag_LR_4b_2b_logit"], ["common_bdt", "mem_SL_0w2h2t"])
+    #of = open("old_opt.tex", "w")
+    #of.write(r.print_tree_latex())
+    #of.close()
     #make_latex("old_bdt")
     #make_latex("old_bdt_mem")
-    make_latex("old_bdt_mem_blrsplit")
+    #make_latex("old_bdt_mem_blrsplit")
     #make_latex("old_blrsplit_B")
     #make_latex("old_blrsplit_B_bdt")
+    make_latex("old_bdtsplit_A")
+    #make_latex("old_bdtsplit_B")
   
     ##DL
     #h_dl = Categorize.GetSparseHistograms(

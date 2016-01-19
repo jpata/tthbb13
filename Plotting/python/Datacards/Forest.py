@@ -168,6 +168,73 @@ trees["old_blrsplit_B_bdt"] = """
              btag_LR_4b_2b_logit__7_2__20_0 Discr=mem_SL_0w2h2t
 """
 
+trees["old_bdtsplit_A"] = """
+  Discr=mem_SL_0w2h2t
+    numJets__3__5 Discr=mem_SL_0w2h2t
+       nBCSVM__1__4 Discr=mem_SL_0w2h2t
+          nBCSVM__1__3 Discr=None
+          nBCSVM__3__4 Discr=mem_SL_0w2h2t
+             common_bdt__m1_0__0_5 Discr=mem_SL_0w2h2t
+             common_bdt__0_5__1_0 Discr=mem_SL_0w2h2t
+       nBCSVM__4__5 Discr=mem_SL_0w2h2t
+          common_bdt__m1_0__0_166666666667 Discr=mem_SL_0w2h2t
+          common_bdt__0_166666666667__1_0 Discr=mem_SL_0w2h2t
+    numJets__5__7 Discr=mem_SL_0w2h2t
+       numJets__5__6 Discr=mem_SL_0w2h2t
+          nBCSVM__1__4 Discr=mem_SL_0w2h2t
+             nBCSVM__1__3 Discr=None
+             nBCSVM__3__4 Discr=mem_SL_0w2h2t
+                common_bdt__m1_0__0_666666666667 Discr=mem_SL_0w2h2t
+                common_bdt__0_666666666667__1_0 Discr=mem_SL_0w2h2t
+          nBCSVM__4__5 Discr=mem_SL_0w2h2t
+             common_bdt__m1_0__0_333333333333 Discr=mem_SL_0w2h2t
+             common_bdt__0_333333333333__1_0 Discr=mem_SL_0w2h2t
+       numJets__6__7 Discr=mem_SL_0w2h2t
+          nBCSVM__1__4 Discr=mem_SL_0w2h2t
+             nBCSVM__1__3 Discr=mem_SL_0w2h2t
+                nBCSVM__1__2 Discr=None
+                nBCSVM__2__3 Discr=mem_SL_0w2h2t
+             nBCSVM__3__4 Discr=mem_SL_0w2h2t
+                common_bdt__m1_0__0_333333333333 Discr=mem_SL_0w2h2t
+                common_bdt__0_333333333333__1_0 Discr=mem_SL_0w2h2t
+          nBCSVM__4__5 Discr=mem_SL_0w2h2t
+             common_bdt__m1_0__0_166666666667 Discr=mem_SL_0w2h2t
+             common_bdt__0_166666666667__1_0 Discr=mem_SL_0w2h2t
+"""
+
+trees["old_bdtsplit_B"] = """
+  Discr=mem_SL_0w2h2t
+    numJets__3__5 Discr=mem_SL_0w2h2t
+       nBCSVM__1__4 Discr=mem_SL_0w2h2t
+          nBCSVM__1__3 Discr=None
+          nBCSVM__3__4 Discr=mem_SL_0w2h2t
+             common_bdt__m1_0__0_5 Discr=common_bdt
+             common_bdt__0_5__1_0 Discr=mem_SL_0w2h2t
+       nBCSVM__4__5 Discr=mem_SL_0w2h2t
+          common_bdt__m1_0__0_166666666667 Discr=common_bdt
+          common_bdt__0_166666666667__1_0 Discr=mem_SL_0w2h2t
+    numJets__5__7 Discr=mem_SL_0w2h2t
+       numJets__5__6 Discr=mem_SL_0w2h2t
+          nBCSVM__1__4 Discr=mem_SL_0w2h2t
+             nBCSVM__1__3 Discr=None
+             nBCSVM__3__4 Discr=mem_SL_0w2h2t
+                common_bdt__m1_0__0_666666666667 Discr=common_bdt
+                common_bdt__0_666666666667__1_0 Discr=mem_SL_0w2h2t
+          nBCSVM__4__5 Discr=mem_SL_0w2h2t
+             common_bdt__m1_0__0_333333333333 Discr=common_bdt
+             common_bdt__0_333333333333__1_0 Discr=mem_SL_0w2h2t
+       numJets__6__7 Discr=mem_SL_0w2h2t
+          nBCSVM__1__4 Discr=mem_SL_0w2h2t
+             nBCSVM__1__3 Discr=mem_SL_0w2h2t
+                nBCSVM__1__2 Discr=None
+                nBCSVM__2__3 Discr=common_bdt
+             nBCSVM__3__4 Discr=mem_SL_0w2h2t
+                common_bdt__m1_0__0_333333333333 Discr=common_bdt
+                common_bdt__0_333333333333__1_0 Discr=mem_SL_0w2h2t
+          nBCSVM__4__5 Discr=mem_SL_0w2h2t
+             common_bdt__m1_0__0_166666666667 Discr=common_bdt
+             common_bdt__0_166666666667__1_0 Discr=mem_SL_0w2h2t
+"""
 
 # Classic categorization:
 # Based on jet and tagged jet multiplicity. Also include the 2tag bins.

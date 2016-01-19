@@ -165,7 +165,7 @@ public:
         outputFile(_outputFile),
         sparseAxes(_sparseAxes),
         enabledCategories(_enabledCategories),
-        recalculateBTagWeight(false)
+        recalculateBTagWeight(true)
     {
     }
     static const Configuration makeConfiguration(JsonValue& value);
