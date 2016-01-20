@@ -37,7 +37,7 @@ inf = [
 #    ("/scratch/joosep/TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9.root", sel)
     #("/dev/shm/joosep/cfg_noME/TT_TuneCUETP8M1_13TeV-powheg-pythia8.root", ttjets_sel),
     #("/dev/shm/joosep/cfg_noME_jetPt20/TT_TuneCUETP8M1_13TeV-powheg-pythia8.root", ttjets_sel),
-    ("/home/joosep/tth/gc/GC948c180dd8b0/cfg_withME/TT_TuneCUETP8M1_13TeV-powheg-pythia8.root", ttjets_sel),
+    ("/scratch/joosep/Dec20_commonclassifier/TT_TuneCUETP8M1_13TeV-powheg-pythia8.root", ttjets_sel),
 ]
 
 def chunks(l, n):

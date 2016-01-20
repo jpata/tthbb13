@@ -64,6 +64,7 @@ const map<string, function<float(const Event& ev)>> AxisFunctions = {
     {"mem_SL_2w2h2t_sj", [](const Event& ev) { return ev.mem_SL_2w2h2t_sj;}},
     {"mem_DL_0w2h2t", [](const Event& ev) { return ev.mem_DL_0w2h2t;}},
     {"tth_mva", [](const Event& ev) { return ev.tth_mva;}},
+    {"common_bdt", [](const Event& ev) { return ev.common_bdt;}},
     {"numJets", [](const Event& ev) { return ev.numJets;}},
     {"nBCSVM", [](const Event& ev) { return ev.nBCSVM;}},
     {"nBCSVL", [](const Event& ev) { return ev.nBCSVL;}},
@@ -295,15 +296,8 @@ Event::Event(
     double _mem_SL_2w2h2t_sj,
     double _mem_DL_0w2h2t,
     double _tth_mva,
+    double _common_bdt,
     double _bTagWeight,
-    double _bTagWeight_Stats1Up,
-    double _bTagWeight_Stats1Down,
-    double _bTagWeight_Stats2Up,
-    double _bTagWeight_Stats2Down,
-    double _bTagWeight_LFUp,
-    double _bTagWeight_LFDown,
-    double _bTagWeight_HFUp,
-    double _bTagWeight_HFDown,
     double _btag_LR_4b_2b,
     int _n_excluded_bjets,
     int _n_excluded_ljets,
@@ -339,15 +333,8 @@ Event::Event(
     mem_SL_2w2h2t_sj(_mem_SL_2w2h2t_sj),
     mem_DL_0w2h2t(_mem_DL_0w2h2t),
     tth_mva(_tth_mva),
+    common_bdt(_common_bdt),
     bTagWeight(_bTagWeight),
-    bTagWeight_Stats1Up(_bTagWeight_Stats1Up),
-    bTagWeight_Stats1Down(_bTagWeight_Stats1Down),
-    bTagWeight_Stats2Up(_bTagWeight_Stats2Up),
-    bTagWeight_Stats2Down(_bTagWeight_Stats2Down),
-    bTagWeight_LFUp(_bTagWeight_LFUp),
-    bTagWeight_LFDown(_bTagWeight_LFDown),
-    bTagWeight_HFUp(_bTagWeight_HFUp),
-    bTagWeight_HFDown(_bTagWeight_HFDown),
     btag_LR_4b_2b(_btag_LR_4b_2b),
     btag_LR_4b_2b_logit(log(_btag_LR_4b_2b / (1.0 - _btag_LR_4b_2b))),
     n_excluded_bjets(_n_excluded_bjets),
@@ -460,6 +447,19 @@ const Event EventFactory::makeNominal(const TreeData& data, const Configuration&
     
     const vector<Jet> jets = makeAllJets(data, &(JetFactory::makeNominal));
     const vector<Lepton> leptons = makeAllLeptons(data);
+   
+    if (conf.recalculateBTagWeight) {
+        double w = 1.0;
+        for (auto & jet : jets) {
+            stringstream s;
+            s << "bweightcalc.calcJetWeightImpl("
+                << jet.p4.Pt() <<"," << std::abs(jet.p4.Eta()) << "," << jet.hadronFlavour << "," << jet.btagCSV << ",\"final\",\"nominal\")";
+            double ret = (double)(TPython::Eval(s.str().c_str()));
+            w *= ret;
+        }
+        //data.bTagWeight = w;
+        //std::cout << jets.size() << " " << data.bTagWeight << " " << w << std::endl;
+    }
 
     const Event ev(
         &data,
@@ -479,15 +479,8 @@ const Event EventFactory::makeNominal(const TreeData& data, const Configuration&
         mem_p(data.mem_tth_p[9], data.mem_ttbb_p[9], 0.05), //SL 222 sj
         mem_p(data.mem_tth_p[1], data.mem_ttbb_p[1]), //DL 022,
         data.tth_mva,
+        data.common_bdt,
         data.bTagWeight,
-        data.bTagWeight_Stats1Up,
-        data.bTagWeight_Stats1Down,
-        data.bTagWeight_Stats2Up,
-        data.bTagWeight_Stats2Down,
-        data.bTagWeight_LFUp,
-        data.bTagWeight_LFDown,
-        data.bTagWeight_HFUp,
-        data.bTagWeight_HFDown,
         data.btag_LR_4b_2b,
         data.n_excluded_bjets,
         data.n_excluded_ljets,
@@ -533,15 +526,8 @@ const Event EventFactory::makeJESUp(const TreeData& data, const Configuration& c
         mem_p(data.mem_tth_JESUp_p[9], data.mem_ttbb_JESUp_p[9], 0.05), //SL 222 sj
         mem_p(data.mem_tth_JESUp_p[1], data.mem_ttbb_JESUp_p[1]), //DL 022,
         data.tth_mva, 
+        data.common_bdt_JESUp, 
         data.bTagWeight,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
         data.btag_LR_4b_2b,
         data.n_excluded_bjets,
         data.n_excluded_ljets,
@@ -586,15 +572,8 @@ const Event EventFactory::makeJESDown(const TreeData& data, const Configuration&
         mem_p(data.mem_tth_JESDown_p[9], data.mem_ttbb_JESDown_p[9], 0.05), //SL 222 sj
         mem_p(data.mem_tth_JESDown_p[1], data.mem_ttbb_JESDown_p[1]), //DL 022,
         data.tth_mva,
+        data.common_bdt_JESDown,
         data.bTagWeight,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
         data.btag_LR_4b_2b,
         data.n_excluded_bjets,
         data.n_excluded_ljets,
@@ -618,10 +597,11 @@ const Event EventFactory::makeJESDown(const TreeData& data, const Configuration&
 }
 
 
-Jet::Jet(const TLorentzVector& _p4, float _btagCSV, float _btagBDT) :
+Jet::Jet(TLorentzVector& _p4, float _btagCSV, float _btagBDT, int _hadronFlavour) :
     p4(_p4),
     btagCSV(_btagCSV),
-    btagBDT(_btagBDT)
+    btagBDT(_btagBDT),
+    hadronFlavour(_hadronFlavour)
 {
 }
 
@@ -643,7 +623,8 @@ const Jet JetFactory::makeNominal(const TreeData& data, int njet) {
     return Jet(
         p4,
         data.jets_btagCSV[njet],
-        data.jets_btagBDT[njet]
+        data.jets_btagBDT[njet],
+        data.jets_hadronFlavour[njet]
     );
 }
 
@@ -662,7 +643,8 @@ const Jet JetFactory::makeJESUp(const TreeData& data, int njet) {
     return Jet(
         p4,
         data.jets_btagCSV[njet],
-        data.jets_btagBDT[njet]
+        data.jets_btagBDT[njet],
+        data.jets_hadronFlavour[njet]
     );
 }
 
@@ -682,7 +664,8 @@ const Jet JetFactory::makeJESDown(const TreeData& data, int njet) {
     return Jet(
         p4,
         data.jets_btagCSV[njet],
-        data.jets_btagBDT[njet]
+        data.jets_btagBDT[njet],
+        data.jets_hadronFlavour[njet]
     );
 }
 

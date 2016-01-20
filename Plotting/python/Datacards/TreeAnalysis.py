@@ -167,34 +167,35 @@ if __name__ == "__main__":
     Categorize.Categorization.h_bkg_sys = h_sl[3]
 
     make_latex("old")
-    make_latex("old_2t_blr_A")
+    make_latex("old_bdt")
+    #make_latex("old_2t_blr_A")
   
-    #DL
-    h_dl = Categorize.GetSparseHistograms(
-        input_file,
-        signals,
-        backgrounds,
-        "dl"
-    )
-    axes = Categorize.GetAxes(h_dl[0]["ttH_hbb"])
+    ##DL
+    #h_dl = Categorize.GetSparseHistograms(
+    #    input_file,
+    #    signals,
+    #    backgrounds,
+    #    "dl"
+    #)
+    #axes = Categorize.GetAxes(h_dl[0]["ttH_hbb"])
 
-    Cut.axes = axes
-    Categorize.Categorization.axes = axes
-    Categorize.Categorization.h_sig = h_dl[0]
-    Categorize.Categorization.h_bkg = h_dl[1]
-    Categorize.Categorization.h_sig_sys = h_dl[2]
-    Categorize.Categorization.h_bkg_sys = h_dl[3]
+    #Cut.axes = axes
+    #Categorize.Categorization.axes = axes
+    #Categorize.Categorization.h_sig = h_dl[0]
+    #Categorize.Categorization.h_bkg = h_dl[1]
+    #Categorize.Categorization.h_sig_sys = h_dl[2]
+    #Categorize.Categorization.h_bkg_sys = h_dl[3]
 
-    make_latex("old_dl")
-    Categorize.Categorization.output_path = output_path + "/old_dl_blr_opt"
-    os.mkdir(Categorize.Categorization.output_path)
-    r = split_leaves_by_BLR(trees["old_dl"], disc="mem_DL_0w2h2t")
-    of = open("old_dl_blr_opt.tex", "w")
-    of.write(r.print_tree_latex())
-    of.close()
-    of = open("old_dl_blr_opt.pickle", "w")
-    of.write(pickle.dumps(r))
-    of.close()
+    #make_latex("old_dl")
+    #Categorize.Categorization.output_path = output_path + "/old_dl_blr_opt"
+    #os.mkdir(Categorize.Categorization.output_path)
+    #r = split_leaves_by_BLR(trees["old_dl"], disc="mem_DL_0w2h2t")
+    #of = open("old_dl_blr_opt.tex", "w")
+    #of.write(r.print_tree_latex())
+    #of.close()
+    #of = open("old_dl_blr_opt.pickle", "w")
+    #of.write(pickle.dumps(r))
+    #of.close()
 
     #r = Categorize.CategorizationFromString(trees["old_2t_blr_A"])
     #r.axes = Categorize.Categorization.axes

@@ -75,6 +75,13 @@ int main(int argc, const char** argv) {
     ResultMap results;
 
     cout << "Looping over events [" << conf.firstEntry << "," << conf.firstEntry+conf.numEntries << ")" << endl;
+
+    if (conf.recalculateBTagWeight) {
+        TPython::Exec("import os");
+        TPython::Exec("from PhysicsTools.Heppy.physicsutils.BTagWeightCalculator import BTagWeightCalculator");
+        TPython::Exec("csvpath = os.environ['CMSSW_BASE']+'/src/PhysicsTools/Heppy/data'");
+        TPython::Exec("bweightcalc = BTagWeightCalculator(csvpath + '/csv_rwt_fit_hf_2015_11_20.root', csvpath + '/csv_rwt_fit_lf_2015_11_20.root')");
+    }
     TStopwatch timer;
     timer.Start();
 
@@ -95,8 +102,8 @@ int main(int argc, const char** argv) {
 
         const unordered_map<SystematicKey::SystematicKey, Event, std::hash<int> > systmap = {
             {SystematicKey::nominal, EventFactory::makeNominal(data, conf)},
-            {SystematicKey::CMS_scale_jUp, EventFactory::makeJESUp(data, conf)},
-            {SystematicKey::CMS_scale_jDown, EventFactory::makeJESDown(data, conf)}
+            //{SystematicKey::CMS_scale_jUp, EventFactory::makeJESUp(data, conf)},
+            //{SystematicKey::CMS_scale_jDown, EventFactory::makeJESDown(data, conf)}
         };
 
         for (auto& kvSyst : systmap) {
