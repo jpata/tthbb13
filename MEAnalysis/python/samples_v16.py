@@ -6969,7 +6969,8 @@ samples_dict = {'ttHTobb_M125_13TeV_powheg_pythia8': cms.PSet(
     name = cms.string('ttHToNonbb_M125_13TeV_powheg_pythia8'),
     nickname = cms.string('ttHToNonbb_M125_13TeV_powheg_pythia8'),
     skip = cms.bool(False),
-    subFiles = cms.vstring('/store/user/jpata/VHBBHeppyV16pre/ttHToNonbb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V16pre_ttHToNonbb_M125_13TeV_powheg_pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/151116_205342/0000/tree_10.root', 
+    subFiles = cms.vstring(
+        '/store/user/jpata/VHBBHeppyV16pre/ttHToNonbb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V16pre_ttHToNonbb_M125_13TeV_powheg_pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/151116_205342/0000/tree_10.root', 
         '/store/user/jpata/VHBBHeppyV16pre/ttHToNonbb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V16pre_ttHToNonbb_M125_13TeV_powheg_pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/151116_205342/0000/tree_11.root', 
         '/store/user/jpata/VHBBHeppyV16pre/ttHToNonbb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V16pre_ttHToNonbb_M125_13TeV_powheg_pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/151116_205342/0000/tree_12.root', 
         '/store/user/jpata/VHBBHeppyV16pre/ttHToNonbb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V16pre_ttHToNonbb_M125_13TeV_powheg_pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/151116_205342/0000/tree_13.root', 

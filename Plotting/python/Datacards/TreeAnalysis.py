@@ -18,7 +18,7 @@ import pickle, os
 ########################################
 
 #ControlPlotsSparse_2015_10_15_withBLR.root
-input_file = "ControlPlotsSparseTesting.root"
+input_file = "ControlPlotsSparseJan20ntp.root"
 output_path = "/scratch/joosep/test/"
 #input_file = "/dev/shm/joosep/ControlPlotsSparse_corr.root"
 #output_path = "/dev/shm/joosep/categorization2/"
@@ -191,9 +191,9 @@ if __name__ == "__main__":
     #of.write(r.print_tree_latex())
     #of.close()
     make_latex("old")
-    make_latex("old_bdt")
-    make_latex("old_bdt_mem")
-    make_latex("old_bdt_mem_blrsplit")
+    #make_latex("old_bdt")
+    #make_latex("old_bdt_mem")
+    #make_latex("old_bdt_mem_blrsplit")
     #make_latex("old_blrsplit_B")
     #make_latex("old_blrsplit_B_bdt")
     #make_latex("old_bdtsplit_A")

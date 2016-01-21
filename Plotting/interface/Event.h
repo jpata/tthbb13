@@ -142,7 +142,6 @@ public:
     vector<SparseAxis> sparseAxes;
     vector<vector<CategoryKey::CategoryKey>> enabledCategories;
     bool recalculateBTagWeight;
-    bool useEvenOnly;
 
     Configuration(
         vector<string>& _filenames,
@@ -166,8 +165,7 @@ public:
         outputFile(_outputFile),
         sparseAxes(_sparseAxes),
         enabledCategories(_enabledCategories),
-        recalculateBTagWeight(true),
-        useEvenOnly(true)
+        recalculateBTagWeight(true)
     {
     }
     static const Configuration makeConfiguration(JsonValue& value);
