@@ -86,6 +86,7 @@ class Categorization(object):
         self.children = []
         self.cut = cut
         self.discriminator_axis = discriminator_axis
+        self.rebin_discriminator = 0
         self.iteration_results = []
     # Allow directly accessing the children
     def __getitem__(self, key):
@@ -180,7 +181,6 @@ class Categorization(object):
         child_fail = Categorization(Cut(axis_name, leftmost_of_right_bins, rightmost_of_right_bins), 
                                     parent = self,
                                     discriminator_axis = discriminator_axis_child_1)
-
 
         self.children = [child_pass, child_fail]
         
@@ -376,7 +376,22 @@ class Categorization(object):
         self.prepare_nominal_thns()        
         S = sum([x.Projection(0).Integral() for x in self.h_sig.values()])
         B = sum([x.Projection(0).Integral() for x in self.h_bkg.values()])
+                
         return S,B
+
+
+    def get_sb_entries(self):
+        """ Get the effective signal and background entries after applying
+        the cuts (+ancestors) for all the associated THNs.
+
+        Return a tuple of numbers: signal and background counts
+        """
+
+        self.prepare_nominal_thns()        
+        S_entries = sum([x.Projection(0).GetEntries() for x in self.h_sig.values()])
+        B_entries = sum([x.Projection(0).GetEntries() for x in self.h_bkg.values()])
+                
+        return S_entries, B_entries
 
 
     def get_leaves(self, ignore_splittings=False):
@@ -471,6 +486,7 @@ class Categorization(object):
                 if c: # this is just to handle the ROOT node
                     # And restirct the axis range
                     thn.GetAxis(c.iaxis).SetRange(c.lo, c.hi)
+                                        
         # End of loop over histograms
 
 
@@ -527,6 +543,8 @@ class Categorization(object):
                 axis = self.axes[axis_name]
                 print "Preparing axis", axis_name
 
+                min_eff_entries_per_bin = 40
+
                 # Loop over bins on the axis
                 # (ROOT Histogram bin counting starts at 1)
                 for split_bin in range(1, axis.nbins):
@@ -534,9 +552,18 @@ class Categorization(object):
                     # Loop over all leaves - these are the categories that we
                     # could split further
                     for ileaf, leaf in enumerate(self.get_leaves()):
+
+                        # Can we split this leave at all?
+                        entries_sig, entries_bkg   = leaf.get_sb_entries()
+                        if min(entries_sig, entries_bkg) < 2*min_eff_entries_per_bin:
+                            print "Do not attempt to split", leaf, entries_sig, entries_bkg
+                            continue
+                            
+
                             
                         for idisc1, discriminator_axis_for_child_0 in enumerate(getattr(leaf, "disc_axes_child_left", discriminator_axes)):
                             for idisc2, discriminator_axis_for_child_1 in enumerate(getattr(leaf, "disc_axes_child_right", discriminator_axes)):
+                                
 
                                 # The split function executes the split
                                 # If it failed (return value of -1) - for example because the requested range is already excluded
@@ -546,8 +573,18 @@ class Categorization(object):
                                            discriminator_axis_for_child_0,
                                            discriminator_axis_for_child_1)==-1:
                                     continue
-                        
+
                                 splitting_name = "iter_{0}_leaf_{1}_bin_{2}_dl_{3}_dr_{4}".format(i_iter, ileaf, split_bin, idisc1, idisc2)
+                        
+                                # Make sure we have sufficient stat power in both children
+                                entries_sig_child_left, entries_bkg_child_left   = leaf.children[0].get_sb_entries()
+                                entries_sig_child_right, entries_bkg_child_right = leaf.children[1].get_sb_entries()
+                                if min(entries_sig_child_left, entries_bkg_child_left, entries_sig_child_right, entries_bkg_child_right) < min_eff_entries_per_bin:
+                                    print "Vetoing", splitting_name, "due to insufficient stats!", entries_sig_child_left, entries_bkg_child_left, entries_sig_child_right, entries_bkg_child_right
+                                    leaf.merge()
+                                    continue
+                                
+
 
                                 control_plots_filename = "{0}/ControlPlots_{1}.root".format(self.output_path, splitting_name)
                                 shapes_txt_filename    = "{0}/shapes_{1}.txt".format(self.output_path, splitting_name)
@@ -744,7 +781,9 @@ class Categorization(object):
                 if self.allhists.has_key(k):
                     h = self.allhists[k]
                 else:
-                    h = thn.Projection(self.axes.keys().index(leaf.discriminator_axis), "E")
+                    h = thn.Projection(self.axes.keys().index(leaf.discriminator_axis), "E")                    
+                    if leaf.rebin_discriminator:
+                        h.Rebin(leaf.rebin_discriminator)                    
                     h.SetName(hname)
                     self.allhists[k] = h.Clone()
 
@@ -772,6 +811,8 @@ class Categorization(object):
                         h = self.allhists[k]
                     else:
                         h = thn.Projection(self.axes.keys().index(leaf.discriminator_axis), "E")
+                        if leaf.rebin_discriminator:
+                            h.Rebin(leaf.rebin_discriminator)                    
                         h.SetName(hname)
                         self.allhists[k] = h.Clone()
                     dirs[outdir_str].append(h)
@@ -860,7 +901,7 @@ def CategorizationFromString(string):
         # remove the first character - it's usually a space (we count
         # the depth by how indented the line is and one space is extra
         # offset)
-        line = line[1:]
+        line = line[1:].rstrip()
         depth = line.count("   ")
 
         # Now split by spaces, if nothing remains, ignore this line
@@ -883,8 +924,16 @@ def CategorizationFromString(string):
         if discriminator == "None":
             discriminator = None
 
+        # If we also have a rebinning prescription
+        if len(line_atoms) > 2:            
+            rebin = int(line_atoms[2].split("=")[1])
+        else:
+            rebin = 0
+        
         # Build the cut object from the string
         cut = Cut(cut_string)
+
+        print depth, cut
 
         # Here the real fun starts
         # - if the depth icreased by one, we do a splitting
@@ -903,8 +952,9 @@ def CategorizationFromString(string):
                 last_node = last_node.parent
             last_node = last_node.parent[1]
             last_depth = depth
-        last_node.discriminator_axis = discriminator
-            
+        last_node.discriminator_axis = discriminator            
+        last_node.rebin_discriminator = rebin
+
     # End of loop over lines
     
     return r
