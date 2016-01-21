@@ -142,6 +142,7 @@ public:
     vector<SparseAxis> sparseAxes;
     vector<vector<CategoryKey::CategoryKey>> enabledCategories;
     bool recalculateBTagWeight;
+    bool useEvenOnly;
 
     Configuration(
         vector<string>& _filenames,
@@ -165,7 +166,8 @@ public:
         outputFile(_outputFile),
         sparseAxes(_sparseAxes),
         enabledCategories(_enabledCategories),
-        recalculateBTagWeight(true)
+        recalculateBTagWeight(true),
+        useEvenOnly(true)
     {
     }
     static const Configuration makeConfiguration(JsonValue& value);
@@ -229,7 +231,7 @@ public:
     double common_bdt;
 
     //btag weights
-    double bTagWeight;
+    map<SystematicKey::SystematicKey, double> bTagWeights;
 
     //btag likelihood
     double btag_LR_4b_2b;
@@ -276,7 +278,7 @@ public:
         double _mem_DL_0w2h2t,
         double _tth_mva,
         double _common_bdt,
-        double _bTagWeight,
+        map<SystematicKey::SystematicKey, double> _bTagWeights,
         double _btag_LR_4b_2b,
         int _n_excluded_bjets,
         int _n_excluded_ljets,
@@ -467,7 +469,7 @@ namespace BaseCuts {
 bool isMC(ProcessKey::ProcessKey proc);
 bool isSignalMC(ProcessKey::ProcessKey proc);
 bool isData(ProcessKey::ProcessKey proc);
-double process_weight(ProcessKey::ProcessKey proc);
+double process_weight(ProcessKey::ProcessKey procm, const Configuration& conf);
 
 //Checks if this category, specified by a list of keys, was enabled in the JSON
 bool isCategoryEnabled(const Configuration& conf, const vector<CategoryKey::CategoryKey>& catKeys);

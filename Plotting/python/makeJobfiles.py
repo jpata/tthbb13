@@ -9,6 +9,9 @@ def chunks(l, n):
     for i in xrange(0, len(l), n):
         yield l[i:i+n]
 
+nbins_mem = 36
+nbins_bdt = 40
+
 ijob = 0
 for samp in Samples.samples_dict.keys():
     s = Samples.samples_dict[samp]
@@ -36,40 +39,46 @@ for samp in Samples.samples_dict.keys():
                     "nBins": 1 
                 },
                 {
+                    "func": "eventParity",
+                    "xMin": 0,
+                    "xMax": 2,
+                    "nBins": 2 
+                },
+                {
                     "func": "mem_SL_2w2h2t",
                     "xMin": 0,
                     "xMax": 1,
-                    "nBins": 12
+                    "nBins": nbins_mem 
                 },
                 {
                     "func": "mem_SL_2w2h2t_sj",
                     "xMin": 0,
                     "xMax": 1,
-                    "nBins": 12
+                    "nBins": nbins_mem
                 },
                 {
                     "func": "mem_SL_0w2h2t",
                     "xMin": 0,
                     "xMax": 1,
-                    "nBins": 12
+                    "nBins": nbins_mem
                 },
                 {
                     "func": "mem_DL_0w2h2t",
                     "xMin": 0,
                     "xMax": 1,
-                    "nBins": 12
+                    "nBins": nbins_mem
                 },
                 {
                     "func": "tth_mva",
                     "xMin": 0,
                     "xMax": 1,
-                    "nBins": 12
+                    "nBins": nbins_bdt
                 },
                 {
                     "func": "common_bdt",
                     "xMin": -1,
                     "xMax": 1,
-                    "nBins": 12
+                    "nBins": nbins_bdt
                 },
                 {
                     "func": "numJets",

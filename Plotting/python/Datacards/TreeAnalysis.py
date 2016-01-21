@@ -18,7 +18,7 @@ import pickle, os
 ########################################
 
 #ControlPlotsSparse_2015_10_15_withBLR.root
-input_file = "ControlPlotsSparse.root"
+input_file = "ControlPlotsSparseTesting.root"
 output_path = "/scratch/joosep/test/"
 #input_file = "/dev/shm/joosep/ControlPlotsSparse_corr.root"
 #output_path = "/dev/shm/joosep/categorization2/"
@@ -165,7 +165,7 @@ if __name__ == "__main__":
     
     Categorize.Categorization.output_path = output_path
     Categorize.Categorization.pool = Pool(n_proc)
-    Categorize.Categorization.do_stat_variations = False
+    Categorize.Categorization.do_stat_variations = True
     Categorize.Categorization.lg = LimitGetter(output_path)
     
     #SL
@@ -190,12 +190,13 @@ if __name__ == "__main__":
     #of = open("old_opt.tex", "w")
     #of.write(r.print_tree_latex())
     #of.close()
-    #make_latex("old_bdt")
-    #make_latex("old_bdt_mem")
-    #make_latex("old_bdt_mem_blrsplit")
+    make_latex("old")
+    make_latex("old_bdt")
+    make_latex("old_bdt_mem")
+    make_latex("old_bdt_mem_blrsplit")
     #make_latex("old_blrsplit_B")
     #make_latex("old_blrsplit_B_bdt")
-    make_latex("old_bdtsplit_A")
+    #make_latex("old_bdtsplit_A")
     #make_latex("old_bdtsplit_B")
   
     ##DL
