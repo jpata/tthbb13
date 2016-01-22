@@ -67,6 +67,13 @@ trees["old_parity"] = """
                  nBCSVM__3__4 Discr=mem_SL_0w2h2t
               nBCSVM__4__8 Discr=mem_SL_0w2h2t
 """
+# 'sl_j4_t3': 2.0,
+# 'sl_j4_t4': 7.4,
+# 'sl_j5_t3': 2.9,
+# 'sl_j5_tge4': 7.4,
+# 'sl_jge6_t2': 0.2,
+# 'sl_jge6_t3': 3.8,
+# 'sl_jge6_tge4': 7.4
 
 # Result of running leaf optimization using BLR and counting on 7 category old tree
 trees["old_blrsplit"] = """
@@ -75,31 +82,31 @@ trees["old_blrsplit"] = """
        nBCSVM__1__4 Discr=mem_SL_0w2h2t
           nBCSVM__1__3 Discr=None
           nBCSVM__3__4 Discr=mem_SL_0w2h2t
-             btag_LR_4b_2b_logit__m20_0__7_2 Discr=mem_SL_0w2h2t
-             btag_LR_4b_2b_logit__7_2__20_0 Discr=mem_SL_0w2h2t
+             btag_LR_4b_2b_logit__m20_0__1_6 Discr=mem_SL_0w2h2t
+             btag_LR_4b_2b_logit__1_6__20_0 Discr=mem_SL_0w2h2t
        nBCSVM__4__5 Discr=mem_SL_0w2h2t
-          btag_LR_4b_2b_logit__m20_0__6_4 Discr=mem_SL_0w2h2t
-          btag_LR_4b_2b_logit__6_4__20_0 Discr=mem_SL_0w2h2t
+          btag_LR_4b_2b_logit__m20_0__7_2 Discr=mem_SL_0w2h2t
+          btag_LR_4b_2b_logit__7_2__20_0 Discr=mem_SL_0w2h2t
     numJets__5__7 Discr=mem_SL_0w2h2t
        numJets__5__6 Discr=mem_SL_0w2h2t
           nBCSVM__1__4 Discr=mem_SL_0w2h2t
              nBCSVM__1__3 Discr=None
              nBCSVM__3__4 Discr=mem_SL_0w2h2t
-                btag_LR_4b_2b_logit__m20_0__5_6 Discr=mem_SL_0w2h2t
-                btag_LR_4b_2b_logit__5_6__20_0 Discr=mem_SL_0w2h2t
+                btag_LR_4b_2b_logit__m20_0__3_2 Discr=mem_SL_0w2h2t
+                btag_LR_4b_2b_logit__3_2__20_0 Discr=mem_SL_0w2h2t
           nBCSVM__4__5 Discr=mem_SL_0w2h2t
-             btag_LR_4b_2b_logit__m20_0__8_8 Discr=mem_SL_0w2h2t
-             btag_LR_4b_2b_logit__8_8__20_0 Discr=mem_SL_0w2h2t
+             btag_LR_4b_2b_logit__m20_0__7_2 Discr=mem_SL_0w2h2t
+             btag_LR_4b_2b_logit__7_2__20_0 Discr=mem_SL_0w2h2t
        numJets__6__7 Discr=mem_SL_0w2h2t
           nBCSVM__1__4 Discr=mem_SL_0w2h2t
              nBCSVM__1__3 Discr=mem_SL_0w2h2t
                 nBCSVM__1__2 Discr=None
                 nBCSVM__2__3 Discr=mem_SL_0w2h2t
-                   btag_LR_4b_2b_logit__m20_0__m18_4 Discr=counting
-                   btag_LR_4b_2b_logit__m18_4__20_0 Discr=mem_SL_0w2h2t
+                   btag_LR_4b_2b_logit__m20_0__0_0 Discr=counting
+                   btag_LR_4b_2b_logit__0_0__20_0 Discr=mem_SL_0w2h2t
              nBCSVM__3__4 Discr=mem_SL_0w2h2t
-                btag_LR_4b_2b_logit__m20_0__5_6 Discr=mem_SL_0w2h2t
-                btag_LR_4b_2b_logit__5_6__20_0 Discr=mem_SL_0w2h2t
+                btag_LR_4b_2b_logit__m20_0__4_0 Discr=mem_SL_0w2h2t
+                btag_LR_4b_2b_logit__4_0__20_0 Discr=mem_SL_0w2h2t
           nBCSVM__4__5 Discr=mem_SL_0w2h2t
              btag_LR_4b_2b_logit__m20_0__7_2 Discr=mem_SL_0w2h2t
              btag_LR_4b_2b_logit__7_2__20_0 Discr=mem_SL_0w2h2t
@@ -929,15 +936,6 @@ trees["old_2t_blr_J"] = """
              btag_LR_4b_2b_logit__9_6__20_0 Discr=mem_SL_0w2h2t
 """
 
-
-
-#trees["old"] = """
-#  Discr=mem_SL_0w2h2t
-#    numJets__4__5 Discr=mem_SL_0w2h2t 
-#       nBCSVM__3__4 Discr=mem_SL_0w2h2t
-#       nBCSVM__4__5 Discr=mem_SL_0w2h2t
-#"""
-
 trees["old_dl"] = """
   Discr=mem_DL_0w2h2t
      nBCSVM__2__3 Discr=mem_DL_0w2h2t
@@ -952,6 +950,65 @@ trees["old_dl"] = """
         nBCSVM__4__6 Discr=mem_DL_0w2h2t
            numJets__1__4 Discr=None
            numJets__4__6 Discr=mem_DL_0w2h2t
+"""
+
+#'dl_j3_t2': -1.3,
+# 'dl_jge3_tge3': 3.8,
+# 'dl_jge4_t2': -0.7,
+# 'dl_jge4_tge4': 7.7,
+
+trees["old_dl_blrsplit"] = """
+  Discr=mem_DL_0w2h2t
+     nBCSVM__2__3 Discr=mem_DL_0w2h2t
+        numJets__2__3 Discr=None
+        numJets__3__6 Discr=mem_DL_0w2h2t
+           numJets__3__4 Discr=mem_DL_0w2h2t
+              btag_LR_4b_2b_logit__m20_0__m1_6 Discr=mem_DL_0w2h2t
+              btag_LR_4b_2b_logit__m1_6__20_0 Discr=mem_DL_0w2h2t
+           numJets__4__6 Discr=mem_DL_0w2h2t
+              btag_LR_4b_2b_logit__m20_0__m0_8 Discr=mem_DL_0w2h2t
+              btag_LR_4b_2b_logit__m0_8__20_0 Discr=mem_DL_0w2h2t
+     nBCSVM__3__6 Discr=mem_DL_0w2h2t
+        nBCSVM__3__4 Discr=mem_DL_0w2h2t
+           numJets__2__3 Discr=None
+           numJets__3__6 Discr=mem_DL_0w2h2t
+              btag_LR_4b_2b_logit__m20_0__4_0 Discr=mem_DL_0w2h2t
+              btag_LR_4b_2b_logit__4_0__20_0 Discr=mem_DL_0w2h2t
+        nBCSVM__4__6 Discr=mem_DL_0w2h2t
+           numJets__1__4 Discr=None
+           numJets__4__6 Discr=mem_DL_0w2h2t
+             btag_LR_4b_2b_logit__m20_0__8_0 Discr=mem_DL_0w2h2t
+              btag_LR_4b_2b_logit__8_0__20_0 Discr=mem_DL_0w2h2t
+"""
+
+trees["old_dl_parity"] = """
+  Discr=mem_DL_0w2h2t
+     eventParity__0__1 Discr=mem_SL_0w2h2t
+        nBCSVM__2__3 Discr=mem_DL_0w2h2t
+           numJets__2__3 Discr=None
+           numJets__3__6 Discr=mem_DL_0w2h2t
+              numJets__3__4 Discr=mem_DL_0w2h2t
+              numJets__4__6 Discr=mem_DL_0w2h2t
+        nBCSVM__3__6 Discr=mem_DL_0w2h2t
+           nBCSVM__3__4 Discr=mem_DL_0w2h2t
+              numJets__2__3 Discr=None
+              numJets__3__6 Discr=mem_DL_0w2h2t
+           nBCSVM__4__6 Discr=mem_DL_0w2h2t
+              numJets__1__4 Discr=None
+              numJets__4__6 Discr=mem_DL_0w2h2t
+     eventParity__1__2 Discr=mem_SL_0w2h2t
+        nBCSVM__2__3 Discr=mem_DL_0w2h2t
+           numJets__2__3 Discr=None
+           numJets__3__6 Discr=mem_DL_0w2h2t
+              numJets__3__4 Discr=mem_DL_0w2h2t
+              numJets__4__6 Discr=mem_DL_0w2h2t
+        nBCSVM__3__6 Discr=mem_DL_0w2h2t
+           nBCSVM__3__4 Discr=mem_DL_0w2h2t
+              numJets__2__3 Discr=None
+              numJets__3__6 Discr=mem_DL_0w2h2t
+           nBCSVM__4__6 Discr=mem_DL_0w2h2t
+              numJets__1__4 Discr=None
+              numJets__4__6 Discr=mem_DL_0w2h2t
 """
 
 

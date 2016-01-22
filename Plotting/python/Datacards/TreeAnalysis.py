@@ -192,9 +192,10 @@ if __name__ == "__main__":
     #of.close()
     Categorize.Categorization.scaling = 0.5
     make_latex("old")
-    Categorize.Categorization.scaling = 1.0
-    make_latex("old_parity")
-    make_latex("old_bdt")
+    make_latex("old_blrsplit")
+    #Categorize.Categorization.scaling = 1.0
+    #make_latex("old_parity")
+    #make_latex("old_bdt")
     #make_latex("old_bdt_mem")
     #make_latex("old_bdt_mem_blrsplit")
     #make_latex("old_blrsplit_B")
@@ -202,23 +203,27 @@ if __name__ == "__main__":
     #make_latex("old_bdtsplit_A")
     #make_latex("old_bdtsplit_B")
   
-    ##DL
-    #h_dl = Categorize.GetSparseHistograms(
-    #    input_file,
-    #    signals,
-    #    backgrounds,
-    #    "dl"
-    #)
-    #axes = Categorize.GetAxes(h_dl[0]["ttH_hbb"])
+    #DL
+    h_dl = Categorize.GetSparseHistograms(
+        input_file,
+        signals,
+        backgrounds,
+        "dl"
+    )
+    axes = Categorize.GetAxes(h_dl[0]["ttH_hbb"])
 
-    #Cut.axes = axes
-    #Categorize.Categorization.axes = axes
-    #Categorize.Categorization.h_sig = h_dl[0]
-    #Categorize.Categorization.h_bkg = h_dl[1]
-    #Categorize.Categorization.h_sig_sys = h_dl[2]
-    #Categorize.Categorization.h_bkg_sys = h_dl[3]
-
-    #make_latex("old_dl")
+    Cut.axes = axes
+    Categorize.Categorization.axes = axes
+    Categorize.Categorization.h_sig = h_dl[0]
+    Categorize.Categorization.h_bkg = h_dl[1]
+    Categorize.Categorization.h_sig_sys = h_dl[2]
+    Categorize.Categorization.h_bkg_sys = h_dl[3]
+    
+    Categorize.Categorization.scaling = 0.5
+    make_latex("old_dl")
+    make_latex("old_dl_blrsplit")
+    Categorize.Categorization.scaling = 1.0
+    make_latex("old_dl_parity")
     #Categorize.Categorization.output_path = output_path + "/old_dl_blr_opt"
     #os.mkdir(Categorize.Categorization.output_path)
     #r = split_leaves_by_BLR(trees["old_dl"], disc="mem_DL_0w2h2t")
