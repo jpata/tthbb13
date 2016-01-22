@@ -431,7 +431,7 @@ double nominal_weight(const Event& ev, const Configuration& conf) {
 double process_weight(ProcessKey::ProcessKey proc, const Configuration& conf) {
 
     //FIXME: weight is 2 because we always want to split on even/odd event number
-    w = 2.0;
+    double w = 2.0;
 
     switch(proc) {
         case ProcessKey::ttbarPlusBBbar:

@@ -190,8 +190,11 @@ if __name__ == "__main__":
     #of = open("old_opt.tex", "w")
     #of.write(r.print_tree_latex())
     #of.close()
+    Categorize.Categorization.scaling = 0.5
     make_latex("old")
-    #make_latex("old_bdt")
+    Categorize.Categorization.scaling = 1.0
+    make_latex("old_parity")
+    make_latex("old_bdt")
     #make_latex("old_bdt_mem")
     #make_latex("old_bdt_mem_blrsplit")
     #make_latex("old_blrsplit_B")
