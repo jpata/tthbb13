@@ -79,6 +79,9 @@ class Categorization(object):
     leaf_files = {}
     event_counts = {}
 
+    #scale all histograms by this factor
+    scaling = 1.0
+
 
     def __init__(self, cut, parent=None, discriminator_axis=0):
         """ Create a new node """        
@@ -330,7 +333,7 @@ class Categorization(object):
                 thn = self.h_bkg[k]
             
             yields[k] = thn.Projection(self.axes.keys().index(projection_axis)).Integral()
-
+            yields[k] = yields[k] * self.scaling
         return yields
                         
         
@@ -375,8 +378,10 @@ class Categorization(object):
 
         self.prepare_nominal_thns()        
         S = sum([x.Projection(0).Integral() for x in self.h_sig.values()])
-        B = sum([x.Projection(0).Integral() for x in self.h_bkg.values()])
-                
+        S = S * self.scaling
+        B = sum([x.Projection(0).Integral() for x in self.h_bkg.values()])        
+        B = B * self.scaling
+
         return S,B
 
 
@@ -782,8 +787,10 @@ class Categorization(object):
                     h = self.allhists[k]
                 else:
                     h = thn.Projection(self.axes.keys().index(leaf.discriminator_axis), "E")                    
+                    h.Scale(self.scaling) 
                     if leaf.rebin_discriminator:
                         h.Rebin(leaf.rebin_discriminator)                    
+
                     h.SetName(hname)
                     self.allhists[k] = h.Clone()
 
@@ -811,8 +818,10 @@ class Categorization(object):
                         h = self.allhists[k]
                     else:
                         h = thn.Projection(self.axes.keys().index(leaf.discriminator_axis), "E")
+                        h.Scale(self.scaling) 
                         if leaf.rebin_discriminator:
                             h.Rebin(leaf.rebin_discriminator)                    
+
                         h.SetName(hname)
                         self.allhists[k] = h.Clone()
                     dirs[outdir_str].append(h)

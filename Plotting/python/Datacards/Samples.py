@@ -12,7 +12,7 @@ elif "pata-macbook" in hostname:
 #Tallinn
 elif "quasar" in hostname:
     #path = "/dev/shm/joosep/"
-    path = "/scratch/joosep/Dec20_commonclassifier/"
+    path = "/scratch/joosep/Jan18_fixbdt/"
 elif "hep.kbfi.ee" in hostname:
     path = "/home/joosep/tth/gc/"
 else:
