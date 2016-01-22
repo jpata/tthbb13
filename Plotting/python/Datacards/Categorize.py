@@ -535,6 +535,8 @@ class Categorization(object):
 
         # Start by calculating the limit without splitting
         last_limit = self.eval_limit("whole")[0][2]
+
+        min_eff_entries_per_bin = 40
         
         for i_iter in range(n):
             print "Doing iteration", i_iter
@@ -542,28 +544,27 @@ class Categorization(object):
             splittings = {}
             i_splitting = 0
 
-            # Loop over axes
-            for axis_name in cut_axes:
-                
-                axis = self.axes[axis_name]
-                print "Preparing axis", axis_name
 
-                min_eff_entries_per_bin = 40
+            # Loop over all leaves - these are the categories that we
+            # could split further
+            for ileaf, leaf in enumerate(self.get_leaves()):
 
-                # Loop over bins on the axis
-                # (ROOT Histogram bin counting starts at 1)
-                for split_bin in range(1, axis.nbins):
+                # Can we split this leave at all?
+                entries_sig, entries_bkg   = leaf.get_sb_entries()
+                if min(entries_sig, entries_bkg) < 2*min_eff_entries_per_bin:
+                    print "Do not attempt to split", leaf, entries_sig, entries_bkg
+                    continue
 
-                    # Loop over all leaves - these are the categories that we
-                    # could split further
-                    for ileaf, leaf in enumerate(self.get_leaves()):
 
-                        # Can we split this leave at all?
-                        entries_sig, entries_bkg   = leaf.get_sb_entries()
-                        if min(entries_sig, entries_bkg) < 2*min_eff_entries_per_bin:
-                            print "Do not attempt to split", leaf, entries_sig, entries_bkg
-                            continue
-                            
+                # Loop over axes
+                for axis_name in cut_axes:
+
+                    axis = self.axes[axis_name]
+                    #print "Preparing axis", axis_name
+
+                    # Loop over bins on the axis
+                    # (ROOT Histogram bin counting starts at 1)
+                    for split_bin in range(1, axis.nbins):
 
                             
                         for idisc1, discriminator_axis_for_child_0 in enumerate(getattr(leaf, "disc_axes_child_left", discriminator_axes)):
@@ -621,6 +622,11 @@ class Categorization(object):
                 # End of loop over histogram bins
             # End of loop over axes
 
+            if len(splittings) == 0:
+                print "NO MORE SPLITTINGS POSSIBLE!"
+                print self.print_tree(verbose=True)
+                break
+            
             # Extract a list todo and pass them to the limit calculation
             li_splittings = splittings.keys()
             print "evaluating limit over {0} trials".format(len(li_splittings))
