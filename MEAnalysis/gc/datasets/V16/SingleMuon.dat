@@ -1,6 +1,16 @@
 [SingleMuon]
 /store/user/jpata/VHBBHeppyV16pre/SingleMuon/VHBB_HEPPY_V16pre_SingleMuon__Run2015C-PromptReco-v1/151121_224348/0000/tree_194.root = 0
 /store/user/jpata/VHBBHeppyV16pre/SingleMuon/VHBB_HEPPY_V16pre_SingleMuon__Run2015C-PromptReco-v1/151121_224348/0000/tree_219.root = 0
+/store/user/jpata/VHBBHeppyV16pre/SingleMuon/VHBB_HEPPY_V16pre_SingleMuon__Run2015D-05Oct2015-v1/151121_175428/0000/tree_1.root = 8931
+/store/user/jpata/VHBBHeppyV16pre/SingleMuon/VHBB_HEPPY_V16pre_SingleMuon__Run2015D-05Oct2015-v1/151121_175428/0000/tree_10.root = 8931
+/store/user/jpata/VHBBHeppyV16pre/SingleMuon/VHBB_HEPPY_V16pre_SingleMuon__Run2015D-05Oct2015-v1/151121_175428/0000/tree_2.root = 8931
+/store/user/jpata/VHBBHeppyV16pre/SingleMuon/VHBB_HEPPY_V16pre_SingleMuon__Run2015D-05Oct2015-v1/151121_175428/0000/tree_3.root = 8931
+/store/user/jpata/VHBBHeppyV16pre/SingleMuon/VHBB_HEPPY_V16pre_SingleMuon__Run2015D-05Oct2015-v1/151121_175428/0000/tree_4.root = 8931
+/store/user/jpata/VHBBHeppyV16pre/SingleMuon/VHBB_HEPPY_V16pre_SingleMuon__Run2015D-05Oct2015-v1/151121_175428/0000/tree_5.root = 8931
+/store/user/jpata/VHBBHeppyV16pre/SingleMuon/VHBB_HEPPY_V16pre_SingleMuon__Run2015D-05Oct2015-v1/151121_175428/0000/tree_6.root = 8931
+/store/user/jpata/VHBBHeppyV16pre/SingleMuon/VHBB_HEPPY_V16pre_SingleMuon__Run2015D-05Oct2015-v1/151121_175428/0000/tree_7.root = 8931
+/store/user/jpata/VHBBHeppyV16pre/SingleMuon/VHBB_HEPPY_V16pre_SingleMuon__Run2015D-05Oct2015-v1/151121_175428/0000/tree_8.root = 8931
+/store/user/jpata/VHBBHeppyV16pre/SingleMuon/VHBB_HEPPY_V16pre_SingleMuon__Run2015D-05Oct2015-v1/151121_175428/0000/tree_9.root = 8931
 /store/user/jpata/VHBBHeppyV16pre/SingleMuon/VHBB_HEPPY_V16pre_SingleMuon__Run2015D-05Oct2015-v1/151121_225415/0000/tree_1.root = 9906
 /store/user/jpata/VHBBHeppyV16pre/SingleMuon/VHBB_HEPPY_V16pre_SingleMuon__Run2015D-05Oct2015-v1/151121_225415/0000/tree_10.root = 9314
 /store/user/jpata/VHBBHeppyV16pre/SingleMuon/VHBB_HEPPY_V16pre_SingleMuon__Run2015D-05Oct2015-v1/151121_225415/0000/tree_100.root = 8536
@@ -728,7 +738,6 @@
 /store/user/jpata/VHBBHeppyV16pre/SingleMuon/VHBB_HEPPY_V16pre_SingleMuon__Run2015D-05Oct2015-v1/151121_225415/0000/tree_97.root = 8240
 /store/user/jpata/VHBBHeppyV16pre/SingleMuon/VHBB_HEPPY_V16pre_SingleMuon__Run2015D-05Oct2015-v1/151121_225415/0000/tree_98.root = 7808
 /store/user/jpata/VHBBHeppyV16pre/SingleMuon/VHBB_HEPPY_V16pre_SingleMuon__Run2015D-05Oct2015-v1/151121_225415/0000/tree_99.root = 8496
-/store/user/jpata/VHBBHeppyV16pre/SingleMuon/VHBB_HEPPY_V16pre_SingleMuon__Run2015D-PromptReco-v4/151119_213530/0000/tree_392.root = 0
 /store/user/jpata/VHBBHeppyV16pre/SingleMuon/VHBB_HEPPY_V16pre_SingleMuon__Run2015D-PromptReco-v4/151121_225513/0000/tree_1.root = 19975
 /store/user/jpata/VHBBHeppyV16pre/SingleMuon/VHBB_HEPPY_V16pre_SingleMuon__Run2015D-PromptReco-v4/151121_225513/0000/tree_10.root = 20679
 /store/user/jpata/VHBBHeppyV16pre/SingleMuon/VHBB_HEPPY_V16pre_SingleMuon__Run2015D-PromptReco-v4/151121_225513/0000/tree_100.root = 19617

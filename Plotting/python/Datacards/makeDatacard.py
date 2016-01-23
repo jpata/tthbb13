@@ -142,7 +142,11 @@ def MakeDatacard2(
         for leaf in leaves:
             if leaf.discriminator_axis is None:
                 continue
-            nbins = categorization.axes[leaf.discriminator_axis].nbins
+                        
+            hname = categorization.axes[leaf.discriminator_axis].name
+            k = (signal, leaf.__repr__(), hname) # Use signal process for bincounta                
+            nbins = categorization.allhists[k].GetNbinsX()
+
             dcard.addStatVariations(str(leaf), nbins)
 
     dcard.filenames_cat = infile_paths

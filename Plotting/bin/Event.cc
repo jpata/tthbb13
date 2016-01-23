@@ -59,6 +59,7 @@ std::vector<std::string> split(const std::string &s, char delim) {
 
 const map<string, function<float(const Event& ev)>> AxisFunctions = {
     {"counting", [](const Event& ev) { return 1;}},
+    {"eventParity", [](const Event& ev) { return ev.data->evt%2;}},
     {"mem_SL_0w2h2t", [](const Event& ev) { return ev.mem_SL_0w2h2t;}},
     {"mem_SL_2w2h2t", [](const Event& ev) { return ev.mem_SL_2w2h2t;}},
     {"mem_SL_2w2h2t_sj", [](const Event& ev) { return ev.mem_SL_2w2h2t_sj;}},
@@ -297,7 +298,7 @@ Event::Event(
     double _mem_DL_0w2h2t,
     double _tth_mva,
     double _common_bdt,
-    double _bTagWeight,
+    map<SystematicKey::SystematicKey, double> _bTagWeights,
     double _btag_LR_4b_2b,
     int _n_excluded_bjets,
     int _n_excluded_ljets,
@@ -334,7 +335,7 @@ Event::Event(
     mem_DL_0w2h2t(_mem_DL_0w2h2t),
     tth_mva(_tth_mva),
     common_bdt(_common_bdt),
-    bTagWeight(_bTagWeight),
+    bTagWeights(_bTagWeights),
     btag_LR_4b_2b(_btag_LR_4b_2b),
     btag_LR_4b_2b_logit(log(_btag_LR_4b_2b / (1.0 - _btag_LR_4b_2b))),
     n_excluded_bjets(_n_excluded_bjets),
@@ -366,7 +367,6 @@ const string Event::to_string() const {
     for (auto& jet : this->jets) {
         ss << " j " << jet.to_string() << endl;
     }
-    ss << " bw=" << this->bTagWeight << endl;
     ss << ");" << endl;
     return ss.str();
 }
@@ -422,43 +422,141 @@ bool isSignalMC(ProcessKey::ProcessKey proc) {
 
 double nominal_weight(const Event& ev, const Configuration& conf) {
     if (isMC(conf.process)) {
-        return conf.lumi * ev.weight_xs * ev.puWeight * ev.bTagWeight * process_weight(conf.process);
+        return conf.lumi * ev.weight_xs * ev.puWeight * ev.bTagWeights.at(SystematicKey::nominal) * process_weight(conf.process, conf);
     }
     return 1.0;
 }
 
 ///FIXME: these ad-hoc process weights are here to fix a wrong value of nGen in processing
-double process_weight(ProcessKey::ProcessKey proc) {
+double process_weight(ProcessKey::ProcessKey proc, const Configuration& conf) {
+
+    //FIXME: weight is 2 because we always want to split on even/odd event number
+    double w = 2.0;
+
     switch(proc) {
         case ProcessKey::ttbarPlusBBbar:
         case ProcessKey::ttbarPlusB:
         case ProcessKey::ttbarPlus2B:
         case ProcessKey::ttbarPlusCCbar:
         case ProcessKey::ttbarOther:
-        //    return 39383772.0 / 19714839.0;
         case ProcessKey::ttH_hbb:
-        //    return 7596287.0 / 3930444.0;
         default:
-            return 1.0;
+            return w;
     }
+    return w;
+}
+
+const char* btag_syst_to_string(SystematicKey::SystematicKey syst) {
+    switch (syst) {
+        case SystematicKey::nominal:
+            return "nominal";
+        case SystematicKey::CMS_ttH_CSVcErr1Up:
+            return "cErr1Up";
+        case SystematicKey::CMS_ttH_CSVcErr1Down:
+            return "cErr1Down";
+        case SystematicKey::CMS_ttH_CSVcErr2Up:
+            return "cErr2Up";
+        case SystematicKey::CMS_ttH_CSVcErr2Down:
+            return "cErr2Down";
+        case SystematicKey::CMS_ttH_CSVLFUp:
+            return "LFUp";
+        case SystematicKey::CMS_ttH_CSVLFDown:
+            return "LFDown";
+        case SystematicKey::CMS_ttH_CSVHFUp:
+            return "HFUp";
+        case SystematicKey::CMS_ttH_CSVHFDown:
+            return "HFDown";
+        case SystematicKey::CMS_ttH_CSVLFStats1Up:
+            return "LFStats1Up";
+        case SystematicKey::CMS_ttH_CSVLFStats1Down:
+            return "LFStats1Down";
+        case SystematicKey::CMS_ttH_CSVLFStats2Up:
+            return "LFStats2Up";
+        case SystematicKey::CMS_ttH_CSVLFStats2Down:
+            return "LFStats2Down";
+        case SystematicKey::CMS_ttH_CSVHFStats1Up:
+            return "HFStats1Up";
+        case SystematicKey::CMS_ttH_CSVHFStats1Down:
+            return "HFStats1Down";
+        case SystematicKey::CMS_ttH_CSVHFStats2Up:
+            return "HFStats2Up";
+        case SystematicKey::CMS_ttH_CSVHFStats2Down:
+            return "HFStats2Down";
+        default:
+            return "none";
+    };
+}
+
+map<SystematicKey::SystematicKey, double> recalc_bweights(vector<Jet> jets) {
+    const auto btag_syst = { 
+        SystematicKey::nominal,
+        SystematicKey::CMS_ttH_CSVcErr1Up,
+        SystematicKey::CMS_ttH_CSVcErr1Down,
+        SystematicKey::CMS_ttH_CSVcErr2Up,
+        SystematicKey::CMS_ttH_CSVcErr2Down,
+        SystematicKey::CMS_ttH_CSVLFUp,
+        SystematicKey::CMS_ttH_CSVLFDown,
+        SystematicKey::CMS_ttH_CSVHFUp,
+        SystematicKey::CMS_ttH_CSVHFDown,
+        SystematicKey::CMS_ttH_CSVHFStats1Up,
+        SystematicKey::CMS_ttH_CSVHFStats1Down,
+        SystematicKey::CMS_ttH_CSVHFStats2Up,
+        SystematicKey::CMS_ttH_CSVHFStats2Down,
+        SystematicKey::CMS_ttH_CSVLFStats1Up,
+        SystematicKey::CMS_ttH_CSVLFStats1Down,
+        SystematicKey::CMS_ttH_CSVLFStats2Up,
+        SystematicKey::CMS_ttH_CSVLFStats2Down,
+    };
+
+    map<SystematicKey::SystematicKey, double> bweights;
+    for (auto k : btag_syst) {
+        bweights[k] = 1.0;
+    }
+
+    for (auto & jet : jets) {
+        for (auto syst : btag_syst) {
+            stringstream s;
+            s << "bweightcalc.calcJetWeightImpl("
+                << jet.p4.Pt() <<"," << std::abs(jet.p4.Eta())
+                << "," << jet.hadronFlavour
+                << "," << jet.btagCSV
+                << ",\"final\",\"" << btag_syst_to_string(syst) << "\")";
+            double ret = (double)(TPython::Eval(s.str().c_str()));
+            bweights[syst] *= ret;
+        }
+    }
+    return bweights;
+}
+
+map<SystematicKey::SystematicKey, double> get_bweights(const TreeData& data) {
+    map<SystematicKey::SystematicKey, double> bweight;
+    bweight[SystematicKey::nominal] = data.bTagWeight;
+    bweight[SystematicKey::CMS_ttH_CSVcErr1Up] = data.bTagWeight_cErr1Up;
+    bweight[SystematicKey::CMS_ttH_CSVcErr1Down] = data.bTagWeight_cErr1Down;
+    bweight[SystematicKey::CMS_ttH_CSVcErr2Up] =  data.bTagWeight_cErr2Up;
+    bweight[SystematicKey::CMS_ttH_CSVcErr2Down] =  data.bTagWeight_cErr2Down;
+    bweight[SystematicKey::CMS_ttH_CSVLFUp] =  data.bTagWeight_LFUp;
+    bweight[SystematicKey::CMS_ttH_CSVLFDown] =  data.bTagWeight_LFDown;
+    bweight[SystematicKey::CMS_ttH_CSVHFUp] =  data.bTagWeight_HFUp;
+    bweight[SystematicKey::CMS_ttH_CSVHFDown] =  data.bTagWeight_HFDown;
+    bweight[SystematicKey::CMS_ttH_CSVHFStats1Up] =  0.0;
+    bweight[SystematicKey::CMS_ttH_CSVHFStats1Down] =  0.0;
+    bweight[SystematicKey::CMS_ttH_CSVLFStats1Up] =  0.0;
+    bweight[SystematicKey::CMS_ttH_CSVLFStats1Down] =  0.0;
+    bweight[SystematicKey::CMS_ttH_CSVHFStats2Up] =  0.0;
+    bweight[SystematicKey::CMS_ttH_CSVHFStats2Down] =  0.0;
+    bweight[SystematicKey::CMS_ttH_CSVLFStats2Up] =  0.0;
+    bweight[SystematicKey::CMS_ttH_CSVLFStats2Down] =  0.0;
+    return bweight;
 }
 
 const Event EventFactory::makeNominal(const TreeData& data, const Configuration& conf) {
-    
     const vector<Jet> jets = makeAllJets(data, &(JetFactory::makeNominal));
     const vector<Lepton> leptons = makeAllLeptons(data);
-   
+    
+    auto bweights = get_bweights(data);
     if (conf.recalculateBTagWeight) {
-        double w = 1.0;
-        for (auto & jet : jets) {
-            stringstream s;
-            s << "bweightcalc.calcJetWeightImpl("
-                << jet.p4.Pt() <<"," << std::abs(jet.p4.Eta()) << "," << jet.hadronFlavour << "," << jet.btagCSV << ",\"final\",\"nominal\")";
-            double ret = (double)(TPython::Eval(s.str().c_str()));
-            w *= ret;
-        }
-        //data.bTagWeight = w;
-        //std::cout << jets.size() << " " << data.bTagWeight << " " << w << std::endl;
+        bweights = recalc_bweights(jets);
     }
 
     const Event ev(
@@ -480,7 +578,7 @@ const Event EventFactory::makeNominal(const TreeData& data, const Configuration&
         mem_p(data.mem_tth_p[1], data.mem_ttbb_p[1]), //DL 022,
         data.tth_mva,
         data.common_bdt,
-        data.bTagWeight,
+        bweights,
         data.btag_LR_4b_2b,
         data.n_excluded_bjets,
         data.n_excluded_ljets,
@@ -508,6 +606,10 @@ const Event EventFactory::makeJESUp(const TreeData& data, const Configuration& c
     const vector<Jet> jets = makeAllJets(data, &(JetFactory::makeJESUp));
     const vector<Lepton> leptons = makeAllLeptons(data);
 
+    auto bweights = get_bweights(data);
+    if (conf.recalculateBTagWeight) {
+        bweights = recalc_bweights(jets);
+    }
     return Event(
         &data,
         data.is_sl,
@@ -527,7 +629,7 @@ const Event EventFactory::makeJESUp(const TreeData& data, const Configuration& c
         mem_p(data.mem_tth_JESUp_p[1], data.mem_ttbb_JESUp_p[1]), //DL 022,
         data.tth_mva, 
         data.common_bdt_JESUp, 
-        data.bTagWeight,
+        bweights,
         data.btag_LR_4b_2b,
         data.n_excluded_bjets,
         data.n_excluded_ljets,
@@ -554,6 +656,10 @@ const Event EventFactory::makeJESDown(const TreeData& data, const Configuration&
     const vector<Jet> jets = makeAllJets(data, &(JetFactory::makeJESDown));
     const vector<Lepton> leptons = makeAllLeptons(data);
 
+    auto bweights = get_bweights(data);
+    if (conf.recalculateBTagWeight) {
+        bweights = recalc_bweights(jets);
+    }
     return Event(
         &data,
         data.is_sl,
@@ -573,7 +679,7 @@ const Event EventFactory::makeJESDown(const TreeData& data, const Configuration&
         mem_p(data.mem_tth_JESDown_p[1], data.mem_ttbb_JESDown_p[1]), //DL 022,
         data.tth_mva,
         data.common_bdt_JESDown,
-        data.bTagWeight,
+        bweights,
         data.btag_LR_4b_2b,
         data.n_excluded_bjets,
         data.n_excluded_ljets,

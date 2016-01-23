@@ -32,7 +32,6 @@ for sample_name, sample in samples_dict.items():
                 print("could not read tree", file=sys.stderr)
             else:
                 outfile.write("{0} = {1}\n".format(f, int(tt.GetEntries())))
-                print f, tt.GetEntries()    
                 hc = tf.Get("Count")
                 ngen += hc.GetBinContent(1)
                 
