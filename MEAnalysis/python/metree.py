@@ -72,13 +72,13 @@ bweightcalc.btag = "btagCSV"
 for syst in ["JES", "LF", "HF", "Stats1", "Stats2", "cErr1", "cErr2"]:
     for sdir in ["Up", "Down"]:
         jetType.variables += [NTupleVariable("bTagWeight"+syst+sdir,
-            lambda jet, sname=syst+sdir,bweightcalc=bweightcalc: bweightcalc.calcJetWeight(
-                jet, kind="final", systematic=sname
+            lambda jet, sname=syst+sdir,bweightcalc=bweightcalc: bweightcalc.calcJetWeightImpl(
+                jet.pt, jet.eta, jet.hadronFlavour, jet.btagCSV, kind="final", systematic=sname
             ), float, mcOnly=True, help="b-tag CSV weight, variating "+syst + " "+sdir
         )]
 jetType.variables += [NTupleVariable("bTagWeight",
-    lambda jet, bweightcalc=bweightcalc: bweightcalc.calcJetWeight(
-        jet, kind="final", systematic="nominal",
+    lambda jet, bweightcalc=bweightcalc: bweightcalc.calcJetWeightImpl(
+        jet.pt, jet.eta, jet.hadronFlavour, jet.btagCSV, kind="final", systematic="nominal",
     ), float, mcOnly=True, help="b-tag CSV weight, nominal"
 )]
 

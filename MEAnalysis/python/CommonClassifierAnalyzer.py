@@ -58,16 +58,13 @@ class CommonClassifierAnalyzer(FilterAnalyzer):
         met_p4.SetPtEtaPhiM(event.MET.pt, 0, event.MET.phi, 0)
         metP4s.push_back(met_p4)
 
-        event.common_mem = []
+        event.common_mem = [ROOT.MEMResult()]
         event.common_bdt = -2.0
         
-        if not event.pass_category_blr:
-            return event
-
         if event.category_string.startswith("sl_"):
             bdt = self.bdtcalc.GetBDTOutput(selectedLeptonP4, selectedJetsP4, selectedJetsCSV, looseJetsP4, looseJetsCSV, met_p4)
             event.common_bdt = bdt
-            mem = self.memcalc.GetOutput(selectedLeptonP4, selectedLeptonCharge, selectedJetsP4, selectedJetsCSV, looseJetsP4, looseJetsCSV, met_p4)
-            event.common_mem = [mem]
+            #mem = self.memcalc.GetOutput(selectedLeptonP4, selectedLeptonCharge, selectedJetsP4, selectedJetsCSV, looseJetsP4, looseJetsCSV, met_p4)
+            #event.common_mem = [mem]
 
         return event
