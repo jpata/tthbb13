@@ -466,14 +466,22 @@ const char* btag_syst_to_string(SystematicKey::SystematicKey syst) {
             return "HFUp";
         case SystematicKey::CMS_ttH_CSVHFDown:
             return "HFDown";
-        case SystematicKey::CMS_ttH_CSVStats1Up:
-            return "Stats1Up";
-        case SystematicKey::CMS_ttH_CSVStats1Down:
-            return "Stats1Down";
-        case SystematicKey::CMS_ttH_CSVStats2Up:
-            return "Stats2Up";
-        case SystematicKey::CMS_ttH_CSVStats2Down:
-            return "Stats2Down";
+        case SystematicKey::CMS_ttH_CSVLFStats1Up:
+            return "LFStats1Up";
+        case SystematicKey::CMS_ttH_CSVLFStats1Down:
+            return "LFStats1Down";
+        case SystematicKey::CMS_ttH_CSVLFStats2Up:
+            return "LFStats2Up";
+        case SystematicKey::CMS_ttH_CSVLFStats2Down:
+            return "LFStats2Down";
+        case SystematicKey::CMS_ttH_CSVHFStats1Up:
+            return "HFStats1Up";
+        case SystematicKey::CMS_ttH_CSVHFStats1Down:
+            return "HFStats1Down";
+        case SystematicKey::CMS_ttH_CSVHFStats2Up:
+            return "HFStats2Up";
+        case SystematicKey::CMS_ttH_CSVHFStats2Down:
+            return "HFStats2Down";
         default:
             return "none";
     };
@@ -490,10 +498,14 @@ map<SystematicKey::SystematicKey, double> recalc_bweights(vector<Jet> jets) {
         SystematicKey::CMS_ttH_CSVLFDown,
         SystematicKey::CMS_ttH_CSVHFUp,
         SystematicKey::CMS_ttH_CSVHFDown,
-        SystematicKey::CMS_ttH_CSVStats1Up,
-        SystematicKey::CMS_ttH_CSVStats1Down,
-        SystematicKey::CMS_ttH_CSVStats2Up,
-        SystematicKey::CMS_ttH_CSVStats2Down,
+        SystematicKey::CMS_ttH_CSVHFStats1Up,
+        SystematicKey::CMS_ttH_CSVHFStats1Down,
+        SystematicKey::CMS_ttH_CSVHFStats2Up,
+        SystematicKey::CMS_ttH_CSVHFStats2Down,
+        SystematicKey::CMS_ttH_CSVLFStats1Up,
+        SystematicKey::CMS_ttH_CSVLFStats1Down,
+        SystematicKey::CMS_ttH_CSVLFStats2Up,
+        SystematicKey::CMS_ttH_CSVLFStats2Down,
     };
 
     map<SystematicKey::SystematicKey, double> bweights;
@@ -527,10 +539,14 @@ map<SystematicKey::SystematicKey, double> get_bweights(const TreeData& data) {
     bweight[SystematicKey::CMS_ttH_CSVLFDown] =  data.bTagWeight_LFDown;
     bweight[SystematicKey::CMS_ttH_CSVHFUp] =  data.bTagWeight_HFUp;
     bweight[SystematicKey::CMS_ttH_CSVHFDown] =  data.bTagWeight_HFDown;
-    bweight[SystematicKey::CMS_ttH_CSVStats1Up] =  data.bTagWeight_Stats1Up;
-    bweight[SystematicKey::CMS_ttH_CSVStats1Down] =  data.bTagWeight_Stats1Down;
-    bweight[SystematicKey::CMS_ttH_CSVStats2Up] =  data.bTagWeight_Stats2Up;
-    bweight[SystematicKey::CMS_ttH_CSVStats2Down] =  data.bTagWeight_Stats2Down;
+    bweight[SystematicKey::CMS_ttH_CSVHFStats1Up] =  0.0;
+    bweight[SystematicKey::CMS_ttH_CSVHFStats1Down] =  0.0;
+    bweight[SystematicKey::CMS_ttH_CSVLFStats1Up] =  0.0;
+    bweight[SystematicKey::CMS_ttH_CSVLFStats1Down] =  0.0;
+    bweight[SystematicKey::CMS_ttH_CSVHFStats2Up] =  0.0;
+    bweight[SystematicKey::CMS_ttH_CSVHFStats2Down] =  0.0;
+    bweight[SystematicKey::CMS_ttH_CSVLFStats2Up] =  0.0;
+    bweight[SystematicKey::CMS_ttH_CSVLFStats2Down] =  0.0;
     return bweight;
 }
 

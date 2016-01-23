@@ -185,7 +185,6 @@ if __name__ == "__main__":
     Categorize.Categorization.h_sig_sys = h_sl[2]
     Categorize.Categorization.h_bkg_sys = h_sl[3]
 
-    #make_latex("old")
     #ret = run_opt("old", 5, ["common_bdt", "btag_LR_4b_2b_logit"], ["common_bdt", "mem_SL_0w2h2t"])
     #of = open("old_opt.tex", "w")
     #of.write(r.print_tree_latex())
@@ -196,6 +195,7 @@ if __name__ == "__main__":
     #Categorize.Categorization.scaling = 1.0
     #make_latex("old_parity")
     #make_latex("old_bdt")
+    #make_latex("old_blrsplit_mem_bdt_parity")
     #make_latex("old_bdt_mem")
     #make_latex("old_bdt_mem_blrsplit")
     #make_latex("old_blrsplit_B")
@@ -219,11 +219,11 @@ if __name__ == "__main__":
     Categorize.Categorization.h_sig_sys = h_dl[2]
     Categorize.Categorization.h_bkg_sys = h_dl[3]
     
-    Categorize.Categorization.scaling = 0.5
-    make_latex("old_dl")
-    make_latex("old_dl_blrsplit")
-    Categorize.Categorization.scaling = 1.0
-    make_latex("old_dl_parity")
+    #Categorize.Categorization.scaling = 0.5
+    #make_latex("old_dl")
+    #make_latex("old_dl_blrsplit")
+    #Categorize.Categorization.scaling = 1.0
+    #make_latex("old_dl_parity")
     #Categorize.Categorization.output_path = output_path + "/old_dl_blr_opt"
     #os.mkdir(Categorize.Categorization.output_path)
     #r = split_leaves_by_BLR(trees["old_dl"], disc="mem_DL_0w2h2t")
