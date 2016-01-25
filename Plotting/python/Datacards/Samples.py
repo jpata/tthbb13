@@ -13,6 +13,7 @@ elif "pata-macbook" in hostname:
 elif "quasar" in hostname:
     #path = "/dev/shm/joosep/"
     path = "/scratch/joosep/Jan18_fixbdt/"
+    path2 = "/scratch/joosep/Jan25_bigtt/"
 elif "hep.kbfi.ee" in hostname:
     path = "/home/joosep/tth/gc/"
 else:
@@ -57,27 +58,27 @@ samples_dict = {
     ),
     "ttbarPlus2B": Sample(
         "ttbarPlus2B", 
-        [path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_tt2b.root"],
+        [path2 + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_tt2b.root"],
         "",
     ),
     "ttbarPlusB": Sample(
         "ttbarPlusB", 
-        [path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttb.root"],
+        [path2 + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttb.root"],
         "",
     ),
     "ttbarPlusBBbar": Sample(
         "ttbarPlusBBbar", 
-        [path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttbb.root"],
+        [path2 + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttbb.root"],
         "",
     ),
     "ttbarPlusCCbar": Sample(
         "ttbarPlusCCbar", 
-        [path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttcc.root"],
+        [path2 + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttcc.root"],
         "",
     ),
     "ttbarOther": Sample(
         "ttbarOther", 
-        [path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttll.root"],
+        [path2 + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttll.root"],
         "",
     ),
 }
