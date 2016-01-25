@@ -5,6 +5,150 @@ trees = {}
 # Based on jet and tagged jet multiplicity
 # 7 categories
 
+trees["6j_ge3t"] = """
+  Discr=counting
+     eventParity__0__1 Discr=None
+     eventParity__1__2 Discr=counting
+        numJets__4__5 Discr=None
+        numJets__5__8 Discr=counting
+           numJets__5__6 Discr=None
+           numJets__6__8 Discr=counting
+              nBCSVM__1__3 Discr=None
+              nBCSVM__3__8 Discr=counting
+"""
+
+trees["6j_ge3t_test1"] = """
+  Discr=counting
+     eventParity__0__1 Discr=None
+     eventParity__1__2 Discr=counting
+        numJets__4__5 Discr=None
+        numJets__5__8 Discr=counting
+           numJets__5__6 Discr=None
+           numJets__6__8 Discr=counting
+              nBCSVM__1__3 Discr=None
+              nBCSVM__3__8 Discr=counting
+                 mem_SL_0w2h2t__0_0__0_444444444444 Discr=counting
+                    mem_SL_0w2h2t__0_0__0_222222222222 Discr=counting
+                       btag_LR_4b_2b_logit__m20_0__7_2 Discr=counting
+                       btag_LR_4b_2b_logit__7_2__20_0 Discr=counting
+                    mem_SL_0w2h2t__0_222222222222__0_444444444444 Discr=counting
+                       btag_LR_4b_2b_logit__m20_0__6_4 Discr=counting
+                       btag_LR_4b_2b_logit__6_4__20_0 Discr=counting
+                 mem_SL_0w2h2t__0_444444444444__1_0 Discr=counting
+                    mem_SL_0w2h2t__0_444444444444__0_722222222222 Discr=counting
+                       btag_LR_4b_2b_logit__m20_0__5_6 Discr=counting
+                       btag_LR_4b_2b_logit__5_6__20_0 Discr=counting
+                    mem_SL_0w2h2t__0_722222222222__1_0 Discr=counting
+"""
+
+trees["6j_ge3t_test2"] = """
+  Discr=counting
+     eventParity__0__1 Discr=counting
+        numJets__3__5 Discr=None
+        numJets__5__7 Discr=counting
+           numJets__5__6 Discr=None
+           numJets__6__7 Discr=counting
+              nBCSVM__1__3 Discr=None
+              nBCSVM__3__5 Discr=counting
+                 mem_SL_0w2h2t__0_0__0_444444444444 Discr=counting
+                    mem_SL_0w2h2t__0_0__0_222222222222 Discr=counting
+                       btag_LR_4b_2b_logit__m20_0__7_2 Discr=counting
+                          mem_SL_0w2h2t__0_0__0_166666666667 Discr=counting
+                             btag_LR_4b_2b_logit__m20_0__4_0 Discr=counting
+                                btag_LR_4b_2b_logit__m20_0__2_4 Discr=counting
+                                   btag_LR_4b_2b_logit__m20_0__1_6 Discr=counting
+                                   btag_LR_4b_2b_logit__1_6__2_4 Discr=counting
+                                btag_LR_4b_2b_logit__2_4__4_0 Discr=counting
+                                   btag_LR_4b_2b_logit__2_4__3_2 Discr=counting
+                                   btag_LR_4b_2b_logit__3_2__4_0 Discr=counting
+                             btag_LR_4b_2b_logit__4_0__7_2 Discr=counting
+                                mem_SL_0w2h2t__0_0__0_0555555555556 Discr=counting
+                                   btag_LR_4b_2b_logit__4_0__5_6 Discr=counting
+                                      btag_LR_4b_2b_logit__4_0__4_8 Discr=counting
+                                      btag_LR_4b_2b_logit__4_8__5_6 Discr=counting
+                                   btag_LR_4b_2b_logit__5_6__7_2 Discr=counting
+                                mem_SL_0w2h2t__0_0555555555556__0_166666666667 Discr=counting
+                                   mem_SL_0w2h2t__0_0555555555556__0_111111111111 Discr=counting
+                                   mem_SL_0w2h2t__0_111111111111__0_166666666667 Discr=counting
+                          mem_SL_0w2h2t__0_166666666667__0_222222222222 Discr=counting
+                       btag_LR_4b_2b_logit__7_2__20_0 Discr=counting
+                    mem_SL_0w2h2t__0_222222222222__0_444444444444 Discr=counting
+                       btag_LR_4b_2b_logit__m20_0__6_4 Discr=counting
+                          mem_SL_0w2h2t__0_222222222222__0_333333333333 Discr=counting
+                             btag_LR_4b_2b_logit__m20_0__4_8 Discr=counting
+                             btag_LR_4b_2b_logit__4_8__6_4 Discr=counting
+                          mem_SL_0w2h2t__0_333333333333__0_444444444444 Discr=counting
+                             btag_LR_4b_2b_logit__m20_0__4_8 Discr=counting
+                             btag_LR_4b_2b_logit__4_8__6_4 Discr=counting
+                       btag_LR_4b_2b_logit__6_4__20_0 Discr=counting
+                 mem_SL_0w2h2t__0_444444444444__1_0 Discr=counting
+                    mem_SL_0w2h2t__0_444444444444__0_722222222222 Discr=counting
+                       btag_LR_4b_2b_logit__m20_0__5_6 Discr=counting
+                          btag_LR_4b_2b_logit__m20_0__4_8 Discr=counting
+                             mem_SL_0w2h2t__0_444444444444__0_638888888889 Discr=counting
+                                mem_SL_0w2h2t__0_444444444444__0_555555555556 Discr=counting
+                                mem_SL_0w2h2t__0_555555555556__0_638888888889 Discr=counting
+                             mem_SL_0w2h2t__0_638888888889__0_722222222222 Discr=counting
+                          btag_LR_4b_2b_logit__4_8__5_6 Discr=counting
+                       btag_LR_4b_2b_logit__5_6__20_0 Discr=counting
+                          mem_SL_0w2h2t__0_444444444444__0_611111111111 Discr=counting
+                          mem_SL_0w2h2t__0_611111111111__0_722222222222 Discr=counting
+                    mem_SL_0w2h2t__0_722222222222__1_0 Discr=counting
+     eventParity__1__2 Discr=counting
+        numJets__3__5 Discr=None
+        numJets__5__7 Discr=counting
+           numJets__5__6 Discr=None
+           numJets__6__7 Discr=counting
+              nBCSVM__1__3 Discr=None
+              nBCSVM__3__5 Discr=counting
+                 mem_SL_0w2h2t__0_0__0_444444444444 Discr=counting
+                    mem_SL_0w2h2t__0_0__0_222222222222 Discr=counting
+                       btag_LR_4b_2b_logit__m20_0__7_2 Discr=counting
+                          mem_SL_0w2h2t__0_0__0_166666666667 Discr=counting
+                             btag_LR_4b_2b_logit__m20_0__4_0 Discr=counting
+                                btag_LR_4b_2b_logit__m20_0__2_4 Discr=counting
+                                   btag_LR_4b_2b_logit__m20_0__1_6 Discr=counting
+                                   btag_LR_4b_2b_logit__1_6__2_4 Discr=counting
+                                btag_LR_4b_2b_logit__2_4__4_0 Discr=counting
+                                   btag_LR_4b_2b_logit__2_4__3_2 Discr=counting
+                                   btag_LR_4b_2b_logit__3_2__4_0 Discr=counting
+                             btag_LR_4b_2b_logit__4_0__7_2 Discr=counting
+                                mem_SL_0w2h2t__0_0__0_0555555555556 Discr=counting
+                                   btag_LR_4b_2b_logit__4_0__5_6 Discr=counting
+                                      btag_LR_4b_2b_logit__4_0__4_8 Discr=counting
+                                      btag_LR_4b_2b_logit__4_8__5_6 Discr=counting
+                                   btag_LR_4b_2b_logit__5_6__7_2 Discr=counting
+                                mem_SL_0w2h2t__0_0555555555556__0_166666666667 Discr=counting
+                                   mem_SL_0w2h2t__0_0555555555556__0_111111111111 Discr=counting
+                                   mem_SL_0w2h2t__0_111111111111__0_166666666667 Discr=counting
+                          mem_SL_0w2h2t__0_166666666667__0_222222222222 Discr=counting
+                       btag_LR_4b_2b_logit__7_2__20_0 Discr=counting
+                    mem_SL_0w2h2t__0_222222222222__0_444444444444 Discr=counting
+                       btag_LR_4b_2b_logit__m20_0__6_4 Discr=counting
+                          mem_SL_0w2h2t__0_222222222222__0_333333333333 Discr=counting
+                             btag_LR_4b_2b_logit__m20_0__4_8 Discr=counting
+                             btag_LR_4b_2b_logit__4_8__6_4 Discr=counting
+                          mem_SL_0w2h2t__0_333333333333__0_444444444444 Discr=counting
+                             btag_LR_4b_2b_logit__m20_0__4_8 Discr=counting
+                             btag_LR_4b_2b_logit__4_8__6_4 Discr=counting
+                       btag_LR_4b_2b_logit__6_4__20_0 Discr=counting
+                 mem_SL_0w2h2t__0_444444444444__1_0 Discr=counting
+                    mem_SL_0w2h2t__0_444444444444__0_722222222222 Discr=counting
+                       btag_LR_4b_2b_logit__m20_0__5_6 Discr=counting
+                          btag_LR_4b_2b_logit__m20_0__4_8 Discr=counting
+                             mem_SL_0w2h2t__0_444444444444__0_638888888889 Discr=counting
+                                mem_SL_0w2h2t__0_444444444444__0_555555555556 Discr=counting
+                                mem_SL_0w2h2t__0_555555555556__0_638888888889 Discr=counting
+                             mem_SL_0w2h2t__0_638888888889__0_722222222222 Discr=counting
+                          btag_LR_4b_2b_logit__4_8__5_6 Discr=counting
+                       btag_LR_4b_2b_logit__5_6__20_0 Discr=counting
+                          mem_SL_0w2h2t__0_444444444444__0_611111111111 Discr=counting
+                          mem_SL_0w2h2t__0_611111111111__0_722222222222 Discr=counting
+                    mem_SL_0w2h2t__0_722222222222__1_0 Discr=counting
+""" 
+
+
+
 trees["old"] = """
   Discr=mem_SL_0w2h2t
      numJets__4__5 Discr=mem_SL_0w2h2t 
@@ -17,7 +161,7 @@ trees["old"] = """
            nBCSVM__2__4 Discr=mem_SL_0w2h2t
               nBCSVM__2__3 Discr=None
               nBCSVM__3__4 Discr=mem_SL_0w2h2t
-           nBCSVM__4__5 Discr=mem_SL_0w2h2t
+           nBCSVM__4__5 Discr=mem_SL_0w2h2tCa
         numJets__6__8 Discr=mem_SL_0w2h2t
            nBCSVM__1__4 Discr=mem_SL_0w2h2t
               nBCSVM__1__3 Discr=mem_SL_0w2h2t
@@ -26,6 +170,255 @@ trees["old"] = """
               nBCSVM__3__4 Discr=mem_SL_0w2h2t
            nBCSVM__4__8 Discr=mem_SL_0w2h2t
 """
+
+
+trees["old_mem_bdt2d"] = """
+  Discr=mem_SL_0w2h2t
+     eventParity__0__1 Discr=mem_SL_0w2h2t 
+        numJets__4__5 Discr=mem_SL_0w2h2t 
+           nBCSVM__2__4 Discr=mem_SL_0w2h2t
+              nBCSVM__2__3 Discr=None
+              nBCSVM__3__4 Discr=mem_SL_0w2h2t rebin=4
+                 common_bdt__m1_0__0_2 Discr=mem_SL_0w2h2t rebin=4
+                 common_bdt__0_2__1_0 Discr=mem_SL_0w2h2t rebin=4
+           nBCSVM__4__5 Discr=mem_SL_0w2h2t rebin=6
+              common_bdt__m1_0__0_2 Discr=mem_SL_0w2h2t rebin=6
+              common_bdt__0_2__1_0 Discr=mem_SL_0w2h2t rebin=6
+        numJets__5__8 Discr=mem_SL_0w2h2t 
+           numJets__5__6 Discr=mem_SL_0w2h2t
+              nBCSVM__2__4 Discr=mem_SL_0w2h2t
+                 nBCSVM__2__3 Discr=None
+                 nBCSVM__3__4 Discr=mem_SL_0w2h2t rebin=4
+                    common_bdt__m1_0__0_15 Discr=mem_SL_0w2h2t rebin=4
+                    common_bdt__0_15__1_0 Discr=mem_SL_0w2h2t rebin=4
+              nBCSVM__4__5 Discr=mem_SL_0w2h2t rebin=6
+                 common_bdt__m1_0__0_2 Discr=mem_SL_0w2h2t rebin=6
+                 common_bdt__0_2__1_0 Discr=mem_SL_0w2h2t rebin=6
+           numJets__6__8 Discr=mem_SL_0w2h2t
+              nBCSVM__1__4 Discr=mem_SL_0w2h2t
+                 nBCSVM__1__3 Discr=mem_SL_0w2h2t
+                    nBCSVM__1__2 Discr=None
+                    nBCSVM__2__3 Discr=mem_SL_0w2h2t rebin=4
+                       common_bdt__m1_0__0_1 Discr=mem_SL_0w2h2t rebin=4
+                       common_bdt__0_1__1_0 Discr=mem_SL_0w2h2t rebin=4
+                 nBCSVM__3__4 Discr=mem_SL_0w2h2t rebin=4
+                    common_bdt__m1_0__0_1 Discr=mem_SL_0w2h2t rebin=4
+                    common_bdt__0_1__1_0 Discr=mem_SL_0w2h2t rebin=4
+              nBCSVM__4__8 Discr=mem_SL_0w2h2t rebin=6
+                 common_bdt__m1_0__0_1 Discr=mem_SL_0w2h2t rebin=6
+                 common_bdt__0_1__1_0 Discr=mem_SL_0w2h2t rebin=6
+     eventParity__1__2 Discr=counting
+        numJets__4__5 Discr=mem_SL_0w2h2t 
+           nBCSVM__2__4 Discr=mem_SL_0w2h2t
+              nBCSVM__2__3 Discr=None
+              nBCSVM__3__4 Discr=mem_SL_0w2h2t rebin=4
+                 common_bdt__m1_0__0_2 Discr=mem_SL_0w2h2t rebin=4
+                 common_bdt__0_2__1_0 Discr=mem_SL_0w2h2t rebin=4
+           nBCSVM__4__5 Discr=mem_SL_0w2h2t rebin=6
+              common_bdt__m1_0__0_2 Discr=mem_SL_0w2h2t rebin=6
+              common_bdt__0_2__1_0 Discr=mem_SL_0w2h2t rebin=6
+        numJets__5__8 Discr=mem_SL_0w2h2t 
+           numJets__5__6 Discr=mem_SL_0w2h2t
+              nBCSVM__2__4 Discr=mem_SL_0w2h2t
+                 nBCSVM__2__3 Discr=None
+                 nBCSVM__3__4 Discr=mem_SL_0w2h2t rebin=4
+                    common_bdt__m1_0__0_15 Discr=mem_SL_0w2h2t rebin=4
+                    common_bdt__0_15__1_0 Discr=mem_SL_0w2h2t rebin=4
+              nBCSVM__4__5 Discr=mem_SL_0w2h2t rebin=6
+                 common_bdt__m1_0__0_2 Discr=mem_SL_0w2h2t rebin=6
+                 common_bdt__0_2__1_0 Discr=mem_SL_0w2h2t rebin=6
+           numJets__6__8 Discr=mem_SL_0w2h2t
+              nBCSVM__1__4 Discr=mem_SL_0w2h2t
+                 nBCSVM__1__3 Discr=mem_SL_0w2h2t
+                    nBCSVM__1__2 Discr=None
+                    nBCSVM__2__3 Discr=mem_SL_0w2h2t rebin=4
+                       common_bdt__m1_0__0_1 Discr=mem_SL_0w2h2t rebin=4
+                       common_bdt__0_1__1_0 Discr=mem_SL_0w2h2t rebin=4
+                 nBCSVM__3__4 Discr=mem_SL_0w2h2t rebin=4
+                    common_bdt__m1_0__0_1 Discr=mem_SL_0w2h2t rebin=4
+                    common_bdt__0_1__1_0 Discr=mem_SL_0w2h2t rebin=4
+              nBCSVM__4__8 Discr=mem_SL_0w2h2t rebin=6
+                 common_bdt__m1_0__0_1 Discr=mem_SL_0w2h2t rebin=6
+                 common_bdt__0_1__1_0 Discr=mem_SL_0w2h2t rebin=6
+"""
+
+trees["old_mem_bdt2d_v2"] = """
+  Discr=mem_SL_0w2h2t
+     eventParity__0__1 Discr=mem_SL_0w2h2t 
+        numJets__4__5 Discr=mem_SL_0w2h2t 
+           nBCSVM__2__4 Discr=mem_SL_0w2h2t
+              nBCSVM__2__3 Discr=None
+              nBCSVM__3__4 Discr=mem_SL_0w2h2t rebin=4
+                 common_bdt__m1_0__0_2 Discr=common_bdt rebin=2
+                 common_bdt__0_2__1_0 Discr=mem_SL_0w2h2t rebin=4
+           nBCSVM__4__5 Discr=mem_SL_0w2h2t rebin=6
+              common_bdt__m1_0__0_2 Discr=common_bdt rebin=4
+              common_bdt__0_2__1_0 Discr=mem_SL_0w2h2t rebin=6
+        numJets__5__8 Discr=mem_SL_0w2h2t 
+           numJets__5__6 Discr=mem_SL_0w2h2t
+              nBCSVM__2__4 Discr=mem_SL_0w2h2t
+                 nBCSVM__2__3 Discr=None
+                 nBCSVM__3__4 Discr=mem_SL_0w2h2t rebin=4
+                    common_bdt__m1_0__0_2 Discr=common_bdt rebin=2
+                    common_bdt__0_2__1_0 Discr=mem_SL_0w2h2t rebin=4
+              nBCSVM__4__5 Discr=mem_SL_0w2h2t rebin=6
+                 common_bdt__m1_0__0_2 Discr=common_bdt rebin=4
+                 common_bdt__0_2__1_0 Discr=mem_SL_0w2h2t rebin=6
+           numJets__6__8 Discr=mem_SL_0w2h2t
+              nBCSVM__1__4 Discr=mem_SL_0w2h2t
+                 nBCSVM__1__3 Discr=mem_SL_0w2h2t
+                    nBCSVM__1__2 Discr=None
+                    nBCSVM__2__3 Discr=mem_SL_0w2h2t rebin=4
+                       common_bdt__m1_0__0_1 Discr=common_bdt rebin=2
+                       common_bdt__0_1__1_0 Discr=mem_SL_0w2h2t rebin=4
+                 nBCSVM__3__4 Discr=mem_SL_0w2h2t rebin=4
+                    common_bdt__m1_0__0_1 Discr=common_bdt rebin=2
+                    common_bdt__0_1__1_0 Discr=mem_SL_0w2h2t rebin=4
+              nBCSVM__4__8 Discr=mem_SL_0w2h2t rebin=6
+                 common_bdt__m1_0__0_0 Discr=common_bdt rebin=4
+                 common_bdt__0_0__1_0 Discr=mem_SL_0w2h2t rebin=6
+     eventParity__1__2 Discr=counting
+        numJets__4__5 Discr=mem_SL_0w2h2t
+           nBCSVM__2__4 Discr=mem_SL_0w2h2t
+              nBCSVM__2__3 Discr=None
+              nBCSVM__3__4 Discr=mem_SL_0w2h2t rebin=4
+                 common_bdt__m1_0__0_2 Discr=common_bdt rebin=2
+                 common_bdt__0_2__1_0 Discr=mem_SL_0w2h2t rebin=4
+           nBCSVM__4__5 Discr=mem_SL_0w2h2t rebin=6
+              common_bdt__m1_0__0_2 Discr=common_bdt rebin=4
+              common_bdt__0_2__1_0 Discr=mem_SL_0w2h2t rebin=6
+        numJets__5__8 Discr=mem_SL_0w2h2t 
+           numJets__5__6 Discr=mem_SL_0w2h2t
+              nBCSVM__2__4 Discr=mem_SL_0w2h2t
+                 nBCSVM__2__3 Discr=None
+                 nBCSVM__3__4 Discr=mem_SL_0w2h2t rebin=4
+                    common_bdt__m1_0__0_2 Discr=common_bdt rebin=2
+                    common_bdt__0_2__1_0 Discr=mem_SL_0w2h2t rebin=4
+              nBCSVM__4__5 Discr=mem_SL_0w2h2t rebin=6
+                 common_bdt__m1_0__0_2 Discr=common_bdt rebin=4
+                 common_bdt__0_2__1_0 Discr=mem_SL_0w2h2t rebin=6
+           numJets__6__8 Discr=mem_SL_0w2h2t
+              nBCSVM__1__4 Discr=mem_SL_0w2h2t
+                 nBCSVM__1__3 Discr=mem_SL_0w2h2t
+                    nBCSVM__1__2 Discr=None
+                    nBCSVM__2__3 Discr=mem_SL_0w2h2t rebin=4
+                       common_bdt__m1_0__0_1 Discr=common_bdt rebin=2
+                       common_bdt__0_1__1_0 Discr=mem_SL_0w2h2t rebin=4
+                 nBCSVM__3__4 Discr=mem_SL_0w2h2t rebin=4
+                    common_bdt__m1_0__0_1 Discr=common_bdt rebin=2
+                    common_bdt__0_1__1_0 Discr=mem_SL_0w2h2t rebin=4
+              nBCSVM__4__8 Discr=mem_SL_0w2h2t rebin=6
+                 common_bdt__m1_0__0_0 Discr=common_bdt rebin=4
+                 common_bdt__0_0__1_0 Discr=mem_SL_0w2h2t rebin=6
+"""
+
+trees["old_rebin"] = """
+  Discr=mem_SL_0w2h2t
+     numJets__4__5 Discr=mem_SL_0w2h2t 
+        nBCSVM__2__4 Discr=mem_SL_0w2h2t
+           nBCSVM__2__3 Discr=None
+           nBCSVM__3__4 Discr=mem_SL_0w2h2t rebin=2
+        nBCSVM__4__5 Discr=mem_SL_0w2h2t rebin=4
+     numJets__5__8 Discr=mem_SL_0w2h2t
+        numJets__5__6 Discr=mem_SL_0w2h2t
+           nBCSVM__2__4 Discr=mem_SL_0w2h2t
+              nBCSVM__2__3 Discr=None
+              nBCSVM__3__4 Discr=mem_SL_0w2h2t rebin=2
+           nBCSVM__4__5 Discr=mem_SL_0w2h2t rebin=4
+        numJets__6__8 Discr=mem_SL_0w2h2t
+           nBCSVM__1__4 Discr=mem_SL_0w2h2t
+              nBCSVM__1__3 Discr=mem_SL_0w2h2t
+                 nBCSVM__1__2 Discr=None
+                 nBCSVM__2__3 Discr=mem_SL_0w2h2t rebin=2
+              nBCSVM__3__4 Discr=mem_SL_0w2h2t rebin=2
+           nBCSVM__4__8 Discr=mem_SL_0w2h2t rebin=6
+"""
+
+trees["old_rebin_parity"] = """
+  Discr=mem_SL_0w2h2t
+     eventParity__0__1 Discr=mem_SL_0w2h2t
+        numJets__4__5 Discr=mem_SL_0w2h2t 
+           nBCSVM__2__4 Discr=mem_SL_0w2h2t
+              nBCSVM__2__3 Discr=None
+              nBCSVM__3__4 Discr=mem_SL_0w2h2t rebin=2
+           nBCSVM__4__5 Discr=mem_SL_0w2h2t rebin=4
+        numJets__5__8 Discr=mem_SL_0w2h2t
+           numJets__5__6 Discr=mem_SL_0w2h2t
+              nBCSVM__2__4 Discr=mem_SL_0w2h2t
+                 nBCSVM__2__3 Discr=None
+                 nBCSVM__3__4 Discr=mem_SL_0w2h2t rebin=2
+              nBCSVM__4__5 Discr=mem_SL_0w2h2t rebin=4
+           numJets__6__8 Discr=mem_SL_0w2h2t
+              nBCSVM__1__4 Discr=mem_SL_0w2h2t
+                 nBCSVM__1__3 Discr=mem_SL_0w2h2t
+                    nBCSVM__1__2 Discr=None
+                    nBCSVM__2__3 Discr=mem_SL_0w2h2t rebin=2
+                 nBCSVM__3__4 Discr=mem_SL_0w2h2t rebin=2
+              nBCSVM__4__8 Discr=mem_SL_0w2h2t rebin=6       
+     eventParity__1__2 Discr=mem_SL_0w2h2t
+        numJets__4__5 Discr=mem_SL_0w2h2t 
+           nBCSVM__2__4 Discr=mem_SL_0w2h2t
+              nBCSVM__2__3 Discr=None
+              nBCSVM__3__4 Discr=mem_SL_0w2h2t rebin=2
+           nBCSVM__4__5 Discr=mem_SL_0w2h2t rebin=4
+        numJets__5__8 Discr=mem_SL_0w2h2t
+           numJets__5__6 Discr=mem_SL_0w2h2t
+              nBCSVM__2__4 Discr=mem_SL_0w2h2t
+                 nBCSVM__2__3 Discr=None
+                 nBCSVM__3__4 Discr=mem_SL_0w2h2t rebin=2
+              nBCSVM__4__5 Discr=mem_SL_0w2h2t rebin=4
+           numJets__6__8 Discr=mem_SL_0w2h2t
+              nBCSVM__1__4 Discr=mem_SL_0w2h2t
+                 nBCSVM__1__3 Discr=mem_SL_0w2h2t
+                    nBCSVM__1__2 Discr=None
+                    nBCSVM__2__3 Discr=mem_SL_0w2h2t rebin=2
+                 nBCSVM__3__4 Discr=mem_SL_0w2h2t rebin=2
+              nBCSVM__4__8 Discr=mem_SL_0w2h2t rebin=6       
+"""
+
+trees["old_rebin_bdt_parity"] = """
+  Discr=common_bdt
+     eventParity__0__1 Discr=common_bdt
+        numJets__4__5 Discr=common_bdt 
+           nBCSVM__2__4 Discr=common_bdt
+              nBCSVM__2__3 Discr=None
+              nBCSVM__3__4 Discr=common_bdt rebin=2
+           nBCSVM__4__5 Discr=common_bdt rebin=4
+        numJets__5__8 Discr=common_bdt
+           numJets__5__6 Discr=common_bdt
+              nBCSVM__2__4 Discr=common_bdt
+                 nBCSVM__2__3 Discr=None
+                 nBCSVM__3__4 Discr=common_bdt rebin=2
+              nBCSVM__4__5 Discr=common_bdt rebin=4
+           numJets__6__8 Discr=common_bdt
+              nBCSVM__1__4 Discr=common_bdt
+                 nBCSVM__1__3 Discr=common_bdt
+                    nBCSVM__1__2 Discr=None
+                    nBCSVM__2__3 Discr=common_bdt rebin=2
+                 nBCSVM__3__4 Discr=common_bdt rebin=2
+              nBCSVM__4__8 Discr=common_bdt rebin=5
+     eventParity__1__2 Discr=common_bdt
+        numJets__4__5 Discr=common_bdt 
+           nBCSVM__2__4 Discr=common_bdt
+              nBCSVM__2__3 Discr=None
+              nBCSVM__3__4 Discr=common_bdt rebin=2
+           nBCSVM__4__5 Discr=common_bdt rebin=4
+        numJets__5__8 Discr=common_bdt
+           numJets__5__6 Discr=common_bdt
+              nBCSVM__2__4 Discr=common_bdt
+                 nBCSVM__2__3 Discr=None
+                 nBCSVM__3__4 Discr=common_bdt rebin=2
+              nBCSVM__4__5 Discr=common_bdt rebin=4
+           numJets__6__8 Discr=common_bdt
+              nBCSVM__1__4 Discr=common_bdt
+                 nBCSVM__1__3 Discr=common_bdt
+                    nBCSVM__1__2 Discr=None
+                    nBCSVM__2__3 Discr=common_bdt rebin=2
+                 nBCSVM__3__4 Discr=common_bdt rebin=2
+              nBCSVM__4__8 Discr=common_bdt rebin=5
+"""
+
+
 trees["old_parity"] = """
   Discr=mem_SL_0w2h2t
      eventParity__0__1 Discr=mem_SL_0w2h2t
@@ -74,6 +467,51 @@ trees["old_parity"] = """
 # 'sl_jge6_t2': 0.2,
 # 'sl_jge6_t3': 3.8,
 # 'sl_jge6_tge4': 7.4
+
+
+#trees["old_bdt"] = """
+#  Discr=common_bdt 
+#     numJets__4__5 Discr=common_bdt 
+#        nBCSVM__2__4 Discr=common_bdt Rebin=2
+#           nBCSVM__2__3 Discr=None
+#           nBCSVM__3__4 Discr=common_bdt Rebin=2
+#        nBCSVM__4__5 Discr=common_bdt Rebin=2
+#     numJets__5__8 Discr=common_bdt Rebin=2
+#        numJets__5__6 Discr=common_bdt Rebin=2
+#           nBCSVM__2__4 Discr=common_bdt Rebin=2
+#              nBCSVM__2__3 Discr=None
+#              nBCSVM__3__4 Discr=common_bdt Rebin=2
+#           nBCSVM__4__5 Discr=common_bdt Rebin=2
+#        numJets__6__8 Discr=common_bdt Rebin=2
+#           nBCSVM__1__4 Discr=common_bdt Rebin=2
+#              nBCSVM__1__3 Discr=common_bdt Rebin=2
+#                 nBCSVM__1__2 Discr=None
+#                 nBCSVM__2__3 Discr=common_bdt Rebin=2
+#              nBCSVM__3__4 Discr=common_bdt Rebin=2
+#           nBCSVM__4__8 Discr=common_bdt Rebin=2
+#"""
+#
+trees["old_bdt"] = """
+  Discr=common_bdt 
+     numJets__4__5 Discr=common_bdt 
+        nBCSVM__2__4 Discr=common_bdt Rebin=3
+           nBCSVM__2__3 Discr=None
+           nBCSVM__3__4 Discr=common_bdt Rebin=3
+        nBCSVM__4__5 Discr=common_bdt Rebin=3
+     numJets__5__8 Discr=common_bdt Rebin=3
+        numJets__5__6 Discr=common_bdt Rebin=3
+           nBCSVM__2__4 Discr=common_bdt Rebin=3
+              nBCSVM__2__3 Discr=None
+              nBCSVM__3__4 Discr=common_bdt Rebin=3
+           nBCSVM__4__5 Discr=common_bdt Rebin=3
+        numJets__6__8 Discr=common_bdt Rebin=3
+           nBCSVM__1__4 Discr=common_bdt Rebin=3
+              nBCSVM__1__3 Discr=common_bdt Rebin=3
+                 nBCSVM__1__2 Discr=None
+                 nBCSVM__2__3 Discr=common_bdt Rebin=3
+              nBCSVM__3__4 Discr=common_bdt Rebin=3
+           nBCSVM__4__8 Discr=common_bdt Rebin=3
+"""
 
 # Result of running leaf optimization using BLR and counting on 7 category old tree
 trees["old_blrsplit"] = """
@@ -510,6 +948,7 @@ trees["old_2t"] = """
              nBCSVM__3__4 Discr=mem_SL_0w2h2t
           nBCSVM__4__8 Discr=mem_SL_0w2h2t
 """
+
 
 trees["old_bdt"] = """
   Discr=common_bdt 
@@ -1468,4 +1907,296 @@ trees["15cat"] = """
                 n_excluded_ljets__2__4 Discr=2
                    topCandidate_mass__100_0__133_333333333 Discr=2
                    topCandidate_mass__133_333333333__200_0 Discr=2
+"""
+
+
+
+#trees["6j_4t"] = """
+#  Discr=common_bdt
+#    numJets__3__5 Discr=None
+#    numJets__5__7 Discr=common_bdt
+#       numJets__5__6 Discr=None
+#       numJets__6__7 Discr=common_bdt
+#          nBCSVM__1__4 Discr=None
+#          nBCSVM__4__5 Discr=common_bdt
+#"""
+#
+trees["6j_4t_memsplit"] = """
+  Discr=common_bdt
+    numJets__3__5 Discr=None
+    numJets__5__7 Discr=common_bdt
+       numJets__5__6 Discr=None
+       numJets__6__7 Discr=common_bdt
+          nBCSVM__1__4 Discr=None
+          nBCSVM__4__5 Discr=common_bdt
+             mem_SL_0w2h2t__0_0__0_833333333333 Discr=common_bdt
+             mem_SL_0w2h2t__0_833333333333__1_0 Discr=common_bdt
+"""
+
+trees["6j_4t"] = """
+  Discr=counting
+    eventParity__0__1 Discr=None
+    eventParity__1__2 Discr=counting
+        numJets__3__5 Discr=None
+        numJets__5__7 Discr=counting
+           numJets__5__6 Discr=None
+           numJets__6__7 Discr=counting
+              nBCSVM__1__4 Discr=None
+              nBCSVM__4__5 Discr=counting
+"""
+
+trees["6j_4t_bdt"] = """
+  Discr=common_bdt rebin=5
+    eventParity__0__1 Discr=common_bdt rebin=5
+       numJets__3__5 Discr=None
+       numJets__5__7 Discr=common_bdt rebin=5
+          numJets__5__6 Discr=None
+          numJets__6__7 Discr=common_bdt rebin=5
+             nBCSVM__1__4 Discr=None
+             nBCSVM__4__5 Discr=common_bdt rebin=5
+    eventParity__1__2 Discr=common_bdt rebin=5
+       numJets__3__5 Discr=None
+       numJets__5__7 Discr=common_bdt rebin=5
+          numJets__5__6 Discr=None
+          numJets__6__7 Discr=common_bdt rebin=5
+             nBCSVM__1__4 Discr=None
+             nBCSVM__4__5 Discr=common_bdt rebin=5
+"""
+
+trees["6j_4t_mem"] = """
+  Discr=mem_SL_0w2h2t rebin=6
+    eventParity__0__1 Discr=mem_SL_0w2h2t rebin=6
+       numJets__3__5 Discr=None
+       numJets__5__7 Discr=mem_SL_0w2h2t rebin=6
+          numJets__5__6 Discr=None
+          numJets__6__7 Discr=mem_SL_0w2h2t rebin=6
+             nBCSVM__1__4 Discr=None
+             nBCSVM__4__5 Discr=mem_SL_0w2h2t rebin=6
+    eventParity__1__2 Discr=mem_SL_0w2h2t rebin=6
+       numJets__3__5 Discr=None
+       numJets__5__7 Discr=mem_SL_0w2h2t rebin=6
+          numJets__5__6 Discr=None
+          numJets__6__7 Discr=mem_SL_0w2h2t rebin=6
+             nBCSVM__1__4 Discr=None
+             nBCSVM__4__5 Discr=mem_SL_0w2h2t rebin=6
+"""
+
+trees["6j_4t_test2"] = """
+  Discr=counting
+    eventParity__0__1 Discr=counting
+       numJets__3__5 Discr=None
+       numJets__5__7 Discr=counting
+          numJets__5__6 Discr=None
+          numJets__6__7 Discr=counting
+             nBCSVM__1__4 Discr=None
+             nBCSVM__4__5 Discr=counting
+                common_bdt__m1_0__0_15 Discr=counting
+                   mem_SL_0w2h2t__0_0__0_416666666667 Discr=counting
+                      mem_SL_0w2h2t__0_0__0_0277777777778 Discr=counting
+                      mem_SL_0w2h2t__0_0277777777778__0_416666666667 Discr=counting
+                         common_bdt__m1_0__m0_1 Discr=counting
+                         common_bdt__m0_1__0_15 Discr=counting
+                   mem_SL_0w2h2t__0_416666666667__1_0 Discr=counting
+                common_bdt__0_15__1_0 Discr=counting             
+    eventParity__1__2 Discr=counting
+       numJets__3__5 Discr=None
+       numJets__5__7 Discr=counting
+          numJets__5__6 Discr=None
+          numJets__6__7 Discr=counting
+             nBCSVM__1__4 Discr=None
+             nBCSVM__4__5 Discr=counting
+                common_bdt__m1_0__0_15 Discr=counting
+                   mem_SL_0w2h2t__0_0__0_416666666667 Discr=counting
+                      mem_SL_0w2h2t__0_0__0_0277777777778 Discr=counting
+                      mem_SL_0w2h2t__0_0277777777778__0_416666666667 Discr=counting
+                         common_bdt__m1_0__m0_1 Discr=counting
+                         common_bdt__m0_1__0_15 Discr=counting
+                   mem_SL_0w2h2t__0_416666666667__1_0 Discr=counting
+                common_bdt__0_15__1_0 Discr=counting             
+"""
+
+# Split only by BDR
+trees["6j_4t_test3"] = """
+  Discr=counting
+    eventParity__0__1 Discr=counting
+       numJets__3__5 Discr=None
+       numJets__5__7 Discr=counting
+          numJets__5__6 Discr=None
+          numJets__6__7 Discr=counting
+             nBCSVM__1__4 Discr=None
+             nBCSVM__4__5 Discr=counting
+                common_bdt__m1_0__0_15 Discr=counting
+                   common_bdt__m1_0__m0_15 Discr=counting
+                      common_bdt__m1_0__m0_3 Discr=counting
+                      common_bdt__m0_3__m0_15 Discr=counting 
+                   common_bdt__m0_15__0_15 Discr=counting
+                      common_bdt__m0_15__0_0 Discr=counting
+                      common_bdt__0_0__0_15 Discr=counting
+                common_bdt__0_15__1_0 Discr=counting
+    eventParity__1__2 Discr=counting
+       numJets__3__5 Discr=None
+       numJets__5__7 Discr=counting
+          numJets__5__6 Discr=None
+          numJets__6__7 Discr=counting
+             nBCSVM__1__4 Discr=None
+             nBCSVM__4__5 Discr=counting
+                common_bdt__m1_0__0_15 Discr=counting
+                   common_bdt__m1_0__m0_15 Discr=counting
+                      common_bdt__m1_0__m0_3 Discr=counting
+                      common_bdt__m0_3__m0_15 Discr=counting
+                   common_bdt__m0_15__0_15 Discr=counting
+                      common_bdt__m0_15__0_0 Discr=counting
+                      common_bdt__0_0__0_15 Discr=counting
+                common_bdt__0_15__1_0 Discr=counting
+"""
+
+# Split only by MEM
+trees["6j_4t_test4"] = """
+  Discr=counting
+    eventParity__0__1 Discr=counting
+       numJets__3__5 Discr=None
+       numJets__5__7 Discr=counting
+          numJets__5__6 Discr=None
+          numJets__6__7 Discr=counting
+             nBCSVM__1__4 Discr=None
+             nBCSVM__4__5 Discr=counting
+                 mem_SL_0w2h2t__0_0__0_361111111111 Discr=counting
+                    mem_SL_0w2h2t__0_0__0_0277777777778 Discr=counting
+                    mem_SL_0w2h2t__0_0277777777778__0_361111111111 Discr=counting
+                       mem_SL_0w2h2t__0_0277777777778__0_194444444444 Discr=counting
+                       mem_SL_0w2h2t__0_194444444444__0_361111111111 Discr=counting
+                 mem_SL_0w2h2t__0_361111111111__1_0 Discr=counting
+                    mem_SL_0w2h2t__0_361111111111__0_611111111111 Discr=counting
+                    mem_SL_0w2h2t__0_611111111111__1_0 Discr=counting
+    eventParity__1__2 Discr=counting
+       numJets__3__5 Discr=None
+       numJets__5__7 Discr=counting
+          numJets__5__6 Discr=None
+          numJets__6__7 Discr=counting
+             nBCSVM__1__4 Discr=None
+             nBCSVM__4__5 Discr=counting
+                 mem_SL_0w2h2t__0_0__0_361111111111 Discr=counting
+                    mem_SL_0w2h2t__0_0__0_0277777777778 Discr=counting
+                    mem_SL_0w2h2t__0_0277777777778__0_361111111111 Discr=counting
+                       mem_SL_0w2h2t__0_0277777777778__0_194444444444 Discr=counting
+                       mem_SL_0w2h2t__0_194444444444__0_361111111111 Discr=counting
+                 mem_SL_0w2h2t__0_361111111111__1_0 Discr=counting
+                    mem_SL_0w2h2t__0_361111111111__0_611111111111 Discr=counting
+                    mem_SL_0w2h2t__0_611111111111__1_0 Discr=counting
+
+"""
+
+
+#
+#                mem_SL_0w2h2t__0_0__0_75 Discr=counting
+#                   mem_SL_0w2h2t__0_0__0_222222222222 Discr=counting
+#                      common_bdt__m1_0__0_05 Discr=counting
+#                      common_bdt__0_05__1_0 Discr=counting
+#                         common_bdt__0_05__0_1 Discr=counting
+#                         common_bdt__0_1__1_0 Discr=counting  
+#                   mem_SL_0w2h2t__0_222222222222__0_75 Discr=counting
+#                      common_bdt__m1_0__0_35 Discr=counting
+#                      common_bdt__0_35__1_0 Discr=counting 
+#                mem_SL_0w2h2t__0_75__1_0 Discr=counting
+#                   common_bdt__m1_0__0_0 Discr=counting
+#                   common_bdt__0_0__1_0 Discr=counting
+#                      common_bdt__0_0__0_3 Discr=counting
+#                      common_bdt__0_3__1_0 Discr=counting
+#                         mem_SL_0w2h2t__0_75__0_888888888889 Discr=counting
+#                         mem_SL_0w2h2t__0_888888888889__1_0 Discr=counting      
+#
+trees["6j_4t_test"] = """
+  Discr=counting
+    eventParity__0__1 Discr=counting
+       numJets__3__5 Discr=None
+       numJets__5__7 Discr=counting
+          numJets__5__6 Discr=None
+          numJets__6__7 Discr=counting
+             nBCSVM__1__4 Discr=None
+             nBCSVM__4__5 Discr=counting
+                mem_SL_0w2h2t__0_0__0_75 Discr=counting                                      
+                   mem_SL_0w2h2t__0_0__0_222222222222 Discr=counting            
+                      common_bdt__m1_0__0_05 Discr=counting                     
+                      common_bdt__0_05__1_0 Discr=counting                      
+                         common_bdt__0_05__0_1 Discr=counting                   
+                         common_bdt__0_1__1_0 Discr=counting                    
+                   mem_SL_0w2h2t__0_222222222222__0_75 Discr=counting           
+                      common_bdt__m1_0__0_35 Discr=counting                     
+                      common_bdt__0_35__1_0 Discr=counting                      
+                mem_SL_0w2h2t__0_75__1_0 Discr=counting                         
+                   common_bdt__m1_0__0_0 Discr=counting                         
+                   common_bdt__0_0__1_0 Discr=counting                          
+                      common_bdt__0_0__0_3 Discr=counting                       
+                      common_bdt__0_3__1_0 Discr=counting                       
+    eventParity__1__2 Discr=counting
+       numJets__3__5 Discr=None
+       numJets__5__7 Discr=counting
+          numJets__5__6 Discr=None
+          numJets__6__7 Discr=counting
+             nBCSVM__1__4 Discr=None
+             nBCSVM__4__5 Discr=counting
+                mem_SL_0w2h2t__0_0__0_75 Discr=counting                                      
+                   mem_SL_0w2h2t__0_0__0_222222222222 Discr=counting            
+                      common_bdt__m1_0__0_05 Discr=counting                     
+                      common_bdt__0_05__1_0 Discr=counting                      
+                         common_bdt__0_05__0_1 Discr=counting                   
+                         common_bdt__0_1__1_0 Discr=counting                    
+                   mem_SL_0w2h2t__0_222222222222__0_75 Discr=counting           
+                      common_bdt__m1_0__0_35 Discr=counting                     
+                      common_bdt__0_35__1_0 Discr=counting                      
+                mem_SL_0w2h2t__0_75__1_0 Discr=counting                         
+                   common_bdt__m1_0__0_0 Discr=counting                         
+                   common_bdt__0_0__1_0 Discr=counting                          
+                      common_bdt__0_0__0_3 Discr=counting                       
+                      common_bdt__0_3__1_0 Discr=counting                       
+                         mem_SL_0w2h2t__0_75__0_888888888889 Discr=counting     
+                         mem_SL_0w2h2t__0_888888888889__1_0 Discr=counting      
+"""
+
+
+
+trees["6j_4t_doublememsplit"] = """
+  Discr=common_bdt
+    numJets__3__5 Discr=None
+    numJets__5__7 Discr=common_bdt
+       numJets__5__6 Discr=None
+       numJets__6__7 Discr=common_bdt
+          nBCSVM__1__4 Discr=None
+          nBCSVM__4__5 Discr=common_bdt
+             mem_SL_0w2h2t__0_0__0_833333333333 Discr=common_bdt
+                mem_SL_0w2h2t__0_0__0_166666666667 Discr=common_bdt
+                mem_SL_0w2h2t__0_166666666667__0_833333333333 Discr=common_bdt
+             mem_SL_0w2h2t__0_833333333333__1_0 Discr=common_bdt
+                mem_SL_0w2h2t__0_833333333333__0_916666666667 Discr=common_bdt
+                mem_SL_0w2h2t__0_916666666667__1_0 Discr=common_bdt
+"""
+
+
+
+trees["6j_4t_doublebdtsplit"] = """
+  Discr=mem_SL_0w2h2t
+    numJets__3__5 Discr=None
+    numJets__5__7 Discr=mem_SL_0w2h2t
+       numJets__5__6 Discr=None
+       numJets__6__7 Discr=mem_SL_0w2h2t
+          nBCSVM__1__4 Discr=None
+          nBCSVM__4__5 Discr=mem_SL_0w2h2t
+             common_bdt__m1_0__0_166666666667 Discr=mem_SL_0w2h2t
+                common_bdt__m1_0__m0_333333333333 Discr=mem_SL_0w2h2t
+                common_bdt__m0_333333333333__0_166666666667 Discr=mem_SL_0w2h2t
+             common_bdt__0_166666666667__1_0 Discr=mem_SL_0w2h2t
+                common_bdt__0_166666666667__0_333333333333 Discr=mem_SL_0w2h2t
+                common_bdt__0_333333333333__1_0 Discr=mem_SL_0w2h2t
+"""
+
+trees["6j_4t_bdtsplit"] = """
+  Discr=mem_SL_0w2h2t
+    numJets__3__5 Discr=None
+    numJets__5__7 Discr=mem_SL_0w2h2t
+       numJets__5__6 Discr=None
+       numJets__6__7 Discr=mem_SL_0w2h2t
+          nBCSVM__1__4 Discr=None
+          nBCSVM__4__5 Discr=mem_SL_0w2h2t
+             common_bdt__m1_0__0_166666666667 Discr=mem_SL_0w2h2t
+             common_bdt__0_166666666667__1_0 Discr=mem_SL_0w2h2t
 """
