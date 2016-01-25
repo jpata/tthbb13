@@ -19,12 +19,12 @@ class Datacard:
             "CMS_scale_j"       : 1,
             "CMS_ttH_CSVLF"       : 1,
             "CMS_ttH_CSVHF"       : 1,
-            #"CMS_ttH_CSVcErr1"    : 1,
-            #"CMS_ttH_CSVcErr2"    : 1,
-            #"CMS_ttH_CSVHFStats1"   : 1,
-            #"CMS_ttH_CSVHFStats2"   : 1,
-            #"CMS_ttH_CSVLFStats1"   : 1,
-            #"CMS_ttH_CSVLFStats2"   : 1,
+            "CMS_ttH_CSVcErr1"    : 1,
+            "CMS_ttH_CSVcErr2"    : 1,
+            "CMS_ttH_CSVHFStats1"   : 1,
+            "CMS_ttH_CSVHFStats2"   : 1,
+            "CMS_ttH_CSVLFStats1"   : 1,
+            "CMS_ttH_CSVLFStats2"   : 1,
         }
     
         #deepcopy otherwise dicts will be linked

@@ -18,7 +18,7 @@ import pickle, os
 ########################################
 
 #ControlPlotsSparse_2015_10_15_withBLR.root
-input_file = "ControlPlotsSparseJan20ntp.root"
+input_file = "ControlPlotsSparseBinningSystematics.root"
 output_path = "/scratch/joosep/test/"
 #input_file = "/dev/shm/joosep/ControlPlotsSparse_corr.root"
 #output_path = "/dev/shm/joosep/categorization2/"
