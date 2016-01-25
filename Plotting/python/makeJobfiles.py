@@ -2,7 +2,7 @@ import TTH.Plotting.Datacards.Samples as Samples
 import ROOT, json
 
 #entries per job
-perjob = 100000
+perjob = 50000
 
 def chunks(l, n):
     """Yield successive n-sized chunks from l."""
