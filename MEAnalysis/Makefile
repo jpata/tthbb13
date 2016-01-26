@@ -52,8 +52,8 @@ step2:
 	hadd -f ~/tth/spring15/sync/vhbb/v10/muel_skim.root ~/tth/sw/CMSSW_7_4_15/src/VHbbAnalysis/Heppy/test/Loop_task_muel_skim_*/tree.root
 
 step3:
-	#hadd -f ~/tth/spring15/sync/tthbb/ttjets.root ~/tth/gc/GC1fbe9d930f1c/cfg_sync/ttjets/output_*.root
-	#hadd -f ~/tth/spring15/sync/tthbb/tth.root ~/tth/gc/GC1fbe9d930f1c/cfg_sync/ttH/output_*.root
+	hadd -f ~/tth/spring15/sync/tthbb/ttjets.root ~/tth/gc/GCe920da062288/cfg_sync/ttjets/output_*.root
+	hadd -f ~/tth/spring15/sync/tthbb/tth.root ~/tth/gc/GCe920da062288/cfg_sync/ttH/output_*.root
 	hadd -f ~/tth/spring15/sync/tthbb/mu.root ~/tth/gc/GC746f5b29beb9/cfg_sync/mu_skim/output_*.root
 	hadd -f ~/tth/spring15/sync/tthbb/el.root ~/tth/gc/GC746f5b29beb9/cfg_sync/el_skim/output_*.root
 	hadd -f ~/tth/spring15/sync/tthbb/muel.root ~/tth/gc/GC746f5b29beb9/cfg_sync/muel_skim/output_*.root
@@ -61,6 +61,9 @@ step3:
 step4:
 	python python/makeTable.py /home/joosep/tth/spring15/sync/tthbb/tth.root nominal > tth.csv
 	python python/makeTable.py /home/joosep/tth/spring15/sync/tthbb/ttjets.root nominal > ttjets.csv
+	python python/makeTable.py /home/joosep/tth/spring15/sync/tthbb/mu.root nominal > mu.csv
+	python python/makeTable.py /home/joosep/tth/spring15/sync/tthbb/el.root nominal > el.csv
+	python python/makeTable.py /home/joosep/tth/spring15/sync/tthbb/muel.root nominal > muel.csv
 
 clean:
 	rm -Rf $(CMSSW_BASE)/src/VHbbAnalysis/Heppy/test/Loop_*

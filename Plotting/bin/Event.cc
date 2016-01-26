@@ -516,6 +516,14 @@ map<SystematicKey::SystematicKey, double> recalc_bweights(vector<Jet> jets) {
     for (auto & jet : jets) {
         for (auto syst : btag_syst) {
             stringstream s;
+            if (
+                std::isnan(jet.p4.Eta()) ||
+                std::isnan(jet.p4.Pt()) ||
+                std::isnan(jet.btagCSV)
+            ) {
+                std::cerr << "bad jet " << jet.p4.Pt() << " " << jet.p4.Eta() << " " << jet.btagCSV << " " << jet.hadronFlavour << std::endl;
+                continue;
+            }
             s << "bweightcalc.calcJetWeightImpl("
                 << jet.p4.Pt() <<"," << std::abs(jet.p4.Eta())
                 << "," << jet.hadronFlavour
@@ -726,9 +734,15 @@ const Jet JetFactory::makeNominal(const TreeData& data, int njet) {
         data.jets_phi[njet],
         data.jets_mass[njet]
     );
+
+    //FIXME: why do we have jets with CSV=nan??
+    double csv = data.jets_btagCSV[njet];
+    if (std::isnan(csv)) {
+        csv = -10.0;
+    }
     return Jet(
         p4,
-        data.jets_btagCSV[njet],
+        csv,
         data.jets_btagBDT[njet],
         data.jets_hadronFlavour[njet]
     );
@@ -746,9 +760,14 @@ const Jet JetFactory::makeJESUp(const TreeData& data, int njet) {
     //Undo nominal correction, re-do JESUp correction
     const double corr = data.jets_corr_JESUp[njet] / data.jets_corr[njet];
     p4 *= (1.0 / corr);
+    //FIXME: why do we have jets with CSV=nan??
+    double csv = data.jets_btagCSV[njet];
+    if (std::isnan(csv)) {
+        csv = -10.0;
+    }
     return Jet(
         p4,
-        data.jets_btagCSV[njet],
+        csv,
         data.jets_btagBDT[njet],
         data.jets_hadronFlavour[njet]
     );
@@ -767,9 +786,14 @@ const Jet JetFactory::makeJESDown(const TreeData& data, int njet) {
     //Undo nominal correction, re-do JESDown correction
     const double corr = data.jets_corr_JESDown[njet] / data.jets_corr[njet];
     p4 *= (1.0 / corr);
+    
+    double csv = data.jets_btagCSV[njet];
+    if (std::isnan(csv)) {
+        csv = -10.0;
+    }
     return Jet(
         p4,
-        data.jets_btagCSV[njet],
+        csv,
         data.jets_btagBDT[njet],
         data.jets_hadronFlavour[njet]
     );
