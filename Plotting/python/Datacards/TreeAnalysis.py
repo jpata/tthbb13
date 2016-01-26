@@ -18,12 +18,12 @@ import pickle, os
 ########################################
 
 #ControlPlotsSparse_2015_10_15_withBLR.root
-input_file = "ControlPlotsSparseBinningSystematics.root"
+input_file = "ControlPlotsSparseExtendTTBinning.root"
 output_path = "/scratch/joosep/test/"
 #input_file = "/dev/shm/joosep/ControlPlotsSparse_corr.root"
 #output_path = "/dev/shm/joosep/categorization2/"
 
-n_proc = 10
+n_proc = 30
 n_iter = 8
 
 signals = [
@@ -192,16 +192,11 @@ if __name__ == "__main__":
     Categorize.Categorization.scaling = 0.5
     make_latex("old")
     make_latex("old_blrsplit")
-    #Categorize.Categorization.scaling = 1.0
-    #make_latex("old_parity")
-    #make_latex("old_bdt")
-    #make_latex("old_blrsplit_mem_bdt_parity")
-    #make_latex("old_bdt_mem")
-    #make_latex("old_bdt_mem_blrsplit")
-    #make_latex("old_blrsplit_B")
-    #make_latex("old_blrsplit_B_bdt")
-    #make_latex("old_bdtsplit_A")
-    #make_latex("old_bdtsplit_B")
+    make_latex("old_mem_bdt2d_unsplit")
+    Categorize.Categorization.scaling = 1.0
+    make_latex("old_parity")
+    make_latex("old_bdt")
+    make_latex("old_mem_bdt2d")
   
     #DL
     h_dl = Categorize.GetSparseHistograms(
@@ -219,11 +214,12 @@ if __name__ == "__main__":
     Categorize.Categorization.h_sig_sys = h_dl[2]
     Categorize.Categorization.h_bkg_sys = h_dl[3]
     
-    #Categorize.Categorization.scaling = 0.5
-    #make_latex("old_dl")
-    #make_latex("old_dl_blrsplit")
-    #Categorize.Categorization.scaling = 1.0
-    #make_latex("old_dl_parity")
+    Categorize.Categorization.scaling = 0.5
+    make_latex("old_dl")
+    make_latex("old_dl_blrsplit")
+    Categorize.Categorization.scaling = 1.0
+    make_latex("old_dl_parity")
+
     #Categorize.Categorization.output_path = output_path + "/old_dl_blr_opt"
     #os.mkdir(Categorize.Categorization.output_path)
     #r = split_leaves_by_BLR(trees["old_dl"], disc="mem_DL_0w2h2t")
