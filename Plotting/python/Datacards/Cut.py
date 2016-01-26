@@ -121,25 +121,21 @@ class Cut(object):
             axis_name = axis.name
             if axis_name == "btag_LR_4b_2b_logit":
                 axis_name = "btag LR"
-
-            if axis_name == "topCandidate_n_subjettiness":
+            elif axis_name == "common_bdt":
+                axis_name = "\mathrm{BDT}"
+            elif axis_name == "topCandidate_n_subjettiness":
                 axis_name = r"top\; \tau_{3}/\tau_{2}"
-
-            if axis_name == "topCandidate_fRec":
+            elif axis_name == "topCandidate_fRec":
                 axis_name = r"top\; f_{Rec}"
-
-            if axis_name == "n_excluded_bjets":
+            elif axis_name == "n_excluded_bjets":
                 axis_name = r"n_{boost}\; b"
-
-            if axis_name == "n_excluded_ljets":
+            elif axis_name == "n_excluded_ljets":
                 axis_name = r"n_{boost}\; l"
-
-            if axis_name == "numJets":
+            elif axis_name == "numJets":
                 axis_name = r"n_{j}"
-
-            if axis_name == "nBCSVM":
+            elif axis_name == "nBCSVM":
                 axis_name = r"n_{b}"
-
+            
             if upper == int(upper):
                 string_upper = "{0}".format(upper)
             else:

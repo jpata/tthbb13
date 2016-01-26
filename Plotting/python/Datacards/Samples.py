@@ -12,7 +12,8 @@ elif "pata-macbook" in hostname:
 #Tallinn
 elif "quasar" in hostname:
     #path = "/dev/shm/joosep/"
-    path = "/scratch/joosep/"
+    path = "/scratch/joosep/Jan18_fixbdt/"
+    path2 = "/scratch/joosep/Jan25_bigtt/"
 elif "hep.kbfi.ee" in hostname:
     path = "/home/joosep/tth/gc/"
 else:
@@ -25,60 +26,59 @@ class Sample:
         self.prefix = prefix 
 
 samples_dict = {
-    "SingleMuon": Sample(
-        "SingleMuon",
-        [path + "cfg_withME/SingleMuon.root"],
-        ""
-    ),
-    "SingleElectron": Sample(
-        "SingleElectron",
-        [path + "cfg_withME/SingleElectron.root"],
-        ""
-    ),
-    "DoubleMuon": Sample(
-        "DoubleMuon",
-        [path + "cfg_withME/DoubleMuon.root"],
-        ""
-    ),
-    "DoubleEG": Sample(
-        "DoubleEG",
-        [path + "cfg_withME/DoubleEG.root"],
-        ""
-    ),
-    "MuonEG": Sample(
-        "MuonEG",
-        [path + "cfg_withME/MuonEG.root"],
-        ""
-    ),
-
+#    "SingleMuon": Sample(
+#        "SingleMuon",
+#        [path + "cfg_withME/SingleMuon.root"],
+#        ""
+#    ),
+#    "SingleElectron": Sample(
+#        "SingleElectron",
+#        [path + "cfg_withME/SingleElectron.root"],
+#        ""
+#    ),
+#    "DoubleMuon": Sample(
+#        "DoubleMuon",
+#        [path + "cfg_withME/DoubleMuon.root"],
+#        ""
+#    ),
+#    "DoubleEG": Sample(
+#        "DoubleEG",
+#        [path + "cfg_withME/DoubleEG.root"],
+#        ""
+#    ),
+#    "MuonEG": Sample(
+#        "MuonEG",
+#        [path + "cfg_withME/MuonEG.root"],
+#        ""
+#    ),
     "ttH_hbb": Sample(
         "ttH_hbb",
-        [path + "cfg_withME/ttHTobb_M125_13TeV_powheg_pythia8.root"],
+        [path + "ttHTobb_M125_13TeV_powheg_pythia8.root"],
         ""
     ),
     "ttbarPlus2B": Sample(
         "ttbarPlus2B", 
-        [path + "cfg_withME/TT_TuneCUETP8M1_13TeV-powheg-pythia8_tt2b.root"],
+        [path2 + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_tt2b.root"],
         "",
     ),
     "ttbarPlusB": Sample(
         "ttbarPlusB", 
-        [path + "cfg_withME/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttb.root"],
+        [path2 + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttb.root"],
         "",
     ),
     "ttbarPlusBBbar": Sample(
         "ttbarPlusBBbar", 
-        [path + "cfg_withME/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttbb.root"],
+        [path2 + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttbb.root"],
         "",
     ),
     "ttbarPlusCCbar": Sample(
         "ttbarPlusCCbar", 
-        [path + "cfg_withME/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttcc.root"],
+        [path2 + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttcc.root"],
         "",
     ),
     "ttbarOther": Sample(
         "ttbarOther", 
-        [path + "cfg_withME/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttll.root"],
+        [path2 + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttll.root"],
         "",
     ),
 }

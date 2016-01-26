@@ -226,27 +226,30 @@ systematics = [
     "nominal",
     "CMS_scale_jUp",
     "CMS_scale_jDown",
-    "CMS_ttH_CSVStats1Up",
-    "CMS_ttH_CSVStats1Down",
-    "CMS_ttH_CSVStats2Up",
-    "CMS_ttH_CSVStats2Down",
+    "CMS_ttH_CSVHFStats1Up",
+    "CMS_ttH_CSVHFStats1Down",
+    "CMS_ttH_CSVHFStats2Up",
+    "CMS_ttH_CSVHFStats2Down",
+    "CMS_ttH_CSVLFStats1Up",
+    "CMS_ttH_CSVLFStats1Down",
+    "CMS_ttH_CSVLFStats2Up",
+    "CMS_ttH_CSVLFStats2Down",
+    "CMS_ttH_CSVcErr1Up",
+    "CMS_ttH_CSVcErr1Down",
+    "CMS_ttH_CSVcErr2Up",
+    "CMS_ttH_CSVcErr2Down",
     "CMS_ttH_CSVLFUp",
     "CMS_ttH_CSVLFDown",
     "CMS_ttH_CSVHFUp",
     "CMS_ttH_CSVHFDown",
 ]
 
-systematic_weights = [
-    ("CMS_ttH_CSVStats1Up",     "nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_Stats1Up"),
-    ("CMS_ttH_CSVStats1Down",   "nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_Stats1Down"),
-    ("CMS_ttH_CSVStats2Up",     "nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_Stats2Up"),
-    ("CMS_ttH_CSVStats2Down",   "nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_Stats2Down"),
-    ("CMS_ttH_CSVStats2Up",     "nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_Stats2Up"),
-    ("CMS_ttH_CSVLFUp",         "nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_LFUp"),
-    ("CMS_ttH_CSVLFDown",       "nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_LFDown"),
-    ("CMS_ttH_CSVHFUp",         "nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_HFUp"),
-    ("CMS_ttH_CSVHFDown",       "nominal_weight(ev, conf)/ev.bTagWeight * ev.bTagWeight_HFDown"),
-]
+systematic_weights = []
+for k in systematics:
+    if "CSV" in k:
+        systematic_weights += [
+            (k, "nominal_weight(ev, conf)/ev.bTagWeights.at(SystematicKey::nominal) * ev.bTagWeights.at(SystematicKey::{0})".format(k)),
+        ]
 
 #List of all processes
 processes = [
@@ -331,6 +334,8 @@ cuts = {
     "j5_tge4": "ev.numJets==5 && ev.nBCSVM>=4",
     "j5_t3": "ev.numJets==5 && ev.nBCSVM==3",
     "j5_t2": "ev.numJets==5 && ev.nBCSVM==2",
+    "j4_t4": "ev.numJets==4 && ev.nBCSVM==4",
+    "j4_t3": "ev.numJets==4 && ev.nBCSVM==3",
     "blrH": "ev.btag_LR_4b_2b > 0.95",
     "boostedHiggs": "ev.nhiggsCandidate >= 1",
     "boostedHiggsOnly": "ev.nhiggsCandidate >= 1 && ev.ntopCandidate==0",
@@ -346,143 +351,33 @@ cuts = {
 #category tree to create
 categories_tree = [
     ("sl", "ControlCategoryProcessor", [
-        ("jge6_tge4", "ControlCategoryProcessor", [
-            ("blrH", "ControlCategoryProcessor", []), 
-        ]),
-        ("jge6_t3", "ControlCategoryProcessor", [
-            ("blrH", "ControlCategoryProcessor", []), 
-        ]),
-        ("jge6_t2", "ControlCategoryProcessor", [
-            ("blrH", "ControlCategoryProcessor", []), 
-        ]),
-        ("j5_tge4", "ControlCategoryProcessor", [
-            ("blrH", "ControlCategoryProcessor", []), 
-        ]),
-        ("j5_t3", "ControlCategoryProcessor", [
-            ("blrH", "ControlCategoryProcessor", []), 
-        ]),
-        ("j5_t2", "ControlCategoryProcessor", [
-            ("blrH", "ControlCategoryProcessor", []), 
-        ]),
+        ("jge6_tge4", "ControlCategoryProcessor", []),
+        ("jge6_t3", "ControlCategoryProcessor", []),
+        ("jge6_t2", "ControlCategoryProcessor", []),
+        ("j5_tge4", "ControlCategoryProcessor", []),
+        ("j5_t3", "ControlCategoryProcessor", []),
+        ("j4_t4", "ControlCategoryProcessor", []),
+        ("j4_t3", "ControlCategoryProcessor", []),
     ]),
     ("sl_mu", "ControlCategoryProcessor", [
-        ("jge6_tge4", "ControlCategoryProcessor", [
-            ("blrH", "ControlCategoryProcessor", []), 
-        ]),
-        ("jge6_t3", "ControlCategoryProcessor", [
-            ("blrH", "ControlCategoryProcessor", []), 
-            ("boostedHiggs", "BoostedCategoryProcessor", []),
-            ("boostedTop", "BoostedCategoryProcessor", []),
-            ("boostedHiggsOnly", "BoostedCategoryProcessor", []),
-            ("boostedTopOnly", "BoostedCategoryProcessor", []),
-            ("boostedHiggsTop", "BoostedCategoryProcessor", []),
-            #("boostedHiggsHighPt", "BoostedCategoryProcessor", []),
-            #("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
-            #("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
-        ]),
-        ("jge6_t2", "ControlCategoryProcessor", [
-            ("blrH", "ControlCategoryProcessor", []), 
-            ("boostedHiggs", "BoostedCategoryProcessor", []),
-            ("boostedTop", "BoostedCategoryProcessor", []),
-            ("boostedHiggsOnly", "BoostedCategoryProcessor", []),
-            ("boostedTopOnly", "BoostedCategoryProcessor", []),
-            ("boostedHiggsTop", "BoostedCategoryProcessor", []),
-            #("boostedHiggsHighPt", "BoostedCategoryProcessor", []),
-            #("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
-            #("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
-        ]),
-        ("j5_tge4", "ControlCategoryProcessor", [
-            ("blrH", "ControlCategoryProcessor", []), 
-            ("boostedHiggs", "BoostedCategoryProcessor", []),
-            ("boostedTop", "BoostedCategoryProcessor", []),
-            ("boostedHiggsOnly", "BoostedCategoryProcessor", []),
-            ("boostedTopOnly", "BoostedCategoryProcessor", []),
-            ("boostedHiggsTop", "BoostedCategoryProcessor", []),
-            #("boostedHiggsHighPt", "BoostedCategoryProcessor", []),
-            #("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
-            #("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
-        ]),
-        ("j5_t3", "ControlCategoryProcessor", [
-            ("blrH", "ControlCategoryProcessor", []), 
-            ("boostedHiggs", "BoostedCategoryProcessor", []),
-            ("boostedTop", "BoostedCategoryProcessor", []),
-            ("boostedHiggsOnly", "BoostedCategoryProcessor", []),
-            ("boostedTopOnly", "BoostedCategoryProcessor", []),
-            ("boostedHiggsTop", "BoostedCategoryProcessor", []),
-            #("boostedHiggsHighPt", "BoostedCategoryProcessor", []),
-            #("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
-            #("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
-        ]),
-        ("j5_t2", "ControlCategoryProcessor", [
-            ("blrH", "ControlCategoryProcessor", []), 
-            ("boostedHiggs", "BoostedCategoryProcessor", []),
-            ("boostedTop", "BoostedCategoryProcessor", []),
-            ("boostedHiggsOnly", "BoostedCategoryProcessor", []),
-            ("boostedTopOnly", "BoostedCategoryProcessor", []),
-            ("boostedHiggsTop", "BoostedCategoryProcessor", []),
-            #("boostedHiggsHighPt", "BoostedCategoryProcessor", []),
-            #("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
-            #("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
-        ]),
+        ("jge6_tge4", "ControlCategoryProcessor", []),
+        ("jge6_t3", "ControlCategoryProcessor", []),
+        ("jge6_t2", "ControlCategoryProcessor", []),
+        ("j5_tge4", "ControlCategoryProcessor", []),
+        ("j5_t3", "ControlCategoryProcessor", []),
+        ("j5_t2", "ControlCategoryProcessor", []),
+        ("j4_t4", "ControlCategoryProcessor", []),
+        ("j4_t3", "ControlCategoryProcessor", []),
     ]),
     ("sl_el", "ControlCategoryProcessor", [
-        ("jge6_tge4", "ControlCategoryProcessor", [
-            ("blrH", "ControlCategoryProcessor", []), 
-        ]),
-        ("jge6_t3", "ControlCategoryProcessor", [
-            ("blrH", "ControlCategoryProcessor", []), 
-            ("boostedHiggs", "BoostedCategoryProcessor", []),
-            ("boostedTop", "BoostedCategoryProcessor", []),
-            ("boostedHiggsOnly", "BoostedCategoryProcessor", []),
-            ("boostedTopOnly", "BoostedCategoryProcessor", []),
-            ("boostedHiggsTop", "BoostedCategoryProcessor", []),
-            #("boostedHiggsHighPt", "BoostedCategoryProcessor", []),
-            #("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
-            #("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
-        ]),
-        ("jge6_t2", "ControlCategoryProcessor", [
-            ("blrH", "ControlCategoryProcessor", []), 
-            ("boostedHiggs", "BoostedCategoryProcessor", []),
-            ("boostedTop", "BoostedCategoryProcessor", []),
-            ("boostedHiggsOnly", "BoostedCategoryProcessor", []),
-            ("boostedTopOnly", "BoostedCategoryProcessor", []),
-            ("boostedHiggsTop", "BoostedCategoryProcessor", []),
-            #("boostedHiggsHighPt", "BoostedCategoryProcessor", []),
-            #("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
-            #("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
-        ]),
-        ("j5_tge4", "ControlCategoryProcessor", [
-            ("boostedHiggs", "BoostedCategoryProcessor", []),
-            ("boostedTop", "BoostedCategoryProcessor", []),
-            ("boostedHiggsOnly", "BoostedCategoryProcessor", []),
-            ("boostedTopOnly", "BoostedCategoryProcessor", []),
-            ("boostedHiggsTop", "BoostedCategoryProcessor", []),
-            #("boostedHiggsHighPt", "BoostedCategoryProcessor", []),
-            #("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
-            #("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
-        ]),
-        ("j5_t3", "ControlCategoryProcessor", [
-            ("blrH", "ControlCategoryProcessor", []), 
-            ("boostedHiggs", "BoostedCategoryProcessor", []),
-            ("boostedTop", "BoostedCategoryProcessor", []),
-            ("boostedHiggsOnly", "BoostedCategoryProcessor", []),
-            ("boostedTopOnly", "BoostedCategoryProcessor", []),
-            ("boostedHiggsTop", "BoostedCategoryProcessor", []),
-            #("boostedHiggsHighPt", "BoostedCategoryProcessor", []),
-            #("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
-            #("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
-        ]),
-        ("j5_t2", "ControlCategoryProcessor", [
-            ("blrH", "ControlCategoryProcessor", []), 
-            ("boostedHiggs", "BoostedCategoryProcessor", []),
-            ("boostedTop", "BoostedCategoryProcessor", []),
-            ("boostedHiggsOnly", "BoostedCategoryProcessor", []),
-            ("boostedTopOnly", "BoostedCategoryProcessor", []),
-            ("boostedHiggsTop", "BoostedCategoryProcessor", []),
-            #("boostedHiggsHighPt", "BoostedCategoryProcessor", []),
-            #("boostedHiggsGenMatch", "BoostedCategoryProcessor", []),
-            #("boostedHiggsGenNoMatch", "BoostedCategoryProcessor", []),
-        ]),
+        ("jge6_tge4", "ControlCategoryProcessor", []),
+        ("jge6_t3", "ControlCategoryProcessor", []),
+        ("jge6_t2", "ControlCategoryProcessor", []),
+        ("j5_tge4", "ControlCategoryProcessor", []),
+        ("j5_t3", "ControlCategoryProcessor", []),
+        ("j5_t2", "ControlCategoryProcessor", []),
+        ("j4_t4", "ControlCategoryProcessor", []),
+        ("j4_t3", "ControlCategoryProcessor", []),
     ]),
     ("dl", "ControlCategoryProcessor", [
         ("j3_t2", "ControlCategoryProcessor", []),
@@ -492,47 +387,23 @@ categories_tree = [
     ]),
     
     ("dl_mumu", "ControlCategoryProcessor", [
-        ("j3_t2", "ControlCategoryProcessor", [
-            ("blrH", "ControlCategoryProcessor", []), 
-        ]),
-        ("jge3_t3", "ControlCategoryProcessor", [
-            ("blrH", "ControlCategoryProcessor", []), 
-        ]),
-        ("jge4_t2", "ControlCategoryProcessor", [
-            ("blrH", "ControlCategoryProcessor", []), 
-        ]),
-        ("jge4_tge4", "ControlCategoryProcessor", [
-            ("blrH", "ControlCategoryProcessor", []), 
-        ]),
+        ("j3_t2", "ControlCategoryProcessor", []),
+        ("jge3_t3", "ControlCategoryProcessor", []),
+        ("jge4_t2", "ControlCategoryProcessor", []),
+        ("jge4_tge4", "ControlCategoryProcessor", []),
     ]),
 
     ("dl_emu", "ControlCategoryProcessor", [
-        ("j3_t2", "ControlCategoryProcessor", [
-            ("blrH", "ControlCategoryProcessor", []), 
-        ]),
-        ("jge3_t3", "ControlCategoryProcessor", [
-            ("blrH", "ControlCategoryProcessor", []), 
-        ]),
-        ("jge4_t2", "ControlCategoryProcessor", [
-            ("blrH", "ControlCategoryProcessor", []), 
-        ]),
-        ("jge4_tge4", "ControlCategoryProcessor", [
-            ("blrH", "ControlCategoryProcessor", []), 
-        ]),
+        ("j3_t2", "ControlCategoryProcessor", []),
+        ("jge3_t3", "ControlCategoryProcessor", []),
+        ("jge4_t2", "ControlCategoryProcessor", []),
+        ("jge4_tge4", "ControlCategoryProcessor", []),
     ]),
     ("dl_ee", "ControlCategoryProcessor", [
-        ("j3_t2", "ControlCategoryProcessor", [
-            ("blrH", "ControlCategoryProcessor", []), 
-        ]),
-        ("jge3_t3", "ControlCategoryProcessor", [
-            ("blrH", "ControlCategoryProcessor", []), 
-        ]),
-        ("jge4_t2", "ControlCategoryProcessor", [
-            ("blrH", "ControlCategoryProcessor", []), 
-        ]),
-        ("jge4_tge4", "ControlCategoryProcessor", [
-            ("blrH", "ControlCategoryProcessor", []), 
-        ]),
+        ("j3_t2", "ControlCategoryProcessor", []),
+        ("jge3_t3", "ControlCategoryProcessor", []),
+        ("jge4_t2", "ControlCategoryProcessor", []),
+        ("jge4_tge4", "ControlCategoryProcessor", []),
     ]),
 
     ("sl", "SparseCategoryProcessor", []),

@@ -10,6 +10,7 @@
 #include "TH1D.h"
 #include "THnSparse.h"
 #include "TFile.h"
+#include "TPython.h"
 #include <tuple>
 #include <unordered_map>
 #include <functional>
@@ -80,11 +81,12 @@ template <> struct hash<vector<CategoryKey::CategoryKey>>
 //Simple representation of a jet
 class Jet {
 public:
-    const TLorentzVector p4;
-    const float btagCSV;
-    const float btagBDT;
+    TLorentzVector p4;
+    float btagCSV;
+    float btagBDT;
+    int hadronFlavour;
 
-    Jet(const TLorentzVector& _p4, float _btagCSV, float _btagBDT);
+    Jet(TLorentzVector& _p4, float _btagCSV, float _btagBDT, int _hadronFlavour);
     const string to_string() const;
 };
 
@@ -139,6 +141,7 @@ public:
     string outputFile;
     vector<SparseAxis> sparseAxes;
     vector<vector<CategoryKey::CategoryKey>> enabledCategories;
+    bool recalculateBTagWeight;
 
     Configuration(
         vector<string>& _filenames,
@@ -161,7 +164,8 @@ public:
         printEvery(_printEvery),
         outputFile(_outputFile),
         sparseAxes(_sparseAxes),
-        enabledCategories(_enabledCategories)
+        enabledCategories(_enabledCategories),
+        recalculateBTagWeight(true)
     {
     }
     static const Configuration makeConfiguration(JsonValue& value);
@@ -221,16 +225,11 @@ public:
     // Our BDT
     double tth_mva;
 
+    //KIT BDT
+    double common_bdt;
+
     //btag weights
-    double bTagWeight;
-    double bTagWeight_Stats1Up;
-    double bTagWeight_Stats1Down;
-    double bTagWeight_Stats2Up;
-    double bTagWeight_Stats2Down;
-    double bTagWeight_LFUp;
-    double bTagWeight_LFDown;
-    double bTagWeight_HFUp;
-    double bTagWeight_HFDown;
+    map<SystematicKey::SystematicKey, double> bTagWeights;
 
     //btag likelihood
     double btag_LR_4b_2b;
@@ -276,15 +275,8 @@ public:
         double _mem_SL_2w2h2t_sj,
         double _mem_DL_0w2h2t,
         double _tth_mva,
-        double _bTagWeight,
-        double _bTagWeight_Stats1Up,
-        double _bTagWeight_Stats1Down,
-        double _bTagWeight_Stats2Up,
-        double _bTagWeight_Stats2Down,
-        double _bTagWeight_LFUp,
-        double _bTagWeight_LFDown,
-        double _bTagWeight_HFUp,
-        double _bTagWeight_HFDown,
+        double _common_bdt,
+        map<SystematicKey::SystematicKey, double> _bTagWeights,
         double _btag_LR_4b_2b,
         int _n_excluded_bjets,
         int _n_excluded_ljets,
@@ -475,7 +467,7 @@ namespace BaseCuts {
 bool isMC(ProcessKey::ProcessKey proc);
 bool isSignalMC(ProcessKey::ProcessKey proc);
 bool isData(ProcessKey::ProcessKey proc);
-double process_weight(ProcessKey::ProcessKey proc);
+double process_weight(ProcessKey::ProcessKey procm, const Configuration& conf);
 
 //Checks if this category, specified by a list of keys, was enabled in the JSON
 bool isCategoryEnabled(const Configuration& conf, const vector<CategoryKey::CategoryKey>& catKeys);

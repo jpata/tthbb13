@@ -19,8 +19,12 @@ class Datacard:
             "CMS_scale_j"       : 1,
             "CMS_ttH_CSVLF"       : 1,
             "CMS_ttH_CSVHF"       : 1,
-            "CMS_ttH_CSVStats1"   : 1,
-            "CMS_ttH_CSVStats2"   : 1,
+            "CMS_ttH_CSVcErr1"    : 1,
+            "CMS_ttH_CSVcErr2"    : 1,
+            "CMS_ttH_CSVHFStats1"   : 1,
+            "CMS_ttH_CSVHFStats2"   : 1,
+            "CMS_ttH_CSVLFStats1"   : 1,
+            "CMS_ttH_CSVLFStats2"   : 1,
         }
     
         #deepcopy otherwise dicts will be linked
@@ -36,30 +40,41 @@ class Datacard:
 
         self.common_scale_uncertainties = {
             "ttH_hbb" : {
-                "lumi" : 1.05
+                "lumi" : 1.045,
+                "QCDscale_ttH" : 1.133,
+                "pdf_gg" : 1.083,
             },
             "ttH_nohbb" : {
-                "lumi" : 1.05
+                "lumi" : 1.045
             },
             "ttbarPlus2B" : {
                 "bgnorm_ttbarPlus2B" : 1.5,
-                "lumi": 1.05
+                "QCDscale_ttbar" : 1.030,
+                "pdf_gg" : 1.026,
+                "lumi": 1.045
             },
             "ttbarPlusB" : {
-                "bgnorm_ttbarPlusB" : 1.3,
-                "lumi": 1.05
+                "bgnorm_ttbarPlusB" : 1.5,
+                "QCDscale_ttbar" : 1.030,
+                "pdf_gg" : 1.026,
+                "lumi": 1.045
             },
             "ttbarPlusBBbar" : {
-                "bgnorm_ttbarPlusBBbar" : 1.3,
-                "lumi": 1.05
+                "bgnorm_ttbarPlusBBbar" : 1.5,
+                "QCDscale_ttbar" : 1.030,
+                "pdf_gg" : 1.026,
+                "lumi": 1.045
             },
             "ttbarPlusCCbar" : {
-                "bgnorm_ttbarPlusCCbar" : 1.3,
-                "lumi": 1.05
+                "bgnorm_ttbarPlusCCbar" : 1.5,
+                "QCDscale_ttbar" : 1.030,
+                "pdf_gg" : 1.026,
+                "lumi": 1.045
             },
             "ttbarOther" : {
-                "bgnorm_ttbarOther" : 1.3,
-                "lumi": 1.05
+                "lumi": 1.045,
+                "QCDscale_ttbar" : 1.030,
+                "pdf_gg" : 1.026,
             },
         }
         # value: normalization uncertainty

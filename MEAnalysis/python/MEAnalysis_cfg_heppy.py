@@ -186,19 +186,19 @@ class Conf:
         # "matching" - print out the association between gen and reco objects
         #"verbosity": ["eventboundary", "input", "matching", "gen", "reco", "meminput"],
         "verbosity": [
-            #"eventboundary", #print run:lumi:event
+            "eventboundary", #print run:lumi:event
             #"trigger", #print trigger bits
             #"input", #print input particles
             #"gen", #print out gen-level info
             #"debug", #very high-level debug info
             #"reco", #info about reconstructed final state
             #"meminput" #info about particles used for MEM input
-            "commoninput" #print out inputs for CommonClassifier
+            #"commoninput" #print out inputs for CommonClassifier
         ],
 
-        # "eventWhitelist": [
-        #     (1, 3372, 672071)
-        # ]
+        #"eventWhitelist": [
+        #    (1,7991, 1593159)
+        #]
     }
 
     bran = {
@@ -254,7 +254,7 @@ class Conf:
 
         #Actually run the ME calculation
         #If False, all ME values will be 0
-        "calcME": True,
+        "calcME": False,
         
         "weight": 0.15,
 
