@@ -571,6 +571,7 @@ def getTreeProducer(conf):
         for vtype in [
             ("weight_xs",               float,  ""),
             ("ttCls",                   int,    ""),
+            ("genHiggsDecayMode",       int,    ""),
             #("bTagWeight",              float,  ""),
             #("bTagWeight_HFDown",       float,  ""),
             #("bTagWeight_HFUp",         float,  ""),
