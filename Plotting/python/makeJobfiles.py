@@ -2,17 +2,17 @@ import TTH.Plotting.Datacards.Samples as Samples
 import ROOT, json
 
 #entries per job
-perjob = 100000
+perjob = 50000
 
 def chunks(l, n):
     """Yield successive n-sized chunks from l."""
     for i in xrange(0, len(l), n):
         yield l[i:i+n]
 
-nbins_mem = 6
-nbins_bdt = 6
-#nbins_mem = 36
-#nbins_bdt = 40
+#nbins_mem = 6
+#nbins_bdt = 6
+nbins_mem = 36
+nbins_bdt = 40
 
 ijob = 0
 for samp in Samples.samples_dict.keys():

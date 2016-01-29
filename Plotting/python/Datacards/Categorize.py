@@ -215,7 +215,7 @@ class Categorization(object):
             c.print_tree(depth+1, of, verbose)
 
 
-    def print_tree_latex(self, depth=0, limits = {}):    
+    def print_tree_latex(self, depth=0, limits = {}, also_calc_unsplit = False):    
         """  """
 
         S,B = self.get_sb()
@@ -227,8 +227,13 @@ class Categorization(object):
             filenames = []
 
             i_split = 0
+                        
+            if also_calc_unsplit:
+                ignore_splittings_list = [True, False]
+            else:
+                ignore_splittings_list = [False]
 
-            for ignore_splittings in [True,False]:
+            for ignore_splittings in ignore_splittings_list:
 
                 for node in nodes_to_eval:
                     shapes_txt_filename    = "{0}/shapes_tree_{1}_{2}_NS{3}.txt".format(node.output_path, str(node), i_split, ignore_splittings)
@@ -254,12 +259,14 @@ class Categorization(object):
 
             li_limits = self.pool.map(self.lg, [f for f in filenames])
             self.li_limits = copy.deepcopy(li_limits)
+
             for n in nodes_to_eval:
-                n.limits_self = li_limits[n.i_split_self]
                 n.limits_comb = li_limits[n.i_split_comb]
+                if also_calc_unsplit:
+                    n.limits_self = li_limits[n.i_split_self]
 
             limits = {}
-            for ignore_splitting in [True,False]:
+            for ignore_splitting in ignore_splittings_list:
                 for n in nodes_to_eval:
                     _limits, _quantiles = li_limits.pop(0)
                     l = _limits[2]
@@ -278,15 +285,17 @@ class Categorization(object):
         ret += "B={0:.1f}".format(B) 
         
         if self.children:
+            
             ret += r"\\"
             ret += r"$\mu_{Comb.} = " + "{0:.2f}$".format(limits[str(self)+str(False)])
 
+            if also_calc_unsplit:
+                ret += r"\\"
+                ret += r"$\mu_{Self} = " + "{0:.2f}$".format(limits.get(str(self)+str(True), -1))
+        else:
+            ret += r"\\"
+            ret += r"$\mu_{Self} = " + "{0:.2f}$".format(limits.get(str(self)+str(False), -1))
 
-        #ret += r"\\"
-        #ret += "Discr: "
-        #ret += self.axes[self.discriminator_axis].name.replace("_", " ")
-        ret += r"\\"
-        ret += r"$\mu_{Self} = " + "{0:.2f}$".format(limits.get(str(self)+str(True), -1))
 
         ret += "}"
 
