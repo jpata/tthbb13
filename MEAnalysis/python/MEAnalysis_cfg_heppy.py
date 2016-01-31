@@ -190,7 +190,7 @@ class Conf:
             #"trigger", #print trigger bits
             #"input", #print input particles
             #"gen", #print out gen-level info
-            #"debug", #very high-level debug info
+            "debug", #very high-level debug info
             #"reco", #info about reconstructed final state
             #"meminput" #info about particles used for MEM input
             #"commoninput" #print out inputs for CommonClassifier
@@ -254,7 +254,7 @@ class Conf:
 
         #Actually run the ME calculation
         #If False, all ME values will be 0
-        "calcME": False,
+        "calcME": True,
         
         "weight": 0.15,
 
@@ -264,13 +264,13 @@ class Conf:
             "sl_j5_tge4": -20,
             
             "sl_jge6_t2": 20,
-            "sl_jge6_t3": 3.8,
+            "sl_jge6_t3": 3.2,
             "sl_jge6_tge4": -20,
 
-            "dl_j3_t2": -1.0,
-            "dl_jge3_t3": 3.4,
-            "dl_jge4_t2": -0.6,
-            "dl_jge4_tge4": 7.4,
+            "dl_j3_t2": 20,
+            "dl_jge3_t3": -20,
+            "dl_jge4_t2": 20,
+            "dl_jge4_tge4": -20,
         },
 
         #Generic event-dependent selection function applied
@@ -279,12 +279,9 @@ class Conf:
         "selection": lambda event: (
             event.pass_category_blr and (
                 (event.is_sl and event.nBCSVM >= 3)
-                or (event.is_dl and event.nBCSVM >= 2)
-            )
+                or (event.is_dl and event.nBCSVM >= 3)
+            ) and event.is_dl #FIXME
         ),
-        #"selection": lambda event: (event.btag_LR_4b_2b > 0.95 #optimized for 40% tth(bb) acceptance
-        #    and (event.is_sl and event.numJets >= 6 and event.nBCSVM >= 4) #always calculate for tagged events
-        #),
         
         #This configures what the array elements mean
         #Better not change this

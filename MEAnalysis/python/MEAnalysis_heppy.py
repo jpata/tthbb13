@@ -254,9 +254,9 @@ sequence = cfg.Sequence([
     genrad,
     gentth,
     subjet_analyzer,
+    commoncls,
     mem_analyzer,
     mva,
-    commoncls,
     treevar,
     treeProducer
 ])

@@ -507,7 +507,9 @@ def getTreeProducer(conf):
             ("passes_btag",         int,        ""),
             ("passes_mem",          int,        "MEM was evaluated"),
             ("tth_mva",             float,      "ttH vs tt+jets bdt"),
-            ("common_bdt",          float,      "KIT BDT"),
+            ("common_bdt",          float,      "KIT BDT (SL/DL)"),
+            ("common_bdt_withmem1", float,      "KIT BDT, MEM in 3t"),
+            ("common_bdt_withmem2", float,      "KIT BDT, MEM in 3t, 4t"),
         ]:
 
             is_mc_only = False
