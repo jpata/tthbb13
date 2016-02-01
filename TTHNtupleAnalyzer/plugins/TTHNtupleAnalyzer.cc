@@ -48,7 +48,10 @@
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/PatCandidates/interface/Tau.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
+#include "DataFormats/JetReco/interface/Jet.h"
 #include "DataFormats/JetReco/interface/GenJet.h"
+
+
 
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
@@ -133,7 +136,6 @@ template<typename T>
 T * ptr(T * obj) { return obj; } //obj is already pointer, return it!
 
 
-// OBSOLOTE: Not needed at the moment!
 // Functor so we can sort a list of ElementType objects according to
 // their deltaR distance to the reference object.  
 // Can take anything that inherits the p4() to give Lorentz Vector. 
@@ -146,6 +148,23 @@ struct distance_sorter
   bool operator()(ElementType first, 
 		  ElementType second){    
     return ROOT::Math::VectorUtil::DeltaR( ptr(first)->p4(), ptr(reference)->p4()) < ROOT::Math::VectorUtil::DeltaR( ptr(second)->p4(), ptr(reference)->p4());
+  }
+};
+
+
+// Functor so we can sort a list of ElementType objects according to
+// their deltaR distance to the reference object.  
+// Can take anything that inherits the p4() to give Lorentz Vector as ElementType. 
+// The reference already has to be a LorentzVector
+// Can deal with references and pointers.
+template <typename ElementType>
+struct distance_sorter_p4
+{  
+   math::XYZTLorentzVector reference;
+  distance_sorter_p4( math::XYZTLorentzVector reference) : reference(reference) { }
+  bool operator()(ElementType first, 
+		  ElementType second){    
+    return ROOT::Math::VectorUtil::DeltaR( ptr(first)->p4(), reference) < ROOT::Math::VectorUtil::DeltaR( ptr(second)->p4(), reference);
   }
 };
 
@@ -1588,10 +1607,11 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	fill_genparticle_branches(tthtree, gen_higgs,    "higgs");
 	fill_genparticle_branches(tthtree, hadronic_ts,  "hadtop");
   
-      
+            	
 	// Loop over HTT collections
 	for (unsigned i_htt_coll = 0; i_htt_coll < htt_objects_.size(); i_htt_coll++){
 
+	
 	  // Get the proper names
 	  std::string htt_object_name   = htt_objects_[i_htt_coll];
 	  std::string htt_branches_name = htt_branches_[i_htt_coll];
@@ -1606,6 +1626,15 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
 	  // Make sure both collections have the same size
 	  assert(top_jets->size()==top_jet_infos->size());
+
+	  edm::Handle<edm::View<reco::PFJet>> calibrated_htt_subjets;
+	  iEvent.getByLabel("foojets", calibrated_htt_subjets);
+
+	  std::vector<reco::PFJet> foo;
+
+	  for (unsigned int i_cal_sj=0; i_cal_sj<calibrated_htt_subjets->size(); i_cal_sj++) {
+	    foo.push_back( (*calibrated_htt_subjets)[i_cal_sj]);
+	  }
 
           // HEPTopTagger
 	  // Top jets and subjets are associated by indices. See:
@@ -1670,7 +1699,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	      fill_truth_matching<reco::BasicJet>(tthtree, x, n_top_jet, gen_higgs, prefix, "higgs");
 	    
 	    bool first = true;
-	    for (auto& constituent : x.getJetConstituents()) {
+	    for ( edm::Ptr<reco::Candidate > constituent : x.getJetConstituents()) {
 	      if (constituent.isNull()) {
 		edm::LogWarning("top jets") << "n_top_jet=" << n_top_jet << " constituent is not valid";
 		break;
@@ -1690,6 +1719,28 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	      tthtree->get_address<float *>(prefix_sj + "energy" )[n_top_jet_subjet]  = constituent->energy();
 
 	      tthtree->get_address<int *>(prefix_sj + "parent_idx" )[n_top_jet_subjet]  = n_top_jet;
+
+	      std::sort(foo.begin(), foo.end(),  distance_sorter_p4<reco::PFJet>(constituent->p4()));
+		
+	      if (htt_object_name == "looseOptRHTT"){
+		std::cout << n_top_jet_subjet << ": " << (foo)[0].pt() <<
+		  " " <<
+		  constituent->pt() <<
+		  " " <<
+		  (*calibrated_htt_subjets)[n_top_jet_subjet].eta() <<
+		  " " <<
+		  constituent->eta() <<
+		  " " <<
+		  (*calibrated_htt_subjets)[n_top_jet_subjet].phi() <<
+		  " " <<
+		  constituent->phi() << std::endl;
+	      }
+	      
+// 	  std::cout << "Number of calibrated subjets: " << ->// // size() << std::endl;
+//	  // // std::cout << "Number of HTT Candidates: " << top_jets->size()
+//		    << " for " <<  << std::endl<< std::endl;
+//
+
 
 	      n_top_jet_subjet += 1;	      
 	      first = false;

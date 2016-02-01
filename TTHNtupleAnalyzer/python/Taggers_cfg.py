@@ -32,9 +32,30 @@ process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load('Configuration.Geometry.GeometryRecoDB_cff')
 process.load("RecoBTag.Configuration.RecoBTag_cff") # this loads all available b-taggers
 
+
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_mc')
+
+
+process.load("CondCore.DBCommon.CondDBCommon_cfi")
+from CondCore.DBCommon.CondDBSetup_cfi import *
+process.jec = cms.ESSource("PoolDBESSource",
+      DBParameters = cms.PSet(
+        messageLevel = cms.untracked.int32(0)
+        ),
+      timetype = cms.string('runnumber'),
+      toGet = cms.VPSet(
+      cms.PSet(
+            record = cms.string('JetCorrectionsRecord'),
+            tag    = cms.string('JetCorrectorParametersCollection_Summer15_25nsV6_MC_AK4PFchs'),
+            label  = cms.untracked.string('AK4PFchs')
+            ),
+      ), 
+      connect = cms.string('sqlite:Summer15_25nsV6_MC.db')
+)
+## add an es_prefer statement to resolve a possible conflict from simultaneous connection to a global tag
+process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
 
 
 #enable debugging printout
@@ -1006,34 +1027,34 @@ li_htt_branches = []
 
 for input_object in ["chs", "puppi"]:
    
-   name = "looseHTT"
-   if not input_object == "chs":
-      name += input_object
-
-   setattr(process, name, cms.EDProducer(
-        "HTTTopJetProducer",
-        PFJetParameters.clone( src = cms.InputTag(input_object),
-                               doAreaFastjet = cms.bool(True),
-                               doRhoFastjet = cms.bool(False),
-                               jetPtMin = cms.double(100.0)
-                           ),
-        AnomalousCellParameters,
-        optimalR = cms.bool(False),
-        algorithm = cms.int32(1),
-        jetAlgorithm = cms.string("CambridgeAachen"),
-        rParam = cms.double(1.5),
-        mode = cms.int32(4),
-        minFatjetPt = cms.double(200.),
-        minCandPt = cms.double(200.),
-        minSubjetPt = cms.double(30.),
-        writeCompound = cms.bool(True),
-        minCandMass = cms.double(0.),
-        maxCandMass = cms.double(1000),
-        massRatioWidth = cms.double(100.),
-        minM23Cut = cms.double(0.),
-        minM13Cut = cms.double(0.),
-        maxM13Cut = cms.double(2.)))
-   li_htt_branches.append(name)
+#   name = "looseHTT"
+#   if not input_object == "chs":
+#      name += input_object
+#
+#   setattr(process, name, cms.EDProducer(
+#        "HTTTopJetProducer",
+#        PFJetParameters.clone( src = cms.InputTag(input_object),
+#                               doAreaFastjet = cms.bool(True),
+#                               doRhoFastjet = cms.bool(False),
+#                               jetPtMin = cms.double(100.0)
+#                           ),
+#        AnomalousCellParameters,
+#        optimalR = cms.bool(False),
+#        algorithm = cms.int32(1),
+#        jetAlgorithm = cms.string("CambridgeAachen"),
+#        rParam = cms.double(1.5),
+#        mode = cms.int32(4),
+#        minFatjetPt = cms.double(200.),
+#        minCandPt = cms.double(200.),
+#        minSubjetPt = cms.double(30.),
+#        writeCompound = cms.bool(True),
+#        minCandMass = cms.double(0.),
+#        maxCandMass = cms.double(1000),
+#        massRatioWidth = cms.double(100.),
+#        minM23Cut = cms.double(0.),
+#        minM13Cut = cms.double(0.),
+#        maxM13Cut = cms.double(2.)))
+#   li_htt_branches.append(name)
 
    name = "looseOptRHTT"
    if not input_object == "chs":
@@ -1047,6 +1068,7 @@ for input_object in ["chs", "puppi"]:
                                jetPtMin = cms.double(100.0)
                            ),
         AnomalousCellParameters,
+        jetCollInstanceName=cms.string("SubJets"),
         optimalR = cms.bool(True),
         algorithm = cms.int32(1),
         jetAlgorithm = cms.string("CambridgeAachen"),
@@ -1064,10 +1086,37 @@ for input_object in ["chs", "puppi"]:
         maxM13Cut = cms.double(2.)))
    li_htt_branches.append(name)
 
-   name = "msortHTT"
-   if not input_object == "chs":
-      name += input_object
 
+process.ak4pfchsL1Fastjet = cms.ESProducer(
+   'L1FastjetCorrectionESProducer',
+   level = cms.string('L1FastJet'),
+   algorithm = cms.string('AK4PFchs'),
+   srcRho = cms.InputTag( 'fixedGridRhoFastjetAll' )
+     )
+ 
+process.ak4pfchsL2Relative = cms.ESProducer(
+   'LXXXCorrectionESProducer',
+   level     = cms.string('L2Relative'),
+   algorithm = cms.string('AK4PFchs')
+)
+
+process.ak4pfchsL3Absolute = cms.ESProducer(
+   'LXXXCorrectionESProducer',
+   level     = cms.string('L3Absolute'),
+   algorithm = cms.string('AK4PFchs')
+)
+
+
+process.ak4pfchsL1L2L3 = cms.ESProducer(
+   'JetCorrectionESChain',
+   correctors = cms.vstring('ak4pfchsL1Fastjet', 
+                            'ak4pfchsL2Relative', 
+                            'ak4pfchsL3Absolute')
+)
+
+process.foojets = cms.EDProducer('PFJetCorrectionProducer',
+    src         = cms.InputTag('looseOptRHTT', 'SubJets'),
+    correctors  = cms.vstring('ak4pfchsL1L2L3'))
 
 #####################################
 # NTupelizer
@@ -1202,6 +1251,8 @@ for x in li_cmstt_objects + li_cmstt_infos:
 
 #process.p += process.jetFlavourInfos
 #process.p += process.printEvent
+
+process.p += process.foojets
 
 # Schedule b-tagging and Ntupelizer
 for x in [process.my_btagging,
