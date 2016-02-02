@@ -1,6 +1,9 @@
 #include <algorithm>
+#include <vector>
 #include "TTH/TTHNtupleAnalyzer/interface/HypoEnums.hh"
 #include <EgammaAnalysis/ElectronTools/interface/ElectronEffectiveArea.h>
+
+using namespace std;
 
 //working points from RecoJets/JetProducers/python/PileupJetIDCutParams_cfi.py
 //Eta Categories  0-2.5 2.5-2.75 2.75-3.0 3.0-5.0

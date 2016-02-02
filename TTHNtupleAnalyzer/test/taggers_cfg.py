@@ -11,7 +11,8 @@ process.source.fileNames = cms.untracked.vstring([
 #    'file:///scratch/gregor/WJetsToLNu_HT-200to400_PU20bx25_MiniAOD.root'
 #    'file:///scratch/gregor/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8.root'
 #    'file:///scratch/gregor/QCD_Pt-300to470_TuneZ2star_13TeV_pythia6.root'
-     'file:///scratch/gregor/zprime_3tev_miniaodv2.root'
+#     'file:///scratch/gregor/zprime_3tev_miniaodv2.root'
+    "root://xrootd.ba.infn.it//store/mc/RunIIFall15MiniAODv1/TT_TuneCUETP8M1_13TeV-powheg-scaledown-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/30000/045996FE-A19D-E511-B76D-D4AE526A0B47.root"
 #     'file:///scratch/gregor/RunIISpring15DR74_ZprimeToTT_M-1000_W-10_TuneCUETP8M1_13TeV_Asympt50ns.root'    
 ])
 

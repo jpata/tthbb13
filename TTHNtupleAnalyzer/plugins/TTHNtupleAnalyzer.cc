@@ -224,8 +224,20 @@ void fill_truth_matching(TTHTree* tthtree,
 // objects as fatjets
 template <typename JetType, typename CollectionType>
 void fill_fatjet_branches(const edm::Event& iEvent, 
-			  TTHTree* tthtree, 
-			  std::string fj_object_name,
+			  TTHTree* tthtree,
+ 			  const edm::EDGetTokenT<CollectionType> fj_token,
+			  edm::EDGetTokenT<edm::ValueMap<float>> fatjetNsubTau1Token,
+			  edm::EDGetTokenT<edm::ValueMap<float>> fatjetNsubTau2Token,
+			  edm::EDGetTokenT<edm::ValueMap<float>> fatjetNsubTau3Token,
+			  edm::EDGetTokenT<edm::ValueMap<double>> fatjetSDChi1Token,
+			  edm::EDGetTokenT<edm::ValueMap<double>> fatjetSDChi2Token,
+			  edm::EDGetTokenT<edm::ValueMap<double>> fatjetSDChi3Token,
+			  edm::EDGetTokenT<edm::ValueMap<int>> fatjetSDNMJ1Token,
+			  edm::EDGetTokenT<edm::ValueMap<int>> fatjetSDNMJ2Token,
+			  edm::EDGetTokenT<edm::ValueMap<int>> fatjetSDNMJ3Token,			  		 	  
+			  edm::EDGetTokenT<reco::JetTagCollection> fatjetBtagsToken,			  		 	  
+			  edm::EDGetTokenT<edm::ValueMap<float>> fatjetQvolsToken,			  		 	  
+			  edm::EDGetTokenT<reco::JetFlavourInfoMatchingCollection> fatjetFlavInfoToken,
 			  std::string fj_nsubs_name,
 			  std::string fj_sds_name,
 			  std::string fj_btags_name,
@@ -237,28 +249,20 @@ void fill_fatjet_branches(const edm::Event& iEvent,
 			  // hard partons for matching
 			  const vector<const reco::Candidate*>  & hard_partons,
 			  // true higgs for matching
-			  const vector<const reco::Candidate*>  & gen_higgs,
-			  bool fj_usesubjets){
+			  const vector<const reco::Candidate*>  & gen_higgs){
   
-  // Get Fatjet iteself  
-  
+  // Get Fatjet iteself    
   edm::Handle<CollectionType>  fatjets;
-  
-
-  
-  if (fj_usesubjets)
-    iEvent.getByLabel(fj_object_name, "SubJets", fatjets);
-  else
-    iEvent.getByLabel(fj_object_name, fatjets);
+  iEvent.getByToken(fj_token, fatjets);
 
   // Handles to get the Nsubjettiness
   edm::Handle<edm::ValueMap<float> > fatjet_nsub_tau1;
   edm::Handle<edm::ValueMap<float> > fatjet_nsub_tau2;
   edm::Handle<edm::ValueMap<float> > fatjet_nsub_tau3;
   if (fj_nsubs_name != "None"){
-    iEvent.getByLabel(fj_nsubs_name, "tau1", fatjet_nsub_tau1);
-    iEvent.getByLabel(fj_nsubs_name, "tau2", fatjet_nsub_tau2);
-    iEvent.getByLabel(fj_nsubs_name, "tau3", fatjet_nsub_tau3);
+    iEvent.getByToken(fatjetNsubTau1Token, fatjet_nsub_tau1);
+    iEvent.getByToken(fatjetNsubTau2Token, fatjet_nsub_tau2);
+    iEvent.getByToken(fatjetNsubTau3Token, fatjet_nsub_tau3);
 
     // Make sure the fatjets and nsujettiness containers have same size
     assert(fatjets->size()==fatjet_nsub_tau1->size());
@@ -276,34 +280,31 @@ void fill_fatjet_branches(const edm::Event& iEvent,
   edm::Handle<edm::ValueMap<int> > fatjet_sd_nmj3;
   if (fj_sds_name != "None"){
 
+    iEvent.getByToken(fatjetSDChi1Token, fatjet_sd_chi1);
+    iEvent.getByToken(fatjetSDNMJ1Token, fatjet_sd_nmj1);
 
-    iEvent.getByLabel(fj_sds_name + "1", "chi", fatjet_sd_chi1);
-    iEvent.getByLabel(fj_sds_name + "1", "nmicrojets", fatjet_sd_nmj1);
+    iEvent.getByToken(fatjetSDChi2Token, fatjet_sd_chi2);
+    iEvent.getByToken(fatjetSDNMJ2Token, fatjet_sd_nmj2);
 
-    iEvent.getByLabel(fj_sds_name + "2", "chi", fatjet_sd_chi2);
-    iEvent.getByLabel(fj_sds_name + "2", "nmicrojets", fatjet_sd_nmj2);
-
-    iEvent.getByLabel(fj_sds_name + "3", "chi", fatjet_sd_chi3);
-    iEvent.getByLabel(fj_sds_name + "3", "nmicrojets", fatjet_sd_nmj3);
-
-
+    iEvent.getByToken(fatjetSDChi3Token, fatjet_sd_chi3);
+    iEvent.getByToken(fatjetSDNMJ3Token, fatjet_sd_nmj3);
   }
 
   // b-tag discriminators handle
   edm::Handle<reco::JetTagCollection> btagDiscriminators;
   if (fj_btags_name != "None"){
-    iEvent.getByLabel(fj_btags_name, btagDiscriminators);    
+    iEvent.getByToken(fatjetBtagsToken, btagDiscriminators);    
   }
 
   // Q-jet volatility handle
   edm::Handle<edm::ValueMap<float> > QjetVols;
   if (fj_qvols_name != "None")
-    iEvent.getByLabel(fj_qvols_name,"QjetsVolatility", QjetVols);
+    iEvent.getByToken(fatjetQvolsToken, QjetVols);
 
   // Flavour Info handle
   edm::Handle<reco::JetFlavourInfoMatchingCollection> JetFlavourInfos;
   if (fj_flavour_info_name != "None"){
-    iEvent.getByLabel(fj_flavour_info_name, JetFlavourInfos);
+    iEvent.getByToken(fatjetFlavInfoToken, JetFlavourInfos);
   }
 
   // Loop over fatjets
@@ -489,6 +490,9 @@ private:
 	const edm::EDGetTokenT<pat::JetCollection> jetToken_;
 	const edm::EDGetTokenT<std::vector<reco::GenJet>> genJetToken_;
 
+  	const edm::EDGetTokenT<GenEventInfoProduct>  genEventInfoToken_;
+  	const edm::EDGetTokenT<std::vector<PileupSummaryInfo> > pupInfoToken_;
+
 	// collection of vertices
 	const edm::EDGetTokenT<reco::VertexCollection> vertexToken_;
 
@@ -499,6 +503,15 @@ private:
 	// collection of  MET
 	const edm::EDGetTokenT<pat::METCollection> metToken_;
 
+        // HTT tokens
+        std::vector<edm::EDGetTokenT< edm::View<reco::BasicJet> > > httTokens_;
+        std::vector<edm::EDGetTokenT< edm::View<reco::HTTTopJetTagInfo> > > httInfoTokens_;
+
+        // CMSTT tokens
+        std::vector<edm::EDGetTokenT< edm::View<reco::BasicJet> > > cmsttTokens_;
+        std::vector<edm::EDGetTokenT< edm::View<reco::CATopJetTagInfo> > > cmsttInfoTokens_;
+        std::vector<edm::EDGetTokenT< reco::JetTagCollection>> cmsttBtagsTokens_;
+    
         // fatjet information
         // objects = name of the jet collection
         // nsubs = name of the N-subjettiness calculation process
@@ -517,6 +530,26 @@ private:
 	const std::vector<int> fatjet_usesubjets_;
   	const std::vector<std::string> fatjet_flavour_infos_;
 
+
+        // Fatjet Tokens
+        std::vector<edm::EDGetTokenT< reco::PFJetCollection > > fatjetTokens_;
+       
+        std::vector<edm::EDGetTokenT<edm::ValueMap<float>>> fatjetNsubTau1Tokens_;
+        std::vector<edm::EDGetTokenT<edm::ValueMap<float>>> fatjetNsubTau2Tokens_;
+        std::vector<edm::EDGetTokenT<edm::ValueMap<float>>> fatjetNsubTau3Tokens_;
+
+        std::vector<edm::EDGetTokenT<edm::ValueMap<double>>> fatjetSDChi1Tokens_;
+        std::vector<edm::EDGetTokenT<edm::ValueMap<double>>> fatjetSDChi2Tokens_;
+        std::vector<edm::EDGetTokenT<edm::ValueMap<double>>> fatjetSDChi3Tokens_;
+
+        std::vector<edm::EDGetTokenT<edm::ValueMap<int>>> fatjetSDNMJ1Tokens_;
+        std::vector<edm::EDGetTokenT<edm::ValueMap<int>>> fatjetSDNMJ2Tokens_;
+        std::vector<edm::EDGetTokenT<edm::ValueMap<int>>> fatjetSDNMJ3Tokens_;
+        
+        std::vector<edm::EDGetTokenT<reco::JetTagCollection>> fatjetBtagsTokens_;
+        std::vector<edm::EDGetTokenT<edm::ValueMap<float>>> fatjetQvolsTokens_;			  		 	  
+        std::vector<edm::EDGetTokenT<reco::JetFlavourInfoMatchingCollection>> fatjetFlavInfoTokens_;
+        
         // HEPTopTagger information
         // objects = name of the input collection
         // htt branches = name of the branches to put this in
@@ -588,6 +621,9 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
 	jetToken_(consumes<pat::JetCollection>(iConfig.getParameter<edm::InputTag>("jets"))),
 	genJetToken_(consumes<std::vector<reco::GenJet>>(iConfig.getParameter<edm::InputTag>("genjets"))),
 
+	genEventInfoToken_(consumes<GenEventInfoProduct>(iConfig.getParameter<edm::InputTag>("generator"))),
+        pupInfoToken_(consumes<std::vector<PileupSummaryInfo> >(iConfig.getParameter<edm::InputTag>("pupInfo"))),
+						   
 	vertexToken_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("vertices"))),
 	prunedGenToken_(consumes<edm::View<reco::GenParticle> >(iConfig.getParameter<edm::InputTag>("pruned"))),
 	packedGenToken_(consumes<edm::View<pat::PackedGenParticle> >(iConfig.getParameter<edm::InputTag>("packed"))),
@@ -643,14 +679,103 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
 
 	jetCorrPars(new JetCorrectorParameters(iConfig.getParameter<edm::FileInPath>("jecFile").fullPath().c_str(), "Total")),
 	jetCorrUnc(new JetCorrectionUncertainty(*jetCorrPars)),
-	rhoSrc_(consumes<double>(iConfig.getParameter<edm::InputTag>("rho")))
+        rhoSrc_(consumes<double>(iConfig.getParameter<edm::InputTag>("rho")))
 {
-	tthtree->make_branches();
-	
-	hcounter->GetXaxis()->SetBinLabel(1, "TTHNtupleAnalyzer__processed");
-	hcounter->GetXaxis()->SetBinLabel(2, "TTHNtupleAnalyzer__passed");
 
-	sw = new TStopwatch();
+  for (unsigned int i=0; i < htt_objects_.size(); i++){
+    edm::InputTag it(htt_objects_[i],"");
+    httTokens_.push_back( consumes<edm::View<reco::BasicJet> >(it));    
+    httInfoTokens_.push_back( consumes<edm::View<reco::HTTTopJetTagInfo> >(it));    
+  }
+
+  for (unsigned int i=0; i < cmstt_objects_.size(); i++){
+    edm::InputTag it(cmstt_objects_[i],"");
+    cmsttTokens_.push_back( consumes<edm::View<reco::BasicJet> >(it));    
+  }
+
+  for (unsigned int i=0; i < cmstt_infos_.size(); i++){
+    edm::InputTag it(cmstt_infos_[i],"");
+    cmsttInfoTokens_.push_back( consumes<edm::View<reco::CATopJetTagInfo> >(it));    
+  }
+
+  for (unsigned int i=0; i < cmstt_btags_.size(); i++){
+    edm::InputTag it(cmstt_btags_[i],"");
+    cmsttBtagsTokens_.push_back( consumes<reco::JetTagCollection>(it));    
+  }
+
+
+
+  for (unsigned int i=0; i < fatjet_objects_.size(); i++){
+    edm::InputTag it;
+
+    if (fatjet_usesubjets_[i] == 1)
+      it = edm::InputTag(fatjet_objects_[i],"SubJets");
+    else
+      it = edm::InputTag(fatjet_objects_[i],"");
+
+    fatjetTokens_.push_back(consumes<reco::PFJetCollection>(it));    
+  }
+
+
+  for (unsigned int i=0; i < fatjet_nsubs_.size(); i++){    
+        edm::InputTag it1(fatjet_nsubs_[i],"tau1");
+        edm::InputTag it2(fatjet_nsubs_[i],"tau2");
+        edm::InputTag it3(fatjet_nsubs_[i],"tau3");
+	
+	fatjetNsubTau1Tokens_.push_back(consumes<edm::ValueMap<float>>(it1));
+	fatjetNsubTau2Tokens_.push_back(consumes<edm::ValueMap<float>>(it2));
+	fatjetNsubTau3Tokens_.push_back(consumes<edm::ValueMap<float>>(it3));           
+  }
+
+
+  for (unsigned int i=0; i < fatjet_sds_.size(); i++){
+
+    std::string sd1_label = fatjet_sds_[i];
+    std::string sd2_label = fatjet_sds_[i];
+    std::string sd3_label = fatjet_sds_[i];    
+
+    sd1_label.append("1");
+    sd2_label.append("2");
+    sd3_label.append("3");
+   
+    edm::InputTag it_chi1(sd1_label,"chi");
+    edm::InputTag it_chi2(sd2_label,"chi");
+    edm::InputTag it_chi3(sd3_label,"chi");
+
+    edm::InputTag it_nmj1(sd1_label,"nmicrojets");
+    edm::InputTag it_nmj2(sd2_label,"nmicrojets");
+    edm::InputTag it_nmj3(sd3_label,"nmicrojets");
+
+    fatjetSDChi1Tokens_.push_back(consumes<edm::ValueMap<double>>(it_chi1));
+    fatjetSDChi2Tokens_.push_back(consumes<edm::ValueMap<double>>(it_chi2));
+    fatjetSDChi3Tokens_.push_back(consumes<edm::ValueMap<double>>(it_chi3));
+    fatjetSDNMJ1Tokens_.push_back(consumes<edm::ValueMap<int>>(it_nmj1));
+    fatjetSDNMJ2Tokens_.push_back(consumes<edm::ValueMap<int>>(it_nmj2));
+    fatjetSDNMJ3Tokens_.push_back(consumes<edm::ValueMap<int>>(it_nmj3));      
+  }
+
+  for (unsigned int i=0; i < fatjet_btags_.size(); i++){
+    edm::InputTag it(fatjet_btags_[i],"");
+    fatjetBtagsTokens_.push_back(consumes<reco::JetTagCollection>(it));    
+  }
+
+  for (unsigned int i=0; i < fatjet_qvols_.size(); i++){
+    edm::InputTag it(fatjet_qvols_[i],"");
+    fatjetQvolsTokens_.push_back(consumes<edm::ValueMap<float>>(it));
+  }
+  
+  for (unsigned int i=0; i < fatjet_flavour_infos_.size(); i++){
+    edm::InputTag it(fatjet_flavour_infos_[i],"");
+    fatjetFlavInfoTokens_.push_back(consumes<reco::JetFlavourInfoMatchingCollection>(it));
+  }
+  
+
+  tthtree->make_branches();
+  
+  hcounter->GetXaxis()->SetBinLabel(1, "TTHNtupleAnalyzer__processed");
+  hcounter->GetXaxis()->SetBinLabel(2, "TTHNtupleAnalyzer__passed");
+  
+  sw = new TStopwatch();
 }
 
 
@@ -691,15 +816,19 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	if (isMC_) {
 	
 	// MC Event Weight
-	edm::Handle<GenEventInfoProduct> genEvtInfo;
-	iEvent.getByLabel( "generator", genEvtInfo );
+	edm::Handle<GenEventInfoProduct> genEvtInfo ;
+
+
+	iEvent.getByToken(genEventInfoToken_, genEvtInfo);
 	tthtree->weight__genmc = genEvtInfo->weight();
+	
+
 	 
 	Handle<edm::View<reco::GenParticle> > pruned;
 	
 	//Pileup and genparticles
 		Handle<std::vector<PileupSummaryInfo>> PupInfo;
-		iEvent.getByLabel(edm::InputTag("slimmedAddPileupInfo"), PupInfo);
+		iEvent.getByToken(pupInfoToken_, PupInfo);
 		std::vector<PileupSummaryInfo>::const_iterator PVI;
 		tthtree->n__pvi = PupInfo->size();
 		int n_pu = 0;
@@ -1618,23 +1747,23 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
  	  
 	  // Top tagger jets
 	  edm::Handle<edm::View<reco::BasicJet>> top_jets;
-	  iEvent.getByLabel(htt_object_name, top_jets);
+	  iEvent.getByToken(httTokens_[i_htt_coll], top_jets);
 
 	  // Extra Info
 	  edm::Handle<edm::View<reco::HTTTopJetTagInfo>> top_jet_infos;
-	  iEvent.getByLabel(htt_object_name, top_jet_infos);
+	  iEvent.getByToken(httInfoTokens_[i_htt_coll], top_jet_infos);
 
 	  // Make sure both collections have the same size
 	  assert(top_jets->size()==top_jet_infos->size());
 
-	  edm::Handle<edm::View<reco::PFJet>> calibrated_htt_subjets;
-	  iEvent.getByLabel("foojets", calibrated_htt_subjets);
+	  //edm::Handle<edm::View<reco::PFJet>> calibrated_htt_subjets;
+	  //iEvent.getByLabel("foojets", calibrated_htt_subjets);
 
-	  std::vector<reco::PFJet> foo;
+	  //std::vector<reco::PFJet> foo;
 
-	  for (unsigned int i_cal_sj=0; i_cal_sj<calibrated_htt_subjets->size(); i_cal_sj++) {
-	    foo.push_back( (*calibrated_htt_subjets)[i_cal_sj]);
-	  }
+	  //for (unsigned int i_cal_sj=0; i_cal_sj<calibrated_htt_subjets->size(); i_cal_sj++) {
+	  //  foo.push_back( (*calibrated_htt_subjets)[i_cal_sj]);
+	  //}
 
           // HEPTopTagger
 	  // Top jets and subjets are associated by indices. See:
@@ -1720,22 +1849,22 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
 	      tthtree->get_address<int *>(prefix_sj + "parent_idx" )[n_top_jet_subjet]  = n_top_jet;
 
-	      std::sort(foo.begin(), foo.end(),  distance_sorter_p4<reco::PFJet>(constituent->p4()));
-		
-	      if (htt_object_name == "looseOptRHTT"){
-		std::cout << n_top_jet_subjet << ": " << (foo)[0].pt() <<
-		  " " <<
-		  constituent->pt() <<
-		  " " <<
-		  (*calibrated_htt_subjets)[n_top_jet_subjet].eta() <<
-		  " " <<
-		  constituent->eta() <<
-		  " " <<
-		  (*calibrated_htt_subjets)[n_top_jet_subjet].phi() <<
-		  " " <<
-		  constituent->phi() << std::endl;
-	      }
-	      
+//	      std::sort(foo.begin(), foo.end(),  distance_sorter_p4<reco::PFJet>(constituent->p4()));
+//		
+//	      if (htt_object_name == "looseOptRHTT"){
+//		std::cout << n_top_jet_subjet << ": " << (foo)[0].pt() <<
+//		  " " <<
+//		  constituent->pt() <<
+//		  " " <<
+//		  (*calibrated_htt_subjets)[n_top_jet_subjet].eta() <<
+//		  " " <<
+//		  constituent->eta() <<
+//		  " " <<
+//		  (*calibrated_htt_subjets)[n_top_jet_subjet].phi() <<
+//		  " " <<
+//		  constituent->phi() << std::endl;
+//	      }
+//	      
 // 	  std::cout << "Number of calibrated subjets: " << ->// // size() << std::endl;
 //	  // // std::cout << "Number of HTT Candidates: " << top_jets->size()
 //		    << " for " <<  << std::endl<< std::endl;
@@ -1765,18 +1894,19 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	for (unsigned i_cmstt_coll = 0; i_cmstt_coll < cmstt_objects_.size(); i_cmstt_coll++){
 
 	  // Get the proper names
-	  std::string cmstt_object_name   = cmstt_objects_[i_cmstt_coll];
-	  std::string cmstt_infos_name    = cmstt_infos_[i_cmstt_coll];
+	  //std::string cmstt_object_name   = cmstt_objects_[i_cmstt_coll];
+	  //std::string cmstt_infos_name    = cmstt_infos_[i_cmstt_coll];
 	  std::string cmstt_branches_name = cmstt_branches_[i_cmstt_coll];
 	  std::string cmstt_btags_name     = cmstt_btags_[i_cmstt_coll];
  	  
+
 	  // Top tagger jets
 	  edm::Handle<edm::View<reco::BasicJet>> top_jets;
-	  iEvent.getByLabel(cmstt_object_name, top_jets);
+	  iEvent.getByToken(cmsttTokens_[i_cmstt_coll], top_jets);
 
 	  // Extra Info
 	  edm::Handle<edm::View<reco::CATopJetTagInfo>> top_jet_infos;
-	  iEvent.getByLabel(cmstt_infos_name, top_jet_infos);
+	  iEvent.getByToken(cmsttInfoTokens_[i_cmstt_coll], top_jet_infos);
 	  	  
 	  // Make sure both collections have the same size
 	  assert(top_jets->size()==top_jet_infos->size());
@@ -1784,7 +1914,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	  // b-tag discriminators handle
 	  edm::Handle<reco::JetTagCollection> btagDiscriminators;
 	  if (cmstt_btags_name != "None")
-	    iEvent.getByLabel(cmstt_btags_name, btagDiscriminators);
+	    iEvent.getByToken(cmsttBtagsTokens_[i_cmstt_coll], btagDiscriminators);
 
 
 	  // Top jets and subjets are associated by indices. See:
@@ -1880,28 +2010,35 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	for (unsigned i_fj_coll = 0; i_fj_coll < fatjet_objects_.size(); i_fj_coll++){
 
 	  // Get the proper names
-	  std::string	fj_object_name	     = fatjet_objects_[i_fj_coll];
-	  std::string	fj_nsubs_name	     = fatjet_nsubs_[i_fj_coll];
-	  std::string	fj_sds_name	     = fatjet_sds_[i_fj_coll];
 	  std::string	fj_btags_name	     = fatjet_btags_[i_fj_coll];
 	  std::string	fj_qvols_name	     = fatjet_qvols_[i_fj_coll];
 	  std::string	fj_branches_name     = fatjet_branches_[i_fj_coll];
-	  int		fj_usesubjets        = fatjet_usesubjets_[i_fj_coll];
 	  std::string	fj_flavour_info_name = fatjet_flavour_infos_[i_fj_coll];
 
 	  fill_fatjet_branches<reco::PFJet, reco::PFJetCollection>(iEvent, 
 								   tthtree, 
-								   fj_object_name,
-								   fj_nsubs_name,
-								   fj_sds_name,
+								   fatjetTokens_[i_fj_coll],
+								   fatjetNsubTau1Tokens_[i_fj_coll], 
+								   fatjetNsubTau2Tokens_[i_fj_coll],
+								   fatjetNsubTau3Tokens_[i_fj_coll],
+								   fatjetSDChi1Tokens_[i_fj_coll],
+								   fatjetSDChi2Tokens_[i_fj_coll],
+								   fatjetSDChi3Tokens_[i_fj_coll],
+								   fatjetSDNMJ1Tokens_[i_fj_coll],
+								   fatjetSDNMJ2Tokens_[i_fj_coll],
+								   fatjetSDNMJ3Tokens_[i_fj_coll],
+								   fatjetBtagsTokens_[i_fj_coll],
+								   fatjetQvolsTokens_[i_fj_coll],
+								   fatjetFlavInfoTokens_[i_fj_coll],
+								   fatjet_nsubs_[i_fj_coll],
+								   fatjet_sds_[i_fj_coll],
 								   fj_btags_name,
 								   fj_qvols_name,
 								   fj_branches_name,
 								   fj_flavour_info_name,
 								   hadronic_ts,
 								   hard_partons,
-								   gen_higgs,
-								   fj_usesubjets);
+								   gen_higgs);
 	 
 	} // End of loop over fatjet collections
 	// Done filling the fatjet information

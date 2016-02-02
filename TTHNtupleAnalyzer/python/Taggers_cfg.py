@@ -38,24 +38,25 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_mc')
 
 
-process.load("CondCore.DBCommon.CondDBCommon_cfi")
-from CondCore.DBCommon.CondDBSetup_cfi import *
-process.jec = cms.ESSource("PoolDBESSource",
-      DBParameters = cms.PSet(
-        messageLevel = cms.untracked.int32(0)
-        ),
-      timetype = cms.string('runnumber'),
-      toGet = cms.VPSet(
-      cms.PSet(
-            record = cms.string('JetCorrectionsRecord'),
-            tag    = cms.string('JetCorrectorParametersCollection_Summer15_25nsV6_MC_AK4PFchs'),
-            label  = cms.untracked.string('AK4PFchs')
-            ),
-      ), 
-      connect = cms.string('sqlite:Summer15_25nsV6_MC.db')
-)
-## add an es_prefer statement to resolve a possible conflict from simultaneous connection to a global tag
-process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
+#process.load("CondCore.DBCommon.CondDBCommon_cfi")
+#from CondCore.DBCommon.CondDBSetup_cfi import *
+#
+#process.jec = cms.ESSource("PoolDBESSource",
+#      DBParameters = cms.PSet(
+#        messageLevel = cms.untracked.int32(0)
+#        ),
+#      timetype = cms.string('runnumber'),
+#      toGet = cms.VPSet(
+#      cms.PSet(
+#            record = cms.string('JetCorrectionsRecord'),
+#            tag    = cms.string('JetCorrectorParametersCollection_Summer15_25nsV6_MC_AK4PFchs'),
+#            label  = cms.untracked.string('AK4PFchs')
+#            ),
+#      ), 
+#      connect = cms.string('sqlite:Summer15_25nsV6_MC.db')
+#)
+### add an es_prefer statement to resolve a possible conflict from simultaneous connection to a global tag
+#process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
 
 
 #enable debugging printout
@@ -683,11 +684,11 @@ for fj_name in li_fatjets_objects:
                                                  measureDefinition = cms.uint32( 0 ), # CMS default is normalized measure
                                                  beta = cms.double(1.0),              # CMS default is 1
                                                  R0 = cms.double(r),                  # CMS default is jet cone size
-                                                 Rcutoff = cms.double( -999.0),       # not used by default
+                                                 Rcutoff = cms.double( +999.0),       # not used by default
                                                  # variables for axes definition :
                                                  axesDefinition = cms.uint32( 6 ),    # CMS default is 1-pass KT axes
-                                                 nPass = cms.int32(-999),             # not used by default
-                                                 akAxesR0 = cms.double(-999.0)        # not used by default
+                                                 nPass = cms.int32(+999),             # not used by default
+                                                 akAxesR0 = cms.double(+999.0)        # not used by default
                                          ))
       li_fatjets_nsubs.append(nsub_name)
 
@@ -1138,7 +1139,9 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
 	taus = cms.InputTag("slimmedTaus"),
 	jets = cms.InputTag("slimmedJets"),
 	genjets = cms.InputTag("slimmedGenJets"),
-
+	generator = cms.InputTag("generator"),
+        pupInfo   = cms.InputTag("slimmedAddPileupInfo"),                                   
+         
 	packed = cms.InputTag("packedGenParticles"),
 	pruned = cms.InputTag("prunedGenParticles"),
 	mets = cms.InputTag("slimmedMETs"),
@@ -1252,7 +1255,7 @@ for x in li_cmstt_objects + li_cmstt_infos:
 #process.p += process.jetFlavourInfos
 #process.p += process.printEvent
 
-process.p += process.foojets
+#process.p += process.foojets
 
 # Schedule b-tagging and Ntupelizer
 for x in [process.my_btagging,
