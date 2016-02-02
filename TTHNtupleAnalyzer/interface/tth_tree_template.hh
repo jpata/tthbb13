@@ -83,16 +83,9 @@ public:
 	int event__lumi;
 	int event__run;
 
-	int trigger__bits[T_MAX];
-	float trigger__prescale[T_MAX];
-
 	float gen_met__phi;
 	float gen_met__pt;
 	float gen_met__sumet;
-
-	//top quark in ttbar processes
-	//initial top pair decay hypothesis based on leptons
-	int hypo1;
 	
 	//gen-level information from LHE
 	float lhe__ht;
@@ -119,7 +112,7 @@ public:
     
     int n__met_shift;
     int n__jet;
-	int n__lep;
+
 
     //number of primary vertices
 	int n__pv;
@@ -127,8 +120,6 @@ public:
 
     //number of trigger identifiers
 	int n__tr;
-
-	int n__sig_lep;
     
 	int pvi__bx[N_MAX];
 	float pvi__n0[N_MAX];
@@ -154,14 +145,9 @@ public:
 		event__lumi = DEF_VAL_INT;
 		event__run = DEF_VAL_INT;
 		
-		SET_ZERO(trigger__bits, T_MAX, DEF_VAL_INT);
-		SET_ZERO(trigger__prescale, T_MAX, DEF_VAL_FLOAT);
-
 		gen_met__phi = DEF_VAL_FLOAT;
 		gen_met__pt = DEF_VAL_FLOAT;
 		gen_met__sumet = DEF_VAL_FLOAT;
-
-		hypo1 = DEF_VAL_INT;
 
 		lhe__ht = DEF_VAL_FLOAT;
 		lhe__n_b = DEF_VAL_INT;
@@ -183,12 +169,11 @@ public:
 		SET_ZERO(met__phi__shift, MET_S_MAX, DEF_VAL_FLOAT);
 		n__jet = DEF_VAL_INT;
 		
-		n__lep = DEF_VAL_INT;
 		n__tr  = DEF_VAL_INT;
 		n__pv  = DEF_VAL_INT;
 		n__pvi = DEF_VAL_INT;
         n__met_shift = DEF_VAL_INT;
-		n__sig_lep = DEF_VAL_INT;
+
 		SET_ZERO(pvi__bx, N_MAX, DEF_VAL_INT);
 		SET_ZERO(pvi__n0, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(pvi__ntrue, N_MAX, DEF_VAL_FLOAT);
@@ -208,9 +193,7 @@ public:
 		tree->Branch("event__json", &event__json, "event__json/I");
 		tree->Branch("event__lumi", &event__lumi, "event__lumi/I");
 		tree->Branch("event__run", &event__run, "event__run/I");
-		
-		tree->Branch("hypo1", &hypo1, "hypo1/I");
-		
+				
 		tree->Branch("lhe__n_b", &lhe__n_b, "lhe__n_b/I");
 		tree->Branch("lhe__n_c", &lhe__n_c, "lhe__n_c/I");
 		tree->Branch("lhe__n_e", &lhe__n_e, "lhe__n_e/I");
@@ -221,16 +204,12 @@ public:
 
 		tree->Branch("n__jet", &n__jet, "n__jet/I");
 		
-		tree->Branch("n__lep", &n__lep, "n__lep/I");
 		tree->Branch("n__pv", &n__pv, "n__pv/I");
 		tree->Branch("n__pvi", &n__pvi, "n__pvi/I");
-		tree->Branch("n__tr", &n__tr, "n__tr/I");
 		tree->Branch("n__met_shift", &n__met_shift, "n__met_shift/I");
-		tree->Branch("n__sig_lep", &n__sig_lep, "n__sig_lep/I");
+
 		tree->Branch("debug__time1c", &debug__time1c, "debug__time1c/D");
 		tree->Branch("debug__time1r", &debug__time1r, "debug__time1r/D");
-		tree->Branch("trigger__bits", trigger__bits, "trigger__bits[n__tr]/I");
-		tree->Branch("trigger__prescale", trigger__prescale, "trigger__prescale[n__tr]/F");
 		tree->Branch("gen_met__phi", &gen_met__phi, "gen_met__phi/F");
 		tree->Branch("gen_met__pt", &gen_met__pt, "gen_met__pt/F");
 		tree->Branch("gen_met__sumet", &gen_met__sumet, "gen_met__sumet/F");
@@ -271,9 +250,7 @@ public:
 		tree->SetBranchAddress("gen_met__phi", &gen_met__phi);
 		tree->SetBranchAddress("gen_met__pt", &gen_met__pt);
 		tree->SetBranchAddress("gen_met__sumet", &gen_met__sumet);
-		
-		tree->SetBranchAddress("hypo1", &hypo1);
-		
+				
 		tree->SetBranchAddress("lhe__ht", &lhe__ht);
 		tree->SetBranchAddress("lhe__n_b", &lhe__n_b);
 		tree->SetBranchAddress("lhe__n_c", &lhe__n_c);
@@ -290,10 +267,10 @@ public:
 		tree->SetBranchAddress("met__pt__en_down", &met__pt__en_down);
 		tree->SetBranchAddress("met__pt__en_up", &met__pt__en_up);
 		tree->SetBranchAddress("n__jet", &n__jet);
-		tree->SetBranchAddress("n__lep", &n__lep);
+
 		tree->SetBranchAddress("n__pv", &n__pv);
 		tree->SetBranchAddress("n__pvi", &n__pvi);
-		tree->SetBranchAddress("n__sig_lep", &n__sig_lep);
+
 		tree->SetBranchAddress("pvi__bx", pvi__bx);
 		tree->SetBranchAddress("pvi__n0", pvi__n0);
 		tree->SetBranchAddress("pvi__ntrue", pvi__ntrue);
