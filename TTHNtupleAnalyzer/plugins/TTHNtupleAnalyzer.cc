@@ -517,22 +517,11 @@ private:
 	// a watch for CPU monitoring
 	TStopwatch* sw;
 
-	//const ElectronEffectiveArea::ElectronEffectiveAreaType electron_eff_area_type = ElectronEffectiveArea::ElectronEffectiveAreaType::kEleGammaAndNeutralHadronIso03;
-	//const ElectronEffectiveArea::ElectronEffectiveAreaType electron_eff_area_target = ElectronEffectiveArea::ElectronEffectiveAreaTarget::kEleEAData2012;
-
 	// parameters
 	const bool		isMC_;
-	const double	jetPt_min_;
-	const int		jetMult_min_;
-	const double	muPt_min_;
-	const double	elePt_min_;
-	const double	tauPt_min_;
   	const double	genPartonPt_min_;
         const int       genPartonStatus_;
 
-	JetCorrectorParameters* jetCorrPars;
-	JetCorrectionUncertainty* jetCorrUnc;
-	const edm::EDGetTokenT<double> rhoSrc_;
 
 };
 
@@ -578,18 +567,8 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
 	
 	//cuts
 	isMC_(iConfig.getParameter<bool>("isMC")),
-	jetPt_min_ (iConfig.getUntrackedParameter<double>("jetPt_min", 5.)),
-	jetMult_min_(iConfig.getUntrackedParameter<int> ("jetMult_min", DEF_VAL_INT)),
-	muPt_min_ (iConfig.getUntrackedParameter<double>("muPt_min", 5.)),
-	elePt_min_ (iConfig.getUntrackedParameter<double>("elePt_min", 5.)),
-	tauPt_min_ (iConfig.getUntrackedParameter<double>("tauPt_min", 5.)),
 	genPartonPt_min_(iConfig.getUntrackedParameter<double>("genPartonPt_min", 200.)),
-        genPartonStatus_(iConfig.getUntrackedParameter<int>("genPartonStatus", 23)),
-
-	jetCorrPars(new JetCorrectorParameters(iConfig.getParameter<edm::FileInPath>("jecFile").fullPath().c_str(), "Total")),
-	jetCorrUnc(new JetCorrectionUncertainty(*jetCorrPars)),
-        rhoSrc_(consumes<double>(iConfig.getParameter<edm::InputTag>("rho")))
-{
+        genPartonStatus_(iConfig.getUntrackedParameter<int>("genPartonStatus", 23)){
 
   for (unsigned int i=0; i < htt_objects_.size(); i++){
     edm::InputTag it(htt_objects_[i],"");

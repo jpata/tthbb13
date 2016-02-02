@@ -1147,9 +1147,6 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
 	mets = cms.InputTag("slimmedMETs"),
 	lhe = cms.InputTag("externalLHEProducer"),
 
-        triggerIdentifiers = cms.vstring([]),
-        triggerIdentifiersForMatching = cms.vstring([]),
-
         fatjetsObjects  = cms.vstring(li_fatjets_objects),
         fatjetsNsubs    = cms.vstring(li_fatjets_nsubs),
         fatjetsSDs      = cms.vstring(li_fatjets_sds),
@@ -1167,23 +1164,7 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
         cmsttBranches = cms.vstring(li_cmstt_branches),
         cmsttBtags    = cms.vstring(li_cmstt_btags),
 
-	jetMult_min   = cms.untracked.int32(-99),
-	jetPt_min     = cms.untracked.double(15.),
-	muPt_min_     = cms.untracked.double(15.),
-	elePt_min_    = cms.untracked.double(15.),
-	tauPt_min_    = cms.untracked.double(15.),
-
-	bits	  = cms.InputTag("TriggerResults","","HLT"),
-	objects   = cms.InputTag("selectedPatTrigger"),
-	prescales = cms.InputTag("patTrigger"),
-
-	eleIdentifiers = cms.vstring([]),
-	tauIdentifiers = cms.vstring([]),
-
 #        genPartonStatus = cms.untracked.int32(3),
-
-        rho = cms.InputTag("fixedGridRhoAll"),
-        jecFile = cms.FileInPath("Summer13_V4_DATA_UncertaintySources_AK5PFchs.txt")
 )
 
 
