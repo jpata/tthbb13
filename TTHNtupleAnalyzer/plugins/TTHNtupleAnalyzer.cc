@@ -423,21 +423,15 @@ private:
 	virtual void endJob() override;
 	virtual void finalizeLoop();
 
-	// jets
-	const edm::EDGetTokenT<std::vector<reco::GenJet>> genJetToken_;
-
+	// truth info
+	const edm::EDGetTokenT<std::vector<reco::GenJet>> genJetToken_;        
   	const edm::EDGetTokenT<GenEventInfoProduct>  genEventInfoToken_;
   	const edm::EDGetTokenT<std::vector<PileupSummaryInfo> > pupInfoToken_;
-
-	// collection of vertices
-	const edm::EDGetTokenT<reco::VertexCollection> vertexToken_;
-
-	// collection of gen particles
 	const edm::EDGetTokenT<edm::View<reco::GenParticle> > prunedGenToken_;
 	const edm::EDGetTokenT<edm::View<pat::PackedGenParticle> > packedGenToken_;
 
-	// collection of  MET
-	const edm::EDGetTokenT<pat::METCollection> metToken_;
+	// collection of vertices
+	const edm::EDGetTokenT<reco::VertexCollection> vertexToken_;
 
         // HTT tokens
         std::vector<edm::EDGetTokenT< edm::View<reco::BasicJet> > > httTokens_;
@@ -465,7 +459,6 @@ private:
 	const std::vector<std::string> fatjet_branches_;
 	const std::vector<int> fatjet_usesubjets_;
   	const std::vector<std::string> fatjet_flavour_infos_;
-
 
         // Fatjet Tokens
         std::vector<edm::EDGetTokenT< reco::PFJetCollection > > fatjetTokens_;
@@ -570,29 +563,32 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
 	genPartonPt_min_(iConfig.getUntrackedParameter<double>("genPartonPt_min", 200.)),
         genPartonStatus_(iConfig.getUntrackedParameter<int>("genPartonStatus", 23)){
 
+  // Produce HTT Tokens
   for (unsigned int i=0; i < htt_objects_.size(); i++){
     edm::InputTag it(htt_objects_[i],"");
     httTokens_.push_back( consumes<edm::View<reco::BasicJet> >(it));    
     httInfoTokens_.push_back( consumes<edm::View<reco::HTTTopJetTagInfo> >(it));    
   }
 
+  // Produce CMSTT Tokens
   for (unsigned int i=0; i < cmstt_objects_.size(); i++){
     edm::InputTag it(cmstt_objects_[i],"");
     cmsttTokens_.push_back( consumes<edm::View<reco::BasicJet> >(it));    
   }
 
+  // Produce CMSTT Info Tokens
   for (unsigned int i=0; i < cmstt_infos_.size(); i++){
     edm::InputTag it(cmstt_infos_[i],"");
     cmsttInfoTokens_.push_back( consumes<edm::View<reco::CATopJetTagInfo> >(it));    
   }
 
+  // Produce CMSTT Btag Tokens
   for (unsigned int i=0; i < cmstt_btags_.size(); i++){
     edm::InputTag it(cmstt_btags_[i],"");
     cmsttBtagsTokens_.push_back( consumes<reco::JetTagCollection>(it));    
   }
 
-
-
+  // Produce Subjet Tokens
   for (unsigned int i=0; i < fatjet_objects_.size(); i++){
     edm::InputTag it;
 
@@ -604,7 +600,7 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
     fatjetTokens_.push_back(consumes<reco::PFJetCollection>(it));    
   }
 
-
+  // Produce NSubjettiness Tokens
   for (unsigned int i=0; i < fatjet_nsubs_.size(); i++){    
         edm::InputTag it1(fatjet_nsubs_[i],"tau1");
         edm::InputTag it2(fatjet_nsubs_[i],"tau2");
@@ -615,7 +611,7 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
 	fatjetNsubTau3Tokens_.push_back(consumes<edm::ValueMap<float>>(it3));           
   }
 
-
+  // Produce Shower Deconstruction Tokens
   for (unsigned int i=0; i < fatjet_sds_.size(); i++){
 
     std::string sd1_label = fatjet_sds_[i];
@@ -642,22 +638,24 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
     fatjetSDNMJ3Tokens_.push_back(consumes<edm::ValueMap<int>>(it_nmj3));      
   }
 
+  // Produce Fatjet/Btag tokens
   for (unsigned int i=0; i < fatjet_btags_.size(); i++){
     edm::InputTag it(fatjet_btags_[i],"");
     fatjetBtagsTokens_.push_back(consumes<reco::JetTagCollection>(it));    
   }
 
+  // Produce Q-jet volatility tokens
   for (unsigned int i=0; i < fatjet_qvols_.size(); i++){
     edm::InputTag it(fatjet_qvols_[i],"");
     fatjetQvolsTokens_.push_back(consumes<edm::ValueMap<float>>(it));
   }
   
+  // Produce jet flavour info tokens
   for (unsigned int i=0; i < fatjet_flavour_infos_.size(); i++){
     edm::InputTag it(fatjet_flavour_infos_[i],"");
     fatjetFlavInfoTokens_.push_back(consumes<reco::JetFlavourInfoMatchingCollection>(it));
   }
   
-
   tthtree->make_branches();
   
   hcounter->GetXaxis()->SetBinLabel(1, "TTHNtupleAnalyzer__processed");
