@@ -177,7 +177,11 @@ class Conf:
         "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions.pickle",
         "transferFunctions_sj_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions_sj.pickle",
         #"systematics": ["nominal"],
-        "systematics": ["nominal", "JESUp", "JESDown", "JERUp", "JERDown"],
+        "systematics": [
+            "nominal",
+            "JESUp", "JESDown",
+        #    "JERUp", "JERDown"
+        ],
         
         
         #If the list contains:
@@ -190,7 +194,7 @@ class Conf:
             #"trigger", #print trigger bits
             #"input", #print input particles
             #"gen", #print out gen-level info
-            "debug", #very high-level debug info
+            #"debug", #very high-level debug info
             #"reco", #info about reconstructed final state
             #"meminput" #info about particles used for MEM input
             #"commoninput" #print out inputs for CommonClassifier

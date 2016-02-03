@@ -1,2 +1,5 @@
 [ttjets]
-/home/joosep/tth/spring15/sync/vhbb/v12/ttjets_2.root = 46558
+/home/joosep/tth/spring15/sync/vhbb/v12/ttjets.root = 42006
+
+[tth]
+/home/joosep/tth/spring15/sync/vhbb/v12/tth.root = 44710
