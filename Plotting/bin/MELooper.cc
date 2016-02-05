@@ -92,7 +92,7 @@ int main(int argc, const char** argv) {
         //
         //for (int ir=0; ir<1000; ir++) {
         //}
-
+        data.init();
         nbytes += tree->GetEntry(iEntry);
         nentries += 1;
         if (do_print) {

@@ -385,6 +385,7 @@ const vector<Jet> makeAllJets(const TreeData& data,
 
 const vector<Lepton> makeAllLeptons(const TreeData& data) {
     vector<Lepton> leps;
+    assert(data.is_sl && data.nleps==1 || data.is_dl && data.nleps==2 || data.nleps==0);
     for (int n=0; n<data.nleps; n++) {
         TLorentzVector p4;
         p4.SetPtEtaPhiM(
@@ -1057,7 +1058,7 @@ namespace BaseCuts {
     }
 
     bool dl(const Event& ev) {
-        return (ev.is_dl && ev.leptons.size()==2 && ev.passPV &&
+        return (ev.is_dl && ev.passPV &&
             ev.leptons.at(0).pdgId * ev.leptons.at(1).pdgId < 0 && (ev.data->ll_mass[0] > 20) && (
                 //Z peak veto
                 abs(ev.leptons.at(0).pdgId) == abs(ev.leptons.at(1).pdgId) ? !(ev.data->ll_mass[0] > 76 && ev.data->ll_mass[0] < 106) : true
