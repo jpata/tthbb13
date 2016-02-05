@@ -153,8 +153,8 @@ class MEAnalyzer(FilterAnalyzer):
         cfg.configure_btag_pdf(self.conf)
         cfg.configure_transfer_function(self.conf)
         self.integrator = MEM.Integrand(
-            MEM.output,
-            #MEM.output + MEM.input + MEM.init + MEM.init_more,
+            #MEM.output,
+            MEM.output + MEM.input + MEM.init + MEM.init_more,
             cfg.cfg
         )
 

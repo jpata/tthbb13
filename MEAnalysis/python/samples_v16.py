@@ -2671,7 +2671,7 @@ samples_dict = {'ttHTobb_M125_13TeV_powheg_pythia8': cms.PSet(
     nGen = cms.int64(0),
     name = cms.string('SingleElectron'),
     nickname = cms.string('SingleElectron'),
-    skip = cms.bool(False),
+    skip = cms.bool(True),
     subFiles = cms.vstring( (
         '/store/user/jpata/VHBBHeppyV16pre/SingleElectron/VHBB_HEPPY_V16pre_SingleElectron__Run2015C-PromptReco-v1/151121_224247/0000/tree_1.root', 
         '/store/user/jpata/VHBBHeppyV16pre/SingleElectron/VHBB_HEPPY_V16pre_SingleElectron__Run2015C-PromptReco-v1/151121_224247/0000/tree_10.root', 
@@ -4831,7 +4831,7 @@ samples_dict = {'ttHTobb_M125_13TeV_powheg_pythia8': cms.PSet(
     nGen = cms.int64(0),
     name = cms.string('SingleMuon'),
     nickname = cms.string('SingleMuon'),
-    skip = cms.bool(False),
+    skip = cms.bool(True),
     subFiles = cms.vstring( ('/store/user/jpata/VHBBHeppyV16pre/SingleMuon/VHBB_HEPPY_V16pre_SingleMuon__Run2015C-PromptReco-v1/151121_224348/0000/tree_194.root', 
         '/store/user/jpata/VHBBHeppyV16pre/SingleMuon/VHBB_HEPPY_V16pre_SingleMuon__Run2015C-PromptReco-v1/151121_224348/0000/tree_219.root', 
         '/store/user/jpata/VHBBHeppyV16pre/SingleMuon/VHBB_HEPPY_V16pre_SingleMuon__Run2015D-05Oct2015-v1/151121_175428/0000/tree_1.root', 
@@ -6275,7 +6275,7 @@ samples_dict = {'ttHTobb_M125_13TeV_powheg_pythia8': cms.PSet(
     nGen = cms.int64(0),
     name = cms.string('DoubleMuon'),
     nickname = cms.string('DoubleMuon'),
-    skip = cms.bool(False),
+    skip = cms.bool(True),
     subFiles = cms.vstring( (
         '/store/user/jpata/VHBBHeppyV16pre/DoubleMuon/VHBB_HEPPY_V16pre_DoubleMuon__Run2015C-PromptReco-v1/151121_224042/0000/tree_1.root', 
         '/store/user/jpata/VHBBHeppyV16pre/DoubleMuon/VHBB_HEPPY_V16pre_DoubleMuon__Run2015C-PromptReco-v1/151121_224042/0000/tree_142.root', 
@@ -7137,7 +7137,7 @@ samples_dict = {'ttHTobb_M125_13TeV_powheg_pythia8': cms.PSet(
     nGen = cms.int64(0),
     name = cms.string('DoubleEG'),
     nickname = cms.string('DoubleEG'),
-    skip = cms.bool(False),
+    skip = cms.bool(True),
     subFiles = cms.vstring( (
         '/store/user/jpata/VHBBHeppyV16pre/DoubleEG/VHBB_HEPPY_V16pre_DoubleEG__Run2015C-PromptReco-v1/151121_223945/0000/tree_1.root', 
         '/store/user/jpata/VHBBHeppyV16pre/DoubleEG/VHBB_HEPPY_V16pre_DoubleEG__Run2015C-PromptReco-v1/151121_223945/0000/tree_10.root', 
@@ -8874,7 +8874,7 @@ samples_dict = {'ttHTobb_M125_13TeV_powheg_pythia8': cms.PSet(
     nGen = cms.int64(3867950),
     name = cms.string('ttHToNonbb_M125_13TeV_powheg_pythia8'),
     nickname = cms.string('ttHToNonbb_M125_13TeV_powheg_pythia8'),
-    skip = cms.bool(False),
+    skip = cms.bool(True),
     subFiles = cms.vstring(
         '/store/user/jpata/VHBBHeppyV16pre/ttHToNonbb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V16pre_ttHToNonbb_M125_13TeV_powheg_pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/151117_175332/0000/tree_1.root', 
         '/store/user/jpata/VHBBHeppyV16pre/ttHToNonbb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V16pre_ttHToNonbb_M125_13TeV_powheg_pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/151117_175332/0000/tree_10.root', 
@@ -8973,7 +8973,7 @@ samples_dict = {'ttHTobb_M125_13TeV_powheg_pythia8': cms.PSet(
     nGen = cms.int64(0),
     name = cms.string('MuonEG'),
     nickname = cms.string('MuonEG'),
-    skip = cms.bool(False),
+    skip = cms.bool(True),
     subFiles = cms.vstring( ('/store/user/jpata/VHBBHeppyV16pre/MuonEG/VHBB_HEPPY_V16pre_MuonEG__Run2015C-PromptReco-v1/151121_224147/0000/tree_1.root', 
         '/store/user/jpata/VHBBHeppyV16pre/MuonEG/VHBB_HEPPY_V16pre_MuonEG__Run2015C-PromptReco-v1/151121_224147/0000/tree_10.root', 
         '/store/user/jpata/VHBBHeppyV16pre/MuonEG/VHBB_HEPPY_V16pre_MuonEG__Run2015C-PromptReco-v1/151121_224147/0000/tree_15.root', 
