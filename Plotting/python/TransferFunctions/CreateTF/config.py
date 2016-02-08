@@ -48,22 +48,11 @@ def Make_config():
     # I/O information
     ########################################
 
-    #config['input_root_file_name'] = '/scratch/tklijnsm/V10_full_jets_TTBarH.root'
-    #config['input_root_file_name'] = '/scratch/tklijnsm/V11_full_jets_0.3delR.root'
-    #config['input_root_file_name'] = '/shome/tklijnsm/Samples/TFsamples/V11_full_subjets_0.3delR.root'
-
-    #config['input_root_file_name'] = '/shome/tklijnsm/Samples/TFsamples/CUSTOMTFFILE_V12_FULL_SUBJETS_NC.root'
-
-    #config['input_root_file_name'] = '/shome/tklijnsm/Samples/V12TFsamples/CUSTOMTFFILE_V12_FULL_JETS.root'
-    config['input_root_file_name'] = '/shome/jpata/tth/gc/JetTree_V14_subjet.root'
-    #config['input_root_file_name'] = '/shome/tklijnsm/Samples/TF_V13/CUSTOMTFFILE_V13_FULL_SUBJETS.root'
+    config['input_root_file_name'] = '/home/joosep/tth/sw/CMSSW_7_4_15/src/TTH/MEAnalysis/gc/JetTree_V16_resolved.root'
 
     config['input_tree_name'] = 'tree'
 
-    #config['outputdir'] = 'V12_REALFULL_JETS_throwaway'
-    #config['outputdir'] = 'V12_REALFULL_SUBJETS_throwaway'
-    #config['outputdir'] = 'V13_SUBJETS'
-    config['outputdir'] = 'V14_JETS'
+    config['outputdir'] = 'V16_RESOLVEDJETS'
 
         
     config['SBF_fitted_hists_pickle_filename'] = \

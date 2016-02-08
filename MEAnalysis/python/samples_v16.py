@@ -3572,7 +3572,7 @@ samples_dict = {'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8': cms.PSet
     xSec = cms.double(1)
 ), 'TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8': cms.PSet(
     isMC = cms.bool(True),
-    nGen = cms.int64(),
+    nGen = cms.int64(129850),
     name = cms.string('TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8'),
     nickname = cms.string('TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8'),
     skip = cms.bool(False),
