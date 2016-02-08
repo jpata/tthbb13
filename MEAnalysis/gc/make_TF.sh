@@ -27,7 +27,7 @@ cd $MY_SCRATCH
 
 # Get some extra stuff
 cp ${CMSSW_BASE}/src/TTH/TTHNtupleAnalyzer/python/AccessHelpers.py .
-cp ${CMSSW_BASE}/src/TTH/Plotting/python/TransferFunctions/cfg_outputtree.dat .
+cp ${CMSSW_BASE}/src/TTH/Plotting/python/TransferFunctions/runs/@runconf@/cfg_outputtree.dat .
 export PYTHONPATH=.:$PYTHONPATH
 
 # And run

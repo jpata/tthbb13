@@ -26,11 +26,21 @@ xsec[("qcd_ht1500to2000", "13TeV")] = 121.5
 xsec[("qcd_ht2000toinf", "13TeV")] = 25.42
 
 #From the AN
+xsec[("wjets", "13TeV")] = 61526.7
+
 xsec[("ttw_wqq", "13TeV")] = 0.435
 xsec[("ttw_wlnu", "13TeV")] = 0.21
 xsec[("ttz_zqq", "13TeV")] = 0.611
-#FIXME
-xsec[("ttz_zllnunu", "13TeV")] = 1.0
+
+xsec[("stop_tW", "13TeV")] = 35.6
+xsec[("stop_tbarW", "13TeV")] = 35.6
+xsec[("stop_t", "13TeV")] = 45.34
+xsec[("stop_tbar", "13TeV")] = 26.98 
+xsec[("stop_s", "13TeV")] = 3.44
+
+xsec[("ww", "13TeV")] = 118.7
+xsec[("wz", "13TeV")] = 47.13
+xsec[("zz", "13TeV")] = 16.523
 
 xsec_sample = {
     "TT_TuneCUETP8M1_13TeV-powheg-pythia8": xsec[("ttjets", "13TeV")],
@@ -78,8 +88,6 @@ else:
     lfPrefix = "root://xrootd-cms.infn.it/"
     def lfn_to_pfn(fn):
         return fn
-
-
 
 def getSampleNGen(sample):
     import ROOT

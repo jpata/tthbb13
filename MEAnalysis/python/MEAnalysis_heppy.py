@@ -14,7 +14,7 @@ import sys
 sys.modules["TFClasses"] = TFClasses
 
 #Import the default list of samples
-from TTH.MEAnalysis.samples_base import lfn_to_pfn
+from TTH.MEAnalysis.samples_base import lfn_to_pfn, getSampleNGen
 
 #Create configuration object based on environment variables
 #if one runs with ME_CONF=/path/to/conffile.py, then the configuration is loaded from that file
