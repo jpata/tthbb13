@@ -25,6 +25,13 @@ xsec[("qcd_ht1000to1500", "13TeV")] = 1064.0
 xsec[("qcd_ht1500to2000", "13TeV")] = 121.5
 xsec[("qcd_ht2000toinf", "13TeV")] = 25.42
 
+#From the AN
+xsec[("ttw_wqq", "13TeV")] = 0.435
+xsec[("ttw_wlnu", "13TeV")] = 0.21
+xsec[("ttz_zqq", "13TeV")] = 0.611
+#FIXME
+xsec[("ttz_zllnunu", "13TeV")] = 1.0
+
 xsec_sample = {
     "TT_TuneCUETP8M1_13TeV-powheg-pythia8": xsec[("ttjets", "13TeV")],
     "ttHTobb_M125_13TeV_powheg_pythia8": xsec[("tthbb", "13TeV")],
