@@ -385,6 +385,7 @@ const vector<Jet> makeAllJets(const TreeData& data,
 
 const vector<Lepton> makeAllLeptons(const TreeData& data) {
     vector<Lepton> leps;
+    assert(data.is_sl && data.nleps==1 || data.is_dl && data.nleps==2 || data.nleps==0);
     for (int n=0; n<data.nleps; n++) {
         TLorentzVector p4;
         p4.SetPtEtaPhiM(

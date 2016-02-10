@@ -11,7 +11,7 @@ elif "pata-macbook" in hostname:
     path = "/Users/joosep/Documents/tth/data/ntp/v16/me/"
 #Tallinn
 elif "quasar" in hostname:
-    path = "/hdfs/cms/store/user/jpata/tth/Jan25_bigtt/"
+    path = "/hdfs/local/joosep/tth/Feb4_dl/"
 elif "hep.kbfi.ee" in hostname:
     path = "/home/joosep/tth/gc/"
 else:

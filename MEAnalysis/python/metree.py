@@ -404,10 +404,10 @@ def getTreeProducer(conf):
             "genTopHad" : NTupleCollection("genTopHad", genTopType, 2, help="Generated top quark (hadronic)", mcOnly=True),
 
             "FatjetCA15ungroomed" : NTupleCollection("fatjets", FatjetCA15ungroomedType, 4, help="Ungroomed CA 1.5 fat jets"),
-            "good_jets_nominal" : NTupleCollection("jets", jetType, 9, help="Selected resolved jets, pt ordered"),
+            "good_jets_nominal" : NTupleCollection("jets", jetType, 16, help="Selected resolved jets, pt ordered"),
             "good_leptons_nominal" : NTupleCollection("leps", leptonType, 2, help="Selected leptons"),
             
-            "loose_jets_nominal" : NTupleCollection("loose_jets", jetType, 4, help="Additional jets with 20<pt<30"),
+            "loose_jets_nominal" : NTupleCollection("loose_jets", jetType, 6, help="Additional jets with 20<pt<30"),
             
             "topCandidate_nominal": NTupleCollection("topCandidate" , topCandidateType, 1, help="Best top candidate in event. Currently chosen by max deltaR wrt. lepton"),
             "othertopCandidate_nominal": NTupleCollection("othertopCandidate", topCandidateType, 4, help="All other top candidates that pass HTTv2 cuts"),
@@ -508,7 +508,9 @@ def getTreeProducer(conf):
             ("passes_btag",         int,        ""),
             ("passes_mem",          int,        "MEM was evaluated"),
             ("tth_mva",             float,      "ttH vs tt+jets bdt"),
-            ("common_bdt",          float,      "KIT BDT"),
+            ("common_bdt",          float,      "KIT BDT (SL/DL)"),
+            ("common_bdt_withmem1", float,      "KIT BDT, MEM in 3t"),
+            ("common_bdt_withmem2", float,      "KIT BDT, MEM in 3t, 4t"),
         ]:
 
             is_mc_only = False
@@ -572,6 +574,7 @@ def getTreeProducer(conf):
         for vtype in [
             ("weight_xs",               float,  ""),
             ("ttCls",                   int,    ""),
+            ("genHiggsDecayMode",       int,    ""),
             #("bTagWeight",              float,  ""),
             #("bTagWeight_HFDown",       float,  ""),
             #("bTagWeight_HFUp",         float,  ""),

@@ -50,6 +50,22 @@ def makeWrapper(classname, data):
         treeclass += '    tree->SetBranchAddress(\"{0}\", &(this->{0}));\n'.format(collname, collname)
 
     treeclass += "  } //loadTree\n"
+    
+    treeclass += "  void init() {\n"
+    for collname, coll in (
+            sorted(data["collections"].items(), key=lambda x: x[0]) +
+            sorted(data["globalObjects"].items(), key=lambda x: x[0])
+        ):
+        vars, maxlen = coll
+        treeclass += '    this->n{0} = 0;\n'.format(collname)
+        for vname, v in vars.items():
+            treeclass += "    for (int i=0; i < {2}; i++) {{ this->{0}_{1}[i] = 0; }}\n".format(collname, vname, maxlen)
+
+
+    for collname, dtype in sorted(data["globalVariables"].items(), key=lambda x: x[0]):
+        treeclass += '    this->{0} = 0;\n'.format(collname)
+
+    treeclass += "  } //init\n"
     treeclass += "}; //class\n"
     
     prefix = """

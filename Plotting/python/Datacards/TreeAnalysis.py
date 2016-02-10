@@ -170,33 +170,31 @@ if __name__ == "__main__":
     
     #SL
     #h_sig, h_bkg, h_sig_sys, h_bkg_sys = Categorize.GetSparseHistograms(
-    h_sl = Categorize.GetSparseHistograms(
-        input_file,
-        signals,
-        backgrounds,
-        "sl"
-    )
-    axes = Categorize.GetAxes(h_sl[0]["ttH_hbb"])
+    #h_sl = Categorize.GetSparseHistograms(
+    #    input_file,
+    #    signals,
+    #    backgrounds,
+    #    "sl"
+    #)
+    #axes = Categorize.GetAxes(h_sl[0]["ttH_hbb"])
 
-    Cut.axes = axes
-    Categorize.Categorization.axes = axes
-    Categorize.Categorization.h_sig = h_sl[0]
-    Categorize.Categorization.h_bkg = h_sl[1]
-    Categorize.Categorization.h_sig_sys = h_sl[2]
-    Categorize.Categorization.h_bkg_sys = h_sl[3]
+    #Cut.axes = axes
+    #Categorize.Categorization.axes = axes
+    #Categorize.Categorization.h_sig = h_sl[0]
+    #Categorize.Categorization.h_bkg = h_sl[1]
+    #Categorize.Categorization.h_sig_sys = h_sl[2]
+    #Categorize.Categorization.h_bkg_sys = h_sl[3]
 
     #ret = run_opt("old", 5, ["common_bdt", "btag_LR_4b_2b_logit"], ["common_bdt", "mem_SL_0w2h2t"])
     #of = open("old_opt.tex", "w")
     #of.write(r.print_tree_latex())
     #of.close()
-    Categorize.Categorization.scaling = 0.5
-    make_latex("old")
-    make_latex("old_blrsplit")
-    make_latex("old_mem_bdt2d_unsplit")
-    Categorize.Categorization.scaling = 1.0
-    make_latex("old_parity")
-    make_latex("old_bdt")
-    make_latex("old_mem_bdt2d")
+    #Categorize.Categorization.scaling = 0.5
+    #make_latex("old")
+    #make_latex("old_blrsplit")
+    #make_latex("old_mem_bdt2d_unsplit")
+    #Categorize.Categorization.scaling = 1.0
+    #make_latex("old_mem_bdt2d_stratB")
   
     #DL
     h_dl = Categorize.GetSparseHistograms(
@@ -217,8 +215,8 @@ if __name__ == "__main__":
     Categorize.Categorization.scaling = 0.5
     make_latex("old_dl")
     make_latex("old_dl_blrsplit")
-    Categorize.Categorization.scaling = 1.0
-    make_latex("old_dl_parity")
+    #Categorize.Categorization.scaling = 1.0
+    #make_latex("old_dl_parity")
 
     #Categorize.Categorization.output_path = output_path + "/old_dl_blr_opt"
     #os.mkdir(Categorize.Categorization.output_path)
