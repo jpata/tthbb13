@@ -163,13 +163,52 @@ class GenTTHAnalyzer(FilterAnalyzer):
                 print "gen b(h)", j.pt, j.eta, j.phi, j.mass, j.pdgId
             print "gen cat", event.cat_gen, event.cat_gen_n
 
+
+        # In semi-leptonic events we need to figure out which top b is from
+        if event.cat_gen == "sl":
+                    
+            # If b pdgId has same sign as hadronic top pdgId, it's the one
+            if event.b_quarks_t[0].pdgId * event.genTopHad[0].pdgId > 0:
+                event.b_quarks_t[0].from_had_t = 1
+                event.b_quarks_t[1].from_had_t = 0
+            else:
+                event.b_quarks_t[0].from_had_t = 0
+                event.b_quarks_t[1].from_had_t = 1
+
+        # In Di leptonic events no b quarks come from hadronic top
+        elif event.cat_gen == "dl":
+            for b in event.b_quarks_t:
+                b.from_had_t = 0
+                            
+        # In All hadronic events both b quarks come from hadronic top
+        elif event.cat_gen == "fh":
+            for b in event.b_quarks_t:
+                b.from_had_t = 1
+        else:
+            for b in event.b_quarks_t:
+                b.from_had_t = -1
+            
+
         #Store for each jet, specified by it's index in the jet
         #vector, if it is matched to any gen-level quarks
         matched_pairs = {}
 
         def match_jets_to_quarks(jetcoll, quarkcoll, label, label_numeric):
-            for ij, j in enumerate(jetcoll):
+            for ij, j in enumerate(jetcoll):        
                 for iq, q in enumerate(quarkcoll):
+
+                    # Set to 1 for bs from hadronic top
+                    # Set to 0 for bs from hadronic top
+                    # Set to -1 for other stuff
+                    if label == "tb":
+                        if q.from_had_t == 1:
+                            numeric_b_from_had_t = 1
+                        elif q.from_had_t == 0:
+                            numeric_b_from_had_t = 0
+                        else:
+                            numeric_b_from_had_t = -1
+                    else:
+                        numeric_b_from_had_t = -1
 
                     #find DeltaR between jet and quark
                     l1 = lvec(q)
@@ -179,9 +218,9 @@ class GenTTHAnalyzer(FilterAnalyzer):
                         #Jet already had a match: take the one with smaller dR
                         if matched_pairs.has_key(ij):
                             if matched_pairs[ij][1] > dr:
-                                matched_pairs[ij] = (label, iq, dr, label_numeric)
+                                matched_pairs[ij] = (label, iq, dr, label_numeric, numeric_b_from_had_t)
                         else:
-                            matched_pairs[ij] = (label, iq, dr, label_numeric)
+                            matched_pairs[ij] = (label, iq, dr, label_numeric, numeric_b_from_had_t)
 
         #Find the best possible match for each individual jet
         match_jets_to_quarks(event.good_jets, event.l_quarks_w, "wq", 0)
@@ -223,13 +262,18 @@ class GenTTHAnalyzer(FilterAnalyzer):
             #midx - index of quark in vector that the jet was matched to
             #mdr - delta R between jet and matched quark
             #mlabel_num - numeric label of quark collection, e.g. 0
-            mlabel, midx, mdr, mlabel_num = matched_pairs[ij]
+            #mlabel_num_bfromhadt - numeric label if the b is from hadronic top
+            #                         -1 if not b or not from top
+            #                          0 if from leptonic top
+            #                          1 if from hadronic top
+            mlabel, midx, mdr, mlabel_num, mlabel_num_bfromhadt = matched_pairs[ij]
 
             jet.tth_match_label = mlabel
             jet.tth_match_index = midx
             jet.tth_match_dr = mdr
             jet.tth_match_label_numeric = mlabel_num
-
+            jet.tth_match_label_bfromhadt = mlabel_num_bfromhadt
+            
             if mlabel == "wq":
                 event.nMatch_wq += 1
 
