@@ -79,6 +79,7 @@ class CommonClassifierAnalyzer(FilterAnalyzer):
                     selectedLeptonP4, selectedJetsP4, selectedJetsCSV, looseJetsP4, looseJetsCSV, met_p4,
                     mem_p_sig.p, mem_p_bkg.p
                 )
+                #FIXME
                 #mem = self.memcalc.GetOutput(selectedLeptonP4, selectedLeptonCharge, selectedJetsP4, selectedJetsCSV, looseJetsP4, looseJetsCSV, met_p4)
                 #event.common_mem = [mem]
         if event.category_string.startswith("dl_"):
