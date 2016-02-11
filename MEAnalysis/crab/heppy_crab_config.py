@@ -14,7 +14,7 @@ config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'heppy_crab_fake_pset.py'
 config.JobType.scriptExe = 'heppy_crab_script.sh'
 #job maximum runtime in minutes
-config.JobType.maxJobRuntimeMin = 47 * 60
+config.JobType.maxJobRuntimeMin = 40 * 60
 
 import os
 #we need to specially ship the python and data directories
