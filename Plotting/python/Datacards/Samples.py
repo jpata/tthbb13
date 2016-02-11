@@ -1,4 +1,4 @@
-import os
+import os, glob
 
 hostname = os.environ.get("HOSTNAME", "")
 #PSI
@@ -18,11 +18,11 @@ else:
     raise Exception("Sample path not defined for hostname={0}!".format(hostname))
 
 class Sample:
-    def __init__(self, name, filenames, prefix):
+    def __init__(self, name, filenames, prefix, cut):
         self.name = name
         self.filenames = filenames
         self.prefix = prefix 
-
+        self.cut = cut
 samples_dict = {
 #    "SingleMuon": Sample(
 #        "SingleMuon",
@@ -51,32 +51,32 @@ samples_dict = {
 #    ),
     "ttH_hbb": Sample(
         "ttH_hbb",
-        [path + "ttHTobb_M125_13TeV_powheg_pythia8.root"],
+        glob.glob("/hdfs/cms/store/user/jpata/tthbb13/VHBBHeppyV16pre/Feb10_15fedbd/ttHTobb_M125_13TeV_powheg_pythia8_10000/crab_ttHTobb_M125_13TeV_powheg_pythia8_10000/160210_184953/0000/*.root"),
         ""
     ),
-    "ttbarPlus2B": Sample(
-        "ttbarPlus2B", 
-        [path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_tt2b.root"],
-        "",
-    ),
-    "ttbarPlusB": Sample(
-        "ttbarPlusB", 
-        [path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttb.root"],
-        "",
-    ),
-    "ttbarPlusBBbar": Sample(
-        "ttbarPlusBBbar", 
-        [path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttbb.root"],
-        "",
-    ),
-    "ttbarPlusCCbar": Sample(
-        "ttbarPlusCCbar", 
-        [path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttcc.root"],
-        "",
-    ),
-    "ttbarOther": Sample(
-        "ttbarOther", 
-        [path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttll.root"],
-        "",
-    ),
+#    "ttbarPlus2B": Sample(
+#        "ttbarPlus2B", 
+#        [path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_tt2b.root"],
+#        "",
+#    ),
+#    "ttbarPlusB": Sample(
+#        "ttbarPlusB", 
+#        [path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttb.root"],
+#        "",
+#    ),
+#    "ttbarPlusBBbar": Sample(
+#        "ttbarPlusBBbar", 
+#        [path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttbb.root"],
+#        "",
+#    ),
+#    "ttbarPlusCCbar": Sample(
+#        "ttbarPlusCCbar", 
+#        [path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttcc.root"],
+#        "",
+#    ),
+#    "ttbarOther": Sample(
+#        "ttbarOther", 
+#        [path + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttll.root"],
+#        "",
+#    ),
 }
