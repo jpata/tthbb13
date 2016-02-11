@@ -35,6 +35,7 @@ namespace trigger {
     }
 }
 
+
 //Evaluate mem probability
 double mem_p(double p_tth, double p_ttbb, double w=0.15) {
     return p_tth > 0.0 ? p_tth / (p_tth + w * p_ttbb) : 0.0;
@@ -57,6 +58,7 @@ std::vector<std::string> split(const std::string &s, char delim) {
     return elems;
 }
 
+//Functions that define how an axis in the sparse histogram should be filled
 const map<string, function<float(const Event& ev)>> AxisFunctions = {
     {"counting", [](const Event& ev) { return 1;}},
     {"eventParity", [](const Event& ev) { return ev.data->evt%2;}},

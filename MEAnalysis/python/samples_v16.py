@@ -3,7 +3,7 @@ from TTH.MEAnalysis.samples_base import *
 samples_dict = {
     'ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1': cms.PSet(
     isMC = cms.bool(True),
-    nGen = cms.int64(1),
+    nGen = cms.int64(613384),
     name = cms.string('ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1'),
     nickname = cms.string('ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1'),
     skip = cms.bool(True),
@@ -32,11 +32,11 @@ samples_dict = {
         "/store/user/jpata/VHBBHeppyV16pre/ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1/VHBB_HEPPY_V16pre_ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160205_220052/0000/tree_8.root",
         "/store/user/jpata/VHBBHeppyV16pre/ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1/VHBB_HEPPY_V16pre_ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160205_220052/0000/tree_9.root"
     ),
-    xSec = cms.double(1)
+    xSec = cms.double(xsec[("stop_s", "13TeV")])
 ),
     'ST_t-channel_antitop_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1': cms.PSet(
     isMC = cms.bool(True),
-    nGen = cms.int64(1),
+    nGen = cms.int64(1680200),
     name = cms.string('ST_t-channel_antitop_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1'),
     nickname = cms.string('ST_t-channel_antitop_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1'),
     skip = cms.bool(True),
@@ -82,11 +82,11 @@ samples_dict = {
         "/store/user/jpata/VHBBHeppyV16pre/ST_t-channel_antitop_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1/VHBB_HEPPY_V16pre_ST_t-channel_antitop_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160205_220231/0000/tree_8.root",
         "/store/user/jpata/VHBBHeppyV16pre/ST_t-channel_antitop_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1/VHBB_HEPPY_V16pre_ST_t-channel_antitop_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160205_220231/0000/tree_9.root"
     ]),
-    xSec = cms.double(1)
+    xSec = cms.double(xsec[("stop_tbar", "13TeV")])
 ),
     'ST_t-channel_top_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1': cms.PSet(
     isMC = cms.bool(True),
-    nGen = cms.int64(1),
+    nGen = cms.int64(2901400),
     name = cms.string('ST_t-channel_top_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1'),
     nickname = cms.string('ST_t-channel_top_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1'),
     skip = cms.bool(True),
@@ -164,7 +164,7 @@ samples_dict = {
         "/store/user/jpata/VHBBHeppyV16pre/ST_t-channel_top_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1/VHBB_HEPPY_V16pre_ST_t-channel_top_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160205_220319/0000/tree_8.root",
         "/store/user/jpata/VHBBHeppyV16pre/ST_t-channel_top_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1/VHBB_HEPPY_V16pre_ST_t-channel_top_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160205_220319/0000/tree_9.root",
     ]),
-    xSec = cms.double(1)
+    xSec = cms.double(xsec[("stop_t", "13TeV")])
 ),
     'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8': cms.PSet(
     isMC = cms.bool(True),
@@ -183,7 +183,7 @@ samples_dict = {
         '/store/user/jpata/VHBBHeppyV16pre/TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8/VHBB_HEPPY_V16pre_TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v2/160205_220800/0000/tree_7.root', 
         '/store/user/jpata/VHBBHeppyV16pre/TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8/VHBB_HEPPY_V16pre_TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v2/160205_220800/0000/tree_8.root', 
         '/store/user/jpata/VHBBHeppyV16pre/TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8/VHBB_HEPPY_V16pre_TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v2/160205_220800/0000/tree_9.root'),
-    xSec = cms.double(1)
+    xSec = cms.double(1) #FIXME
 ), 'TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8': cms.PSet(
     isMC = cms.bool(True),
     nGen = cms.int64(430330),
@@ -211,7 +211,7 @@ samples_dict = {
         '/store/user/jpata/VHBBHeppyV16pre/TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/VHBB_HEPPY_V16pre_TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160205_220629/0000/tree_7.root', 
         '/store/user/jpata/VHBBHeppyV16pre/TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/VHBB_HEPPY_V16pre_TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160205_220629/0000/tree_8.root', 
         '/store/user/jpata/VHBBHeppyV16pre/TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/VHBB_HEPPY_V16pre_TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160205_220629/0000/tree_9.root'),
-    xSec = cms.double(1)
+    xSec = cms.double(xsec[("ttw_wqq", "13TeV")])
 ), 'ttHTobb_M125_13TeV_powheg_pythia8': cms.PSet(
     isMC = cms.bool(True),
     nGen = cms.int64(3933404),
@@ -339,7 +339,7 @@ samples_dict = {
         '/store/user/jpata/VHBBHeppyV16pre/ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/VHBB_HEPPY_V16pre_ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v2/160205_220455/0000/tree_7.root', 
         '/store/user/jpata/VHBBHeppyV16pre/ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/VHBB_HEPPY_V16pre_ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v2/160205_220455/0000/tree_8.root', 
         '/store/user/jpata/VHBBHeppyV16pre/ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/VHBB_HEPPY_V16pre_ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v2/160205_220455/0000/tree_9.root'),
-    xSec = cms.double(1)
+    xSec = cms.double(xsec[("stop_tW", "13TeV")])
 ), 'TT_TuneCUETP8M1_13TeV-powheg-pythia8': cms.PSet(
     isMC = cms.bool(True),
     nGen = cms.int64(116078190),
@@ -2928,7 +2928,7 @@ samples_dict = {
         '/store/user/jpata/VHBBHeppyV16pre/TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8/VHBB_HEPPY_V16pre_TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160205_220714/0000/tree_7.root', 
         '/store/user/jpata/VHBBHeppyV16pre/TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8/VHBB_HEPPY_V16pre_TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160205_220714/0000/tree_8.root', 
         '/store/user/jpata/VHBBHeppyV16pre/TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8/VHBB_HEPPY_V16pre_TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160205_220714/0000/tree_9.root'),
-    xSec = cms.double(1)
+    xSec = cms.double(xsec[("ttz_zqq", "13TeV")])
 ), 'ZZ_TuneCUETP8M1_13TeV-pythia8': cms.PSet(
     isMC = cms.bool(True),
     nGen = cms.int64(996944),
@@ -2961,7 +2961,7 @@ samples_dict = {
         '/store/user/jpata/VHBBHeppyV16pre/ZZ_TuneCUETP8M1_13TeV-pythia8/VHBB_HEPPY_V16pre_ZZ_TuneCUETP8M1_13TeV-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160205_221020/0000/tree_7.root', 
         '/store/user/jpata/VHBBHeppyV16pre/ZZ_TuneCUETP8M1_13TeV-pythia8/VHBB_HEPPY_V16pre_ZZ_TuneCUETP8M1_13TeV-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160205_221020/0000/tree_8.root', 
         '/store/user/jpata/VHBBHeppyV16pre/ZZ_TuneCUETP8M1_13TeV-pythia8/VHBB_HEPPY_V16pre_ZZ_TuneCUETP8M1_13TeV-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160205_221020/0000/tree_9.root'),
-    xSec = cms.double(1)
+    xSec = cms.double(xsec[("zz", "13TeV")])
 ), 'WZ_TuneCUETP8M1_13TeV-pythia8': cms.PSet(
     isMC = cms.bool(True),
     nGen = cms.int64(988500),
@@ -2997,7 +2997,7 @@ samples_dict = {
         '/store/user/jpata/VHBBHeppyV16pre/WZ_TuneCUETP8M1_13TeV-pythia8/VHBB_HEPPY_V16pre_WZ_TuneCUETP8M1_13TeV-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160205_220933/0000/tree_7.root', 
         '/store/user/jpata/VHBBHeppyV16pre/WZ_TuneCUETP8M1_13TeV-pythia8/VHBB_HEPPY_V16pre_WZ_TuneCUETP8M1_13TeV-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160205_220933/0000/tree_8.root', 
         '/store/user/jpata/VHBBHeppyV16pre/WZ_TuneCUETP8M1_13TeV-pythia8/VHBB_HEPPY_V16pre_WZ_TuneCUETP8M1_13TeV-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160205_220933/0000/tree_9.root'),
-    xSec = cms.double(1)
+    xSec = cms.double(xsec[("wz", "13TeV")])
 ), 'WW_TuneCUETP8M1_13TeV-pythia8': cms.PSet(
     isMC = cms.bool(True),
     nGen = cms.int64(993640),
@@ -3033,7 +3033,7 @@ samples_dict = {
         '/store/user/jpata/VHBBHeppyV16pre/WW_TuneCUETP8M1_13TeV-pythia8/VHBB_HEPPY_V16pre_WW_TuneCUETP8M1_13TeV-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160205_220846/0000/tree_7.root', 
         '/store/user/jpata/VHBBHeppyV16pre/WW_TuneCUETP8M1_13TeV-pythia8/VHBB_HEPPY_V16pre_WW_TuneCUETP8M1_13TeV-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160205_220846/0000/tree_8.root', 
         '/store/user/jpata/VHBBHeppyV16pre/WW_TuneCUETP8M1_13TeV-pythia8/VHBB_HEPPY_V16pre_WW_TuneCUETP8M1_13TeV-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160205_220846/0000/tree_9.root'),
-    xSec = cms.double(1)
+    xSec = cms.double(xsec[("ww", "13TeV")])
 ), 'ttHToNonbb_M125_13TeV_powheg_pythia8': cms.PSet(
     isMC = cms.bool(True),
     nGen = cms.int64(3913550),
@@ -3164,7 +3164,7 @@ samples_dict = {
         '/store/user/jpata/VHBBHeppyV16pre/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/VHBB_HEPPY_V16pre_ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160205_220408/0000/tree_7.root', 
         '/store/user/jpata/VHBBHeppyV16pre/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/VHBB_HEPPY_V16pre_ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160205_220408/0000/tree_8.root', 
         '/store/user/jpata/VHBBHeppyV16pre/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/VHBB_HEPPY_V16pre_ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160205_220408/0000/tree_9.root'),
-    xSec = cms.double(1)
+    xSec = cms.double(xsec[("stop_tbarW", "13TeV")])
 ), 'WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8': cms.PSet(
     isMC = cms.bool(True),
     nGen = cms.int64(16514288),
@@ -3735,7 +3735,7 @@ samples_dict = {
         '/store/user/jpata/VHBBHeppyV16pre/WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/VHBB_HEPPY_V16pre_WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160205_221111/0000/tree_97.root', 
         '/store/user/jpata/VHBBHeppyV16pre/WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/VHBB_HEPPY_V16pre_WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160205_221111/0000/tree_98.root', 
         '/store/user/jpata/VHBBHeppyV16pre/WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/VHBB_HEPPY_V16pre_WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160205_221111/0000/tree_99.root' ) ),
-    xSec = cms.double(1)
+    xSec = cms.double(xsec[("wjets", "13TeV")])
 ), 'TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8': cms.PSet(
     isMC = cms.bool(True),
     nGen = cms.int64(129850),
@@ -3749,5 +3749,5 @@ samples_dict = {
         '/store/user/jpata/VHBBHeppyV16pre/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/VHBB_HEPPY_V16pre_TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160205_220541/0000/tree_5.root', 
         '/store/user/jpata/VHBBHeppyV16pre/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/VHBB_HEPPY_V16pre_TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160205_220541/0000/tree_6.root', 
         '/store/user/jpata/VHBBHeppyV16pre/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/VHBB_HEPPY_V16pre_TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160205_220541/0000/tree_7.root'),
-    xSec = cms.double(1)
+    xSec = cms.double(xsec[("ttw_wlnu", "13TeV")])
 )}

@@ -7,7 +7,7 @@ entries = 0
 
 rootprefix = "root://eoscms.cern.ch//eos/cms/"
 toreplace = "/store/user/jpata/VHBBHeppyV16pre/"
-siteprefix = "/store/group/phys_higgs/hbb/ntuples/V16pre/"
+siteprefix = "/store/group/phys_higgs/hbb/ntuples/V16_tth_moriond/"
 
 def findSampleName(n):
     n = n.replace(rootprefix + siteprefix, "")
@@ -31,8 +31,6 @@ try:
     firstInput = crabFiles[0]
     filename, firstEvent, nEvents = firstInput.split("___")
     filename = filename.replace(toreplace, siteprefix)
-    #rootfilename = "root://xrootd-cms.infn.it//" + filename
-    #rootfilename = "root://148.187.64.51:1094//pnfs/lcg.cscs.ch/cms/trivcat/" + filename
     rootfilename = rootprefix + filename
     firstEvent = int(firstEvent)
     nEvents = int(nEvents)
