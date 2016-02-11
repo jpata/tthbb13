@@ -43,8 +43,12 @@ def el_baseline_medium(el):
     
     #medium ID (cut-based)
     #ret = ret and el.eleCutIdSpring15_25ns_v1 >= 3
-    
-    ret = ret and el.mvaIdTrigMediumResult == 1
+ 
+    #EGamma POG MVA ID for triggering electrons (0=none, 1=WP90, 2=WP80, Spring15 training); 1 for muons
+    # We want 80%
+    # https://twiki.cern.ch/twiki/bin/viewauth/CMS/TTbarHbbRun2ReferenceAnalysis_76XTransition#Electrons
+    ret = ret and el.eleMVAIdSpring15Trig == 2
+
     return ret
 
 #def el_baseline_loose(el):
@@ -61,7 +65,7 @@ def print_el(el):
         el.pt, el.eta, el.convVeto, abs(el.etaSc), abs(el.eleDEta),
         abs(el.eleDPhi), el.eleSieie, el.eleHoE, abs(el.dxy),
         abs(el.dz), el.relIso03 , getattr(el, "eleExpMissingInnerHits", 0),
-        getattr(el, "eleooEmooP", 0), el.pfRelIso03, el.mvaIdTrigMediumResult, el.mvaIdTrig,
+        getattr(el, "eleooEmooP", 0), el.pfRelIso03, el.eleMVAIdSpring15Trig, el.eleMVArawSpring15Trig,
         el.eleEcalClusterIso/el.pt, el.eleHcalClusterIso/el.pt
     )
 
@@ -173,7 +177,7 @@ class Conf:
         "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV14_finebin.root",
         #"controlPlotsFileNew": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV14.root",
         "QGLPlotsFile_flavour": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/Histos_QGL_flavour.root",
-        "sampleFile": os.environ["CMSSW_BASE"]+"/python/TTH/MEAnalysis/samples_v16.py",
+        "sampleFile": os.environ["CMSSW_BASE"]+"/python/TTH/MEAnalysis/samples_a20.py",
         "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions.pickle",
         "transferFunctions_sj_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions_sj.pickle",
         #"systematics": ["nominal"],
