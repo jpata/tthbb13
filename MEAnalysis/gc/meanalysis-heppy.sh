@@ -10,7 +10,7 @@
 
 
 #on PSI, CMSSW_BASE is not exported with the grid job, need to set manually
-#CMSSW_BASE=$HOME/tth/sw/CMSSW/
+CMSSW_BASE=$HOME/tth/sw/CMSSW/
 
 #here we use @...@ to give grid-control the possibility to substitute the configuration file name
 #export ME_CONF=$CMSSW_BASE/src/TTH/MEAnalysis/python/cfg_withME.py
@@ -25,10 +25,11 @@ ls -al
 
 #set env
 cd ${CMSSW_BASE}/src/TTH/MEAnalysis/
+source ../setenv_psi.sh
 export SCRAM_ARCH="slc6_amd64_gcc491"
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 
-source ${CMSSW_BASE}/src/TTH/setenv_kbfi.sh
+source ${CMSSW_BASE}/src/TTH/setenv_psi.sh
 
 #go to work directory
 cd $MY_SCRATCH
