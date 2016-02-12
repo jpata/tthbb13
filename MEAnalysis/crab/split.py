@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 import sys, os
 
+from transferData import dsname_repl
+
 def prepare_crab_list(infile, dataset, perjob, outfile):
     """
     makes a crab-compatible file list.
@@ -19,6 +21,10 @@ def prepare_crab_list(infile, dataset, perjob, outfile):
             curname = line[1:-1]
         elif "root" in line:
             l0, l1 = line.split("=") 
+            for repls in dsname_repl:
+                l0 = l0.replace(repls[0], repls[1])
+            if len(l0) > 255:
+                raise Exception("too long filename: {0}".format(l0))
             datafiles += [(l0.strip(), int(l1.strip()))]
    
     #add last dataset
