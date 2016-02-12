@@ -6,9 +6,9 @@ filename = ""
 entries = 0
 
 rootprefix = "root://eoscms.cern.ch//eos/cms/"
-toreplace = "/store/user/jpata/VHBBHeppyV16pre/"
 siteprefix = "/store/group/phys_higgs/hbb/ntuples/V16_tth_moriond/"
 
+#Currently, the name of the sample is exracted from the filename
 def findSampleName(n):
     n = n.replace(rootprefix + siteprefix, "")
     spl = n.split("/")
@@ -30,7 +30,6 @@ try:
     print "crabFiles=", crabFiles
     firstInput = crabFiles[0]
     filename, firstEvent, nEvents = firstInput.split("___")
-    filename = filename.replace(toreplace, siteprefix)
     rootfilename = rootprefix + filename
     firstEvent = int(firstEvent)
     nEvents = int(nEvents)
@@ -46,18 +45,6 @@ try:
         retcode = 8010 
         raise Exception("wrong entry number: {0}".format(firstEvent))
     tf.Close()
-
-    #print "--------------- using edmFileUtil to convert PFN to LFN -------------------------"
-    #for i in xrange(0,len(crabFiles)) :
-    #     if os.getenv("GLIDECLIENT_Group","") != "overflow" :
-    #       print "Data is local"
-    #       pfn=os.popen("edmFileUtil -d %s"%(crabFiles[i])).read() 
-    #       pfn=re.sub("\n","",pfn)
-    #       print crabFiles[i],"->",pfn
-    #       crabFiles[i]=pfn
-    #     else:
-    #       print "Data is not local, using AAA/xrootd"
-    #       crabFiles[i]="root://cms-xrd-global.cern.ch/"+crabFiles[i]
     
     import imp
     import cPickle as pickle
