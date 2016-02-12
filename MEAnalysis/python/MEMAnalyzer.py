@@ -1,5 +1,9 @@
 from TTH.MEAnalysis.vhbb_utils import lvec
 
+import pdb
+
+import itertools
+
 import ROOT
 import copy
 ROOT.gSystem.Load("libTTHMEIntegratorStandalone")
@@ -7,15 +11,24 @@ from ROOT import MEM
 
 import numpy as np
 import json
+import pickle
 
 from TTH.MEAnalysis.MEMUtils import set_integration_vars, add_obj
 from TTH.MEAnalysis.MEMConfig import MEMConfig
+
+from TTH.MEAnalysis.MakeTaggingNtuple import calc_vars_hadtop_3j
+import TTH.TTHNtupleAnalyzer.AccessHelpers as AH
 
 #Pre-define shorthands for permutation and integration variable vectors
 CvectorPermutations = getattr(ROOT, "std::vector<MEM::Permutations::Permutations>")
 CvectorPSVar = getattr(ROOT, "std::vector<MEM::PSVar::PSVar>")
 #CmapDistributionTypeTH3D = getattr(ROOT, "std::map<MEM::DistributionType::DistributionType,TH3D>")
 
+pickle_f = open("/shome/gregor/VHBB-7415/CMSSW_7_4_15/src/TTH/MEAnalysis/python/cls_top_resolved.pickle","rb")
+cls = pickle.load(pickle_f)
+pickle_f.close()
+
+    
 from TTH.MEAnalysis.Analyzer import FilterAnalyzer
 class MECategoryAnalyzer(FilterAnalyzer):
     """
@@ -153,6 +166,7 @@ class MEAnalyzer(FilterAnalyzer):
         cfg.configure_btag_pdf(self.conf)
         cfg.configure_transfer_function(self.conf)
         self.integrator = MEM.Integrand(
+            #0,
             MEM.output,
             #MEM.output + MEM.input + MEM.init + MEM.init_more,
             cfg.cfg
@@ -296,6 +310,40 @@ class MEAnalyzer(FilterAnalyzer):
         self.vars_to_marginalize.clear()
         self.integrator.next_event()
 
+
+        #Permuation magic
+        #pdb.set_trace()
+        
+        jets = []
+        for ij,jet in enumerate(event.good_jets):
+            tlv = AH.buildTlv(jet.pt, jet.eta, jet.phi, jet.mass)
+            tlv.btagCSV        = jet.btagCSV
+            tlv.index          = ij
+            jets.append(tlv)
+        # Make sure jets are sorted
+        jets.sort(key = lambda x:-x.Pt())
+
+        
+
+        
+        best_comb = None
+        best_response = -1
+
+        for comb in itertools.combinations(jets, 3):
+            v = calc_vars_hadtop_3j(comb, False)
+
+            vararray = np.array([v[vname] for vname in cls.varlist])
+            vararray = vararray.reshape(1,-1)
+
+            response = cls.predict_proba(vararray)[0,1]
+
+            if response > best_response:
+                best_response = response
+                best_comb = comb
+        
+        #if best_response > 0:
+        #    print "Found: ", best_response, best_comb[0].index, best_comb[1].index, best_comb[2].index
+            
         #Initialize members for tree filler
         event.mem_results_tth = []
         event.mem_results_ttbb = []
@@ -340,6 +388,20 @@ class MEAnalyzer(FilterAnalyzer):
                     else:
                         res[(hypo, confname)] = MEM.MEMOutput()
                         continue
+                    
+                if confname == "SL_2w2h2t_3jt":                    
+                    top_indices = [best_comb[0].index, best_comb[1].index, best_comb[2].index]
+                    for j in event.good_jets:
+                        j.PDGID = 0
+                        
+                        tmp_jets = [event.good_jets[i] for i in top_indices]
+                        tmp_jets.sort(key = lambda x:x.btagCSV)
+                        if len(tmp_jets)==3:
+                            tmp_jets[0].PDGID = 1
+                            tmp_jets[1].PDGID = 1
+                            tmp_jets[2].PDGID = 5
+                    # TODO: RESTORE AFERWARDS!!!
+
 
                 #if "meminput" in self.conf.general["verbosity"]:
                 if "meminput" in self.conf.general["verbosity"]:

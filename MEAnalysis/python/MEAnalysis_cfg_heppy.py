@@ -301,6 +301,8 @@ class Conf:
             "SL_2w2h1t_h",
             "SL_2w2h2t",
 
+            "SL_2w2h2t_3jt",
+
             #with bLR calc by mem code
             "SL_2w2h2t_memLR",
             "SL_0w2h2t_memLR",
@@ -316,13 +318,14 @@ class Conf:
 
         #This configures the MEMs to actually run, the rest will be set to 0
         "methodsToRun": [
-            "SL_0w2h2t",
-            "DL_0w2h2t",
+            #"SL_0w2h2t",
+            #"DL_0w2h2t",
             #"SL_1w2h2t",
             #"SL_2w2h1t_l",
             #"SL_2w2h1t_h",
             "SL_2w2h2t",
-            "SL_2w2h2t_sj",
+            "SL_2w2h2t_3jt",
+            #"SL_2w2h2t_sj",
             #"SL_0w2h2t_sj",
             #"SL_2w2h2t_memLR",
             #"SL_0w2h2t_memLR",
@@ -354,6 +357,26 @@ strat.push_back(MEM.Permutations.QUntagged)
 strat.push_back(MEM.Permutations.BTagged)
 c.cfg.perm_pruning = strat
 Conf.mem_configs["SL_2w2h2t"] = c
+
+
+###
+### SL_2w2h2t_3jt
+###
+#FIXME: why == here and not >= ?
+c = MEMConfig()
+c.do_calculate = lambda ev, mcfg: (
+    len(mcfg.lepton_candidates(ev)) == 1 and
+    len(mcfg.b_quark_candidates(ev)) >= 4 and
+    len(mcfg.l_quark_candidates(ev)) >= 2
+)
+c.mem_assumptions.add("sl")
+strat = CvectorPermutations()
+strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
+strat.push_back(MEM.Permutations.HEPTopTagged)
+c.cfg.perm_pruning = strat
+Conf.mem_configs["SL_2w2h2t_3jt"] = c
+
+
 
 ###
 ### SL_1w2h2t

@@ -1,55 +1,63 @@
-import ROOT
+"""
+
+"""
+
+########################################
+# Imports
+########################################
+
+import pickle
 
 import matplotlib as mpl
 mpl.use('Agg')
-
 import sklearn
 import numpy as np
-import sys
-
 import matplotlib.pyplot as plt
 import pandas, root_numpy
-import rootpy
-import rootpy.plotting
-import rootpy.plotting.root2matplotlib as rplt
+from sklearn.ensemble import GradientBoostingClassifier
 
 from TTH.Plotting.joosep.plotlib import *
 
 
+########################################
+# Configuration
+########################################
+
 brs = [
     "is_signal",
-    "j1j2_mass", "j1j3_mass", "j2j3_mass", "j1j2j3_mass", "frec", "min_btagCSV", "max_btagCSV",
+    "j1j2_mass", "j1j3_mass", "j2j3_mass", "j1j2j3_mass", "frec", 
+    "min_btagCSV", "max_btagCSV",
+    "mean_btagCSV", "variance_btagCSV",
  ]
-
 
 ds = []
 path = "/shome/gregor/tth/gc/GCf4625db4aa6a/cfg_noME/ttHTobb_M125_13TeV_powheg_pythia8/"
 
-for ifn, fn in enumerate([
-    path + "outputhadtop_3j.root",
-]):
-    d = root_numpy.root2rec(
-        fn,
-        branches=brs,
-    )
-    d = pandas.DataFrame(d)
-    
-    #d["w"] = d["weight_xs"]
+for fn in [path + "outputhadtop_3j.root"]:
+    d = root_numpy.root2rec(fn, branches=brs)
+    d = pandas.DataFrame(d)    
     ds += [d]
 
 df = pandas.concat(ds)
 
 print df.shape
-
 print df.groupby('is_signal')["is_signal"].count()
 
-from sklearn.ensemble import GradientBoostingClassifier
+#df["j1j2j3_massnew"] = df["j1j2j3_mass"]
+#df.loc[df["j1j2j3_massnew"] > 400,"j1j2j3_massnew"] = 400
+#brs.append("j1j2j3_massnew")
 
+#df["frecnew"] = df["frec"]
+#df.loc[df["frecnew"] > 0.4,"frecnew"] = 0.4
+#brs.append("frecnew")
+
+
+########################################
+# Helper: train
+########################################
 
 def train(df, var,  **kwargs):
-    weight = kwargs.get("weight", None)
     
-
     df_shuf = df.iloc[np.random.permutation(np.arange(len(df)))]
     
     cls = GradientBoostingClassifier(
@@ -62,82 +70,17 @@ def train(df, var,  **kwargs):
         verbose=kwargs.get("verbose", False)
     )
 
-    if not weight:
-        cls = cls.fit(df_shuf[var], df_shuf["is_signal"])
-    else:
-        cls = cls.fit(df_shuf[var], df_shuf["is_signal"], df_shuf[weight])
+
+    cls = cls.fit(df_shuf[var], df_shuf["is_signal"])
     cls.varlist = var
+
     return cls
 
-df_shuf = df.iloc[np.random.permutation(len(df))]
 
-nsig = df_shuf["is_signal"]==1
-nbkg = df_shuf["is_signal"]==0
+########################################
+# Helper: rocplot
+########################################
 
-d_bkg_tr = df_shuf[nbkg][:sum(nbkg)/2];
-d_sig_tr = df_shuf[nsig][:sum(nsig)/2];
-
-d_bkg_te = df_shuf[nbkg][sum(nbkg)/2:];
-d_sig_te = df_shuf[nsig][sum(nsig)/2:];
-
-dtrain = pandas.concat([d_bkg_tr, d_sig_tr])
-dtest = pandas.concat([d_bkg_te, d_sig_te])
-
-cls_2var_50 = train(
-    dtrain,
-    ["j1j2j3_mass", "frec"],
-    ntrees=50,
-    learning_rate=0.1,
-    max_depth=4,
-    subsample=0.8,
-    verbose=True
-)
-
-
-cls_4var_50 = train(
-    dtrain,
-    ["j1j2j3_mass", "frec", "min_btagCSV", "max_btagCSV"],
-    ntrees=50,
-    learning_rate=0.1,
-    max_depth=4,
-    subsample=0.8,
-    verbose=True
-)
-
-cls_4var_200 = train(
-    dtrain,
-    ["j1j2j3_mass", "frec", "min_btagCSV", "max_btagCSV"],
-    ntrees=200,
-    learning_rate=0.025,
-    max_depth=4,
-    subsample=0.8,
-    verbose=True
-)
-
-cls_6var_200 = train(
-    dtrain,
-    ["j1j2_mass", "j1j3_mass", "j2j3_mass", "j1j2j3_mass", "min_btagCSV", "max_btagCSV"],
-    ntrees=200,
-    learning_rate=0.025,
-    max_depth=4,
-    subsample=0.8,
-    verbose=True
-)
-
-
-
-
-#plt.hist(cls.predict_proba(dtest.loc[
-#    dtest.eval("(is_signal==0)"), cls.varlist
-#    ])[:,0], bins=np.linspace(0,1,51), normed=True, alpha=0.4
-#);
-#plt.hist(cls.predict_proba(dtest.loc[
-#    dtest.eval("(is_signal==1)"), cls.varlist
-#    ])[:,0], bins=np.linspace(0,1,51), color="red", alpha=0.4, normed=True
-#);
-#
-#plt.savefig("foo.png")
-#
 def rocplot(cut, title, classifiers, labels):
     plt.plot([0,1],[0,1], color="black", lw=2)
     #sel = dtest.eval(cut) 
@@ -160,8 +103,10 @@ def rocplot(cut, title, classifiers, labels):
         #plt.fill_betweenx(r[:,1], r[:,0]-e[:,0], r[:,0]+e[:,0],alpha=0.1, color="black")
         idx += 1
 
-    plt.xlabel("tt+H(bb) efficiency", fontsize=16)
-    plt.ylabel("tt+jets efficiency", fontsize=16)
+    plt.xlabel("true match efficiency", fontsize=16)
+    plt.ylabel("fake match efficiency", fontsize=16)
+    #plt.yscale('log')
+
 
     #var = "lr0"
     #if "dl" in title:
@@ -177,11 +122,81 @@ def rocplot(cut, title, classifiers, labels):
     plt.legend(loc=2)
     plt.xlim(0,1);plt.ylim(0,1);
 
+
+df_shuf = df.iloc[np.random.permutation(len(df))]
+
+nsig = df_shuf["is_signal"]==1
+nbkg = df_shuf["is_signal"]==0
+
+d_bkg_tr = df_shuf[nbkg][:sum(nsig)/2]
+d_sig_tr = df_shuf[nsig][:sum(nsig)/2]
+
+d_bkg_te = df_shuf[nbkg][sum(nbkg)/2:]
+d_sig_te = df_shuf[nsig][sum(nsig)/2:]
+
+dtrain = pandas.concat([d_bkg_tr, d_sig_tr])
+dtest = pandas.concat([d_bkg_te, d_sig_te])
+
+
+for br in brs:
+
+    xmin = min(df[br])
+    xmax = max(df[br])
+
+    plt.clf()
+    plt.hist(df.loc[df["is_signal"]==0,br].as_matrix(),color="red", bins=np.linspace(xmin,xmax,50),normed=True, alpha=0.4)
+    plt.hist(df.loc[df["is_signal"]==1,br].as_matrix(),color="blue",bins=np.linspace(xmin,xmax,50),normed=True, alpha=0.4)
+    
+    plt.savefig("nom_{0}.png".format(br))
+
+cls = train(
+    dtrain,
+    ["j1j2j3_mass", "frec", "min_btagCSV", "max_btagCSV"],
+    ntrees=50,
+    learning_rate=0.1,
+    max_depth=4,
+    subsample=.8,
+    verbose=True
+)
+
+cls_meanvarCSV = train(
+    dtrain,
+    ["j1j2j3_mass", "frec", "mean_btagCSV", "variance_btagCSV"],
+    ntrees=50,
+    learning_rate=0.1,
+    max_depth=4,
+    subsample=.8,
+    verbose=True
+)
+
 plt.clf()
 
-rocplot("", "foo",[cls_2var_50, cls_4var_50, cls_4var_200, cls_6var_200],["2 50", "4 50", "4 200", "6 200"])
-plt.savefig("bar.png")
-        #[cls_cat[c], cls_cat_withmem[c], cls_cat_memonly[c]],
-        #["BDT", "BDT+MEM", "MEM+blr"]
-        #[], ["BDT"]
+
+plt.hist(cls.predict_proba(dtest.loc[
+    dtest.eval("(is_signal==0)"), cls.varlist
+    ])[:,1], bins=np.linspace(0,1,51), color="red", normed=True, alpha=0.4
+);
+plt.hist(cls.predict_proba(dtest.loc[
+    dtest.eval("(is_signal==1)"), cls.varlist
+    ])[:,1], bins=np.linspace(0,1,51), color="blue", alpha=0.4, normed=True
+);
+
+
+cls.predict_proba(dtest.loc[dtest.eval("(is_signal==1)"), cls.varlist])[:,0]
+plt.savefig("foo.png")
+
+
+
+plt.clf()
+rocplot("", "foo",[cls, cls_meanvarCSV],["kin+min/max","kin+mean/var"])
+plt.savefig("ROC.png")
+
+
+f = open("cls_top_resolved.pickle","wb")
+pickle.dump(cls_meanvarCSV, f)
+f.close()
+
+
+
+
 
