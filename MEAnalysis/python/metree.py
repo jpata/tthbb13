@@ -52,6 +52,7 @@ jetType = NTupleObjectType("jetType", variables = [
         mcOnly=True,
         help="0 - matched to light quark from W, 1 - matched to b form top, 2 - matched to b from higgs"
     ),
+    NTupleVariable("matchBfromHadT", lambda x : getattr(x, "tth_match_label_bfromhadt", -1), type=int, mcOnly=True),
     NTupleVariable("mcPt", lambda x : x.mcPt, mcOnly=True),
     NTupleVariable("mcEta", lambda x : x.mcEta, mcOnly=True),
     NTupleVariable("mcPhi", lambda x : x.mcPhi, mcOnly=True),

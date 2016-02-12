@@ -41,6 +41,16 @@ TChain* loadFiles(const Configuration& conf) {
 
 const vector<CategoryKey::CategoryKey> emptykey;
 
+//Defines how a process can be extracted
+const map<ProcessKey::ProcessKey, function<bool(const TreeData* data)>> ProcessCuts = {
+    {ProcessKey::ttH_hbb, [](const TreeData* data) { return data->nGenBHiggs == 2;}},
+    {ProcessKey::ttbarOther, [](const TreeData* data) { return data->ttCls <= 0;}},
+    {ProcessKey::ttbarPlusB, [](const TreeData* data) { return data->ttCls == 51;}},
+    {ProcessKey::ttbarPlus2B, [](const TreeData* data) { return data->ttCls == 52;}},
+    {ProcessKey::ttbarPlusBBbar, [](const TreeData* data) { return ((data->ttCls >= 53) && (data->ttCls <= 56));}},
+    {ProcessKey::ttbarPlusCCbar, [](const TreeData* data) { return ((data->ttCls >= 41) && (data->ttCls <= 45));}},
+};
+
 int main(int argc, const char** argv) {
     //Switch off histogram naming for memory management
     TH1::AddDirectory(false);
@@ -84,20 +94,32 @@ int main(int argc, const char** argv) {
     }
     TStopwatch timer;
     timer.Start();
-
-    for (long iEntry=conf.firstEntry; iEntry<conf.firstEntry+conf.numEntries; iEntry++) {
-
+    
+    const long maxEntries = conf.firstEntry + conf.numEntries;
+    
+    for (long iEntry=conf.firstEntry; iEntry < maxEntries; iEntry++) {
         const bool do_print = (conf.printEvery>0 && iEntry % conf.printEvery == 0);
         //std::vector<long> randoms;
         //
         //for (int ir=0; ir<1000; ir++) {
         //}
-
+        data.init();
         nbytes += tree->GetEntry(iEntry);
         nentries += 1;
+        if (iEntry == conf.firstEntry) {
+            cout << "first entry " << data.run << ":" << data.lumi << ":" << data.evt << endl;
+        }
+        if (iEntry == maxEntries - 1) {
+            cout << "last entry " << data.run << ":" << data.lumi << ":" << data.evt << endl;
+        }
+
         if (do_print) {
             cout << "------" << endl;
             cout << "entry " << iEntry << endl;
+        }
+
+        if (! ProcessCuts.at(conf.process)(&data)) {
+            continue;
         }
 
         const unordered_map<SystematicKey::SystematicKey, Event, std::hash<int> > systmap = {

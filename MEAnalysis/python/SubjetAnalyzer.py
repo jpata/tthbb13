@@ -235,9 +235,10 @@ class SubjetAnalyzer(FilterAnalyzer):
                 for top in other_tops: self.Get_Subjets( top )
 
             # Set 'PDGID' to 1 for light, and to 5 for b
-            for subjet in top_subjets:
-                if subjet.btagFlag == 1.0: setattr( subjet, 'PDGID', 5 )
-                if subjet.btagFlag == 0.0: setattr( subjet, 'PDGID', 1 )
+            # FIXME: do not use PDGID currently, as it ONLY works with the HEPTopTagger perm pruning strat
+            #for subjet in top_subjets:
+            #    if subjet.btagFlag == 1.0: setattr( subjet, 'PDGID', 5 )
+            #    if subjet.btagFlag == 0.0: setattr( subjet, 'PDGID', 1 )
 
             # Create two new lists for btagged_jets and wquark_candidate_jets in the
             # original events
@@ -247,12 +248,12 @@ class SubjetAnalyzer(FilterAnalyzer):
             for jet in reco_btagged_jets:
                 setattr( jet, 'btag', getattr(jet,self.btagAlgo) )
                 setattr( jet, 'btagFlag', 1.0 )
-                setattr( jet, 'PDGID', 0 )
+                #setattr( jet, 'PDGID', 0 )
 
             for jet in reco_ltagged_jets:
                 setattr( jet, 'btag', getattr(jet,self.btagAlgo) )
                 setattr( jet, 'btagFlag', 0.0 )
-                setattr( jet, 'PDGID', 0 )
+                #setattr( jet, 'PDGID', 0 )
 
 
             ########################################

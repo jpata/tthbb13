@@ -47,13 +47,13 @@ def prepare_crab_list(infile, dataset, perjob, outfile):
     print "wrote {0} lines to {1}".format(n, outfile)
 
 if __name__ == "__main__":
-    if len(sys.argv) != 5:
-        print "{0} ../gc/datasets/infile.dat name_of_dataset datasets/name_of_dataset.dat events_per_job".format(sys.argv[0])
+    if len(sys.argv) != 4:
+        print "{0} ../gc/datasets/infile.dat datasets/name_of_dataset.dat events_per_job".format(sys.argv[0])
         sys.exit(1) 
     infile = sys.argv[1]
-    dataset = sys.argv[2]
-    outfile = sys.argv[3]
-    perjob = int(sys.argv[4])
-    
+    outfile = sys.argv[2]
+    perjob = int(sys.argv[3])
+    dataset = infile.split("/")[-1].split(".")[0]
+
     prepare_crab_list(infile, dataset, perjob, outfile)
 

@@ -51,6 +51,5 @@ for sample_name, sample in samples_dict.items():
         del tf
         sys.stdout.flush()
         sys.stderr.flush()
-    print("{0} {1} {2} {3} {4} {5} {6}".format(sample_name, ngen, ngenPos, ngenNeg, ngen2, ngenNeg2, ngenPos2))
-    print(sample_name, ngenPos-ngenNeg)
+    print("{0} ngen={1} ngeneff={2}".format(sample_name, ngen, ngenPos-ngenNeg))
     outfile.close()

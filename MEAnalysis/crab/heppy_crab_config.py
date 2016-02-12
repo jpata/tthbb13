@@ -2,7 +2,7 @@ from WMCore.Configuration import Configuration
 config = Configuration()
 import os
 
-processing_name = "Dec6_GITHASH" 
+processing_name = "Feb11_withme_GITHASH" 
 config.section_("General")
 #this will be used for the crab directory name
 config.General.requestName = DNAME
@@ -14,7 +14,7 @@ config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'heppy_crab_fake_pset.py'
 config.JobType.scriptExe = 'heppy_crab_script.sh'
 #job maximum runtime in minutes
-config.JobType.maxJobRuntimeMin = 47 * 60
+config.JobType.maxJobRuntimeMin = 40 * 60
 
 import os
 #we need to specially ship the python and data directories

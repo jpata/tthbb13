@@ -14,7 +14,7 @@ import sys
 sys.modules["TFClasses"] = TFClasses
 
 #Import the default list of samples
-from TTH.MEAnalysis.samples_base import lfn_to_pfn
+from TTH.MEAnalysis.samples_base import lfn_to_pfn, getSampleNGen
 
 #Create configuration object based on environment variables
 #if one runs with ME_CONF=/path/to/conffile.py, then the configuration is loaded from that file
@@ -310,7 +310,7 @@ if __name__ == "__main__":
 
         #Configure the number of events to run
         from PhysicsTools.HeppyCore.framework.looper import Looper
-        nEvents = 1000
+        nEvents = 10000
 
         kwargs = {}
         if conf.general.get("eventWhitelist", None) is None:

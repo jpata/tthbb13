@@ -48,11 +48,11 @@ def Make_config():
     config['input_tree_name'] = 'tree'
 
     #the path to the root files
-    #config["root_file_base"] = 'file://'
-    config["root_file_base"] = "dcap:///pnfs/psi.ch/cms/trivcat/"
+    config["root_file_base"] = 'file:///hdfs/cms/'
+    #config["root_file_base"] = "dcap:///pnfs/psi.ch/cms/trivcat/"
 
     # The config file will be copied to 'runs/{config['run_name']}'
-    config['run_name'] = 'JP_V14_resolvedjet'
+    config['run_name'] = 'JP_V16_resolvedjet'
 
     config['output_root_file_name'] = 'out.root'
 
@@ -95,10 +95,12 @@ def Make_config():
     #     to add underscores where necessary manually.
 
     config['quarktypes'] = ['GenBQuarkFromTop_', 'GenBQuarkFromH_', 'GenWZQuark_' ]
-    #config['jettypes'] = [ 'Jet_' ]
     
-    config['jettypes'] = [ 'httCandidates_sjW1', 'httCandidates_sjW2',
-        'httCandidates_sjNonW']
+    #enable this for resolved jets
+    config['jettypes'] = [ 'Jet_' ]
+    #Enable this for subjets
+    #config['jettypes'] = [ 'httCandidates_sjW1', 'httCandidates_sjW2',
+    #    'httCandidates_sjNonW']
 
     # Specify which branches *other* than pt, eta, phi, mass and E should be 
     # extracted.
@@ -115,14 +117,17 @@ def Make_config():
     config['jet_extra_vars'] = []
      
     config['jet_extra_vars'] = [
-    #    '{particle}hadronFlavour',
-    #    '{particle}btagCSV',
-    #    '{particle}btagBDT',
-         'httCandidates_pt',
-         'httCandidates_eta',
-         'httCandidates_phi',
-         'httCandidates_mass',
-         'httCandidates_fRec',
+    #resolved jets
+        '{particle}hadronFlavour',
+        '{particle}btagCSV',
+        '{particle}btagBDT',
+   
+    #subjets only
+    #     'httCandidates_pt',
+    #     'httCandidates_eta',
+    #     'httCandidates_phi',
+    #     'httCandidates_mass',
+    #     'httCandidates_fRec',
     ]
 
 
@@ -135,10 +140,10 @@ def Make_config():
 
 
     config['jet_cutoff_list'] = [
-        #( '{particle}pt'       , '>' , 30.0 ),
-        ( 'httCandidates_pt'   , '>' , 200.0 ),
-        ( 'httCandidates_mass' , '>' , 120.0 ),
-        ( 'httCandidates_mass' , '<' , 220.0 ),
+        ( '{particle}pt'       , '>' , 30.0 ),
+        #( 'httCandidates_pt'   , '>' , 200.0 ),
+        #( 'httCandidates_mass' , '>' , 120.0 ),
+        #( 'httCandidates_mass' , '<' , 220.0 ),
         #( 'httCandidates_fW'   , '<' , 0.175 ),
         ]
 

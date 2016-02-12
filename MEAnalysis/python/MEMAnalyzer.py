@@ -153,8 +153,8 @@ class MEAnalyzer(FilterAnalyzer):
         cfg.configure_btag_pdf(self.conf)
         cfg.configure_transfer_function(self.conf)
         self.integrator = MEM.Integrand(
-            #MEM.output,
-            MEM.output + MEM.input + MEM.init + MEM.init_more,
+            MEM.output,
+            #MEM.output + MEM.input + MEM.init + MEM.init_more,
             cfg.cfg
         )
 
@@ -248,7 +248,7 @@ class MEAnalyzer(FilterAnalyzer):
 
         return self.conf.general["passall"] or np.any([v.passes_mem for v in event.systResults.values()])
 
-    def printInputs(self, event):
+    def printInputs(self, event, confname):
         inputs = {
             "selectedJetsP4": [
                 (j.pt, j.eta, j.phi, j.mass) for j in event.good_jets
@@ -275,7 +275,7 @@ class MEAnalyzer(FilterAnalyzer):
             "cat": event.category_string,
             "blr": event.btag_LR_4b_2b
         }
-        memidx = self.conf.mem["methodOrder"].index("SL_0w2h2t")
+        memidx = self.conf.mem["methodOrder"].index(confname)
         outobjects["output"] = {
             "p_tth": event.mem_results_tth[memidx].p,
             "p_ttbb": event.mem_results_ttbb[memidx].p,
@@ -391,16 +391,19 @@ class MEAnalyzer(FilterAnalyzer):
         if "default" in self.memkeys:
             p1 = res[(MEM.Hypothesis.TTH, "default")].p
             p2 = res[(MEM.Hypothesis.TTBB, "default")].p
-
+        
         event.mem_results_tth = [res[(MEM.Hypothesis.TTH, k)] for k in self.memkeys]
         event.mem_results_ttbb = [res[(MEM.Hypothesis.TTBB, k)] for k in self.memkeys]
+
+        for confname in self.memkeysToRun:
+            if confname not in skipped and "commoninput" in self.conf.general["verbosity"]:
+                self.printInputs(event, confname)
+        
         if "memoutput" in self.conf.general["verbosity"]:
             print [r.p for r in event.mem_results_tth]
             print [r.p for r in event.mem_results_ttbb]
             print "---MEM done EVENT r:l:e", event.input.run, event.input.lumi, event.input.evt
         
-        if "SL_0w2h2t" not in skipped and "commoninput" in self.conf.general["verbosity"]:
-            self.printInputs(event)
 
         event.passes_mem = True
         return event
