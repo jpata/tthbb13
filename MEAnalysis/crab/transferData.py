@@ -1,17 +1,21 @@
+import glob, sys
 
-import glob
-
-infiles = glob.glob("../gc/datasets/V16_newjec/*.dat")
+infiles = sys.argv[1:]
 
 #repl1 = "/store/user/jpata/VHBBHeppyV16pre/"
 #repl2 = "/store/group/phys_higgs/hbb/ntuples/V16_tth_moriond/"
 #src_pref = "srm://ganymede.hep.kbfi.ee:8888/hdfs/cms"
 #dst_pref = "srm://srm-eoscms.cern.ch:8443/eos/cms"
 
-repl1 = "/store/user/jpata/VHBBHeppyV16pre/"
-repl2 = repl1
-src_pref = "srm://ganymede.hep.kbfi.ee:8888/hdfs/cms"
-dst_pref = "srm://t3se01.psi.ch:8443/pnfs/psi.ch/cms/trivcat/"
+#repl1 = "/store/user/arizzi/"
+#repl2 = "/store/user/jpata/"
+#src_pref = "srm://ganymede.hep.kbfi.ee:8888/hdfs/cms"
+#dst_pref = "srm://t3se01.psi.ch:8443/pnfs/psi.ch/cms/trivcat/"
+
+repl1 = "/store/user/arizzi/"
+repl2 = "/store/user/jpata/"
+src_pref = "srm://stormfe1.pi.infn.it:8444/cms"
+dst_pref = "srm://ganymede.hep.kbfi.ee:8888/hdfs/cms"
 
 def parseDataFile(infile):
     curname = None
@@ -26,7 +30,11 @@ def parseDataFile(infile):
             datafiles = []
             curname = line[1:-1]
         elif "root" in line:
-            l0, l1 = line.split("=") 
+            if "=" in line:
+                l0, l1 = line.split("=")
+            else:
+                l0 = line
+                l1 = "-1"
             datafiles += [(l0.strip(), int(l1.strip()))]
     #add last dataset
     datasets[curname] = datafiles
