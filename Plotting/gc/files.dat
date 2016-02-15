@@ -12,3 +12,7 @@
 /hdfs/local/joosep/tth/Feb11_jec_74x_moriond/TT_TuneCUETP8M1_13TeV-powheg-pythia8_10000_tt2b.root = 212100
 [ttbarOther]
 /hdfs/local/joosep/tth/Feb11_jec_74x_moriond/TT_TuneCUETP8M1_13TeV-powheg-pythia8_10000_ttll.root = 18872606
+[SingleMuon]
+/hdfs/local/joosep/tth/Feb11_jec_74x_moriond/SingleMuon.root = 280564
+[SingleElectron]
+/hdfs/local/joosep/tth/Feb11_jec_74x_moriond/SingleElectron.root = 271249

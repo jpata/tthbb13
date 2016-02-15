@@ -28,6 +28,12 @@ for sample, files in [
     ("ttbarOther", [
         base + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_10000_ttll.root"
     ]),
+    ("SingleMuon", [
+        base + "SingleMuon.root"
+    ]),
+    ("SingleElectron", [
+        base + "SingleElectron.root"
+    ]),
     ]:
 
     #files = []

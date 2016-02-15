@@ -92,6 +92,24 @@ const map<string, function<float(const Event& ev)>> AxisFunctions = {
     }},
     {"nBoostedTopWP2", [](const Event& event) { return (
         event.topCandidate_mass<180) && (event.topCandidate_mass>120) && (event.topCandidate_fRec<0.22) && (event.topCandidate_n_subjettiness<0.56);
+    }},
+    {"leptonFlavour", [](const Event& event) { 
+        if (BaseCuts::sl_mu(event)) {
+            return 1;
+        }
+        else if (BaseCuts::sl_el(event)) {
+            return 2;
+        }
+        else if (BaseCuts::dl_mumu(event)) {
+            return 3;
+        }
+        else if (BaseCuts::dl_emu(event)) {
+            return 4;
+        }
+        else if (BaseCuts::dl_ee(event)) {
+            return 5;
+        }
+        return 0;
     }}
 };
 
