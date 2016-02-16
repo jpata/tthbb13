@@ -18,6 +18,7 @@ try:
 except Exception as e:
     print "Could not load scikit-learn. Please configure PYTHONPATH=/path/to/anaconda/lib/python2.7/site-packages:$PYTHONPATH PATH=/path/to/anaconda/bin/:$PATH"
     mva_enabled = False
+mva_enabled = False
 
 CvectorTLorentzVector = getattr(ROOT, "std::vector<TLorentzVector>")
 EventShapeVariables = getattr(ROOT, "EventShapeVariables")

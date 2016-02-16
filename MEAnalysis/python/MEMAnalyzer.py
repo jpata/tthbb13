@@ -401,6 +401,9 @@ class MEAnalyzer(FilterAnalyzer):
                             tmp_jets[1].PDGID = 1
                             tmp_jets[2].PDGID = 5
                     # TODO: RESTORE AFERWARDS!!!
+                else:
+                    for j in event.good_jets:
+                        j.PDGID = 0
 
 
                 #if "meminput" in self.conf.general["verbosity"]:
