@@ -29,7 +29,16 @@ try:
     crabFiles = PSet.process.source.fileNames
     print "crabFiles=", crabFiles
     firstInput = crabFiles[0]
-    filename, firstEvent, nEvents = firstInput.split("___")
+    
+    #Check if number of events was provided with file
+    if "___" in firstInput:
+        filename, firstEvent, nEvents = firstInput.split("___")
+    #Otherwise just use the whole file
+    else:
+        filename = firstInput
+        firstEvent = 0
+        nEvents = -1
+
     rootfilename = rootprefix + filename
     firstEvent = int(firstEvent)
     nEvents = int(nEvents)

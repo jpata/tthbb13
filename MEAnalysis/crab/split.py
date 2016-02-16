@@ -39,17 +39,28 @@ def prepare_crab_list(infile, dataset, perjob, outfile):
         raise e
     total = sum([d[1] for d in mydata])
     l = []
-    for df, nd, in mydata:
-        cur = 0
-        while cur < nd-perjob:
-            l += [(df, cur, perjob)]
-            cur += perjob
-    of = open(outfile, "w")
+    
     n = 0
-    for fn, cur, perjob in l:
-        of.write("{0}___{1}___{2}\n".format(fn, cur, perjob))
-        n += 1
-    of.close()
+    if perjob > 0:
+        for df, nd, in mydata:
+            cur = 0
+            if perjob > nd:
+                raise Exception("cannot split job: file has {0} but perjob is {1}".format(nd, perjob))
+            while cur < nd-perjob:
+                l += [(df, cur, perjob)]
+                cur += perjob
+        of = open(outfile, "w")
+        for fn, cur, perjob in l:
+            of.write("{0}___{1}___{2}\n".format(fn, cur, perjob))
+            n += 1
+        of.close()
+    else:
+        of = open(outfile, "w")
+        for df, nd, in mydata:
+            l += [df]
+            of.write("{0}\n".format(df))
+            n += 1
+        of.close()
     print "wrote {0} lines to {1}".format(n, outfile)
 
 if __name__ == "__main__":

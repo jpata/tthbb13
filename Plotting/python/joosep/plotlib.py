@@ -55,8 +55,6 @@ cats = {
     'sl_jge6_t3': "(is_sl==1) & (numJets>=6) & (nBCSVM==3)",
     'sl_jge6_tge4': "(is_sl==1) & (numJets>=6) & (nBCSVM>=4)",
 }
-memcut = "& ((btag_LR_4b_2b>0.95) | ((is_sl==1) & (nBCSVM>=3)) | ((is_dl==1) & (nBCSVM>=2)))"
-
 
 #List of sample filenames -> short names
 samplelist = [
@@ -306,7 +304,12 @@ def hist_abs(h):
     for i in range(1, h.GetNbinsX()+1):
         h.SetBinContent(i, abs(h.GetBinContent(i)))
 
-def mc_stack(hlist, hs_syst, systematics, colors="auto"):
+def mc_stack(
+    hlist,
+    hs_syst,
+    systematics,
+    colors="auto"
+    ):
     if colors=="auto":
         coloriter = iter(plt.cm.jet(np.linspace(0,1,len(hlist))))
         for h in hlist:
@@ -345,9 +348,6 @@ def mc_stack(hlist, hs_syst, systematics, colors="auto"):
     htot_usyst = htot.Clone()
     htot_dsyst = htot.Clone()
     for systUp, systDown in systematics:
-        #import pdb
-        #pdb.set_trace()
-        hs_syst[systUp]
         errs_syst_up = np.array([y for y in sum(hs_syst[systUp].values()).y()])
         errs_syst_down = np.array([y for y in sum(hs_syst[systDown].values()).y()])
         errs_syst = np.abs(errs_syst_up - errs_syst_down)
@@ -497,7 +497,7 @@ def draw_data_mc(tf, hname, samples, **kwargs):
     
     data = None
     if do_pseudodata:
-        data = tot_mc.Clone()#dice(tot_mc, nsigma=1.0)
+        data = tot_mc.Clone()
         data.title = "pseudodata"
         if blindFunc:
             data = blindFunc(data)

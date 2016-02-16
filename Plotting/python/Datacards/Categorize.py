@@ -466,7 +466,7 @@ class Categorization(object):
         """ Prime nominal and systematic variation THNs for projection """
         
         # Nominal
-        thns = self.h_sig.values() + self.h_bkg.values() 
+        thns = self.h_sig.values() + self.h_bkg.values() + self.h_data.values()
         
         # Systematic variations
         # (these nested dictionaries)
@@ -1019,7 +1019,7 @@ def CategorizationFromString(string):
 ########################################
 
 def GetSparseHistograms(input_file,
-        signals, backgrounds, category="sl"):
+        signals, backgrounds, category="sl", data=[]):
     """
     Given an input file containing histograms in the structure
     {process}/{category}/sparse{_syst[Up,Down]}
@@ -1046,7 +1046,8 @@ def GetSparseHistograms(input_file,
     h_bkg = {}
     h_sig_sys = {}
     h_bkg_sys = {}
-         
+    h_data = {}
+
     for processes, h, h_sys in zip( [signals,   backgrounds],
                                     [h_sig,     h_bkg],
                                     [h_sig_sys, h_bkg_sys] ):
@@ -1070,8 +1071,12 @@ def GetSparseHistograms(input_file,
             # End loop over keys
         # End loop over processes
     # End Signal/Background loop
-
-    return h_sig, h_bkg, h_sig_sys, h_bkg_sys
+    for dname in data:
+        h_data[dname] = f.Get("{0}/{1}/sparse".format(dname, category))
+    if len(data) > 0:
+        return h_sig, h_bkg, h_sig_sys, h_bkg_sys, h_data
+    else:
+        return h_data
 # End of GetSparseHistograms
    
 
@@ -1112,7 +1117,7 @@ def control_plots_leaves(of, leaves, do_stat_variations, use_cache):
 
         processes = []
         # Nominal
-        for process, thn in leaf.h_sig.items() + leaf.h_bkg.items():
+        for process, thn in leaf.h_sig.items() + leaf.h_bkg.items() + leaf.h_data.items():
 
             # Get the output directory (inside the TFile)
             outdir_str = "{0}/{1}".format(process, leaf)
