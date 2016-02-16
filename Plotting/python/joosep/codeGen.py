@@ -255,6 +255,7 @@ for k in systematics:
 processes = [
     "ttH",
     "ttH_hbb",
+    "ttH_nonhbb",
     "ttbarPlusBBbar",
     "ttbarPlusB",
     "ttbarPlus2B",
