@@ -2,7 +2,7 @@ from WMCore.Configuration import Configuration
 config = Configuration()
 import os
 
-processing_name = "Feb11_withme_GITHASH" 
+processing_name = "Feb11_withme" 
 config.section_("General")
 #this will be used for the crab directory name
 config.General.requestName = DNAME
@@ -41,6 +41,10 @@ config.Data.totalUnits = -1
 config.Data.outLFNDirBase = '/store/user/jpata/tthbb13/VHBBHeppyV16pre/' + processing_name
 config.Data.publication = False
 filelist = open(DATASET).readlines()
+filelist = map(lambda x: x.strip(), filelist)
+for fn in filelist:
+    if len(fn)>255:
+        raise Exception("too long filename: {0}".format(fn))
 config.Data.userInputFiles = filelist
 
 config.section_("Site")

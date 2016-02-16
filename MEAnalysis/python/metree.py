@@ -46,7 +46,12 @@ jetType = NTupleObjectType("jetType", variables = [
     NTupleVariable("mcFlavour", lambda x : x.mcFlavour, type=int, mcOnly=True),
     NTupleVariable("mcMatchId", lambda x : x.mcMatchId, type=int, mcOnly=True),
     NTupleVariable("hadronFlavour", lambda x : x.hadronFlavour, type=int, mcOnly=True),
-    NTupleVariable("matchFlag", lambda x : getattr(x, "tth_match_label_numeric", -1), type=int, mcOnly=True),
+    NTupleVariable("matchFlag",
+        lambda x : getattr(x, "tth_match_label_numeric", -1),
+        type=int,
+        mcOnly=True,
+        help="0 - matched to light quark from W, 1 - matched to b form top, 2 - matched to b from higgs"
+    ),
     NTupleVariable("matchBfromHadT", lambda x : getattr(x, "tth_match_label_bfromhadt", -1), type=int, mcOnly=True),
     NTupleVariable("mcPt", lambda x : x.mcPt, mcOnly=True),
     NTupleVariable("mcEta", lambda x : x.mcEta, mcOnly=True),

@@ -42,16 +42,16 @@ good_samp = []
 print "processing dataset={0}".format(dataset)
 
 for ns in samples_dict.keys():
-    if samples_dict[ns].name.value() == dataset:
+    if samples_dict[ns].nickname.value() == dataset:
         samples_dict[ns].skip = False
         samples_dict[ns].subFiles = map(lfn_to_pfn, fns ) #DS
         good_samp += [samples_dict[ns]]
     else:
-        print "skipping", samples_dict[ns].name.value()
+        print "skipping", samples_dict[ns].nickname.value()
         samples_dict[ns].skip = True
 
 if len(good_samp) != 1:
-    raise Exception("Need to specify at least one sample: dataset={0}, subfiles={1}".format(dataset, fns))
+    raise Exception("Need to specify at least one sample: dataset={0}, subfiles={1}, good_samp={2}".format(dataset, fns, good_samp))
 assert(len(good_samp) == 1)
 
 print 'Running over sample: {0}'.format(good_samp)

@@ -33,8 +33,8 @@ colors = {
     "ttbarPlusBBbar": (102, 0, 0),
     "ttbarPlus2B": (80, 0, 0),
     "ttH": (44, 62, 167),
-    "ttHbb": (44, 62, 167),
-    "ttHnonbb": (39, 57, 162),
+    "ttH_hbb": (44, 62, 167),
+    "ttH_nonbb": (39, 57, 162),
     "other": (251, 73, 255),
 }
 
@@ -60,14 +60,14 @@ memcut = "& ((btag_LR_4b_2b>0.95) | ((is_sl==1) & (nBCSVM>=3)) | ((is_dl==1) & (
 
 #List of sample filenames -> short names
 samplelist = [
-    ("ttHTobb_M125_13TeV_powheg_pythia8", "ttHbb"),
-    ("TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttbb", "ttbarPlusBBbar"),
-    ("TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttb", "ttbarPlusB"),
-    ("TT_TuneCUETP8M1_13TeV-powheg-pythia8_tt2b", "ttbarPlus2B"),
-    ("TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttcc", "ttbarPlusCCbar"),
-    ("TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttll", "ttbarOther"),
+    ("ttH_hbb", "ttHbb"),
+    ("ttbarPlusBBbar", "ttbarPlusBBbar"),
+    ("ttbarPlusB", "ttbarPlusB"),
+    ("ttbarPlus2B", "ttbarPlus2B"),
+    ("ttbarPlusCCbar", "ttbarPlusCCbar"),
+    ("ttbarOther", "ttbarOther"),
 ]
-samplecolors = [colors[sn[1]] for sn in samplelist]
+samplecolors = [colors[sn[0]] for sn in samplelist]
 
 varnames = {
     "jet0_pt": "leading jet $p_T$ [GeV]",
@@ -122,7 +122,7 @@ varnames = {
     "mem_DL_0w2h2t": "mem DL 0w2h2t",
     "nPVs": "$N_{\\mathrm{PV}}$",
     "ntopCandidate": "$N_{\\mathrm{HTTv2}}$",
-
+    "common_bdt": "BDT"
 }
 
 varunits = {
@@ -499,6 +499,9 @@ def draw_data_mc(tf, hname, samples, **kwargs):
     if do_pseudodata:
         data = tot_mc.Clone()#dice(tot_mc, nsigma=1.0)
         data.title = "pseudodata"
+        if blindFunc:
+            data = blindFunc(data)
+        idata = data.Integral()
     elif dataname:
         datas = []
         for dn in dataname:
@@ -518,7 +521,7 @@ def draw_data_mc(tf, hname, samples, **kwargs):
         data.title = "data ({0})".format(data.Integral())
         idata = data.Integral()
 
-    if data:
+    if data and (blindFunc is None):
         if show_overflow:
             fill_overflow(data)
         for ibin in range(data.GetNbinsX()):
