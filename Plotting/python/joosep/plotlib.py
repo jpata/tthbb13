@@ -448,6 +448,8 @@ def draw_data_mc(tf, hname, samples, **kwargs):
     hs = OrderedDict()
     hs_syst = OrderedDict()
     hs = getHistograms(tf, samples, hname)
+
+    #get the systematically variated histograms
     for systUp, systDown in systematics:
         hs_syst[systUp] = getHistograms(tf, samples, hname+systUp)
         hs_syst[systDown] = getHistograms(tf, samples, hname+systDown)
