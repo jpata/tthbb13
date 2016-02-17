@@ -451,8 +451,7 @@ double nominal_weight(const Event& ev, const Configuration& conf) {
 ///FIXME: these ad-hoc process weights are here to fix a wrong value of nGen in processing
 double process_weight(ProcessKey::ProcessKey proc, const Configuration& conf) {
 
-    //FIXME: weight is 2 because we always want to split on even/odd event number
-    double w = 2.0;
+    double w = 1.0;
 
     switch(proc) {
         case ProcessKey::ttbarPlusBBbar:
