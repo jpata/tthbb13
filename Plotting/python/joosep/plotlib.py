@@ -34,7 +34,7 @@ colors = {
     "ttbarPlus2B": (80, 0, 0),
     "ttH": (44, 62, 167),
     "ttH_hbb": (44, 62, 167),
-    "ttH_nonbb": (39, 57, 162),
+    "ttH_nonhbb": (39, 57, 162),
     "other": (251, 73, 255),
 }
 
@@ -59,6 +59,7 @@ cats = {
 #List of sample filenames -> short names
 samplelist = [
     ("ttH_hbb", "ttHbb"),
+    ("ttH_nonhbb", "ttHnonbb"),
     ("ttbarPlusBBbar", "ttbarPlusBBbar"),
     ("ttbarPlusB", "ttbarPlusB"),
     ("ttbarPlus2B", "ttbarPlus2B"),
