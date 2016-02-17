@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 import sys, os
 
+from transferData import dsname_repl
+
 def prepare_crab_list(infile, dataset, perjob, outfile):
     """
     makes a crab-compatible file list.
@@ -19,6 +21,10 @@ def prepare_crab_list(infile, dataset, perjob, outfile):
             curname = line[1:-1]
         elif "root" in line:
             l0, l1 = line.split("=") 
+            for repls in dsname_repl:
+                l0 = l0.replace(repls[0], repls[1])
+            if len(l0) > 255:
+                raise Exception("too long filename: {0}".format(l0))
             datafiles += [(l0.strip(), int(l1.strip()))]
    
     #add last dataset
@@ -33,27 +39,38 @@ def prepare_crab_list(infile, dataset, perjob, outfile):
         raise e
     total = sum([d[1] for d in mydata])
     l = []
-    for df, nd, in mydata:
-        cur = 0
-        while cur < nd-perjob:
-            l += [(df, cur, perjob)]
-            cur += perjob
-    of = open(outfile, "w")
+    
     n = 0
-    for fn, cur, perjob in l:
-        of.write("{0}___{1}___{2}\n".format(fn, cur, perjob))
-        n += 1
-    of.close()
+    if perjob > 0:
+        for df, nd, in mydata:
+            cur = 0
+            if perjob > nd:
+                raise Exception("cannot split job: file has {0} but perjob is {1}".format(nd, perjob))
+            while cur < nd-perjob:
+                l += [(df, cur, perjob)]
+                cur += perjob
+        of = open(outfile, "w")
+        for fn, cur, perjob in l:
+            of.write("{0}___{1}___{2}\n".format(fn, cur, perjob))
+            n += 1
+        of.close()
+    else:
+        of = open(outfile, "w")
+        for df, nd, in mydata:
+            l += [df]
+            of.write("{0}\n".format(df))
+            n += 1
+        of.close()
     print "wrote {0} lines to {1}".format(n, outfile)
 
 if __name__ == "__main__":
-    if len(sys.argv) != 5:
-        print "{0} ../gc/datasets/infile.dat name_of_dataset datasets/name_of_dataset.dat events_per_job".format(sys.argv[0])
+    if len(sys.argv) != 4:
+        print "{0} ../gc/datasets/infile.dat datasets/name_of_dataset.dat events_per_job".format(sys.argv[0])
         sys.exit(1) 
     infile = sys.argv[1]
-    dataset = sys.argv[2]
-    outfile = sys.argv[3]
-    perjob = int(sys.argv[4])
-    
+    outfile = sys.argv[2]
+    perjob = int(sys.argv[3])
+    dataset = infile.split("/")[-1].split(".")[0]
+
     prepare_crab_list(infile, dataset, perjob, outfile)
 

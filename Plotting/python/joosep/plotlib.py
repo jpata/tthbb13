@@ -33,8 +33,8 @@ colors = {
     "ttbarPlusBBbar": (102, 0, 0),
     "ttbarPlus2B": (80, 0, 0),
     "ttH": (44, 62, 167),
-    "ttHbb": (44, 62, 167),
-    "ttHnonbb": (39, 57, 162),
+    "ttH_hbb": (44, 62, 167),
+    "ttH_nonbb": (39, 57, 162),
     "other": (251, 73, 255),
 }
 
@@ -55,19 +55,17 @@ cats = {
     'sl_jge6_t3': "(is_sl==1) & (numJets>=6) & (nBCSVM==3)",
     'sl_jge6_tge4': "(is_sl==1) & (numJets>=6) & (nBCSVM>=4)",
 }
-memcut = "& ((btag_LR_4b_2b>0.95) | ((is_sl==1) & (nBCSVM>=3)) | ((is_dl==1) & (nBCSVM>=2)))"
-
 
 #List of sample filenames -> short names
 samplelist = [
-    ("ttHTobb_M125_13TeV_powheg_pythia8", "ttHbb"),
-    ("TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttbb", "ttbarPlusBBbar"),
-    ("TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttb", "ttbarPlusB"),
-    ("TT_TuneCUETP8M1_13TeV-powheg-pythia8_tt2b", "ttbarPlus2B"),
-    ("TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttcc", "ttbarPlusCCbar"),
-    ("TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttll", "ttbarOther"),
+    ("ttH_hbb", "ttHbb"),
+    ("ttbarPlusBBbar", "ttbarPlusBBbar"),
+    ("ttbarPlusB", "ttbarPlusB"),
+    ("ttbarPlus2B", "ttbarPlus2B"),
+    ("ttbarPlusCCbar", "ttbarPlusCCbar"),
+    ("ttbarOther", "ttbarOther"),
 ]
-samplecolors = [colors[sn[1]] for sn in samplelist]
+samplecolors = [colors[sn[0]] for sn in samplelist]
 
 varnames = {
     "jet0_pt": "leading jet $p_T$ [GeV]",
@@ -122,7 +120,7 @@ varnames = {
     "mem_DL_0w2h2t": "mem DL 0w2h2t",
     "nPVs": "$N_{\\mathrm{PV}}$",
     "ntopCandidate": "$N_{\\mathrm{HTTv2}}$",
-
+    "common_bdt": "BDT"
 }
 
 varunits = {
@@ -306,7 +304,12 @@ def hist_abs(h):
     for i in range(1, h.GetNbinsX()+1):
         h.SetBinContent(i, abs(h.GetBinContent(i)))
 
-def mc_stack(hlist, hs_syst, systematics, colors="auto"):
+def mc_stack(
+    hlist,
+    hs_syst,
+    systematics,
+    colors="auto"
+    ):
     if colors=="auto":
         coloriter = iter(plt.cm.jet(np.linspace(0,1,len(hlist))))
         for h in hlist:
@@ -345,9 +348,6 @@ def mc_stack(hlist, hs_syst, systematics, colors="auto"):
     htot_usyst = htot.Clone()
     htot_dsyst = htot.Clone()
     for systUp, systDown in systematics:
-        #import pdb
-        #pdb.set_trace()
-        hs_syst[systUp]
         errs_syst_up = np.array([y for y in sum(hs_syst[systUp].values()).y()])
         errs_syst_down = np.array([y for y in sum(hs_syst[systDown].values()).y()])
         errs_syst = np.abs(errs_syst_up - errs_syst_down)
@@ -448,6 +448,8 @@ def draw_data_mc(tf, hname, samples, **kwargs):
     hs = OrderedDict()
     hs_syst = OrderedDict()
     hs = getHistograms(tf, samples, hname)
+
+    #get the systematically variated histograms
     for systUp, systDown in systematics:
         hs_syst[systUp] = getHistograms(tf, samples, hname+systUp)
         hs_syst[systDown] = getHistograms(tf, samples, hname+systDown)
@@ -497,8 +499,11 @@ def draw_data_mc(tf, hname, samples, **kwargs):
     
     data = None
     if do_pseudodata:
-        data = tot_mc.Clone()#dice(tot_mc, nsigma=1.0)
+        data = tot_mc.Clone()
         data.title = "pseudodata"
+        if blindFunc:
+            data = blindFunc(data)
+        idata = data.Integral()
     elif dataname:
         datas = []
         for dn in dataname:
@@ -518,7 +523,7 @@ def draw_data_mc(tf, hname, samples, **kwargs):
         data.title = "data ({0})".format(data.Integral())
         idata = data.Integral()
 
-    if data:
+    if data and (blindFunc is None):
         if show_overflow:
             fill_overflow(data)
         for ibin in range(data.GetNbinsX()):

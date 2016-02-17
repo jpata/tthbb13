@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 #HOSTNAME=`hostname`
 #if [[ "$hnamestr" == *.hep.kbfi.ee ]]; then
 #    source /home/joosep/root-6.05.02/bin/thisroot.sh
@@ -18,6 +19,6 @@ python ${CMSSW_BASE}/src/TTH/Plotting/python/makeJobfile.py
 ${CMSSW_BASE}/src/TTH/Plotting/melooper job.json
 
 OUTDIR=$HOME/tth/gc/melooper/${TASK_ID}/
+mkdir -p $OUTDIR 
 OFNAME=$OUTDIR/output_${MY_JOBID}.root
 cp ControlPlotsSparse.root $OFNAME
-mkdir -p $OUTDIR 

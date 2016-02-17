@@ -255,6 +255,7 @@ for k in systematics:
 processes = [
     "ttH",
     "ttH_hbb",
+    "ttH_nonhbb",
     "ttbarPlusBBbar",
     "ttbarPlusB",
     "ttbarPlus2B",
@@ -276,39 +277,22 @@ processes = [
 #List of all individual category "bits"
 categories = [
     "sl",
-#    "sl_mu",
-#    "sl_el",
     "dl",
-#    "dl_mumu",
-#    "dl_emu",
-#    "dl_ee",
-#
+    
     "j3_t2",
     "j3_t3",
     "jge4_t3",
     "jge4_t2",
     "jge4_tge4",
 #
-#    "j4_t3",
-#    "j4_t4",
-#    "j5_t2",
-#    "j5_t3",
-#    "j5_tge4",
-#    "jge6_t2",
-#    "jge6_t3",
-#    "jge6_tge4",
-#
-#    "blrL",
-#    "blrH",
-#
-#    "boostedHiggs",
-#    "boostedHiggsOnly",
-#    #"boostedHiggsHighPt",
-#    #"boostedHiggsGenMatch",
-#    #"boostedHiggsGenNoMatch",
-#    "boostedTop",
-#    "boostedTopOnly",
-#    "boostedHiggsTop",
+    "j4_t3",
+    "j4_t4",
+    "j5_t2",
+    "j5_t3",
+    "j5_tge4",
+    "jge6_t2",
+    "jge6_t3",
+    "jge6_tge4",
 ]
 
 #Map categories to their respective C++ cuts. The Event is available as "ev"
@@ -407,7 +391,7 @@ categories_tree = [
 #        ("jge4_tge4", "ControlCategoryProcessor", []),
 #    ]),
 
-#    ("sl", "SparseCategoryProcessor", []),
+    ("sl", "SparseCategoryProcessor", []),
     ("dl", "SparseCategoryProcessor", []),
 ]
 

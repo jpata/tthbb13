@@ -18,12 +18,13 @@ import pickle, os
 ########################################
 
 #ControlPlotsSparse_2015_10_15_withBLR.root
-input_file = "ControlPlotsSparseExtendTTBinning.root"
-output_path = "/scratch/joosep/test/"
+input_file = "/home/joosep/joosep-mac/Documents/tth/data/histograms/ControlPlotsDL.root"
+#needs to be an absolute path
+output_path = "/home/joosep/joosep-mac/Documents/tth/sw-slc6/CMSSW_7_4_15/src/TTH/Plotting/tmp/"
 #input_file = "/dev/shm/joosep/ControlPlotsSparse_corr.root"
 #output_path = "/dev/shm/joosep/categorization2/"
 
-n_proc = 30
+n_proc = 4
 n_iter = 8
 
 signals = [
@@ -148,7 +149,7 @@ def make_latex(name):
 
     #r.print_yield_table()
     of = open( name + ".tex","w")
-    of.write(r.print_tree_latex())
+    of.write(r.print_tree_latex(also_calc_unsplit=False))
     r.SaveControlPlots(name)
     of.close()
     of = open(name + ".pickle", "w")
@@ -156,6 +157,12 @@ def make_latex(name):
     of.close()
 # End of make_latex
 
+class FakePool:
+    def __init__(self, n):
+        pass
+
+    def map(self, func, list):
+        return map(func, list)
 
 if __name__ == "__main__":
 
@@ -165,6 +172,7 @@ if __name__ == "__main__":
     
     Categorize.Categorization.output_path = output_path
     Categorize.Categorization.pool = Pool(n_proc)
+    #Categorize.Categorization.pool = FakePool(n_proc)
     Categorize.Categorization.do_stat_variations = True
     Categorize.Categorization.lg = LimitGetter(output_path)
     
@@ -213,8 +221,14 @@ if __name__ == "__main__":
     Categorize.Categorization.h_bkg_sys = h_dl[3]
     
     Categorize.Categorization.scaling = 0.5
-    make_latex("old_dl")
-    make_latex("old_dl_blrsplit")
+    #make_latex("old_dl")
+    #make_latex("old_dl_blr")
+    #make_latex("old_dl_bdt")
+    #make_latex("old_dl_mem_bdt")
+    #make_latex("old_dl_mem_bdt_blrsplit")
+    #make_latex("old_dl_mem_bdt_2d")
+    make_latex("old_dl_mem_bdt_2d_4bins")
+    #make_latex("old_dl_blrsplit")
     #Categorize.Categorization.scaling = 1.0
     #make_latex("old_dl_parity")
 

@@ -77,7 +77,6 @@ class Cut(object):
         else:
             return True
 
-
     def __repr__(self):
 
         if self.axis:
@@ -102,8 +101,6 @@ class Cut(object):
             return True
         else:
             return False
-        
-
 
     def latex_string(self):
 

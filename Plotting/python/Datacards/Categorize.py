@@ -82,7 +82,6 @@ class Categorization(object):
     #scale all histograms by this factor
     scaling = 1.0
 
-
     def __init__(self, cut, parent=None, discriminator_axis=0):
         """ Create a new node """        
         self.parent = parent
@@ -256,6 +255,7 @@ class Categorization(object):
                     i_split += 1
                 #end of loop over nodes
             #end of loop over split/not split
+            print "running limits", [f for f in filenames]
 
             li_limits = self.pool.map(self.lg, [f for f in filenames])
             self.li_limits = copy.deepcopy(li_limits)
@@ -272,7 +272,7 @@ class Categorization(object):
                     l = _limits[2]
                     limits[str(n)+str(ignore_splitting)] = l
         ret = ""
-        print str(self)
+        print str(self), depth
         if self.discriminator_axis is None:
             return "{}"
         
@@ -466,7 +466,7 @@ class Categorization(object):
         """ Prime nominal and systematic variation THNs for projection """
         
         # Nominal
-        thns = self.h_sig.values() + self.h_bkg.values() 
+        thns = self.h_sig.values() + self.h_bkg.values() + self.h_data.values()
         
         # Systematic variations
         # (these nested dictionaries)
@@ -810,6 +810,7 @@ class Categorization(object):
             #This leaf is specified to be removed from the fit
             if leaf.discriminator_axis is None:
                 continue
+            print leaf_fname
 
             of = ROOT.TFile(leaf_fname, "RECREATE")
             self.leaf_files[leaf.__repr__()] = leaf_fname
@@ -986,8 +987,6 @@ def CategorizationFromString(string):
         # Build the cut object from the string
         cut = Cut(cut_string)
 
-        print depth, cut
-
         # Here the real fun starts
         # - if the depth icreased by one, we do a splitting
         if depth > last_depth:
@@ -1020,8 +1019,26 @@ def CategorizationFromString(string):
 ########################################
 
 def GetSparseHistograms(input_file,
-        signals, backgrounds, basecat="sl"):
-    """ Get All Sparse Histograms """
+        signals, backgrounds, category="sl", data=[]):
+    """
+    Given an input file containing histograms in the structure
+    {process}/{category}/sparse{_syst[Up,Down]}
+    where process is any signal or background process, category
+    a subfolder denoting the analysis category (e.g. sl) and syst[Up,Down]
+    any systematic variation, returns the per-process dictionaries of the
+    nominal signal and background histograms as well as the systematic variations.
+    The histograms are not copied to memory and the file will be kept open by PyROOT (?).
+    
+
+    input_file (string): path to TFile which contains the aforementioned structure.
+    signals (list of strings): list of all signal processes
+    backgrounds (list of strings): list of all background processes
+    category (string): name of the category, default "sl"
+
+    returns: tuple of dicts h_sig, h_bkg, h_sig_sys, h_bkg_sys
+        h_[sig,bkg]: a d[process]->histogram dictionary
+        h_[sig,bkg]_sys: a double dictionary d[process][syst_name]->histogram 
+    """
 
     f = ROOT.TFile(input_file)
 
@@ -1029,30 +1046,37 @@ def GetSparseHistograms(input_file,
     h_bkg = {}
     h_sig_sys = {}
     h_bkg_sys = {}
-         
+    h_data = {}
+
     for processes, h, h_sys in zip( [signals,   backgrounds],
                                     [h_sig,     h_bkg],
                                     [h_sig_sys, h_bkg_sys] ):
         for process in processes:
 
             # Nominal Histograms
-            h[process] = f.Get("{0}/{1}/sparse".format(process, basecat))
+            h[process] = f.Get("{0}/{1}/sparse".format(process, category))
 
             # Systematic Variations
             h_sys[process] = {}     
-            for key in f.Get("{0}/{1}".format(process, basecat)).GetListOfKeys():
+            for key in f.Get("{0}/{1}".format(process, category)).GetListOfKeys():
 
                 if not "sparse_" in key.GetName():
                     continue
 
                 syst_name = key.GetName().replace("sparse_", "")
-                h_sys[process][syst_name] = f.Get("{0}/{1}/{2}".format(process, basecat, key.GetName()))
+                h_sys[process][syst_name] = f.Get("{0}/{1}/{2}".format(
+                    process, category, key.GetName()
+                ))
 
             # End loop over keys
         # End loop over processes
     # End Signal/Background loop
-
-    return h_sig, h_bkg, h_sig_sys, h_bkg_sys
+    for dname in data:
+        h_data[dname] = f.Get("{0}/{1}/sparse".format(dname, category))
+    if len(data) > 0:
+        return h_sig, h_bkg, h_sig_sys, h_bkg_sys, h_data
+    else:
+        return h_data
 # End of GetSparseHistograms
    
 
@@ -1083,3 +1107,85 @@ def Recurse(categorization, depth=0, leaves=[], nodes=[]):
     categorization.name = categorization.__repr__()
     for ch in categorization.children:
         Recurse(ch, depth+1, leaves, nodes)
+
+def control_plots_leaves(of, leaves, do_stat_variations, use_cache):
+    # Loop over categories
+    for leaf in leaves:
+        dirs = {}
+
+        leaf.prepare_all_thns()
+
+        processes = []
+        # Nominal
+        for process, thn in leaf.h_sig.items() + leaf.h_bkg.items() + leaf.h_data.items():
+
+            # Get the output directory (inside the TFile)
+            outdir_str = "{0}/{1}".format(process, leaf)
+            if not outdir_str in dirs.keys():
+                dirs[outdir_str] = []
+
+            hname = leaf.axes[leaf.discriminator_axis].name
+            k = (process, leaf.__repr__(), hname)
+            if use_cache and leaf.allhists.has_key(k):
+                h = leaf.allhists[k]
+            else:
+                h = thn.Projection(leaf.axes.keys().index(leaf.discriminator_axis), "E")                    
+                h.Scale(leaf.scaling) 
+                if leaf.rebin_discriminator:
+                    h.Rebin(leaf.rebin_discriminator)                    
+
+                h.SetName(hname)
+                leaf.allhists[k] = h.Clone()
+
+            if not leaf.event_counts.has_key(process):
+                leaf.event_counts[process] = {}
+            leaf.event_counts[process][leaf.__repr__()] = h.Integral()
+
+            dirs[outdir_str].append(h)
+            processes += [process]
+        # End of loop over processes
+
+        # Systematic Variations
+        for process, hs in leaf.h_sig_sys.items() + leaf.h_bkg_sys.items():
+
+            # Get the output directory (inside the TFile)
+            outdir_str = "{0}/{1}".format(process, leaf)
+            if not outdir_str in dirs.keys():
+                dirs[outdir_str] = []
+
+            for sys_name, thn in hs.items():
+
+                hname = leaf.axes[leaf.discriminator_axis].name + "_" + sys_name
+                k = (process, leaf.__repr__(), hname)
+                if use_cache and leaf.allhists.has_key(k):
+                    h = leaf.allhists[k]
+                else:
+                    h = thn.Projection(leaf.axes.keys().index(leaf.discriminator_axis), "E")
+                    h.Scale(leaf.scaling) 
+                    if leaf.rebin_discriminator:
+                        h.Rebin(leaf.rebin_discriminator)                    
+
+                    h.SetName(hname)
+                    leaf.allhists[k] = h.Clone()
+                dirs[outdir_str].append(h)
+
+        # End of loop over systematics
+        # End of loop over processes
+        for outdir_str, hs in dirs.iteritems():
+
+            of.mkdir(outdir_str)
+            outdir = of.Get(outdir_str)
+
+            for h in hs:
+                h.SetDirectory(outdir)
+            outdir.Write("", ROOT.TObject.kOverwrite)
+        if do_stat_variations:
+            makeStatVariations(of, of, [leaf.discriminator_axis], [leaf.__repr__()], processes)
+        #fakeData(of, of, [leaf.discriminator_axis], [leaf.__repr__()], processes)
+
+def leaves_cplots(categorization, of):
+    nodes_to_eval = []
+    for c in categorization.get_offspring():
+        if len(c.children) == 0 and not (c.discriminator_axis is None):
+            nodes_to_eval += [c]
+    control_plots_leaves(of, nodes_to_eval, False, False)

@@ -84,9 +84,10 @@ int main(int argc, const char** argv) {
     }
     TStopwatch timer;
     timer.Start();
-
-    for (long iEntry=conf.firstEntry; iEntry<conf.firstEntry+conf.numEntries; iEntry++) {
-
+    
+    const long maxEntries = conf.firstEntry + conf.numEntries;
+    
+    for (long iEntry=conf.firstEntry; iEntry < maxEntries; iEntry++) {
         const bool do_print = (conf.printEvery>0 && iEntry % conf.printEvery == 0);
         //std::vector<long> randoms;
         //
@@ -95,6 +96,13 @@ int main(int argc, const char** argv) {
         data.init();
         nbytes += tree->GetEntry(iEntry);
         nentries += 1;
+        if (iEntry == conf.firstEntry) {
+            cout << "first entry " << data.run << ":" << data.lumi << ":" << data.evt << endl;
+        }
+        if (iEntry == maxEntries - 1) {
+            cout << "last entry " << data.run << ":" << data.lumi << ":" << data.evt << endl;
+        }
+
         if (do_print) {
             cout << "------" << endl;
             cout << "entry " << iEntry << endl;

@@ -1,7 +1,7 @@
 from TTH.TTHNtupleAnalyzer.CrabHelpers import hadd_from_file, replicate
 import argparse, subprocess, glob, os
 
-version = "Jan18_3603967_fixbdtblr_jesjer"
+version = "Jan25_bigtt"
 
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
@@ -71,13 +71,13 @@ if args.action == "hadd":
         subprocess.call(["python", os.environ["CMSSW_BASE"] + "/src/TTH/TTHNtupleAnalyzer/python/ParHadd.py", output_filename] + input_filenames)
         completed_files += [output_filename]
 
-    repl_files = open("to-replica.txt", "w")
+    repl_files = open("rep.txt", "w")
     for cf in completed_files:
         repl_files.write(cf + "\n")
     repl_files.close()
 #end hadd
 if args.action == "replicate":
-    if not os.path.isfile("to-replica.txt"):
-        raise FileError("file to-replica.txt does not exist, create it using --action=hadd")
-    replicate("to-replica.txt", "T3_CH_PSI", "/store/user/jpata/tth/" + version)
-    replicate("to-replica.txt", "T2_EE_Estonia", "/store/user/jpata/tth/" + version)
+    if not os.path.isfile("rep.txt"):
+        raise FileError("file rep.txt does not exist, create it using --action=hadd")
+    replicate("rep.txt", "T3_CH_PSI", "/store/user/jpata/tth/" + version)
+    #replicate("rep.txt", "T2_EE_Estonia", "/store/user/jpata/tth/" + version)
