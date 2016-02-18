@@ -5,6 +5,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 
 import numpy as np
+import os
 
 import rootpy
 import rootpy.io
@@ -811,6 +812,9 @@ def syst_comparison(tf, sn, l, **kwargs):
 
 
 def svfg(fn, **kwargs):
+    path = os.path.dirname(fn)
+    if not os.path.exists(path):
+        os.makedirs(path)
     plt.savefig(fn, pad_inches=0.5, bbox_inches='tight', **kwargs)
     #plt.clf()
 
