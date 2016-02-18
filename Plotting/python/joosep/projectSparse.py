@@ -213,7 +213,7 @@ if __name__ == "__main__":
                         os.makedirs(p)
                     plotlib.svfg("plots/{0}/syst{1}/{2}_{3}.pdf".format(varname, syst_name, cutname, sample))
                     plotlib.svfg("plots/{0}/syst{1}/{2}_{3}.png".format(varname, syst_name, cutname, sample))
-                    systout.write('<a href="plots/{0}/syst{1}/{2}_{3}.pdf"><img width="300" src="plots/syst{0}/{1}_{2}.png"></a>\n'.format(varname, syst_name, cutname, sample))
+                    systout.write('<a href="plots/{0}/syst{1}/{2}_{3}.pdf"><img width="300" src="plots/{0}/syst{1}/{2}_{3}.png"></a>\n'.format(varname, syst_name, cutname, sample))
             systout.close()
             htmlout.write('<br><br>systematics: <a href="{0}"> link </a>\n'.format(systout_fn))
 
