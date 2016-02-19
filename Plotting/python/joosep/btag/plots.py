@@ -4,6 +4,7 @@ import os
 if "CMSSW" in os.environ["PYTHONPATH"]:
     from TTH.Plotting.joosep.plotlib import *
 else:
+    sys.path.append("/Users/joosep/Documents/tth/sw-slc6/CMSSW_7_4_15/src/TTH/Plotting/python/joosep/")
     from plotlib import *
 
 import rootpy, glob
@@ -37,7 +38,7 @@ for bin in ["Bin0", "Bin1"]:
     plt.ylim(0.001,1.0)
     plt.xlabel("CSV b-discriminator")
     plt.ylabel("fraction of jets")
-    svfg("btagCSV_{0}.pdf".format(bin))
+    svfg("plots/btagCSV_{0}.pdf".format(bin))
 
     plt.figure(figsize=(6,6))
     hl2.color = "green"
@@ -52,7 +53,7 @@ for bin in ["Bin0", "Bin1"]:
     plt.ylim(0.001,1.0)
     plt.xlabel("cMVAv2 b-discriminator")
     plt.ylabel("fraction of jets")
-    svfg("btagBDT_{0}.pdf".format(bin))
+    svfg("plots/btagBDT_{0}.pdf".format(bin))
 
     r1, re1 = calc_roc(hb1, hl1)
     r2, re2 = calc_roc(hb2, hl2)
@@ -78,4 +79,4 @@ for bin in ["Bin0", "Bin1"]:
     plt.ylim(0.0001,1.0)
     plt.axhline(0.1)
     plt.axhline(0.01)
-    svfg("btag_{0}.pdf".format(bin))
+    svfg("plots/btag_{0}.pdf".format(bin))
