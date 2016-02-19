@@ -36,7 +36,7 @@ python ${CMSSW_BASE}/src/TTH/Plotting/python/TransferFunctions/outputtree-strict
 echo "outputtree-strict.py is Done"
 
 # Copy output
-OUTDIR=$HOME/tth/gc/${TASK_ID}/
+OUTDIR=$HOME/tth/gc/${TASK_ID}/@runconf@/
 mkdir -p $OUTDIR 
 echo "copying output"
 OFNAME=$OUTDIR/output_${MY_JOBID}.root
