@@ -58,3 +58,15 @@ table:
 
 clean:
 	rm -Rf $(CMSSW_BASE)/src/VHbbAnalysis/Heppy/test/Loop_*
+
+
+datasets:
+	find /hdfs/cms/store/user/jpata/VHBBHeppyV16pre/SingleElectron/ -path "*Run2015D*/*160216*" -name "*.root" > data/SingleElectron
+	find /hdfs/cms/store/user/jpata/VHBBHeppyV16pre/SingleMuon/ -path "*Run2015D*/*160216*" -name "*.root" > data/SingleMuon
+	find /hdfs/cms/store/user/jpata/VHBBHeppyV16pre/DoubleEG/ -path "*Run2015D*/*160216*" -name "*.root" > data/DoubleEG
+	find /hdfs/cms/store/user/jpata/VHBBHeppyV16pre/DoubleMuon/ -path "*Run2015D*/*160216*" -name "*.root" > data/DoubleMuon
+	find /hdfs/cms/store/user/jpata/VHBBHeppyV16pre/MuonEG/ -path "*Run2015D*/*160216*" -name "*.root" > data/MuonEG
+	find /hdfs/cms/store/user/jpata/VHBBHeppyV16pre/WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/VHBB_HEPPY_V16pre_WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160205_221111 -name "*.root" > data/WJets
+	find /hdfs/cms/store/user/jpata/VHBBHeppyV16pre/TT_TuneCUETP8M1_13TeV-powheg-pythia8/VHBB_HEPPY_V16pre_TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2_ext3-v1/160207_115841 -name "*.root" >> data/TT
+	find /hdfs/cms/store/user/jpata/VHBBHeppyV16pre/TT_TuneCUETP8M1_13TeV-powheg-pythia8/VHBB_HEPPY_V16pre_TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160205_220001 -name "*.root" >> data/TT
+	sed -si "s|/hdfs/cms||" data/*

@@ -52,7 +52,7 @@ def Make_config():
     #config["root_file_base"] = "dcap:///pnfs/psi.ch/cms/trivcat/"
 
     # The config file will be copied to 'runs/{config['run_name']}'
-    config['run_name'] = 'JP_V16_resolvedjet'
+    config['run_name'] = 'JP_V20_resolvedjet'
 
     config['output_root_file_name'] = 'out.root'
 

@@ -3,11 +3,12 @@ ROOT.gROOT.SetBatch(True)
 ROOT.TH1.SetDefaultSumw2(True)
 ROOT.TH1.AddDirectory(False)
 
-INFILE = sys.argv[1]
-OUTFILE = sys.argv[2]
+INFILES = sys.argv[2:]
+OUTFILE = sys.argv[1]
 
-tf = ROOT.TFile(INFILE)
-tt = tf.Get("tree")
+tt = ROOT.TChain("tree")
+for inf in INFILES:
+    tt.AddFile(inf)
 
 def hist(of, x, disc, low=0, high=1):
     h = ROOT.TH1D(x, x, 100, low, high)
@@ -86,7 +87,7 @@ def makeControlPlots(discname, functoplot, low, high):
                 #print i, j, h3.ProjectionZ("", i, i, j, j).Integral()
 
 makeControlPlots("btagCSV", "Jet_btagCSV", 0.0, 1.0)
-makeControlPlots("btagBDT", "log((1.0 + Jet_btagBDT)/(1.0 - Jet_btagBDT))", -10.0, 15.0)
+makeControlPlots("btagBDT", "Jet_btagBDT", -1.0, 1.0)
 
 of.Write()
 of.Close()

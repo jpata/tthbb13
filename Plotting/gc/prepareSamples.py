@@ -6,27 +6,34 @@ import os
 
 
 base = "/hdfs/local/joosep/tth/Feb11_jec_74x_moriond/"
+base2 = "/hdfs/local/joosep/tth/Feb16_nome/"
 for sample, files in [
     ("ttH_hbb", [
-        base + "ttHTobb_M125_13TeV_powheg_pythia8.root"
+        base2 + "ttHTobb_M125_13TeV_powheg_pythia8.root"
     ]),
     ("ttH_nonhbb", [
-        base + "ttHToNonbb_M125_13TeV_powheg_pythia8.root"
+        base2 + "ttHToNonbb_M125_13TeV_powheg_pythia8.root"
     ]),
     ("ttbarPlusBBbar", [
-        base + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_10000_ttbb.root"
+        base2 + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttbb.root"
     ]),
     ("ttbarPlusCCbar", [
-        base + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_10000_ttcc.root"
+        base2 + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttcc.root"
     ]),
     ("ttbarPlusB", [
-        base + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_10000_ttb.root"
+        base2 + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttb.root"
     ]),
     ("ttbarPlus2B", [
-        base + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_10000_tt2b.root"
+        base2 + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_tt2b.root"
     ]),
     ("ttbarOther", [
-        base + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_10000_ttll.root"
+        base2 + "TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttll.root"
+    ]),
+    ("SingleMuon", [
+        base + "SingleMuon.root"
+    ]),
+    ("SingleElectron", [
+        base + "SingleElectron.root"
     ]),
     ]:
 

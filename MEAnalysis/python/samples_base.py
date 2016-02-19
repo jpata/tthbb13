@@ -90,7 +90,7 @@ else:
         return fn
 
 def get_files(fname):
-    lines = open(os.environ.get["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/" + fname).readlines()
+    lines = open(os.environ.get("CMSSW_BASE") + "/src/TTH/MEAnalysis/data/" + fname).readlines()
     lines = map(lambda x: x.strip(), lines)
     lines = filter(lambda x: "root" in x, lines)
     return lines

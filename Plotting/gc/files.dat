@@ -1,14 +1,18 @@
 [ttH_hbb]
-/hdfs/local/joosep/tth/Feb11_jec_74x_moriond/ttHTobb_M125_13TeV_powheg_pythia8.root = 2051659
+/hdfs/local/joosep/tth/Feb16_nome/ttHTobb_M125_13TeV_powheg_pythia8.root = 2070095
 [ttH_nonhbb]
-/hdfs/local/joosep/tth/Feb11_jec_74x_moriond/ttHToNonbb_M125_13TeV_powheg_pythia8.root = 1971058
+/hdfs/local/joosep/tth/Feb16_nome/ttHToNonbb_M125_13TeV_powheg_pythia8.root = 2114097
 [ttbarPlusBBbar]
-/hdfs/local/joosep/tth/Feb11_jec_74x_moriond/TT_TuneCUETP8M1_13TeV-powheg-pythia8_10000_ttbb.root = 254640
+/hdfs/local/joosep/tth/Feb16_nome/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttbb.root = 283749
 [ttbarPlusCCbar]
-/hdfs/local/joosep/tth/Feb11_jec_74x_moriond/TT_TuneCUETP8M1_13TeV-powheg-pythia8_10000_ttcc.root = 3799564
+/hdfs/local/joosep/tth/Feb16_nome/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttcc.root = 4238544
 [ttbarPlusB]
-/hdfs/local/joosep/tth/Feb11_jec_74x_moriond/TT_TuneCUETP8M1_13TeV-powheg-pythia8_10000_ttb.root = 630201
+/hdfs/local/joosep/tth/Feb16_nome/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttb.root = 703103
 [ttbarPlus2B]
-/hdfs/local/joosep/tth/Feb11_jec_74x_moriond/TT_TuneCUETP8M1_13TeV-powheg-pythia8_10000_tt2b.root = 212100
+/hdfs/local/joosep/tth/Feb16_nome/TT_TuneCUETP8M1_13TeV-powheg-pythia8_tt2b.root = 236485
 [ttbarOther]
-/hdfs/local/joosep/tth/Feb11_jec_74x_moriond/TT_TuneCUETP8M1_13TeV-powheg-pythia8_10000_ttll.root = 18872606
+/hdfs/local/joosep/tth/Feb16_nome/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ttll.root = 21049245
+[SingleMuon]
+/hdfs/local/joosep/tth/Feb11_jec_74x_moriond/SingleMuon.root = 280564
+[SingleElectron]
+/hdfs/local/joosep/tth/Feb11_jec_74x_moriond/SingleElectron.root = 271249

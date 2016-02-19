@@ -5,6 +5,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 
 import numpy as np
+import os
 
 import rootpy
 import rootpy.io
@@ -34,7 +35,7 @@ colors = {
     "ttbarPlus2B": (80, 0, 0),
     "ttH": (44, 62, 167),
     "ttH_hbb": (44, 62, 167),
-    "ttH_nonbb": (39, 57, 162),
+    "ttH_nonhbb": (39, 57, 162),
     "other": (251, 73, 255),
 }
 
@@ -59,6 +60,7 @@ cats = {
 #List of sample filenames -> short names
 samplelist = [
     ("ttH_hbb", "ttHbb"),
+    ("ttH_nonhbb", "ttHnonbb"),
     ("ttbarPlusBBbar", "ttbarPlusBBbar"),
     ("ttbarPlusB", "ttbarPlusB"),
     ("ttbarPlus2B", "ttbarPlus2B"),
@@ -448,6 +450,8 @@ def draw_data_mc(tf, hname, samples, **kwargs):
     hs = OrderedDict()
     hs_syst = OrderedDict()
     hs = getHistograms(tf, samples, hname)
+
+    #get the systematically variated histograms
     for systUp, systDown in systematics:
         hs_syst[systUp] = getHistograms(tf, samples, hname+systUp)
         hs_syst[systDown] = getHistograms(tf, samples, hname+systDown)
@@ -808,6 +812,9 @@ def syst_comparison(tf, sn, l, **kwargs):
 
 
 def svfg(fn, **kwargs):
+    path = os.path.dirname(fn)
+    if not os.path.exists(path):
+        os.makedirs(path)
     plt.savefig(fn, pad_inches=0.5, bbox_inches='tight', **kwargs)
     #plt.clf()
 

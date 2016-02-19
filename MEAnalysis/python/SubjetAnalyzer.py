@@ -176,7 +176,9 @@ class SubjetAnalyzer(FilterAnalyzer):
             if top and hasattr(fatjet, 'matched_top') and fatjet == top.matched_fatjet:
                 continue
 
-            fatjet.n_subjettiness = fatjet.tau2 / fatjet.tau1
+            fatjet.n_subjettiness = -1
+            if fatjet.tau1 > 0:
+                fatjet.n_subjettiness = fatjet.tau2 / fatjet.tau1
             if top:
                 fatjet.dr_top = self.Get_DeltaR_two_objects(fatjet, top)
 
