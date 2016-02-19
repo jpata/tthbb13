@@ -19,7 +19,7 @@ for sample_name, sample in samples_dict.items():
     if sample.skip:
         continue
     files = sample.subFiles
-    outfile = open(sample.nickname.value()+".dat", "w")
+    outfile = open(sample.name.value()+".dat", "w")
     outfile.write("[{0}]\n".format(sample_name))
     for f in files:
         pfn = lfn_to_pfn(f)

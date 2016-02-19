@@ -52,7 +52,7 @@ def Make_config():
     #config["root_file_base"] = "dcap:///pnfs/psi.ch/cms/trivcat/"
 
     # The config file will be copied to 'runs/{config['run_name']}'
-    config['run_name'] = 'JP_V20_resolvedjet'
+    config['run_name'] = 'JP_V20_subjet'
 
     config['output_root_file_name'] = 'out.root'
 
@@ -97,10 +97,10 @@ def Make_config():
     config['quarktypes'] = ['GenBQuarkFromTop_', 'GenBQuarkFromH_', 'GenWZQuark_' ]
     
     #enable this for resolved jets
-    config['jettypes'] = [ 'Jet_' ]
+    #config['jettypes'] = [ 'Jet_' ]
     #Enable this for subjets
-    #config['jettypes'] = [ 'httCandidates_sjW1', 'httCandidates_sjW2',
-    #    'httCandidates_sjNonW']
+    config['jettypes'] = [ 'httCandidates_sjW1', 'httCandidates_sjW2',
+        'httCandidates_sjNonW']
 
     # Specify which branches *other* than pt, eta, phi, mass and E should be 
     # extracted.
@@ -118,16 +118,16 @@ def Make_config():
      
     config['jet_extra_vars'] = [
     #resolved jets
-        '{particle}hadronFlavour',
-        '{particle}btagCSV',
-        '{particle}btagBDT',
+    #    '{particle}hadronFlavour',
+    #    '{particle}btagCSV',
+    #    '{particle}btagBDT',
    
     #subjets only
-    #     'httCandidates_pt',
-    #     'httCandidates_eta',
-    #     'httCandidates_phi',
-    #     'httCandidates_mass',
-    #     'httCandidates_fRec',
+         'httCandidates_pt',
+         'httCandidates_eta',
+         'httCandidates_phi',
+         'httCandidates_mass',
+         'httCandidates_fRec',
     ]
 
 

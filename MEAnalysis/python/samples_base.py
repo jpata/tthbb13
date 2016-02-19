@@ -42,6 +42,36 @@ xsec[("ww", "13TeV")] = 118.7
 xsec[("wz", "13TeV")] = 47.13
 xsec[("zz", "13TeV")] = 16.523
 
+samples_nick = {
+    'ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1': "stop_s",
+    'ST_t-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1': "stop_t",
+    'ST_t-channel_antitop_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1': "stop_tbar",
+    'ST_t-channel_top_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1': "stop_t",
+    'ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1': "stop_tbarW",
+    'ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1':"stop_tW",
+    'TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8':"tt_dl",
+    'TTJets_HT-1200to2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': "ttjets_ht_1200_2500",
+    'TTJets_HT-2500toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': "ttjets_ht_2500_inf",
+    'TTJets_HT-600to800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': "ttjets_ht_600_800",
+    'TTJets_HT-800to1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': "ttjets_ht_800_1200",
+    'TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': "ttjets_sl_t",
+    'TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': "ttjets_sl_tbar",
+    'TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': "ttjets",
+    'TT_TuneCUETP8M1_13TeV-amcatnlo-pythia8': "ttjets",
+    'TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8': "ttW_Wlnu",
+    'TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8':"ttW_Wqq",
+    'TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8': "ttZ_Zqq",
+    'WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8':"wjets_Wlnu_ht_100_200",
+    'WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8':"wjets_Wlnu_ht_100_200",
+    'WJetsToLNu_HT-600ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8':"wjets_Wlnu_ht_600_inf",
+    'WJetsToQQ_HT-600ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8':"wjets_Wqq_ht_600_inf",
+    'WW_TuneCUETP8M1_13TeV-pythia8': "ww",
+    'WZ_TuneCUETP8M1_13TeV-pythia8': "wz",
+    'ZZ_TuneCUETP8M1_13TeV-pythia8': "zz",
+    'ttHToNonbb_M125_13TeV_powheg_pythia8': "ttH_Hnonbb",
+    'ttHTobb_M125_13TeV_powheg_pythia8': "ttH_Hbb"
+}
+
 xsec_sample = {
     "TT_TuneCUETP8M1_13TeV-powheg-pythia8": xsec[("ttjets", "13TeV")],
     "ttHTobb_M125_13TeV_powheg_pythia8": xsec[("tthbb", "13TeV")],
