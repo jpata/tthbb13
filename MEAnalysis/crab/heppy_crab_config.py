@@ -2,7 +2,7 @@ from WMCore.Configuration import Configuration
 config = Configuration()
 import os
 
-processing_name = "Feb12_withme" 
+processing_name = "Feb19_withme" 
 config.section_("General")
 #this will be used for the crab directory name
 config.General.requestName = DNAME
@@ -14,7 +14,7 @@ config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'heppy_crab_fake_pset.py'
 config.JobType.scriptExe = 'heppy_crab_script.sh'
 #job maximum runtime in minutes
-config.JobType.maxJobRuntimeMin = 40 * 60
+config.JobType.maxJobRuntimeMin = 120
 
 import os
 #we need to specially ship the python and data directories
@@ -37,8 +37,8 @@ config.section_("Data")
 config.Data.outputPrimaryDataset = FULLDAS
 config.Data.splitting = 'FileBased'
 config.Data.unitsPerJob = 1
-config.Data.totalUnits = -1
-config.Data.outLFNDirBase = '/store/user/jpata/tthbb13/VHBBHeppyV16pre/' + processing_name
+config.Data.totalUnits = 10
+config.Data.outLFNDirBase = '/store/user/jpata/tthbb13/VHBBHeppyV20/' + processing_name
 config.Data.publication = False
 filelist = open(DATASET).readlines()
 filelist = map(lambda x: x.strip(), filelist)
@@ -51,5 +51,5 @@ config.section_("Site")
 #config.Site.storageSite = "T3_CH_PSI"
 #config.Site.storageSite = "T2_CH_CSCS"
 config.Site.storageSite = "T2_EE_Estonia"
-config.Site.blacklist = ["T2_UA_KIPT", "T3_US_FIT"]
+#config.Site.blacklist = ["T2_UA_KIPT", "T3_US_FIT"]
 #config.Data.ignoreLocality = True

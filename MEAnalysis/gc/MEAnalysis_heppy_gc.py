@@ -42,12 +42,12 @@ good_samp = []
 print "processing dataset={0}".format(dataset)
 
 for ns in samples_dict.keys():
-    if samples_dict[ns].nickname.value() == dataset:
+    if samples_dict[ns].name.value() == dataset:
         samples_dict[ns].skip = False
         samples_dict[ns].subFiles = map(lfn_to_pfn, fns ) #DS
         good_samp += [samples_dict[ns]]
     else:
-        print "skipping", samples_dict[ns].nickname.value()
+        print "skipping", samples_dict[ns].name.value()
         samples_dict[ns].skip = True
 
 if len(good_samp) != 1:

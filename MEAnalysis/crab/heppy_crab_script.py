@@ -5,8 +5,13 @@ retcode = 0
 filename = ""
 entries = 0
 
-rootprefix = "root://eoscms.cern.ch//eos/cms/"
-siteprefix = "/store/group/phys_higgs/hbb/ntuples/V16_tth_moriond/"
+#Only from EOS
+#rootprefix = "root://eoscms.cern.ch//eos/cms/"
+#siteprefix = "/store/group/phys_higgs/hbb/ntuples/V16_tth_moriond/"
+
+#Whole grifd
+rootprefix = "root://xrootd-cms.infn.it/"
+siteprefix = "/store/user/jpata/VHBBHeppyV20/"
 
 #Currently, the name of the sample is exracted from the filename
 def findSampleName(n):

@@ -45,7 +45,8 @@ def prepare_crab_list(infile, dataset, perjob, outfile):
         for df, nd, in mydata:
             cur = 0
             if perjob > nd:
-                raise Exception("cannot split job: file has {0} but perjob is {1}".format(nd, perjob))
+                l += [(df, cur, nd)]
+                print "cannot split file {2}: file has {0} but perjob is {1}".format(nd, perjob, df)
             while cur < nd-perjob:
                 l += [(df, cur, perjob)]
                 cur += perjob

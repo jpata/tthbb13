@@ -48,11 +48,11 @@ def Make_config():
     # I/O information
     ########################################
 
-    config['input_root_file_name'] = '/home/joosep/tth/sw/CMSSW_7_4_15/src/TTH/MEAnalysis/gc/JetTree_V16_subjet.root'
+    config['input_root_file_name'] = '/hdfs/local/joosep/tth/JetTree_V20_subjet.root'
 
     config['input_tree_name'] = 'tree'
 
-    config['outputdir'] = 'V16_SUBJETS'
+    config['outputdir'] = 'V20_SUBJETS'
 
         
     config['SBF_fitted_hists_pickle_filename'] = \

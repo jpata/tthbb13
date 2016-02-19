@@ -1,3 +1,4 @@
+from TTH.MEAnalysis.samples_base import *
 samples_dict = {
     
         "DoubleEG": cms.PSet(
