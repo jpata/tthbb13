@@ -5,7 +5,7 @@ import os
 processing_name = "Feb19_withme_full_40h" 
 config.section_("General")
 #this will be used for the crab directory name
-config.General.requestName = DNAME
+config.General.requestName = DNAME + "_" + processing_name
 config.General.workArea = 'crab_projects_mem/' + processing_name
 config.General.transferLogs = True
 

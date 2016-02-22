@@ -27,6 +27,8 @@ matplotlib.rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 matplotlib.rc("axes", labelsize=24)
 matplotlib.rc("axes", titlesize=16)
 
+#All the colors of the various processes
+#extracted using the apple color picker tool
 colors = {
     "ttbarOther": (251, 102, 102),
     "ttbarPlusCCbar": (204, 2, -0),
@@ -39,12 +41,16 @@ colors = {
     "other": (251, 73, 255),
 }
 
+#create floats of colors from 0..1
 for cn, c in colors.items():
     colors[cn] = (c[0]/255.0, c[1]/255.0, c[2]/255.0)
 
+#list of all categories and their ROOT cuts
 cats = {
     'dl_j3_t2': "(is_dl==1) & (numJets==3) & (nBCSVM==2)",
     'dl_jge3_t3': "(is_dl==1) & (numJets>=3) & (nBCSVM==3)",
+    'dl_j3_t3': "(is_dl==1) & (numJets==3) & (nBCSVM==3)",
+    'dl_jge4_t3': "(is_dl==1) & (numJets>=4) & (nBCSVM==3)",
     'dl_jge4_t2': "(is_dl==1) & (numJets>=4) & (nBCSVM==2)",
     'dl_jge4_tge4': "(is_dl==1) & (numJets>=4) & (nBCSVM>=4)",
     
@@ -57,7 +63,7 @@ cats = {
     'sl_jge6_tge4': "(is_sl==1) & (numJets>=6) & (nBCSVM>=4)",
 }
 
-#List of sample filenames -> short names
+#List of sample filenames -> short names suitable for latex
 samplelist = [
     ("ttH_hbb", "ttHbb"),
     ("ttH_nonhbb", "ttHnonbb"),
@@ -69,6 +75,7 @@ samplelist = [
 ]
 samplecolors = [colors[sn[0]] for sn in samplelist]
 
+#list of all variable names, suitable for latex
 varnames = {
     "jet0_pt": "leading jet $p_T$ [GeV]",
     "jet1_pt": "subleading jet $p_T$ [GeV]",
@@ -125,6 +132,7 @@ varnames = {
     "common_bdt": "BDT"
 }
 
+#the units for variables
 varunits = {
     "jet0_pt": "GeV",
     "jet1_pt": "GeV",
@@ -137,6 +145,17 @@ varunits = {
 }
 
 def process_sample_hist(fnames, hname, func, bins, cut, **kwargs):
+    """
+    Takes a list of files and projects a 1D histogram with the specified cut.
+    fnames (list of strings): list of filenames to be opened
+    hname (string): name of the output histogram, must be unique
+    func (string): the function (ROOT string) to be evaluated
+    bins (3-tuple): the (nbins, low, high) of the histograms
+    cut (string): the weight and cut string (ROOT format) to be evaluated.
+    
+    returns: TH1D in the gROOT directory
+    """
+
     tt = ROOT.TChain("tree")
     for fn in fnames:
         tt.Add(fn)
@@ -155,156 +174,6 @@ def process_sample_hist(fnames, hname, func, bins, cut, **kwargs):
         if h.Integral()>0:
             h.Scale(1.0 / h.Integral())
     return h
-    
-def make_df_hist(bins, x, w=1.0):
-    h = rootpy.plotting.Hist(*bins)
-    a = np.array(x).astype("float64")
-    if isinstance(w, float):
-        b = np.repeat(w, len(a)).astype("float64")
-    else:
-        b = np.array(w).astype("float64")
-    h.FillN(len(a), a, b)
-    return h
-# 
-# def augment(d, varlist):
-#     d = d[varlist+["id" ,"genWeight"]]
-#     newd = copy.deepcopy(d)
-#     for c in varlist:
-#         m = d[c].mean()
-#         s = d[c].std()
-#         perturb = np.random.normal(m, s, len(d))
-#         newd[c] += perturb
-#     ret = pandas.concat((d, newd))
-#     return ret
-# 
-# def augment_multi(d, varlist, n):
-#     if n>0:
-#         return augment_multi(augment(d, varlist), varlist, n-1)
-#     else:
-#         return augment(d, varlist)
-#         
-
-
-def cls_hists(cls, df, var, bins=None):
-    if bins is None:
-        bins = (101,0.0,1.0)
-
-    probs1 = cls.predict_proba(df[df["id"]==1][var])[:, 1]
-    probs2 = cls.predict_proba(df[df["id"]==0][var])[:, 1]
-
-    h1 = make_df_hist(bins, probs1, df[df["id"]==1]["genWeight"])
-    h2 = make_df_hist(bins, probs2, df[df["id"]==0]["genWeight"])
-
-    # h1 = make_df_hist(bins, probs1)
-    # h2 = make_df_hist(bins, probs2)
-
-    # h1tr = make_df_hist(bins, probs1tr)
-    # h2tr = make_df_hist(bins, probs2tr)
-
-    for h in [h1, h2]:
-        h.Scale(1.0 / h.Integral())
-    return h1, h2
-    
-    
-def draw_cls_hists(cls, d1, d2, var):
-    h1, h2 = cls_hists(cls, d1, var)
-    h1tr, h2tr = cls_hists(cls, d2, var)
-
-    h1.color = "red"
-    h2.color = "blue"
-    h1tr.color = "red"
-    h2tr.color = "blue"
-
-    errorbar(h1)
-    errorbar(h2)
-    h1tr.linestyle = "dashed"
-    h2tr.linestyle = "dashed"
-    hist(h1tr, ls="--")
-    hist(h2tr, ls="--")
-    
-def draw_roc(cls, df_test, var, df_train=None):
-    h1, h2 = cls_hists(cls, df_test, var)
-    
-    r, e = calc_roc(h1, h2)
-    if not df_train is None:
-        h1tr, h2tr = cls_hists(cls, df_train, var)
-        rtr, etr = calc_roc(h1tr, h2tr)
-    plt.figure(figsize=(6,6))
-    plt.grid()
-    plt.plot([0,1],[0,1], color="black")
-    plt.errorbar(r[:, 0], r[:, 1], e[:, 0], e[:, 1], marker="o", label="test")
-    if not df_train is None:
-        plt.errorbar(rtr[:, 0], rtr[:, 1], etr[:, 0], etr[:, 1], marker="x", label="train")
-    plt.axvline(0.5, color="black", ls="--")
-    plt.yticks(np.linspace(0,1,11));
-    plt.ylim(0,1)
-    plt.xlim(0,1)
-    try:
-        a = sklearn.metrics.auc(r[:, 0], r[:, 1])
-    except ValueError as e:
-        print "ROC is not sorted, probably negative weights"
-        a = -1
-    return a
-    
-
-def draw_cls_importance(cls, var):
-    plt.grid()
-    labs = []
-    imps = []
-    for v, i in sorted(zip(var, cls.feature_importances_), key=lambda x: x[1], reverse=True):
-        labs += [v]
-        imps += [i]
-    plt.bar(range(len(imps)), imps);
-    plt.xticks(np.array(range(len(labs)))+0.5, labs, rotation=90, fontsize=16)
-    
-
-def auc(df_test, df_train, ntrees=100, rate=0.02, depth=2, min1=12, min2=12, sub=0.8, ntrain=1.0):
-    print ntrees, rate, depth, min1, min2, sub, ntrain
-    if ntrees>2000 or ntrees<10:
-        return 1.0
-    try:
-        cls = GradientBoostingClassifier(
-            n_estimators=int(ntrees), learning_rate=rate,
-            max_depth=int(depth),
-            min_samples_split=int(min1),
-            min_samples_leaf=int(min2),
-            subsample=sub,
-            verbose=False
-        )
-
-        df_train_shuf = df_train.iloc[np.random.permutation(np.arange(len(df_train)))]
-        if ntrain>1.0:
-            df_train_shuf = df_train_shuf[:int(len(df_train_shuf)*ntrain)]
-        cls = cls.fit(df_train_shuf[var], df_train_shuf["id"])
-    except Exception as e:
-        return 1.0
-    
-    h1, h2, h1tr, h2tr = cls_hists(cls, df_test, df_train)
-    
-    r, e = calc_roc(h1, h2)
-    A = sklearn.metrics.auc(r[:, 0], r[:, 1])
-    print A
-    return A
-    
-def compare(df, bins, v):
-    h1 = make_df_hist(bins, df[df["id"]==1][v], df[df["id"]==1]["genWeight"])
-    h2 = make_df_hist(bins, df[df["id"]==2][v], df[df["id"]==2]["genWeight"])
-
-    h1.color = "red"
-    h2.color = "blue"
-
-    h1.Scale(1.0/h1.Integral())
-
-    h2.Scale(1.0/h2.Integral())
-    errorbar(h1)
-    errorbar(h2)
-    hist(h1, ls="-")
-    hist(h2, ls="-")
-    
-
-def hist_abs(h):
-    for i in range(1, h.GetNbinsX()+1):
-        h.SetBinContent(i, abs(h.GetBinContent(i)))
 
 def mc_stack(
     hlist,
@@ -375,18 +244,6 @@ def dice(h, nsigma=1.0):
         n = np.random.normal(m, nsigma*e)
         hret.set_bin_content(i, n)
     return hret
-
-# def make_uoflow(h):
-#     widths = list(h.xwidth())
-#     edgs = list(h.xedgesl())
-#     h2 = rootpy.plotting.Hist(h.nbins()+2, edgs[0] - widths[0], edgs[-1] + widths[-1])
-#     nb = h.GetNbinsX()
-#     for i in range(0,nb+2):
-#         h2.SetBinContent(i+1, h.GetBinContent(i))
-#         h2.SetBinError(i+1, h.GetBinError(i))
-#     h2.SetEntries(h.GetEntries())
-#     return h2
-
 
 def make_uoflow(h):
     nb = h.GetNbinsX()
@@ -642,69 +499,69 @@ def calc_roc(h1, h2):
             err[i, 1] = e2
     return roc, err
 
-def match_histogram(sample, var, cut):
-    hs = process_sample_hist(
-        sample, "hs",
-        var,
-        (250,0,250),
-        cut
-    )
-    hs.Scale(1.0 / hs.Integral())
-
-    nb = 0
-    labels = []
-    h = rootpy.plotting.Hist(30,0,30)
-    for i in range(0,3):
-        for j in range(0,3):
-            for k in range(0,3):
-                nb += 1
-                h.SetBinContent(nb, hs.GetBinContent(1 + 100*i+10*j+k))
-                h.SetBinError(nb, hs.GetBinError(1 + 100*i+10*j+k))
-                #print nb, i,j,k,h.GetBinContent(nb)
-                labels += ["%d%d%d"%(i,j,k)]
+#def match_histogram(sample, var, cut):
+#    hs = process_sample_hist(
+#        sample, "hs",
+#        var,
+#        (250,0,250),
+#        cut
+#    )
+#    hs.Scale(1.0 / hs.Integral())
+#
+#    nb = 0
+#    labels = []
+#    h = rootpy.plotting.Hist(30,0,30)
+#    for i in range(0,3):
+#        for j in range(0,3):
+#            for k in range(0,3):
+#                nb += 1
+#                h.SetBinContent(nb, hs.GetBinContent(1 + 100*i+10*j+k))
+#                h.SetBinError(nb, hs.GetBinError(1 + 100*i+10*j+k))
+#                #print nb, i,j,k,h.GetBinContent(nb)
+#                labels += ["%d%d%d"%(i,j,k)]
+#    
+#    return h
     
-    return h
-    
-def get_pairs_file(pairs, **kwargs):
-    ps = []
-    for pair in pairs:
-        tf, hn1, hn2, label = pair
-        h1 = tf.get(hn1).Clone()
-        if isinstance(hn2, str):
-            h2 = tf.get(hn2).Clone()
-        elif isinstance(hn2, list):
-            h2 = tf.get(hn2[0]).Clone()
-            for _hn2 in hn2[1:]:
-                h2 += tf.get(_hn2).Clone()
-        ps += [(h1, h2, label)]
-    return ps
+#def get_pairs_file(pairs, **kwargs):
+#    ps = []
+#    for pair in pairs:
+#        tf, hn1, hn2, label = pair
+#        h1 = tf.get(hn1).Clone()
+#        if isinstance(hn2, str):
+#            h2 = tf.get(hn2).Clone()
+#        elif isinstance(hn2, list):
+#            h2 = tf.get(hn2[0]).Clone()
+#            for _hn2 in hn2[1:]:
+#                h2 += tf.get(_hn2).Clone()
+#        ps += [(h1, h2, label)]
+#    return ps
     
     
-def draw_rocs(pairs, **kwargs):
-    rebin = kwargs.get("rebin", 1)
-
-    #c = plt.figure(figsize=(6,6))
-    #plt.axes()
-    plt.plot([0.0,1.0],[0.0,1.0], color="black")
-    plt.xlim(0,1)
-    plt.ylim(0,1)
-
-    
-    rs = []
-    es = []
-    for pair in pairs:
-        h1, h2, label = pair
-        h1.rebin(rebin)
-        h2.rebin(rebin)
-        r, e = calc_roc(h1, h2)
-        rs += [r]
-        es += [e]
-
-    for (r, e, pair) in zip(rs, es, pairs):
-        h1, h2, label = pair
-        plt.errorbar(r[:, 0], r[:, 1], xerr=e[:, 0], yerr=e[:, 1], label=label)
-
-    plt.legend(loc=2)
+#def draw_rocs(pairs, **kwargs):
+#    rebin = kwargs.get("rebin", 1)
+#
+#    #c = plt.figure(figsize=(6,6))
+#    #plt.axes()
+#    plt.plot([0.0,1.0],[0.0,1.0], color="black")
+#    plt.xlim(0,1)
+#    plt.ylim(0,1)
+#
+#    
+#    rs = []
+#    es = []
+#    for pair in pairs:
+#        h1, h2, label = pair
+#        h1.rebin(rebin)
+#        h2.rebin(rebin)
+#        r, e = calc_roc(h1, h2)
+#        rs += [r]
+#        es += [e]
+#
+#    for (r, e, pair) in zip(rs, es, pairs):
+#        h1, h2, label = pair
+#        plt.errorbar(r[:, 0], r[:, 1], xerr=e[:, 0], yerr=e[:, 1], label=label)
+#
+#    plt.legend(loc=2)
 
 def draw_shape(f, samples, hn, **kwargs):
     rebin = kwargs.get("rebin", 1)
@@ -725,91 +582,6 @@ def draw_shape(f, samples, hn, **kwargs):
     plt.legend()
     for h in hs:
         hist(h, lw=1, ls="-")
-
-def train(df, var, cut, **kwargs):
-    df_sel = df[df.eval(cut)]
-    ntrain_1 = int(sum(df_sel["id"]==1) * 0.5)
-    ntrain_2 = int(sum(df_sel["id"]==0) * 0.5)
-    weight = kwargs.get("weight", None)
-
-    if weight:
-        print "weighted", sum(df_sel[df_sel["id"]==1][weight]), sum(df_sel[df_sel["id"]==0][weight])
-        print "unweighted", sum(df_sel["id"]==1), sum(df_sel["id"]==0)
-        
-    df_train = pandas.concat((df_sel[df_sel["id"]==1][:ntrain_1], df_sel[df_sel["id"]==0][:ntrain_2]))
-    df_test = pandas.concat((df_sel[df_sel["id"]==1][ntrain_1:], df_sel[df_sel["id"]==0][ntrain_2:]))
-
-    df_train_shuf = df_train.iloc[np.random.permutation(np.arange(len(df_train)))]
-    
-    cls = GradientBoostingClassifier(
-        n_estimators=kwargs.get("ntrees", 200),
-        learning_rate=kwargs.get("learning_rate", 0.1),
-        max_depth=kwargs.get("depth", 2),
-        min_samples_split=kwargs.get("min1", 1),
-        min_samples_leaf=kwargs.get("min2", 1),
-        subsample=kwargs.get("subsample", 1.0),
-        verbose=True
-    )
-
-    if not weight:
-        cls = cls.fit(df_train_shuf[var], df_train_shuf["id"])
-    else:
-        cls = cls.fit(df_train_shuf[var], df_train_shuf["id"], df_train_shuf[weight])
-
-    return cls, df_test, df_train
-
-def syst_comparison(tf, sn, l, **kwargs):
-    h0 = tf.get(sn + l[0]).Clone()
-    h1 = tf.get(sn + l[1]).Clone()
-    h2 = tf.get(sn + l[2]).Clone()
-    
-    for ih, h in enumerate([h0, h1, h2]):
-        h.title = l[ih]
-        h.title = h.title.replace("_", "")
-        h.title += " ({0:.2f})".format(h.Integral())
-    rb = kwargs.get("rebin", 1)
-    h0.rebin(rb)
-    h1.rebin(rb)
-    h2.rebin(rb)
-
-    a1 = plt.axes([0.0,0.52,1.0,0.5])
-    errorbar(h0)
-    h1.linewidth = 2
-    h2.linewidth = 2
-    hist(h1, color="blue")
-    hist(h2, color="red")
-
-    fill_between(h1, h2, hatch="////", facecolor="none", edgecolor="black", lw=0, zorder=10)
-
-    h1n = h1.Clone()
-    h2n = h2.Clone()
-    plt.legend(numpoints=1, loc="best")
-    if h1n.Integral() > 0:
-        h1n.Scale(h0.Integral() / h1n.Integral())
-    if h2n.Integral() > 0:
-        h2n.Scale(h0.Integral() / h2n.Integral())
-    
-    h1n.linestyle = "dashed"
-    h2n.linestyle = "dashed"
-    hist(h1n, color="blue")
-    hist(h2n, color="red")
-    
-    #plt.ylim(bottom=0)
-    plt.axhline(0.0)
-    a2 = plt.axes([0.0,0.0,1.0,0.48],sharex=a1)
-
-    h1r = h1n.Clone()
-    h1r.Divide(h0)
-    h2r = h2n.Clone()
-    h2r.Divide(h0)
-    h1r.color = "blue"
-    h2r.color = "red"
-    hist(h1r, color="blue")
-    hist(h2r, color="red")
-    a2.set_ylim(0.9, 1.1)
-    plt.axhline(1.0, color="black")
-    #fill_between(h1, h2, hatch="\\\\", facecolor="none", edgecolor="black", lw=0, zorder=10)
-
 
 def svfg(fn, **kwargs):
     path = os.path.dirname(fn)
@@ -869,61 +641,6 @@ def get_sb_cats(inf, categories, suffix=""):
         es += [e]
     xs_num = np.array(range(len(xs)))+0.5
     return xs, xs_num, ys, es
-
-
-def getDataname(cat):
-    if "sl_mu" in cat:
-        return ["SingleMuon"]
-    elif "sl_el" in cat:
-        return ["SingleElectron"]
-    elif "dl_mumu" in cat:
-        return ["DoubleMuon"]
-    elif "dl_ee" in cat:
-        return ["DoubleEG"]
-    elif "dl_emu" in cat:
-        return ["MuonEG"]
-    #FIXME: for flavour-unsplit data bins, need to make sure all data categories are exclusive
-    elif "sl" in cat:
-        return ["SingleMuon", "SingleElectron"]
-    elif "dl" in cat:
-        return ["DoubleMuon", "DoubleEG", "MuonEG"]
-    raise Exception("not recognized {0}".format(cat))
-
-
-def sync_table(inf, cats, bkg):
-    """
-    inf - input file (ControlPlotsSparse.root)
-    cats - list of category strings (["sl_jge6_tge4", ...])
-    """
-    hd = {}
-    for ic, cat in enumerate(cats):
-        for sample in ["ttH_hbb"] + bkg + ["data"]:
-            k = sample + "/" + "yields"
-            if hd.has_key(k):
-                h = hd[k]
-            else:
-                #hist not found, create default empty 
-                h = rootpy.plotting.Hist(len(cats), 0, len(cats))
-            if sample == "data":
-                categories_to_get = getDataname(cat)
-            else:
-                categories_to_get = [sample]
-            y, e = get_yields(inf, cat, "", categories_to_get)
-            h.SetBinContent(ic+1, y)
-            h.SetBinError(ic+1, e)
-            hd[k] = h
-
-    table = []
-    for sample in ["ttH_hbb"] + bkg + ["data"]:
-        row = [sample]
-        for ic, cat in enumerate(cats):
-            i = hd[sample + "/yields"].GetBinContent(ic+1)
-            row += [i]
-        table += [row]
-        
-    d = np.array(table)[:, 1:].astype("f")
-    table.insert(-1, ["total"] + [f for f in np.sum(d[0:-1, :], axis=0)])
-    return hd, table
 
 def get_cut_at_eff(h, eff):
     h = h.Clone()
