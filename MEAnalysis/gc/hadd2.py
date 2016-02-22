@@ -2,19 +2,15 @@
 #This script recursively adds root files in directories
 # e.g. /a/b/c/output_*.root -> /a/b/c.root
 from TTH.TTHNtupleAnalyzer.ParHadd import par_hadd
-import glob
-import sys
-import os, fnmatch
+import sys, os
 
-all_rootfiles = []
+infile = sys.argv[1]
+lines = open(infile).readlines()
+sample_name = lines[0].strip()[1:-1]
 
-#recurse over the given path
-for path, dirs, files in os.walk(sys.argv[1]):
-    #Check if there are root files in this path
-    rootfiles = filter(lambda x: x.endswith("root"), files)
-    #Add the full path
-    rootfiles = map(lambda f: os.path.join(path, f), rootfiles)
-    all_rootfiles += rootfiles
+files = []
+for li in lines[1:]:
+    fi = li.split()[0]
+    files += ["/hdfs/cms" + fi]
 
-sample_name = sys.argv[1].strip("/").split("/")[-1]
-par_hadd("/scratch/" + os.environ["USER"] + "/" + sample_name + ".root", all_rootfiles, 250, 5, 3)
+par_hadd("/scratch/" + os.environ["USER"] + "/" + sample_name + ".root", files, 250, 5, 3)

@@ -77,6 +77,8 @@ const map<string, function<float(const Event& ev)>> AxisFunctions = {
     {"topCandidate_fRec", [](const Event& ev) { return ev.topCandidate_fRec;}},
     {"topCandidate_n_subjettiness", [](const Event& ev) { return ev.topCandidate_n_subjettiness;}},
     {"Wmass", [](const Event& ev) { return ev.Wmass;}},
+    {"jet0_pt", [](const Event& ev) { return ev.jets.at(0).p4.Pt();}},
+    {"jet0_eta", [](const Event& ev) { return ev.jets.at(0).p4.Eta();}},
     {"n_excluded_bjets", [](const Event& ev) { return ev.n_excluded_bjets;}},
     {"n_excluded_ljets", [](const Event& ev) { return ev.n_excluded_ljets;}},
 
