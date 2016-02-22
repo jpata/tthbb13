@@ -27,6 +27,7 @@ ls -al
 cd ${CMSSW_BASE}/src/TTH/MEAnalysis/
 export SCRAM_ARCH="slc6_amd64_gcc491"
 source /cvmfs/cms.cern.ch/cmsset_default.sh
+#source ${CMSSW_BASE}/src/TTH/setenv_psi.sh
 source ${CMSSW_BASE}/src/TTH/setenv_kbfi.sh
 
 #go to work directory

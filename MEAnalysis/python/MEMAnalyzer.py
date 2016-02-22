@@ -391,7 +391,7 @@ class MEAnalyzer(FilterAnalyzer):
                         res[(hypo, confname)] = MEM.MEMOutput()
                         continue
                     
-                if confname == "SL_2w2h2t_3jt":                    
+                if confname == "SL_2w2h2t_3jt" and best_comb != None:                    
                     top_indices = [best_comb[0].index, best_comb[1].index, best_comb[2].index]
                     for j in event.good_jets:
                         j.PDGID = 0

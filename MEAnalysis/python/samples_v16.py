@@ -217,7 +217,7 @@ samples_dict = {
     nGen = cms.int64(3933404),
     name = cms.string('ttHTobb_M125_13TeV_powheg_pythia8'),
     nickname = cms.string('ttHTobb_M125_13TeV_powheg_pythia8'),
-    skip = cms.bool(True),
+    skip = cms.bool(False),
     subFiles = cms.vstring(
         '/store/user/jpata/VHBBHeppyV16pre/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V16pre_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160205_173026/0000/tree_1.root', 
         '/store/user/jpata/VHBBHeppyV16pre/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V16pre_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160205_173026/0000/tree_10.root', 
