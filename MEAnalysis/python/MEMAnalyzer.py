@@ -24,7 +24,9 @@ CvectorPermutations = getattr(ROOT, "std::vector<MEM::Permutations::Permutations
 CvectorPSVar = getattr(ROOT, "std::vector<MEM::PSVar::PSVar>")
 #CmapDistributionTypeTH3D = getattr(ROOT, "std::map<MEM::DistributionType::DistributionType,TH3D>")
 
-pickle_f = open("/shome/gregor/VHBB-7415/CMSSW_7_4_15/src/TTH/MEAnalysis/python/cls_top_resolved.pickle","rb")
+#FIXME remove this hardcoding
+import os
+pickle_f = open(os.environ.get("CMSSW_BASE") + "/src/TTH/MEAnalysis/python/cls_top_resolved.pickle","rb")
 cls = pickle.load(pickle_f)
 pickle_f.close()
 

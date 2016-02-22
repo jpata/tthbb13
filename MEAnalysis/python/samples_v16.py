@@ -217,7 +217,7 @@ samples_dict = {
     nGen = cms.int64(3933404),
     name = cms.string('ttHTobb_M125_13TeV_powheg_pythia8'),
     nickname = cms.string('ttHTobb_M125_13TeV_powheg_pythia8'),
-    skip = cms.bool(False),
+    skip = cms.bool(True),
     subFiles = cms.vstring(
         '/store/user/jpata/VHBBHeppyV16pre/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V16pre_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160205_173026/0000/tree_1.root', 
         '/store/user/jpata/VHBBHeppyV16pre/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V16pre_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160205_173026/0000/tree_10.root', 
@@ -3757,7 +3757,7 @@ samples_dict = {
     nGen = cms.int64(1),
     name = cms.string('SingleMuon'),
     nickname = cms.string('SingleMuon'),
-    skip = cms.bool(False),
+    skip = cms.bool(True),
     subFiles = cms.vstring(samples_base.get_files("SingleMuon")),
     xSec = cms.double(1)
 ),
@@ -3766,7 +3766,7 @@ samples_dict = {
     nGen = cms.int64(1),
     name = cms.string('SingleElectron'),
     nickname = cms.string('SingleElectron'),
-    skip = cms.bool(False),
+    skip = cms.bool(True),
     subFiles = cms.vstring(samples_base.get_files("SingleElectron")),
     xSec = cms.double(1)
 ),
@@ -3775,8 +3775,8 @@ samples_dict = {
     nGen = cms.int64(1),
     name = cms.string('DoubleMuon'),
     nickname = cms.string('DoubleMuon'),
-    skip = cms.bool(False),
-    subFiles = cms.vstring(samples_base.get_files("DoubleMuon"))
+    skip = cms.bool(True),
+    subFiles = cms.vstring(samples_base.get_files("DoubleMuon")),
     xSec = cms.double(1)
 ),
     'DoubleEG': cms.PSet(
@@ -3784,7 +3784,7 @@ samples_dict = {
     nGen = cms.int64(1),
     name = cms.string('DoubleEG'),
     nickname = cms.string('DoubleEG'),
-    skip = cms.bool(False),
+    skip = cms.bool(True),
     subFiles = cms.vstring(samples_base.get_files("DoubleEG")),
     xSec = cms.double(1)
 ),
@@ -3793,14 +3793,16 @@ samples_dict = {
     nGen = cms.int64(1),
     name = cms.string('MuonEG'),
     nickname = cms.string('MuonEG'),
-    skip = cms.bool(False),
+    skip = cms.bool(True),
     subFiles = cms.vstring(samples_base.get_files("MuonEG")),
     xSec = cms.double(1)
 ),
 }
 
-for k in samples_dict.keys():
-    if samples_dict[k].isMC:
-        samples_dict[k].skip = False
-    else: 
-        samples_dict[k].skip = True
+
+for k in sorted(samples_dict.keys()):
+    s = samples_dict[k]
+    print "{0} isMC={1} nGen={2} skip={3} xSec={4} subFiles={5}".format(
+        k, s.isMC.value(), s.nGen.value(), s.skip.value(), s.xSec.value(), len(s.subFiles)
+    )
+
