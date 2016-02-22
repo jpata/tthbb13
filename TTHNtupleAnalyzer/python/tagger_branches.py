@@ -79,6 +79,7 @@ for fj_name in li_fatjets_branches:
     # And all the individual float branches
     for branch_name in [
             "pt", "eta", "phi", "mass",  # Kinematics
+            "masscal",                   # calibrated mass
             "tau1", "tau2", "tau3",      # N-subjettiness
             "btag",                      # b-tag discriminator
             "chi1", "nmj1",                # Shower deconstruction chi and number of microjets

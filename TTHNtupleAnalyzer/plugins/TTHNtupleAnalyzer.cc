@@ -51,8 +51,6 @@
 #include "DataFormats/JetReco/interface/Jet.h"
 #include "DataFormats/JetReco/interface/GenJet.h"
 
-
-
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
@@ -79,10 +77,11 @@
 #include <EgammaAnalysis/ElectronTools/interface/ElectronEffectiveArea.h>
 
 #include "FWCore/Framework/interface/ESHandle.h"
+#include "JetMETCorrections/JetCorrector/interface/JetCorrector.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 #include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
-#include "JetMETCorrections/Objects/interface/JetCorrector.h"
+
 
 #include "TTH/TTHNtupleAnalyzer/interface/tth_tree.hh"
 #include "TTH/TTHNtupleAnalyzer/interface/gen_association.h"
@@ -227,14 +226,16 @@ void fill_fatjet_branches(const edm::Event& iEvent,
 			  edm::EDGetTokenT<edm::ValueMap<int>> fatjetSDNMJ2Token,
 			  edm::EDGetTokenT<edm::ValueMap<int>> fatjetSDNMJ3Token,			  		 	  
 			  edm::EDGetTokenT<reco::JetTagCollection> fatjetBtagsToken,			  		 	  
-			  edm::EDGetTokenT<edm::ValueMap<float>> fatjetQvolsToken,			  		 	  
+			  edm::EDGetTokenT<edm::ValueMap<float>> fatjetQvolsToken,			  		 	 
 			  edm::EDGetTokenT<reco::JetFlavourInfoMatchingCollection> fatjetFlavInfoToken,
+			  edm::EDGetTokenT<reco::JetCorrector> jetCorrectorToken,
 			  std::string fj_nsubs_name,
 			  std::string fj_sds_name,
 			  std::string fj_btags_name,
 			  std::string fj_qvols_name,
 			  std::string fj_branches_name,
 			  std::string fj_flavour_info_name,
+			  std::string fj_corrector_name,
 			  // true top and anti top for optional matching
 			  const vector<const reco::Candidate*>  & true_t,
 			  // hard partons for matching
@@ -298,6 +299,11 @@ void fill_fatjet_branches(const edm::Event& iEvent,
     iEvent.getByToken(fatjetFlavInfoToken, JetFlavourInfos);
   }
 
+  // JetCorrector
+  edm::Handle<reco::JetCorrector> corrector;
+  if (fj_corrector_name != "None")
+    iEvent.getByToken(jetCorrectorToken, corrector);
+
   // Loop over fatjets
   for (unsigned n_fat_jet = 0; n_fat_jet != fatjets->size(); n_fat_jet++){
 	    
@@ -309,11 +315,18 @@ void fill_fatjet_branches(const edm::Event& iEvent,
     prefix.append(fj_branches_name);
     prefix.append("__");
 
+    // Get the correction factor for this jet
+    float corr_factor = 1;
+    if (fj_corrector_name != "None")
+      corr_factor = corrector->correction(x);
+
     // Turn the branch address into the actual object we want to fill
     tthtree->get_address<float *>(prefix + "pt"  )[n_fat_jet] = x.pt();
     tthtree->get_address<float *>(prefix + "eta" )[n_fat_jet] = x.eta();
     tthtree->get_address<float *>(prefix + "phi" )[n_fat_jet] = x.phi();
     tthtree->get_address<float *>(prefix + "mass")[n_fat_jet] = x.mass();
+
+    tthtree->get_address<float *>(prefix + "masscal")[n_fat_jet] = x.mass() * corr_factor;
     
     // Constituents
     tthtree->get_address<int *>(prefix + "nconst")[n_fat_jet] = x.getJetConstituents().size();
@@ -423,15 +436,21 @@ private:
 	virtual void endJob() override;
 	virtual void finalizeLoop();
 
-	// truth info
 	const edm::EDGetTokenT<std::vector<reco::GenJet>> genJetToken_;        
   	const edm::EDGetTokenT<GenEventInfoProduct>  genEventInfoToken_;
   	const edm::EDGetTokenT<std::vector<PileupSummaryInfo> > pupInfoToken_;
-	const edm::EDGetTokenT<edm::View<reco::GenParticle> > prunedGenToken_;
-	const edm::EDGetTokenT<edm::View<pat::PackedGenParticle> > packedGenToken_;
 
 	// collection of vertices
 	const edm::EDGetTokenT<reco::VertexCollection> vertexToken_;
+
+
+	// truth info
+
+
+
+	const edm::EDGetTokenT<edm::View<reco::GenParticle> > prunedGenToken_;
+	const edm::EDGetTokenT<edm::View<pat::PackedGenParticle> > packedGenToken_;
+
 
         // HTT tokens
         std::vector<edm::EDGetTokenT< edm::View<reco::BasicJet> > > httTokens_;
@@ -459,6 +478,7 @@ private:
 	const std::vector<std::string> fatjet_branches_;
 	const std::vector<int> fatjet_usesubjets_;
   	const std::vector<std::string> fatjet_flavour_infos_;
+  	const std::vector<std::string> fatjet_correctors_;
 
         // Fatjet Tokens
         std::vector<edm::EDGetTokenT< reco::PFJetCollection > > fatjetTokens_;
@@ -479,6 +499,8 @@ private:
         std::vector<edm::EDGetTokenT<edm::ValueMap<float>>> fatjetQvolsTokens_;			  		 	  
         std::vector<edm::EDGetTokenT<reco::JetFlavourInfoMatchingCollection>> fatjetFlavInfoTokens_;
         
+        std::vector<edm::EDGetTokenT<reco::JetCorrector>> jetCorrectorTokens_;
+  
         // HEPTopTagger information
         // objects = name of the input collection
         // htt branches = name of the branches to put this in
@@ -515,7 +537,6 @@ private:
   	const double	genPartonPt_min_;
         const int       genPartonStatus_;
 
-
 };
 
 
@@ -529,7 +550,7 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
 	vertexToken_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("vertices"))),
 	prunedGenToken_(consumes<edm::View<reco::GenParticle> >(iConfig.getParameter<edm::InputTag>("pruned"))),
 	packedGenToken_(consumes<edm::View<pat::PackedGenParticle> >(iConfig.getParameter<edm::InputTag>("packed"))),
-	metToken_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("mets"))),
+
 	       					  
         fatjet_objects_(iConfig.getParameter<std::vector<std::string>>("fatjetsObjects")),
         fatjet_nsubs_(iConfig.getParameter<std::vector<std::string>>("fatjetsNsubs")),
@@ -539,7 +560,8 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
         fatjet_branches_(iConfig.getParameter<std::vector<std::string>>("fatjetsBranches")),
         fatjet_usesubjets_(iConfig.getParameter<std::vector<int>>("fatjetsUsesubjets")),
         fatjet_flavour_infos_(iConfig.getParameter<std::vector<std::string>>("fatjetsFlavourInfos")),
-
+        fatjet_correctors_(iConfig.getParameter<std::vector<std::string>>("fatjetsCorrectors")),
+      
         htt_objects_(iConfig.getParameter<std::vector<std::string>>("httObjects")),
         htt_branches_(iConfig.getParameter<std::vector<std::string>>("httBranches")),
 
@@ -655,6 +677,12 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
     edm::InputTag it(fatjet_flavour_infos_[i],"");
     fatjetFlavInfoTokens_.push_back(consumes<reco::JetFlavourInfoMatchingCollection>(it));
   }
+
+  // Produce jet corrector info tokens
+  for (unsigned int i=0; i < fatjet_correctors_.size(); i++){
+    edm::InputTag it(fatjet_correctors_[i],"");
+    jetCorrectorTokens_.push_back(consumes<reco::JetCorrector>(it));
+  }
   
   tthtree->make_branches();
   
@@ -740,6 +768,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	assert(fatjet_objects_.size()==fatjet_branches_.size());
 	assert(fatjet_objects_.size()==fatjet_usesubjets_.size());
 	assert(fatjet_objects_.size()==fatjet_flavour_infos_.size());
+	assert(fatjet_objects_.size()==fatjet_correctors_.size());
 
 	// Sanity check the htt lists-of-names
 	assert(htt_objects_.size()==htt_branches_.size());
@@ -1085,6 +1114,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	  std::string	fj_qvols_name	     = fatjet_qvols_[i_fj_coll];
 	  std::string	fj_branches_name     = fatjet_branches_[i_fj_coll];
 	  std::string	fj_flavour_info_name = fatjet_flavour_infos_[i_fj_coll];
+	  std::string	fj_corrector_name    = fatjet_correctors_[i_fj_coll];
 
 	  fill_fatjet_branches<reco::PFJet, reco::PFJetCollection>(iEvent, 
 								   tthtree, 
@@ -1101,12 +1131,14 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 								   fatjetBtagsTokens_[i_fj_coll],
 								   fatjetQvolsTokens_[i_fj_coll],
 								   fatjetFlavInfoTokens_[i_fj_coll],
+								   jetCorrectorTokens_[i_fj_coll],
 								   fatjet_nsubs_[i_fj_coll],
 								   fatjet_sds_[i_fj_coll],
 								   fj_btags_name,
 								   fj_qvols_name,
 								   fj_branches_name,
 								   fj_flavour_info_name,
+								   fj_corrector_name,
 								   hadronic_ts,
 								   hard_partons,
 								   gen_higgs);
@@ -1115,79 +1147,6 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	// Done filling the fatjet information
 
 
-	edm::Handle<pat::METCollection> mets;
-	iEvent.getByToken(metToken_, mets);
-	const pat::MET &met = mets->front();
-	tthtree->met__pt = met.pt();
-	tthtree->met__phi = met.phi();
-	
-	tthtree->met__sumet = met.sumEt();
-
-	//do MET shifting
-	if (isMC_) {
-
-		tthtree->n__met_shift = 12;
-
-		// Pt
-		tthtree->met__pt__shift[0]	= met.shiftedPt(pat::MET::JetEnUp);
-		tthtree->met__pt__shift[1]	= met.shiftedPt(pat::MET::JetEnDown);
-		tthtree->met__pt__shift[2]	= met.shiftedPt(pat::MET::JetResUp);
-		tthtree->met__pt__shift[3]	= met.shiftedPt(pat::MET::JetResDown);
-		tthtree->met__pt__shift[4]	= met.shiftedPt(pat::MET::MuonEnUp);
-		tthtree->met__pt__shift[5]	= met.shiftedPt(pat::MET::MuonEnDown);
-		tthtree->met__pt__shift[6]	= met.shiftedPt(pat::MET::ElectronEnUp);
-		tthtree->met__pt__shift[7]	= met.shiftedPt(pat::MET::ElectronEnDown);
-		tthtree->met__pt__shift[8]	= met.shiftedPt(pat::MET::TauEnUp);
-		tthtree->met__pt__shift[9]	= met.shiftedPt(pat::MET::TauEnDown);
-		tthtree->met__pt__shift[10]	= met.shiftedPt(pat::MET::UnclusteredEnUp);
-		tthtree->met__pt__shift[11]	= met.shiftedPt(pat::MET::UnclusteredEnDown);
-
-		// Px
-		tthtree->met__px__shift[0]	= met.shiftedPx(pat::MET::JetEnUp);
-		tthtree->met__px__shift[1]	= met.shiftedPx(pat::MET::JetEnDown);
-		tthtree->met__px__shift[2]	= met.shiftedPx(pat::MET::JetResUp);
-		tthtree->met__px__shift[3]	= met.shiftedPx(pat::MET::JetResDown);
-		tthtree->met__px__shift[4]	= met.shiftedPx(pat::MET::MuonEnUp);
-		tthtree->met__px__shift[5]	= met.shiftedPx(pat::MET::MuonEnDown);
-		tthtree->met__px__shift[6]	= met.shiftedPx(pat::MET::ElectronEnUp);
-		tthtree->met__px__shift[7]	= met.shiftedPx(pat::MET::ElectronEnDown);
-		tthtree->met__px__shift[8]	= met.shiftedPx(pat::MET::TauEnUp);
-		tthtree->met__px__shift[9]	= met.shiftedPx(pat::MET::TauEnDown);
-		tthtree->met__px__shift[10]	= met.shiftedPx(pat::MET::UnclusteredEnUp);
-		tthtree->met__px__shift[11]	= met.shiftedPx(pat::MET::UnclusteredEnDown);
-
-		// Py
-		tthtree->met__py__shift[0]		= met.shiftedPy(pat::MET::JetEnUp);
-		tthtree->met__py__shift[1]		= met.shiftedPy(pat::MET::JetEnDown);
-		tthtree->met__py__shift[2]		= met.shiftedPy(pat::MET::JetResUp);
-		tthtree->met__py__shift[3]		= met.shiftedPy(pat::MET::JetResDown);
-		tthtree->met__py__shift[4]		= met.shiftedPy(pat::MET::MuonEnUp);
-		tthtree->met__py__shift[5]		= met.shiftedPy(pat::MET::MuonEnDown);
-		tthtree->met__py__shift[6]		= met.shiftedPy(pat::MET::ElectronEnUp);
-		tthtree->met__py__shift[7]		= met.shiftedPy(pat::MET::ElectronEnDown);
-		tthtree->met__py__shift[8]		= met.shiftedPy(pat::MET::TauEnUp);
-		tthtree->met__py__shift[9]		= met.shiftedPy(pat::MET::TauEnDown);
-		tthtree->met__py__shift[10]		= met.shiftedPy(pat::MET::UnclusteredEnUp);
-		tthtree->met__py__shift[11]		= met.shiftedPy(pat::MET::UnclusteredEnDown);
-
-		// Phi
-		tthtree->met__phi__shift[0]		= met.shiftedPhi(pat::MET::JetEnUp);
-		tthtree->met__phi__shift[1]		= met.shiftedPhi(pat::MET::JetEnDown);
-		tthtree->met__phi__shift[2]		= met.shiftedPhi(pat::MET::JetResUp);
-		tthtree->met__phi__shift[3]		= met.shiftedPhi(pat::MET::JetResDown);
-		tthtree->met__phi__shift[4]		= met.shiftedPhi(pat::MET::MuonEnUp);
-		tthtree->met__phi__shift[5]		= met.shiftedPhi(pat::MET::MuonEnDown);
-		tthtree->met__phi__shift[6]		= met.shiftedPhi(pat::MET::ElectronEnUp);
-		tthtree->met__phi__shift[7]		= met.shiftedPhi(pat::MET::ElectronEnDown);
-		tthtree->met__phi__shift[8]		= met.shiftedPhi(pat::MET::TauEnUp);
-		tthtree->met__phi__shift[9]		= met.shiftedPhi(pat::MET::TauEnDown);
-		tthtree->met__phi__shift[10]	= met.shiftedPhi(pat::MET::UnclusteredEnUp);
-		tthtree->met__phi__shift[11]	= met.shiftedPhi(pat::MET::UnclusteredEnDown);
-
-		tthtree->gen_met__pt = met.genMET()->pt();
-		tthtree->gen_met__sumet = met.genMET()->sumEt();
-		tthtree->gen_met__phi = met.genMET()->phi();
-	} //isMC for shifted MET
 
 	//get the LHE gen-level stuff
 	//code from LB --> LHE not always available

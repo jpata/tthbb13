@@ -35,7 +35,8 @@ process.load("RecoBTag.Configuration.RecoBTag_cff") # this loads all available b
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_mc')
+#process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_mc')
+process.GlobalTag = GlobalTag(process.GlobalTag, '76X_mcRun2_asymptotic_RunIIFall15DR76_v0')
 
 
 #process.load("CondCore.DBCommon.CondDBCommon_cfi")
@@ -604,6 +605,91 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
    li_fatjets_branches.append(branch_name)
 
 
+
+#####################################
+# JetCorrectors
+#####################################
+
+# AK8 / PF + CHS
+process.corrL2 = cms.EDProducer(
+    'LXXXCorrectorProducer',
+    level     = cms.string('L2Relative'),
+    algorithm = cms.string('AK8PFchs')
+    )
+
+process.corrL3 = cms.EDProducer(
+    'LXXXCorrectorProducer',
+    level     = cms.string('L3Absolute'),
+    algorithm = cms.string('AK8PFchs')
+    )
+
+# L2L3 
+process.corrL2L3 = cms.EDProducer(
+    'ChainedJetCorrectorProducer',
+    correctors = cms.VInputTag('corrL2','corrL3')
+    )
+process.corrL2L3chain = cms.Sequence(
+    process.corrL2 * process.corrL3 * process.corrL2L3
+)
+
+# AK8 / PUPPI
+process.corrL2Puppi = cms.EDProducer(
+    'LXXXCorrectorProducer',
+    level     = cms.string('L2Relative'),
+    algorithm = cms.string('AK8PFPuppi')
+    )
+
+process.corrL3Puppi = cms.EDProducer(
+    'LXXXCorrectorProducer',
+    level     = cms.string('L3Absolute'),
+    algorithm = cms.string('AK8PFPuppi')
+    )
+
+# L2L3 
+process.corrL2L3Puppi = cms.EDProducer(
+    'ChainedJetCorrectorProducer',
+    correctors = cms.VInputTag('corrL2Puppi','corrL3Puppi')
+    )
+process.corrL2L3Puppichain = cms.Sequence(
+    process.corrL2Puppi * process.corrL3Puppi * process.corrL2L3Puppi
+)
+
+corrector_ak8      = "corrL2L3"
+corrector_ak8Puppi = "corrL2L3Puppi"
+
+li_fatjets_correctors = []
+
+for fj_obj_name in li_fatjets_objects:
+
+   if "forbtag" in fj_obj_name:
+      print "NOT correcting subjets"
+      li_fatjets_correctors.append("None")
+
+   elif "PUPPI" in fj_obj_name:
+      if "ak08" in fj_obj_name:         
+         li_fatjets_correctors.append(corrector_ak8Puppi)
+      elif "ca15" in fj_obj_name:
+         print "NOT correcting CA15 jets"
+         li_fatjets_correctors.append("None")
+      else:
+         print "Could not find algorithm for", fj_obj_name
+         sys.exit()
+
+   elif "CHS" in fj_obj_name:
+      if "ak08" in fj_obj_name:
+         li_fatjets_correctors.append(corrector_ak8)
+      elif "ca15" in fj_obj_name:
+         print "NOT correcting CA15 jets"
+         li_fatjets_correctors.append("None")
+      else:
+         print "Could not find algorithm for", fj_obj_name
+         sys.exit()
+
+   else:
+      print "Could not find algorithm for", fj_obj_name
+      sys.exit()
+
+
 #####################################
 # Flavour Infos
 #####################################
@@ -945,9 +1031,13 @@ for collection in ["fatjets", "cmstt"]:
 
          # Define the names
          impact_info_name          = fatjet_name + "ImpactParameterTagInfos"
-         isv_info_name             = fatjet_name + "pfInclusiveSecondaryVertexFinderTagInfos"        
+         sv_info_name              = fatjet_name + "secondaryVertexTagInfos"
+         isv_info_name             = fatjet_name + "pfInclusiveSecondaryVertexFinderTagInfos"                 
+         soft_mu_info_name         = fatjet_name + "softMuonTagInfos"
+         soft_el_info_name         = fatjet_name + "softPFElectronsTagInfos"
          csvv2_computer_name       = fatjet_name + "combinedSecondaryVertexV2Computer"
          csvv2ivf_name             = fatjet_name + "pfCombinedInclusiveSecondaryVertexV2BJetTags"        
+         cmva_name                 = fatjet_name + "combinedMVAV2BJetTags"
 
          delta_r = GetRadiusFromName(fatjet_name)
 
@@ -1003,11 +1093,51 @@ for collection in ["fatjets", "cmstt"]:
                                              cms.InputTag(isv_info_name)),
                     jetTagComputer = cms.string(csvv2_computer_name,)
                  ))
-
+         
+#         setattr(process,
+#                 sv_info_name,
+#                 process.secondaryVertexTagInfos.clone(
+#                    extSVCollection     = cms.InputTag('slimmedSecondaryVertices'),
+#                    trackIPTagInfos = cms.InputTag(impact_info_name), 
+#                 ))
+#
+#         setattr(process,
+#                 soft_mu_info_name,
+#                 process.softMuonTagInfos.clone(
+#                    primaryVertex = cms.InputTag("offlineSlimmedPrimaryVertices"),
+#                    jets = cms.InputTag(fatjet_name, "SubJets"),
+#                    leptons = cms.InputTag("slimmedMuonds"),
+#                 ))
+#
+#         setattr(process,
+#                 soft_el_info_name,
+#                 process.softPFElectronsTagInfos.clone(
+#                    primaryVertex = cms.InputTag("offlineSlimmedPrimaryVertices"),
+#                    jets = cms.InputTag(fatjet_name, "SubJets"),
+#                    electrons = cms.InputTag("slimmedElectrons"),
+#                    )
+#                 )
+#
+#         setattr(process,
+#                 cmva_name,
+#                 process.combinedMVAV2BJetTags.clone(             
+#                    tagInfos = cms.VInputTag(
+#                       cms.InputTag(impact_info_name), 
+#                       cms.InputTag(sv_info_name), 
+#                       cms.InputTag(isv_info_name),
+#                       cms.InputTag(soft_mu_info_name),
+#                       cms.InputTag(soft_el_info_name))))
+#         
+         
          # Add modules to sequence
-         for module_name in [impact_info_name,
-                             isv_info_name,              
-                             csvv2ivf_name]:              
+         for module_name in [
+               impact_info_name,
+               isv_info_name,              
+               #soft_mu_info_name,
+               #soft_el_info_name,
+               #sv_info_name,
+               #cmva_name,
+               csvv2ivf_name]:              
             process.my_btagging += getattr(process, module_name)
 
          # remember the module that actually produces the b-tag
@@ -1028,35 +1158,6 @@ li_htt_branches = []
 
 for input_object in ["chs", "puppi"]:
    
-#   name = "looseHTT"
-#   if not input_object == "chs":
-#      name += input_object
-#
-#   setattr(process, name, cms.EDProducer(
-#        "HTTTopJetProducer",
-#        PFJetParameters.clone( src = cms.InputTag(input_object),
-#                               doAreaFastjet = cms.bool(True),
-#                               doRhoFastjet = cms.bool(False),
-#                               jetPtMin = cms.double(100.0)
-#                           ),
-#        AnomalousCellParameters,
-#        optimalR = cms.bool(False),
-#        algorithm = cms.int32(1),
-#        jetAlgorithm = cms.string("CambridgeAachen"),
-#        rParam = cms.double(1.5),
-#        mode = cms.int32(4),
-#        minFatjetPt = cms.double(200.),
-#        minCandPt = cms.double(200.),
-#        minSubjetPt = cms.double(30.),
-#        writeCompound = cms.bool(True),
-#        minCandMass = cms.double(0.),
-#        maxCandMass = cms.double(1000),
-#        massRatioWidth = cms.double(100.),
-#        minM23Cut = cms.double(0.),
-#        minM13Cut = cms.double(0.),
-#        maxM13Cut = cms.double(2.)))
-#   li_htt_branches.append(name)
-
    name = "looseOptRHTT"
    if not input_object == "chs":
       name += input_object
@@ -1088,37 +1189,6 @@ for input_object in ["chs", "puppi"]:
    li_htt_branches.append(name)
 
 
-process.ak4pfchsL1Fastjet = cms.ESProducer(
-   'L1FastjetCorrectionESProducer',
-   level = cms.string('L1FastJet'),
-   algorithm = cms.string('AK4PFchs'),
-   srcRho = cms.InputTag( 'fixedGridRhoFastjetAll' )
-     )
- 
-process.ak4pfchsL2Relative = cms.ESProducer(
-   'LXXXCorrectionESProducer',
-   level     = cms.string('L2Relative'),
-   algorithm = cms.string('AK4PFchs')
-)
-
-process.ak4pfchsL3Absolute = cms.ESProducer(
-   'LXXXCorrectionESProducer',
-   level     = cms.string('L3Absolute'),
-   algorithm = cms.string('AK4PFchs')
-)
-
-
-process.ak4pfchsL1L2L3 = cms.ESProducer(
-   'JetCorrectionESChain',
-   correctors = cms.vstring('ak4pfchsL1Fastjet', 
-                            'ak4pfchsL2Relative', 
-                            'ak4pfchsL3Absolute')
-)
-
-process.foojets = cms.EDProducer('PFJetCorrectionProducer',
-    src         = cms.InputTag('looseOptRHTT', 'SubJets'),
-    correctors  = cms.vstring('ak4pfchsL1L2L3'))
-
 #####################################
 # NTupelizer
 #####################################
@@ -1129,7 +1199,6 @@ for fj in li_fatjets_objects:
       li_fatjets_use_subjets.append(1)
    else:
       li_fatjets_use_subjets.append(0)
-
 
 process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
 	isMC = cms.bool(True),
@@ -1155,7 +1224,8 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
         fatjetsBranches = cms.vstring(li_fatjets_branches),
         fatjetsUsesubjets = cms.vint32(li_fatjets_use_subjets),                                           
         fatjetsFlavourInfos = cms.vstring(li_fatjets_flavour_infos),                                           
-
+        fatjetsCorrectors   = cms.vstring(li_fatjets_correctors),                                           
+        
         httObjects  = cms.vstring(li_htt_branches), # Using branch names also as object names
         httBranches = cms.vstring(li_htt_branches),                                           
                                            
@@ -1236,7 +1306,8 @@ for x in li_cmstt_objects + li_cmstt_infos:
 #process.p += process.jetFlavourInfos
 #process.p += process.printEvent
 
-#process.p += process.foojets
+process.p += process.corrL2L3chain
+process.p += process.corrL2L3Puppichain
 
 # Schedule b-tagging and Ntupelizer
 for x in [process.my_btagging,

@@ -267,6 +267,7 @@ public:
 	float jet_ak08__eta[N_MAX];
 	float jet_ak08__phi[N_MAX];
 	float jet_ak08__mass[N_MAX];
+	float jet_ak08__masscal[N_MAX];
 	float jet_ak08__tau1[N_MAX];
 	float jet_ak08__tau2[N_MAX];
 	float jet_ak08__tau3[N_MAX];
@@ -297,6 +298,7 @@ public:
 	float jet_ak08puppi__eta[N_MAX];
 	float jet_ak08puppi__phi[N_MAX];
 	float jet_ak08puppi__mass[N_MAX];
+	float jet_ak08puppi__masscal[N_MAX];
 	float jet_ak08puppi__tau1[N_MAX];
 	float jet_ak08puppi__tau2[N_MAX];
 	float jet_ak08puppi__tau3[N_MAX];
@@ -327,6 +329,7 @@ public:
 	float jet_ak08trimmedr2f3forbtag__eta[N_MAX];
 	float jet_ak08trimmedr2f3forbtag__phi[N_MAX];
 	float jet_ak08trimmedr2f3forbtag__mass[N_MAX];
+	float jet_ak08trimmedr2f3forbtag__masscal[N_MAX];
 	float jet_ak08trimmedr2f3forbtag__tau1[N_MAX];
 	float jet_ak08trimmedr2f3forbtag__tau2[N_MAX];
 	float jet_ak08trimmedr2f3forbtag__tau3[N_MAX];
@@ -357,6 +360,7 @@ public:
 	float jet_ak08trimmedr2f6forbtag__eta[N_MAX];
 	float jet_ak08trimmedr2f6forbtag__phi[N_MAX];
 	float jet_ak08trimmedr2f6forbtag__mass[N_MAX];
+	float jet_ak08trimmedr2f6forbtag__masscal[N_MAX];
 	float jet_ak08trimmedr2f6forbtag__tau1[N_MAX];
 	float jet_ak08trimmedr2f6forbtag__tau2[N_MAX];
 	float jet_ak08trimmedr2f6forbtag__tau3[N_MAX];
@@ -387,6 +391,7 @@ public:
 	float jet_ak08softdropz10b00forbtag__eta[N_MAX];
 	float jet_ak08softdropz10b00forbtag__phi[N_MAX];
 	float jet_ak08softdropz10b00forbtag__mass[N_MAX];
+	float jet_ak08softdropz10b00forbtag__masscal[N_MAX];
 	float jet_ak08softdropz10b00forbtag__tau1[N_MAX];
 	float jet_ak08softdropz10b00forbtag__tau2[N_MAX];
 	float jet_ak08softdropz10b00forbtag__tau3[N_MAX];
@@ -417,6 +422,7 @@ public:
 	float jet_ak08softdropz20b10forbtag__eta[N_MAX];
 	float jet_ak08softdropz20b10forbtag__phi[N_MAX];
 	float jet_ak08softdropz20b10forbtag__mass[N_MAX];
+	float jet_ak08softdropz20b10forbtag__masscal[N_MAX];
 	float jet_ak08softdropz20b10forbtag__tau1[N_MAX];
 	float jet_ak08softdropz20b10forbtag__tau2[N_MAX];
 	float jet_ak08softdropz20b10forbtag__tau3[N_MAX];
@@ -447,6 +453,7 @@ public:
 	float jet_ak08filteredn3r2forbtag__eta[N_MAX];
 	float jet_ak08filteredn3r2forbtag__phi[N_MAX];
 	float jet_ak08filteredn3r2forbtag__mass[N_MAX];
+	float jet_ak08filteredn3r2forbtag__masscal[N_MAX];
 	float jet_ak08filteredn3r2forbtag__tau1[N_MAX];
 	float jet_ak08filteredn3r2forbtag__tau2[N_MAX];
 	float jet_ak08filteredn3r2forbtag__tau3[N_MAX];
@@ -477,6 +484,7 @@ public:
 	float jet_ak08filteredn3r3forbtag__eta[N_MAX];
 	float jet_ak08filteredn3r3forbtag__phi[N_MAX];
 	float jet_ak08filteredn3r3forbtag__mass[N_MAX];
+	float jet_ak08filteredn3r3forbtag__masscal[N_MAX];
 	float jet_ak08filteredn3r3forbtag__tau1[N_MAX];
 	float jet_ak08filteredn3r3forbtag__tau2[N_MAX];
 	float jet_ak08filteredn3r3forbtag__tau3[N_MAX];
@@ -507,6 +515,7 @@ public:
 	float jet_ak08prunedn3z10rfac50forbtag__eta[N_MAX];
 	float jet_ak08prunedn3z10rfac50forbtag__phi[N_MAX];
 	float jet_ak08prunedn3z10rfac50forbtag__mass[N_MAX];
+	float jet_ak08prunedn3z10rfac50forbtag__masscal[N_MAX];
 	float jet_ak08prunedn3z10rfac50forbtag__tau1[N_MAX];
 	float jet_ak08prunedn3z10rfac50forbtag__tau2[N_MAX];
 	float jet_ak08prunedn3z10rfac50forbtag__tau3[N_MAX];
@@ -537,6 +546,7 @@ public:
 	float jet_ak08filteredn3r2__eta[N_MAX];
 	float jet_ak08filteredn3r2__phi[N_MAX];
 	float jet_ak08filteredn3r2__mass[N_MAX];
+	float jet_ak08filteredn3r2__masscal[N_MAX];
 	float jet_ak08filteredn3r2__tau1[N_MAX];
 	float jet_ak08filteredn3r2__tau2[N_MAX];
 	float jet_ak08filteredn3r2__tau3[N_MAX];
@@ -567,6 +577,7 @@ public:
 	float jet_ak08filteredn3r3__eta[N_MAX];
 	float jet_ak08filteredn3r3__phi[N_MAX];
 	float jet_ak08filteredn3r3__mass[N_MAX];
+	float jet_ak08filteredn3r3__masscal[N_MAX];
 	float jet_ak08filteredn3r3__tau1[N_MAX];
 	float jet_ak08filteredn3r3__tau2[N_MAX];
 	float jet_ak08filteredn3r3__tau3[N_MAX];
@@ -597,6 +608,7 @@ public:
 	float jet_ak08filteredn5r2__eta[N_MAX];
 	float jet_ak08filteredn5r2__phi[N_MAX];
 	float jet_ak08filteredn5r2__mass[N_MAX];
+	float jet_ak08filteredn5r2__masscal[N_MAX];
 	float jet_ak08filteredn5r2__tau1[N_MAX];
 	float jet_ak08filteredn5r2__tau2[N_MAX];
 	float jet_ak08filteredn5r2__tau3[N_MAX];
@@ -627,6 +639,7 @@ public:
 	float jet_ak08prunedn3z10rfac50__eta[N_MAX];
 	float jet_ak08prunedn3z10rfac50__phi[N_MAX];
 	float jet_ak08prunedn3z10rfac50__mass[N_MAX];
+	float jet_ak08prunedn3z10rfac50__masscal[N_MAX];
 	float jet_ak08prunedn3z10rfac50__tau1[N_MAX];
 	float jet_ak08prunedn3z10rfac50__tau2[N_MAX];
 	float jet_ak08prunedn3z10rfac50__tau3[N_MAX];
@@ -657,6 +670,7 @@ public:
 	float jet_ak08trimmedr2f3__eta[N_MAX];
 	float jet_ak08trimmedr2f3__phi[N_MAX];
 	float jet_ak08trimmedr2f3__mass[N_MAX];
+	float jet_ak08trimmedr2f3__masscal[N_MAX];
 	float jet_ak08trimmedr2f3__tau1[N_MAX];
 	float jet_ak08trimmedr2f3__tau2[N_MAX];
 	float jet_ak08trimmedr2f3__tau3[N_MAX];
@@ -687,6 +701,7 @@ public:
 	float jet_ak08trimmedr2f6__eta[N_MAX];
 	float jet_ak08trimmedr2f6__phi[N_MAX];
 	float jet_ak08trimmedr2f6__mass[N_MAX];
+	float jet_ak08trimmedr2f6__masscal[N_MAX];
 	float jet_ak08trimmedr2f6__tau1[N_MAX];
 	float jet_ak08trimmedr2f6__tau2[N_MAX];
 	float jet_ak08trimmedr2f6__tau3[N_MAX];
@@ -717,6 +732,7 @@ public:
 	float jet_ak08trimmedr2f9__eta[N_MAX];
 	float jet_ak08trimmedr2f9__phi[N_MAX];
 	float jet_ak08trimmedr2f9__mass[N_MAX];
+	float jet_ak08trimmedr2f9__masscal[N_MAX];
 	float jet_ak08trimmedr2f9__tau1[N_MAX];
 	float jet_ak08trimmedr2f9__tau2[N_MAX];
 	float jet_ak08trimmedr2f9__tau3[N_MAX];
@@ -747,6 +763,7 @@ public:
 	float jet_ak08softdropz10bm10__eta[N_MAX];
 	float jet_ak08softdropz10bm10__phi[N_MAX];
 	float jet_ak08softdropz10bm10__mass[N_MAX];
+	float jet_ak08softdropz10bm10__masscal[N_MAX];
 	float jet_ak08softdropz10bm10__tau1[N_MAX];
 	float jet_ak08softdropz10bm10__tau2[N_MAX];
 	float jet_ak08softdropz10bm10__tau3[N_MAX];
@@ -777,6 +794,7 @@ public:
 	float jet_ak08softdropz10b00__eta[N_MAX];
 	float jet_ak08softdropz10b00__phi[N_MAX];
 	float jet_ak08softdropz10b00__mass[N_MAX];
+	float jet_ak08softdropz10b00__masscal[N_MAX];
 	float jet_ak08softdropz10b00__tau1[N_MAX];
 	float jet_ak08softdropz10b00__tau2[N_MAX];
 	float jet_ak08softdropz10b00__tau3[N_MAX];
@@ -807,6 +825,7 @@ public:
 	float jet_ak08softdropz10b10__eta[N_MAX];
 	float jet_ak08softdropz10b10__phi[N_MAX];
 	float jet_ak08softdropz10b10__mass[N_MAX];
+	float jet_ak08softdropz10b10__masscal[N_MAX];
 	float jet_ak08softdropz10b10__tau1[N_MAX];
 	float jet_ak08softdropz10b10__tau2[N_MAX];
 	float jet_ak08softdropz10b10__tau3[N_MAX];
@@ -837,6 +856,7 @@ public:
 	float jet_ak08softdropz10b20__eta[N_MAX];
 	float jet_ak08softdropz10b20__phi[N_MAX];
 	float jet_ak08softdropz10b20__mass[N_MAX];
+	float jet_ak08softdropz10b20__masscal[N_MAX];
 	float jet_ak08softdropz10b20__tau1[N_MAX];
 	float jet_ak08softdropz10b20__tau2[N_MAX];
 	float jet_ak08softdropz10b20__tau3[N_MAX];
@@ -867,6 +887,7 @@ public:
 	float jet_ak08softdropz15bm10__eta[N_MAX];
 	float jet_ak08softdropz15bm10__phi[N_MAX];
 	float jet_ak08softdropz15bm10__mass[N_MAX];
+	float jet_ak08softdropz15bm10__masscal[N_MAX];
 	float jet_ak08softdropz15bm10__tau1[N_MAX];
 	float jet_ak08softdropz15bm10__tau2[N_MAX];
 	float jet_ak08softdropz15bm10__tau3[N_MAX];
@@ -897,6 +918,7 @@ public:
 	float jet_ak08softdropz15b00__eta[N_MAX];
 	float jet_ak08softdropz15b00__phi[N_MAX];
 	float jet_ak08softdropz15b00__mass[N_MAX];
+	float jet_ak08softdropz15b00__masscal[N_MAX];
 	float jet_ak08softdropz15b00__tau1[N_MAX];
 	float jet_ak08softdropz15b00__tau2[N_MAX];
 	float jet_ak08softdropz15b00__tau3[N_MAX];
@@ -927,6 +949,7 @@ public:
 	float jet_ak08softdropz15b10__eta[N_MAX];
 	float jet_ak08softdropz15b10__phi[N_MAX];
 	float jet_ak08softdropz15b10__mass[N_MAX];
+	float jet_ak08softdropz15b10__masscal[N_MAX];
 	float jet_ak08softdropz15b10__tau1[N_MAX];
 	float jet_ak08softdropz15b10__tau2[N_MAX];
 	float jet_ak08softdropz15b10__tau3[N_MAX];
@@ -957,6 +980,7 @@ public:
 	float jet_ak08softdropz15b20__eta[N_MAX];
 	float jet_ak08softdropz15b20__phi[N_MAX];
 	float jet_ak08softdropz15b20__mass[N_MAX];
+	float jet_ak08softdropz15b20__masscal[N_MAX];
 	float jet_ak08softdropz15b20__tau1[N_MAX];
 	float jet_ak08softdropz15b20__tau2[N_MAX];
 	float jet_ak08softdropz15b20__tau3[N_MAX];
@@ -987,6 +1011,7 @@ public:
 	float jet_ak08softdropz20b00__eta[N_MAX];
 	float jet_ak08softdropz20b00__phi[N_MAX];
 	float jet_ak08softdropz20b00__mass[N_MAX];
+	float jet_ak08softdropz20b00__masscal[N_MAX];
 	float jet_ak08softdropz20b00__tau1[N_MAX];
 	float jet_ak08softdropz20b00__tau2[N_MAX];
 	float jet_ak08softdropz20b00__tau3[N_MAX];
@@ -1017,6 +1042,7 @@ public:
 	float jet_ak08softdropz20bm10__eta[N_MAX];
 	float jet_ak08softdropz20bm10__phi[N_MAX];
 	float jet_ak08softdropz20bm10__mass[N_MAX];
+	float jet_ak08softdropz20bm10__masscal[N_MAX];
 	float jet_ak08softdropz20bm10__tau1[N_MAX];
 	float jet_ak08softdropz20bm10__tau2[N_MAX];
 	float jet_ak08softdropz20bm10__tau3[N_MAX];
@@ -1047,6 +1073,7 @@ public:
 	float jet_ak08softdropz20b10__eta[N_MAX];
 	float jet_ak08softdropz20b10__phi[N_MAX];
 	float jet_ak08softdropz20b10__mass[N_MAX];
+	float jet_ak08softdropz20b10__masscal[N_MAX];
 	float jet_ak08softdropz20b10__tau1[N_MAX];
 	float jet_ak08softdropz20b10__tau2[N_MAX];
 	float jet_ak08softdropz20b10__tau3[N_MAX];
@@ -1077,6 +1104,7 @@ public:
 	float jet_ak08softdropz20b20__eta[N_MAX];
 	float jet_ak08softdropz20b20__phi[N_MAX];
 	float jet_ak08softdropz20b20__mass[N_MAX];
+	float jet_ak08softdropz20b20__masscal[N_MAX];
 	float jet_ak08softdropz20b20__tau1[N_MAX];
 	float jet_ak08softdropz20b20__tau2[N_MAX];
 	float jet_ak08softdropz20b20__tau3[N_MAX];
@@ -1107,6 +1135,7 @@ public:
 	float jet_ak08puppitrimmedr2f3forbtag__eta[N_MAX];
 	float jet_ak08puppitrimmedr2f3forbtag__phi[N_MAX];
 	float jet_ak08puppitrimmedr2f3forbtag__mass[N_MAX];
+	float jet_ak08puppitrimmedr2f3forbtag__masscal[N_MAX];
 	float jet_ak08puppitrimmedr2f3forbtag__tau1[N_MAX];
 	float jet_ak08puppitrimmedr2f3forbtag__tau2[N_MAX];
 	float jet_ak08puppitrimmedr2f3forbtag__tau3[N_MAX];
@@ -1137,6 +1166,7 @@ public:
 	float jet_ak08puppitrimmedr2f6forbtag__eta[N_MAX];
 	float jet_ak08puppitrimmedr2f6forbtag__phi[N_MAX];
 	float jet_ak08puppitrimmedr2f6forbtag__mass[N_MAX];
+	float jet_ak08puppitrimmedr2f6forbtag__masscal[N_MAX];
 	float jet_ak08puppitrimmedr2f6forbtag__tau1[N_MAX];
 	float jet_ak08puppitrimmedr2f6forbtag__tau2[N_MAX];
 	float jet_ak08puppitrimmedr2f6forbtag__tau3[N_MAX];
@@ -1167,6 +1197,7 @@ public:
 	float jet_ak08puppisoftdropz10b00forbtag__eta[N_MAX];
 	float jet_ak08puppisoftdropz10b00forbtag__phi[N_MAX];
 	float jet_ak08puppisoftdropz10b00forbtag__mass[N_MAX];
+	float jet_ak08puppisoftdropz10b00forbtag__masscal[N_MAX];
 	float jet_ak08puppisoftdropz10b00forbtag__tau1[N_MAX];
 	float jet_ak08puppisoftdropz10b00forbtag__tau2[N_MAX];
 	float jet_ak08puppisoftdropz10b00forbtag__tau3[N_MAX];
@@ -1197,6 +1228,7 @@ public:
 	float jet_ak08puppisoftdropz20b10forbtag__eta[N_MAX];
 	float jet_ak08puppisoftdropz20b10forbtag__phi[N_MAX];
 	float jet_ak08puppisoftdropz20b10forbtag__mass[N_MAX];
+	float jet_ak08puppisoftdropz20b10forbtag__masscal[N_MAX];
 	float jet_ak08puppisoftdropz20b10forbtag__tau1[N_MAX];
 	float jet_ak08puppisoftdropz20b10forbtag__tau2[N_MAX];
 	float jet_ak08puppisoftdropz20b10forbtag__tau3[N_MAX];
@@ -1227,6 +1259,7 @@ public:
 	float jet_ak08puppifilteredn3r2forbtag__eta[N_MAX];
 	float jet_ak08puppifilteredn3r2forbtag__phi[N_MAX];
 	float jet_ak08puppifilteredn3r2forbtag__mass[N_MAX];
+	float jet_ak08puppifilteredn3r2forbtag__masscal[N_MAX];
 	float jet_ak08puppifilteredn3r2forbtag__tau1[N_MAX];
 	float jet_ak08puppifilteredn3r2forbtag__tau2[N_MAX];
 	float jet_ak08puppifilteredn3r2forbtag__tau3[N_MAX];
@@ -1257,6 +1290,7 @@ public:
 	float jet_ak08puppifilteredn3r3forbtag__eta[N_MAX];
 	float jet_ak08puppifilteredn3r3forbtag__phi[N_MAX];
 	float jet_ak08puppifilteredn3r3forbtag__mass[N_MAX];
+	float jet_ak08puppifilteredn3r3forbtag__masscal[N_MAX];
 	float jet_ak08puppifilteredn3r3forbtag__tau1[N_MAX];
 	float jet_ak08puppifilteredn3r3forbtag__tau2[N_MAX];
 	float jet_ak08puppifilteredn3r3forbtag__tau3[N_MAX];
@@ -1287,6 +1321,7 @@ public:
 	float jet_ak08puppiprunedn3z10rfac50forbtag__eta[N_MAX];
 	float jet_ak08puppiprunedn3z10rfac50forbtag__phi[N_MAX];
 	float jet_ak08puppiprunedn3z10rfac50forbtag__mass[N_MAX];
+	float jet_ak08puppiprunedn3z10rfac50forbtag__masscal[N_MAX];
 	float jet_ak08puppiprunedn3z10rfac50forbtag__tau1[N_MAX];
 	float jet_ak08puppiprunedn3z10rfac50forbtag__tau2[N_MAX];
 	float jet_ak08puppiprunedn3z10rfac50forbtag__tau3[N_MAX];
@@ -1317,6 +1352,7 @@ public:
 	float jet_ak08puppifilteredn3r2__eta[N_MAX];
 	float jet_ak08puppifilteredn3r2__phi[N_MAX];
 	float jet_ak08puppifilteredn3r2__mass[N_MAX];
+	float jet_ak08puppifilteredn3r2__masscal[N_MAX];
 	float jet_ak08puppifilteredn3r2__tau1[N_MAX];
 	float jet_ak08puppifilteredn3r2__tau2[N_MAX];
 	float jet_ak08puppifilteredn3r2__tau3[N_MAX];
@@ -1347,6 +1383,7 @@ public:
 	float jet_ak08puppifilteredn3r3__eta[N_MAX];
 	float jet_ak08puppifilteredn3r3__phi[N_MAX];
 	float jet_ak08puppifilteredn3r3__mass[N_MAX];
+	float jet_ak08puppifilteredn3r3__masscal[N_MAX];
 	float jet_ak08puppifilteredn3r3__tau1[N_MAX];
 	float jet_ak08puppifilteredn3r3__tau2[N_MAX];
 	float jet_ak08puppifilteredn3r3__tau3[N_MAX];
@@ -1377,6 +1414,7 @@ public:
 	float jet_ak08puppifilteredn5r2__eta[N_MAX];
 	float jet_ak08puppifilteredn5r2__phi[N_MAX];
 	float jet_ak08puppifilteredn5r2__mass[N_MAX];
+	float jet_ak08puppifilteredn5r2__masscal[N_MAX];
 	float jet_ak08puppifilteredn5r2__tau1[N_MAX];
 	float jet_ak08puppifilteredn5r2__tau2[N_MAX];
 	float jet_ak08puppifilteredn5r2__tau3[N_MAX];
@@ -1407,6 +1445,7 @@ public:
 	float jet_ak08puppiprunedn3z10rfac50__eta[N_MAX];
 	float jet_ak08puppiprunedn3z10rfac50__phi[N_MAX];
 	float jet_ak08puppiprunedn3z10rfac50__mass[N_MAX];
+	float jet_ak08puppiprunedn3z10rfac50__masscal[N_MAX];
 	float jet_ak08puppiprunedn3z10rfac50__tau1[N_MAX];
 	float jet_ak08puppiprunedn3z10rfac50__tau2[N_MAX];
 	float jet_ak08puppiprunedn3z10rfac50__tau3[N_MAX];
@@ -1437,6 +1476,7 @@ public:
 	float jet_ak08puppitrimmedr2f3__eta[N_MAX];
 	float jet_ak08puppitrimmedr2f3__phi[N_MAX];
 	float jet_ak08puppitrimmedr2f3__mass[N_MAX];
+	float jet_ak08puppitrimmedr2f3__masscal[N_MAX];
 	float jet_ak08puppitrimmedr2f3__tau1[N_MAX];
 	float jet_ak08puppitrimmedr2f3__tau2[N_MAX];
 	float jet_ak08puppitrimmedr2f3__tau3[N_MAX];
@@ -1467,6 +1507,7 @@ public:
 	float jet_ak08puppitrimmedr2f6__eta[N_MAX];
 	float jet_ak08puppitrimmedr2f6__phi[N_MAX];
 	float jet_ak08puppitrimmedr2f6__mass[N_MAX];
+	float jet_ak08puppitrimmedr2f6__masscal[N_MAX];
 	float jet_ak08puppitrimmedr2f6__tau1[N_MAX];
 	float jet_ak08puppitrimmedr2f6__tau2[N_MAX];
 	float jet_ak08puppitrimmedr2f6__tau3[N_MAX];
@@ -1497,6 +1538,7 @@ public:
 	float jet_ak08puppitrimmedr2f9__eta[N_MAX];
 	float jet_ak08puppitrimmedr2f9__phi[N_MAX];
 	float jet_ak08puppitrimmedr2f9__mass[N_MAX];
+	float jet_ak08puppitrimmedr2f9__masscal[N_MAX];
 	float jet_ak08puppitrimmedr2f9__tau1[N_MAX];
 	float jet_ak08puppitrimmedr2f9__tau2[N_MAX];
 	float jet_ak08puppitrimmedr2f9__tau3[N_MAX];
@@ -1527,6 +1569,7 @@ public:
 	float jet_ak08puppisoftdropz10bm10__eta[N_MAX];
 	float jet_ak08puppisoftdropz10bm10__phi[N_MAX];
 	float jet_ak08puppisoftdropz10bm10__mass[N_MAX];
+	float jet_ak08puppisoftdropz10bm10__masscal[N_MAX];
 	float jet_ak08puppisoftdropz10bm10__tau1[N_MAX];
 	float jet_ak08puppisoftdropz10bm10__tau2[N_MAX];
 	float jet_ak08puppisoftdropz10bm10__tau3[N_MAX];
@@ -1557,6 +1600,7 @@ public:
 	float jet_ak08puppisoftdropz10b00__eta[N_MAX];
 	float jet_ak08puppisoftdropz10b00__phi[N_MAX];
 	float jet_ak08puppisoftdropz10b00__mass[N_MAX];
+	float jet_ak08puppisoftdropz10b00__masscal[N_MAX];
 	float jet_ak08puppisoftdropz10b00__tau1[N_MAX];
 	float jet_ak08puppisoftdropz10b00__tau2[N_MAX];
 	float jet_ak08puppisoftdropz10b00__tau3[N_MAX];
@@ -1587,6 +1631,7 @@ public:
 	float jet_ak08puppisoftdropz10b10__eta[N_MAX];
 	float jet_ak08puppisoftdropz10b10__phi[N_MAX];
 	float jet_ak08puppisoftdropz10b10__mass[N_MAX];
+	float jet_ak08puppisoftdropz10b10__masscal[N_MAX];
 	float jet_ak08puppisoftdropz10b10__tau1[N_MAX];
 	float jet_ak08puppisoftdropz10b10__tau2[N_MAX];
 	float jet_ak08puppisoftdropz10b10__tau3[N_MAX];
@@ -1617,6 +1662,7 @@ public:
 	float jet_ak08puppisoftdropz10b20__eta[N_MAX];
 	float jet_ak08puppisoftdropz10b20__phi[N_MAX];
 	float jet_ak08puppisoftdropz10b20__mass[N_MAX];
+	float jet_ak08puppisoftdropz10b20__masscal[N_MAX];
 	float jet_ak08puppisoftdropz10b20__tau1[N_MAX];
 	float jet_ak08puppisoftdropz10b20__tau2[N_MAX];
 	float jet_ak08puppisoftdropz10b20__tau3[N_MAX];
@@ -1647,6 +1693,7 @@ public:
 	float jet_ak08puppisoftdropz15bm10__eta[N_MAX];
 	float jet_ak08puppisoftdropz15bm10__phi[N_MAX];
 	float jet_ak08puppisoftdropz15bm10__mass[N_MAX];
+	float jet_ak08puppisoftdropz15bm10__masscal[N_MAX];
 	float jet_ak08puppisoftdropz15bm10__tau1[N_MAX];
 	float jet_ak08puppisoftdropz15bm10__tau2[N_MAX];
 	float jet_ak08puppisoftdropz15bm10__tau3[N_MAX];
@@ -1677,6 +1724,7 @@ public:
 	float jet_ak08puppisoftdropz15b00__eta[N_MAX];
 	float jet_ak08puppisoftdropz15b00__phi[N_MAX];
 	float jet_ak08puppisoftdropz15b00__mass[N_MAX];
+	float jet_ak08puppisoftdropz15b00__masscal[N_MAX];
 	float jet_ak08puppisoftdropz15b00__tau1[N_MAX];
 	float jet_ak08puppisoftdropz15b00__tau2[N_MAX];
 	float jet_ak08puppisoftdropz15b00__tau3[N_MAX];
@@ -1707,6 +1755,7 @@ public:
 	float jet_ak08puppisoftdropz15b10__eta[N_MAX];
 	float jet_ak08puppisoftdropz15b10__phi[N_MAX];
 	float jet_ak08puppisoftdropz15b10__mass[N_MAX];
+	float jet_ak08puppisoftdropz15b10__masscal[N_MAX];
 	float jet_ak08puppisoftdropz15b10__tau1[N_MAX];
 	float jet_ak08puppisoftdropz15b10__tau2[N_MAX];
 	float jet_ak08puppisoftdropz15b10__tau3[N_MAX];
@@ -1737,6 +1786,7 @@ public:
 	float jet_ak08puppisoftdropz15b20__eta[N_MAX];
 	float jet_ak08puppisoftdropz15b20__phi[N_MAX];
 	float jet_ak08puppisoftdropz15b20__mass[N_MAX];
+	float jet_ak08puppisoftdropz15b20__masscal[N_MAX];
 	float jet_ak08puppisoftdropz15b20__tau1[N_MAX];
 	float jet_ak08puppisoftdropz15b20__tau2[N_MAX];
 	float jet_ak08puppisoftdropz15b20__tau3[N_MAX];
@@ -1767,6 +1817,7 @@ public:
 	float jet_ak08puppisoftdropz20b00__eta[N_MAX];
 	float jet_ak08puppisoftdropz20b00__phi[N_MAX];
 	float jet_ak08puppisoftdropz20b00__mass[N_MAX];
+	float jet_ak08puppisoftdropz20b00__masscal[N_MAX];
 	float jet_ak08puppisoftdropz20b00__tau1[N_MAX];
 	float jet_ak08puppisoftdropz20b00__tau2[N_MAX];
 	float jet_ak08puppisoftdropz20b00__tau3[N_MAX];
@@ -1797,6 +1848,7 @@ public:
 	float jet_ak08puppisoftdropz20bm10__eta[N_MAX];
 	float jet_ak08puppisoftdropz20bm10__phi[N_MAX];
 	float jet_ak08puppisoftdropz20bm10__mass[N_MAX];
+	float jet_ak08puppisoftdropz20bm10__masscal[N_MAX];
 	float jet_ak08puppisoftdropz20bm10__tau1[N_MAX];
 	float jet_ak08puppisoftdropz20bm10__tau2[N_MAX];
 	float jet_ak08puppisoftdropz20bm10__tau3[N_MAX];
@@ -1827,6 +1879,7 @@ public:
 	float jet_ak08puppisoftdropz20b10__eta[N_MAX];
 	float jet_ak08puppisoftdropz20b10__phi[N_MAX];
 	float jet_ak08puppisoftdropz20b10__mass[N_MAX];
+	float jet_ak08puppisoftdropz20b10__masscal[N_MAX];
 	float jet_ak08puppisoftdropz20b10__tau1[N_MAX];
 	float jet_ak08puppisoftdropz20b10__tau2[N_MAX];
 	float jet_ak08puppisoftdropz20b10__tau3[N_MAX];
@@ -1857,6 +1910,7 @@ public:
 	float jet_ak08puppisoftdropz20b20__eta[N_MAX];
 	float jet_ak08puppisoftdropz20b20__phi[N_MAX];
 	float jet_ak08puppisoftdropz20b20__mass[N_MAX];
+	float jet_ak08puppisoftdropz20b20__masscal[N_MAX];
 	float jet_ak08puppisoftdropz20b20__tau1[N_MAX];
 	float jet_ak08puppisoftdropz20b20__tau2[N_MAX];
 	float jet_ak08puppisoftdropz20b20__tau3[N_MAX];
@@ -2264,6 +2318,7 @@ public:
 		SET_ZERO(jet_ak08__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -2294,6 +2349,7 @@ public:
 		SET_ZERO(jet_ak08puppi__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppi__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppi__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08puppi__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppi__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppi__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppi__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -2324,6 +2380,7 @@ public:
 		SET_ZERO(jet_ak08trimmedr2f3forbtag__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08trimmedr2f3forbtag__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08trimmedr2f3forbtag__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08trimmedr2f3forbtag__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08trimmedr2f3forbtag__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08trimmedr2f3forbtag__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08trimmedr2f3forbtag__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -2354,6 +2411,7 @@ public:
 		SET_ZERO(jet_ak08trimmedr2f6forbtag__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08trimmedr2f6forbtag__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08trimmedr2f6forbtag__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08trimmedr2f6forbtag__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08trimmedr2f6forbtag__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08trimmedr2f6forbtag__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08trimmedr2f6forbtag__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -2384,6 +2442,7 @@ public:
 		SET_ZERO(jet_ak08softdropz10b00forbtag__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz10b00forbtag__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz10b00forbtag__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08softdropz10b00forbtag__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz10b00forbtag__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz10b00forbtag__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz10b00forbtag__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -2414,6 +2473,7 @@ public:
 		SET_ZERO(jet_ak08softdropz20b10forbtag__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz20b10forbtag__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz20b10forbtag__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08softdropz20b10forbtag__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz20b10forbtag__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz20b10forbtag__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz20b10forbtag__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -2444,6 +2504,7 @@ public:
 		SET_ZERO(jet_ak08filteredn3r2forbtag__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08filteredn3r2forbtag__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08filteredn3r2forbtag__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08filteredn3r2forbtag__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08filteredn3r2forbtag__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08filteredn3r2forbtag__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08filteredn3r2forbtag__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -2474,6 +2535,7 @@ public:
 		SET_ZERO(jet_ak08filteredn3r3forbtag__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08filteredn3r3forbtag__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08filteredn3r3forbtag__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08filteredn3r3forbtag__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08filteredn3r3forbtag__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08filteredn3r3forbtag__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08filteredn3r3forbtag__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -2504,6 +2566,7 @@ public:
 		SET_ZERO(jet_ak08prunedn3z10rfac50forbtag__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08prunedn3z10rfac50forbtag__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08prunedn3z10rfac50forbtag__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08prunedn3z10rfac50forbtag__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08prunedn3z10rfac50forbtag__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08prunedn3z10rfac50forbtag__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08prunedn3z10rfac50forbtag__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -2534,6 +2597,7 @@ public:
 		SET_ZERO(jet_ak08filteredn3r2__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08filteredn3r2__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08filteredn3r2__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08filteredn3r2__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08filteredn3r2__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08filteredn3r2__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08filteredn3r2__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -2564,6 +2628,7 @@ public:
 		SET_ZERO(jet_ak08filteredn3r3__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08filteredn3r3__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08filteredn3r3__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08filteredn3r3__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08filteredn3r3__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08filteredn3r3__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08filteredn3r3__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -2594,6 +2659,7 @@ public:
 		SET_ZERO(jet_ak08filteredn5r2__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08filteredn5r2__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08filteredn5r2__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08filteredn5r2__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08filteredn5r2__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08filteredn5r2__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08filteredn5r2__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -2624,6 +2690,7 @@ public:
 		SET_ZERO(jet_ak08prunedn3z10rfac50__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08prunedn3z10rfac50__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08prunedn3z10rfac50__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08prunedn3z10rfac50__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08prunedn3z10rfac50__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08prunedn3z10rfac50__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08prunedn3z10rfac50__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -2654,6 +2721,7 @@ public:
 		SET_ZERO(jet_ak08trimmedr2f3__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08trimmedr2f3__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08trimmedr2f3__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08trimmedr2f3__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08trimmedr2f3__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08trimmedr2f3__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08trimmedr2f3__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -2684,6 +2752,7 @@ public:
 		SET_ZERO(jet_ak08trimmedr2f6__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08trimmedr2f6__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08trimmedr2f6__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08trimmedr2f6__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08trimmedr2f6__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08trimmedr2f6__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08trimmedr2f6__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -2714,6 +2783,7 @@ public:
 		SET_ZERO(jet_ak08trimmedr2f9__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08trimmedr2f9__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08trimmedr2f9__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08trimmedr2f9__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08trimmedr2f9__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08trimmedr2f9__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08trimmedr2f9__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -2744,6 +2814,7 @@ public:
 		SET_ZERO(jet_ak08softdropz10bm10__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz10bm10__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz10bm10__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08softdropz10bm10__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz10bm10__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz10bm10__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz10bm10__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -2774,6 +2845,7 @@ public:
 		SET_ZERO(jet_ak08softdropz10b00__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz10b00__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz10b00__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08softdropz10b00__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz10b00__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz10b00__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz10b00__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -2804,6 +2876,7 @@ public:
 		SET_ZERO(jet_ak08softdropz10b10__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz10b10__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz10b10__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08softdropz10b10__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz10b10__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz10b10__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz10b10__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -2834,6 +2907,7 @@ public:
 		SET_ZERO(jet_ak08softdropz10b20__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz10b20__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz10b20__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08softdropz10b20__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz10b20__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz10b20__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz10b20__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -2864,6 +2938,7 @@ public:
 		SET_ZERO(jet_ak08softdropz15bm10__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz15bm10__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz15bm10__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08softdropz15bm10__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz15bm10__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz15bm10__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz15bm10__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -2894,6 +2969,7 @@ public:
 		SET_ZERO(jet_ak08softdropz15b00__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz15b00__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz15b00__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08softdropz15b00__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz15b00__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz15b00__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz15b00__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -2924,6 +3000,7 @@ public:
 		SET_ZERO(jet_ak08softdropz15b10__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz15b10__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz15b10__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08softdropz15b10__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz15b10__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz15b10__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz15b10__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -2954,6 +3031,7 @@ public:
 		SET_ZERO(jet_ak08softdropz15b20__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz15b20__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz15b20__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08softdropz15b20__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz15b20__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz15b20__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz15b20__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -2984,6 +3062,7 @@ public:
 		SET_ZERO(jet_ak08softdropz20b00__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz20b00__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz20b00__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08softdropz20b00__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz20b00__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz20b00__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz20b00__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -3014,6 +3093,7 @@ public:
 		SET_ZERO(jet_ak08softdropz20bm10__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz20bm10__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz20bm10__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08softdropz20bm10__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz20bm10__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz20bm10__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz20bm10__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -3044,6 +3124,7 @@ public:
 		SET_ZERO(jet_ak08softdropz20b10__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz20b10__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz20b10__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08softdropz20b10__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz20b10__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz20b10__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz20b10__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -3074,6 +3155,7 @@ public:
 		SET_ZERO(jet_ak08softdropz20b20__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz20b20__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz20b20__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08softdropz20b20__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz20b20__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz20b20__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08softdropz20b20__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -3104,6 +3186,7 @@ public:
 		SET_ZERO(jet_ak08puppitrimmedr2f3forbtag__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppitrimmedr2f3forbtag__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppitrimmedr2f3forbtag__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08puppitrimmedr2f3forbtag__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppitrimmedr2f3forbtag__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppitrimmedr2f3forbtag__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppitrimmedr2f3forbtag__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -3134,6 +3217,7 @@ public:
 		SET_ZERO(jet_ak08puppitrimmedr2f6forbtag__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppitrimmedr2f6forbtag__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppitrimmedr2f6forbtag__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08puppitrimmedr2f6forbtag__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppitrimmedr2f6forbtag__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppitrimmedr2f6forbtag__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppitrimmedr2f6forbtag__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -3164,6 +3248,7 @@ public:
 		SET_ZERO(jet_ak08puppisoftdropz10b00forbtag__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz10b00forbtag__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz10b00forbtag__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08puppisoftdropz10b00forbtag__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz10b00forbtag__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz10b00forbtag__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz10b00forbtag__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -3194,6 +3279,7 @@ public:
 		SET_ZERO(jet_ak08puppisoftdropz20b10forbtag__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz20b10forbtag__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz20b10forbtag__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08puppisoftdropz20b10forbtag__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz20b10forbtag__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz20b10forbtag__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz20b10forbtag__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -3224,6 +3310,7 @@ public:
 		SET_ZERO(jet_ak08puppifilteredn3r2forbtag__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppifilteredn3r2forbtag__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppifilteredn3r2forbtag__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08puppifilteredn3r2forbtag__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppifilteredn3r2forbtag__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppifilteredn3r2forbtag__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppifilteredn3r2forbtag__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -3254,6 +3341,7 @@ public:
 		SET_ZERO(jet_ak08puppifilteredn3r3forbtag__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppifilteredn3r3forbtag__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppifilteredn3r3forbtag__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08puppifilteredn3r3forbtag__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppifilteredn3r3forbtag__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppifilteredn3r3forbtag__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppifilteredn3r3forbtag__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -3284,6 +3372,7 @@ public:
 		SET_ZERO(jet_ak08puppiprunedn3z10rfac50forbtag__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppiprunedn3z10rfac50forbtag__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppiprunedn3z10rfac50forbtag__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08puppiprunedn3z10rfac50forbtag__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppiprunedn3z10rfac50forbtag__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppiprunedn3z10rfac50forbtag__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppiprunedn3z10rfac50forbtag__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -3314,6 +3403,7 @@ public:
 		SET_ZERO(jet_ak08puppifilteredn3r2__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppifilteredn3r2__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppifilteredn3r2__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08puppifilteredn3r2__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppifilteredn3r2__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppifilteredn3r2__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppifilteredn3r2__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -3344,6 +3434,7 @@ public:
 		SET_ZERO(jet_ak08puppifilteredn3r3__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppifilteredn3r3__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppifilteredn3r3__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08puppifilteredn3r3__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppifilteredn3r3__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppifilteredn3r3__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppifilteredn3r3__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -3374,6 +3465,7 @@ public:
 		SET_ZERO(jet_ak08puppifilteredn5r2__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppifilteredn5r2__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppifilteredn5r2__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08puppifilteredn5r2__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppifilteredn5r2__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppifilteredn5r2__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppifilteredn5r2__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -3404,6 +3496,7 @@ public:
 		SET_ZERO(jet_ak08puppiprunedn3z10rfac50__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppiprunedn3z10rfac50__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppiprunedn3z10rfac50__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08puppiprunedn3z10rfac50__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppiprunedn3z10rfac50__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppiprunedn3z10rfac50__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppiprunedn3z10rfac50__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -3434,6 +3527,7 @@ public:
 		SET_ZERO(jet_ak08puppitrimmedr2f3__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppitrimmedr2f3__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppitrimmedr2f3__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08puppitrimmedr2f3__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppitrimmedr2f3__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppitrimmedr2f3__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppitrimmedr2f3__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -3464,6 +3558,7 @@ public:
 		SET_ZERO(jet_ak08puppitrimmedr2f6__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppitrimmedr2f6__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppitrimmedr2f6__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08puppitrimmedr2f6__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppitrimmedr2f6__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppitrimmedr2f6__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppitrimmedr2f6__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -3494,6 +3589,7 @@ public:
 		SET_ZERO(jet_ak08puppitrimmedr2f9__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppitrimmedr2f9__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppitrimmedr2f9__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08puppitrimmedr2f9__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppitrimmedr2f9__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppitrimmedr2f9__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppitrimmedr2f9__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -3524,6 +3620,7 @@ public:
 		SET_ZERO(jet_ak08puppisoftdropz10bm10__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz10bm10__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz10bm10__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08puppisoftdropz10bm10__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz10bm10__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz10bm10__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz10bm10__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -3554,6 +3651,7 @@ public:
 		SET_ZERO(jet_ak08puppisoftdropz10b00__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz10b00__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz10b00__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08puppisoftdropz10b00__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz10b00__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz10b00__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz10b00__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -3584,6 +3682,7 @@ public:
 		SET_ZERO(jet_ak08puppisoftdropz10b10__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz10b10__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz10b10__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08puppisoftdropz10b10__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz10b10__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz10b10__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz10b10__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -3614,6 +3713,7 @@ public:
 		SET_ZERO(jet_ak08puppisoftdropz10b20__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz10b20__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz10b20__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08puppisoftdropz10b20__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz10b20__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz10b20__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz10b20__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -3644,6 +3744,7 @@ public:
 		SET_ZERO(jet_ak08puppisoftdropz15bm10__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz15bm10__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz15bm10__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08puppisoftdropz15bm10__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz15bm10__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz15bm10__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz15bm10__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -3674,6 +3775,7 @@ public:
 		SET_ZERO(jet_ak08puppisoftdropz15b00__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz15b00__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz15b00__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08puppisoftdropz15b00__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz15b00__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz15b00__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz15b00__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -3704,6 +3806,7 @@ public:
 		SET_ZERO(jet_ak08puppisoftdropz15b10__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz15b10__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz15b10__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08puppisoftdropz15b10__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz15b10__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz15b10__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz15b10__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -3734,6 +3837,7 @@ public:
 		SET_ZERO(jet_ak08puppisoftdropz15b20__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz15b20__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz15b20__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08puppisoftdropz15b20__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz15b20__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz15b20__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz15b20__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -3764,6 +3868,7 @@ public:
 		SET_ZERO(jet_ak08puppisoftdropz20b00__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz20b00__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz20b00__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08puppisoftdropz20b00__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz20b00__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz20b00__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz20b00__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -3794,6 +3899,7 @@ public:
 		SET_ZERO(jet_ak08puppisoftdropz20bm10__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz20bm10__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz20bm10__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08puppisoftdropz20bm10__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz20bm10__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz20bm10__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz20bm10__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -3824,6 +3930,7 @@ public:
 		SET_ZERO(jet_ak08puppisoftdropz20b10__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz20b10__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz20b10__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08puppisoftdropz20b10__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz20b10__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz20b10__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz20b10__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -3854,6 +3961,7 @@ public:
 		SET_ZERO(jet_ak08puppisoftdropz20b20__eta, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz20b20__phi, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz20b20__mass, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08puppisoftdropz20b20__masscal, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz20b20__tau1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz20b20__tau2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08puppisoftdropz20b20__tau3, N_MAX, DEF_VAL_FLOAT);
@@ -4260,6 +4368,7 @@ public:
 		tree->Branch("jet_ak08__eta", jet_ak08__eta, "jet_ak08__eta[n__jet_ak08]/F");
 		tree->Branch("jet_ak08__phi", jet_ak08__phi, "jet_ak08__phi[n__jet_ak08]/F");
 		tree->Branch("jet_ak08__mass", jet_ak08__mass, "jet_ak08__mass[n__jet_ak08]/F");
+		tree->Branch("jet_ak08__masscal", jet_ak08__masscal, "jet_ak08__masscal[n__jet_ak08]/F");
 		tree->Branch("jet_ak08__tau1", jet_ak08__tau1, "jet_ak08__tau1[n__jet_ak08]/F");
 		tree->Branch("jet_ak08__tau2", jet_ak08__tau2, "jet_ak08__tau2[n__jet_ak08]/F");
 		tree->Branch("jet_ak08__tau3", jet_ak08__tau3, "jet_ak08__tau3[n__jet_ak08]/F");
@@ -4290,6 +4399,7 @@ public:
 		tree->Branch("jet_ak08puppi__eta", jet_ak08puppi__eta, "jet_ak08puppi__eta[n__jet_ak08puppi]/F");
 		tree->Branch("jet_ak08puppi__phi", jet_ak08puppi__phi, "jet_ak08puppi__phi[n__jet_ak08puppi]/F");
 		tree->Branch("jet_ak08puppi__mass", jet_ak08puppi__mass, "jet_ak08puppi__mass[n__jet_ak08puppi]/F");
+		tree->Branch("jet_ak08puppi__masscal", jet_ak08puppi__masscal, "jet_ak08puppi__masscal[n__jet_ak08puppi]/F");
 		tree->Branch("jet_ak08puppi__tau1", jet_ak08puppi__tau1, "jet_ak08puppi__tau1[n__jet_ak08puppi]/F");
 		tree->Branch("jet_ak08puppi__tau2", jet_ak08puppi__tau2, "jet_ak08puppi__tau2[n__jet_ak08puppi]/F");
 		tree->Branch("jet_ak08puppi__tau3", jet_ak08puppi__tau3, "jet_ak08puppi__tau3[n__jet_ak08puppi]/F");
@@ -4320,6 +4430,7 @@ public:
 		tree->Branch("jet_ak08trimmedr2f3forbtag__eta", jet_ak08trimmedr2f3forbtag__eta, "jet_ak08trimmedr2f3forbtag__eta[n__jet_ak08trimmedr2f3forbtag]/F");
 		tree->Branch("jet_ak08trimmedr2f3forbtag__phi", jet_ak08trimmedr2f3forbtag__phi, "jet_ak08trimmedr2f3forbtag__phi[n__jet_ak08trimmedr2f3forbtag]/F");
 		tree->Branch("jet_ak08trimmedr2f3forbtag__mass", jet_ak08trimmedr2f3forbtag__mass, "jet_ak08trimmedr2f3forbtag__mass[n__jet_ak08trimmedr2f3forbtag]/F");
+		tree->Branch("jet_ak08trimmedr2f3forbtag__masscal", jet_ak08trimmedr2f3forbtag__masscal, "jet_ak08trimmedr2f3forbtag__masscal[n__jet_ak08trimmedr2f3forbtag]/F");
 		tree->Branch("jet_ak08trimmedr2f3forbtag__tau1", jet_ak08trimmedr2f3forbtag__tau1, "jet_ak08trimmedr2f3forbtag__tau1[n__jet_ak08trimmedr2f3forbtag]/F");
 		tree->Branch("jet_ak08trimmedr2f3forbtag__tau2", jet_ak08trimmedr2f3forbtag__tau2, "jet_ak08trimmedr2f3forbtag__tau2[n__jet_ak08trimmedr2f3forbtag]/F");
 		tree->Branch("jet_ak08trimmedr2f3forbtag__tau3", jet_ak08trimmedr2f3forbtag__tau3, "jet_ak08trimmedr2f3forbtag__tau3[n__jet_ak08trimmedr2f3forbtag]/F");
@@ -4350,6 +4461,7 @@ public:
 		tree->Branch("jet_ak08trimmedr2f6forbtag__eta", jet_ak08trimmedr2f6forbtag__eta, "jet_ak08trimmedr2f6forbtag__eta[n__jet_ak08trimmedr2f6forbtag]/F");
 		tree->Branch("jet_ak08trimmedr2f6forbtag__phi", jet_ak08trimmedr2f6forbtag__phi, "jet_ak08trimmedr2f6forbtag__phi[n__jet_ak08trimmedr2f6forbtag]/F");
 		tree->Branch("jet_ak08trimmedr2f6forbtag__mass", jet_ak08trimmedr2f6forbtag__mass, "jet_ak08trimmedr2f6forbtag__mass[n__jet_ak08trimmedr2f6forbtag]/F");
+		tree->Branch("jet_ak08trimmedr2f6forbtag__masscal", jet_ak08trimmedr2f6forbtag__masscal, "jet_ak08trimmedr2f6forbtag__masscal[n__jet_ak08trimmedr2f6forbtag]/F");
 		tree->Branch("jet_ak08trimmedr2f6forbtag__tau1", jet_ak08trimmedr2f6forbtag__tau1, "jet_ak08trimmedr2f6forbtag__tau1[n__jet_ak08trimmedr2f6forbtag]/F");
 		tree->Branch("jet_ak08trimmedr2f6forbtag__tau2", jet_ak08trimmedr2f6forbtag__tau2, "jet_ak08trimmedr2f6forbtag__tau2[n__jet_ak08trimmedr2f6forbtag]/F");
 		tree->Branch("jet_ak08trimmedr2f6forbtag__tau3", jet_ak08trimmedr2f6forbtag__tau3, "jet_ak08trimmedr2f6forbtag__tau3[n__jet_ak08trimmedr2f6forbtag]/F");
@@ -4380,6 +4492,7 @@ public:
 		tree->Branch("jet_ak08softdropz10b00forbtag__eta", jet_ak08softdropz10b00forbtag__eta, "jet_ak08softdropz10b00forbtag__eta[n__jet_ak08softdropz10b00forbtag]/F");
 		tree->Branch("jet_ak08softdropz10b00forbtag__phi", jet_ak08softdropz10b00forbtag__phi, "jet_ak08softdropz10b00forbtag__phi[n__jet_ak08softdropz10b00forbtag]/F");
 		tree->Branch("jet_ak08softdropz10b00forbtag__mass", jet_ak08softdropz10b00forbtag__mass, "jet_ak08softdropz10b00forbtag__mass[n__jet_ak08softdropz10b00forbtag]/F");
+		tree->Branch("jet_ak08softdropz10b00forbtag__masscal", jet_ak08softdropz10b00forbtag__masscal, "jet_ak08softdropz10b00forbtag__masscal[n__jet_ak08softdropz10b00forbtag]/F");
 		tree->Branch("jet_ak08softdropz10b00forbtag__tau1", jet_ak08softdropz10b00forbtag__tau1, "jet_ak08softdropz10b00forbtag__tau1[n__jet_ak08softdropz10b00forbtag]/F");
 		tree->Branch("jet_ak08softdropz10b00forbtag__tau2", jet_ak08softdropz10b00forbtag__tau2, "jet_ak08softdropz10b00forbtag__tau2[n__jet_ak08softdropz10b00forbtag]/F");
 		tree->Branch("jet_ak08softdropz10b00forbtag__tau3", jet_ak08softdropz10b00forbtag__tau3, "jet_ak08softdropz10b00forbtag__tau3[n__jet_ak08softdropz10b00forbtag]/F");
@@ -4410,6 +4523,7 @@ public:
 		tree->Branch("jet_ak08softdropz20b10forbtag__eta", jet_ak08softdropz20b10forbtag__eta, "jet_ak08softdropz20b10forbtag__eta[n__jet_ak08softdropz20b10forbtag]/F");
 		tree->Branch("jet_ak08softdropz20b10forbtag__phi", jet_ak08softdropz20b10forbtag__phi, "jet_ak08softdropz20b10forbtag__phi[n__jet_ak08softdropz20b10forbtag]/F");
 		tree->Branch("jet_ak08softdropz20b10forbtag__mass", jet_ak08softdropz20b10forbtag__mass, "jet_ak08softdropz20b10forbtag__mass[n__jet_ak08softdropz20b10forbtag]/F");
+		tree->Branch("jet_ak08softdropz20b10forbtag__masscal", jet_ak08softdropz20b10forbtag__masscal, "jet_ak08softdropz20b10forbtag__masscal[n__jet_ak08softdropz20b10forbtag]/F");
 		tree->Branch("jet_ak08softdropz20b10forbtag__tau1", jet_ak08softdropz20b10forbtag__tau1, "jet_ak08softdropz20b10forbtag__tau1[n__jet_ak08softdropz20b10forbtag]/F");
 		tree->Branch("jet_ak08softdropz20b10forbtag__tau2", jet_ak08softdropz20b10forbtag__tau2, "jet_ak08softdropz20b10forbtag__tau2[n__jet_ak08softdropz20b10forbtag]/F");
 		tree->Branch("jet_ak08softdropz20b10forbtag__tau3", jet_ak08softdropz20b10forbtag__tau3, "jet_ak08softdropz20b10forbtag__tau3[n__jet_ak08softdropz20b10forbtag]/F");
@@ -4440,6 +4554,7 @@ public:
 		tree->Branch("jet_ak08filteredn3r2forbtag__eta", jet_ak08filteredn3r2forbtag__eta, "jet_ak08filteredn3r2forbtag__eta[n__jet_ak08filteredn3r2forbtag]/F");
 		tree->Branch("jet_ak08filteredn3r2forbtag__phi", jet_ak08filteredn3r2forbtag__phi, "jet_ak08filteredn3r2forbtag__phi[n__jet_ak08filteredn3r2forbtag]/F");
 		tree->Branch("jet_ak08filteredn3r2forbtag__mass", jet_ak08filteredn3r2forbtag__mass, "jet_ak08filteredn3r2forbtag__mass[n__jet_ak08filteredn3r2forbtag]/F");
+		tree->Branch("jet_ak08filteredn3r2forbtag__masscal", jet_ak08filteredn3r2forbtag__masscal, "jet_ak08filteredn3r2forbtag__masscal[n__jet_ak08filteredn3r2forbtag]/F");
 		tree->Branch("jet_ak08filteredn3r2forbtag__tau1", jet_ak08filteredn3r2forbtag__tau1, "jet_ak08filteredn3r2forbtag__tau1[n__jet_ak08filteredn3r2forbtag]/F");
 		tree->Branch("jet_ak08filteredn3r2forbtag__tau2", jet_ak08filteredn3r2forbtag__tau2, "jet_ak08filteredn3r2forbtag__tau2[n__jet_ak08filteredn3r2forbtag]/F");
 		tree->Branch("jet_ak08filteredn3r2forbtag__tau3", jet_ak08filteredn3r2forbtag__tau3, "jet_ak08filteredn3r2forbtag__tau3[n__jet_ak08filteredn3r2forbtag]/F");
@@ -4470,6 +4585,7 @@ public:
 		tree->Branch("jet_ak08filteredn3r3forbtag__eta", jet_ak08filteredn3r3forbtag__eta, "jet_ak08filteredn3r3forbtag__eta[n__jet_ak08filteredn3r3forbtag]/F");
 		tree->Branch("jet_ak08filteredn3r3forbtag__phi", jet_ak08filteredn3r3forbtag__phi, "jet_ak08filteredn3r3forbtag__phi[n__jet_ak08filteredn3r3forbtag]/F");
 		tree->Branch("jet_ak08filteredn3r3forbtag__mass", jet_ak08filteredn3r3forbtag__mass, "jet_ak08filteredn3r3forbtag__mass[n__jet_ak08filteredn3r3forbtag]/F");
+		tree->Branch("jet_ak08filteredn3r3forbtag__masscal", jet_ak08filteredn3r3forbtag__masscal, "jet_ak08filteredn3r3forbtag__masscal[n__jet_ak08filteredn3r3forbtag]/F");
 		tree->Branch("jet_ak08filteredn3r3forbtag__tau1", jet_ak08filteredn3r3forbtag__tau1, "jet_ak08filteredn3r3forbtag__tau1[n__jet_ak08filteredn3r3forbtag]/F");
 		tree->Branch("jet_ak08filteredn3r3forbtag__tau2", jet_ak08filteredn3r3forbtag__tau2, "jet_ak08filteredn3r3forbtag__tau2[n__jet_ak08filteredn3r3forbtag]/F");
 		tree->Branch("jet_ak08filteredn3r3forbtag__tau3", jet_ak08filteredn3r3forbtag__tau3, "jet_ak08filteredn3r3forbtag__tau3[n__jet_ak08filteredn3r3forbtag]/F");
@@ -4500,6 +4616,7 @@ public:
 		tree->Branch("jet_ak08prunedn3z10rfac50forbtag__eta", jet_ak08prunedn3z10rfac50forbtag__eta, "jet_ak08prunedn3z10rfac50forbtag__eta[n__jet_ak08prunedn3z10rfac50forbtag]/F");
 		tree->Branch("jet_ak08prunedn3z10rfac50forbtag__phi", jet_ak08prunedn3z10rfac50forbtag__phi, "jet_ak08prunedn3z10rfac50forbtag__phi[n__jet_ak08prunedn3z10rfac50forbtag]/F");
 		tree->Branch("jet_ak08prunedn3z10rfac50forbtag__mass", jet_ak08prunedn3z10rfac50forbtag__mass, "jet_ak08prunedn3z10rfac50forbtag__mass[n__jet_ak08prunedn3z10rfac50forbtag]/F");
+		tree->Branch("jet_ak08prunedn3z10rfac50forbtag__masscal", jet_ak08prunedn3z10rfac50forbtag__masscal, "jet_ak08prunedn3z10rfac50forbtag__masscal[n__jet_ak08prunedn3z10rfac50forbtag]/F");
 		tree->Branch("jet_ak08prunedn3z10rfac50forbtag__tau1", jet_ak08prunedn3z10rfac50forbtag__tau1, "jet_ak08prunedn3z10rfac50forbtag__tau1[n__jet_ak08prunedn3z10rfac50forbtag]/F");
 		tree->Branch("jet_ak08prunedn3z10rfac50forbtag__tau2", jet_ak08prunedn3z10rfac50forbtag__tau2, "jet_ak08prunedn3z10rfac50forbtag__tau2[n__jet_ak08prunedn3z10rfac50forbtag]/F");
 		tree->Branch("jet_ak08prunedn3z10rfac50forbtag__tau3", jet_ak08prunedn3z10rfac50forbtag__tau3, "jet_ak08prunedn3z10rfac50forbtag__tau3[n__jet_ak08prunedn3z10rfac50forbtag]/F");
@@ -4530,6 +4647,7 @@ public:
 		tree->Branch("jet_ak08filteredn3r2__eta", jet_ak08filteredn3r2__eta, "jet_ak08filteredn3r2__eta[n__jet_ak08filteredn3r2]/F");
 		tree->Branch("jet_ak08filteredn3r2__phi", jet_ak08filteredn3r2__phi, "jet_ak08filteredn3r2__phi[n__jet_ak08filteredn3r2]/F");
 		tree->Branch("jet_ak08filteredn3r2__mass", jet_ak08filteredn3r2__mass, "jet_ak08filteredn3r2__mass[n__jet_ak08filteredn3r2]/F");
+		tree->Branch("jet_ak08filteredn3r2__masscal", jet_ak08filteredn3r2__masscal, "jet_ak08filteredn3r2__masscal[n__jet_ak08filteredn3r2]/F");
 		tree->Branch("jet_ak08filteredn3r2__tau1", jet_ak08filteredn3r2__tau1, "jet_ak08filteredn3r2__tau1[n__jet_ak08filteredn3r2]/F");
 		tree->Branch("jet_ak08filteredn3r2__tau2", jet_ak08filteredn3r2__tau2, "jet_ak08filteredn3r2__tau2[n__jet_ak08filteredn3r2]/F");
 		tree->Branch("jet_ak08filteredn3r2__tau3", jet_ak08filteredn3r2__tau3, "jet_ak08filteredn3r2__tau3[n__jet_ak08filteredn3r2]/F");
@@ -4560,6 +4678,7 @@ public:
 		tree->Branch("jet_ak08filteredn3r3__eta", jet_ak08filteredn3r3__eta, "jet_ak08filteredn3r3__eta[n__jet_ak08filteredn3r3]/F");
 		tree->Branch("jet_ak08filteredn3r3__phi", jet_ak08filteredn3r3__phi, "jet_ak08filteredn3r3__phi[n__jet_ak08filteredn3r3]/F");
 		tree->Branch("jet_ak08filteredn3r3__mass", jet_ak08filteredn3r3__mass, "jet_ak08filteredn3r3__mass[n__jet_ak08filteredn3r3]/F");
+		tree->Branch("jet_ak08filteredn3r3__masscal", jet_ak08filteredn3r3__masscal, "jet_ak08filteredn3r3__masscal[n__jet_ak08filteredn3r3]/F");
 		tree->Branch("jet_ak08filteredn3r3__tau1", jet_ak08filteredn3r3__tau1, "jet_ak08filteredn3r3__tau1[n__jet_ak08filteredn3r3]/F");
 		tree->Branch("jet_ak08filteredn3r3__tau2", jet_ak08filteredn3r3__tau2, "jet_ak08filteredn3r3__tau2[n__jet_ak08filteredn3r3]/F");
 		tree->Branch("jet_ak08filteredn3r3__tau3", jet_ak08filteredn3r3__tau3, "jet_ak08filteredn3r3__tau3[n__jet_ak08filteredn3r3]/F");
@@ -4590,6 +4709,7 @@ public:
 		tree->Branch("jet_ak08filteredn5r2__eta", jet_ak08filteredn5r2__eta, "jet_ak08filteredn5r2__eta[n__jet_ak08filteredn5r2]/F");
 		tree->Branch("jet_ak08filteredn5r2__phi", jet_ak08filteredn5r2__phi, "jet_ak08filteredn5r2__phi[n__jet_ak08filteredn5r2]/F");
 		tree->Branch("jet_ak08filteredn5r2__mass", jet_ak08filteredn5r2__mass, "jet_ak08filteredn5r2__mass[n__jet_ak08filteredn5r2]/F");
+		tree->Branch("jet_ak08filteredn5r2__masscal", jet_ak08filteredn5r2__masscal, "jet_ak08filteredn5r2__masscal[n__jet_ak08filteredn5r2]/F");
 		tree->Branch("jet_ak08filteredn5r2__tau1", jet_ak08filteredn5r2__tau1, "jet_ak08filteredn5r2__tau1[n__jet_ak08filteredn5r2]/F");
 		tree->Branch("jet_ak08filteredn5r2__tau2", jet_ak08filteredn5r2__tau2, "jet_ak08filteredn5r2__tau2[n__jet_ak08filteredn5r2]/F");
 		tree->Branch("jet_ak08filteredn5r2__tau3", jet_ak08filteredn5r2__tau3, "jet_ak08filteredn5r2__tau3[n__jet_ak08filteredn5r2]/F");
@@ -4620,6 +4740,7 @@ public:
 		tree->Branch("jet_ak08prunedn3z10rfac50__eta", jet_ak08prunedn3z10rfac50__eta, "jet_ak08prunedn3z10rfac50__eta[n__jet_ak08prunedn3z10rfac50]/F");
 		tree->Branch("jet_ak08prunedn3z10rfac50__phi", jet_ak08prunedn3z10rfac50__phi, "jet_ak08prunedn3z10rfac50__phi[n__jet_ak08prunedn3z10rfac50]/F");
 		tree->Branch("jet_ak08prunedn3z10rfac50__mass", jet_ak08prunedn3z10rfac50__mass, "jet_ak08prunedn3z10rfac50__mass[n__jet_ak08prunedn3z10rfac50]/F");
+		tree->Branch("jet_ak08prunedn3z10rfac50__masscal", jet_ak08prunedn3z10rfac50__masscal, "jet_ak08prunedn3z10rfac50__masscal[n__jet_ak08prunedn3z10rfac50]/F");
 		tree->Branch("jet_ak08prunedn3z10rfac50__tau1", jet_ak08prunedn3z10rfac50__tau1, "jet_ak08prunedn3z10rfac50__tau1[n__jet_ak08prunedn3z10rfac50]/F");
 		tree->Branch("jet_ak08prunedn3z10rfac50__tau2", jet_ak08prunedn3z10rfac50__tau2, "jet_ak08prunedn3z10rfac50__tau2[n__jet_ak08prunedn3z10rfac50]/F");
 		tree->Branch("jet_ak08prunedn3z10rfac50__tau3", jet_ak08prunedn3z10rfac50__tau3, "jet_ak08prunedn3z10rfac50__tau3[n__jet_ak08prunedn3z10rfac50]/F");
@@ -4650,6 +4771,7 @@ public:
 		tree->Branch("jet_ak08trimmedr2f3__eta", jet_ak08trimmedr2f3__eta, "jet_ak08trimmedr2f3__eta[n__jet_ak08trimmedr2f3]/F");
 		tree->Branch("jet_ak08trimmedr2f3__phi", jet_ak08trimmedr2f3__phi, "jet_ak08trimmedr2f3__phi[n__jet_ak08trimmedr2f3]/F");
 		tree->Branch("jet_ak08trimmedr2f3__mass", jet_ak08trimmedr2f3__mass, "jet_ak08trimmedr2f3__mass[n__jet_ak08trimmedr2f3]/F");
+		tree->Branch("jet_ak08trimmedr2f3__masscal", jet_ak08trimmedr2f3__masscal, "jet_ak08trimmedr2f3__masscal[n__jet_ak08trimmedr2f3]/F");
 		tree->Branch("jet_ak08trimmedr2f3__tau1", jet_ak08trimmedr2f3__tau1, "jet_ak08trimmedr2f3__tau1[n__jet_ak08trimmedr2f3]/F");
 		tree->Branch("jet_ak08trimmedr2f3__tau2", jet_ak08trimmedr2f3__tau2, "jet_ak08trimmedr2f3__tau2[n__jet_ak08trimmedr2f3]/F");
 		tree->Branch("jet_ak08trimmedr2f3__tau3", jet_ak08trimmedr2f3__tau3, "jet_ak08trimmedr2f3__tau3[n__jet_ak08trimmedr2f3]/F");
@@ -4680,6 +4802,7 @@ public:
 		tree->Branch("jet_ak08trimmedr2f6__eta", jet_ak08trimmedr2f6__eta, "jet_ak08trimmedr2f6__eta[n__jet_ak08trimmedr2f6]/F");
 		tree->Branch("jet_ak08trimmedr2f6__phi", jet_ak08trimmedr2f6__phi, "jet_ak08trimmedr2f6__phi[n__jet_ak08trimmedr2f6]/F");
 		tree->Branch("jet_ak08trimmedr2f6__mass", jet_ak08trimmedr2f6__mass, "jet_ak08trimmedr2f6__mass[n__jet_ak08trimmedr2f6]/F");
+		tree->Branch("jet_ak08trimmedr2f6__masscal", jet_ak08trimmedr2f6__masscal, "jet_ak08trimmedr2f6__masscal[n__jet_ak08trimmedr2f6]/F");
 		tree->Branch("jet_ak08trimmedr2f6__tau1", jet_ak08trimmedr2f6__tau1, "jet_ak08trimmedr2f6__tau1[n__jet_ak08trimmedr2f6]/F");
 		tree->Branch("jet_ak08trimmedr2f6__tau2", jet_ak08trimmedr2f6__tau2, "jet_ak08trimmedr2f6__tau2[n__jet_ak08trimmedr2f6]/F");
 		tree->Branch("jet_ak08trimmedr2f6__tau3", jet_ak08trimmedr2f6__tau3, "jet_ak08trimmedr2f6__tau3[n__jet_ak08trimmedr2f6]/F");
@@ -4710,6 +4833,7 @@ public:
 		tree->Branch("jet_ak08trimmedr2f9__eta", jet_ak08trimmedr2f9__eta, "jet_ak08trimmedr2f9__eta[n__jet_ak08trimmedr2f9]/F");
 		tree->Branch("jet_ak08trimmedr2f9__phi", jet_ak08trimmedr2f9__phi, "jet_ak08trimmedr2f9__phi[n__jet_ak08trimmedr2f9]/F");
 		tree->Branch("jet_ak08trimmedr2f9__mass", jet_ak08trimmedr2f9__mass, "jet_ak08trimmedr2f9__mass[n__jet_ak08trimmedr2f9]/F");
+		tree->Branch("jet_ak08trimmedr2f9__masscal", jet_ak08trimmedr2f9__masscal, "jet_ak08trimmedr2f9__masscal[n__jet_ak08trimmedr2f9]/F");
 		tree->Branch("jet_ak08trimmedr2f9__tau1", jet_ak08trimmedr2f9__tau1, "jet_ak08trimmedr2f9__tau1[n__jet_ak08trimmedr2f9]/F");
 		tree->Branch("jet_ak08trimmedr2f9__tau2", jet_ak08trimmedr2f9__tau2, "jet_ak08trimmedr2f9__tau2[n__jet_ak08trimmedr2f9]/F");
 		tree->Branch("jet_ak08trimmedr2f9__tau3", jet_ak08trimmedr2f9__tau3, "jet_ak08trimmedr2f9__tau3[n__jet_ak08trimmedr2f9]/F");
@@ -4740,6 +4864,7 @@ public:
 		tree->Branch("jet_ak08softdropz10bm10__eta", jet_ak08softdropz10bm10__eta, "jet_ak08softdropz10bm10__eta[n__jet_ak08softdropz10bm10]/F");
 		tree->Branch("jet_ak08softdropz10bm10__phi", jet_ak08softdropz10bm10__phi, "jet_ak08softdropz10bm10__phi[n__jet_ak08softdropz10bm10]/F");
 		tree->Branch("jet_ak08softdropz10bm10__mass", jet_ak08softdropz10bm10__mass, "jet_ak08softdropz10bm10__mass[n__jet_ak08softdropz10bm10]/F");
+		tree->Branch("jet_ak08softdropz10bm10__masscal", jet_ak08softdropz10bm10__masscal, "jet_ak08softdropz10bm10__masscal[n__jet_ak08softdropz10bm10]/F");
 		tree->Branch("jet_ak08softdropz10bm10__tau1", jet_ak08softdropz10bm10__tau1, "jet_ak08softdropz10bm10__tau1[n__jet_ak08softdropz10bm10]/F");
 		tree->Branch("jet_ak08softdropz10bm10__tau2", jet_ak08softdropz10bm10__tau2, "jet_ak08softdropz10bm10__tau2[n__jet_ak08softdropz10bm10]/F");
 		tree->Branch("jet_ak08softdropz10bm10__tau3", jet_ak08softdropz10bm10__tau3, "jet_ak08softdropz10bm10__tau3[n__jet_ak08softdropz10bm10]/F");
@@ -4770,6 +4895,7 @@ public:
 		tree->Branch("jet_ak08softdropz10b00__eta", jet_ak08softdropz10b00__eta, "jet_ak08softdropz10b00__eta[n__jet_ak08softdropz10b00]/F");
 		tree->Branch("jet_ak08softdropz10b00__phi", jet_ak08softdropz10b00__phi, "jet_ak08softdropz10b00__phi[n__jet_ak08softdropz10b00]/F");
 		tree->Branch("jet_ak08softdropz10b00__mass", jet_ak08softdropz10b00__mass, "jet_ak08softdropz10b00__mass[n__jet_ak08softdropz10b00]/F");
+		tree->Branch("jet_ak08softdropz10b00__masscal", jet_ak08softdropz10b00__masscal, "jet_ak08softdropz10b00__masscal[n__jet_ak08softdropz10b00]/F");
 		tree->Branch("jet_ak08softdropz10b00__tau1", jet_ak08softdropz10b00__tau1, "jet_ak08softdropz10b00__tau1[n__jet_ak08softdropz10b00]/F");
 		tree->Branch("jet_ak08softdropz10b00__tau2", jet_ak08softdropz10b00__tau2, "jet_ak08softdropz10b00__tau2[n__jet_ak08softdropz10b00]/F");
 		tree->Branch("jet_ak08softdropz10b00__tau3", jet_ak08softdropz10b00__tau3, "jet_ak08softdropz10b00__tau3[n__jet_ak08softdropz10b00]/F");
@@ -4800,6 +4926,7 @@ public:
 		tree->Branch("jet_ak08softdropz10b10__eta", jet_ak08softdropz10b10__eta, "jet_ak08softdropz10b10__eta[n__jet_ak08softdropz10b10]/F");
 		tree->Branch("jet_ak08softdropz10b10__phi", jet_ak08softdropz10b10__phi, "jet_ak08softdropz10b10__phi[n__jet_ak08softdropz10b10]/F");
 		tree->Branch("jet_ak08softdropz10b10__mass", jet_ak08softdropz10b10__mass, "jet_ak08softdropz10b10__mass[n__jet_ak08softdropz10b10]/F");
+		tree->Branch("jet_ak08softdropz10b10__masscal", jet_ak08softdropz10b10__masscal, "jet_ak08softdropz10b10__masscal[n__jet_ak08softdropz10b10]/F");
 		tree->Branch("jet_ak08softdropz10b10__tau1", jet_ak08softdropz10b10__tau1, "jet_ak08softdropz10b10__tau1[n__jet_ak08softdropz10b10]/F");
 		tree->Branch("jet_ak08softdropz10b10__tau2", jet_ak08softdropz10b10__tau2, "jet_ak08softdropz10b10__tau2[n__jet_ak08softdropz10b10]/F");
 		tree->Branch("jet_ak08softdropz10b10__tau3", jet_ak08softdropz10b10__tau3, "jet_ak08softdropz10b10__tau3[n__jet_ak08softdropz10b10]/F");
@@ -4830,6 +4957,7 @@ public:
 		tree->Branch("jet_ak08softdropz10b20__eta", jet_ak08softdropz10b20__eta, "jet_ak08softdropz10b20__eta[n__jet_ak08softdropz10b20]/F");
 		tree->Branch("jet_ak08softdropz10b20__phi", jet_ak08softdropz10b20__phi, "jet_ak08softdropz10b20__phi[n__jet_ak08softdropz10b20]/F");
 		tree->Branch("jet_ak08softdropz10b20__mass", jet_ak08softdropz10b20__mass, "jet_ak08softdropz10b20__mass[n__jet_ak08softdropz10b20]/F");
+		tree->Branch("jet_ak08softdropz10b20__masscal", jet_ak08softdropz10b20__masscal, "jet_ak08softdropz10b20__masscal[n__jet_ak08softdropz10b20]/F");
 		tree->Branch("jet_ak08softdropz10b20__tau1", jet_ak08softdropz10b20__tau1, "jet_ak08softdropz10b20__tau1[n__jet_ak08softdropz10b20]/F");
 		tree->Branch("jet_ak08softdropz10b20__tau2", jet_ak08softdropz10b20__tau2, "jet_ak08softdropz10b20__tau2[n__jet_ak08softdropz10b20]/F");
 		tree->Branch("jet_ak08softdropz10b20__tau3", jet_ak08softdropz10b20__tau3, "jet_ak08softdropz10b20__tau3[n__jet_ak08softdropz10b20]/F");
@@ -4860,6 +4988,7 @@ public:
 		tree->Branch("jet_ak08softdropz15bm10__eta", jet_ak08softdropz15bm10__eta, "jet_ak08softdropz15bm10__eta[n__jet_ak08softdropz15bm10]/F");
 		tree->Branch("jet_ak08softdropz15bm10__phi", jet_ak08softdropz15bm10__phi, "jet_ak08softdropz15bm10__phi[n__jet_ak08softdropz15bm10]/F");
 		tree->Branch("jet_ak08softdropz15bm10__mass", jet_ak08softdropz15bm10__mass, "jet_ak08softdropz15bm10__mass[n__jet_ak08softdropz15bm10]/F");
+		tree->Branch("jet_ak08softdropz15bm10__masscal", jet_ak08softdropz15bm10__masscal, "jet_ak08softdropz15bm10__masscal[n__jet_ak08softdropz15bm10]/F");
 		tree->Branch("jet_ak08softdropz15bm10__tau1", jet_ak08softdropz15bm10__tau1, "jet_ak08softdropz15bm10__tau1[n__jet_ak08softdropz15bm10]/F");
 		tree->Branch("jet_ak08softdropz15bm10__tau2", jet_ak08softdropz15bm10__tau2, "jet_ak08softdropz15bm10__tau2[n__jet_ak08softdropz15bm10]/F");
 		tree->Branch("jet_ak08softdropz15bm10__tau3", jet_ak08softdropz15bm10__tau3, "jet_ak08softdropz15bm10__tau3[n__jet_ak08softdropz15bm10]/F");
@@ -4890,6 +5019,7 @@ public:
 		tree->Branch("jet_ak08softdropz15b00__eta", jet_ak08softdropz15b00__eta, "jet_ak08softdropz15b00__eta[n__jet_ak08softdropz15b00]/F");
 		tree->Branch("jet_ak08softdropz15b00__phi", jet_ak08softdropz15b00__phi, "jet_ak08softdropz15b00__phi[n__jet_ak08softdropz15b00]/F");
 		tree->Branch("jet_ak08softdropz15b00__mass", jet_ak08softdropz15b00__mass, "jet_ak08softdropz15b00__mass[n__jet_ak08softdropz15b00]/F");
+		tree->Branch("jet_ak08softdropz15b00__masscal", jet_ak08softdropz15b00__masscal, "jet_ak08softdropz15b00__masscal[n__jet_ak08softdropz15b00]/F");
 		tree->Branch("jet_ak08softdropz15b00__tau1", jet_ak08softdropz15b00__tau1, "jet_ak08softdropz15b00__tau1[n__jet_ak08softdropz15b00]/F");
 		tree->Branch("jet_ak08softdropz15b00__tau2", jet_ak08softdropz15b00__tau2, "jet_ak08softdropz15b00__tau2[n__jet_ak08softdropz15b00]/F");
 		tree->Branch("jet_ak08softdropz15b00__tau3", jet_ak08softdropz15b00__tau3, "jet_ak08softdropz15b00__tau3[n__jet_ak08softdropz15b00]/F");
@@ -4920,6 +5050,7 @@ public:
 		tree->Branch("jet_ak08softdropz15b10__eta", jet_ak08softdropz15b10__eta, "jet_ak08softdropz15b10__eta[n__jet_ak08softdropz15b10]/F");
 		tree->Branch("jet_ak08softdropz15b10__phi", jet_ak08softdropz15b10__phi, "jet_ak08softdropz15b10__phi[n__jet_ak08softdropz15b10]/F");
 		tree->Branch("jet_ak08softdropz15b10__mass", jet_ak08softdropz15b10__mass, "jet_ak08softdropz15b10__mass[n__jet_ak08softdropz15b10]/F");
+		tree->Branch("jet_ak08softdropz15b10__masscal", jet_ak08softdropz15b10__masscal, "jet_ak08softdropz15b10__masscal[n__jet_ak08softdropz15b10]/F");
 		tree->Branch("jet_ak08softdropz15b10__tau1", jet_ak08softdropz15b10__tau1, "jet_ak08softdropz15b10__tau1[n__jet_ak08softdropz15b10]/F");
 		tree->Branch("jet_ak08softdropz15b10__tau2", jet_ak08softdropz15b10__tau2, "jet_ak08softdropz15b10__tau2[n__jet_ak08softdropz15b10]/F");
 		tree->Branch("jet_ak08softdropz15b10__tau3", jet_ak08softdropz15b10__tau3, "jet_ak08softdropz15b10__tau3[n__jet_ak08softdropz15b10]/F");
@@ -4950,6 +5081,7 @@ public:
 		tree->Branch("jet_ak08softdropz15b20__eta", jet_ak08softdropz15b20__eta, "jet_ak08softdropz15b20__eta[n__jet_ak08softdropz15b20]/F");
 		tree->Branch("jet_ak08softdropz15b20__phi", jet_ak08softdropz15b20__phi, "jet_ak08softdropz15b20__phi[n__jet_ak08softdropz15b20]/F");
 		tree->Branch("jet_ak08softdropz15b20__mass", jet_ak08softdropz15b20__mass, "jet_ak08softdropz15b20__mass[n__jet_ak08softdropz15b20]/F");
+		tree->Branch("jet_ak08softdropz15b20__masscal", jet_ak08softdropz15b20__masscal, "jet_ak08softdropz15b20__masscal[n__jet_ak08softdropz15b20]/F");
 		tree->Branch("jet_ak08softdropz15b20__tau1", jet_ak08softdropz15b20__tau1, "jet_ak08softdropz15b20__tau1[n__jet_ak08softdropz15b20]/F");
 		tree->Branch("jet_ak08softdropz15b20__tau2", jet_ak08softdropz15b20__tau2, "jet_ak08softdropz15b20__tau2[n__jet_ak08softdropz15b20]/F");
 		tree->Branch("jet_ak08softdropz15b20__tau3", jet_ak08softdropz15b20__tau3, "jet_ak08softdropz15b20__tau3[n__jet_ak08softdropz15b20]/F");
@@ -4980,6 +5112,7 @@ public:
 		tree->Branch("jet_ak08softdropz20b00__eta", jet_ak08softdropz20b00__eta, "jet_ak08softdropz20b00__eta[n__jet_ak08softdropz20b00]/F");
 		tree->Branch("jet_ak08softdropz20b00__phi", jet_ak08softdropz20b00__phi, "jet_ak08softdropz20b00__phi[n__jet_ak08softdropz20b00]/F");
 		tree->Branch("jet_ak08softdropz20b00__mass", jet_ak08softdropz20b00__mass, "jet_ak08softdropz20b00__mass[n__jet_ak08softdropz20b00]/F");
+		tree->Branch("jet_ak08softdropz20b00__masscal", jet_ak08softdropz20b00__masscal, "jet_ak08softdropz20b00__masscal[n__jet_ak08softdropz20b00]/F");
 		tree->Branch("jet_ak08softdropz20b00__tau1", jet_ak08softdropz20b00__tau1, "jet_ak08softdropz20b00__tau1[n__jet_ak08softdropz20b00]/F");
 		tree->Branch("jet_ak08softdropz20b00__tau2", jet_ak08softdropz20b00__tau2, "jet_ak08softdropz20b00__tau2[n__jet_ak08softdropz20b00]/F");
 		tree->Branch("jet_ak08softdropz20b00__tau3", jet_ak08softdropz20b00__tau3, "jet_ak08softdropz20b00__tau3[n__jet_ak08softdropz20b00]/F");
@@ -5010,6 +5143,7 @@ public:
 		tree->Branch("jet_ak08softdropz20bm10__eta", jet_ak08softdropz20bm10__eta, "jet_ak08softdropz20bm10__eta[n__jet_ak08softdropz20bm10]/F");
 		tree->Branch("jet_ak08softdropz20bm10__phi", jet_ak08softdropz20bm10__phi, "jet_ak08softdropz20bm10__phi[n__jet_ak08softdropz20bm10]/F");
 		tree->Branch("jet_ak08softdropz20bm10__mass", jet_ak08softdropz20bm10__mass, "jet_ak08softdropz20bm10__mass[n__jet_ak08softdropz20bm10]/F");
+		tree->Branch("jet_ak08softdropz20bm10__masscal", jet_ak08softdropz20bm10__masscal, "jet_ak08softdropz20bm10__masscal[n__jet_ak08softdropz20bm10]/F");
 		tree->Branch("jet_ak08softdropz20bm10__tau1", jet_ak08softdropz20bm10__tau1, "jet_ak08softdropz20bm10__tau1[n__jet_ak08softdropz20bm10]/F");
 		tree->Branch("jet_ak08softdropz20bm10__tau2", jet_ak08softdropz20bm10__tau2, "jet_ak08softdropz20bm10__tau2[n__jet_ak08softdropz20bm10]/F");
 		tree->Branch("jet_ak08softdropz20bm10__tau3", jet_ak08softdropz20bm10__tau3, "jet_ak08softdropz20bm10__tau3[n__jet_ak08softdropz20bm10]/F");
@@ -5040,6 +5174,7 @@ public:
 		tree->Branch("jet_ak08softdropz20b10__eta", jet_ak08softdropz20b10__eta, "jet_ak08softdropz20b10__eta[n__jet_ak08softdropz20b10]/F");
 		tree->Branch("jet_ak08softdropz20b10__phi", jet_ak08softdropz20b10__phi, "jet_ak08softdropz20b10__phi[n__jet_ak08softdropz20b10]/F");
 		tree->Branch("jet_ak08softdropz20b10__mass", jet_ak08softdropz20b10__mass, "jet_ak08softdropz20b10__mass[n__jet_ak08softdropz20b10]/F");
+		tree->Branch("jet_ak08softdropz20b10__masscal", jet_ak08softdropz20b10__masscal, "jet_ak08softdropz20b10__masscal[n__jet_ak08softdropz20b10]/F");
 		tree->Branch("jet_ak08softdropz20b10__tau1", jet_ak08softdropz20b10__tau1, "jet_ak08softdropz20b10__tau1[n__jet_ak08softdropz20b10]/F");
 		tree->Branch("jet_ak08softdropz20b10__tau2", jet_ak08softdropz20b10__tau2, "jet_ak08softdropz20b10__tau2[n__jet_ak08softdropz20b10]/F");
 		tree->Branch("jet_ak08softdropz20b10__tau3", jet_ak08softdropz20b10__tau3, "jet_ak08softdropz20b10__tau3[n__jet_ak08softdropz20b10]/F");
@@ -5070,6 +5205,7 @@ public:
 		tree->Branch("jet_ak08softdropz20b20__eta", jet_ak08softdropz20b20__eta, "jet_ak08softdropz20b20__eta[n__jet_ak08softdropz20b20]/F");
 		tree->Branch("jet_ak08softdropz20b20__phi", jet_ak08softdropz20b20__phi, "jet_ak08softdropz20b20__phi[n__jet_ak08softdropz20b20]/F");
 		tree->Branch("jet_ak08softdropz20b20__mass", jet_ak08softdropz20b20__mass, "jet_ak08softdropz20b20__mass[n__jet_ak08softdropz20b20]/F");
+		tree->Branch("jet_ak08softdropz20b20__masscal", jet_ak08softdropz20b20__masscal, "jet_ak08softdropz20b20__masscal[n__jet_ak08softdropz20b20]/F");
 		tree->Branch("jet_ak08softdropz20b20__tau1", jet_ak08softdropz20b20__tau1, "jet_ak08softdropz20b20__tau1[n__jet_ak08softdropz20b20]/F");
 		tree->Branch("jet_ak08softdropz20b20__tau2", jet_ak08softdropz20b20__tau2, "jet_ak08softdropz20b20__tau2[n__jet_ak08softdropz20b20]/F");
 		tree->Branch("jet_ak08softdropz20b20__tau3", jet_ak08softdropz20b20__tau3, "jet_ak08softdropz20b20__tau3[n__jet_ak08softdropz20b20]/F");
@@ -5100,6 +5236,7 @@ public:
 		tree->Branch("jet_ak08puppitrimmedr2f3forbtag__eta", jet_ak08puppitrimmedr2f3forbtag__eta, "jet_ak08puppitrimmedr2f3forbtag__eta[n__jet_ak08puppitrimmedr2f3forbtag]/F");
 		tree->Branch("jet_ak08puppitrimmedr2f3forbtag__phi", jet_ak08puppitrimmedr2f3forbtag__phi, "jet_ak08puppitrimmedr2f3forbtag__phi[n__jet_ak08puppitrimmedr2f3forbtag]/F");
 		tree->Branch("jet_ak08puppitrimmedr2f3forbtag__mass", jet_ak08puppitrimmedr2f3forbtag__mass, "jet_ak08puppitrimmedr2f3forbtag__mass[n__jet_ak08puppitrimmedr2f3forbtag]/F");
+		tree->Branch("jet_ak08puppitrimmedr2f3forbtag__masscal", jet_ak08puppitrimmedr2f3forbtag__masscal, "jet_ak08puppitrimmedr2f3forbtag__masscal[n__jet_ak08puppitrimmedr2f3forbtag]/F");
 		tree->Branch("jet_ak08puppitrimmedr2f3forbtag__tau1", jet_ak08puppitrimmedr2f3forbtag__tau1, "jet_ak08puppitrimmedr2f3forbtag__tau1[n__jet_ak08puppitrimmedr2f3forbtag]/F");
 		tree->Branch("jet_ak08puppitrimmedr2f3forbtag__tau2", jet_ak08puppitrimmedr2f3forbtag__tau2, "jet_ak08puppitrimmedr2f3forbtag__tau2[n__jet_ak08puppitrimmedr2f3forbtag]/F");
 		tree->Branch("jet_ak08puppitrimmedr2f3forbtag__tau3", jet_ak08puppitrimmedr2f3forbtag__tau3, "jet_ak08puppitrimmedr2f3forbtag__tau3[n__jet_ak08puppitrimmedr2f3forbtag]/F");
@@ -5130,6 +5267,7 @@ public:
 		tree->Branch("jet_ak08puppitrimmedr2f6forbtag__eta", jet_ak08puppitrimmedr2f6forbtag__eta, "jet_ak08puppitrimmedr2f6forbtag__eta[n__jet_ak08puppitrimmedr2f6forbtag]/F");
 		tree->Branch("jet_ak08puppitrimmedr2f6forbtag__phi", jet_ak08puppitrimmedr2f6forbtag__phi, "jet_ak08puppitrimmedr2f6forbtag__phi[n__jet_ak08puppitrimmedr2f6forbtag]/F");
 		tree->Branch("jet_ak08puppitrimmedr2f6forbtag__mass", jet_ak08puppitrimmedr2f6forbtag__mass, "jet_ak08puppitrimmedr2f6forbtag__mass[n__jet_ak08puppitrimmedr2f6forbtag]/F");
+		tree->Branch("jet_ak08puppitrimmedr2f6forbtag__masscal", jet_ak08puppitrimmedr2f6forbtag__masscal, "jet_ak08puppitrimmedr2f6forbtag__masscal[n__jet_ak08puppitrimmedr2f6forbtag]/F");
 		tree->Branch("jet_ak08puppitrimmedr2f6forbtag__tau1", jet_ak08puppitrimmedr2f6forbtag__tau1, "jet_ak08puppitrimmedr2f6forbtag__tau1[n__jet_ak08puppitrimmedr2f6forbtag]/F");
 		tree->Branch("jet_ak08puppitrimmedr2f6forbtag__tau2", jet_ak08puppitrimmedr2f6forbtag__tau2, "jet_ak08puppitrimmedr2f6forbtag__tau2[n__jet_ak08puppitrimmedr2f6forbtag]/F");
 		tree->Branch("jet_ak08puppitrimmedr2f6forbtag__tau3", jet_ak08puppitrimmedr2f6forbtag__tau3, "jet_ak08puppitrimmedr2f6forbtag__tau3[n__jet_ak08puppitrimmedr2f6forbtag]/F");
@@ -5160,6 +5298,7 @@ public:
 		tree->Branch("jet_ak08puppisoftdropz10b00forbtag__eta", jet_ak08puppisoftdropz10b00forbtag__eta, "jet_ak08puppisoftdropz10b00forbtag__eta[n__jet_ak08puppisoftdropz10b00forbtag]/F");
 		tree->Branch("jet_ak08puppisoftdropz10b00forbtag__phi", jet_ak08puppisoftdropz10b00forbtag__phi, "jet_ak08puppisoftdropz10b00forbtag__phi[n__jet_ak08puppisoftdropz10b00forbtag]/F");
 		tree->Branch("jet_ak08puppisoftdropz10b00forbtag__mass", jet_ak08puppisoftdropz10b00forbtag__mass, "jet_ak08puppisoftdropz10b00forbtag__mass[n__jet_ak08puppisoftdropz10b00forbtag]/F");
+		tree->Branch("jet_ak08puppisoftdropz10b00forbtag__masscal", jet_ak08puppisoftdropz10b00forbtag__masscal, "jet_ak08puppisoftdropz10b00forbtag__masscal[n__jet_ak08puppisoftdropz10b00forbtag]/F");
 		tree->Branch("jet_ak08puppisoftdropz10b00forbtag__tau1", jet_ak08puppisoftdropz10b00forbtag__tau1, "jet_ak08puppisoftdropz10b00forbtag__tau1[n__jet_ak08puppisoftdropz10b00forbtag]/F");
 		tree->Branch("jet_ak08puppisoftdropz10b00forbtag__tau2", jet_ak08puppisoftdropz10b00forbtag__tau2, "jet_ak08puppisoftdropz10b00forbtag__tau2[n__jet_ak08puppisoftdropz10b00forbtag]/F");
 		tree->Branch("jet_ak08puppisoftdropz10b00forbtag__tau3", jet_ak08puppisoftdropz10b00forbtag__tau3, "jet_ak08puppisoftdropz10b00forbtag__tau3[n__jet_ak08puppisoftdropz10b00forbtag]/F");
@@ -5190,6 +5329,7 @@ public:
 		tree->Branch("jet_ak08puppisoftdropz20b10forbtag__eta", jet_ak08puppisoftdropz20b10forbtag__eta, "jet_ak08puppisoftdropz20b10forbtag__eta[n__jet_ak08puppisoftdropz20b10forbtag]/F");
 		tree->Branch("jet_ak08puppisoftdropz20b10forbtag__phi", jet_ak08puppisoftdropz20b10forbtag__phi, "jet_ak08puppisoftdropz20b10forbtag__phi[n__jet_ak08puppisoftdropz20b10forbtag]/F");
 		tree->Branch("jet_ak08puppisoftdropz20b10forbtag__mass", jet_ak08puppisoftdropz20b10forbtag__mass, "jet_ak08puppisoftdropz20b10forbtag__mass[n__jet_ak08puppisoftdropz20b10forbtag]/F");
+		tree->Branch("jet_ak08puppisoftdropz20b10forbtag__masscal", jet_ak08puppisoftdropz20b10forbtag__masscal, "jet_ak08puppisoftdropz20b10forbtag__masscal[n__jet_ak08puppisoftdropz20b10forbtag]/F");
 		tree->Branch("jet_ak08puppisoftdropz20b10forbtag__tau1", jet_ak08puppisoftdropz20b10forbtag__tau1, "jet_ak08puppisoftdropz20b10forbtag__tau1[n__jet_ak08puppisoftdropz20b10forbtag]/F");
 		tree->Branch("jet_ak08puppisoftdropz20b10forbtag__tau2", jet_ak08puppisoftdropz20b10forbtag__tau2, "jet_ak08puppisoftdropz20b10forbtag__tau2[n__jet_ak08puppisoftdropz20b10forbtag]/F");
 		tree->Branch("jet_ak08puppisoftdropz20b10forbtag__tau3", jet_ak08puppisoftdropz20b10forbtag__tau3, "jet_ak08puppisoftdropz20b10forbtag__tau3[n__jet_ak08puppisoftdropz20b10forbtag]/F");
@@ -5220,6 +5360,7 @@ public:
 		tree->Branch("jet_ak08puppifilteredn3r2forbtag__eta", jet_ak08puppifilteredn3r2forbtag__eta, "jet_ak08puppifilteredn3r2forbtag__eta[n__jet_ak08puppifilteredn3r2forbtag]/F");
 		tree->Branch("jet_ak08puppifilteredn3r2forbtag__phi", jet_ak08puppifilteredn3r2forbtag__phi, "jet_ak08puppifilteredn3r2forbtag__phi[n__jet_ak08puppifilteredn3r2forbtag]/F");
 		tree->Branch("jet_ak08puppifilteredn3r2forbtag__mass", jet_ak08puppifilteredn3r2forbtag__mass, "jet_ak08puppifilteredn3r2forbtag__mass[n__jet_ak08puppifilteredn3r2forbtag]/F");
+		tree->Branch("jet_ak08puppifilteredn3r2forbtag__masscal", jet_ak08puppifilteredn3r2forbtag__masscal, "jet_ak08puppifilteredn3r2forbtag__masscal[n__jet_ak08puppifilteredn3r2forbtag]/F");
 		tree->Branch("jet_ak08puppifilteredn3r2forbtag__tau1", jet_ak08puppifilteredn3r2forbtag__tau1, "jet_ak08puppifilteredn3r2forbtag__tau1[n__jet_ak08puppifilteredn3r2forbtag]/F");
 		tree->Branch("jet_ak08puppifilteredn3r2forbtag__tau2", jet_ak08puppifilteredn3r2forbtag__tau2, "jet_ak08puppifilteredn3r2forbtag__tau2[n__jet_ak08puppifilteredn3r2forbtag]/F");
 		tree->Branch("jet_ak08puppifilteredn3r2forbtag__tau3", jet_ak08puppifilteredn3r2forbtag__tau3, "jet_ak08puppifilteredn3r2forbtag__tau3[n__jet_ak08puppifilteredn3r2forbtag]/F");
@@ -5250,6 +5391,7 @@ public:
 		tree->Branch("jet_ak08puppifilteredn3r3forbtag__eta", jet_ak08puppifilteredn3r3forbtag__eta, "jet_ak08puppifilteredn3r3forbtag__eta[n__jet_ak08puppifilteredn3r3forbtag]/F");
 		tree->Branch("jet_ak08puppifilteredn3r3forbtag__phi", jet_ak08puppifilteredn3r3forbtag__phi, "jet_ak08puppifilteredn3r3forbtag__phi[n__jet_ak08puppifilteredn3r3forbtag]/F");
 		tree->Branch("jet_ak08puppifilteredn3r3forbtag__mass", jet_ak08puppifilteredn3r3forbtag__mass, "jet_ak08puppifilteredn3r3forbtag__mass[n__jet_ak08puppifilteredn3r3forbtag]/F");
+		tree->Branch("jet_ak08puppifilteredn3r3forbtag__masscal", jet_ak08puppifilteredn3r3forbtag__masscal, "jet_ak08puppifilteredn3r3forbtag__masscal[n__jet_ak08puppifilteredn3r3forbtag]/F");
 		tree->Branch("jet_ak08puppifilteredn3r3forbtag__tau1", jet_ak08puppifilteredn3r3forbtag__tau1, "jet_ak08puppifilteredn3r3forbtag__tau1[n__jet_ak08puppifilteredn3r3forbtag]/F");
 		tree->Branch("jet_ak08puppifilteredn3r3forbtag__tau2", jet_ak08puppifilteredn3r3forbtag__tau2, "jet_ak08puppifilteredn3r3forbtag__tau2[n__jet_ak08puppifilteredn3r3forbtag]/F");
 		tree->Branch("jet_ak08puppifilteredn3r3forbtag__tau3", jet_ak08puppifilteredn3r3forbtag__tau3, "jet_ak08puppifilteredn3r3forbtag__tau3[n__jet_ak08puppifilteredn3r3forbtag]/F");
@@ -5280,6 +5422,7 @@ public:
 		tree->Branch("jet_ak08puppiprunedn3z10rfac50forbtag__eta", jet_ak08puppiprunedn3z10rfac50forbtag__eta, "jet_ak08puppiprunedn3z10rfac50forbtag__eta[n__jet_ak08puppiprunedn3z10rfac50forbtag]/F");
 		tree->Branch("jet_ak08puppiprunedn3z10rfac50forbtag__phi", jet_ak08puppiprunedn3z10rfac50forbtag__phi, "jet_ak08puppiprunedn3z10rfac50forbtag__phi[n__jet_ak08puppiprunedn3z10rfac50forbtag]/F");
 		tree->Branch("jet_ak08puppiprunedn3z10rfac50forbtag__mass", jet_ak08puppiprunedn3z10rfac50forbtag__mass, "jet_ak08puppiprunedn3z10rfac50forbtag__mass[n__jet_ak08puppiprunedn3z10rfac50forbtag]/F");
+		tree->Branch("jet_ak08puppiprunedn3z10rfac50forbtag__masscal", jet_ak08puppiprunedn3z10rfac50forbtag__masscal, "jet_ak08puppiprunedn3z10rfac50forbtag__masscal[n__jet_ak08puppiprunedn3z10rfac50forbtag]/F");
 		tree->Branch("jet_ak08puppiprunedn3z10rfac50forbtag__tau1", jet_ak08puppiprunedn3z10rfac50forbtag__tau1, "jet_ak08puppiprunedn3z10rfac50forbtag__tau1[n__jet_ak08puppiprunedn3z10rfac50forbtag]/F");
 		tree->Branch("jet_ak08puppiprunedn3z10rfac50forbtag__tau2", jet_ak08puppiprunedn3z10rfac50forbtag__tau2, "jet_ak08puppiprunedn3z10rfac50forbtag__tau2[n__jet_ak08puppiprunedn3z10rfac50forbtag]/F");
 		tree->Branch("jet_ak08puppiprunedn3z10rfac50forbtag__tau3", jet_ak08puppiprunedn3z10rfac50forbtag__tau3, "jet_ak08puppiprunedn3z10rfac50forbtag__tau3[n__jet_ak08puppiprunedn3z10rfac50forbtag]/F");
@@ -5310,6 +5453,7 @@ public:
 		tree->Branch("jet_ak08puppifilteredn3r2__eta", jet_ak08puppifilteredn3r2__eta, "jet_ak08puppifilteredn3r2__eta[n__jet_ak08puppifilteredn3r2]/F");
 		tree->Branch("jet_ak08puppifilteredn3r2__phi", jet_ak08puppifilteredn3r2__phi, "jet_ak08puppifilteredn3r2__phi[n__jet_ak08puppifilteredn3r2]/F");
 		tree->Branch("jet_ak08puppifilteredn3r2__mass", jet_ak08puppifilteredn3r2__mass, "jet_ak08puppifilteredn3r2__mass[n__jet_ak08puppifilteredn3r2]/F");
+		tree->Branch("jet_ak08puppifilteredn3r2__masscal", jet_ak08puppifilteredn3r2__masscal, "jet_ak08puppifilteredn3r2__masscal[n__jet_ak08puppifilteredn3r2]/F");
 		tree->Branch("jet_ak08puppifilteredn3r2__tau1", jet_ak08puppifilteredn3r2__tau1, "jet_ak08puppifilteredn3r2__tau1[n__jet_ak08puppifilteredn3r2]/F");
 		tree->Branch("jet_ak08puppifilteredn3r2__tau2", jet_ak08puppifilteredn3r2__tau2, "jet_ak08puppifilteredn3r2__tau2[n__jet_ak08puppifilteredn3r2]/F");
 		tree->Branch("jet_ak08puppifilteredn3r2__tau3", jet_ak08puppifilteredn3r2__tau3, "jet_ak08puppifilteredn3r2__tau3[n__jet_ak08puppifilteredn3r2]/F");
@@ -5340,6 +5484,7 @@ public:
 		tree->Branch("jet_ak08puppifilteredn3r3__eta", jet_ak08puppifilteredn3r3__eta, "jet_ak08puppifilteredn3r3__eta[n__jet_ak08puppifilteredn3r3]/F");
 		tree->Branch("jet_ak08puppifilteredn3r3__phi", jet_ak08puppifilteredn3r3__phi, "jet_ak08puppifilteredn3r3__phi[n__jet_ak08puppifilteredn3r3]/F");
 		tree->Branch("jet_ak08puppifilteredn3r3__mass", jet_ak08puppifilteredn3r3__mass, "jet_ak08puppifilteredn3r3__mass[n__jet_ak08puppifilteredn3r3]/F");
+		tree->Branch("jet_ak08puppifilteredn3r3__masscal", jet_ak08puppifilteredn3r3__masscal, "jet_ak08puppifilteredn3r3__masscal[n__jet_ak08puppifilteredn3r3]/F");
 		tree->Branch("jet_ak08puppifilteredn3r3__tau1", jet_ak08puppifilteredn3r3__tau1, "jet_ak08puppifilteredn3r3__tau1[n__jet_ak08puppifilteredn3r3]/F");
 		tree->Branch("jet_ak08puppifilteredn3r3__tau2", jet_ak08puppifilteredn3r3__tau2, "jet_ak08puppifilteredn3r3__tau2[n__jet_ak08puppifilteredn3r3]/F");
 		tree->Branch("jet_ak08puppifilteredn3r3__tau3", jet_ak08puppifilteredn3r3__tau3, "jet_ak08puppifilteredn3r3__tau3[n__jet_ak08puppifilteredn3r3]/F");
@@ -5370,6 +5515,7 @@ public:
 		tree->Branch("jet_ak08puppifilteredn5r2__eta", jet_ak08puppifilteredn5r2__eta, "jet_ak08puppifilteredn5r2__eta[n__jet_ak08puppifilteredn5r2]/F");
 		tree->Branch("jet_ak08puppifilteredn5r2__phi", jet_ak08puppifilteredn5r2__phi, "jet_ak08puppifilteredn5r2__phi[n__jet_ak08puppifilteredn5r2]/F");
 		tree->Branch("jet_ak08puppifilteredn5r2__mass", jet_ak08puppifilteredn5r2__mass, "jet_ak08puppifilteredn5r2__mass[n__jet_ak08puppifilteredn5r2]/F");
+		tree->Branch("jet_ak08puppifilteredn5r2__masscal", jet_ak08puppifilteredn5r2__masscal, "jet_ak08puppifilteredn5r2__masscal[n__jet_ak08puppifilteredn5r2]/F");
 		tree->Branch("jet_ak08puppifilteredn5r2__tau1", jet_ak08puppifilteredn5r2__tau1, "jet_ak08puppifilteredn5r2__tau1[n__jet_ak08puppifilteredn5r2]/F");
 		tree->Branch("jet_ak08puppifilteredn5r2__tau2", jet_ak08puppifilteredn5r2__tau2, "jet_ak08puppifilteredn5r2__tau2[n__jet_ak08puppifilteredn5r2]/F");
 		tree->Branch("jet_ak08puppifilteredn5r2__tau3", jet_ak08puppifilteredn5r2__tau3, "jet_ak08puppifilteredn5r2__tau3[n__jet_ak08puppifilteredn5r2]/F");
@@ -5400,6 +5546,7 @@ public:
 		tree->Branch("jet_ak08puppiprunedn3z10rfac50__eta", jet_ak08puppiprunedn3z10rfac50__eta, "jet_ak08puppiprunedn3z10rfac50__eta[n__jet_ak08puppiprunedn3z10rfac50]/F");
 		tree->Branch("jet_ak08puppiprunedn3z10rfac50__phi", jet_ak08puppiprunedn3z10rfac50__phi, "jet_ak08puppiprunedn3z10rfac50__phi[n__jet_ak08puppiprunedn3z10rfac50]/F");
 		tree->Branch("jet_ak08puppiprunedn3z10rfac50__mass", jet_ak08puppiprunedn3z10rfac50__mass, "jet_ak08puppiprunedn3z10rfac50__mass[n__jet_ak08puppiprunedn3z10rfac50]/F");
+		tree->Branch("jet_ak08puppiprunedn3z10rfac50__masscal", jet_ak08puppiprunedn3z10rfac50__masscal, "jet_ak08puppiprunedn3z10rfac50__masscal[n__jet_ak08puppiprunedn3z10rfac50]/F");
 		tree->Branch("jet_ak08puppiprunedn3z10rfac50__tau1", jet_ak08puppiprunedn3z10rfac50__tau1, "jet_ak08puppiprunedn3z10rfac50__tau1[n__jet_ak08puppiprunedn3z10rfac50]/F");
 		tree->Branch("jet_ak08puppiprunedn3z10rfac50__tau2", jet_ak08puppiprunedn3z10rfac50__tau2, "jet_ak08puppiprunedn3z10rfac50__tau2[n__jet_ak08puppiprunedn3z10rfac50]/F");
 		tree->Branch("jet_ak08puppiprunedn3z10rfac50__tau3", jet_ak08puppiprunedn3z10rfac50__tau3, "jet_ak08puppiprunedn3z10rfac50__tau3[n__jet_ak08puppiprunedn3z10rfac50]/F");
@@ -5430,6 +5577,7 @@ public:
 		tree->Branch("jet_ak08puppitrimmedr2f3__eta", jet_ak08puppitrimmedr2f3__eta, "jet_ak08puppitrimmedr2f3__eta[n__jet_ak08puppitrimmedr2f3]/F");
 		tree->Branch("jet_ak08puppitrimmedr2f3__phi", jet_ak08puppitrimmedr2f3__phi, "jet_ak08puppitrimmedr2f3__phi[n__jet_ak08puppitrimmedr2f3]/F");
 		tree->Branch("jet_ak08puppitrimmedr2f3__mass", jet_ak08puppitrimmedr2f3__mass, "jet_ak08puppitrimmedr2f3__mass[n__jet_ak08puppitrimmedr2f3]/F");
+		tree->Branch("jet_ak08puppitrimmedr2f3__masscal", jet_ak08puppitrimmedr2f3__masscal, "jet_ak08puppitrimmedr2f3__masscal[n__jet_ak08puppitrimmedr2f3]/F");
 		tree->Branch("jet_ak08puppitrimmedr2f3__tau1", jet_ak08puppitrimmedr2f3__tau1, "jet_ak08puppitrimmedr2f3__tau1[n__jet_ak08puppitrimmedr2f3]/F");
 		tree->Branch("jet_ak08puppitrimmedr2f3__tau2", jet_ak08puppitrimmedr2f3__tau2, "jet_ak08puppitrimmedr2f3__tau2[n__jet_ak08puppitrimmedr2f3]/F");
 		tree->Branch("jet_ak08puppitrimmedr2f3__tau3", jet_ak08puppitrimmedr2f3__tau3, "jet_ak08puppitrimmedr2f3__tau3[n__jet_ak08puppitrimmedr2f3]/F");
@@ -5460,6 +5608,7 @@ public:
 		tree->Branch("jet_ak08puppitrimmedr2f6__eta", jet_ak08puppitrimmedr2f6__eta, "jet_ak08puppitrimmedr2f6__eta[n__jet_ak08puppitrimmedr2f6]/F");
 		tree->Branch("jet_ak08puppitrimmedr2f6__phi", jet_ak08puppitrimmedr2f6__phi, "jet_ak08puppitrimmedr2f6__phi[n__jet_ak08puppitrimmedr2f6]/F");
 		tree->Branch("jet_ak08puppitrimmedr2f6__mass", jet_ak08puppitrimmedr2f6__mass, "jet_ak08puppitrimmedr2f6__mass[n__jet_ak08puppitrimmedr2f6]/F");
+		tree->Branch("jet_ak08puppitrimmedr2f6__masscal", jet_ak08puppitrimmedr2f6__masscal, "jet_ak08puppitrimmedr2f6__masscal[n__jet_ak08puppitrimmedr2f6]/F");
 		tree->Branch("jet_ak08puppitrimmedr2f6__tau1", jet_ak08puppitrimmedr2f6__tau1, "jet_ak08puppitrimmedr2f6__tau1[n__jet_ak08puppitrimmedr2f6]/F");
 		tree->Branch("jet_ak08puppitrimmedr2f6__tau2", jet_ak08puppitrimmedr2f6__tau2, "jet_ak08puppitrimmedr2f6__tau2[n__jet_ak08puppitrimmedr2f6]/F");
 		tree->Branch("jet_ak08puppitrimmedr2f6__tau3", jet_ak08puppitrimmedr2f6__tau3, "jet_ak08puppitrimmedr2f6__tau3[n__jet_ak08puppitrimmedr2f6]/F");
@@ -5490,6 +5639,7 @@ public:
 		tree->Branch("jet_ak08puppitrimmedr2f9__eta", jet_ak08puppitrimmedr2f9__eta, "jet_ak08puppitrimmedr2f9__eta[n__jet_ak08puppitrimmedr2f9]/F");
 		tree->Branch("jet_ak08puppitrimmedr2f9__phi", jet_ak08puppitrimmedr2f9__phi, "jet_ak08puppitrimmedr2f9__phi[n__jet_ak08puppitrimmedr2f9]/F");
 		tree->Branch("jet_ak08puppitrimmedr2f9__mass", jet_ak08puppitrimmedr2f9__mass, "jet_ak08puppitrimmedr2f9__mass[n__jet_ak08puppitrimmedr2f9]/F");
+		tree->Branch("jet_ak08puppitrimmedr2f9__masscal", jet_ak08puppitrimmedr2f9__masscal, "jet_ak08puppitrimmedr2f9__masscal[n__jet_ak08puppitrimmedr2f9]/F");
 		tree->Branch("jet_ak08puppitrimmedr2f9__tau1", jet_ak08puppitrimmedr2f9__tau1, "jet_ak08puppitrimmedr2f9__tau1[n__jet_ak08puppitrimmedr2f9]/F");
 		tree->Branch("jet_ak08puppitrimmedr2f9__tau2", jet_ak08puppitrimmedr2f9__tau2, "jet_ak08puppitrimmedr2f9__tau2[n__jet_ak08puppitrimmedr2f9]/F");
 		tree->Branch("jet_ak08puppitrimmedr2f9__tau3", jet_ak08puppitrimmedr2f9__tau3, "jet_ak08puppitrimmedr2f9__tau3[n__jet_ak08puppitrimmedr2f9]/F");
@@ -5520,6 +5670,7 @@ public:
 		tree->Branch("jet_ak08puppisoftdropz10bm10__eta", jet_ak08puppisoftdropz10bm10__eta, "jet_ak08puppisoftdropz10bm10__eta[n__jet_ak08puppisoftdropz10bm10]/F");
 		tree->Branch("jet_ak08puppisoftdropz10bm10__phi", jet_ak08puppisoftdropz10bm10__phi, "jet_ak08puppisoftdropz10bm10__phi[n__jet_ak08puppisoftdropz10bm10]/F");
 		tree->Branch("jet_ak08puppisoftdropz10bm10__mass", jet_ak08puppisoftdropz10bm10__mass, "jet_ak08puppisoftdropz10bm10__mass[n__jet_ak08puppisoftdropz10bm10]/F");
+		tree->Branch("jet_ak08puppisoftdropz10bm10__masscal", jet_ak08puppisoftdropz10bm10__masscal, "jet_ak08puppisoftdropz10bm10__masscal[n__jet_ak08puppisoftdropz10bm10]/F");
 		tree->Branch("jet_ak08puppisoftdropz10bm10__tau1", jet_ak08puppisoftdropz10bm10__tau1, "jet_ak08puppisoftdropz10bm10__tau1[n__jet_ak08puppisoftdropz10bm10]/F");
 		tree->Branch("jet_ak08puppisoftdropz10bm10__tau2", jet_ak08puppisoftdropz10bm10__tau2, "jet_ak08puppisoftdropz10bm10__tau2[n__jet_ak08puppisoftdropz10bm10]/F");
 		tree->Branch("jet_ak08puppisoftdropz10bm10__tau3", jet_ak08puppisoftdropz10bm10__tau3, "jet_ak08puppisoftdropz10bm10__tau3[n__jet_ak08puppisoftdropz10bm10]/F");
@@ -5550,6 +5701,7 @@ public:
 		tree->Branch("jet_ak08puppisoftdropz10b00__eta", jet_ak08puppisoftdropz10b00__eta, "jet_ak08puppisoftdropz10b00__eta[n__jet_ak08puppisoftdropz10b00]/F");
 		tree->Branch("jet_ak08puppisoftdropz10b00__phi", jet_ak08puppisoftdropz10b00__phi, "jet_ak08puppisoftdropz10b00__phi[n__jet_ak08puppisoftdropz10b00]/F");
 		tree->Branch("jet_ak08puppisoftdropz10b00__mass", jet_ak08puppisoftdropz10b00__mass, "jet_ak08puppisoftdropz10b00__mass[n__jet_ak08puppisoftdropz10b00]/F");
+		tree->Branch("jet_ak08puppisoftdropz10b00__masscal", jet_ak08puppisoftdropz10b00__masscal, "jet_ak08puppisoftdropz10b00__masscal[n__jet_ak08puppisoftdropz10b00]/F");
 		tree->Branch("jet_ak08puppisoftdropz10b00__tau1", jet_ak08puppisoftdropz10b00__tau1, "jet_ak08puppisoftdropz10b00__tau1[n__jet_ak08puppisoftdropz10b00]/F");
 		tree->Branch("jet_ak08puppisoftdropz10b00__tau2", jet_ak08puppisoftdropz10b00__tau2, "jet_ak08puppisoftdropz10b00__tau2[n__jet_ak08puppisoftdropz10b00]/F");
 		tree->Branch("jet_ak08puppisoftdropz10b00__tau3", jet_ak08puppisoftdropz10b00__tau3, "jet_ak08puppisoftdropz10b00__tau3[n__jet_ak08puppisoftdropz10b00]/F");
@@ -5580,6 +5732,7 @@ public:
 		tree->Branch("jet_ak08puppisoftdropz10b10__eta", jet_ak08puppisoftdropz10b10__eta, "jet_ak08puppisoftdropz10b10__eta[n__jet_ak08puppisoftdropz10b10]/F");
 		tree->Branch("jet_ak08puppisoftdropz10b10__phi", jet_ak08puppisoftdropz10b10__phi, "jet_ak08puppisoftdropz10b10__phi[n__jet_ak08puppisoftdropz10b10]/F");
 		tree->Branch("jet_ak08puppisoftdropz10b10__mass", jet_ak08puppisoftdropz10b10__mass, "jet_ak08puppisoftdropz10b10__mass[n__jet_ak08puppisoftdropz10b10]/F");
+		tree->Branch("jet_ak08puppisoftdropz10b10__masscal", jet_ak08puppisoftdropz10b10__masscal, "jet_ak08puppisoftdropz10b10__masscal[n__jet_ak08puppisoftdropz10b10]/F");
 		tree->Branch("jet_ak08puppisoftdropz10b10__tau1", jet_ak08puppisoftdropz10b10__tau1, "jet_ak08puppisoftdropz10b10__tau1[n__jet_ak08puppisoftdropz10b10]/F");
 		tree->Branch("jet_ak08puppisoftdropz10b10__tau2", jet_ak08puppisoftdropz10b10__tau2, "jet_ak08puppisoftdropz10b10__tau2[n__jet_ak08puppisoftdropz10b10]/F");
 		tree->Branch("jet_ak08puppisoftdropz10b10__tau3", jet_ak08puppisoftdropz10b10__tau3, "jet_ak08puppisoftdropz10b10__tau3[n__jet_ak08puppisoftdropz10b10]/F");
@@ -5610,6 +5763,7 @@ public:
 		tree->Branch("jet_ak08puppisoftdropz10b20__eta", jet_ak08puppisoftdropz10b20__eta, "jet_ak08puppisoftdropz10b20__eta[n__jet_ak08puppisoftdropz10b20]/F");
 		tree->Branch("jet_ak08puppisoftdropz10b20__phi", jet_ak08puppisoftdropz10b20__phi, "jet_ak08puppisoftdropz10b20__phi[n__jet_ak08puppisoftdropz10b20]/F");
 		tree->Branch("jet_ak08puppisoftdropz10b20__mass", jet_ak08puppisoftdropz10b20__mass, "jet_ak08puppisoftdropz10b20__mass[n__jet_ak08puppisoftdropz10b20]/F");
+		tree->Branch("jet_ak08puppisoftdropz10b20__masscal", jet_ak08puppisoftdropz10b20__masscal, "jet_ak08puppisoftdropz10b20__masscal[n__jet_ak08puppisoftdropz10b20]/F");
 		tree->Branch("jet_ak08puppisoftdropz10b20__tau1", jet_ak08puppisoftdropz10b20__tau1, "jet_ak08puppisoftdropz10b20__tau1[n__jet_ak08puppisoftdropz10b20]/F");
 		tree->Branch("jet_ak08puppisoftdropz10b20__tau2", jet_ak08puppisoftdropz10b20__tau2, "jet_ak08puppisoftdropz10b20__tau2[n__jet_ak08puppisoftdropz10b20]/F");
 		tree->Branch("jet_ak08puppisoftdropz10b20__tau3", jet_ak08puppisoftdropz10b20__tau3, "jet_ak08puppisoftdropz10b20__tau3[n__jet_ak08puppisoftdropz10b20]/F");
@@ -5640,6 +5794,7 @@ public:
 		tree->Branch("jet_ak08puppisoftdropz15bm10__eta", jet_ak08puppisoftdropz15bm10__eta, "jet_ak08puppisoftdropz15bm10__eta[n__jet_ak08puppisoftdropz15bm10]/F");
 		tree->Branch("jet_ak08puppisoftdropz15bm10__phi", jet_ak08puppisoftdropz15bm10__phi, "jet_ak08puppisoftdropz15bm10__phi[n__jet_ak08puppisoftdropz15bm10]/F");
 		tree->Branch("jet_ak08puppisoftdropz15bm10__mass", jet_ak08puppisoftdropz15bm10__mass, "jet_ak08puppisoftdropz15bm10__mass[n__jet_ak08puppisoftdropz15bm10]/F");
+		tree->Branch("jet_ak08puppisoftdropz15bm10__masscal", jet_ak08puppisoftdropz15bm10__masscal, "jet_ak08puppisoftdropz15bm10__masscal[n__jet_ak08puppisoftdropz15bm10]/F");
 		tree->Branch("jet_ak08puppisoftdropz15bm10__tau1", jet_ak08puppisoftdropz15bm10__tau1, "jet_ak08puppisoftdropz15bm10__tau1[n__jet_ak08puppisoftdropz15bm10]/F");
 		tree->Branch("jet_ak08puppisoftdropz15bm10__tau2", jet_ak08puppisoftdropz15bm10__tau2, "jet_ak08puppisoftdropz15bm10__tau2[n__jet_ak08puppisoftdropz15bm10]/F");
 		tree->Branch("jet_ak08puppisoftdropz15bm10__tau3", jet_ak08puppisoftdropz15bm10__tau3, "jet_ak08puppisoftdropz15bm10__tau3[n__jet_ak08puppisoftdropz15bm10]/F");
@@ -5670,6 +5825,7 @@ public:
 		tree->Branch("jet_ak08puppisoftdropz15b00__eta", jet_ak08puppisoftdropz15b00__eta, "jet_ak08puppisoftdropz15b00__eta[n__jet_ak08puppisoftdropz15b00]/F");
 		tree->Branch("jet_ak08puppisoftdropz15b00__phi", jet_ak08puppisoftdropz15b00__phi, "jet_ak08puppisoftdropz15b00__phi[n__jet_ak08puppisoftdropz15b00]/F");
 		tree->Branch("jet_ak08puppisoftdropz15b00__mass", jet_ak08puppisoftdropz15b00__mass, "jet_ak08puppisoftdropz15b00__mass[n__jet_ak08puppisoftdropz15b00]/F");
+		tree->Branch("jet_ak08puppisoftdropz15b00__masscal", jet_ak08puppisoftdropz15b00__masscal, "jet_ak08puppisoftdropz15b00__masscal[n__jet_ak08puppisoftdropz15b00]/F");
 		tree->Branch("jet_ak08puppisoftdropz15b00__tau1", jet_ak08puppisoftdropz15b00__tau1, "jet_ak08puppisoftdropz15b00__tau1[n__jet_ak08puppisoftdropz15b00]/F");
 		tree->Branch("jet_ak08puppisoftdropz15b00__tau2", jet_ak08puppisoftdropz15b00__tau2, "jet_ak08puppisoftdropz15b00__tau2[n__jet_ak08puppisoftdropz15b00]/F");
 		tree->Branch("jet_ak08puppisoftdropz15b00__tau3", jet_ak08puppisoftdropz15b00__tau3, "jet_ak08puppisoftdropz15b00__tau3[n__jet_ak08puppisoftdropz15b00]/F");
@@ -5700,6 +5856,7 @@ public:
 		tree->Branch("jet_ak08puppisoftdropz15b10__eta", jet_ak08puppisoftdropz15b10__eta, "jet_ak08puppisoftdropz15b10__eta[n__jet_ak08puppisoftdropz15b10]/F");
 		tree->Branch("jet_ak08puppisoftdropz15b10__phi", jet_ak08puppisoftdropz15b10__phi, "jet_ak08puppisoftdropz15b10__phi[n__jet_ak08puppisoftdropz15b10]/F");
 		tree->Branch("jet_ak08puppisoftdropz15b10__mass", jet_ak08puppisoftdropz15b10__mass, "jet_ak08puppisoftdropz15b10__mass[n__jet_ak08puppisoftdropz15b10]/F");
+		tree->Branch("jet_ak08puppisoftdropz15b10__masscal", jet_ak08puppisoftdropz15b10__masscal, "jet_ak08puppisoftdropz15b10__masscal[n__jet_ak08puppisoftdropz15b10]/F");
 		tree->Branch("jet_ak08puppisoftdropz15b10__tau1", jet_ak08puppisoftdropz15b10__tau1, "jet_ak08puppisoftdropz15b10__tau1[n__jet_ak08puppisoftdropz15b10]/F");
 		tree->Branch("jet_ak08puppisoftdropz15b10__tau2", jet_ak08puppisoftdropz15b10__tau2, "jet_ak08puppisoftdropz15b10__tau2[n__jet_ak08puppisoftdropz15b10]/F");
 		tree->Branch("jet_ak08puppisoftdropz15b10__tau3", jet_ak08puppisoftdropz15b10__tau3, "jet_ak08puppisoftdropz15b10__tau3[n__jet_ak08puppisoftdropz15b10]/F");
@@ -5730,6 +5887,7 @@ public:
 		tree->Branch("jet_ak08puppisoftdropz15b20__eta", jet_ak08puppisoftdropz15b20__eta, "jet_ak08puppisoftdropz15b20__eta[n__jet_ak08puppisoftdropz15b20]/F");
 		tree->Branch("jet_ak08puppisoftdropz15b20__phi", jet_ak08puppisoftdropz15b20__phi, "jet_ak08puppisoftdropz15b20__phi[n__jet_ak08puppisoftdropz15b20]/F");
 		tree->Branch("jet_ak08puppisoftdropz15b20__mass", jet_ak08puppisoftdropz15b20__mass, "jet_ak08puppisoftdropz15b20__mass[n__jet_ak08puppisoftdropz15b20]/F");
+		tree->Branch("jet_ak08puppisoftdropz15b20__masscal", jet_ak08puppisoftdropz15b20__masscal, "jet_ak08puppisoftdropz15b20__masscal[n__jet_ak08puppisoftdropz15b20]/F");
 		tree->Branch("jet_ak08puppisoftdropz15b20__tau1", jet_ak08puppisoftdropz15b20__tau1, "jet_ak08puppisoftdropz15b20__tau1[n__jet_ak08puppisoftdropz15b20]/F");
 		tree->Branch("jet_ak08puppisoftdropz15b20__tau2", jet_ak08puppisoftdropz15b20__tau2, "jet_ak08puppisoftdropz15b20__tau2[n__jet_ak08puppisoftdropz15b20]/F");
 		tree->Branch("jet_ak08puppisoftdropz15b20__tau3", jet_ak08puppisoftdropz15b20__tau3, "jet_ak08puppisoftdropz15b20__tau3[n__jet_ak08puppisoftdropz15b20]/F");
@@ -5760,6 +5918,7 @@ public:
 		tree->Branch("jet_ak08puppisoftdropz20b00__eta", jet_ak08puppisoftdropz20b00__eta, "jet_ak08puppisoftdropz20b00__eta[n__jet_ak08puppisoftdropz20b00]/F");
 		tree->Branch("jet_ak08puppisoftdropz20b00__phi", jet_ak08puppisoftdropz20b00__phi, "jet_ak08puppisoftdropz20b00__phi[n__jet_ak08puppisoftdropz20b00]/F");
 		tree->Branch("jet_ak08puppisoftdropz20b00__mass", jet_ak08puppisoftdropz20b00__mass, "jet_ak08puppisoftdropz20b00__mass[n__jet_ak08puppisoftdropz20b00]/F");
+		tree->Branch("jet_ak08puppisoftdropz20b00__masscal", jet_ak08puppisoftdropz20b00__masscal, "jet_ak08puppisoftdropz20b00__masscal[n__jet_ak08puppisoftdropz20b00]/F");
 		tree->Branch("jet_ak08puppisoftdropz20b00__tau1", jet_ak08puppisoftdropz20b00__tau1, "jet_ak08puppisoftdropz20b00__tau1[n__jet_ak08puppisoftdropz20b00]/F");
 		tree->Branch("jet_ak08puppisoftdropz20b00__tau2", jet_ak08puppisoftdropz20b00__tau2, "jet_ak08puppisoftdropz20b00__tau2[n__jet_ak08puppisoftdropz20b00]/F");
 		tree->Branch("jet_ak08puppisoftdropz20b00__tau3", jet_ak08puppisoftdropz20b00__tau3, "jet_ak08puppisoftdropz20b00__tau3[n__jet_ak08puppisoftdropz20b00]/F");
@@ -5790,6 +5949,7 @@ public:
 		tree->Branch("jet_ak08puppisoftdropz20bm10__eta", jet_ak08puppisoftdropz20bm10__eta, "jet_ak08puppisoftdropz20bm10__eta[n__jet_ak08puppisoftdropz20bm10]/F");
 		tree->Branch("jet_ak08puppisoftdropz20bm10__phi", jet_ak08puppisoftdropz20bm10__phi, "jet_ak08puppisoftdropz20bm10__phi[n__jet_ak08puppisoftdropz20bm10]/F");
 		tree->Branch("jet_ak08puppisoftdropz20bm10__mass", jet_ak08puppisoftdropz20bm10__mass, "jet_ak08puppisoftdropz20bm10__mass[n__jet_ak08puppisoftdropz20bm10]/F");
+		tree->Branch("jet_ak08puppisoftdropz20bm10__masscal", jet_ak08puppisoftdropz20bm10__masscal, "jet_ak08puppisoftdropz20bm10__masscal[n__jet_ak08puppisoftdropz20bm10]/F");
 		tree->Branch("jet_ak08puppisoftdropz20bm10__tau1", jet_ak08puppisoftdropz20bm10__tau1, "jet_ak08puppisoftdropz20bm10__tau1[n__jet_ak08puppisoftdropz20bm10]/F");
 		tree->Branch("jet_ak08puppisoftdropz20bm10__tau2", jet_ak08puppisoftdropz20bm10__tau2, "jet_ak08puppisoftdropz20bm10__tau2[n__jet_ak08puppisoftdropz20bm10]/F");
 		tree->Branch("jet_ak08puppisoftdropz20bm10__tau3", jet_ak08puppisoftdropz20bm10__tau3, "jet_ak08puppisoftdropz20bm10__tau3[n__jet_ak08puppisoftdropz20bm10]/F");
@@ -5820,6 +5980,7 @@ public:
 		tree->Branch("jet_ak08puppisoftdropz20b10__eta", jet_ak08puppisoftdropz20b10__eta, "jet_ak08puppisoftdropz20b10__eta[n__jet_ak08puppisoftdropz20b10]/F");
 		tree->Branch("jet_ak08puppisoftdropz20b10__phi", jet_ak08puppisoftdropz20b10__phi, "jet_ak08puppisoftdropz20b10__phi[n__jet_ak08puppisoftdropz20b10]/F");
 		tree->Branch("jet_ak08puppisoftdropz20b10__mass", jet_ak08puppisoftdropz20b10__mass, "jet_ak08puppisoftdropz20b10__mass[n__jet_ak08puppisoftdropz20b10]/F");
+		tree->Branch("jet_ak08puppisoftdropz20b10__masscal", jet_ak08puppisoftdropz20b10__masscal, "jet_ak08puppisoftdropz20b10__masscal[n__jet_ak08puppisoftdropz20b10]/F");
 		tree->Branch("jet_ak08puppisoftdropz20b10__tau1", jet_ak08puppisoftdropz20b10__tau1, "jet_ak08puppisoftdropz20b10__tau1[n__jet_ak08puppisoftdropz20b10]/F");
 		tree->Branch("jet_ak08puppisoftdropz20b10__tau2", jet_ak08puppisoftdropz20b10__tau2, "jet_ak08puppisoftdropz20b10__tau2[n__jet_ak08puppisoftdropz20b10]/F");
 		tree->Branch("jet_ak08puppisoftdropz20b10__tau3", jet_ak08puppisoftdropz20b10__tau3, "jet_ak08puppisoftdropz20b10__tau3[n__jet_ak08puppisoftdropz20b10]/F");
@@ -5850,6 +6011,7 @@ public:
 		tree->Branch("jet_ak08puppisoftdropz20b20__eta", jet_ak08puppisoftdropz20b20__eta, "jet_ak08puppisoftdropz20b20__eta[n__jet_ak08puppisoftdropz20b20]/F");
 		tree->Branch("jet_ak08puppisoftdropz20b20__phi", jet_ak08puppisoftdropz20b20__phi, "jet_ak08puppisoftdropz20b20__phi[n__jet_ak08puppisoftdropz20b20]/F");
 		tree->Branch("jet_ak08puppisoftdropz20b20__mass", jet_ak08puppisoftdropz20b20__mass, "jet_ak08puppisoftdropz20b20__mass[n__jet_ak08puppisoftdropz20b20]/F");
+		tree->Branch("jet_ak08puppisoftdropz20b20__masscal", jet_ak08puppisoftdropz20b20__masscal, "jet_ak08puppisoftdropz20b20__masscal[n__jet_ak08puppisoftdropz20b20]/F");
 		tree->Branch("jet_ak08puppisoftdropz20b20__tau1", jet_ak08puppisoftdropz20b20__tau1, "jet_ak08puppisoftdropz20b20__tau1[n__jet_ak08puppisoftdropz20b20]/F");
 		tree->Branch("jet_ak08puppisoftdropz20b20__tau2", jet_ak08puppisoftdropz20b20__tau2, "jet_ak08puppisoftdropz20b20__tau2[n__jet_ak08puppisoftdropz20b20]/F");
 		tree->Branch("jet_ak08puppisoftdropz20b20__tau3", jet_ak08puppisoftdropz20b20__tau3, "jet_ak08puppisoftdropz20b20__tau3[n__jet_ak08puppisoftdropz20b20]/F");
@@ -6251,6 +6413,7 @@ public:
 		tree->SetBranchAddress("jet_ak08__eta", jet_ak08__eta);
 		tree->SetBranchAddress("jet_ak08__phi", jet_ak08__phi);
 		tree->SetBranchAddress("jet_ak08__mass", jet_ak08__mass);
+		tree->SetBranchAddress("jet_ak08__masscal", jet_ak08__masscal);
 		tree->SetBranchAddress("jet_ak08__tau1", jet_ak08__tau1);
 		tree->SetBranchAddress("jet_ak08__tau2", jet_ak08__tau2);
 		tree->SetBranchAddress("jet_ak08__tau3", jet_ak08__tau3);
@@ -6281,6 +6444,7 @@ public:
 		tree->SetBranchAddress("jet_ak08puppi__eta", jet_ak08puppi__eta);
 		tree->SetBranchAddress("jet_ak08puppi__phi", jet_ak08puppi__phi);
 		tree->SetBranchAddress("jet_ak08puppi__mass", jet_ak08puppi__mass);
+		tree->SetBranchAddress("jet_ak08puppi__masscal", jet_ak08puppi__masscal);
 		tree->SetBranchAddress("jet_ak08puppi__tau1", jet_ak08puppi__tau1);
 		tree->SetBranchAddress("jet_ak08puppi__tau2", jet_ak08puppi__tau2);
 		tree->SetBranchAddress("jet_ak08puppi__tau3", jet_ak08puppi__tau3);
@@ -6311,6 +6475,7 @@ public:
 		tree->SetBranchAddress("jet_ak08trimmedr2f3forbtag__eta", jet_ak08trimmedr2f3forbtag__eta);
 		tree->SetBranchAddress("jet_ak08trimmedr2f3forbtag__phi", jet_ak08trimmedr2f3forbtag__phi);
 		tree->SetBranchAddress("jet_ak08trimmedr2f3forbtag__mass", jet_ak08trimmedr2f3forbtag__mass);
+		tree->SetBranchAddress("jet_ak08trimmedr2f3forbtag__masscal", jet_ak08trimmedr2f3forbtag__masscal);
 		tree->SetBranchAddress("jet_ak08trimmedr2f3forbtag__tau1", jet_ak08trimmedr2f3forbtag__tau1);
 		tree->SetBranchAddress("jet_ak08trimmedr2f3forbtag__tau2", jet_ak08trimmedr2f3forbtag__tau2);
 		tree->SetBranchAddress("jet_ak08trimmedr2f3forbtag__tau3", jet_ak08trimmedr2f3forbtag__tau3);
@@ -6341,6 +6506,7 @@ public:
 		tree->SetBranchAddress("jet_ak08trimmedr2f6forbtag__eta", jet_ak08trimmedr2f6forbtag__eta);
 		tree->SetBranchAddress("jet_ak08trimmedr2f6forbtag__phi", jet_ak08trimmedr2f6forbtag__phi);
 		tree->SetBranchAddress("jet_ak08trimmedr2f6forbtag__mass", jet_ak08trimmedr2f6forbtag__mass);
+		tree->SetBranchAddress("jet_ak08trimmedr2f6forbtag__masscal", jet_ak08trimmedr2f6forbtag__masscal);
 		tree->SetBranchAddress("jet_ak08trimmedr2f6forbtag__tau1", jet_ak08trimmedr2f6forbtag__tau1);
 		tree->SetBranchAddress("jet_ak08trimmedr2f6forbtag__tau2", jet_ak08trimmedr2f6forbtag__tau2);
 		tree->SetBranchAddress("jet_ak08trimmedr2f6forbtag__tau3", jet_ak08trimmedr2f6forbtag__tau3);
@@ -6371,6 +6537,7 @@ public:
 		tree->SetBranchAddress("jet_ak08softdropz10b00forbtag__eta", jet_ak08softdropz10b00forbtag__eta);
 		tree->SetBranchAddress("jet_ak08softdropz10b00forbtag__phi", jet_ak08softdropz10b00forbtag__phi);
 		tree->SetBranchAddress("jet_ak08softdropz10b00forbtag__mass", jet_ak08softdropz10b00forbtag__mass);
+		tree->SetBranchAddress("jet_ak08softdropz10b00forbtag__masscal", jet_ak08softdropz10b00forbtag__masscal);
 		tree->SetBranchAddress("jet_ak08softdropz10b00forbtag__tau1", jet_ak08softdropz10b00forbtag__tau1);
 		tree->SetBranchAddress("jet_ak08softdropz10b00forbtag__tau2", jet_ak08softdropz10b00forbtag__tau2);
 		tree->SetBranchAddress("jet_ak08softdropz10b00forbtag__tau3", jet_ak08softdropz10b00forbtag__tau3);
@@ -6401,6 +6568,7 @@ public:
 		tree->SetBranchAddress("jet_ak08softdropz20b10forbtag__eta", jet_ak08softdropz20b10forbtag__eta);
 		tree->SetBranchAddress("jet_ak08softdropz20b10forbtag__phi", jet_ak08softdropz20b10forbtag__phi);
 		tree->SetBranchAddress("jet_ak08softdropz20b10forbtag__mass", jet_ak08softdropz20b10forbtag__mass);
+		tree->SetBranchAddress("jet_ak08softdropz20b10forbtag__masscal", jet_ak08softdropz20b10forbtag__masscal);
 		tree->SetBranchAddress("jet_ak08softdropz20b10forbtag__tau1", jet_ak08softdropz20b10forbtag__tau1);
 		tree->SetBranchAddress("jet_ak08softdropz20b10forbtag__tau2", jet_ak08softdropz20b10forbtag__tau2);
 		tree->SetBranchAddress("jet_ak08softdropz20b10forbtag__tau3", jet_ak08softdropz20b10forbtag__tau3);
@@ -6431,6 +6599,7 @@ public:
 		tree->SetBranchAddress("jet_ak08filteredn3r2forbtag__eta", jet_ak08filteredn3r2forbtag__eta);
 		tree->SetBranchAddress("jet_ak08filteredn3r2forbtag__phi", jet_ak08filteredn3r2forbtag__phi);
 		tree->SetBranchAddress("jet_ak08filteredn3r2forbtag__mass", jet_ak08filteredn3r2forbtag__mass);
+		tree->SetBranchAddress("jet_ak08filteredn3r2forbtag__masscal", jet_ak08filteredn3r2forbtag__masscal);
 		tree->SetBranchAddress("jet_ak08filteredn3r2forbtag__tau1", jet_ak08filteredn3r2forbtag__tau1);
 		tree->SetBranchAddress("jet_ak08filteredn3r2forbtag__tau2", jet_ak08filteredn3r2forbtag__tau2);
 		tree->SetBranchAddress("jet_ak08filteredn3r2forbtag__tau3", jet_ak08filteredn3r2forbtag__tau3);
@@ -6461,6 +6630,7 @@ public:
 		tree->SetBranchAddress("jet_ak08filteredn3r3forbtag__eta", jet_ak08filteredn3r3forbtag__eta);
 		tree->SetBranchAddress("jet_ak08filteredn3r3forbtag__phi", jet_ak08filteredn3r3forbtag__phi);
 		tree->SetBranchAddress("jet_ak08filteredn3r3forbtag__mass", jet_ak08filteredn3r3forbtag__mass);
+		tree->SetBranchAddress("jet_ak08filteredn3r3forbtag__masscal", jet_ak08filteredn3r3forbtag__masscal);
 		tree->SetBranchAddress("jet_ak08filteredn3r3forbtag__tau1", jet_ak08filteredn3r3forbtag__tau1);
 		tree->SetBranchAddress("jet_ak08filteredn3r3forbtag__tau2", jet_ak08filteredn3r3forbtag__tau2);
 		tree->SetBranchAddress("jet_ak08filteredn3r3forbtag__tau3", jet_ak08filteredn3r3forbtag__tau3);
@@ -6491,6 +6661,7 @@ public:
 		tree->SetBranchAddress("jet_ak08prunedn3z10rfac50forbtag__eta", jet_ak08prunedn3z10rfac50forbtag__eta);
 		tree->SetBranchAddress("jet_ak08prunedn3z10rfac50forbtag__phi", jet_ak08prunedn3z10rfac50forbtag__phi);
 		tree->SetBranchAddress("jet_ak08prunedn3z10rfac50forbtag__mass", jet_ak08prunedn3z10rfac50forbtag__mass);
+		tree->SetBranchAddress("jet_ak08prunedn3z10rfac50forbtag__masscal", jet_ak08prunedn3z10rfac50forbtag__masscal);
 		tree->SetBranchAddress("jet_ak08prunedn3z10rfac50forbtag__tau1", jet_ak08prunedn3z10rfac50forbtag__tau1);
 		tree->SetBranchAddress("jet_ak08prunedn3z10rfac50forbtag__tau2", jet_ak08prunedn3z10rfac50forbtag__tau2);
 		tree->SetBranchAddress("jet_ak08prunedn3z10rfac50forbtag__tau3", jet_ak08prunedn3z10rfac50forbtag__tau3);
@@ -6521,6 +6692,7 @@ public:
 		tree->SetBranchAddress("jet_ak08filteredn3r2__eta", jet_ak08filteredn3r2__eta);
 		tree->SetBranchAddress("jet_ak08filteredn3r2__phi", jet_ak08filteredn3r2__phi);
 		tree->SetBranchAddress("jet_ak08filteredn3r2__mass", jet_ak08filteredn3r2__mass);
+		tree->SetBranchAddress("jet_ak08filteredn3r2__masscal", jet_ak08filteredn3r2__masscal);
 		tree->SetBranchAddress("jet_ak08filteredn3r2__tau1", jet_ak08filteredn3r2__tau1);
 		tree->SetBranchAddress("jet_ak08filteredn3r2__tau2", jet_ak08filteredn3r2__tau2);
 		tree->SetBranchAddress("jet_ak08filteredn3r2__tau3", jet_ak08filteredn3r2__tau3);
@@ -6551,6 +6723,7 @@ public:
 		tree->SetBranchAddress("jet_ak08filteredn3r3__eta", jet_ak08filteredn3r3__eta);
 		tree->SetBranchAddress("jet_ak08filteredn3r3__phi", jet_ak08filteredn3r3__phi);
 		tree->SetBranchAddress("jet_ak08filteredn3r3__mass", jet_ak08filteredn3r3__mass);
+		tree->SetBranchAddress("jet_ak08filteredn3r3__masscal", jet_ak08filteredn3r3__masscal);
 		tree->SetBranchAddress("jet_ak08filteredn3r3__tau1", jet_ak08filteredn3r3__tau1);
 		tree->SetBranchAddress("jet_ak08filteredn3r3__tau2", jet_ak08filteredn3r3__tau2);
 		tree->SetBranchAddress("jet_ak08filteredn3r3__tau3", jet_ak08filteredn3r3__tau3);
@@ -6581,6 +6754,7 @@ public:
 		tree->SetBranchAddress("jet_ak08filteredn5r2__eta", jet_ak08filteredn5r2__eta);
 		tree->SetBranchAddress("jet_ak08filteredn5r2__phi", jet_ak08filteredn5r2__phi);
 		tree->SetBranchAddress("jet_ak08filteredn5r2__mass", jet_ak08filteredn5r2__mass);
+		tree->SetBranchAddress("jet_ak08filteredn5r2__masscal", jet_ak08filteredn5r2__masscal);
 		tree->SetBranchAddress("jet_ak08filteredn5r2__tau1", jet_ak08filteredn5r2__tau1);
 		tree->SetBranchAddress("jet_ak08filteredn5r2__tau2", jet_ak08filteredn5r2__tau2);
 		tree->SetBranchAddress("jet_ak08filteredn5r2__tau3", jet_ak08filteredn5r2__tau3);
@@ -6611,6 +6785,7 @@ public:
 		tree->SetBranchAddress("jet_ak08prunedn3z10rfac50__eta", jet_ak08prunedn3z10rfac50__eta);
 		tree->SetBranchAddress("jet_ak08prunedn3z10rfac50__phi", jet_ak08prunedn3z10rfac50__phi);
 		tree->SetBranchAddress("jet_ak08prunedn3z10rfac50__mass", jet_ak08prunedn3z10rfac50__mass);
+		tree->SetBranchAddress("jet_ak08prunedn3z10rfac50__masscal", jet_ak08prunedn3z10rfac50__masscal);
 		tree->SetBranchAddress("jet_ak08prunedn3z10rfac50__tau1", jet_ak08prunedn3z10rfac50__tau1);
 		tree->SetBranchAddress("jet_ak08prunedn3z10rfac50__tau2", jet_ak08prunedn3z10rfac50__tau2);
 		tree->SetBranchAddress("jet_ak08prunedn3z10rfac50__tau3", jet_ak08prunedn3z10rfac50__tau3);
@@ -6641,6 +6816,7 @@ public:
 		tree->SetBranchAddress("jet_ak08trimmedr2f3__eta", jet_ak08trimmedr2f3__eta);
 		tree->SetBranchAddress("jet_ak08trimmedr2f3__phi", jet_ak08trimmedr2f3__phi);
 		tree->SetBranchAddress("jet_ak08trimmedr2f3__mass", jet_ak08trimmedr2f3__mass);
+		tree->SetBranchAddress("jet_ak08trimmedr2f3__masscal", jet_ak08trimmedr2f3__masscal);
 		tree->SetBranchAddress("jet_ak08trimmedr2f3__tau1", jet_ak08trimmedr2f3__tau1);
 		tree->SetBranchAddress("jet_ak08trimmedr2f3__tau2", jet_ak08trimmedr2f3__tau2);
 		tree->SetBranchAddress("jet_ak08trimmedr2f3__tau3", jet_ak08trimmedr2f3__tau3);
@@ -6671,6 +6847,7 @@ public:
 		tree->SetBranchAddress("jet_ak08trimmedr2f6__eta", jet_ak08trimmedr2f6__eta);
 		tree->SetBranchAddress("jet_ak08trimmedr2f6__phi", jet_ak08trimmedr2f6__phi);
 		tree->SetBranchAddress("jet_ak08trimmedr2f6__mass", jet_ak08trimmedr2f6__mass);
+		tree->SetBranchAddress("jet_ak08trimmedr2f6__masscal", jet_ak08trimmedr2f6__masscal);
 		tree->SetBranchAddress("jet_ak08trimmedr2f6__tau1", jet_ak08trimmedr2f6__tau1);
 		tree->SetBranchAddress("jet_ak08trimmedr2f6__tau2", jet_ak08trimmedr2f6__tau2);
 		tree->SetBranchAddress("jet_ak08trimmedr2f6__tau3", jet_ak08trimmedr2f6__tau3);
@@ -6701,6 +6878,7 @@ public:
 		tree->SetBranchAddress("jet_ak08trimmedr2f9__eta", jet_ak08trimmedr2f9__eta);
 		tree->SetBranchAddress("jet_ak08trimmedr2f9__phi", jet_ak08trimmedr2f9__phi);
 		tree->SetBranchAddress("jet_ak08trimmedr2f9__mass", jet_ak08trimmedr2f9__mass);
+		tree->SetBranchAddress("jet_ak08trimmedr2f9__masscal", jet_ak08trimmedr2f9__masscal);
 		tree->SetBranchAddress("jet_ak08trimmedr2f9__tau1", jet_ak08trimmedr2f9__tau1);
 		tree->SetBranchAddress("jet_ak08trimmedr2f9__tau2", jet_ak08trimmedr2f9__tau2);
 		tree->SetBranchAddress("jet_ak08trimmedr2f9__tau3", jet_ak08trimmedr2f9__tau3);
@@ -6731,6 +6909,7 @@ public:
 		tree->SetBranchAddress("jet_ak08softdropz10bm10__eta", jet_ak08softdropz10bm10__eta);
 		tree->SetBranchAddress("jet_ak08softdropz10bm10__phi", jet_ak08softdropz10bm10__phi);
 		tree->SetBranchAddress("jet_ak08softdropz10bm10__mass", jet_ak08softdropz10bm10__mass);
+		tree->SetBranchAddress("jet_ak08softdropz10bm10__masscal", jet_ak08softdropz10bm10__masscal);
 		tree->SetBranchAddress("jet_ak08softdropz10bm10__tau1", jet_ak08softdropz10bm10__tau1);
 		tree->SetBranchAddress("jet_ak08softdropz10bm10__tau2", jet_ak08softdropz10bm10__tau2);
 		tree->SetBranchAddress("jet_ak08softdropz10bm10__tau3", jet_ak08softdropz10bm10__tau3);
@@ -6761,6 +6940,7 @@ public:
 		tree->SetBranchAddress("jet_ak08softdropz10b00__eta", jet_ak08softdropz10b00__eta);
 		tree->SetBranchAddress("jet_ak08softdropz10b00__phi", jet_ak08softdropz10b00__phi);
 		tree->SetBranchAddress("jet_ak08softdropz10b00__mass", jet_ak08softdropz10b00__mass);
+		tree->SetBranchAddress("jet_ak08softdropz10b00__masscal", jet_ak08softdropz10b00__masscal);
 		tree->SetBranchAddress("jet_ak08softdropz10b00__tau1", jet_ak08softdropz10b00__tau1);
 		tree->SetBranchAddress("jet_ak08softdropz10b00__tau2", jet_ak08softdropz10b00__tau2);
 		tree->SetBranchAddress("jet_ak08softdropz10b00__tau3", jet_ak08softdropz10b00__tau3);
@@ -6791,6 +6971,7 @@ public:
 		tree->SetBranchAddress("jet_ak08softdropz10b10__eta", jet_ak08softdropz10b10__eta);
 		tree->SetBranchAddress("jet_ak08softdropz10b10__phi", jet_ak08softdropz10b10__phi);
 		tree->SetBranchAddress("jet_ak08softdropz10b10__mass", jet_ak08softdropz10b10__mass);
+		tree->SetBranchAddress("jet_ak08softdropz10b10__masscal", jet_ak08softdropz10b10__masscal);
 		tree->SetBranchAddress("jet_ak08softdropz10b10__tau1", jet_ak08softdropz10b10__tau1);
 		tree->SetBranchAddress("jet_ak08softdropz10b10__tau2", jet_ak08softdropz10b10__tau2);
 		tree->SetBranchAddress("jet_ak08softdropz10b10__tau3", jet_ak08softdropz10b10__tau3);
@@ -6821,6 +7002,7 @@ public:
 		tree->SetBranchAddress("jet_ak08softdropz10b20__eta", jet_ak08softdropz10b20__eta);
 		tree->SetBranchAddress("jet_ak08softdropz10b20__phi", jet_ak08softdropz10b20__phi);
 		tree->SetBranchAddress("jet_ak08softdropz10b20__mass", jet_ak08softdropz10b20__mass);
+		tree->SetBranchAddress("jet_ak08softdropz10b20__masscal", jet_ak08softdropz10b20__masscal);
 		tree->SetBranchAddress("jet_ak08softdropz10b20__tau1", jet_ak08softdropz10b20__tau1);
 		tree->SetBranchAddress("jet_ak08softdropz10b20__tau2", jet_ak08softdropz10b20__tau2);
 		tree->SetBranchAddress("jet_ak08softdropz10b20__tau3", jet_ak08softdropz10b20__tau3);
@@ -6851,6 +7033,7 @@ public:
 		tree->SetBranchAddress("jet_ak08softdropz15bm10__eta", jet_ak08softdropz15bm10__eta);
 		tree->SetBranchAddress("jet_ak08softdropz15bm10__phi", jet_ak08softdropz15bm10__phi);
 		tree->SetBranchAddress("jet_ak08softdropz15bm10__mass", jet_ak08softdropz15bm10__mass);
+		tree->SetBranchAddress("jet_ak08softdropz15bm10__masscal", jet_ak08softdropz15bm10__masscal);
 		tree->SetBranchAddress("jet_ak08softdropz15bm10__tau1", jet_ak08softdropz15bm10__tau1);
 		tree->SetBranchAddress("jet_ak08softdropz15bm10__tau2", jet_ak08softdropz15bm10__tau2);
 		tree->SetBranchAddress("jet_ak08softdropz15bm10__tau3", jet_ak08softdropz15bm10__tau3);
@@ -6881,6 +7064,7 @@ public:
 		tree->SetBranchAddress("jet_ak08softdropz15b00__eta", jet_ak08softdropz15b00__eta);
 		tree->SetBranchAddress("jet_ak08softdropz15b00__phi", jet_ak08softdropz15b00__phi);
 		tree->SetBranchAddress("jet_ak08softdropz15b00__mass", jet_ak08softdropz15b00__mass);
+		tree->SetBranchAddress("jet_ak08softdropz15b00__masscal", jet_ak08softdropz15b00__masscal);
 		tree->SetBranchAddress("jet_ak08softdropz15b00__tau1", jet_ak08softdropz15b00__tau1);
 		tree->SetBranchAddress("jet_ak08softdropz15b00__tau2", jet_ak08softdropz15b00__tau2);
 		tree->SetBranchAddress("jet_ak08softdropz15b00__tau3", jet_ak08softdropz15b00__tau3);
@@ -6911,6 +7095,7 @@ public:
 		tree->SetBranchAddress("jet_ak08softdropz15b10__eta", jet_ak08softdropz15b10__eta);
 		tree->SetBranchAddress("jet_ak08softdropz15b10__phi", jet_ak08softdropz15b10__phi);
 		tree->SetBranchAddress("jet_ak08softdropz15b10__mass", jet_ak08softdropz15b10__mass);
+		tree->SetBranchAddress("jet_ak08softdropz15b10__masscal", jet_ak08softdropz15b10__masscal);
 		tree->SetBranchAddress("jet_ak08softdropz15b10__tau1", jet_ak08softdropz15b10__tau1);
 		tree->SetBranchAddress("jet_ak08softdropz15b10__tau2", jet_ak08softdropz15b10__tau2);
 		tree->SetBranchAddress("jet_ak08softdropz15b10__tau3", jet_ak08softdropz15b10__tau3);
@@ -6941,6 +7126,7 @@ public:
 		tree->SetBranchAddress("jet_ak08softdropz15b20__eta", jet_ak08softdropz15b20__eta);
 		tree->SetBranchAddress("jet_ak08softdropz15b20__phi", jet_ak08softdropz15b20__phi);
 		tree->SetBranchAddress("jet_ak08softdropz15b20__mass", jet_ak08softdropz15b20__mass);
+		tree->SetBranchAddress("jet_ak08softdropz15b20__masscal", jet_ak08softdropz15b20__masscal);
 		tree->SetBranchAddress("jet_ak08softdropz15b20__tau1", jet_ak08softdropz15b20__tau1);
 		tree->SetBranchAddress("jet_ak08softdropz15b20__tau2", jet_ak08softdropz15b20__tau2);
 		tree->SetBranchAddress("jet_ak08softdropz15b20__tau3", jet_ak08softdropz15b20__tau3);
@@ -6971,6 +7157,7 @@ public:
 		tree->SetBranchAddress("jet_ak08softdropz20b00__eta", jet_ak08softdropz20b00__eta);
 		tree->SetBranchAddress("jet_ak08softdropz20b00__phi", jet_ak08softdropz20b00__phi);
 		tree->SetBranchAddress("jet_ak08softdropz20b00__mass", jet_ak08softdropz20b00__mass);
+		tree->SetBranchAddress("jet_ak08softdropz20b00__masscal", jet_ak08softdropz20b00__masscal);
 		tree->SetBranchAddress("jet_ak08softdropz20b00__tau1", jet_ak08softdropz20b00__tau1);
 		tree->SetBranchAddress("jet_ak08softdropz20b00__tau2", jet_ak08softdropz20b00__tau2);
 		tree->SetBranchAddress("jet_ak08softdropz20b00__tau3", jet_ak08softdropz20b00__tau3);
@@ -7001,6 +7188,7 @@ public:
 		tree->SetBranchAddress("jet_ak08softdropz20bm10__eta", jet_ak08softdropz20bm10__eta);
 		tree->SetBranchAddress("jet_ak08softdropz20bm10__phi", jet_ak08softdropz20bm10__phi);
 		tree->SetBranchAddress("jet_ak08softdropz20bm10__mass", jet_ak08softdropz20bm10__mass);
+		tree->SetBranchAddress("jet_ak08softdropz20bm10__masscal", jet_ak08softdropz20bm10__masscal);
 		tree->SetBranchAddress("jet_ak08softdropz20bm10__tau1", jet_ak08softdropz20bm10__tau1);
 		tree->SetBranchAddress("jet_ak08softdropz20bm10__tau2", jet_ak08softdropz20bm10__tau2);
 		tree->SetBranchAddress("jet_ak08softdropz20bm10__tau3", jet_ak08softdropz20bm10__tau3);
@@ -7031,6 +7219,7 @@ public:
 		tree->SetBranchAddress("jet_ak08softdropz20b10__eta", jet_ak08softdropz20b10__eta);
 		tree->SetBranchAddress("jet_ak08softdropz20b10__phi", jet_ak08softdropz20b10__phi);
 		tree->SetBranchAddress("jet_ak08softdropz20b10__mass", jet_ak08softdropz20b10__mass);
+		tree->SetBranchAddress("jet_ak08softdropz20b10__masscal", jet_ak08softdropz20b10__masscal);
 		tree->SetBranchAddress("jet_ak08softdropz20b10__tau1", jet_ak08softdropz20b10__tau1);
 		tree->SetBranchAddress("jet_ak08softdropz20b10__tau2", jet_ak08softdropz20b10__tau2);
 		tree->SetBranchAddress("jet_ak08softdropz20b10__tau3", jet_ak08softdropz20b10__tau3);
@@ -7061,6 +7250,7 @@ public:
 		tree->SetBranchAddress("jet_ak08softdropz20b20__eta", jet_ak08softdropz20b20__eta);
 		tree->SetBranchAddress("jet_ak08softdropz20b20__phi", jet_ak08softdropz20b20__phi);
 		tree->SetBranchAddress("jet_ak08softdropz20b20__mass", jet_ak08softdropz20b20__mass);
+		tree->SetBranchAddress("jet_ak08softdropz20b20__masscal", jet_ak08softdropz20b20__masscal);
 		tree->SetBranchAddress("jet_ak08softdropz20b20__tau1", jet_ak08softdropz20b20__tau1);
 		tree->SetBranchAddress("jet_ak08softdropz20b20__tau2", jet_ak08softdropz20b20__tau2);
 		tree->SetBranchAddress("jet_ak08softdropz20b20__tau3", jet_ak08softdropz20b20__tau3);
@@ -7091,6 +7281,7 @@ public:
 		tree->SetBranchAddress("jet_ak08puppitrimmedr2f3forbtag__eta", jet_ak08puppitrimmedr2f3forbtag__eta);
 		tree->SetBranchAddress("jet_ak08puppitrimmedr2f3forbtag__phi", jet_ak08puppitrimmedr2f3forbtag__phi);
 		tree->SetBranchAddress("jet_ak08puppitrimmedr2f3forbtag__mass", jet_ak08puppitrimmedr2f3forbtag__mass);
+		tree->SetBranchAddress("jet_ak08puppitrimmedr2f3forbtag__masscal", jet_ak08puppitrimmedr2f3forbtag__masscal);
 		tree->SetBranchAddress("jet_ak08puppitrimmedr2f3forbtag__tau1", jet_ak08puppitrimmedr2f3forbtag__tau1);
 		tree->SetBranchAddress("jet_ak08puppitrimmedr2f3forbtag__tau2", jet_ak08puppitrimmedr2f3forbtag__tau2);
 		tree->SetBranchAddress("jet_ak08puppitrimmedr2f3forbtag__tau3", jet_ak08puppitrimmedr2f3forbtag__tau3);
@@ -7121,6 +7312,7 @@ public:
 		tree->SetBranchAddress("jet_ak08puppitrimmedr2f6forbtag__eta", jet_ak08puppitrimmedr2f6forbtag__eta);
 		tree->SetBranchAddress("jet_ak08puppitrimmedr2f6forbtag__phi", jet_ak08puppitrimmedr2f6forbtag__phi);
 		tree->SetBranchAddress("jet_ak08puppitrimmedr2f6forbtag__mass", jet_ak08puppitrimmedr2f6forbtag__mass);
+		tree->SetBranchAddress("jet_ak08puppitrimmedr2f6forbtag__masscal", jet_ak08puppitrimmedr2f6forbtag__masscal);
 		tree->SetBranchAddress("jet_ak08puppitrimmedr2f6forbtag__tau1", jet_ak08puppitrimmedr2f6forbtag__tau1);
 		tree->SetBranchAddress("jet_ak08puppitrimmedr2f6forbtag__tau2", jet_ak08puppitrimmedr2f6forbtag__tau2);
 		tree->SetBranchAddress("jet_ak08puppitrimmedr2f6forbtag__tau3", jet_ak08puppitrimmedr2f6forbtag__tau3);
@@ -7151,6 +7343,7 @@ public:
 		tree->SetBranchAddress("jet_ak08puppisoftdropz10b00forbtag__eta", jet_ak08puppisoftdropz10b00forbtag__eta);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz10b00forbtag__phi", jet_ak08puppisoftdropz10b00forbtag__phi);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz10b00forbtag__mass", jet_ak08puppisoftdropz10b00forbtag__mass);
+		tree->SetBranchAddress("jet_ak08puppisoftdropz10b00forbtag__masscal", jet_ak08puppisoftdropz10b00forbtag__masscal);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz10b00forbtag__tau1", jet_ak08puppisoftdropz10b00forbtag__tau1);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz10b00forbtag__tau2", jet_ak08puppisoftdropz10b00forbtag__tau2);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz10b00forbtag__tau3", jet_ak08puppisoftdropz10b00forbtag__tau3);
@@ -7181,6 +7374,7 @@ public:
 		tree->SetBranchAddress("jet_ak08puppisoftdropz20b10forbtag__eta", jet_ak08puppisoftdropz20b10forbtag__eta);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz20b10forbtag__phi", jet_ak08puppisoftdropz20b10forbtag__phi);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz20b10forbtag__mass", jet_ak08puppisoftdropz20b10forbtag__mass);
+		tree->SetBranchAddress("jet_ak08puppisoftdropz20b10forbtag__masscal", jet_ak08puppisoftdropz20b10forbtag__masscal);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz20b10forbtag__tau1", jet_ak08puppisoftdropz20b10forbtag__tau1);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz20b10forbtag__tau2", jet_ak08puppisoftdropz20b10forbtag__tau2);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz20b10forbtag__tau3", jet_ak08puppisoftdropz20b10forbtag__tau3);
@@ -7211,6 +7405,7 @@ public:
 		tree->SetBranchAddress("jet_ak08puppifilteredn3r2forbtag__eta", jet_ak08puppifilteredn3r2forbtag__eta);
 		tree->SetBranchAddress("jet_ak08puppifilteredn3r2forbtag__phi", jet_ak08puppifilteredn3r2forbtag__phi);
 		tree->SetBranchAddress("jet_ak08puppifilteredn3r2forbtag__mass", jet_ak08puppifilteredn3r2forbtag__mass);
+		tree->SetBranchAddress("jet_ak08puppifilteredn3r2forbtag__masscal", jet_ak08puppifilteredn3r2forbtag__masscal);
 		tree->SetBranchAddress("jet_ak08puppifilteredn3r2forbtag__tau1", jet_ak08puppifilteredn3r2forbtag__tau1);
 		tree->SetBranchAddress("jet_ak08puppifilteredn3r2forbtag__tau2", jet_ak08puppifilteredn3r2forbtag__tau2);
 		tree->SetBranchAddress("jet_ak08puppifilteredn3r2forbtag__tau3", jet_ak08puppifilteredn3r2forbtag__tau3);
@@ -7241,6 +7436,7 @@ public:
 		tree->SetBranchAddress("jet_ak08puppifilteredn3r3forbtag__eta", jet_ak08puppifilteredn3r3forbtag__eta);
 		tree->SetBranchAddress("jet_ak08puppifilteredn3r3forbtag__phi", jet_ak08puppifilteredn3r3forbtag__phi);
 		tree->SetBranchAddress("jet_ak08puppifilteredn3r3forbtag__mass", jet_ak08puppifilteredn3r3forbtag__mass);
+		tree->SetBranchAddress("jet_ak08puppifilteredn3r3forbtag__masscal", jet_ak08puppifilteredn3r3forbtag__masscal);
 		tree->SetBranchAddress("jet_ak08puppifilteredn3r3forbtag__tau1", jet_ak08puppifilteredn3r3forbtag__tau1);
 		tree->SetBranchAddress("jet_ak08puppifilteredn3r3forbtag__tau2", jet_ak08puppifilteredn3r3forbtag__tau2);
 		tree->SetBranchAddress("jet_ak08puppifilteredn3r3forbtag__tau3", jet_ak08puppifilteredn3r3forbtag__tau3);
@@ -7271,6 +7467,7 @@ public:
 		tree->SetBranchAddress("jet_ak08puppiprunedn3z10rfac50forbtag__eta", jet_ak08puppiprunedn3z10rfac50forbtag__eta);
 		tree->SetBranchAddress("jet_ak08puppiprunedn3z10rfac50forbtag__phi", jet_ak08puppiprunedn3z10rfac50forbtag__phi);
 		tree->SetBranchAddress("jet_ak08puppiprunedn3z10rfac50forbtag__mass", jet_ak08puppiprunedn3z10rfac50forbtag__mass);
+		tree->SetBranchAddress("jet_ak08puppiprunedn3z10rfac50forbtag__masscal", jet_ak08puppiprunedn3z10rfac50forbtag__masscal);
 		tree->SetBranchAddress("jet_ak08puppiprunedn3z10rfac50forbtag__tau1", jet_ak08puppiprunedn3z10rfac50forbtag__tau1);
 		tree->SetBranchAddress("jet_ak08puppiprunedn3z10rfac50forbtag__tau2", jet_ak08puppiprunedn3z10rfac50forbtag__tau2);
 		tree->SetBranchAddress("jet_ak08puppiprunedn3z10rfac50forbtag__tau3", jet_ak08puppiprunedn3z10rfac50forbtag__tau3);
@@ -7301,6 +7498,7 @@ public:
 		tree->SetBranchAddress("jet_ak08puppifilteredn3r2__eta", jet_ak08puppifilteredn3r2__eta);
 		tree->SetBranchAddress("jet_ak08puppifilteredn3r2__phi", jet_ak08puppifilteredn3r2__phi);
 		tree->SetBranchAddress("jet_ak08puppifilteredn3r2__mass", jet_ak08puppifilteredn3r2__mass);
+		tree->SetBranchAddress("jet_ak08puppifilteredn3r2__masscal", jet_ak08puppifilteredn3r2__masscal);
 		tree->SetBranchAddress("jet_ak08puppifilteredn3r2__tau1", jet_ak08puppifilteredn3r2__tau1);
 		tree->SetBranchAddress("jet_ak08puppifilteredn3r2__tau2", jet_ak08puppifilteredn3r2__tau2);
 		tree->SetBranchAddress("jet_ak08puppifilteredn3r2__tau3", jet_ak08puppifilteredn3r2__tau3);
@@ -7331,6 +7529,7 @@ public:
 		tree->SetBranchAddress("jet_ak08puppifilteredn3r3__eta", jet_ak08puppifilteredn3r3__eta);
 		tree->SetBranchAddress("jet_ak08puppifilteredn3r3__phi", jet_ak08puppifilteredn3r3__phi);
 		tree->SetBranchAddress("jet_ak08puppifilteredn3r3__mass", jet_ak08puppifilteredn3r3__mass);
+		tree->SetBranchAddress("jet_ak08puppifilteredn3r3__masscal", jet_ak08puppifilteredn3r3__masscal);
 		tree->SetBranchAddress("jet_ak08puppifilteredn3r3__tau1", jet_ak08puppifilteredn3r3__tau1);
 		tree->SetBranchAddress("jet_ak08puppifilteredn3r3__tau2", jet_ak08puppifilteredn3r3__tau2);
 		tree->SetBranchAddress("jet_ak08puppifilteredn3r3__tau3", jet_ak08puppifilteredn3r3__tau3);
@@ -7361,6 +7560,7 @@ public:
 		tree->SetBranchAddress("jet_ak08puppifilteredn5r2__eta", jet_ak08puppifilteredn5r2__eta);
 		tree->SetBranchAddress("jet_ak08puppifilteredn5r2__phi", jet_ak08puppifilteredn5r2__phi);
 		tree->SetBranchAddress("jet_ak08puppifilteredn5r2__mass", jet_ak08puppifilteredn5r2__mass);
+		tree->SetBranchAddress("jet_ak08puppifilteredn5r2__masscal", jet_ak08puppifilteredn5r2__masscal);
 		tree->SetBranchAddress("jet_ak08puppifilteredn5r2__tau1", jet_ak08puppifilteredn5r2__tau1);
 		tree->SetBranchAddress("jet_ak08puppifilteredn5r2__tau2", jet_ak08puppifilteredn5r2__tau2);
 		tree->SetBranchAddress("jet_ak08puppifilteredn5r2__tau3", jet_ak08puppifilteredn5r2__tau3);
@@ -7391,6 +7591,7 @@ public:
 		tree->SetBranchAddress("jet_ak08puppiprunedn3z10rfac50__eta", jet_ak08puppiprunedn3z10rfac50__eta);
 		tree->SetBranchAddress("jet_ak08puppiprunedn3z10rfac50__phi", jet_ak08puppiprunedn3z10rfac50__phi);
 		tree->SetBranchAddress("jet_ak08puppiprunedn3z10rfac50__mass", jet_ak08puppiprunedn3z10rfac50__mass);
+		tree->SetBranchAddress("jet_ak08puppiprunedn3z10rfac50__masscal", jet_ak08puppiprunedn3z10rfac50__masscal);
 		tree->SetBranchAddress("jet_ak08puppiprunedn3z10rfac50__tau1", jet_ak08puppiprunedn3z10rfac50__tau1);
 		tree->SetBranchAddress("jet_ak08puppiprunedn3z10rfac50__tau2", jet_ak08puppiprunedn3z10rfac50__tau2);
 		tree->SetBranchAddress("jet_ak08puppiprunedn3z10rfac50__tau3", jet_ak08puppiprunedn3z10rfac50__tau3);
@@ -7421,6 +7622,7 @@ public:
 		tree->SetBranchAddress("jet_ak08puppitrimmedr2f3__eta", jet_ak08puppitrimmedr2f3__eta);
 		tree->SetBranchAddress("jet_ak08puppitrimmedr2f3__phi", jet_ak08puppitrimmedr2f3__phi);
 		tree->SetBranchAddress("jet_ak08puppitrimmedr2f3__mass", jet_ak08puppitrimmedr2f3__mass);
+		tree->SetBranchAddress("jet_ak08puppitrimmedr2f3__masscal", jet_ak08puppitrimmedr2f3__masscal);
 		tree->SetBranchAddress("jet_ak08puppitrimmedr2f3__tau1", jet_ak08puppitrimmedr2f3__tau1);
 		tree->SetBranchAddress("jet_ak08puppitrimmedr2f3__tau2", jet_ak08puppitrimmedr2f3__tau2);
 		tree->SetBranchAddress("jet_ak08puppitrimmedr2f3__tau3", jet_ak08puppitrimmedr2f3__tau3);
@@ -7451,6 +7653,7 @@ public:
 		tree->SetBranchAddress("jet_ak08puppitrimmedr2f6__eta", jet_ak08puppitrimmedr2f6__eta);
 		tree->SetBranchAddress("jet_ak08puppitrimmedr2f6__phi", jet_ak08puppitrimmedr2f6__phi);
 		tree->SetBranchAddress("jet_ak08puppitrimmedr2f6__mass", jet_ak08puppitrimmedr2f6__mass);
+		tree->SetBranchAddress("jet_ak08puppitrimmedr2f6__masscal", jet_ak08puppitrimmedr2f6__masscal);
 		tree->SetBranchAddress("jet_ak08puppitrimmedr2f6__tau1", jet_ak08puppitrimmedr2f6__tau1);
 		tree->SetBranchAddress("jet_ak08puppitrimmedr2f6__tau2", jet_ak08puppitrimmedr2f6__tau2);
 		tree->SetBranchAddress("jet_ak08puppitrimmedr2f6__tau3", jet_ak08puppitrimmedr2f6__tau3);
@@ -7481,6 +7684,7 @@ public:
 		tree->SetBranchAddress("jet_ak08puppitrimmedr2f9__eta", jet_ak08puppitrimmedr2f9__eta);
 		tree->SetBranchAddress("jet_ak08puppitrimmedr2f9__phi", jet_ak08puppitrimmedr2f9__phi);
 		tree->SetBranchAddress("jet_ak08puppitrimmedr2f9__mass", jet_ak08puppitrimmedr2f9__mass);
+		tree->SetBranchAddress("jet_ak08puppitrimmedr2f9__masscal", jet_ak08puppitrimmedr2f9__masscal);
 		tree->SetBranchAddress("jet_ak08puppitrimmedr2f9__tau1", jet_ak08puppitrimmedr2f9__tau1);
 		tree->SetBranchAddress("jet_ak08puppitrimmedr2f9__tau2", jet_ak08puppitrimmedr2f9__tau2);
 		tree->SetBranchAddress("jet_ak08puppitrimmedr2f9__tau3", jet_ak08puppitrimmedr2f9__tau3);
@@ -7511,6 +7715,7 @@ public:
 		tree->SetBranchAddress("jet_ak08puppisoftdropz10bm10__eta", jet_ak08puppisoftdropz10bm10__eta);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz10bm10__phi", jet_ak08puppisoftdropz10bm10__phi);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz10bm10__mass", jet_ak08puppisoftdropz10bm10__mass);
+		tree->SetBranchAddress("jet_ak08puppisoftdropz10bm10__masscal", jet_ak08puppisoftdropz10bm10__masscal);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz10bm10__tau1", jet_ak08puppisoftdropz10bm10__tau1);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz10bm10__tau2", jet_ak08puppisoftdropz10bm10__tau2);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz10bm10__tau3", jet_ak08puppisoftdropz10bm10__tau3);
@@ -7541,6 +7746,7 @@ public:
 		tree->SetBranchAddress("jet_ak08puppisoftdropz10b00__eta", jet_ak08puppisoftdropz10b00__eta);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz10b00__phi", jet_ak08puppisoftdropz10b00__phi);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz10b00__mass", jet_ak08puppisoftdropz10b00__mass);
+		tree->SetBranchAddress("jet_ak08puppisoftdropz10b00__masscal", jet_ak08puppisoftdropz10b00__masscal);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz10b00__tau1", jet_ak08puppisoftdropz10b00__tau1);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz10b00__tau2", jet_ak08puppisoftdropz10b00__tau2);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz10b00__tau3", jet_ak08puppisoftdropz10b00__tau3);
@@ -7571,6 +7777,7 @@ public:
 		tree->SetBranchAddress("jet_ak08puppisoftdropz10b10__eta", jet_ak08puppisoftdropz10b10__eta);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz10b10__phi", jet_ak08puppisoftdropz10b10__phi);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz10b10__mass", jet_ak08puppisoftdropz10b10__mass);
+		tree->SetBranchAddress("jet_ak08puppisoftdropz10b10__masscal", jet_ak08puppisoftdropz10b10__masscal);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz10b10__tau1", jet_ak08puppisoftdropz10b10__tau1);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz10b10__tau2", jet_ak08puppisoftdropz10b10__tau2);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz10b10__tau3", jet_ak08puppisoftdropz10b10__tau3);
@@ -7601,6 +7808,7 @@ public:
 		tree->SetBranchAddress("jet_ak08puppisoftdropz10b20__eta", jet_ak08puppisoftdropz10b20__eta);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz10b20__phi", jet_ak08puppisoftdropz10b20__phi);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz10b20__mass", jet_ak08puppisoftdropz10b20__mass);
+		tree->SetBranchAddress("jet_ak08puppisoftdropz10b20__masscal", jet_ak08puppisoftdropz10b20__masscal);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz10b20__tau1", jet_ak08puppisoftdropz10b20__tau1);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz10b20__tau2", jet_ak08puppisoftdropz10b20__tau2);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz10b20__tau3", jet_ak08puppisoftdropz10b20__tau3);
@@ -7631,6 +7839,7 @@ public:
 		tree->SetBranchAddress("jet_ak08puppisoftdropz15bm10__eta", jet_ak08puppisoftdropz15bm10__eta);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz15bm10__phi", jet_ak08puppisoftdropz15bm10__phi);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz15bm10__mass", jet_ak08puppisoftdropz15bm10__mass);
+		tree->SetBranchAddress("jet_ak08puppisoftdropz15bm10__masscal", jet_ak08puppisoftdropz15bm10__masscal);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz15bm10__tau1", jet_ak08puppisoftdropz15bm10__tau1);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz15bm10__tau2", jet_ak08puppisoftdropz15bm10__tau2);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz15bm10__tau3", jet_ak08puppisoftdropz15bm10__tau3);
@@ -7661,6 +7870,7 @@ public:
 		tree->SetBranchAddress("jet_ak08puppisoftdropz15b00__eta", jet_ak08puppisoftdropz15b00__eta);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz15b00__phi", jet_ak08puppisoftdropz15b00__phi);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz15b00__mass", jet_ak08puppisoftdropz15b00__mass);
+		tree->SetBranchAddress("jet_ak08puppisoftdropz15b00__masscal", jet_ak08puppisoftdropz15b00__masscal);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz15b00__tau1", jet_ak08puppisoftdropz15b00__tau1);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz15b00__tau2", jet_ak08puppisoftdropz15b00__tau2);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz15b00__tau3", jet_ak08puppisoftdropz15b00__tau3);
@@ -7691,6 +7901,7 @@ public:
 		tree->SetBranchAddress("jet_ak08puppisoftdropz15b10__eta", jet_ak08puppisoftdropz15b10__eta);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz15b10__phi", jet_ak08puppisoftdropz15b10__phi);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz15b10__mass", jet_ak08puppisoftdropz15b10__mass);
+		tree->SetBranchAddress("jet_ak08puppisoftdropz15b10__masscal", jet_ak08puppisoftdropz15b10__masscal);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz15b10__tau1", jet_ak08puppisoftdropz15b10__tau1);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz15b10__tau2", jet_ak08puppisoftdropz15b10__tau2);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz15b10__tau3", jet_ak08puppisoftdropz15b10__tau3);
@@ -7721,6 +7932,7 @@ public:
 		tree->SetBranchAddress("jet_ak08puppisoftdropz15b20__eta", jet_ak08puppisoftdropz15b20__eta);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz15b20__phi", jet_ak08puppisoftdropz15b20__phi);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz15b20__mass", jet_ak08puppisoftdropz15b20__mass);
+		tree->SetBranchAddress("jet_ak08puppisoftdropz15b20__masscal", jet_ak08puppisoftdropz15b20__masscal);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz15b20__tau1", jet_ak08puppisoftdropz15b20__tau1);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz15b20__tau2", jet_ak08puppisoftdropz15b20__tau2);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz15b20__tau3", jet_ak08puppisoftdropz15b20__tau3);
@@ -7751,6 +7963,7 @@ public:
 		tree->SetBranchAddress("jet_ak08puppisoftdropz20b00__eta", jet_ak08puppisoftdropz20b00__eta);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz20b00__phi", jet_ak08puppisoftdropz20b00__phi);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz20b00__mass", jet_ak08puppisoftdropz20b00__mass);
+		tree->SetBranchAddress("jet_ak08puppisoftdropz20b00__masscal", jet_ak08puppisoftdropz20b00__masscal);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz20b00__tau1", jet_ak08puppisoftdropz20b00__tau1);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz20b00__tau2", jet_ak08puppisoftdropz20b00__tau2);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz20b00__tau3", jet_ak08puppisoftdropz20b00__tau3);
@@ -7781,6 +7994,7 @@ public:
 		tree->SetBranchAddress("jet_ak08puppisoftdropz20bm10__eta", jet_ak08puppisoftdropz20bm10__eta);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz20bm10__phi", jet_ak08puppisoftdropz20bm10__phi);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz20bm10__mass", jet_ak08puppisoftdropz20bm10__mass);
+		tree->SetBranchAddress("jet_ak08puppisoftdropz20bm10__masscal", jet_ak08puppisoftdropz20bm10__masscal);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz20bm10__tau1", jet_ak08puppisoftdropz20bm10__tau1);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz20bm10__tau2", jet_ak08puppisoftdropz20bm10__tau2);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz20bm10__tau3", jet_ak08puppisoftdropz20bm10__tau3);
@@ -7811,6 +8025,7 @@ public:
 		tree->SetBranchAddress("jet_ak08puppisoftdropz20b10__eta", jet_ak08puppisoftdropz20b10__eta);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz20b10__phi", jet_ak08puppisoftdropz20b10__phi);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz20b10__mass", jet_ak08puppisoftdropz20b10__mass);
+		tree->SetBranchAddress("jet_ak08puppisoftdropz20b10__masscal", jet_ak08puppisoftdropz20b10__masscal);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz20b10__tau1", jet_ak08puppisoftdropz20b10__tau1);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz20b10__tau2", jet_ak08puppisoftdropz20b10__tau2);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz20b10__tau3", jet_ak08puppisoftdropz20b10__tau3);
@@ -7841,6 +8056,7 @@ public:
 		tree->SetBranchAddress("jet_ak08puppisoftdropz20b20__eta", jet_ak08puppisoftdropz20b20__eta);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz20b20__phi", jet_ak08puppisoftdropz20b20__phi);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz20b20__mass", jet_ak08puppisoftdropz20b20__mass);
+		tree->SetBranchAddress("jet_ak08puppisoftdropz20b20__masscal", jet_ak08puppisoftdropz20b20__masscal);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz20b20__tau1", jet_ak08puppisoftdropz20b20__tau1);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz20b20__tau2", jet_ak08puppisoftdropz20b20__tau2);
 		tree->SetBranchAddress("jet_ak08puppisoftdropz20b20__tau3", jet_ak08puppisoftdropz20b20__tau3);
