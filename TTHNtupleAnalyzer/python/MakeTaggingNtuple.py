@@ -79,7 +79,7 @@ else:
 # Determine particle species
 # Tier3
 if socket.gethostname() == "t3ui12":
-    particle_name = "parton"
+    particle_name = "hadtop"
     r_matching = 1.2
 # Grid
 else:
@@ -133,7 +133,7 @@ particle_branches = particle_branches_float + particle_branches_int
 
 
 # "Normal" branches for most fatjet collections
-fj_branches = ["pt", "mass", "tau1", "tau2", "tau3", "qvol", "nconst", "ncharged", "nneutral", "hadflavour", "partflavour",]
+fj_branches = ["pt", "mass", "masscal", "tau1", "tau2", "tau3", "qvol", "nconst", "ncharged", "nneutral", "hadflavour", "partflavour",]
 
 # Extended fj branches, including
 #   shower deconstruction chi
