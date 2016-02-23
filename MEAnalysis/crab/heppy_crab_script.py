@@ -32,6 +32,7 @@ try:
     print "ARGV:",sys.argv
     JobNumber = sys.argv[1]
     crabFiles = PSet.process.source.fileNames
+    print PSet.process.dumpPython()
     print "crabFiles=", crabFiles
     firstInput = crabFiles[0]
     
@@ -109,7 +110,7 @@ try:
         retcode = 8021
         raise e
     looper.write()
-    
+
     print "output file:", PSet.process.output.fileName
     os.rename("Output/tree.root", "tree.root")
     

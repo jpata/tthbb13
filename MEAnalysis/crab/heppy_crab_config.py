@@ -48,8 +48,5 @@ for fn in filelist:
 config.Data.userInputFiles = filelist
 
 config.section_("Site")
-#config.Site.storageSite = "T3_CH_PSI"
-#config.Site.storageSite = "T2_CH_CSCS"
-config.Site.storageSite = "T2_EE_Estonia"
-#config.Site.blacklist = ["T2_UA_KIPT", "T3_US_FIT"]
-#config.Data.ignoreLocality = True
+config.Site.storageSite = "T2_CH_CSCS"
+#config.Site.storageSite = "T2_EE_Estonia"
