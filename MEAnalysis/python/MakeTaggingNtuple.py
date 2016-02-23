@@ -242,7 +242,9 @@ if __name__ == "__main__":
             continue
 
         jets = make_jets_hadtop_3j(intree)
-
+    
+        print any([is_signal_hadtop_3j(comb) for comb in itertools.combinations(jets, 3)])
+                    
         for comb in itertools.combinations(jets, 3):
 
             # Reset branches
