@@ -270,7 +270,7 @@ class Conf:
             "sl_j5_t3": 3.2,
             "sl_j5_tge4": -20,
             
-            "sl_jge6_t2": 0.5,
+            "sl_jge6_t2": 2,
             "sl_jge6_t3": 3.2,
             "sl_jge6_tge4": -20,
 
@@ -318,7 +318,7 @@ class Conf:
         "methodsToRun": [
             "SL_0w2h2t",
             "DL_0w2h2t",
-            #"SL_1w2h2t",
+            "SL_1w2h2t",
             #"SL_2w2h1t_l",
             #"SL_2w2h1t_h",
             "SL_2w2h2t",

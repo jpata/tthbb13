@@ -321,3 +321,9 @@ samples_dict = {
             subFiles = cms.vstring(get_files("ttHTobb_M125_13TeV_powheg_pythia8.dat")),
         ),
     }
+
+for k in samples_dict.keys():
+    if "ttHTobb" in k:
+        samples_dict[k].skip = False
+    else:
+        samples_dict[k].skip = True
