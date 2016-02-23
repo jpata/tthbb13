@@ -99,6 +99,9 @@ try:
 
     from PhysicsTools.HeppyCore.framework.looper import Looper
     print "processing",rootfilename, firstEvent, nEvents
+    #Run over all events in file
+    if nEvents < 0:
+        nEvents = None
     looper = Looper( 'Output', config, nPrint = 0, firstEvent=firstEvent, nEvents=nEvents)
     try:
         looper.loop()
