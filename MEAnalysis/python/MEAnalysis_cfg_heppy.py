@@ -261,7 +261,7 @@ class Conf:
 
         #Actually run the ME calculation
         #If False, all ME values will be 0
-        "calcME": False,
+        "calcME": True,
         
         "weight": 0.15,
 
@@ -270,7 +270,7 @@ class Conf:
             "sl_j5_t3": 3.2,
             "sl_j5_tge4": -20,
             
-            "sl_jge6_t2": 20,
+            "sl_jge6_t2": 0.5,
             "sl_jge6_t3": 3.2,
             "sl_jge6_tge4": -20,
 
