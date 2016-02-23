@@ -23,8 +23,6 @@ def prepare_crab_list(infile, dataset, perjob, outfile):
             l0, l1 = line.split("=") 
             for repls in dsname_repl:
                 l0 = l0.replace(repls[0], repls[1])
-            if len(l0) > 255:
-                raise Exception("too long filename: {0}".format(l0))
             datafiles += [(l0.strip(), int(l1.strip()))]
    
     #add last dataset
@@ -52,7 +50,10 @@ def prepare_crab_list(infile, dataset, perjob, outfile):
                 cur += perjob
         of = open(outfile, "w")
         for fn, cur, perjob in l:
-            of.write("{0}___{1}___{2}\n".format(fn, cur, perjob))
+            fns = "{0}___{1}___{2}\n".format(fn, cur, perjob)
+            if len(fns) > 255:
+                raise Exception("too long filename: {0}".format(fns))
+            of.write(fns)
             n += 1
         of.close()
     else:
