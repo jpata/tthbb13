@@ -159,6 +159,12 @@ commonMemType = NTupleObjectType("commonMemType", variables = [
     NTupleVariable("blr_2b", lambda x : x.blr_2b),
 ])
 
+bdtfexType = NTupleObjectType("bdtfexType", variables = [
+    NTupleVariable("bdt", lambda x : x["bdt"]),
+    NTupleVariable("good_perm_in_event", lambda x : x["good_perm_in_event"]),
+    NTupleVariable("picked_good_perm", lambda x : x["picked_good_perm"]),
+])
+
 
 branType = NTupleObjectType("branType", variables = [
     NTupleVariable("p",        lambda x : x[0] ),
@@ -558,6 +564,10 @@ def getTreeProducer(conf):
                 "fw_h_untagjets" + syst_suffix: NTupleCollection(
                     "fw_uj" + syst_suffix2, FoxWolframType, 8,
                     help="Fox-Wolfram momenta calculated with untagged jets", mcOnly=is_mc_only
+                ),
+                "bdtfex" + syst_suffix: NTupleCollection(
+                    "bdtfex" + syst_suffix2, bdtfexType, 1,
+                    help="BDT feature extraction info", mcOnly=is_mc_only
                 ),
             })
 

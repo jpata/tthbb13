@@ -16,7 +16,7 @@ import pickle
 from TTH.MEAnalysis.MEMUtils import set_integration_vars, add_obj
 from TTH.MEAnalysis.MEMConfig import MEMConfig
 
-from TTH.MEAnalysis.MakeTaggingNtuple import calc_vars_hadtop_3j
+from TTH.MEAnalysis.MakeTaggingNtuple import calc_vars_hadtop_3j, is_signal_hadtop_3j
 import TTH.TTHNtupleAnalyzer.AccessHelpers as AH
 
 #Pre-define shorthands for permutation and integration variable vectors
@@ -321,16 +321,15 @@ class MEAnalyzer(FilterAnalyzer):
             tlv = AH.buildTlv(jet.pt, jet.eta, jet.phi, jet.mass)
             tlv.btagCSV        = jet.btagCSV
             tlv.index          = ij
+            tlv.matchFlag      = jet.tth_match_label_numeric if hasattr(jet, "tth_match_label_numeric") else -1
+            tlv.matchBfromHadT = jet.tth_match_label_bfromhadt if hasattr(jet, "tth_match_label_bfromhadt") else -1
             jets.append(tlv)
         # Make sure jets are sorted
         jets.sort(key = lambda x:-x.Pt())
-
-        
-
-        
+            
         best_comb = None
         best_response = -1
-
+        
         for comb in itertools.combinations(jets, 3):
             v = calc_vars_hadtop_3j(comb, False)
 
@@ -343,6 +342,17 @@ class MEAnalyzer(FilterAnalyzer):
                 best_response = response
                 best_comb = comb
         
+        good_perm_in_event = any([is_signal_hadtop_3j(comb) for comb in itertools.combinations(jets, 3)])
+        if best_response > -1:
+            picked_good_perm = is_signal_hadtop_3j(best_comb)
+        else:
+            picked_good_perm = False
+
+        event.bdtfex = [{"bdt" : best_response,
+                         "good_perm_in_event" : good_perm_in_event,
+                         "picked_good_perm" : picked_good_perm
+                     }]
+
         #if best_response > 0:
         #    print "Found: ", best_response, best_comb[0].index, best_comb[1].index, best_comb[2].index
             
