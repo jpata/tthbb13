@@ -23,7 +23,7 @@ fi;
 
 #here we use @...@ to give grid-control the possibility to substitute the configuration file name
 #comment this line when testing locally
-#export ME_CONF=$CMSSW_BASE/src/TTH/MEAnalysis/python/cfg_noME.py
+#export ME_CONF=$CMSSW_BASE/src/TTH/MEAnalysis/python/cfg_withME.py
 export ME_CONF=$CMSSW_BASE/src/TTH/MEAnalysis/python/@me_conf@
 
 #print out the environment
