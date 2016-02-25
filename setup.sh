@@ -28,5 +28,10 @@ cd ..
 cp TTH/MEAnalysis/libs/*.so ../lib/$SCRAM_ARCH/
 scram setup lhapdf
 
+cd TTH/MEAnalysis/gc
+git clone https://github.com/jpata/grid-control.git
+cd grid-control
+git checkout from-svn
+cd ../../..
 # And build:
 # scram b -j 10

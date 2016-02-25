@@ -3,17 +3,27 @@
 #uncomment these to test the script
 #these are all the input parameters that MEAnalysis_heppy_gc.py reads
 #export SKIP_EVENTS=0
-#export MAX_EVENTS=10000
+#export MAX_EVENTS=200
 #export DATASETPATH=ttHTobb_M125_13TeV_powheg_pythia8
-#export FILE_NAMES=/store/user/jpata/VHBBHeppyV16pre/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V16pre_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/151117_175129/0000/tree_1.root
+#export FILE_NAMES=/store/user/jpata/VHBBHeppyV20/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V20_ttHTobb_M125_13TeV_powheg_Py8__fall15MAv2-pu25ns15v1_76r2as_v12-v1/160209_170826/0000/tree_1.root
 #export MY_SCRATCH=./
 
+SITE="UNKNOWN"
+hnamestr=`hostname`
+if [[ "$hnamestr" == t3* ]]; then
+    export SITE="PSI"
+elif [[ "$hnamestr" == comp* ]]; then
+    export SITE="TALLINN"
+fi
 
 #on PSI, CMSSW_BASE is not exported with the grid job, need to set manually
-#CMSSW_BASE=$HOME/tth/sw/CMSSW/
+if [[ "$SITE" == "PSI" ]]; then
+    export CMSSW_BASE=$HOME/tth/sw-76/CMSSW/
+fi;
 
 #here we use @...@ to give grid-control the possibility to substitute the configuration file name
-#export ME_CONF=$CMSSW_BASE/src/TTH/MEAnalysis/python/cfg_withME.py
+#comment this line when testing locally
+#export ME_CONF=$CMSSW_BASE/src/TTH/MEAnalysis/python/cfg_noME.py
 export ME_CONF=$CMSSW_BASE/src/TTH/MEAnalysis/python/@me_conf@
 
 #print out the environment
@@ -27,7 +37,12 @@ ls -al
 cd ${CMSSW_BASE}/src/TTH/MEAnalysis/
 export SCRAM_ARCH="slc6_amd64_gcc491"
 source /cvmfs/cms.cern.ch/cmsset_default.sh
-source ${CMSSW_BASE}/src/TTH/setenv_kbfi.sh
+
+if [[ "$SITE" == "PSI" ]]; then
+    source ${CMSSW_BASE}/src/TTH/setenv_psi.sh
+elif [[ "$SITE" == "TALLINN" ]]; then
+    source ${CMSSW_BASE}/src/TTH/setenv_kbfi.sh
+fi
 
 #go to work directory
 cd $MY_SCRATCH

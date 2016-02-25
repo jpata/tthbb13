@@ -57,8 +57,8 @@ class MVAVarAnalyzer(FilterAnalyzer):
         self.conf = cfg_ana._conf
         super(MVAVarAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
 
-        if mva_enabled:
-            self.cls = joblib.load(self.conf.tth_mva["filename"])
+        #if mva_enabled:
+        #    self.cls = joblib.load(self.conf.tth_mva["filename"])
 
     def beginLoop(self, setup):
         super(MVAVarAnalyzer, self).beginLoop(setup)
@@ -158,8 +158,8 @@ class MVAVarAnalyzer(FilterAnalyzer):
         vararray[np.isnan(vararray)] = 0
         
         event.tth_mva = 0
-        if mva_enabled:
-            event.tth_mva = self.cls.predict_proba(vararray)[0,1]
+        #if mva_enabled:
+        #    event.tth_mva = self.cls.predict_proba(vararray)[0,1]
         event.passes_mva = True
 
         return event
