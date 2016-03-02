@@ -11,6 +11,8 @@ sample_name = lines[0].strip()[1:-1]
 files = []
 for li in lines[1:]:
     fi = li.split()[0]
-    files += ["/hdfs/cms" + fi]
+    if not "root" in fi:
+        continue
+    files += ["root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat" + fi]
 
 par_hadd("/scratch/" + os.environ["USER"] + "/" + sample_name + ".root", files, 250, 5, 3)
