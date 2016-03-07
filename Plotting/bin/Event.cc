@@ -250,16 +250,18 @@ void saveResults(ResultMap& res, const string& prefix, const string& filename) {
     sort(resKeys.begin(), resKeys.end());
 
     for (auto rk : resKeys) {
-        const auto systKey = get<1>(rk);
-        const auto histKey = get<2>(rk);
+        const auto procKey = get<0>(rk);
+        const auto systKey = get<2>(rk);
+        const auto histKey = get<3>(rk);
         stringstream ss;
         ss << prefix << "/";
 
         //Add all categories together with underscores
         int ind = 0;
-        for (auto& catKey : get<0>(rk)) {
+        ss << ProcessKey::to_string(procKey) << "/";
+        for (auto& catKey : get<1>(rk)) {
             ss << CategoryKey::to_string(catKey);
-            if (ind < get<0>(rk).size() - 1) {
+            if (ind < get<1>(rk).size() - 1) {
                 ss << "_";
             }
             ind++;
@@ -441,6 +443,29 @@ bool isSignalMC(ProcessKey::ProcessKey proc) {
         proc == ProcessKey::ttH ||
         proc == ProcessKey::ttH_hbb
     );
+}
+
+//Given a base process key, e.g. ttbarUnsplit, produces a final process key, e.g. ttbarOther,
+//based on the properties of the event
+ProcessKey::ProcessKey getProcessKey(const Event& ev, ProcessKey::ProcessKey proc_key) {
+    if (proc_key == ProcessKey::ttbarUnsplit) {
+        if (ev.data->ttCls == 51) {
+            return ProcessKey::ttbarPlusB;
+        }
+        else if (ev.data->ttCls == 52) {
+            return ProcessKey::ttbarPlus2B;
+        }
+        else if (ev.data->ttCls >= 53) {
+            return ProcessKey::ttbarPlusBBbar;
+        }
+        else if (ev.data->ttCls >= 41) {
+            return ProcessKey::ttbarPlusCCbar;
+        }
+        else if (ev.data->ttCls <= 0) {
+            return ProcessKey::ttbarOther;
+        }
+    }
+    return ProcessKey::UNKNOWN;
 }
 
 double nominal_weight(const Event& ev, const Configuration& conf) {
@@ -839,7 +864,8 @@ void CategoryProcessor::fillHistograms(
         vector<CategoryKey::CategoryKey>,
         SystematicKey::SystematicKey
     > key,
-    double weight
+    double weight,
+    const Configuration& conf
     ) const {
 }
 
@@ -883,7 +909,8 @@ void CategoryProcessor::process(
             this->fillHistograms(
                 event, results,
                 make_tuple(_catKeys, _systKey),
-                weight
+                weight,
+                conf
             );
         } // weightFuncs
         
@@ -901,26 +928,30 @@ void MEMCategoryProcessor::fillHistograms(
         vector<CategoryKey::CategoryKey>,
         SystematicKey::SystematicKey
     > key,
-    double weight
+    double weight,
+    const Configuration& conf
     ) const {
 
     //fill base histograms
-    CategoryProcessor::fillHistograms(event, results, key, weight);
+    CategoryProcessor::fillHistograms(event, results, key, weight, conf);
 
     if (CategoryKey::is_sl(get<0>(key))) {
         const auto mem_SL_0w2h2t_key = make_tuple(
+            conf.process,
             get<0>(key),
             get<1>(key),
             HistogramKey::mem_SL_0w2h2t
         );
         
         const auto mem_SL_2w2h2t_sj_key = make_tuple(
+            conf.process,
             get<0>(key),
             get<1>(key),
             HistogramKey::mem_SL_2w2h2t_sj
         );
         
         const auto mem_SL_2w2h2t_key = make_tuple(
+            conf.process,
             get<0>(key),
             get<1>(key),
             HistogramKey::mem_SL_2w2h2t
@@ -941,6 +972,7 @@ void MEMCategoryProcessor::fillHistograms(
         static_cast<TH1D*>(results[mem_SL_2w2h2t_sj_key])->Fill(event.mem_SL_2w2h2t_sj, weight);
     } else if (CategoryKey::is_dl(get<0>(key))) {
         const auto mem_DL_0w2h2t_key = make_tuple(
+            conf.process,
             get<0>(key),
             get<1>(key),
             HistogramKey::mem_DL_0w2h2t
@@ -960,15 +992,17 @@ void SparseCategoryProcessor::fillHistograms(
         vector<CategoryKey::CategoryKey>,
         SystematicKey::SystematicKey
     > key,
-    double weight
+    double weight,
+    const Configuration& conf
     ) const {
 
     //fill base histograms
-    CategoryProcessor::fillHistograms(event, results, key, weight);
+    CategoryProcessor::fillHistograms(event, results, key, weight, conf);
 
     THnSparseF* h = nullptr;
     if (CategoryKey::is_sl(get<0>(key))) {
         const auto hkey = make_tuple(
+            conf.process,
             get<0>(key),
             get<1>(key),
             HistogramKey::sparse
@@ -982,6 +1016,7 @@ void SparseCategoryProcessor::fillHistograms(
         }
     } else if (CategoryKey::is_dl(get<0>(key))) {
         const auto hkey = make_tuple(
+            conf.process,
             get<0>(key),
             get<1>(key),
             HistogramKey::sparse
@@ -1012,11 +1047,12 @@ void SparseCategoryProcessor::fillHistograms(
 string to_string(const ResultKey& k) {
     stringstream ss;
     ss << "ResultKey(";
-    for (auto& v : get<0>(k)) {
+    ss << ProcessKey::to_string(get<0>(k)) << ", ";
+    for (auto& v : get<1>(k)) {
         ss << CategoryKey::to_string(v) << ", ";
     }
-    ss << SystematicKey::to_string(get<1>(k)) << ", ";
-    ss << HistogramKey::to_string(get<2>(k)) << ")";
+    ss << SystematicKey::to_string(get<2>(k)) << ", ";
+    ss << HistogramKey::to_string(get<3>(k)) << ")";
     return ss.str();
 }
 

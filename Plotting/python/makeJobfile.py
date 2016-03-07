@@ -10,10 +10,16 @@ nEvents = int(os.environ.get("MAX_EVENTS", -1))
 nbins_mem = 36
 nbins_bdt = 40
 
+sample_repl = {
+    "ttHToNonbb_M125_13TeV_powheg_pythia8": "ttH_nonhbb",
+    "ttHTobb_M125_13TeV_powheg_pythia8": "ttH",
+    "TT_TuneCUETP8M1_13TeV-powheg-pythia8": "ttbarOther",
+}
+
 ret = {
     "filenames": filenames,
-    "lumi": 2500,
-    "process": sample,
+    "lumi": 1,
+    "process": sample_repl[sample],
     "prefix": prefix,
     "outputFile": "ControlPlotsSparse.root",
     "firstEntry": firstEvent,

@@ -24,6 +24,7 @@ using namespace std;
 //Simple 3-tuple of (category, systematic, histname) to keep track of
 //final histograms.
 typedef tuple<
+    ProcessKey::ProcessKey,
     vector<CategoryKey::CategoryKey>,
     SystematicKey::SystematicKey,
     HistogramKey::HistogramKey
@@ -45,14 +46,17 @@ namespace std {
         int ninc = 8; // how many bits to shift each
         int ic = 0; //shift counter
 
+        r += static_cast<int>(get<0>(x)) << (ninc*ic);
+        ic++;
+
         //shift vector of category keys
-        for (auto& v : get<0>(x)) {
+        for (auto& v : get<1>(x)) {
             r += static_cast<int>(v) << (ninc*ic);        
         }
         ic++;
-        r += static_cast<int>(get<1>(x)) << (ninc*ic);
-        ic++;
         r += static_cast<int>(get<2>(x)) << (ninc*ic);
+        ic++;
+        r += static_cast<int>(get<3>(x)) << (ninc*ic);
         std::hash<unsigned long long> _hash_fn;
         return _hash_fn(r);
     }
@@ -367,7 +371,8 @@ public:
             vector<CategoryKey::CategoryKey>,
             SystematicKey::SystematicKey
         >,
-        double weight
+        double weight,
+        const Configuration& conf
     ) const;
 
     void process(
@@ -398,7 +403,8 @@ public:
             vector<CategoryKey::CategoryKey>,
             SystematicKey::SystematicKey
         >,
-        double weight
+        double weight,
+        const Configuration& conf
     ) const;
 };
 
@@ -448,7 +454,8 @@ public:
             vector<CategoryKey::CategoryKey>,
             SystematicKey::SystematicKey
         >,
-        double weight
+        double weight,
+        const Configuration& conf
     ) const;
 };
 
@@ -471,5 +478,7 @@ double process_weight(ProcessKey::ProcessKey procm, const Configuration& conf);
 
 //Checks if this category, specified by a list of keys, was enabled in the JSON
 bool isCategoryEnabled(const Configuration& conf, const vector<CategoryKey::CategoryKey>& catKeys);
+
+ProcessKey::ProcessKey getProcessKey(const Event& ev, ProcessKey::ProcessKey proc_key);
 
 #endif

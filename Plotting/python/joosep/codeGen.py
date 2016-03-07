@@ -182,7 +182,8 @@ public:
             vector<CategoryKey::CategoryKey>,
             SystematicKey::SystematicKey
         >,
-        double weight
+        double weight,
+        const Configuration& conf
     ) const;
 }};
 """.format(
@@ -202,10 +203,11 @@ void {0}::fillHistograms(
         vector<CategoryKey::CategoryKey>,
         SystematicKey::SystematicKey
     > key,
-    double weight
+    double weight,
+    const Configuration& conf
     ) const {{
     //fill base histograms
-    {1}::fillHistograms(event, results, key, weight);
+    {1}::fillHistograms(event, results, key, weight, conf);
 {2}
 }}
 """.format(
@@ -261,6 +263,7 @@ processes = [
     "ttbarPlus2B",
     "ttbarPlusCCbar",
     "ttbarOther",
+    "ttbarUnsplit",
     "ttW_Wlnu",
     "ttW_Wqq",
     "ttZ_Zqq",
