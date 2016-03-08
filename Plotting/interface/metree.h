@@ -85,6 +85,7 @@ public:
   int njets;
   double jets_mcPt[16]; //
   double jets_mcEta[16]; //
+  int jets_matchBfromHadT[16]; //
   double jets_id[16]; //
   double jets_bTagWeightLFUp[16]; //b-tag CSV weight, variating LF Up
   double jets_pt[16]; //
@@ -97,7 +98,7 @@ public:
   double jets_bTagWeightStats1Up[16]; //b-tag CSV weight, variating Stats1 Up
   double jets_bTagWeightStats1Down[16]; //b-tag CSV weight, variating Stats1 Down
   double jets_bTagWeightcErr2Down[16]; //b-tag CSV weight, variating cErr2 Down
-  int jets_matchFlag[16]; //
+  int jets_matchFlag[16]; //0 - matched to light quark from W, 1 - matched to b form top, 2 - matched to b from higgs
   double jets_phi[16]; //
   double jets_bTagWeightStats2Down[16]; //b-tag CSV weight, variating Stats2 Down
   double jets_bTagWeightLFDown[16]; //b-tag CSV weight, variating LF Down
@@ -134,6 +135,7 @@ public:
   int nloose_jets;
   double loose_jets_mcPt[6]; //
   double loose_jets_mcEta[6]; //
+  int loose_jets_matchBfromHadT[6]; //
   double loose_jets_id[6]; //
   double loose_jets_bTagWeightLFUp[6]; //b-tag CSV weight, variating LF Up
   double loose_jets_pt[6]; //
@@ -146,7 +148,7 @@ public:
   double loose_jets_bTagWeightStats1Up[6]; //b-tag CSV weight, variating Stats1 Up
   double loose_jets_bTagWeightStats1Down[6]; //b-tag CSV weight, variating Stats1 Down
   double loose_jets_bTagWeightcErr2Down[6]; //b-tag CSV weight, variating cErr2 Down
-  int loose_jets_matchFlag[6]; //
+  int loose_jets_matchFlag[6]; //0 - matched to light quark from W, 1 - matched to b form top, 2 - matched to b from higgs
   double loose_jets_phi[6]; //
   double loose_jets_bTagWeightStats2Down[6]; //b-tag CSV weight, variating Stats2 Down
   double loose_jets_bTagWeightLFDown[6]; //b-tag CSV weight, variating LF Down
@@ -339,12 +341,15 @@ public:
   double D;
   double D_JESDown;
   double D_JESUp;
-  int HLT_BIT_HLT_CaloMHTNoPU90_PFMET90_PFMHT90_IDLoose_BTagCSV0p7_v;
-  int HLT_BIT_HLT_CaloMHTNoPU90_PFMET90_PFMHT90_IDLoose_v;
+  int HLT_BIT_HLT_AK8DiPFJet250_200_TrimMass30_BTagCSV0p45_v;
+  int HLT_BIT_HLT_AK8DiPFJet280_200_TrimMass30_BTagCSV0p45_v;
+  int HLT_BIT_HLT_AK8PFHT600_TrimR0p1PT0p03Mass50_BTagCSV0p45_v;
+  int HLT_BIT_HLT_AK8PFHT650_TrimR0p1PT0p03Mass50_v;
+  int HLT_BIT_HLT_AK8PFHT700_TrimR0p1PT0p03Mass50_v;
+  int HLT_BIT_HLT_AK8PFJet360_TrimMass30_v;
   int HLT_BIT_HLT_CaloMHTNoPU90_PFMET90_PFMHT90_IDTight_BTagCSV0p72_v;
   int HLT_BIT_HLT_CaloMHTNoPU90_PFMET90_PFMHT90_IDTight_v;
   int HLT_BIT_HLT_DiCentralPFJet55_PFMET110_NoiseCleaned_v;
-  int HLT_BIT_HLT_DiCentralPFJet70_PFMET120_NoiseCleaned_v;
   int HLT_BIT_HLT_DiPFJetAve140_v;
   int HLT_BIT_HLT_DiPFJetAve200_v;
   int HLT_BIT_HLT_DiPFJetAve260_v;
@@ -352,13 +357,10 @@ public:
   int HLT_BIT_HLT_DiPFJetAve40_v;
   int HLT_BIT_HLT_DiPFJetAve60_v;
   int HLT_BIT_HLT_DiPFJetAve80_v;
-  int HLT_BIT_HLT_DoubleEle24_22_eta2p1_WP75_Gsf_v;
   int HLT_BIT_HLT_DoubleEle24_22_eta2p1_WPLoose_Gsf_v;
   int HLT_BIT_HLT_DoubleIsoMu17_eta2p1_v;
   int HLT_BIT_HLT_DoubleJet90_Double30_DoubleBTagCSV0p67_v;
-  int HLT_BIT_HLT_DoubleJet90_Double30_DoubleCSV0p5_v;
   int HLT_BIT_HLT_DoubleJet90_Double30_TripleBTagCSV0p67_v;
-  int HLT_BIT_HLT_DoubleJet90_Double30_TripleCSV0p5_v;
   int HLT_BIT_HLT_Ele105_CaloIdVT_GsfTrkIdT_v;
   int HLT_BIT_HLT_Ele12_CaloIdL_TrackIdL_IsoVL_v;
   int HLT_BIT_HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v;
@@ -370,24 +372,17 @@ public:
   int HLT_BIT_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_v;
   int HLT_BIT_HLT_Ele23_WPLoose_Gsf_WHbbBoost_v;
   int HLT_BIT_HLT_Ele23_WPLoose_Gsf_v;
-  int HLT_BIT_HLT_Ele27_WP85_Gsf_v;
   int HLT_BIT_HLT_Ele27_WPLoose_Gsf_WHbbBoost_v;
   int HLT_BIT_HLT_Ele27_WPLoose_Gsf_v;
-  int HLT_BIT_HLT_Ele27_eta2p1_WP75_Gsf_CentralPFJet30_BTagCSV07_v;
-  int HLT_BIT_HLT_Ele27_eta2p1_WP75_Gsf_v;
-  int HLT_BIT_HLT_Ele27_eta2p1_WP85_Gsf_HT200_v;
   int HLT_BIT_HLT_Ele27_eta2p1_WPLoose_Gsf_CentralPFJet30_BTagCSV07_v;
   int HLT_BIT_HLT_Ele27_eta2p1_WPLoose_Gsf_HT200_v;
   int HLT_BIT_HLT_Ele27_eta2p1_WPLoose_Gsf_v;
   int HLT_BIT_HLT_Ele27_eta2p1_WPTight_Gsf_v;
   int HLT_BIT_HLT_Ele30WP60_Ele8_Mass55_v;
-  int HLT_BIT_HLT_Ele32_eta2p1_WP75_Gsf_CentralPFJet30_BTagCSV07_v;
-  int HLT_BIT_HLT_Ele32_eta2p1_WP75_Gsf_v;
   int HLT_BIT_HLT_Ele32_eta2p1_WPLoose_Gsf_CentralPFJet30_BTagCSV07_v;
   int HLT_BIT_HLT_Ele32_eta2p1_WPLoose_Gsf_v;
   int HLT_BIT_HLT_Ele45_CaloIdVT_GsfTrkIdT_PFJet200_PFJet50_v;
   int HLT_BIT_HLT_IsoMu16_eta2p1_CaloMET30_v;
-  int HLT_BIT_HLT_IsoMu17_eta2p1_v;
   int HLT_BIT_HLT_IsoMu18_v;
   int HLT_BIT_HLT_IsoMu20_eta2p1_CentralPFJet30_BTagCSV07_v;
   int HLT_BIT_HLT_IsoMu20_eta2p1_v;
@@ -420,20 +415,15 @@ public:
   int HLT_BIT_HLT_OldIsoMu18_v;
   int HLT_BIT_HLT_OldIsoTkMu18_v;
   int HLT_BIT_HLT_PFHT350_PFMET100_NoiseCleaned_v;
-  int HLT_BIT_HLT_PFHT350_PFMET120_NoiseCleaned_v;
   int HLT_BIT_HLT_PFHT350_v;
   int HLT_BIT_HLT_PFHT400_SixJet30_BTagCSV0p55_2PFBTagCSV0p72_v;
-  int HLT_BIT_HLT_PFHT400_SixJet30_BTagCSV0p5_2PFBTagCSV_v;
   int HLT_BIT_HLT_PFHT400_SixJet30_v;
   int HLT_BIT_HLT_PFHT450_SixJet40_PFBTagCSV0p72_v;
-  int HLT_BIT_HLT_PFHT450_SixJet40_PFBTagCSV_v;
   int HLT_BIT_HLT_PFHT450_SixJet40_v;
   int HLT_BIT_HLT_PFHT650_WideJetMJJ900DEtaJJ1p5_v;
   int HLT_BIT_HLT_PFHT650_WideJetMJJ950DEtaJJ1p5_v;
   int HLT_BIT_HLT_PFHT750_4JetPt50_v;
-  int HLT_BIT_HLT_PFHT750_4Jet_v;
   int HLT_BIT_HLT_PFHT800_v;
-  int HLT_BIT_HLT_PFHT900_v;
   int HLT_BIT_HLT_PFJet140_v;
   int HLT_BIT_HLT_PFJet200_v;
   int HLT_BIT_HLT_PFJet260_v;
@@ -443,22 +433,16 @@ public:
   int HLT_BIT_HLT_PFJet450_v;
   int HLT_BIT_HLT_PFJet60_v;
   int HLT_BIT_HLT_PFJet80_v;
-  int HLT_BIT_HLT_PFMET100_PFMHT100_IDLoose_v;
   int HLT_BIT_HLT_PFMET100_PFMHT100_IDTight_v;
-  int HLT_BIT_HLT_PFMET110_PFMHT110_IDLoose_v;
   int HLT_BIT_HLT_PFMET110_PFMHT110_IDTight_v;
   int HLT_BIT_HLT_PFMET120_NoiseCleaned_Mu5_v;
-  int HLT_BIT_HLT_PFMET120_PFMHT120_IDLoose_v;
   int HLT_BIT_HLT_PFMET120_PFMHT120_IDTight_v;
   int HLT_BIT_HLT_PFMET170_NoiseCleaned_v;
-  int HLT_BIT_HLT_PFMET90_PFMHT90_IDLoose_v;
   int HLT_BIT_HLT_PFMET90_PFMHT90_IDTight_v;
   int HLT_BIT_HLT_PFMETNoMu120_NoiseCleaned_PFMHTNoMu120_IDTight_v;
   int HLT_BIT_HLT_PFMETNoMu90_NoiseCleaned_PFMHTNoMu90_IDTight_v;
   int HLT_BIT_HLT_QuadJet45_DoubleBTagCSV0p67_v;
-  int HLT_BIT_HLT_QuadJet45_DoubleCSV0p5_v;
   int HLT_BIT_HLT_QuadJet45_TripleBTagCSV0p67_v;
-  int HLT_BIT_HLT_QuadJet45_TripleCSV0p5_v;
   int HLT_BIT_HLT_QuadPFJet_DoubleBTagCSV_VBF_Mqq200_v;
   int HLT_BIT_HLT_QuadPFJet_DoubleBTagCSV_VBF_Mqq240_v;
   int HLT_BIT_HLT_QuadPFJet_SingleBTagCSV_VBF_Mqq460_v;
@@ -488,9 +472,8 @@ public:
   int HLT_ZmmHbbAll;
   int HLT_ZmmHbbHighLumi;
   int HLT_ZmmHbbLowLumi;
+  int HLT_ZnnHbb;
   int HLT_ZnnHbbAll;
-  int HLT_ZnnHbbHighLumi;
-  int HLT_ZnnHbbLowLumi;
   int HLT_hadronic;
   int HLT_ttHhardonicAll;
   int HLT_ttHhardonicHighLumi;
@@ -787,6 +770,7 @@ public:
     tree->SetBranchAddress("njets", &(this->njets));
     tree->SetBranchAddress("jets_mcPt", this->jets_mcPt);
     tree->SetBranchAddress("jets_mcEta", this->jets_mcEta);
+    tree->SetBranchAddress("jets_matchBfromHadT", this->jets_matchBfromHadT);
     tree->SetBranchAddress("jets_id", this->jets_id);
     tree->SetBranchAddress("jets_bTagWeightLFUp", this->jets_bTagWeightLFUp);
     tree->SetBranchAddress("jets_pt", this->jets_pt);
@@ -836,6 +820,7 @@ public:
     tree->SetBranchAddress("nloose_jets", &(this->nloose_jets));
     tree->SetBranchAddress("loose_jets_mcPt", this->loose_jets_mcPt);
     tree->SetBranchAddress("loose_jets_mcEta", this->loose_jets_mcEta);
+    tree->SetBranchAddress("loose_jets_matchBfromHadT", this->loose_jets_matchBfromHadT);
     tree->SetBranchAddress("loose_jets_id", this->loose_jets_id);
     tree->SetBranchAddress("loose_jets_bTagWeightLFUp", this->loose_jets_bTagWeightLFUp);
     tree->SetBranchAddress("loose_jets_pt", this->loose_jets_pt);
@@ -1041,12 +1026,15 @@ public:
     tree->SetBranchAddress("D", &(this->D));
     tree->SetBranchAddress("D_JESDown", &(this->D_JESDown));
     tree->SetBranchAddress("D_JESUp", &(this->D_JESUp));
-    tree->SetBranchAddress("HLT_BIT_HLT_CaloMHTNoPU90_PFMET90_PFMHT90_IDLoose_BTagCSV0p7_v", &(this->HLT_BIT_HLT_CaloMHTNoPU90_PFMET90_PFMHT90_IDLoose_BTagCSV0p7_v));
-    tree->SetBranchAddress("HLT_BIT_HLT_CaloMHTNoPU90_PFMET90_PFMHT90_IDLoose_v", &(this->HLT_BIT_HLT_CaloMHTNoPU90_PFMET90_PFMHT90_IDLoose_v));
+    tree->SetBranchAddress("HLT_BIT_HLT_AK8DiPFJet250_200_TrimMass30_BTagCSV0p45_v", &(this->HLT_BIT_HLT_AK8DiPFJet250_200_TrimMass30_BTagCSV0p45_v));
+    tree->SetBranchAddress("HLT_BIT_HLT_AK8DiPFJet280_200_TrimMass30_BTagCSV0p45_v", &(this->HLT_BIT_HLT_AK8DiPFJet280_200_TrimMass30_BTagCSV0p45_v));
+    tree->SetBranchAddress("HLT_BIT_HLT_AK8PFHT600_TrimR0p1PT0p03Mass50_BTagCSV0p45_v", &(this->HLT_BIT_HLT_AK8PFHT600_TrimR0p1PT0p03Mass50_BTagCSV0p45_v));
+    tree->SetBranchAddress("HLT_BIT_HLT_AK8PFHT650_TrimR0p1PT0p03Mass50_v", &(this->HLT_BIT_HLT_AK8PFHT650_TrimR0p1PT0p03Mass50_v));
+    tree->SetBranchAddress("HLT_BIT_HLT_AK8PFHT700_TrimR0p1PT0p03Mass50_v", &(this->HLT_BIT_HLT_AK8PFHT700_TrimR0p1PT0p03Mass50_v));
+    tree->SetBranchAddress("HLT_BIT_HLT_AK8PFJet360_TrimMass30_v", &(this->HLT_BIT_HLT_AK8PFJet360_TrimMass30_v));
     tree->SetBranchAddress("HLT_BIT_HLT_CaloMHTNoPU90_PFMET90_PFMHT90_IDTight_BTagCSV0p72_v", &(this->HLT_BIT_HLT_CaloMHTNoPU90_PFMET90_PFMHT90_IDTight_BTagCSV0p72_v));
     tree->SetBranchAddress("HLT_BIT_HLT_CaloMHTNoPU90_PFMET90_PFMHT90_IDTight_v", &(this->HLT_BIT_HLT_CaloMHTNoPU90_PFMET90_PFMHT90_IDTight_v));
     tree->SetBranchAddress("HLT_BIT_HLT_DiCentralPFJet55_PFMET110_NoiseCleaned_v", &(this->HLT_BIT_HLT_DiCentralPFJet55_PFMET110_NoiseCleaned_v));
-    tree->SetBranchAddress("HLT_BIT_HLT_DiCentralPFJet70_PFMET120_NoiseCleaned_v", &(this->HLT_BIT_HLT_DiCentralPFJet70_PFMET120_NoiseCleaned_v));
     tree->SetBranchAddress("HLT_BIT_HLT_DiPFJetAve140_v", &(this->HLT_BIT_HLT_DiPFJetAve140_v));
     tree->SetBranchAddress("HLT_BIT_HLT_DiPFJetAve200_v", &(this->HLT_BIT_HLT_DiPFJetAve200_v));
     tree->SetBranchAddress("HLT_BIT_HLT_DiPFJetAve260_v", &(this->HLT_BIT_HLT_DiPFJetAve260_v));
@@ -1054,13 +1042,10 @@ public:
     tree->SetBranchAddress("HLT_BIT_HLT_DiPFJetAve40_v", &(this->HLT_BIT_HLT_DiPFJetAve40_v));
     tree->SetBranchAddress("HLT_BIT_HLT_DiPFJetAve60_v", &(this->HLT_BIT_HLT_DiPFJetAve60_v));
     tree->SetBranchAddress("HLT_BIT_HLT_DiPFJetAve80_v", &(this->HLT_BIT_HLT_DiPFJetAve80_v));
-    tree->SetBranchAddress("HLT_BIT_HLT_DoubleEle24_22_eta2p1_WP75_Gsf_v", &(this->HLT_BIT_HLT_DoubleEle24_22_eta2p1_WP75_Gsf_v));
     tree->SetBranchAddress("HLT_BIT_HLT_DoubleEle24_22_eta2p1_WPLoose_Gsf_v", &(this->HLT_BIT_HLT_DoubleEle24_22_eta2p1_WPLoose_Gsf_v));
     tree->SetBranchAddress("HLT_BIT_HLT_DoubleIsoMu17_eta2p1_v", &(this->HLT_BIT_HLT_DoubleIsoMu17_eta2p1_v));
     tree->SetBranchAddress("HLT_BIT_HLT_DoubleJet90_Double30_DoubleBTagCSV0p67_v", &(this->HLT_BIT_HLT_DoubleJet90_Double30_DoubleBTagCSV0p67_v));
-    tree->SetBranchAddress("HLT_BIT_HLT_DoubleJet90_Double30_DoubleCSV0p5_v", &(this->HLT_BIT_HLT_DoubleJet90_Double30_DoubleCSV0p5_v));
     tree->SetBranchAddress("HLT_BIT_HLT_DoubleJet90_Double30_TripleBTagCSV0p67_v", &(this->HLT_BIT_HLT_DoubleJet90_Double30_TripleBTagCSV0p67_v));
-    tree->SetBranchAddress("HLT_BIT_HLT_DoubleJet90_Double30_TripleCSV0p5_v", &(this->HLT_BIT_HLT_DoubleJet90_Double30_TripleCSV0p5_v));
     tree->SetBranchAddress("HLT_BIT_HLT_Ele105_CaloIdVT_GsfTrkIdT_v", &(this->HLT_BIT_HLT_Ele105_CaloIdVT_GsfTrkIdT_v));
     tree->SetBranchAddress("HLT_BIT_HLT_Ele12_CaloIdL_TrackIdL_IsoVL_v", &(this->HLT_BIT_HLT_Ele12_CaloIdL_TrackIdL_IsoVL_v));
     tree->SetBranchAddress("HLT_BIT_HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v", &(this->HLT_BIT_HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v));
@@ -1072,24 +1057,17 @@ public:
     tree->SetBranchAddress("HLT_BIT_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_v", &(this->HLT_BIT_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_v));
     tree->SetBranchAddress("HLT_BIT_HLT_Ele23_WPLoose_Gsf_WHbbBoost_v", &(this->HLT_BIT_HLT_Ele23_WPLoose_Gsf_WHbbBoost_v));
     tree->SetBranchAddress("HLT_BIT_HLT_Ele23_WPLoose_Gsf_v", &(this->HLT_BIT_HLT_Ele23_WPLoose_Gsf_v));
-    tree->SetBranchAddress("HLT_BIT_HLT_Ele27_WP85_Gsf_v", &(this->HLT_BIT_HLT_Ele27_WP85_Gsf_v));
     tree->SetBranchAddress("HLT_BIT_HLT_Ele27_WPLoose_Gsf_WHbbBoost_v", &(this->HLT_BIT_HLT_Ele27_WPLoose_Gsf_WHbbBoost_v));
     tree->SetBranchAddress("HLT_BIT_HLT_Ele27_WPLoose_Gsf_v", &(this->HLT_BIT_HLT_Ele27_WPLoose_Gsf_v));
-    tree->SetBranchAddress("HLT_BIT_HLT_Ele27_eta2p1_WP75_Gsf_CentralPFJet30_BTagCSV07_v", &(this->HLT_BIT_HLT_Ele27_eta2p1_WP75_Gsf_CentralPFJet30_BTagCSV07_v));
-    tree->SetBranchAddress("HLT_BIT_HLT_Ele27_eta2p1_WP75_Gsf_v", &(this->HLT_BIT_HLT_Ele27_eta2p1_WP75_Gsf_v));
-    tree->SetBranchAddress("HLT_BIT_HLT_Ele27_eta2p1_WP85_Gsf_HT200_v", &(this->HLT_BIT_HLT_Ele27_eta2p1_WP85_Gsf_HT200_v));
     tree->SetBranchAddress("HLT_BIT_HLT_Ele27_eta2p1_WPLoose_Gsf_CentralPFJet30_BTagCSV07_v", &(this->HLT_BIT_HLT_Ele27_eta2p1_WPLoose_Gsf_CentralPFJet30_BTagCSV07_v));
     tree->SetBranchAddress("HLT_BIT_HLT_Ele27_eta2p1_WPLoose_Gsf_HT200_v", &(this->HLT_BIT_HLT_Ele27_eta2p1_WPLoose_Gsf_HT200_v));
     tree->SetBranchAddress("HLT_BIT_HLT_Ele27_eta2p1_WPLoose_Gsf_v", &(this->HLT_BIT_HLT_Ele27_eta2p1_WPLoose_Gsf_v));
     tree->SetBranchAddress("HLT_BIT_HLT_Ele27_eta2p1_WPTight_Gsf_v", &(this->HLT_BIT_HLT_Ele27_eta2p1_WPTight_Gsf_v));
     tree->SetBranchAddress("HLT_BIT_HLT_Ele30WP60_Ele8_Mass55_v", &(this->HLT_BIT_HLT_Ele30WP60_Ele8_Mass55_v));
-    tree->SetBranchAddress("HLT_BIT_HLT_Ele32_eta2p1_WP75_Gsf_CentralPFJet30_BTagCSV07_v", &(this->HLT_BIT_HLT_Ele32_eta2p1_WP75_Gsf_CentralPFJet30_BTagCSV07_v));
-    tree->SetBranchAddress("HLT_BIT_HLT_Ele32_eta2p1_WP75_Gsf_v", &(this->HLT_BIT_HLT_Ele32_eta2p1_WP75_Gsf_v));
     tree->SetBranchAddress("HLT_BIT_HLT_Ele32_eta2p1_WPLoose_Gsf_CentralPFJet30_BTagCSV07_v", &(this->HLT_BIT_HLT_Ele32_eta2p1_WPLoose_Gsf_CentralPFJet30_BTagCSV07_v));
     tree->SetBranchAddress("HLT_BIT_HLT_Ele32_eta2p1_WPLoose_Gsf_v", &(this->HLT_BIT_HLT_Ele32_eta2p1_WPLoose_Gsf_v));
     tree->SetBranchAddress("HLT_BIT_HLT_Ele45_CaloIdVT_GsfTrkIdT_PFJet200_PFJet50_v", &(this->HLT_BIT_HLT_Ele45_CaloIdVT_GsfTrkIdT_PFJet200_PFJet50_v));
     tree->SetBranchAddress("HLT_BIT_HLT_IsoMu16_eta2p1_CaloMET30_v", &(this->HLT_BIT_HLT_IsoMu16_eta2p1_CaloMET30_v));
-    tree->SetBranchAddress("HLT_BIT_HLT_IsoMu17_eta2p1_v", &(this->HLT_BIT_HLT_IsoMu17_eta2p1_v));
     tree->SetBranchAddress("HLT_BIT_HLT_IsoMu18_v", &(this->HLT_BIT_HLT_IsoMu18_v));
     tree->SetBranchAddress("HLT_BIT_HLT_IsoMu20_eta2p1_CentralPFJet30_BTagCSV07_v", &(this->HLT_BIT_HLT_IsoMu20_eta2p1_CentralPFJet30_BTagCSV07_v));
     tree->SetBranchAddress("HLT_BIT_HLT_IsoMu20_eta2p1_v", &(this->HLT_BIT_HLT_IsoMu20_eta2p1_v));
@@ -1122,20 +1100,15 @@ public:
     tree->SetBranchAddress("HLT_BIT_HLT_OldIsoMu18_v", &(this->HLT_BIT_HLT_OldIsoMu18_v));
     tree->SetBranchAddress("HLT_BIT_HLT_OldIsoTkMu18_v", &(this->HLT_BIT_HLT_OldIsoTkMu18_v));
     tree->SetBranchAddress("HLT_BIT_HLT_PFHT350_PFMET100_NoiseCleaned_v", &(this->HLT_BIT_HLT_PFHT350_PFMET100_NoiseCleaned_v));
-    tree->SetBranchAddress("HLT_BIT_HLT_PFHT350_PFMET120_NoiseCleaned_v", &(this->HLT_BIT_HLT_PFHT350_PFMET120_NoiseCleaned_v));
     tree->SetBranchAddress("HLT_BIT_HLT_PFHT350_v", &(this->HLT_BIT_HLT_PFHT350_v));
     tree->SetBranchAddress("HLT_BIT_HLT_PFHT400_SixJet30_BTagCSV0p55_2PFBTagCSV0p72_v", &(this->HLT_BIT_HLT_PFHT400_SixJet30_BTagCSV0p55_2PFBTagCSV0p72_v));
-    tree->SetBranchAddress("HLT_BIT_HLT_PFHT400_SixJet30_BTagCSV0p5_2PFBTagCSV_v", &(this->HLT_BIT_HLT_PFHT400_SixJet30_BTagCSV0p5_2PFBTagCSV_v));
     tree->SetBranchAddress("HLT_BIT_HLT_PFHT400_SixJet30_v", &(this->HLT_BIT_HLT_PFHT400_SixJet30_v));
     tree->SetBranchAddress("HLT_BIT_HLT_PFHT450_SixJet40_PFBTagCSV0p72_v", &(this->HLT_BIT_HLT_PFHT450_SixJet40_PFBTagCSV0p72_v));
-    tree->SetBranchAddress("HLT_BIT_HLT_PFHT450_SixJet40_PFBTagCSV_v", &(this->HLT_BIT_HLT_PFHT450_SixJet40_PFBTagCSV_v));
     tree->SetBranchAddress("HLT_BIT_HLT_PFHT450_SixJet40_v", &(this->HLT_BIT_HLT_PFHT450_SixJet40_v));
     tree->SetBranchAddress("HLT_BIT_HLT_PFHT650_WideJetMJJ900DEtaJJ1p5_v", &(this->HLT_BIT_HLT_PFHT650_WideJetMJJ900DEtaJJ1p5_v));
     tree->SetBranchAddress("HLT_BIT_HLT_PFHT650_WideJetMJJ950DEtaJJ1p5_v", &(this->HLT_BIT_HLT_PFHT650_WideJetMJJ950DEtaJJ1p5_v));
     tree->SetBranchAddress("HLT_BIT_HLT_PFHT750_4JetPt50_v", &(this->HLT_BIT_HLT_PFHT750_4JetPt50_v));
-    tree->SetBranchAddress("HLT_BIT_HLT_PFHT750_4Jet_v", &(this->HLT_BIT_HLT_PFHT750_4Jet_v));
     tree->SetBranchAddress("HLT_BIT_HLT_PFHT800_v", &(this->HLT_BIT_HLT_PFHT800_v));
-    tree->SetBranchAddress("HLT_BIT_HLT_PFHT900_v", &(this->HLT_BIT_HLT_PFHT900_v));
     tree->SetBranchAddress("HLT_BIT_HLT_PFJet140_v", &(this->HLT_BIT_HLT_PFJet140_v));
     tree->SetBranchAddress("HLT_BIT_HLT_PFJet200_v", &(this->HLT_BIT_HLT_PFJet200_v));
     tree->SetBranchAddress("HLT_BIT_HLT_PFJet260_v", &(this->HLT_BIT_HLT_PFJet260_v));
@@ -1145,22 +1118,16 @@ public:
     tree->SetBranchAddress("HLT_BIT_HLT_PFJet450_v", &(this->HLT_BIT_HLT_PFJet450_v));
     tree->SetBranchAddress("HLT_BIT_HLT_PFJet60_v", &(this->HLT_BIT_HLT_PFJet60_v));
     tree->SetBranchAddress("HLT_BIT_HLT_PFJet80_v", &(this->HLT_BIT_HLT_PFJet80_v));
-    tree->SetBranchAddress("HLT_BIT_HLT_PFMET100_PFMHT100_IDLoose_v", &(this->HLT_BIT_HLT_PFMET100_PFMHT100_IDLoose_v));
     tree->SetBranchAddress("HLT_BIT_HLT_PFMET100_PFMHT100_IDTight_v", &(this->HLT_BIT_HLT_PFMET100_PFMHT100_IDTight_v));
-    tree->SetBranchAddress("HLT_BIT_HLT_PFMET110_PFMHT110_IDLoose_v", &(this->HLT_BIT_HLT_PFMET110_PFMHT110_IDLoose_v));
     tree->SetBranchAddress("HLT_BIT_HLT_PFMET110_PFMHT110_IDTight_v", &(this->HLT_BIT_HLT_PFMET110_PFMHT110_IDTight_v));
     tree->SetBranchAddress("HLT_BIT_HLT_PFMET120_NoiseCleaned_Mu5_v", &(this->HLT_BIT_HLT_PFMET120_NoiseCleaned_Mu5_v));
-    tree->SetBranchAddress("HLT_BIT_HLT_PFMET120_PFMHT120_IDLoose_v", &(this->HLT_BIT_HLT_PFMET120_PFMHT120_IDLoose_v));
     tree->SetBranchAddress("HLT_BIT_HLT_PFMET120_PFMHT120_IDTight_v", &(this->HLT_BIT_HLT_PFMET120_PFMHT120_IDTight_v));
     tree->SetBranchAddress("HLT_BIT_HLT_PFMET170_NoiseCleaned_v", &(this->HLT_BIT_HLT_PFMET170_NoiseCleaned_v));
-    tree->SetBranchAddress("HLT_BIT_HLT_PFMET90_PFMHT90_IDLoose_v", &(this->HLT_BIT_HLT_PFMET90_PFMHT90_IDLoose_v));
     tree->SetBranchAddress("HLT_BIT_HLT_PFMET90_PFMHT90_IDTight_v", &(this->HLT_BIT_HLT_PFMET90_PFMHT90_IDTight_v));
     tree->SetBranchAddress("HLT_BIT_HLT_PFMETNoMu120_NoiseCleaned_PFMHTNoMu120_IDTight_v", &(this->HLT_BIT_HLT_PFMETNoMu120_NoiseCleaned_PFMHTNoMu120_IDTight_v));
     tree->SetBranchAddress("HLT_BIT_HLT_PFMETNoMu90_NoiseCleaned_PFMHTNoMu90_IDTight_v", &(this->HLT_BIT_HLT_PFMETNoMu90_NoiseCleaned_PFMHTNoMu90_IDTight_v));
     tree->SetBranchAddress("HLT_BIT_HLT_QuadJet45_DoubleBTagCSV0p67_v", &(this->HLT_BIT_HLT_QuadJet45_DoubleBTagCSV0p67_v));
-    tree->SetBranchAddress("HLT_BIT_HLT_QuadJet45_DoubleCSV0p5_v", &(this->HLT_BIT_HLT_QuadJet45_DoubleCSV0p5_v));
     tree->SetBranchAddress("HLT_BIT_HLT_QuadJet45_TripleBTagCSV0p67_v", &(this->HLT_BIT_HLT_QuadJet45_TripleBTagCSV0p67_v));
-    tree->SetBranchAddress("HLT_BIT_HLT_QuadJet45_TripleCSV0p5_v", &(this->HLT_BIT_HLT_QuadJet45_TripleCSV0p5_v));
     tree->SetBranchAddress("HLT_BIT_HLT_QuadPFJet_DoubleBTagCSV_VBF_Mqq200_v", &(this->HLT_BIT_HLT_QuadPFJet_DoubleBTagCSV_VBF_Mqq200_v));
     tree->SetBranchAddress("HLT_BIT_HLT_QuadPFJet_DoubleBTagCSV_VBF_Mqq240_v", &(this->HLT_BIT_HLT_QuadPFJet_DoubleBTagCSV_VBF_Mqq240_v));
     tree->SetBranchAddress("HLT_BIT_HLT_QuadPFJet_SingleBTagCSV_VBF_Mqq460_v", &(this->HLT_BIT_HLT_QuadPFJet_SingleBTagCSV_VBF_Mqq460_v));
@@ -1190,9 +1157,8 @@ public:
     tree->SetBranchAddress("HLT_ZmmHbbAll", &(this->HLT_ZmmHbbAll));
     tree->SetBranchAddress("HLT_ZmmHbbHighLumi", &(this->HLT_ZmmHbbHighLumi));
     tree->SetBranchAddress("HLT_ZmmHbbLowLumi", &(this->HLT_ZmmHbbLowLumi));
+    tree->SetBranchAddress("HLT_ZnnHbb", &(this->HLT_ZnnHbb));
     tree->SetBranchAddress("HLT_ZnnHbbAll", &(this->HLT_ZnnHbbAll));
-    tree->SetBranchAddress("HLT_ZnnHbbHighLumi", &(this->HLT_ZnnHbbHighLumi));
-    tree->SetBranchAddress("HLT_ZnnHbbLowLumi", &(this->HLT_ZnnHbbLowLumi));
     tree->SetBranchAddress("HLT_hadronic", &(this->HLT_hadronic));
     tree->SetBranchAddress("HLT_ttHhardonicAll", &(this->HLT_ttHhardonicAll));
     tree->SetBranchAddress("HLT_ttHhardonicHighLumi", &(this->HLT_ttHhardonicHighLumi));
@@ -1490,6 +1456,7 @@ public:
     this->njets = 0;
     for (int i=0; i < 16; i++) { this->jets_mcPt[i] = 0; }
     for (int i=0; i < 16; i++) { this->jets_mcEta[i] = 0; }
+    for (int i=0; i < 16; i++) { this->jets_matchBfromHadT[i] = 0; }
     for (int i=0; i < 16; i++) { this->jets_id[i] = 0; }
     for (int i=0; i < 16; i++) { this->jets_bTagWeightLFUp[i] = 0; }
     for (int i=0; i < 16; i++) { this->jets_pt[i] = 0; }
@@ -1539,6 +1506,7 @@ public:
     this->nloose_jets = 0;
     for (int i=0; i < 6; i++) { this->loose_jets_mcPt[i] = 0; }
     for (int i=0; i < 6; i++) { this->loose_jets_mcEta[i] = 0; }
+    for (int i=0; i < 6; i++) { this->loose_jets_matchBfromHadT[i] = 0; }
     for (int i=0; i < 6; i++) { this->loose_jets_id[i] = 0; }
     for (int i=0; i < 6; i++) { this->loose_jets_bTagWeightLFUp[i] = 0; }
     for (int i=0; i < 6; i++) { this->loose_jets_pt[i] = 0; }
@@ -1744,12 +1712,15 @@ public:
     this->D = 0;
     this->D_JESDown = 0;
     this->D_JESUp = 0;
-    this->HLT_BIT_HLT_CaloMHTNoPU90_PFMET90_PFMHT90_IDLoose_BTagCSV0p7_v = 0;
-    this->HLT_BIT_HLT_CaloMHTNoPU90_PFMET90_PFMHT90_IDLoose_v = 0;
+    this->HLT_BIT_HLT_AK8DiPFJet250_200_TrimMass30_BTagCSV0p45_v = 0;
+    this->HLT_BIT_HLT_AK8DiPFJet280_200_TrimMass30_BTagCSV0p45_v = 0;
+    this->HLT_BIT_HLT_AK8PFHT600_TrimR0p1PT0p03Mass50_BTagCSV0p45_v = 0;
+    this->HLT_BIT_HLT_AK8PFHT650_TrimR0p1PT0p03Mass50_v = 0;
+    this->HLT_BIT_HLT_AK8PFHT700_TrimR0p1PT0p03Mass50_v = 0;
+    this->HLT_BIT_HLT_AK8PFJet360_TrimMass30_v = 0;
     this->HLT_BIT_HLT_CaloMHTNoPU90_PFMET90_PFMHT90_IDTight_BTagCSV0p72_v = 0;
     this->HLT_BIT_HLT_CaloMHTNoPU90_PFMET90_PFMHT90_IDTight_v = 0;
     this->HLT_BIT_HLT_DiCentralPFJet55_PFMET110_NoiseCleaned_v = 0;
-    this->HLT_BIT_HLT_DiCentralPFJet70_PFMET120_NoiseCleaned_v = 0;
     this->HLT_BIT_HLT_DiPFJetAve140_v = 0;
     this->HLT_BIT_HLT_DiPFJetAve200_v = 0;
     this->HLT_BIT_HLT_DiPFJetAve260_v = 0;
@@ -1757,13 +1728,10 @@ public:
     this->HLT_BIT_HLT_DiPFJetAve40_v = 0;
     this->HLT_BIT_HLT_DiPFJetAve60_v = 0;
     this->HLT_BIT_HLT_DiPFJetAve80_v = 0;
-    this->HLT_BIT_HLT_DoubleEle24_22_eta2p1_WP75_Gsf_v = 0;
     this->HLT_BIT_HLT_DoubleEle24_22_eta2p1_WPLoose_Gsf_v = 0;
     this->HLT_BIT_HLT_DoubleIsoMu17_eta2p1_v = 0;
     this->HLT_BIT_HLT_DoubleJet90_Double30_DoubleBTagCSV0p67_v = 0;
-    this->HLT_BIT_HLT_DoubleJet90_Double30_DoubleCSV0p5_v = 0;
     this->HLT_BIT_HLT_DoubleJet90_Double30_TripleBTagCSV0p67_v = 0;
-    this->HLT_BIT_HLT_DoubleJet90_Double30_TripleCSV0p5_v = 0;
     this->HLT_BIT_HLT_Ele105_CaloIdVT_GsfTrkIdT_v = 0;
     this->HLT_BIT_HLT_Ele12_CaloIdL_TrackIdL_IsoVL_v = 0;
     this->HLT_BIT_HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v = 0;
@@ -1775,24 +1743,17 @@ public:
     this->HLT_BIT_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_v = 0;
     this->HLT_BIT_HLT_Ele23_WPLoose_Gsf_WHbbBoost_v = 0;
     this->HLT_BIT_HLT_Ele23_WPLoose_Gsf_v = 0;
-    this->HLT_BIT_HLT_Ele27_WP85_Gsf_v = 0;
     this->HLT_BIT_HLT_Ele27_WPLoose_Gsf_WHbbBoost_v = 0;
     this->HLT_BIT_HLT_Ele27_WPLoose_Gsf_v = 0;
-    this->HLT_BIT_HLT_Ele27_eta2p1_WP75_Gsf_CentralPFJet30_BTagCSV07_v = 0;
-    this->HLT_BIT_HLT_Ele27_eta2p1_WP75_Gsf_v = 0;
-    this->HLT_BIT_HLT_Ele27_eta2p1_WP85_Gsf_HT200_v = 0;
     this->HLT_BIT_HLT_Ele27_eta2p1_WPLoose_Gsf_CentralPFJet30_BTagCSV07_v = 0;
     this->HLT_BIT_HLT_Ele27_eta2p1_WPLoose_Gsf_HT200_v = 0;
     this->HLT_BIT_HLT_Ele27_eta2p1_WPLoose_Gsf_v = 0;
     this->HLT_BIT_HLT_Ele27_eta2p1_WPTight_Gsf_v = 0;
     this->HLT_BIT_HLT_Ele30WP60_Ele8_Mass55_v = 0;
-    this->HLT_BIT_HLT_Ele32_eta2p1_WP75_Gsf_CentralPFJet30_BTagCSV07_v = 0;
-    this->HLT_BIT_HLT_Ele32_eta2p1_WP75_Gsf_v = 0;
     this->HLT_BIT_HLT_Ele32_eta2p1_WPLoose_Gsf_CentralPFJet30_BTagCSV07_v = 0;
     this->HLT_BIT_HLT_Ele32_eta2p1_WPLoose_Gsf_v = 0;
     this->HLT_BIT_HLT_Ele45_CaloIdVT_GsfTrkIdT_PFJet200_PFJet50_v = 0;
     this->HLT_BIT_HLT_IsoMu16_eta2p1_CaloMET30_v = 0;
-    this->HLT_BIT_HLT_IsoMu17_eta2p1_v = 0;
     this->HLT_BIT_HLT_IsoMu18_v = 0;
     this->HLT_BIT_HLT_IsoMu20_eta2p1_CentralPFJet30_BTagCSV07_v = 0;
     this->HLT_BIT_HLT_IsoMu20_eta2p1_v = 0;
@@ -1825,20 +1786,15 @@ public:
     this->HLT_BIT_HLT_OldIsoMu18_v = 0;
     this->HLT_BIT_HLT_OldIsoTkMu18_v = 0;
     this->HLT_BIT_HLT_PFHT350_PFMET100_NoiseCleaned_v = 0;
-    this->HLT_BIT_HLT_PFHT350_PFMET120_NoiseCleaned_v = 0;
     this->HLT_BIT_HLT_PFHT350_v = 0;
     this->HLT_BIT_HLT_PFHT400_SixJet30_BTagCSV0p55_2PFBTagCSV0p72_v = 0;
-    this->HLT_BIT_HLT_PFHT400_SixJet30_BTagCSV0p5_2PFBTagCSV_v = 0;
     this->HLT_BIT_HLT_PFHT400_SixJet30_v = 0;
     this->HLT_BIT_HLT_PFHT450_SixJet40_PFBTagCSV0p72_v = 0;
-    this->HLT_BIT_HLT_PFHT450_SixJet40_PFBTagCSV_v = 0;
     this->HLT_BIT_HLT_PFHT450_SixJet40_v = 0;
     this->HLT_BIT_HLT_PFHT650_WideJetMJJ900DEtaJJ1p5_v = 0;
     this->HLT_BIT_HLT_PFHT650_WideJetMJJ950DEtaJJ1p5_v = 0;
     this->HLT_BIT_HLT_PFHT750_4JetPt50_v = 0;
-    this->HLT_BIT_HLT_PFHT750_4Jet_v = 0;
     this->HLT_BIT_HLT_PFHT800_v = 0;
-    this->HLT_BIT_HLT_PFHT900_v = 0;
     this->HLT_BIT_HLT_PFJet140_v = 0;
     this->HLT_BIT_HLT_PFJet200_v = 0;
     this->HLT_BIT_HLT_PFJet260_v = 0;
@@ -1848,22 +1804,16 @@ public:
     this->HLT_BIT_HLT_PFJet450_v = 0;
     this->HLT_BIT_HLT_PFJet60_v = 0;
     this->HLT_BIT_HLT_PFJet80_v = 0;
-    this->HLT_BIT_HLT_PFMET100_PFMHT100_IDLoose_v = 0;
     this->HLT_BIT_HLT_PFMET100_PFMHT100_IDTight_v = 0;
-    this->HLT_BIT_HLT_PFMET110_PFMHT110_IDLoose_v = 0;
     this->HLT_BIT_HLT_PFMET110_PFMHT110_IDTight_v = 0;
     this->HLT_BIT_HLT_PFMET120_NoiseCleaned_Mu5_v = 0;
-    this->HLT_BIT_HLT_PFMET120_PFMHT120_IDLoose_v = 0;
     this->HLT_BIT_HLT_PFMET120_PFMHT120_IDTight_v = 0;
     this->HLT_BIT_HLT_PFMET170_NoiseCleaned_v = 0;
-    this->HLT_BIT_HLT_PFMET90_PFMHT90_IDLoose_v = 0;
     this->HLT_BIT_HLT_PFMET90_PFMHT90_IDTight_v = 0;
     this->HLT_BIT_HLT_PFMETNoMu120_NoiseCleaned_PFMHTNoMu120_IDTight_v = 0;
     this->HLT_BIT_HLT_PFMETNoMu90_NoiseCleaned_PFMHTNoMu90_IDTight_v = 0;
     this->HLT_BIT_HLT_QuadJet45_DoubleBTagCSV0p67_v = 0;
-    this->HLT_BIT_HLT_QuadJet45_DoubleCSV0p5_v = 0;
     this->HLT_BIT_HLT_QuadJet45_TripleBTagCSV0p67_v = 0;
-    this->HLT_BIT_HLT_QuadJet45_TripleCSV0p5_v = 0;
     this->HLT_BIT_HLT_QuadPFJet_DoubleBTagCSV_VBF_Mqq200_v = 0;
     this->HLT_BIT_HLT_QuadPFJet_DoubleBTagCSV_VBF_Mqq240_v = 0;
     this->HLT_BIT_HLT_QuadPFJet_SingleBTagCSV_VBF_Mqq460_v = 0;
@@ -1893,9 +1843,8 @@ public:
     this->HLT_ZmmHbbAll = 0;
     this->HLT_ZmmHbbHighLumi = 0;
     this->HLT_ZmmHbbLowLumi = 0;
+    this->HLT_ZnnHbb = 0;
     this->HLT_ZnnHbbAll = 0;
-    this->HLT_ZnnHbbHighLumi = 0;
-    this->HLT_ZnnHbbLowLumi = 0;
     this->HLT_hadronic = 0;
     this->HLT_ttHhardonicAll = 0;
     this->HLT_ttHhardonicHighLumi = 0;

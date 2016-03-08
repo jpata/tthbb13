@@ -92,6 +92,7 @@ def makeHistogram(h):
 const auto {hname}_key = make_tuple(
     get<0>(key),
     get<1>(key),
+    get<2>(key),
     HistogramKey::{hname}
 );
 if (!results.count({hname}_key)) {{
@@ -178,10 +179,10 @@ public:
     virtual void fillHistograms(
         const Event& event,
         ResultMap& results,
-        const tuple<
+        tuple<
+            ProcessKey::ProcessKey,
             vector<CategoryKey::CategoryKey>,
-            SystematicKey::SystematicKey
-        >,
+            SystematicKey::SystematicKey> key,
         double weight,
         const Configuration& conf
     ) const;
@@ -199,10 +200,10 @@ def makeCategoryProcessorImpl(name, parentname, histograms):
 void {0}::fillHistograms(
     const Event& event,
     ResultMap& results,
-    const tuple<
+    tuple<
+        ProcessKey::ProcessKey,
         vector<CategoryKey::CategoryKey>,
-        SystematicKey::SystematicKey
-    > key,
+        SystematicKey::SystematicKey> key,
     double weight,
     const Configuration& conf
     ) const {{

@@ -125,6 +125,9 @@ def get_files(fname):
     lines = filter(lambda x: "root" in x, lines)
     return lines
 
+def getSitePrefix(fn):
+    return "root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat" + fn
+
 def getSampleNGen(sample):
     import ROOT
     n = 0

@@ -24,13 +24,15 @@ namespace trigger {
     
     bool sl_el(const TreeData& data) {
         return (
-            data.HLT_BIT_HLT_Ele27_WP85_Gsf_v
+            true
+            //data.HLT_BIT_HLT_Ele27_WP85_Gsf_v
         );
     }
     
     bool sl_mu(const TreeData& data) {
         return (
-            data.HLT_BIT_HLT_IsoMu17_eta2p1_v
+            true
+            //data.HLT_BIT_HLT_IsoMu17_eta2p1_v
         );
     }
 }
@@ -77,8 +79,8 @@ const map<string, function<float(const Event& ev)>> AxisFunctions = {
     {"topCandidate_fRec", [](const Event& ev) { return ev.topCandidate_fRec;}},
     {"topCandidate_n_subjettiness", [](const Event& ev) { return ev.topCandidate_n_subjettiness;}},
     {"Wmass", [](const Event& ev) { return ev.Wmass;}},
-    {"jet0_pt", [](const Event& ev) { return ev.jets.at(0).p4.Pt();}},
-    {"jet0_eta", [](const Event& ev) { return ev.jets.at(0).p4.Eta();}},
+    {"jet0_pt", [](const Event& ev) { return ev.jets.size() > 0 ? ev.jets.at(0).p4.Pt() : -99;}},
+    {"jet0_eta", [](const Event& ev) { return ev.jets.size() > 0 ? ev.jets.at(0).p4.Eta() : -99;}},
     {"n_excluded_bjets", [](const Event& ev) { return ev.n_excluded_bjets;}},
     {"n_excluded_ljets", [](const Event& ev) { return ev.n_excluded_ljets;}},
 
@@ -118,6 +120,7 @@ const map<string, function<float(const Event& ev)>> AxisFunctions = {
 const Configuration Configuration::makeConfiguration(JsonValue& value) {
     vector<string> filenames;
     double lumi = -1.0;
+    double xsweight = -1.0;
     ProcessKey::ProcessKey process = ProcessKey::UNKNOWN;
     string prefix;
     string outputFile = "UNDEFINED";
@@ -139,6 +142,9 @@ const Configuration Configuration::makeConfiguration(JsonValue& value) {
         }
         else if (ks == "lumi") {
             lumi = lev1->value.toNumber();
+        }
+        else if (ks == "xsweight") {
+            xsweight = lev1->value.toNumber();
         }
         else if (ks == "enabledCategories") {
             //loop over list of enabled categories
@@ -203,7 +209,9 @@ const Configuration Configuration::makeConfiguration(JsonValue& value) {
         }
     }
     return Configuration(
-        filenames, lumi,
+        filenames,
+        lumi,
+        xsweight,
         process,
         prefix,
         firstEntry, numEntries, printEvery,
@@ -254,7 +262,6 @@ void saveResults(ResultMap& res, const string& prefix, const string& filename) {
         const auto systKey = get<2>(rk);
         const auto histKey = get<3>(rk);
         stringstream ss;
-        ss << prefix << "/";
 
         //Add all categories together with underscores
         int ind = 0;
@@ -465,12 +472,12 @@ ProcessKey::ProcessKey getProcessKey(const Event& ev, ProcessKey::ProcessKey pro
             return ProcessKey::ttbarOther;
         }
     }
-    return ProcessKey::UNKNOWN;
+    return proc_key;
 }
 
 double nominal_weight(const Event& ev, const Configuration& conf) {
     if (isMC(conf.process)) {
-        return conf.lumi * ev.weight_xs * ev.puWeight * ev.bTagWeights.at(SystematicKey::nominal) * process_weight(conf.process, conf);
+        return conf.lumi * conf.xsweight * ev.puWeight * ev.bTagWeights.at(SystematicKey::nominal) * process_weight(conf.process, conf);
     }
     return 1.0;
 }
@@ -534,54 +541,54 @@ const char* btag_syst_to_string(SystematicKey::SystematicKey syst) {
     };
 }
 
-map<SystematicKey::SystematicKey, double> recalc_bweights(vector<Jet> jets) {
-    const auto btag_syst = { 
-        SystematicKey::nominal,
-        SystematicKey::CMS_ttH_CSVcErr1Up,
-        SystematicKey::CMS_ttH_CSVcErr1Down,
-        SystematicKey::CMS_ttH_CSVcErr2Up,
-        SystematicKey::CMS_ttH_CSVcErr2Down,
-        SystematicKey::CMS_ttH_CSVLFUp,
-        SystematicKey::CMS_ttH_CSVLFDown,
-        SystematicKey::CMS_ttH_CSVHFUp,
-        SystematicKey::CMS_ttH_CSVHFDown,
-        SystematicKey::CMS_ttH_CSVHFStats1Up,
-        SystematicKey::CMS_ttH_CSVHFStats1Down,
-        SystematicKey::CMS_ttH_CSVHFStats2Up,
-        SystematicKey::CMS_ttH_CSVHFStats2Down,
-        SystematicKey::CMS_ttH_CSVLFStats1Up,
-        SystematicKey::CMS_ttH_CSVLFStats1Down,
-        SystematicKey::CMS_ttH_CSVLFStats2Up,
-        SystematicKey::CMS_ttH_CSVLFStats2Down,
-    };
-
-    map<SystematicKey::SystematicKey, double> bweights;
-    for (auto k : btag_syst) {
-        bweights[k] = 1.0;
-    }
-
-    for (auto & jet : jets) {
-        for (auto syst : btag_syst) {
-            stringstream s;
-            if (
-                std::isnan(jet.p4.Eta()) ||
-                std::isnan(jet.p4.Pt()) ||
-                std::isnan(jet.btagCSV)
-            ) {
-                std::cerr << "bad jet " << jet.p4.Pt() << " " << jet.p4.Eta() << " " << jet.btagCSV << " " << jet.hadronFlavour << std::endl;
-                continue;
-            }
-            s << "bweightcalc.calcJetWeightImpl("
-                << jet.p4.Pt() <<"," << std::abs(jet.p4.Eta())
-                << "," << jet.hadronFlavour
-                << "," << jet.btagCSV
-                << ",\"final\",\"" << btag_syst_to_string(syst) << "\")";
-            double ret = (double)(TPython::Eval(s.str().c_str()));
-            bweights[syst] *= ret;
-        }
-    }
-    return bweights;
-}
+//map<SystematicKey::SystematicKey, double> recalc_bweights(vector<Jet> jets) {
+//    const auto btag_syst = { 
+//        SystematicKey::nominal,
+//        SystematicKey::CMS_ttH_CSVcErr1Up,
+//        SystematicKey::CMS_ttH_CSVcErr1Down,
+//        SystematicKey::CMS_ttH_CSVcErr2Up,
+//        SystematicKey::CMS_ttH_CSVcErr2Down,
+//        SystematicKey::CMS_ttH_CSVLFUp,
+//        SystematicKey::CMS_ttH_CSVLFDown,
+//        SystematicKey::CMS_ttH_CSVHFUp,
+//        SystematicKey::CMS_ttH_CSVHFDown,
+//        SystematicKey::CMS_ttH_CSVHFStats1Up,
+//        SystematicKey::CMS_ttH_CSVHFStats1Down,
+//        SystematicKey::CMS_ttH_CSVHFStats2Up,
+//        SystematicKey::CMS_ttH_CSVHFStats2Down,
+//        SystematicKey::CMS_ttH_CSVLFStats1Up,
+//        SystematicKey::CMS_ttH_CSVLFStats1Down,
+//        SystematicKey::CMS_ttH_CSVLFStats2Up,
+//        SystematicKey::CMS_ttH_CSVLFStats2Down,
+//    };
+//
+//    map<SystematicKey::SystematicKey, double> bweights;
+//    for (auto k : btag_syst) {
+//        bweights[k] = 1.0;
+//    }
+//
+//    for (auto & jet : jets) {
+//        for (auto syst : btag_syst) {
+//            stringstream s;
+//            if (
+//                std::isnan(jet.p4.Eta()) ||
+//                std::isnan(jet.p4.Pt()) ||
+//                std::isnan(jet.btagCSV)
+//            ) {
+//                std::cerr << "bad jet " << jet.p4.Pt() << " " << jet.p4.Eta() << " " << jet.btagCSV << " " << jet.hadronFlavour << std::endl;
+//                continue;
+//            }
+//            s << "bweightcalc.calcJetWeightImpl("
+//                << jet.p4.Pt() <<"," << std::abs(jet.p4.Eta())
+//                << "," << jet.hadronFlavour
+//                << "," << jet.btagCSV
+//                << ",\"final\",\"" << btag_syst_to_string(syst) << "\")";
+//            double ret = (double)(TPython::Eval(s.str().c_str()));
+//            bweights[syst] *= ret;
+//        }
+//    }
+//    return bweights;
+//}
 
 map<SystematicKey::SystematicKey, double> get_bweights(const TreeData& data) {
     map<SystematicKey::SystematicKey, double> bweight;
@@ -610,9 +617,9 @@ const Event EventFactory::makeNominal(const TreeData& data, const Configuration&
     const vector<Lepton> leptons = makeAllLeptons(data);
     
     auto bweights = get_bweights(data);
-    if (conf.recalculateBTagWeight) {
-        bweights = recalc_bweights(jets);
-    }
+    //if (conf.recalculateBTagWeight) {
+    //    bweights = recalc_bweights(jets);
+    //}
 
     const Event ev(
         &data,
@@ -662,9 +669,9 @@ const Event EventFactory::makeJESUp(const TreeData& data, const Configuration& c
     const vector<Lepton> leptons = makeAllLeptons(data);
 
     auto bweights = get_bweights(data);
-    if (conf.recalculateBTagWeight) {
-        bweights = recalc_bweights(jets);
-    }
+    //if (conf.recalculateBTagWeight) {
+    //    bweights = recalc_bweights(jets);
+    //}
     return Event(
         &data,
         data.is_sl,
@@ -712,9 +719,9 @@ const Event EventFactory::makeJESDown(const TreeData& data, const Configuration&
     const vector<Lepton> leptons = makeAllLeptons(data);
 
     auto bweights = get_bweights(data);
-    if (conf.recalculateBTagWeight) {
-        bweights = recalc_bweights(jets);
-    }
+    //if (conf.recalculateBTagWeight) {
+    //    bweights = recalc_bweights(jets);
+    //}
     return Event(
         &data,
         data.is_sl,
@@ -782,7 +789,6 @@ const Jet JetFactory::makeNominal(const TreeData& data, int njet) {
         data.jets_mass[njet]
     );
 
-    //FIXME: why do we have jets with CSV=nan??
     double csv = data.jets_btagCSV[njet];
     if (std::isnan(csv)) {
         csv = -10.0;
@@ -807,7 +813,6 @@ const Jet JetFactory::makeJESUp(const TreeData& data, int njet) {
     //Undo nominal correction, re-do JESUp correction
     const double corr = data.jets_corr_JESUp[njet] / data.jets_corr[njet];
     p4 *= (1.0 / corr);
-    //FIXME: why do we have jets with CSV=nan??
     double csv = data.jets_btagCSV[njet];
     if (std::isnan(csv)) {
         csv = -10.0;
@@ -860,10 +865,10 @@ const string Jet::to_string() const {
 void CategoryProcessor::fillHistograms(
     const Event& event,
     ResultMap& results,
-    const tuple<
+    tuple<
+        ProcessKey::ProcessKey,
         vector<CategoryKey::CategoryKey>,
-        SystematicKey::SystematicKey
-    > key,
+        SystematicKey::SystematicKey> key,
     double weight,
     const Configuration& conf
     ) const {
@@ -908,7 +913,7 @@ void CategoryProcessor::process(
             }
             this->fillHistograms(
                 event, results,
-                make_tuple(_catKeys, _systKey),
+                make_tuple(conf.process, _catKeys, _systKey),
                 weight,
                 conf
             );
@@ -924,10 +929,10 @@ void CategoryProcessor::process(
 void MEMCategoryProcessor::fillHistograms(
     const Event& event,
     ResultMap& results,
-    const tuple<
+    tuple<
+        ProcessKey::ProcessKey,
         vector<CategoryKey::CategoryKey>,
-        SystematicKey::SystematicKey
-    > key,
+        SystematicKey::SystematicKey> key,
     double weight,
     const Configuration& conf
     ) const {
@@ -935,25 +940,25 @@ void MEMCategoryProcessor::fillHistograms(
     //fill base histograms
     CategoryProcessor::fillHistograms(event, results, key, weight, conf);
 
-    if (CategoryKey::is_sl(get<0>(key))) {
+    if (CategoryKey::is_sl(get<1>(key))) {
         const auto mem_SL_0w2h2t_key = make_tuple(
-            conf.process,
             get<0>(key),
             get<1>(key),
+            get<2>(key),
             HistogramKey::mem_SL_0w2h2t
         );
         
         const auto mem_SL_2w2h2t_sj_key = make_tuple(
-            conf.process,
             get<0>(key),
             get<1>(key),
+            get<2>(key),
             HistogramKey::mem_SL_2w2h2t_sj
         );
         
         const auto mem_SL_2w2h2t_key = make_tuple(
-            conf.process,
             get<0>(key),
             get<1>(key),
+            get<2>(key),
             HistogramKey::mem_SL_2w2h2t
         );
 
@@ -970,11 +975,11 @@ void MEMCategoryProcessor::fillHistograms(
         static_cast<TH1D*>(results[mem_SL_0w2h2t_key])->Fill(event.mem_SL_0w2h2t, weight);
         static_cast<TH1D*>(results[mem_SL_2w2h2t_key])->Fill(event.mem_SL_2w2h2t, weight);
         static_cast<TH1D*>(results[mem_SL_2w2h2t_sj_key])->Fill(event.mem_SL_2w2h2t_sj, weight);
-    } else if (CategoryKey::is_dl(get<0>(key))) {
+    } else if (CategoryKey::is_dl(get<1>(key))) {
         const auto mem_DL_0w2h2t_key = make_tuple(
-            conf.process,
             get<0>(key),
             get<1>(key),
+            get<2>(key),
             HistogramKey::mem_DL_0w2h2t
         );
 
@@ -988,10 +993,10 @@ void MEMCategoryProcessor::fillHistograms(
 void SparseCategoryProcessor::fillHistograms(
     const Event& event,
     ResultMap& results,
-    const tuple<
+    tuple<
+        ProcessKey::ProcessKey,
         vector<CategoryKey::CategoryKey>,
-        SystematicKey::SystematicKey
-    > key,
+        SystematicKey::SystematicKey> key,
     double weight,
     const Configuration& conf
     ) const {
@@ -1000,11 +1005,11 @@ void SparseCategoryProcessor::fillHistograms(
     CategoryProcessor::fillHistograms(event, results, key, weight, conf);
 
     THnSparseF* h = nullptr;
-    if (CategoryKey::is_sl(get<0>(key))) {
+    if (CategoryKey::is_sl(get<1>(key))) {
         const auto hkey = make_tuple(
-            conf.process,
             get<0>(key),
             get<1>(key),
+            get<2>(key),
             HistogramKey::sparse
         );
         
@@ -1014,11 +1019,11 @@ void SparseCategoryProcessor::fillHistograms(
         } else {
             h = static_cast<THnSparseF*>(results.at(hkey));
         }
-    } else if (CategoryKey::is_dl(get<0>(key))) {
+    } else if (CategoryKey::is_dl(get<1>(key))) {
         const auto hkey = make_tuple(
-            conf.process,
             get<0>(key),
             get<1>(key),
+            get<2>(key),
             HistogramKey::sparse
         );
         if (!results.count(hkey)) {

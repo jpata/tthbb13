@@ -1,11 +1,18 @@
 import json, sys, os
+from TTH.MEAnalysis.samples_base import getSitePrefix, xsec
 
-filenames = os.environ["FILE_NAMES"].split()
+filenames = map(getSitePrefix, os.environ["FILE_NAMES"].split())
 sample = os.environ["DATASETPATH"]
 prefix = "" 
 ijob = os.environ["MY_JOBID"]
-firstEvent = int(os.environ.get("SKIP_EVENTS", 0))
-nEvents = int(os.environ.get("MAX_EVENTS", -1))
+
+#for event-based splitting
+#firstEvent = int(os.environ.get("SKIP_EVENTS", 0))
+#nEvents = int(os.environ.get("MAX_EVENTS", -1))
+
+#for file-based splitting
+firstEvent = 0
+nEvents = -1
 
 nbins_mem = 36
 nbins_bdt = 40
@@ -13,13 +20,20 @@ nbins_bdt = 40
 sample_repl = {
     "ttHToNonbb_M125_13TeV_powheg_pythia8": "ttH_nonhbb",
     "ttHTobb_M125_13TeV_powheg_pythia8": "ttH",
-    "TT_TuneCUETP8M1_13TeV-powheg-pythia8": "ttbarOther",
+    "TT_TuneCUETP8M1_13TeV-powheg-pythia8": "ttbarUnsplit",
+}
+
+xsweights = {
+    "ttHToNonbb_M125_13TeV_powheg_pythia8": xsec[("tth_nonbb", "13TeV")]/3945824.0,
+    "ttHTobb_M125_13TeV_powheg_pythia8": xsec[("tthbb", "13TeV")]/3772012.0,
+    "TT_TuneCUETP8M1_13TeV-powheg-pythia8": xsec[("ttjets", "13TeV")]/97994442.0, 
 }
 
 ret = {
     "filenames": filenames,
-    "lumi": 1,
+    "lumi": 2500,
     "process": sample_repl[sample],
+    "xsweight": xsweights[sample],
     "prefix": prefix,
     "outputFile": "ControlPlotsSparse.root",
     "firstEntry": firstEvent,

@@ -137,6 +137,7 @@ public:
 
     vector<string> filenames;
     double lumi;
+    double xsweight;
     ProcessKey::ProcessKey process;
     string prefix;
     long firstEntry;
@@ -150,6 +151,7 @@ public:
     Configuration(
         vector<string>& _filenames,
         double _lumi,
+        double _xsweight,
         ProcessKey::ProcessKey _process,
         string _prefix,
         long _firstEntry,
@@ -161,6 +163,7 @@ public:
         ) :
         filenames(_filenames),
         lumi(_lumi),
+        xsweight(_xsweight),
         process(_process),
         prefix(_prefix),
         firstEntry(_firstEntry),
@@ -367,10 +370,10 @@ public:
     virtual void fillHistograms(
         const Event& event,
         ResultMap& results,
-        const tuple<
+        tuple<
+            ProcessKey::ProcessKey,
             vector<CategoryKey::CategoryKey>,
-            SystematicKey::SystematicKey
-        >,
+            SystematicKey::SystematicKey> key,
         double weight,
         const Configuration& conf
     ) const;
@@ -399,10 +402,10 @@ public:
     virtual void fillHistograms(
         const Event& event,
         ResultMap& results,
-        const tuple<
+        tuple<
+            ProcessKey::ProcessKey,
             vector<CategoryKey::CategoryKey>,
-            SystematicKey::SystematicKey
-        >,
+            SystematicKey::SystematicKey> key,
         double weight,
         const Configuration& conf
     ) const;
@@ -450,10 +453,10 @@ public:
     virtual void fillHistograms(
         const Event& event,
         ResultMap& results,
-        const tuple<
+        tuple<
+            ProcessKey::ProcessKey,
             vector<CategoryKey::CategoryKey>,
-            SystematicKey::SystematicKey
-        >,
+            SystematicKey::SystematicKey> key,
         double weight,
         const Configuration& conf
     ) const;
