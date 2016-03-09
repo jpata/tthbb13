@@ -6,7 +6,7 @@ ROOT.TH1.AddDirectory(False)
 INFILES = sys.argv[2:]
 OUTFILE = sys.argv[1]
 
-tt = ROOT.TChain("tree")
+tt = ROOT.TChain("vhbb/tree")
 for inf in INFILES:
     tt.AddFile(inf)
 

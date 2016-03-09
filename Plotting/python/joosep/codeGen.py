@@ -10,6 +10,9 @@ This file can also create new classes deriving from CategoryProcessor, which
 can have their own logic of filling histograms. Each CategoryProcessor corresponds
 to a set of plots that you want to create in a particular category. They will also fill
 Histograms of their parent categories.
+
+#FIXME: if oyu add systematics, you need to change them here.
+
 """
 def parseId(id):
     """
