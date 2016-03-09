@@ -5,7 +5,7 @@ Created with make_TF.conf
 
 March 9, 2016
 --------------
-tthbb code hash: `68497e0`
+tthbb13 code hash: `68497e0`
 
 input files:
 files in `datasets/vhbb_tth/tth.dat`
