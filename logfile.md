@@ -1,7 +1,7 @@
 
 Transfer function trees
 =======================
-Created with make_TF.conf
+Created with `make_TF.conf`
 
 March 9, 2016
 --------------
