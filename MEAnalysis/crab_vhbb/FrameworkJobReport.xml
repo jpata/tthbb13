@@ -1,0 +1,41 @@
+<FrameworkJobReport>
+<ReadBranches>
+</ReadBranches>
+<PerformanceReport>
+  <PerformanceSummary Metric="StorageStatistics">
+    <Metric Name="Parameter-untracked-bool-enabled" Value="true"/>
+    <Metric Name="Parameter-untracked-bool-stats" Value="true"/>
+    <Metric Name="Parameter-untracked-string-cacheHint" Value="application-only"/>
+    <Metric Name="Parameter-untracked-string-readHint" Value="auto-detect"/>
+    <Metric Name="ROOT-tfile-read-totalMegabytes" Value="0"/>
+    <Metric Name="ROOT-tfile-write-totalMegabytes" Value="0"/>
+  </PerformanceSummary>
+</PerformanceReport>
+
+<GeneratorInfo>
+</GeneratorInfo>
+
+<InputFile>
+<LFN>file:///shome/jpata/tth/sw-76/CMSSW/src/TTH/MEAnalysis/crab_vhbb/00F20861-40B8-E511-B593-001EC9B2189E.root</LFN>
+<PFN></PFN>
+<Catalog></Catalog>
+<InputType>primaryFiles</InputType>
+<ModuleLabel>source</ModuleLabel>
+<GUID></GUID>
+<InputSourceClass>PoolSource</InputSourceClass>
+<EventsRead>1</EventsRead>
+
+</InputFile>
+
+<File>
+<LFN></LFN>
+<PFN>tree.root</PFN>
+<Catalog></Catalog>
+<ModuleLabel>HEPPY</ModuleLabel>
+<GUID></GUID>
+<OutputModuleClass>PoolOutputModule</OutputModuleClass>
+<TotalEvents>94</TotalEvents>
+<BranchHash>dc90308e392b2fa1e0eff46acbfa24bc</BranchHash>
+</File>
+
+</FrameworkJobReport>
