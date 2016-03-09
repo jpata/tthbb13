@@ -98,6 +98,27 @@
 //TTH, EventHypothesis
 #include "TTH/TTHNtupleAnalyzer/interface/EventHypothesis.hh"
 
+
+int convert_to_grid(float orig_eta,
+		    float orig_phi,
+		    float eta,
+		    float phi,
+		    int ijet){
+
+
+  int i_eta = 7 + lroundf((eta - orig_eta)/0.1);
+  int i_phi = 7 + lroundf((phi - orig_phi)/0.1);
+  
+  i_eta = max(0, i_eta);
+  i_phi = max(0, i_phi);
+  i_eta = min(15, i_eta);
+  i_phi = min(15, i_phi);
+
+  return i_phi + 16 * (i_eta + 16 * ijet);
+   
+}
+		    
+
 //converts a vector of objects to a vector of pointers 
 template <typename T, typename R>
 std::vector<R> to_ptrvec(T coll) {
@@ -308,17 +329,39 @@ void fill_fatjet_branches(const edm::Event& iEvent,
   for (unsigned n_fat_jet = 0; n_fat_jet != fatjets->size(); n_fat_jet++){
 	    
     const JetType& x = (*fatjets).at(n_fat_jet);
-    
+           
     LogDebug("fat jets") << "n_fat_jet=" << n_fat_jet << CANDPRINT(x);
 	    	    
     std::string prefix("jet_");
     prefix.append(fj_branches_name);
     prefix.append("__");
 
+
+    if (fj_branches_name == "ak08" && n_fat_jet < 10) {    
+
+      float *emap      = tthtree->get_address<float *>(prefix + "emap");
+      float *ptmap     = tthtree->get_address<float *>(prefix + "ptmap");
+      float *massmap   = tthtree->get_address<float *>(prefix + "massmap");
+      int   *chargemap = tthtree->get_address<int   *>(prefix + "chargemap");
+      
+      reco::Jet::Constituents constis = x.getJetConstituents();
+      for(reco::Jet::Constituents::iterator cit = constis.begin(); 
+	  cit != constis.end(); 
+	  ++cit) {
+      
+	int ipos = convert_to_grid(x.eta(), x.phi(), (*cit)->eta(), (*cit)->phi(), n_fat_jet);
+	emap[ipos]	+= (*cit)->energy();
+	ptmap[ipos]	+= (*cit)->pt();
+	massmap[ipos]	+= (*cit)->mass();
+	chargemap[ipos] += (*cit)->charge();	
+      }
+    }
+
     // Get the correction factor for this jet
     float corr_factor = 1;
     if (fj_corrector_name != "None")
       corr_factor = corrector->correction(x);
+
 
     // Turn the branch address into the actual object we want to fill
     tthtree->get_address<float *>(prefix + "pt"  )[n_fat_jet] = x.pt();
@@ -517,7 +560,9 @@ private:
 	const std::vector<std::string> cmstt_infos_;
 	const std::vector<std::string> cmstt_branches_;
 	const std::vector<std::string> cmstt_btags_;
-	
+       
+        const edm::EDGetTokenT<reco::PFCandidateCollection > candToken_;
+
 	// LHE event product (may not be present!!)
 	const edm::EDGetTokenT<LHEEventProduct> lheToken_;
 
@@ -569,7 +614,9 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
         cmstt_infos_(iConfig.getParameter<std::vector<std::string>>("cmsttInfos")),
         cmstt_branches_(iConfig.getParameter<std::vector<std::string>>("cmsttBranches")),
         cmstt_btags_(iConfig.getParameter<std::vector<std::string>>("cmsttBtags")),
-							  
+
+        candToken_(consumes<reco::PFCandidateCollection>(iConfig.getParameter<edm::InputTag>("particleCandidates"))),
+     		  
 	//Gen-level
 	lheToken_( (iConfig.getParameter<edm::InputTag>("lhe")).label()!="" ?
 			consumes<LHEEventProduct>( iConfig.getParameter<edm::InputTag>("lhe")) : edm::EDGetTokenT<LHEEventProduct>() ),
@@ -845,7 +892,15 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	fill_genparticle_branches(tthtree, gen_higgs,    "higgs");
 	fill_genparticle_branches(tthtree, hadronic_ts,  "hadtop");
   
-            	
+        // Access PF/PUPPI candidates
+
+  	edm::Handle<reco::PFCandidateCollection> cands;
+	iEvent.getByToken(candToken_, cands);
+
+	std::cout << "Number of PF/PUPPI cands: " << cands->size() << std::endl;
+
+	
+
 	// Loop over HTT collections
 	for (unsigned i_htt_coll = 0; i_htt_coll < htt_objects_.size(); i_htt_coll++){
 

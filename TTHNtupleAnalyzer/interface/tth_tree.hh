@@ -43,6 +43,7 @@ inline bool is_undef(double x) { return fabs(x-DEF_VAL_DOUBLE) < DOUBLE_EPS; };
 //x is the array, n is the size, y is the initialized value
 #define SET_ZERO(x,n,y) for(int i=0;i<n;i++) {x[i]=y;}
 #define SET_ZERO_2(x,n,m,y) for(int i=0;i<n;i++) { for(int j=0;j<m;j++) { x[i][j]=y; } }
+#define SET_ZERO_3(x,n,m,l,y) for(int i=0;i<n;i++) { for(int j=0;j<m;j++) { for(int k=0;k<l;k++) { x[i][j][k]=y; } } }
 
 /*
 This is a simple wrapper class for the TTH-specific flat data format.
@@ -279,6 +280,12 @@ public:
 	float jet_ak08__chi3[N_MAX];
 	float jet_ak08__nmj3[N_MAX];
 	float jet_ak08__qvol[N_MAX];
+
+        float jet_ak08__emap[10][16][16];
+        float jet_ak08__ptmap[10][16][16];
+        float jet_ak08__massmap[10][16][16];
+        int jet_ak08__chargemap[10][16][16];
+
 	int jet_ak08__nconst[N_MAX];
 	int jet_ak08__ncharged[N_MAX];
 	int jet_ak08__nneutral[N_MAX];
@@ -2327,9 +2334,15 @@ public:
 		SET_ZERO(jet_ak08__nmj1, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08__chi2, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08__nmj2, N_MAX, DEF_VAL_FLOAT);
-		SET_ZERO(jet_ak08__chi3, N_MAX, DEF_VAL_FLOAT);
+		SET_ZERO(jet_ak08__chi3, N_MAX, DEF_VAL_FLOAT);  
 		SET_ZERO(jet_ak08__nmj3, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08__qvol, N_MAX, DEF_VAL_FLOAT);
+
+		SET_ZERO_3(jet_ak08__emap, 10, 16,16, 0.);
+		SET_ZERO_3(jet_ak08__ptmap, 10, 16,16, 0.);
+		SET_ZERO_3(jet_ak08__massmap, 10, 16,16, 0.);
+		SET_ZERO_3(jet_ak08__chargemap, 10, 16,16, 0);
+
 		SET_ZERO(jet_ak08__nconst, N_MAX, DEF_VAL_INT);
 		SET_ZERO(jet_ak08__ncharged, N_MAX, DEF_VAL_INT);
 		SET_ZERO(jet_ak08__nneutral, N_MAX, DEF_VAL_INT);
@@ -4380,6 +4393,13 @@ public:
 		tree->Branch("jet_ak08__chi3", jet_ak08__chi3, "jet_ak08__chi3[n__jet_ak08]/F");
 		tree->Branch("jet_ak08__nmj3", jet_ak08__nmj3, "jet_ak08__nmj3[n__jet_ak08]/F");
 		tree->Branch("jet_ak08__qvol", jet_ak08__qvol, "jet_ak08__qvol[n__jet_ak08]/F");
+
+		tree->Branch("jet_ak08__emap", jet_ak08__emap, "jet_ak08__emap[10][16][16]");
+		tree->Branch("jet_ak08__ptmap", jet_ak08__ptmap, "jet_ak08__ptmap[10][16][16]");
+		tree->Branch("jet_ak08__massmap", jet_ak08__massmap, "jet_ak08__massmap[10][16][16]");
+		tree->Branch("jet_ak08__chargemap", jet_ak08__chargemap, "jet_ak08__chargemap[10][16][16]");
+
+
 		tree->Branch("jet_ak08__nconst", jet_ak08__nconst, "jet_ak08__nconst[n__jet_ak08]/I");
 		tree->Branch("jet_ak08__ncharged", jet_ak08__ncharged, "jet_ak08__ncharged[n__jet_ak08]/I");
 		tree->Branch("jet_ak08__nneutral", jet_ak08__nneutral, "jet_ak08__nneutral[n__jet_ak08]/I");
@@ -6425,6 +6445,12 @@ public:
 		tree->SetBranchAddress("jet_ak08__chi3", jet_ak08__chi3);
 		tree->SetBranchAddress("jet_ak08__nmj3", jet_ak08__nmj3);
 		tree->SetBranchAddress("jet_ak08__qvol", jet_ak08__qvol);
+
+		tree->SetBranchAddress("jet_ak08__emap", jet_ak08__emap);
+		tree->SetBranchAddress("jet_ak08__ptmap", jet_ak08__ptmap);
+		tree->SetBranchAddress("jet_ak08__massmap", jet_ak08__massmap);
+		tree->SetBranchAddress("jet_ak08__chargemap", jet_ak08__chargemap);
+
 		tree->SetBranchAddress("jet_ak08__nconst", jet_ak08__nconst);
 		tree->SetBranchAddress("jet_ak08__ncharged", jet_ak08__ncharged);
 		tree->SetBranchAddress("jet_ak08__nneutral", jet_ak08__nneutral);

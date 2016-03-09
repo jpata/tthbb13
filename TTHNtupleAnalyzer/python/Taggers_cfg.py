@@ -101,7 +101,7 @@ process.load('CommonTools/PileupAlgos/Puppi_cff')
 ## e.g. to run on miniAOD
 process.puppi.candName = cms.InputTag('packedPFCandidates')
 process.puppi.vertexName = cms.InputTag('offlineSlimmedPrimaryVertices')
-
+process.puppi.clonePackedCands = cms.bool(True)
 
 # Ghost particle collection used for Hadron-Jet association 
 from PhysicsTools.JetMCAlgos.HadronAndPartonSelector_cfi import selectedHadronsAndPartons
@@ -1234,6 +1234,8 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
         cmsttBranches = cms.vstring(li_cmstt_branches),
         cmsttBtags    = cms.vstring(li_cmstt_btags),
 
+        particleCandidates = cms.InputTag("puppi"),
+                                          
 #        genPartonStatus = cms.untracked.int32(3),
 )
 
