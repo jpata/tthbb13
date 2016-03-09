@@ -1,6 +1,6 @@
 export SCRAM_ARCH=slc6_amd64_gcc493
 
-scram project -n CMSSW CMSSW CMSSW_7_6_3
+scram project -n CMSSW CMSSW CMSSW_7_6_3_patch2
 cd CMSSW/src/
 cmsenv
 git cms-init
