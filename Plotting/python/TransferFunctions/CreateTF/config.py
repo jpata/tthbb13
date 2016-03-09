@@ -48,11 +48,11 @@ def Make_config():
     # I/O information
     ########################################
 
-    config['input_root_file_name'] = 'root://t3se01.psi.ch:1094//store/user/jpata/tth/tf_trees/JP_VHBBHeppyV20.root'
+    config['input_root_file_name'] = 'root://t3se01.psi.ch:1094//store/user/jpata/tth/tf_trees/JP_VHBBHeppyV20_subjet.root'
 
     config['input_tree_name'] = 'tree'
 
-    config['outputdir'] = 'VHBBHeppyV20_resolvedjets'
+    config['outputdir'] = 'VHBBHeppyV20_subjets'
 
         
     config['SBF_fitted_hists_pickle_filename'] = \
