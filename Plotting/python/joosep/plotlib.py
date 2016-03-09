@@ -22,6 +22,8 @@ import math
 import matplotlib.patches as mpatches
 import matplotlib.lines as mlines
 
+import multiprocessing
+
 matplotlib.rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 
 matplotlib.rc("axes", labelsize=24)
@@ -38,6 +40,10 @@ colors = {
     "ttH": (44, 62, 167),
     "ttH_hbb": (44, 62, 167),
     "ttH_nonhbb": (39, 57, 162),
+    "diboson": (42, 100, 198),
+    "wjets": (102, 201, 77),
+    "stop": (235, 73, 247),
+    "ttV": (204, 204, 251),
     "other": (251, 73, 255),
 }
 
@@ -72,8 +78,11 @@ samplelist = [
     ("ttbarPlus2B", "ttbarPlus2B"),
     ("ttbarPlusCCbar", "ttbarPlusCCbar"),
     ("ttbarOther", "ttbarOther"),
+    ("diboson", "diboson"),
+#    ("stop", "stop"),
+#    ("wjets", "wjets"),
+#    ("ttV", "ttV"),
 ]
-samplecolors = [colors[sn[0]] for sn in samplelist]
 
 #list of all variable names, suitable for latex
 varnames = {
@@ -129,7 +138,8 @@ varnames = {
     "mem_DL_0w2h2t": "mem DL 0w2h2t",
     "nPVs": "$N_{\\mathrm{PV}}$",
     "ntopCandidate": "$N_{\\mathrm{HTTv2}}$",
-    "common_bdt": "BDT"
+    "common_bdt": "BDT",
+    "Wmass": "$m_{qq}$"
 }
 
 #the units for variables
@@ -396,8 +406,9 @@ def draw_data_mc(tf, hname, samples, **kwargs):
             dataline = mlines.Line2D([], [], color='black', marker='o', label=data.title)
             patches += [dataline]
         for line, h in zip(r["hists"], hs.values()):
-            #print h.title, line.get_color()
-            patch = mpatches.Patch(color=line.get_color(), label=h.title)
+            #import pdb
+            #pdb.set_trace()
+            patch = mpatches.Patch(color=line[0].get_color(), label=h.title)
             patches += [patch]
         patches += [mpatches.Patch(facecolor="none", edgecolor="black", label="stat", hatch="////////")]
         patches += [mpatches.Patch(facecolor="none", edgecolor="gray", label="stat+syst", hatch="\\\\\\\\")]

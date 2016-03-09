@@ -1053,12 +1053,14 @@ def GetSparseHistograms(input_file,
                                     [h_sig_sys, h_bkg_sys] ):
         for process in processes:
 
+            basedir = "{0}/{1}".format(process, category)
+            base = basedir + "/sparse"
             # Nominal Histograms
-            h[process] = f.Get("{0}/{1}/sparse".format(process, category))
+            h[process] = f.Get(base)
 
             # Systematic Variations
             h_sys[process] = {}     
-            for key in f.Get("{0}/{1}".format(process, category)).GetListOfKeys():
+            for key in f.Get(basedir).GetListOfKeys():
 
                 if not "sparse_" in key.GetName():
                     continue
@@ -1073,10 +1075,7 @@ def GetSparseHistograms(input_file,
     # End Signal/Background loop
     for dname in data:
         h_data[dname] = f.Get("{0}/{1}/sparse".format(dname, category))
-    if len(data) > 0:
-        return h_sig, h_bkg, h_sig_sys, h_bkg_sys, h_data
-    else:
-        return h_data
+    return h_sig, h_bkg, h_sig_sys, h_bkg_sys, h_data
 # End of GetSparseHistograms
    
 
