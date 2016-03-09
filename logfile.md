@@ -1,3 +1,10 @@
+VHbb + tthbb13 ntuples
+=======================
+
+March2016B: VHBBHeppyV20_tthbbV3_withme_finer
+--------------
+created with ~V20 of vhbb, 68497e0 of tthbb13
+`https://github.com/jpata/tthbb13/blob/meanalysis-76x/MEAnalysis/gc/datasets/VHBBHeppyV20_tthbbV3.dat`
 
 Transfer function trees
 =======================
@@ -19,5 +26,3 @@ root://t3se01.psi.ch:1094//store/user/jpata/tth/tf_trees/JP_VHBBHeppyV20.root
 root://t3se01.psi.ch:1094//store/user/jpata/tth/tf_trees/JP_VHBBHeppyV20_subjet.root
 ~~~
 
-Transfer function fits
-=======================
