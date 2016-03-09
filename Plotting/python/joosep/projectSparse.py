@@ -78,21 +78,22 @@ if __name__ == "__main__":
             "ttbarPlusBBbar",
             "ttbarPlusCCbar",
             "ttbarOther",
-            "ww",
-            "wz",
-            "zz",
-            "stop_t",
-            "stop_tbar",
-            "stop_tW",
-            "stop_tbarW",
-            "stop_s",
-            "wjets",
-            "ttW_Wlnu",
-            "ttW_Wqq",
-            "ttZ_Zqq",
+#            "ww",
+#            "wz",
+#            "zz",
+#            "stop_t",
+#            "stop_tbar",
+#            "stop_tW",
+#            "stop_tbarW",
+#            "stop_s",
+#            "wjets",
+#            "ttW_Wlnu",
+#            "ttW_Wqq",
+#            "ttZ_Zqq",
         ],
         category="sl",
-        data=["SingleMuon", "SingleElectron"]
+#        data=["SingleMuon", "SingleElectron"]
+        data=[]
     )
 
     rules_var = OrderedDict()

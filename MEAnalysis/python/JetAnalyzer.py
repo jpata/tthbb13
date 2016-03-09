@@ -73,10 +73,13 @@ class JetAnalyzer(FilterAnalyzer):
 
     def process(self, event):
 
+        #FIXME: why discarded jets no longer in vhbb?
+        #injets = event.Jet+event.DiscardedJet
+        event.injets = event.Jet
         #pt-descending input jets
         if "input" in self.conf.general["verbosity"]:
             print "jets"
-            for j in event.Jet+event.DiscardedJet:
+            for j in event.injets:
                 print "InJetReco", j.pt, j.eta, j.phi, j.mass, j.btagCSV, j.mcFlavour
                 print "InJetGen", j.mcPt, j.mcEta, j.mcPhi, j.mcM
 
@@ -143,7 +146,7 @@ class JetAnalyzer(FilterAnalyzer):
 
         #Identify loose jets by (pt, eta)
         loose_jets = sorted(filter(
-            jetsel_loose_pt, event.Jet+event.DiscardedJet
+            jetsel_loose_pt, event.injets 
             ), key=lambda x: x.pt, reverse=True
         )
 
@@ -195,8 +198,8 @@ class JetAnalyzer(FilterAnalyzer):
         event.loose_jets = filter(lambda x, event=event: x not in event.good_jets, loose_jets) 
 
         if "debug" in self.conf.general["verbosity"]:
-            print "All jets: ", len(event.Jet)+len(event.DiscardedJet)
-            for x in event.Jet+event.DiscardedJet:
+            print "All jets: ", len(event.injets)
+            for x in event.injets:
                 print "\t(%s, %s, neHEF=%s, chEmEF=%s, neEmEF=%s, nod=%s, chHEF=%s, chMult=%s, neMult=%s, muEF=%s, csv=%s id=%d jec=%s jer=%s)" % (x.pt, x.eta, x.neHEF, x.chEmEF, x.neEmEF, x.numberOfDaughters, x.chHEF, x.chMult, x.neMult, x.muEF, x.btagCSV, x.id, x.corr, x.corr_JER)
             
             print "Loose jets: ", len(event.loose_jets)

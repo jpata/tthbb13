@@ -108,7 +108,7 @@ elif "psi" in hn or "psi" in vo:
     # pfPath = "/pnfs/psi.ch/cms/trivcat/"
     # lfPrefix = "dcap://t3se01.psi.ch:22125/"
     def lfn_to_pfn(fn):
-        if fn.startswith("file://"):
+        if fn.startswith("file://") or fn.startswith("root://"):
             return fn
         else:
             return "dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/" + fn

@@ -19,7 +19,7 @@ nbins_bdt = 40
 
 sample_repl = {
     "ttHToNonbb_M125_13TeV_powheg_pythia8": "ttH_nonhbb",
-    "ttHTobb_M125_13TeV_powheg_pythia8": "ttH",
+    "ttHTobb_M125_13TeV_powheg_pythia8": "ttH_hbb",
     "TT_TuneCUETP8M1_13TeV-powheg-pythia8": "ttbarUnsplit",
 }
 

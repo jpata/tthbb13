@@ -73,14 +73,12 @@ def prepareInputSamples(sampleFile=conf.general["sampleFile"]):
         inputSample = cfg.Component(
             s.name.value(),
             files = map(lfn_to_pfn, s.subFiles.value()),
-            tree_name = "tree",
+            tree_name = s.treeName.value(),
             n_gen = sample_ngen,
             xs = s.xSec.value()
         )
         inputSample.isMC = s.isMC.value()
-        #use sample only if not skipped and subFiles defined
-        if s.skip.value() == False and len(s.subFiles.value())>0:
-            inputSamples.append(inputSample)
+        inputSamples.append(inputSample)
     return inputSamples, samples_dict
 
 inputSamples, samples_dict = prepareInputSamples(conf.general["sampleFile"])

@@ -45,14 +45,15 @@ def Make_config():
     # I/O information
     ########################################
 
-    config['input_tree_name'] = 'tree'
+    config['input_tree_name'] = 'vhbb/tree'
 
     #the path to the root files
-    config["root_file_base"] = 'file:///hdfs/cms/'
+    config["root_file_base"] = 'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat'
+    #config["root_file_base"] = 'file:///hdfs/cms/'
     #config["root_file_base"] = "dcap:///pnfs/psi.ch/cms/trivcat/"
 
     # The config file will be copied to 'runs/{config['run_name']}'
-    config['run_name'] = 'JP_V20_subjet'
+    config['run_name'] = 'JP_VHBBHeppyV20'
 
     config['output_root_file_name'] = 'out.root'
 
@@ -97,10 +98,10 @@ def Make_config():
     config['quarktypes'] = ['GenBQuarkFromTop_', 'GenBQuarkFromH_', 'GenWZQuark_' ]
     
     #enable this for resolved jets
-    #config['jettypes'] = [ 'Jet_' ]
+    config['jettypes'] = [ 'Jet_' ]
     #Enable this for subjets
-    config['jettypes'] = [ 'httCandidates_sjW1', 'httCandidates_sjW2',
-        'httCandidates_sjNonW']
+    #config['jettypes'] = [ 'httCandidates_sjW1', 'httCandidates_sjW2',
+    #    'httCandidates_sjNonW']
 
     # Specify which branches *other* than pt, eta, phi, mass and E should be 
     # extracted.
@@ -114,20 +115,18 @@ def Make_config():
         #'{particle}status',
         ]
 
-    config['jet_extra_vars'] = []
-     
     config['jet_extra_vars'] = [
     #resolved jets
-    #    '{particle}hadronFlavour',
-    #    '{particle}btagCSV',
-    #    '{particle}btagBDT',
+        '{particle}hadronFlavour',
+        '{particle}btagCSV',
+        '{particle}btagBDT',
    
     #subjets only
-         'httCandidates_pt',
-         'httCandidates_eta',
-         'httCandidates_phi',
-         'httCandidates_mass',
-         'httCandidates_fRec',
+    #     'httCandidates_pt',
+    #     'httCandidates_eta',
+    #     'httCandidates_phi',
+    #     'httCandidates_mass',
+    #     'httCandidates_fRec',
     ]
 
 
