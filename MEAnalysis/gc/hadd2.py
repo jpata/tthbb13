@@ -13,6 +13,7 @@ for li in lines[1:]:
     fi = li.split()[0]
     if not "root" in fi:
         continue
-    files += ["root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat" + fi]
+#    files += ["root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat" + fi]
+    files += [fi]
 
 par_hadd("/scratch/" + os.environ["USER"] + "/" + sample_name + ".root", files, 250, 5, 3)

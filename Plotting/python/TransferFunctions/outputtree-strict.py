@@ -402,7 +402,7 @@ def main():
         print root_file_base+input_root_file_name
         input_root_file = ROOT.TFile.Open(root_file_base+input_root_file_name)
         print input_root_file
-        input_tree = input_root_file.Get('tree')
+        input_tree = input_root_file.Get(config['input_tree_name'])
         print 'Processing {0}'.format(input_root_file_name)
         
         n_entries = input_tree.GetEntries()

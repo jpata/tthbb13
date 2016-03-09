@@ -24,6 +24,7 @@ using namespace std;
 //Simple 3-tuple of (category, systematic, histname) to keep track of
 //final histograms.
 typedef tuple<
+    ProcessKey::ProcessKey,
     vector<CategoryKey::CategoryKey>,
     SystematicKey::SystematicKey,
     HistogramKey::HistogramKey
@@ -45,14 +46,17 @@ namespace std {
         int ninc = 8; // how many bits to shift each
         int ic = 0; //shift counter
 
+        r += static_cast<int>(get<0>(x)) << (ninc*ic);
+        ic++;
+
         //shift vector of category keys
-        for (auto& v : get<0>(x)) {
+        for (auto& v : get<1>(x)) {
             r += static_cast<int>(v) << (ninc*ic);        
         }
         ic++;
-        r += static_cast<int>(get<1>(x)) << (ninc*ic);
-        ic++;
         r += static_cast<int>(get<2>(x)) << (ninc*ic);
+        ic++;
+        r += static_cast<int>(get<3>(x)) << (ninc*ic);
         std::hash<unsigned long long> _hash_fn;
         return _hash_fn(r);
     }
@@ -133,6 +137,7 @@ public:
 
     vector<string> filenames;
     double lumi;
+    double xsweight;
     ProcessKey::ProcessKey process;
     string prefix;
     long firstEntry;
@@ -146,6 +151,7 @@ public:
     Configuration(
         vector<string>& _filenames,
         double _lumi,
+        double _xsweight,
         ProcessKey::ProcessKey _process,
         string _prefix,
         long _firstEntry,
@@ -157,6 +163,7 @@ public:
         ) :
         filenames(_filenames),
         lumi(_lumi),
+        xsweight(_xsweight),
         process(_process),
         prefix(_prefix),
         firstEntry(_firstEntry),
@@ -363,11 +370,12 @@ public:
     virtual void fillHistograms(
         const Event& event,
         ResultMap& results,
-        const tuple<
+        tuple<
+            ProcessKey::ProcessKey,
             vector<CategoryKey::CategoryKey>,
-            SystematicKey::SystematicKey
-        >,
-        double weight
+            SystematicKey::SystematicKey> key,
+        double weight,
+        const Configuration& conf
     ) const;
 
     void process(
@@ -394,11 +402,12 @@ public:
     virtual void fillHistograms(
         const Event& event,
         ResultMap& results,
-        const tuple<
+        tuple<
+            ProcessKey::ProcessKey,
             vector<CategoryKey::CategoryKey>,
-            SystematicKey::SystematicKey
-        >,
-        double weight
+            SystematicKey::SystematicKey> key,
+        double weight,
+        const Configuration& conf
     ) const;
 };
 
@@ -444,11 +453,12 @@ public:
     virtual void fillHistograms(
         const Event& event,
         ResultMap& results,
-        const tuple<
+        tuple<
+            ProcessKey::ProcessKey,
             vector<CategoryKey::CategoryKey>,
-            SystematicKey::SystematicKey
-        >,
-        double weight
+            SystematicKey::SystematicKey> key,
+        double weight,
+        const Configuration& conf
     ) const;
 };
 
@@ -471,5 +481,7 @@ double process_weight(ProcessKey::ProcessKey procm, const Configuration& conf);
 
 //Checks if this category, specified by a list of keys, was enabled in the JSON
 bool isCategoryEnabled(const Configuration& conf, const vector<CategoryKey::CategoryKey>& catKeys);
+
+ProcessKey::ProcessKey getProcessKey(const Event& ev, ProcessKey::ProcessKey proc_key);
 
 #endif

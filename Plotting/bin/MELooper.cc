@@ -48,20 +48,6 @@ int main(int argc, const char** argv) {
     const Configuration conf = parseArgs(argc, argv);
     TChain* tree = loadFiles(conf);
 
-    // Here a tree of categories is defined
-    // Each category is specified by a list of CategoryKeys (called name) which form the name
-    // in the output root file.
-    // A category is only processed if it passes a cut, specified by a lambda function
-    // of the form cutFunc: const Event& -> bool
-    // Different CategoryProcessors may be created, each with their own fillHistograms
-    // method, which fill different histograms depending on need.
-    // As an example, we have CategoryProcessor, which fills jet0_pt
-    // and MEMCategoryProcessor which fills, in addition, the MEM histograms.
-    // Each category can contain subcategories, which are processed only if
-    // the parent category cut passed. The subcategories need only specify the additional
-    // names, which will be added to the parent category name to create the final
-    // output directory of the histogram.
-
     // Note: this vector is made const, so that it is fully known and will not change at runtime.
     const vector<const CategoryProcessor*> categorymap = makeCategories(conf);
 
@@ -74,7 +60,6 @@ int main(int argc, const char** argv) {
     
     ResultMap results;
 
-    cout << "Looping over events [" << conf.firstEntry << "," << conf.firstEntry+conf.numEntries << ")" << endl;
 
     if (conf.recalculateBTagWeight) {
         TPython::Exec("import os");
@@ -84,11 +69,18 @@ int main(int argc, const char** argv) {
     }
     TStopwatch timer;
     timer.Start();
-    
-    const long maxEntries = conf.firstEntry + conf.numEntries;
-    
+   
+    long maxEntries = 0;
+    if (conf.numEntries >= 0) { 
+        maxEntries = conf.firstEntry + conf.numEntries;
+    } else {
+        maxEntries = tree->GetEntries();
+    }
+    cout << "Looping over events [" << conf.firstEntry << "," << maxEntries << ")" << endl;
+
     for (long iEntry=conf.firstEntry; iEntry < maxEntries; iEntry++) {
         const bool do_print = (conf.printEvery>0 && iEntry % conf.printEvery == 0);
+       
         //std::vector<long> randoms;
         //
         //for (int ir=0; ir<1000; ir++) {
@@ -117,11 +109,17 @@ int main(int argc, const char** argv) {
         for (auto& kvSyst : systmap) {
             //cout << " syst " << SystematicKey::to_string(kvSyst.first) << endl;
             const Event& event = kvSyst.second;
+            //FIXME: seems that some DL events pass, even though no jets were identified 
+            if (event.jets.size() == 0) {
+                continue;
+            }
+            Configuration ev_conf(conf);
+            ev_conf.process = getProcessKey(event, conf.process);
             if (do_print) {
                 cout << SystematicKey::to_string(kvSyst.first) << " " << event.to_string();
             }
             for (auto& cat : categorymap) {
-                cat->process(event, conf, results, {}, kvSyst.first);
+                cat->process(event, ev_conf, results, {}, kvSyst.first);
             } //categorymap
         } // systmap
     } //entries
