@@ -48,11 +48,11 @@ def Make_config():
     # I/O information
     ########################################
 
-    config['input_root_file_name'] = '/hdfs/local/joosep/tth/JetTree_V20_subjet.root'
+    config['input_root_file_name'] = 'root://t3se01.psi.ch:1094//store/user/jpata/tth/tf_trees/JP_VHBBHeppyV20.root'
 
     config['input_tree_name'] = 'tree'
 
-    config['outputdir'] = 'V20_SUBJETS'
+    config['outputdir'] = 'VHBBHeppyV20_resolvedjets'
 
         
     config['SBF_fitted_hists_pickle_filename'] = \

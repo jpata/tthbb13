@@ -15,11 +15,7 @@ def fillCoreVariables(self, tr, event, isMC):
     else:
         for x in ["run", "lumi", "evt"]:
             tr.fill(x, getattr(event.input, x))
-    #attrs = dir(event.input)
-    #print attrs 
-    #for attr in attrs:
-    #    if attr.startswith("HLT"):
-    #        tr.fill(attr, getattr(event.input, attr))
+
 AutoFillTreeProducer.fillCoreVariables = fillCoreVariables
 
 #Specifies what to save for jets
@@ -430,7 +426,6 @@ def getTreeProducer(conf):
             if not tn in trignames:
                 trignames += [tn]
     
-    print trignames
     for trig in trignames:
         treeProducer.globalVariables += [NTupleVariable(
             trig, lambda ev, name=trig: getattr(ev.input, name, -1), type=int, mcOnly=False

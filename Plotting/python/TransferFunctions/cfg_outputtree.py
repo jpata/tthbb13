@@ -211,7 +211,10 @@ def Make_config(do_subjets=False):
 # End of Main
 ########################################
 def main():
-    Make_config(do_subjets=True)
+    if sys.argv[1] == "resolvedjets":
+        Make_config(do_subjets=True)
+    elif sys.argv[1] == "subjets":
+        Make_config(do_subjets=False)
 
 if __name__ == "__main__":
   main()

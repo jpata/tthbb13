@@ -577,6 +577,7 @@ class vLeptons:
         _eleMVAIdSpring15NonTrig = getattr(tree, "vLeptons_eleMVAIdSpring15NonTrig", [None]*n)
         _nStations = getattr(tree, "vLeptons_nStations", [None]*n)
         _trkKink = getattr(tree, "vLeptons_trkKink", [None]*n)
+        _segmentCompatibility = getattr(tree, "vLeptons_segmentCompatibility", [None]*n)
         _caloCompatibility = getattr(tree, "vLeptons_caloCompatibility", [None]*n)
         _globalTrackChi2 = getattr(tree, "vLeptons_globalTrackChi2", [None]*n)
         _nChamberHits = getattr(tree, "vLeptons_nChamberHits", [None]*n)
@@ -602,8 +603,10 @@ class vLeptons:
         _dr03TkSumPt = getattr(tree, "vLeptons_dr03TkSumPt", [None]*n)
         _eleEcalClusterIso = getattr(tree, "vLeptons_eleEcalClusterIso", [None]*n)
         _eleHcalClusterIso = getattr(tree, "vLeptons_eleHcalClusterIso", [None]*n)
-        _SF_HLT = getattr(tree, "vLeptons_SF_HLT", [None]*n)
-        _SFerr_HLT = getattr(tree, "vLeptons_SFerr_HLT", [None]*n)
+        _miniIsoCharged = getattr(tree, "vLeptons_miniIsoCharged", [None]*n)
+        _miniIsoNeutral = getattr(tree, "vLeptons_miniIsoNeutral", [None]*n)
+        _mvaTTHjetPtRel = getattr(tree, "vLeptons_mvaTTHjetPtRel", [None]*n)
+        _mvaTTHjetNDauChargedMVASel = getattr(tree, "vLeptons_mvaTTHjetNDauChargedMVASel", [None]*n)
         _SF_IsoLoose = getattr(tree, "vLeptons_SF_IsoLoose", [None]*n)
         _SFerr_IsoLoose = getattr(tree, "vLeptons_SFerr_IsoLoose", [None]*n)
         _SF_IsoTight = getattr(tree, "vLeptons_SF_IsoTight", [None]*n)
@@ -612,10 +615,20 @@ class vLeptons:
         _SFerr_IdLoose = getattr(tree, "vLeptons_SFerr_IdLoose", [None]*n)
         _SF_IdTight = getattr(tree, "vLeptons_SF_IdTight", [None]*n)
         _SFerr_IdTight = getattr(tree, "vLeptons_SFerr_IdTight", [None]*n)
-        _Eff_HLT = getattr(tree, "vLeptons_Eff_HLT", [None]*n)
-        _Efferr_HLT = getattr(tree, "vLeptons_Efferr_HLT", [None]*n)
-        return [vLeptons(_charge[n], _tightId[n], _eleCutIdCSA14_25ns_v1[n], _eleCutIdCSA14_50ns_v1[n], _eleCutIdSpring15_25ns_v1[n], _dxy[n], _dz[n], _edxy[n], _edz[n], _ip3d[n], _sip3d[n], _convVeto[n], _lostHits[n], _relIso03[n], _relIso04[n], _miniRelIso[n], _relIsoAn04[n], _tightCharge[n], _mcMatchId[n], _mcMatchAny[n], _mcMatchTau[n], _mcPt[n], _mediumMuonId[n], _pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _looseIdSusy[n], _looseIdPOG[n], _chargedHadRelIso03[n], _chargedHadRelIso04[n], _eleSieie[n], _eleDEta[n], _eleDPhi[n], _eleHoE[n], _eleMissingHits[n], _eleChi2[n], _convVetoFull[n], _eleMVArawPhys14NonTrig[n], _eleMVAIdPhys14NonTrig[n], _eleMVArawSpring15Trig[n], _eleMVAIdSpring15Trig[n], _eleMVArawSpring15NonTrig[n], _eleMVAIdSpring15NonTrig[n], _nStations[n], _trkKink[n], _caloCompatibility[n], _globalTrackChi2[n], _nChamberHits[n], _isPFMuon[n], _isGlobalMuon[n], _isTrackerMuon[n], _pixelHits[n], _trackerLayers[n], _pixelLayers[n], _mvaTTH[n], _jetOverlapIdx[n], _jetPtRatio[n], _jetBTagCSV[n], _jetDR[n], _mvaTTHjetPtRatio[n], _mvaTTHjetBTagCSV[n], _mvaTTHjetDR[n], _pfRelIso03[n], _pfRelIso04[n], _etaSc[n], _eleExpMissingInnerHits[n], _eleooEmooP[n], _dr03TkSumPt[n], _eleEcalClusterIso[n], _eleHcalClusterIso[n], _SF_HLT[n], _SFerr_HLT[n], _SF_IsoLoose[n], _SFerr_IsoLoose[n], _SF_IsoTight[n], _SFerr_IsoTight[n], _SF_IdLoose[n], _SFerr_IdLoose[n], _SF_IdTight[n], _SFerr_IdTight[n], _Eff_HLT[n], _Efferr_HLT[n]) for n in range(n)]
-    def __init__(self, charge,tightId,eleCutIdCSA14_25ns_v1,eleCutIdCSA14_50ns_v1,eleCutIdSpring15_25ns_v1,dxy,dz,edxy,edz,ip3d,sip3d,convVeto,lostHits,relIso03,relIso04,miniRelIso,relIsoAn04,tightCharge,mcMatchId,mcMatchAny,mcMatchTau,mcPt,mediumMuonId,pdgId,pt,eta,phi,mass,looseIdSusy,looseIdPOG,chargedHadRelIso03,chargedHadRelIso04,eleSieie,eleDEta,eleDPhi,eleHoE,eleMissingHits,eleChi2,convVetoFull,eleMVArawPhys14NonTrig,eleMVAIdPhys14NonTrig,eleMVArawSpring15Trig,eleMVAIdSpring15Trig,eleMVArawSpring15NonTrig,eleMVAIdSpring15NonTrig,nStations,trkKink,caloCompatibility,globalTrackChi2,nChamberHits,isPFMuon,isGlobalMuon,isTrackerMuon,pixelHits,trackerLayers,pixelLayers,mvaTTH,jetOverlapIdx,jetPtRatio,jetBTagCSV,jetDR,mvaTTHjetPtRatio,mvaTTHjetBTagCSV,mvaTTHjetDR,pfRelIso03,pfRelIso04,etaSc,eleExpMissingInnerHits,eleooEmooP,dr03TkSumPt,eleEcalClusterIso,eleHcalClusterIso,SF_HLT,SFerr_HLT,SF_IsoLoose,SFerr_IsoLoose,SF_IsoTight,SFerr_IsoTight,SF_IdLoose,SFerr_IdLoose,SF_IdTight,SFerr_IdTight,Eff_HLT,Efferr_HLT):
+        _SF_HLT_D4p3 = getattr(tree, "vLeptons_SF_HLT_D4p3", [None]*n)
+        _SFerr_HLT_D4p3 = getattr(tree, "vLeptons_SFerr_HLT_D4p3", [None]*n)
+        _SF_HLT_D4p2 = getattr(tree, "vLeptons_SF_HLT_D4p2", [None]*n)
+        _SFerr_HLT_D4p2 = getattr(tree, "vLeptons_SFerr_HLT_D4p2", [None]*n)
+        _SF_HLT_C = getattr(tree, "vLeptons_SF_HLT_C", [None]*n)
+        _SFerr_HLT_C = getattr(tree, "vLeptons_SFerr_HLT_C", [None]*n)
+        _Eff_HLT_D4p3 = getattr(tree, "vLeptons_Eff_HLT_D4p3", [None]*n)
+        _Efferr_HLT_D4p3 = getattr(tree, "vLeptons_Efferr_HLT_D4p3", [None]*n)
+        _Eff_HLT_D4p2 = getattr(tree, "vLeptons_Eff_HLT_D4p2", [None]*n)
+        _Efferr_HLT_D4p2 = getattr(tree, "vLeptons_Efferr_HLT_D4p2", [None]*n)
+        _Eff_HLT_C = getattr(tree, "vLeptons_Eff_HLT_C", [None]*n)
+        _Efferr_HLT_C = getattr(tree, "vLeptons_Efferr_HLT_C", [None]*n)
+        return [vLeptons(_charge[n], _tightId[n], _eleCutIdCSA14_25ns_v1[n], _eleCutIdCSA14_50ns_v1[n], _eleCutIdSpring15_25ns_v1[n], _dxy[n], _dz[n], _edxy[n], _edz[n], _ip3d[n], _sip3d[n], _convVeto[n], _lostHits[n], _relIso03[n], _relIso04[n], _miniRelIso[n], _relIsoAn04[n], _tightCharge[n], _mcMatchId[n], _mcMatchAny[n], _mcMatchTau[n], _mcPt[n], _mediumMuonId[n], _pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _looseIdSusy[n], _looseIdPOG[n], _chargedHadRelIso03[n], _chargedHadRelIso04[n], _eleSieie[n], _eleDEta[n], _eleDPhi[n], _eleHoE[n], _eleMissingHits[n], _eleChi2[n], _convVetoFull[n], _eleMVArawPhys14NonTrig[n], _eleMVAIdPhys14NonTrig[n], _eleMVArawSpring15Trig[n], _eleMVAIdSpring15Trig[n], _eleMVArawSpring15NonTrig[n], _eleMVAIdSpring15NonTrig[n], _nStations[n], _trkKink[n], _segmentCompatibility[n], _caloCompatibility[n], _globalTrackChi2[n], _nChamberHits[n], _isPFMuon[n], _isGlobalMuon[n], _isTrackerMuon[n], _pixelHits[n], _trackerLayers[n], _pixelLayers[n], _mvaTTH[n], _jetOverlapIdx[n], _jetPtRatio[n], _jetBTagCSV[n], _jetDR[n], _mvaTTHjetPtRatio[n], _mvaTTHjetBTagCSV[n], _mvaTTHjetDR[n], _pfRelIso03[n], _pfRelIso04[n], _etaSc[n], _eleExpMissingInnerHits[n], _eleooEmooP[n], _dr03TkSumPt[n], _eleEcalClusterIso[n], _eleHcalClusterIso[n], _miniIsoCharged[n], _miniIsoNeutral[n], _mvaTTHjetPtRel[n], _mvaTTHjetNDauChargedMVASel[n], _SF_IsoLoose[n], _SFerr_IsoLoose[n], _SF_IsoTight[n], _SFerr_IsoTight[n], _SF_IdLoose[n], _SFerr_IdLoose[n], _SF_IdTight[n], _SFerr_IdTight[n], _SF_HLT_D4p3[n], _SFerr_HLT_D4p3[n], _SF_HLT_D4p2[n], _SFerr_HLT_D4p2[n], _SF_HLT_C[n], _SFerr_HLT_C[n], _Eff_HLT_D4p3[n], _Efferr_HLT_D4p3[n], _Eff_HLT_D4p2[n], _Efferr_HLT_D4p2[n], _Eff_HLT_C[n], _Efferr_HLT_C[n]) for n in range(n)]
+    def __init__(self, charge,tightId,eleCutIdCSA14_25ns_v1,eleCutIdCSA14_50ns_v1,eleCutIdSpring15_25ns_v1,dxy,dz,edxy,edz,ip3d,sip3d,convVeto,lostHits,relIso03,relIso04,miniRelIso,relIsoAn04,tightCharge,mcMatchId,mcMatchAny,mcMatchTau,mcPt,mediumMuonId,pdgId,pt,eta,phi,mass,looseIdSusy,looseIdPOG,chargedHadRelIso03,chargedHadRelIso04,eleSieie,eleDEta,eleDPhi,eleHoE,eleMissingHits,eleChi2,convVetoFull,eleMVArawPhys14NonTrig,eleMVAIdPhys14NonTrig,eleMVArawSpring15Trig,eleMVAIdSpring15Trig,eleMVArawSpring15NonTrig,eleMVAIdSpring15NonTrig,nStations,trkKink,segmentCompatibility,caloCompatibility,globalTrackChi2,nChamberHits,isPFMuon,isGlobalMuon,isTrackerMuon,pixelHits,trackerLayers,pixelLayers,mvaTTH,jetOverlapIdx,jetPtRatio,jetBTagCSV,jetDR,mvaTTHjetPtRatio,mvaTTHjetBTagCSV,mvaTTHjetDR,pfRelIso03,pfRelIso04,etaSc,eleExpMissingInnerHits,eleooEmooP,dr03TkSumPt,eleEcalClusterIso,eleHcalClusterIso,miniIsoCharged,miniIsoNeutral,mvaTTHjetPtRel,mvaTTHjetNDauChargedMVASel,SF_IsoLoose,SFerr_IsoLoose,SF_IsoTight,SFerr_IsoTight,SF_IdLoose,SFerr_IdLoose,SF_IdTight,SFerr_IdTight,SF_HLT_D4p3,SFerr_HLT_D4p3,SF_HLT_D4p2,SFerr_HLT_D4p2,SF_HLT_C,SFerr_HLT_C,Eff_HLT_D4p3,Efferr_HLT_D4p3,Eff_HLT_D4p2,Efferr_HLT_D4p2,Eff_HLT_C,Efferr_HLT_C):
         self.charge = charge #
         self.tightId = tightId #POG Tight ID (for electrons it's configured in the analyzer)
         self.eleCutIdCSA14_25ns_v1 = eleCutIdCSA14_25ns_v1 #Electron cut-based id (POG CSA14_25ns_v1): 0=none, 1=veto, 2=loose, 3=medium, 4=tight
@@ -663,6 +676,7 @@ class vLeptons:
         self.eleMVAIdSpring15NonTrig = eleMVAIdSpring15NonTrig #EGamma POG MVA ID for non-triggering electrons (0=none, 1=WP90, 2=WP80, Spring15 training); 1 for muons
         self.nStations = nStations #Number of matched muons stations (4 for electrons)
         self.trkKink = trkKink #Tracker kink-finder
+        self.segmentCompatibility = segmentCompatibility #Segment compatibility
         self.caloCompatibility = caloCompatibility #Calorimetric compatibility
         self.globalTrackChi2 = globalTrackChi2 #Global track normalized chi2
         self.nChamberHits = nChamberHits #Number of muon chamber hits (-1 for electrons)
@@ -688,8 +702,10 @@ class vLeptons:
         self.dr03TkSumPt = dr03TkSumPt #Electron track sum pt
         self.eleEcalClusterIso = eleEcalClusterIso #Electron ecal cluster iso
         self.eleHcalClusterIso = eleHcalClusterIso #Electron hcal cluster iso
-        self.SF_HLT = SF_HLT #SF for lepton HLT
-        self.SFerr_HLT = SFerr_HLT #SF error for lepton HLT
+        self.miniIsoCharged = miniIsoCharged #PF miniIso (charged) in GeV
+        self.miniIsoNeutral = miniIsoNeutral #PF miniIso (neutral) in GeV
+        self.mvaTTHjetPtRel = mvaTTHjetPtRel #jetPtRel variable used by ttH multilepton MVA
+        self.mvaTTHjetNDauChargedMVASel = mvaTTHjetNDauChargedMVASel #jetNDauChargedMVASel variable used by ttH multilepton MVA
         self.SF_IsoLoose = SF_IsoLoose #SF for lepton IsoLoose
         self.SFerr_IsoLoose = SFerr_IsoLoose #SF error for lepton IsoLoose
         self.SF_IsoTight = SF_IsoTight #SF for lepton IsoTight
@@ -698,8 +714,18 @@ class vLeptons:
         self.SFerr_IdLoose = SFerr_IdLoose #SF error for lepton IdLoose
         self.SF_IdTight = SF_IdTight #SF for lepton IdTight
         self.SFerr_IdTight = SFerr_IdTight #SF error for lepton IdTight
-        self.Eff_HLT = Eff_HLT #Eff for lepton HLT
-        self.Efferr_HLT = Efferr_HLT #Eff error for lepton HLT
+        self.SF_HLT_D4p3 = SF_HLT_D4p3 #SF for lepton HLT_D4p3
+        self.SFerr_HLT_D4p3 = SFerr_HLT_D4p3 #SF error for lepton HLT_D4p3
+        self.SF_HLT_D4p2 = SF_HLT_D4p2 #SF for lepton HLT_D4p2
+        self.SFerr_HLT_D4p2 = SFerr_HLT_D4p2 #SF error for lepton HLT_D4p2
+        self.SF_HLT_C = SF_HLT_C #SF for lepton HLT_C
+        self.SFerr_HLT_C = SFerr_HLT_C #SF error for lepton HLT_C
+        self.Eff_HLT_D4p3 = Eff_HLT_D4p3 #SF for lepton HLT_D4p3
+        self.Efferr_HLT_D4p3 = Efferr_HLT_D4p3 #SF error for lepton HLT_D4p3
+        self.Eff_HLT_D4p2 = Eff_HLT_D4p2 #SF for lepton HLT_D4p2
+        self.Efferr_HLT_D4p2 = Efferr_HLT_D4p2 #SF error for lepton HLT_D4p2
+        self.Eff_HLT_C = Eff_HLT_C #SF for lepton HLT_C
+        self.Efferr_HLT_C = Efferr_HLT_C #SF error for lepton HLT_C
 class trgObjects_hltL1sL1TripleJet927664VBFORL1DoubleJetC100ORL1TripleJet846848VBFORL1DoubleJetC84ORL1HTT100ORL1HTT125ORL1HTT150ORL1HTT175:
     """
     
@@ -1192,6 +1218,7 @@ class aLeptons:
         _eleMVAIdSpring15NonTrig = getattr(tree, "aLeptons_eleMVAIdSpring15NonTrig", [None]*n)
         _nStations = getattr(tree, "aLeptons_nStations", [None]*n)
         _trkKink = getattr(tree, "aLeptons_trkKink", [None]*n)
+        _segmentCompatibility = getattr(tree, "aLeptons_segmentCompatibility", [None]*n)
         _caloCompatibility = getattr(tree, "aLeptons_caloCompatibility", [None]*n)
         _globalTrackChi2 = getattr(tree, "aLeptons_globalTrackChi2", [None]*n)
         _nChamberHits = getattr(tree, "aLeptons_nChamberHits", [None]*n)
@@ -1217,8 +1244,10 @@ class aLeptons:
         _dr03TkSumPt = getattr(tree, "aLeptons_dr03TkSumPt", [None]*n)
         _eleEcalClusterIso = getattr(tree, "aLeptons_eleEcalClusterIso", [None]*n)
         _eleHcalClusterIso = getattr(tree, "aLeptons_eleHcalClusterIso", [None]*n)
-        _SF_HLT = getattr(tree, "aLeptons_SF_HLT", [None]*n)
-        _SFerr_HLT = getattr(tree, "aLeptons_SFerr_HLT", [None]*n)
+        _miniIsoCharged = getattr(tree, "aLeptons_miniIsoCharged", [None]*n)
+        _miniIsoNeutral = getattr(tree, "aLeptons_miniIsoNeutral", [None]*n)
+        _mvaTTHjetPtRel = getattr(tree, "aLeptons_mvaTTHjetPtRel", [None]*n)
+        _mvaTTHjetNDauChargedMVASel = getattr(tree, "aLeptons_mvaTTHjetNDauChargedMVASel", [None]*n)
         _SF_IsoLoose = getattr(tree, "aLeptons_SF_IsoLoose", [None]*n)
         _SFerr_IsoLoose = getattr(tree, "aLeptons_SFerr_IsoLoose", [None]*n)
         _SF_IsoTight = getattr(tree, "aLeptons_SF_IsoTight", [None]*n)
@@ -1227,10 +1256,20 @@ class aLeptons:
         _SFerr_IdLoose = getattr(tree, "aLeptons_SFerr_IdLoose", [None]*n)
         _SF_IdTight = getattr(tree, "aLeptons_SF_IdTight", [None]*n)
         _SFerr_IdTight = getattr(tree, "aLeptons_SFerr_IdTight", [None]*n)
-        _Eff_HLT = getattr(tree, "aLeptons_Eff_HLT", [None]*n)
-        _Efferr_HLT = getattr(tree, "aLeptons_Efferr_HLT", [None]*n)
-        return [aLeptons(_charge[n], _tightId[n], _eleCutIdCSA14_25ns_v1[n], _eleCutIdCSA14_50ns_v1[n], _eleCutIdSpring15_25ns_v1[n], _dxy[n], _dz[n], _edxy[n], _edz[n], _ip3d[n], _sip3d[n], _convVeto[n], _lostHits[n], _relIso03[n], _relIso04[n], _miniRelIso[n], _relIsoAn04[n], _tightCharge[n], _mcMatchId[n], _mcMatchAny[n], _mcMatchTau[n], _mcPt[n], _mediumMuonId[n], _pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _looseIdSusy[n], _looseIdPOG[n], _chargedHadRelIso03[n], _chargedHadRelIso04[n], _eleSieie[n], _eleDEta[n], _eleDPhi[n], _eleHoE[n], _eleMissingHits[n], _eleChi2[n], _convVetoFull[n], _eleMVArawPhys14NonTrig[n], _eleMVAIdPhys14NonTrig[n], _eleMVArawSpring15Trig[n], _eleMVAIdSpring15Trig[n], _eleMVArawSpring15NonTrig[n], _eleMVAIdSpring15NonTrig[n], _nStations[n], _trkKink[n], _caloCompatibility[n], _globalTrackChi2[n], _nChamberHits[n], _isPFMuon[n], _isGlobalMuon[n], _isTrackerMuon[n], _pixelHits[n], _trackerLayers[n], _pixelLayers[n], _mvaTTH[n], _jetOverlapIdx[n], _jetPtRatio[n], _jetBTagCSV[n], _jetDR[n], _mvaTTHjetPtRatio[n], _mvaTTHjetBTagCSV[n], _mvaTTHjetDR[n], _pfRelIso03[n], _pfRelIso04[n], _etaSc[n], _eleExpMissingInnerHits[n], _eleooEmooP[n], _dr03TkSumPt[n], _eleEcalClusterIso[n], _eleHcalClusterIso[n], _SF_HLT[n], _SFerr_HLT[n], _SF_IsoLoose[n], _SFerr_IsoLoose[n], _SF_IsoTight[n], _SFerr_IsoTight[n], _SF_IdLoose[n], _SFerr_IdLoose[n], _SF_IdTight[n], _SFerr_IdTight[n], _Eff_HLT[n], _Efferr_HLT[n]) for n in range(n)]
-    def __init__(self, charge,tightId,eleCutIdCSA14_25ns_v1,eleCutIdCSA14_50ns_v1,eleCutIdSpring15_25ns_v1,dxy,dz,edxy,edz,ip3d,sip3d,convVeto,lostHits,relIso03,relIso04,miniRelIso,relIsoAn04,tightCharge,mcMatchId,mcMatchAny,mcMatchTau,mcPt,mediumMuonId,pdgId,pt,eta,phi,mass,looseIdSusy,looseIdPOG,chargedHadRelIso03,chargedHadRelIso04,eleSieie,eleDEta,eleDPhi,eleHoE,eleMissingHits,eleChi2,convVetoFull,eleMVArawPhys14NonTrig,eleMVAIdPhys14NonTrig,eleMVArawSpring15Trig,eleMVAIdSpring15Trig,eleMVArawSpring15NonTrig,eleMVAIdSpring15NonTrig,nStations,trkKink,caloCompatibility,globalTrackChi2,nChamberHits,isPFMuon,isGlobalMuon,isTrackerMuon,pixelHits,trackerLayers,pixelLayers,mvaTTH,jetOverlapIdx,jetPtRatio,jetBTagCSV,jetDR,mvaTTHjetPtRatio,mvaTTHjetBTagCSV,mvaTTHjetDR,pfRelIso03,pfRelIso04,etaSc,eleExpMissingInnerHits,eleooEmooP,dr03TkSumPt,eleEcalClusterIso,eleHcalClusterIso,SF_HLT,SFerr_HLT,SF_IsoLoose,SFerr_IsoLoose,SF_IsoTight,SFerr_IsoTight,SF_IdLoose,SFerr_IdLoose,SF_IdTight,SFerr_IdTight,Eff_HLT,Efferr_HLT):
+        _SF_HLT_D4p3 = getattr(tree, "aLeptons_SF_HLT_D4p3", [None]*n)
+        _SFerr_HLT_D4p3 = getattr(tree, "aLeptons_SFerr_HLT_D4p3", [None]*n)
+        _SF_HLT_D4p2 = getattr(tree, "aLeptons_SF_HLT_D4p2", [None]*n)
+        _SFerr_HLT_D4p2 = getattr(tree, "aLeptons_SFerr_HLT_D4p2", [None]*n)
+        _SF_HLT_C = getattr(tree, "aLeptons_SF_HLT_C", [None]*n)
+        _SFerr_HLT_C = getattr(tree, "aLeptons_SFerr_HLT_C", [None]*n)
+        _Eff_HLT_D4p3 = getattr(tree, "aLeptons_Eff_HLT_D4p3", [None]*n)
+        _Efferr_HLT_D4p3 = getattr(tree, "aLeptons_Efferr_HLT_D4p3", [None]*n)
+        _Eff_HLT_D4p2 = getattr(tree, "aLeptons_Eff_HLT_D4p2", [None]*n)
+        _Efferr_HLT_D4p2 = getattr(tree, "aLeptons_Efferr_HLT_D4p2", [None]*n)
+        _Eff_HLT_C = getattr(tree, "aLeptons_Eff_HLT_C", [None]*n)
+        _Efferr_HLT_C = getattr(tree, "aLeptons_Efferr_HLT_C", [None]*n)
+        return [aLeptons(_charge[n], _tightId[n], _eleCutIdCSA14_25ns_v1[n], _eleCutIdCSA14_50ns_v1[n], _eleCutIdSpring15_25ns_v1[n], _dxy[n], _dz[n], _edxy[n], _edz[n], _ip3d[n], _sip3d[n], _convVeto[n], _lostHits[n], _relIso03[n], _relIso04[n], _miniRelIso[n], _relIsoAn04[n], _tightCharge[n], _mcMatchId[n], _mcMatchAny[n], _mcMatchTau[n], _mcPt[n], _mediumMuonId[n], _pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _looseIdSusy[n], _looseIdPOG[n], _chargedHadRelIso03[n], _chargedHadRelIso04[n], _eleSieie[n], _eleDEta[n], _eleDPhi[n], _eleHoE[n], _eleMissingHits[n], _eleChi2[n], _convVetoFull[n], _eleMVArawPhys14NonTrig[n], _eleMVAIdPhys14NonTrig[n], _eleMVArawSpring15Trig[n], _eleMVAIdSpring15Trig[n], _eleMVArawSpring15NonTrig[n], _eleMVAIdSpring15NonTrig[n], _nStations[n], _trkKink[n], _segmentCompatibility[n], _caloCompatibility[n], _globalTrackChi2[n], _nChamberHits[n], _isPFMuon[n], _isGlobalMuon[n], _isTrackerMuon[n], _pixelHits[n], _trackerLayers[n], _pixelLayers[n], _mvaTTH[n], _jetOverlapIdx[n], _jetPtRatio[n], _jetBTagCSV[n], _jetDR[n], _mvaTTHjetPtRatio[n], _mvaTTHjetBTagCSV[n], _mvaTTHjetDR[n], _pfRelIso03[n], _pfRelIso04[n], _etaSc[n], _eleExpMissingInnerHits[n], _eleooEmooP[n], _dr03TkSumPt[n], _eleEcalClusterIso[n], _eleHcalClusterIso[n], _miniIsoCharged[n], _miniIsoNeutral[n], _mvaTTHjetPtRel[n], _mvaTTHjetNDauChargedMVASel[n], _SF_IsoLoose[n], _SFerr_IsoLoose[n], _SF_IsoTight[n], _SFerr_IsoTight[n], _SF_IdLoose[n], _SFerr_IdLoose[n], _SF_IdTight[n], _SFerr_IdTight[n], _SF_HLT_D4p3[n], _SFerr_HLT_D4p3[n], _SF_HLT_D4p2[n], _SFerr_HLT_D4p2[n], _SF_HLT_C[n], _SFerr_HLT_C[n], _Eff_HLT_D4p3[n], _Efferr_HLT_D4p3[n], _Eff_HLT_D4p2[n], _Efferr_HLT_D4p2[n], _Eff_HLT_C[n], _Efferr_HLT_C[n]) for n in range(n)]
+    def __init__(self, charge,tightId,eleCutIdCSA14_25ns_v1,eleCutIdCSA14_50ns_v1,eleCutIdSpring15_25ns_v1,dxy,dz,edxy,edz,ip3d,sip3d,convVeto,lostHits,relIso03,relIso04,miniRelIso,relIsoAn04,tightCharge,mcMatchId,mcMatchAny,mcMatchTau,mcPt,mediumMuonId,pdgId,pt,eta,phi,mass,looseIdSusy,looseIdPOG,chargedHadRelIso03,chargedHadRelIso04,eleSieie,eleDEta,eleDPhi,eleHoE,eleMissingHits,eleChi2,convVetoFull,eleMVArawPhys14NonTrig,eleMVAIdPhys14NonTrig,eleMVArawSpring15Trig,eleMVAIdSpring15Trig,eleMVArawSpring15NonTrig,eleMVAIdSpring15NonTrig,nStations,trkKink,segmentCompatibility,caloCompatibility,globalTrackChi2,nChamberHits,isPFMuon,isGlobalMuon,isTrackerMuon,pixelHits,trackerLayers,pixelLayers,mvaTTH,jetOverlapIdx,jetPtRatio,jetBTagCSV,jetDR,mvaTTHjetPtRatio,mvaTTHjetBTagCSV,mvaTTHjetDR,pfRelIso03,pfRelIso04,etaSc,eleExpMissingInnerHits,eleooEmooP,dr03TkSumPt,eleEcalClusterIso,eleHcalClusterIso,miniIsoCharged,miniIsoNeutral,mvaTTHjetPtRel,mvaTTHjetNDauChargedMVASel,SF_IsoLoose,SFerr_IsoLoose,SF_IsoTight,SFerr_IsoTight,SF_IdLoose,SFerr_IdLoose,SF_IdTight,SFerr_IdTight,SF_HLT_D4p3,SFerr_HLT_D4p3,SF_HLT_D4p2,SFerr_HLT_D4p2,SF_HLT_C,SFerr_HLT_C,Eff_HLT_D4p3,Efferr_HLT_D4p3,Eff_HLT_D4p2,Efferr_HLT_D4p2,Eff_HLT_C,Efferr_HLT_C):
         self.charge = charge #
         self.tightId = tightId #POG Tight ID (for electrons it's configured in the analyzer)
         self.eleCutIdCSA14_25ns_v1 = eleCutIdCSA14_25ns_v1 #Electron cut-based id (POG CSA14_25ns_v1): 0=none, 1=veto, 2=loose, 3=medium, 4=tight
@@ -1278,6 +1317,7 @@ class aLeptons:
         self.eleMVAIdSpring15NonTrig = eleMVAIdSpring15NonTrig #EGamma POG MVA ID for non-triggering electrons (0=none, 1=WP90, 2=WP80, Spring15 training); 1 for muons
         self.nStations = nStations #Number of matched muons stations (4 for electrons)
         self.trkKink = trkKink #Tracker kink-finder
+        self.segmentCompatibility = segmentCompatibility #Segment compatibility
         self.caloCompatibility = caloCompatibility #Calorimetric compatibility
         self.globalTrackChi2 = globalTrackChi2 #Global track normalized chi2
         self.nChamberHits = nChamberHits #Number of muon chamber hits (-1 for electrons)
@@ -1303,8 +1343,10 @@ class aLeptons:
         self.dr03TkSumPt = dr03TkSumPt #Electron track sum pt
         self.eleEcalClusterIso = eleEcalClusterIso #Electron ecal cluster iso
         self.eleHcalClusterIso = eleHcalClusterIso #Electron hcal cluster iso
-        self.SF_HLT = SF_HLT #SF for lepton HLT
-        self.SFerr_HLT = SFerr_HLT #SF error for lepton HLT
+        self.miniIsoCharged = miniIsoCharged #PF miniIso (charged) in GeV
+        self.miniIsoNeutral = miniIsoNeutral #PF miniIso (neutral) in GeV
+        self.mvaTTHjetPtRel = mvaTTHjetPtRel #jetPtRel variable used by ttH multilepton MVA
+        self.mvaTTHjetNDauChargedMVASel = mvaTTHjetNDauChargedMVASel #jetNDauChargedMVASel variable used by ttH multilepton MVA
         self.SF_IsoLoose = SF_IsoLoose #SF for lepton IsoLoose
         self.SFerr_IsoLoose = SFerr_IsoLoose #SF error for lepton IsoLoose
         self.SF_IsoTight = SF_IsoTight #SF for lepton IsoTight
@@ -1313,8 +1355,18 @@ class aLeptons:
         self.SFerr_IdLoose = SFerr_IdLoose #SF error for lepton IdLoose
         self.SF_IdTight = SF_IdTight #SF for lepton IdTight
         self.SFerr_IdTight = SFerr_IdTight #SF error for lepton IdTight
-        self.Eff_HLT = Eff_HLT #Eff for lepton HLT
-        self.Efferr_HLT = Efferr_HLT #Eff error for lepton HLT
+        self.SF_HLT_D4p3 = SF_HLT_D4p3 #SF for lepton HLT_D4p3
+        self.SFerr_HLT_D4p3 = SFerr_HLT_D4p3 #SF error for lepton HLT_D4p3
+        self.SF_HLT_D4p2 = SF_HLT_D4p2 #SF for lepton HLT_D4p2
+        self.SFerr_HLT_D4p2 = SFerr_HLT_D4p2 #SF error for lepton HLT_D4p2
+        self.SF_HLT_C = SF_HLT_C #SF for lepton HLT_C
+        self.SFerr_HLT_C = SFerr_HLT_C #SF error for lepton HLT_C
+        self.Eff_HLT_D4p3 = Eff_HLT_D4p3 #SF for lepton HLT_D4p3
+        self.Efferr_HLT_D4p3 = Efferr_HLT_D4p3 #SF error for lepton HLT_D4p3
+        self.Eff_HLT_D4p2 = Eff_HLT_D4p2 #SF for lepton HLT_D4p2
+        self.Efferr_HLT_D4p2 = Efferr_HLT_D4p2 #SF error for lepton HLT_D4p2
+        self.Eff_HLT_C = Eff_HLT_C #SF for lepton HLT_C
+        self.Efferr_HLT_C = Efferr_HLT_C #SF error for lepton HLT_C
 class trgObjects_hltPFQuadJetLooseID15:
     """
     
@@ -1542,6 +1594,7 @@ class selLeptons:
         _eleMVAIdSpring15NonTrig = getattr(tree, "selLeptons_eleMVAIdSpring15NonTrig", [None]*n)
         _nStations = getattr(tree, "selLeptons_nStations", [None]*n)
         _trkKink = getattr(tree, "selLeptons_trkKink", [None]*n)
+        _segmentCompatibility = getattr(tree, "selLeptons_segmentCompatibility", [None]*n)
         _caloCompatibility = getattr(tree, "selLeptons_caloCompatibility", [None]*n)
         _globalTrackChi2 = getattr(tree, "selLeptons_globalTrackChi2", [None]*n)
         _nChamberHits = getattr(tree, "selLeptons_nChamberHits", [None]*n)
@@ -1567,8 +1620,10 @@ class selLeptons:
         _dr03TkSumPt = getattr(tree, "selLeptons_dr03TkSumPt", [None]*n)
         _eleEcalClusterIso = getattr(tree, "selLeptons_eleEcalClusterIso", [None]*n)
         _eleHcalClusterIso = getattr(tree, "selLeptons_eleHcalClusterIso", [None]*n)
-        _SF_HLT = getattr(tree, "selLeptons_SF_HLT", [None]*n)
-        _SFerr_HLT = getattr(tree, "selLeptons_SFerr_HLT", [None]*n)
+        _miniIsoCharged = getattr(tree, "selLeptons_miniIsoCharged", [None]*n)
+        _miniIsoNeutral = getattr(tree, "selLeptons_miniIsoNeutral", [None]*n)
+        _mvaTTHjetPtRel = getattr(tree, "selLeptons_mvaTTHjetPtRel", [None]*n)
+        _mvaTTHjetNDauChargedMVASel = getattr(tree, "selLeptons_mvaTTHjetNDauChargedMVASel", [None]*n)
         _SF_IsoLoose = getattr(tree, "selLeptons_SF_IsoLoose", [None]*n)
         _SFerr_IsoLoose = getattr(tree, "selLeptons_SFerr_IsoLoose", [None]*n)
         _SF_IsoTight = getattr(tree, "selLeptons_SF_IsoTight", [None]*n)
@@ -1577,10 +1632,20 @@ class selLeptons:
         _SFerr_IdLoose = getattr(tree, "selLeptons_SFerr_IdLoose", [None]*n)
         _SF_IdTight = getattr(tree, "selLeptons_SF_IdTight", [None]*n)
         _SFerr_IdTight = getattr(tree, "selLeptons_SFerr_IdTight", [None]*n)
-        _Eff_HLT = getattr(tree, "selLeptons_Eff_HLT", [None]*n)
-        _Efferr_HLT = getattr(tree, "selLeptons_Efferr_HLT", [None]*n)
-        return [selLeptons(_charge[n], _tightId[n], _eleCutIdCSA14_25ns_v1[n], _eleCutIdCSA14_50ns_v1[n], _eleCutIdSpring15_25ns_v1[n], _dxy[n], _dz[n], _edxy[n], _edz[n], _ip3d[n], _sip3d[n], _convVeto[n], _lostHits[n], _relIso03[n], _relIso04[n], _miniRelIso[n], _relIsoAn04[n], _tightCharge[n], _mcMatchId[n], _mcMatchAny[n], _mcMatchTau[n], _mcPt[n], _mediumMuonId[n], _pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _looseIdSusy[n], _looseIdPOG[n], _chargedHadRelIso03[n], _chargedHadRelIso04[n], _eleSieie[n], _eleDEta[n], _eleDPhi[n], _eleHoE[n], _eleMissingHits[n], _eleChi2[n], _convVetoFull[n], _eleMVArawPhys14NonTrig[n], _eleMVAIdPhys14NonTrig[n], _eleMVArawSpring15Trig[n], _eleMVAIdSpring15Trig[n], _eleMVArawSpring15NonTrig[n], _eleMVAIdSpring15NonTrig[n], _nStations[n], _trkKink[n], _caloCompatibility[n], _globalTrackChi2[n], _nChamberHits[n], _isPFMuon[n], _isGlobalMuon[n], _isTrackerMuon[n], _pixelHits[n], _trackerLayers[n], _pixelLayers[n], _mvaTTH[n], _jetOverlapIdx[n], _jetPtRatio[n], _jetBTagCSV[n], _jetDR[n], _mvaTTHjetPtRatio[n], _mvaTTHjetBTagCSV[n], _mvaTTHjetDR[n], _pfRelIso03[n], _pfRelIso04[n], _etaSc[n], _eleExpMissingInnerHits[n], _eleooEmooP[n], _dr03TkSumPt[n], _eleEcalClusterIso[n], _eleHcalClusterIso[n], _SF_HLT[n], _SFerr_HLT[n], _SF_IsoLoose[n], _SFerr_IsoLoose[n], _SF_IsoTight[n], _SFerr_IsoTight[n], _SF_IdLoose[n], _SFerr_IdLoose[n], _SF_IdTight[n], _SFerr_IdTight[n], _Eff_HLT[n], _Efferr_HLT[n]) for n in range(n)]
-    def __init__(self, charge,tightId,eleCutIdCSA14_25ns_v1,eleCutIdCSA14_50ns_v1,eleCutIdSpring15_25ns_v1,dxy,dz,edxy,edz,ip3d,sip3d,convVeto,lostHits,relIso03,relIso04,miniRelIso,relIsoAn04,tightCharge,mcMatchId,mcMatchAny,mcMatchTau,mcPt,mediumMuonId,pdgId,pt,eta,phi,mass,looseIdSusy,looseIdPOG,chargedHadRelIso03,chargedHadRelIso04,eleSieie,eleDEta,eleDPhi,eleHoE,eleMissingHits,eleChi2,convVetoFull,eleMVArawPhys14NonTrig,eleMVAIdPhys14NonTrig,eleMVArawSpring15Trig,eleMVAIdSpring15Trig,eleMVArawSpring15NonTrig,eleMVAIdSpring15NonTrig,nStations,trkKink,caloCompatibility,globalTrackChi2,nChamberHits,isPFMuon,isGlobalMuon,isTrackerMuon,pixelHits,trackerLayers,pixelLayers,mvaTTH,jetOverlapIdx,jetPtRatio,jetBTagCSV,jetDR,mvaTTHjetPtRatio,mvaTTHjetBTagCSV,mvaTTHjetDR,pfRelIso03,pfRelIso04,etaSc,eleExpMissingInnerHits,eleooEmooP,dr03TkSumPt,eleEcalClusterIso,eleHcalClusterIso,SF_HLT,SFerr_HLT,SF_IsoLoose,SFerr_IsoLoose,SF_IsoTight,SFerr_IsoTight,SF_IdLoose,SFerr_IdLoose,SF_IdTight,SFerr_IdTight,Eff_HLT,Efferr_HLT):
+        _SF_HLT_D4p3 = getattr(tree, "selLeptons_SF_HLT_D4p3", [None]*n)
+        _SFerr_HLT_D4p3 = getattr(tree, "selLeptons_SFerr_HLT_D4p3", [None]*n)
+        _SF_HLT_D4p2 = getattr(tree, "selLeptons_SF_HLT_D4p2", [None]*n)
+        _SFerr_HLT_D4p2 = getattr(tree, "selLeptons_SFerr_HLT_D4p2", [None]*n)
+        _SF_HLT_C = getattr(tree, "selLeptons_SF_HLT_C", [None]*n)
+        _SFerr_HLT_C = getattr(tree, "selLeptons_SFerr_HLT_C", [None]*n)
+        _Eff_HLT_D4p3 = getattr(tree, "selLeptons_Eff_HLT_D4p3", [None]*n)
+        _Efferr_HLT_D4p3 = getattr(tree, "selLeptons_Efferr_HLT_D4p3", [None]*n)
+        _Eff_HLT_D4p2 = getattr(tree, "selLeptons_Eff_HLT_D4p2", [None]*n)
+        _Efferr_HLT_D4p2 = getattr(tree, "selLeptons_Efferr_HLT_D4p2", [None]*n)
+        _Eff_HLT_C = getattr(tree, "selLeptons_Eff_HLT_C", [None]*n)
+        _Efferr_HLT_C = getattr(tree, "selLeptons_Efferr_HLT_C", [None]*n)
+        return [selLeptons(_charge[n], _tightId[n], _eleCutIdCSA14_25ns_v1[n], _eleCutIdCSA14_50ns_v1[n], _eleCutIdSpring15_25ns_v1[n], _dxy[n], _dz[n], _edxy[n], _edz[n], _ip3d[n], _sip3d[n], _convVeto[n], _lostHits[n], _relIso03[n], _relIso04[n], _miniRelIso[n], _relIsoAn04[n], _tightCharge[n], _mcMatchId[n], _mcMatchAny[n], _mcMatchTau[n], _mcPt[n], _mediumMuonId[n], _pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _looseIdSusy[n], _looseIdPOG[n], _chargedHadRelIso03[n], _chargedHadRelIso04[n], _eleSieie[n], _eleDEta[n], _eleDPhi[n], _eleHoE[n], _eleMissingHits[n], _eleChi2[n], _convVetoFull[n], _eleMVArawPhys14NonTrig[n], _eleMVAIdPhys14NonTrig[n], _eleMVArawSpring15Trig[n], _eleMVAIdSpring15Trig[n], _eleMVArawSpring15NonTrig[n], _eleMVAIdSpring15NonTrig[n], _nStations[n], _trkKink[n], _segmentCompatibility[n], _caloCompatibility[n], _globalTrackChi2[n], _nChamberHits[n], _isPFMuon[n], _isGlobalMuon[n], _isTrackerMuon[n], _pixelHits[n], _trackerLayers[n], _pixelLayers[n], _mvaTTH[n], _jetOverlapIdx[n], _jetPtRatio[n], _jetBTagCSV[n], _jetDR[n], _mvaTTHjetPtRatio[n], _mvaTTHjetBTagCSV[n], _mvaTTHjetDR[n], _pfRelIso03[n], _pfRelIso04[n], _etaSc[n], _eleExpMissingInnerHits[n], _eleooEmooP[n], _dr03TkSumPt[n], _eleEcalClusterIso[n], _eleHcalClusterIso[n], _miniIsoCharged[n], _miniIsoNeutral[n], _mvaTTHjetPtRel[n], _mvaTTHjetNDauChargedMVASel[n], _SF_IsoLoose[n], _SFerr_IsoLoose[n], _SF_IsoTight[n], _SFerr_IsoTight[n], _SF_IdLoose[n], _SFerr_IdLoose[n], _SF_IdTight[n], _SFerr_IdTight[n], _SF_HLT_D4p3[n], _SFerr_HLT_D4p3[n], _SF_HLT_D4p2[n], _SFerr_HLT_D4p2[n], _SF_HLT_C[n], _SFerr_HLT_C[n], _Eff_HLT_D4p3[n], _Efferr_HLT_D4p3[n], _Eff_HLT_D4p2[n], _Efferr_HLT_D4p2[n], _Eff_HLT_C[n], _Efferr_HLT_C[n]) for n in range(n)]
+    def __init__(self, charge,tightId,eleCutIdCSA14_25ns_v1,eleCutIdCSA14_50ns_v1,eleCutIdSpring15_25ns_v1,dxy,dz,edxy,edz,ip3d,sip3d,convVeto,lostHits,relIso03,relIso04,miniRelIso,relIsoAn04,tightCharge,mcMatchId,mcMatchAny,mcMatchTau,mcPt,mediumMuonId,pdgId,pt,eta,phi,mass,looseIdSusy,looseIdPOG,chargedHadRelIso03,chargedHadRelIso04,eleSieie,eleDEta,eleDPhi,eleHoE,eleMissingHits,eleChi2,convVetoFull,eleMVArawPhys14NonTrig,eleMVAIdPhys14NonTrig,eleMVArawSpring15Trig,eleMVAIdSpring15Trig,eleMVArawSpring15NonTrig,eleMVAIdSpring15NonTrig,nStations,trkKink,segmentCompatibility,caloCompatibility,globalTrackChi2,nChamberHits,isPFMuon,isGlobalMuon,isTrackerMuon,pixelHits,trackerLayers,pixelLayers,mvaTTH,jetOverlapIdx,jetPtRatio,jetBTagCSV,jetDR,mvaTTHjetPtRatio,mvaTTHjetBTagCSV,mvaTTHjetDR,pfRelIso03,pfRelIso04,etaSc,eleExpMissingInnerHits,eleooEmooP,dr03TkSumPt,eleEcalClusterIso,eleHcalClusterIso,miniIsoCharged,miniIsoNeutral,mvaTTHjetPtRel,mvaTTHjetNDauChargedMVASel,SF_IsoLoose,SFerr_IsoLoose,SF_IsoTight,SFerr_IsoTight,SF_IdLoose,SFerr_IdLoose,SF_IdTight,SFerr_IdTight,SF_HLT_D4p3,SFerr_HLT_D4p3,SF_HLT_D4p2,SFerr_HLT_D4p2,SF_HLT_C,SFerr_HLT_C,Eff_HLT_D4p3,Efferr_HLT_D4p3,Eff_HLT_D4p2,Efferr_HLT_D4p2,Eff_HLT_C,Efferr_HLT_C):
         self.charge = charge #
         self.tightId = tightId #POG Tight ID (for electrons it's configured in the analyzer)
         self.eleCutIdCSA14_25ns_v1 = eleCutIdCSA14_25ns_v1 #Electron cut-based id (POG CSA14_25ns_v1): 0=none, 1=veto, 2=loose, 3=medium, 4=tight
@@ -1628,6 +1693,7 @@ class selLeptons:
         self.eleMVAIdSpring15NonTrig = eleMVAIdSpring15NonTrig #EGamma POG MVA ID for non-triggering electrons (0=none, 1=WP90, 2=WP80, Spring15 training); 1 for muons
         self.nStations = nStations #Number of matched muons stations (4 for electrons)
         self.trkKink = trkKink #Tracker kink-finder
+        self.segmentCompatibility = segmentCompatibility #Segment compatibility
         self.caloCompatibility = caloCompatibility #Calorimetric compatibility
         self.globalTrackChi2 = globalTrackChi2 #Global track normalized chi2
         self.nChamberHits = nChamberHits #Number of muon chamber hits (-1 for electrons)
@@ -1653,8 +1719,10 @@ class selLeptons:
         self.dr03TkSumPt = dr03TkSumPt #Electron track sum pt
         self.eleEcalClusterIso = eleEcalClusterIso #Electron ecal cluster iso
         self.eleHcalClusterIso = eleHcalClusterIso #Electron hcal cluster iso
-        self.SF_HLT = SF_HLT #SF for lepton HLT
-        self.SFerr_HLT = SFerr_HLT #SF error for lepton HLT
+        self.miniIsoCharged = miniIsoCharged #PF miniIso (charged) in GeV
+        self.miniIsoNeutral = miniIsoNeutral #PF miniIso (neutral) in GeV
+        self.mvaTTHjetPtRel = mvaTTHjetPtRel #jetPtRel variable used by ttH multilepton MVA
+        self.mvaTTHjetNDauChargedMVASel = mvaTTHjetNDauChargedMVASel #jetNDauChargedMVASel variable used by ttH multilepton MVA
         self.SF_IsoLoose = SF_IsoLoose #SF for lepton IsoLoose
         self.SFerr_IsoLoose = SFerr_IsoLoose #SF error for lepton IsoLoose
         self.SF_IsoTight = SF_IsoTight #SF for lepton IsoTight
@@ -1663,8 +1731,18 @@ class selLeptons:
         self.SFerr_IdLoose = SFerr_IdLoose #SF error for lepton IdLoose
         self.SF_IdTight = SF_IdTight #SF for lepton IdTight
         self.SFerr_IdTight = SFerr_IdTight #SF error for lepton IdTight
-        self.Eff_HLT = Eff_HLT #Eff for lepton HLT
-        self.Efferr_HLT = Efferr_HLT #Eff error for lepton HLT
+        self.SF_HLT_D4p3 = SF_HLT_D4p3 #SF for lepton HLT_D4p3
+        self.SFerr_HLT_D4p3 = SFerr_HLT_D4p3 #SF error for lepton HLT_D4p3
+        self.SF_HLT_D4p2 = SF_HLT_D4p2 #SF for lepton HLT_D4p2
+        self.SFerr_HLT_D4p2 = SFerr_HLT_D4p2 #SF error for lepton HLT_D4p2
+        self.SF_HLT_C = SF_HLT_C #SF for lepton HLT_C
+        self.SFerr_HLT_C = SFerr_HLT_C #SF error for lepton HLT_C
+        self.Eff_HLT_D4p3 = Eff_HLT_D4p3 #SF for lepton HLT_D4p3
+        self.Efferr_HLT_D4p3 = Efferr_HLT_D4p3 #SF error for lepton HLT_D4p3
+        self.Eff_HLT_D4p2 = Eff_HLT_D4p2 #SF for lepton HLT_D4p2
+        self.Efferr_HLT_D4p2 = Efferr_HLT_D4p2 #SF error for lepton HLT_D4p2
+        self.Eff_HLT_C = Eff_HLT_C #SF for lepton HLT_C
+        self.Efferr_HLT_C = Efferr_HLT_C #SF error for lepton HLT_C
 class trgObjects_hltPFMET90:
     """
     

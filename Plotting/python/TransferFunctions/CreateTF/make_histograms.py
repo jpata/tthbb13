@@ -355,7 +355,7 @@ def Make_Histograms():
     ROOT.gStyle.SetOptFit(1011)
 
     print 'Reading {0}'.format(input_root_file_name)
-    input_root_file = ROOT.TFile(input_root_file_name)
+    input_root_file = ROOT.TFile.Open(input_root_file_name)
     input_tree = input_root_file.Get(input_tree_name)
 
     outputdir = config['outputdir']

@@ -85,43 +85,28 @@ public:
   int njets;
   double jets_mcPt[16]; //
   double jets_mcEta[16]; //
-  int jets_matchBfromHadT[16]; //
   double jets_id[16]; //
-  double jets_bTagWeightLFUp[16]; //b-tag CSV weight, variating LF Up
   double jets_pt[16]; //
-  double jets_mcNumBHadrons[16]; //
   double jets_corr_JERDown[16]; //
-  double jets_bTagWeightStats2Up[16]; //b-tag CSV weight, variating Stats2 Up
   double jets_qgl[16]; //
-  double jets_bTagWeightcErr2Up[16]; //b-tag CSV weight, variating cErr2 Up
   double jets_mcPhi[16]; //
-  double jets_bTagWeightStats1Up[16]; //b-tag CSV weight, variating Stats1 Up
-  double jets_bTagWeightStats1Down[16]; //b-tag CSV weight, variating Stats1 Down
-  double jets_bTagWeightcErr2Down[16]; //b-tag CSV weight, variating cErr2 Down
+  double jets_mcNumCHadrons[16]; //
   int jets_matchFlag[16]; //0 - matched to light quark from W, 1 - matched to b form top, 2 - matched to b from higgs
   double jets_phi[16]; //
-  double jets_bTagWeightStats2Down[16]; //b-tag CSV weight, variating Stats2 Down
-  double jets_bTagWeightLFDown[16]; //b-tag CSV weight, variating LF Down
+  int jets_matchBfromHadT[16]; //
   int jets_hadronFlavour[16]; //
   double jets_corr_JESUp[16]; //
-  double jets_bTagWeightJESDown[16]; //b-tag CSV weight, variating JES Down
-  double jets_bTagWeightHFDown[16]; //b-tag CSV weight, variating HF Down
   double jets_corr_JERUp[16]; //
   double jets_corr[16]; //
   double jets_corr_JER[16]; //
   double jets_corr_JESDown[16]; //
-  double jets_btagCSV[16]; //
   double jets_mcM[16]; //
-  double jets_bTagWeightHFUp[16]; //b-tag CSV weight, variating HF Up
-  double jets_bTagWeightcErr1Down[16]; //b-tag CSV weight, variating cErr1 Down
+  double jets_btagCSV[16]; //
   int jets_mcMatchId[16]; //
   double jets_btagBDT[16]; //
-  double jets_bTagWeightcErr1Up[16]; //b-tag CSV weight, variating cErr1 Up
-  double jets_bTagWeight[16]; //b-tag CSV weight, nominal
+  double jets_mcNumBHadrons[16]; //
   double jets_eta[16]; //
   double jets_mass[16]; //
-  double jets_bTagWeightJESUp[16]; //b-tag CSV weight, variating JES Up
-  double jets_mcNumCHadrons[16]; //
   int jets_mcFlavour[16]; //
   int nleps;
   double leps_phi[2]; //
@@ -135,43 +120,28 @@ public:
   int nloose_jets;
   double loose_jets_mcPt[6]; //
   double loose_jets_mcEta[6]; //
-  int loose_jets_matchBfromHadT[6]; //
   double loose_jets_id[6]; //
-  double loose_jets_bTagWeightLFUp[6]; //b-tag CSV weight, variating LF Up
   double loose_jets_pt[6]; //
-  double loose_jets_mcNumBHadrons[6]; //
   double loose_jets_corr_JERDown[6]; //
-  double loose_jets_bTagWeightStats2Up[6]; //b-tag CSV weight, variating Stats2 Up
   double loose_jets_qgl[6]; //
-  double loose_jets_bTagWeightcErr2Up[6]; //b-tag CSV weight, variating cErr2 Up
   double loose_jets_mcPhi[6]; //
-  double loose_jets_bTagWeightStats1Up[6]; //b-tag CSV weight, variating Stats1 Up
-  double loose_jets_bTagWeightStats1Down[6]; //b-tag CSV weight, variating Stats1 Down
-  double loose_jets_bTagWeightcErr2Down[6]; //b-tag CSV weight, variating cErr2 Down
+  double loose_jets_mcNumCHadrons[6]; //
   int loose_jets_matchFlag[6]; //0 - matched to light quark from W, 1 - matched to b form top, 2 - matched to b from higgs
   double loose_jets_phi[6]; //
-  double loose_jets_bTagWeightStats2Down[6]; //b-tag CSV weight, variating Stats2 Down
-  double loose_jets_bTagWeightLFDown[6]; //b-tag CSV weight, variating LF Down
+  int loose_jets_matchBfromHadT[6]; //
   int loose_jets_hadronFlavour[6]; //
   double loose_jets_corr_JESUp[6]; //
-  double loose_jets_bTagWeightJESDown[6]; //b-tag CSV weight, variating JES Down
-  double loose_jets_bTagWeightHFDown[6]; //b-tag CSV weight, variating HF Down
   double loose_jets_corr_JERUp[6]; //
   double loose_jets_corr[6]; //
   double loose_jets_corr_JER[6]; //
   double loose_jets_corr_JESDown[6]; //
-  double loose_jets_btagCSV[6]; //
   double loose_jets_mcM[6]; //
-  double loose_jets_bTagWeightHFUp[6]; //b-tag CSV weight, variating HF Up
-  double loose_jets_bTagWeightcErr1Down[6]; //b-tag CSV weight, variating cErr1 Down
+  double loose_jets_btagCSV[6]; //
   int loose_jets_mcMatchId[6]; //
   double loose_jets_btagBDT[6]; //
-  double loose_jets_bTagWeightcErr1Up[6]; //b-tag CSV weight, variating cErr1 Up
-  double loose_jets_bTagWeight[6]; //b-tag CSV weight, nominal
+  double loose_jets_mcNumBHadrons[6]; //
   double loose_jets_eta[6]; //
   double loose_jets_mass[6]; //
-  double loose_jets_bTagWeightJESUp[6]; //b-tag CSV weight, variating JES Up
-  double loose_jets_mcNumCHadrons[6]; //
   int loose_jets_mcFlavour[6]; //
   int nmem_ttbb;
   double mem_ttbb_p[12]; //
@@ -487,15 +457,19 @@ public:
   double aplanarity_JESUp;
   double bTagWeight;
   double bTagWeight_HFDown;
+  double bTagWeight_HFStats1Down;
+  double bTagWeight_HFStats1Up;
+  double bTagWeight_HFStats2Down;
+  double bTagWeight_HFStats2Up;
   double bTagWeight_HFUp;
   double bTagWeight_JESDown;
   double bTagWeight_JESUp;
   double bTagWeight_LFDown;
+  double bTagWeight_LFStats1Down;
+  double bTagWeight_LFStats1Up;
+  double bTagWeight_LFStats2Down;
+  double bTagWeight_LFStats2Up;
   double bTagWeight_LFUp;
-  double bTagWeight_Stats1Down;
-  double bTagWeight_Stats1Up;
-  double bTagWeight_Stats2Down;
-  double bTagWeight_Stats2Up;
   double bTagWeight_cErr1Down;
   double bTagWeight_cErr1Up;
   double bTagWeight_cErr2Down;
@@ -770,43 +744,28 @@ public:
     tree->SetBranchAddress("njets", &(this->njets));
     tree->SetBranchAddress("jets_mcPt", this->jets_mcPt);
     tree->SetBranchAddress("jets_mcEta", this->jets_mcEta);
-    tree->SetBranchAddress("jets_matchBfromHadT", this->jets_matchBfromHadT);
     tree->SetBranchAddress("jets_id", this->jets_id);
-    tree->SetBranchAddress("jets_bTagWeightLFUp", this->jets_bTagWeightLFUp);
     tree->SetBranchAddress("jets_pt", this->jets_pt);
-    tree->SetBranchAddress("jets_mcNumBHadrons", this->jets_mcNumBHadrons);
     tree->SetBranchAddress("jets_corr_JERDown", this->jets_corr_JERDown);
-    tree->SetBranchAddress("jets_bTagWeightStats2Up", this->jets_bTagWeightStats2Up);
     tree->SetBranchAddress("jets_qgl", this->jets_qgl);
-    tree->SetBranchAddress("jets_bTagWeightcErr2Up", this->jets_bTagWeightcErr2Up);
     tree->SetBranchAddress("jets_mcPhi", this->jets_mcPhi);
-    tree->SetBranchAddress("jets_bTagWeightStats1Up", this->jets_bTagWeightStats1Up);
-    tree->SetBranchAddress("jets_bTagWeightStats1Down", this->jets_bTagWeightStats1Down);
-    tree->SetBranchAddress("jets_bTagWeightcErr2Down", this->jets_bTagWeightcErr2Down);
+    tree->SetBranchAddress("jets_mcNumCHadrons", this->jets_mcNumCHadrons);
     tree->SetBranchAddress("jets_matchFlag", this->jets_matchFlag);
     tree->SetBranchAddress("jets_phi", this->jets_phi);
-    tree->SetBranchAddress("jets_bTagWeightStats2Down", this->jets_bTagWeightStats2Down);
-    tree->SetBranchAddress("jets_bTagWeightLFDown", this->jets_bTagWeightLFDown);
+    tree->SetBranchAddress("jets_matchBfromHadT", this->jets_matchBfromHadT);
     tree->SetBranchAddress("jets_hadronFlavour", this->jets_hadronFlavour);
     tree->SetBranchAddress("jets_corr_JESUp", this->jets_corr_JESUp);
-    tree->SetBranchAddress("jets_bTagWeightJESDown", this->jets_bTagWeightJESDown);
-    tree->SetBranchAddress("jets_bTagWeightHFDown", this->jets_bTagWeightHFDown);
     tree->SetBranchAddress("jets_corr_JERUp", this->jets_corr_JERUp);
     tree->SetBranchAddress("jets_corr", this->jets_corr);
     tree->SetBranchAddress("jets_corr_JER", this->jets_corr_JER);
     tree->SetBranchAddress("jets_corr_JESDown", this->jets_corr_JESDown);
-    tree->SetBranchAddress("jets_btagCSV", this->jets_btagCSV);
     tree->SetBranchAddress("jets_mcM", this->jets_mcM);
-    tree->SetBranchAddress("jets_bTagWeightHFUp", this->jets_bTagWeightHFUp);
-    tree->SetBranchAddress("jets_bTagWeightcErr1Down", this->jets_bTagWeightcErr1Down);
+    tree->SetBranchAddress("jets_btagCSV", this->jets_btagCSV);
     tree->SetBranchAddress("jets_mcMatchId", this->jets_mcMatchId);
     tree->SetBranchAddress("jets_btagBDT", this->jets_btagBDT);
-    tree->SetBranchAddress("jets_bTagWeightcErr1Up", this->jets_bTagWeightcErr1Up);
-    tree->SetBranchAddress("jets_bTagWeight", this->jets_bTagWeight);
+    tree->SetBranchAddress("jets_mcNumBHadrons", this->jets_mcNumBHadrons);
     tree->SetBranchAddress("jets_eta", this->jets_eta);
     tree->SetBranchAddress("jets_mass", this->jets_mass);
-    tree->SetBranchAddress("jets_bTagWeightJESUp", this->jets_bTagWeightJESUp);
-    tree->SetBranchAddress("jets_mcNumCHadrons", this->jets_mcNumCHadrons);
     tree->SetBranchAddress("jets_mcFlavour", this->jets_mcFlavour);
     tree->SetBranchAddress("nleps", &(this->nleps));
     tree->SetBranchAddress("leps_phi", this->leps_phi);
@@ -820,43 +779,28 @@ public:
     tree->SetBranchAddress("nloose_jets", &(this->nloose_jets));
     tree->SetBranchAddress("loose_jets_mcPt", this->loose_jets_mcPt);
     tree->SetBranchAddress("loose_jets_mcEta", this->loose_jets_mcEta);
-    tree->SetBranchAddress("loose_jets_matchBfromHadT", this->loose_jets_matchBfromHadT);
     tree->SetBranchAddress("loose_jets_id", this->loose_jets_id);
-    tree->SetBranchAddress("loose_jets_bTagWeightLFUp", this->loose_jets_bTagWeightLFUp);
     tree->SetBranchAddress("loose_jets_pt", this->loose_jets_pt);
-    tree->SetBranchAddress("loose_jets_mcNumBHadrons", this->loose_jets_mcNumBHadrons);
     tree->SetBranchAddress("loose_jets_corr_JERDown", this->loose_jets_corr_JERDown);
-    tree->SetBranchAddress("loose_jets_bTagWeightStats2Up", this->loose_jets_bTagWeightStats2Up);
     tree->SetBranchAddress("loose_jets_qgl", this->loose_jets_qgl);
-    tree->SetBranchAddress("loose_jets_bTagWeightcErr2Up", this->loose_jets_bTagWeightcErr2Up);
     tree->SetBranchAddress("loose_jets_mcPhi", this->loose_jets_mcPhi);
-    tree->SetBranchAddress("loose_jets_bTagWeightStats1Up", this->loose_jets_bTagWeightStats1Up);
-    tree->SetBranchAddress("loose_jets_bTagWeightStats1Down", this->loose_jets_bTagWeightStats1Down);
-    tree->SetBranchAddress("loose_jets_bTagWeightcErr2Down", this->loose_jets_bTagWeightcErr2Down);
+    tree->SetBranchAddress("loose_jets_mcNumCHadrons", this->loose_jets_mcNumCHadrons);
     tree->SetBranchAddress("loose_jets_matchFlag", this->loose_jets_matchFlag);
     tree->SetBranchAddress("loose_jets_phi", this->loose_jets_phi);
-    tree->SetBranchAddress("loose_jets_bTagWeightStats2Down", this->loose_jets_bTagWeightStats2Down);
-    tree->SetBranchAddress("loose_jets_bTagWeightLFDown", this->loose_jets_bTagWeightLFDown);
+    tree->SetBranchAddress("loose_jets_matchBfromHadT", this->loose_jets_matchBfromHadT);
     tree->SetBranchAddress("loose_jets_hadronFlavour", this->loose_jets_hadronFlavour);
     tree->SetBranchAddress("loose_jets_corr_JESUp", this->loose_jets_corr_JESUp);
-    tree->SetBranchAddress("loose_jets_bTagWeightJESDown", this->loose_jets_bTagWeightJESDown);
-    tree->SetBranchAddress("loose_jets_bTagWeightHFDown", this->loose_jets_bTagWeightHFDown);
     tree->SetBranchAddress("loose_jets_corr_JERUp", this->loose_jets_corr_JERUp);
     tree->SetBranchAddress("loose_jets_corr", this->loose_jets_corr);
     tree->SetBranchAddress("loose_jets_corr_JER", this->loose_jets_corr_JER);
     tree->SetBranchAddress("loose_jets_corr_JESDown", this->loose_jets_corr_JESDown);
-    tree->SetBranchAddress("loose_jets_btagCSV", this->loose_jets_btagCSV);
     tree->SetBranchAddress("loose_jets_mcM", this->loose_jets_mcM);
-    tree->SetBranchAddress("loose_jets_bTagWeightHFUp", this->loose_jets_bTagWeightHFUp);
-    tree->SetBranchAddress("loose_jets_bTagWeightcErr1Down", this->loose_jets_bTagWeightcErr1Down);
+    tree->SetBranchAddress("loose_jets_btagCSV", this->loose_jets_btagCSV);
     tree->SetBranchAddress("loose_jets_mcMatchId", this->loose_jets_mcMatchId);
     tree->SetBranchAddress("loose_jets_btagBDT", this->loose_jets_btagBDT);
-    tree->SetBranchAddress("loose_jets_bTagWeightcErr1Up", this->loose_jets_bTagWeightcErr1Up);
-    tree->SetBranchAddress("loose_jets_bTagWeight", this->loose_jets_bTagWeight);
+    tree->SetBranchAddress("loose_jets_mcNumBHadrons", this->loose_jets_mcNumBHadrons);
     tree->SetBranchAddress("loose_jets_eta", this->loose_jets_eta);
     tree->SetBranchAddress("loose_jets_mass", this->loose_jets_mass);
-    tree->SetBranchAddress("loose_jets_bTagWeightJESUp", this->loose_jets_bTagWeightJESUp);
-    tree->SetBranchAddress("loose_jets_mcNumCHadrons", this->loose_jets_mcNumCHadrons);
     tree->SetBranchAddress("loose_jets_mcFlavour", this->loose_jets_mcFlavour);
     tree->SetBranchAddress("nmem_ttbb", &(this->nmem_ttbb));
     tree->SetBranchAddress("mem_ttbb_p", this->mem_ttbb_p);
@@ -1172,15 +1116,19 @@ public:
     tree->SetBranchAddress("aplanarity_JESUp", &(this->aplanarity_JESUp));
     tree->SetBranchAddress("bTagWeight", &(this->bTagWeight));
     tree->SetBranchAddress("bTagWeight_HFDown", &(this->bTagWeight_HFDown));
+    tree->SetBranchAddress("bTagWeight_HFStats1Down", &(this->bTagWeight_HFStats1Down));
+    tree->SetBranchAddress("bTagWeight_HFStats1Up", &(this->bTagWeight_HFStats1Up));
+    tree->SetBranchAddress("bTagWeight_HFStats2Down", &(this->bTagWeight_HFStats2Down));
+    tree->SetBranchAddress("bTagWeight_HFStats2Up", &(this->bTagWeight_HFStats2Up));
     tree->SetBranchAddress("bTagWeight_HFUp", &(this->bTagWeight_HFUp));
     tree->SetBranchAddress("bTagWeight_JESDown", &(this->bTagWeight_JESDown));
     tree->SetBranchAddress("bTagWeight_JESUp", &(this->bTagWeight_JESUp));
     tree->SetBranchAddress("bTagWeight_LFDown", &(this->bTagWeight_LFDown));
+    tree->SetBranchAddress("bTagWeight_LFStats1Down", &(this->bTagWeight_LFStats1Down));
+    tree->SetBranchAddress("bTagWeight_LFStats1Up", &(this->bTagWeight_LFStats1Up));
+    tree->SetBranchAddress("bTagWeight_LFStats2Down", &(this->bTagWeight_LFStats2Down));
+    tree->SetBranchAddress("bTagWeight_LFStats2Up", &(this->bTagWeight_LFStats2Up));
     tree->SetBranchAddress("bTagWeight_LFUp", &(this->bTagWeight_LFUp));
-    tree->SetBranchAddress("bTagWeight_Stats1Down", &(this->bTagWeight_Stats1Down));
-    tree->SetBranchAddress("bTagWeight_Stats1Up", &(this->bTagWeight_Stats1Up));
-    tree->SetBranchAddress("bTagWeight_Stats2Down", &(this->bTagWeight_Stats2Down));
-    tree->SetBranchAddress("bTagWeight_Stats2Up", &(this->bTagWeight_Stats2Up));
     tree->SetBranchAddress("bTagWeight_cErr1Down", &(this->bTagWeight_cErr1Down));
     tree->SetBranchAddress("bTagWeight_cErr1Up", &(this->bTagWeight_cErr1Up));
     tree->SetBranchAddress("bTagWeight_cErr2Down", &(this->bTagWeight_cErr2Down));
@@ -1456,43 +1404,28 @@ public:
     this->njets = 0;
     for (int i=0; i < 16; i++) { this->jets_mcPt[i] = 0; }
     for (int i=0; i < 16; i++) { this->jets_mcEta[i] = 0; }
-    for (int i=0; i < 16; i++) { this->jets_matchBfromHadT[i] = 0; }
     for (int i=0; i < 16; i++) { this->jets_id[i] = 0; }
-    for (int i=0; i < 16; i++) { this->jets_bTagWeightLFUp[i] = 0; }
     for (int i=0; i < 16; i++) { this->jets_pt[i] = 0; }
-    for (int i=0; i < 16; i++) { this->jets_mcNumBHadrons[i] = 0; }
     for (int i=0; i < 16; i++) { this->jets_corr_JERDown[i] = 0; }
-    for (int i=0; i < 16; i++) { this->jets_bTagWeightStats2Up[i] = 0; }
     for (int i=0; i < 16; i++) { this->jets_qgl[i] = 0; }
-    for (int i=0; i < 16; i++) { this->jets_bTagWeightcErr2Up[i] = 0; }
     for (int i=0; i < 16; i++) { this->jets_mcPhi[i] = 0; }
-    for (int i=0; i < 16; i++) { this->jets_bTagWeightStats1Up[i] = 0; }
-    for (int i=0; i < 16; i++) { this->jets_bTagWeightStats1Down[i] = 0; }
-    for (int i=0; i < 16; i++) { this->jets_bTagWeightcErr2Down[i] = 0; }
+    for (int i=0; i < 16; i++) { this->jets_mcNumCHadrons[i] = 0; }
     for (int i=0; i < 16; i++) { this->jets_matchFlag[i] = 0; }
     for (int i=0; i < 16; i++) { this->jets_phi[i] = 0; }
-    for (int i=0; i < 16; i++) { this->jets_bTagWeightStats2Down[i] = 0; }
-    for (int i=0; i < 16; i++) { this->jets_bTagWeightLFDown[i] = 0; }
+    for (int i=0; i < 16; i++) { this->jets_matchBfromHadT[i] = 0; }
     for (int i=0; i < 16; i++) { this->jets_hadronFlavour[i] = 0; }
     for (int i=0; i < 16; i++) { this->jets_corr_JESUp[i] = 0; }
-    for (int i=0; i < 16; i++) { this->jets_bTagWeightJESDown[i] = 0; }
-    for (int i=0; i < 16; i++) { this->jets_bTagWeightHFDown[i] = 0; }
     for (int i=0; i < 16; i++) { this->jets_corr_JERUp[i] = 0; }
     for (int i=0; i < 16; i++) { this->jets_corr[i] = 0; }
     for (int i=0; i < 16; i++) { this->jets_corr_JER[i] = 0; }
     for (int i=0; i < 16; i++) { this->jets_corr_JESDown[i] = 0; }
-    for (int i=0; i < 16; i++) { this->jets_btagCSV[i] = 0; }
     for (int i=0; i < 16; i++) { this->jets_mcM[i] = 0; }
-    for (int i=0; i < 16; i++) { this->jets_bTagWeightHFUp[i] = 0; }
-    for (int i=0; i < 16; i++) { this->jets_bTagWeightcErr1Down[i] = 0; }
+    for (int i=0; i < 16; i++) { this->jets_btagCSV[i] = 0; }
     for (int i=0; i < 16; i++) { this->jets_mcMatchId[i] = 0; }
     for (int i=0; i < 16; i++) { this->jets_btagBDT[i] = 0; }
-    for (int i=0; i < 16; i++) { this->jets_bTagWeightcErr1Up[i] = 0; }
-    for (int i=0; i < 16; i++) { this->jets_bTagWeight[i] = 0; }
+    for (int i=0; i < 16; i++) { this->jets_mcNumBHadrons[i] = 0; }
     for (int i=0; i < 16; i++) { this->jets_eta[i] = 0; }
     for (int i=0; i < 16; i++) { this->jets_mass[i] = 0; }
-    for (int i=0; i < 16; i++) { this->jets_bTagWeightJESUp[i] = 0; }
-    for (int i=0; i < 16; i++) { this->jets_mcNumCHadrons[i] = 0; }
     for (int i=0; i < 16; i++) { this->jets_mcFlavour[i] = 0; }
     this->nleps = 0;
     for (int i=0; i < 2; i++) { this->leps_phi[i] = 0; }
@@ -1506,43 +1439,28 @@ public:
     this->nloose_jets = 0;
     for (int i=0; i < 6; i++) { this->loose_jets_mcPt[i] = 0; }
     for (int i=0; i < 6; i++) { this->loose_jets_mcEta[i] = 0; }
-    for (int i=0; i < 6; i++) { this->loose_jets_matchBfromHadT[i] = 0; }
     for (int i=0; i < 6; i++) { this->loose_jets_id[i] = 0; }
-    for (int i=0; i < 6; i++) { this->loose_jets_bTagWeightLFUp[i] = 0; }
     for (int i=0; i < 6; i++) { this->loose_jets_pt[i] = 0; }
-    for (int i=0; i < 6; i++) { this->loose_jets_mcNumBHadrons[i] = 0; }
     for (int i=0; i < 6; i++) { this->loose_jets_corr_JERDown[i] = 0; }
-    for (int i=0; i < 6; i++) { this->loose_jets_bTagWeightStats2Up[i] = 0; }
     for (int i=0; i < 6; i++) { this->loose_jets_qgl[i] = 0; }
-    for (int i=0; i < 6; i++) { this->loose_jets_bTagWeightcErr2Up[i] = 0; }
     for (int i=0; i < 6; i++) { this->loose_jets_mcPhi[i] = 0; }
-    for (int i=0; i < 6; i++) { this->loose_jets_bTagWeightStats1Up[i] = 0; }
-    for (int i=0; i < 6; i++) { this->loose_jets_bTagWeightStats1Down[i] = 0; }
-    for (int i=0; i < 6; i++) { this->loose_jets_bTagWeightcErr2Down[i] = 0; }
+    for (int i=0; i < 6; i++) { this->loose_jets_mcNumCHadrons[i] = 0; }
     for (int i=0; i < 6; i++) { this->loose_jets_matchFlag[i] = 0; }
     for (int i=0; i < 6; i++) { this->loose_jets_phi[i] = 0; }
-    for (int i=0; i < 6; i++) { this->loose_jets_bTagWeightStats2Down[i] = 0; }
-    for (int i=0; i < 6; i++) { this->loose_jets_bTagWeightLFDown[i] = 0; }
+    for (int i=0; i < 6; i++) { this->loose_jets_matchBfromHadT[i] = 0; }
     for (int i=0; i < 6; i++) { this->loose_jets_hadronFlavour[i] = 0; }
     for (int i=0; i < 6; i++) { this->loose_jets_corr_JESUp[i] = 0; }
-    for (int i=0; i < 6; i++) { this->loose_jets_bTagWeightJESDown[i] = 0; }
-    for (int i=0; i < 6; i++) { this->loose_jets_bTagWeightHFDown[i] = 0; }
     for (int i=0; i < 6; i++) { this->loose_jets_corr_JERUp[i] = 0; }
     for (int i=0; i < 6; i++) { this->loose_jets_corr[i] = 0; }
     for (int i=0; i < 6; i++) { this->loose_jets_corr_JER[i] = 0; }
     for (int i=0; i < 6; i++) { this->loose_jets_corr_JESDown[i] = 0; }
-    for (int i=0; i < 6; i++) { this->loose_jets_btagCSV[i] = 0; }
     for (int i=0; i < 6; i++) { this->loose_jets_mcM[i] = 0; }
-    for (int i=0; i < 6; i++) { this->loose_jets_bTagWeightHFUp[i] = 0; }
-    for (int i=0; i < 6; i++) { this->loose_jets_bTagWeightcErr1Down[i] = 0; }
+    for (int i=0; i < 6; i++) { this->loose_jets_btagCSV[i] = 0; }
     for (int i=0; i < 6; i++) { this->loose_jets_mcMatchId[i] = 0; }
     for (int i=0; i < 6; i++) { this->loose_jets_btagBDT[i] = 0; }
-    for (int i=0; i < 6; i++) { this->loose_jets_bTagWeightcErr1Up[i] = 0; }
-    for (int i=0; i < 6; i++) { this->loose_jets_bTagWeight[i] = 0; }
+    for (int i=0; i < 6; i++) { this->loose_jets_mcNumBHadrons[i] = 0; }
     for (int i=0; i < 6; i++) { this->loose_jets_eta[i] = 0; }
     for (int i=0; i < 6; i++) { this->loose_jets_mass[i] = 0; }
-    for (int i=0; i < 6; i++) { this->loose_jets_bTagWeightJESUp[i] = 0; }
-    for (int i=0; i < 6; i++) { this->loose_jets_mcNumCHadrons[i] = 0; }
     for (int i=0; i < 6; i++) { this->loose_jets_mcFlavour[i] = 0; }
     this->nmem_ttbb = 0;
     for (int i=0; i < 12; i++) { this->mem_ttbb_p[i] = 0; }
@@ -1858,15 +1776,19 @@ public:
     this->aplanarity_JESUp = 0;
     this->bTagWeight = 0;
     this->bTagWeight_HFDown = 0;
+    this->bTagWeight_HFStats1Down = 0;
+    this->bTagWeight_HFStats1Up = 0;
+    this->bTagWeight_HFStats2Down = 0;
+    this->bTagWeight_HFStats2Up = 0;
     this->bTagWeight_HFUp = 0;
     this->bTagWeight_JESDown = 0;
     this->bTagWeight_JESUp = 0;
     this->bTagWeight_LFDown = 0;
+    this->bTagWeight_LFStats1Down = 0;
+    this->bTagWeight_LFStats1Up = 0;
+    this->bTagWeight_LFStats2Down = 0;
+    this->bTagWeight_LFStats2Up = 0;
     this->bTagWeight_LFUp = 0;
-    this->bTagWeight_Stats1Down = 0;
-    this->bTagWeight_Stats1Up = 0;
-    this->bTagWeight_Stats2Down = 0;
-    this->bTagWeight_Stats2Up = 0;
     this->bTagWeight_cErr1Down = 0;
     this->bTagWeight_cErr1Up = 0;
     this->bTagWeight_cErr2Down = 0;
