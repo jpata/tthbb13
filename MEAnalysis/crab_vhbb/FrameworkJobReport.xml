@@ -16,7 +16,7 @@
 </GeneratorInfo>
 
 <InputFile>
-<LFN>file:///shome/jpata/tth/sw-76/CMSSW/src/TTH/MEAnalysis/crab_vhbb/00F20861-40B8-E511-B593-001EC9B2189E.root</LFN>
+<LFN>file:///home/joosep/tth/sw/CMSSW/src/TTH/MEAnalysis/crab_vhbb/00F20861-40B8-E511-B593-001EC9B2189E.root</LFN>
 <PFN></PFN>
 <Catalog></Catalog>
 <InputType>primaryFiles</InputType>

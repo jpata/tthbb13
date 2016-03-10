@@ -21,7 +21,6 @@ os.system("tar czf data.tar.gz --dereference --directory $CMSSW_BASE/src/TTH/MEA
 vhbb_dir = os.environ.get("CMSSW_BASE") + "/src/VHbbAnalysis/Heppy/test"
 config.JobType.inputFiles = ['heppy_config.py',
                              'heppy_crab_script.py',
-                             'addTreeFiles.py',
                              'python.tar.gz',
                              'data.tar.gz',
                              "MEAnalysis_heppy.py",
