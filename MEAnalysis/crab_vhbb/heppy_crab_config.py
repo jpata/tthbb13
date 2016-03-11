@@ -1,7 +1,7 @@
 from WMCore.Configuration import Configuration
 config = Configuration()
 
-submitname = "VHBBHeppyV21pre_tthbbV4pre_nome"
+submitname = "VHBBHeppyV21pre_tthbbV5"
 
 config.section_("General")
 config.General.requestName = 'tth_' + submitname

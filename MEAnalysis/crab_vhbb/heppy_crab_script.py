@@ -78,13 +78,14 @@ vhbb_dir = tof.mkdir("vhbb")
 vhbb_dir.cd()
 for k in inf1.GetListOfKeys():
     o = k.ReadObj().Clone()
-    o.Write()
+    o.Write("", ROOT.TObject.kOverwrite)
 
 #copy tth output
 tof.cd()
 for k in inf2.GetListOfKeys():
     o = k.ReadObj().Clone()
-    o.Write()
+    o.Write("", ROOT.TObject.kOverwrite)
+tof.Write()
 tof.Close()
 
 #print PSet.process.output.fileName
