@@ -342,7 +342,7 @@ void fill_fatjet_branches(const edm::Event& iEvent,
       float *emap      = tthtree->get_address<float *>(prefix + "emap");
       float *ptmap     = tthtree->get_address<float *>(prefix + "ptmap");
       float *massmap   = tthtree->get_address<float *>(prefix + "massmap");
-      int   *chargemap = tthtree->get_address<int   *>(prefix + "chargemap");
+      float *chargemap = tthtree->get_address<float *>(prefix + "chargemap");
       
       reco::Jet::Constituents constis = x.getJetConstituents();
       for(reco::Jet::Constituents::iterator cit = constis.begin(); 
@@ -353,7 +353,9 @@ void fill_fatjet_branches(const edm::Event& iEvent,
 	emap[ipos]	+= (*cit)->energy();
 	ptmap[ipos]	+= (*cit)->pt();
 	massmap[ipos]	+= (*cit)->mass();
-	chargemap[ipos] += (*cit)->charge();	
+		
+	if ( (*cit)->charge() < 100 && (*cit)->charge() > -100)
+	  chargemap[ipos] += fabs((*cit)->charge());		  
       }
     }
 
@@ -897,7 +899,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   	edm::Handle<reco::PFCandidateCollection> cands;
 	iEvent.getByToken(candToken_, cands);
 
-	std::cout << "Number of PF/PUPPI cands: " << cands->size() << std::endl;
+	//	std::cout << "Number of PF/PUPPI cands: " << cands->size() << std::endl;
 
 	
 

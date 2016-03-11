@@ -16,6 +16,7 @@
 
 import os
 import sys
+import pdb
 import glob
 import math
 import socket
@@ -124,13 +125,14 @@ else:
 # Dictionary of event info branches to add
 # key -> branch name to use for storing
 # value -> list[branch name in input, data type]
-event_infos = {"npv" : ["n__pv", "int"]}
+event_infos = {"npv" : ["n__pv", "int"],
+               "evt" : ["event__id", "int"]
+           }
         
 # Truth particle information
 particle_branches_float = ["pt", "eta", "phi", "mass"]
 particle_branches_int = ["pdgid"]
 particle_branches = particle_branches_float + particle_branches_int
-
 
 # "Normal" branches for most fatjet collections
 fj_branches = ["pt", "mass", "masscal", "tau1", "tau2", "tau3", "qvol", "nconst", "ncharged", "nneutral", "hadflavour", "partflavour",]
@@ -294,6 +296,12 @@ objects_to_pop = list(set(objects_to_pop))
 for o in objects_to_pop:
     objects.pop(o)
 
+
+
+AH.addVectorBranches(variables, variable_types, outtree,
+                     ["ak08_emap", "ak08_ptmap", "ak08_massmap", "ak08_chargemap"], 
+                     datatype = 'float')
+
 ########################################
 # Event loop
 ########################################
@@ -433,7 +441,9 @@ for i_event in range(n_entries):
             max_int_32 = 2147483647
             if len(i_branch) == max_int_32:
                 continue
-        
+
+                
+
             # Special treatment for b-tagging subjets. Don't take closest but b-likeliest in radius
             if "forbtag" in object_name:
                 
@@ -507,6 +517,26 @@ for i_event in range(n_entries):
                     i_matched = closest_dr_and_pos[1]
 
                     variables["dr"][0] = closest_dr_and_pos[0]
+
+                    # Add 2d maps (serialized to 1d)
+                    # todo: properly integrate with rest
+                    if object_name == "ak08":
+                        
+                        for mapname in ["emap", "ptmap", "massmap", "chargemap"]:
+                        
+                            full_branch_in = "jet_ak08__" + mapname
+                            full_branch_out = "ak08_" + mapname
+
+                            xmap = AH.getter(intree,full_branch_in)
+
+                            nbins = 16
+
+                            for i_eta in range(nbins):
+                                for i_phi in range(nbins):
+                                    idx = i_phi + nbins*(i_eta + nbins * i_matched)
+                                    variables[full_branch_out].push_back(xmap[idx])
+                                                        
+
                     for branch_name in branch_names:
 
                         #subjet b-tagging for cmstt branches

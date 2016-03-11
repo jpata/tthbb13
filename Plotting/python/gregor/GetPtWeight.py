@@ -74,8 +74,7 @@ for name in to_process:
 
 output_dir = "/shome/gregor/new_results/GetPtWeight/"
 
-output_pickle_file_name = "/shome/gregor/TTH-74X/CMSSW/src/TTH/Plotting/python/gregor/flat_pt_weights.pickle"
-
+output_pickle_file_name = "/shome/gregor/TOP-763/CMSSW_7_6_3/src/TTH/Plotting/python/gregor/flat_pt_weights.pickle"
 
 ########################################
 # Define plots and do fits
@@ -92,8 +91,8 @@ if True:
         pt_var = "{0}_pt".format(truth_var)
         eta_var = "{0}_eta".format(truth_var)
 
-        #fiducial_cut = "(({0}>{1})&&({0}<{2})&&(top_size<{3}))".format(pt_var, ranges[k][0], ranges[k][1], ranges[k][3])
-        fiducial_cut = "(({0}>{1})&&({0}<{2}))".format(pt_var, ranges[k][0], ranges[k][1])
+        fiducial_cut = "(({0}>{1})&&({0}<{2})&&(top_size<{3}))".format(pt_var, ranges[k][0], ranges[k][1], ranges[k][3])
+        #fiducial_cut = "(({0}>{1})&&({0}<{2}))".format(pt_var, ranges[k][0], ranges[k][1])
 
 
         combinedPlot ( k + "_pt_cut",
@@ -165,7 +164,7 @@ pickle_file.close()
 
 # Then add the new ones
 for k in to_process:
-    v = files[k] + "-nosize"
+    v = files[k] # + "-nosize"
     print "Adding: ", v
 
     if "zprime" in k:

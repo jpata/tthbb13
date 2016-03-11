@@ -284,7 +284,7 @@ public:
         float jet_ak08__emap[10][16][16];
         float jet_ak08__ptmap[10][16][16];
         float jet_ak08__massmap[10][16][16];
-        int jet_ak08__chargemap[10][16][16];
+        float jet_ak08__chargemap[10][16][16];
 
 	int jet_ak08__nconst[N_MAX];
 	int jet_ak08__ncharged[N_MAX];
@@ -2341,7 +2341,7 @@ public:
 		SET_ZERO_3(jet_ak08__emap, 10, 16,16, 0.);
 		SET_ZERO_3(jet_ak08__ptmap, 10, 16,16, 0.);
 		SET_ZERO_3(jet_ak08__massmap, 10, 16,16, 0.);
-		SET_ZERO_3(jet_ak08__chargemap, 10, 16,16, 0);
+		SET_ZERO_3(jet_ak08__chargemap, 10, 16,16, 0.);
 
 		SET_ZERO(jet_ak08__nconst, N_MAX, DEF_VAL_INT);
 		SET_ZERO(jet_ak08__ncharged, N_MAX, DEF_VAL_INT);
