@@ -78,7 +78,7 @@ brs = ["evt",
        "ak08softdropz10b00_mass",
        "ak08_emap", 
        #"ak08_ptmap", 
-       "ak08_massmap", 
+       #"ak08_massmap", 
        #"ak08_chargemap"
 ]
 
@@ -87,20 +87,17 @@ to_plot = ["pt", "eta", "top_size",
            "ak08softdropz10b00forbtag_btag", 
            "ak08softdropz10b00_mass"]
 
+default_mdl = {        
+    "n_layers"    : 2,
+    "n_nodes"     : 64,
+    "dropout"     : 0.5,
 
+    "lr"          : 0.05,
+    "decay"       : 1e-7,
+    "momentum"    : 0.9,            
 
-#for ic in range(MAX_PERM):
-#    brs.extend(["c{0}_mass".format(ic), 
-#                "c{0}_frec".format(ic), 
-#                "c{0}_meanCSV".format(ic), 
-#                "c{0}_varCSV".format(ic)])
-#
-#train_vars = []
-#for ic in range(MAX_PERM):
-#    train_vars.extend(["c{0}_mass".format(ic), 
-#                       "c{0}_frec".format(ic), 
-#                       "c{0}_meanCSV".format(ic), 
-#                       "c{0}_varCSV".format(ic)])
+    "nb_epoch"    : 50,
+}
 
 colors = ['black', 'red','blue','green','orange','green','magenta']
 
@@ -109,10 +106,15 @@ class_names = {0: "background",
 
 classes = sorted(class_names.keys())
 
-plot_inputs    = True
+plot_inputs    = False
 
-infname_sig = "/scratch/gregor/ntop_x1_zprime_m2000-tagging-weighted.root"
-infname_bkg = "/scratch/gregor/ntop_x1_qcd_800_1000-tagging-weighted.root"
+min_pt = 801
+max_pt = 999
+max_eta = 1.5
+min_reco_pt = 500
+
+infname_sig = "ntop_x1_zprime_m2000-tagging-weighted.root"
+infname_bkg = "ntop_x1_qcd_800_1000-tagging-weighted.root"
 
 
 ########################################
@@ -135,10 +137,6 @@ print "Reading Data: Done..."
 df_tmp = pandas.concat([df_sig, df_bkg], ignore_index=True)
 
 # Apply fiducial
-min_pt = 801
-max_pt = 999
-max_eta = 1.5
-min_reco_pt = 500
 df_tmp["keep"] = np.where( df_tmp["pt"] > min_pt, True, False)
 df_tmp["keep"] = np.where( df_tmp["pt"] < max_pt, df_tmp["keep"], False)
 df_tmp["keep"] = np.where( abs(df_tmp["eta"]) < max_eta, df_tmp["keep"], False)
@@ -162,6 +160,26 @@ print "\nTest Sample:"
 print dtest.groupby('is_signal_new')["is_signal_new"].count()
     
 print "Preparing Data: Done..."
+
+
+########################################
+# Read in NN parameters
+########################################
+
+mdl = {}
+for param in default_mdl.keys():
+
+    if param in os.environ.keys():
+
+        cls = default_mdl[param].__class__
+        value = cls(os.environ[param])
+        mdl[param] = value
+        print "Setting ", param, value
+    else:
+        mdl[param] = default_mdl[param]
+
+    for k,v in mdl.iteritems():
+        print k,v
 
 
 ########################################
@@ -224,7 +242,7 @@ classifiers = {
 
     "NN" : ["keras",
             ["ak08_emap"],
-            {},
+            mdl,
             False,
             get_data_emap
         ],
@@ -254,7 +272,11 @@ def train_scikit(df, var, clf, get_data):
 ########################################
 
 def train_keras(df_train, df_val, var, mdl, get_data):
-  
+
+    print "Starting train_keras with the parameters: ",
+    for k,v in mdl.iteritems():
+        print k,v
+
     channels = 1
     nclasses = 2
     
@@ -268,26 +290,26 @@ def train_keras(df_train, df_val, var, mdl, get_data):
 
     model = Sequential()
  
-    model.add(Dense(64, input_dim = 256))
+    model.add(Dense(mdl["n_nodes"], input_dim = 256))
     model.add(activ())
 
-    for ilayer in range(2):  
-        model.add(Dense(64))
+    for ilayer in range(mdl["n_layers"]):  
+        model.add(Dense(mdl["n_nodes"]))
         model.add(activ())                   
-        model.add(Dropout(0.7))
+        model.add(Dropout(mdl["dropout"]))
 
     model.add(Dense(nclasses))
     model.add(Activation('softmax'))
 
-    sgd = SGD(lr=0.1, 
-              decay=1e-8, 
-              momentum=0.9, 
+    sgd = SGD(lr=mdl["lr"], 
+              decay=mdl["decay"], 
+              momentum=mdl["momentum"], 
               nesterov=True)
     model.compile(loss='mean_squared_error', optimizer=sgd)
 
     ret = model.fit(X_train, 
                     np_utils.to_categorical(y_train), 
-                    nb_epoch = 50,
+                    nb_epoch = mdl["nb_epoch"],
                     verbose=2, 
                     validation_data=(X_val, np_utils.to_categorical(y_val)),
                     show_accuracy=True)
@@ -543,54 +565,6 @@ if False:
     get_data       = v[4]
 
     clf =  prepare(k, variables, classifier, get_data, load_from_file)
-    
-    ## Load trained classifier from file or train
-    #if load_from_file:         
-    #    f = open(outfname + ".pickle", "r")
-    #    clf = pickle.load(f)
-    #    f.close()
-    #    print "Loading from file: Done..."
-    #else:
-    #    
-    #    default_mdl = {        
-    #        "n_conv_layers"  : 2,
-    #        "n_feature_maps" : 20,
-    #        "n_pool"         : 1,
-    #        
-    #        "n_dense_layers" : 2,
-    #        "n_dense_nodes"  : 16,
-    #        
-    #        "dropout_conv"   : 0.,
-    #        "dropout_flat"   : 0.7,
-    #        "dropout_dense"  : 0.,
-    #        
-    #        "prelayer" : False,
-    #
-    #        "lr"             : 0.05,
-    #        "decay"          : 1e-7,
-    #        "momentum"       : 0.9,            
-    #        
-    #        "nb_epoch"       : 50,
-    #    }
-    #    
-    #    mdl = {}
-    #    for param in default_mdl.keys():
-    #        
-    #        if param in os.environ.keys():
-    #            
-    #            cls = default_mdl[param].__class__
-    #            value = cls(os.environ[param])
-    #            mdl[param] = value
-    #            print "Setting ", param, value
-    #        else:
-    #            mdl[param] = default_mdl[param]
-    #
-    #    for k,v in mdl.iteritems():
-    #        print k,v
-    #
-    #    clf = train2(dtrain, dtest, mdl)
-    #    print "Training: Done..."
-    
         
     rocplot(k, clf, dtest, classes, class_names, get_data)
 
@@ -608,7 +582,12 @@ if False:
 all_names = classifiers.keys()
 
 multirocplot([n for n in all_names],
-             [prepare(n, classifiers[n][0], classifiers[n][1], classifiers[n][2], classifiers[n][4], classifiers[n][3]) for n in all_names],
+             [prepare(n, 
+                      classifiers[n][0], 
+                      classifiers[n][1], 
+                      classifiers[n][2], 
+                      classifiers[n][4], 
+                      classifiers[n][3]) for n in all_names],
              [classifiers[n][4] for n in all_names],
              dtest)
 
