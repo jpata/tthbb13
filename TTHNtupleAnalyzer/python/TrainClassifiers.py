@@ -40,7 +40,7 @@ from keras.optimizers import SGD
 from keras.utils import np_utils, generic_utils
 from keras.layers.advanced_activations import PReLU
 from keras.layers.normalization import BatchNormalization
-from keras.layers.convolutional import Convolution2D, MaxPooling2D, AveragePooling2D
+from keras.layers.convolutional import Convolution2D, MaxPooling2D, AveragePooling2D, ZeroPadding2D
 from keras.layers.core import Reshape
 from keras.models import model_from_yaml
 
@@ -87,13 +87,34 @@ to_plot = ["pt", "eta", "top_size",
            "ak08softdropz10b00forbtag_btag", 
            "ak08softdropz10b00_mass"]
 
-default_mdl = {        
-    "n_layers"    : 2,
-    "n_nodes"     : 64,
-    "dropout"     : 0.5,
+# 1D
+# default_mdl = {        
+#     "n_layers"    : 1,
+#     "n_nodes"     : 512,
+#     "dropout"     : 0.3,
+# 
+#     "lr"          : 0.01,
+#     "decay"       : 1e-6,
+#     "momentum"    : 0.9,            
+# 
+#     "nb_epoch"    : 50,
+# }
 
-    "lr"          : 0.05,
-    "decay"       : 1e-7,
+
+default_mdl = {        
+    "n_blocks" : 2,    
+
+    "n_conv_layers" : 2,        
+    "conv_nfeat" : 1,
+    "conv_size"  : 4,
+
+    "pool_size"  : 2,
+
+    "n_dense_layers" : 2,
+    "n_dense_nodes"  : 16,
+
+    "lr"          : 0.01,
+    "decay"       : 1e-6,
     "momentum"    : 0.9,            
 
     "nb_epoch"    : 50,
@@ -207,6 +228,20 @@ scaler.fit(get_data_flatten(dtrain, ["ak08_emap"]))
 def get_data_emap(df, varlist):
     return scaler.transform(get_data_flatten(df, varlist))
 
+def get_data_emap_2d(df, varlist):
+    tmp  = get_data_emap(df, varlist)
+    tmp2 =  np.expand_dims(tmp, axis=-1)
+    n_lines = tmp2.shape[0]
+    tmp3 = tmp2.reshape(n_lines, 16, 16)
+    tmp4 = np.expand_dims(tmp3, axis=1)    
+
+    print tmp.shape
+    print tmp2.shape
+    print tmp3.shape
+    print tmp4.shape
+
+    return tmp4
+
 
 classifiers = {
 
@@ -240,11 +275,18 @@ classifiers = {
                  get_data_vars,
              ],
 
-    "NN" : ["keras",
-            ["ak08_emap"],
-            mdl,
-            False,
-            get_data_emap
+#    "NN" : ["keras",
+#            ["ak08_emap"],
+#            mdl,
+#            False,
+#            get_data_emap
+#        ],
+
+    "NN2d" : ["keras",
+              ["ak08_emap"],
+              mdl,
+              False,
+              get_data_emap_2d
         ],
     
 }
@@ -288,32 +330,78 @@ def train_keras(df_train, df_val, var, mdl, get_data):
  
     activ = lambda : Activation('relu')
 
-    model = Sequential()
- 
-    model.add(Dense(mdl["n_nodes"], input_dim = 256))
-    model.add(activ())
-    model.add(Dropout(mdl["dropout"]))
 
-    for ilayer in range(mdl["n_layers"]):  
-        model.add(Dense(mdl["n_nodes"]))
-        model.add(activ())                   
-        model.add(Dropout(mdl["dropout"]))
+
+# 1D Model 
+
+#    model = Sequential()
+#
+#    model.add(Dense(mdl["n_nodes"], input_dim = 256))
+#    model.add(activ())
+#    model.add(Dropout(mdl["dropout"]))
+#
+#    for ilayer in range(mdl["n_layers"]):  
+#        model.add(Dense(mdl["n_nodes"]))
+#        model.add(activ())                   
+#        model.add(Dropout(mdl["dropout"]))
+#
+#    model.add(Dense(nclasses))
+#    model.add(Activation('softmax'))
+#
+#    sgd = SGD(lr=mdl["lr"], 
+#              decay=mdl["decay"], 
+#              momentum=mdl["momentum"], 
+#              nesterov=True)
+#    model.compile(loss='mean_squared_error', optimizer=sgd)
+#
+#    ret = model.fit(X_train, 
+#                    np_utils.to_categorical(y_train), 
+#                    nb_epoch = mdl["nb_epoch"],
+#                    verbose=2, 
+#                    validation_data=(X_val, np_utils.to_categorical(y_val)),
+#                    show_accuracy=True)
+
+
+    model = Sequential()
+
+    for i_block in range(mdl["n_blocks"]):
+        for i_conv_layer in range(mdl["n_conv_layers"]):
+
+            if i_conv_layer == 0 and i_block ==0:
+                model.add(ZeroPadding2D(padding=(1, 1), input_shape=(1, 16, 16)))
+            else:
+                model.add(ZeroPadding2D(padding=(1, 1)))
+
+            model.add(Convolution2D(mdl["conv_nfeat"],
+                                    mdl["conv_size" ], 
+                                    mdl["conv_size" ]))
+            model.add(activ())
+        
+        if mdl["pool_size"] > 0:
+            model.add(MaxPooling2D(pool_size=(mdl["pool_size"], mdl["pool_size"])))
+
+    model.add(Flatten())
+
+    for i_dense_layer in range(mdl["n_dense_layers"]):
+        model.add(Dense(mdl["n_dense_nodes"]))
+        model.add(activ())    
 
     model.add(Dense(nclasses))
     model.add(Activation('softmax'))
 
-    sgd = SGD(lr=mdl["lr"], 
-              decay=mdl["decay"], 
-              momentum=mdl["momentum"], 
+    sgd = SGD(lr = mdl["lr"], 
+              decay = mdl["decay"], 
+              momentum = mdl["momentum"], 
               nesterov=True)
     model.compile(loss='mean_squared_error', optimizer=sgd)
-
+                
     ret = model.fit(X_train, 
                     np_utils.to_categorical(y_train), 
                     nb_epoch = mdl["nb_epoch"],
                     verbose=2, 
                     validation_data=(X_val, np_utils.to_categorical(y_val)),
                     show_accuracy=True)
+
   
     plt.clf()
     plt.plot(ret.history["acc"])

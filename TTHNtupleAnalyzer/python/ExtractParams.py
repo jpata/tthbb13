@@ -6,7 +6,9 @@ import glob
 import pickle
 
 
-params = ["n_layers", "n_nodes", "dropout", "lr", "decay", "momentum", "nb_epoch"]
+#params = ["n_layers", "n_nodes", "dropout", "lr", "decay", "momentum", "nb_epoch"]
+params = ["n_blocks", "n_conv_layers", "conv_nfeat", "conv_size", "pool_size", "n_dense_layers", "n_dense_nodes", "lr", "decay", "momentum" , "nb_epoch"]
+
 
 if not len(sys.argv) == 2:
     print "Invalid number of arguments"
@@ -66,7 +68,7 @@ def pretty_print(d):
     fields = [ "valacc", "maxvalacc", "delacc"] + params    
     n_fields = len(fields)
     
-    form_string = " ".join(["{" + str(i) + ": <12.4" + "}" for i in range(n_fields)])
+    form_string = " ".join(["{" + str(i) + ": <9.4" + "}" for i in range(n_fields)])
     vals =  [float(d[f]) for f in fields]
 
 
@@ -76,7 +78,7 @@ def pretty_print(d):
 
 fields = ["maxvalacc", "valacc", "delacc"] + params    
 n_fields = len(fields)
-form_string = " ".join(["{" + str(i) + ": <12" + "}" for i in range(n_fields)])
+form_string = " ".join(["{" + str(i) + ": <9" + "}" for i in range(n_fields)])
 print form_string.format(*fields)
 
 #pdb.set_trace()
@@ -84,7 +86,7 @@ print form_string.format(*fields)
 #for k in di.keys():
 #    print k, di[k], di[k]["valacc"].__class__ 
 
-sorted_keys = sorted(di.keys(), key = lambda x:di[x]["valacc"])[-50:]
+sorted_keys = sorted(di.keys(), key = lambda x:di[x]["valacc"])[-30:]
 
 for k in sorted_keys:
     print pretty_print(di[k]), k
