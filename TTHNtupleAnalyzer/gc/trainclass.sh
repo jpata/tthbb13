@@ -47,6 +47,7 @@ echo "copying output"
 
 cp $MY_SCRATCH/*.png $OUTDIR 
 cp $MY_SCRATCH/valacc.txt $OUTDIR 
+cp $MY_SCRATCH/maxvalacc.txt $OUTDIR 
 cp $MY_SCRATCH/deltaacc.txt $OUTDIR 
 env > $OUTDIR/env.txt
 

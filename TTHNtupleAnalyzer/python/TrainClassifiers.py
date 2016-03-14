@@ -292,6 +292,7 @@ def train_keras(df_train, df_val, var, mdl, get_data):
  
     model.add(Dense(mdl["n_nodes"], input_dim = 256))
     model.add(activ())
+    model.add(Dropout(mdl["dropout"]))
 
     for ilayer in range(mdl["n_layers"]):  
         model.add(Dense(mdl["n_nodes"]))
@@ -327,6 +328,10 @@ def train_keras(df_train, df_val, var, mdl, get_data):
     valacc_out = open("valacc.txt", "w")
     valacc_out.write(str(ret.history["val_acc"][-1]) + "\n")
     valacc_out.close()
+
+    maxvalacc_out = open("maxvalacc.txt", "w")
+    maxvalacc_out.write(str(max(ret.history["val_acc"])) + "\n")
+    maxvalacc_out.close()
     
     deltaacc_out = open("deltaacc.txt", "w")
     deltaacc_out.write(str(ret.history["val_acc"][-1] - ret.history["acc"][-1]) + "\n")
