@@ -79,7 +79,7 @@ brs = ["evt",
        "ak08_emap", 
        #"ak08_ptmap", 
        #"ak08_massmap", 
-       #"ak08_chargemap"
+       "ak08_chargemap"
 ]
 
 to_plot = ["pt", "eta", "top_size", 
@@ -87,37 +87,30 @@ to_plot = ["pt", "eta", "top_size",
            "ak08softdropz10b00forbtag_btag", 
            "ak08softdropz10b00_mass"]
 
-# 1D
-# default_mdl = {        
-#     "n_layers"    : 1,
-#     "n_nodes"     : 512,
-#     "dropout"     : 0.3,
-# 
-#     "lr"          : 0.01,
-#     "decay"       : 1e-6,
-#     "momentum"    : 0.9,            
-# 
-#     "nb_epoch"    : 50,
-# }
 
+default_params = {        
 
-default_mdl = {        
-    "n_blocks" : 2,    
+    "architecture" : "2dconv",
 
-    "n_conv_layers" : 2,        
-    "conv_nfeat" : 1,
-    "conv_size"  : 4,
+    # Parameters for 1d architecture
+    "1d_n_layers"    : 1,
+    "1d_n_nodes"     : 512,
+    "1d_dropout"     : 0.3,
 
-    "pool_size"  : 2,
+    # Parameters for 2d or 3d convolutional architecture    
+    "n_blocks"       : 1,    
+    "n_conv_layers"  : 1,        
+    "conv_nfeat"     : 1,
+    "conv_size"      : 2,
+    "pool_size"      : 0,
+    "n_dense_layers" : 1,
+    "n_dense_nodes"  : 8,
 
-    "n_dense_layers" : 2,
-    "n_dense_nodes"  : 16,
-
+    # Common parameters
     "lr"          : 0.01,
     "decay"       : 1e-6,
     "momentum"    : 0.9,            
-
-    "nb_epoch"    : 50,
+    "nb_epoch"    : 10,
 }
 
 colors = ['black', 'red','blue','green','orange','green','magenta']
@@ -187,21 +180,15 @@ print "Preparing Data: Done..."
 # Read in NN parameters
 ########################################
 
-mdl = {}
-for param in default_mdl.keys():
+params = {}
+for param in default_params.keys():
 
     if param in os.environ.keys():
-
-        cls = default_mdl[param].__class__
+        cls = default_params[param].__class__
         value = cls(os.environ[param])
-        mdl[param] = value
-        print "Setting ", param, value
+        params[param] = value
     else:
-        mdl[param] = default_mdl[param]
-
-    for k,v in mdl.iteritems():
-        print k,v
-
+        params[param] = default_params[param]
 
 ########################################
 # Classifiers
@@ -220,13 +207,18 @@ def get_data_flatten(df, varlist):
     return ret 
 
 
-# TODO: make more elegant, interface properly
-# Also prepare a scaler
-scaler = StandardScaler()  
-scaler.fit(get_data_flatten(dtrain, ["ak08_emap"]))
+scaler_emap = StandardScaler()  
+scaler_emap.fit(get_data_flatten(dtrain, ["ak08_emap"]))
 
 def get_data_emap(df, varlist):
-    return scaler.transform(get_data_flatten(df, varlist))
+    return scaler_emap.transform(get_data_flatten(df, varlist))
+
+scaler_chargemap = StandardScaler()  
+scaler_chargemap.fit(get_data_flatten(dtrain, ["ak08_chargemap"]))
+
+def get_data_chargemap(df, varlist):
+    return scaler_chargemap.transform(get_data_flatten(df, varlist))
+
 
 def get_data_emap_2d(df, varlist):
     tmp  = get_data_emap(df, varlist)
@@ -234,173 +226,253 @@ def get_data_emap_2d(df, varlist):
     n_lines = tmp2.shape[0]
     tmp3 = tmp2.reshape(n_lines, 16, 16)
     tmp4 = np.expand_dims(tmp3, axis=1)    
-
-    print tmp.shape
-    print tmp2.shape
-    print tmp3.shape
-    print tmp4.shape
-
     return tmp4
 
 
-classifiers = {
+def get_data_3d(df, varlist):
 
-    "BDT" : ["scikit", 
-             ["ak08_tau3", "ak08_tau2", "ak08softdropz10b00forbtag_btag", "ak08softdropz10b00_mass"],            
-             GradientBoostingClassifier(
-                 n_estimators=200,
-                 learning_rate=0.1,
-                 max_leaf_nodes = 6,
-                 min_samples_split=1,
-                 min_samples_leaf=1,
-                 subsample=0.8,
-                 verbose = True,
-             ),
-             True,
-             get_data_vars,
-         ],
+    emap      = get_data_emap(df, ["ak08_emap"])
+    chargemap = get_data_chargemap(df, ["ak08_chargemap"])
 
-    "BDT-nob" : ["scikit", 
-                 ["ak08_tau3", "ak08_tau2", "ak08softdropz10b00_mass"],            
-                 GradientBoostingClassifier(
-                     n_estimators=200,
-                     learning_rate=0.1,
-                     max_leaf_nodes = 6,
-                     min_samples_split=1,
-                     min_samples_leaf=1,
-                     subsample=0.8,
-                     verbose = True,
-                 ),
-                 True,
-                 get_data_vars,
-             ],
+    n_lines = len(emap)
 
-#    "NN" : ["keras",
-#            ["ak08_emap"],
-#            mdl,
-#            False,
-#            get_data_emap
-#        ],
+    emap_shaped      = np.expand_dims(np.expand_dims(emap,      axis=-1).reshape(n_lines, 16,16), axis=1)
+    chargemap_shaped = np.expand_dims(np.expand_dims(chargemap, axis=-1).reshape(n_lines, 16,16), axis=1)
 
-    "NN2d" : ["keras",
-              ["ak08_emap"],
-              mdl,
-              False,
-              get_data_emap_2d
-        ],
+    return np.append(emap_shaped, chargemap_shaped, axis=1)
+
+
+if params["architecture"] == "2dconv":
+    variables = ["ak08_emap"]
+    get_data_function = get_data_emap_2d
+else:
+    variables = ["ak08_emap", "ak08_chargemap"]
+    get_data_function = get_data_3d
+
+
+
+class Classifier:
+    def __init__(self,
+                 name,
+                 varlist,
+                 backend,
+                 params,
+                 load_from_file,
+                 get_data,
+                 model=None):
+        self.name = name
+        self.varlist = varlist
+        self.backend = backend
+        self.params = params
+        self.load_from_file = load_from_file
+        self.get_data = get_data
+        self.model = model
+
+    def prepare(self):
+
+        if not self.load_from_file:
+            if self.backend == "scikit":
+                train_scikit(dtrain, self)
+            elif self.backend == "keras":
+                train_keras(dtrain, dtest, self)
+        else:
+            if self.backend == "scikit":
+                f = open(self.name + ".pickle", "r")
+                self.model = pickle.load(f)
+                f.close()
+            elif self.backend == "keras":
+                f = open(self.name + ".yaml", "r")
+                yaml_string = f.read()
+                f.close()
+                self.model = model_from_yaml(yaml_string)                
+                self.model.load_weights(self.name + "_weights.h5")
+            print "Loading", self.name, "from file: Done..."
+
+classifiers = [
+
+    Classifier("BDT",
+               ["ak08_tau3", "ak08_tau2", "ak08softdropz10b00forbtag_btag", "ak08softdropz10b00_mass"],            
+               "scikit", 
+               {},
+               True,
+               get_data_vars,
+               model = GradientBoostingClassifier(
+                   n_estimators=200,
+                   learning_rate=0.1,
+                   max_leaf_nodes = 6,
+                   min_samples_split=1,
+                   min_samples_leaf=1,
+                   subsample=0.8,
+                   verbose = True,
+               )),
+
+    Classifier("BDT-nob",
+               ["ak08_tau3", "ak08_tau2", "ak08softdropz10b00_mass"],            
+               "scikit", 
+               {},
+               True,
+               get_data_vars,                              
+               model = GradientBoostingClassifier(
+                   n_estimators=200,
+                   learning_rate=0.1,
+                   max_leaf_nodes = 6,
+                   min_samples_split=1,
+                   min_samples_leaf=1,
+                   subsample=0.8,
+                   verbose = True,
+                 )),
+
+#    Classifier("NN", 
+#               ["ak08_emap"],
+#               "keras",              
+#               {"architecture" : "1d",
+#                "1d_n_layers"    : 1,
+#                "1d_n_nodes"     : 100,
+#                "1d_dropout"     : 0.3,                   
+#                "lr"             : 0.01,
+#                "decay"          : 1e-6,
+#                "momentum"       : 0.9,            
+#                "nb_epoch"       : 10},               
+#               True,
+#               get_data_emap),
+#
+    Classifier("NNXd", 
+               variables,
+               "keras",              
+               params,
+               False,
+               get_data_function)
     
-}
+]
 
 
 ########################################
 # Helper: train_scitkit
 ########################################
 
-def train_scikit(df, var, clf, get_data):
+def train_scikit(df, clf):
 
     df_shuf = df.iloc[np.random.permutation(np.arange(len(df)))]
 
-    X = get_data(df_shuf,var)
+    X = clf.get_data(df_shuf,clf.varlist)
     y = df_shuf["is_signal_new"].values
 
-    clf.fit(X, y)
-    clf.varlist = var
+    clf.model.fit(X, y)
 
-    return clf
+    f = open(clf.name + ".pickle","wb")
+    pickle.dump(clf.model, f)
+    f.close()
 
 
 ########################################
 # Helper: train_keras
 ########################################
 
-def train_keras(df_train, df_val, var, mdl, get_data):
+def train_keras(df_train, df_val, clf):
 
-    print "Starting train_keras with the parameters: ",
-    for k,v in mdl.iteritems():
-        print k,v
+    print "Starting train_keras with the parameters: "
+    for k,v in clf.params.iteritems():
+        print "\t", k,"=",v
 
     channels = 1
     nclasses = 2
     
-    X_train = get_data(df_train, var)
-    X_val   = get_data(df_val, var)
+    X_train = clf.get_data(df_train, clf.varlist)
+    X_val   = clf.get_data(df_val, clf.varlist)
  
     y_train = df_train["is_signal_new"].values
     y_val   = df_val["is_signal_new"].values
  
     activ = lambda : Activation('relu')
 
+    clf.model = Sequential()
+
+    # 1D Model
+    if clf.params["architecture"] == "1d":
+
+        clf.model.add(Dense(clf.params["1d_n_nodes"], input_dim = 256))
+        clf.model.add(activ())
+        clf.model.add(Dropout(clf.params["1d_dropout"]))
+
+        for ilayer in range(clf.params["1d_n_layers"]):  
+            clf.model.add(Dense(clf.params["1d_n_nodes"]))
+            clf.model.add(activ())                   
+            clf.model.add(Dropout(clf.params["1d_dropout"]))
+
+        clf.model.add(Dense(nclasses))
+        clf.model.add(Activation('softmax'))
+
+    # 2D Convolutional Model
+    elif clf.params["architecture"] == "2dconv":
+
+        for i_block in range(clf.params["n_blocks"]):
+            for i_conv_layer in range(clf.params["n_conv_layers"]):
+
+                if i_conv_layer == 0 and i_block ==0:
+                    clf.model.add(ZeroPadding2D(padding=(1, 1), input_shape=(1, 16, 16)))
+                else:
+                    clf.model.add(ZeroPadding2D(padding=(1, 1)))
+
+                clf.model.add(Convolution2D(clf.params["conv_nfeat"],
+                                        clf.params["conv_size" ], 
+                                        clf.params["conv_size" ]))
+                clf.model.add(activ())
+
+            if clf.params["pool_size"] > 0:
+                clf.model.add(MaxPooling2D(pool_size=(clf.params["pool_size"], clf.params["pool_size"])))
+
+        clf.model.add(Flatten())
+
+        for i_dense_layer in range(clf.params["n_dense_layers"]):
+            clf.model.add(Dense(clf.params["n_dense_nodes"]))
+            clf.model.add(activ())    
+
+        clf.model.add(Dense(nclasses))
+        clf.model.add(Activation('softmax'))
+
+    # 3D Convolutional Model
+    elif clf.params["architecture"] == "3dconv":
+
+        for i_block in range(clf.params["n_blocks"]):
+            for i_conv_layer in range(clf.params["n_conv_layers"]):
+
+                if i_conv_layer == 0 and i_block ==0:
+                    clf.model.add(ZeroPadding2D(padding=(1, 1), input_shape=(2, 16, 16)))
+                else:
+                    clf.model.add(ZeroPadding2D(padding=(1, 1)))
+
+                clf.model.add(Convolution2D(clf.params["conv_nfeat"],
+                                        clf.params["conv_size" ], 
+                                        clf.params["conv_size" ]))
+                clf.model.add(activ())
+
+            if clf.params["pool_size"] > 0:
+                clf.model.add(MaxPooling2D(pool_size=(clf.params["pool_size"], clf.params["pool_size"])))
+
+        clf.model.add(Flatten())
+
+        for i_dense_layer in range(clf.params["n_dense_layers"]):
+            clf.model.add(Dense(clf.params["n_dense_nodes"]))
+            clf.model.add(activ())    
+
+        clf.model.add(Dense(nclasses))
+        clf.model.add(Activation('softmax'))
 
 
-# 1D Model 
-
-#    model = Sequential()
-#
-#    model.add(Dense(mdl["n_nodes"], input_dim = 256))
-#    model.add(activ())
-#    model.add(Dropout(mdl["dropout"]))
-#
-#    for ilayer in range(mdl["n_layers"]):  
-#        model.add(Dense(mdl["n_nodes"]))
-#        model.add(activ())                   
-#        model.add(Dropout(mdl["dropout"]))
-#
-#    model.add(Dense(nclasses))
-#    model.add(Activation('softmax'))
-#
-#    sgd = SGD(lr=mdl["lr"], 
-#              decay=mdl["decay"], 
-#              momentum=mdl["momentum"], 
-#              nesterov=True)
-#    model.compile(loss='mean_squared_error', optimizer=sgd)
-#
-#    ret = model.fit(X_train, 
-#                    np_utils.to_categorical(y_train), 
-#                    nb_epoch = mdl["nb_epoch"],
-#                    verbose=2, 
-#                    validation_data=(X_val, np_utils.to_categorical(y_val)),
-#                    show_accuracy=True)
-
-
-    model = Sequential()
-
-    for i_block in range(mdl["n_blocks"]):
-        for i_conv_layer in range(mdl["n_conv_layers"]):
-
-            if i_conv_layer == 0 and i_block ==0:
-                model.add(ZeroPadding2D(padding=(1, 1), input_shape=(1, 16, 16)))
-            else:
-                model.add(ZeroPadding2D(padding=(1, 1)))
-
-            model.add(Convolution2D(mdl["conv_nfeat"],
-                                    mdl["conv_size" ], 
-                                    mdl["conv_size" ]))
-            model.add(activ())
-        
-        if mdl["pool_size"] > 0:
-            model.add(MaxPooling2D(pool_size=(mdl["pool_size"], mdl["pool_size"])))
-
-    model.add(Flatten())
-
-    for i_dense_layer in range(mdl["n_dense_layers"]):
-        model.add(Dense(mdl["n_dense_nodes"]))
-        model.add(activ())    
-
-    model.add(Dense(nclasses))
-    model.add(Activation('softmax'))
-
-    sgd = SGD(lr = mdl["lr"], 
-              decay = mdl["decay"], 
-              momentum = mdl["momentum"], 
+    # Prepare model and train
+    sgd = SGD(lr = clf.params["lr"], 
+              decay = clf.params["decay"], 
+              momentum = clf.params["momentum"], 
               nesterov=True)
-    model.compile(loss='mean_squared_error', optimizer=sgd)
+    clf.model.compile(loss='mean_squared_error', optimizer=sgd)
                 
-    ret = model.fit(X_train, 
+    ret = clf.model.fit(X_train, 
                     np_utils.to_categorical(y_train), 
-                    nb_epoch = mdl["nb_epoch"],
+                    nb_epoch = clf.params["nb_epoch"],
                     verbose=2, 
                     validation_data=(X_val, np_utils.to_categorical(y_val)),
                     show_accuracy=True)
+
 
   
     plt.clf()
@@ -424,22 +496,27 @@ def train_keras(df_train, df_val, var, mdl, get_data):
     deltaacc_out = open("deltaacc.txt", "w")
     deltaacc_out.write(str(ret.history["val_acc"][-1] - ret.history["acc"][-1]) + "\n")
     deltaacc_out.close()
-            
-    model.varlist = var
  
-    return model
+    # save the architecture
+    model_out_yaml = open(clf.name + ".yaml", "w")
+    model_out_yaml.write(clf.model.to_yaml())
+    model_out_yaml.close()
+    
+    # And the weights
+    clf.model.save_weights(clf.name + '_weights.h5', 
+                           overwrite=True)
 
     
 ########################################
 # Helper: rocplot
 ########################################
 
-def rocplot(name, clf, tmp_df, classes, class_names, get_data):
+def rocplot(clf, tmp_df, classes, class_names):
 
     # Predict all probabilities
 
-    X_test = get_data(tmp_df,clf.varlist)
-    all_probs = clf.predict_proba(X_test)    
+    X_test = clf.get_data(tmp_df,clf.varlist)
+    all_probs = clf.model.predict_proba(X_test)    
 
     # And add them to (copy of) dataframe
     df = tmp_df.copy()
@@ -487,7 +564,7 @@ def rocplot(name, clf, tmp_df, classes, class_names, get_data):
         plt.legend(loc=1)
         plt.xlim(min_prob,max_prob)
         plt.show()
-        plt.savefig(name + "-" + str(sig_class) + "-proba.png")
+        plt.savefig(clf.name + "-" + str(sig_class) + "-proba.png")
 
         plt.clf()
         
@@ -521,14 +598,14 @@ def rocplot(name, clf, tmp_df, classes, class_names, get_data):
         plt.ylim(0,1)
 
         plt.show()
-        plt.savefig(name + "-" + str(sig_class) + "-ROC.png")
+        plt.savefig(clf.name + "-" + str(sig_class) + "-ROC.png")
 
 
+########################################
+# Helper: multirocplot
+########################################
 
-def multirocplot(names, 
-                 clfs, 
-                 get_datas,
-                 tmp_df):
+def multirocplot(clfs, tmp_df):
 
     df = tmp_df.copy()
 
@@ -544,26 +621,26 @@ def multirocplot(names,
 
     rocs = []
 
-    for name, clf, get_data in zip(names, clfs, get_datas):
+    for clf in clfs:
         
-        X_test = get_data(df, clf.varlist)
-        df["proba_" + name] = clf.predict_proba(X_test)[:,sig_class]
+        X_test = clf.get_data(df, clf.varlist)
+        df["proba_" + clf.name] = clf.model.predict_proba(X_test)[:,sig_class]
 
         # Signal Efficiency
         sig = df["is_signal_new"]==sig_class
-        probs1 = df[sig]["proba_" + name].values
+        probs1 = df[sig]["proba_" + clf.name].values
         h1 = make_df_hist((nbins*5,min_prob,max_prob), probs1)
         
         # Background efficiency
         bkg = df["is_signal_new"]==bkg_class
-        probs2 = df[bkg]["proba_" + name].values
+        probs2 = df[bkg]["proba_" + clf.name].values
         h2 = make_df_hist((nbins*5,min_prob,max_prob), probs2)
 
         # And turn into ROC
         r, e = calc_roc(h1, h2)
         rocs.append(r)
         
-        plt.plot(r[:, 0], r[:, 1], label=name, lw=1, ls="--")
+        plt.plot(r[:, 0], r[:, 1], label=clf.name, lw=1, ls="--")
 
     # Setup nicely
     plt.legend(loc=2)
@@ -576,27 +653,6 @@ def multirocplot(names,
     plt.show()
     plt.savefig("All-ROC.png")
 
-
-def prepare(name, backend, variables, classifier, get_data, load_from_file):
-
-    if not load_from_file:
-        if backend == "scikit":
-            clf = train_scikit(dtrain, variables, classifier, get_data)
-        elif backend == "keras":
-            clf = train_keras(dtrain, dtest, variables, classifier, get_data)
-    else:
-        if backend == "scikit":
-            f = open(name + ".pickle", "r")
-            clf = pickle.load(f)
-            f.close()
-            print "Loading from file: Done..."
-        elif backend == "keras":
-            #f = open(name + ".yaml", "r")
-            #model = model_from_yaml(yaml_string)
-            print "Sorry, can't load keras from file yet"
-            clf = None
-
-    return clf
 
 
 ########################################
@@ -627,62 +683,30 @@ if plot_inputs:
     print "Plotting 1D inputs: Done..."
 
     # 2D maps
-    
-    X = get_data_emap(dtrain, ["ak08_emap"])
+    for map_name in ["ak08_emap", "ak08_chargemap"]:
 
-    for idx in range(20):
-        map_1d = X[idx]
-        map_2d = map_1d.reshape(16,16)
+        X = dtrain[map_name].values.flatten()
 
-        plt.clf()
+        for idx in range(20):
+            map_1d = X[idx]
+            map_2d = map_1d.reshape(16,16)
 
-        plt.imshow(map_2d, interpolation = 'spline36')
-        #plt.colorbar(map_2d)
-        plt.savefig("maps/{0}_{1}.png".format("emap", idx))
+            plt.clf()
+
+            plt.imshow(map_2d, interpolation = 'spline36')
+            #plt.colorbar(map_2d)
+            plt.savefig("maps/{0}_{1}.png".format(map_name, idx))
 
     print "Plotting 2D inputs: Done..."
 
 
+########################################
+# Train/Load classifiers and make ROCs
+########################################
 
-
-# Handle all classifiers
-#for k,v in classifiers.iteritems():
-if False:
-
-    print "Doing: ", k
-
-    backend        = v[0]
-    variables      = v[1]
-    classifier     = v[2]
-    load_from_file = v[3]
-    get_data       = v[4]
-
-    clf =  prepare(k, variables, classifier, get_data, load_from_file)
-        
-    rocplot(k, clf, dtest, classes, class_names, get_data)
-
-    # And store    
-    if not load_from_file:
-        if backend == "scikit":
-            f = open(k + ".pickle","wb")
-            pickle.dump(clf, f)
-            f.close()
-        elif backend == "keras":            
-            model_out = open(k + ".yaml", "w")
-            model_out.write(clf.to_yaml())
-            model_out.close()
-            
-all_names = classifiers.keys()
-
-multirocplot([n for n in all_names],
-             [prepare(n, 
-                      classifiers[n][0], 
-                      classifiers[n][1], 
-                      classifiers[n][2], 
-                      classifiers[n][4], 
-                      classifiers[n][3]) for n in all_names],
-             [classifiers[n][4] for n in all_names],
-             dtest)
+[clf.prepare() for clf in classifiers]
+[rocplot(clf, dtest, classes, class_names) for clf in classifiers]
+multirocplot(classifiers, dtest)
 
  
 

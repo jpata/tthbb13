@@ -68,7 +68,7 @@ def pretty_print(d):
     fields = [ "valacc", "maxvalacc", "delacc"] + params    
     n_fields = len(fields)
     
-    form_string = " ".join(["{" + str(i) + ": <9.4" + "}" for i in range(n_fields)])
+    form_string = " ".join(["{" + str(i) + ": <12.4" + "}" for i in range(n_fields)])
     vals =  [float(d[f]) for f in fields]
 
 
@@ -78,7 +78,7 @@ def pretty_print(d):
 
 fields = ["maxvalacc", "valacc", "delacc"] + params    
 n_fields = len(fields)
-form_string = " ".join(["{" + str(i) + ": <9" + "}" for i in range(n_fields)])
+form_string = " ".join(["{" + str(i) + ": <12" + "}" for i in range(n_fields)])
 print form_string.format(*fields)
 
 #pdb.set_trace()
@@ -86,7 +86,7 @@ print form_string.format(*fields)
 #for k in di.keys():
 #    print k, di[k], di[k]["valacc"].__class__ 
 
-sorted_keys = sorted(di.keys(), key = lambda x:di[x]["valacc"])[-30:]
+sorted_keys = sorted(di.keys(), key = lambda x:di[x]["valacc"])[-50:]
 
 for k in sorted_keys:
     print pretty_print(di[k]), k

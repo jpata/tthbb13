@@ -49,6 +49,8 @@ cp $MY_SCRATCH/*.png $OUTDIR
 cp $MY_SCRATCH/valacc.txt $OUTDIR 
 cp $MY_SCRATCH/maxvalacc.txt $OUTDIR 
 cp $MY_SCRATCH/deltaacc.txt $OUTDIR 
+cp $MY_SCRATCH/*.yaml $OUTDIR 
+cp $MY_SCRATCH/*.h5 $OUTDIR 
 env > $OUTDIR/env.txt
 
 
