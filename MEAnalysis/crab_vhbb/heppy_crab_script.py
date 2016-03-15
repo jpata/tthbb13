@@ -71,27 +71,28 @@ looper.write()
 #Now we need to copy both the vhbb and tth outputs to the same file
 inf1 = ROOT.TFile("Output/tree.root")
 inf2 = ROOT.TFile("Output_tth/tree.root")
-
 tof = ROOT.TFile("tree.root", "RECREATE")
-#copy ttjets output
-vhbb_dir = tof.mkdir("vhbb")
-vhbb_dir.cd()
-for k in inf1.GetListOfKeys():
-    o = k.ReadObj().Clone()
-    o.Write("", ROOT.TObject.kOverwrite)
 
-#copy tth output
-tof.cd()
-for k in inf2.GetListOfKeys():
-    o = k.ReadObj().Clone()
-    o.Write("", ROOT.TObject.kOverwrite)
-tof.Write()
-tof.Close()
+vhbb_dir = tof.mkdir("vhbb")
+def copyTo(src, dst):
+    #copy ttjets output
+    dst.cd()
+    for k in src.GetListOfKeys():
+        o = k.ReadObj()
+        if o.ClassName() == "TTree":
+            o = o.CloneTree()
+        else:
+            o = o.Clone()
+        print k, o 
+        dst.Add(o) 
+        o.Write("", ROOT.TObject.kOverwrite)
+
+copyTo(inf1, vhbb_dir)
+copyTo(inf2, tof)
 
 #print PSet.process.output.fileName
 #os.system("./addTreeFiles.py tree.root Output/tree.root Output_tth/tree.root")
 
-import ROOT
 f=ROOT.TFile.Open('tree.root')
 entries=f.Get('tree').GetEntries()
 
