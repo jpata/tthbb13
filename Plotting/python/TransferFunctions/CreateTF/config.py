@@ -27,7 +27,7 @@ import datetime
 # Main
 ########################################
 
-def Make_config():
+def Make_config(filename):
 
     config = {}
 
@@ -48,11 +48,11 @@ def Make_config():
     # I/O information
     ########################################
 
-    config['input_root_file_name'] = 'root://t3se01.psi.ch:1094//store/user/jpata/tth/tf_trees/JP_VHBBHeppyV20_subjet.root'
+    config['input_root_file_name'] = 'root://t3se01.psi.ch:1094//store/user/jpata/tth/tf_trees/{0}.root'.format(filename)
 
     config['input_tree_name'] = 'tree'
 
-    config['outputdir'] = 'VHBBHeppyV20_subjets'
+    config['outputdir'] = filename
 
         
     config['SBF_fitted_hists_pickle_filename'] = \
@@ -332,6 +332,8 @@ def Make_config():
 
     f = open( 'config.dat', 'wb' )
     pickle.dump( config , f)
+    print config
+    f.close()
 
     print "config.dat created"
 
@@ -341,12 +343,15 @@ def Make_config():
 
     shutil.copyfile( 'config.py', 'configs/{0}/config.py'.format(
         config['outputdir'] ) )
+    shutil.copyfile( 'config.dat', 'configs/{0}/config.dat'.format(
+        config['outputdir'] ) )
 
 ########################################
 # End of Main
 ########################################
 def main():
-    Make_config()
+    Make_config('TF_tthbb13_resolved')
+    Make_config('TF_tthbb13_subjet')
 
 if __name__ == "__main__":
   main()

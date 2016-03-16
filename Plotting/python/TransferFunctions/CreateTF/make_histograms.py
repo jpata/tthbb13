@@ -281,18 +281,18 @@ def Make_hist_mat( eta_axis, E_axis, particle, config ):
 # Make_Histograms
 ########################################
 
-def Make_Histograms():
+def Make_Histograms(conffile):
 
     ########################################
     # Get the configuration file
     ########################################
 
-    if not os.path.isfile('config.dat'):
-        print "Error: Can't find configuration file config.dat"
+    print 'Importing configuration data from {0}'.format(conffile)
+    if not os.path.isfile(conffile):
+        print "Error: Can't find configuration file {0}".format(conffile)
         return 0
 
-    print 'Importing configuration data'
-    pickle_f = open( 'config.dat', 'rb' )
+    pickle_f = open( conffile, 'rb' )
     config = pickle.load( pickle_f )
     pickle_f.close()
 
@@ -489,11 +489,11 @@ def Make_Histograms():
 
 
     ########################################
-    # Adding extra info to config.dat
+    # Adding extra info to config file
     ########################################   
 
-    print 'Adding single bin fit information to config.dat'
-    pickle_f = open( 'config.dat', 'wb' )
+    print 'Adding single bin fit information to {0}'.format(conffile)
+    pickle_f = open( conffile, 'wb' )
     pickle.dump( config, pickle_f )
     pickle_f.close()
 

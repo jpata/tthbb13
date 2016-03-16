@@ -53,9 +53,11 @@ def Make_config(do_subjets=False):
     #config["root_file_base"] = "dcap:///pnfs/psi.ch/cms/trivcat/"
 
     # The config file will be copied to 'runs/{config['run_name']}'
-    config['run_name'] = 'JP_VHBBHeppyV20'
+    config['run_name'] = 'TF_tthbb13'
     if do_subjets:
         config['run_name'] += "_subjet"
+    else:
+        config['run_name'] += "_resolved"
 
     config['output_root_file_name'] = 'out.root'
 
@@ -211,10 +213,8 @@ def Make_config(do_subjets=False):
 # End of Main
 ########################################
 def main():
-    if sys.argv[1] == "resolvedjets":
-        Make_config(do_subjets=True)
-    elif sys.argv[1] == "subjets":
-        Make_config(do_subjets=False)
+    Make_config(do_subjets=True)
+    Make_config(do_subjets=False)
 
 if __name__ == "__main__":
   main()

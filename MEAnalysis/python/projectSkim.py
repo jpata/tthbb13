@@ -21,6 +21,7 @@ tt.SetBranchStatus("ttCls", True)
 tt.SetBranchStatus("run", True)
 tt.SetBranchStatus("lumi", True)
 tt.SetBranchStatus("evt", True)
+tt.SetBranchStatus("jets_*", True)
 #tt.SetBranchStatus("weight_xs", True)
 
 of = ROOT.TFile(ofname, "RECREATE")
