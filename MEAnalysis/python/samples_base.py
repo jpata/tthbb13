@@ -100,7 +100,7 @@ if "kbfi" in hn or "kbfi" in vo or "comp" in hn:
     def lfn_to_pfn(fn):
 
         #fix to replace broken file names
-        if fn.startswith("/home"):
+        if fn.startswith("file://") or fn.startswith("root://"):
             return fn
         else:
             return "file:///hdfs/cms" + fn

@@ -1,6 +1,6 @@
 from TTH.MEAnalysis.Analyzer import FilterAnalyzer
 import ROOT
-from TTH.MEAnalysis.vhbb_utils import lvec
+from TTH.MEAnalysis.vhbb_utils import lvec, autolog
 
 class LeptonAnalyzer(FilterAnalyzer):
     """
@@ -32,7 +32,7 @@ class LeptonAnalyzer(FilterAnalyzer):
             event.selLeptons,
         )
         if "debug" in self.conf.general["verbosity"]:
-            print "input muons: ", len(event.mu)
+            autolog("input muons: ", len(event.mu))
             for it in event.mu:
                 (self.conf.leptons["mu"]["debug"])(it)
 
@@ -41,7 +41,7 @@ class LeptonAnalyzer(FilterAnalyzer):
             event.selLeptons,
         )
         if "debug" in self.conf.general["verbosity"]:
-            print "input electrons: ", len(event.el)
+            autolog("input electrons: ", len(event.el))
             for it in event.el:
                 (self.conf.leptons["el"]["debug"])(it)
 
@@ -53,9 +53,9 @@ class LeptonAnalyzer(FilterAnalyzer):
                 isotype = self.conf.leptons[lep_flavour]["isotype"]
                 isocut = lepcuts.get("iso", 99)
                 if "debug" in self.conf.general["verbosity"]:
-                    print "input collection", id_type, lep_flavour
+                    autolog("input collection", id_type, lep_flavour)
                     for lep in incoll:
-                        print lep.pt, lep.eta, lep.pdgId
+                        autolog(lep.pt, lep.eta, lep.pdgId)
 
                 leps = filter(
                     lambda x, lepcuts=lepcuts: (
@@ -64,9 +64,9 @@ class LeptonAnalyzer(FilterAnalyzer):
                     ), incoll
                 )
                 if "debug" in self.conf.general["verbosity"]:
-                    print "after eta"
+                    autolog("after eta")
                     for lep in leps:
-                        print lep.pt, lep.eta, lep.pdgId
+                        autolog(lep.pt, lep.eta, lep.pdgId)
 
                 #Apply isolation cut
                 if isotype != "none":
@@ -74,15 +74,15 @@ class LeptonAnalyzer(FilterAnalyzer):
                         lambda x, isotype=isotype, isocut=isocut: abs(getattr(x, isotype)) < isocut, leps
                     )
                 if "debug" in self.conf.general["verbosity"]:
-                    print "after iso", isotype
+                    autolog("after iso", isotype)
                     for lep in leps:
-                        print lep.pt, lep.eta, lep.pdgId
+                        autolog(lep.pt, lep.eta, lep.pdgId)
                 #Apply ID cut 
                 leps = filter(lepcuts["idcut"], leps)
                 if "debug" in self.conf.general["verbosity"]:
-                    print "after id"
+                    autolog("after id")
                     for lep in leps:
-                        print lep.pt, lep.eta, lep.pdgId
+                        autolog(lep.pt, lep.eta, lep.pdgId)
 
                 sumleps += leps
                 lepname = lep_flavour + "_" + id_type
@@ -124,15 +124,17 @@ class LeptonAnalyzer(FilterAnalyzer):
                     prefix += "DL "
                 if lep in event.lep_DL:
                     prefix += "veto "
-                print prefix
+                autolog(prefix)
                 f(lep)
-            print "n_lep_tight={0}, n_lep_loose={1}, n_lep_tight_veto={2}".format(event.n_lep_SL, event.n_lep_DL, event.n_lep_veto)
+            autolog("n_lep_tight={0}, n_lep_loose={1}, n_lep_tight_veto={2}".format(
+                event.n_lep_SL, event.n_lep_DL, event.n_lep_veto)
+            )
 
         event.is_sl = (event.n_lep_SL == 1 and event.n_lep_veto == 1)
         event.is_dl = (event.n_lep_DL == 2 and event.n_lep_veto == 2)
         event.is_fh = (not event.is_sl and not event.is_dl)
         if "debug" in self.conf.general["verbosity"]:
-            print "DEBUG: is_sl, is_dl, is_fh", event.is_sl, event.is_dl, event.is_fh
+            autolog("is_sl, is_dl, is_fh", event.is_sl, event.is_dl, event.is_fh)
         
         #Calculate di-lepton system momentum
         event.dilepton_p4 = ROOT.TLorentzVector()
@@ -154,30 +156,32 @@ class LeptonAnalyzer(FilterAnalyzer):
         #apply configuration-dependent selection
         passes = self.conf.leptons["selection"](event)
         if "debug" in self.conf.general["verbosity"]:
-            print "LeptonAnalyzer selection", passes
+            autolog("LeptonAnalyzer selection", passes)
         if event.is_sl and event.is_dl:
-            print "DEBUG: The event (%s,%s,%s) is both sl and dl" % (event.input.run,event.input.lumi,event.input.evt)
-            print "SL mu"
+            autolog("The event (%s,%s,%s) is both sl and dl" % (
+                event.input.run,event.input.lumi,event.input.evt)
+            )
+            autolog("SL mu")
             for lep in event.mu_SL:
                 (self.conf.leptons["mu"]["debug"])(lep)
-            print "DL mu"
+            autolog("DL mu")
             for lep in event.mu_DL:
                 (self.conf.leptons["mu"]["debug"])(lep)
                 
-            print "SL el"
+            autolog("SL el")
             for lep in event.el_SL:
                 (self.conf.leptons["el"]["debug"])(lep)
-            print "DL el"
+            autolog("DL el")
             for lep in event.el_DL:
                 (self.conf.leptons["el"]["debug"])(lep)
                 
-            print "veto mu"
+            autolog("veto mu")
             for lep in event.mu_veto:
                 (self.conf.leptons["mu"]["debug"])(lep)
-            print "veto el"
+            autolog("veto el")
             for lep in event.mu_veto:
                 (self.conf.leptons["el"]["debug"])(lep)
             passes = False
-            print "WARNING: Overlapping event"
+            autolog("WARNING: Overlapping event")
 
         return self.conf.general["passall"] or passes
