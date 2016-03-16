@@ -7,10 +7,8 @@ elif [[ "$hnamestr" == comp* ]]; then
     export SITE="TALLINN"
 fi
 
-#on PSI, CMSSW_BASE is not exported with the grid job, need to set manually
-if [[ "$SITE" == "PSI" ]]; then
-    export CMSSW_BASE=$HOME/tth/sw-76/CMSSW/
-fi;
+# Get private environment variables
+source env.sh
 
 env
 set -e
