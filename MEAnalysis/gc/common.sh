@@ -7,10 +7,8 @@ elif [[ "$hnamestr" == comp* ]]; then
     export SITE="TALLINN"
 fi
 
-#on PSI, CMSSW_BASE is not exported with the grid job, need to set manually
-if [[ "$SITE" == "PSI" ]]; then
-    export CMSSW_BASE=$HOME/tth/sw-76/CMSSW/
-fi;
+# Get private environment variables
+source env.sh
 
 env
 set -e
@@ -20,7 +18,6 @@ ls -al
 
 #set env
 cd ${CMSSW_BASE}/src/TTH/MEAnalysis/
-export SCRAM_ARCH="slc6_amd64_gcc491"
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 #eval `scramv1 runtime -sh`
 if [[ "$SITE" == "PSI" ]]; then
