@@ -48,7 +48,7 @@ def Make_config(filename):
     # I/O information
     ########################################
 
-    config['input_root_file_name'] = 'root://t3se01.psi.ch:1094//store/user/jpata/tth/tf_trees/{0}.root'.format(filename)
+    config['input_root_file_name'] = 'root://t3se01.psi.ch:1094/pnfs/psi.ch/cms/trivcat/store/user/jpata/tth/tf_trees/{0}.root'.format(filename)
 
     config['input_tree_name'] = 'tree'
 

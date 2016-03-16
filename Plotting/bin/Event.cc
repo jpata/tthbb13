@@ -329,7 +329,6 @@ Event::Event(
     double _mem_DL_0w2h2t,
     double _tth_mva,
     double _common_bdt,
-    map<SystematicKey::SystematicKey, double> _bTagWeights,
     double _btag_LR_4b_2b,
     int _n_excluded_bjets,
     int _n_excluded_ljets,
@@ -366,12 +365,10 @@ Event::Event(
     mem_DL_0w2h2t(_mem_DL_0w2h2t),
     tth_mva(_tth_mva),
     common_bdt(_common_bdt),
-    bTagWeights(_bTagWeights),
     btag_LR_4b_2b(_btag_LR_4b_2b),
     btag_LR_4b_2b_logit(log(_btag_LR_4b_2b / (1.0 - _btag_LR_4b_2b))),
     n_excluded_bjets(_n_excluded_bjets),
     n_excluded_ljets(_n_excluded_ljets),
-
     ntopCandidate(_ntopCandidate),
     topCandidate_pt(_topCandidate_pt),
     topCandidate_eta(_topCandidate_eta),
@@ -477,7 +474,7 @@ ProcessKey::ProcessKey getProcessKey(const Event& ev, ProcessKey::ProcessKey pro
 
 double nominal_weight(const Event& ev, const Configuration& conf) {
     if (isMC(conf.process)) {
-        return conf.lumi * conf.xsweight * ev.puWeight * ev.bTagWeights.at(SystematicKey::nominal) * process_weight(conf.process, conf);
+        return conf.lumi * conf.xsweight * ev.puWeight * ev.data->bTagWeight * process_weight(conf.process, conf);
     }
     return 1.0;
 }
@@ -590,36 +587,31 @@ const char* btag_syst_to_string(SystematicKey::SystematicKey syst) {
 //    return bweights;
 //}
 
-map<SystematicKey::SystematicKey, double> get_bweights(const TreeData& data) {
-    map<SystematicKey::SystematicKey, double> bweight;
-    bweight[SystematicKey::nominal] = data.bTagWeight;
-    bweight[SystematicKey::CMS_ttH_CSVcErr1Up] = data.bTagWeight_cErr1Up;
-    bweight[SystematicKey::CMS_ttH_CSVcErr1Down] = data.bTagWeight_cErr1Down;
-    bweight[SystematicKey::CMS_ttH_CSVcErr2Up] =  data.bTagWeight_cErr2Up;
-    bweight[SystematicKey::CMS_ttH_CSVcErr2Down] =  data.bTagWeight_cErr2Down;
-    bweight[SystematicKey::CMS_ttH_CSVLFUp] =  data.bTagWeight_LFUp;
-    bweight[SystematicKey::CMS_ttH_CSVLFDown] =  data.bTagWeight_LFDown;
-    bweight[SystematicKey::CMS_ttH_CSVHFUp] =  data.bTagWeight_HFUp;
-    bweight[SystematicKey::CMS_ttH_CSVHFDown] =  data.bTagWeight_HFDown;
-    bweight[SystematicKey::CMS_ttH_CSVHFStats1Up] =  0.0;
-    bweight[SystematicKey::CMS_ttH_CSVHFStats1Down] =  0.0;
-    bweight[SystematicKey::CMS_ttH_CSVLFStats1Up] =  0.0;
-    bweight[SystematicKey::CMS_ttH_CSVLFStats1Down] =  0.0;
-    bweight[SystematicKey::CMS_ttH_CSVHFStats2Up] =  0.0;
-    bweight[SystematicKey::CMS_ttH_CSVHFStats2Down] =  0.0;
-    bweight[SystematicKey::CMS_ttH_CSVLFStats2Up] =  0.0;
-    bweight[SystematicKey::CMS_ttH_CSVLFStats2Down] =  0.0;
-    return bweight;
-}
+//map<SystematicKey::SystematicKey, double> get_bweights(const TreeData& data) {
+//    map<SystematicKey::SystematicKey, double> bweight;
+//    bweight[SystematicKey::nominal] = data.bTagWeight;
+//    bweight[SystematicKey::CMS_ttH_CSVcErr1Up] = data.bTagWeight_cErr1Up;
+//    bweight[SystematicKey::CMS_ttH_CSVcErr1Down] = data.bTagWeight_cErr1Down;
+//    bweight[SystematicKey::CMS_ttH_CSVcErr2Up] =  data.bTagWeight_cErr2Up;
+//    bweight[SystematicKey::CMS_ttH_CSVcErr2Down] =  data.bTagWeight_cErr2Down;
+//    bweight[SystematicKey::CMS_ttH_CSVLFUp] =  data.bTagWeight_LFUp;
+//    bweight[SystematicKey::CMS_ttH_CSVLFDown] =  data.bTagWeight_LFDown;
+//    bweight[SystematicKey::CMS_ttH_CSVHFUp] =  data.bTagWeight_HFUp;
+//    bweight[SystematicKey::CMS_ttH_CSVHFDown] =  data.bTagWeight_HFDown;
+//    bweight[SystematicKey::CMS_ttH_CSVHFStats1Up] =  0.0;
+//    bweight[SystematicKey::CMS_ttH_CSVHFStats1Down] =  0.0;
+//    bweight[SystematicKey::CMS_ttH_CSVLFStats1Up] =  0.0;
+//    bweight[SystematicKey::CMS_ttH_CSVLFStats1Down] =  0.0;
+//    bweight[SystematicKey::CMS_ttH_CSVHFStats2Up] =  0.0;
+//    bweight[SystematicKey::CMS_ttH_CSVHFStats2Down] =  0.0;
+//    bweight[SystematicKey::CMS_ttH_CSVLFStats2Up] =  0.0;
+//    bweight[SystematicKey::CMS_ttH_CSVLFStats2Down] =  0.0;
+//    return bweight;
+//}
 
 const Event EventFactory::makeNominal(const TreeData& data, const Configuration& conf) {
     const vector<Jet> jets = makeAllJets(data, &(JetFactory::makeNominal));
     const vector<Lepton> leptons = makeAllLeptons(data);
-    
-    auto bweights = get_bweights(data);
-    //if (conf.recalculateBTagWeight) {
-    //    bweights = recalc_bweights(jets);
-    //}
 
     const Event ev(
         &data,
@@ -640,7 +632,6 @@ const Event EventFactory::makeNominal(const TreeData& data, const Configuration&
         mem_p(data.mem_tth_p[1], data.mem_ttbb_p[1]), //DL 022,
         data.tth_mva,
         data.common_bdt,
-        bweights,
         data.btag_LR_4b_2b,
         data.n_excluded_bjets,
         data.n_excluded_ljets,
@@ -668,10 +659,6 @@ const Event EventFactory::makeJESUp(const TreeData& data, const Configuration& c
     const vector<Jet> jets = makeAllJets(data, &(JetFactory::makeJESUp));
     const vector<Lepton> leptons = makeAllLeptons(data);
 
-    auto bweights = get_bweights(data);
-    //if (conf.recalculateBTagWeight) {
-    //    bweights = recalc_bweights(jets);
-    //}
     return Event(
         &data,
         data.is_sl,
@@ -691,7 +678,6 @@ const Event EventFactory::makeJESUp(const TreeData& data, const Configuration& c
         mem_p(data.mem_tth_JESUp_p[1], data.mem_ttbb_JESUp_p[1]), //DL 022,
         data.tth_mva, 
         data.common_bdt_JESUp, 
-        bweights,
         data.btag_LR_4b_2b,
         data.n_excluded_bjets,
         data.n_excluded_ljets,
@@ -718,10 +704,6 @@ const Event EventFactory::makeJESDown(const TreeData& data, const Configuration&
     const vector<Jet> jets = makeAllJets(data, &(JetFactory::makeJESDown));
     const vector<Lepton> leptons = makeAllLeptons(data);
 
-    auto bweights = get_bweights(data);
-    //if (conf.recalculateBTagWeight) {
-    //    bweights = recalc_bweights(jets);
-    //}
     return Event(
         &data,
         data.is_sl,
@@ -741,7 +723,6 @@ const Event EventFactory::makeJESDown(const TreeData& data, const Configuration&
         mem_p(data.mem_tth_JESDown_p[1], data.mem_ttbb_JESDown_p[1]), //DL 022,
         data.tth_mva,
         data.common_bdt_JESDown,
-        bweights,
         data.btag_LR_4b_2b,
         data.n_excluded_bjets,
         data.n_excluded_ljets,
