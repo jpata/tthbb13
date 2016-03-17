@@ -6,23 +6,7 @@ March2016B: VHBBHeppyV20_tthbbV3_withme_finer
 created with ~V20 of vhbb, 68497e0 of tthbb13
 `https://github.com/jpata/tthbb13/blob/meanalysis-76x/MEAnalysis/gc/datasets/VHBBHeppyV20_tthbbV3.dat`
 
-Transfer function trees
-=======================
-Created with `make_TF.conf`
-
-March 9, 2016
+March2016C: VHBBHeppyV21_tthbbV5
 --------------
-tthbb13 code hash: `68497e0`
-
-input files:
-files in `datasets/vhbb_tth/tth.dat`
-~~~
-root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/VHBBHeppyV20_tthbbV3_withme_finer/ttHTobb_M125_13TeV_powheg_pythia8/VHBBHeppyV20_tthbbV3_withme_finer_ttHTobb_M125_13TeV_powheg_Py8__fall15MAv2-pu25ns15v1_76r2as_v12-v1/160302_131859/
-~~~
-
-output files:
-~~~
-root://t3se01.psi.ch:1094//store/user/jpata/tth/tf_trees/JP_VHBBHeppyV20.root
-root://t3se01.psi.ch:1094//store/user/jpata/tth/tf_trees/JP_VHBBHeppyV20_subjet.root
-~~~
-
+tthbb13 code: bb20d988313d75fb4a0ef54785e271b5c8274ddf
+vhbb code: 16bc9e81196c5d5ab918f62a92ca4618b88932d8
