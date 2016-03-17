@@ -1,3 +1,4 @@
+#!/bin/bash
 # Prepares user specific environment variables.
 # Run once when you setup
 # env.sh should NOT GO under version control

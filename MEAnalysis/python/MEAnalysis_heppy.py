@@ -14,7 +14,7 @@ import sys
 sys.modules["TFClasses"] = TFClasses
 
 #Import the default list of samples
-from TTH.MEAnalysis.samples_base import lfn_to_pfn, getSampleNGen
+from TTH.MEAnalysis.samples_base import getSitePrefix
 
 #Create configuration object based on environment variables
 #if one runs with ME_CONF=/path/to/conffile.py, then the configuration is loaded from that file
@@ -68,11 +68,9 @@ def prepareInputSamples(sampleFile=conf.general["sampleFile"]):
     for sn in sorted(samples_dict.keys()):
         s = samples_dict[sn]
         sample_ngen = s.nGen.value()
-        if (s.isMC.value() and sample_ngen<0):
-            sample_ngen = getSampleNGen(s)
         inputSample = cfg.Component(
             s.name.value(),
-            files = map(lfn_to_pfn, s.subFiles.value()),
+            files = map(getSitePrefix, s.subFiles.value()),
             tree_name = s.treeName.value(),
             n_gen = sample_ngen,
             xs = s.xSec.value()

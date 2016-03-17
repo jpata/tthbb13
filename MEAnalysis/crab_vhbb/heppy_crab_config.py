@@ -1,7 +1,7 @@
 from WMCore.Configuration import Configuration
 config = Configuration()
 
-submitname = "VHBBHeppyV21pre_tthbbV5"
+submitname = "VHBBHeppyV21_tthbbV5"
 
 config.section_("General")
 config.General.requestName = 'tth_' + submitname
@@ -12,7 +12,7 @@ config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'heppy_crab_fake_pset.py'
 config.JobType.scriptExe = 'heppy_crab_script.sh'
-config.JobType.maxJobRuntimeMin = 20 * 60
+config.JobType.maxJobRuntimeMin = 40 * 60
 
 import os
 os.system("tar czf python.tar.gz --dereference --directory $CMSSW_BASE python")

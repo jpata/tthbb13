@@ -147,9 +147,9 @@ class Conf:
         #These working points are evaluated and stored in the trees as nB* - number of jets passing the WP
         #https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideBTagging#Preliminary_working_or_operating
         "btagWPs": {
-            "CSVM": ("btagCSV", 0.89),
-            "CSVL": ("btagCSV", 0.423),
-            "CSVT": ("btagCSV", 0.941)
+            "CSVM": ("btagCSV", 0.800),
+            "CSVL": ("btagCSV", 0.460),
+            "CSVT": ("btagCSV", 0.935)
         },
 
         #if btagCSV, untagged/tagged selection for W mass and MEM is done by CSVM cut
@@ -177,7 +177,7 @@ class Conf:
         "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV20.root",
         #"controlPlotsFileNew": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV14.root",
         "QGLPlotsFile_flavour": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/Histos_QGL_flavour.root",
-        "sampleFile": os.environ["CMSSW_BASE"]+"/python/TTH/MEAnalysis/samples.py",
+        "sampleFile": os.environ["CMSSW_BASE"]+"/python/TTH/MEAnalysis/samples_v20.py",
         "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions.pickle",
         "transferFunctions_sj_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions_sj.pickle",
         #"systematics": ["nominal"],
@@ -261,7 +261,7 @@ class Conf:
 
         #Actually run the ME calculation
         #If False, all ME values will be 0
-        "calcME": False,
+        "calcME": True,
         
         "weight": 0.15,
 

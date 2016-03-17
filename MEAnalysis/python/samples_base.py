@@ -100,7 +100,7 @@ if "kbfi" in hn or "kbfi" in vo or "comp" in hn:
     def lfn_to_pfn(fn):
 
         #fix to replace broken file names
-        if fn.startswith("/home"):
+        if fn.startswith("file://") or fn.startswith("root://"):
             return fn
         else:
             return "file:///hdfs/cms" + fn
@@ -125,6 +125,7 @@ def get_files(fname):
     lines = open(os.path.join(os.environ.get("CMSSW_BASE"),fname)).readlines()
     lines = map(lambda x: x.strip(), lines)
     lines = filter(lambda x: "root" in x, lines)
+    lines = map(lambda x: x.split()[0], lines)
     return lines
 
 def getSitePrefix(fn):
