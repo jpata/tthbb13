@@ -18,7 +18,7 @@ import sys
 sys.modules["TFClasses"] = TFClasses
 
 from TTH.MEAnalysis.MEAnalysis_heppy import sequence, samples_dict
-from TTH.MEAnalysis.samples_base import lfn_to_pfn
+from TTH.MEAnalysis.samples_base import getSitePrefix
 
 firstEvent = int(os.environ["SKIP_EVENTS"])
 nEvents = int(os.environ["MAX_EVENTS"])
@@ -43,12 +43,12 @@ print "processing dataset={0}".format(dataset)
 
 for ns in samples_dict.keys():
     if samples_dict[ns].name.value() == dataset:
-        samples_dict[ns].skip = False
-        samples_dict[ns].subFiles = map(lfn_to_pfn, fns ) #DS
+        samples_dict[ns].skip = cms.untracked.bool(False)
+        samples_dict[ns].subFiles = map(getSitePrefix, fns ) #DS
         good_samp += [samples_dict[ns]]
     else:
         print "skipping", samples_dict[ns].name.value()
-        samples_dict[ns].skip = True
+        samples_dict[ns].skip = cms.untracked.bool(True)
 
 if len(good_samp) != 1:
     raise Exception("Need to specify at least one sample: dataset={0}, subfiles={1}, good_samp={2}".format(dataset, fns, good_samp))

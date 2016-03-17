@@ -111,7 +111,8 @@ elif "psi" in hn or "psi" in vo:
         if fn.startswith("file://") or fn.startswith("root://"):
             return fn
         else:
-            return "dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/" + fn
+            #return "dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/" + fn
+            return "root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/" + fn
 else:
     print "Warning: host '{0}' VO '{1}' is unknown, using xrootd".format(hn, vo)
     pfPath = ""
@@ -120,7 +121,8 @@ else:
         return fn
 
 def get_files(fname):
-    lines = open(fname).readlines()
+    # Expect fname relative to CMSSW BASE
+    lines = open(os.path.join(os.environ.get("CMSSW_BASE"),fname)).readlines()
     lines = map(lambda x: x.strip(), lines)
     lines = filter(lambda x: "root" in x, lines)
     lines = map(lambda x: x.split()[0], lines)
