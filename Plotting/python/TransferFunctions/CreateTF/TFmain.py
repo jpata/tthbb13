@@ -49,5 +49,5 @@ def main(conffile):
 # End of Main
 ########################################
 if __name__ == "__main__":
-  main("configs/TF_tthbb13_resolved/config.dat")
+  #main("configs/TF_tthbb13_resolved/config.dat")
   main("configs/TF_tthbb13_subjet/config.dat")
