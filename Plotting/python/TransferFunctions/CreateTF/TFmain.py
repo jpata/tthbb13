@@ -25,61 +25,19 @@ from draw_hists_and_fits import Draw_Hists_and_Fits
 # Main
 ########################################
 
-def main():
+def main(conffile):
 
     print 'This is TFmain.py. This program runs the full chain of creating a matrix of transfer functions from a customized .root file. To create the customized .root file, see \'outputtree.py\'\n'
 
-    print '\n###################################'
-    print '# TFmain: START OF CONFIGURATION'
-    print '###################################'
-    # Create the config.dat file  
-    Make_config()
-    print '###################################'
-    print '# TFmain: END OF CONFIGURATION'
-    print '###################################'
-
-    print '\n###################################'
-    print '# TFmain: START OF MAKING HISTOGRAMS'
-    print '###################################'
-    # Creating the bins and filling the histograms
-    Make_Histograms()
-    print '###################################'
-    print '# TFmain: END OF MAKING HISTOGRAMS'
-    print '###################################'
-
-    print '\n###################################'
-    print '# TFmain: START OF FITTING SINGLE BINS'
-    print '###################################'
-    # Fitting the single bins
-    Fit_Single_Bins()
-    print '###################################'
-    print '# TFmain: END OF FITTING SINGLE BINS'
-    print '###################################'
-
-    print '\n###################################'
-    print '# TFmain: START OF FITTING ACROSS BINS'
-    print '###################################'
-    # Fit across the E-bins
-    Fit_Across_Bins()
-    print '###################################'
-    print '# TFmain: END OF FITTING ACROSS BINS'
-    print '###################################'
-
-    print '\n###################################'
-    print '# TFmain: START OF DRAWING ABF RESULTS'
-    print '###################################'
-    # Drawing the single bin histograms and the ABF results
-    Draw_Hists_and_Fits()
-    print '###################################'
-    print '# TFmain: END OF DRAWING ABF RESULTS'
-    print '###################################'
-
-
-    pickle_f = open( 'config.dat', 'rb' )
+    Make_Histograms(conffile)
+    Fit_Single_Bins(conffile)
+    Fit_Across_Bins(conffile)
+    Draw_Hists_and_Fits(conffile)
+    
+    pickle_f = open( conffile, 'rb' )
     config = pickle.load( pickle_f )
     pickle_f.close()
 
-    print ''
     print config['info']
 
     ts = time.time()
@@ -87,17 +45,9 @@ def main():
 
     print ' Analysis end time:              {0}\n'.format( config['enddate'] )
 
-
-    # Save latest version of config, and copy to the output folder
-    pickle_f = open( 'config.dat', 'wb' )
-    pickle.dump( config, pickle_f )
-    pickle_f.close()
-    shutil.copyfile( 'config.dat', '{0}/config.dat'.format( config['outputdir'] ) )
-    shutil.copyfile( 'config.dat', 'configs/{0}/config.dat'.format(
-        config['outputdir'] ) )
-
 ########################################
 # End of Main
 ########################################
 if __name__ == "__main__":
-  main()
+  #main("configs/TF_tthbb13_resolved/config.dat")
+  main("configs/TF_tthbb13_subjet/config.dat")

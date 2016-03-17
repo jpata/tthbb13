@@ -26,13 +26,11 @@ from draw_hists_and_fits import Draw_Hists_and_Fits
 # Main
 ########################################
 
-def main():
+def main(conffile):
 
     print 'This is TFfitting.py. This program only performs the fitting of histograms but does not produce the histograms. It runs fit_single_bins.py, fit_across_bins.py and draw_hists_and_fits.py. For the full chain, see TFmain.py\n'
 
-    Make_config()
-
-    pickle_f = open( 'config.dat', 'rb' )
+    pickle_f = open( conffile, 'rb' )
     config = pickle.load( pickle_f )
     pickle_f.close()
 

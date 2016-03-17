@@ -10,6 +10,9 @@ This file can also create new classes deriving from CategoryProcessor, which
 can have their own logic of filling histograms. Each CategoryProcessor corresponds
 to a set of plots that you want to create in a particular category. They will also fill
 Histograms of their parent categories.
+
+#FIXME: if oyu add systematics, you need to change them here.
+
 """
 def parseId(id):
     """
@@ -250,8 +253,9 @@ systematics = [
 systematic_weights = []
 for k in systematics:
     if "CSV" in k:
+        kstrip = k.replace("CMS_ttH_CSV", "")
         systematic_weights += [
-            (k, "nominal_weight(ev, conf)/ev.bTagWeights.at(SystematicKey::nominal) * ev.bTagWeights.at(SystematicKey::{0})".format(k)),
+            (k, "nominal_weight(ev, conf)/ev.data->bTagWeight * ev.data->bTagWeight_{0}".format(kstrip)),
         ]
 
 #List of all processes

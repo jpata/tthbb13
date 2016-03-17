@@ -255,19 +255,19 @@ def Make_AcrossBinFit( TFobj, fit_dicts, config ):
 # Main
 ########################################
 
-def Fit_Across_Bins():
+def Fit_Across_Bins(conffile):
 
     ROOT.gROOT.SetBatch(True)
     ROOT.gROOT.ProcessLine("gErrorIgnoreLevel = 1001;")
     ROOT.gStyle.SetOptFit(1011)
 
     # Import config.dat; check for existence
-    if not os.path.isfile('config.dat'):
+    if not os.path.isfile(conffile):
         print "Fit_Across_Bins: Error: Can't find configuration file config.dat"
         return 0
 
     print 'Fit_Across_Bins: Importing config.dat'
-    pickle_f = open( 'config.dat', 'rb' )
+    pickle_f = open( conffile, 'rb' )
     config = pickle.load( pickle_f )
     pickle_f.close()
 

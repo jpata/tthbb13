@@ -20,9 +20,7 @@ import pickle, os
 #ControlPlotsSparse_2015_10_15_withBLR.root
 input_file = "/home/joosep/joosep-mac/Documents/tth/data/histograms/ControlPlotsDL.root"
 #needs to be an absolute path
-output_path = "/home/joosep/joosep-mac/Documents/tth/sw-slc6/CMSSW_7_4_15/src/TTH/Plotting/tmp/"
-#input_file = "/dev/shm/joosep/ControlPlotsSparse_corr.root"
-#output_path = "/dev/shm/joosep/categorization2/"
+output_path = "/scratch/jpata/Categorize/"
 
 n_proc = 4
 n_iter = 8

@@ -52,7 +52,7 @@ def Fit_DG( hist, f_DG_in_main, config ):
 # Main
 ########################################
 
-def Fit_Single_Bins():
+def Fit_Single_Bins(conffile):
 
     ROOT.gROOT.SetBatch(True)
     #ROOT.gROOT.ProcessLine("gErrorIgnoreLevel = 1001;")
@@ -63,7 +63,7 @@ def Fit_Single_Bins():
 
 
     # Load config.dat
-    pickle_f = open( 'config.dat', 'rb' )
+    pickle_f = open( conffile, 'rb' )
     config = pickle.load( pickle_f )
     pickle_f.close()
 

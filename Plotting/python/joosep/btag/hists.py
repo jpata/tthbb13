@@ -1,4 +1,5 @@
 import ROOT, sys
+from TTH.MEAnalysis.samples_base import getSitePrefix
 ROOT.gROOT.SetBatch(True)
 ROOT.TH1.SetDefaultSumw2(True)
 ROOT.TH1.AddDirectory(False)
@@ -6,9 +7,9 @@ ROOT.TH1.AddDirectory(False)
 INFILES = sys.argv[2:]
 OUTFILE = sys.argv[1]
 
-tt = ROOT.TChain("tree")
+tt = ROOT.TChain("vhbb/tree")
 for inf in INFILES:
-    tt.AddFile(inf)
+    tt.AddFile(getSitePrefix(inf))
 
 def hist(of, x, disc, low=0, high=1):
     h = ROOT.TH1D(x, x, 100, low, high)
