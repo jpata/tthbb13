@@ -1,4 +1,5 @@
 import ROOT, math
+from copy import deepcopy
 
 def lvec(self):
     """
@@ -51,7 +52,8 @@ class MET:
 
 class FakeEvent:
     def __init__(self, event):
-        self.__dict__.update(event.__dict__)
+        src = deepcopy(event.__dict__)
+        self.__dict__.update(src)
 
 
 from TTH.MEAnalysis.VHbbTree import Jet

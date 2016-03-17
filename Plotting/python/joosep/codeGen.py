@@ -253,8 +253,9 @@ systematics = [
 systematic_weights = []
 for k in systematics:
     if "CSV" in k:
+        kstrip = k.replace("CMS_ttH_CSV", "")
         systematic_weights += [
-            (k, "nominal_weight(ev, conf)/ev.bTagWeights.at(SystematicKey::nominal) * ev.bTagWeights.at(SystematicKey::{0})".format(k)),
+            (k, "nominal_weight(ev, conf)/ev.data->bTagWeight * ev.data->bTagWeight_{0}".format(kstrip)),
         ]
 
 #List of all processes

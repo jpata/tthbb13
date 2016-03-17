@@ -69,15 +69,6 @@ class JetAnalyzer(FilterAnalyzer):
 
     def process(self, event):
 
-        #FIXME: why discarded jets no longer in vhbb?
-        #injets = event.Jet+event.DiscardedJet
-        event.injets = event.Jet
-        #pt-descending input jets
-        if "input" in self.conf.general["verbosity"]:
-            autolog("jets input") 
-            for ij, j in enumerate(event.injets):
-                autolog("InJetReco", ij, j.pt, j.eta, j.phi, j.mass, j.btagCSV, j.mcFlavour)
-                autolog("InJetGen", ij, j.mcPt, j.mcEta, j.mcPhi, j.mcM)
 
         event.MET = MET(pt=event.met.pt, phi=event.met.phi)
         event.MET_gen = MET(pt=event.MET.genPt, phi=event.MET.genPhi)
@@ -118,6 +109,16 @@ class JetAnalyzer(FilterAnalyzer):
         return self.conf.general["passall"] or np.any([v.passes_jet for v in event.systResults.values()])
 
     def _process(self, event):
+        
+        #FIXME: why discarded jets no longer in vhbb?
+        #injets = event.Jet+event.DiscardedJet
+        event.injets = event.Jet
+        #pt-descending input jets
+        if "input" in self.conf.general["verbosity"]:
+            autolog("jets input") 
+            for ij, j in enumerate(event.injets):
+                autolog("InJetReco", ij, j.pt, j.eta, j.phi, j.mass, j.btagCSV, j.mcFlavour)
+                autolog("InJetGen", ij, j.mcPt, j.mcEta, j.mcPhi, j.mcM)
 
         #choose pt cut key based on lepton channel
         pt_cut  = "pt"
@@ -147,16 +148,6 @@ class JetAnalyzer(FilterAnalyzer):
             jetsel_loose_pt, event.injets 
             ), key=lambda x: x.pt, reverse=True
         )
-
-        #In DL, the leading two jets must pass the tighter pt cut,
-        #whereas the trailing can pass the looser
-        #if event.is_dl:
-        #    good_jets_leading = filter(
-        #        lambda x, self=self: x.pt > self.conf.jets["pt_sl"],
-        #        event.good_jets[:2]
-        #    )
-        #    event.good_jets = good_jets_leading + event.good_jets[2:]
-
 
         #Take care of overlaps between jets and veto leptons
         jets_to_remove = []
@@ -295,5 +286,5 @@ class JetAnalyzer(FilterAnalyzer):
                         jet.genjet = gj
                         genjets.remove(gj)
                         break
-
+        event.ht = sum(map(lambda x: x.pt, event.good_jets))
         return event

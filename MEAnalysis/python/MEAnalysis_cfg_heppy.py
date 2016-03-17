@@ -261,7 +261,7 @@ class Conf:
 
         #Actually run the ME calculation
         #If False, all ME values will be 0
-        "calcME": False,
+        "calcME": True,
         
         "weight": 0.15,
 

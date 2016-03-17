@@ -44,6 +44,14 @@ test_MEAnalysis: test_mkdir
 	python -c "import ROOT; f=ROOT.TFile('MEAnalysis/Loop_ttHTobb_M125_13TeV_powheg_pythia8/tree.root'); print f.Get('tree').GetEntries()" &>> $(test_out_dir)/MEAnalysis_MEAnalysis_heppy.log
 	cp MEAnalysis/Loop_ttHTobb_M125_13TeV_powheg_pythia8/tree.root $(test_out_dir)/MEAnalysis_MEAnalysis_heppy.root
 
+test_MEAnalysis_withme: test_mkdir
+	rm -Rf MEAnalysis/Loop_*
+	cd MEAnalysis && ME_CONF=python/cfg_withME.py python python/MEAnalysis_heppy.py &> $(test_out_dir)/MEAnalysis_MEAnalysis_heppy_withme.log
+	sleep 5
+	du -csh MEAnalysis/Loop_ttHTobb_M125_13TeV_powheg_pythia8/tree.root &>> $(test_out_dir)/MEAnalysis_MEAnalysis_heppy_withme.log
+	python -c "import ROOT; f=ROOT.TFile('MEAnalysis/Loop_ttHTobb_M125_13TeV_powheg_pythia8/tree.root'); print f.Get('tree').GetEntries()" &>> $(test_out_dir)/MEAnalysis_MEAnalysis_heppy_withme.log
+	cp MEAnalysis/Loop_ttHTobb_M125_13TeV_powheg_pythia8/tree.root $(test_out_dir)/MEAnalysis_MEAnalysis_heppy_withme.root
+
 test_MELooper: test_mkdir melooper
 	cd Plotting && FILE_NAMES=$(testfile_vhbb_tthbb) DATASETPATH=ttHTobb_M125_13TeV_powheg_pythia8 ./python/makeJobfile.py && ./melooper job.json &> $(test_out_dir)/Plotting_MELooper.log
 	sleep 5	
