@@ -44,7 +44,9 @@
 #include "DataFormats/Common/interface/ValueMap.h"
 #include "DataFormats/BTauReco/interface/JetTag.h"
 
+
 #include "DataFormats/PatCandidates/interface/Muon.h"
+#include "DataFormats/PatCandidates/interface/PackedCandidate.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/PatCandidates/interface/Tau.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
@@ -105,16 +107,15 @@ int convert_to_grid(float orig_eta,
 		    float phi,
 		    int ijet){
 
-
-  int i_eta = 7 + lroundf((eta - orig_eta)/0.1);
-  int i_phi = 7 + lroundf((phi - orig_phi)/0.1);
+  int i_eta = 15 + lroundf((eta - orig_eta)/0.05);
+  int i_phi = 15 + lroundf((phi - orig_phi)/0.05);
   
   i_eta = max(0, i_eta);
   i_phi = max(0, i_phi);
-  i_eta = min(15, i_eta);
-  i_phi = min(15, i_phi);
+  i_eta = min(31, i_eta);
+  i_phi = min(31, i_phi);
 
-  return i_phi + 16 * (i_eta + 16 * ijet);
+  return i_phi + 32 * (i_eta + 32 * ijet);
    
 }
 		    
@@ -343,20 +344,34 @@ void fill_fatjet_branches(const edm::Event& iEvent,
       float *ptmap     = tthtree->get_address<float *>(prefix + "ptmap");
       float *massmap   = tthtree->get_address<float *>(prefix + "massmap");
       float *chargemap = tthtree->get_address<float *>(prefix + "chargemap");
+      float *fracmap   = tthtree->get_address<float *>(prefix + "fracmap");
       
       reco::Jet::Constituents constis = x.getJetConstituents();
       for(reco::Jet::Constituents::iterator cit = constis.begin(); 
 	  cit != constis.end(); 
 	  ++cit) {
+
       
 	int ipos = convert_to_grid(x.eta(), x.phi(), (*cit)->eta(), (*cit)->phi(), n_fat_jet);
 	emap[ipos]	+= (*cit)->energy();
 	ptmap[ipos]	+= (*cit)->pt();
 	massmap[ipos]	+= (*cit)->mass();
+	fracmap[ipos]	+= ((pat::PackedCandidate * )(&(**cit)))->hcalFraction();
 		
 	if ( (*cit)->charge() < 100 && (*cit)->charge() > -100)
 	  chargemap[ipos] += fabs((*cit)->charge());		  
       }
+
+      for (int ii=0; ii != 32; ii++){
+	for (int jj=0; jj != 32; jj++){
+
+	  int ipos = ii + 32 * (jj + 32 * n_fat_jet);
+	  
+	  if (emap[ipos] > 0)
+	    fracmap[ipos] /= emap[ipos];	  
+	}
+      }
+	     
     }
 
     // Get the correction factor for this jet
@@ -994,6 +1009,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	      fill_truth_matching<reco::BasicJet>(tthtree, x, n_top_jet, gen_higgs, prefix, "higgs");
 	    
 	    bool first = true;
+
 	    for ( edm::Ptr<reco::Candidate > constituent : x.getJetConstituents()) {
 	      if (constituent.isNull()) {
 		edm::LogWarning("top jets") << "n_top_jet=" << n_top_jet << " constituent is not valid";

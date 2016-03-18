@@ -281,10 +281,11 @@ public:
 	float jet_ak08__nmj3[N_MAX];
 	float jet_ak08__qvol[N_MAX];
 
-        float jet_ak08__emap[10][16][16];
-        float jet_ak08__ptmap[10][16][16];
-        float jet_ak08__massmap[10][16][16];
-        float jet_ak08__chargemap[10][16][16];
+        float jet_ak08__emap[10][32][32];
+        float jet_ak08__ptmap[10][32][32];
+        float jet_ak08__massmap[10][32][32];
+        float jet_ak08__chargemap[10][32][32];
+        float jet_ak08__fracmap[10][32][32];
 
 	int jet_ak08__nconst[N_MAX];
 	int jet_ak08__ncharged[N_MAX];
@@ -2338,10 +2339,11 @@ public:
 		SET_ZERO(jet_ak08__nmj3, N_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(jet_ak08__qvol, N_MAX, DEF_VAL_FLOAT);
 
-		SET_ZERO_3(jet_ak08__emap, 10, 16,16, 0.);
-		SET_ZERO_3(jet_ak08__ptmap, 10, 16,16, 0.);
-		SET_ZERO_3(jet_ak08__massmap, 10, 16,16, 0.);
-		SET_ZERO_3(jet_ak08__chargemap, 10, 16,16, 0.);
+		SET_ZERO_3(jet_ak08__emap, 10, 32,32, 0.);
+		SET_ZERO_3(jet_ak08__ptmap, 10, 32,32, 0.);
+		SET_ZERO_3(jet_ak08__massmap, 10, 32,32, 0.);
+		SET_ZERO_3(jet_ak08__chargemap, 10, 32,32, 0.);
+		SET_ZERO_3(jet_ak08__fracmap, 10, 32,32, 0.);
 
 		SET_ZERO(jet_ak08__nconst, N_MAX, DEF_VAL_INT);
 		SET_ZERO(jet_ak08__ncharged, N_MAX, DEF_VAL_INT);
@@ -4394,10 +4396,11 @@ public:
 		tree->Branch("jet_ak08__nmj3", jet_ak08__nmj3, "jet_ak08__nmj3[n__jet_ak08]/F");
 		tree->Branch("jet_ak08__qvol", jet_ak08__qvol, "jet_ak08__qvol[n__jet_ak08]/F");
 
-		tree->Branch("jet_ak08__emap", jet_ak08__emap, "jet_ak08__emap[10][16][16]");
-		tree->Branch("jet_ak08__ptmap", jet_ak08__ptmap, "jet_ak08__ptmap[10][16][16]");
-		tree->Branch("jet_ak08__massmap", jet_ak08__massmap, "jet_ak08__massmap[10][16][16]");
-		tree->Branch("jet_ak08__chargemap", jet_ak08__chargemap, "jet_ak08__chargemap[10][16][16]");
+		tree->Branch("jet_ak08__emap", jet_ak08__emap, "jet_ak08__emap[10][32][32]");
+		tree->Branch("jet_ak08__ptmap", jet_ak08__ptmap, "jet_ak08__ptmap[10][32][32]");
+		tree->Branch("jet_ak08__massmap", jet_ak08__massmap, "jet_ak08__massmap[10][32][32]");
+		tree->Branch("jet_ak08__chargemap", jet_ak08__chargemap, "jet_ak08__chargemap[10][32][32]");
+		tree->Branch("jet_ak08__fracmap", jet_ak08__fracmap, "jet_ak08__fracmap[10][32][32]");
 
 
 		tree->Branch("jet_ak08__nconst", jet_ak08__nconst, "jet_ak08__nconst[n__jet_ak08]/I");
@@ -6450,6 +6453,7 @@ public:
 		tree->SetBranchAddress("jet_ak08__ptmap", jet_ak08__ptmap);
 		tree->SetBranchAddress("jet_ak08__massmap", jet_ak08__massmap);
 		tree->SetBranchAddress("jet_ak08__chargemap", jet_ak08__chargemap);
+		tree->SetBranchAddress("jet_ak08__fracmap", jet_ak08__fracmap);
 
 		tree->SetBranchAddress("jet_ak08__nconst", jet_ak08__nconst);
 		tree->SetBranchAddress("jet_ak08__ncharged", jet_ak08__ncharged);
