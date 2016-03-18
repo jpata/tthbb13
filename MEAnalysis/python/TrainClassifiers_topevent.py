@@ -31,18 +31,23 @@ colors = ['black', 'red','blue','green','orange','green','magenta']
 class_names = {0: "no top",
                1: "top in event"}
 
-
 plot_inputs = False
 
 default_params = {        
-    # Parameters for 2d architecture    
-    "n_blocks"       : 2,    
-    "n_conv_layers"  : 2,        
-    "pool_size"      : 0,
-    "n_dense_layers" : 1,
-    "n_dense_nodes"  : 20,
-    "n_features"     : 8,
-    "do_reshape"     : 0,
+
+    # Parameters for 1d architecture    
+    "n_dense_layers" : 2,
+    "n_dense_nodes"  : 80,
+    "dense_dropout"  : 0.2,
+
+#    # Parameters for 2d architecture    
+#    "n_blocks"       : 2,    
+#    "n_conv_layers"  : 2,        
+#    "pool_size"      : 0,
+#    "n_dense_layers" : 1,
+#    "n_dense_nodes"  : 20,
+#    "n_features"     : 8,
+#    "do_reshape"     : 0,
 
     # Common parameters
     "lr"          : 0.01,
@@ -106,23 +111,24 @@ for param in default_params.keys():
 # Classifiers
 ########################################
 
-def get_data_flat(df):
+def get_data_flat_unscaled(df):
     arr = np.array([df[["c{0}_mass".format(ic), 
                         "c{0}_frec".format(ic), 
                         "c{0}_meanCSV".format(ic), 
                         "c{0}_varCSV".format(ic)]].values for ic in range(MAX_PERM)])        
-    arr2 = np.swapaxes(arr,0,1)
-    arr3 = np.swapaxes(arr2,1,2)
-    arr4 = np.reshape(arr3, (-1, 80))
+    return np.reshape( np.swapaxes( np.swapaxes(arr,0,1), 1,2), (-1, 80))
 
-    return arr4
 
 # Also prepare a scaler
 scaler = StandardScaler()  
-scaler.fit(get_data_flat(df))
+scaler.fit(get_data_flat_unscaled(df))
 
-def get_data(df):
+def get_data_flat(df):
+    return scaler.transform(get_data_flat_unscaled(df))
+
+def get_data_2d(df):
     return np.expand_dims(scaler.transform(get_data_flat(df)).reshape(-1, 4, 20), axis=1)
+
 
 
 def model_2dconv(params):
@@ -165,13 +171,32 @@ def model_2dconv(params):
     return model
 
 
+def model_1d(params):
+
+    activ = lambda : Activation('relu')
+    model = Sequential()
+
+    for i_dense_layer in range(params["n_dense_layers"]):
+        if i_dense_layer == 0:
+            model.add(Dense(params["n_dense_nodes"], input_dim = 80))
+        else:
+            model.add(Dense(params["n_dense_nodes"]))
+        model.add(Dropout(params["dense_dropout"]))
+        model.add(activ())    
+
+    model.add(Dense(2))
+    model.add(Activation('softmax'))
+
+    return model
+
+
 classifiers = [
     Classifier("NN", 
                "keras",              
                params,
                False,
-               get_data,
-               model_2dconv(params)
+               get_data_flat,
+               model_1d(params)
            )]
 
 
