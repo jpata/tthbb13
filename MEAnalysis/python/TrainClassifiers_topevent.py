@@ -38,9 +38,11 @@ default_params = {
     # Parameters for 2d architecture    
     "n_blocks"       : 2,    
     "n_conv_layers"  : 2,        
-    "pool_size"      : 2,
+    "pool_size"      : 0,
     "n_dense_layers" : 1,
     "n_dense_nodes"  : 20,
+    "n_features"     : 8,
+    "do_reshape"     : 0,
 
     # Common parameters
     "lr"          : 0.01,
@@ -131,20 +133,21 @@ def model_2dconv(params):
 
     current_rows = 4
 
-
-
-
     # 2D Convolutional Model
     for i_block in range(params["n_blocks"]):
         for i_conv_layer in range(params["n_conv_layers"]):
 
             if i_conv_layer == 0 and i_block ==0:
-                model.add(Convolution2D(current_rows, current_rows,1, input_shape=(1, 4, 20)))
+                model.add(Convolution2D(params["n_features"], current_rows,1, input_shape=(1, 4, 20)))
             else:
-                model.add(Convolution2D(current_rows, current_rows,1))
+                model.add(Convolution2D(params["n_features"], current_rows,1))
             model.add(activ())
             
-            model.add(Reshape((1,current_rows,20)))
+            if params["do_reshape"]:
+                model.add(Reshape((1,params["n_features"],20)))                
+                current_rows = params["n_features"]
+            else:
+                current_rows = 1
 
         if params["pool_size"] > 0:
             model.add(MaxPooling2D(pool_size=(params["pool_size"], 1)))
