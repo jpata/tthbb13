@@ -1,4 +1,5 @@
 import ROOT, math
+from copy import deepcopy
 
 def lvec(self):
     """
@@ -51,4 +52,37 @@ class MET:
 
 class FakeEvent:
     def __init__(self, event):
-        self.__dict__.update(event.__dict__)
+        src = deepcopy(event.__dict__)
+        self.__dict__.update(src)
+
+
+from TTH.MEAnalysis.VHbbTree import Jet
+
+jet_keys = ["pt", "eta", "phi", "m", "btagCSV", "chMult", "nhMult"]
+
+def printJet(j):
+    s = ""
+    for k, v in sorted(j.__dict__.items(), key=lambda x: x[0]):
+        if k in jet_keys:
+            try:
+                v = float(v)
+                s += "{0}={1:2.2f} ".format(k, v)
+            except TypeError as e:
+                pass
+    return s
+
+Jet.__str__ = printJet
+
+def autolog(*args):
+    import inspect, logging
+    # Get the previous frame in the stack, otherwise it would
+    # be this function!!!
+    func = inspect.currentframe().f_back.f_code
+    message = ", ".join(map(str, args))
+    # Dump the message + the name of this function to the log.
+    print "[%s %s:%i]: %s" % (
+        func.co_name,
+        func.co_filename,
+        func.co_firstlineno,
+        message
+    )

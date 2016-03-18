@@ -21,6 +21,9 @@ class TreeVarAnalyzer(FilterAnalyzer):
         #in order to correctly ntuplize, we need to define event.genTopLep = event.systResults["nominal"].genTopLep etc
         event.genTopLep = getattr(event.systResults["nominal"], "genTopLep", [])
         event.genTopHad = getattr(event.systResults["nominal"], "genTopHad", [])
+        
+        import pdb
+        pdb.set_trace()
 
         for syst, event_syst in event.systResults.items():
             event_syst.mem_results_tth = getattr(event_syst, "mem_results_tth", [])

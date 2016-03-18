@@ -55,6 +55,18 @@ def apply_cuts_project(h, cuts, projections):
     hp = h.Projection(*axs).Clone("__".join(["__".join(map(str, c)) for c in cuts]) + "__" + "__".join(projections))
     return rootpy.asrootpy(hp)
 
+def mkdirs(fi, path):
+    path = path.encode("ascii", "ignore")
+    pathspl = path.split("/")
+    sfi = fi
+    for p in pathspl:
+        d = sfi.Get(str(p))
+        if d == None:
+            d = sfi.mkdir(p)
+            d.Write()
+        sfi = d
+    return sfi
+
 
 def save_hdict(ofn, hdict):
     """
@@ -66,9 +78,10 @@ def save_hdict(ofn, hdict):
         be saved to the output.
     returns: nothing
     """
-    outfile = rootpy.io.File(ofn, "recreate")
+    outfile = ROOT.TFile(ofn, "recreate")
 
-    for k, v in hdict.items():
+    dirs = {}
+    for k, v in sorted(hdict.items(), key=lambda x: x[0]):
         kpath = "/".join(k.split("/")[:-1])
         kname = k.split("/")[-1]
         if len(kname) == 0:
@@ -76,155 +89,16 @@ def save_hdict(ofn, hdict):
 
         try:
             d = outfile.get(kpath)
-        except rootpy.io.file.DoesNotExist as e:
-            d = outfile.mkdir(kpath, recurse=True)
-
+        except Exception as e:
+            d = mkdirs(outfile, kpath)
+            dirs[kpath] = d
+        assert(v != None)
         v.SetName(kname)
         v.SetDirectory(d)
-        d.Write("", ROOT.TObject.kOverwrite)
+        #d.Write("", ROOT.TObject.kOverwrite)
+    print "Writing..."
+    outfile.Write()
     outfile.Close()
-
-class InputKey(object):
-    def __init__(self, sample, systematic):
-        self.sample = sample
-        self.systematic = systematic
-
-class OutputRenameRule(object):
-    """
-    Base class for renaming output histograms based on
-    the sample name and rule.
-    E.g. you can do
-    SingleMuon/numJets__6__8__nBCSVM__4__8/mem_SL_0w2h2t -> data/6j4t/mem
-    """
-    def __init__(self, func):
-        self.func = func
-
-    def __call__(self, sample_name, rule):
-        return self.func(sample_name, rule)
-
-class SampleFilter(object):
-    """
-    A base class for a filter applied on a rule.
-    The filter works on the basis of the sample names and returns
-    a boolean if the rule is to be applied on this sample.
-    """
-    def __init__(self):
-        pass
-
-    def __call__(self, sample_name):
-        return True
-
-class DataFilter(SampleFilter):
-    """
-    A Filter that can be configured to accept only the dataset
-    that corresponds to the particular analysis channel.
-    This is needed in order to not add together SingleMuon and SingleElectron
-    events in an incorrect and overlapping way
-    """
-
-    def __init__(self, dname):
-        """
-        dname (string): name of the channel. Should be one of "mu", "el"
-        """
-        self.dname = dname
-
-    def __call__(self, sn):
-        if "Single" in sn.sample:
-            if self.dname == "mu":
-                return sn.sample == "SingleMuon"
-            elif self.dname == "el":
-                return sn.sample == "SingleElectron"
-        if "Double" in sn.sample or "MuonEG" in sn.sample:
-            return False
-        return True
-
-class RenameRule(OutputRenameRule):
-    """
-    Renames the output histogram according to the sample and Rule which produced
-    it.
-    """
-    def __init__(self):
-        pass
-
-    def __call__(self, key, rule, histname):
-        """
-        key (InputKey): represents the origin of the input THn
-        rule (Rule): the Rule that created the histogram that being renamed
-        histname (string): name of the output distribution, e.g. "mem"
-
-        returns (string): full path of the histogram in the output file
-        """
-        sample = key.sample
-        systematic = key.systematic
-        return "{0}/{1}/{2}/{3}".format(sample, rule.name, rule.project_axes_str(), histname)
-
-class DataRenameRule(RenameRule):
-    """
-    Rule to rename histograms derived from data.
-    """
-    def __init__(self, parent_rule):
-        self.parent_rule = parent_rule
-        super(DataRenameRule, self).__init__()
-
-    def __call__(self, key, rule, histname):
-        """
-        Overrides the sample name from e.g. SingleMuon to data
-        Parameters as ``RenameRule.__call__``
-        """
-        if key.sample in ["SingleMuon", "SingleElectron", "DoubleMuon", "DoubleEG", "MuonEG"]:
-            key = InputKey("data", "nominal")
-        return super(DataRenameRule, self).__call__(key, self.parent_rule, histname)
-
-class ProjectionRule(object):
-    """
-    Specifies how a projection is made from a sparse histogram.
-    The sparse histogram can have string qualifiers specifying the process
-    and systematic scenario.
-
-    The projection is defined by a list of cuts, which are currently 3-tuples
-    with (axisname, lovalue, hivalue).
-
-    The rule can selectively process samples by applying a ``SampleFilter``,
-    which decides based on the name of the sample if this rule should
-    be applied.
-    
-    The output of applying the rule on a collection (OrderedDict) of sparse histograms
-    is a TH1D, which can be selectively renamed based on a ``RenameRule``
-    """
-    def __init__(self, **kwargs):
-        self.name = kwargs.get("name")
-        self.cuts = kwargs.get("cuts")
-        self.project_axes = kwargs.get("project_axes")
-        self.sample_filter = kwargs.get("sample_filter", SampleFilter())
-        self.output_rename = kwargs.get("output_rename", RenameRule())
-        self.rebin = kwargs.get("rebin", 1)
-
-    def __call__(self, input):
-        out = OrderedDict()
-        for (inputkey, hist) in input.items():
-            if not self.sample_filter(inputkey):
-                continue
-            ret = apply_cuts_project(hist, self.cuts, self.project_axes)
-            ret.Rebin(self.rebin)
-
-            if inputkey.systematic == "nominal":
-                ret.SetName(self.project_axes_str())
-            else:
-                ret.SetName(self.project_axes_str() + "_" + inputkey.systematic)
-            out[self.output_rename(inputkey, self, ret.GetName())] = ret
-        return out
-
-    def cut_str(self):
-        """
-        String representation of the cuts.
-        """
-        return "__".join(["__".join([str(y) for y in x]) for x in self.cuts])
-
-    def project_axes_str(self):
-        """
-        String representation of the axes that are projected.
-        """
-        return "__".join(self.project_axes)
 
 def add_hdict(d1, d2):
     """
@@ -234,26 +108,13 @@ def add_hdict(d1, d2):
     ks1 = set(d1.keys())
     ks2 = set(d2.keys())
     for k in ks1.intersection(ks2):
-        out[k] = d1[k] + d2[k]
+        out[k] = d1[k].Clone()
+        out[k].Add(d2[k])
         out[k].SetName(d1[k].GetName())
     for k in ks1.difference(ks2):
         out[k] = d1[k].Clone()
     for k in ks2.difference(ks1):
         out[k] = d2[k].Clone()
-    return out
-
-def apply_rules(input, rules):
-    """
-    Applies a list of rules on an input.
-
-    input (OrderedDict): a dictionary of 
-    """
-    out = OrderedDict()
-    rules_out = []
-    for rule_name, rule in rules.items():
-        rule_out = rule(input)
-        rules_out += [rule_out]
-    out = reduce(add_hdict, rules_out)
     return out
 
 class SparseToolsTest(unittest.TestCase):
@@ -284,14 +145,14 @@ class SparseToolsTest(unittest.TestCase):
 
     def test_apply_cuts_project_1d(self):
         h1 = apply_cuts_project(self.hsparse, [("numJets", 4, 6), ("nBCSVM", 1, 3)], ["btag_LR_4b_2b_logit"])
-        self.assertIsInstance(h1, rootpy.plotting.hist.Hist)
-        self.assertAlmostEqual(h1.Integral(), 98.07965384168327)
+        #self.assertIsInstance(h1, rootpy.plotting.hist.Hist)
+        self.assertAlmostEqual(h1.Integral(), 48.59897653569705)
         self.assertEqual(h1.GetName(), "numJets__4__6__nBCSVM__1__3__btag_LR_4b_2b_logit")
 
-    def test_apply_cuts_project_1d(self):
+    def test_apply_cuts_project_2d(self):
         h1 = apply_cuts_project(self.hsparse, [("numJets", 4, 6), ("nBCSVM", 1, 100)], ["btag_LR_4b_2b_logit", "common_bdt"])
         #self.assertIs(type(h1), rootpy.plotting.hist.Hist2D)
-        self.assertAlmostEqual(h1.Integral(), 123.3783247201219)
+        self.assertAlmostEqual(h1.Integral(), 61.12569607935839)
         self.assertEqual(h1.GetName(), "numJets__4__6__nBCSVM__1__100__btag_LR_4b_2b_logit__common_bdt")
 
     def test_save_hdict(self):
@@ -313,129 +174,31 @@ class SparseToolsTest(unittest.TestCase):
         inf.close()
 
     def test_save_hdict_dupe(self):
+        ROOT.TH1F.AddDirectory(False)
         h1 = apply_cuts_project(self.hsparse, [("numJets", 4, 6), ("nBCSVM", 1, 3)], ["btag_LR_4b_2b_logit"])
         h2 = apply_cuts_project(self.hsparse, [("numJets", 4, 6), ("nBCSVM", 3, 6)], ["btag_LR_4b_2b_logit"])
         hdict = OrderedDict()
-        hdict["ttH_hbb/cat1/blr/hblr"] = h1.Clone()
-        hdict["ttH_hbb/cat1/hblr_asd"] = h2.Clone()
+        hdict["data/dl_jge4_tge4/Wmass"] = h1.Clone()
+        hdict["data/dl_jge4_tge4/common_bdt"] = h2.Clone()
         save_hdict("test.root", hdict)
-        
-        inf = rootpy.io.File("test.root")
-        h1a = inf.Get("ttH_hbb/cat1/blr/hblr")
-        self.assertIsNot(h1a, None)
-        self.assertEqual(h1a.Integral(), h1.Integral())
-
-        h2a = inf.Get("ttH_hbb/cat1/hblr_asd")
-        self.assertIsNot(h2a, None)
-        self.assertEqual(h2a.Integral(), h2.Integral())
-        inf.close()
-
-
-class RuleTest(unittest.TestCase):
-
-    def test_InputKey(self):
-        ik = InputKey("ttH_hbb", "nominal")
-        self.assertEquals(ik.sample, "ttH_hbb")
-        self.assertEquals(ik.systematic, "nominal")
-
-    def test_DataFilter(self):
-        df = DataFilter("mu")
-        for d in ["ttH_hbb", "SingleMuon"]:
-            self.assertEquals(df(InputKey(d, "nominal")), True)
-        for d in ["SingleElectron", "DoubleMuon", "DoubleEG", "MuonEG"]:
-            self.assertEquals(df(InputKey(d, "nominal")), False)
-
-        df = DataFilter("el")
-        for d in ["ttH_hbb", "SingleElectron"]:
-            self.assertEquals(df(InputKey(d, "nominal")), True)
-        for d in ["SingleMuon", "DoubleMuon", "DoubleEG", "MuonEG"]:
-            self.assertEquals(df(InputKey(d, "nominal")), False)
-
-    def test_RenameRule(self):
-        rn = RenameRule()
-        r = ProjectionRule(
-            name="6j4t",
-            cuts = [("numJets", 6, 8), ("nBCSVM", 4, 8)],
-            project_axes=["mem_SL_0w2h2t"],
-        )
-
-        out = rn(
-            InputKey("ttH_hbb", "nominal"),
-            r,
-            "mem_SL_0w2h2t"
-        )
-        self.assertEquals(out, "ttH_hbb/6j4t/mem_SL_0w2h2t/mem_SL_0w2h2t")
-
-        #FIXME
-        #the renaming of the histogram object is done only by the ProjectionRule that makes the histogram,
-        #not the actual RenameRule, which only produces a string
-        out = rn(
-            InputKey("ttH_hbb", "CMS_JESUp"),
-            r,
-            "mem_SL_0w2h2t"
-        )
-        self.assertEquals(out, "ttH_hbb/6j4t/mem_SL_0w2h2t/mem_SL_0w2h2t")
-        #self.assertEquals(out, "ttH_hbb/6j4t/mem_SL_0w2h2t/mem_SL_0w2h2t_CMS_JESUp")
-
-    def test_DataRenameRule(self):
-
-        r = ProjectionRule(
-            name="6j4t",
-            cuts = [("numJets", 6, 8), ("nBCSVM", 4, 8)],
-            project_axes=["mem_SL_0w2h2t"],
-        )
-        rn = DataRenameRule(r)
-
-        out = rn(
-            InputKey("ttH_hbb", "nominal"),
-            r,
-            "mem_SL_0w2h2t"
-        )
-        self.assertEquals(out, "ttH_hbb/6j4t/mem_SL_0w2h2t/mem_SL_0w2h2t")
-
-        out = rn(
-            InputKey("SingleMuon", "nominal"),
-            r,
-            "mem_SL_0w2h2t"
-        )
-        self.assertEquals(out, "data/6j4t/mem_SL_0w2h2t/mem_SL_0w2h2t")
-
-
-    def test_ProjectionRule(self):
-
-        file = ROOT.TFile("/Users/joosep/Documents/tth/data/histograms/ControlPlotsSparse.root")
-        hsparse_sig = file.Get("ttH_hbb/sl/sparse")
-        hsparse_sig_jUp = file.Get("ttH_hbb/sl/sparse_CMS_scale_jUp")
-        hsparse_bkg = file.Get("ttbarOther/sl/sparse")
-        hsparse_data = file.Get("SingleMuon/sl/sparse")
+        # 
+        # inf = rootpy.io.File("test.root")
+        # h1a = inf.Get("ttH_hbb/cat1/blr/hblr")
+        # self.assertIsNot(h1a, None)
+        # self.assertEqual(h1a.Integral(), h1.Integral())
+        # 
+        # h2a = inf.Get("ttH_hbb/cat1/hblr_asd")
+        # self.assertIsNot(h2a, None)
+        # self.assertEqual(h2a.Integral(), h2.Integral())
+        # inf.close()
     
-        r = ProjectionRule(
-            name="6j4t",
-            cuts = [("numJets", 6, 8), ("nBCSVM", 4, 8)],
-            project_axes=["mem_SL_0w2h2t"],
-        )
-        r.output_rename = DataRenameRule(r)
-
-        input = OrderedDict()
-        input[InputKey("ttH_hbb", "nominal")] = hsparse_sig
-        input[InputKey("ttH_hbb", "CMS_scale_jUp")] = hsparse_sig_jUp
-        input[InputKey("ttbarOther", "nominal")] = hsparse_bkg
-        input[InputKey("SingleMuon", "nominal")] = hsparse_data
-        
-        ret = r(input)
-        print ret
-        self.assertIn("ttH_hbb/6j4t/mem_SL_0w2h2t/mem_SL_0w2h2t", ret.keys())
-        h = ret["ttH_hbb/6j4t/mem_SL_0w2h2t/mem_SL_0w2h2t"]
-        self.assertAlmostEquals(h.Integral(), 6.3561650237769225)
-
-        self.assertIn("ttH_hbb/6j4t/mem_SL_0w2h2t/mem_SL_0w2h2t_CMS_scale_jUp", ret.keys())
-        h = ret["ttH_hbb/6j4t/mem_SL_0w2h2t/mem_SL_0w2h2t_CMS_scale_jUp"]
-        self.assertAlmostEquals(h.Integral(), 6.68035408513626)
-
-        self.assertIn("data/6j4t/mem_SL_0w2h2t/mem_SL_0w2h2t", ret.keys())
-        h = ret["data/6j4t/mem_SL_0w2h2t/mem_SL_0w2h2t"]
-        self.assertAlmostEquals(h.Integral(), 5.0)
-
+    def test_save_hdict_many(self):
+        ROOT.TH1F.AddDirectory(False)
+        h1 = apply_cuts_project(self.hsparse, [("numJets", 4, 6), ("nBCSVM", 1, 3)], ["btag_LR_4b_2b_logit"])
+        hdict = OrderedDict()
+        for i in range(10000):
+            hdict["ttH_hbb/cat{0}/hblr".format(i)] = h1.Clone("h{0}".format(i))
+        save_hdict("test.root", hdict)
 
 def main():
     unittest.main()

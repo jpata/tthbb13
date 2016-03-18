@@ -1,6 +1,6 @@
 
 #sample vhbb+tthbb file
-testfile_vhbb_tthbb=/store/user/jpata/tth/VHBBHeppyV20_tthbbV3_withme_finer/ttHTobb_M125_13TeV_powheg_pythia8/VHBBHeppyV20_tthbbV3_withme_finer_ttHTobb_M125_13TeV_powheg_Py8__fall15MAv2-pu25ns15v1_76r2as_v12-v1/160302_131859/0000/tree_885.root
+testfile_vhbb_tthbb=root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat//store/user/jpata/tth/VHBBHeppyV21pre_tthbbV5/ttHTobb_M125_13TeV_powheg_pythia8/VHBBHeppyV21pre_tthbbV5_ttHTobb_M125_13TeV_powheg_Py8__fall15MAv2-pu25ns15v1_76r2as_v12-v1/160311_183358/0000/tree_1.root
 test_out_dir=$(CMSSW_BASE)/src/TTH/tests_out
 
 melooper: Plotting/python/joosep/codeGen.py Plotting/bin/*.cc Plotting/interface/*.h
@@ -43,6 +43,14 @@ test_MEAnalysis: test_mkdir
 	du -csh MEAnalysis/Loop_ttHTobb_M125_13TeV_powheg_pythia8/tree.root &>> $(test_out_dir)/MEAnalysis_MEAnalysis_heppy.log
 	python -c "import ROOT; f=ROOT.TFile('MEAnalysis/Loop_ttHTobb_M125_13TeV_powheg_pythia8/tree.root'); print f.Get('tree').GetEntries()" &>> $(test_out_dir)/MEAnalysis_MEAnalysis_heppy.log
 	cp MEAnalysis/Loop_ttHTobb_M125_13TeV_powheg_pythia8/tree.root $(test_out_dir)/MEAnalysis_MEAnalysis_heppy.root
+
+test_MEAnalysis_withme: test_mkdir
+	rm -Rf MEAnalysis/Loop_*
+	cd MEAnalysis && ME_CONF=python/cfg_withME.py python python/MEAnalysis_heppy.py &> $(test_out_dir)/MEAnalysis_MEAnalysis_heppy_withme.log
+	sleep 5
+	du -csh MEAnalysis/Loop_ttHTobb_M125_13TeV_powheg_pythia8/tree.root &>> $(test_out_dir)/MEAnalysis_MEAnalysis_heppy_withme.log
+	python -c "import ROOT; f=ROOT.TFile('MEAnalysis/Loop_ttHTobb_M125_13TeV_powheg_pythia8/tree.root'); print f.Get('tree').GetEntries()" &>> $(test_out_dir)/MEAnalysis_MEAnalysis_heppy_withme.log
+	cp MEAnalysis/Loop_ttHTobb_M125_13TeV_powheg_pythia8/tree.root $(test_out_dir)/MEAnalysis_MEAnalysis_heppy_withme.root
 
 test_MELooper: test_mkdir melooper
 	cd Plotting && FILE_NAMES=$(testfile_vhbb_tthbb) DATASETPATH=ttHTobb_M125_13TeV_powheg_pythia8 ./python/makeJobfile.py && ./melooper job.json &> $(test_out_dir)/Plotting_MELooper.log
