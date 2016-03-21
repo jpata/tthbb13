@@ -36,24 +36,24 @@ plot_inputs = False
 default_params = {        
 
     # Parameters for 1d architecture    
-    "n_dense_layers" : 2,
-    "n_dense_nodes"  : 80,
-    "dense_dropout"  : 0.2,
+    # "n_dense_layers" : 2,
+    # "n_dense_nodes"  : 80,
+    # "dense_dropout"  : 0.2,
 
-#    # Parameters for 2d architecture    
-#    "n_blocks"       : 2,    
-#    "n_conv_layers"  : 2,        
-#    "pool_size"      : 0,
-#    "n_dense_layers" : 1,
-#    "n_dense_nodes"  : 20,
-#    "n_features"     : 8,
-#    "do_reshape"     : 0,
+    # Parameters for 2d architecture    
+    "n_blocks"       : 1,    
+    "n_conv_layers"  : 2,        
+    "pool_size"      : 0,
+    "n_dense_layers" : 1,
+    "n_dense_nodes"  : 20,
+    "n_features"     : 4,
+    "do_reshape"     : 1,
 
     # Common parameters
-    "lr"          : 0.01,
+    "lr"          : 0.02,
     "decay"       : 1e-6,
     "momentum"    : 0.9,            
-    "nb_epoch"    : 10,
+    "nb_epoch"    : 50,
 }
 
 
@@ -143,7 +143,7 @@ def model_2dconv(params):
     for i_block in range(params["n_blocks"]):
         for i_conv_layer in range(params["n_conv_layers"]):
 
-            if i_conv_layer == 0 and i_block ==0:
+            if i_conv_layer == 0 and i_block == 0:
                 model.add(Convolution2D(params["n_features"], current_rows,1, input_shape=(1, 4, 20)))
             else:
                 model.add(Convolution2D(params["n_features"], current_rows,1))
@@ -195,8 +195,8 @@ classifiers = [
                "keras",              
                params,
                False,
-               get_data_flat,
-               model_1d(params)
+               get_data_2d,
+               model_2dconv(params)
            )]
 
 
@@ -206,7 +206,7 @@ classifiers = [
 
 [clf.prepare(dtrain, dtest) for clf in classifiers]
 [rocplot(clf, dtest, classes, class_names) for clf in classifiers]
-multirocplot(classifiers, dtest)
+multirocplot(classifiers, dtest, False)
 
 
 

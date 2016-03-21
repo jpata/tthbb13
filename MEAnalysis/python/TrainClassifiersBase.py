@@ -77,13 +77,22 @@ class Classifier:
                  params,
                  load_from_file,
                  get_data,
-                 model):
+                 model,
+                 inpath = ".",
+                 plot_name = "",
+             ):
         self.name = name
         self.backend = backend
         self.params = params
         self.load_from_file = load_from_file
         self.get_data = get_data
         self.model = model
+        self.inpath = inpath
+
+        if plot_name:
+            self.plot_name = plot_name
+        else:
+            self.plot_name = name
 
     def prepare(self, dtrain, dtest):
 
@@ -94,15 +103,15 @@ class Classifier:
                 train_keras(dtrain, dtest, self)
         else:
             if self.backend == "scikit":
-                f = open(self.name + ".pickle", "r")
+                f = open(os.path.join(self.inpath,self.name + ".pickle"), "r")
                 self.model = pickle.load(f)
                 f.close()
             elif self.backend == "keras":
-                f = open(self.name + ".yaml", "r")
+                f = open(os.path.join(self.inpath,self.name + ".yaml"), "r")
                 yaml_string = f.read()
                 f.close()
                 self.model = model_from_yaml(yaml_string)                
-                self.model.load_weights(self.name + "_weights.h5")
+                self.model.load_weights(os.path.join(self.inpath,self.name + "_weights.h5"))
             print "Loading", self.name, "from file: Done..."
 
 
@@ -285,13 +294,16 @@ def rocplot(clf, tmp_df, classes, class_names):
 # Helper: multirocplot
 ########################################
 
-def multirocplot(clfs, tmp_df):
+def multirocplot(clfs, tmp_df, logy=True):
 
     df = tmp_df.copy()
 
     plt.clf()
-    plt.yscale('log')
-
+    if logy:
+        plt.yscale('log')
+    else:
+        plt.yscale('linear')
+        
     sig_class = 1
     bkg_class = 0
     
@@ -304,23 +316,23 @@ def multirocplot(clfs, tmp_df):
     for clf in clfs:
         
         X_test = clf.get_data(df)
-        df["proba_" + clf.name] = clf.model.predict_proba(X_test)[:,sig_class]
+        df["proba_" + clf.plot_name] = clf.model.predict_proba(X_test)[:,sig_class]
 
         # Signal Efficiency
         sig = df["is_signal_new"]==sig_class
-        probs1 = df[sig]["proba_" + clf.name].values
+        probs1 = df[sig]["proba_" + clf.plot_name].values
         h1 = make_df_hist((nbins*5,min_prob,max_prob), probs1)
         
         # Background efficiency
         bkg = df["is_signal_new"]==bkg_class
-        probs2 = df[bkg]["proba_" + clf.name].values
+        probs2 = df[bkg]["proba_" + clf.plot_name].values
         h2 = make_df_hist((nbins*5,min_prob,max_prob), probs2)
 
         # And turn into ROC
         r, e = calc_roc(h1, h2)
         rocs.append(r)
         
-        plt.plot(r[:, 0], r[:, 1], label=clf.name, lw=1, ls="--")
+        plt.plot(r[:, 0], r[:, 1], label=clf.plot_name, lw=1, ls="--")
 
     # Setup nicely
     plt.legend(loc=2)
