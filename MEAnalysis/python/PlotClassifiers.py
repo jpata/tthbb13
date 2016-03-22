@@ -109,7 +109,18 @@ classifiers = [
                model = None,
                inpath = "/shome/gregor/tth/gc/best-topevent/conv",
                plot_name = "Conv NN"
-           )]
+           ),
+    Classifier("NN", 
+               "keras",              
+               params = {},
+               load_from_file = True,
+               get_data = get_data_2d,
+               model = None,
+               inpath = "/shome/gregor/tth/gc/GC12603af43460/907",
+               plot_name = "Conv NN v2"
+           ),
+
+]
 
 
 ########################################

@@ -40,20 +40,21 @@ default_params = {
     # "n_dense_nodes"  : 80,
     # "dense_dropout"  : 0.2,
 
+
     # Parameters for 2d architecture    
-    "n_blocks"       : 1,    
+    "n_blocks"       : 2,    
     "n_conv_layers"  : 2,        
     "pool_size"      : 0,
     "n_dense_layers" : 1,
     "n_dense_nodes"  : 20,
-    "n_features"     : 4,
-    "do_reshape"     : 1,
+    "n_features"     : 8,
+    "do_reshape"     : 0,
 
     # Common parameters
-    "lr"          : 0.02,
+    "lr"          : 0.01,
     "decay"       : 1e-6,
     "momentum"    : 0.9,            
-    "nb_epoch"    : 50,
+    "nb_epoch"    : 10,
 }
 
 
@@ -127,8 +128,7 @@ def get_data_flat(df):
     return scaler.transform(get_data_flat_unscaled(df))
 
 def get_data_2d(df):
-    return np.expand_dims(scaler.transform(get_data_flat(df)).reshape(-1, 4, 20), axis=1)
-
+    return np.expand_dims(scaler.transform(get_data_flat_unscaled(df)).reshape(-1, 4, 20), axis=1)
 
 
 def model_2dconv(params):
@@ -203,6 +203,12 @@ classifiers = [
 ########################################
 # Train/Load classifiers and make ROCs
 ########################################
+
+# firstiiter: 4 features, reshaping
+# second-iter: different features, also test wo/ reshaping
+# third-iter: 1d test
+# fourth-iter: bigger 1d test
+
 
 [clf.prepare(dtrain, dtest) for clf in classifiers]
 [rocplot(clf, dtest, classes, class_names) for clf in classifiers]
