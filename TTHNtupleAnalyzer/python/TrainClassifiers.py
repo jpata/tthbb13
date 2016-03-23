@@ -707,7 +707,7 @@ if plot_inputs:
             
         plt.xlabel(name, fontsize=16)
         plt.ylabel("Fraction of Jets", fontsize=16)
-        plt.legend(loc=1)
+        plt.legend(loc=0)
 
         plt.savefig("input_{0}.png".format(br))
 
@@ -715,23 +715,33 @@ if plot_inputs:
     for cls in classes:
 
         plt.clf()
-        for br in ["ak08softdropz10b00_mass","ak08softdropz10b00_masscal", "ak08puppisoftdropz10b00_mass","ak08puppisoftdropz10b00_masscal"]:
+        for i_br, br in enumerate(["ak08softdropz10b00_mass",
+                                   "ak08softdropz10b00_masscal", 
+                                   "ak08puppisoftdropz10b00_mass",
+                                   "ak08puppisoftdropz10b00_masscal"]):
        
             xmin = 0
             xmax = 300
             name = br
 
+            names = {"ak08softdropz10b00_mass"         : "CHS, Uncal.",
+                     "ak08softdropz10b00_masscal"      : "CHS, Cal.",
+                     "ak08puppisoftdropz10b00_mass"    : "Puppi, Uncal.",
+                     "ak08puppisoftdropz10b00_masscal" : "Puppi, Cal.",
+                     }
+
             plt.hist(df.loc[df["is_signal_new"]==cls,br].as_matrix(),
-                         color=colors[cls+1], 
-                         bins=np.linspace(xmin,xmax,50),
-                         normed=True, 
-                         alpha=0.4,
-                         label = br
+                     color=colors[i_br], 
+                     edgecolor = colors[i_br], 
+                     bins=np.linspace(xmin,xmax,50),
+                     normed=True, 
+                     histtype="step",
+                     label = names[br]
                 )    
 
-        plt.xlabel("Mass", fontsize=16)
+        plt.xlabel("Mass [GeV]", fontsize=16)
         plt.ylabel("Fraction of Jets", fontsize=16)
-        plt.legend(loc=1)
+        plt.legend()
 
         plt.savefig("input_mass_{0}.png".format(cls))
 
