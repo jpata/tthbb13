@@ -7,8 +7,8 @@ else:
 
 files = {}
 
-#files["zprime_m2000"]     = "ntop_x1_zprime_m2000-tagging"	
-files["qcd_800_1000"]     = "ntop_x1_qcd_800_1000-tagging" 
+#files["zprime_m2000"]     = "ntop_x3_zprime_m2000-tagging"	
+files["qcd_800_1000"]     = "ntop_x3_qcd_800_1000-tagging" 
 
 
 weighted_files = {}

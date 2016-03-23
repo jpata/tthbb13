@@ -28,8 +28,8 @@ export NUMEXPR_NUM_THREADS=1
 export MKL_NUM_THREADS=1
 
 # Stage in the data
-xrdcp root://t3dcachedb.psi.ch:1094///pnfs/psi.ch/cms/trivcat/store/user/gregor/ntop_x1_qcd_800_1000-tagging-weighted.root ntop_x1_qcd_800_1000-tagging-weighted.root  
-xrdcp root://t3dcachedb.psi.ch:1094///pnfs/psi.ch/cms/trivcat/store/user/gregor/ntop_x1_zprime_m2000-tagging-weighted.root ntop_x1_zprime_m2000-tagging-weighted.root
+xrdcp root://t3dcachedb.psi.ch:1094///pnfs/psi.ch/cms/trivcat/store/user/gregor/ntop_x3_qcd_800_1000-tagging-weighted.root ntop_x3_qcd_800_1000-tagging-weighted.root  
+xrdcp root://t3dcachedb.psi.ch:1094///pnfs/psi.ch/cms/trivcat/store/user/gregor/ntop_x3_zprime_m2000-tagging-weighted.root ntop_x3_zprime_m2000-tagging-weighted.root
 
 # And the pickled results of two BDT trainings for comparison 
 cp ${CMSSW_BASE}/src/TTH/TTHNtupleAnalyzer/python/BDT-nob.pickle .
