@@ -6,7 +6,7 @@ import ROOT
 
 cmssw_base = os.environ["CMSSW_BASE"]
 
-datasetpath = "src/TTH/MEAnalysis/gc/datasets/vhbb_tth/"
+datasetpath = "src/TTH/MEAnalysis/gc/datasets/VHBBHeppyV21_tthbbV6/"
 getSize = False
 
 path1 = os.path.join(cmssw_base, datasetpath)

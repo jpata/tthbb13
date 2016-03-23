@@ -21,7 +21,7 @@ from TTH.MEAnalysis.samples_base import getSitePrefix
 DEF_VAL_FLOAT = -9999.0
 TOP_MASS = 172
 MAX_PERM = 20
-TOPEVENT_INCREASE_STAT = 200
+TOPEVENT_INCREASE_STAT = 50
 
 ntpl = {"hadtop_3j": {"int_branches"      : [],
                          "float_branches" : [],
