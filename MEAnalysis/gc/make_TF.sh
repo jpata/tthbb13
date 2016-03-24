@@ -17,7 +17,7 @@ echo "outputtree-strict.py is Done"
 
 # Copy output
 export SRMBASE=srm://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/
-OUTDIR=/store/user/$USER/tth/gc/makeTF/${TASK_ID}/@runconf@/
+OUTDIR=/store/user/$USER/tth/gc/makeTF/${TASK_ID}/$dsversion"_"$jettype/
 gfal-mkdir -p $SRMBASE/$OUTDIR || true
 echo "copying output"
 OFNAME=$OUTDIR/output_${MY_JOBID}.root
