@@ -23,11 +23,11 @@ from TFClasses import function
 # Functions
 ########################################
 
-def Make_E_axis( input_tree, eta_axis, n_E_bins, E_bounds, particle, config ):
+def Make_E_axis( input_chain, eta_axis, n_E_bins, E_bounds, particle, config ):
 
     # Method:
     #  - Per eta bin, loop:
-    #    - Get an E histogram from the input_tree, selected for eta and min/max E
+    #    - Get an E histogram from the input_chain, selected for eta and min/max E
     #    - Loop over the bins and sum up bin content
     #    - Once sum of bin content equals a fraction 1/n_E_bins of the total content,
     #      save the bin number as a boundary, and reset sum to 0
@@ -75,8 +75,12 @@ def Make_E_axis( input_tree, eta_axis, n_E_bins, E_bounds, particle, config ):
             E_bounds[0], E_bounds[1] )
 
         # Retrieve the histogram
-        input_tree.Draw(draw_str, sel_str)
+        input_chain.Draw(draw_str, sel_str)
         E_hist = getattr(ROOT, hist_name).Clone()
+
+
+        if not os.path.isdir("histogramming_output"):
+            os.makedirs("histogramming_output")
 
 
         ########################################
@@ -354,9 +358,11 @@ def Make_Histograms(conffile):
     ROOT.gROOT.ProcessLine("gErrorIgnoreLevel = 1001;")
     ROOT.gStyle.SetOptFit(1011)
 
-    print 'Reading {0}'.format(input_root_file_name)
-    input_root_file = ROOT.TFile.Open(input_root_file_name)
-    input_tree = input_root_file.Get(input_tree_name)
+    input_chain = ROOT.TChain(input_tree_name)    
+    input_chain.Add(input_root_file_name)
+
+    #input_root_file = ROOT.TFile.Open(input_root_file_name)
+    #input_tree = input_chain.Get()
 
     outputdir = config['outputdir']
 
@@ -405,7 +411,7 @@ def Make_Histograms(conffile):
 
         print 'Creating E_axis for {0}'.format(particle)
         ( dic['E_axis'], dic['E_values'] ) = Make_E_axis(
-            input_tree,
+            input_chain,
             dic['eta_axis'],
             dic['n_E_bins'],
             dic['E_bounds'],
@@ -425,7 +431,7 @@ def Make_Histograms(conffile):
     # Event loop
     ########################################
     
-    n_entries = input_tree.GetEntries()
+    n_entries = input_chain.GetEntries()
     config['n_total_events'] = n_entries
     config['events_used'] = 0
 
@@ -440,18 +446,18 @@ def Make_Histograms(conffile):
         if not i_event % 5000:
             print "{0:.1f}%".format( 100.*i_event /n_processed)
 
-        input_tree.GetEntry( i_event )
+        input_chain.GetEntry( i_event )
 
         if Use_mc_values:
-            E_event = AH.getter(input_tree, config['mc_E_str'])
-            eta_event = AH.getter(input_tree, config['mc_Eta_str'])
-            particle_event = AH.getter(input_tree, config['mc_Flavour_str'])
+            E_event = AH.getter(input_chain, config['mc_E_str'])
+            eta_event = AH.getter(input_chain, config['mc_Eta_str'])
+            particle_event = AH.getter(input_chain, config['mc_Flavour_str'])
         else:
-            E_event = AH.getter(input_tree, config['quark_E_str'])
-            eta_event = AH.getter(input_tree, config['quark_Eta_str'])
-            particle_event = AH.getter(input_tree, config['quark_Flavour_str'])
+            E_event = AH.getter(input_chain, config['quark_E_str'])
+            eta_event = AH.getter(input_chain, config['quark_Eta_str'])
+            particle_event = AH.getter(input_chain, config['quark_Flavour_str'])
 
-        E_reconstructed = AH.getter( input_tree, config['reco_E_str'] )
+        E_reconstructed = AH.getter( input_chain, config['reco_E_str'] )
 
 
         if E_event >= E_bounds[0] and E_event <= E_bounds[1] and eta_event >= eta_axis[0] and eta_event <= eta_axis[-1]:
