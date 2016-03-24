@@ -58,6 +58,8 @@ ntpl["hadtop_3j"]["float_branches"].extend(["j1j2_mass",
 
 ntpl["topevent"]["int_branches"].extend(["evt", "good_perm_in_event", "good_perm_in_first_n"])
 
+ntpl["topevent"]["float_branches"].extend(["mem_022", "mem_222"])
+
 for ic in range(MAX_PERM):
     ntpl["topevent"]["float_branches"].extend(["c{0}_mass".format(ic), 
                                                "c{0}_frec".format(ic), 
@@ -261,6 +263,10 @@ if __name__ == "__main__":
 
     intree = ROOT.TChain("tree")
     for fi in sys.argv[2:]:
+        
+        if fi in ["=","1"]:
+            continue
+        
         print "adding", fi
         intree.AddFile(getSitePrefix(fi))
 
@@ -320,11 +326,30 @@ if __name__ == "__main__":
         # Prepare topevent ntuple
         if "topevent" in ntpl.keys():
 
+                        
+            # Get the MEM discriminant
+            mem_022_tth  = AH.getter(intree, "mem_tth_p")[0]
+            mem_222_tth  = AH.getter(intree, "mem_tth_p")[5]
+            mem_022_ttbb = AH.getter(intree, "mem_ttbb_p")[0]
+            mem_222_ttbb = AH.getter(intree, "mem_ttbb_p")[5]
+            
+            k = 0.15
+
+            if (mem_022_tth + k * mem_022_ttbb) > 0:
+                mem_022 = mem_022_tth / (mem_022_tth + k * mem_022_ttbb)
+
+            if (mem_222_tth + k * mem_222_ttbb) > 0:
+                mem_222 = mem_222_tth / (mem_222_tth + k * mem_222_ttbb)                        
+
+
+
             variables      = ntpl["topevent"]["vars"]
             variable_types = ntpl["topevent"]["var_types"]
 
             sorted_combs = sorted(all_combs, key = lambda x:abs(x["j1j2j3_mass"] - TOP_MASS))
             sorted_combs = sorted_combs[:MAX_PERM]
+
+
 
             # Inflate statistics ( and make independent of ordering)
             for _ in range(TOPEVENT_INCREASE_STAT):
@@ -337,6 +362,9 @@ if __name__ == "__main__":
                 variables["evt"][0] = AH.getter(intree, "evt")
                 variables["good_perm_in_event"][0] = any([c["is_signal"]==5 for c in sorted_combs])
                 variables["good_perm_in_first_n"][0] = any([c["is_signal"]==5 for c in sorted_combs[:MAX_PERM]])
+
+                variables["mem_022"][0] = mem_022
+                variables["mem_222"][0] = mem_222
 
                 for ic in range(MAX_PERM):                    
                     variables["c{0}_mass".format(ic)][0]     = sorted_combs[ic]["j1j2j3_mass"]
