@@ -5,6 +5,7 @@
 
 from TTH.MEAnalysis.samples_base import *
 
+version = "VHBBHeppyV21_tthbbV6"
 datasetpath = "src/TTH/MEAnalysis/gc/datasets/VHBBHeppyV21_tthbbV6/"
 samples_dict = {
     

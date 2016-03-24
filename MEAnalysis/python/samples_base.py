@@ -128,7 +128,7 @@ def get_files(fname):
     lines = map(lambda x: x.split()[0], lines)
     return lines
 
-def getSitePrefix(fn):
+def getSitePrefix(fn=""):
     return "root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat" + fn
 
 def getSampleNGen(sample):

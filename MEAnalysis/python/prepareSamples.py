@@ -6,7 +6,8 @@ import ROOT
 
 cmssw_base = os.environ["CMSSW_BASE"]
 
-datasetpath = "src/TTH/MEAnalysis/gc/datasets/VHBBHeppyV21_tthbbV6/"
+version = "VHBBHeppyV21_tthbbV6"
+datasetpath = "src/TTH/MEAnalysis/gc/datasets/{0}/".format(version)
 getSize = False
 
 path1 = os.path.join(cmssw_base, datasetpath)
@@ -24,6 +25,7 @@ samp_py.write("# do NOT modify (except to skip individual samples)\n\n\n")
 
 samp_py.write('from TTH.MEAnalysis.samples_base import *\n\n')
 
+samp_py.write('version = "' + version + '"\n')
 samp_py.write('datasetpath = "' + datasetpath + '"\n')
 
 samp_py.write("samples_dict = {\n")
