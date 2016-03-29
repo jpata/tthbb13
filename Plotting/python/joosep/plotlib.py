@@ -693,3 +693,15 @@ def brazilplot(lims, ks, knames):
     yax.set_tick_params(pad=pad)
 
     #plt.grid()
+
+
+def make_df_hist(bins, x, w=1.0):
+    h = rootpy.plotting.Hist(*bins)
+    a = np.array(x).astype("float64")
+    if isinstance(w, float):
+        b = np.repeat(w, len(a)).astype("float64")
+    else:
+        b = np.array(w).astype("float64")
+    h.FillN(len(a), a, b)
+    return h
+# 

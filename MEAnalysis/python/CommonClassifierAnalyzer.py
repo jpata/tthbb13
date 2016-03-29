@@ -8,7 +8,6 @@ CvectorTLorentzVector = getattr(ROOT, "std::vector<TLorentzVector>")
 Cvectordouble = getattr(ROOT, "std::vector<double>")
 from TTH.MEAnalysis.vhbb_utils import lvec
 
-
 class CommonClassifierAnalyzer(FilterAnalyzer):
     """
     Performs ME categorization

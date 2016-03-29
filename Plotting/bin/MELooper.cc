@@ -132,7 +132,7 @@ int main(int argc, const char** argv) {
     cout << "speedMB " << (double)nbytes/1024.0/1024.0 / t_real << " MB/s (real) " << (double)nbytes/1024.0/1024.0 / t_cpu << " MB/s (cpu)" << endl; 
     cout << "speedEV " << (double)nentries / t_real << " ev/s (real) " << (double)nentries / t_cpu << " ev/s (cpu)" << endl; 
     cout << to_string(results) << endl;
-    const string outname = ProcessKey::to_string(conf.process) + conf.prefix;
+    const string outname = conf.prefix;
     saveResults(results, outname, conf.outputFile);
     return 0;
 }
