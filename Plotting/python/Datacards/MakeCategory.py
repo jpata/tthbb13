@@ -1,5 +1,5 @@
-import json, copy
-import sparse, ROOT, multiprocessing, sys
+import json, copy, os, multiprocessing, sys
+import sparse, ROOT
 
 #Nota bene: this is very important!
 #need to store histograms in memory, not on disk
@@ -130,15 +130,56 @@ def apply_rules_parallel(infile, rules, ncores=4):
 
 if __name__ == "__main__":
     
+    #path to sparse.root from MELooper
     infile = sys.argv[1]
 
+    #use the pre-defined analysis specification
     if len(sys.argv)==2:
         import AnalysisSpecification as anspec
+    #load from file
     elif len(sys.argv)==3:
         import imp
         anspec = imp.load_source("anspec", sys.argv[2])
+    analysis = anspec.analysis
 
-    for cat in anspec.sl_categories + anspec.dl_categories:
-        rules = make_rule_cut(cat.src_histogram, cat)
-        hdict = apply_rules_parallel(infile, rules)
-        sparse.save_hdict("out/{0}.root".format(cat.name), hdict)
+    rules = []
+    for cat in analysis.categories:
+        rules += make_rule_cut(cat.src_histogram, cat)
+    
+    #project out all the histograms
+    hdict = apply_rules_parallel(infile, rules)
+
+    #split the big dictionary to category-based dictionaries
+    hdict_cat = {}
+    for k in hdict.keys():
+        catname = k.split("/")[1]
+        if not hdict_cat.has_key(catname):
+            hdict_cat[catname] = {}
+        hdict_cat[catname][k] = hdict[k]
+    
+    #catname -> file name
+    category_files = {}
+
+    #save the histograms into per-category files
+    for catname in hdict_cat.keys():
+        hfile = os.path.join(analysis.output_directory, "{0}.root".format(catname))
+        category_files[catname] = hfile
+        sparse.save_hdict(hfile, hdict_cat[catname])
+    
+    #add the fake data
+    if analysis.do_fake_data:
+        from datacardCombiner import fakeData
+        for cat in analysis.categories:
+            hfile = category_files[cat.name]
+            tf = ROOT.TFile(hfile, "UPDATE")
+            fakeData(tf, tf, [cat])
+            tf.Close()
+
+    #add the stat variations
+    if analysis.do_stat_variations:
+        from datacardCombiner import makeStatVariations
+        for cat in analysis.categories:
+            hfile = category_files[cat.name]
+            tf = ROOT.TFile(hfile, "UPDATE")
+            makeStatVariations(tf, tf, [cat])
+            tf.Close()
