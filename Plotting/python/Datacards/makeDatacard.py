@@ -119,6 +119,11 @@ def MakeDatacard2(
         #FIXME: if category discriminator is None, this will crash as event_counts is not evaluated for skipped categories
         #need to skip category here as well if disc==None
         if not categorization.event_counts[signal].has_key(cat):
+            print "category {0} doesn't have signal counts specified in categorization.event_counts[\"{1}\"]".format(
+                cat,
+                signal
+            )
+
             badcats += [cat]
             continue
         sig = categorization.event_counts[signal][cat]

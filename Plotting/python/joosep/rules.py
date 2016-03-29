@@ -1,5 +1,8 @@
 import plotlib, json, copy
 import sparse, ROOT, multiprocessing, sys
+
+#Nota bene: this is very important!
+#need to store histograms in memory, not on disk
 ROOT.TH1.AddDirectory(False)
 
 mc_samples = [
@@ -27,10 +30,40 @@ systs = [
 ]
 
 def replace_out(samp):
+    """
+    FIXME: this should be handled in datacard.py by some specification
+    """
     if samp in ["ww", "wz", "zz"]:
         return "diboson"
     return samp
+
 def make_rule_cut(basehist, cuts, variables, catname, histname):
+    """
+    Given a THnSparse base histogram and a list of cuts, makes the rules to
+    project out the given variables into a TH1D histogram. The rules are a list
+    of dictionary objects with
+    {
+        'input': 'ttH_hbb/sl/sparse' #the source sparse histogram
+        'cuts': [('numJets', 6, 8), ('nBCSVM', 4, 6)] #the list of cuts to apply
+        'project': [('mem_SL_0w2h2t', 4)] #the variables to project out
+        'output': 'ttH_hbb/sl_jge6_tge4/mem_SL_0w2h2t' #the output histogram
+    }
+    which can be used to produce a set of histograms. Each rule should be
+    independent of the other rules.
+
+    basehist (string): name of the sparse histogram in the input file, e.g.
+        "sl/sparse". Systematic variations are added automatically to this base name.
+    cuts (list of 3-tuples): The cuts (SetRange commands) to apply on the sparse
+        histogram. Example: [('numJets', 6, 8), ('nBCSVM', 4, 6)] sets the jge6_tge4
+        selection.
+    variables (list of (varname, nrebin) tuples): list of variables to project
+        out, along with the rebinning, e.g. [('mem_SL_0w2h2t', 4)]
+    catname (string): name of the category, used for the output histogram name. 
+        Example: "sl_jge6_tge4" 
+    histname (string): name of the output histogram. Example "mem_SL_0w2h2t"
+
+    Returns: a list of rules to apply using apply_rule.
+    """
     rules = []
     for samp in mc_samples:
         samp_out = replace_out(samp)
@@ -48,6 +81,9 @@ def make_rule_cut(basehist, cuts, variables, catname, histname):
                 d2["input"] += sd
                 d2["output"] += sd
                 rules += [d2]
+
+    #Now we need to apply additional cuts on data samples based on the lepton
+    #flavour
     for samp in data_samples:
         if "sl/" in basehist:
             if samp == "SingleMuon":
@@ -75,8 +111,14 @@ def make_rule_cut(basehist, cuts, variables, catname, histname):
         rules += [d]
     return rules
 
-
 def apply_rules(args):
+    """
+    The worker function for the histogram projection rules.
+    args (tuple): (input filename, list of rules) to apply
+
+    Returns: a dictionary with the output histograms
+    """
+
     infile, rules = args
     infile_tf = ROOT.TFile.Open(infile)
     hdict = {}
