@@ -21,6 +21,8 @@ from fit_single_bins import Fit_Single_Bins
 from fit_across_bins import Fit_Across_Bins
 from draw_hists_and_fits import Draw_Hists_and_Fits
 
+import TTH.MEAnalysis.samples as samples
+
 ########################################
 # Main
 ########################################
@@ -45,9 +47,10 @@ def main(conffile):
 
     print ' Analysis end time:              {0}\n'.format( config['enddate'] )
 
+
 ########################################
 # End of Main
 ########################################
 if __name__ == "__main__":
-  #main("configs/TF_tthbb13_resolved/config.dat")
-  main("configs/TF_tthbb13_subjet/config.dat")
+  #main("configs/{0}_resolved/config.dat".format(samples.version))
+  main("configs/{0}_subjet/config.dat".format(samples.version))
