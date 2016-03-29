@@ -261,10 +261,11 @@ void saveResults(ResultMap& res, const string& prefix, const string& filename) {
         const auto procKey = get<0>(rk);
         const auto systKey = get<2>(rk);
         const auto histKey = get<3>(rk);
-        stringstream ss;
 
         //Add all categories together with underscores
         int ind = 0;
+        stringstream ss;
+        ss << prefix << "/";
         ss << ProcessKey::to_string(procKey) << "/";
         for (auto& catKey : get<1>(rk)) {
             ss << CategoryKey::to_string(catKey);
@@ -275,6 +276,7 @@ void saveResults(ResultMap& res, const string& prefix, const string& filename) {
         }
         //make root dir if doesn't exist
         const string dirname = ss.str();
+        cout << "dirname=" << dirname << endl;
         TDirectory* dir = (TDirectory*)(of.Get(dirname.c_str()));
         if (dir == nullptr) {
             of.mkdir(dirname.c_str());

@@ -190,11 +190,11 @@ brnd = cfg.Analyzer(
     _conf = conf
 )
 
-#commoncls = cfg.Analyzer(
-#    MECoreAnalyzers.CommonClassifierAnalyzer,
-#    'brand',
-#    _conf = conf
-#)
+commoncls = cfg.Analyzer(
+    MECoreAnalyzers.CommonClassifierAnalyzer,
+    'brand',
+    _conf = conf
+)
 
 treevar = cfg.Analyzer(
     MECoreAnalyzers.TreeVarAnalyzer,
@@ -224,7 +224,7 @@ sequence = cfg.Sequence([
     genrad,
     gentth,
     subjet_analyzer,
-    #commoncls,
+    commoncls,
     mem_analyzer,
     mva,
     treevar,

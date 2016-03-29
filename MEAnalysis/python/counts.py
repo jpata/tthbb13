@@ -22,6 +22,9 @@ hEntries.Write()
 
 for infn in filenames:
     tf = ROOT.TFile.Open(infn)
+    if not tf or tf.IsZombie():
+        print "Could not open {0}, skipping".format(infn)
+        continue
     vhbb_dir = tf.Get("vhbb")
     for k in vhbb_dir.GetListOfKeys():
         kn = k.GetName() 
