@@ -1,7 +1,7 @@
 from WMCore.Configuration import Configuration
 config = Configuration()
 
-submitname = "VHBBHeppyV21_tthbbV5"
+submitname = "VHBBHeppyV21_tthbbV6"
 
 config.section_("General")
 config.General.requestName = 'tth_' + submitname
@@ -38,9 +38,8 @@ config.JobType.inputFiles = ['heppy_config.py',
                               vhbb_dir + "/Wln-spring15.weights.xml",
                               vhbb_dir + "/Znn-spring15.weights.xml",
                               vhbb_dir + "/VBF-spring15.weights.xml",
-                              vhbb_dir + "/ttbar-spring15.weights.xml",
-                              vhbb_dir + "/ttbar-fall15.weights.xml",
-                              vhbb_dir + '/TMVA_blikelihood_vbf_cmssw76.weights.xml'
+                              vhbb_dir + "/ttbar-fall15_TargetGenOverPt_GenPtCut0.weights.xml",
+                              vhbb_dir + '/TMVA_blikelihood_vbf_cmssw76_h21trained.weights.xml'
 ]
 #config.JobType.outputFiles = ['tree.root']
 
@@ -48,7 +47,7 @@ config.section_("Data")
 config.Data.inputDataset = '/ttHTobb_M125_13TeV_powheg_pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM'
 config.Data.inputDBS = 'global'
 config.Data.splitting = 'LumiBased'
-config.Data.unitsPerJob = 50
+config.Data.unitsPerJob = 10
 config.Data.totalUnits = -1
 config.Data.outLFNDirBase = '/store/user/jpata/tth/' + submitname
 config.Data.publication = True

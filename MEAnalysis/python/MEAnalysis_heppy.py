@@ -54,32 +54,6 @@ pi_file = open(conf.general["transferFunctions_sj_Pickle"] , 'rb')
 conf.tf_sj_matrix = pickle.load(pi_file)
 pi_file.close()
     
-#Load the input sample dictionary
-#Samples are configured in the Conf object, by default, we use samples_vhbb
-
-#input component
-#several input components can be declared,
-#and added to the list of selected components
-def prepareInputSamples(sampleFile=conf.general["sampleFile"]):
-    print "loading samples from", sampleFile
-    samplefile = imp.load_source("samplefile", sampleFile)
-    from samplefile import samples_dict
-    inputSamples = []
-    for sn in sorted(samples_dict.keys()):
-        s = samples_dict[sn]
-        sample_ngen = s.nGen.value()
-        inputSample = cfg.Component(
-            s.name.value(),
-            files = map(getSitePrefix, s.subFiles.value()),
-            tree_name = s.treeName.value(),
-            n_gen = sample_ngen,
-            xs = s.xSec.value()
-        )
-        inputSample.isMC = s.isMC.value()
-        inputSamples.append(inputSample)
-    return inputSamples, samples_dict
-
-inputSamples, samples_dict = prepareInputSamples(conf.general["sampleFile"])
 
 #Event contents are defined here
 #This is work in progress
@@ -216,11 +190,11 @@ brnd = cfg.Analyzer(
     _conf = conf
 )
 
-#commoncls = cfg.Analyzer(
-#    MECoreAnalyzers.CommonClassifierAnalyzer,
-#    'brand',
-#    _conf = conf
-#)
+commoncls = cfg.Analyzer(
+    MECoreAnalyzers.CommonClassifierAnalyzer,
+    'brand',
+    _conf = conf
+)
 
 treevar = cfg.Analyzer(
     MECoreAnalyzers.TreeVarAnalyzer,
@@ -250,7 +224,7 @@ sequence = cfg.Sequence([
     genrad,
     gentth,
     subjet_analyzer,
-    #commoncls,
+    commoncls,
     mem_analyzer,
     mva,
     treevar,
@@ -271,7 +245,7 @@ output_service = cfg.Service(
 from PhysicsTools.HeppyCore.framework.chain import Chain as Events
 config = cfg.Config(
     #Run across these inputs
-    components = inputSamples,
+    components = [],
 
     #Using this sequence
     sequence = sequence,
@@ -285,7 +259,31 @@ config = cfg.Config(
 
 if __name__ == "__main__":
     print "Running MEAnalysis heppy main loop"
-
+    
+    #input component
+    #several input components can be declared,
+    #and added to the list of selected components
+    def prepareInputSamples(sampleFile=conf.general["sampleFile"]):
+        print "loading samples from", sampleFile
+        samplefile = imp.load_source("samplefile", sampleFile)
+        from samplefile import samples_dict
+        inputSamples = []
+        for sn in sorted(samples_dict.keys()):
+            s = samples_dict[sn]
+            sample_ngen = s.nGen.value()
+            inputSample = cfg.Component(
+                s.name.value(),
+                files = map(getSitePrefix, s.subFiles.value()),
+                tree_name = s.treeName.value(),
+                n_gen = sample_ngen,
+                xs = s.xSec.value()
+            )
+            inputSample.isMC = s.isMC.value()
+            inputSamples.append(inputSample)
+        return inputSamples, samples_dict
+    
+    inputSamples, samples_dict = prepareInputSamples(conf.general["sampleFile"])
+    
     #Process all samples in the sample list
     for samp in inputSamples:
         if not samp.isMC:

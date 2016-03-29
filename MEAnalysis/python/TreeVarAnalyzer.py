@@ -22,9 +22,6 @@ class TreeVarAnalyzer(FilterAnalyzer):
         event.genTopLep = getattr(event.systResults["nominal"], "genTopLep", [])
         event.genTopHad = getattr(event.systResults["nominal"], "genTopHad", [])
         
-        import pdb
-        pdb.set_trace()
-
         for syst, event_syst in event.systResults.items():
             event_syst.mem_results_tth = getattr(event_syst, "mem_results_tth", [])
             event_syst.mem_results_ttbb = getattr(event_syst, "mem_results_ttbb", [])
