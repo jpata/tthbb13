@@ -96,7 +96,6 @@ def save_hdict(ofn, hdict):
         v.SetName(kname)
         v.SetDirectory(d)
         #d.Write("", ROOT.TObject.kOverwrite)
-    print "Writing..."
     outfile.Write()
     outfile.Close()
 

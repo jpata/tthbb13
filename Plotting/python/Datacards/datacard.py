@@ -102,7 +102,17 @@ class Datacard:
             self.scale_uncertainties[cat] = {}
             for proc in self.processes:
                 self.scale_uncertainties[cat][proc] = copy.deepcopy(self.common_scale_uncertainties[proc])
-                
+
+    @staticmethod
+    def defaultDatacard(self):
+        return Datacard(
+            [
+            "ttH_hbb", "ttH_nonhbb",
+            "ttbarPlus2B", "ttbarPlusBBbar", "ttbarPlusB", "ttbarPlusCCbar", "ttbarOther"
+            ],
+
+        )
+
     def addStatVariations(self, category, nbins):
         #Add MC statistical uncertainties
         for proc in self.processes:
