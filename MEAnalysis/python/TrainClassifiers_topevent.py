@@ -49,6 +49,8 @@ default_params = {
     "n_dense_nodes"  : 20,
     "n_features"     : 8,
     "do_reshape"     : 0,
+    "dense_dropout"  : 0.2,
+    "conv_dropout"   : 0.2,
 
     # Common parameters
     "lr"          : 0.01,
@@ -147,6 +149,10 @@ def model_2dconv(params):
                 model.add(Convolution2D(params["n_features"], current_rows,1, input_shape=(1, 4, 20)))
             else:
                 model.add(Convolution2D(params["n_features"], current_rows,1))
+
+            if params["conv_dropout"] > 0.:         
+                model.add(Dropout(params["conv_dropout"]))
+
             model.add(activ())
             
             if params["do_reshape"]:
@@ -163,6 +169,10 @@ def model_2dconv(params):
 
     for i_dense_layer in range(params["n_dense_layers"]):
         model.add(Dense(params["n_dense_nodes"]))
+        
+        if params["dense_dropout"] > 0.:         
+            model.add(Dropout(params["dense_dropout"]))
+
         model.add(activ())    
 
     model.add(Dense(2))
@@ -208,7 +218,8 @@ classifiers = [
 # second-iter: different features, also test wo/ reshaping
 # third-iter: 1d test
 # fourth-iter: bigger 1d test
-
+# fifth-iter: 2d network parameter tuning
+# sixth-tier: 2d mostly fixed network, play with learning setting
 
 [clf.prepare(dtrain, dtest) for clf in classifiers]
 [rocplot(clf, dtest, classes, class_names) for clf in classifiers]
