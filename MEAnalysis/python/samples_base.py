@@ -16,7 +16,7 @@ xsec[("tthbb", "8TeV")] = xsec[("tth", "8TeV")] * br_h_to_bb
 #https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageAt1314TeV#s_13_0_TeV
 xsec[("tth", "13TeV")] = 0.5085
 xsec[("tthbb", "13TeV")] = xsec[("tth", "13TeV")] * br_h_to_bb
-xsec[("tth_nonbb", "13TeV")] = xsec[("tth", "13TeV")] * (1.0 - br_h_to_bb)
+xsec[("tth_nonhbb", "13TeV")] = xsec[("tth", "13TeV")] * (1.0 - br_h_to_bb)
 
 xsec[("qcd_ht300to500", "13TeV")] = 366800.0
 xsec[("qcd_ht500to700", "13TeV")] = 29370.0
@@ -75,7 +75,7 @@ samples_nick = {
 xsec_sample = {
     "TT_TuneCUETP8M1_13TeV-powheg-pythia8": xsec[("ttjets", "13TeV")],
     "ttHTobb_M125_13TeV_powheg_pythia8": xsec[("tthbb", "13TeV")],
-    "ttHToNonbb_M125_13TeV_powheg_pythia8": xsec[("tth_nonbb", "13TeV")],
+    "ttHToNonbb_M125_13TeV_powheg_pythia8": xsec[("tth_nonhbb", "13TeV")],
 }
 
 #Configure the site-specific file path

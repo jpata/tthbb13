@@ -1,8 +1,4 @@
 import ROOT
-
-if ROOT.gROOT.GetVersion().startswith("5."):
-    ROOT.gSystem.Load("libCintex")
-    ROOT.gROOT.ProcessLine('ROOT::Cintex::Cintex::Enable();')
 ROOT.gSystem.Load("libTTHMEIntegratorStandalone")
 from ROOT import MEM
 
