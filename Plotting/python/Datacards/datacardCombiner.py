@@ -41,13 +41,16 @@ def copyHistograms(tf, of, hists, channels, processes):
         # End of loop over channels
     # End of loop over histograms
 
-########################################
-# Copy existing, needed histograms
-#  into new file 
-########################################
-def makeStatVariations(tf, of, categories): 
+def makeStatVariations(tf, of, categories):
+    """
+    Given an input TFile and an output TFile, produces the histograms for
+    bin-by-bin variations for the given categories.
+    """
+    ret = {}
     for cat in categories:
+        ret[cat.name] = {}
         for proc in cat.processes:
+            ret[cat.name][proc] = []
             hn = "{0}/{1}/{2}".format(proc, cat.name, cat.discriminator)
             h = tf.Get(hn)
             h = h.Clone()
@@ -56,9 +59,12 @@ def makeStatVariations(tf, of, categories):
                 of.mkdir(outdir)
             outdir = of.Get(outdir)
             for ibin in range(1, h.GetNbinsX() + 1):
+                systname = "{0}_{1}_Bin{2}".format(proc, cat.name, ibin)
+                ret[cat.name][proc] += [systname]
                 for sigma, sdir in [(+1, "Up"), (-1, "Down")]:
                     outdir.cd()
-                    hvar = h.Clone(h.GetName() + "_{0}_{1}_Bin{2}{3}".format(proc, cat.name, ibin, sdir))
+                    systname_sdir = h.GetName() + "_" + systname + sdir
+                    hvar = h.Clone(systname_sdir)
                     delta = hvar.GetBinError(ibin)
                     c = hvar.GetBinContent(ibin) + sigma*delta
                     if c <= 10**-5 and h.Integral() > 0:
@@ -66,6 +72,7 @@ def makeStatVariations(tf, of, categories):
                     hvar.SetBinContent(ibin, c)
                     outdir.Add(hvar)
                     hvar.Write("", ROOT.TObject.kOverwrite)
+    return ret
 
 ########################################
 # Create fake data

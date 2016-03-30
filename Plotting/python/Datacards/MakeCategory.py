@@ -36,13 +36,15 @@ def make_rule_cut(basehist, category):
         rules += [d]
 
         #make systematic variations
-        for syst in category.shape_uncertainties.keys():
-            for direction in ["Up", "Down"]:
-                d2 = copy.deepcopy(d)
-                d2["input"] += "_" + syst + direction
-                d2["output"] += "_" + syst + direction
-                rules += [d2]
+        for proc, systdict in category.shape_uncertainties.items():
+            for systname, systsize in systdict.items():
+                for direction in ["Up", "Down"]:
+                    d2 = copy.deepcopy(d)
+                    d2["input"] += "_" + systname + direction
+                    d2["output"] += "_" + systname + direction
+                    rules += [d2]
 
+    # FIXME: this needs to be added to AnalysisSpecification.py
     # #Now we need to apply additional cuts on data samples based on the lepton
     # #flavour
     # for samp in data_samples:
@@ -84,9 +86,14 @@ def apply_rules(args):
     infile_tf = ROOT.TFile.Open(infile)
     hdict = {}
     for rule in rules:
+
+        #convert the string of the cut list into the actual list
         cuts = eval(rule["cuts"])
         hk = rule["output"]
         h = infile_tf.Get(str(rule["input"]))
+        
+        #in case the input histogram could not be found, keep track that we have
+        #to use a dummy to get the correct binning
         dummy = False
 
         #in case no histogram could be found, use a dummy histogram so that we
@@ -105,25 +112,42 @@ def apply_rules(args):
         if dummy:
             ret.Scale(0)
             ret.SetEntries(0)
+
         ret.SetName(rule["output"].split("/")[-1])
+
+        #1D rebin
         if len(variables) == 1:
             ret.Rebin(variables[0][1])
+        #2D rebin
         elif len(variables) == 2:
             ret.Rebin2D(variables[0][1], variables[0][2])
-        if hdict.has_key(hk):
-            hdict[hk] += ret
-        else:
-            hdict[hk] = ret
+        
+    if hdict.has_key(hk):
+        hdict[hk] += ret
+    else:
+        hdict[hk] = ret
     infile_tf.Close()
     return hdict
 
 def apply_rules_parallel(infile, rules, ncores=4):
+    """
+    Project out all the histograms according to the projection rules.
+    infile (string) - path to input root file with sparse histograms
+    rules (list of dicts) - all the rules
+    
+    Optional:
+    ncores (int) - number of parallel cores for projection
+    """ 
     p = multiprocessing.Pool(ncores)
     inputs = [
         (infile, [r]) for r in rules
     ]
+
     rets = p.map(apply_rules, inputs)
+
+    #add all the histogram dictionaries together
     ret = reduce(sparse.add_hdict, rets)
+
     p.close()
     return ret
 
@@ -146,6 +170,9 @@ if __name__ == "__main__":
     for cat in analysis.categories:
         rules += make_rule_cut(cat.src_histogram, cat)
     
+    of = open("rules.json", "w")
+    of.write(json.dumps(rules, indent=2))
+    of.close()
     #project out all the histograms
     hdict = apply_rules_parallel(infile, rules)
 
@@ -156,6 +183,15 @@ if __name__ == "__main__":
         if not hdict_cat.has_key(catname):
             hdict_cat[catname] = {}
         hdict_cat[catname][k] = hdict[k]
+
+    #produce the event counts per category
+    event_counts = {}
+    for cat in analysis.categories:
+        event_counts[cat.name] = {}
+        for proc in cat.processes:
+            event_counts[cat.name][proc] = hdict["{0}/{1}/{2}".format(
+                proc, cat.name, cat.discriminator
+            )].Integral()
     
     #catname -> file name
     category_files = {}
@@ -181,5 +217,22 @@ if __name__ == "__main__":
         for cat in analysis.categories:
             hfile = category_files[cat.name]
             tf = ROOT.TFile(hfile, "UPDATE")
-            makeStatVariations(tf, tf, [cat])
+            stathist_names = makeStatVariations(tf, tf, [cat])
             tf.Close()
+            
+            #add the statistical uncertainties to the datacard specificatio
+            for proc in cat.processes:
+                for syst in stathist_names[cat.name][proc]:
+                    cat.shape_uncertainties[proc][syst] = 1.0
+                
+    from makeDatacard import PrintDatacard
+    #make datacards for groups
+    for groupname, categories in analysis.groups.items():
+        fn = os.path.join(analysis.output_directory, "shapes_{0}.txt".format(groupname))
+        dcof = open(fn, "w")
+        PrintDatacard(categories, event_counts, category_files, dcof)
+        dcof.write("# execute with\n")
+        dcof.write("# combine -n {0} -M Asymptotic -t -1 {1}\n".format(groupname, os.path.basename(fn)))
+        dcof.close()
+
+    
