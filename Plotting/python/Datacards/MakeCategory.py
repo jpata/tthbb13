@@ -32,6 +32,7 @@ def make_rule_cut(basehist, category):
             "cuts": str(category.cuts),
             "project": str([(category.discriminator, category.rebin)]),
             "output": "{0}/{1}/{2}".format(samp.output_name, category.name, category.discriminator),
+            "xs_weight": samp.xs_weight
         }
         rules += [d]
 
@@ -121,7 +122,8 @@ def apply_rules(args):
         #2D rebin
         elif len(variables) == 2:
             ret.Rebin2D(variables[0][1], variables[0][2])
-        
+        ret.Scale(rule["xs_weight"])
+
     if hdict.has_key(hk):
         hdict[hk] += ret
     else:
@@ -199,12 +201,13 @@ if __name__ == "__main__":
     #save the histograms into per-category files
     for catname in hdict_cat.keys():
         hfile = os.path.join(analysis.output_directory, "{0}.root".format(catname))
+        print "saving {0} histograms to {1}".format(len(hdict_cat[catname]), hfile)
         category_files[catname] = hfile
         sparse.save_hdict(hfile, hdict_cat[catname])
     
     #add the fake data
     if analysis.do_fake_data:
-        from datacardCombiner import fakeData
+        from utils import fakeData
         for cat in analysis.categories:
             hfile = category_files[cat.name]
             tf = ROOT.TFile(hfile, "UPDATE")
@@ -213,7 +216,7 @@ if __name__ == "__main__":
 
     #add the stat variations
     if analysis.do_stat_variations:
-        from datacardCombiner import makeStatVariations
+        from utils import makeStatVariations
         for cat in analysis.categories:
             hfile = category_files[cat.name]
             tf = ROOT.TFile(hfile, "UPDATE")
@@ -225,7 +228,7 @@ if __name__ == "__main__":
                 for syst in stathist_names[cat.name][proc]:
                     cat.shape_uncertainties[proc][syst] = 1.0
                 
-    from makeDatacard import PrintDatacard
+    from utils import PrintDatacard
     #make datacards for groups
     for groupname, categories in analysis.groups.items():
         fn = os.path.join(analysis.output_directory, "shapes_{0}.txt".format(groupname))

@@ -1,7 +1,11 @@
+#!/usr/bin/python
+"""
+This file contains a few tools to handle sparse histograms.
+All tests should be written in test/testDatacards.py
+"""
 import rootpy
 import rootpy.io
 import ROOT
-import unittest
 
 from collections import OrderedDict
 
@@ -79,7 +83,10 @@ def save_hdict(ofn, hdict):
     returns: nothing
     """
     outfile = ROOT.TFile(ofn, "recreate")
-
+    if not outfile or outfile.IsZombie():
+        raise Exception(
+            "Could not open output file {0}".format(ofn)
+        )
     dirs = {}
     for k, v in sorted(hdict.items(), key=lambda x: x[0]):
         kpath = "/".join(k.split("/")[:-1])
@@ -115,92 +122,3 @@ def add_hdict(d1, d2):
     for k in ks2.difference(ks1):
         out[k] = d2[k].Clone()
     return out
-
-class SparseToolsTest(unittest.TestCase):
-    def setUp(self):
-        self.file = ROOT.TFile("/Users/joosep/Documents/tth/data/histograms/ControlPlotsSparse.root")
-        self.hsparse = self.file.Get("ttH_hbb/sl/sparse")
-    
-    def test_find_axis_success(self):
-        self.assertEqual(find_axis(self.hsparse, "numJets"), 8)
-
-    def test_find_axis_fail(self):
-        def f():
-            find_axis(self.hsparse, "asdf")
-        self.assertRaises(KeyError, f)
-
-    def test_set_range(self):
-        iax = find_axis(self.hsparse, "numJets")
-
-        h1 = self.hsparse.Projection(iax).Clone("p1")
-
-        set_range(self.hsparse, "numJets", 0, 6)
-        h2a = self.hsparse.Projection(iax).Clone("p2a")
-
-        set_range(self.hsparse, "numJets", 6, 10)
-        h2b = self.hsparse.Projection(iax).Clone("p2b")
-
-        self.assertAlmostEqual(h1.Integral(), h2a.Integral()+h2b.Integral())
-
-    def test_apply_cuts_project_1d(self):
-        h1 = apply_cuts_project(self.hsparse, [("numJets", 4, 6), ("nBCSVM", 1, 3)], ["btag_LR_4b_2b_logit"])
-        #self.assertIsInstance(h1, rootpy.plotting.hist.Hist)
-        self.assertAlmostEqual(h1.Integral(), 48.59897653569705)
-        self.assertEqual(h1.GetName(), "numJets__4__6__nBCSVM__1__3__btag_LR_4b_2b_logit")
-
-    def test_apply_cuts_project_2d(self):
-        h1 = apply_cuts_project(self.hsparse, [("numJets", 4, 6), ("nBCSVM", 1, 100)], ["btag_LR_4b_2b_logit", "common_bdt"])
-        #self.assertIs(type(h1), rootpy.plotting.hist.Hist2D)
-        self.assertAlmostEqual(h1.Integral(), 61.12569607935839)
-        self.assertEqual(h1.GetName(), "numJets__4__6__nBCSVM__1__100__btag_LR_4b_2b_logit__common_bdt")
-
-    def test_save_hdict(self):
-        h1 = apply_cuts_project(self.hsparse, [("numJets", 4, 6), ("nBCSVM", 1, 3)], ["btag_LR_4b_2b_logit"])
-        h2 = apply_cuts_project(self.hsparse, [("numJets", 4, 6), ("nBCSVM", 3, 6)], ["btag_LR_4b_2b_logit"])
-        hdict = OrderedDict()
-        hdict["ttH_hbb/cat1/blr/hblr"] = h1.Clone("hblr")
-        hdict["ttH_hbb/cat2/blr/hblr_asd"] = h2.Clone("hblr_asd")
-        save_hdict("test.root", hdict)
-        
-        inf = rootpy.io.File("test.root")
-        h1a = inf.Get("ttH_hbb/cat1/blr/hblr")
-        self.assertIsNot(h1a, None)
-        self.assertEqual(h1a.Integral(), h1.Integral())
-
-        h2a = inf.Get("ttH_hbb/cat2/blr/hblr_asd")
-        self.assertIsNot(h2a, None)
-        self.assertEqual(h2a.Integral(), h2.Integral())
-        inf.close()
-
-    def test_save_hdict_dupe(self):
-        ROOT.TH1F.AddDirectory(False)
-        h1 = apply_cuts_project(self.hsparse, [("numJets", 4, 6), ("nBCSVM", 1, 3)], ["btag_LR_4b_2b_logit"])
-        h2 = apply_cuts_project(self.hsparse, [("numJets", 4, 6), ("nBCSVM", 3, 6)], ["btag_LR_4b_2b_logit"])
-        hdict = OrderedDict()
-        hdict["data/dl_jge4_tge4/Wmass"] = h1.Clone()
-        hdict["data/dl_jge4_tge4/common_bdt"] = h2.Clone()
-        save_hdict("test.root", hdict)
-        # 
-        # inf = rootpy.io.File("test.root")
-        # h1a = inf.Get("ttH_hbb/cat1/blr/hblr")
-        # self.assertIsNot(h1a, None)
-        # self.assertEqual(h1a.Integral(), h1.Integral())
-        # 
-        # h2a = inf.Get("ttH_hbb/cat1/hblr_asd")
-        # self.assertIsNot(h2a, None)
-        # self.assertEqual(h2a.Integral(), h2.Integral())
-        # inf.close()
-    
-    def test_save_hdict_many(self):
-        ROOT.TH1F.AddDirectory(False)
-        h1 = apply_cuts_project(self.hsparse, [("numJets", 4, 6), ("nBCSVM", 1, 3)], ["btag_LR_4b_2b_logit"])
-        hdict = OrderedDict()
-        for i in range(10000):
-            hdict["ttH_hbb/cat{0}/hblr".format(i)] = h1.Clone("h{0}".format(i))
-        save_hdict("test.root", hdict)
-
-def main():
-    unittest.main()
-
-if __name__ == "__main__":
-    main()

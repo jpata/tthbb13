@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 import ROOT
 import sys, imp, os, copy
-def PrintDatacard(categories, event_counts, filenames, dcof):
 
+def PrintDatacard(categories, event_counts, filenames, dcof):
     number_of_bins = len(categories)
     number_of_backgrounds = len(list(set(reduce(lambda x,y:x+y, [c.processes for c in categories], [])))) - 1 
     analysis_categories = list(set([c.name for c in categories]))
@@ -92,3 +92,58 @@ def PrintDatacard(categories, event_counts, filenames, dcof):
     # shapename_base = shapename.split(".")[0]
     # dcof.write("# Execute with:\n")
     # dcof.write("# combine -n {0} -M Asymptotic -t -1 {1} \n".format(shapename_base, shapename))
+
+
+def makeStatVariations(tf, of, categories):
+    """
+    Given an input TFile and an output TFile, produces the histograms for
+    bin-by-bin variations for the given categories.
+    """
+    ret = {}
+    for cat in categories:
+        ret[cat.name] = {}
+        for proc in cat.processes:
+            ret[cat.name][proc] = []
+            hn = "{0}/{1}/{2}".format(proc, cat.name, cat.discriminator)
+            h = tf.Get(hn)
+            h = h.Clone()
+            outdir = "{0}/{1}".format(proc, cat.name)
+            if of.Get(outdir) == None:
+                of.mkdir(outdir)
+            outdir = of.Get(outdir)
+            for ibin in range(1, h.GetNbinsX() + 1):
+                systname = "{0}_{1}_Bin{2}".format(proc, cat.name, ibin)
+                ret[cat.name][proc] += [systname]
+                for sigma, sdir in [(+1, "Up"), (-1, "Down")]:
+                    outdir.cd()
+                    systname_sdir = h.GetName() + "_" + systname + sdir
+                    hvar = h.Clone(systname_sdir)
+                    delta = hvar.GetBinError(ibin)
+                    c = hvar.GetBinContent(ibin) + sigma*delta
+                    if c <= 10**-5 and h.Integral() > 0:
+                        c = 10**-5
+                    hvar.SetBinContent(ibin, c)
+                    outdir.Add(hvar)
+                    hvar.Write("", ROOT.TObject.kOverwrite)
+    return ret
+#end of makeStatVariations
+
+def fakeData(infile, outfile, categories):
+    dircache = {}
+    for cat in categories:
+        h = infile.Get("{0}/{1}/{2}".format(cat.processes[0], cat.name, cat.discriminator)).Clone()
+        for proc in cat.processes[1:]:
+            h2 = infile.Get("{0}/{1}/{2}".format(proc, cat.name, cat.discriminator))
+            h.Add(h2)
+
+        outdir = "data_obs/{0}".format(cat.name)
+        dircache[outdir] = h 
+
+    # End of loop over categories
+    for (k, v) in dircache.items():
+        if outfile.Get(k) == None:
+            outfile.mkdir(k)
+        k = outfile.Get(k)
+        v.SetDirectory(k)
+        k.Write("", ROOT.TObject.kOverwrite)
+#end of fakeData
