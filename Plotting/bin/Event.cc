@@ -81,6 +81,10 @@ const map<string, function<float(const Event& ev)>> AxisFunctions = {
     {"Wmass", [](const Event& ev) { return ev.Wmass;}},
     {"jet0_pt", [](const Event& ev) { return ev.jets.size() > 0 ? ev.jets.at(0).p4.Pt() : -99;}},
     {"jet0_eta", [](const Event& ev) { return ev.jets.size() > 0 ? ev.jets.at(0).p4.Eta() : -99;}},
+    {"jet0_btagCSV", [](const Event& ev) { return ev.jets.size() > 0 ? ev.jets.at(0).btagCSV : -99;}},
+    {"jet1_pt", [](const Event& ev) { return ev.jets.size() > 0 ? ev.jets.at(0).p4.Pt() : -99;}},
+    {"jet1_eta", [](const Event& ev) { return ev.jets.size() > 0 ? ev.jets.at(0).p4.Eta() : -99;}},
+    {"jet1_btagCSV", [](const Event& ev) { return ev.jets.size() > 0 ? ev.jets.at(0).btagCSV : -99;}},
     {"n_excluded_bjets", [](const Event& ev) { return ev.n_excluded_bjets;}},
     {"n_excluded_ljets", [](const Event& ev) { return ev.n_excluded_ljets;}},
 
@@ -907,70 +911,6 @@ void CategoryProcessor::process(
             subcat->process(event, conf, results, _catKeys, systKey);
         }
     } // passes
-}
-
-void MEMCategoryProcessor::fillHistograms(
-    const Event& event,
-    ResultMap& results,
-    tuple<
-        ProcessKey::ProcessKey,
-        vector<CategoryKey::CategoryKey>,
-        SystematicKey::SystematicKey> key,
-    double weight,
-    const Configuration& conf
-    ) const {
-
-    //fill base histograms
-    CategoryProcessor::fillHistograms(event, results, key, weight, conf);
-
-    if (CategoryKey::is_sl(get<1>(key))) {
-        const auto mem_SL_0w2h2t_key = make_tuple(
-            get<0>(key),
-            get<1>(key),
-            get<2>(key),
-            HistogramKey::mem_SL_0w2h2t
-        );
-        
-        const auto mem_SL_2w2h2t_sj_key = make_tuple(
-            get<0>(key),
-            get<1>(key),
-            get<2>(key),
-            HistogramKey::mem_SL_2w2h2t_sj
-        );
-        
-        const auto mem_SL_2w2h2t_key = make_tuple(
-            get<0>(key),
-            get<1>(key),
-            get<2>(key),
-            HistogramKey::mem_SL_2w2h2t
-        );
-
-
-        if (!results.count(mem_SL_0w2h2t_key)) {
-            results[mem_SL_0w2h2t_key] = new TH1D("mem_SL_0w2h2t", "mem SL 0w2h2t", 6, 0, 1);
-        }
-        if (!results.count(mem_SL_2w2h2t_sj_key)) {
-            results[mem_SL_2w2h2t_sj_key] = new TH1D("mem_SL_2w2h2t_sj", "mem SL 0w2h2t subjet", 6, 0, 1);
-        }
-        if (!results.count(mem_SL_2w2h2t_key)) {
-            results[mem_SL_2w2h2t_key] = new TH1D("mem_SL_2w2h2t", "mem SL 2w2h2t", 6, 0, 1);
-        }
-        static_cast<TH1D*>(results[mem_SL_0w2h2t_key])->Fill(event.mem_SL_0w2h2t, weight);
-        static_cast<TH1D*>(results[mem_SL_2w2h2t_key])->Fill(event.mem_SL_2w2h2t, weight);
-        static_cast<TH1D*>(results[mem_SL_2w2h2t_sj_key])->Fill(event.mem_SL_2w2h2t_sj, weight);
-    } else if (CategoryKey::is_dl(get<1>(key))) {
-        const auto mem_DL_0w2h2t_key = make_tuple(
-            get<0>(key),
-            get<1>(key),
-            get<2>(key),
-            HistogramKey::mem_DL_0w2h2t
-        );
-
-        if (!results.count(mem_DL_0w2h2t_key)) {
-            results[mem_DL_0w2h2t_key] = new TH1D("mem_DL_0w2h2t", "mem DL 0w2h2t", 6, 0, 1);
-        }
-        static_cast<TH1D*>(results[mem_DL_0w2h2t_key])->Fill(event.mem_DL_0w2h2t, weight);
-    }
 }
 
 void SparseCategoryProcessor::fillHistograms(

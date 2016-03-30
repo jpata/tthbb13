@@ -387,28 +387,6 @@ private:
     std::function<int(const Event& ev)> cutFunc;
 };
 
-class MEMCategoryProcessor : public CategoryProcessor {
-public:
-    MEMCategoryProcessor(
-        std::function<int(const Event& ev)> _cutFunc,
-        const vector<CategoryKey::CategoryKey>& _keys,
-        const Configuration& _conf,
-        const vector<const CategoryProcessor*>& _subCategories={}
-    ) :
-      CategoryProcessor(_cutFunc, _keys, _conf, _subCategories) {};
-     
-    virtual void fillHistograms(
-        const Event& event,
-        ResultMap& results,
-        tuple<
-            ProcessKey::ProcessKey,
-            vector<CategoryKey::CategoryKey>,
-            SystematicKey::SystematicKey> key,
-        double weight,
-        const Configuration& conf
-    ) const;
-};
-
 
 class SparseCategoryProcessor : public CategoryProcessor {
 public:
