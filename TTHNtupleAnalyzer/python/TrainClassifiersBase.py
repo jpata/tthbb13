@@ -17,6 +17,7 @@ def fixPath():
 sys.path = fixPath()
 
 import os
+import psutil
 import pickle
 import pdb
 
@@ -80,7 +81,8 @@ class Classifier:
                  backend,
                  params,
                  load_from_file,
-                 get_data,
+                 datagen_train,
+                 datagen_test,
                  model,
                  inpath = ".",
                  plot_name = "",
@@ -89,7 +91,8 @@ class Classifier:
         self.backend = backend
         self.params = params
         self.load_from_file = load_from_file
-        self.get_data = get_data
+        self.datagen_train = datagen_train
+        self.datagen_test  = datagen_test
         self.model = model
         self.inpath = inpath
 
@@ -127,6 +130,7 @@ def train_scikit(df, clf):
 
     df_shuf = df.iloc[np.random.permutation(np.arange(len(df)))]
 
+    # TODO: rewrite to use datagen
     X = clf.get_data(df_shuf)
     y = df_shuf["is_signal_new"].values
 
@@ -153,12 +157,14 @@ def train_keras(clf):
               momentum = clf.params["momentum"], 
               nesterov=True)
     clf.model.compile(loss='mean_squared_error', optimizer=sgd)
+
+    print clf.datagen_test
                 
-    ret = clf.model.fit_generator(clf.get_data,
-                                  10000,
+    ret = clf.model.fit_generator(clf.datagen_train,
+                                  samples_per_epoch = clf.params["samples_per_epoch"], 
                                   nb_epoch = clf.params["nb_epoch"],
                                   verbose=2, 
-                                  #validation_data=(X_val, np_utils.to_categorical(y_val)),
+                                  validation_data=clf.datagen_test.next(),
                                   show_accuracy=True)
   
     plt.clf()
@@ -202,6 +208,7 @@ def rocplot(clf, tmp_df, classes, class_names):
 
     # Predict all probabilities
 
+    # TODO: rewrite to use datagen
     X_test = clf.get_data(tmp_df)
     all_probs = clf.model.predict_proba(X_test)    
 
@@ -313,6 +320,7 @@ def multirocplot(clfs, tmp_df, logy=True):
 
     for clf in clfs:
         
+        # TODO: rewrite to use datagen
         X_test = clf.get_data(df)
         df["proba_" + clf.plot_name] = clf.model.predict_proba(X_test)[:,sig_class]
 
@@ -386,13 +394,9 @@ def datagen(sel, brs, infname_sig, infname_bkg, n_batches=10):
         df_bkg["is_signal_new"] = 0
 
         df = pandas.concat([df_sig, df_bkg], ignore_index=True)
-
-        print i_start_sig, i_start_bkg, df_sig.shape, df_bkg.shape,
                     
         # Shuffle
         df = df.iloc[np.random.permutation(len(df))]
-        
-        print len(df)
     
         yield df
 

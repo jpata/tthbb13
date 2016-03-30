@@ -61,10 +61,12 @@ default_params = {
     "n_dense_nodes"  : 8,
 
     # Common parameters
-    "lr"          : 0.01,
-    "decay"       : 1e-6,
-    "momentum"    : 0.9,            
-    "nb_epoch"    : 200,
+    "n_batches"         : 200,
+    "lr"                : 0.01,
+    "decay"             : 1e-6,
+    "momentum"          : 0.9,            
+    "nb_epoch"          : 10,
+    "samples_per_epoch" : None, # later filled from input files
 }
 
 colors = ['black', 'red','blue','green','orange','green','magenta']
@@ -74,12 +76,8 @@ class_names = {0: "background",
 
 classes = sorted(class_names.keys())
 
-plot_inputs    = False
-
 infname_sig = "ntop_x3_zprime_m2000-tagging-weighted.root"
 infname_bkg = "ntop_x3_qcd_800_1000-tagging-weighted.root"
-
-n_batches = 20
 
 min_pt = 801
 max_pt = 999
@@ -114,18 +112,25 @@ for param in default_params.keys():
 # Prepare data and scalers
 ########################################
 
-datagen_train = datagen(cut_train, brs, infname_sig, infname_bkg, n_batches=n_batches)
-datagen_test  = datagen(cut_test, brs, infname_sig, infname_bkg, n_batches=n_batches)
+n_train_samples = 0 
+for fn in [infname_sig, infname_bkg]:
+    n_train_samples += len(root_numpy.root2rec(fn, branches=["evt"], selection = cut_train))
+print "Total number of training samples = ", n_train_samples
+params["samples_per_epoch"] = n_train_samples
+
+
+datagen_train = datagen(cut_train, brs, infname_sig, infname_bkg, n_batches=params["n_batches"])
+datagen_test  = datagen(cut_test, brs, infname_sig, infname_bkg, n_batches=params["n_batches"])
 
 scaler_emap = StandardScaler()  
 
-for _ in range(2):
+# Don't need full data to train the scaler
+for _ in range(params["n_batches"]/4):
     scaler_emap.partial_fit(get_data_flatten(datagen_train.next(), ["ak08_emap"]))
 
 print "Preparing Scalers: Done..."
 
 # Define a generator for the inputs we need
-
 def generate_data_emap(datagen):
 
     while True:
@@ -137,26 +142,10 @@ def generate_data_emap(datagen):
             scaler_emap.transform(get_data_flatten(df, ["ak08_emap"])), axis=-1
         ).reshape(-1,32,32), axis=1)
 
-        print X.shape
-
         y = np_utils.to_categorical(df["is_signal_new"].values)
         
         yield X,y
 
-#
-#
-#def get_data_emap_2d(df):
-#    tmp  = get_data_emap(df)
-#    print tmp.shape
-#    tmp2 =  np.expand_dims(tmp, axis=-1)
-#    print tmp2.shape
-#    n_lines = tmp2.shape[0]
-#    tmp3 = tmp2.reshape(n_lines, 32, 32)
-#    print tmp3.shape
-#    tmp4 = np.expand_dims(tmp3, axis=1)    
-#    print tmp4.shape
-#    return tmp4
-#
 
 #def get_data_3d(df, varlist):
 #
@@ -307,96 +296,11 @@ classifiers = [
                params,
                False,
                generate_data_emap(datagen_train),
+               generate_data_emap(datagen_test),
                model_2d(params)
                )
     
 ]
-
-
-########################################
-# Plot inputs
-########################################
-
-if plot_inputs:
-    
-    # 1D Variables
-    for plotvar in to_plot:
-
-        br = plotvar[0]
-        xmin = plotvar[1]
-        xmax = plotvar[2]
-        name = plotvar[3]
-
-        plt.clf()
-
-        for cls in classes:
-            plt.hist(df.loc[df["is_signal_new"]==cls,br].as_matrix(),
-                     color=colors[cls+1], 
-                     bins=np.linspace(xmin,xmax,50),
-                     normed=True, 
-                     alpha=0.4,
-                     label = class_names[cls]
-            )    
-            
-        plt.xlabel(name, fontsize=16)
-        plt.ylabel("Fraction of Jets", fontsize=16)
-        plt.legend(loc=0)
-
-        plt.savefig("input_{0}.png".format(br))
-
-
-    for cls in classes:
-
-        plt.clf()
-        for i_br, br in enumerate(["ak08softdropz10b00_mass",
-                                   "ak08softdropz10b00_masscal", 
-                                   #"ak08puppisoftdropz10b00_mass",
-                                   #"ak08puppisoftdropz10b00_masscal"
-                               ]):
-       
-            xmin = 120
-            xmax = 220
-            name = br
-
-            names = {"ak08softdropz10b00_mass"         : "CHS, Uncal.",
-                     "ak08softdropz10b00_masscal"      : "CHS, Cal.",
-                     "ak08puppisoftdropz10b00_mass"    : "Puppi, Uncal.",
-                     "ak08puppisoftdropz10b00_masscal" : "Puppi, Cal.",
-                     }
-
-            plt.hist(df.loc[(df["pass_tau"]==True) & (df["is_signal_new"]==cls) & (df_tmp["keep"]==True), br].as_matrix(),
-                     color=colors[i_br], 
-                     edgecolor = colors[i_br], 
-                     bins=np.linspace(xmin,xmax,50),
-                     normed=True, 
-                     histtype="step",
-                     label = names[br]
-                )    
-
-        plt.xlabel("Mass [GeV]", fontsize=16)
-        plt.ylabel("Fraction of Jets", fontsize=16)
-        plt.legend(loc=0)
-
-        plt.savefig("input_mass_{0}.png".format(cls))
-
-    print "Plotting 1D inputs: Done..."
-
-    # 2D maps
-    for map_name in ["ak08_emap", "ak08_chargemap"]:
-
-        X = dtrain[map_name].values.flatten()
-
-        for idx in range(20):
-            map_1d = X[idx]
-            map_2d = map_1d.reshape(32,32)
-
-            plt.clf()
-
-            plt.imshow(map_2d, interpolation = 'spline36')
-            #plt.colorbar(map_2d)
-            plt.savefig("maps/{0}_{1}.png".format(map_name, idx))
-
-    print "Plotting 2D inputs: Done..."
 
 
 ########################################
