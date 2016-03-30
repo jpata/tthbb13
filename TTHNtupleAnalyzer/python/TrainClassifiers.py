@@ -1,4 +1,4 @@
-########################################
+#######################################
 # Imports
 ########################################
 
@@ -64,7 +64,7 @@ default_params = {
     "lr"          : 0.01,
     "decay"       : 1e-6,
     "momentum"    : 0.9,            
-    "nb_epoch"    : 10,
+    "nb_epoch"    : 200,
 }
 
 colors = ['black', 'red','blue','green','orange','green','magenta']
@@ -76,63 +76,23 @@ classes = sorted(class_names.keys())
 
 plot_inputs    = False
 
+infname_sig = "ntop_x3_zprime_m2000-tagging-weighted.root"
+infname_bkg = "ntop_x3_qcd_800_1000-tagging-weighted.root"
+
+n_batches = 20
+
 min_pt = 801
 max_pt = 999
 max_eta = 1.5
 min_reco_pt = 500
 
-infname_sig = "ntop_x3_zprime_m2000-tagging-weighted.root"
-infname_bkg = "ntop_x3_qcd_800_1000-tagging-weighted.root"
+fiducial_cut = "(pt>{0}) && (pt<{1}) && (fabs(eta) < {2}) && (ak08_pt > {3})".format(min_pt, 
+                                                                                     max_pt, 
+                                                                                     max_eta,
+                                                                                     min_reco_pt)
 
-
-########################################
-# Prepare Data
-########################################
-
-# Get signal events
-d_sig = root_numpy.root2rec(infname_sig, branches=brs)
-df_sig = pandas.DataFrame(d_sig)    
-df_sig["is_signal_new"] = 1
-
-# Get background events
-d_bkg = root_numpy.root2rec(infname_bkg, branches=brs)
-df_bkg = pandas.DataFrame(d_bkg)    
-df_bkg["is_signal_new"] = 0
-
-print "Reading Data: Done..."
-
-# Combine
-df_tmp = pandas.concat([df_sig, df_bkg], ignore_index=True)
-
-# Apply fiducial
-df_tmp["keep"] = np.where( df_tmp["pt"] > min_pt, True, False)
-df_tmp["keep"] = np.where( df_tmp["pt"] < max_pt, df_tmp["keep"], False)
-df_tmp["keep"] = np.where( abs(df_tmp["eta"]) < max_eta, df_tmp["keep"], False)
-df_tmp["keep"] = np.where( df_tmp["ak08_pt"] > min_reco_pt, df_tmp["keep"], False)
-#df_tmp["keep"] = np.where( df_tmp["ak08softdropz10b00_mass"] >= 0., df_tmp["keep"], False)
-#df_tmp["keep"] = np.where( df_tmp["ak08softdropz10b00forbtag_btag"] >= 0., df_tmp["keep"], False)
-#df_tmp["keep"] = np.where( len(df_tmp["ak08_emap"]) > 0., df_tmp["keep"], False)
-
-
-df_tmp["ak08_tau3_over_tau2"] = df_tmp["ak08_tau3"]/df_tmp["ak08_tau2"]
-df_tmp["ak08puppi_tau3_over_tau2"] = df_tmp["ak08puppi_tau3"]/df_tmp["ak08puppi_tau2"]
-df_tmp["pass_tau"] = np.where( df_tmp["ak08_tau3_over_tau2"] < 0.5, True, False)
-
-df = df_tmp[df_tmp["keep"]==True]
-
-# Shuffle
-df = df.iloc[np.random.permutation(len(df))]
-
-# Split into test and training
-dtrain = df[df["evt"] % 4 == 1]
-dtest  = df[df["evt"] % 4 == 3]
-
-print "\nTraining Sample:"
-print dtrain.groupby('is_signal_new')["is_signal_new"].count()
-print "\nTest Sample:"
-print dtest.groupby('is_signal_new')["is_signal_new"].count()
-    
-print "Preparing Data: Done..."
+cut_test  = fiducial_cut  + "&& (evt%4==1)"
+cut_train = fiducial_cut +  "&& (evt%4==3)"
 
 
 ########################################
@@ -151,66 +111,64 @@ for param in default_params.keys():
 
 
 ########################################
-# Classifiers
+# Prepare data and scalers
 ########################################
 
-def get_data_vars(df, varlist):        
-    return df[varlist].values
-
-def get_data_flatten(df, varlist):
-    
-    # tmp is a 1d-array of 1d-arrays
-    # so we need to convert it to 2d array
-    tmp = df[varlist].values.flatten() # 
-    ret = np.vstack([tmp[i] for i in xrange(len(tmp))])
-     
-    return ret 
-
+datagen_train = datagen(cut_train, brs, infname_sig, infname_bkg, n_batches=n_batches)
+datagen_test  = datagen(cut_test, brs, infname_sig, infname_bkg, n_batches=n_batches)
 
 scaler_emap = StandardScaler()  
-scaler_emap.fit(get_data_flatten(dtrain, ["ak08_emap"]))
 
-def get_data_emap(df):
-    return scaler_emap.transform(get_data_flatten(df, ["ak08_emap"]))
+for _ in range(2):
+    scaler_emap.partial_fit(get_data_flatten(datagen_train.next(), ["ak08_emap"]))
 
-#scaler_chargemap = StandardScaler()  
-#scaler_chargemap.fit(get_data_flatten(dtrain, ["ak08_chargemap"]))
+print "Preparing Scalers: Done..."
 
-def get_data_chargemap(df, varlist):
-    return scaler_chargemap.transform(get_data_flatten(df, varlist))
+# Define a generator for the inputs we need
 
-def get_data_emap_2d(df):
-    tmp  = get_data_emap(df)
-    print tmp.shape
-    tmp2 =  np.expand_dims(tmp, axis=-1)
-    print tmp2.shape
-    n_lines = tmp2.shape[0]
-    tmp3 = tmp2.reshape(n_lines, 32, 32)
-    print tmp3.shape
-    tmp4 = np.expand_dims(tmp3, axis=1)    
-    print tmp4.shape
-    return tmp4
+def generate_data_emap(datagen):
 
+    while True:
 
-def get_data_3d(df, varlist):
+        df = datagen.next()
 
-    emap      = get_data_emap(df, ["ak08_emap"])
-    chargemap = get_data_chargemap(df, ["ak08_chargemap"])
+        # transform-expand-reshape-expand
+        X = np.expand_dims(np.expand_dims(
+            scaler_emap.transform(get_data_flatten(df, ["ak08_emap"])), axis=-1
+        ).reshape(-1,32,32), axis=1)
 
-    n_lines = len(emap)
+        print X.shape
 
-    emap_shaped      = np.expand_dims(np.expand_dims(emap,      axis=-1).reshape(n_lines, 32,32), axis=1)
-    chargemap_shaped = np.expand_dims(np.expand_dims(chargemap, axis=-1).reshape(n_lines, 32,32), axis=1)
+        y = np_utils.to_categorical(df["is_signal_new"].values)
+        
+        yield X,y
 
-    return np.append(emap_shaped, chargemap_shaped, axis=1)
+#
+#
+#def get_data_emap_2d(df):
+#    tmp  = get_data_emap(df)
+#    print tmp.shape
+#    tmp2 =  np.expand_dims(tmp, axis=-1)
+#    print tmp2.shape
+#    n_lines = tmp2.shape[0]
+#    tmp3 = tmp2.reshape(n_lines, 32, 32)
+#    print tmp3.shape
+#    tmp4 = np.expand_dims(tmp3, axis=1)    
+#    print tmp4.shape
+#    return tmp4
+#
 
-
-if params["architecture"] == "2dconv":
-    variables = ["ak08_emap"]
-    get_data_function = get_data_emap_2d
-else:
-    variables = ["ak08_emap", "ak08_chargemap"]
-    get_data_function = get_data_3d
+#def get_data_3d(df, varlist):
+#
+#    emap      = get_data_emap(df, ["ak08_emap"])
+#    chargemap = get_data_chargemap(df, ["ak08_chargemap"])
+#
+#    n_lines = len(emap)
+#
+#    emap_shaped      = np.expand_dims(np.expand_dims(emap,      axis=-1).reshape(n_lines, 32,32), axis=1)
+#    chargemap_shaped = np.expand_dims(np.expand_dims(chargemap, axis=-1).reshape(n_lines, 32,32), axis=1)
+#
+#    return np.append(emap_shaped, chargemap_shaped, axis=1)
 
 
 def model_1d(params):
@@ -309,46 +267,46 @@ def model_3d(params):
 
 classifiers = [
 
-    Classifier("BDT",
-               "scikit", 
-               {},
-               True,
-               lambda x :get_data_vars(x, ["ak08_tau3", 
-                                           "ak08_tau2", 
-                                           "ak08softdropz10b00forbtag_btag", 
-                                           "ak08softdropz10b00_mass"]),               
-               GradientBoostingClassifier(
-                   n_estimators=200,
-                   learning_rate=0.1,
-                   max_leaf_nodes = 6,
-                   min_samples_split=1,
-                   min_samples_leaf=1,
-                   subsample=0.8,
-                   verbose = True,
-                )),
-
-    Classifier("BDT-nob",
-               "scikit", 
-               {},
-               True,
-               lambda x :get_data_vars(x, ["ak08_tau3", 
-                                           "ak08_tau2",                        
-                                           "ak08softdropz10b00_mass"]),               
-               GradientBoostingClassifier(
-                   n_estimators=200,
-                   learning_rate=0.1,
-                   max_leaf_nodes = 6,
-                   min_samples_split=1,
-                   min_samples_leaf=1,
-                   subsample=0.8,
-                   verbose = True,
-                )),
+#    Classifier("BDT",
+#               "scikit", 
+#               {},
+#               True,
+#               lambda x :get_data_vars(x, ["ak08_tau3", 
+#                                           "ak08_tau2", 
+#                                           "ak08softdropz10b00forbtag_btag", 
+#                                           "ak08softdropz10b00_mass"]),               
+#               GradientBoostingClassifier(
+#                   n_estimators=200,
+#                   learning_rate=0.1,
+#                   max_leaf_nodes = 6,
+#                   min_samples_split=1,
+#                   min_samples_leaf=1,
+#                   subsample=0.8,
+#                   verbose = True,
+#                )),
+#
+#    Classifier("BDT-nob",
+#               "scikit", 
+#               {},
+#               True,
+#               lambda x :get_data_vars(x, ["ak08_tau3", 
+#                                           "ak08_tau2",                        
+#                                           "ak08softdropz10b00_mass"]),               
+#               GradientBoostingClassifier(
+#                   n_estimators=200,
+#                   learning_rate=0.1,
+#                   max_leaf_nodes = 6,
+#                   min_samples_split=1,
+#                   min_samples_leaf=1,
+#                   subsample=0.8,
+#                   verbose = True,
+#                )),
 
     Classifier("NNXd", 
                "keras",
                params,
                False,
-               get_data_function,
+               generate_data_emap(datagen_train),
                model_2d(params)
                )
     
@@ -445,9 +403,9 @@ if plot_inputs:
 # Train/Load classifiers and make ROCs
 ########################################
 
-[clf.prepare(dtrain, dtest) for clf in classifiers]
-[rocplot(clf, dtest, classes, class_names) for clf in classifiers]
-multirocplot(classifiers, dtest)
+[clf.prepare() for clf in classifiers]
+#[rocplot(clf, dtest, classes, class_names) for clf in classifiers]
+#multirocplot(classifiers, dtest)
 
  
 

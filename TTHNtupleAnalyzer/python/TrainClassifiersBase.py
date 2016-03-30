@@ -22,6 +22,10 @@ import pdb
 
 print "Imported basics"
 
+import ROOT
+
+print "Imported ROOT"
+
 import matplotlib as mpl
 mpl.use('Agg')
 import numpy as np
@@ -94,13 +98,13 @@ class Classifier:
         else:
             self.plot_name = name
 
-    def prepare(self, dtrain, dtest):
+    def prepare(self):
 
         if not self.load_from_file:
             if self.backend == "scikit":
                 train_scikit(dtrain, self)
             elif self.backend == "keras":
-                train_keras(dtrain, dtest, self)
+                train_keras(self)
         else:
             if self.backend == "scikit":
                 f = open(os.path.join(self.inpath,self.name + ".pickle"), "r")
@@ -137,18 +141,12 @@ def train_scikit(df, clf):
 # Helper: train_keras
 ########################################
 
-def train_keras(df_train, df_val, clf):
+def train_keras(clf):
 
     print "Starting train_keras with the parameters: "
     for k,v in clf.params.iteritems():
         print "\t", k,"=",v
-    
-    X_train = clf.get_data(df_train)
-    X_val   = clf.get_data(df_val)
- 
-    y_train = df_train["is_signal_new"].values
-    y_val   = df_val["is_signal_new"].values
- 
+      
     # Prepare model and train
     sgd = SGD(lr = clf.params["lr"], 
               decay = clf.params["decay"], 
@@ -156,12 +154,12 @@ def train_keras(df_train, df_val, clf):
               nesterov=True)
     clf.model.compile(loss='mean_squared_error', optimizer=sgd)
                 
-    ret = clf.model.fit(X_train, 
-                    np_utils.to_categorical(y_train), 
-                    nb_epoch = clf.params["nb_epoch"],
-                    verbose=2, 
-                    validation_data=(X_val, np_utils.to_categorical(y_val)),
-                    show_accuracy=True)
+    ret = clf.model.fit_generator(clf.get_data,
+                                  10000,
+                                  nb_epoch = clf.params["nb_epoch"],
+                                  verbose=2, 
+                                  #validation_data=(X_val, np_utils.to_categorical(y_val)),
+                                  show_accuracy=True)
   
     plt.clf()
     plt.plot(ret.history["acc"])
@@ -344,3 +342,73 @@ def multirocplot(clfs, tmp_df, logy=True):
 
     plt.show()
     plt.savefig("All-ROC.png")
+
+
+########################################
+# Helper: datagen
+########################################
+
+def datagen(sel, brs, infname_sig, infname_bkg, n_batches=10):
+
+    f_sig = ROOT.TFile.Open(infname_sig)
+    sig_entries = f_sig.Get("tree").GetEntries()
+    f_sig.Close()
+
+    f_bkg = ROOT.TFile.Open(infname_bkg)
+    bkg_entries = f_bkg.Get("tree").GetEntries()
+    f_bkg.Close()
+
+    # Initialize
+    step_sig = sig_entries/n_batches
+    step_bkg = bkg_entries/n_batches
+
+    i_start_sig = 0
+    i_start_bkg = 0        
+
+    # Generate data forever
+    while True:
+        
+        d_sig = root_numpy.root2rec(infname_sig, branches=brs, selection = sel, start=i_start_sig, stop = i_start_sig + step_sig)
+        d_bkg = root_numpy.root2rec(infname_bkg, branches=brs, selection = sel, start=i_start_bkg, stop = i_start_bkg + step_bkg)
+
+        i_start_sig += step_sig
+        i_start_bkg += step_bkg
+        # roll over
+        if ((i_start_sig + step_sig >= sig_entries) or 
+            (i_start_bkg + step_bkg >= bkg_entries)):
+            i_start_sig = 0
+            i_start_bkg = 0
+        
+        df_sig = pandas.DataFrame(d_sig)    
+        df_sig["is_signal_new"] = 1
+
+        df_bkg = pandas.DataFrame(d_bkg)    
+        df_bkg["is_signal_new"] = 0
+
+        df = pandas.concat([df_sig, df_bkg], ignore_index=True)
+
+        print i_start_sig, i_start_bkg, df_sig.shape, df_bkg.shape,
+                    
+        # Shuffle
+        df = df.iloc[np.random.permutation(len(df))]
+        
+        print len(df)
+    
+        yield df
+
+
+########################################
+# Data access helpers
+########################################
+
+def get_data_vars(df, varlist):        
+    return df[varlist].values
+
+def get_data_flatten(df, varlist):
+    
+    # tmp is a 1d-array of 1d-arrays
+    # so we need to convert it to 2d array
+    tmp = df[varlist].values.flatten() # 
+    ret = np.vstack([tmp[i] for i in xrange(len(tmp))])
+     
+    return ret 
