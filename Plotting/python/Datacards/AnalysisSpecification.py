@@ -222,4 +222,4 @@ analysis = Analysis(
 
 #add single-category groups
 for cat in sl_categories:
-    analysis.groups[cat.full_name] = cat
+    analysis.groups[cat.full_name] = [cat]
