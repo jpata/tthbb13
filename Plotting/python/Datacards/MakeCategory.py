@@ -131,7 +131,7 @@ def apply_rules(args):
     infile_tf.Close()
     return hdict
 
-def apply_rules_parallel(infile, rules, ncores=2):
+def apply_rules_parallel(infile, rules, ncores=4):
     """
     Project out all the histograms according to the projection rules.
     infile (string) - path to input root file with sparse histograms
@@ -148,6 +148,7 @@ def apply_rules_parallel(infile, rules, ncores=2):
     rets = p.map(apply_rules, inputs)
 
     #add all the histogram dictionaries together
+    print "reducing..."
     ret = reduce(sparse.add_hdict, rets)
 
     p.close()
@@ -200,6 +201,7 @@ if __name__ == "__main__":
         hdict_cat[catname][k] = hdict[k]
 
     #produce the event counts per category
+    print "producing event counts"
     event_counts = {}
     for cat in analysis.categories:
         event_counts[cat.name] = {}
@@ -212,6 +214,7 @@ if __name__ == "__main__":
     category_files = {}
 
     #save the histograms into per-category files
+    print "saving categories"
     for catname in hdict_cat.keys():
         hfile = os.path.join(analysis.output_directory, "{0}.root".format(catname))
         print "saving {0} histograms to {1}".format(len(hdict_cat[catname]), hfile)
@@ -220,6 +223,7 @@ if __name__ == "__main__":
     
     #add the fake data
     if analysis.do_fake_data:
+        print "adding fake data"
         from utils import fakeData
         for cat in analysis.categories:
             hfile = category_files[cat.name]
@@ -229,6 +233,7 @@ if __name__ == "__main__":
 
     #add the stat variations
     if analysis.do_stat_variations:
+        print "adding stat variations"
         from utils import makeStatVariations
         for cat in analysis.categories:
             hfile = category_files[cat.name]
@@ -247,6 +252,7 @@ if __name__ == "__main__":
         if not cat.do_limit:
             continue
         fn = os.path.join(analysis.output_directory, "shapes_{0}.txt".format(cat.full_name))
+        print "writing shape file {0}".format(fn)
         dcof = open(fn, "w")
         PrintDatacard([cat], event_counts, category_files, dcof)
         dcof.write("# execute with\n")

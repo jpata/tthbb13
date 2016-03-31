@@ -114,11 +114,11 @@ def add_hdict(d1, d2):
     ks1 = set(d1.keys())
     ks2 = set(d2.keys())
     for k in ks1.intersection(ks2):
-        out[k] = d1[k].Clone()
+        out[k] = d1[k]
         out[k].Add(d2[k])
         out[k].SetName(d1[k].GetName())
     for k in ks1.difference(ks2):
-        out[k] = d1[k].Clone()
+        out[k] = d1[k]
     for k in ks2.difference(ks1):
-        out[k] = d2[k].Clone()
+        out[k] = d2[k]
     return out
