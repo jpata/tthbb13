@@ -131,7 +131,7 @@ def apply_rules(args):
     infile_tf.Close()
     return hdict
 
-def apply_rules_parallel(infile, rules, ncores=4):
+def apply_rules_parallel(infile, rules, ncores=1):
     """
     Project out all the histograms according to the projection rules.
     infile (string) - path to input root file with sparse histograms
@@ -177,12 +177,18 @@ if __name__ == "__main__":
 
     rules = []
     for cat in analysis.categories:
+        print "making rules for category={0} discr={1}".format(
+            cat.name, cat.discriminator
+        )
         rules += make_rule_cut(cat.src_histogram, cat)
     
     of = open("rules.json", "w")
+    print "writing {0} rules".format(len(rules))
     of.write(json.dumps(rules, indent=2))
     of.close()
+
     #project out all the histograms
+    print "applying {0} rules".format(len(rules))
     hdict = apply_rules_parallel(infile, rules)
 
     #split the big dictionary to category-based dictionaries
@@ -238,7 +244,7 @@ if __name__ == "__main__":
     from utils import PrintDatacard
     #make datacards for individual categories
     for cat in analysis.categories:
-        fn = os.path.join(analysis.output_directory, "shapes_{0}.txt".format(cat.name))
+        fn = os.path.join(analysis.output_directory, "shapes_{0}.txt".format(cat.full_name))
         dcof = open(fn, "w")
         PrintDatacard([cat], event_counts, category_files, dcof)
         dcof.write("# execute with\n")
