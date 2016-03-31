@@ -103,6 +103,8 @@ base_samples = [
 ]
 
 sl_categories = [
+
+    # >= 6 jets, >= 4 tags
     Category(
         name = "sl_jge6_tge4",
         cuts = [("numJets", 6, 8), ("nBCSVM", 4, 8)],
@@ -114,6 +116,8 @@ sl_categories = [
         discriminator = "mem_SL_0w2h2t",
         src_histogram = "sl/sparse"
     ),
+
+    # >= 6 jets, == 3 tags
     Category(
         name = "sl_jge6_t3",
         cuts = [("numJets", 6, 8), ("nBCSVM", 3, 4)],
@@ -125,7 +129,75 @@ sl_categories = [
         discriminator = "mem_SL_0w2h2t",
         rebin=1,
         src_histogram = "sl/sparse"
-    )
+    ),
+
+    # >= 6 jets, == 2 tags
+    Category(
+        name = "sl_jge6_t2",
+        cuts = [("numJets", 6, 8), ("nBCSVM", 2, 3)],
+        samples = base_samples,
+        signal_processes = signal_processes,
+        common_shape_uncertainties = common_shape_uncertainties,
+        common_scale_uncertainties = common_scale_uncertainties,
+        scale_uncertainties = scale_uncertainties,
+        discriminator = "mem_SL_0w2h2t",
+        rebin=1,
+        src_histogram = "sl/sparse"
+    ),
+
+    # == 5 jets, >= 4 tags
+    Category(
+        name = "sl_j5_tge4",
+        cuts = [("numJets", 5, 6), ("nBCSVM", 4, 8)],
+        samples = base_samples,
+        signal_processes = signal_processes,
+        common_shape_uncertainties = common_shape_uncertainties,
+        common_scale_uncertainties = common_scale_uncertainties,
+        scale_uncertainties = scale_uncertainties,
+        discriminator = "mem_SL_0w2h2t",
+        src_histogram = "sl/sparse"
+    ),
+
+    # == 5 jets, == 3 tags
+    Category(
+        name = "sl_j5_t3",
+        cuts = [("numJets", 5, 6), ("nBCSVM", 3, 4)],
+        samples = base_samples,
+        signal_processes = signal_processes,
+        common_shape_uncertainties = common_shape_uncertainties,
+        common_scale_uncertainties = common_scale_uncertainties,
+        scale_uncertainties = scale_uncertainties,
+        discriminator = "mem_SL_0w2h2t",
+        rebin=1,
+        src_histogram = "sl/sparse"
+    ),
+
+    # == 4 jets, >= 4 tags
+    Category(
+        name = "sl_j4_tge4",
+        cuts = [("numJets", 4, 5), ("nBCSVM", 4, 8)],
+        samples = base_samples,
+        signal_processes = signal_processes,
+        common_shape_uncertainties = common_shape_uncertainties,
+        common_scale_uncertainties = common_scale_uncertainties,
+        scale_uncertainties = scale_uncertainties,
+        discriminator = "mem_SL_0w2h2t",
+        src_histogram = "sl/sparse"
+    ),
+
+    # == 4 jets, == 3 tags
+    Category(
+        name = "sl_j4_t3",
+        cuts = [("numJets", 4, 5), ("nBCSVM", 3, 4)],
+        samples = base_samples,
+        signal_processes = signal_processes,
+        common_shape_uncertainties = common_shape_uncertainties,
+        common_scale_uncertainties = common_scale_uncertainties,
+        scale_uncertainties = scale_uncertainties,
+        discriminator = "mem_SL_0w2h2t",
+        rebin=1,
+        src_histogram = "sl/sparse"
+    ),
 ]
 
 analysis = Analysis(
