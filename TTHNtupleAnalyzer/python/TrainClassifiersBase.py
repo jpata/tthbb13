@@ -17,7 +17,6 @@ def fixPath():
 sys.path = fixPath()
 
 import os
-import psutil
 import pickle
 import pdb
 
@@ -157,8 +156,6 @@ def train_keras(clf):
               momentum = clf.params["momentum"], 
               nesterov=True)
     clf.model.compile(loss='mean_squared_error', optimizer=sgd)
-
-    print clf.datagen_test
                 
     ret = clf.model.fit_generator(clf.datagen_train,
                                   samples_per_epoch = clf.params["samples_per_epoch"], 
@@ -356,7 +353,7 @@ def multirocplot(clfs, tmp_df, logy=True):
 # Helper: datagen
 ########################################
 
-def datagen(sel, brs, infname_sig, infname_bkg, n_batches=10):
+def datagen(sel, brs, infname_sig, infname_bkg, n_chunks=10):
 
     f_sig = ROOT.TFile.Open(infname_sig)
     sig_entries = f_sig.Get("tree").GetEntries()
@@ -367,8 +364,8 @@ def datagen(sel, brs, infname_sig, infname_bkg, n_batches=10):
     f_bkg.Close()
 
     # Initialize
-    step_sig = sig_entries/n_batches
-    step_bkg = bkg_entries/n_batches
+    step_sig = sig_entries/n_chunks
+    step_bkg = bkg_entries/n_chunks
 
     i_start_sig = 0
     i_start_bkg = 0        

@@ -61,7 +61,8 @@ default_params = {
     "n_dense_nodes"  : 8,
 
     # Common parameters
-    "n_batches"         : 200,
+    "n_chunks"          : 20,
+    "batch_size"        : 128,
     "lr"                : 0.01,
     "decay"             : 1e-6,
     "momentum"          : 0.9,            
@@ -109,43 +110,82 @@ for param in default_params.keys():
 
 
 ########################################
-# Prepare data and scalers
+# Count effective training samples
 ########################################
 
+# We want to know the "real" number of training samples
+# This is a bit tricky as we read the file in "chunks" and then divide each chunk into "batches"
+# both operations might loose a few events at the end
+# So we actually do this procedure on a "cheap" branch
+
 n_train_samples = 0 
+# Loop over signal and background sample
 for fn in [infname_sig, infname_bkg]:
-    n_train_samples += len(root_numpy.root2rec(fn, branches=["evt"], selection = cut_train))
+
+    # get the number of events in the root file so we can determin the chunk size
+    rf = ROOT.TFile.Open(fn)
+    entries = rf.Get("tree").GetEntries()
+    rf.Close()
+
+    step = entries/params["n_chunks"]    
+    i_start = 0
+
+    # Loop over chunks from file
+    for i_chunk in range(params["n_chunks"]):
+    
+        # get the samples in this chunk that survive the fiducial selection + training sample selection
+        n_samples = len(root_numpy.root2rec(fn, branches=["evt"], selection = cut_train, start=i_start, stop=i_start+step))
+
+        # round to batch_size
+        n_train_samples += (n_samples/params["batch_size"])*params["batch_size"]
+        i_start += step
+
 print "Total number of training samples = ", n_train_samples
 params["samples_per_epoch"] = n_train_samples
 
 
-datagen_train = datagen(cut_train, brs, infname_sig, infname_bkg, n_batches=params["n_batches"])
-datagen_test  = datagen(cut_test, brs, infname_sig, infname_bkg, n_batches=params["n_batches"])
+########################################
+# Prepare data and scalers
+########################################
+
+datagen_train = datagen(cut_train, brs, infname_sig, infname_bkg, n_chunks=params["n_chunks"])
+datagen_test  = datagen(cut_test, brs, infname_sig, infname_bkg, n_chunks=params["n_chunks"])
 
 scaler_emap = StandardScaler()  
 
 # Don't need full data to train the scaler
-for _ in range(params["n_batches"]/4):
+for _ in range(params["n_chunks"]/4):
     scaler_emap.partial_fit(get_data_flatten(datagen_train.next(), ["ak08_emap"]))
 
 print "Preparing Scalers: Done..."
 
 # Define a generator for the inputs we need
-def generate_data_emap(datagen):
+def generate_data_emap(datagen, batch_size):
+
+    X=[]
+    y=[]
+
+    i_start = 0
 
     while True:
+    
+        if len(X)>i_start+batch_size:
+            
+            yield X[i_start:i_start+batch_size], y[i_start:i_start+batch_size]
+            i_start += batch_size
 
-        df = datagen.next()
+        else:
+            # refill data stores
 
-        # transform-expand-reshape-expand
-        X = np.expand_dims(np.expand_dims(
-            scaler_emap.transform(get_data_flatten(df, ["ak08_emap"])), axis=-1
-        ).reshape(-1,32,32), axis=1)
+            df = datagen.next()
+            # transform-expand-reshape-expand
+            X = np.expand_dims(np.expand_dims(
+                scaler_emap.transform(get_data_flatten(df, ["ak08_emap"])), axis=-1
+            ).reshape(-1,32,32), axis=1)            
+            y = np_utils.to_categorical(df["is_signal_new"].values)
 
-        y = np_utils.to_categorical(df["is_signal_new"].values)
+            i_start = 0
         
-        yield X,y
-
 
 #def get_data_3d(df, varlist):
 #
@@ -295,11 +335,10 @@ classifiers = [
                "keras",
                params,
                False,
-               generate_data_emap(datagen_train),
-               generate_data_emap(datagen_test),
+               generate_data_emap(datagen_train, batch_size = params["batch_size"]),
+               generate_data_emap(datagen_test, batch_size = params["batch_size"]),
                model_2d(params)
-               )
-    
+               )    
 ]
 
 
