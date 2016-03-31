@@ -10,8 +10,10 @@ class Category:
     def __init__(self, **kwargs):
         self.name = kwargs.get("name")
         self.discriminator = kwargs.get("discriminator")
+        self.full_name = "{0}_{1}".format(self.name, self.discriminator)
         self.src_histogram = kwargs.get("src_histogram")
         self.rebin = kwargs.get("rebin", 1)
+        self.do_limit = kwargs.get("do_limit", 1)
 
         self.scale_uncertainties = kwargs.get("scale_uncertainties", {})
 
@@ -54,7 +56,3 @@ class Analysis:
         self.do_fake_data = kwargs.get("do_fake_data", False)
         self.do_stat_variations = kwargs.get("do_stat_variations", False)
         self.output_directory = kwargs.get("output_directory", "./out")
-
-        #add single-category groups
-        for cat in self.categories:
-            self.groups[cat.name] = [cat]
