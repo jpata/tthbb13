@@ -163,10 +163,17 @@ if __name__ == "__main__":
     if len(sys.argv)==2:
         import AnalysisSpecification as anspec
     #load from file
-    elif len(sys.argv)==3:
+    elif len(sys.argv)>=3:
         import imp
         anspec = imp.load_source("anspec", sys.argv[2])
+        
     analysis = anspec.analysis
+
+    # if we receive argument from command line:
+    # only process one category (given by its name)
+    if len(sys.argv)==4:        
+        cat_to_process = sys.argv[3]        
+        analysis.categories = [c for c in analysis.categories if c.name==cat_to_process]
 
     rules = []
     for cat in analysis.categories:
@@ -229,13 +236,13 @@ if __name__ == "__main__":
                     cat.shape_uncertainties[proc][syst] = 1.0
                 
     from utils import PrintDatacard
-    #make datacards for groups
-    for groupname, categories in analysis.groups.items():
-        fn = os.path.join(analysis.output_directory, "shapes_{0}.txt".format(groupname))
+    #make datacards for individual categories
+    for cat in analysis.categories:
+        fn = os.path.join(analysis.output_directory, "shapes_{0}.txt".format(cat.name))
         dcof = open(fn, "w")
-        PrintDatacard(categories, event_counts, category_files, dcof)
+        PrintDatacard([cat], event_counts, category_files, dcof)
         dcof.write("# execute with\n")
-        dcof.write("# combine -n {0} -M Asymptotic -t -1 {1}\n".format(groupname, os.path.basename(fn)))
+        dcof.write("# combine -n {0} -M Asymptotic -t -1 {1}\n".format(cat.name, os.path.basename(fn)))
         dcof.close()
 
     

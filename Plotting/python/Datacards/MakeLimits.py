@@ -15,6 +15,7 @@ if not len(sys.argv) in [2,3]:
     print "Wrong number of arguments"
     print "Usage: "
     print "{0} datacard_file.py [group to process]".format(sys.argv[0])
+    sys.exit()
 
 # TODO: define input/output directories
 
@@ -51,6 +52,12 @@ lg = LimitGetter(dcard.analysis.output_directory)
 for group in groups_to_process:
 
     print "Doing {0} consisting of {1} categories".format(group, len(dcard.analysis.groups[group]))    
+    
+    # If the group has more than one entry, we first need to merge the
+    # individual per-category datacard
+    if len(dcard.analysis.groups[group])>1:
+        pass
+        
 
     lg(os.path.join(dcard.analysis.output_directory, "shapes_{0}.txt".format(group)))
 
