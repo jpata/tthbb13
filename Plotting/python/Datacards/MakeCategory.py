@@ -131,7 +131,7 @@ def apply_rules(args):
     infile_tf.Close()
     return hdict
 
-def apply_rules_parallel(infile, rules, ncores=1):
+def apply_rules_parallel(infile, rules, ncores=2):
     """
     Project out all the histograms according to the projection rules.
     infile (string) - path to input root file with sparse histograms
@@ -244,6 +244,8 @@ if __name__ == "__main__":
     from utils import PrintDatacard
     #make datacards for individual categories
     for cat in analysis.categories:
+        if not cat.do_limit:
+            continue
         fn = os.path.join(analysis.output_directory, "shapes_{0}.txt".format(cat.full_name))
         dcof = open(fn, "w")
         PrintDatacard([cat], event_counts, category_files, dcof)

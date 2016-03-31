@@ -206,6 +206,7 @@ for discr in ["jet0_pt", "common_bdt"]:
     for cat in sl_categories:
         newcat_d = cat.__dict__
         newcat_d["discriminator"] = discr
+        newcat_d["do_limit"] = 0
         newcat = Category(**newcat_d)
         all_cats += [newcat]
 
@@ -221,4 +222,4 @@ analysis = Analysis(
 
 #add single-category groups
 for cat in sl_categories:
-    analysis.groups[cat.name] = cat
+    analysis.groups[cat.full_name] = cat

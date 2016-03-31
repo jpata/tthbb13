@@ -13,6 +13,7 @@ class Category:
         self.full_name = "{0}_{1}".format(self.name, self.discriminator)
         self.src_histogram = kwargs.get("src_histogram")
         self.rebin = kwargs.get("rebin", 1)
+        self.do_limit = kwargs.get("do_limit", 1)
 
         self.scale_uncertainties = kwargs.get("scale_uncertainties", {})
 
