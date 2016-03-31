@@ -2,6 +2,7 @@ import imp
 file = open( "heppy_crab_config.py", 'r' )
 cfg = imp.load_source( 'cfg', "heppy_crab_config.py", file)
 config = cfg.config
+
 import os
 import re
 dataset=os.environ["DATASET"]
@@ -29,4 +30,7 @@ if len(config.General.requestName) > 100 :
 config.Data.inputDataset = dataset
 config.Data.outputDatasetTag += "_"+sample
 config.Data.unitsPerJob = int(os.environ["NLUMIS"])
+if int(os.environ.get("DATA", 0)) == 1:
+    config.JobType.inputFiles[0] = "heppy_config_data.py"
+    config.JobType.scriptExe = "heppy_crab_script_data.sh"
 print config

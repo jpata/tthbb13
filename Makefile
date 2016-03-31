@@ -1,6 +1,6 @@
 
 #sample vhbb+tthbb file
-testfile_vhbb_tthbb=root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat//store/user/jpata/tth/VHBBHeppyV21pre_tthbbV5/ttHTobb_M125_13TeV_powheg_pythia8/VHBBHeppyV21pre_tthbbV5_ttHTobb_M125_13TeV_powheg_Py8__fall15MAv2-pu25ns15v1_76r2as_v12-v1/160311_183358/0000/tree_1.root
+testfile_vhbb_tthbb=/store/user/jpata/tth/VHBBHeppyV21_tthbbV6/ttHTobb_M125_13TeV_powheg_pythia8/VHBBHeppyV21_tthbbV6_ttHTobb_M125_13TeV_powheg_Py8__fall15MAv2-pu25ns15v1_76r2as_v12-v1/160318_163755/0000/tree_10.root
 test_out_dir=$(CMSSW_BASE)/src/TTH/tests_out
 
 melooper: Plotting/python/joosep/codeGen.py Plotting/bin/*.cc Plotting/interface/*.h
@@ -56,7 +56,7 @@ test_MELooper: test_mkdir melooper
 	cd Plotting && FILE_NAMES=$(testfile_vhbb_tthbb) DATASETPATH=ttHTobb_M125_13TeV_powheg_pythia8 ./python/makeJobfile.py && ./melooper job.json &> $(test_out_dir)/Plotting_MELooper.log
 	sleep 5	
 	du -csh Plotting/ControlPlotsSparse.root &>> $(test_out_dir)/Plotting_MELooper.log
-	python -c "import ROOT; f=ROOT.TFile('Plotting/ControlPlotsSparse.root'); print f.Get('ttH_hbb/sl/sparse').GetEntries()" &>> $(test_out_dir)/Plotting_MELooper.log
+	python -c "import ROOT; f=ROOT.TFile('Plotting/ControlPlotsSparse.root'); print f.Get('ttHTobb_M125_13TeV_powheg_pythia8/ttH_hbb/sl/sparse').GetEntries()" &>> $(test_out_dir)/Plotting_MELooper.log
 
 test_VHBB: test_mkdir
 	rm -Rf $(CMSSW_BASE)/src/VHbbAnalysis/Heppy/test/Loop* 
