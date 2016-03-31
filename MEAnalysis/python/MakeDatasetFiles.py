@@ -16,42 +16,62 @@ import subprocess
 das_client = "../crab_vhbb/das_client.py"
 output_base = "../gc/datasets"
 
-if not len(sys.argv)==2:
-    print "Wrong number of command line arguments"
-    print "Example: python {0} VHBBHeppyV21_tthbbV6".format(sys.argv[0])
-    sys.exit()
-else:
-    version = sys.argv[1]
-    
+import argparse
+parser = argparse.ArgumentParser(description='Prepares dataset lists from DAS')
+parser.add_argument('--version', action="store", help="DAS pattern to search, also the output directory")
+parser.add_argument('--datasetfile', action="store", help="Input file with datasets")
+args = parser.parse_args()
+
+version = args.version
+
 # Create directory for version under output_base
 outdir = os.path.join(output_base, version)
 
 if not os.path.exists(outdir):
     os.makedirs(outdir)
 
-
 ########################################
 # Get List of Datasets
 ########################################
+
+#no specified input dataset list
+if not args.datasetfile:
+    datasets_json = subprocess.Popen(["python",
+                                    das_client, 
+                                    "--format=json",
+                                    "--limit=0",
+                                    '--query=dataset dataset=/*/*{0}*/USER instance=prod/phys03'.format(version)], 
+                                    stdout=subprocess.PIPE).stdout.read()
     
-datasets_json = subprocess.Popen(["python",
-                                  das_client, 
-                                 "--format=json", 
-                                  '--query=dataset dataset=/*/*{0}*/USER'.format(version)], 
-                                 stdout=subprocess.PIPE).stdout.read()
-
-print datasets_json
-
-datasets_di = json.loads(datasets_json)
-datasets = datasets_di["data"][0]["hints"][0]["results"][0]["examples"]
-
-print "Got {0} datasets".format(len(datasets))
-
-
+    datasets_di = json.loads(datasets_json)
+    datasets = [
+        d["dataset"][0]["name"] for d in datasets_di["data"]
+    ]
+    
+    print "Got {0} datasets".format(len(datasets))
+    
+    ds_list = []
+    dupe = False
+    for dataset in datasets:
+        print dataset
+        ds_name = dataset.split("/")[1]
+        if ds_name in ds_list:
+            dupe = True
+        ds_list += [ds_name]
+    if dupe:
+        raise Exception("Found duplicate datasets, please disambiguate manually")
+else:
+    datasets = filter(
+        lambda x: len(x)>0,
+        map(lambda x: x.strip(),
+            open(args.datasetfile).readlines()
+        )
+    )
 ########################################
 # And add .txt for each of them
 ########################################
 
+samples_processed = []
 for ds in datasets:
 
     print "Doing", ds
@@ -62,7 +82,10 @@ for ds in datasets:
     # Yields:
     # sample = TTTo2L2Nu_13TeV-powheg
     sample  = ds.split("/")[1]
-
+    if sample in samples_processed:
+        raise Exception("Duplicate sample {0}".format(sample))
+    samples_processed += [sample]
+    
     ofile = open(os.path.join(outdir,sample+".txt"),"w")
 
     ofile.write("[{0}]\n".format(sample))
