@@ -52,10 +52,10 @@ sys.modules["TFClasses"] = TFClasses
         
 handle = None
 handle = open("MEAnalysis_heppy.py", 'r')
-cfo = imp.load_source("heppy_config", "MEAnalysis_heppy.py", handle)
-config = cfo.config
+cfo2 = imp.load_source("heppy_config", "MEAnalysis_heppy.py", handle)
+config = cfo2.config
 from TTH.MEAnalysis.MEAnalysis_cfg_heppy import conf_to_str
-print "MEM config", conf_to_str(cfo.conf)
+print "MEM config", conf_to_str(cfo2.conf)
 config.components = [cfg.Component(
     "dummy",
     files = ["Output/tree.root"],
@@ -63,7 +63,7 @@ config.components = [cfg.Component(
     n_gen = 1,
     xs = 1,
 )]
-config.components[0].isMC = True
+config.components[0].isMC = cfo.sample.isMC
 looper = Looper('Output_tth', config, nPrint=0)
 looper.loop()
 looper.write()
