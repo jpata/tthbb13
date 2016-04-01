@@ -12,6 +12,8 @@ ngen = {
     "TT_TuneCUETP8M1_13TeV-powheg-pythia8": 95807288.0,
 }
 lumi = 2500 # pb-1
+do_stat_variations = False
+do_fake_data = True
 
 common_shape_uncertainties = {
     "CMS_scale_j"           : 1,
@@ -201,23 +203,29 @@ sl_categories = [
     ),
 ]
 
-all_cats = copy.deepcopy(sl_categories)
-for discr in ["jet0_pt", "common_bdt"]:
-    for cat in sl_categories:
-        newcat_d = cat.__dict__
-        newcat_d["discriminator"] = discr
-        newcat_d["do_limit"] = False
-        newcat = Category(**newcat_d)
-        all_cats += [newcat]
+control_variables = ["jet0_pt", "btag_LR_4b_2b_logit"]
+def make_control_categories(input_categories):
+    all_cats = copy.deepcopy(input_categories)
+    for discr in control_variables + ["common_bdt"]:
+        for cat in input_categories:
+            newcat_d = cat.__dict__
+            newcat_d["discriminator"] = discr
+            newcat_d["do_limit"] = False
+            if discr == "common_bdt":
+                newcat_d["do_limit"] = True
+            newcat = Category(**newcat_d)
+            all_cats += [newcat]
+    return all_cats
 
+all_cats = make_control_categories(sl_categories)
 analysis = Analysis(
     samples = base_samples,
     categories = all_cats,
     groups = {
         "sl": sl_categories,
     },
-    do_fake_data = True,
-    do_stat_variations = False
+    do_fake_data = do_fake_data,
+    do_stat_variations = do_stat_variations
 )
 
 #add single-category groups
