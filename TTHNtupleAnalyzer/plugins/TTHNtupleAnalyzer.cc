@@ -234,10 +234,10 @@ void fill_truth_matching(TTHTree* tthtree,
 // Function to fill the branches for a fatjet collection
 // This needs to be templated as we can have either PFJets or BasicJet 
 // objects as fatjets
-template <typename JetType, typename CollectionType>
+template <typename JetType, typename CollectionType, typename JetTokenType>
 void fill_fatjet_branches(const edm::Event& iEvent, 
 			  TTHTree* tthtree,
- 			  const edm::EDGetTokenT<CollectionType> fj_token,
+ 			  JetTokenType fj_token,
 			  edm::EDGetTokenT<edm::ValueMap<float>> fatjetNsubTau1Token,
 			  edm::EDGetTokenT<edm::ValueMap<float>> fatjetNsubTau2Token,
 			  edm::EDGetTokenT<edm::ValueMap<float>> fatjetNsubTau3Token,
@@ -265,8 +265,9 @@ void fill_fatjet_branches(const edm::Event& iEvent,
 			  // true higgs for matching
 			  const vector<const reco::Candidate*>  & gen_higgs){
   
+
   // Get Fatjet iteself    
-  edm::Handle<CollectionType>  fatjets;
+  edm::Handle<CollectionType>  fatjets;  
   iEvent.getByToken(fj_token, fatjets);
 
   // Handles to get the Nsubjettiness
@@ -338,13 +339,13 @@ void fill_fatjet_branches(const edm::Event& iEvent,
     prefix.append("__");
 
 
-    if (fj_branches_name == "ak08" && n_fat_jet < 10) {    
+    if (fj_branches_name == "ak08gen" && n_fat_jet < 10) {    
 
       float *emap      = tthtree->get_address<float *>(prefix + "emap");
-      float *ptmap     = tthtree->get_address<float *>(prefix + "ptmap");
-      float *massmap   = tthtree->get_address<float *>(prefix + "massmap");
-      float *chargemap = tthtree->get_address<float *>(prefix + "chargemap");
-      float *fracmap   = tthtree->get_address<float *>(prefix + "fracmap");
+      //float *ptmap     = tthtree->get_address<float *>(prefix + "ptmap");
+      //float *massmap   = tthtree->get_address<float *>(prefix + "massmap");
+      //float *chargemap = tthtree->get_address<float *>(prefix + "chargemap");
+      //float *fracmap   = tthtree->get_address<float *>(prefix + "fracmap");
       
       reco::Jet::Constituents constis = x.getJetConstituents();
       for(reco::Jet::Constituents::iterator cit = constis.begin(); 
@@ -354,23 +355,23 @@ void fill_fatjet_branches(const edm::Event& iEvent,
       
 	int ipos = convert_to_grid(x.eta(), x.phi(), (*cit)->eta(), (*cit)->phi(), n_fat_jet);
 	emap[ipos]	+= (*cit)->energy();
-	ptmap[ipos]	+= (*cit)->pt();
-	massmap[ipos]	+= (*cit)->mass();
-	fracmap[ipos]	+= ((pat::PackedCandidate * )(&(**cit)))->hcalFraction();
+	//ptmap[ipos]	+= (*cit)->pt();
+	//massmap[ipos]	+= (*cit)->mass();
+	//fracmap[ipos]	+= ((pat::PackedCandidate * )(&(**cit)))->hcalFraction();
 		
-	if ( (*cit)->charge() < 100 && (*cit)->charge() > -100)
-	  chargemap[ipos] += fabs((*cit)->charge());		  
+	//if ( (*cit)->charge() < 100 && (*cit)->charge() > -100)
+	//  chargemap[ipos] += fabs((*cit)->charge());		  
       }
 
-      for (int ii=0; ii != 32; ii++){
-	for (int jj=0; jj != 32; jj++){
-
-	  int ipos = ii + 32 * (jj + 32 * n_fat_jet);
-	  
-	  if (emap[ipos] > 0)
-	    fracmap[ipos] /= emap[ipos];	  
-	}
-      }
+      //for (int ii=0; ii != 32; ii++){
+      //	for (int jj=0; jj != 32; jj++){
+      //
+      //	  int ipos = ii + 32 * (jj + 32 * n_fat_jet);
+      //	  
+      //	  if (emap[ipos] > 0)
+      //	    fracmap[ipos] /= emap[ipos];	  
+      //	}
+      //}
 	     
     }
 
@@ -390,8 +391,8 @@ void fill_fatjet_branches(const edm::Event& iEvent,
     
     // Constituents
     tthtree->get_address<int *>(prefix + "nconst")[n_fat_jet] = x.getJetConstituents().size();
-    tthtree->get_address<int *>(prefix + "ncharged")[n_fat_jet] = x.chargedMultiplicity();
-    tthtree->get_address<int *>(prefix + "nneutral")[n_fat_jet] = x.neutralMultiplicity();
+    //tthtree->get_address<int *>(prefix + "ncharged")[n_fat_jet] = x.chargedMultiplicity();
+    //tthtree->get_address<int *>(prefix + "nneutral")[n_fat_jet] = x.neutralMultiplicity();
 
 
     // NSubjettiness
@@ -537,11 +538,17 @@ private:
 	const std::vector<std::string> fatjet_qvols_;
 	const std::vector<std::string> fatjet_branches_;
 	const std::vector<int> fatjet_usesubjets_;
+	const std::vector<int> fatjet_isgen_;
   	const std::vector<std::string> fatjet_flavour_infos_;
   	const std::vector<std::string> fatjet_correctors_;
 
         // Fatjet Tokens
-        std::vector<edm::EDGetTokenT< reco::PFJetCollection > > fatjetTokens_;
+
+        // Use a vector of pointers to token for convenience
+        // extra vecotrs for the tokens themselves so they don't garbabe collected
+        std::vector<int> tokenIndex_;
+        std::vector<edm::EDGetTokenT< std::vector<reco::PFJet> >> pfjetTokens_;
+        std::vector<edm::EDGetTokenT< std::vector<reco::GenJet> >> genjetTokens_;
        
         std::vector<edm::EDGetTokenT<edm::ValueMap<float>>> fatjetNsubTau1Tokens_;
         std::vector<edm::EDGetTokenT<edm::ValueMap<float>>> fatjetNsubTau2Tokens_;
@@ -621,6 +628,7 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
         fatjet_qvols_(iConfig.getParameter<std::vector<std::string>>("fatjetsQvols")),
         fatjet_branches_(iConfig.getParameter<std::vector<std::string>>("fatjetsBranches")),
         fatjet_usesubjets_(iConfig.getParameter<std::vector<int>>("fatjetsUsesubjets")),
+        fatjet_isgen_(iConfig.getParameter<std::vector<int>>("fatjetsIsgen")),
         fatjet_flavour_infos_(iConfig.getParameter<std::vector<std::string>>("fatjetsFlavourInfos")),
         fatjet_correctors_(iConfig.getParameter<std::vector<std::string>>("fatjetsCorrectors")),
       
@@ -683,7 +691,14 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
     else
       it = edm::InputTag(fatjet_objects_[i],"");
 
-    fatjetTokens_.push_back(consumes<reco::PFJetCollection>(it));    
+    if (fatjet_isgen_[i]){
+      tokenIndex_.push_back(genjetTokens_.size());           
+      genjetTokens_.push_back( consumes<std::vector<reco::GenJet>>(it));
+    }
+    else{
+      tokenIndex_.push_back(pfjetTokens_.size());
+      pfjetTokens_.push_back( consumes<std::vector<reco::PFJet>>(it));
+    }
   }
 
   // Produce NSubjettiness Tokens
@@ -831,6 +846,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	assert(fatjet_objects_.size()==fatjet_qvols_.size());
 	assert(fatjet_objects_.size()==fatjet_branches_.size());
 	assert(fatjet_objects_.size()==fatjet_usesubjets_.size());
+	assert(fatjet_objects_.size()==fatjet_isgen_.size());
 	assert(fatjet_objects_.size()==fatjet_flavour_infos_.size());
 	assert(fatjet_objects_.size()==fatjet_correctors_.size());
 
@@ -1189,33 +1205,63 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	  std::string	fj_flavour_info_name = fatjet_flavour_infos_[i_fj_coll];
 	  std::string	fj_corrector_name    = fatjet_correctors_[i_fj_coll];
 
-	  fill_fatjet_branches<reco::PFJet, reco::PFJetCollection>(iEvent, 
-								   tthtree, 
-								   fatjetTokens_[i_fj_coll],
-								   fatjetNsubTau1Tokens_[i_fj_coll], 
-								   fatjetNsubTau2Tokens_[i_fj_coll],
-								   fatjetNsubTau3Tokens_[i_fj_coll],
-								   fatjetSDChi1Tokens_[i_fj_coll],
-								   fatjetSDChi2Tokens_[i_fj_coll],
-								   fatjetSDChi3Tokens_[i_fj_coll],
-								   fatjetSDNMJ1Tokens_[i_fj_coll],
-								   fatjetSDNMJ2Tokens_[i_fj_coll],
-								   fatjetSDNMJ3Tokens_[i_fj_coll],
-								   fatjetBtagsTokens_[i_fj_coll],
-								   fatjetQvolsTokens_[i_fj_coll],
-								   fatjetFlavInfoTokens_[i_fj_coll],
-								   jetCorrectorTokens_[i_fj_coll],
-								   fatjet_nsubs_[i_fj_coll],
-								   fatjet_sds_[i_fj_coll],
-								   fj_btags_name,
-								   fj_qvols_name,
-								   fj_branches_name,
-								   fj_flavour_info_name,
-								   fj_corrector_name,
-								   hadronic_ts,
-								   hard_partons,
-								   gen_higgs);
-	 
+	  if (fatjet_isgen_[i_fj_coll]){
+	    fill_fatjet_branches<reco::GenJet, std::vector<reco::GenJet>, edm::EDGetTokenT< std::vector<reco::GenJet> > >(iEvent, 
+															  tthtree, 
+															  genjetTokens_[tokenIndex_[i_fj_coll]],
+															  fatjetNsubTau1Tokens_[i_fj_coll], 
+															  fatjetNsubTau2Tokens_[i_fj_coll],
+															  fatjetNsubTau3Tokens_[i_fj_coll],
+															  fatjetSDChi1Tokens_[i_fj_coll],
+															  fatjetSDChi2Tokens_[i_fj_coll],
+															  fatjetSDChi3Tokens_[i_fj_coll],
+															  fatjetSDNMJ1Tokens_[i_fj_coll],
+															  fatjetSDNMJ2Tokens_[i_fj_coll],
+															  fatjetSDNMJ3Tokens_[i_fj_coll],
+															  fatjetBtagsTokens_[i_fj_coll],
+															  fatjetQvolsTokens_[i_fj_coll],
+															  fatjetFlavInfoTokens_[i_fj_coll],
+															  jetCorrectorTokens_[i_fj_coll],
+															  fatjet_nsubs_[i_fj_coll],
+															  fatjet_sds_[i_fj_coll],
+															  fj_btags_name,
+															  fj_qvols_name,
+															  fj_branches_name,
+															  fj_flavour_info_name,
+															  fj_corrector_name,
+															  hadronic_ts,
+															  hard_partons,
+															  gen_higgs);
+	  }
+	  else {
+	    fill_fatjet_branches<reco::PFJet, std::vector<reco::PFJet>, edm::EDGetTokenT< std::vector<reco::PFJet> > >(iEvent, 
+														       tthtree, 
+														       pfjetTokens_[tokenIndex_[i_fj_coll]],
+														       fatjetNsubTau1Tokens_[i_fj_coll], 
+														       fatjetNsubTau2Tokens_[i_fj_coll],
+														       fatjetNsubTau3Tokens_[i_fj_coll],
+														       fatjetSDChi1Tokens_[i_fj_coll],
+														       fatjetSDChi2Tokens_[i_fj_coll],
+														       fatjetSDChi3Tokens_[i_fj_coll],
+														       fatjetSDNMJ1Tokens_[i_fj_coll],
+														       fatjetSDNMJ2Tokens_[i_fj_coll],
+														       fatjetSDNMJ3Tokens_[i_fj_coll],
+														       fatjetBtagsTokens_[i_fj_coll],
+														       fatjetQvolsTokens_[i_fj_coll],
+														       fatjetFlavInfoTokens_[i_fj_coll],
+														       jetCorrectorTokens_[i_fj_coll],
+														       fatjet_nsubs_[i_fj_coll],
+														       fatjet_sds_[i_fj_coll],
+														       fj_btags_name,
+														       fj_qvols_name,
+														       fj_branches_name,
+														       fj_flavour_info_name,
+														       fj_corrector_name,
+														       hadronic_ts,
+														       hard_partons,
+														       gen_higgs);
+	  }
+
 	} // End of loop over fatjet collections
 	// Done filling the fatjet information
 

@@ -34,6 +34,7 @@ inline bool is_undef(double x) { return fabs(x-DEF_VAL_DOUBLE) < DOUBLE_EPS; };
 //x is the array, n is the size, y is the initialized value
 #define SET_ZERO(x,n,y) for(int i=0;i<n;i++) {x[i]=y;}
 #define SET_ZERO_2(x,n,m,y) for(int i=0;i<n;i++) { for(int j=0;j<m;j++) { x[i][j]=y; } }
+#define SET_ZERO_3(x,n,m,l,y) for(int i=0;i<n;i++) { for(int j=0;j<m;j++) { for(int k=0;k<l;k++) { x[i][j][k]=y; } } }
 
 /*
 This is a simple wrapper class for the TTH-specific flat data format.
@@ -131,6 +132,13 @@ public:
 	float weight__trigger;
 	float weight__trigger_down;
 	float weight__trigger_up;
+
+        float jet_ak08gen__emap[10][32][32];
+        //float jet_ak08__ptmap[10][32][32];
+        //float jet_ak08__massmap[10][32][32];
+        //float jet_ak08__chargemap[10][32][32];
+        //float jet_ak08__fracmap[10][32][32];
+
     
     //HEADERGEN_BRANCH_VARIABLES
     //This comment is for automatic header generation, do not remove
@@ -168,6 +176,12 @@ public:
 		SET_ZERO(met__py__shift,  MET_S_MAX, DEF_VAL_FLOAT);
 		SET_ZERO(met__phi__shift, MET_S_MAX, DEF_VAL_FLOAT);
 		n__jet = DEF_VAL_INT;
+
+		SET_ZERO_3(jet_ak08gen__emap, 10, 32,32, 0.);
+		//SET_ZERO_3(jet_ak08__ptmap, 10, 32,32, 0.);
+		//SET_ZERO_3(jet_ak08__massmap, 10, 32,32, 0.);
+		//SET_ZERO_3(jet_ak08__chargemap, 10, 32,32, 0.);
+		//SET_ZERO_3(jet_ak08__fracmap, 10, 32,32, 0.);
 		
 		n__tr  = DEF_VAL_INT;
 		n__pv  = DEF_VAL_INT;
@@ -234,6 +248,13 @@ public:
 		tree->Branch("weight__trigger", &weight__trigger, "weight__trigger/F");
 		tree->Branch("weight__trigger_down", &weight__trigger_down, "weight__trigger_down/F");
 		tree->Branch("weight__trigger_up", &weight__trigger_up, "weight__trigger_up/F");
+
+		tree->Branch("jet_ak08gen__emap", jet_ak08gen__emap, "jet_ak08gen__emap[10][32][32]");
+		//tree->Branch("jet_ak08__ptmap", jet_ak08__ptmap, "jet_ak08__ptmap[10][32][32]");
+		//tree->Branch("jet_ak08__massmap", jet_ak08__massmap, "jet_ak08__massmap[10][32][32]");
+		//tree->Branch("jet_ak08__chargemap", jet_ak08__chargemap, "jet_ak08__chargemap[10][32][32]");
+		//ttree->Branch("jet_ak08__fracmap", jet_ak08__fracmap, "jet_ak08__fracmap[10][32][32]");
+
         
         //HEADERGEN_BRANCH_CREATOR
 	}
@@ -280,6 +301,13 @@ public:
 		tree->SetBranchAddress("weight__trigger", &weight__trigger);
 		tree->SetBranchAddress("weight__trigger_down", &weight__trigger_down);
 		tree->SetBranchAddress("weight__trigger_up", &weight__trigger_up);
+
+		tree->SetBranchAddress("jet_ak08gen__emap", jet_ak08gen__emap);
+		//tree->SetBranchAddress("jet_ak08__ptmap", jet_ak08__ptmap);
+		//tree->SetBranchAddress("jet_ak08__massmap", jet_ak08__massmap);
+		//tree->SetBranchAddress("jet_ak08__chargemap", jet_ak08__chargemap);
+		//tree->SetBranchAddress("jet_ak08__fracmap", jet_ak08__fracmap);
+
         
         //HEADERGEN_BRANCH_SETADDRESS
 

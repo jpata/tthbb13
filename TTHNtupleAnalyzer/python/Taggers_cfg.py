@@ -119,12 +119,15 @@ DO_R08 = True
 from RecoJets.JetProducers.AnomalousCellParameters_cfi import *
 from RecoJets.JetProducers.PFJetParameters_cfi import *
 from RecoJets.JetProducers.CATopJetParameters_cfi import *
+from RecoJets.JetProducers.GenJetParameters_cfi import *
+
 
 # Setup fatjet collections to store
 li_fatjets_objects       = []
 li_fatjets_branches      = []
 li_ungroomed_fatjets_objects  = []
 li_ungroomed_fatjets_branches = []
+
 
 # First create the ungroomed fatjet collections
 # These are the ones that get all the groomers applied to later on
@@ -157,6 +160,23 @@ if DO_R08:
            rParam       = cms.double(0.8)))
    getattr(process, fj_name).src = cms.InputTag("puppi")
    getattr(process, fj_name).jetPtMin = cms.double(200)
+   li_fatjets_objects.append(fj_name)
+   li_fatjets_branches.append(branch_name)
+   li_ungroomed_fatjets_objects.append(fj_name)
+   li_ungroomed_fatjets_branches.append(branch_name)
+
+   ## AntiKt, R=0.8, pT > 200 GeV, GEN
+   fj_name = "ak08PFJetsGEN"
+   branch_name = 'ak08gen'
+   setattr(process, fj_name, cms.EDProducer(
+           "FastjetJetProducer",
+           PFJetParameters,
+           AnomalousCellParameters,
+           jetAlgorithm = cms.string("AntiKt"),
+           rParam       = cms.double(0.8)))
+   getattr(process, fj_name).src = cms.InputTag("packedGenParticles")
+   getattr(process, fj_name).jetPtMin = cms.double(200)
+   getattr(process, fj_name).jetType = cms.string('GenJet')
    li_fatjets_objects.append(fj_name)
    li_fatjets_branches.append(branch_name)
    li_ungroomed_fatjets_objects.append(fj_name)
@@ -661,8 +681,12 @@ li_fatjets_correctors = []
 
 for fj_obj_name in li_fatjets_objects:
 
-   if "forbtag" in fj_obj_name:
+   if "forbtag"  in fj_obj_name:
       print "NOT correcting subjets"
+      li_fatjets_correctors.append("None")
+
+   elif "GEN" in fj_obj_name:
+      print "NOT correcting genjets"
       li_fatjets_correctors.append("None")
 
    elif "PUPPI" in fj_obj_name:
@@ -1200,6 +1224,15 @@ for fj in li_fatjets_objects:
    else:
       li_fatjets_use_subjets.append(0)
 
+li_fatjets_is_gen = []
+for fj in li_fatjets_objects:
+   if "GEN" in fj:
+      li_fatjets_is_gen.append(1)
+   else:
+      li_fatjets_is_gen.append(0)
+
+
+
 process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
 	isMC = cms.bool(True),
 	vertices = cms.InputTag("offlineSlimmedPrimaryVertices"),
@@ -1223,6 +1256,7 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
         fatjetsQvols    = cms.vstring(li_fatjets_qvols),
         fatjetsBranches = cms.vstring(li_fatjets_branches),
         fatjetsUsesubjets = cms.vint32(li_fatjets_use_subjets),                                           
+        fatjetsIsgen      = cms.vint32(li_fatjets_is_gen),                                         
         fatjetsFlavourInfos = cms.vstring(li_fatjets_flavour_infos),                                           
         fatjetsCorrectors   = cms.vstring(li_fatjets_correctors),                                           
         

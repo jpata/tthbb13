@@ -299,7 +299,9 @@ for o in objects_to_pop:
 
 
 AH.addVectorBranches(variables, variable_types, outtree,
-                     ["ak08_emap", "ak08_ptmap", "ak08_massmap", "ak08_chargemap", "ak08_fracmap"], 
+                     ["ak08gen_emap", 
+                      #"ak08_ptmap", "ak08_massmap", "ak08_chargemap", "ak08_fracmap"
+                  ], 
                      datatype = 'float')
 
 ########################################
@@ -522,10 +524,11 @@ for i_event in range(n_entries):
                     # todo: properly integrate with rest
                     if object_name == "ak08":
                         
-                        for mapname in ["emap", "ptmap", "massmap", "chargemap", "fracmap"]:
+                        for mapname in ["emap"] :
+                        #"ptmap", "massmap", "chargemap", "fracmap"]:
                         
-                            full_branch_in = "jet_ak08__" + mapname
-                            full_branch_out = "ak08_" + mapname
+                            full_branch_in = "jet_ak08gen__" + mapname
+                            full_branch_out = "ak08gen_" + mapname
 
                             xmap = AH.getter(intree,full_branch_in)
 
