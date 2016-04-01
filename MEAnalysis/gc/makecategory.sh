@@ -17,15 +17,15 @@ cd $MY_SCRATCH
 # Create output directory
 mkdir out
 
-# get the sparse histograms
-cp  $sparse_histo_file sparse.root
-
 echo "Running MakeCategory"
-python ${CMSSW_BASE}/src/TTH/Plotting/python/Datacards/MakeCategory.py sparse.root ${CMSSW_BASE}/${analysis_spec} $category
+python ${CMSSW_BASE}/src/TTH/Plotting/python/Datacards/MakeCategory.py $sparse_histo_file ${CMSSW_BASE}/${analysis_spec} $category
 echo "Done MakeCategory"
 
+xbase=${analysis_spec##*/}
+anspec_base=${xbase%.*}
+echo "anspec_base", $anspec_base
 #copy output
-OUTDIR=$HOME/tth/gc/${TASK_ID}/out/
+OUTDIR=$HOME/tth/gc/makecategory/${TASK_ID}/${anspec_base}/
 mkdir -p $OUTDIR 
 echo "copying output"
 cp out/* $OUTDIR 

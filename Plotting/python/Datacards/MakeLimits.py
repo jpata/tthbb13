@@ -55,9 +55,6 @@ for group_name in groups_to_process:
     group = dcard.analysis.groups[group_name]    
     print "Doing {0} consisting of {1} categories".format(group_name, len(group))    
     
-    # For testing
-    for c in group:
-        c.full_name = c.name
 
     # Get all the per-category datacards and use combineCards to merge into one "group datacard)"
     input_dcard_names = ["shapes_{0}.txt".format(c.full_name) for c in group]

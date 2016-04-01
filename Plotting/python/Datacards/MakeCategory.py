@@ -131,7 +131,7 @@ def apply_rules(args):
     infile_tf.Close()
     return hdict
 
-def apply_rules_parallel(infile, rules, ncores=4):
+def apply_rules_parallel(infile, rules, ncores=1):
     """
     Project out all the histograms according to the projection rules.
     infile (string) - path to input root file with sparse histograms
@@ -140,18 +140,22 @@ def apply_rules_parallel(infile, rules, ncores=4):
     Optional:
     ncores (int) - number of parallel cores for projection
     """ 
-    p = multiprocessing.Pool(ncores)
+    if ncores > 1:
+        p = multiprocessing.Pool(ncores)
     inputs = [
         (infile, [r]) for r in rules
     ]
-
-    rets = p.map(apply_rules, inputs)
+    if ncores > 1:
+        rets = p.map(apply_rules, inputs)
+    else:
+        rets = map(apply_rules, inputs)
 
     #add all the histogram dictionaries together
     print "reducing..."
     ret = reduce(sparse.add_hdict, rets)
-
-    p.close()
+    
+    if ncores > 1:
+        p.close()
     return ret
 
 
