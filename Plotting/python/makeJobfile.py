@@ -35,7 +35,7 @@ sample_repl = {
 ret = {
     "filenames": filenames,
     "lumi": 1.0,
-    "process": sample_repl[sample],
+    "process": sample_repl.get(sample, sample),
     "xsweight": 1.0,
     "prefix": sample,
     "outputFile": "ControlPlotsSparse.root",
