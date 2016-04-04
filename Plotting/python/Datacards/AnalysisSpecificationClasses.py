@@ -56,4 +56,4 @@ class Analysis:
         self.groups = kwargs.get("groups")
         self.do_fake_data = kwargs.get("do_fake_data", False)
         self.do_stat_variations = kwargs.get("do_stat_variations", False)
-        self.output_directory = kwargs.get("output_directory", "./out")
+

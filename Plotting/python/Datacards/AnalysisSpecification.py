@@ -274,3 +274,8 @@ analysis = Analysis(
 #add single-category groups
 for cat in sl_categories:
     analysis.groups[cat.full_name] = [cat]
+
+# Dictionary of all analyses we consider
+analyses = {
+    "SL_7cat" : analysis
+}
