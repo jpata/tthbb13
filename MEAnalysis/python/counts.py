@@ -13,18 +13,17 @@ def get_tree_entries(treename, filenames):
     for fi in filenames:
         print "adding", fi
         tt.AddFile(fi)
-    return tt.GetEntries()
+    i = tt.GetEntries()
+    return i
 
-hEntries = ROOT.TH1D("numEntries", "numEntries", 3, 0, 3)
-hEntries.SetBinContent(1, get_tree_entries("vhbb/tree", filenames))
-hEntries.SetBinContent(2, get_tree_entries("tree", filenames))
-hEntries.Write()
-
+good_filenames = []
 for infn in filenames:
     tf = ROOT.TFile.Open(infn)
     if not tf or tf.IsZombie():
         print "Could not open {0}, skipping".format(infn)
         continue
+    print "good file", infn, tf
+    good_filenames += [infn]
     vhbb_dir = tf.Get("vhbb")
     for k in vhbb_dir.GetListOfKeys():
         kn = k.GetName() 
@@ -37,4 +36,10 @@ for infn in filenames:
                 of.Get(kn).Add(o)
     of.Write()
     tf.Close()
+
+hEntries = ROOT.TH1D("numEntries", "numEntries", 3, 0, 3)
+hEntries.SetBinContent(1, get_tree_entries("vhbb/tree", good_filenames))
+hEntries.SetBinContent(2, get_tree_entries("tree", good_filenames))
+hEntries.Write()
+
 of.Close()
