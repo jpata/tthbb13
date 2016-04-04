@@ -24,15 +24,14 @@ namespace trigger {
     
     bool sl_el(const TreeData& data) {
         return (
-            true
-            //data.HLT_BIT_HLT_Ele27_WP85_Gsf_v
+            data.HLT_BIT_HLT_Ele27_eta2p1_WPLoose_Gsf_v
         );
     }
     
     bool sl_mu(const TreeData& data) {
         return (
-            true
-            //data.HLT_BIT_HLT_IsoMu17_eta2p1_v
+            data.HLT_BIT_HLT_IsoMu20_v ||
+            data.HLT_BIT_HLT_IsoTkMu20_v
         );
     }
 }

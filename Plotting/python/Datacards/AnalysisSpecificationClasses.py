@@ -28,8 +28,8 @@ class Category:
         self.scale_uncertainties = {}
 
         #[syst] -> scale factor, common for all processes
-        self.common_shape_uncertainties = kwargs.get("common_shape_uncertainties", {})        
-        self.common_scale_uncertainties = kwargs.get("common_scale_uncertainties", {})        
+        self.common_shape_uncertainties = kwargs.get("common_shape_uncertainties", {})
+        self.common_scale_uncertainties = kwargs.get("common_scale_uncertainties", {})
         for proc in self.processes:
             self.shape_uncertainties[proc] = {}
             self.scale_uncertainties[proc] = {}
