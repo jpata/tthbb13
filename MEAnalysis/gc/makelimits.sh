@@ -1,15 +1,6 @@
 #!/bin/bash
 
-# Get private environment variables
-echo "Reading env.sh:"
-cat env.sh
-source env.sh
-echo "Done reading env.sh:"
 source common.sh
-
-#print out the environment
-env
-set -e
 
 #go to work directory
 cd $MY_SCRATCH
@@ -19,15 +10,24 @@ cd $MY_SCRATCH
 # "$CMSSW_BASE/src/TTH/Plotting/python/Datacards/out"
 export SCRATCH_DCARDDIR=$(basename ${datacarddir})
 
+echo "MY_SCRATCH=$MY_SCRATCH"
+
+echo `pwd`
+echo "SCRATCH_DCARDDIR="$SCRATCH_DCARDDIR
 # get the datacards/root files we need as input
 cp -r ${datacarddir} $SCRATCH_DCARDDIR
+cd $SCRATCH_DCARDDIR
 
 echo "Running MakeLimits"
 python ${CMSSW_BASE}/src/TTH/Plotting/python/Datacards/MakeLimits.py ${CMSSW_BASE}/${analysis_spec} $groups 
 echo "Done MakeLimits"
+cd ../
+
+xbase=${analysis_spec##*/}
+anspec_base=${xbase%.*}
 
 #copy output
-OUTDIR=$HOME/tth/makelimits/${TASK_ID}/${MY_JOBID}/
+OUTDIR=$HOME/tth/gc/makelimits/${TASK_ID}/${anspec_base}/${MY_JOBID}/
 mkdir -p $OUTDIR 
 echo "copying output"
 cp $SCRATCH_DCARDDIR/higgsCombine*.root $OUTDIR 

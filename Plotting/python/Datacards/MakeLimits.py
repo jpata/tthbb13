@@ -8,6 +8,7 @@ import subprocess
 from CombineHelper import LimitGetter
 
 
+print "MakeLimits.py called from cwd={0}".format(os.getcwd())
 ########################################
 # Setup
 ########################################
@@ -43,7 +44,7 @@ else:
 print "Processing groups:", groups_to_process
 
 # Prepare the limit getter
-lg = LimitGetter(dcard.analysis.output_directory)
+lg = LimitGetter("./")
 
 
 ########################################
@@ -59,17 +60,23 @@ for group_name in groups_to_process:
     # Get all the per-category datacards and use combineCards to merge into one "group datacard)"
     input_dcard_names = ["shapes_{0}.txt".format(c.full_name) for c in group]
     add_dcard_command = ["combineCards.py"] + input_dcard_names 
+    print "Running combineCards: {0}".format(" ".join(add_dcard_command))
     process = subprocess.Popen(add_dcard_command, 
                                stdout=subprocess.PIPE, 
-                               cwd=dcard.analysis.output_directory)        
+                               #cwd=dcard.analysis.output_directory)
+                               cwd="./")
     group_dcard = process.communicate()[0]
 
     # Write the group datacard to a file
-    group_dcard_filename = os.path.join(dcard.analysis.output_directory, "shapes_group_{0}.txt".format(group_name))
+    group_dcard_filename = os.path.join(
+        #dcard.analysis.output_directory,
+        "./",
+        "shapes_group_{0}.txt".format(group_name)
+    )
     group_dcard_file = open(group_dcard_filename, "w")
     group_dcard_file.write(group_dcard)
     group_dcard_file.close()
-
+    print "Running limit on {0}".format(group_dcard_filename)
     # And run limit setting on it
     lg(group_dcard_filename)
 
