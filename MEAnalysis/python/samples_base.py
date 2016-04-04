@@ -1,6 +1,4 @@
-import FWCore.ParameterSet.Config as cms
 import glob, os
-import ConfigParser
 
 #Cross-sections from
 # $t \bar{t} + \mathrm{jets}$ - https://twiki.cern.ch/twiki/bin/view/LHCPhysics/TtbarNNLO, $M_{top} = 172.5$ GeV

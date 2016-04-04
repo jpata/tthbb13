@@ -37,13 +37,13 @@ def make_rule_cut(basehist, category):
         rules += [d]
 
         #make systematic variations
-        for proc, systdict in category.shape_uncertainties.items():
-            for systname, systsize in systdict.items():
-                for direction in ["Up", "Down"]:
-                    d2 = copy.deepcopy(d)
-                    d2["input"] += "_" + systname + direction
-                    d2["output"] += "_" + systname + direction
-                    rules += [d2]
+        systdict = category.shape_uncertainties[samp.output_name]
+        for systname, systsize in systdict.items():
+            for direction in ["Up", "Down"]:
+                d2 = copy.deepcopy(d)
+                d2["input"] += "_" + systname + direction
+                d2["output"] += "_" + systname + direction
+                rules += [d2]
 
     # FIXME: this needs to be added to AnalysisSpecification.py
     # #Now we need to apply additional cuts on data samples based on the lepton
