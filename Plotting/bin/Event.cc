@@ -987,13 +987,9 @@ string to_string(const ResultKey& k) {
 string to_string(const ResultMap& res) {
     stringstream ss;
     ss << "ResultMap[" << endl;
-    // for (auto& kv : res) {
-    //     ss << " " << to_string(kv.first)
-    //         << " " << kv.second.GetName()
-    //         << " N=" << kv.second.GetEntries()
-    //         << " I=" << kv.second.Integral()
-    //         << " mu=" << kv.second.GetMean() << endl;
-    // }
+    for (auto& kv : res) {
+        ss << " " << to_string(kv.first) << endl;
+    }
     ss << "]" << endl;
     return ss.str();
 }
