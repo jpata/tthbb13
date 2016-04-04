@@ -1,4 +1,4 @@
-import json, copy, os, multiprocessing, sys
+import json, copy, os, imp, multiprocessing, sys
 import sparse, ROOT
 
 #Nota bene: this is very important!
@@ -29,7 +29,7 @@ def make_rule_cut(basehist, category):
     for samp in category.samples:
         d = {
             "input": "{0}/{1}".format(samp.input_name, basehist),
-            "cuts": str(category.cuts),
+            "cuts": str(category.cuts + samp.cuts),
             "project": str([(category.discriminator, category.rebin)]),
             "output": "{0}/{1}/{2}".format(samp.output_name, category.name, category.discriminator),
             "xs_weight": samp.xs_weight
@@ -37,18 +37,18 @@ def make_rule_cut(basehist, category):
         rules += [d]
 
         #make systematic variations
-        for proc, systdict in category.shape_uncertainties.items():
-            for systname, systsize in systdict.items():
-                for direction in ["Up", "Down"]:
-                    d2 = copy.deepcopy(d)
-                    d2["input"] += "_" + systname + direction
-                    d2["output"] += "_" + systname + direction
-                    rules += [d2]
+        systdict = category.shape_uncertainties[samp.output_name]
+        for systname, systsize in systdict.items():
+            for direction in ["Up", "Down"]:
+                d2 = copy.deepcopy(d)
+                d2["input"] += "_" + systname + direction
+                d2["output"] += "_" + systname + direction
+                rules += [d2]
 
     # FIXME: this needs to be added to AnalysisSpecification.py
     # #Now we need to apply additional cuts on data samples based on the lepton
     # #flavour
-    # for samp in data_samples:
+    for samp in category.data_samples:
     #     if "sl/" in basehist:
     #         if samp == "SingleMuon":
     #             cuts = [("leptonFlavour", 1, 2)] + cuts
@@ -65,14 +65,15 @@ def make_rule_cut(basehist, category):
     #             cuts = [("leptonFlavour", 5, 6)] + cuts
     #         else:
     #             continue
-    #     d = {
-    #         "input": "{0}/{1}".format(samp, basehist),
-    #         "cuts": str(cuts),
-    #         "project": str(variables),
-    #         "output": "data/{1}/{2}".format(samp, catname, histname),
-    #     }
-    # 
-    #     rules += [d]
+        d = {
+            "input": "{0}/{1}".format(samp.input_name, basehist),
+            "cuts": str(category.cuts + samp.cuts),
+            "project": str([(category.discriminator, category.rebin)]),
+            "output": "{0}/{1}/{2}".format(samp.output_name, category.name, category.discriminator),
+            "xs_weight": 1.0
+        }
+    
+        rules += [d]
     return rules
 
 def apply_rules(args):
@@ -161,29 +162,26 @@ def apply_rules_parallel(infile, rules, ncores=1):
 
 if __name__ == "__main__":
     
-    #path to sparse.root from MELooper
-    infile = sys.argv[1]
-
-    #use the pre-defined analysis specification
-    if len(sys.argv)==2:
-        import AnalysisSpecification as anspec
-    #load from file
-    elif len(sys.argv)>=3:
-        import imp
-        anspec = imp.load_source("anspec", sys.argv[2])
+    if not len(sys.argv)==5:
+        print "Invalid number of arguments. Usage:"
+        print "{0} sparse.root AnalysisSpecification.py SL_7cat sl_j4_t3".format(sys.argv[0])
+        sys.exit()
         
-    analysis = anspec.analysis
+    infile = sys.argv[1] # path to sparse.root from MELooper
+    anspec = imp.load_source("anspec", sys.argv[2])
+    analysis_to_process = sys.argv[3]        
+    cat_to_process = sys.argv[4]                
+        
+    # Limit to one analysis/category
+    analysis = anspec.analyses[analysis_to_process]
+    categories = [c for c in analysis.categories if c.name==cat_to_process]
 
-    # if we receive argument from command line:
-    # only process one category (given by its name)
-    if len(sys.argv)==4:        
-        cat_to_process = sys.argv[3]        
-        analysis.categories = [c for c in analysis.categories if c.name==cat_to_process]
 
+    # Make all the rules
     rules = []
-    for cat in analysis.categories:
-        print "making rules for category={0} discr={1}".format(
-            cat.name, cat.discriminator
+    for cat in categories:
+        print "making rules for analysis={0} category={1} discr={2}".format(
+            analysis_to_process, cat.name, cat.discriminator
         )
         rules += make_rule_cut(cat.src_histogram, cat)
     
@@ -207,7 +205,7 @@ if __name__ == "__main__":
     #produce the event counts per category
     print "producing event counts"
     event_counts = {}
-    for cat in analysis.categories:
+    for cat in categories:
         event_counts[cat.name] = {}
         for proc in cat.processes:
             event_counts[cat.name][proc] = hdict["{0}/{1}/{2}".format(
@@ -229,7 +227,7 @@ if __name__ == "__main__":
     if analysis.do_fake_data:
         print "adding fake data"
         from utils import fakeData
-        for cat in analysis.categories:
+        for cat in categories:
             hfile = category_files[cat.name]
             tf = ROOT.TFile(hfile, "UPDATE")
             fakeData(tf, tf, [cat])
@@ -239,7 +237,7 @@ if __name__ == "__main__":
     if analysis.do_stat_variations:
         print "adding stat variations"
         from utils import makeStatVariations
-        for cat in analysis.categories:
+        for cat in categories:
             hfile = category_files[cat.name]
             tf = ROOT.TFile(hfile, "UPDATE")
             stathist_names = makeStatVariations(tf, tf, [cat])
@@ -251,8 +249,8 @@ if __name__ == "__main__":
                     cat.shape_uncertainties[proc][syst] = 1.0
                 
     from utils import PrintDatacard
-    #make datacards for individual categories
-    for cat in analysis.categories:
+    #make datacards for individual categories 
+    for cat in categories:
         if not cat.do_limit:
             continue
         fn = os.path.join(analysis.output_directory, "shapes_{0}.txt".format(cat.full_name))

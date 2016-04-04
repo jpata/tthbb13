@@ -23,7 +23,7 @@ echo "Done MakeCategory"
 
 xbase=${analysis_spec##*/}
 anspec_base=${xbase%.*}
-echo "anspec_base", $anspec_base
+
 #copy output
 OUTDIR=$HOME/tth/gc/makecategory/${TASK_ID}/${anspec_base}/
 mkdir -p $OUTDIR 

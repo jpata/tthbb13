@@ -1,11 +1,14 @@
 from TTH.Plotting.Datacards.AnalysisSpecification import *
 
+dl_data = [data_samples["DoubleMuon"], data_samples["MuonEG"], data_samples["DoubleEG"]]
+
 dl_categories = [
     # >= 4 jets, >= 4 tags
     Category(
         name = "dl_jge4_tge4",
         cuts = [("numJets", 4, 8), ("nBCSVM", 4, 8)],
         samples = base_samples,
+        data_samples = dl_data,
         signal_processes = signal_processes,
         common_shape_uncertainties = common_shape_uncertainties,
         common_scale_uncertainties = common_scale_uncertainties,
@@ -19,6 +22,7 @@ dl_categories = [
         name = "dl_jge4_t3",
         cuts = [("numJets", 4, 8), ("nBCSVM", 3, 4)],
         samples = base_samples,
+        data_samples = dl_data,
         signal_processes = signal_processes,
         common_shape_uncertainties = common_shape_uncertainties,
         common_scale_uncertainties = common_scale_uncertainties,
@@ -32,6 +36,7 @@ dl_categories = [
         name = "dl_jge4_t2",
         cuts = [("numJets", 4, 8), ("nBCSVM", 2, 3)],
         samples = base_samples,
+        data_samples = dl_data,
         signal_processes = signal_processes,
         common_shape_uncertainties = common_shape_uncertainties,
         common_scale_uncertainties = common_scale_uncertainties,
@@ -45,6 +50,7 @@ dl_categories = [
         name = "dl_j3_t3",
         cuts = [("numJets", 3, 4), ("nBCSVM", 3, 4)],
         samples = base_samples,
+        data_samples = dl_data,
         signal_processes = signal_processes,
         common_shape_uncertainties = common_shape_uncertainties,
         common_scale_uncertainties = common_scale_uncertainties,
@@ -58,6 +64,7 @@ dl_categories = [
         name = "dl_j3_t2",
         cuts = [("numJets", 3, 4), ("nBCSVM", 2, 3)],
         samples = base_samples,
+        data_samples = dl_data,
         signal_processes = signal_processes,
         common_shape_uncertainties = common_shape_uncertainties,
         common_scale_uncertainties = common_scale_uncertainties,

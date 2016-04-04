@@ -19,6 +19,7 @@ class Category:
 
         self.cuts = kwargs.get("cuts", [])
         self.samples = kwargs.get("samples", [])
+        self.data_samples = kwargs.get("data_samples", [])
         self.signal_processes = kwargs.get("signal_processes", [])
         self.processes = list(set([s.output_name for s in self.samples]))
 
@@ -27,8 +28,8 @@ class Category:
         self.scale_uncertainties = {}
 
         #[syst] -> scale factor, common for all processes
-        self.common_shape_uncertainties = kwargs.get("common_shape_uncertainties", {})        
-        self.common_scale_uncertainties = kwargs.get("common_scale_uncertainties", {})        
+        self.common_shape_uncertainties = kwargs.get("common_shape_uncertainties", {})
+        self.common_scale_uncertainties = kwargs.get("common_scale_uncertainties", {})
         for proc in self.processes:
             self.shape_uncertainties[proc] = {}
             self.scale_uncertainties[proc] = {}
@@ -55,4 +56,4 @@ class Analysis:
         self.groups = kwargs.get("groups")
         self.do_fake_data = kwargs.get("do_fake_data", False)
         self.do_stat_variations = kwargs.get("do_stat_variations", False)
-        self.output_directory = kwargs.get("output_directory", "./out")
+
