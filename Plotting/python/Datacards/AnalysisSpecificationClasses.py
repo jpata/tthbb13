@@ -19,6 +19,7 @@ class Category:
 
         self.cuts = kwargs.get("cuts", [])
         self.samples = kwargs.get("samples", [])
+        self.data_samples = kwargs.get("data_samples", [])
         self.signal_processes = kwargs.get("signal_processes", [])
         self.processes = list(set([s.output_name for s in self.samples]))
 

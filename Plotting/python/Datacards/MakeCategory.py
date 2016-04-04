@@ -29,7 +29,7 @@ def make_rule_cut(basehist, category):
     for samp in category.samples:
         d = {
             "input": "{0}/{1}".format(samp.input_name, basehist),
-            "cuts": str(category.cuts),
+            "cuts": str(category.cuts + samp.cuts),
             "project": str([(category.discriminator, category.rebin)]),
             "output": "{0}/{1}/{2}".format(samp.output_name, category.name, category.discriminator),
             "xs_weight": samp.xs_weight
@@ -48,7 +48,7 @@ def make_rule_cut(basehist, category):
     # FIXME: this needs to be added to AnalysisSpecification.py
     # #Now we need to apply additional cuts on data samples based on the lepton
     # #flavour
-    # for samp in data_samples:
+    for samp in category.data_samples:
     #     if "sl/" in basehist:
     #         if samp == "SingleMuon":
     #             cuts = [("leptonFlavour", 1, 2)] + cuts
@@ -65,14 +65,15 @@ def make_rule_cut(basehist, category):
     #             cuts = [("leptonFlavour", 5, 6)] + cuts
     #         else:
     #             continue
-    #     d = {
-    #         "input": "{0}/{1}".format(samp, basehist),
-    #         "cuts": str(cuts),
-    #         "project": str(variables),
-    #         "output": "data/{1}/{2}".format(samp, catname, histname),
-    #     }
-    # 
-    #     rules += [d]
+        d = {
+            "input": "{0}/{1}".format(samp.input_name, basehist),
+            "cuts": str(category.cuts + samp.cuts),
+            "project": str([(category.discriminator, category.rebin)]),
+            "output": "{0}/{1}/{2}".format(samp.output_name, category.name, category.discriminator),
+            "xs_weight": 1.0
+        }
+    
+        rules += [d]
     return rules
 
 def apply_rules(args):

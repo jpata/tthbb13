@@ -329,8 +329,6 @@ def draw_data_mc(tf, hname, samples, **kwargs):
     for hd in [hs] + hs_syst.values():
         for (sample, h) in hd.items():
             make_uoflow(h)
-            #print hs[sample].GetBinLowEdge(0), hs[sample].GetBinLowEdge(hs[sample].GetNbinsX()+1)
-            #hs[sample].Scale(get_weight(sample))
             h.title = sample_d[sample] + " ({0:.1f})".format(h.Integral())
             h.rebin(rebin)
             if show_overflow:

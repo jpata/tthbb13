@@ -105,14 +105,50 @@ base_samples = [
         xs_weight = lumi * xsec[("ttjets", "13TeV")] / ngen["TT_TuneCUETP8M1_13TeV-powheg-pythia8"]
     ),
 ]
+data_samples = {
+    "SingleMuon": Sample(
+        input_name = "SingleMuon/SingleMuon",
+        output_name = "data",
+        xs_weight = 1.0,
+        cuts = [("leptonFlavour", 1, 2)]
+    ),
+    "SingleElectron": Sample(
+        input_name = "SingleElectron/SingleElectron",
+        output_name = "data",
+        xs_weight = 1.0,
+        cuts = [("leptonFlavour", 2, 3)]
+    ),
+
+    "DoubleMuon": Sample(
+        input_name = "DoubleMuon/DoubleMuon",
+        output_name = "data",
+        xs_weight = 1.0,
+        cuts = [("leptonFlavour", 3, 4)]
+    ),
+    "MuonEG": Sample(
+        input_name = "MuonEG/MuonEG",
+        output_name = "data",
+        xs_weight = 1.0,
+        cuts = [("leptonFlavour", 4, 5)]
+    ),
+    "DoubleEG": Sample(
+        input_name = "DoubleEG/DoubleEG",
+        output_name = "data",
+        xs_weight = 1.0,
+        cuts = [("leptonFlavour", 5, 6)]
+    ),
+
+}
+
+sl_data = [data_samples["SingleMuon"], data_samples["SingleElectron"]]
 
 sl_categories = [
-
     # >= 6 jets, >= 4 tags
     Category(
         name = "sl_jge6_tge4",
         cuts = [("numJets", 6, 8), ("nBCSVM", 4, 8)],
         samples = base_samples,
+        data_samples = sl_data,
         signal_processes = signal_processes,
         common_shape_uncertainties = common_shape_uncertainties,
         common_scale_uncertainties = common_scale_uncertainties,
@@ -120,12 +156,13 @@ sl_categories = [
         discriminator = "mem_SL_0w2h2t",
         src_histogram = "sl/sparse"
     ),
-
+    
     # >= 6 jets, == 3 tags
     Category(
         name = "sl_jge6_t3",
         cuts = [("numJets", 6, 8), ("nBCSVM", 3, 4)],
         samples = base_samples,
+        data_samples = sl_data,
         signal_processes = signal_processes,
         common_shape_uncertainties = common_shape_uncertainties,
         common_scale_uncertainties = common_scale_uncertainties,
@@ -134,12 +171,13 @@ sl_categories = [
         rebin=1,
         src_histogram = "sl/sparse"
     ),
-
+    
     # >= 6 jets, == 2 tags
     Category(
         name = "sl_jge6_t2",
         cuts = [("numJets", 6, 8), ("nBCSVM", 2, 3)],
         samples = base_samples,
+        data_samples = sl_data,
         signal_processes = signal_processes,
         common_shape_uncertainties = common_shape_uncertainties,
         common_scale_uncertainties = common_scale_uncertainties,
@@ -148,12 +186,13 @@ sl_categories = [
         rebin=1,
         src_histogram = "sl/sparse"
     ),
-
+    
     # == 5 jets, >= 4 tags
     Category(
         name = "sl_j5_tge4",
         cuts = [("numJets", 5, 6), ("nBCSVM", 4, 8)],
         samples = base_samples,
+        data_samples = sl_data,
         signal_processes = signal_processes,
         common_shape_uncertainties = common_shape_uncertainties,
         common_scale_uncertainties = common_scale_uncertainties,
@@ -161,12 +200,13 @@ sl_categories = [
         discriminator = "mem_SL_0w2h2t",
         src_histogram = "sl/sparse"
     ),
-
+    
     # == 5 jets, == 3 tags
     Category(
         name = "sl_j5_t3",
         cuts = [("numJets", 5, 6), ("nBCSVM", 3, 4)],
         samples = base_samples,
+        data_samples = sl_data,
         signal_processes = signal_processes,
         common_shape_uncertainties = common_shape_uncertainties,
         common_scale_uncertainties = common_scale_uncertainties,
@@ -175,12 +215,13 @@ sl_categories = [
         rebin=1,
         src_histogram = "sl/sparse"
     ),
-
+    
     # == 4 jets, >= 4 tags
     Category(
         name = "sl_j4_tge4",
         cuts = [("numJets", 4, 5), ("nBCSVM", 4, 8)],
         samples = base_samples,
+        data_samples = sl_data,
         signal_processes = signal_processes,
         common_shape_uncertainties = common_shape_uncertainties,
         common_scale_uncertainties = common_scale_uncertainties,
@@ -188,12 +229,13 @@ sl_categories = [
         discriminator = "mem_SL_0w2h2t",
         src_histogram = "sl/sparse"
     ),
-
+    
     # == 4 jets, == 3 tags
     Category(
         name = "sl_j4_t3",
         cuts = [("numJets", 4, 5), ("nBCSVM", 3, 4)],
         samples = base_samples,
+        data_samples = sl_data,
         signal_processes = signal_processes,
         common_shape_uncertainties = common_shape_uncertainties,
         common_scale_uncertainties = common_scale_uncertainties,
