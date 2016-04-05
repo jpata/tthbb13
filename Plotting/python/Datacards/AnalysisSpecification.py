@@ -246,7 +246,7 @@ sl_categories = [
     ),
 ]
 
-control_variables = ["jet0_pt", "btag_LR_4b_2b_logit"]
+control_variables = ["jet0_pt", "jet0_eta", "jet0_btagCSV", "btag_LR_4b_2b_logit"]
 def make_control_categories(input_categories):
     all_cats = copy.deepcopy(input_categories)
     for discr in control_variables + ["common_bdt"]:
