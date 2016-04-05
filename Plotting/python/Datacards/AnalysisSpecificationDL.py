@@ -1,4 +1,5 @@
-from TTH.Plotting.Datacards.AnalysisSpecification import *
+from TTH.Plotting.Datacards.AnalysisSpecificationSL import data_samples, base_samples, signal_processes, common_shape_uncertainties, lumi, common_scale_uncertainties, scale_uncertainties, make_control_categories
+from TTH.Plotting.Datacards.AnalysisSpecificationClasses import Sample, Category, Analysis, make_csv_abstract
 
 dl_data = [data_samples["DoubleMuon"], data_samples["MuonEG"], data_samples["DoubleEG"]]
 
@@ -64,6 +65,7 @@ dl_categories = [
         name = "dl_j3_t2",
         cuts = [("numJets", 3, 4), ("nBCSVM", 2, 3)],
         samples = base_samples,
+        sparse_input_file = "/mnt/t3nfs01/data01/shome/gregor/sparse_Apr1.root",
         data_samples = dl_data,
         signal_processes = signal_processes,
         common_shape_uncertainties = common_shape_uncertainties,
@@ -79,6 +81,7 @@ all_cats = make_control_categories(dl_categories)
 analysis = Analysis(
     samples = base_samples,
     categories = all_cats,
+    sparse_input_file = "/mnt/t3nfs01/data01/shome/gregor/sparse_Apr1.root",
     groups = {
         "dl": dl_categories,
     },
@@ -89,3 +92,10 @@ analysis = Analysis(
 #add single-category groups
 for cat in dl_categories:
     analysis.groups[cat.full_name] = [cat]
+
+analyses = {"DL" : analysis}
+
+def make_csv():
+    return make_csv_abstract(analyses)
+
+
