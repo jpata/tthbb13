@@ -1,12 +1,12 @@
 #define RUNONDATA 0
 #define LOGSCALE 0
-#define NORMALIZE 1
+#define NORMALIZE 0
 #define POISSON 0
-#define SAVEPLOTS 1
-#define MAXEVENTS -10002
+#define SAVEPLOTS 0
+#define MAXEVENTS 100000
 #define NMAXJETS 30
-#define CAT -11
-#define METHOD8 10 // 10=4w2h2t or 11=3w2h2t
+#define CAT 11    // 7, 8, 9, 10, 11 or <0 for all
+#define METHOD8 11 // 10=4w2h2t or 11=3w2h2t
 #define CUT_HT 500.0
 #define PSB_FAC 0.02
 #define CSVM 0.89
@@ -22,7 +22,7 @@ void MED_plots(){
   float xmin  = 0;
   float xmax  = 200;
 
-  string folder = "/scratch/dsalerno/TTH_MEM_74X/V14/crab_151102/";
+  string folder = "/scratch/dsalerno/TTH_MEM_74X/V14/crab_151222/";
 
   string variable;
   //variable = "leadjet_pt";
@@ -263,33 +263,37 @@ void MED_plots(){
     vector<string> fname;
     
     if( samples[s] == "QCD" ){
-      //fname.push_back(folder+"QCD300/tree_QCD300_part.root");      
-      fname.push_back(folder+"QCD500/tree_QCD500_part.root");
-      fname.push_back(folder+"QCD700/tree_QCD700_part.root");
-      fname.push_back(folder+"QCD1000/tree_QCD1000_part.root");
-      fname.push_back(folder+"QCD1500/tree_QCD1500_part.root");
-      fname.push_back(folder+"QCD2000/tree_QCD2000_part.root");
+      //fname.push_back(folder+"QCD300/tree_QCD300.root");      
+      fname.push_back(folder+"QCD500/tree_QCD500.root");
+      fname.push_back(folder+"QCD700/tree_QCD700.root");
+      fname.push_back(folder+"QCD1000/tree_QCD1000.root");
+      fname.push_back(folder+"QCD1500/tree_QCD1500.root");
+      fname.push_back(folder+"QCD2000/tree_QCD2000.root");
     }
     else if( samples[s].find("Data") != string::npos ){
       fname.push_back(folder+"ME_data.root");
     }
+    else if( samples[s] == "TTH" ){
+      fname.push_back(folder+"TTH/tree_TTH_part.root");
+    }
     else{
-      fname.push_back(folder+samples[s]+"/tree_"+samples[s]+"_part.root");
+      fname.push_back(folder+samples[s]+"/tree_"+samples[s]+".root");
     }
     // loop over input files
     for(unsigned int f=0; f<fname.size(); f++){
       
       outfile << endl << "Running file " << fname[f] << endl;
 
-      float nGen_fac = 0.0;
-      if( fname[f].find("/TTH/") != string::npos ) nGen_fac = 3933404.0/1617675.0;
-      else if( fname[f].find("TTJets") != string::npos ) nGen_fac = 19757190.0/14278690.0;
-      else if( fname[f].find("QCD300") != string::npos ) nGen_fac = 19466760.0/18282047.0;
-      else if( fname[f].find("QCD500") != string::npos ) nGen_fac = 19664159.0/17830047.0;
-      else if( fname[f].find("QCD700") != string::npos ) nGen_fac = 15165288.0/13441279.0;
-      else if( fname[f].find("QCD1000") != string::npos ) nGen_fac = 4963895.0/4461516.0;
-      else if( fname[f].find("QCD1500") != string::npos ) nGen_fac = 3691495.0/3415737.0;
-      else if( fname[f].find("QCD2000") != string::npos ) nGen_fac = 1912529.0/1862522.0;
+      float nGen_fac = 1.0;
+      if( fname[f].find("/TTH/") != string::npos ) nGen_fac = 3933404.0/(3933404.0-3089.0);
+      // else if( fname[f].find("TTJets") != string::npos ) nGen_fac = 19757190.0/14278690.0;
+      // else if( fname[f].find("QCD300") != string::npos ) nGen_fac = 19466760.0/18282047.0;
+      // else if( fname[f].find("QCD500") != string::npos ) nGen_fac = 19664159.0/17830047.0;
+      // else if( fname[f].find("QCD700") != string::npos ) nGen_fac = 15165288.0/13441279.0;
+      // else if( fname[f].find("QCD1000") != string::npos ) nGen_fac = 4963895.0/4461516.0;
+      // else if( fname[f].find("QCD1500") != string::npos ) nGen_fac = 3691495.0/3415737.0;
+      // else if( fname[f].find("QCD2000") != string::npos ) nGen_fac = 1912529.0/1862522.0
+							    ;
 
       //float psb_bins[13] = {0.0, 0.4, 0.41, 0.42, 0.43, 0.44, 0.45, 0.46, 0.47, 0.48, 0.49, 0.5, 1.0};
       float psb_bins[13] = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.63, 0.67, 0.7, 0.8, 0.9, 1.1};
@@ -451,7 +455,7 @@ void MED_plots(){
 	// if( (samples[s]== "TTH" || samples[s]== "TTJets") && cat_gen!=2 ) continue;
 	
 	// Trigger selection
-	if( triggerDecision<0 ) continue;
+	if( triggerDecision<=0 ) continue;
 
 	// HT cut
 	if( ht < CUT_HT) continue;
@@ -805,22 +809,22 @@ void MED_plots(){
     p2->SetTopMargin(0.05);
 
     httH ->SetLineWidth( 4 );
-    httH ->SetFillStyle( 0 );
+    //httH ->SetFillStyle( 0 );
 
     hQCD ->SetLineWidth( 4 );
-    hQCD ->SetFillStyle( 0 );
+    //hQCD ->SetFillStyle( 0 );
 
     httjj ->SetLineWidth( 4 );
-    httjj ->SetFillStyle( 0 );
+    //httjj ->SetFillStyle( 0 );
 
     httcc ->SetLineWidth( 4 );
-    httcc ->SetFillStyle( 0 );
+    //httcc ->SetFillStyle( 0 );
 
     httb ->SetLineWidth( 4 );
-    httb ->SetFillStyle( 0 );
+    //httb ->SetFillStyle( 0 );
 
     httbb ->SetLineWidth( 4 );
-    httbb ->SetFillStyle( 0 );
+    //httbb ->SetFillStyle( 0 );
 
     hQCD ->GetYaxis()->SetTitle("Normalized units");
     hQCD ->SetMaximum( hQCD->GetMaximum()*2.0 );   //CHANGE HERE

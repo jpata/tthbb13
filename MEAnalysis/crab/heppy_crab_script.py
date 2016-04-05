@@ -21,13 +21,13 @@ try:
     crabFiles = PSet.process.source.fileNames
     print "crabFiles=", crabFiles
     firstInput = crabFiles[0]
-    #filename, firstEvent, nEvents = firstInput.split("W") #DS was "___"
-    filename = firstInput
-    firstEvent = 0
-    nEvents = None
+    filename, firstEvent, nEvents = firstInput.split("W") #DS was "___"
+    #filename = firstInput
+    #firstEvent = 0
+    #nEvents = None
     rootfilename = "root://xrootd-cms.infn.it//" + filename
-    #firstEvent = int(firstEvent) #DS
-    #nEvents = int(nEvents) #DS
+    firstEvent = int(firstEvent) #DS
+    nEvents = int(nEvents) #DS
     print "checking file",rootfilename
     tf = ROOT.TFile.Open(rootfilename)
     if not tf or tf.IsZombie():

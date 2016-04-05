@@ -1,5 +1,5 @@
 #define SAVEPLOTS 1
-#define CAT 8
+#define CAT 11
 #define CUT_HT 500.0
 #define PSB_FAC 0.02
 
@@ -28,24 +28,26 @@ void ROC_curve(){
   else tag += Form("_cat%d",CAT);
   tag += Form("_%.3f",PSB_FAC);
 
+  string folder = "/scratch/dsalerno/TTH_MEM_74X/V14/crab_151222/";
+
   // load files
-  TFile* fsignal = TFile::Open( "/scratch/dsalerno/TTH_MEM_74X/V14/crab_151102/TTH/tree_TTH_part.root" );
+  TFile* fsignal = TFile::Open( (folder+"TTH/tree_TTH_part.root").c_str() );
   if(fsignal==0 || fsignal->IsZombie() ) return;
 
-  TFile* fttj = TFile::Open( "/scratch/dsalerno/TTH_MEM_74X/V14/crab_151102/TTJets/tree_TTJets_part.root" );
+  TFile* fttj = TFile::Open( (folder+"TTJets/tree_TTJets.root").c_str() );
   if(fttj==0 || fttj->IsZombie() ) return;
 
-  TFile* fqcd3 = TFile::Open( "/scratch/dsalerno/TTH_MEM_74X/V14/crab_151102/QCD300/tree_QCD300_part.root" );
+  TFile* fqcd3 = TFile::Open( (folder+"QCD300/tree_QCD300.root").c_str() );
   if(fqcd3==0 || fqcd3->IsZombie() ) return;
-  TFile* fqcd5 = TFile::Open( "/scratch/dsalerno/TTH_MEM_74X/V14/crab_151102/QCD500/tree_QCD500_part.root" );
+  TFile* fqcd5 = TFile::Open( (folder+"QCD500/tree_QCD500.root").c_str() );
   if(fqcd5==0 || fqcd5->IsZombie() ) return;
-  TFile* fqcd7 = TFile::Open( "/scratch/dsalerno/TTH_MEM_74X/V14/crab_151102/QCD700/tree_QCD700_part.root" );
+  TFile* fqcd7 = TFile::Open( (folder+"QCD700/tree_QCD700.root").c_str() );
   if(fqcd7==0 || fqcd7->IsZombie() ) return;
-  TFile* fqcd10 = TFile::Open( "/scratch/dsalerno/TTH_MEM_74X/V14/crab_151102/QCD1000/tree_QCD1000_part.root" );
+  TFile* fqcd10 = TFile::Open( (folder+"QCD1000/tree_QCD1000.root").c_str() );
   if(fqcd10==0 || fqcd10->IsZombie() ) return;
-  TFile* fqcd15 = TFile::Open( "/scratch/dsalerno/TTH_MEM_74X/V14/crab_151102/QCD1500/tree_QCD1500_part.root" );
+  TFile* fqcd15 = TFile::Open( (folder+"QCD1500/tree_QCD1500.root").c_str() );
   if(fqcd15==0 || fqcd15->IsZombie() ) return;
-  TFile* fqcd20 = TFile::Open( "/scratch/dsalerno/TTH_MEM_74X/V14/crab_151102/QCD2000/tree_QCD2000_part.root" );
+  TFile* fqcd20 = TFile::Open( (folder+"QCD2000/tree_QCD2000.root").c_str() );
   if(fqcd20==0 || fqcd20->IsZombie() ) return;
 
   // determine ME method used
@@ -55,7 +57,7 @@ void ROC_curve(){
     method = "_3w2h2t";
   }
   else if(CAT==8){
-    element = "10"; //10 or 11
+    element = "10"; //10 or 11 (leave at 10 as 11 hardcoded seperately)
     method = "_4w2h2t"; //4w2h2t or 3w2h2t
   }
   else if(CAT==9){
@@ -74,12 +76,12 @@ void ROC_curve(){
   if(CAT>=0) tag += method;
 
   // QCD scale factors
-  double scalefac3 = 19466760.0/18282047.0;
-  double scalefac5 = 19664159.0/17830047.0;
-  double scalefac7 = 15165288.0/13441279.0;
-  double scalefac10 = 4963895.0/4461516.0;
-  double scalefac15 = 3691495.0/3415737.0;
-  double scalefac20 = 1912529.0/1862522.0;
+  double scalefac3 = 1.0; //19466760.0/18282047.0;
+  double scalefac5 = 1.0; //19664159.0/17830047.0;
+  double scalefac7 = 1.0; //15165288.0/13441279.0;
+  double scalefac10 = 1.0; //4963895.0/4461516.0;
+  double scalefac15 = 1.0; //3691495.0/3415737.0;
+  double scalefac20 = 1.0; //1912529.0/1862522.0;
 
   // load trees
   TTree *tsignal = (TTree*)fsignal->Get("tree");
@@ -112,6 +114,7 @@ void ROC_curve(){
   me += Form("%.0f",CUT_HT);
   me += " && cat==";
   me += Form("%d",CAT);
+  me += " && triggerDecision>0";
   me += ")";
   
   TString draw = ("mem_tth_p["+element+"]/(mem_tth_p["+element+"]+"+Form("%.3f",PSB_FAC)+"*mem_ttbb_p["+element+"])").c_str();

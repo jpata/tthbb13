@@ -24,7 +24,7 @@ class MECategoryAnalyzer(FilterAnalyzer):
     def __init__(self, cfg_ana, cfg_comp, looperName):
         self.conf = cfg_ana._conf
         super(MECategoryAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
-        self.cat_map = {"NOCAT":-1, "cat1": 1, "cat2": 2, "cat3": 3, "cat6":6, "cat7":7, "cat8":8, "cat9":9, "cat10":10, "cat11":11 }
+        self.cat_map = {"NOCAT":-1, "cat1": 1, "cat2": 2, "cat3": 3, "cat6":6, "cat7":7, "cat8":8, "cat9":9, "cat10":10, "cat11":11, "cat12":12 }
         self.btag_cat_map = {"NOCAT":-1, "L": 0, "H": 1}
    
 
@@ -84,13 +84,15 @@ class MECategoryAnalyzer(FilterAnalyzer):
                 event.wquark_candidate_jets = event.buntagged_jets + event.selected_btagged_jets_low
                 if(len(event.selected_btagged_jets_high) == 4):
                     cat = "cat7"
-                if(len(event.selected_btagged_jets_high) == 3):
+                elif(len(event.selected_btagged_jets_high) == 3):
                     cat = "cat11"
             #exactly 9 jets, Wtag in [72,94]
             if (len(event.good_jets) == 9 and event.Wmass >= 72 and event.Wmass < 94):
                 event.wquark_candidate_jets = event.buntagged_jets + event.selected_btagged_jets_low
                 if(len(event.selected_btagged_jets_high) == 4):
                     cat = "cat9"
+                elif(len(event.selected_btagged_jets_high) == 3):
+                    cat = "cat12"
             #DS
 
         event.cat = cat
@@ -171,9 +173,9 @@ class MEAnalyzer(FilterAnalyzer):
         cfg = MEMConfig()
         cfg.configure_btag_pdf(self.conf)
         cfg.configure_transfer_function(self.conf)
-        self.integrator = MEM.Integrand(
-            MEM.output,
-            #MEM.output + MEM.init + MEM.init_more,
+        self.integrator = MEM.Integrand( #first element sets verbosity
+            #MEM.output,
+            MEM.output + MEM.init, # + MEM.init_more, #DS
             cfg.cfg
         )
 
@@ -198,7 +200,7 @@ class MEAnalyzer(FilterAnalyzer):
         maxjets = mem_cfg.maxJets
         maxljets = maxjets #DS
         if event.is_fh:
-            maxljets = mem_cfg.maxlJets #DS #allow up to 5 light jets for AH 9j,4b and 8j,3b categories
+            maxljets = mem_cfg.maxlJets #DS #allow up to 5 light jets for AH 9j,4b and 8j,3b categories, 6 light jets (not used) for 9j,3b category
 
         # take highest pT jets if Dl and njets30 >= 4
         #if "dl" in mem_cfg.mem_assumptions:

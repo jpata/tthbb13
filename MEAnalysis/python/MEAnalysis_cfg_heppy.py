@@ -398,7 +398,10 @@ class Conf:
             #fully-hadronic
             "FH_4w2h2t", #8j,4b & 9j,4b
             "FH_3w2h2t", #7j,4b
-            "FH_4w2h1t"  #7j,3b & 8j,3b
+            "FH_4w2h1t", #7j,3b & 8j,3b
+            "FH_0w2h2t", #all 4b cats
+            "FH_0w2h1t", #all cats
+            "FH_0w1h2t"  #all cats
         ],
 
         #This configures the MEMs to actually run, the rest will be set to 0
@@ -415,7 +418,10 @@ class Conf:
             #"DL_0w2h2t_Rndge4t",
             #"FH_4w2h2t", #8j,4b
             #"FH_3w2h2t", #7j,4b
-            #"FH_4w2h1t"  #7j,3b & 8j,3b
+            #"FH_4w2h1t", #7j,3b & 8j,3b
+            #"FH_0w2h2t", #all 4b cats
+            #"FH_0w2h1t", #all cats
+            #"FH_0w1h2t"  #all cats
         ],
 
     }
@@ -643,7 +649,7 @@ c.cfg.perm_pruning = strat
 Conf.mem_configs["FH_4w2h2t"] = c
 
 ###
-### FH_3w2h2t #7j,4b
+### FH_3w2h2t #7j,4b (& 8j,4b)
 ###
 c = MEMConfig()
 c.do_calculate = lambda ev, mcfg: (
@@ -678,6 +684,67 @@ strat.push_back(MEM.Permutations.QUntagged)
 strat.push_back(MEM.Permutations.BTagged)
 c.cfg.perm_pruning = strat
 Conf.mem_configs["FH_4w2h1t"] = c
+
+###
+### FH_0w2h2t #all 4b categories: 7j,4b, 8j,4b, 9j,4b
+###
+c = MEMConfig()
+c.do_calculate = lambda ev, mcfg: (
+    len(mcfg.lepton_candidates(ev)) == 0 and
+    len(mcfg.b_quark_candidates(ev)) >= 4 and #DS
+    ( (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==7 or
+      (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==8 or
+      (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==9 ) 
+)
+c.mem_assumptions.add("fh")
+c.mem_assumptions.add("0w2h2t")
+strat = CvectorPermutations()
+strat.push_back(MEM.Permutations.QQbarBBbarSymmetry) #FIXME: add t-tbar symmetry
+strat.push_back(MEM.Permutations.QUntagged)
+strat.push_back(MEM.Permutations.BTagged)
+c.cfg.perm_pruning = strat
+Conf.mem_configs["FH_0w2h2t"] = c
+
+###
+### FH_0w2h1t #all FH categories: 7j,4b, 8j,4b, 9j,4b, 7j,3b, 8j,3b, 9j,3b
+###
+c = MEMConfig()
+c.do_calculate = lambda ev, mcfg: (
+    len(mcfg.lepton_candidates(ev)) == 0 and
+    len(mcfg.b_quark_candidates(ev)) >= 3 and #DS
+    ( (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==7 or
+      (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==8 or
+      (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==9 ) 
+)
+c.mem_assumptions.add("fh")
+c.mem_assumptions.add("0w2h1t")
+strat = CvectorPermutations()
+strat.push_back(MEM.Permutations.QQbarBBbarSymmetry) #FIXME: add t-tbar symmetry
+strat.push_back(MEM.Permutations.QUntagged)
+strat.push_back(MEM.Permutations.BTagged)
+c.cfg.perm_pruning = strat
+Conf.mem_configs["FH_0w2h1t"] = c
+
+###
+### FH_0w1h2t #all FH categories: 7j,4b, 8j,4b, 9j,4b, 7j,3b, 8j,3b, 9j,3b
+###
+c = MEMConfig()
+c.do_calculate = lambda ev, mcfg: (
+    len(mcfg.lepton_candidates(ev)) == 0 and
+    len(mcfg.b_quark_candidates(ev)) >= 3 and #DS
+    ( (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==7 or
+      (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==8 or
+      (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==9 ) 
+)
+c.mem_assumptions.add("fh")
+c.mem_assumptions.add("0w1h2t")
+strat = CvectorPermutations()
+strat.push_back(MEM.Permutations.QQbarBBbarSymmetry) #FIXME: add t-tbar symmetry
+strat.push_back(MEM.Permutations.QUntagged)
+strat.push_back(MEM.Permutations.BTagged)
+c.cfg.perm_pruning = strat
+Conf.mem_configs["FH_0w1h2t"] = c
+
 
 
 import inspect

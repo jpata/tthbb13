@@ -1,166 +1,257 @@
-#include "TTree.h"
-
-#define CSVM 0.89
-#define ETACUT 2.4
-#define PTCUT 30.0
-#define HARDPTCUT 30.0
-#define HTCUT 450.0
-#define NBCUT 3
 #define NMAXJETS 30
+#define SAVEPLOTS 0
+#define LUMI 10
+#define VAR "nj" // "eta" or "nj"
 
 void Jet_eta(){
 
-  vector<string> samples;
-  //samples.push_back( "dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/t3groups/ethz-higgs/run2/VHBBHeppyV14/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V14_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/151025_084144/0000/tree_33.root" );
-  //samples.push_back( "dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/t3groups/ethz-higgs/run2/VHBBHeppyV14/TT_TuneCUETP8M1_13TeV-powheg-pythia8/VHBB_HEPPY_V14_TT_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/151024_212301/0000/tree_33.root" );
-  samples.push_back( "root://xrootd-cms.infn.it//store/user/arizzi/VHBBHeppyV14/QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/VHBB_HEPPY_V14_QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/151026_081050/0000/tree_33.root" );
-  samples.push_back( "root://xrootd-cms.infn.it//store/user/arizzi/VHBBHeppyV14/QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/VHBB_HEPPY_V14_QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/151024_181957/0000/tree_33.root" );
-  samples.push_back( "root://xrootd-cms.infn.it//store/user/arizzi/VHBBHeppyV14/QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/VHBB_HEPPY_V14_QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/151025_083726/0000/tree_33.root" );
-  samples.push_back( "root://xrootd-cms.infn.it//store/user/arizzi/VHBBHeppyV14/QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/VHBB_HEPPY_V14_QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/151025_083753/0000/tree_33.root" );
-  samples.push_back( "root://xrootd-cms.infn.it//store/user/arizzi/VHBBHeppyV14/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/VHBB_HEPPY_V14_QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/151025_093151/0000/tree_33.root" );
-  samples.push_back( "root://xrootd-cms.infn.it//store/user/arizzi/VHBBHeppyV14/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/VHBB_HEPPY_V14_QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/151024_184123/0000/tree_22.root" );
+  int jet = 8; //nth jet for eta plot
 
+  vector<string> samples;
+  samples.push_back( "TTH" );
+  samples.push_back( "TTJets" ); 
+  samples.push_back( "QCD300" );
+  samples.push_back( "QCD500" );
+  samples.push_back( "QCD700" );
+  samples.push_back( "QCD1000" );  
+  samples.push_back( "QCD1500" );
+  samples.push_back( "QCD2000" );
+
+  gStyle->SetOptStat(0);
+  gStyle->SetTitleFillColor(0);
+  gStyle->SetCanvasBorderMode(0);
+  gStyle->SetCanvasColor(0);
+  gStyle->SetPadBorderMode(0);
+  gStyle->SetPadColor(0);
+  gStyle->SetTitleFillColor(0);
+  gStyle->SetTitleBorderSize(0);
+  gStyle->SetTitleH(0.04);
+  //gStyle->SetTitleFontSize(0.025);
+  gStyle->SetTitleStyle(0);
+  gStyle->SetTitleOffset(1.3,"y");
+  
+  TCanvas *c2 = new TCanvas("c2","",5,30,640,580);
+  TPad *p2 = new TPad("p2","",0,0,1,1);
+  p2->SetGrid(0,0);
+  p2->SetFillStyle(4000);
+  p2->SetFillColor(10);
+  p2->SetTicky();
+  p2->SetTicks(0,0);
+  p2->SetObjectStat(0);
+  p2->Draw();
+  p2->cd();
+  p2->SetTopMargin(0.05);
+  
+  TString cmsinfo = "";
+  cmsinfo = "Simulation                                                  Normalized";
+
+  TPaveText *pt_title = new TPaveText(0.1, 0.952, 0.9, 1.0,"brNDC");
+  pt_title->SetFillStyle(1001);
+  pt_title->SetBorderSize(0);
+  pt_title->SetFillColor(0);
+  pt_title->SetTextFont(42); 
+  pt_title->SetTextSize(0.04); 
+  pt_title->AddText(cmsinfo);
+  
+  TLegend* leg = new TLegend(0.22,0.54,0.47,0.91,NULL,"brNDC");
+  leg->SetFillStyle(0);
+  leg->SetBorderSize(0);
+  leg->SetFillColor(kYellow);
+  leg->SetTextSize(0.04);
+  
+  TH1F* httH  = 0;
+  TH1F* hQCD  = 0;
+  TH1F* httJ  = 0;
+  
+  string n = "";
+  if(jet==1) n = "1st";
+  else if(jet==2) n = "2nd";   
+  else if(jet==3) n = "3rd";    
+  else n= Form("%dth",jet);
+  
+  // master histogram (all other histograms are a clone of this one)
+  TH1F* h1 = new TH1F("h1",("Eta of "+n+" jet; #eta; Normalized units").c_str(), 100 , -5.0, 5.0 );
+  if(VAR == "nj"){
+    TH1F* h2 = new TH1F("h2","Number of jets with |#eta|<2.4; n_{jet}; Normalized units", 9 , 0, 9 );
+    h1  = (TH1F*)h2->Clone("h1" );
+  }
+
+  h1->GetXaxis()->SetTitleFont(62);
+  h1->GetXaxis()->SetTitleSize(0.04);
+  h1->GetXaxis()->SetLabelFont(62);
+  h1->GetXaxis()->SetLabelSize(0.038);
+  
+  h1->GetYaxis()->SetTitleFont(62);
+  h1->GetYaxis()->SetTitleSize(0.039);
+  h1->GetYaxis()->SetLabelFont(62);
+  h1->GetYaxis()->SetLabelSize(0.038);
+  
+  // clone histograms
+  httH  = (TH1F*)h1->Clone("httH" );
+  hQCD  = (TH1F*)h1->Clone("hQCD" );
+  httJ  = (TH1F*)h1->Clone("httJ" );
+
+  // set histogram styles
+  httH ->SetLineColor( kBlue+2 );
+  httH ->SetMarkerColor( kBlue+2 );
+  httH ->SetMarkerStyle( 20 );
+  httH ->SetMarkerSize( 1 );
+  httH ->SetLineWidth( 4 );
+  httH ->SetFillStyle( 0 );
+  //httH ->Sumw2();
+
+  hQCD ->SetLineColor( kGreen+3 );
+  hQCD ->SetMarkerColor( kGreen+3 );
+  hQCD ->SetMarkerStyle( 21 );
+  hQCD ->SetMarkerSize( 1 );
+  hQCD ->SetLineWidth( 4 );
+  hQCD ->SetFillStyle( 0 );
+  //hQCD ->Sumw2();
+
+  httJ ->SetLineColor( kRed-2 );
+  httJ ->SetFillColor( kRed-2 );
+  httJ ->SetMarkerColor( kRed-2 );
+  httJ ->SetMarkerStyle( 22 );
+  httJ ->SetMarkerSize( 1 );
+  httJ ->SetLineWidth( 4 );
+  httJ ->SetFillStyle( 0 );
+  //httJ ->Sumw2();
+ 
+  cout << "Sample Total Range1 Range2 Range3" << endl;
+
+  // loop over samples
   for(int s=0; s<samples.size(); s++){
-    TString fname;
-    if(samples[s].find("ttHTobb") != string::npos) fname = "TTH";
-    if(samples[s].find("TT_Tune") != string::npos) fname = "TTJets";
-    if(samples[s].find("QCD_HT300") != string::npos) fname = "QCD300";
-    if(samples[s].find("QCD_HT500") != string::npos) fname = "QCD500";
-    if(samples[s].find("QCD_HT700") != string::npos) fname = "QCD700";
-    if(samples[s].find("QCD_HT1000") != string::npos) fname = "QCD1000";
-    if(samples[s].find("QCD_HT1500") != string::npos) fname = "QCD1500";
-    if(samples[s].find("QCD_HT2000") != string::npos) fname = "QCD2000";
+    float weight = -99.0;
+    if(samples[s] == "TTH") weight = 0.5085*0.577/90000; //xsec*BR/nGen in file only
+    else if(samples[s] == "TTJets") weight = 831.76/90555;
+    else if(samples[s] == "QCD300") weight = 366800.0/85185;
+    else if(samples[s] == "QCD500") weight = 29370.0/98732;
+    else if(samples[s] == "QCD700") weight = 6524.0/83929;
+    else if(samples[s] == "QCD1000") weight = 1064.0/70989;
+    else if(samples[s] == "QCD1500") weight = 121.5/93081;
+    else if(samples[s] == "QCD2000") weight = 25.42/84179;
+    
+    if(weight<0){
+      cout << "negative weight! return" << endl;
+      return;
+    }
+
+    cout << samples[s] << " ";
+    //cout << endl << "Running sample " << samples[s] << endl;
+    
+    // load file
+    TFile* file = TFile::Open( ("jets_"+samples[s]+".root").c_str() );
+    if(file==0 || file->IsZombie() ) continue;
+    
+    // load tree
+    TTree *tree = (TTree*)file->Get("tree");
 
     // Declare calculated variables
-    int tot = 0;
-    
-    TString outname = "jets_"+fname+".root";
-    // clean output file (if any)
-    gSystem->Exec( "rm "+outname );
-    // create output file
-    TFile *fout_tmp = TFile::Open( outname,"UPDATE");
+    int numEvents = 0;
+    int numSelected = 0;
+    float numTotal = 0.0;
+    float numRange1 = 0.0; //|eta|<2.4       or njeteta==jet
+    float numRange2 = 0.0; //|eta|>2.4       or njeteta==jet-1
+    float numRange3 = 0.0; //2.4<|eta|>3.0   or njeteta < jet-1
+    float eta;
+    int nj;   
 
-    // output tree
-    TTree *tree  = new TTree("tree","");
-
-    // variables to save in new trees
-    int njet; //njets with pT>30 GeV
-    int njeteta; //njets with pT>30 GeV && |eta|<2.4
-    int nbtag; //njets with pT>30 GeV && CSV>0.89
-    int nbtageta; //njets with pT>30 GeV && CSV>0.89 && |eta|<2.4
-    int nhardjet; //njets with pT>40 GeV && |eta|<2.4
+    // declare leaf types
+    int njet;      //njets with pT>30 GeV
+    int njeteta;   //njets with pT>30 GeV && |eta|<2.4
+    int nbtag;     //njets with pT>30 GeV && CSV>0.89
+    int nbtageta;  //njets with pT>30 GeV && CSV>0.89 && |eta|<2.4
+    int nhardjet;  //njets with pT>40 GeV && |eta|<2.4
     float HT;
     float jet_pt      [NMAXJETS];  //jets sorted by decreasing pT
     float jet_eta     [NMAXJETS];
     float jet_csv     [NMAXJETS];
     
-    // branches to save
-    tree->Branch("njet",         &njet,         "njet/I");
-    tree->Branch("njeteta",      &njeteta,      "njeteta/I");
-    tree->Branch("nbtag",        &nbtag,        "nbtag/I");
-    tree->Branch("nbtageta",     &nbtageta,     "nbtageta/I");
-    tree->Branch("nhardjet",     &nhardjet,     "nhardjet/I");
-    tree->Branch("HT",           &HT,           "HT/F");
-    tree->Branch("jet_pt",       jet_pt,        "jet_pt[njet]/F");
-    tree->Branch("jet_eta",      jet_eta,       "jet_eta[njet]/F");
-    tree->Branch("jet_csv",      jet_csv,       "jet_csv[njet]/F");
-    
-    // declare histograms
-    TH1F* hnjet = new TH1F("hnjet","; njets; Events", 15 , 0, 15 );
-    TH1F* hnjeteta = new TH1F("hnjeteta","; njets; Events", 15 , 0, 15 );
-    TH1F* hnbtag = new TH1F("hnbtag","; nbtags; Events", 8 , 0, 8 );
-    TH1F* hnbtageta = new TH1F("hnbtageta","; nbtags; Events", 8 , 0, 8 );
-    TH1F* hnhardjet = new TH1F("hnhardjet","; njets; Events", 15 , 0, 15 );
-    TH1F* hHT = new TH1F("hHT","; HT [GeV]; Events", 40 , 0, 2000 );
-    
-    // load file
-    //TFile* file = TFile::Open( "root://xrootd-cms.infn.it//store/user/arizzi/VHBBHeppyV14/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V14_ttHTobb_M125_13TeV_powheg_pythia8__RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/151025_084144/0000/tree_3.root" );
-    TFile *file = TFile::Open( samples[s].c_str() );
-    
-    if(file==0 || file->IsZombie() ) return;
-    
-    // load tree
-    TTree *intree = (TTree*)file->Get("tree");
-    
-    // declare leaf types
-    Int_t   nJet;
-    Float_t Jet_pt[NMAXJETS];
-    Float_t Jet_eta[NMAXJETS];
-    Float_t Jet_btagCSV[NMAXJETS];
-    
     // Connect the branches with their member variables.
-    if(!intree) return;
-    intree->SetBranchAddress("nJet",        &nJet);
-    intree->SetBranchAddress("Jet_pt",      Jet_pt);
-    intree->SetBranchAddress("Jet_eta",     Jet_eta);
-    intree->SetBranchAddress("Jet_btagCSV", Jet_btagCSV);
+    if(!tree) return;
+    tree->SetBranchAddress("njet",         &njet);
+    tree->SetBranchAddress("njeteta",      &njeteta);
+    tree->SetBranchAddress("nbtag",        &nbtag);
+    tree->SetBranchAddress("nbtageta",     &nbtageta);
+    tree->SetBranchAddress("nhardjet",     &nhardjet); 
+    tree->SetBranchAddress("HT",           &HT);
+    tree->SetBranchAddress("jet_pt",       jet_pt);
+    tree->SetBranchAddress("jet_eta",      jet_eta);
+    tree->SetBranchAddress("jet_csv",      jet_csv);
+
+    int totalEntries = tree->GetEntries();
+    //cout << totalEntries << endl;
     
-    int totalEntries = intree->GetEntries();
-    cout << totalEntries << endl;
-    
-    //////////////////////////////////////////////////// loop over events
+    // loop over events
     for(int entry=0; entry < totalEntries; entry++){
-      intree->GetEntry(entry);
-      tot++;
-      
-      // reset variables
-      nhardjet = 0;
-      njet = 0;
-      njeteta = 0;
-      nbtag = 0;
-      nbtageta = 0;
-      HT = 0.0;
-      for(int k = 0; k < NMAXJETS ; k++ ){
-	jet_pt   [k] = -99;
-	jet_eta  [k] = -99;
-	jet_csv  [k] = -99;
-      }
-      
-      // print the processed event number
-      if(entry%10000==0){
-	cout << entry << " (" << float(entry)/float(totalEntries)*100 << " %)" << endl;
-      }
-      
-      
-      for(int j=0; j<nJet; j++){
-	if(Jet_pt[j]>PTCUT ){
-	  jet_pt[njet]=Jet_pt[j];
-	  jet_eta[njet]=Jet_eta[j];
-	  jet_csv[njet]=Jet_btagCSV[j];	
-	  HT += Jet_pt[j];
-	  njet++;
-	  if( Jet_btagCSV[j] > CSVM && Jet_btagCSV[j]<=1 ) nbtag++;
-	  if( Jet_eta[j]<ETACUT && Jet_eta[j]>-ETACUT ){
-	    njeteta++;
-	    if( Jet_pt[j] > HARDPTCUT ) nhardjet++;
-	    if( Jet_btagCSV[j] > CSVM && Jet_btagCSV[j]<=1 ) nbtageta++;
-	  }
+      tree->GetEntry(entry);
+      numEvents++;
+      eta = -99.;
+      nj = -99;
+
+      // get nth jet eta
+      if( njet >= jet ){
+	numSelected ++;
+	eta = jet_eta[jet-1];
+	if( njet == jet ) nj = njeteta;
+
+	if( VAR=="eta" ){
+	  numTotal += weight*1000*LUMI;
+	  if( abs(jet_eta[jet-1]) < 2.4 ) numRange1 += weight*1000*LUMI;
+	  if( abs(jet_eta[jet-1]) > 2.4 ) numRange2 += weight*1000*LUMI;
+	  if( abs(jet_eta[jet-1]) > 2.4 &&  abs(jet_eta[jet-1]) < 3.0 ) numRange3 += weight*1000*LUMI;	
 	}
-      }
+	else if( VAR=="nj" && njet == jet ){
+	  numTotal += weight*1000*LUMI;
+	  if( njeteta == jet   ) numRange1 += weight*1000*LUMI;
+	  if( njeteta == jet-1 ) numRange2 += weight*1000*LUMI;
+	  if( njeteta < jet-1 ) numRange3 += weight*1000*LUMI;  
+	}
+
+        if( samples[s]=="TTH" ){
+	  if(VAR == "eta") httH->Fill(eta,weight);
+	  else if( nj>-1 ) httH->Fill(nj,weight);
+	}
+	else if( samples[s]=="TTJets" ){
+	  if(VAR == "eta") httJ->Fill(eta,weight);
+	  else if( nj>-1 ) httJ->Fill(nj,weight);
+	}
+	else if( samples[s].find("QCD") != string::npos ){
+	  if(VAR == "eta") hQCD->Fill(eta,weight);
+	  else if( nj>-1 ) hQCD->Fill(nj,weight);
+	}
+	else{
+	  cout << "sample not found. return" << endl;
+	  return;
+	}
+	
+	  
+      } //end selection
       
-      // fill the tree...
-      tree->Fill();
       
-      // fill historgrams
-      hnjet->Fill(njet);
-      hnjeteta->Fill(njeteta);
-      hnbtag->Fill(nbtag);
-      hnbtageta->Fill(nbtageta);
-      hnhardjet->Fill(nhardjet);
-      hHT->Fill(HT);
-    }
-    
-    // save the tree and histograms in the ROOT file
-    fout_tmp->cd();
-    tree ->Write("",TObject::kOverwrite );
-    hnjet     ->Write("",TObject::kOverwrite );
-    hnjeteta  ->Write("",TObject::kOverwrite );
-    hnbtag    ->Write("",TObject::kOverwrite );
-    hnbtageta ->Write("",TObject::kOverwrite );
-    hnhardjet ->Write("",TObject::kOverwrite );
-    hHT       ->Write("",TObject::kOverwrite );
-    fout_tmp->Close();
-  }
+    } //end loop over events
+
+    cout << numTotal << " " << numRange1 << " " << numRange2 << " " << numRange3 << " " << endl;
+
+  } //end loop over samples
+
+  leg->AddEntry(httH,  "t#bar{t}H (125)", "F");
+  leg->AddEntry(httJ, "t#bar{t}", "F");
+  leg->AddEntry(hQCD,  "QCD", "F");
+
+  hQCD ->GetYaxis()->SetTitle("Normalized units");
+  hQCD ->SetMaximum( hQCD->GetMaximum()*2.0 );   //CHANGE HERE
+  hQCD ->DrawNormalized("HIST");
+  httJ ->DrawNormalized("HISTSAME");
+  httH ->DrawNormalized("HISTSAME");
+  leg->Draw();
+  pt_title->Draw();
   
-  return;
+  string variable = Form("%d",jet);
+  if( SAVEPLOTS ){
+    if(VAR=="eta") c2->SaveAs( ("./Jet_plots/eta_"+variable+"jet_norm.pdf").c_str() ); 
+    else if(VAR=="nj") c2->SaveAs( ("./Jet_plots/nj_"+variable+"jet_norm.pdf").c_str() );
+  }
+
+
 }
