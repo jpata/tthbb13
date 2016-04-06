@@ -58,7 +58,7 @@ class Analysis:
         self.do_stat_variations = kwargs.get("do_stat_variations", False)
 
 
-def make_csv_abstract(di):
+def make_csv_categories_abstract(di):
 
     import csv
     with open('analysis_specs.csv', 'w') as csvfile:
@@ -76,6 +76,25 @@ def make_csv_abstract(di):
             unique_cat_names = list(set(c.name for c in analysis.categories))
             for cat_name in unique_cat_names:
                 csvwriter.writerow([analysis_spec_file, analysis_name, cat_name, analysis.sparse_input_file])
+
+    return [1]
+
+def make_csv_groups_abstract(di):
+
+    import csv
+    with open('analysis_groups.csv', 'w') as csvfile:
+        csvwriter = csv.writer(csvfile, delimiter=';')    
+
+        csvwriter.writerow(['specfile', 'analysis', 'group'])
+    
+        # We want the analysis specification file
+        # as make_csv is called from there we just take the filename of the outer stack    
+        import inspect
+        analysis_spec_file = inspect.getouterframes(inspect.currentframe())[1][1]
+
+        for analysis_name, analysis in di.iteritems():        
+            for group_name in analysis.groups.keys():
+                csvwriter.writerow([analysis_spec_file, analysis_name, group_name])
 
     return [1]
 

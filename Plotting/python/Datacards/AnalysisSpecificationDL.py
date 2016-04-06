@@ -1,5 +1,5 @@
 from TTH.Plotting.Datacards.AnalysisSpecificationSL import data_samples, base_samples, signal_processes, common_shape_uncertainties, lumi, common_scale_uncertainties, scale_uncertainties, make_control_categories
-from TTH.Plotting.Datacards.AnalysisSpecificationClasses import Sample, Category, Analysis, make_csv_abstract
+from TTH.Plotting.Datacards.AnalysisSpecificationClasses import Sample, Category, Analysis, make_csv_categories_abstract, make_csv_groups_abstract
 
 dl_data = [data_samples["DoubleMuon"], data_samples["MuonEG"], data_samples["DoubleEG"]]
 
@@ -95,7 +95,10 @@ for cat in dl_categories:
 
 analyses = {"DL" : analysis}
 
-def make_csv():
-    return make_csv_abstract(analyses)
+def make_csv_categories():
+    return make_csv_categories_abstract(analyses)
+
+def make_csv_groups():
+    return make_csv_groups_abstract(analyses)
 
 
