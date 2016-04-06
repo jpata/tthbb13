@@ -1,4 +1,3 @@
-
 class Sample:
     def __init__(self, **kwargs):
         self.input_name = kwargs.get("input_name")
@@ -28,8 +27,8 @@ class Category:
         self.scale_uncertainties = {}
 
         #[syst] -> scale factor, common for all processes
-        self.common_shape_uncertainties = kwargs.get("common_shape_uncertainties", {})        
-        self.common_scale_uncertainties = kwargs.get("common_scale_uncertainties", {})        
+        self.common_shape_uncertainties = kwargs.get("common_shape_uncertainties", {})
+        self.common_scale_uncertainties = kwargs.get("common_scale_uncertainties", {})
         for proc in self.processes:
             self.shape_uncertainties[proc] = {}
             self.scale_uncertainties[proc] = {}
@@ -51,9 +50,37 @@ class Analysis:
     def __init__(self, **kwargs):
         self.samples = kwargs.get("samples")
         self.categories = kwargs.get("categories")
+        self.sparse_input_file = kwargs.get("sparse_input_file")
 
         #groups represent calls to combine
         self.groups = kwargs.get("groups")
         self.do_fake_data = kwargs.get("do_fake_data", False)
         self.do_stat_variations = kwargs.get("do_stat_variations", False)
-        self.output_directory = kwargs.get("output_directory", "./out")
+
+
+def make_csv_abstract(di):
+
+    import csv
+    with open('analysis_specs.csv', 'w') as csvfile:
+        csvwriter = csv.writer(csvfile, delimiter=';')    
+
+        csvwriter.writerow(['specfile', 'analysis', 'category', 'sparsefile'])
+    
+        # We want the analysis specification file
+        # as make_csv is called from there we just take the filename of the outer stack    
+        import inspect
+        analysis_spec_file = inspect.getouterframes(inspect.currentframe())[1][1]
+
+        for analysis_name, analysis in di.iteritems():        
+
+            unique_cat_names = list(set(c.name for c in analysis.categories))
+            for cat_name in unique_cat_names:
+                csvwriter.writerow([analysis_spec_file, analysis_name, cat_name, analysis.sparse_input_file])
+
+    return [1]
+
+        
+    
+    
+
+

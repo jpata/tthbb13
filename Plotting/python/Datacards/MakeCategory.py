@@ -1,4 +1,4 @@
-import json, copy, os, multiprocessing, sys
+import json, copy, os, imp, multiprocessing, sys
 import sparse, ROOT
 
 #Nota bene: this is very important!
@@ -161,30 +161,29 @@ def apply_rules_parallel(infile, rules, ncores=1):
 
 
 if __name__ == "__main__":
+
+    # Process one analysis/category name and write output to current working directory
     
-    #path to sparse.root from MELooper
-    infile = sys.argv[1]
-
-    #use the pre-defined analysis specification
-    if len(sys.argv)==2:
-        import AnalysisSpecification as anspec
-    #load from file
-    elif len(sys.argv)>=3:
-        import imp
-        anspec = imp.load_source("anspec", sys.argv[2])
+    if not len(sys.argv)==5:
+        print "Invalid number of arguments. Usage:"
+        print "{0} sparse.root AnalysisSpecification.py SL_7cat sl_j4_t3".format(sys.argv[0])
+        sys.exit()
         
-    analysis = anspec.analysis
+    infile = sys.argv[1] # path to sparse.root from MELooper
+    anspec = imp.load_source("anspec", sys.argv[2])
+    analysis_to_process = sys.argv[3]        
+    cat_to_process = sys.argv[4]                
+        
+    # Limit to one analysis/category
+    analysis = anspec.analyses[analysis_to_process]
+    categories = [c for c in analysis.categories if c.name==cat_to_process]
 
-    # if we receive argument from command line:
-    # only process one category (given by its name)
-    if len(sys.argv)==4:        
-        cat_to_process = sys.argv[3]        
-        analysis.categories = [c for c in analysis.categories if c.name==cat_to_process]
 
+    # Make all the rules
     rules = []
-    for cat in analysis.categories:
-        print "making rules for category={0} discr={1}".format(
-            cat.name, cat.discriminator
+    for cat in categories:
+        print "making rules for analysis={0} category={1} discr={2}".format(
+            analysis_to_process, cat.name, cat.discriminator
         )
         rules += make_rule_cut(cat.src_histogram, cat)
     
@@ -208,7 +207,7 @@ if __name__ == "__main__":
     #produce the event counts per category
     print "producing event counts"
     event_counts = {}
-    for cat in analysis.categories:
+    for cat in categories:
         event_counts[cat.name] = {}
         for proc in cat.processes:
             event_counts[cat.name][proc] = hdict["{0}/{1}/{2}".format(
@@ -221,7 +220,7 @@ if __name__ == "__main__":
     #save the histograms into per-category files
     print "saving categories"
     for catname in hdict_cat.keys():
-        hfile = os.path.join(analysis.output_directory, "{0}.root".format(catname))
+        hfile = "{0}.root".format(catname)
         print "saving {0} histograms to {1}".format(len(hdict_cat[catname]), hfile)
         category_files[catname] = hfile
         sparse.save_hdict(hfile, hdict_cat[catname])
@@ -230,7 +229,7 @@ if __name__ == "__main__":
     if analysis.do_fake_data:
         print "adding fake data"
         from utils import fakeData
-        for cat in analysis.categories:
+        for cat in categories:
             hfile = category_files[cat.name]
             tf = ROOT.TFile(hfile, "UPDATE")
             fakeData(tf, tf, [cat])
@@ -240,7 +239,7 @@ if __name__ == "__main__":
     if analysis.do_stat_variations:
         print "adding stat variations"
         from utils import makeStatVariations
-        for cat in analysis.categories:
+        for cat in categories:
             hfile = category_files[cat.name]
             tf = ROOT.TFile(hfile, "UPDATE")
             stathist_names = makeStatVariations(tf, tf, [cat])
@@ -252,11 +251,11 @@ if __name__ == "__main__":
                     cat.shape_uncertainties[proc][syst] = 1.0
                 
     from utils import PrintDatacard
-    #make datacards for individual categories
-    for cat in analysis.categories:
+    #make datacards for individual categories 
+    for cat in categories:
         if not cat.do_limit:
             continue
-        fn = os.path.join(analysis.output_directory, "shapes_{0}.txt".format(cat.full_name))
+        fn = "shapes_{0}.txt".format(cat.full_name)
         print "writing shape file {0}".format(fn)
         dcof = open(fn, "w")
         PrintDatacard([cat], event_counts, category_files, dcof)
