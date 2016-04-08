@@ -10,4 +10,3 @@ def make_csv_categories():
 
 def make_csv_groups():
     return make_csv_groups_abstract(analyses)
-

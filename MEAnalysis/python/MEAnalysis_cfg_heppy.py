@@ -285,7 +285,7 @@ class Conf:
         #note that we set hypothesis-specific cuts below
         "selection": lambda event: (
             event.pass_category_blr and (
-                (event.is_sl and event.nBCSVM >= 3)
+                (event.is_sl and event.nBCSVM >= 4)
                 or (event.is_dl and event.nBCSVM >= 3)
             )
         ),
@@ -317,12 +317,12 @@ class Conf:
         #This configures the MEMs to actually run, the rest will be set to 0
         "methodsToRun": [
             "SL_0w2h2t",
-            #"DL_0w2h2t",
-            #"SL_1w2h2t",
+            "DL_0w2h2t",
+            "SL_1w2h2t",
             #"SL_2w2h1t_l",
             #"SL_2w2h1t_h",
             "SL_2w2h2t",
-            #"SL_2w2h2t_sj",
+            "SL_2w2h2t_sj",
             #"SL_0w2h2t_sj",
             #"SL_2w2h2t_memLR",
             #"SL_0w2h2t_memLR",
