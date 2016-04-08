@@ -63,43 +63,36 @@ std::vector<std::string> split(const std::string &s, char delim) {
 const map<string, function<float(const Event& ev)>> AxisFunctions = {
     {"counting", [](const Event& ev) { return 1;}},
     {"eventParity", [](const Event& ev) { return ev.data->evt%2;}},
+
+    //tt+bb discriminators
     {"mem_SL_0w2h2t", [](const Event& ev) { return ev.mem_SL_0w2h2t;}},
     {"mem_SL_2w2h2t", [](const Event& ev) { return ev.mem_SL_2w2h2t;}},
     {"mem_SL_2w2h2t_sj", [](const Event& ev) { return ev.mem_SL_2w2h2t_sj;}},
     {"mem_DL_0w2h2t", [](const Event& ev) { return ev.mem_DL_0w2h2t;}},
-    {"tth_mva", [](const Event& ev) { return ev.tth_mva;}},
     {"common_bdt", [](const Event& ev) { return ev.common_bdt;}},
+
+    //categorization variables
     {"numJets", [](const Event& ev) { return ev.numJets;}},
     {"nBCSVM", [](const Event& ev) { return ev.nBCSVM;}},
     {"nBCSVL", [](const Event& ev) { return ev.nBCSVL;}},
-    {"btag_LR_4b_2b_logit", [](const Event& ev) { return ev.btag_LR_4b_2b_logit;}},
-    {"nBoosted", [](const Event& ev) { return ev.n_excluded_bjets<2 && ev.ntopCandidate==1;}},
-    {"topCandidate_mass", [](const Event& ev) { return ev.topCandidate_mass;}},
-    {"topCandidate_fRec", [](const Event& ev) { return ev.topCandidate_fRec;}},
-    {"topCandidate_n_subjettiness", [](const Event& ev) { return ev.topCandidate_n_subjettiness;}},
+
+    //Resolved control variables
     {"Wmass", [](const Event& ev) { return ev.Wmass;}},
     {"jet0_pt", [](const Event& ev) { return ev.jets.size() > 0 ? ev.jets.at(0).p4.Pt() : -99;}},
     {"jet0_eta", [](const Event& ev) { return ev.jets.size() > 0 ? ev.jets.at(0).p4.Eta() : -99;}},
     {"jet0_btagCSV", [](const Event& ev) { return ev.jets.size() > 0 ? ev.jets.at(0).btagCSV : -99;}},
-    {"jet1_pt", [](const Event& ev) { return ev.jets.size() > 0 ? ev.jets.at(0).p4.Pt() : -99;}},
-    {"jet1_eta", [](const Event& ev) { return ev.jets.size() > 0 ? ev.jets.at(0).p4.Eta() : -99;}},
-    {"jet1_btagCSV", [](const Event& ev) { return ev.jets.size() > 0 ? ev.jets.at(0).btagCSV : -99;}},
-    {"n_excluded_bjets", [](const Event& ev) { return ev.n_excluded_bjets;}},
-    {"n_excluded_ljets", [](const Event& ev) { return ev.n_excluded_ljets;}},
-
-    //Top candidate working points from GK-s PAS
-    {"nBoostedTop_Mass120_180", [](const Event& event) { return (
-        event.topCandidate_mass<180) && (event.topCandidate_mass>120);
-    }},
-    {"nBoostedTop_Mass120_180_fRec02", [](const Event& event) { return (
-        event.topCandidate_mass<180) && (event.topCandidate_mass>120) && (event.topCandidate_fRec<0.2);
-    }},
-    {"nBoostedTopWP1", [](const Event& event) { return (
-        event.topCandidate_mass<180) && (event.topCandidate_mass>120) && (event.topCandidate_fRec<0.2) && (event.topCandidate_n_subjettiness<0.55);
-    }},
-    {"nBoostedTopWP2", [](const Event& event) { return (
-        event.topCandidate_mass<180) && (event.topCandidate_mass>120) && (event.topCandidate_fRec<0.22) && (event.topCandidate_n_subjettiness<0.56);
-    }},
+    {"jet1_pt", [](const Event& ev) { return ev.jets.size() > 1 ? ev.jets.at(1).p4.Pt() : -99;}},
+    {"jet1_eta", [](const Event& ev) { return ev.jets.size() > 1 ? ev.jets.at(1).p4.Eta() : -99;}},
+    {"jet1_btagCSV", [](const Event& ev) { return ev.jets.size() > 1 ? ev.jets.at(1).btagCSV : -99;}},
+    {"lep0_pt", [](const Event& ev) { return ev.leptons.size() > 0 ? ev.leptons.at(0).p4.Pt() : -99;}},
+    {"lep0_eta", [](const Event& ev) { return ev.leptons.size() > 0 ? ev.leptons.at(0).p4.Eta() : -99;}},
+    {"btag_LR_4b_2b_logit", [](const Event& ev) { return ev.btag_LR_4b_2b_logit;}},
+   
+    //boosted control variables
+    {"topCandidate_mass", [](const Event& ev) { return ev.topCandidate_mass;}},
+    {"topCandidate_fRec", [](const Event& ev) { return ev.topCandidate_fRec;}},
+    
+    //This is needed to correctly divide the data 
     {"leptonFlavour", [](const Event& event) { 
         if (BaseCuts::sl_mu(event)) {
             return 1;
