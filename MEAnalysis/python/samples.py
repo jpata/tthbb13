@@ -4,6 +4,7 @@
 
 
 from TTH.MEAnalysis.samples_base import *
+import FWCore.ParameterSet.Config as cms
 
 version = "VHBBHeppyV21_tthbbV6"
 datasetpath = "src/TTH/MEAnalysis/gc/datasets/VHBBHeppyV21_tthbbV6/"
