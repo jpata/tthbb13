@@ -11,6 +11,7 @@ source common.sh
 env
 set -e
 
+
 #go to work directory
 cd $MY_SCRATCH
 
@@ -18,18 +19,16 @@ cd $MY_SCRATCH
 mkdir out
 
 echo "Running MakeCategory"
-python ${CMSSW_BASE}/src/TTH/Plotting/python/Datacards/MakeCategory.py $sparse_histo_file ${CMSSW_BASE}/${analysis_spec} $category
+echo ${CMSSW_BASE}/src/TTH/Plotting/python/Datacards/MakeCategory.py $sparsefile $specfile $analysis $category
+python ${CMSSW_BASE}/src/TTH/Plotting/python/Datacards/MakeCategory.py $sparsefile $specfile $analysis $category
 echo "Done MakeCategory"
 
-xbase=${analysis_spec##*/}
-anspec_base=${xbase%.*}
-
 #copy output
-OUTDIR=$HOME/tth/gc/makecategory/${TASK_ID}/${anspec_base}/
+OUTDIR=$HOME/tth/gc/makecategory/${TASK_ID}/${analysis}/
 mkdir -p $OUTDIR 
 echo "copying output"
-cp out/* $OUTDIR 
-
+cp $category.root $OUTDIR 
+cp shapes_${category}*.txt $OUTDIR 
 
 
 

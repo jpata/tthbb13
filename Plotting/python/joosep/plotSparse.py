@@ -2,6 +2,7 @@ import ROOT
 import rootpy
 import math
 import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from rootpy.plotting import root2matplotlib as rplt
 
@@ -103,75 +104,87 @@ def category_report(htmlout_master, path, category):
     ))
     plt.clf()
     del fig
-    # 
-    # 
-    # #Plot the shapes of all the components
-    # fig = plt.figure(figsize=(6,6))
-    # table = []
-    # for k, v in r[2].items():
-    #     if k == "data":
-    #         continue
-    #     heplot.barhist(v, color=plotlib.colors.get(k, "gray"), lw=2, scaling="normed", label=dict(plotlib.samplelist)[k])
-    #     table += [(k, v.Integral())]
-    # plt.xlabel(plotlib.varnames[category.discriminator])
-    # plt.legend(loc="best", numpoints=1, prop={'size': 10}, ncol=2, frameon=False)
-    # plt.ylim(bottom=0)
-    # plt.title(cn)
-    # plotlib.svfg("output/plots/{0}/{1}_shapes.pdf".format(
-    #     category.discriminator, category.name
-    # ))
-    # plotlib.svfg("output/plots/{0}/{1}_shapes.png".format(
-    #     category.name, category.discriminator
-    # ))
-    # htmlout.write('<a href="plots/{0}/{1}_shapes.pdf"><img width="600" src="plots/{0}/{1}_shapes.png"></a>\n'.format(
-    #     category.name, category.discriminator
-    # ))
-    # plt.clf()
-    # del fig
-    # 
-    # systout_fn = "output/{0}_{1}_discriminator.html".format(
-    #     category.name, category.discriminator
-    # )
-    # systout = open(systout_fn, "w")
-    # syst_pairs = [r[4].keys()[i:i+2] for i in range(0,len(r[4].keys()),2)]
-    # 
-    # #plot the systematic variations
-    # for s1, s2 in syst_pairs:
-    #     syst_name = s1.replace("Up", "")
-    #     systout.write('<h2>{0}</h2>\n'.format(syst_name))
-    #     for sample in r[2].keys():
-    #         fig = plt.figure(figsize=(6,6))
-    #         heplot.barhist(r[2][sample], color="black", label="nominal")
-    #         heplot.barhist(r[4][s1][sample], color="red", label="up")
-    #         heplot.barhist(r[4][s2][sample], color="blue", label="down")
-    #         plt.title(cn + " " + syst_name.replace("_", "") + " " + sample.replace("_", ""))
-    #         p = "plots/{0}/syst{1}".format(category.discriminator, syst_name)
-    #         if not os.path.exists(p):
-    #             os.makedirs(p)
-    #         plotlib.svfg("output/plots/{2}/syst{1}/{0}_{3}.pdf".format(category.discriminator, syst_name, category.name, sample))
-    #         plotlib.svfg("output/plots/{2}/syst{1}/{0}_{3}.png".format(category.discriminator, syst_name, category.name, sample))
-    #         systout.write(
-    #             '<a href="plots/{2}/syst{1}/{0}_{3}.pdf"><img width="300" src="plots/{2}/syst{1}/{0}_{3}.png"></a>\n'.format(
-    #                 category.discriminator, syst_name, category.name, sample)
-    #         )
-    #         plt.clf()
-    #         del fig
-    # systout.close()
-    # htmlout.write('<br><br><br>systematics: <a href="{0}"> link </a>\n'.format(os.path.basename(systout_fn)))
-    # 
+    
+    
+    #Plot the shapes of all the components
+    fig = plt.figure(figsize=(6,6))
+    table = []
+    for k, v in r[2].items():
+        if k == "data":
+            continue
+        heplot.barhist(v, color=plotlib.colors.get(k, "gray"), lw=2, scaling="normed", label=dict(plotlib.samplelist)[k])
+        table += [(k, v.Integral())]
+    plt.xlabel(plotlib.varnames[category.discriminator])
+    plt.legend(loc="best", numpoints=1, prop={'size': 10}, ncol=2, frameon=False)
+    plt.ylim(bottom=0)
+    plt.title(cn)
+    plotlib.svfg("output/plots/{0}/{1}_shapes.pdf".format(
+        category.discriminator, category.name
+    ))
+    plotlib.svfg("output/plots/{0}/{1}_shapes.png".format(
+        category.name, category.discriminator
+    ))
+    htmlout.write('<a href="plots/{0}/{1}_shapes.pdf"><img width="600" src="plots/{0}/{1}_shapes.png"></a>\n'.format(
+        category.name, category.discriminator
+    ))
+    plt.clf()
+    del fig
+    
+    systout_fn = "output/{0}_{1}_discriminator.html".format(
+        category.name, category.discriminator
+    )
+    systout = open(systout_fn, "w")
+    syst_pairs = [r[4].keys()[i:i+2] for i in range(0,len(r[4].keys()),2)]
+    
+    #plot the systematic variations
+    if category.do_limit:
+        for s1, s2 in syst_pairs:
+            syst_name = s1.replace("Up", "")
+            print syst_name
+            systout.write('<h2>{0}</h2>\n'.format(syst_name))
+            for sample in r[2].keys():
+                fig = plt.figure(figsize=(6,6))
+                heplot.barhist(r[2][sample], color="black", label="nominal")
+                heplot.barhist(r[4][s1][sample], color="red", label="up")
+                heplot.barhist(r[4][s2][sample], color="blue", label="down")
+                plt.title(cn + " " + syst_name.replace("_", "") + " " + sample.replace("_", ""))
+                p = "plots/{0}/syst{1}".format(category.discriminator, syst_name)
+                if not os.path.exists(p):
+                    os.makedirs(p)
+                plotlib.svfg("output/plots/{2}/syst{1}/{0}_{3}.pdf".format(category.discriminator, syst_name, category.name, sample))
+                #plotlib.svfg("output/plots/{2}/syst{1}/{0}_{3}.png".format(category.discriminator, syst_name, category.name, sample))
+                systout.write(
+                    '<a href="plots/{2}/syst{1}/{0}_{3}.pdf"><img width="300" src="plots/{2}/syst{1}/{0}_{3}.png"></a>\n'.format(
+                        category.discriminator, syst_name, category.name, sample)
+                )
+                plt.clf()
+                del fig
+        systout.close()
+        htmlout.write('<br><br><br>systematics: <a href="{0}"> link </a>\n'.format(os.path.basename(systout_fn)))
+    
     htmlout.close()
-    matplotlib.pyplot.close("all")
+    #matplotlib.pyplot.close("all")
 
 from TTH.Plotting.Datacards.AnalysisSpecification import analysis
-
 htmlout_master = open("output/index.html", "w")
 for cat in analysis.categories:
     print cat.full_name
     category_report(
         htmlout_master,
-        "/Users/joosep/Documents/tth/data/histograms/GC80297307d12d/AnalysisSpecification/",
+        "/Users/joosep/Documents/tth/data/histograms/GC45c610484aa0/AnalysisSpecification/",
         cat
     )
+
+# 
+# from TTH.Plotting.Datacards.AnalysisSpecificationDL import analysis
+# for cat in analysis.categories[:1]:
+#     print cat.full_name
+#     category_report(
+#         htmlout_master,
+#         "/Users/joosep/Documents/tth/data/histograms/GC45c610484aa0/AnalysisSpecificationDL/",
+#         cat
+#     )
+
 htmlout_master.close()
 
 # 

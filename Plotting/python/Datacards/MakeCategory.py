@@ -161,6 +161,8 @@ def apply_rules_parallel(infile, rules, ncores=1):
 
 
 if __name__ == "__main__":
+
+    # Process one analysis/category name and write output to current working directory
     
     if not len(sys.argv)==5:
         print "Invalid number of arguments. Usage:"
@@ -218,7 +220,7 @@ if __name__ == "__main__":
     #save the histograms into per-category files
     print "saving categories"
     for catname in hdict_cat.keys():
-        hfile = os.path.join(analysis.output_directory, "{0}.root".format(catname))
+        hfile = "{0}.root".format(catname)
         print "saving {0} histograms to {1}".format(len(hdict_cat[catname]), hfile)
         category_files[catname] = hfile
         sparse.save_hdict(hfile, hdict_cat[catname])
@@ -253,7 +255,7 @@ if __name__ == "__main__":
     for cat in categories:
         if not cat.do_limit:
             continue
-        fn = os.path.join(analysis.output_directory, "shapes_{0}.txt".format(cat.full_name))
+        fn = "shapes_{0}.txt".format(cat.full_name)
         print "writing shape file {0}".format(fn)
         dcof = open(fn, "w")
         PrintDatacard([cat], event_counts, category_files, dcof)
