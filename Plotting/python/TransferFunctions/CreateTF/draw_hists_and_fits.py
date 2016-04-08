@@ -18,7 +18,7 @@ from TFClasses import TF
 # Main
 ########################################
 
-def Draw_Hists_and_Fits():
+def Draw_Hists_and_Fits(conffile):
 
     ROOT.gROOT.SetBatch(True)
     ROOT.gROOT.ProcessLine("gErrorIgnoreLevel = 1001;")
@@ -29,7 +29,7 @@ def Draw_Hists_and_Fits():
     ROOT.gStyle.SetOptStat(0)
 
     # Load config.dat
-    pickle_f = open( 'config.dat', 'rb' )
+    pickle_f = open( conffile, 'rb' )
     config = pickle.load( pickle_f )
     pickle_f.close()
 

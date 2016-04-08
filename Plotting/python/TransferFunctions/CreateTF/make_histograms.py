@@ -23,11 +23,11 @@ from TFClasses import function
 # Functions
 ########################################
 
-def Make_E_axis( input_tree, eta_axis, n_E_bins, E_bounds, particle, config ):
+def Make_E_axis( input_chain, eta_axis, n_E_bins, E_bounds, particle, config ):
 
     # Method:
     #  - Per eta bin, loop:
-    #    - Get an E histogram from the input_tree, selected for eta and min/max E
+    #    - Get an E histogram from the input_chain, selected for eta and min/max E
     #    - Loop over the bins and sum up bin content
     #    - Once sum of bin content equals a fraction 1/n_E_bins of the total content,
     #      save the bin number as a boundary, and reset sum to 0
@@ -60,7 +60,7 @@ def Make_E_axis( input_tree, eta_axis, n_E_bins, E_bounds, particle, config ):
 
         # The more bins chosen, the more precise the bin boundaries will be
         #n_E_hist_bins = 50000
-        n_E_hist_bins = 1000
+        n_E_hist_bins = 200
 
         # Store this number also in config
         config['n_E_hist_bins'] = n_E_hist_bins
@@ -75,8 +75,12 @@ def Make_E_axis( input_tree, eta_axis, n_E_bins, E_bounds, particle, config ):
             E_bounds[0], E_bounds[1] )
 
         # Retrieve the histogram
-        input_tree.Draw(draw_str, sel_str)
+        input_chain.Draw(draw_str, sel_str)
         E_hist = getattr(ROOT, hist_name).Clone()
+
+
+        if not os.path.isdir("histogramming_output"):
+            os.makedirs("histogramming_output")
 
 
         ########################################
@@ -88,8 +92,12 @@ def Make_E_axis( input_tree, eta_axis, n_E_bins, E_bounds, particle, config ):
         c1 = ROOT.TCanvas("c1","c1",500,400)
         c1.SetGrid()
 
-        E_hist.Draw()
-        c1.Print( 'Ehist_beforecut', 'pdf')
+        #E_hist.Draw()
+        #c1.Print( 'Ehist_beforecut', 'pdf')
+        f_pthist_bc = open( 'histogramming_output/pt_hist_bc_{0}{1}.pickle'.format(
+            particle, i_eta ), 'wb' )
+        pickle.dump( E_hist, f_pthist_bc )
+        f_pthist_bc.close()
 
         cut_bin_value = int(0.3 * E_hist.GetMaximum())
 
@@ -97,9 +105,12 @@ def Make_E_axis( input_tree, eta_axis, n_E_bins, E_bounds, particle, config ):
             if E_hist.GetBinContent(i) > cut_bin_value:
                 E_hist.SetBinContent( i, cut_bin_value )
 
-        E_hist.Draw()
-        c1.Print( 'Ehist_aftercut', 'pdf')
-
+        #E_hist.Draw()
+        #c1.Print( 'Ehist_aftercut', 'pdf')
+        f_pthist_ac = open( 'histogramming_output/pt_hist_ac_{0}{1}.pickle'.format(
+            particle, i_eta ), 'wb' )
+        pickle.dump( E_hist, f_pthist_ac )
+        f_pthist_ac.close()
 
         ########################################
         # Determine the bin boundaries
@@ -139,6 +150,13 @@ def Make_E_axis( input_tree, eta_axis, n_E_bins, E_bounds, particle, config ):
         E_axis_this_eta.append( E_bounds[1] )
 
         E_axis.append( E_axis_this_eta )
+
+        f_pt_bins = open( 'histogramming_output/pt_bins_{0}{1}.txt'.format(particle,i_eta) , 'w' )
+        f_pt_bins.write( '###\n{0}\n{1}\n'.format( particle, i_eta ) )
+        for val in E_axis_this_eta:
+            f_pt_bins.write( '{0}\n'.format(val) )
+        f_pt_bins.close()
+        
 
         ########################################
         # Determine the central or mean value of E bin
@@ -267,18 +285,18 @@ def Make_hist_mat( eta_axis, E_axis, particle, config ):
 # Make_Histograms
 ########################################
 
-def Make_Histograms():
+def Make_Histograms(conffile):
 
     ########################################
     # Get the configuration file
     ########################################
 
-    if not os.path.isfile('config.dat'):
-        print "Error: Can't find configuration file config.dat"
+    print 'Importing configuration data from {0}'.format(conffile)
+    if not os.path.isfile(conffile):
+        print "Error: Can't find configuration file {0}".format(conffile)
         return 0
 
-    print 'Importing configuration data'
-    pickle_f = open( 'config.dat', 'rb' )
+    pickle_f = open( conffile, 'rb' )
     config = pickle.load( pickle_f )
     pickle_f.close()
 
@@ -340,9 +358,11 @@ def Make_Histograms():
     ROOT.gROOT.ProcessLine("gErrorIgnoreLevel = 1001;")
     ROOT.gStyle.SetOptFit(1011)
 
-    print 'Reading {0}'.format(input_root_file_name)
-    input_root_file = ROOT.TFile(input_root_file_name)
-    input_tree = input_root_file.Get(input_tree_name)
+    input_chain = ROOT.TChain(input_tree_name)    
+    input_chain.Add(input_root_file_name)
+
+    #input_root_file = ROOT.TFile.Open(input_root_file_name)
+    #input_tree = input_chain.Get()
 
     outputdir = config['outputdir']
 
@@ -391,7 +411,7 @@ def Make_Histograms():
 
         print 'Creating E_axis for {0}'.format(particle)
         ( dic['E_axis'], dic['E_values'] ) = Make_E_axis(
-            input_tree,
+            input_chain,
             dic['eta_axis'],
             dic['n_E_bins'],
             dic['E_bounds'],
@@ -404,12 +424,14 @@ def Make_Histograms():
 
         dicts[particle] = dic
         
+    # Temporary
+    #return
 
     ########################################
     # Event loop
     ########################################
     
-    n_entries = input_tree.GetEntries()
+    n_entries = input_chain.GetEntries()
     config['n_total_events'] = n_entries
     config['events_used'] = 0
 
@@ -424,18 +446,18 @@ def Make_Histograms():
         if not i_event % 5000:
             print "{0:.1f}%".format( 100.*i_event /n_processed)
 
-        input_tree.GetEntry( i_event )
+        input_chain.GetEntry( i_event )
 
         if Use_mc_values:
-            E_event = AH.getter(input_tree, config['mc_E_str'])
-            eta_event = AH.getter(input_tree, config['mc_Eta_str'])
-            particle_event = AH.getter(input_tree, config['mc_Flavour_str'])
+            E_event = AH.getter(input_chain, config['mc_E_str'])
+            eta_event = AH.getter(input_chain, config['mc_Eta_str'])
+            particle_event = AH.getter(input_chain, config['mc_Flavour_str'])
         else:
-            E_event = AH.getter(input_tree, config['quark_E_str'])
-            eta_event = AH.getter(input_tree, config['quark_Eta_str'])
-            particle_event = AH.getter(input_tree, config['quark_Flavour_str'])
+            E_event = AH.getter(input_chain, config['quark_E_str'])
+            eta_event = AH.getter(input_chain, config['quark_Eta_str'])
+            particle_event = AH.getter(input_chain, config['quark_Flavour_str'])
 
-        E_reconstructed = AH.getter( input_tree, config['reco_E_str'] )
+        E_reconstructed = AH.getter( input_chain, config['reco_E_str'] )
 
 
         if E_event >= E_bounds[0] and E_event <= E_bounds[1] and eta_event >= eta_axis[0] and eta_event <= eta_axis[-1]:
@@ -473,11 +495,11 @@ def Make_Histograms():
 
 
     ########################################
-    # Adding extra info to config.dat
+    # Adding extra info to config file
     ########################################   
 
-    print 'Adding single bin fit information to config.dat'
-    pickle_f = open( 'config.dat', 'wb' )
+    print 'Adding single bin fit information to {0}'.format(conffile)
+    pickle_f = open( conffile, 'wb' )
     pickle.dump( config, pickle_f )
     pickle_f.close()
 

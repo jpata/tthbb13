@@ -14,7 +14,7 @@ import sys
 sys.modules["TFClasses"] = TFClasses
 
 #Import the default list of samples
-from TTH.MEAnalysis.samples_base import lfn_to_pfn
+from TTH.MEAnalysis.samples_base import getSitePrefix
 
 #Create configuration object based on environment variables
 #if one runs with ME_CONF=/path/to/conffile.py, then the configuration is loaded from that file
@@ -42,6 +42,7 @@ conf.tf_matrix = pickle.load(pi_file)
 # eval_gen:specifies how the transfer functions are interpreted
 #     If True, TF [0] - reco, x - gen
 #     If False, TF [0] - gen, x - reco
+#FIXME!!!: remove this flag in future versions!
 eval_gen=False
 conf.tf_formula = {}
 for fl in ["b", "l"]:
@@ -56,33 +57,6 @@ pi_file = open(conf.general["transferFunctions_sj_Pickle"] , 'rb')
 conf.tf_sj_matrix = pickle.load(pi_file)
 pi_file.close()
     
-#Load the input sample dictionary
-#Samples are configured in the Conf object, by default, we use samples_vhbb
-print "loading samples from", conf.general["sampleFile"]
-samplefile = imp.load_source("samplefile", conf.general["sampleFile"])
-from samplefile import samples_dict, samples
-
-#input component
-#several input components can be declared,
-#and added to the list of selected components
-inputSamples = []
-for sn in sorted(samples_dict.keys()):
-    s = samples_dict[sn]
-    sample_ngen = s.nGen.value()
-    if (s.isMC.value() and sample_ngen<0):
-        sample_ngen = getSampleNGen(s)
-    inputSample = cfg.Component(
-        s.name.value(),
-        files = map(lfn_to_pfn, s.subFiles.value()),
-        tree_name = "tree",
-        n_gen = sample_ngen,
-        xs = s.xSec.value()
-    )
-    inputSample.isMC = s.isMC.value()
- 
-    #use sample only if not skipped and subFiles defined
-    if s.skip.value() == False and len(s.subFiles.value())>0:
-        inputSamples.append(inputSample)
 
 #Event contents are defined here
 #This is work in progress
@@ -154,8 +128,17 @@ genrad = cfg.Analyzer(
 btaglr = cfg.Analyzer(
     MECoreAnalyzers.BTagLRAnalyzer,
     'btaglr',
-    _conf = conf
+    _conf = conf,
+    btagAlgo = "btagCSV"
 )
+
+##calculates the b-tag likelihood ratio
+#btaglr_bdt = cfg.Analyzer(
+#    MECoreAnalyzers.BTagLRAnalyzer,
+#    'btaglr_bdt',
+#    _conf = conf,
+#    btagAlgo = "btagBDT"
+#)
 
 #calculates the b-tag likelihood ratio
 qglr = cfg.Analyzer(
@@ -210,6 +193,12 @@ brnd = cfg.Analyzer(
     _conf = conf
 )
 
+commoncls = cfg.Analyzer(
+    MECoreAnalyzers.CommonClassifierAnalyzer,
+    'brand',
+    _conf = conf
+)
+
 treevar = cfg.Analyzer(
     MECoreAnalyzers.TreeVarAnalyzer,
     'treevar',
@@ -231,14 +220,16 @@ sequence = cfg.Sequence([
     jets,
     brnd,
     btaglr,
+    #btaglr_bdt,
     qglr,
-    mva,
     wtag,
     mecat,
     genrad,
     gentth,
     subjet_analyzer,
+    commoncls,
     mem_analyzer,
+    mva,
     treevar,
     treeProducer
 ])
@@ -257,7 +248,7 @@ output_service = cfg.Service(
 from PhysicsTools.HeppyCore.framework.chain import Chain as Events
 config = cfg.Config(
     #Run across these inputs
-    components = inputSamples,
+    components = [],
 
     #Using this sequence
     sequence = sequence,
@@ -271,11 +262,35 @@ config = cfg.Config(
 
 if __name__ == "__main__":
     print "Running MEAnalysis heppy main loop"
-
+    
+    #input component
+    #several input components can be declared,
+    #and added to the list of selected components
+    def prepareInputSamples(sampleFile=conf.general["sampleFile"]):
+        print "loading samples from", sampleFile
+        samplefile = imp.load_source("samplefile", sampleFile)
+        from samplefile import samples_dict
+        inputSamples = []
+        for sn in sorted(samples_dict.keys()):
+            s = samples_dict[sn]
+            sample_ngen = s.nGen.value()
+            inputSample = cfg.Component(
+                s.name.value(),
+                files = map(getSitePrefix, s.subFiles.value()),
+                tree_name = s.treeName.value(),
+                n_gen = sample_ngen,
+                xs = s.xSec.value()
+            )
+            inputSample.isMC = s.isMC.value()
+            inputSamples.append(inputSample)
+        return inputSamples, samples_dict
+    
+    inputSamples, samples_dict = prepareInputSamples(conf.general["sampleFile"])
+    
     #Process all samples in the sample list
     for samp in inputSamples:
-
-        print "processing sample ", samp
+        if not samp.isMC:
+            continue
         config = cfg.Config(
             #Run across these inputs
             components = [samp],
@@ -292,8 +307,7 @@ if __name__ == "__main__":
 
         #Configure the number of events to run
         from PhysicsTools.HeppyCore.framework.looper import Looper
-        nEvents = 300 #DS temp
-
+        nEvents = 10000
 
         kwargs = {}
         if conf.general.get("eventWhitelist", None) is None:
@@ -305,6 +319,12 @@ if __name__ == "__main__":
             nPrint = 0,
             **kwargs
         )
+
+
+        #import cProfile, time
+        #p = cProfile.Profile(time.clock)
+        #p.runcall(looper.loop)
+        #p.print_stats()
 
         #execute the code
         looper.loop()

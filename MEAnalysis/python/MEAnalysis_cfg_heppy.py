@@ -3,182 +3,71 @@ from collections import OrderedDict
 from TTH.MEAnalysis.MEMConfig import MEMConfig
 import ROOT
 from ROOT import MEM
+import VHbbAnalysis.Heppy.TriggerTableData as trigData
+import VHbbAnalysis.Heppy.TriggerTable as trig
 
-def jet_baseline(jet, oldpt=None):
-    #in case pt has been rescaled, then need to rescale energy fractions
-    if oldpt is None:
-        oldpt = jet.pt
-    ptfrac = jet.pt / oldpt
-    
-    #X = x / oldpt
-    #Xnew = x / (ptfrac * oldpt) = X / ptfrac
-    return (jet.neHEF/ptfrac < 0.99
-        and jet.chEmEF/ptfrac < 0.99
-        and jet.neEmEF/ptfrac < 0.99
-        and jet.numberOfDaughters > 1
-        and jet.chHEF/ptfrac > 0.0
-        and jet.chMult/ptfrac > 0.0
-    )
+def jet_baseline(jet):
+    #Require that jet must have at least loose POG_PFID
+    #Look in Heppy autophobj.py and Jet.py 
+    return (jet.id >= 1)
 
 # LB: in fact,  mu.tightId should contain all the other cuts
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Tight_Muon
 # https://github.com/vhbb/cmssw/blob/vhbbHeppy722patch2/PhysicsTools/Heppy/python/physicsobjects/Muon.py
 def mu_baseline_tight(mu):
     return (
-        mu.tightId and
-        mu.isPFMuon and
-        mu.isGlobalMuon and
-        mu.dxy < 0.2 and
-        mu.dz < 0.5 and
-        mu.globalTrackChi2 < 10 and
-        (getattr(mu, "nMuonHits", 0) > 0 or getattr(mu, "nChamberHits", 0) > 0) and #the name of the branch changed between v11 and v12 
-        mu.pixelHits > 0 and
-        mu.nStations > 1 #FIXME: is this the same as nMuonHits
+        mu.tightId == 1
     )
 
 def print_mu(mu):
     print "Muon: (pt=%s, eta=%s, tight=%s, pf=%s, glo=%s, dxy=%s, dz=%s, chi2=%s, nhits=%s, pix=%s, stat=%s, pfRelIso04=%s)" % (mu.pt, mu.eta, mu.tightId, mu.isPFMuon,  mu.isGlobalMuon, mu.dxy , mu.dz, mu.globalTrackChi2, (getattr(mu, "nMuonHits", 0) > 0 or getattr(mu, "nChamberHits", 0) > 0) , mu.pixelHits , mu.nStations, mu.pfRelIso04)
 
+def el_baseline_medium(el):
 
-#def el_baseline_tight(el):
-#    sca = abs(el.etaSc)
-#    ret = (
-#        not(sca > 1.4442 and sca < 1.5660) and
-#        el.convVeto
-#    )
-#    if not ret:
-#        return False
+    sca = abs(el.etaSc)
+    ret = ((sca < 1.4442 and
+        el.eleSieie < 0.012 and
+        el.eleHoE < 0.09 and
+        el.eleEcalClusterIso/ el.pt < 0.37 and
+        el.eleHcalClusterIso / el.pt < 0.25 and
+        abs(el.eleDEta) < 0.0095 and
+        abs(el.eleDPhi) < 0.065 and
+        el.dr03TkSumPt/el.pt < 0.18) or
+        (sca > 1.5660 and
+        el.eleSieie < 0.033 and
+        el.eleHoE < 0.09 and
+        el.eleEcalClusterIso / el.pt < 0.45 and
+        el.eleHcalClusterIso / el.pt < 0.28 and
+        el.dr03TkSumPt/el.pt < 0.18)
+    )
+    
+    #medium ID (cut-based)
+    #ret = ret and el.eleCutIdSpring15_25ns_v1 >= 3
+ 
+    #EGamma POG MVA ID for triggering electrons (0=none, 1=WP90, 2=WP80, Spring15 training); 1 for muons
+    # We want 80%
+    # https://twiki.cern.ch/twiki/bin/viewauth/CMS/TTbarHbbRun2ReferenceAnalysis_76XTransition#Electrons
+    ret = ret and el.eleMVAIdSpring15Trig == 2
+
+    return ret
+
+#def el_baseline_loose(el):
 #
-#    if sca <= 1.479:
-#        ret = ret and (
-#            (abs(el.eleDEta)    < 0.006046) and
-#            (abs(el.eleDPhi)    < 0.028092) and
-#            (el.eleSieie        < 0.009947) and
-#            (el.eleHoE          < 0.045772) and
-#            (abs(el.dxy)        < 0.008790) and
-#            (abs(el.dz)         < 0.021226) and
-#            (el.pfRelIso03        < 0.069537)
-#            #FIXME: expectedMissingInnerHits and hOverE 
-#        )
-#    elif sca < 2.5:
-#        ret = ret and (
-#            (abs(el.eleDEta)    < 0.007057) and
-#            (abs(el.eleDPhi)    < 0.030159) and
-#            (el.eleSieie        < 0.028237) and
-#            (el.eleHoE          < 0.067778) and
-#            (abs(el.dxy)        < 0.027984) and
-#            (abs(el.dz)         < 0.133431) and
-#            (el.pfRelIso03        < 0.078265)
-#            #FIXME: expectedMissingInnerHits and hOverE 
-#        )
+#    sca = abs(el.etaSc)
+#    ret = not (sca > 1.4442 and sca < 1.5660)
+#
+#    #Loose ID
+#    ret = ret and el.eleCutIdSpring15_25ns_v1 >= 2
 #    return ret
 
-def el_baseline_medium(el):
-    sca = abs(el.etaSc)
-    ret = (
-        not(sca > 1.4442 and sca < 1.5660) and
-        el.convVeto
-    )
-    if not ret:
-        return False
-
-    if (sca <= 1.479):
-        ret = ret and (
-            (el.eleSieie < 0.0101) and
-            (abs(el.eleDEta) < 0.0103) and
-            (abs(el.eleDPhi) < 0.0336) and
-            (el.eleHoE < 0.0876) and
-            (el.relIso03 < 0.0766) and
-            (el.eleooEmooP < 0.0174) and
-            (abs(el.dxy) < 0.0118) and
-            (abs(el.dz) < 0.373) and
-            (el.eleExpMissingInnerHits <= 2.0) and
-            (el.convVeto)
-        )
-    elif (sca < 2.5):
-        ret = ret and (
-            (el.eleSieie < 0.0283) and
-            (abs(el.eleDEta) < 0.00733) and
-            (abs(el.eleDPhi) < 0.114) and
-            (el.eleHoE < 0.0678) and
-            (el.relIso03 < 0.0678) and
-            (el.eleooEmooP < 0.0898) and
-            (abs(el.dxy) < 0.0739) and
-            (abs(el.dz) < 0.602) and
-            (el.eleExpMissingInnerHits <= 1.0) and
-            (el.convVeto)
-        )
-        
-    return ret
-
-def el_baseline_loose(el):
-    sca = abs(el.etaSc)
-    ret = (
-        not(sca > 1.4442 and sca < 1.5660) and
-        el.convVeto
-    )
-    if not ret:
-        return False
-
-    if (sca <= 1.479):
-        ret = ret and (
-            (el.eleSieie < 0.0103) and
-            (abs(el.eleDEta) < 0.0105) and
-            (abs(el.eleDPhi) < 0.115) and
-            (el.eleHoE < 0.104) and
-            (el.relIso03 < 0.0893) and
-            (el.eleooEmooP < 0.102) and
-            (abs(el.dxy) < 0.0261) and
-            (abs(el.dz) < 0.41) and
-            (el.eleExpMissingInnerHits <= 2.0) and
-            (el.convVeto)
-        )
-    elif (sca < 2.5):
-        ret = ret and (
-            (el.eleSieie < 0.0301) and
-            (abs(el.eleDEta) < 0.00814) and
-            (abs(el.eleDPhi) < 0.182) and
-            (el.eleHoE < 0.0897) and
-            (el.relIso03 < 0.121) and
-            (el.eleooEmooP < 0.126) and
-            (abs(el.dxy) < 0.118) and
-            (abs(el.dz) < 0.822) and
-            (el.eleExpMissingInnerHits <= 1.0) and
-            (el.convVeto)
-        )
-    return ret
-
-
 def print_el(el):
-    print "Electron: (pt=%s, eta=%s, convVeto=%s, etaSc=%s, dEta=%s, dPhi=%s, sieie=%s, HoE=%s, dxy=%s, dz=%s, iso03=%s, nhits=%s, eOp=%s, pfRelIso03=%s)" % (el.pt, el.eta, el.convVeto, abs(el.etaSc), abs(el.eleDEta) , abs(el.eleDPhi) , el.eleSieie, el.eleHoE , abs(el.dxy) , abs(el.dz) , el.relIso03 , getattr(el, "eleExpMissingInnerHits", 0) , getattr(el, "eleooEmooP", 0), el.pfRelIso03)
-
-
-
-#https://twiki.cern.ch/twiki/bin/viewauth/CMS/CutBasedElectronIdentificationRun2#PHYS14_selection_all_conditions
-#PHYS14 selection, conditions: PU20 bx25, barrel cuts ( |eta supercluster| <= 1.479)
-#                    Veto        Loose           Medium          Tight
-#abs(dEtaIn) <   0.013625        0.009277        0.008925        0.006046
-#abs(dPhiIn) <   0.230374        0.094739        0.035973        0.028092
-#sieie <         0.011586        0.010331        0.009996        0.009947
-#hOverE <        0.181130        0.093068        0.050537        0.045772
-#abs(d0) <       0.094095        0.035904        0.012235        0.008790
-#abs(dz) <       0.713070        0.075496        0.042020        0.021226
-#ooEmooP <       0.295751        0.189968        0.091942        0.020118
-#iso             0.158721        0.130136        0.107587        0.069537
-#expectedMissingInnerHits <=     2       1       1       1
-#
-#PHYS14 selection, conditions: PU20 bx25, endcap cuts (1.479 < |eta supercluster| < 2.5)
-#    Veto        Loose   Medium  Tight
-#abs(dEtaIn) <   0.011932        0.009833        0.007429        0.007057
-#abs(dPhiIn) <   0.255450        0.149934        0.067879        0.030159
-#sie <           0.031849        0.031838        0.030135        0.028237
-#hOverE <        0.223870        0.115754        0.086782        0.067778
-#abs(d0) <       0.342293        0.099266        0.036719        0.027984
-#abs(dz) <       0.953461        0.197897        0.138142        0.133431
-#ooEmooP <       0.155501        0.140662        0.100683        0.098919
-#iso             0.177032        0.163368        0.113254        0.078265
-#h <=             3       1       1       1
-
+    print "Electron: (pt=%s, eta=%s, convVeto=%s, etaSc=%s, dEta=%s, dPhi=%s, sieie=%s, HoE=%s, dxy=%s, dz=%s, iso03=%s, nhits=%s, eOp=%s, pfRelIso03=%s, mvaIdFlag=%s, mvaId=%s, ecalIso=%s, hcalIso=%s)" % (
+        el.pt, el.eta, el.convVeto, abs(el.etaSc), abs(el.eleDEta),
+        abs(el.eleDPhi), el.eleSieie, el.eleHoE, abs(el.dxy),
+        abs(el.dz), el.relIso03 , getattr(el, "eleExpMissingInnerHits", 0),
+        getattr(el, "eleooEmooP", 0), el.pfRelIso03, el.eleMVAIdSpring15Trig, el.eleMVArawSpring15Trig,
+        el.eleEcalClusterIso/el.pt, el.eleHcalClusterIso/el.pt
+    )
 
 class Conf:
     leptons = {
@@ -186,28 +75,25 @@ class Conf:
 
             #SL
             "SL": {
-                "pt": 30,
+                "pt": 25,
                 "eta":2.1,
-                "iso": 0.12,
+                "iso": 0.15,
                 "idcut": mu_baseline_tight,
             },
-            #DL
             "DL": {
-                "pt": 20,
+                "iso": 0.15,
                 "eta": 2.4,
-                "iso": 0.12,
                 "idcut": mu_baseline_tight,
             },
             "veto": {
-                "pt": 10.0,
+                "pt": 15.0,
                 "eta": 2.4,
-                "iso": 0.2,
+                "iso": 0.15,
                 "idcut": mu_baseline_tight,
             },
             "isotype": "pfRelIso04", #pfRelIso - delta-beta, relIso - rho
             "debug" : print_mu
         },
-
 
         "el": {
             "SL": {
@@ -216,18 +102,21 @@ class Conf:
                 "idcut": lambda el: el_baseline_medium(el),
             },
             "DL": {
-                "pt": 20,
+                "eta": 2.4,
+                "idcut": el_baseline_medium,
+            },
+            "veto": {
+                "pt": 15.0,
                 "eta": 2.4,
                 "idcut": lambda el: el_baseline_medium(el),
             },
-            "veto": {
-                "pt": 10,
-                "eta": 2.4,
-                "idcut": lambda el: el_baseline_loose(el),
-            },
             #"isotype": "pfRelIso03", #pfRelIso - delta-beta, relIso - rho
-            "isotype": "relIso03", #pfRelIso - delta-beta, relIso - rho
+            "isotype": "none", #pfRelIso - delta-beta, relIso - rho (Heppy.LeptonAnalyzer.ele/mu_isoCorr), none
             "debug" : print_el
+        },
+        "DL": {
+            "pt_leading": 20,
+            "pt_subleading": 15,
         },
         "selection": lambda event: event.is_sl or event.is_dl
         #"selection": lambda event: event.is_fh
@@ -238,7 +127,7 @@ class Conf:
         "pt":   30,
         "eta":  2.4,
 
-        # pt, |eta| thresholds for **trailing jets** specific to sl channel
+        # pt, |eta| thresholds for **leading jets** specific to sl channel
         "pt_sl":  30,
         "eta_sl": 2.4,
 
@@ -264,104 +153,139 @@ class Conf:
         #These working points are evaluated and stored in the trees as nB* - number of jets passing the WP
         #https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideBTagging#Preliminary_working_or_operating
         "btagWPs": {
-            #"CSVM": ("btagCSV", 0.814),
-            "CSVM": ("btagCSV", 0.89),
-            "CSVL": ("btagCSV", 0.423),
-            "CSVT": ("btagCSV", 0.941)
+            "CSVM": ("btagCSV", 0.800),
+            "CSVL": ("btagCSV", 0.460),
+            "CSVT": ("btagCSV", 0.935)
         },
 
         #if btagCSV, untagged/tagged selection for W mass and MEM is done by CSVM cut
         #if btagLR, selection is done by the btag likelihood ratio permutation
+        #"untaggedSelection": "btagCSV",
         "untaggedSelection": "btagLR",
         
         #how many jets to consider for the btag LR permutations
-        "NJetsForBTagLR": 6,
+        "NJetsForBTagLR": 8,
+
+        #base jet selection
         "selection": jet_baseline
     }
 
     trigger = {
 
         "filter": False,
-        "paths": [
-        
-            #SL triggers
-            "HLT_BIT_HLT_Ele27_eta2p1_WP85_Gsf_HT200_v",
-            "HLT_BIT_HLT_IsoMu24_eta2p1_v"
-            
-            #DL triggers
-            #mumu
-            "HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v",
-            "HLT_BIT_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v",
-            
-            #emu
-            "HLT_BIT_HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v",
-            "HLT_BIT_HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v",
-            
-            #ee
-            "HLT_BIT_HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v",
-
-            #FH triggers: in separate config file
-            #"HLT_BIT_HLT_PFHT400_SixJet30_BTagCSV0p5_2PFBTagCSV_v",
-            #"HLT_BIT_HLT_PFHT450_SixJet40_PFBTagCSV_v",
-            #"HLT_ttHhardonicLowLumi",
-            ],
-      
+        "trigTable": trig.triggerTable, 
+        "trigTableData": trigData.triggerTable, 
     }
 
     general = {
-        "passall": False, #DS temp
-        "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV6_finerPt.root",
+        "passall": True,
+        "doQGL": False,
+        "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV20.root",
+        #"controlPlotsFileNew": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV14.root",
         "QGLPlotsFile_flavour": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/Histos_QGL_flavour.root",
-        #"sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_722sync.py",
-        #"sampleFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/python/samples_722minisync.py",
-        #"sampleFile": os.environ["CMSSW_BASE"]+"/python/TTH/MEAnalysis/samples_v12.py",
-        "sampleFile": os.environ["CMSSW_BASE"]+"/python/TTH/MEAnalysis/samples_v14.py",
+        "sampleFile": os.environ["CMSSW_BASE"]+"/python/TTH/MEAnalysis/samples.py",
         "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions.pickle",
         "transferFunctions_sj_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions_sj.pickle",
-        "systematics": ["nominal"],
-        #"systematics": ["nominal", "JESUp", "JESDown", "raw"],
-        #"systematics": ["nominal", "JESUp", "JESDown"],
+        #"systematics": ["nominal"],
+        "systematics": [
+            "nominal",
+            "JESUp", "JESDown",
+        #    "JERUp", "JERDown"
+        ],
         
         
         #If the list contains:
         # "gen" - print out the ttH gen-level particles (b from top, b form higgs, q from W, leptons
         # "reco" - print out the reco-level selected particles
         # "matching" - print out the association between gen and reco objects
-        #"verbosity": ["eventboundary", "input", "matching", "gen", "reco", "meminput"],
         "verbosity": [
-            #"trigger",
+            "eventboundary", #print run:lumi:event
+            #"trigger", #print trigger bits
+            #"input", #print input particles
             #"gen", #print out gen-level info
             #"debug", #very high-level debug info
             #"reco", #info about reconstructed final state
             #"meminput" #info about particles used for MEM input
+            "commoninput" #print out inputs for CommonClassifier
         ],
 
         #"eventWhitelist": [
-        #    (1, 1094, 109371),
+        #    (1, 6627, 1321096)
         #]
     }
 
     bran = {
       
+        "enabled": False,
         "pdfFile" :  general["controlPlotsFile"], #os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV6_finerPt_722sync.root",
 
         "jetCategories" : {
             #"2t"   : (2, 2, 0),
             "3t"   : (3, 3, 1),
             "ge4t" : (4, 6, 2), # needed for timing 
-            }
         }
+    }
 
-
+    tth_mva = {
+        "filename": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/tth_bdt.pkl",
+        "varlist": [
+            "is_sl",
+            "is_dl",
+            "lep0_pt",
+            "lep0_aeta",
+            "lep1_pt",
+            "lep1_aeta",
+            "jet0_pt",
+            "jet0_btag",
+            "jet0_aeta",
+            "jet1_pt",
+            "jet1_btag",
+            "jet1_aeta",
+            "jet2_pt",
+            "jet2_btag",
+            "jet2_aeta",
+            "mean_bdisc",
+            "mean_bdisc_btag",
+            "min_dr_btag",
+            "mean_dr_btag",
+            "std_dr_btag",
+            "momentum_eig0",
+            "momentum_eig1",
+            "momentum_eig2",
+            "fw_h0",
+            "fw_h1",
+            "fw_h2",
+            "aplanarity",
+            "isotropy",
+            "numJets",
+            "nBCSVM",
+            "Wmass"
+        ]
+    }
+    
     mem = {
 
         #Actually run the ME calculation
         #If False, all ME values will be 0
         "calcME": True,
+        
+        "weight": 0.15,
 
-        #Generic event-dependent selection function applied
-        #just before the MEM. If False, MEM is skipped
-        "selection": lambda event: event.btag_LR_4b_2b > 0.95, #optimized for 40% tth(bb) acceptance
+        "blr_cuts": {
+            "sl_j5_t2": 20,
+            "sl_j5_t3": 3.2,
+            "sl_j5_tge4": -20,
+            
+            "sl_jge6_t2": 2,
+            "sl_jge6_t3": 3.2,
+            "sl_jge6_tge4": -20,
+
+            "dl_j3_t2": 20,
+            "dl_jge3_t3": -20,
+            "dl_jge4_t2": 20,
+            "dl_jge4_tge4": -20,
+        },
+
 
         #categories to run the mem
         "categories": [
@@ -376,6 +300,16 @@ class Conf:
             "cat11",
         ],
 
+        #Generic event-dependent selection function applied
+        #just before the MEM. If False, MEM is skipped for all hypos
+        #note that we set hypothesis-specific cuts below
+        "selection": lambda event: (
+            event.pass_category_blr and (
+                (event.is_sl and event.nBCSVM >= 3)
+                or (event.is_dl and event.nBCSVM >= 3)
+            )
+        ),
+        
         #This configures what the array elements mean
         #Better not change this
         "methodOrder": [
@@ -394,6 +328,7 @@ class Conf:
             # with rnd CSV values
             "DL_0w2h2t_Rndge4t",
             "SL_2w2h2t_sj",
+            "SL_0w2h2t_sj",
 
             #fully-hadronic
             "FH_4w2h2t", #8j,4b & 9j,4b
@@ -407,12 +342,13 @@ class Conf:
         #This configures the MEMs to actually run, the rest will be set to 0
         "methodsToRun": [
             "SL_0w2h2t",
-            "DL_0w2h2t",
-            "SL_1w2h2t",
-            "SL_2w2h1t_l",
-            "SL_2w2h1t_h",
+            #"DL_0w2h2t",
+            #"SL_1w2h2t",
+            #"SL_2w2h1t_l",
+            #"SL_2w2h1t_h",
             "SL_2w2h2t",
             #"SL_2w2h2t_sj",
+            #"SL_0w2h2t_sj",
             #"SL_2w2h2t_memLR",
             #"SL_0w2h2t_memLR",
             #"DL_0w2h2t_Rndge4t",
@@ -531,8 +467,7 @@ c.b_quark_candidates = lambda ev: ev.good_jets
 c.l_quark_candidates = lambda ev: []
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 1 and
-    len(mcfg.b_quark_candidates(ev)) >= 3 and
-    ev.nBCSVM >= 3
+    len(mcfg.b_quark_candidates(ev)) >= 3
 )
 c.mem_assumptions.add("sl")
 c.mem_assumptions.add("0w2h2t")
@@ -553,14 +488,14 @@ c.b_quark_candidates = lambda ev: ev.good_jets
 c.l_quark_candidates = lambda ev: []
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 2 and
-    len(mcfg.b_quark_candidates(ev)) >= 4 and
-    ev.nBCSVM >= 3
+    len(mcfg.b_quark_candidates(ev)) >= 4
     #(len(mcfg.l_quark_candidates(ev)) + len(mcfg.b_quark_candidates(ev))) >= 4
 )
 #c.cfg.int_code = 0
 c.maxJets = 8
 c.mem_assumptions.add("dl")
 strat = CvectorPermutations()
+#FIXME: are we sure about these assumptions?
 strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
 strat.push_back(MEM.Permutations.FirstRankedByBTAG)
 c.cfg.perm_pruning = strat
@@ -575,7 +510,7 @@ c.l_quark_candidates = lambda ev: []
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 2 and
     len(mcfg.b_quark_candidates(ev)) >= 4 and
-    ev.nBCSVMRndge4t >= 4
+    getattr(ev, "nBCSVMRndge4t", 0) >= 4
 )
 c.btagMethod = "btagCSVRndge4t"
 c.maxJets = 8
@@ -604,12 +539,32 @@ c.do_calculate = lambda ev, mcfg: (
 )
 c.mem_assumptions.add("sl")
 strat = CvectorPermutations()
-strat = CvectorPermutations()
 strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
 strat.push_back(MEM.Permutations.QUntagged)
 strat.push_back(MEM.Permutations.BTagged)
 c.cfg.perm_pruning = strat
 Conf.mem_configs["SL_2w2h2t_sj"] = c
+
+#SL_0w2h2t_sj
+c = MEMConfig()
+# Select the custom jet lists
+c.b_quark_candidates = lambda event: \
+                                     event.boosted_bjets
+c.l_quark_candidates = lambda event: \
+                                     event.boosted_ljets
+c.do_calculate = lambda ev, mcfg: (
+    len(mcfg.lepton_candidates(ev)) == 1 and
+    len(mcfg.b_quark_candidates(ev)) >= 4 and
+    len(mcfg.l_quark_candidates(ev)) >= 0
+)
+c.mem_assumptions.add("sl")
+c.mem_assumptions.add("0w2h2t")
+strat = CvectorPermutations()
+strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
+strat.push_back(MEM.Permutations.QUntagged)
+strat.push_back(MEM.Permutations.BTagged)
+c.cfg.perm_pruning = strat
+Conf.mem_configs["SL_0w2h2t_sj"] = c
 
 ##SL_2w2h2t_sj_perm
 #c = MEMConfig()
@@ -764,10 +719,10 @@ def conf_to_str(Conf):
     for k, v in sorted(Conf.__dict__.items(), key=lambda x: x[0]):
         s += "{0}: ".format(k)
         if isinstance(v, dict):
-            s += print_dict(v)
+            s += print_dict(v) + ",\n"
         elif isinstance(v, ROOT.TF1):
-            s += "ROOT.TF1({0}, {1})".format(v.GetName(), v.GetTitle())
+            s += "ROOT.TF1({0}, {1})".format(v.GetName(), v.GetTitle()) + ",\n"
         else:
-            s += str(v)
+            s += str(v) + ",\n"
     s += "\n"
     return s

@@ -5,6 +5,9 @@ Usage:
 	./ParHadd.py output_file.root input_file1.root input_file2.root ...
 	See also ./ParHadd.py --help
 
+Example call:
+    python ParHadd.py --njobs=5 --nfiles=10 --nsteps=2 /scratch/jpata/QCD_HT500to700_v14.root /shome/nchernya/Hbb/skim_trees/v14/QCD_HT500to700_v14/skimmed*.root
+
 Author: Joosep Pata (ETHz) joosep.pata@cern.ch
 """
 
@@ -109,5 +112,4 @@ def par_hadd(outfile, infiles, nchunks, njobs, nsteps):
 if __name__ == "__main__":
         outfile = remaining_args[0]
 	infiles = remaining_args[1:]
-
 	par_hadd(outfile, infiles, pargs.nfiles, pargs.njobs, pargs.nsteps)

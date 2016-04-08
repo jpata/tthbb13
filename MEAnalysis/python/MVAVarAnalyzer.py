@@ -11,7 +11,15 @@ from scipy.special import eval_legendre
 import ROOT
 ROOT.gSystem.Load("libTTHMEAnalysis")
 
+mva_enabled = False
 from TTH.MEAnalysis.Analyzer import FilterAnalyzer
+if mva_enabled:
+    try:
+        from sklearn.externals import joblib
+    except Exception as e:
+        print "Could not load scikit-learn. Please configure PYTHONPATH=/path/to/anaconda/lib/python2.7/site-packages:$PYTHONPATH PATH=/path/to/anaconda/bin/:$PATH"
+        mva_enabled = False
+
 CvectorTLorentzVector = getattr(ROOT, "std::vector<TLorentzVector>")
 EventShapeVariables = getattr(ROOT, "EventShapeVariables")
 TMatrixDSym = getattr(ROOT, "TMatrixDSym")
@@ -41,7 +49,6 @@ class FoxWolfram:
                 vals = np.array([cos_omega_ij]*len(orders))
 
                 p_l = np.array(eval_legendre(orders, vals))
-                #print i, j, cos_omega_ij, w_ij, p_l
                 h += w_ij * p_l
         return h
 
@@ -51,6 +58,9 @@ class MVAVarAnalyzer(FilterAnalyzer):
     def __init__(self, cfg_ana, cfg_comp, looperName):
         self.conf = cfg_ana._conf
         super(MVAVarAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
+
+        if mva_enabled:
+            self.cls = joblib.load(self.conf.tth_mva["filename"])
 
     def beginLoop(self, setup):
         super(MVAVarAnalyzer, self).beginLoop(setup)
@@ -63,29 +73,28 @@ class MVAVarAnalyzer(FilterAnalyzer):
                 event.systResults[syst] = res
             else:
                 event.systResults[syst].passes_mva = False
-        #print "MVA", getattr(event.systResults["JES"], "fw_h_alljets", None)
-        #event.__dict__.update(event.systResults["nominal"].__dict__)
         return self.conf.general["passall"] or np.any([v.passes_mva for v in event.systResults.values()])
 
     def _process(self, event):
-        sumP2 = 0.0 #---DS
+        #FIXME: NEED COMMENTS HERE
+        sumP2 = 0.0
         sumPxx = 0.0
         sumPxy = 0.0
         sumPxz = 0.0
         sumPyy = 0.0
         sumPyz = 0.0
-        sumPzz = 0.0 #---DS
+        sumPzz = 0.0
         vecs = CvectorTLorentzVector()
         for jet in event.good_jets:
-            obj = lvec(jet) #DS
+            obj = lvec(jet)
             vecs.push_back(lvec(jet))
-            sumP2  += obj.P() * obj.P() #---DS
+            sumP2  += obj.P() * obj.P()
             sumPxx += obj.Px() * obj.Px()
             sumPxy += obj.Px() * obj.Py()
             sumPxz += obj.Px() * obj.Pz()
             sumPyy += obj.Py() * obj.Py()
             sumPyz += obj.Py() * obj.Pz()
-            sumPzz += obj.Pz() * obj.Pz() #---DS
+            sumPzz += obj.Pz() * obj.Pz()
         evshape = EventShapeVariables(vecs)
         eigs = evshape.compEigenValues(2.0) #difference: this takes T^2-x^2-y^2-z^2 for P2
         event.momentum_eig0 = eigs[0]
@@ -117,10 +126,10 @@ class MVAVarAnalyzer(FilterAnalyzer):
         event.D = 27.*eigenValues(0)*eigenValues(1)*eigenValues(2) #---------DS 
 
         event.isotropy = evshape.isotropy()
-        #event.sphericity = 1.5*(eigs[1]+eigs[2]) #evshape.sphericity(eigs) #DS
-        #event.aplanarity = 1.5*eigs[2] #evshape.aplanarity(eigs) #DS
-        #event.C = 3.0*(eigs[0]*eigs[1] + eigs[0]*eigs[2] + eigs[1]*eigs[2]) #evshape.C(eigs) #DS
-        #event.D = 27.*eigs[0]*eigs[1]*eigs[2] #evshape.D(eigs) #DS
+        event.sphericity = 1.5*(eigs[1]+eigs[2]) #evshape.sphericity(eigs) #DS
+        event.aplanarity = 1.5*eigs[2] #evshape.aplanarity(eigs) #DS
+        event.C = 3.0*(eigs[0]*eigs[1] + eigs[0]*eigs[2] + eigs[1]*eigs[2]) #evshape.C(eigs) #DS
+        event.D = 27.*eigs[0]*eigs[1]*eigs[2] #evshape.D(eigs) #DS
 
         event.mean_bdisc = np.mean([j.btagCSV for j in event.good_jets])
         event.mean_bdisc_btag = np.mean([j.btagCSV for j in event.selected_btagged_jets])
@@ -163,6 +172,34 @@ class MVAVarAnalyzer(FilterAnalyzer):
         event.fw_h_alljets = FoxWolfram.calcFoxWolfram(event.good_jets, orders, FoxWolfram.w_s)
         event.fw_h_btagjets = FoxWolfram.calcFoxWolfram(event.selected_btagged_jets_high, orders, FoxWolfram.w_s)
         event.fw_h_untagjets = FoxWolfram.calcFoxWolfram(event.buntagged_jets, orders, FoxWolfram.w_s)
+        
+        for ij in range(6):
+            setattr(event, "jet{0}_pt".format(ij), 0)
+            setattr(event, "jet{0}_aeta".format(ij), 0)
+            setattr(event, "jet{0}_btag".format(ij), 0)
+
+        for ij, jet in enumerate(event.good_jets):
+            setattr(event, "jet{0}_pt".format(ij), jet.pt)
+            setattr(event, "jet{0}_aeta".format(ij), abs(jet.eta))
+            setattr(event, "jet{0}_btag".format(ij), jet.btagCSV)
+       
+        for i in range(2):
+            setattr(event, "lep{0}_pt".format(i), 0.0)
+            setattr(event, "lep{0}_aeta".format(i), 0.0)
+
+        for ij, lep in enumerate(event.good_leptons):
+            setattr(event, "lep{0}_pt".format(ij), lep.pt)
+            setattr(event, "lep{0}_aeta".format(ij), abs(lep.eta))
+        
+        for io in orders:
+            setattr(event, "fw_h{0}".format(io), event.fw_h_alljets[io])
+        
+        vararray = np.array([getattr(event, vname) for vname in self.conf.tth_mva["varlist"]])
+        vararray[np.isnan(vararray)] = 0
+        
+        event.tth_mva = 0
+        if mva_enabled:
+            event.tth_mva = self.cls.predict_proba(vararray)[0,1]
         event.passes_mva = True
 
         return event

@@ -1,8 +1,5 @@
 import ROOT
 
-if ROOT.gROOT.GetVersion().startswith("5."):
-    ROOT.gSystem.Load("libCintex")
-    ROOT.gROOT.ProcessLine('ROOT::Cintex::Cintex::Enable();')
 ROOT.gSystem.Load("libTTHMEIntegratorStandalone")
 from ROOT import MEM
 import inspect
@@ -19,12 +16,15 @@ ROOT.MEM.MEMConfig.__repr__ = ROOT_MEMConfig_str
 class MEMConfig:
     def __init__(self):
         self.cfg = MEM.MEMConfig()
-        self.cfg.defaultCfg()
+
+        #Specify the MEM precision. 1.0 = default ncalls
+        self.cfg.defaultCfg(1.0)
+
         self.b_quark_candidates = lambda event: event.selected_btagged_jets_high
         self.l_quark_candidates = lambda event: event.wquark_candidate_jets
         self.lepton_candidates = lambda event: event.good_leptons
         self.met_candidates = lambda event: event.MET
-        self.transfer_function_method = MEM.TFMethod.External
+        self.cfg.transfer_function_method = MEM.TFMethod.External
 
         self.do_calculate = lambda event, config: False
         self.mem_assumptions = set([])

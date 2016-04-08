@@ -19,3 +19,4 @@ from TTH.MEAnalysis.TriggerAnalyzer import TriggerAnalyzer
 from TTH.MEAnalysis.MVAVarAnalyzer import MVAVarAnalyzer
 from TTH.MEAnalysis.BTagRandomizerAnalyzer import BTagRandomizerAnalyzer
 from TTH.MEAnalysis.TreeVarAnalyzer import TreeVarAnalyzer
+from TTH.MEAnalysis.CommonClassifierAnalyzer import CommonClassifierAnalyzer

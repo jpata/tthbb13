@@ -17,9 +17,8 @@ import TTH.MEAnalysis.TFClasses as TFClasses
 import sys
 sys.modules["TFClasses"] = TFClasses
 
-from TTH.MEAnalysis.MEAnalysis_heppy import sequence, samples
-from TTH.MEAnalysis.samples_base import lfn_to_pfn
-from TTH.MEAnalysis.samples_v12 import samples
+from TTH.MEAnalysis.MEAnalysis_heppy import sequence, samples_dict
+from TTH.MEAnalysis.samples_base import getSitePrefix
 
 firstEvent = int(os.environ["SKIP_EVENTS"])
 nEvents = int(os.environ["MAX_EVENTS"])
@@ -42,17 +41,17 @@ print fns
 good_samp = []
 print "processing dataset={0}".format(dataset)
 
-for ns in range(len(samples)):
-    if samples[ns].name.value() == dataset:
-        samples[ns].skip = False
-        samples[ns].subFiles = map(lfn_to_pfn, samples[ns].subFiles ) #DS
-        good_samp += [samples[ns]]
+for ns in samples_dict.keys():
+    if samples_dict[ns].name.value() == dataset:
+        samples_dict[ns].skip = cms.untracked.bool(False)
+        samples_dict[ns].subFiles = map(getSitePrefix, fns ) #DS
+        good_samp += [samples_dict[ns]]
     else:
-        print "skipping", samples[ns].name.value()
-        samples[ns].skip = True
+        print "skipping", samples_dict[ns].name.value()
+        samples_dict[ns].skip = cms.untracked.bool(True)
 
 if len(good_samp) != 1:
-    raise Exception("Need to specify at least one sample: dataset={0}, subfiles={1}".format(dataset, fns))
+    raise Exception("Need to specify at least one sample: dataset={0}, subfiles={1}, good_samp={2}".format(dataset, fns, good_samp))
 assert(len(good_samp) == 1)
 
 print 'Running over sample: {0}'.format(good_samp)
@@ -70,7 +69,7 @@ output_service = cfg.Service(
 )
 
 inputSamples = []
-for s in samples:
+for sn, s in samples_dict.items():
     sample_ngen = s.nGen.value()
     if (sample_ngen<0):
         sample_ngen = getSampleNGen(s)

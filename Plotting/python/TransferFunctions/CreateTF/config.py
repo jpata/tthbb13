@@ -14,20 +14,23 @@ config.dat.
 # Imports
 ########################################
 
-import pickle
+import pickle, json
 import os
 import shutil
 import copy
-from TFClasses import function
 
 import time
 import datetime
 
+from TFClasses import function
+import TTH.MEAnalysis.samples as samples
+
+
 ########################################
-# Main
+# Make_config
 ########################################
 
-def Make_config():
+def Make_config(tf_gc_path, filename):
 
     config = {}
 
@@ -48,19 +51,11 @@ def Make_config():
     # I/O information
     ########################################
 
-    #config['input_root_file_name'] = '/scratch/tklijnsm/V10_full_jets_TTBarH.root'
-    #config['input_root_file_name'] = '/scratch/tklijnsm/V11_full_jets_0.3delR.root'
-    #config['input_root_file_name'] = '/shome/tklijnsm/Samples/TFsamples/V11_full_subjets_0.3delR.root'
-
-    #config['input_root_file_name'] = '/shome/tklijnsm/Samples/TFsamples/CUSTOMTFFILE_V12_FULL_SUBJETS_NC.root'
-
-    #config['input_root_file_name'] = '/shome/tklijnsm/Samples/V12TFsamples/CUSTOMTFFILE_V12_FULL_JETS.root'
-    config['input_root_file_name'] = '/shome/tklijnsm/Samples/V12TFsamples/CUSTOMTFFILE_V12_FULL_SUBJETS.root'
+    config['input_root_file_name'] = '{0}/{1}/*.root'.format(tf_gc_path, filename)
 
     config['input_tree_name'] = 'tree'
 
-    #config['outputdir'] = 'V12_REALFULL_JETS'
-    config['outputdir'] = 'V12_REALFULL_SUBJETS'
+    config['outputdir'] = filename
 
         
     config['SBF_fitted_hists_pickle_filename'] = \
@@ -78,7 +73,7 @@ def Make_config():
 
     # Specify the number of entries if only a limited number of entries is used
     #   This number is not used if Use_limited_entries is set to False
-    config['n_entries_limited'] = 100000
+    config['n_entries_limited'] = 10000
 
     # Specify whether to make a TF from E_mc to E_reco, or Pt_mc to Pt_reco
     config['Use_Pt'] = True
@@ -339,7 +334,9 @@ def Make_config():
     ########################################
 
     f = open( 'config.dat', 'wb' )
-    pickle.dump( config , f )
+    pickle.dump( config , f)
+    print config
+    f.close()
 
     print "config.dat created"
 
@@ -349,12 +346,21 @@ def Make_config():
 
     shutil.copyfile( 'config.py', 'configs/{0}/config.py'.format(
         config['outputdir'] ) )
+    shutil.copyfile( 'config.dat', 'configs/{0}/config.dat'.format(
+        config['outputdir'] ) )
+
 
 ########################################
-# End of Main
+# Main
 ########################################
 def main():
-    Make_config()
+
+    # !!! Change this line to point to output from make_TF.sh gridcontrol run !!!
+    path = "root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat///store/user/gregor/tth/gc/makeTF/GCff1ec5951d47"
+
+    for jettype in ["resolved", "subjet"]:
+        Make_config(path, '{0}_{1}'.format(samples.version, jettype))
+
 
 if __name__ == "__main__":
   main()

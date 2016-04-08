@@ -10,8 +10,17 @@ processes = [
     "ttbarOther",
 ]
 
-channels = ["sl_jge6_tge4"]
-hist = "mem_d_nomatch_0"
+channels = [
+    "sl_j4_t3_blrH",
+    "sl_j4_t3_blrL",
+    "sl_j5_t3_blrH",
+    "sl_j5_t3_blrL",
+    "sl_jge6_t3_blrH",
+    "sl_jge6_t3_blrL",
+    "sl_jge6_tge4_blrH",
+    "sl_jge6_tge4_blrL"
+]
+hist = "mem_SL_0w2h2t"
 
 
 of = ROOT.TFile("fakeData.root", "RECREATE")
@@ -28,5 +37,6 @@ for ch in channels:
     of.mkdir(outdir)
     outdir = of.Get(outdir)
     h.SetDirectory(outdir)
-of.Write()
+    outdir.Write()
+#of.Write()
 of.Close()

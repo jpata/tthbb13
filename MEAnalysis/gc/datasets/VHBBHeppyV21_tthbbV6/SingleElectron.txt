@@ -1,0 +1,3 @@
+[SingleElectron]
+/store/user/jpata/tth/VHBBHeppyV21_tthbbV6_datav1/SingleElectron/VHBBHeppyV21_tthbbV6_datav1_SingleElectron__Run2015D-16Dec2015-v1/160331_092559/0000/tree_33.root = 0
+/store/user/jpata/tth/VHBBHeppyV21_tthbbV6_datav1/SingleElectron/VHBBHeppyV21_tthbbV6_datav1_SingleElectron__Run2015D-16Dec2015-v1/160331_092559/0000/tree_39.root = 58

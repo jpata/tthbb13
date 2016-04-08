@@ -52,7 +52,7 @@ def Fit_DG( hist, f_DG_in_main, config ):
 # Main
 ########################################
 
-def Fit_Single_Bins():
+def Fit_Single_Bins(conffile):
 
     ROOT.gROOT.SetBatch(True)
     #ROOT.gROOT.ProcessLine("gErrorIgnoreLevel = 1001;")
@@ -63,7 +63,7 @@ def Fit_Single_Bins():
 
 
     # Load config.dat
-    pickle_f = open( 'config.dat', 'rb' )
+    pickle_f = open( conffile, 'rb' )
     config = pickle.load( pickle_f )
     pickle_f.close()
 
@@ -186,6 +186,7 @@ def Fit_Single_Bins():
                     config['eta_axis'][i_eta+1] ]
 
                 fit_dict['E_value'] = dic['E_values'][i_eta][i_E]
+                fit_dict['E_bounds'] = [ dic['E_axis'][i_eta][i_E], dic['E_axis'][i_eta][i_E+1] ]
 
                 for i in range( n_fit_params ):
                     fitfunc.par_values.append( f1.GetParameter(i) )
