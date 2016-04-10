@@ -65,7 +65,6 @@ dl_categories = [
         name = "dl_j3_t2",
         cuts = [("numJets", 3, 4), ("nBCSVM", 2, 3)],
         samples = base_samples,
-        sparse_input_file = "/mnt/t3nfs01/data01/shome/gregor/sparse_Apr1.root",
         data_samples = dl_data,
         signal_processes = signal_processes,
         common_shape_uncertainties = common_shape_uncertainties,
@@ -81,7 +80,8 @@ all_cats = make_control_categories(dl_categories)
 analysis = Analysis(
     samples = base_samples,
     categories = all_cats,
-    sparse_input_file = "/mnt/t3nfs01/data01/shome/gregor/sparse_Apr1.root",
+    #sparse_input_file = "root://t3se01.psi.ch///store/user/jpata/tth/histograms/April2016A/sparse_Apr5.root",
+    sparse_input_file = "/home/joosep/public_html/tth/histograms/April2016A/sparse_Apr5.root",
     groups = {
         "dl": dl_categories,
     },

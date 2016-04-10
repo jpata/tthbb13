@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/uSr/bin/env python
 
 #Need to enable ROOT batch mode to prevent it from importing libXpm, which may cause a crash
 import ROOT
@@ -17,29 +17,19 @@ import TTH.MEAnalysis.TFClasses as TFClasses
 import sys
 sys.modules["TFClasses"] = TFClasses
 
-from TTH.MEAnalysis.MEAnalysis_heppy import sequence, samples_dict
+from TTH.MEAnalysis.MEAnalysis_heppy import sequence
+from TTH.MEAnalysis.samples import samples_dict
 from TTH.MEAnalysis.samples_base import getSitePrefix
+import FWCore.ParameterSet.Config as cms
 
 firstEvent = int(os.environ["SKIP_EVENTS"])
 nEvents = int(os.environ["MAX_EVENTS"])
-
 fns = os.environ["FILE_NAMES"].split()
-
 dataset = os.environ["DATASETPATH"]
 
-# Added by Thomas:
-#dataset = 'V11_tth_13tev'
-
-print 'Dataset:'
-print dataset
-print 'Filenames:'
-print fns
-
-#Create a list of samples to run
-#fill the subFiles of the samples from
-#the supplied file names
 good_samp = []
 print "processing dataset={0}".format(dataset)
+print "event range firstEvent={0} nEvents={1}".format(firstEvent, nEvents)
 
 for ns in samples_dict.keys():
     if samples_dict[ns].name.value() == dataset:
@@ -76,7 +66,7 @@ for sn, s in samples_dict.items():
     inputSample = cfg.Component(
         'tth',
         files = s.subFiles.value(),
-        tree_name = "tree",
+        tree_name = s.treeName.value(),
         n_gen = sample_ngen,
         xs = s.xSec.value()
     )
@@ -105,7 +95,7 @@ looper = Looper('Loop',
     config,
     nPrint = 0,
     firstEvent=firstEvent,
-    nEvents = nEvents
+    nEvents=nEvents
 )
 
 looper.loop()
