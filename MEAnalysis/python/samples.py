@@ -2,7 +2,6 @@
 # Made by prepareSamples.py
 # do NOT modify (except to skip individual samples)
 
-
 from TTH.MEAnalysis.samples_base import *
 import FWCore.ParameterSet.Config as cms
 

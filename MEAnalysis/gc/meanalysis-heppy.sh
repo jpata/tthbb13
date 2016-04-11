@@ -30,12 +30,12 @@ echo "MEAnalysis is done"
 
 #copy output
 ME_CONF_NAME=$(basename "$ME_CONF")
-#export SRMBASE=srm://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/
-export SRMBASE=/hdfs/local/joosep/tth/
+export SRMBASE=srm://t3se01.psi.ch/pnfs/lcg.cscs.ch/cms/trivcat/
+#export SRMBASE=/hdfs/local/joosep/tth/
 OUTDIR=${TASK_ID}/${ME_CONF_NAME%.*}/${DATASETPATH}/
 mkdir -p $SRMBASE/$OUTDIR || true
 echo "copying output"
 OFNAME=$OUTDIR/output_${MY_JOBID}.root
-cp $MY_SCRATCH/Loop/tree.root $SRMBASE/$OFNAME
+gfal-copy://$MY_SCRATCH/Loop/tree.root $SRMBASE/$OFNAME
 echo $OFNAME > output.txt
 

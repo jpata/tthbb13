@@ -1,4 +1,5 @@
 from TTH.MEAnalysis.MEAnalysis_cfg_heppy import Conf
+import os
 
-Conf.general["sampleFile"] = "/home/joosep/joosep-mac/Documents/tth/sw-slc6/CMSSW_7_4_15/src/TTH/MEAnalysis/python/samples_local.py"
+Conf.general["sampleFile"] = os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/python/samples_local.py"
 Conf.mem["enabled"] = True

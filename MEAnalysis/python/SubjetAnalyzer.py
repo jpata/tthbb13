@@ -523,7 +523,8 @@ class SubjetAnalyzer(FilterAnalyzer):
 
     # ==============================================================================
     def Get_Subjets( self, top ):
-
+        if top is None:
+            return []
         top_subjets = []
         for prefix in [ 'sjW1', 'sjW2', 'sjNonW' ]:
             x = Jet_container(
@@ -958,13 +959,7 @@ class SubjetAnalyzer(FilterAnalyzer):
             gentops, 'gentop',
             R_cut = self.R_cut_fatjets )
 
-        #print "nmatched ", n_matched_gentop
-
-        #for l in event.topCandidate:
-        #    print "BOOSTED TOP                 " , l.pt, l.eta, l.phi, hasattr( l, 'matched_gentop' )
-
         for l in gentops:
-         #   print "GENTOP PT ETA PHI PDG match " , l.pt, l.eta, l.phi, l.pdgId, hasattr( l, 'matched_topcand' )
             if hasattr( l, 'matched_topcand' ):
                 event.matched_TTgentop_pt= l.pt
         

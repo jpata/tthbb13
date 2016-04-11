@@ -19,13 +19,10 @@ from TTH.MEAnalysis.samples_base import getSitePrefix
 #Create configuration object based on environment variables
 #if one runs with ME_CONF=/path/to/conffile.py, then the configuration is loaded from that file
 #otherwise, the default config is used
-# if os.environ.has_key("ME_CONF"):
-#     print "Loading ME config from", os.environ["ME_CONF"]
-#     meconf = imp.load_source("meconf", os.environ["ME_CONF"])
-#     from meconf import Conf
-if 1:
-    print "Loading ME config from TTH.MEAnalysis.cfg_FH" #DS
-    from TTH.MEAnalysis.cfg_FH import Conf 
+if os.environ.has_key("ME_CONF"):
+    print "Loading ME config from", os.environ["ME_CONF"]
+    meconf = imp.load_source("meconf", os.environ["ME_CONF"])
+    from meconf import Conf
 else:
     print "Loading ME config from TTH.MEAnalysis.MEAnalysis_cfg_heppy"
     from TTH.MEAnalysis.MEAnalysis_cfg_heppy import Conf

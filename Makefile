@@ -38,11 +38,11 @@ test_Plotting_btaghists: test_mkdir
 
 test_MEAnalysis: test_mkdir
 	rm -Rf MEAnalysis/Loop_*
-	cd MEAnalysis && ME_CONF=python/cfg_noME.py python python/MEAnalysis_heppy.py &> $(test_out_dir)/MEAnalysis_MEAnalysis_heppy.log
+	cd MEAnalysis && INPUT_FILE=$(testfile_vhbb_tthbb) ME_CONF=python/cfg_local.py python python/MEAnalysis_heppy.py &> $(test_out_dir)/MEAnalysis_MEAnalysis_heppy.log
 	sleep 5
-	du -csh MEAnalysis/Loop_ttHTobb_M125_13TeV_powheg_pythia8/tree.root &>> $(test_out_dir)/MEAnalysis_MEAnalysis_heppy.log
-	python -c "import ROOT; f=ROOT.TFile('MEAnalysis/Loop_ttHTobb_M125_13TeV_powheg_pythia8/tree.root'); print f.Get('tree').GetEntries()" &>> $(test_out_dir)/MEAnalysis_MEAnalysis_heppy.log
-	cp MEAnalysis/Loop_ttHTobb_M125_13TeV_powheg_pythia8/tree.root $(test_out_dir)/MEAnalysis_MEAnalysis_heppy.root
+	du -csh MEAnalysis/Loop_sample/tree.root &>> $(test_out_dir)/MEAnalysis_MEAnalysis_heppy.log
+	python -c "import ROOT; f=ROOT.TFile('MEAnalysis/Loop_sample/tree.root'); print f.Get('tree').GetEntries()" &>> $(test_out_dir)/MEAnalysis_MEAnalysis_heppy.log
+	cp MEAnalysis/Loop_sample/tree.root $(test_out_dir)/MEAnalysis_MEAnalysis_heppy.root
 
 test_MEAnalysis_withme: test_mkdir
 	rm -Rf MEAnalysis/Loop_*
