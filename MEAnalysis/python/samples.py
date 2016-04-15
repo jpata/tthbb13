@@ -14,7 +14,7 @@ samples_dict = {
             nickname = cms.string("TTTo2L2Nu_13TeV-powheg"),
             xSec     = cms.double("1"),
             nGen     = cms.int64(0),
-            skip     = cms.bool(False),
+            skip     = cms.bool(True), #DS
             isMC     = cms.bool(True),
             treeName = cms.string("vhbb/tree"),
             subFiles = cms.vstring(get_files(datasetpath + "TTTo2L2Nu_13TeV-powheg.txt")),
@@ -25,7 +25,7 @@ samples_dict = {
             nickname = cms.string("ttH_Hbb"),
             xSec     = cms.double("0.2934045"),
             nGen     = cms.int64(0),
-            skip     = cms.bool(False),
+            skip     = cms.bool(True), #DS
             isMC     = cms.bool(True),
             treeName = cms.string("vhbb/tree"),
             subFiles = cms.vstring(get_files(datasetpath + "ttHTobb_M125_13TeV_powheg_pythia8.txt")),
@@ -36,7 +36,7 @@ samples_dict = {
             nickname = cms.string("TT_TuneCUETP8M1_13TeV-powheg-pythia8"),
             xSec     = cms.double("831.76"),
             nGen     = cms.int64(0),
-            skip     = cms.bool(False),
+            skip     = cms.bool(True), #DS
             isMC     = cms.bool(True),
             treeName = cms.string("vhbb/tree"),
             subFiles = cms.vstring(get_files(datasetpath + "TT_TuneCUETP8M1_13TeV-powheg-pythia8.txt")),
@@ -47,7 +47,7 @@ samples_dict = {
             nickname = cms.string("ttH_Hnonbb"),
             xSec     = cms.double("0.2150955"),
             nGen     = cms.int64(0),
-            skip     = cms.bool(False),
+            skip     = cms.bool(True), #DS
             isMC     = cms.bool(True),
             treeName = cms.string("vhbb/tree"),
             subFiles = cms.vstring(get_files(datasetpath + "ttHToNonbb_M125_13TeV_powheg_pythia8.txt")),
@@ -58,9 +58,76 @@ samples_dict = {
             nickname = cms.string("TTToSemiLeptonic_13TeV-powheg"),
             xSec     = cms.double("1"),
             nGen     = cms.int64(0),
-            skip     = cms.bool(False),
+            skip     = cms.bool(True), #DS
             isMC     = cms.bool(True),
             treeName = cms.string("vhbb/tree"),
             subFiles = cms.vstring(get_files(datasetpath + "TTToSemiLeptonic_13TeV-powheg.txt")),
         ),
+
+        "QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": cms.PSet(
+            name     = cms.string("QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"),
+            nickname = cms.string("QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"),
+            xSec     = cms.double("1"),
+            nGen     = cms.int64(0),
+            skip     = cms.bool(True), #DS
+            isMC     = cms.bool(True),
+            treeName = cms.string("tree"),
+            subFiles = cms.vstring(get_files(datasetpath + "QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt")),
+        ),
+
+        "QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": cms.PSet(
+            name     = cms.string("QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"),
+            nickname = cms.string("QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"),
+            xSec     = cms.double("1"),
+            nGen     = cms.int64(0),
+            skip     = cms.bool(True), #DS
+            isMC     = cms.bool(True),
+            treeName = cms.string("tree"),
+            subFiles = cms.vstring(get_files(datasetpath + "QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt")),
+        ),
+
+        "QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": cms.PSet(
+            name     = cms.string("QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"),
+            nickname = cms.string("QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"),
+            xSec     = cms.double("1"),
+            nGen     = cms.int64(0),
+            skip     = cms.bool(True), #DS
+            isMC     = cms.bool(True),
+            treeName = cms.string("tree"),
+            subFiles = cms.vstring(get_files(datasetpath + "QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt")),
+        ),
+
+        "QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": cms.PSet(
+            name     = cms.string("QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"),
+            nickname = cms.string("QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"),
+            xSec     = cms.double("1"),
+            nGen     = cms.int64(0),
+            skip     = cms.bool(True), #DS
+            isMC     = cms.bool(True),
+            treeName = cms.string("tree"),
+            subFiles = cms.vstring(get_files(datasetpath + "QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt")),
+        ),
+
+        "QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": cms.PSet(
+            name     = cms.string("QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"),
+            nickname = cms.string("QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"),
+            xSec     = cms.double("1"),
+            nGen     = cms.int64(0),
+            skip     = cms.bool(True), #DS
+            isMC     = cms.bool(True),
+            treeName = cms.string("tree"),
+            subFiles = cms.vstring(get_files(datasetpath + "QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt")),
+        ),
+
+        "QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": cms.PSet(
+            name     = cms.string("QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"),
+            nickname = cms.string("QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"),
+            xSec     = cms.double("1"),
+            nGen     = cms.int64(0),
+            skip     = cms.bool(False), #DS
+            isMC     = cms.bool(True),
+            treeName = cms.string("tree"),
+            subFiles = cms.vstring(get_files(datasetpath + "QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt")),
+        ),
+
     }

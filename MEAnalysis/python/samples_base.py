@@ -97,7 +97,8 @@ def get_files(fname):
     return lines
 
 def getSitePrefix(fn=""):
-    return "root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat" + fn
+    #return "root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat" + fn
+    return "root://xrootd-cms.infn.it/" + fn #DS
 
 def getSampleNGen(sample):
     import ROOT
