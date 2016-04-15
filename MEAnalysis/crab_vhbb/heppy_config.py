@@ -1,1 +1,1 @@
-../../../VHbbAnalysis/Heppy/test/vhbb_combined_data.py
+../../../VHbbAnalysis/Heppy/test/vhbb_combined.py
