@@ -30,7 +30,7 @@ class CommonClassifierAnalyzer(FilterAnalyzer):
                 event.systResults[syst] = res
             else:
                 event.systResults[syst].passes_mecat = False
-        return self.conf.general["passall"] or np.any([v.passes_mecat for v in event.systResults.values()])
+        return self.conf.general["passall"] # or np.any([v.passes_mecat for v in event.systResults.values()]) #DS np not defined
 
     def _process(self, event):
 

@@ -308,6 +308,7 @@ class Conf:
                 (event.is_sl and event.nBCSVM >= 4)
                 or (event.is_dl and event.nBCSVM >= 3)
             )
+            or event.is_fh #DS
         ),
         
         #This configures what the array elements mean

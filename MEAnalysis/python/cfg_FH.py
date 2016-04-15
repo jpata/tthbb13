@@ -12,7 +12,8 @@ for k, v in Conf.mem_configs.items():
 #    Conf.mem_configs[k].cfg.is_default = False #must be false to set n_max_calls
 
 #other options
-Conf.general["passall"] = False
+Conf.general["passall"] = True #DS
+Conf.general["systematics"] = ["nominal"] #DS
 Conf.leptons["selection"] = lambda event: event.is_fh
 Conf.jets["untaggedSelection"] = "btagCSV"
 Conf.jets["NJetsForBTagLR"] = 8
@@ -37,23 +38,23 @@ Conf.mem["methodsToRun"] = (
             #"SL_2w2h2t_memLR",           #[7]
             #"SL_0w2h2t_memLR",           #[8]
             #"DL_0w2h2t_Rndge4t",         #[9]
-            #"FH_4w2h2t", #8j,4b & 9j,4b  #[10]
-            #"FH_3w2h2t", #7j,4b          #[11]
-            #"FH_4w2h1t", #7j,3b & 8j,3b  #[12]
-            "FH_0w2h2t", #all 4b cats    #[13]
-            "FH_0w2h1t", #all cats       #[14]
-            "FH_0w1h2t"  #all cats       #[15]            
+            "FH_4w2h2t", #8j,4b & 9j,4b  #[10]
+            "FH_3w2h2t", #7j,4b          #[11]
+            "FH_4w2h1t", #7j,3b & 8j,3b  #[12]
+            #"FH_0w2h2t", #all 4b cats    #[13]
+            #"FH_0w2h1t", #all cats       #[14]
+            #"FH_0w1h2t"  #all cats       #[15]            
         )
 Conf.mem["categories"] = (
             #"cat1",
             #"cat2",
             #"cat3",
             #"cat6",
-            #"cat7",
+            "cat7",
             "cat8",
             #"cat9",
-            #"cat10",
-            #"cat11",
+            "cat10",
+            "cat11",
             #"cat12", #9j,3b
         )
 
