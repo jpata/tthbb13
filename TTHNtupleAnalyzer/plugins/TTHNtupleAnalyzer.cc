@@ -238,6 +238,7 @@ template <typename JetType, typename CollectionType, typename JetTokenType>
 void fill_fatjet_branches(const edm::Event& iEvent, 
 			  TTHTree* tthtree,
  			  JetTokenType fj_token,
+ 			  JetTokenType fj_token_initial,
 			  edm::EDGetTokenT<edm::ValueMap<float>> fatjetNsubTau1Token,
 			  edm::EDGetTokenT<edm::ValueMap<float>> fatjetNsubTau2Token,
 			  edm::EDGetTokenT<edm::ValueMap<float>> fatjetNsubTau3Token,
@@ -322,10 +323,15 @@ void fill_fatjet_branches(const edm::Event& iEvent,
     iEvent.getByToken(fatjetFlavInfoToken, JetFlavourInfos);
   }
 
-  // JetCorrector
+  // JetCorrector and ungroomed jets
   edm::Handle<reco::JetCorrector> corrector;
-  if (fj_corrector_name != "None")
+  edm::Handle<CollectionType>  fatjets_initial;  
+
+  if (fj_corrector_name != "None") {
     iEvent.getByToken(jetCorrectorToken, corrector);
+    iEvent.getByToken(fj_token_initial, fatjets_initial);
+  }
+
 
   // Loop over fatjets
   for (unsigned n_fat_jet = 0; n_fat_jet != fatjets->size(); n_fat_jet++){
@@ -333,12 +339,45 @@ void fill_fatjet_branches(const edm::Event& iEvent,
     const JetType& x = (*fatjets).at(n_fat_jet);
            
     LogDebug("fat jets") << "n_fat_jet=" << n_fat_jet << CANDPRINT(x);
+
 	    	    
     std::string prefix("jet_");
     prefix.append(fj_branches_name);
     prefix.append("__");
+   
+    // Jet mass calibration
+    float corr_factor = 1;
+
+    if (fj_corrector_name != "None") {
+      
+      float closest_dr = 100;
+      int closest_ungroomed = -1;      
+
+      // Get the matching (in dR ungroomed jet)      
+      for (unsigned n_fat_jet_initial = 0; n_fat_jet_initial != fatjets_initial->size(); n_fat_jet_initial++){	    
+	  const JetType& y = (*fatjets_initial).at(n_fat_jet_initial);	  
+	  float dr = ROOT::Math::VectorUtil::DeltaR(x.p4(), y.p4());
+	  
+	  if (dr < closest_dr){
+	    closest_dr = dr;	    
+	    closest_ungroomed = n_fat_jet_initial;
+	  }	   
+      }
+      
+      // Take the closest matching jet within Delta R < 0.5
+      // Otherwise don't get calibration
+      float max_dr_for_calibration_match = 0.5;
+      if ( closest_dr < max_dr_for_calibration_match && closest_ungroomed > -1){
+
+	const JetType& jet_for_calib = (*fatjets_initial).at(closest_ungroomed);	  
+	corr_factor = corrector->correction(jet_for_calib);
+      }
+      
+    } 
+    
 
 
+    // Fill 2D Maps
     if (fj_branches_name == "ak08gen" && n_fat_jet < 10) {    
 
       float *emap      = tthtree->get_address<float *>(prefix + "emap");
@@ -375,10 +414,6 @@ void fill_fatjet_branches(const edm::Event& iEvent,
 	     
     }
 
-    // Get the correction factor for this jet
-    float corr_factor = 1;
-    if (fj_corrector_name != "None")
-      corr_factor = corrector->correction(x);
 
 
     // Turn the branch address into the actual object we want to fill
@@ -532,6 +567,7 @@ private:
         // usesubjets = either use that jet object or the "SubJets" field
         // !!the lists have to be in sync!!
 	const std::vector<std::string> fatjet_objects_;
+	const std::vector<std::string> fatjet_initial_objects_;
 	const std::vector<std::string> fatjet_nsubs_;
 	const std::vector<std::string> fatjet_sds_;
 	const std::vector<std::string> fatjet_btags_;
@@ -547,6 +583,7 @@ private:
         // Use a vector of pointers to token for convenience
         // extra vecotrs for the tokens themselves so they don't garbabe collected
         std::vector<int> tokenIndex_;
+        std::vector<int> initialTokenIndex_;
         std::vector<edm::EDGetTokenT< std::vector<reco::PFJet> >> pfjetTokens_;
         std::vector<edm::EDGetTokenT< std::vector<reco::GenJet> >> genjetTokens_;
        
@@ -622,6 +659,7 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
 
 	       					  
         fatjet_objects_(iConfig.getParameter<std::vector<std::string>>("fatjetsObjects")),
+        fatjet_initial_objects_(iConfig.getParameter<std::vector<std::string>>("fatjetsInitialObjects")),
         fatjet_nsubs_(iConfig.getParameter<std::vector<std::string>>("fatjetsNsubs")),
         fatjet_sds_(iConfig.getParameter<std::vector<std::string>>("fatjetsSDs")),
         fatjet_btags_(iConfig.getParameter<std::vector<std::string>>("fatjetsBtags")),
@@ -682,6 +720,7 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
     cmsttBtagsTokens_.push_back( consumes<reco::JetTagCollection>(it));    
   }
 
+
   // Produce Subjet Tokens
   for (unsigned int i=0; i < fatjet_objects_.size(); i++){
     edm::InputTag it;
@@ -700,6 +739,26 @@ TTHNtupleAnalyzer::TTHNtupleAnalyzer(const edm::ParameterSet& iConfig) :
       pfjetTokens_.push_back( consumes<std::vector<reco::PFJet>>(it));
     }
   }
+
+  // Produce extra tokens for initial/ungroomed jet collections
+  // (used for calibration at the moment)
+  for (unsigned int i=0; i < fatjet_initial_objects_.size(); i++){
+
+    edm::InputTag it = edm::InputTag(fatjet_initial_objects_[i],"");
+
+    // We're using the fact that fatjet_isgen, fatjet_objects and fatjet_initial_objects are all in sync
+    if (fatjet_isgen_[i]){
+      initialTokenIndex_.push_back(genjetTokens_.size());           
+      genjetTokens_.push_back( consumes<std::vector<reco::GenJet>>(it));
+    }
+    else{
+      initialTokenIndex_.push_back(pfjetTokens_.size());
+      pfjetTokens_.push_back( consumes<std::vector<reco::PFJet>>(it));
+    }
+  }
+
+
+
 
   // Produce NSubjettiness Tokens
   for (unsigned int i=0; i < fatjet_nsubs_.size(); i++){    
@@ -841,6 +900,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
 	// Sanity check the fatjet lists-of-names
 	assert(fatjet_objects_.size()==fatjet_nsubs_.size());
+	assert(fatjet_objects_.size()==fatjet_initial_objects_.size());
 	assert(fatjet_objects_.size()==fatjet_sds_.size());
 	assert(fatjet_objects_.size()==fatjet_btags_.size());
 	assert(fatjet_objects_.size()==fatjet_qvols_.size());
@@ -1209,6 +1269,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	    fill_fatjet_branches<reco::GenJet, std::vector<reco::GenJet>, edm::EDGetTokenT< std::vector<reco::GenJet> > >(iEvent, 
 															  tthtree, 
 															  genjetTokens_[tokenIndex_[i_fj_coll]],
+															  genjetTokens_[initialTokenIndex_[i_fj_coll]],
 															  fatjetNsubTau1Tokens_[i_fj_coll], 
 															  fatjetNsubTau2Tokens_[i_fj_coll],
 															  fatjetNsubTau3Tokens_[i_fj_coll],
@@ -1237,6 +1298,7 @@ TTHNtupleAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	    fill_fatjet_branches<reco::PFJet, std::vector<reco::PFJet>, edm::EDGetTokenT< std::vector<reco::PFJet> > >(iEvent, 
 														       tthtree, 
 														       pfjetTokens_[tokenIndex_[i_fj_coll]],
+														       pfjetTokens_[initialTokenIndex_[i_fj_coll]],
 														       fatjetNsubTau1Tokens_[i_fj_coll], 
 														       fatjetNsubTau2Tokens_[i_fj_coll],
 														       fatjetNsubTau3Tokens_[i_fj_coll],

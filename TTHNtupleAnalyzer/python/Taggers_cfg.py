@@ -123,8 +123,9 @@ from RecoJets.JetProducers.GenJetParameters_cfi import *
 
 
 # Setup fatjet collections to store
-li_fatjets_objects       = []
-li_fatjets_branches      = []
+li_fatjets_objects            = []
+li_fatjets_initial_objects    = []
+li_fatjets_branches           = []
 li_ungroomed_fatjets_objects  = []
 li_ungroomed_fatjets_branches = []
 
@@ -145,6 +146,7 @@ if DO_R08:
    getattr(process, fj_name).src = cms.InputTag("chs")
    getattr(process, fj_name).jetPtMin = cms.double(200)
    li_fatjets_objects.append(fj_name)
+   li_fatjets_initial_objects.append(fj_name)
    li_fatjets_branches.append(branch_name)
    li_ungroomed_fatjets_objects.append(fj_name)
    li_ungroomed_fatjets_branches.append(branch_name)
@@ -162,6 +164,7 @@ if DO_R08:
    getattr(process, fj_name).jetPtMin = cms.double(200)
    li_fatjets_objects.append(fj_name)
    li_fatjets_branches.append(branch_name)
+   li_fatjets_initial_objects.append(fj_name)
    li_ungroomed_fatjets_objects.append(fj_name)
    li_ungroomed_fatjets_branches.append(branch_name)
 
@@ -178,6 +181,7 @@ if DO_R08:
    getattr(process, fj_name).jetPtMin = cms.double(200)
    getattr(process, fj_name).jetType = cms.string('GenJet')
    li_fatjets_objects.append(fj_name)
+   li_fatjets_initial_objects.append(fj_name)
    li_fatjets_branches.append(branch_name)
    li_ungroomed_fatjets_objects.append(fj_name)
    li_ungroomed_fatjets_branches.append(branch_name)
@@ -195,6 +199,7 @@ if DO_R15:
    getattr(process, fj_name).src = cms.InputTag("chs")
    getattr(process, fj_name).jetPtMin = cms.double(200)
    li_fatjets_objects.append(fj_name)
+   li_fatjets_initial_objects.append(fj_name)
    li_fatjets_branches.append(branch_name)
    li_ungroomed_fatjets_objects.append(fj_name)
    li_ungroomed_fatjets_branches.append(branch_name)
@@ -211,6 +216,7 @@ if DO_R15:
    getattr(process, fj_name).src = cms.InputTag("puppi")
    getattr(process, fj_name).jetPtMin = cms.double(200)
    li_fatjets_objects.append(fj_name)
+   li_fatjets_initial_objects.append(fj_name)
    li_fatjets_branches.append(branch_name)
    li_ungroomed_fatjets_objects.append(fj_name)
    li_ungroomed_fatjets_branches.append(branch_name)
@@ -290,7 +296,8 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
       writeCompound = cms.bool(True),
       jetCollInstanceName=cms.string("SubJets"),
    ))
-   li_fatjets_objects.append(fj_name)        
+   li_fatjets_objects.append(fj_name)     
+   li_fatjets_initial_objects.append(ungroomed_fj_name)   
    li_fatjets_branches.append(branch_name)
 
    name = "trimmedr2f6forbtag"   
@@ -305,6 +312,7 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
       jetCollInstanceName=cms.string("SubJets"),
    ))
    li_fatjets_objects.append(fj_name)        
+   li_fatjets_initial_objects.append(ungroomed_fj_name)   
    li_fatjets_branches.append(branch_name)
 
    name = "softdropz10b00forbtag"   
@@ -320,6 +328,7 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
            jetCollInstanceName=cms.string("SubJets")
    ))
    li_fatjets_objects.append(fj_name)        
+   li_fatjets_initial_objects.append(ungroomed_fj_name)   
    li_fatjets_branches.append(branch_name)
 
    name = "softdropz20b10forbtag"   
@@ -335,6 +344,7 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
            jetCollInstanceName=cms.string("SubJets")
    ))
    li_fatjets_objects.append(fj_name)        
+   li_fatjets_initial_objects.append(ungroomed_fj_name)   
    li_fatjets_branches.append(branch_name)
 
    name = "filteredn3r2forbtag"   
@@ -349,6 +359,7 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
       jetCollInstanceName=cms.string("SubJets")
    ))
    li_fatjets_objects.append(fj_name)        
+   li_fatjets_initial_objects.append(ungroomed_fj_name)   
    li_fatjets_branches.append(branch_name)
 
    name = "filteredn3r3forbtag"   
@@ -363,6 +374,7 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
       jetCollInstanceName=cms.string("SubJets")
    ))
    li_fatjets_objects.append(fj_name)        
+   li_fatjets_initial_objects.append(ungroomed_fj_name)   
    li_fatjets_branches.append(branch_name)
 
    name = "prunedn3z10rfac50forbtag"   
@@ -378,6 +390,7 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
       jetCollInstanceName=cms.string("SubJets")
    ))
    li_fatjets_objects.append(fj_name)        
+   li_fatjets_initial_objects.append(ungroomed_fj_name)   
    li_fatjets_branches.append(branch_name)
 
 
@@ -394,7 +407,8 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
         nFilt = cms.int32(3),
         rFilt = cms.double(0.2),
         useExplicitGhosts = cms.bool(True)))
-   li_fatjets_objects.append(fj_name)        
+   li_fatjets_objects.append(fj_name)     
+   li_fatjets_initial_objects.append(ungroomed_fj_name)      
    li_fatjets_branches.append(branch_name)
 
    name = "filteredn3r3"
@@ -406,6 +420,7 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
         rFilt = cms.double(0.3),
         useExplicitGhosts = cms.bool(True)))
    li_fatjets_objects.append(fj_name)        
+   li_fatjets_initial_objects.append(ungroomed_fj_name)   
    li_fatjets_branches.append(branch_name)
 
    name = "filteredn5r2"
@@ -417,6 +432,7 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
         rFilt = cms.double(0.2),
         useExplicitGhosts = cms.bool(True)))
    li_fatjets_objects.append(fj_name)        
+   li_fatjets_initial_objects.append(ungroomed_fj_name)   
    li_fatjets_branches.append(branch_name)
 
 
@@ -433,7 +449,8 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
         zcut = cms.double(0.1),
         rcut_factor = cms.double(0.5),
         useExplicitGhosts = cms.bool(True)))
-   li_fatjets_objects.append(fj_name)        
+   li_fatjets_objects.append(fj_name)       
+   li_fatjets_initial_objects.append(ungroomed_fj_name)    
    li_fatjets_branches.append(branch_name)
 
 
@@ -449,7 +466,8 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
       rFilt = cms.double(0.2),
       trimPtFracMin = cms.double(0.03),
       useExplicitGhosts = cms.bool(True)))
-   li_fatjets_objects.append(fj_name)        
+   li_fatjets_objects.append(fj_name)     
+   li_fatjets_initial_objects.append(ungroomed_fj_name)      
    li_fatjets_branches.append(branch_name)
 
    name = "trimmedr2f6"   
@@ -460,7 +478,8 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
       rFilt = cms.double(0.2),
       trimPtFracMin = cms.double(0.06),
       useExplicitGhosts = cms.bool(True)))
-   li_fatjets_objects.append(fj_name)        
+   li_fatjets_objects.append(fj_name)     
+   li_fatjets_initial_objects.append(ungroomed_fj_name)      
    li_fatjets_branches.append(branch_name)
 
    name = "trimmedr2f9"   
@@ -472,6 +491,7 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
       trimPtFracMin = cms.double(0.09),
       useExplicitGhosts = cms.bool(True)))
    li_fatjets_objects.append(fj_name)        
+   li_fatjets_initial_objects.append(ungroomed_fj_name)   
    li_fatjets_branches.append(branch_name)
 
 
@@ -489,6 +509,7 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
            R0 = cms.double(r),
            useExplicitGhosts = cms.bool(True)))
    li_fatjets_objects.append(fj_name)        
+   li_fatjets_initial_objects.append(ungroomed_fj_name)   
    li_fatjets_branches.append(branch_name)
 
    name = "softdropz10b00"   
@@ -501,6 +522,7 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
            R0 = cms.double(r),
            useExplicitGhosts = cms.bool(True)))
    li_fatjets_objects.append(fj_name)        
+   li_fatjets_initial_objects.append(ungroomed_fj_name)   
    li_fatjets_branches.append(branch_name)
 
    name = "softdropz10b10"   
@@ -513,6 +535,7 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
            R0 = cms.double(r),
            useExplicitGhosts = cms.bool(True)))
    li_fatjets_objects.append(fj_name)        
+   li_fatjets_initial_objects.append(ungroomed_fj_name)   
    li_fatjets_branches.append(branch_name)
 
    name = "softdropz10b20"   
@@ -525,6 +548,7 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
            R0 = cms.double(r),
            useExplicitGhosts = cms.bool(True)))
    li_fatjets_objects.append(fj_name)        
+   li_fatjets_initial_objects.append(ungroomed_fj_name)   
    li_fatjets_branches.append(branch_name)
 
    name = "softdropz15bm10"   
@@ -536,7 +560,8 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
            beta = cms.double(-1.0),
            R0 = cms.double(r),
            useExplicitGhosts = cms.bool(True)))
-   li_fatjets_objects.append(fj_name)        
+   li_fatjets_objects.append(fj_name)     
+   li_fatjets_initial_objects.append(ungroomed_fj_name)      
    li_fatjets_branches.append(branch_name)
 
    name = "softdropz15b00"   
@@ -548,7 +573,8 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
            beta = cms.double(0.0),
            R0 = cms.double(r),
            useExplicitGhosts = cms.bool(True)))
-   li_fatjets_objects.append(fj_name)        
+   li_fatjets_objects.append(fj_name)     
+   li_fatjets_initial_objects.append(ungroomed_fj_name)      
    li_fatjets_branches.append(branch_name)
 
    name = "softdropz15b10"   
@@ -561,6 +587,7 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
            R0 = cms.double(r),
            useExplicitGhosts = cms.bool(True)))
    li_fatjets_objects.append(fj_name)        
+   li_fatjets_initial_objects.append(ungroomed_fj_name)   
    li_fatjets_branches.append(branch_name)
 
    name = "softdropz15b20"   
@@ -573,6 +600,7 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
            R0 = cms.double(r),
            useExplicitGhosts = cms.bool(True)))
    li_fatjets_objects.append(fj_name)        
+   li_fatjets_initial_objects.append(ungroomed_fj_name)   
    li_fatjets_branches.append(branch_name)
 
 
@@ -585,7 +613,8 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
            beta = cms.double(0.0),
            R0 = cms.double(r),
            useExplicitGhosts = cms.bool(True)))
-   li_fatjets_objects.append(fj_name)        
+   li_fatjets_objects.append(fj_name)      
+   li_fatjets_initial_objects.append(ungroomed_fj_name)     
    li_fatjets_branches.append(branch_name)
 
    name = "softdropz20bm10"   
@@ -598,6 +627,7 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
            R0 = cms.double(r),
            useExplicitGhosts = cms.bool(True)))
    li_fatjets_objects.append(fj_name)        
+   li_fatjets_initial_objects.append(ungroomed_fj_name)   
    li_fatjets_branches.append(branch_name)
 
    name = "softdropz20b10"   
@@ -610,6 +640,7 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
            R0 = cms.double(r),
            useExplicitGhosts = cms.bool(True)))
    li_fatjets_objects.append(fj_name)        
+   li_fatjets_initial_objects.append(ungroomed_fj_name)   
    li_fatjets_branches.append(branch_name)
 
    name = "softdropz20b20"   
@@ -622,6 +653,7 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
            R0 = cms.double(r),
            useExplicitGhosts = cms.bool(True)))
    li_fatjets_objects.append(fj_name)        
+   li_fatjets_initial_objects.append(ungroomed_fj_name)   
    li_fatjets_branches.append(branch_name)
 
 
@@ -1249,16 +1281,17 @@ process.tthNtupleAnalyzer = cms.EDAnalyzer('TTHNtupleAnalyzer',
 	mets = cms.InputTag("slimmedMETs"),
 	lhe = cms.InputTag("externalLHEProducer"),
 
-        fatjetsObjects  = cms.vstring(li_fatjets_objects),
-        fatjetsNsubs    = cms.vstring(li_fatjets_nsubs),
-        fatjetsSDs      = cms.vstring(li_fatjets_sds),
-        fatjetsBtags    = cms.vstring(li_fatjets_btags),
-        fatjetsQvols    = cms.vstring(li_fatjets_qvols),
-        fatjetsBranches = cms.vstring(li_fatjets_branches),
-        fatjetsUsesubjets = cms.vint32(li_fatjets_use_subjets),                                           
-        fatjetsIsgen      = cms.vint32(li_fatjets_is_gen),                                         
-        fatjetsFlavourInfos = cms.vstring(li_fatjets_flavour_infos),                                           
-        fatjetsCorrectors   = cms.vstring(li_fatjets_correctors),                                           
+        fatjetsObjects        = cms.vstring(li_fatjets_objects),
+        fatjetsInitialObjects = cms.vstring(li_fatjets_initial_objects),
+        fatjetsNsubs          = cms.vstring(li_fatjets_nsubs),
+        fatjetsSDs            = cms.vstring(li_fatjets_sds),
+        fatjetsBtags          = cms.vstring(li_fatjets_btags),
+        fatjetsQvols          = cms.vstring(li_fatjets_qvols),
+        fatjetsBranches       = cms.vstring(li_fatjets_branches),
+        fatjetsUsesubjets     = cms.vint32(li_fatjets_use_subjets),                                           
+        fatjetsIsgen          = cms.vint32(li_fatjets_is_gen),                                         
+        fatjetsFlavourInfos   = cms.vstring(li_fatjets_flavour_infos),                                           
+        fatjetsCorrectors     = cms.vstring(li_fatjets_correctors),                                           
         
         httObjects  = cms.vstring(li_htt_branches), # Using branch names also as object names
         httBranches = cms.vstring(li_htt_branches),                                           
