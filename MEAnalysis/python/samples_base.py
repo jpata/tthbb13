@@ -97,7 +97,12 @@ def get_files(fname):
     return lines
 
 def getSitePrefix(fn=""):
-    return "root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat" + fn
+    if fn.startswith("/store"):
+        return "root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat" + fn
+    elif fn.startswith("file://"):
+        return fn
+    else:
+        raise Exception("Could not open file: {0}".format(fn))
 
 def getSampleNGen(sample):
     import ROOT

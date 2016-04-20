@@ -1,6 +1,6 @@
 import copy, math
 
-from TTH.MEAnalysis.vhbb_utils import lvec, MET
+from TTH.MEAnalysis.vhbb_utils import lvec, MET, autolog
 from TTH.MEAnalysis.Analyzer import FilterAnalyzer
 from TTH.MEAnalysis.JetAnalyzer import attach_jet_transfer_function
 
@@ -27,6 +27,9 @@ class GenTTHAnalyzer(FilterAnalyzer):
         return True
 
     def _process(self, event):
+
+        if "debug" in self.conf.general["verbosity"]:
+            autolog("GenTTHAnalyzer started")
 
         #Get light quarks from W/Z
         event.l_quarks_w = event.GenWZQuark
@@ -152,16 +155,16 @@ class GenTTHAnalyzer(FilterAnalyzer):
 
         if "gen" in self.conf.general["verbosity"]:
             for j in event.l_quarks_w:
-                print "gen q(W)", j.pt, j.eta, j.phi, j.mass, j.pdgId
+                autolog("gen q(W)", j.pt, j.eta, j.phi, j.mass, j.pdgId)
             for j in event.b_quarks_t:
-                print "gen b(t)", j.pt, j.eta, j.phi, j.mass, j.pdgId
+                autolog("gen b(t)", j.pt, j.eta, j.phi, j.mass, j.pdgId)
             for j in event.lep_top:
-                print "gen l(t)", j.pt, j.eta, j.phi, j.mass, j.pdgId
+                autolog("gen l(t)", j.pt, j.eta, j.phi, j.mass, j.pdgId)
             for j in event.nu_top:
-                print "gen n(t)", j.pt, j.eta, j.phi, j.mass, j.pdgId
+                autolog("gen n(t)", j.pt, j.eta, j.phi, j.mass, j.pdgId)
             for j in event.b_quarks_h:
-                print "gen b(h)", j.pt, j.eta, j.phi, j.mass, j.pdgId
-            print "gen cat", event.cat_gen, event.cat_gen_n
+                autolog("gen b(h)", j.pt, j.eta, j.phi, j.mass, j.pdgId)
+            autolog("gen cat", event.cat_gen, event.cat_gen_n)
 
 
         # In semi-leptonic events we need to figure out which top b is from
@@ -237,14 +240,14 @@ class GenTTHAnalyzer(FilterAnalyzer):
         event.nMatch_hb_btag = 0
         
         if "debug" in self.conf.general["verbosity"]:
-            print "nMatch {0}_{1}_{2} nMatch_btag {3}_{4}_{5}".format(
+            autolog("nMatch {0}_{1}_{2} nMatch_btag {3}_{4}_{5}".format(
                 event.nMatch_wq,
                 event.nMatch_tb,
                 event.nMatch_hb,
                 event.nMatch_wq_btag,
                 event.nMatch_tb_btag,
                 event.nMatch_hb_btag,
-            )
+            ))
         
         #Now check what each jet was matched to
         for ij, jet in enumerate(event.good_jets):
@@ -299,7 +302,7 @@ class GenTTHAnalyzer(FilterAnalyzer):
                 if not matched_pairs.has_key(ij):
                     continue
                 mlabel, midx, mdr, mlabel_num = matched_pairs[ij]
-                print "jet match", ij, mlabel, midx, mdr, jet.pt, matches[mlabel][midx].pt
+                autolog("jet match", ij, mlabel, midx, mdr, jet.pt, matches[mlabel][midx].pt)
 
         #reco-level tth-matched system
         spx = 0.0

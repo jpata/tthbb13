@@ -4,7 +4,7 @@ import copy
 import sys
 import numpy as np
 import math
-from TTH.MEAnalysis.vhbb_utils import lvec
+from TTH.MEAnalysis.vhbb_utils import lvec, autolog
 
 class Jet_container:
     def __init__(self, pt, eta, phi, mass):
@@ -68,6 +68,9 @@ class SubjetAnalyzer(FilterAnalyzer):
 
     def _process(self, event):
         event.passes_subjet = True
+        
+        if "debug" in self.conf.general["verbosity"]:
+            autolog("SubjetAnalyzer started")
 
         if "subjet" in self.conf.general["verbosity"]:
             print 'Printing from SubjetAnalyzer! iEv = {0}'.format(event.iEv)

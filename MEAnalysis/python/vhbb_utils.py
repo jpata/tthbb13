@@ -79,10 +79,11 @@ def autolog(*args):
     # be this function!!!
     func = inspect.currentframe().f_back.f_code
     message = ", ".join(map(str, args))
+    filename_last = func.co_filename.split("/")[-1]
     # Dump the message + the name of this function to the log.
     print "[%s %s:%i]: %s" % (
         func.co_name,
-        func.co_filename,
+        filename_last,
         func.co_firstlineno,
         message
     )

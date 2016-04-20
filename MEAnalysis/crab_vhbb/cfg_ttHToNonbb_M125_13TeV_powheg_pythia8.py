@@ -14,7 +14,7 @@ config.section_('Data')
 config.Data.inputDataset = '/ttHToNonbb_M125_13TeV_powheg_pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM'
 config.Data.outputDatasetTag = 'VHBBHeppyV21_tthbbV7_fh_ttHToNonbb_M125_13TeV_powheg_Py8__fall15MAv2-pu25ns15v1_76r2as_v12-v1'
 config.Data.totalUnits = -1
-config.Data.unitsPerJob = 100
+config.Data.unitsPerJob = 50
 config.Data.ignoreLocality = False
 config.Data.inputDBS = 'global'
 config.Data.splitting = 'LumiBased'

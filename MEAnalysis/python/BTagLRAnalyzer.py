@@ -5,7 +5,7 @@ import itertools
 import math
 
 from TTH.MEAnalysis.Analyzer import FilterAnalyzer
-from TTH.MEAnalysis.vhbb_utils import lvec
+from TTH.MEAnalysis.vhbb_utils import lvec, autolog
 
 import numpy as np
 Cvectoruint = getattr(ROOT, "std::vector<unsigned int>")
@@ -81,48 +81,8 @@ class BTagLRAnalyzer(FilterAnalyzer):
             self.get_pdf_prob(pdfs, "l", pt, eta, taggerval, kind)
         )
 
-    #def btag_likelihood(self, probs, nB, nC):
-    #    """
-    #    This is the outdated python function for evaluating the b-tag likelihood.
-    #    """
-
-    #    perms = itertools.permutations(range(len(probs)))
-
-    #    P = 0.0
-    #    max_p = -1.0
-    #    nperms = 0
-    #    best_perm = None
-
-    #    np = len(probs)
-    #    for perm in perms:
-    #        p = 1.0
-
-    #        for i in range(0, nB):
-    #            if i < np:
-    #                p *= probs[perm[i]][0]
-    #        for i in range(nB, min(nB + nC, np)):
-    #            if i < np:
-    #                p *= probs[perm[i]][1]
-    #        for i in range(nB + nC, np):
-    #            if i < np:
-    #                p *= probs[perm[i]][2]
-
-    #        #print nperms, p, perm, max_p, best_perm
-    #        if p > max_p:
-    #            best_perm = perm
-    #            max_p = p
-
-    #        P += p
-    #        nperms += 1
-    #    P = P / float(nperms)
-    #    assert nperms > 0
-    #    return P, best_perm
-    #    #end permutation loop
-
-
     def btag_likelihood2(self, probs, nB):
         self.jlh.next_event()
-        #print "njets", len(probs)
         for ijet in range(len(probs)):
             jp = ROOT.MEM.JetProbability()
             jp.setProbability(MEM.JetInterpretation.b, probs[ijet][0])
@@ -180,18 +140,14 @@ class BTagLRAnalyzer(FilterAnalyzer):
         if self.conf.bran["enabled"]:
             btagalgos += ["btagCSVRndge4t", "btagCSVInpge4t", "btagCSVRnd3t", "btagCSVInp3t"]
         jets_for_btag_lr, jet_probs = self.getJetProbs(self.csv_pdfs, event, btagalgos )
-        #for j in jets_for_btag_lr[self.bTagAlgo]:
-            #print "jet", j.pt, j.btagCSV, j.btagBDT, j.mcFlavour
 
         btag_likelihood_results = {}
         btag_likelihood_ratio_results = {}
         for btagalgo in btagalgos:
             btag_lr_4b, best_4b_perm = self.btag_likelihood2(jet_probs["new_pt_eta_bin_3d-" + btagalgo], 4)
             btag_lr_2b, best_2b_perm = self.btag_likelihood2(jet_probs["new_pt_eta_bin_3d-" + btagalgo], 2)
-            #print "likelihoods", btagalgo, btag_lr_4b, btag_lr_2b
             btag_likelihood_results[btagalgo] = (btag_lr_4b, btag_lr_2b, best_4b_perm, best_2b_perm)
             btag_likelihood_ratio_results[btagalgo] = self.lratio(btag_lr_4b, btag_lr_2b)
-            #print "LR", btag_likelihood_ratio_results[btagalgo]
         
         #default btagger used
         event.btag_lr_4b = btag_likelihood_results[self.bTagAlgo][0]
@@ -208,12 +164,21 @@ class BTagLRAnalyzer(FilterAnalyzer):
 
         #Jets are untagged according to the b-tagging likelihood ratio permutation
         if self.conf.jets["untaggedSelection"] == "btagLR":
+            if "debug" in self.conf.general["verbosity"]:
+                autolog("using btagLR for btag/untag jet selection")
             event.buntagged_jets = event.buntagged_jets_by_LR_4b_2b
             event.selected_btagged_jets = event.btagged_jets_by_LR_4b_2b
         #Jets are untagged according to b-discriminatr
         elif self.conf.jets["untaggedSelection"] == "btagCSV":
+            if "debug" in self.conf.general["verbosity"]:
+                autolog("using btagCSV for btag/untag jet selection")
             event.buntagged_jets = event.buntagged_jets_bdisc
             event.selected_btagged_jets = event.btagged_jets_bdisc
+        if "debug" in self.conf.general["verbosity"]:
+            autolog("N(untagged)={0} N(tagged)={1}".format(
+                len(event.buntagged_jets),
+                len(event.selected_btagged_jets)
+            ))
 
         btagged = sorted(event.selected_btagged_jets, key=lambda x, self=self: getattr(x, self.bTagAlgo) , reverse=True)
 
@@ -232,7 +197,11 @@ class BTagLRAnalyzer(FilterAnalyzer):
 
         event.passes_btag = len(event.selected_btagged_jets)>=0
         if "debug" in self.conf.general["verbosity"]:
-            print "Passes btag", event.passes_btag, event.selected_btagged_jets
+            autolog("BTag selection pass={0}, len(btagged_jets)={1} using the method={2}".format(
+                event.passes_btag,
+                len(event.selected_btagged_jets),
+                self.conf.jets["untaggedSelection"]
+            ))
 
         #do category-specific blr cuts
         cat = ""
@@ -258,8 +227,10 @@ class BTagLRAnalyzer(FilterAnalyzer):
             cat += "dl_"
             if len(event.good_jets)==3 and event.nBCSVM==2:
                 cat += "j3_t2"
-            elif len(event.good_jets)>=3 and event.nBCSVM==3:
-                cat += "jge3_t3"
+            elif len(event.good_jets)==3 and event.nBCSVM==3:
+                cat += "j3_t3"
+            elif len(event.good_jets)>=4 and event.nBCSVM==3:
+                cat += "jge4_t3"
             elif len(event.good_jets)>=4 and event.nBCSVM==2:
                 cat += "jge4_t2"
             elif len(event.good_jets)>=4 and event.nBCSVM>=4:
@@ -270,9 +241,13 @@ class BTagLRAnalyzer(FilterAnalyzer):
             cat = "unknown"
 
         event.category_string = cat
+        blr_cut = self.conf.mem["blr_cuts"].get(cat, -20)
         if cat != "unknown":
-            event.pass_category_blr = logit(event.btag_LR_4b_2b) > self.conf.mem["blr_cuts"].get(cat, -20)
+            event.pass_category_blr = logit(event.btag_LR_4b_2b) > blr_cut 
         else:
             event.pass_category_blr = False
-
+        if "debug" in self.conf.general["verbosity"]:
+            autolog("SL/DL category: {0}, pass blr cut {1}: {2}".format(
+                event.category_string, blr_cut, event.pass_category_blr)
+            )
         return event
