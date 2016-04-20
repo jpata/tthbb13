@@ -59,15 +59,16 @@ def set_integration_vars(vars_to_integrate, vars_to_marginalize, mem_assumptions
         vars_to_marginalize.push_back(MEM.PSVar.cos_b1)
         vars_to_marginalize.push_back(MEM.PSVar.phi_b1)
 
-    if "0w2h2t" in mem_assumptions:  #DS
-        vars_to_marginalize.push_back(MEM.PSVar.cos_q1)
-        vars_to_marginalize.push_back(MEM.PSVar.phi_q1)
-        vars_to_marginalize.push_back(MEM.PSVar.cos_qbar1)
-        vars_to_marginalize.push_back(MEM.PSVar.phi_qbar1) #overwrite SL case above
-        vars_to_marginalize.push_back(MEM.PSVar.cos_q2)
-        vars_to_marginalize.push_back(MEM.PSVar.phi_q2)
-        vars_to_marginalize.push_back(MEM.PSVar.cos_qbar2)
-        vars_to_marginalize.push_back(MEM.PSVar.phi_qbar2)
+    #FIXME: this is FH only
+    #if "0w2h2t" in mem_assumptions:  #DS
+    #    vars_to_marginalize.push_back(MEM.PSVar.cos_q1)
+    #    vars_to_marginalize.push_back(MEM.PSVar.phi_q1)
+    #    vars_to_marginalize.push_back(MEM.PSVar.cos_qbar1)
+    #    vars_to_marginalize.push_back(MEM.PSVar.phi_qbar1)
+    #    vars_to_marginalize.push_back(MEM.PSVar.cos_q2)
+    #    vars_to_marginalize.push_back(MEM.PSVar.phi_q2)
+    #    vars_to_marginalize.push_back(MEM.PSVar.cos_qbar2)
+    #    vars_to_marginalize.push_back(MEM.PSVar.phi_qbar2)
         
     if "0w2h1t" in mem_assumptions:  #DS
         vars_to_marginalize.push_back(MEM.PSVar.cos_q1)

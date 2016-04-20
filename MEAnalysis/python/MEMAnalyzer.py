@@ -169,7 +169,7 @@ class MEAnalyzer(FilterAnalyzer):
         self.vars_to_integrate   = CvectorPSVar()
         self.vars_to_marginalize = CvectorPSVar()
         
-        cfg = MEMConfig()
+        cfg = MEMConfig(self.conf)
         cfg.configure_btag_pdf(self.conf)
         cfg.configure_transfer_function(self.conf)
         self.integrator = MEM.Integrand(
