@@ -287,18 +287,18 @@ class Conf:
         },
 
 
-        #categories to run the mem
-        "categories": [
-            #"cat1",
-            #"cat2",
-            #"cat3",
-            #"cat6",
-            "cat7",
-            "cat8",
-            #"cat9",
-            "cat10",
-            "cat11",
-        ],
+        # #categories to run the mem
+        # "categories": [
+        #     #"cat1",
+        #     #"cat2",
+        #     #"cat3",
+        #     #"cat6",
+        #     "cat7",
+        #     "cat8",
+        #     #"cat9",
+        #     "cat10",
+        #     "cat11",
+        # ],
 
         #Generic event-dependent selection function applied
         #just before the MEM. If False, MEM is skipped for all hypos
@@ -308,7 +308,7 @@ class Conf:
                 (event.is_sl and event.nBCSVM >= 4)
                 or (event.is_dl and event.nBCSVM >= 3)
             )
-            or event.is_fh #DS
+            or (event.is_fh and event.cat in ["cat7","cat8","cat9","cat10","cat11"]) #DS: FH=7,8,9,10,11
         ),
         
         #This configures what the array elements mean
