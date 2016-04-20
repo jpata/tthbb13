@@ -1,5 +1,4 @@
 import ROOT
-
 ROOT.gSystem.Load("libTTHMEIntegratorStandalone")
 from ROOT import MEM
 import inspect
@@ -18,7 +17,8 @@ class MEMConfig:
         self.cfg = MEM.MEMConfig()
 
         #Specify the MEM precision. 1.0 = default ncalls
-        self.cfg.defaultCfg(1.0)
+        #FIXME FIXME: set back to 1.0, optimize
+        self.cfg.defaultCfg(0.1)
 
         self.b_quark_candidates = lambda event: event.selected_btagged_jets_high
         self.l_quark_candidates = lambda event: event.wquark_candidate_jets
@@ -28,9 +28,8 @@ class MEMConfig:
 
         self.do_calculate = lambda event, config: False
         self.mem_assumptions = set([])
-        self.enabled = True
-        self.maxJets = 4
-        self.maxlJets = 5 #DS
+        self.maxBJets = 4
+        self.maxLJets = 5
         self.btagMethod = "btagCSV"
 
     def __str__(self):

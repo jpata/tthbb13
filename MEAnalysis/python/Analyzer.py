@@ -9,9 +9,6 @@ class FilterAnalyzer(Analyzer):
     """
     def beginLoop(self, setup):
         super(FilterAnalyzer, self).beginLoop(setup)
-        self.counters.addCounter("processing")
-        self.counters["processing"].register("processed")
-        self.counters["processing"].register("passes")
 
 
 class CounterAnalyzer(FilterAnalyzer):
@@ -40,7 +37,6 @@ class EventIDFilterAnalyzer(FilterAnalyzer):
         super(EventIDFilterAnalyzer, self).beginLoop(setup)
 
     def process(self, event):
-        self.counters["processing"].inc("processed")
 
         passes = True
         if not self.event_whitelist is None:
@@ -54,8 +50,6 @@ class EventIDFilterAnalyzer(FilterAnalyzer):
             "debug" in self.conf.general["verbosity"]
             ):
             print "---starting EVENT r:l:e", event.input.run, event.input.lumi, event.input.evt
-        if passes:
-            self.counters["processing"].inc("passes")
         return passes
 
 
@@ -73,7 +67,6 @@ class EventWeightAnalyzer(FilterAnalyzer):
         super(EventWeightAnalyzer, self).beginLoop(setup)
 
     def process(self, event):
-        self.counters["processing"].inc("processed")
         event.weight_xs = self.xs/float(self.n_gen) if self.n_gen > 0 else 1
        
 

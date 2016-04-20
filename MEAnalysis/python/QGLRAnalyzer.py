@@ -3,7 +3,7 @@ import itertools
 import numpy as np
 
 from TTH.MEAnalysis.Analyzer import FilterAnalyzer
-from TTH.MEAnalysis.vhbb_utils import lvec
+from TTH.MEAnalysis.vhbb_utils import lvec, autolog
 
 class QGLRAnalyzer(FilterAnalyzer):
     """
@@ -100,30 +100,17 @@ class QGLRAnalyzer(FilterAnalyzer):
                 event.systResults[syst] = res
             else:
                 event.systResults[syst].passes_qgl = False
-        #event.__dict__.update(event.systResults["nominal"].__dict__)
         return np.any([v.passes_qgl for v in event.systResults.values()])
 
     def _process(self, event): 
-        self.counters["processing"].inc("processed")
+        if "debug" in self.conf.general["verbosity"]:
+            autolog("QGLRAnalyzer started")
         event.passes_qgl = True
         if not self.conf.general["doQGL"]:
             return event
 
-        #Make list of non-btagged jets
-        # jets_for_qg_lr = sorted(
-        #     filter(
-        #         lambda x: (
-        #             getattr(x, self.bTagAlgo) < 0.814
-        #         ), event.good_jets
-        #     ),
-        #     key=lambda x: x.qgl, reverse=True
-        #     )[0:6]
         jets_for_qg_lr = event.buntagged_jets_bdisc[0:6]
       
-        #print "----------------"
-        #for ijet in jets_for_qg_lr: 
-        #    print "jet pt eta qgl ", ijet.pt, ijet.eta, ijet.qgl
-
         jet_probs = {
             kind: [
                 self.evaluate_jet_prob(j.pt, j.eta, j.qgl, kind)

@@ -118,8 +118,7 @@ class Conf:
             "pt_leading": 20,
             "pt_subleading": 15,
         },
-        "selection": lambda event: event.is_sl or event.is_dl
-        #"selection": lambda event: event.is_fh
+        "selection": lambda event: event.is_sl or event.is_dl or event.is_fh
     }
 
     jets = {
@@ -178,10 +177,9 @@ class Conf:
     }
 
     general = {
-        "passall": True,
+        "passall": False,
         "doQGL": False,
         "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV20.root",
-        #"controlPlotsFileNew": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV14.root",
         "QGLPlotsFile_flavour": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/Histos_QGL_flavour.root",
         "sampleFile": os.environ["CMSSW_BASE"]+"/python/TTH/MEAnalysis/samples.py",
         "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/transfer_functions.pickle",
@@ -189,7 +187,7 @@ class Conf:
         #"systematics": ["nominal"],
         "systematics": [
             "nominal",
-            "JESUp", "JESDown",
+        #    "JESUp", "JESDown",
         #    "JERUp", "JERDown"
         ],
         
@@ -199,13 +197,13 @@ class Conf:
         # "reco" - print out the reco-level selected particles
         # "matching" - print out the association between gen and reco objects
         "verbosity": [
-            "eventboundary", #print run:lumi:event
+            #"eventboundary", #print run:lumi:event
             #"trigger", #print trigger bits
             #"input", #print input particles
             #"gen", #print out gen-level info
-            #"debug", #very high-level debug info
+            "debug", #very high-level debug info
             #"reco", #info about reconstructed final state
-            #"meminput" #info about particles used for MEM input
+            "meminput", #info about particles used for MEM input
             "commoninput" #print out inputs for CommonClassifier
         ],
 
@@ -285,20 +283,6 @@ class Conf:
             "dl_jge4_t2": 20,
             "dl_jge4_tge4": -20,
         },
-
-
-        #categories to run the mem
-        "categories": [
-            #"cat1",
-            #"cat2",
-            #"cat3",
-            #"cat6",
-            "cat7",
-            "cat8",
-            #"cat9",
-            "cat10",
-            "cat11",
-        ],
 
         #Generic event-dependent selection function applied
         #just before the MEM. If False, MEM is skipped for all hypos
@@ -460,27 +444,6 @@ c.cfg.perm_pruning = strat
 Conf.mem_configs["SL_0w2h2t"] = c
 
 ###
-### SL_0w2h2t _memLR
-###
-c = MEMConfig()
-c.b_quark_candidates = lambda ev: ev.good_jets
-c.l_quark_candidates = lambda ev: []
-c.do_calculate = lambda ev, mcfg: (
-    len(mcfg.lepton_candidates(ev)) == 1 and
-    len(mcfg.b_quark_candidates(ev)) >= 3
-)
-c.mem_assumptions.add("sl")
-c.mem_assumptions.add("0w2h2t")
-strat = CvectorPermutations()
-strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
-strat.push_back(MEM.Permutations.FirstRankedByBTAG)
-c.cfg.perm_pruning = strat
-#c.cfg.int_code = 1+2+4
-#c.cfg.int_code = 0
-c.maxJets = 8
-Conf.mem_configs["SL_0w2h2t_memLR"] = c
-
-###
 ### DL_0w2h2t
 ###
 c = MEMConfig()
@@ -491,8 +454,7 @@ c.do_calculate = lambda ev, mcfg: (
     len(mcfg.b_quark_candidates(ev)) >= 4
     #(len(mcfg.l_quark_candidates(ev)) + len(mcfg.b_quark_candidates(ev))) >= 4
 )
-#c.cfg.int_code = 0
-c.maxJets = 8
+c.maxLJets = 4
 c.mem_assumptions.add("dl")
 strat = CvectorPermutations()
 #FIXME: are we sure about these assumptions?
@@ -501,25 +463,6 @@ strat.push_back(MEM.Permutations.FirstRankedByBTAG)
 c.cfg.perm_pruning = strat
 Conf.mem_configs["DL_0w2h2t"] = c
 
-###
-### DL_0w2h2t_Rnd4t
-###
-c = MEMConfig()
-c.b_quark_candidates = lambda ev: ev.good_jets
-c.l_quark_candidates = lambda ev: []
-c.do_calculate = lambda ev, mcfg: (
-    len(mcfg.lepton_candidates(ev)) == 2 and
-    len(mcfg.b_quark_candidates(ev)) >= 4 and
-    getattr(ev, "nBCSVMRndge4t", 0) >= 4
-)
-c.btagMethod = "btagCSVRndge4t"
-c.maxJets = 8
-c.mem_assumptions.add("dl")
-strat = CvectorPermutations()
-strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
-strat.push_back(MEM.Permutations.FirstRankedByBTAG)
-c.cfg.perm_pruning = strat
-Conf.mem_configs["DL_0w2h2t_Rndge4t"] = c
 
 #Subjet configurations#
 #######################
