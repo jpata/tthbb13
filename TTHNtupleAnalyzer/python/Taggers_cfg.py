@@ -35,8 +35,8 @@ process.load("RecoBTag.Configuration.RecoBTag_cff") # this loads all available b
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 from Configuration.AlCa.GlobalTag import GlobalTag
-#process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_mc')
-process.GlobalTag = GlobalTag(process.GlobalTag, '76X_mcRun2_asymptotic_RunIIFall15DR76_v1')
+process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_mc')
+#process.GlobalTag = GlobalTag(process.GlobalTag, '76X_mcRun2_asymptotic_RunIIFall15DR76_v1')
 
 
 #process.load("CondCore.DBCommon.CondDBCommon_cfi")
