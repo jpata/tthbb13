@@ -291,20 +291,30 @@ class MEAnalyzer(FilterAnalyzer):
             "lumi":event.input.lumi,
             "event": event.input.evt,
             "cat": event.category_string,
-            "blr": event.btag_LR_4b_2b
+            "blr": event.btag_LR_4b_2b,
+            "match_btag": "{0}w_{1}h_{2}h".format(
+                event.nMatch_wq_btag,
+                event.nMatch_hb_btag,
+                event.nMatch_tb_btag,
+            ),
+            "match": "{0}w_{1}h_{2}h".format(
+                event.nMatch_wq,
+                event.nMatch_hb,
+                event.nMatch_tb,
+            )
         }
         memidx = self.conf.mem["methodOrder"].index(confname)
         outobjects["output"] = {
+            "mem_cfg": confname,
             "p_tth": event.mem_results_tth[memidx].p,
             "p_ttbb": event.mem_results_ttbb[memidx].p,
             "p": event.mem_results_tth[memidx].p / (
                 event.mem_results_tth[memidx].p + self.conf.mem["weight"]*event.mem_results_ttbb[memidx].p
             ) if event.mem_results_tth[memidx].p > 0 else 0.0
         }
-        print json.dumps(outobjects, indent=2)
         self.jsonout = open("events.json", "a")
         self.jsonout.write(
-            json.dumps(outobjects, indent=2) + "\n\n\n"
+            json.dumps(outobjects) + "\n"
         )
         self.jsonout.close()
 
@@ -417,7 +427,8 @@ class MEAnalyzer(FilterAnalyzer):
         event.mem_results_ttbb = [res[(MEM.Hypothesis.TTBB, k)] for k in self.memkeys]
 
         for confname in self.memkeysToRun:
-            if confname not in skipped and "commoninput" in self.conf.general["verbosity"]:
+            mem_cfg = self.mem_configs[confname]
+            if "commoninput" in self.conf.general["verbosity"] and mem_cfg.do_calculate(event, mem_cfg):
                 self.printInputs(event, confname)
         
         if "memoutput" in self.conf.general["verbosity"]:
