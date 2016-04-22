@@ -54,7 +54,7 @@ class FakeEvent:
     def __init__(self, event):
         src = deepcopy(event.__dict__)
         self.__dict__.update(src)
-
+        self.input = event.input
 
 from TTH.MEAnalysis.VHbbTree import Jet
 
