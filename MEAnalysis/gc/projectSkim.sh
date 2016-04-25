@@ -10,8 +10,9 @@ cd $MY_SCRATCH
 OUTDIR=$HOME/tth/gc/projectSkim/${TASK_ID}/${DATASETPATH}/
 mkdir -p $OUTDIR
 OFNAME=$OUTDIR/output_${MY_JOBID}.root
-python ${CMSSW_BASE}/src/TTH/MEAnalysis/python/MakeTaggingNtuple.py taggingNtuple.root $FILE_NAMES
+#python ${CMSSW_BASE}/src/TTH/MEAnalysis/python/MakeTaggingNtuple.py taggingNtuple.root $FILE_NAMES
 python ${CMSSW_BASE}/src/TTH/MEAnalysis/python/projectSkim.py skim.root $FILE_NAMES
 python ${CMSSW_BASE}/src/TTH/Plotting/python/joosep/btag/hists.py btag.root $FILE_NAMES
-hadd out.root skim.root btag.root taggingNtuple.root
+hadd out.root skim.root btag.root
+# taggingNtuple.root
 cp out.root $OFNAME
