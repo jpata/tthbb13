@@ -279,6 +279,7 @@ if __name__ == "__main__":
                 xs = s.xSec.value()
             )
             inputSample.isMC = s.isMC.value()
+            inputSample.skip = s.skip.value() #DS 
             inputSamples.append(inputSample)
         return inputSamples, samples_dict
     
@@ -287,6 +288,8 @@ if __name__ == "__main__":
     #Process all samples in the sample list
     for samp in inputSamples:
         if not samp.isMC:
+            continue
+        if samp.skip: #DS
             continue
         config = cfg.Config(
             #Run across these inputs
@@ -304,7 +307,7 @@ if __name__ == "__main__":
 
         #Configure the number of events to run
         from PhysicsTools.HeppyCore.framework.looper import Looper
-        nEvents = 10000
+        nEvents = 300 #DS
 
         kwargs = {}
         if conf.general.get("eventWhitelist", None) is None:
