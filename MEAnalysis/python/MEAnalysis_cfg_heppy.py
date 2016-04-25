@@ -119,6 +119,7 @@ class Conf:
             "pt_subleading": 15,
         },
         "selection": lambda event: event.is_sl or event.is_dl or event.is_fh
+        #"selection": lambda event: event.is_fh #DS
     }
 
     jets = {
@@ -163,7 +164,7 @@ class Conf:
         "untaggedSelection": "btagLR",
         
         #how many jets to consider for the btag LR permutations
-        "NJetsForBTagLR": 8,
+        "NJetsForBTagLR": 9, #DS
 
         #base jet selection
         "selection": jet_baseline
@@ -201,10 +202,10 @@ class Conf:
             #"trigger", #print trigger bits
             #"input", #print input particles
             #"gen", #print out gen-level info
-            "debug", #very high-level debug info
+            #"debug", #very high-level debug info
             #"reco", #info about reconstructed final state
-            "meminput", #info about particles used for MEM input
-            "commoninput" #print out inputs for CommonClassifier
+            #"meminput", #info about particles used for MEM input
+            #"commoninput" #print out inputs for CommonClassifier
         ],
 
         #"eventWhitelist": [
@@ -265,10 +266,10 @@ class Conf:
 
         #Actually run the ME calculation
         #If False, all ME values will be 0
-        "calcME": False,
+        "calcME": True, #DS
         "n_integration_points_mult": 0.1,
 
-        "weight": 0.15,
+        "weight": 0.15, #k in Psb = Ps/(Ps+k*Pb)
 
         "blr_cuts": {
             "sl_j5_t2": 20,
@@ -293,7 +294,7 @@ class Conf:
                 (event.is_sl and event.nBCSVM >= 4)
                 or (event.is_dl and event.nBCSVM >= 3)
             ) or
-            (event.is_fh and event.cat in ["cat7","cat8","cat9","cat10","cat11"]
+            (event.is_fh and event.cat in ["cat7","cat8","cat10","cat11"]
             and event.btag_LR_4b_2b > 0.95)
         ),
         
@@ -534,6 +535,7 @@ Conf.mem_configs["SL_0w2h2t_sj"] = c
 ### FH_4w2h2t #8j,4b, 9j,4b
 ###
 c = MEMConfig(Conf)
+c.l_quark_candidates = lambda event: event.buntagged_jets + event.selected_btagged_jets_low #DS adds 5th,6th,... btags
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 0 and
     len(mcfg.b_quark_candidates(ev)) >= 4 and #DS #although from BTagLRAnalyzer there are max 4 candidates
@@ -553,6 +555,7 @@ Conf.mem_configs["FH_4w2h2t"] = c
 ### FH_3w2h2t #7j,4b (& 8j,4b)
 ###
 c = MEMConfig(Conf)
+c.l_quark_candidates = lambda event: event.buntagged_jets + event.selected_btagged_jets_low
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 0 and
     len(mcfg.b_quark_candidates(ev)) >= 4 and #DS
@@ -572,6 +575,7 @@ Conf.mem_configs["FH_3w2h2t"] = c
 ### FH_4w2h1t #7j,3b, 8j,3b #do not need _l,_h if not imposing t-tbar symmetry
 ###
 c = MEMConfig(Conf)
+c.l_quark_candidates = lambda event: event.buntagged_jets + event.selected_btagged_jets_low
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 0 and
     len(mcfg.b_quark_candidates(ev)) == 3 and #DS
@@ -590,6 +594,7 @@ Conf.mem_configs["FH_4w2h1t"] = c
 ### FH_0w2h2t #all 4b categories: 7j,4b, 8j,4b, 9j,4b
 ###
 c = MEMConfig(Conf)
+c.l_quark_candidates = lambda event: event.buntagged_jets + event.selected_btagged_jets_low
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 0 and
     len(mcfg.b_quark_candidates(ev)) >= 4 and #DS
@@ -610,6 +615,7 @@ Conf.mem_configs["FH_0w2h2t"] = c
 ### FH_0w2h1t #all FH categories: 7j,4b, 8j,4b, 9j,4b, 7j,3b, 8j,3b, 9j,3b
 ###
 c = MEMConfig(Conf)
+c.l_quark_candidates = lambda event: event.buntagged_jets + event.selected_btagged_jets_low
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 0 and
     len(mcfg.b_quark_candidates(ev)) >= 3 and #DS
@@ -630,6 +636,7 @@ Conf.mem_configs["FH_0w2h1t"] = c
 ### FH_0w1h2t #all FH categories: 7j,4b, 8j,4b, 9j,4b, 7j,3b, 8j,3b, 9j,3b
 ###
 c = MEMConfig(Conf)
+c.l_quark_candidates = lambda event: event.buntagged_jets + event.selected_btagged_jets_low
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 0 and
     len(mcfg.b_quark_candidates(ev)) >= 3 and #DS

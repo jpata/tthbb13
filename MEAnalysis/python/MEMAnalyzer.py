@@ -76,21 +76,21 @@ class MECategoryAnalyzer(FilterAnalyzer):
         elif event.is_fh:
             #exactly 8 jets, Wtag in [60,100]
             if (len(event.good_jets) == 8 and event.Wmass >= 60 and event.Wmass < 100):
-                event.wquark_candidate_jets = event.buntagged_jets + event.selected_btagged_jets_low #DS adds 5th,6th,... btags
+                #event.wquark_candidate_jets = event.buntagged_jets + event.selected_btagged_jets_low #DS adds 5th,6th,... btags
                 if(len(event.selected_btagged_jets_high) == 4):
                     cat = "cat8"
                 elif(len(event.selected_btagged_jets_high) == 3):
                     cat = "cat10"
             #exactly 7 jets, Wtag in [60,100]
             if (len(event.good_jets) == 7 and event.Wmass >= 60 and event.Wmass < 100):
-                event.wquark_candidate_jets = event.buntagged_jets + event.selected_btagged_jets_low
+                #event.wquark_candidate_jets = event.buntagged_jets + event.selected_btagged_jets_low
                 if(len(event.selected_btagged_jets_high) == 4):
                     cat = "cat7"
                 elif(len(event.selected_btagged_jets_high) == 3):
                     cat = "cat11"
             #exactly 9 jets, Wtag in [72,94]
             if (len(event.good_jets) == 9 and event.Wmass >= 72 and event.Wmass < 94):
-                event.wquark_candidate_jets = event.buntagged_jets + event.selected_btagged_jets_low
+                #event.wquark_candidate_jets = event.buntagged_jets + event.selected_btagged_jets_low
                 if(len(event.selected_btagged_jets_high) == 4):
                     cat = "cat9"
                 elif(len(event.selected_btagged_jets_high) == 3):
