@@ -54,7 +54,7 @@ class FakeEvent:
     def __init__(self, event):
         src = deepcopy(event.__dict__)
         self.__dict__.update(src)
-
+        self.input = event.input
 
 from TTH.MEAnalysis.VHbbTree import Jet
 
@@ -79,10 +79,11 @@ def autolog(*args):
     # be this function!!!
     func = inspect.currentframe().f_back.f_code
     message = ", ".join(map(str, args))
+    filename_last = func.co_filename.split("/")[-1]
     # Dump the message + the name of this function to the log.
     print "[%s %s:%i]: %s" % (
         func.co_name,
-        func.co_filename,
+        filename_last,
         func.co_firstlineno,
         message
     )

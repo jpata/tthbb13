@@ -1,4 +1,4 @@
-from TTH.MEAnalysis.vhbb_utils import lvec
+from TTH.MEAnalysis.vhbb_utils import lvec, autolog
 from TTH.MEAnalysis.Analyzer import FilterAnalyzer
 from TTH.MEAnalysis.MEMUtils import add_obj
 import ROOT
@@ -57,8 +57,8 @@ class BTagRandomizerAnalyzer(FilterAnalyzer):
         return True
 
     def _process(self, event):
-        if "debug" in self.conf.general["verbosity"]:  
-            print "BTagRandomizer"
+        if "debug" in self.conf.general["verbosity"]:
+            autolog("BTagRandomizer started")
 
         event.b_ran_results = []
 

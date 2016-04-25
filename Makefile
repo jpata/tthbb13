@@ -1,7 +1,11 @@
 
 #sample vhbb+tthbb file
 testfile_vhbb_tthbb=/store/user/jpata/tth/VHBBHeppyV21_tthbbV6/ttHTobb_M125_13TeV_powheg_pythia8/VHBBHeppyV21_tthbbV6_ttHTobb_M125_13TeV_powheg_Py8__fall15MAv2-pu25ns15v1_76r2as_v12-v1/160318_163755/0000/tree_10.root
+#testfile_vhbb_tthbb=file:///mnt/t3nfs01/data01/shome/jpata/tth/sw-76/CMSSW/src/TTH/tree_10.root
 test_out_dir=$(CMSSW_BASE)/src/TTH/tests_out
+
+get_testfile:
+	xrdcp xrdcp root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/$(testfile_vhbb_tthbb) ./test.root
 
 melooper: Plotting/python/joosep/codeGen.py Plotting/bin/*.cc Plotting/interface/*.h
 	cd Plotting && python python/joosep/codeGen.py
@@ -38,11 +42,11 @@ test_Plotting_btaghists: test_mkdir
 
 test_MEAnalysis: test_mkdir
 	rm -Rf MEAnalysis/Loop_*
-	cd MEAnalysis && ME_CONF=python/cfg_noME.py python python/MEAnalysis_heppy.py &> $(test_out_dir)/MEAnalysis_MEAnalysis_heppy.log
+	cd MEAnalysis && INPUT_FILE=$(testfile_vhbb_tthbb) ME_CONF=python/cfg_local.py python python/MEAnalysis_heppy.py &> $(test_out_dir)/MEAnalysis_MEAnalysis_heppy.log
 	sleep 5
-	du -csh MEAnalysis/Loop_ttHTobb_M125_13TeV_powheg_pythia8/tree.root &>> $(test_out_dir)/MEAnalysis_MEAnalysis_heppy.log
-	python -c "import ROOT; f=ROOT.TFile('MEAnalysis/Loop_ttHTobb_M125_13TeV_powheg_pythia8/tree.root'); print f.Get('tree').GetEntries()" &>> $(test_out_dir)/MEAnalysis_MEAnalysis_heppy.log
-	cp MEAnalysis/Loop_ttHTobb_M125_13TeV_powheg_pythia8/tree.root $(test_out_dir)/MEAnalysis_MEAnalysis_heppy.root
+	du -csh MEAnalysis/Loop_sample/tree.root &>> $(test_out_dir)/MEAnalysis_MEAnalysis_heppy.log
+	python -c "import ROOT; f=ROOT.TFile('MEAnalysis/Loop_sample/tree.root'); print f.Get('tree').GetEntries()" &>> $(test_out_dir)/MEAnalysis_MEAnalysis_heppy.log
+	cp MEAnalysis/Loop_sample/tree.root $(test_out_dir)/MEAnalysis_MEAnalysis_heppy.root
 
 test_MEAnalysis_withme: test_mkdir
 	rm -Rf MEAnalysis/Loop_*
@@ -76,8 +80,8 @@ test_MEAnalysis_crab_vhbb: test_mkdir
 	python -c "import ROOT; f=ROOT.TFile('$(test_out_dir)/MEAnalysis_crab_vhbb.root');print f.Get('vhbb/tree').GetEntries(); print f.Get('tree').GetEntries()" &>> $(test_out_dir)/MEAnalysis_crab_vhbb.log
 
 get_hashes:
-	echo "tthbb13="`git rev-parse HEAD` > hash
-	cd CommonClassifier && echo "CommonClassifier="`git rev-parse HEAD` >> ../hash
-	cd $(CMSSW_BASE)/src && echo "CMSSW="`git rev-parse HEAD` >> TTH/hash
+	echo "tthbb13="`git rev-parse --short HEAD` > hash
+	cd CommonClassifier && echo "CommonClassifier="`git rev-parse --short HEAD` >> ../hash
+	cd $(CMSSW_BASE)/src && echo "CMSSW="`git rev-parse --short HEAD` >> TTH/hash
 
 .PHONY: test_mkdir get_hashes

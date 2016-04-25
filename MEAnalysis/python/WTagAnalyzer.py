@@ -1,5 +1,5 @@
 from TTH.MEAnalysis.Analyzer import FilterAnalyzer
-from TTH.MEAnalysis.vhbb_utils import lvec
+from TTH.MEAnalysis.vhbb_utils import lvec, autolog
 
 import numpy as np
 class WTagAnalyzer(FilterAnalyzer):
@@ -53,10 +53,11 @@ class WTagAnalyzer(FilterAnalyzer):
                 event.systResults[syst] = res
             else:
                 event.systResults[syst].passes_wtag = False
-        #event.__dict__.update(event.systResults["nominal"].__dict__)
         return self.conf.general["passall"] or np.any([v.passes_wtag for v in event.systResults.values()])
 
     def _process(self, event):
+        if "debug" in self.conf.general["verbosity"]:
+            autolog("WTagAnalyzer started")
         event.Wmass = 0.0
 
         #we keep a set of the Q quark candidate jets
@@ -78,12 +79,12 @@ class WTagAnalyzer(FilterAnalyzer):
 
             #Add at most 2 best pairs
             for i in range(min(len(bpair), 2)):
-                event.wquark_candidate_jets.add(bpair[i][1])
+                event.wquark_candidate_jets.add(bpair[i][1]) #DS could the same jet end up here from i=0 and i=1?
                 event.wquark_candidate_jets.add(bpair[i][2])
                 event.wquark_candidate_jet_pairs += [(bpair[i][1], bpair[i][2])]
 
                 if "reco" in self.conf.general["verbosity"]:
-                    print("Wmass", event.Wmass,
+                    print("Wmass", event.Wmasses[i], #DS
                         event.good_jets.index(bpair[i][1]),
                         event.good_jets.index(bpair[i][2])
                     )

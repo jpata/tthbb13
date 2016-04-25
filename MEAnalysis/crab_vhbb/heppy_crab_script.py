@@ -93,6 +93,8 @@ copyTo(inf2, tof)
 #print PSet.process.output.fileName
 #os.system("./addTreeFiles.py tree.root Output/tree.root Output_tth/tree.root")
 
+tof.Close()
+
 f=ROOT.TFile.Open('tree.root')
 entries=f.Get('tree').GetEntries()
 

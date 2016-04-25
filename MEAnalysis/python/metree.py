@@ -96,6 +96,9 @@ leptonType = NTupleObjectType("leptonType", variables = [
     NTupleVariable("mvaId", lambda x : x.eleMVAIdSpring15Trig),
 ])
 
+
+
+
 p4type = NTupleObjectType("p4Type", variables = [
     NTupleVariable("pt", lambda x : x.Pt()),
     NTupleVariable("eta", lambda x : x.Eta()),

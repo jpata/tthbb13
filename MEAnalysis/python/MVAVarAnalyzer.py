@@ -22,6 +22,8 @@ if mva_enabled:
 
 CvectorTLorentzVector = getattr(ROOT, "std::vector<TLorentzVector>")
 EventShapeVariables = getattr(ROOT, "EventShapeVariables")
+TMatrixDSym = getattr(ROOT, "TMatrixDSym")
+TMatrixDSymEigen = getattr(ROOT, "TMatrixDSymEigen")
 
 class FoxWolfram:
 
@@ -47,7 +49,6 @@ class FoxWolfram:
                 vals = np.array([cos_omega_ij]*len(orders))
 
                 p_l = np.array(eval_legendre(orders, vals))
-                #print i, j, cos_omega_ij, w_ij, p_l
                 h += w_ij * p_l
         return h
 
@@ -72,25 +73,63 @@ class MVAVarAnalyzer(FilterAnalyzer):
                 event.systResults[syst] = res
             else:
                 event.systResults[syst].passes_mva = False
-        #print "MVA", getattr(event.systResults["JES"], "fw_h_alljets", None)
-        #event.__dict__.update(event.systResults["nominal"].__dict__)
         return self.conf.general["passall"] or np.any([v.passes_mva for v in event.systResults.values()])
 
     def _process(self, event):
+        #FIXME: NEED COMMENTS HERE
+        sumP2 = 0.0
+        sumPxx = 0.0
+        sumPxy = 0.0
+        sumPxz = 0.0
+        sumPyy = 0.0
+        sumPyz = 0.0
+        sumPzz = 0.0
         vecs = CvectorTLorentzVector()
         for jet in event.good_jets:
+            obj = lvec(jet)
             vecs.push_back(lvec(jet))
+            sumP2  += obj.P() * obj.P()
+            sumPxx += obj.Px() * obj.Px()
+            sumPxy += obj.Px() * obj.Py()
+            sumPxz += obj.Px() * obj.Pz()
+            sumPyy += obj.Py() * obj.Py()
+            sumPyz += obj.Py() * obj.Pz()
+            sumPzz += obj.Pz() * obj.Pz()
         evshape = EventShapeVariables(vecs)
-        eigs = evshape.compEigenValues(2.0)
+        eigs = evshape.compEigenValues(2.0) #difference: this takes T^2-x^2-y^2-z^2 for P2
         event.momentum_eig0 = eigs[0]
         event.momentum_eig1 = eigs[1]
         event.momentum_eig2 = eigs[2]
+        
+        ##---- compute sphericity --------------------#DS
+        Txx = sumPxx/sumP2
+        Tyy = sumPyy/sumP2
+        Tzz = sumPzz/sumP2
+        Txy = sumPxy/sumP2
+        Txz = sumPxz/sumP2
+        Tyz = sumPyz/sumP2
+        T = TMatrixDSym(3)
+        T[0,0] = Txx
+        T[0,1] = Txy
+        T[0,2] = Txz
+        T[1,0] = Txy
+        T[1,1] = Tyy
+        T[1,2] = Tyz
+        T[2,0] = Txz
+        T[2,1] = Tyz
+        T[2,2] = Tzz
+        TEigen = TMatrixDSymEigen(T)
+        eigenValues = TEigen.GetEigenValues()
+        event.sphericity = 1.5*(eigenValues(1)+eigenValues(2))
+        event.aplanarity = 1.5*eigenValues(2)
+        event.C = 3.0*(eigenValues(0)*eigenValues(1) + eigenValues(0)*eigenValues(2) + eigenValues(1)*eigenValues(2))
+        event.D = 27.*eigenValues(0)*eigenValues(1)*eigenValues(2) #---------DS 
 
         event.isotropy = evshape.isotropy()
-        event.sphericity = evshape.sphericity(eigs)
-        event.aplanarity = evshape.aplanarity(eigs)
-        event.C = evshape.C(eigs)
-        event.D = evshape.D(eigs)
+        event.sphericity = 1.5*(eigs[1]+eigs[2]) #evshape.sphericity(eigs) #DS
+        event.aplanarity = 1.5*eigs[2] #evshape.aplanarity(eigs) #DS
+        event.C = 3.0*(eigs[0]*eigs[1] + eigs[0]*eigs[2] + eigs[1]*eigs[2]) #evshape.C(eigs) #DS
+        event.D = 27.*eigs[0]*eigs[1]*eigs[2] #evshape.D(eigs) #DS
 
         event.mean_bdisc = np.mean([j.btagCSV for j in event.good_jets])
         event.mean_bdisc_btag = np.mean([j.btagCSV for j in event.selected_btagged_jets])

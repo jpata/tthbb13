@@ -88,36 +88,6 @@ def pfn_to_lfn(fn):
     """
     return fn[fn.find("/store"):]
 
-def lfn_to_pfn(fn):
-    return fn
-
-#These assume the files are located on the local tier
-if "kbfi" in hn or "kbfi" in vo or "comp" in hn:
-    pfPath = "/hdfs/cms/"
-    lfPrefix = "file://"
-    def lfn_to_pfn(fn):
-
-        #fix to replace broken file names
-        if fn.startswith("file://") or fn.startswith("root://"):
-            return fn
-        else:
-            return "file:///hdfs/cms" + fn
-elif "psi" in hn or "psi" in vo:
-    # pfPath = "/pnfs/psi.ch/cms/trivcat/"
-    # lfPrefix = "dcap://t3se01.psi.ch:22125/"
-    def lfn_to_pfn(fn):
-        if fn.startswith("file://") or fn.startswith("root://"):
-            return fn
-        else:
-            #return "dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/" + fn
-            return "root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/" + fn
-else:
-    print "Warning: host '{0}' VO '{1}' is unknown, using xrootd".format(hn, vo)
-    pfPath = ""
-    lfPrefix = "root://xrootd-cms.infn.it/"
-    def lfn_to_pfn(fn):
-        return fn
-
 def get_files(fname):
     # Expect fname relative to CMSSW BASE
     lines = open(os.path.join(os.environ.get("CMSSW_BASE"),fname)).readlines()
@@ -127,7 +97,12 @@ def get_files(fname):
     return lines
 
 def getSitePrefix(fn=""):
-    return "root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat" + fn
+    if fn.startswith("/store"):
+        return "root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat" + fn
+    elif fn.startswith("file://"):
+        return fn
+    else:
+        raise Exception("Could not open file: {0}".format(fn))
 
 def getSampleNGen(sample):
     import ROOT

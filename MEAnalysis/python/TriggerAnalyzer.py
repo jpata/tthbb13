@@ -33,11 +33,8 @@ class TriggerAnalyzer(FilterAnalyzer):
                 if (bit == 1):
                     event.triggerDecision = True
 
-        #event.triggerBitmask = int(sum(1<<i for i, b in enumerate(event.trigvec) if b))
-        #if "trigger" in self.conf.general["verbosity"]:
-        #    print "[trigger] bitmask", event.triggerBitmask
-        #passes = True
-        #if self.conf.trigger["filter"] and not event.triggerDecision:
-        #    passes = False
+        passes = True
+        if self.conf.trigger["filter"] and not event.triggerDecision:
+            passes = False
         
         return self.conf.general["passall"] or passes

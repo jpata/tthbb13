@@ -1,4 +1,4 @@
-from TTH.MEAnalysis.vhbb_utils import lvec
+from TTH.MEAnalysis.vhbb_utils import lvec, autolog
 from TTH.MEAnalysis.Analyzer import FilterAnalyzer
 class GenRadiationModeAnalyzer(FilterAnalyzer):
     """
@@ -24,6 +24,9 @@ class GenRadiationModeAnalyzer(FilterAnalyzer):
 
     def _process(self, event):
 
+        if "debug" in self.conf.general["verbosity"]:
+            autolog("GenTTHAnalyzer started")
+        
         event.nMatchSimB = 0
         event.nMatchSimC = 0
         lv_bs = map(lvec, event.GenBQuarkFromTop)

@@ -6,7 +6,8 @@ from TTH.MEAnalysis.Analyzer import FilterAnalyzer
 
 CvectorTLorentzVector = getattr(ROOT, "std::vector<TLorentzVector>")
 Cvectordouble = getattr(ROOT, "std::vector<double>")
-from TTH.MEAnalysis.vhbb_utils import lvec
+from TTH.MEAnalysis.vhbb_utils import lvec, autolog
+import numpy as np
 
 class CommonClassifierAnalyzer(FilterAnalyzer):
     """
@@ -33,6 +34,9 @@ class CommonClassifierAnalyzer(FilterAnalyzer):
 
     def _process(self, event):
 
+        if "debug" in self.conf.general["verbosity"]:
+            autolog("CommonClassifierAnalyzer started")
+        
         selectedLeptonP4 = CvectorTLorentzVector()
         selectedLeptonCharge = Cvectordouble()
 

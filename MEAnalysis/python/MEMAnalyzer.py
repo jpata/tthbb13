@@ -1,4 +1,4 @@
-from TTH.MEAnalysis.vhbb_utils import lvec
+from TTH.MEAnalysis.vhbb_utils import lvec, autolog
 
 import ROOT
 import copy
@@ -25,7 +25,7 @@ class MECategoryAnalyzer(FilterAnalyzer):
     def __init__(self, cfg_ana, cfg_comp, looperName):
         self.conf = cfg_ana._conf
         super(MECategoryAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
-        self.cat_map = {"NOCAT":-1, "cat1": 1, "cat2": 2, "cat3": 3, "cat6":6, "cat8":8}
+        self.cat_map = {"NOCAT":-1, "cat1": 1, "cat2": 2, "cat3": 3, "cat6":6, "cat7":7, "cat8":8, "cat9":9, "cat10":10, "cat11":11, "cat12":12 }
         self.btag_cat_map = {"NOCAT":-1, "L": 0, "H": 1}
 
     def process(self, event):
@@ -40,21 +40,23 @@ class MECategoryAnalyzer(FilterAnalyzer):
 
     def _process(self, event):
 
+        if "debug" in self.conf.general["verbosity"]:
+            autolog("MECategoryAnalyzer started")
+
         cat = "NOCAT"
-        #pass_btag_lr = (self.conf.jets["untaggedSelection"] == "btagLR" and
-        #    event.btag_LR_4b_2b > self.conf.mem["btagLRCut"][event.cat]
-        #)
-        pass_btag_lr = False
+        
         pass_btag_csv = (self.conf.jets["untaggedSelection"] == "btagCSV" and
             len(event.selected_btagged_jets_high) >= 4
         )
-        cat_btag = "NOCAT"
 
-        if pass_btag_lr or pass_btag_csv:
+        #Here we define if an event was of high-btag multiplicity
+        cat_btag = "NOCAT"
+        if event.pass_category_blr or pass_btag_csv:
             cat_btag = "H"
+        else:
+            cat_btag = "L"
 
         if event.is_sl:
-
             #at least 6 jets, if 6, Wtag in [60,100], if more Wtag in [72,94]
             if ((len(event.good_jets) == 6 and event.Wmass >= 60 and event.Wmass < 100) or
                (len(event.good_jets) > 6 and event.Wmass >= 72 and event.Wmass < 94)):
@@ -71,19 +73,37 @@ class MECategoryAnalyzer(FilterAnalyzer):
             #event.wquark_candidate_jets = []
             event.wquark_candidate_jets = event.buntagged_jets
             cat = "cat6"
-        elif event.is_fh:   #AH
+        elif event.is_fh:
             #exactly 8 jets, Wtag in [60,100]
             if (len(event.good_jets) == 8 and event.Wmass >= 60 and event.Wmass < 100):
-                event.wquark_candidate_jets = event.buntagged_jets
-                cat = "cat8"
-            #FIXME: add other AH categories
+                event.wquark_candidate_jets = event.buntagged_jets + event.selected_btagged_jets_low #DS adds 5th,6th,... btags
+                if(len(event.selected_btagged_jets_high) == 4):
+                    cat = "cat8"
+                elif(len(event.selected_btagged_jets_high) == 3):
+                    cat = "cat10"
+            #exactly 7 jets, Wtag in [60,100]
+            if (len(event.good_jets) == 7 and event.Wmass >= 60 and event.Wmass < 100):
+                event.wquark_candidate_jets = event.buntagged_jets + event.selected_btagged_jets_low
+                if(len(event.selected_btagged_jets_high) == 4):
+                    cat = "cat7"
+                elif(len(event.selected_btagged_jets_high) == 3):
+                    cat = "cat11"
+            #exactly 9 jets, Wtag in [72,94]
+            if (len(event.good_jets) == 9 and event.Wmass >= 72 and event.Wmass < 94):
+                event.wquark_candidate_jets = event.buntagged_jets + event.selected_btagged_jets_low
+                if(len(event.selected_btagged_jets_high) == 4):
+                    cat = "cat9"
+                elif(len(event.selected_btagged_jets_high) == 3):
+                    cat = "cat12"
 
         event.cat = cat
         event.cat_btag = cat_btag
         event.catn = self.cat_map.get(cat, -1)
         event.cat_btag_n = self.btag_cat_map.get(cat_btag, -1)
-
+       
+        #always pass ME category analyzer
         event.passes_mecat = True
+
         return event
 
 class MEAnalyzer(FilterAnalyzer):
@@ -149,7 +169,7 @@ class MEAnalyzer(FilterAnalyzer):
         self.vars_to_integrate   = CvectorPSVar()
         self.vars_to_marginalize = CvectorPSVar()
         
-        cfg = MEMConfig()
+        cfg = MEMConfig(self.conf)
         cfg.configure_btag_pdf(self.conf)
         cfg.configure_transfer_function(self.conf)
         self.integrator = MEM.Integrand(
@@ -170,24 +190,30 @@ class MEAnalyzer(FilterAnalyzer):
         self.vars_to_marginalize.clear()
         self.integrator.next_event()
 
-        mem_cfg.enabled = True
-
         set_integration_vars(self.vars_to_integrate, self.vars_to_marginalize, mem_cfg.mem_assumptions)
         
         bquarks = sorted(list(mem_cfg.b_quark_candidates(event)), key=lambda x: x.pt, reverse=True)
 
-        maxjets = mem_cfg.maxJets
-
-        if len(bquarks)>maxjets:
-            print "More than {0} b-quarks supplied, dropping last {1} from MEM".format(maxjets, len(bquarks) - maxjets)
+        if len(bquarks) > mem_cfg.maxBJets:
+            autolog("More than {0} b-quarks supplied, dropping last {1} from MEM".format(
+                mem_cfg.maxBJets, len(bquarks) - mem_cfg.maxBJets)
+            )
+            for q in bquarks[mem_cfg.maxBJets:]:
+                print "Dropping jet", q.pt, q.eta
+            bquarks = bquarks[:mem_cfg.maxBJets]
         
         lquarks = sorted(list(mem_cfg.l_quark_candidates(event)), key=lambda x: x.pt, reverse=True)
 
-        if len(lquarks)>maxjets:
-            print "More than {0} l-quarks supplied, dropping last {1} from MEM".format(maxjets, len(lquarks) - maxjets)
-        print "lquarks", lquarks 
+        if len(lquarks) > mem_cfg.maxLJets:
+            autolog("More than {0} l-quarks supplied, dropping last {1} from MEM".format(
+                mem_cfg.maxLJets, len(lquarks) - mem_cfg.maxLJets)
+            )
+            for q in lquarks[mem_cfg.maxLJets:]:
+                print "Dropping jet", q.pt, q.eta
+            lquarks = lquarks[:mem_cfg.maxLJets]
+        
         ##Only take up to 4 candidates, otherwise runtimes become too great
-        for jet in bquarks[:maxjets] + lquarks[:maxjets]:
+        for jet in bquarks + lquarks:
             add_obj(
                 self.integrator,
                 MEM.ObjectType.Jet,
@@ -231,14 +257,6 @@ class MEAnalyzer(FilterAnalyzer):
         )
 
     def process(self, event):
-        # #self.inputCounter.Fill(1)
-        # if self.cfg_comp.isMC:
-        #     genWeight = getattr(event.input, "genWeight")
-        #     if genWeight > 0:
-        #         self.inputCounterPosWeight.Fill(1)
-        #     elif genWeight < 0:
-        #         self.inputCounterNegWeight.Fill(1)
-
         for (syst, event_syst) in event.systResults.items():
             if event_syst.passes_btag:
                 res = self._process(event_syst)
@@ -273,24 +291,38 @@ class MEAnalyzer(FilterAnalyzer):
             "lumi":event.input.lumi,
             "event": event.input.evt,
             "cat": event.category_string,
-            "blr": event.btag_LR_4b_2b
+            "blr": event.btag_LR_4b_2b,
+            "match_btag": "{0}w_{1}h_{2}h".format(
+                event.nMatch_wq_btag,
+                event.nMatch_hb_btag,
+                event.nMatch_tb_btag,
+            ),
+            "match": "{0}w_{1}h_{2}h".format(
+                event.nMatch_wq,
+                event.nMatch_hb,
+                event.nMatch_tb,
+            )
         }
         memidx = self.conf.mem["methodOrder"].index(confname)
         outobjects["output"] = {
+            "mem_cfg": confname,
             "p_tth": event.mem_results_tth[memidx].p,
             "p_ttbb": event.mem_results_ttbb[memidx].p,
             "p": event.mem_results_tth[memidx].p / (
                 event.mem_results_tth[memidx].p + self.conf.mem["weight"]*event.mem_results_ttbb[memidx].p
             ) if event.mem_results_tth[memidx].p > 0 else 0.0
         }
-        print json.dumps(outobjects, indent=2)
         self.jsonout = open("events.json", "a")
         self.jsonout.write(
-            json.dumps(outobjects, indent=2) + "\n\n\n"
+            json.dumps(outobjects) + "\n"
         )
         self.jsonout.close()
 
     def _process(self, event):
+        
+        if "debug" in self.conf.general["verbosity"]:
+            autolog("MEMAnalyzer started")
+        
         #Clean up any old MEM state
         self.vars_to_integrate.clear()
         self.vars_to_marginalize.clear()
@@ -308,6 +340,7 @@ class MEAnalyzer(FilterAnalyzer):
                 event.input.run, event.input.lumi, event.input.evt,
                 event.is_sl, event.is_dl,
                 event.cat, event.cat_btag, event.numJets, event.nBCSVM,
+                event.n_el_SL, event.n_mu_SL, getattr(event, "systematic", None),
                 getattr(event, "systematic", None),
             )
 
@@ -342,8 +375,9 @@ class MEAnalyzer(FilterAnalyzer):
                         continue
 
                 #if "meminput" in self.conf.general["verbosity"]:
-                if "meminput" in self.conf.general["verbosity"]:
-                    print "MEM conf={0} fs={1} nl={2} nb={3} nq={4} numJets={5} nBCSVM={6} bLR={7} doCalc={8} enabled={9} selection={10} inRun={11} isMC={12}".format(
+                if ("meminput" in self.conf.general["verbosity"] or
+                    "debug" in self.conf.general["verbosity"]):
+                    autolog("MEMconf={0} fstate={1} MEMCand[l={2} b={3} q={4}] Reco[j={5} b={6} bLR={7}] MEMconf.doCalc={8} event.selection={9} toBeRun={10} isMC={11}".format(
                         confname,
                         fstate,
                         len(mem_cfg.lepton_candidates(event)),
@@ -351,19 +385,16 @@ class MEAnalyzer(FilterAnalyzer):
                         len(mem_cfg.l_quark_candidates(event)),
                         event.numJets, event.nBCSVM, event.btag_LR_4b_2b,
                         mem_cfg.do_calculate(event, mem_cfg),
-                        mem_cfg.enabled,
                         self.conf.mem["selection"](event),
                         confname in self.memkeysToRun,
                         self.cfg_comp.isMC
-                    )
+                    ))
                     
                 #Run MEM if we did not explicitly disable it
                 if (self.conf.mem["calcME"] and
                         mem_cfg.do_calculate(event, mem_cfg) and
-                        mem_cfg.enabled and
                         self.conf.mem["selection"](event) and
                         confname in self.memkeysToRun
-                        #self.cfg_comp.isMC #only run MEM on MC
                     ):
                     
                     print "Integrator::run started hypo={0} conf={1} run:lumi:evt={2}:{3}:{4} {5} blr={6}".format(
@@ -378,7 +409,7 @@ class MEAnalyzer(FilterAnalyzer):
                         self.vars_to_integrate,
                         self.vars_to_marginalize
                     )
-                    print "Integrator::run done hypo={0} conf={1}".format(hypo, confname)
+                    print "Integrator::run done hypo={0} conf={1} cat={2}".format(hypo, confname, event.cat) #DS
 
                     res[(hypo, confname)] = r
                 else:
@@ -396,7 +427,8 @@ class MEAnalyzer(FilterAnalyzer):
         event.mem_results_ttbb = [res[(MEM.Hypothesis.TTBB, k)] for k in self.memkeys]
 
         for confname in self.memkeysToRun:
-            if confname not in skipped and "commoninput" in self.conf.general["verbosity"]:
+            mem_cfg = self.mem_configs[confname]
+            if "commoninput" in self.conf.general["verbosity"] and mem_cfg.do_calculate(event, mem_cfg):
                 self.printInputs(event, confname)
         
         if "memoutput" in self.conf.general["verbosity"]:
