@@ -1,4 +1,4 @@
-VHbb + tthbb13 ntuples
+VHBB + tthbb13 ntuples
 =======================
 
 March2016B: VHBBHeppyV20_tthbbV3_withme_finer
@@ -14,3 +14,13 @@ March2016C: VHBBHeppyV21_tthbbV5
 --------------
 * tthbb13 code: `bb20d988313d75fb4a0ef54785e271b5c8274ddf`
 * vhbb code: `16bc9e81196c5d5ab918f62a92ca4618b88932d8`
+
+
+April2016D: VHBBHeppyV21_tthbbV7_Apr25
+--------------
+* `tthbb13=0179317`
+* `CommonClassifier=2505ba5`
+* `MEIntegratorStandalone=973bcf0`
+* `CMSSW=16bc9e8`
+
+Comments: created with the fully-hadronic branch merged.
