@@ -16,7 +16,7 @@ source common.sh
 export ME_CONF=$CMSSW_BASE/src/TTH/MEAnalysis/python/@me_conf@
 
 #go to work directory
-cd $MY_SCRATCH
+cd $GC_SCRATCH
 
 # Make sure we process all events (as currently using file based splitting)
 # Change back if we go to event bases
@@ -30,11 +30,19 @@ echo "MEAnalysis is done"
 
 #copy output
 ME_CONF_NAME=$(basename "$ME_CONF")
-export SRMBASE=srm://t3se01.psi.ch/pnfs/psi.ch/cms/trivcat/store/user/$USER/tth
-OUTDIR=${TASK_ID}/${ME_CONF_NAME%.*}/${DATASETPATH}/
-mkdir -p $SRMBASE/$OUTDIR || true
+
+#OUTDIR=${TASK_ID}/${ME_CONF_NAME%.*}/${DATASETPATH}/
+OUTDIR=~/tth/gc/${GC_TASK_ID}/${ME_CONF_NAME%.*}/${DATASETPATH}/
+
 echo "copying output"
 OFNAME=$OUTDIR/output_${MY_JOBID}.root
-gfal-copy file://$MY_SCRATCH/Loop/tree.root $SRMBASE/$OFNAME
+
+#export SRMBASE=srm://t3se01.psi.ch/pnfs/psi.ch/cms/trivcat/store/user/$USER/tth
+#mkdir -p $SRMBASE/$OUTDIR || true
+#gfal-copy file://$MY_SCRATCH/Loop/tree.root $SRMBASE/$OFNAME
+
+mkdir -p $OUTDIR
+cp $GC_SCRATCH/Loop/tree.root $OUTDIR/tree_$MY_JOBID.root
+
 echo $OFNAME > output.txt
 

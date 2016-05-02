@@ -2,8 +2,8 @@ from WMCore.Configuration import Configuration
 config = Configuration()
 config.section_('General')
 config.General.transferLogs = True
-config.General.workArea = 'crab_projects/VHBBHeppyV21_tthbbV7_fh'
-config.General.requestName = 'tth_VHBBHeppyV21_tthbbV7_fh_TT_TuneCUETP8M1_13TeV-powheg-Py8__fall15MAv2-pu25ns15v1_76r2as12_ext3-v1'
+config.General.workArea = 'crab_projects/VHBBHeppyV21_tthbbV8_Apr30'
+config.General.requestName = 'tth_VHBBHeppyV21_tthbbV8_Apr30_TT_TuneCUETP8M1_13TeV-powheg-Py8__fall15MAv2-pu25ns15v1_76r12_ext3-v1'
 config.section_('JobType')
 config.JobType.psetName = 'heppy_crab_fake_pset.py'
 config.JobType.pluginName = 'Analysis'
@@ -12,13 +12,13 @@ config.JobType.inputFiles = ['heppy_config.py', 'heppy_crab_script.py', 'python.
 config.JobType.scriptExe = 'heppy_crab_script.sh'
 config.section_('Data')
 config.Data.inputDataset = '/TT_TuneCUETP8M1_13TeV-powheg-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext3-v1/MINIAODSIM'
-config.Data.outputDatasetTag = 'VHBBHeppyV21_tthbbV7_fh_TT_TuneCUETP8M1_13TeV-powheg-Py8__fall15MAv2-pu25ns15v1_76r2as_v12_ext3-v1'
+config.Data.outputDatasetTag = 'VHBBHeppyV21_tthbbV8_Apr30_TT_TuneCUETP8M1_13TeV-powheg-Py8__fall15MAv2-pu25ns15v1_76r2as_v12_ext3-v1'
 config.Data.totalUnits = -1
 config.Data.unitsPerJob = 100
 config.Data.ignoreLocality = False
 config.Data.inputDBS = 'global'
 config.Data.splitting = 'LumiBased'
-config.Data.outLFNDirBase = '/store/user/jpata/tth/VHBBHeppyV21_tthbbV7_fh'
+config.Data.outLFNDirBase = '/store/user/jpata/tth/VHBBHeppyV21_tthbbV8_Apr30'
 config.Data.publication = True
 config.section_('Site')
 config.Site.storageSite = 'T2_CH_CSCS'
