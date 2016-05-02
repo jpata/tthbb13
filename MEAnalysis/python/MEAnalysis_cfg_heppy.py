@@ -345,7 +345,7 @@ class Conf:
             #"SL_2w2h2t_memLR",
             #"SL_0w2h2t_memLR",
             #"DL_0w2h2t_Rndge4t",
-            #"FH_4w2h2t", #8j,4b
+            "FH_4w2h2t", #8j,4b
             #"FH_3w2h2t", #7j,4b
             #"FH_4w2h1t", #7j,3b & 8j,3b
             #"FH_0w2h2t", #all 4b cats
