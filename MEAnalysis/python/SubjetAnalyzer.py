@@ -6,6 +6,8 @@ import numpy as np
 import math
 from TTH.MEAnalysis.vhbb_utils import lvec, autolog
 
+import pdb
+
 class Jet_container:
     def __init__(self, pt, eta, phi, mass):
         self.pt = pt
@@ -187,7 +189,14 @@ class SubjetAnalyzer(FilterAnalyzer):
         # ======================================
 
         #Types of fatjets to match to Higgs candidate
-        fatjets_to_match = ["softdropz2b1", "softdrop", "pruned"]
+        fatjets_to_match = ["softdropz2b1", "softdrop", "pruned", "subjetfiltered"]
+        extra_higgs_vars = ["mass", "nallsubjets", "sj1pt", "sj1eta", "sj1phi", "sj1mass", "sj1btag", "sj2pt", "sj2eta", "sj2phi", "sj2mass", "sj2btag", "sj12mass"]
+        
+        # TODO: 
+        # -add groomed n-subjettiness
+
+        for fatjet_name in fatjets_to_match:
+            self.Add_Higgs_Subjets_To_Fatjet(event, fatjet_name)
 
         higgs_present = False
         higgsCandidates = []
@@ -204,42 +213,44 @@ class SubjetAnalyzer(FilterAnalyzer):
             if top:
                 fatjet.dr_top = self.Get_DeltaR_two_objects(fatjet, top)
 
-            #set default masses for all fatjet types
+            #set default extra variables for all fatjet types
             for fatjetkind in fatjets_to_match:
-                setattr(fatjet, "mass_" + fatjetkind, 0)
-            
+                for var in extra_higgs_vars:
+                    setattr(fatjet, var + "_" + fatjetkind, -9999)
+                    
             genhiggs = getattr(event, "GenHiggsBoson", [])
+
             #match higgs candidate to generated higgs
             if self.cfg_comp.isMC and len(genhiggs) >= 1:
                 lv1 = lvec(fatjet)
                 lv2 = lvec(genhiggs[0])
                 fatjet.dr_genHiggs = lv1.DeltaR(lv2)
-            # FIXME: to associate higgs candidates to subjets, need fatjet to subjet association
-            # higgs_subjets = self.Get_Subjets( fatjet ) <-- does not work like this
-            # for (isj, subjet) in enumerate(higgs_subjets):
-            #     setattr(fatjet, "sj{0}pt", subjet.pt)
-            #     setattr(fatjet, "sj{0}eta", subjet.eta)
-            #     setattr(fatjet, "sj{0}phi", subjet.phi)
-            #     setattr(fatjet, "sj{0}mass", subjet.mass)
-            #     setattr(fatjet, "sj{0}btag", subjet.btagCSV)
+
             higgsCandidates.append( fatjet )
             higgs_present = True
 
         # Sort by decreasing bbtag
         higgsCandidates = sorted( higgsCandidates, key=lambda x: -x.bbtag )
         
-        #Match higgs candidates to various fat jets
+        # Match higgs candidates to various fat jets
         for fatjetkind in fatjets_to_match:
             nmatch = self.Match_two_lists(
                 higgsCandidates, 'higgs',
                 getattr(event, "FatjetCA15" + fatjetkind), 'fatjet_' + fatjetkind,
                 R_cut = self.R_cut_fatjets
             )
+
+        # Add properties of the matched fatjet to the higgs candidate
         for higgsCandidate in higgsCandidates:
             for fatjetkind in fatjets_to_match:
                 matchjet = getattr(higgsCandidate, "matched_fatjet_" + fatjetkind, None)
                 if matchjet != None:
-                    setattr(higgsCandidate, "mass_" + fatjetkind, matchjet.mass)
+                    for var in extra_higgs_vars:                        
+                        if hasattr(matchjet,var):
+                            setattr(higgsCandidate, var + "_" + fatjetkind, getattr(matchjet,var))
+                        else:
+                            print "No",matchjet, var
+                            
         ########################################
         # Get the lists of particles: quarks, jets and subjets
         ########################################
@@ -1011,6 +1022,59 @@ class SubjetAnalyzer(FilterAnalyzer):
             event.n_matched_TTgenb = n_matched_genb
             event.n_matched_TTgenW = n_matched_genW
      
-      
 
+    def Add_Higgs_Subjets_To_Fatjet(self, event, fatjet_name):
+            
+        # get fatjet and subjet collections
+        all_fatjets = getattr(event, "FatjetCA15" + fatjet_name)
+        all_subjets = getattr(event,  "SubjetCA15" + fatjet_name)
+
+            
+        # for Higgs reconstruction we want two subjets
+        # 
+        # the procedure differs by fatjet collection:
+        # 
+        # -softdrop and pruned: we only have two subjets, sort them by b-tag
+        # -subjet-filtered: we have many more, sort by pT first, 
+        #    take leading three, then sort by btag and take leading two
+            
+        # loop over fatjets
+        for i_fj, fj in enumerate(all_fatjets):
+
+            # get the subjets that belong to it
+            subjets = [sj for sj in all_subjets if sj.fromFJ == i_fj]
+
+            fj.nallsubjets = len(subjets)
+            
+            if fatjet_name == "subjetfiltered":
+                subjets = sorted(subjets, key = lambda x: -x.pt)
+                if len(subjets) > 3:
+                    subjets = subjets[:3]
+                    
+            # Now sort by b-tag
+            subjets = sorted(subjets, key = lambda x: -x.btag)
+                
+            # And add quantities to fatjet
+            
+            print fatjet_name, len(subjets)
+
+            for isj, subjet in enumerate(subjets):
+                setattr(fj, "sj{0}pt".format(isj+1), subjet.pt)
+                setattr(fj, "sj{0}eta".format(isj+1), subjet.eta)
+                setattr(fj, "sj{0}phi".format(isj+1), subjet.phi)
+                setattr(fj, "sj{0}mass".format(isj+1), subjet.mass)
+                setattr(fj, "sj{0}btag".format(isj+1), subjet.btag)
+            
+            # Also calculate the mass of subjet pair
+            # mostly important for BDRS
+            if len(subjets) >= 2:
+                sj1 = ROOT.TLorentzVector()
+                sj2 = ROOT.TLorentzVector()
+                sj1.SetPtEtaPhiM( subjets[0].pt, subjets[0].eta, subjets[0].phi, subjets[0].mass)
+                sj2.SetPtEtaPhiM( subjets[1].pt, subjets[1].eta, subjets[1].phi, subjets[1].mass)
+                setattr(fj, "sj12mass", (sj1+sj2).M())
+            
+
+    # end of Add_Higgs_Subjets_To_Fatjet
+                        
 #==========================END OF SUBJET ANALYZER==========================#
