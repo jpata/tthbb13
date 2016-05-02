@@ -10,19 +10,12 @@ git cms-merge-topic jpata:V21_v1
 #get the TTH code
 git clone https://github.com/jpata/tthbb13.git TTH
 cd TTH
-git checkout meanalysis-76x
-git clone https://github.com/bianchini/Code.git MEIntegratorStandalone
-cd MEIntegratorStandalone
-cd ../..
+git checkout meanalysis-76x_V9
+git clone https://github.com/bianchini/Code.git TTH/MEIntegratorStandalone
 
-cd TTH
-git clone https://github.com/jpata/CommonClassifier.git --branch mem_npoints
-cd ..
+git clone https://github.com/jpata/CommonClassifier.git TTH/CommonClassifier --branch mem_npoints
 
-#git clone https://github.com/cms-analysis/HiggsAnalysis-CombinedLimit.git HiggsAnalysis/CombinedLimit
-#cd HiggsAnalysis/CombinedLimit
-#git checkout 74x-root6
-#cd ../..
+git clone https://github.com/cms-analysis/HiggsAnalysis-CombinedLimit.git HiggsAnalysis/CombinedLimit --branch 74x-root6 
 
 #after scram b clean, these need to be copied again
 cp -R TTH/MEIntegratorStandalone/libs/* ../lib/$SCRAM_ARCH/
@@ -31,8 +24,4 @@ scram setup lhapdf
 
 cd TTH/MEAnalysis/gc
 git clone https://github.com/grid-control/grid-control
-cd grid-control
-git checkout from-svn
-cd ../../..
-# And build:
-# scram b -j 10
+cd $CMSSW_BASE
