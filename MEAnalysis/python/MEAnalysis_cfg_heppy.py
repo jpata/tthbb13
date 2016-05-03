@@ -327,9 +327,9 @@ class Conf:
             "FH_4w2h2t", #8j,4b & 9j,4b
             "FH_3w2h2t", #7j,4b
             "FH_4w2h1t", #7j,3b & 8j,3b
-            "FH_0w2h2t", #all 4b cats
-            "FH_0w2h1t", #all cats
-            "FH_0w1h2t"  #all cats
+            "FH_0w0w2h2t", #all 4b cats
+            "FH_0w0w2h1t", #all cats
+            "FH_0w0w1h2t"  #all cats
         ],
 
         #This configures the MEMs to actually run, the rest will be set to 0
@@ -348,9 +348,9 @@ class Conf:
             "FH_4w2h2t", #8j,4b
             #"FH_3w2h2t", #7j,4b
             #"FH_4w2h1t", #7j,3b & 8j,3b
-            #"FH_0w2h2t", #all 4b cats
-            #"FH_0w2h1t", #all cats
-            #"FH_0w1h2t"  #all cats
+            #"FH_0w0w2h2t", #all 4b cats
+            #"FH_0w0w2h1t", #all cats
+            #"FH_0w0w1h2t"  #all cats
         ],
 
     }
@@ -597,7 +597,7 @@ c.cfg.perm_pruning = strat
 Conf.mem_configs["FH_4w2h1t"] = c
 
 ###
-### FH_0w2h2t #all 4b categories: 7j,4b, 8j,4b, 9j,4b
+### FH_0w0w2h2t #all 4b categories: 7j,4b, 8j,4b, 9j,4b
 ###
 c = MEMConfig(Conf)
 c.l_quark_candidates = lambda event: event.buntagged_jets + event.selected_btagged_jets_low
@@ -609,16 +609,16 @@ c.do_calculate = lambda ev, mcfg: (
       (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==9 ) 
 )
 c.mem_assumptions.add("fh")
-c.mem_assumptions.add("0w2h2t")
+c.mem_assumptions.add("0w0w2h2t")
 strat = CvectorPermutations()
 strat.push_back(MEM.Permutations.QQbarBBbarSymmetry) #FIXME: add t-tbar symmetry
 strat.push_back(MEM.Permutations.QUntagged)
 strat.push_back(MEM.Permutations.BTagged)
 c.cfg.perm_pruning = strat
-Conf.mem_configs["FH_0w2h2t"] = c
+Conf.mem_configs["FH_0w0w2h2t"] = c
 
 ###
-### FH_0w2h1t #all FH categories: 7j,4b, 8j,4b, 9j,4b, 7j,3b, 8j,3b, 9j,3b
+### FH_0w0w2h1t #all FH categories: 7j,4b, 8j,4b, 9j,4b, 7j,3b, 8j,3b, 9j,3b
 ###
 c = MEMConfig(Conf)
 c.l_quark_candidates = lambda event: event.buntagged_jets + event.selected_btagged_jets_low
@@ -630,16 +630,16 @@ c.do_calculate = lambda ev, mcfg: (
       (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==9 ) 
 )
 c.mem_assumptions.add("fh")
-c.mem_assumptions.add("0w2h1t")
+c.mem_assumptions.add("0w0w2h1t")
 strat = CvectorPermutations()
 strat.push_back(MEM.Permutations.QQbarBBbarSymmetry) #FIXME: add t-tbar symmetry
 strat.push_back(MEM.Permutations.QUntagged)
 strat.push_back(MEM.Permutations.BTagged)
 c.cfg.perm_pruning = strat
-Conf.mem_configs["FH_0w2h1t"] = c
+Conf.mem_configs["FH_0w0w2h1t"] = c
 
 ###
-### FH_0w1h2t #all FH categories: 7j,4b, 8j,4b, 9j,4b, 7j,3b, 8j,3b, 9j,3b
+### FH_0w0w1h2t #all FH categories: 7j,4b, 8j,4b, 9j,4b, 7j,3b, 8j,3b, 9j,3b
 ###
 c = MEMConfig(Conf)
 c.l_quark_candidates = lambda event: event.buntagged_jets + event.selected_btagged_jets_low
@@ -651,13 +651,13 @@ c.do_calculate = lambda ev, mcfg: (
       (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==9 ) 
 )
 c.mem_assumptions.add("fh")
-c.mem_assumptions.add("0w1h2t")
+c.mem_assumptions.add("0w0w1h2t")
 strat = CvectorPermutations()
 strat.push_back(MEM.Permutations.QQbarBBbarSymmetry) #FIXME: add t-tbar symmetry
 strat.push_back(MEM.Permutations.QUntagged)
 strat.push_back(MEM.Permutations.BTagged)
 c.cfg.perm_pruning = strat
-Conf.mem_configs["FH_0w1h2t"] = c
+Conf.mem_configs["FH_0w0w1h2t"] = c
 
 import inspect
 def print_dict(d):
