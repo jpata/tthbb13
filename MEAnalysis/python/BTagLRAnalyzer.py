@@ -237,6 +237,23 @@ class BTagLRAnalyzer(FilterAnalyzer):
                 cat += "jge4_tge4"
             else:
                 cat = "unknown"
+        elif event.is_fh:  #DS
+            cat += "fh_"
+            if len(event.good_jets) == 7:
+                cat += "j7_"
+            elif len(event.good_jets) == 8:
+                cat += "j8_"
+            elif len(event.good_jets) >= 9:
+                cat += "jge9_"
+
+            if event.nBCSVM == 3:
+                cat += "t3"
+            elif event.nBCSVM == 4:
+                cat += "t4"
+            elif event.nBCSVM >= 5:
+                cat += "tge5"
+            else:
+                cat = "unknown"
         else:
             cat = "unknown"
 
