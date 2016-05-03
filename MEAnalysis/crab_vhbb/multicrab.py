@@ -1,4 +1,6 @@
 dataset = {
+    'ttH':'/ttHTobb_M125_13TeV_powheg_pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
+    'TTbar':'/TT_TuneCUETP8M1_13TeV-powheg-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext3-v1/MINIAODSIM',
     'QCD300':'/QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
     'QCD500':'/QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
     'QCD700':'/QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
@@ -8,6 +10,8 @@ dataset = {
 }
 
 nlumis = {
+    'ttH':     -1,
+    'TTbar':   99000,
     'QCD300':  -1,
     'QCD500':  -1,
     'QCD700':  -1,
@@ -17,13 +21,17 @@ nlumis = {
 }
 
 lumisPerJob = {
-    'QCD300':  1000,
-    'QCD500':  1000,
-    'QCD700':  500,
+    'ttH':     10,
+    'TTbar':   200,
+    'QCD300':  500,
+    'QCD500':  500,
+    'QCD700':  300,
     'QCD1000': 200,
     'QCD1500': 100,
     'QCD2000': 100,
 }
+
+version = '_v1'  #***************CHANGE HERE***************
 
 fractionlumis=10 #>1 for testing
 
@@ -35,7 +43,7 @@ if __name__ == '__main__':
 
     from CRABClient.UserUtilities import config
     config = config()
-    name = 'VHBBHeppyV21_tthbbV7_v1'  #***************CHANGE HERE***************
+    name = 'VHBBHeppyV21_tthbbV9' + version
     config.General.workArea = 'crab_projects/'+name
     config.General.transferLogs = True
 
@@ -79,18 +87,19 @@ if __name__ == '__main__':
 
     config.Site.storageSite = "T2_CH_CSCS"
 
-    listOfSamples = ['QCD300','QCD500','QCD700','QCD1000','QCD1500','QCD2000']
+    listOfSamples = ['ttH','TTbar','QCD300','QCD500','QCD700','QCD1000','QCD1500','QCD2000'] #******CHOOSE HERE*********
 
     #loop over samples
     for sample in listOfSamples:
+        print ''
         print 'submitting ' + sample
-        config.General.requestName = sample
+        config.General.requestName = sample + version
         config.Data.inputDataset = dataset[sample]
         config.Data.unitsPerJob = lumisPerJob[sample]/fractionlumis
         if fractionlumis>1:
             config.Data.totalUnits = lumisPerJob[sample]
         else:
             config.Data.totalUnits = nlumis[sample]
-        config.Data.outputDatasetTag = sample
+        config.Data.outputDatasetTag = name
         config.Data.outLFNDirBase = '/store/user/dsalerno/tth/' + name
 	submit(config)
