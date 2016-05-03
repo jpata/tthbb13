@@ -248,8 +248,6 @@ class SubjetAnalyzer(FilterAnalyzer):
                     for var in extra_higgs_vars:                        
                         if hasattr(matchjet,var):
                             setattr(higgsCandidate, var + "_" + fatjetkind, getattr(matchjet,var))
-                        else:
-                            print "No",matchjet, var
                             
         ########################################
         # Get the lists of particles: quarks, jets and subjets
@@ -1054,10 +1052,7 @@ class SubjetAnalyzer(FilterAnalyzer):
             # Now sort by b-tag
             subjets = sorted(subjets, key = lambda x: -x.btag)
                 
-            # And add quantities to fatjet
-            
-            print fatjet_name, len(subjets)
-
+            # And add quantities to fatjet                    
             for isj, subjet in enumerate(subjets):
                 setattr(fj, "sj{0}pt".format(isj+1), subjet.pt)
                 setattr(fj, "sj{0}eta".format(isj+1), subjet.eta)
