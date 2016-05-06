@@ -12,7 +12,8 @@ tt = tf.Get("tree")
 compare_basic = True
 compare_extra = False
 compare_dl    = False
-compare_boost = False
+compare_boost = True
+
 
 def getVar(tt, var, syst):
     if syst == "nominal":
@@ -105,59 +106,59 @@ variables = [
     ["finalDiscriminant2",   compare_extra],
     ["higgstag_fatjet_1",    compare_extra],
     ["higgstag_fatjet_2",    compare_extra],
-    ["n_fatjets",            compare_boost],
-    ["pt_fatjet_1",          compare_boost],
-    ["pt_fatjet_2",          compare_boost],
-    ["pt_nonW_1",            compare_boost],
-    ["pt_nonW_2",            compare_boost],
-    ["pt_W1_1",              compare_boost],
-    ["pt_W1_2",              compare_boost],
-    ["pt_W2_1",              compare_boost],
-    ["pt_W2_2",              compare_boost],
-    ["csv_nonW_1",           compare_boost],
-    ["csv_nonW_2",           compare_boost],
-    ["csv_W1_1",             compare_boost],
-    ["csv_W1_2",             compare_boost],
-    ["csv_W2_1",             compare_boost],
-    ["csv_W2_2",             compare_boost],
-    ["m_top_1",              compare_boost],
-    ["m_top_2",              compare_boost],
-    ["pt_sf_filterjet1_1",   compare_boost],
-    ["pt_sf_filterjet1_2",   compare_boost],
-    ["pt_sf_filterjet2_1",   compare_boost],
-    ["pt_sf_filterjet2_2 ",  compare_boost],
-    ["pt_sf_filterjet3_1",   compare_boost],
-    ["pt_sf_filterjet3_2",   compare_boost],
-    ["csv_sf_filterjet1_1",  compare_boost],
-    ["csv_sf_filterjet1_2",  compare_boost],
-    ["csv_sf_filterjet2_1",  compare_boost],
-    ["csv_sf_filterjet2_2",  compare_boost],
-    ["csv_sf_filterjet3_1",  compare_boost],
-    ["csv_sf_filterjet3_2",  compare_boost],
-    ["pt_pruned_subjet1_1",  compare_boost],
-    ["pt_pruned_subjet1_2",  compare_boost],
-    ["pt_pruned_subjet2_1",  compare_boost],
-    ["pt_pruned_subjet2_2",  compare_boost],
-    ["csv_pruned_subjet1_1", compare_boost],
-    ["csv_pruned_subjet1_2", compare_boost],
-    ["csv_pruned_subjet2_1", compare_boost],
-    ["csv_pruned_subjet2_2", compare_boost],
-    ["pt_sd_subjet1_1",      compare_boost],
-    ["pt_sd_subjet1_2",      compare_boost],
-    ["pt_sd_subjet2_1",      compare_boost],
-    ["pt_sd_subjet2_2",      compare_boost],
-    ["csv_sd_subjet1_1",     compare_boost],
-    ["csv_sd_subjet1_2",     compare_boost],
-    ["csv_sd_subjet2_1",     compare_boost],
-    ["csv_sd_subjet2_2",     compare_boost],
-    ["pt_sdz2b1_subjet1_1",  compare_boost],
-    ["pt_sdz2b1_subjet1_2",  compare_boost],
-    ["pt_sdz2b1_subjet2_1",  compare_boost],
-    ["pt_sdz2b1_subjet2_2",  compare_boost],
-    ["csv_sdz2b1_subjet1_1", compare_boost],
-    ["csv_sdz2b1_subjet1_2", compare_boost],
-    ["csv_sdz2b1_subjet2_1", compare_boost],
-    ["csv_sdz2b1_subjet2_2", compare_boost],
+    ["n_fatjets",            compare_boost, lambda tt: tt.nfatjets],
+    ["pt_fatjet_1",          compare_boost, lambda tt: tt.fatjets_pt[0] if tt.nfatjets >= 1 else 0.],
+    ["pt_fatjet_2",          compare_boost, lambda tt: tt.fatjets_pt[1] if tt.nfatjets >= 2 else 0.],
+    ["pt_nonW_1",            compare_boost, lambda tt: tt.topCandidatesSync_sjNonWpt[0] if tt.ntopCandidatesSync >= 1 else 0.],
+    ["pt_nonW_2",            compare_boost, lambda tt: tt.topCandidatesSync_sjNonWpt[1] if tt.ntopCandidatesSync >= 2 else 0.],
+    ["pt_W1_1",              compare_boost, lambda tt: tt.topCandidatesSync_sjW1pt[0] if tt.ntopCandidatesSync >= 1 else 0.],
+    ["pt_W1_2",              compare_boost, lambda tt: tt.topCandidatesSync_sjW2pt[1] if tt.ntopCandidatesSync >= 2 else 0.],
+    ["pt_W2_1",              compare_boost, lambda tt: tt.topCandidatesSync_sjW1pt[0] if tt.ntopCandidatesSync >= 1 else 0.],
+    ["pt_W2_2",              compare_boost, lambda tt: tt.topCandidatesSync_sjW2pt[1] if tt.ntopCandidatesSync >= 2 else 0.],   
+    ["csv_nonW_1",           compare_boost, lambda tt: tt.topCandidatesSync_sjNonWbtag[0] if tt.ntopCandidatesSync >= 1 else 0.], 
+    ["csv_nonW_2",           compare_boost, lambda tt: tt.topCandidatesSync_sjNonWbtag[1] if tt.ntopCandidatesSync >= 2 else 0.], 
+    ["csv_W1_1",             compare_boost, lambda tt: tt.topCandidatesSync_sjW1btag[0] if tt.ntopCandidatesSync >= 1 else 0.],   
+    ["csv_W1_2",             compare_boost, lambda tt: tt.topCandidatesSync_sjW2btag[1] if tt.ntopCandidatesSync >= 2 else 0.],   
+    ["csv_W2_1",             compare_boost, lambda tt: tt.topCandidatesSync_sjW1btag[0] if tt.ntopCandidatesSync >= 1 else 0.],   
+    ["csv_W2_2",             compare_boost, lambda tt: tt.topCandidatesSync_sjW2btag[1] if tt.ntopCandidatesSync >= 2 else 0.],   
+    ["m_top_1",              compare_boost, lambda tt: tt.topCandidatesSync_mass[0] if tt.ntopCandidatesSync >= 1 else 0.],   
+    ["m_top_2",              compare_boost, lambda tt: tt.topCandidatesSync_mass[1] if tt.ntopCandidatesSync >= 2 else 0.],   
+    ["pt_sf_filterjet1_1",   compare_boost, lambda tt: tt.higgsCandidate_sj1pt_subjetfiltered[0] if tt.nhiggsCandidate >= 1 else 0.],
+    ["pt_sf_filterjet1_2",   compare_boost, lambda tt: tt.higgsCandidate_sj1pt_subjetfiltered[1] if tt.nhiggsCandidate >= 2 else 0.],
+    ["pt_sf_filterjet2_1",   compare_boost, lambda tt: tt.higgsCandidate_sj2pt_subjetfiltered[0] if tt.nhiggsCandidate >= 1 else 0.],
+    ["pt_sf_filterjet2_2 ",  compare_boost, lambda tt: tt.higgsCandidate_sj2pt_subjetfiltered[1] if tt.nhiggsCandidate >= 2 else 0.],
+    ["pt_sf_filterjet3_1",   compare_boost, lambda tt: tt.higgsCandidate_sj3pt_subjetfiltered[0]  if tt.nhiggsCandidate >= 1 else 0.],
+    ["pt_sf_filterjet3_2",   compare_boost, lambda tt: tt.higgsCandidate_sj3pt_subjetfiltered[1]  if tt.nhiggsCandidate >= 2 else 0.],
+    ["csv_sf_filterjet1_1",  compare_boost, lambda tt: tt.higgsCandidate_sj1btag_subjetfiltered[0] if tt.nhiggsCandidate >= 1 else 0.],
+    ["csv_sf_filterjet1_2",  compare_boost, lambda tt: tt.higgsCandidate_sj1btag_subjetfiltered[1] if tt.nhiggsCandidate >= 2 else 0.],
+    ["csv_sf_filterjet2_1",  compare_boost, lambda tt: tt.higgsCandidate_sj2btag_subjetfiltered[0] if tt.nhiggsCandidate >= 1 else 0.],
+    ["csv_sf_filterjet2_2",  compare_boost, lambda tt: tt.higgsCandidate_sj2btag_subjetfiltered[1] if tt.nhiggsCandidate >= 2 else 0.],
+    ["csv_sf_filterjet3_1",  compare_boost, lambda tt: tt.higgsCandidate_sj3btag_subjetfiltered[0]  if tt.nhiggsCandidate >= 1 else 0.],
+    ["csv_sf_filterjet3_2",  compare_boost, lambda tt: tt.higgsCandidate_sj3btag_subjetfiltered[1]  if tt.nhiggsCandidate >= 2 else 0.],
+    ["pt_pruned_subjet1_1",  compare_boost, lambda tt: tt.higgsCandidate_sj1pt_pruned[0] if tt.nhiggsCandidate >= 1 else 0.],   
+    ["pt_pruned_subjet1_2",  compare_boost, lambda tt: tt.higgsCandidate_sj1pt_pruned[1] if tt.nhiggsCandidate >= 2 else 0.],   
+    ["pt_pruned_subjet2_1",  compare_boost, lambda tt: tt.higgsCandidate_sj2pt_pruned[0] if tt.nhiggsCandidate >= 1 else 0.],   
+    ["pt_pruned_subjet2_2",  compare_boost, lambda tt: tt.higgsCandidate_sj2pt_pruned[1] if tt.nhiggsCandidate >= 2 else 0.],   
+    ["csv_pruned_subjet1_1", compare_boost, lambda tt: tt.higgsCandidate_sj1btag_pruned[0] if tt.nhiggsCandidate >= 1 else 0.], 
+    ["csv_pruned_subjet1_2", compare_boost, lambda tt: tt.higgsCandidate_sj1btag_pruned[1] if tt.nhiggsCandidate >= 2 else 0.], 
+    ["csv_pruned_subjet2_1", compare_boost, lambda tt: tt.higgsCandidate_sj2btag_pruned[0] if tt.nhiggsCandidate >= 1 else 0.], 
+    ["csv_pruned_subjet2_2", compare_boost, lambda tt: tt.higgsCandidate_sj2btag_pruned[1] if tt.nhiggsCandidate >= 2 else 0.], 
+    ["pt_sd_subjet1_1",      compare_boost, lambda tt: tt.higgsCandidate_sj1pt_softdrop[0] if tt.nhiggsCandidate >= 1 else 0.],  
+    ["pt_sd_subjet1_2",      compare_boost, lambda tt: tt.higgsCandidate_sj1pt_softdrop[1] if tt.nhiggsCandidate >= 2 else 0.],  
+    ["pt_sd_subjet2_1",      compare_boost, lambda tt: tt.higgsCandidate_sj2pt_softdrop[0] if tt.nhiggsCandidate >= 1 else 0.],  
+    ["pt_sd_subjet2_2",      compare_boost, lambda tt: tt.higgsCandidate_sj2pt_softdrop[1] if tt.nhiggsCandidate >= 2 else 0.],  
+    ["csv_sd_subjet1_1",     compare_boost, lambda tt: tt.higgsCandidate_sj1btag_softdrop[0] if tt.nhiggsCandidate >= 1 else 0.],
+    ["csv_sd_subjet1_2",     compare_boost, lambda tt: tt.higgsCandidate_sj1btag_softdrop[1] if tt.nhiggsCandidate >= 2 else 0.],
+    ["csv_sd_subjet2_1",     compare_boost, lambda tt: tt.higgsCandidate_sj2btag_softdrop[0] if tt.nhiggsCandidate >= 1 else 0.],
+    ["csv_sd_subjet2_2",     compare_boost, lambda tt: tt.higgsCandidate_sj2btag_softdrop[1] if tt.nhiggsCandidate >= 2 else 0.],
+    ["pt_sdz2b1_subjet1_1",  compare_boost, lambda tt: tt.higgsCandidate_sj1pt_softdropz2b1[0] if tt.nhiggsCandidate >= 1 else 0.],  
+    ["pt_sdz2b1_subjet1_2",  compare_boost, lambda tt: tt.higgsCandidate_sj1pt_softdropz2b1[1] if tt.nhiggsCandidate >= 2 else 0.],  
+    ["pt_sdz2b1_subjet2_1",  compare_boost, lambda tt: tt.higgsCandidate_sj2pt_softdropz2b1[0] if tt.nhiggsCandidate >= 1 else 0.],  
+    ["pt_sdz2b1_subjet2_2",  compare_boost, lambda tt: tt.higgsCandidate_sj2pt_softdropz2b1[1] if tt.nhiggsCandidate >= 2 else 0.],  
+    ["csv_sdz2b1_subjet1_1", compare_boost, lambda tt: tt.higgsCandidate_sj1btag_softdropz2b1[0] if tt.nhiggsCandidate >= 1 else 0.],
+    ["csv_sdz2b1_subjet1_2", compare_boost, lambda tt: tt.higgsCandidate_sj1btag_softdropz2b1[1] if tt.nhiggsCandidate >= 2 else 0.],
+    ["csv_sdz2b1_subjet2_1", compare_boost, lambda tt: tt.higgsCandidate_sj2btag_softdropz2b1[0] if tt.nhiggsCandidate >= 1 else 0.],
+    ["csv_sdz2b1_subjet2_2", compare_boost, lambda tt: tt.higgsCandidate_sj2btag_softdropz2b1[1] if tt.nhiggsCandidate >= 2 else 0.],
 ]    
 
 
@@ -243,19 +244,14 @@ for ev in range(tt.GetEntries()):
     #    float(0), float(0)              #higgstag_fatjet_1,higgstag_fatjet_2"
     #]
 
-    #s = ""
-    #for i in range(len(arr)):
-    #    if not isinstance(arr[i], int):
-    #        s += str(round(arr[i], 4)) + ","
-    #    else:
-    #        s += str(arr[i]) + ","
-    #lines += [(int(tt.evt), s[:-1])]
-
     s = ""
     for var in variables:
-        if var[1]:
-            
+        if var[1]:            
             res = var[2](tt)
+            
+            # Map dummy -9999 to zero
+            if res == -9999:
+                res =0 
             
             if not isinstance(res, int):
                 s += str(round(res, 4)) + ","
@@ -263,6 +259,8 @@ for ev in range(tt.GetEntries()):
                 s += str(res) + ","
     lines += [(int(tt.evt), s[:-1])]
 
+# List of all variable names
+print ",".join([var[0] for var in variables if var[1]])
 
 lines = sorted(lines, key=lambda x: x[0])
 for line in lines:
