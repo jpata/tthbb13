@@ -91,8 +91,10 @@ class GenTTHAnalyzer(FilterAnalyzer):
                 event.genTopLep = []
                 event.genTopHad = []
 
+        #these are the quarks that would pass selection
         event.l_quarks_gen = []
-        event.b_quarks_gen = []
+        event.b_quarks_gen_t = []
+        event.b_quarks_gen_h = []
 
         nq = 0
         #Find the light quarks from W that would pass jet selection
@@ -115,7 +117,7 @@ class GenTTHAnalyzer(FilterAnalyzer):
                 q.tth_match_label = "tb"
                 q.tth_match_index = nq
                 attach_jet_transfer_function(q, self.conf)
-                event.b_quarks_gen += [q]
+                event.b_quarks_gen_t += [q]
 
         #Find the b quarks from Higgs that would pass jet selection
         #associate them with a transfer function
@@ -126,7 +128,12 @@ class GenTTHAnalyzer(FilterAnalyzer):
                 q.tth_match_label = "hb"
                 q.tth_match_index = nq
                 attach_jet_transfer_function(q, self.conf)
-                event.b_quarks_gen += [q]
+                event.b_quarks_gen_h += [q]
+        
+        #Number of reco jets matched to quarks from W, top, higgs
+        event.nSelected_wq = len(event.l_quarks_gen)
+        event.nSelected_tb = len(event.b_quarks_gen_t)
+        event.nSelected_hb = len(event.b_quarks_gen_h)
 
         #Get the total MET from the neutrinos
         spx = 0
@@ -226,9 +233,9 @@ class GenTTHAnalyzer(FilterAnalyzer):
                             matched_pairs[ij] = (label, iq, dr, label_numeric, numeric_b_from_had_t)
 
         #Find the best possible match for each individual jet
-        match_jets_to_quarks(event.good_jets, event.l_quarks_w, "wq", 0)
-        match_jets_to_quarks(event.good_jets, event.b_quarks_t, "tb", 1)
-        match_jets_to_quarks(event.good_jets, event.b_quarks_h, "hb", 2)
+        match_jets_to_quarks(event.good_jets, event.l_quarks_gen, "wq", 0)
+        match_jets_to_quarks(event.good_jets, event.b_quarks_gen_t, "tb", 1)
+        match_jets_to_quarks(event.good_jets, event.b_quarks_gen_h, "hb", 2)
 
         #Number of reco jets matched to quarks from W, top, higgs
         event.nMatch_wq = 0
@@ -238,16 +245,6 @@ class GenTTHAnalyzer(FilterAnalyzer):
         event.nMatch_wq_btag = 0
         event.nMatch_tb_btag = 0
         event.nMatch_hb_btag = 0
-        
-        if "debug" in self.conf.general["verbosity"]:
-            autolog("nMatch {0}_{1}_{2} nMatch_btag {3}_{4}_{5}".format(
-                event.nMatch_wq,
-                event.nMatch_tb,
-                event.nMatch_hb,
-                event.nMatch_wq_btag,
-                event.nMatch_tb_btag,
-                event.nMatch_hb_btag,
-            ))
         
         #Now check what each jet was matched to
         for ij, jet in enumerate(event.good_jets):
@@ -295,6 +292,19 @@ class GenTTHAnalyzer(FilterAnalyzer):
                 if jet.btagFlag == 1.0:
                     event.nMatch_hb_btag += 1
 
+        if "debug" in self.conf.general["verbosity"]:
+            autolog("nSel {0}_{1}_{2} nMatch {3}_{4}_{5} nMatch_btag {6}_{7}_{8}".format(
+                event.nSelected_wq,
+                event.nSelected_tb,
+                event.nSelected_hb,
+                event.nMatch_wq,
+                event.nMatch_tb,
+                event.nMatch_hb,
+                event.nMatch_wq_btag,
+                event.nMatch_tb_btag,
+                event.nMatch_hb_btag,
+            ))
+        
         if "matching" in self.conf.general["verbosity"]:
             matches = {"wq":event.l_quarks_w, "tb": event.b_quarks_t, "hb":event.b_quarks_h}
 

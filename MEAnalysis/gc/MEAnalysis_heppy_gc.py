@@ -46,7 +46,7 @@ assert(len(good_samp) == 1)
 
 print 'Running over sample: {0}'.format(good_samp)
 
-outFileName = os.environ["MY_SCRATCH"] + "/output.root"
+outFileName = os.environ["GC_SCRATCH"] + "/output.root"
 
 import PhysicsTools.HeppyCore.framework.config as cfg
 from PhysicsTools.HeppyCore.framework.services.tfile import TFileService

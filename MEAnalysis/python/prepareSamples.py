@@ -6,7 +6,7 @@ import ROOT
 
 cmssw_base = os.environ["CMSSW_BASE"]
 
-version = "VHBBHeppyV21_tthbbV6"
+version = "VHBBHeppyV21_tthbbV7_fh"
 datasetpath = "src/TTH/MEAnalysis/gc/datasets/{0}/".format(version)
 getSize = False
 
