@@ -1,7 +1,7 @@
 
 #sample vhbb+tthbb file
-#testfile_vhbb_tthbb=/store/user/jpata/tth/VHBBHeppyV21_tthbbV6/ttHTobb_M125_13TeV_powheg_pythia8/VHBBHeppyV21_tthbbV6_ttHTobb_M125_13TeV_powheg_Py8__fall15MAv2-pu25ns15v1_76r2as_v12-v1/160318_163755/0000/tree_10.root
-testfile_vhbb_tthbb=file:///home/joosep/tth/sw/CMSSW/src/TTH/test.root
+testfile_vhbb_tthbb=/store/user/jpata/tth/VHBBHeppyV21_tthbbV6/ttHTobb_M125_13TeV_powheg_pythia8/VHBBHeppyV21_tthbbV6_ttHTobb_M125_13TeV_powheg_Py8__fall15MAv2-pu25ns15v1_76r2as_v12-v1/160318_163755/0000/tree_10.root
+#testfile_vhbb_tthbb=file:///home/joosep/tth/sw/CMSSW/src/TTH/test.root
 test_out_dir=$(CMSSW_BASE)/src/TTH/tests_out
 
 get_testfile:

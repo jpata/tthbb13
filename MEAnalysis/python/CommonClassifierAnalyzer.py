@@ -6,6 +6,7 @@ from TTH.MEAnalysis.Analyzer import FilterAnalyzer
 
 CvectorTLorentzVector = getattr(ROOT, "std::vector<TLorentzVector>")
 Cvectordouble = getattr(ROOT, "std::vector<double>")
+CvectorJetType = getattr(ROOT, "std::vector<MEMClassifier::JetType>")
 from TTH.MEAnalysis.vhbb_utils import lvec, autolog
 import numpy as np
 
@@ -42,6 +43,7 @@ class CommonClassifierAnalyzer(FilterAnalyzer):
 
         selectedJetsP4 = CvectorTLorentzVector()
         selectedJetsCSV = Cvectordouble()
+        selectedJetsType = CvectorJetType()
         looseJetsP4 = CvectorTLorentzVector()
         looseJetsCSV = Cvectordouble()
 
@@ -52,12 +54,7 @@ class CommonClassifierAnalyzer(FilterAnalyzer):
         for jet in event.good_jets:
             selectedJetsP4.push_back(lvec(jet))
             selectedJetsCSV.push_back(jet.btagCSV)
-            looseJetsP4.push_back(lvec(jet))
-            looseJetsCSV.push_back(jet.btagCSV)
-
-        for jet in event.loose_jets:
-            looseJetsP4.push_back(lvec(jet))
-            looseJetsCSV.push_back(jet.btagCSV)
+            selectedJetsType.push_back(ROOT.MEMClassifier.RESOLVED)
 
         metP4s = CvectorTLorentzVector()
         met_p4 = ROOT.TLorentzVector()
@@ -82,12 +79,16 @@ class CommonClassifierAnalyzer(FilterAnalyzer):
                     selectedLeptonP4, selectedJetsP4, selectedJetsCSV, looseJetsP4, looseJetsCSV, met_p4,
                     mem_p_sig.p, mem_p_bkg.p
                 )
-                #FIXME
-                #mem = self.memcalc.GetOutput(selectedLeptonP4, selectedLeptonCharge, selectedJetsP4, selectedJetsCSV, looseJetsP4, looseJetsCSV, met_p4)
-                #event.common_mem = [mem]
+            if event.nBCSVM >= 4:
+                mem = self.memcalc.GetOutput(selectedLeptonP4, selectedLeptonCharge, selectedJetsP4, selectedJetsCSV, looseJetsP4, looseJetsCSV, met_p4)
+                event.common_mem = [mem]
+                if "commonclassifier" in self.conf.general["verbosity"]:
+                    autolog("Evaluated common mem: {0}, ".format(mem.p_sig, mem.p_bkg))
         if event.category_string.startswith("dl_"):
             bdt = self.bdtcalc_dl.GetBDTOutput(selectedLeptonP4, selectedLeptonCharge, selectedJetsP4, selectedJetsCSV, met_p4)
             event.common_bdt = bdt
+            mem = self.memcalc.GetOutput(selectedLeptonP4, selectedLeptonCharge, selectedJetsP4, selectedJetsCSV, selectedJetsType, met_p4)
+            event.common_mem = [mem]
         if "debug" in self.conf.general["verbosity"]:
             print "bdt", event.category_string, event.common_bdt
         return event
