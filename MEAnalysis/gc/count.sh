@@ -3,7 +3,7 @@ set -e
 source common.sh
 
 #go to work directory
-cd $MY_SCRATCH
+cd $GC_SCRATCH
 
 OUTDIR=$HOME/tth/gc/count/${TASK_ID}/${DATASETPATH}/
 mkdir -p $OUTDIR
