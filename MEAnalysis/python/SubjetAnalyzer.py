@@ -86,8 +86,10 @@ class SubjetAnalyzer(FilterAnalyzer):
         setattr( event, 'boosted_bjets', [] )
         setattr( event, 'boosted_ljets', [] )
         setattr( event, 'topCandidate', [] )
+        setattr( event, 'topCandidatesSync', [] )
         setattr( event, 'othertopCandidate', [] )
         setattr( event, 'higgsCandidate', [] )
+        setattr( event, 'higgsCandidateForSync', [] )
 
         event.n_bjets = len( event.selected_btagged_jets_high )
         event.n_ljets = len( list( event.wquark_candidate_jets ) )
@@ -116,6 +118,21 @@ class SubjetAnalyzer(FilterAnalyzer):
         #    return event
 
 
+        # All HTT candidates for sync
+        all_tops = []
+        for candidate in event.httCandidates:
+            all_tops.append( copy.deepcopy(candidate) )
+
+        # Sort by pT
+        all_tops = sorted( all_tops, key=lambda x: -x.pt )        
+
+        # Match the top to a fat jet
+        #  - Copies bbtag and tau_N, calculates n_subjettiness
+        #  - DOES NOT apply the n_subjettiness cut
+        all_tops = self.Match_top_to_fatjet( event, all_tops, False )
+        
+
+
         # Apply the cuts on the httCandidate
         tops = []
         for candidate in event.httCandidates:
@@ -126,17 +143,16 @@ class SubjetAnalyzer(FilterAnalyzer):
         # Match the top to a fat jet
         #  - Copies bbtag and tau_N, calculates n_subjettiness
         #  - Applies the n_subjettiness cut
-        #  - Calculates delR with the single lepton
-        tops = self.Match_top_to_fatjet( event, tops )
+        tops = self.Match_top_to_fatjet( event, tops, True )
         other_tops = []
 
         # Calculate delR with the lepton for all tops that survived the cut
         if event.is_sl: #LC
-            for top in tops:
+            for top in tops + all_tops:
                 setattr( top, 'delR_lepton' ,
                           self.Get_DeltaR_two_objects( top, event.good_leptons[0] ) )
         else:
-            for top in tops:
+            for top in tops + all_tops:
                 setattr( top, 'delR_lepton' , -1 )
 
         # Keep track of how many httCandidates passed
@@ -190,7 +206,11 @@ class SubjetAnalyzer(FilterAnalyzer):
 
         #Types of fatjets to match to Higgs candidate
         fatjets_to_match = ["softdropz2b1", "softdrop", "pruned", "subjetfiltered"]
-        extra_higgs_vars = ["mass", "nallsubjets", "sj1pt", "sj1eta", "sj1phi", "sj1mass", "sj1btag", "sj2pt", "sj2eta", "sj2phi", "sj2mass", "sj2btag", "sj12mass"]
+        extra_higgs_vars = ["mass", "nallsubjets", 
+                            "sj1pt", "sj1eta", "sj1phi", "sj1mass", "sj1btag", 
+                            "sj2pt", "sj2eta", "sj2phi", "sj2mass", "sj2btag", 
+                            "sj3pt", "sj3eta", "sj3phi", "sj3mass", "sj3btag", 
+                            "sj12mass"]
         
         # TODO: 
         # -add groomed n-subjettiness
@@ -202,10 +222,11 @@ class SubjetAnalyzer(FilterAnalyzer):
         higgsCandidates = []
         for fatjet in event.FatjetCA15ungroomed:
 
-            # Choose only fatjets that were not HTTv2 candidates for the higgs reco
-            # Check if the fatjet is not already matched to the chosen top candidate
-            if top and hasattr(fatjet, 'matched_top') and fatjet == top.matched_fatjet:
-                continue
+            # Turned off for now. TODO: Revisit Higgs/Top overlap removal
+            # # Choose only fatjets that were not HTTv2 candidates for the higgs reco
+            # # Check if the fatjet is not already matched to the chosen top candidate
+            # if top and hasattr(fatjet, 'matched_top') and fatjet == top.matched_fatjet:
+            #    continue
 
             fatjet.n_subjettiness = -1
             if fatjet.tau1 > 0:
@@ -229,8 +250,9 @@ class SubjetAnalyzer(FilterAnalyzer):
             higgsCandidates.append( fatjet )
             higgs_present = True
 
-        # Sort by decreasing bbtag
-        higgsCandidates = sorted( higgsCandidates, key=lambda x: -x.bbtag )
+        # Sort by pT
+        # TODO: for now. Revisit and change to subjet b-tag/bbtag we decide on
+        higgsCandidates = sorted( higgsCandidates, key=lambda x: -x.pt )
         
         # Match higgs candidates to various fat jets
         for fatjetkind in fatjets_to_match:
@@ -419,6 +441,10 @@ class SubjetAnalyzer(FilterAnalyzer):
 
         # Store output lists in event
         event.higgsCandidate = higgsCandidates
+
+        if len(all_tops):
+            event.topCandidatesSync = all_tops
+
         if len(tops)>0:
             event.topCandidate = [ top ]
             event.othertopCandidate = other_tops
@@ -430,6 +456,8 @@ class SubjetAnalyzer(FilterAnalyzer):
 
             event.n_excluded_bjets = n_excluded_bjets
             event.n_excluded_ljets = n_excluded_ljets
+
+        #pdb.set_trace()
 
         if "subjet" in self.conf.general["verbosity"]:
             print '[SubjetAnalyzer] Exiting SubjetAnalyzer! event.PassedSubjetAnalyzer = {0}'.format(
@@ -483,7 +511,7 @@ class SubjetAnalyzer(FilterAnalyzer):
     # ==============================================================================
     # Additional httCandidate cut: n-subjetiness
     # Takes a list of tops, returns a (reduced) list of tops with an n_subjettiness
-    def Match_top_to_fatjet( self, event, tops ):
+    def Match_top_to_fatjet( self, event, tops, do_nsub_cut):
 
         # Loosely match the fatjets to the tops
         n_matched_httcand_fatjet = self.Match_two_lists(
@@ -514,7 +542,8 @@ class SubjetAnalyzer(FilterAnalyzer):
             n_subjettiness_groomed = fatjet_softdrop.tau3 / fatjet_softdrop.tau2 if fatjet_softdrop.tau2 > 0.0 else 0.0 
 
             # Try next top if n_subjettiness exceeds the cut
-            if n_subjettiness > self.n_subjettiness_cut: continue
+            if do_nsub_cut:
+                if n_subjettiness > self.n_subjettiness_cut: continue
 
             # Set n_subjettiness, tau_N and the bbtag
             top.n_subjettiness = n_subjettiness

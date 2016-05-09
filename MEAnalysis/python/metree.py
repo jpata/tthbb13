@@ -310,6 +310,12 @@ higgsCandidateType = NTupleObjectType("higgsCandidateType", variables = [
     NTupleVariable("sj2btag_subjetfiltered", lambda x: x.sj2btag_subjetfiltered ),
     NTupleVariable("sj12mass_subjetfiltered", lambda x: x.sj12mass_subjetfiltered ),
 
+    NTupleVariable("sj3pt_subjetfiltered",   lambda x: x.sj2pt_subjetfiltered ),
+    NTupleVariable("sj3eta_subjetfiltered",  lambda x: x.sj2eta_subjetfiltered ),
+    NTupleVariable("sj3phi_subjetfiltered",  lambda x: x.sj2phi_subjetfiltered ),
+    NTupleVariable("sj3mass_subjetfiltered", lambda x: x.sj2mass_subjetfiltered ),
+    NTupleVariable("sj3btag_subjetfiltered", lambda x: x.sj2btag_subjetfiltered ),
+
 
     NTupleVariable("mass_softdrop", lambda x: x.mass_softdrop, help="mass of the matched softdrop jet" ),
     NTupleVariable("mass_softdropz2b1", lambda x: x.mass_softdropz2b1, help="mass of the matched softdropz2b1 jet" ),
@@ -457,7 +463,9 @@ def getTreeProducer(conf):
             
             "topCandidate_nominal": NTupleCollection("topCandidate" , topCandidateType, 1, help="Best top candidate in event. Currently chosen by max deltaR wrt. lepton"),
             "othertopCandidate_nominal": NTupleCollection("othertopCandidate", topCandidateType, 4, help="All other top candidates that pass HTTv2 cuts"),
+            "topCandidatesSync_nominal": NTupleCollection("topCandidatesSync" , topCandidateType, 4, help=""),
             "higgsCandidate_nominal": NTupleCollection("higgsCandidate", higgsCandidateType, 4, help="Boosted Higgs candidates"),
+
         }
     )
     
