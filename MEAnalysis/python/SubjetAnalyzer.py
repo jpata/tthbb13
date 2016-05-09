@@ -8,6 +8,45 @@ from TTH.MEAnalysis.vhbb_utils import lvec, autolog
 
 import pdb
 
+class DummyTop(object):
+    fRec                  = 0.
+    Ropt                  = 0.
+    RoptCalc              = 0.
+    ptForRoptCalc         = 0.
+    pt                    = 0.
+    ptcal                 = 0.
+    eta                   = 0.
+    etacal                = 0.
+    phi                   = 0.
+    phical                = 0.
+    mass                  = 0.
+    masscal               = 0.
+    sjW1pt                = 0.
+    sjW1eta               = 0.
+    sjW1phi               = 0.
+    sjW1mass              = 0.
+    sjW1btag              = 0.
+    sjW2pt                = 0.
+    sjW2eta               = 0.
+    sjW2phi               = 0.
+    sjW2mass              = 0.
+    sjW2btag              = 0.
+    sjNonWpt              = 0.
+    sjNonWeta             = 0.
+    sjNonWphi             = 0.
+    sjNonWmass            = 0.
+    sjNonWbtag            = 0.
+    tau1                  = 0.
+    tau2                  = 0.
+    tau3                  = 0.
+    bbtag                 = 0.
+    n_subjettiness        = 0.
+    n_subjettiness_groomed= 0.
+    delRopt               = 0.
+    genTopHad_dr          = 0.
+
+
+
 class Jet_container:
     def __init__(self, pt, eta, phi, mass):
         self.pt = pt
@@ -123,15 +162,17 @@ class SubjetAnalyzer(FilterAnalyzer):
         for candidate in event.httCandidates:
             all_tops.append( copy.deepcopy(candidate) )
 
-        # Sort by pT
-        all_tops = sorted( all_tops, key=lambda x: -x.pt )        
-
         # Match the top to a fat jet
         #  - Copies bbtag and tau_N, calculates n_subjettiness
         #  - DOES NOT apply the n_subjettiness cut
         all_tops = self.Match_top_to_fatjet( event, all_tops, False )
-        
 
+        for top in all_tops:
+            top.fj_index = event.FatjetCA15ungroomed.index(top.matched_fatjet)            
+        
+        # Sort by which ungroomed fj they are matched to
+        all_tops = sorted(all_tops, key=lambda x: x.fj_index )        
+                
 
         # Apply the cuts on the httCandidate
         tops = []
@@ -442,8 +483,26 @@ class SubjetAnalyzer(FilterAnalyzer):
         # Store output lists in event
         event.higgsCandidate = higgsCandidates
 
-        if len(all_tops):
-            event.topCandidatesSync = all_tops
+        all_tops_to_add = []
+
+        # Add top matched to leading fatjet OR dummy
+        for top in all_tops:
+            if top.fj_index == 0:
+                all_tops_to_add.append(top)
+                break
+        if len(all_tops_to_add) == 0:
+            all_tops_to_add.append(DummyTop())
+
+        # Add top matched to sub-leading fatjet OR dummy
+        for top in all_tops:
+            if top.fj_index == 1:
+                all_tops_to_add.append( top)
+                break
+        if len(all_tops_to_add) == 1:
+            all_tops_to_add.append(DummyTop())
+        
+        
+        event.topCandidatesSync = all_tops_to_add
 
         if len(tops)>0:
             event.topCandidate = [ top ]
