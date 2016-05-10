@@ -53,10 +53,17 @@ cd TTH/MEAnalysis/gc
 python ../python/getCounts.py /path/to/output/GC1234/
 ~~~
 
-Step3: Sparse histograms with `melooper`
+Step3: Sparse histograms with `Plotting/bin/MELooper.cc`
 ------------------
 In order to industrially produce all variated histograms, we create an intermediate file containing ROOT THnSparse histograms of the samples.
 
+First make the `melooper` exe:
+~~~
+cd TTH
+make melooper
+~~~
+
+Then submit the jobs
 ~~~
 cd TTH/MEAnalysis/gc
 ./grid-control/go.py confs/plots.conf
