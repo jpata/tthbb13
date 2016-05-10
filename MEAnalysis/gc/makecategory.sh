@@ -9,12 +9,5 @@ cd $GC_SCRATCH
 mkdir out
 
 echo "Running MakeCategory"
-echo ${CMSSW_BASE}/src/TTH/Plotting/python/Datacards/MakeCategory.py $sparsefile $specfile $analysis $category
 python ${CMSSW_BASE}/src/TTH/Plotting/python/Datacards/MakeCategory.py $sparsefile $specfile $analysis $category
 echo "Done MakeCategory"
-
-cp $category.root $OUTDIR 
-cp shapes_${category}*.txt $OUTDIR 
-
-
-

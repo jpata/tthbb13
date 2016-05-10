@@ -5,6 +5,15 @@ class Sample:
         self.cuts = kwargs.get("cuts", [])
         self.xs_weight = kwargs.get("xs_weight", 1.0)
 
+    def __repr__(self):
+        s = "Sample: maps {0}->{1} with cuts=[{2}], xsw={3}".format(
+            self.input_name,
+            self.output_name,
+            ",".join(map(str, self.cuts)),
+            self.xs_weight
+        )
+        return s
+
 class Category:
     def __init__(self, **kwargs):
         self.name = kwargs.get("name")
@@ -46,6 +55,16 @@ class Category:
         for k, v in self.proc_scale_uncertainties.items():
             self.scale_uncertainties[k].update(v)
 
+    def __repr__(self):
+        s = "Category: {0} ({1}) discr={2} cuts={3} do_limit={4}".format(
+            self.name,
+            self.full_name,
+            self.discriminator,
+            self.cuts,
+            self.do_limit
+        )
+        return s
+
 class Analysis:
     def __init__(self, **kwargs):
         self.samples = kwargs.get("samples")
@@ -57,6 +76,20 @@ class Analysis:
         self.do_fake_data = kwargs.get("do_fake_data", False)
         self.do_stat_variations = kwargs.get("do_stat_variations", False)
 
+    def __repr__(self):
+        s = "Analysis:\n"
+        s += "  input file: {0}\n".format(self.sparse_input_file)
+        s += "  samples:\n"
+        for samp in self.samples:
+            s += "    {0}\n".format(samp)
+        s += "  categories:\n"
+        for cat in self.categories:
+            s += "    {0}\n".format(cat)
+        
+        s += "  groups for combine:\n"
+        for groupname, cats in self.groups.items():
+            s += "    {0}: {1}\n".format(groupname, [c.name for c in self.groups[groupname]])
+        return s
 
 def make_csv_categories_abstract(di):
 
@@ -97,9 +130,3 @@ def make_csv_groups_abstract(di):
                 csvwriter.writerow([analysis_spec_file, analysis_name, group_name])
 
     return [1]
-
-        
-    
-    
-
-
