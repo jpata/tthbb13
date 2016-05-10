@@ -1,12 +1,7 @@
 #!/bin/bash
 
-# Setup
-echo "Reading env.sh:"
-cat env.sh
-source env.sh
-echo "Done reading env.sh:"
 source common.sh
-cd $MY_SCRATCH
+cd $GC_SCRATCH
 
 # get the datacards/root files we need as input
 cp ${datacardbase}/${analysis}/*.root .
@@ -18,10 +13,7 @@ echo ${CMSSW_BASE}/src/TTH/Plotting/python/Datacards/MakeLimits.py $specfile . $
 python ${CMSSW_BASE}/src/TTH/Plotting/python/Datacards/MakeLimits.py $specfile . $analysis $group
 echo "Done MakeLimits"
 
-#copy output
-OUTDIR=$HOME/tth/gc/makelimits/${TASK_ID}/${analysis}/
-mkdir -p $OUTDIR 
-echo "copying output"
+ls -l .
 cp higgsCombine*.root $OUTDIR 
 cp out*.log $OUTDIR 
 
