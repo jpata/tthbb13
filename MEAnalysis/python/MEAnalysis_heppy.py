@@ -23,6 +23,9 @@ if os.environ.has_key("ME_CONF"):
     print "Loading ME config from", os.environ["ME_CONF"]
     meconf = imp.load_source("meconf", os.environ["ME_CONF"])
     from meconf import Conf
+elif 0:
+    print "Loading ME config from TTH.MEAnalysis.cfg_FH"
+    from TTH.MEAnalysis.cfg_FH import Conf    
 else:
     print "Loading ME config from TTH.MEAnalysis.MEAnalysis_cfg_heppy"
     from TTH.MEAnalysis.MEAnalysis_cfg_heppy import Conf

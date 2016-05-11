@@ -21,17 +21,17 @@ nlumis = {
 }
 
 lumisPerJob = {
-    'ttH':     10,
-    'TTbar':   200,
-    'QCD300':  500,
-    'QCD500':  500,
-    'QCD700':  300,
-    'QCD1000': 200,
-    'QCD1500': 100,
-    'QCD2000': 100,
+    'ttH':     10, #10=> max >41h, median~36h
+    'TTbar':   200, #200=> max 36h/28h
+    'QCD300':  500, #500=> max 23h
+    'QCD500':  500, #500=> max 33h
+    'QCD700':  300, #300=> max 23h
+    'QCD1000': 200, #200=> max 27h
+    'QCD1500': 100, #100=> max 16h
+    'QCD2000': 100, #100=> max 11h
 }
 
-version = '_v1'  #***************CHANGE HERE***************
+version = '_v2'  #***************CHANGE HERE***************
 
 fractionlumis=10 #>1 for testing
 
@@ -95,7 +95,7 @@ if __name__ == '__main__':
         print 'submitting ' + sample
         config.General.requestName = sample + version
         config.Data.inputDataset = dataset[sample]
-        config.Data.unitsPerJob = lumisPerJob[sample]/fractionlumis
+        config.Data.unitsPerJob = max(1,lumisPerJob[sample]/fractionlumis)
         if fractionlumis>1:
             config.Data.totalUnits = lumisPerJob[sample]
         else:
