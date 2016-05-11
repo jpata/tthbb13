@@ -17,7 +17,7 @@ config.JobType.maxJobRuntimeMin = 40 * 60
 import os
 os.system("tar czf python.tar.gz --dereference --directory $CMSSW_BASE python")
 os.system("tar czf data.tar.gz --dereference --directory $CMSSW_BASE/src/TTH/MEAnalysis root")
-os.system("make -f $CMSSW_BASE/src/TTH/Makefile get_hashes")
+os.system("make -sf $CMSSW_BASE/src/TTH/Makefile get_hashes")
 os.system("echo '\n\n{0}\n-------------' >> $CMSSW_BASE/src/TTH/logfile.md".format(submitname))
 os.system("cat $CMSSW_BASE/src/TTH/hash >> $CMSSW_BASE/src/TTH/logfile.md")
 

@@ -1,7 +1,3 @@
-cd /home/joosep/tth/sw2/CMSSW/src/TTH && echo "tthbb13="`git rev-parse --short HEAD` > /home/joosep/tth/sw2/CMSSW/src/TTH/hash
-cd /home/joosep/tth/sw2/CMSSW/src/TTH/CommonClassifier && echo "CommonClassifier="`git rev-parse --short HEAD` >> /home/joosep/tth/sw2/CMSSW/src/TTH/hash
-cd /home/joosep/tth/sw2/CMSSW/src/TTH/MEIntegratorStandalone && echo "MEIntegratorStandalone="`git rev-parse --short HEAD` >> /home/joosep/tth/sw2/CMSSW/src/TTH/hash
-cd /home/joosep/tth/sw2/CMSSW/src && echo "CMSSW="`git rev-parse --short HEAD` >> /home/joosep/tth/sw2/CMSSW/src/TTH/hash
 from WMCore.Configuration import Configuration
 config = Configuration()
 config.section_('General')
