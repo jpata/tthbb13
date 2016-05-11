@@ -1,7 +1,7 @@
 from WMCore.Configuration import Configuration
 config = Configuration()
 
-submitname = "VHBBHeppyV21_tthbbV9_May4"
+submitname = "VHBBHeppyV21_tthbbV9_May11"
 
 config.section_("General")
 config.General.requestName = 'tth_' + submitname
@@ -17,31 +17,35 @@ config.JobType.maxJobRuntimeMin = 40 * 60
 import os
 os.system("tar czf python.tar.gz --dereference --directory $CMSSW_BASE python")
 os.system("tar czf data.tar.gz --dereference --directory $CMSSW_BASE/src/TTH/MEAnalysis root")
+os.system("make -f $CMSSW_BASE/src/TTH/Makefile get_hashes")
+os.system("echo '\n\n{0}\n-------------' >> $CMSSW_BASE/src/TTH/logfile.md".format(submitname))
+os.system("cat $CMSSW_BASE/src/TTH/hash >> $CMSSW_BASE/src/TTH/logfile.md")
 
 vhbb_dir = os.environ.get("CMSSW_BASE") + "/src/VHbbAnalysis/Heppy/test"
-config.JobType.inputFiles = ['heppy_config.py',
-                             'heppy_crab_script.py',
-                             'python.tar.gz',
-                             'data.tar.gz',
-                             "MEAnalysis_heppy.py",
-                             'MVAJetTags_620SLHCX_Phase1And2Upgrade.db',
-                             'combined_cmssw.py',
-                             vhbb_dir + '/vhbb.py',
-                              vhbb_dir + '/vhbb_combined.py',
-                             'TMVAClassification_BDT.weights.xml',
-                             'puData.root',
-                             vhbb_dir + '/puDataMinus.root',
-                             vhbb_dir + '/puDataPlus.root',
-                             'puMC.root',
-                              'json.txt',
-                              vhbb_dir + "/Zll-spring15.weights.xml",
-                              vhbb_dir + "/Wln-spring15.weights.xml",
-                              vhbb_dir + "/Znn-spring15.weights.xml",
-                              vhbb_dir + "/VBF-spring15.weights.xml",
-                              vhbb_dir + "/ttbar-fall15_TargetGenOverPt_GenPtCut0.weights.xml",
-                              vhbb_dir + '/TMVA_blikelihood_vbf_cmssw76_h21trained.weights.xml'
+config.JobType.inputFiles = [
+    'hash',
+    'heppy_config.py',
+    'heppy_crab_script.py',
+    'python.tar.gz',
+    'data.tar.gz',
+    "MEAnalysis_heppy.py",
+    'MVAJetTags_620SLHCX_Phase1And2Upgrade.db',
+    'combined_cmssw.py',
+    vhbb_dir + '/vhbb.py',
+     vhbb_dir + '/vhbb_combined.py',
+    'TMVAClassification_BDT.weights.xml',
+    'puData.root',
+    vhbb_dir + '/puDataMinus.root',
+    vhbb_dir + '/puDataPlus.root',
+    'puMC.root',
+     'json.txt',
+     vhbb_dir + "/Zll-spring15.weights.xml",
+     vhbb_dir + "/Wln-spring15.weights.xml",
+     vhbb_dir + "/Znn-spring15.weights.xml",
+     vhbb_dir + "/VBF-spring15.weights.xml",
+     vhbb_dir + "/ttbar-fall15_TargetGenOverPt_GenPtCut0.weights.xml",
+     vhbb_dir + '/TMVA_blikelihood_vbf_cmssw76_h21trained.weights.xml'
 ]
-#config.JobType.outputFiles = ['tree.root']
 
 config.section_("Data")
 config.Data.inputDataset = '/ttHTobb_M125_13TeV_powheg_pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM'

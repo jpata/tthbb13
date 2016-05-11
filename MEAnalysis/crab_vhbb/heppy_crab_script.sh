@@ -56,6 +56,8 @@ echo $LD_LIBRARY_PATH
 
 export ROOT_INCLUDE_PATH=.:./src:$ROOT_INCLUDE_PATH
 
+echo "tth_hashes"
+cat hash
 python heppy_crab_script.py $1
 echo "======================== CMSRUN LOG ============================"
 head -n 30 Output/cmsRun.log 
