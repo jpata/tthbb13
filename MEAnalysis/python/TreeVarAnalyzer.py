@@ -14,7 +14,8 @@ class TreeVarAnalyzer(FilterAnalyzer):
         setattr( event, 'boosted_bjets', [] )
         setattr( event, 'boosted_ljets', [] )
         setattr( event, 'topCandidate', [] )
-        setattr( event, 'othertopCandidate', [] )
+        setattr( event, 'othertopCandidate', [])
+        setattr( event, 'topCandidatesSync', [])    
         setattr( event, 'higgsCandidate', [] )
         
         #FIXME: currently, gen-level analysis is redone for systematic variations
@@ -35,7 +36,7 @@ class TreeVarAnalyzer(FilterAnalyzer):
             for k, v in event_syst.__dict__.items():
                 event.__dict__[k + "_" + syst] = v
         
-        for br in ["boosted_bjets", "boosted_ljets", "topCandidate", "othertopCandidate", "higgsCandidate"]:
+        for br in ["boosted_bjets", "boosted_ljets", "topCandidate", "othertopCandidate", "topCandidatesSync", "higgsCandidate"]:
             if not hasattr(event, br+"_nominal"):
                 setattr(event, br + "_nominal", [])
         return True
