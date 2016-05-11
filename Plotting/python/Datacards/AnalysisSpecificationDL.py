@@ -81,7 +81,7 @@ analysis = Analysis(
     samples = base_samples,
     categories = all_cats,
     #sparse_input_file = "root://t3se01.psi.ch///store/user/jpata/tth/histograms/April2016A/sparse_Apr5.root",
-    sparse_input_file = "/home/joosep/public_html/tth/histograms/April2016A/sparse_Apr5.root",
+    sparse_input_file = "/home/joosep/tth/gc/melooper/GC011c9bcd5217/ControlPlotsSparse.root",
     groups = {
         "dl": dl_categories,
     },
