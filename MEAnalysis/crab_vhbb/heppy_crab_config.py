@@ -1,7 +1,9 @@
+import os
+
 from WMCore.Configuration import Configuration
 config = Configuration()
 
-submitname = "VHBBHeppyV21_tthbbV9_May11"
+submitname = os.environ.get("TTH_TAG", "VHBBHeppyV21_tthbbV9_May11")
 
 config.section_("General")
 config.General.requestName = 'tth_' + submitname
@@ -12,6 +14,7 @@ config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'heppy_crab_fake_pset.py'
 config.JobType.scriptExe = 'heppy_crab_script.sh'
+config.JobType.scriptArgs = ['ME_CONF=MEAnalysis_cfg_heppy.py']
 config.JobType.maxJobRuntimeMin = 40 * 60
 
 import os
@@ -24,6 +27,7 @@ os.system("cat $CMSSW_BASE/src/TTH/hash >> $CMSSW_BASE/src/TTH/logfile.md")
 vhbb_dir = os.environ.get("CMSSW_BASE") + "/src/VHbbAnalysis/Heppy/test"
 config.JobType.inputFiles = [
     'hash',
+    'FrameworkJobReport.xml',
     'heppy_config.py',
     'heppy_crab_script.py',
     'python.tar.gz',

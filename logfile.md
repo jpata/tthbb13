@@ -27,23 +27,15 @@ Comments: created with the fully-hadronic branch merged.
 
 VHBBHeppyV21_tthbbV9_May11
 -------------
-tthbb13=2c3c0b5
+tthbb13=c5675f2
 CommonClassifier=7d13981
 MEIntegratorStandalone=a3c81d8
 CMSSW=7482860
 
 
-VHBBHeppyV21_tthbbV9_May11
+test1
 -------------
-tthbb13=8674cd1
-CommonClassifier=7d13981
-MEIntegratorStandalone=a3c81d8
-CMSSW=7482860
-
-
-VHBBHeppyV21_tthbbV9_May11
--------------
-tthbb13=8674cd1
+tthbb13=c5675f2
 CommonClassifier=7d13981
 MEIntegratorStandalone=a3c81d8
 CMSSW=7482860
