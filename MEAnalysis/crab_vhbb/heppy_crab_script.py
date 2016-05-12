@@ -9,6 +9,12 @@ import PSet
 t0 = time.time()
 print "ARGV:",sys.argv
 
+me_conf_name = "MEAnalysis_cfg_heppy.py"
+for arg in sys.argv:
+    if arg.startswith("ME_CONF="):
+        me_conf_name = arg.split("=")[1]
+
+
 JobNumber=sys.argv[1]
 print "JobNumber", JobNumber
 print PSet.process.dumpPython()
@@ -62,6 +68,7 @@ print "Running tth code"
 import cPickle as pickle
 import TTH.MEAnalysis.TFClasses as TFClasses
 sys.modules["TFClasses"] = TFClasses
+os.environ["ME_CONF"] = os.environ["CMSSW_BASE"] + "/python/TTH/MEAnalysis/" + me_conf_name
 handle = open("MEAnalysis_heppy.py", 'r')
 cfo2 = imp.load_source("heppy_config", "MEAnalysis_heppy.py", handle)
 config = cfo2.config
