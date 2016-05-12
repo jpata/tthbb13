@@ -1,4 +1,5 @@
 import sys, re
+from copy import deepcopy
 
 #Each time you call multicrab.py, you choose to submit jobs from one of these workflows
 workflows = [
@@ -45,38 +46,62 @@ datasets = {
         "runtime": 40,
         "mem_cfg": me_cfgs["default"],
     },
-    'TTbar_sl': (
-        '/TTToSemiLeptonic_13TeV-powheg/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext1-v1/MINIAODSIM',
-        -1, 100, 40, me_cfgs["leptonic"],
-    ),
-    'TTbar_dl': (
-        '/TTTo2L2Nu_13TeV-powheg/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext1-v1/MINIAODSIM',
-        -1, 200, 40, me_cfgs["leptonic"],
-    ),
-    'QCD300': (
-        '/QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
-        -1, 500, 40, me_cfgs["hadronic"],
-    ),
-    'QCD500': (
-        '/QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
-        -1, 500, 40, me_cfgs["hadronic"],
-    ),
-    'QCD700': (
-        '/QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
-        -1, 300, 40, me_cfgs["hadronic"],
-    ),
-    'QCD1000': (
+    'TTbar_sl': {
+        "ds": '/TTToSemiLeptonic_13TeV-powheg/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext1-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 100,
+        "runtime": 40,
+        "mem_cfg": me_cfgs["leptonic"],
+    },
+    'TTbar_dl': {
+        "ds": '/TTTo2L2Nu_13TeV-powheg/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext1-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 200,
+        "runtime": 40,
+        "mem_cfg": me_cfgs["leptonic"],
+    },
+    'QCD300': {
+        "ds": '/QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 500,
+        "runtime": 40,
+        "mem_cfg": me_cfgs["hadronic"],
+    },
+    'QCD500': {
+        "ds": '/QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 500,
+        "runtime": 40,
+        "mem_cfg": me_cfgs["hadronic"],
+    },
+    'QCD700': {
+        "ds": '/QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 300,
+        "runtime": 40,
+        "mem_cfg": me_cfgs["hadronic"],
+    },
+    'QCD1000': {
         '/QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
-        -1, 200, 40, me_cfgs["hadronic"],
-    ),
-    'QCD1500': (
+        "maxlumis": -1,
+        "perjob": 200,
+        "runtime": 40,
+        "mem_cfg": me_cfgs["hadronic"],
+    },
+    'QCD1500': {
         '/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
-        -1, 100, 40, me_cfgs["hadronic"],
-    ),
-    'QCD2000': (
+        "maxlumis": -1,
+        "perjob": 100,
+        "runtime": 40,
+        "mem_cfg": me_cfgs["hadronic"],
+    },
+    'QCD2000': {
         '/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
-        -1, 100, 40, me_cfgs["hadronic"],
-    ),
+        "maxlumis": -1,
+        "perjob": 100,
+        "runtime": 40,
+        "mem_cfg": me_cfgs["hadronic"],
+    },
 }
 
 #now we construct the workflows from all the base datasets
@@ -91,24 +116,24 @@ for k in datasets.keys():
         workflow_datasets["hadronic"][k] = datasets[k]
     elif k == "TTbar_inc":
         #don't run all of tt+jets
-        D = list(datasets[k])
-        D[1] = 10000
-        workflow_datasets["hadronic"][k] = tuple(D)
+        D = deepcopy(datasets[k])
+        D["maxlumis"] = 10000
+        workflow_datasets["hadronic"][k] = D
 
 #Pilot job for updating transfer functions, retraining BLR
 workflow_datasets["pilot"] = {}
-D = list(datasets["ttHTobb"])
-D[2] = 50
-D[4] = me_cfgs["nome"]
+D = deepcopy(datasets["ttHTobb"])
+D["perjob"] = 50
+D["mem_cfg"] = me_cfgs["nome"]
 workflow_datasets["pilot"]["ttHTobb"] = D
 
 #1-lumi per job, 10 job testing of a few samples
 workflow_datasets["testing"] = {}
 for k in ["ttHTobb"]:
 #for k in ["ttHTobb", "TTbar_inc", "QCD1500"]:
-    D = list(datasets[k])
-    D[1] = 10
-    D[2] = 1
+    D = deepcopy(datasets[k])
+    D["maxlumis"] = 10
+    D["perjob"] = 1
     workflow_datasets["testing"][k] = D
 
 #Now select a set of datasets
@@ -175,7 +200,12 @@ if __name__ == '__main__':
     #loop over samples
     for sample in sel_datasets.keys():
         print 'submitting ' + sample
-        dataset, nlumis, perjob, runtime_h, cfgname = sel_datasets[sample]
+        dataset = sel_datasets[sample]["ds"]
+        nlumis = sel_datasets[sample]["maxlumis"]
+        perjob = sel_datasets[sample]["perjob"]
+        runtime_h = sel_datasets[sample]["runtime_h"]
+        me_cfg = sel_datasets[sample]["me_cfg"]
+
         config.JobType.maxJobRuntimeMin = runtime_h * 60
         config.General.requestName = sample + "_" + submitname
         config.Data.inputDataset = dataset
@@ -183,5 +213,5 @@ if __name__ == '__main__':
         config.Data.totalUnits = nlumis
         config.Data.outputDatasetTag = submitname
         config.Data.outLFNDirBase = '/store/user/{0}/tth/'.format(getUsernameFromSiteDB()) + submitname
-        config.JobType.scriptArgs = ['ME_CONF={0}'.format(cfgname)]
+        config.JobType.scriptArgs = ['ME_CONF={0}'.format(me_cfg)]
         submit(config)
