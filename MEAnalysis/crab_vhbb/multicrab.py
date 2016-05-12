@@ -1,71 +1,85 @@
 import sys, re
 
+#Each time you call multicrab.py, you choose to submit jobs from one of these workflows
 workflows = [
-    "leptonic",
-    "hadronic",
-    "pilot",
-    "testing"
+    "leptonic", #ttH with SL/DL decays
+    "hadronic", #ttH with FH decays
+    "pilot", #ttH sample only, with no MEM
+    "testing" #single-lumi jobs, a few samples
 ]
 
 import argparse
 parser = argparse.ArgumentParser(description='Submits crab jobs')
 parser.add_argument('--workflow', action="store", required=True, help="Type of workflow to run", type=str, choices=workflows)
-parser.add_argument('--tag', action="store", required=True, help="Input file with datasets")
+parser.add_argument('--tag', action="store", required=True, help="the version tag for this run, e.g. test1, May10, will be appended to VHBBHeppyV21_tthbbV9_")
 args = parser.parse_args()
 
+#list of configurations that we are using, should be in TTH/MEAnalysis/python/
 me_cfgs = {
     "default": "MEAnalysis_cfg_heppy.py",
+    "nome": "cfg_noME.py",
     "leptonic": "cfg_leptonic.py",
     "hadronic": "cfg_FH.py",
 }
 
+#all available datasets.
 datasets = {
-    'ttHTobb': (
-        '/ttHTobb_M125_13TeV_powheg_pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
-        -1, 10, me_cfgs["default"],
-    ),
-    'ttHToNonbb': (
-        '/ttHToNonbb_M125_13TeV_powheg_pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
-        -1, 100, me_cfgs["default"],
-    ),
-    'TTbar_inc': (
-        '/TT_TuneCUETP8M1_13TeV-powheg-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext3-v1/MINIAODSIM',
-        -1, 100, me_cfgs["default"],
-    ),
+    'ttHTobb': {
+        "ds": '/ttHTobb_M125_13TeV_powheg_pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 10,
+        "runtime": 40,
+        "mem_cfg": me_cfgs["default"],
+    },
+    'ttHToNonbb': {
+        "ds": '/ttHToNonbb_M125_13TeV_powheg_pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 100,
+        "runtime": 40,
+        "mem_cfg": me_cfgs["default"],
+    },
+    'TTbar_inc': {
+        "ds": '/TT_TuneCUETP8M1_13TeV-powheg-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext3-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 100,
+        "runtime": 40,
+        "mem_cfg": me_cfgs["default"],
+    },
     'TTbar_sl': (
         '/TTToSemiLeptonic_13TeV-powheg/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext1-v1/MINIAODSIM',
-        -1, 100, me_cfgs["leptonic"],
+        -1, 100, 40, me_cfgs["leptonic"],
     ),
     'TTbar_dl': (
         '/TTTo2L2Nu_13TeV-powheg/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext1-v1/MINIAODSIM',
-        -1, 200, me_cfgs["leptonic"],
+        -1, 200, 40, me_cfgs["leptonic"],
     ),
     'QCD300': (
         '/QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
-        -1, 500, me_cfgs["hadronic"],
+        -1, 500, 40, me_cfgs["hadronic"],
     ),
     'QCD500': (
         '/QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
-        -1, 500, me_cfgs["hadronic"],
+        -1, 500, 40, me_cfgs["hadronic"],
     ),
     'QCD700': (
         '/QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
-        -1, 300, me_cfgs["hadronic"],
+        -1, 300, 40, me_cfgs["hadronic"],
     ),
     'QCD1000': (
         '/QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
-        -1, 200, me_cfgs["hadronic"],
+        -1, 200, 40, me_cfgs["hadronic"],
     ),
     'QCD1500': (
         '/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
-        -1, 100, me_cfgs["hadronic"],
+        -1, 100, 40, me_cfgs["hadronic"],
     ),
     'QCD2000': (
         '/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
-        -1, 100, me_cfgs["hadronic"],
+        -1, 100, 40, me_cfgs["hadronic"],
     ),
 }
 
+#now we construct the workflows from all the base datasets
 workflow_datasets = {}
 workflow_datasets["leptonic"] = {}
 for k in ["ttHTobb", "ttHToNonbb", "TTbar_inc", "TTbar_sl", "TTbar_dl"]:
@@ -81,11 +95,14 @@ for k in datasets.keys():
         D[1] = 10000
         workflow_datasets["hadronic"][k] = tuple(D)
 
+#Pilot job for updating transfer functions, retraining BLR
 workflow_datasets["pilot"] = {}
 D = list(datasets["ttHTobb"])
 D[2] = 50
+D[4] = me_cfgs["nome"]
 workflow_datasets["pilot"]["ttHTobb"] = D
 
+#1-lumi per job, 10 job testing of a few samples
 workflow_datasets["testing"] = {}
 for k in ["ttHTobb"]:
 #for k in ["ttHTobb", "TTbar_inc", "QCD1500"]:
@@ -94,6 +111,7 @@ for k in ["ttHTobb"]:
     D[2] = 1
     workflow_datasets["testing"][k] = D
 
+#Now select a set of datasets
 sel_datasets = workflow_datasets[args.workflow]
 
 if __name__ == '__main__':
@@ -112,7 +130,6 @@ if __name__ == '__main__':
     config.JobType.pluginName = 'Analysis'
     config.JobType.psetName = 'heppy_crab_fake_pset.py'
     config.JobType.scriptExe = 'heppy_crab_script.sh'
-    config.JobType.maxJobRuntimeMin = 1 * 60
 
     import os
     os.system("tar czf python.tar.gz --dereference --directory $CMSSW_BASE python")
@@ -157,8 +174,9 @@ if __name__ == '__main__':
 
     #loop over samples
     for sample in sel_datasets.keys():
-        dataset, nlumis, perjob, cfgname = sel_datasets[sample]
         print 'submitting ' + sample
+        dataset, nlumis, perjob, runtime_h, cfgname = sel_datasets[sample]
+        config.JobType.maxJobRuntimeMin = runtime_h * 60
         config.General.requestName = sample + "_" + submitname
         config.Data.inputDataset = dataset
         config.Data.unitsPerJob = perjob
