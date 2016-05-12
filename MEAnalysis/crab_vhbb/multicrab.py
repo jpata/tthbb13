@@ -82,21 +82,21 @@ datasets = {
         "mem_cfg": me_cfgs["hadronic"],
     },
     'QCD1000': {
-        '/QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
+        "ds": '/QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
         "maxlumis": -1,
         "perjob": 200,
         "runtime": 40,
         "mem_cfg": me_cfgs["hadronic"],
     },
     'QCD1500': {
-        '/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
+        "ds": '/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
         "maxlumis": -1,
         "perjob": 100,
         "runtime": 40,
         "mem_cfg": me_cfgs["hadronic"],
     },
     'QCD2000': {
-        '/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
+        "ds": '/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
         "maxlumis": -1,
         "perjob": 100,
         "runtime": 40,
@@ -203,15 +203,15 @@ if __name__ == '__main__':
         dataset = sel_datasets[sample]["ds"]
         nlumis = sel_datasets[sample]["maxlumis"]
         perjob = sel_datasets[sample]["perjob"]
-        runtime_h = sel_datasets[sample]["runtime_h"]
-        me_cfg = sel_datasets[sample]["me_cfg"]
+        runtime = sel_datasets[sample]["runtime"]
+        mem_cfg = sel_datasets[sample]["mem_cfg"]
 
-        config.JobType.maxJobRuntimeMin = runtime_h * 60
+        config.JobType.maxJobRuntimeMin = runtime * 60
         config.General.requestName = sample + "_" + submitname
         config.Data.inputDataset = dataset
         config.Data.unitsPerJob = perjob
         config.Data.totalUnits = nlumis
         config.Data.outputDatasetTag = submitname
         config.Data.outLFNDirBase = '/store/user/{0}/tth/'.format(getUsernameFromSiteDB()) + submitname
-        config.JobType.scriptArgs = ['ME_CONF={0}'.format(me_cfg)]
+        config.JobType.scriptArgs = ['ME_CONF={0}'.format(mem_cfg)]
         submit(config)
