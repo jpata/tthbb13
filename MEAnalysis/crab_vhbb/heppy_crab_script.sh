@@ -56,7 +56,26 @@ echo $LD_LIBRARY_PATH
 
 export ROOT_INCLUDE_PATH=.:./src:$ROOT_INCLUDE_PATH
 
-python heppy_crab_script.py $1
+echo "tth_hashes"
+cat hash
+python heppy_crab_script.py $@ &> log
+exitCode=$?
+cat log
+if [ $exitCode -eq 0 ]; then
+echo "command succeeded"
+else
+exitCode=80500
+errorType=""
+exitMessage=`tail -n5 log`
+cat << EOF > FrameworkJobReport.xml
+<FrameworkJobReport>
+<FrameworkError ExitStatus="$exitCode" Type="$errorType" >
+$exitMessage
+</FrameworkError>
+</FrameworkJobReport>
+EOF
+fi
+
 echo "======================== CMSRUN LOG ============================"
 head -n 30 Output/cmsRun.log 
 echo "=== SNIP ==="

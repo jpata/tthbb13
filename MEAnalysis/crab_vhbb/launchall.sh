@@ -1,6 +1,6 @@
 #!/bin/bash
 eval `scramv1 runtime -sh` 
-#source /cvmfs/cms.cern.ch/crab3/crab.sh
+source /cvmfs/cms.cern.ch/crab3/crab.sh
 #voms-proxy-init -voms cms
 while read i; do
   export DATASET=`echo $i | cut -f1 -d' '`
