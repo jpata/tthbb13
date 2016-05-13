@@ -18,7 +18,7 @@ blr_cuts = {
     "sl_jge6_t3": 2.9,
 }
 
-input_file = "/home/joosep/tth/gc/melooper/GC011c9bcd5217/ControlPlotsSparse.root"
+input_file = "/home/joosep/tth/gc/plots/GC3bceb4f98811/ControlPlotsSparse.root"
 
 lumi = 2600 # pb-1
 do_stat_variations = True
