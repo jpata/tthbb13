@@ -129,11 +129,12 @@ workflow_datasets["pilot"]["ttHTobb"] = D
 
 #1-lumi per job, 10 job testing of a few samples
 workflow_datasets["testing"] = {}
-for k in ["ttHTobb"]:
-#for k in ["ttHTobb", "TTbar_inc", "QCD1500"]:
+for k in ["ttHTobb", "TTbar_inc", "QCD1500"]:
     D = deepcopy(datasets[k])
     D["maxlumis"] = 10
     D["perjob"] = 1
+    D["runtime"] = 1
+    D["mem_cfg"] = "cfg_noME.py"
     workflow_datasets["testing"][k] = D
 
 #Now select a set of datasets
