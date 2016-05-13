@@ -53,20 +53,31 @@ for cn, c in colors.items():
 
 #list of all categories and their ROOT cuts
 cats = {
-    'dl_j3_t2': "(is_dl==1) & (numJets==3) & (nBCSVM==2)",
-    'dl_jge3_t3': "(is_dl==1) & (numJets>=3) & (nBCSVM==3)",
-    'dl_j3_t3': "(is_dl==1) & (numJets==3) & (nBCSVM==3)",
-    'dl_jge4_t3': "(is_dl==1) & (numJets>=4) & (nBCSVM==3)",
-    'dl_jge4_t2': "(is_dl==1) & (numJets>=4) & (nBCSVM==2)",
-    'dl_jge4_tge4': "(is_dl==1) & (numJets>=4) & (nBCSVM>=4)",
     
-    'sl_j4_t3': "(is_sl==1) & (numJets==4) & (nBCSVM==3)",
-    'sl_j4_t4': "(is_sl==1) & (numJets==4) & (nBCSVM==4)",
-    'sl_j5_t3': "(is_sl==1) & (numJets==5) & (nBCSVM==3)",
-    'sl_j5_tge4': "(is_sl==1) & (numJets==5) & (nBCSVM>=4)",
-    'sl_jge6_t2': "(is_sl==1) & (numJets>=6) & (nBCSVM==2)",
-    'sl_jge6_t3': "(is_sl==1) & (numJets>=6) & (nBCSVM==3)",
-    'sl_jge6_tge4': "(is_sl==1) & (numJets>=6) & (nBCSVM>=4)",
+    'fh_j7_t3': "(is_fh==1) && (numJets==7) && (nBCSVM==3)",
+    'fh_j8_t3': "(is_fh==1) && (numJets==8) && (nBCSVM==3)",
+    'fh_jge9_t3': "(is_fh==1) && (numJets>=9) && (nBCSVM==3)",
+    
+    'fh_j7_tge4': "(is_fh==1) && (numJets==7) && (nBCSVM>=4)",
+    'fh_j8_tge4': "(is_fh==1) && (numJets==8) && (nBCSVM>=4)",
+    'fh_jge9_tge4': "(is_fh==1) && (numJets>=9) && (nBCSVM>=4)",
+    
+    'dl_j3_t2': "(is_dl==1) && (numJets==3) && (nBCSVM==2)",
+    'dl_jge3_t3': "(is_dl==1) && (numJets>=3) && (nBCSVM==3)",
+    'dl_j3_t3': "(is_dl==1) && (numJets==3) && (nBCSVM==3)",
+    'dl_jge4_t3': "(is_dl==1) && (numJets>=4) && (nBCSVM==3)",
+    'dl_jge4_t2': "(is_dl==1) && (numJets>=4) && (nBCSVM==2)",
+    'dl_jge4_tge4': "(is_dl==1) && (numJets>=4) && (nBCSVM>=4)",
+    
+    'sl_j4_t3': "(is_sl==1) && (numJets==4) && (nBCSVM==3)",
+    'sl_j4_t4': "(is_sl==1) && (numJets==4) && (nBCSVM==4)",
+    'sl_j5_t2': "(is_sl==1) && (numJets==5) && (nBCSVM==2)",
+    'sl_j5_t3': "(is_sl==1) && (numJets==5) && (nBCSVM==3)",
+    'sl_j5_tge4': "(is_sl==1) && (numJets==5) && (nBCSVM>=4)",
+    'sl_jge6_t2': "(is_sl==1) && (numJets>=6) && (nBCSVM==2)",
+    'sl_jge6_t3': "(is_sl==1) && (numJets>=6) && (nBCSVM==3)",
+    'sl_jge6_tge4': "(is_sl==1) && (numJets>=6) && (nBCSVM>=4)",
+    #'sl_jge6_tge4': "(is_sl==1) && (n_excluded_bjets<=1) && (n_boosted_bjets>=4) && (n_boosted_ljets>=2)",
 }
 
 #List of sample filenames -> short names suitable for latex

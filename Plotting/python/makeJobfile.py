@@ -80,6 +80,12 @@ ret = {
             "nBins": nbins_mem
         },
         {
+            "func": "mem_SL_1w2h2t",
+            "xMin": 0,
+            "xMax": 1,
+            "nBins": nbins_mem
+        },
+        {
             "func": "mem_DL_0w2h2t",
             "xMin": 0,
             "xMax": 1,

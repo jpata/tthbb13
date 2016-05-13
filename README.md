@@ -1,136 +1,95 @@
 TTHBB MEM code
 ==============
 
-https://twiki.cern.ch/twiki/bin/viewauth/CMS/TTHbbAnalysisWithMEM#V6_Recipe
-
 Setup on SLC6 in a clean directory (no CMSSW)
 ~~~
-mkdir TTH
-cd TTH
+mkdir -p ~/tth/sw
+cd ~/tth/sw
 wget --no-check-certificate https://raw.githubusercontent.com/jpata/tthbb13/master/setup.sh
 source setup.sh
 ~~~
+This will download CMSSW, the tthbb code and all the dependencies.
 
-Running the MEM code
+
+
+Step1: VHBB code
+----------------
+This will start with MiniAOD and produce a VHBB ntuple.
+
 ~~~
-python TTH/MEAnalysis/python/MEAnalysis_heppy.py
+make test_VHBB
+#this will call VHbbAnalysis/Heppy/test/vhbb_combined.py
 ~~~
 
-Top Tagging Ntuple Making (based on TTH-MEM Ntuple)
-==============
+Step2: tthbb code
+--------------------
+Using the VHBB ntuple, we will run the ttH(bb) and matrix element code
 
-### Setup on SLC6
 ~~~
-mkdir TTH
+make test_MEAnalysis
+#this will call TTH/MEAnalysis/python/MEAnalysis_heppy.py
+~~~
+
+Step1+2: VHBB & tthbb13 with CRAB
+---------------------------------
+
+Step3: skim with `projectSkim.sh`
+------------------
+When some of the samples are done, you can produce small (<5GB) skims of the files using
+
+~~~
+cd TTH/MEAnalysis/gc
+./grid-control/go.py confs/projectSkim.conf
+...
+./hadd.py /path/to/output/GC1234/
+~~~
+
+The total processed yields can be extracted with
+~~~
+cd TTH/MEAnalysis/gc
+./grid-control/go.py confs/count.conf
+...
+./hadd.py /path/to/output/GC1234/
+python ../python/getCounts.py /path/to/output/GC1234/
+~~~
+
+Step3: Sparse histograms with `Plotting/bin/MELooper.cc`
+------------------
+In order to industrially produce all variated histograms, we create an intermediate file containing ROOT THnSparse histograms of the samples.
+
+First make the `melooper` exe:
+~~~
 cd TTH
-wget --no-check-certificate https://raw.githubusercontent.com/jpata/tthbb13/dev-73X/setup.sh
-source setup.sh
+make melooper
 ~~~
 
-When running later just execute
+Then submit the jobs
 ~~~
-export SCRAM_ARCH=slc6_amd64_gcc491
+cd TTH/MEAnalysis/gc
+./grid-control/go.py confs/plots.conf
+find /path/to/output/GC1234/ -name "*.root" > files.txt
+hadd ControlPlotsSparse.root `cat files.txt | xargs`
 ~~~
-before setting up the CMS environment.
+This creates a histogram file `ControlPlotsSparse.root`
 
-Now everything is ready for compilation:
-~~~
-cd $CMSSW_BASE/src
-scram b -j 10
-~~~
+Step4: Categories with `makecategories.sh`
+-----------------
 
-As the default Ntuple is for TTH we need to change a few branches:
-~~~
-cd TTH/TTHNtupleAnalyzer/python
-python headergen.py ../interface/tth_tree_template.hh ../interface/tth_tree.hh tagger_branches.py
-~~~
-
-Re-Compile the TTHNtupleAnalyzer:
-~~~
-cd $CMSSW_BASE/src/TTH/TTHNtupleAnalyzer
-scram b -j 10
-~~~
-
-
-
-
-### NTuple Production
-
-
-To test the Ntuple making:
-(first download a MiniAOD (CSA14 and Phys14 should both do, Pythia6 will have problems with parton matching) and set the path to it in taggers_cfg)
-~~~
-cd TTH/TTHNtupleAnalyzer/test
-cmsRun taggers_cfg.py
-~~~
-
-"Step 2" (per top/parton) Ntuples can be created with the script:
-(this is now automatically run on the grid if you submit via crab_ntuples/ntop.py - see below)
-~~~
-TTH/TTHNtupleAnalyzer/python/MakeTaggingNtuple.py
-~~~
-
-You should also either comment out Shower Deconstruction or ping Gregor to get added to the private github repo that contains the code.
-
-### Adding Variables
-
-New grooming settings can be added by modifying:
-~~~
-TTH/TTHNtupleAnalyzer/python/Taggers_cfg.py
-~~~
-
-These changes should be automatically picked up py
+Configure the input file in `TTH/Plotting/python/Datacards/AnalysisSpecificationSL.py`, then call
 
 ~~~
-TTH/TTHNtupleAnalyzer/python/tagger_branches.py
-TTH/TTHNtupleAnalyzer/python/MakeTaggingNtuple.py
+cd TTH/MEAnalysis/gc
+#generate the parameter csv files: analysis_groups.csv, analysis_specs.csv
+python $CMSSW_BASE/src/TTH/Plotting/python/Datacards/AnalysisSpecification.py
+./grid-control/go.py confs/makecategories.conf
 ~~~
 
-Do not forget to re-run the headergen step and recompile after changing the grooming settings.
+Step5: Limits with `makelimits.sh`
+-----------------
 
+Configure the path to the category output in `confs/makelimits.conf` by setting `datacardbase` to the output of step 4.
 
-### Grid Submission:
-The grid submission scripts are in: 
 ~~~
-TTH/TTHNtupleAnalyzer/crab_configs
+cd TTH/MEAnalysis/gc
+./grid-control/go.py confs/makelimits.conf
 ~~~
-
-The submission is done by ntop.py which relies on ~~~../python/CrabHelpers.py~~~ Most of the parameters are set in c_TEMPLATE.py and the actual thing that runs on the grid is myScript.sh
-
-### Plotting
-
-Some plotting examples are in:
-~~~
-TTH/Plotting/python/gregor
-~~~
-
-First you will want to run something similar to:
-~~~
-Plotting/python/gregor/GetPtWeight.py
-~~~
-
-This will produce a file storing the re-weighting functions for pT and eta. Then run
-~~~
-TTHNtupleAnalyzer/python/AddWeights.py
-~~~
-to make a new file with the weights included (it also adds a pt and eta branch that copy either the hadronic top or the qcd parton).
-
-Everything else comes afterwards.
-Most of the control plots are in
-~~~
-CheckPtWeight.py
-~~~
-Examples for MutualInformation:
-~~~
-TestMutualInformation.py
-~~~
-Examples for TMVA:
-~~~
-ClassifyTaggers.py
-~~~
-
-I've started centralizing the per-Sample information in TopSamples.pyand the per-Variable information in TopTaggingVariables.py.
-
-
-
-

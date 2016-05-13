@@ -45,26 +45,7 @@ def make_rule_cut(basehist, category):
                 d2["output"] += "_" + systname + direction
                 rules += [d2]
 
-    # FIXME: this needs to be added to AnalysisSpecification.py
-    # #Now we need to apply additional cuts on data samples based on the lepton
-    # #flavour
     for samp in category.data_samples:
-    #     if "sl/" in basehist:
-    #         if samp == "SingleMuon":
-    #             cuts = [("leptonFlavour", 1, 2)] + cuts
-    #         elif samp == "SingleElectron":
-    #             cuts = [("leptonFlavour", 2, 3)] + cuts
-    #         else:
-    #             continue
-    #     elif "dl/" in basehist:
-    #         if samp == "DoubleMuon":
-    #             cuts = [("leptonFlavour", 3, 4)] + cuts
-    #         elif samp == "MuonEG":
-    #             cuts = [("leptonFlavour", 4, 5)] + cuts
-    #         elif samp == "DoubleEG":
-    #             cuts = [("leptonFlavour", 5, 6)] + cuts
-    #         else:
-    #             continue
         d = {
             "input": "{0}/{1}".format(samp.input_name, basehist),
             "cuts": str(category.cuts + samp.cuts),
@@ -171,8 +152,8 @@ if __name__ == "__main__":
         
     infile = sys.argv[1] # path to sparse.root from MELooper
     anspec = imp.load_source("anspec", sys.argv[2])
-    analysis_to_process = sys.argv[3]        
-    cat_to_process = sys.argv[4]                
+    analysis_to_process = sys.argv[3]
+    cat_to_process = sys.argv[4]
         
     # Limit to one analysis/category
     analysis = anspec.analyses[analysis_to_process]

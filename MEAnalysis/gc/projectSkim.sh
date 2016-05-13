@@ -7,13 +7,8 @@ source common.sh
 #go to work directory
 cd $GC_SCRATCH
 
-OUTDIR=$HOME/tth/gc/projectSkim/${GC_TASK_ID}/${DATASETPATH}/
-mkdir -p $OUTDIR
-OFNAME=$OUTDIR/output_${MY_JOBID}.root
 #python ${CMSSW_BASE}/src/TTH/MEAnalysis/python/MakeTaggingNtuple.py taggingNtuple.root $FILE_NAMES
 python ${CMSSW_BASE}/src/TTH/MEAnalysis/python/projectSkim.py skim.root $FILE_NAMES
 python ${CMSSW_BASE}/src/TTH/Plotting/python/joosep/btag/hists.py btag.root $FILE_NAMES
 python ${CMSSW_BASE}/src/TTH/MEAnalysis/python/counts.py count.root $FILE_NAMES
 hadd out.root skim.root btag.root count.root
-# taggingNtuple.root
-cp out.root $OFNAME
