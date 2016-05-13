@@ -79,16 +79,19 @@ class CommonClassifierAnalyzer(FilterAnalyzer):
                     selectedLeptonP4, selectedJetsP4, selectedJetsCSV, looseJetsP4, looseJetsCSV, met_p4,
                     mem_p_sig.p, mem_p_bkg.p
                 )
-            if event.nBCSVM >= 4:
+            if event.numJets>=4 and event.nBCSVM >= 4:
                 mem = self.memcalc.GetOutput(selectedLeptonP4, selectedLeptonCharge, selectedJetsP4, selectedJetsCSV, looseJetsP4, looseJetsCSV, met_p4)
                 event.common_mem = [mem]
                 if "commonclassifier" in self.conf.general["verbosity"]:
                     autolog("Evaluated common mem: {0}, ".format(mem.p_sig, mem.p_bkg))
-        if event.category_string.startswith("dl_"):
+        elif event.category_string.startswith("dl_"):
             bdt = self.bdtcalc_dl.GetBDTOutput(selectedLeptonP4, selectedLeptonCharge, selectedJetsP4, selectedJetsCSV, met_p4)
             event.common_bdt = bdt
-            mem = self.memcalc.GetOutput(selectedLeptonP4, selectedLeptonCharge, selectedJetsP4, selectedJetsCSV, selectedJetsType, met_p4)
-            event.common_mem = [mem]
+            if event.numJets>=4 and event.nBCSVM >= 4:
+                mem = self.memcalc.GetOutput(selectedLeptonP4, selectedLeptonCharge, selectedJetsP4, selectedJetsCSV, selectedJetsType, met_p4)
+                event.common_mem = [mem]
+                if "commonclassifier" in self.conf.general["verbosity"]:
+                    autolog("Evaluated common mem: {0}, ".format(mem.p_sig, mem.p_bkg))
         if "debug" in self.conf.general["verbosity"]:
             print "bdt", event.category_string, event.common_bdt
         return event
