@@ -64,7 +64,7 @@ cat log
 if [ $exitCode -eq 0 ]; then
 echo "command succeeded"
 else
-exitCode=80500
+exitCode=`expr 80500 + $exitCode`
 errorType=""
 exitMessage=`tail -n5 log`
 cat << EOF > FrameworkJobReport.xml
@@ -75,6 +75,9 @@ $exitMessage
 </FrameworkJobReport>
 EOF
 fi
+
+tail -n100 log
+cat FrameworkJobReport.xml
 
 echo "======================== CMSRUN LOG ============================"
 head -n 30 Output/cmsRun.log 
