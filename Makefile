@@ -42,7 +42,7 @@ test_Plotting_btaghists: test_mkdir
 
 test_MEAnalysis: test_mkdir
 	rm -Rf MEAnalysis/Loop_*
-	cd MEAnalysis && INPUT_FILE=$(testfile_vhbb_tthbb) ME_CONF=python/cfg_local.py python python/MEAnalysis_heppy.py &> $(test_out_dir)/MEAnalysis_MEAnalysis_heppy.log
+	cd MEAnalysis && TTH_CALCME=0 INPUT_FILE=$(testfile_vhbb_tthbb) ME_CONF=python/cfg_local.py python python/MEAnalysis_heppy.py &> $(test_out_dir)/MEAnalysis_MEAnalysis_heppy.log
 	sleep 5
 	du -csh MEAnalysis/Loop_sample/tree.root &>> $(test_out_dir)/MEAnalysis_MEAnalysis_heppy.log
 	python -c "import ROOT; f=ROOT.TFile('MEAnalysis/Loop_sample/tree.root'); print f.Get('tree').GetEntries()" &>> $(test_out_dir)/MEAnalysis_MEAnalysis_heppy.log
@@ -50,11 +50,11 @@ test_MEAnalysis: test_mkdir
 
 test_MEAnalysis_withme: test_mkdir
 	rm -Rf MEAnalysis/Loop_*
-	cd MEAnalysis && ME_CONF=python/cfg_withME.py python python/MEAnalysis_heppy.py &> $(test_out_dir)/MEAnalysis_MEAnalysis_heppy_withme.log
+	cd MEAnalysis && TTH_CALCME=1 INPUT_FILE=$(testfile_vhbb_tthbb) ME_CONF=python/cfg_local.py python python/MEAnalysis_heppy.py &> $(test_out_dir)/MEAnalysis_MEAnalysis_heppy.log
 	sleep 5
-	du -csh MEAnalysis/Loop_ttHTobb_M125_13TeV_powheg_pythia8/tree.root &>> $(test_out_dir)/MEAnalysis_MEAnalysis_heppy_withme.log
-	python -c "import ROOT; f=ROOT.TFile('MEAnalysis/Loop_ttHTobb_M125_13TeV_powheg_pythia8/tree.root'); print f.Get('tree').GetEntries()" &>> $(test_out_dir)/MEAnalysis_MEAnalysis_heppy_withme.log
-	cp MEAnalysis/Loop_ttHTobb_M125_13TeV_powheg_pythia8/tree.root $(test_out_dir)/MEAnalysis_MEAnalysis_heppy_withme.root
+	du -csh MEAnalysis/Loop_sample/tree.root &>> $(test_out_dir)/MEAnalysis_MEAnalysis_heppy_calcME.log
+	python -c "import ROOT; f=ROOT.TFile('MEAnalysis/Loop_sample/tree.root'); print f.Get('tree').GetEntries()" &>> $(test_out_dir)/MEAnalysis_MEAnalysis_heppy.log
+	cp MEAnalysis/Loop_sample/tree.root $(test_out_dir)/MEAnalysis_MEAnalysis_heppy_calcME.root
 
 test_MELooper: test_mkdir melooper
 	cd Plotting && FILE_NAMES=$(testfile_vhbb_tthbb) DATASETPATH=ttHTobb_M125_13TeV_powheg_pythia8 ./python/makeJobfile.py && ./melooper job.json &> $(test_out_dir)/Plotting_MELooper.log
@@ -80,9 +80,9 @@ test_MEAnalysis_crab_vhbb: test_mkdir
 	python -c "import ROOT; f=ROOT.TFile('$(test_out_dir)/MEAnalysis_crab_vhbb.root');print f.Get('vhbb/tree').GetEntries(); print f.Get('tree').GetEntries()" &>> $(test_out_dir)/MEAnalysis_crab_vhbb.log
 
 get_hashes:
-	echo "tthbb13="`git rev-parse --short HEAD` > hash
-	cd CommonClassifier && echo "CommonClassifier="`git rev-parse --short HEAD` >> ../hash
-	cd MEIntegratorStandalone && echo "MEIntegratorStandalone="`git rev-parse --short HEAD` >> ../hash
-	cd $(CMSSW_BASE)/src && echo "CMSSW="`git rev-parse --short HEAD` >> TTH/hash
+	cd $(CMSSW_BASE)/src/TTH && echo "tthbb13="`git rev-parse --short HEAD` > $(CMSSW_BASE)/src/TTH/hash
+	cd $(CMSSW_BASE)/src/TTH/CommonClassifier && echo "CommonClassifier="`git rev-parse --short HEAD` >> $(CMSSW_BASE)/src/TTH/hash
+	cd $(CMSSW_BASE)/src/TTH/MEIntegratorStandalone && echo "MEIntegratorStandalone="`git rev-parse --short HEAD` >> $(CMSSW_BASE)/src/TTH/hash
+	cd $(CMSSW_BASE)/src && echo "CMSSW="`git rev-parse --short HEAD` >> $(CMSSW_BASE)/src/TTH/hash
 
 .PHONY: test_mkdir get_hashes

@@ -10,7 +10,6 @@ git cms-merge-topic jpata:V21_v1
 #get the TTH code
 git clone https://github.com/jpata/tthbb13.git TTH
 cd $CMSSW_BASE/src/TTH
-git checkout meanalysis-76x_V9
 git clone https://github.com/bianchini/Code.git MEIntegratorStandalone
 git clone https://github.com/jpata/CommonClassifier.git CommonClassifier --branch mem_npoints
 git clone https://github.com/grid-control/grid-control MEAnalysis/gc/grid-control

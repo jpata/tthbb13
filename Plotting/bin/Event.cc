@@ -3,6 +3,10 @@
 
 using namespace std;
 
+double logit(double x) {
+    return log(x/(1.0 - x));
+}
+
 namespace trigger {
     bool mumu(const TreeData& data) {
         return (
@@ -66,6 +70,7 @@ const map<string, function<float(const Event& ev)>> AxisFunctions = {
 
     //tt+bb discriminators
     {"mem_SL_0w2h2t", [](const Event& ev) { return ev.mem_SL_0w2h2t;}},
+    {"mem_SL_1w2h2t", [](const Event& ev) { return ev.mem_SL_1w2h2t;}},
     {"mem_SL_2w2h2t", [](const Event& ev) { return ev.mem_SL_2w2h2t;}},
     {"mem_SL_2w2h2t_sj", [](const Event& ev) { return ev.mem_SL_2w2h2t_sj;}},
     {"mem_DL_0w2h2t", [](const Event& ev) { return ev.mem_DL_0w2h2t;}},
@@ -322,28 +327,14 @@ Event::Event(
     double _puWeight,
     double _Wmass,
     double _mem_SL_0w2h2t,
+    double _mem_SL_1w2h2t,
     double _mem_SL_2w2h2t,
     double _mem_SL_2w2h2t_sj,
     double _mem_DL_0w2h2t,
     double _tth_mva,
     double _common_bdt,
     double _btag_LR_4b_2b,
-    int _n_excluded_bjets,
-    int _n_excluded_ljets,
-    int _ntopCandidate,
-    double _topCandidate_pt,
-    double _topCandidate_eta,
-    double _topCandidate_mass,
-    double _topCandidate_masscal,
-    double _topCandidate_fRec,
-    double _topCandidate_n_subjettiness,
-    int _nhiggsCandidate,
-    double _higgsCandidate_pt,
-    double _higgsCandidate_eta,
-    double _higgsCandidate_mass,
-    double _higgsCandidate_bbtag,
-    double _higgsCandidate_n_subjettiness,
-    double _higgsCandidate_dr_genHiggs
+    double _btag_LR_4b_2b_logit
     ) :
     data(_data),
     is_sl(_is_sl),
@@ -358,29 +349,14 @@ Event::Event(
     puWeight(_puWeight),
     Wmass(_Wmass),
     mem_SL_0w2h2t(_mem_SL_0w2h2t),
+    mem_SL_1w2h2t(_mem_SL_1w2h2t),
     mem_SL_2w2h2t(_mem_SL_2w2h2t),
     mem_SL_2w2h2t_sj(_mem_SL_2w2h2t_sj),
     mem_DL_0w2h2t(_mem_DL_0w2h2t),
     tth_mva(_tth_mva),
     common_bdt(_common_bdt),
     btag_LR_4b_2b(_btag_LR_4b_2b),
-    btag_LR_4b_2b_logit(log(_btag_LR_4b_2b / (1.0 - _btag_LR_4b_2b))),
-    n_excluded_bjets(_n_excluded_bjets),
-    n_excluded_ljets(_n_excluded_ljets),
-    ntopCandidate(_ntopCandidate),
-    topCandidate_pt(_topCandidate_pt),
-    topCandidate_eta(_topCandidate_eta),
-    topCandidate_mass(_topCandidate_mass),
-    topCandidate_masscal(_topCandidate_masscal),
-    topCandidate_fRec(_topCandidate_fRec),
-    topCandidate_n_subjettiness(_topCandidate_n_subjettiness),
-    nhiggsCandidate(_nhiggsCandidate),
-    higgsCandidate_pt(_higgsCandidate_pt),
-    higgsCandidate_eta(_higgsCandidate_eta),
-    higgsCandidate_mass(_higgsCandidate_mass),
-    higgsCandidate_bbtag(_higgsCandidate_bbtag),
-    higgsCandidate_n_subjettiness(_higgsCandidate_n_subjettiness),
-    higgsCandidate_dr_genHiggs(_higgsCandidate_dr_genHiggs)
+    btag_LR_4b_2b_logit(logit(_btag_LR_4b_2b))
 {
     
 }
@@ -625,30 +601,14 @@ const Event EventFactory::makeNominal(const TreeData& data, const Configuration&
         data.puWeight,
         data.Wmass,
         mem_p(data.mem_tth_p[0], data.mem_ttbb_p[0]), //SL 022
+        mem_p(data.mem_tth_p[1], data.mem_ttbb_p[1]), //SL 122
         mem_p(data.mem_tth_p[5], data.mem_ttbb_p[5]), //SL 222
         mem_p(data.mem_tth_p[9], data.mem_ttbb_p[9], 0.05), //SL 222 sj
         mem_p(data.mem_tth_p[1], data.mem_ttbb_p[1]), //DL 022,
         data.tth_mva,
         data.common_bdt,
         data.btag_LR_4b_2b,
-        data.n_excluded_bjets,
-        data.n_excluded_ljets,
-        
-        data.ntopCandidate,
-        data.topCandidate_pt[0],
-        data.topCandidate_eta[0],
-        data.topCandidate_mass[0],
-        data.topCandidate_masscal[0],
-        data.topCandidate_fRec[0],
-        data.topCandidate_n_subjettiness[0],
-        
-        data.nhiggsCandidate,
-        data.higgsCandidate_pt[0],
-        data.higgsCandidate_eta[0],
-        data.higgsCandidate_mass[0],
-        data.higgsCandidate_bbtag[0],
-        data.higgsCandidate_n_subjettiness[0],
-        data.higgsCandidate_dr_genHiggs[0]
+        logit(data.btag_LR_4b_2b)
     );
     return ev;
 }
@@ -671,30 +631,14 @@ const Event EventFactory::makeJESUp(const TreeData& data, const Configuration& c
         data.puWeight,
         data.Wmass,
         mem_p(data.mem_tth_JESUp_p[0], data.mem_ttbb_JESUp_p[0]), //SL 022
+        mem_p(data.mem_tth_JESUp_p[2], data.mem_ttbb_JESUp_p[2]), //SL 122
         mem_p(data.mem_tth_JESUp_p[5], data.mem_ttbb_JESUp_p[5]), //SL 222
         mem_p(data.mem_tth_JESUp_p[9], data.mem_ttbb_JESUp_p[9], 0.05), //SL 222 sj
         mem_p(data.mem_tth_JESUp_p[1], data.mem_ttbb_JESUp_p[1]), //DL 022,
-        data.tth_mva, 
-        data.common_bdt_JESUp, 
-        data.btag_LR_4b_2b,
-        data.n_excluded_bjets,
-        data.n_excluded_ljets,
-        
-        data.ntopCandidate,
-        data.topCandidate_pt[0],
-        data.topCandidate_eta[0],
-        data.topCandidate_mass[0],
-        data.topCandidate_masscal[0],
-        data.topCandidate_fRec[0],
-        data.topCandidate_n_subjettiness[0],
-
-        data.nhiggsCandidate,
-        data.higgsCandidate_pt[0],
-        data.higgsCandidate_eta[0],
-        data.higgsCandidate_mass[0],
-        data.higgsCandidate_bbtag[0],
-        data.higgsCandidate_n_subjettiness[0],
-        data.higgsCandidate_dr_genHiggs[0]
+        data.tth_mva_JESUp,
+        data.common_bdt_JESUp,
+        data.btag_LR_4b_2b_JESUp,
+        logit(data.btag_LR_4b_2b_JESUp)
     );
 }
 
@@ -716,30 +660,14 @@ const Event EventFactory::makeJESDown(const TreeData& data, const Configuration&
         data.puWeight,
         data.Wmass,
         mem_p(data.mem_tth_JESDown_p[0], data.mem_ttbb_JESDown_p[0]), //SL 022
+        mem_p(data.mem_tth_JESDown_p[2], data.mem_ttbb_JESDown_p[2]), //SL 122
         mem_p(data.mem_tth_JESDown_p[5], data.mem_ttbb_JESDown_p[5]), //SL 222
         mem_p(data.mem_tth_JESDown_p[9], data.mem_ttbb_JESDown_p[9], 0.05), //SL 222 sj
         mem_p(data.mem_tth_JESDown_p[1], data.mem_ttbb_JESDown_p[1]), //DL 022,
         data.tth_mva,
         data.common_bdt_JESDown,
-        data.btag_LR_4b_2b,
-        data.n_excluded_bjets,
-        data.n_excluded_ljets,
-        
-        data.ntopCandidate,
-        data.topCandidate_pt[0],
-        data.topCandidate_eta[0],
-        data.topCandidate_mass[0],
-        data.topCandidate_masscal[0],
-        data.topCandidate_fRec[0],
-        data.topCandidate_n_subjettiness[0],
-
-        data.nhiggsCandidate,
-        data.higgsCandidate_pt[0],
-        data.higgsCandidate_eta[0],
-        data.higgsCandidate_mass[0],
-        data.higgsCandidate_bbtag[0],
-        data.higgsCandidate_n_subjettiness[0],
-        data.higgsCandidate_dr_genHiggs[0]
+        data.btag_LR_4b_2b_JESDown,
+        logit(data.btag_LR_4b_2b_JESDown)
     );
 }
 

@@ -1,21 +1,32 @@
 #!/usr/bin/env python
-import os
-import PhysicsTools.HeppyCore.framework.config as cfg
+import os, time, sys, re, imp
 import ROOT
-import time
 
+import PhysicsTools.HeppyCore.framework.config as cfg
 cfg.Analyzer.nosubdir=True
-
 import PSet
-import sys
-import re
+
 t0 = time.time()
 print "ARGV:",sys.argv
+
+me_conf_name = "MEAnalysis_cfg_heppy.py"
+for arg in sys.argv:
+    if arg.startswith("ME_CONF="):
+        me_conf_name = arg.split("=")[1]
+
+
 JobNumber=sys.argv[1]
+print "JobNumber", JobNumber
 print PSet.process.dumpPython()
+
 crabFiles=PSet.process.source.fileNames
-print crabFiles
+print "crabFiles", crabFiles
+
 firstInput = crabFiles[0]
+
+###
+### Convert LFN to PFN
+###
 print "--------------- using edmFileUtil to convert PFN to LFN -------------------------"
 for i in xrange(0,len(crabFiles)) :
      if ((os.getenv("GLIDECLIENT_Group","") != "overflow" and
@@ -30,7 +41,9 @@ for i in xrange(0,len(crabFiles)) :
        crabFiles[i]="root://cms-xrd-global.cern.ch/"+crabFiles[i]
 print "timeto_convertPFN ",(time.time()-t0) #DS 
 
-import imp
+###
+### VHBB code
+###
 handle = open("heppy_config.py", 'r')
 cfo = imp.load_source("heppy_config", "heppy_config.py", handle)
 config = cfo.config
@@ -41,21 +54,21 @@ print "timeto_setLumis ",(time.time()-t0) #DS
 #replace files with crab ones
 config.components[0].files=crabFiles
 
-print config
+print "heppy_config", config
 from PhysicsTools.HeppyCore.framework.looper import Looper
 looper = Looper( 'Output', config, nPrint=0)
 looper.loop()
 looper.write()
 print "timeto_doVHbb ",(time.time()-t0) #DS
 
+###
+### tthbb13 code
+###
 print "Running tth code"
-import imp
 import cPickle as pickle
 import TTH.MEAnalysis.TFClasses as TFClasses
-import sys
 sys.modules["TFClasses"] = TFClasses
-        
-handle = None
+os.environ["ME_CONF"] = os.environ["CMSSW_BASE"] + "/python/TTH/MEAnalysis/" + me_conf_name
 handle = open("MEAnalysis_heppy.py", 'r')
 cfo2 = imp.load_source("heppy_config", "MEAnalysis_heppy.py", handle)
 config = cfo2.config
@@ -95,15 +108,12 @@ def copyTo(src, dst):
 
 copyTo(inf1, vhbb_dir)
 copyTo(inf2, tof)
-
-#print PSet.process.output.fileName
-#os.system("./addTreeFiles.py tree.root Output/tree.root Output_tth/tree.root")
-
 tof.Close()
 
 f=ROOT.TFile.Open('tree.root')
 entries=f.Get('tree').GetEntries()
 
+#Now write the FWKJobReport
 fwkreport='''<FrameworkJobReport>
 <ReadBranches>
 </ReadBranches>

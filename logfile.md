@@ -24,3 +24,11 @@ April2016D: VHBBHeppyV21_tthbbV7_Apr25
 * `CMSSW=16bc9e8`
 
 Comments: created with the fully-hadronic branch merged.
+
+VHBBHeppyV21_tthbbV9_May11
+-------------
+tthbb13=c5675f2
+CommonClassifier=7d13981
+MEIntegratorStandalone=a3c81d8
+CMSSW=7482860
+

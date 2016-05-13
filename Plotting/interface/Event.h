@@ -225,6 +225,7 @@ public:
     
     //mem hypotheses
     double mem_SL_0w2h2t;
+    double mem_SL_1w2h2t;
     double mem_SL_2w2h2t;
     double mem_SL_2w2h2t_sj;
     double mem_DL_0w2h2t;
@@ -277,30 +278,14 @@ public:
         double _puWeight,
         double _Wmass,
         double _mem_SL_0w2h2t,
+        double _mem_SL_1w2h2t,
         double _mem_SL_2w2h2t,
         double _mem_SL_2w2h2t_sj,
         double _mem_DL_0w2h2t,
         double _tth_mva,
         double _common_bdt,
         double _btag_LR_4b_2b,
-        int _n_excluded_bjets,
-        int _n_excluded_ljets,
-        
-        int _ntopCandidate,
-        double _topCandidate_pt,
-        double _topCandidate_eta,
-        double _topCandidate_mass,
-        double _topCandidate_masscal,
-        double _topCandidate_fRec,
-        double _topCandidate_n_subjettiness,
-
-        int _nhiggsCandidate,
-        double _higgsCandidate_pt,
-        double _higgsCandidate_eta,
-        double _higgsCandidate_mass,
-        double _higgsCandidate_bbtag,
-        double _higgsCandidate_n_subjettiness,
-        double _higgsCandidate_dr_genHiggs
+        double _btag_LR_4b_2b_logit
     );
 
     const string to_string() const;
