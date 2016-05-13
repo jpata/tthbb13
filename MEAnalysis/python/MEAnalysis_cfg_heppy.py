@@ -268,6 +268,7 @@ class Conf:
         #Actually run the ME calculation
         #If False, all ME values will be 0
         "calcME": True,
+        "calcMECommon": False,
         "n_integration_points_mult": 1.0,
 
         "weight": 0.15, #k in Psb = Ps/(Ps+k*Pb)
