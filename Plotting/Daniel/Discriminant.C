@@ -4,14 +4,11 @@
 #define NORMALIZE 0
 #define POISSON 0
 #define SAVEPLOTS 0
-#define MAXEVENTS 100000
-#define NMAXJETS 30
-#define CAT 8   // 7, 8, 9, 10, 11 or <0 for all
-#define METHOD 11 // 11=4w2h2t, 12=3w2h2t, 13=4w2h1t, 14=0w2h2t, 15=0w2h1t
-#define CUT_HT 500.0
+#define CAT 9  // 7, 8, 9, 10, 11 or <0 for all
+#define METHOD 12 // 11=4w2h2t, 12=3w2h2t, 13=4w2h1t, 14=0w2h2t, 15=0w2h1t
+#define CUT_HT 450.0
 #define PSB_FAC 0.02
-#define CSVM 0.89
-#define LUMI 10.0  //Just for now
+#define LUMI 10.0
 
 #include <fstream>
 
@@ -75,19 +72,24 @@ void Discriminant(){
   else if(METHOD==15) {method = "_0w2h1t";  element="15";}
 
   if(CAT==7){
-    cat = "cat==7 && nBCSVM>=4";
+    //cat = "cat==7 && nBCSVM>=4";
+    cat = "numJets==7 && nBCSVM>=4";
   }
   else if(CAT==8){
-    cat = "cat==8 && nBCSVM>=4";
+    //cat = "cat==8 && nBCSVM>=4";
+    cat = "numJets==8 && nBCSVM>=4";
   }
   else if(CAT==9){
-    cat = "cat==9 && nBCSVM>=4";
+    //cat = "cat==9 && nBCSVM>=4";
+    cat = "numJets==9 && nBCSVM>=4";
   }
   else if(CAT==10){
-    cat = "cat==10 && nBCSVM==3";
+    //cat = "cat==10 && nBCSVM==3";
+    cat = "numJets==8 && nBCSVM==3";
   }
   else if(CAT==11){
-    cat = "cat==11 && nBCSVM==3";
+    //cat = "cat==11 && nBCSVM==3";
+    cat = "numJets==7 && nBCSVM==3";
   }
   if(CAT>=0) tag += method;
   
@@ -153,7 +155,8 @@ void Discriminant(){
   selection += " && HLT_ttHhardonicLowLumi>0";
   selection += ")";
 
-  TString draw = ("mem_tth_p["+element+"]/(mem_tth_p["+element+"]+"+Form("%.3f",PSB_FAC)+"*mem_ttbb_p["+element+"])").c_str();
+  //TString draw = ("mem_tth_p["+element+"]/(mem_tth_p["+element+"]+"+Form("%.3f",PSB_FAC)+"*mem_ttbb_p["+element+"])").c_str();
+  TString draw = "1.0*numJets/(2.0*numJets)";
   TString cut = selection.c_str();
   
   cout << draw << endl;
@@ -169,15 +172,22 @@ void Discriminant(){
   tqcd15->Draw(draw+">>hqcd15",cut);
   tqcd20->Draw(draw+">>hqcd20",cut);
 
-  hsignal->Scale(lumi*scalefacttH*20.0);
+  hsignal->Scale(lumi*scalefacttH*10.0);
   htth->Scale(lumi*scalefacttH);
   httj->Scale(lumi*scalefacTTbar);
-  //hqcd->Add(hqcd3,lumi*scalefacQCD3); //exclude QCD300 due to large weights
+  hqcd->Add(hqcd3,lumi*scalefacQCD3); //exclude QCD300 due to large weights
   hqcd->Add(hqcd5,lumi*scalefacQCD5); 
   hqcd->Add(hqcd7,lumi*scalefacQCD7);
   hqcd->Add(hqcd10,lumi*scalefacQCD10);
   hqcd->Add(hqcd15,lumi*scalefacQCD15);
   hqcd->Add(hqcd20,lumi*scalefacQCD20);
+
+  cout << endl;
+  cout << "cat" << CAT << endl;
+  cout << "ttH "   << htth->Integral() << endl;
+  cout << "TTbar " << httj->Integral() << endl;
+  cout << "QCD "   << hqcd->Integral() << endl;  
+  cout << endl;
 
   gStyle->SetOptStat(0);
   gStyle->SetTitleH(0.04);
@@ -305,7 +315,7 @@ void Discriminant(){
   leg->AddEntry(hqcd,  "QCD Multijet", "F");
   if(RUNONDATA) leg->AddEntry(hdata, "Data", "LPE");
   leg->AddEntry(herr,  "Bkg. Unc.", "F");
-  leg->AddEntry(hsignal,"t#bar{t}H (125) x 20", "L");
+  leg->AddEntry(hsignal,"t#bar{t}H (125) x 10", "L");
  
   // set y-axis range
   float max =  TMath::Max( herr->GetMaximum()*1.15,(hdata!=0 ? hdata->GetMaximum()*1.45 : -1.));
@@ -454,18 +464,20 @@ void Discriminant(){
   // Normalized plot
   if( NORMALIZE ){
     TCanvas *c2 = new TCanvas("c2","",5,30,640,580);
-    TPad *p2 = new TPad("p2","",0,0,1,1);
+    TPad *p3 = new TPad("p2","",0,0,1,1);
   
-    p2->SetGrid(0,0);
-    p2->SetFillStyle(4000);
-    p2->SetFillColor(10);
-    p2->SetTicky();
-    p2->SetTicks(0,0);
-    p2->SetObjectStat(0);
-    p2->Draw();
-    p2->cd();
+    p3->SetGrid(0,0);
+    p3->SetFillStyle(4000);
+    p3->SetFillColor(10);
+    p3->SetTicky();
+    p3->SetTicks(0,0);
+    p3->SetObjectStat(0);
+    p3->Draw();
+    p3->cd();
     
-    p2->SetTopMargin(0.05);
+    p3->SetTopMargin(0.05);
+    p3->SetLeftMargin(0.11);
+    p3->SetRightMargin(0.05);
 
     htth ->SetLineWidth( 4 );
     //htth ->SetFillStyle( 0 );
