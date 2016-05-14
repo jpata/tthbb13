@@ -6,7 +6,8 @@ workflows = [
     "leptonic", #ttH with SL/DL decays
     "hadronic", #ttH with FH decays
     "pilot", #ttH sample only, with no MEM
-    "testing" #single-lumi jobs, a few samples
+    "testing", #single-lumi jobs, a few samples
+    "testing_withme" #single-lumi jobs, a few samples
 ]
 
 import argparse
@@ -137,6 +138,15 @@ for k in ["ttHTobb", "TTbar_inc", "QCD1500"]:
     D["mem_cfg"] = "cfg_noME.py"
     workflow_datasets["testing"][k] = D
 
+workflow_datasets["testing_withme"] = {}
+for k in ["ttHTobb", "TTbar_inc", "QCD1500"]:
+    D = deepcopy(datasets[k])
+    D["maxlumis"] = 10
+    D["perjob"] = 1
+    D["runtime"] = 5
+    D["mem_cfg"] = me_cfgs["default"]
+    workflow_datasets["testing_withme"][k] = D
+
 #Now select a set of datasets
 sel_datasets = workflow_datasets[args.workflow]
 
@@ -160,13 +170,15 @@ if __name__ == '__main__':
     import os
     os.system("tar czf python.tar.gz --dereference --directory $CMSSW_BASE python")
     os.system("tar czf data.tar.gz --dereference --directory $CMSSW_BASE/src/TTH/MEAnalysis root")
-    os.system("make -sf $CMSSW_BASE/src/TTH/Makefile get_hashes")
-    os.system("echo '\n\n{0}\n-------------' >> $CMSSW_BASE/src/TTH/logfile.md".format(submitname))
-    os.system("cat $CMSSW_BASE/src/TTH/hash >> $CMSSW_BASE/src/TTH/logfile.md")
+    if not "testing" in args.workflow: 
+        os.system("make -sf $CMSSW_BASE/src/TTH/Makefile get_hashes")
+        os.system("echo '\n\n{0}\n-------------' >> $CMSSW_BASE/src/TTH/logfile.md".format(submitname))
+        os.system("cat $CMSSW_BASE/src/TTH/hash >> $CMSSW_BASE/src/TTH/logfile.md")
     
     vhbb_dir = os.environ.get("CMSSW_BASE") + "/src/VHbbAnalysis/Heppy/test"
     config.JobType.inputFiles = [
         'hash',
+        'analyze_log.py',
         'FrameworkJobReport.xml',
         'heppy_config.py',
         'heppy_crab_script.py',

@@ -18,7 +18,7 @@ blr_cuts = {
     "sl_jge6_t3": 2.9,
 }
 
-input_file = "/home/joosep/tth/gc/melooper/GC011c9bcd5217/ControlPlotsSparse.root"
+input_file = "/home/joosep/tth/gc/plots/GC3bceb4f98811/ControlPlotsSparse.root"
 
 lumi = 2600 # pb-1
 do_stat_variations = True
@@ -226,7 +226,7 @@ sl_categories = [
     
     # == 5 jets, == 3 tags, high blr
     Category(
-        name = "sl_j5_t3",
+        name = "sl_j5_t3_blrH",
         cuts = [("numJets", 5, 6), ("nBCSVM", 3, 4), ("btag_LR_4b_2b_logit", blr_cuts["sl_j5_t3"], 20)],
         samples = base_samples,
         data_samples = sl_data,
@@ -241,7 +241,7 @@ sl_categories = [
     
     # == 5 jets, == 3 tags, low blr
     Category(
-        name = "sl_j5_t3",
+        name = "sl_j5_t3_blrL",
         cuts = [("numJets", 5, 6), ("nBCSVM", 3, 4), ("btag_LR_4b_2b_logit", -20, blr_cuts["sl_j5_t3"])],
         samples = base_samples,
         data_samples = sl_data,

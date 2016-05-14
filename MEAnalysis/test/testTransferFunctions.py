@@ -10,8 +10,8 @@ outfile = ROOT.TFile("transfer.root", "RECREATE")
 pickle_fn    = sys.argv[1] # Resolved
 pickle_fn_sj = sys.argv[2] # Subjets
  
-for prefix, fn in zip(["",        "sj"], 
-                      [pickle_fn, pickle_fn_sj]): 
+for prefix, fn in zip(["",        "sj"],
+                      [pickle_fn, pickle_fn_sj]):
 
 
     #Load transfer functions from pickle file
