@@ -13,6 +13,7 @@ compare_basic = True
 compare_extra = False
 compare_dl    = False
 compare_boost = True
+compare_boost1 = True
 
 
 def getVar(tt, var, syst):
@@ -109,26 +110,32 @@ variables = [
     ["n_fatjets",            compare_boost, lambda tt: tt.nfatjets],
     ["pt_fatjet_1",          compare_boost, lambda tt: tt.fatjets_pt[0] if tt.nfatjets >= 1 else 0.],
     ["pt_fatjet_2",          compare_boost, lambda tt: tt.fatjets_pt[1] if tt.nfatjets >= 2 else 0.],
+    ["eta_fatjet_1",         compare_boost, lambda tt: tt.fatjets_eta[0] if tt.nfatjets >= 1 else 0.],
+    ["eta_fatjet_2",         compare_boost, lambda tt: tt.fatjets_eta[1] if tt.nfatjets >= 2 else 0.],
     ["pt_nonW_1",            compare_boost, lambda tt: tt.topCandidatesSync_sjNonWpt[0] if tt.ntopCandidatesSync >= 1 else 0.],
     ["pt_nonW_2",            compare_boost, lambda tt: tt.topCandidatesSync_sjNonWpt[1] if tt.ntopCandidatesSync >= 2 else 0.],
     ["pt_W1_1",              compare_boost, lambda tt: tt.topCandidatesSync_sjW1pt[0] if tt.ntopCandidatesSync >= 1 else 0.],
-    ["pt_W1_2",              compare_boost, lambda tt: tt.topCandidatesSync_sjW2pt[1] if tt.ntopCandidatesSync >= 2 else 0.],
-    ["pt_W2_1",              compare_boost, lambda tt: tt.topCandidatesSync_sjW1pt[0] if tt.ntopCandidatesSync >= 1 else 0.],
+    ["pt_W1_2",              compare_boost, lambda tt: tt.topCandidatesSync_sjW1pt[1] if tt.ntopCandidatesSync >= 2 else 0.],
+    ["pt_W2_1",              compare_boost, lambda tt: tt.topCandidatesSync_sjW2pt[0] if tt.ntopCandidatesSync >= 1 else 0.],
     ["pt_W2_2",              compare_boost, lambda tt: tt.topCandidatesSync_sjW2pt[1] if tt.ntopCandidatesSync >= 2 else 0.],   
-    ["csv_nonW_1",           compare_boost, lambda tt: tt.topCandidatesSync_sjNonWbtag[0] if tt.ntopCandidatesSync >= 1 else 0.], 
-    ["csv_nonW_2",           compare_boost, lambda tt: tt.topCandidatesSync_sjNonWbtag[1] if tt.ntopCandidatesSync >= 2 else 0.], 
-    ["csv_W1_1",             compare_boost, lambda tt: tt.topCandidatesSync_sjW1btag[0] if tt.ntopCandidatesSync >= 1 else 0.],   
-    ["csv_W1_2",             compare_boost, lambda tt: tt.topCandidatesSync_sjW2btag[1] if tt.ntopCandidatesSync >= 2 else 0.],   
-    ["csv_W2_1",             compare_boost, lambda tt: tt.topCandidatesSync_sjW1btag[0] if tt.ntopCandidatesSync >= 1 else 0.],   
-    ["csv_W2_2",             compare_boost, lambda tt: tt.topCandidatesSync_sjW2btag[1] if tt.ntopCandidatesSync >= 2 else 0.],   
+    ["csv_nonW_1",           compare_boost1, lambda tt: tt.topCandidatesSync_sjNonWbtag[0] if tt.ntopCandidatesSync >= 1 else 0.], 
+    ["csv_nonW_2",           compare_boost1, lambda tt: tt.topCandidatesSync_sjNonWbtag[1] if tt.ntopCandidatesSync >= 2 else 0.], 
+    ["csv_W1_1",             compare_boost1, lambda tt: tt.topCandidatesSync_sjW1btag[0] if tt.ntopCandidatesSync >= 1 else 0.],   
+    ["csv_W1_2",             compare_boost1, lambda tt: tt.topCandidatesSync_sjW1btag[1] if tt.ntopCandidatesSync >= 2 else 0.],   
+    ["csv_W2_1",             compare_boost1, lambda tt: tt.topCandidatesSync_sjW2btag[0] if tt.ntopCandidatesSync >= 1 else 0.],   
+    ["csv_W2_2",             compare_boost1, lambda tt: tt.topCandidatesSync_sjW2btag[1] if tt.ntopCandidatesSync >= 2 else 0.],   
+    ["pt_top_1",              compare_boost, lambda tt: tt.topCandidatesSync_pt[0] if tt.ntopCandidatesSync >= 1 else 0.],   
+    ["pt_top_2",              compare_boost, lambda tt: tt.topCandidatesSync_pt[1] if tt.ntopCandidatesSync >= 2 else 0.],   
+    ["eta_top_1",              compare_boost, lambda tt: tt.topCandidatesSync_eta[0] if tt.ntopCandidatesSync >= 1 else 0.],   
+    ["eta_top_2",              compare_boost, lambda tt: tt.topCandidatesSync_eta[1] if tt.ntopCandidatesSync >= 2 else 0.],   
     ["m_top_1",              compare_boost, lambda tt: tt.topCandidatesSync_mass[0] if tt.ntopCandidatesSync >= 1 else 0.],   
     ["m_top_2",              compare_boost, lambda tt: tt.topCandidatesSync_mass[1] if tt.ntopCandidatesSync >= 2 else 0.],   
-    ["pt_sf_filterjet1_1",   compare_boost, lambda tt: tt.higgsCandidate_sj1pt_subjetfiltered[0] if tt.nhiggsCandidate >= 1 else 0.],
-    ["pt_sf_filterjet1_2",   compare_boost, lambda tt: tt.higgsCandidate_sj1pt_subjetfiltered[1] if tt.nhiggsCandidate >= 2 else 0.],
-    ["pt_sf_filterjet2_1",   compare_boost, lambda tt: tt.higgsCandidate_sj2pt_subjetfiltered[0] if tt.nhiggsCandidate >= 1 else 0.],
-    ["pt_sf_filterjet2_2 ",  compare_boost, lambda tt: tt.higgsCandidate_sj2pt_subjetfiltered[1] if tt.nhiggsCandidate >= 2 else 0.],
-    ["pt_sf_filterjet3_1",   compare_boost, lambda tt: tt.higgsCandidate_sj3pt_subjetfiltered[0]  if tt.nhiggsCandidate >= 1 else 0.],
-    ["pt_sf_filterjet3_2",   compare_boost, lambda tt: tt.higgsCandidate_sj3pt_subjetfiltered[1]  if tt.nhiggsCandidate >= 2 else 0.],
+    ["pt_sf_filterjet1_1",   compare_boost, lambda tt: float(tt.higgsCandidate_sj1pt_subjetfiltered[0]) if tt.nhiggsCandidate >= 1 else 0.],
+    ["pt_sf_filterjet1_2",   compare_boost, lambda tt: float(tt.higgsCandidate_sj1pt_subjetfiltered[1]) if tt.nhiggsCandidate >= 2 else 0.],
+    ["pt_sf_filterjet2_1",   compare_boost, lambda tt: float(tt.higgsCandidate_sj2pt_subjetfiltered[0]) if tt.nhiggsCandidate >= 1 else 0.],
+    ["pt_sf_filterjet2_2",   compare_boost, lambda tt:  float(tt.higgsCandidate_sj2pt_subjetfiltered[1]) if tt.nhiggsCandidate >= 2 else 0.],
+    ["pt_sf_filterjet3_1",   compare_boost, lambda tt: float(tt.higgsCandidate_sj3pt_subjetfiltered[0])  if tt.nhiggsCandidate >= 1 else 0.],
+    ["pt_sf_filterjet3_2",   compare_boost, lambda tt: float(tt.higgsCandidate_sj3pt_subjetfiltered[1])  if tt.nhiggsCandidate >= 2 else 0.],
     ["csv_sf_filterjet1_1",  compare_boost, lambda tt: tt.higgsCandidate_sj1btag_subjetfiltered[0] if tt.nhiggsCandidate >= 1 else 0.],
     ["csv_sf_filterjet1_2",  compare_boost, lambda tt: tt.higgsCandidate_sj1btag_subjetfiltered[1] if tt.nhiggsCandidate >= 2 else 0.],
     ["csv_sf_filterjet2_1",  compare_boost, lambda tt: tt.higgsCandidate_sj2btag_subjetfiltered[0] if tt.nhiggsCandidate >= 1 else 0.],
@@ -251,10 +258,10 @@ for ev in range(tt.GetEntries()):
             
             # Map dummy -9999 to zero
             if res == -9999:
-                res =0 
+                res =0.
             
             if not isinstance(res, int):
-                s += str(round(res, 4)) + ","
+                s += "{0:.4f}".format(res) + ","
             else:
                 s += str(res) + ","
     lines += [(int(tt.evt), s[:-1])]

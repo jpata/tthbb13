@@ -1133,12 +1133,15 @@ class SubjetAnalyzer(FilterAnalyzer):
             fj.nallsubjets = len(subjets)
             
             if fatjet_name == "subjetfiltered":
+                #pdb.set_trace()
                 subjets = sorted(subjets, key = lambda x: -x.pt)
+
                 if len(subjets) > 3:
                     subjets = subjets[:3]
                     
-            # Now sort by b-tag
-            subjets = sorted(subjets, key = lambda x: -x.btag)
+            # Now sort by b-tag            
+            #if "subjetfiltered" in fatjet_name:
+            #    subjets = sorted(subjets, key = lambda x: -x.btag)
                 
             # And add quantities to fatjet                    
             for isj, subjet in enumerate(subjets):
