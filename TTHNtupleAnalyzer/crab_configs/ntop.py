@@ -15,10 +15,10 @@ import TTH.TTHNtupleAnalyzer.CrabHelpers as CH
 
 # Ntuple name/version and samples to include
 name = "ntop"
-version = "x5"
+version = "x6"
 li_samples = [
-    "zprime_m2000",
-    "qcd_800_1000"
+    "zprime_m1000",
+    #"qcd_300_470"
 ]
 
 cmssw_config_path = '/shome/gregor/TOP-763/CMSSW_7_6_3/src/TTH/TTHNtupleAnalyzer/python/'

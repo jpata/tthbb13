@@ -7,8 +7,11 @@ else:
 
 files = {}
 
-files["zprime_m2000"]     = "ntop_x5_zprime_m2000-tagging"	
-files["qcd_800_1000"]     = "ntop_x5_qcd_800_1000-tagging" 
+#files["zprime_m2000"]     = "ntop_x6_zprime_m2000-tagging"	
+#files["qcd_800_1000"]     = "ntop_x6_qcd_800_1000-tagging" 
+
+files["zprime_m1000"]     = "ntop_x6_zprime_m1000-tagging"	
+files["qcd_300_470"]     = "ntop_x6_qcd_300_470-tagging" 
 
 
 weighted_files = {}
@@ -17,10 +20,10 @@ for k,v in files.iteritems():
 
 pairs = { 
 #    "pt-200-to-300" : ["zprime_m1000_low", "qcd_170_300"],
-#    "pt-300-to-470" : ["zprime_m1000", "qcd_300_470"],
+    "pt-300-to-470" : ["zprime_m1000", "qcd_300_470"],
 #   "pt-470-to-600" : ["zprime_m1250", "qcd_470_600"],
 #    "pt-600-to-800" : ["zprime_m2000_low", "qcd_600_800"],
-    "pt-800-to-1000" : ["zprime_m2000", "qcd_800_1000"],
+#    "pt-800-to-1000" : ["zprime_m2000", "qcd_800_1000"],
 }
 
 # [Minimal pT, Maximal pT, |eta|]

@@ -113,8 +113,8 @@ process.selectedHadronsAndPartons = selectedHadronsAndPartons.clone(
 # Ungroomed Fatjets
 #####################################
 
-DO_R15 = False
-DO_R08 = True
+DO_R15 = True
+DO_R08 = False
 
 from RecoJets.JetProducers.AnomalousCellParameters_cfi import *
 from RecoJets.JetProducers.PFJetParameters_cfi import *
@@ -285,35 +285,35 @@ for ungroomed_fj_name, ungroomed_branch_name in zip(li_ungroomed_fatjets_objects
    # Trimming (for btag)
    #####################################
 
-   name = "trimmedr2f3forbtag"   
-   fj_name = ungroomed_fj_name + name
-   branch_name = ungroomed_branch_name + name
-   setattr(process, fj_name, ungroomed_fj.clone(
-      useTrimming = cms.bool(True),
-      rFilt = cms.double(0.2),
-      trimPtFracMin = cms.double(0.03),
-      useExplicitGhosts = cms.bool(True),
-      writeCompound = cms.bool(True),
-      jetCollInstanceName=cms.string("SubJets"),
-   ))
-   li_fatjets_objects.append(fj_name)     
-   li_fatjets_initial_objects.append(ungroomed_fj_name)   
-   li_fatjets_branches.append(branch_name)
-
-   name = "trimmedr2f6forbtag"   
-   fj_name = ungroomed_fj_name + name
-   branch_name = ungroomed_branch_name + name
-   setattr(process, fj_name, ungroomed_fj.clone(
-      useTrimming = cms.bool(True),
-      rFilt = cms.double(0.2),
-      trimPtFracMin = cms.double(0.06),
-      useExplicitGhosts = cms.bool(True),
-      writeCompound = cms.bool(True),
-      jetCollInstanceName=cms.string("SubJets"),
-   ))
-   li_fatjets_objects.append(fj_name)        
-   li_fatjets_initial_objects.append(ungroomed_fj_name)   
-   li_fatjets_branches.append(branch_name)
+#   name = "trimmedr2f3forbtag"   
+#   fj_name = ungroomed_fj_name + name
+#   branch_name = ungroomed_branch_name + name
+#   setattr(process, fj_name, ungroomed_fj.clone(
+#      useTrimming = cms.bool(True),
+#      rFilt = cms.double(0.2),
+#      trimPtFracMin = cms.double(0.03),
+#      useExplicitGhosts = cms.bool(True),
+#      writeCompound = cms.bool(True),
+#      jetCollInstanceName=cms.string("SubJets"),
+#   ))
+#   li_fatjets_objects.append(fj_name)     
+#   li_fatjets_initial_objects.append(ungroomed_fj_name)   
+#   li_fatjets_branches.append(branch_name)
+#
+#   name = "trimmedr2f6forbtag"   
+#   fj_name = ungroomed_fj_name + name
+#   branch_name = ungroomed_branch_name + name
+#   setattr(process, fj_name, ungroomed_fj.clone(
+#      useTrimming = cms.bool(True),
+#      rFilt = cms.double(0.2),
+#      trimPtFracMin = cms.double(0.06),
+#      useExplicitGhosts = cms.bool(True),
+#      writeCompound = cms.bool(True),
+#      jetCollInstanceName=cms.string("SubJets"),
+#   ))
+#   li_fatjets_objects.append(fj_name)        
+#   li_fatjets_initial_objects.append(ungroomed_fj_name)   
+#   li_fatjets_branches.append(branch_name)
 
    name = "softdropz10b00forbtag"   
    fj_name = ungroomed_fj_name + name
