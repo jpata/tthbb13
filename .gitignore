@@ -26,3 +26,4 @@ Plotting/interface/categories.h
 Plotting/interface/gen.h
 Plotting/bin/categories.cc
 Plotting/bin/gen.cc
+CommonClassifier

@@ -140,7 +140,8 @@ class SubjetAnalyzer(FilterAnalyzer):
         #  - At least 1 httCandidate
         ########################################
 
-        # Check if the event is single leptonic
+        # Check if the event is single leptonic or FH
+        # for SYNC: REMOVE this cut
         if not (event.is_sl or event.is_fh): #LC
             return event
 
@@ -160,8 +161,12 @@ class SubjetAnalyzer(FilterAnalyzer):
         # All HTT candidates for sync
         all_tops = []
         for candidate in event.httCandidates:
+            # (optional eta cut)
+            #if abs(candidate.eta) < 2.0:
             all_tops.append( copy.deepcopy(candidate) )
 
+        # TODO: Add eta cut also to analysis tops
+            
         # Match the top to a fat jet
         #  - Copies bbtag and tau_N, calculates n_subjettiness
         #  - DOES NOT apply the n_subjettiness cut
@@ -250,12 +255,11 @@ class SubjetAnalyzer(FilterAnalyzer):
         extra_higgs_vars = ["mass", "nallsubjets", 
                             "sj1pt", "sj1eta", "sj1phi", "sj1mass", "sj1btag", 
                             "sj2pt", "sj2eta", "sj2phi", "sj2mass", "sj2btag", 
-                            "sj3pt", "sj3eta", "sj3phi", "sj3mass", "sj3btag", 
-                            "sj12mass"]
-        
-        # TODO: 
-        # -add groomed n-subjettiness
+                            "sj3pt", "sj3eta", "sj3phi", "sj3mass", "sj3btag", # only calc for subjetfiltered
+                            "sj12masspt", "sj12massb", "sj123masspt", # only calc for subjetfiltered
+        ]
 
+    
         for fatjet_name in fatjets_to_match:
             self.Add_Higgs_Subjets_To_Fatjet(event, fatjet_name)
 
@@ -280,14 +284,20 @@ class SubjetAnalyzer(FilterAnalyzer):
                 for var in extra_higgs_vars:
                     setattr(fatjet, var + "_" + fatjetkind, -9999)
                     
-            genhiggs = getattr(event, "GenHiggsBoson", [])
 
             #match higgs candidate to generated higgs
-            if self.cfg_comp.isMC and len(genhiggs) >= 1:
+            genhiggs = getattr(event, "GenHiggsBoson", [])
+            if self.cfg_comp.isMC and genhiggs:
                 lv1 = lvec(fatjet)
                 lv2 = lvec(genhiggs[0])
                 fatjet.dr_genHiggs = lv1.DeltaR(lv2)
 
+            #match higgs candidate to generated tops
+            gentops = [x for x in event.GenTop if x.pt>self.GenTop_pt_cut]
+            if self.cfg_comp.isMC and gentops:
+                lv1 = lvec(fatjet)
+                fatjet.dr_genTop = min([lv1.DeltaR(lvec(x)) for x in gentops])
+    
             higgsCandidates.append( fatjet )
             higgs_present = True
 
@@ -1151,15 +1161,36 @@ class SubjetAnalyzer(FilterAnalyzer):
                 setattr(fj, "sj{0}mass".format(isj+1), subjet.mass)
                 setattr(fj, "sj{0}btag".format(isj+1), subjet.btag)
             
-            # Also calculate the mass of subjet pair
-            # mostly important for BDRS
-            if len(subjets) >= 2:
+
+                "sj12masspt", "sj12massb", "sj123masspt", # only calc for subjetfiltered
+        
+            # Leading two subjet mass (sorted by pt)
+            if len(subjets) >= 2 and fatjet_name == "subjetfiltered":
                 sj1 = ROOT.TLorentzVector()
                 sj2 = ROOT.TLorentzVector()
                 sj1.SetPtEtaPhiM( subjets[0].pt, subjets[0].eta, subjets[0].phi, subjets[0].mass)
                 sj2.SetPtEtaPhiM( subjets[1].pt, subjets[1].eta, subjets[1].phi, subjets[1].mass)
-                setattr(fj, "sj12mass", (sj1+sj2).M())
-            
+                setattr(fj, "sj12masspt", (sj1+sj2).M())
+
+            # Leading three subjet mass
+            if len(subjets) >= 3 and fatjet_name == "subjetfiltered":
+                sj1 = ROOT.TLorentzVector()
+                sj2 = ROOT.TLorentzVector()
+                sj3 = ROOT.TLorentzVector()
+                sj1.SetPtEtaPhiM( subjets[0].pt, subjets[0].eta, subjets[0].phi, subjets[0].mass)
+                sj2.SetPtEtaPhiM( subjets[1].pt, subjets[1].eta, subjets[1].phi, subjets[1].mass)
+                sj3.SetPtEtaPhiM( subjets[2].pt, subjets[2].eta, subjets[2].phi, subjets[2].mass)
+                setattr(fj, "sj123masspt", (sj1+sj2+sj3).M())
+                
+            # Leading two subjet mass (sorted by btag, taken from three leading pT ones)
+            if len(subjets) >= 2 and fatjet_name == "subjetfiltered":
+                subjets_by_btag = sorted(subjets, key = lambda x: -x.btag)
+                sj1 = ROOT.TLorentzVector()
+                sj2 = ROOT.TLorentzVector()
+                sj1.SetPtEtaPhiM( subjets_by_btag[0].pt, subjets_by_btag[0].eta, subjets_by_btag[0].phi, subjets_by_btag[0].mass)
+                sj2.SetPtEtaPhiM( subjets_by_btag[1].pt, subjets_by_btag[1].eta, subjets_by_btag[1].phi, subjets_by_btag[1].mass)
+                setattr(fj, "sj12massb", (sj1+sj2).M())
+                                            
 
     # end of Add_Higgs_Subjets_To_Fatjet
                         

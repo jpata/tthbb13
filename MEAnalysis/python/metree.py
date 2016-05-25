@@ -272,7 +272,6 @@ higgsCandidateType = NTupleObjectType("higgsCandidateType", variables = [
     NTupleVariable("sj2phi_softdrop",  lambda x: x.sj2phi_softdrop ),
     NTupleVariable("sj2mass_softdrop", lambda x: x.sj2mass_softdrop ),
     NTupleVariable("sj2btag_softdrop", lambda x: x.sj2btag_softdrop ),
-    NTupleVariable("sj12mass_softdrop", lambda x: x.sj12mass_softdrop ),
 
     NTupleVariable("sj1pt_softdropz2b1",   lambda x: x.sj1pt_softdropz2b1 ),
     NTupleVariable("sj1eta_softdropz2b1",  lambda x: x.sj1eta_softdropz2b1 ),
@@ -284,7 +283,6 @@ higgsCandidateType = NTupleObjectType("higgsCandidateType", variables = [
     NTupleVariable("sj2phi_softdropz2b1",  lambda x: x.sj2phi_softdropz2b1 ),
     NTupleVariable("sj2mass_softdropz2b1", lambda x: x.sj2mass_softdropz2b1 ),
     NTupleVariable("sj2btag_softdropz2b1", lambda x: x.sj2btag_softdropz2b1 ),
-    NTupleVariable("sj12mass_softdropz2b1", lambda x: x.sj12mass_softdropz2b1 ),
 
     NTupleVariable("sj1pt_pruned",   lambda x: x.sj1pt_pruned ),
     NTupleVariable("sj1eta_pruned",  lambda x: x.sj1eta_pruned ),
@@ -296,7 +294,6 @@ higgsCandidateType = NTupleObjectType("higgsCandidateType", variables = [
     NTupleVariable("sj2phi_pruned",  lambda x: x.sj2phi_pruned ),
     NTupleVariable("sj2mass_pruned", lambda x: x.sj2mass_pruned ),
     NTupleVariable("sj2btag_pruned", lambda x: x.sj2btag_pruned ),
-    NTupleVariable("sj12mass_pruned", lambda x: x.sj12mass_pruned ),
 
     NTupleVariable("sj1pt_subjetfiltered",   lambda x: x.sj1pt_subjetfiltered ),
     NTupleVariable("sj1eta_subjetfiltered",  lambda x: x.sj1eta_subjetfiltered ),
@@ -308,7 +305,9 @@ higgsCandidateType = NTupleObjectType("higgsCandidateType", variables = [
     NTupleVariable("sj2phi_subjetfiltered",  lambda x: x.sj2phi_subjetfiltered ),
     NTupleVariable("sj2mass_subjetfiltered", lambda x: x.sj2mass_subjetfiltered ),
     NTupleVariable("sj2btag_subjetfiltered", lambda x: x.sj2btag_subjetfiltered ),
-    NTupleVariable("sj12mass_subjetfiltered", lambda x: x.sj12mass_subjetfiltered ),
+    NTupleVariable("sj12masspt_subjetfiltered", lambda x: x.sj12masspt_subjetfiltered ), # take leading two pt subjets for mass
+    NTupleVariable("sj12massb_subjetfiltered", lambda x: x.sj12massb_subjetfiltered ), # take leading two bjet from leading three pt subjets
+    NTupleVariable("sj123masspt_subjetfiltered", lambda x: x.sj123masspt_subjetfiltered ), # take leading three pt subjets for mass
 
     NTupleVariable("sj3pt_subjetfiltered",   lambda x: x.sj3pt_subjetfiltered ),
     NTupleVariable("sj3eta_subjetfiltered",  lambda x: x.sj3eta_subjetfiltered ),
@@ -322,6 +321,7 @@ higgsCandidateType = NTupleObjectType("higgsCandidateType", variables = [
     NTupleVariable("n_subjettiness", lambda x: x.n_subjettiness ),
     NTupleVariable("dr_top", lambda x: getattr(x, "dr_top", -1), help="deltaR to the best HTT candidate"),
     NTupleVariable("dr_genHiggs", lambda x: getattr(x, "dr_genHiggs", -1), help="deltaR to gen higgs"),
+    NTupleVariable("dr_genTop", lambda x: getattr(x, "dr_genTop", -1), help="deltaR to closest gen top"),
 ])
 
 FatjetCA15ungroomedType = NTupleObjectType("FatjetCA15ungroomedType", variables = [

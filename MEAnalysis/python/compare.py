@@ -1,6 +1,6 @@
 import sys
 
-f1 = "KIT_1kEvents_NoSubSel_2016-05-13-2002.csv"
+f1 = "KIT_1kEvents_NoSubSel_2016-05-19-1521.csv"
 f2 = "out.txt"
 
 
@@ -21,26 +21,41 @@ if not header1 == header2:
 
 
 test_vars = [
-    #"pt_fatjet_1", "pt_fatjet_2",
-    #"pt_top_1", "pt_top_2",
-    #"m_top_1", "m_top_2",
-    #"pt_nonW_1","pt_nonW_2", "pt_W1_1","pt_W1_2", "pt_W2_1","pt_W2_2",
-    #"csv_nonW_1", "csv_nonW_2","csv_W1_1","csv_W1_2","csv_W2_1","csv_W2_2",
 
-    #"pt_pruned_subjet1_1", "pt_pruned_subjet1_2", "pt_pruned_subjet2_1", "pt_pruned_subjet2_2",    
-    #"pt_sd_subjet1_1", "pt_sd_subjet1_2", "pt_sd_subjet2_1", "pt_sd_subjet2_2",    
-    #"pt_sdz2b1_subjet1_1", "pt_sdz2b1_subjet1_2", "pt_sdz2b1_subjet2_1", "pt_sdz2b1_subjet2_2",    
+    "run","lumi","event",
+    #"is_SL",
+    #"lep1_pt","lep1_eta","lep1_phi","lep1_iso","lep1_pdgId",
+    #"n_jets","n_btags",
+    #"jet1_pt","jet2_pt","jet3_pt","jet4_pt","jet1_CSVv2","jet2_CSVv2","jet3_CSVv2","jet4_CSVv2",
+"n_fatjets","pt_fatjet_1","pt_fatjet_2","eta_fatjet_1","eta_fatjet_2","pt_nonW_1","pt_nonW_2","pt_W1_1","pt_W1_2","pt_W2_1","pt_W2_2","csv_nonW_1","csv_nonW_2","csv_W1_1","csv_W1_2","csv_W2_1","csv_W2_2","pt_top_1","pt_top_2","eta_top_1","eta_top_2","m_top_1","m_top_2","pt_sf_filterjet1_1","pt_sf_filterjet1_2","pt_sf_filterjet2_1","pt_sf_filterjet2_2","pt_sf_filterjet3_1","pt_sf_filterjet3_2","csv_sf_filterjet1_1","csv_sf_filterjet1_2","csv_sf_filterjet2_1","csv_sf_filterjet2_2","csv_sf_filterjet3_1","csv_sf_filterjet3_2","pt_pruned_subjet1_1","pt_pruned_subjet1_2","pt_pruned_subjet2_1","pt_pruned_subjet2_2","csv_pruned_subjet1_1","csv_pruned_subjet1_2","csv_pruned_subjet2_1","csv_pruned_subjet2_2","pt_sd_subjet1_1","pt_sd_subjet1_2","pt_sd_subjet2_1","pt_sd_subjet2_2","csv_sd_subjet1_1","csv_sd_subjet1_2","csv_sd_subjet2_1","csv_sd_subjet2_2","pt_sdz2b1_subjet1_1","pt_sdz2b1_subjet1_2","pt_sdz2b1_subjet2_1","pt_sdz2b1_subjet2_2","csv_sdz2b1_subjet1_1","csv_sdz2b1_subjet1_2","csv_sdz2b1_subjet2_1","csv_sdz2b1_subjet2_2",
 
-    "csv_pruned_subjet1_1", "csv_pruned_subjet1_2", "csv_pruned_subjet2_1", "csv_pruned_subjet2_2",    
-    "csv_sd_subjet1_1", "csv_sd_subjet1_2", "csv_sd_subjet2_1", "csv_sd_subjet2_2",    
-    "csv_sdz2b1_subjet1_1", "csv_sdz2b1_subjet1_2", "csv_sdz2b1_subjet2_1", "csv_sdz2b1_subjet2_2",    
-
-    #"pt_sf_filterjet1_1", 
-    #"pt_sf_filterjet1_2", 
-    #"pt_sf_filterjet2_1", 
-    #"pt_sf_filterjet2_2",     
-    #"pt_sf_filterjet3_1", 
-    #"pt_sf_filterjet3_2", 
+#    #"pt_fatjet_1", "pt_fatjet_2",
+#    #"pt_top_1", "pt_top_2",
+#    #"m_top_1", "m_top_2",
+#    #"pt_nonW_1","pt_nonW_2", "pt_W1_1","pt_W1_2", "pt_W2_1","pt_W2_2",
+#    #"csv_nonW_1", "csv_nonW_2","csv_W1_1","csv_W1_2","csv_W2_1","csv_W2_2",
+#
+#    #"pt_pruned_subjet1_1", "pt_pruned_subjet1_2", "pt_pruned_subjet2_1", "pt_pruned_subjet2_2",    
+#    #"pt_sd_subjet1_1", "pt_sd_subjet1_2", "pt_sd_subjet2_1", "pt_sd_subjet2_2",    
+#    #"pt_sdz2b1_subjet1_1", "pt_sdz2b1_subjet1_2", "pt_sdz2b1_subjet2_1", "pt_sdz2b1_subjet2_2",    
+#
+#    #"csv_pruned_subjet1_1", "csv_pruned_subjet1_2", "csv_pruned_subjet2_1", "csv_pruned_subjet2_2",    
+#    #"csv_sd_subjet1_1", "csv_sd_subjet1_2", "csv_sd_subjet2_1", "csv_sd_subjet2_2",    
+#    #"csv_sdz2b1_subjet1_1", "csv_sdz2b1_subjet1_2", "csv_sdz2b1_subjet2_1", "csv_sdz2b1_subjet2_2",    
+#
+#    #"pt_sf_filterjet1_1", 
+#    #"pt_sf_filterjet1_2", 
+#    #"pt_sf_filterjet2_1", 
+#    #"pt_sf_filterjet2_2",     
+#    #"pt_sf_filterjet3_1", 
+#    #"pt_sf_filterjet3_2", 
+#
+#    "csv_sf_filterjet1_1", 
+#    "csv_sf_filterjet1_2", 
+#    "csv_sf_filterjet2_1", 
+#    "csv_sf_filterjet2_2",     
+#    "csv_sf_filterjet3_1", 
+#    "csv_sf_filterjet3_2", 
 
 
     ]

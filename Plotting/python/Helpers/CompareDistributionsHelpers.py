@@ -136,29 +136,15 @@ li_line_styles = [1]*len(li_colors) + [4]*len(li_colors) + [2]*len(li_colors)
 c = ROOT.TCanvas("","",800,800)
 
 
+
 ########################################
-# Actual histogramming and printing
+# Create histograms
 ########################################
 
-def doWork( dic_files, output_dir ):
-
-    print "Starting doWork"
-
-
-    ########################################
-    # Define and create output directory
-    ########################################
-
-    OutputDirectoryHelper.CreateOutputDirs( output_dir )
-
-
-    ########################################
-    # Create histograms
-    ########################################
+def createHistograms(dic_files):
 
     # Dictionary to store the histograms in
     # key: combinedPlot.name _ plot.name
-    # TODO: ensure uniqueness
     dic_histos = {}
 
     # Count the draw commands. This way wec can
@@ -166,27 +152,33 @@ def doWork( dic_files, output_dir ):
     # htmpX
     i_draw = 0
 
-    # TODO: reorganize this loop to reduce file opening/closing
-
     for cp in combinedPlot.li_combined_plots:
 
        for p in cp.li_plots:
 
            # open file and get tree
 
-           # dic_files can have two different kinds of value
-           # either a string: this is then a filename, use "SpartyJet_Tree" as treename
-           # or a tuple: (filename, treename)
-           # ONLY FILENAME GIVEN
+           # dic_files can have three different kinds of value
+           # - a string: this is then a filename, use "tree" as treename
+           # - a tuple: (filename, treename)
+           # - a tuple: ('list of filenames', treename)
+           # Using a Chain instead of a Tree of flexibility
+           # ONLY FILENAME GIVEN           
            if isinstance( dic_files[p.from_file], str ):          
-              input_file = ROOT.TFile.Open( dic_files[p.from_file], "READ" )
-              input_tree = getattr(input_file, "tree")
+              input_tree = ROOT.TChain("tree")
+              input_tree.Add(dic_files[p.from_file])
            # FILENAME AND TREENAME FIVEN
+           elif isinstance( dic_files[p.from_file][0], str ):
+              input_tree = ROOT.TChain(dic_files[p.from_file][1])
+              input_tree.Add(dic_files[p.from_file][0])                            
+           # LIST OF FILENAMES AND TREENAME FIVEN
            else:
-              input_file = ROOT.TFile.Open( dic_files[p.from_file][0], "READ" )
-              input_tree = getattr(input_file, dic_files[p.from_file][1])
-           # end openeing input file
+               input_tree = ROOT.TChain(dic_files[p.from_file][1])
+               for fn in dic_files[p.from_file][0]:
+                  input_tree.Add(fn)          
 
+           # end openeing input file
+  
            # draw the variable and save into 
            # a histogram
            htmp_name = "htmp"+str(i_draw)
@@ -244,10 +236,18 @@ def doWork( dic_files, output_dir ):
        # end of variable loop
        # end of input_file loop
 
+    return dic_histos
+# end of createHistograms
 
-    ########################################
-    # Draw Histograms
-    ########################################
+
+########################################
+# Draw Histograms
+########################################
+
+def drawHistograms(dic_histos, output_dir):
+
+    # Define and create output directory
+    OutputDirectoryHelper.CreateOutputDirs( output_dir )
 
     # Loop over combinedPlots
     for cp in combinedPlot.li_combined_plots:
@@ -362,4 +362,20 @@ def doWork( dic_files, output_dir ):
         OutputDirectoryHelper.ManyPrint( c, output_dir, cp.name )
 
     # end of loop over combinedPlots
+# end of drawHistograms
+
+
+########################################
+# doWork
+########################################
+
+def doWork(dic_files, output_dir):
+   """ doWork: Inclusive function (histogram making+drawing) for local use"""
+
+   # First create the histograms
+   dic_histos = createHistograms(dic_files)
+
+   # And draw them
+   drawHistograms(dic_histos, output_dir)
+
 # end of doWork
