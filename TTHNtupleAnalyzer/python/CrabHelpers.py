@@ -301,8 +301,8 @@ def cleanup(name,
 
             t.GetEntry(10)
 
-            m = t.ak08_mass
-            #m = t.ca15_mass
+            #m = t.ak08_mass
+            m = t.ca15_mass
 
             if f.IsZombie():
                 broken.append(fn)

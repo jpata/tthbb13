@@ -44,8 +44,8 @@ class_names = {0: "background",
 
 classes = sorted(class_names.keys())
 
-infname_sig = "/scratch/gregor/ntop_x5_zprime_m2000-tagging-weighted.root"
-infname_bkg = "/scratch/gregor/ntop_x5_qcd_800_1000-tagging-weighted.root"
+infname_sig = "/scratch/gregor/ntop_x6_zprime_m2000-tagging-weighted.root"
+infname_bkg = "/scratch/gregor/ntop_x6_qcd_800_1000-tagging-weighted.root"
 
 min_pt = 801
 max_pt = 999
