@@ -13,7 +13,7 @@ samples_dict = {
         nGen     = cms.int64(0),
         skip     = cms.bool(False),
         isMC     = cms.bool(True),
-        treeName = cms.string("vhbb/tree"),
+        treeName = cms.string("tree"),
         subFiles = cms.vstring(os.environ["INPUT_FILE"]),
     )
 }

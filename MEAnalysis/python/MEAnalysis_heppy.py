@@ -307,7 +307,7 @@ if __name__ == "__main__":
 
         #Configure the number of events to run
         from PhysicsTools.HeppyCore.framework.looper import Looper
-        nEvents = 300 #DS
+        nEvents = 1000
 
         kwargs = {}
         if conf.general.get("eventWhitelist", None) is None:

@@ -70,6 +70,10 @@ test_VHBB: test_mkdir
 	du -csh $(test_out_dir)/VHBB.root 
 	python -c "import ROOT; f=ROOT.TFile('$(test_out_dir)/VHBB.root'); print f.Get('tree').GetEntries()" &>> $(test_out_dir)/VHBB.log
 
+test_VHBB_MEAnalysis: test_mkdir
+	rm -Rf MEAnalysis/Loop_*
+	cd MEAnalysis && TTH_CALCME=0 INPUT_FILE=$(test_out_dir)/VHBB.root ME_CONF=python/cfg_local.py python python/MEAnalysis_heppy.py &> $(test_out_dir)/VHBB_MEAnalysis_MEAnalysis_heppy.log
+
 test_MEAnalysis_crab_vhbb: test_mkdir
 	egrep -o "file:.*root" MEAnalysis/crab_vhbb/PSet.py
 	rm -Rf MEAnalysis/crab_vhbb/Output* 

@@ -1,4 +1,5 @@
 #s -lR
+echo "heppy_crab_script.sh"
 tar xvzf python.tar.gz --directory $CMSSW_BASE 
 tar xzf data.tar.gz --directory $CMSSW_BASE/src/TTH/MEAnalysis
 ls -lR .
@@ -58,6 +59,8 @@ export ROOT_INCLUDE_PATH=.:./src:$ROOT_INCLUDE_PATH
 
 echo "tth_hashes"
 cat hash
+
+
 python heppy_crab_script.py $@ &> log
 exitCode=$?
 cat log
@@ -80,7 +83,6 @@ fi
 
 tail -n100 log
 cat FrameworkJobReport.xml
-
 echo "======================== CMSRUN LOG ============================"
 head -n 30 Output/cmsRun.log 
 echo "=== SNIP ==="

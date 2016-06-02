@@ -1,2439 +1,1249 @@
 class GenBQuarkFromHafterISR:
-    """
-    Generated bottom quarks from Higgs decays
-    """
+    def __init__(self, tree, n):
+        self.pdgId = tree.GenBQuarkFromHafterISR_pdgId[n];
+        self.pt = tree.GenBQuarkFromHafterISR_pt[n];
+        self.eta = tree.GenBQuarkFromHafterISR_eta[n];
+        self.phi = tree.GenBQuarkFromHafterISR_phi[n];
+        self.mass = tree.GenBQuarkFromHafterISR_mass[n];
+        self.charge = tree.GenBQuarkFromHafterISR_charge[n];
+        self.status = tree.GenBQuarkFromHafterISR_status[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nGenBQuarkFromHafterISR", 0)
-        _pdgId = getattr(tree, "GenBQuarkFromHafterISR_pdgId", [None]*n)
-        _pt = getattr(tree, "GenBQuarkFromHafterISR_pt", [None]*n)
-        _eta = getattr(tree, "GenBQuarkFromHafterISR_eta", [None]*n)
-        _phi = getattr(tree, "GenBQuarkFromHafterISR_phi", [None]*n)
-        _mass = getattr(tree, "GenBQuarkFromHafterISR_mass", [None]*n)
-        _charge = getattr(tree, "GenBQuarkFromHafterISR_charge", [None]*n)
-        _status = getattr(tree, "GenBQuarkFromHafterISR_status", [None]*n)
-        return [GenBQuarkFromHafterISR(_pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _charge[n], _status[n]) for n in range(n)]
-    def __init__(self, pdgId,pt,eta,phi,mass,charge,status):
-        self.pdgId = pdgId #
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        self.charge = charge #
-        self.status = status #
+        return [GenBQuarkFromHafterISR(tree, i) for i in range(tree.nGenBQuarkFromHafterISR)]
 class pileUpVertex_ptHat:
-    """
-    z position of hardest pile-up collisions
-    """
+    def __init__(self, tree, n):
+        self.pileUpVertex_ptHat = tree.pileUpVertex_ptHat[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "npileUpVertex_ptHat", 0)
-        _pileUpVertex_ptHat = getattr(tree, "pileUpVertex_ptHat", [None]*n);
-        return [pileUpVertex_ptHat(_pileUpVertex_ptHat[n]) for n in range(n)]
-    def __init__(self, pileUpVertex_ptHat):
-        self.pileUpVertex_ptHat = pileUpVertex_ptHat #z position of hardest pile-up collisions
+        return [pileUpVertex_ptHat(tree, i) for i in range(tree.npileUpVertex_ptHat)]
 class trgObjects_hltMET70:
-    """
-    
-    """
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_hltMET70", 0)
-        return [trgObjects_hltMET70() for n in range(n)]
+        return [trgObjects_hltMET70(tree, i) for i in range(tree.ntrgObjects_hltMET70)]
 class trgObjects_hltL1sL1ETM70ORETM60ORETM50ORDoubleJetC56ETM60:
-    """
-    
-    """
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_hltL1sL1ETM70ORETM60ORETM50ORDoubleJetC56ETM60", 0)
-        return [trgObjects_hltL1sL1ETM70ORETM60ORETM50ORDoubleJetC56ETM60() for n in range(n)]
+        return [trgObjects_hltL1sL1ETM70ORETM60ORETM50ORDoubleJetC56ETM60(tree, i) for i in range(tree.ntrgObjects_hltL1sL1ETM70ORETM60ORETM50ORDoubleJetC56ETM60)]
 class GenLepFromTop:
-    """
-    Generated leptons from t->W decays
-    """
+    def __init__(self, tree, n):
+        self.pdgId = tree.GenLepFromTop_pdgId[n];
+        self.pt = tree.GenLepFromTop_pt[n];
+        self.eta = tree.GenLepFromTop_eta[n];
+        self.phi = tree.GenLepFromTop_phi[n];
+        self.mass = tree.GenLepFromTop_mass[n];
+        self.charge = tree.GenLepFromTop_charge[n];
+        self.status = tree.GenLepFromTop_status[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nGenLepFromTop", 0)
-        _pdgId = getattr(tree, "GenLepFromTop_pdgId", [None]*n)
-        _pt = getattr(tree, "GenLepFromTop_pt", [None]*n)
-        _eta = getattr(tree, "GenLepFromTop_eta", [None]*n)
-        _phi = getattr(tree, "GenLepFromTop_phi", [None]*n)
-        _mass = getattr(tree, "GenLepFromTop_mass", [None]*n)
-        _charge = getattr(tree, "GenLepFromTop_charge", [None]*n)
-        _status = getattr(tree, "GenLepFromTop_status", [None]*n)
-        return [GenLepFromTop(_pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _charge[n], _status[n]) for n in range(n)]
-    def __init__(self, pdgId,pt,eta,phi,mass,charge,status):
-        self.pdgId = pdgId #
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        self.charge = charge #
-        self.status = status #
+        return [GenLepFromTop(tree, i) for i in range(tree.nGenLepFromTop)]
 class ajidxaddJetsdR08:
-    """
-    additional jet indices with Higgs formed adding cen jets if dR<0.8 from hJetsCSV
-    """
+    def __init__(self, tree, n):
+        self.ajidxaddJetsdR08 = tree.ajidxaddJetsdR08[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "najidxaddJetsdR08", 0)
-        _ajidxaddJetsdR08 = getattr(tree, "ajidxaddJetsdR08", [None]*n);
-        return [ajidxaddJetsdR08(_ajidxaddJetsdR08[n]) for n in range(n)]
-    def __init__(self, ajidxaddJetsdR08):
-        self.ajidxaddJetsdR08 = ajidxaddJetsdR08 #additional jet indices with Higgs formed adding cen jets if dR<0.8 from hJetsCSV
+        return [ajidxaddJetsdR08(tree, i) for i in range(tree.najidxaddJetsdR08)]
 class SubjetCA15softdrop:
-    """
-    Subjets of CA, R=1.5, pT > 200 GeV, softdrop z=1, beta=0
-    """
+    def __init__(self, tree, n):
+        self.pt = tree.SubjetCA15softdrop_pt[n];
+        self.eta = tree.SubjetCA15softdrop_eta[n];
+        self.phi = tree.SubjetCA15softdrop_phi[n];
+        self.mass = tree.SubjetCA15softdrop_mass[n];
+        self.btag = tree.SubjetCA15softdrop_btag[n];
+        self.fromFJ = tree.SubjetCA15softdrop_fromFJ[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nSubjetCA15softdrop", 0)
-        _pt = getattr(tree, "SubjetCA15softdrop_pt", [None]*n)
-        _eta = getattr(tree, "SubjetCA15softdrop_eta", [None]*n)
-        _phi = getattr(tree, "SubjetCA15softdrop_phi", [None]*n)
-        _mass = getattr(tree, "SubjetCA15softdrop_mass", [None]*n)
-        _btag = getattr(tree, "SubjetCA15softdrop_btag", [None]*n)
-        _fromFJ = getattr(tree, "SubjetCA15softdrop_fromFJ", [None]*n)
-        return [SubjetCA15softdrop(_pt[n], _eta[n], _phi[n], _mass[n], _btag[n], _fromFJ[n]) for n in range(n)]
-    def __init__(self, pt,eta,phi,mass,btag,fromFJ):
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        self.btag = btag #CVS IVF V2 btag-score
-        self.fromFJ = fromFJ #assigns subjet to fatjet. index of fatjet. Use the matching fj collection - eg: ca15prunedsubjets and ca15pruned
+        return [SubjetCA15softdrop(tree, i) for i in range(tree.nSubjetCA15softdrop)]
 class trgObjects_hltQuadCentralJet30:
-    """
-    
-    """
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_hltQuadCentralJet30", 0)
-        return [trgObjects_hltQuadCentralJet30() for n in range(n)]
+        return [trgObjects_hltQuadCentralJet30(tree, i) for i in range(tree.ntrgObjects_hltQuadCentralJet30)]
 class GenVbosonsRecovered:
-    """
-    Generated W or Z bosons recovered from daughters, mass > 30
-    """
+    def __init__(self, tree, n):
+        self.pdgId = tree.GenVbosonsRecovered_pdgId[n];
+        self.pt = tree.GenVbosonsRecovered_pt[n];
+        self.eta = tree.GenVbosonsRecovered_eta[n];
+        self.phi = tree.GenVbosonsRecovered_phi[n];
+        self.mass = tree.GenVbosonsRecovered_mass[n];
+        self.charge = tree.GenVbosonsRecovered_charge[n];
+        self.status = tree.GenVbosonsRecovered_status[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nGenVbosonsRecovered", 0)
-        _pdgId = getattr(tree, "GenVbosonsRecovered_pdgId", [None]*n)
-        _pt = getattr(tree, "GenVbosonsRecovered_pt", [None]*n)
-        _eta = getattr(tree, "GenVbosonsRecovered_eta", [None]*n)
-        _phi = getattr(tree, "GenVbosonsRecovered_phi", [None]*n)
-        _mass = getattr(tree, "GenVbosonsRecovered_mass", [None]*n)
-        _charge = getattr(tree, "GenVbosonsRecovered_charge", [None]*n)
-        _status = getattr(tree, "GenVbosonsRecovered_status", [None]*n)
-        return [GenVbosonsRecovered(_pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _charge[n], _status[n]) for n in range(n)]
-    def __init__(self, pdgId,pt,eta,phi,mass,charge,status):
-        self.pdgId = pdgId #
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        self.charge = charge #
-        self.status = status #
+        return [GenVbosonsRecovered(tree, i) for i in range(tree.nGenVbosonsRecovered)]
 class hJidx_sortcsv:
-    """
-    Higgs jet indices within hJets with CSV sorting 
-    """
+    def __init__(self, tree, n):
+        self.hJidx_sortcsv = tree.hJidx_sortcsv[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nhJidx_sortcsv", 0)
-        _hJidx_sortcsv = getattr(tree, "hJidx_sortcsv", [None]*n);
-        return [hJidx_sortcsv(_hJidx_sortcsv[n]) for n in range(n)]
-    def __init__(self, hJidx_sortcsv):
-        self.hJidx_sortcsv = hJidx_sortcsv #Higgs jet indices within hJets with CSV sorting 
+        return [hJidx_sortcsv(tree, i) for i in range(tree.nhJidx_sortcsv)]
 class trgObjects_hltEle23WPLoose:
-    """
-    
-    """
+    def __init__(self, tree, n):
+        self.pt = tree.trgObjects_hltEle23WPLoose_pt[n];
+        self.eta = tree.trgObjects_hltEle23WPLoose_eta[n];
+        self.phi = tree.trgObjects_hltEle23WPLoose_phi[n];
+        self.mass = tree.trgObjects_hltEle23WPLoose_mass[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_hltEle23WPLoose", 0)
-        _pt = getattr(tree, "trgObjects_hltEle23WPLoose_pt", [None]*n)
-        _eta = getattr(tree, "trgObjects_hltEle23WPLoose_eta", [None]*n)
-        _phi = getattr(tree, "trgObjects_hltEle23WPLoose_phi", [None]*n)
-        _mass = getattr(tree, "trgObjects_hltEle23WPLoose_mass", [None]*n)
-        return [trgObjects_hltEle23WPLoose(_pt[n], _eta[n], _phi[n], _mass[n]) for n in range(n)]
-    def __init__(self, pt,eta,phi,mass):
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
+        return [trgObjects_hltEle23WPLoose(tree, i) for i in range(tree.ntrgObjects_hltEle23WPLoose)]
 class trgObjects_l1Mht:
-    """
-    
-    """
+    def __init__(self, tree, n):
+        self.pt = tree.trgObjects_l1Mht_pt[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_l1Mht", 0)
-        _pt = getattr(tree, "trgObjects_l1Mht_pt", [None]*n)
-        return [trgObjects_l1Mht(_pt[n]) for n in range(n)]
-    def __init__(self, pt):
-        self.pt = pt #trigger object pt
+        return [trgObjects_l1Mht(tree, i) for i in range(tree.ntrgObjects_l1Mht)]
 class aJCidx:
-    """
-    additional jet indices CSV
-    """
+    def __init__(self, tree, n):
+        self.aJCidx = tree.aJCidx[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "naJCidx", 0)
-        _aJCidx = getattr(tree, "aJCidx", [None]*n);
-        return [aJCidx(_aJCidx[n]) for n in range(n)]
-    def __init__(self, aJCidx):
-        self.aJCidx = aJCidx #additional jet indices CSV
+        return [aJCidx(tree, i) for i in range(tree.naJCidx)]
 class GenTausRecovered:
-    """
-    Generated taus from recovered W/Z decays
-    """
+    def __init__(self, tree, n):
+        self.pdgId = tree.GenTausRecovered_pdgId[n];
+        self.pt = tree.GenTausRecovered_pt[n];
+        self.eta = tree.GenTausRecovered_eta[n];
+        self.phi = tree.GenTausRecovered_phi[n];
+        self.mass = tree.GenTausRecovered_mass[n];
+        self.charge = tree.GenTausRecovered_charge[n];
+        self.status = tree.GenTausRecovered_status[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nGenTausRecovered", 0)
-        _pdgId = getattr(tree, "GenTausRecovered_pdgId", [None]*n)
-        _pt = getattr(tree, "GenTausRecovered_pt", [None]*n)
-        _eta = getattr(tree, "GenTausRecovered_eta", [None]*n)
-        _phi = getattr(tree, "GenTausRecovered_phi", [None]*n)
-        _mass = getattr(tree, "GenTausRecovered_mass", [None]*n)
-        _charge = getattr(tree, "GenTausRecovered_charge", [None]*n)
-        _status = getattr(tree, "GenTausRecovered_status", [None]*n)
-        return [GenTausRecovered(_pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _charge[n], _status[n]) for n in range(n)]
-    def __init__(self, pdgId,pt,eta,phi,mass,charge,status):
-        self.pdgId = pdgId #
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        self.charge = charge #
-        self.status = status #
+        return [GenTausRecovered(tree, i) for i in range(tree.nGenTausRecovered)]
 class SubjetCA15softdropz2b1:
-    """
-    Subjets of CA, R=1.5, pT > 200 GeV, softdrop z=1, beta=0
-    """
+    def __init__(self, tree, n):
+        self.pt = tree.SubjetCA15softdropz2b1_pt[n];
+        self.eta = tree.SubjetCA15softdropz2b1_eta[n];
+        self.phi = tree.SubjetCA15softdropz2b1_phi[n];
+        self.mass = tree.SubjetCA15softdropz2b1_mass[n];
+        self.btag = tree.SubjetCA15softdropz2b1_btag[n];
+        self.fromFJ = tree.SubjetCA15softdropz2b1_fromFJ[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nSubjetCA15softdropz2b1", 0)
-        _pt = getattr(tree, "SubjetCA15softdropz2b1_pt", [None]*n)
-        _eta = getattr(tree, "SubjetCA15softdropz2b1_eta", [None]*n)
-        _phi = getattr(tree, "SubjetCA15softdropz2b1_phi", [None]*n)
-        _mass = getattr(tree, "SubjetCA15softdropz2b1_mass", [None]*n)
-        _btag = getattr(tree, "SubjetCA15softdropz2b1_btag", [None]*n)
-        _fromFJ = getattr(tree, "SubjetCA15softdropz2b1_fromFJ", [None]*n)
-        return [SubjetCA15softdropz2b1(_pt[n], _eta[n], _phi[n], _mass[n], _btag[n], _fromFJ[n]) for n in range(n)]
-    def __init__(self, pt,eta,phi,mass,btag,fromFJ):
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        self.btag = btag #CVS IVF V2 btag-score
-        self.fromFJ = fromFJ #assigns subjet to fatjet. index of fatjet. Use the matching fj collection - eg: ca15prunedsubjets and ca15pruned
+        return [SubjetCA15softdropz2b1(tree, i) for i in range(tree.nSubjetCA15softdropz2b1)]
 class hJCidx:
-    """
-    Higgs jet indices CSV
-    """
+    def __init__(self, tree, n):
+        self.hJCidx = tree.hJCidx[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nhJCidx", 0)
-        _hJCidx = getattr(tree, "hJCidx", [None]*n);
-        return [hJCidx(_hJCidx[n]) for n in range(n)]
-    def __init__(self, hJCidx):
-        self.hJCidx = hJCidx #Higgs jet indices CSV
+        return [hJCidx(tree, i) for i in range(tree.nhJCidx)]
 class GenTop:
-    """
-    Generated top quarks from hard scattering
-    """
+    def __init__(self, tree, n):
+        self.charge = tree.GenTop_charge[n];
+        self.status = tree.GenTop_status[n];
+        self.pdgId = tree.GenTop_pdgId[n];
+        self.pt = tree.GenTop_pt[n];
+        self.eta = tree.GenTop_eta[n];
+        self.phi = tree.GenTop_phi[n];
+        self.mass = tree.GenTop_mass[n];
+        self.decayMode = tree.GenTop_decayMode[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nGenTop", 0)
-        _charge = getattr(tree, "GenTop_charge", [None]*n)
-        _status = getattr(tree, "GenTop_status", [None]*n)
-        _pdgId = getattr(tree, "GenTop_pdgId", [None]*n)
-        _pt = getattr(tree, "GenTop_pt", [None]*n)
-        _eta = getattr(tree, "GenTop_eta", [None]*n)
-        _phi = getattr(tree, "GenTop_phi", [None]*n)
-        _mass = getattr(tree, "GenTop_mass", [None]*n)
-        _decayMode = getattr(tree, "GenTop_decayMode", [None]*n)
-        return [GenTop(_charge[n], _status[n], _pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _decayMode[n]) for n in range(n)]
-    def __init__(self, charge,status,pdgId,pt,eta,phi,mass,decayMode):
-        self.charge = charge #
-        self.status = status #
-        self.pdgId = pdgId #
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        self.decayMode = decayMode #Generator level top decay mode: 0=leptonic, 1=hadronic, -1=not known
+        return [GenTop(tree, i) for i in range(tree.nGenTop)]
 class aJidx:
-    """
-    additional jet indices
-    """
+    def __init__(self, tree, n):
+        self.aJidx = tree.aJidx[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "naJidx", 0)
-        _aJidx = getattr(tree, "aJidx", [None]*n);
-        return [aJidx(_aJidx[n]) for n in range(n)]
-    def __init__(self, aJidx):
-        self.aJidx = aJidx #additional jet indices
+        return [aJidx(tree, i) for i in range(tree.naJidx)]
 class trgObjects_hltEle22eta2p1WPLoose:
-    """
-    
-    """
+    def __init__(self, tree, n):
+        self.pt = tree.trgObjects_hltEle22eta2p1WPLoose_pt[n];
+        self.eta = tree.trgObjects_hltEle22eta2p1WPLoose_eta[n];
+        self.phi = tree.trgObjects_hltEle22eta2p1WPLoose_phi[n];
+        self.mass = tree.trgObjects_hltEle22eta2p1WPLoose_mass[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_hltEle22eta2p1WPLoose", 0)
-        _pt = getattr(tree, "trgObjects_hltEle22eta2p1WPLoose_pt", [None]*n)
-        _eta = getattr(tree, "trgObjects_hltEle22eta2p1WPLoose_eta", [None]*n)
-        _phi = getattr(tree, "trgObjects_hltEle22eta2p1WPLoose_phi", [None]*n)
-        _mass = getattr(tree, "trgObjects_hltEle22eta2p1WPLoose_mass", [None]*n)
-        return [trgObjects_hltEle22eta2p1WPLoose(_pt[n], _eta[n], _phi[n], _mass[n]) for n in range(n)]
-    def __init__(self, pt,eta,phi,mass):
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
+        return [trgObjects_hltEle22eta2p1WPLoose(tree, i) for i in range(tree.ntrgObjects_hltEle22eta2p1WPLoose)]
 class GenLepFromTau:
-    """
-    Generated leptons from decays of taus from W/Z decays
-    """
+    def __init__(self, tree, n):
+        self.pdgId = tree.GenLepFromTau_pdgId[n];
+        self.pt = tree.GenLepFromTau_pt[n];
+        self.eta = tree.GenLepFromTau_eta[n];
+        self.phi = tree.GenLepFromTau_phi[n];
+        self.mass = tree.GenLepFromTau_mass[n];
+        self.charge = tree.GenLepFromTau_charge[n];
+        self.status = tree.GenLepFromTau_status[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nGenLepFromTau", 0)
-        _pdgId = getattr(tree, "GenLepFromTau_pdgId", [None]*n)
-        _pt = getattr(tree, "GenLepFromTau_pt", [None]*n)
-        _eta = getattr(tree, "GenLepFromTau_eta", [None]*n)
-        _phi = getattr(tree, "GenLepFromTau_phi", [None]*n)
-        _mass = getattr(tree, "GenLepFromTau_mass", [None]*n)
-        _charge = getattr(tree, "GenLepFromTau_charge", [None]*n)
-        _status = getattr(tree, "GenLepFromTau_status", [None]*n)
-        return [GenLepFromTau(_pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _charge[n], _status[n]) for n in range(n)]
-    def __init__(self, pdgId,pt,eta,phi,mass,charge,status):
-        self.pdgId = pdgId #
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        self.charge = charge #
-        self.status = status #
+        return [GenLepFromTau(tree, i) for i in range(tree.nGenLepFromTau)]
 class GenNuFromTop:
-    """
-    Generated neutrino from t->W decay
-    """
+    def __init__(self, tree, n):
+        self.pdgId = tree.GenNuFromTop_pdgId[n];
+        self.pt = tree.GenNuFromTop_pt[n];
+        self.eta = tree.GenNuFromTop_eta[n];
+        self.phi = tree.GenNuFromTop_phi[n];
+        self.mass = tree.GenNuFromTop_mass[n];
+        self.charge = tree.GenNuFromTop_charge[n];
+        self.status = tree.GenNuFromTop_status[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nGenNuFromTop", 0)
-        _pdgId = getattr(tree, "GenNuFromTop_pdgId", [None]*n)
-        _pt = getattr(tree, "GenNuFromTop_pt", [None]*n)
-        _eta = getattr(tree, "GenNuFromTop_eta", [None]*n)
-        _phi = getattr(tree, "GenNuFromTop_phi", [None]*n)
-        _mass = getattr(tree, "GenNuFromTop_mass", [None]*n)
-        _charge = getattr(tree, "GenNuFromTop_charge", [None]*n)
-        _status = getattr(tree, "GenNuFromTop_status", [None]*n)
-        return [GenNuFromTop(_pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _charge[n], _status[n]) for n in range(n)]
-    def __init__(self, pdgId,pt,eta,phi,mass,charge,status):
-        self.pdgId = pdgId #
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        self.charge = charge #
-        self.status = status #
+        return [GenNuFromTop(tree, i) for i in range(tree.nGenNuFromTop)]
 class trgObjects_hltPFDoubleJetLooseID76:
-    """
-    
-    """
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_hltPFDoubleJetLooseID76", 0)
-        return [trgObjects_hltPFDoubleJetLooseID76() for n in range(n)]
+        return [trgObjects_hltPFDoubleJetLooseID76(tree, i) for i in range(tree.ntrgObjects_hltPFDoubleJetLooseID76)]
 class GenVbosons:
-    """
-    Generated W or Z bosons, mass > 30
-    """
+    def __init__(self, tree, n):
+        self.pdgId = tree.GenVbosons_pdgId[n];
+        self.pt = tree.GenVbosons_pt[n];
+        self.eta = tree.GenVbosons_eta[n];
+        self.phi = tree.GenVbosons_phi[n];
+        self.mass = tree.GenVbosons_mass[n];
+        self.charge = tree.GenVbosons_charge[n];
+        self.status = tree.GenVbosons_status[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nGenVbosons", 0)
-        _pdgId = getattr(tree, "GenVbosons_pdgId", [None]*n)
-        _pt = getattr(tree, "GenVbosons_pt", [None]*n)
-        _eta = getattr(tree, "GenVbosons_eta", [None]*n)
-        _phi = getattr(tree, "GenVbosons_phi", [None]*n)
-        _mass = getattr(tree, "GenVbosons_mass", [None]*n)
-        _charge = getattr(tree, "GenVbosons_charge", [None]*n)
-        _status = getattr(tree, "GenVbosons_status", [None]*n)
-        return [GenVbosons(_pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _charge[n], _status[n]) for n in range(n)]
-    def __init__(self, pdgId,pt,eta,phi,mass,charge,status):
-        self.pdgId = pdgId #
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        self.charge = charge #
-        self.status = status #
+        return [GenVbosons(tree, i) for i in range(tree.nGenVbosons)]
 class trgObjects_hltMHTNoPU90:
-    """
-    
-    """
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_hltMHTNoPU90", 0)
-        return [trgObjects_hltMHTNoPU90() for n in range(n)]
+        return [trgObjects_hltMHTNoPU90(tree, i) for i in range(tree.ntrgObjects_hltMHTNoPU90)]
 class trgObjects_hltQuadPFCentralJetLooseID30:
-    """
-    
-    """
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_hltQuadPFCentralJetLooseID30", 0)
-        return [trgObjects_hltQuadPFCentralJetLooseID30() for n in range(n)]
+        return [trgObjects_hltQuadPFCentralJetLooseID30(tree, i) for i in range(tree.ntrgObjects_hltQuadPFCentralJetLooseID30)]
 class trgObjects_caloMhtNoPU:
-    """
-    
-    """
+    def __init__(self, tree, n):
+        self.pt = tree.trgObjects_caloMhtNoPU_pt[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_caloMhtNoPU", 0)
-        _pt = getattr(tree, "trgObjects_caloMhtNoPU_pt", [None]*n)
-        return [trgObjects_caloMhtNoPU(_pt[n]) for n in range(n)]
-    def __init__(self, pt):
-        self.pt = pt #trigger object pt
+        return [trgObjects_caloMhtNoPU(tree, i) for i in range(tree.ntrgObjects_caloMhtNoPU)]
 class trgObjects_hltCSVPF0p78:
-    """
-    
-    """
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_hltCSVPF0p78", 0)
-        return [trgObjects_hltCSVPF0p78() for n in range(n)]
+        return [trgObjects_hltCSVPF0p78(tree, i) for i in range(tree.ntrgObjects_hltCSVPF0p78)]
 class SubjetAK08softdrop:
-    """
-    Subjets of AK, R=0.8 softdrop
-    """
+    def __init__(self, tree, n):
+        self.pt = tree.SubjetAK08softdrop_pt[n];
+        self.eta = tree.SubjetAK08softdrop_eta[n];
+        self.phi = tree.SubjetAK08softdrop_phi[n];
+        self.mass = tree.SubjetAK08softdrop_mass[n];
+        self.btag = tree.SubjetAK08softdrop_btag[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nSubjetAK08softdrop", 0)
-        _pt = getattr(tree, "SubjetAK08softdrop_pt", [None]*n)
-        _eta = getattr(tree, "SubjetAK08softdrop_eta", [None]*n)
-        _phi = getattr(tree, "SubjetAK08softdrop_phi", [None]*n)
-        _mass = getattr(tree, "SubjetAK08softdrop_mass", [None]*n)
-        _btag = getattr(tree, "SubjetAK08softdrop_btag", [None]*n)
-        return [SubjetAK08softdrop(_pt[n], _eta[n], _phi[n], _mass[n], _btag[n]) for n in range(n)]
-    def __init__(self, pt,eta,phi,mass,btag):
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        self.btag = btag #CVS IVF V2 btag-score
+        return [SubjetAK08softdrop(tree, i) for i in range(tree.nSubjetAK08softdrop)]
 class trgObjects_hltDoublePFCentralJetLooseID90:
-    """
-    
-    """
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_hltDoublePFCentralJetLooseID90", 0)
-        return [trgObjects_hltDoublePFCentralJetLooseID90() for n in range(n)]
+        return [trgObjects_hltDoublePFCentralJetLooseID90(tree, i) for i in range(tree.ntrgObjects_hltDoublePFCentralJetLooseID90)]
 class trgObjects_hltCSVL30p74:
-    """
-    
-    """
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_hltCSVL30p74", 0)
-        return [trgObjects_hltCSVL30p74() for n in range(n)]
+        return [trgObjects_hltCSVL30p74(tree, i) for i in range(tree.ntrgObjects_hltCSVL30p74)]
 class trgObjects_hltIsoMu18:
-    """
-    
-    """
+    def __init__(self, tree, n):
+        self.pt = tree.trgObjects_hltIsoMu18_pt[n];
+        self.eta = tree.trgObjects_hltIsoMu18_eta[n];
+        self.phi = tree.trgObjects_hltIsoMu18_phi[n];
+        self.mass = tree.trgObjects_hltIsoMu18_mass[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_hltIsoMu18", 0)
-        _pt = getattr(tree, "trgObjects_hltIsoMu18_pt", [None]*n)
-        _eta = getattr(tree, "trgObjects_hltIsoMu18_eta", [None]*n)
-        _phi = getattr(tree, "trgObjects_hltIsoMu18_phi", [None]*n)
-        _mass = getattr(tree, "trgObjects_hltIsoMu18_mass", [None]*n)
-        return [trgObjects_hltIsoMu18(_pt[n], _eta[n], _phi[n], _mass[n]) for n in range(n)]
-    def __init__(self, pt,eta,phi,mass):
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
+        return [trgObjects_hltIsoMu18(tree, i) for i in range(tree.ntrgObjects_hltIsoMu18)]
 class GenLep:
-    """
-    Generated leptons from W/Z decays
-    """
+    def __init__(self, tree, n):
+        self.pdgId = tree.GenLep_pdgId[n];
+        self.pt = tree.GenLep_pt[n];
+        self.eta = tree.GenLep_eta[n];
+        self.phi = tree.GenLep_phi[n];
+        self.mass = tree.GenLep_mass[n];
+        self.charge = tree.GenLep_charge[n];
+        self.status = tree.GenLep_status[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nGenLep", 0)
-        _pdgId = getattr(tree, "GenLep_pdgId", [None]*n)
-        _pt = getattr(tree, "GenLep_pt", [None]*n)
-        _eta = getattr(tree, "GenLep_eta", [None]*n)
-        _phi = getattr(tree, "GenLep_phi", [None]*n)
-        _mass = getattr(tree, "GenLep_mass", [None]*n)
-        _charge = getattr(tree, "GenLep_charge", [None]*n)
-        _status = getattr(tree, "GenLep_status", [None]*n)
-        return [GenLep(_pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _charge[n], _status[n]) for n in range(n)]
-    def __init__(self, pdgId,pt,eta,phi,mass,charge,status):
-        self.pdgId = pdgId #
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        self.charge = charge #
-        self.status = status #
+        return [GenLep(tree, i) for i in range(tree.nGenLep)]
 class trgObjects_caloJets:
-    """
-    
-    """
+    def __init__(self, tree, n):
+        self.pt = tree.trgObjects_caloJets_pt[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_caloJets", 0)
-        _pt = getattr(tree, "trgObjects_caloJets_pt", [None]*n)
-        return [trgObjects_caloJets(_pt[n]) for n in range(n)]
-    def __init__(self, pt):
-        self.pt = pt #trigger object pt
+        return [trgObjects_caloJets(tree, i) for i in range(tree.ntrgObjects_caloJets)]
 class trgObjects_hltPFSingleJetLooseID92:
-    """
-    
-    """
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_hltPFSingleJetLooseID92", 0)
-        return [trgObjects_hltPFSingleJetLooseID92() for n in range(n)]
+        return [trgObjects_hltPFSingleJetLooseID92(tree, i) for i in range(tree.ntrgObjects_hltPFSingleJetLooseID92)]
 class GenHadTaus:
-    """
-    Generator level hadronic tau decays
-    """
+    def __init__(self, tree, n):
+        self.charge = tree.GenHadTaus_charge[n];
+        self.status = tree.GenHadTaus_status[n];
+        self.pdgId = tree.GenHadTaus_pdgId[n];
+        self.pt = tree.GenHadTaus_pt[n];
+        self.eta = tree.GenHadTaus_eta[n];
+        self.phi = tree.GenHadTaus_phi[n];
+        self.mass = tree.GenHadTaus_mass[n];
+        self.decayMode = tree.GenHadTaus_decayMode[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nGenHadTaus", 0)
-        _charge = getattr(tree, "GenHadTaus_charge", [None]*n)
-        _status = getattr(tree, "GenHadTaus_status", [None]*n)
-        _pdgId = getattr(tree, "GenHadTaus_pdgId", [None]*n)
-        _pt = getattr(tree, "GenHadTaus_pt", [None]*n)
-        _eta = getattr(tree, "GenHadTaus_eta", [None]*n)
-        _phi = getattr(tree, "GenHadTaus_phi", [None]*n)
-        _mass = getattr(tree, "GenHadTaus_mass", [None]*n)
-        _decayMode = getattr(tree, "GenHadTaus_decayMode", [None]*n)
-        return [GenHadTaus(_charge[n], _status[n], _pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _decayMode[n]) for n in range(n)]
-    def __init__(self, charge,status,pdgId,pt,eta,phi,mass,decayMode):
-        self.charge = charge #
-        self.status = status #
-        self.pdgId = pdgId #
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        self.decayMode = decayMode #Generator level tau decay mode
+        return [GenHadTaus(tree, i) for i in range(tree.nGenHadTaus)]
 class trgObjects_pfJets:
-    """
-    
-    """
+    def __init__(self, tree, n):
+        self.pt = tree.trgObjects_pfJets_pt[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_pfJets", 0)
-        _pt = getattr(tree, "trgObjects_pfJets_pt", [None]*n)
-        return [trgObjects_pfJets(_pt[n]) for n in range(n)]
-    def __init__(self, pt):
-        self.pt = pt #trigger object pt
+        return [trgObjects_pfJets(tree, i) for i in range(tree.ntrgObjects_pfJets)]
 class trgObjects_hltL1sL1TripleJet927664VBFORL1TripleJet846848VBFORL1HTT100ORL1HTT125ORL1HTT150ORL1HTT175ORL1SingleJet128ORL1DoubleJetC84:
-    """
-    
-    """
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_hltL1sL1TripleJet927664VBFORL1TripleJet846848VBFORL1HTT100ORL1HTT125ORL1HTT150ORL1HTT175ORL1SingleJet128ORL1DoubleJetC84", 0)
-        return [trgObjects_hltL1sL1TripleJet927664VBFORL1TripleJet846848VBFORL1HTT100ORL1HTT125ORL1HTT150ORL1HTT175ORL1SingleJet128ORL1DoubleJetC84() for n in range(n)]
+        return [trgObjects_hltL1sL1TripleJet927664VBFORL1TripleJet846848VBFORL1HTT100ORL1HTT125ORL1HTT150ORL1HTT175ORL1SingleJet128ORL1DoubleJetC84(tree, i) for i in range(tree.ntrgObjects_hltL1sL1TripleJet927664VBFORL1TripleJet846848VBFORL1HTT100ORL1HTT125ORL1HTT150ORL1HTT175ORL1SingleJet128ORL1DoubleJetC84)]
 class vLeptons:
-    """
-    Leptons after the preselection
-    """
+    def __init__(self, tree, n):
+        self.charge = tree.vLeptons_charge[n];
+        self.tightId = tree.vLeptons_tightId[n];
+        self.eleCutIdCSA14_25ns_v1 = tree.vLeptons_eleCutIdCSA14_25ns_v1[n];
+        self.eleCutIdCSA14_50ns_v1 = tree.vLeptons_eleCutIdCSA14_50ns_v1[n];
+        self.eleCutIdSpring15_25ns_v1 = tree.vLeptons_eleCutIdSpring15_25ns_v1[n];
+        self.dxy = tree.vLeptons_dxy[n];
+        self.dz = tree.vLeptons_dz[n];
+        self.edxy = tree.vLeptons_edxy[n];
+        self.edz = tree.vLeptons_edz[n];
+        self.ip3d = tree.vLeptons_ip3d[n];
+        self.sip3d = tree.vLeptons_sip3d[n];
+        self.convVeto = tree.vLeptons_convVeto[n];
+        self.lostHits = tree.vLeptons_lostHits[n];
+        self.relIso03 = tree.vLeptons_relIso03[n];
+        self.relIso04 = tree.vLeptons_relIso04[n];
+        self.miniRelIso = tree.vLeptons_miniRelIso[n];
+        self.relIsoAn04 = tree.vLeptons_relIsoAn04[n];
+        self.tightCharge = tree.vLeptons_tightCharge[n];
+        self.mcMatchId = tree.vLeptons_mcMatchId[n];
+        self.mcMatchAny = tree.vLeptons_mcMatchAny[n];
+        self.mcMatchTau = tree.vLeptons_mcMatchTau[n];
+        self.mcPt = tree.vLeptons_mcPt[n];
+        self.mediumMuonId = tree.vLeptons_mediumMuonId[n];
+        self.pdgId = tree.vLeptons_pdgId[n];
+        self.pt = tree.vLeptons_pt[n];
+        self.eta = tree.vLeptons_eta[n];
+        self.phi = tree.vLeptons_phi[n];
+        self.mass = tree.vLeptons_mass[n];
+        self.looseIdSusy = tree.vLeptons_looseIdSusy[n];
+        self.looseIdPOG = tree.vLeptons_looseIdPOG[n];
+        self.chargedHadRelIso03 = tree.vLeptons_chargedHadRelIso03[n];
+        self.chargedHadRelIso04 = tree.vLeptons_chargedHadRelIso04[n];
+        self.eleSieie = tree.vLeptons_eleSieie[n];
+        self.eleDEta = tree.vLeptons_eleDEta[n];
+        self.eleDPhi = tree.vLeptons_eleDPhi[n];
+        self.eleHoE = tree.vLeptons_eleHoE[n];
+        self.eleMissingHits = tree.vLeptons_eleMissingHits[n];
+        self.eleChi2 = tree.vLeptons_eleChi2[n];
+        self.convVetoFull = tree.vLeptons_convVetoFull[n];
+        self.eleMVArawSpring15Trig = tree.vLeptons_eleMVArawSpring15Trig[n];
+        self.eleMVAIdSpring15Trig = tree.vLeptons_eleMVAIdSpring15Trig[n];
+        self.eleMVArawSpring15NonTrig = tree.vLeptons_eleMVArawSpring15NonTrig[n];
+        self.eleMVAIdSpring15NonTrig = tree.vLeptons_eleMVAIdSpring15NonTrig[n];
+        self.nStations = tree.vLeptons_nStations[n];
+        self.trkKink = tree.vLeptons_trkKink[n];
+        self.segmentCompatibility = tree.vLeptons_segmentCompatibility[n];
+        self.caloCompatibility = tree.vLeptons_caloCompatibility[n];
+        self.globalTrackChi2 = tree.vLeptons_globalTrackChi2[n];
+        self.nChamberHits = tree.vLeptons_nChamberHits[n];
+        self.isPFMuon = tree.vLeptons_isPFMuon[n];
+        self.isGlobalMuon = tree.vLeptons_isGlobalMuon[n];
+        self.isTrackerMuon = tree.vLeptons_isTrackerMuon[n];
+        self.pixelHits = tree.vLeptons_pixelHits[n];
+        self.trackerLayers = tree.vLeptons_trackerLayers[n];
+        self.pixelLayers = tree.vLeptons_pixelLayers[n];
+        self.mvaTTH = tree.vLeptons_mvaTTH[n];
+        self.jetOverlapIdx = tree.vLeptons_jetOverlapIdx[n];
+        self.jetPtRatio = tree.vLeptons_jetPtRatio[n];
+        self.jetBTagCSV = tree.vLeptons_jetBTagCSV[n];
+        self.jetDR = tree.vLeptons_jetDR[n];
+        self.mvaTTHjetPtRatio = tree.vLeptons_mvaTTHjetPtRatio[n];
+        self.mvaTTHjetBTagCSV = tree.vLeptons_mvaTTHjetBTagCSV[n];
+        self.mvaTTHjetDR = tree.vLeptons_mvaTTHjetDR[n];
+        self.pfRelIso03 = tree.vLeptons_pfRelIso03[n];
+        self.pfRelIso04 = tree.vLeptons_pfRelIso04[n];
+        self.etaSc = tree.vLeptons_etaSc[n];
+        self.eleExpMissingInnerHits = tree.vLeptons_eleExpMissingInnerHits[n];
+        self.eleooEmooP = tree.vLeptons_eleooEmooP[n];
+        self.dr03TkSumPt = tree.vLeptons_dr03TkSumPt[n];
+        self.eleEcalClusterIso = tree.vLeptons_eleEcalClusterIso[n];
+        self.eleHcalClusterIso = tree.vLeptons_eleHcalClusterIso[n];
+        self.miniIsoCharged = tree.vLeptons_miniIsoCharged[n];
+        self.miniIsoNeutral = tree.vLeptons_miniIsoNeutral[n];
+        self.mvaTTHjetPtRel = tree.vLeptons_mvaTTHjetPtRel[n];
+        self.mvaTTHjetNDauChargedMVASel = tree.vLeptons_mvaTTHjetNDauChargedMVASel[n];
+        self.uncalibratedPt = tree.vLeptons_uncalibratedPt[n];
+        self.SF_IsoLoose = tree.vLeptons_SF_IsoLoose[n];
+        self.SFerr_IsoLoose = tree.vLeptons_SFerr_IsoLoose[n];
+        self.SF_IsoTight = tree.vLeptons_SF_IsoTight[n];
+        self.SFerr_IsoTight = tree.vLeptons_SFerr_IsoTight[n];
+        self.SF_IdCutLoose = tree.vLeptons_SF_IdCutLoose[n];
+        self.SFerr_IdCutLoose = tree.vLeptons_SFerr_IdCutLoose[n];
+        self.SF_IdCutTight = tree.vLeptons_SF_IdCutTight[n];
+        self.SFerr_IdCutTight = tree.vLeptons_SFerr_IdCutTight[n];
+        self.SF_IdMVALoose = tree.vLeptons_SF_IdMVALoose[n];
+        self.SFerr_IdMVALoose = tree.vLeptons_SFerr_IdMVALoose[n];
+        self.SF_IdMVATight = tree.vLeptons_SF_IdMVATight[n];
+        self.SFerr_IdMVATight = tree.vLeptons_SFerr_IdMVATight[n];
+        self.SF_HLT_RunD4p3 = tree.vLeptons_SF_HLT_RunD4p3[n];
+        self.SFerr_HLT_RunD4p3 = tree.vLeptons_SFerr_HLT_RunD4p3[n];
+        self.SF_HLT_RunD4p2 = tree.vLeptons_SF_HLT_RunD4p2[n];
+        self.SFerr_HLT_RunD4p2 = tree.vLeptons_SFerr_HLT_RunD4p2[n];
+        self.SF_HLT_RunC = tree.vLeptons_SF_HLT_RunC[n];
+        self.SFerr_HLT_RunC = tree.vLeptons_SFerr_HLT_RunC[n];
+        self.Eff_HLT_RunD4p3 = tree.vLeptons_Eff_HLT_RunD4p3[n];
+        self.Efferr_HLT_RunD4p3 = tree.vLeptons_Efferr_HLT_RunD4p3[n];
+        self.Eff_HLT_RunD4p2 = tree.vLeptons_Eff_HLT_RunD4p2[n];
+        self.Efferr_HLT_RunD4p2 = tree.vLeptons_Efferr_HLT_RunD4p2[n];
+        self.Eff_HLT_RunC = tree.vLeptons_Eff_HLT_RunC[n];
+        self.Efferr_HLT_RunC = tree.vLeptons_Efferr_HLT_RunC[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nvLeptons", 0)
-        _charge = getattr(tree, "vLeptons_charge", [None]*n)
-        _tightId = getattr(tree, "vLeptons_tightId", [None]*n)
-        _eleCutIdCSA14_25ns_v1 = getattr(tree, "vLeptons_eleCutIdCSA14_25ns_v1", [None]*n)
-        _eleCutIdCSA14_50ns_v1 = getattr(tree, "vLeptons_eleCutIdCSA14_50ns_v1", [None]*n)
-        _eleCutIdSpring15_25ns_v1 = getattr(tree, "vLeptons_eleCutIdSpring15_25ns_v1", [None]*n)
-        _dxy = getattr(tree, "vLeptons_dxy", [None]*n)
-        _dz = getattr(tree, "vLeptons_dz", [None]*n)
-        _edxy = getattr(tree, "vLeptons_edxy", [None]*n)
-        _edz = getattr(tree, "vLeptons_edz", [None]*n)
-        _ip3d = getattr(tree, "vLeptons_ip3d", [None]*n)
-        _sip3d = getattr(tree, "vLeptons_sip3d", [None]*n)
-        _convVeto = getattr(tree, "vLeptons_convVeto", [None]*n)
-        _lostHits = getattr(tree, "vLeptons_lostHits", [None]*n)
-        _relIso03 = getattr(tree, "vLeptons_relIso03", [None]*n)
-        _relIso04 = getattr(tree, "vLeptons_relIso04", [None]*n)
-        _miniRelIso = getattr(tree, "vLeptons_miniRelIso", [None]*n)
-        _relIsoAn04 = getattr(tree, "vLeptons_relIsoAn04", [None]*n)
-        _tightCharge = getattr(tree, "vLeptons_tightCharge", [None]*n)
-        _mcMatchId = getattr(tree, "vLeptons_mcMatchId", [None]*n)
-        _mcMatchAny = getattr(tree, "vLeptons_mcMatchAny", [None]*n)
-        _mcMatchTau = getattr(tree, "vLeptons_mcMatchTau", [None]*n)
-        _mcPt = getattr(tree, "vLeptons_mcPt", [None]*n)
-        _mediumMuonId = getattr(tree, "vLeptons_mediumMuonId", [None]*n)
-        _pdgId = getattr(tree, "vLeptons_pdgId", [None]*n)
-        _pt = getattr(tree, "vLeptons_pt", [None]*n)
-        _eta = getattr(tree, "vLeptons_eta", [None]*n)
-        _phi = getattr(tree, "vLeptons_phi", [None]*n)
-        _mass = getattr(tree, "vLeptons_mass", [None]*n)
-        _looseIdSusy = getattr(tree, "vLeptons_looseIdSusy", [None]*n)
-        _looseIdPOG = getattr(tree, "vLeptons_looseIdPOG", [None]*n)
-        _chargedHadRelIso03 = getattr(tree, "vLeptons_chargedHadRelIso03", [None]*n)
-        _chargedHadRelIso04 = getattr(tree, "vLeptons_chargedHadRelIso04", [None]*n)
-        _eleSieie = getattr(tree, "vLeptons_eleSieie", [None]*n)
-        _eleDEta = getattr(tree, "vLeptons_eleDEta", [None]*n)
-        _eleDPhi = getattr(tree, "vLeptons_eleDPhi", [None]*n)
-        _eleHoE = getattr(tree, "vLeptons_eleHoE", [None]*n)
-        _eleMissingHits = getattr(tree, "vLeptons_eleMissingHits", [None]*n)
-        _eleChi2 = getattr(tree, "vLeptons_eleChi2", [None]*n)
-        _convVetoFull = getattr(tree, "vLeptons_convVetoFull", [None]*n)
-        _eleMVArawSpring15Trig = getattr(tree, "vLeptons_eleMVArawSpring15Trig", [None]*n)
-        _eleMVAIdSpring15Trig = getattr(tree, "vLeptons_eleMVAIdSpring15Trig", [None]*n)
-        _eleMVArawSpring15NonTrig = getattr(tree, "vLeptons_eleMVArawSpring15NonTrig", [None]*n)
-        _eleMVAIdSpring15NonTrig = getattr(tree, "vLeptons_eleMVAIdSpring15NonTrig", [None]*n)
-        _nStations = getattr(tree, "vLeptons_nStations", [None]*n)
-        _trkKink = getattr(tree, "vLeptons_trkKink", [None]*n)
-        _segmentCompatibility = getattr(tree, "vLeptons_segmentCompatibility", [None]*n)
-        _caloCompatibility = getattr(tree, "vLeptons_caloCompatibility", [None]*n)
-        _globalTrackChi2 = getattr(tree, "vLeptons_globalTrackChi2", [None]*n)
-        _nChamberHits = getattr(tree, "vLeptons_nChamberHits", [None]*n)
-        _isPFMuon = getattr(tree, "vLeptons_isPFMuon", [None]*n)
-        _isGlobalMuon = getattr(tree, "vLeptons_isGlobalMuon", [None]*n)
-        _isTrackerMuon = getattr(tree, "vLeptons_isTrackerMuon", [None]*n)
-        _pixelHits = getattr(tree, "vLeptons_pixelHits", [None]*n)
-        _trackerLayers = getattr(tree, "vLeptons_trackerLayers", [None]*n)
-        _pixelLayers = getattr(tree, "vLeptons_pixelLayers", [None]*n)
-        _mvaTTH = getattr(tree, "vLeptons_mvaTTH", [None]*n)
-        _jetOverlapIdx = getattr(tree, "vLeptons_jetOverlapIdx", [None]*n)
-        _jetPtRatio = getattr(tree, "vLeptons_jetPtRatio", [None]*n)
-        _jetBTagCSV = getattr(tree, "vLeptons_jetBTagCSV", [None]*n)
-        _jetDR = getattr(tree, "vLeptons_jetDR", [None]*n)
-        _mvaTTHjetPtRatio = getattr(tree, "vLeptons_mvaTTHjetPtRatio", [None]*n)
-        _mvaTTHjetBTagCSV = getattr(tree, "vLeptons_mvaTTHjetBTagCSV", [None]*n)
-        _mvaTTHjetDR = getattr(tree, "vLeptons_mvaTTHjetDR", [None]*n)
-        _pfRelIso03 = getattr(tree, "vLeptons_pfRelIso03", [None]*n)
-        _pfRelIso04 = getattr(tree, "vLeptons_pfRelIso04", [None]*n)
-        _etaSc = getattr(tree, "vLeptons_etaSc", [None]*n)
-        _eleExpMissingInnerHits = getattr(tree, "vLeptons_eleExpMissingInnerHits", [None]*n)
-        _eleooEmooP = getattr(tree, "vLeptons_eleooEmooP", [None]*n)
-        _dr03TkSumPt = getattr(tree, "vLeptons_dr03TkSumPt", [None]*n)
-        _eleEcalClusterIso = getattr(tree, "vLeptons_eleEcalClusterIso", [None]*n)
-        _eleHcalClusterIso = getattr(tree, "vLeptons_eleHcalClusterIso", [None]*n)
-        _miniIsoCharged = getattr(tree, "vLeptons_miniIsoCharged", [None]*n)
-        _miniIsoNeutral = getattr(tree, "vLeptons_miniIsoNeutral", [None]*n)
-        _mvaTTHjetPtRel = getattr(tree, "vLeptons_mvaTTHjetPtRel", [None]*n)
-        _mvaTTHjetNDauChargedMVASel = getattr(tree, "vLeptons_mvaTTHjetNDauChargedMVASel", [None]*n)
-        _uncalibratedPt = getattr(tree, "vLeptons_uncalibratedPt", [None]*n)
-        _SF_IsoLoose = getattr(tree, "vLeptons_SF_IsoLoose", [None]*n)
-        _SFerr_IsoLoose = getattr(tree, "vLeptons_SFerr_IsoLoose", [None]*n)
-        _SF_IsoTight = getattr(tree, "vLeptons_SF_IsoTight", [None]*n)
-        _SFerr_IsoTight = getattr(tree, "vLeptons_SFerr_IsoTight", [None]*n)
-        _SF_IdCutLoose = getattr(tree, "vLeptons_SF_IdCutLoose", [None]*n)
-        _SFerr_IdCutLoose = getattr(tree, "vLeptons_SFerr_IdCutLoose", [None]*n)
-        _SF_IdCutTight = getattr(tree, "vLeptons_SF_IdCutTight", [None]*n)
-        _SFerr_IdCutTight = getattr(tree, "vLeptons_SFerr_IdCutTight", [None]*n)
-        _SF_IdMVALoose = getattr(tree, "vLeptons_SF_IdMVALoose", [None]*n)
-        _SFerr_IdMVALoose = getattr(tree, "vLeptons_SFerr_IdMVALoose", [None]*n)
-        _SF_IdMVATight = getattr(tree, "vLeptons_SF_IdMVATight", [None]*n)
-        _SFerr_IdMVATight = getattr(tree, "vLeptons_SFerr_IdMVATight", [None]*n)
-        _SF_HLT_RunD4p3 = getattr(tree, "vLeptons_SF_HLT_RunD4p3", [None]*n)
-        _SFerr_HLT_RunD4p3 = getattr(tree, "vLeptons_SFerr_HLT_RunD4p3", [None]*n)
-        _SF_HLT_RunD4p2 = getattr(tree, "vLeptons_SF_HLT_RunD4p2", [None]*n)
-        _SFerr_HLT_RunD4p2 = getattr(tree, "vLeptons_SFerr_HLT_RunD4p2", [None]*n)
-        _SF_HLT_RunC = getattr(tree, "vLeptons_SF_HLT_RunC", [None]*n)
-        _SFerr_HLT_RunC = getattr(tree, "vLeptons_SFerr_HLT_RunC", [None]*n)
-        _Eff_HLT_RunD4p3 = getattr(tree, "vLeptons_Eff_HLT_RunD4p3", [None]*n)
-        _Efferr_HLT_RunD4p3 = getattr(tree, "vLeptons_Efferr_HLT_RunD4p3", [None]*n)
-        _Eff_HLT_RunD4p2 = getattr(tree, "vLeptons_Eff_HLT_RunD4p2", [None]*n)
-        _Efferr_HLT_RunD4p2 = getattr(tree, "vLeptons_Efferr_HLT_RunD4p2", [None]*n)
-        _Eff_HLT_RunC = getattr(tree, "vLeptons_Eff_HLT_RunC", [None]*n)
-        _Efferr_HLT_RunC = getattr(tree, "vLeptons_Efferr_HLT_RunC", [None]*n)
-        return [vLeptons(_charge[n], _tightId[n], _eleCutIdCSA14_25ns_v1[n], _eleCutIdCSA14_50ns_v1[n], _eleCutIdSpring15_25ns_v1[n], _dxy[n], _dz[n], _edxy[n], _edz[n], _ip3d[n], _sip3d[n], _convVeto[n], _lostHits[n], _relIso03[n], _relIso04[n], _miniRelIso[n], _relIsoAn04[n], _tightCharge[n], _mcMatchId[n], _mcMatchAny[n], _mcMatchTau[n], _mcPt[n], _mediumMuonId[n], _pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _looseIdSusy[n], _looseIdPOG[n], _chargedHadRelIso03[n], _chargedHadRelIso04[n], _eleSieie[n], _eleDEta[n], _eleDPhi[n], _eleHoE[n], _eleMissingHits[n], _eleChi2[n], _convVetoFull[n], _eleMVArawSpring15Trig[n], _eleMVAIdSpring15Trig[n], _eleMVArawSpring15NonTrig[n], _eleMVAIdSpring15NonTrig[n], _nStations[n], _trkKink[n], _segmentCompatibility[n], _caloCompatibility[n], _globalTrackChi2[n], _nChamberHits[n], _isPFMuon[n], _isGlobalMuon[n], _isTrackerMuon[n], _pixelHits[n], _trackerLayers[n], _pixelLayers[n], _mvaTTH[n], _jetOverlapIdx[n], _jetPtRatio[n], _jetBTagCSV[n], _jetDR[n], _mvaTTHjetPtRatio[n], _mvaTTHjetBTagCSV[n], _mvaTTHjetDR[n], _pfRelIso03[n], _pfRelIso04[n], _etaSc[n], _eleExpMissingInnerHits[n], _eleooEmooP[n], _dr03TkSumPt[n], _eleEcalClusterIso[n], _eleHcalClusterIso[n], _miniIsoCharged[n], _miniIsoNeutral[n], _mvaTTHjetPtRel[n], _mvaTTHjetNDauChargedMVASel[n], _uncalibratedPt[n], _SF_IsoLoose[n], _SFerr_IsoLoose[n], _SF_IsoTight[n], _SFerr_IsoTight[n], _SF_IdCutLoose[n], _SFerr_IdCutLoose[n], _SF_IdCutTight[n], _SFerr_IdCutTight[n], _SF_IdMVALoose[n], _SFerr_IdMVALoose[n], _SF_IdMVATight[n], _SFerr_IdMVATight[n], _SF_HLT_RunD4p3[n], _SFerr_HLT_RunD4p3[n], _SF_HLT_RunD4p2[n], _SFerr_HLT_RunD4p2[n], _SF_HLT_RunC[n], _SFerr_HLT_RunC[n], _Eff_HLT_RunD4p3[n], _Efferr_HLT_RunD4p3[n], _Eff_HLT_RunD4p2[n], _Efferr_HLT_RunD4p2[n], _Eff_HLT_RunC[n], _Efferr_HLT_RunC[n]) for n in range(n)]
-    def __init__(self, charge,tightId,eleCutIdCSA14_25ns_v1,eleCutIdCSA14_50ns_v1,eleCutIdSpring15_25ns_v1,dxy,dz,edxy,edz,ip3d,sip3d,convVeto,lostHits,relIso03,relIso04,miniRelIso,relIsoAn04,tightCharge,mcMatchId,mcMatchAny,mcMatchTau,mcPt,mediumMuonId,pdgId,pt,eta,phi,mass,looseIdSusy,looseIdPOG,chargedHadRelIso03,chargedHadRelIso04,eleSieie,eleDEta,eleDPhi,eleHoE,eleMissingHits,eleChi2,convVetoFull,eleMVArawSpring15Trig,eleMVAIdSpring15Trig,eleMVArawSpring15NonTrig,eleMVAIdSpring15NonTrig,nStations,trkKink,segmentCompatibility,caloCompatibility,globalTrackChi2,nChamberHits,isPFMuon,isGlobalMuon,isTrackerMuon,pixelHits,trackerLayers,pixelLayers,mvaTTH,jetOverlapIdx,jetPtRatio,jetBTagCSV,jetDR,mvaTTHjetPtRatio,mvaTTHjetBTagCSV,mvaTTHjetDR,pfRelIso03,pfRelIso04,etaSc,eleExpMissingInnerHits,eleooEmooP,dr03TkSumPt,eleEcalClusterIso,eleHcalClusterIso,miniIsoCharged,miniIsoNeutral,mvaTTHjetPtRel,mvaTTHjetNDauChargedMVASel,uncalibratedPt,SF_IsoLoose,SFerr_IsoLoose,SF_IsoTight,SFerr_IsoTight,SF_IdCutLoose,SFerr_IdCutLoose,SF_IdCutTight,SFerr_IdCutTight,SF_IdMVALoose,SFerr_IdMVALoose,SF_IdMVATight,SFerr_IdMVATight,SF_HLT_RunD4p3,SFerr_HLT_RunD4p3,SF_HLT_RunD4p2,SFerr_HLT_RunD4p2,SF_HLT_RunC,SFerr_HLT_RunC,Eff_HLT_RunD4p3,Efferr_HLT_RunD4p3,Eff_HLT_RunD4p2,Efferr_HLT_RunD4p2,Eff_HLT_RunC,Efferr_HLT_RunC):
-        self.charge = charge #
-        self.tightId = tightId #POG Tight ID (for electrons it's configured in the analyzer)
-        self.eleCutIdCSA14_25ns_v1 = eleCutIdCSA14_25ns_v1 #Electron cut-based id (POG CSA14_25ns_v1): 0=none, 1=veto, 2=loose, 3=medium, 4=tight
-        self.eleCutIdCSA14_50ns_v1 = eleCutIdCSA14_50ns_v1 #Electron cut-based id (POG CSA14_50ns_v1): 0=none, 1=veto, 2=loose, 3=medium, 4=tight
-        self.eleCutIdSpring15_25ns_v1 = eleCutIdSpring15_25ns_v1 #Electron cut-based id (POG Spring15_25ns_v1): 0=none, 1=veto, 2=loose, 3=medium, 4=tight
-        self.dxy = dxy #d_{xy} with respect to PV, in cm (with sign)
-        self.dz = dz #d_{z} with respect to PV, in cm (with sign)
-        self.edxy = edxy ##sigma(d_{xy}) with respect to PV, in cm
-        self.edz = edz ##sigma(d_{z}) with respect to PV, in cm
-        self.ip3d = ip3d #d_{3d} with respect to PV, in cm (absolute value)
-        self.sip3d = sip3d #S_{ip3d} with respect to PV (significance)
-        self.convVeto = convVeto #Conversion veto (always true for muons)
-        self.lostHits = lostHits #Number of lost hits on inner track
-        self.relIso03 = relIso03 #PF Rel Iso, R=0.3, pile-up corrected
-        self.relIso04 = relIso04 #PF Rel Iso, R=0.4, pile-up corrected
-        self.miniRelIso = miniRelIso #PF Rel miniRel, pile-up corrected
-        self.relIsoAn04 = relIsoAn04 #PF Activity Annulus, pile-up corrected
-        self.tightCharge = tightCharge #Tight charge criteria: for electrons, 2 if isGsfCtfScPixChargeConsistent, 1 if only isGsfScPixChargeConsistent, 0 otherwise; for muons, 2 if ptError/pt < 0.20, 0 otherwise 
-        self.mcMatchId = mcMatchId #Match to source from hard scatter (pdgId of heaviest particle in chain, 25 for H, 6 for t, 23/24 for W/Z), zero if non-prompt or fake
-        self.mcMatchAny = mcMatchAny #Match to any final state leptons: 0 if unmatched, 1 if light flavour (including prompt), 4 if charm, 5 if bottom
-        self.mcMatchTau = mcMatchTau #True if the leptons comes from a tau
-        self.mcPt = mcPt #p_{T} of associated gen lepton
-        self.mediumMuonId = mediumMuonId #Muon POG Medium id
-        self.pdgId = pdgId #
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        self.looseIdSusy = looseIdSusy #Loose ID for Susy ntuples (always true on selected leptons)
-        self.looseIdPOG = looseIdPOG #Loose ID for Susy ntuples (always true on selected leptons)
-        self.chargedHadRelIso03 = chargedHadRelIso03 #PF Rel Iso, R=0.3, charged hadrons only
-        self.chargedHadRelIso04 = chargedHadRelIso04 #PF Rel Iso, R=0.4, charged hadrons only
-        self.eleSieie = eleSieie #sigma IEtaIEta for electrons
-        self.eleDEta = eleDEta #delta eta for electrons
-        self.eleDPhi = eleDPhi #delta phi for electrons
-        self.eleHoE = eleHoE #H/E for electrons
-        self.eleMissingHits = eleMissingHits #Missing hits for electrons
-        self.eleChi2 = eleChi2 #Track chi squared for electrons' gsf tracks
-        self.convVetoFull = convVetoFull #Conv veto + no missing hits for electrons, always true for muons.
-        self.eleMVArawSpring15Trig = eleMVArawSpring15Trig #EGamma POG MVA ID for triggering electrons (raw MVA value, Spring15 training); 1 for muons
-        self.eleMVAIdSpring15Trig = eleMVAIdSpring15Trig #EGamma POG MVA ID for triggering electrons (0=none, 1=WP90, 2=WP80, Spring15 training); 1 for muons
-        self.eleMVArawSpring15NonTrig = eleMVArawSpring15NonTrig #EGamma POG MVA ID for non-triggering electrons (raw MVA value, Spring15 training); 1 for muons
-        self.eleMVAIdSpring15NonTrig = eleMVAIdSpring15NonTrig #EGamma POG MVA ID for non-triggering electrons (0=none, 1=WP90, 2=WP80, Spring15 training); 1 for muons
-        self.nStations = nStations #Number of matched muons stations (4 for electrons)
-        self.trkKink = trkKink #Tracker kink-finder
-        self.segmentCompatibility = segmentCompatibility #Segment compatibility
-        self.caloCompatibility = caloCompatibility #Calorimetric compatibility
-        self.globalTrackChi2 = globalTrackChi2 #Global track normalized chi2
-        self.nChamberHits = nChamberHits #Number of muon chamber hits (-1 for electrons)
-        self.isPFMuon = isPFMuon #1 if muon passes particle flow ID
-        self.isGlobalMuon = isGlobalMuon #1 if muon is global muon
-        self.isTrackerMuon = isTrackerMuon #1 if muon is tracker muon
-        self.pixelHits = pixelHits #Number of pixel hits (-1 for electrons)
-        self.trackerLayers = trackerLayers #Tracker Layers
-        self.pixelLayers = pixelLayers #Pixel Layers
-        self.mvaTTH = mvaTTH #Lepton MVA (ttH version)
-        self.jetOverlapIdx = jetOverlapIdx #index of jet with overlapping PF constituents. If idx>=1000, then idx = idx-1000 and refers to discarded jets.
-        self.jetPtRatio = jetPtRatio #pt(lepton)/pt(nearest jet)
-        self.jetBTagCSV = jetBTagCSV #btag of nearest jet
-        self.jetDR = jetDR #deltaR(lepton, nearest jet)
-        self.mvaTTHjetPtRatio = mvaTTHjetPtRatio #pt(lepton)/pt(nearest jet with pT > 25 GeV)
-        self.mvaTTHjetBTagCSV = mvaTTHjetBTagCSV #btag of nearest jet with pT > 25 GeV
-        self.mvaTTHjetDR = mvaTTHjetDR #deltaR(lepton, nearest jet with pT > 25 GeV)
-        self.pfRelIso03 = pfRelIso03 #0.3 particle based iso
-        self.pfRelIso04 = pfRelIso04 #0.4 particle based iso
-        self.etaSc = etaSc #Electron supercluster pseudorapidity
-        self.eleExpMissingInnerHits = eleExpMissingInnerHits #Electron expected missing inner hits
-        self.eleooEmooP = eleooEmooP #Electron 1/E - 1/P
-        self.dr03TkSumPt = dr03TkSumPt #Electron track sum pt
-        self.eleEcalClusterIso = eleEcalClusterIso #Electron ecal cluster iso
-        self.eleHcalClusterIso = eleHcalClusterIso #Electron hcal cluster iso
-        self.miniIsoCharged = miniIsoCharged #PF miniIso (charged) in GeV
-        self.miniIsoNeutral = miniIsoNeutral #PF miniIso (neutral) in GeV
-        self.mvaTTHjetPtRel = mvaTTHjetPtRel #jetPtRel variable used by ttH multilepton MVA
-        self.mvaTTHjetNDauChargedMVASel = mvaTTHjetNDauChargedMVASel #jetNDauChargedMVASel variable used by ttH multilepton MVA
-        self.uncalibratedPt = uncalibratedPt #Electron uncalibrated pt
-        self.SF_IsoLoose = SF_IsoLoose #SF for lepton IsoLoose
-        self.SFerr_IsoLoose = SFerr_IsoLoose #SF error for lepton IsoLoose
-        self.SF_IsoTight = SF_IsoTight #SF for lepton IsoTight
-        self.SFerr_IsoTight = SFerr_IsoTight #SF error for lepton IsoTight
-        self.SF_IdCutLoose = SF_IdCutLoose #SF for lepton IdCutLoose
-        self.SFerr_IdCutLoose = SFerr_IdCutLoose #SF error for lepton IdCutLoose
-        self.SF_IdCutTight = SF_IdCutTight #SF for lepton IdCutTight
-        self.SFerr_IdCutTight = SFerr_IdCutTight #SF error for lepton IdCutTight
-        self.SF_IdMVALoose = SF_IdMVALoose #SF for lepton IdMVALoose
-        self.SFerr_IdMVALoose = SFerr_IdMVALoose #SF error for lepton IdMVALoose
-        self.SF_IdMVATight = SF_IdMVATight #SF for lepton IdMVATight
-        self.SFerr_IdMVATight = SFerr_IdMVATight #SF error for lepton IdMVATight
-        self.SF_HLT_RunD4p3 = SF_HLT_RunD4p3 #SF for lepton HLT_RunD4p3
-        self.SFerr_HLT_RunD4p3 = SFerr_HLT_RunD4p3 #SF error for lepton HLT_RunD4p3
-        self.SF_HLT_RunD4p2 = SF_HLT_RunD4p2 #SF for lepton HLT_RunD4p2
-        self.SFerr_HLT_RunD4p2 = SFerr_HLT_RunD4p2 #SF error for lepton HLT_RunD4p2
-        self.SF_HLT_RunC = SF_HLT_RunC #SF for lepton HLT_RunC
-        self.SFerr_HLT_RunC = SFerr_HLT_RunC #SF error for lepton HLT_RunC
-        self.Eff_HLT_RunD4p3 = Eff_HLT_RunD4p3 #SF for lepton HLT_RunD4p3
-        self.Efferr_HLT_RunD4p3 = Efferr_HLT_RunD4p3 #SF error for lepton HLT_RunD4p3
-        self.Eff_HLT_RunD4p2 = Eff_HLT_RunD4p2 #SF for lepton HLT_RunD4p2
-        self.Efferr_HLT_RunD4p2 = Efferr_HLT_RunD4p2 #SF error for lepton HLT_RunD4p2
-        self.Eff_HLT_RunC = Eff_HLT_RunC #SF for lepton HLT_RunC
-        self.Efferr_HLT_RunC = Efferr_HLT_RunC #SF error for lepton HLT_RunC
+        return [vLeptons(tree, i) for i in range(tree.nvLeptons)]
 class trgObjects_hltL1sL1TripleJet927664VBFORL1DoubleJetC100ORL1TripleJet846848VBFORL1DoubleJetC84ORL1HTT100ORL1HTT125ORL1HTT150ORL1HTT175:
-    """
-    
-    """
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_hltL1sL1TripleJet927664VBFORL1DoubleJetC100ORL1TripleJet846848VBFORL1DoubleJetC84ORL1HTT100ORL1HTT125ORL1HTT150ORL1HTT175", 0)
-        return [trgObjects_hltL1sL1TripleJet927664VBFORL1DoubleJetC100ORL1TripleJet846848VBFORL1DoubleJetC84ORL1HTT100ORL1HTT125ORL1HTT150ORL1HTT175() for n in range(n)]
+        return [trgObjects_hltL1sL1TripleJet927664VBFORL1DoubleJetC100ORL1TripleJet846848VBFORL1DoubleJetC84ORL1HTT100ORL1HTT125ORL1HTT150ORL1HTT175(tree, i) for i in range(tree.ntrgObjects_hltL1sL1TripleJet927664VBFORL1DoubleJetC100ORL1TripleJet846848VBFORL1DoubleJetC84ORL1HTT100ORL1HTT125ORL1HTT150ORL1HTT175)]
 class pileUpVertex_z:
-    """
-    z position of hardest pile-up collisions
-    """
+    def __init__(self, tree, n):
+        self.pileUpVertex_z = tree.pileUpVertex_z[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "npileUpVertex_z", 0)
-        _pileUpVertex_z = getattr(tree, "pileUpVertex_z", [None]*n);
-        return [pileUpVertex_z(_pileUpVertex_z[n]) for n in range(n)]
-    def __init__(self, pileUpVertex_z):
-        self.pileUpVertex_z = pileUpVertex_z #z position of hardest pile-up collisions
+        return [pileUpVertex_z(tree, i) for i in range(tree.npileUpVertex_z)]
 class trgObjects_l1CentralJets:
-    """
-    
-    """
+    def __init__(self, tree, n):
+        self.pt = tree.trgObjects_l1CentralJets_pt[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_l1CentralJets", 0)
-        _pt = getattr(tree, "trgObjects_l1CentralJets_pt", [None]*n)
-        return [trgObjects_l1CentralJets(_pt[n]) for n in range(n)]
-    def __init__(self, pt):
-        self.pt = pt #trigger object pt
+        return [trgObjects_l1CentralJets(tree, i) for i in range(tree.ntrgObjects_l1CentralJets)]
 class trgObjects_pfMht:
-    """
-    
-    """
+    def __init__(self, tree, n):
+        self.pt = tree.trgObjects_pfMht_pt[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_pfMht", 0)
-        _pt = getattr(tree, "trgObjects_pfMht_pt", [None]*n)
-        return [trgObjects_pfMht(_pt[n]) for n in range(n)]
-    def __init__(self, pt):
-        self.pt = pt #trigger object pt
+        return [trgObjects_pfMht(tree, i) for i in range(tree.ntrgObjects_pfMht)]
 class GenBQuarkFromTop:
-    """
-    Generated bottom quarks from top decays
-    """
+    def __init__(self, tree, n):
+        self.pdgId = tree.GenBQuarkFromTop_pdgId[n];
+        self.pt = tree.GenBQuarkFromTop_pt[n];
+        self.eta = tree.GenBQuarkFromTop_eta[n];
+        self.phi = tree.GenBQuarkFromTop_phi[n];
+        self.mass = tree.GenBQuarkFromTop_mass[n];
+        self.charge = tree.GenBQuarkFromTop_charge[n];
+        self.status = tree.GenBQuarkFromTop_status[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nGenBQuarkFromTop", 0)
-        _pdgId = getattr(tree, "GenBQuarkFromTop_pdgId", [None]*n)
-        _pt = getattr(tree, "GenBQuarkFromTop_pt", [None]*n)
-        _eta = getattr(tree, "GenBQuarkFromTop_eta", [None]*n)
-        _phi = getattr(tree, "GenBQuarkFromTop_phi", [None]*n)
-        _mass = getattr(tree, "GenBQuarkFromTop_mass", [None]*n)
-        _charge = getattr(tree, "GenBQuarkFromTop_charge", [None]*n)
-        _status = getattr(tree, "GenBQuarkFromTop_status", [None]*n)
-        return [GenBQuarkFromTop(_pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _charge[n], _status[n]) for n in range(n)]
-    def __init__(self, pdgId,pt,eta,phi,mass,charge,status):
-        self.pdgId = pdgId #
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        self.charge = charge #
-        self.status = status #
+        return [GenBQuarkFromTop(tree, i) for i in range(tree.nGenBQuarkFromTop)]
 class SubjetCA15subjetfiltered:
-    """
-    Subjets of CA, R=1.5, pT > 200 GeV, BDRS, filterjets
-    """
+    def __init__(self, tree, n):
+        self.pt = tree.SubjetCA15subjetfiltered_pt[n];
+        self.eta = tree.SubjetCA15subjetfiltered_eta[n];
+        self.phi = tree.SubjetCA15subjetfiltered_phi[n];
+        self.mass = tree.SubjetCA15subjetfiltered_mass[n];
+        self.btag = tree.SubjetCA15subjetfiltered_btag[n];
+        self.fromFJ = tree.SubjetCA15subjetfiltered_fromFJ[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nSubjetCA15subjetfiltered", 0)
-        _pt = getattr(tree, "SubjetCA15subjetfiltered_pt", [None]*n)
-        _eta = getattr(tree, "SubjetCA15subjetfiltered_eta", [None]*n)
-        _phi = getattr(tree, "SubjetCA15subjetfiltered_phi", [None]*n)
-        _mass = getattr(tree, "SubjetCA15subjetfiltered_mass", [None]*n)
-        _btag = getattr(tree, "SubjetCA15subjetfiltered_btag", [None]*n)
-        _fromFJ = getattr(tree, "SubjetCA15subjetfiltered_fromFJ", [None]*n)
-        return [SubjetCA15subjetfiltered(_pt[n], _eta[n], _phi[n], _mass[n], _btag[n], _fromFJ[n]) for n in range(n)]
-    def __init__(self, pt,eta,phi,mass,btag,fromFJ):
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        self.btag = btag #CVS IVF V2 btag-score
-        self.fromFJ = fromFJ #assigns subjet to fatjet. index of fatjet. Use the matching fj collection - eg: ca15prunedsubjets and ca15pruned
+        return [SubjetCA15subjetfiltered(tree, i) for i in range(tree.nSubjetCA15subjetfiltered)]
 class GenHiggsBoson:
-    """
-    Generated Higgs boson 
-    """
+    def __init__(self, tree, n):
+        self.pdgId = tree.GenHiggsBoson_pdgId[n];
+        self.pt = tree.GenHiggsBoson_pt[n];
+        self.eta = tree.GenHiggsBoson_eta[n];
+        self.phi = tree.GenHiggsBoson_phi[n];
+        self.mass = tree.GenHiggsBoson_mass[n];
+        self.charge = tree.GenHiggsBoson_charge[n];
+        self.status = tree.GenHiggsBoson_status[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nGenHiggsBoson", 0)
-        _pdgId = getattr(tree, "GenHiggsBoson_pdgId", [None]*n)
-        _pt = getattr(tree, "GenHiggsBoson_pt", [None]*n)
-        _eta = getattr(tree, "GenHiggsBoson_eta", [None]*n)
-        _phi = getattr(tree, "GenHiggsBoson_phi", [None]*n)
-        _mass = getattr(tree, "GenHiggsBoson_mass", [None]*n)
-        _charge = getattr(tree, "GenHiggsBoson_charge", [None]*n)
-        _status = getattr(tree, "GenHiggsBoson_status", [None]*n)
-        return [GenHiggsBoson(_pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _charge[n], _status[n]) for n in range(n)]
-    def __init__(self, pdgId,pt,eta,phi,mass,charge,status):
-        self.pdgId = pdgId #
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        self.charge = charge #
-        self.status = status #
+        return [GenHiggsBoson(tree, i) for i in range(tree.nGenHiggsBoson)]
 class LHE_weights_scale:
-    """
-    LHE weights for scale variation
-    """
+    def __init__(self, tree, n):
+        self.id = tree.LHE_weights_scale_id[n];
+        self.wgt = tree.LHE_weights_scale_wgt[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nLHE_weights_scale", 0)
-        _id = getattr(tree, "LHE_weights_scale_id", [None]*n)
-        _wgt = getattr(tree, "LHE_weights_scale_wgt", [None]*n)
-        return [LHE_weights_scale(_id[n], _wgt[n]) for n in range(n)]
-    def __init__(self, id,wgt):
-        self.id = id #
-        self.wgt = wgt #
+        return [LHE_weights_scale(tree, i) for i in range(tree.nLHE_weights_scale)]
 class GenLepFromTauRecovered:
-    """
-    Generated leptons from decays of taus from recovered W/Z decays
-    """
+    def __init__(self, tree, n):
+        self.pdgId = tree.GenLepFromTauRecovered_pdgId[n];
+        self.pt = tree.GenLepFromTauRecovered_pt[n];
+        self.eta = tree.GenLepFromTauRecovered_eta[n];
+        self.phi = tree.GenLepFromTauRecovered_phi[n];
+        self.mass = tree.GenLepFromTauRecovered_mass[n];
+        self.charge = tree.GenLepFromTauRecovered_charge[n];
+        self.status = tree.GenLepFromTauRecovered_status[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nGenLepFromTauRecovered", 0)
-        _pdgId = getattr(tree, "GenLepFromTauRecovered_pdgId", [None]*n)
-        _pt = getattr(tree, "GenLepFromTauRecovered_pt", [None]*n)
-        _eta = getattr(tree, "GenLepFromTauRecovered_eta", [None]*n)
-        _phi = getattr(tree, "GenLepFromTauRecovered_phi", [None]*n)
-        _mass = getattr(tree, "GenLepFromTauRecovered_mass", [None]*n)
-        _charge = getattr(tree, "GenLepFromTauRecovered_charge", [None]*n)
-        _status = getattr(tree, "GenLepFromTauRecovered_status", [None]*n)
-        return [GenLepFromTauRecovered(_pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _charge[n], _status[n]) for n in range(n)]
-    def __init__(self, pdgId,pt,eta,phi,mass,charge,status):
-        self.pdgId = pdgId #
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        self.charge = charge #
-        self.status = status #
+        return [GenLepFromTauRecovered(tree, i) for i in range(tree.nGenLepFromTauRecovered)]
 class FatjetCA15pruned:
-    """
-    CA, R=1.5, pT > 200 GeV, pruned zcut=0.1, rcut=0.5, n=2
-    """
+    def __init__(self, tree, n):
+        self.pt = tree.FatjetCA15pruned_pt[n];
+        self.eta = tree.FatjetCA15pruned_eta[n];
+        self.phi = tree.FatjetCA15pruned_phi[n];
+        self.mass = tree.FatjetCA15pruned_mass[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nFatjetCA15pruned", 0)
-        _pt = getattr(tree, "FatjetCA15pruned_pt", [None]*n)
-        _eta = getattr(tree, "FatjetCA15pruned_eta", [None]*n)
-        _phi = getattr(tree, "FatjetCA15pruned_phi", [None]*n)
-        _mass = getattr(tree, "FatjetCA15pruned_mass", [None]*n)
-        return [FatjetCA15pruned(_pt[n], _eta[n], _phi[n], _mass[n]) for n in range(n)]
-    def __init__(self, pt,eta,phi,mass):
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
+        return [FatjetCA15pruned(tree, i) for i in range(tree.nFatjetCA15pruned)]
 class trgObjects_hltVBFCaloJetEtaSortedMqq150Deta1p5:
-    """
-    
-    """
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_hltVBFCaloJetEtaSortedMqq150Deta1p5", 0)
-        return [trgObjects_hltVBFCaloJetEtaSortedMqq150Deta1p5() for n in range(n)]
+        return [trgObjects_hltVBFCaloJetEtaSortedMqq150Deta1p5(tree, i) for i in range(tree.ntrgObjects_hltVBFCaloJetEtaSortedMqq150Deta1p5)]
 class trgObjects_caloMht:
-    """
-    
-    """
+    def __init__(self, tree, n):
+        self.pt = tree.trgObjects_caloMht_pt[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_caloMht", 0)
-        _pt = getattr(tree, "trgObjects_caloMht_pt", [None]*n)
-        return [trgObjects_caloMht(_pt[n]) for n in range(n)]
-    def __init__(self, pt):
-        self.pt = pt #trigger object pt
+        return [trgObjects_caloMht(tree, i) for i in range(tree.ntrgObjects_caloMht)]
 class trgObjects_hltCSV0p72L3:
-    """
-    
-    """
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_hltCSV0p72L3", 0)
-        return [trgObjects_hltCSV0p72L3() for n in range(n)]
+        return [trgObjects_hltCSV0p72L3(tree, i) for i in range(tree.ntrgObjects_hltCSV0p72L3)]
 class trgObjects_hltDoubleCentralJet90:
-    """
-    
-    """
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_hltDoubleCentralJet90", 0)
-        return [trgObjects_hltDoubleCentralJet90() for n in range(n)]
+        return [trgObjects_hltDoubleCentralJet90(tree, i) for i in range(tree.ntrgObjects_hltDoubleCentralJet90)]
 class trgObjects_l1Met:
-    """
-    
-    """
+    def __init__(self, tree, n):
+        self.pt = tree.trgObjects_l1Met_pt[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_l1Met", 0)
-        _pt = getattr(tree, "trgObjects_l1Met_pt", [None]*n)
-        return [trgObjects_l1Met(_pt[n]) for n in range(n)]
-    def __init__(self, pt):
-        self.pt = pt #trigger object pt
+        return [trgObjects_l1Met(tree, i) for i in range(tree.ntrgObjects_l1Met)]
 class GenJet:
-    """
-    Generated jets with hadron matching, sorted by pt descending
-    """
+    def __init__(self, tree, n):
+        self.charge = tree.GenJet_charge[n];
+        self.status = tree.GenJet_status[n];
+        self.pdgId = tree.GenJet_pdgId[n];
+        self.pt = tree.GenJet_pt[n];
+        self.eta = tree.GenJet_eta[n];
+        self.phi = tree.GenJet_phi[n];
+        self.mass = tree.GenJet_mass[n];
+        self.numBHadrons = tree.GenJet_numBHadrons[n];
+        self.numCHadrons = tree.GenJet_numCHadrons[n];
+        self.numBHadronsFromTop = tree.GenJet_numBHadronsFromTop[n];
+        self.numCHadronsFromTop = tree.GenJet_numCHadronsFromTop[n];
+        self.numBHadronsAfterTop = tree.GenJet_numBHadronsAfterTop[n];
+        self.numCHadronsAfterTop = tree.GenJet_numCHadronsAfterTop[n];
+        self.wNuPt = tree.GenJet_wNuPt[n];
+        self.wNuEta = tree.GenJet_wNuEta[n];
+        self.wNuPhi = tree.GenJet_wNuPhi[n];
+        self.wNuM = tree.GenJet_wNuM[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nGenJet", 0)
-        _charge = getattr(tree, "GenJet_charge", [None]*n)
-        _status = getattr(tree, "GenJet_status", [None]*n)
-        _pdgId = getattr(tree, "GenJet_pdgId", [None]*n)
-        _pt = getattr(tree, "GenJet_pt", [None]*n)
-        _eta = getattr(tree, "GenJet_eta", [None]*n)
-        _phi = getattr(tree, "GenJet_phi", [None]*n)
-        _mass = getattr(tree, "GenJet_mass", [None]*n)
-        _numBHadrons = getattr(tree, "GenJet_numBHadrons", [None]*n)
-        _numCHadrons = getattr(tree, "GenJet_numCHadrons", [None]*n)
-        _numBHadronsFromTop = getattr(tree, "GenJet_numBHadronsFromTop", [None]*n)
-        _numCHadronsFromTop = getattr(tree, "GenJet_numCHadronsFromTop", [None]*n)
-        _numBHadronsAfterTop = getattr(tree, "GenJet_numBHadronsAfterTop", [None]*n)
-        _numCHadronsAfterTop = getattr(tree, "GenJet_numCHadronsAfterTop", [None]*n)
-        _wNuPt = getattr(tree, "GenJet_wNuPt", [None]*n)
-        _wNuEta = getattr(tree, "GenJet_wNuEta", [None]*n)
-        _wNuPhi = getattr(tree, "GenJet_wNuPhi", [None]*n)
-        _wNuM = getattr(tree, "GenJet_wNuM", [None]*n)
-        return [GenJet(_charge[n], _status[n], _pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _numBHadrons[n], _numCHadrons[n], _numBHadronsFromTop[n], _numCHadronsFromTop[n], _numBHadronsAfterTop[n], _numCHadronsAfterTop[n], _wNuPt[n], _wNuEta[n], _wNuPhi[n], _wNuM[n]) for n in range(n)]
-    def __init__(self, charge,status,pdgId,pt,eta,phi,mass,numBHadrons,numCHadrons,numBHadronsFromTop,numCHadronsFromTop,numBHadronsAfterTop,numCHadronsAfterTop,wNuPt,wNuEta,wNuPhi,wNuM):
-        self.charge = charge #
-        self.status = status #
-        self.pdgId = pdgId #
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        self.numBHadrons = numBHadrons #number of matched b hadrons before top quark decay
-        self.numCHadrons = numCHadrons #number of matched c hadrons before top quark decay
-        self.numBHadronsFromTop = numBHadronsFromTop #number of matched b hadrons from top quark decay
-        self.numCHadronsFromTop = numCHadronsFromTop #number of matched c hadrons from top quark decay
-        self.numBHadronsAfterTop = numBHadronsAfterTop #number of matched b hadrons after top quark decay
-        self.numCHadronsAfterTop = numCHadronsAfterTop #number of matched c hadrons after top quark decay
-        self.wNuPt = wNuPt #pt of jet adding back the neutrinos
-        self.wNuEta = wNuEta #eta of jet adding back the neutrinos
-        self.wNuPhi = wNuPhi #phi of jet adding back the neutrinos
-        self.wNuM = wNuM #mass of jet adding back the neutrinos
+        return [GenJet(tree, i) for i in range(tree.nGenJet)]
 class SubjetCA15pruned:
-    """
-    Subjets of CA, R=1.5, pT > 200 GeV, pruned zcut=0.1, rcut=0.5, n=2
-    """
+    def __init__(self, tree, n):
+        self.pt = tree.SubjetCA15pruned_pt[n];
+        self.eta = tree.SubjetCA15pruned_eta[n];
+        self.phi = tree.SubjetCA15pruned_phi[n];
+        self.mass = tree.SubjetCA15pruned_mass[n];
+        self.btag = tree.SubjetCA15pruned_btag[n];
+        self.fromFJ = tree.SubjetCA15pruned_fromFJ[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nSubjetCA15pruned", 0)
-        _pt = getattr(tree, "SubjetCA15pruned_pt", [None]*n)
-        _eta = getattr(tree, "SubjetCA15pruned_eta", [None]*n)
-        _phi = getattr(tree, "SubjetCA15pruned_phi", [None]*n)
-        _mass = getattr(tree, "SubjetCA15pruned_mass", [None]*n)
-        _btag = getattr(tree, "SubjetCA15pruned_btag", [None]*n)
-        _fromFJ = getattr(tree, "SubjetCA15pruned_fromFJ", [None]*n)
-        return [SubjetCA15pruned(_pt[n], _eta[n], _phi[n], _mass[n], _btag[n], _fromFJ[n]) for n in range(n)]
-    def __init__(self, pt,eta,phi,mass,btag,fromFJ):
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        self.btag = btag #CVS IVF V2 btag-score
-        self.fromFJ = fromFJ #assigns subjet to fatjet. index of fatjet. Use the matching fj collection - eg: ca15prunedsubjets and ca15pruned
+        return [SubjetCA15pruned(tree, i) for i in range(tree.nSubjetCA15pruned)]
 class trgObjects_caloMet:
-    """
-    
-    """
+    def __init__(self, tree, n):
+        self.pt = tree.trgObjects_caloMet_pt[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_caloMet", 0)
-        _pt = getattr(tree, "trgObjects_caloMet_pt", [None]*n)
-        return [trgObjects_caloMet(_pt[n]) for n in range(n)]
-    def __init__(self, pt):
-        self.pt = pt #trigger object pt
+        return [trgObjects_caloMet(tree, i) for i in range(tree.ntrgObjects_caloMet)]
 class FatjetCA15ungroomed:
-    """
-    CA, R=1.5, pT > 200 GeV, no grooming
-    """
+    def __init__(self, tree, n):
+        self.pt = tree.FatjetCA15ungroomed_pt[n];
+        self.eta = tree.FatjetCA15ungroomed_eta[n];
+        self.phi = tree.FatjetCA15ungroomed_phi[n];
+        self.mass = tree.FatjetCA15ungroomed_mass[n];
+        self.tau1 = tree.FatjetCA15ungroomed_tau1[n];
+        self.tau2 = tree.FatjetCA15ungroomed_tau2[n];
+        self.tau3 = tree.FatjetCA15ungroomed_tau3[n];
+        self.bbtag = tree.FatjetCA15ungroomed_bbtag[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nFatjetCA15ungroomed", 0)
-        _pt = getattr(tree, "FatjetCA15ungroomed_pt", [None]*n)
-        _eta = getattr(tree, "FatjetCA15ungroomed_eta", [None]*n)
-        _phi = getattr(tree, "FatjetCA15ungroomed_phi", [None]*n)
-        _mass = getattr(tree, "FatjetCA15ungroomed_mass", [None]*n)
-        _tau1 = getattr(tree, "FatjetCA15ungroomed_tau1", [None]*n)
-        _tau2 = getattr(tree, "FatjetCA15ungroomed_tau2", [None]*n)
-        _tau3 = getattr(tree, "FatjetCA15ungroomed_tau3", [None]*n)
-        _bbtag = getattr(tree, "FatjetCA15ungroomed_bbtag", [None]*n)
-        return [FatjetCA15ungroomed(_pt[n], _eta[n], _phi[n], _mass[n], _tau1[n], _tau2[n], _tau3[n], _bbtag[n]) for n in range(n)]
-    def __init__(self, pt,eta,phi,mass,tau1,tau2,tau3,bbtag):
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        self.tau1 = tau1 #Nsubjettiness (1 axis)
-        self.tau2 = tau2 #Nsubjettiness (2 axes)
-        self.tau3 = tau3 #Nsubjettiness (3 axes)
-        self.bbtag = bbtag #Hbb b-tag score
+        return [FatjetCA15ungroomed(tree, i) for i in range(tree.nFatjetCA15ungroomed)]
 class trgObjects_pfMet:
-    """
-    
-    """
+    def __init__(self, tree, n):
+        self.pt = tree.trgObjects_pfMet_pt[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_pfMet", 0)
-        _pt = getattr(tree, "trgObjects_pfMet_pt", [None]*n)
-        return [trgObjects_pfMet(_pt[n]) for n in range(n)]
-    def __init__(self, pt):
-        self.pt = pt #trigger object pt
+        return [trgObjects_pfMet(tree, i) for i in range(tree.ntrgObjects_pfMet)]
 class trgObjects_pfHt:
-    """
-    
-    """
+    def __init__(self, tree, n):
+        self.pt = tree.trgObjects_pfHt_pt[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_pfHt", 0)
-        _pt = getattr(tree, "trgObjects_pfHt_pt", [None]*n)
-        return [trgObjects_pfHt(_pt[n]) for n in range(n)]
-    def __init__(self, pt):
-        self.pt = pt #trigger object pt
+        return [trgObjects_pfHt(tree, i) for i in range(tree.ntrgObjects_pfHt)]
 class dRaddJetsdR08:
-    """
-    dR of add jet with Higgs formed adding cen jets if dR<0.8 from hJetsCSV
-    """
+    def __init__(self, tree, n):
+        self.dRaddJetsdR08 = tree.dRaddJetsdR08[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ndRaddJetsdR08", 0)
-        _dRaddJetsdR08 = getattr(tree, "dRaddJetsdR08", [None]*n);
-        return [dRaddJetsdR08(_dRaddJetsdR08[n]) for n in range(n)]
-    def __init__(self, dRaddJetsdR08):
-        self.dRaddJetsdR08 = dRaddJetsdR08 #dR of add jet with Higgs formed adding cen jets if dR<0.8 from hJetsCSV
+        return [dRaddJetsdR08(tree, i) for i in range(tree.ndRaddJetsdR08)]
 class trgObjects_hltDoubleCSVPF0p58:
-    """
-    
-    """
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_hltDoubleCSVPF0p58", 0)
-        return [trgObjects_hltDoubleCSVPF0p58() for n in range(n)]
+        return [trgObjects_hltDoubleCSVPF0p58(tree, i) for i in range(tree.ntrgObjects_hltDoubleCSVPF0p58)]
 class GenBQuarkFromH:
-    """
-    Generated bottom quarks from Higgs decays
-    """
+    def __init__(self, tree, n):
+        self.pdgId = tree.GenBQuarkFromH_pdgId[n];
+        self.pt = tree.GenBQuarkFromH_pt[n];
+        self.eta = tree.GenBQuarkFromH_eta[n];
+        self.phi = tree.GenBQuarkFromH_phi[n];
+        self.mass = tree.GenBQuarkFromH_mass[n];
+        self.charge = tree.GenBQuarkFromH_charge[n];
+        self.status = tree.GenBQuarkFromH_status[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nGenBQuarkFromH", 0)
-        _pdgId = getattr(tree, "GenBQuarkFromH_pdgId", [None]*n)
-        _pt = getattr(tree, "GenBQuarkFromH_pt", [None]*n)
-        _eta = getattr(tree, "GenBQuarkFromH_eta", [None]*n)
-        _phi = getattr(tree, "GenBQuarkFromH_phi", [None]*n)
-        _mass = getattr(tree, "GenBQuarkFromH_mass", [None]*n)
-        _charge = getattr(tree, "GenBQuarkFromH_charge", [None]*n)
-        _status = getattr(tree, "GenBQuarkFromH_status", [None]*n)
-        return [GenBQuarkFromH(_pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _charge[n], _status[n]) for n in range(n)]
-    def __init__(self, pdgId,pt,eta,phi,mass,charge,status):
-        self.pdgId = pdgId #
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        self.charge = charge #
-        self.status = status #
+        return [GenBQuarkFromH(tree, i) for i in range(tree.nGenBQuarkFromH)]
 class trgObjects_hltDoubleJet65:
-    """
-    
-    """
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_hltDoubleJet65", 0)
-        return [trgObjects_hltDoubleJet65() for n in range(n)]
+        return [trgObjects_hltDoubleJet65(tree, i) for i in range(tree.ntrgObjects_hltDoubleJet65)]
 class FatjetCA15trimmed:
-    """
-    CA, R=1.5, pT > 200 GeV, trimmed r=0.2, f=0.06
-    """
+    def __init__(self, tree, n):
+        self.pt = tree.FatjetCA15trimmed_pt[n];
+        self.eta = tree.FatjetCA15trimmed_eta[n];
+        self.phi = tree.FatjetCA15trimmed_phi[n];
+        self.mass = tree.FatjetCA15trimmed_mass[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nFatjetCA15trimmed", 0)
-        _pt = getattr(tree, "FatjetCA15trimmed_pt", [None]*n)
-        _eta = getattr(tree, "FatjetCA15trimmed_eta", [None]*n)
-        _phi = getattr(tree, "FatjetCA15trimmed_phi", [None]*n)
-        _mass = getattr(tree, "FatjetCA15trimmed_mass", [None]*n)
-        return [FatjetCA15trimmed(_pt[n], _eta[n], _phi[n], _mass[n]) for n in range(n)]
-    def __init__(self, pt,eta,phi,mass):
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
+        return [FatjetCA15trimmed(tree, i) for i in range(tree.nFatjetCA15trimmed)]
 class trgObjects_hltL1sL1HTT175ORL1QuadJetC60ORL1HTT100ORL1HTT125ORL1HTT150ORL1QuadJetC40:
-    """
-    
-    """
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_hltL1sL1HTT175ORL1QuadJetC60ORL1HTT100ORL1HTT125ORL1HTT150ORL1QuadJetC40", 0)
-        return [trgObjects_hltL1sL1HTT175ORL1QuadJetC60ORL1HTT100ORL1HTT125ORL1HTT150ORL1QuadJetC40() for n in range(n)]
+        return [trgObjects_hltL1sL1HTT175ORL1QuadJetC60ORL1HTT100ORL1HTT125ORL1HTT150ORL1QuadJetC40(tree, i) for i in range(tree.ntrgObjects_hltL1sL1HTT175ORL1QuadJetC60ORL1HTT100ORL1HTT125ORL1HTT150ORL1QuadJetC40)]
 class GenHiggsSisters:
-    """
-    Sisters of the Higgs bosons
-    """
+    def __init__(self, tree, n):
+        self.pdgId = tree.GenHiggsSisters_pdgId[n];
+        self.pt = tree.GenHiggsSisters_pt[n];
+        self.eta = tree.GenHiggsSisters_eta[n];
+        self.phi = tree.GenHiggsSisters_phi[n];
+        self.mass = tree.GenHiggsSisters_mass[n];
+        self.charge = tree.GenHiggsSisters_charge[n];
+        self.status = tree.GenHiggsSisters_status[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nGenHiggsSisters", 0)
-        _pdgId = getattr(tree, "GenHiggsSisters_pdgId", [None]*n)
-        _pt = getattr(tree, "GenHiggsSisters_pt", [None]*n)
-        _eta = getattr(tree, "GenHiggsSisters_eta", [None]*n)
-        _phi = getattr(tree, "GenHiggsSisters_phi", [None]*n)
-        _mass = getattr(tree, "GenHiggsSisters_mass", [None]*n)
-        _charge = getattr(tree, "GenHiggsSisters_charge", [None]*n)
-        _status = getattr(tree, "GenHiggsSisters_status", [None]*n)
-        return [GenHiggsSisters(_pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _charge[n], _status[n]) for n in range(n)]
-    def __init__(self, pdgId,pt,eta,phi,mass,charge,status):
-        self.pdgId = pdgId #
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        self.charge = charge #
-        self.status = status #
+        return [GenHiggsSisters(tree, i) for i in range(tree.nGenHiggsSisters)]
 class aLeptons:
-    """
-    Additional leptons, not passing the preselection
-    """
+    def __init__(self, tree, n):
+        self.charge = tree.aLeptons_charge[n];
+        self.tightId = tree.aLeptons_tightId[n];
+        self.eleCutIdCSA14_25ns_v1 = tree.aLeptons_eleCutIdCSA14_25ns_v1[n];
+        self.eleCutIdCSA14_50ns_v1 = tree.aLeptons_eleCutIdCSA14_50ns_v1[n];
+        self.eleCutIdSpring15_25ns_v1 = tree.aLeptons_eleCutIdSpring15_25ns_v1[n];
+        self.dxy = tree.aLeptons_dxy[n];
+        self.dz = tree.aLeptons_dz[n];
+        self.edxy = tree.aLeptons_edxy[n];
+        self.edz = tree.aLeptons_edz[n];
+        self.ip3d = tree.aLeptons_ip3d[n];
+        self.sip3d = tree.aLeptons_sip3d[n];
+        self.convVeto = tree.aLeptons_convVeto[n];
+        self.lostHits = tree.aLeptons_lostHits[n];
+        self.relIso03 = tree.aLeptons_relIso03[n];
+        self.relIso04 = tree.aLeptons_relIso04[n];
+        self.miniRelIso = tree.aLeptons_miniRelIso[n];
+        self.relIsoAn04 = tree.aLeptons_relIsoAn04[n];
+        self.tightCharge = tree.aLeptons_tightCharge[n];
+        self.mcMatchId = tree.aLeptons_mcMatchId[n];
+        self.mcMatchAny = tree.aLeptons_mcMatchAny[n];
+        self.mcMatchTau = tree.aLeptons_mcMatchTau[n];
+        self.mcPt = tree.aLeptons_mcPt[n];
+        self.mediumMuonId = tree.aLeptons_mediumMuonId[n];
+        self.pdgId = tree.aLeptons_pdgId[n];
+        self.pt = tree.aLeptons_pt[n];
+        self.eta = tree.aLeptons_eta[n];
+        self.phi = tree.aLeptons_phi[n];
+        self.mass = tree.aLeptons_mass[n];
+        self.looseIdSusy = tree.aLeptons_looseIdSusy[n];
+        self.looseIdPOG = tree.aLeptons_looseIdPOG[n];
+        self.chargedHadRelIso03 = tree.aLeptons_chargedHadRelIso03[n];
+        self.chargedHadRelIso04 = tree.aLeptons_chargedHadRelIso04[n];
+        self.eleSieie = tree.aLeptons_eleSieie[n];
+        self.eleDEta = tree.aLeptons_eleDEta[n];
+        self.eleDPhi = tree.aLeptons_eleDPhi[n];
+        self.eleHoE = tree.aLeptons_eleHoE[n];
+        self.eleMissingHits = tree.aLeptons_eleMissingHits[n];
+        self.eleChi2 = tree.aLeptons_eleChi2[n];
+        self.convVetoFull = tree.aLeptons_convVetoFull[n];
+        self.eleMVArawSpring15Trig = tree.aLeptons_eleMVArawSpring15Trig[n];
+        self.eleMVAIdSpring15Trig = tree.aLeptons_eleMVAIdSpring15Trig[n];
+        self.eleMVArawSpring15NonTrig = tree.aLeptons_eleMVArawSpring15NonTrig[n];
+        self.eleMVAIdSpring15NonTrig = tree.aLeptons_eleMVAIdSpring15NonTrig[n];
+        self.nStations = tree.aLeptons_nStations[n];
+        self.trkKink = tree.aLeptons_trkKink[n];
+        self.segmentCompatibility = tree.aLeptons_segmentCompatibility[n];
+        self.caloCompatibility = tree.aLeptons_caloCompatibility[n];
+        self.globalTrackChi2 = tree.aLeptons_globalTrackChi2[n];
+        self.nChamberHits = tree.aLeptons_nChamberHits[n];
+        self.isPFMuon = tree.aLeptons_isPFMuon[n];
+        self.isGlobalMuon = tree.aLeptons_isGlobalMuon[n];
+        self.isTrackerMuon = tree.aLeptons_isTrackerMuon[n];
+        self.pixelHits = tree.aLeptons_pixelHits[n];
+        self.trackerLayers = tree.aLeptons_trackerLayers[n];
+        self.pixelLayers = tree.aLeptons_pixelLayers[n];
+        self.mvaTTH = tree.aLeptons_mvaTTH[n];
+        self.jetOverlapIdx = tree.aLeptons_jetOverlapIdx[n];
+        self.jetPtRatio = tree.aLeptons_jetPtRatio[n];
+        self.jetBTagCSV = tree.aLeptons_jetBTagCSV[n];
+        self.jetDR = tree.aLeptons_jetDR[n];
+        self.mvaTTHjetPtRatio = tree.aLeptons_mvaTTHjetPtRatio[n];
+        self.mvaTTHjetBTagCSV = tree.aLeptons_mvaTTHjetBTagCSV[n];
+        self.mvaTTHjetDR = tree.aLeptons_mvaTTHjetDR[n];
+        self.pfRelIso03 = tree.aLeptons_pfRelIso03[n];
+        self.pfRelIso04 = tree.aLeptons_pfRelIso04[n];
+        self.etaSc = tree.aLeptons_etaSc[n];
+        self.eleExpMissingInnerHits = tree.aLeptons_eleExpMissingInnerHits[n];
+        self.eleooEmooP = tree.aLeptons_eleooEmooP[n];
+        self.dr03TkSumPt = tree.aLeptons_dr03TkSumPt[n];
+        self.eleEcalClusterIso = tree.aLeptons_eleEcalClusterIso[n];
+        self.eleHcalClusterIso = tree.aLeptons_eleHcalClusterIso[n];
+        self.miniIsoCharged = tree.aLeptons_miniIsoCharged[n];
+        self.miniIsoNeutral = tree.aLeptons_miniIsoNeutral[n];
+        self.mvaTTHjetPtRel = tree.aLeptons_mvaTTHjetPtRel[n];
+        self.mvaTTHjetNDauChargedMVASel = tree.aLeptons_mvaTTHjetNDauChargedMVASel[n];
+        self.uncalibratedPt = tree.aLeptons_uncalibratedPt[n];
+        self.SF_IsoLoose = tree.aLeptons_SF_IsoLoose[n];
+        self.SFerr_IsoLoose = tree.aLeptons_SFerr_IsoLoose[n];
+        self.SF_IsoTight = tree.aLeptons_SF_IsoTight[n];
+        self.SFerr_IsoTight = tree.aLeptons_SFerr_IsoTight[n];
+        self.SF_IdCutLoose = tree.aLeptons_SF_IdCutLoose[n];
+        self.SFerr_IdCutLoose = tree.aLeptons_SFerr_IdCutLoose[n];
+        self.SF_IdCutTight = tree.aLeptons_SF_IdCutTight[n];
+        self.SFerr_IdCutTight = tree.aLeptons_SFerr_IdCutTight[n];
+        self.SF_IdMVALoose = tree.aLeptons_SF_IdMVALoose[n];
+        self.SFerr_IdMVALoose = tree.aLeptons_SFerr_IdMVALoose[n];
+        self.SF_IdMVATight = tree.aLeptons_SF_IdMVATight[n];
+        self.SFerr_IdMVATight = tree.aLeptons_SFerr_IdMVATight[n];
+        self.SF_HLT_RunD4p3 = tree.aLeptons_SF_HLT_RunD4p3[n];
+        self.SFerr_HLT_RunD4p3 = tree.aLeptons_SFerr_HLT_RunD4p3[n];
+        self.SF_HLT_RunD4p2 = tree.aLeptons_SF_HLT_RunD4p2[n];
+        self.SFerr_HLT_RunD4p2 = tree.aLeptons_SFerr_HLT_RunD4p2[n];
+        self.SF_HLT_RunC = tree.aLeptons_SF_HLT_RunC[n];
+        self.SFerr_HLT_RunC = tree.aLeptons_SFerr_HLT_RunC[n];
+        self.Eff_HLT_RunD4p3 = tree.aLeptons_Eff_HLT_RunD4p3[n];
+        self.Efferr_HLT_RunD4p3 = tree.aLeptons_Efferr_HLT_RunD4p3[n];
+        self.Eff_HLT_RunD4p2 = tree.aLeptons_Eff_HLT_RunD4p2[n];
+        self.Efferr_HLT_RunD4p2 = tree.aLeptons_Efferr_HLT_RunD4p2[n];
+        self.Eff_HLT_RunC = tree.aLeptons_Eff_HLT_RunC[n];
+        self.Efferr_HLT_RunC = tree.aLeptons_Efferr_HLT_RunC[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "naLeptons", 0)
-        _charge = getattr(tree, "aLeptons_charge", [None]*n)
-        _tightId = getattr(tree, "aLeptons_tightId", [None]*n)
-        _eleCutIdCSA14_25ns_v1 = getattr(tree, "aLeptons_eleCutIdCSA14_25ns_v1", [None]*n)
-        _eleCutIdCSA14_50ns_v1 = getattr(tree, "aLeptons_eleCutIdCSA14_50ns_v1", [None]*n)
-        _eleCutIdSpring15_25ns_v1 = getattr(tree, "aLeptons_eleCutIdSpring15_25ns_v1", [None]*n)
-        _dxy = getattr(tree, "aLeptons_dxy", [None]*n)
-        _dz = getattr(tree, "aLeptons_dz", [None]*n)
-        _edxy = getattr(tree, "aLeptons_edxy", [None]*n)
-        _edz = getattr(tree, "aLeptons_edz", [None]*n)
-        _ip3d = getattr(tree, "aLeptons_ip3d", [None]*n)
-        _sip3d = getattr(tree, "aLeptons_sip3d", [None]*n)
-        _convVeto = getattr(tree, "aLeptons_convVeto", [None]*n)
-        _lostHits = getattr(tree, "aLeptons_lostHits", [None]*n)
-        _relIso03 = getattr(tree, "aLeptons_relIso03", [None]*n)
-        _relIso04 = getattr(tree, "aLeptons_relIso04", [None]*n)
-        _miniRelIso = getattr(tree, "aLeptons_miniRelIso", [None]*n)
-        _relIsoAn04 = getattr(tree, "aLeptons_relIsoAn04", [None]*n)
-        _tightCharge = getattr(tree, "aLeptons_tightCharge", [None]*n)
-        _mcMatchId = getattr(tree, "aLeptons_mcMatchId", [None]*n)
-        _mcMatchAny = getattr(tree, "aLeptons_mcMatchAny", [None]*n)
-        _mcMatchTau = getattr(tree, "aLeptons_mcMatchTau", [None]*n)
-        _mcPt = getattr(tree, "aLeptons_mcPt", [None]*n)
-        _mediumMuonId = getattr(tree, "aLeptons_mediumMuonId", [None]*n)
-        _pdgId = getattr(tree, "aLeptons_pdgId", [None]*n)
-        _pt = getattr(tree, "aLeptons_pt", [None]*n)
-        _eta = getattr(tree, "aLeptons_eta", [None]*n)
-        _phi = getattr(tree, "aLeptons_phi", [None]*n)
-        _mass = getattr(tree, "aLeptons_mass", [None]*n)
-        _looseIdSusy = getattr(tree, "aLeptons_looseIdSusy", [None]*n)
-        _looseIdPOG = getattr(tree, "aLeptons_looseIdPOG", [None]*n)
-        _chargedHadRelIso03 = getattr(tree, "aLeptons_chargedHadRelIso03", [None]*n)
-        _chargedHadRelIso04 = getattr(tree, "aLeptons_chargedHadRelIso04", [None]*n)
-        _eleSieie = getattr(tree, "aLeptons_eleSieie", [None]*n)
-        _eleDEta = getattr(tree, "aLeptons_eleDEta", [None]*n)
-        _eleDPhi = getattr(tree, "aLeptons_eleDPhi", [None]*n)
-        _eleHoE = getattr(tree, "aLeptons_eleHoE", [None]*n)
-        _eleMissingHits = getattr(tree, "aLeptons_eleMissingHits", [None]*n)
-        _eleChi2 = getattr(tree, "aLeptons_eleChi2", [None]*n)
-        _convVetoFull = getattr(tree, "aLeptons_convVetoFull", [None]*n)
-        _eleMVArawSpring15Trig = getattr(tree, "aLeptons_eleMVArawSpring15Trig", [None]*n)
-        _eleMVAIdSpring15Trig = getattr(tree, "aLeptons_eleMVAIdSpring15Trig", [None]*n)
-        _eleMVArawSpring15NonTrig = getattr(tree, "aLeptons_eleMVArawSpring15NonTrig", [None]*n)
-        _eleMVAIdSpring15NonTrig = getattr(tree, "aLeptons_eleMVAIdSpring15NonTrig", [None]*n)
-        _nStations = getattr(tree, "aLeptons_nStations", [None]*n)
-        _trkKink = getattr(tree, "aLeptons_trkKink", [None]*n)
-        _segmentCompatibility = getattr(tree, "aLeptons_segmentCompatibility", [None]*n)
-        _caloCompatibility = getattr(tree, "aLeptons_caloCompatibility", [None]*n)
-        _globalTrackChi2 = getattr(tree, "aLeptons_globalTrackChi2", [None]*n)
-        _nChamberHits = getattr(tree, "aLeptons_nChamberHits", [None]*n)
-        _isPFMuon = getattr(tree, "aLeptons_isPFMuon", [None]*n)
-        _isGlobalMuon = getattr(tree, "aLeptons_isGlobalMuon", [None]*n)
-        _isTrackerMuon = getattr(tree, "aLeptons_isTrackerMuon", [None]*n)
-        _pixelHits = getattr(tree, "aLeptons_pixelHits", [None]*n)
-        _trackerLayers = getattr(tree, "aLeptons_trackerLayers", [None]*n)
-        _pixelLayers = getattr(tree, "aLeptons_pixelLayers", [None]*n)
-        _mvaTTH = getattr(tree, "aLeptons_mvaTTH", [None]*n)
-        _jetOverlapIdx = getattr(tree, "aLeptons_jetOverlapIdx", [None]*n)
-        _jetPtRatio = getattr(tree, "aLeptons_jetPtRatio", [None]*n)
-        _jetBTagCSV = getattr(tree, "aLeptons_jetBTagCSV", [None]*n)
-        _jetDR = getattr(tree, "aLeptons_jetDR", [None]*n)
-        _mvaTTHjetPtRatio = getattr(tree, "aLeptons_mvaTTHjetPtRatio", [None]*n)
-        _mvaTTHjetBTagCSV = getattr(tree, "aLeptons_mvaTTHjetBTagCSV", [None]*n)
-        _mvaTTHjetDR = getattr(tree, "aLeptons_mvaTTHjetDR", [None]*n)
-        _pfRelIso03 = getattr(tree, "aLeptons_pfRelIso03", [None]*n)
-        _pfRelIso04 = getattr(tree, "aLeptons_pfRelIso04", [None]*n)
-        _etaSc = getattr(tree, "aLeptons_etaSc", [None]*n)
-        _eleExpMissingInnerHits = getattr(tree, "aLeptons_eleExpMissingInnerHits", [None]*n)
-        _eleooEmooP = getattr(tree, "aLeptons_eleooEmooP", [None]*n)
-        _dr03TkSumPt = getattr(tree, "aLeptons_dr03TkSumPt", [None]*n)
-        _eleEcalClusterIso = getattr(tree, "aLeptons_eleEcalClusterIso", [None]*n)
-        _eleHcalClusterIso = getattr(tree, "aLeptons_eleHcalClusterIso", [None]*n)
-        _miniIsoCharged = getattr(tree, "aLeptons_miniIsoCharged", [None]*n)
-        _miniIsoNeutral = getattr(tree, "aLeptons_miniIsoNeutral", [None]*n)
-        _mvaTTHjetPtRel = getattr(tree, "aLeptons_mvaTTHjetPtRel", [None]*n)
-        _mvaTTHjetNDauChargedMVASel = getattr(tree, "aLeptons_mvaTTHjetNDauChargedMVASel", [None]*n)
-        _uncalibratedPt = getattr(tree, "aLeptons_uncalibratedPt", [None]*n)
-        _SF_IsoLoose = getattr(tree, "aLeptons_SF_IsoLoose", [None]*n)
-        _SFerr_IsoLoose = getattr(tree, "aLeptons_SFerr_IsoLoose", [None]*n)
-        _SF_IsoTight = getattr(tree, "aLeptons_SF_IsoTight", [None]*n)
-        _SFerr_IsoTight = getattr(tree, "aLeptons_SFerr_IsoTight", [None]*n)
-        _SF_IdCutLoose = getattr(tree, "aLeptons_SF_IdCutLoose", [None]*n)
-        _SFerr_IdCutLoose = getattr(tree, "aLeptons_SFerr_IdCutLoose", [None]*n)
-        _SF_IdCutTight = getattr(tree, "aLeptons_SF_IdCutTight", [None]*n)
-        _SFerr_IdCutTight = getattr(tree, "aLeptons_SFerr_IdCutTight", [None]*n)
-        _SF_IdMVALoose = getattr(tree, "aLeptons_SF_IdMVALoose", [None]*n)
-        _SFerr_IdMVALoose = getattr(tree, "aLeptons_SFerr_IdMVALoose", [None]*n)
-        _SF_IdMVATight = getattr(tree, "aLeptons_SF_IdMVATight", [None]*n)
-        _SFerr_IdMVATight = getattr(tree, "aLeptons_SFerr_IdMVATight", [None]*n)
-        _SF_HLT_RunD4p3 = getattr(tree, "aLeptons_SF_HLT_RunD4p3", [None]*n)
-        _SFerr_HLT_RunD4p3 = getattr(tree, "aLeptons_SFerr_HLT_RunD4p3", [None]*n)
-        _SF_HLT_RunD4p2 = getattr(tree, "aLeptons_SF_HLT_RunD4p2", [None]*n)
-        _SFerr_HLT_RunD4p2 = getattr(tree, "aLeptons_SFerr_HLT_RunD4p2", [None]*n)
-        _SF_HLT_RunC = getattr(tree, "aLeptons_SF_HLT_RunC", [None]*n)
-        _SFerr_HLT_RunC = getattr(tree, "aLeptons_SFerr_HLT_RunC", [None]*n)
-        _Eff_HLT_RunD4p3 = getattr(tree, "aLeptons_Eff_HLT_RunD4p3", [None]*n)
-        _Efferr_HLT_RunD4p3 = getattr(tree, "aLeptons_Efferr_HLT_RunD4p3", [None]*n)
-        _Eff_HLT_RunD4p2 = getattr(tree, "aLeptons_Eff_HLT_RunD4p2", [None]*n)
-        _Efferr_HLT_RunD4p2 = getattr(tree, "aLeptons_Efferr_HLT_RunD4p2", [None]*n)
-        _Eff_HLT_RunC = getattr(tree, "aLeptons_Eff_HLT_RunC", [None]*n)
-        _Efferr_HLT_RunC = getattr(tree, "aLeptons_Efferr_HLT_RunC", [None]*n)
-        return [aLeptons(_charge[n], _tightId[n], _eleCutIdCSA14_25ns_v1[n], _eleCutIdCSA14_50ns_v1[n], _eleCutIdSpring15_25ns_v1[n], _dxy[n], _dz[n], _edxy[n], _edz[n], _ip3d[n], _sip3d[n], _convVeto[n], _lostHits[n], _relIso03[n], _relIso04[n], _miniRelIso[n], _relIsoAn04[n], _tightCharge[n], _mcMatchId[n], _mcMatchAny[n], _mcMatchTau[n], _mcPt[n], _mediumMuonId[n], _pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _looseIdSusy[n], _looseIdPOG[n], _chargedHadRelIso03[n], _chargedHadRelIso04[n], _eleSieie[n], _eleDEta[n], _eleDPhi[n], _eleHoE[n], _eleMissingHits[n], _eleChi2[n], _convVetoFull[n], _eleMVArawSpring15Trig[n], _eleMVAIdSpring15Trig[n], _eleMVArawSpring15NonTrig[n], _eleMVAIdSpring15NonTrig[n], _nStations[n], _trkKink[n], _segmentCompatibility[n], _caloCompatibility[n], _globalTrackChi2[n], _nChamberHits[n], _isPFMuon[n], _isGlobalMuon[n], _isTrackerMuon[n], _pixelHits[n], _trackerLayers[n], _pixelLayers[n], _mvaTTH[n], _jetOverlapIdx[n], _jetPtRatio[n], _jetBTagCSV[n], _jetDR[n], _mvaTTHjetPtRatio[n], _mvaTTHjetBTagCSV[n], _mvaTTHjetDR[n], _pfRelIso03[n], _pfRelIso04[n], _etaSc[n], _eleExpMissingInnerHits[n], _eleooEmooP[n], _dr03TkSumPt[n], _eleEcalClusterIso[n], _eleHcalClusterIso[n], _miniIsoCharged[n], _miniIsoNeutral[n], _mvaTTHjetPtRel[n], _mvaTTHjetNDauChargedMVASel[n], _uncalibratedPt[n], _SF_IsoLoose[n], _SFerr_IsoLoose[n], _SF_IsoTight[n], _SFerr_IsoTight[n], _SF_IdCutLoose[n], _SFerr_IdCutLoose[n], _SF_IdCutTight[n], _SFerr_IdCutTight[n], _SF_IdMVALoose[n], _SFerr_IdMVALoose[n], _SF_IdMVATight[n], _SFerr_IdMVATight[n], _SF_HLT_RunD4p3[n], _SFerr_HLT_RunD4p3[n], _SF_HLT_RunD4p2[n], _SFerr_HLT_RunD4p2[n], _SF_HLT_RunC[n], _SFerr_HLT_RunC[n], _Eff_HLT_RunD4p3[n], _Efferr_HLT_RunD4p3[n], _Eff_HLT_RunD4p2[n], _Efferr_HLT_RunD4p2[n], _Eff_HLT_RunC[n], _Efferr_HLT_RunC[n]) for n in range(n)]
-    def __init__(self, charge,tightId,eleCutIdCSA14_25ns_v1,eleCutIdCSA14_50ns_v1,eleCutIdSpring15_25ns_v1,dxy,dz,edxy,edz,ip3d,sip3d,convVeto,lostHits,relIso03,relIso04,miniRelIso,relIsoAn04,tightCharge,mcMatchId,mcMatchAny,mcMatchTau,mcPt,mediumMuonId,pdgId,pt,eta,phi,mass,looseIdSusy,looseIdPOG,chargedHadRelIso03,chargedHadRelIso04,eleSieie,eleDEta,eleDPhi,eleHoE,eleMissingHits,eleChi2,convVetoFull,eleMVArawSpring15Trig,eleMVAIdSpring15Trig,eleMVArawSpring15NonTrig,eleMVAIdSpring15NonTrig,nStations,trkKink,segmentCompatibility,caloCompatibility,globalTrackChi2,nChamberHits,isPFMuon,isGlobalMuon,isTrackerMuon,pixelHits,trackerLayers,pixelLayers,mvaTTH,jetOverlapIdx,jetPtRatio,jetBTagCSV,jetDR,mvaTTHjetPtRatio,mvaTTHjetBTagCSV,mvaTTHjetDR,pfRelIso03,pfRelIso04,etaSc,eleExpMissingInnerHits,eleooEmooP,dr03TkSumPt,eleEcalClusterIso,eleHcalClusterIso,miniIsoCharged,miniIsoNeutral,mvaTTHjetPtRel,mvaTTHjetNDauChargedMVASel,uncalibratedPt,SF_IsoLoose,SFerr_IsoLoose,SF_IsoTight,SFerr_IsoTight,SF_IdCutLoose,SFerr_IdCutLoose,SF_IdCutTight,SFerr_IdCutTight,SF_IdMVALoose,SFerr_IdMVALoose,SF_IdMVATight,SFerr_IdMVATight,SF_HLT_RunD4p3,SFerr_HLT_RunD4p3,SF_HLT_RunD4p2,SFerr_HLT_RunD4p2,SF_HLT_RunC,SFerr_HLT_RunC,Eff_HLT_RunD4p3,Efferr_HLT_RunD4p3,Eff_HLT_RunD4p2,Efferr_HLT_RunD4p2,Eff_HLT_RunC,Efferr_HLT_RunC):
-        self.charge = charge #
-        self.tightId = tightId #POG Tight ID (for electrons it's configured in the analyzer)
-        self.eleCutIdCSA14_25ns_v1 = eleCutIdCSA14_25ns_v1 #Electron cut-based id (POG CSA14_25ns_v1): 0=none, 1=veto, 2=loose, 3=medium, 4=tight
-        self.eleCutIdCSA14_50ns_v1 = eleCutIdCSA14_50ns_v1 #Electron cut-based id (POG CSA14_50ns_v1): 0=none, 1=veto, 2=loose, 3=medium, 4=tight
-        self.eleCutIdSpring15_25ns_v1 = eleCutIdSpring15_25ns_v1 #Electron cut-based id (POG Spring15_25ns_v1): 0=none, 1=veto, 2=loose, 3=medium, 4=tight
-        self.dxy = dxy #d_{xy} with respect to PV, in cm (with sign)
-        self.dz = dz #d_{z} with respect to PV, in cm (with sign)
-        self.edxy = edxy ##sigma(d_{xy}) with respect to PV, in cm
-        self.edz = edz ##sigma(d_{z}) with respect to PV, in cm
-        self.ip3d = ip3d #d_{3d} with respect to PV, in cm (absolute value)
-        self.sip3d = sip3d #S_{ip3d} with respect to PV (significance)
-        self.convVeto = convVeto #Conversion veto (always true for muons)
-        self.lostHits = lostHits #Number of lost hits on inner track
-        self.relIso03 = relIso03 #PF Rel Iso, R=0.3, pile-up corrected
-        self.relIso04 = relIso04 #PF Rel Iso, R=0.4, pile-up corrected
-        self.miniRelIso = miniRelIso #PF Rel miniRel, pile-up corrected
-        self.relIsoAn04 = relIsoAn04 #PF Activity Annulus, pile-up corrected
-        self.tightCharge = tightCharge #Tight charge criteria: for electrons, 2 if isGsfCtfScPixChargeConsistent, 1 if only isGsfScPixChargeConsistent, 0 otherwise; for muons, 2 if ptError/pt < 0.20, 0 otherwise 
-        self.mcMatchId = mcMatchId #Match to source from hard scatter (pdgId of heaviest particle in chain, 25 for H, 6 for t, 23/24 for W/Z), zero if non-prompt or fake
-        self.mcMatchAny = mcMatchAny #Match to any final state leptons: 0 if unmatched, 1 if light flavour (including prompt), 4 if charm, 5 if bottom
-        self.mcMatchTau = mcMatchTau #True if the leptons comes from a tau
-        self.mcPt = mcPt #p_{T} of associated gen lepton
-        self.mediumMuonId = mediumMuonId #Muon POG Medium id
-        self.pdgId = pdgId #
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        self.looseIdSusy = looseIdSusy #Loose ID for Susy ntuples (always true on selected leptons)
-        self.looseIdPOG = looseIdPOG #Loose ID for Susy ntuples (always true on selected leptons)
-        self.chargedHadRelIso03 = chargedHadRelIso03 #PF Rel Iso, R=0.3, charged hadrons only
-        self.chargedHadRelIso04 = chargedHadRelIso04 #PF Rel Iso, R=0.4, charged hadrons only
-        self.eleSieie = eleSieie #sigma IEtaIEta for electrons
-        self.eleDEta = eleDEta #delta eta for electrons
-        self.eleDPhi = eleDPhi #delta phi for electrons
-        self.eleHoE = eleHoE #H/E for electrons
-        self.eleMissingHits = eleMissingHits #Missing hits for electrons
-        self.eleChi2 = eleChi2 #Track chi squared for electrons' gsf tracks
-        self.convVetoFull = convVetoFull #Conv veto + no missing hits for electrons, always true for muons.
-        self.eleMVArawSpring15Trig = eleMVArawSpring15Trig #EGamma POG MVA ID for triggering electrons (raw MVA value, Spring15 training); 1 for muons
-        self.eleMVAIdSpring15Trig = eleMVAIdSpring15Trig #EGamma POG MVA ID for triggering electrons (0=none, 1=WP90, 2=WP80, Spring15 training); 1 for muons
-        self.eleMVArawSpring15NonTrig = eleMVArawSpring15NonTrig #EGamma POG MVA ID for non-triggering electrons (raw MVA value, Spring15 training); 1 for muons
-        self.eleMVAIdSpring15NonTrig = eleMVAIdSpring15NonTrig #EGamma POG MVA ID for non-triggering electrons (0=none, 1=WP90, 2=WP80, Spring15 training); 1 for muons
-        self.nStations = nStations #Number of matched muons stations (4 for electrons)
-        self.trkKink = trkKink #Tracker kink-finder
-        self.segmentCompatibility = segmentCompatibility #Segment compatibility
-        self.caloCompatibility = caloCompatibility #Calorimetric compatibility
-        self.globalTrackChi2 = globalTrackChi2 #Global track normalized chi2
-        self.nChamberHits = nChamberHits #Number of muon chamber hits (-1 for electrons)
-        self.isPFMuon = isPFMuon #1 if muon passes particle flow ID
-        self.isGlobalMuon = isGlobalMuon #1 if muon is global muon
-        self.isTrackerMuon = isTrackerMuon #1 if muon is tracker muon
-        self.pixelHits = pixelHits #Number of pixel hits (-1 for electrons)
-        self.trackerLayers = trackerLayers #Tracker Layers
-        self.pixelLayers = pixelLayers #Pixel Layers
-        self.mvaTTH = mvaTTH #Lepton MVA (ttH version)
-        self.jetOverlapIdx = jetOverlapIdx #index of jet with overlapping PF constituents. If idx>=1000, then idx = idx-1000 and refers to discarded jets.
-        self.jetPtRatio = jetPtRatio #pt(lepton)/pt(nearest jet)
-        self.jetBTagCSV = jetBTagCSV #btag of nearest jet
-        self.jetDR = jetDR #deltaR(lepton, nearest jet)
-        self.mvaTTHjetPtRatio = mvaTTHjetPtRatio #pt(lepton)/pt(nearest jet with pT > 25 GeV)
-        self.mvaTTHjetBTagCSV = mvaTTHjetBTagCSV #btag of nearest jet with pT > 25 GeV
-        self.mvaTTHjetDR = mvaTTHjetDR #deltaR(lepton, nearest jet with pT > 25 GeV)
-        self.pfRelIso03 = pfRelIso03 #0.3 particle based iso
-        self.pfRelIso04 = pfRelIso04 #0.4 particle based iso
-        self.etaSc = etaSc #Electron supercluster pseudorapidity
-        self.eleExpMissingInnerHits = eleExpMissingInnerHits #Electron expected missing inner hits
-        self.eleooEmooP = eleooEmooP #Electron 1/E - 1/P
-        self.dr03TkSumPt = dr03TkSumPt #Electron track sum pt
-        self.eleEcalClusterIso = eleEcalClusterIso #Electron ecal cluster iso
-        self.eleHcalClusterIso = eleHcalClusterIso #Electron hcal cluster iso
-        self.miniIsoCharged = miniIsoCharged #PF miniIso (charged) in GeV
-        self.miniIsoNeutral = miniIsoNeutral #PF miniIso (neutral) in GeV
-        self.mvaTTHjetPtRel = mvaTTHjetPtRel #jetPtRel variable used by ttH multilepton MVA
-        self.mvaTTHjetNDauChargedMVASel = mvaTTHjetNDauChargedMVASel #jetNDauChargedMVASel variable used by ttH multilepton MVA
-        self.uncalibratedPt = uncalibratedPt #Electron uncalibrated pt
-        self.SF_IsoLoose = SF_IsoLoose #SF for lepton IsoLoose
-        self.SFerr_IsoLoose = SFerr_IsoLoose #SF error for lepton IsoLoose
-        self.SF_IsoTight = SF_IsoTight #SF for lepton IsoTight
-        self.SFerr_IsoTight = SFerr_IsoTight #SF error for lepton IsoTight
-        self.SF_IdCutLoose = SF_IdCutLoose #SF for lepton IdCutLoose
-        self.SFerr_IdCutLoose = SFerr_IdCutLoose #SF error for lepton IdCutLoose
-        self.SF_IdCutTight = SF_IdCutTight #SF for lepton IdCutTight
-        self.SFerr_IdCutTight = SFerr_IdCutTight #SF error for lepton IdCutTight
-        self.SF_IdMVALoose = SF_IdMVALoose #SF for lepton IdMVALoose
-        self.SFerr_IdMVALoose = SFerr_IdMVALoose #SF error for lepton IdMVALoose
-        self.SF_IdMVATight = SF_IdMVATight #SF for lepton IdMVATight
-        self.SFerr_IdMVATight = SFerr_IdMVATight #SF error for lepton IdMVATight
-        self.SF_HLT_RunD4p3 = SF_HLT_RunD4p3 #SF for lepton HLT_RunD4p3
-        self.SFerr_HLT_RunD4p3 = SFerr_HLT_RunD4p3 #SF error for lepton HLT_RunD4p3
-        self.SF_HLT_RunD4p2 = SF_HLT_RunD4p2 #SF for lepton HLT_RunD4p2
-        self.SFerr_HLT_RunD4p2 = SFerr_HLT_RunD4p2 #SF error for lepton HLT_RunD4p2
-        self.SF_HLT_RunC = SF_HLT_RunC #SF for lepton HLT_RunC
-        self.SFerr_HLT_RunC = SFerr_HLT_RunC #SF error for lepton HLT_RunC
-        self.Eff_HLT_RunD4p3 = Eff_HLT_RunD4p3 #SF for lepton HLT_RunD4p3
-        self.Efferr_HLT_RunD4p3 = Efferr_HLT_RunD4p3 #SF error for lepton HLT_RunD4p3
-        self.Eff_HLT_RunD4p2 = Eff_HLT_RunD4p2 #SF for lepton HLT_RunD4p2
-        self.Efferr_HLT_RunD4p2 = Efferr_HLT_RunD4p2 #SF error for lepton HLT_RunD4p2
-        self.Eff_HLT_RunC = Eff_HLT_RunC #SF for lepton HLT_RunC
-        self.Efferr_HLT_RunC = Efferr_HLT_RunC #SF error for lepton HLT_RunC
+        return [aLeptons(tree, i) for i in range(tree.naLeptons)]
 class trgObjects_hltPFQuadJetLooseID15:
-    """
-    
-    """
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_hltPFQuadJetLooseID15", 0)
-        return [trgObjects_hltPFQuadJetLooseID15() for n in range(n)]
+        return [trgObjects_hltPFQuadJetLooseID15(tree, i) for i in range(tree.ntrgObjects_hltPFQuadJetLooseID15)]
 class trgObjects_hltQuadPFCentralJetLooseID45:
-    """
-    
-    """
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_hltQuadPFCentralJetLooseID45", 0)
-        return [trgObjects_hltQuadPFCentralJetLooseID45() for n in range(n)]
+        return [trgObjects_hltQuadPFCentralJetLooseID45(tree, i) for i in range(tree.ntrgObjects_hltQuadPFCentralJetLooseID45)]
 class trgObjects_l1ForwardJets:
-    """
-    
-    """
+    def __init__(self, tree, n):
+        self.pt = tree.trgObjects_l1ForwardJets_pt[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_l1ForwardJets", 0)
-        _pt = getattr(tree, "trgObjects_l1ForwardJets_pt", [None]*n)
-        return [trgObjects_l1ForwardJets(_pt[n]) for n in range(n)]
-    def __init__(self, pt):
-        self.pt = pt #trigger object pt
+        return [trgObjects_l1ForwardJets(tree, i) for i in range(tree.ntrgObjects_l1ForwardJets)]
 class trgObjects_hltVBFPFJetCSVSortedMqq200Detaqq1p2:
-    """
-    
-    """
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_hltVBFPFJetCSVSortedMqq200Detaqq1p2", 0)
-        return [trgObjects_hltVBFPFJetCSVSortedMqq200Detaqq1p2() for n in range(n)]
+        return [trgObjects_hltVBFPFJetCSVSortedMqq200Detaqq1p2(tree, i) for i in range(tree.ntrgObjects_hltVBFPFJetCSVSortedMqq200Detaqq1p2)]
 class softActivityVHJets:
-    """
-    jets made for soft activity VH version
-    """
+    def __init__(self, tree, n):
+        self.pt = tree.softActivityVHJets_pt[n];
+        self.eta = tree.softActivityVHJets_eta[n];
+        self.phi = tree.softActivityVHJets_phi[n];
+        self.mass = tree.softActivityVHJets_mass[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nsoftActivityVHJets", 0)
-        _pt = getattr(tree, "softActivityVHJets_pt", [None]*n)
-        _eta = getattr(tree, "softActivityVHJets_eta", [None]*n)
-        _phi = getattr(tree, "softActivityVHJets_phi", [None]*n)
-        _mass = getattr(tree, "softActivityVHJets_mass", [None]*n)
-        return [softActivityVHJets(_pt[n], _eta[n], _phi[n], _mass[n]) for n in range(n)]
-    def __init__(self, pt,eta,phi,mass):
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
+        return [softActivityVHJets(tree, i) for i in range(tree.nsoftActivityVHJets)]
 class FatjetAK08ungroomed:
-    """
-    AK, R=0.8, pT > 200 GeV, no grooming, calibrated
-    """
+    def __init__(self, tree, n):
+        self.pt = tree.FatjetAK08ungroomed_pt[n];
+        self.eta = tree.FatjetAK08ungroomed_eta[n];
+        self.phi = tree.FatjetAK08ungroomed_phi[n];
+        self.mass = tree.FatjetAK08ungroomed_mass[n];
+        self.tau1 = tree.FatjetAK08ungroomed_tau1[n];
+        self.tau2 = tree.FatjetAK08ungroomed_tau2[n];
+        self.tau3 = tree.FatjetAK08ungroomed_tau3[n];
+        self.msoftdrop = tree.FatjetAK08ungroomed_msoftdrop[n];
+        self.mpruned = tree.FatjetAK08ungroomed_mpruned[n];
+        self.mprunedcorr = tree.FatjetAK08ungroomed_mprunedcorr[n];
+        self.JEC_L2L3 = tree.FatjetAK08ungroomed_JEC_L2L3[n];
+        self.JEC_L1L2L3 = tree.FatjetAK08ungroomed_JEC_L1L2L3[n];
+        self.bbtag = tree.FatjetAK08ungroomed_bbtag[n];
+        self.id_Tight = tree.FatjetAK08ungroomed_id_Tight[n];
+        self.numberOfDaughters = tree.FatjetAK08ungroomed_numberOfDaughters[n];
+        self.neutralEmEnergyFraction = tree.FatjetAK08ungroomed_neutralEmEnergyFraction[n];
+        self.neutralHadronEnergyFraction = tree.FatjetAK08ungroomed_neutralHadronEnergyFraction[n];
+        self.muonEnergyFraction = tree.FatjetAK08ungroomed_muonEnergyFraction[n];
+        self.chargedEmEnergyFraction = tree.FatjetAK08ungroomed_chargedEmEnergyFraction[n];
+        self.chargedHadronEnergyFraction = tree.FatjetAK08ungroomed_chargedHadronEnergyFraction[n];
+        self.chargedMultiplicity = tree.FatjetAK08ungroomed_chargedMultiplicity[n];
+        self.Flavour = tree.FatjetAK08ungroomed_Flavour[n];
+        self.BhadronFlavour = tree.FatjetAK08ungroomed_BhadronFlavour[n];
+        self.ChadronFlavour = tree.FatjetAK08ungroomed_ChadronFlavour[n];
+        self.GenPt = tree.FatjetAK08ungroomed_GenPt[n];
+        self.PFLepton_ptrel = tree.FatjetAK08ungroomed_PFLepton_ptrel[n];
+        self.z_ratio = tree.FatjetAK08ungroomed_z_ratio[n];
+        self.PFLepton_IP2D = tree.FatjetAK08ungroomed_PFLepton_IP2D[n];
+        self.nSL = tree.FatjetAK08ungroomed_nSL[n];
+        self.tau1_trackEtaRel_0 = tree.FatjetAK08ungroomed_tau1_trackEtaRel_0[n];
+        self.tau1_trackEtaRel_1 = tree.FatjetAK08ungroomed_tau1_trackEtaRel_1[n];
+        self.tau1_trackEtaRel_2 = tree.FatjetAK08ungroomed_tau1_trackEtaRel_2[n];
+        self.tau0_trackEtaRel_0 = tree.FatjetAK08ungroomed_tau0_trackEtaRel_0[n];
+        self.tau0_trackEtaRel_1 = tree.FatjetAK08ungroomed_tau0_trackEtaRel_1[n];
+        self.tau0_trackEtaRel_2 = tree.FatjetAK08ungroomed_tau0_trackEtaRel_2[n];
+        self.tau_vertexMass_0 = tree.FatjetAK08ungroomed_tau_vertexMass_0[n];
+        self.tau_vertexEnergyRatio_0 = tree.FatjetAK08ungroomed_tau_vertexEnergyRatio_0[n];
+        self.tau_vertexDeltaR_0 = tree.FatjetAK08ungroomed_tau_vertexDeltaR_0[n];
+        self.tau_flightDistance2dSig_0 = tree.FatjetAK08ungroomed_tau_flightDistance2dSig_0[n];
+        self.tau_vertexMass_1 = tree.FatjetAK08ungroomed_tau_vertexMass_1[n];
+        self.tau_vertexEnergyRatio_1 = tree.FatjetAK08ungroomed_tau_vertexEnergyRatio_1[n];
+        self.tau_flightDistance2dSig_1 = tree.FatjetAK08ungroomed_tau_flightDistance2dSig_1[n];
+        self.nSV = tree.FatjetAK08ungroomed_nSV[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nFatjetAK08ungroomed", 0)
-        _pt = getattr(tree, "FatjetAK08ungroomed_pt", [None]*n)
-        _eta = getattr(tree, "FatjetAK08ungroomed_eta", [None]*n)
-        _phi = getattr(tree, "FatjetAK08ungroomed_phi", [None]*n)
-        _mass = getattr(tree, "FatjetAK08ungroomed_mass", [None]*n)
-        _tau1 = getattr(tree, "FatjetAK08ungroomed_tau1", [None]*n)
-        _tau2 = getattr(tree, "FatjetAK08ungroomed_tau2", [None]*n)
-        _tau3 = getattr(tree, "FatjetAK08ungroomed_tau3", [None]*n)
-        _msoftdrop = getattr(tree, "FatjetAK08ungroomed_msoftdrop", [None]*n)
-        _mpruned = getattr(tree, "FatjetAK08ungroomed_mpruned", [None]*n)
-        _mtrimmed = getattr(tree, "FatjetAK08ungroomed_mtrimmed", [None]*n)
-        _mfiltered = getattr(tree, "FatjetAK08ungroomed_mfiltered", [None]*n)
-        _mprunedcorr = getattr(tree, "FatjetAK08ungroomed_mprunedcorr", [None]*n)
-        _JEC_L2L3 = getattr(tree, "FatjetAK08ungroomed_JEC_L2L3", [None]*n)
-        _JEC_L1L2L3 = getattr(tree, "FatjetAK08ungroomed_JEC_L1L2L3", [None]*n)
-        _bbtag = getattr(tree, "FatjetAK08ungroomed_bbtag", [None]*n)
-        _id_Tight = getattr(tree, "FatjetAK08ungroomed_id_Tight", [None]*n)
-        _numberOfDaughters = getattr(tree, "FatjetAK08ungroomed_numberOfDaughters", [None]*n)
-        _neutralEmEnergyFraction = getattr(tree, "FatjetAK08ungroomed_neutralEmEnergyFraction", [None]*n)
-        _neutralHadronEnergyFraction = getattr(tree, "FatjetAK08ungroomed_neutralHadronEnergyFraction", [None]*n)
-        _muonEnergyFraction = getattr(tree, "FatjetAK08ungroomed_muonEnergyFraction", [None]*n)
-        _chargedEmEnergyFraction = getattr(tree, "FatjetAK08ungroomed_chargedEmEnergyFraction", [None]*n)
-        _chargedHadronEnergyFraction = getattr(tree, "FatjetAK08ungroomed_chargedHadronEnergyFraction", [None]*n)
-        _chargedMultiplicity = getattr(tree, "FatjetAK08ungroomed_chargedMultiplicity", [None]*n)
-        _Flavour = getattr(tree, "FatjetAK08ungroomed_Flavour", [None]*n)
-        _BhadronFlavour = getattr(tree, "FatjetAK08ungroomed_BhadronFlavour", [None]*n)
-        _ChadronFlavour = getattr(tree, "FatjetAK08ungroomed_ChadronFlavour", [None]*n)
-        _GenPt = getattr(tree, "FatjetAK08ungroomed_GenPt", [None]*n)
-        _PFLepton_ptrel = getattr(tree, "FatjetAK08ungroomed_PFLepton_ptrel", [None]*n)
-        _z_ratio = getattr(tree, "FatjetAK08ungroomed_z_ratio", [None]*n)
-        _PFLepton_IP2D = getattr(tree, "FatjetAK08ungroomed_PFLepton_IP2D", [None]*n)
-        _nSL = getattr(tree, "FatjetAK08ungroomed_nSL", [None]*n)
-        _tau1_trackEtaRel_0 = getattr(tree, "FatjetAK08ungroomed_tau1_trackEtaRel_0", [None]*n)
-        _tau1_trackEtaRel_1 = getattr(tree, "FatjetAK08ungroomed_tau1_trackEtaRel_1", [None]*n)
-        _tau1_trackEtaRel_2 = getattr(tree, "FatjetAK08ungroomed_tau1_trackEtaRel_2", [None]*n)
-        _tau0_trackEtaRel_0 = getattr(tree, "FatjetAK08ungroomed_tau0_trackEtaRel_0", [None]*n)
-        _tau0_trackEtaRel_1 = getattr(tree, "FatjetAK08ungroomed_tau0_trackEtaRel_1", [None]*n)
-        _tau0_trackEtaRel_2 = getattr(tree, "FatjetAK08ungroomed_tau0_trackEtaRel_2", [None]*n)
-        _tau_vertexMass_0 = getattr(tree, "FatjetAK08ungroomed_tau_vertexMass_0", [None]*n)
-        _tau_vertexEnergyRatio_0 = getattr(tree, "FatjetAK08ungroomed_tau_vertexEnergyRatio_0", [None]*n)
-        _tau_vertexDeltaR_0 = getattr(tree, "FatjetAK08ungroomed_tau_vertexDeltaR_0", [None]*n)
-        _tau_flightDistance2dSig_0 = getattr(tree, "FatjetAK08ungroomed_tau_flightDistance2dSig_0", [None]*n)
-        _tau_vertexMass_1 = getattr(tree, "FatjetAK08ungroomed_tau_vertexMass_1", [None]*n)
-        _tau_vertexEnergyRatio_1 = getattr(tree, "FatjetAK08ungroomed_tau_vertexEnergyRatio_1", [None]*n)
-        _tau_flightDistance2dSig_1 = getattr(tree, "FatjetAK08ungroomed_tau_flightDistance2dSig_1", [None]*n)
-        _nSV = getattr(tree, "FatjetAK08ungroomed_nSV", [None]*n)
-        return [FatjetAK08ungroomed(_pt[n], _eta[n], _phi[n], _mass[n], _tau1[n], _tau2[n], _tau3[n], _msoftdrop[n], _mpruned[n], _mtrimmed[n], _mfiltered[n], _mprunedcorr[n], _JEC_L2L3[n], _JEC_L1L2L3[n], _bbtag[n], _id_Tight[n], _numberOfDaughters[n], _neutralEmEnergyFraction[n], _neutralHadronEnergyFraction[n], _muonEnergyFraction[n], _chargedEmEnergyFraction[n], _chargedHadronEnergyFraction[n], _chargedMultiplicity[n], _Flavour[n], _BhadronFlavour[n], _ChadronFlavour[n], _GenPt[n], _PFLepton_ptrel[n], _z_ratio[n], _PFLepton_IP2D[n], _nSL[n], _tau1_trackEtaRel_0[n], _tau1_trackEtaRel_1[n], _tau1_trackEtaRel_2[n], _tau0_trackEtaRel_0[n], _tau0_trackEtaRel_1[n], _tau0_trackEtaRel_2[n], _tau_vertexMass_0[n], _tau_vertexEnergyRatio_0[n], _tau_vertexDeltaR_0[n], _tau_flightDistance2dSig_0[n], _tau_vertexMass_1[n], _tau_vertexEnergyRatio_1[n], _tau_flightDistance2dSig_1[n], _nSV[n]) for n in range(n)]
-    def __init__(self, pt,eta,phi,mass,tau1,tau2,tau3,msoftdrop,mpruned,mtrimmed,mfiltered,mprunedcorr,JEC_L2L3,JEC_L1L2L3,bbtag,id_Tight,numberOfDaughters,neutralEmEnergyFraction,neutralHadronEnergyFraction,muonEnergyFraction,chargedEmEnergyFraction,chargedHadronEnergyFraction,chargedMultiplicity,Flavour,BhadronFlavour,ChadronFlavour,GenPt,PFLepton_ptrel,z_ratio,PFLepton_IP2D,nSL,tau1_trackEtaRel_0,tau1_trackEtaRel_1,tau1_trackEtaRel_2,tau0_trackEtaRel_0,tau0_trackEtaRel_1,tau0_trackEtaRel_2,tau_vertexMass_0,tau_vertexEnergyRatio_0,tau_vertexDeltaR_0,tau_flightDistance2dSig_0,tau_vertexMass_1,tau_vertexEnergyRatio_1,tau_flightDistance2dSig_1,nSV):
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        self.tau1 = tau1 #Nsubjettiness (1 axis)
-        self.tau2 = tau2 #Nsubjettiness (2 axes)
-        self.tau3 = tau3 #Nsubjettiness (3 axes)
-        self.msoftdrop = msoftdrop #Softdrop Mass
-        self.mpruned = mpruned #Pruned Mass
-        self.mtrimmed = mtrimmed #Trimmed Mass
-        self.mfiltered = mfiltered #Filtered Mass
-        self.mprunedcorr = mprunedcorr #Pruned Mass L2+L3 corrected
-        self.JEC_L2L3 = JEC_L2L3 #L2+L3 correction factor for pruned mass
-        self.JEC_L1L2L3 = JEC_L1L2L3 #L1+L2+L3 correction factor for ungroomed pt
-        self.bbtag = bbtag #Hbb b-tag score
-        self.id_Tight = id_Tight #POG Tight jet ID lep veto
-        self.numberOfDaughters = numberOfDaughters #numberOfDaughters
-        self.neutralEmEnergyFraction = neutralEmEnergyFraction #neutralEmEnergyFraction
-        self.neutralHadronEnergyFraction = neutralHadronEnergyFraction #neutralHadronEnergyFraction
-        self.muonEnergyFraction = muonEnergyFraction #muonEnergyFraction
-        self.chargedEmEnergyFraction = chargedEmEnergyFraction #chargedEmEnergyFraction
-        self.chargedHadronEnergyFraction = chargedHadronEnergyFraction #chargedHadronEnergyFraction
-        self.chargedMultiplicity = chargedMultiplicity #chargedMultiplicity
-        self.Flavour = Flavour #parton flavor as ghost matching
-        self.BhadronFlavour = BhadronFlavour #hadron flavour (ghost matching to B hadrons)
-        self.ChadronFlavour = ChadronFlavour #hadron flavour (ghost matching to C hadrons)
-        self.GenPt = GenPt #gen jet pt for JER computation
-        self.PFLepton_ptrel = PFLepton_ptrel #pt-rel of e/mu (for bb-tag)
-        self.z_ratio = z_ratio #z-ratio (for bb-tag)
-        self.PFLepton_IP2D = PFLepton_IP2D #lepton IP2D (for bb-tag)
-        self.nSL = nSL #number of soft leptons (for bb-tag)
-        self.tau1_trackEtaRel_0 = tau1_trackEtaRel_0 # bb-tag input as in 76x
-        self.tau1_trackEtaRel_1 = tau1_trackEtaRel_1 # bb-tag input as in 76x
-        self.tau1_trackEtaRel_2 = tau1_trackEtaRel_2 # bb-tag input as in 76x
-        self.tau0_trackEtaRel_0 = tau0_trackEtaRel_0 # bb-tag input as in 76x
-        self.tau0_trackEtaRel_1 = tau0_trackEtaRel_1 # bb-tag input as in 76x
-        self.tau0_trackEtaRel_2 = tau0_trackEtaRel_2 # bb-tag input as in 76x
-        self.tau_vertexMass_0 = tau_vertexMass_0 # bb-tag input as in 76x
-        self.tau_vertexEnergyRatio_0 = tau_vertexEnergyRatio_0 # bb-tag input as in 76x
-        self.tau_vertexDeltaR_0 = tau_vertexDeltaR_0 # bb-tag input as in 76x
-        self.tau_flightDistance2dSig_0 = tau_flightDistance2dSig_0 # bb-tag input as in 76x
-        self.tau_vertexMass_1 = tau_vertexMass_1 # bb-tag input as in 76x
-        self.tau_vertexEnergyRatio_1 = tau_vertexEnergyRatio_1 # bb-tag input as in 76x
-        self.tau_flightDistance2dSig_1 = tau_flightDistance2dSig_1 # bb-tag input as in 76x
-        self.nSV = nSV # bb-tag input as in 76x
+        return [FatjetAK08ungroomed(tree, i) for i in range(tree.nFatjetAK08ungroomed)]
 class trgObjects_hltPFMHTTightID90:
-    """
-    
-    """
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_hltPFMHTTightID90", 0)
-        return [trgObjects_hltPFMHTTightID90() for n in range(n)]
+        return [trgObjects_hltPFMHTTightID90(tree, i) for i in range(tree.ntrgObjects_hltPFMHTTightID90)]
 class trgObjects_hltQuadCentralJet45:
-    """
-    
-    """
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_hltQuadCentralJet45", 0)
-        return [trgObjects_hltQuadCentralJet45() for n in range(n)]
+        return [trgObjects_hltQuadCentralJet45(tree, i) for i in range(tree.ntrgObjects_hltQuadCentralJet45)]
 class hjidxaddJetsdR08:
-    """
-    Higgs jet indices with Higgs formed adding cen jets if dR<0.8 from hJetsCSV
-    """
+    def __init__(self, tree, n):
+        self.hjidxaddJetsdR08 = tree.hjidxaddJetsdR08[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nhjidxaddJetsdR08", 0)
-        _hjidxaddJetsdR08 = getattr(tree, "hjidxaddJetsdR08", [None]*n);
-        return [hjidxaddJetsdR08(_hjidxaddJetsdR08[n]) for n in range(n)]
-    def __init__(self, hjidxaddJetsdR08):
-        self.hjidxaddJetsdR08 = hjidxaddJetsdR08 #Higgs jet indices with Higgs formed adding cen jets if dR<0.8 from hJetsCSV
+        return [hjidxaddJetsdR08(tree, i) for i in range(tree.nhjidxaddJetsdR08)]
 class selLeptons:
-    """
-    Leptons after the preselection
-    """
+    def __init__(self, tree, n):
+        self.charge = tree.selLeptons_charge[n];
+        self.tightId = tree.selLeptons_tightId[n];
+        self.eleCutIdCSA14_25ns_v1 = tree.selLeptons_eleCutIdCSA14_25ns_v1[n];
+        self.eleCutIdCSA14_50ns_v1 = tree.selLeptons_eleCutIdCSA14_50ns_v1[n];
+        self.eleCutIdSpring15_25ns_v1 = tree.selLeptons_eleCutIdSpring15_25ns_v1[n];
+        self.dxy = tree.selLeptons_dxy[n];
+        self.dz = tree.selLeptons_dz[n];
+        self.edxy = tree.selLeptons_edxy[n];
+        self.edz = tree.selLeptons_edz[n];
+        self.ip3d = tree.selLeptons_ip3d[n];
+        self.sip3d = tree.selLeptons_sip3d[n];
+        self.convVeto = tree.selLeptons_convVeto[n];
+        self.lostHits = tree.selLeptons_lostHits[n];
+        self.relIso03 = tree.selLeptons_relIso03[n];
+        self.relIso04 = tree.selLeptons_relIso04[n];
+        self.miniRelIso = tree.selLeptons_miniRelIso[n];
+        self.relIsoAn04 = tree.selLeptons_relIsoAn04[n];
+        self.tightCharge = tree.selLeptons_tightCharge[n];
+        self.mcMatchId = tree.selLeptons_mcMatchId[n];
+        self.mcMatchAny = tree.selLeptons_mcMatchAny[n];
+        self.mcMatchTau = tree.selLeptons_mcMatchTau[n];
+        self.mcPt = tree.selLeptons_mcPt[n];
+        self.mediumMuonId = tree.selLeptons_mediumMuonId[n];
+        self.pdgId = tree.selLeptons_pdgId[n];
+        self.pt = tree.selLeptons_pt[n];
+        self.eta = tree.selLeptons_eta[n];
+        self.phi = tree.selLeptons_phi[n];
+        self.mass = tree.selLeptons_mass[n];
+        self.looseIdSusy = tree.selLeptons_looseIdSusy[n];
+        self.looseIdPOG = tree.selLeptons_looseIdPOG[n];
+        self.chargedHadRelIso03 = tree.selLeptons_chargedHadRelIso03[n];
+        self.chargedHadRelIso04 = tree.selLeptons_chargedHadRelIso04[n];
+        self.eleSieie = tree.selLeptons_eleSieie[n];
+        self.eleDEta = tree.selLeptons_eleDEta[n];
+        self.eleDPhi = tree.selLeptons_eleDPhi[n];
+        self.eleHoE = tree.selLeptons_eleHoE[n];
+        self.eleMissingHits = tree.selLeptons_eleMissingHits[n];
+        self.eleChi2 = tree.selLeptons_eleChi2[n];
+        self.convVetoFull = tree.selLeptons_convVetoFull[n];
+        self.eleMVArawSpring15Trig = tree.selLeptons_eleMVArawSpring15Trig[n];
+        self.eleMVAIdSpring15Trig = tree.selLeptons_eleMVAIdSpring15Trig[n];
+        self.eleMVArawSpring15NonTrig = tree.selLeptons_eleMVArawSpring15NonTrig[n];
+        self.eleMVAIdSpring15NonTrig = tree.selLeptons_eleMVAIdSpring15NonTrig[n];
+        self.nStations = tree.selLeptons_nStations[n];
+        self.trkKink = tree.selLeptons_trkKink[n];
+        self.segmentCompatibility = tree.selLeptons_segmentCompatibility[n];
+        self.caloCompatibility = tree.selLeptons_caloCompatibility[n];
+        self.globalTrackChi2 = tree.selLeptons_globalTrackChi2[n];
+        self.nChamberHits = tree.selLeptons_nChamberHits[n];
+        self.isPFMuon = tree.selLeptons_isPFMuon[n];
+        self.isGlobalMuon = tree.selLeptons_isGlobalMuon[n];
+        self.isTrackerMuon = tree.selLeptons_isTrackerMuon[n];
+        self.pixelHits = tree.selLeptons_pixelHits[n];
+        self.trackerLayers = tree.selLeptons_trackerLayers[n];
+        self.pixelLayers = tree.selLeptons_pixelLayers[n];
+        self.mvaTTH = tree.selLeptons_mvaTTH[n];
+        self.jetOverlapIdx = tree.selLeptons_jetOverlapIdx[n];
+        self.jetPtRatio = tree.selLeptons_jetPtRatio[n];
+        self.jetBTagCSV = tree.selLeptons_jetBTagCSV[n];
+        self.jetDR = tree.selLeptons_jetDR[n];
+        self.mvaTTHjetPtRatio = tree.selLeptons_mvaTTHjetPtRatio[n];
+        self.mvaTTHjetBTagCSV = tree.selLeptons_mvaTTHjetBTagCSV[n];
+        self.mvaTTHjetDR = tree.selLeptons_mvaTTHjetDR[n];
+        self.pfRelIso03 = tree.selLeptons_pfRelIso03[n];
+        self.pfRelIso04 = tree.selLeptons_pfRelIso04[n];
+        self.etaSc = tree.selLeptons_etaSc[n];
+        self.eleExpMissingInnerHits = tree.selLeptons_eleExpMissingInnerHits[n];
+        self.eleooEmooP = tree.selLeptons_eleooEmooP[n];
+        self.dr03TkSumPt = tree.selLeptons_dr03TkSumPt[n];
+        self.eleEcalClusterIso = tree.selLeptons_eleEcalClusterIso[n];
+        self.eleHcalClusterIso = tree.selLeptons_eleHcalClusterIso[n];
+        self.miniIsoCharged = tree.selLeptons_miniIsoCharged[n];
+        self.miniIsoNeutral = tree.selLeptons_miniIsoNeutral[n];
+        self.mvaTTHjetPtRel = tree.selLeptons_mvaTTHjetPtRel[n];
+        self.mvaTTHjetNDauChargedMVASel = tree.selLeptons_mvaTTHjetNDauChargedMVASel[n];
+        self.uncalibratedPt = tree.selLeptons_uncalibratedPt[n];
+        self.SF_IsoLoose = tree.selLeptons_SF_IsoLoose[n];
+        self.SFerr_IsoLoose = tree.selLeptons_SFerr_IsoLoose[n];
+        self.SF_IsoTight = tree.selLeptons_SF_IsoTight[n];
+        self.SFerr_IsoTight = tree.selLeptons_SFerr_IsoTight[n];
+        self.SF_IdCutLoose = tree.selLeptons_SF_IdCutLoose[n];
+        self.SFerr_IdCutLoose = tree.selLeptons_SFerr_IdCutLoose[n];
+        self.SF_IdCutTight = tree.selLeptons_SF_IdCutTight[n];
+        self.SFerr_IdCutTight = tree.selLeptons_SFerr_IdCutTight[n];
+        self.SF_IdMVALoose = tree.selLeptons_SF_IdMVALoose[n];
+        self.SFerr_IdMVALoose = tree.selLeptons_SFerr_IdMVALoose[n];
+        self.SF_IdMVATight = tree.selLeptons_SF_IdMVATight[n];
+        self.SFerr_IdMVATight = tree.selLeptons_SFerr_IdMVATight[n];
+        self.SF_HLT_RunD4p3 = tree.selLeptons_SF_HLT_RunD4p3[n];
+        self.SFerr_HLT_RunD4p3 = tree.selLeptons_SFerr_HLT_RunD4p3[n];
+        self.SF_HLT_RunD4p2 = tree.selLeptons_SF_HLT_RunD4p2[n];
+        self.SFerr_HLT_RunD4p2 = tree.selLeptons_SFerr_HLT_RunD4p2[n];
+        self.SF_HLT_RunC = tree.selLeptons_SF_HLT_RunC[n];
+        self.SFerr_HLT_RunC = tree.selLeptons_SFerr_HLT_RunC[n];
+        self.Eff_HLT_RunD4p3 = tree.selLeptons_Eff_HLT_RunD4p3[n];
+        self.Efferr_HLT_RunD4p3 = tree.selLeptons_Efferr_HLT_RunD4p3[n];
+        self.Eff_HLT_RunD4p2 = tree.selLeptons_Eff_HLT_RunD4p2[n];
+        self.Efferr_HLT_RunD4p2 = tree.selLeptons_Efferr_HLT_RunD4p2[n];
+        self.Eff_HLT_RunC = tree.selLeptons_Eff_HLT_RunC[n];
+        self.Efferr_HLT_RunC = tree.selLeptons_Efferr_HLT_RunC[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nselLeptons", 0)
-        _charge = getattr(tree, "selLeptons_charge", [None]*n)
-        _tightId = getattr(tree, "selLeptons_tightId", [None]*n)
-        _eleCutIdCSA14_25ns_v1 = getattr(tree, "selLeptons_eleCutIdCSA14_25ns_v1", [None]*n)
-        _eleCutIdCSA14_50ns_v1 = getattr(tree, "selLeptons_eleCutIdCSA14_50ns_v1", [None]*n)
-        _eleCutIdSpring15_25ns_v1 = getattr(tree, "selLeptons_eleCutIdSpring15_25ns_v1", [None]*n)
-        _dxy = getattr(tree, "selLeptons_dxy", [None]*n)
-        _dz = getattr(tree, "selLeptons_dz", [None]*n)
-        _edxy = getattr(tree, "selLeptons_edxy", [None]*n)
-        _edz = getattr(tree, "selLeptons_edz", [None]*n)
-        _ip3d = getattr(tree, "selLeptons_ip3d", [None]*n)
-        _sip3d = getattr(tree, "selLeptons_sip3d", [None]*n)
-        _convVeto = getattr(tree, "selLeptons_convVeto", [None]*n)
-        _lostHits = getattr(tree, "selLeptons_lostHits", [None]*n)
-        _relIso03 = getattr(tree, "selLeptons_relIso03", [None]*n)
-        _relIso04 = getattr(tree, "selLeptons_relIso04", [None]*n)
-        _miniRelIso = getattr(tree, "selLeptons_miniRelIso", [None]*n)
-        _relIsoAn04 = getattr(tree, "selLeptons_relIsoAn04", [None]*n)
-        _tightCharge = getattr(tree, "selLeptons_tightCharge", [None]*n)
-        _mcMatchId = getattr(tree, "selLeptons_mcMatchId", [None]*n)
-        _mcMatchAny = getattr(tree, "selLeptons_mcMatchAny", [None]*n)
-        _mcMatchTau = getattr(tree, "selLeptons_mcMatchTau", [None]*n)
-        _mcPt = getattr(tree, "selLeptons_mcPt", [None]*n)
-        _mediumMuonId = getattr(tree, "selLeptons_mediumMuonId", [None]*n)
-        _pdgId = getattr(tree, "selLeptons_pdgId", [None]*n)
-        _pt = getattr(tree, "selLeptons_pt", [None]*n)
-        _eta = getattr(tree, "selLeptons_eta", [None]*n)
-        _phi = getattr(tree, "selLeptons_phi", [None]*n)
-        _mass = getattr(tree, "selLeptons_mass", [None]*n)
-        _looseIdSusy = getattr(tree, "selLeptons_looseIdSusy", [None]*n)
-        _looseIdPOG = getattr(tree, "selLeptons_looseIdPOG", [None]*n)
-        _chargedHadRelIso03 = getattr(tree, "selLeptons_chargedHadRelIso03", [None]*n)
-        _chargedHadRelIso04 = getattr(tree, "selLeptons_chargedHadRelIso04", [None]*n)
-        _eleSieie = getattr(tree, "selLeptons_eleSieie", [None]*n)
-        _eleDEta = getattr(tree, "selLeptons_eleDEta", [None]*n)
-        _eleDPhi = getattr(tree, "selLeptons_eleDPhi", [None]*n)
-        _eleHoE = getattr(tree, "selLeptons_eleHoE", [None]*n)
-        _eleMissingHits = getattr(tree, "selLeptons_eleMissingHits", [None]*n)
-        _eleChi2 = getattr(tree, "selLeptons_eleChi2", [None]*n)
-        _convVetoFull = getattr(tree, "selLeptons_convVetoFull", [None]*n)
-        _eleMVArawSpring15Trig = getattr(tree, "selLeptons_eleMVArawSpring15Trig", [None]*n)
-        _eleMVAIdSpring15Trig = getattr(tree, "selLeptons_eleMVAIdSpring15Trig", [None]*n)
-        _eleMVArawSpring15NonTrig = getattr(tree, "selLeptons_eleMVArawSpring15NonTrig", [None]*n)
-        _eleMVAIdSpring15NonTrig = getattr(tree, "selLeptons_eleMVAIdSpring15NonTrig", [None]*n)
-        _nStations = getattr(tree, "selLeptons_nStations", [None]*n)
-        _trkKink = getattr(tree, "selLeptons_trkKink", [None]*n)
-        _segmentCompatibility = getattr(tree, "selLeptons_segmentCompatibility", [None]*n)
-        _caloCompatibility = getattr(tree, "selLeptons_caloCompatibility", [None]*n)
-        _globalTrackChi2 = getattr(tree, "selLeptons_globalTrackChi2", [None]*n)
-        _nChamberHits = getattr(tree, "selLeptons_nChamberHits", [None]*n)
-        _isPFMuon = getattr(tree, "selLeptons_isPFMuon", [None]*n)
-        _isGlobalMuon = getattr(tree, "selLeptons_isGlobalMuon", [None]*n)
-        _isTrackerMuon = getattr(tree, "selLeptons_isTrackerMuon", [None]*n)
-        _pixelHits = getattr(tree, "selLeptons_pixelHits", [None]*n)
-        _trackerLayers = getattr(tree, "selLeptons_trackerLayers", [None]*n)
-        _pixelLayers = getattr(tree, "selLeptons_pixelLayers", [None]*n)
-        _mvaTTH = getattr(tree, "selLeptons_mvaTTH", [None]*n)
-        _jetOverlapIdx = getattr(tree, "selLeptons_jetOverlapIdx", [None]*n)
-        _jetPtRatio = getattr(tree, "selLeptons_jetPtRatio", [None]*n)
-        _jetBTagCSV = getattr(tree, "selLeptons_jetBTagCSV", [None]*n)
-        _jetDR = getattr(tree, "selLeptons_jetDR", [None]*n)
-        _mvaTTHjetPtRatio = getattr(tree, "selLeptons_mvaTTHjetPtRatio", [None]*n)
-        _mvaTTHjetBTagCSV = getattr(tree, "selLeptons_mvaTTHjetBTagCSV", [None]*n)
-        _mvaTTHjetDR = getattr(tree, "selLeptons_mvaTTHjetDR", [None]*n)
-        _pfRelIso03 = getattr(tree, "selLeptons_pfRelIso03", [None]*n)
-        _pfRelIso04 = getattr(tree, "selLeptons_pfRelIso04", [None]*n)
-        _etaSc = getattr(tree, "selLeptons_etaSc", [None]*n)
-        _eleExpMissingInnerHits = getattr(tree, "selLeptons_eleExpMissingInnerHits", [None]*n)
-        _eleooEmooP = getattr(tree, "selLeptons_eleooEmooP", [None]*n)
-        _dr03TkSumPt = getattr(tree, "selLeptons_dr03TkSumPt", [None]*n)
-        _eleEcalClusterIso = getattr(tree, "selLeptons_eleEcalClusterIso", [None]*n)
-        _eleHcalClusterIso = getattr(tree, "selLeptons_eleHcalClusterIso", [None]*n)
-        _miniIsoCharged = getattr(tree, "selLeptons_miniIsoCharged", [None]*n)
-        _miniIsoNeutral = getattr(tree, "selLeptons_miniIsoNeutral", [None]*n)
-        _mvaTTHjetPtRel = getattr(tree, "selLeptons_mvaTTHjetPtRel", [None]*n)
-        _mvaTTHjetNDauChargedMVASel = getattr(tree, "selLeptons_mvaTTHjetNDauChargedMVASel", [None]*n)
-        _uncalibratedPt = getattr(tree, "selLeptons_uncalibratedPt", [None]*n)
-        _SF_IsoLoose = getattr(tree, "selLeptons_SF_IsoLoose", [None]*n)
-        _SFerr_IsoLoose = getattr(tree, "selLeptons_SFerr_IsoLoose", [None]*n)
-        _SF_IsoTight = getattr(tree, "selLeptons_SF_IsoTight", [None]*n)
-        _SFerr_IsoTight = getattr(tree, "selLeptons_SFerr_IsoTight", [None]*n)
-        _SF_IdCutLoose = getattr(tree, "selLeptons_SF_IdCutLoose", [None]*n)
-        _SFerr_IdCutLoose = getattr(tree, "selLeptons_SFerr_IdCutLoose", [None]*n)
-        _SF_IdCutTight = getattr(tree, "selLeptons_SF_IdCutTight", [None]*n)
-        _SFerr_IdCutTight = getattr(tree, "selLeptons_SFerr_IdCutTight", [None]*n)
-        _SF_IdMVALoose = getattr(tree, "selLeptons_SF_IdMVALoose", [None]*n)
-        _SFerr_IdMVALoose = getattr(tree, "selLeptons_SFerr_IdMVALoose", [None]*n)
-        _SF_IdMVATight = getattr(tree, "selLeptons_SF_IdMVATight", [None]*n)
-        _SFerr_IdMVATight = getattr(tree, "selLeptons_SFerr_IdMVATight", [None]*n)
-        _SF_HLT_RunD4p3 = getattr(tree, "selLeptons_SF_HLT_RunD4p3", [None]*n)
-        _SFerr_HLT_RunD4p3 = getattr(tree, "selLeptons_SFerr_HLT_RunD4p3", [None]*n)
-        _SF_HLT_RunD4p2 = getattr(tree, "selLeptons_SF_HLT_RunD4p2", [None]*n)
-        _SFerr_HLT_RunD4p2 = getattr(tree, "selLeptons_SFerr_HLT_RunD4p2", [None]*n)
-        _SF_HLT_RunC = getattr(tree, "selLeptons_SF_HLT_RunC", [None]*n)
-        _SFerr_HLT_RunC = getattr(tree, "selLeptons_SFerr_HLT_RunC", [None]*n)
-        _Eff_HLT_RunD4p3 = getattr(tree, "selLeptons_Eff_HLT_RunD4p3", [None]*n)
-        _Efferr_HLT_RunD4p3 = getattr(tree, "selLeptons_Efferr_HLT_RunD4p3", [None]*n)
-        _Eff_HLT_RunD4p2 = getattr(tree, "selLeptons_Eff_HLT_RunD4p2", [None]*n)
-        _Efferr_HLT_RunD4p2 = getattr(tree, "selLeptons_Efferr_HLT_RunD4p2", [None]*n)
-        _Eff_HLT_RunC = getattr(tree, "selLeptons_Eff_HLT_RunC", [None]*n)
-        _Efferr_HLT_RunC = getattr(tree, "selLeptons_Efferr_HLT_RunC", [None]*n)
-        return [selLeptons(_charge[n], _tightId[n], _eleCutIdCSA14_25ns_v1[n], _eleCutIdCSA14_50ns_v1[n], _eleCutIdSpring15_25ns_v1[n], _dxy[n], _dz[n], _edxy[n], _edz[n], _ip3d[n], _sip3d[n], _convVeto[n], _lostHits[n], _relIso03[n], _relIso04[n], _miniRelIso[n], _relIsoAn04[n], _tightCharge[n], _mcMatchId[n], _mcMatchAny[n], _mcMatchTau[n], _mcPt[n], _mediumMuonId[n], _pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _looseIdSusy[n], _looseIdPOG[n], _chargedHadRelIso03[n], _chargedHadRelIso04[n], _eleSieie[n], _eleDEta[n], _eleDPhi[n], _eleHoE[n], _eleMissingHits[n], _eleChi2[n], _convVetoFull[n], _eleMVArawSpring15Trig[n], _eleMVAIdSpring15Trig[n], _eleMVArawSpring15NonTrig[n], _eleMVAIdSpring15NonTrig[n], _nStations[n], _trkKink[n], _segmentCompatibility[n], _caloCompatibility[n], _globalTrackChi2[n], _nChamberHits[n], _isPFMuon[n], _isGlobalMuon[n], _isTrackerMuon[n], _pixelHits[n], _trackerLayers[n], _pixelLayers[n], _mvaTTH[n], _jetOverlapIdx[n], _jetPtRatio[n], _jetBTagCSV[n], _jetDR[n], _mvaTTHjetPtRatio[n], _mvaTTHjetBTagCSV[n], _mvaTTHjetDR[n], _pfRelIso03[n], _pfRelIso04[n], _etaSc[n], _eleExpMissingInnerHits[n], _eleooEmooP[n], _dr03TkSumPt[n], _eleEcalClusterIso[n], _eleHcalClusterIso[n], _miniIsoCharged[n], _miniIsoNeutral[n], _mvaTTHjetPtRel[n], _mvaTTHjetNDauChargedMVASel[n], _uncalibratedPt[n], _SF_IsoLoose[n], _SFerr_IsoLoose[n], _SF_IsoTight[n], _SFerr_IsoTight[n], _SF_IdCutLoose[n], _SFerr_IdCutLoose[n], _SF_IdCutTight[n], _SFerr_IdCutTight[n], _SF_IdMVALoose[n], _SFerr_IdMVALoose[n], _SF_IdMVATight[n], _SFerr_IdMVATight[n], _SF_HLT_RunD4p3[n], _SFerr_HLT_RunD4p3[n], _SF_HLT_RunD4p2[n], _SFerr_HLT_RunD4p2[n], _SF_HLT_RunC[n], _SFerr_HLT_RunC[n], _Eff_HLT_RunD4p3[n], _Efferr_HLT_RunD4p3[n], _Eff_HLT_RunD4p2[n], _Efferr_HLT_RunD4p2[n], _Eff_HLT_RunC[n], _Efferr_HLT_RunC[n]) for n in range(n)]
-    def __init__(self, charge,tightId,eleCutIdCSA14_25ns_v1,eleCutIdCSA14_50ns_v1,eleCutIdSpring15_25ns_v1,dxy,dz,edxy,edz,ip3d,sip3d,convVeto,lostHits,relIso03,relIso04,miniRelIso,relIsoAn04,tightCharge,mcMatchId,mcMatchAny,mcMatchTau,mcPt,mediumMuonId,pdgId,pt,eta,phi,mass,looseIdSusy,looseIdPOG,chargedHadRelIso03,chargedHadRelIso04,eleSieie,eleDEta,eleDPhi,eleHoE,eleMissingHits,eleChi2,convVetoFull,eleMVArawSpring15Trig,eleMVAIdSpring15Trig,eleMVArawSpring15NonTrig,eleMVAIdSpring15NonTrig,nStations,trkKink,segmentCompatibility,caloCompatibility,globalTrackChi2,nChamberHits,isPFMuon,isGlobalMuon,isTrackerMuon,pixelHits,trackerLayers,pixelLayers,mvaTTH,jetOverlapIdx,jetPtRatio,jetBTagCSV,jetDR,mvaTTHjetPtRatio,mvaTTHjetBTagCSV,mvaTTHjetDR,pfRelIso03,pfRelIso04,etaSc,eleExpMissingInnerHits,eleooEmooP,dr03TkSumPt,eleEcalClusterIso,eleHcalClusterIso,miniIsoCharged,miniIsoNeutral,mvaTTHjetPtRel,mvaTTHjetNDauChargedMVASel,uncalibratedPt,SF_IsoLoose,SFerr_IsoLoose,SF_IsoTight,SFerr_IsoTight,SF_IdCutLoose,SFerr_IdCutLoose,SF_IdCutTight,SFerr_IdCutTight,SF_IdMVALoose,SFerr_IdMVALoose,SF_IdMVATight,SFerr_IdMVATight,SF_HLT_RunD4p3,SFerr_HLT_RunD4p3,SF_HLT_RunD4p2,SFerr_HLT_RunD4p2,SF_HLT_RunC,SFerr_HLT_RunC,Eff_HLT_RunD4p3,Efferr_HLT_RunD4p3,Eff_HLT_RunD4p2,Efferr_HLT_RunD4p2,Eff_HLT_RunC,Efferr_HLT_RunC):
-        self.charge = charge #
-        self.tightId = tightId #POG Tight ID (for electrons it's configured in the analyzer)
-        self.eleCutIdCSA14_25ns_v1 = eleCutIdCSA14_25ns_v1 #Electron cut-based id (POG CSA14_25ns_v1): 0=none, 1=veto, 2=loose, 3=medium, 4=tight
-        self.eleCutIdCSA14_50ns_v1 = eleCutIdCSA14_50ns_v1 #Electron cut-based id (POG CSA14_50ns_v1): 0=none, 1=veto, 2=loose, 3=medium, 4=tight
-        self.eleCutIdSpring15_25ns_v1 = eleCutIdSpring15_25ns_v1 #Electron cut-based id (POG Spring15_25ns_v1): 0=none, 1=veto, 2=loose, 3=medium, 4=tight
-        self.dxy = dxy #d_{xy} with respect to PV, in cm (with sign)
-        self.dz = dz #d_{z} with respect to PV, in cm (with sign)
-        self.edxy = edxy ##sigma(d_{xy}) with respect to PV, in cm
-        self.edz = edz ##sigma(d_{z}) with respect to PV, in cm
-        self.ip3d = ip3d #d_{3d} with respect to PV, in cm (absolute value)
-        self.sip3d = sip3d #S_{ip3d} with respect to PV (significance)
-        self.convVeto = convVeto #Conversion veto (always true for muons)
-        self.lostHits = lostHits #Number of lost hits on inner track
-        self.relIso03 = relIso03 #PF Rel Iso, R=0.3, pile-up corrected
-        self.relIso04 = relIso04 #PF Rel Iso, R=0.4, pile-up corrected
-        self.miniRelIso = miniRelIso #PF Rel miniRel, pile-up corrected
-        self.relIsoAn04 = relIsoAn04 #PF Activity Annulus, pile-up corrected
-        self.tightCharge = tightCharge #Tight charge criteria: for electrons, 2 if isGsfCtfScPixChargeConsistent, 1 if only isGsfScPixChargeConsistent, 0 otherwise; for muons, 2 if ptError/pt < 0.20, 0 otherwise 
-        self.mcMatchId = mcMatchId #Match to source from hard scatter (pdgId of heaviest particle in chain, 25 for H, 6 for t, 23/24 for W/Z), zero if non-prompt or fake
-        self.mcMatchAny = mcMatchAny #Match to any final state leptons: 0 if unmatched, 1 if light flavour (including prompt), 4 if charm, 5 if bottom
-        self.mcMatchTau = mcMatchTau #True if the leptons comes from a tau
-        self.mcPt = mcPt #p_{T} of associated gen lepton
-        self.mediumMuonId = mediumMuonId #Muon POG Medium id
-        self.pdgId = pdgId #
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        self.looseIdSusy = looseIdSusy #Loose ID for Susy ntuples (always true on selected leptons)
-        self.looseIdPOG = looseIdPOG #Loose ID for Susy ntuples (always true on selected leptons)
-        self.chargedHadRelIso03 = chargedHadRelIso03 #PF Rel Iso, R=0.3, charged hadrons only
-        self.chargedHadRelIso04 = chargedHadRelIso04 #PF Rel Iso, R=0.4, charged hadrons only
-        self.eleSieie = eleSieie #sigma IEtaIEta for electrons
-        self.eleDEta = eleDEta #delta eta for electrons
-        self.eleDPhi = eleDPhi #delta phi for electrons
-        self.eleHoE = eleHoE #H/E for electrons
-        self.eleMissingHits = eleMissingHits #Missing hits for electrons
-        self.eleChi2 = eleChi2 #Track chi squared for electrons' gsf tracks
-        self.convVetoFull = convVetoFull #Conv veto + no missing hits for electrons, always true for muons.
-        self.eleMVArawSpring15Trig = eleMVArawSpring15Trig #EGamma POG MVA ID for triggering electrons (raw MVA value, Spring15 training); 1 for muons
-        self.eleMVAIdSpring15Trig = eleMVAIdSpring15Trig #EGamma POG MVA ID for triggering electrons (0=none, 1=WP90, 2=WP80, Spring15 training); 1 for muons
-        self.eleMVArawSpring15NonTrig = eleMVArawSpring15NonTrig #EGamma POG MVA ID for non-triggering electrons (raw MVA value, Spring15 training); 1 for muons
-        self.eleMVAIdSpring15NonTrig = eleMVAIdSpring15NonTrig #EGamma POG MVA ID for non-triggering electrons (0=none, 1=WP90, 2=WP80, Spring15 training); 1 for muons
-        self.nStations = nStations #Number of matched muons stations (4 for electrons)
-        self.trkKink = trkKink #Tracker kink-finder
-        self.segmentCompatibility = segmentCompatibility #Segment compatibility
-        self.caloCompatibility = caloCompatibility #Calorimetric compatibility
-        self.globalTrackChi2 = globalTrackChi2 #Global track normalized chi2
-        self.nChamberHits = nChamberHits #Number of muon chamber hits (-1 for electrons)
-        self.isPFMuon = isPFMuon #1 if muon passes particle flow ID
-        self.isGlobalMuon = isGlobalMuon #1 if muon is global muon
-        self.isTrackerMuon = isTrackerMuon #1 if muon is tracker muon
-        self.pixelHits = pixelHits #Number of pixel hits (-1 for electrons)
-        self.trackerLayers = trackerLayers #Tracker Layers
-        self.pixelLayers = pixelLayers #Pixel Layers
-        self.mvaTTH = mvaTTH #Lepton MVA (ttH version)
-        self.jetOverlapIdx = jetOverlapIdx #index of jet with overlapping PF constituents. If idx>=1000, then idx = idx-1000 and refers to discarded jets.
-        self.jetPtRatio = jetPtRatio #pt(lepton)/pt(nearest jet)
-        self.jetBTagCSV = jetBTagCSV #btag of nearest jet
-        self.jetDR = jetDR #deltaR(lepton, nearest jet)
-        self.mvaTTHjetPtRatio = mvaTTHjetPtRatio #pt(lepton)/pt(nearest jet with pT > 25 GeV)
-        self.mvaTTHjetBTagCSV = mvaTTHjetBTagCSV #btag of nearest jet with pT > 25 GeV
-        self.mvaTTHjetDR = mvaTTHjetDR #deltaR(lepton, nearest jet with pT > 25 GeV)
-        self.pfRelIso03 = pfRelIso03 #0.3 particle based iso
-        self.pfRelIso04 = pfRelIso04 #0.4 particle based iso
-        self.etaSc = etaSc #Electron supercluster pseudorapidity
-        self.eleExpMissingInnerHits = eleExpMissingInnerHits #Electron expected missing inner hits
-        self.eleooEmooP = eleooEmooP #Electron 1/E - 1/P
-        self.dr03TkSumPt = dr03TkSumPt #Electron track sum pt
-        self.eleEcalClusterIso = eleEcalClusterIso #Electron ecal cluster iso
-        self.eleHcalClusterIso = eleHcalClusterIso #Electron hcal cluster iso
-        self.miniIsoCharged = miniIsoCharged #PF miniIso (charged) in GeV
-        self.miniIsoNeutral = miniIsoNeutral #PF miniIso (neutral) in GeV
-        self.mvaTTHjetPtRel = mvaTTHjetPtRel #jetPtRel variable used by ttH multilepton MVA
-        self.mvaTTHjetNDauChargedMVASel = mvaTTHjetNDauChargedMVASel #jetNDauChargedMVASel variable used by ttH multilepton MVA
-        self.uncalibratedPt = uncalibratedPt #Electron uncalibrated pt
-        self.SF_IsoLoose = SF_IsoLoose #SF for lepton IsoLoose
-        self.SFerr_IsoLoose = SFerr_IsoLoose #SF error for lepton IsoLoose
-        self.SF_IsoTight = SF_IsoTight #SF for lepton IsoTight
-        self.SFerr_IsoTight = SFerr_IsoTight #SF error for lepton IsoTight
-        self.SF_IdCutLoose = SF_IdCutLoose #SF for lepton IdCutLoose
-        self.SFerr_IdCutLoose = SFerr_IdCutLoose #SF error for lepton IdCutLoose
-        self.SF_IdCutTight = SF_IdCutTight #SF for lepton IdCutTight
-        self.SFerr_IdCutTight = SFerr_IdCutTight #SF error for lepton IdCutTight
-        self.SF_IdMVALoose = SF_IdMVALoose #SF for lepton IdMVALoose
-        self.SFerr_IdMVALoose = SFerr_IdMVALoose #SF error for lepton IdMVALoose
-        self.SF_IdMVATight = SF_IdMVATight #SF for lepton IdMVATight
-        self.SFerr_IdMVATight = SFerr_IdMVATight #SF error for lepton IdMVATight
-        self.SF_HLT_RunD4p3 = SF_HLT_RunD4p3 #SF for lepton HLT_RunD4p3
-        self.SFerr_HLT_RunD4p3 = SFerr_HLT_RunD4p3 #SF error for lepton HLT_RunD4p3
-        self.SF_HLT_RunD4p2 = SF_HLT_RunD4p2 #SF for lepton HLT_RunD4p2
-        self.SFerr_HLT_RunD4p2 = SFerr_HLT_RunD4p2 #SF error for lepton HLT_RunD4p2
-        self.SF_HLT_RunC = SF_HLT_RunC #SF for lepton HLT_RunC
-        self.SFerr_HLT_RunC = SFerr_HLT_RunC #SF error for lepton HLT_RunC
-        self.Eff_HLT_RunD4p3 = Eff_HLT_RunD4p3 #SF for lepton HLT_RunD4p3
-        self.Efferr_HLT_RunD4p3 = Efferr_HLT_RunD4p3 #SF error for lepton HLT_RunD4p3
-        self.Eff_HLT_RunD4p2 = Eff_HLT_RunD4p2 #SF for lepton HLT_RunD4p2
-        self.Efferr_HLT_RunD4p2 = Efferr_HLT_RunD4p2 #SF error for lepton HLT_RunD4p2
-        self.Eff_HLT_RunC = Eff_HLT_RunC #SF for lepton HLT_RunC
-        self.Efferr_HLT_RunC = Efferr_HLT_RunC #SF error for lepton HLT_RunC
+        return [selLeptons(tree, i) for i in range(tree.nselLeptons)]
 class trgObjects_hltPFMET90:
-    """
-    
-    """
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_hltPFMET90", 0)
-        return [trgObjects_hltPFMET90() for n in range(n)]
+        return [trgObjects_hltPFMET90(tree, i) for i in range(tree.ntrgObjects_hltPFMET90)]
 class trgObjects_hltQuadJet15:
-    """
-    
-    """
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_hltQuadJet15", 0)
-        return [trgObjects_hltQuadJet15() for n in range(n)]
+        return [trgObjects_hltQuadJet15(tree, i) for i in range(tree.ntrgObjects_hltQuadJet15)]
 class TauGood:
-    """
-    Taus after the preselection
-    """
+    def __init__(self, tree, n):
+        self.charge = tree.TauGood_charge[n];
+        self.decayMode = tree.TauGood_decayMode[n];
+        self.idDecayMode = tree.TauGood_idDecayMode[n];
+        self.idDecayModeNewDMs = tree.TauGood_idDecayModeNewDMs[n];
+        self.dxy = tree.TauGood_dxy[n];
+        self.dz = tree.TauGood_dz[n];
+        self.idMVArun2 = tree.TauGood_idMVArun2[n];
+        self.rawMVArun2 = tree.TauGood_rawMVArun2[n];
+        self.idMVArun2dR03 = tree.TauGood_idMVArun2dR03[n];
+        self.rawMVArun2dR03 = tree.TauGood_rawMVArun2dR03[n];
+        self.idMVArun2NewDM = tree.TauGood_idMVArun2NewDM[n];
+        self.rawMVArun2NewDM = tree.TauGood_rawMVArun2NewDM[n];
+        self.idCI3hit = tree.TauGood_idCI3hit[n];
+        self.idAntiMu = tree.TauGood_idAntiMu[n];
+        self.idAntiErun2 = tree.TauGood_idAntiErun2[n];
+        self.isoCI3hit = tree.TauGood_isoCI3hit[n];
+        self.photonOutsideSigCone = tree.TauGood_photonOutsideSigCone[n];
+        self.mcMatchId = tree.TauGood_mcMatchId[n];
+        self.pdgId = tree.TauGood_pdgId[n];
+        self.pt = tree.TauGood_pt[n];
+        self.eta = tree.TauGood_eta[n];
+        self.phi = tree.TauGood_phi[n];
+        self.mass = tree.TauGood_mass[n];
+        self.idxJetMatch = tree.TauGood_idxJetMatch[n];
+        self.genMatchType = tree.TauGood_genMatchType[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nTauGood", 0)
-        _charge = getattr(tree, "TauGood_charge", [None]*n)
-        _decayMode = getattr(tree, "TauGood_decayMode", [None]*n)
-        _idDecayMode = getattr(tree, "TauGood_idDecayMode", [None]*n)
-        _idDecayModeNewDMs = getattr(tree, "TauGood_idDecayModeNewDMs", [None]*n)
-        _dxy = getattr(tree, "TauGood_dxy", [None]*n)
-        _dz = getattr(tree, "TauGood_dz", [None]*n)
-        _idMVA = getattr(tree, "TauGood_idMVA", [None]*n)
-        _idMVArun2 = getattr(tree, "TauGood_idMVArun2", [None]*n)
-        _rawMVArun2 = getattr(tree, "TauGood_rawMVArun2", [None]*n)
-        _idMVArun2dR03 = getattr(tree, "TauGood_idMVArun2dR03", [None]*n)
-        _rawMVArun2dR03 = getattr(tree, "TauGood_rawMVArun2dR03", [None]*n)
-        _idMVANewDM = getattr(tree, "TauGood_idMVANewDM", [None]*n)
-        _idMVArun2NewDM = getattr(tree, "TauGood_idMVArun2NewDM", [None]*n)
-        _rawMVArun2NewDM = getattr(tree, "TauGood_rawMVArun2NewDM", [None]*n)
-        _idCI3hit = getattr(tree, "TauGood_idCI3hit", [None]*n)
-        _idCI3hitdR03 = getattr(tree, "TauGood_idCI3hitdR03", [None]*n)
-        _idAntiMu = getattr(tree, "TauGood_idAntiMu", [None]*n)
-        _idAntiE = getattr(tree, "TauGood_idAntiE", [None]*n)
-        _idAntiErun2 = getattr(tree, "TauGood_idAntiErun2", [None]*n)
-        _isoCI3hit = getattr(tree, "TauGood_isoCI3hit", [None]*n)
-        _photonOutsideSigCone = getattr(tree, "TauGood_photonOutsideSigCone", [None]*n)
-        _mcMatchId = getattr(tree, "TauGood_mcMatchId", [None]*n)
-        _pdgId = getattr(tree, "TauGood_pdgId", [None]*n)
-        _pt = getattr(tree, "TauGood_pt", [None]*n)
-        _eta = getattr(tree, "TauGood_eta", [None]*n)
-        _phi = getattr(tree, "TauGood_phi", [None]*n)
-        _mass = getattr(tree, "TauGood_mass", [None]*n)
-        _idxJetMatch = getattr(tree, "TauGood_idxJetMatch", [None]*n)
-        _genMatchType = getattr(tree, "TauGood_genMatchType", [None]*n)
-        return [TauGood(_charge[n], _decayMode[n], _idDecayMode[n], _idDecayModeNewDMs[n], _dxy[n], _dz[n], _idMVA[n], _idMVArun2[n], _rawMVArun2[n], _idMVArun2dR03[n], _rawMVArun2dR03[n], _idMVANewDM[n], _idMVArun2NewDM[n], _rawMVArun2NewDM[n], _idCI3hit[n], _idCI3hitdR03[n], _idAntiMu[n], _idAntiE[n], _idAntiErun2[n], _isoCI3hit[n], _photonOutsideSigCone[n], _mcMatchId[n], _pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _idxJetMatch[n], _genMatchType[n]) for n in range(n)]
-    def __init__(self, charge,decayMode,idDecayMode,idDecayModeNewDMs,dxy,dz,idMVA,idMVArun2,rawMVArun2,idMVArun2dR03,rawMVArun2dR03,idMVANewDM,idMVArun2NewDM,rawMVArun2NewDM,idCI3hit,idCI3hitdR03,idAntiMu,idAntiE,idAntiErun2,isoCI3hit,photonOutsideSigCone,mcMatchId,pdgId,pt,eta,phi,mass,idxJetMatch,genMatchType):
-        self.charge = charge #
-        self.decayMode = decayMode #
-        self.idDecayMode = idDecayMode #
-        self.idDecayModeNewDMs = idDecayModeNewDMs #
-        self.dxy = dxy #d_{xy} of lead track with respect to PV, in cm (with sign)
-        self.dz = dz #d_{z} of lead track with respect to PV, in cm (with sign)
-        self.idMVA = idMVA #1,2,3,4,5,6 if the tau passes the very loose to very very tight WP of the MVA3oldDMwLT discriminator
-        self.idMVArun2 = idMVArun2 #1,2,3,4,5,6 if the tau passes the very loose to very very tight WP of the MVArun2v1DBoldDMwLT discriminator
-        self.rawMVArun2 = rawMVArun2 #byIsolationMVArun2v1DBoldDMwLT raw output discriminator
-        self.idMVArun2dR03 = idMVArun2dR03 #1,2,3,4,5,6 if the tau passes the very loose to very very tight WP of the MVArun2v1DBdR03oldDMwLT discriminator
-        self.rawMVArun2dR03 = rawMVArun2dR03 #byIsolationMVArun2v1DBdR03oldDMwLT raw output discriminator
-        self.idMVANewDM = idMVANewDM #1,2,3,4,5,6 if the tau passes the very loose to very very tight WP of the MVA3newDMwLT discriminator
-        self.idMVArun2NewDM = idMVArun2NewDM #1,2,3,4,5,6 if the tau passes the very loose to very very tight WP of the MVArun2v1DBnewDMwLT discriminator
-        self.rawMVArun2NewDM = rawMVArun2NewDM #byIsolationMVArun2v1DBnewDMwLT raw output discriminator
-        self.idCI3hit = idCI3hit #1,2,3 if the tau passes the loose, medium, tight WP of the By<X>CombinedIsolationDBSumPtCorr3Hits discriminator
-        self.idCI3hitdR03 = idCI3hitdR03 #1,2,3 if the tau passes the loose, medium, tight WP of the By<X>CombinedIsolationDeltaBetaCorr3HitsdR03 discriminator
-        self.idAntiMu = idAntiMu #1,2 if the tau passes the loose/tight WP of the againstMuon<X>3 discriminator
-        self.idAntiE = idAntiE #1,2,3,4,5 if the tau passes the v loose, loose, medium, tight, v tight WP of the againstElectron<X>MVA5 discriminator
-        self.idAntiErun2 = idAntiErun2 #1,2,3,4,5 if the tau passes the v loose, loose, medium, tight, v tight WP of the againstElectron<X>MVA6 discriminator
-        self.isoCI3hit = isoCI3hit #byCombinedIsolationDeltaBetaCorrRaw3Hits raw output discriminator
-        self.photonOutsideSigCone = photonOutsideSigCone #photonPtSumOutsideSignalCone raw output discriminator
-        self.mcMatchId = mcMatchId #Match to source from hard scatter (pdgId of heaviest particle in chain, 25 for H, 6 for t, 23/24 for W/Z), zero if non-prompt or fake
-        self.pdgId = pdgId #
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        self.idxJetMatch = idxJetMatch #index of the matching jet
-        self.genMatchType = genMatchType #..FILLME PLEASE..
+        return [TauGood(tree, i) for i in range(tree.nTauGood)]
 class hJidx:
-    """
-    Higgs jet indices
-    """
+    def __init__(self, tree, n):
+        self.hJidx = tree.hJidx[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nhJidx", 0)
-        _hJidx = getattr(tree, "hJidx", [None]*n);
-        return [hJidx(_hJidx[n]) for n in range(n)]
-    def __init__(self, hJidx):
-        self.hJidx = hJidx #Higgs jet indices
+        return [hJidx(tree, i) for i in range(tree.nhJidx)]
 class trgObjects_hltTripleCSV0p67:
-    """
-    
-    """
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_hltTripleCSV0p67", 0)
-        return [trgObjects_hltTripleCSV0p67() for n in range(n)]
+        return [trgObjects_hltTripleCSV0p67(tree, i) for i in range(tree.ntrgObjects_hltTripleCSV0p67)]
 class GenLepRecovered:
-    """
-    Generated leptons from recovered W/Z decays
-    """
+    def __init__(self, tree, n):
+        self.pdgId = tree.GenLepRecovered_pdgId[n];
+        self.pt = tree.GenLepRecovered_pt[n];
+        self.eta = tree.GenLepRecovered_eta[n];
+        self.phi = tree.GenLepRecovered_phi[n];
+        self.mass = tree.GenLepRecovered_mass[n];
+        self.charge = tree.GenLepRecovered_charge[n];
+        self.status = tree.GenLepRecovered_status[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nGenLepRecovered", 0)
-        _pdgId = getattr(tree, "GenLepRecovered_pdgId", [None]*n)
-        _pt = getattr(tree, "GenLepRecovered_pt", [None]*n)
-        _eta = getattr(tree, "GenLepRecovered_eta", [None]*n)
-        _phi = getattr(tree, "GenLepRecovered_phi", [None]*n)
-        _mass = getattr(tree, "GenLepRecovered_mass", [None]*n)
-        _charge = getattr(tree, "GenLepRecovered_charge", [None]*n)
-        _status = getattr(tree, "GenLepRecovered_status", [None]*n)
-        return [GenLepRecovered(_pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _charge[n], _status[n]) for n in range(n)]
-    def __init__(self, pdgId,pt,eta,phi,mass,charge,status):
-        self.pdgId = pdgId #
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        self.charge = charge #
-        self.status = status #
+        return [GenLepRecovered(tree, i) for i in range(tree.nGenLepRecovered)]
 class FatjetCA15softdropz2b1:
-    """
-    CA, R=1.5, pT > 200 GeV, softdrop zcut=0.2, beta=1
-    """
+    def __init__(self, tree, n):
+        self.pt = tree.FatjetCA15softdropz2b1_pt[n];
+        self.eta = tree.FatjetCA15softdropz2b1_eta[n];
+        self.phi = tree.FatjetCA15softdropz2b1_phi[n];
+        self.mass = tree.FatjetCA15softdropz2b1_mass[n];
+        self.tau1 = tree.FatjetCA15softdropz2b1_tau1[n];
+        self.tau2 = tree.FatjetCA15softdropz2b1_tau2[n];
+        self.tau3 = tree.FatjetCA15softdropz2b1_tau3[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nFatjetCA15softdropz2b1", 0)
-        _pt = getattr(tree, "FatjetCA15softdropz2b1_pt", [None]*n)
-        _eta = getattr(tree, "FatjetCA15softdropz2b1_eta", [None]*n)
-        _phi = getattr(tree, "FatjetCA15softdropz2b1_phi", [None]*n)
-        _mass = getattr(tree, "FatjetCA15softdropz2b1_mass", [None]*n)
-        _tau1 = getattr(tree, "FatjetCA15softdropz2b1_tau1", [None]*n)
-        _tau2 = getattr(tree, "FatjetCA15softdropz2b1_tau2", [None]*n)
-        _tau3 = getattr(tree, "FatjetCA15softdropz2b1_tau3", [None]*n)
-        return [FatjetCA15softdropz2b1(_pt[n], _eta[n], _phi[n], _mass[n], _tau1[n], _tau2[n], _tau3[n]) for n in range(n)]
-    def __init__(self, pt,eta,phi,mass,tau1,tau2,tau3):
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        self.tau1 = tau1 #Nsubjettiness (1 axis)
-        self.tau2 = tau2 #Nsubjettiness (2 axes)
-        self.tau3 = tau3 #Nsubjettiness (3 axes)
+        return [FatjetCA15softdropz2b1(tree, i) for i in range(tree.nFatjetCA15softdropz2b1)]
 class GenStatus2bHad:
-    """
-    Generated Status 2 b Hadrons
-    """
+    def __init__(self, tree, n):
+        self.pdgId = tree.GenStatus2bHad_pdgId[n];
+        self.pt = tree.GenStatus2bHad_pt[n];
+        self.eta = tree.GenStatus2bHad_eta[n];
+        self.phi = tree.GenStatus2bHad_phi[n];
+        self.mass = tree.GenStatus2bHad_mass[n];
+        self.charge = tree.GenStatus2bHad_charge[n];
+        self.status = tree.GenStatus2bHad_status[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nGenStatus2bHad", 0)
-        _pdgId = getattr(tree, "GenStatus2bHad_pdgId", [None]*n)
-        _pt = getattr(tree, "GenStatus2bHad_pt", [None]*n)
-        _eta = getattr(tree, "GenStatus2bHad_eta", [None]*n)
-        _phi = getattr(tree, "GenStatus2bHad_phi", [None]*n)
-        _mass = getattr(tree, "GenStatus2bHad_mass", [None]*n)
-        _charge = getattr(tree, "GenStatus2bHad_charge", [None]*n)
-        _status = getattr(tree, "GenStatus2bHad_status", [None]*n)
-        return [GenStatus2bHad(_pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _charge[n], _status[n]) for n in range(n)]
-    def __init__(self, pdgId,pt,eta,phi,mass,charge,status):
-        self.pdgId = pdgId #
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        self.charge = charge #
-        self.status = status #
+        return [GenStatus2bHad(tree, i) for i in range(tree.nGenStatus2bHad)]
 class trgObjects_hltTripleJet50:
-    """
-    
-    """
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_hltTripleJet50", 0)
-        return [trgObjects_hltTripleJet50() for n in range(n)]
+        return [trgObjects_hltTripleJet50(tree, i) for i in range(tree.ntrgObjects_hltTripleJet50)]
 class trgObjects_hltVBFPFJetCSVSortedMqq460Detaqq4p1:
-    """
-    
-    """
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_hltVBFPFJetCSVSortedMqq460Detaqq4p1", 0)
-        return [trgObjects_hltVBFPFJetCSVSortedMqq460Detaqq4p1() for n in range(n)]
+        return [trgObjects_hltVBFPFJetCSVSortedMqq460Detaqq4p1(tree, i) for i in range(tree.ntrgObjects_hltVBFPFJetCSVSortedMqq460Detaqq4p1)]
 class httCandidates:
-    """
-    OptimalR HEPTopTagger Candidates
-    """
+    def __init__(self, tree, n):
+        self.pt = tree.httCandidates_pt[n];
+        self.eta = tree.httCandidates_eta[n];
+        self.phi = tree.httCandidates_phi[n];
+        self.mass = tree.httCandidates_mass[n];
+        self.ptcal = tree.httCandidates_ptcal[n];
+        self.etacal = tree.httCandidates_etacal[n];
+        self.phical = tree.httCandidates_phical[n];
+        self.masscal = tree.httCandidates_masscal[n];
+        self.fRec = tree.httCandidates_fRec[n];
+        self.Ropt = tree.httCandidates_Ropt[n];
+        self.RoptCalc = tree.httCandidates_RoptCalc[n];
+        self.ptForRoptCalc = tree.httCandidates_ptForRoptCalc[n];
+        self.sjW1ptcal = tree.httCandidates_sjW1ptcal[n];
+        self.sjW1pt = tree.httCandidates_sjW1pt[n];
+        self.sjW1eta = tree.httCandidates_sjW1eta[n];
+        self.sjW1phi = tree.httCandidates_sjW1phi[n];
+        self.sjW1masscal = tree.httCandidates_sjW1masscal[n];
+        self.sjW1mass = tree.httCandidates_sjW1mass[n];
+        self.sjW1btag = tree.httCandidates_sjW1btag[n];
+        self.sjW2ptcal = tree.httCandidates_sjW2ptcal[n];
+        self.sjW2pt = tree.httCandidates_sjW2pt[n];
+        self.sjW2eta = tree.httCandidates_sjW2eta[n];
+        self.sjW2phi = tree.httCandidates_sjW2phi[n];
+        self.sjW2masscal = tree.httCandidates_sjW2masscal[n];
+        self.sjW2mass = tree.httCandidates_sjW2mass[n];
+        self.sjW2btag = tree.httCandidates_sjW2btag[n];
+        self.sjNonWptcal = tree.httCandidates_sjNonWptcal[n];
+        self.sjNonWpt = tree.httCandidates_sjNonWpt[n];
+        self.sjNonWeta = tree.httCandidates_sjNonWeta[n];
+        self.sjNonWphi = tree.httCandidates_sjNonWphi[n];
+        self.sjNonWmasscal = tree.httCandidates_sjNonWmasscal[n];
+        self.sjNonWmass = tree.httCandidates_sjNonWmass[n];
+        self.sjNonWbtag = tree.httCandidates_sjNonWbtag[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nhttCandidates", 0)
-        _pt = getattr(tree, "httCandidates_pt", [None]*n)
-        _eta = getattr(tree, "httCandidates_eta", [None]*n)
-        _phi = getattr(tree, "httCandidates_phi", [None]*n)
-        _mass = getattr(tree, "httCandidates_mass", [None]*n)
-        _ptcal = getattr(tree, "httCandidates_ptcal", [None]*n)
-        _etacal = getattr(tree, "httCandidates_etacal", [None]*n)
-        _phical = getattr(tree, "httCandidates_phical", [None]*n)
-        _masscal = getattr(tree, "httCandidates_masscal", [None]*n)
-        _fRec = getattr(tree, "httCandidates_fRec", [None]*n)
-        _Ropt = getattr(tree, "httCandidates_Ropt", [None]*n)
-        _RoptCalc = getattr(tree, "httCandidates_RoptCalc", [None]*n)
-        _ptForRoptCalc = getattr(tree, "httCandidates_ptForRoptCalc", [None]*n)
-        _sjW1ptcal = getattr(tree, "httCandidates_sjW1ptcal", [None]*n)
-        _sjW1pt = getattr(tree, "httCandidates_sjW1pt", [None]*n)
-        _sjW1eta = getattr(tree, "httCandidates_sjW1eta", [None]*n)
-        _sjW1phi = getattr(tree, "httCandidates_sjW1phi", [None]*n)
-        _sjW1masscal = getattr(tree, "httCandidates_sjW1masscal", [None]*n)
-        _sjW1mass = getattr(tree, "httCandidates_sjW1mass", [None]*n)
-        _sjW1btag = getattr(tree, "httCandidates_sjW1btag", [None]*n)
-        _sjW2ptcal = getattr(tree, "httCandidates_sjW2ptcal", [None]*n)
-        _sjW2pt = getattr(tree, "httCandidates_sjW2pt", [None]*n)
-        _sjW2eta = getattr(tree, "httCandidates_sjW2eta", [None]*n)
-        _sjW2phi = getattr(tree, "httCandidates_sjW2phi", [None]*n)
-        _sjW2masscal = getattr(tree, "httCandidates_sjW2masscal", [None]*n)
-        _sjW2mass = getattr(tree, "httCandidates_sjW2mass", [None]*n)
-        _sjW2btag = getattr(tree, "httCandidates_sjW2btag", [None]*n)
-        _sjNonWptcal = getattr(tree, "httCandidates_sjNonWptcal", [None]*n)
-        _sjNonWpt = getattr(tree, "httCandidates_sjNonWpt", [None]*n)
-        _sjNonWeta = getattr(tree, "httCandidates_sjNonWeta", [None]*n)
-        _sjNonWphi = getattr(tree, "httCandidates_sjNonWphi", [None]*n)
-        _sjNonWmasscal = getattr(tree, "httCandidates_sjNonWmasscal", [None]*n)
-        _sjNonWmass = getattr(tree, "httCandidates_sjNonWmass", [None]*n)
-        _sjNonWbtag = getattr(tree, "httCandidates_sjNonWbtag", [None]*n)
-        return [httCandidates(_pt[n], _eta[n], _phi[n], _mass[n], _ptcal[n], _etacal[n], _phical[n], _masscal[n], _fRec[n], _Ropt[n], _RoptCalc[n], _ptForRoptCalc[n], _sjW1ptcal[n], _sjW1pt[n], _sjW1eta[n], _sjW1phi[n], _sjW1masscal[n], _sjW1mass[n], _sjW1btag[n], _sjW2ptcal[n], _sjW2pt[n], _sjW2eta[n], _sjW2phi[n], _sjW2masscal[n], _sjW2mass[n], _sjW2btag[n], _sjNonWptcal[n], _sjNonWpt[n], _sjNonWeta[n], _sjNonWphi[n], _sjNonWmasscal[n], _sjNonWmass[n], _sjNonWbtag[n]) for n in range(n)]
-    def __init__(self, pt,eta,phi,mass,ptcal,etacal,phical,masscal,fRec,Ropt,RoptCalc,ptForRoptCalc,sjW1ptcal,sjW1pt,sjW1eta,sjW1phi,sjW1masscal,sjW1mass,sjW1btag,sjW2ptcal,sjW2pt,sjW2eta,sjW2phi,sjW2masscal,sjW2mass,sjW2btag,sjNonWptcal,sjNonWpt,sjNonWeta,sjNonWphi,sjNonWmasscal,sjNonWmass,sjNonWbtag):
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        self.ptcal = ptcal #pT (calibrated)
-        self.etacal = etacal #eta (calibrated)
-        self.phical = phical #phi (calibrated)
-        self.masscal = masscal #mass (calibrated)
-        self.fRec = fRec #relative W width
-        self.Ropt = Ropt #optimal value of R
-        self.RoptCalc = RoptCalc #expected value of optimal R
-        self.ptForRoptCalc = ptForRoptCalc #pT used for calculation of RoptCalc
-        self.sjW1ptcal = sjW1ptcal #Leading W Subjet pT (calibrated)
-        self.sjW1pt = sjW1pt #Leading W Subjet pT
-        self.sjW1eta = sjW1eta #Leading W Subjet eta
-        self.sjW1phi = sjW1phi #Leading W Subjet phi
-        self.sjW1masscal = sjW1masscal #Leading W Subjet mass (calibrated)
-        self.sjW1mass = sjW1mass #Leading W Subjet mass
-        self.sjW1btag = sjW1btag #Leading W Subjet btag
-        self.sjW2ptcal = sjW2ptcal #Second Subjet pT (calibrated)
-        self.sjW2pt = sjW2pt #Second Subjet pT
-        self.sjW2eta = sjW2eta #Second Subjet eta
-        self.sjW2phi = sjW2phi #Second Subjet phi
-        self.sjW2masscal = sjW2masscal #Second Subjet mass (calibrated)
-        self.sjW2mass = sjW2mass #Second Subjet mass
-        self.sjW2btag = sjW2btag #Second Subjet btag
-        self.sjNonWptcal = sjNonWptcal #Non-W Subjet pT (calibrated)
-        self.sjNonWpt = sjNonWpt #Non-W Subjet pT
-        self.sjNonWeta = sjNonWeta #Non-W Subjet eta
-        self.sjNonWphi = sjNonWphi #Non-W Subjet phi
-        self.sjNonWmasscal = sjNonWmasscal #Non-W Subjet mass (calibrated)
-        self.sjNonWmass = sjNonWmass #Non-W Subjet mass
-        self.sjNonWbtag = sjNonWbtag #Non-W Subjet btag
+        return [httCandidates(tree, i) for i in range(tree.nhttCandidates)]
 class GenTaus:
-    """
-    Generated taus
-    """
+    def __init__(self, tree, n):
+        self.pdgId = tree.GenTaus_pdgId[n];
+        self.pt = tree.GenTaus_pt[n];
+        self.eta = tree.GenTaus_eta[n];
+        self.phi = tree.GenTaus_phi[n];
+        self.mass = tree.GenTaus_mass[n];
+        self.charge = tree.GenTaus_charge[n];
+        self.status = tree.GenTaus_status[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nGenTaus", 0)
-        _pdgId = getattr(tree, "GenTaus_pdgId", [None]*n)
-        _pt = getattr(tree, "GenTaus_pt", [None]*n)
-        _eta = getattr(tree, "GenTaus_eta", [None]*n)
-        _phi = getattr(tree, "GenTaus_phi", [None]*n)
-        _mass = getattr(tree, "GenTaus_mass", [None]*n)
-        _charge = getattr(tree, "GenTaus_charge", [None]*n)
-        _status = getattr(tree, "GenTaus_status", [None]*n)
-        return [GenTaus(_pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _charge[n], _status[n]) for n in range(n)]
-    def __init__(self, pdgId,pt,eta,phi,mass,charge,status):
-        self.pdgId = pdgId #
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        self.charge = charge #
-        self.status = status #
+        return [GenTaus(tree, i) for i in range(tree.nGenTaus)]
 class trgObjects_hltMHT70:
-    """
-    
-    """
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_hltMHT70", 0)
-        return [trgObjects_hltMHT70() for n in range(n)]
+        return [trgObjects_hltMHT70(tree, i) for i in range(tree.ntrgObjects_hltMHT70)]
 class Jet:
-    """
-    Cental+fwd jets after full selection and cleaning, sorted by b-tag
-    """
+    def __init__(self, tree, n):
+        self.id = tree.Jet_id[n];
+        self.puId = tree.Jet_puId[n];
+        self.btagCSV = tree.Jet_btagCSV[n];
+        self.btagCMVA = tree.Jet_btagCMVA[n];
+        self.rawPt = tree.Jet_rawPt[n];
+        self.mcPt = tree.Jet_mcPt[n];
+        self.mcFlavour = tree.Jet_mcFlavour[n];
+        self.partonFlavour = tree.Jet_partonFlavour[n];
+        self.hadronFlavour = tree.Jet_hadronFlavour[n];
+        self.mcMatchId = tree.Jet_mcMatchId[n];
+        self.corr_JECUp = tree.Jet_corr_JECUp[n];
+        self.corr_JECDown = tree.Jet_corr_JECDown[n];
+        self.corr = tree.Jet_corr[n];
+        self.corr_JERUp = tree.Jet_corr_JERUp[n];
+        self.corr_JERDown = tree.Jet_corr_JERDown[n];
+        self.corr_JER = tree.Jet_corr_JER[n];
+        self.pt = tree.Jet_pt[n];
+        self.eta = tree.Jet_eta[n];
+        self.phi = tree.Jet_phi[n];
+        self.mass = tree.Jet_mass[n];
+        self.rawPtAfterSmearing = tree.Jet_rawPtAfterSmearing[n];
+        self.idxFirstTauMatch = tree.Jet_idxFirstTauMatch[n];
+        self.heppyFlavour = tree.Jet_heppyFlavour[n];
+        self.ctagVsL = tree.Jet_ctagVsL[n];
+        self.ctagVsB = tree.Jet_ctagVsB[n];
+        self.btagBDT = tree.Jet_btagBDT[n];
+        self.btagProb = tree.Jet_btagProb[n];
+        self.btagBProb = tree.Jet_btagBProb[n];
+        self.btagSoftEl = tree.Jet_btagSoftEl[n];
+        self.btagSoftMu = tree.Jet_btagSoftMu[n];
+        self.btagnew = tree.Jet_btagnew[n];
+        self.btagCSVV0 = tree.Jet_btagCSVV0[n];
+        self.btagCMVAV2 = tree.Jet_btagCMVAV2[n];
+        self.chHEF = tree.Jet_chHEF[n];
+        self.neHEF = tree.Jet_neHEF[n];
+        self.chEmEF = tree.Jet_chEmEF[n];
+        self.neEmEF = tree.Jet_neEmEF[n];
+        self.muEF = tree.Jet_muEF[n];
+        self.chMult = tree.Jet_chMult[n];
+        self.nhMult = tree.Jet_nhMult[n];
+        self.leadTrackPt = tree.Jet_leadTrackPt[n];
+        self.mcEta = tree.Jet_mcEta[n];
+        self.mcPhi = tree.Jet_mcPhi[n];
+        self.mcM = tree.Jet_mcM[n];
+        self.leptonPdgId = tree.Jet_leptonPdgId[n];
+        self.leptonPt = tree.Jet_leptonPt[n];
+        self.leptonPtRel = tree.Jet_leptonPtRel[n];
+        self.leptonPtRelInv = tree.Jet_leptonPtRelInv[n];
+        self.leptonDeltaR = tree.Jet_leptonDeltaR[n];
+        self.leptonDeltaPhi = tree.Jet_leptonDeltaPhi[n];
+        self.leptonDeltaEta = tree.Jet_leptonDeltaEta[n];
+        self.vtxMass = tree.Jet_vtxMass[n];
+        self.vtxNtracks = tree.Jet_vtxNtracks[n];
+        self.vtxPt = tree.Jet_vtxPt[n];
+        self.vtx3DSig = tree.Jet_vtx3DSig[n];
+        self.vtx3DVal = tree.Jet_vtx3DVal[n];
+        self.vtxPosX = tree.Jet_vtxPosX[n];
+        self.vtxPosY = tree.Jet_vtxPosY[n];
+        self.vtxPosZ = tree.Jet_vtxPosZ[n];
+        self.pullVectorPhi = tree.Jet_pullVectorPhi[n];
+        self.pullVectorMag = tree.Jet_pullVectorMag[n];
+        self.qgl = tree.Jet_qgl[n];
+        self.ptd = tree.Jet_ptd[n];
+        self.axis2 = tree.Jet_axis2[n];
+        self.mult = tree.Jet_mult[n];
+        self.numberOfDaughters = tree.Jet_numberOfDaughters[n];
+        self.btagIdx = tree.Jet_btagIdx[n];
+        self.mcIdx = tree.Jet_mcIdx[n];
+        self.blike_VBF = tree.Jet_blike_VBF[n];
+        self.pt_reg = tree.Jet_pt_reg[n];
+        self.pt_regVBF = tree.Jet_pt_regVBF[n];
+        self.pt_reg_corrJECUp = tree.Jet_pt_reg_corrJECUp[n];
+        self.pt_regVBF_corrJECUp = tree.Jet_pt_regVBF_corrJECUp[n];
+        self.pt_reg_corrJECDown = tree.Jet_pt_reg_corrJECDown[n];
+        self.pt_regVBF_corrJECDown = tree.Jet_pt_regVBF_corrJECDown[n];
+        self.pt_reg_corrJERUp = tree.Jet_pt_reg_corrJERUp[n];
+        self.pt_regVBF_corrJERUp = tree.Jet_pt_regVBF_corrJERUp[n];
+        self.pt_reg_corrJERDown = tree.Jet_pt_reg_corrJERDown[n];
+        self.pt_regVBF_corrJERDown = tree.Jet_pt_regVBF_corrJERDown[n];
+        self.bTagWeightJESUp = tree.Jet_bTagWeightJESUp[n];
+        self.bTagWeightJESDown = tree.Jet_bTagWeightJESDown[n];
+        self.bTagWeightLFUp = tree.Jet_bTagWeightLFUp[n];
+        self.bTagWeightLFDown = tree.Jet_bTagWeightLFDown[n];
+        self.bTagWeightHFUp = tree.Jet_bTagWeightHFUp[n];
+        self.bTagWeightHFDown = tree.Jet_bTagWeightHFDown[n];
+        self.bTagWeightHFStats1Up = tree.Jet_bTagWeightHFStats1Up[n];
+        self.bTagWeightHFStats1Down = tree.Jet_bTagWeightHFStats1Down[n];
+        self.bTagWeightHFStats2Up = tree.Jet_bTagWeightHFStats2Up[n];
+        self.bTagWeightHFStats2Down = tree.Jet_bTagWeightHFStats2Down[n];
+        self.bTagWeightLFStats1Up = tree.Jet_bTagWeightLFStats1Up[n];
+        self.bTagWeightLFStats1Down = tree.Jet_bTagWeightLFStats1Down[n];
+        self.bTagWeightLFStats2Up = tree.Jet_bTagWeightLFStats2Up[n];
+        self.bTagWeightLFStats2Down = tree.Jet_bTagWeightLFStats2Down[n];
+        self.bTagWeightcErr1Up = tree.Jet_bTagWeightcErr1Up[n];
+        self.bTagWeightcErr1Down = tree.Jet_bTagWeightcErr1Down[n];
+        self.bTagWeightcErr2Up = tree.Jet_bTagWeightcErr2Up[n];
+        self.bTagWeightcErr2Down = tree.Jet_bTagWeightcErr2Down[n];
+        self.bTagWeight = tree.Jet_bTagWeight[n];
+        self.btagCSVLSF = tree.Jet_btagCSVLSF[n];
+        self.btagCSVLSF_Up = tree.Jet_btagCSVLSF_Up[n];
+        self.btagCSVLSF_Down = tree.Jet_btagCSVLSF_Down[n];
+        self.btagCSVMSF = tree.Jet_btagCSVMSF[n];
+        self.btagCSVMSF_Up = tree.Jet_btagCSVMSF_Up[n];
+        self.btagCSVMSF_Down = tree.Jet_btagCSVMSF_Down[n];
+        self.btagCSVTSF = tree.Jet_btagCSVTSF[n];
+        self.btagCSVTSF_Up = tree.Jet_btagCSVTSF_Up[n];
+        self.btagCSVTSF_Down = tree.Jet_btagCSVTSF_Down[n];
+        self.btagCMVAV2LSF = tree.Jet_btagCMVAV2LSF[n];
+        self.btagCMVAV2LSF_Up = tree.Jet_btagCMVAV2LSF_Up[n];
+        self.btagCMVAV2LSF_Down = tree.Jet_btagCMVAV2LSF_Down[n];
+        self.btagCMVAV2MSF = tree.Jet_btagCMVAV2MSF[n];
+        self.btagCMVAV2MSF_Up = tree.Jet_btagCMVAV2MSF_Up[n];
+        self.btagCMVAV2MSF_Down = tree.Jet_btagCMVAV2MSF_Down[n];
+        self.btagCMVAV2TSF = tree.Jet_btagCMVAV2TSF[n];
+        self.btagCMVAV2TSF_Up = tree.Jet_btagCMVAV2TSF_Up[n];
+        self.btagCMVAV2TSF_Down = tree.Jet_btagCMVAV2TSF_Down[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nJet", 0)
-        _id = getattr(tree, "Jet_id", [None]*n)
-        _puId = getattr(tree, "Jet_puId", [None]*n)
-        _btagCSV = getattr(tree, "Jet_btagCSV", [None]*n)
-        _btagCMVA = getattr(tree, "Jet_btagCMVA", [None]*n)
-        _rawPt = getattr(tree, "Jet_rawPt", [None]*n)
-        _mcPt = getattr(tree, "Jet_mcPt", [None]*n)
-        _mcFlavour = getattr(tree, "Jet_mcFlavour", [None]*n)
-        _partonFlavour = getattr(tree, "Jet_partonFlavour", [None]*n)
-        _hadronFlavour = getattr(tree, "Jet_hadronFlavour", [None]*n)
-        _mcMatchId = getattr(tree, "Jet_mcMatchId", [None]*n)
-        _corr_JECUp = getattr(tree, "Jet_corr_JECUp", [None]*n)
-        _corr_JECDown = getattr(tree, "Jet_corr_JECDown", [None]*n)
-        _corr = getattr(tree, "Jet_corr", [None]*n)
-        _corr_JERUp = getattr(tree, "Jet_corr_JERUp", [None]*n)
-        _corr_JERDown = getattr(tree, "Jet_corr_JERDown", [None]*n)
-        _corr_JER = getattr(tree, "Jet_corr_JER", [None]*n)
-        _pt = getattr(tree, "Jet_pt", [None]*n)
-        _eta = getattr(tree, "Jet_eta", [None]*n)
-        _phi = getattr(tree, "Jet_phi", [None]*n)
-        _mass = getattr(tree, "Jet_mass", [None]*n)
-        _rawPtAfterSmearing = getattr(tree, "Jet_rawPtAfterSmearing", [None]*n)
-        _idxFirstTauMatch = getattr(tree, "Jet_idxFirstTauMatch", [None]*n)
-        _heppyFlavour = getattr(tree, "Jet_heppyFlavour", [None]*n)
-        _ctagVsL = getattr(tree, "Jet_ctagVsL", [None]*n)
-        _ctagVsB = getattr(tree, "Jet_ctagVsB", [None]*n)
-        _btagBDT = getattr(tree, "Jet_btagBDT", [None]*n)
-        _btagProb = getattr(tree, "Jet_btagProb", [None]*n)
-        _btagBProb = getattr(tree, "Jet_btagBProb", [None]*n)
-        _btagSoftEl = getattr(tree, "Jet_btagSoftEl", [None]*n)
-        _btagSoftMu = getattr(tree, "Jet_btagSoftMu", [None]*n)
-        _btagnew = getattr(tree, "Jet_btagnew", [None]*n)
-        _btagCSVV0 = getattr(tree, "Jet_btagCSVV0", [None]*n)
-        _btagCMVAV2 = getattr(tree, "Jet_btagCMVAV2", [None]*n)
-        _chHEF = getattr(tree, "Jet_chHEF", [None]*n)
-        _neHEF = getattr(tree, "Jet_neHEF", [None]*n)
-        _chEmEF = getattr(tree, "Jet_chEmEF", [None]*n)
-        _neEmEF = getattr(tree, "Jet_neEmEF", [None]*n)
-        _muEF = getattr(tree, "Jet_muEF", [None]*n)
-        _chMult = getattr(tree, "Jet_chMult", [None]*n)
-        _nhMult = getattr(tree, "Jet_nhMult", [None]*n)
-        _leadTrackPt = getattr(tree, "Jet_leadTrackPt", [None]*n)
-        _mcEta = getattr(tree, "Jet_mcEta", [None]*n)
-        _mcPhi = getattr(tree, "Jet_mcPhi", [None]*n)
-        _mcM = getattr(tree, "Jet_mcM", [None]*n)
-        _leptonPdgId = getattr(tree, "Jet_leptonPdgId", [None]*n)
-        _leptonPt = getattr(tree, "Jet_leptonPt", [None]*n)
-        _leptonPtRel = getattr(tree, "Jet_leptonPtRel", [None]*n)
-        _leptonPtRelInv = getattr(tree, "Jet_leptonPtRelInv", [None]*n)
-        _leptonDeltaR = getattr(tree, "Jet_leptonDeltaR", [None]*n)
-        _leptonDeltaPhi = getattr(tree, "Jet_leptonDeltaPhi", [None]*n)
-        _leptonDeltaEta = getattr(tree, "Jet_leptonDeltaEta", [None]*n)
-        _vtxMass = getattr(tree, "Jet_vtxMass", [None]*n)
-        _vtxNtracks = getattr(tree, "Jet_vtxNtracks", [None]*n)
-        _vtxPt = getattr(tree, "Jet_vtxPt", [None]*n)
-        _vtx3DSig = getattr(tree, "Jet_vtx3DSig", [None]*n)
-        _vtx3DVal = getattr(tree, "Jet_vtx3DVal", [None]*n)
-        _vtxPosX = getattr(tree, "Jet_vtxPosX", [None]*n)
-        _vtxPosY = getattr(tree, "Jet_vtxPosY", [None]*n)
-        _vtxPosZ = getattr(tree, "Jet_vtxPosZ", [None]*n)
-        _pullVectorPhi = getattr(tree, "Jet_pullVectorPhi", [None]*n)
-        _pullVectorMag = getattr(tree, "Jet_pullVectorMag", [None]*n)
-        _qgl = getattr(tree, "Jet_qgl", [None]*n)
-        _ptd = getattr(tree, "Jet_ptd", [None]*n)
-        _axis2 = getattr(tree, "Jet_axis2", [None]*n)
-        _mult = getattr(tree, "Jet_mult", [None]*n)
-        _numberOfDaughters = getattr(tree, "Jet_numberOfDaughters", [None]*n)
-        _btagIdx = getattr(tree, "Jet_btagIdx", [None]*n)
-        _mcIdx = getattr(tree, "Jet_mcIdx", [None]*n)
-        _blike_VBF = getattr(tree, "Jet_blike_VBF", [None]*n)
-        _pt_reg = getattr(tree, "Jet_pt_reg", [None]*n)
-        _pt_regVBF = getattr(tree, "Jet_pt_regVBF", [None]*n)
-        _pt_reg_corrJECUp = getattr(tree, "Jet_pt_reg_corrJECUp", [None]*n)
-        _pt_regVBF_corrJECUp = getattr(tree, "Jet_pt_regVBF_corrJECUp", [None]*n)
-        _pt_reg_corrJECDown = getattr(tree, "Jet_pt_reg_corrJECDown", [None]*n)
-        _pt_regVBF_corrJECDown = getattr(tree, "Jet_pt_regVBF_corrJECDown", [None]*n)
-        _pt_reg_corrJERUp = getattr(tree, "Jet_pt_reg_corrJERUp", [None]*n)
-        _pt_regVBF_corrJERUp = getattr(tree, "Jet_pt_regVBF_corrJERUp", [None]*n)
-        _pt_reg_corrJERDown = getattr(tree, "Jet_pt_reg_corrJERDown", [None]*n)
-        _pt_regVBF_corrJERDown = getattr(tree, "Jet_pt_regVBF_corrJERDown", [None]*n)
-        _bTagWeightJESUp = getattr(tree, "Jet_bTagWeightJESUp", [None]*n)
-        _bTagWeightJESDown = getattr(tree, "Jet_bTagWeightJESDown", [None]*n)
-        _bTagWeightLFUp = getattr(tree, "Jet_bTagWeightLFUp", [None]*n)
-        _bTagWeightLFDown = getattr(tree, "Jet_bTagWeightLFDown", [None]*n)
-        _bTagWeightHFUp = getattr(tree, "Jet_bTagWeightHFUp", [None]*n)
-        _bTagWeightHFDown = getattr(tree, "Jet_bTagWeightHFDown", [None]*n)
-        _bTagWeightHFStats1Up = getattr(tree, "Jet_bTagWeightHFStats1Up", [None]*n)
-        _bTagWeightHFStats1Down = getattr(tree, "Jet_bTagWeightHFStats1Down", [None]*n)
-        _bTagWeightHFStats2Up = getattr(tree, "Jet_bTagWeightHFStats2Up", [None]*n)
-        _bTagWeightHFStats2Down = getattr(tree, "Jet_bTagWeightHFStats2Down", [None]*n)
-        _bTagWeightLFStats1Up = getattr(tree, "Jet_bTagWeightLFStats1Up", [None]*n)
-        _bTagWeightLFStats1Down = getattr(tree, "Jet_bTagWeightLFStats1Down", [None]*n)
-        _bTagWeightLFStats2Up = getattr(tree, "Jet_bTagWeightLFStats2Up", [None]*n)
-        _bTagWeightLFStats2Down = getattr(tree, "Jet_bTagWeightLFStats2Down", [None]*n)
-        _bTagWeightcErr1Up = getattr(tree, "Jet_bTagWeightcErr1Up", [None]*n)
-        _bTagWeightcErr1Down = getattr(tree, "Jet_bTagWeightcErr1Down", [None]*n)
-        _bTagWeightcErr2Up = getattr(tree, "Jet_bTagWeightcErr2Up", [None]*n)
-        _bTagWeightcErr2Down = getattr(tree, "Jet_bTagWeightcErr2Down", [None]*n)
-        _bTagWeight = getattr(tree, "Jet_bTagWeight", [None]*n)
-        _btagCSVLSF = getattr(tree, "Jet_btagCSVLSF", [None]*n)
-        _btagCSVLSF_Up = getattr(tree, "Jet_btagCSVLSF_Up", [None]*n)
-        _btagCSVLSF_Down = getattr(tree, "Jet_btagCSVLSF_Down", [None]*n)
-        _btagCSVMSF = getattr(tree, "Jet_btagCSVMSF", [None]*n)
-        _btagCSVMSF_Up = getattr(tree, "Jet_btagCSVMSF_Up", [None]*n)
-        _btagCSVMSF_Down = getattr(tree, "Jet_btagCSVMSF_Down", [None]*n)
-        _btagCSVTSF = getattr(tree, "Jet_btagCSVTSF", [None]*n)
-        _btagCSVTSF_Up = getattr(tree, "Jet_btagCSVTSF_Up", [None]*n)
-        _btagCSVTSF_Down = getattr(tree, "Jet_btagCSVTSF_Down", [None]*n)
-        _btagCMVAV2LSF = getattr(tree, "Jet_btagCMVAV2LSF", [None]*n)
-        _btagCMVAV2LSF_Up = getattr(tree, "Jet_btagCMVAV2LSF_Up", [None]*n)
-        _btagCMVAV2LSF_Down = getattr(tree, "Jet_btagCMVAV2LSF_Down", [None]*n)
-        _btagCMVAV2MSF = getattr(tree, "Jet_btagCMVAV2MSF", [None]*n)
-        _btagCMVAV2MSF_Up = getattr(tree, "Jet_btagCMVAV2MSF_Up", [None]*n)
-        _btagCMVAV2MSF_Down = getattr(tree, "Jet_btagCMVAV2MSF_Down", [None]*n)
-        _btagCMVAV2TSF = getattr(tree, "Jet_btagCMVAV2TSF", [None]*n)
-        _btagCMVAV2TSF_Up = getattr(tree, "Jet_btagCMVAV2TSF_Up", [None]*n)
-        _btagCMVAV2TSF_Down = getattr(tree, "Jet_btagCMVAV2TSF_Down", [None]*n)
-        return [Jet(_id[n], _puId[n], _btagCSV[n], _btagCMVA[n], _rawPt[n], _mcPt[n], _mcFlavour[n], _partonFlavour[n], _hadronFlavour[n], _mcMatchId[n], _corr_JECUp[n], _corr_JECDown[n], _corr[n], _corr_JERUp[n], _corr_JERDown[n], _corr_JER[n], _pt[n], _eta[n], _phi[n], _mass[n], _rawPtAfterSmearing[n], _idxFirstTauMatch[n], _heppyFlavour[n], _ctagVsL[n], _ctagVsB[n], _btagBDT[n], _btagProb[n], _btagBProb[n], _btagSoftEl[n], _btagSoftMu[n], _btagnew[n], _btagCSVV0[n], _btagCMVAV2[n], _chHEF[n], _neHEF[n], _chEmEF[n], _neEmEF[n], _muEF[n], _chMult[n], _nhMult[n], _leadTrackPt[n], _mcEta[n], _mcPhi[n], _mcM[n], _leptonPdgId[n], _leptonPt[n], _leptonPtRel[n], _leptonPtRelInv[n], _leptonDeltaR[n], _leptonDeltaPhi[n], _leptonDeltaEta[n], _vtxMass[n], _vtxNtracks[n], _vtxPt[n], _vtx3DSig[n], _vtx3DVal[n], _vtxPosX[n], _vtxPosY[n], _vtxPosZ[n], _pullVectorPhi[n], _pullVectorMag[n], _qgl[n], _ptd[n], _axis2[n], _mult[n], _numberOfDaughters[n], _btagIdx[n], _mcIdx[n], _blike_VBF[n], _pt_reg[n], _pt_regVBF[n], _pt_reg_corrJECUp[n], _pt_regVBF_corrJECUp[n], _pt_reg_corrJECDown[n], _pt_regVBF_corrJECDown[n], _pt_reg_corrJERUp[n], _pt_regVBF_corrJERUp[n], _pt_reg_corrJERDown[n], _pt_regVBF_corrJERDown[n], _bTagWeightJESUp[n], _bTagWeightJESDown[n], _bTagWeightLFUp[n], _bTagWeightLFDown[n], _bTagWeightHFUp[n], _bTagWeightHFDown[n], _bTagWeightHFStats1Up[n], _bTagWeightHFStats1Down[n], _bTagWeightHFStats2Up[n], _bTagWeightHFStats2Down[n], _bTagWeightLFStats1Up[n], _bTagWeightLFStats1Down[n], _bTagWeightLFStats2Up[n], _bTagWeightLFStats2Down[n], _bTagWeightcErr1Up[n], _bTagWeightcErr1Down[n], _bTagWeightcErr2Up[n], _bTagWeightcErr2Down[n], _bTagWeight[n], _btagCSVLSF[n], _btagCSVLSF_Up[n], _btagCSVLSF_Down[n], _btagCSVMSF[n], _btagCSVMSF_Up[n], _btagCSVMSF_Down[n], _btagCSVTSF[n], _btagCSVTSF_Up[n], _btagCSVTSF_Down[n], _btagCMVAV2LSF[n], _btagCMVAV2LSF_Up[n], _btagCMVAV2LSF_Down[n], _btagCMVAV2MSF[n], _btagCMVAV2MSF_Up[n], _btagCMVAV2MSF_Down[n], _btagCMVAV2TSF[n], _btagCMVAV2TSF_Up[n], _btagCMVAV2TSF_Down[n]) for n in range(n)]
-    def __init__(self, id,puId,btagCSV,btagCMVA,rawPt,mcPt,mcFlavour,partonFlavour,hadronFlavour,mcMatchId,corr_JECUp,corr_JECDown,corr,corr_JERUp,corr_JERDown,corr_JER,pt,eta,phi,mass,rawPtAfterSmearing,idxFirstTauMatch,heppyFlavour,ctagVsL,ctagVsB,btagBDT,btagProb,btagBProb,btagSoftEl,btagSoftMu,btagnew,btagCSVV0,btagCMVAV2,chHEF,neHEF,chEmEF,neEmEF,muEF,chMult,nhMult,leadTrackPt,mcEta,mcPhi,mcM,leptonPdgId,leptonPt,leptonPtRel,leptonPtRelInv,leptonDeltaR,leptonDeltaPhi,leptonDeltaEta,vtxMass,vtxNtracks,vtxPt,vtx3DSig,vtx3DVal,vtxPosX,vtxPosY,vtxPosZ,pullVectorPhi,pullVectorMag,qgl,ptd,axis2,mult,numberOfDaughters,btagIdx,mcIdx,blike_VBF,pt_reg,pt_regVBF,pt_reg_corrJECUp,pt_regVBF_corrJECUp,pt_reg_corrJECDown,pt_regVBF_corrJECDown,pt_reg_corrJERUp,pt_regVBF_corrJERUp,pt_reg_corrJERDown,pt_regVBF_corrJERDown,bTagWeightJESUp,bTagWeightJESDown,bTagWeightLFUp,bTagWeightLFDown,bTagWeightHFUp,bTagWeightHFDown,bTagWeightHFStats1Up,bTagWeightHFStats1Down,bTagWeightHFStats2Up,bTagWeightHFStats2Down,bTagWeightLFStats1Up,bTagWeightLFStats1Down,bTagWeightLFStats2Up,bTagWeightLFStats2Down,bTagWeightcErr1Up,bTagWeightcErr1Down,bTagWeightcErr2Up,bTagWeightcErr2Down,bTagWeight,btagCSVLSF,btagCSVLSF_Up,btagCSVLSF_Down,btagCSVMSF,btagCSVMSF_Up,btagCSVMSF_Down,btagCSVTSF,btagCSVTSF_Up,btagCSVTSF_Down,btagCMVAV2LSF,btagCMVAV2LSF_Up,btagCMVAV2LSF_Down,btagCMVAV2MSF,btagCMVAV2MSF_Up,btagCMVAV2MSF_Down,btagCMVAV2TSF,btagCMVAV2TSF_Up,btagCMVAV2TSF_Down):
-        self.id = id #POG Loose jet ID
-        self.puId = puId #puId (full MVA, loose WP, 5.3.X training on AK5PFchs: the only thing that is available now)
-        self.btagCSV = btagCSV #CSV-IVF v2 discriminator
-        self.btagCMVA = btagCMVA #CMVA discriminator
-        self.rawPt = rawPt #p_{T} before JEC
-        self.mcPt = mcPt #p_{T} of associated gen jet
-        self.mcFlavour = mcFlavour #parton flavour (physics definition, i.e. including b's from shower)
-        self.partonFlavour = partonFlavour #purely parton-based flavour
-        self.hadronFlavour = hadronFlavour #hadron flavour (ghost matching to B/C hadrons)
-        self.mcMatchId = mcMatchId #Match to source from hard scatter (pdgId of heaviest particle in chain, 25 for H, 6 for t, 23/24 for W/Z), zero if non-prompt or fake
-        self.corr_JECUp = corr_JECUp #
-        self.corr_JECDown = corr_JECDown #
-        self.corr = corr #
-        self.corr_JERUp = corr_JERUp #
-        self.corr_JERDown = corr_JERDown #
-        self.corr_JER = corr_JER #
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        self.rawPtAfterSmearing = rawPtAfterSmearing #p_{T} before JEC but including JER effect
-        self.idxFirstTauMatch = idxFirstTauMatch #index of the first matching tau
-        self.heppyFlavour = heppyFlavour #heppy-style match to gen quarks
-        self.ctagVsL = ctagVsL #c-btag vs light jets
-        self.ctagVsB = ctagVsB #c-btag vs light jets
-        self.btagBDT = btagBDT #combined super-btag
-        self.btagProb = btagProb #jet probability b-tag
-        self.btagBProb = btagBProb #jet b-probability b-tag
-        self.btagSoftEl = btagSoftEl #soft electron b-tag
-        self.btagSoftMu = btagSoftMu #soft muon b-tag
-        self.btagnew = btagnew #newest btag discriminator
-        self.btagCSVV0 = btagCSVV0 #should be the old CSV discriminator with AVR vertices
-        self.btagCMVAV2 = btagCMVAV2 #CMVA V2 discriminator
-        self.chHEF = chHEF #chargedHadronEnergyFraction (relative to uncorrected jet energy)
-        self.neHEF = neHEF #neutralHadronEnergyFraction (relative to uncorrected jet energy)
-        self.chEmEF = chEmEF #chargedEmEnergyFraction (relative to uncorrected jet energy)
-        self.neEmEF = neEmEF #neutralEmEnergyFraction (relative to uncorrected jet energy)
-        self.muEF = muEF #muon energy fraction (relative to uncorrected jet energy)
-        self.chMult = chMult #chargedMultiplicity from PFJet.h
-        self.nhMult = nhMult #neutralMultiplicity from PFJet.h
-        self.leadTrackPt = leadTrackPt #pt of the leading track in the jet
-        self.mcEta = mcEta #eta of associated gen jet
-        self.mcPhi = mcPhi #phi of associated gen jet
-        self.mcM = mcM #mass of associated gen jet
-        self.leptonPdgId = leptonPdgId #pdg id of the first associated lepton
-        self.leptonPt = leptonPt #pt of the first associated lepton
-        self.leptonPtRel = leptonPtRel #ptrel of the first associated lepton
-        self.leptonPtRelInv = leptonPtRelInv #ptrel Run1 definition of the first associated lepton
-        self.leptonDeltaR = leptonDeltaR #deltaR of the first associated lepton
-        self.leptonDeltaPhi = leptonDeltaPhi #deltaPhi of the first associated lepton
-        self.leptonDeltaEta = leptonDeltaEta #deltaEta of the first associated lepton
-        self.vtxMass = vtxMass #vtxMass from btag
-        self.vtxNtracks = vtxNtracks #number of tracks at vertex from btag
-        self.vtxPt = vtxPt #pt of vertex from btag
-        self.vtx3DSig = vtx3DSig #decay len significance of vertex from btag
-        self.vtx3DVal = vtx3DVal #decay len of vertex from btag
-        self.vtxPosX = vtxPosX #X coord of vertex from btag
-        self.vtxPosY = vtxPosY #Y coord of vertex from btag
-        self.vtxPosZ = vtxPosZ #Z coord of vertex from btag
-        self.pullVectorPhi = pullVectorPhi #pull angle phi in the phi eta plane
-        self.pullVectorMag = pullVectorMag #pull angle magnitude
-        self.qgl = qgl #QG Likelihood
-        self.ptd = ptd #QG input variable: ptD
-        self.axis2 = axis2 #QG input variable: axis2
-        self.mult = mult #QG input variable: total multiplicity
-        self.numberOfDaughters = numberOfDaughters #number of daughters
-        self.btagIdx = btagIdx #ranking in btag
-        self.mcIdx = mcIdx #index of the matching gen jet
-        self.blike_VBF = blike_VBF #VBF blikelihood for SingleBtag dataset
-        self.pt_reg = pt_reg #Regression 
-        self.pt_regVBF = pt_regVBF #Regressionfor VBF 
-        self.pt_reg_corrJECUp = pt_reg_corrJECUp #Regression corrJECUp
-        self.pt_regVBF_corrJECUp = pt_regVBF_corrJECUp #Regressionfor VBF corrJECUp
-        self.pt_reg_corrJECDown = pt_reg_corrJECDown #Regression corrJECDown
-        self.pt_regVBF_corrJECDown = pt_regVBF_corrJECDown #Regressionfor VBF corrJECDown
-        self.pt_reg_corrJERUp = pt_reg_corrJERUp #Regression corrJERUp
-        self.pt_regVBF_corrJERUp = pt_regVBF_corrJERUp #Regressionfor VBF corrJERUp
-        self.pt_reg_corrJERDown = pt_reg_corrJERDown #Regression corrJERDown
-        self.pt_regVBF_corrJERDown = pt_regVBF_corrJERDown #Regressionfor VBF corrJERDown
-        self.bTagWeightJESUp = bTagWeightJESUp #b-tag CSV weight, variating JES Up
-        self.bTagWeightJESDown = bTagWeightJESDown #b-tag CSV weight, variating JES Down
-        self.bTagWeightLFUp = bTagWeightLFUp #b-tag CSV weight, variating LF Up
-        self.bTagWeightLFDown = bTagWeightLFDown #b-tag CSV weight, variating LF Down
-        self.bTagWeightHFUp = bTagWeightHFUp #b-tag CSV weight, variating HF Up
-        self.bTagWeightHFDown = bTagWeightHFDown #b-tag CSV weight, variating HF Down
-        self.bTagWeightHFStats1Up = bTagWeightHFStats1Up #b-tag CSV weight, variating HFStats1 Up
-        self.bTagWeightHFStats1Down = bTagWeightHFStats1Down #b-tag CSV weight, variating HFStats1 Down
-        self.bTagWeightHFStats2Up = bTagWeightHFStats2Up #b-tag CSV weight, variating HFStats2 Up
-        self.bTagWeightHFStats2Down = bTagWeightHFStats2Down #b-tag CSV weight, variating HFStats2 Down
-        self.bTagWeightLFStats1Up = bTagWeightLFStats1Up #b-tag CSV weight, variating LFStats1 Up
-        self.bTagWeightLFStats1Down = bTagWeightLFStats1Down #b-tag CSV weight, variating LFStats1 Down
-        self.bTagWeightLFStats2Up = bTagWeightLFStats2Up #b-tag CSV weight, variating LFStats2 Up
-        self.bTagWeightLFStats2Down = bTagWeightLFStats2Down #b-tag CSV weight, variating LFStats2 Down
-        self.bTagWeightcErr1Up = bTagWeightcErr1Up #b-tag CSV weight, variating cErr1 Up
-        self.bTagWeightcErr1Down = bTagWeightcErr1Down #b-tag CSV weight, variating cErr1 Down
-        self.bTagWeightcErr2Up = bTagWeightcErr2Up #b-tag CSV weight, variating cErr2 Up
-        self.bTagWeightcErr2Down = bTagWeightcErr2Down #b-tag CSV weight, variating cErr2 Down
-        self.bTagWeight = bTagWeight #b-tag CSV weight, nominal
-        self.btagCSVLSF = btagCSVLSF #b-tag CSVL POG scale factor, central
-        self.btagCSVLSF_Up = btagCSVLSF_Up #b-tag CSVL POG scale factor, up
-        self.btagCSVLSF_Down = btagCSVLSF_Down #b-tag CSVL POG scale factor, down
-        self.btagCSVMSF = btagCSVMSF #b-tag CSVM POG scale factor, central
-        self.btagCSVMSF_Up = btagCSVMSF_Up #b-tag CSVM POG scale factor, up
-        self.btagCSVMSF_Down = btagCSVMSF_Down #b-tag CSVM POG scale factor, down
-        self.btagCSVTSF = btagCSVTSF #b-tag CSVT POG scale factor, central
-        self.btagCSVTSF_Up = btagCSVTSF_Up #b-tag CSVT POG scale factor, up
-        self.btagCSVTSF_Down = btagCSVTSF_Down #b-tag CSVT POG scale factor, down
-        self.btagCMVAV2LSF = btagCMVAV2LSF #b-tag CMVAV2L POG scale factor, central
-        self.btagCMVAV2LSF_Up = btagCMVAV2LSF_Up #b-tag CMVAV2L POG scale factor, up
-        self.btagCMVAV2LSF_Down = btagCMVAV2LSF_Down #b-tag CMVAV2L POG scale factor, down
-        self.btagCMVAV2MSF = btagCMVAV2MSF #b-tag CMVAV2M POG scale factor, central
-        self.btagCMVAV2MSF_Up = btagCMVAV2MSF_Up #b-tag CMVAV2M POG scale factor, up
-        self.btagCMVAV2MSF_Down = btagCMVAV2MSF_Down #b-tag CMVAV2M POG scale factor, down
-        self.btagCMVAV2TSF = btagCMVAV2TSF #b-tag CMVAV2T POG scale factor, central
-        self.btagCMVAV2TSF_Up = btagCMVAV2TSF_Up #b-tag CMVAV2T POG scale factor, up
-        self.btagCMVAV2TSF_Down = btagCMVAV2TSF_Down #b-tag CMVAV2T POG scale factor, down
+        return [Jet(tree, i) for i in range(tree.nJet)]
 class FatjetCA15softdrop:
-    """
-    CA, R=1.5, pT > 200 GeV, softdrop zcut=0.1, beta=0
-    """
+    def __init__(self, tree, n):
+        self.pt = tree.FatjetCA15softdrop_pt[n];
+        self.eta = tree.FatjetCA15softdrop_eta[n];
+        self.phi = tree.FatjetCA15softdrop_phi[n];
+        self.mass = tree.FatjetCA15softdrop_mass[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nFatjetCA15softdrop", 0)
-        _pt = getattr(tree, "FatjetCA15softdrop_pt", [None]*n)
-        _eta = getattr(tree, "FatjetCA15softdrop_eta", [None]*n)
-        _phi = getattr(tree, "FatjetCA15softdrop_phi", [None]*n)
-        _mass = getattr(tree, "FatjetCA15softdrop_mass", [None]*n)
-        return [FatjetCA15softdrop(_pt[n], _eta[n], _phi[n], _mass[n]) for n in range(n)]
-    def __init__(self, pt,eta,phi,mass):
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
+        return [FatjetCA15softdrop(tree, i) for i in range(tree.nFatjetCA15softdrop)]
 class trgObjects_hltPFTripleJetLooseID64:
-    """
-    
-    """
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_hltPFTripleJetLooseID64", 0)
-        return [trgObjects_hltPFTripleJetLooseID64() for n in range(n)]
+        return [trgObjects_hltPFTripleJetLooseID64(tree, i) for i in range(tree.ntrgObjects_hltPFTripleJetLooseID64)]
 class LHE_weights_pdf:
-    """
-    LHE weights for pdf variation (NNPDF)
-    """
+    def __init__(self, tree, n):
+        self.id = tree.LHE_weights_pdf_id[n];
+        self.wgt = tree.LHE_weights_pdf_wgt[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nLHE_weights_pdf", 0)
-        _id = getattr(tree, "LHE_weights_pdf_id", [None]*n)
-        _wgt = getattr(tree, "LHE_weights_pdf_wgt", [None]*n)
-        return [LHE_weights_pdf(_id[n], _wgt[n]) for n in range(n)]
-    def __init__(self, id,wgt):
-        self.id = id #
-        self.wgt = wgt #
+        return [LHE_weights_pdf(tree, i) for i in range(tree.nLHE_weights_pdf)]
 class primaryVertices:
-    """
-    first four PVs
-    """
+    def __init__(self, tree, n):
+        self.x = tree.primaryVertices_x[n];
+        self.y = tree.primaryVertices_y[n];
+        self.z = tree.primaryVertices_z[n];
+        self.isFake = tree.primaryVertices_isFake[n];
+        self.ndof = tree.primaryVertices_ndof[n];
+        self.Rho = tree.primaryVertices_Rho[n];
+        self.score = tree.primaryVertices_score[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nprimaryVertices", 0)
-        _x = getattr(tree, "primaryVertices_x", [None]*n)
-        _y = getattr(tree, "primaryVertices_y", [None]*n)
-        _z = getattr(tree, "primaryVertices_z", [None]*n)
-        _isFake = getattr(tree, "primaryVertices_isFake", [None]*n)
-        _ndof = getattr(tree, "primaryVertices_ndof", [None]*n)
-        _Rho = getattr(tree, "primaryVertices_Rho", [None]*n)
-        _score = getattr(tree, "primaryVertices_score", [None]*n)
-        return [primaryVertices(_x[n], _y[n], _z[n], _isFake[n], _ndof[n], _Rho[n], _score[n]) for n in range(n)]
-    def __init__(self, x,y,z,isFake,ndof,Rho,score):
-        self.x = x #
-        self.y = y #
-        self.z = z #
-        self.isFake = isFake #
-        self.ndof = ndof #
-        self.Rho = Rho #
-        self.score = score #
+        return [primaryVertices(tree, i) for i in range(tree.nprimaryVertices)]
 class softActivityJets:
-    """
-    jets made for soft activity
-    """
+    def __init__(self, tree, n):
+        self.pt = tree.softActivityJets_pt[n];
+        self.eta = tree.softActivityJets_eta[n];
+        self.phi = tree.softActivityJets_phi[n];
+        self.mass = tree.softActivityJets_mass[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nsoftActivityJets", 0)
-        _pt = getattr(tree, "softActivityJets_pt", [None]*n)
-        _eta = getattr(tree, "softActivityJets_eta", [None]*n)
-        _phi = getattr(tree, "softActivityJets_phi", [None]*n)
-        _mass = getattr(tree, "softActivityJets_mass", [None]*n)
-        return [softActivityJets(_pt[n], _eta[n], _phi[n], _mass[n]) for n in range(n)]
-    def __init__(self, pt,eta,phi,mass):
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
+        return [softActivityJets(tree, i) for i in range(tree.nsoftActivityJets)]
 class FatjetCA15subjetfiltered:
-    """
-    CA, R=1.5, pT > 200 GeV, BDRS via SubjetFilterJetProducer
-    """
+    def __init__(self, tree, n):
+        self.pt = tree.FatjetCA15subjetfiltered_pt[n];
+        self.eta = tree.FatjetCA15subjetfiltered_eta[n];
+        self.phi = tree.FatjetCA15subjetfiltered_phi[n];
+        self.mass = tree.FatjetCA15subjetfiltered_mass[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nFatjetCA15subjetfiltered", 0)
-        _pt = getattr(tree, "FatjetCA15subjetfiltered_pt", [None]*n)
-        _eta = getattr(tree, "FatjetCA15subjetfiltered_eta", [None]*n)
-        _phi = getattr(tree, "FatjetCA15subjetfiltered_phi", [None]*n)
-        _mass = getattr(tree, "FatjetCA15subjetfiltered_mass", [None]*n)
-        return [FatjetCA15subjetfiltered(_pt[n], _eta[n], _phi[n], _mass[n]) for n in range(n)]
-    def __init__(self, pt,eta,phi,mass):
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
+        return [FatjetCA15subjetfiltered(tree, i) for i in range(tree.nFatjetCA15subjetfiltered)]
 class GenWZQuark:
-    """
-    Generated quarks from W/Z decays
-    """
+    def __init__(self, tree, n):
+        self.pdgId = tree.GenWZQuark_pdgId[n];
+        self.pt = tree.GenWZQuark_pt[n];
+        self.eta = tree.GenWZQuark_eta[n];
+        self.phi = tree.GenWZQuark_phi[n];
+        self.mass = tree.GenWZQuark_mass[n];
+        self.charge = tree.GenWZQuark_charge[n];
+        self.status = tree.GenWZQuark_status[n];
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "nGenWZQuark", 0)
-        _pdgId = getattr(tree, "GenWZQuark_pdgId", [None]*n)
-        _pt = getattr(tree, "GenWZQuark_pt", [None]*n)
-        _eta = getattr(tree, "GenWZQuark_eta", [None]*n)
-        _phi = getattr(tree, "GenWZQuark_phi", [None]*n)
-        _mass = getattr(tree, "GenWZQuark_mass", [None]*n)
-        _charge = getattr(tree, "GenWZQuark_charge", [None]*n)
-        _status = getattr(tree, "GenWZQuark_status", [None]*n)
-        return [GenWZQuark(_pdgId[n], _pt[n], _eta[n], _phi[n], _mass[n], _charge[n], _status[n]) for n in range(n)]
-    def __init__(self, pdgId,pt,eta,phi,mass,charge,status):
-        self.pdgId = pdgId #
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        self.charge = charge #
-        self.status = status #
+        return [GenWZQuark(tree, i) for i in range(tree.nGenWZQuark)]
 class trgObjects_hltSingleJet80:
-    """
-    
-    """
     @staticmethod
     def make_array(tree):
-        n = getattr(tree, "ntrgObjects_hltSingleJet80", 0)
-        return [trgObjects_hltSingleJet80() for n in range(n)]
+        return [trgObjects_hltSingleJet80(tree, i) for i in range(tree.ntrgObjects_hltSingleJet80)]
 class H_reg_corrJECUp:
     """
     

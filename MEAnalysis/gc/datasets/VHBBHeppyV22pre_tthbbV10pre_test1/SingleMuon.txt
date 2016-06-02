@@ -1,0 +1,11 @@
+[SingleMuon]
+/store/user/jpata/tth/VHBBHeppyV21_tthbbV9_test3/SingleMuon/VHBBHeppyV21_tthbbV9_test3/160602_131825/0000/tree_10.root = 1
+/store/user/jpata/tth/VHBBHeppyV21_tthbbV9_test3/SingleMuon/VHBBHeppyV21_tthbbV9_test3/160602_131825/0000/tree_1.root = 1
+/store/user/jpata/tth/VHBBHeppyV21_tthbbV9_test3/SingleMuon/VHBBHeppyV21_tthbbV9_test3/160602_131825/0000/tree_2.root = 1
+/store/user/jpata/tth/VHBBHeppyV21_tthbbV9_test3/SingleMuon/VHBBHeppyV21_tthbbV9_test3/160602_131825/0000/tree_3.root = 1
+/store/user/jpata/tth/VHBBHeppyV21_tthbbV9_test3/SingleMuon/VHBBHeppyV21_tthbbV9_test3/160602_131825/0000/tree_4.root = 1
+/store/user/jpata/tth/VHBBHeppyV21_tthbbV9_test3/SingleMuon/VHBBHeppyV21_tthbbV9_test3/160602_131825/0000/tree_5.root = 1
+/store/user/jpata/tth/VHBBHeppyV21_tthbbV9_test3/SingleMuon/VHBBHeppyV21_tthbbV9_test3/160602_131825/0000/tree_6.root = 1
+/store/user/jpata/tth/VHBBHeppyV21_tthbbV9_test3/SingleMuon/VHBBHeppyV21_tthbbV9_test3/160602_131825/0000/tree_7.root = 1
+/store/user/jpata/tth/VHBBHeppyV21_tthbbV9_test3/SingleMuon/VHBBHeppyV21_tthbbV9_test3/160602_131825/0000/tree_8.root = 1
+/store/user/jpata/tth/VHBBHeppyV21_tthbbV9_test3/SingleMuon/VHBBHeppyV21_tthbbV9_test3/160602_131825/0000/tree_9.root = 1

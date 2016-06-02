@@ -39,7 +39,7 @@ for i in xrange(0,len(crabFiles)) :
      else:
        print "Data is not local, using AAA/xrootd"
        crabFiles[i]="root://cms-xrd-global.cern.ch/"+crabFiles[i]
-print "timeto_convertPFN ",(time.time()-t0) #DS 
+print "timeto_convertPFN ",(time.time()-t0)
 
 ###
 ### VHBB code
@@ -49,17 +49,18 @@ cfo = imp.load_source("heppy_config", "heppy_config.py", handle)
 config = cfo.config
 config.preprocessor.options["lumisToProcess"] = PSet.process.source.lumisToProcess
 handle.close()
-print "timeto_setLumis ",(time.time()-t0) #DS 
+print "timeto_setLumis ",(time.time()-t0)
 
 #replace files with crab ones
 config.components[0].files=crabFiles
+print config.components[0]
 
 print "heppy_config", config
 from PhysicsTools.HeppyCore.framework.looper import Looper
 looper = Looper( 'Output', config, nPrint=0)
 looper.loop()
 looper.write()
-print "timeto_doVHbb ",(time.time()-t0) #DS
+print "timeto_doVHbb ",(time.time()-t0)
 
 ###
 ### tthbb13 code
@@ -80,12 +81,12 @@ config.components = [cfg.Component(
     tree_name = "tree",
     n_gen = 1,
     xs = 1,
+    isMC = cfo.sample.isMC
 )]
-config.components[0].isMC = cfo.sample.isMC
 looper = Looper('Output_tth', config, nPrint=0)
 looper.loop()
 looper.write()
-print "timeto_doMEM ",(time.time()-t0) #DS
+print "timeto_doMEM ",(time.time()-t0)
 
 #Now we need to copy both the vhbb and tth outputs to the same file
 inf1 = ROOT.TFile("Output/tree.root")
@@ -158,4 +159,4 @@ fwkreport='''<FrameworkJobReport>
 
 f1=open('./FrameworkJobReport.xml', 'w+')
 f1.write(fwkreport)
-print "timeto_totalJob ",(time.time()-t0) #DS
+print "timeto_totalJob ",(time.time()-t0)

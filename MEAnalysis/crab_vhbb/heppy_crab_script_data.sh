@@ -1,4 +1,5 @@
 #s -lR
+echo "heppy_crab_script_data.sh"
 tar xvzf python.tar.gz --directory $CMSSW_BASE 
 tar xzf data.tar.gz --directory $CMSSW_BASE/src/TTH/MEAnalysis
 ls -lR .
@@ -56,8 +57,31 @@ echo $LD_LIBRARY_PATH
 
 export ROOT_INCLUDE_PATH=.:./src:$ROOT_INCLUDE_PATH
 
+echo "tth_hashes"
+cat hash
 mv heppy_config_data.py heppy_config.py
-python heppy_crab_script.py $1
+python heppy_crab_script.py $@ &> log
+exitCode=$?
+cat log
+
+if [ $exitCode -eq 0 ]; then
+echo "command succeeded"
+else
+cat log | python analyze_log.py
+exitCode=$?
+errorType=""
+exitMessage=`tail -n500 | grep -A5 -B5 -i error`
+cat << EOF > FrameworkJobReport.xml
+<FrameworkJobReport>
+<FrameworkError ExitStatus="$exitCode" Type="$errorType" >
+$exitMessage
+</FrameworkError>
+</FrameworkJobReport>
+EOF
+fi
+
+tail -n100 log
+cat FrameworkJobReport.xml
 echo "======================== CMSRUN LOG ============================"
 head -n 30 Output/cmsRun.log 
 echo "=== SNIP ==="

@@ -64,8 +64,9 @@ def hadd(args):
 	outfile = args[0]
 	infiles = args[1]
 	print "merging {0} files -> {1}".format(len(infiles), outfile)
-
-	ret = subprocess.call(["hadd", "-v", "0", "-f", outfile] + infiles)
+	cmd = ["hadd", "-f", outfile] + infiles
+	print " ".join(cmd)
+	ret = subprocess.call(cmd)
 	if ret != 0:
 		raise Exception("could not merge {0}".format(outfile))
 	return outfile
@@ -99,6 +100,7 @@ def chunked_step(pool, infiles, index, nchunks=20, delete_inputs=False):
 	return ret
 
 def par_hadd(outfile, infiles, nchunks, njobs, nsteps):
+	print "Adding {0} files to outfile {1}".format(len(infiles), outfile)
 	pool = Pool(processes=njobs)
 
 	of = infiles
@@ -110,6 +112,6 @@ def par_hadd(outfile, infiles, nchunks, njobs, nsteps):
 	hadd((outfile, of))
 
 if __name__ == "__main__":
-        outfile = remaining_args[0]
+	outfile = remaining_args[0]
 	infiles = remaining_args[1:]
 	par_hadd(outfile, infiles, pargs.nfiles, pargs.njobs, pargs.nsteps)
