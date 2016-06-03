@@ -68,8 +68,6 @@ class JetAnalyzer(FilterAnalyzer):
         return newjets
 
     def process(self, event):
-
-
         event.MET = MET(pt=event.met.pt, phi=event.met.phi)
         event.MET_gen = MET(pt=event.MET.genPt, phi=event.MET.genPhi)
         event.MET_tt = MET(px=0, py=0)
@@ -95,6 +93,8 @@ class JetAnalyzer(FilterAnalyzer):
                 ev.Jet = jets
                 ev.systematic = name
                 evdict[name] = ev
+
+        #We create a wrapper around the base event with nominal quantities
         if "nominal" in self.conf.general["systematics"]:
             evdict["nominal"] = FakeEvent(event)
             evdict["nominal"].systematic = "nominal"

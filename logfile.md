@@ -31,3 +31,11 @@ tthbb13=302f1a8
 CommonClassifier=8d923c0
 MEIntegratorStandalone=a3c81d8
 CMSSW=7482860
+
+
+VHBBHeppyV22pre_tthbbV10pre_pilot1
+-------------
+tthbb13=aa6a656
+CommonClassifier=3746eb6
+MEIntegratorStandalone=c8307f6
+CMSSW=c41bc99

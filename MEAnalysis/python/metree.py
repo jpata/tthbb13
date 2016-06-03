@@ -27,7 +27,7 @@ jetType = NTupleObjectType("jetType", variables = [
     NTupleVariable("id", lambda x : x.id, mcOnly=True),  
     NTupleVariable("qgl", lambda x : x.qgl),
     NTupleVariable("btagCSV", lambda x : x.btagCSV),
-    NTupleVariable("btagBDT", lambda x : x.btagBDT),
+    NTupleVariable("btagCMVA", lambda x : x.btagCMVA),
     #NTupleVariable("bTagWeight", lambda x : x.bTagWeight, mcOnly=True),
     #NTupleVariable("bTagWeightHFUp", lambda x : x.bTagWeightHFUp, mcOnly=True),
     #NTupleVariable("bTagWeightHFDown", lambda x : x.bTagWeightHFDown, mcOnly=True),
@@ -624,33 +624,32 @@ def getTreeProducer(conf):
                             })
 
 
-    for systematic in ["nominal"]:
-        for vtype in [
-            ("weight_xs",               float,  ""),
-            ("ttCls",                   int,    ""),
-            ("genHiggsDecayMode",       int,    ""),
-            ("bTagWeight",              float,  ""),
-            ("bTagWeight_HFDown",       float,  ""),
-            ("bTagWeight_HFUp",         float,  ""),
-            ("bTagWeight_JESDown",      float,  ""),
-            ("bTagWeight_JESUp",        float,  ""),
-            ("bTagWeight_LFDown",       float,  ""),
-            ("bTagWeight_LFUp",         float,  ""),
-            ("bTagWeight_cErr1Down",       float,  ""),
-            ("bTagWeight_cErr1Up",         float,  ""),
-            ("bTagWeight_cErr2Down",       float,  ""),
-            ("bTagWeight_cErr2Up",         float,  ""),
-            ("bTagWeight_HFStats1Down",   float,  ""),
-            ("bTagWeight_HFStats1Up",     float,  ""),
-            ("bTagWeight_HFStats2Down",   float,  ""),
-            ("bTagWeight_HFStats2Up",     float,  ""),
-            ("bTagWeight_LFStats1Down",   float,  ""),
-            ("bTagWeight_LFStats1Up",     float,  ""),
-            ("bTagWeight_LFStats2Down",   float,  ""),
-            ("bTagWeight_LFStats2Up",     float,  ""),
-            ("nPU0",                    float,  ""),
-        ]:
-            treeProducer.globalVariables += [makeGlobalVariable(vtype, systematic, mcOnly=True)]
+    for vtype in [
+        ("weight_xs",               float,  ""),
+        ("ttCls",                   int,    ""),
+        ("genHiggsDecayMode",       int,    ""),
+        ("bTagWeight",              float,  ""),
+        ("bTagWeight_HFDown",       float,  ""),
+        ("bTagWeight_HFUp",         float,  ""),
+        ("bTagWeight_JESDown",      float,  ""),
+        ("bTagWeight_JESUp",        float,  ""),
+        ("bTagWeight_LFDown",       float,  ""),
+        ("bTagWeight_LFUp",         float,  ""),
+        ("bTagWeight_cErr1Down",       float,  ""),
+        ("bTagWeight_cErr1Up",         float,  ""),
+        ("bTagWeight_cErr2Down",       float,  ""),
+        ("bTagWeight_cErr2Up",         float,  ""),
+        ("bTagWeight_HFStats1Down",   float,  ""),
+        ("bTagWeight_HFStats1Up",     float,  ""),
+        ("bTagWeight_HFStats2Down",   float,  ""),
+        ("bTagWeight_HFStats2Up",     float,  ""),
+        ("bTagWeight_LFStats1Down",   float,  ""),
+        ("bTagWeight_LFStats1Up",     float,  ""),
+        ("bTagWeight_LFStats2Down",   float,  ""),
+        ("bTagWeight_LFStats2Up",     float,  ""),
+        ("nPU0",                    float,  ""),
+    ]:
+        treeProducer.globalVariables += [makeGlobalVariable(vtype, "nominal", mcOnly=True)]
 
         #Update b-tag weights locally
         #btag_weights = {}

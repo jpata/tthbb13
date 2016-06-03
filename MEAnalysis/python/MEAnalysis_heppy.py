@@ -204,6 +204,8 @@ treevar = cfg.Analyzer(
 from TTH.MEAnalysis.metree import getTreeProducer
 treeProducer = getTreeProducer(conf)
 
+print treeProducer
+
 # definition of a sequence of analyzers,
 # the analyzers will process each event in this order
 sequence = cfg.Sequence([

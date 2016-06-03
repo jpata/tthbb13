@@ -1,4 +1,4 @@
-import sys, re
+import sys, re, shutil
 from copy import deepcopy
 
 #Each time you call multicrab.py, you choose to submit jobs from one of these workflows
@@ -8,6 +8,7 @@ workflows = [
     "hadronic", #ttH with FH decays
     "pilot", #ttH sample only, with no MEM
     "testing", #single-lumi jobs, a few samples
+    "localtesting", #run combined jobs locally
     "testing_withme" #single-lumi jobs, a few samples
 ]
 
@@ -49,24 +50,24 @@ for sd in sets_data:
         "runtime": 40,
         "mem_cfg": me_cfgs["nome"],
         "script": 'heppy_crab_script_data.sh'
+    }
+datasets.update({
+    'ttHTobb': {
+        "ds": '/ttHTobb_M125_13TeV_powheg_pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 10,
+        "runtime": 40,
+        "mem_cfg": me_cfgs["default"],
+        "script": 'heppy_crab_script.sh'
     },
-datasets.extend({
-    #'ttHTobb': {
-    #    "ds": '/ttHTobb_M125_13TeV_powheg_pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
-    #    "maxlumis": -1,
-    #    "perjob": 10,
-    #    "runtime": 40,
-    #    "mem_cfg": me_cfgs["default"],
-    #    "script": 'heppy_crab_script.sh'
-    #},
-    #'ttHToNonbb': {
-    #    "ds": '/ttHToNonbb_M125_13TeV_powheg_pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
-    #    "maxlumis": -1,
-    #    "perjob": 100,
-    #    "runtime": 40,
-    #    "mem_cfg": me_cfgs["default"],
-    #    "script": 'heppy_crab_script.sh'
-    #},
+    'ttHToNonbb': {
+        "ds": '/ttHToNonbb_M125_13TeV_powheg_pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 100,
+        "runtime": 40,
+        "mem_cfg": me_cfgs["default"],
+        "script": 'heppy_crab_script.sh'
+    },
     'TTbar_inc': {
         "ds": '/TT_TuneEE5C_13TeV-powheg-herwigpp/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM',
         "maxlumis": -1,
@@ -75,70 +76,70 @@ datasets.extend({
         "mem_cfg": me_cfgs["default"],
         "script": 'heppy_crab_script.sh'
     },
-    #'TTbar_sl': {
-    #    "ds": '/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM',
-    #    "maxlumis": -1,
-    #    "perjob": 100,
-    #    "runtime": 40,
-    #    "mem_cfg": me_cfgs["leptonic"],
-    #    "script": 'heppy_crab_script.sh'
-    #},
-    #'TTbar_dl': {
-    #    "ds": '/TTTo2L2Nu_13TeV-powheg/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext1-v1/MINIAODSIM',
-    #    "maxlumis": -1,
-    #    "perjob": 200,
-    #    "runtime": 40,
-    #    "mem_cfg": me_cfgs["leptonic"],
-    #    "script": 'heppy_crab_script.sh'
-    #},
-    #'QCD300': {
-    #    "ds": '/QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
-    #    "maxlumis": -1,
-    #    "perjob": 500,
-    #    "runtime": 40,
-    #    "mem_cfg": me_cfgs["hadronic"],
-    #    "script": 'heppy_crab_script.sh'
-    #},
-    #'QCD500': {
-    #    "ds": '/QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
-    #    "maxlumis": -1,
-    #    "perjob": 500,
-    #    "runtime": 40,
-    #    "mem_cfg": me_cfgs["hadronic"],
-    #    "script": 'heppy_crab_script.sh'
-    #},
-    #'QCD700': {
-    #    "ds": '/QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
-    #    "maxlumis": -1,
-    #    "perjob": 300,
-    #    "runtime": 40,
-    #    "mem_cfg": me_cfgs["hadronic"],
-    #    "script": 'heppy_crab_script.sh'
-    #},
-    #'QCD1000': {
-    #    "ds": '/QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
-    #    "maxlumis": -1,
-    #    "perjob": 200,
-    #    "runtime": 40,
-    #    "mem_cfg": me_cfgs["hadronic"],
-    #    "script": 'heppy_crab_script.sh'
-    #},
-    #'QCD1500': {
-    #    "ds": '/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
-    #    "maxlumis": -1,
-    #    "perjob": 100,
-    #    "runtime": 40,
-    #    "mem_cfg": me_cfgs["hadronic"],
-    #    "script": 'heppy_crab_script.sh'
-    #},
-    #'QCD2000': {
-    #    "ds": '/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
-    #    "maxlumis": -1,
-    #    "perjob": 100,
-    #    "runtime": 40,
-    #    "mem_cfg": me_cfgs["hadronic"],
-    #    "script": 'heppy_crab_script.sh'
-    #},
+    'TTbar_sl': {
+        "ds": '/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 100,
+        "runtime": 40,
+        "mem_cfg": me_cfgs["leptonic"],
+        "script": 'heppy_crab_script.sh'
+    },
+    'TTbar_dl': {
+        "ds": '/TTTo2L2Nu_13TeV-powheg/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext1-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 200,
+        "runtime": 40,
+        "mem_cfg": me_cfgs["leptonic"],
+        "script": 'heppy_crab_script.sh'
+    },
+    'QCD300': {
+        "ds": '/QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 500,
+        "runtime": 40,
+        "mem_cfg": me_cfgs["hadronic"],
+        "script": 'heppy_crab_script.sh'
+    },
+    'QCD500': {
+        "ds": '/QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 500,
+        "runtime": 40,
+        "mem_cfg": me_cfgs["hadronic"],
+        "script": 'heppy_crab_script.sh'
+    },
+    'QCD700': {
+        "ds": '/QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 300,
+        "runtime": 40,
+        "mem_cfg": me_cfgs["hadronic"],
+        "script": 'heppy_crab_script.sh'
+    },
+    'QCD1000': {
+        "ds": '/QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 200,
+        "runtime": 40,
+        "mem_cfg": me_cfgs["hadronic"],
+        "script": 'heppy_crab_script.sh'
+    },
+    'QCD1500': {
+        "ds": '/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 100,
+        "runtime": 40,
+        "mem_cfg": me_cfgs["hadronic"],
+        "script": 'heppy_crab_script.sh'
+    },
+    'QCD2000': {
+        "ds": '/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 100,
+        "runtime": 40,
+        "mem_cfg": me_cfgs["hadronic"],
+        "script": 'heppy_crab_script.sh'
+    },
 })
 
 #now we construct the workflows from all the base datasets
@@ -164,22 +165,34 @@ for k in datasets.keys():
 
 #Pilot job for updating transfer functions, retraining BLR
 workflow_datasets["pilot"] = {}
-pilot_ds = "TTbar_inc" 
+pilot_name = "TTbar_inc" 
 D = deepcopy(datasets[pilot_name])
-D["perjob"] = 50
+D["perjob"] = 300
 D["mem_cfg"] = me_cfgs["nome"]
 workflow_datasets["pilot"][pilot_name] = D
 
 #1-lumi per job, 10 job testing of a few samples
 workflow_datasets["testing"] = {}
 #for k in ["ttHTobb", "TTbar_inc", "QCD1500"]:
-for k in ["TTbar_inc", "SingleMuon"]:
+for k in ["TTbar_inc"]:#, "SingleMuon-Run2016B-PromptReco-v2"]:
+    D = deepcopy(datasets[k])
+    D["maxlumis"] = 10
+    D["perjob"] = 1
+    if "data" in D["script"]:
+        D["maxlumis"] = 250
+        D["perjob"] = 25
+    D["runtime"] = 1
+    D["mem_cfg"] = "cfg_noME.py"
+    workflow_datasets["testing"][k] = D
+
+workflow_datasets["localtesting"] = {}
+for k in ["TTbar_inc"]:#, "SingleMuon-Run2016B-PromptReco-v2"]:
     D = deepcopy(datasets[k])
     D["maxlumis"] = 10
     D["perjob"] = 1
     D["runtime"] = 1
     D["mem_cfg"] = "cfg_noME.py"
-    workflow_datasets["testing"][k] = D
+    workflow_datasets["localtesting"][k] = D
 
 workflow_datasets["testing_withme"] = {}
 for k in ["ttHTobb", "TTbar_inc", "QCD1500"]:
@@ -199,6 +212,31 @@ if __name__ == '__main__':
 
     def submit(config):
         res = crabCommand('submit', config = config)
+    
+    def localsubmit(config):
+        TMPDIR = "/scratch/{0}/crab_{1}".format(os.environ["USER"], "x")
+        CMSSW_VERSION = "CMSSW_8_0_5"
+        workdir = os.path.join(TMPDIR, CMSSW_VERSION, "work")
+        try: 
+            shutil.rmtree(TMPDIR)
+        except Exception as e:
+            print e
+        os.makedirs(TMPDIR)
+        os.system("cd {0}".format(TMPDIR))
+        pwd = os.getcwd() 
+        os.chdir(TMPDIR)
+        os.system("scramv1 project CMSSW {0}".format(CMSSW_VERSION))
+        os.makedirs(workdir)
+        os.chdir(pwd)
+        for inf in config.JobType.inputFiles + [config.JobType.scriptExe, 'PSet.py', 'file.json']:
+            print inf
+            shutil.copy(inf, os.path.join(workdir, os.path.basename(inf)))
+        os.system("cp -r $CMSSW_BASE/lib {0}/".format(workdir)) 
+        os.system("cp -r $CMSSW_BASE/lib/proclib {0}/lib/slc*/".format(workdir)) 
+        os.system('find $CMSSW_BASE/src/ -path "*/data/*" -type f | sed -s "s|$CMSSW_BASE/||" > files')
+        os.system('cp files $CMSSW_BASE/; cd $CMSSW_BASE; for f in `cat files`; do cp --parents $f {0}/; done'.format(workdir))
+        #os.system("cp -r $CMSSW_BASE/include {0}/".format(workdir)) 
+        #os.system("cp -r $CMSSW_BASE/src {0}/".format(workdir)) 
 
     from CRABClient.UserUtilities import config
     config = config()
@@ -251,11 +289,12 @@ if __name__ == '__main__':
     config.Data.publication = True
     config.Data.ignoreLocality = False
 
+    #config.Site.whitelist = ["T2_CH_CSCS", "T1_US_FNAL", "T2_DE_DESY", "T1_DE_KIT"]
     config.Site.storageSite = "T2_CH_CSCS"
 
     #loop over samples
     for sample in sel_datasets.keys():
-        print 'submitting ' + sample
+        print 'submitting ' + sample, sel_datasets[sample]
         dataset = sel_datasets[sample]["ds"]
         nlumis = sel_datasets[sample]["maxlumis"]
         perjob = sel_datasets[sample]["perjob"]
@@ -271,4 +310,7 @@ if __name__ == '__main__':
         config.Data.outputDatasetTag = submitname
         config.Data.outLFNDirBase = '/store/user/{0}/tth/'.format(getUsernameFromSiteDB()) + submitname
         config.JobType.scriptArgs = ['ME_CONF={0}'.format(mem_cfg)]
-        submit(config)
+        if args.workflow == "localtesting":
+            localsubmit(config)
+        else:
+            submit(config)

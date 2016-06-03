@@ -81,8 +81,8 @@ config.components = [cfg.Component(
     tree_name = "tree",
     n_gen = 1,
     xs = 1,
-    isMC = cfo.sample.isMC
 )]
+config.components[0].isMC = cfo.sample.isMC
 looper = Looper('Output_tth', config, nPrint=0)
 looper.loop()
 looper.write()
@@ -92,7 +92,6 @@ print "timeto_doMEM ",(time.time()-t0)
 inf1 = ROOT.TFile("Output/tree.root")
 inf2 = ROOT.TFile("Output_tth/tree.root")
 tof = ROOT.TFile("tree.root", "RECREATE")
-
 vhbb_dir = tof.mkdir("vhbb")
 def copyTo(src, dst):
     #copy ttjets output
@@ -113,7 +112,7 @@ tof.Close()
 
 f=ROOT.TFile.Open('tree.root')
 entries=f.Get('tree').GetEntries()
-
+f.Get('tree').Print("ALL")
 #Now write the FWKJobReport
 fwkreport='''<FrameworkJobReport>
 <ReadBranches>

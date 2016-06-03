@@ -81,9 +81,9 @@ $exitMessage
 EOF
 fi
 
-tail -n100 log
+tail -n500 log
 cat FrameworkJobReport.xml
 echo "======================== CMSRUN LOG ============================"
-head -n 30 Output/cmsRun.log 
+head -n 500 Output/cmsRun.log 
 echo "=== SNIP ==="
 tail -n 500 Output/cmsRun.log 
