@@ -13,8 +13,19 @@ import subprocess
 # Initialize
 ########################################
 
-das_client = "../crab_vhbb/das_client.py"
-output_base = "../gc/datasets"
+#/cvmfs/cms.cern.ch/slc6_amd64_gcc530/cms/cmssw/CMSSW_8_0_5/external/slc6_amd64_gcc530/bin/das_client.py
+#das_client = os.path.join(
+#    os.environ["CMSSW_RELEASE_BASE"],
+#    "external",
+#    os.environ["SCRAM_ARCH"],
+#    "bin",
+#    "das_client.py"
+#)
+das_client = "das_client.py"
+output_base = os.path.join(
+    os.environ["CMSSW_BASE"],
+    "src/TTH/MEAnalysis/gc/datasets/",
+)
 
 import argparse
 parser = argparse.ArgumentParser(description='Prepares dataset lists from DAS')
