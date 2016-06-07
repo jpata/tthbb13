@@ -28,6 +28,7 @@ sample_repl = {
     "ttHToNonbb_M125_13TeV_powheg_pythia8": "ttH_nonhbb",
     "ttHTobb_M125_13TeV_powheg_pythia8": "ttH_hbb",
     "TT_TuneCUETP8M1_13TeV-powheg-pythia8": "ttbarUnsplit",
+    "TT_TuneEE5C_13TeV-powheg-herwigpp": "ttbarUnsplit",
     "TTTo2L2Nu_13TeV-powheg": "ttbarUnsplit",
     "TTToSemiLeptonic_13TeV-powheg": "ttbarUnsplit",
 }

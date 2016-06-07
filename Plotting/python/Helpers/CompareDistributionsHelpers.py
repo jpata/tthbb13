@@ -163,19 +163,23 @@ def createHistograms(dic_files):
            # - a tuple: (filename, treename)
            # - a tuple: ('list of filenames', treename)
            # Using a Chain instead of a Tree of flexibility
-           # ONLY FILENAME GIVEN           
-           if isinstance( dic_files[p.from_file], str ):          
+           # ONLY FILENAME GIVEN
+           if isinstance( dic_files[p.from_file], str ):
               input_tree = ROOT.TChain("tree")
               input_tree.Add(dic_files[p.from_file])
+           elif isinstance( dic_files[p.from_file], list ):
+              input_tree = ROOT.TChain("tree")
+              for fi in dic_files[p.from_file]:
+                input_tree.Add(fi)
            # FILENAME AND TREENAME FIVEN
            elif isinstance( dic_files[p.from_file][0], str ):
               input_tree = ROOT.TChain(dic_files[p.from_file][1])
-              input_tree.Add(dic_files[p.from_file][0])                            
+              input_tree.Add(dic_files[p.from_file][0])
            # LIST OF FILENAMES AND TREENAME FIVEN
            else:
                input_tree = ROOT.TChain(dic_files[p.from_file][1])
                for fn in dic_files[p.from_file][0]:
-                  input_tree.Add(fn)          
+                  input_tree.Add(fn)
 
            # end openeing input file
   
