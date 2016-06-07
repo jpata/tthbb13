@@ -167,10 +167,6 @@ def createHistograms(dic_files):
            if isinstance( dic_files[p.from_file], str ):
               input_tree = ROOT.TChain("tree")
               input_tree.Add(dic_files[p.from_file])
-           elif isinstance( dic_files[p.from_file], list ):
-              input_tree = ROOT.TChain("tree")
-              for fi in dic_files[p.from_file]:
-                input_tree.Add(fi)
            # FILENAME AND TREENAME FIVEN
            elif isinstance( dic_files[p.from_file][0], str ):
               input_tree = ROOT.TChain(dic_files[p.from_file][1])
