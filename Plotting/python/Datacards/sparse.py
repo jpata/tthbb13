@@ -3,8 +3,6 @@
 This file contains a few tools to handle sparse histograms.
 All tests should be written in test/testDatacards.py
 """
-import rootpy
-import rootpy.io
 import ROOT
 
 from collections import OrderedDict
@@ -51,6 +49,7 @@ def apply_cuts_project(h, cuts, projections):
     cuts (list of 3-tuples): list of cuts in the form of tuples (variable, loval, hival).
     projections (list): list of variables to project out.
     """
+    import rootpy
     for i in range(h.GetNdimensions()):
         h.GetAxis(i).SetRange(1, h.GetAxis(i).GetNbins())
     for c in cuts:
@@ -93,16 +92,18 @@ def save_hdict(ofn, hdict):
         kname = k.split("/")[-1]
         if len(kname) == 0:
             raise KeyError("Object had no name")
-
-        try:
-            d = outfile.get(kpath)
-        except Exception as e:
-            d = mkdirs(outfile, kpath)
-            dirs[kpath] = d
-        assert(v != None)
-        v.SetName(kname)
-        v.SetDirectory(d)
-        #d.Write("", ROOT.TObject.kOverwrite)
+        if kpath:
+            try:
+                d = outfile.get(kpath)
+            except Exception as e:
+                d = mkdirs(outfile, kpath)
+                dirs[kpath] = d
+            assert(v != None)
+            v.SetName(kname)
+            v.SetDirectory(d)
+        else:
+            v.SetName(kname)
+            v.SetDirectory(outfile)
     outfile.Write()
     outfile.Close()
 

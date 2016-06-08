@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 ########################################
 # Imports
 ########################################
@@ -21,7 +22,13 @@ import subprocess
 #    "bin",
 #    "das_client.py"
 #)
-das_client = "das_client.py"
+#das_client = os.path.join(
+#    os.environ["CMSSW_BASE"],
+#    "src/TTH/MEAnalysis/python",
+#    "das_client.py"
+#)
+das_client = "/afs/cern.ch/user/v/valya/public/das_client.py"
+
 output_base = os.path.join(
     os.environ["CMSSW_BASE"],
     "src/TTH/MEAnalysis/gc/datasets/",
