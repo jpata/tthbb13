@@ -69,7 +69,7 @@ def apply_rules(args):
     infile_tf = ROOT.TFile.Open(infile)
     hdict = {}
     for rule in rules:
-
+        
         #convert the string of the cut list into the actual list
         cuts = eval(rule["cuts"])
         hk = rule["output"]
@@ -106,10 +106,10 @@ def apply_rules(args):
             ret.Rebin2D(variables[0][1], variables[0][2])
         ret.Scale(rule["xs_weight"])
 
-    if hdict.has_key(hk):
-        hdict[hk] += ret
-    else:
-        hdict[hk] = ret
+        if hdict.has_key(hk):
+            hdict[hk] += ret
+        else:
+            hdict[hk] = ret
     infile_tf.Close()
     return hdict
 

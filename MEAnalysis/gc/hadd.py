@@ -9,7 +9,7 @@ import os, fnmatch
 #recurse over the given path
 for path, dirs, files in os.walk(sys.argv[1]):
     #Check if there are root files in this path
-    rootfiles = filter(lambda x: x.endswith("root") and x.startswith("output"), files)
+    rootfiles = filter(lambda x: x.endswith("root"), files)
     #If yes, this is a sample directory
     isSample = False
     if len(rootfiles)>0:

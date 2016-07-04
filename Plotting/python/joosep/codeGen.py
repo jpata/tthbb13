@@ -42,7 +42,7 @@ def makeCategory(cat, ids=[]):
     if isleaf:
         s = r"""
 new {catkind}(
-    [](const Event& ev){{
+    [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst){{
       return {cuts};
     }},
     {catid},
@@ -263,6 +263,7 @@ for k in systematics:
             ]
 
 #List of all processes
+#These will be converted to the enum ProcessKey
 processes = [
     "ttH",
     "ttH_hbb",
@@ -302,18 +303,11 @@ categories = [
 #Map categories to their respective C++ cuts. The Event is available as "ev"
 cuts = {
     "sl": "BaseCuts::sl(ev)",
-    "sl_mu": "BaseCuts::sl_mu(ev)",
-    "sl_el": "BaseCuts::sl_el(ev)",
-    
-    "dl_mumu": "BaseCuts::dl_mumu(ev)",
-    "dl_ee": "BaseCuts::dl_ee(ev)",
-    "dl_emu": "BaseCuts::dl_emu(ev)",
-
     "dl": "BaseCuts::dl(ev)",
 }
 
 #Nested list of (name, type, subcategory) triplets, corresponding to the
-#category tree to create
+#CategoryKey enum to create
 categories_tree = [
     ("sl", "SparseCategoryProcessor", []),
     ("dl", "SparseCategoryProcessor", []),

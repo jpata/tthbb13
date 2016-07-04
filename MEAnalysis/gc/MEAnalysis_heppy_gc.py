@@ -25,7 +25,7 @@ import FWCore.ParameterSet.Config as cms
 firstEvent = int(os.environ["SKIP_EVENTS"])
 nEvents = int(os.environ["MAX_EVENTS"])
 fns = os.environ["FILE_NAMES"].split()
-dataset = os.environ["DATASETPATH"]
+dataset = os.environ["DATASETPATH"].split("__")[-1]
 
 good_samp = []
 print "processing dataset={0}".format(dataset)
@@ -60,15 +60,12 @@ output_service = cfg.Service(
 
 inputSamples = []
 for sn, s in samples_dict.items():
-    sample_ngen = s.nGen.value()
-    if (sample_ngen<0):
-        sample_ngen = getSampleNGen(s)
     inputSample = cfg.Component(
         'tth',
         files = s.subFiles.value(),
         tree_name = s.treeName.value(),
-        n_gen = sample_ngen,
-        xs = s.xSec.value()
+        n_gen = 1.0,
+        xs = 1.0
     )
     inputSample.isMC = s.isMC.value()
     if s.skip.value() == False:

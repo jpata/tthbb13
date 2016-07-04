@@ -151,11 +151,15 @@ class Conf:
         "btagWP": "CSVM",
 
         #These working points are evaluated and stored in the trees as nB* - number of jets passing the WP
-        #https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideBTagging#Preliminary_working_or_operating
+        #https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation80X
         "btagWPs": {
             "CSVM": ("btagCSV", 0.800),
             "CSVL": ("btagCSV", 0.460),
-            "CSVT": ("btagCSV", 0.935)
+            "CSVT": ("btagCSV", 0.935),
+            
+            "CMVAM": ("btagCMVA", 0.185),
+            "CMVAL": ("btagCMVA", -0.715),
+            "CMVAT": ("btagCMVA", 0.875)
         },
 
         #if btagCSV, untagged/tagged selection for W mass and MEM is done by CSVM cut
@@ -188,8 +192,8 @@ class Conf:
         #"systematics": ["nominal"],
         "systematics": [
             "nominal",
-            "JESUp", "JESDown",
-        #    "JERUp", "JERDown"
+            #"JESUp", "JESDown",
+            #"JERUp", "JERDown"
         ],
         
         
@@ -206,11 +210,11 @@ class Conf:
             #"reco", #info about reconstructed final state
             #"meminput", #info about particles used for MEM input
             #"commoninput", #print out inputs for CommonClassifier
-            "commonclassifier",
+            #"commonclassifier",
         ],
 
         #"eventWhitelist": [
-        #    (1, 6627, 1321096)
+        #    (1, 144279, 14372670)
         #]
     }
 
@@ -331,7 +335,8 @@ class Conf:
             "FH_4w2h1t", #7j,3b & 8j,3b
             "FH_0w0w2h2t", #all 4b cats
             "FH_0w0w2h1t", #all cats
-            "FH_0w0w1h2t"  #all cats
+            "FH_0w0w1h2t",  #all cats
+            "SL_2w2h2t_1j",
         ],
 
         #This configures the MEMs to actually run, the rest will be set to 0
@@ -342,12 +347,13 @@ class Conf:
             #"SL_2w2h1t_l",
             #"SL_2w2h1t_h",
             "SL_2w2h2t",
-            "SL_2w2h2t_sj",
+            "SL_2w2h2t_1j",
+            #"SL_2w2h2t_sj",
             #"SL_0w2h2t_sj",
             #"SL_2w2h2t_memLR",
             #"SL_0w2h2t_memLR",
             #"DL_0w2h2t_Rndge4t",
-            "FH_4w2h2t", #8j,4b
+            #"FH_4w2h2t", #8j,4b
             #"FH_3w2h2t", #7j,4b
             #"FH_4w2h1t", #7j,3b & 8j,3b
             #"FH_0w0w2h2t", #all 4b cats
@@ -365,7 +371,6 @@ CvectorPSVar = getattr(ROOT, "std::vector<MEM::PSVar::PSVar>")
 ###
 ### SL_2w2h2t
 ###
-#FIXME: why == here and not >= ?
 c = MEMConfig(Conf)
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 1 and
@@ -379,6 +384,24 @@ strat.push_back(MEM.Permutations.QUntagged)
 strat.push_back(MEM.Permutations.BTagged)
 c.cfg.perm_pruning = strat
 Conf.mem_configs["SL_2w2h2t"] = c
+
+###
+### SL_2w2h2t_1j
+###
+c = MEMConfig(Conf)
+c.do_calculate = lambda ev, mcfg: (
+    len(mcfg.lepton_candidates(ev)) == 1 and
+    len(mcfg.b_quark_candidates(ev)) >= 4 and
+    len(mcfg.l_quark_candidates(ev)) >= 3
+)
+c.mem_assumptions.add("sl")
+strat = CvectorPermutations()
+strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
+strat.push_back(MEM.Permutations.QUntagged)
+strat.push_back(MEM.Permutations.BTagged)
+c.cfg.perm_pruning = strat
+c.cfg.int_code += ROOT.MEM.IntegrandType.AdditionalRadiation
+Conf.mem_configs["SL_2w2h2t_1j"] = c
 
 ###
 ### SL_1w2h2t

@@ -1,11 +1,22 @@
 import glob, os
 
+
+ngen = {'VHBBHeppyV22pre_tthbbV10pre_leptonic_Jun10_mc_withme__TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': 1815355.0, 'VHBBHeppyV22pre_tthbbV10pre_leptonic_Jun10_mc_withme__ttHTobb_M125_13TeV_powheg_pythia8': 396368.0, 'VHBBHeppyV22pre_tthbbV10pre_leptonic_Jun10_mc_withme__TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': 1860322.0, 'VHBBHeppyV22pre_tthbbV10pre_leptonic_Jun10_mc_withme__TTTo2L2Nu_13TeV-powheg': 1999194.0,
+        'VHBBHeppyV22pre_tthbbV10pre_leptonic_Jun10_mc_withme__TT_TuneEE5C_13TeV-powheg-herwigpp': 999319.0}
+
+
 #Cross-sections from
 # $t \bar{t} + \mathrm{jets}$ - https://twiki.cern.ch/twiki/bin/view/LHCPhysics/TtbarNNLO, $M_{top} = 172.5$ GeV
 # ttH - https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageAt1314TeV, $M_H = 125.0$ GeV
 xsec = {}
 xsec[("ttjets", "8TeV")] = 252.89
 xsec[("ttjets", "13TeV")] = 831.76
+#http://pdg.lbl.gov/2013/reviews/rpp2013-rev-top-quark.pdf page 3, A-C
+br_tt_to_ll = 0.105
+br_tt_to_lj = 0.438
+
+xsec[("ttjets", "tt_to_ll", "13TeV")] = xsec[("ttjets", "13TeV")] * br_tt_to_ll
+xsec[("ttjets", "tt_to_lj", "13TeV")] = xsec[("ttjets", "13TeV")] * br_tt_to_lj
 
 br_h_to_bb = 0.577
 xsec[("tth", "8TeV")] = 0.1302
@@ -47,15 +58,17 @@ samples_nick = {
     'ST_t-channel_top_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1': "stop_t",
     'ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1': "stop_tbarW",
     'ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1':"stop_tW",
-    'TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8':"tt_dl",
-    'TTJets_HT-1200to2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': "ttjets_ht_1200_2500",
-    'TTJets_HT-2500toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': "ttjets_ht_2500_inf",
-    'TTJets_HT-600to800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': "ttjets_ht_600_800",
-    'TTJets_HT-800to1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': "ttjets_ht_800_1200",
-    'TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': "ttjets_sl_t",
-    'TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': "ttjets_sl_tbar",
-    'TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': "ttjets",
-    'TT_TuneCUETP8M1_13TeV-amcatnlo-pythia8': "ttjets",
+    'TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8':"ttbarUnsplit",
+    'TTJets_HT-1200to2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': "ttbarUnsplit",
+    'TTJets_HT-2500toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': "ttbarUnsplit",
+    'TTJets_HT-600to800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': "ttbarUnsplit",
+    'TTJets_HT-800to1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': "ttbarUnsplit",
+    'TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': "ttbarUnsplit",
+    'TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': "ttbarUnsplit",
+    'TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': "ttbarUnsplit",
+    'TTTo2L2Nu_13TeV-powheg': 'ttbarUnsplit',
+    'TT_TuneEE5C_13TeV-powheg-herwigpp': 'ttbarUnsplit',
+    'TT_TuneCUETP8M1_13TeV-amcatnlo-pythia8': "ttbarUnsplit",
     'TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8': "ttW_Wlnu",
     'TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8':"ttW_Wqq",
     'TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8': "ttZ_Zqq",
@@ -66,12 +79,16 @@ samples_nick = {
     'WW_TuneCUETP8M1_13TeV-pythia8': "ww",
     'WZ_TuneCUETP8M1_13TeV-pythia8': "wz",
     'ZZ_TuneCUETP8M1_13TeV-pythia8': "zz",
-    'ttHToNonbb_M125_13TeV_powheg_pythia8': "ttH_Hnonbb",
-    'ttHTobb_M125_13TeV_powheg_pythia8': "ttH_Hbb"
+    'ttHToNonbb_M125_13TeV_powheg_pythia8': "ttH_nonhbb",
+    'ttHTobb_M125_13TeV_powheg_pythia8': "ttH_hbb"
 }
 
 xsec_sample = {
     "TT_TuneCUETP8M1_13TeV-powheg-pythia8": xsec[("ttjets", "13TeV")],
+    "TT_TuneEE5C_13TeV-powheg-herwigpp": xsec[("ttjets", "13TeV")],
+    "TTTo2L2Nu_13TeV-powheg": xsec[("ttjets", "tt_to_ll", "13TeV")],
+    "TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": 0.5*xsec[("ttjets", "tt_to_lj", "13TeV")],
+    "TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": 0.5*xsec[("ttjets", "tt_to_lj", "13TeV")],
     "ttHTobb_M125_13TeV_powheg_pythia8": xsec[("tthbb", "13TeV")],
     "ttHToNonbb_M125_13TeV_powheg_pythia8": xsec[("tth_nonhbb", "13TeV")],
 }
@@ -96,9 +113,12 @@ def get_files(fname):
     lines = map(lambda x: x.split()[0], lines)
     return lines
 
+# This function is used everywher to translate LFN /store to PFN root://
+# currently all files are assumed to reside at CSCS
+site_prefix = "root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat"
 def getSitePrefix(fn=""):
     if fn.startswith("/store"):
-        return "root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat" + fn
+        return site_prefix  + fn
     elif fn.startswith("file://"):
         return fn
     else:

@@ -64,41 +64,60 @@ std::vector<std::string> split(const std::string &s, char delim) {
 }
 
 //Functions that define how an axis in the sparse histogram should be filled
-const map<string, function<float(const Event& ev)>> AxisFunctions = {
-    {"counting", [](const Event& ev) { return 1;}},
-    {"eventParity", [](const Event& ev) { return ev.data->evt%2;}},
+const map<string, AxisFunction> AxisFunctions = {
+    {"counting", [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) { return 1;}},
+    {"eventParity", [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) { return ev.data->evt%2;}},
 
     //tt+bb discriminators
-    {"mem_SL_0w2h2t", [](const Event& ev) { return ev.mem_SL_0w2h2t;}},
-    {"mem_SL_1w2h2t", [](const Event& ev) { return ev.mem_SL_1w2h2t;}},
-    {"mem_SL_2w2h2t", [](const Event& ev) { return ev.mem_SL_2w2h2t;}},
-    {"mem_SL_2w2h2t_sj", [](const Event& ev) { return ev.mem_SL_2w2h2t_sj;}},
-    {"mem_DL_0w2h2t", [](const Event& ev) { return ev.mem_DL_0w2h2t;}},
-    {"common_bdt", [](const Event& ev) { return ev.common_bdt;}},
+    {"mem_SL_0w2h2t", [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) { return ev.mem_SL_0w2h2t;}},
+    {"mem_SL_1w2h2t", [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) { return ev.mem_SL_1w2h2t;}},
+    {"mem_SL_2w2h2t", [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) { return ev.mem_SL_2w2h2t;}},
+    {"mem_SL_2w2h2t_sj", [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) { return ev.mem_SL_2w2h2t_sj;}},
+    {"mem_DL_0w2h2t", [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) { return ev.mem_DL_0w2h2t;}},
+    {"common_bdt", [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) { return ev.common_bdt;}},
 
     //categorization variables
-    {"numJets", [](const Event& ev) { return ev.numJets;}},
-    {"nBCSVM", [](const Event& ev) { return ev.nBCSVM;}},
-    {"nBCSVL", [](const Event& ev) { return ev.nBCSVL;}},
+    {"numJets", [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) { return ev.numJets;}},
+    {"nBCSVM", [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) { return ev.nBCSVM;}},
+    {"nBCSVL", [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) { return ev.nBCSVL;}},
+    {"bkgCat1", [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) {
+        const int ttCls = ev.data->ttCls;
+        if (ev.data->ttCls == 51) {
+            return 1;
+        }
+        else if (ev.data->ttCls == 52) {
+            return 2;
+        }
+        else if (ev.data->ttCls >= 53) {
+            return 3;
+        }
+        else if (ev.data->ttCls >= 41) {
+            return 4;
+        }
+        else if (ev.data->ttCls <= 0) {
+            return 0;
+        }
+    }},
 
     //Resolved control variables
-    {"Wmass", [](const Event& ev) { return ev.Wmass;}},
-    {"jet0_pt", [](const Event& ev) { return ev.jets.size() > 0 ? ev.jets.at(0).p4.Pt() : -99;}},
-    {"jet0_eta", [](const Event& ev) { return ev.jets.size() > 0 ? ev.jets.at(0).p4.Eta() : -99;}},
-    {"jet0_btagCSV", [](const Event& ev) { return ev.jets.size() > 0 ? ev.jets.at(0).btagCSV : -99;}},
-    {"jet1_pt", [](const Event& ev) { return ev.jets.size() > 1 ? ev.jets.at(1).p4.Pt() : -99;}},
-    {"jet1_eta", [](const Event& ev) { return ev.jets.size() > 1 ? ev.jets.at(1).p4.Eta() : -99;}},
-    {"jet1_btagCSV", [](const Event& ev) { return ev.jets.size() > 1 ? ev.jets.at(1).btagCSV : -99;}},
-    {"lep0_pt", [](const Event& ev) { return ev.leptons.size() > 0 ? ev.leptons.at(0).p4.Pt() : -99;}},
-    {"lep0_eta", [](const Event& ev) { return ev.leptons.size() > 0 ? ev.leptons.at(0).p4.Eta() : -99;}},
-    {"btag_LR_4b_2b_logit", [](const Event& ev) { return ev.btag_LR_4b_2b_logit;}},
+    {"Wmass", [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) { return ev.Wmass;}},
+    {"jet0_pt", [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) { return ev.jets.size() > 0 ? ev.jets.at(0).p4.Pt() : -99;}},
+    {"jet0_eta", [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) { return ev.jets.size() > 0 ? ev.jets.at(0).p4.Eta() : -99;}},
+    {"jet0_btagCSV", [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) { return ev.jets.size() > 0 ? ev.jets.at(0).btagCSV : -99;}},
+    {"jet1_pt", [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) { return ev.jets.size() > 1 ? ev.jets.at(1).p4.Pt() : -99;}},
+    {"jet1_eta", [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) { return ev.jets.size() > 1 ? ev.jets.at(1).p4.Eta() : -99;}},
+    {"jet1_btagCSV", [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) { return ev.jets.size() > 1 ? ev.jets.at(1).btagCSV : -99;}},
+    {"lep0_pt", [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) { return ev.leptons.size() > 0 ? ev.leptons.at(0).p4.Pt() : -99;}},
+    {"lep0_eta", [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) { return ev.leptons.size() > 0 ? ev.leptons.at(0).p4.Eta() : -99;}},
+    {"btag_LR_4b_2b_logit_btagCSV", [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) { return ev.btag_LR_4b_2b_logit_CSV;}},
+    {"btag_LR_4b_2b_logit_btagCMVA", [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) { return ev.btag_LR_4b_2b_logit_CMVA;}},
    
     //boosted control variables
-    {"topCandidate_mass", [](const Event& ev) { return ev.topCandidate_mass;}},
-    {"topCandidate_fRec", [](const Event& ev) { return ev.topCandidate_fRec;}},
+    {"topCandidate_mass", [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) { return ev.topCandidate_mass;}},
+    {"topCandidate_fRec", [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) { return ev.topCandidate_fRec;}},
     
     //This is needed to correctly divide the data 
-    {"leptonFlavour", [](const Event& event) { 
+    {"leptonFlavour", [](const Event& event, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) { 
         if (BaseCuts::sl_mu(event)) {
             return 1;
         }
@@ -182,7 +201,7 @@ const Configuration Configuration::makeConfiguration(JsonValue& value) {
             //loop over list of sparse
             for (auto lev2 : lev1->value) {
 
-                function<float(const Event& _ev)> _func;
+                AxisFunction _func;
                 int nBins = -1;
                 float xMin = 0.0;
                 float xMax = 0.0;
@@ -245,6 +264,10 @@ namespace CategoryKey {
 
     bool is_dl(vector<CategoryKey> k) {
         return k[0] == dl;
+    }
+
+    bool is_any(vector<CategoryKey> k) {
+        return (is_sl(k) || is_dl(k));
     }
 }
 
@@ -448,7 +471,7 @@ ProcessKey::ProcessKey getProcessKey(const Event& ev, ProcessKey::ProcessKey pro
 
 double nominal_weight(const Event& ev, const Configuration& conf) {
     if (isMC(conf.process)) {
-        return conf.lumi * conf.xsweight * ev.puWeight * ev.data->bTagWeight * process_weight(conf.process, conf);
+        return conf.lumi * conf.xsweight * ev.puWeight * ev.data->bTagWeight * process_weight(conf.process, conf) * ev.data->genWeight;
     }
     return 1.0;
 }
@@ -608,7 +631,8 @@ const Event EventFactory::makeNominal(const TreeData& data, const Configuration&
         data.tth_mva,
         data.common_bdt,
         data.btag_LR_4b_2b,
-        logit(data.btag_LR_4b_2b)
+        logit(data.btag_LR_4b_2b_btagCSV),
+        logit(data.btag_LR_4b_2b_btagCMVA)
     );
     return ev;
 }
@@ -638,7 +662,8 @@ const Event EventFactory::makeJESUp(const TreeData& data, const Configuration& c
         data.tth_mva_JESUp,
         data.common_bdt_JESUp,
         data.btag_LR_4b_2b_JESUp,
-        logit(data.btag_LR_4b_2b_JESUp)
+        logit(data.btag_LR_4b_2b_btagCSV_JESUp),
+        logit(data.btag_LR_4b_2b_btagCMVA_JESUp)
     );
 }
 
@@ -667,7 +692,68 @@ const Event EventFactory::makeJESDown(const TreeData& data, const Configuration&
         data.tth_mva,
         data.common_bdt_JESDown,
         data.btag_LR_4b_2b_JESDown,
-        logit(data.btag_LR_4b_2b_JESDown)
+        logit(data.btag_LR_4b_2b_btagCSV_JESDown),
+        logit(data.btag_LR_4b_2b_btagCMVA_JESDown)
+    );
+}
+
+const Event EventFactory::makeJERUp(const TreeData& data, const Configuration& conf) {
+    const vector<Jet> jets = makeAllJets(data, &(JetFactory::makeJERUp));
+    const vector<Lepton> leptons = makeAllLeptons(data);
+
+    return Event(
+        &data,
+        data.is_sl,
+        data.is_dl,
+        data.passPV,
+        data.numJets_JERUp,
+        data.nBCSVM_JERUp,
+        data.nBCSVL_JERUp,
+        jets,
+        leptons,
+        data.weight_xs,
+        data.puWeight,
+        data.Wmass,
+        mem_p(data.mem_tth_JERUp_p[0], data.mem_ttbb_JERUp_p[0]), //SL 022
+        mem_p(data.mem_tth_JERUp_p[2], data.mem_ttbb_JERUp_p[2]), //SL 122
+        mem_p(data.mem_tth_JERUp_p[5], data.mem_ttbb_JERUp_p[5]), //SL 222
+        mem_p(data.mem_tth_JERUp_p[9], data.mem_ttbb_JERUp_p[9], 0.05), //SL 222 sj
+        mem_p(data.mem_tth_JERUp_p[1], data.mem_ttbb_JERUp_p[1]), //DL 022,
+        data.tth_mva_JERUp,
+        data.common_bdt_JERUp,
+        data.btag_LR_4b_2b_JERUp,
+        logit(data.btag_LR_4b_2b_btagCSV_JERUp),
+        logit(data.btag_LR_4b_2b_btagCMVA_JERUp)
+    );
+}
+
+const Event EventFactory::makeJERDown(const TreeData& data, const Configuration& conf) {
+    const vector<Jet> jets = makeAllJets(data, &(JetFactory::makeJERDown));
+    const vector<Lepton> leptons = makeAllLeptons(data);
+
+    return Event(
+        &data,
+        data.is_sl,
+        data.is_dl,
+        data.passPV,
+        data.numJets_JERDown,
+        data.nBCSVM_JERDown,
+        data.nBCSVL_JERDown,
+        jets,
+        leptons,
+        data.weight_xs,
+        data.puWeight,
+        data.Wmass,
+        mem_p(data.mem_tth_JERDown_p[0], data.mem_ttbb_JERDown_p[0]), //SL 022
+        mem_p(data.mem_tth_JERDown_p[2], data.mem_ttbb_JERDown_p[2]), //SL 122
+        mem_p(data.mem_tth_JERDown_p[5], data.mem_ttbb_JERDown_p[5]), //SL 222
+        mem_p(data.mem_tth_JERDown_p[9], data.mem_ttbb_JERDown_p[9], 0.05), //SL 222 sj
+        mem_p(data.mem_tth_JERDown_p[1], data.mem_ttbb_JERDown_p[1]), //DL 022,
+        data.tth_mva,
+        data.common_bdt_JERDown,
+        data.btag_LR_4b_2b_JERDown,
+        logit(data.btag_LR_4b_2b_btagCSV_JERDown),
+        logit(data.btag_LR_4b_2b_btagCMVA_JERDown)
     );
 }
 
@@ -703,7 +789,7 @@ const Jet JetFactory::makeNominal(const TreeData& data, int njet) {
     return Jet(
         p4,
         csv,
-        data.jets_btagBDT[njet],
+        data.jets_btagCMVA[njet],
         data.jets_hadronFlavour[njet]
     );
 }
@@ -727,7 +813,7 @@ const Jet JetFactory::makeJESUp(const TreeData& data, int njet) {
     return Jet(
         p4,
         csv,
-        data.jets_btagBDT[njet],
+        data.jets_btagCMVA[njet],
         data.jets_hadronFlavour[njet]
     );
 }
@@ -753,7 +839,58 @@ const Jet JetFactory::makeJESDown(const TreeData& data, int njet) {
     return Jet(
         p4,
         csv,
-        data.jets_btagBDT[njet],
+        data.jets_btagCMVA[njet],
+        data.jets_hadronFlavour[njet]
+    );
+}
+
+
+const Jet JetFactory::makeJERUp(const TreeData& data, int njet) {
+    assert(njet <= data.njets);
+    TLorentzVector p4;
+    p4.SetPtEtaPhiM(
+        data.jets_pt[njet],
+        data.jets_eta[njet],
+        data.jets_phi[njet],
+        data.jets_mass[njet]
+    );
+    //Undo nominal correction, re-do JERUp correction
+    const double corr = data.jets_corr_JERUp[njet] / data.jets_corr_JER[njet];
+    p4 *= (1.0 / corr);
+    double csv = data.jets_btagCSV[njet];
+    if (std::isnan(csv)) {
+        csv = -10.0;
+    }
+    return Jet(
+        p4,
+        csv,
+        data.jets_btagCSV[njet],
+        data.jets_hadronFlavour[njet]
+    );
+}
+
+
+const Jet JetFactory::makeJERDown(const TreeData& data, int njet) {
+    assert(njet <= data.njets);
+    TLorentzVector p4;
+    p4.SetPtEtaPhiM(
+        data.jets_pt[njet],
+        data.jets_eta[njet],
+        data.jets_phi[njet],
+        data.jets_mass[njet]
+    );
+    //Undo nominal correction, re-do JERDown correction
+    const double corr = data.jets_corr_JERDown[njet] / data.jets_corr_JER[njet];
+    p4 *= (1.0 / corr);
+    
+    double csv = data.jets_btagCSV[njet];
+    if (std::isnan(csv)) {
+        csv = -10.0;
+    }
+    return Jet(
+        p4,
+        csv,
+        data.jets_btagCSV[njet],
         data.jets_hadronFlavour[njet]
     );
 }
@@ -792,7 +929,7 @@ void CategoryProcessor::process(
     //Check if event passes cuts
     bool passes = isCategoryEnabled(conf, catKeys);
     if (passes) {
-        passes = passes && (*this)(event);
+        passes = passes && (*this)(event, conf.process, catKeys, systKey);
     } 
 
     if (passes) {
@@ -846,50 +983,42 @@ void SparseCategoryProcessor::fillHistograms(
 
     //fill base histograms
     CategoryProcessor::fillHistograms(event, results, key, weight, conf);
-
+    const auto proc = get<0>(key);
+    const auto cats = get<1>(key);
+    const auto syst = get<2>(key);
     THnSparseF* h = nullptr;
-    if (CategoryKey::is_sl(get<1>(key))) {
-        const auto hkey = make_tuple(
-            get<0>(key),
-            get<1>(key),
-            get<2>(key),
-            HistogramKey::sparse
-        );
-        
-        if (!results.count(hkey)) {
-            h = makeHist();
-            results[hkey] = static_cast<TObject*>(h);
-        } else {
-            h = static_cast<THnSparseF*>(results.at(hkey));
-        }
-    } else if (CategoryKey::is_dl(get<1>(key))) {
-        const auto hkey = make_tuple(
-            get<0>(key),
-            get<1>(key),
-            get<2>(key),
-            HistogramKey::sparse
-        );
-        if (!results.count(hkey)) {
-            h = makeHist();
-            results[hkey] = static_cast<TObject*>(h);
-        } else {
-            h = static_cast<THnSparseF*>(results.at(hkey));
-        }
-    }
-    if (h != nullptr) {
-        vector<double> vals;
-        for (auto& ax : axes) {
-            double x = ax.evalFunc(event);
-            if (x < ax.xMin) {
-                x = ax.xMin;
-            } else if (x >= ax.xMax) {
-                x = ax.xMax - (ax.xMax-ax.xMin)/(double)ax.nBins;
-            }
-            vals.push_back(x);
-        }
 
-        h->Fill(&vals[0], weight);
+    //check that the category is defined
+    const auto hkey = make_tuple(
+        proc, //process
+        cats, //categories (vector)
+        syst, //systematic
+        HistogramKey::sparse //histo name
+    );
+    
+    //Make output histo if doesn't exist
+    if (!results.count(hkey)) {
+        h = makeHist();
+        results[hkey] = static_cast<TObject*>(h);
+    } else {
+        h = static_cast<THnSparseF*>(results.at(hkey));
     }
+    assert(h != nullptr);
+
+    //Evaluate all axis functions of the sparse histo
+    vector<double> vals;
+    for (auto& ax : axes) {
+        double x = ax.evalFunc(event, proc, cats, syst);
+        if (x < ax.xMin) {
+            x = ax.xMin;
+        } else if (x >= ax.xMax) {
+            x = ax.xMax - (ax.xMax-ax.xMin)/(double)ax.nBins;
+        }
+        vals.push_back(x);
+    }
+
+    h->Fill(&vals[0], weight);
+    
 }
 
 string to_string(const ResultKey& k) {

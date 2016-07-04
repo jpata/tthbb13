@@ -2,7 +2,6 @@
 echo "heppy_crab_script.sh"
 tar xvzf python.tar.gz --directory $CMSSW_BASE 
 tar xzf data.tar.gz --directory $CMSSW_BASE/src/TTH/MEAnalysis
-ls -lR .
 echo "ENV..................................."
 env 
 echo "VOMS"
@@ -11,18 +10,15 @@ echo "CMSSW BASE, python path, pwd"
 echo $CMSSW_BASE 
 echo $PYTHON_PATH
 echo $PWD 
-cp lib/slc*/* $CMSSW_BASE/lib/slc*
-cp lib/slc*/.* $CMSSW_BASE/lib/slc*
+cp -r lib/slc*/* $CMSSW_BASE/lib/slc*
+cp -r lib/slc*/.* $CMSSW_BASE/lib/slc*
 echo "AFTER COPY content of $CMSSW_BASE/lib/slc*"
-ls -lR  $CMSSW_BASE/lib/slc*
 
 cp -r interface/* $CMSSW_BASE/interface/
 echo "AFTER COPY content of $CMSSW_BASE/interface"
-ls -lR  $CMSSW_BASE/interface/
 
 cp -r src/* $CMSSW_BASE/src/
 echo "AFTER COPY content of $CMSSW_BASE/src"
-ls -lR  $CMSSW_BASE/src/
 
 PROXYFILE=`grep "BEGIN CERTIFICATE" * | perl -pe 's/:.*//'  | grep -v heppy | tail -n 1`
 export X509_USER_PROXY=$PWD/$PROXYFILE

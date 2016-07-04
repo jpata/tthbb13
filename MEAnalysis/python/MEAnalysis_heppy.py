@@ -57,7 +57,7 @@ pi_file.close()
 
 #Event contents are defined here
 #This is work in progress
-from TTH.MEAnalysis.VHbbTree import *
+from TTH.MEAnalysis.VHbbTree import EventAnalyzer
 
 #This analyzer reads branches from event.input (the TTree/TChain) to event.XYZ (XYZ is e.g. jets, leptons etc)
 evs = cfg.Analyzer(
@@ -204,8 +204,6 @@ treevar = cfg.Analyzer(
 from TTH.MEAnalysis.metree import getTreeProducer
 treeProducer = getTreeProducer(conf)
 
-print treeProducer
-
 # definition of a sequence of analyzers,
 # the analyzers will process each event in this order
 sequence = cfg.Sequence([
@@ -290,7 +288,12 @@ if __name__ == "__main__":
     #Process all samples in the sample list
     for samp in inputSamples:
         if not samp.isMC:
-            continue
+            from TTH.MEAnalysis.VHbbTree_data import EventAnalyzer
+            evs = cfg.Analyzer(
+                EventAnalyzer,
+                'events',
+            )
+            sequence[2] = evs 
         if samp.skip: #DS
             continue
         config = cfg.Config(

@@ -236,12 +236,12 @@ class JetAnalyzer(FilterAnalyzer):
             if "debug" in self.conf.general["verbosity"]:
                 autolog("fails because SL NJ<3")
             passes = False
-        if event.is_dl:
+        elif event.is_dl:
             if len(event.good_jets) < 2:
                 if "debug" in self.conf.general["verbosity"]:
                     autolog("fails because DL NJ<2")
                 passes = False
-        if event.is_fh:
+        elif event.is_fh:
             if len(event.good_jets) < self.conf.jets["minjets_fh"]: #DS
                 passes = False        
             if len(event.good_jets) >= self.conf.jets["minjets_fh"]:

@@ -351,7 +351,7 @@ def draw_data_mc(tf, hname, samples, **kwargs):
     else:
         a1 = plt.axes()
         
-    c.suptitle("$\\textbf{CMS}$ preliminary $\sqrt{s} = 13$ TeV"+title_extended,
+    c.suptitle("$\textbf{{CMS}}$ preliminary $\sqrt{{s}} = 13$ TeV"+title_extended,
         y=1.02, x=0.02,
         horizontalalignment="left", verticalalignment="bottom", fontsize=16
     )

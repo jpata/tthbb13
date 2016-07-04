@@ -1,15 +1,18 @@
-import ROOT, sys
+import ROOT, sys, os
 from TTH.MEAnalysis.samples_base import getSitePrefix
+from TTH.MEAnalysis.samples import samples_dict
 ROOT.gROOT.SetBatch(True)
 ROOT.TH1.SetDefaultSumw2(True)
 ROOT.TH1.AddDirectory(False)
 
+DATASETPATH = os.environ.get("DATASETPATH", "")
+spl = DATASETPATH.split("__")
+sample_name = spl[-1]
+sample = samples_dict[sample_name]
+
 INFILES = sys.argv[2:]
 OUTFILE = sys.argv[1]
 
-tt = ROOT.TChain("vhbb/tree")
-for inf in INFILES:
-    tt.AddFile(getSitePrefix(inf))
 
 def hist(of, x, disc, low=0, high=1):
     h = ROOT.TH1D(x, x, 100, low, high)
@@ -24,9 +27,6 @@ def hist3d(of, x, disc, low=0, high=1):
     h.GetZaxis().SetTitle(disc + " b-discriminator")
     of.Add(h)
     return h
-
-of = ROOT.TFile(OUTFILE, "RECREATE")
-of.cd()
 
 def makeControlPlots(discname, functoplot, low, high):
     hists = {
@@ -87,8 +87,17 @@ def makeControlPlots(discname, functoplot, low, high):
                     h3.SetBinContent(i, j, k, unnorm)
                 #print i, j, h3.ProjectionZ("", i, i, j, j).Integral()
 
-makeControlPlots("btagCSV", "Jet_btagCSV", 0.0, 1.0)
-makeControlPlots("btagBDT", "Jet_btagBDT", -1.0, 1.0)
+if __name__ == "__main__":
+    tt = ROOT.TChain("vhbb/tree")
+    for inf in INFILES:
+        tt.AddFile(getSitePrefix(inf))
 
-of.Write()
-of.Close()
+    of = ROOT.TFile(OUTFILE, "RECREATE")
+    of.cd()
+
+    if sample.isMC:
+        makeControlPlots("btagCSV", "Jet_btagCSV", 0.0, 1.0)
+        makeControlPlots("btagCMVA", "Jet_btagCMVA", -1.0, 1.0)
+    
+    of.Write()
+    of.Close()

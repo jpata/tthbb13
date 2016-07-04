@@ -100,7 +100,7 @@ class SubjetAnalyzer(FilterAnalyzer):
     def process(self, event):
         #Process subjets with variated systematics
         for (syst, event_syst) in event.systResults.items():
-            if event_syst.passes_btag:
+            if getattr(event_syst, "passes_btag", False):
                 res = self._process(event_syst)
                 event.systResults[syst] = res
             else:
@@ -285,18 +285,19 @@ class SubjetAnalyzer(FilterAnalyzer):
                     setattr(fatjet, var + "_" + fatjetkind, -9999)
                     
 
-            #match higgs candidate to generated higgs
-            genhiggs = getattr(event, "GenHiggsBoson", [])
-            if self.cfg_comp.isMC and genhiggs:
-                lv1 = lvec(fatjet)
-                lv2 = lvec(genhiggs[0])
-                fatjet.dr_genHiggs = lv1.DeltaR(lv2)
+            if self.cfg_comp.isMC:
+                #match higgs candidate to generated higgs
+                genhiggs = getattr(event, "GenHiggsBoson", [])
+                if len(genhiggs)>0:
+                    lv1 = lvec(fatjet)
+                    lv2 = lvec(genhiggs[0])
+                    fatjet.dr_genHiggs = lv1.DeltaR(lv2)
 
-            #match higgs candidate to generated tops
-            gentops = [x for x in event.GenTop if x.pt>self.GenTop_pt_cut]
-            if self.cfg_comp.isMC and gentops:
-                lv1 = lvec(fatjet)
-                fatjet.dr_genTop = min([lv1.DeltaR(lvec(x)) for x in gentops])
+                #match higgs candidate to generated tops
+                gentops = [x for x in getattr(event, "GenTop", []) if x.pt>self.GenTop_pt_cut]
+                if len(gentops)>0:
+                    lv1 = lvec(fatjet)
+                    fatjet.dr_genTop = min([lv1.DeltaR(lvec(x)) for x in gentops])
     
             higgsCandidates.append( fatjet )
             higgs_present = True
@@ -543,7 +544,7 @@ class SubjetAnalyzer(FilterAnalyzer):
         event.n_matched_TTgenb = -1
         event.n_matched_TTgenW = -1
 
-        if len(tops)>0:
+        if self.cfg_comp.isMC and len(tops)>0:
             self.Do_GenTop_Matching(event)
 
         return event 
@@ -558,8 +559,8 @@ class SubjetAnalyzer(FilterAnalyzer):
         # in the event, but these branches do not have to be filled (they will be
         # automatically set to -1 in the final output root file).
 
-       
-        self.Do_Quark_Matching( event )
+        if self.cfg_comp.isMC:
+            self.Do_Quark_Matching( event )
 
        
     ########################################
