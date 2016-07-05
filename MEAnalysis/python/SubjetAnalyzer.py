@@ -22,19 +22,25 @@ class DummyTop(object):
     mass                  = 0.
     masscal               = 0.
     sjW1pt                = 0.
+    sjW1ptcal             = 0.
     sjW1eta               = 0.
     sjW1phi               = 0.
     sjW1mass              = 0.
+    sjW1masscal           = 0.
     sjW1btag              = 0.
     sjW2pt                = 0.
+    sjW2ptcal             = 0.
     sjW2eta               = 0.
     sjW2phi               = 0.
     sjW2mass              = 0.
+    sjW2masscal           = 0.
     sjW2btag              = 0.
     sjNonWpt              = 0.
+    sjNonWptcal           = 0.
     sjNonWeta             = 0.
     sjNonWphi             = 0.
     sjNonWmass            = 0.
+    sjNonWmasscal         = 0.
     sjNonWbtag            = 0.
     tau1                  = 0.
     tau2                  = 0.
@@ -78,6 +84,7 @@ class SubjetAnalyzer(FilterAnalyzer):
             ( 'mass', '>', '80.0' ),
             ( 'mass', '<', '250.0' ),
             ( 'fRec'  , '<', '0.45' ),
+            ( 'subjetIDPassed', '==', True),
             ]
 
         #should be a NOOP
@@ -142,8 +149,8 @@ class SubjetAnalyzer(FilterAnalyzer):
 
         # Check if the event is single leptonic or FH
         # for SYNC: REMOVE this cut
-        if not (event.is_sl or event.is_fh): #LC
-            return event
+        #if not (event.is_sl or event.is_fh): #LC
+        #    return event
 
         # Get the top candidates
         # ======================================
@@ -161,6 +168,11 @@ class SubjetAnalyzer(FilterAnalyzer):
         # All HTT candidates for sync
         all_tops = []
         for candidate in event.httCandidates:
+
+            # Veto tops unless all subjets pass jetID
+            if not candidate.subjetIDPassed:
+                continue
+
             # (optional eta cut)
             #if abs(candidate.eta) < 2.0:
             all_tops.append( copy.deepcopy(candidate) )
@@ -251,7 +263,8 @@ class SubjetAnalyzer(FilterAnalyzer):
         # ======================================
 
         #Types of fatjets to match to Higgs candidate
-        fatjets_to_match = ["softdropz2b1", "softdrop", "pruned", "subjetfiltered"]
+        fatjets_to_match = ["softdropz2b1", "softdrop", 
+                            "pruned", "subjetfiltered"]
         extra_higgs_vars = ["mass", "nallsubjets", 
                             "sj1pt", "sj1eta", "sj1phi", "sj1mass", "sj1btag", 
                             "sj2pt", "sj2eta", "sj2phi", "sj2mass", "sj2btag", 
@@ -645,6 +658,8 @@ class SubjetAnalyzer(FilterAnalyzer):
                 getattr( top, prefix + 'mass' ) )
             setattr( x, 'prefix', prefix )
             setattr( x, 'btag'  , getattr( top, prefix + 'btag' ) )
+            setattr( x, 'ptcal', getattr( top, prefix + 'ptcal' ))
+            setattr( x, 'masscal', getattr( top, prefix + 'masscal' ))
 
             top_subjets.append( x )
 
@@ -1124,8 +1139,10 @@ class SubjetAnalyzer(FilterAnalyzer):
             
         # get fatjet and subjet collections
         all_fatjets = getattr(event, "FatjetCA15" + fatjet_name)
-        all_subjets = getattr(event,  "SubjetCA15" + fatjet_name)
-
+        if hasattr(event,  "SubjetCA15" + fatjet_name):
+            all_subjets = getattr(event,  "SubjetCA15" + fatjet_name)
+        else:
+            return
             
         # for Higgs reconstruction we want two subjets
         # 
@@ -1140,6 +1157,9 @@ class SubjetAnalyzer(FilterAnalyzer):
 
             # get the subjets that belong to it
             subjets = [sj for sj in all_subjets if sj.fromFJ == i_fj]
+
+            # apply subjet jet ID
+            subjets = [j for j in subjets if j.jetID]
 
             fj.nallsubjets = len(subjets)
             
