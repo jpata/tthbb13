@@ -25,6 +25,8 @@ parser.add_argument('--workflow', action="store", required=True, help="Type of w
 parser.add_argument('--tag', action="store", required=True, help="the version tag for this run, e.g. VHBBHeppyV22_tthbbV10_test1")
 args = parser.parse_args()
 
+localtesting = "localtesting" in args.workflow
+
 #list of configurations that we are using, should be in TTH/MEAnalysis/python/
 me_cfgs = {
     "default": "MEAnalysis_cfg_heppy.py",
@@ -215,13 +217,30 @@ for k in ["ttHTobb", "ttHToNonbb", "TTbar_inc", "SingleMuon-Run2016B-PromptReco-
     D["mem_cfg"] = "cfg_noME.py"
     workflow_datasets["testing"][k] = D
 
+datasets_local = {
+    "mc": {
+        "mem_cfg": me_cfgs["nome"],
+
+        "script": 'heppy_crab_script.sh'
+    },
+    "data": {
+        "maxlumis": -1,
+        "mem_cfg": me_cfgs["nome"],
+        "script": 'heppy_crab_script_data.sh'
+    }
+}
+
 workflow_datasets["localtesting"] = {}
-for k in ["ttHTobb", "SingleMuon-Run2016B-PromptReco-v2"]:
-    D = deepcopy(datasets[k])
-    D["splitmode"] = "file"
-    D["runtime"] = 1
+for k in ["mc", "data"]:
+    D = deepcopy(datasets_local[k])
     D["mem_cfg"] = "cfg_noME.py"
     workflow_datasets["localtesting"][k] = D
+
+workflow_datasets["localtesting_withme"] = {}
+for k in ["mc", "data"]:
+    D = deepcopy(datasets_local[k])
+    D["mem_cfg"] = me_cfgs["leptonic"]
+    workflow_datasets["localtesting_withme"][k] = D
 
 workflow_datasets["testing_withme"] = {}
 for k in ["ttHTobb", "TTbar_inc", "SingleMuon-Run2016B-PromptReco-v1"]:
@@ -274,8 +293,8 @@ scram b ProjectRename
 eval `scramv1 runtime -sh`
 scram b
 env
-./{0} 1
-""".format(config.JobType.scriptExe).strip() + '\n'
+./{0} 1 {1}
+""".format(config.JobType.scriptExe, " ".join(config.JobType.scriptArgs)).strip() + '\n'
 )
         runfile.close()
         os.system('chmod +x {0}/run.sh'.format(workdir))
@@ -343,28 +362,29 @@ env
     #loop over samples
     for sample in sel_datasets.keys():
         print 'submitting ' + sample, sel_datasets[sample]
-        dataset = sel_datasets[sample]["ds"]
-        nlumis = sel_datasets[sample]["maxlumis"]
-        perjob = sel_datasets[sample]["perjob"]
-        runtime = sel_datasets[sample]["runtime"]
+        
         mem_cfg = sel_datasets[sample]["mem_cfg"]
         config.JobType.scriptExe = sel_datasets[sample]["script"]
+        
+        if not localtesting:
+            dataset = sel_datasets[sample]["ds"]
+            nlumis = sel_datasets[sample]["maxlumis"]
+            perjob = sel_datasets[sample]["perjob"]
+            runtime = sel_datasets[sample]["runtime"]
 
-        config.JobType.maxJobRuntimeMin = runtime * 60
-        config.General.requestName = sample + "_" + submitname
-        config.Data.inputDataset = dataset
-        config.Data.unitsPerJob = perjob
-        config.Data.totalUnits = nlumis
-        config.Data.outputDatasetTag = submitname
-        try:
-            config.Data.outLFNDirBase = '/store/user/{0}/tth/'.format(getUsernameFromSiteDB()) + submitname
-        except Exception as e:
-            config.Data.outLFNDirBase = '/store/user/{0}/tth/'.format(os.environ["USER"]) + submitname
+            config.JobType.maxJobRuntimeMin = runtime * 60
+            config.General.requestName = sample + "_" + submitname
+            config.Data.inputDataset = dataset
+            config.Data.unitsPerJob = perjob
+            config.Data.totalUnits = nlumis
+            config.Data.outputDatasetTag = submitname
+            try:
+                config.Data.outLFNDirBase = '/store/user/{0}/tth/'.format(getUsernameFromSiteDB()) + submitname
+            except Exception as e:
+                config.Data.outLFNDirBase = '/store/user/{0}/tth/'.format(os.environ["USER"]) + submitname
+
         config.JobType.scriptArgs = ['ME_CONF={0}'.format(mem_cfg)]
-        if args.workflow == "localtesting":
+        if localtesting:
             localsubmit(config, sample, sel_datasets[sample])
         else:
-            try:
-                submit(config)
-            except Exception as e:
-                print e
+            submit(config)
