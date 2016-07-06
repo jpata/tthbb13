@@ -264,6 +264,7 @@ class SubjetAnalyzer(FilterAnalyzer):
 
         #Types of fatjets to match to Higgs candidate
         fatjets_to_match = ["softdropz2b1", "softdrop", 
+                            "softdropz2b1filt", "softdropfilt", 
                             "pruned", "subjetfiltered"]
         extra_higgs_vars = ["mass", "nallsubjets", 
                             "sj1pt", "sj1eta", "sj1phi", "sj1mass", "sj1btag", 

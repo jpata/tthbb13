@@ -271,6 +271,8 @@ higgsCandidateType = NTupleObjectType("higgsCandidateType", variables = [
 
     NTupleVariable("nallsubjets_softdrop", lambda x: x.nallsubjets_softdrop ),
     NTupleVariable("nallsubjets_softdropz2b1", lambda x: x.nallsubjets_softdropz2b1 ),
+    NTupleVariable("nallsubjets_softdropfilt", lambda x: x.nallsubjets_softdropfilt ),
+    NTupleVariable("nallsubjets_softdropz2b1filt", lambda x: x.nallsubjets_softdropz2b1filt ),
     NTupleVariable("nallsubjets_pruned", lambda x: x.nallsubjets_pruned ),
     NTupleVariable("nallsubjets_subjetfiltered", lambda x: x.nallsubjets_subjetfiltered ),
 
@@ -295,6 +297,28 @@ higgsCandidateType = NTupleObjectType("higgsCandidateType", variables = [
     NTupleVariable("sj2phi_softdropz2b1",  lambda x: x.sj2phi_softdropz2b1 ),
     NTupleVariable("sj2mass_softdropz2b1", lambda x: x.sj2mass_softdropz2b1 ),
     NTupleVariable("sj2btag_softdropz2b1", lambda x: x.sj2btag_softdropz2b1 ),
+
+    NTupleVariable("sj1pt_softdropfilt",   lambda x: x.sj1pt_softdropfilt ),
+    NTupleVariable("sj1eta_softdropfilt",  lambda x: x.sj1eta_softdropfilt ),
+    NTupleVariable("sj1phi_softdropfilt",  lambda x: x.sj1phi_softdropfilt ),
+    NTupleVariable("sj1mass_softdropfilt", lambda x: x.sj1mass_softdropfilt ),
+    NTupleVariable("sj1btag_softdropfilt", lambda x: x.sj1btag_softdropfilt ),
+    NTupleVariable("sj2pt_softdropfilt",   lambda x: x.sj2pt_softdropfilt ),
+    NTupleVariable("sj2eta_softdropfilt",  lambda x: x.sj2eta_softdropfilt ),
+    NTupleVariable("sj2phi_softdropfilt",  lambda x: x.sj2phi_softdropfilt ),
+    NTupleVariable("sj2mass_softdropfilt", lambda x: x.sj2mass_softdropfilt ),
+    NTupleVariable("sj2btag_softdropfilt", lambda x: x.sj2btag_softdropfilt ),
+
+    NTupleVariable("sj1pt_softdropz2b1filt",   lambda x: x.sj1pt_softdropz2b1filt ),
+    NTupleVariable("sj1eta_softdropz2b1filt",  lambda x: x.sj1eta_softdropz2b1filt ),
+    NTupleVariable("sj1phi_softdropz2b1filt",  lambda x: x.sj1phi_softdropz2b1filt ),
+    NTupleVariable("sj1mass_softdropz2b1filt", lambda x: x.sj1mass_softdropz2b1filt ),
+    NTupleVariable("sj1btag_softdropz2b1filt", lambda x: x.sj1btag_softdropz2b1filt ),
+    NTupleVariable("sj2pt_softdropz2b1filt",   lambda x: x.sj2pt_softdropz2b1filt ),
+    NTupleVariable("sj2eta_softdropz2b1filt",  lambda x: x.sj2eta_softdropz2b1filt ),
+    NTupleVariable("sj2phi_softdropz2b1filt",  lambda x: x.sj2phi_softdropz2b1filt ),
+    NTupleVariable("sj2mass_softdropz2b1filt", lambda x: x.sj2mass_softdropz2b1filt ),
+    NTupleVariable("sj2btag_softdropz2b1filt", lambda x: x.sj2btag_softdropz2b1filt ),
 
     NTupleVariable("sj1pt_pruned",   lambda x: x.sj1pt_pruned ),
     NTupleVariable("sj1eta_pruned",  lambda x: x.sj1eta_pruned ),
@@ -329,6 +353,9 @@ higgsCandidateType = NTupleObjectType("higgsCandidateType", variables = [
 
     NTupleVariable("mass_softdrop", lambda x: x.mass_softdrop, help="mass of the matched softdrop jet" ),
     NTupleVariable("mass_softdropz2b1", lambda x: x.mass_softdropz2b1, help="mass of the matched softdropz2b1 jet" ),
+
+    NTupleVariable("mass_softdropfilt", lambda x: x.mass_softdropfilt, help="mass of the matched softdropfilt jet" ),
+    NTupleVariable("mass_softdropz2b1filt", lambda x: x.mass_softdropz2b1filt, help="mass of the matched softdropz2b1filt jet" ),
     NTupleVariable("mass_pruned", lambda x: x.mass_pruned, help="mass of the matched pruned jet" ),
     NTupleVariable("n_subjettiness", lambda x: x.n_subjettiness ),
     NTupleVariable("dr_top", lambda x: getattr(x, "dr_top", -1), help="deltaR to the best HTT candidate"),
