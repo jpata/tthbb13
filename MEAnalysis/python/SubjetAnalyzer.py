@@ -271,6 +271,7 @@ class SubjetAnalyzer(FilterAnalyzer):
                             "sj2pt", "sj2eta", "sj2phi", "sj2mass", "sj2btag", 
                             "sj3pt", "sj3eta", "sj3phi", "sj3mass", "sj3btag", # only calc for subjetfiltered
                             "sj12masspt", "sj12massb", "sj123masspt", # only calc for subjetfiltered
+                            "secondbtag", # only calc for subjetfiltered
         ]
 
     
@@ -316,9 +317,6 @@ class SubjetAnalyzer(FilterAnalyzer):
             higgsCandidates.append( fatjet )
             higgs_present = True
 
-        # Sort by pT
-        # TODO: for now. Revisit and change to subjet b-tag/bbtag we decide on
-        higgsCandidates = sorted( higgsCandidates, key=lambda x: -x.pt )
         
         # Match higgs candidates to various fat jets
         for fatjetkind in fatjets_to_match:
@@ -336,6 +334,11 @@ class SubjetAnalyzer(FilterAnalyzer):
                     for var in extra_higgs_vars:                        
                         if hasattr(matchjet,var):
                             setattr(higgsCandidate, var + "_" + fatjetkind, getattr(matchjet,var))
+
+        # Sort higgs candidates by pt
+        # We store all of them, so it does not really matter fow now
+        higgsCandidates = sorted( higgsCandidates, key=lambda x: -x.pt )
+
                             
         ########################################
         # Get the lists of particles: quarks, jets and subjets
@@ -1170,11 +1173,14 @@ class SubjetAnalyzer(FilterAnalyzer):
 
                 if len(subjets) > 3:
                     subjets = subjets[:3]
-                    
-            # Now sort by b-tag            
-            #if "subjetfiltered" in fatjet_name:
-            #    subjets = sorted(subjets, key = lambda x: -x.btag)
-                
+                   
+            # Get the second highest subjet-btag
+            if "subjetfiltered" in fatjet_name:
+                if len(subjets) >= 2:
+                    setattr(fj, "secondbtag", sorted([sj.btag for sj in subjets])[-2])                           
+                else:
+                    setattr(fj, "secondbtag", -1)
+
             # And add quantities to fatjet                    
             for isj, subjet in enumerate(subjets):
                 setattr(fj, "sj{0}pt".format(isj+1), subjet.pt)
@@ -1182,10 +1188,7 @@ class SubjetAnalyzer(FilterAnalyzer):
                 setattr(fj, "sj{0}phi".format(isj+1), subjet.phi)
                 setattr(fj, "sj{0}mass".format(isj+1), subjet.mass)
                 setattr(fj, "sj{0}btag".format(isj+1), subjet.btag)
-            
-
-                "sj12masspt", "sj12massb", "sj123masspt", # only calc for subjetfiltered
-        
+                    
             # Leading two subjet mass (sorted by pt)
             if len(subjets) >= 2 and fatjet_name == "subjetfiltered":
                 sj1 = ROOT.TLorentzVector()
