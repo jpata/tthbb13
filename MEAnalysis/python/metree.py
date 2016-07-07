@@ -1,6 +1,7 @@
 import PhysicsTools.HeppyCore.framework.config as cfg
 import os
 from PhysicsTools.Heppy.physicsutils.BTagWeightCalculator import BTagWeightCalculator
+from TTH.MEAnalysis.MEMAnalyzer import MEMPermutation
 
 #Defines the output TTree branch structures
 from PhysicsTools.Heppy.analyzers.core.AutoFillTreeProducer import *
@@ -28,6 +29,7 @@ jetType = NTupleObjectType("jetType", variables = [
     NTupleVariable("qgl", lambda x : x.qgl),
     NTupleVariable("btagCSV", lambda x : x.btagCSV),
     NTupleVariable("btagCMVA", lambda x : x.btagCMVA),
+    NTupleVariable("btagFlag", lambda x : getattr(x, "btagFlag", -1), help="Jet was considered to be a b in MEM according to the algo"),
     #NTupleVariable("bTagWeight", lambda x : x.bTagWeight, mcOnly=True),
     #NTupleVariable("bTagWeightHFUp", lambda x : x.bTagWeightHFUp, mcOnly=True),
     #NTupleVariable("bTagWeightHFDown", lambda x : x.bTagWeightHFDown, mcOnly=True),
@@ -150,11 +152,19 @@ memType = NTupleObjectType("memType", variables = [
     NTupleVariable("nperm", lambda x : x.num_perm, type=int),
 ])
 
+perm_vars = [
+    NTupleVariable("perm_{0}".format(i), lambda x : getattr(x, "perm_{0}".format(i)))
+    for i in range(MEMPermutation.MAXOBJECTS)
+]
 memPermType = NTupleObjectType("memPermType", variables = [
     NTupleVariable("idx", lambda x : x.idx, type=int),
     NTupleVariable("p_mean", lambda x : x.p_mean),
     NTupleVariable("p_std", lambda x : x.p_std),
-])
+    NTupleVariable("p_tf_mean", lambda x : x.p_tf_mean),
+    NTupleVariable("p_tf_std", lambda x : x.p_tf_std),
+    NTupleVariable("p_me_mean", lambda x : x.p_me_mean),
+    NTupleVariable("p_me_std", lambda x : x.p_me_std),
+] + perm_vars)
 
 commonMemType = NTupleObjectType("commonMemType", variables = [
     NTupleVariable("p", lambda x : x.p),
@@ -677,7 +687,6 @@ def getTreeProducer(conf):
 
 
     for vtype in [
-        ("weight_xs",               float,  ""),
         ("ttCls",                   int,    "ttbar classification from GenHFHadronMatcher"),
         ("genHiggsDecayMode",       int,    ""),
         ("bTagWeight",              float,  ""),

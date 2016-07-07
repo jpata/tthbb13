@@ -24,6 +24,8 @@ def normalize_proba(vec):
     return ret
 
 class MEMPermutation:
+    MAXOBJECTS=10
+
     def __init__(self, idx,
         perm,
         p_mean, p_std,
@@ -32,6 +34,9 @@ class MEMPermutation:
         ):
         self.idx = idx
         self.perm = perm
+        for i in range(MEMPermutation.MAXOBJECTS):
+            r = perm[i] if i<len(perm) else -99
+            setattr(self, "perm_{0}".format(i), r)
         self.p_mean = p_mean
         self.p_std = p_std
         self.p_tf_mean = p_tf_mean
@@ -448,7 +453,9 @@ class MEAnalyzer(FilterAnalyzer):
                     v_p = normalize_proba([v for v in mem_res.permutation_probas[iperm]])
                     v_p_tf = normalize_proba([v for v in mem_res.permutation_probas_transfer[iperm]])
                     v_p_me = normalize_proba([v for v in mem_res.permutation_probas_me[iperm]])
-                    mem_perm = MEMPermutation(iperm, perm,
+                    mem_perm = MEMPermutation(
+                        iperm,
+                        [_p for _p in perm],
                         np.mean(v_p), np.std(v_p), 
                         np.mean(v_p_tf), np.std(v_p_tf), 
                         np.mean(v_p_me), np.std(v_p_me),

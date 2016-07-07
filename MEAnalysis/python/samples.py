@@ -6,34 +6,10 @@
 import FWCore.ParameterSet.Config as cms
 from TTH.MEAnalysis.samples_base import *
 
-version = "Jun23_leptonic_v1"
-datasetpath = "src/TTH/MEAnalysis/gc/datasets/Jun23_leptonic_v1/"
+version = "Jul6_pilot_v1"
+datasetpath = "src/TTH/MEAnalysis/gc/datasets/Jul6_pilot_v1/"
 samples_dict = {
  
-        "TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": cms.PSet(
-            name     = cms.string("TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"),
-            nickname = cms.string("TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"),
-            isMC     = cms.bool(False),
-            treeName = cms.string("vhbb/tree"),
-            subFiles = cms.vstring(get_files(datasetpath + "TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt")),
-        ),
-     
-        "TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": cms.PSet(
-            name     = cms.string("TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"),
-            nickname = cms.string("TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"),
-            isMC     = cms.bool(False),
-            treeName = cms.string("vhbb/tree"),
-            subFiles = cms.vstring(get_files(datasetpath + "TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt")),
-        ),
-     
-        "TT_TuneEE5C_13TeV-powheg-herwigpp": cms.PSet(
-            name     = cms.string("TT_TuneEE5C_13TeV-powheg-herwigpp"),
-            nickname = cms.string("TT_TuneEE5C_13TeV-powheg-herwigpp"),
-            isMC     = cms.bool(True),
-            treeName = cms.string("vhbb/tree"),
-            subFiles = cms.vstring(get_files(datasetpath + "TT_TuneEE5C_13TeV-powheg-herwigpp.txt")),
-        ),
-     
         "ttHTobb_M125_13TeV_powheg_pythia8": cms.PSet(
             name     = cms.string("ttHTobb_M125_13TeV_powheg_pythia8"),
             nickname = cms.string("ttHTobb_M125_13TeV_powheg_pythia8"),

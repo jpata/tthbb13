@@ -6,7 +6,7 @@ import ROOT
 
 cmssw_base = os.environ["CMSSW_BASE"]
 
-version = "Jun23_leptonic_v1"
+version = "Jul6_pilot_v1"
 datasetpath = "src/TTH/MEAnalysis/gc/datasets/{0}/".format(version)
 getSize = False
 

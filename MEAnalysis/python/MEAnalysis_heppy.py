@@ -87,13 +87,6 @@ pvana = cfg.Analyzer(
     _conf = conf
 )
 
-
-evtweight = cfg.Analyzer(
-    MECoreAnalyzers.EventWeightAnalyzer,
-    'eventweight',
-    _conf = conf
-)
-
 trigger = cfg.Analyzer(
     MECoreAnalyzers.TriggerAnalyzer,
     'trigger',
@@ -210,7 +203,6 @@ sequence = cfg.Sequence([
     counter,
     evtid_filter,
     evs,
-    evtweight,
     pvana,
     trigger,
     leps,
@@ -270,16 +262,12 @@ if __name__ == "__main__":
         inputSamples = []
         for sn in sorted(samples_dict.keys()):
             s = samples_dict[sn]
-            sample_ngen = s.nGen.value()
             inputSample = cfg.Component(
                 s.name.value(),
                 files = map(getSitePrefix, s.subFiles.value()),
                 tree_name = s.treeName.value(),
-                n_gen = sample_ngen,
-                xs = s.xSec.value()
             )
             inputSample.isMC = s.isMC.value()
-            inputSample.skip = s.skip.value() #DS 
             inputSamples.append(inputSample)
         return inputSamples, samples_dict
     
@@ -294,8 +282,6 @@ if __name__ == "__main__":
                 'events',
             )
             sequence[2] = evs 
-        if samp.skip: #DS
-            continue
         config = cfg.Config(
             #Run across these inputs
             components = [samp],
