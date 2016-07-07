@@ -18,6 +18,7 @@ class MEMConfig:
 
         #Specify the MEM precision.
         self.cfg.defaultCfg(conf.mem["n_integration_points_mult"])
+        self.cfg.save_permutations = True
 
         self.b_quark_candidates = lambda event: event.selected_btagged_jets_high
         self.l_quark_candidates = lambda event: event.wquark_candidate_jets
