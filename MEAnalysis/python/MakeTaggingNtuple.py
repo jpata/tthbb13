@@ -103,19 +103,19 @@ def calc_vars(tree):
 
     # ttb
     if tree.ttCls == 51:
-        tt_class = 1  
+        tt_class = 0
     # tt2b
     elif tree.ttCls == 52:
-        tt_class = 2  
+        tt_class = 1  
     # ttbb
     elif tree.ttCls == 53 or tree.ttCls == 54 or tree.ttCls == 55 or tree.ttCls==56:
-        tt_class = 3  
+        tt_class = 2  
     # ttcc 
     elif tree.ttCls == 41 or tree.ttCls == 42 or tree.ttCls == 43 or tree.ttCls == 44 or tree.ttCls == 45:
-        tt_class = 4  
+        tt_class = 3  
     # ttll
     elif tree.ttCls == 0 or tree.ttCls<0:
-        tt_class = 0  
+        tt_class = 4  
     # should not happen
     else:
         print "Error determining tt+jets subsample" 
@@ -166,7 +166,8 @@ if __name__ == "__main__":
     else:
         for fi in sys.argv[2:]:
             print "adding", fi
-            intree.AddFile(getSitePrefix(fi))
+            #intree.AddFile(getSitePrefix(fi))
+            intree.AddFile(fi)
         
 
 
@@ -194,7 +195,11 @@ if __name__ == "__main__":
         # Use 6 jet events
         if not (AH.getter(intree, "numJets") >= 6):
             continue
-            
+
+        # Require at least two medium b-tags
+        if not (AH.getter(intree, "nBCSVM") >= 2):
+            continue
+                    
         # Prepare multiclass - 6 jet ntuple
         if "multiclass_6j" in ntpl.keys():
 

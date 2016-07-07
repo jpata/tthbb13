@@ -148,11 +148,11 @@ classifiers = [
                model(params),
                image_fun = to_image,               
                class_names = {
-                   0: "ttll",
-                   1: "ttb", 
-                   2: "tt2b",
-                   3: "ttbb",
-                   4: "ttcc",
+                   0: "ttb", 
+                   1: "tt2b",
+                   2: "ttbb",
+                   3: "ttcc",
+                   4: "ttll",
                },
                input_vars = input_vars
                )    
