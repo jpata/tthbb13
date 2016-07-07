@@ -308,36 +308,6 @@ class Conf:
             (event.is_fh and event.cat in ["cat7","cat8","cat10","cat11"]
             and event.btag_LR_4b_2b > 0.95)
         ),
-        
-        #This configures what the array elements mean
-        #Better not change this
-        "methodOrder": [
-            "SL_0w2h2t",
-            "DL_0w2h2t",
-            
-            "SL_1w2h2t",
-            "SL_2w2h1t_l",
-            "SL_2w2h1t_h",
-            "SL_2w2h2t",
-
-            #with bLR calc by mem code
-            "SL_2w2h2t_memLR",
-            "SL_0w2h2t_memLR",
-
-            # with rnd CSV values
-            "DL_0w2h2t_Rndge4t",
-            "SL_2w2h2t_sj",
-            "SL_0w2h2t_sj",
-
-            #fully-hadronic
-            "FH_4w2h2t", #8j,4b & 9j,4b
-            "FH_3w2h2t", #7j,4b
-            "FH_4w2h1t", #7j,3b & 8j,3b
-            "FH_0w0w2h2t", #all 4b cats
-            "FH_0w0w2h1t", #all cats
-            "FH_0w0w1h2t",  #all cats
-            "SL_2w2h2t_1j",
-        ],
 
         #This configures the MEMs to actually run, the rest will be set to 0
         "methodsToRun": [
@@ -411,7 +381,7 @@ c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 1 and
     len(mcfg.b_quark_candidates(ev)) >= 4 and
     len(mcfg.l_quark_candidates(ev)) >= 1 and
-    ev.numJets == 5
+    ev.numJets >= 5
 )
 c.mem_assumptions.add("sl")
 c.mem_assumptions.add("1w2h2t")
@@ -466,7 +436,7 @@ c.l_quark_candidates = lambda ev: []
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 1 and
     len(mcfg.b_quark_candidates(ev)) >= 4 and
-    ev.numJets == 4
+    ev.numJets >= 4
 )
 c.mem_assumptions.add("sl")
 c.mem_assumptions.add("0w2h2t")
