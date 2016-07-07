@@ -1,0 +1,13 @@
+[Jul6_pilot_v1__ttHTobb_M125_13TeV_powheg_pythia8]
+/store/user/jpata/tth/Jul6_pilot_v1/ttHTobb_M125_13TeV_powheg_pythia8/Jul6_pilot_v1/160706_161521/0000/tree_1.root = 2464
+/store/user/jpata/tth/Jul6_pilot_v1/ttHTobb_M125_13TeV_powheg_pythia8/Jul6_pilot_v1/160706_161521/0000/tree_193.root = 9797
+/store/user/jpata/tth/Jul6_pilot_v1/ttHTobb_M125_13TeV_powheg_pythia8/Jul6_pilot_v1/160706_161521/0000/tree_194.root = 1281
+/store/user/jpata/tth/Jul6_pilot_v1/ttHTobb_M125_13TeV_powheg_pythia8/Jul6_pilot_v1/160706_161521/0000/tree_196.root = 4144
+/store/user/jpata/tth/Jul6_pilot_v1/ttHTobb_M125_13TeV_powheg_pythia8/Jul6_pilot_v1/160706_161521/0000/tree_197.root = 1506
+/store/user/jpata/tth/Jul6_pilot_v1/ttHTobb_M125_13TeV_powheg_pythia8/Jul6_pilot_v1/160706_161521/0000/tree_198.root = 4720
+/store/user/jpata/tth/Jul6_pilot_v1/ttHTobb_M125_13TeV_powheg_pythia8/Jul6_pilot_v1/160706_161521/0000/tree_199.root = 9844
+/store/user/jpata/tth/Jul6_pilot_v1/ttHTobb_M125_13TeV_powheg_pythia8/Jul6_pilot_v1/160706_161521/0000/tree_200.root = 4743
+/store/user/jpata/tth/Jul6_pilot_v1/ttHTobb_M125_13TeV_powheg_pythia8/Jul6_pilot_v1/160706_161521/0000/tree_201.root = 9964
+/store/user/jpata/tth/Jul6_pilot_v1/ttHTobb_M125_13TeV_powheg_pythia8/Jul6_pilot_v1/160706_161521/0000/tree_202.root = 9728
+/store/user/jpata/tth/Jul6_pilot_v1/ttHTobb_M125_13TeV_powheg_pythia8/Jul6_pilot_v1/160706_161521/0000/tree_203.root = 6742
+/store/user/jpata/tth/Jul6_pilot_v1/ttHTobb_M125_13TeV_powheg_pythia8/Jul6_pilot_v1/160706_161521/0000/tree_4.root = 7986

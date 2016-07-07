@@ -230,3 +230,11 @@ tthbb13=dfe1314
 CommonClassifier=f326dcc
 MEIntegratorStandalone=90ff179
 CMSSW=c4d31ef
+
+
+Jul7_pilot_v1
+-------------
+tthbb13=8628a93
+CommonClassifier=f326dcc
+MEIntegratorStandalone=90ff179
+CMSSW=c4d31ef
