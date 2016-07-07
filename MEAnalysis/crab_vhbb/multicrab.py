@@ -16,6 +16,7 @@ workflows = [
     "pilot", #ttH sample only, with no MEM
     "testing", #single-lumi jobs, a few samples
     "localtesting", #run combined jobs locally
+    "localtesting_withme", #run combined jobs locally
     "testing_withme" #single-lumi jobs, a few samples
 ]
 
@@ -91,7 +92,7 @@ datasets.update({
     'TTbar_sl1': {
         "ds": '/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM',
         "maxlumis": -1,
-        "perjob": 100,
+        "perjob": 50,
         "runtime": 40,
         "mem_cfg": me_cfgs["leptonic"],
         "script": 'heppy_crab_script.sh'
@@ -99,7 +100,7 @@ datasets.update({
     'TTbar_sl2': {
         "ds": '/TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM',
         "maxlumis": -1,
-        "perjob": 100,
+        "perjob": 50,
         "runtime": 40,
         "mem_cfg": me_cfgs["leptonic"],
         "script": 'heppy_crab_script.sh'
@@ -171,7 +172,7 @@ for k in ["ttHTobb", "ttHToNonbb", "TTbar_inc", "TTbar_sl1", "TTbar_sl2", "TTbar
     workflow_datasets["leptonic"][k] = D
 
 workflow_datasets["leptonic_nome"] = {}
-for k in ["ttHToNonbb", "TTbar_inc", "TTbar_sl1", "TTbar_sl2", "TTbar_dl"] + datanames:
+for k in ["ttHTobb", "ttHToNonbb", "TTbar_inc", "TTbar_sl1", "TTbar_sl2", "TTbar_dl"] + datanames:
     D = deepcopy(datasets[k])
     D["perjob"] = 200
     if "data" in D["script"]:
@@ -200,7 +201,7 @@ for k in datasets.keys():
 workflow_datasets["pilot"] = {}
 pilot_name = 'ttHTobb'
 D = deepcopy(datasets[pilot_name])
-D["perjob"] = 300
+D["perjob"] = 50
 D["mem_cfg"] = me_cfgs["nome"]
 workflow_datasets["pilot"][pilot_name] = D
 
@@ -299,8 +300,9 @@ env
         runfile.close()
         os.system('chmod +x {0}/run.sh'.format(workdir))
         os.system('cd {0}/{1};eval `scram runtime -sh`;scram b;'.format(TMPDIR, CMSSW_VERSION))
-        os.system('cd {0};tar zcfv job_{1}.tar.gz {2} > {1}.log'.format(TMPDIR, TMPDIR.split("/")[-1], CMSSW_VERSION))
-        os.system("cp {0}/job_{1}.tar.gz ./".format(TMPDIR, TMPDIR.split("/")[-1]))
+        archive_name = "_".join([dname, args.workflow, args.tag])
+        os.system('cd {0};tar zcfv job_{1}.tar.gz {2} > {1}.log'.format(TMPDIR, archive_name, CMSSW_VERSION))
+        os.system("cp {0}/job_{1}.tar.gz ./".format(TMPDIR, archive_name))
         #os.system("cp -r $CMSSW_BASE/src {0}/".format(workdir)) 
 
     from CRABClient.UserUtilities import config

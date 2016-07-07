@@ -3,7 +3,7 @@ echo "Running"
 set -e
 
 cd $GC_SCRATCH
-tar xf job_crab_*.tar.gz
+tar xf job_*.tar.gz
 cd CMSSW*/work/
 ./run.sh
 cp log $GC_SCRATCH/
