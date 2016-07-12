@@ -356,7 +356,7 @@ def Make_config(tf_gc_path, filename):
 def main():
 
     # !!! Change this line to point to output from make_TF.sh gridcontrol run !!!
-    path = "file:///mnt/t3nfs01/data01/shome/jpata/tth/gc/transfer/GCa08f189eb27e/"
+    path = "file:///mnt/t3nfs01/data01/shome/jpata/tth/gc/transfer/GCf998975af53f/Jul8_pilot_v2__ttHTobb_M125_13TeV_powheg_pythia8/"
 
     for jettype in ["resolved", "subjet"]:
         Make_config(path, '{1}'.format(samples.version, jettype))

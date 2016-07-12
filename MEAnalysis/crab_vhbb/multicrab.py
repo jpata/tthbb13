@@ -38,15 +38,15 @@ me_cfgs = {
 }
 
 sets_data = [
-      "/DoubleEG/Run2016B-PromptReco-v1/MINIAOD"
-    , "/DoubleEG/Run2016B-PromptReco-v2/MINIAOD"
-    , "/DoubleMuon/Run2016B-PromptReco-v1/MINIAOD"
+    #, "/DoubleEG/Run2016B-PromptReco-v1/MINIAOD"
+    "/DoubleEG/Run2016B-PromptReco-v2/MINIAOD"
+    #, "/DoubleMuon/Run2016B-PromptReco-v1/MINIAOD"
     , "/DoubleMuon/Run2016B-PromptReco-v2/MINIAOD"
-    , "/MuonEG/Run2016B-PromptReco-v1/MINIAOD"
+    #, "/MuonEG/Run2016B-PromptReco-v1/MINIAOD"
     , "/MuonEG/Run2016B-PromptReco-v2/MINIAOD"
-    , "/SingleElectron/Run2016B-PromptReco-v1/MINIAOD"
+    #, "/SingleElectron/Run2016B-PromptReco-v1/MINIAOD"
     , "/SingleElectron/Run2016B-PromptReco-v2/MINIAOD"
-    , "/SingleMuon/Run2016B-PromptReco-v1/MINIAOD"
+    #, "/SingleMuon/Run2016B-PromptReco-v1/MINIAOD"
     , "/SingleMuon/Run2016B-PromptReco-v2/MINIAOD"
 ]
 
@@ -59,7 +59,7 @@ for sd in sets_data:
     datasets[name] = {
         "ds": sd,
         "maxlumis": -1,
-        "perjob": 100,
+        "perjob": 50,
         "runtime": 40,
         "mem_cfg": me_cfgs["nome"],
         "script": 'heppy_crab_script_data.sh'

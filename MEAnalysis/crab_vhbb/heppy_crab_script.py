@@ -27,18 +27,20 @@ firstInput = crabFiles[0]
 ###
 ### Convert LFN to PFN
 ###
-print "--------------- using edmFileUtil to convert PFN to LFN -------------------------"
 for i in xrange(0,len(crabFiles)) :
-     if ((os.getenv("GLIDECLIENT_Group","") != "overflow" and
-        os.getenv("GLIDECLIENT_Group","") != "overflow_conservative") or "file:/" in crabFiles[i]):
-       print "Data is local"
-       pfn=os.popen("edmFileUtil -d %s"%(crabFiles[i])).read() 
-       pfn=re.sub("\n","",pfn)
-       print crabFiles[i],"->",pfn
-       crabFiles[i]=pfn
-     else:
-       print "Data is not local, using AAA/xrootd"
-       crabFiles[i]="root://cms-xrd-global.cern.ch/"+crabFiles[i]
+    crabFiles[i]="root://cms-xrd-global.cern.ch/"+crabFiles[i]
+#print "--------------- using edmFileUtil to convert PFN to LFN -------------------------"
+#for i in xrange(0,len(crabFiles)) :
+#     if ((os.getenv("GLIDECLIENT_Group","") != "overflow" and
+#        os.getenv("GLIDECLIENT_Group","") != "overflow_conservative") or "file:/" in crabFiles[i]):
+#       print "Data is local"
+#       pfn=os.popen("edmFileUtil -d %s"%(crabFiles[i])).read() 
+#       pfn=re.sub("\n","",pfn)
+#       print crabFiles[i],"->",pfn
+#       crabFiles[i]=pfn
+#     else:
+#       print "Data is not local, using AAA/xrootd"
+#       crabFiles[i]="root://cms-xrd-global.cern.ch/"+crabFiles[i]
 print "timeto_convertPFN ",(time.time()-t0)
 
 ###

@@ -107,7 +107,8 @@ def pfn_to_lfn(fn):
 
 def get_files(fname):
     # Expect fname relative to CMSSW BASE
-    lines = open(os.path.join(os.environ.get("CMSSW_BASE"),fname)).readlines()
+    fname = fname.replace("$CMSSW_BASE", os.environ["CMSSW_BASE"])
+    lines = open(fname).readlines()
     lines = map(lambda x: x.strip(), lines)
     lines = filter(lambda x: "root" in x, lines)
     lines = map(lambda x: x.split()[0], lines)

@@ -6,13 +6,23 @@ import ROOT
 
 cmssw_base = os.environ["CMSSW_BASE"]
 
-version = "Jul6_pilot_v1"
-datasetpath = "src/TTH/MEAnalysis/gc/datasets/{0}/".format(version)
-getSize = False
+version = "Jul8_pilot_v2"
 
-path1 = os.path.join(cmssw_base, datasetpath)
-samples = [ os.path.splitext(os.path.basename(s))[0] for s in glob.glob(os.path.join(path1,"*.txt"))]
-print samples
+samples = [
+    "gc/datasets/Jul6_leptonic_nome_v1/DoubleEG.txt",
+    "gc/datasets/Jul6_leptonic_nome_v1/DoubleMuon.txt",
+    "gc/datasets/Jul6_leptonic_nome_v1/MuonEG.txt",
+    "gc/datasets/Jul6_leptonic_nome_v1/SingleElectron.txt",
+    "gc/datasets/Jul6_leptonic_nome_v1/SingleMuon.txt",
+    "gc/datasets/Jul6_leptonic_nome_v1/ttHToNonbb_M125_13TeV_powheg_pythia8.txt",
+    "gc/datasets/Jul6_leptonic_nome_v1/TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt",
+    "gc/datasets/Jul6_leptonic_nome_v1/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt",
+    "gc/datasets/Jul6_leptonic_nome_v1/TTTo2L2Nu_13TeV-powheg.txt",
+    "gc/datasets/Jul6_leptonic_nome_v1/TT_TuneEE5C_13TeV-powheg-herwigpp.txt",
+    "gc/datasets/Jul8_pilot_v2/ttHTobb_M125_13TeV_powheg_pythia8.txt"
+]
+
+samples = ["$CMSSW_BASE/src/TTH/MEAnalysis/" + s for s in samples]
 
 sampfiles = {}
 samples_dict = {}
@@ -27,7 +37,6 @@ samp_py.write('import FWCore.ParameterSet.Config as cms\n')
 samp_py.write('from TTH.MEAnalysis.samples_base import *\n\n')
 
 samp_py.write('version = "' + version + '"\n')
-samp_py.write('datasetpath = "' + datasetpath + '"\n')
 
 samp_py.write("samples_dict = {\n")
 for sample in samples:
@@ -35,16 +44,17 @@ for sample in samples:
     isMC = True
     if "Single" in sample or "Double" in sample or "MuonEG" in sample:
         isMC = False
-    
+    sampname = sample.split("/")[-1]
+    sampname = sampname.replace(".txt", "")
     x = """ 
         "{0}": cms.PSet(
             name     = cms.string("{0}"),
             nickname = cms.string("{0}"),
-            isMC     = cms.bool({1}),
+            isMC     = cms.bool({2}),
             treeName = cms.string("vhbb/tree"),
-            subFiles = cms.vstring(get_files(datasetpath + "{0}.txt")),
+            subFiles = cms.vstring(get_files("{1}")),
         ),
-    """.format(sample, isMC)
+    """.format(sampname, sample, isMC)
     samp_py.write(x)
 
 samp_py.write("}\n")

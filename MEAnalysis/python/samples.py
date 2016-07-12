@@ -6,15 +6,94 @@
 import FWCore.ParameterSet.Config as cms
 from TTH.MEAnalysis.samples_base import *
 
-version = "Jul6_pilot_v1"
-datasetpath = "src/TTH/MEAnalysis/gc/datasets/Jul6_pilot_v1/"
+version = "Jul8_pilot_v2"
 samples_dict = {
  
+        "DoubleEG": cms.PSet(
+            name     = cms.string("DoubleEG"),
+            nickname = cms.string("DoubleEG"),
+            isMC     = cms.bool(False),
+            treeName = cms.string("vhbb/tree"),
+            subFiles = cms.vstring(get_files("$CMSSW_BASE/src/TTH/MEAnalysis/gc/datasets/Jul6_leptonic_nome_v1/DoubleEG.txt")),
+        ),
+     
+        "DoubleMuon": cms.PSet(
+            name     = cms.string("DoubleMuon"),
+            nickname = cms.string("DoubleMuon"),
+            isMC     = cms.bool(False),
+            treeName = cms.string("vhbb/tree"),
+            subFiles = cms.vstring(get_files("$CMSSW_BASE/src/TTH/MEAnalysis/gc/datasets/Jul6_leptonic_nome_v1/DoubleMuon.txt")),
+        ),
+     
+        "MuonEG": cms.PSet(
+            name     = cms.string("MuonEG"),
+            nickname = cms.string("MuonEG"),
+            isMC     = cms.bool(False),
+            treeName = cms.string("vhbb/tree"),
+            subFiles = cms.vstring(get_files("$CMSSW_BASE/src/TTH/MEAnalysis/gc/datasets/Jul6_leptonic_nome_v1/MuonEG.txt")),
+        ),
+     
+        "SingleElectron": cms.PSet(
+            name     = cms.string("SingleElectron"),
+            nickname = cms.string("SingleElectron"),
+            isMC     = cms.bool(False),
+            treeName = cms.string("vhbb/tree"),
+            subFiles = cms.vstring(get_files("$CMSSW_BASE/src/TTH/MEAnalysis/gc/datasets/Jul6_leptonic_nome_v1/SingleElectron.txt")),
+        ),
+     
+        "SingleMuon": cms.PSet(
+            name     = cms.string("SingleMuon"),
+            nickname = cms.string("SingleMuon"),
+            isMC     = cms.bool(False),
+            treeName = cms.string("vhbb/tree"),
+            subFiles = cms.vstring(get_files("$CMSSW_BASE/src/TTH/MEAnalysis/gc/datasets/Jul6_leptonic_nome_v1/SingleMuon.txt")),
+        ),
+     
+        "ttHToNonbb_M125_13TeV_powheg_pythia8": cms.PSet(
+            name     = cms.string("ttHToNonbb_M125_13TeV_powheg_pythia8"),
+            nickname = cms.string("ttHToNonbb_M125_13TeV_powheg_pythia8"),
+            isMC     = cms.bool(True),
+            treeName = cms.string("vhbb/tree"),
+            subFiles = cms.vstring(get_files("$CMSSW_BASE/src/TTH/MEAnalysis/gc/datasets/Jul6_leptonic_nome_v1/ttHToNonbb_M125_13TeV_powheg_pythia8.txt")),
+        ),
+     
+        "TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": cms.PSet(
+            name     = cms.string("TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"),
+            nickname = cms.string("TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"),
+            isMC     = cms.bool(False),
+            treeName = cms.string("vhbb/tree"),
+            subFiles = cms.vstring(get_files("$CMSSW_BASE/src/TTH/MEAnalysis/gc/datasets/Jul6_leptonic_nome_v1/TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt")),
+        ),
+     
+        "TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": cms.PSet(
+            name     = cms.string("TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"),
+            nickname = cms.string("TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"),
+            isMC     = cms.bool(False),
+            treeName = cms.string("vhbb/tree"),
+            subFiles = cms.vstring(get_files("$CMSSW_BASE/src/TTH/MEAnalysis/gc/datasets/Jul6_leptonic_nome_v1/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt")),
+        ),
+     
+        "TTTo2L2Nu_13TeV-powheg": cms.PSet(
+            name     = cms.string("TTTo2L2Nu_13TeV-powheg"),
+            nickname = cms.string("TTTo2L2Nu_13TeV-powheg"),
+            isMC     = cms.bool(True),
+            treeName = cms.string("vhbb/tree"),
+            subFiles = cms.vstring(get_files("$CMSSW_BASE/src/TTH/MEAnalysis/gc/datasets/Jul6_leptonic_nome_v1/TTTo2L2Nu_13TeV-powheg.txt")),
+        ),
+     
+        "TT_TuneEE5C_13TeV-powheg-herwigpp": cms.PSet(
+            name     = cms.string("TT_TuneEE5C_13TeV-powheg-herwigpp"),
+            nickname = cms.string("TT_TuneEE5C_13TeV-powheg-herwigpp"),
+            isMC     = cms.bool(True),
+            treeName = cms.string("vhbb/tree"),
+            subFiles = cms.vstring(get_files("$CMSSW_BASE/src/TTH/MEAnalysis/gc/datasets/Jul6_leptonic_nome_v1/TT_TuneEE5C_13TeV-powheg-herwigpp.txt")),
+        ),
+     
         "ttHTobb_M125_13TeV_powheg_pythia8": cms.PSet(
             name     = cms.string("ttHTobb_M125_13TeV_powheg_pythia8"),
             nickname = cms.string("ttHTobb_M125_13TeV_powheg_pythia8"),
             isMC     = cms.bool(True),
             treeName = cms.string("vhbb/tree"),
-            subFiles = cms.vstring(get_files(datasetpath + "ttHTobb_M125_13TeV_powheg_pythia8.txt")),
+            subFiles = cms.vstring(get_files("$CMSSW_BASE/src/TTH/MEAnalysis/gc/datasets/Jul8_pilot_v2/ttHTobb_M125_13TeV_powheg_pythia8.txt")),
         ),
     }

@@ -7,8 +7,6 @@ ROOT.TH1.AddDirectory(False)
 
 DATASETPATH = os.environ.get("DATASETPATH", "")
 spl = DATASETPATH.split("__")
-sample_name = spl[-1]
-sample = samples_dict[sample_name]
 
 INFILES = sys.argv[2:]
 OUTFILE = sys.argv[1]
@@ -95,9 +93,8 @@ if __name__ == "__main__":
     of = ROOT.TFile(OUTFILE, "RECREATE")
     of.cd()
 
-    if sample.isMC:
-        makeControlPlots("btagCSV", "Jet_btagCSV", 0.0, 1.0)
-        makeControlPlots("btagCMVA", "Jet_btagCMVA", -1.0, 1.0)
+    makeControlPlots("btagCSV", "Jet_btagCSV", 0.0, 1.0)
+    makeControlPlots("btagCMVA", "Jet_btagCMVA", -1.0, 1.0)
     
     of.Write()
     of.Close()

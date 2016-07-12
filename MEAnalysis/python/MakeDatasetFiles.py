@@ -8,6 +8,7 @@ import sys
 import pdb
 import json
 import subprocess
+import time
 
 
 ########################################
@@ -50,6 +51,8 @@ if not os.path.exists(outdir):
 
 #no specified input dataset list
 if not args.datasetfile:
+    #sleep so as to not overload the DAS server
+    time.sleep(60)
     datasets_json = subprocess.Popen([
                                     das_client, 
                                     "--format=json",
@@ -114,14 +117,19 @@ for ds in datasets:
     print "Got {0} files".format(len(files_di['data']))
 
     for f in  files_di['data']:
-        name    = f["file"][0]["name"]
-
         try:
-            nevents = f["file"][0]["nevents"]
+            name = f["file"][0]["name"]
         except Exception as e:
-            print f["file"][0]["name"]
-            nevents = 0
-        ofile.write("{0} = {1}\n".format(name, nevents))
+            print "Could not parse file name", f
+            name = None
+        
+        if name:
+            try:
+                nevents = f["file"][0]["nevents"]
+            except Exception as e:
+                print "Could not parse nevents"
+                nevents = 0
+            ofile.write("{0} = {1}\n".format(name, nevents))
     ofile.close()
 
     
