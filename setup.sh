@@ -5,7 +5,7 @@ cd CMSSW/src/
 eval `scramv1 runtime -sh`
 
 git cms-init
-git cms-merge-topic vhbb:vhbbHeppy80X
+git cms-merge-topic jpata:meanalysis-80x
 
 #get the TTH code
 git clone https://github.com/jpata/tthbb13.git TTH --branch meanalysis-80x 
