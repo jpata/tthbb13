@@ -166,15 +166,9 @@ if __name__ == "__main__":
     else:
         for fi in sys.argv[2:]:
             print "adding", fi
-            #intree.AddFile(getSitePrefix(fi))
-            intree.AddFile(fi)
+            intree.AddFile(getSitePrefix(fi))
+            #intree.AddFile(fi)
         
-
-
-
-    ## For local testing:
-    #infile = ROOT.TFile(sys.argv[2])
-    #intree = infile.Get('tree')
 
     n_entries = intree.GetEntries()
 
