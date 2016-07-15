@@ -49,6 +49,11 @@ print "timeto_convertPFN ",(time.time()-t0)
 handle = open("heppy_config.py", 'r')
 cfo = imp.load_source("heppy_config", "heppy_config.py", handle)
 config = cfo.config
+
+#change HLT path to HLT2
+if "reHLT" in crabFiles[0]:
+    cfo.fix_reHLT(config)
+
 if hasattr(PSet.process.source, "lumisToProcess"):
     config.preprocessor.options["lumisToProcess"] = PSet.process.source.lumisToProcess
 handle.close()

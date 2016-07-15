@@ -5,7 +5,7 @@ process = cms.Process("FAKE")
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-        map(lambda x: "root://xrootd-cms.infn.it//" + x, os.environ["FILE_NAMES"].split())
+        os.environ["FILE_NAMES"].split()
     ),
     skipEvents = cms.untracked.uint32(int(os.environ["SKIP_EVENTS"]))
 )

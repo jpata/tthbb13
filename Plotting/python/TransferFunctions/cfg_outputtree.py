@@ -54,7 +54,7 @@ def Make_config(do_subjets=False):
     config["root_file_base"] = samples_base.site_prefix
 
     # The config file will be copied to 'runs/{config['run_name']}'
-    config['run_name'] = samples.version
+    config['run_name'] = "Jul13_pilot_v1"
     if do_subjets:
         config['run_name'] += "_subjet"
     else:

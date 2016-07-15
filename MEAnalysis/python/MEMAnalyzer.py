@@ -187,7 +187,7 @@ class MEAnalyzer(FilterAnalyzer):
 
         self.mem_configs = self.conf.mem_configs
         for k, v in self.mem_configs.items():
-            v.configure_btag_pdf(self.conf)
+            #v.configure_btag_pdf(self.conf)
             v.configure_transfer_function(self.conf)
 
         self.memkeysToRun = self.conf.mem["methodsToRun"]
@@ -197,7 +197,7 @@ class MEAnalyzer(FilterAnalyzer):
         self.vars_to_marginalize = CvectorPSVar()
         
         cfg = MEMConfig(self.conf)
-        cfg.configure_btag_pdf(self.conf)
+        #cfg.configure_btag_pdf(self.conf)
         cfg.configure_transfer_function(self.conf)
         self.integrator = MEM.Integrand(
             MEM.output, #verbosity level

@@ -38,16 +38,30 @@ me_cfgs = {
 }
 
 sets_data = [
-    #, "/DoubleEG/Run2016B-PromptReco-v1/MINIAOD"
-    "/DoubleEG/Run2016B-PromptReco-v2/MINIAOD"
-    #, "/DoubleMuon/Run2016B-PromptReco-v1/MINIAOD"
-    , "/DoubleMuon/Run2016B-PromptReco-v2/MINIAOD"
-    #, "/MuonEG/Run2016B-PromptReco-v1/MINIAOD"
-    , "/MuonEG/Run2016B-PromptReco-v2/MINIAOD"
-    #, "/SingleElectron/Run2016B-PromptReco-v1/MINIAOD"
-    , "/SingleElectron/Run2016B-PromptReco-v2/MINIAOD"
-    #, "/SingleMuon/Run2016B-PromptReco-v1/MINIAOD"
-    , "/SingleMuon/Run2016B-PromptReco-v2/MINIAOD"
+    "/DoubleEG/Run2016B-PromptReco-v1/MINIAOD",
+    "/DoubleEG/Run2016B-PromptReco-v2/MINIAOD",
+    "/DoubleEG/Run2016C-PromptReco-v2/MINIAOD",
+    "/DoubleEG/Run2016D-PromptReco-v2/MINIAOD",
+
+    "/DoubleMuon/Run2016B-PromptReco-v1/MINIAOD",
+    "/DoubleMuon/Run2016B-PromptReco-v2/MINIAOD",
+    "/DoubleMuon/Run2016C-PromptReco-v2/MINIAOD",
+    "/DoubleMuon/Run2016D-PromptReco-v2/MINIAOD",
+
+    "/MuonEG/Run2016B-PromptReco-v1/MINIAOD",
+    "/MuonEG/Run2016B-PromptReco-v2/MINIAOD",
+    "/MuonEG/Run2016C-PromptReco-v2/MINIAOD",
+    "/MuonEG/Run2016D-PromptReco-v2/MINIAOD",
+
+    "/SingleElectron/Run2016B-PromptReco-v1/MINIAOD",
+    "/SingleElectron/Run2016B-PromptReco-v2/MINIAOD",
+    "/SingleElectron/Run2016C-PromptReco-v2/MINIAOD",
+    "/SingleElectron/Run2016D-PromptReco-v2/MINIAOD",
+
+    "/SingleMuon/Run2016B-PromptReco-v1/MINIAOD",
+    "/SingleMuon/Run2016B-PromptReco-v2/MINIAOD",
+    "/SingleMuon/Run2016C-PromptReco-v2/MINIAOD",
+    "/SingleMuon/Run2016D-PromptReco-v2/MINIAOD",
 ]
 
 #all available datasets.
@@ -66,7 +80,7 @@ for sd in sets_data:
     }
 datasets.update({
     'ttHTobb': {
-        "ds": '/ttHTobb_M125_13TeV_powheg_pythia8/RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v2/MINIAODSIM',
+        "ds": '/ttHTobb_M125_13TeV_powheg_pythia8/RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1/MINIAODSIM',
         "maxlumis": -1,
         "perjob": 10,
         "runtime": 40,
@@ -74,7 +88,7 @@ datasets.update({
         "script": 'heppy_crab_script.sh'
     },
     'ttHToNonbb': {
-        "ds": '/ttHToNonbb_M125_13TeV_powheg_pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM',
+        "ds": '/ttHToNonbb_M125_13TeV_powheg_pythia8/RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1/MINIAODSIM',
         "maxlumis": -1,
         "perjob": 50,
         "runtime": 40,
@@ -82,7 +96,7 @@ datasets.update({
         "script": 'heppy_crab_script.sh'
     },
     'TTbar_inc': {
-        "ds": '/TT_TuneEE5C_13TeV-powheg-herwigpp/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM',
+        "ds": '/TT_TuneCUETP8M1_13TeV-powheg-pythia8/RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14_ext3-v1/MINIAODSIM',
         "maxlumis": -1,
         "perjob": 200,
         "runtime": 40,

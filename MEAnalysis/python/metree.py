@@ -29,6 +29,7 @@ jetType = NTupleObjectType("jetType", variables = [
     NTupleVariable("qgl", lambda x : x.qgl),
     NTupleVariable("btagCSV", lambda x : x.btagCSV),
     NTupleVariable("btagCMVA", lambda x : x.btagCMVA),
+    NTupleVariable("btagCMVA_log", lambda x : getattr(x, "btagCMVA_log", -20), help="log-transformed btagCMVA"),
     NTupleVariable("btagFlag", lambda x : getattr(x, "btagFlag", -1), help="Jet was considered to be a b in MEM according to the algo"),
     #NTupleVariable("bTagWeight", lambda x : x.bTagWeight, mcOnly=True),
     #NTupleVariable("bTagWeightHFUp", lambda x : x.bTagWeightHFUp, mcOnly=True),
@@ -558,7 +559,8 @@ def getTreeProducer(conf):
             #("btag_lr_4b_Inp3t",    float,      "4b, N-4 light, probability, 3D binning, 3t   input"),
             #("btag_lr_2b_Inp3t",    float,      "2b, N-2 Nlight probability, 3D binning, 3t   input"),
 
-            ("btag_LR_4b_2b",        float,      ""),
+            #("btag_LR_4b_2b",        float,      ""),
+            ("btag_LR_4b_2b_btagCMVA_log",        float,      ""),
             ("btag_LR_4b_2b_btagCMVA",        float,      ""),
             ("btag_LR_4b_2b_btagCSV",        float,      ""),
             #("btag_LR_4b_2b_ded",        float,      ""),
