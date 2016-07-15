@@ -52,5 +52,5 @@ def main(conffile):
 # End of Main
 ########################################
 if __name__ == "__main__":
-    for s in ["subjet", "resolved"]:
+    for s in ["resolved"]:
         main("configs/{0}/config.dat".format(s))
