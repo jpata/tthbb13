@@ -369,7 +369,7 @@ env
     config.Data.inputDBS = 'global'
     config.Data.splitting = 'LumiBased'
     config.Data.publication = True
-    config.Data.ignoreLocality = True
+    config.Data.ignoreLocality = False
     config.Data.allowNonValidInputDataset = True
 
     #config.Site.whitelist = ["T2_CH_CSCS", "T1_US_FNAL", "T2_DE_DESY", "T1_DE_KIT"]
