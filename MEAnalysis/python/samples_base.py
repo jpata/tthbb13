@@ -1,10 +1,5 @@
 import glob, os
 
-
-ngen = {'VHBBHeppyV22pre_tthbbV10pre_leptonic_Jun10_mc_withme__TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': 1815355.0, 'VHBBHeppyV22pre_tthbbV10pre_leptonic_Jun10_mc_withme__ttHTobb_M125_13TeV_powheg_pythia8': 396368.0, 'VHBBHeppyV22pre_tthbbV10pre_leptonic_Jun10_mc_withme__TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': 1860322.0, 'VHBBHeppyV22pre_tthbbV10pre_leptonic_Jun10_mc_withme__TTTo2L2Nu_13TeV-powheg': 1999194.0,
-        'VHBBHeppyV22pre_tthbbV10pre_leptonic_Jun10_mc_withme__TT_TuneEE5C_13TeV-powheg-herwigpp': 999319.0}
-
-
 #Cross-sections from
 # $t \bar{t} + \mathrm{jets}$ - https://twiki.cern.ch/twiki/bin/view/LHCPhysics/TtbarNNLO, $M_{top} = 172.5$ GeV
 # ttH - https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageAt1314TeV, $M_H = 125.0$ GeV
@@ -124,6 +119,18 @@ def getSitePrefix(fn=""):
         return fn
     else:
         raise Exception("Could not open file: {0}".format(fn))
+
+def get_prefix_sample(datasetpath):
+    spl = datasetpath.split("__")
+    if len(spl) == 2:
+        prefix = spl[0]
+        sample = spl[1]
+    elif len(spl) == 1:
+        prefix = ""
+        sample = datasetpath
+    else:
+        raise Exception("could not parse DATASETPATH: {0}".format(datasetpath))
+    return (prefix, sample)
 
 def getSampleNGen(sample):
     import ROOT

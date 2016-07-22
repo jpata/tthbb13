@@ -7,20 +7,11 @@
 #FILE_NAMES="file1.root file2.root"
 #DATASETPATH="name of dataset"
 import json, sys, os
-from TTH.MEAnalysis.samples_base import getSitePrefix, xsec, samples_nick, xsec_sample, ngen
+from TTH.MEAnalysis.samples_base import getSitePrefix, xsec, samples_nick, xsec_sample, get_prefix_sample
 
 filenames = map(getSitePrefix, os.environ["FILE_NAMES"].split())
 datasetpath = os.environ["DATASETPATH"]
-prefix = ""
-sample = datasetpath
-spl = sample.split("__")
-if len(spl) == 2:
-    prefix = spl[0]
-    sample = spl[1]
-
-#for event-based splitting
-#firstEvent = int(os.environ.get("SKIP_EVENTS", 0))
-#nEvents = int(os.environ.get("MAX_EVENTS", -1))
+prefix, sample = get_prefix_sample(datasetpath)
 
 #for file-based splitting
 firstEvent = 0
@@ -33,8 +24,7 @@ ret = {
     "filenames": filenames,
     "lumi": 1000.0,
     "process": samples_nick[sample],
-    "xsweight": xsec_sample[sample] / ngen[datasetpath],
-    #"prefix": "/".join([prefix, sample]),
+    "xsweight": xsec_sample[sample],
     "prefix": sample,
     "outputFile": "ControlPlotsSparse.root",
     "firstEntry": firstEvent,

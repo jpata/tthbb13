@@ -1,8 +1,6 @@
-
 #sample vhbb+tthbb file
-testfile_vhbb_tthbb=/store/user/jpata/tth/Jul13_pilot_v1/ttHTobb_M125_13TeV_powheg_pythia8/Jul13_pilot_v1/160713_160356/0000/tree_1.root
-DATASETPATH=Jun17_leptonic_nome__TT_TuneEE5C_13TeV-powheg-herwigpp
-#testfile_vhbb_tthbb=file:///home/joosep/tth/sw/CMSSW/src/TTH/test.root
+testfile_vhbb_tthbb=/store/user/jpata/tth/Jul15_leptonic_v1/ttHTobb_M125_13TeV_powheg_pythia8/Jul15_leptonic_v1/160715_182411/0000/tree_1.root
+DATASETPATH=Jul15_leptonic_v1__ttHTobb_M125_13TeV_powheg_pythia8
 test_out_dir=$(CMSSW_BASE)/src/TTH/tests_out
 
 get_testfile:

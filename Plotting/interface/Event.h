@@ -241,8 +241,8 @@ public:
     map<SystematicKey::SystematicKey, double> bTagWeights;
 
     //btag likelihood
-    double btag_LR_4b_2b;
-    double btag_LR_4b_2b_logit; // log(x/(1 - x))
+    double blr1;
+    double blr2;
 
     //boosted variables
     int n_excluded_bjets;
@@ -285,8 +285,8 @@ public:
         double _mem_DL_0w2h2t,
         double _tth_mva,
         double _common_bdt,
-        double _btag_LR_4b_2b,
-        double _btag_LR_4b_2b_logit
+        double _blr1,
+        double _blr2
     );
 
     const string to_string() const;

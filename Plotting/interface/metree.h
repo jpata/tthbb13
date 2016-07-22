@@ -10,30 +10,6 @@ public:
   double common_mem_blr_4b[1]; //
   double common_mem_blr_2b[1]; //
   double common_mem_p_sig[1]; //
-  int ncommon_mem_JERDown;
-  double common_mem_JERDown_p_bkg[1]; //
-  double common_mem_JERDown_p[1]; //
-  double common_mem_JERDown_blr_4b[1]; //
-  double common_mem_JERDown_blr_2b[1]; //
-  double common_mem_JERDown_p_sig[1]; //
-  int ncommon_mem_JERUp;
-  double common_mem_JERUp_p_bkg[1]; //
-  double common_mem_JERUp_p[1]; //
-  double common_mem_JERUp_blr_4b[1]; //
-  double common_mem_JERUp_blr_2b[1]; //
-  double common_mem_JERUp_p_sig[1]; //
-  int ncommon_mem_JESDown;
-  double common_mem_JESDown_p_bkg[1]; //
-  double common_mem_JESDown_p[1]; //
-  double common_mem_JESDown_blr_4b[1]; //
-  double common_mem_JESDown_blr_2b[1]; //
-  double common_mem_JESDown_p_sig[1]; //
-  int ncommon_mem_JESUp;
-  double common_mem_JESUp_p_bkg[1]; //
-  double common_mem_JESUp_p[1]; //
-  double common_mem_JESUp_blr_4b[1]; //
-  double common_mem_JESUp_blr_2b[1]; //
-  double common_mem_JESUp_p_sig[1]; //
   int nfatjets;
   double fatjets_phi[4]; //
   double fatjets_pt[4]; //
@@ -45,34 +21,10 @@ public:
   double fatjets_bbtag[4]; //
   int nfw_aj;
   double fw_aj_fw_h_alljets_nominal[8]; //
-  int nfw_aj_JERDown;
-  double fw_aj_JERDown_fw_h_alljets_JERDown[8]; //
-  int nfw_aj_JERUp;
-  double fw_aj_JERUp_fw_h_alljets_JERUp[8]; //
-  int nfw_aj_JESDown;
-  double fw_aj_JESDown_fw_h_alljets_JESDown[8]; //
-  int nfw_aj_JESUp;
-  double fw_aj_JESUp_fw_h_alljets_JESUp[8]; //
   int nfw_bj;
   double fw_bj_fw_h_btagjets_nominal[8]; //
-  int nfw_bj_JERDown;
-  double fw_bj_JERDown_fw_h_btagjets_JERDown[8]; //
-  int nfw_bj_JERUp;
-  double fw_bj_JERUp_fw_h_btagjets_JERUp[8]; //
-  int nfw_bj_JESDown;
-  double fw_bj_JESDown_fw_h_btagjets_JESDown[8]; //
-  int nfw_bj_JESUp;
-  double fw_bj_JESUp_fw_h_btagjets_JESUp[8]; //
   int nfw_uj;
   double fw_uj_fw_h_untagjets_nominal[8]; //
-  int nfw_uj_JERDown;
-  double fw_uj_JERDown_fw_h_untagjets_JERDown[8]; //
-  int nfw_uj_JERUp;
-  double fw_uj_JERUp_fw_h_untagjets_JERUp[8]; //
-  int nfw_uj_JESDown;
-  double fw_uj_JESDown_fw_h_untagjets_JESDown[8]; //
-  int nfw_uj_JESUp;
-  double fw_uj_JESUp_fw_h_untagjets_JESUp[8]; //
   int ngenHiggs;
   double genHiggs_phi[2]; //
   double genHiggs_eta[2]; //
@@ -92,78 +44,104 @@ public:
   double genTopLep_pt[2]; //
   double genTopLep_decayMode[2]; //
   int nhiggsCandidate;
-  double higgsCandidate_sj1eta_softdropz2b1[4]; //
-  double higgsCandidate_sj1phi_pruned[4]; //
-  double higgsCandidate_sj2pt_softdrop[4]; //
-  double higgsCandidate_tau1[4]; //
+  double higgsCandidate_sj1eta_softdropfilt[4]; //
+  double higgsCandidate_mass_softdrop[4]; //mass of the matched softdrop jet
+  double higgsCandidate_sj2mass_pruned[4]; //
+  double higgsCandidate_sj2pt_pruned[4]; //
+  double higgsCandidate_sj2eta_softdropfilt[4]; //
+  double higgsCandidate_sj2pt_softdropfilt[4]; //
+  double higgsCandidate_sj2eta_softdropz2b1filt[4]; //
+  double higgsCandidate_sj2mass_softdropfilt[4]; //
+  double higgsCandidate_sj2mass_softdropz2b1filt[4]; //
+  double higgsCandidate_sj2eta_softdrop[4]; //
+  double higgsCandidate_sj2phi_pruned[4]; //
+  double higgsCandidate_mass_softdropfilt[4]; //mass of the matched softdropfilt jet
+  double higgsCandidate_sj1phi_softdrop[4]; //
+  double higgsCandidate_sj1eta_subjetfiltered[4]; //
+  double higgsCandidate_dr_top[4]; //deltaR to the best HTT candidate
+  double higgsCandidate_sj1mass_softdropz2b1filt[4]; //
+  double higgsCandidate_n_subjettiness[4]; //
   double higgsCandidate_sj2eta_softdropz2b1[4]; //
   double higgsCandidate_dr_genHiggs[4]; //deltaR to gen higgs
-  double higgsCandidate_sj1pt_subjetfiltered[4]; //
-  double higgsCandidate_mass_softdrop[4]; //mass of the matched softdrop jet
   double higgsCandidate_sj3pt_subjetfiltered[4]; //
+  double higgsCandidate_sj2btag_softdropfilt[4]; //
   double higgsCandidate_sj2eta_pruned[4]; //
-  double higgsCandidate_sj2btag_softdrop[4]; //
   double higgsCandidate_sj2pt_subjetfiltered[4]; //
   double higgsCandidate_sj2mass_subjetfiltered[4]; //
+  double higgsCandidate_sj12masspt_subjetfiltered[4]; //
+  double higgsCandidate_sj1pt_subjetfiltered[4]; //
+  double higgsCandidate_sj2btag_softdropz2b1filt[4]; //
+  double higgsCandidate_sj1pt_softdropfilt[4]; //
+  double higgsCandidate_sj1phi_softdropfilt[4]; //
+  double higgsCandidate_sj1mass_softdropz2b1[4]; //
+  double higgsCandidate_nallsubjets_softdropz2b1filt[4]; //
+  double higgsCandidate_dr_genTop[4]; //deltaR to closest gen top
+  double higgsCandidate_nallsubjets_pruned[4]; //
+  double higgsCandidate_sj1pt_softdropz2b1filt[4]; //
+  double higgsCandidate_sj3btag_subjetfiltered[4]; //
+  double higgsCandidate_sj2btag_subjetfiltered[4]; //
+  double higgsCandidate_sj1btag_softdrop[4]; //
+  double higgsCandidate_eta[4]; //
+  double higgsCandidate_sj1btag_softdropfilt[4]; //
+  double higgsCandidate_nallsubjets_softdropfilt[4]; //
+  double higgsCandidate_sj12massb_subjetfiltered[4]; //
+  double higgsCandidate_sj1phi_pruned[4]; //
+  double higgsCandidate_sj2pt_softdrop[4]; //
+  double higgsCandidate_sj3phi_subjetfiltered[4]; //
+  double higgsCandidate_sj2mass_softdrop[4]; //
   double higgsCandidate_sj1pt_pruned[4]; //
-  double higgsCandidate_sj3eta_subjetfiltered[4]; //
+  double higgsCandidate_mass_softdropz2b1filt[4]; //mass of the matched softdropz2b1filt jet
   double higgsCandidate_sj1eta_pruned[4]; //
   double higgsCandidate_sj1phi_subjetfiltered[4]; //
   double higgsCandidate_mass_pruned[4]; //mass of the matched pruned jet
-  double higgsCandidate_sj2pt_pruned[4]; //
-  double higgsCandidate_sj3mass_subjetfiltered[4]; //
-  double higgsCandidate_sj12masspt_subjetfiltered[4]; //
-  double higgsCandidate_sj1mass_subjetfiltered[4]; //
+  double higgsCandidate_pt[4]; //
+  double higgsCandidate_sj1eta_softdropz2b1filt[4]; //
   double higgsCandidate_nallsubjets_softdropz2b1[4]; //
   double higgsCandidate_sj1pt_softdrop[4]; //
   double higgsCandidate_tau2[4]; //
   double higgsCandidate_tau3[4]; //
-  double higgsCandidate_nallsubjets_subjetfiltered[4]; //
-  double higgsCandidate_sj1btag_pruned[4]; //
+  double higgsCandidate_sj3eta_subjetfiltered[4]; //
+  double higgsCandidate_tau1[4]; //
   double higgsCandidate_nallsubjets_softdrop[4]; //
-  double higgsCandidate_sj2phi_subjetfiltered[4]; //
-  double higgsCandidate_mass[4]; //
   double higgsCandidate_sj2btag_pruned[4]; //
   double higgsCandidate_sj1eta_softdrop[4]; //
-  double higgsCandidate_sj123masspt_subjetfiltered[4]; //
-  double higgsCandidate_sj2mass_pruned[4]; //
-  double higgsCandidate_phi[4]; //
-  double higgsCandidate_sj1mass_softdropz2b1[4]; //
-  double higgsCandidate_sj2pt_softdropz2b1[4]; //
+  double higgsCandidate_sj1btag_softdropz2b1filt[4]; //
   double higgsCandidate_sj2mass_softdropz2b1[4]; //
-  double higgsCandidate_sj2phi_softdrop[4]; //
-  double higgsCandidate_sj2eta_softdrop[4]; //
-  double higgsCandidate_sj2phi_pruned[4]; //
-  double higgsCandidate_dr_genTop[4]; //deltaR to closest gen top
-  double higgsCandidate_nallsubjets_pruned[4]; //
+  double higgsCandidate_nallsubjets_subjetfiltered[4]; //
+  double higgsCandidate_sj2pt_softdropz2b1[4]; //
+  double higgsCandidate_sj2pt_softdropz2b1filt[4]; //
   double higgsCandidate_sj2phi_softdropz2b1[4]; //
-  double higgsCandidate_sj2eta_subjetfiltered[4]; //
-  double higgsCandidate_bbtag[4]; //
-  double higgsCandidate_sj2btag_subjetfiltered[4]; //
-  double higgsCandidate_sj1phi_softdropz2b1[4]; //
-  double higgsCandidate_sj1phi_softdrop[4]; //
+  double higgsCandidate_sj2phi_softdropz2b1filt[4]; //
   double higgsCandidate_sj1mass_pruned[4]; //
-  double higgsCandidate_sj3btag_subjetfiltered[4]; //
-  double higgsCandidate_sj1btag_softdropz2b1[4]; //
   double higgsCandidate_sj1pt_softdropz2b1[4]; //
-  double higgsCandidate_sj1btag_softdrop[4]; //
   double higgsCandidate_sj1mass_softdrop[4]; //
-  double higgsCandidate_pt[4]; //
-  double higgsCandidate_sj3phi_subjetfiltered[4]; //
-  double higgsCandidate_sj1eta_subjetfiltered[4]; //
-  double higgsCandidate_dr_top[4]; //deltaR to the best HTT candidate
-  double higgsCandidate_eta[4]; //
-  double higgsCandidate_n_subjettiness[4]; //
-  double higgsCandidate_sj2btag_softdropz2b1[4]; //
-  double higgsCandidate_sj12massb_subjetfiltered[4]; //
+  double higgsCandidate_sj1btag_softdropz2b1[4]; //
   double higgsCandidate_sj1btag_subjetfiltered[4]; //
+  double higgsCandidate_sj1eta_softdropz2b1[4]; //
+  double higgsCandidate_sj2eta_subjetfiltered[4]; //
+  double higgsCandidate_secondbtag_subjetfiltered[4]; //
+  double higgsCandidate_sj2btag_softdrop[4]; //
+  double higgsCandidate_sj2phi_softdropfilt[4]; //
+  double higgsCandidate_sj3mass_subjetfiltered[4]; //
+  double higgsCandidate_sj1mass_subjetfiltered[4]; //
+  double higgsCandidate_sj1btag_pruned[4]; //
+  double higgsCandidate_sj2phi_subjetfiltered[4]; //
+  double higgsCandidate_sj123masspt_subjetfiltered[4]; //
+  double higgsCandidate_phi[4]; //
+  double higgsCandidate_sj1mass_softdropfilt[4]; //
+  double higgsCandidate_sj2phi_softdrop[4]; //
+  double higgsCandidate_sj1phi_softdropz2b1[4]; //
+  double higgsCandidate_sj1phi_softdropz2b1filt[4]; //
+  double higgsCandidate_mass[4]; //
+  double higgsCandidate_sj2btag_softdropz2b1[4]; //
+  double higgsCandidate_bbtag[4]; //
   double higgsCandidate_mass_softdropz2b1[4]; //mass of the matched softdropz2b1 jet
-  double higgsCandidate_sj2mass_softdrop[4]; //
   int njets;
   double jets_mcPt[16]; //
   double jets_mcEta[16]; //
   double jets_btagCMVA[16]; //
   double jets_id[16]; //
+  double jets_btagFlag[16]; //Jet was considered to be a b in MEM according to the algo
   double jets_pt[16]; //
   double jets_corr_JERDown[16]; //
   double jets_qgl[16]; //
@@ -181,6 +159,7 @@ public:
   double jets_mcM[16]; //
   double jets_btagCSV[16]; //
   int jets_mcMatchId[16]; //
+  double jets_btagCMVA_log[16]; //log-transformed btagCMVA
   double jets_mcNumBHadrons[16]; //
   double jets_eta[16]; //
   double jets_mass[16]; //
@@ -199,6 +178,7 @@ public:
   double loose_jets_mcEta[6]; //
   double loose_jets_btagCMVA[6]; //
   double loose_jets_id[6]; //
+  double loose_jets_btagFlag[6]; //Jet was considered to be a b in MEM according to the algo
   double loose_jets_pt[6]; //
   double loose_jets_corr_JERDown[6]; //
   double loose_jets_qgl[6]; //
@@ -216,106 +196,176 @@ public:
   double loose_jets_mcM[6]; //
   double loose_jets_btagCSV[6]; //
   int loose_jets_mcMatchId[6]; //
+  double loose_jets_btagCMVA_log[6]; //log-transformed btagCMVA
   double loose_jets_mcNumBHadrons[6]; //
   double loose_jets_eta[6]; //
   double loose_jets_mass[6]; //
   int loose_jets_mcFlavour[6]; //
-  int nmem_ttbb;
-  double mem_ttbb_p[17]; //
-  double mem_ttbb_chi2[17]; //
-  double mem_ttbb_p_err[17]; //
-  double mem_ttbb_efficiency[17]; //
-  int mem_ttbb_nperm[17]; //
-  double mem_ttbb_time[17]; //
-  int mem_ttbb_error_code[17]; //
-  int nmem_ttbb_JERDown;
-  double mem_ttbb_JERDown_p[17]; //
-  double mem_ttbb_JERDown_chi2[17]; //
-  double mem_ttbb_JERDown_p_err[17]; //
-  double mem_ttbb_JERDown_efficiency[17]; //
-  int mem_ttbb_JERDown_nperm[17]; //
-  double mem_ttbb_JERDown_time[17]; //
-  int mem_ttbb_JERDown_error_code[17]; //
-  int nmem_ttbb_JERUp;
-  double mem_ttbb_JERUp_p[17]; //
-  double mem_ttbb_JERUp_chi2[17]; //
-  double mem_ttbb_JERUp_p_err[17]; //
-  double mem_ttbb_JERUp_efficiency[17]; //
-  int mem_ttbb_JERUp_nperm[17]; //
-  double mem_ttbb_JERUp_time[17]; //
-  int mem_ttbb_JERUp_error_code[17]; //
-  int nmem_ttbb_JESDown;
-  double mem_ttbb_JESDown_p[17]; //
-  double mem_ttbb_JESDown_chi2[17]; //
-  double mem_ttbb_JESDown_p_err[17]; //
-  double mem_ttbb_JESDown_efficiency[17]; //
-  int mem_ttbb_JESDown_nperm[17]; //
-  double mem_ttbb_JESDown_time[17]; //
-  int mem_ttbb_JESDown_error_code[17]; //
-  int nmem_ttbb_JESUp;
-  double mem_ttbb_JESUp_p[17]; //
-  double mem_ttbb_JESUp_chi2[17]; //
-  double mem_ttbb_JESUp_p_err[17]; //
-  double mem_ttbb_JESUp_efficiency[17]; //
-  int mem_ttbb_JESUp_nperm[17]; //
-  double mem_ttbb_JESUp_time[17]; //
-  int mem_ttbb_JESUp_error_code[17]; //
-  int nmem_tth;
-  double mem_tth_p[17]; //
-  double mem_tth_chi2[17]; //
-  double mem_tth_p_err[17]; //
-  double mem_tth_efficiency[17]; //
-  int mem_tth_nperm[17]; //
-  double mem_tth_time[17]; //
-  int mem_tth_error_code[17]; //
-  int nmem_tth_JERDown;
-  double mem_tth_JERDown_p[17]; //
-  double mem_tth_JERDown_chi2[17]; //
-  double mem_tth_JERDown_p_err[17]; //
-  double mem_tth_JERDown_efficiency[17]; //
-  int mem_tth_JERDown_nperm[17]; //
-  double mem_tth_JERDown_time[17]; //
-  int mem_tth_JERDown_error_code[17]; //
-  int nmem_tth_JERUp;
-  double mem_tth_JERUp_p[17]; //
-  double mem_tth_JERUp_chi2[17]; //
-  double mem_tth_JERUp_p_err[17]; //
-  double mem_tth_JERUp_efficiency[17]; //
-  int mem_tth_JERUp_nperm[17]; //
-  double mem_tth_JERUp_time[17]; //
-  int mem_tth_JERUp_error_code[17]; //
-  int nmem_tth_JESDown;
-  double mem_tth_JESDown_p[17]; //
-  double mem_tth_JESDown_chi2[17]; //
-  double mem_tth_JESDown_p_err[17]; //
-  double mem_tth_JESDown_efficiency[17]; //
-  int mem_tth_JESDown_nperm[17]; //
-  double mem_tth_JESDown_time[17]; //
-  int mem_tth_JESDown_error_code[17]; //
-  int nmem_tth_JESUp;
-  double mem_tth_JESUp_p[17]; //
-  double mem_tth_JESUp_chi2[17]; //
-  double mem_tth_JESUp_p_err[17]; //
-  double mem_tth_JESUp_efficiency[17]; //
-  int mem_tth_JESUp_nperm[17]; //
-  double mem_tth_JESUp_time[17]; //
-  int mem_tth_JESUp_error_code[17]; //
+  double mem_ttbb_DL_0w2h2t_perm_p_me_mean[50]; //
+  double mem_ttbb_DL_0w2h2t_perm_p_me_std[50]; //
+  double mem_ttbb_DL_0w2h2t_perm_p_mean[50]; //
+  double mem_ttbb_DL_0w2h2t_perm_p_std[50]; //
+  double mem_ttbb_DL_0w2h2t_perm_p_tf_mean[50]; //
+  double mem_ttbb_DL_0w2h2t_perm_p_tf_std[50]; //
+  double mem_ttbb_DL_0w2h2t_perm_perm_0[50]; //
+  double mem_ttbb_DL_0w2h2t_perm_perm_1[50]; //
+  double mem_ttbb_DL_0w2h2t_perm_perm_2[50]; //
+  double mem_ttbb_DL_0w2h2t_perm_perm_3[50]; //
+  double mem_ttbb_DL_0w2h2t_perm_perm_4[50]; //
+  double mem_ttbb_DL_0w2h2t_perm_perm_5[50]; //
+  double mem_ttbb_DL_0w2h2t_perm_perm_6[50]; //
+  double mem_ttbb_DL_0w2h2t_perm_perm_7[50]; //
+  double mem_ttbb_DL_0w2h2t_perm_perm_8[50]; //
+  double mem_ttbb_DL_0w2h2t_perm_perm_9[50]; //
+  double mem_ttbb_SL_0w2h2t_perm_p_me_mean[50]; //
+  double mem_ttbb_SL_0w2h2t_perm_p_me_std[50]; //
+  double mem_ttbb_SL_0w2h2t_perm_p_mean[50]; //
+  double mem_ttbb_SL_0w2h2t_perm_p_std[50]; //
+  double mem_ttbb_SL_0w2h2t_perm_p_tf_mean[50]; //
+  double mem_ttbb_SL_0w2h2t_perm_p_tf_std[50]; //
+  double mem_ttbb_SL_0w2h2t_perm_perm_0[50]; //
+  double mem_ttbb_SL_0w2h2t_perm_perm_1[50]; //
+  double mem_ttbb_SL_0w2h2t_perm_perm_2[50]; //
+  double mem_ttbb_SL_0w2h2t_perm_perm_3[50]; //
+  double mem_ttbb_SL_0w2h2t_perm_perm_4[50]; //
+  double mem_ttbb_SL_0w2h2t_perm_perm_5[50]; //
+  double mem_ttbb_SL_0w2h2t_perm_perm_6[50]; //
+  double mem_ttbb_SL_0w2h2t_perm_perm_7[50]; //
+  double mem_ttbb_SL_0w2h2t_perm_perm_8[50]; //
+  double mem_ttbb_SL_0w2h2t_perm_perm_9[50]; //
+  double mem_ttbb_SL_1w2h2t_perm_p_me_mean[50]; //
+  double mem_ttbb_SL_1w2h2t_perm_p_me_std[50]; //
+  double mem_ttbb_SL_1w2h2t_perm_p_mean[50]; //
+  double mem_ttbb_SL_1w2h2t_perm_p_std[50]; //
+  double mem_ttbb_SL_1w2h2t_perm_p_tf_mean[50]; //
+  double mem_ttbb_SL_1w2h2t_perm_p_tf_std[50]; //
+  double mem_ttbb_SL_1w2h2t_perm_perm_0[50]; //
+  double mem_ttbb_SL_1w2h2t_perm_perm_1[50]; //
+  double mem_ttbb_SL_1w2h2t_perm_perm_2[50]; //
+  double mem_ttbb_SL_1w2h2t_perm_perm_3[50]; //
+  double mem_ttbb_SL_1w2h2t_perm_perm_4[50]; //
+  double mem_ttbb_SL_1w2h2t_perm_perm_5[50]; //
+  double mem_ttbb_SL_1w2h2t_perm_perm_6[50]; //
+  double mem_ttbb_SL_1w2h2t_perm_perm_7[50]; //
+  double mem_ttbb_SL_1w2h2t_perm_perm_8[50]; //
+  double mem_ttbb_SL_1w2h2t_perm_perm_9[50]; //
+  double mem_ttbb_SL_2w2h2t_perm_p_me_mean[50]; //
+  double mem_ttbb_SL_2w2h2t_perm_p_me_std[50]; //
+  double mem_ttbb_SL_2w2h2t_perm_p_mean[50]; //
+  double mem_ttbb_SL_2w2h2t_perm_p_std[50]; //
+  double mem_ttbb_SL_2w2h2t_perm_p_tf_mean[50]; //
+  double mem_ttbb_SL_2w2h2t_perm_p_tf_std[50]; //
+  double mem_ttbb_SL_2w2h2t_perm_perm_0[50]; //
+  double mem_ttbb_SL_2w2h2t_perm_perm_1[50]; //
+  double mem_ttbb_SL_2w2h2t_perm_perm_2[50]; //
+  double mem_ttbb_SL_2w2h2t_perm_perm_3[50]; //
+  double mem_ttbb_SL_2w2h2t_perm_perm_4[50]; //
+  double mem_ttbb_SL_2w2h2t_perm_perm_5[50]; //
+  double mem_ttbb_SL_2w2h2t_perm_perm_6[50]; //
+  double mem_ttbb_SL_2w2h2t_perm_perm_7[50]; //
+  double mem_ttbb_SL_2w2h2t_perm_perm_8[50]; //
+  double mem_ttbb_SL_2w2h2t_perm_perm_9[50]; //
+  double mem_tth_DL_0w2h2t_perm_p_me_mean[50]; //
+  double mem_tth_DL_0w2h2t_perm_p_me_std[50]; //
+  double mem_tth_DL_0w2h2t_perm_p_mean[50]; //
+  double mem_tth_DL_0w2h2t_perm_p_std[50]; //
+  double mem_tth_DL_0w2h2t_perm_p_tf_mean[50]; //
+  double mem_tth_DL_0w2h2t_perm_p_tf_std[50]; //
+  double mem_tth_DL_0w2h2t_perm_perm_0[50]; //
+  double mem_tth_DL_0w2h2t_perm_perm_1[50]; //
+  double mem_tth_DL_0w2h2t_perm_perm_2[50]; //
+  double mem_tth_DL_0w2h2t_perm_perm_3[50]; //
+  double mem_tth_DL_0w2h2t_perm_perm_4[50]; //
+  double mem_tth_DL_0w2h2t_perm_perm_5[50]; //
+  double mem_tth_DL_0w2h2t_perm_perm_6[50]; //
+  double mem_tth_DL_0w2h2t_perm_perm_7[50]; //
+  double mem_tth_DL_0w2h2t_perm_perm_8[50]; //
+  double mem_tth_DL_0w2h2t_perm_perm_9[50]; //
+  double mem_tth_SL_0w2h2t_perm_p_me_mean[50]; //
+  double mem_tth_SL_0w2h2t_perm_p_me_std[50]; //
+  double mem_tth_SL_0w2h2t_perm_p_mean[50]; //
+  double mem_tth_SL_0w2h2t_perm_p_std[50]; //
+  double mem_tth_SL_0w2h2t_perm_p_tf_mean[50]; //
+  double mem_tth_SL_0w2h2t_perm_p_tf_std[50]; //
+  double mem_tth_SL_0w2h2t_perm_perm_0[50]; //
+  double mem_tth_SL_0w2h2t_perm_perm_1[50]; //
+  double mem_tth_SL_0w2h2t_perm_perm_2[50]; //
+  double mem_tth_SL_0w2h2t_perm_perm_3[50]; //
+  double mem_tth_SL_0w2h2t_perm_perm_4[50]; //
+  double mem_tth_SL_0w2h2t_perm_perm_5[50]; //
+  double mem_tth_SL_0w2h2t_perm_perm_6[50]; //
+  double mem_tth_SL_0w2h2t_perm_perm_7[50]; //
+  double mem_tth_SL_0w2h2t_perm_perm_8[50]; //
+  double mem_tth_SL_0w2h2t_perm_perm_9[50]; //
+  double mem_tth_SL_1w2h2t_perm_p_me_mean[50]; //
+  double mem_tth_SL_1w2h2t_perm_p_me_std[50]; //
+  double mem_tth_SL_1w2h2t_perm_p_mean[50]; //
+  double mem_tth_SL_1w2h2t_perm_p_std[50]; //
+  double mem_tth_SL_1w2h2t_perm_p_tf_mean[50]; //
+  double mem_tth_SL_1w2h2t_perm_p_tf_std[50]; //
+  double mem_tth_SL_1w2h2t_perm_perm_0[50]; //
+  double mem_tth_SL_1w2h2t_perm_perm_1[50]; //
+  double mem_tth_SL_1w2h2t_perm_perm_2[50]; //
+  double mem_tth_SL_1w2h2t_perm_perm_3[50]; //
+  double mem_tth_SL_1w2h2t_perm_perm_4[50]; //
+  double mem_tth_SL_1w2h2t_perm_perm_5[50]; //
+  double mem_tth_SL_1w2h2t_perm_perm_6[50]; //
+  double mem_tth_SL_1w2h2t_perm_perm_7[50]; //
+  double mem_tth_SL_1w2h2t_perm_perm_8[50]; //
+  double mem_tth_SL_1w2h2t_perm_perm_9[50]; //
+  double mem_tth_SL_2w2h2t_perm_p_me_mean[50]; //
+  double mem_tth_SL_2w2h2t_perm_p_me_std[50]; //
+  double mem_tth_SL_2w2h2t_perm_p_mean[50]; //
+  double mem_tth_SL_2w2h2t_perm_p_std[50]; //
+  double mem_tth_SL_2w2h2t_perm_p_tf_mean[50]; //
+  double mem_tth_SL_2w2h2t_perm_p_tf_std[50]; //
+  double mem_tth_SL_2w2h2t_perm_perm_0[50]; //
+  double mem_tth_SL_2w2h2t_perm_perm_1[50]; //
+  double mem_tth_SL_2w2h2t_perm_perm_2[50]; //
+  double mem_tth_SL_2w2h2t_perm_perm_3[50]; //
+  double mem_tth_SL_2w2h2t_perm_perm_4[50]; //
+  double mem_tth_SL_2w2h2t_perm_perm_5[50]; //
+  double mem_tth_SL_2w2h2t_perm_perm_6[50]; //
+  double mem_tth_SL_2w2h2t_perm_perm_7[50]; //
+  double mem_tth_SL_2w2h2t_perm_perm_8[50]; //
+  double mem_tth_SL_2w2h2t_perm_perm_9[50]; //
+  int mem_ttbb_DL_0w2h2t_perm_idx[50]; //
+  int mem_ttbb_SL_0w2h2t_perm_idx[50]; //
+  int mem_ttbb_SL_1w2h2t_perm_idx[50]; //
+  int mem_ttbb_SL_2w2h2t_perm_idx[50]; //
+  int mem_tth_DL_0w2h2t_perm_idx[50]; //
+  int mem_tth_SL_0w2h2t_perm_idx[50]; //
+  int mem_tth_SL_1w2h2t_perm_idx[50]; //
+  int mem_tth_SL_2w2h2t_perm_idx[50]; //
+  int nmem_ttbb_DL_0w2h2t_perm;
+  int nmem_ttbb_SL_0w2h2t_perm;
+  int nmem_ttbb_SL_1w2h2t_perm;
+  int nmem_ttbb_SL_2w2h2t_perm;
+  int nmem_tth_DL_0w2h2t_perm;
+  int nmem_tth_SL_0w2h2t_perm;
+  int nmem_tth_SL_1w2h2t_perm;
+  int nmem_tth_SL_2w2h2t_perm;
   int nothertopCandidate;
   double othertopCandidate_tau1[4]; //
   double othertopCandidate_etacal[4]; //
   double othertopCandidate_sjW2btag[4]; //
   double othertopCandidate_n_subjettiness_groomed[4]; //
   double othertopCandidate_sjW2pt[4]; //
+  double othertopCandidate_sjW1ptcal[4]; //
   double othertopCandidate_sjW1btag[4]; //
   double othertopCandidate_sjW1mass[4]; //
   double othertopCandidate_sjNonWmass[4]; //
+  double othertopCandidate_sjNonWptcal[4]; //
   double othertopCandidate_sjNonWeta[4]; //
   double othertopCandidate_pt[4]; //
+  double othertopCandidate_sjW2masscal[4]; //
   double othertopCandidate_ptForRoptCalc[4]; //
   double othertopCandidate_tau2[4]; //
   double othertopCandidate_phi[4]; //
   double othertopCandidate_tau3[4]; //
   double othertopCandidate_sjNonWpt[4]; //
+  double othertopCandidate_sjNonWmasscal[4]; //
+  double othertopCandidate_sjW1masscal[4]; //
   double othertopCandidate_sjW2mass[4]; //
   double othertopCandidate_mass[4]; //
   double othertopCandidate_sjNonWbtag[4]; //
@@ -333,6 +383,7 @@ public:
   double othertopCandidate_sjW2phi[4]; //
   double othertopCandidate_eta[4]; //
   double othertopCandidate_n_subjettiness[4]; //
+  double othertopCandidate_sjW2ptcal[4]; //
   double othertopCandidate_bbtag[4]; //
   double othertopCandidate_sjW2eta[4]; //
   double othertopCandidate_genTopHad_dr[4]; //DeltaR to the closest hadronic gen top
@@ -342,16 +393,21 @@ public:
   double topCandidate_sjW2btag[1]; //
   double topCandidate_n_subjettiness_groomed[1]; //
   double topCandidate_sjW2pt[1]; //
+  double topCandidate_sjW1ptcal[1]; //
   double topCandidate_sjW1btag[1]; //
   double topCandidate_sjW1mass[1]; //
   double topCandidate_sjNonWmass[1]; //
+  double topCandidate_sjNonWptcal[1]; //
   double topCandidate_sjNonWeta[1]; //
   double topCandidate_pt[1]; //
+  double topCandidate_sjW2masscal[1]; //
   double topCandidate_ptForRoptCalc[1]; //
   double topCandidate_tau2[1]; //
   double topCandidate_phi[1]; //
   double topCandidate_tau3[1]; //
   double topCandidate_sjNonWpt[1]; //
+  double topCandidate_sjNonWmasscal[1]; //
+  double topCandidate_sjW1masscal[1]; //
   double topCandidate_sjW2mass[1]; //
   double topCandidate_mass[1]; //
   double topCandidate_sjNonWbtag[1]; //
@@ -369,6 +425,7 @@ public:
   double topCandidate_sjW2phi[1]; //
   double topCandidate_eta[1]; //
   double topCandidate_n_subjettiness[1]; //
+  double topCandidate_sjW2ptcal[1]; //
   double topCandidate_bbtag[1]; //
   double topCandidate_sjW2eta[1]; //
   double topCandidate_genTopHad_dr[1]; //DeltaR to the closest hadronic gen top
@@ -378,16 +435,21 @@ public:
   double topCandidatesSync_sjW2btag[4]; //
   double topCandidatesSync_n_subjettiness_groomed[4]; //
   double topCandidatesSync_sjW2pt[4]; //
+  double topCandidatesSync_sjW1ptcal[4]; //
   double topCandidatesSync_sjW1btag[4]; //
   double topCandidatesSync_sjW1mass[4]; //
   double topCandidatesSync_sjNonWmass[4]; //
+  double topCandidatesSync_sjNonWptcal[4]; //
   double topCandidatesSync_sjNonWeta[4]; //
   double topCandidatesSync_pt[4]; //
+  double topCandidatesSync_sjW2masscal[4]; //
   double topCandidatesSync_ptForRoptCalc[4]; //
   double topCandidatesSync_tau2[4]; //
   double topCandidatesSync_phi[4]; //
   double topCandidatesSync_tau3[4]; //
   double topCandidatesSync_sjNonWpt[4]; //
+  double topCandidatesSync_sjNonWmasscal[4]; //
+  double topCandidatesSync_sjW1masscal[4]; //
   double topCandidatesSync_sjW2mass[4]; //
   double topCandidatesSync_mass[4]; //
   double topCandidatesSync_sjNonWbtag[4]; //
@@ -405,6 +467,7 @@ public:
   double topCandidatesSync_sjW2phi[4]; //
   double topCandidatesSync_eta[4]; //
   double topCandidatesSync_n_subjettiness[4]; //
+  double topCandidatesSync_sjW2ptcal[4]; //
   double topCandidatesSync_bbtag[4]; //
   double topCandidatesSync_sjW2eta[4]; //
   double topCandidatesSync_genTopHad_dr[4]; //DeltaR to the closest hadronic gen top
@@ -413,6 +476,70 @@ public:
   double ll_eta[1]; //
   double ll_mass[1]; //
   double ll_pt[1]; //
+  int nmem_ttbb_DL_0w2h2t;
+  double mem_ttbb_DL_0w2h2t_p[1]; //
+  double mem_ttbb_DL_0w2h2t_chi2[1]; //
+  double mem_ttbb_DL_0w2h2t_p_err[1]; //
+  double mem_ttbb_DL_0w2h2t_efficiency[1]; //
+  int mem_ttbb_DL_0w2h2t_nperm[1]; //
+  double mem_ttbb_DL_0w2h2t_time[1]; //
+  int mem_ttbb_DL_0w2h2t_error_code[1]; //
+  int nmem_ttbb_SL_0w2h2t;
+  double mem_ttbb_SL_0w2h2t_p[1]; //
+  double mem_ttbb_SL_0w2h2t_chi2[1]; //
+  double mem_ttbb_SL_0w2h2t_p_err[1]; //
+  double mem_ttbb_SL_0w2h2t_efficiency[1]; //
+  int mem_ttbb_SL_0w2h2t_nperm[1]; //
+  double mem_ttbb_SL_0w2h2t_time[1]; //
+  int mem_ttbb_SL_0w2h2t_error_code[1]; //
+  int nmem_ttbb_SL_1w2h2t;
+  double mem_ttbb_SL_1w2h2t_p[1]; //
+  double mem_ttbb_SL_1w2h2t_chi2[1]; //
+  double mem_ttbb_SL_1w2h2t_p_err[1]; //
+  double mem_ttbb_SL_1w2h2t_efficiency[1]; //
+  int mem_ttbb_SL_1w2h2t_nperm[1]; //
+  double mem_ttbb_SL_1w2h2t_time[1]; //
+  int mem_ttbb_SL_1w2h2t_error_code[1]; //
+  int nmem_ttbb_SL_2w2h2t;
+  double mem_ttbb_SL_2w2h2t_p[1]; //
+  double mem_ttbb_SL_2w2h2t_chi2[1]; //
+  double mem_ttbb_SL_2w2h2t_p_err[1]; //
+  double mem_ttbb_SL_2w2h2t_efficiency[1]; //
+  int mem_ttbb_SL_2w2h2t_nperm[1]; //
+  double mem_ttbb_SL_2w2h2t_time[1]; //
+  int mem_ttbb_SL_2w2h2t_error_code[1]; //
+  int nmem_tth_DL_0w2h2t;
+  double mem_tth_DL_0w2h2t_p[1]; //
+  double mem_tth_DL_0w2h2t_chi2[1]; //
+  double mem_tth_DL_0w2h2t_p_err[1]; //
+  double mem_tth_DL_0w2h2t_efficiency[1]; //
+  int mem_tth_DL_0w2h2t_nperm[1]; //
+  double mem_tth_DL_0w2h2t_time[1]; //
+  int mem_tth_DL_0w2h2t_error_code[1]; //
+  int nmem_tth_SL_0w2h2t;
+  double mem_tth_SL_0w2h2t_p[1]; //
+  double mem_tth_SL_0w2h2t_chi2[1]; //
+  double mem_tth_SL_0w2h2t_p_err[1]; //
+  double mem_tth_SL_0w2h2t_efficiency[1]; //
+  int mem_tth_SL_0w2h2t_nperm[1]; //
+  double mem_tth_SL_0w2h2t_time[1]; //
+  int mem_tth_SL_0w2h2t_error_code[1]; //
+  int nmem_tth_SL_1w2h2t;
+  double mem_tth_SL_1w2h2t_p[1]; //
+  double mem_tth_SL_1w2h2t_chi2[1]; //
+  double mem_tth_SL_1w2h2t_p_err[1]; //
+  double mem_tth_SL_1w2h2t_efficiency[1]; //
+  int mem_tth_SL_1w2h2t_nperm[1]; //
+  double mem_tth_SL_1w2h2t_time[1]; //
+  int mem_tth_SL_1w2h2t_error_code[1]; //
+  int nmem_tth_SL_2w2h2t;
+  double mem_tth_SL_2w2h2t_p[1]; //
+  double mem_tth_SL_2w2h2t_chi2[1]; //
+  double mem_tth_SL_2w2h2t_p_err[1]; //
+  double mem_tth_SL_2w2h2t_efficiency[1]; //
+  int mem_tth_SL_2w2h2t_nperm[1]; //
+  double mem_tth_SL_2w2h2t_time[1]; //
+  int mem_tth_SL_2w2h2t_error_code[1]; //
   int nmet;
   double met_phi[1]; //
   double met_sumEt[1]; //
@@ -451,15 +578,7 @@ public:
   double pv_rho[1]; //
   double pv_ndof[1]; //
   double C;
-  double C_JERDown;
-  double C_JERUp;
-  double C_JESDown;
-  double C_JESUp;
   double D;
-  double D_JERDown;
-  double D_JERUp;
-  double D_JESDown;
-  double D_JESUp;
   int HLT_BIT_HLT_AK8DiPFJet250_200_TrimMass30_BTagCSV0p45_v;
   int HLT_BIT_HLT_AK8DiPFJet250_200_TrimMass30_BTagCSV_p20_v;
   int HLT_BIT_HLT_AK8DiPFJet280_200_TrimMass30_BTagCSV0p45_v;
@@ -620,15 +739,7 @@ public:
   int HLT_ttHhardonicLowLumi;
   int HLT_ttHleptonic;
   double Wmass;
-  double Wmass_JERDown;
-  double Wmass_JERUp;
-  double Wmass_JESDown;
-  double Wmass_JESUp;
   double aplanarity;
-  double aplanarity_JERDown;
-  double aplanarity_JERUp;
-  double aplanarity_JESDown;
-  double aplanarity_JESUp;
   double bTagWeight;
   double bTagWeight_HFDown;
   double bTagWeight_HFStats1Down;
@@ -648,226 +759,58 @@ public:
   double bTagWeight_cErr1Up;
   double bTagWeight_cErr2Down;
   double bTagWeight_cErr2Up;
-  double btag_LR_4b_2b;
-  double btag_LR_4b_2b_JERDown;
-  double btag_LR_4b_2b_JERUp;
-  double btag_LR_4b_2b_JESDown;
-  double btag_LR_4b_2b_JESUp;
   double btag_LR_4b_2b_btagCMVA;
-  double btag_LR_4b_2b_btagCMVA_JERDown;
-  double btag_LR_4b_2b_btagCMVA_JERUp;
-  double btag_LR_4b_2b_btagCMVA_JESDown;
-  double btag_LR_4b_2b_btagCMVA_JESUp;
+  double btag_LR_4b_2b_btagCMVA_log;
   double btag_LR_4b_2b_btagCSV;
-  double btag_LR_4b_2b_btagCSV_JERDown;
-  double btag_LR_4b_2b_btagCSV_JERUp;
-  double btag_LR_4b_2b_btagCSV_JESDown;
-  double btag_LR_4b_2b_btagCSV_JESUp;
   double btag_lr_2b;
-  double btag_lr_2b_JERDown;
-  double btag_lr_2b_JERUp;
-  double btag_lr_2b_JESDown;
-  double btag_lr_2b_JESUp;
   double btag_lr_4b;
-  double btag_lr_4b_JERDown;
-  double btag_lr_4b_JERUp;
-  double btag_lr_4b_JESDown;
-  double btag_lr_4b_JESUp;
   int cat;
-  int cat_JERDown;
-  int cat_JERUp;
-  int cat_JESDown;
-  int cat_JESUp;
   int cat_btag;
-  int cat_btag_JERDown;
-  int cat_btag_JERUp;
-  int cat_btag_JESDown;
-  int cat_btag_JESUp;
   int cat_gen;
-  int cat_gen_JERDown;
-  int cat_gen_JERUp;
-  int cat_gen_JESDown;
-  int cat_gen_JESUp;
   double common_bdt;
-  double common_bdt_JERDown;
-  double common_bdt_JERUp;
-  double common_bdt_JESDown;
-  double common_bdt_JESUp;
   double common_bdt_withmem1;
-  double common_bdt_withmem1_JERDown;
-  double common_bdt_withmem1_JERUp;
-  double common_bdt_withmem1_JESDown;
-  double common_bdt_withmem1_JESUp;
   double common_bdt_withmem2;
-  double common_bdt_withmem2_JERDown;
-  double common_bdt_withmem2_JERUp;
-  double common_bdt_withmem2_JESDown;
-  double common_bdt_withmem2_JESUp;
   double eta_drpair_btag;
-  double eta_drpair_btag_JERDown;
-  double eta_drpair_btag_JERUp;
-  double eta_drpair_btag_JESDown;
-  double eta_drpair_btag_JESUp;
   long evt;
   int genHiggsDecayMode;
   double genWeight;
   double ht;
-  double ht_JERDown;
-  double ht_JERUp;
-  double ht_JESDown;
-  double ht_JESUp;
   int is_dl;
-  int is_dl_JERDown;
-  int is_dl_JERUp;
-  int is_dl_JESDown;
-  int is_dl_JESUp;
   int is_fh;
-  int is_fh_JERDown;
-  int is_fh_JERUp;
-  int is_fh_JESDown;
-  int is_fh_JESUp;
   int is_sl;
-  int is_sl_JERDown;
-  int is_sl_JERUp;
-  int is_sl_JESDown;
-  int is_sl_JESUp;
   double isotropy;
-  double isotropy_JERDown;
-  double isotropy_JERUp;
-  double isotropy_JESDown;
-  double isotropy_JESUp;
   double json;
   long lumi;
   double mass_drpair_btag;
-  double mass_drpair_btag_JERDown;
-  double mass_drpair_btag_JERUp;
-  double mass_drpair_btag_JESDown;
-  double mass_drpair_btag_JESUp;
   double mean_bdisc;
-  double mean_bdisc_JERDown;
-  double mean_bdisc_JERUp;
-  double mean_bdisc_JESDown;
-  double mean_bdisc_JESUp;
   double mean_bdisc_btag;
-  double mean_bdisc_btag_JERDown;
-  double mean_bdisc_btag_JERUp;
-  double mean_bdisc_btag_JESDown;
-  double mean_bdisc_btag_JESUp;
   double mean_dr_btag;
-  double mean_dr_btag_JERDown;
-  double mean_dr_btag_JERUp;
-  double mean_dr_btag_JESDown;
-  double mean_dr_btag_JESUp;
   double min_dr_btag;
-  double min_dr_btag_JERDown;
-  double min_dr_btag_JERUp;
-  double min_dr_btag_JESDown;
-  double min_dr_btag_JESUp;
   double momentum_eig0;
-  double momentum_eig0_JERDown;
-  double momentum_eig0_JERUp;
-  double momentum_eig0_JESDown;
-  double momentum_eig0_JESUp;
   double momentum_eig1;
-  double momentum_eig1_JERDown;
-  double momentum_eig1_JERUp;
-  double momentum_eig1_JESDown;
-  double momentum_eig1_JESUp;
   double momentum_eig2;
-  double momentum_eig2_JERDown;
-  double momentum_eig2_JERUp;
-  double momentum_eig2_JESDown;
-  double momentum_eig2_JESUp;
   int nBCMVAL;
-  int nBCMVAL_JERDown;
-  int nBCMVAL_JERUp;
-  int nBCMVAL_JESDown;
-  int nBCMVAL_JESUp;
   int nBCMVAM;
-  int nBCMVAM_JERDown;
-  int nBCMVAM_JERUp;
-  int nBCMVAM_JESDown;
-  int nBCMVAM_JESUp;
   int nBCMVAT;
-  int nBCMVAT_JERDown;
-  int nBCMVAT_JERUp;
-  int nBCMVAT_JESDown;
-  int nBCMVAT_JESUp;
   int nBCSVL;
-  int nBCSVL_JERDown;
-  int nBCSVL_JERUp;
-  int nBCSVL_JESDown;
-  int nBCSVL_JESUp;
   int nBCSVM;
-  int nBCSVM_JERDown;
-  int nBCSVM_JERUp;
-  int nBCSVM_JESDown;
-  int nBCSVM_JESUp;
   int nBCSVT;
-  int nBCSVT_JERDown;
-  int nBCSVT_JERUp;
-  int nBCSVT_JESDown;
-  int nBCSVT_JESUp;
   int nGenBHiggs;
   int nGenBTop;
   int nGenQW;
   int nMatchSimB;
-  int nMatchSimB_JERDown;
-  int nMatchSimB_JERUp;
-  int nMatchSimB_JESDown;
-  int nMatchSimB_JESUp;
   int nMatchSimC;
-  int nMatchSimC_JERDown;
-  int nMatchSimC_JERUp;
-  int nMatchSimC_JESDown;
-  int nMatchSimC_JESUp;
   int nMatch_hb;
-  int nMatch_hb_JERDown;
-  int nMatch_hb_JERUp;
-  int nMatch_hb_JESDown;
-  int nMatch_hb_JESUp;
   int nMatch_hb_btag;
-  int nMatch_hb_btag_JERDown;
-  int nMatch_hb_btag_JERUp;
-  int nMatch_hb_btag_JESDown;
-  int nMatch_hb_btag_JESUp;
   int nMatch_tb;
-  int nMatch_tb_JERDown;
-  int nMatch_tb_JERUp;
-  int nMatch_tb_JESDown;
-  int nMatch_tb_JESUp;
   int nMatch_tb_btag;
-  int nMatch_tb_btag_JERDown;
-  int nMatch_tb_btag_JERUp;
-  int nMatch_tb_btag_JESDown;
-  int nMatch_tb_btag_JESUp;
   int nMatch_wq;
-  int nMatch_wq_JERDown;
-  int nMatch_wq_JERUp;
-  int nMatch_wq_JESDown;
-  int nMatch_wq_JESUp;
   int nMatch_wq_btag;
-  int nMatch_wq_btag_JERDown;
-  int nMatch_wq_btag_JERUp;
-  int nMatch_wq_btag_JESDown;
-  int nMatch_wq_btag_JESUp;
   double nPU0;
   double nPVs;
   int nSelected_hb;
-  int nSelected_hb_JERDown;
-  int nSelected_hb_JERUp;
-  int nSelected_hb_JESDown;
-  int nSelected_hb_JESUp;
   int nSelected_tb;
-  int nSelected_tb_JERDown;
-  int nSelected_tb_JERUp;
-  int nSelected_tb_JESDown;
-  int nSelected_tb_JESUp;
   int nSelected_wq;
-  int nSelected_wq_JERDown;
-  int nSelected_wq_JERUp;
-  int nSelected_wq_JESDown;
-  int nSelected_wq_JESUp;
   double nTrueInt;
   double n_bjets;
   double n_boosted_bjets;
@@ -876,113 +819,32 @@ public:
   double n_excluded_ljets;
   double n_ljets;
   int numJets;
-  int numJets_JERDown;
-  int numJets_JERUp;
-  int numJets_JESDown;
-  int numJets_JESUp;
   int passPV;
   int passes_btag;
-  int passes_btag_JERDown;
-  int passes_btag_JERUp;
-  int passes_btag_JESDown;
-  int passes_btag_JESUp;
   int passes_jet;
-  int passes_jet_JERDown;
-  int passes_jet_JERUp;
-  int passes_jet_JESDown;
-  int passes_jet_JESUp;
   int passes_mem;
-  int passes_mem_JERDown;
-  int passes_mem_JERUp;
-  int passes_mem_JESDown;
-  int passes_mem_JESUp;
   double pt_drpair_btag;
-  double pt_drpair_btag_JERDown;
-  double pt_drpair_btag_JERUp;
-  double pt_drpair_btag_JESDown;
-  double pt_drpair_btag_JESUp;
   double puWeight;
   double qg_LR_flavour_4q_0q;
   double qg_LR_flavour_4q_0q_1q;
   double qg_LR_flavour_4q_0q_1q_2q;
   double qg_LR_flavour_4q_0q_1q_2q_3q;
-  double qg_LR_flavour_4q_0q_1q_2q_3q_JERDown;
-  double qg_LR_flavour_4q_0q_1q_2q_3q_JERUp;
-  double qg_LR_flavour_4q_0q_1q_2q_3q_JESDown;
-  double qg_LR_flavour_4q_0q_1q_2q_3q_JESUp;
-  double qg_LR_flavour_4q_0q_1q_2q_JERDown;
-  double qg_LR_flavour_4q_0q_1q_2q_JERUp;
-  double qg_LR_flavour_4q_0q_1q_2q_JESDown;
-  double qg_LR_flavour_4q_0q_1q_2q_JESUp;
-  double qg_LR_flavour_4q_0q_1q_JERDown;
-  double qg_LR_flavour_4q_0q_1q_JERUp;
-  double qg_LR_flavour_4q_0q_1q_JESDown;
-  double qg_LR_flavour_4q_0q_1q_JESUp;
-  double qg_LR_flavour_4q_0q_JERDown;
-  double qg_LR_flavour_4q_0q_JERUp;
-  double qg_LR_flavour_4q_0q_JESDown;
-  double qg_LR_flavour_4q_0q_JESUp;
   double qg_LR_flavour_4q_1q;
   double qg_LR_flavour_4q_1q_2q;
   double qg_LR_flavour_4q_1q_2q_3q;
-  double qg_LR_flavour_4q_1q_2q_3q_JERDown;
-  double qg_LR_flavour_4q_1q_2q_3q_JERUp;
-  double qg_LR_flavour_4q_1q_2q_3q_JESDown;
-  double qg_LR_flavour_4q_1q_2q_3q_JESUp;
-  double qg_LR_flavour_4q_1q_2q_JERDown;
-  double qg_LR_flavour_4q_1q_2q_JERUp;
-  double qg_LR_flavour_4q_1q_2q_JESDown;
-  double qg_LR_flavour_4q_1q_2q_JESUp;
-  double qg_LR_flavour_4q_1q_JERDown;
-  double qg_LR_flavour_4q_1q_JERUp;
-  double qg_LR_flavour_4q_1q_JESDown;
-  double qg_LR_flavour_4q_1q_JESUp;
   double qg_LR_flavour_4q_2q;
   double qg_LR_flavour_4q_2q_3q;
-  double qg_LR_flavour_4q_2q_3q_JERDown;
-  double qg_LR_flavour_4q_2q_3q_JERUp;
-  double qg_LR_flavour_4q_2q_3q_JESDown;
-  double qg_LR_flavour_4q_2q_3q_JESUp;
-  double qg_LR_flavour_4q_2q_JERDown;
-  double qg_LR_flavour_4q_2q_JERUp;
-  double qg_LR_flavour_4q_2q_JESDown;
-  double qg_LR_flavour_4q_2q_JESUp;
   double qg_LR_flavour_4q_3q;
-  double qg_LR_flavour_4q_3q_JERDown;
-  double qg_LR_flavour_4q_3q_JERUp;
-  double qg_LR_flavour_4q_3q_JESDown;
-  double qg_LR_flavour_4q_3q_JESUp;
   double rho;
   long run;
   double sphericity;
-  double sphericity_JERDown;
-  double sphericity_JERUp;
-  double sphericity_JESDown;
-  double sphericity_JESUp;
   double std_bdisc;
-  double std_bdisc_JERDown;
-  double std_bdisc_JERUp;
-  double std_bdisc_JESDown;
-  double std_bdisc_JESUp;
   double std_bdisc_btag;
-  double std_bdisc_btag_JERDown;
-  double std_bdisc_btag_JERUp;
-  double std_bdisc_btag_JESDown;
-  double std_bdisc_btag_JESUp;
   double std_dr_btag;
-  double std_dr_btag_JERDown;
-  double std_dr_btag_JERUp;
-  double std_dr_btag_JESDown;
-  double std_dr_btag_JESUp;
   int triggerBitmask;
   int triggerDecision;
   int ttCls;
   double tth_mva;
-  double tth_mva_JERDown;
-  double tth_mva_JERUp;
-  double tth_mva_JESDown;
-  double tth_mva_JESUp;
-  double weight_xs;
   double xsec;
   void loadTree(TTree* tree) {
     tree->SetBranchAddress("ncommon_mem", &(this->ncommon_mem));
@@ -991,30 +853,6 @@ public:
     tree->SetBranchAddress("common_mem_blr_4b", this->common_mem_blr_4b);
     tree->SetBranchAddress("common_mem_blr_2b", this->common_mem_blr_2b);
     tree->SetBranchAddress("common_mem_p_sig", this->common_mem_p_sig);
-    tree->SetBranchAddress("ncommon_mem_JERDown", &(this->ncommon_mem_JERDown));
-    tree->SetBranchAddress("common_mem_JERDown_p_bkg", this->common_mem_JERDown_p_bkg);
-    tree->SetBranchAddress("common_mem_JERDown_p", this->common_mem_JERDown_p);
-    tree->SetBranchAddress("common_mem_JERDown_blr_4b", this->common_mem_JERDown_blr_4b);
-    tree->SetBranchAddress("common_mem_JERDown_blr_2b", this->common_mem_JERDown_blr_2b);
-    tree->SetBranchAddress("common_mem_JERDown_p_sig", this->common_mem_JERDown_p_sig);
-    tree->SetBranchAddress("ncommon_mem_JERUp", &(this->ncommon_mem_JERUp));
-    tree->SetBranchAddress("common_mem_JERUp_p_bkg", this->common_mem_JERUp_p_bkg);
-    tree->SetBranchAddress("common_mem_JERUp_p", this->common_mem_JERUp_p);
-    tree->SetBranchAddress("common_mem_JERUp_blr_4b", this->common_mem_JERUp_blr_4b);
-    tree->SetBranchAddress("common_mem_JERUp_blr_2b", this->common_mem_JERUp_blr_2b);
-    tree->SetBranchAddress("common_mem_JERUp_p_sig", this->common_mem_JERUp_p_sig);
-    tree->SetBranchAddress("ncommon_mem_JESDown", &(this->ncommon_mem_JESDown));
-    tree->SetBranchAddress("common_mem_JESDown_p_bkg", this->common_mem_JESDown_p_bkg);
-    tree->SetBranchAddress("common_mem_JESDown_p", this->common_mem_JESDown_p);
-    tree->SetBranchAddress("common_mem_JESDown_blr_4b", this->common_mem_JESDown_blr_4b);
-    tree->SetBranchAddress("common_mem_JESDown_blr_2b", this->common_mem_JESDown_blr_2b);
-    tree->SetBranchAddress("common_mem_JESDown_p_sig", this->common_mem_JESDown_p_sig);
-    tree->SetBranchAddress("ncommon_mem_JESUp", &(this->ncommon_mem_JESUp));
-    tree->SetBranchAddress("common_mem_JESUp_p_bkg", this->common_mem_JESUp_p_bkg);
-    tree->SetBranchAddress("common_mem_JESUp_p", this->common_mem_JESUp_p);
-    tree->SetBranchAddress("common_mem_JESUp_blr_4b", this->common_mem_JESUp_blr_4b);
-    tree->SetBranchAddress("common_mem_JESUp_blr_2b", this->common_mem_JESUp_blr_2b);
-    tree->SetBranchAddress("common_mem_JESUp_p_sig", this->common_mem_JESUp_p_sig);
     tree->SetBranchAddress("nfatjets", &(this->nfatjets));
     tree->SetBranchAddress("fatjets_phi", this->fatjets_phi);
     tree->SetBranchAddress("fatjets_pt", this->fatjets_pt);
@@ -1026,34 +864,10 @@ public:
     tree->SetBranchAddress("fatjets_bbtag", this->fatjets_bbtag);
     tree->SetBranchAddress("nfw_aj", &(this->nfw_aj));
     tree->SetBranchAddress("fw_aj_fw_h_alljets_nominal", this->fw_aj_fw_h_alljets_nominal);
-    tree->SetBranchAddress("nfw_aj_JERDown", &(this->nfw_aj_JERDown));
-    tree->SetBranchAddress("fw_aj_JERDown_fw_h_alljets_JERDown", this->fw_aj_JERDown_fw_h_alljets_JERDown);
-    tree->SetBranchAddress("nfw_aj_JERUp", &(this->nfw_aj_JERUp));
-    tree->SetBranchAddress("fw_aj_JERUp_fw_h_alljets_JERUp", this->fw_aj_JERUp_fw_h_alljets_JERUp);
-    tree->SetBranchAddress("nfw_aj_JESDown", &(this->nfw_aj_JESDown));
-    tree->SetBranchAddress("fw_aj_JESDown_fw_h_alljets_JESDown", this->fw_aj_JESDown_fw_h_alljets_JESDown);
-    tree->SetBranchAddress("nfw_aj_JESUp", &(this->nfw_aj_JESUp));
-    tree->SetBranchAddress("fw_aj_JESUp_fw_h_alljets_JESUp", this->fw_aj_JESUp_fw_h_alljets_JESUp);
     tree->SetBranchAddress("nfw_bj", &(this->nfw_bj));
     tree->SetBranchAddress("fw_bj_fw_h_btagjets_nominal", this->fw_bj_fw_h_btagjets_nominal);
-    tree->SetBranchAddress("nfw_bj_JERDown", &(this->nfw_bj_JERDown));
-    tree->SetBranchAddress("fw_bj_JERDown_fw_h_btagjets_JERDown", this->fw_bj_JERDown_fw_h_btagjets_JERDown);
-    tree->SetBranchAddress("nfw_bj_JERUp", &(this->nfw_bj_JERUp));
-    tree->SetBranchAddress("fw_bj_JERUp_fw_h_btagjets_JERUp", this->fw_bj_JERUp_fw_h_btagjets_JERUp);
-    tree->SetBranchAddress("nfw_bj_JESDown", &(this->nfw_bj_JESDown));
-    tree->SetBranchAddress("fw_bj_JESDown_fw_h_btagjets_JESDown", this->fw_bj_JESDown_fw_h_btagjets_JESDown);
-    tree->SetBranchAddress("nfw_bj_JESUp", &(this->nfw_bj_JESUp));
-    tree->SetBranchAddress("fw_bj_JESUp_fw_h_btagjets_JESUp", this->fw_bj_JESUp_fw_h_btagjets_JESUp);
     tree->SetBranchAddress("nfw_uj", &(this->nfw_uj));
     tree->SetBranchAddress("fw_uj_fw_h_untagjets_nominal", this->fw_uj_fw_h_untagjets_nominal);
-    tree->SetBranchAddress("nfw_uj_JERDown", &(this->nfw_uj_JERDown));
-    tree->SetBranchAddress("fw_uj_JERDown_fw_h_untagjets_JERDown", this->fw_uj_JERDown_fw_h_untagjets_JERDown);
-    tree->SetBranchAddress("nfw_uj_JERUp", &(this->nfw_uj_JERUp));
-    tree->SetBranchAddress("fw_uj_JERUp_fw_h_untagjets_JERUp", this->fw_uj_JERUp_fw_h_untagjets_JERUp);
-    tree->SetBranchAddress("nfw_uj_JESDown", &(this->nfw_uj_JESDown));
-    tree->SetBranchAddress("fw_uj_JESDown_fw_h_untagjets_JESDown", this->fw_uj_JESDown_fw_h_untagjets_JESDown);
-    tree->SetBranchAddress("nfw_uj_JESUp", &(this->nfw_uj_JESUp));
-    tree->SetBranchAddress("fw_uj_JESUp_fw_h_untagjets_JESUp", this->fw_uj_JESUp_fw_h_untagjets_JESUp);
     tree->SetBranchAddress("ngenHiggs", &(this->ngenHiggs));
     tree->SetBranchAddress("genHiggs_phi", this->genHiggs_phi);
     tree->SetBranchAddress("genHiggs_eta", this->genHiggs_eta);
@@ -1073,78 +887,104 @@ public:
     tree->SetBranchAddress("genTopLep_pt", this->genTopLep_pt);
     tree->SetBranchAddress("genTopLep_decayMode", this->genTopLep_decayMode);
     tree->SetBranchAddress("nhiggsCandidate", &(this->nhiggsCandidate));
-    tree->SetBranchAddress("higgsCandidate_sj1eta_softdropz2b1", this->higgsCandidate_sj1eta_softdropz2b1);
-    tree->SetBranchAddress("higgsCandidate_sj1phi_pruned", this->higgsCandidate_sj1phi_pruned);
-    tree->SetBranchAddress("higgsCandidate_sj2pt_softdrop", this->higgsCandidate_sj2pt_softdrop);
-    tree->SetBranchAddress("higgsCandidate_tau1", this->higgsCandidate_tau1);
+    tree->SetBranchAddress("higgsCandidate_sj1eta_softdropfilt", this->higgsCandidate_sj1eta_softdropfilt);
+    tree->SetBranchAddress("higgsCandidate_mass_softdrop", this->higgsCandidate_mass_softdrop);
+    tree->SetBranchAddress("higgsCandidate_sj2mass_pruned", this->higgsCandidate_sj2mass_pruned);
+    tree->SetBranchAddress("higgsCandidate_sj2pt_pruned", this->higgsCandidate_sj2pt_pruned);
+    tree->SetBranchAddress("higgsCandidate_sj2eta_softdropfilt", this->higgsCandidate_sj2eta_softdropfilt);
+    tree->SetBranchAddress("higgsCandidate_sj2pt_softdropfilt", this->higgsCandidate_sj2pt_softdropfilt);
+    tree->SetBranchAddress("higgsCandidate_sj2eta_softdropz2b1filt", this->higgsCandidate_sj2eta_softdropz2b1filt);
+    tree->SetBranchAddress("higgsCandidate_sj2mass_softdropfilt", this->higgsCandidate_sj2mass_softdropfilt);
+    tree->SetBranchAddress("higgsCandidate_sj2mass_softdropz2b1filt", this->higgsCandidate_sj2mass_softdropz2b1filt);
+    tree->SetBranchAddress("higgsCandidate_sj2eta_softdrop", this->higgsCandidate_sj2eta_softdrop);
+    tree->SetBranchAddress("higgsCandidate_sj2phi_pruned", this->higgsCandidate_sj2phi_pruned);
+    tree->SetBranchAddress("higgsCandidate_mass_softdropfilt", this->higgsCandidate_mass_softdropfilt);
+    tree->SetBranchAddress("higgsCandidate_sj1phi_softdrop", this->higgsCandidate_sj1phi_softdrop);
+    tree->SetBranchAddress("higgsCandidate_sj1eta_subjetfiltered", this->higgsCandidate_sj1eta_subjetfiltered);
+    tree->SetBranchAddress("higgsCandidate_dr_top", this->higgsCandidate_dr_top);
+    tree->SetBranchAddress("higgsCandidate_sj1mass_softdropz2b1filt", this->higgsCandidate_sj1mass_softdropz2b1filt);
+    tree->SetBranchAddress("higgsCandidate_n_subjettiness", this->higgsCandidate_n_subjettiness);
     tree->SetBranchAddress("higgsCandidate_sj2eta_softdropz2b1", this->higgsCandidate_sj2eta_softdropz2b1);
     tree->SetBranchAddress("higgsCandidate_dr_genHiggs", this->higgsCandidate_dr_genHiggs);
-    tree->SetBranchAddress("higgsCandidate_sj1pt_subjetfiltered", this->higgsCandidate_sj1pt_subjetfiltered);
-    tree->SetBranchAddress("higgsCandidate_mass_softdrop", this->higgsCandidate_mass_softdrop);
     tree->SetBranchAddress("higgsCandidate_sj3pt_subjetfiltered", this->higgsCandidate_sj3pt_subjetfiltered);
+    tree->SetBranchAddress("higgsCandidate_sj2btag_softdropfilt", this->higgsCandidate_sj2btag_softdropfilt);
     tree->SetBranchAddress("higgsCandidate_sj2eta_pruned", this->higgsCandidate_sj2eta_pruned);
-    tree->SetBranchAddress("higgsCandidate_sj2btag_softdrop", this->higgsCandidate_sj2btag_softdrop);
     tree->SetBranchAddress("higgsCandidate_sj2pt_subjetfiltered", this->higgsCandidate_sj2pt_subjetfiltered);
     tree->SetBranchAddress("higgsCandidate_sj2mass_subjetfiltered", this->higgsCandidate_sj2mass_subjetfiltered);
+    tree->SetBranchAddress("higgsCandidate_sj12masspt_subjetfiltered", this->higgsCandidate_sj12masspt_subjetfiltered);
+    tree->SetBranchAddress("higgsCandidate_sj1pt_subjetfiltered", this->higgsCandidate_sj1pt_subjetfiltered);
+    tree->SetBranchAddress("higgsCandidate_sj2btag_softdropz2b1filt", this->higgsCandidate_sj2btag_softdropz2b1filt);
+    tree->SetBranchAddress("higgsCandidate_sj1pt_softdropfilt", this->higgsCandidate_sj1pt_softdropfilt);
+    tree->SetBranchAddress("higgsCandidate_sj1phi_softdropfilt", this->higgsCandidate_sj1phi_softdropfilt);
+    tree->SetBranchAddress("higgsCandidate_sj1mass_softdropz2b1", this->higgsCandidate_sj1mass_softdropz2b1);
+    tree->SetBranchAddress("higgsCandidate_nallsubjets_softdropz2b1filt", this->higgsCandidate_nallsubjets_softdropz2b1filt);
+    tree->SetBranchAddress("higgsCandidate_dr_genTop", this->higgsCandidate_dr_genTop);
+    tree->SetBranchAddress("higgsCandidate_nallsubjets_pruned", this->higgsCandidate_nallsubjets_pruned);
+    tree->SetBranchAddress("higgsCandidate_sj1pt_softdropz2b1filt", this->higgsCandidate_sj1pt_softdropz2b1filt);
+    tree->SetBranchAddress("higgsCandidate_sj3btag_subjetfiltered", this->higgsCandidate_sj3btag_subjetfiltered);
+    tree->SetBranchAddress("higgsCandidate_sj2btag_subjetfiltered", this->higgsCandidate_sj2btag_subjetfiltered);
+    tree->SetBranchAddress("higgsCandidate_sj1btag_softdrop", this->higgsCandidate_sj1btag_softdrop);
+    tree->SetBranchAddress("higgsCandidate_eta", this->higgsCandidate_eta);
+    tree->SetBranchAddress("higgsCandidate_sj1btag_softdropfilt", this->higgsCandidate_sj1btag_softdropfilt);
+    tree->SetBranchAddress("higgsCandidate_nallsubjets_softdropfilt", this->higgsCandidate_nallsubjets_softdropfilt);
+    tree->SetBranchAddress("higgsCandidate_sj12massb_subjetfiltered", this->higgsCandidate_sj12massb_subjetfiltered);
+    tree->SetBranchAddress("higgsCandidate_sj1phi_pruned", this->higgsCandidate_sj1phi_pruned);
+    tree->SetBranchAddress("higgsCandidate_sj2pt_softdrop", this->higgsCandidate_sj2pt_softdrop);
+    tree->SetBranchAddress("higgsCandidate_sj3phi_subjetfiltered", this->higgsCandidate_sj3phi_subjetfiltered);
+    tree->SetBranchAddress("higgsCandidate_sj2mass_softdrop", this->higgsCandidate_sj2mass_softdrop);
     tree->SetBranchAddress("higgsCandidate_sj1pt_pruned", this->higgsCandidate_sj1pt_pruned);
-    tree->SetBranchAddress("higgsCandidate_sj3eta_subjetfiltered", this->higgsCandidate_sj3eta_subjetfiltered);
+    tree->SetBranchAddress("higgsCandidate_mass_softdropz2b1filt", this->higgsCandidate_mass_softdropz2b1filt);
     tree->SetBranchAddress("higgsCandidate_sj1eta_pruned", this->higgsCandidate_sj1eta_pruned);
     tree->SetBranchAddress("higgsCandidate_sj1phi_subjetfiltered", this->higgsCandidate_sj1phi_subjetfiltered);
     tree->SetBranchAddress("higgsCandidate_mass_pruned", this->higgsCandidate_mass_pruned);
-    tree->SetBranchAddress("higgsCandidate_sj2pt_pruned", this->higgsCandidate_sj2pt_pruned);
-    tree->SetBranchAddress("higgsCandidate_sj3mass_subjetfiltered", this->higgsCandidate_sj3mass_subjetfiltered);
-    tree->SetBranchAddress("higgsCandidate_sj12masspt_subjetfiltered", this->higgsCandidate_sj12masspt_subjetfiltered);
-    tree->SetBranchAddress("higgsCandidate_sj1mass_subjetfiltered", this->higgsCandidate_sj1mass_subjetfiltered);
+    tree->SetBranchAddress("higgsCandidate_pt", this->higgsCandidate_pt);
+    tree->SetBranchAddress("higgsCandidate_sj1eta_softdropz2b1filt", this->higgsCandidate_sj1eta_softdropz2b1filt);
     tree->SetBranchAddress("higgsCandidate_nallsubjets_softdropz2b1", this->higgsCandidate_nallsubjets_softdropz2b1);
     tree->SetBranchAddress("higgsCandidate_sj1pt_softdrop", this->higgsCandidate_sj1pt_softdrop);
     tree->SetBranchAddress("higgsCandidate_tau2", this->higgsCandidate_tau2);
     tree->SetBranchAddress("higgsCandidate_tau3", this->higgsCandidate_tau3);
-    tree->SetBranchAddress("higgsCandidate_nallsubjets_subjetfiltered", this->higgsCandidate_nallsubjets_subjetfiltered);
-    tree->SetBranchAddress("higgsCandidate_sj1btag_pruned", this->higgsCandidate_sj1btag_pruned);
+    tree->SetBranchAddress("higgsCandidate_sj3eta_subjetfiltered", this->higgsCandidate_sj3eta_subjetfiltered);
+    tree->SetBranchAddress("higgsCandidate_tau1", this->higgsCandidate_tau1);
     tree->SetBranchAddress("higgsCandidate_nallsubjets_softdrop", this->higgsCandidate_nallsubjets_softdrop);
-    tree->SetBranchAddress("higgsCandidate_sj2phi_subjetfiltered", this->higgsCandidate_sj2phi_subjetfiltered);
-    tree->SetBranchAddress("higgsCandidate_mass", this->higgsCandidate_mass);
     tree->SetBranchAddress("higgsCandidate_sj2btag_pruned", this->higgsCandidate_sj2btag_pruned);
     tree->SetBranchAddress("higgsCandidate_sj1eta_softdrop", this->higgsCandidate_sj1eta_softdrop);
-    tree->SetBranchAddress("higgsCandidate_sj123masspt_subjetfiltered", this->higgsCandidate_sj123masspt_subjetfiltered);
-    tree->SetBranchAddress("higgsCandidate_sj2mass_pruned", this->higgsCandidate_sj2mass_pruned);
-    tree->SetBranchAddress("higgsCandidate_phi", this->higgsCandidate_phi);
-    tree->SetBranchAddress("higgsCandidate_sj1mass_softdropz2b1", this->higgsCandidate_sj1mass_softdropz2b1);
-    tree->SetBranchAddress("higgsCandidate_sj2pt_softdropz2b1", this->higgsCandidate_sj2pt_softdropz2b1);
+    tree->SetBranchAddress("higgsCandidate_sj1btag_softdropz2b1filt", this->higgsCandidate_sj1btag_softdropz2b1filt);
     tree->SetBranchAddress("higgsCandidate_sj2mass_softdropz2b1", this->higgsCandidate_sj2mass_softdropz2b1);
-    tree->SetBranchAddress("higgsCandidate_sj2phi_softdrop", this->higgsCandidate_sj2phi_softdrop);
-    tree->SetBranchAddress("higgsCandidate_sj2eta_softdrop", this->higgsCandidate_sj2eta_softdrop);
-    tree->SetBranchAddress("higgsCandidate_sj2phi_pruned", this->higgsCandidate_sj2phi_pruned);
-    tree->SetBranchAddress("higgsCandidate_dr_genTop", this->higgsCandidate_dr_genTop);
-    tree->SetBranchAddress("higgsCandidate_nallsubjets_pruned", this->higgsCandidate_nallsubjets_pruned);
+    tree->SetBranchAddress("higgsCandidate_nallsubjets_subjetfiltered", this->higgsCandidate_nallsubjets_subjetfiltered);
+    tree->SetBranchAddress("higgsCandidate_sj2pt_softdropz2b1", this->higgsCandidate_sj2pt_softdropz2b1);
+    tree->SetBranchAddress("higgsCandidate_sj2pt_softdropz2b1filt", this->higgsCandidate_sj2pt_softdropz2b1filt);
     tree->SetBranchAddress("higgsCandidate_sj2phi_softdropz2b1", this->higgsCandidate_sj2phi_softdropz2b1);
-    tree->SetBranchAddress("higgsCandidate_sj2eta_subjetfiltered", this->higgsCandidate_sj2eta_subjetfiltered);
-    tree->SetBranchAddress("higgsCandidate_bbtag", this->higgsCandidate_bbtag);
-    tree->SetBranchAddress("higgsCandidate_sj2btag_subjetfiltered", this->higgsCandidate_sj2btag_subjetfiltered);
-    tree->SetBranchAddress("higgsCandidate_sj1phi_softdropz2b1", this->higgsCandidate_sj1phi_softdropz2b1);
-    tree->SetBranchAddress("higgsCandidate_sj1phi_softdrop", this->higgsCandidate_sj1phi_softdrop);
+    tree->SetBranchAddress("higgsCandidate_sj2phi_softdropz2b1filt", this->higgsCandidate_sj2phi_softdropz2b1filt);
     tree->SetBranchAddress("higgsCandidate_sj1mass_pruned", this->higgsCandidate_sj1mass_pruned);
-    tree->SetBranchAddress("higgsCandidate_sj3btag_subjetfiltered", this->higgsCandidate_sj3btag_subjetfiltered);
-    tree->SetBranchAddress("higgsCandidate_sj1btag_softdropz2b1", this->higgsCandidate_sj1btag_softdropz2b1);
     tree->SetBranchAddress("higgsCandidate_sj1pt_softdropz2b1", this->higgsCandidate_sj1pt_softdropz2b1);
-    tree->SetBranchAddress("higgsCandidate_sj1btag_softdrop", this->higgsCandidate_sj1btag_softdrop);
     tree->SetBranchAddress("higgsCandidate_sj1mass_softdrop", this->higgsCandidate_sj1mass_softdrop);
-    tree->SetBranchAddress("higgsCandidate_pt", this->higgsCandidate_pt);
-    tree->SetBranchAddress("higgsCandidate_sj3phi_subjetfiltered", this->higgsCandidate_sj3phi_subjetfiltered);
-    tree->SetBranchAddress("higgsCandidate_sj1eta_subjetfiltered", this->higgsCandidate_sj1eta_subjetfiltered);
-    tree->SetBranchAddress("higgsCandidate_dr_top", this->higgsCandidate_dr_top);
-    tree->SetBranchAddress("higgsCandidate_eta", this->higgsCandidate_eta);
-    tree->SetBranchAddress("higgsCandidate_n_subjettiness", this->higgsCandidate_n_subjettiness);
-    tree->SetBranchAddress("higgsCandidate_sj2btag_softdropz2b1", this->higgsCandidate_sj2btag_softdropz2b1);
-    tree->SetBranchAddress("higgsCandidate_sj12massb_subjetfiltered", this->higgsCandidate_sj12massb_subjetfiltered);
+    tree->SetBranchAddress("higgsCandidate_sj1btag_softdropz2b1", this->higgsCandidate_sj1btag_softdropz2b1);
     tree->SetBranchAddress("higgsCandidate_sj1btag_subjetfiltered", this->higgsCandidate_sj1btag_subjetfiltered);
+    tree->SetBranchAddress("higgsCandidate_sj1eta_softdropz2b1", this->higgsCandidate_sj1eta_softdropz2b1);
+    tree->SetBranchAddress("higgsCandidate_sj2eta_subjetfiltered", this->higgsCandidate_sj2eta_subjetfiltered);
+    tree->SetBranchAddress("higgsCandidate_secondbtag_subjetfiltered", this->higgsCandidate_secondbtag_subjetfiltered);
+    tree->SetBranchAddress("higgsCandidate_sj2btag_softdrop", this->higgsCandidate_sj2btag_softdrop);
+    tree->SetBranchAddress("higgsCandidate_sj2phi_softdropfilt", this->higgsCandidate_sj2phi_softdropfilt);
+    tree->SetBranchAddress("higgsCandidate_sj3mass_subjetfiltered", this->higgsCandidate_sj3mass_subjetfiltered);
+    tree->SetBranchAddress("higgsCandidate_sj1mass_subjetfiltered", this->higgsCandidate_sj1mass_subjetfiltered);
+    tree->SetBranchAddress("higgsCandidate_sj1btag_pruned", this->higgsCandidate_sj1btag_pruned);
+    tree->SetBranchAddress("higgsCandidate_sj2phi_subjetfiltered", this->higgsCandidate_sj2phi_subjetfiltered);
+    tree->SetBranchAddress("higgsCandidate_sj123masspt_subjetfiltered", this->higgsCandidate_sj123masspt_subjetfiltered);
+    tree->SetBranchAddress("higgsCandidate_phi", this->higgsCandidate_phi);
+    tree->SetBranchAddress("higgsCandidate_sj1mass_softdropfilt", this->higgsCandidate_sj1mass_softdropfilt);
+    tree->SetBranchAddress("higgsCandidate_sj2phi_softdrop", this->higgsCandidate_sj2phi_softdrop);
+    tree->SetBranchAddress("higgsCandidate_sj1phi_softdropz2b1", this->higgsCandidate_sj1phi_softdropz2b1);
+    tree->SetBranchAddress("higgsCandidate_sj1phi_softdropz2b1filt", this->higgsCandidate_sj1phi_softdropz2b1filt);
+    tree->SetBranchAddress("higgsCandidate_mass", this->higgsCandidate_mass);
+    tree->SetBranchAddress("higgsCandidate_sj2btag_softdropz2b1", this->higgsCandidate_sj2btag_softdropz2b1);
+    tree->SetBranchAddress("higgsCandidate_bbtag", this->higgsCandidate_bbtag);
     tree->SetBranchAddress("higgsCandidate_mass_softdropz2b1", this->higgsCandidate_mass_softdropz2b1);
-    tree->SetBranchAddress("higgsCandidate_sj2mass_softdrop", this->higgsCandidate_sj2mass_softdrop);
     tree->SetBranchAddress("njets", &(this->njets));
     tree->SetBranchAddress("jets_mcPt", this->jets_mcPt);
     tree->SetBranchAddress("jets_mcEta", this->jets_mcEta);
     tree->SetBranchAddress("jets_btagCMVA", this->jets_btagCMVA);
     tree->SetBranchAddress("jets_id", this->jets_id);
+    tree->SetBranchAddress("jets_btagFlag", this->jets_btagFlag);
     tree->SetBranchAddress("jets_pt", this->jets_pt);
     tree->SetBranchAddress("jets_corr_JERDown", this->jets_corr_JERDown);
     tree->SetBranchAddress("jets_qgl", this->jets_qgl);
@@ -1162,6 +1002,7 @@ public:
     tree->SetBranchAddress("jets_mcM", this->jets_mcM);
     tree->SetBranchAddress("jets_btagCSV", this->jets_btagCSV);
     tree->SetBranchAddress("jets_mcMatchId", this->jets_mcMatchId);
+    tree->SetBranchAddress("jets_btagCMVA_log", this->jets_btagCMVA_log);
     tree->SetBranchAddress("jets_mcNumBHadrons", this->jets_mcNumBHadrons);
     tree->SetBranchAddress("jets_eta", this->jets_eta);
     tree->SetBranchAddress("jets_mass", this->jets_mass);
@@ -1180,6 +1021,7 @@ public:
     tree->SetBranchAddress("loose_jets_mcEta", this->loose_jets_mcEta);
     tree->SetBranchAddress("loose_jets_btagCMVA", this->loose_jets_btagCMVA);
     tree->SetBranchAddress("loose_jets_id", this->loose_jets_id);
+    tree->SetBranchAddress("loose_jets_btagFlag", this->loose_jets_btagFlag);
     tree->SetBranchAddress("loose_jets_pt", this->loose_jets_pt);
     tree->SetBranchAddress("loose_jets_corr_JERDown", this->loose_jets_corr_JERDown);
     tree->SetBranchAddress("loose_jets_qgl", this->loose_jets_qgl);
@@ -1197,106 +1039,176 @@ public:
     tree->SetBranchAddress("loose_jets_mcM", this->loose_jets_mcM);
     tree->SetBranchAddress("loose_jets_btagCSV", this->loose_jets_btagCSV);
     tree->SetBranchAddress("loose_jets_mcMatchId", this->loose_jets_mcMatchId);
+    tree->SetBranchAddress("loose_jets_btagCMVA_log", this->loose_jets_btagCMVA_log);
     tree->SetBranchAddress("loose_jets_mcNumBHadrons", this->loose_jets_mcNumBHadrons);
     tree->SetBranchAddress("loose_jets_eta", this->loose_jets_eta);
     tree->SetBranchAddress("loose_jets_mass", this->loose_jets_mass);
     tree->SetBranchAddress("loose_jets_mcFlavour", this->loose_jets_mcFlavour);
-    tree->SetBranchAddress("nmem_ttbb", &(this->nmem_ttbb));
-    tree->SetBranchAddress("mem_ttbb_p", this->mem_ttbb_p);
-    tree->SetBranchAddress("mem_ttbb_chi2", this->mem_ttbb_chi2);
-    tree->SetBranchAddress("mem_ttbb_p_err", this->mem_ttbb_p_err);
-    tree->SetBranchAddress("mem_ttbb_efficiency", this->mem_ttbb_efficiency);
-    tree->SetBranchAddress("mem_ttbb_nperm", this->mem_ttbb_nperm);
-    tree->SetBranchAddress("mem_ttbb_time", this->mem_ttbb_time);
-    tree->SetBranchAddress("mem_ttbb_error_code", this->mem_ttbb_error_code);
-    tree->SetBranchAddress("nmem_ttbb_JERDown", &(this->nmem_ttbb_JERDown));
-    tree->SetBranchAddress("mem_ttbb_JERDown_p", this->mem_ttbb_JERDown_p);
-    tree->SetBranchAddress("mem_ttbb_JERDown_chi2", this->mem_ttbb_JERDown_chi2);
-    tree->SetBranchAddress("mem_ttbb_JERDown_p_err", this->mem_ttbb_JERDown_p_err);
-    tree->SetBranchAddress("mem_ttbb_JERDown_efficiency", this->mem_ttbb_JERDown_efficiency);
-    tree->SetBranchAddress("mem_ttbb_JERDown_nperm", this->mem_ttbb_JERDown_nperm);
-    tree->SetBranchAddress("mem_ttbb_JERDown_time", this->mem_ttbb_JERDown_time);
-    tree->SetBranchAddress("mem_ttbb_JERDown_error_code", this->mem_ttbb_JERDown_error_code);
-    tree->SetBranchAddress("nmem_ttbb_JERUp", &(this->nmem_ttbb_JERUp));
-    tree->SetBranchAddress("mem_ttbb_JERUp_p", this->mem_ttbb_JERUp_p);
-    tree->SetBranchAddress("mem_ttbb_JERUp_chi2", this->mem_ttbb_JERUp_chi2);
-    tree->SetBranchAddress("mem_ttbb_JERUp_p_err", this->mem_ttbb_JERUp_p_err);
-    tree->SetBranchAddress("mem_ttbb_JERUp_efficiency", this->mem_ttbb_JERUp_efficiency);
-    tree->SetBranchAddress("mem_ttbb_JERUp_nperm", this->mem_ttbb_JERUp_nperm);
-    tree->SetBranchAddress("mem_ttbb_JERUp_time", this->mem_ttbb_JERUp_time);
-    tree->SetBranchAddress("mem_ttbb_JERUp_error_code", this->mem_ttbb_JERUp_error_code);
-    tree->SetBranchAddress("nmem_ttbb_JESDown", &(this->nmem_ttbb_JESDown));
-    tree->SetBranchAddress("mem_ttbb_JESDown_p", this->mem_ttbb_JESDown_p);
-    tree->SetBranchAddress("mem_ttbb_JESDown_chi2", this->mem_ttbb_JESDown_chi2);
-    tree->SetBranchAddress("mem_ttbb_JESDown_p_err", this->mem_ttbb_JESDown_p_err);
-    tree->SetBranchAddress("mem_ttbb_JESDown_efficiency", this->mem_ttbb_JESDown_efficiency);
-    tree->SetBranchAddress("mem_ttbb_JESDown_nperm", this->mem_ttbb_JESDown_nperm);
-    tree->SetBranchAddress("mem_ttbb_JESDown_time", this->mem_ttbb_JESDown_time);
-    tree->SetBranchAddress("mem_ttbb_JESDown_error_code", this->mem_ttbb_JESDown_error_code);
-    tree->SetBranchAddress("nmem_ttbb_JESUp", &(this->nmem_ttbb_JESUp));
-    tree->SetBranchAddress("mem_ttbb_JESUp_p", this->mem_ttbb_JESUp_p);
-    tree->SetBranchAddress("mem_ttbb_JESUp_chi2", this->mem_ttbb_JESUp_chi2);
-    tree->SetBranchAddress("mem_ttbb_JESUp_p_err", this->mem_ttbb_JESUp_p_err);
-    tree->SetBranchAddress("mem_ttbb_JESUp_efficiency", this->mem_ttbb_JESUp_efficiency);
-    tree->SetBranchAddress("mem_ttbb_JESUp_nperm", this->mem_ttbb_JESUp_nperm);
-    tree->SetBranchAddress("mem_ttbb_JESUp_time", this->mem_ttbb_JESUp_time);
-    tree->SetBranchAddress("mem_ttbb_JESUp_error_code", this->mem_ttbb_JESUp_error_code);
-    tree->SetBranchAddress("nmem_tth", &(this->nmem_tth));
-    tree->SetBranchAddress("mem_tth_p", this->mem_tth_p);
-    tree->SetBranchAddress("mem_tth_chi2", this->mem_tth_chi2);
-    tree->SetBranchAddress("mem_tth_p_err", this->mem_tth_p_err);
-    tree->SetBranchAddress("mem_tth_efficiency", this->mem_tth_efficiency);
-    tree->SetBranchAddress("mem_tth_nperm", this->mem_tth_nperm);
-    tree->SetBranchAddress("mem_tth_time", this->mem_tth_time);
-    tree->SetBranchAddress("mem_tth_error_code", this->mem_tth_error_code);
-    tree->SetBranchAddress("nmem_tth_JERDown", &(this->nmem_tth_JERDown));
-    tree->SetBranchAddress("mem_tth_JERDown_p", this->mem_tth_JERDown_p);
-    tree->SetBranchAddress("mem_tth_JERDown_chi2", this->mem_tth_JERDown_chi2);
-    tree->SetBranchAddress("mem_tth_JERDown_p_err", this->mem_tth_JERDown_p_err);
-    tree->SetBranchAddress("mem_tth_JERDown_efficiency", this->mem_tth_JERDown_efficiency);
-    tree->SetBranchAddress("mem_tth_JERDown_nperm", this->mem_tth_JERDown_nperm);
-    tree->SetBranchAddress("mem_tth_JERDown_time", this->mem_tth_JERDown_time);
-    tree->SetBranchAddress("mem_tth_JERDown_error_code", this->mem_tth_JERDown_error_code);
-    tree->SetBranchAddress("nmem_tth_JERUp", &(this->nmem_tth_JERUp));
-    tree->SetBranchAddress("mem_tth_JERUp_p", this->mem_tth_JERUp_p);
-    tree->SetBranchAddress("mem_tth_JERUp_chi2", this->mem_tth_JERUp_chi2);
-    tree->SetBranchAddress("mem_tth_JERUp_p_err", this->mem_tth_JERUp_p_err);
-    tree->SetBranchAddress("mem_tth_JERUp_efficiency", this->mem_tth_JERUp_efficiency);
-    tree->SetBranchAddress("mem_tth_JERUp_nperm", this->mem_tth_JERUp_nperm);
-    tree->SetBranchAddress("mem_tth_JERUp_time", this->mem_tth_JERUp_time);
-    tree->SetBranchAddress("mem_tth_JERUp_error_code", this->mem_tth_JERUp_error_code);
-    tree->SetBranchAddress("nmem_tth_JESDown", &(this->nmem_tth_JESDown));
-    tree->SetBranchAddress("mem_tth_JESDown_p", this->mem_tth_JESDown_p);
-    tree->SetBranchAddress("mem_tth_JESDown_chi2", this->mem_tth_JESDown_chi2);
-    tree->SetBranchAddress("mem_tth_JESDown_p_err", this->mem_tth_JESDown_p_err);
-    tree->SetBranchAddress("mem_tth_JESDown_efficiency", this->mem_tth_JESDown_efficiency);
-    tree->SetBranchAddress("mem_tth_JESDown_nperm", this->mem_tth_JESDown_nperm);
-    tree->SetBranchAddress("mem_tth_JESDown_time", this->mem_tth_JESDown_time);
-    tree->SetBranchAddress("mem_tth_JESDown_error_code", this->mem_tth_JESDown_error_code);
-    tree->SetBranchAddress("nmem_tth_JESUp", &(this->nmem_tth_JESUp));
-    tree->SetBranchAddress("mem_tth_JESUp_p", this->mem_tth_JESUp_p);
-    tree->SetBranchAddress("mem_tth_JESUp_chi2", this->mem_tth_JESUp_chi2);
-    tree->SetBranchAddress("mem_tth_JESUp_p_err", this->mem_tth_JESUp_p_err);
-    tree->SetBranchAddress("mem_tth_JESUp_efficiency", this->mem_tth_JESUp_efficiency);
-    tree->SetBranchAddress("mem_tth_JESUp_nperm", this->mem_tth_JESUp_nperm);
-    tree->SetBranchAddress("mem_tth_JESUp_time", this->mem_tth_JESUp_time);
-    tree->SetBranchAddress("mem_tth_JESUp_error_code", this->mem_tth_JESUp_error_code);
+    tree->SetBranchAddress("nmem_ttbb_DL_0w2h2t_perm", &(this->nmem_ttbb_DL_0w2h2t_perm));
+    tree->SetBranchAddress("mem_ttbb_DL_0w2h2t_perm_p_me_mean", this->mem_ttbb_DL_0w2h2t_perm_p_me_mean);
+    tree->SetBranchAddress("mem_ttbb_DL_0w2h2t_perm_p_tf_std", this->mem_ttbb_DL_0w2h2t_perm_p_tf_std);
+    tree->SetBranchAddress("mem_ttbb_DL_0w2h2t_perm_idx", this->mem_ttbb_DL_0w2h2t_perm_idx);
+    tree->SetBranchAddress("mem_ttbb_DL_0w2h2t_perm_p_std", this->mem_ttbb_DL_0w2h2t_perm_p_std);
+    tree->SetBranchAddress("mem_ttbb_DL_0w2h2t_perm_p_mean", this->mem_ttbb_DL_0w2h2t_perm_p_mean);
+    tree->SetBranchAddress("mem_ttbb_DL_0w2h2t_perm_perm_5", this->mem_ttbb_DL_0w2h2t_perm_perm_5);
+    tree->SetBranchAddress("mem_ttbb_DL_0w2h2t_perm_perm_4", this->mem_ttbb_DL_0w2h2t_perm_perm_4);
+    tree->SetBranchAddress("mem_ttbb_DL_0w2h2t_perm_perm_7", this->mem_ttbb_DL_0w2h2t_perm_perm_7);
+    tree->SetBranchAddress("mem_ttbb_DL_0w2h2t_perm_perm_6", this->mem_ttbb_DL_0w2h2t_perm_perm_6);
+    tree->SetBranchAddress("mem_ttbb_DL_0w2h2t_perm_perm_1", this->mem_ttbb_DL_0w2h2t_perm_perm_1);
+    tree->SetBranchAddress("mem_ttbb_DL_0w2h2t_perm_perm_0", this->mem_ttbb_DL_0w2h2t_perm_perm_0);
+    tree->SetBranchAddress("mem_ttbb_DL_0w2h2t_perm_perm_3", this->mem_ttbb_DL_0w2h2t_perm_perm_3);
+    tree->SetBranchAddress("mem_ttbb_DL_0w2h2t_perm_perm_2", this->mem_ttbb_DL_0w2h2t_perm_perm_2);
+    tree->SetBranchAddress("mem_ttbb_DL_0w2h2t_perm_p_tf_mean", this->mem_ttbb_DL_0w2h2t_perm_p_tf_mean);
+    tree->SetBranchAddress("mem_ttbb_DL_0w2h2t_perm_p_me_std", this->mem_ttbb_DL_0w2h2t_perm_p_me_std);
+    tree->SetBranchAddress("mem_ttbb_DL_0w2h2t_perm_perm_9", this->mem_ttbb_DL_0w2h2t_perm_perm_9);
+    tree->SetBranchAddress("mem_ttbb_DL_0w2h2t_perm_perm_8", this->mem_ttbb_DL_0w2h2t_perm_perm_8);
+    tree->SetBranchAddress("nmem_ttbb_SL_0w2h2t_perm", &(this->nmem_ttbb_SL_0w2h2t_perm));
+    tree->SetBranchAddress("mem_ttbb_SL_0w2h2t_perm_p_me_mean", this->mem_ttbb_SL_0w2h2t_perm_p_me_mean);
+    tree->SetBranchAddress("mem_ttbb_SL_0w2h2t_perm_p_tf_std", this->mem_ttbb_SL_0w2h2t_perm_p_tf_std);
+    tree->SetBranchAddress("mem_ttbb_SL_0w2h2t_perm_idx", this->mem_ttbb_SL_0w2h2t_perm_idx);
+    tree->SetBranchAddress("mem_ttbb_SL_0w2h2t_perm_p_std", this->mem_ttbb_SL_0w2h2t_perm_p_std);
+    tree->SetBranchAddress("mem_ttbb_SL_0w2h2t_perm_p_mean", this->mem_ttbb_SL_0w2h2t_perm_p_mean);
+    tree->SetBranchAddress("mem_ttbb_SL_0w2h2t_perm_perm_5", this->mem_ttbb_SL_0w2h2t_perm_perm_5);
+    tree->SetBranchAddress("mem_ttbb_SL_0w2h2t_perm_perm_4", this->mem_ttbb_SL_0w2h2t_perm_perm_4);
+    tree->SetBranchAddress("mem_ttbb_SL_0w2h2t_perm_perm_7", this->mem_ttbb_SL_0w2h2t_perm_perm_7);
+    tree->SetBranchAddress("mem_ttbb_SL_0w2h2t_perm_perm_6", this->mem_ttbb_SL_0w2h2t_perm_perm_6);
+    tree->SetBranchAddress("mem_ttbb_SL_0w2h2t_perm_perm_1", this->mem_ttbb_SL_0w2h2t_perm_perm_1);
+    tree->SetBranchAddress("mem_ttbb_SL_0w2h2t_perm_perm_0", this->mem_ttbb_SL_0w2h2t_perm_perm_0);
+    tree->SetBranchAddress("mem_ttbb_SL_0w2h2t_perm_perm_3", this->mem_ttbb_SL_0w2h2t_perm_perm_3);
+    tree->SetBranchAddress("mem_ttbb_SL_0w2h2t_perm_perm_2", this->mem_ttbb_SL_0w2h2t_perm_perm_2);
+    tree->SetBranchAddress("mem_ttbb_SL_0w2h2t_perm_p_tf_mean", this->mem_ttbb_SL_0w2h2t_perm_p_tf_mean);
+    tree->SetBranchAddress("mem_ttbb_SL_0w2h2t_perm_p_me_std", this->mem_ttbb_SL_0w2h2t_perm_p_me_std);
+    tree->SetBranchAddress("mem_ttbb_SL_0w2h2t_perm_perm_9", this->mem_ttbb_SL_0w2h2t_perm_perm_9);
+    tree->SetBranchAddress("mem_ttbb_SL_0w2h2t_perm_perm_8", this->mem_ttbb_SL_0w2h2t_perm_perm_8);
+    tree->SetBranchAddress("nmem_ttbb_SL_1w2h2t_perm", &(this->nmem_ttbb_SL_1w2h2t_perm));
+    tree->SetBranchAddress("mem_ttbb_SL_1w2h2t_perm_p_me_mean", this->mem_ttbb_SL_1w2h2t_perm_p_me_mean);
+    tree->SetBranchAddress("mem_ttbb_SL_1w2h2t_perm_p_tf_std", this->mem_ttbb_SL_1w2h2t_perm_p_tf_std);
+    tree->SetBranchAddress("mem_ttbb_SL_1w2h2t_perm_idx", this->mem_ttbb_SL_1w2h2t_perm_idx);
+    tree->SetBranchAddress("mem_ttbb_SL_1w2h2t_perm_p_std", this->mem_ttbb_SL_1w2h2t_perm_p_std);
+    tree->SetBranchAddress("mem_ttbb_SL_1w2h2t_perm_p_mean", this->mem_ttbb_SL_1w2h2t_perm_p_mean);
+    tree->SetBranchAddress("mem_ttbb_SL_1w2h2t_perm_perm_5", this->mem_ttbb_SL_1w2h2t_perm_perm_5);
+    tree->SetBranchAddress("mem_ttbb_SL_1w2h2t_perm_perm_4", this->mem_ttbb_SL_1w2h2t_perm_perm_4);
+    tree->SetBranchAddress("mem_ttbb_SL_1w2h2t_perm_perm_7", this->mem_ttbb_SL_1w2h2t_perm_perm_7);
+    tree->SetBranchAddress("mem_ttbb_SL_1w2h2t_perm_perm_6", this->mem_ttbb_SL_1w2h2t_perm_perm_6);
+    tree->SetBranchAddress("mem_ttbb_SL_1w2h2t_perm_perm_1", this->mem_ttbb_SL_1w2h2t_perm_perm_1);
+    tree->SetBranchAddress("mem_ttbb_SL_1w2h2t_perm_perm_0", this->mem_ttbb_SL_1w2h2t_perm_perm_0);
+    tree->SetBranchAddress("mem_ttbb_SL_1w2h2t_perm_perm_3", this->mem_ttbb_SL_1w2h2t_perm_perm_3);
+    tree->SetBranchAddress("mem_ttbb_SL_1w2h2t_perm_perm_2", this->mem_ttbb_SL_1w2h2t_perm_perm_2);
+    tree->SetBranchAddress("mem_ttbb_SL_1w2h2t_perm_p_tf_mean", this->mem_ttbb_SL_1w2h2t_perm_p_tf_mean);
+    tree->SetBranchAddress("mem_ttbb_SL_1w2h2t_perm_p_me_std", this->mem_ttbb_SL_1w2h2t_perm_p_me_std);
+    tree->SetBranchAddress("mem_ttbb_SL_1w2h2t_perm_perm_9", this->mem_ttbb_SL_1w2h2t_perm_perm_9);
+    tree->SetBranchAddress("mem_ttbb_SL_1w2h2t_perm_perm_8", this->mem_ttbb_SL_1w2h2t_perm_perm_8);
+    tree->SetBranchAddress("nmem_ttbb_SL_2w2h2t_perm", &(this->nmem_ttbb_SL_2w2h2t_perm));
+    tree->SetBranchAddress("mem_ttbb_SL_2w2h2t_perm_p_me_mean", this->mem_ttbb_SL_2w2h2t_perm_p_me_mean);
+    tree->SetBranchAddress("mem_ttbb_SL_2w2h2t_perm_p_tf_std", this->mem_ttbb_SL_2w2h2t_perm_p_tf_std);
+    tree->SetBranchAddress("mem_ttbb_SL_2w2h2t_perm_idx", this->mem_ttbb_SL_2w2h2t_perm_idx);
+    tree->SetBranchAddress("mem_ttbb_SL_2w2h2t_perm_p_std", this->mem_ttbb_SL_2w2h2t_perm_p_std);
+    tree->SetBranchAddress("mem_ttbb_SL_2w2h2t_perm_p_mean", this->mem_ttbb_SL_2w2h2t_perm_p_mean);
+    tree->SetBranchAddress("mem_ttbb_SL_2w2h2t_perm_perm_5", this->mem_ttbb_SL_2w2h2t_perm_perm_5);
+    tree->SetBranchAddress("mem_ttbb_SL_2w2h2t_perm_perm_4", this->mem_ttbb_SL_2w2h2t_perm_perm_4);
+    tree->SetBranchAddress("mem_ttbb_SL_2w2h2t_perm_perm_7", this->mem_ttbb_SL_2w2h2t_perm_perm_7);
+    tree->SetBranchAddress("mem_ttbb_SL_2w2h2t_perm_perm_6", this->mem_ttbb_SL_2w2h2t_perm_perm_6);
+    tree->SetBranchAddress("mem_ttbb_SL_2w2h2t_perm_perm_1", this->mem_ttbb_SL_2w2h2t_perm_perm_1);
+    tree->SetBranchAddress("mem_ttbb_SL_2w2h2t_perm_perm_0", this->mem_ttbb_SL_2w2h2t_perm_perm_0);
+    tree->SetBranchAddress("mem_ttbb_SL_2w2h2t_perm_perm_3", this->mem_ttbb_SL_2w2h2t_perm_perm_3);
+    tree->SetBranchAddress("mem_ttbb_SL_2w2h2t_perm_perm_2", this->mem_ttbb_SL_2w2h2t_perm_perm_2);
+    tree->SetBranchAddress("mem_ttbb_SL_2w2h2t_perm_p_tf_mean", this->mem_ttbb_SL_2w2h2t_perm_p_tf_mean);
+    tree->SetBranchAddress("mem_ttbb_SL_2w2h2t_perm_p_me_std", this->mem_ttbb_SL_2w2h2t_perm_p_me_std);
+    tree->SetBranchAddress("mem_ttbb_SL_2w2h2t_perm_perm_9", this->mem_ttbb_SL_2w2h2t_perm_perm_9);
+    tree->SetBranchAddress("mem_ttbb_SL_2w2h2t_perm_perm_8", this->mem_ttbb_SL_2w2h2t_perm_perm_8);
+    tree->SetBranchAddress("nmem_tth_DL_0w2h2t_perm", &(this->nmem_tth_DL_0w2h2t_perm));
+    tree->SetBranchAddress("mem_tth_DL_0w2h2t_perm_p_me_mean", this->mem_tth_DL_0w2h2t_perm_p_me_mean);
+    tree->SetBranchAddress("mem_tth_DL_0w2h2t_perm_p_tf_std", this->mem_tth_DL_0w2h2t_perm_p_tf_std);
+    tree->SetBranchAddress("mem_tth_DL_0w2h2t_perm_idx", this->mem_tth_DL_0w2h2t_perm_idx);
+    tree->SetBranchAddress("mem_tth_DL_0w2h2t_perm_p_std", this->mem_tth_DL_0w2h2t_perm_p_std);
+    tree->SetBranchAddress("mem_tth_DL_0w2h2t_perm_p_mean", this->mem_tth_DL_0w2h2t_perm_p_mean);
+    tree->SetBranchAddress("mem_tth_DL_0w2h2t_perm_perm_5", this->mem_tth_DL_0w2h2t_perm_perm_5);
+    tree->SetBranchAddress("mem_tth_DL_0w2h2t_perm_perm_4", this->mem_tth_DL_0w2h2t_perm_perm_4);
+    tree->SetBranchAddress("mem_tth_DL_0w2h2t_perm_perm_7", this->mem_tth_DL_0w2h2t_perm_perm_7);
+    tree->SetBranchAddress("mem_tth_DL_0w2h2t_perm_perm_6", this->mem_tth_DL_0w2h2t_perm_perm_6);
+    tree->SetBranchAddress("mem_tth_DL_0w2h2t_perm_perm_1", this->mem_tth_DL_0w2h2t_perm_perm_1);
+    tree->SetBranchAddress("mem_tth_DL_0w2h2t_perm_perm_0", this->mem_tth_DL_0w2h2t_perm_perm_0);
+    tree->SetBranchAddress("mem_tth_DL_0w2h2t_perm_perm_3", this->mem_tth_DL_0w2h2t_perm_perm_3);
+    tree->SetBranchAddress("mem_tth_DL_0w2h2t_perm_perm_2", this->mem_tth_DL_0w2h2t_perm_perm_2);
+    tree->SetBranchAddress("mem_tth_DL_0w2h2t_perm_p_tf_mean", this->mem_tth_DL_0w2h2t_perm_p_tf_mean);
+    tree->SetBranchAddress("mem_tth_DL_0w2h2t_perm_p_me_std", this->mem_tth_DL_0w2h2t_perm_p_me_std);
+    tree->SetBranchAddress("mem_tth_DL_0w2h2t_perm_perm_9", this->mem_tth_DL_0w2h2t_perm_perm_9);
+    tree->SetBranchAddress("mem_tth_DL_0w2h2t_perm_perm_8", this->mem_tth_DL_0w2h2t_perm_perm_8);
+    tree->SetBranchAddress("nmem_tth_SL_0w2h2t_perm", &(this->nmem_tth_SL_0w2h2t_perm));
+    tree->SetBranchAddress("mem_tth_SL_0w2h2t_perm_p_me_mean", this->mem_tth_SL_0w2h2t_perm_p_me_mean);
+    tree->SetBranchAddress("mem_tth_SL_0w2h2t_perm_p_tf_std", this->mem_tth_SL_0w2h2t_perm_p_tf_std);
+    tree->SetBranchAddress("mem_tth_SL_0w2h2t_perm_idx", this->mem_tth_SL_0w2h2t_perm_idx);
+    tree->SetBranchAddress("mem_tth_SL_0w2h2t_perm_p_std", this->mem_tth_SL_0w2h2t_perm_p_std);
+    tree->SetBranchAddress("mem_tth_SL_0w2h2t_perm_p_mean", this->mem_tth_SL_0w2h2t_perm_p_mean);
+    tree->SetBranchAddress("mem_tth_SL_0w2h2t_perm_perm_5", this->mem_tth_SL_0w2h2t_perm_perm_5);
+    tree->SetBranchAddress("mem_tth_SL_0w2h2t_perm_perm_4", this->mem_tth_SL_0w2h2t_perm_perm_4);
+    tree->SetBranchAddress("mem_tth_SL_0w2h2t_perm_perm_7", this->mem_tth_SL_0w2h2t_perm_perm_7);
+    tree->SetBranchAddress("mem_tth_SL_0w2h2t_perm_perm_6", this->mem_tth_SL_0w2h2t_perm_perm_6);
+    tree->SetBranchAddress("mem_tth_SL_0w2h2t_perm_perm_1", this->mem_tth_SL_0w2h2t_perm_perm_1);
+    tree->SetBranchAddress("mem_tth_SL_0w2h2t_perm_perm_0", this->mem_tth_SL_0w2h2t_perm_perm_0);
+    tree->SetBranchAddress("mem_tth_SL_0w2h2t_perm_perm_3", this->mem_tth_SL_0w2h2t_perm_perm_3);
+    tree->SetBranchAddress("mem_tth_SL_0w2h2t_perm_perm_2", this->mem_tth_SL_0w2h2t_perm_perm_2);
+    tree->SetBranchAddress("mem_tth_SL_0w2h2t_perm_p_tf_mean", this->mem_tth_SL_0w2h2t_perm_p_tf_mean);
+    tree->SetBranchAddress("mem_tth_SL_0w2h2t_perm_p_me_std", this->mem_tth_SL_0w2h2t_perm_p_me_std);
+    tree->SetBranchAddress("mem_tth_SL_0w2h2t_perm_perm_9", this->mem_tth_SL_0w2h2t_perm_perm_9);
+    tree->SetBranchAddress("mem_tth_SL_0w2h2t_perm_perm_8", this->mem_tth_SL_0w2h2t_perm_perm_8);
+    tree->SetBranchAddress("nmem_tth_SL_1w2h2t_perm", &(this->nmem_tth_SL_1w2h2t_perm));
+    tree->SetBranchAddress("mem_tth_SL_1w2h2t_perm_p_me_mean", this->mem_tth_SL_1w2h2t_perm_p_me_mean);
+    tree->SetBranchAddress("mem_tth_SL_1w2h2t_perm_p_tf_std", this->mem_tth_SL_1w2h2t_perm_p_tf_std);
+    tree->SetBranchAddress("mem_tth_SL_1w2h2t_perm_idx", this->mem_tth_SL_1w2h2t_perm_idx);
+    tree->SetBranchAddress("mem_tth_SL_1w2h2t_perm_p_std", this->mem_tth_SL_1w2h2t_perm_p_std);
+    tree->SetBranchAddress("mem_tth_SL_1w2h2t_perm_p_mean", this->mem_tth_SL_1w2h2t_perm_p_mean);
+    tree->SetBranchAddress("mem_tth_SL_1w2h2t_perm_perm_5", this->mem_tth_SL_1w2h2t_perm_perm_5);
+    tree->SetBranchAddress("mem_tth_SL_1w2h2t_perm_perm_4", this->mem_tth_SL_1w2h2t_perm_perm_4);
+    tree->SetBranchAddress("mem_tth_SL_1w2h2t_perm_perm_7", this->mem_tth_SL_1w2h2t_perm_perm_7);
+    tree->SetBranchAddress("mem_tth_SL_1w2h2t_perm_perm_6", this->mem_tth_SL_1w2h2t_perm_perm_6);
+    tree->SetBranchAddress("mem_tth_SL_1w2h2t_perm_perm_1", this->mem_tth_SL_1w2h2t_perm_perm_1);
+    tree->SetBranchAddress("mem_tth_SL_1w2h2t_perm_perm_0", this->mem_tth_SL_1w2h2t_perm_perm_0);
+    tree->SetBranchAddress("mem_tth_SL_1w2h2t_perm_perm_3", this->mem_tth_SL_1w2h2t_perm_perm_3);
+    tree->SetBranchAddress("mem_tth_SL_1w2h2t_perm_perm_2", this->mem_tth_SL_1w2h2t_perm_perm_2);
+    tree->SetBranchAddress("mem_tth_SL_1w2h2t_perm_p_tf_mean", this->mem_tth_SL_1w2h2t_perm_p_tf_mean);
+    tree->SetBranchAddress("mem_tth_SL_1w2h2t_perm_p_me_std", this->mem_tth_SL_1w2h2t_perm_p_me_std);
+    tree->SetBranchAddress("mem_tth_SL_1w2h2t_perm_perm_9", this->mem_tth_SL_1w2h2t_perm_perm_9);
+    tree->SetBranchAddress("mem_tth_SL_1w2h2t_perm_perm_8", this->mem_tth_SL_1w2h2t_perm_perm_8);
+    tree->SetBranchAddress("nmem_tth_SL_2w2h2t_perm", &(this->nmem_tth_SL_2w2h2t_perm));
+    tree->SetBranchAddress("mem_tth_SL_2w2h2t_perm_p_me_mean", this->mem_tth_SL_2w2h2t_perm_p_me_mean);
+    tree->SetBranchAddress("mem_tth_SL_2w2h2t_perm_p_tf_std", this->mem_tth_SL_2w2h2t_perm_p_tf_std);
+    tree->SetBranchAddress("mem_tth_SL_2w2h2t_perm_idx", this->mem_tth_SL_2w2h2t_perm_idx);
+    tree->SetBranchAddress("mem_tth_SL_2w2h2t_perm_p_std", this->mem_tth_SL_2w2h2t_perm_p_std);
+    tree->SetBranchAddress("mem_tth_SL_2w2h2t_perm_p_mean", this->mem_tth_SL_2w2h2t_perm_p_mean);
+    tree->SetBranchAddress("mem_tth_SL_2w2h2t_perm_perm_5", this->mem_tth_SL_2w2h2t_perm_perm_5);
+    tree->SetBranchAddress("mem_tth_SL_2w2h2t_perm_perm_4", this->mem_tth_SL_2w2h2t_perm_perm_4);
+    tree->SetBranchAddress("mem_tth_SL_2w2h2t_perm_perm_7", this->mem_tth_SL_2w2h2t_perm_perm_7);
+    tree->SetBranchAddress("mem_tth_SL_2w2h2t_perm_perm_6", this->mem_tth_SL_2w2h2t_perm_perm_6);
+    tree->SetBranchAddress("mem_tth_SL_2w2h2t_perm_perm_1", this->mem_tth_SL_2w2h2t_perm_perm_1);
+    tree->SetBranchAddress("mem_tth_SL_2w2h2t_perm_perm_0", this->mem_tth_SL_2w2h2t_perm_perm_0);
+    tree->SetBranchAddress("mem_tth_SL_2w2h2t_perm_perm_3", this->mem_tth_SL_2w2h2t_perm_perm_3);
+    tree->SetBranchAddress("mem_tth_SL_2w2h2t_perm_perm_2", this->mem_tth_SL_2w2h2t_perm_perm_2);
+    tree->SetBranchAddress("mem_tth_SL_2w2h2t_perm_p_tf_mean", this->mem_tth_SL_2w2h2t_perm_p_tf_mean);
+    tree->SetBranchAddress("mem_tth_SL_2w2h2t_perm_p_me_std", this->mem_tth_SL_2w2h2t_perm_p_me_std);
+    tree->SetBranchAddress("mem_tth_SL_2w2h2t_perm_perm_9", this->mem_tth_SL_2w2h2t_perm_perm_9);
+    tree->SetBranchAddress("mem_tth_SL_2w2h2t_perm_perm_8", this->mem_tth_SL_2w2h2t_perm_perm_8);
     tree->SetBranchAddress("nothertopCandidate", &(this->nothertopCandidate));
     tree->SetBranchAddress("othertopCandidate_tau1", this->othertopCandidate_tau1);
     tree->SetBranchAddress("othertopCandidate_etacal", this->othertopCandidate_etacal);
     tree->SetBranchAddress("othertopCandidate_sjW2btag", this->othertopCandidate_sjW2btag);
     tree->SetBranchAddress("othertopCandidate_n_subjettiness_groomed", this->othertopCandidate_n_subjettiness_groomed);
     tree->SetBranchAddress("othertopCandidate_sjW2pt", this->othertopCandidate_sjW2pt);
+    tree->SetBranchAddress("othertopCandidate_sjW1ptcal", this->othertopCandidate_sjW1ptcal);
     tree->SetBranchAddress("othertopCandidate_sjW1btag", this->othertopCandidate_sjW1btag);
     tree->SetBranchAddress("othertopCandidate_sjW1mass", this->othertopCandidate_sjW1mass);
     tree->SetBranchAddress("othertopCandidate_sjNonWmass", this->othertopCandidate_sjNonWmass);
+    tree->SetBranchAddress("othertopCandidate_sjNonWptcal", this->othertopCandidate_sjNonWptcal);
     tree->SetBranchAddress("othertopCandidate_sjNonWeta", this->othertopCandidate_sjNonWeta);
     tree->SetBranchAddress("othertopCandidate_pt", this->othertopCandidate_pt);
+    tree->SetBranchAddress("othertopCandidate_sjW2masscal", this->othertopCandidate_sjW2masscal);
     tree->SetBranchAddress("othertopCandidate_ptForRoptCalc", this->othertopCandidate_ptForRoptCalc);
     tree->SetBranchAddress("othertopCandidate_tau2", this->othertopCandidate_tau2);
     tree->SetBranchAddress("othertopCandidate_phi", this->othertopCandidate_phi);
     tree->SetBranchAddress("othertopCandidate_tau3", this->othertopCandidate_tau3);
     tree->SetBranchAddress("othertopCandidate_sjNonWpt", this->othertopCandidate_sjNonWpt);
+    tree->SetBranchAddress("othertopCandidate_sjNonWmasscal", this->othertopCandidate_sjNonWmasscal);
+    tree->SetBranchAddress("othertopCandidate_sjW1masscal", this->othertopCandidate_sjW1masscal);
     tree->SetBranchAddress("othertopCandidate_sjW2mass", this->othertopCandidate_sjW2mass);
     tree->SetBranchAddress("othertopCandidate_mass", this->othertopCandidate_mass);
     tree->SetBranchAddress("othertopCandidate_sjNonWbtag", this->othertopCandidate_sjNonWbtag);
@@ -1314,6 +1226,7 @@ public:
     tree->SetBranchAddress("othertopCandidate_sjW2phi", this->othertopCandidate_sjW2phi);
     tree->SetBranchAddress("othertopCandidate_eta", this->othertopCandidate_eta);
     tree->SetBranchAddress("othertopCandidate_n_subjettiness", this->othertopCandidate_n_subjettiness);
+    tree->SetBranchAddress("othertopCandidate_sjW2ptcal", this->othertopCandidate_sjW2ptcal);
     tree->SetBranchAddress("othertopCandidate_bbtag", this->othertopCandidate_bbtag);
     tree->SetBranchAddress("othertopCandidate_sjW2eta", this->othertopCandidate_sjW2eta);
     tree->SetBranchAddress("othertopCandidate_genTopHad_dr", this->othertopCandidate_genTopHad_dr);
@@ -1323,16 +1236,21 @@ public:
     tree->SetBranchAddress("topCandidate_sjW2btag", this->topCandidate_sjW2btag);
     tree->SetBranchAddress("topCandidate_n_subjettiness_groomed", this->topCandidate_n_subjettiness_groomed);
     tree->SetBranchAddress("topCandidate_sjW2pt", this->topCandidate_sjW2pt);
+    tree->SetBranchAddress("topCandidate_sjW1ptcal", this->topCandidate_sjW1ptcal);
     tree->SetBranchAddress("topCandidate_sjW1btag", this->topCandidate_sjW1btag);
     tree->SetBranchAddress("topCandidate_sjW1mass", this->topCandidate_sjW1mass);
     tree->SetBranchAddress("topCandidate_sjNonWmass", this->topCandidate_sjNonWmass);
+    tree->SetBranchAddress("topCandidate_sjNonWptcal", this->topCandidate_sjNonWptcal);
     tree->SetBranchAddress("topCandidate_sjNonWeta", this->topCandidate_sjNonWeta);
     tree->SetBranchAddress("topCandidate_pt", this->topCandidate_pt);
+    tree->SetBranchAddress("topCandidate_sjW2masscal", this->topCandidate_sjW2masscal);
     tree->SetBranchAddress("topCandidate_ptForRoptCalc", this->topCandidate_ptForRoptCalc);
     tree->SetBranchAddress("topCandidate_tau2", this->topCandidate_tau2);
     tree->SetBranchAddress("topCandidate_phi", this->topCandidate_phi);
     tree->SetBranchAddress("topCandidate_tau3", this->topCandidate_tau3);
     tree->SetBranchAddress("topCandidate_sjNonWpt", this->topCandidate_sjNonWpt);
+    tree->SetBranchAddress("topCandidate_sjNonWmasscal", this->topCandidate_sjNonWmasscal);
+    tree->SetBranchAddress("topCandidate_sjW1masscal", this->topCandidate_sjW1masscal);
     tree->SetBranchAddress("topCandidate_sjW2mass", this->topCandidate_sjW2mass);
     tree->SetBranchAddress("topCandidate_mass", this->topCandidate_mass);
     tree->SetBranchAddress("topCandidate_sjNonWbtag", this->topCandidate_sjNonWbtag);
@@ -1350,6 +1268,7 @@ public:
     tree->SetBranchAddress("topCandidate_sjW2phi", this->topCandidate_sjW2phi);
     tree->SetBranchAddress("topCandidate_eta", this->topCandidate_eta);
     tree->SetBranchAddress("topCandidate_n_subjettiness", this->topCandidate_n_subjettiness);
+    tree->SetBranchAddress("topCandidate_sjW2ptcal", this->topCandidate_sjW2ptcal);
     tree->SetBranchAddress("topCandidate_bbtag", this->topCandidate_bbtag);
     tree->SetBranchAddress("topCandidate_sjW2eta", this->topCandidate_sjW2eta);
     tree->SetBranchAddress("topCandidate_genTopHad_dr", this->topCandidate_genTopHad_dr);
@@ -1359,16 +1278,21 @@ public:
     tree->SetBranchAddress("topCandidatesSync_sjW2btag", this->topCandidatesSync_sjW2btag);
     tree->SetBranchAddress("topCandidatesSync_n_subjettiness_groomed", this->topCandidatesSync_n_subjettiness_groomed);
     tree->SetBranchAddress("topCandidatesSync_sjW2pt", this->topCandidatesSync_sjW2pt);
+    tree->SetBranchAddress("topCandidatesSync_sjW1ptcal", this->topCandidatesSync_sjW1ptcal);
     tree->SetBranchAddress("topCandidatesSync_sjW1btag", this->topCandidatesSync_sjW1btag);
     tree->SetBranchAddress("topCandidatesSync_sjW1mass", this->topCandidatesSync_sjW1mass);
     tree->SetBranchAddress("topCandidatesSync_sjNonWmass", this->topCandidatesSync_sjNonWmass);
+    tree->SetBranchAddress("topCandidatesSync_sjNonWptcal", this->topCandidatesSync_sjNonWptcal);
     tree->SetBranchAddress("topCandidatesSync_sjNonWeta", this->topCandidatesSync_sjNonWeta);
     tree->SetBranchAddress("topCandidatesSync_pt", this->topCandidatesSync_pt);
+    tree->SetBranchAddress("topCandidatesSync_sjW2masscal", this->topCandidatesSync_sjW2masscal);
     tree->SetBranchAddress("topCandidatesSync_ptForRoptCalc", this->topCandidatesSync_ptForRoptCalc);
     tree->SetBranchAddress("topCandidatesSync_tau2", this->topCandidatesSync_tau2);
     tree->SetBranchAddress("topCandidatesSync_phi", this->topCandidatesSync_phi);
     tree->SetBranchAddress("topCandidatesSync_tau3", this->topCandidatesSync_tau3);
     tree->SetBranchAddress("topCandidatesSync_sjNonWpt", this->topCandidatesSync_sjNonWpt);
+    tree->SetBranchAddress("topCandidatesSync_sjNonWmasscal", this->topCandidatesSync_sjNonWmasscal);
+    tree->SetBranchAddress("topCandidatesSync_sjW1masscal", this->topCandidatesSync_sjW1masscal);
     tree->SetBranchAddress("topCandidatesSync_sjW2mass", this->topCandidatesSync_sjW2mass);
     tree->SetBranchAddress("topCandidatesSync_mass", this->topCandidatesSync_mass);
     tree->SetBranchAddress("topCandidatesSync_sjNonWbtag", this->topCandidatesSync_sjNonWbtag);
@@ -1386,6 +1310,7 @@ public:
     tree->SetBranchAddress("topCandidatesSync_sjW2phi", this->topCandidatesSync_sjW2phi);
     tree->SetBranchAddress("topCandidatesSync_eta", this->topCandidatesSync_eta);
     tree->SetBranchAddress("topCandidatesSync_n_subjettiness", this->topCandidatesSync_n_subjettiness);
+    tree->SetBranchAddress("topCandidatesSync_sjW2ptcal", this->topCandidatesSync_sjW2ptcal);
     tree->SetBranchAddress("topCandidatesSync_bbtag", this->topCandidatesSync_bbtag);
     tree->SetBranchAddress("topCandidatesSync_sjW2eta", this->topCandidatesSync_sjW2eta);
     tree->SetBranchAddress("topCandidatesSync_genTopHad_dr", this->topCandidatesSync_genTopHad_dr);
@@ -1394,6 +1319,70 @@ public:
     tree->SetBranchAddress("ll_eta", this->ll_eta);
     tree->SetBranchAddress("ll_mass", this->ll_mass);
     tree->SetBranchAddress("ll_pt", this->ll_pt);
+    tree->SetBranchAddress("nmem_ttbb_DL_0w2h2t", &(this->nmem_ttbb_DL_0w2h2t));
+    tree->SetBranchAddress("mem_ttbb_DL_0w2h2t_p", this->mem_ttbb_DL_0w2h2t_p);
+    tree->SetBranchAddress("mem_ttbb_DL_0w2h2t_chi2", this->mem_ttbb_DL_0w2h2t_chi2);
+    tree->SetBranchAddress("mem_ttbb_DL_0w2h2t_p_err", this->mem_ttbb_DL_0w2h2t_p_err);
+    tree->SetBranchAddress("mem_ttbb_DL_0w2h2t_efficiency", this->mem_ttbb_DL_0w2h2t_efficiency);
+    tree->SetBranchAddress("mem_ttbb_DL_0w2h2t_nperm", this->mem_ttbb_DL_0w2h2t_nperm);
+    tree->SetBranchAddress("mem_ttbb_DL_0w2h2t_time", this->mem_ttbb_DL_0w2h2t_time);
+    tree->SetBranchAddress("mem_ttbb_DL_0w2h2t_error_code", this->mem_ttbb_DL_0w2h2t_error_code);
+    tree->SetBranchAddress("nmem_ttbb_SL_0w2h2t", &(this->nmem_ttbb_SL_0w2h2t));
+    tree->SetBranchAddress("mem_ttbb_SL_0w2h2t_p", this->mem_ttbb_SL_0w2h2t_p);
+    tree->SetBranchAddress("mem_ttbb_SL_0w2h2t_chi2", this->mem_ttbb_SL_0w2h2t_chi2);
+    tree->SetBranchAddress("mem_ttbb_SL_0w2h2t_p_err", this->mem_ttbb_SL_0w2h2t_p_err);
+    tree->SetBranchAddress("mem_ttbb_SL_0w2h2t_efficiency", this->mem_ttbb_SL_0w2h2t_efficiency);
+    tree->SetBranchAddress("mem_ttbb_SL_0w2h2t_nperm", this->mem_ttbb_SL_0w2h2t_nperm);
+    tree->SetBranchAddress("mem_ttbb_SL_0w2h2t_time", this->mem_ttbb_SL_0w2h2t_time);
+    tree->SetBranchAddress("mem_ttbb_SL_0w2h2t_error_code", this->mem_ttbb_SL_0w2h2t_error_code);
+    tree->SetBranchAddress("nmem_ttbb_SL_1w2h2t", &(this->nmem_ttbb_SL_1w2h2t));
+    tree->SetBranchAddress("mem_ttbb_SL_1w2h2t_p", this->mem_ttbb_SL_1w2h2t_p);
+    tree->SetBranchAddress("mem_ttbb_SL_1w2h2t_chi2", this->mem_ttbb_SL_1w2h2t_chi2);
+    tree->SetBranchAddress("mem_ttbb_SL_1w2h2t_p_err", this->mem_ttbb_SL_1w2h2t_p_err);
+    tree->SetBranchAddress("mem_ttbb_SL_1w2h2t_efficiency", this->mem_ttbb_SL_1w2h2t_efficiency);
+    tree->SetBranchAddress("mem_ttbb_SL_1w2h2t_nperm", this->mem_ttbb_SL_1w2h2t_nperm);
+    tree->SetBranchAddress("mem_ttbb_SL_1w2h2t_time", this->mem_ttbb_SL_1w2h2t_time);
+    tree->SetBranchAddress("mem_ttbb_SL_1w2h2t_error_code", this->mem_ttbb_SL_1w2h2t_error_code);
+    tree->SetBranchAddress("nmem_ttbb_SL_2w2h2t", &(this->nmem_ttbb_SL_2w2h2t));
+    tree->SetBranchAddress("mem_ttbb_SL_2w2h2t_p", this->mem_ttbb_SL_2w2h2t_p);
+    tree->SetBranchAddress("mem_ttbb_SL_2w2h2t_chi2", this->mem_ttbb_SL_2w2h2t_chi2);
+    tree->SetBranchAddress("mem_ttbb_SL_2w2h2t_p_err", this->mem_ttbb_SL_2w2h2t_p_err);
+    tree->SetBranchAddress("mem_ttbb_SL_2w2h2t_efficiency", this->mem_ttbb_SL_2w2h2t_efficiency);
+    tree->SetBranchAddress("mem_ttbb_SL_2w2h2t_nperm", this->mem_ttbb_SL_2w2h2t_nperm);
+    tree->SetBranchAddress("mem_ttbb_SL_2w2h2t_time", this->mem_ttbb_SL_2w2h2t_time);
+    tree->SetBranchAddress("mem_ttbb_SL_2w2h2t_error_code", this->mem_ttbb_SL_2w2h2t_error_code);
+    tree->SetBranchAddress("nmem_tth_DL_0w2h2t", &(this->nmem_tth_DL_0w2h2t));
+    tree->SetBranchAddress("mem_tth_DL_0w2h2t_p", this->mem_tth_DL_0w2h2t_p);
+    tree->SetBranchAddress("mem_tth_DL_0w2h2t_chi2", this->mem_tth_DL_0w2h2t_chi2);
+    tree->SetBranchAddress("mem_tth_DL_0w2h2t_p_err", this->mem_tth_DL_0w2h2t_p_err);
+    tree->SetBranchAddress("mem_tth_DL_0w2h2t_efficiency", this->mem_tth_DL_0w2h2t_efficiency);
+    tree->SetBranchAddress("mem_tth_DL_0w2h2t_nperm", this->mem_tth_DL_0w2h2t_nperm);
+    tree->SetBranchAddress("mem_tth_DL_0w2h2t_time", this->mem_tth_DL_0w2h2t_time);
+    tree->SetBranchAddress("mem_tth_DL_0w2h2t_error_code", this->mem_tth_DL_0w2h2t_error_code);
+    tree->SetBranchAddress("nmem_tth_SL_0w2h2t", &(this->nmem_tth_SL_0w2h2t));
+    tree->SetBranchAddress("mem_tth_SL_0w2h2t_p", this->mem_tth_SL_0w2h2t_p);
+    tree->SetBranchAddress("mem_tth_SL_0w2h2t_chi2", this->mem_tth_SL_0w2h2t_chi2);
+    tree->SetBranchAddress("mem_tth_SL_0w2h2t_p_err", this->mem_tth_SL_0w2h2t_p_err);
+    tree->SetBranchAddress("mem_tth_SL_0w2h2t_efficiency", this->mem_tth_SL_0w2h2t_efficiency);
+    tree->SetBranchAddress("mem_tth_SL_0w2h2t_nperm", this->mem_tth_SL_0w2h2t_nperm);
+    tree->SetBranchAddress("mem_tth_SL_0w2h2t_time", this->mem_tth_SL_0w2h2t_time);
+    tree->SetBranchAddress("mem_tth_SL_0w2h2t_error_code", this->mem_tth_SL_0w2h2t_error_code);
+    tree->SetBranchAddress("nmem_tth_SL_1w2h2t", &(this->nmem_tth_SL_1w2h2t));
+    tree->SetBranchAddress("mem_tth_SL_1w2h2t_p", this->mem_tth_SL_1w2h2t_p);
+    tree->SetBranchAddress("mem_tth_SL_1w2h2t_chi2", this->mem_tth_SL_1w2h2t_chi2);
+    tree->SetBranchAddress("mem_tth_SL_1w2h2t_p_err", this->mem_tth_SL_1w2h2t_p_err);
+    tree->SetBranchAddress("mem_tth_SL_1w2h2t_efficiency", this->mem_tth_SL_1w2h2t_efficiency);
+    tree->SetBranchAddress("mem_tth_SL_1w2h2t_nperm", this->mem_tth_SL_1w2h2t_nperm);
+    tree->SetBranchAddress("mem_tth_SL_1w2h2t_time", this->mem_tth_SL_1w2h2t_time);
+    tree->SetBranchAddress("mem_tth_SL_1w2h2t_error_code", this->mem_tth_SL_1w2h2t_error_code);
+    tree->SetBranchAddress("nmem_tth_SL_2w2h2t", &(this->nmem_tth_SL_2w2h2t));
+    tree->SetBranchAddress("mem_tth_SL_2w2h2t_p", this->mem_tth_SL_2w2h2t_p);
+    tree->SetBranchAddress("mem_tth_SL_2w2h2t_chi2", this->mem_tth_SL_2w2h2t_chi2);
+    tree->SetBranchAddress("mem_tth_SL_2w2h2t_p_err", this->mem_tth_SL_2w2h2t_p_err);
+    tree->SetBranchAddress("mem_tth_SL_2w2h2t_efficiency", this->mem_tth_SL_2w2h2t_efficiency);
+    tree->SetBranchAddress("mem_tth_SL_2w2h2t_nperm", this->mem_tth_SL_2w2h2t_nperm);
+    tree->SetBranchAddress("mem_tth_SL_2w2h2t_time", this->mem_tth_SL_2w2h2t_time);
+    tree->SetBranchAddress("mem_tth_SL_2w2h2t_error_code", this->mem_tth_SL_2w2h2t_error_code);
     tree->SetBranchAddress("nmet", &(this->nmet));
     tree->SetBranchAddress("met_phi", this->met_phi);
     tree->SetBranchAddress("met_sumEt", this->met_sumEt);
@@ -1432,15 +1421,7 @@ public:
     tree->SetBranchAddress("pv_rho", this->pv_rho);
     tree->SetBranchAddress("pv_ndof", this->pv_ndof);
     tree->SetBranchAddress("C", &(this->C));
-    tree->SetBranchAddress("C_JERDown", &(this->C_JERDown));
-    tree->SetBranchAddress("C_JERUp", &(this->C_JERUp));
-    tree->SetBranchAddress("C_JESDown", &(this->C_JESDown));
-    tree->SetBranchAddress("C_JESUp", &(this->C_JESUp));
     tree->SetBranchAddress("D", &(this->D));
-    tree->SetBranchAddress("D_JERDown", &(this->D_JERDown));
-    tree->SetBranchAddress("D_JERUp", &(this->D_JERUp));
-    tree->SetBranchAddress("D_JESDown", &(this->D_JESDown));
-    tree->SetBranchAddress("D_JESUp", &(this->D_JESUp));
     tree->SetBranchAddress("HLT_BIT_HLT_AK8DiPFJet250_200_TrimMass30_BTagCSV0p45_v", &(this->HLT_BIT_HLT_AK8DiPFJet250_200_TrimMass30_BTagCSV0p45_v));
     tree->SetBranchAddress("HLT_BIT_HLT_AK8DiPFJet250_200_TrimMass30_BTagCSV_p20_v", &(this->HLT_BIT_HLT_AK8DiPFJet250_200_TrimMass30_BTagCSV_p20_v));
     tree->SetBranchAddress("HLT_BIT_HLT_AK8DiPFJet280_200_TrimMass30_BTagCSV0p45_v", &(this->HLT_BIT_HLT_AK8DiPFJet280_200_TrimMass30_BTagCSV0p45_v));
@@ -1601,15 +1582,7 @@ public:
     tree->SetBranchAddress("HLT_ttHhardonicLowLumi", &(this->HLT_ttHhardonicLowLumi));
     tree->SetBranchAddress("HLT_ttHleptonic", &(this->HLT_ttHleptonic));
     tree->SetBranchAddress("Wmass", &(this->Wmass));
-    tree->SetBranchAddress("Wmass_JERDown", &(this->Wmass_JERDown));
-    tree->SetBranchAddress("Wmass_JERUp", &(this->Wmass_JERUp));
-    tree->SetBranchAddress("Wmass_JESDown", &(this->Wmass_JESDown));
-    tree->SetBranchAddress("Wmass_JESUp", &(this->Wmass_JESUp));
     tree->SetBranchAddress("aplanarity", &(this->aplanarity));
-    tree->SetBranchAddress("aplanarity_JERDown", &(this->aplanarity_JERDown));
-    tree->SetBranchAddress("aplanarity_JERUp", &(this->aplanarity_JERUp));
-    tree->SetBranchAddress("aplanarity_JESDown", &(this->aplanarity_JESDown));
-    tree->SetBranchAddress("aplanarity_JESUp", &(this->aplanarity_JESUp));
     tree->SetBranchAddress("bTagWeight", &(this->bTagWeight));
     tree->SetBranchAddress("bTagWeight_HFDown", &(this->bTagWeight_HFDown));
     tree->SetBranchAddress("bTagWeight_HFStats1Down", &(this->bTagWeight_HFStats1Down));
@@ -1629,226 +1602,58 @@ public:
     tree->SetBranchAddress("bTagWeight_cErr1Up", &(this->bTagWeight_cErr1Up));
     tree->SetBranchAddress("bTagWeight_cErr2Down", &(this->bTagWeight_cErr2Down));
     tree->SetBranchAddress("bTagWeight_cErr2Up", &(this->bTagWeight_cErr2Up));
-    tree->SetBranchAddress("btag_LR_4b_2b", &(this->btag_LR_4b_2b));
-    tree->SetBranchAddress("btag_LR_4b_2b_JERDown", &(this->btag_LR_4b_2b_JERDown));
-    tree->SetBranchAddress("btag_LR_4b_2b_JERUp", &(this->btag_LR_4b_2b_JERUp));
-    tree->SetBranchAddress("btag_LR_4b_2b_JESDown", &(this->btag_LR_4b_2b_JESDown));
-    tree->SetBranchAddress("btag_LR_4b_2b_JESUp", &(this->btag_LR_4b_2b_JESUp));
     tree->SetBranchAddress("btag_LR_4b_2b_btagCMVA", &(this->btag_LR_4b_2b_btagCMVA));
-    tree->SetBranchAddress("btag_LR_4b_2b_btagCMVA_JERDown", &(this->btag_LR_4b_2b_btagCMVA_JERDown));
-    tree->SetBranchAddress("btag_LR_4b_2b_btagCMVA_JERUp", &(this->btag_LR_4b_2b_btagCMVA_JERUp));
-    tree->SetBranchAddress("btag_LR_4b_2b_btagCMVA_JESDown", &(this->btag_LR_4b_2b_btagCMVA_JESDown));
-    tree->SetBranchAddress("btag_LR_4b_2b_btagCMVA_JESUp", &(this->btag_LR_4b_2b_btagCMVA_JESUp));
+    tree->SetBranchAddress("btag_LR_4b_2b_btagCMVA_log", &(this->btag_LR_4b_2b_btagCMVA_log));
     tree->SetBranchAddress("btag_LR_4b_2b_btagCSV", &(this->btag_LR_4b_2b_btagCSV));
-    tree->SetBranchAddress("btag_LR_4b_2b_btagCSV_JERDown", &(this->btag_LR_4b_2b_btagCSV_JERDown));
-    tree->SetBranchAddress("btag_LR_4b_2b_btagCSV_JERUp", &(this->btag_LR_4b_2b_btagCSV_JERUp));
-    tree->SetBranchAddress("btag_LR_4b_2b_btagCSV_JESDown", &(this->btag_LR_4b_2b_btagCSV_JESDown));
-    tree->SetBranchAddress("btag_LR_4b_2b_btagCSV_JESUp", &(this->btag_LR_4b_2b_btagCSV_JESUp));
     tree->SetBranchAddress("btag_lr_2b", &(this->btag_lr_2b));
-    tree->SetBranchAddress("btag_lr_2b_JERDown", &(this->btag_lr_2b_JERDown));
-    tree->SetBranchAddress("btag_lr_2b_JERUp", &(this->btag_lr_2b_JERUp));
-    tree->SetBranchAddress("btag_lr_2b_JESDown", &(this->btag_lr_2b_JESDown));
-    tree->SetBranchAddress("btag_lr_2b_JESUp", &(this->btag_lr_2b_JESUp));
     tree->SetBranchAddress("btag_lr_4b", &(this->btag_lr_4b));
-    tree->SetBranchAddress("btag_lr_4b_JERDown", &(this->btag_lr_4b_JERDown));
-    tree->SetBranchAddress("btag_lr_4b_JERUp", &(this->btag_lr_4b_JERUp));
-    tree->SetBranchAddress("btag_lr_4b_JESDown", &(this->btag_lr_4b_JESDown));
-    tree->SetBranchAddress("btag_lr_4b_JESUp", &(this->btag_lr_4b_JESUp));
     tree->SetBranchAddress("cat", &(this->cat));
-    tree->SetBranchAddress("cat_JERDown", &(this->cat_JERDown));
-    tree->SetBranchAddress("cat_JERUp", &(this->cat_JERUp));
-    tree->SetBranchAddress("cat_JESDown", &(this->cat_JESDown));
-    tree->SetBranchAddress("cat_JESUp", &(this->cat_JESUp));
     tree->SetBranchAddress("cat_btag", &(this->cat_btag));
-    tree->SetBranchAddress("cat_btag_JERDown", &(this->cat_btag_JERDown));
-    tree->SetBranchAddress("cat_btag_JERUp", &(this->cat_btag_JERUp));
-    tree->SetBranchAddress("cat_btag_JESDown", &(this->cat_btag_JESDown));
-    tree->SetBranchAddress("cat_btag_JESUp", &(this->cat_btag_JESUp));
     tree->SetBranchAddress("cat_gen", &(this->cat_gen));
-    tree->SetBranchAddress("cat_gen_JERDown", &(this->cat_gen_JERDown));
-    tree->SetBranchAddress("cat_gen_JERUp", &(this->cat_gen_JERUp));
-    tree->SetBranchAddress("cat_gen_JESDown", &(this->cat_gen_JESDown));
-    tree->SetBranchAddress("cat_gen_JESUp", &(this->cat_gen_JESUp));
     tree->SetBranchAddress("common_bdt", &(this->common_bdt));
-    tree->SetBranchAddress("common_bdt_JERDown", &(this->common_bdt_JERDown));
-    tree->SetBranchAddress("common_bdt_JERUp", &(this->common_bdt_JERUp));
-    tree->SetBranchAddress("common_bdt_JESDown", &(this->common_bdt_JESDown));
-    tree->SetBranchAddress("common_bdt_JESUp", &(this->common_bdt_JESUp));
     tree->SetBranchAddress("common_bdt_withmem1", &(this->common_bdt_withmem1));
-    tree->SetBranchAddress("common_bdt_withmem1_JERDown", &(this->common_bdt_withmem1_JERDown));
-    tree->SetBranchAddress("common_bdt_withmem1_JERUp", &(this->common_bdt_withmem1_JERUp));
-    tree->SetBranchAddress("common_bdt_withmem1_JESDown", &(this->common_bdt_withmem1_JESDown));
-    tree->SetBranchAddress("common_bdt_withmem1_JESUp", &(this->common_bdt_withmem1_JESUp));
     tree->SetBranchAddress("common_bdt_withmem2", &(this->common_bdt_withmem2));
-    tree->SetBranchAddress("common_bdt_withmem2_JERDown", &(this->common_bdt_withmem2_JERDown));
-    tree->SetBranchAddress("common_bdt_withmem2_JERUp", &(this->common_bdt_withmem2_JERUp));
-    tree->SetBranchAddress("common_bdt_withmem2_JESDown", &(this->common_bdt_withmem2_JESDown));
-    tree->SetBranchAddress("common_bdt_withmem2_JESUp", &(this->common_bdt_withmem2_JESUp));
     tree->SetBranchAddress("eta_drpair_btag", &(this->eta_drpair_btag));
-    tree->SetBranchAddress("eta_drpair_btag_JERDown", &(this->eta_drpair_btag_JERDown));
-    tree->SetBranchAddress("eta_drpair_btag_JERUp", &(this->eta_drpair_btag_JERUp));
-    tree->SetBranchAddress("eta_drpair_btag_JESDown", &(this->eta_drpair_btag_JESDown));
-    tree->SetBranchAddress("eta_drpair_btag_JESUp", &(this->eta_drpair_btag_JESUp));
     tree->SetBranchAddress("evt", &(this->evt));
     tree->SetBranchAddress("genHiggsDecayMode", &(this->genHiggsDecayMode));
     tree->SetBranchAddress("genWeight", &(this->genWeight));
     tree->SetBranchAddress("ht", &(this->ht));
-    tree->SetBranchAddress("ht_JERDown", &(this->ht_JERDown));
-    tree->SetBranchAddress("ht_JERUp", &(this->ht_JERUp));
-    tree->SetBranchAddress("ht_JESDown", &(this->ht_JESDown));
-    tree->SetBranchAddress("ht_JESUp", &(this->ht_JESUp));
     tree->SetBranchAddress("is_dl", &(this->is_dl));
-    tree->SetBranchAddress("is_dl_JERDown", &(this->is_dl_JERDown));
-    tree->SetBranchAddress("is_dl_JERUp", &(this->is_dl_JERUp));
-    tree->SetBranchAddress("is_dl_JESDown", &(this->is_dl_JESDown));
-    tree->SetBranchAddress("is_dl_JESUp", &(this->is_dl_JESUp));
     tree->SetBranchAddress("is_fh", &(this->is_fh));
-    tree->SetBranchAddress("is_fh_JERDown", &(this->is_fh_JERDown));
-    tree->SetBranchAddress("is_fh_JERUp", &(this->is_fh_JERUp));
-    tree->SetBranchAddress("is_fh_JESDown", &(this->is_fh_JESDown));
-    tree->SetBranchAddress("is_fh_JESUp", &(this->is_fh_JESUp));
     tree->SetBranchAddress("is_sl", &(this->is_sl));
-    tree->SetBranchAddress("is_sl_JERDown", &(this->is_sl_JERDown));
-    tree->SetBranchAddress("is_sl_JERUp", &(this->is_sl_JERUp));
-    tree->SetBranchAddress("is_sl_JESDown", &(this->is_sl_JESDown));
-    tree->SetBranchAddress("is_sl_JESUp", &(this->is_sl_JESUp));
     tree->SetBranchAddress("isotropy", &(this->isotropy));
-    tree->SetBranchAddress("isotropy_JERDown", &(this->isotropy_JERDown));
-    tree->SetBranchAddress("isotropy_JERUp", &(this->isotropy_JERUp));
-    tree->SetBranchAddress("isotropy_JESDown", &(this->isotropy_JESDown));
-    tree->SetBranchAddress("isotropy_JESUp", &(this->isotropy_JESUp));
     tree->SetBranchAddress("json", &(this->json));
     tree->SetBranchAddress("lumi", &(this->lumi));
     tree->SetBranchAddress("mass_drpair_btag", &(this->mass_drpair_btag));
-    tree->SetBranchAddress("mass_drpair_btag_JERDown", &(this->mass_drpair_btag_JERDown));
-    tree->SetBranchAddress("mass_drpair_btag_JERUp", &(this->mass_drpair_btag_JERUp));
-    tree->SetBranchAddress("mass_drpair_btag_JESDown", &(this->mass_drpair_btag_JESDown));
-    tree->SetBranchAddress("mass_drpair_btag_JESUp", &(this->mass_drpair_btag_JESUp));
     tree->SetBranchAddress("mean_bdisc", &(this->mean_bdisc));
-    tree->SetBranchAddress("mean_bdisc_JERDown", &(this->mean_bdisc_JERDown));
-    tree->SetBranchAddress("mean_bdisc_JERUp", &(this->mean_bdisc_JERUp));
-    tree->SetBranchAddress("mean_bdisc_JESDown", &(this->mean_bdisc_JESDown));
-    tree->SetBranchAddress("mean_bdisc_JESUp", &(this->mean_bdisc_JESUp));
     tree->SetBranchAddress("mean_bdisc_btag", &(this->mean_bdisc_btag));
-    tree->SetBranchAddress("mean_bdisc_btag_JERDown", &(this->mean_bdisc_btag_JERDown));
-    tree->SetBranchAddress("mean_bdisc_btag_JERUp", &(this->mean_bdisc_btag_JERUp));
-    tree->SetBranchAddress("mean_bdisc_btag_JESDown", &(this->mean_bdisc_btag_JESDown));
-    tree->SetBranchAddress("mean_bdisc_btag_JESUp", &(this->mean_bdisc_btag_JESUp));
     tree->SetBranchAddress("mean_dr_btag", &(this->mean_dr_btag));
-    tree->SetBranchAddress("mean_dr_btag_JERDown", &(this->mean_dr_btag_JERDown));
-    tree->SetBranchAddress("mean_dr_btag_JERUp", &(this->mean_dr_btag_JERUp));
-    tree->SetBranchAddress("mean_dr_btag_JESDown", &(this->mean_dr_btag_JESDown));
-    tree->SetBranchAddress("mean_dr_btag_JESUp", &(this->mean_dr_btag_JESUp));
     tree->SetBranchAddress("min_dr_btag", &(this->min_dr_btag));
-    tree->SetBranchAddress("min_dr_btag_JERDown", &(this->min_dr_btag_JERDown));
-    tree->SetBranchAddress("min_dr_btag_JERUp", &(this->min_dr_btag_JERUp));
-    tree->SetBranchAddress("min_dr_btag_JESDown", &(this->min_dr_btag_JESDown));
-    tree->SetBranchAddress("min_dr_btag_JESUp", &(this->min_dr_btag_JESUp));
     tree->SetBranchAddress("momentum_eig0", &(this->momentum_eig0));
-    tree->SetBranchAddress("momentum_eig0_JERDown", &(this->momentum_eig0_JERDown));
-    tree->SetBranchAddress("momentum_eig0_JERUp", &(this->momentum_eig0_JERUp));
-    tree->SetBranchAddress("momentum_eig0_JESDown", &(this->momentum_eig0_JESDown));
-    tree->SetBranchAddress("momentum_eig0_JESUp", &(this->momentum_eig0_JESUp));
     tree->SetBranchAddress("momentum_eig1", &(this->momentum_eig1));
-    tree->SetBranchAddress("momentum_eig1_JERDown", &(this->momentum_eig1_JERDown));
-    tree->SetBranchAddress("momentum_eig1_JERUp", &(this->momentum_eig1_JERUp));
-    tree->SetBranchAddress("momentum_eig1_JESDown", &(this->momentum_eig1_JESDown));
-    tree->SetBranchAddress("momentum_eig1_JESUp", &(this->momentum_eig1_JESUp));
     tree->SetBranchAddress("momentum_eig2", &(this->momentum_eig2));
-    tree->SetBranchAddress("momentum_eig2_JERDown", &(this->momentum_eig2_JERDown));
-    tree->SetBranchAddress("momentum_eig2_JERUp", &(this->momentum_eig2_JERUp));
-    tree->SetBranchAddress("momentum_eig2_JESDown", &(this->momentum_eig2_JESDown));
-    tree->SetBranchAddress("momentum_eig2_JESUp", &(this->momentum_eig2_JESUp));
     tree->SetBranchAddress("nBCMVAL", &(this->nBCMVAL));
-    tree->SetBranchAddress("nBCMVAL_JERDown", &(this->nBCMVAL_JERDown));
-    tree->SetBranchAddress("nBCMVAL_JERUp", &(this->nBCMVAL_JERUp));
-    tree->SetBranchAddress("nBCMVAL_JESDown", &(this->nBCMVAL_JESDown));
-    tree->SetBranchAddress("nBCMVAL_JESUp", &(this->nBCMVAL_JESUp));
     tree->SetBranchAddress("nBCMVAM", &(this->nBCMVAM));
-    tree->SetBranchAddress("nBCMVAM_JERDown", &(this->nBCMVAM_JERDown));
-    tree->SetBranchAddress("nBCMVAM_JERUp", &(this->nBCMVAM_JERUp));
-    tree->SetBranchAddress("nBCMVAM_JESDown", &(this->nBCMVAM_JESDown));
-    tree->SetBranchAddress("nBCMVAM_JESUp", &(this->nBCMVAM_JESUp));
     tree->SetBranchAddress("nBCMVAT", &(this->nBCMVAT));
-    tree->SetBranchAddress("nBCMVAT_JERDown", &(this->nBCMVAT_JERDown));
-    tree->SetBranchAddress("nBCMVAT_JERUp", &(this->nBCMVAT_JERUp));
-    tree->SetBranchAddress("nBCMVAT_JESDown", &(this->nBCMVAT_JESDown));
-    tree->SetBranchAddress("nBCMVAT_JESUp", &(this->nBCMVAT_JESUp));
     tree->SetBranchAddress("nBCSVL", &(this->nBCSVL));
-    tree->SetBranchAddress("nBCSVL_JERDown", &(this->nBCSVL_JERDown));
-    tree->SetBranchAddress("nBCSVL_JERUp", &(this->nBCSVL_JERUp));
-    tree->SetBranchAddress("nBCSVL_JESDown", &(this->nBCSVL_JESDown));
-    tree->SetBranchAddress("nBCSVL_JESUp", &(this->nBCSVL_JESUp));
     tree->SetBranchAddress("nBCSVM", &(this->nBCSVM));
-    tree->SetBranchAddress("nBCSVM_JERDown", &(this->nBCSVM_JERDown));
-    tree->SetBranchAddress("nBCSVM_JERUp", &(this->nBCSVM_JERUp));
-    tree->SetBranchAddress("nBCSVM_JESDown", &(this->nBCSVM_JESDown));
-    tree->SetBranchAddress("nBCSVM_JESUp", &(this->nBCSVM_JESUp));
     tree->SetBranchAddress("nBCSVT", &(this->nBCSVT));
-    tree->SetBranchAddress("nBCSVT_JERDown", &(this->nBCSVT_JERDown));
-    tree->SetBranchAddress("nBCSVT_JERUp", &(this->nBCSVT_JERUp));
-    tree->SetBranchAddress("nBCSVT_JESDown", &(this->nBCSVT_JESDown));
-    tree->SetBranchAddress("nBCSVT_JESUp", &(this->nBCSVT_JESUp));
     tree->SetBranchAddress("nGenBHiggs", &(this->nGenBHiggs));
     tree->SetBranchAddress("nGenBTop", &(this->nGenBTop));
     tree->SetBranchAddress("nGenQW", &(this->nGenQW));
     tree->SetBranchAddress("nMatchSimB", &(this->nMatchSimB));
-    tree->SetBranchAddress("nMatchSimB_JERDown", &(this->nMatchSimB_JERDown));
-    tree->SetBranchAddress("nMatchSimB_JERUp", &(this->nMatchSimB_JERUp));
-    tree->SetBranchAddress("nMatchSimB_JESDown", &(this->nMatchSimB_JESDown));
-    tree->SetBranchAddress("nMatchSimB_JESUp", &(this->nMatchSimB_JESUp));
     tree->SetBranchAddress("nMatchSimC", &(this->nMatchSimC));
-    tree->SetBranchAddress("nMatchSimC_JERDown", &(this->nMatchSimC_JERDown));
-    tree->SetBranchAddress("nMatchSimC_JERUp", &(this->nMatchSimC_JERUp));
-    tree->SetBranchAddress("nMatchSimC_JESDown", &(this->nMatchSimC_JESDown));
-    tree->SetBranchAddress("nMatchSimC_JESUp", &(this->nMatchSimC_JESUp));
     tree->SetBranchAddress("nMatch_hb", &(this->nMatch_hb));
-    tree->SetBranchAddress("nMatch_hb_JERDown", &(this->nMatch_hb_JERDown));
-    tree->SetBranchAddress("nMatch_hb_JERUp", &(this->nMatch_hb_JERUp));
-    tree->SetBranchAddress("nMatch_hb_JESDown", &(this->nMatch_hb_JESDown));
-    tree->SetBranchAddress("nMatch_hb_JESUp", &(this->nMatch_hb_JESUp));
     tree->SetBranchAddress("nMatch_hb_btag", &(this->nMatch_hb_btag));
-    tree->SetBranchAddress("nMatch_hb_btag_JERDown", &(this->nMatch_hb_btag_JERDown));
-    tree->SetBranchAddress("nMatch_hb_btag_JERUp", &(this->nMatch_hb_btag_JERUp));
-    tree->SetBranchAddress("nMatch_hb_btag_JESDown", &(this->nMatch_hb_btag_JESDown));
-    tree->SetBranchAddress("nMatch_hb_btag_JESUp", &(this->nMatch_hb_btag_JESUp));
     tree->SetBranchAddress("nMatch_tb", &(this->nMatch_tb));
-    tree->SetBranchAddress("nMatch_tb_JERDown", &(this->nMatch_tb_JERDown));
-    tree->SetBranchAddress("nMatch_tb_JERUp", &(this->nMatch_tb_JERUp));
-    tree->SetBranchAddress("nMatch_tb_JESDown", &(this->nMatch_tb_JESDown));
-    tree->SetBranchAddress("nMatch_tb_JESUp", &(this->nMatch_tb_JESUp));
     tree->SetBranchAddress("nMatch_tb_btag", &(this->nMatch_tb_btag));
-    tree->SetBranchAddress("nMatch_tb_btag_JERDown", &(this->nMatch_tb_btag_JERDown));
-    tree->SetBranchAddress("nMatch_tb_btag_JERUp", &(this->nMatch_tb_btag_JERUp));
-    tree->SetBranchAddress("nMatch_tb_btag_JESDown", &(this->nMatch_tb_btag_JESDown));
-    tree->SetBranchAddress("nMatch_tb_btag_JESUp", &(this->nMatch_tb_btag_JESUp));
     tree->SetBranchAddress("nMatch_wq", &(this->nMatch_wq));
-    tree->SetBranchAddress("nMatch_wq_JERDown", &(this->nMatch_wq_JERDown));
-    tree->SetBranchAddress("nMatch_wq_JERUp", &(this->nMatch_wq_JERUp));
-    tree->SetBranchAddress("nMatch_wq_JESDown", &(this->nMatch_wq_JESDown));
-    tree->SetBranchAddress("nMatch_wq_JESUp", &(this->nMatch_wq_JESUp));
     tree->SetBranchAddress("nMatch_wq_btag", &(this->nMatch_wq_btag));
-    tree->SetBranchAddress("nMatch_wq_btag_JERDown", &(this->nMatch_wq_btag_JERDown));
-    tree->SetBranchAddress("nMatch_wq_btag_JERUp", &(this->nMatch_wq_btag_JERUp));
-    tree->SetBranchAddress("nMatch_wq_btag_JESDown", &(this->nMatch_wq_btag_JESDown));
-    tree->SetBranchAddress("nMatch_wq_btag_JESUp", &(this->nMatch_wq_btag_JESUp));
     tree->SetBranchAddress("nPU0", &(this->nPU0));
     tree->SetBranchAddress("nPVs", &(this->nPVs));
     tree->SetBranchAddress("nSelected_hb", &(this->nSelected_hb));
-    tree->SetBranchAddress("nSelected_hb_JERDown", &(this->nSelected_hb_JERDown));
-    tree->SetBranchAddress("nSelected_hb_JERUp", &(this->nSelected_hb_JERUp));
-    tree->SetBranchAddress("nSelected_hb_JESDown", &(this->nSelected_hb_JESDown));
-    tree->SetBranchAddress("nSelected_hb_JESUp", &(this->nSelected_hb_JESUp));
     tree->SetBranchAddress("nSelected_tb", &(this->nSelected_tb));
-    tree->SetBranchAddress("nSelected_tb_JERDown", &(this->nSelected_tb_JERDown));
-    tree->SetBranchAddress("nSelected_tb_JERUp", &(this->nSelected_tb_JERUp));
-    tree->SetBranchAddress("nSelected_tb_JESDown", &(this->nSelected_tb_JESDown));
-    tree->SetBranchAddress("nSelected_tb_JESUp", &(this->nSelected_tb_JESUp));
     tree->SetBranchAddress("nSelected_wq", &(this->nSelected_wq));
-    tree->SetBranchAddress("nSelected_wq_JERDown", &(this->nSelected_wq_JERDown));
-    tree->SetBranchAddress("nSelected_wq_JERUp", &(this->nSelected_wq_JERUp));
-    tree->SetBranchAddress("nSelected_wq_JESDown", &(this->nSelected_wq_JESDown));
-    tree->SetBranchAddress("nSelected_wq_JESUp", &(this->nSelected_wq_JESUp));
     tree->SetBranchAddress("nTrueInt", &(this->nTrueInt));
     tree->SetBranchAddress("n_bjets", &(this->n_bjets));
     tree->SetBranchAddress("n_boosted_bjets", &(this->n_boosted_bjets));
@@ -1857,113 +1662,32 @@ public:
     tree->SetBranchAddress("n_excluded_ljets", &(this->n_excluded_ljets));
     tree->SetBranchAddress("n_ljets", &(this->n_ljets));
     tree->SetBranchAddress("numJets", &(this->numJets));
-    tree->SetBranchAddress("numJets_JERDown", &(this->numJets_JERDown));
-    tree->SetBranchAddress("numJets_JERUp", &(this->numJets_JERUp));
-    tree->SetBranchAddress("numJets_JESDown", &(this->numJets_JESDown));
-    tree->SetBranchAddress("numJets_JESUp", &(this->numJets_JESUp));
     tree->SetBranchAddress("passPV", &(this->passPV));
     tree->SetBranchAddress("passes_btag", &(this->passes_btag));
-    tree->SetBranchAddress("passes_btag_JERDown", &(this->passes_btag_JERDown));
-    tree->SetBranchAddress("passes_btag_JERUp", &(this->passes_btag_JERUp));
-    tree->SetBranchAddress("passes_btag_JESDown", &(this->passes_btag_JESDown));
-    tree->SetBranchAddress("passes_btag_JESUp", &(this->passes_btag_JESUp));
     tree->SetBranchAddress("passes_jet", &(this->passes_jet));
-    tree->SetBranchAddress("passes_jet_JERDown", &(this->passes_jet_JERDown));
-    tree->SetBranchAddress("passes_jet_JERUp", &(this->passes_jet_JERUp));
-    tree->SetBranchAddress("passes_jet_JESDown", &(this->passes_jet_JESDown));
-    tree->SetBranchAddress("passes_jet_JESUp", &(this->passes_jet_JESUp));
     tree->SetBranchAddress("passes_mem", &(this->passes_mem));
-    tree->SetBranchAddress("passes_mem_JERDown", &(this->passes_mem_JERDown));
-    tree->SetBranchAddress("passes_mem_JERUp", &(this->passes_mem_JERUp));
-    tree->SetBranchAddress("passes_mem_JESDown", &(this->passes_mem_JESDown));
-    tree->SetBranchAddress("passes_mem_JESUp", &(this->passes_mem_JESUp));
     tree->SetBranchAddress("pt_drpair_btag", &(this->pt_drpair_btag));
-    tree->SetBranchAddress("pt_drpair_btag_JERDown", &(this->pt_drpair_btag_JERDown));
-    tree->SetBranchAddress("pt_drpair_btag_JERUp", &(this->pt_drpair_btag_JERUp));
-    tree->SetBranchAddress("pt_drpair_btag_JESDown", &(this->pt_drpair_btag_JESDown));
-    tree->SetBranchAddress("pt_drpair_btag_JESUp", &(this->pt_drpair_btag_JESUp));
     tree->SetBranchAddress("puWeight", &(this->puWeight));
     tree->SetBranchAddress("qg_LR_flavour_4q_0q", &(this->qg_LR_flavour_4q_0q));
     tree->SetBranchAddress("qg_LR_flavour_4q_0q_1q", &(this->qg_LR_flavour_4q_0q_1q));
     tree->SetBranchAddress("qg_LR_flavour_4q_0q_1q_2q", &(this->qg_LR_flavour_4q_0q_1q_2q));
     tree->SetBranchAddress("qg_LR_flavour_4q_0q_1q_2q_3q", &(this->qg_LR_flavour_4q_0q_1q_2q_3q));
-    tree->SetBranchAddress("qg_LR_flavour_4q_0q_1q_2q_3q_JERDown", &(this->qg_LR_flavour_4q_0q_1q_2q_3q_JERDown));
-    tree->SetBranchAddress("qg_LR_flavour_4q_0q_1q_2q_3q_JERUp", &(this->qg_LR_flavour_4q_0q_1q_2q_3q_JERUp));
-    tree->SetBranchAddress("qg_LR_flavour_4q_0q_1q_2q_3q_JESDown", &(this->qg_LR_flavour_4q_0q_1q_2q_3q_JESDown));
-    tree->SetBranchAddress("qg_LR_flavour_4q_0q_1q_2q_3q_JESUp", &(this->qg_LR_flavour_4q_0q_1q_2q_3q_JESUp));
-    tree->SetBranchAddress("qg_LR_flavour_4q_0q_1q_2q_JERDown", &(this->qg_LR_flavour_4q_0q_1q_2q_JERDown));
-    tree->SetBranchAddress("qg_LR_flavour_4q_0q_1q_2q_JERUp", &(this->qg_LR_flavour_4q_0q_1q_2q_JERUp));
-    tree->SetBranchAddress("qg_LR_flavour_4q_0q_1q_2q_JESDown", &(this->qg_LR_flavour_4q_0q_1q_2q_JESDown));
-    tree->SetBranchAddress("qg_LR_flavour_4q_0q_1q_2q_JESUp", &(this->qg_LR_flavour_4q_0q_1q_2q_JESUp));
-    tree->SetBranchAddress("qg_LR_flavour_4q_0q_1q_JERDown", &(this->qg_LR_flavour_4q_0q_1q_JERDown));
-    tree->SetBranchAddress("qg_LR_flavour_4q_0q_1q_JERUp", &(this->qg_LR_flavour_4q_0q_1q_JERUp));
-    tree->SetBranchAddress("qg_LR_flavour_4q_0q_1q_JESDown", &(this->qg_LR_flavour_4q_0q_1q_JESDown));
-    tree->SetBranchAddress("qg_LR_flavour_4q_0q_1q_JESUp", &(this->qg_LR_flavour_4q_0q_1q_JESUp));
-    tree->SetBranchAddress("qg_LR_flavour_4q_0q_JERDown", &(this->qg_LR_flavour_4q_0q_JERDown));
-    tree->SetBranchAddress("qg_LR_flavour_4q_0q_JERUp", &(this->qg_LR_flavour_4q_0q_JERUp));
-    tree->SetBranchAddress("qg_LR_flavour_4q_0q_JESDown", &(this->qg_LR_flavour_4q_0q_JESDown));
-    tree->SetBranchAddress("qg_LR_flavour_4q_0q_JESUp", &(this->qg_LR_flavour_4q_0q_JESUp));
     tree->SetBranchAddress("qg_LR_flavour_4q_1q", &(this->qg_LR_flavour_4q_1q));
     tree->SetBranchAddress("qg_LR_flavour_4q_1q_2q", &(this->qg_LR_flavour_4q_1q_2q));
     tree->SetBranchAddress("qg_LR_flavour_4q_1q_2q_3q", &(this->qg_LR_flavour_4q_1q_2q_3q));
-    tree->SetBranchAddress("qg_LR_flavour_4q_1q_2q_3q_JERDown", &(this->qg_LR_flavour_4q_1q_2q_3q_JERDown));
-    tree->SetBranchAddress("qg_LR_flavour_4q_1q_2q_3q_JERUp", &(this->qg_LR_flavour_4q_1q_2q_3q_JERUp));
-    tree->SetBranchAddress("qg_LR_flavour_4q_1q_2q_3q_JESDown", &(this->qg_LR_flavour_4q_1q_2q_3q_JESDown));
-    tree->SetBranchAddress("qg_LR_flavour_4q_1q_2q_3q_JESUp", &(this->qg_LR_flavour_4q_1q_2q_3q_JESUp));
-    tree->SetBranchAddress("qg_LR_flavour_4q_1q_2q_JERDown", &(this->qg_LR_flavour_4q_1q_2q_JERDown));
-    tree->SetBranchAddress("qg_LR_flavour_4q_1q_2q_JERUp", &(this->qg_LR_flavour_4q_1q_2q_JERUp));
-    tree->SetBranchAddress("qg_LR_flavour_4q_1q_2q_JESDown", &(this->qg_LR_flavour_4q_1q_2q_JESDown));
-    tree->SetBranchAddress("qg_LR_flavour_4q_1q_2q_JESUp", &(this->qg_LR_flavour_4q_1q_2q_JESUp));
-    tree->SetBranchAddress("qg_LR_flavour_4q_1q_JERDown", &(this->qg_LR_flavour_4q_1q_JERDown));
-    tree->SetBranchAddress("qg_LR_flavour_4q_1q_JERUp", &(this->qg_LR_flavour_4q_1q_JERUp));
-    tree->SetBranchAddress("qg_LR_flavour_4q_1q_JESDown", &(this->qg_LR_flavour_4q_1q_JESDown));
-    tree->SetBranchAddress("qg_LR_flavour_4q_1q_JESUp", &(this->qg_LR_flavour_4q_1q_JESUp));
     tree->SetBranchAddress("qg_LR_flavour_4q_2q", &(this->qg_LR_flavour_4q_2q));
     tree->SetBranchAddress("qg_LR_flavour_4q_2q_3q", &(this->qg_LR_flavour_4q_2q_3q));
-    tree->SetBranchAddress("qg_LR_flavour_4q_2q_3q_JERDown", &(this->qg_LR_flavour_4q_2q_3q_JERDown));
-    tree->SetBranchAddress("qg_LR_flavour_4q_2q_3q_JERUp", &(this->qg_LR_flavour_4q_2q_3q_JERUp));
-    tree->SetBranchAddress("qg_LR_flavour_4q_2q_3q_JESDown", &(this->qg_LR_flavour_4q_2q_3q_JESDown));
-    tree->SetBranchAddress("qg_LR_flavour_4q_2q_3q_JESUp", &(this->qg_LR_flavour_4q_2q_3q_JESUp));
-    tree->SetBranchAddress("qg_LR_flavour_4q_2q_JERDown", &(this->qg_LR_flavour_4q_2q_JERDown));
-    tree->SetBranchAddress("qg_LR_flavour_4q_2q_JERUp", &(this->qg_LR_flavour_4q_2q_JERUp));
-    tree->SetBranchAddress("qg_LR_flavour_4q_2q_JESDown", &(this->qg_LR_flavour_4q_2q_JESDown));
-    tree->SetBranchAddress("qg_LR_flavour_4q_2q_JESUp", &(this->qg_LR_flavour_4q_2q_JESUp));
     tree->SetBranchAddress("qg_LR_flavour_4q_3q", &(this->qg_LR_flavour_4q_3q));
-    tree->SetBranchAddress("qg_LR_flavour_4q_3q_JERDown", &(this->qg_LR_flavour_4q_3q_JERDown));
-    tree->SetBranchAddress("qg_LR_flavour_4q_3q_JERUp", &(this->qg_LR_flavour_4q_3q_JERUp));
-    tree->SetBranchAddress("qg_LR_flavour_4q_3q_JESDown", &(this->qg_LR_flavour_4q_3q_JESDown));
-    tree->SetBranchAddress("qg_LR_flavour_4q_3q_JESUp", &(this->qg_LR_flavour_4q_3q_JESUp));
     tree->SetBranchAddress("rho", &(this->rho));
     tree->SetBranchAddress("run", &(this->run));
     tree->SetBranchAddress("sphericity", &(this->sphericity));
-    tree->SetBranchAddress("sphericity_JERDown", &(this->sphericity_JERDown));
-    tree->SetBranchAddress("sphericity_JERUp", &(this->sphericity_JERUp));
-    tree->SetBranchAddress("sphericity_JESDown", &(this->sphericity_JESDown));
-    tree->SetBranchAddress("sphericity_JESUp", &(this->sphericity_JESUp));
     tree->SetBranchAddress("std_bdisc", &(this->std_bdisc));
-    tree->SetBranchAddress("std_bdisc_JERDown", &(this->std_bdisc_JERDown));
-    tree->SetBranchAddress("std_bdisc_JERUp", &(this->std_bdisc_JERUp));
-    tree->SetBranchAddress("std_bdisc_JESDown", &(this->std_bdisc_JESDown));
-    tree->SetBranchAddress("std_bdisc_JESUp", &(this->std_bdisc_JESUp));
     tree->SetBranchAddress("std_bdisc_btag", &(this->std_bdisc_btag));
-    tree->SetBranchAddress("std_bdisc_btag_JERDown", &(this->std_bdisc_btag_JERDown));
-    tree->SetBranchAddress("std_bdisc_btag_JERUp", &(this->std_bdisc_btag_JERUp));
-    tree->SetBranchAddress("std_bdisc_btag_JESDown", &(this->std_bdisc_btag_JESDown));
-    tree->SetBranchAddress("std_bdisc_btag_JESUp", &(this->std_bdisc_btag_JESUp));
     tree->SetBranchAddress("std_dr_btag", &(this->std_dr_btag));
-    tree->SetBranchAddress("std_dr_btag_JERDown", &(this->std_dr_btag_JERDown));
-    tree->SetBranchAddress("std_dr_btag_JERUp", &(this->std_dr_btag_JERUp));
-    tree->SetBranchAddress("std_dr_btag_JESDown", &(this->std_dr_btag_JESDown));
-    tree->SetBranchAddress("std_dr_btag_JESUp", &(this->std_dr_btag_JESUp));
     tree->SetBranchAddress("triggerBitmask", &(this->triggerBitmask));
     tree->SetBranchAddress("triggerDecision", &(this->triggerDecision));
     tree->SetBranchAddress("ttCls", &(this->ttCls));
     tree->SetBranchAddress("tth_mva", &(this->tth_mva));
-    tree->SetBranchAddress("tth_mva_JERDown", &(this->tth_mva_JERDown));
-    tree->SetBranchAddress("tth_mva_JERUp", &(this->tth_mva_JERUp));
-    tree->SetBranchAddress("tth_mva_JESDown", &(this->tth_mva_JESDown));
-    tree->SetBranchAddress("tth_mva_JESUp", &(this->tth_mva_JESUp));
-    tree->SetBranchAddress("weight_xs", &(this->weight_xs));
     tree->SetBranchAddress("xsec", &(this->xsec));
   } //loadTree
   void init() {
@@ -1973,30 +1697,6 @@ public:
     for (int i=0; i < 1; i++) { this->common_mem_blr_4b[i] = 0; }
     for (int i=0; i < 1; i++) { this->common_mem_blr_2b[i] = 0; }
     for (int i=0; i < 1; i++) { this->common_mem_p_sig[i] = 0; }
-    this->ncommon_mem_JERDown = 0;
-    for (int i=0; i < 1; i++) { this->common_mem_JERDown_p_bkg[i] = 0; }
-    for (int i=0; i < 1; i++) { this->common_mem_JERDown_p[i] = 0; }
-    for (int i=0; i < 1; i++) { this->common_mem_JERDown_blr_4b[i] = 0; }
-    for (int i=0; i < 1; i++) { this->common_mem_JERDown_blr_2b[i] = 0; }
-    for (int i=0; i < 1; i++) { this->common_mem_JERDown_p_sig[i] = 0; }
-    this->ncommon_mem_JERUp = 0;
-    for (int i=0; i < 1; i++) { this->common_mem_JERUp_p_bkg[i] = 0; }
-    for (int i=0; i < 1; i++) { this->common_mem_JERUp_p[i] = 0; }
-    for (int i=0; i < 1; i++) { this->common_mem_JERUp_blr_4b[i] = 0; }
-    for (int i=0; i < 1; i++) { this->common_mem_JERUp_blr_2b[i] = 0; }
-    for (int i=0; i < 1; i++) { this->common_mem_JERUp_p_sig[i] = 0; }
-    this->ncommon_mem_JESDown = 0;
-    for (int i=0; i < 1; i++) { this->common_mem_JESDown_p_bkg[i] = 0; }
-    for (int i=0; i < 1; i++) { this->common_mem_JESDown_p[i] = 0; }
-    for (int i=0; i < 1; i++) { this->common_mem_JESDown_blr_4b[i] = 0; }
-    for (int i=0; i < 1; i++) { this->common_mem_JESDown_blr_2b[i] = 0; }
-    for (int i=0; i < 1; i++) { this->common_mem_JESDown_p_sig[i] = 0; }
-    this->ncommon_mem_JESUp = 0;
-    for (int i=0; i < 1; i++) { this->common_mem_JESUp_p_bkg[i] = 0; }
-    for (int i=0; i < 1; i++) { this->common_mem_JESUp_p[i] = 0; }
-    for (int i=0; i < 1; i++) { this->common_mem_JESUp_blr_4b[i] = 0; }
-    for (int i=0; i < 1; i++) { this->common_mem_JESUp_blr_2b[i] = 0; }
-    for (int i=0; i < 1; i++) { this->common_mem_JESUp_p_sig[i] = 0; }
     this->nfatjets = 0;
     for (int i=0; i < 4; i++) { this->fatjets_phi[i] = 0; }
     for (int i=0; i < 4; i++) { this->fatjets_pt[i] = 0; }
@@ -2008,34 +1708,10 @@ public:
     for (int i=0; i < 4; i++) { this->fatjets_bbtag[i] = 0; }
     this->nfw_aj = 0;
     for (int i=0; i < 8; i++) { this->fw_aj_fw_h_alljets_nominal[i] = 0; }
-    this->nfw_aj_JERDown = 0;
-    for (int i=0; i < 8; i++) { this->fw_aj_JERDown_fw_h_alljets_JERDown[i] = 0; }
-    this->nfw_aj_JERUp = 0;
-    for (int i=0; i < 8; i++) { this->fw_aj_JERUp_fw_h_alljets_JERUp[i] = 0; }
-    this->nfw_aj_JESDown = 0;
-    for (int i=0; i < 8; i++) { this->fw_aj_JESDown_fw_h_alljets_JESDown[i] = 0; }
-    this->nfw_aj_JESUp = 0;
-    for (int i=0; i < 8; i++) { this->fw_aj_JESUp_fw_h_alljets_JESUp[i] = 0; }
     this->nfw_bj = 0;
     for (int i=0; i < 8; i++) { this->fw_bj_fw_h_btagjets_nominal[i] = 0; }
-    this->nfw_bj_JERDown = 0;
-    for (int i=0; i < 8; i++) { this->fw_bj_JERDown_fw_h_btagjets_JERDown[i] = 0; }
-    this->nfw_bj_JERUp = 0;
-    for (int i=0; i < 8; i++) { this->fw_bj_JERUp_fw_h_btagjets_JERUp[i] = 0; }
-    this->nfw_bj_JESDown = 0;
-    for (int i=0; i < 8; i++) { this->fw_bj_JESDown_fw_h_btagjets_JESDown[i] = 0; }
-    this->nfw_bj_JESUp = 0;
-    for (int i=0; i < 8; i++) { this->fw_bj_JESUp_fw_h_btagjets_JESUp[i] = 0; }
     this->nfw_uj = 0;
     for (int i=0; i < 8; i++) { this->fw_uj_fw_h_untagjets_nominal[i] = 0; }
-    this->nfw_uj_JERDown = 0;
-    for (int i=0; i < 8; i++) { this->fw_uj_JERDown_fw_h_untagjets_JERDown[i] = 0; }
-    this->nfw_uj_JERUp = 0;
-    for (int i=0; i < 8; i++) { this->fw_uj_JERUp_fw_h_untagjets_JERUp[i] = 0; }
-    this->nfw_uj_JESDown = 0;
-    for (int i=0; i < 8; i++) { this->fw_uj_JESDown_fw_h_untagjets_JESDown[i] = 0; }
-    this->nfw_uj_JESUp = 0;
-    for (int i=0; i < 8; i++) { this->fw_uj_JESUp_fw_h_untagjets_JESUp[i] = 0; }
     this->ngenHiggs = 0;
     for (int i=0; i < 2; i++) { this->genHiggs_phi[i] = 0; }
     for (int i=0; i < 2; i++) { this->genHiggs_eta[i] = 0; }
@@ -2055,78 +1731,104 @@ public:
     for (int i=0; i < 2; i++) { this->genTopLep_pt[i] = 0; }
     for (int i=0; i < 2; i++) { this->genTopLep_decayMode[i] = 0; }
     this->nhiggsCandidate = 0;
-    for (int i=0; i < 4; i++) { this->higgsCandidate_sj1eta_softdropz2b1[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_sj1phi_pruned[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_sj2pt_softdrop[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_tau1[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj1eta_softdropfilt[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_mass_softdrop[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj2mass_pruned[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj2pt_pruned[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj2eta_softdropfilt[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj2pt_softdropfilt[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj2eta_softdropz2b1filt[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj2mass_softdropfilt[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj2mass_softdropz2b1filt[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj2eta_softdrop[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj2phi_pruned[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_mass_softdropfilt[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj1phi_softdrop[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj1eta_subjetfiltered[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_dr_top[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj1mass_softdropz2b1filt[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_n_subjettiness[i] = 0; }
     for (int i=0; i < 4; i++) { this->higgsCandidate_sj2eta_softdropz2b1[i] = 0; }
     for (int i=0; i < 4; i++) { this->higgsCandidate_dr_genHiggs[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_sj1pt_subjetfiltered[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_mass_softdrop[i] = 0; }
     for (int i=0; i < 4; i++) { this->higgsCandidate_sj3pt_subjetfiltered[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj2btag_softdropfilt[i] = 0; }
     for (int i=0; i < 4; i++) { this->higgsCandidate_sj2eta_pruned[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_sj2btag_softdrop[i] = 0; }
     for (int i=0; i < 4; i++) { this->higgsCandidate_sj2pt_subjetfiltered[i] = 0; }
     for (int i=0; i < 4; i++) { this->higgsCandidate_sj2mass_subjetfiltered[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj12masspt_subjetfiltered[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj1pt_subjetfiltered[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj2btag_softdropz2b1filt[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj1pt_softdropfilt[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj1phi_softdropfilt[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj1mass_softdropz2b1[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_nallsubjets_softdropz2b1filt[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_dr_genTop[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_nallsubjets_pruned[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj1pt_softdropz2b1filt[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj3btag_subjetfiltered[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj2btag_subjetfiltered[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj1btag_softdrop[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_eta[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj1btag_softdropfilt[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_nallsubjets_softdropfilt[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj12massb_subjetfiltered[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj1phi_pruned[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj2pt_softdrop[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj3phi_subjetfiltered[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj2mass_softdrop[i] = 0; }
     for (int i=0; i < 4; i++) { this->higgsCandidate_sj1pt_pruned[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_sj3eta_subjetfiltered[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_mass_softdropz2b1filt[i] = 0; }
     for (int i=0; i < 4; i++) { this->higgsCandidate_sj1eta_pruned[i] = 0; }
     for (int i=0; i < 4; i++) { this->higgsCandidate_sj1phi_subjetfiltered[i] = 0; }
     for (int i=0; i < 4; i++) { this->higgsCandidate_mass_pruned[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_sj2pt_pruned[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_sj3mass_subjetfiltered[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_sj12masspt_subjetfiltered[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_sj1mass_subjetfiltered[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_pt[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj1eta_softdropz2b1filt[i] = 0; }
     for (int i=0; i < 4; i++) { this->higgsCandidate_nallsubjets_softdropz2b1[i] = 0; }
     for (int i=0; i < 4; i++) { this->higgsCandidate_sj1pt_softdrop[i] = 0; }
     for (int i=0; i < 4; i++) { this->higgsCandidate_tau2[i] = 0; }
     for (int i=0; i < 4; i++) { this->higgsCandidate_tau3[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_nallsubjets_subjetfiltered[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_sj1btag_pruned[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj3eta_subjetfiltered[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_tau1[i] = 0; }
     for (int i=0; i < 4; i++) { this->higgsCandidate_nallsubjets_softdrop[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_sj2phi_subjetfiltered[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_mass[i] = 0; }
     for (int i=0; i < 4; i++) { this->higgsCandidate_sj2btag_pruned[i] = 0; }
     for (int i=0; i < 4; i++) { this->higgsCandidate_sj1eta_softdrop[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_sj123masspt_subjetfiltered[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_sj2mass_pruned[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_phi[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_sj1mass_softdropz2b1[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_sj2pt_softdropz2b1[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj1btag_softdropz2b1filt[i] = 0; }
     for (int i=0; i < 4; i++) { this->higgsCandidate_sj2mass_softdropz2b1[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_sj2phi_softdrop[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_sj2eta_softdrop[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_sj2phi_pruned[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_dr_genTop[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_nallsubjets_pruned[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_nallsubjets_subjetfiltered[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj2pt_softdropz2b1[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj2pt_softdropz2b1filt[i] = 0; }
     for (int i=0; i < 4; i++) { this->higgsCandidate_sj2phi_softdropz2b1[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_sj2eta_subjetfiltered[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_bbtag[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_sj2btag_subjetfiltered[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_sj1phi_softdropz2b1[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_sj1phi_softdrop[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj2phi_softdropz2b1filt[i] = 0; }
     for (int i=0; i < 4; i++) { this->higgsCandidate_sj1mass_pruned[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_sj3btag_subjetfiltered[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_sj1btag_softdropz2b1[i] = 0; }
     for (int i=0; i < 4; i++) { this->higgsCandidate_sj1pt_softdropz2b1[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_sj1btag_softdrop[i] = 0; }
     for (int i=0; i < 4; i++) { this->higgsCandidate_sj1mass_softdrop[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_pt[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_sj3phi_subjetfiltered[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_sj1eta_subjetfiltered[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_dr_top[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_eta[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_n_subjettiness[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_sj2btag_softdropz2b1[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_sj12massb_subjetfiltered[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj1btag_softdropz2b1[i] = 0; }
     for (int i=0; i < 4; i++) { this->higgsCandidate_sj1btag_subjetfiltered[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj1eta_softdropz2b1[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj2eta_subjetfiltered[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_secondbtag_subjetfiltered[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj2btag_softdrop[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj2phi_softdropfilt[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj3mass_subjetfiltered[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj1mass_subjetfiltered[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj1btag_pruned[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj2phi_subjetfiltered[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj123masspt_subjetfiltered[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_phi[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj1mass_softdropfilt[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj2phi_softdrop[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj1phi_softdropz2b1[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj1phi_softdropz2b1filt[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_mass[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_sj2btag_softdropz2b1[i] = 0; }
+    for (int i=0; i < 4; i++) { this->higgsCandidate_bbtag[i] = 0; }
     for (int i=0; i < 4; i++) { this->higgsCandidate_mass_softdropz2b1[i] = 0; }
-    for (int i=0; i < 4; i++) { this->higgsCandidate_sj2mass_softdrop[i] = 0; }
     this->njets = 0;
     for (int i=0; i < 16; i++) { this->jets_mcPt[i] = 0; }
     for (int i=0; i < 16; i++) { this->jets_mcEta[i] = 0; }
     for (int i=0; i < 16; i++) { this->jets_btagCMVA[i] = 0; }
     for (int i=0; i < 16; i++) { this->jets_id[i] = 0; }
+    for (int i=0; i < 16; i++) { this->jets_btagFlag[i] = 0; }
     for (int i=0; i < 16; i++) { this->jets_pt[i] = 0; }
     for (int i=0; i < 16; i++) { this->jets_corr_JERDown[i] = 0; }
     for (int i=0; i < 16; i++) { this->jets_qgl[i] = 0; }
@@ -2144,6 +1846,7 @@ public:
     for (int i=0; i < 16; i++) { this->jets_mcM[i] = 0; }
     for (int i=0; i < 16; i++) { this->jets_btagCSV[i] = 0; }
     for (int i=0; i < 16; i++) { this->jets_mcMatchId[i] = 0; }
+    for (int i=0; i < 16; i++) { this->jets_btagCMVA_log[i] = 0; }
     for (int i=0; i < 16; i++) { this->jets_mcNumBHadrons[i] = 0; }
     for (int i=0; i < 16; i++) { this->jets_eta[i] = 0; }
     for (int i=0; i < 16; i++) { this->jets_mass[i] = 0; }
@@ -2162,6 +1865,7 @@ public:
     for (int i=0; i < 6; i++) { this->loose_jets_mcEta[i] = 0; }
     for (int i=0; i < 6; i++) { this->loose_jets_btagCMVA[i] = 0; }
     for (int i=0; i < 6; i++) { this->loose_jets_id[i] = 0; }
+    for (int i=0; i < 6; i++) { this->loose_jets_btagFlag[i] = 0; }
     for (int i=0; i < 6; i++) { this->loose_jets_pt[i] = 0; }
     for (int i=0; i < 6; i++) { this->loose_jets_corr_JERDown[i] = 0; }
     for (int i=0; i < 6; i++) { this->loose_jets_qgl[i] = 0; }
@@ -2179,106 +1883,176 @@ public:
     for (int i=0; i < 6; i++) { this->loose_jets_mcM[i] = 0; }
     for (int i=0; i < 6; i++) { this->loose_jets_btagCSV[i] = 0; }
     for (int i=0; i < 6; i++) { this->loose_jets_mcMatchId[i] = 0; }
+    for (int i=0; i < 6; i++) { this->loose_jets_btagCMVA_log[i] = 0; }
     for (int i=0; i < 6; i++) { this->loose_jets_mcNumBHadrons[i] = 0; }
     for (int i=0; i < 6; i++) { this->loose_jets_eta[i] = 0; }
     for (int i=0; i < 6; i++) { this->loose_jets_mass[i] = 0; }
     for (int i=0; i < 6; i++) { this->loose_jets_mcFlavour[i] = 0; }
-    this->nmem_ttbb = 0;
-    for (int i=0; i < 17; i++) { this->mem_ttbb_p[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_ttbb_chi2[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_ttbb_p_err[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_ttbb_efficiency[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_ttbb_nperm[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_ttbb_time[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_ttbb_error_code[i] = 0; }
-    this->nmem_ttbb_JERDown = 0;
-    for (int i=0; i < 17; i++) { this->mem_ttbb_JERDown_p[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_ttbb_JERDown_chi2[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_ttbb_JERDown_p_err[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_ttbb_JERDown_efficiency[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_ttbb_JERDown_nperm[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_ttbb_JERDown_time[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_ttbb_JERDown_error_code[i] = 0; }
-    this->nmem_ttbb_JERUp = 0;
-    for (int i=0; i < 17; i++) { this->mem_ttbb_JERUp_p[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_ttbb_JERUp_chi2[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_ttbb_JERUp_p_err[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_ttbb_JERUp_efficiency[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_ttbb_JERUp_nperm[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_ttbb_JERUp_time[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_ttbb_JERUp_error_code[i] = 0; }
-    this->nmem_ttbb_JESDown = 0;
-    for (int i=0; i < 17; i++) { this->mem_ttbb_JESDown_p[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_ttbb_JESDown_chi2[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_ttbb_JESDown_p_err[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_ttbb_JESDown_efficiency[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_ttbb_JESDown_nperm[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_ttbb_JESDown_time[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_ttbb_JESDown_error_code[i] = 0; }
-    this->nmem_ttbb_JESUp = 0;
-    for (int i=0; i < 17; i++) { this->mem_ttbb_JESUp_p[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_ttbb_JESUp_chi2[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_ttbb_JESUp_p_err[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_ttbb_JESUp_efficiency[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_ttbb_JESUp_nperm[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_ttbb_JESUp_time[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_ttbb_JESUp_error_code[i] = 0; }
-    this->nmem_tth = 0;
-    for (int i=0; i < 17; i++) { this->mem_tth_p[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_tth_chi2[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_tth_p_err[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_tth_efficiency[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_tth_nperm[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_tth_time[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_tth_error_code[i] = 0; }
-    this->nmem_tth_JERDown = 0;
-    for (int i=0; i < 17; i++) { this->mem_tth_JERDown_p[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_tth_JERDown_chi2[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_tth_JERDown_p_err[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_tth_JERDown_efficiency[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_tth_JERDown_nperm[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_tth_JERDown_time[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_tth_JERDown_error_code[i] = 0; }
-    this->nmem_tth_JERUp = 0;
-    for (int i=0; i < 17; i++) { this->mem_tth_JERUp_p[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_tth_JERUp_chi2[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_tth_JERUp_p_err[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_tth_JERUp_efficiency[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_tth_JERUp_nperm[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_tth_JERUp_time[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_tth_JERUp_error_code[i] = 0; }
-    this->nmem_tth_JESDown = 0;
-    for (int i=0; i < 17; i++) { this->mem_tth_JESDown_p[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_tth_JESDown_chi2[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_tth_JESDown_p_err[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_tth_JESDown_efficiency[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_tth_JESDown_nperm[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_tth_JESDown_time[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_tth_JESDown_error_code[i] = 0; }
-    this->nmem_tth_JESUp = 0;
-    for (int i=0; i < 17; i++) { this->mem_tth_JESUp_p[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_tth_JESUp_chi2[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_tth_JESUp_p_err[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_tth_JESUp_efficiency[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_tth_JESUp_nperm[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_tth_JESUp_time[i] = 0; }
-    for (int i=0; i < 17; i++) { this->mem_tth_JESUp_error_code[i] = 0; }
+    this->nmem_ttbb_DL_0w2h2t_perm = 0;
+    for (int i=0; i < 50; i++) { this->mem_ttbb_DL_0w2h2t_perm_p_me_mean[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_DL_0w2h2t_perm_p_tf_std[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_DL_0w2h2t_perm_idx[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_DL_0w2h2t_perm_p_std[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_DL_0w2h2t_perm_p_mean[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_DL_0w2h2t_perm_perm_5[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_DL_0w2h2t_perm_perm_4[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_DL_0w2h2t_perm_perm_7[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_DL_0w2h2t_perm_perm_6[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_DL_0w2h2t_perm_perm_1[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_DL_0w2h2t_perm_perm_0[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_DL_0w2h2t_perm_perm_3[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_DL_0w2h2t_perm_perm_2[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_DL_0w2h2t_perm_p_tf_mean[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_DL_0w2h2t_perm_p_me_std[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_DL_0w2h2t_perm_perm_9[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_DL_0w2h2t_perm_perm_8[i] = 0; }
+    this->nmem_ttbb_SL_0w2h2t_perm = 0;
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_0w2h2t_perm_p_me_mean[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_0w2h2t_perm_p_tf_std[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_0w2h2t_perm_idx[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_0w2h2t_perm_p_std[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_0w2h2t_perm_p_mean[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_0w2h2t_perm_perm_5[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_0w2h2t_perm_perm_4[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_0w2h2t_perm_perm_7[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_0w2h2t_perm_perm_6[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_0w2h2t_perm_perm_1[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_0w2h2t_perm_perm_0[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_0w2h2t_perm_perm_3[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_0w2h2t_perm_perm_2[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_0w2h2t_perm_p_tf_mean[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_0w2h2t_perm_p_me_std[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_0w2h2t_perm_perm_9[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_0w2h2t_perm_perm_8[i] = 0; }
+    this->nmem_ttbb_SL_1w2h2t_perm = 0;
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_1w2h2t_perm_p_me_mean[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_1w2h2t_perm_p_tf_std[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_1w2h2t_perm_idx[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_1w2h2t_perm_p_std[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_1w2h2t_perm_p_mean[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_1w2h2t_perm_perm_5[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_1w2h2t_perm_perm_4[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_1w2h2t_perm_perm_7[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_1w2h2t_perm_perm_6[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_1w2h2t_perm_perm_1[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_1w2h2t_perm_perm_0[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_1w2h2t_perm_perm_3[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_1w2h2t_perm_perm_2[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_1w2h2t_perm_p_tf_mean[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_1w2h2t_perm_p_me_std[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_1w2h2t_perm_perm_9[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_1w2h2t_perm_perm_8[i] = 0; }
+    this->nmem_ttbb_SL_2w2h2t_perm = 0;
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_2w2h2t_perm_p_me_mean[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_2w2h2t_perm_p_tf_std[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_2w2h2t_perm_idx[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_2w2h2t_perm_p_std[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_2w2h2t_perm_p_mean[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_2w2h2t_perm_perm_5[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_2w2h2t_perm_perm_4[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_2w2h2t_perm_perm_7[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_2w2h2t_perm_perm_6[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_2w2h2t_perm_perm_1[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_2w2h2t_perm_perm_0[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_2w2h2t_perm_perm_3[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_2w2h2t_perm_perm_2[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_2w2h2t_perm_p_tf_mean[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_2w2h2t_perm_p_me_std[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_2w2h2t_perm_perm_9[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_ttbb_SL_2w2h2t_perm_perm_8[i] = 0; }
+    this->nmem_tth_DL_0w2h2t_perm = 0;
+    for (int i=0; i < 50; i++) { this->mem_tth_DL_0w2h2t_perm_p_me_mean[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_DL_0w2h2t_perm_p_tf_std[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_DL_0w2h2t_perm_idx[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_DL_0w2h2t_perm_p_std[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_DL_0w2h2t_perm_p_mean[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_DL_0w2h2t_perm_perm_5[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_DL_0w2h2t_perm_perm_4[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_DL_0w2h2t_perm_perm_7[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_DL_0w2h2t_perm_perm_6[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_DL_0w2h2t_perm_perm_1[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_DL_0w2h2t_perm_perm_0[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_DL_0w2h2t_perm_perm_3[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_DL_0w2h2t_perm_perm_2[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_DL_0w2h2t_perm_p_tf_mean[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_DL_0w2h2t_perm_p_me_std[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_DL_0w2h2t_perm_perm_9[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_DL_0w2h2t_perm_perm_8[i] = 0; }
+    this->nmem_tth_SL_0w2h2t_perm = 0;
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_0w2h2t_perm_p_me_mean[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_0w2h2t_perm_p_tf_std[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_0w2h2t_perm_idx[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_0w2h2t_perm_p_std[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_0w2h2t_perm_p_mean[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_0w2h2t_perm_perm_5[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_0w2h2t_perm_perm_4[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_0w2h2t_perm_perm_7[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_0w2h2t_perm_perm_6[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_0w2h2t_perm_perm_1[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_0w2h2t_perm_perm_0[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_0w2h2t_perm_perm_3[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_0w2h2t_perm_perm_2[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_0w2h2t_perm_p_tf_mean[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_0w2h2t_perm_p_me_std[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_0w2h2t_perm_perm_9[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_0w2h2t_perm_perm_8[i] = 0; }
+    this->nmem_tth_SL_1w2h2t_perm = 0;
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_1w2h2t_perm_p_me_mean[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_1w2h2t_perm_p_tf_std[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_1w2h2t_perm_idx[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_1w2h2t_perm_p_std[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_1w2h2t_perm_p_mean[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_1w2h2t_perm_perm_5[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_1w2h2t_perm_perm_4[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_1w2h2t_perm_perm_7[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_1w2h2t_perm_perm_6[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_1w2h2t_perm_perm_1[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_1w2h2t_perm_perm_0[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_1w2h2t_perm_perm_3[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_1w2h2t_perm_perm_2[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_1w2h2t_perm_p_tf_mean[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_1w2h2t_perm_p_me_std[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_1w2h2t_perm_perm_9[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_1w2h2t_perm_perm_8[i] = 0; }
+    this->nmem_tth_SL_2w2h2t_perm = 0;
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_2w2h2t_perm_p_me_mean[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_2w2h2t_perm_p_tf_std[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_2w2h2t_perm_idx[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_2w2h2t_perm_p_std[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_2w2h2t_perm_p_mean[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_2w2h2t_perm_perm_5[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_2w2h2t_perm_perm_4[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_2w2h2t_perm_perm_7[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_2w2h2t_perm_perm_6[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_2w2h2t_perm_perm_1[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_2w2h2t_perm_perm_0[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_2w2h2t_perm_perm_3[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_2w2h2t_perm_perm_2[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_2w2h2t_perm_p_tf_mean[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_2w2h2t_perm_p_me_std[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_2w2h2t_perm_perm_9[i] = 0; }
+    for (int i=0; i < 50; i++) { this->mem_tth_SL_2w2h2t_perm_perm_8[i] = 0; }
     this->nothertopCandidate = 0;
     for (int i=0; i < 4; i++) { this->othertopCandidate_tau1[i] = 0; }
     for (int i=0; i < 4; i++) { this->othertopCandidate_etacal[i] = 0; }
     for (int i=0; i < 4; i++) { this->othertopCandidate_sjW2btag[i] = 0; }
     for (int i=0; i < 4; i++) { this->othertopCandidate_n_subjettiness_groomed[i] = 0; }
     for (int i=0; i < 4; i++) { this->othertopCandidate_sjW2pt[i] = 0; }
+    for (int i=0; i < 4; i++) { this->othertopCandidate_sjW1ptcal[i] = 0; }
     for (int i=0; i < 4; i++) { this->othertopCandidate_sjW1btag[i] = 0; }
     for (int i=0; i < 4; i++) { this->othertopCandidate_sjW1mass[i] = 0; }
     for (int i=0; i < 4; i++) { this->othertopCandidate_sjNonWmass[i] = 0; }
+    for (int i=0; i < 4; i++) { this->othertopCandidate_sjNonWptcal[i] = 0; }
     for (int i=0; i < 4; i++) { this->othertopCandidate_sjNonWeta[i] = 0; }
     for (int i=0; i < 4; i++) { this->othertopCandidate_pt[i] = 0; }
+    for (int i=0; i < 4; i++) { this->othertopCandidate_sjW2masscal[i] = 0; }
     for (int i=0; i < 4; i++) { this->othertopCandidate_ptForRoptCalc[i] = 0; }
     for (int i=0; i < 4; i++) { this->othertopCandidate_tau2[i] = 0; }
     for (int i=0; i < 4; i++) { this->othertopCandidate_phi[i] = 0; }
     for (int i=0; i < 4; i++) { this->othertopCandidate_tau3[i] = 0; }
     for (int i=0; i < 4; i++) { this->othertopCandidate_sjNonWpt[i] = 0; }
+    for (int i=0; i < 4; i++) { this->othertopCandidate_sjNonWmasscal[i] = 0; }
+    for (int i=0; i < 4; i++) { this->othertopCandidate_sjW1masscal[i] = 0; }
     for (int i=0; i < 4; i++) { this->othertopCandidate_sjW2mass[i] = 0; }
     for (int i=0; i < 4; i++) { this->othertopCandidate_mass[i] = 0; }
     for (int i=0; i < 4; i++) { this->othertopCandidate_sjNonWbtag[i] = 0; }
@@ -2296,6 +2070,7 @@ public:
     for (int i=0; i < 4; i++) { this->othertopCandidate_sjW2phi[i] = 0; }
     for (int i=0; i < 4; i++) { this->othertopCandidate_eta[i] = 0; }
     for (int i=0; i < 4; i++) { this->othertopCandidate_n_subjettiness[i] = 0; }
+    for (int i=0; i < 4; i++) { this->othertopCandidate_sjW2ptcal[i] = 0; }
     for (int i=0; i < 4; i++) { this->othertopCandidate_bbtag[i] = 0; }
     for (int i=0; i < 4; i++) { this->othertopCandidate_sjW2eta[i] = 0; }
     for (int i=0; i < 4; i++) { this->othertopCandidate_genTopHad_dr[i] = 0; }
@@ -2305,16 +2080,21 @@ public:
     for (int i=0; i < 1; i++) { this->topCandidate_sjW2btag[i] = 0; }
     for (int i=0; i < 1; i++) { this->topCandidate_n_subjettiness_groomed[i] = 0; }
     for (int i=0; i < 1; i++) { this->topCandidate_sjW2pt[i] = 0; }
+    for (int i=0; i < 1; i++) { this->topCandidate_sjW1ptcal[i] = 0; }
     for (int i=0; i < 1; i++) { this->topCandidate_sjW1btag[i] = 0; }
     for (int i=0; i < 1; i++) { this->topCandidate_sjW1mass[i] = 0; }
     for (int i=0; i < 1; i++) { this->topCandidate_sjNonWmass[i] = 0; }
+    for (int i=0; i < 1; i++) { this->topCandidate_sjNonWptcal[i] = 0; }
     for (int i=0; i < 1; i++) { this->topCandidate_sjNonWeta[i] = 0; }
     for (int i=0; i < 1; i++) { this->topCandidate_pt[i] = 0; }
+    for (int i=0; i < 1; i++) { this->topCandidate_sjW2masscal[i] = 0; }
     for (int i=0; i < 1; i++) { this->topCandidate_ptForRoptCalc[i] = 0; }
     for (int i=0; i < 1; i++) { this->topCandidate_tau2[i] = 0; }
     for (int i=0; i < 1; i++) { this->topCandidate_phi[i] = 0; }
     for (int i=0; i < 1; i++) { this->topCandidate_tau3[i] = 0; }
     for (int i=0; i < 1; i++) { this->topCandidate_sjNonWpt[i] = 0; }
+    for (int i=0; i < 1; i++) { this->topCandidate_sjNonWmasscal[i] = 0; }
+    for (int i=0; i < 1; i++) { this->topCandidate_sjW1masscal[i] = 0; }
     for (int i=0; i < 1; i++) { this->topCandidate_sjW2mass[i] = 0; }
     for (int i=0; i < 1; i++) { this->topCandidate_mass[i] = 0; }
     for (int i=0; i < 1; i++) { this->topCandidate_sjNonWbtag[i] = 0; }
@@ -2332,6 +2112,7 @@ public:
     for (int i=0; i < 1; i++) { this->topCandidate_sjW2phi[i] = 0; }
     for (int i=0; i < 1; i++) { this->topCandidate_eta[i] = 0; }
     for (int i=0; i < 1; i++) { this->topCandidate_n_subjettiness[i] = 0; }
+    for (int i=0; i < 1; i++) { this->topCandidate_sjW2ptcal[i] = 0; }
     for (int i=0; i < 1; i++) { this->topCandidate_bbtag[i] = 0; }
     for (int i=0; i < 1; i++) { this->topCandidate_sjW2eta[i] = 0; }
     for (int i=0; i < 1; i++) { this->topCandidate_genTopHad_dr[i] = 0; }
@@ -2341,16 +2122,21 @@ public:
     for (int i=0; i < 4; i++) { this->topCandidatesSync_sjW2btag[i] = 0; }
     for (int i=0; i < 4; i++) { this->topCandidatesSync_n_subjettiness_groomed[i] = 0; }
     for (int i=0; i < 4; i++) { this->topCandidatesSync_sjW2pt[i] = 0; }
+    for (int i=0; i < 4; i++) { this->topCandidatesSync_sjW1ptcal[i] = 0; }
     for (int i=0; i < 4; i++) { this->topCandidatesSync_sjW1btag[i] = 0; }
     for (int i=0; i < 4; i++) { this->topCandidatesSync_sjW1mass[i] = 0; }
     for (int i=0; i < 4; i++) { this->topCandidatesSync_sjNonWmass[i] = 0; }
+    for (int i=0; i < 4; i++) { this->topCandidatesSync_sjNonWptcal[i] = 0; }
     for (int i=0; i < 4; i++) { this->topCandidatesSync_sjNonWeta[i] = 0; }
     for (int i=0; i < 4; i++) { this->topCandidatesSync_pt[i] = 0; }
+    for (int i=0; i < 4; i++) { this->topCandidatesSync_sjW2masscal[i] = 0; }
     for (int i=0; i < 4; i++) { this->topCandidatesSync_ptForRoptCalc[i] = 0; }
     for (int i=0; i < 4; i++) { this->topCandidatesSync_tau2[i] = 0; }
     for (int i=0; i < 4; i++) { this->topCandidatesSync_phi[i] = 0; }
     for (int i=0; i < 4; i++) { this->topCandidatesSync_tau3[i] = 0; }
     for (int i=0; i < 4; i++) { this->topCandidatesSync_sjNonWpt[i] = 0; }
+    for (int i=0; i < 4; i++) { this->topCandidatesSync_sjNonWmasscal[i] = 0; }
+    for (int i=0; i < 4; i++) { this->topCandidatesSync_sjW1masscal[i] = 0; }
     for (int i=0; i < 4; i++) { this->topCandidatesSync_sjW2mass[i] = 0; }
     for (int i=0; i < 4; i++) { this->topCandidatesSync_mass[i] = 0; }
     for (int i=0; i < 4; i++) { this->topCandidatesSync_sjNonWbtag[i] = 0; }
@@ -2368,6 +2154,7 @@ public:
     for (int i=0; i < 4; i++) { this->topCandidatesSync_sjW2phi[i] = 0; }
     for (int i=0; i < 4; i++) { this->topCandidatesSync_eta[i] = 0; }
     for (int i=0; i < 4; i++) { this->topCandidatesSync_n_subjettiness[i] = 0; }
+    for (int i=0; i < 4; i++) { this->topCandidatesSync_sjW2ptcal[i] = 0; }
     for (int i=0; i < 4; i++) { this->topCandidatesSync_bbtag[i] = 0; }
     for (int i=0; i < 4; i++) { this->topCandidatesSync_sjW2eta[i] = 0; }
     for (int i=0; i < 4; i++) { this->topCandidatesSync_genTopHad_dr[i] = 0; }
@@ -2376,6 +2163,70 @@ public:
     for (int i=0; i < 1; i++) { this->ll_eta[i] = 0; }
     for (int i=0; i < 1; i++) { this->ll_mass[i] = 0; }
     for (int i=0; i < 1; i++) { this->ll_pt[i] = 0; }
+    this->nmem_ttbb_DL_0w2h2t = 0;
+    for (int i=0; i < 1; i++) { this->mem_ttbb_DL_0w2h2t_p[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_ttbb_DL_0w2h2t_chi2[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_ttbb_DL_0w2h2t_p_err[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_ttbb_DL_0w2h2t_efficiency[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_ttbb_DL_0w2h2t_nperm[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_ttbb_DL_0w2h2t_time[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_ttbb_DL_0w2h2t_error_code[i] = 0; }
+    this->nmem_ttbb_SL_0w2h2t = 0;
+    for (int i=0; i < 1; i++) { this->mem_ttbb_SL_0w2h2t_p[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_ttbb_SL_0w2h2t_chi2[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_ttbb_SL_0w2h2t_p_err[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_ttbb_SL_0w2h2t_efficiency[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_ttbb_SL_0w2h2t_nperm[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_ttbb_SL_0w2h2t_time[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_ttbb_SL_0w2h2t_error_code[i] = 0; }
+    this->nmem_ttbb_SL_1w2h2t = 0;
+    for (int i=0; i < 1; i++) { this->mem_ttbb_SL_1w2h2t_p[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_ttbb_SL_1w2h2t_chi2[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_ttbb_SL_1w2h2t_p_err[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_ttbb_SL_1w2h2t_efficiency[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_ttbb_SL_1w2h2t_nperm[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_ttbb_SL_1w2h2t_time[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_ttbb_SL_1w2h2t_error_code[i] = 0; }
+    this->nmem_ttbb_SL_2w2h2t = 0;
+    for (int i=0; i < 1; i++) { this->mem_ttbb_SL_2w2h2t_p[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_ttbb_SL_2w2h2t_chi2[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_ttbb_SL_2w2h2t_p_err[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_ttbb_SL_2w2h2t_efficiency[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_ttbb_SL_2w2h2t_nperm[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_ttbb_SL_2w2h2t_time[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_ttbb_SL_2w2h2t_error_code[i] = 0; }
+    this->nmem_tth_DL_0w2h2t = 0;
+    for (int i=0; i < 1; i++) { this->mem_tth_DL_0w2h2t_p[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_tth_DL_0w2h2t_chi2[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_tth_DL_0w2h2t_p_err[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_tth_DL_0w2h2t_efficiency[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_tth_DL_0w2h2t_nperm[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_tth_DL_0w2h2t_time[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_tth_DL_0w2h2t_error_code[i] = 0; }
+    this->nmem_tth_SL_0w2h2t = 0;
+    for (int i=0; i < 1; i++) { this->mem_tth_SL_0w2h2t_p[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_tth_SL_0w2h2t_chi2[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_tth_SL_0w2h2t_p_err[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_tth_SL_0w2h2t_efficiency[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_tth_SL_0w2h2t_nperm[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_tth_SL_0w2h2t_time[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_tth_SL_0w2h2t_error_code[i] = 0; }
+    this->nmem_tth_SL_1w2h2t = 0;
+    for (int i=0; i < 1; i++) { this->mem_tth_SL_1w2h2t_p[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_tth_SL_1w2h2t_chi2[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_tth_SL_1w2h2t_p_err[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_tth_SL_1w2h2t_efficiency[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_tth_SL_1w2h2t_nperm[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_tth_SL_1w2h2t_time[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_tth_SL_1w2h2t_error_code[i] = 0; }
+    this->nmem_tth_SL_2w2h2t = 0;
+    for (int i=0; i < 1; i++) { this->mem_tth_SL_2w2h2t_p[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_tth_SL_2w2h2t_chi2[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_tth_SL_2w2h2t_p_err[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_tth_SL_2w2h2t_efficiency[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_tth_SL_2w2h2t_nperm[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_tth_SL_2w2h2t_time[i] = 0; }
+    for (int i=0; i < 1; i++) { this->mem_tth_SL_2w2h2t_error_code[i] = 0; }
     this->nmet = 0;
     for (int i=0; i < 1; i++) { this->met_phi[i] = 0; }
     for (int i=0; i < 1; i++) { this->met_sumEt[i] = 0; }
@@ -2414,15 +2265,7 @@ public:
     for (int i=0; i < 1; i++) { this->pv_rho[i] = 0; }
     for (int i=0; i < 1; i++) { this->pv_ndof[i] = 0; }
     this->C = 0;
-    this->C_JERDown = 0;
-    this->C_JERUp = 0;
-    this->C_JESDown = 0;
-    this->C_JESUp = 0;
     this->D = 0;
-    this->D_JERDown = 0;
-    this->D_JERUp = 0;
-    this->D_JESDown = 0;
-    this->D_JESUp = 0;
     this->HLT_BIT_HLT_AK8DiPFJet250_200_TrimMass30_BTagCSV0p45_v = 0;
     this->HLT_BIT_HLT_AK8DiPFJet250_200_TrimMass30_BTagCSV_p20_v = 0;
     this->HLT_BIT_HLT_AK8DiPFJet280_200_TrimMass30_BTagCSV0p45_v = 0;
@@ -2583,15 +2426,7 @@ public:
     this->HLT_ttHhardonicLowLumi = 0;
     this->HLT_ttHleptonic = 0;
     this->Wmass = 0;
-    this->Wmass_JERDown = 0;
-    this->Wmass_JERUp = 0;
-    this->Wmass_JESDown = 0;
-    this->Wmass_JESUp = 0;
     this->aplanarity = 0;
-    this->aplanarity_JERDown = 0;
-    this->aplanarity_JERUp = 0;
-    this->aplanarity_JESDown = 0;
-    this->aplanarity_JESUp = 0;
     this->bTagWeight = 0;
     this->bTagWeight_HFDown = 0;
     this->bTagWeight_HFStats1Down = 0;
@@ -2611,226 +2446,58 @@ public:
     this->bTagWeight_cErr1Up = 0;
     this->bTagWeight_cErr2Down = 0;
     this->bTagWeight_cErr2Up = 0;
-    this->btag_LR_4b_2b = 0;
-    this->btag_LR_4b_2b_JERDown = 0;
-    this->btag_LR_4b_2b_JERUp = 0;
-    this->btag_LR_4b_2b_JESDown = 0;
-    this->btag_LR_4b_2b_JESUp = 0;
     this->btag_LR_4b_2b_btagCMVA = 0;
-    this->btag_LR_4b_2b_btagCMVA_JERDown = 0;
-    this->btag_LR_4b_2b_btagCMVA_JERUp = 0;
-    this->btag_LR_4b_2b_btagCMVA_JESDown = 0;
-    this->btag_LR_4b_2b_btagCMVA_JESUp = 0;
+    this->btag_LR_4b_2b_btagCMVA_log = 0;
     this->btag_LR_4b_2b_btagCSV = 0;
-    this->btag_LR_4b_2b_btagCSV_JERDown = 0;
-    this->btag_LR_4b_2b_btagCSV_JERUp = 0;
-    this->btag_LR_4b_2b_btagCSV_JESDown = 0;
-    this->btag_LR_4b_2b_btagCSV_JESUp = 0;
     this->btag_lr_2b = 0;
-    this->btag_lr_2b_JERDown = 0;
-    this->btag_lr_2b_JERUp = 0;
-    this->btag_lr_2b_JESDown = 0;
-    this->btag_lr_2b_JESUp = 0;
     this->btag_lr_4b = 0;
-    this->btag_lr_4b_JERDown = 0;
-    this->btag_lr_4b_JERUp = 0;
-    this->btag_lr_4b_JESDown = 0;
-    this->btag_lr_4b_JESUp = 0;
     this->cat = 0;
-    this->cat_JERDown = 0;
-    this->cat_JERUp = 0;
-    this->cat_JESDown = 0;
-    this->cat_JESUp = 0;
     this->cat_btag = 0;
-    this->cat_btag_JERDown = 0;
-    this->cat_btag_JERUp = 0;
-    this->cat_btag_JESDown = 0;
-    this->cat_btag_JESUp = 0;
     this->cat_gen = 0;
-    this->cat_gen_JERDown = 0;
-    this->cat_gen_JERUp = 0;
-    this->cat_gen_JESDown = 0;
-    this->cat_gen_JESUp = 0;
     this->common_bdt = 0;
-    this->common_bdt_JERDown = 0;
-    this->common_bdt_JERUp = 0;
-    this->common_bdt_JESDown = 0;
-    this->common_bdt_JESUp = 0;
     this->common_bdt_withmem1 = 0;
-    this->common_bdt_withmem1_JERDown = 0;
-    this->common_bdt_withmem1_JERUp = 0;
-    this->common_bdt_withmem1_JESDown = 0;
-    this->common_bdt_withmem1_JESUp = 0;
     this->common_bdt_withmem2 = 0;
-    this->common_bdt_withmem2_JERDown = 0;
-    this->common_bdt_withmem2_JERUp = 0;
-    this->common_bdt_withmem2_JESDown = 0;
-    this->common_bdt_withmem2_JESUp = 0;
     this->eta_drpair_btag = 0;
-    this->eta_drpair_btag_JERDown = 0;
-    this->eta_drpair_btag_JERUp = 0;
-    this->eta_drpair_btag_JESDown = 0;
-    this->eta_drpair_btag_JESUp = 0;
     this->evt = 0;
     this->genHiggsDecayMode = 0;
     this->genWeight = 0;
     this->ht = 0;
-    this->ht_JERDown = 0;
-    this->ht_JERUp = 0;
-    this->ht_JESDown = 0;
-    this->ht_JESUp = 0;
     this->is_dl = 0;
-    this->is_dl_JERDown = 0;
-    this->is_dl_JERUp = 0;
-    this->is_dl_JESDown = 0;
-    this->is_dl_JESUp = 0;
     this->is_fh = 0;
-    this->is_fh_JERDown = 0;
-    this->is_fh_JERUp = 0;
-    this->is_fh_JESDown = 0;
-    this->is_fh_JESUp = 0;
     this->is_sl = 0;
-    this->is_sl_JERDown = 0;
-    this->is_sl_JERUp = 0;
-    this->is_sl_JESDown = 0;
-    this->is_sl_JESUp = 0;
     this->isotropy = 0;
-    this->isotropy_JERDown = 0;
-    this->isotropy_JERUp = 0;
-    this->isotropy_JESDown = 0;
-    this->isotropy_JESUp = 0;
     this->json = 0;
     this->lumi = 0;
     this->mass_drpair_btag = 0;
-    this->mass_drpair_btag_JERDown = 0;
-    this->mass_drpair_btag_JERUp = 0;
-    this->mass_drpair_btag_JESDown = 0;
-    this->mass_drpair_btag_JESUp = 0;
     this->mean_bdisc = 0;
-    this->mean_bdisc_JERDown = 0;
-    this->mean_bdisc_JERUp = 0;
-    this->mean_bdisc_JESDown = 0;
-    this->mean_bdisc_JESUp = 0;
     this->mean_bdisc_btag = 0;
-    this->mean_bdisc_btag_JERDown = 0;
-    this->mean_bdisc_btag_JERUp = 0;
-    this->mean_bdisc_btag_JESDown = 0;
-    this->mean_bdisc_btag_JESUp = 0;
     this->mean_dr_btag = 0;
-    this->mean_dr_btag_JERDown = 0;
-    this->mean_dr_btag_JERUp = 0;
-    this->mean_dr_btag_JESDown = 0;
-    this->mean_dr_btag_JESUp = 0;
     this->min_dr_btag = 0;
-    this->min_dr_btag_JERDown = 0;
-    this->min_dr_btag_JERUp = 0;
-    this->min_dr_btag_JESDown = 0;
-    this->min_dr_btag_JESUp = 0;
     this->momentum_eig0 = 0;
-    this->momentum_eig0_JERDown = 0;
-    this->momentum_eig0_JERUp = 0;
-    this->momentum_eig0_JESDown = 0;
-    this->momentum_eig0_JESUp = 0;
     this->momentum_eig1 = 0;
-    this->momentum_eig1_JERDown = 0;
-    this->momentum_eig1_JERUp = 0;
-    this->momentum_eig1_JESDown = 0;
-    this->momentum_eig1_JESUp = 0;
     this->momentum_eig2 = 0;
-    this->momentum_eig2_JERDown = 0;
-    this->momentum_eig2_JERUp = 0;
-    this->momentum_eig2_JESDown = 0;
-    this->momentum_eig2_JESUp = 0;
     this->nBCMVAL = 0;
-    this->nBCMVAL_JERDown = 0;
-    this->nBCMVAL_JERUp = 0;
-    this->nBCMVAL_JESDown = 0;
-    this->nBCMVAL_JESUp = 0;
     this->nBCMVAM = 0;
-    this->nBCMVAM_JERDown = 0;
-    this->nBCMVAM_JERUp = 0;
-    this->nBCMVAM_JESDown = 0;
-    this->nBCMVAM_JESUp = 0;
     this->nBCMVAT = 0;
-    this->nBCMVAT_JERDown = 0;
-    this->nBCMVAT_JERUp = 0;
-    this->nBCMVAT_JESDown = 0;
-    this->nBCMVAT_JESUp = 0;
     this->nBCSVL = 0;
-    this->nBCSVL_JERDown = 0;
-    this->nBCSVL_JERUp = 0;
-    this->nBCSVL_JESDown = 0;
-    this->nBCSVL_JESUp = 0;
     this->nBCSVM = 0;
-    this->nBCSVM_JERDown = 0;
-    this->nBCSVM_JERUp = 0;
-    this->nBCSVM_JESDown = 0;
-    this->nBCSVM_JESUp = 0;
     this->nBCSVT = 0;
-    this->nBCSVT_JERDown = 0;
-    this->nBCSVT_JERUp = 0;
-    this->nBCSVT_JESDown = 0;
-    this->nBCSVT_JESUp = 0;
     this->nGenBHiggs = 0;
     this->nGenBTop = 0;
     this->nGenQW = 0;
     this->nMatchSimB = 0;
-    this->nMatchSimB_JERDown = 0;
-    this->nMatchSimB_JERUp = 0;
-    this->nMatchSimB_JESDown = 0;
-    this->nMatchSimB_JESUp = 0;
     this->nMatchSimC = 0;
-    this->nMatchSimC_JERDown = 0;
-    this->nMatchSimC_JERUp = 0;
-    this->nMatchSimC_JESDown = 0;
-    this->nMatchSimC_JESUp = 0;
     this->nMatch_hb = 0;
-    this->nMatch_hb_JERDown = 0;
-    this->nMatch_hb_JERUp = 0;
-    this->nMatch_hb_JESDown = 0;
-    this->nMatch_hb_JESUp = 0;
     this->nMatch_hb_btag = 0;
-    this->nMatch_hb_btag_JERDown = 0;
-    this->nMatch_hb_btag_JERUp = 0;
-    this->nMatch_hb_btag_JESDown = 0;
-    this->nMatch_hb_btag_JESUp = 0;
     this->nMatch_tb = 0;
-    this->nMatch_tb_JERDown = 0;
-    this->nMatch_tb_JERUp = 0;
-    this->nMatch_tb_JESDown = 0;
-    this->nMatch_tb_JESUp = 0;
     this->nMatch_tb_btag = 0;
-    this->nMatch_tb_btag_JERDown = 0;
-    this->nMatch_tb_btag_JERUp = 0;
-    this->nMatch_tb_btag_JESDown = 0;
-    this->nMatch_tb_btag_JESUp = 0;
     this->nMatch_wq = 0;
-    this->nMatch_wq_JERDown = 0;
-    this->nMatch_wq_JERUp = 0;
-    this->nMatch_wq_JESDown = 0;
-    this->nMatch_wq_JESUp = 0;
     this->nMatch_wq_btag = 0;
-    this->nMatch_wq_btag_JERDown = 0;
-    this->nMatch_wq_btag_JERUp = 0;
-    this->nMatch_wq_btag_JESDown = 0;
-    this->nMatch_wq_btag_JESUp = 0;
     this->nPU0 = 0;
     this->nPVs = 0;
     this->nSelected_hb = 0;
-    this->nSelected_hb_JERDown = 0;
-    this->nSelected_hb_JERUp = 0;
-    this->nSelected_hb_JESDown = 0;
-    this->nSelected_hb_JESUp = 0;
     this->nSelected_tb = 0;
-    this->nSelected_tb_JERDown = 0;
-    this->nSelected_tb_JERUp = 0;
-    this->nSelected_tb_JESDown = 0;
-    this->nSelected_tb_JESUp = 0;
     this->nSelected_wq = 0;
-    this->nSelected_wq_JERDown = 0;
-    this->nSelected_wq_JERUp = 0;
-    this->nSelected_wq_JESDown = 0;
-    this->nSelected_wq_JESUp = 0;
     this->nTrueInt = 0;
     this->n_bjets = 0;
     this->n_boosted_bjets = 0;
@@ -2839,113 +2506,32 @@ public:
     this->n_excluded_ljets = 0;
     this->n_ljets = 0;
     this->numJets = 0;
-    this->numJets_JERDown = 0;
-    this->numJets_JERUp = 0;
-    this->numJets_JESDown = 0;
-    this->numJets_JESUp = 0;
     this->passPV = 0;
     this->passes_btag = 0;
-    this->passes_btag_JERDown = 0;
-    this->passes_btag_JERUp = 0;
-    this->passes_btag_JESDown = 0;
-    this->passes_btag_JESUp = 0;
     this->passes_jet = 0;
-    this->passes_jet_JERDown = 0;
-    this->passes_jet_JERUp = 0;
-    this->passes_jet_JESDown = 0;
-    this->passes_jet_JESUp = 0;
     this->passes_mem = 0;
-    this->passes_mem_JERDown = 0;
-    this->passes_mem_JERUp = 0;
-    this->passes_mem_JESDown = 0;
-    this->passes_mem_JESUp = 0;
     this->pt_drpair_btag = 0;
-    this->pt_drpair_btag_JERDown = 0;
-    this->pt_drpair_btag_JERUp = 0;
-    this->pt_drpair_btag_JESDown = 0;
-    this->pt_drpair_btag_JESUp = 0;
     this->puWeight = 0;
     this->qg_LR_flavour_4q_0q = 0;
     this->qg_LR_flavour_4q_0q_1q = 0;
     this->qg_LR_flavour_4q_0q_1q_2q = 0;
     this->qg_LR_flavour_4q_0q_1q_2q_3q = 0;
-    this->qg_LR_flavour_4q_0q_1q_2q_3q_JERDown = 0;
-    this->qg_LR_flavour_4q_0q_1q_2q_3q_JERUp = 0;
-    this->qg_LR_flavour_4q_0q_1q_2q_3q_JESDown = 0;
-    this->qg_LR_flavour_4q_0q_1q_2q_3q_JESUp = 0;
-    this->qg_LR_flavour_4q_0q_1q_2q_JERDown = 0;
-    this->qg_LR_flavour_4q_0q_1q_2q_JERUp = 0;
-    this->qg_LR_flavour_4q_0q_1q_2q_JESDown = 0;
-    this->qg_LR_flavour_4q_0q_1q_2q_JESUp = 0;
-    this->qg_LR_flavour_4q_0q_1q_JERDown = 0;
-    this->qg_LR_flavour_4q_0q_1q_JERUp = 0;
-    this->qg_LR_flavour_4q_0q_1q_JESDown = 0;
-    this->qg_LR_flavour_4q_0q_1q_JESUp = 0;
-    this->qg_LR_flavour_4q_0q_JERDown = 0;
-    this->qg_LR_flavour_4q_0q_JERUp = 0;
-    this->qg_LR_flavour_4q_0q_JESDown = 0;
-    this->qg_LR_flavour_4q_0q_JESUp = 0;
     this->qg_LR_flavour_4q_1q = 0;
     this->qg_LR_flavour_4q_1q_2q = 0;
     this->qg_LR_flavour_4q_1q_2q_3q = 0;
-    this->qg_LR_flavour_4q_1q_2q_3q_JERDown = 0;
-    this->qg_LR_flavour_4q_1q_2q_3q_JERUp = 0;
-    this->qg_LR_flavour_4q_1q_2q_3q_JESDown = 0;
-    this->qg_LR_flavour_4q_1q_2q_3q_JESUp = 0;
-    this->qg_LR_flavour_4q_1q_2q_JERDown = 0;
-    this->qg_LR_flavour_4q_1q_2q_JERUp = 0;
-    this->qg_LR_flavour_4q_1q_2q_JESDown = 0;
-    this->qg_LR_flavour_4q_1q_2q_JESUp = 0;
-    this->qg_LR_flavour_4q_1q_JERDown = 0;
-    this->qg_LR_flavour_4q_1q_JERUp = 0;
-    this->qg_LR_flavour_4q_1q_JESDown = 0;
-    this->qg_LR_flavour_4q_1q_JESUp = 0;
     this->qg_LR_flavour_4q_2q = 0;
     this->qg_LR_flavour_4q_2q_3q = 0;
-    this->qg_LR_flavour_4q_2q_3q_JERDown = 0;
-    this->qg_LR_flavour_4q_2q_3q_JERUp = 0;
-    this->qg_LR_flavour_4q_2q_3q_JESDown = 0;
-    this->qg_LR_flavour_4q_2q_3q_JESUp = 0;
-    this->qg_LR_flavour_4q_2q_JERDown = 0;
-    this->qg_LR_flavour_4q_2q_JERUp = 0;
-    this->qg_LR_flavour_4q_2q_JESDown = 0;
-    this->qg_LR_flavour_4q_2q_JESUp = 0;
     this->qg_LR_flavour_4q_3q = 0;
-    this->qg_LR_flavour_4q_3q_JERDown = 0;
-    this->qg_LR_flavour_4q_3q_JERUp = 0;
-    this->qg_LR_flavour_4q_3q_JESDown = 0;
-    this->qg_LR_flavour_4q_3q_JESUp = 0;
     this->rho = 0;
     this->run = 0;
     this->sphericity = 0;
-    this->sphericity_JERDown = 0;
-    this->sphericity_JERUp = 0;
-    this->sphericity_JESDown = 0;
-    this->sphericity_JESUp = 0;
     this->std_bdisc = 0;
-    this->std_bdisc_JERDown = 0;
-    this->std_bdisc_JERUp = 0;
-    this->std_bdisc_JESDown = 0;
-    this->std_bdisc_JESUp = 0;
     this->std_bdisc_btag = 0;
-    this->std_bdisc_btag_JERDown = 0;
-    this->std_bdisc_btag_JERUp = 0;
-    this->std_bdisc_btag_JESDown = 0;
-    this->std_bdisc_btag_JESUp = 0;
     this->std_dr_btag = 0;
-    this->std_dr_btag_JERDown = 0;
-    this->std_dr_btag_JERUp = 0;
-    this->std_dr_btag_JESDown = 0;
-    this->std_dr_btag_JESUp = 0;
     this->triggerBitmask = 0;
     this->triggerDecision = 0;
     this->ttCls = 0;
     this->tth_mva = 0;
-    this->tth_mva_JERDown = 0;
-    this->tth_mva_JERUp = 0;
-    this->tth_mva_JESDown = 0;
-    this->tth_mva_JESUp = 0;
-    this->weight_xs = 0;
     this->xsec = 0;
   } //init
 }; //class

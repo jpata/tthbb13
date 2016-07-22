@@ -102,10 +102,10 @@ int main(int argc, const char** argv) {
 
         const unordered_map<SystematicKey::SystematicKey, Event, std::hash<int> > systmap = {
             {SystematicKey::nominal, EventFactory::makeNominal(data, conf)},
-            {SystematicKey::CMS_scale_jUp, EventFactory::makeJESUp(data, conf)},
-            {SystematicKey::CMS_scale_jDown, EventFactory::makeJESDown(data, conf)},
-            {SystematicKey::CMS_scale_jUp, EventFactory::makeJERUp(data, conf)},
-            {SystematicKey::CMS_scale_jDown, EventFactory::makeJERDown(data, conf)}
+            //{SystematicKey::CMS_scale_jUp, EventFactory::makeJESUp(data, conf)},
+            //{SystematicKey::CMS_scale_jDown, EventFactory::makeJESDown(data, conf)},
+            //{SystematicKey::CMS_scale_jUp, EventFactory::makeJERUp(data, conf)},
+            //{SystematicKey::CMS_scale_jDown, EventFactory::makeJERDown(data, conf)}
         };
 
         for (auto& kvSyst : systmap) {

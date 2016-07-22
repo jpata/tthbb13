@@ -79,6 +79,7 @@ const map<string, AxisFunction> AxisFunctions = {
     //categorization variables
     {"numJets", [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) { return ev.numJets;}},
     {"nBCSVM", [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) { return ev.nBCSVM;}},
+    {"nBCMVAM", [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) { return ev.nBCMVAM;}},
     {"nBCSVL", [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) { return ev.nBCSVL;}},
     {"bkgCat1", [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) {
         const int ttCls = ev.data->ttCls;
@@ -109,8 +110,8 @@ const map<string, AxisFunction> AxisFunctions = {
     {"jet1_btagCSV", [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) { return ev.jets.size() > 1 ? ev.jets.at(1).btagCSV : -99;}},
     {"lep0_pt", [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) { return ev.leptons.size() > 0 ? ev.leptons.at(0).p4.Pt() : -99;}},
     {"lep0_eta", [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) { return ev.leptons.size() > 0 ? ev.leptons.at(0).p4.Eta() : -99;}},
-    {"btag_LR_4b_2b_logit_btagCSV", [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) { return ev.btag_LR_4b_2b_logit_CSV;}},
-    {"btag_LR_4b_2b_logit_btagCMVA", [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) { return ev.btag_LR_4b_2b_logit_CMVA;}},
+    {"btag_LR_4b_2b_logit_btagCSV", [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) { return logit(ev.blr1);}},
+    {"btag_LR_4b_2b_logit_btagCMVA", [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) { return logit(ev.blr2);}},
    
     //boosted control variables
     {"topCandidate_mass", [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) { return ev.topCandidate_mass;}},
@@ -183,7 +184,6 @@ const Configuration Configuration::makeConfiguration(JsonValue& value) {
         }
         else if (ks == "prefix") {
             prefix = lev1->value.toString();
-            cout << "json deserialized prefix " << prefix << endl;
         }
         else if (ks == "firstEntry") {
             firstEntry = (long)(lev1->value.toNumber());
@@ -211,6 +211,10 @@ const Configuration Configuration::makeConfiguration(JsonValue& value) {
                     const string spk = string(lev3->key);
                     if (spk == "func") {
                         name = lev3->value.toString();
+                        if (AxisFunctions.find(name) == AxisFunctions.end()) {
+                            cerr << "could not find function " << name << " in map of predefined functions: AxisFunctions" << endl;
+                            throw std::runtime_error("UndefinedAxisFunction");
+                        }
                         _func = AxisFunctions.at(name);
                     } else if (spk == "nBins") {
                         nBins = (int)(lev3->value.toNumber());
@@ -356,8 +360,8 @@ Event::Event(
     double _mem_DL_0w2h2t,
     double _tth_mva,
     double _common_bdt,
-    double _btag_LR_4b_2b,
-    double _btag_LR_4b_2b_logit
+    double _blr1,
+    double _blr2
     ) :
     data(_data),
     is_sl(_is_sl),
@@ -378,8 +382,8 @@ Event::Event(
     mem_DL_0w2h2t(_mem_DL_0w2h2t),
     tth_mva(_tth_mva),
     common_bdt(_common_bdt),
-    btag_LR_4b_2b(_btag_LR_4b_2b),
-    btag_LR_4b_2b_logit(logit(_btag_LR_4b_2b))
+    blr1(_blr1),
+    blr2(_blr2)
 {
     
 }
@@ -618,144 +622,141 @@ const Event EventFactory::makeNominal(const TreeData& data, const Configuration&
         data.numJets,
         data.nBCSVM,
         data.nBCSVL,
+        data.nBCMVAM,
         jets,
         leptons,
-        data.weight_xs,
+        1.0,
         data.puWeight,
         data.Wmass,
-        mem_p(data.mem_tth_p[0], data.mem_ttbb_p[0]), //SL 022
-        mem_p(data.mem_tth_p[1], data.mem_ttbb_p[1]), //SL 122
-        mem_p(data.mem_tth_p[5], data.mem_ttbb_p[5]), //SL 222
-        mem_p(data.mem_tth_p[9], data.mem_ttbb_p[9], 0.05), //SL 222 sj
-        mem_p(data.mem_tth_p[1], data.mem_ttbb_p[1]), //DL 022,
+        mem_p(data.mem_tth_SL_0w2h2t_p[0], data.mem_ttbb_SL_0w2h2t_p[0]),
+        mem_p(data.mem_tth_SL_1w2h2t_p[0], data.mem_ttbb_SL_1w2h2t_p[0]),
+        mem_p(data.mem_tth_SL_2w2h2t_p[0], data.mem_ttbb_SL_2w2h2t_p[0]), //SL 222
+        0.0,
+        //mem_p(data.mem_tth_SL_2w2h2t_sj_p[0], data.mem_ttbb_SL_2w2h2t_sh_p[0], 0.05), //SL 222 sj
+        mem_p(data.mem_tth_DL_0w2h2t_p[0], data.mem_ttbb_DL_0w2h2t_p[0]), //DL 022,
         data.tth_mva,
         data.common_bdt,
-        data.btag_LR_4b_2b,
         logit(data.btag_LR_4b_2b_btagCSV),
         logit(data.btag_LR_4b_2b_btagCMVA)
     );
     return ev;
 }
 
-const Event EventFactory::makeJESUp(const TreeData& data, const Configuration& conf) {
-    const vector<Jet> jets = makeAllJets(data, &(JetFactory::makeJESUp));
-    const vector<Lepton> leptons = makeAllLeptons(data);
-
-    return Event(
-        &data,
-        data.is_sl,
-        data.is_dl,
-        data.passPV,
-        data.numJets_JESUp,
-        data.nBCSVM_JESUp,
-        data.nBCSVL_JESUp,
-        jets,
-        leptons,
-        data.weight_xs,
-        data.puWeight,
-        data.Wmass,
-        mem_p(data.mem_tth_JESUp_p[0], data.mem_ttbb_JESUp_p[0]), //SL 022
-        mem_p(data.mem_tth_JESUp_p[2], data.mem_ttbb_JESUp_p[2]), //SL 122
-        mem_p(data.mem_tth_JESUp_p[5], data.mem_ttbb_JESUp_p[5]), //SL 222
-        mem_p(data.mem_tth_JESUp_p[9], data.mem_ttbb_JESUp_p[9], 0.05), //SL 222 sj
-        mem_p(data.mem_tth_JESUp_p[1], data.mem_ttbb_JESUp_p[1]), //DL 022,
-        data.tth_mva_JESUp,
-        data.common_bdt_JESUp,
-        data.btag_LR_4b_2b_JESUp,
-        logit(data.btag_LR_4b_2b_btagCSV_JESUp),
-        logit(data.btag_LR_4b_2b_btagCMVA_JESUp)
-    );
-}
-
-const Event EventFactory::makeJESDown(const TreeData& data, const Configuration& conf) {
-    const vector<Jet> jets = makeAllJets(data, &(JetFactory::makeJESDown));
-    const vector<Lepton> leptons = makeAllLeptons(data);
-
-    return Event(
-        &data,
-        data.is_sl,
-        data.is_dl,
-        data.passPV,
-        data.numJets_JESDown,
-        data.nBCSVM_JESDown,
-        data.nBCSVL_JESDown,
-        jets,
-        leptons,
-        data.weight_xs,
-        data.puWeight,
-        data.Wmass,
-        mem_p(data.mem_tth_JESDown_p[0], data.mem_ttbb_JESDown_p[0]), //SL 022
-        mem_p(data.mem_tth_JESDown_p[2], data.mem_ttbb_JESDown_p[2]), //SL 122
-        mem_p(data.mem_tth_JESDown_p[5], data.mem_ttbb_JESDown_p[5]), //SL 222
-        mem_p(data.mem_tth_JESDown_p[9], data.mem_ttbb_JESDown_p[9], 0.05), //SL 222 sj
-        mem_p(data.mem_tth_JESDown_p[1], data.mem_ttbb_JESDown_p[1]), //DL 022,
-        data.tth_mva,
-        data.common_bdt_JESDown,
-        data.btag_LR_4b_2b_JESDown,
-        logit(data.btag_LR_4b_2b_btagCSV_JESDown),
-        logit(data.btag_LR_4b_2b_btagCMVA_JESDown)
-    );
-}
-
-const Event EventFactory::makeJERUp(const TreeData& data, const Configuration& conf) {
-    const vector<Jet> jets = makeAllJets(data, &(JetFactory::makeJERUp));
-    const vector<Lepton> leptons = makeAllLeptons(data);
-
-    return Event(
-        &data,
-        data.is_sl,
-        data.is_dl,
-        data.passPV,
-        data.numJets_JERUp,
-        data.nBCSVM_JERUp,
-        data.nBCSVL_JERUp,
-        jets,
-        leptons,
-        data.weight_xs,
-        data.puWeight,
-        data.Wmass,
-        mem_p(data.mem_tth_JERUp_p[0], data.mem_ttbb_JERUp_p[0]), //SL 022
-        mem_p(data.mem_tth_JERUp_p[2], data.mem_ttbb_JERUp_p[2]), //SL 122
-        mem_p(data.mem_tth_JERUp_p[5], data.mem_ttbb_JERUp_p[5]), //SL 222
-        mem_p(data.mem_tth_JERUp_p[9], data.mem_ttbb_JERUp_p[9], 0.05), //SL 222 sj
-        mem_p(data.mem_tth_JERUp_p[1], data.mem_ttbb_JERUp_p[1]), //DL 022,
-        data.tth_mva_JERUp,
-        data.common_bdt_JERUp,
-        data.btag_LR_4b_2b_JERUp,
-        logit(data.btag_LR_4b_2b_btagCSV_JERUp),
-        logit(data.btag_LR_4b_2b_btagCMVA_JERUp)
-    );
-}
-
-const Event EventFactory::makeJERDown(const TreeData& data, const Configuration& conf) {
-    const vector<Jet> jets = makeAllJets(data, &(JetFactory::makeJERDown));
-    const vector<Lepton> leptons = makeAllLeptons(data);
-
-    return Event(
-        &data,
-        data.is_sl,
-        data.is_dl,
-        data.passPV,
-        data.numJets_JERDown,
-        data.nBCSVM_JERDown,
-        data.nBCSVL_JERDown,
-        jets,
-        leptons,
-        data.weight_xs,
-        data.puWeight,
-        data.Wmass,
-        mem_p(data.mem_tth_JERDown_p[0], data.mem_ttbb_JERDown_p[0]), //SL 022
-        mem_p(data.mem_tth_JERDown_p[2], data.mem_ttbb_JERDown_p[2]), //SL 122
-        mem_p(data.mem_tth_JERDown_p[5], data.mem_ttbb_JERDown_p[5]), //SL 222
-        mem_p(data.mem_tth_JERDown_p[9], data.mem_ttbb_JERDown_p[9], 0.05), //SL 222 sj
-        mem_p(data.mem_tth_JERDown_p[1], data.mem_ttbb_JERDown_p[1]), //DL 022,
-        data.tth_mva,
-        data.common_bdt_JERDown,
-        data.btag_LR_4b_2b_JERDown,
-        logit(data.btag_LR_4b_2b_btagCSV_JERDown),
-        logit(data.btag_LR_4b_2b_btagCMVA_JERDown)
-    );
-}
+//const Event EventFactory::makeJESUp(const TreeData& data, const Configuration& conf) {
+//    const vector<Jet> jets = makeAllJets(data, &(JetFactory::makeJESUp));
+//    const vector<Lepton> leptons = makeAllLeptons(data);
+//
+//    return Event(
+//        &data,
+//        data.is_sl,
+//        data.is_dl,
+//        data.passPV,
+//        data.numJets_JESUp,
+//        data.nBCSVM_JESUp,
+//        data.nBCSVL_JESUp,
+//        jets,
+//        leptons,
+//        data.weight_xs,
+//        data.puWeight,
+//        data.Wmass,
+//        mem_p(data.mem_tth_JESUp_p[0], data.mem_ttbb_JESUp_p[0]), //SL 022
+//        mem_p(data.mem_tth_JESUp_p[2], data.mem_ttbb_JESUp_p[2]), //SL 122
+//        mem_p(data.mem_tth_JESUp_p[5], data.mem_ttbb_JESUp_p[5]), //SL 222
+//        mem_p(data.mem_tth_JESUp_p[9], data.mem_ttbb_JESUp_p[9], 0.05), //SL 222 sj
+//        mem_p(data.mem_tth_JESUp_p[1], data.mem_ttbb_JESUp_p[1]), //DL 022,
+//        data.tth_mva_JESUp,
+//        data.common_bdt_JESUp,
+//        logit(data.btag_LR_4b_2b_btagCSV_JESUp),
+//        logit(data.btag_LR_4b_2b_btagCMVA_JESUp)
+//    );
+//}
+//
+//const Event EventFactory::makeJESDown(const TreeData& data, const Configuration& conf) {
+//    const vector<Jet> jets = makeAllJets(data, &(JetFactory::makeJESDown));
+//    const vector<Lepton> leptons = makeAllLeptons(data);
+//
+//    return Event(
+//        &data,
+//        data.is_sl,
+//        data.is_dl,
+//        data.passPV,
+//        data.numJets_JESDown,
+//        data.nBCSVM_JESDown,
+//        data.nBCSVL_JESDown,
+//        jets,
+//        leptons,
+//        data.weight_xs,
+//        data.puWeight,
+//        data.Wmass,
+//        mem_p(data.mem_tth_JESDown_p[0], data.mem_ttbb_JESDown_p[0]), //SL 022
+//        mem_p(data.mem_tth_JESDown_p[2], data.mem_ttbb_JESDown_p[2]), //SL 122
+//        mem_p(data.mem_tth_JESDown_p[5], data.mem_ttbb_JESDown_p[5]), //SL 222
+//        mem_p(data.mem_tth_JESDown_p[9], data.mem_ttbb_JESDown_p[9], 0.05), //SL 222 sj
+//        mem_p(data.mem_tth_JESDown_p[1], data.mem_ttbb_JESDown_p[1]), //DL 022,
+//        data.tth_mva,
+//        data.common_bdt_JESDown,
+//        logit(data.btag_LR_4b_2b_btagCSV_JESDown),
+//        logit(data.btag_LR_4b_2b_btagCMVA_JESDown)
+//    );
+//}
+//
+//const Event EventFactory::makeJERUp(const TreeData& data, const Configuration& conf) {
+//    const vector<Jet> jets = makeAllJets(data, &(JetFactory::makeJERUp));
+//    const vector<Lepton> leptons = makeAllLeptons(data);
+//
+//    return Event(
+//        &data,
+//        data.is_sl,
+//        data.is_dl,
+//        data.passPV,
+//        data.numJets_JERUp,
+//        data.nBCSVM_JERUp,
+//        data.nBCSVL_JERUp,
+//        jets,
+//        leptons,
+//        data.weight_xs,
+//        data.puWeight,
+//        data.Wmass,
+//        mem_p(data.mem_tth_JERUp_p[0], data.mem_ttbb_JERUp_p[0]), //SL 022
+//        mem_p(data.mem_tth_JERUp_p[2], data.mem_ttbb_JERUp_p[2]), //SL 122
+//        mem_p(data.mem_tth_JERUp_p[5], data.mem_ttbb_JERUp_p[5]), //SL 222
+//        mem_p(data.mem_tth_JERUp_p[9], data.mem_ttbb_JERUp_p[9], 0.05), //SL 222 sj
+//        mem_p(data.mem_tth_JERUp_p[1], data.mem_ttbb_JERUp_p[1]), //DL 022,
+//        data.tth_mva_JERUp,
+//        data.common_bdt_JERUp,
+//        logit(data.btag_LR_4b_2b_btagCSV_JERUp),
+//        logit(data.btag_LR_4b_2b_btagCMVA_JERUp)
+//    );
+//}
+//
+//const Event EventFactory::makeJERDown(const TreeData& data, const Configuration& conf) {
+//    const vector<Jet> jets = makeAllJets(data, &(JetFactory::makeJERDown));
+//    const vector<Lepton> leptons = makeAllLeptons(data);
+//
+//    return Event(
+//        &data,
+//        data.is_sl,
+//        data.is_dl,
+//        data.passPV,
+//        data.numJets_JERDown,
+//        data.nBCSVM_JERDown,
+//        data.nBCSVL_JERDown,
+//        jets,
+//        leptons,
+//        data.weight_xs,
+//        data.puWeight,
+//        data.Wmass,
+//        mem_p(data.mem_tth_JERDown_p[0], data.mem_ttbb_JERDown_p[0]), //SL 022
+//        mem_p(data.mem_tth_JERDown_p[2], data.mem_ttbb_JERDown_p[2]), //SL 122
+//        mem_p(data.mem_tth_JERDown_p[5], data.mem_ttbb_JERDown_p[5]), //SL 222
+//        mem_p(data.mem_tth_JERDown_p[9], data.mem_ttbb_JERDown_p[9], 0.05), //SL 222 sj
+//        mem_p(data.mem_tth_JERDown_p[1], data.mem_ttbb_JERDown_p[1]), //DL 022,
+//        data.tth_mva,
+//        data.common_bdt_JERDown,
+//        logit(data.btag_LR_4b_2b_btagCSV_JERDown),
+//        logit(data.btag_LR_4b_2b_btagCMVA_JERDown)
+//    );
+//}
 
 
 Jet::Jet(TLorentzVector& _p4, float _btagCSV, float _btagBDT, int _hadronFlavour) :
@@ -794,106 +795,106 @@ const Jet JetFactory::makeNominal(const TreeData& data, int njet) {
     );
 }
 
-const Jet JetFactory::makeJESUp(const TreeData& data, int njet) {
-    assert(njet <= data.njets);
-    TLorentzVector p4;
-    p4.SetPtEtaPhiM(
-        data.jets_pt[njet],
-        data.jets_eta[njet],
-        data.jets_phi[njet],
-        data.jets_mass[njet]
-    );
-    //Undo nominal correction, re-do JESUp correction
-    const double corr = data.jets_corr_JESUp[njet] / data.jets_corr[njet];
-    p4 *= (1.0 / corr);
-    double csv = data.jets_btagCSV[njet];
-    if (std::isnan(csv)) {
-        csv = -10.0;
-    }
-    return Jet(
-        p4,
-        csv,
-        data.jets_btagCMVA[njet],
-        data.jets_hadronFlavour[njet]
-    );
-}
+//const Jet JetFactory::makeJESUp(const TreeData& data, int njet) {
+//    assert(njet <= data.njets);
+//    TLorentzVector p4;
+//    p4.SetPtEtaPhiM(
+//        data.jets_pt[njet],
+//        data.jets_eta[njet],
+//        data.jets_phi[njet],
+//        data.jets_mass[njet]
+//    );
+//    //Undo nominal correction, re-do JESUp correction
+//    const double corr = data.jets_corr_JESUp[njet] / data.jets_corr[njet];
+//    p4 *= (1.0 / corr);
+//    double csv = data.jets_btagCSV[njet];
+//    if (std::isnan(csv)) {
+//        csv = -10.0;
+//    }
+//    return Jet(
+//        p4,
+//        csv,
+//        data.jets_btagCMVA[njet],
+//        data.jets_hadronFlavour[njet]
+//    );
+//}
+//
+//
+//const Jet JetFactory::makeJESDown(const TreeData& data, int njet) {
+//    assert(njet <= data.njets);
+//    TLorentzVector p4;
+//    p4.SetPtEtaPhiM(
+//        data.jets_pt[njet],
+//        data.jets_eta[njet],
+//        data.jets_phi[njet],
+//        data.jets_mass[njet]
+//    );
+//    //Undo nominal correction, re-do JESDown correction
+//    const double corr = data.jets_corr_JESDown[njet] / data.jets_corr[njet];
+//    p4 *= (1.0 / corr);
+//    
+//    double csv = data.jets_btagCSV[njet];
+//    if (std::isnan(csv)) {
+//        csv = -10.0;
+//    }
+//    return Jet(
+//        p4,
+//        csv,
+//        data.jets_btagCMVA[njet],
+//        data.jets_hadronFlavour[njet]
+//    );
+//}
 
 
-const Jet JetFactory::makeJESDown(const TreeData& data, int njet) {
-    assert(njet <= data.njets);
-    TLorentzVector p4;
-    p4.SetPtEtaPhiM(
-        data.jets_pt[njet],
-        data.jets_eta[njet],
-        data.jets_phi[njet],
-        data.jets_mass[njet]
-    );
-    //Undo nominal correction, re-do JESDown correction
-    const double corr = data.jets_corr_JESDown[njet] / data.jets_corr[njet];
-    p4 *= (1.0 / corr);
-    
-    double csv = data.jets_btagCSV[njet];
-    if (std::isnan(csv)) {
-        csv = -10.0;
-    }
-    return Jet(
-        p4,
-        csv,
-        data.jets_btagCMVA[njet],
-        data.jets_hadronFlavour[njet]
-    );
-}
-
-
-const Jet JetFactory::makeJERUp(const TreeData& data, int njet) {
-    assert(njet <= data.njets);
-    TLorentzVector p4;
-    p4.SetPtEtaPhiM(
-        data.jets_pt[njet],
-        data.jets_eta[njet],
-        data.jets_phi[njet],
-        data.jets_mass[njet]
-    );
-    //Undo nominal correction, re-do JERUp correction
-    const double corr = data.jets_corr_JERUp[njet] / data.jets_corr_JER[njet];
-    p4 *= (1.0 / corr);
-    double csv = data.jets_btagCSV[njet];
-    if (std::isnan(csv)) {
-        csv = -10.0;
-    }
-    return Jet(
-        p4,
-        csv,
-        data.jets_btagCSV[njet],
-        data.jets_hadronFlavour[njet]
-    );
-}
-
-
-const Jet JetFactory::makeJERDown(const TreeData& data, int njet) {
-    assert(njet <= data.njets);
-    TLorentzVector p4;
-    p4.SetPtEtaPhiM(
-        data.jets_pt[njet],
-        data.jets_eta[njet],
-        data.jets_phi[njet],
-        data.jets_mass[njet]
-    );
-    //Undo nominal correction, re-do JERDown correction
-    const double corr = data.jets_corr_JERDown[njet] / data.jets_corr_JER[njet];
-    p4 *= (1.0 / corr);
-    
-    double csv = data.jets_btagCSV[njet];
-    if (std::isnan(csv)) {
-        csv = -10.0;
-    }
-    return Jet(
-        p4,
-        csv,
-        data.jets_btagCSV[njet],
-        data.jets_hadronFlavour[njet]
-    );
-}
+//const Jet JetFactory::makeJERUp(const TreeData& data, int njet) {
+//    assert(njet <= data.njets);
+//    TLorentzVector p4;
+//    p4.SetPtEtaPhiM(
+//        data.jets_pt[njet],
+//        data.jets_eta[njet],
+//        data.jets_phi[njet],
+//        data.jets_mass[njet]
+//    );
+//    //Undo nominal correction, re-do JERUp correction
+//    const double corr = data.jets_corr_JERUp[njet] / data.jets_corr_JER[njet];
+//    p4 *= (1.0 / corr);
+//    double csv = data.jets_btagCSV[njet];
+//    if (std::isnan(csv)) {
+//        csv = -10.0;
+//    }
+//    return Jet(
+//        p4,
+//        csv,
+//        data.jets_btagCSV[njet],
+//        data.jets_hadronFlavour[njet]
+//    );
+//}
+//
+//
+//const Jet JetFactory::makeJERDown(const TreeData& data, int njet) {
+//    assert(njet <= data.njets);
+//    TLorentzVector p4;
+//    p4.SetPtEtaPhiM(
+//        data.jets_pt[njet],
+//        data.jets_eta[njet],
+//        data.jets_phi[njet],
+//        data.jets_mass[njet]
+//    );
+//    //Undo nominal correction, re-do JERDown correction
+//    const double corr = data.jets_corr_JERDown[njet] / data.jets_corr_JER[njet];
+//    p4 *= (1.0 / corr);
+//    
+//    double csv = data.jets_btagCSV[njet];
+//    if (std::isnan(csv)) {
+//        csv = -10.0;
+//    }
+//    return Jet(
+//        p4,
+//        csv,
+//        data.jets_btagCSV[njet],
+//        data.jets_hadronFlavour[njet]
+//    );
+//}
 
 
 const string Jet::to_string() const {
