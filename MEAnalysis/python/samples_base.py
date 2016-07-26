@@ -64,6 +64,7 @@ samples_nick = {
     'TTTo2L2Nu_13TeV-powheg': 'ttbarUnsplit',
     'TT_TuneEE5C_13TeV-powheg-herwigpp': 'ttbarUnsplit',
     'TT_TuneCUETP8M1_13TeV-amcatnlo-pythia8': "ttbarUnsplit",
+    'TT_TuneCUETP8M1_13TeV-powheg-pythia8': "ttbarUnsplit",
     'TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8': "ttW_Wlnu",
     'TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8':"ttW_Wqq",
     'TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8': "ttZ_Zqq",

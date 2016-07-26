@@ -1,4 +1,5 @@
 import ROOT
+ROOT.TH1.AddDirectory(False)
 from rootpy.tree.chain import TreeChain
 import sys, os
 from collections import OrderedDict
@@ -8,9 +9,44 @@ import rootpy.io
 
 import numpy as np
 from TTH.MEAnalysis.samples_base import getSitePrefix, xsec, samples_nick, xsec_sample, get_prefix_sample
+from TTH.Plotting.Datacards.sparse import save_hdict
 
 NA = -999
 MEM_SF = 0.1
+
+PROCESS_MAP = {
+    "ttH_hbb": 0,
+    "ttH_nonbb": 1,
+    "ttbarPlusBBbar": 2,
+    "ttbarPlus2B": 3,
+    "ttbarPlusB": 4,
+    "ttbarPlusCCbar": 5,
+    "ttbarOther": 6,
+}
+
+def assign_process_label(process, event):
+    """
+    In case the you need to decide which process an event falls into based on
+    the event itself:
+    process (string): the input process
+    event (FIXME): the event data
+
+    returns (string): the newly modified process string
+    """
+    if process == "ttbarUnsplit":
+        ttCls = event["ttCls"]
+        if ttCls == 51:
+            _process = "ttbarPlusB"
+        elif ttCls == 52:
+            _process = "ttbarPlus2B"
+        elif ttCls >= 53:
+            _process = "ttbarPlusBBbar"
+        elif ttCls in [41, 42, 43, 44, 45]:
+            _process = "ttbarPlusCCbar"
+        else:
+            _process = "ttbarOther"
+        process = _process
+    return process
 
 def logit(x):
     return np.log(x/(1.0 - x))
@@ -141,7 +177,8 @@ desc = Desc([
 ])
 
 class Axis:
-    def __init__(self, nbins, lo, hi, func):
+    def __init__(self, name, nbins, lo, hi, func):
+        self.name = name
         self.nbins = nbins 
         self.lo = lo
         self.hi = hi
@@ -151,7 +188,7 @@ class Axis:
         return self.func(event)
 
 class SparseOut:
-    def __init__(self, name, cut, axes, outdir):
+    def __init__(self, name, cut, axes):
         self.cut = cut
         self.axes = axes
 
@@ -171,47 +208,59 @@ class SparseOut:
             minVec.data(),
             maxVec.data(),
         )
+        for iax, ax in enumerate(self.axes):
+            self.hist.GetAxis(iax).SetName(ax.name)
+            self.hist.GetAxis(iax).SetTitle(ax.name)
+
         self.hist.Sumw2()
-        outdir.Add(self.hist)
     
     def fill(self, event):
         valVec = getattr(ROOT, "std::vector<float>")()
-        for ax in axes:
-            valVec.push_back(ax.getValue(event))
+        for ax in self.axes:
+            v = ax.getValue(event)
+            valVec.push_back(v)
         self.hist.Fill(valVec)
 
+def saveResults(outfile, prefix, outdict_syst):
+    hdict = {}
+    for syst, outdict in outdict_syst.items():
+        if syst == "nominal":
+            systsuf = ""
+        else:
+            systsuf = "_" + syst
+
+        for name, obj in outdict.items():
+            full_name = "{0}/{1}{2}".format(prefix, name, systsuf)
+            print full_name, obj.hist.GetEntries()
+            obj.hist = obj.hist.Clone()
+            hdict[full_name] = obj.hist
+    save_hdict(outfile, hdict)
+
 axes = [
-    Axis(1, 0, 1, lambda ev: ev["counting"]),
-    Axis(6, 0, 6, lambda ev: ev["leptonFlavour"]),
-    Axis(1, 0, 1, lambda ev: ev["evt"]%2==0),
-    Axis(36, 0, 1, lambda ev: ev["mem_SL_2w2h2t_p"]),
-    Axis(36, 0, 1, lambda ev: ev["mem_SL_1w2h2t_p"]),
-    Axis(36, 0, 1, lambda ev: ev["mem_SL_0w2h2t_p"]),
-    Axis(36, 0, 1, lambda ev: ev["mem_DL_0w2h2t_p"]),
-    Axis(36, 0, 1, lambda ev: ev["common_bdt"]),
-    Axis(5, 3, 8, lambda ev: ev["numJets"]),
-    Axis(4, 1, 5, lambda ev: ev["nBCSVM"]),
-    Axis(4, 1, 5, lambda ev: ev["nBCMVAM"]),
-    Axis(50, -20, 20, lambda ev: ev["btag_LR_4b_2b_btagCSV_logit"]),
-    Axis(50, -20, 20, lambda ev: ev["btag_LR_4b_2b_btagCMVA_logit"]),
+    Axis("process", 20, 0, 20, lambda ev: ev["process"]),
+    Axis("counting", 1, 0, 1, lambda ev: ev["counting"]),
+    Axis("leptonFlavour", 6, 0, 6, lambda ev: ev["leptonFlavour"]),
+    Axis("parity", 1, 0, 1, lambda ev: ev["evt"]%2==0),
+    Axis("mem_SL_2w2h2t_p", 36, 0, 1, lambda ev: ev["mem_SL_2w2h2t_p"]),
+    Axis("mem_SL_1w2h2t_p", 36, 0, 1, lambda ev: ev["mem_SL_1w2h2t_p"]),
+    Axis("mem_SL_0w2h2t_p", 36, 0, 1, lambda ev: ev["mem_SL_0w2h2t_p"]),
+    Axis("mem_DL_0w2h2t_p", 36, 0, 1, lambda ev: ev["mem_DL_0w2h2t_p"]),
+    Axis("common_bdt", 36, 0, 1, lambda ev: ev["common_bdt"]),
+    Axis("numJets", 5, 3, 8, lambda ev: ev["numJets"]),
+    Axis("nBCSVM", 4, 1, 5, lambda ev: ev["nBCSVM"]),
+    Axis("nBCMVAM", 4, 1, 5, lambda ev: ev["nBCMVAM"]),
+    Axis("btag_LR_4b_2b_btagCSV_logit", 50, -20, 20, lambda ev: ev["btag_LR_4b_2b_btagCSV_logit"]),
+    Axis("btag_LR_4b_2b_btagCMVA_logit", 50, -20, 20, lambda ev: ev["btag_LR_4b_2b_btagCMVA_logit"]),
+    Axis("jetsByPt_0_pt", 50, 0, 400, lambda ev: ev["jets_p4"][0].Pt()),
 ]
 
 if __name__ == "__main__":
     file_names = map(getSitePrefix, os.environ["FILE_NAMES"].split())
     prefix, sample = get_prefix_sample(os.environ["DATASETPATH"])
     process = samples_nick[sample]
-    #of = rootpy.io.File("out.root", "RECREATE")
-    #dirs = {}
-    #dirs["sl"] = of.mkdir("{0}/sl".format(process), recurse=True)
-    #dirs["dl"] = of.mkdir("{0}/dl".format(process), recurse=True)
 
     outdict_syst = {}
-  
-    events = TreeChain("tree", file_names, verbose=True)
-    #events = ROOT.TChain("tree")
-    #for fi in file_names:
-    #    events.AddFile(fi)
-
+    
     systs = ["nominal", "JESUp", "JESDown"]
     for syst in systs: 
         syststr = ""
@@ -219,43 +268,56 @@ if __name__ == "__main__":
             syststr = "_" + syst
 
         outdict = {}
-        #outdict["sl/sparse"] = SparseOut(
-        #    "sparse" + syststr,
-        #    lambda ev: ev["is_sl"] == 1,
-        #    axes,
-        #    dirs["sl"] 
-        #)
-        #outdict["dl/sparse"] = SparseOut(
-        #    "sparse" + syststr,
-        #    lambda ev: ev["is_dl"] == 1,
-        #    axes,
-        #    dirs["dl"] 
-        #)
+        outdict["sl/sparse"] = SparseOut(
+            "sparse" + syststr,
+            lambda ev: ev["is_sl"] == 1,
+            axes,
+        )
+        outdict["dl/sparse"] = SparseOut(
+            "sparse" + syststr,
+            lambda ev: ev["is_dl"] == 1,
+            axes,
+        )
         outdict_syst[syst] = outdict
+    
+    nevents = 0
+    for file_name in file_names:
+        print "opening {0}".format(file_name)
+        tf = rootpy.io.File.Open(file_name)
+        events = tf.Get("tree")
+        print "opened {0}".format(events)
+        print "looping over {0} events".format(events.GetEntries())
+       
+        iEv = 0
+        for ev in events:
+            if not (ev.is_sl or ev.is_dl):
+                continue
+            if not ev.numJets >= 4:
+                continue
+            if not ev.nBCSVM>=3:
+                continue
 
-    for iEv, ev in enumerate(events):
+            for syst in systs:
+                ret = desc.getValue(ev, syst)
+                proc_label = assign_process_label(process, ret)
+                ret["process"] = PROCESS_MAP[proc_label]
+                ret["syst"] = syst
+                ret["counting"] = 0
+                ret["leptonFlavour"] = 0
+                ret["common_bdt"] = 0
+                #print event_as_str(ret)+"\n---"
+                
+                for (k, v) in outdict_syst[syst].items():
+                    if v.cut(ret):
+                        v.fill(ret)
+            #end of loop over systematics
+            nevents += 1
+            iEv += 1
+        #end of loop over events
+        tf.Close()
+    #end of loop over file names
 
-        if not ev.is_sl or ev.is_dl:
-            continue
-        if not ev.numJets >= 4:
-            continue
-        if not ev.nBCSVM>=3:
-            continue
+    print "processed {0} events".format(nevents)
+    print "writing output"
 
-        for syst in systs:
-            ret = desc.getValue(ev, syst)
-            ret["syst"] = syst
-            ret["counting"] = 0
-            ret["leptonFlavour"] = 0
-            ret["common_bdt"] = 0
-            print event_as_str(ret)+"\n---"
-            
-            #for (k, v) in outdict_syst[syst].items():
-            #    if v.cut(ret):
-            #        v.fill(ret)
-
-    print "writing output" 
-    #of.Write()
-    #of.Close()
-    #del of
-    #del events
+    saveResults("out.root", process, outdict_syst)
