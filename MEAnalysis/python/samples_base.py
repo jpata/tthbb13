@@ -76,7 +76,12 @@ samples_nick = {
     'WZ_TuneCUETP8M1_13TeV-pythia8': "wz",
     'ZZ_TuneCUETP8M1_13TeV-pythia8': "zz",
     'ttHToNonbb_M125_13TeV_powheg_pythia8': "ttH_nonhbb",
-    'ttHTobb_M125_13TeV_powheg_pythia8': "ttH_hbb"
+    'ttHTobb_M125_13TeV_powheg_pythia8': "ttH_hbb",
+    "SingleMuon": "data_m",
+    "SingleElectron": "data_e",
+    "MuonEG": "data_em",
+    "DoubleEG": "data_ee",
+    "DoubleMuon": "data_mm",
 }
 
 xsec_sample = {

@@ -1,11 +1,19 @@
+from __future__ import print_function
+
 import ROOT
 ROOT.TH1.AddDirectory(False)
-from rootpy.tree.chain import TreeChain
+
 import sys, os
 from collections import OrderedDict
-from rootpy.vector import LorentzVector
-import rootpy
-import rootpy.io
+
+try:
+    from rootpy.tree.chain import TreeChain
+    from rootpy.vector import LorentzVector
+    import rootpy
+    import rootpy.io
+except Exception as e:
+    print('could not import rootpy, make sure you are using anaconda (via $CMSSW_BASE/src/TTH/setenv_*.sh)', file=sys.stderr)
+    raise e
 
 import numpy as np
 from TTH.MEAnalysis.samples_base import getSitePrefix, xsec, samples_nick, xsec_sample, get_prefix_sample
@@ -22,6 +30,13 @@ PROCESS_MAP = {
     "ttbarPlusB": 4,
     "ttbarPlusCCbar": 5,
     "ttbarOther": 6,
+
+#need to keep different data samples separate at this point
+    "data_e": 7,
+    "data_m": 8,
+    "data_mm": 9,
+    "data_ee": 10,
+    "data_em": 11,
 }
 
 def assign_process_label(process, event):
@@ -45,7 +60,9 @@ def assign_process_label(process, event):
             _process = "ttbarPlusCCbar"
         else:
             _process = "ttbarOther"
-        process = _process
+        return _process 
+    elif samples_nick.has_key(process):
+        return samples_nick[process]
     return process
 
 def logit(x):
@@ -70,7 +87,7 @@ class Var:
         self.nominal_func = kwargs.get("nominal", Func(self.name))
 
         self.systematics_funcs = kwargs.get("systematics", {})
-
+        self.schema = kwargs.get("schema", ["mc", "data"])
 
     def getValue(self, event, systematic="nominal"):
         if systematic == "nominal" or not self.systematics_funcs.has_key(systematic):
@@ -83,10 +100,11 @@ class Desc:
         self.variables = variables
         self.variables_dict = OrderedDict([(v.name, v) for v in self.variables])
 
-    def getValue(self, event, systematic="nominal"):
+    def getValue(self, event, systematic="nominal", schema="mc"):
         ret = OrderedDict()
         for vname, v in self.variables_dict.items():
-            ret[vname] = v.getValue(event, systematic)
+            if schema in v.schema:
+                ret[vname] = v.getValue(event, systematic)
         return ret
 
 def event_as_str(ret):
@@ -131,7 +149,7 @@ desc = Desc([
     Var(name="nBCSVM"),
     Var(name="nBCMVAM"),
 
-    Var(name="ttCls"),
+    Var(name="ttCls", schema=["mc"]),
 
     Var(name="btag_LR_4b_2b_btagCSV_logit",
         nominal=Func("blr_CSV", func=lambda ev: logit(ev.btag_LR_4b_2b_btagCSV)),
@@ -231,7 +249,7 @@ def saveResults(outfile, prefix, outdict_syst):
 
         for name, obj in outdict.items():
             full_name = "{0}/{1}{2}".format(prefix, name, systsuf)
-            print full_name, obj.hist.GetEntries()
+            print(full_name, obj.hist.GetEntries())
             obj.hist = obj.hist.Clone()
             hdict[full_name] = obj.hist
     save_hdict(outfile, hdict)
@@ -239,7 +257,6 @@ def saveResults(outfile, prefix, outdict_syst):
 axes = [
     Axis("process", 20, 0, 20, lambda ev: ev["process"]),
     Axis("counting", 1, 0, 1, lambda ev: ev["counting"]),
-    Axis("leptonFlavour", 6, 0, 6, lambda ev: ev["leptonFlavour"]),
     Axis("parity", 1, 0, 1, lambda ev: ev["evt"]%2==0),
     Axis("mem_SL_2w2h2t_p", 36, 0, 1, lambda ev: ev["mem_SL_2w2h2t_p"]),
     Axis("mem_SL_1w2h2t_p", 36, 0, 1, lambda ev: ev["mem_SL_1w2h2t_p"]),
@@ -254,15 +271,30 @@ axes = [
     Axis("jetsByPt_0_pt", 50, 0, 400, lambda ev: ev["jets_p4"][0].Pt()),
 ]
 
+def get_schema(sample):
+    process = samples_nick[sample]
+    if "data" in process:
+        schema = "data"
+    else:
+        schema = "mc"
+    return schema
+
 if __name__ == "__main__":
     file_names = map(getSitePrefix, os.environ["FILE_NAMES"].split())
     prefix, sample = get_prefix_sample(os.environ["DATASETPATH"])
     process = samples_nick[sample]
+    schema = get_schema(sample)
 
     outdict_syst = {}
-    
-    systs = ["nominal", "JESUp", "JESDown"]
-    for syst in systs: 
+  
+    #configure systematic scenarios according to MC/Data
+    if schema == "mc":
+        systematics = ["nominal", "JESUp", "JESDown"]
+    elif schema == "data":
+        systematics = ["nominal"]
+   
+    #pre-create output histograms
+    for syst in systematics: 
         syststr = ""
         if syst != "nominal":
             syststr = "_" + syst
@@ -282,23 +314,26 @@ if __name__ == "__main__":
     
     nevents = 0
     for file_name in file_names:
-        print "opening {0}".format(file_name)
+        print("opening {0}".format(file_name))
         tf = rootpy.io.File.Open(file_name)
         events = tf.Get("tree")
-        print "opened {0}".format(events)
-        print "looping over {0} events".format(events.GetEntries())
+        print("opened {0}".format(events))
+        print("looping over {0} events".format(events.GetEntries()))
        
         iEv = 0
-        for ev in events:
-            if not (ev.is_sl or ev.is_dl):
+
+        for event in events:
+
+            #apply some basic preselection
+            if not (event.is_sl or event.is_dl):
                 continue
-            if not ev.numJets >= 4:
+            if not event.numJets >= 4:
                 continue
-            if not ev.nBCSVM>=3:
+            if not event.nBCSVM>=3:
                 continue
 
-            for syst in systs:
-                ret = desc.getValue(ev, syst)
+            for syst in systematics:
+                ret = desc.getValue(event, syst, schema)
                 proc_label = assign_process_label(process, ret)
                 ret["process"] = PROCESS_MAP[proc_label]
                 ret["syst"] = syst
@@ -317,7 +352,7 @@ if __name__ == "__main__":
         tf.Close()
     #end of loop over file names
 
-    print "processed {0} events".format(nevents)
-    print "writing output"
+    print("processed {0} events".format(nevents))
+    print("writing output")
 
-    saveResults("out.root", process, outdict_syst)
+    saveResults("out.root", sample, outdict_syst)
