@@ -282,7 +282,7 @@ class SparseOut:
         for ax in self.axes:
             v = ax.getValue(event)
             valVec.push_back(v)
-        print([v for v in valVec], "w={0}".format(weight))
+        #print([v for v in valVec], "w={0}".format(weight))
 
         #Very important: here we need to take the pointer to the start of the value vector with std::vector<double)::data() -> double*
         #otherwise the THnSparse is filled, but with garbage and will result in TBrowser segfaults later 
@@ -390,7 +390,10 @@ if __name__ == "__main__":
                 ret["counting"] = 0
                 ret["leptonFlavour"] = 0
                 ret["common_bdt"] = 0
-                ret["weight_nominal"] = ret["puWeight"]
+
+                ret["weight_nominal"] = 1.0
+                if schema == "mc":
+                    ret["weight_nominal"] *= ret["puWeight"]
                 
                 #Fill the base histogram
                 for (k, v) in outdict_syst[syst].items():
@@ -399,7 +402,7 @@ if __name__ == "__main__":
                         v.fill(ret, weight)
                
                 #nominal event, fill also histograms with systematic weights
-                if syst == "nominal":
+                if syst == "nominal" and schema == "mc":
                     for (syst_weight, weightfunc) in systematic_weights:
                         weight = weightfunc(ret)
                         for (k, v) in outdict_syst[syst_weight].items():
