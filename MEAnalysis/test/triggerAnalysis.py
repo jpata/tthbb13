@@ -34,7 +34,7 @@ triggers_SL_e = [
 ]
 
 # Nota: ttH triggers are Mu22
-# but not available, so use Mu20
+# but not available, so use Mu27
 # https://github.com/jpata/tthbb-sync/blob/master/Sync16.md#trigger-selection
 triggers_SL_m = [
     "HLT_IsoMu27_v",
