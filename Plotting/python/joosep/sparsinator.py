@@ -5,6 +5,12 @@ import ROOT
 import sys, os
 from collections import OrderedDict
 
+# We use rootpy because it has a nice buffer arount TTree,
+# which allows us to not re-read the whole tree every time we access
+# one branch from python using tree.branch.
+# See https://github.com/rootpy/rootpy/blob/master/rootpy/tree/treebuffer.py
+# for more details. In case you use rootpy.io.File instead of TFile,
+# the tree automatically has this buffer.
 #Try loading rootpy (installed via anaconda)
 try:
     from rootpy.tree.chain import TreeChain
@@ -43,6 +49,7 @@ PROCESS_MAP = {
     "data_ee": 10,
     "data_em": 11,
 }
+SYSTEMATICS_EVENT = ["JESUp", "JESDown", "JERUp", "JERDown"]
 
 """
 Create pairs of (systematic_name, weight function), which will be used on the
@@ -101,6 +108,17 @@ class Func:
     def __call__(self, event):
         return self.func(event)
 
+def fillSystSuffix(name, systematics):
+    ret = {}
+    for syst in systematics:
+        for sdir in ["Up", "Down"]:
+            suffix = syst+sdir
+            ret[suffix] = Func(
+                name + "_" + suffix,
+                func=lambda ev, suff=suffix, fallback=name: getattr(ev, suff, fallback)
+            )
+    return ret
+
 class Var:
     def __init__(self, **kwargs):
         self.name = kwargs.get("name")
@@ -110,6 +128,13 @@ class Var:
         self.nominal_func = kwargs.get("nominal", Func(self.name))
 
         self.systematics_funcs = kwargs.get("systematics", {})
+        #in case this variable is just a pre-calculated branch on the tree (e.g. numJets),
+        #append systematic suffixes to create the systematically variated branches (numJets_JESUp)
+        if self.systematics_funcs == "suffix":
+            if kwargs.has_key("nominal"):
+                raise Exception("don't know how to generate systematic function for non-default nominal")
+            self.systematics_funcs = fillSystSuffix(self.name, SYSTEMATICS_EVENT)
+
         self.schema = kwargs.get("schema", ["mc", "data"])
 
     def getValue(self, event, systematic="nominal"):
@@ -168,14 +193,12 @@ desc = Desc([
     Var(name="is_sl"),
     Var(name="is_dl"),
 
-    Var(name="numJets"),
-    Var(name="nBCSVM"),
-    Var(name="nBCMVAM"),
+    Var(name="numJets", systematics="suffix"),
+    Var(name="nBCSVM", systematics="suffix"),
+    Var(name="nBCMVAM", systematics="suffix"),
+    
+    Var(name="Wmass", systematics="suffix"),
 
-    Var(name="ttCls", schema=["mc"]),
-    Var(name="puWeight", schema=["mc"]),
-    #nominal b-tag weight, systematic weights added later
-    Var(name="bTagWeight", schema=["mc"]),
 
     Var(name="btag_LR_4b_2b_btagCSV_logit",
         nominal=Func("blr_CSV", func=lambda ev: logit(ev.btag_LR_4b_2b_btagCSV)),
@@ -183,8 +206,6 @@ desc = Desc([
     Var(name="btag_LR_4b_2b_btagCMVA_logit",
         nominal=Func("blr_cMVA", func=lambda ev: logit(ev.btag_LR_4b_2b_btagCMVA)),
     ),
-
-    Var(name="nBCMVAM"),
 
     Var(name="jets_p4",
         nominal=Func(
@@ -202,6 +223,16 @@ desc = Desc([
                 "jets_p4_JESDown",
                 func=lambda ev: [lv_p4s(pt*float(cvar)/float(c), eta, phi, m) for (pt, eta, phi, m, cvar, c) in
                 zip(ev.jets_pt[:ev.njets], ev.jets_eta[:ev.njets], ev.jets_phi[:ev.njets], ev.jets_mass[:ev.njets], ev.jets_corr_JESDown[:ev.njets], ev.jets_corr[:ev.njets])]
+            ),
+            "JERUp": Func(
+                "jets_p4_JERUp",
+                func=lambda ev: [lv_p4s(pt*float(cvar)/float(c) if c>0 else 0.0, eta, phi, m) for (pt, eta, phi, m, cvar, c) in
+                zip(ev.jets_pt[:ev.njets], ev.jets_eta[:ev.njets], ev.jets_phi[:ev.njets], ev.jets_mass[:ev.njets], ev.jets_corr_JERUp[:ev.njets], ev.jets_corr_JER[:ev.njets])]
+            ),
+            "JERDown": Func(
+                "jets_p4_JERDown",
+                func=lambda ev: [lv_p4s(pt*float(cvar)/float(c) if c>0 else 0.0, eta, phi, m) for (pt, eta, phi, m, cvar, c) in
+                zip(ev.jets_pt[:ev.njets], ev.jets_eta[:ev.njets], ev.jets_phi[:ev.njets], ev.jets_mass[:ev.njets], ev.jets_corr_JERDown[:ev.njets], ev.jets_corr_JER[:ev.njets])]
             )
         }
     ),
@@ -218,6 +249,12 @@ desc = Desc([
     Var(name="mem_DL_0w2h2t_p",
         nominal=Func("mem_p_DL_0w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_DL_0w2h2t_p/(ev.mem_tth_DL_0w2h2t_p + sf*ev.mem_ttbb_DL_0w2h2t_p) if ev.mem_tth_DL_0w2h2t_p>0 else 0.0),
     ),
+
+#MC-only branches
+    Var(name="ttCls", schema=["mc"]),
+    Var(name="puWeight", schema=["mc"]),
+    #nominal b-tag weight, systematic weights added later
+    Var(name="bTagWeight", schema=["mc"]),
 ] + [Var(name=bw, schema=["mc"]) for bw in btag_weights])
 
 class Axis:
@@ -300,9 +337,19 @@ axes = [
     Axis("numJets", 5, 3, 8, lambda ev: ev["numJets"]),
     Axis("nBCSVM", 4, 1, 5, lambda ev: ev["nBCSVM"]),
     Axis("nBCMVAM", 4, 1, 5, lambda ev: ev["nBCMVAM"]),
+    
+    Axis("Wmass", 100, 50, 150, lambda ev: ev["Wmass"]),
+
     Axis("btag_LR_4b_2b_btagCSV_logit", 50, -20, 20, lambda ev: ev["btag_LR_4b_2b_btagCSV_logit"]),
     Axis("btag_LR_4b_2b_btagCMVA_logit", 50, -20, 20, lambda ev: ev["btag_LR_4b_2b_btagCMVA_logit"]),
+    
     Axis("jetsByPt_0_pt", 50, 0, 400, lambda ev: ev["jets_p4"][0].Pt()),
+    Axis("jetsByPt_1_pt", 50, 0, 400, lambda ev: ev["jets_p4"][1].Pt()),
+    Axis("jetsByPt_2_pt", 50, 0, 400, lambda ev: ev["jets_p4"][2].Pt()),
+
+    Axis("jetsByPt_0_eta", 50, 0, 400, lambda ev: ev["jets_p4"][0].Eta()),
+    Axis("jetsByPt_1_eta", 50, 0, 400, lambda ev: ev["jets_p4"][1].Eta()),
+    Axis("jetsByPt_2_eta", 50, 0, 400, lambda ev: ev["jets_p4"][2].Eta()),
 ]
 
 def get_schema(sample):
@@ -346,7 +393,7 @@ if __name__ == "__main__":
 
     #configure systematic scenarios according to MC/Data
     if schema == "mc":
-        systematics_event = ["nominal", "JESUp", "JESDown", "JERUp", "JERDown"]
+        systematics_event = ["nominal"] + SYSTEMATICS_EVENT
         systematics_weight = [k[0] for k in systematic_weights]
     elif schema == "data":
         systematics_event = ["nominal"]
@@ -379,7 +426,7 @@ if __name__ == "__main__":
                 continue
             if not event.numJets >= 4:
                 continue
-            if not event.nBCSVM>=3 or event.nBCMVAM>=3:
+            if not (event.nBCSVM>=3 or event.nBCMVAM>=3):
                 continue
 
             for syst in systematics_event:
