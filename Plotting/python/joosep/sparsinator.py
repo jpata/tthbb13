@@ -327,6 +327,7 @@ class SparseOut:
 
 axes = [
     Axis("process", 20, 0, 20, lambda ev: ev["process"]),
+    Axis("triggerPath", 20, 0, 20, lambda ev: ev["triggerPath"]),
     Axis("counting", 1, 0, 1, lambda ev: ev["counting"]),
     Axis("parity", 1, 0, 1, lambda ev: ev["evt"]%2==0),
     Axis("mem_SL_2w2h2t_p", 36, 0, 1, lambda ev: ev["mem_SL_2w2h2t_p"]),
@@ -385,6 +386,34 @@ def createOutputs(dirs, systematics):
         outdict_syst[syst] = outdict
     return outdict_syst
 
+def pass_HLT_sl_mu(event):
+    return True
+
+def pass_HLT_sl_mu(event):
+    return True
+
+def pass_HLT_dl_mumu(event):
+    return True
+
+def pass_HLT_dl_elmu(event):
+    return True
+
+def pass_HLT_dl_elel(event):
+    return True
+
+def triggerPath(event):
+    if event["is_sl"] and pass_HLT_sl_mu(event):
+        return 1
+    elif event["is_sl"] and pass_HLT_sl_el(event):
+        return 2
+    elif event["is_dl"] and pass_HLT_dl_mumu(event):
+        return 3
+    elif event["is_dl"] and pass_HLT_dl_elmu(event):
+        return 3
+    elif event["is_dl"] and pass_HLT_dl_elel(event):
+        return 4
+    return 0
+
 if __name__ == "__main__":
     file_names = map(getSitePrefix, os.environ["FILE_NAMES"].split())
     prefix, sample = get_prefix_sample(os.environ["DATASETPATH"])
@@ -437,6 +466,7 @@ if __name__ == "__main__":
                 ret["counting"] = 0
                 ret["leptonFlavour"] = 0
                 ret["common_bdt"] = 0
+                ret["triggerPath"] = triggerPath(ret)
 
                 ret["weight_nominal"] = 1.0
                 if schema == "mc":

@@ -11,13 +11,22 @@ from PhysicsTools.Heppy.analyzers.core.AutoFillTreeProducer import *
 #FIXME: this is a hack to run heppy on non-EDM formats. Better to propagate it to heppy
 def fillCoreVariables(self, tr, event, isMC):
     if isMC:
-        for x in ["run", "lumi", "evt", "xsec", "nTrueInt", "puWeight", "genWeight"]:
+        for x in ["run", "lumi", "evt", "xsec", "nTrueInt", "genWeight"]:
             tr.fill(x, getattr(event.input, x))
     else:
         for x in ["run", "lumi", "evt"]:
             tr.fill(x, getattr(event.input, x))
 
 AutoFillTreeProducer.fillCoreVariables = fillCoreVariables
+  
+bweights = [
+    "btagWeightCSV", "btagWeightCMVAV2"
+]
+
+for sdir in ["up", "down"]:
+    for syst in ["cferr1", "cferr2", "hf", "hfstats1", "hfstats2", "jes", "lf", "lfstats1", "lfstats2"]:
+        for tagger in ["CSV", "CMVAV2"]:
+            bweights += ["btagWeight{0}_{1}_{2}".format(tagger, syst, sdir)]
 
 #Specifies what to save for jets
 jetType = NTupleObjectType("jetType", variables = [
@@ -31,17 +40,6 @@ jetType = NTupleObjectType("jetType", variables = [
     NTupleVariable("btagCMVA", lambda x : x.btagCMVA),
     NTupleVariable("btagCMVA_log", lambda x : getattr(x, "btagCMVA_log", -20), help="log-transformed btagCMVA"),
     NTupleVariable("btagFlag", lambda x : getattr(x, "btagFlag", -1), help="Jet was considered to be a b in MEM according to the algo"),
-    #NTupleVariable("bTagWeight", lambda x : x.bTagWeight, mcOnly=True),
-    #NTupleVariable("bTagWeightHFUp", lambda x : x.bTagWeightHFUp, mcOnly=True),
-    #NTupleVariable("bTagWeightHFDown", lambda x : x.bTagWeightHFDown, mcOnly=True),
-    #NTupleVariable("bTagWeightLFUp", lambda x : x.bTagWeightLFUp, mcOnly=True),
-    #NTupleVariable("bTagWeightLFDown", lambda x : x.bTagWeightLFDown, mcOnly=True),
-    #NTupleVariable("bTagWeightStats1Up", lambda x : x.bTagWeightStats1Up, mcOnly=True),
-    #NTupleVariable("bTagWeightStats1Down", lambda x : x.bTagWeightStats1Down, mcOnly=True),
-    #NTupleVariable("bTagWeightStats2Up", lambda x : x.bTagWeightStats2Up, mcOnly=True),
-    #NTupleVariable("bTagWeightStats2Down", lambda x : x.bTagWeightStats2Down, mcOnly=True),
-    #NTupleVariable("bTagWeightJESUp", lambda x : x.bTagWeightJESUp, mcOnly=True),
-    #NTupleVariable("bTagWeightJESDown", lambda x : x.bTagWeightJESDown, mcOnly=True),
     NTupleVariable("mcFlavour", lambda x : x.mcFlavour, type=int, mcOnly=True),
     NTupleVariable("mcMatchId", lambda x : x.mcMatchId, type=int, mcOnly=True),
     NTupleVariable("hadronFlavour", lambda x : x.hadronFlavour, type=int, mcOnly=True),
@@ -65,27 +63,6 @@ jetType = NTupleObjectType("jetType", variables = [
     NTupleVariable("corr_JERUp", lambda x : x.corr_JERUp, mcOnly=True),
     NTupleVariable("corr_JERDown", lambda x : x.corr_JERDown, mcOnly=True),
 ])
-
-#Set up offline b-weight calculation
-#csvpath = os.environ['CMSSW_BASE']+"/src/VHbbAnalysis/Heppy/data/csv"
-#bweightcalc = BTagWeightCalculator(
-#    csvpath + "/csv_rwt_fit_hf_76x_2016_02_08.root",
-#    csvpath + "/csv_rwt_fit_lf_76x_2016_02_08.root"
-#)
-#bweightcalc.btag = "btagCSV"
-
-#for syst in ["JES", "LF", "HF", "Stats1", "Stats2", "cErr1", "cErr2"]:
-#    for sdir in ["Up", "Down"]:
-#        jetType.variables += [NTupleVariable("bTagWeight"+syst+sdir,
-#            lambda jet, sname=syst+sdir,bweightcalc=bweightcalc: bweightcalc.calcJetWeightImpl(
-#                jet.pt, jet.eta, jet.hadronFlavour, jet.btagCSV, kind="final", systematic=sname
-#            ), float, mcOnly=True, help="b-tag CSV weight, variating "+syst + " "+sdir
-#        )]
-#jetType.variables += [NTupleVariable("bTagWeight",
-#    lambda jet, bweightcalc=bweightcalc: bweightcalc.calcJetWeightImpl(
-#        jet.pt, jet.eta, jet.hadronFlavour, jet.btagCSV, kind="final", systematic="nominal",
-#    ), float, mcOnly=True, help="b-tag CSV weight, nominal"
-#)]
 
 #Specifies what to save for leptons
 leptonType = NTupleObjectType("leptonType", variables = [
@@ -691,45 +668,18 @@ def getTreeProducer(conf):
     for vtype in [
         ("ttCls",                   int,    "ttbar classification from GenHFHadronMatcher"),
         ("genHiggsDecayMode",       int,    ""),
-        ("bTagWeight",              float,  ""),
-        ("bTagWeight_HFDown",       float,  ""),
-        ("bTagWeight_HFUp",         float,  ""),
-        ("bTagWeight_JESDown",      float,  ""),
-        ("bTagWeight_JESUp",        float,  ""),
-        ("bTagWeight_LFDown",       float,  ""),
-        ("bTagWeight_LFUp",         float,  ""),
-        ("bTagWeight_cErr1Down",       float,  ""),
-        ("bTagWeight_cErr1Up",         float,  ""),
-        ("bTagWeight_cErr2Down",       float,  ""),
-        ("bTagWeight_cErr2Up",         float,  ""),
-        ("bTagWeight_HFStats1Down",   float,  ""),
-        ("bTagWeight_HFStats1Up",     float,  ""),
-        ("bTagWeight_HFStats2Down",   float,  ""),
-        ("bTagWeight_HFStats2Up",     float,  ""),
-        ("bTagWeight_LFStats1Down",   float,  ""),
-        ("bTagWeight_LFStats1Up",     float,  ""),
-        ("bTagWeight_LFStats2Down",   float,  ""),
-        ("bTagWeight_LFStats2Up",     float,  ""),
+        ("puWeight",                float,    ""),
+        ("puWeightUp",                float,    ""),
+        ("puWeightDown",                float,    ""),
         ("nPU0",                    float,  ""),
     ]:
         treeProducer.globalVariables += [makeGlobalVariable(vtype, "nominal", mcOnly=True)]
+   
+    for bweight in bweights:
+        treeProducer.globalVariables += [
+            makeGlobalVariable((bweight, "float", ""), "nominal", mcOnly=True)
+        ]
 
-        #Update b-tag weights locally
-        #btag_weights = {}
-        #for syst in ["JES", "LF", "HF", "Stats1", "Stats2", "cErr1", "cErr2"]:
-        #    for sdir in ["Up", "Down"]:
-        #        name = "bTagWeight"+syst+sdir
-        #        btag_weights[name] = NTupleVariable("bTagWeight_" + syst + sdir,
-        #            lambda ev, sname=syst+sdir: bweightcalc.calcEventWeight(
-        #                ev.systResults["nominal"].good_jets, kind="final", systematic=sname
-        #            ), float, mcOnly=True, help="b-tag CSV weight, variating "+syst+" "+sdir
-        #        )
-        #btag_weights["bTagWeight"] = NTupleVariable("bTagWeight",
-        #    lambda ev: bweightcalc.calcEventWeight(
-        #        ev.systResults["nominal"].good_jets, kind="final", systematic="nominal"
-        #    ), float ,mcOnly=True, help="b-tag CSV weight, nominal"
-        #)
-        #treeProducer.globalVariables += list(btag_weights.values())
     for vtype in [
         ("rho",                     float,  ""),
         ("json",                    float,  ""),
