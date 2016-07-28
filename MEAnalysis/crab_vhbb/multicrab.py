@@ -358,6 +358,7 @@ env
         vhbb_dir + '/puDataPlus.root',
         'puMC.root',
         'json.txt',
+        vhbb_dir + "/ttbar-spring16-80X.weights.xml",
         vhbb_dir + "/Zll-spring15.weights.xml",
         vhbb_dir + "/Wln-spring15.weights.xml",
         vhbb_dir + "/Znn-spring15.weights.xml",
