@@ -14,7 +14,9 @@ melooper: Plotting/python/joosep/codeGen.py Plotting/bin/*.cc Plotting/interface
 vhbb_wrapper:
 	cd $(CMSSW_BASE)/src/VHbbAnalysis/Heppy/test && python genWrapper.py
 	cp $(CMSSW_BASE)/src/VHbbAnalysis/Heppy/test/tree.py $(CMSSW_BASE)/src/TTH/MEAnalysis/python/VHbbTree.py
-	git diff --stat $(CMSSW_BASE)/src/TTH/MEAnalysis/python/VHbbTree.py
+	cd $(CMSSW_BASE)/src/VHbbAnalysis/Heppy/test && python genWrapper_data.py
+	cp $(CMSSW_BASE)/src/VHbbAnalysis/Heppy/test/tree.py $(CMSSW_BASE)/src/TTH/MEAnalysis/python/VHbbTree_data.py
+	git diff --stat $(CMSSW_BASE)/src/TTH/MEAnalysis/python/VHbbTree*.py
 
 #This generates the C header file which describes the tthbb tree structure
 metree_wrapper:

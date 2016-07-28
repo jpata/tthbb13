@@ -81,6 +81,13 @@ class trgObjects_hltIsoMu20:
     @staticmethod
     def make_array(input):
         return [trgObjects_hltIsoMu20(input, i) for i in range(input.ntrgObjects_hltIsoMu20)]
+class aJCMVAV2idx:
+    def __init__(self, tree, n):
+        self.aJCMVAV2idx = tree.aJCMVAV2idx[n];
+        pass
+    @staticmethod
+    def make_array(input):
+        return [aJCMVAV2idx(input, i) for i in range(input.naJCMVAV2idx)]
 class trgObjects_hltQuadCentralJet30:
     def __init__(self, tree, n):
         pass
@@ -309,6 +316,13 @@ class trgObjects_caloJets:
     @staticmethod
     def make_array(input):
         return [trgObjects_caloJets(input, i) for i in range(input.ntrgObjects_caloJets)]
+class hJCMVAV2idx:
+    def __init__(self, tree, n):
+        self.hJCMVAV2idx = tree.hJCMVAV2idx[n];
+        pass
+    @staticmethod
+    def make_array(input):
+        return [hJCMVAV2idx(input, i) for i in range(input.nhJCMVAV2idx)]
 class trgObjects_hltPFSingleJetLooseID92:
     def __init__(self, tree, n):
         pass
@@ -935,6 +949,8 @@ class FatjetAK08ungroomed:
         self.mprunedcorr = tree.FatjetAK08ungroomed_mprunedcorr[n];
         self.JEC_L2L3 = tree.FatjetAK08ungroomed_JEC_L2L3[n];
         self.JEC_L1L2L3 = tree.FatjetAK08ungroomed_JEC_L1L2L3[n];
+        self.JEC_L2L3Unc = tree.FatjetAK08ungroomed_JEC_L2L3Unc[n];
+        self.JEC_L1L2L3Unc = tree.FatjetAK08ungroomed_JEC_L1L2L3Unc[n];
         self.bbtag = tree.FatjetAK08ungroomed_bbtag[n];
         self.id_Tight = tree.FatjetAK08ungroomed_id_Tight[n];
         self.numberOfDaughters = tree.FatjetAK08ungroomed_numberOfDaughters[n];
@@ -1351,43 +1367,62 @@ class Jet:
         self.pt_regVBF_corrJERUp = tree.Jet_pt_regVBF_corrJERUp[n];
         self.pt_reg_corrJERDown = tree.Jet_pt_reg_corrJERDown[n];
         self.pt_regVBF_corrJERDown = tree.Jet_pt_regVBF_corrJERDown[n];
-        self.bTagWeightJESUp = tree.Jet_bTagWeightJESUp[n];
-        self.bTagWeightJESDown = tree.Jet_bTagWeightJESDown[n];
-        self.bTagWeightLFUp = tree.Jet_bTagWeightLFUp[n];
-        self.bTagWeightLFDown = tree.Jet_bTagWeightLFDown[n];
-        self.bTagWeightHFUp = tree.Jet_bTagWeightHFUp[n];
-        self.bTagWeightHFDown = tree.Jet_bTagWeightHFDown[n];
-        self.bTagWeightHFStats1Up = tree.Jet_bTagWeightHFStats1Up[n];
-        self.bTagWeightHFStats1Down = tree.Jet_bTagWeightHFStats1Down[n];
-        self.bTagWeightHFStats2Up = tree.Jet_bTagWeightHFStats2Up[n];
-        self.bTagWeightHFStats2Down = tree.Jet_bTagWeightHFStats2Down[n];
-        self.bTagWeightLFStats1Up = tree.Jet_bTagWeightLFStats1Up[n];
-        self.bTagWeightLFStats1Down = tree.Jet_bTagWeightLFStats1Down[n];
-        self.bTagWeightLFStats2Up = tree.Jet_bTagWeightLFStats2Up[n];
-        self.bTagWeightLFStats2Down = tree.Jet_bTagWeightLFStats2Down[n];
-        self.bTagWeightcErr1Up = tree.Jet_bTagWeightcErr1Up[n];
-        self.bTagWeightcErr1Down = tree.Jet_bTagWeightcErr1Down[n];
-        self.bTagWeightcErr2Up = tree.Jet_bTagWeightcErr2Up[n];
-        self.bTagWeightcErr2Down = tree.Jet_bTagWeightcErr2Down[n];
-        self.bTagWeight = tree.Jet_bTagWeight[n];
-        self.btagCSVLSF = tree.Jet_btagCSVLSF[n];
-        self.btagCSVLSF_Up = tree.Jet_btagCSVLSF_Up[n];
-        self.btagCSVLSF_Down = tree.Jet_btagCSVLSF_Down[n];
-        self.btagCSVMSF = tree.Jet_btagCSVMSF[n];
-        self.btagCSVMSF_Up = tree.Jet_btagCSVMSF_Up[n];
-        self.btagCSVMSF_Down = tree.Jet_btagCSVMSF_Down[n];
-        self.btagCSVTSF = tree.Jet_btagCSVTSF[n];
-        self.btagCSVTSF_Up = tree.Jet_btagCSVTSF_Up[n];
-        self.btagCSVTSF_Down = tree.Jet_btagCSVTSF_Down[n];
-        self.btagCMVAV2LSF = tree.Jet_btagCMVAV2LSF[n];
-        self.btagCMVAV2LSF_Up = tree.Jet_btagCMVAV2LSF_Up[n];
-        self.btagCMVAV2LSF_Down = tree.Jet_btagCMVAV2LSF_Down[n];
-        self.btagCMVAV2MSF = tree.Jet_btagCMVAV2MSF[n];
-        self.btagCMVAV2MSF_Up = tree.Jet_btagCMVAV2MSF_Up[n];
-        self.btagCMVAV2MSF_Down = tree.Jet_btagCMVAV2MSF_Down[n];
-        self.btagCMVAV2TSF = tree.Jet_btagCMVAV2TSF[n];
-        self.btagCMVAV2TSF_Up = tree.Jet_btagCMVAV2TSF_Up[n];
-        self.btagCMVAV2TSF_Down = tree.Jet_btagCMVAV2TSF_Down[n];
+        self.btagCSVL_SF = tree.Jet_btagCSVL_SF[n];
+        self.btagCSVL_SF_up = tree.Jet_btagCSVL_SF_up[n];
+        self.btagCSVL_SF_down = tree.Jet_btagCSVL_SF_down[n];
+        self.btagCSVM_SF = tree.Jet_btagCSVM_SF[n];
+        self.btagCSVM_SF_up = tree.Jet_btagCSVM_SF_up[n];
+        self.btagCSVM_SF_down = tree.Jet_btagCSVM_SF_down[n];
+        self.btagCSVT_SF = tree.Jet_btagCSVT_SF[n];
+        self.btagCSVT_SF_up = tree.Jet_btagCSVT_SF_up[n];
+        self.btagCSVT_SF_down = tree.Jet_btagCSVT_SF_down[n];
+        self.btagWeightCSV = tree.Jet_btagWeightCSV[n];
+        self.btagWeightCSV_up_jes = tree.Jet_btagWeightCSV_up_jes[n];
+        self.btagWeightCSV_down_jes = tree.Jet_btagWeightCSV_down_jes[n];
+        self.btagWeightCSV_up_lf = tree.Jet_btagWeightCSV_up_lf[n];
+        self.btagWeightCSV_down_lf = tree.Jet_btagWeightCSV_down_lf[n];
+        self.btagWeightCSV_up_hf = tree.Jet_btagWeightCSV_up_hf[n];
+        self.btagWeightCSV_down_hf = tree.Jet_btagWeightCSV_down_hf[n];
+        self.btagWeightCSV_up_hfstats1 = tree.Jet_btagWeightCSV_up_hfstats1[n];
+        self.btagWeightCSV_down_hfstats1 = tree.Jet_btagWeightCSV_down_hfstats1[n];
+        self.btagWeightCSV_up_hfstats2 = tree.Jet_btagWeightCSV_up_hfstats2[n];
+        self.btagWeightCSV_down_hfstats2 = tree.Jet_btagWeightCSV_down_hfstats2[n];
+        self.btagWeightCSV_up_lfstats1 = tree.Jet_btagWeightCSV_up_lfstats1[n];
+        self.btagWeightCSV_down_lfstats1 = tree.Jet_btagWeightCSV_down_lfstats1[n];
+        self.btagWeightCSV_up_lfstats2 = tree.Jet_btagWeightCSV_up_lfstats2[n];
+        self.btagWeightCSV_down_lfstats2 = tree.Jet_btagWeightCSV_down_lfstats2[n];
+        self.btagWeightCSV_up_cferr1 = tree.Jet_btagWeightCSV_up_cferr1[n];
+        self.btagWeightCSV_down_cferr1 = tree.Jet_btagWeightCSV_down_cferr1[n];
+        self.btagWeightCSV_up_cferr2 = tree.Jet_btagWeightCSV_up_cferr2[n];
+        self.btagWeightCSV_down_cferr2 = tree.Jet_btagWeightCSV_down_cferr2[n];
+        self.btagCMVAV2L_SF = tree.Jet_btagCMVAV2L_SF[n];
+        self.btagCMVAV2L_SF_up = tree.Jet_btagCMVAV2L_SF_up[n];
+        self.btagCMVAV2L_SF_down = tree.Jet_btagCMVAV2L_SF_down[n];
+        self.btagCMVAV2M_SF = tree.Jet_btagCMVAV2M_SF[n];
+        self.btagCMVAV2M_SF_up = tree.Jet_btagCMVAV2M_SF_up[n];
+        self.btagCMVAV2M_SF_down = tree.Jet_btagCMVAV2M_SF_down[n];
+        self.btagCMVAV2T_SF = tree.Jet_btagCMVAV2T_SF[n];
+        self.btagCMVAV2T_SF_up = tree.Jet_btagCMVAV2T_SF_up[n];
+        self.btagCMVAV2T_SF_down = tree.Jet_btagCMVAV2T_SF_down[n];
+        self.btagWeightCMVAV2 = tree.Jet_btagWeightCMVAV2[n];
+        self.btagWeightCMVAV2_up_jes = tree.Jet_btagWeightCMVAV2_up_jes[n];
+        self.btagWeightCMVAV2_down_jes = tree.Jet_btagWeightCMVAV2_down_jes[n];
+        self.btagWeightCMVAV2_up_lf = tree.Jet_btagWeightCMVAV2_up_lf[n];
+        self.btagWeightCMVAV2_down_lf = tree.Jet_btagWeightCMVAV2_down_lf[n];
+        self.btagWeightCMVAV2_up_hf = tree.Jet_btagWeightCMVAV2_up_hf[n];
+        self.btagWeightCMVAV2_down_hf = tree.Jet_btagWeightCMVAV2_down_hf[n];
+        self.btagWeightCMVAV2_up_hfstats1 = tree.Jet_btagWeightCMVAV2_up_hfstats1[n];
+        self.btagWeightCMVAV2_down_hfstats1 = tree.Jet_btagWeightCMVAV2_down_hfstats1[n];
+        self.btagWeightCMVAV2_up_hfstats2 = tree.Jet_btagWeightCMVAV2_up_hfstats2[n];
+        self.btagWeightCMVAV2_down_hfstats2 = tree.Jet_btagWeightCMVAV2_down_hfstats2[n];
+        self.btagWeightCMVAV2_up_lfstats1 = tree.Jet_btagWeightCMVAV2_up_lfstats1[n];
+        self.btagWeightCMVAV2_down_lfstats1 = tree.Jet_btagWeightCMVAV2_down_lfstats1[n];
+        self.btagWeightCMVAV2_up_lfstats2 = tree.Jet_btagWeightCMVAV2_up_lfstats2[n];
+        self.btagWeightCMVAV2_down_lfstats2 = tree.Jet_btagWeightCMVAV2_down_lfstats2[n];
+        self.btagWeightCMVAV2_up_cferr1 = tree.Jet_btagWeightCMVAV2_up_cferr1[n];
+        self.btagWeightCMVAV2_down_cferr1 = tree.Jet_btagWeightCMVAV2_down_cferr1[n];
+        self.btagWeightCMVAV2_up_cferr2 = tree.Jet_btagWeightCMVAV2_up_cferr2[n];
+        self.btagWeightCMVAV2_down_cferr2 = tree.Jet_btagWeightCMVAV2_down_cferr2[n];
         pass
     @staticmethod
     def make_array(input):
@@ -1469,6 +1504,240 @@ class trgObjects_hltSingleJet80:
     @staticmethod
     def make_array(input):
         return [trgObjects_hltSingleJet80(input, i) for i in range(input.ntrgObjects_hltSingleJet80)]
+class HCMVAV2_reg_corrJECDown:
+    """
+    
+    """
+    @staticmethod
+    def make_obj(tree):
+        _pt = getattr(tree, "HCMVAV2_reg_corrJECDown_pt", None)
+        _eta = getattr(tree, "HCMVAV2_reg_corrJECDown_eta", None)
+        _phi = getattr(tree, "HCMVAV2_reg_corrJECDown_phi", None)
+        _mass = getattr(tree, "HCMVAV2_reg_corrJECDown_mass", None)
+        return HCMVAV2_reg_corrJECDown(_pt, _eta, _phi, _mass)
+    def __init__(self, pt,eta,phi,mass):
+        self.pt = pt #
+        self.eta = eta #
+        self.phi = phi #
+        self.mass = mass #
+        pass
+class HCMVAV2_reg_corrJERDown:
+    """
+    
+    """
+    @staticmethod
+    def make_obj(tree):
+        _pt = getattr(tree, "HCMVAV2_reg_corrJERDown_pt", None)
+        _eta = getattr(tree, "HCMVAV2_reg_corrJERDown_eta", None)
+        _phi = getattr(tree, "HCMVAV2_reg_corrJERDown_phi", None)
+        _mass = getattr(tree, "HCMVAV2_reg_corrJERDown_mass", None)
+        return HCMVAV2_reg_corrJERDown(_pt, _eta, _phi, _mass)
+    def __init__(self, pt,eta,phi,mass):
+        self.pt = pt #
+        self.eta = eta #
+        self.phi = phi #
+        self.mass = mass #
+        pass
+class V:
+    """
+    
+    """
+    @staticmethod
+    def make_obj(tree):
+        _pt = getattr(tree, "V_pt", None)
+        _eta = getattr(tree, "V_eta", None)
+        _phi = getattr(tree, "V_phi", None)
+        _mass = getattr(tree, "V_mass", None)
+        return V(_pt, _eta, _phi, _mass)
+    def __init__(self, pt,eta,phi,mass):
+        self.pt = pt #
+        self.eta = eta #
+        self.phi = phi #
+        self.mass = mass #
+        pass
+class H_reg:
+    """
+    
+    """
+    @staticmethod
+    def make_obj(tree):
+        _pt = getattr(tree, "H_reg_pt", None)
+        _eta = getattr(tree, "H_reg_eta", None)
+        _phi = getattr(tree, "H_reg_phi", None)
+        _mass = getattr(tree, "H_reg_mass", None)
+        return H_reg(_pt, _eta, _phi, _mass)
+    def __init__(self, pt,eta,phi,mass):
+        self.pt = pt #
+        self.eta = eta #
+        self.phi = phi #
+        self.mass = mass #
+        pass
+class HCSV_reg_corrJERDown:
+    """
+    
+    """
+    @staticmethod
+    def make_obj(tree):
+        _pt = getattr(tree, "HCSV_reg_corrJERDown_pt", None)
+        _eta = getattr(tree, "HCSV_reg_corrJERDown_eta", None)
+        _phi = getattr(tree, "HCSV_reg_corrJERDown_phi", None)
+        _mass = getattr(tree, "HCSV_reg_corrJERDown_mass", None)
+        return HCSV_reg_corrJERDown(_pt, _eta, _phi, _mass)
+    def __init__(self, pt,eta,phi,mass):
+        self.pt = pt #
+        self.eta = eta #
+        self.phi = phi #
+        self.mass = mass #
+        pass
+class HCSV:
+    """
+    
+    """
+    @staticmethod
+    def make_obj(tree):
+        _pt = getattr(tree, "HCSV_pt", None)
+        _eta = getattr(tree, "HCSV_eta", None)
+        _phi = getattr(tree, "HCSV_phi", None)
+        _mass = getattr(tree, "HCSV_mass", None)
+        return HCSV(_pt, _eta, _phi, _mass)
+    def __init__(self, pt,eta,phi,mass):
+        self.pt = pt #
+        self.eta = eta #
+        self.phi = phi #
+        self.mass = mass #
+        pass
+class fakeMET:
+    """
+    
+    """
+    @staticmethod
+    def make_obj(tree):
+        _pt = getattr(tree, "fakeMET_pt", None)
+        _eta = getattr(tree, "fakeMET_eta", None)
+        _phi = getattr(tree, "fakeMET_phi", None)
+        _mass = getattr(tree, "fakeMET_mass", None)
+        return fakeMET(_pt, _eta, _phi, _mass)
+    def __init__(self, pt,eta,phi,mass):
+        self.pt = pt #
+        self.eta = eta #
+        self.phi = phi #
+        self.mass = mass #
+        pass
+class HCSV_reg_corrJERUp:
+    """
+    
+    """
+    @staticmethod
+    def make_obj(tree):
+        _pt = getattr(tree, "HCSV_reg_corrJERUp_pt", None)
+        _eta = getattr(tree, "HCSV_reg_corrJERUp_eta", None)
+        _phi = getattr(tree, "HCSV_reg_corrJERUp_phi", None)
+        _mass = getattr(tree, "HCSV_reg_corrJERUp_mass", None)
+        return HCSV_reg_corrJERUp(_pt, _eta, _phi, _mass)
+    def __init__(self, pt,eta,phi,mass):
+        self.pt = pt #
+        self.eta = eta #
+        self.phi = phi #
+        self.mass = mass #
+        pass
+class HCMVAV2_reg_corrJERUp:
+    """
+    
+    """
+    @staticmethod
+    def make_obj(tree):
+        _pt = getattr(tree, "HCMVAV2_reg_corrJERUp_pt", None)
+        _eta = getattr(tree, "HCMVAV2_reg_corrJERUp_eta", None)
+        _phi = getattr(tree, "HCMVAV2_reg_corrJERUp_phi", None)
+        _mass = getattr(tree, "HCMVAV2_reg_corrJERUp_mass", None)
+        return HCMVAV2_reg_corrJERUp(_pt, _eta, _phi, _mass)
+    def __init__(self, pt,eta,phi,mass):
+        self.pt = pt #
+        self.eta = eta #
+        self.phi = phi #
+        self.mass = mass #
+        pass
+class HCSV_reg_corrJECUp:
+    """
+    
+    """
+    @staticmethod
+    def make_obj(tree):
+        _pt = getattr(tree, "HCSV_reg_corrJECUp_pt", None)
+        _eta = getattr(tree, "HCSV_reg_corrJECUp_eta", None)
+        _phi = getattr(tree, "HCSV_reg_corrJECUp_phi", None)
+        _mass = getattr(tree, "HCSV_reg_corrJECUp_mass", None)
+        return HCSV_reg_corrJECUp(_pt, _eta, _phi, _mass)
+    def __init__(self, pt,eta,phi,mass):
+        self.pt = pt #
+        self.eta = eta #
+        self.phi = phi #
+        self.mass = mass #
+        pass
+class met_shifted_UnclusteredEnUp:
+    """
+    
+    """
+    @staticmethod
+    def make_obj(tree):
+        _pt = getattr(tree, "met_shifted_UnclusteredEnUp_pt", None)
+        _phi = getattr(tree, "met_shifted_UnclusteredEnUp_phi", None)
+        _sumEt = getattr(tree, "met_shifted_UnclusteredEnUp_sumEt", None)
+        return met_shifted_UnclusteredEnUp(_pt, _phi, _sumEt)
+    def __init__(self, pt,phi,sumEt):
+        self.pt = pt #
+        self.phi = phi #
+        self.sumEt = sumEt #
+        pass
+class met_shifted_UnclusteredEnDown:
+    """
+    
+    """
+    @staticmethod
+    def make_obj(tree):
+        _pt = getattr(tree, "met_shifted_UnclusteredEnDown_pt", None)
+        _phi = getattr(tree, "met_shifted_UnclusteredEnDown_phi", None)
+        _sumEt = getattr(tree, "met_shifted_UnclusteredEnDown_sumEt", None)
+        return met_shifted_UnclusteredEnDown(_pt, _phi, _sumEt)
+    def __init__(self, pt,phi,sumEt):
+        self.pt = pt #
+        self.phi = phi #
+        self.sumEt = sumEt #
+        pass
+class HCSV_reg:
+    """
+    
+    """
+    @staticmethod
+    def make_obj(tree):
+        _pt = getattr(tree, "HCSV_reg_pt", None)
+        _eta = getattr(tree, "HCSV_reg_eta", None)
+        _phi = getattr(tree, "HCSV_reg_phi", None)
+        _mass = getattr(tree, "HCSV_reg_mass", None)
+        return HCSV_reg(_pt, _eta, _phi, _mass)
+    def __init__(self, pt,eta,phi,mass):
+        self.pt = pt #
+        self.eta = eta #
+        self.phi = phi #
+        self.mass = mass #
+        pass
+class H_reg_corrJERUp:
+    """
+    
+    """
+    @staticmethod
+    def make_obj(tree):
+        _pt = getattr(tree, "H_reg_corrJERUp_pt", None)
+        _eta = getattr(tree, "H_reg_corrJERUp_eta", None)
+        _phi = getattr(tree, "H_reg_corrJERUp_phi", None)
+        _mass = getattr(tree, "H_reg_corrJERUp_mass", None)
+        return H_reg_corrJERUp(_pt, _eta, _phi, _mass)
+    def __init__(self, pt,eta,phi,mass):
+        self.pt = pt #
+        self.eta = eta #
+        self.phi = phi #
+        self.mass = mass #
+        pass
 class H_reg_corrJECUp:
     """
     
@@ -1486,17 +1755,17 @@ class H_reg_corrJECUp:
         self.phi = phi #
         self.mass = mass #
         pass
-class HaddJetsdR08:
+class HCMVAV2_reg:
     """
     
     """
     @staticmethod
     def make_obj(tree):
-        _pt = getattr(tree, "HaddJetsdR08_pt", None)
-        _eta = getattr(tree, "HaddJetsdR08_eta", None)
-        _phi = getattr(tree, "HaddJetsdR08_phi", None)
-        _mass = getattr(tree, "HaddJetsdR08_mass", None)
-        return HaddJetsdR08(_pt, _eta, _phi, _mass)
+        _pt = getattr(tree, "HCMVAV2_reg_pt", None)
+        _eta = getattr(tree, "HCMVAV2_reg_eta", None)
+        _phi = getattr(tree, "HCMVAV2_reg_phi", None)
+        _mass = getattr(tree, "HCMVAV2_reg_mass", None)
+        return HCMVAV2_reg(_pt, _eta, _phi, _mass)
     def __init__(self, pt,eta,phi,mass):
         self.pt = pt #
         self.eta = eta #
@@ -1583,56 +1852,50 @@ class met:
         self.genPhi = genPhi #
         self.genEta = genEta #
         pass
-class H_reg:
+class met_shifted_JetEnUp:
     """
     
     """
     @staticmethod
     def make_obj(tree):
-        _pt = getattr(tree, "H_reg_pt", None)
-        _eta = getattr(tree, "H_reg_eta", None)
-        _phi = getattr(tree, "H_reg_phi", None)
-        _mass = getattr(tree, "H_reg_mass", None)
-        return H_reg(_pt, _eta, _phi, _mass)
-    def __init__(self, pt,eta,phi,mass):
+        _pt = getattr(tree, "met_shifted_JetEnUp_pt", None)
+        _phi = getattr(tree, "met_shifted_JetEnUp_phi", None)
+        _sumEt = getattr(tree, "met_shifted_JetEnUp_sumEt", None)
+        return met_shifted_JetEnUp(_pt, _phi, _sumEt)
+    def __init__(self, pt,phi,sumEt):
         self.pt = pt #
-        self.eta = eta #
         self.phi = phi #
-        self.mass = mass #
+        self.sumEt = sumEt #
         pass
-class HCSV_reg_corrJERDown:
+class met_shifted_JetEnDown:
     """
     
     """
     @staticmethod
     def make_obj(tree):
-        _pt = getattr(tree, "HCSV_reg_corrJERDown_pt", None)
-        _eta = getattr(tree, "HCSV_reg_corrJERDown_eta", None)
-        _phi = getattr(tree, "HCSV_reg_corrJERDown_phi", None)
-        _mass = getattr(tree, "HCSV_reg_corrJERDown_mass", None)
-        return HCSV_reg_corrJERDown(_pt, _eta, _phi, _mass)
-    def __init__(self, pt,eta,phi,mass):
+        _pt = getattr(tree, "met_shifted_JetEnDown_pt", None)
+        _phi = getattr(tree, "met_shifted_JetEnDown_phi", None)
+        _sumEt = getattr(tree, "met_shifted_JetEnDown_sumEt", None)
+        return met_shifted_JetEnDown(_pt, _phi, _sumEt)
+    def __init__(self, pt,phi,sumEt):
         self.pt = pt #
-        self.eta = eta #
         self.phi = phi #
-        self.mass = mass #
+        self.sumEt = sumEt #
         pass
-class HCSV:
+class met_shifted_MuonEnUp:
     """
     
     """
     @staticmethod
     def make_obj(tree):
-        _pt = getattr(tree, "HCSV_pt", None)
-        _eta = getattr(tree, "HCSV_eta", None)
-        _phi = getattr(tree, "HCSV_phi", None)
-        _mass = getattr(tree, "HCSV_mass", None)
-        return HCSV(_pt, _eta, _phi, _mass)
-    def __init__(self, pt,eta,phi,mass):
+        _pt = getattr(tree, "met_shifted_MuonEnUp_pt", None)
+        _phi = getattr(tree, "met_shifted_MuonEnUp_phi", None)
+        _sumEt = getattr(tree, "met_shifted_MuonEnUp_sumEt", None)
+        return met_shifted_MuonEnUp(_pt, _phi, _sumEt)
+    def __init__(self, pt,phi,sumEt):
         self.pt = pt #
-        self.eta = eta #
         self.phi = phi #
-        self.mass = mass #
+        self.sumEt = sumEt #
         pass
 class met_shifted_MuonEnDown:
     """
@@ -1679,72 +1942,6 @@ class met_shifted_ElectronEnDown:
         self.phi = phi #
         self.sumEt = sumEt #
         pass
-class fakeMET:
-    """
-    
-    """
-    @staticmethod
-    def make_obj(tree):
-        _pt = getattr(tree, "fakeMET_pt", None)
-        _eta = getattr(tree, "fakeMET_eta", None)
-        _phi = getattr(tree, "fakeMET_phi", None)
-        _mass = getattr(tree, "fakeMET_mass", None)
-        return fakeMET(_pt, _eta, _phi, _mass)
-    def __init__(self, pt,eta,phi,mass):
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        pass
-class met_shifted_TauEnDown:
-    """
-    
-    """
-    @staticmethod
-    def make_obj(tree):
-        _pt = getattr(tree, "met_shifted_TauEnDown_pt", None)
-        _phi = getattr(tree, "met_shifted_TauEnDown_phi", None)
-        _sumEt = getattr(tree, "met_shifted_TauEnDown_sumEt", None)
-        return met_shifted_TauEnDown(_pt, _phi, _sumEt)
-    def __init__(self, pt,phi,sumEt):
-        self.pt = pt #
-        self.phi = phi #
-        self.sumEt = sumEt #
-        pass
-class V:
-    """
-    
-    """
-    @staticmethod
-    def make_obj(tree):
-        _pt = getattr(tree, "V_pt", None)
-        _eta = getattr(tree, "V_eta", None)
-        _phi = getattr(tree, "V_phi", None)
-        _mass = getattr(tree, "V_mass", None)
-        return V(_pt, _eta, _phi, _mass)
-    def __init__(self, pt,eta,phi,mass):
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        pass
-class HCSV_reg_corrJERUp:
-    """
-    
-    """
-    @staticmethod
-    def make_obj(tree):
-        _pt = getattr(tree, "HCSV_reg_corrJERUp_pt", None)
-        _eta = getattr(tree, "HCSV_reg_corrJERUp_eta", None)
-        _phi = getattr(tree, "HCSV_reg_corrJERUp_phi", None)
-        _mass = getattr(tree, "HCSV_reg_corrJERUp_mass", None)
-        return HCSV_reg_corrJERUp(_pt, _eta, _phi, _mass)
-    def __init__(self, pt,eta,phi,mass):
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        pass
 class met_shifted_TauEnUp:
     """
     
@@ -1760,112 +1957,16 @@ class met_shifted_TauEnUp:
         self.phi = phi #
         self.sumEt = sumEt #
         pass
-class HCSV_reg_corrJECUp:
+class met_shifted_TauEnDown:
     """
     
     """
     @staticmethod
     def make_obj(tree):
-        _pt = getattr(tree, "HCSV_reg_corrJECUp_pt", None)
-        _eta = getattr(tree, "HCSV_reg_corrJECUp_eta", None)
-        _phi = getattr(tree, "HCSV_reg_corrJECUp_phi", None)
-        _mass = getattr(tree, "HCSV_reg_corrJECUp_mass", None)
-        return HCSV_reg_corrJECUp(_pt, _eta, _phi, _mass)
-    def __init__(self, pt,eta,phi,mass):
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        pass
-class met_shifted_UnclusteredEnUp:
-    """
-    
-    """
-    @staticmethod
-    def make_obj(tree):
-        _pt = getattr(tree, "met_shifted_UnclusteredEnUp_pt", None)
-        _phi = getattr(tree, "met_shifted_UnclusteredEnUp_phi", None)
-        _sumEt = getattr(tree, "met_shifted_UnclusteredEnUp_sumEt", None)
-        return met_shifted_UnclusteredEnUp(_pt, _phi, _sumEt)
-    def __init__(self, pt,phi,sumEt):
-        self.pt = pt #
-        self.phi = phi #
-        self.sumEt = sumEt #
-        pass
-class met_shifted_UnclusteredEnDown:
-    """
-    
-    """
-    @staticmethod
-    def make_obj(tree):
-        _pt = getattr(tree, "met_shifted_UnclusteredEnDown_pt", None)
-        _phi = getattr(tree, "met_shifted_UnclusteredEnDown_phi", None)
-        _sumEt = getattr(tree, "met_shifted_UnclusteredEnDown_sumEt", None)
-        return met_shifted_UnclusteredEnDown(_pt, _phi, _sumEt)
-    def __init__(self, pt,phi,sumEt):
-        self.pt = pt #
-        self.phi = phi #
-        self.sumEt = sumEt #
-        pass
-class met_shifted_JetEnUp:
-    """
-    
-    """
-    @staticmethod
-    def make_obj(tree):
-        _pt = getattr(tree, "met_shifted_JetEnUp_pt", None)
-        _phi = getattr(tree, "met_shifted_JetEnUp_phi", None)
-        _sumEt = getattr(tree, "met_shifted_JetEnUp_sumEt", None)
-        return met_shifted_JetEnUp(_pt, _phi, _sumEt)
-    def __init__(self, pt,phi,sumEt):
-        self.pt = pt #
-        self.phi = phi #
-        self.sumEt = sumEt #
-        pass
-class H_reg_corrJERDown:
-    """
-    
-    """
-    @staticmethod
-    def make_obj(tree):
-        _pt = getattr(tree, "H_reg_corrJERDown_pt", None)
-        _eta = getattr(tree, "H_reg_corrJERDown_eta", None)
-        _phi = getattr(tree, "H_reg_corrJERDown_phi", None)
-        _mass = getattr(tree, "H_reg_corrJERDown_mass", None)
-        return H_reg_corrJERDown(_pt, _eta, _phi, _mass)
-    def __init__(self, pt,eta,phi,mass):
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        pass
-class HCSV_reg:
-    """
-    
-    """
-    @staticmethod
-    def make_obj(tree):
-        _pt = getattr(tree, "HCSV_reg_pt", None)
-        _eta = getattr(tree, "HCSV_reg_eta", None)
-        _phi = getattr(tree, "HCSV_reg_phi", None)
-        _mass = getattr(tree, "HCSV_reg_mass", None)
-        return HCSV_reg(_pt, _eta, _phi, _mass)
-    def __init__(self, pt,eta,phi,mass):
-        self.pt = pt #
-        self.eta = eta #
-        self.phi = phi #
-        self.mass = mass #
-        pass
-class met_shifted_JetEnDown:
-    """
-    
-    """
-    @staticmethod
-    def make_obj(tree):
-        _pt = getattr(tree, "met_shifted_JetEnDown_pt", None)
-        _phi = getattr(tree, "met_shifted_JetEnDown_phi", None)
-        _sumEt = getattr(tree, "met_shifted_JetEnDown_sumEt", None)
-        return met_shifted_JetEnDown(_pt, _phi, _sumEt)
+        _pt = getattr(tree, "met_shifted_TauEnDown_pt", None)
+        _phi = getattr(tree, "met_shifted_TauEnDown_phi", None)
+        _sumEt = getattr(tree, "met_shifted_TauEnDown_sumEt", None)
+        return met_shifted_TauEnDown(_pt, _phi, _sumEt)
     def __init__(self, pt,phi,sumEt):
         self.pt = pt #
         self.phi = phi #
@@ -1886,6 +1987,57 @@ class met_shifted_JetResDown:
         self.phi = phi #
         self.sumEt = sumEt #
         pass
+class HaddJetsdR08:
+    """
+    
+    """
+    @staticmethod
+    def make_obj(tree):
+        _pt = getattr(tree, "HaddJetsdR08_pt", None)
+        _eta = getattr(tree, "HaddJetsdR08_eta", None)
+        _phi = getattr(tree, "HaddJetsdR08_phi", None)
+        _mass = getattr(tree, "HaddJetsdR08_mass", None)
+        return HaddJetsdR08(_pt, _eta, _phi, _mass)
+    def __init__(self, pt,eta,phi,mass):
+        self.pt = pt #
+        self.eta = eta #
+        self.phi = phi #
+        self.mass = mass #
+        pass
+class H_reg_corrJERDown:
+    """
+    
+    """
+    @staticmethod
+    def make_obj(tree):
+        _pt = getattr(tree, "H_reg_corrJERDown_pt", None)
+        _eta = getattr(tree, "H_reg_corrJERDown_eta", None)
+        _phi = getattr(tree, "H_reg_corrJERDown_phi", None)
+        _mass = getattr(tree, "H_reg_corrJERDown_mass", None)
+        return H_reg_corrJERDown(_pt, _eta, _phi, _mass)
+    def __init__(self, pt,eta,phi,mass):
+        self.pt = pt #
+        self.eta = eta #
+        self.phi = phi #
+        self.mass = mass #
+        pass
+class HCMVAV2_reg_corrJECUp:
+    """
+    
+    """
+    @staticmethod
+    def make_obj(tree):
+        _pt = getattr(tree, "HCMVAV2_reg_corrJECUp_pt", None)
+        _eta = getattr(tree, "HCMVAV2_reg_corrJECUp_eta", None)
+        _phi = getattr(tree, "HCMVAV2_reg_corrJECUp_phi", None)
+        _mass = getattr(tree, "HCMVAV2_reg_corrJECUp_mass", None)
+        return HCMVAV2_reg_corrJECUp(_pt, _eta, _phi, _mass)
+    def __init__(self, pt,eta,phi,mass):
+        self.pt = pt #
+        self.eta = eta #
+        self.phi = phi #
+        self.mass = mass #
+        pass
 class softActivity:
     """
     
@@ -1902,21 +2054,6 @@ class softActivity:
         self.njets5 = njets5 #number of jets from soft activity with pt>5Gev
         self.njets10 = njets10 #number of jets from soft activity with pt>10Gev
         self.HT = HT #sum pt of sa jets
-        pass
-class met_shifted_MuonEnUp:
-    """
-    
-    """
-    @staticmethod
-    def make_obj(tree):
-        _pt = getattr(tree, "met_shifted_MuonEnUp_pt", None)
-        _phi = getattr(tree, "met_shifted_MuonEnUp_phi", None)
-        _sumEt = getattr(tree, "met_shifted_MuonEnUp_sumEt", None)
-        return met_shifted_MuonEnUp(_pt, _phi, _sumEt)
-    def __init__(self, pt,phi,sumEt):
-        self.pt = pt #
-        self.phi = phi #
-        self.sumEt = sumEt #
         pass
 class HCSV_reg_corrJECDown:
     """
@@ -1935,17 +2072,17 @@ class HCSV_reg_corrJECDown:
         self.phi = phi #
         self.mass = mass #
         pass
-class H_reg_corrJERUp:
+class HCMVAV2:
     """
     
     """
     @staticmethod
     def make_obj(tree):
-        _pt = getattr(tree, "H_reg_corrJERUp_pt", None)
-        _eta = getattr(tree, "H_reg_corrJERUp_eta", None)
-        _phi = getattr(tree, "H_reg_corrJERUp_phi", None)
-        _mass = getattr(tree, "H_reg_corrJERUp_mass", None)
-        return H_reg_corrJERUp(_pt, _eta, _phi, _mass)
+        _pt = getattr(tree, "HCMVAV2_pt", None)
+        _eta = getattr(tree, "HCMVAV2_eta", None)
+        _phi = getattr(tree, "HCMVAV2_phi", None)
+        _mass = getattr(tree, "HCMVAV2_mass", None)
+        return HCMVAV2(_pt, _eta, _phi, _mass)
     def __init__(self, pt,eta,phi,mass):
         self.pt = pt #
         self.eta = eta #
@@ -1975,202 +2112,229 @@ class EventAnalyzer(Analyzer):
     def __init__(self, cfg_ana, cfg_comp, looperName):
         super(EventAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
     def process(self, event):
-        event.FatjetAK08ungroomed = FatjetAK08ungroomed.make_array(event.input)
-        event.FatjetCA15pruned = FatjetCA15pruned.make_array(event.input)
-        event.FatjetCA15softdrop = FatjetCA15softdrop.make_array(event.input)
-        event.FatjetCA15softdropfilt = FatjetCA15softdropfilt.make_array(event.input)
-        event.FatjetCA15softdropz2b1 = FatjetCA15softdropz2b1.make_array(event.input)
-        event.FatjetCA15softdropz2b1filt = FatjetCA15softdropz2b1filt.make_array(event.input)
-        event.FatjetCA15subjetfiltered = FatjetCA15subjetfiltered.make_array(event.input)
-        event.FatjetCA15trimmed = FatjetCA15trimmed.make_array(event.input)
-        event.FatjetCA15ungroomed = FatjetCA15ungroomed.make_array(event.input)
-        event.Flag_hbheFilterNew = getattr(event.input, "Flag_hbheFilterNew", None)
-        event.Flag_hbheIsoFilter = getattr(event.input, "Flag_hbheIsoFilter", None)
-        event.GenBQuarkFromH = GenBQuarkFromH.make_array(event.input)
         event.GenBQuarkFromHafterISR = GenBQuarkFromHafterISR.make_array(event.input)
-        event.GenBQuarkFromTop = GenBQuarkFromTop.make_array(event.input)
-        event.GenGluonFromB = GenGluonFromB.make_array(event.input)
-        event.GenGluonFromTop = GenGluonFromTop.make_array(event.input)
-        event.GenHadTaus = GenHadTaus.make_array(event.input)
-        event.GenHiggsBoson = GenHiggsBoson.make_array(event.input)
-        event.GenHiggsSisters = GenHiggsSisters.make_array(event.input)
-        event.GenJet = GenJet.make_array(event.input)
-        event.GenLep = GenLep.make_array(event.input)
-        event.GenLepFromTau = GenLepFromTau.make_array(event.input)
-        event.GenLepFromTauRecovered = GenLepFromTauRecovered.make_array(event.input)
+        event.pileUpVertex_ptHat = pileUpVertex_ptHat.make_array(event.input)
+        event.trgObjects_hltMET70 = trgObjects_hltMET70.make_array(event.input)
+        event.trgObjects_hltL1sTripleJetVBFIorHTTIorDoubleJetCIorSingleJet = trgObjects_hltL1sTripleJetVBFIorHTTIorDoubleJetCIorSingleJet.make_array(event.input)
+        event.trgObjects_hltBTagPFCSVp11DoubleWithMatching = trgObjects_hltBTagPFCSVp11DoubleWithMatching.make_array(event.input)
         event.GenLepFromTop = GenLepFromTop.make_array(event.input)
-        event.GenLepRecovered = GenLepRecovered.make_array(event.input)
-        event.GenNuFromTop = GenNuFromTop.make_array(event.input)
-        event.GenStatus2bHad = GenStatus2bHad.make_array(event.input)
-        event.GenTaus = GenTaus.make_array(event.input)
-        event.GenTausRecovered = GenTausRecovered.make_array(event.input)
-        event.GenTop = GenTop.make_array(event.input)
-        event.GenVbosons = GenVbosons.make_array(event.input)
-        event.GenVbosonsRecovered = GenVbosonsRecovered.make_array(event.input)
-        event.GenWZQuark = GenWZQuark.make_array(event.input)
-        event.H = H.make_obj(event.input)
-        event.HCSV = HCSV.make_obj(event.input)
-        event.HCSV_reg = HCSV_reg.make_obj(event.input)
-        event.HCSV_reg_corrJECDown = HCSV_reg_corrJECDown.make_obj(event.input)
-        event.HCSV_reg_corrJECUp = HCSV_reg_corrJECUp.make_obj(event.input)
-        event.HCSV_reg_corrJERDown = HCSV_reg_corrJERDown.make_obj(event.input)
-        event.HCSV_reg_corrJERUp = HCSV_reg_corrJERUp.make_obj(event.input)
-        event.HVdPhi = getattr(event.input, "HVdPhi", None)
-        event.H_reg = H_reg.make_obj(event.input)
-        event.H_reg_corrJECDown = H_reg_corrJECDown.make_obj(event.input)
-        event.H_reg_corrJECUp = H_reg_corrJECUp.make_obj(event.input)
-        event.H_reg_corrJERDown = H_reg_corrJERDown.make_obj(event.input)
-        event.H_reg_corrJERUp = H_reg_corrJERUp.make_obj(event.input)
-        event.HaddJetsdR08 = HaddJetsdR08.make_obj(event.input)
-        event.Jet = Jet.make_array(event.input)
-        event.LHE_weights_pdf = LHE_weights_pdf.make_array(event.input)
-        event.LHE_weights_scale = LHE_weights_scale.make_array(event.input)
-        event.SubjetAK08softdrop = SubjetAK08softdrop.make_array(event.input)
-        event.SubjetCA15pruned = SubjetCA15pruned.make_array(event.input)
-        event.SubjetCA15softdrop = SubjetCA15softdrop.make_array(event.input)
-        event.SubjetCA15softdropfilt = SubjetCA15softdropfilt.make_array(event.input)
-        event.SubjetCA15softdropz2b1 = SubjetCA15softdropz2b1.make_array(event.input)
-        event.SubjetCA15softdropz2b1filt = SubjetCA15softdropz2b1filt.make_array(event.input)
-        event.SubjetCA15subjetfiltered = SubjetCA15subjetfiltered.make_array(event.input)
-        event.TauGood = TauGood.make_array(event.input)
-        event.V = V.make_obj(event.input)
-        event.VMt = getattr(event.input, "VMt", None)
-        event.Vtype = getattr(event.input, "Vtype", None)
-        event.VtypeSim = getattr(event.input, "VtypeSim", None)
-        event.aJCidx = aJCidx.make_array(event.input)
-        event.aJidx = aJidx.make_array(event.input)
-        event.aLeptons = aLeptons.make_array(event.input)
         event.ajidxaddJetsdR08 = ajidxaddJetsdR08.make_array(event.input)
-        event.bTagWeight = getattr(event.input, "bTagWeight", None)
-        event.bTagWeight_HFDown = getattr(event.input, "bTagWeight_HFDown", None)
-        event.bTagWeight_HFStats1Down = getattr(event.input, "bTagWeight_HFStats1Down", None)
-        event.bTagWeight_HFStats1Up = getattr(event.input, "bTagWeight_HFStats1Up", None)
-        event.bTagWeight_HFStats2Down = getattr(event.input, "bTagWeight_HFStats2Down", None)
-        event.bTagWeight_HFStats2Up = getattr(event.input, "bTagWeight_HFStats2Up", None)
-        event.bTagWeight_HFUp = getattr(event.input, "bTagWeight_HFUp", None)
-        event.bTagWeight_JESDown = getattr(event.input, "bTagWeight_JESDown", None)
-        event.bTagWeight_JESUp = getattr(event.input, "bTagWeight_JESUp", None)
-        event.bTagWeight_LFDown = getattr(event.input, "bTagWeight_LFDown", None)
-        event.bTagWeight_LFStats1Down = getattr(event.input, "bTagWeight_LFStats1Down", None)
-        event.bTagWeight_LFStats1Up = getattr(event.input, "bTagWeight_LFStats1Up", None)
-        event.bTagWeight_LFStats2Down = getattr(event.input, "bTagWeight_LFStats2Down", None)
-        event.bTagWeight_LFStats2Up = getattr(event.input, "bTagWeight_LFStats2Up", None)
-        event.bTagWeight_LFUp = getattr(event.input, "bTagWeight_LFUp", None)
-        event.bTagWeight_cErr1Down = getattr(event.input, "bTagWeight_cErr1Down", None)
-        event.bTagWeight_cErr1Up = getattr(event.input, "bTagWeight_cErr1Up", None)
-        event.bTagWeight_cErr2Down = getattr(event.input, "bTagWeight_cErr2Down", None)
-        event.bTagWeight_cErr2Up = getattr(event.input, "bTagWeight_cErr2Up", None)
-        event.bx = getattr(event.input, "bx", None)
-        event.caloMetPhi = getattr(event.input, "caloMetPhi", None)
-        event.caloMetPt = getattr(event.input, "caloMetPt", None)
-        event.dRaddJetsdR08 = dRaddJetsdR08.make_array(event.input)
-        event.deltaR_jj = getattr(event.input, "deltaR_jj", None)
-        event.fakeMET = fakeMET.make_obj(event.input)
-        event.fakeMET_sumet = getattr(event.input, "fakeMET_sumet", None)
-        event.genHiggsDecayMode = getattr(event.input, "genHiggsDecayMode", None)
-        event.genTTHtoTauTauDecayMode = getattr(event.input, "genTTHtoTauTauDecayMode", None)
-        event.hJCidx = hJCidx.make_array(event.input)
-        event.hJidx = hJidx.make_array(event.input)
+        event.SubjetCA15softdrop = SubjetCA15softdrop.make_array(event.input)
+        event.trgObjects_hltIsoMu20 = trgObjects_hltIsoMu20.make_array(event.input)
+        event.aJCMVAV2idx = aJCMVAV2idx.make_array(event.input)
+        event.trgObjects_hltQuadCentralJet30 = trgObjects_hltQuadCentralJet30.make_array(event.input)
+        event.GenVbosonsRecovered = GenVbosonsRecovered.make_array(event.input)
         event.hJidx_sortcsv = hJidx_sortcsv.make_array(event.input)
-        event.heavyFlavourCategory = getattr(event.input, "heavyFlavourCategory", None)
+        event.trgObjects_hltL1sQuadJetCIorTripleJetVBFIorHTT = trgObjects_hltL1sQuadJetCIorTripleJetVBFIorHTT.make_array(event.input)
+        event.GenTausRecovered = GenTausRecovered.make_array(event.input)
+        event.SubjetCA15softdropz2b1 = SubjetCA15softdropz2b1.make_array(event.input)
+        event.hJCidx = hJCidx.make_array(event.input)
+        event.GenTop = GenTop.make_array(event.input)
+        event.aJidx = aJidx.make_array(event.input)
+        event.GenGluonFromTop = GenGluonFromTop.make_array(event.input)
+        event.GenLepFromTau = GenLepFromTau.make_array(event.input)
+        event.GenNuFromTop = GenNuFromTop.make_array(event.input)
+        event.trgObjects_hltPFDoubleJetLooseID76 = trgObjects_hltPFDoubleJetLooseID76.make_array(event.input)
+        event.trgObjects_hltBTagPFCSVp016SingleWithMatching = trgObjects_hltBTagPFCSVp016SingleWithMatching.make_array(event.input)
+        event.GenVbosons = GenVbosons.make_array(event.input)
+        event.softActivityVHJets = softActivityVHJets.make_array(event.input)
+        event.trgObjects_hltQuadPFCentralJetLooseID30 = trgObjects_hltQuadPFCentralJetLooseID30.make_array(event.input)
+        event.trgObjects_caloMhtNoPU = trgObjects_caloMhtNoPU.make_array(event.input)
+        event.trgObjects_hltEle25eta2p1WPLoose = trgObjects_hltEle25eta2p1WPLoose.make_array(event.input)
+        event.SubjetAK08softdrop = SubjetAK08softdrop.make_array(event.input)
+        event.trgObjects_hltDoublePFCentralJetLooseID90 = trgObjects_hltDoublePFCentralJetLooseID90.make_array(event.input)
+        event.GenLep = GenLep.make_array(event.input)
+        event.trgObjects_caloJets = trgObjects_caloJets.make_array(event.input)
+        event.hJCMVAV2idx = hJCMVAV2idx.make_array(event.input)
+        event.trgObjects_hltPFSingleJetLooseID92 = trgObjects_hltPFSingleJetLooseID92.make_array(event.input)
+        event.GenHadTaus = GenHadTaus.make_array(event.input)
+        event.trgObjects_hltL1sETM50ToETM100IorETM60Jet60dPhiMin0p4IorDoubleJetC60ETM60 = trgObjects_hltL1sETM50ToETM100IorETM60Jet60dPhiMin0p4IorDoubleJetC60ETM60.make_array(event.input)
+        event.trgObjects_hltEle25WPTight = trgObjects_hltEle25WPTight.make_array(event.input)
+        event.trgObjects_pfJets = trgObjects_pfJets.make_array(event.input)
+        event.SubjetCA15subjetfiltered = SubjetCA15subjetfiltered.make_array(event.input)
+        event.vLeptons = vLeptons.make_array(event.input)
+        event.trgObjects_hltBTagCaloCSVp014DoubleWithMatching = trgObjects_hltBTagCaloCSVp014DoubleWithMatching.make_array(event.input)
+        event.pileUpVertex_z = pileUpVertex_z.make_array(event.input)
+        event.trgObjects_pfMht = trgObjects_pfMht.make_array(event.input)
+        event.GenBQuarkFromTop = GenBQuarkFromTop.make_array(event.input)
+        event.GenHiggsBoson = GenHiggsBoson.make_array(event.input)
+        event.LHE_weights_scale = LHE_weights_scale.make_array(event.input)
+        event.GenLepFromTauRecovered = GenLepFromTauRecovered.make_array(event.input)
+        event.FatjetCA15pruned = FatjetCA15pruned.make_array(event.input)
+        event.trgObjects_hltVBFCaloJetEtaSortedMqq150Deta1p5 = trgObjects_hltVBFCaloJetEtaSortedMqq150Deta1p5.make_array(event.input)
+        event.trgObjects_caloMht = trgObjects_caloMht.make_array(event.input)
+        event.FatjetCA15softdropz2b1filt = FatjetCA15softdropz2b1filt.make_array(event.input)
+        event.trgObjects_hltDoubleCentralJet90 = trgObjects_hltDoubleCentralJet90.make_array(event.input)
+        event.GenJet = GenJet.make_array(event.input)
+        event.trgObjects_hltDoublePFJetsC100 = trgObjects_hltDoublePFJetsC100.make_array(event.input)
+        event.SubjetCA15pruned = SubjetCA15pruned.make_array(event.input)
+        event.trgObjects_caloMet = trgObjects_caloMet.make_array(event.input)
+        event.FatjetCA15ungroomed = FatjetCA15ungroomed.make_array(event.input)
+        event.trgObjects_pfMet = trgObjects_pfMet.make_array(event.input)
+        event.trgObjects_pfHt = trgObjects_pfHt.make_array(event.input)
+        event.dRaddJetsdR08 = dRaddJetsdR08.make_array(event.input)
+        event.GenBQuarkFromH = GenBQuarkFromH.make_array(event.input)
+        event.SubjetCA15softdropz2b1filt = SubjetCA15softdropz2b1filt.make_array(event.input)
+        event.trgObjects_hltDoubleJet65 = trgObjects_hltDoubleJet65.make_array(event.input)
+        event.FatjetCA15trimmed = FatjetCA15trimmed.make_array(event.input)
+        event.GenHiggsSisters = GenHiggsSisters.make_array(event.input)
+        event.SubjetCA15softdropfilt = SubjetCA15softdropfilt.make_array(event.input)
+        event.trgObjects_hltBTagCaloCSVp026DoubleWithMatching = trgObjects_hltBTagCaloCSVp026DoubleWithMatching.make_array(event.input)
+        event.aLeptons = aLeptons.make_array(event.input)
+        event.trgObjects_hltPFQuadJetLooseID15 = trgObjects_hltPFQuadJetLooseID15.make_array(event.input)
+        event.trgObjects_hltQuadPFCentralJetLooseID45 = trgObjects_hltQuadPFCentralJetLooseID45.make_array(event.input)
+        event.GenGluonFromB = GenGluonFromB.make_array(event.input)
+        event.trgObjects_hltBTagCaloCSVp067Single = trgObjects_hltBTagCaloCSVp067Single.make_array(event.input)
+        event.trgObjects_hltVBFPFJetCSVSortedMqq200Detaqq1p2 = trgObjects_hltVBFPFJetCSVSortedMqq200Detaqq1p2.make_array(event.input)
         event.hjidxaddJetsdR08 = hjidxaddJetsdR08.make_array(event.input)
-        event.htJet30 = getattr(event.input, "htJet30", None)
+        event.FatjetCA15softdropfilt = FatjetCA15softdropfilt.make_array(event.input)
+        event.trgObjects_hltMHTNoPU90 = trgObjects_hltMHTNoPU90.make_array(event.input)
+        event.FatjetAK08ungroomed = FatjetAK08ungroomed.make_array(event.input)
+        event.trgObjects_hltPFMHTTightID90 = trgObjects_hltPFMHTTightID90.make_array(event.input)
+        event.trgObjects_hltQuadCentralJet45 = trgObjects_hltQuadCentralJet45.make_array(event.input)
+        event.trgObjects_hltBTagCaloCSVp022Single = trgObjects_hltBTagCaloCSVp022Single.make_array(event.input)
+        event.aJCidx = aJCidx.make_array(event.input)
+        event.selLeptons = selLeptons.make_array(event.input)
+        event.trgObjects_hltPFMET90 = trgObjects_hltPFMET90.make_array(event.input)
+        event.trgObjects_hltQuadJet15 = trgObjects_hltQuadJet15.make_array(event.input)
+        event.TauGood = TauGood.make_array(event.input)
+        event.hJidx = hJidx.make_array(event.input)
+        event.GenLepRecovered = GenLepRecovered.make_array(event.input)
+        event.FatjetCA15softdropz2b1 = FatjetCA15softdropz2b1.make_array(event.input)
+        event.GenStatus2bHad = GenStatus2bHad.make_array(event.input)
+        event.trgObjects_hltTripleJet50 = trgObjects_hltTripleJet50.make_array(event.input)
+        event.trgObjects_hltVBFPFJetCSVSortedMqq460Detaqq4p1 = trgObjects_hltVBFPFJetCSVSortedMqq460Detaqq4p1.make_array(event.input)
         event.httCandidates = httCandidates.make_array(event.input)
-        event.isrJetVH = getattr(event.input, "isrJetVH", None)
+        event.trgObjects_hltBTagCaloCSVp087Triple = trgObjects_hltBTagCaloCSVp087Triple.make_array(event.input)
+        event.GenTaus = GenTaus.make_array(event.input)
+        event.trgObjects_hltMHT70 = trgObjects_hltMHT70.make_array(event.input)
+        event.Jet = Jet.make_array(event.input)
+        event.FatjetCA15softdrop = FatjetCA15softdrop.make_array(event.input)
+        event.trgObjects_hltPFTripleJetLooseID64 = trgObjects_hltPFTripleJetLooseID64.make_array(event.input)
+        event.LHE_weights_pdf = LHE_weights_pdf.make_array(event.input)
+        event.primaryVertices = primaryVertices.make_array(event.input)
+        event.softActivityJets = softActivityJets.make_array(event.input)
+        event.FatjetCA15subjetfiltered = FatjetCA15subjetfiltered.make_array(event.input)
+        event.GenWZQuark = GenWZQuark.make_array(event.input)
+        event.trgObjects_hltSingleJet80 = trgObjects_hltSingleJet80.make_array(event.input)
+        event.HCMVAV2_reg_corrJECDown = HCMVAV2_reg_corrJECDown.make_obj(event.input)
+        event.HCMVAV2_reg_corrJERDown = HCMVAV2_reg_corrJERDown.make_obj(event.input)
+        event.V = V.make_obj(event.input)
+        event.H_reg = H_reg.make_obj(event.input)
+        event.HCSV_reg_corrJERDown = HCSV_reg_corrJERDown.make_obj(event.input)
+        event.HCSV = HCSV.make_obj(event.input)
+        event.fakeMET = fakeMET.make_obj(event.input)
+        event.HCSV_reg_corrJERUp = HCSV_reg_corrJERUp.make_obj(event.input)
+        event.HCMVAV2_reg_corrJERUp = HCMVAV2_reg_corrJERUp.make_obj(event.input)
+        event.HCSV_reg_corrJECUp = HCSV_reg_corrJECUp.make_obj(event.input)
+        event.met_shifted_UnclusteredEnUp = met_shifted_UnclusteredEnUp.make_obj(event.input)
+        event.met_shifted_UnclusteredEnDown = met_shifted_UnclusteredEnDown.make_obj(event.input)
+        event.HCSV_reg = HCSV_reg.make_obj(event.input)
+        event.H_reg_corrJERUp = H_reg_corrJERUp.make_obj(event.input)
+        event.H_reg_corrJECUp = H_reg_corrJECUp.make_obj(event.input)
+        event.HCMVAV2_reg = HCMVAV2_reg.make_obj(event.input)
+        event.H = H.make_obj(event.input)
+        event.softActivityVH = softActivityVH.make_obj(event.input)
+        event.met_shifted_JetResUp = met_shifted_JetResUp.make_obj(event.input)
+        event.met = met.make_obj(event.input)
+        event.met_shifted_JetEnUp = met_shifted_JetEnUp.make_obj(event.input)
+        event.met_shifted_JetEnDown = met_shifted_JetEnDown.make_obj(event.input)
+        event.met_shifted_MuonEnUp = met_shifted_MuonEnUp.make_obj(event.input)
+        event.met_shifted_MuonEnDown = met_shifted_MuonEnDown.make_obj(event.input)
+        event.met_shifted_ElectronEnUp = met_shifted_ElectronEnUp.make_obj(event.input)
+        event.met_shifted_ElectronEnDown = met_shifted_ElectronEnDown.make_obj(event.input)
+        event.met_shifted_TauEnUp = met_shifted_TauEnUp.make_obj(event.input)
+        event.met_shifted_TauEnDown = met_shifted_TauEnDown.make_obj(event.input)
+        event.met_shifted_JetResDown = met_shifted_JetResDown.make_obj(event.input)
+        event.HaddJetsdR08 = HaddJetsdR08.make_obj(event.input)
+        event.H_reg_corrJERDown = H_reg_corrJERDown.make_obj(event.input)
+        event.HCMVAV2_reg_corrJECUp = HCMVAV2_reg_corrJECUp.make_obj(event.input)
+        event.softActivity = softActivity.make_obj(event.input)
+        event.HCSV_reg_corrJECDown = HCSV_reg_corrJECDown.make_obj(event.input)
+        event.HCMVAV2 = HCMVAV2.make_obj(event.input)
+        event.H_reg_corrJECDown = H_reg_corrJECDown.make_obj(event.input)
+        event.puWeightUp = getattr(event.input, "puWeightUp", None)
+        event.puWeightDown = getattr(event.input, "puWeightDown", None)
         event.json = getattr(event.input, "json", None)
         event.json_silver = getattr(event.input, "json_silver", None)
-        event.lheHT = getattr(event.input, "lheHT", None)
+        event.nPU0 = getattr(event.input, "nPU0", None)
+        event.nPVs = getattr(event.input, "nPVs", None)
+        event.Vtype = getattr(event.input, "Vtype", None)
+        event.VtypeSim = getattr(event.input, "VtypeSim", None)
+        event.VMt = getattr(event.input, "VMt", None)
+        event.HVdPhi = getattr(event.input, "HVdPhi", None)
+        event.fakeMET_sumet = getattr(event.input, "fakeMET_sumet", None)
+        event.bx = getattr(event.input, "bx", None)
+        event.caloMetPt = getattr(event.input, "caloMetPt", None)
+        event.caloMetPhi = getattr(event.input, "caloMetPhi", None)
+        event.rho = getattr(event.input, "rho", None)
+        event.rhoN = getattr(event.input, "rhoN", None)
+        event.rhoCHPU = getattr(event.input, "rhoCHPU", None)
+        event.rhoCentral = getattr(event.input, "rhoCentral", None)
+        event.deltaR_jj = getattr(event.input, "deltaR_jj", None)
+        event.lheNj = getattr(event.input, "lheNj", None)
         event.lheNb = getattr(event.input, "lheNb", None)
         event.lheNc = getattr(event.input, "lheNc", None)
         event.lheNg = getattr(event.input, "lheNg", None)
-        event.lheNj = getattr(event.input, "lheNj", None)
         event.lheNl = getattr(event.input, "lheNl", None)
         event.lheV_pt = getattr(event.input, "lheV_pt", None)
-        event.met = met.make_obj(event.input)
-        event.metPuppi_phi = getattr(event.input, "metPuppi_phi", None)
-        event.metPuppi_pt = getattr(event.input, "metPuppi_pt", None)
-        event.metPuppi_rawpt = getattr(event.input, "metPuppi_rawpt", None)
-        event.metType1p2_pt = getattr(event.input, "metType1p2_pt", None)
-        event.met_rawpt = getattr(event.input, "met_rawpt", None)
-        event.met_shifted_ElectronEnDown = met_shifted_ElectronEnDown.make_obj(event.input)
-        event.met_shifted_ElectronEnUp = met_shifted_ElectronEnUp.make_obj(event.input)
-        event.met_shifted_JetEnDown = met_shifted_JetEnDown.make_obj(event.input)
-        event.met_shifted_JetEnUp = met_shifted_JetEnUp.make_obj(event.input)
-        event.met_shifted_JetResDown = met_shifted_JetResDown.make_obj(event.input)
-        event.met_shifted_JetResUp = met_shifted_JetResUp.make_obj(event.input)
-        event.met_shifted_MuonEnDown = met_shifted_MuonEnDown.make_obj(event.input)
-        event.met_shifted_MuonEnUp = met_shifted_MuonEnUp.make_obj(event.input)
-        event.met_shifted_TauEnDown = met_shifted_TauEnDown.make_obj(event.input)
-        event.met_shifted_TauEnUp = met_shifted_TauEnUp.make_obj(event.input)
-        event.met_shifted_UnclusteredEnDown = met_shifted_UnclusteredEnDown.make_obj(event.input)
-        event.met_shifted_UnclusteredEnUp = met_shifted_UnclusteredEnUp.make_obj(event.input)
-        event.met_sig = getattr(event.input, "met_sig", None)
+        event.lheHT = getattr(event.input, "lheHT", None)
+        event.genTTHtoTauTauDecayMode = getattr(event.input, "genTTHtoTauTauDecayMode", None)
+        event.ttCls = getattr(event.input, "ttCls", None)
+        event.heavyFlavourCategory = getattr(event.input, "heavyFlavourCategory", None)
         event.mhtJet30 = getattr(event.input, "mhtJet30", None)
         event.mhtPhiJet30 = getattr(event.input, "mhtPhiJet30", None)
-        event.nPU0 = getattr(event.input, "nPU0", None)
-        event.nPVs = getattr(event.input, "nPVs", None)
-        event.pileUpVertex_ptHat = pileUpVertex_ptHat.make_array(event.input)
-        event.pileUpVertex_z = pileUpVertex_z.make_array(event.input)
-        event.primaryVertices = primaryVertices.make_array(event.input)
-        event.puWeightDown = getattr(event.input, "puWeightDown", None)
-        event.puWeightUp = getattr(event.input, "puWeightUp", None)
-        event.rho = getattr(event.input, "rho", None)
-        event.rhoCHPU = getattr(event.input, "rhoCHPU", None)
-        event.rhoCentral = getattr(event.input, "rhoCentral", None)
-        event.rhoN = getattr(event.input, "rhoN", None)
-        event.selLeptons = selLeptons.make_array(event.input)
-        event.simPrimaryVertex_z = getattr(event.input, "simPrimaryVertex_z", None)
-        event.softActivity = softActivity.make_obj(event.input)
-        event.softActivityJets = softActivityJets.make_array(event.input)
-        event.softActivityVH = softActivityVH.make_obj(event.input)
-        event.softActivityVHJets = softActivityVHJets.make_array(event.input)
-        event.tkMetPVchs_phi = getattr(event.input, "tkMetPVchs_phi", None)
-        event.tkMetPVchs_pt = getattr(event.input, "tkMetPVchs_pt", None)
-        event.tkMet_phi = getattr(event.input, "tkMet_phi", None)
+        event.htJet30 = getattr(event.input, "htJet30", None)
+        event.met_sig = getattr(event.input, "met_sig", None)
+        event.met_rawpt = getattr(event.input, "met_rawpt", None)
+        event.metPuppi_pt = getattr(event.input, "metPuppi_pt", None)
+        event.metPuppi_phi = getattr(event.input, "metPuppi_phi", None)
+        event.metPuppi_rawpt = getattr(event.input, "metPuppi_rawpt", None)
+        event.metType1p2_pt = getattr(event.input, "metType1p2_pt", None)
         event.tkMet_pt = getattr(event.input, "tkMet_pt", None)
-        event.trgObjects_caloJets = trgObjects_caloJets.make_array(event.input)
-        event.trgObjects_caloMet = trgObjects_caloMet.make_array(event.input)
-        event.trgObjects_caloMht = trgObjects_caloMht.make_array(event.input)
-        event.trgObjects_caloMhtNoPU = trgObjects_caloMhtNoPU.make_array(event.input)
-        event.trgObjects_hltBTagCaloCSVp014DoubleWithMatching = trgObjects_hltBTagCaloCSVp014DoubleWithMatching.make_array(event.input)
-        event.trgObjects_hltBTagCaloCSVp022Single = trgObjects_hltBTagCaloCSVp022Single.make_array(event.input)
-        event.trgObjects_hltBTagCaloCSVp026DoubleWithMatching = trgObjects_hltBTagCaloCSVp026DoubleWithMatching.make_array(event.input)
-        event.trgObjects_hltBTagCaloCSVp067Single = trgObjects_hltBTagCaloCSVp067Single.make_array(event.input)
-        event.trgObjects_hltBTagCaloCSVp087Triple = trgObjects_hltBTagCaloCSVp087Triple.make_array(event.input)
-        event.trgObjects_hltBTagPFCSVp016SingleWithMatching = trgObjects_hltBTagPFCSVp016SingleWithMatching.make_array(event.input)
-        event.trgObjects_hltBTagPFCSVp11DoubleWithMatching = trgObjects_hltBTagPFCSVp11DoubleWithMatching.make_array(event.input)
-        event.trgObjects_hltDoubleCentralJet90 = trgObjects_hltDoubleCentralJet90.make_array(event.input)
-        event.trgObjects_hltDoubleJet65 = trgObjects_hltDoubleJet65.make_array(event.input)
-        event.trgObjects_hltDoublePFCentralJetLooseID90 = trgObjects_hltDoublePFCentralJetLooseID90.make_array(event.input)
-        event.trgObjects_hltDoublePFJetsC100 = trgObjects_hltDoublePFJetsC100.make_array(event.input)
-        event.trgObjects_hltEle25WPTight = trgObjects_hltEle25WPTight.make_array(event.input)
-        event.trgObjects_hltEle25eta2p1WPLoose = trgObjects_hltEle25eta2p1WPLoose.make_array(event.input)
-        event.trgObjects_hltIsoMu20 = trgObjects_hltIsoMu20.make_array(event.input)
-        event.trgObjects_hltL1sETM50ToETM100IorETM60Jet60dPhiMin0p4IorDoubleJetC60ETM60 = trgObjects_hltL1sETM50ToETM100IorETM60Jet60dPhiMin0p4IorDoubleJetC60ETM60.make_array(event.input)
-        event.trgObjects_hltL1sQuadJetCIorTripleJetVBFIorHTT = trgObjects_hltL1sQuadJetCIorTripleJetVBFIorHTT.make_array(event.input)
-        event.trgObjects_hltL1sTripleJetVBFIorHTTIorDoubleJetCIorSingleJet = trgObjects_hltL1sTripleJetVBFIorHTTIorDoubleJetCIorSingleJet.make_array(event.input)
-        event.trgObjects_hltMET70 = trgObjects_hltMET70.make_array(event.input)
-        event.trgObjects_hltMHT70 = trgObjects_hltMHT70.make_array(event.input)
-        event.trgObjects_hltMHTNoPU90 = trgObjects_hltMHTNoPU90.make_array(event.input)
-        event.trgObjects_hltPFDoubleJetLooseID76 = trgObjects_hltPFDoubleJetLooseID76.make_array(event.input)
-        event.trgObjects_hltPFMET90 = trgObjects_hltPFMET90.make_array(event.input)
-        event.trgObjects_hltPFMHTTightID90 = trgObjects_hltPFMHTTightID90.make_array(event.input)
-        event.trgObjects_hltPFQuadJetLooseID15 = trgObjects_hltPFQuadJetLooseID15.make_array(event.input)
-        event.trgObjects_hltPFSingleJetLooseID92 = trgObjects_hltPFSingleJetLooseID92.make_array(event.input)
-        event.trgObjects_hltPFTripleJetLooseID64 = trgObjects_hltPFTripleJetLooseID64.make_array(event.input)
-        event.trgObjects_hltQuadCentralJet30 = trgObjects_hltQuadCentralJet30.make_array(event.input)
-        event.trgObjects_hltQuadCentralJet45 = trgObjects_hltQuadCentralJet45.make_array(event.input)
-        event.trgObjects_hltQuadJet15 = trgObjects_hltQuadJet15.make_array(event.input)
-        event.trgObjects_hltQuadPFCentralJetLooseID30 = trgObjects_hltQuadPFCentralJetLooseID30.make_array(event.input)
-        event.trgObjects_hltQuadPFCentralJetLooseID45 = trgObjects_hltQuadPFCentralJetLooseID45.make_array(event.input)
-        event.trgObjects_hltSingleJet80 = trgObjects_hltSingleJet80.make_array(event.input)
-        event.trgObjects_hltTripleJet50 = trgObjects_hltTripleJet50.make_array(event.input)
-        event.trgObjects_hltVBFCaloJetEtaSortedMqq150Deta1p5 = trgObjects_hltVBFCaloJetEtaSortedMqq150Deta1p5.make_array(event.input)
-        event.trgObjects_hltVBFPFJetCSVSortedMqq200Detaqq1p2 = trgObjects_hltVBFPFJetCSVSortedMqq200Detaqq1p2.make_array(event.input)
-        event.trgObjects_hltVBFPFJetCSVSortedMqq460Detaqq4p1 = trgObjects_hltVBFPFJetCSVSortedMqq460Detaqq4p1.make_array(event.input)
-        event.trgObjects_pfHt = trgObjects_pfHt.make_array(event.input)
-        event.trgObjects_pfJets = trgObjects_pfJets.make_array(event.input)
-        event.trgObjects_pfMet = trgObjects_pfMet.make_array(event.input)
-        event.trgObjects_pfMht = trgObjects_pfMht.make_array(event.input)
-        event.ttCls = getattr(event.input, "ttCls", None)
-        event.vLeptons = vLeptons.make_array(event.input)
+        event.tkMet_phi = getattr(event.input, "tkMet_phi", None)
+        event.tkMetPVchs_pt = getattr(event.input, "tkMetPVchs_pt", None)
+        event.tkMetPVchs_phi = getattr(event.input, "tkMetPVchs_phi", None)
+        event.isrJetVH = getattr(event.input, "isrJetVH", None)
+        event.Flag_hbheIsoFilter = getattr(event.input, "Flag_hbheIsoFilter", None)
+        event.Flag_hbheFilterNew = getattr(event.input, "Flag_hbheFilterNew", None)
+        event.simPrimaryVertex_z = getattr(event.input, "simPrimaryVertex_z", None)
+        event.genHiggsDecayMode = getattr(event.input, "genHiggsDecayMode", None)
+        event.btagWeightCSV_down_cferr1 = getattr(event.input, "btagWeightCSV_down_cferr1", None)
+        event.btagWeightCMVAV2_down_hfstats1 = getattr(event.input, "btagWeightCMVAV2_down_hfstats1", None)
+        event.btagWeightCMVAV2_down_hfstats2 = getattr(event.input, "btagWeightCMVAV2_down_hfstats2", None)
+        event.btagWeightCSV_down_cferr2 = getattr(event.input, "btagWeightCSV_down_cferr2", None)
+        event.btagWeightCSV_down_jes = getattr(event.input, "btagWeightCSV_down_jes", None)
+        event.btagWeightCSV_down_lf = getattr(event.input, "btagWeightCSV_down_lf", None)
+        event.btagWeightCSV_up_lf = getattr(event.input, "btagWeightCSV_up_lf", None)
+        event.btagWeightCSV_down_lfstats2 = getattr(event.input, "btagWeightCSV_down_lfstats2", None)
+        event.btagWeightCSV_down_lfstats1 = getattr(event.input, "btagWeightCSV_down_lfstats1", None)
+        event.btagWeightCSV_down_hf = getattr(event.input, "btagWeightCSV_down_hf", None)
+        event.btagWeightCSV_up_lfstats1 = getattr(event.input, "btagWeightCSV_up_lfstats1", None)
+        event.btagWeightCMVAV2_down_lf = getattr(event.input, "btagWeightCMVAV2_down_lf", None)
+        event.btagWeightCSV_up_lfstats2 = getattr(event.input, "btagWeightCSV_up_lfstats2", None)
+        event.btagWeightCSV = getattr(event.input, "btagWeightCSV", None)
+        event.btagWeightCSV_up_cferr2 = getattr(event.input, "btagWeightCSV_up_cferr2", None)
+        event.btagWeightCSV_up_cferr1 = getattr(event.input, "btagWeightCSV_up_cferr1", None)
+        event.btagWeightCSV_up_hf = getattr(event.input, "btagWeightCSV_up_hf", None)
+        event.btagWeightCMVAV2_down_hf = getattr(event.input, "btagWeightCMVAV2_down_hf", None)
+        event.btagWeightCMVAV2_up_lfstats2 = getattr(event.input, "btagWeightCMVAV2_up_lfstats2", None)
+        event.btagWeightCMVAV2_up_hfstats2 = getattr(event.input, "btagWeightCMVAV2_up_hfstats2", None)
+        event.btagWeightCMVAV2_up_hfstats1 = getattr(event.input, "btagWeightCMVAV2_up_hfstats1", None)
+        event.btagWeightCMVAV2 = getattr(event.input, "btagWeightCMVAV2", None)
+        event.btagWeightCMVAV2_up_lfstats1 = getattr(event.input, "btagWeightCMVAV2_up_lfstats1", None)
+        event.btagWeightCMVAV2_down_cferr2 = getattr(event.input, "btagWeightCMVAV2_down_cferr2", None)
+        event.btagWeightCMVAV2_up_hf = getattr(event.input, "btagWeightCMVAV2_up_hf", None)
+        event.btagWeightCMVAV2_down_cferr1 = getattr(event.input, "btagWeightCMVAV2_down_cferr1", None)
+        event.btagWeightCSV_up_jes = getattr(event.input, "btagWeightCSV_up_jes", None)
+        event.btagWeightCMVAV2_up_jes = getattr(event.input, "btagWeightCMVAV2_up_jes", None)
+        event.btagWeightCMVAV2_up_lf = getattr(event.input, "btagWeightCMVAV2_up_lf", None)
+        event.btagWeightCSV_down_hfstats2 = getattr(event.input, "btagWeightCSV_down_hfstats2", None)
+        event.btagWeightCSV_down_hfstats1 = getattr(event.input, "btagWeightCSV_down_hfstats1", None)
+        event.btagWeightCMVAV2_up_cferr1 = getattr(event.input, "btagWeightCMVAV2_up_cferr1", None)
+        event.btagWeightCMVAV2_up_cferr2 = getattr(event.input, "btagWeightCMVAV2_up_cferr2", None)
+        event.btagWeightCMVAV2_down_lfstats1 = getattr(event.input, "btagWeightCMVAV2_down_lfstats1", None)
+        event.btagWeightCMVAV2_down_lfstats2 = getattr(event.input, "btagWeightCMVAV2_down_lfstats2", None)
+        event.btagWeightCSV_up_hfstats1 = getattr(event.input, "btagWeightCSV_up_hfstats1", None)
+        event.btagWeightCMVAV2_down_jes = getattr(event.input, "btagWeightCMVAV2_down_jes", None)
+        event.btagWeightCSV_up_hfstats2 = getattr(event.input, "btagWeightCSV_up_hfstats2", None)
