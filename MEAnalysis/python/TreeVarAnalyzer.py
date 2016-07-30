@@ -18,6 +18,7 @@ class TreeVarAnalyzer(FilterAnalyzer):
         setattr( event, 'topCandidatesSync', [])    
         setattr( event, 'higgsCandidate', [] )
         
+        
         #FIXME: currently, gen-level analysis is redone for systematic variations
         #in order to correctly ntuplize, we need to define event.genTopLep = event.systResults["nominal"].genTopLep etc
         event.genTopLep = getattr(event.systResults["nominal"], "genTopLep", [])

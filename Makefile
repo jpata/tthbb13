@@ -88,7 +88,7 @@ test_VHBB_data: test_mkdir
 
 test_VHBB_MEAnalysis: test_mkdir
 	rm -Rf MEAnalysis/Loop_*
-	cd MEAnalysis && TTH_CALCME=0 INPUT_FILE=$(test_out_dir)/VHBB.root ME_CONF=python/cfg_local.py python python/MEAnalysis_heppy.py &> $(test_out_dir)/VHBB_MEAnalysis_MEAnalysis_heppy.log
+	cd MEAnalysis && TTH_CALCME=0 INPUT_FILE=$(test_out_dir)/VHBB.root INPUT_TREE=tree ME_CONF=python/cfg_local.py python -m pdb python/MEAnalysis_heppy.py &> $(test_out_dir)/VHBB_MEAnalysis_MEAnalysis_heppy.log
 
 test_MEAnalysis_crab_vhbb: test_mkdir
 	egrep -o "file:.*root" MEAnalysis/crab_vhbb/PSet.py

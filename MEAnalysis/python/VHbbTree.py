@@ -2300,6 +2300,7 @@ class EventAnalyzer(Analyzer):
         event.Flag_hbheFilterNew = getattr(event.input, "Flag_hbheFilterNew", None)
         event.simPrimaryVertex_z = getattr(event.input, "simPrimaryVertex_z", None)
         event.genHiggsDecayMode = getattr(event.input, "genHiggsDecayMode", None)
+        event.triggerEmulationWeight = getattr(event.input, "triggerEmulationWeight", None)
         event.btagWeightCSV_down_cferr1 = getattr(event.input, "btagWeightCSV_down_cferr1", None)
         event.btagWeightCMVAV2_down_hfstats1 = getattr(event.input, "btagWeightCMVAV2_down_hfstats1", None)
         event.btagWeightCMVAV2_down_hfstats2 = getattr(event.input, "btagWeightCMVAV2_down_hfstats2", None)
