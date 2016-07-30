@@ -14,12 +14,6 @@ for k, v in analyses.items():
     print k
     print v
 
-def make_csv_categories():
-    return make_csv_categories_abstract(analyses)
-
-def make_csv_groups():
-    return make_csv_groups_abstract(analyses)
-
 if __name__ == "__main__":
-    make_csv_categories()
-    make_csv_groups()
+    make_csv_categories_abstract(analyses)
+    make_csv_groups_abstract(analyses)

@@ -46,6 +46,14 @@ xsec[("ww", "13TeV")] = 118.7
 xsec[("wz", "13TeV")] = 47.13
 xsec[("zz", "13TeV")] = 16.523
 
+ngen = {
+    'TT_TuneCUETP8M1_13TeV-powheg-pythia8': 3881100.0,
+    'TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': 815002.0,
+    'TTTo2L2Nu_13TeV-powheg': 1999535.0,
+    'ttHTobb_M125_13TeV_powheg_pythia8': 199796.0,
+    'TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': 910468.0
+}
+
 samples_nick = {
     'ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1': "stop_s",
     'ST_t-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1': "stop_t",

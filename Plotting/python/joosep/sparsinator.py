@@ -4,6 +4,8 @@ import ROOT
 
 import sys, os
 from collections import OrderedDict
+import logging
+LOG_MODULE_NAME = logging.getLogger(__name__)
 
 # We use rootpy because it has a nice buffer arount TTree,
 # which allows us to not re-read the whole tree every time we access
@@ -12,14 +14,15 @@ from collections import OrderedDict
 # for more details. In case you use rootpy.io.File instead of TFile,
 # the tree automatically has this buffer.
 #Try loading rootpy (installed via anaconda)
+HAVE_ROOTPY = False
 try:
     from rootpy.tree.chain import TreeChain
     from rootpy.vector import LorentzVector
     import rootpy
     import rootpy.io
-except Exception as e:
-    print('could not import rootpy, make sure you are using anaconda (via $CMSSW_BASE/src/TTH/setenv_*.sh)', file=sys.stderr)
-    raise e
+    HAVE_ROOTPY = True
+except ImportError as e:
+    LOG_MODULE_NAME.warning("Could not import rootpy, disabling")
 
 import numpy as np
 from TTH.MEAnalysis.samples_base import getSitePrefix, xsec, samples_nick, xsec_sample, get_prefix_sample
@@ -49,7 +52,11 @@ PROCESS_MAP = {
     "data_ee": 10,
     "data_em": 11,
 }
-SYSTEMATICS_EVENT = ["JESUp", "JESDown", "JERUp", "JERDown"]
+
+SYSTEMATICS_EVENT = [
+    "CMS_scale_jUp", "CMS_scale_jDown",
+    "CMS_res_jUp", "CMS_res_jDown"
+]
 
 """
 Create pairs of (systematic_name, weight function), which will be used on the
@@ -207,6 +214,8 @@ desc = Desc([
         nominal=Func("blr_cMVA", func=lambda ev: logit(ev.btag_LR_4b_2b_btagCMVA)),
     ),
 
+    Var(name="leps_pdgId"),
+
     Var(name="jets_p4",
         nominal=Func(
             "jets_p4",
@@ -214,22 +223,22 @@ desc = Desc([
             zip(ev.jets_pt[:ev.njets], ev.jets_eta[:ev.njets], ev.jets_phi[:ev.njets], ev.jets_mass[:ev.njets])]
         ),
         systematics = {
-            "JESUp": Func(
+            "CMS_scale_jUp": Func(
                 "jets_p4_JESUp",
                 func=lambda ev: [lv_p4s(pt*float(cvar)/float(c), eta, phi, m) for (pt, eta, phi, m, cvar, c) in
                 zip(ev.jets_pt[:ev.njets], ev.jets_eta[:ev.njets], ev.jets_phi[:ev.njets], ev.jets_mass[:ev.njets], ev.jets_corr_JESUp[:ev.njets], ev.jets_corr[:ev.njets])]
             ),
-            "JESDown": Func(
+            "CMS_scale_jDown": Func(
                 "jets_p4_JESDown",
                 func=lambda ev: [lv_p4s(pt*float(cvar)/float(c), eta, phi, m) for (pt, eta, phi, m, cvar, c) in
                 zip(ev.jets_pt[:ev.njets], ev.jets_eta[:ev.njets], ev.jets_phi[:ev.njets], ev.jets_mass[:ev.njets], ev.jets_corr_JESDown[:ev.njets], ev.jets_corr[:ev.njets])]
             ),
-            "JERUp": Func(
+            "CMS_res_jUp": Func(
                 "jets_p4_JERUp",
                 func=lambda ev: [lv_p4s(pt*float(cvar)/float(c) if c>0 else 0.0, eta, phi, m) for (pt, eta, phi, m, cvar, c) in
                 zip(ev.jets_pt[:ev.njets], ev.jets_eta[:ev.njets], ev.jets_phi[:ev.njets], ev.jets_mass[:ev.njets], ev.jets_corr_JERUp[:ev.njets], ev.jets_corr_JER[:ev.njets])]
             ),
-            "JERDown": Func(
+            "CMS_res_jDown": Func(
                 "jets_p4_JERDown",
                 func=lambda ev: [lv_p4s(pt*float(cvar)/float(c) if c>0 else 0.0, eta, phi, m) for (pt, eta, phi, m, cvar, c) in
                 zip(ev.jets_pt[:ev.njets], ev.jets_eta[:ev.njets], ev.jets_phi[:ev.njets], ev.jets_mass[:ev.njets], ev.jets_corr_JERDown[:ev.njets], ev.jets_corr_JER[:ev.njets])]
@@ -441,7 +450,10 @@ if __name__ == "__main__":
     nevents = 0
     for file_name in file_names:
         print("opening {0}".format(file_name))
-        tf = rootpy.io.File.Open(file_name)
+        if HAVE_ROOTPY:
+            tf = rootpy.io.File.Open(file_name)
+        else:
+            tf = ROOT.TFile.Open(file_name)
         events = tf.Get("tree")
         print("opened {0}".format(events))
         print("looping over {0} events".format(events.GetEntries()))
@@ -497,4 +509,3 @@ if __name__ == "__main__":
     print("writing output")
     outfile.Write()
     outfile.Close()
-
