@@ -215,7 +215,7 @@ for k in datasets.keys():
 workflow_datasets["pilot"] = {}
 pilot_name = 'ttHTobb'
 D = deepcopy(datasets[pilot_name])
-D["perjob"] = 50
+D["perjob"] = 20
 D["mem_cfg"] = me_cfgs["nome"]
 workflow_datasets["pilot"][pilot_name] = D
 
@@ -348,21 +348,22 @@ env
         'python.tar.gz',
         'data.tar.gz',
         "MEAnalysis_heppy.py",
-        'MVAJetTags_620SLHCX_Phase1And2Upgrade.db',
-        'combined_cmssw.py',
+        vhbb_dir + '/MVAJetTags_620SLHCX_Phase1And2Upgrade.db',
+        vhbb_dir + '/combined_cmssw.py',
         vhbb_dir + '/vhbb.py',
         vhbb_dir + '/vhbb_combined.py',
-        'TMVAClassification_BDT.weights.xml',
-        'puData.root',
+        vhbb_dir + '/TMVAClassification_BDT.weights.xml',
+        vhbb_dir + '/puData.root',
         vhbb_dir + '/puDataMinus.root',
         vhbb_dir + '/puDataPlus.root',
-        'puMC.root',
-        'json.txt',
+        vhbb_dir + '/puMC.root',
+        vhbb_dir + '/json.txt',
+        vhbb_dir + '/triggerEmulation.root',
         vhbb_dir + "/Zll-spring15.weights.xml",
         vhbb_dir + "/Wln-spring15.weights.xml",
         vhbb_dir + "/Znn-spring15.weights.xml",
         vhbb_dir + "/VBF-spring15.weights.xml",
-        vhbb_dir + "/ttbar-fall15_TargetGenOverPt_GenPtCut0.weights.xml",
+        vhbb_dir + "/ttbar-spring16-80X.weights.xml",
         vhbb_dir + '/TMVA_blikelihood_vbf_cmssw76_h21trained.weights.xml'
     ]
 
