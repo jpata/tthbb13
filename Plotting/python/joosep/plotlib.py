@@ -1,6 +1,8 @@
 import ROOT
 ROOT.gROOT.SetBatch(True)
 
+import uuid
+
 import matplotlib
 import matplotlib.pyplot as plt
 
@@ -47,6 +49,9 @@ colors = {
     "other": (251, 73, 255),
 }
 
+components = {
+
+}
 #create floats of colors from 0..1
 for cn, c in colors.items():
     colors[cn] = (c[0]/255.0, c[1]/255.0, c[2]/255.0)
@@ -94,6 +99,8 @@ samplelist = [
 #    ("wjets", "wjets"),
 #    ("ttV", "ttV"),
 ]
+
+samplelist_d = dict(samplelist)
 
 #list of all variable names, suitable for latex
 varnames = {
@@ -177,24 +184,31 @@ def process_sample_hist(fnames, hname, func, bins, cut, **kwargs):
     returns: TH1D in the gROOT directory
     """
 
-    tt = ROOT.TChain("tree")
-    for fn in fnames:
+    for ifn in range(len(fnames)):
+        fn = fnames[ifn]
+        if type(fn) is str:
+            fnames[ifn] = (fnames[ifn], 1.0)
+    
+    hs = []
+    for fn, xsw in fnames:
+        tt = ROOT.TChain("tree")
         tt.Add(fn)
-    ROOT.gROOT.cd()
-    hs = {}
-    h = ROOT.gROOT.Get(hname)
-    if h:
-        h.Delete()
-    h = ROOT.TH1D(hname, "", bins[0], bins[1], bins[2])
-    h.Sumw2()
-    hname = h.GetName()
-    h = rootpy.asrootpy(h)
-    h.SetDirectory(ROOT.gROOT)
-    n = tt.Draw("{0} >> {1}".format(func, hname), cut)
-    if kwargs.get("norm", False):
-        if h.Integral()>0:
-            h.Scale(1.0 / h.Integral())
-    return h
+        ROOT.gROOT.cd()
+        _hname = str(uuid.uuid4())
+        ndims = len(bins)/3
+        if ndims == 1:
+            h = ROOT.TH1D(_hname, "", *bins)
+        elif ndims == 2:
+            h = ROOT.TH2D(_hname, "", *bins)
+        h.Sumw2()
+        h.SetDirectory(ROOT.gROOT)
+        n = tt.Draw("{0} >> {1}".format(func, _hname), cut)
+        h.Scale(xsw)
+        h = rootpy.asrootpy(h)
+        hs += [h]
+    htot = sum(hs)
+    htot.SetName(hname)
+    return htot
 
 def mc_stack(
     hlist,
@@ -498,9 +512,12 @@ def draw_mem_data_mc(*args, **kwargs):
     a1.set_ylim(bottom=0)
     return a1, a2, hs
 
-def calc_roc(h1, h2):
+def calc_roc(h1, h2, rebin=1):
     h1 = h1.Clone()
     h2 = h2.Clone()
+    h1.Rebin(rebin)
+    h2.Rebin(rebin)
+
     if h1.Integral()>0:
         h1.Scale(1.0 / h1.Integral())
     if h2.Integral()>0:
