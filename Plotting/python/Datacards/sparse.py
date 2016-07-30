@@ -100,10 +100,10 @@ def save_hdict(ofn, hdict):
                 dirs[kpath] = d
             assert(v != None)
             v.SetName(kname)
-            v.SetDirectory(d)
+            d.Add(v)
         else:
             v.SetName(kname)
-            v.SetDirectory(outfile)
+            outfile.Add(v)
     outfile.Write()
     outfile.Close()
 
