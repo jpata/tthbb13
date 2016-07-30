@@ -11,7 +11,7 @@ from PhysicsTools.Heppy.analyzers.core.AutoFillTreeProducer import *
 #FIXME: this is a hack to run heppy on non-EDM formats. Better to propagate it to heppy
 def fillCoreVariables(self, tr, event, isMC):
     if isMC:
-        for x in ["run", "lumi", "evt", "xsec", "nTrueInt", "genWeight"]:
+        for x in ["run", "lumi", "evt", "xsec", "genWeight"]:
             tr.fill(x, getattr(event.input, x))
     else:
         for x in ["run", "lumi", "evt"]:
@@ -669,15 +669,17 @@ def getTreeProducer(conf):
         ("ttCls",                   int,    "ttbar classification from GenHFHadronMatcher"),
         ("genHiggsDecayMode",       int,    ""),
         ("puWeight",                float,    ""),
-        ("puWeightUp",                float,    ""),
-        ("puWeightDown",                float,    ""),
+        ("puWeightUp",              float,    ""),
+        ("puWeightDown",            float,    ""),
         ("nPU0",                    float,  ""),
+        ("nTrueInt",                int,  ""),
+        ("triggerEmulationWeight",  float,  ""),
     ]:
         treeProducer.globalVariables += [makeGlobalVariable(vtype, "nominal", mcOnly=True)]
    
     for bweight in bweights:
         treeProducer.globalVariables += [
-            makeGlobalVariable((bweight, "float", ""), "nominal", mcOnly=True)
+            makeGlobalVariable((bweight, float, ""), "nominal", mcOnly=True)
         ]
 
     for vtype in [
