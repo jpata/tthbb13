@@ -28,7 +28,7 @@ blr_cuts = {
 
 input_file = "/mnt/t3nfs01/data01/shome/jpata/tth/gc/melooper/GCdf683f856c22/ControlPlots.root"
 
-lumi = 2500
+LUMI = 9600.0
 
 do_stat_variations = False
 do_fake_data = True
@@ -97,7 +97,7 @@ base_samples = [
     Sample(
         input_name = "ttHTobb_M125_13TeV_powheg_pythia8",
         output_name = "ttH_hbb",
-        xs_weight = lumi*samples_base.xsec_sample["ttHTobb_M125_13TeV_powheg_pythia8"]/samples_base.ngen["ttHTobb_M125_13TeV_powheg_pythia8"]
+        xs_weight = LUMI*samples_base.xsec_sample["ttHTobb_M125_13TeV_powheg_pythia8"]/samples_base.ngen["ttHTobb_M125_13TeV_powheg_pythia8"]
     ),
     # Sample(
     #     input_name = "ttHToNonbb_M125_13TeV_powheg_pythia8",
@@ -116,7 +116,7 @@ ttjets_powheg = [
     Sample(
         input_name = "TT_TuneCUETP8M1_13TeV-powheg-pythia8",
         output_name = tt,
-        xs_weight = lumi*samples_base.xsec_sample["TT_TuneCUETP8M1_13TeV-powheg-pythia8"]/samples_base.ngen["TT_TuneCUETP8M1_13TeV-powheg-pythia8"],
+        xs_weight = LUMI*samples_base.xsec_sample["TT_TuneCUETP8M1_13TeV-powheg-pythia8"]/samples_base.ngen["TT_TuneCUETP8M1_13TeV-powheg-pythia8"],
         cuts = [processCut(tt)]
     ) for tt in [
         "ttbarOther", "ttbarPlusBBbar", "ttbarPlus2B", "ttbarPlusB", "ttbarPlusCCbar"

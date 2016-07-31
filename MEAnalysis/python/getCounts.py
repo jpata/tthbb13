@@ -11,5 +11,9 @@ for fn in sys.argv[1:]:
     h1 = f.Get("CountPosWeight")
     h2 = f.Get("CountNegWeight")
     d2[fn.split("/")[-1].split(".")[0]] = h1.GetBinContent(1) - h2.GetBinContent(1)
+
+print "counts"
 print d
+
+print "counts with weight"
 print d2

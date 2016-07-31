@@ -23,7 +23,9 @@ try:
     HAVE_ROOTPY = True
 except ImportError as e:
     LOG_MODULE_NAME.warning("Could not import rootpy, disabling")
-
+    LOG_MODULE_NAME.error("This code will NOT work without rootpy!")
+    raise e
+    
 import numpy as np
 from TTH.MEAnalysis.samples_base import getSitePrefix, xsec, samples_nick, xsec_sample, get_prefix_sample, PROCESS_MAP
 from TTH.Plotting.Datacards.sparse import save_hdict
@@ -196,7 +198,7 @@ desc = Desc([
         nominal=Func("blr_cMVA", func=lambda ev: logit(ev.btag_LR_4b_2b_btagCMVA)),
     ),
 
-    Var(name="leps_pdgId", nominal=Func("leps_pdgId", func=lambda ev: [int(x) for x in ev.leps_pdgId[:ev.nleps]]),
+    Var(name="leps_pdgId", nominal=Func("leps_pdgId", func=lambda ev: [int(ev.leps_pdgId[i]) for i in range(ev.nleps)])),
 
     Var(name="jets_p4",
         nominal=Func(
@@ -246,7 +248,7 @@ desc = Desc([
     Var(name="puWeight", schema=["mc"]),
     #nominal b-tag weight, systematic weights added later
     Var(name="bTagWeight", schema=["mc"]),
-] + [Var(name=bw, schema=["mc"]) for bw in btag_weights])
+    ] + [Var(name=bw, schema=["mc"]) for bw in btag_weights])
 
 class Axis:
     def __init__(self, name, nbins, lo, hi, func):
@@ -403,9 +405,9 @@ def triggerPath(event):
     elif event["is_dl"] and pass_HLT_dl_mumu(event):
         return 3
     elif event["is_dl"] and pass_HLT_dl_elmu(event):
-        return 3
-    elif event["is_dl"] and pass_HLT_dl_elel(event):
         return 4
+    elif event["is_dl"] and pass_HLT_dl_elel(event):
+        return 5
     return 0
 
 if __name__ == "__main__":
@@ -446,13 +448,14 @@ if __name__ == "__main__":
         iEv = 0
 
         for event in events:
-
             #apply some basic preselection
             if not (event.is_sl or event.is_dl):
                 continue
             if not event.numJets >= 4:
                 continue
             if not (event.nBCSVM>=3 or event.nBCMVAM>=3):
+                continue
+            if schema == "data" and not event.json:
                 continue
 
             for syst in systematics_event:
