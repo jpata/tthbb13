@@ -214,7 +214,7 @@ def mc_stack(
         h.fillstyle = "solid"
 
     #FIXME: Temporary workaround for failed fill, only works when hatch is specified
-    r = hist(hlist, stacked=True, hatch=".", lw=2)
+    stack = hist(hlist, stacked=True, hatch=".", lw=2)
     htot = sum(hlist)
     htot.color="black"
 
@@ -254,7 +254,7 @@ def mc_stack(
         alpha=1.0, linewidth=0, facecolor="none", edgecolor="gray", zorder=10,
     )
 
-    return {"hists":r, "tot":htot, "tot_u":htot_u, "tot_d":htot_d, "tot_usyst":htot_usyst, "tot_dsyst":htot_dsyst}
+    return {"hists":stack, "tot":htot, "tot_u":htot_u, "tot_d":htot_d, "tot_usyst":htot_usyst, "tot_dsyst":htot_dsyst}
 
 def dice(h, nsigma=1.0):
     hret = h.clone()
@@ -267,6 +267,10 @@ def dice(h, nsigma=1.0):
     return hret
 
 def make_uoflow(h):
+    """
+    Given a TH1 with bins [1...nbins], fill the underflow entries (bin 0) into the first bin and
+    the overflow entries (nbins+1) into the last bin (nbins).
+    """
     nb = h.GetNbinsX()
     #h.SetBinEntries(1, h.GetBinEntries(0) + h.GetBinEntries(1))
     #h.SetBinEntries(nb+1, h.GetBinEntries(nb) + h.GetBinEntries(nb + 1))
@@ -305,12 +309,13 @@ def getHistograms(tf, samples, hname):
             else:
                 return hs
     return hs
+def escape_string(s):
+    return s.replace("_", " ")
 
 def draw_data_mc(tf, hname, samples, **kwargs):
 
-    do_pseudodata = kwargs.get("do_pseudodata", False)
-    dataname = kwargs.get("dataname", None)
-    xlabel = kwargs.get("xlabel", hname.replace("_", " "))
+    dataname = kwargs.get("dataname", "data_obs")
+    xlabel = kwargs.get("xlabel", escape_string(hname))
     xunit = kwargs.get("xunit", "XUNIT")
     ylabel = kwargs.get("ylabel", "auto")
     rebin = kwargs.get("rebin", 1)
@@ -339,25 +344,22 @@ def draw_data_mc(tf, hname, samples, **kwargs):
     sample_d = dict(samples)
     for hd in [hs] + hs_syst.values():
         for (sample, h) in hd.items():
-            make_uoflow(h)
             h.title = sample_d[sample] + " ({0:.1f})".format(h.Integral())
             h.rebin(rebin)
             if show_overflow:
                 fill_overflow(h)
             
     c = plt.figure(figsize=(6,6))
-    if do_pseudodata or dataname:
-        a1 = plt.axes([0.0,0.22, 1.0, 0.8])
-    else:
-        a1 = plt.axes()
+
+    a1 = plt.axes([0.0, 0.22, 1.0, 0.8])
         
-    c.suptitle("$\textbf{{CMS}}$ preliminary $\sqrt{{s}} = 13$ TeV"+title_extended,
+    c.suptitle("$\\textbf{CMS}$ preliminary $\sqrt{s} = 13$ TeV"+title_extended,
         y=1.02, x=0.02,
         horizontalalignment="left", verticalalignment="bottom", fontsize=16
     )
     if len(hs) == 0:
         raise KeyError("did not find any histograms for MC")
-    r = mc_stack(hs.values(), hs_syst, systematics, colors=colors)
+    stacked_hists = mc_stack(hs.values(), hs_syst, systematics, colors=colors)
     
     #Create the normalized signal shape
     hsig = hs[samples[0][0]].Clone()
@@ -368,6 +370,7 @@ def draw_data_mc(tf, hname, samples, **kwargs):
     hsig.title = samples[0][1] + " norm"
     hsig.linewidth=2
     hsig.fillstyle = None
+    #draw the signal shape
     hist([hsig])
     
     tot_mc.title = "pseudodata"
@@ -375,35 +378,17 @@ def draw_data_mc(tf, hname, samples, **kwargs):
 
     tot_bg = sum([hs[k] for k in hs.keys() if "tth" not in k])
     
+    #Get the data histogram
     data = None
-    if do_pseudodata:
-        data = tot_mc.Clone()
-        data.title = "pseudodata"
+    if dataname != "":
+        data = tf.get(dataname + "/" + hname)
+        data.rebin(rebin)
         if blindFunc:
             data = blindFunc(data)
-        idata = data.Integral()
-    elif dataname:
-        datas = []
-        for dn in dataname:
-            try:
-                h = tf.get(dn + "/" + hname)
-                datas += [tf.get(dn + "/" + hname).Clone()]
-            except rootpy.io.file.DoesNotExist:
-                print "missing", dn, hname
-        if len(datas)>0:
-            data = sum(datas)
-            data.rebin(rebin)
-        else:
-            data = tot_mc.Clone()
-            data.Scale(0.0)
-        if blindFunc:
-            data = blindFunc(data)
-        data.title = "data ({0})".format(data.Integral())
-        idata = data.Integral()
-
-    if data and (blindFunc is None):
+        data.title = "data ({0:.2f})".format(data.Integral())
         if show_overflow:
             fill_overflow(data)
+        #set data error to 0 in case no data (FIXME) 
         for ibin in range(data.GetNbinsX()):
             if data.GetBinContent(ibin) == 0:
                 data.SetBinError(ibin, 1)
@@ -414,10 +399,8 @@ def draw_data_mc(tf, hname, samples, **kwargs):
         if data:
             dataline = mlines.Line2D([], [], color='black', marker='o', label=data.title)
             patches += [dataline]
-        for line, h in zip(r["hists"], hs.values()):
-            #import pdb
-            #pdb.set_trace()
-            patch = mpatches.Patch(color=line[0].get_color(), label=h.title)
+        for (line1, line2), h in zip(stacked_hists["hists"], hs.values()):
+            patch = mpatches.Patch(color=line1.get_color(), label=h.title)
             patches += [patch]
         patches += [mpatches.Patch(facecolor="none", edgecolor="black", label="stat", hatch="////////")]
         patches += [mpatches.Patch(facecolor="none", edgecolor="gray", label="stat+syst", hatch="\\\\\\\\")]
@@ -425,13 +408,10 @@ def draw_data_mc(tf, hname, samples, **kwargs):
     if ylabel == "auto":
         ylabel = "events / {0:.2f} {1}".format(hs.values()[0].get_bin_width(1), xunit)
     plt.ylabel(ylabel)
-    if not data:
-        plt.xlabel(xlabel)
+
     #hide x ticks on main panel
     ticks = a1.get_xticks()
-    if data:
-        a1.get_xaxis().set_visible(False)
-    #print ticks
+    a1.get_xaxis().set_visible(False)
     
     a1.set_ylim(bottom=0, top=1.1*a1.get_ylim()[1])
     a1.grid(zorder=100000)
@@ -445,25 +425,32 @@ def draw_data_mc(tf, hname, samples, **kwargs):
         plt.xlabel(xlabel)
         a2.grid()
         
-        data.Divide(tot_mc)
-        for ibin in range(data.GetNbinsX()):
+        data_ratio = data.Clone()
+        data_ratio.Divide(tot_mc)
+
+        #In case MC was empty, set data/mc ratio to 0
+        for ibin in range(data_ratio.GetNbinsX()):
             bc = tot_mc.GetBinContent(ibin)
             if bc==0:
-                data.SetBinContent(ibin, 0)
-        bg_unc_u = r["tot_u"]
-        bg_unc_d = r["tot_d"]
+                data_ratio.SetBinContent(ibin, 0)
 
-        bg_unc_u.Divide(r["tot"])
-        bg_unc_d.Divide(r["tot"])
+        #create also the variated band
+        bg_unc_u = stacked_hists["tot_u"]
+        bg_unc_d = stacked_hists["tot_d"]
 
-        bg_unc_usyst = r["tot_usyst"]
-        bg_unc_dsyst = r["tot_dsyst"]
+        bg_unc_u.Divide(stacked_hists["tot"])
+        bg_unc_d.Divide(stacked_hists["tot"])
 
-        bg_unc_usyst.Divide(r["tot"])
-        bg_unc_dsyst.Divide(r["tot"])
+        bg_unc_usyst = stacked_hists["tot_usyst"]
+        bg_unc_dsyst = stacked_hists["tot_dsyst"]
+
+        bg_unc_usyst.Divide(stacked_hists["tot"])
+        bg_unc_dsyst.Divide(stacked_hists["tot"])
+        
+        #blind the data also on the ratio
         if blindFunc:
-            data = blindFunc(data)
-        errorbar(data)
+            data_ratio = blindFunc(data_ratio)
+        errorbar(data_ratio)
 
         fill_between(
             bg_unc_u, bg_unc_d,
@@ -476,14 +463,18 @@ def draw_data_mc(tf, hname, samples, **kwargs):
             color="gray", hatch="\\\\\\\\",
             alpha=1.0, linewidth=0, facecolor="none", edgecolor="gray", zorder=10,
         )
-        plt.title("data={0:.1f}\ MC={1:.1f}".format(idata, r["tot"].Integral()), x=0.01, y=0.8, fontsize=10, horizontalalignment="left")
+        plt.title("data={0:.1f}\ MC={1:.1f}".format(
+            data.Integral(),
+            stacked_hists["tot"].Integral()
+            ), x=0.01, y=0.8, fontsize=10, horizontalalignment="left"
+        )
         plt.ylabel("$\\frac{\mathrm{data}}{\mathrm{pred.}}$", fontsize=16)
         plt.axhline(1.0, color="black")
         a2.set_ylim(0, 2)
         #hide last tick on ratio y axes
         a2.set_yticks(a2.get_yticks()[:-1]);
         a2.set_xticks(ticks);
-    return a1, a2, hs, r, hs_syst
+    return a1, a2, hs, stacked_hists, hs_syst
 
 def draw_mem_data_mc(*args, **kwargs):
     a1, a2, hs = draw_data_mc(*args, **kwargs)
