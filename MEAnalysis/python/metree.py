@@ -38,7 +38,7 @@ jetType = NTupleObjectType("jetType", variables = [
     NTupleVariable("qgl", lambda x : x.qgl),
     NTupleVariable("btagCSV", lambda x : x.btagCSV),
     NTupleVariable("btagCMVA", lambda x : x.btagCMVA),
-    NTupleVariable("btagCMVA_log", lambda x : getattr(x, "btagCMVA_log", -20), help="log-transformed btagCMVA"),
+    #NTupleVariable("btagCMVA_log", lambda x : getattr(x, "btagCMVA_log", -20), help="log-transformed btagCMVA"),
     NTupleVariable("btagFlag", lambda x : getattr(x, "btagFlag", -1), help="Jet was considered to be a b in MEM according to the algo"),
     NTupleVariable("mcFlavour", lambda x : x.mcFlavour, type=int, mcOnly=True),
     NTupleVariable("mcMatchId", lambda x : x.mcMatchId, type=int, mcOnly=True),
@@ -64,6 +64,20 @@ jetType = NTupleObjectType("jetType", variables = [
     NTupleVariable("corr_JERDown", lambda x : x.corr_JERDown, mcOnly=True),
 ])
 
+lepton_sf_kind = [
+    "SF_HLT_RunD4p2",
+    "SF_HLT_RunD4p3",
+    "SF_IdCutLoose",
+    "SF_IdCutTight",
+    "SF_IdMVALoose",
+    "SF_IdMVATight",
+    "SF_IsoLoose",
+    "SF_IsoTight",
+    "SF_trk_eta",
+]
+
+lepton_sf_kind_err = [x.replace("SF", "SFerr") for x in lepton_sf_kind]
+
 #Specifies what to save for leptons
 leptonType = NTupleObjectType("leptonType", variables = [
     NTupleVariable("pt", lambda x : x.pt),
@@ -73,7 +87,10 @@ leptonType = NTupleObjectType("leptonType", variables = [
     NTupleVariable("pdgId", lambda x : x.pdgId),
     NTupleVariable("relIso03", lambda x : x.pfRelIso03),
     NTupleVariable("relIso04", lambda x : x.pfRelIso04),
-    NTupleVariable("mvaId", lambda x : x.eleMVAIdSpring15Trig),
+    NTupleVariable("ele_mva_id", lambda x : x.eleMVAIdSpring15Trig),
+    NTupleVariable("mu_id", lambda x : 1*getattr(x, "looseIdPOG", 0) + 2*getattr(x, "tightId", 0)),
+] + [NTupleVariable(sf, lambda x, sf=sf : getattr(x, sf, -1.0))
+    for sf in lepton_sf_kind + lepton_sf_kind_err
 ])
 
 
@@ -498,15 +515,16 @@ def getTreeProducer(conf):
 
     trignames = []
     for pathname, trigs in list(conf.trigger["trigTable"].items()) + list(conf.trigger["trigTableData"].items()):
-        pathname = "HLT_" + pathname 
-        if not pathname in trignames:
-            trignames += [pathname]
-        for tn in trigs:
-            #strip the star
-            tn = "HLT_BIT_" + tn[:-1]
-            if not tn in trignames:
-                trignames += [tn]
-    
+        for pref in ["HLT", "HLT2"]:
+            pathname = "_".join([pref, pathname])
+            if not pathname in trignames:
+                trignames += [pathname]
+            for tn in trigs:
+                #strip the star
+                tn = pref + "_BIT_" + tn[:-1]
+                if not tn in trignames:
+                    trignames += [tn]
+    print trignames 
     for trig in trignames:
         treeProducer.globalVariables += [NTupleVariable(
             trig, lambda ev, name=trig: getattr(ev.input, name, -1), type=int, mcOnly=False

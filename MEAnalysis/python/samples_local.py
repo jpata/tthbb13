@@ -14,6 +14,6 @@ samples_dict = {
         skip     = cms.bool(False),
         isMC     = cms.bool(True),
         treeName = cms.string(os.environ.get("INPUT_TREE", "vhbb/tree")),
-        subFiles = cms.vstring("file://"+os.environ["INPUT_FILE"]),
+        subFiles = cms.vstring(getSitePrefix(os.environ["INPUT_FILE"])),
     )
 }
