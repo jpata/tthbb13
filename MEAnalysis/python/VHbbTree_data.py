@@ -1,24 +1,3 @@
-class GenBQuarkFromHafterISR:
-    def __init__(self, tree, n):
-        self.pdgId = tree.GenBQuarkFromHafterISR_pdgId[n];
-        self.pt = tree.GenBQuarkFromHafterISR_pt[n];
-        self.eta = tree.GenBQuarkFromHafterISR_eta[n];
-        self.phi = tree.GenBQuarkFromHafterISR_phi[n];
-        self.mass = tree.GenBQuarkFromHafterISR_mass[n];
-        self.charge = tree.GenBQuarkFromHafterISR_charge[n];
-        self.status = tree.GenBQuarkFromHafterISR_status[n];
-        self.isPromptHard = tree.GenBQuarkFromHafterISR_isPromptHard[n];
-        pass
-    @staticmethod
-    def make_array(input):
-        return [GenBQuarkFromHafterISR(input, i) for i in range(input.nGenBQuarkFromHafterISR)]
-class pileUpVertex_ptHat:
-    def __init__(self, tree, n):
-        self.pileUpVertex_ptHat = tree.pileUpVertex_ptHat[n];
-        pass
-    @staticmethod
-    def make_array(input):
-        return [pileUpVertex_ptHat(input, i) for i in range(input.npileUpVertex_ptHat)]
 class trgObjects_hltMET70:
     def __init__(self, tree, n):
         pass
@@ -37,20 +16,6 @@ class trgObjects_hltBTagPFCSVp11DoubleWithMatching:
     @staticmethod
     def make_array(input):
         return [trgObjects_hltBTagPFCSVp11DoubleWithMatching(input, i) for i in range(input.ntrgObjects_hltBTagPFCSVp11DoubleWithMatching)]
-class GenLepFromTop:
-    def __init__(self, tree, n):
-        self.pdgId = tree.GenLepFromTop_pdgId[n];
-        self.pt = tree.GenLepFromTop_pt[n];
-        self.eta = tree.GenLepFromTop_eta[n];
-        self.phi = tree.GenLepFromTop_phi[n];
-        self.mass = tree.GenLepFromTop_mass[n];
-        self.charge = tree.GenLepFromTop_charge[n];
-        self.status = tree.GenLepFromTop_status[n];
-        self.isPromptHard = tree.GenLepFromTop_isPromptHard[n];
-        pass
-    @staticmethod
-    def make_array(input):
-        return [GenLepFromTop(input, i) for i in range(input.nGenLepFromTop)]
 class ajidxaddJetsdR08:
     def __init__(self, tree, n):
         self.ajidxaddJetsdR08 = tree.ajidxaddJetsdR08[n];
@@ -94,20 +59,6 @@ class trgObjects_hltQuadCentralJet30:
     @staticmethod
     def make_array(input):
         return [trgObjects_hltQuadCentralJet30(input, i) for i in range(input.ntrgObjects_hltQuadCentralJet30)]
-class GenVbosonsRecovered:
-    def __init__(self, tree, n):
-        self.pdgId = tree.GenVbosonsRecovered_pdgId[n];
-        self.pt = tree.GenVbosonsRecovered_pt[n];
-        self.eta = tree.GenVbosonsRecovered_eta[n];
-        self.phi = tree.GenVbosonsRecovered_phi[n];
-        self.mass = tree.GenVbosonsRecovered_mass[n];
-        self.charge = tree.GenVbosonsRecovered_charge[n];
-        self.status = tree.GenVbosonsRecovered_status[n];
-        self.isPromptHard = tree.GenVbosonsRecovered_isPromptHard[n];
-        pass
-    @staticmethod
-    def make_array(input):
-        return [GenVbosonsRecovered(input, i) for i in range(input.nGenVbosonsRecovered)]
 class hJidx_sortcsv:
     def __init__(self, tree, n):
         self.hJidx_sortcsv = tree.hJidx_sortcsv[n];
@@ -121,20 +72,6 @@ class trgObjects_hltL1sQuadJetCIorTripleJetVBFIorHTT:
     @staticmethod
     def make_array(input):
         return [trgObjects_hltL1sQuadJetCIorTripleJetVBFIorHTT(input, i) for i in range(input.ntrgObjects_hltL1sQuadJetCIorTripleJetVBFIorHTT)]
-class GenTausRecovered:
-    def __init__(self, tree, n):
-        self.pdgId = tree.GenTausRecovered_pdgId[n];
-        self.pt = tree.GenTausRecovered_pt[n];
-        self.eta = tree.GenTausRecovered_eta[n];
-        self.phi = tree.GenTausRecovered_phi[n];
-        self.mass = tree.GenTausRecovered_mass[n];
-        self.charge = tree.GenTausRecovered_charge[n];
-        self.status = tree.GenTausRecovered_status[n];
-        self.isPromptHard = tree.GenTausRecovered_isPromptHard[n];
-        pass
-    @staticmethod
-    def make_array(input):
-        return [GenTausRecovered(input, i) for i in range(input.nGenTausRecovered)]
 class SubjetCA15softdropz2b1:
     def __init__(self, tree, n):
         self.pt = tree.SubjetCA15softdropz2b1_pt[n];
@@ -155,21 +92,6 @@ class hJCidx:
     @staticmethod
     def make_array(input):
         return [hJCidx(input, i) for i in range(input.nhJCidx)]
-class GenTop:
-    def __init__(self, tree, n):
-        self.charge = tree.GenTop_charge[n];
-        self.status = tree.GenTop_status[n];
-        self.isPromptHard = tree.GenTop_isPromptHard[n];
-        self.pdgId = tree.GenTop_pdgId[n];
-        self.pt = tree.GenTop_pt[n];
-        self.eta = tree.GenTop_eta[n];
-        self.phi = tree.GenTop_phi[n];
-        self.mass = tree.GenTop_mass[n];
-        self.decayMode = tree.GenTop_decayMode[n];
-        pass
-    @staticmethod
-    def make_array(input):
-        return [GenTop(input, i) for i in range(input.nGenTop)]
 class aJidx:
     def __init__(self, tree, n):
         self.aJidx = tree.aJidx[n];
@@ -177,48 +99,6 @@ class aJidx:
     @staticmethod
     def make_array(input):
         return [aJidx(input, i) for i in range(input.naJidx)]
-class GenGluonFromTop:
-    def __init__(self, tree, n):
-        self.pdgId = tree.GenGluonFromTop_pdgId[n];
-        self.pt = tree.GenGluonFromTop_pt[n];
-        self.eta = tree.GenGluonFromTop_eta[n];
-        self.phi = tree.GenGluonFromTop_phi[n];
-        self.mass = tree.GenGluonFromTop_mass[n];
-        self.charge = tree.GenGluonFromTop_charge[n];
-        self.status = tree.GenGluonFromTop_status[n];
-        self.isPromptHard = tree.GenGluonFromTop_isPromptHard[n];
-        pass
-    @staticmethod
-    def make_array(input):
-        return [GenGluonFromTop(input, i) for i in range(input.nGenGluonFromTop)]
-class GenLepFromTau:
-    def __init__(self, tree, n):
-        self.pdgId = tree.GenLepFromTau_pdgId[n];
-        self.pt = tree.GenLepFromTau_pt[n];
-        self.eta = tree.GenLepFromTau_eta[n];
-        self.phi = tree.GenLepFromTau_phi[n];
-        self.mass = tree.GenLepFromTau_mass[n];
-        self.charge = tree.GenLepFromTau_charge[n];
-        self.status = tree.GenLepFromTau_status[n];
-        self.isPromptHard = tree.GenLepFromTau_isPromptHard[n];
-        pass
-    @staticmethod
-    def make_array(input):
-        return [GenLepFromTau(input, i) for i in range(input.nGenLepFromTau)]
-class GenNuFromTop:
-    def __init__(self, tree, n):
-        self.pdgId = tree.GenNuFromTop_pdgId[n];
-        self.pt = tree.GenNuFromTop_pt[n];
-        self.eta = tree.GenNuFromTop_eta[n];
-        self.phi = tree.GenNuFromTop_phi[n];
-        self.mass = tree.GenNuFromTop_mass[n];
-        self.charge = tree.GenNuFromTop_charge[n];
-        self.status = tree.GenNuFromTop_status[n];
-        self.isPromptHard = tree.GenNuFromTop_isPromptHard[n];
-        pass
-    @staticmethod
-    def make_array(input):
-        return [GenNuFromTop(input, i) for i in range(input.nGenNuFromTop)]
 class trgObjects_hltPFDoubleJetLooseID76:
     def __init__(self, tree, n):
         pass
@@ -231,20 +111,6 @@ class trgObjects_hltBTagPFCSVp016SingleWithMatching:
     @staticmethod
     def make_array(input):
         return [trgObjects_hltBTagPFCSVp016SingleWithMatching(input, i) for i in range(input.ntrgObjects_hltBTagPFCSVp016SingleWithMatching)]
-class GenVbosons:
-    def __init__(self, tree, n):
-        self.pdgId = tree.GenVbosons_pdgId[n];
-        self.pt = tree.GenVbosons_pt[n];
-        self.eta = tree.GenVbosons_eta[n];
-        self.phi = tree.GenVbosons_phi[n];
-        self.mass = tree.GenVbosons_mass[n];
-        self.charge = tree.GenVbosons_charge[n];
-        self.status = tree.GenVbosons_status[n];
-        self.isPromptHard = tree.GenVbosons_isPromptHard[n];
-        pass
-    @staticmethod
-    def make_array(input):
-        return [GenVbosons(input, i) for i in range(input.nGenVbosons)]
 class softActivityVHJets:
     def __init__(self, tree, n):
         self.pt = tree.softActivityVHJets_pt[n];
@@ -295,20 +161,6 @@ class trgObjects_hltDoublePFCentralJetLooseID90:
     @staticmethod
     def make_array(input):
         return [trgObjects_hltDoublePFCentralJetLooseID90(input, i) for i in range(input.ntrgObjects_hltDoublePFCentralJetLooseID90)]
-class GenLep:
-    def __init__(self, tree, n):
-        self.pdgId = tree.GenLep_pdgId[n];
-        self.pt = tree.GenLep_pt[n];
-        self.eta = tree.GenLep_eta[n];
-        self.phi = tree.GenLep_phi[n];
-        self.mass = tree.GenLep_mass[n];
-        self.charge = tree.GenLep_charge[n];
-        self.status = tree.GenLep_status[n];
-        self.isPromptHard = tree.GenLep_isPromptHard[n];
-        pass
-    @staticmethod
-    def make_array(input):
-        return [GenLep(input, i) for i in range(input.nGenLep)]
 class trgObjects_caloJets:
     def __init__(self, tree, n):
         self.pt = tree.trgObjects_caloJets_pt[n];
@@ -329,21 +181,6 @@ class trgObjects_hltPFSingleJetLooseID92:
     @staticmethod
     def make_array(input):
         return [trgObjects_hltPFSingleJetLooseID92(input, i) for i in range(input.ntrgObjects_hltPFSingleJetLooseID92)]
-class GenHadTaus:
-    def __init__(self, tree, n):
-        self.charge = tree.GenHadTaus_charge[n];
-        self.status = tree.GenHadTaus_status[n];
-        self.isPromptHard = tree.GenHadTaus_isPromptHard[n];
-        self.pdgId = tree.GenHadTaus_pdgId[n];
-        self.pt = tree.GenHadTaus_pt[n];
-        self.eta = tree.GenHadTaus_eta[n];
-        self.phi = tree.GenHadTaus_phi[n];
-        self.mass = tree.GenHadTaus_mass[n];
-        self.decayMode = tree.GenHadTaus_decayMode[n];
-        pass
-    @staticmethod
-    def make_array(input):
-        return [GenHadTaus(input, i) for i in range(input.nGenHadTaus)]
 class trgObjects_hltL1sETM50ToETM100IorETM60Jet60dPhiMin0p4IorDoubleJetC60ETM60:
     def __init__(self, tree, n):
         pass
@@ -400,10 +237,6 @@ class vLeptons:
         self.miniRelIso = tree.vLeptons_miniRelIso[n];
         self.relIsoAn04 = tree.vLeptons_relIsoAn04[n];
         self.tightCharge = tree.vLeptons_tightCharge[n];
-        self.mcMatchId = tree.vLeptons_mcMatchId[n];
-        self.mcMatchAny = tree.vLeptons_mcMatchAny[n];
-        self.mcMatchTau = tree.vLeptons_mcMatchTau[n];
-        self.mcPt = tree.vLeptons_mcPt[n];
         self.mediumMuonId = tree.vLeptons_mediumMuonId[n];
         self.pdgId = tree.vLeptons_pdgId[n];
         self.pt = tree.vLeptons_pt[n];
@@ -458,32 +291,6 @@ class vLeptons:
         self.mvaTTHjetPtRel = tree.vLeptons_mvaTTHjetPtRel[n];
         self.mvaTTHjetNDauChargedMVASel = tree.vLeptons_mvaTTHjetNDauChargedMVASel[n];
         self.uncalibratedPt = tree.vLeptons_uncalibratedPt[n];
-        self.SF_IsoLoose = tree.vLeptons_SF_IsoLoose[n];
-        self.SFerr_IsoLoose = tree.vLeptons_SFerr_IsoLoose[n];
-        self.SF_IsoTight = tree.vLeptons_SF_IsoTight[n];
-        self.SFerr_IsoTight = tree.vLeptons_SFerr_IsoTight[n];
-        self.SF_IdCutLoose = tree.vLeptons_SF_IdCutLoose[n];
-        self.SFerr_IdCutLoose = tree.vLeptons_SFerr_IdCutLoose[n];
-        self.SF_IdCutTight = tree.vLeptons_SF_IdCutTight[n];
-        self.SFerr_IdCutTight = tree.vLeptons_SFerr_IdCutTight[n];
-        self.SF_IdMVALoose = tree.vLeptons_SF_IdMVALoose[n];
-        self.SFerr_IdMVALoose = tree.vLeptons_SFerr_IdMVALoose[n];
-        self.SF_IdMVATight = tree.vLeptons_SF_IdMVATight[n];
-        self.SFerr_IdMVATight = tree.vLeptons_SFerr_IdMVATight[n];
-        self.SF_HLT_RunD4p3 = tree.vLeptons_SF_HLT_RunD4p3[n];
-        self.SFerr_HLT_RunD4p3 = tree.vLeptons_SFerr_HLT_RunD4p3[n];
-        self.SF_HLT_RunD4p2 = tree.vLeptons_SF_HLT_RunD4p2[n];
-        self.SFerr_HLT_RunD4p2 = tree.vLeptons_SFerr_HLT_RunD4p2[n];
-        self.SF_HLT_RunC = tree.vLeptons_SF_HLT_RunC[n];
-        self.SFerr_HLT_RunC = tree.vLeptons_SFerr_HLT_RunC[n];
-        self.SF_trk_eta = tree.vLeptons_SF_trk_eta[n];
-        self.SFerr_trk_eta = tree.vLeptons_SFerr_trk_eta[n];
-        self.Eff_HLT_RunD4p3 = tree.vLeptons_Eff_HLT_RunD4p3[n];
-        self.Efferr_HLT_RunD4p3 = tree.vLeptons_Efferr_HLT_RunD4p3[n];
-        self.Eff_HLT_RunD4p2 = tree.vLeptons_Eff_HLT_RunD4p2[n];
-        self.Efferr_HLT_RunD4p2 = tree.vLeptons_Efferr_HLT_RunD4p2[n];
-        self.Eff_HLT_RunC = tree.vLeptons_Eff_HLT_RunC[n];
-        self.Efferr_HLT_RunC = tree.vLeptons_Efferr_HLT_RunC[n];
         pass
     @staticmethod
     def make_array(input):
@@ -498,13 +305,6 @@ class trgObjects_hltBTagCaloCSVp014DoubleWithMatching:
     @staticmethod
     def make_array(input):
         return [trgObjects_hltBTagCaloCSVp014DoubleWithMatching(input, i) for i in range(input.ntrgObjects_hltBTagCaloCSVp014DoubleWithMatching)]
-class pileUpVertex_z:
-    def __init__(self, tree, n):
-        self.pileUpVertex_z = tree.pileUpVertex_z[n];
-        pass
-    @staticmethod
-    def make_array(input):
-        return [pileUpVertex_z(input, i) for i in range(input.npileUpVertex_z)]
 class trgObjects_pfMht:
     def __init__(self, tree, n):
         self.pt = tree.trgObjects_pfMht_pt[n];
@@ -512,56 +312,6 @@ class trgObjects_pfMht:
     @staticmethod
     def make_array(input):
         return [trgObjects_pfMht(input, i) for i in range(input.ntrgObjects_pfMht)]
-class GenBQuarkFromTop:
-    def __init__(self, tree, n):
-        self.pdgId = tree.GenBQuarkFromTop_pdgId[n];
-        self.pt = tree.GenBQuarkFromTop_pt[n];
-        self.eta = tree.GenBQuarkFromTop_eta[n];
-        self.phi = tree.GenBQuarkFromTop_phi[n];
-        self.mass = tree.GenBQuarkFromTop_mass[n];
-        self.charge = tree.GenBQuarkFromTop_charge[n];
-        self.status = tree.GenBQuarkFromTop_status[n];
-        self.isPromptHard = tree.GenBQuarkFromTop_isPromptHard[n];
-        pass
-    @staticmethod
-    def make_array(input):
-        return [GenBQuarkFromTop(input, i) for i in range(input.nGenBQuarkFromTop)]
-class GenHiggsBoson:
-    def __init__(self, tree, n):
-        self.pdgId = tree.GenHiggsBoson_pdgId[n];
-        self.pt = tree.GenHiggsBoson_pt[n];
-        self.eta = tree.GenHiggsBoson_eta[n];
-        self.phi = tree.GenHiggsBoson_phi[n];
-        self.mass = tree.GenHiggsBoson_mass[n];
-        self.charge = tree.GenHiggsBoson_charge[n];
-        self.status = tree.GenHiggsBoson_status[n];
-        self.isPromptHard = tree.GenHiggsBoson_isPromptHard[n];
-        pass
-    @staticmethod
-    def make_array(input):
-        return [GenHiggsBoson(input, i) for i in range(input.nGenHiggsBoson)]
-class LHE_weights_scale:
-    def __init__(self, tree, n):
-        self.id = tree.LHE_weights_scale_id[n];
-        self.wgt = tree.LHE_weights_scale_wgt[n];
-        pass
-    @staticmethod
-    def make_array(input):
-        return [LHE_weights_scale(input, i) for i in range(input.nLHE_weights_scale)]
-class GenLepFromTauRecovered:
-    def __init__(self, tree, n):
-        self.pdgId = tree.GenLepFromTauRecovered_pdgId[n];
-        self.pt = tree.GenLepFromTauRecovered_pt[n];
-        self.eta = tree.GenLepFromTauRecovered_eta[n];
-        self.phi = tree.GenLepFromTauRecovered_phi[n];
-        self.mass = tree.GenLepFromTauRecovered_mass[n];
-        self.charge = tree.GenLepFromTauRecovered_charge[n];
-        self.status = tree.GenLepFromTauRecovered_status[n];
-        self.isPromptHard = tree.GenLepFromTauRecovered_isPromptHard[n];
-        pass
-    @staticmethod
-    def make_array(input):
-        return [GenLepFromTauRecovered(input, i) for i in range(input.nGenLepFromTauRecovered)]
 class FatjetCA15pruned:
     def __init__(self, tree, n):
         self.pt = tree.FatjetCA15pruned_pt[n];
@@ -601,30 +351,6 @@ class trgObjects_hltDoubleCentralJet90:
     @staticmethod
     def make_array(input):
         return [trgObjects_hltDoubleCentralJet90(input, i) for i in range(input.ntrgObjects_hltDoubleCentralJet90)]
-class GenJet:
-    def __init__(self, tree, n):
-        self.charge = tree.GenJet_charge[n];
-        self.status = tree.GenJet_status[n];
-        self.isPromptHard = tree.GenJet_isPromptHard[n];
-        self.pdgId = tree.GenJet_pdgId[n];
-        self.pt = tree.GenJet_pt[n];
-        self.eta = tree.GenJet_eta[n];
-        self.phi = tree.GenJet_phi[n];
-        self.mass = tree.GenJet_mass[n];
-        self.numBHadrons = tree.GenJet_numBHadrons[n];
-        self.numCHadrons = tree.GenJet_numCHadrons[n];
-        self.numBHadronsFromTop = tree.GenJet_numBHadronsFromTop[n];
-        self.numCHadronsFromTop = tree.GenJet_numCHadronsFromTop[n];
-        self.numBHadronsAfterTop = tree.GenJet_numBHadronsAfterTop[n];
-        self.numCHadronsAfterTop = tree.GenJet_numCHadronsAfterTop[n];
-        self.wNuPt = tree.GenJet_wNuPt[n];
-        self.wNuEta = tree.GenJet_wNuEta[n];
-        self.wNuPhi = tree.GenJet_wNuPhi[n];
-        self.wNuM = tree.GenJet_wNuM[n];
-        pass
-    @staticmethod
-    def make_array(input):
-        return [GenJet(input, i) for i in range(input.nGenJet)]
 class trgObjects_hltDoublePFJetsC100:
     def __init__(self, tree, n):
         self.pt = tree.trgObjects_hltDoublePFJetsC100_pt[n];
@@ -690,20 +416,6 @@ class dRaddJetsdR08:
     @staticmethod
     def make_array(input):
         return [dRaddJetsdR08(input, i) for i in range(input.ndRaddJetsdR08)]
-class GenBQuarkFromH:
-    def __init__(self, tree, n):
-        self.pdgId = tree.GenBQuarkFromH_pdgId[n];
-        self.pt = tree.GenBQuarkFromH_pt[n];
-        self.eta = tree.GenBQuarkFromH_eta[n];
-        self.phi = tree.GenBQuarkFromH_phi[n];
-        self.mass = tree.GenBQuarkFromH_mass[n];
-        self.charge = tree.GenBQuarkFromH_charge[n];
-        self.status = tree.GenBQuarkFromH_status[n];
-        self.isPromptHard = tree.GenBQuarkFromH_isPromptHard[n];
-        pass
-    @staticmethod
-    def make_array(input):
-        return [GenBQuarkFromH(input, i) for i in range(input.nGenBQuarkFromH)]
 class SubjetCA15softdropz2b1filt:
     def __init__(self, tree, n):
         self.pt = tree.SubjetCA15softdropz2b1filt_pt[n];
@@ -733,20 +445,6 @@ class FatjetCA15trimmed:
     @staticmethod
     def make_array(input):
         return [FatjetCA15trimmed(input, i) for i in range(input.nFatjetCA15trimmed)]
-class GenHiggsSisters:
-    def __init__(self, tree, n):
-        self.pdgId = tree.GenHiggsSisters_pdgId[n];
-        self.pt = tree.GenHiggsSisters_pt[n];
-        self.eta = tree.GenHiggsSisters_eta[n];
-        self.phi = tree.GenHiggsSisters_phi[n];
-        self.mass = tree.GenHiggsSisters_mass[n];
-        self.charge = tree.GenHiggsSisters_charge[n];
-        self.status = tree.GenHiggsSisters_status[n];
-        self.isPromptHard = tree.GenHiggsSisters_isPromptHard[n];
-        pass
-    @staticmethod
-    def make_array(input):
-        return [GenHiggsSisters(input, i) for i in range(input.nGenHiggsSisters)]
 class SubjetCA15softdropfilt:
     def __init__(self, tree, n):
         self.pt = tree.SubjetCA15softdropfilt_pt[n];
@@ -790,10 +488,6 @@ class aLeptons:
         self.miniRelIso = tree.aLeptons_miniRelIso[n];
         self.relIsoAn04 = tree.aLeptons_relIsoAn04[n];
         self.tightCharge = tree.aLeptons_tightCharge[n];
-        self.mcMatchId = tree.aLeptons_mcMatchId[n];
-        self.mcMatchAny = tree.aLeptons_mcMatchAny[n];
-        self.mcMatchTau = tree.aLeptons_mcMatchTau[n];
-        self.mcPt = tree.aLeptons_mcPt[n];
         self.mediumMuonId = tree.aLeptons_mediumMuonId[n];
         self.pdgId = tree.aLeptons_pdgId[n];
         self.pt = tree.aLeptons_pt[n];
@@ -848,32 +542,6 @@ class aLeptons:
         self.mvaTTHjetPtRel = tree.aLeptons_mvaTTHjetPtRel[n];
         self.mvaTTHjetNDauChargedMVASel = tree.aLeptons_mvaTTHjetNDauChargedMVASel[n];
         self.uncalibratedPt = tree.aLeptons_uncalibratedPt[n];
-        self.SF_IsoLoose = tree.aLeptons_SF_IsoLoose[n];
-        self.SFerr_IsoLoose = tree.aLeptons_SFerr_IsoLoose[n];
-        self.SF_IsoTight = tree.aLeptons_SF_IsoTight[n];
-        self.SFerr_IsoTight = tree.aLeptons_SFerr_IsoTight[n];
-        self.SF_IdCutLoose = tree.aLeptons_SF_IdCutLoose[n];
-        self.SFerr_IdCutLoose = tree.aLeptons_SFerr_IdCutLoose[n];
-        self.SF_IdCutTight = tree.aLeptons_SF_IdCutTight[n];
-        self.SFerr_IdCutTight = tree.aLeptons_SFerr_IdCutTight[n];
-        self.SF_IdMVALoose = tree.aLeptons_SF_IdMVALoose[n];
-        self.SFerr_IdMVALoose = tree.aLeptons_SFerr_IdMVALoose[n];
-        self.SF_IdMVATight = tree.aLeptons_SF_IdMVATight[n];
-        self.SFerr_IdMVATight = tree.aLeptons_SFerr_IdMVATight[n];
-        self.SF_HLT_RunD4p3 = tree.aLeptons_SF_HLT_RunD4p3[n];
-        self.SFerr_HLT_RunD4p3 = tree.aLeptons_SFerr_HLT_RunD4p3[n];
-        self.SF_HLT_RunD4p2 = tree.aLeptons_SF_HLT_RunD4p2[n];
-        self.SFerr_HLT_RunD4p2 = tree.aLeptons_SFerr_HLT_RunD4p2[n];
-        self.SF_HLT_RunC = tree.aLeptons_SF_HLT_RunC[n];
-        self.SFerr_HLT_RunC = tree.aLeptons_SFerr_HLT_RunC[n];
-        self.SF_trk_eta = tree.aLeptons_SF_trk_eta[n];
-        self.SFerr_trk_eta = tree.aLeptons_SFerr_trk_eta[n];
-        self.Eff_HLT_RunD4p3 = tree.aLeptons_Eff_HLT_RunD4p3[n];
-        self.Efferr_HLT_RunD4p3 = tree.aLeptons_Efferr_HLT_RunD4p3[n];
-        self.Eff_HLT_RunD4p2 = tree.aLeptons_Eff_HLT_RunD4p2[n];
-        self.Efferr_HLT_RunD4p2 = tree.aLeptons_Efferr_HLT_RunD4p2[n];
-        self.Eff_HLT_RunC = tree.aLeptons_Eff_HLT_RunC[n];
-        self.Efferr_HLT_RunC = tree.aLeptons_Efferr_HLT_RunC[n];
         pass
     @staticmethod
     def make_array(input):
@@ -890,20 +558,6 @@ class trgObjects_hltQuadPFCentralJetLooseID45:
     @staticmethod
     def make_array(input):
         return [trgObjects_hltQuadPFCentralJetLooseID45(input, i) for i in range(input.ntrgObjects_hltQuadPFCentralJetLooseID45)]
-class GenGluonFromB:
-    def __init__(self, tree, n):
-        self.pdgId = tree.GenGluonFromB_pdgId[n];
-        self.pt = tree.GenGluonFromB_pt[n];
-        self.eta = tree.GenGluonFromB_eta[n];
-        self.phi = tree.GenGluonFromB_phi[n];
-        self.mass = tree.GenGluonFromB_mass[n];
-        self.charge = tree.GenGluonFromB_charge[n];
-        self.status = tree.GenGluonFromB_status[n];
-        self.isPromptHard = tree.GenGluonFromB_isPromptHard[n];
-        pass
-    @staticmethod
-    def make_array(input):
-        return [GenGluonFromB(input, i) for i in range(input.nGenGluonFromB)]
 class trgObjects_hltBTagCaloCSVp067Single:
     def __init__(self, tree, n):
         pass
@@ -964,10 +618,6 @@ class FatjetAK08ungroomed:
         self.chargedEmEnergyFraction = tree.FatjetAK08ungroomed_chargedEmEnergyFraction[n];
         self.chargedHadronEnergyFraction = tree.FatjetAK08ungroomed_chargedHadronEnergyFraction[n];
         self.chargedMultiplicity = tree.FatjetAK08ungroomed_chargedMultiplicity[n];
-        self.Flavour = tree.FatjetAK08ungroomed_Flavour[n];
-        self.BhadronFlavour = tree.FatjetAK08ungroomed_BhadronFlavour[n];
-        self.ChadronFlavour = tree.FatjetAK08ungroomed_ChadronFlavour[n];
-        self.GenPt = tree.FatjetAK08ungroomed_GenPt[n];
         self.PFLepton_ptrel = tree.FatjetAK08ungroomed_PFLepton_ptrel[n];
         self.z_ratio = tree.FatjetAK08ungroomed_z_ratio[n];
         self.PFLepton_IP2D = tree.FatjetAK08ungroomed_PFLepton_IP2D[n];
@@ -1035,10 +685,6 @@ class selLeptons:
         self.miniRelIso = tree.selLeptons_miniRelIso[n];
         self.relIsoAn04 = tree.selLeptons_relIsoAn04[n];
         self.tightCharge = tree.selLeptons_tightCharge[n];
-        self.mcMatchId = tree.selLeptons_mcMatchId[n];
-        self.mcMatchAny = tree.selLeptons_mcMatchAny[n];
-        self.mcMatchTau = tree.selLeptons_mcMatchTau[n];
-        self.mcPt = tree.selLeptons_mcPt[n];
         self.mediumMuonId = tree.selLeptons_mediumMuonId[n];
         self.pdgId = tree.selLeptons_pdgId[n];
         self.pt = tree.selLeptons_pt[n];
@@ -1093,32 +739,6 @@ class selLeptons:
         self.mvaTTHjetPtRel = tree.selLeptons_mvaTTHjetPtRel[n];
         self.mvaTTHjetNDauChargedMVASel = tree.selLeptons_mvaTTHjetNDauChargedMVASel[n];
         self.uncalibratedPt = tree.selLeptons_uncalibratedPt[n];
-        self.SF_IsoLoose = tree.selLeptons_SF_IsoLoose[n];
-        self.SFerr_IsoLoose = tree.selLeptons_SFerr_IsoLoose[n];
-        self.SF_IsoTight = tree.selLeptons_SF_IsoTight[n];
-        self.SFerr_IsoTight = tree.selLeptons_SFerr_IsoTight[n];
-        self.SF_IdCutLoose = tree.selLeptons_SF_IdCutLoose[n];
-        self.SFerr_IdCutLoose = tree.selLeptons_SFerr_IdCutLoose[n];
-        self.SF_IdCutTight = tree.selLeptons_SF_IdCutTight[n];
-        self.SFerr_IdCutTight = tree.selLeptons_SFerr_IdCutTight[n];
-        self.SF_IdMVALoose = tree.selLeptons_SF_IdMVALoose[n];
-        self.SFerr_IdMVALoose = tree.selLeptons_SFerr_IdMVALoose[n];
-        self.SF_IdMVATight = tree.selLeptons_SF_IdMVATight[n];
-        self.SFerr_IdMVATight = tree.selLeptons_SFerr_IdMVATight[n];
-        self.SF_HLT_RunD4p3 = tree.selLeptons_SF_HLT_RunD4p3[n];
-        self.SFerr_HLT_RunD4p3 = tree.selLeptons_SFerr_HLT_RunD4p3[n];
-        self.SF_HLT_RunD4p2 = tree.selLeptons_SF_HLT_RunD4p2[n];
-        self.SFerr_HLT_RunD4p2 = tree.selLeptons_SFerr_HLT_RunD4p2[n];
-        self.SF_HLT_RunC = tree.selLeptons_SF_HLT_RunC[n];
-        self.SFerr_HLT_RunC = tree.selLeptons_SFerr_HLT_RunC[n];
-        self.SF_trk_eta = tree.selLeptons_SF_trk_eta[n];
-        self.SFerr_trk_eta = tree.selLeptons_SFerr_trk_eta[n];
-        self.Eff_HLT_RunD4p3 = tree.selLeptons_Eff_HLT_RunD4p3[n];
-        self.Efferr_HLT_RunD4p3 = tree.selLeptons_Efferr_HLT_RunD4p3[n];
-        self.Eff_HLT_RunD4p2 = tree.selLeptons_Eff_HLT_RunD4p2[n];
-        self.Efferr_HLT_RunD4p2 = tree.selLeptons_Efferr_HLT_RunD4p2[n];
-        self.Eff_HLT_RunC = tree.selLeptons_Eff_HLT_RunC[n];
-        self.Efferr_HLT_RunC = tree.selLeptons_Efferr_HLT_RunC[n];
         pass
     @staticmethod
     def make_array(input):
@@ -1154,14 +774,12 @@ class TauGood:
         self.idAntiErun2 = tree.TauGood_idAntiErun2[n];
         self.isoCI3hit = tree.TauGood_isoCI3hit[n];
         self.photonOutsideSigCone = tree.TauGood_photonOutsideSigCone[n];
-        self.mcMatchId = tree.TauGood_mcMatchId[n];
         self.pdgId = tree.TauGood_pdgId[n];
         self.pt = tree.TauGood_pt[n];
         self.eta = tree.TauGood_eta[n];
         self.phi = tree.TauGood_phi[n];
         self.mass = tree.TauGood_mass[n];
         self.idxJetMatch = tree.TauGood_idxJetMatch[n];
-        self.genMatchType = tree.TauGood_genMatchType[n];
         pass
     @staticmethod
     def make_array(input):
@@ -1173,20 +791,6 @@ class hJidx:
     @staticmethod
     def make_array(input):
         return [hJidx(input, i) for i in range(input.nhJidx)]
-class GenLepRecovered:
-    def __init__(self, tree, n):
-        self.pdgId = tree.GenLepRecovered_pdgId[n];
-        self.pt = tree.GenLepRecovered_pt[n];
-        self.eta = tree.GenLepRecovered_eta[n];
-        self.phi = tree.GenLepRecovered_phi[n];
-        self.mass = tree.GenLepRecovered_mass[n];
-        self.charge = tree.GenLepRecovered_charge[n];
-        self.status = tree.GenLepRecovered_status[n];
-        self.isPromptHard = tree.GenLepRecovered_isPromptHard[n];
-        pass
-    @staticmethod
-    def make_array(input):
-        return [GenLepRecovered(input, i) for i in range(input.nGenLepRecovered)]
 class FatjetCA15softdropz2b1:
     def __init__(self, tree, n):
         self.pt = tree.FatjetCA15softdropz2b1_pt[n];
@@ -1200,20 +804,6 @@ class FatjetCA15softdropz2b1:
     @staticmethod
     def make_array(input):
         return [FatjetCA15softdropz2b1(input, i) for i in range(input.nFatjetCA15softdropz2b1)]
-class GenStatus2bHad:
-    def __init__(self, tree, n):
-        self.pdgId = tree.GenStatus2bHad_pdgId[n];
-        self.pt = tree.GenStatus2bHad_pt[n];
-        self.eta = tree.GenStatus2bHad_eta[n];
-        self.phi = tree.GenStatus2bHad_phi[n];
-        self.mass = tree.GenStatus2bHad_mass[n];
-        self.charge = tree.GenStatus2bHad_charge[n];
-        self.status = tree.GenStatus2bHad_status[n];
-        self.isPromptHard = tree.GenStatus2bHad_isPromptHard[n];
-        pass
-    @staticmethod
-    def make_array(input):
-        return [GenStatus2bHad(input, i) for i in range(input.nGenStatus2bHad)]
 class trgObjects_hltTripleJet50:
     def __init__(self, tree, n):
         pass
@@ -1272,20 +862,6 @@ class trgObjects_hltBTagCaloCSVp087Triple:
     @staticmethod
     def make_array(input):
         return [trgObjects_hltBTagCaloCSVp087Triple(input, i) for i in range(input.ntrgObjects_hltBTagCaloCSVp087Triple)]
-class GenTaus:
-    def __init__(self, tree, n):
-        self.pdgId = tree.GenTaus_pdgId[n];
-        self.pt = tree.GenTaus_pt[n];
-        self.eta = tree.GenTaus_eta[n];
-        self.phi = tree.GenTaus_phi[n];
-        self.mass = tree.GenTaus_mass[n];
-        self.charge = tree.GenTaus_charge[n];
-        self.status = tree.GenTaus_status[n];
-        self.isPromptHard = tree.GenTaus_isPromptHard[n];
-        pass
-    @staticmethod
-    def make_array(input):
-        return [GenTaus(input, i) for i in range(input.nGenTaus)]
 class trgObjects_hltMHT70:
     def __init__(self, tree, n):
         pass
@@ -1299,24 +875,15 @@ class Jet:
         self.btagCSV = tree.Jet_btagCSV[n];
         self.btagCMVA = tree.Jet_btagCMVA[n];
         self.rawPt = tree.Jet_rawPt[n];
-        self.mcPt = tree.Jet_mcPt[n];
-        self.mcFlavour = tree.Jet_mcFlavour[n];
-        self.partonFlavour = tree.Jet_partonFlavour[n];
-        self.hadronFlavour = tree.Jet_hadronFlavour[n];
-        self.mcMatchId = tree.Jet_mcMatchId[n];
         self.corr_JECUp = tree.Jet_corr_JECUp[n];
         self.corr_JECDown = tree.Jet_corr_JECDown[n];
         self.corr = tree.Jet_corr[n];
-        self.corr_JERUp = tree.Jet_corr_JERUp[n];
-        self.corr_JERDown = tree.Jet_corr_JERDown[n];
-        self.corr_JER = tree.Jet_corr_JER[n];
         self.pt = tree.Jet_pt[n];
         self.eta = tree.Jet_eta[n];
         self.phi = tree.Jet_phi[n];
         self.mass = tree.Jet_mass[n];
         self.rawPtAfterSmearing = tree.Jet_rawPtAfterSmearing[n];
         self.idxFirstTauMatch = tree.Jet_idxFirstTauMatch[n];
-        self.heppyFlavour = tree.Jet_heppyFlavour[n];
         self.ctagVsL = tree.Jet_ctagVsL[n];
         self.ctagVsB = tree.Jet_ctagVsB[n];
         self.btagBDT = tree.Jet_btagBDT[n];
@@ -1335,9 +902,6 @@ class Jet:
         self.chMult = tree.Jet_chMult[n];
         self.nhMult = tree.Jet_nhMult[n];
         self.leadTrackPt = tree.Jet_leadTrackPt[n];
-        self.mcEta = tree.Jet_mcEta[n];
-        self.mcPhi = tree.Jet_mcPhi[n];
-        self.mcM = tree.Jet_mcM[n];
         self.leptonPdgId = tree.Jet_leptonPdgId[n];
         self.leptonPt = tree.Jet_leptonPt[n];
         self.leptonPtRel = tree.Jet_leptonPtRel[n];
@@ -1373,62 +937,6 @@ class Jet:
         self.pt_regVBF_corrJERUp = tree.Jet_pt_regVBF_corrJERUp[n];
         self.pt_reg_corrJERDown = tree.Jet_pt_reg_corrJERDown[n];
         self.pt_regVBF_corrJERDown = tree.Jet_pt_regVBF_corrJERDown[n];
-        self.btagCSVL_SF = tree.Jet_btagCSVL_SF[n];
-        self.btagCSVL_SF_up = tree.Jet_btagCSVL_SF_up[n];
-        self.btagCSVL_SF_down = tree.Jet_btagCSVL_SF_down[n];
-        self.btagCSVM_SF = tree.Jet_btagCSVM_SF[n];
-        self.btagCSVM_SF_up = tree.Jet_btagCSVM_SF_up[n];
-        self.btagCSVM_SF_down = tree.Jet_btagCSVM_SF_down[n];
-        self.btagCSVT_SF = tree.Jet_btagCSVT_SF[n];
-        self.btagCSVT_SF_up = tree.Jet_btagCSVT_SF_up[n];
-        self.btagCSVT_SF_down = tree.Jet_btagCSVT_SF_down[n];
-        self.btagWeightCSV = tree.Jet_btagWeightCSV[n];
-        self.btagWeightCSV_up_jes = tree.Jet_btagWeightCSV_up_jes[n];
-        self.btagWeightCSV_down_jes = tree.Jet_btagWeightCSV_down_jes[n];
-        self.btagWeightCSV_up_lf = tree.Jet_btagWeightCSV_up_lf[n];
-        self.btagWeightCSV_down_lf = tree.Jet_btagWeightCSV_down_lf[n];
-        self.btagWeightCSV_up_hf = tree.Jet_btagWeightCSV_up_hf[n];
-        self.btagWeightCSV_down_hf = tree.Jet_btagWeightCSV_down_hf[n];
-        self.btagWeightCSV_up_hfstats1 = tree.Jet_btagWeightCSV_up_hfstats1[n];
-        self.btagWeightCSV_down_hfstats1 = tree.Jet_btagWeightCSV_down_hfstats1[n];
-        self.btagWeightCSV_up_hfstats2 = tree.Jet_btagWeightCSV_up_hfstats2[n];
-        self.btagWeightCSV_down_hfstats2 = tree.Jet_btagWeightCSV_down_hfstats2[n];
-        self.btagWeightCSV_up_lfstats1 = tree.Jet_btagWeightCSV_up_lfstats1[n];
-        self.btagWeightCSV_down_lfstats1 = tree.Jet_btagWeightCSV_down_lfstats1[n];
-        self.btagWeightCSV_up_lfstats2 = tree.Jet_btagWeightCSV_up_lfstats2[n];
-        self.btagWeightCSV_down_lfstats2 = tree.Jet_btagWeightCSV_down_lfstats2[n];
-        self.btagWeightCSV_up_cferr1 = tree.Jet_btagWeightCSV_up_cferr1[n];
-        self.btagWeightCSV_down_cferr1 = tree.Jet_btagWeightCSV_down_cferr1[n];
-        self.btagWeightCSV_up_cferr2 = tree.Jet_btagWeightCSV_up_cferr2[n];
-        self.btagWeightCSV_down_cferr2 = tree.Jet_btagWeightCSV_down_cferr2[n];
-        self.btagCMVAV2L_SF = tree.Jet_btagCMVAV2L_SF[n];
-        self.btagCMVAV2L_SF_up = tree.Jet_btagCMVAV2L_SF_up[n];
-        self.btagCMVAV2L_SF_down = tree.Jet_btagCMVAV2L_SF_down[n];
-        self.btagCMVAV2M_SF = tree.Jet_btagCMVAV2M_SF[n];
-        self.btagCMVAV2M_SF_up = tree.Jet_btagCMVAV2M_SF_up[n];
-        self.btagCMVAV2M_SF_down = tree.Jet_btagCMVAV2M_SF_down[n];
-        self.btagCMVAV2T_SF = tree.Jet_btagCMVAV2T_SF[n];
-        self.btagCMVAV2T_SF_up = tree.Jet_btagCMVAV2T_SF_up[n];
-        self.btagCMVAV2T_SF_down = tree.Jet_btagCMVAV2T_SF_down[n];
-        self.btagWeightCMVAV2 = tree.Jet_btagWeightCMVAV2[n];
-        self.btagWeightCMVAV2_up_jes = tree.Jet_btagWeightCMVAV2_up_jes[n];
-        self.btagWeightCMVAV2_down_jes = tree.Jet_btagWeightCMVAV2_down_jes[n];
-        self.btagWeightCMVAV2_up_lf = tree.Jet_btagWeightCMVAV2_up_lf[n];
-        self.btagWeightCMVAV2_down_lf = tree.Jet_btagWeightCMVAV2_down_lf[n];
-        self.btagWeightCMVAV2_up_hf = tree.Jet_btagWeightCMVAV2_up_hf[n];
-        self.btagWeightCMVAV2_down_hf = tree.Jet_btagWeightCMVAV2_down_hf[n];
-        self.btagWeightCMVAV2_up_hfstats1 = tree.Jet_btagWeightCMVAV2_up_hfstats1[n];
-        self.btagWeightCMVAV2_down_hfstats1 = tree.Jet_btagWeightCMVAV2_down_hfstats1[n];
-        self.btagWeightCMVAV2_up_hfstats2 = tree.Jet_btagWeightCMVAV2_up_hfstats2[n];
-        self.btagWeightCMVAV2_down_hfstats2 = tree.Jet_btagWeightCMVAV2_down_hfstats2[n];
-        self.btagWeightCMVAV2_up_lfstats1 = tree.Jet_btagWeightCMVAV2_up_lfstats1[n];
-        self.btagWeightCMVAV2_down_lfstats1 = tree.Jet_btagWeightCMVAV2_down_lfstats1[n];
-        self.btagWeightCMVAV2_up_lfstats2 = tree.Jet_btagWeightCMVAV2_up_lfstats2[n];
-        self.btagWeightCMVAV2_down_lfstats2 = tree.Jet_btagWeightCMVAV2_down_lfstats2[n];
-        self.btagWeightCMVAV2_up_cferr1 = tree.Jet_btagWeightCMVAV2_up_cferr1[n];
-        self.btagWeightCMVAV2_down_cferr1 = tree.Jet_btagWeightCMVAV2_down_cferr1[n];
-        self.btagWeightCMVAV2_up_cferr2 = tree.Jet_btagWeightCMVAV2_up_cferr2[n];
-        self.btagWeightCMVAV2_down_cferr2 = tree.Jet_btagWeightCMVAV2_down_cferr2[n];
         pass
     @staticmethod
     def make_array(input):
@@ -1449,14 +957,6 @@ class trgObjects_hltPFTripleJetLooseID64:
     @staticmethod
     def make_array(input):
         return [trgObjects_hltPFTripleJetLooseID64(input, i) for i in range(input.ntrgObjects_hltPFTripleJetLooseID64)]
-class LHE_weights_pdf:
-    def __init__(self, tree, n):
-        self.id = tree.LHE_weights_pdf_id[n];
-        self.wgt = tree.LHE_weights_pdf_wgt[n];
-        pass
-    @staticmethod
-    def make_array(input):
-        return [LHE_weights_pdf(input, i) for i in range(input.nLHE_weights_pdf)]
 class primaryVertices:
     def __init__(self, tree, n):
         self.x = tree.primaryVertices_x[n];
@@ -1490,20 +990,6 @@ class FatjetCA15subjetfiltered:
     @staticmethod
     def make_array(input):
         return [FatjetCA15subjetfiltered(input, i) for i in range(input.nFatjetCA15subjetfiltered)]
-class GenWZQuark:
-    def __init__(self, tree, n):
-        self.pdgId = tree.GenWZQuark_pdgId[n];
-        self.pt = tree.GenWZQuark_pt[n];
-        self.eta = tree.GenWZQuark_eta[n];
-        self.phi = tree.GenWZQuark_phi[n];
-        self.mass = tree.GenWZQuark_mass[n];
-        self.charge = tree.GenWZQuark_charge[n];
-        self.status = tree.GenWZQuark_status[n];
-        self.isPromptHard = tree.GenWZQuark_isPromptHard[n];
-        pass
-    @staticmethod
-    def make_array(input):
-        return [GenWZQuark(input, i) for i in range(input.nGenWZQuark)]
 class trgObjects_hltSingleJet80:
     def __init__(self, tree, n):
         pass
@@ -1841,11 +1327,8 @@ class met:
         _rawPt = getattr(tree, "met_rawPt", None)
         _rawPhi = getattr(tree, "met_rawPhi", None)
         _rawSumEt = getattr(tree, "met_rawSumEt", None)
-        _genPt = getattr(tree, "met_genPt", None)
-        _genPhi = getattr(tree, "met_genPhi", None)
-        _genEta = getattr(tree, "met_genEta", None)
-        return met(_pt, _eta, _phi, _mass, _sumEt, _rawPt, _rawPhi, _rawSumEt, _genPt, _genPhi, _genEta)
-    def __init__(self, pt,eta,phi,mass,sumEt,rawPt,rawPhi,rawSumEt,genPt,genPhi,genEta):
+        return met(_pt, _eta, _phi, _mass, _sumEt, _rawPt, _rawPhi, _rawSumEt)
+    def __init__(self, pt,eta,phi,mass,sumEt,rawPt,rawPhi,rawSumEt):
         self.pt = pt #
         self.eta = eta #
         self.phi = phi #
@@ -1854,9 +1337,6 @@ class met:
         self.rawPt = rawPt #
         self.rawPhi = rawPhi #
         self.rawSumEt = rawSumEt #
-        self.genPt = genPt #
-        self.genPhi = genPhi #
-        self.genEta = genEta #
         pass
 class met_shifted_JetEnUp:
     """
@@ -2129,28 +1609,6 @@ class EventAnalyzer(Analyzer):
         event.FatjetCA15ungroomed = FatjetCA15ungroomed.make_array(event.input)
         event.Flag_hbheFilterNew = getattr(event.input, "Flag_hbheFilterNew", None)
         event.Flag_hbheIsoFilter = getattr(event.input, "Flag_hbheIsoFilter", None)
-        event.GenBQuarkFromH = GenBQuarkFromH.make_array(event.input)
-        event.GenBQuarkFromHafterISR = GenBQuarkFromHafterISR.make_array(event.input)
-        event.GenBQuarkFromTop = GenBQuarkFromTop.make_array(event.input)
-        event.GenGluonFromB = GenGluonFromB.make_array(event.input)
-        event.GenGluonFromTop = GenGluonFromTop.make_array(event.input)
-        event.GenHadTaus = GenHadTaus.make_array(event.input)
-        event.GenHiggsBoson = GenHiggsBoson.make_array(event.input)
-        event.GenHiggsSisters = GenHiggsSisters.make_array(event.input)
-        event.GenJet = GenJet.make_array(event.input)
-        event.GenLep = GenLep.make_array(event.input)
-        event.GenLepFromTau = GenLepFromTau.make_array(event.input)
-        event.GenLepFromTauRecovered = GenLepFromTauRecovered.make_array(event.input)
-        event.GenLepFromTop = GenLepFromTop.make_array(event.input)
-        event.GenLepRecovered = GenLepRecovered.make_array(event.input)
-        event.GenNuFromTop = GenNuFromTop.make_array(event.input)
-        event.GenStatus2bHad = GenStatus2bHad.make_array(event.input)
-        event.GenTaus = GenTaus.make_array(event.input)
-        event.GenTausRecovered = GenTausRecovered.make_array(event.input)
-        event.GenTop = GenTop.make_array(event.input)
-        event.GenVbosons = GenVbosons.make_array(event.input)
-        event.GenVbosonsRecovered = GenVbosonsRecovered.make_array(event.input)
-        event.GenWZQuark = GenWZQuark.make_array(event.input)
         event.H = H.make_obj(event.input)
         event.HCMVAV2 = HCMVAV2.make_obj(event.input)
         event.HCMVAV2_reg = HCMVAV2_reg.make_obj(event.input)
@@ -2172,8 +1630,6 @@ class EventAnalyzer(Analyzer):
         event.H_reg_corrJERUp = H_reg_corrJERUp.make_obj(event.input)
         event.HaddJetsdR08 = HaddJetsdR08.make_obj(event.input)
         event.Jet = Jet.make_array(event.input)
-        event.LHE_weights_pdf = LHE_weights_pdf.make_array(event.input)
-        event.LHE_weights_scale = LHE_weights_scale.make_array(event.input)
         event.SubjetAK08softdrop = SubjetAK08softdrop.make_array(event.input)
         event.SubjetCA15pruned = SubjetCA15pruned.make_array(event.input)
         event.SubjetCA15softdrop = SubjetCA15softdrop.make_array(event.input)
@@ -2279,8 +1735,6 @@ class EventAnalyzer(Analyzer):
         event.mhtPhiJet30 = getattr(event.input, "mhtPhiJet30", None)
         event.nPU0 = getattr(event.input, "nPU0", None)
         event.nPVs = getattr(event.input, "nPVs", None)
-        event.pileUpVertex_ptHat = pileUpVertex_ptHat.make_array(event.input)
-        event.pileUpVertex_z = pileUpVertex_z.make_array(event.input)
         event.primaryVertices = primaryVertices.make_array(event.input)
         event.puWeightDown = getattr(event.input, "puWeightDown", None)
         event.puWeightUp = getattr(event.input, "puWeightUp", None)
