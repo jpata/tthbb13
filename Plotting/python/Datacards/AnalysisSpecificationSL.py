@@ -26,9 +26,11 @@ blr_cuts = {
     "dl_jge4_tge4": -20,
 }
 
-input_file = "/mnt/t3nfs01/data01/shome/jpata/tth/gc/melooper/GCdf683f856c22/ControlPlots.root"
+input_file = "/mnt/t3nfs01/data01/shome/jpata/tth/sw/CMSSW/src/TTH/MEAnalysis/gc/Sparse.root"
 
-LUMI = 9600.0
+#https://github.com/vhbb/cmssw/issues/493#issuecomment-233123300
+#however, actual lumi may be a bit smaller, as not 100% of the data was processed successfully 
+LUMI = 9235 #Jul18
 
 do_stat_variations = False
 do_fake_data = True
@@ -123,17 +125,27 @@ ttjets_powheg = [
     ]
 ]
 
-# ttjets_split = [
-#     Sample(
-#         input_name = "{0}/{1}".format(sn, tt),
-#         output_name = tt,
-#         xs_weight = 1.0
-#     ) for sn in [
-#         "TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8",
-#         "TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8",
-#         "TTTo2L2Nu_13TeV-powheg",
-#     ] for tt in ["ttbarOther", "ttbarPlusBBbar", "ttbarPlus2B", "ttbarPlusB", "ttbarPlusCCbar"]
-# ]
+ttjets_split = [
+    Sample(
+        input_name = "TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8",
+        output_name = tt,
+        xs_weight = LUMI*samples_base.xsec_sample["TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"]/samples_base.ngen["TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"],
+        cuts = [processCut(tt)]
+    ) for tt in [
+        "ttbarOther", "ttbarPlusBBbar", "ttbarPlus2B", "ttbarPlusB", "ttbarPlusCCbar"
+    ]
+]
+
+ttjets_split += [
+    Sample(
+        input_name = "TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8",
+        output_name = tt,
+        xs_weight = LUMI*samples_base.xsec_sample["TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"]/samples_base.ngen["TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"],
+        cuts = [processCut(tt)]
+    ) for tt in [
+        "ttbarOther", "ttbarPlusBBbar", "ttbarPlus2B", "ttbarPlusB", "ttbarPlusCCbar"
+    ]
+]
 
 # On the data samples, we only need to choose the events that pass the correct
 # trigger path, e.g. in SingleMuon, the ones that passed the singlemuon selection
@@ -208,7 +220,7 @@ sl_categories = [
     # >= 6 jets, == 3 tags, high blr
     Category(
         name = "sl_jge6_t3_blrH",
-        cuts = [("numJets", 6, 8), ("nBCSVM", 3, 4), ("btag_LR_4b_2b_logit", blr_cuts["sl_jge6_t3"], 20)],
+        cuts = [("numJets", 6, 8), ("nBCSVM", 3, 4), ("btag_LR_4b_2b_btagCSV_logit", blr_cuts["sl_jge6_t3"], 20)],
         samples = base_samples + ttjets_powheg,
         data_samples = sl_data,
         signal_processes = signal_processes,
@@ -245,7 +257,7 @@ sl_categories = [
         common_shape_uncertainties = common_shape_uncertainties,
         common_scale_uncertainties = common_scale_uncertainties,
         scale_uncertainties = scale_uncertainties,
-        discriminator = "btag_LR_4b_2b_logit",
+        discriminator = "btag_LR_4b_2b_btagCSV_logit",
         rebin=1,
         src_histogram = "sl/sparse"
     ),
@@ -338,7 +350,7 @@ sl_categories = [
     # == 4 jets, == 3 tags
     Category(
         name = "sl_j4_t3_blrH",
-        cuts = [("numJets", 4, 5), ("nBCSVM", 3, 4), ("btag_LR_4b_2b_logit", blr_cuts["sl_j4_t3"], 20)],
+        cuts = [("numJets", 4, 5), ("nBCSVM", 3, 4), ("btag_LR_4b_2b_btagCSV_logit", blr_cuts["sl_j4_t3"], 20)],
         samples = base_samples + ttjets_powheg,
         data_samples = sl_data,
         signal_processes = signal_processes,
@@ -352,14 +364,14 @@ sl_categories = [
     
     Category(
         name = "sl_j4_t3_blrL",
-        cuts = [("numJets", 4, 5), ("nBCSVM", 3, 4), ("btag_LR_4b_2b_logit", -20, blr_cuts["sl_j4_t3"])],
+        cuts = [("numJets", 4, 5), ("nBCSVM", 3, 4), ("btag_LR_4b_2b_btagCSV_logit", -20, blr_cuts["sl_j4_t3"])],
         samples = base_samples + ttjets_powheg,
         data_samples = sl_data,
         signal_processes = signal_processes,
         common_shape_uncertainties = common_shape_uncertainties,
         common_scale_uncertainties = common_scale_uncertainties,
         scale_uncertainties = scale_uncertainties,
-        discriminator = "btag_LR_4b_2b_logit",
+        discriminator = "btag_LR_4b_2b_btagCSV_logit",
         rebin=1,
         src_histogram = "sl/sparse"
     ),
@@ -367,7 +379,8 @@ sl_categories = [
 
 control_variables = [
     "jetsByPt_0_pt",
-    "btag_LR_4b_2b_btagCSV_logit"
+    "btag_LR_4b_2b_btagCSV_logit",
+    "btag_LR_4b_2b_btagCMVA_logit"
 ]
 def make_control_categories(input_categories):
     all_cats = copy.deepcopy(input_categories)
@@ -392,20 +405,20 @@ analysis = Analysis(
     do_stat_variations = do_stat_variations
 )
 
-# 
-# analysis_ttjets_split = Analysis(
-#     samples = base_samples + ttjets_split,
-#     categories = deepcopy(all_cats),
-#     sparse_input_file = input_file,
-#     groups = {
-#         "sl": sl_categories,
-#     },
-#     do_fake_data = do_fake_data,
-#     do_stat_variations = do_stat_variations
-# )
-# for icat in range(len(analysis_ttjets_split.categories)):
-#     analysis_ttjets_split.categories[icat].samples = base_samples + ttjets_split 
-# 
+
+analysis_ttjets_split = Analysis(
+    samples = base_samples + ttjets_split,
+    categories = deepcopy(all_cats),
+    sparse_input_file = input_file,
+    groups = {
+        "sl": sl_categories,
+    },
+    do_fake_data = do_fake_data,
+    do_stat_variations = do_stat_variations
+)
+for icat in range(len(analysis_ttjets_split.categories)):
+    analysis_ttjets_split.categories[icat].samples = base_samples + ttjets_split 
+ 
 # sl_categories_bdt = filter(lambda x: x.discriminator == "common_bdt", all_cats)
 # 
 # analysis_bdt = Analysis(
@@ -428,6 +441,6 @@ for cat in sl_categories:
 # Dictionary of all analyses we consider
 analyses = {
     "SL_7cat" : analysis,
-    #"SL_ttjets_split" : analysis_ttjets_split,
+    "SL_ttjets_split" : analysis_ttjets_split,
     #"SL_7cat_bdt" : analysis_bdt
 }
