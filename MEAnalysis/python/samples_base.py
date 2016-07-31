@@ -92,6 +92,25 @@ samples_nick = {
     "DoubleMuon": "data_mm",
 }
 
+#Numeric keys for processes, used for filling the process axis
+#in the sparse histogram
+PROCESS_MAP = {
+    "ttH_hbb": 0,
+    "ttH_nonhbb": 1,
+    "ttbarPlusBBbar": 2,
+    "ttbarPlus2B": 3,
+    "ttbarPlusB": 4,
+    "ttbarPlusCCbar": 5,
+    "ttbarOther": 6,
+
+#need to keep different data samples separate at this point
+    "data_e": 7,
+    "data_m": 8,
+    "data_mm": 9,
+    "data_ee": 10,
+    "data_em": 11,
+}
+
 xsec_sample = {
     "TT_TuneCUETP8M1_13TeV-powheg-pythia8": xsec[("ttjets", "13TeV")],
     "TT_TuneEE5C_13TeV-powheg-herwigpp": xsec[("ttjets", "13TeV")],

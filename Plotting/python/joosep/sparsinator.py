@@ -25,7 +25,7 @@ except ImportError as e:
     LOG_MODULE_NAME.warning("Could not import rootpy, disabling")
 
 import numpy as np
-from TTH.MEAnalysis.samples_base import getSitePrefix, xsec, samples_nick, xsec_sample, get_prefix_sample
+from TTH.MEAnalysis.samples_base import getSitePrefix, xsec, samples_nick, xsec_sample, get_prefix_sample, PROCESS_MAP
 from TTH.Plotting.Datacards.sparse import save_hdict
 
 #placeholder value
@@ -34,24 +34,6 @@ NA = -999
 #default MEM scale factor in the likelihood ratio
 MEM_SF = 0.1
 
-#Numeric keys for processes, used for filling the process axis
-#in the sparse histogram
-PROCESS_MAP = {
-    "ttH_hbb": 0,
-    "ttH_nonbb": 1,
-    "ttbarPlusBBbar": 2,
-    "ttbarPlus2B": 3,
-    "ttbarPlusB": 4,
-    "ttbarPlusCCbar": 5,
-    "ttbarOther": 6,
-
-#need to keep different data samples separate at this point
-    "data_e": 7,
-    "data_m": 8,
-    "data_mm": 9,
-    "data_ee": 10,
-    "data_em": 11,
-}
 
 SYSTEMATICS_EVENT = [
     "CMS_scale_jUp", "CMS_scale_jDown",
@@ -214,7 +196,7 @@ desc = Desc([
         nominal=Func("blr_cMVA", func=lambda ev: logit(ev.btag_LR_4b_2b_btagCMVA)),
     ),
 
-    Var(name="leps_pdgId"),
+    Var(name="leps_pdgId", nominal=Func("leps_pdgId", func=lambda ev: [int(x) for x in ev.leps_pdgId[:ev.nleps]]),
 
     Var(name="jets_p4",
         nominal=Func(
@@ -396,19 +378,22 @@ def createOutputs(dirs, systematics):
     return outdict_syst
 
 def pass_HLT_sl_mu(event):
-    return True
+    return abs(event["leps_pdgId"][0]) == 13
 
-def pass_HLT_sl_mu(event):
-    return True
+def pass_HLT_sl_el(event):
+    return abs(event["leps_pdgId"][0]) == 11
 
 def pass_HLT_dl_mumu(event):
-    return True
+    st = sum(map(abs, event["leps_pdgId"]))
+    return st == 26
 
 def pass_HLT_dl_elmu(event):
-    return True
+    st = sum(map(abs, event["leps_pdgId"]))
+    return st == 24
 
 def pass_HLT_dl_elel(event):
-    return True
+    st = sum(map(abs, event["leps_pdgId"]))
+    return st == 22
 
 def triggerPath(event):
     if event["is_sl"] and pass_HLT_sl_mu(event):
