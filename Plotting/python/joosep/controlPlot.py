@@ -1,22 +1,22 @@
 import ROOT
-import rootpy
+import logging
 
 import matplotlib
 from matplotlib import rc
 #temporarily disable true latex for fast testing
 rc('text', usetex=False)
-matplotlib.use('Agg')
-
+matplotlib.use('PS') #needed on T3
 import matplotlib.pyplot as plt
-from rootpy.plotting import root2matplotlib as rplt
 
-import sys, os
+import sys, os, copy
+from collections import OrderedDict
 import heplot, plotlib
 
+import rootpy
 from rootpy.plotting import Hist
-from collections import OrderedDict
+from rootpy.plotting import root2matplotlib as rplt
 
-inf = rootpy.io.File("/Users/joosep/sl_jge6_tge4.root")
+inf = "/mnt/t3nfs01/data01/shome/jpata/tth/gc/makecategory/GC41c32de9adb2/SL_7cat/sl_jge6_tge4.root"
 procs_names = [
     ("ttH_hbb", "tt+H(bb)"),
     ("ttbarOther", "tt+light"),
@@ -31,8 +31,6 @@ category = "sl_jge6_tge4"
 variable = "jetsByPt_0_pt"
 variable_name = "jet $p_t$"
 
-fig = plt.figure(figsize=(6,6))
-
 #optional function f: TH1D -> TH1D to blind data
 def blind(h):
     hc = h.Clone()
@@ -41,22 +39,54 @@ def blind(h):
         hc.SetBinError(i, 0)
     return hc
 
-r = plotlib.draw_data_mc(
-    inf,
-    "{0}/{1}".format(category, variable),
-    procs_names,
-    ["ttH_hbb"],
-    dataname="data", #data_obs for fake data
-    rebin=2,
-    xlabel=variable,
-    xunit="GeV",
-    legend_fontsize=10, legend_loc="best",
-    colors=[plotlib.colors.get(p) for p in procs],
-    do_legend=True,
-    show_overflow=True,
-    title_extended="$,\\ \\mathcal{L}=9.2,\\ \\mathrm{fb}^{-1}$, ",
-    systematics=[],
-    blindFunc=blind,
-    #do_pseudodata=True
-)
-plotlib.svfg("./out.pdf")
+def plot_worker(kwargs):
+    inf = rootpy.io.File(kwargs.pop("infile"))
+    outname = kwargs.pop("outname")
+    histname = kwargs.pop("histname")
+    procs = kwargs.pop("procs")
+    signal_procs = kwargs.pop("signal_procs")
+
+    fig = plt.figure(figsize=(6,6))
+    r = plotlib.draw_data_mc(
+        inf,
+        histname,
+        procs,
+        signal_procs,
+        **kwargs
+    )
+    logging.info("saving {0}".format(outname))
+    plotlib.svfg("./{0}".format(outname))
+    inf.Close()
+
+args = [
+    {
+    "infile": inf,
+    "histname": "/".join([category, variable]),
+    "outname": "_".join([category, variable]),
+    "procs": procs_names,
+    "signal_procs": ["ttH_hbb"],
+    "dataname": "data", #data_obs for fake data
+    "rebin": 2,
+    "xlabel": variable_name,
+    "xunit": "GeV",
+    "legend_fontsize": 10,
+    "legend_loc": "best",
+    "colors": [plotlib.colors.get(p) for p in procs],
+    "do_legend": True,
+    "show_overflow": True,
+    "title_extended": r"$,\ \mathcal{L}=9.2,\ \mathrm{fb}^{-1}$, ",
+    "systematics": [],
+    "blindFunc": blind,
+    }
+]
+
+if __name__ == "__main__":
+    for i in range(1000):
+        a = copy.deepcopy(args[0])
+        a["outname"] = "plot_{0}.pdf".format(i)
+        args += [a]
+    
+    import multiprocessing
+    pool = multiprocessing.Pool(10)
+    pool.map(plot_worker, args)
+    pool.close()

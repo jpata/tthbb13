@@ -1,3 +1,7 @@
+from cleanPath import fixPythonPath
+import sys
+sys.path = fixPythonPath(sys.path)
+
 import ROOT
 ROOT.gROOT.SetBatch(True)
 
@@ -96,39 +100,39 @@ samplelist = [
 
 #list of all variable names, suitable for latex
 varnames = {
-    "jet0_pt": "leading jet $p_T$ [GeV]",
-    "jet1_pt": "subleading jet $p_T$ [GeV]",
+    "jet0_pt": r"leading jet $p_T$ [GeV]",
+    "jet1_pt": r"subleading jet $p_T$ [GeV]",
 
-    "jet0_btagCSV": "leading jet $b_{\\mathrm{CSV}}$",
-    "jet1_btagCSV": "subleading jet $b_{\\mathrm{CSV}}$",
+    "jet0_btagCSV": r"leading jet $b_{\mathrm{CSV}}$",
+    "jet1_btagCSV": r"subleading jet $b_{\mathrm{CSV}}$",
 
-    "jet0_btagBDT": "leading jet $b_{\\mathrm{cMVAv2}}$",
-    "jet1_btagBDT": "subleading jet $b_{\\mathrm{cMVAv2}}$",
+    "jet0_btagBDT": r"leading jet $b_{\mathrm{cMVAv2}}$",
+    "jet1_btagBDT": r"subleading jet $b_{\mathrm{cMVAv2}}$",
 
-    "jet0_eta": "leading jet $\eta$",
-    "jet1_eta": "subleading jet $\eta$",
+    "jet0_eta": r"leading jet $\eta$",
+    "jet1_eta": r"subleading jet $\eta$",
 
-    "jet0_aeta": "leading jet $|\eta|$",
-    "jet1_aeta": "subleading jet $|\eta|$",
+    "jet0_aeta": r"leading jet $|\eta|$",
+    "jet1_aeta": r"subleading jet $|\eta|$",
 
-    "lep0_pt": "leading lepton $p_T$ [GeV]",
-    "lep1_pt": "subleading jet $p_T$ [GeV]",
+    "lep0_pt": r"leading lepton $p_T$ [GeV]",
+    "lep1_pt": r"subleading jet $p_T$ [GeV]",
 
-    "lep0_eta": "leading lepton $|\eta|$ [GeV]",
-    "lep1_eta": "subleading jet $|\eta|$ [GeV]",
+    "lep0_eta": r"leading lepton $|\eta|$ [GeV]",
+    "lep1_eta": r"subleading jet $|\eta|$ [GeV]",
 
-    "njets": "$N_{\\mathrm{jets}}$",
-    "ntags": "$N_{\\mathrm{CSVM}}$",
+    "njets": r"$N_{\mathrm{jets}}$",
+    "ntags": r"$N_{\mathrm{CSVM}}$",
 
-    "btag_LR_4b_2b_logit": "$\\log{[\\mathcal{F} / (1 - \\mathcal{F})]}$",
+    "btag_LR_4b_2b_logit": r"$\log{[\mathcal{F} / (1 - \mathcal{F})]}$",
     "nfatjets": r"$N_{\mathcal{fatjets}}$",
     "topCandidate_pt": "top candidate $p_T$ [GeV]",
     "topCandidate_mass": "top candidate $M$ [GeV]",
     "topCandidate_masscal": "top candidate $M$ [GeV]",
-    "topCandidate_fRec": "top candidate $f_{\\mathrm{rec}}$",
-    "topCandidate_Ropt": "top candidate $R_{\\mathrm{opt}}$",
-    "topCandidate_RoptCalc": "top candidate $R_{\\mathrm{opt}}, calc$",
-    "topCandidate_n_subjettiness": "top candidate n-subjettiness$",
+    "topCandidate_fRec": r"top candidate $f_{\mathrm{rec}}$",
+    "topCandidate_Ropt": r"top candidate $R_{\mathrm{opt}}$",
+    "topCandidate_RoptCalc": r"top candidate $R_{\mathrm{opt}}, calc$",
+    "topCandidate_n_subjettiness": r"top candidate n-subjettiness$",
 
     "nhiggsCandidate": "Number of higgs candidates",
     "higgsCandidate_pt": "H candidate $p_T$ [GeV]",
@@ -249,7 +253,7 @@ def mc_stack(
         htot_dsyst.SetBinContent(i+1, htot_dsyst.GetBinContent(i+1) - errs[i]/2)
 
     fill_between(htot_usyst, htot_dsyst,
-        color="gray", hatch="\\\\\\\\",
+        color="gray", hatch=r"\\\\",
         alpha=1.0, linewidth=0, facecolor="none", edgecolor="gray", zorder=10,
     )
 
@@ -382,7 +386,7 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
     #Create top panel
     a1 = plt.axes([0.0, 0.22, 1.0, 0.8])
         
-    c.suptitle("$\\textbf{CMS}$ preliminary $\sqrt{s} = 13$ TeV"+title_extended,
+    c.suptitle(r"$\textbf{CMS}$ preliminary $\sqrt{s} = 13$ TeV"+title_extended,
         y=1.02, x=0.02,
         horizontalalignment="left", verticalalignment="bottom", fontsize=16
     )
@@ -439,7 +443,7 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
             patch = mpatches.Patch(color=line1.get_color(), label=h.title)
             patches += [patch]
         patches += [mpatches.Patch(facecolor="none", edgecolor="black", label="stat", hatch="////////")]
-        patches += [mpatches.Patch(facecolor="none", edgecolor="gray", label="stat+syst", hatch="\\\\\\\\")]
+        patches += [mpatches.Patch(facecolor="none", edgecolor="gray", label="stat+syst", hatch=r"\\\\")]
         plt.legend(handles=patches, loc=legend_loc, numpoints=1, prop={'size':legend_fontsize}, ncol=2, frameon=False)
         
     #create an automatic bin width label on the y axis
@@ -498,7 +502,7 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
 
         fill_between(
             bg_unc_usyst, bg_unc_dsyst,
-            color="gray", hatch="\\\\\\\\",
+            color="gray", hatch=r"\\\\",
             alpha=1.0, linewidth=0, facecolor="none", edgecolor="gray", zorder=10,
         )
         plt.title("data={0:.1f}\ MC={1:.1f}".format(
@@ -506,7 +510,7 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
             stacked_hists["tot"].Integral()
             ), x=0.01, y=0.8, fontsize=10, horizontalalignment="left"
         )
-        plt.ylabel("$\\frac{\mathrm{data}}{\mathrm{pred.}}$", fontsize=16)
+        plt.ylabel(r"$\frac{\mathrm{data}}{\mathrm{pred.}}$", fontsize=16)
         plt.axhline(1.0, color="black")
         a2.set_ylim(0, 2)
         #hide last tick on ratio y axes
