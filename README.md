@@ -188,8 +188,7 @@ ttbarPlusB
 ...
 ~~~
 
-Step5: Limits with `makelimits.sh`
------------------
+## Step5: Limits with `makelimits.sh`
 
 Configure the path to the category output in `confs/makelimits.conf` by setting `datacardbase` to the output of step 4.
 
@@ -197,3 +196,11 @@ Configure the path to the category output in `confs/makelimits.conf` by setting 
 cd TTH/MEAnalysis/gc
 ./grid-control/go.py confs/makelimits.conf
 ~~~
+
+## Step6: data/mc plots
+
+From the output of makecategory, you can make data/MC plots using code in `plotlib.py` and `controlPlot.py`.
+
+See `TTH/MEAnalysis/python/joosep/controlPlot.py` for an example.
+
+For this to work, you need to use the rootpy environment.
