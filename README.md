@@ -22,12 +22,12 @@ This will start with MiniAOD and produce a VHBB ntuple.
 In order to run a quick test of the code, use the following makefile
 ~~~
 $ make test_VHBB
-#this will call VHbbAnalysis/Heppy/test/vhbb_combined.py
-$ make test_VHBB
-#this will call VHbbAnalysis/Heppy/test/vhbb_combined.py
+# this will call VHbbAnalysis/Heppy/test/vhbb_combined.py
+$ make test_VHBB_data
+# this will call VHbbAnalysis/Heppy/test/vhbb_combined_data.py
 ~~~
 
-Submission will proceed via `crab3`, explained later.
+Submission will proceed via `crab3`, explained in Step1+2.
 
 ## Step2: tthbb code
 Using the VHBB ntuple, we will run the ttH(bb) and matrix element code
@@ -62,7 +62,7 @@ $ python TTH/MEAnalysis/python/MakeDatasetFiles.py --version {TAG}
 
 ## Step3: skim with `projectSkim`
 
-When some of the samples are done, you can produce small (<5GB) skims of the files using local batch jobs.
+When some of the samples are done, you can produce smallis (<10GB) skims of the files using local batch jobs.
 
 ~~~
 $ cd TTH/MEAnalysis/gc
@@ -75,8 +75,8 @@ $ ./hadd.py /path/to/output/GC1234/
 This will produce some skimmed ntuples in
 ~~~
 /mnt/t3nfs01/data01/shome/jpata/tth/gc/projectSkim/GCe0f041d65b98:
-Jul15_leptonic_v1__ttHTobb_M125_13TeV_powheg_pythia8
-Jul15_leptonic_v1__ttHTobb_M125_13TeV_powheg_pythia8.root
+Jul15_leptonic_v1__ttHTobb_M125_13TeV_powheg_pythia8 <= unmerged
+Jul15_leptonic_v1__ttHTobb_M125_13TeV_powheg_pythia8.root <= merged file
 Jul15_leptonic_v1__TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8
 Jul15_leptonic_v1__TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root
 Jul15_leptonic_v1__TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8
@@ -141,6 +141,51 @@ cd TTH/MEAnalysis/gc
 #generate the parameter csv files: analysis_groups.csv, analysis_specs.csv
 python $CMSSW_BASE/src/TTH/Plotting/python/Datacards/AnalysisSpecification.py
 ./grid-control/go.py confs/makecategories.conf
+~~~
+
+This will create all the `combine` datacards (`{ANALYSIS}/{CATEGORY}.root` files and `shapes_*.txt` files) for all analyses and all the categories.
+
+~~~
+[jpata@t3ui17 gc]$ ls -1 ~/tth/gc/makecategory/GC41c32de9adb2/SL_7cat/
+shapes_sl_j4_t3_blrH_mem_SL_0w2h2t_p.txt
+shapes_sl_j4_t3_blrL_btag_LR_4b_2b_btagCSV_logit.txt
+shapes_sl_j4_t3_mem_SL_0w2h2t_p.txt
+shapes_sl_j4_tge4_mem_SL_0w2h2t_p.txt
+shapes_sl_j5_t3_blrH_mem_SL_1w2h2t_p.txt
+shapes_sl_j5_t3_blrL_btag_LR_4b_2b_btagCSV_logit.txt
+shapes_sl_j5_t3_mem_SL_1w2h2t_p.txt
+shapes_sl_j5_tge4_mem_SL_1w2h2t_p.txt
+shapes_sl_jge6_t2_btag_LR_4b_2b_btagCSV_logit.txt
+shapes_sl_jge6_t3_blrH_mem_SL_2w2h2t_p.txt
+shapes_sl_jge6_t3_blrL_mem_SL_2w2h2t_p.txt
+shapes_sl_jge6_t3_mem_SL_2w2h2t_p.txt
+shapes_sl_jge6_tge4_mem_SL_2w2h2t_p.txt
+sl_j4_t3_blrH.root
+sl_j4_t3_blrL.root
+sl_j4_t3.root
+sl_j4_tge4.root
+sl_j5_t3_blrH.root
+sl_j5_t3_blrL.root
+sl_j5_t3.root
+sl_j5_tge4.root
+sl_jge6_t2.root
+sl_jge6_t3_blrH.root
+sl_jge6_t3_blrL.root
+sl_jge6_t3.root
+sl_jge6_tge4.root
+
+$ python ../test/listroot.py ~/tth/gc/makecategory/GC41c32de9adb2/SL_7cat/sl_jge6_tge4.root
+ttH_hbb
+-sl_jge6_tge4
+--btag_LR_4b_2b_btagCSV_logit (Hist)
+--jetsByPt_0_pt (Hist)
+--mem_SL_2w2h2t_p (Hist)
+ttbarPlusB
+-sl_jge6_tge4
+--btag_LR_4b_2b_btagCSV_logit (Hist)
+--jetsByPt_0_pt (Hist)
+--mem_SL_2w2h2t_p (Hist)
+...
 ~~~
 
 Step5: Limits with `makelimits.sh`
