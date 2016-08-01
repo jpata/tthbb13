@@ -23,7 +23,9 @@ try:
     HAVE_ROOTPY = True
 except ImportError as e:
     LOG_MODULE_NAME.warning("Could not import rootpy, disabling")
-
+    LOG_MODULE_NAME.error("This code will NOT work without rootpy, try setenv_psi.sh!")
+    raise e
+    
 import numpy as np
 from TTH.MEAnalysis.samples_base import getSitePrefix, xsec, samples_nick, xsec_sample, get_prefix_sample, PROCESS_MAP
 from TTH.Plotting.Datacards.sparse import save_hdict
@@ -50,13 +52,19 @@ ttH/sl/sparse_CMS_ttH_CSVJESUp -> event with btagWeight with JES up variation
 """
 systematic_weights = []
 btag_weights = []
-for syst in ["JES", "LF", "HF", "LFStats1", "LFStats2", "HFStats1", "HFStats2", "cErr1", "cErr2"]:
-    for sdir in ["Up", "Down"]:
-        bweight = "bTagWeight_{0}{1}".format(syst, sdir)
-        systematic_weights += [
-            ("CMS_ttH_CSV{0}{1}".format(syst, sdir), lambda ev, bweight=bweight: ev["weight_nominal"]/ev["bTagWeight"]*ev[bweight])
-        ]
-        btag_weights += [bweight]
+for sdir in ["up", "down"]:
+    for syst in ["cferr1", "cferr2", "hf", "hfstats1", "hfstats2", "jes", "lf", "lfstats1", "lfstats2"]:
+        for tagger in ["CSV"]:
+            bweight = "btagWeight{0}_{1}_{2}".format(tagger, syst, sdir)
+            systematic_weights += [
+                ("CMS_ttH_{0}{1}{2}".format(tagger, syst, sdir), lambda ev, bweight=bweight: ev["weight_nominal"]/ev["btagWeight"+tagger]*ev[bweight])
+            ]
+            btag_weights += [bweight]
+
+systematic_weights += [
+        ("puUp", lambda ev: ev["weight_nominal"]/ev["puWeight"] * ev["puWeightUp"]),
+        ("puDown", lambda ev: ev["weight_nominal"]/ev["puWeight"] * ev["puWeightDown"])
+]
 
 def assign_process_label(process, event):
     """
@@ -196,7 +204,7 @@ desc = Desc([
         nominal=Func("blr_cMVA", func=lambda ev: logit(ev.btag_LR_4b_2b_btagCMVA)),
     ),
 
-    Var(name="leps_pdgId", nominal=Func("leps_pdgId", func=lambda ev: [int(x) for x in ev.leps_pdgId[:ev.nleps]]),
+    Var(name="leps_pdgId", nominal=Func("leps_pdgId", func=lambda ev: [int(ev.leps_pdgId[i]) for i in range(ev.nleps)])),
 
     Var(name="jets_p4",
         nominal=Func(
@@ -244,9 +252,12 @@ desc = Desc([
 #MC-only branches
     Var(name="ttCls", schema=["mc"]),
     Var(name="puWeight", schema=["mc"]),
+    Var(name="puWeightUp", schema=["mc"]),
+    Var(name="puWeightDown", schema=["mc"]),
+
     #nominal b-tag weight, systematic weights added later
-    Var(name="bTagWeight", schema=["mc"]),
-] + [Var(name=bw, schema=["mc"]) for bw in btag_weights])
+    Var(name="btagWeightCSV", schema=["mc"]),
+    ] + [Var(name=bw, schema=["mc"]) for bw in btag_weights])
 
 class Axis:
     def __init__(self, name, nbins, lo, hi, func):
@@ -403,14 +414,20 @@ def triggerPath(event):
     elif event["is_dl"] and pass_HLT_dl_mumu(event):
         return 3
     elif event["is_dl"] and pass_HLT_dl_elmu(event):
-        return 3
-    elif event["is_dl"] and pass_HLT_dl_elel(event):
         return 4
+    elif event["is_dl"] and pass_HLT_dl_elel(event):
+        return 5
     return 0
 
 if __name__ == "__main__":
-    file_names = map(getSitePrefix, os.environ["FILE_NAMES"].split())
-    prefix, sample = get_prefix_sample(os.environ["DATASETPATH"])
+    if os.environ.has_key("FILE_NAMES"):
+        file_names = map(getSitePrefix, os.environ["FILE_NAMES"].split())
+        prefix, sample = get_prefix_sample(os.environ["DATASETPATH"])
+    else:
+        file_names = [getSitePrefix("/store/user/jpata/tth/pilot_Jul30_v1/ttHTobb_M125_13TeV_powheg_pythia8/pilot_Jul30_v1/160730_115048/0000/tree_{0}.root".format(i)) for i in range(1, 10)]
+        prefix = ""
+        sample = "ttHTobb_M125_13TeV_powheg_pythia8"
+
     process = samples_nick[sample]
     schema = get_schema(sample)
 
@@ -446,13 +463,14 @@ if __name__ == "__main__":
         iEv = 0
 
         for event in events:
-
             #apply some basic preselection
             if not (event.is_sl or event.is_dl):
                 continue
             if not event.numJets >= 4:
                 continue
             if not (event.nBCSVM>=3 or event.nBCMVAM>=3):
+                continue
+            if schema == "data" and not event.json:
                 continue
 
             for syst in systematics_event:
@@ -467,7 +485,7 @@ if __name__ == "__main__":
 
                 ret["weight_nominal"] = 1.0
                 if schema == "mc":
-                    ret["weight_nominal"] *= ret["puWeight"]
+                    ret["weight_nominal"] *= ret["puWeight"] * ret["btagWeightCSV"]
                 
                 #Fill the base histogram
                 for (k, v) in outdict_syst[syst].items():

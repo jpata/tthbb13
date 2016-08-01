@@ -15,5 +15,8 @@ for k, v in analyses.items():
     print v
 
 if __name__ == "__main__":
+    #write out all categories that we want to create
     make_csv_categories_abstract(analyses)
+
+    #write out all the combine groups
     make_csv_groups_abstract(analyses)

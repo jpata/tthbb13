@@ -47,11 +47,12 @@ xsec[("wz", "13TeV")] = 47.13
 xsec[("zz", "13TeV")] = 16.523
 
 ngen = {
-    'TT_TuneCUETP8M1_13TeV-powheg-pythia8': 3881100.0,
-    'TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': 815002.0,
-    'TTTo2L2Nu_13TeV-powheg': 1999535.0,
-    'ttHTobb_M125_13TeV_powheg_pythia8': 199796.0,
-    'TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': 910468.0
+    'TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': 9468936.0,
+    'TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': 11947951.0,
+    'TTTo2L2Nu_13TeV-powheg': 104607104.0,
+    'TT_TuneCUETP8M1_13TeV-powheg-pythia8': 88506656.0,
+    'ttHToNonbb_M125_13TeV_powheg_pythia8': 2756598.0,
+    'ttHTobb_M125_13TeV_powheg_pythia8': 3912212.0,
 }
 
 samples_nick = {

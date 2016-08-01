@@ -16,7 +16,7 @@ vhbb_wrapper:
 	cd $(CMSSW_BASE)/src/VHbbAnalysis/Heppy/test && python genWrapper.py
 	cp $(CMSSW_BASE)/src/VHbbAnalysis/Heppy/test/tree.py $(CMSSW_BASE)/src/TTH/MEAnalysis/python/VHbbTree.py
 	cd $(CMSSW_BASE)/src/VHbbAnalysis/Heppy/test && python genWrapper_data.py
-	cp $(CMSSW_BASE)/src/VHbbAnalysis/Heppy/test/tree.py $(CMSSW_BASE)/src/TTH/MEAnalysis/python/VHbbTree_data.py
+	cp $(CMSSW_BASE)/src/VHbbAnalysis/Heppy/test/tree_data.py $(CMSSW_BASE)/src/TTH/MEAnalysis/python/VHbbTree_data.py
 	git diff --stat $(CMSSW_BASE)/src/TTH/MEAnalysis/python/VHbbTree*.py
 
 #This generates the C header file which describes the tthbb tree structure
@@ -91,6 +91,11 @@ test_VHBB_MEAnalysis: test_mkdir
 	rm -Rf MEAnalysis/Loop_*
 	cd MEAnalysis && TTH_CALCME=0 INPUT_FILE=file://$(test_out_dir)/VHBB.root INPUT_TREE=tree ME_CONF=python/cfg_local.py python python/MEAnalysis_heppy.py &> $(test_out_dir)/VHBB_MEAnalysis_MEAnalysis_heppy.log
 	cp MEAnalysis/Loop_sample/tree.root $(test_out_dir)/VHBB_MEAnalysis.root
+
+test_VHBB_MEAnalysis_data: test_mkdir
+	rm -Rf MEAnalysis/Loop_*
+	cd MEAnalysis && TTH_CALCME=0 INPUT_FILE=file://$(test_out_dir)/VHBB_data.root INPUT_TREE=tree IS_MC=0 ME_CONF=python/cfg_local.py python python/MEAnalysis_heppy.py &> $(test_out_dir)/VHBB_MEAnalysis_MEAnalysis_heppy.log
+	cp MEAnalysis/Loop_sample/tree.root $(test_out_dir)/VHBB_MEAnalysis_data.root
 
 test_MEAnalysis_crab_vhbb: test_mkdir
 	egrep -o "file:.*root" MEAnalysis/crab_vhbb/PSet.py
