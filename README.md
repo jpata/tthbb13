@@ -16,6 +16,10 @@ $ cmsenv
 $ scram b -j 8
 ~~~
 
+## Step0: environment
+
+We use rootpy in the code, which is installed on the T3 locally in `~jpata/rootpy`. In order to properly configure the environment, run the following `source setenv_psi.sh` before starting your work.
+
 ## Step1: VHBB code
 This will start with MiniAOD and produce a VHBB ntuple.
 
