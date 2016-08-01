@@ -77,18 +77,17 @@ cats = {
     'sl_jge6_t2': "(is_sl==1) && (numJets>=6) && (nBCSVM==2)",
     'sl_jge6_t3': "(is_sl==1) && (numJets>=6) && (nBCSVM==3)",
     'sl_jge6_tge4': "(is_sl==1) && (numJets>=6) && (nBCSVM>=4)",
-    #'sl_jge6_tge4': "(is_sl==1) && (n_excluded_bjets<=1) && (n_boosted_bjets>=4) && (n_boosted_ljets>=2)",
 }
 
 #List of sample filenames -> short names suitable for latex
 samplelist = [
-    ("ttH_hbb", "ttHbb"),
-    ("ttH_nonhbb", "ttHnonbb"),
-    ("ttbarPlusBBbar", "ttbarPlusBBbar"),
-    ("ttbarPlusB", "ttbarPlusB"),
-    ("ttbarPlus2B", "ttbarPlus2B"),
-    ("ttbarPlusCCbar", "ttbarPlusCCbar"),
-    ("ttbarOther", "ttbarOther"),
+    ("ttH_hbb", "tt+H(bb)"),
+    ("ttH_nonhbb", "tt+H(nonbb)"),
+    ("ttbarPlusBBbar", "tt+bb"),
+    ("ttbarPlusB", "tt+b"),
+    ("ttbarPlus2B", "tt+2b"),
+    ("ttbarPlusCCbar", "tt+cc"),
+    ("ttbarOther", "tt+l"),
     ("diboson", "diboson"),
 #    ("stop", "stop"),
 #    ("wjets", "wjets"),
@@ -309,74 +308,110 @@ def getHistograms(tf, samples, hname):
             else:
                 return hs
     return hs
+
 def escape_string(s):
     return s.replace("_", " ")
 
-def draw_data_mc(tf, hname, samples, **kwargs):
+def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
+    """
+    Given a root file in the combine datacard format, draws a data/mc histogram,
+    ratio and systematic band.
+    tf (TFile): input root file
+    hname (string): name of histogram, example "sl_jge6_tge4/jetsByPt_0_pt"
+    processes (list of (str, str) tuples): processes to use for the plot. First
+        argument of tuple is the name in the file, second the name on the plot.
+        The order here defines the order of plotting (bottom to top). Assume that
+        signal is the first process.
+    signal_processes (list of str): process names to consider as signal
+    """
 
+    # name (string) of the data process.
+    # Example: "data" (real data), "data_obs" (fake data)
+    #must exist in the input file
     dataname = kwargs.get("dataname", "data_obs")
+    
     xlabel = kwargs.get("xlabel", escape_string(hname))
     xunit = kwargs.get("xunit", "XUNIT")
     ylabel = kwargs.get("ylabel", "auto")
     rebin = kwargs.get("rebin", 1)
     title_extended = kwargs.get("title_extended", "")
+
+    #legend properties
     do_legend = kwargs.get("do_legend", True)
     legend_loc = kwargs.get("legend_loc", (1.1,0.1))
     legend_fontsize = kwargs.get("legend_fontsize", 6)
+
+    #Dictionary of sample (string) -> color (tuple of floats) to use as colors
+    #or "auto" to generate a sequence of colors
     colors = kwargs.get("colors", "auto")
+
+    #True if you want to put the contents of the overflow bin into the last
+    #visible bin of the histogram, False otherwise
     show_overflow = kwargs.get("show_overflow", False)
+
+    #function f: TH1D -> TH1D to apply on data to blind it.
     blindFunc = kwargs.get("blindFunc", None)
 
-    #array of up-down pairs for systematic names, e.g. _CMS_scale_jUp/Down
+    #array of up-down pairs for systematic names to use for the systematic band,
+    #e.g.[("_CMS_scale_jUp", "_CMS_scale_jDown")]
     systematics = kwargs.get("systematics", [])
 
-    hs = OrderedDict()
-    hs_syst = OrderedDict()
-    hs = getHistograms(tf, samples, hname)
+    histograms_nominal = getHistograms(tf, processes, hname)
+    if len(histograms_nominal) == 0:
+        raise KeyError("did not find any histograms for MC")
 
+    histograms_systematic = OrderedDict()
     #get the systematically variated histograms
     for systUp, systDown in systematics:
-        hs_syst[systUp] = getHistograms(tf, samples, hname+systUp)
-        hs_syst[systDown] = getHistograms(tf, samples, hname+systDown)
-        if len(hs_syst[systUp])==0 or len(hs_syst[systDown])==0:
+        histograms_systematic[systUp] = getHistograms(tf, processes, hname+systUp)
+        histograms_systematic[systDown] = getHistograms(tf, processes, hname+systDown)
+        if len(histograms_systematic[systUp])==0 or len(histograms_systematic[systDown])==0:
             print "Could not read histograms for {0}".format(hname+systUp)
 
-    sample_d = dict(samples)
-    for hd in [hs] + hs_syst.values():
-        for (sample, h) in hd.items():
-            h.title = sample_d[sample] + " ({0:.1f})".format(h.Integral())
+    processes_d = dict(processes)
+
+    for histo_dict in [histograms_nominal] + histograms_systematic.values():
+        for (proc, h) in histo_dict.items():
+            h.title = processes_d[proc] + " ({0:.1f})".format(h.Integral())
             h.rebin(rebin)
             if show_overflow:
                 fill_overflow(h)
             
     c = plt.figure(figsize=(6,6))
 
+    #Create top panel
     a1 = plt.axes([0.0, 0.22, 1.0, 0.8])
         
     c.suptitle("$\\textbf{CMS}$ preliminary $\sqrt{s} = 13$ TeV"+title_extended,
         y=1.02, x=0.02,
         horizontalalignment="left", verticalalignment="bottom", fontsize=16
     )
-    if len(hs) == 0:
-        raise KeyError("did not find any histograms for MC")
-    stacked_hists = mc_stack(hs.values(), hs_syst, systematics, colors=colors)
+    stacked_hists = mc_stack(
+        histograms_nominal.values(),
+        histograms_systematic,
+        systematics,
+        colors = colors
+    )
     
     #Create the normalized signal shape
-    hsig = hs[samples[0][0]].Clone()
-    tot_mc = sum(hs.values())
+    histogram_signal = sum([histograms_nominal[sig] for sig in signal_processes])
+    histogram_total_mc = sum(histograms_nominal.values())
     #hsig.Rebin(2)
-    if hsig.Integral()>0:
-        hsig.Scale(0.2 * tot_mc.Integral() / hsig.Integral())
-    hsig.title = samples[0][1] + " norm"
-    hsig.linewidth=2
-    hsig.fillstyle = None
+    if histogram_signal.Integral()>0:
+        histogram_signal.Scale(0.2 * histogram_total_mc.Integral() / histogram_signal.Integral())
+    histogram_signal.title = processes[0][1] + " norm"
+    histogram_signal.linewidth=2
+    histogram_signal.fillstyle = None
     #draw the signal shape
-    hist([hsig])
+    hist([histogram_signal])
     
-    tot_mc.title = "pseudodata"
-    tot_mc.color = "black"
+    histogram_total_mc.title = "pseudodata"
+    histogram_total_mc.color = "black"
 
-    tot_bg = sum([hs[k] for k in hs.keys() if "tth" not in k])
+    histogram_total_bkg = sum([
+        histograms_nominal[k] for k in histograms_nominal.keys()
+        if k not in signal_processes]
+    )
     
     #Get the data histogram
     data = None
@@ -395,18 +430,21 @@ def draw_data_mc(tf, hname, samples, **kwargs):
         errorbar(data)
 
     if do_legend:
+        #create nice filled legend patches for all the processes
         patches = []
         if data:
             dataline = mlines.Line2D([], [], color='black', marker='o', label=data.title)
             patches += [dataline]
-        for (line1, line2), h in zip(stacked_hists["hists"], hs.values()):
+        for (line1, line2), h in zip(stacked_hists["hists"], histograms_nominal.values()):
             patch = mpatches.Patch(color=line1.get_color(), label=h.title)
             patches += [patch]
         patches += [mpatches.Patch(facecolor="none", edgecolor="black", label="stat", hatch="////////")]
         patches += [mpatches.Patch(facecolor="none", edgecolor="gray", label="stat+syst", hatch="\\\\\\\\")]
         plt.legend(handles=patches, loc=legend_loc, numpoints=1, prop={'size':legend_fontsize}, ncol=2, frameon=False)
+        
+    #create an automatic bin width label on the y axis
     if ylabel == "auto":
-        ylabel = "events / {0:.2f} {1}".format(hs.values()[0].get_bin_width(1), xunit)
+        ylabel = "events / {0:.2f} {1}".format(histogram_signal.get_bin_width(1), xunit)
     plt.ylabel(ylabel)
 
     #hide x ticks on main panel
@@ -426,11 +464,11 @@ def draw_data_mc(tf, hname, samples, **kwargs):
         a2.grid()
         
         data_ratio = data.Clone()
-        data_ratio.Divide(tot_mc)
+        data_ratio.Divide(histogram_total_mc)
 
         #In case MC was empty, set data/mc ratio to 0
         for ibin in range(data_ratio.GetNbinsX()):
-            bc = tot_mc.GetBinContent(ibin)
+            bc = histogram_total_mc.GetBinContent(ibin)
             if bc==0:
                 data_ratio.SetBinContent(ibin, 0)
 
@@ -474,7 +512,7 @@ def draw_data_mc(tf, hname, samples, **kwargs):
         #hide last tick on ratio y axes
         a2.set_yticks(a2.get_yticks()[:-1]);
         a2.set_xticks(ticks);
-    return a1, a2, hs, stacked_hists, hs_syst
+    return a1, a2, histograms_nominal, stacked_hists, histograms_systematic
 
 def draw_mem_data_mc(*args, **kwargs):
     a1, a2, hs = draw_data_mc(*args, **kwargs)
