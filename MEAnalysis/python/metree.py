@@ -516,9 +516,12 @@ def getTreeProducer(conf):
     trignames = []
     for pathname, trigs in list(conf.trigger["trigTable"].items()) + list(conf.trigger["trigTableData"].items()):
         for pref in ["HLT", "HLT2"]:
-            pathname = "_".join([pref, pathname])
-            if not pathname in trignames:
-                trignames += [pathname]
+            #add trigger path (combination of trigger)
+            _pathname = "_".join([pref, pathname])
+            if not _pathname in trignames:
+                trignames += [_pathname]
+
+            #add individual trigger bits
             for tn in trigs:
                 #strip the star
                 tn = pref + "_BIT_" + tn[:-1]
