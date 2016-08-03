@@ -222,7 +222,7 @@ workflow_datasets["pilot"][pilot_name] = D
 
 #1-lumi per job, 10 job testing of a few samples
 workflow_datasets["testing"] = {}
-for k in ["ttHTobb", "ttHToNonbb", "TTbar_inc", "SingleMuon-Run2016B-PromptReco-v2"]:
+for k in ["ttHTobb", "TTbar_inc", "SingleMuon-Run2016B-PromptReco-v2"]:
     D = deepcopy(datasets[k])
     D["maxlumis"] = 50
     D["perjob"] = 5

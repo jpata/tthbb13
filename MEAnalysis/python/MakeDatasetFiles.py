@@ -135,7 +135,7 @@ for ds in datasets:
             try:
                 nevents = f["file"][0]["nevents"]
             except Exception as e:
-                print "Could not parse nevents"
+                print "Could not parse nevents", f["file"][0]
                 nevents = 0
             ofile.write("{0} = {1}\n".format(name, nevents))
     ofile.close()
