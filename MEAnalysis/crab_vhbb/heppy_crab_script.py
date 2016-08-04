@@ -14,15 +14,12 @@ for arg in sys.argv:
     if arg.startswith("ME_CONF="):
         me_conf_name = arg.split("=")[1]
 
-
 JobNumber=sys.argv[1]
 print "JobNumber", JobNumber
 print PSet.process.dumpPython()
 
 crabFiles=PSet.process.source.fileNames
 print "crabFiles", crabFiles
-
-firstInput = crabFiles[0]
 
 ###
 ### Convert LFN to PFN
@@ -54,6 +51,7 @@ config = cfo.config
 if "reHLT" in crabFiles[0]:
     cfo.fix_reHLT(config)
 
+#Setting lumis in file
 if hasattr(PSet.process.source, "lumisToProcess"):
     config.preprocessor.options["lumisToProcess"] = PSet.process.source.lumisToProcess
 handle.close()
@@ -62,51 +60,51 @@ print "timeto_setLumis ",(time.time()-t0)
 #replace files with crab ones
 config.components[0].files=crabFiles
 
-print "heppy_config", config
-from PhysicsTools.HeppyCore.framework.looper import Looper
-if hasattr(PSet.process.source, "skipEvents") and PSet.process.source.skipEvents.value()>0:
-    nfirst = int(PSet.process.source.skipEvents.value())
-    nmax = int(PSet.process.maxEvents.input.value())
-    looper = Looper( 'Output', config, nPrint=0, nEvents=nmax, firstEvent=nfirst)
-else:
-    looper = Looper( 'Output', config, nPrint=0)
-looper.loop()
-looper.write()
-print "timeto_doVHbb ",(time.time()-t0)
+# print "heppy_config", config
+# from PhysicsTools.HeppyCore.framework.looper import Looper
+# if hasattr(PSet.process.source, "skipEvents") and PSet.process.source.skipEvents.value()>=0:
+#     nfirst = int(PSet.process.source.skipEvents.value())
+#     nmax = int(PSet.process.maxEvents.input.value())
+#     looper = Looper( 'Output', config, nPrint=0, nEvents=nmax, firstEvent=nfirst)
+# else:
+#     looper = Looper( 'Output', config, nPrint=0)
+# looper.loop()
+# looper.write()
+# print "timeto_doVHbb ",(time.time()-t0)
 
 ###
 ### tthbb13 code
 ###
-print "Running tth code"
-import cPickle as pickle
-import TTH.MEAnalysis.TFClasses as TFClasses
-sys.modules["TFClasses"] = TFClasses
-os.environ["ME_CONF"] = os.environ["CMSSW_BASE"] + "/python/TTH/MEAnalysis/" + me_conf_name
-handle = open("MEAnalysis_heppy.py", 'r')
-cfo2 = imp.load_source("heppy_config", "MEAnalysis_heppy.py", handle)
-config = cfo2.config
-from TTH.MEAnalysis.MEAnalysis_cfg_heppy import conf_to_str
-print "MEM config", conf_to_str(cfo2.conf)
-config.components = [cfg.Component(
-    "dummy",
-    files = ["Output/tree.root"],
-    tree_name = "tree",
-    n_gen = 1,
-    xs = 1,
-)]
-config.components[0].isMC = cfo.sample.isMC
+# print "Running tth code"
+# import cPickle as pickle
+# import TTH.MEAnalysis.TFClasses as TFClasses
+# sys.modules["TFClasses"] = TFClasses
+# os.environ["ME_CONF"] = os.environ["CMSSW_BASE"] + "/python/TTH/MEAnalysis/" + me_conf_name
+# handle = open("MEAnalysis_heppy.py", 'r')
+# cfo2 = imp.load_source("heppy_config", "MEAnalysis_heppy.py", handle)
+# config = cfo2.config
+# from TTH.MEAnalysis.MEAnalysis_cfg_heppy import conf_to_str
+# print "MEM config", conf_to_str(cfo2.conf)
+# config.components = [cfg.Component(
+#     "dummy",
+#     files = ["Output/tree.root"],
+#     tree_name = "tree",
+#     n_gen = 1,
+#     xs = 1,
+# )]
+# config.components[0].isMC = cfo.sample.isMC
 
-if not cfo.sample.isMC:
-    from TTH.MEAnalysis.VHbbTree_data import EventAnalyzer
-    evs = cfg.Analyzer(
-        EventAnalyzer,
-        'events',
-    )
-    config.sequence[2] = evs
-looper = Looper('Output_tth', config, nPrint=0)
-looper.loop()
-looper.write()
-print "timeto_doMEM ",(time.time()-t0)
+# if not cfo.sample.isMC:
+#     from TTH.MEAnalysis.VHbbTree_data import EventAnalyzer
+#     evs = cfg.Analyzer(
+#         EventAnalyzer,
+#         'events',
+#     )
+#     config.sequence[2] = evs
+# looper = Looper('Output_tth', config, nPrint=0)
+# looper.loop()
+# looper.write()
+# print "timeto_doMEM ",(time.time()-t0)
 
 #Now we need to copy both the vhbb and tth outputs to the same file
 inf1 = ROOT.TFile("Output/tree.root")
@@ -130,51 +128,102 @@ copyTo(inf1, vhbb_dir)
 copyTo(inf2, tof)
 tof.Close()
 
-f=ROOT.TFile.Open('tree.root')
-entries=f.Get('tree').GetEntries()
+def getEventsLumisInFile(infile):
+    from DataFormats.FWLite import Lumis, Handle, Events
+    events = Events(infile)
+    lumis = Lumis(infile)
+
+    ret = {}
+    for lum in lumis:
+        run = lum.aux().run()
+        if not ret.has_key(run):
+            ret[run] = []
+        ret[run] += [lum.aux().id().luminosityBlock()]
+    return events.size(), ret
+
+def getFJR(inputfiles, outputfile):
+
+    fwkreport="""<FrameworkJobReport>
+    <ReadBranches>
+    </ReadBranches>
+    <PerformanceReport>
+      <PerformanceSummary Metric="StorageStatistics">
+        <Metric Name="Parameter-untracked-bool-enabled" Value="true"/>
+        <Metric Name="Parameter-untracked-bool-stats" Value="true"/>
+        <Metric Name="Parameter-untracked-string-cacheHint" Value="application-only"/>
+        <Metric Name="Parameter-untracked-string-readHint" Value="auto-detect"/>
+        <Metric Name="ROOT-tfile-read-totalMegabytes" Value="0"/>
+        <Metric Name="ROOT-tfile-write-totalMegabytes" Value="0"/>
+      </PerformanceSummary>
+    </PerformanceReport>
+    
+    <GeneratorInfo>
+    </GeneratorInfo>
+"""
+    allruns = {}
+    for infile in inputfiles:
+        events, runs = getEventsLumisInFile(infile)
+        for k, v in runs.items():
+            if not allruns.has_key(k):
+                allruns[k] = v
+            else:
+                allruns[k] += v
+
+        allruns.update(runs)
+        inf = """
+        <InputFile>
+        <LFN>%s</LFN>
+        <PFN></PFN>
+        <Catalog></Catalog>
+        <InputType>primaryFiles</InputType>
+        <ModuleLabel>source</ModuleLabel>
+        <GUID></GUID>
+        <InputSourceClass>PoolSource</InputSourceClass>
+        <EventsRead>%d</EventsRead>
+        <Runs>""" % (infile, events)
+        for run, lumis in runs.items():
+            inf += """<Run ID="%d">
+            """ % run
+            for lumisection in lumis:
+                inf += """<LumiSection ID="%d"/>
+                """ % lumisection
+        inf += """
+        </Runs>
+        </InputFile>
+        """
+        fwkreport += inf
+    
+    output_entries = 0
+    tf = ROOT.TFile(outputfile)
+    output_entries = tf.Get("vhbb/tree").GetEntries()
+
+    fwkreport += """
+    <File>
+    <LFN></LFN>
+    <PFN>%s</PFN>
+    <Catalog></Catalog>
+    <ModuleLabel>HEPPY</ModuleLabel>
+    <Runs>""" % (outputfile)
+    for run, lumis in allruns.items():
+        fwkreport += """<Run ID="%d">
+        """ % run
+        for lumisection in lumis:
+            fwkreport += """<LumiSection ID="%d"/>
+            """ % lumisection
+    fwkreport += """
+    </Runs>
+    <GUID></GUID>
+    <OutputModuleClass>PoolOutputModule</OutputModuleClass>
+    <TotalEvents>%d</TotalEvents>
+    <BranchHash>dc90308e392b2fa1e0eff46acbfa24bc</BranchHash>
+    </File>
+    
+    </FrameworkJobReport>""" % (output_entries)
+    return fwkreport
+
 #Now write the FWKJobReport
-fwkreport='''<FrameworkJobReport>
-<ReadBranches>
-</ReadBranches>
-<PerformanceReport>
-  <PerformanceSummary Metric="StorageStatistics">
-    <Metric Name="Parameter-untracked-bool-enabled" Value="true"/>
-    <Metric Name="Parameter-untracked-bool-stats" Value="true"/>
-    <Metric Name="Parameter-untracked-string-cacheHint" Value="application-only"/>
-    <Metric Name="Parameter-untracked-string-readHint" Value="auto-detect"/>
-    <Metric Name="ROOT-tfile-read-totalMegabytes" Value="0"/>
-    <Metric Name="ROOT-tfile-write-totalMegabytes" Value="0"/>
-  </PerformanceSummary>
-</PerformanceReport>
 
-<GeneratorInfo>
-</GeneratorInfo>
-
-<InputFile>
-<LFN>%s</LFN>
-<PFN></PFN>
-<Catalog></Catalog>
-<InputType>primaryFiles</InputType>
-<ModuleLabel>source</ModuleLabel>
-<GUID></GUID>
-<InputSourceClass>PoolSource</InputSourceClass>
-<EventsRead>1</EventsRead>
-
-</InputFile>
-
-<File>
-<LFN></LFN>
-<PFN>tree.root</PFN>
-<Catalog></Catalog>
-<ModuleLabel>HEPPY</ModuleLabel>
-<GUID></GUID>
-<OutputModuleClass>PoolOutputModule</OutputModuleClass>
-<TotalEvents>%s</TotalEvents>
-<BranchHash>dc90308e392b2fa1e0eff46acbfa24bc</BranchHash>
-</File>
-
-</FrameworkJobReport>''' % (firstInput,entries)
-
-f1=open('./FrameworkJobReport.xml', 'w+')
-f1.write(fwkreport)
+report=open('./FrameworkJobReport.xml', 'w+')
+report.write(getFJR(crabFiles, "tree.root"))
+report.close()
 print "timeto_totalJob ",(time.time()-t0)
