@@ -334,3 +334,11 @@ tthbb13=b166b58
 CommonClassifier=f326dcc
 MEIntegratorStandalone=02d58d6
 CMSSW=5727125
+
+
+tth_Aug3_V24_v2
+-------------
+tthbb13=5b3cf57
+CommonClassifier=f326dcc
+MEIntegratorStandalone=02d58d6
+CMSSW=5727125

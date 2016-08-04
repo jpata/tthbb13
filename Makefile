@@ -60,9 +60,9 @@ test_MEAnalysis_withme: test_mkdir
 
 CODE_SPARSINATOR=python Plotting/python/joosep/sparsinator.py
 test_sparsinator:
-	FILE_NAMES=`head -n5 MEAnalysis/gc/datasets/Jul18_data_v1/SingleMuon.txt | grep root | cut -f1 -d' '` DATASETPATH=Jul18__SingleMuon $(CODE_SPARSINATOR)
+	FILE_NAMES=`head -n5 MEAnalysis/gc/datasets/tth_Jul31_V24_v1/SingleMuon.txt | grep root | cut -f1 -d' '` DATASETPATH=Jul18__SingleMuon $(CODE_SPARSINATOR)
 	mv out.root $(test_out_dir)/sparse_SingleMuon.root
-	FILE_NAMES=`head -n5 MEAnalysis/gc/datasets/Jul15_leptonic_v1/ttHTobb_M125_13TeV_powheg_pythia8.txt | grep root | cut -f1 -d' '` DATASETPATH=Jul15_leptonic_v1__ttHTobb_M125_13TeV_powheg_pythia8 $(CODE_SPARSINATOR)
+	FILE_NAMES=`head -n5 MEAnalysis/gc/datasets/tth_Jul31_V24_v1/ttHTobb_M125_13TeV_powheg_pythia8.txt | grep root | cut -f1 -d' '` DATASETPATH=Jul15_leptonic_v1__ttHTobb_M125_13TeV_powheg_pythia8 $(CODE_SPARSINATOR)
 	mv out.root $(test_out_dir)/sparse_ttH_hbb.root
 
 test_MELooper: test_mkdir melooper

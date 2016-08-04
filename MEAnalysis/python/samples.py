@@ -6,7 +6,7 @@
 import FWCore.ParameterSet.Config as cms
 from TTH.MEAnalysis.samples_base import *
 
-version = "Aug2"
+version = "tth_Jul31_V24_v1"
 samples_dict = {
  
         "ttHTobb_M125_13TeV_powheg_pythia8": cms.PSet(
@@ -14,6 +14,6 @@ samples_dict = {
             nickname = cms.string("ttHTobb_M125_13TeV_powheg_pythia8"),
             isMC     = cms.bool(True),
             treeName = cms.string("vhbb/tree"),
-            subFiles = cms.vstring(get_files("$CMSSW_BASE/src/TTH/MEAnalysis/gc/datasets/pilot_Jul30_v1/ttHTobb_M125_13TeV_powheg_pythia8.txt")),
+            subFiles = cms.vstring(get_files("$CMSSW_BASE/src/TTH/MEAnalysis/gc/datasets/tth_Jul31_V24_v1/ttHTobb_M125_13TeV_powheg_pythia8.txt")),
         ),
     }

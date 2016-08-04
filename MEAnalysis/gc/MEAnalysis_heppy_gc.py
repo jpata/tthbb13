@@ -1,4 +1,4 @@
-#!/uSr/bin/env python
+#!/usr/bin/env python
 
 #Need to enable ROOT batch mode to prevent it from importing libXpm, which may cause a crash
 import ROOT

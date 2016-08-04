@@ -1,3 +1,4 @@
+import logging
 from PhysicsTools.HeppyCore.framework.analyzer import Analyzer
 from TTH.MEAnalysis.vhbb_utils import lvec
 import ROOT
@@ -7,6 +8,14 @@ class FilterAnalyzer(Analyzer):
     A generic analyzer that may filter events.
     Counts events the number of processed and passing events.
     """
+    def __init__(self, cfg_ana, cfg_comp, looperName):
+        super(FilterAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
+        self.conf = cfg_ana._conf
+        self.logger = logging.getLogger(self.name)
+        level = getattr(logging, self.conf.general["loglevel"].get(self.name, "WARNING"))
+        self.logger.setLevel(level)
+        print "logger {0} level {1}".format(self.name, level)
+
     def beginLoop(self, setup):
         super(FilterAnalyzer, self).beginLoop(setup)
 
@@ -45,11 +54,9 @@ class EventIDFilterAnalyzer(FilterAnalyzer):
                 print "IDFilter", (event.input.run, event.input.lumi, event.input.evt)
                 passes = True
 
-        if passes and (
-            "eventboundary" in self.conf.general["verbosity"] or
-            "debug" in self.conf.general["verbosity"]
-            ):
-            print "---starting EVENT r:l:e", event.input.run, event.input.lumi, event.input.evt
+        self.logger.info("starting EVENT run:lumi:event = {0}:{1}:{2}".format(
+            event.input.run, event.input.lumi, event.input.evt
+        ))
         return passes
 
 

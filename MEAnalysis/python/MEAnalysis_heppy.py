@@ -1,11 +1,9 @@
 #!/usr/bin/env python
-import os
+import os, logging, imp, itertools
 import PhysicsTools.HeppyCore.framework.config as cfg
+
 import ROOT
 ROOT.gROOT.SetBatch(True)
-import imp
-
-import itertools
 
 #pickle and transfer function classes to load transfer functions
 import cPickle as pickle
@@ -32,6 +30,7 @@ from TTH.MEAnalysis.MEAnalysis_cfg_heppy import conf_to_str
 conf = Conf
 
 #Load transfer functions from pickle file
+logging.info("loading pickle file {0}".format(conf.general["transferFunctionsPickle"]))
 pi_file = open(conf.general["transferFunctionsPickle"] , 'rb')
 conf.tf_matrix = pickle.load(pi_file)
 
@@ -49,6 +48,7 @@ for fl in ["b", "l"]:
 
 pi_file.close()
 
+logging.info("loading pickle file {0}".format(conf.general["transferFunctions_sj_Pickle"]))
 #Load the subjet transfer functions from pickle file
 pi_file = open(conf.general["transferFunctions_sj_Pickle"] , 'rb')
 conf.tf_sj_matrix = pickle.load(pi_file)
@@ -57,7 +57,9 @@ pi_file.close()
 
 #Event contents are defined here
 #This is work in progress
-from TTH.MEAnalysis.VHbbTree import EventAnalyzer
+from TTH.MEAnalysis.vhbb_utils import EventAnalyzer
+
+logging.info("creating analyzers")
 
 #This analyzer reads branches from event.input (the TTree/TChain) to event.XYZ (XYZ is e.g. jets, leptons etc)
 evs = cfg.Analyzer(
@@ -195,7 +197,9 @@ treevar = cfg.Analyzer(
     _conf = conf
 )
 from TTH.MEAnalysis.metree import getTreeProducer
+logging.info("building TreeProducer")
 treeProducer = getTreeProducer(conf)
+logging.info("building sequence")
 
 # definition of a sequence of analyzers,
 # the analyzers will process each event in this order
@@ -251,7 +255,8 @@ config = cfg.Config(
 
 if __name__ == "__main__":
     print "Running MEAnalysis heppy main loop"
-    
+    logging.basicConfig(filename="MEAnalysis_heppy.log", level=logging.INFO)
+
     #input component
     #several input components can be declared,
     #and added to the list of selected components
@@ -271,17 +276,22 @@ if __name__ == "__main__":
             inputSamples.append(inputSample)
         return inputSamples, samples_dict
     
+    logging.info("preparing input samples")
     inputSamples, samples_dict = prepareInputSamples(conf.general["sampleFile"])
     
     #Process all samples in the sample list
     for samp in inputSamples:
+        logging.info("processing sample {0}".format(samp))
+
+        #Load the data event model
         if not samp.isMC:
             from TTH.MEAnalysis.VHbbTree_data import EventAnalyzer
             evs = cfg.Analyzer(
                 EventAnalyzer,
                 'events',
             )
-            sequence[2] = evs 
+            sequence[2] = evs
+
         config = cfg.Config(
             #Run across these inputs
             components = [samp],
@@ -298,7 +308,7 @@ if __name__ == "__main__":
 
         #Configure the number of events to run
         from PhysicsTools.HeppyCore.framework.looper import Looper
-        nEvents = 1000
+        nEvents = 300
 
         kwargs = {}
         if conf.general.get("eventWhitelist", None) is None:
@@ -311,7 +321,7 @@ if __name__ == "__main__":
             **kwargs
         )
 
-
+        logging.info("creating looper")
         import cProfile, time
         p = cProfile.Profile(time.clock)
         p.runcall(looper.loop)

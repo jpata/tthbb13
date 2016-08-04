@@ -1,17 +1,534 @@
 <FrameworkJobReport>
-<ReadBranches>
-</ReadBranches>
-<PerformanceReport>
-  <PerformanceSummary Metric="StorageStatistics">
-    <Metric Name="Parameter-untracked-bool-enabled" Value="true"/>
-    <Metric Name="Parameter-untracked-bool-stats" Value="true"/>
-    <Metric Name="Parameter-untracked-string-cacheHint" Value="application-only"/>
-    <Metric Name="Parameter-untracked-string-readHint" Value="auto-detect"/>
-    <Metric Name="ROOT-tfile-read-totalMegabytes" Value="0"/>
-    <Metric Name="ROOT-tfile-write-totalMegabytes" Value="0"/>
-  </PerformanceSummary>
-</PerformanceReport>
+    <ReadBranches>
+    </ReadBranches>
+    <PerformanceReport>
+      <PerformanceSummary Metric="StorageStatistics">
+        <Metric Name="Parameter-untracked-bool-enabled" Value="true"/>
+        <Metric Name="Parameter-untracked-bool-stats" Value="true"/>
+        <Metric Name="Parameter-untracked-string-cacheHint" Value="application-only"/>
+        <Metric Name="Parameter-untracked-string-readHint" Value="auto-detect"/>
+        <Metric Name="ROOT-tfile-read-totalMegabytes" Value="0"/>
+        <Metric Name="ROOT-tfile-write-totalMegabytes" Value="0"/>
+      </PerformanceSummary>
+    </PerformanceReport>
+    
+    <GeneratorInfo>
+    </GeneratorInfo>
 
-<GeneratorInfo>
-</GeneratorInfo>
-</FrameworkJobReport>
+        <InputFile>
+        <LFN>root://cms-xrd-global.cern.ch//store/mc/RunIISpring16MiniAODv2/ttHTobb_M125_13TeV_powheg_pythia8/MINIAODSIM/PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1/40000/0089CC67-6338-E611-947D-0025904C4E2A.root</LFN>
+        <PFN></PFN>
+        <Catalog></Catalog>
+        <InputType>primaryFiles</InputType>
+        <ModuleLabel>source</ModuleLabel>
+        <GUID></GUID>
+        <InputSourceClass>PoolSource</InputSourceClass>
+        <EventsRead>48800</EventsRead>
+        <Runs><Run ID="1">
+            <LumiSection ID="8957"/>
+                <LumiSection ID="9763"/>
+                <LumiSection ID="9765"/>
+                <LumiSection ID="9816"/>
+                <LumiSection ID="9818"/>
+                <LumiSection ID="9773"/>
+                <LumiSection ID="9861"/>
+                <LumiSection ID="9876"/>
+                <LumiSection ID="9901"/>
+                <LumiSection ID="10741"/>
+                <LumiSection ID="9843"/>
+                <LumiSection ID="9916"/>
+                <LumiSection ID="10724"/>
+                <LumiSection ID="13371"/>
+                <LumiSection ID="14182"/>
+                <LumiSection ID="13306"/>
+                <LumiSection ID="13324"/>
+                <LumiSection ID="13326"/>
+                <LumiSection ID="13330"/>
+                <LumiSection ID="13358"/>
+                <LumiSection ID="13328"/>
+                <LumiSection ID="13331"/>
+                <LumiSection ID="13382"/>
+                <LumiSection ID="13387"/>
+                <LumiSection ID="13398"/>
+                <LumiSection ID="11227"/>
+                <LumiSection ID="11378"/>
+                <LumiSection ID="15045"/>
+                <LumiSection ID="15048"/>
+                <LumiSection ID="15051"/>
+                <LumiSection ID="11261"/>
+                <LumiSection ID="11269"/>
+                <LumiSection ID="11270"/>
+                <LumiSection ID="11274"/>
+                <LumiSection ID="11284"/>
+                <LumiSection ID="11277"/>
+                <LumiSection ID="11280"/>
+                <LumiSection ID="11286"/>
+                <LumiSection ID="11293"/>
+                <LumiSection ID="11301"/>
+                <LumiSection ID="11297"/>
+                <LumiSection ID="11300"/>
+                <LumiSection ID="11303"/>
+                <LumiSection ID="11307"/>
+                <LumiSection ID="11321"/>
+                <LumiSection ID="11334"/>
+                <LumiSection ID="11341"/>
+                <LumiSection ID="11342"/>
+                <LumiSection ID="11344"/>
+                <LumiSection ID="11351"/>
+                <LumiSection ID="11191"/>
+                <LumiSection ID="11201"/>
+                <LumiSection ID="11209"/>
+                <LumiSection ID="11236"/>
+                <LumiSection ID="11264"/>
+                <LumiSection ID="11272"/>
+                <LumiSection ID="11366"/>
+                <LumiSection ID="11376"/>
+                <LumiSection ID="11377"/>
+                <LumiSection ID="11420"/>
+                <LumiSection ID="11427"/>
+                <LumiSection ID="11443"/>
+                <LumiSection ID="11428"/>
+                <LumiSection ID="11431"/>
+                <LumiSection ID="11445"/>
+                <LumiSection ID="13719"/>
+                <LumiSection ID="13720"/>
+                <LumiSection ID="13722"/>
+                <LumiSection ID="13728"/>
+                <LumiSection ID="13729"/>
+                <LumiSection ID="15120"/>
+                <LumiSection ID="15137"/>
+                <LumiSection ID="15168"/>
+                <LumiSection ID="19126"/>
+                <LumiSection ID="19153"/>
+                <LumiSection ID="19157"/>
+                <LumiSection ID="19441"/>
+                <LumiSection ID="19442"/>
+                <LumiSection ID="19447"/>
+                <LumiSection ID="19511"/>
+                <LumiSection ID="19542"/>
+                <LumiSection ID="19543"/>
+                <LumiSection ID="19718"/>
+                <LumiSection ID="19719"/>
+                <LumiSection ID="19736"/>
+                <LumiSection ID="19743"/>
+                <LumiSection ID="19780"/>
+                <LumiSection ID="19752"/>
+                <LumiSection ID="19778"/>
+                <LumiSection ID="19813"/>
+                <LumiSection ID="19816"/>
+                <LumiSection ID="19833"/>
+                <LumiSection ID="19830"/>
+                <LumiSection ID="19831"/>
+                <LumiSection ID="19832"/>
+                <LumiSection ID="11423"/>
+                <LumiSection ID="11429"/>
+                <LumiSection ID="11440"/>
+                <LumiSection ID="11441"/>
+                <LumiSection ID="11444"/>
+                <LumiSection ID="11459"/>
+                <LumiSection ID="15055"/>
+                <LumiSection ID="15100"/>
+                <LumiSection ID="15124"/>
+                <LumiSection ID="15173"/>
+                <LumiSection ID="11467"/>
+                <LumiSection ID="11475"/>
+                <LumiSection ID="11479"/>
+                <LumiSection ID="11484"/>
+                <LumiSection ID="11485"/>
+                <LumiSection ID="15053"/>
+                <LumiSection ID="15056"/>
+                <LumiSection ID="15057"/>
+                <LumiSection ID="15060"/>
+                <LumiSection ID="15062"/>
+                <LumiSection ID="15083"/>
+                <LumiSection ID="15084"/>
+                <LumiSection ID="15086"/>
+                <LumiSection ID="15087"/>
+                <LumiSection ID="15089"/>
+                <LumiSection ID="15148"/>
+                <LumiSection ID="15259"/>
+                <LumiSection ID="15284"/>
+                <LumiSection ID="15321"/>
+                <LumiSection ID="15330"/>
+                <LumiSection ID="15335"/>
+                <LumiSection ID="15372"/>
+                <LumiSection ID="15374"/>
+                <LumiSection ID="15375"/>
+                <LumiSection ID="15433"/>
+                <LumiSection ID="15436"/>
+                <LumiSection ID="15440"/>
+                <LumiSection ID="15437"/>
+                <LumiSection ID="15461"/>
+                <LumiSection ID="15468"/>
+                <LumiSection ID="15483"/>
+                <LumiSection ID="15491"/>
+                <LumiSection ID="15500"/>
+                <LumiSection ID="15772"/>
+                <LumiSection ID="15798"/>
+                <LumiSection ID="15816"/>
+                <LumiSection ID="15778"/>
+                <LumiSection ID="15779"/>
+                <LumiSection ID="15792"/>
+                <LumiSection ID="19056"/>
+                <LumiSection ID="19083"/>
+                <LumiSection ID="19085"/>
+                <LumiSection ID="19088"/>
+                <LumiSection ID="19093"/>
+                <LumiSection ID="19063"/>
+                <LumiSection ID="19079"/>
+                <LumiSection ID="19082"/>
+                <LumiSection ID="19086"/>
+                <LumiSection ID="19090"/>
+                <LumiSection ID="19125"/>
+                <LumiSection ID="19132"/>
+                <LumiSection ID="19134"/>
+                <LumiSection ID="19147"/>
+                <LumiSection ID="19159"/>
+                <LumiSection ID="19161"/>
+                <LumiSection ID="19162"/>
+                <LumiSection ID="19163"/>
+                <LumiSection ID="19168"/>
+                <LumiSection ID="19169"/>
+                <LumiSection ID="19189"/>
+                <LumiSection ID="19190"/>
+                <LumiSection ID="19195"/>
+                <LumiSection ID="19251"/>
+                <LumiSection ID="19262"/>
+                <LumiSection ID="19248"/>
+                <LumiSection ID="19263"/>
+                <LumiSection ID="19278"/>
+                <LumiSection ID="19284"/>
+                <LumiSection ID="19288"/>
+                <LumiSection ID="19307"/>
+                <LumiSection ID="19308"/>
+                <LumiSection ID="19309"/>
+                <LumiSection ID="19310"/>
+                <LumiSection ID="19312"/>
+                <LumiSection ID="19427"/>
+                <LumiSection ID="19430"/>
+                <LumiSection ID="19431"/>
+                <LumiSection ID="19433"/>
+                <LumiSection ID="19449"/>
+                <LumiSection ID="19480"/>
+                <LumiSection ID="19486"/>
+                <LumiSection ID="19495"/>
+                <LumiSection ID="19499"/>
+                <LumiSection ID="19500"/>
+                <LumiSection ID="19502"/>
+                <LumiSection ID="19503"/>
+                <LumiSection ID="19504"/>
+                <LumiSection ID="19537"/>
+                <LumiSection ID="19538"/>
+                <LumiSection ID="19533"/>
+                <LumiSection ID="19536"/>
+                <LumiSection ID="19539"/>
+                <LumiSection ID="19552"/>
+                <LumiSection ID="19558"/>
+                <LumiSection ID="19534"/>
+                <LumiSection ID="19545"/>
+                <LumiSection ID="19556"/>
+                <LumiSection ID="19562"/>
+                <LumiSection ID="19571"/>
+                <LumiSection ID="19567"/>
+                <LumiSection ID="19568"/>
+                <LumiSection ID="19572"/>
+                <LumiSection ID="19574"/>
+                <LumiSection ID="19575"/>
+                <LumiSection ID="19583"/>
+                <LumiSection ID="19585"/>
+                <LumiSection ID="19586"/>
+                <LumiSection ID="19587"/>
+                <LumiSection ID="19601"/>
+                <LumiSection ID="19584"/>
+                <LumiSection ID="19588"/>
+                <LumiSection ID="19591"/>
+                <LumiSection ID="19592"/>
+                <LumiSection ID="19599"/>
+                <LumiSection ID="19610"/>
+                <LumiSection ID="19628"/>
+                <LumiSection ID="19629"/>
+                <LumiSection ID="19633"/>
+                <LumiSection ID="19634"/>
+                <LumiSection ID="19630"/>
+                <LumiSection ID="19631"/>
+                <LumiSection ID="19661"/>
+                <LumiSection ID="19681"/>
+                <LumiSection ID="19754"/>
+                <LumiSection ID="19639"/>
+                <LumiSection ID="19640"/>
+                <LumiSection ID="19646"/>
+                <LumiSection ID="19647"/>
+                <LumiSection ID="19651"/>
+                <LumiSection ID="19648"/>
+                <LumiSection ID="19710"/>
+                <LumiSection ID="19735"/>
+                <LumiSection ID="19744"/>
+                <LumiSection ID="19748"/>
+                <LumiSection ID="19714"/>
+                <LumiSection ID="19737"/>
+                <LumiSection ID="19745"/>
+                <LumiSection ID="19746"/>
+                <LumiSection ID="19751"/>
+                
+        </Runs>
+        </InputFile>
+        
+    <File>
+    <LFN></LFN>
+    <PFN>tree.root</PFN>
+    <Catalog></Catalog>
+    <ModuleLabel>HEPPY</ModuleLabel>
+    <Runs><Run ID="1">
+        <LumiSection ID="8957"/>
+            <LumiSection ID="9763"/>
+            <LumiSection ID="9765"/>
+            <LumiSection ID="9816"/>
+            <LumiSection ID="9818"/>
+            <LumiSection ID="9773"/>
+            <LumiSection ID="9861"/>
+            <LumiSection ID="9876"/>
+            <LumiSection ID="9901"/>
+            <LumiSection ID="10741"/>
+            <LumiSection ID="9843"/>
+            <LumiSection ID="9916"/>
+            <LumiSection ID="10724"/>
+            <LumiSection ID="13371"/>
+            <LumiSection ID="14182"/>
+            <LumiSection ID="13306"/>
+            <LumiSection ID="13324"/>
+            <LumiSection ID="13326"/>
+            <LumiSection ID="13330"/>
+            <LumiSection ID="13358"/>
+            <LumiSection ID="13328"/>
+            <LumiSection ID="13331"/>
+            <LumiSection ID="13382"/>
+            <LumiSection ID="13387"/>
+            <LumiSection ID="13398"/>
+            <LumiSection ID="11227"/>
+            <LumiSection ID="11378"/>
+            <LumiSection ID="15045"/>
+            <LumiSection ID="15048"/>
+            <LumiSection ID="15051"/>
+            <LumiSection ID="11261"/>
+            <LumiSection ID="11269"/>
+            <LumiSection ID="11270"/>
+            <LumiSection ID="11274"/>
+            <LumiSection ID="11284"/>
+            <LumiSection ID="11277"/>
+            <LumiSection ID="11280"/>
+            <LumiSection ID="11286"/>
+            <LumiSection ID="11293"/>
+            <LumiSection ID="11301"/>
+            <LumiSection ID="11297"/>
+            <LumiSection ID="11300"/>
+            <LumiSection ID="11303"/>
+            <LumiSection ID="11307"/>
+            <LumiSection ID="11321"/>
+            <LumiSection ID="11334"/>
+            <LumiSection ID="11341"/>
+            <LumiSection ID="11342"/>
+            <LumiSection ID="11344"/>
+            <LumiSection ID="11351"/>
+            <LumiSection ID="11191"/>
+            <LumiSection ID="11201"/>
+            <LumiSection ID="11209"/>
+            <LumiSection ID="11236"/>
+            <LumiSection ID="11264"/>
+            <LumiSection ID="11272"/>
+            <LumiSection ID="11366"/>
+            <LumiSection ID="11376"/>
+            <LumiSection ID="11377"/>
+            <LumiSection ID="11420"/>
+            <LumiSection ID="11427"/>
+            <LumiSection ID="11443"/>
+            <LumiSection ID="11428"/>
+            <LumiSection ID="11431"/>
+            <LumiSection ID="11445"/>
+            <LumiSection ID="13719"/>
+            <LumiSection ID="13720"/>
+            <LumiSection ID="13722"/>
+            <LumiSection ID="13728"/>
+            <LumiSection ID="13729"/>
+            <LumiSection ID="15120"/>
+            <LumiSection ID="15137"/>
+            <LumiSection ID="15168"/>
+            <LumiSection ID="19126"/>
+            <LumiSection ID="19153"/>
+            <LumiSection ID="19157"/>
+            <LumiSection ID="19441"/>
+            <LumiSection ID="19442"/>
+            <LumiSection ID="19447"/>
+            <LumiSection ID="19511"/>
+            <LumiSection ID="19542"/>
+            <LumiSection ID="19543"/>
+            <LumiSection ID="19718"/>
+            <LumiSection ID="19719"/>
+            <LumiSection ID="19736"/>
+            <LumiSection ID="19743"/>
+            <LumiSection ID="19780"/>
+            <LumiSection ID="19752"/>
+            <LumiSection ID="19778"/>
+            <LumiSection ID="19813"/>
+            <LumiSection ID="19816"/>
+            <LumiSection ID="19833"/>
+            <LumiSection ID="19830"/>
+            <LumiSection ID="19831"/>
+            <LumiSection ID="19832"/>
+            <LumiSection ID="11423"/>
+            <LumiSection ID="11429"/>
+            <LumiSection ID="11440"/>
+            <LumiSection ID="11441"/>
+            <LumiSection ID="11444"/>
+            <LumiSection ID="11459"/>
+            <LumiSection ID="15055"/>
+            <LumiSection ID="15100"/>
+            <LumiSection ID="15124"/>
+            <LumiSection ID="15173"/>
+            <LumiSection ID="11467"/>
+            <LumiSection ID="11475"/>
+            <LumiSection ID="11479"/>
+            <LumiSection ID="11484"/>
+            <LumiSection ID="11485"/>
+            <LumiSection ID="15053"/>
+            <LumiSection ID="15056"/>
+            <LumiSection ID="15057"/>
+            <LumiSection ID="15060"/>
+            <LumiSection ID="15062"/>
+            <LumiSection ID="15083"/>
+            <LumiSection ID="15084"/>
+            <LumiSection ID="15086"/>
+            <LumiSection ID="15087"/>
+            <LumiSection ID="15089"/>
+            <LumiSection ID="15148"/>
+            <LumiSection ID="15259"/>
+            <LumiSection ID="15284"/>
+            <LumiSection ID="15321"/>
+            <LumiSection ID="15330"/>
+            <LumiSection ID="15335"/>
+            <LumiSection ID="15372"/>
+            <LumiSection ID="15374"/>
+            <LumiSection ID="15375"/>
+            <LumiSection ID="15433"/>
+            <LumiSection ID="15436"/>
+            <LumiSection ID="15440"/>
+            <LumiSection ID="15437"/>
+            <LumiSection ID="15461"/>
+            <LumiSection ID="15468"/>
+            <LumiSection ID="15483"/>
+            <LumiSection ID="15491"/>
+            <LumiSection ID="15500"/>
+            <LumiSection ID="15772"/>
+            <LumiSection ID="15798"/>
+            <LumiSection ID="15816"/>
+            <LumiSection ID="15778"/>
+            <LumiSection ID="15779"/>
+            <LumiSection ID="15792"/>
+            <LumiSection ID="19056"/>
+            <LumiSection ID="19083"/>
+            <LumiSection ID="19085"/>
+            <LumiSection ID="19088"/>
+            <LumiSection ID="19093"/>
+            <LumiSection ID="19063"/>
+            <LumiSection ID="19079"/>
+            <LumiSection ID="19082"/>
+            <LumiSection ID="19086"/>
+            <LumiSection ID="19090"/>
+            <LumiSection ID="19125"/>
+            <LumiSection ID="19132"/>
+            <LumiSection ID="19134"/>
+            <LumiSection ID="19147"/>
+            <LumiSection ID="19159"/>
+            <LumiSection ID="19161"/>
+            <LumiSection ID="19162"/>
+            <LumiSection ID="19163"/>
+            <LumiSection ID="19168"/>
+            <LumiSection ID="19169"/>
+            <LumiSection ID="19189"/>
+            <LumiSection ID="19190"/>
+            <LumiSection ID="19195"/>
+            <LumiSection ID="19251"/>
+            <LumiSection ID="19262"/>
+            <LumiSection ID="19248"/>
+            <LumiSection ID="19263"/>
+            <LumiSection ID="19278"/>
+            <LumiSection ID="19284"/>
+            <LumiSection ID="19288"/>
+            <LumiSection ID="19307"/>
+            <LumiSection ID="19308"/>
+            <LumiSection ID="19309"/>
+            <LumiSection ID="19310"/>
+            <LumiSection ID="19312"/>
+            <LumiSection ID="19427"/>
+            <LumiSection ID="19430"/>
+            <LumiSection ID="19431"/>
+            <LumiSection ID="19433"/>
+            <LumiSection ID="19449"/>
+            <LumiSection ID="19480"/>
+            <LumiSection ID="19486"/>
+            <LumiSection ID="19495"/>
+            <LumiSection ID="19499"/>
+            <LumiSection ID="19500"/>
+            <LumiSection ID="19502"/>
+            <LumiSection ID="19503"/>
+            <LumiSection ID="19504"/>
+            <LumiSection ID="19537"/>
+            <LumiSection ID="19538"/>
+            <LumiSection ID="19533"/>
+            <LumiSection ID="19536"/>
+            <LumiSection ID="19539"/>
+            <LumiSection ID="19552"/>
+            <LumiSection ID="19558"/>
+            <LumiSection ID="19534"/>
+            <LumiSection ID="19545"/>
+            <LumiSection ID="19556"/>
+            <LumiSection ID="19562"/>
+            <LumiSection ID="19571"/>
+            <LumiSection ID="19567"/>
+            <LumiSection ID="19568"/>
+            <LumiSection ID="19572"/>
+            <LumiSection ID="19574"/>
+            <LumiSection ID="19575"/>
+            <LumiSection ID="19583"/>
+            <LumiSection ID="19585"/>
+            <LumiSection ID="19586"/>
+            <LumiSection ID="19587"/>
+            <LumiSection ID="19601"/>
+            <LumiSection ID="19584"/>
+            <LumiSection ID="19588"/>
+            <LumiSection ID="19591"/>
+            <LumiSection ID="19592"/>
+            <LumiSection ID="19599"/>
+            <LumiSection ID="19610"/>
+            <LumiSection ID="19628"/>
+            <LumiSection ID="19629"/>
+            <LumiSection ID="19633"/>
+            <LumiSection ID="19634"/>
+            <LumiSection ID="19630"/>
+            <LumiSection ID="19631"/>
+            <LumiSection ID="19661"/>
+            <LumiSection ID="19681"/>
+            <LumiSection ID="19754"/>
+            <LumiSection ID="19639"/>
+            <LumiSection ID="19640"/>
+            <LumiSection ID="19646"/>
+            <LumiSection ID="19647"/>
+            <LumiSection ID="19651"/>
+            <LumiSection ID="19648"/>
+            <LumiSection ID="19710"/>
+            <LumiSection ID="19735"/>
+            <LumiSection ID="19744"/>
+            <LumiSection ID="19748"/>
+            <LumiSection ID="19714"/>
+            <LumiSection ID="19737"/>
+            <LumiSection ID="19745"/>
+            <LumiSection ID="19746"/>
+            <LumiSection ID="19751"/>
+            
+    </Runs>
+    <GUID></GUID>
+    <OutputModuleClass>PoolOutputModule</OutputModuleClass>
+    <TotalEvents>100</TotalEvents>
+    <BranchHash>dc90308e392b2fa1e0eff46acbfa24bc</BranchHash>
+    </File>
+    
+    </FrameworkJobReport>

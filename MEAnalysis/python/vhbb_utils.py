@@ -1,5 +1,5 @@
 import ROOT, math
-from copy import deepcopy
+import copy
 
 def lvec(self):
     """
@@ -52,7 +52,7 @@ class MET:
 
 class FakeEvent:
     def __init__(self, event):
-        src = deepcopy(event.__dict__)
+        src = copy.deepcopy(event.__dict__)
         self.__dict__.update(src)
         self.input = event.input
 
@@ -70,8 +70,63 @@ def printJet(j):
             except TypeError as e:
                 pass
     return s
+def printJetShort(j):
+    s = "<Jet(pt={0:.2f})>".format(j.pt)
+    return s
+
+class TreeCache(object):
+    """
+    This caches a usual PyROOT TTree object such that tree.x does not result
+    in an expensive GetEntry operation each time.
+    """
+    def __init__(self, tree):
+        self.tree = tree
+        self.branch_cache = {}
+        self.branch_cache_values = {}
+        self.current_entry = 0
+
+    def __getattr__(self, attr):
+        """
+        Fetches the branch from the TTree and caches it for future usage.
+        attr (string): name of branch or if not existing, TreeCache attribute
+        returns: value of branch
+        """
+        branch_cache = self.__dict__["branch_cache"]
+        branch_cache_values = self.__dict__["branch_cache_values"]
+        tree = self.__dict__["tree"]
+
+        if not branch_cache.has_key(attr):
+            br = tree.GetBranch(attr)
+            if not br:
+                return object.__getattribute__(self, attr)
+            branch_cache[attr] = br
+        branch = branch_cache[attr]
+
+        if not branch_cache_values.has_key(branch):
+            branch.GetEntry(self.__dict__["current_entry"])
+            branch_cache_values[branch] = getattr(tree, attr)
+        return branch_cache_values[branch]
+
+    def next_entry(self, ientry):
+        self.current_entry = ientry
+        self.branch_cache_values = {}
+
+from PhysicsTools.HeppyCore.framework.analyzer import Analyzer
+from TTH.MEAnalysis.VHbbTree import process_event
+class EventAnalyzer(Analyzer):
+    
+    def __init__(self, cfg_ana, cfg_comp, looperName):
+        super(EventAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
+        self.cache = None
+    
+    def process(self, event):
+        if not self.cache:
+            self.cache = TreeCache(event.input)
+        self.cache.next_entry(event.iEv)
+        process_event(event, self.cache)
 
 Jet.__str__ = printJet
+Jet.__repr__ = printJetShort
 
 def autolog(*args):
     import inspect, logging

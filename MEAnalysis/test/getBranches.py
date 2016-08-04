@@ -6,7 +6,9 @@ if not tf:
     raise Exception("Could not open file")
 tt = tf.Get(sys.argv[2])
 
+tt.Print("ALL")
+
 branches = sorted([br.GetName() for br in tt.GetListOfBranches()])
 for br in branches:
-    print br
+    print br, [l.GetTypeName() for l in tt.GetBranch(br).GetListOfLeaves()]
 

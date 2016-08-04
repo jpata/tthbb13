@@ -6,10 +6,10 @@ import ROOT
 
 cmssw_base = os.environ["CMSSW_BASE"]
 
-version = "Aug2"
+version = "tth_Jul31_V24_v1"
 
 samples = [
-    "gc/datasets/pilot_Jul30_v1/ttHTobb_M125_13TeV_powheg_pythia8.txt",
+    "gc/datasets/tth_Jul31_V24_v1/ttHTobb_M125_13TeV_powheg_pythia8.txt"
 ]
 
 samples = ["$CMSSW_BASE/src/TTH/MEAnalysis/" + s for s in samples]

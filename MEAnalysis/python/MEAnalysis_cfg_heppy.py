@@ -214,6 +214,10 @@ class Conf:
             #"commonclassifier",
         ],
 
+        "loglevel": {
+            #"TTH.MEAnalysis.JetAnalyzer.JetAnalyzer_jets": "DEBUG"
+        }
+
         #"eventWhitelist": [
         #    (1, 144279, 14372670)
         #]
@@ -272,7 +276,7 @@ class Conf:
 
         #Actually run the ME calculation
         #If False, all ME values will be 0
-        "calcME": True,
+        "calcME": False,
         "calcMECommon": False,
         "n_integration_points_mult": 1.0,
 

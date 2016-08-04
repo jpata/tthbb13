@@ -1,10 +1,9 @@
 from TTH.MEAnalysis.Analyzer import FilterAnalyzer
 from TTH.MEAnalysis.VHbbTree import *
 from TTH.MEAnalysis.vhbb_utils import *
-from copy import deepcopy
 import numpy as np
 import copy
-
+import logging
 
 #FIXME: understand the effect of cropping the transfer functions
 def attach_jet_transfer_function(jet, conf):
@@ -22,6 +21,13 @@ def attach_jet_transfer_function(jet, conf):
     jet.tf_l.SetNpx(10000)
     jet.tf_l.SetRange(0, 500)
 
+def copy_jet(jet):
+    newjet = copy.copy(jet)
+    newjet.pt = copy.deepcopy(jet.pt)
+    newjet.mass = copy.deepcopy(jet.mass)
+    return newjet
+#Jet.__copy__ = copy_jet
+
 class JetAnalyzer(FilterAnalyzer):
     """
     Performs jet selection and b-tag counting.
@@ -29,13 +35,18 @@ class JetAnalyzer(FilterAnalyzer):
     """
     def __init__(self, cfg_ana, cfg_comp, looperName):
         super(JetAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
-        self.conf = cfg_ana._conf
 
     def beginLoop(self, setup):
         super(JetAnalyzer, self).beginLoop(setup)
 
     def variateJets(self, jets, systematic, sigma):
-        newjets = deepcopy(jets)
+        """
+        """
+
+        self.logger.debug("variateJets: systematic={0} sigma={1}".format(systematic, sigma))
+        self.logger.debug("variateJets: jets=[{0}]".format(",".join([repr(j) for j in jets])))
+        newjets = [copy_jet(jet) for jet in jets]
+
         if self.cfg_comp.isMC and systematic == "JES":
             for i in range(len(jets)):
                 if sigma > 0:
@@ -65,6 +76,12 @@ class JetAnalyzer(FilterAnalyzer):
 
                 newjets[i].pt *= cf
                 newjets[i].mass *= cf
+
+
+        self.logger.debug("variateJets: newjets")
+        for jet, newjet in zip(jets, newjets):
+            self.logger.debug("variateJets: original={0} new={1}".format(repr(jet), repr(newjet)))
+
         return newjets
 
     def process(self, event):
@@ -100,12 +117,12 @@ class JetAnalyzer(FilterAnalyzer):
             evdict["nominal"].systematic = "nominal"
 
         for syst, event_syst in evdict.items():
-            if "debug" in self.conf.general["verbosity"]:
-                autolog("processing systematic", syst)
+            self.logger.debug("process: processing systematic {0}".format(syst))
             res = self._process(event_syst)
             evdict[syst] = res
         event.systResults = evdict
 
+        #Process the next Analyzers in case set passall==True OR any of the systematically processed events pass
         return self.conf.general["passall"] or np.any([v.passes_jet for v in event.systResults.values()])
 
     def _process(self, event):
@@ -113,12 +130,8 @@ class JetAnalyzer(FilterAnalyzer):
         #FIXME: why discarded jets no longer in vhbb?
         #injets = event.Jet+event.DiscardedJet
         event.injets = event.Jet
-        #pt-descending input jets
-        if "input" in self.conf.general["verbosity"]:
-            autolog("jets input") 
-            for ij, j in enumerate(event.injets):
-                autolog("InJetReco", ij, j.pt, j.eta, j.phi, j.mass, j.btagCSV, j.mcFlavour)
-                autolog("InJetGen", ij, j.mcPt, j.mcEta, j.mcPhi, j.mcM)
+        for ijet, jet in enumerate(event.injets):
+            self.logger.debug("_process: input jet {0} {1}".format(ijet, str(jet)))
 
         #choose pt cut key based on lepton channel
         pt_cut  = "pt"
@@ -158,14 +171,11 @@ class JetAnalyzer(FilterAnalyzer):
                 lv2 = lvec(lep)
                 dr = lv1.DeltaR(lv2)
                 if dr < 0.4:
-                    if "jets" in self.conf.general["verbosity"] or "debug" in self.conf.general["verbosity"]:
-                        autolog("[jet lepton cleaning] deltaR", dr, lep.pt, lep.eta, lep.phi, jet.pt, jet.eta, jet.phi)
+                    self.logger.debug("_process: cleaning jet {0} against lepton {1} by dR={2}".format(repr(jet), repr(lep), dr))
                     jets_to_remove += [jet]
 
         #Now actually remove the overlapping jets
         for jet in jets_to_remove:
-            if "jets" in self.conf.general["verbosity"] or "debug" in self.conf.general["verbosity"]:
-                autolog("removing jet", jet.pt, jet.eta)
             if jet in loose_jets:
                 loose_jets.remove(jet)
         
@@ -186,16 +196,10 @@ class JetAnalyzer(FilterAnalyzer):
         event.good_jets = filter(jetsel, loose_jets)
         event.loose_jets = filter(lambda x, event=event: x not in event.good_jets, loose_jets) 
 
-        if "debug" in self.conf.general["verbosity"]:
-            autolog("All jets: ", len(event.injets))
-            for x in event.injets:
-                autolog(str(x))
-            autolog("Loose jets: ", len(event.loose_jets))
-            for x in event.loose_jets:
-                autolog(str(x))
-            autolog("Good jets: ", len(event.good_jets))
-            for x in event.good_jets:
-                autolog(str(x))
+        for ijet, jet in enumerate(event.injets):
+            self.logger.debug("_process: processed jet {0} {1} loose={2} good={3}".format(
+                ijet, jet, jet in event.loose_jets, event.good_jets)
+            )
 
         #Assing jet transfer functions
         for jet in event.loose_jets + event.good_jets:
