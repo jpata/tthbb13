@@ -10,8 +10,9 @@ import random
 
 import ROOT
 
-import TTH.TTHNtupleAnalyzer.AccessHelpers as AH
+import TTH.MEAnalysis.AccessHelpers as AH
 from TTH.MEAnalysis.samples_base import getSitePrefix
+
 
 ########################################
 # Configuration
