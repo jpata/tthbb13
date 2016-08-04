@@ -46,6 +46,15 @@ xsec[("ww", "13TeV")] = 118.7
 xsec[("wz", "13TeV")] = 47.13
 xsec[("zz", "13TeV")] = 16.523
 
+ngen = {
+    'TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': 9468936.0,
+    'TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': 11947951.0,
+    'TTTo2L2Nu_13TeV-powheg': 104607104.0,
+    'TT_TuneCUETP8M1_13TeV-powheg-pythia8': 88506656.0,
+    'ttHToNonbb_M125_13TeV_powheg_pythia8': 2756598.0,
+    'ttHTobb_M125_13TeV_powheg_pythia8': 3912212.0,
+}
+
 samples_nick = {
     'ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1': "stop_s",
     'ST_t-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1': "stop_t",
@@ -82,6 +91,25 @@ samples_nick = {
     "MuonEG": "data_em",
     "DoubleEG": "data_ee",
     "DoubleMuon": "data_mm",
+}
+
+#Numeric keys for processes, used for filling the process axis
+#in the sparse histogram
+PROCESS_MAP = {
+    "ttH_hbb": 0,
+    "ttH_nonhbb": 1,
+    "ttbarPlusBBbar": 2,
+    "ttbarPlus2B": 3,
+    "ttbarPlusB": 4,
+    "ttbarPlusCCbar": 5,
+    "ttbarOther": 6,
+
+#need to keep different data samples separate at this point
+    "data_e": 7,
+    "data_m": 8,
+    "data_mm": 9,
+    "data_ee": 10,
+    "data_em": 11,
 }
 
 xsec_sample = {

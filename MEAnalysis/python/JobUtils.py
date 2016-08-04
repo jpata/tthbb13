@@ -30,7 +30,7 @@ def hadd_from_file(
         if len(input_filenames)>0:
             output_filename = basepath + "/" + name + ".root"
             #subprocess.call(["echo", "hadd", "-f", output_filename, "-n", "500"] + input_filenames)
-            subprocess.call(["python", os.environ["CMSSW_BASE"] + "/src/TTH/TTHNtupleAnalyzer/python/ParHadd.py", output_filename] + input_filenames)
+            subprocess.call(["python", os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/python/ParHadd.py", output_filename] + input_filenames)
             return output_filename
         else:
             print "no files in", input_fn

@@ -131,9 +131,13 @@ def makeStatVariations(tf, of, categories):
 def fakeData(infile, outfile, categories):
     dircache = {}
     for cat in categories:
-        h = infile.Get("{0}/{1}/{2}".format(cat.processes[0], cat.name, cat.discriminator)).Clone()
+        h = infile.Get("{0}/{1}/{2}".format(
+            cat.processes[0], cat.name, cat.discriminator
+        )).Clone()
         for proc in cat.processes[1:]:
-            h2 = infile.Get("{0}/{1}/{2}".format(proc, cat.name, cat.discriminator))
+            h2 = infile.Get("{0}/{1}/{2}".format(
+                proc, cat.name, cat.discriminator
+            ))
             h.Add(h2)
 
         outdir = "data_obs/{0}".format(cat.name)

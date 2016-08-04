@@ -1,5 +1,6 @@
 #sample vhbb+tthbb file
-testfile_vhbb_tthbb=/store/user/jpata/tth/Jul15_leptonic_v1/ttHTobb_M125_13TeV_powheg_pythia8/Jul15_leptonic_v1/160715_182411/0000/tree_1.root
+#testfile_vhbb_tthbb=/store/user/jpata/tth/tth_Jul31_V24_v1/ttHTobb_M125_13TeV_powheg_pythia8/tth_Jul31_V24_v1/160731_130548/0000/tree_1.root
+testfile_vhbb_tthbb=file:///mnt/t3nfs01/data01/shome/jpata/tth/sw/CMSSW/src/TTH/test.root
 DATASETPATH=Jul15_leptonic_v1__ttHTobb_M125_13TeV_powheg_pythia8
 test_out_dir=$(CMSSW_BASE)/src/TTH/tests_out
 
@@ -14,7 +15,9 @@ melooper: Plotting/python/joosep/codeGen.py Plotting/bin/*.cc Plotting/interface
 vhbb_wrapper:
 	cd $(CMSSW_BASE)/src/VHbbAnalysis/Heppy/test && python genWrapper.py
 	cp $(CMSSW_BASE)/src/VHbbAnalysis/Heppy/test/tree.py $(CMSSW_BASE)/src/TTH/MEAnalysis/python/VHbbTree.py
-	git diff --stat $(CMSSW_BASE)/src/TTH/MEAnalysis/python/VHbbTree.py
+	cd $(CMSSW_BASE)/src/VHbbAnalysis/Heppy/test && python genWrapper_data.py
+	cp $(CMSSW_BASE)/src/VHbbAnalysis/Heppy/test/tree_data.py $(CMSSW_BASE)/src/TTH/MEAnalysis/python/VHbbTree_data.py
+	git diff --stat $(CMSSW_BASE)/src/TTH/MEAnalysis/python/VHbbTree*.py
 
 #This generates the C header file which describes the tthbb tree structure
 metree_wrapper:
@@ -86,7 +89,13 @@ test_VHBB_data: test_mkdir
 
 test_VHBB_MEAnalysis: test_mkdir
 	rm -Rf MEAnalysis/Loop_*
-	cd MEAnalysis && TTH_CALCME=0 INPUT_FILE=$(test_out_dir)/VHBB.root ME_CONF=python/cfg_local.py python python/MEAnalysis_heppy.py &> $(test_out_dir)/VHBB_MEAnalysis_MEAnalysis_heppy.log
+	cd MEAnalysis && TTH_CALCME=0 INPUT_FILE=file://$(test_out_dir)/VHBB.root INPUT_TREE=tree ME_CONF=python/cfg_local.py python python/MEAnalysis_heppy.py &> $(test_out_dir)/VHBB_MEAnalysis_MEAnalysis_heppy.log
+	cp MEAnalysis/Loop_sample/tree.root $(test_out_dir)/VHBB_MEAnalysis.root
+
+test_VHBB_MEAnalysis_data: test_mkdir
+	rm -Rf MEAnalysis/Loop_*
+	cd MEAnalysis && TTH_CALCME=0 INPUT_FILE=file://$(test_out_dir)/VHBB_data.root INPUT_TREE=tree IS_MC=0 ME_CONF=python/cfg_local.py python python/MEAnalysis_heppy.py &> $(test_out_dir)/VHBB_MEAnalysis_MEAnalysis_heppy.log
+	cp MEAnalysis/Loop_sample/tree.root $(test_out_dir)/VHBB_MEAnalysis_data.root
 
 test_MEAnalysis_crab_vhbb: test_mkdir
 	egrep -o "file:.*root" MEAnalysis/crab_vhbb/PSet.py

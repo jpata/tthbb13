@@ -24,6 +24,7 @@ def print_mu(mu):
 
 def el_baseline_medium(el):
 
+    #ele MVA ID preselection
     sca = abs(el.etaSc)
     ret = ((sca < 1.4442 and
         el.eleSieie < 0.012 and
@@ -45,7 +46,7 @@ def el_baseline_medium(el):
     #ret = ret and el.eleCutIdSpring15_25ns_v1 >= 3
  
     #EGamma POG MVA ID for triggering electrons (0=none, 1=WP90, 2=WP80, Spring15 training); 1 for muons
-    # We want 80%
+    # We want 80% (tight id)
     # https://twiki.cern.ch/twiki/bin/viewauth/CMS/TTbarHbbRun2ReferenceAnalysis_76XTransition#Electrons
     ret = ret and el.eleMVAIdSpring15Trig == 2
 

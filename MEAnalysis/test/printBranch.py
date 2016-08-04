@@ -5,8 +5,8 @@ tf = ROOT.TFile.Open(getSitePrefix(sys.argv[1]))
 if not tf:
     raise Exception("Could not open file")
 tt = tf.Get(sys.argv[2])
+branch = sys.argv[3]
 
-branches = sorted([br.GetName() for br in tt.GetListOfBranches()])
-for br in branches:
-    print br
+for ev in tt:
+    print getattr(ev, branch)
 
