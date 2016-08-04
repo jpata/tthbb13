@@ -22,7 +22,7 @@ class MulticlassAnalyzer(FilterAnalyzer):
         super(MulticlassAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
         self.conf = cfg_ana._conf
 
-        self.pickle_filename = "../python/BDT.pickle"
+        self.pickle_filename = "BDT.pickle"
         
         # Load the BDT
         pickle_file = open(self.pickle_filename, "r")

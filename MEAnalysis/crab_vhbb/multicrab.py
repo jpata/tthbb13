@@ -349,7 +349,7 @@ env
         'python.tar.gz',
         'data.tar.gz',
         'MEAnalysis_heppy.py',
-        '../python/BDT.pickle',
+        'BDT.pickle',
         vhbb_dir + '/MVAJetTags_620SLHCX_Phase1And2Upgrade.db',
         vhbb_dir + '/combined_cmssw.py',
         vhbb_dir + '/vhbb.py',
