@@ -5,6 +5,7 @@ import ROOT
 import PhysicsTools.HeppyCore.framework.config as cfg
 cfg.Analyzer.nosubdir=True
 import PSet
+import copy
 
 t0 = time.time()
 print "ARGV:",sys.argv
@@ -19,7 +20,7 @@ print "JobNumber", JobNumber
 print PSet.process.dumpPython()
 
 crabFiles=PSet.process.source.fileNames
-print "crabFiles", crabFiles
+crabFiles_pfn = copy.deepcopy(PSet.process.source.fileNames)
 
 ###
 ### Convert LFN to PFN
@@ -34,10 +35,10 @@ for i in xrange(0,len(crabFiles)) :
        pfn=os.popen("edmFileUtil -d %s"%(crabFiles[i])).read()
        pfn=re.sub("\n","",pfn)
        print "replaced", crabFiles[i],"->",pfn
-       crabFiles[i]=pfn
+       crabFiles_pfn[i]=pfn
      else:
        print "Data is not local, using AAA/xrootd"
-       crabFiles[i]="root://cms-xrd-global.cern.ch/"+crabFiles[i]
+       crabFiles_pfn[i]="root://cms-xrd-global.cern.ch/"+crabFiles[i]
 print "timeto_convertPFN ",(time.time()-t0)
 
 ###
@@ -48,7 +49,7 @@ cfo = imp.load_source("heppy_config", "heppy_config.py", handle)
 config = cfo.config
 
 #change HLT path to HLT2
-if "reHLT" in crabFiles[0]:
+if "reHLT" in crabFiles_pfn[0]:
     cfo.fix_reHLT(config)
 
 #Setting lumis in file
@@ -58,7 +59,7 @@ handle.close()
 print "timeto_setLumis ",(time.time()-t0)
 
 #replace files with crab ones
-config.components[0].files=crabFiles
+config.components[0].files=crabFiles_pfn
 
 print "heppy_config", config
 from PhysicsTools.HeppyCore.framework.looper import Looper
@@ -141,7 +142,7 @@ def getEventsLumisInFile(infile):
         ret[run] += [lum.aux().id().luminosityBlock()]
     return events.size(), ret
 
-def getFJR(inputfiles, outputfile):
+def getFJR(inputfiles_lfn, inputfiles_pfn, outputfile):
 
     fwkreport="""<FrameworkJobReport>
     <ReadBranches>
@@ -161,8 +162,8 @@ def getFJR(inputfiles, outputfile):
     </GeneratorInfo>
 """
     allruns = {}
-    for infile in inputfiles:
-        events, runs = getEventsLumisInFile(infile)
+    for infile_lfn, infile_pfn in zip(inputfiles_lfn, inputfiles_pfn):
+        events, runs = getEventsLumisInFile(infile_pfn)
         for k, v in runs.items():
             if not allruns.has_key(k):
                 allruns[k] = v
@@ -181,7 +182,7 @@ def getFJR(inputfiles, outputfile):
         <InputSourceClass>PoolSource</InputSourceClass>
         <EventsRead>%d</EventsRead>
         <Runs>
-        """ % (infile, events)
+        """ % (infile_lfn, events)
         for run, lumis in runs.items():
             inf += """<Run ID="%d">
             """ % run
@@ -229,6 +230,6 @@ def getFJR(inputfiles, outputfile):
 #Now write the FWKJobReport
 
 report=open('./FrameworkJobReport.xml', 'w+')
-report.write(getFJR(crabFiles, "tree.root"))
+report.write(getFJR(crabFiles, crabFiles_pfn, "tree.root"))
 report.close()
 print "timeto_totalJob ",(time.time()-t0)
