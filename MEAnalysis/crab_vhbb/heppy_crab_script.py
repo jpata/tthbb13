@@ -180,14 +180,15 @@ def getFJR(inputfiles, outputfile):
         <GUID></GUID>
         <InputSourceClass>PoolSource</InputSourceClass>
         <EventsRead>%d</EventsRead>
-        <Runs>""" % (infile, events)
+        <Runs>
+        """ % (infile, events)
         for run, lumis in runs.items():
             inf += """<Run ID="%d">
             """ % run
             for lumisection in lumis:
                 inf += """<LumiSection ID="%d"/>
                 """ % lumisection
-            fwkreport += """</Run>"""
+            inf += """</Run>"""
         inf += """
         </Runs>
         </InputFile>
@@ -204,7 +205,8 @@ def getFJR(inputfiles, outputfile):
     <PFN>%s</PFN>
     <Catalog></Catalog>
     <ModuleLabel>HEPPY</ModuleLabel>
-    <Runs>""" % (outputfile)
+    <Runs>
+    """ % (outputfile)
     for run, lumis in allruns.items():
         fwkreport += """<Run ID="%d">
         """ % run

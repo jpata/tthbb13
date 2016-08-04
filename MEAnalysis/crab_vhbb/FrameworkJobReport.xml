@@ -1,17 +1,284 @@
 <FrameworkJobReport>
-<ReadBranches>
-</ReadBranches>
-<PerformanceReport>
-  <PerformanceSummary Metric="StorageStatistics">
-    <Metric Name="Parameter-untracked-bool-enabled" Value="true"/>
-    <Metric Name="Parameter-untracked-bool-stats" Value="true"/>
-    <Metric Name="Parameter-untracked-string-cacheHint" Value="application-only"/>
-    <Metric Name="Parameter-untracked-string-readHint" Value="auto-detect"/>
-    <Metric Name="ROOT-tfile-read-totalMegabytes" Value="0"/>
-    <Metric Name="ROOT-tfile-write-totalMegabytes" Value="0"/>
-  </PerformanceSummary>
-</PerformanceReport>
+    <ReadBranches>
+    </ReadBranches>
+    <PerformanceReport>
+      <PerformanceSummary Metric="StorageStatistics">
+        <Metric Name="Parameter-untracked-bool-enabled" Value="true"/>
+        <Metric Name="Parameter-untracked-bool-stats" Value="true"/>
+        <Metric Name="Parameter-untracked-string-cacheHint" Value="application-only"/>
+        <Metric Name="Parameter-untracked-string-readHint" Value="auto-detect"/>
+        <Metric Name="ROOT-tfile-read-totalMegabytes" Value="0"/>
+        <Metric Name="ROOT-tfile-write-totalMegabytes" Value="0"/>
+      </PerformanceSummary>
+    </PerformanceReport>
 
-<GeneratorInfo>
-</GeneratorInfo>
-</FrameworkJobReport>
+    <GeneratorInfo>
+    </GeneratorInfo>
+
+        <InputFile>
+        <LFN>root://cms-xrd-global.cern.ch//store/data/Run2016B/SingleMuon/MINIAOD/PromptReco-v2/000/274/088/00000/F25DEE72-0F25-E611-9083-02163E0143F5.root</LFN>
+        <PFN></PFN>
+        <Catalog></Catalog>
+        <InputType>primaryFiles</InputType>
+        <ModuleLabel>source</ModuleLabel>
+        <GUID></GUID>
+        <InputSourceClass>PoolSource</InputSourceClass>
+        <EventsRead>2366</EventsRead>
+        <Runs>
+        <Run ID="274088">
+            <LumiSection ID="14"/>
+                <LumiSection ID="15"/>
+                <LumiSection ID="16"/>
+                <LumiSection ID="17"/>
+                <LumiSection ID="18"/>
+                <LumiSection ID="19"/>
+                <LumiSection ID="20"/>
+                <LumiSection ID="21"/>
+                <LumiSection ID="22"/>
+                <LumiSection ID="23"/>
+                <LumiSection ID="24"/>
+                <LumiSection ID="25"/>
+                <LumiSection ID="26"/>
+                <LumiSection ID="27"/>
+                <LumiSection ID="28"/>
+                <LumiSection ID="29"/>
+                <LumiSection ID="30"/>
+                <LumiSection ID="31"/>
+                <LumiSection ID="32"/>
+                <LumiSection ID="33"/>
+                <LumiSection ID="34"/>
+                <LumiSection ID="35"/>
+                <LumiSection ID="36"/>
+                <LumiSection ID="37"/>
+                <LumiSection ID="38"/>
+                <LumiSection ID="39"/>
+                <LumiSection ID="40"/>
+                <LumiSection ID="41"/>
+                <LumiSection ID="42"/>
+                <LumiSection ID="43"/>
+                <LumiSection ID="44"/>
+                <LumiSection ID="45"/>
+                <LumiSection ID="46"/>
+                <LumiSection ID="47"/>
+                <LumiSection ID="48"/>
+                <LumiSection ID="49"/>
+                <LumiSection ID="50"/>
+                <LumiSection ID="51"/>
+                <LumiSection ID="52"/>
+                <LumiSection ID="53"/>
+                <LumiSection ID="54"/>
+                <LumiSection ID="55"/>
+                <LumiSection ID="56"/>
+                <LumiSection ID="57"/>
+                <LumiSection ID="58"/>
+                <LumiSection ID="59"/>
+                <LumiSection ID="60"/>
+                <LumiSection ID="61"/>
+                <LumiSection ID="62"/>
+                <LumiSection ID="63"/>
+                <LumiSection ID="64"/>
+                <LumiSection ID="65"/>
+                <LumiSection ID="66"/>
+                <LumiSection ID="67"/>
+                <LumiSection ID="68"/>
+                <LumiSection ID="69"/>
+                <LumiSection ID="70"/>
+                <LumiSection ID="71"/>
+                <LumiSection ID="72"/>
+                <LumiSection ID="73"/>
+                <LumiSection ID="74"/>
+                <LumiSection ID="75"/>
+                <LumiSection ID="76"/>
+                <LumiSection ID="77"/>
+                <LumiSection ID="78"/>
+                <LumiSection ID="79"/>
+                <LumiSection ID="80"/>
+                <LumiSection ID="81"/>
+                <LumiSection ID="82"/>
+                <LumiSection ID="83"/>
+                <LumiSection ID="84"/>
+                <LumiSection ID="85"/>
+                <LumiSection ID="86"/>
+                <LumiSection ID="87"/>
+                <LumiSection ID="88"/>
+                <LumiSection ID="89"/>
+                <LumiSection ID="90"/>
+                <LumiSection ID="91"/>
+                <LumiSection ID="92"/>
+                <LumiSection ID="93"/>
+                <LumiSection ID="94"/>
+                <LumiSection ID="95"/>
+                <LumiSection ID="96"/>
+                <LumiSection ID="97"/>
+                <LumiSection ID="98"/>
+                <LumiSection ID="99"/>
+                <LumiSection ID="100"/>
+                <LumiSection ID="101"/>
+                <LumiSection ID="102"/>
+                <LumiSection ID="103"/>
+                <LumiSection ID="104"/>
+                <LumiSection ID="105"/>
+                <LumiSection ID="106"/>
+                <LumiSection ID="107"/>
+                <LumiSection ID="108"/>
+                <LumiSection ID="109"/>
+                <LumiSection ID="110"/>
+                <LumiSection ID="111"/>
+                <LumiSection ID="112"/>
+                <LumiSection ID="113"/>
+                <LumiSection ID="114"/>
+                <LumiSection ID="115"/>
+                <LumiSection ID="116"/>
+                <LumiSection ID="117"/>
+                <LumiSection ID="118"/>
+                <LumiSection ID="119"/>
+                <LumiSection ID="120"/>
+                <LumiSection ID="121"/>
+                <LumiSection ID="122"/>
+                <LumiSection ID="123"/>
+                <LumiSection ID="124"/>
+                <LumiSection ID="125"/>
+                <LumiSection ID="126"/>
+                <LumiSection ID="127"/>
+                <LumiSection ID="128"/>
+                <LumiSection ID="129"/>
+                <LumiSection ID="130"/>
+                <LumiSection ID="131"/>
+                </Run>
+        </Runs>
+        </InputFile>
+
+    <File>
+    <LFN></LFN>
+    <PFN>tree.root</PFN>
+    <Catalog></Catalog>
+    <ModuleLabel>HEPPY</ModuleLabel>
+    <Runs>
+    <Run ID="274088">
+        <LumiSection ID="14"/>
+            <LumiSection ID="15"/>
+            <LumiSection ID="16"/>
+            <LumiSection ID="17"/>
+            <LumiSection ID="18"/>
+            <LumiSection ID="19"/>
+            <LumiSection ID="20"/>
+            <LumiSection ID="21"/>
+            <LumiSection ID="22"/>
+            <LumiSection ID="23"/>
+            <LumiSection ID="24"/>
+            <LumiSection ID="25"/>
+            <LumiSection ID="26"/>
+            <LumiSection ID="27"/>
+            <LumiSection ID="28"/>
+            <LumiSection ID="29"/>
+            <LumiSection ID="30"/>
+            <LumiSection ID="31"/>
+            <LumiSection ID="32"/>
+            <LumiSection ID="33"/>
+            <LumiSection ID="34"/>
+            <LumiSection ID="35"/>
+            <LumiSection ID="36"/>
+            <LumiSection ID="37"/>
+            <LumiSection ID="38"/>
+            <LumiSection ID="39"/>
+            <LumiSection ID="40"/>
+            <LumiSection ID="41"/>
+            <LumiSection ID="42"/>
+            <LumiSection ID="43"/>
+            <LumiSection ID="44"/>
+            <LumiSection ID="45"/>
+            <LumiSection ID="46"/>
+            <LumiSection ID="47"/>
+            <LumiSection ID="48"/>
+            <LumiSection ID="49"/>
+            <LumiSection ID="50"/>
+            <LumiSection ID="51"/>
+            <LumiSection ID="52"/>
+            <LumiSection ID="53"/>
+            <LumiSection ID="54"/>
+            <LumiSection ID="55"/>
+            <LumiSection ID="56"/>
+            <LumiSection ID="57"/>
+            <LumiSection ID="58"/>
+            <LumiSection ID="59"/>
+            <LumiSection ID="60"/>
+            <LumiSection ID="61"/>
+            <LumiSection ID="62"/>
+            <LumiSection ID="63"/>
+            <LumiSection ID="64"/>
+            <LumiSection ID="65"/>
+            <LumiSection ID="66"/>
+            <LumiSection ID="67"/>
+            <LumiSection ID="68"/>
+            <LumiSection ID="69"/>
+            <LumiSection ID="70"/>
+            <LumiSection ID="71"/>
+            <LumiSection ID="72"/>
+            <LumiSection ID="73"/>
+            <LumiSection ID="74"/>
+            <LumiSection ID="75"/>
+            <LumiSection ID="76"/>
+            <LumiSection ID="77"/>
+            <LumiSection ID="78"/>
+            <LumiSection ID="79"/>
+            <LumiSection ID="80"/>
+            <LumiSection ID="81"/>
+            <LumiSection ID="82"/>
+            <LumiSection ID="83"/>
+            <LumiSection ID="84"/>
+            <LumiSection ID="85"/>
+            <LumiSection ID="86"/>
+            <LumiSection ID="87"/>
+            <LumiSection ID="88"/>
+            <LumiSection ID="89"/>
+            <LumiSection ID="90"/>
+            <LumiSection ID="91"/>
+            <LumiSection ID="92"/>
+            <LumiSection ID="93"/>
+            <LumiSection ID="94"/>
+            <LumiSection ID="95"/>
+            <LumiSection ID="96"/>
+            <LumiSection ID="97"/>
+            <LumiSection ID="98"/>
+            <LumiSection ID="99"/>
+            <LumiSection ID="100"/>
+            <LumiSection ID="101"/>
+            <LumiSection ID="102"/>
+            <LumiSection ID="103"/>
+            <LumiSection ID="104"/>
+            <LumiSection ID="105"/>
+            <LumiSection ID="106"/>
+            <LumiSection ID="107"/>
+            <LumiSection ID="108"/>
+            <LumiSection ID="109"/>
+            <LumiSection ID="110"/>
+            <LumiSection ID="111"/>
+            <LumiSection ID="112"/>
+            <LumiSection ID="113"/>
+            <LumiSection ID="114"/>
+            <LumiSection ID="115"/>
+            <LumiSection ID="116"/>
+            <LumiSection ID="117"/>
+            <LumiSection ID="118"/>
+            <LumiSection ID="119"/>
+            <LumiSection ID="120"/>
+            <LumiSection ID="121"/>
+            <LumiSection ID="122"/>
+            <LumiSection ID="123"/>
+            <LumiSection ID="124"/>
+            <LumiSection ID="125"/>
+            <LumiSection ID="126"/>
+            <LumiSection ID="127"/>
+            <LumiSection ID="128"/>
+            <LumiSection ID="129"/>
+            <LumiSection ID="130"/>
+            <LumiSection ID="131"/>
+        </Run>
+    </Runs>
+    <GUID></GUID>
+    <OutputModuleClass>PoolOutputModule</OutputModuleClass>
+    <TotalEvents>0</TotalEvents>
+    <BranchHash>dc90308e392b2fa1e0eff46acbfa24bc</BranchHash>
+    </File>
+
+    </FrameworkJobReport>
