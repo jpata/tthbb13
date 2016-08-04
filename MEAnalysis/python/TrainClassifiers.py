@@ -48,7 +48,7 @@ default_params = {
     "samples_per_epoch" : None, # later filled from input files
 }
 
-infname = "/mnt/t3nfs01/data01/shome/gregor/tth/gc/mvatuple/v2/out.root"
+infname = "/mnt/t3nfs01/data01/shome/gregor/tth/gc/mvatuple/v3/out.root"
 
 
 

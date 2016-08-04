@@ -148,8 +148,10 @@ def train_scikit(clf):
     X = clf.image_fun(df)
     y = df["tt_class"].values
             
-    weight_dic = df["tt_class"].value_counts().to_dict()
-    weight_dic = {k:float(len(X))/v for k,v in weight_dic.iteritems()}
+    tmp_weight_dic = df["tt_class"].value_counts().to_dict()    
+    weight_dic = {}
+    for k,v in tmp_weight_dic.iteritems():
+        weight_dic[k] = float(len(X))/v 
     weights = np.vectorize(weight_dic.get)(y)
     
     clf.model.fit(X, y, sample_weight=weights)
@@ -336,8 +338,11 @@ def analyze(clf):
 
     # Generate the training weight dictionary 
     # (using weights derived on testing sample would be cheating)            
-    weight_dic = df_train["tt_class"].value_counts().to_dict()
-    weight_dic = {k:float(len(X_train))/v for k,v in weight_dic.iteritems()}
+
+    tmp_weight_dic = df_train["tt_class"].value_counts().to_dict()    
+    weight_dic = {}
+    for k,v in tmp_weight_dic.iteritems():
+        weight_dic[k] = float(len(X_train))/v 
 
     # and apply to both samples
     weights_train = np.vectorize(weight_dic.get)(df_train["tt_class"].values)
