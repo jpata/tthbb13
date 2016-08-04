@@ -4,25 +4,11 @@ import ROOT
 
 import sys, os
 from collections import OrderedDict
-
-# We use rootpy because it has a nice buffer arount TTree,
-# which allows us to not re-read the whole tree every time we access
-# one branch from python using tree.branch.
-# See https://github.com/rootpy/rootpy/blob/master/rootpy/tree/treebuffer.py
-# for more details. In case you use rootpy.io.File instead of TFile,
-# the tree automatically has this buffer.
-#Try loading rootpy (installed via anaconda)
-try:
-    from rootpy.tree.chain import TreeChain
-    from rootpy.vector import LorentzVector
-    import rootpy
-    import rootpy.io
-except Exception as e:
-    print('could not import rootpy, make sure you are using anaconda (via $CMSSW_BASE/src/TTH/setenv_*.sh)', file=sys.stderr)
-    raise e
-
+import logging
+LOG_MODULE_NAME = logging.getLogger(__name__)
+    
 import numpy as np
-from TTH.MEAnalysis.samples_base import getSitePrefix, xsec, samples_nick, xsec_sample, get_prefix_sample
+from TTH.MEAnalysis.samples_base import getSitePrefix, xsec, samples_nick, xsec_sample, get_prefix_sample, PROCESS_MAP
 from TTH.Plotting.Datacards.sparse import save_hdict
 
 #placeholder value
@@ -31,25 +17,10 @@ NA = -999
 #default MEM scale factor in the likelihood ratio
 MEM_SF = 0.1
 
-#Numeric keys for processes, used for filling the process axis
-#in the sparse histogram
-PROCESS_MAP = {
-    "ttH_hbb": 0,
-    "ttH_nonbb": 1,
-    "ttbarPlusBBbar": 2,
-    "ttbarPlus2B": 3,
-    "ttbarPlusB": 4,
-    "ttbarPlusCCbar": 5,
-    "ttbarOther": 6,
-
-#need to keep different data samples separate at this point
-    "data_e": 7,
-    "data_m": 8,
-    "data_mm": 9,
-    "data_ee": 10,
-    "data_em": 11,
-}
-SYSTEMATICS_EVENT = ["JESUp", "JESDown", "JERUp", "JERDown"]
+SYSTEMATICS_EVENT = [
+    "CMS_scale_jUp", "CMS_scale_jDown",
+    "CMS_res_jUp", "CMS_res_jDown"
+]
 
 """
 Create pairs of (systematic_name, weight function), which will be used on the
@@ -61,13 +32,19 @@ ttH/sl/sparse_CMS_ttH_CSVJESUp -> event with btagWeight with JES up variation
 """
 systematic_weights = []
 btag_weights = []
-for syst in ["JES", "LF", "HF", "LFStats1", "LFStats2", "HFStats1", "HFStats2", "cErr1", "cErr2"]:
-    for sdir in ["Up", "Down"]:
-        bweight = "bTagWeight_{0}{1}".format(syst, sdir)
-        systematic_weights += [
-            ("CMS_ttH_CSV{0}{1}".format(syst, sdir), lambda ev, bweight=bweight: ev["weight_nominal"]/ev["bTagWeight"]*ev[bweight])
-        ]
-        btag_weights += [bweight]
+for sdir in ["up", "down"]:
+    for syst in ["cferr1", "cferr2", "hf", "hfstats1", "hfstats2", "jes", "lf", "lfstats1", "lfstats2"]:
+        for tagger in ["CSV"]:
+            bweight = "btagWeight{0}_{1}_{2}".format(tagger, syst, sdir)
+            systematic_weights += [
+                ("CMS_ttH_{0}{1}{2}".format(tagger, syst, sdir), lambda ev, bweight=bweight: ev["weight_nominal"]/ev["btagWeight"+tagger]*ev[bweight])
+            ]
+            btag_weights += [bweight]
+
+systematic_weights += [
+        ("puUp", lambda ev: ev["weight_nominal"]/ev["puWeight"] * ev["puWeightUp"]),
+        ("puDown", lambda ev: ev["weight_nominal"]/ev["puWeight"] * ev["puWeightDown"])
+]
 
 def assign_process_label(process, event):
     """
@@ -181,7 +158,7 @@ Event(
     return r
 
 def lv_p4s(pt, eta, phi, m):
-    ret = LorentzVector()
+    ret = ROOT.TLorentzVector()
     ret.SetPtEtaPhiM(pt, eta, phi, m)
     return ret
 
@@ -207,32 +184,29 @@ desc = Desc([
         nominal=Func("blr_cMVA", func=lambda ev: logit(ev.btag_LR_4b_2b_btagCMVA)),
     ),
 
+    Var(name="leps_pdgId", nominal=Func("leps_pdgId", func=lambda ev: [int(ev.leps_pdgId[i]) for i in range(ev.nleps)])),
+
     Var(name="jets_p4",
         nominal=Func(
             "jets_p4",
-            func=lambda ev: [lv_p4s(pt, eta, phi, m) for (pt, eta, phi, m) in
-            zip(ev.jets_pt[:ev.njets], ev.jets_eta[:ev.njets], ev.jets_phi[:ev.njets], ev.jets_mass[:ev.njets])]
+            func=lambda ev: [lv_p4s(ev.jets_pt[i], ev.jets_eta[i], ev.jets_phi[i], ev.jets_mass[i]) for i in range(ev.njets)]
         ),
         systematics = {
-            "JESUp": Func(
+            "CMS_scale_jUp": Func(
                 "jets_p4_JESUp",
-                func=lambda ev: [lv_p4s(pt*float(cvar)/float(c), eta, phi, m) for (pt, eta, phi, m, cvar, c) in
-                zip(ev.jets_pt[:ev.njets], ev.jets_eta[:ev.njets], ev.jets_phi[:ev.njets], ev.jets_mass[:ev.njets], ev.jets_corr_JESUp[:ev.njets], ev.jets_corr[:ev.njets])]
+                func=lambda ev: [lv_p4s(ev.jets_pt[i]*float(ev.jets_corr_JESUp[i])/float(ev.jets_corr[i]), ev.jets_eta[i], ev.jets_phi[i], ev.jets_mass[i]) for i in range(ev.njets)]
             ),
-            "JESDown": Func(
+            "CMS_scale_jDown": Func(
                 "jets_p4_JESDown",
-                func=lambda ev: [lv_p4s(pt*float(cvar)/float(c), eta, phi, m) for (pt, eta, phi, m, cvar, c) in
-                zip(ev.jets_pt[:ev.njets], ev.jets_eta[:ev.njets], ev.jets_phi[:ev.njets], ev.jets_mass[:ev.njets], ev.jets_corr_JESDown[:ev.njets], ev.jets_corr[:ev.njets])]
+                func=lambda ev: [lv_p4s(ev.jets_pt[i]*float(ev.jets_corr_JESDown[i])/float(ev.jets_corr[i]), ev.jets_eta[i], ev.jets_phi[i], ev.jets_mass[i]) for i in range(ev.njets)]
             ),
-            "JERUp": Func(
+            "CMS_res_jUp": Func(
                 "jets_p4_JERUp",
-                func=lambda ev: [lv_p4s(pt*float(cvar)/float(c) if c>0 else 0.0, eta, phi, m) for (pt, eta, phi, m, cvar, c) in
-                zip(ev.jets_pt[:ev.njets], ev.jets_eta[:ev.njets], ev.jets_phi[:ev.njets], ev.jets_mass[:ev.njets], ev.jets_corr_JERUp[:ev.njets], ev.jets_corr_JER[:ev.njets])]
+                func=lambda ev: [lv_p4s(ev.jets_pt[i]*float(ev.jets_corr_JERUp[i])/float(ev.jets_corr_JER[i]) if ev.jets_corr_JER[i]>0 else 0.0, ev.jets_eta[i], ev.jets_phi[i], ev.jets_mass[i]) for i in range(ev.njets)]
             ),
-            "JERDown": Func(
+            "CMS_res_jDown": Func(
                 "jets_p4_JERDown",
-                func=lambda ev: [lv_p4s(pt*float(cvar)/float(c) if c>0 else 0.0, eta, phi, m) for (pt, eta, phi, m, cvar, c) in
-                zip(ev.jets_pt[:ev.njets], ev.jets_eta[:ev.njets], ev.jets_phi[:ev.njets], ev.jets_mass[:ev.njets], ev.jets_corr_JERDown[:ev.njets], ev.jets_corr_JER[:ev.njets])]
+                func=lambda ev: [lv_p4s(ev.jets_pt[i]*float(ev.jets_corr_JERDown[i])/float(ev.jets_corr_JER[i]) if ev.jets_corr_JER[i]>0 else 0.0, ev.jets_eta[i], ev.jets_phi[i], ev.jets_mass[i]) for i in range(ev.njets)]
             )
         }
     ),
@@ -253,9 +227,13 @@ desc = Desc([
 #MC-only branches
     Var(name="ttCls", schema=["mc"]),
     Var(name="puWeight", schema=["mc"]),
+    Var(name="puWeightUp", schema=["mc"]),
+    Var(name="puWeightDown", schema=["mc"]),
+
     #nominal b-tag weight, systematic weights added later
-    Var(name="bTagWeight", schema=["mc"]),
-] + [Var(name=bw, schema=["mc"]) for bw in btag_weights])
+    Var(name="btagWeightCSV", schema=["mc"]),
+    ] + [Var(name=bw, schema=["mc"]) for bw in btag_weights]
+)
 
 class Axis:
     def __init__(self, name, nbins, lo, hi, func):
@@ -327,6 +305,7 @@ class SparseOut:
 
 axes = [
     Axis("process", 20, 0, 20, lambda ev: ev["process"]),
+    Axis("triggerPath", 20, 0, 20, lambda ev: ev["triggerPath"]),
     Axis("counting", 1, 0, 1, lambda ev: ev["counting"]),
     Axis("parity", 1, 0, 1, lambda ev: ev["evt"]%2==0),
     Axis("mem_SL_2w2h2t_p", 36, 0, 1, lambda ev: ev["mem_SL_2w2h2t_p"]),
@@ -385,9 +364,46 @@ def createOutputs(dirs, systematics):
         outdict_syst[syst] = outdict
     return outdict_syst
 
+def pass_HLT_sl_mu(event):
+    return abs(event["leps_pdgId"][0]) == 13
+
+def pass_HLT_sl_el(event):
+    return abs(event["leps_pdgId"][0]) == 11
+
+def pass_HLT_dl_mumu(event):
+    st = sum(map(abs, event["leps_pdgId"]))
+    return st == 26
+
+def pass_HLT_dl_elmu(event):
+    st = sum(map(abs, event["leps_pdgId"]))
+    return st == 24
+
+def pass_HLT_dl_elel(event):
+    st = sum(map(abs, event["leps_pdgId"]))
+    return st == 22
+
+def triggerPath(event):
+    if event["is_sl"] and pass_HLT_sl_mu(event):
+        return 1
+    elif event["is_sl"] and pass_HLT_sl_el(event):
+        return 2
+    elif event["is_dl"] and pass_HLT_dl_mumu(event):
+        return 3
+    elif event["is_dl"] and pass_HLT_dl_elmu(event):
+        return 4
+    elif event["is_dl"] and pass_HLT_dl_elel(event):
+        return 5
+    return 0
+
 if __name__ == "__main__":
-    file_names = map(getSitePrefix, os.environ["FILE_NAMES"].split())
-    prefix, sample = get_prefix_sample(os.environ["DATASETPATH"])
+    if os.environ.has_key("FILE_NAMES"):
+        file_names = map(getSitePrefix, os.environ["FILE_NAMES"].split())
+        prefix, sample = get_prefix_sample(os.environ["DATASETPATH"])
+    else:
+        file_names = [getSitePrefix("/store/user/jpata/tth/pilot_Jul30_v1/ttHTobb_M125_13TeV_powheg_pythia8/pilot_Jul30_v1/160730_115048/0000/tree_{0}.root".format(i)) for i in range(1, 10)]
+        prefix = ""
+        sample = "ttHTobb_M125_13TeV_powheg_pythia8"
+
     process = samples_nick[sample]
     schema = get_schema(sample)
 
@@ -412,7 +428,7 @@ if __name__ == "__main__":
     nevents = 0
     for file_name in file_names:
         print("opening {0}".format(file_name))
-        tf = rootpy.io.File.Open(file_name)
+        tf = ROOT.TFile.Open(file_name)
         events = tf.Get("tree")
         print("opened {0}".format(events))
         print("looping over {0} events".format(events.GetEntries()))
@@ -420,13 +436,14 @@ if __name__ == "__main__":
         iEv = 0
 
         for event in events:
-
             #apply some basic preselection
             if not (event.is_sl or event.is_dl):
                 continue
             if not event.numJets >= 4:
                 continue
             if not (event.nBCSVM>=3 or event.nBCMVAM>=3):
+                continue
+            if schema == "data" and not event.json:
                 continue
 
             for syst in systematics_event:
@@ -437,10 +454,11 @@ if __name__ == "__main__":
                 ret["counting"] = 0
                 ret["leptonFlavour"] = 0
                 ret["common_bdt"] = 0
+                ret["triggerPath"] = triggerPath(ret)
 
                 ret["weight_nominal"] = 1.0
                 if schema == "mc":
-                    ret["weight_nominal"] *= ret["puWeight"]
+                    ret["weight_nominal"] *= ret["puWeight"] * ret["btagWeightCSV"]
                 
                 #Fill the base histogram
                 for (k, v) in outdict_syst[syst].items():
@@ -467,4 +485,3 @@ if __name__ == "__main__":
     print("writing output")
     outfile.Write()
     outfile.Close()
-

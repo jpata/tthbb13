@@ -21,6 +21,8 @@ class TriggerAnalyzer(FilterAnalyzer):
             triglist = self.conf.trigger["trigTable"]
         else:
             triglist = self.conf.trigger["trigTableData"]
+        triglist = filter(lambda x: "tth" in x[0], triglist.items())
+        triglist = dict(triglist)
 
         for pathname, trigs in triglist.items():
             for name in trigs:

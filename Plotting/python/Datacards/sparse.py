@@ -6,6 +6,16 @@ All tests should be written in test/testDatacards.py
 import ROOT
 
 from collections import OrderedDict
+import logging
+
+LOG_MODULE_NAME = logging.getLogger(__name__)
+
+HAVE_ROOTPY = False
+try:
+    import rootpy
+    HAVE_ROOTPY = True
+except ImportError:
+    LOG_MODULE_NAME.warning("Could not import rootpy, disabling")
 
 def find_axis(h, axname):
     """
@@ -17,12 +27,14 @@ def find_axis(h, axname):
         KeyError if axis is not found
     """
     iaxis = -1
+    axnames = []
     for i in range(h.GetNdimensions()):
+        axnames += [h.GetAxis(i).GetName()]
         if h.GetAxis(i).GetName() == axname:
             iaxis = i
             break
     if iaxis == -1:
-        raise KeyError("No axis {0} found".format(axname))
+        raise KeyError("No axis {0} found: axes={1}".format(axname, axnames))
     return iaxis
 
 def set_range(h, axname, loval, hival):
@@ -38,8 +50,9 @@ def set_range(h, axname, loval, hival):
     """
     iaxis = find_axis(h, axname)
     lobin = h.GetAxis(iaxis).FindBin(loval)
-    hibin = h.GetAxis(iaxis).FindBin(hival)
-    h.GetAxis(iaxis).SetRange(lobin, hibin-1)
+    hibin = h.GetAxis(iaxis).FindBin(hival) - 1
+    LOG_MODULE_NAME.debug("set_range: {0} h.GetAxis({1}).SetRange({2}, {3})".format(axname, iaxis, lobin, hibin))
+    h.GetAxis(iaxis).SetRange(lobin, hibin)
 
 
 def apply_cuts_project(h, cuts, projections):
@@ -49,14 +62,21 @@ def apply_cuts_project(h, cuts, projections):
     cuts (list of 3-tuples): list of cuts in the form of tuples (variable, loval, hival).
     projections (list): list of variables to project out.
     """
-    import rootpy
+    axs = [find_axis(h, project) for project in projections] + ["E"]
+    LOG_MODULE_NAME.debug("apply_cuts_project: h to axes {1} N={0}".format(
+        h.GetEntries(), axs
+    ))
+
     for i in range(h.GetNdimensions()):
-        h.GetAxis(i).SetRange(1, h.GetAxis(i).GetNbins())
+        h.GetAxis(i).SetRange(0, h.GetAxis(i).GetNbins() + 1)
+
     for c in cuts:
         set_range(h, c[0], c[1], c[2])
-    axs = [find_axis(h, project) for project in projections]
     hp = h.Projection(*axs).Clone("__".join(["__".join(map(str, c)) for c in cuts]) + "__" + "__".join(projections))
-    return rootpy.asrootpy(hp)
+    if HAVE_ROOTPY:
+        return rootpy.asrootpy(hp)
+    else:
+        return hp
 
 def mkdirs(fi, path):
     path = path.encode("ascii", "ignore")

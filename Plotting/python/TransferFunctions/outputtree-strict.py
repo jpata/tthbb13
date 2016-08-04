@@ -18,7 +18,7 @@ import datetime
 try: 
     import AccessHelpers as AH
 except:
-    import TTH.TTHNtupleAnalyzer.AccessHelpers as AH
+    import TTH.MEAnalysis.AccessHelpers as AH
 
 
 ########################################

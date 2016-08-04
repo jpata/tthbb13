@@ -14,7 +14,7 @@ dl_categories = [
         common_shape_uncertainties = common_shape_uncertainties,
         common_scale_uncertainties = common_scale_uncertainties,
         scale_uncertainties = scale_uncertainties,
-        discriminator = "mem_DL_0w2h2t",
+        discriminator = "mem_DL_0w2h2t_p",
         src_histogram = "dl/sparse"
     ),
     
@@ -28,7 +28,7 @@ dl_categories = [
         common_shape_uncertainties = common_shape_uncertainties,
         common_scale_uncertainties = common_scale_uncertainties,
         scale_uncertainties = scale_uncertainties,
-        discriminator = "mem_DL_0w2h2t",
+        discriminator = "mem_DL_0w2h2t_p",
         src_histogram = "dl/sparse"
     ),
     
@@ -42,7 +42,7 @@ dl_categories = [
         common_shape_uncertainties = common_shape_uncertainties,
         common_scale_uncertainties = common_scale_uncertainties,
         scale_uncertainties = scale_uncertainties,
-        discriminator = "mem_DL_0w2h2t",
+        discriminator = "mem_DL_0w2h2t_p",
         src_histogram = "dl/sparse"
     ),
     
@@ -56,7 +56,7 @@ dl_categories = [
         common_shape_uncertainties = common_shape_uncertainties,
         common_scale_uncertainties = common_scale_uncertainties,
         scale_uncertainties = scale_uncertainties,
-        discriminator = "mem_DL_0w2h2t",
+        discriminator = "mem_DL_0w2h2t_p",
         src_histogram = "dl/sparse"
     ),
     
@@ -70,7 +70,7 @@ dl_categories = [
         common_shape_uncertainties = common_shape_uncertainties,
         common_scale_uncertainties = common_scale_uncertainties,
         scale_uncertainties = scale_uncertainties,
-        discriminator = "mem_DL_0w2h2t",
+        discriminator = "mem_DL_0w2h2t_p",
         src_histogram = "dl/sparse"
     ),
 ]
