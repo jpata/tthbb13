@@ -6,6 +6,7 @@ import math
 from TTH.MEAnalysis.VHbbTree import *
 
 from TTH.MEAnalysis.SubjetAnalyzer import SubjetAnalyzer
+from TTH.MEAnalysis.MulticlassAnalyzer import MulticlassAnalyzer
 from TTH.MEAnalysis.WTagAnalyzer import WTagAnalyzer
 from TTH.MEAnalysis.GenRadiationModeAnalyzer import GenRadiationModeAnalyzer
 from TTH.MEAnalysis.GenTTHAnalyzer import GenTTHAnalyzer
