@@ -60,11 +60,12 @@ pi_file.close()
 from TTH.MEAnalysis.vhbb_utils import EventAnalyzer
 
 logging.info("creating analyzers")
-
+from TTH.MEAnalysis.VHbbTree import process_event as process_event_mc
 #This analyzer reads branches from event.input (the TTree/TChain) to event.XYZ (XYZ is e.g. jets, leptons etc)
 evs = cfg.Analyzer(
     EventAnalyzer,
     'events',
+    process_event = process_event_mc
 )
 
 #Here we define all the main analyzers
@@ -285,10 +286,11 @@ if __name__ == "__main__":
 
         #Load the data event model
         if not samp.isMC:
-            from TTH.MEAnalysis.VHbbTree_data import EventAnalyzer
+            from TTH.MEAnalysis.VHbbTree_data import process_event as process_event_data
             evs = cfg.Analyzer(
                 EventAnalyzer,
                 'events',
+                process_event = process_event_data
             )
             sequence[2] = evs
 

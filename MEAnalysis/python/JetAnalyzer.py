@@ -45,7 +45,7 @@ class JetAnalyzer(FilterAnalyzer):
 
         self.logger.debug("variateJets: systematic={0} sigma={1}".format(systematic, sigma))
         self.logger.debug("variateJets: jets=[{0}]".format(",".join([repr(j) for j in jets])))
-        newjets = [copy_jet(jet) for jet in jets]
+        newjets = copy.deepcopy(jets)
 
         if self.cfg_comp.isMC and systematic == "JES":
             for i in range(len(jets)):
@@ -118,6 +118,7 @@ class JetAnalyzer(FilterAnalyzer):
 
         for syst, event_syst in evdict.items():
             self.logger.debug("process: processing systematic {0}".format(syst))
+            self.logger.debug("process: jets = " + str(",".join([str(j) for j in event_syst.Jet])))
             res = self._process(event_syst)
             evdict[syst] = res
         event.systResults = evdict

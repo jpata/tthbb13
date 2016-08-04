@@ -193,8 +193,8 @@ class Conf:
         #"systematics": ["nominal"],
         "systematics": [
             "nominal",
-            #"JESUp", "JESDown",
-            #"JERUp", "JERDown"
+            "JESUp", "JESDown",
+            "JERUp", "JERDown"
         ],
         
         

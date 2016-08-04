@@ -9,7 +9,7 @@ class TreeVarAnalyzer(FilterAnalyzer):
     def __init__(self, cfg_ana, cfg_comp, looperName):
         super(TreeVarAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
         self.conf = cfg_ana._conf
-
+    
     def process(self, event):
         setattr( event, 'boosted_bjets', [] )
         setattr( event, 'boosted_ljets', [] )
@@ -25,6 +25,7 @@ class TreeVarAnalyzer(FilterAnalyzer):
         event.genTopHad = getattr(event.systResults["nominal"], "genTopHad", [])
         
         for syst, event_syst in event.systResults.items():
+            self.logger.debug("process: syst={0} branches={1}".format(syst, str(dir(event_syst))))
             event_syst.common_mem = getattr(event_syst, "common_mem", [])
             event_syst.common_bdt = getattr(event_syst, "common_bdt", -1)
             event_syst.fw_h_alljets = getattr(event_syst, "fw_h_alljets", [])
@@ -34,7 +35,7 @@ class TreeVarAnalyzer(FilterAnalyzer):
             #add all variated quantities to event with a suffix
             for k, v in event_syst.__dict__.items():
                 event.__dict__[k + "_" + syst] = v
-        
+
         for br in ["boosted_bjets", "boosted_ljets", "topCandidate", "othertopCandidate", "topCandidatesSync", "higgsCandidate"]:
             if not hasattr(event, br+"_nominal"):
                 setattr(event, br + "_nominal", [])

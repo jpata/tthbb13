@@ -112,18 +112,17 @@ class TreeCache(object):
         self.branch_cache_values = {}
 
 from PhysicsTools.HeppyCore.framework.analyzer import Analyzer
-from TTH.MEAnalysis.VHbbTree import process_event
 class EventAnalyzer(Analyzer):
     
     def __init__(self, cfg_ana, cfg_comp, looperName):
         super(EventAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
         self.cache = None
-    
+        self.process_event = cfg_ana.process_event
     def process(self, event):
         if not self.cache:
             self.cache = TreeCache(event.input)
         self.cache.next_entry(event.iEv)
-        process_event(event, self.cache)
+        self.process_event(event, self.cache)
 
 Jet.__str__ = printJet
 Jet.__repr__ = printJetShort
