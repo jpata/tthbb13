@@ -187,6 +187,7 @@ def getFJR(inputfiles, outputfile):
             for lumisection in lumis:
                 inf += """<LumiSection ID="%d"/>
                 """ % lumisection
+            fwkreport += """</Run>"""
         inf += """
         </Runs>
         </InputFile>
@@ -210,6 +211,8 @@ def getFJR(inputfiles, outputfile):
         for lumisection in lumis:
             fwkreport += """<LumiSection ID="%d"/>
             """ % lumisection
+        fwkreport += """</Run>"""
+
     fwkreport += """
     </Runs>
     <GUID></GUID>
