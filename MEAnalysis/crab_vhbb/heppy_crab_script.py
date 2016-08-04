@@ -60,51 +60,51 @@ print "timeto_setLumis ",(time.time()-t0)
 #replace files with crab ones
 config.components[0].files=crabFiles
 
-# print "heppy_config", config
-# from PhysicsTools.HeppyCore.framework.looper import Looper
-# if hasattr(PSet.process.source, "skipEvents") and PSet.process.source.skipEvents.value()>=0:
-#     nfirst = int(PSet.process.source.skipEvents.value())
-#     nmax = int(PSet.process.maxEvents.input.value())
-#     looper = Looper( 'Output', config, nPrint=0, nEvents=nmax, firstEvent=nfirst)
-# else:
-#     looper = Looper( 'Output', config, nPrint=0)
-# looper.loop()
-# looper.write()
-# print "timeto_doVHbb ",(time.time()-t0)
+print "heppy_config", config
+from PhysicsTools.HeppyCore.framework.looper import Looper
+if hasattr(PSet.process.source, "skipEvents") and PSet.process.source.skipEvents.value()>=0:
+    nfirst = int(PSet.process.source.skipEvents.value())
+    nmax = int(PSet.process.maxEvents.input.value())
+    looper = Looper( 'Output', config, nPrint=0, nEvents=nmax, firstEvent=nfirst)
+else:
+    looper = Looper( 'Output', config, nPrint=0)
+looper.loop()
+looper.write()
+print "timeto_doVHbb ",(time.time()-t0)
 
 ###
 ### tthbb13 code
 ###
-# print "Running tth code"
-# import cPickle as pickle
-# import TTH.MEAnalysis.TFClasses as TFClasses
-# sys.modules["TFClasses"] = TFClasses
-# os.environ["ME_CONF"] = os.environ["CMSSW_BASE"] + "/python/TTH/MEAnalysis/" + me_conf_name
-# handle = open("MEAnalysis_heppy.py", 'r')
-# cfo2 = imp.load_source("heppy_config", "MEAnalysis_heppy.py", handle)
-# config = cfo2.config
-# from TTH.MEAnalysis.MEAnalysis_cfg_heppy import conf_to_str
-# print "MEM config", conf_to_str(cfo2.conf)
-# config.components = [cfg.Component(
-#     "dummy",
-#     files = ["Output/tree.root"],
-#     tree_name = "tree",
-#     n_gen = 1,
-#     xs = 1,
-# )]
-# config.components[0].isMC = cfo.sample.isMC
+print "Running tth code"
+import cPickle as pickle
+import TTH.MEAnalysis.TFClasses as TFClasses
+sys.modules["TFClasses"] = TFClasses
+os.environ["ME_CONF"] = os.environ["CMSSW_BASE"] + "/python/TTH/MEAnalysis/" + me_conf_name
+handle = open("MEAnalysis_heppy.py", 'r')
+cfo2 = imp.load_source("heppy_config", "MEAnalysis_heppy.py", handle)
+config = cfo2.config
+from TTH.MEAnalysis.MEAnalysis_cfg_heppy import conf_to_str
+print "MEM config", conf_to_str(cfo2.conf)
+config.components = [cfg.Component(
+    "dummy",
+    files = ["Output/tree.root"],
+    tree_name = "tree",
+    n_gen = 1,
+    xs = 1,
+)]
+config.components[0].isMC = cfo.sample.isMC
 
-# if not cfo.sample.isMC:
-#     from TTH.MEAnalysis.VHbbTree_data import EventAnalyzer
-#     evs = cfg.Analyzer(
-#         EventAnalyzer,
-#         'events',
-#     )
-#     config.sequence[2] = evs
-# looper = Looper('Output_tth', config, nPrint=0)
-# looper.loop()
-# looper.write()
-# print "timeto_doMEM ",(time.time()-t0)
+if not cfo.sample.isMC:
+    from TTH.MEAnalysis.VHbbTree_data import EventAnalyzer
+    evs = cfg.Analyzer(
+        EventAnalyzer,
+        'events',
+    )
+    config.sequence[2] = evs
+looper = Looper('Output_tth', config, nPrint=0)
+looper.loop()
+looper.write()
+print "timeto_doMEM ",(time.time()-t0)
 
 #Now we need to copy both the vhbb and tth outputs to the same file
 inf1 = ROOT.TFile("Output/tree.root")
