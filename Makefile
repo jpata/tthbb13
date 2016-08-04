@@ -1,6 +1,6 @@
 #sample vhbb+tthbb file
-#testfile_vhbb_tthbb=/store/user/jpata/tth/tth_Jul31_V24_v1/ttHTobb_M125_13TeV_powheg_pythia8/tth_Jul31_V24_v1/160731_130548/0000/tree_1.root
-testfile_vhbb_tthbb=file:///mnt/t3nfs01/data01/shome/jpata/tth/sw/CMSSW/src/TTH/test.root
+testfile_vhbb_tthbb=/store/user/jpata/tth/tth_Jul31_V24_v1/ttHTobb_M125_13TeV_powheg_pythia8/tth_Jul31_V24_v1/160731_130548/0000/tree_1.root
+#testfile_vhbb_tthbb=file:///mnt/t3nfs01/data01/shome/jpata/tth/sw/CMSSW/src/TTH/test.root
 DATASETPATH=Jul15_leptonic_v1__ttHTobb_M125_13TeV_powheg_pythia8
 test_out_dir=$(CMSSW_BASE)/src/TTH/tests_out
 
