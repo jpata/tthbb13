@@ -59,7 +59,7 @@ cat hash
 # Use version from IB until it migrates to the main release
 # Should work as long as both releases have same python version
 # Will need to update this path once in a while
-export IB_BASE=/cvmfs/cms-ib.cern.ch/2016-32/slc6_amd64_gcc530
+export IB_BASE=/cvmfs/cms-ib.cern.ch/week0/slc6_amd64_gcc530
 export PYTHONPATH=$IB_BASE/external/py2-numpy/1.11.1/lib/python2.7/site-packages:$PYTHONPATH
 export PYTHONPATH=$IB_BASE/external/py2-scikit-learn/0.17.1/lib/python2.7/site-packages:$PYTHONPATH
 export PYTHONPATH=$IB_BASE/external/py2-pandas/0.17.1-agcabg/lib/python2.7/site-packages:$PYTHONPATH
@@ -75,17 +75,17 @@ ls /cvmfs/
 echo "ls /cvmfs/cms-ib.cern.ch/"
 ls /cvmfs/cms-ib.cern.ch/
 
-echo "ls /cvmfs/cms-ib.cern.ch/2016-32/"
-ls /cvmfs/cms-ib.cern.ch/2016-32/
+echo "ls /cvmfs/cms-ib.cern.ch/week0/"
+ls /cvmfs/cms-ib.cern.ch/week0/
 
-echo "ls /cvmfs/cms-ib.cern.ch/2016-32/slc6_amd64_gcc530"
-ls /cvmfs/cms-ib.cern.ch/2016-32/slc6_amd64_gcc530
+echo "ls /cvmfs/cms-ib.cern.ch/week0/slc6_amd64_gcc530"
+ls /cvmfs/cms-ib.cern.ch/week0/slc6_amd64_gcc530
 
-echo "ls /cvmfs/cms-ib.cern.ch/2016-32/slc6_amd64_gcc530/external"
-ls /cvmfs/cms-ib.cern.ch/2016-32/slc6_amd64_gcc530/external
+echo "ls /cvmfs/cms-ib.cern.ch/week0/slc6_amd64_gcc530/external"
+ls /cvmfs/cms-ib.cern.ch/week0/slc6_amd64_gcc530/external
 
-echo "ls /cvmfs/cms-ib.cern.ch/2016-32/slc6_amd64_gcc530/external/py2-scikit-learn"
-ls /cvmfs/cms-ib.cern.ch/2016-32/slc6_amd64_gcc530/external/py2-scikit-learn
+echo "ls /cvmfs/cms-ib.cern.ch/week0/slc6_amd64_gcc530/external/py2-scikit-learn"
+ls /cvmfs/cms-ib.cern.ch/week0/slc6_amd64_gcc530/external/py2-scikit-learn
 
 
 python heppy_crab_script.py $@ &> log
