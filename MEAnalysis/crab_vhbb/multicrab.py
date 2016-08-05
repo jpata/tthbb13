@@ -222,8 +222,7 @@ workflow_datasets["pilot"][pilot_name] = D
 
 #1-lumi per job, 10 job testing of a few samples
 workflow_datasets["testing"] = {}
-for k in ["ttHTobb", "TTbar_inc"]:
-          #"SingleMuon-Run2016B-PromptReco-v2"
+for k in ["ttHTobb", "TTbar_inc","SingleMuon-Run2016B-PromptReco-v2"]:
 
     D = deepcopy(datasets[k])
     D["maxlumis"] = 50
@@ -378,7 +377,6 @@ env
     config.Data.allowNonValidInputDataset = True
 
     #config.Site.whitelist = ["T2_CH_CSCS", "T1_US_FNAL", "T2_DE_DESY", "T1_DE_KIT"]
-    config.Site.whitelist = ["T2_US_Wisconsin", "T2_US_Caltech","T2_US_Nebraska"]
     config.Site.storageSite = "T2_CH_CSCS"
 
     #loop over samples
