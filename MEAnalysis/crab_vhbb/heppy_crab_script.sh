@@ -66,7 +66,27 @@ export PYTHONPATH=$IB_BASE/external/py2-pandas/0.17.1-agcabg/lib/python2.7/site-
 export PYTHONPATH=$IB_BASE/external/py2-matplotlib/1.5.2/lib/python2.7/site-packages:$PYTHONPATH
 export PYTHONPATH=$IB_BASE/external/py2-scipy/0.16.1/lib/python2.7/site-packages:$PYTHONPATH
 
+echo "Our NEW PYTHONPATH:"
 echo $PYTHONPATH
+
+echo "ls /cvmfs/"
+ls /cvmfs/
+
+echo "ls /cvmfs/cms-ib.cern.ch/"
+ls /cvmfs/cms-ib.cern.ch/
+
+echo "ls /cvmfs/cms-ib.cern.ch/2016-32/"
+ls /cvmfs/cms-ib.cern.ch/2016-32/
+
+echo "ls /cvmfs/cms-ib.cern.ch/2016-32/slc6_amd64_gcc530"
+ls /cvmfs/cms-ib.cern.ch/2016-32/slc6_amd64_gcc530
+
+echo "ls /cvmfs/cms-ib.cern.ch/2016-32/slc6_amd64_gcc530/external"
+ls /cvmfs/cms-ib.cern.ch/2016-32/slc6_amd64_gcc530/external
+
+echo "ls /cvmfs/cms-ib.cern.ch/2016-32/slc6_amd64_gcc530/external/py2-scikit-learn"
+ls /cvmfs/cms-ib.cern.ch/2016-32/slc6_amd64_gcc530/external/py2-scikit-learn
+
 
 python heppy_crab_script.py $@ &> log
 exitCode=$?
