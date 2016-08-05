@@ -14,6 +14,46 @@ samples_dict = {
             nickname = cms.string("ttHTobb_M125_13TeV_powheg_pythia8"),
             isMC     = cms.bool(True),
             treeName = cms.string("vhbb/tree"),
-            subFiles = cms.vstring(get_files("$CMSSW_BASE/src/TTH/MEAnalysis/gc/datasets/pilot_Jul30_v1/ttHTobb_M125_13TeV_powheg_pythia8.txt")),
+            subFiles = cms.vstring(get_files("$CMSSW_BASE/src/TTH/MEAnalysis/gc/datasets/tth_Jul31_V24_v1_vhbbev/ttHTobb_M125_13TeV_powheg_pythia8.txt")),
+        ),
+     
+        "ttHToNonbb_M125_13TeV_powheg_pythia8": cms.PSet(
+            name     = cms.string("ttHToNonbb_M125_13TeV_powheg_pythia8"),
+            nickname = cms.string("ttHToNonbb_M125_13TeV_powheg_pythia8"),
+            isMC     = cms.bool(True),
+            treeName = cms.string("vhbb/tree"),
+            subFiles = cms.vstring(get_files("$CMSSW_BASE/src/TTH/MEAnalysis/gc/datasets/tth_Jul31_V24_v1_vhbbev/ttHToNonbb_M125_13TeV_powheg_pythia8.txt")),
+        ),
+     
+        "TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": cms.PSet(
+            name     = cms.string("TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"),
+            nickname = cms.string("TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"),
+            isMC     = cms.bool(False),
+            treeName = cms.string("vhbb/tree"),
+            subFiles = cms.vstring(get_files("$CMSSW_BASE/src/TTH/MEAnalysis/gc/datasets/tth_Jul31_V24_v1_vhbbev/TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt")),
+        ),
+     
+        "TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": cms.PSet(
+            name     = cms.string("TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"),
+            nickname = cms.string("TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"),
+            isMC     = cms.bool(False),
+            treeName = cms.string("vhbb/tree"),
+            subFiles = cms.vstring(get_files("$CMSSW_BASE/src/TTH/MEAnalysis/gc/datasets/tth_Jul31_V24_v1_vhbbev/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt")),
+        ),
+     
+        "TTTo2L2Nu_13TeV-powheg": cms.PSet(
+            name     = cms.string("TTTo2L2Nu_13TeV-powheg"),
+            nickname = cms.string("TTTo2L2Nu_13TeV-powheg"),
+            isMC     = cms.bool(True),
+            treeName = cms.string("vhbb/tree"),
+            subFiles = cms.vstring(get_files("$CMSSW_BASE/src/TTH/MEAnalysis/gc/datasets/tth_Jul31_V24_v1_vhbbev/TTTo2L2Nu_13TeV-powheg.txt")),
+        ),
+     
+        "TT_TuneCUETP8M1_13TeV-powheg-pythia8": cms.PSet(
+            name     = cms.string("TT_TuneCUETP8M1_13TeV-powheg-pythia8"),
+            nickname = cms.string("TT_TuneCUETP8M1_13TeV-powheg-pythia8"),
+            isMC     = cms.bool(True),
+            treeName = cms.string("vhbb/tree"),
+            subFiles = cms.vstring(get_files("$CMSSW_BASE/src/TTH/MEAnalysis/gc/datasets/tth_Jul31_V24_v1_vhbbev/TT_TuneCUETP8M1_13TeV-powheg-pythia8.txt")),
         ),
     }
