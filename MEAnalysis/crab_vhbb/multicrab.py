@@ -222,14 +222,15 @@ workflow_datasets["pilot"][pilot_name] = D
 
 #1-lumi per job, 10 job testing of a few samples
 workflow_datasets["testing"] = {}
-for k in ["ttHTobb", "TTbar_inc", "SingleMuon-Run2016B-PromptReco-v2"]:
+#for k in ["ttHTobb", "TTbar_inc", "SingleMuon-Run2016B-PromptReco-v2"]:
+for k in ["SingleMuon-Run2016B-PromptReco-v2"]:
     D = deepcopy(datasets[k])
-    D["maxlumis"] = 50
-    D["perjob"] = 5
+    D["maxlumis"] = 20
+    D["perjob"] = 2
     if "data" in D["script"]:
-        D["maxlumis"] = 250
-        D["perjob"] = 25
-    D["runtime"] = 2
+        D["maxlumis"] = 50
+        D["perjob"] = 5
+    D["runtime_min"] = 60
     D["mem_cfg"] = "cfg_noME.py"
     workflow_datasets["testing"][k] = D
 
@@ -388,9 +389,9 @@ env
             dataset = sel_datasets[sample]["ds"]
             nlumis = sel_datasets[sample]["maxlumis"]
             perjob = sel_datasets[sample]["perjob"]
-            runtime = sel_datasets[sample]["runtime"]
+            runtime_min = sel_datasets[sample].get("runtime_min", sel_datasets[sample]["runtime"]*60)
 
-            config.JobType.maxJobRuntimeMin = runtime * 60
+            config.JobType.maxJobRuntimeMin = runtime_min
             config.General.requestName = sample + "_" + submitname
             config.Data.inputDataset = dataset
             config.Data.unitsPerJob = perjob

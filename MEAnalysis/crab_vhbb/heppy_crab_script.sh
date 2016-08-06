@@ -56,7 +56,8 @@ export ROOT_INCLUDE_PATH=.:./src:$ROOT_INCLUDE_PATH
 echo "tth_hashes"
 cat hash
 
-
+ls $CMSSW_BASE/../
+cat $CMSSW_BASE/../*.json
 python heppy_crab_script.py $@ &> log
 exitCode=$?
 cat log
