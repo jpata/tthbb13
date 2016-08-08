@@ -349,12 +349,8 @@ env
         'heppy_crab_script.py',
         'python.tar.gz',
         'data.tar.gz',
-<<<<<<< HEAD
         "MEAnalysis_heppy.py",
-=======
-        'MEAnalysis_heppy.py',
         'BDT.pickle',
->>>>>>> tmp_head
         vhbb_dir + '/MVAJetTags_620SLHCX_Phase1And2Upgrade.db',
         vhbb_dir + '/combined_cmssw.py',
         vhbb_dir + '/vhbb.py',
