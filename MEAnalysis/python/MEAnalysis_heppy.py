@@ -157,6 +157,12 @@ subjet_analyzer = cfg.Analyzer(
     _conf = conf
 )
 
+multiclass_analyzer = cfg.Analyzer(
+    MECoreAnalyzers.MulticlassAnalyzer,
+    'multiclass',
+    _conf = conf
+)
+
 #Calls the C++ MEM integrator with good_jets, good_leptons and
 #the ME category
 mem_analyzer = cfg.Analyzer(
@@ -216,6 +222,7 @@ sequence = cfg.Sequence([
     genrad,
     gentth,
     subjet_analyzer,
+    multiclass_analyzer,
     commoncls,
     mem_analyzer,
     mva,

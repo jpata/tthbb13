@@ -10,8 +10,9 @@ import random
 
 import ROOT
 
-import TTH.TTHNtupleAnalyzer.AccessHelpers as AH
+import TTH.MEAnalysis.AccessHelpers as AH
 from TTH.MEAnalysis.samples_base import getSitePrefix
+
 
 ########################################
 # Configuration
@@ -44,18 +45,27 @@ for j in range(6):
 # Helper: make_jets
 ########################################
 
-def make_jets(tree):
+def make_jets(source, source_type = "tree"):
 
-    # Loop over truth particles
-    n_jets = tree.njets
+    if source_type == "tree":
+        n_jets = source.njets
 
-    # Get jet branches
-    jet_pt             = tree.jets_pt
-    jet_eta            = tree.jets_eta
-    jet_phi            = tree.jets_phi
-    jet_mass           = tree.jets_mass
-    jet_btagCSV        = tree.jets_btagCSV
+        # Get jet branches
+        jet_pt             = source.jets_pt
+        jet_eta            = source.jets_eta
+        jet_phi            = source.jets_phi
+        jet_mass           = source.jets_mass
+        jet_btagCSV        = source.jets_btagCSV
+    elif source_type == "event":
+        n_jets = len(source.good_jets)
 
+        # Get jet branches
+        jet_pt             = [j.pt for j in source.good_jets]
+        jet_eta            = [j.eta for j in source.good_jets]
+        jet_phi            = [j.phi for j in source.good_jets]
+        jet_mass           = [j.mass for j in source.good_jets]
+        jet_btagCSV        = [j.btagCSV for j in source.good_jets]
+        
     # Build jet objects (TLorentzVector + extra quantities)    
     jets = []
     for ij in range(n_jets):
@@ -74,12 +84,12 @@ def make_jets(tree):
 # Helper: calc_vars
 ########################################
 
-def calc_vars(tree):
+def calc_vars(source, source_type="tree"):
 
     v = {}
 
     # Prepare objects
-    jets = make_jets(tree)
+    jets = make_jets(source, source_type)
 
     # Jet Variables
     for ij in range(6):
@@ -89,33 +99,44 @@ def calc_vars(tree):
         v["j{0}_mass".format(ij)]    = jets[ij].M()
         v["j{0}_btagCSV".format(ij)] = max(jets[ij].btagCSV, 0)
 
+    # When reading from a file
+    if source_type == "tree":
+        # Lepton Variables
+        v["l_pt"]    = source.leps_pt[0]
+        v["l_eta"]   = source.leps_eta[0]
+        v["l_phi"]   = source.leps_phi[0]
+        v["l_pdgid"] = source.leps_pdgId[0]
 
+        # Missing Et     
+        v["met_pt"]   = source.met_pt
+        v["met_phi"]  = source.met_phi
+    # During a ttH/Heppy analyzer module
+    elif source_type == "event":
+        # Lepton Variables
+        v["l_pt"]    = source.good_leptons[0].pt
+        v["l_eta"]   = source.good_leptons[0].eta
+        v["l_phi"]   = source.good_leptons[0].phi
+        v["l_pdgid"] = source.good_leptons[0].pdgId
 
-    # Lepton Variables
-    v["l_pt"]    = tree.leps_pt[0]
-    v["l_eta"]   = tree.leps_eta[0]
-    v["l_phi"]   = tree.leps_phi[0]
-    v["l_pdgid"] = tree.leps_pdgId[0]
-
-    # Missing Et
-    v["met_pt"]   = tree.met_pt
-    v["met_phi"]  = tree.met_phi
+        # Missing Et     
+        v["met_pt"]   = source.MET.pt
+        v["met_phi"]  = source.MET.phi
 
     # ttb
-    if tree.ttCls == 51:
-        tt_class = 1  
+    if source.ttCls == 51:
+        tt_class = 0
     # tt2b
-    elif tree.ttCls == 52:
-        tt_class = 2  
+    elif source.ttCls == 52:
+        tt_class = 1  
     # ttbb
-    elif tree.ttCls == 53 or tree.ttCls == 54 or tree.ttCls == 55 or tree.ttCls==56:
-        tt_class = 3  
+    elif source.ttCls == 53 or source.ttCls == 54 or source.ttCls == 55 or source.ttCls==56:
+        tt_class = 2  
     # ttcc 
-    elif tree.ttCls == 41 or tree.ttCls == 42 or tree.ttCls == 43 or tree.ttCls == 44 or tree.ttCls == 45:
-        tt_class = 4  
+    elif source.ttCls == 41 or source.ttCls == 42 or source.ttCls == 43 or source.ttCls == 44 or source.ttCls == 45:
+        tt_class = 3  
     # ttll
-    elif tree.ttCls == 0 or tree.ttCls<0:
-        tt_class = 0  
+    elif source.ttCls == 0 or source.ttCls<0:
+        tt_class = 4  
     # should not happen
     else:
         print "Error determining tt+jets subsample" 
@@ -167,13 +188,8 @@ if __name__ == "__main__":
         for fi in sys.argv[2:]:
             print "adding", fi
             intree.AddFile(getSitePrefix(fi))
+            #intree.AddFile(fi)
         
-
-
-
-    ## For local testing:
-    #infile = ROOT.TFile(sys.argv[2])
-    #intree = infile.Get('tree')
 
     n_entries = intree.GetEntries()
 
@@ -194,7 +210,11 @@ if __name__ == "__main__":
         # Use 6 jet events
         if not (AH.getter(intree, "numJets") >= 6):
             continue
-            
+
+        # Require at least two medium b-tags
+        if not (AH.getter(intree, "nBCSVM") >= 2):
+            continue
+                    
         # Prepare multiclass - 6 jet ntuple
         if "multiclass_6j" in ntpl.keys():
 

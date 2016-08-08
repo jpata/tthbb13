@@ -222,6 +222,7 @@ workflow_datasets["pilot"][pilot_name] = D
 
 #1-lumi per job, 10 job testing of a few samples
 workflow_datasets["testing"] = {}
+
 for k in ["ttHTobb", "TTbar_inc", "SingleMuon-Run2016B-PromptReco-v2"]:
     D = deepcopy(datasets[k])
     D["maxlumis"] = 50
@@ -348,7 +349,12 @@ env
         'heppy_crab_script.py',
         'python.tar.gz',
         'data.tar.gz',
+<<<<<<< HEAD
         "MEAnalysis_heppy.py",
+=======
+        'MEAnalysis_heppy.py',
+        'BDT.pickle',
+>>>>>>> tmp_head
         vhbb_dir + '/MVAJetTags_620SLHCX_Phase1And2Upgrade.db',
         vhbb_dir + '/combined_cmssw.py',
         vhbb_dir + '/vhbb.py',

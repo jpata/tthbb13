@@ -22,12 +22,11 @@ brs = ["l_pt", "l_eta", "l_phi", "l_pdgid",
 ]
 
 # Variables to feed to BDT
-input_vars = [
-    "l_pt", "l_eta", 
-    "j0_pt", "j0_eta",  "j0_mass", "j0_btagCSV", 
-    "j1_pt", "j1_eta",  "j1_mass", "j1_btagCSV", 
-    "j2_pt", "j2_eta",  "j2_mass", "j2_btagCSV", 
-    "j3_pt", "j3_eta",  "j3_mass", "j3_btagCSV", 
+input_vars = [    
+    "j0_eta",  "j0_mass", "j0_btagCSV", 
+    "j1_eta",  "j1_mass", "j1_btagCSV", 
+    "j2_eta",  "j2_mass", "j2_btagCSV", 
+    "j3_eta",  "j3_mass", "j3_btagCSV", 
     "j4_pt", "j4_eta",  "j4_mass", "j4_btagCSV", 
     "j5_pt", "j5_eta",  "j5_mass", "j5_btagCSV"
 ]
@@ -39,18 +38,17 @@ default_params = {
 
     "n_chunks"          : 1,
 
-    "n_estimators"   : 140,
-    "max_depth"      : 2, 
-    "learning_rate"  : 0.1,    
+    "n_estimators"   : 160,
+    #"max_depth"      : 2, 
+    "max_leaf_nodes" : 3,
+    "learning_rate"  : 0.05,    
     "subsample"      : 0.5,     
     "verbose"        : 2,    
 
     "samples_per_epoch" : None, # later filled from input files
 }
 
-colors = ['black', 'red','blue','green','orange','green','magenta']
-
-infname = "/mnt/t3nfs01/data01/shome/gregor/tth/gc/mvatuple/v1/out.root"
+infname = "/mnt/t3nfs01/data01/shome/gregor/tth/gc/mvatuple/v3/out.root"
 
 
 
@@ -128,7 +126,7 @@ def model(params):
 
     classif =GradientBoostingClassifier(
         n_estimators  = params["n_estimators"],   
-        max_depth     = params["max_depth"],      
+        max_leaf_nodes = params["max_leaf_nodes"],      
         learning_rate = params["learning_rate"],  
         subsample     = params["subsample"],      
         verbose       = params["verbose"],        
@@ -148,11 +146,11 @@ classifiers = [
                model(params),
                image_fun = to_image,               
                class_names = {
-                   0: "ttll",
-                   1: "ttb", 
-                   2: "tt2b",
-                   3: "ttbb",
-                   4: "ttcc",
+                   0: "ttb", 
+                   1: "tt2b",
+                   2: "ttbb",
+                   3: "ttcc",
+                   4: "ttll",
                },
                input_vars = input_vars
                )    
@@ -166,7 +164,7 @@ classifiers = [
 ########################################
 
 [clf.prepare() for clf in classifiers]
-#[analyze(clf) for clf in classifiers]
+[analyze(clf) for clf in classifiers]
 
 
  
