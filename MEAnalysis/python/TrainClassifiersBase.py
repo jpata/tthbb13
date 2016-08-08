@@ -63,7 +63,7 @@ from sklearn.preprocessing import normalize
 from sklearn.svm import LinearSVC
 from sklearn.preprocessing import StandardScaler  
 from sklearn.svm import SVC
-
+from sklearn.metrics import log_loss
 
 print "Imported sklearn"
 
@@ -148,8 +148,10 @@ def train_scikit(clf):
     X = clf.image_fun(df)
     y = df["tt_class"].values
             
-    weight_dic = df["tt_class"].value_counts().to_dict()
-    weight_dic = {k:float(len(X))/v for k,v in weight_dic.iteritems()}
+    tmp_weight_dic = df["tt_class"].value_counts().to_dict()    
+    weight_dic = {}
+    for k,v in tmp_weight_dic.iteritems():
+        weight_dic[k] = float(len(X))/v 
     weights = np.vectorize(weight_dic.get)(y)
     
     clf.model.fit(X, y, sample_weight=weights)
@@ -320,15 +322,27 @@ def analyze(clf):
     print "Eval test"
     X_test = clf.image_fun(df_test)
     df_test["output"] = clf.model.predict(X_test)
+    
+    for ic in clf.classes:
+        df_test["proba_{0}".format(ic)] = 0
+    df_test[["proba_{0}".format(ic) for ic in clf.classes]] = clf.model.predict_proba(X_test)
 
     print "Eval train"
     X_train = clf.image_fun(df_train)
     df_train["output"] = clf.model.predict(X_train)
 
+    for ic in clf.classes:
+        df_train["proba_{0}".format(ic)] = 0
+    df_train[["proba_{0}".format(ic) for ic in clf.classes]] = clf.model.predict_proba(X_train)
+
+
     # Generate the training weight dictionary 
     # (using weights derived on testing sample would be cheating)            
-    weight_dic = df_train["tt_class"].value_counts().to_dict()
-    weight_dic = {k:float(len(X_train))/v for k,v in weight_dic.iteritems()}
+
+    tmp_weight_dic = df_train["tt_class"].value_counts().to_dict()    
+    weight_dic = {}
+    for k,v in tmp_weight_dic.iteritems():
+        weight_dic[k] = float(len(X_train))/v 
 
     # and apply to both samples
     weights_train = np.vectorize(weight_dic.get)(df_train["tt_class"].values)
@@ -346,7 +360,10 @@ def analyze(clf):
     min_val, max_val, diff = 0., float(len(clf.classes)), 1.
 
     #imshow portion
-    ax.imshow(matrix, interpolation='nearest')
+    ax.imshow(matrix, 
+              interpolation='nearest',
+              cmap=plt.get_cmap("summer")
+    )
 
     print matrix
 
@@ -383,28 +400,81 @@ def analyze(clf):
         print "{0: <15}: {1:.4f}".format(f[0],f[1])
 
 
-    plt.clf()
+    # Plot different reco probaility distribtuons for each true class
+    for true_class in clf.classes:
 
-    pdb.set_trace()
+        plt.clf()
 
-#    # Loss function/time    
+        min_prob = min([min( df_test.loc[ df_test["tt_class"] == true_class, "proba_{0}".format(reco_class) ]) for reco_class in clf.classes])
+        max_prob = max([max( df_test.loc[ df_test["tt_class"] == true_class, "proba_{0}".format(reco_class) ]) for reco_class in clf.classes])
+
+        colors = ['black', 'red','blue','green','orange','green','magenta']
+
+        for reco_class in clf.classes:
+            
+            # Test Sample
+            prob = df_test.loc[ df_test["tt_class"] == true_class, "proba_{0}".format(reco_class) ]            
+            plt.hist(prob, 
+                     label="{0} proba (Test)".format(clf.class_names[reco_class]), 
+                     bins=np.linspace(min_prob,max_prob,60), 
+                     histtype = 'step',
+                     ls="-",
+                     color = colors[reco_class],
+                     normed=True)
+
+            # Train Sample
+            prob = df_train.loc[ df_train["tt_class"] == true_class, "proba_{0}".format(reco_class) ]            
+            plt.hist(prob, 
+                     label="{0} proba (Train)".format(clf.class_names[reco_class]), 
+                     bins=np.linspace(min_prob,max_prob,60), 
+                     histtype = 'step',
+                     ls=':', 
+                     color = colors[reco_class],
+                     normed=True)
+
+
+
+        plt.title("True {0} Events".format(clf.class_names[true_class]))
+        plt.xlabel("Probability", fontsize=16)
+        plt.ylabel("Events", fontsize=16)        
+        plt.legend(loc=1)
+        plt.xlim(min_prob,max_prob)
+        plt.show()
+        plt.savefig("{0}_probas.png".format(clf.class_names[true_class]))
+
+    
+    # Loss function/time    
+    
 #    print "Calculating test scores for all iterations. Samples:", len(X_test)
 #    predictor_test  = clf.model.staged_predict(X_test)	
-#    test_scores  = [clf.model.score(X_test ,predictor_test.next(), weights_test)   for _ in range(clf.params["n_estimators"])]
+#    predictor_test_proba  = clf.model.staged_predict_proba(X_test)	
+#
+#    test_scores  = [log_loss(df_test["tt_class"], 
+#                             predictor_test_proba.next(), 
+#                             normalize = True,
+#                             sample_weight=weights_test) for _ in range(clf.params["n_estimators"])]
 #
 #    print "Calculating train scores for all iterations. Samples:", len(X_train)
 #    predictor_train  = clf.model.staged_predict(X_train)	
-#    train_scores  = [clf.model.score(X_train ,predictor_train.next(), weights_train)   for _ in range(clf.params["n_estimators"])]
+#    predictor_train_proba  = clf.model.staged_predict_proba(X_train)	
+#    train_scores  = [log_loss(df_train["tt_class"], 
+#                              predictor_train_proba.next(), 
+#                              normalize = True,
+#                              sample_weight=weights_train) for _ in range(clf.params["n_estimators"])]
 #
-#    print "Train:", train_scores
-#    print "Test:",  test_scores
+#    print "Last Train:", train_scores[-1]
+#    print "Last Test:",  test_scores[-1]
+#
+#    plt.clf()
 #
 #    plt.plot(train_scores, label="Train", color = 'blue')
 #    plt.plot(test_scores, label="Test", color = 'red')
 #
-#    plt.xlabel('Iterations')
-#    plt.ylabel('Score')
+#    plt.title('Cross Entropy', fontsize=16)
+#    plt.xlabel('Iterations', fontsize=16)
+#    plt.ylabel('Score', fontsize=16)
 #    plt.grid(False)
+#    plt.legend(loc=0)
 #    plt.show()
 #    plt.savefig("score.png")
 

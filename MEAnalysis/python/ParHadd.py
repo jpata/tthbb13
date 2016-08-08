@@ -17,7 +17,7 @@ import ROOT
 import subprocess
 import os
 
-from TTH.TTHNtupleAnalyzer.Helpers import chunks
+from TTH.MEAnalysis.Helpers import chunks
 
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 

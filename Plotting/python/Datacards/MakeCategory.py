@@ -1,5 +1,7 @@
 import json, copy, os, imp, multiprocessing, sys
 import sparse, ROOT
+import logging
+from utils import fakeData
 
 #Nota bene: this is very important!
 #need to store histograms in memory, not on disk
@@ -67,32 +69,39 @@ def apply_rules(args):
 
     infile, rules = args
     infile_tf = ROOT.TFile.Open(infile)
+    if not infile_tf:
+        raise FileError("Could not open file: {0}".format(infile))
     hdict = {}
+
     for rule in rules:
         
         #convert the string of the cut list into the actual list
         cuts = eval(rule["cuts"])
         hk = rule["output"]
-        h = infile_tf.Get(str(rule["input"]))
-        
-        #in case the input histogram could not be found, keep track that we have
-        #to use a dummy to get the correct binning
-        dummy = False
+        inp = str(rule["input"])
+        logging.debug("apply_rules: histogram {0} => {1} with cut {2}".format(inp, hk, cuts))
+        h = infile_tf.Get(inp)
 
         #in case no histogram could be found, use a dummy histogram so that we
         #have at least the correct binning
-        if h == None:
-            h = infile_tf.Get(str("ttHTobb_M125_13TeV_powheg_pythia8/ttH_hbb/sl/sparse"))
-            if not h:
-                raise Exception("Could not get histogram")
+        dummy = False
+        if not h:
             dummy = True
+            logging.warning("Could not get histogram {0}, using fallback".format(inp))
+            h = infile_tf.Get(str("ttHTobb_M125_13TeV_powheg_pythia8/sl/sparse"))
+            if not h:
+                raise Exception("Could not get fallback histogram {0}".format("ttHTobb_M125_13TeV_powheg_pythia8/sl/sparse"))
             cuts = []
+
         variables = eval(rule["project"])
         vnames = [v[0] for v in variables]
         ret = sparse.apply_cuts_project(h, cuts, vnames)
 
+        logging.debug("{2} = {0} {1}".format(ret.GetEntries(), ret.Integral(), hk))
+
         #dummy histogram needs to be made empty
         if dummy:
+            logging.debug("{2} = {0} {1}".format(ret.GetEntries(), ret.Integral(), hk))
             ret.Scale(0)
             ret.SetEntries(0)
 
@@ -101,6 +110,7 @@ def apply_rules(args):
         #1D rebin
         if len(variables) == 1:
             ret.Rebin(variables[0][1])
+
         #2D rebin
         elif len(variables) == 2:
             ret.Rebin2D(variables[0][1], variables[0][2])
@@ -142,9 +152,8 @@ def apply_rules_parallel(infile, rules, ncores=1):
 
 
 if __name__ == "__main__":
-
+    logging.basicConfig(level=logging.INFO)
     # Process one analysis/category name and write output to current working directory
-    
     if not len(sys.argv)==5:
         print "Invalid number of arguments. Usage:"
         print "{0} sparse.root AnalysisSpecification.py SL_7cat sl_j4_t3".format(sys.argv[0])
@@ -209,7 +218,6 @@ if __name__ == "__main__":
     #add the fake data
     if analysis.do_fake_data:
         print "adding fake data"
-        from utils import fakeData
         for cat in categories:
             hfile = category_files[cat.name]
             tf = ROOT.TFile(hfile, "UPDATE")
@@ -226,7 +234,7 @@ if __name__ == "__main__":
             stathist_names = makeStatVariations(tf, tf, [cat])
             tf.Close()
             
-            #add the statistical uncertainties to the datacard specificatio
+            #add the statistical uncertainties to the datacard specification
             for proc in cat.processes:
                 for syst in stathist_names[cat.name][proc]:
                     cat.shape_uncertainties[proc][syst] = 1.0

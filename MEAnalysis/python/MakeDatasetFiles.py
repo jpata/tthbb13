@@ -35,6 +35,7 @@ parser.add_argument('--version', action="store", help="DAS pattern to search, al
 parser.add_argument('--datasetfile', action="store", help="Input file with datasets")
 parser.add_argument('--instance', action="store", help="DBS instance", default="prod/phys03")
 parser.add_argument('--limit', action="store", help="max files per dataset", default=0)
+parser.add_argument('--debug', action="store", help="debug mode", default=False)
 args = parser.parse_args()
 
 version = args.version
@@ -51,14 +52,17 @@ if not os.path.exists(outdir):
 
 #no specified input dataset list
 if not args.datasetfile:
-    #sleep so as to not overload the DAS server
-    time.sleep(60)
-    datasets_json = subprocess.Popen([
-                                    das_client, 
-                                    "--format=json",
-                                    "--limit=0",
-                                    '--query=dataset dataset=/*/*{0}*/USER instance={1}'.format(version, args.instance)], 
-                                    stdout=subprocess.PIPE).stdout.read()
+    cmds = [ 
+        das_client, 
+        "--format=json",
+        "--limit=0",
+        '--query=dataset dataset=/*/*{0}*/USER instance={1}'.format(version, args.instance)
+    ]
+    if args.debug:
+        print " ".join(cmds)
+    datasets_json = subprocess.Popen(cmds, stdout=subprocess.PIPE).stdout.read()
+    if args.debug:
+        print datasets_json
     
     datasets_di = json.loads(datasets_json)
     datasets = [
@@ -114,23 +118,34 @@ for ds in datasets:
     ).stdout.read()
     
     files_di = json.loads(files_json)
-    print "Got {0} files".format(len(files_di['data']))
-
-    for f in  files_di['data']:
+    
+    try:
+        print "Got {0} files".format(len(files_di['data']))
+    except Exception as e:
+        print "Could not parse 'data' in output json"
+        print files_di
+        raise e
+    for ifile, fi in enumerate(files_di['data']):
+        name = None
         try:
-            name = f["file"][0]["name"]
+            name = fi["file"][0]["name"]
         except Exception as e:
-            print "Could not parse file name", f
+            print "Could not parse file name", fi
             name = None
         
         if name:
             try:
-                nevents = f["file"][0]["nevents"]
+                nevents = fi["file"][0]["nevents"]
             except Exception as e:
-                print "Could not parse nevents"
+                print "Could not parse nevents", fi["file"][0]
                 nevents = 0
+            if fi.has_key("run"):
+                for (run, lumi) in zip(fi["run"], fi["lumi"]):
+                    print run, lumi
             ofile.write("{0} = {1}\n".format(name, nevents))
     ofile.close()
+    #sleep so as to not overload the DAS server
+    time.sleep(60)
 
     
 

@@ -1,18 +1,23 @@
 class Sample:
+    """
+    Defines how an input sample should be mapped to an output histogram.
+    Optionally 
+    """
     def __init__(self, **kwargs):
         self.input_name = kwargs.get("input_name")
         self.output_name = kwargs.get("output_name")
         self.cuts = kwargs.get("cuts", [])
         self.xs_weight = kwargs.get("xs_weight", 1.0)
 
-    def __repr__(self):
-        s = "Sample: maps {0}->{1} with cuts=[{2}], xsw={3}".format(
-            self.input_name,
-            self.output_name,
-            ",".join(map(str, self.cuts)),
-            self.xs_weight
-        )
-        return s
+    # 
+    # def __repr__(self):
+    #     s = "Sample: maps {0}->{1} with cuts=[{2}], xsw={3}".format(
+    #         self.input_name,
+    #         self.output_name,
+    #         ",".join(map(str, self.cuts)),
+    #         self.xs_weight
+    #     )
+    #     return s
 
 class Category:
     def __init__(self, **kwargs):
@@ -55,6 +60,7 @@ class Category:
         for k, v in self.proc_scale_uncertainties.items():
             self.scale_uncertainties[k].update(v)
 
+    
     def __repr__(self):
         s = "Category: {0} ({1}) discr={2} cuts={3} do_limit={4}".format(
             self.name,
@@ -71,11 +77,16 @@ class Analysis:
         self.categories = kwargs.get("categories")
         self.sparse_input_file = kwargs.get("sparse_input_file")
 
-        #groups represent calls to combine
-        self.groups = kwargs.get("groups")
+        # groups represent calls to combine, i.e. 
+        # {"myCombination1": ["cat1", "cat2"] }
+        # will calculate the combined limit myCombination1 of cat1 and cat2 
+        self.groups = kwargs.get("groups", {})
         self.do_fake_data = kwargs.get("do_fake_data", False)
         self.do_stat_variations = kwargs.get("do_stat_variations", False)
 
+    def to_JSON(self):
+        return json.dumps(self.__dict__, indent=2)
+    
     def __repr__(self):
         s = "Analysis:\n"
         s += "  input file: {0}\n".format(self.sparse_input_file)
