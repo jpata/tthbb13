@@ -7,6 +7,7 @@ import subprocess
 
 from CombineHelper import LimitGetter
 
+from EnvForCombine import PATH, LD_LIBRARY_PATH, PYTHONPATH
 
 print "MakeLimits.py called from cwd={0}".format(os.getcwd())
 ########################################
@@ -66,9 +67,17 @@ for analysis_name, analysis in analyses.iteritems():
         # Get all the per-category datacards and use combineCards to merge into one "group datacard"
         input_dcard_names = ["shapes_{0}.txt".format(c.full_name) for c in group]
         add_dcard_command = ["combineCards.py"] + input_dcard_names 
+
+        print "Command:", add_dcard_command 
         process = subprocess.Popen(add_dcard_command, 
                                    stdout=subprocess.PIPE, 
-                                   cwd=inout_dir)        
+                                   cwd=inout_dir,
+                                   env=dict(os.environ, 
+                                            PATH=PATH,
+                                            LD_LIBRARY_PATH = LD_LIBRARY_PATH,
+                                            PYTHONPATH=PYTHONPATH
+                                        ))
+
         group_dcard = process.communicate()[0]
 
         # Write the group datacard to a file

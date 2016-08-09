@@ -14,6 +14,8 @@ import subprocess
 import ROOT
 import numpy as np
 
+from EnvForCombine import PATH, LD_LIBRARY_PATH, PYTHONPATH, GENREFLEX, ROOTSYS, ROOT_INCLUDE_PATH
+
 def get_limits(fn):
     """
     Returns a length 6 vector with the expected limits and quantiles based on the
@@ -65,7 +67,15 @@ class LimitGetter(object):
         
         process = subprocess.Popen(combine_command,
                                    stdout=subprocess.PIPE,
-                                   cwd=datacard_path)
+                                   cwd=datacard_path,
+                                   env=dict(os.environ, 
+                                            PATH=PATH,
+                                            LD_LIBRARY_PATH = LD_LIBRARY_PATH,
+                                            PYTHONPATH=PYTHONPATH,
+                                            ROOT_INCLUDE_PATH = ROOT_INCLUDE_PATH,
+                                            ROOTSYS = ROOTSYS,
+                                            GENREFLEX = GENREFLEX
+                                        ))
         
         output = process.communicate()[0]
         
