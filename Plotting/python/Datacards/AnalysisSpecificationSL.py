@@ -26,7 +26,7 @@ blr_cuts = {
     "dl_jge4_tge4": -20,
 }
 
-input_file = "/mnt/t3nfs01/data01/shome/jpata/tth/sw/CMSSW/src/TTH/MEAnalysis/gc/Sparse.root"
+input_file = "/mnt/t3nfs01/data01/shome/gregor/tth/gc/sparse/GCd70d6c450ccf/sparse.root"
 
 #https://github.com/vhbb/cmssw/issues/493#issuecomment-233123300
 #however, actual lumi may be a bit smaller, as not 100% of the data was processed successfully 
@@ -199,7 +199,7 @@ sl_categories = [
         common_shape_uncertainties = common_shape_uncertainties,
         common_scale_uncertainties = common_scale_uncertainties,
         scale_uncertainties = scale_uncertainties,
-        discriminator = "mem_SL_2w2h2t_p",
+        discriminator = "btag_LR_4b_2b_btagCMVA_logit",
         src_histogram = "sl/sparse"
     ),
     
@@ -213,7 +213,7 @@ sl_categories = [
         common_shape_uncertainties = common_shape_uncertainties,
         common_scale_uncertainties = common_scale_uncertainties,
         scale_uncertainties = scale_uncertainties,
-        discriminator = "mem_SL_2w2h2t_p",
+        discriminator = "btag_LR_4b_2b_btagCMVA_logit",
         rebin=1,
         src_histogram = "sl/sparse"
     ),
@@ -227,7 +227,7 @@ sl_categories = [
         common_shape_uncertainties = common_shape_uncertainties,
         common_scale_uncertainties = common_scale_uncertainties,
         scale_uncertainties = scale_uncertainties,
-        discriminator = "mem_SL_2w2h2t_p",
+        discriminator = "btag_LR_4b_2b_btagCMVA_logit",
         rebin=1,
         src_histogram = "sl/sparse"
     ),
@@ -242,7 +242,7 @@ sl_categories = [
         common_shape_uncertainties = common_shape_uncertainties,
         common_scale_uncertainties = common_scale_uncertainties,
         scale_uncertainties = scale_uncertainties,
-        discriminator = "mem_SL_2w2h2t_p",
+        discriminator = "btag_LR_4b_2b_btagCMVA_logit",
         rebin=1,
         src_histogram = "sl/sparse"
     ),
@@ -272,7 +272,7 @@ sl_categories = [
         common_shape_uncertainties = common_shape_uncertainties,
         common_scale_uncertainties = common_scale_uncertainties,
         scale_uncertainties = scale_uncertainties,
-        discriminator = "mem_SL_1w2h2t_p",
+        discriminator = "btag_LR_4b_2b_btagCMVA_logit",
         src_histogram = "sl/sparse"
     ),
     
@@ -286,7 +286,7 @@ sl_categories = [
         common_shape_uncertainties = common_shape_uncertainties,
         common_scale_uncertainties = common_scale_uncertainties,
         scale_uncertainties = scale_uncertainties,
-        discriminator = "mem_SL_1w2h2t_p",
+        discriminator = "btag_LR_4b_2b_btagCMVA_logit",
         rebin=1,
         src_histogram = "sl/sparse"
     ),
@@ -299,7 +299,7 @@ sl_categories = [
         common_shape_uncertainties = common_shape_uncertainties,
         common_scale_uncertainties = common_scale_uncertainties,
         scale_uncertainties = scale_uncertainties,
-        discriminator = "mem_SL_1w2h2t_p",
+        discriminator = "btag_LR_4b_2b_btagCMVA_logit",
         rebin=1,
         src_histogram = "sl/sparse"
     ),
@@ -329,7 +329,7 @@ sl_categories = [
         common_shape_uncertainties = common_shape_uncertainties,
         common_scale_uncertainties = common_scale_uncertainties,
         scale_uncertainties = scale_uncertainties,
-        discriminator = "mem_SL_0w2h2t_p",
+        discriminator = "btag_LR_4b_2b_btagCMVA_logit",
         src_histogram = "sl/sparse"
     ),
     
@@ -343,7 +343,7 @@ sl_categories = [
         common_shape_uncertainties = common_shape_uncertainties,
         common_scale_uncertainties = common_scale_uncertainties,
         scale_uncertainties = scale_uncertainties,
-        discriminator = "mem_SL_0w2h2t_p",
+        discriminator = "btag_LR_4b_2b_btagCMVA_logit",
         rebin=1,
         src_histogram = "sl/sparse"
     ),
@@ -357,7 +357,7 @@ sl_categories = [
         common_shape_uncertainties = common_shape_uncertainties,
         common_scale_uncertainties = common_scale_uncertainties,
         scale_uncertainties = scale_uncertainties,
-        discriminator = "mem_SL_0w2h2t_p",
+        discriminator = "btag_LR_4b_2b_btagCMVA_logit",
         rebin=1,
         src_histogram = "sl/sparse"
     ),
@@ -441,6 +441,6 @@ for cat in sl_categories:
 # Dictionary of all analyses we consider
 analyses = {
     "SL_7cat" : analysis,
-    "SL_ttjets_split" : analysis_ttjets_split,
+    #"SL_ttjets_split" : analysis_ttjets_split,
     #"SL_7cat_bdt" : analysis_bdt
 }
