@@ -46,15 +46,6 @@ xsec[("ww", "13TeV")] = 118.7
 xsec[("wz", "13TeV")] = 47.13
 xsec[("zz", "13TeV")] = 16.523
 
-ngen = {
-    'TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': 9468936.0,
-    'TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': 11947951.0,
-    'TTTo2L2Nu_13TeV-powheg': 104607104.0,
-    'TT_TuneCUETP8M1_13TeV-powheg-pythia8': 88506656.0,
-    'ttHToNonbb_M125_13TeV_powheg_pythia8': 2756598.0,
-    'ttHTobb_M125_13TeV_powheg_pythia8': 3912212.0,
-}
-
 samples_nick = {
     'ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1': "stop_s",
     'ST_t-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1': "stop_t",
@@ -110,6 +101,14 @@ PROCESS_MAP = {
     "data_mm": 9,
     "data_ee": 10,
     "data_em": 11,
+}
+
+TRIGGERPATH_MAP = {
+    "m": 1,
+    "e": 2,
+    "mm": 3,
+    "em": 4,
+    "ee": 5,
 }
 
 xsec_sample = {

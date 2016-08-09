@@ -1,12 +1,11 @@
-import pdb
 import os
 
-class Sample:
+class Sample(object):
     """
     Defines how an input sample should be mapped to an output histogram.
     Optionally 
     """
-    def __init__(self, **kwargs):
+    def __init__(self, *args, **kwargs):
         self.input_name = kwargs.get("input_name")
         self.output_name = kwargs.get("output_name")
         self.cuts = kwargs.get("cuts", [])
@@ -22,6 +21,11 @@ class Sample:
     #     )
     #     return s
 
+class DataSample(Sample):
+    def __init__(self, *args, **kwargs):
+        super(DataSample, self).__init__(self, *args, **kwargs)
+        self.lumi = kwargs.get("lumi", 1.0)
+
 class Category:
     def __init__(self, **kwargs):
         self.name = kwargs.get("name")
@@ -36,6 +40,8 @@ class Category:
         self.cuts = kwargs.get("cuts", [])
         self.samples = kwargs.get("samples", [])
         self.data_samples = kwargs.get("data_samples", [])
+        self.lumi = sum([d.lumi for d in self.data_samples])
+
         self.signal_processes = kwargs.get("signal_processes", [])
         self.processes = list(set([s.output_name for s in self.samples]))
 
@@ -111,20 +117,18 @@ def make_csv_categories_abstract(di):
     with open('analysis_specs.csv', 'w') as csvfile:
         csvwriter = csv.writer(csvfile, delimiter=';')    
 
-        csvwriter.writerow(['specfile', 'analysis', 'category', 'sparsefile'])
+        csvwriter.writerow(['specfile', 'analysis', 'category'])
     
         # We want the analysis specification file
-        # as make_csv is called from there we just take the filename of the outer stack    
+        # as make_csv is called from there we just take the filename of the outer stack
         import inspect
-    
-        analysis_spec_file = inspect.getouterframes(inspect.currentframe())[1][1]
-        analysis_spec_file =  os.path.dirname(os.path.abspath(analysis_spec_file)) + "/" + analysis_spec_file
+        analysis_spec_file = os.path.abspath(inspect.getouterframes(inspect.currentframe())[1][1])
 
         for analysis_name, analysis in di.iteritems():        
 
             unique_cat_names = list(set(c.name for c in analysis.categories))
             for cat_name in unique_cat_names:
-                csvwriter.writerow([analysis_spec_file, analysis_name, cat_name, analysis.sparse_input_file])
+                csvwriter.writerow([analysis_spec_file, analysis_name, cat_name])
 
     return [1]
 
@@ -139,8 +143,7 @@ def make_csv_groups_abstract(di):
         # We want the analysis specification file
         # as make_csv is called from there we just take the filename of the outer stack    
         import inspect
-        analysis_spec_file = inspect.getouterframes(inspect.currentframe())[1][1]
-        analysis_spec_file =  os.path.dirname(os.path.abspath(analysis_spec_file)) + "/" + analysis_spec_file
+        analysis_spec_file = os.path.abspath(inspect.getouterframes(inspect.currentframe())[1][1])
 
         for analysis_name, analysis in di.iteritems():        
             for group_name in analysis.groups.keys():
