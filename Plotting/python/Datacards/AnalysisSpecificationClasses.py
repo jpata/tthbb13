@@ -1,3 +1,6 @@
+import pdb
+import os
+
 class Sample:
     """
     Defines how an input sample should be mapped to an output histogram.
@@ -113,7 +116,9 @@ def make_csv_categories_abstract(di):
         # We want the analysis specification file
         # as make_csv is called from there we just take the filename of the outer stack    
         import inspect
+    
         analysis_spec_file = inspect.getouterframes(inspect.currentframe())[1][1]
+        analysis_spec_file =  os.path.dirname(os.path.abspath(analysis_spec_file)) + "/" + analysis_spec_file
 
         for analysis_name, analysis in di.iteritems():        
 
@@ -135,6 +140,7 @@ def make_csv_groups_abstract(di):
         # as make_csv is called from there we just take the filename of the outer stack    
         import inspect
         analysis_spec_file = inspect.getouterframes(inspect.currentframe())[1][1]
+        analysis_spec_file =  os.path.dirname(os.path.abspath(analysis_spec_file)) + "/" + analysis_spec_file
 
         for analysis_name, analysis in di.iteritems():        
             for group_name in analysis.groups.keys():
