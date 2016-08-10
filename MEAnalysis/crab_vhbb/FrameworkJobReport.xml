@@ -1,17 +1,52 @@
 <FrameworkJobReport>
-<ReadBranches>
-</ReadBranches>
-<PerformanceReport>
-  <PerformanceSummary Metric="StorageStatistics">
-    <Metric Name="Parameter-untracked-bool-enabled" Value="true"/>
-    <Metric Name="Parameter-untracked-bool-stats" Value="true"/>
-    <Metric Name="Parameter-untracked-string-cacheHint" Value="application-only"/>
-    <Metric Name="Parameter-untracked-string-readHint" Value="auto-detect"/>
-    <Metric Name="ROOT-tfile-read-totalMegabytes" Value="0"/>
-    <Metric Name="ROOT-tfile-write-totalMegabytes" Value="0"/>
-  </PerformanceSummary>
-</PerformanceReport>
+    <ReadBranches>
+    </ReadBranches>
+    <PerformanceReport>
+      <PerformanceSummary Metric="StorageStatistics">
+        <Metric Name="Parameter-untracked-bool-enabled" Value="true"/>
+        <Metric Name="Parameter-untracked-bool-stats" Value="true"/>
+        <Metric Name="Parameter-untracked-string-cacheHint" Value="application-only"/>
+        <Metric Name="Parameter-untracked-string-readHint" Value="auto-detect"/>
+        <Metric Name="ROOT-tfile-read-totalMegabytes" Value="0"/>
+        <Metric Name="ROOT-tfile-write-totalMegabytes" Value="0"/>
+      </PerformanceSummary>
+    </PerformanceReport>
+    
+    <GeneratorInfo>
+    </GeneratorInfo>
 
-<GeneratorInfo>
-</GeneratorInfo>
-</FrameworkJobReport>
+        <InputFile>
+        <LFN>root://cms-xrd-global.cern.ch//store/mc/RunIISpring16MiniAODv2/ttHTobb_M125_13TeV_powheg_pythia8/MINIAODSIM/PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1/40000/9C1A9584-A439-E611-AD48-0090FAA573B0.root</LFN>
+        <PFN></PFN>
+        <Catalog></Catalog>
+        <InputType>primaryFiles</InputType>
+        <ModuleLabel>source</ModuleLabel>
+        <GUID></GUID>
+        <InputSourceClass>PoolSource</InputSourceClass>
+        <EventsRead>5200</EventsRead>
+        <Runs>
+        <Run ID="1">
+            <LumiSection ID="5002"/>
+                <LumiSection ID="5024"/>
+                </Run>
+        </Runs>
+        </InputFile>
+        
+    <File>
+    <LFN></LFN>
+    <PFN>tree.root</PFN>
+    <Catalog></Catalog>
+    <ModuleLabel>HEPPY</ModuleLabel>
+    <Runs>
+    <Run ID="1">
+        <LumiSection ID="5002"/>
+            <LumiSection ID="5024"/>
+            </Run>
+    </Runs>
+    <GUID></GUID>
+    <OutputModuleClass>PoolOutputModule</OutputModuleClass>
+    <TotalEvents>399</TotalEvents>
+    <BranchHash>dc90308e392b2fa1e0eff46acbfa24bc</BranchHash>
+    </File>
+    
+    </FrameworkJobReport>
