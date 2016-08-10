@@ -87,7 +87,6 @@ ls /cvmfs/cms-ib.cern.ch/week0/slc6_amd64_gcc530/external
 echo "ls /cvmfs/cms-ib.cern.ch/week0/slc6_amd64_gcc530/external/py2-scikit-learn"
 ls /cvmfs/cms-ib.cern.ch/week0/slc6_amd64_gcc530/external/py2-scikit-learn
 
-
 python heppy_crab_script.py $@ &> log
 exitCode=$?
 cat log
