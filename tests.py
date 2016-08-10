@@ -6,6 +6,7 @@ import subprocess
 import copy, os
 import unittest
 import logging
+import ROOT
 
 class MEAnalysisTestCase(unittest.TestCase):
     def test_MEAnalysis(self):
@@ -70,7 +71,6 @@ class MakeCategoryTestCase(unittest.TestCase):
         outfile = "{0}.root".format(catname)
         self.assertTrue(os.path.isfile(outfile))
         
-        import ROOT
         fi = ROOT.TFile(outfile)
         self.assertFalse(fi == None)
 

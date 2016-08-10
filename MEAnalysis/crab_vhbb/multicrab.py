@@ -186,8 +186,7 @@ for k in ["ttHTobb", "ttHToNonbb", "TTbar_inc", "TTbar_sl1", "TTbar_sl2", "TTbar
     workflow_datasets["leptonic"][k] = D
 
 workflow_datasets["leptonic_nome"] = {}
-#for k in ["ttHTobb", "ttHToNonbb", "TTbar_inc", "TTbar_sl1", "TTbar_sl2", "TTbar_dl"] + datanames:
-for k in datanames:
+for k in ["ttHTobb", "ttHToNonbb", "TTbar_inc", "TTbar_sl1", "TTbar_sl2", "TTbar_dl"] + datanames:
     D = deepcopy(datasets[k])
     D["perjob"] = 100
     if "data" in D["script"]:
