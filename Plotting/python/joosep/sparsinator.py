@@ -105,6 +105,7 @@ class Var:
 
         #in case function not defined, just use variable name
         self.nominal_func = kwargs.get("nominal", Func(self.name))
+        self.funcs_schema = kwargs.get("funcs_schema", {})
 
         self.systematics_funcs = kwargs.get("systematics", {})
         #in case this variable is just a pre-calculated branch on the tree (e.g. numJets),
@@ -116,9 +117,9 @@ class Var:
 
         self.schema = kwargs.get("schema", ["mc", "data"])
 
-    def getValue(self, event, systematic="nominal"):
+    def getValue(self, event, schema, systematic="nominal"):
         if systematic == "nominal" or not self.systematics_funcs.has_key(systematic):
-            return self.nominal_func(event)
+            return self.funcs_schema.get(schema, self.nominal_func)(event)
         else:
             return self.systematics_funcs[systematic](event)
 
@@ -127,11 +128,11 @@ class Desc:
         self.variables = variables
         self.variables_dict = OrderedDict([(v.name, v) for v in self.variables])
 
-    def getValue(self, event, systematic="nominal", schema="mc"):
+    def getValue(self, event, schema="mc", systematic="nominal"):
         ret = OrderedDict()
         for vname, v in self.variables_dict.items():
             if schema in v.schema:
-                ret[vname] = v.getValue(event, systematic)
+                ret[vname] = v.getValue(event, schema, systematic)
         return ret
 
 def event_as_str(ret):
@@ -226,11 +227,11 @@ desc = Desc([
         nominal=Func("mem_p_DL_0w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_DL_0w2h2t_p/(ev.mem_tth_DL_0w2h2t_p + sf*ev.mem_ttbb_DL_0w2h2t_p) if ev.mem_tth_DL_0w2h2t_p>0 else 0.0),
     ),
     
-    Var(name="HLT2_HLT_ttH_DL_mumu"),
-    Var(name="HLT2_HLT_ttH_DL_elel"),
-    Var(name="HLT2_HLT_ttH_DL_elmu"),
-    Var(name="HLT2_HLT_ttH_SL_el"),
-    Var(name="HLT2_HLT_ttH_SL_mu"),
+    Var(name="HLT_ttH_DL_mumu", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_DL_mumu}),
+    Var(name="HLT_ttH_DL_elel", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_DL_elel}),
+    Var(name="HLT_ttH_DL_elmu", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_DL_elmu}),
+    Var(name="HLT_ttH_SL_el", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_SL_el}),
+    Var(name="HLT_ttH_SL_mu", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_SL_mu}),
 
 #MC-only branches
     Var(name="ttCls", schema=["mc"]),
@@ -375,35 +376,25 @@ def createOutputs(dirs, systematics):
     return outdict_syst
 
 def pass_HLT_sl_mu(event):
-    pass_hlt = True
-    if event["schema"] == "data":
-        pass_hlt = event["HLT2_ttH_sl_mu"]
+    pass_hlt = event["HLT_ttH_SL_mu"]
     return pass_hlt and abs(event["leps_pdgId"][0]) == 13
 
 def pass_HLT_sl_el(event):
-    pass_hlt = True
-    if event["schema"] == "data":
-        pass_hlt = event["HLT2_ttH_sl_el"]
+    pass_hlt = event["HLT_ttH_SL_el"]
     return pass_hlt and abs(event["leps_pdgId"][0]) == 11
 
 def pass_HLT_dl_mumu(event):
-    pass_hlt = True
-    if event["schema"] == "data":
-        pass_hlt = event["HLT2_ttH_dl_mumu"]
+    pass_hlt = event["HLT_ttH_DL_mumu"]
     st = sum(map(abs, event["leps_pdgId"]))
     return pass_hlt and st == 26
 
 def pass_HLT_dl_elmu(event):
-    pass_hlt = True
-    if event["schema"] == "data":
-        pass_hlt = event["HLT2_ttH_dl_elmu"]
+    pass_hlt = event["HLT_ttH_DL_elmu"]
     st = sum(map(abs, event["leps_pdgId"]))
     return pass_hlt and st == 24
 
 def pass_HLT_dl_elel(event):
-    pass_hlt = True
-    if event["schema"] == "data":
-        pass_hlt = event["HLT2_ttH_dl_elel"]
+    pass_hlt = event["HLT_ttH_DL_elel"]
     st = sum(map(abs, event["leps_pdgId"]))
     return pass_hlt and st == 22
 
@@ -472,8 +463,7 @@ if __name__ == "__main__":
                 continue
 
             for syst in systematics_event:
-                ret = desc.getValue(event, syst, schema)
-                ret["schema"] = schema
+                ret = desc.getValue(event, schema, syst)
                 proc_label = assign_process_label(process, ret)
                 ret["process"] = PROCESS_MAP[proc_label]
                 ret["syst"] = syst
