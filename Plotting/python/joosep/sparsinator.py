@@ -225,6 +225,12 @@ desc = Desc([
     Var(name="mem_DL_0w2h2t_p",
         nominal=Func("mem_p_DL_0w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_DL_0w2h2t_p/(ev.mem_tth_DL_0w2h2t_p + sf*ev.mem_ttbb_DL_0w2h2t_p) if ev.mem_tth_DL_0w2h2t_p>0 else 0.0),
     ),
+    
+    Var(name="HLT2_HLT_ttH_DL_mumu"),
+    Var(name="HLT2_HLT_ttH_DL_elel"),
+    Var(name="HLT2_HLT_ttH_DL_elmu"),
+    Var(name="HLT2_HLT_ttH_SL_el"),
+    Var(name="HLT2_HLT_ttH_SL_mu"),
 
 #MC-only branches
     Var(name="ttCls", schema=["mc"]),
@@ -369,22 +375,37 @@ def createOutputs(dirs, systematics):
     return outdict_syst
 
 def pass_HLT_sl_mu(event):
-    return abs(event["leps_pdgId"][0]) == 13
+    pass_hlt = True
+    if event["schema"] == "data":
+        pass_hlt = event["HLT2_ttH_sl_mu"]
+    return pass_hlt and abs(event["leps_pdgId"][0]) == 13
 
 def pass_HLT_sl_el(event):
-    return abs(event["leps_pdgId"][0]) == 11
+    pass_hlt = True
+    if event["schema"] == "data":
+        pass_hlt = event["HLT2_ttH_sl_el"]
+    return pass_hlt and abs(event["leps_pdgId"][0]) == 11
 
 def pass_HLT_dl_mumu(event):
+    pass_hlt = True
+    if event["schema"] == "data":
+        pass_hlt = event["HLT2_ttH_dl_mumu"]
     st = sum(map(abs, event["leps_pdgId"]))
-    return st == 26
+    return pass_hlt and st == 26
 
 def pass_HLT_dl_elmu(event):
+    pass_hlt = True
+    if event["schema"] == "data":
+        pass_hlt = event["HLT2_ttH_dl_elmu"]
     st = sum(map(abs, event["leps_pdgId"]))
-    return st == 24
+    return pass_hlt and st == 24
 
 def pass_HLT_dl_elel(event):
+    pass_hlt = True
+    if event["schema"] == "data":
+        pass_hlt = event["HLT2_ttH_dl_elel"]
     st = sum(map(abs, event["leps_pdgId"]))
-    return st == 22
+    return pass_hlt and st == 22
 
 def triggerPath(event):
     if event["is_sl"] and pass_HLT_sl_mu(event):
@@ -404,7 +425,7 @@ if __name__ == "__main__":
         file_names = map(getSitePrefix, os.environ["FILE_NAMES"].split())
         prefix, sample = get_prefix_sample(os.environ["DATASETPATH"])
     else:
-        file_names = [getSitePrefix("/store/user/jpata/tth/pilot_Jul30_v1/ttHTobb_M125_13TeV_powheg_pythia8/pilot_Jul30_v1/160730_115048/0000/tree_{0}.root".format(i)) for i in range(1, 10)]
+        file_names = [getSitePrefix("/store/user/jpata/tth/tth_Jul31_V24_v1/ttHTobb_M125_13TeV_powheg_pythia8/tth_Jul31_V24_v1/160731_130548/0000/tree_{0}.root".format(i)) for i in range(1, 10)]
         prefix = ""
         sample = "ttHTobb_M125_13TeV_powheg_pythia8"
 
@@ -452,6 +473,7 @@ if __name__ == "__main__":
 
             for syst in systematics_event:
                 ret = desc.getValue(event, syst, schema)
+                ret["schema"] = schema
                 proc_label = assign_process_label(process, ret)
                 ret["process"] = PROCESS_MAP[proc_label]
                 ret["syst"] = syst
