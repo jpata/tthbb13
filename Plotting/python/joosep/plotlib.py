@@ -1,6 +1,9 @@
-from cleanPath import fixPythonPath
-import sys
-sys.path = fixPythonPath(sys.path)
+import os
+
+if os.environ.has_key("CMSSW_BASE"):
+    from cleanPath import fixPythonPath
+    import sys
+    sys.path = fixPythonPath(sys.path)
 
 import ROOT
 ROOT.gROOT.SetBatch(True)
@@ -11,7 +14,6 @@ import matplotlib
 import matplotlib.pyplot as plt
 
 import numpy as np
-import os
 
 import rootpy
 import rootpy.io
@@ -107,29 +109,29 @@ samplelist_d = dict(samplelist)
 
 #list of all variable names, suitable for latex
 varnames = {
-    "jet0_pt": r"leading jet $p_T$ [GeV]",
-    "jet1_pt": r"subleading jet $p_T$ [GeV]",
+    "jetsByPt_0_pt": r"leading jet $p_T$ [GeV]",
+    "jetsByPt_1_pt": r"subleading jet $p_T$ [GeV]",
 
-    "jet0_btagCSV": r"leading jet $b_{\mathrm{CSV}}$",
-    "jet1_btagCSV": r"subleading jet $b_{\mathrm{CSV}}$",
+    # "jet0_btagCSV": r"leading jet $b_{\mathrm{CSV}}$",
+    # "jet1_btagCSV": r"subleading jet $b_{\mathrm{CSV}}$",
 
-    "jet0_btagBDT": r"leading jet $b_{\mathrm{cMVAv2}}$",
-    "jet1_btagBDT": r"subleading jet $b_{\mathrm{cMVAv2}}$",
+    # "jet0_btagBDT": r"leading jet $b_{\mathrm{cMVAv2}}$",
+    # "jet1_btagBDT": r"subleading jet $b_{\mathrm{cMVAv2}}$",
 
-    "jet0_eta": r"leading jet $\eta$",
-    "jet1_eta": r"subleading jet $\eta$",
+    # "jet0_eta": r"leading jet $\eta$",
+    # "jet1_eta": r"subleading jet $\eta$",
 
-    "jet0_aeta": r"leading jet $|\eta|$",
-    "jet1_aeta": r"subleading jet $|\eta|$",
+    # "jet0_aeta": r"leading jet $|\eta|$",
+    # "jet1_aeta": r"subleading jet $|\eta|$",
 
-    "lep0_pt": r"leading lepton $p_T$ [GeV]",
-    "lep1_pt": r"subleading jet $p_T$ [GeV]",
+    # "lep0_pt": r"leading lepton $p_T$ [GeV]",
+    # "lep1_pt": r"subleading jet $p_T$ [GeV]",
 
-    "lep0_eta": r"leading lepton $|\eta|$ [GeV]",
-    "lep1_eta": r"subleading jet $|\eta|$ [GeV]",
+    # "lep0_eta": r"leading lepton $|\eta|$ [GeV]",
+    # "lep1_eta": r"subleading jet $|\eta|$ [GeV]",
 
-    "njets": r"$N_{\mathrm{jets}}$",
-    "ntags": r"$N_{\mathrm{CSVM}}$",
+    "numJets": r"$N_{\mathrm{jets}}$",
+    "numJets": r"$N_{\mathrm{CSVM}}$",
 
     "btag_LR_4b_2b_logit": r"$\log{[\mathcal{F} / (1 - \mathcal{F})]}$",
     "nfatjets": r"$N_{\mathcal{fatjets}}$",
@@ -165,8 +167,8 @@ varnames = {
 
 #the units for variables
 varunits = {
-    "jet0_pt": "GeV",
-    "jet1_pt": "GeV",
+    "jetsByPt_0_pt": "GeV",
+    "jetsByPt_1_pt": "GeV",
     "topCandidate_pt": "GeV",
     "topCandidate_mass": "GeV",
     "higgsCandidate_pt": "GeV",
@@ -438,9 +440,10 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
         data.rebin(rebin)
         if blindFunc:
             data = blindFunc(data)
-        data.title = "data ({0:.2f})".format(data.Integral())
         if show_overflow:
             fill_overflow(data)
+        data.title = "data ({0:.2f})".format(data.Integral())
+        
         #set data error to 0 in case no data (FIXME) 
         for ibin in range(data.GetNbinsX()):
             if data.GetBinContent(ibin) == 0:

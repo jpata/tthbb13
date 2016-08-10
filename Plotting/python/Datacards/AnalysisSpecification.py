@@ -9,12 +9,12 @@ from TTH.Plotting.Datacards.AnalysisSpecificationDL import analyses as analyses_
 
 analyses = dict((k, v) for d in [analyses_SL, analyses_DL] for k, v in d.items())
 
-print "Printing all analyses"
-for k, v in analyses.items():
-    print k
-    print v
-
 if __name__ == "__main__":
+    print "Printing all analyses"
+    for k, v in analyses.items():
+        print k
+        print v
+    
     #write out all categories that we want to create
     make_csv_categories_abstract(analyses)
 

@@ -189,9 +189,9 @@ workflow_datasets["leptonic_nome"] = {}
 #for k in ["ttHTobb", "ttHToNonbb", "TTbar_inc", "TTbar_sl1", "TTbar_sl2", "TTbar_dl"] + datanames:
 for k in datanames:
     D = deepcopy(datasets[k])
-    D["perjob"] = 200
+    D["perjob"] = 100
     if "data" in D["script"]:
-        D["perjob"] = 100
+        D["perjob"] = 50
 
     D["mem_cfg"] = "cfg_noME.py"
     workflow_datasets["leptonic_nome"][k] = D

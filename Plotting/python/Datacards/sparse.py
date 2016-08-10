@@ -62,7 +62,7 @@ def apply_cuts_project(h, cuts, projections):
     cuts (list of 3-tuples): list of cuts in the form of tuples (variable, loval, hival).
     projections (list): list of variables to project out.
     """
-    axs = [find_axis(h, project) for project in projections] + ["E"]
+    axs = [find_axis(h, project) for project in projections] + ["E GOFF"]
     LOG_MODULE_NAME.debug("apply_cuts_project: h to axes {1} N={0}".format(
         h.GetEntries(), axs
     ))
@@ -72,11 +72,11 @@ def apply_cuts_project(h, cuts, projections):
 
     for c in cuts:
         set_range(h, c[0], c[1], c[2])
-    hp = h.Projection(*axs).Clone("__".join(["__".join(map(str, c)) for c in cuts]) + "__" + "__".join(projections))
-    if HAVE_ROOTPY:
-        return rootpy.asrootpy(hp)
-    else:
-        return hp
+
+    hp = h.Projection(*axs)
+    hp.SetDirectory(0)
+    hp.SetName("__".join(["__".join(map(str, c)) for c in cuts]) + "__" + "__".join(projections))
+    return hp
 
 def mkdirs(fi, path):
     path = path.encode("ascii", "ignore")

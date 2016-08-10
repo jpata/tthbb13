@@ -8,7 +8,7 @@ import logging
 LOG_MODULE_NAME = logging.getLogger(__name__)
     
 import numpy as np
-from TTH.MEAnalysis.samples_base import getSitePrefix, xsec, samples_nick, xsec_sample, get_prefix_sample, PROCESS_MAP
+from TTH.MEAnalysis.samples_base import getSitePrefix, xsec, samples_nick, xsec_sample, get_prefix_sample, PROCESS_MAP, TRIGGERPATH_MAP
 from TTH.Plotting.Datacards.sparse import save_hdict
 
 #placeholder value
@@ -34,10 +34,12 @@ systematic_weights = []
 btag_weights = []
 for sdir in ["up", "down"]:
     for syst in ["cferr1", "cferr2", "hf", "hfstats1", "hfstats2", "jes", "lf", "lfstats1", "lfstats2"]:
-        for tagger in ["CSV"]:
+        for tagger in ["CSV", "CMVAV2"]:
             bweight = "btagWeight{0}_{1}_{2}".format(tagger, syst, sdir)
+            #make systematic outputs consistent in Up/Down naming
+            sdir_cap = sdir.capitalize()
             systematic_weights += [
-                ("CMS_ttH_{0}{1}{2}".format(tagger, syst, sdir), lambda ev, bweight=bweight: ev["weight_nominal"]/ev["btagWeight"+tagger]*ev[bweight])
+                ("CMS_ttH_{0}{1}{2}".format(tagger, syst, sdir_cap), lambda ev, bweight=bweight: ev["weight_nominal"]/ev["btagWeight"+tagger]*ev[bweight])
             ]
             btag_weights += [bweight]
 
@@ -229,9 +231,11 @@ desc = Desc([
     Var(name="puWeight", schema=["mc"]),
     Var(name="puWeightUp", schema=["mc"]),
     Var(name="puWeightDown", schema=["mc"]),
+    Var(name="triggerEmulationWeight", schema=["mc"]),
 
     #nominal b-tag weight, systematic weights added later
     Var(name="btagWeightCSV", schema=["mc"]),
+    Var(name="btagWeightCMVAV2", schema=["mc"]),
     ] + [Var(name=bw, schema=["mc"]) for bw in btag_weights]
 )
 
@@ -384,15 +388,15 @@ def pass_HLT_dl_elel(event):
 
 def triggerPath(event):
     if event["is_sl"] and pass_HLT_sl_mu(event):
-        return 1
+        return TRIGGERPATH_MAP["m"]
     elif event["is_sl"] and pass_HLT_sl_el(event):
-        return 2
+        return TRIGGERPATH_MAP["e"]
     elif event["is_dl"] and pass_HLT_dl_mumu(event):
-        return 3
+        return TRIGGERPATH_MAP["mm"]
     elif event["is_dl"] and pass_HLT_dl_elmu(event):
-        return 4
+        return TRIGGERPATH_MAP["em"]
     elif event["is_dl"] and pass_HLT_dl_elel(event):
-        return 5
+        return TRIGGERPATH_MAP["ee"]
     return 0
 
 if __name__ == "__main__":
@@ -439,9 +443,9 @@ if __name__ == "__main__":
             #apply some basic preselection
             if not (event.is_sl or event.is_dl):
                 continue
-            if not event.numJets >= 4:
+            if not event.numJets >= 3:
                 continue
-            if not (event.nBCSVM>=3 or event.nBCMVAM>=3):
+            if not (event.nBCSVM>=2 or event.nBCMVAM>=2):
                 continue
             if schema == "data" and not event.json:
                 continue
@@ -458,7 +462,7 @@ if __name__ == "__main__":
 
                 ret["weight_nominal"] = 1.0
                 if schema == "mc":
-                    ret["weight_nominal"] *= ret["puWeight"] * ret["btagWeightCSV"]
+                    ret["weight_nominal"] *= ret["puWeight"] * ret["btagWeightCSV"] * ret["triggerEmulationWeight"]
                 
                 #Fill the base histogram
                 for (k, v) in outdict_syst[syst].items():

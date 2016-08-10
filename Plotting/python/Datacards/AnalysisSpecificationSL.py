@@ -1,36 +1,16 @@
 from TTH.MEAnalysis.samples_base import xsec
-from TTH.Plotting.Datacards.AnalysisSpecificationClasses import Sample, Category, Analysis, make_csv_categories_abstract, make_csv_groups_abstract
-from TTH.Plotting.joosep.sparsinator import PROCESS_MAP
+from TTH.Plotting.Datacards.AnalysisSpecificationClasses import Sample, DataSample, Category, Analysis, make_csv_categories_abstract, make_csv_groups_abstract
+from TTH.Plotting.joosep.sparsinator import PROCESS_MAP, TRIGGERPATH_MAP
 from TTH.MEAnalysis import samples_base
+from TTH.MEAnalysis.inputs import sparse_data
 
 import copy
 from copy import deepcopy
 
-blr_cuts = {
-    "sl_j4_t2": 20,
-    "sl_j4_t3": 1.1,
-    "sl_j4_tge4": -20,
-    
-    "sl_j5_t2": 20,
-    "sl_j5_t3": 2.3,
-    "sl_j5_tge4": -20,
-    
-    "sl_jge6_t2": -0.4,
-    "sl_jge6_t3": 2.9,
-    "sl_jge6_tge4": -20,
-
-    "dl_j3_t2": 20,
-    "dl_j3_t3": -20,
-    "dl_jge4_t2": 20,
-    "dl_jge4_t3": 2.3,
-    "dl_jge4_tge4": -20,
-}
-
-input_file = "/mnt/t3nfs01/data01/shome/gregor/tth/gc/sparse/GCd70d6c450ccf/sparse.root"
-
-#https://github.com/vhbb/cmssw/issues/493#issuecomment-233123300
-#however, actual lumi may be a bit smaller, as not 100% of the data was processed successfully 
-LUMI = 9235 #Jul18
+input_file = sparse_data["Aug10"].infile
+ngen = sparse_data["Aug10"].ngen
+lumi = sparse_data["Aug10"].lumi
+blr_cuts = sparse_data["Aug10"].blr_cuts
 
 do_stat_variations = False
 do_fake_data = True
@@ -39,17 +19,18 @@ do_fake_data = True
 # like {process}/{channel}/{input}_{systematic}
 # where process={ttH_hbb,...}, channel={sl,dl,...}, input={sparse}
 common_shape_uncertainties = {
-    # "JER": 1,
-    # "JES": 1,
-    # "CMS_scale_j"           : 1,
-    # "CMS_ttH_CSVLF"         : 1,
-    # "CMS_ttH_CSVHF"         : 1,
-    # "CMS_ttH_CSVcErr1"      : 1,
-    # "CMS_ttH_CSVcErr2"      : 1,
-    # "CMS_ttH_CSVHFStats1"   : 1,
-    # "CMS_ttH_CSVHFStats2"   : 1,
-    # "CMS_ttH_CSVLFStats1"   : 1,
-    # "CMS_ttH_CSVLFStats2"   : 1,
+    "CMS_scale_j"          : 1,
+    "CMS_res_j"            : 1,
+    "pu"                   : 1,
+    "CMS_ttH_CSVcferr1"       : 1,
+    "CMS_ttH_CSVcferr2"       : 1,
+    "CMS_ttH_CSVhf"           : 1,
+    "CMS_ttH_CSVhfstats1"     : 1,
+    "CMS_ttH_CSVhfstats2"     : 1,
+    "CMS_ttH_CSVjes"          : 1,
+    "CMS_ttH_CSVlf"           : 1,
+    "CMS_ttH_CSVlfstats1"     : 1,
+    "CMS_ttH_CSVlfstats2"     : 1,
 }
 
 common_scale_uncertainties = {
@@ -61,10 +42,10 @@ scale_uncertainties = {
         "QCDscale_ttH" : 1.133,
         "pdf_gg" : 1.083,
     },
-    # "ttH_nonhbb" : {
-        # "QCDscale_ttH" : 1.133,
-        # "pdf_gg" : 1.083,
-    # },
+    #"ttH_nonhbb" : {
+    #  # "QCDscale_ttH" : 1.133,
+    #  # "pdf_gg" : 1.083,
+    #},
     "ttbarPlus2B" : {
         "bgnorm_ttbarPlus2B" : 1.5,
         "QCDscale_ttbar" : 1.030,
@@ -99,14 +80,39 @@ base_samples = [
     Sample(
         input_name = "ttHTobb_M125_13TeV_powheg_pythia8",
         output_name = "ttH_hbb",
-        xs_weight = LUMI*samples_base.xsec_sample["ttHTobb_M125_13TeV_powheg_pythia8"]/samples_base.ngen["ttHTobb_M125_13TeV_powheg_pythia8"]
+        xs_weight = samples_base.xsec_sample["ttHTobb_M125_13TeV_powheg_pythia8"]/ngen["ttHTobb_M125_13TeV_powheg_pythia8"]
     ),
-    # Sample(
-    #     input_name = "ttHToNonbb_M125_13TeV_powheg_pythia8",
-    #     output_name = "ttH_nonhbb",
-    #     xs_weight = lumi*samples_base.xsec_sample["ttHToNonbb_M125_13TeV_powheg_pythia8"]/samples_base.ngen["ttHToNonbb_M125_13TeV_powheg_pythia8"]
-    # ),
+    Sample(
+        input_name = "ttHToNonbb_M125_13TeV_powheg_pythia8",
+        output_name = "ttH_nonhbb",
+        xs_weight = samples_base.xsec_sample["ttHToNonbb_M125_13TeV_powheg_pythia8"]/ngen["ttHToNonbb_M125_13TeV_powheg_pythia8"]
+    ),
 ]
+
+def splitByTriggerPath(samples):
+    """
+    Given a list of samples, add a cut on a trigger path (SLmu, SLele etc)
+    and normalize to the given luminosity.
+    """
+    out = []
+    _lumis = {
+        "m": lumi["SingleMuon"],
+        "e": lumi["SingleElectron"],
+        "mm": lumi["DoubleMuon"],
+        "em": lumi["MuonEG"],
+        "ee": lumi["DoubleEG"],
+    }
+
+    for name, trigpath in TRIGGERPATH_MAP.items():
+        for samp in samples:
+            newsamp = Sample(
+                input_name = samp.input_name,
+                output_name = samp.output_name,
+                xs_weight = _lumis[name] * samp.xs_weight,
+                cuts = samp.cuts + [("triggerPath", trigpath, trigpath+1)]
+            )
+            out += [newsamp]
+    return out
 
 #For tt+jets, we need to apply the selection that splits the sample into
 #different tt+jets categories (ttbarPlusBBbar, ttbarPlusCCbar etc)
@@ -118,7 +124,7 @@ ttjets_powheg = [
     Sample(
         input_name = "TT_TuneCUETP8M1_13TeV-powheg-pythia8",
         output_name = tt,
-        xs_weight = LUMI*samples_base.xsec_sample["TT_TuneCUETP8M1_13TeV-powheg-pythia8"]/samples_base.ngen["TT_TuneCUETP8M1_13TeV-powheg-pythia8"],
+        xs_weight = samples_base.xsec_sample["TT_TuneCUETP8M1_13TeV-powheg-pythia8"]/ngen["TT_TuneCUETP8M1_13TeV-powheg-pythia8"],
         cuts = [processCut(tt)]
     ) for tt in [
         "ttbarOther", "ttbarPlusBBbar", "ttbarPlus2B", "ttbarPlusB", "ttbarPlusCCbar"
@@ -129,7 +135,7 @@ ttjets_split = [
     Sample(
         input_name = "TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8",
         output_name = tt,
-        xs_weight = LUMI*samples_base.xsec_sample["TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"]/samples_base.ngen["TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"],
+        xs_weight = samples_base.xsec_sample["TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"]/ngen["TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"],
         cuts = [processCut(tt)]
     ) for tt in [
         "ttbarOther", "ttbarPlusBBbar", "ttbarPlus2B", "ttbarPlusB", "ttbarPlusCCbar"
@@ -140,45 +146,50 @@ ttjets_split += [
     Sample(
         input_name = "TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8",
         output_name = tt,
-        xs_weight = LUMI*samples_base.xsec_sample["TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"]/samples_base.ngen["TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"],
+        xs_weight = samples_base.xsec_sample["TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"]/ngen["TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"],
         cuts = [processCut(tt)]
     ) for tt in [
         "ttbarOther", "ttbarPlusBBbar", "ttbarPlus2B", "ttbarPlusB", "ttbarPlusCCbar"
     ]
 ]
 
+#Need to normalize each trigger path with the corresponding luminosity
+base_samples = splitByTriggerPath(base_samples)
+ttjets_split = splitByTriggerPath(ttjets_split)
+ttjets_powheg = splitByTriggerPath(ttjets_powheg)
+
 # On the data samples, we only need to choose the events that pass the correct
 # trigger path, e.g. in SingleMuon, the ones that passed the singlemuon selection
 data_samples = {
-    "SingleMuon": Sample(
+    "SingleMuon": DataSample(
         input_name = "SingleMuon",
         output_name = "data",
-        xs_weight = 1.0,
+        lumi = lumi["SingleMuon"],
         cuts = [("triggerPath", 1, 2)]
     ),
-    "SingleElectron": Sample(
+    "SingleElectron": DataSample(
         input_name = "SingleElectron",
         output_name = "data",
-        xs_weight = 1.0,
+        lumi = lumi["SingleElectron"],
         cuts = [("triggerPath", 2, 3)]
     ),
 
-    "DoubleMuon": Sample(
+    "DoubleMuon": DataSample(
         input_name = "DoubleMuon",
         output_name = "data",
-        xs_weight = 1.0,
+        lumi = lumi["DoubleMuon"],
         cuts = [("triggerPath", 3, 4)]
     ),
-    "MuonEG": Sample(
+    "MuonEG": DataSample(
         input_name = "MuonEG",
         output_name = "data",
-        xs_weight = 1.0,
+        lumi = lumi["MuonEG"],
         cuts = [("triggerPath", 4, 5)]
     ),
-    "DoubleEG": Sample(
+    "DoubleEG": DataSample(
         input_name = "DoubleEG",
         output_name = "data",
-        xs_weight = 1.0,
+        lumi = lumi["DoubleEG"],
         cuts = [("triggerPath", 5, 6)]
     ),
 
@@ -189,6 +200,20 @@ sl_data = [data_samples["SingleMuon"], data_samples["SingleElectron"]]
 
 #now define the analysis categories
 sl_categories = [
+    # >= 6 jets, >= 4 tags
+    Category(
+        name = "sl_jge3",
+        cuts = [("numJets", 3, 8)],
+        samples = base_samples + ttjets_powheg,
+        data_samples = sl_data,
+        signal_processes = signal_processes,
+        common_shape_uncertainties = common_shape_uncertainties,
+        common_scale_uncertainties = common_scale_uncertainties,
+        scale_uncertainties = scale_uncertainties,
+        discriminator = "numJets",
+        src_histogram = "sl/sparse"
+    ),
+
     # >= 6 jets, >= 4 tags
     Category(
         name = "sl_jge6_tge4",
@@ -380,12 +405,15 @@ sl_categories = [
 control_variables = [
     "jetsByPt_0_pt",
     "btag_LR_4b_2b_btagCSV_logit",
-    "btag_LR_4b_2b_btagCMVA_logit"
+#    "btag_LR_4b_2b_btagCMVA_logit"
 ]
 def make_control_categories(input_categories):
     all_cats = copy.deepcopy(input_categories)
     for discr in control_variables:
         for cat in input_categories:
+            #Update only the discriminator, note that this is hacky and may not
+            #work in the future, because we assume the object is final
+            #after the constructor
             newcat_d = cat.__dict__
             newcat_d["discriminator"] = discr
             newcat_d["do_limit"] = False
@@ -411,7 +439,7 @@ analysis_ttjets_split = Analysis(
     categories = deepcopy(all_cats),
     sparse_input_file = input_file,
     groups = {
-        "sl": sl_categories,
+        "sl": [c for c in sl_categories if c.do_limit],
     },
     do_fake_data = do_fake_data,
     do_stat_variations = do_stat_variations
