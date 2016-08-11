@@ -222,14 +222,14 @@ workflow_datasets["pilot"][pilot_name] = D
 #1-lumi per job, 10 job testing of a few samples
 workflow_datasets["testing"] = {}
 
-for k in ["ttHTobb", "TTbar_inc", "SingleMuon-Run2016B-PromptReco-v2"]:
-#for k in ["SingleMuon-Run2016B-PromptReco-v2"]:
+#for k in ["ttHTobb", "TTbar_inc", "SingleMuon-Run2016B-PromptReco-v2"]:
+for k in ["SingleMuon-Run2016B-PromptReco-v2"]:
     D = deepcopy(datasets[k])
     D["maxlumis"] = 40
-    D["perjob"] =2 
+    D["perjob"] = 2
     if "data" in D["script"]:
-        D["maxlumis"] = 100 
-        D["perjob"] = 10 
+        D["maxlumis"] = 200
+        D["perjob"] = 10
     D["runtime"] = 2
     D["mem_cfg"] = "cfg_noME.py"
     workflow_datasets["testing"][k] = D
@@ -344,6 +344,8 @@ env
         'hash',
         'analyze_log.py',
         'FrameworkJobReport.xml',
+        'env.sh',
+        'post.sh',
         'heppy_config.py',
         'heppy_config_data.py',
         'heppy_crab_script.py',
@@ -377,6 +379,8 @@ env
     config.Data.allowNonValidInputDataset = True
 
     #config.Site.whitelist = ["T2_CH_CSCS", "T1_US_FNAL", "T2_DE_DESY", "T1_DE_KIT"]
+    config.Site.blacklist = ["T2_US_Florida", "T2_US_MIT", "T2_US_Wisconsin"]
+
     config.Site.storageSite = "T2_CH_CSCS"
 
     #loop over samples
