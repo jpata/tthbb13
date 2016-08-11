@@ -148,7 +148,7 @@ site_prefix = "root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat"
 def getSitePrefix(fn=""):
     if fn.startswith("/store"):
         return site_prefix  + fn
-    elif fn.startswith("file://"):
+    elif fn.startswith("file://") or fn.startswith("root://"):
         return fn
     else:
         raise Exception("Could not open file: {0}".format(fn))
