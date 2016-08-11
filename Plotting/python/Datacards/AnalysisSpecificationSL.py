@@ -469,6 +469,6 @@ for cat in sl_categories:
 # Dictionary of all analyses we consider
 analyses = {
     "SL_7cat" : analysis,
-    #"SL_ttjets_split" : analysis_ttjets_split,
+    "SL_ttjets_split" : analysis_ttjets_split,
     #"SL_7cat_bdt" : analysis_bdt
 }

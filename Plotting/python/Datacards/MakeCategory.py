@@ -74,14 +74,11 @@ def apply_rules(args):
     Returns: a dictionary with the output histograms
     """
 
-    infile, rules = args
-    infile_tf = ROOT.TFile.Open(infile)
-    if not infile_tf:
-        raise FileError("Could not open file: {0}".format(infile))
+    input_map, rules = args
     hdict = {}
 
     t0 = time.time()
-    logging.info("apply_rules: rules={0}".format(len(rules)))
+    logging.info("apply_rules: len(rules)={0}".format(len(rules)))
     for rule in rules:
         
         #convert the string of the cut list into the actual list
@@ -89,15 +86,15 @@ def apply_rules(args):
         hk = rule["output"]
         inp = str(rule["input"])
         logging.debug("apply_rules: histogram {0} => {1} with rule {2}".format(inp, hk, rule))
-        h = infile_tf.Get(inp)
+        sparse_hist = input_map[inp]
 
         #in case no histogram could be found, use a dummy histogram so that we
         #have at least the correct binning
         dummy = False
-        if not h:
+        if not sparse_hist:
             dummy = True
             logging.warning("Could not get histogram {0}, using fallback".format(inp))
-            h = infile_tf.Get(str("ttHTobb_M125_13TeV_powheg_pythia8/sl/sparse"))
+            sparse_hist = input_map["ttHTobb_M125_13TeV_powheg_pythia8/sl/sparse"]
             if not h:
                 raise Exception("Could not get fallback histogram {0}".format("ttHTobb_M125_13TeV_powheg_pythia8/sl/sparse"))
             cuts = []
@@ -105,9 +102,7 @@ def apply_rules(args):
         variables = eval(rule["project"])
         vnames = [v[0] for v in variables]
 
-        #FIXME: producing a histo here somehow leaks memory
-        ret = sparse.apply_cuts_project(h, cuts, vnames)
-        #ret = ROOT.TH1D()
+        ret = sparse.apply_cuts_project(sparse_hist, cuts, vnames)
 
         #dummy histogram needs to be made empty
         if dummy:
@@ -134,7 +129,6 @@ def apply_rules(args):
             hdict[hk] = ret
     t1 = time.time()
     logging.info("apply_rules: projected {0} rules in {1} seconds: {2} r/s".format(len(rules), t1-t0, len(rules)/float(t1-t0)))
-    infile_tf.Close()
     return hdict
 
 def chunks(l, n):
@@ -154,11 +148,25 @@ def apply_rules_parallel(infile, rules, ncores=1):
     if ncores > 1:
         p = multiprocessing.Pool(ncores)
     inputs = []
-    logging.info("apply_rules_parallel: creating chunks")
 
+    # preload THnSparse here, once per input, in order to prevent memory leak, see
+    # https://github.com/jpata/tthbb13/issues/107
+    unique_inputs = set([r["input"] for r in rules])
+    logging.info("apply_rules_parallel: preloading {0} sparse histograms from {1}".format(
+        len(unique_inputs), infile
+    ))
+    infile_tf = ROOT.TFile.Open(infile)
+    if not infile_tf:
+        raise FileError("Could not open file: {0}".format(infile))
+    input_map = {
+        k: infile_tf.Get(k) for k in unique_inputs
+    }
+
+    logging.info("apply_rules_parallel: creating chunks")
     #so that we can apply some N rules at the same time
+    #sort so that we are creating histograms that end up in the same result
     for chunk in chunks(sorted(rules, key=lambda x: x["output"]), 100):
-        inputs += [(infile, chunk)]
+        inputs += [(input_map, chunk)]
     
     rets = {}
     if ncores > 1:
@@ -172,6 +180,7 @@ def apply_rules_parallel(infile, rules, ncores=1):
     
     if ncores > 1:
         p.close()
+    infile_tf.Close()
     return rets
 
 def main(analysis_spec, analysis_name, category_name, outdir=".", ncores=1):

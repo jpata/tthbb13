@@ -6,16 +6,19 @@ import subprocess
 import copy, os
 import unittest
 import logging
+import ROOT
 
-def test_MEAnalysis(infile):
-    env = copy.copy(os.environ)
-    CMSSW_BASE = os.environ["CMSSW_BASE"]
-    env["ME_CONF"] = os.path.join(CMSSW_BASE, "src/TTH/MEAnalysis/python/cfg_local.py")
-    env["INPUT_FILE"] = infile
-    ret = subprocess.Popen([
-        "python", "MEAnalysis/python/MEAnalysis_heppy.py",
-    ], env=env).communicate()
-    return
+class MEAnalysisTestCase(unittest.TestCase):
+    def test_MEAnalysis(self):
+        infile = "/store/user/jpata/tth/tth_Jul31_V24_v1/ttHTobb_M125_13TeV_powheg_pythia8/tth_Jul31_V24_v1/160731_130548/0000/tree_1.root"
+        env = copy.copy(os.environ)
+        CMSSW_BASE = os.environ["CMSSW_BASE"]
+        env["ME_CONF"] = os.path.join(CMSSW_BASE, "src/TTH/MEAnalysis/python/cfg_local.py")
+        env["INPUT_FILE"] = infile
+        ret = subprocess.Popen([
+            "python", "MEAnalysis/python/MEAnalysis_heppy.py",
+        ], env=env).communicate()
+        return True
 
 def run_sparsinator(infiles, datasetpath):
     print "running on files", infiles
@@ -36,9 +39,21 @@ def read_inputs(dataset):
 class MakeSparsinatorTestCase(unittest.TestCase):
     def test_sparsinator_data(self):
         run_sparsinator(read_inputs("MEAnalysis/gc/datasets/tth_Jul31_V24_v1/SingleMuon.txt")[:2], "SingleMuon")
+        
+        self.assertTrue(os.path.isfile("out.root"))
+        fi = ROOT.TFile("out.root")
+        hi = fi.Get("ttHTobb_M125_13TeV_powheg_pythia8/sl/sparse")
+        self.assertFalse(hi == None)
+        fi.Close()
     
     def test_sparsinator_mc(self):
         run_sparsinator(read_inputs("MEAnalysis/gc/datasets/tth_Jul31_V24_v1/ttHTobb_M125_13TeV_powheg_pythia8.txt")[:1], "ttHTobb_M125_13TeV_powheg_pythia8")
+        
+        self.assertTrue(os.path.isfile("out.root"))
+        fi = ROOT.TFile("out.root")
+        hi = fi.Get("ttHTobb_M125_13TeV_powheg_pythia8/sl/sparse")
+        self.assertFalse(hi == None)
+        fi.Close()
 
 class MakeCategoryTestCase(unittest.TestCase):
     
@@ -56,7 +71,6 @@ class MakeCategoryTestCase(unittest.TestCase):
         outfile = "{0}.root".format(catname)
         self.assertTrue(os.path.isfile(outfile))
         
-        import ROOT
         fi = ROOT.TFile(outfile)
         self.assertFalse(fi == None)
 

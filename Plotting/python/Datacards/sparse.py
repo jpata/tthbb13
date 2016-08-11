@@ -76,7 +76,10 @@ def apply_cuts_project(h, cuts, projections):
     hp = h.Projection(*axs)
     hp.SetDirectory(0)
     hp.SetName("__".join(["__".join(map(str, c)) for c in cuts]) + "__" + "__".join(projections))
-    return hp
+    if HAVE_ROOTPY:
+        return rootpy.asrootpy(hp)
+    else:
+        return hp
 
 def mkdirs(fi, path):
     path = path.encode("ascii", "ignore")
