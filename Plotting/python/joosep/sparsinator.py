@@ -31,7 +31,7 @@ ttH/sl/sparse_CMS_ttH_CSVJESUp -> event with btagWeight with JES up variation
 ...
 """
 systematic_weights = []
-#btag_weights = []
+btag_weights = []
 #for sdir in ["up", "down"]:
 #    for syst in ["cferr1", "cferr2", "hf", "hfstats1", "hfstats2", "jes", "lf", "lfstats1", "lfstats2"]:
 #        for tagger in ["CSV", "CMVAV2"]:
