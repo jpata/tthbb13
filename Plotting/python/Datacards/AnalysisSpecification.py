@@ -4,10 +4,12 @@
 #Each Analysis is made of Groups, which are made of Categories.
 from TTH.Plotting.Datacards.AnalysisSpecificationClasses import make_csv_categories_abstract, make_csv_groups_abstract
 
-from TTH.Plotting.Datacards.AnalysisSpecificationSL import analyses as analyses_SL
-from TTH.Plotting.Datacards.AnalysisSpecificationDL import analyses as analyses_DL
+from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
 
-analyses = dict((k, v) for d in [analyses_SL, analyses_DL] for k, v in d.items())
+analyses = {}
+for config in ["config_sl.cfg", "config_dl.cfg"]:
+    name, analysis = analysisFromConfig(config)
+    analyses[name] = analysis
 
 if __name__ == "__main__":
     print "Printing all analyses"
