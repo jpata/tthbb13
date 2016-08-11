@@ -68,8 +68,6 @@ class JetAnalyzer(FilterAnalyzer):
         return newjets
 
     def process(self, event):
-
-
         event.MET = MET(pt=event.met.pt, phi=event.met.phi)
         event.MET_gen = MET(pt=event.MET.genPt, phi=event.MET.genPhi)
         event.MET_tt = MET(px=0, py=0)
@@ -95,6 +93,8 @@ class JetAnalyzer(FilterAnalyzer):
                 ev.Jet = jets
                 ev.systematic = name
                 evdict[name] = ev
+
+        #We create a wrapper around the base event with nominal quantities
         if "nominal" in self.conf.general["systematics"]:
             evdict["nominal"] = FakeEvent(event)
             evdict["nominal"].systematic = "nominal"
@@ -236,12 +236,12 @@ class JetAnalyzer(FilterAnalyzer):
             if "debug" in self.conf.general["verbosity"]:
                 autolog("fails because SL NJ<3")
             passes = False
-        if event.is_dl:
+        elif event.is_dl:
             if len(event.good_jets) < 2:
                 if "debug" in self.conf.general["verbosity"]:
                     autolog("fails because DL NJ<2")
                 passes = False
-        if event.is_fh:
+        elif event.is_fh:
             if len(event.good_jets) < self.conf.jets["minjets_fh"]: #DS
                 passes = False        
             if len(event.good_jets) >= self.conf.jets["minjets_fh"]:

@@ -9,17 +9,14 @@ from TTH.Plotting.Datacards.AnalysisSpecificationDL import analyses as analyses_
 
 analyses = dict((k, v) for d in [analyses_SL, analyses_DL] for k, v in d.items())
 
-print "Printing all analyses"
-for k, v in analyses.items():
-    print k
-    print v
-
-def make_csv_categories():
-    return make_csv_categories_abstract(analyses)
-
-def make_csv_groups():
-    return make_csv_groups_abstract(analyses)
-
 if __name__ == "__main__":
-    make_csv_categories()
-    make_csv_groups()
+    print "Printing all analyses"
+    for k, v in analyses.items():
+        print k
+        print v
+    
+    #write out all categories that we want to create
+    make_csv_categories_abstract(analyses)
+
+    #write out all the combine groups
+    make_csv_groups_abstract(analyses)

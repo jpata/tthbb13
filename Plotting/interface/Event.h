@@ -106,12 +106,13 @@ public:
 
 //fwd decl
 class Event;
+typedef std::function<float(const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst)> AxisFunction;
 
 class SparseAxis {
 public:
     SparseAxis(
         const string& _name,
-        std::function<float(const Event& ev)> _evalFunc,
+        AxisFunction _evalFunc,
         int _nBins,
         float _xMin,
         float _xMax
@@ -122,7 +123,7 @@ public:
         xMin(_xMin),
         xMax(_xMax) {};
     string name;
-    std::function<float(const Event& ev)> evalFunc;
+    AxisFunction evalFunc;
     int nBins;
     float xMin, xMax;
 };
@@ -240,8 +241,8 @@ public:
     map<SystematicKey::SystematicKey, double> bTagWeights;
 
     //btag likelihood
-    double btag_LR_4b_2b;
-    double btag_LR_4b_2b_logit; // log(x/(1 - x))
+    double blr1;
+    double blr2;
 
     //boosted variables
     int n_excluded_bjets;
@@ -284,8 +285,8 @@ public:
         double _mem_DL_0w2h2t,
         double _tth_mva,
         double _common_bdt,
-        double _btag_LR_4b_2b,
-        double _btag_LR_4b_2b_logit
+        double _blr1,
+        double _blr2
     );
 
     const string to_string() const;
@@ -311,6 +312,8 @@ public:
     static const Jet makeNominal(const TreeData& data, int njet);
     static const Jet makeJESUp(const TreeData& data, int njet);
     static const Jet makeJESDown(const TreeData& data, int njet);
+    static const Jet makeJERUp(const TreeData& data, int njet);
+    static const Jet makeJERDown(const TreeData& data, int njet);
 };
 
 //Helper class to make various variated Event representations from TreeData
@@ -319,6 +322,8 @@ public:
     static const Event makeNominal(const TreeData& data, const Configuration& conf);
     static const Event makeJESUp(const TreeData& data, const Configuration& conf);
     static const Event makeJESDown(const TreeData& data, const Configuration& conf);
+    static const Event makeJERUp(const TreeData& data, const Configuration& conf);
+    static const Event makeJERDown(const TreeData& data, const Configuration& conf);
 };
 
 //A class combining a cut function, evaluated with this() along
@@ -326,7 +331,7 @@ public:
 class CategoryProcessor {
 public:
     CategoryProcessor(
-        std::function<int(const Event& ev)> _cutFunc,
+        AxisFunction _cutFunc,
         const vector<CategoryKey::CategoryKey>& _keys,
         const Configuration& _conf,
         const vector<const CategoryProcessor*>& _subCategories={},
@@ -341,8 +346,8 @@ public:
     weightFuncs(_weightFuncs)
     {}
 
-    const bool operator()(const Event& ev) const {
-        return cutFunc(ev);
+    const bool operator()(const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst) const {
+        return cutFunc(ev, proc, cats, syst);
     }
 
     const vector<CategoryKey::CategoryKey> keys;
@@ -369,14 +374,14 @@ public:
         SystematicKey::SystematicKey systKey
     ) const;
 private:
-    std::function<int(const Event& ev)> cutFunc;
+    AxisFunction cutFunc;
 };
 
 
 class SparseCategoryProcessor : public CategoryProcessor {
 public:
     SparseCategoryProcessor(
-        std::function<int(const Event& ev)> _cutFunc,
+        AxisFunction _cutFunc,
         const vector<CategoryKey::CategoryKey>& _keys,
         const Configuration& _conf,
         const vector<const CategoryProcessor*>& _subCategories={},

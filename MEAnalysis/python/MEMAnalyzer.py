@@ -16,6 +16,34 @@ CvectorPermutations = getattr(ROOT, "std::vector<MEM::Permutations::Permutations
 CvectorPSVar = getattr(ROOT, "std::vector<MEM::PSVar::PSVar>")
 #CmapDistributionTypeTH3D = getattr(ROOT, "std::map<MEM::DistributionType::DistributionType,TH3D>")
 
+
+def normalize_proba(vec):
+    proba_vec = np.array(vec)
+    proba_vec[proba_vec <= 1E-50] = 1E-50
+    ret = np.array(np.log10(proba_vec), dtype="float64")
+    return ret
+
+class MEMPermutation:
+    MAXOBJECTS=10
+
+    def __init__(self, idx,
+        perm,
+        p_mean, p_std,
+        p_tf_mean, p_tf_std,
+        p_me_mean, p_me_std,
+        ):
+        self.idx = idx
+        self.perm = perm
+        for i in range(MEMPermutation.MAXOBJECTS):
+            r = perm[i] if i<len(perm) else -99
+            setattr(self, "perm_{0}".format(i), r)
+        self.p_mean = p_mean
+        self.p_std = p_std
+        self.p_tf_mean = p_tf_mean
+        self.p_tf_std = p_tf_std
+        self.p_me_mean = p_me_mean
+        self.p_me_std = p_me_std
+
 from TTH.MEAnalysis.Analyzer import FilterAnalyzer
 class MECategoryAnalyzer(FilterAnalyzer):
     """
@@ -159,10 +187,9 @@ class MEAnalyzer(FilterAnalyzer):
 
         self.mem_configs = self.conf.mem_configs
         for k, v in self.mem_configs.items():
-            v.configure_btag_pdf(self.conf)
+            #v.configure_btag_pdf(self.conf)
             v.configure_transfer_function(self.conf)
 
-        self.memkeys = self.conf.mem["methodOrder"]
         self.memkeysToRun = self.conf.mem["methodsToRun"]
         
         #Create an empty vector for the integration variables
@@ -170,12 +197,10 @@ class MEAnalyzer(FilterAnalyzer):
         self.vars_to_marginalize = CvectorPSVar()
         
         cfg = MEMConfig(self.conf)
-        cfg.configure_btag_pdf(self.conf)
+        #cfg.configure_btag_pdf(self.conf)
         cfg.configure_transfer_function(self.conf)
         self.integrator = MEM.Integrand(
-            0, 
-            #MEM.output,
-            #MEM.output + MEM.input + MEM.init + MEM.init_more,
+            MEM.output, #verbosity level
             cfg.cfg
         )
 
@@ -221,8 +246,8 @@ class MEAnalyzer(FilterAnalyzer):
                 p4s=(jet.pt, jet.eta, jet.phi, jet.mass),
                 obs_dict={
                     MEM.Observable.BTAG: jet.btagFlag,
-                    MEM.Observable.CSV: getattr(jet, mem_cfg.btagMethod, -1),
-                    MEM.Observable.PDGID: getattr(jet, "PDGID", 0)
+                    #MEM.Observable.CSV: getattr(jet, mem_cfg.btagMethod, -1),
+                    #MEM.Observable.PDGID: getattr(jet, "PDGID", 0)
                     },
                 tf_dict={
                     MEM.TFType.bReco: jet.tf_b, MEM.TFType.qReco: jet.tf_l,
@@ -233,8 +258,8 @@ class MEAnalyzer(FilterAnalyzer):
                     jet.pt, jet.eta, jet.phi, jet.mass,\
                     ", Flag: ", jet.btagFlag,\
                     ", CSV: ",  getattr(jet, mem_cfg.btagMethod, -1),\
-                    ", PDGID: ",  getattr(jet, "PDGID", 0)
-                    #", Match: ", jet.tth_match_label, jet.tth_match_index\
+                    ", PDGID: ",  getattr(jet, "PDGID", -1),\
+                    ", Match: ", jet.tth_match_label, jet.tth_match_index
                 
                 
         for lep in mem_cfg.lepton_candidates(event):
@@ -347,20 +372,8 @@ class MEAnalyzer(FilterAnalyzer):
 
         for hypo in [MEM.Hypothesis.TTH, MEM.Hypothesis.TTBB]:
             skipped = []
-            for confname in self.memkeys:
-                if self.mem_configs.has_key(confname):
-                    mem_cfg = self.mem_configs[confname]
-                else:
-                    if confname in self.memkeysToRun:
-                        raise KeyError(
-                            "Asked for configuration={0} but this was never specified in mem_configs.keys={1}".format(
-                                confname, list(self.mem_configs.keys())
-                            )
-                        )
-                    else:
-                        if "meminput" in self.conf.general["verbosity"]:
-                            print "skipping conf", confname
-
+            for confname in self.memkeysToRun:
+                mem_cfg = self.conf.mem_configs[confname]
                 fstate = MEM.FinalState.Undefined
                 if "dl" in mem_cfg.mem_assumptions:
                     fstate = MEM.FinalState.LL
@@ -403,6 +416,10 @@ class MEAnalyzer(FilterAnalyzer):
                         event.input.run, event.input.lumi, event.input.evt,
                         event.category_string, event.btag_LR_4b_2b
                     )
+                    print "Integrator conf: b={0} l={1}".format(
+                        len(mem_cfg.b_quark_candidates(event)),
+                        len(mem_cfg.l_quark_candidates(event))
+                    )
                     self.configure_mem(event, mem_cfg)
                     r = self.integrator.run(
                         fstate,
@@ -419,23 +436,38 @@ class MEAnalyzer(FilterAnalyzer):
                     res[(hypo, confname)] = r
             if "meminput" in self.conf.general["verbosity"]:
                 print "skipped confs", skipped
-                
-        if "default" in self.memkeys:
-            p1 = res[(MEM.Hypothesis.TTH, "default")].p
-            p2 = res[(MEM.Hypothesis.TTBB, "default")].p
         
-        event.mem_results_tth = [res[(MEM.Hypothesis.TTH, k)] for k in self.memkeys]
-        event.mem_results_ttbb = [res[(MEM.Hypothesis.TTBB, k)] for k in self.memkeys]
+        #Add MEM results to event
+        for key in self.memkeysToRun:
+            for (hypo_name, hypo) in [
+                ("tth", MEM.Hypothesis.TTH),
+                ("ttbb", MEM.Hypothesis.TTBB)
+            ]:
+                mem_res = res[(hypo, key)]
+                setattr(event, "mem_{0}_{1}".format(hypo_name, key), mem_res)
 
+                #Create MEM permutations
+                perms = []
+                for iperm in range(mem_res.num_perm):
+                    perm = mem_res.permutation_indexes[iperm]
+                    v_p = normalize_proba([v for v in mem_res.permutation_probas[iperm]])
+                    v_p_tf = normalize_proba([v for v in mem_res.permutation_probas_transfer[iperm]])
+                    v_p_me = normalize_proba([v for v in mem_res.permutation_probas_me[iperm]])
+                    mem_perm = MEMPermutation(
+                        iperm,
+                        [_p for _p in perm],
+                        np.mean(v_p), np.std(v_p), 
+                        np.mean(v_p_tf), np.std(v_p_tf), 
+                        np.mean(v_p_me), np.std(v_p_me),
+                    )
+                    perms += [mem_perm]
+                setattr(event, "mem_{0}_{1}_perm".format(hypo_name, key), perms)
+
+        #print out the JSON format for the standalone integrator
         for confname in self.memkeysToRun:
             mem_cfg = self.mem_configs[confname]
             if "commoninput" in self.conf.general["verbosity"] and mem_cfg.do_calculate(event, mem_cfg):
                 self.printInputs(event, confname)
-        
-        if "memoutput" in self.conf.general["verbosity"]:
-            print [r.p for r in event.mem_results_tth]
-            print [r.p for r in event.mem_results_ttbb]
-            print "---MEM done EVENT r:l:e", event.input.run, event.input.lumi, event.input.evt
         
 
         event.passes_mem = True

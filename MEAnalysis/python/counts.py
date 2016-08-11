@@ -29,7 +29,9 @@ for infn in filenames:
         kn = k.GetName() 
         if "Count" in kn:
             o = k.ReadObj()
+            print "Entries", kn, o.GetBinContent(1)
             if not of.Get(kn):
+                print "first file, creating histogram", kn
                 o2 = o.Clone()
                 of.Add(o2)
             else:
@@ -37,9 +39,10 @@ for infn in filenames:
     of.Write()
     tf.Close()
 
-hEntries = ROOT.TH1D("numEntries", "numEntries", 3, 0, 3)
-hEntries.SetBinContent(1, get_tree_entries("vhbb/tree", good_filenames))
-hEntries.SetBinContent(2, get_tree_entries("tree", good_filenames))
-hEntries.Write()
+#hEntries = ROOT.TH1D("numEntries", "numEntries", 3, 0, 3)
+#hEntries.SetDirectory(of)
+#hEntries.SetBinContent(1, get_tree_entries("vhbb/tree", good_filenames))
+#hEntries.SetBinContent(2, get_tree_entries("tree", good_filenames))
+#hEntries.Write()
 
 of.Close()

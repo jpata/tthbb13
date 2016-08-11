@@ -1,11 +1,19 @@
+import os
+
+if os.environ.has_key("CMSSW_BASE"):
+    from cleanPath import fixPythonPath
+    import sys
+    sys.path = fixPythonPath(sys.path)
+
 import ROOT
 ROOT.gROOT.SetBatch(True)
+
+import uuid
 
 import matplotlib
 import matplotlib.pyplot as plt
 
 import numpy as np
-import os
 
 import rootpy
 import rootpy.io
@@ -47,6 +55,9 @@ colors = {
     "other": (251, 73, 255),
 }
 
+components = {
+
+}
 #create floats of colors from 0..1
 for cn, c in colors.items():
     colors[cn] = (c[0]/255.0, c[1]/255.0, c[2]/255.0)
@@ -77,59 +88,60 @@ cats = {
     'sl_jge6_t2': "(is_sl==1) && (numJets>=6) && (nBCSVM==2)",
     'sl_jge6_t3': "(is_sl==1) && (numJets>=6) && (nBCSVM==3)",
     'sl_jge6_tge4': "(is_sl==1) && (numJets>=6) && (nBCSVM>=4)",
-    #'sl_jge6_tge4': "(is_sl==1) && (n_excluded_bjets<=1) && (n_boosted_bjets>=4) && (n_boosted_ljets>=2)",
 }
 
 #List of sample filenames -> short names suitable for latex
 samplelist = [
-    ("ttH_hbb", "ttHbb"),
-    ("ttH_nonhbb", "ttHnonbb"),
-    ("ttbarPlusBBbar", "ttbarPlusBBbar"),
-    ("ttbarPlusB", "ttbarPlusB"),
-    ("ttbarPlus2B", "ttbarPlus2B"),
-    ("ttbarPlusCCbar", "ttbarPlusCCbar"),
-    ("ttbarOther", "ttbarOther"),
+    ("ttH_hbb", "tt+H(bb)"),
+    ("ttH_nonhbb", "tt+H(nonbb)"),
+    ("ttbarPlusBBbar", "tt+bb"),
+    ("ttbarPlusB", "tt+b"),
+    ("ttbarPlus2B", "tt+2b"),
+    ("ttbarPlusCCbar", "tt+cc"),
+    ("ttbarOther", "tt+l"),
     ("diboson", "diboson"),
 #    ("stop", "stop"),
 #    ("wjets", "wjets"),
 #    ("ttV", "ttV"),
 ]
 
+samplelist_d = dict(samplelist)
+
 #list of all variable names, suitable for latex
 varnames = {
-    "jet0_pt": "leading jet $p_T$ [GeV]",
-    "jet1_pt": "subleading jet $p_T$ [GeV]",
+    "jetsByPt_0_pt": r"leading jet $p_T$ [GeV]",
+    "jetsByPt_1_pt": r"subleading jet $p_T$ [GeV]",
 
-    "jet0_btagCSV": "leading jet $b_{\\mathrm{CSV}}$",
-    "jet1_btagCSV": "subleading jet $b_{\\mathrm{CSV}}$",
+    # "jet0_btagCSV": r"leading jet $b_{\mathrm{CSV}}$",
+    # "jet1_btagCSV": r"subleading jet $b_{\mathrm{CSV}}$",
 
-    "jet0_btagBDT": "leading jet $b_{\\mathrm{cMVAv2}}$",
-    "jet1_btagBDT": "subleading jet $b_{\\mathrm{cMVAv2}}$",
+    # "jet0_btagBDT": r"leading jet $b_{\mathrm{cMVAv2}}$",
+    # "jet1_btagBDT": r"subleading jet $b_{\mathrm{cMVAv2}}$",
 
-    "jet0_eta": "leading jet $\eta$",
-    "jet1_eta": "subleading jet $\eta$",
+    # "jet0_eta": r"leading jet $\eta$",
+    # "jet1_eta": r"subleading jet $\eta$",
 
-    "jet0_aeta": "leading jet $|\eta|$",
-    "jet1_aeta": "subleading jet $|\eta|$",
+    # "jet0_aeta": r"leading jet $|\eta|$",
+    # "jet1_aeta": r"subleading jet $|\eta|$",
 
-    "lep0_pt": "leading lepton $p_T$ [GeV]",
-    "lep1_pt": "subleading jet $p_T$ [GeV]",
+    # "lep0_pt": r"leading lepton $p_T$ [GeV]",
+    # "lep1_pt": r"subleading jet $p_T$ [GeV]",
 
-    "lep0_eta": "leading lepton $|\eta|$ [GeV]",
-    "lep1_eta": "subleading jet $|\eta|$ [GeV]",
+    # "lep0_eta": r"leading lepton $|\eta|$ [GeV]",
+    # "lep1_eta": r"subleading jet $|\eta|$ [GeV]",
 
-    "njets": "$N_{\\mathrm{jets}}$",
-    "ntags": "$N_{\\mathrm{CSVM}}$",
+    "numJets": r"$N_{\mathrm{jets}}$",
+    "numJets": r"$N_{\mathrm{CSVM}}$",
 
-    "btag_LR_4b_2b_logit": "$\\log{[\\mathcal{F} / (1 - \\mathcal{F})]}$",
+    "btag_LR_4b_2b_logit": r"$\log{[\mathcal{F} / (1 - \mathcal{F})]}$",
     "nfatjets": r"$N_{\mathcal{fatjets}}$",
     "topCandidate_pt": "top candidate $p_T$ [GeV]",
     "topCandidate_mass": "top candidate $M$ [GeV]",
     "topCandidate_masscal": "top candidate $M$ [GeV]",
-    "topCandidate_fRec": "top candidate $f_{\\mathrm{rec}}$",
-    "topCandidate_Ropt": "top candidate $R_{\\mathrm{opt}}$",
-    "topCandidate_RoptCalc": "top candidate $R_{\\mathrm{opt}}, calc$",
-    "topCandidate_n_subjettiness": "top candidate n-subjettiness$",
+    "topCandidate_fRec": r"top candidate $f_{\mathrm{rec}}$",
+    "topCandidate_Ropt": r"top candidate $R_{\mathrm{opt}}$",
+    "topCandidate_RoptCalc": r"top candidate $R_{\mathrm{opt}}, calc$",
+    "topCandidate_n_subjettiness": r"top candidate n-subjettiness$",
 
     "nhiggsCandidate": "Number of higgs candidates",
     "higgsCandidate_pt": "H candidate $p_T$ [GeV]",
@@ -155,8 +167,8 @@ varnames = {
 
 #the units for variables
 varunits = {
-    "jet0_pt": "GeV",
-    "jet1_pt": "GeV",
+    "jetsByPt_0_pt": "GeV",
+    "jetsByPt_1_pt": "GeV",
     "topCandidate_pt": "GeV",
     "topCandidate_mass": "GeV",
     "higgsCandidate_pt": "GeV",
@@ -177,24 +189,31 @@ def process_sample_hist(fnames, hname, func, bins, cut, **kwargs):
     returns: TH1D in the gROOT directory
     """
 
-    tt = ROOT.TChain("tree")
-    for fn in fnames:
+    for ifn in range(len(fnames)):
+        fn = fnames[ifn]
+        if type(fn) is str:
+            fnames[ifn] = (fnames[ifn], 1.0)
+    
+    hs = []
+    for fn, xsw in fnames:
+        tt = ROOT.TChain("tree")
         tt.Add(fn)
-    ROOT.gROOT.cd()
-    hs = {}
-    h = ROOT.gROOT.Get(hname)
-    if h:
-        h.Delete()
-    h = ROOT.TH1D(hname, "", bins[0], bins[1], bins[2])
-    h.Sumw2()
-    hname = h.GetName()
-    h = rootpy.asrootpy(h)
-    h.SetDirectory(ROOT.gROOT)
-    n = tt.Draw("{0} >> {1}".format(func, hname), cut)
-    if kwargs.get("norm", False):
-        if h.Integral()>0:
-            h.Scale(1.0 / h.Integral())
-    return h
+        ROOT.gROOT.cd()
+        _hname = str(uuid.uuid4())
+        ndims = len(bins)/3
+        if ndims == 1:
+            h = ROOT.TH1D(_hname, "", *bins)
+        elif ndims == 2:
+            h = ROOT.TH2D(_hname, "", *bins)
+        h.Sumw2()
+        h.SetDirectory(ROOT.gROOT)
+        n = tt.Draw("{0} >> {1}".format(func, _hname), cut)
+        h.Scale(xsw)
+        h = rootpy.asrootpy(h)
+        hs += [h]
+    htot = sum(hs)
+    htot.SetName(hname)
+    return htot
 
 def mc_stack(
     hlist,
@@ -214,7 +233,7 @@ def mc_stack(
         h.fillstyle = "solid"
 
     #FIXME: Temporary workaround for failed fill, only works when hatch is specified
-    r = hist(hlist, stacked=True, hatch=".", lw=2)
+    stack = hist(hlist, stacked=True, hatch=".", lw=2)
     htot = sum(hlist)
     htot.color="black"
 
@@ -250,11 +269,11 @@ def mc_stack(
         htot_dsyst.SetBinContent(i+1, htot_dsyst.GetBinContent(i+1) - errs[i]/2)
 
     fill_between(htot_usyst, htot_dsyst,
-        color="gray", hatch="\\\\\\\\",
+        color="gray", hatch=r"\\\\",
         alpha=1.0, linewidth=0, facecolor="none", edgecolor="gray", zorder=10,
     )
 
-    return {"hists":r, "tot":htot, "tot_u":htot_u, "tot_d":htot_d, "tot_usyst":htot_usyst, "tot_dsyst":htot_dsyst}
+    return {"hists":stack, "tot":htot, "tot_u":htot_u, "tot_d":htot_d, "tot_usyst":htot_usyst, "tot_dsyst":htot_dsyst}
 
 def dice(h, nsigma=1.0):
     hret = h.clone()
@@ -267,6 +286,10 @@ def dice(h, nsigma=1.0):
     return hret
 
 def make_uoflow(h):
+    """
+    Given a TH1 with bins [1...nbins], fill the underflow entries (bin 0) into the first bin and
+    the overflow entries (nbins+1) into the last bin (nbins).
+    """
     nb = h.GetNbinsX()
     #h.SetBinEntries(1, h.GetBinEntries(0) + h.GetBinEntries(1))
     #h.SetBinEntries(nb+1, h.GetBinEntries(nb) + h.GetBinEntries(nb + 1))
@@ -306,132 +329,148 @@ def getHistograms(tf, samples, hname):
                 return hs
     return hs
 
-def draw_data_mc(tf, hname, samples, **kwargs):
+def escape_string(s):
+    return s.replace("_", " ")
 
-    do_pseudodata = kwargs.get("do_pseudodata", False)
-    dataname = kwargs.get("dataname", None)
-    xlabel = kwargs.get("xlabel", hname.replace("_", " "))
+def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
+    """
+    Given a root file in the combine datacard format, draws a data/mc histogram,
+    ratio and systematic band.
+    tf (TFile): input root file
+    hname (string): name of histogram, example "sl_jge6_tge4/jetsByPt_0_pt"
+    processes (list of (str, str) tuples): processes to use for the plot. First
+        argument of tuple is the name in the file, second the name on the plot.
+        The order here defines the order of plotting (bottom to top). Assume that
+        signal is the first process.
+    signal_processes (list of str): process names to consider as signal
+    """
+
+    # name (string) of the data process.
+    # Example: "data" (real data), "data_obs" (fake data)
+    #must exist in the input file
+    dataname = kwargs.get("dataname", "data_obs")
+    
+    xlabel = kwargs.get("xlabel", escape_string(hname))
     xunit = kwargs.get("xunit", "XUNIT")
     ylabel = kwargs.get("ylabel", "auto")
     rebin = kwargs.get("rebin", 1)
     title_extended = kwargs.get("title_extended", "")
+
+    #legend properties
     do_legend = kwargs.get("do_legend", True)
     legend_loc = kwargs.get("legend_loc", (1.1,0.1))
     legend_fontsize = kwargs.get("legend_fontsize", 6)
+
+    #Dictionary of sample (string) -> color (tuple of floats) to use as colors
+    #or "auto" to generate a sequence of colors
     colors = kwargs.get("colors", "auto")
+
+    #True if you want to put the contents of the overflow bin into the last
+    #visible bin of the histogram, False otherwise
     show_overflow = kwargs.get("show_overflow", False)
+
+    #function f: TH1D -> TH1D to apply on data to blind it.
     blindFunc = kwargs.get("blindFunc", None)
 
-    #array of up-down pairs for systematic names, e.g. _CMS_scale_jUp/Down
+    #array of up-down pairs for systematic names to use for the systematic band,
+    #e.g.[("_CMS_scale_jUp", "_CMS_scale_jDown")]
     systematics = kwargs.get("systematics", [])
 
-    hs = OrderedDict()
-    hs_syst = OrderedDict()
-    hs = getHistograms(tf, samples, hname)
+    histograms_nominal = getHistograms(tf, processes, hname)
+    if len(histograms_nominal) == 0:
+        raise KeyError("did not find any histograms for MC")
 
+    histograms_systematic = OrderedDict()
     #get the systematically variated histograms
     for systUp, systDown in systematics:
-        hs_syst[systUp] = getHistograms(tf, samples, hname+systUp)
-        hs_syst[systDown] = getHistograms(tf, samples, hname+systDown)
-        if len(hs_syst[systUp])==0 or len(hs_syst[systDown])==0:
+        histograms_systematic[systUp] = getHistograms(tf, processes, hname+systUp)
+        histograms_systematic[systDown] = getHistograms(tf, processes, hname+systDown)
+        if len(histograms_systematic[systUp])==0 or len(histograms_systematic[systDown])==0:
             print "Could not read histograms for {0}".format(hname+systUp)
 
-    sample_d = dict(samples)
-    for hd in [hs] + hs_syst.values():
-        for (sample, h) in hd.items():
-            make_uoflow(h)
-            h.title = sample_d[sample] + " ({0:.1f})".format(h.Integral())
+    processes_d = dict(processes)
+
+    for histo_dict in [histograms_nominal] + histograms_systematic.values():
+        for (proc, h) in histo_dict.items():
+            h.title = processes_d[proc] + " ({0:.1f})".format(h.Integral())
             h.rebin(rebin)
             if show_overflow:
                 fill_overflow(h)
             
     c = plt.figure(figsize=(6,6))
-    if do_pseudodata or dataname:
-        a1 = plt.axes([0.0,0.22, 1.0, 0.8])
-    else:
-        a1 = plt.axes()
+
+    #Create top panel
+    a1 = plt.axes([0.0, 0.22, 1.0, 0.8])
         
-    c.suptitle("$\\textbf{CMS}$ preliminary $\sqrt{s} = 13$ TeV"+title_extended,
+    c.suptitle(r"$\textbf{CMS}$ preliminary $\sqrt{s} = 13$ TeV"+title_extended,
         y=1.02, x=0.02,
         horizontalalignment="left", verticalalignment="bottom", fontsize=16
     )
-    if len(hs) == 0:
-        raise KeyError("did not find any histograms for MC")
-    r = mc_stack(hs.values(), hs_syst, systematics, colors=colors)
+    stacked_hists = mc_stack(
+        histograms_nominal.values(),
+        histograms_systematic,
+        systematics,
+        colors = colors
+    )
     
     #Create the normalized signal shape
-    hsig = hs[samples[0][0]].Clone()
-    tot_mc = sum(hs.values())
+    histogram_signal = sum([histograms_nominal[sig] for sig in signal_processes])
+    histogram_total_mc = sum(histograms_nominal.values())
     #hsig.Rebin(2)
-    if hsig.Integral()>0:
-        hsig.Scale(0.2 * tot_mc.Integral() / hsig.Integral())
-    hsig.title = samples[0][1] + " norm"
-    hsig.linewidth=2
-    hsig.fillstyle = None
-    hist([hsig])
+    if histogram_signal.Integral()>0:
+        histogram_signal.Scale(0.2 * histogram_total_mc.Integral() / histogram_signal.Integral())
+    histogram_signal.title = processes[0][1] + " norm"
+    histogram_signal.linewidth=2
+    histogram_signal.fillstyle = None
+    #draw the signal shape
+    hist([histogram_signal])
     
-    tot_mc.title = "pseudodata"
-    tot_mc.color = "black"
+    histogram_total_mc.title = "pseudodata"
+    histogram_total_mc.color = "black"
 
-    tot_bg = sum([hs[k] for k in hs.keys() if "tth" not in k])
+    histogram_total_bkg = sum([
+        histograms_nominal[k] for k in histograms_nominal.keys()
+        if k not in signal_processes]
+    )
     
+    #Get the data histogram
     data = None
-    if do_pseudodata:
-        data = tot_mc.Clone()
-        data.title = "pseudodata"
+    if dataname != "":
+        data = tf.get(dataname + "/" + hname)
+        data.rebin(rebin)
         if blindFunc:
             data = blindFunc(data)
-        idata = data.Integral()
-    elif dataname:
-        datas = []
-        for dn in dataname:
-            try:
-                h = tf.get(dn + "/" + hname)
-                datas += [tf.get(dn + "/" + hname).Clone()]
-            except rootpy.io.file.DoesNotExist:
-                print "missing", dn, hname
-        if len(datas)>0:
-            data = sum(datas)
-            data.rebin(rebin)
-        else:
-            data = tot_mc.Clone()
-            data.Scale(0.0)
-        if blindFunc:
-            data = blindFunc(data)
-        data.title = "data ({0})".format(data.Integral())
-        idata = data.Integral()
-
-    if data and (blindFunc is None):
         if show_overflow:
             fill_overflow(data)
+        data.title = "data ({0:.2f})".format(data.Integral())
+        
+        #set data error to 0 in case no data (FIXME) 
         for ibin in range(data.GetNbinsX()):
             if data.GetBinContent(ibin) == 0:
                 data.SetBinError(ibin, 1)
         errorbar(data)
 
     if do_legend:
+        #create nice filled legend patches for all the processes
         patches = []
         if data:
             dataline = mlines.Line2D([], [], color='black', marker='o', label=data.title)
             patches += [dataline]
-        for line, h in zip(r["hists"], hs.values()):
-            #import pdb
-            #pdb.set_trace()
-            patch = mpatches.Patch(color=line[0].get_color(), label=h.title)
+        for (line1, line2), h in zip(stacked_hists["hists"], histograms_nominal.values()):
+            patch = mpatches.Patch(color=line1.get_color(), label=h.title)
             patches += [patch]
         patches += [mpatches.Patch(facecolor="none", edgecolor="black", label="stat", hatch="////////")]
-        patches += [mpatches.Patch(facecolor="none", edgecolor="gray", label="stat+syst", hatch="\\\\\\\\")]
+        patches += [mpatches.Patch(facecolor="none", edgecolor="gray", label="stat+syst", hatch=r"\\\\")]
         plt.legend(handles=patches, loc=legend_loc, numpoints=1, prop={'size':legend_fontsize}, ncol=2, frameon=False)
+        
+    #create an automatic bin width label on the y axis
     if ylabel == "auto":
-        ylabel = "events / {0:.2f} {1}".format(hs.values()[0].get_bin_width(1), xunit)
+        ylabel = "events / {0:.2f} {1}".format(histogram_signal.get_bin_width(1), xunit)
     plt.ylabel(ylabel)
-    if not data:
-        plt.xlabel(xlabel)
+
     #hide x ticks on main panel
     ticks = a1.get_xticks()
-    if data:
-        a1.get_xaxis().set_visible(False)
-    #print ticks
+    a1.get_xaxis().set_visible(False)
     
     a1.set_ylim(bottom=0, top=1.1*a1.get_ylim()[1])
     a1.grid(zorder=100000)
@@ -445,25 +484,32 @@ def draw_data_mc(tf, hname, samples, **kwargs):
         plt.xlabel(xlabel)
         a2.grid()
         
-        data.Divide(tot_mc)
-        for ibin in range(data.GetNbinsX()):
-            bc = tot_mc.GetBinContent(ibin)
+        data_ratio = data.Clone()
+        data_ratio.Divide(histogram_total_mc)
+
+        #In case MC was empty, set data/mc ratio to 0
+        for ibin in range(data_ratio.GetNbinsX()):
+            bc = histogram_total_mc.GetBinContent(ibin)
             if bc==0:
-                data.SetBinContent(ibin, 0)
-        bg_unc_u = r["tot_u"]
-        bg_unc_d = r["tot_d"]
+                data_ratio.SetBinContent(ibin, 0)
 
-        bg_unc_u.Divide(r["tot"])
-        bg_unc_d.Divide(r["tot"])
+        #create also the variated band
+        bg_unc_u = stacked_hists["tot_u"]
+        bg_unc_d = stacked_hists["tot_d"]
 
-        bg_unc_usyst = r["tot_usyst"]
-        bg_unc_dsyst = r["tot_dsyst"]
+        bg_unc_u.Divide(stacked_hists["tot"])
+        bg_unc_d.Divide(stacked_hists["tot"])
 
-        bg_unc_usyst.Divide(r["tot"])
-        bg_unc_dsyst.Divide(r["tot"])
+        bg_unc_usyst = stacked_hists["tot_usyst"]
+        bg_unc_dsyst = stacked_hists["tot_dsyst"]
+
+        bg_unc_usyst.Divide(stacked_hists["tot"])
+        bg_unc_dsyst.Divide(stacked_hists["tot"])
+        
+        #blind the data also on the ratio
         if blindFunc:
-            data = blindFunc(data)
-        errorbar(data)
+            data_ratio = blindFunc(data_ratio)
+        errorbar(data_ratio)
 
         fill_between(
             bg_unc_u, bg_unc_d,
@@ -473,17 +519,21 @@ def draw_data_mc(tf, hname, samples, **kwargs):
 
         fill_between(
             bg_unc_usyst, bg_unc_dsyst,
-            color="gray", hatch="\\\\\\\\",
+            color="gray", hatch=r"\\\\",
             alpha=1.0, linewidth=0, facecolor="none", edgecolor="gray", zorder=10,
         )
-        plt.title("data={0:.1f}\ MC={1:.1f}".format(idata, r["tot"].Integral()), x=0.01, y=0.8, fontsize=10, horizontalalignment="left")
-        plt.ylabel("$\\frac{\mathrm{data}}{\mathrm{pred.}}$", fontsize=16)
+        plt.title("data={0:.1f}\ MC={1:.1f}".format(
+            data.Integral(),
+            stacked_hists["tot"].Integral()
+            ), x=0.01, y=0.8, fontsize=10, horizontalalignment="left"
+        )
+        plt.ylabel(r"$\frac{\mathrm{data}}{\mathrm{pred.}}$", fontsize=16)
         plt.axhline(1.0, color="black")
         a2.set_ylim(0, 2)
         #hide last tick on ratio y axes
         a2.set_yticks(a2.get_yticks()[:-1]);
         a2.set_xticks(ticks);
-    return a1, a2, hs, r, hs_syst
+    return a1, a2, histograms_nominal, stacked_hists, histograms_systematic
 
 def draw_mem_data_mc(*args, **kwargs):
     a1, a2, hs = draw_data_mc(*args, **kwargs)
@@ -498,9 +548,12 @@ def draw_mem_data_mc(*args, **kwargs):
     a1.set_ylim(bottom=0)
     return a1, a2, hs
 
-def calc_roc(h1, h2):
+def calc_roc(h1, h2, rebin=1):
     h1 = h1.Clone()
     h2 = h2.Clone()
+    h1.Rebin(rebin)
+    h2.Rebin(rebin)
+
     if h1.Integral()>0:
         h1.Scale(1.0 / h1.Integral())
     if h2.Integral()>0:

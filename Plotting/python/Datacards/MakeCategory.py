@@ -1,9 +1,18 @@
 import json, copy, os, imp, multiprocessing, sys
 import sparse, ROOT
+import logging
+from utils import fakeData
+import os
+import os.path
+import fnmatch
+import time
+import itertools
+import gc
 
 #Nota bene: this is very important!
 #need to store histograms in memory, not on disk
 ROOT.TH1.AddDirectory(False)
+ROOT.gROOT.SetBatch(True)
 
 def make_rule_cut(basehist, category):
     """
@@ -67,29 +76,38 @@ def apply_rules(args):
 
     infile, rules = args
     infile_tf = ROOT.TFile.Open(infile)
+    if not infile_tf:
+        raise FileError("Could not open file: {0}".format(infile))
     hdict = {}
-    for rule in rules:
 
+    t0 = time.time()
+    logging.info("apply_rules: rules={0}".format(len(rules)))
+    for rule in rules:
+        
         #convert the string of the cut list into the actual list
         cuts = eval(rule["cuts"])
         hk = rule["output"]
-        h = infile_tf.Get(str(rule["input"]))
-        
-        #in case the input histogram could not be found, keep track that we have
-        #to use a dummy to get the correct binning
-        dummy = False
+        inp = str(rule["input"])
+        logging.debug("apply_rules: histogram {0} => {1} with rule {2}".format(inp, hk, rule))
+        h = infile_tf.Get(inp)
 
         #in case no histogram could be found, use a dummy histogram so that we
         #have at least the correct binning
-        if h == None:
-            h = infile_tf.Get(str("ttHTobb_M125_13TeV_powheg_pythia8/ttH_hbb/sl/sparse"))
-            if not h:
-                raise Exception("Could not get histogram")
+        dummy = False
+        if not h:
             dummy = True
+            logging.warning("Could not get histogram {0}, using fallback".format(inp))
+            h = infile_tf.Get(str("ttHTobb_M125_13TeV_powheg_pythia8/sl/sparse"))
+            if not h:
+                raise Exception("Could not get fallback histogram {0}".format("ttHTobb_M125_13TeV_powheg_pythia8/sl/sparse"))
             cuts = []
+
         variables = eval(rule["project"])
         vnames = [v[0] for v in variables]
+
+        #FIXME: producing a histo here somehow leaks memory
         ret = sparse.apply_cuts_project(h, cuts, vnames)
+        #ret = ROOT.TH1D()
 
         #dummy histogram needs to be made empty
         if dummy:
@@ -101,17 +119,28 @@ def apply_rules(args):
         #1D rebin
         if len(variables) == 1:
             ret.Rebin(variables[0][1])
+
         #2D rebin
         elif len(variables) == 2:
             ret.Rebin2D(variables[0][1], variables[0][2])
+
         ret.Scale(rule["xs_weight"])
 
-    if hdict.has_key(hk):
-        hdict[hk] += ret
-    else:
-        hdict[hk] = ret
+        logging.debug("apply_rules: {2}: N={0} I={1}".format(ret.GetEntries(), ret.Integral(), hk))
+
+        if hdict.has_key(hk):
+            hdict[hk] += ret
+        else:
+            hdict[hk] = ret
+    t1 = time.time()
+    logging.info("apply_rules: projected {0} rules in {1} seconds: {2} r/s".format(len(rules), t1-t0, len(rules)/float(t1-t0)))
     infile_tf.Close()
     return hdict
+
+def chunks(l, n):
+    """Yield successive n-sized chunks from l."""
+    for i in range(0, len(l), n):
+        yield l[i:i + n]
 
 def apply_rules_parallel(infile, rules, ncores=1):
     """
@@ -124,58 +153,59 @@ def apply_rules_parallel(infile, rules, ncores=1):
     """ 
     if ncores > 1:
         p = multiprocessing.Pool(ncores)
-    inputs = [
-        (infile, [r]) for r in rules
-    ]
-    if ncores > 1:
-        rets = p.map(apply_rules, inputs)
-    else:
-        rets = map(apply_rules, inputs)
+    inputs = []
+    logging.info("apply_rules_parallel: creating chunks")
 
-    #add all the histogram dictionaries together
-    print "reducing..."
-    ret = reduce(sparse.add_hdict, rets)
+    #so that we can apply some N rules at the same time
+    for chunk in chunks(sorted(rules, key=lambda x: x["output"]), 100):
+        inputs += [(infile, chunk)]
+    
+    rets = {}
+    if ncores > 1:
+        rets = reduce(sparse.add_hdict, p.map(apply_rules, inputs), rets)
+    else:
+        for inp in inputs:
+            ret = apply_rules(inp)
+            logging.debug("reducing {0}".format(len(ret)))
+            rets = sparse.add_hdict(rets, ret)
+            logging.debug("len(rets) = {0}".format(len(rets)))
     
     if ncores > 1:
         p.close()
-    return ret
+    return rets
 
-
-if __name__ == "__main__":
-
-    # Process one analysis/category name and write output to current working directory
-    
-    if not len(sys.argv)==5:
-        print "Invalid number of arguments. Usage:"
-        print "{0} sparse.root AnalysisSpecification.py SL_7cat sl_j4_t3".format(sys.argv[0])
-        sys.exit()
-        
-    infile = sys.argv[1] # path to sparse.root from MELooper
-    anspec = imp.load_source("anspec", sys.argv[2])
-    analysis_to_process = sys.argv[3]
-    cat_to_process = sys.argv[4]
+def main(analysis_spec, analysis_name, category_name, outdir=".", ncores=1):
+ 
+    #load the python analysis specification
+    logging.info("main: importing {0}".format(analysis_spec))
+    anspec = imp.load_source("anspec", analysis_spec)
         
     # Limit to one analysis/category
-    analysis = anspec.analyses[analysis_to_process]
-    categories = [c for c in analysis.categories if c.name==cat_to_process]
+    logging.info("main: loading analysis {0}".format(analysis_name))
+    analysis = anspec.analyses[analysis_name]
+    categories = [c for c in analysis.categories if fnmatch.fnmatch(c.name, category_name)]
 
+    logging.info("main: matched categories: {0}".format(str([s.full_name for s in categories])))
+
+    if len(categories) == 0:
+        raise Exception("Could not match any categories")
 
     # Make all the rules
     rules = []
     for cat in categories:
-        print "making rules for analysis={0} category={1} discr={2}".format(
-            analysis_to_process, cat.name, cat.discriminator
-        )
+        logging.debug("main: making rules for analysis={0} category={1} discr={2}".format(
+            analysis_name, cat.name, cat.discriminator
+        ))
         rules += make_rule_cut(cat.src_histogram, cat)
     
     of = open("rules.json", "w")
-    print "writing {0} rules".format(len(rules))
+    logging.info("writing {0} rules".format(len(rules)))
     of.write(json.dumps(rules, indent=2))
     of.close()
 
     #project out all the histograms
-    print "applying {0} rules".format(len(rules))
-    hdict = apply_rules_parallel(infile, rules)
+    logging.info("main: applying {0} rules".format(len(rules)))
+    hdict = apply_rules_parallel(analysis.sparse_input_file, rules, ncores)
 
     #split the big dictionary to category-based dictionaries
     hdict_cat = {}
@@ -186,7 +216,7 @@ if __name__ == "__main__":
         hdict_cat[catname][k] = hdict[k]
 
     #produce the event counts per category
-    print "producing event counts"
+    logging.info("main: producing event counts")
     event_counts = {}
     for cat in categories:
         event_counts[cat.name] = {}
@@ -199,17 +229,18 @@ if __name__ == "__main__":
     category_files = {}
 
     #save the histograms into per-category files
-    print "saving categories"
+    logging.info("main: saving categories")
     for catname in hdict_cat.keys():
-        hfile = "{0}.root".format(catname)
-        print "saving {0} histograms to {1}".format(len(hdict_cat[catname]), hfile)
+        hfile = os.path.join(outdir, "{0}.root".format(catname))
+        logging.debug("saving {0} histograms to {1}".format(
+            len(hdict_cat[catname]), hfile)
+        )
         category_files[catname] = hfile
         sparse.save_hdict(hfile, hdict_cat[catname])
     
     #add the fake data
     if analysis.do_fake_data:
-        print "adding fake data"
-        from utils import fakeData
+        logging.info("main: adding fake data")
         for cat in categories:
             hfile = category_files[cat.name]
             tf = ROOT.TFile(hfile, "UPDATE")
@@ -218,7 +249,7 @@ if __name__ == "__main__":
 
     #add the stat variations
     if analysis.do_stat_variations:
-        print "adding stat variations"
+        logging.info("main: adding stat variations")
         from utils import makeStatVariations
         for cat in categories:
             hfile = category_files[cat.name]
@@ -226,22 +257,78 @@ if __name__ == "__main__":
             stathist_names = makeStatVariations(tf, tf, [cat])
             tf.Close()
             
-            #add the statistical uncertainties to the datacard specificatio
+            #add the statistical uncertainties to the datacard specification
             for proc in cat.processes:
                 for syst in stathist_names[cat.name][proc]:
                     cat.shape_uncertainties[proc][syst] = 1.0
                 
     from utils import PrintDatacard
-    #make datacards for individual categories 
+    #make combine datacards (.txt) for individual categories 
     for cat in categories:
         if not cat.do_limit:
             continue
-        fn = "shapes_{0}.txt".format(cat.full_name)
-        print "writing shape file {0}".format(fn)
+        fn = os.path.join(outdir, "shapes_{0}.txt".format(cat.full_name))
+        logging.debug("main: writing shape file {0}".format(fn))
         dcof = open(fn, "w")
         PrintDatacard([cat], event_counts, category_files, dcof)
         dcof.write("# execute with\n")
         dcof.write("# combine -n {0} -M Asymptotic -t -1 {1}\n".format(cat.name, os.path.basename(fn)))
         dcof.close()
 
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    
+    logging.info("importing default analysis specification")
+    from TTH.Plotting.Datacards.AnalysisSpecification import analyses as analyses
+
+    import argparse
+    parser = argparse.ArgumentParser(
+        description='Creates datacards in categories based on a sparse histogram'
+    )
+    parser.add_argument(
+        '--anspec',
+        action="store",
+        help="path to file containing analysis specification",
+        default=os.path.join(
+            os.environ["CMSSW_BASE"],
+            "src/TTH/Plotting/python/Datacards/AnalysisSpecification.py"
+        ),
+    )
+    parser.add_argument(
+        '--ncores',
+        action="store",
+        help="number of parallel cores",
+        default=1,
+        type=int
+    )
+    parser.add_argument(
+        '--analysis',
+        action="store",
+        help="name of analysis or glob pattern",
+        default="*",
+        type=str
+    )
+    parser.add_argument(
+        '--category',
+        action="store",
+        help="name of category or glob pattern",
+        default="*",
+    )
+    parser.add_argument(
+        '--outdir',
+        action="store",
+        help="per-analsyis output directory (will be created)",
+        default=r"{analysis}",
+    )
+    args = parser.parse_args()
+    matched_analyses = [an for an in analyses.keys() if fnmatch.fnmatch(an, args.analysis)]
+    if len(matched_analyses) == 0:
+        raise Exception("No matched analyses")
+        
+    for analysis in matched_analyses:
+        outdir = args.outdir.format(analysis=analysis)
+        logging.info("__main__: analysis {0} to dir {1}".format(analysis, outdir))
+        if not os.path.isdir(outdir):
+            os.makedirs(outdir)
+        main(args.anspec, analysis, args.category, outdir=outdir, ncores=args.ncores)
     

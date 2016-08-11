@@ -152,7 +152,11 @@ class LeptonAnalyzer(FilterAnalyzer):
         
         event.good_leptons = sorted(event.good_leptons, key=lambda x: x.pt, reverse=True)
         event.veto_leptons = sorted(event.veto_leptons, key=lambda x: x.pt, reverse=True)
-
+       
+        #Match good signal leptons to gen-leptons 
+        if self.cfg_comp.isMC:
+            from PhysicsTools.HeppyCore.utils.deltar import matchObjectCollection
+            #matchObjectCollection(event.good_leptons, event.GenLepFromTop, 0.3)
         #apply configuration-dependent selection
         passes = self.conf.leptons["selection"](event)
         if "debug" in self.conf.general["verbosity"]:

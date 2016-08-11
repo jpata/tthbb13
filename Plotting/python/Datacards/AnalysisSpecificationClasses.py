@@ -1,18 +1,30 @@
-class Sample:
-    def __init__(self, **kwargs):
+import os
+
+class Sample(object):
+    """
+    Defines how an input sample should be mapped to an output histogram.
+    Optionally 
+    """
+    def __init__(self, *args, **kwargs):
         self.input_name = kwargs.get("input_name")
         self.output_name = kwargs.get("output_name")
         self.cuts = kwargs.get("cuts", [])
         self.xs_weight = kwargs.get("xs_weight", 1.0)
 
-    def __repr__(self):
-        s = "Sample: maps {0}->{1} with cuts=[{2}], xsw={3}".format(
-            self.input_name,
-            self.output_name,
-            ",".join(map(str, self.cuts)),
-            self.xs_weight
-        )
-        return s
+    # 
+    # def __repr__(self):
+    #     s = "Sample: maps {0}->{1} with cuts=[{2}], xsw={3}".format(
+    #         self.input_name,
+    #         self.output_name,
+    #         ",".join(map(str, self.cuts)),
+    #         self.xs_weight
+    #     )
+    #     return s
+
+class DataSample(Sample):
+    def __init__(self, *args, **kwargs):
+        super(DataSample, self).__init__(self, *args, **kwargs)
+        self.lumi = kwargs.get("lumi", 1.0)
 
 class Category:
     def __init__(self, **kwargs):
@@ -28,6 +40,8 @@ class Category:
         self.cuts = kwargs.get("cuts", [])
         self.samples = kwargs.get("samples", [])
         self.data_samples = kwargs.get("data_samples", [])
+        self.lumi = sum([d.lumi for d in self.data_samples])
+
         self.signal_processes = kwargs.get("signal_processes", [])
         self.processes = list(set([s.output_name for s in self.samples]))
 
@@ -55,6 +69,7 @@ class Category:
         for k, v in self.proc_scale_uncertainties.items():
             self.scale_uncertainties[k].update(v)
 
+    
     def __repr__(self):
         s = "Category: {0} ({1}) discr={2} cuts={3} do_limit={4}".format(
             self.name,
@@ -71,11 +86,16 @@ class Analysis:
         self.categories = kwargs.get("categories")
         self.sparse_input_file = kwargs.get("sparse_input_file")
 
-        #groups represent calls to combine
-        self.groups = kwargs.get("groups")
+        # groups represent calls to combine, i.e. 
+        # {"myCombination1": ["cat1", "cat2"] }
+        # will calculate the combined limit myCombination1 of cat1 and cat2 
+        self.groups = kwargs.get("groups", {})
         self.do_fake_data = kwargs.get("do_fake_data", False)
         self.do_stat_variations = kwargs.get("do_stat_variations", False)
 
+    def to_JSON(self):
+        return json.dumps(self.__dict__, indent=2)
+    
     def __repr__(self):
         s = "Analysis:\n"
         s += "  input file: {0}\n".format(self.sparse_input_file)
@@ -97,18 +117,18 @@ def make_csv_categories_abstract(di):
     with open('analysis_specs.csv', 'w') as csvfile:
         csvwriter = csv.writer(csvfile, delimiter=';')    
 
-        csvwriter.writerow(['specfile', 'analysis', 'category', 'sparsefile'])
+        csvwriter.writerow(['specfile', 'analysis', 'category'])
     
         # We want the analysis specification file
-        # as make_csv is called from there we just take the filename of the outer stack    
+        # as make_csv is called from there we just take the filename of the outer stack
         import inspect
-        analysis_spec_file = inspect.getouterframes(inspect.currentframe())[1][1]
+        analysis_spec_file = os.path.abspath(inspect.getouterframes(inspect.currentframe())[1][1])
 
         for analysis_name, analysis in di.iteritems():        
 
             unique_cat_names = list(set(c.name for c in analysis.categories))
             for cat_name in unique_cat_names:
-                csvwriter.writerow([analysis_spec_file, analysis_name, cat_name, analysis.sparse_input_file])
+                csvwriter.writerow([analysis_spec_file, analysis_name, cat_name])
 
     return [1]
 
@@ -123,7 +143,7 @@ def make_csv_groups_abstract(di):
         # We want the analysis specification file
         # as make_csv is called from there we just take the filename of the outer stack    
         import inspect
-        analysis_spec_file = inspect.getouterframes(inspect.currentframe())[1][1]
+        analysis_spec_file = os.path.abspath(inspect.getouterframes(inspect.currentframe())[1][1])
 
         for analysis_name, analysis in di.iteritems():        
             for group_name in analysis.groups.keys():

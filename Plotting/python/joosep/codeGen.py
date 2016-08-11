@@ -42,7 +42,7 @@ def makeCategory(cat, ids=[]):
     if isleaf:
         s = r"""
 new {catkind}(
-    [](const Event& ev){{
+    [](const Event& ev, const ProcessKey::ProcessKey& proc, const vector<CategoryKey::CategoryKey>& cats, const SystematicKey::SystematicKey& syst){{
       return {cuts};
     }},
     {catid},
@@ -224,7 +224,6 @@ def makeSystWeightFunction(name, func):
         name, func
     )
 
-
 #List of all systematics that we want to consider
 systematics = [
     "nominal",
@@ -263,6 +262,7 @@ for k in systematics:
             ]
 
 #List of all processes
+#These will be converted to the enum ProcessKey
 processes = [
     "ttH",
     "ttH_hbb",
@@ -302,18 +302,11 @@ categories = [
 #Map categories to their respective C++ cuts. The Event is available as "ev"
 cuts = {
     "sl": "BaseCuts::sl(ev)",
-    "sl_mu": "BaseCuts::sl_mu(ev)",
-    "sl_el": "BaseCuts::sl_el(ev)",
-    
-    "dl_mumu": "BaseCuts::dl_mumu(ev)",
-    "dl_ee": "BaseCuts::dl_ee(ev)",
-    "dl_emu": "BaseCuts::dl_emu(ev)",
-
     "dl": "BaseCuts::dl(ev)",
 }
 
 #Nested list of (name, type, subcategory) triplets, corresponding to the
-#category tree to create
+#CategoryKey enum to create
 categories_tree = [
     ("sl", "SparseCategoryProcessor", []),
     ("dl", "SparseCategoryProcessor", []),
@@ -332,6 +325,21 @@ category_processors = [
 all_histogram_keys = (
     additional_histograms
 )
+
+class EventFunction:
+    def __init__(self, syst, func):
+        self.func = func
+
+class EventVariable:
+    def __init__(self, name, typ, nominal, systematics):
+        self.name = name
+        self.typ = typ
+        self.nominal = nominal
+        self.systematics = systematics
+
+event_structure = [
+    EventVariable("is_sl", "bool", EventFunction("data->is_sl"), {}),
+]
 
 if __name__ == "__main__":
     #file with enum includes

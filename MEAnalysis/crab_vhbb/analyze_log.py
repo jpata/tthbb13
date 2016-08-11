@@ -6,7 +6,6 @@ for line in sys.stdin.readlines():
     if "tnetxngfile" in line and "error" in line:
         n_xrootd += 1
 
-print len(badlines)
 if n_xrootd>0:
     sys.exit(8028)
 else:

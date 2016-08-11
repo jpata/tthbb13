@@ -163,19 +163,24 @@ def createHistograms(dic_files):
            # - a tuple: (filename, treename)
            # - a tuple: ('list of filenames', treename)
            # Using a Chain instead of a Tree of flexibility
-           # ONLY FILENAME GIVEN           
-           if isinstance( dic_files[p.from_file], str ):          
+           # ONLY FILENAME GIVEN
+           if isinstance( dic_files[p.from_file], str ):
               input_tree = ROOT.TChain("tree")
               input_tree.Add(dic_files[p.from_file])
            # FILENAME AND TREENAME FIVEN
            elif isinstance( dic_files[p.from_file][0], str ):
               input_tree = ROOT.TChain(dic_files[p.from_file][1])
-              input_tree.Add(dic_files[p.from_file][0])                            
+              input_tree.Add(dic_files[p.from_file][0])
            # LIST OF FILENAMES AND TREENAME FIVEN
            else:
                input_tree = ROOT.TChain(dic_files[p.from_file][1])
+               
+               if len(dic_files[p.from_file][0])==0:
+                  print "Skipping", p.from_file
+                  continue
+               
                for fn in dic_files[p.from_file][0]:
-                  input_tree.Add(fn)          
+                  input_tree.Add(fn)
 
            # end openeing input file
   
@@ -224,11 +229,6 @@ def createHistograms(dic_files):
                  h.Scale(1./n_entries_cut)
 
            i_draw += 1
-
-           # Optional: normalize area to one
-           if cp.normalize:
-               if h.Integral():
-                   h.Scale( 1/h.Integral())
         
            # Save the histogram in the dictionary
            dic_histos[cp.name + "_" + p.name] = h
@@ -265,6 +265,15 @@ def drawHistograms(dic_histos, output_dir):
         leg.SetTextSize(cp.legend_text_size)
         leg.SetShadowColor(0)
 
+
+
+        # Optional: normalize area to one
+        if cp.normalize:
+           for p in cp.li_plots:
+              h = dic_histos[cp.name + "_" + p.name]
+              if h.Integral():
+                 h.Scale( 1/h.Integral())
+                  
         # If not set, determine the y-range
         if cp.max_y == None:
 
@@ -298,6 +307,7 @@ def drawHistograms(dic_histos, output_dir):
             # add to legend
             leg.AddEntry( h, p.name, "L")
 
+
             # Adjust y-range        
             if cp.log_y:
                 h.SetAxisRange(0.0001, cp.max_y,"y")
@@ -327,9 +337,10 @@ def drawHistograms(dic_histos, output_dir):
 
             print p.name, h.GetEntries()
 
+
             # Optional fit            
             if p.fit is not None:
-               h.Fit(p.fit, "R")
+               h.Fit(p.fit, "R")               
 
             # Draw the histogram
             if i_p == 0:

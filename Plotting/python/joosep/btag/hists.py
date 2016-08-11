@@ -1,15 +1,16 @@
-import ROOT, sys
+import ROOT, sys, os
 from TTH.MEAnalysis.samples_base import getSitePrefix
+from TTH.MEAnalysis.samples import samples_dict
 ROOT.gROOT.SetBatch(True)
 ROOT.TH1.SetDefaultSumw2(True)
 ROOT.TH1.AddDirectory(False)
 
+DATASETPATH = os.environ.get("DATASETPATH", "")
+spl = DATASETPATH.split("__")
+
 INFILES = sys.argv[2:]
 OUTFILE = sys.argv[1]
 
-tt = ROOT.TChain("vhbb/tree")
-for inf in INFILES:
-    tt.AddFile(getSitePrefix(inf))
 
 def hist(of, x, disc, low=0, high=1):
     h = ROOT.TH1D(x, x, 100, low, high)
@@ -18,16 +19,18 @@ def hist(of, x, disc, low=0, high=1):
     return h
     
 def hist3d(of, x, disc, low=0, high=1):
-    h = ROOT.TH3D(x, x, 6, 20, 400, 6, 0, 4.5, 100, low, high)
+    h = ROOT.TH3D(x, x,
+        6, 20, 400, #pt
+        6, 0, 2.4, #eta
+        20, low, high #btag
+    )
     h.GetXaxis().SetTitle("Jet pt")
     h.GetYaxis().SetTitle("Jet |eta|")
     h.GetZaxis().SetTitle(disc + " b-discriminator")
     of.Add(h)
     return h
 
-of = ROOT.TFile(OUTFILE, "RECREATE")
-of.cd()
-
+cut = "Jet_pt>20 && abs(Jet_eta)<2.4 && Jet_id>=1 && "
 def makeControlPlots(discname, functoplot, low, high):
     hists = {
         "b": {
@@ -47,19 +50,19 @@ def makeControlPlots(discname, functoplot, low, high):
         }
     }
     
-    tt.Draw("{1} >> {0}_b_Bin0__rec".format(discname, functoplot), "abs(Jet_eta)<=1.0 && abs(Jet_hadronFlavour)==5")
-    tt.Draw("{1} >> {0}_b_Bin1__rec".format(discname, functoplot), "abs(Jet_eta)>1.0 && abs(Jet_hadronFlavour)==5")
+    tt.Draw("{1} >> {0}_b_Bin0__rec".format(discname, functoplot), cut + "abs(Jet_eta)<=1.0 && abs(Jet_hadronFlavour)==5")
+    tt.Draw("{1} >> {0}_b_Bin1__rec".format(discname, functoplot), cut + "abs(Jet_eta)>1.0 && abs(Jet_hadronFlavour)==5")
 
-    tt.Draw("{1} >> {0}_c_Bin0__rec".format(discname, functoplot), "abs(Jet_eta)<=1.0 && abs(Jet_hadronFlavour)==4")
-    tt.Draw("{1} >> {0}_c_Bin1__rec".format(discname, functoplot), "abs(Jet_eta)>1.0 && abs(Jet_hadronFlavour)==4")
+    tt.Draw("{1} >> {0}_c_Bin0__rec".format(discname, functoplot), cut + "abs(Jet_eta)<=1.0 && abs(Jet_hadronFlavour)==4")
+    tt.Draw("{1} >> {0}_c_Bin1__rec".format(discname, functoplot), cut + "abs(Jet_eta)>1.0 && abs(Jet_hadronFlavour)==4")
 
-    tt.Draw("{1} >> {0}_l_Bin0__rec".format(discname, functoplot), "abs(Jet_eta)<=1.0 && abs(Jet_hadronFlavour)!=4 && abs(Jet_hadronFlavour)!=5")
-    tt.Draw("{1} >> {0}_l_Bin1__rec".format(discname, functoplot), "abs(Jet_eta)>1.0 && abs(Jet_hadronFlavour)!=4 && abs(Jet_hadronFlavour)!=5")
+    tt.Draw("{1} >> {0}_l_Bin0__rec".format(discname, functoplot), cut + "abs(Jet_eta)<=1.0 && abs(Jet_hadronFlavour)!=4 && abs(Jet_hadronFlavour)!=5")
+    tt.Draw("{1} >> {0}_l_Bin1__rec".format(discname, functoplot), cut + "abs(Jet_eta)>1.0 && abs(Jet_hadronFlavour)!=4 && abs(Jet_hadronFlavour)!=5")
 
 
-    tt.Draw("{1}:abs(Jet_eta):Jet_pt >> {0}_b_pt_eta".format(discname, functoplot), "abs(Jet_hadronFlavour)==5")
-    tt.Draw("{1}:abs(Jet_eta):Jet_pt >> {0}_c_pt_eta".format(discname, functoplot), "abs(Jet_hadronFlavour)==4")
-    tt.Draw("{1}:abs(Jet_eta):Jet_pt >> {0}_l_pt_eta".format(discname, functoplot), "abs(Jet_hadronFlavour)!=4 && abs(Jet_hadronFlavour)!=5")
+    tt.Draw("{1}:abs(Jet_eta):Jet_pt >> {0}_b_pt_eta".format(discname, functoplot), cut + "abs(Jet_hadronFlavour)==5")
+    tt.Draw("{1}:abs(Jet_eta):Jet_pt >> {0}_c_pt_eta".format(discname, functoplot), cut + "abs(Jet_hadronFlavour)==4")
+    tt.Draw("{1}:abs(Jet_eta):Jet_pt >> {0}_l_pt_eta".format(discname, functoplot), cut + "abs(Jet_hadronFlavour)!=4 && abs(Jet_hadronFlavour)!=5")
 
     #normalize 1D distributions
     for k in hists.keys():
@@ -87,8 +90,17 @@ def makeControlPlots(discname, functoplot, low, high):
                     h3.SetBinContent(i, j, k, unnorm)
                 #print i, j, h3.ProjectionZ("", i, i, j, j).Integral()
 
-makeControlPlots("btagCSV", "Jet_btagCSV", 0.0, 1.0)
-makeControlPlots("btagBDT", "Jet_btagBDT", -1.0, 1.0)
+if __name__ == "__main__":
+    tt = ROOT.TChain("vhbb/tree")
+    for inf in INFILES:
+        tt.AddFile(getSitePrefix(inf))
 
-of.Write()
-of.Close()
+    of = ROOT.TFile(OUTFILE, "RECREATE")
+    of.cd()
+
+    makeControlPlots("btagCSV", "Jet_btagCSV", 0.0, 1.0)
+    makeControlPlots("btagCMVA", "Jet_btagCMVA", -1.0, 1.0)
+    makeControlPlots("btagCMVA_log", "log((1.0 + Jet_btagCMVA)/(1.0 - Jet_btagCMVA))", -15.0, 15.0)
+    
+    of.Write()
+    of.Close()

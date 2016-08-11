@@ -12,6 +12,7 @@ tth_sel = [
     ("hX", "nGenBHiggs<2"),
 ]
 
+sel = "is_sl && numJets>=6"
 #ttbar heavy-light classification
 ttjets_sel = [
     ("ttb", "ttCls == 51"),
@@ -30,10 +31,14 @@ ttjets_sel = [
     ("ttll", "ttCls == 0 || ttCls<0")
 ]
 
+ttjets_sel_withcut = [
+    (k[0], "({0}) && ({1})".format(k[1], sel))
+    for k in ttjets_sel
+]
 
 #list of filename -> selection that you want to project
 inf = [
-    ("/scratch/joosep/ttjets_big.root", ttjets_sel),
+    ("/scratch/jpata/tth_data/Jul6_leptonic_nome_v1/Jul6_leptonic_nome_v1__TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root", ttjets_sel_withcut),
 ]
 
 def chunks(l, n):
@@ -60,7 +65,7 @@ def SelectTree_par(args):
 
 import multiprocessing, os
 from TTH.TTHNtupleAnalyzer.ParHadd import hadd 
-pool = multiprocessing.Pool(40)
+pool = multiprocessing.Pool(10)
 
 for infile, cuts in inf:
     tf = ROOT.TFile(infile)

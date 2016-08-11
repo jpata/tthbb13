@@ -26,8 +26,8 @@ for infile in infiles:
             lumidict[(run[0], lumi[0], event[0])] = [(infile, i)]
         else:
             lumidict[(run[0], lumi[0], event[0])] += [(infile, i)]
-    print "scanned", infile, i
+    print "scanned file={0} Nentries={1}".format(infile, i)
     tf.Close()
 for (k, v) in lumidict.items():
     if len(v) > 1:
-        print k, len(v)
+        print "DUPE", k, len(v)

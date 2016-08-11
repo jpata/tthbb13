@@ -1,187 +1,174 @@
-import ROOT
+#######################################
+# Imports
+########################################
 
-import matplotlib as mpl
-mpl.use('Agg')
+from TrainClassifiersBase import *
 
-import sklearn
-import numpy as np
-import sys
-
-import matplotlib.pyplot as plt
-import pandas, root_numpy
-import rootpy
-import rootpy.plotting
-import rootpy.plotting.root2matplotlib as rplt
-
-from TTH.Plotting.joosep.plotlib import *
+########################################
+# Configuration
+########################################
 
 
-brs = [
-    "is_signal",
-    "j1j2_mass", "j1j3_mass", "j2j3_mass", "j1j2j3_mass", "frec", "min_btagCSV", "max_btagCSV",
- ]
+# All branches to load from file
+brs = ["l_pt", "l_eta", "l_phi", "l_pdgid",
+       "met_pt", "met_phi",
+       "j0_pt", "j0_eta", "j0_phi", "j0_mass", "j0_btagCSV", 
+       "j1_pt", "j1_eta", "j1_phi", "j1_mass", "j1_btagCSV", 
+       "j2_pt", "j2_eta", "j2_phi", "j2_mass", "j2_btagCSV", 
+       "j3_pt", "j3_eta", "j3_phi", "j3_mass", "j3_btagCSV", 
+       "j4_pt", "j4_eta", "j4_phi", "j4_mass", "j4_btagCSV", 
+       "j5_pt", "j5_eta", "j5_phi", "j5_mass", "j5_btagCSV", 
+       "tt_class", "evt",       
+]
+
+# Variables to feed to BDT
+input_vars = [    
+    "j0_eta",  "j0_mass", "j0_btagCSV", 
+    "j1_eta",  "j1_mass", "j1_btagCSV", 
+    "j2_eta",  "j2_mass", "j2_btagCSV", 
+    "j3_eta",  "j3_mass", "j3_btagCSV", 
+    "j4_pt", "j4_eta",  "j4_mass", "j4_btagCSV", 
+    "j5_pt", "j5_eta",  "j5_mass", "j5_btagCSV"
+]
+              
+
+default_params = {        
+
+    # Common parameters
+
+    "n_chunks"          : 1,
+
+    "n_estimators"   : 160,
+    #"max_depth"      : 2, 
+    "max_leaf_nodes" : 3,
+    "learning_rate"  : 0.05,    
+    "subsample"      : 0.5,     
+    "verbose"        : 2,    
+
+    "samples_per_epoch" : None, # later filled from input files
+}
+
+infname = "/mnt/t3nfs01/data01/shome/gregor/tth/gc/mvatuple/v3/out.root"
 
 
-ds = []
-path = "/shome/gregor/tth/gc/GCf4625db4aa6a/cfg_noME/ttHTobb_M125_13TeV_powheg_pythia8/"
 
-for ifn, fn in enumerate([
-    path + "outputhadtop_3j.root",
-]):
-    d = root_numpy.root2rec(
-        fn,
-        branches=brs,
-    )
-    d = pandas.DataFrame(d)
-    
-    #d["w"] = d["weight_xs"]
-    ds += [d]
-
-df = pandas.concat(ds)
-
-print df.shape
-
-print df.groupby('is_signal')["is_signal"].count()
-
-from sklearn.ensemble import GradientBoostingClassifier
+cut_train =  "(evt%2==0)"
+cut_test  =  "(evt%2==1)"
 
 
-def train(df, var,  **kwargs):
-    weight = kwargs.get("weight", None)
-    
+########################################
+# Read in parameters
+########################################
 
-    df_shuf = df.iloc[np.random.permutation(np.arange(len(df)))]
-    
-    cls = GradientBoostingClassifier(
-        n_estimators=kwargs.get("ntrees", 200),
-        learning_rate=kwargs.get("learning_rate", 0.1),
-        max_depth=kwargs.get("depth", 2),
-        min_samples_split=kwargs.get("min1", 1),
-        min_samples_leaf=kwargs.get("min2", 1),
-        subsample=kwargs.get("subsample", 1.0),
-        verbose=kwargs.get("verbose", False)
-    )
+params = {}
+for param in default_params.keys():
 
-    if not weight:
-        cls = cls.fit(df_shuf[var], df_shuf["is_signal"])
+    if param in os.environ.keys():
+        cls = default_params[param].__class__
+        value = cls(os.environ[param])
+        params[param] = value
     else:
-        cls = cls.fit(df_shuf[var], df_shuf["is_signal"], df_shuf[weight])
-    cls.varlist = var
-    return cls
-
-df_shuf = df.iloc[np.random.permutation(len(df))]
-
-nsig = df_shuf["is_signal"]==1
-nbkg = df_shuf["is_signal"]==0
-
-d_bkg_tr = df_shuf[nbkg][:sum(nbkg)/2];
-d_sig_tr = df_shuf[nsig][:sum(nsig)/2];
-
-d_bkg_te = df_shuf[nbkg][sum(nbkg)/2:];
-d_sig_te = df_shuf[nsig][sum(nsig)/2:];
-
-dtrain = pandas.concat([d_bkg_tr, d_sig_tr])
-dtest = pandas.concat([d_bkg_te, d_sig_te])
-
-cls_2var_50 = train(
-    dtrain,
-    ["j1j2j3_mass", "frec"],
-    ntrees=50,
-    learning_rate=0.1,
-    max_depth=4,
-    subsample=0.8,
-    verbose=True
-)
+        params[param] = default_params[param]
 
 
-cls_4var_50 = train(
-    dtrain,
-    ["j1j2j3_mass", "frec", "min_btagCSV", "max_btagCSV"],
-    ntrees=50,
-    learning_rate=0.1,
-    max_depth=4,
-    subsample=0.8,
-    verbose=True
-)
+########################################
+# Count effective training samples
+########################################
 
-cls_4var_200 = train(
-    dtrain,
-    ["j1j2j3_mass", "frec", "min_btagCSV", "max_btagCSV"],
-    ntrees=200,
-    learning_rate=0.025,
-    max_depth=4,
-    subsample=0.8,
-    verbose=True
-)
+# We want to know the "real" number of training samples
+# This is a bit tricky as we read the file in "chunks" and then divide each chunk into "batches"
+# both operations might loose a few events at the end
+# So we actually do this procedure on a "cheap" branch
 
-cls_6var_200 = train(
-    dtrain,
-    ["j1j2_mass", "j1j3_mass", "j2j3_mass", "j1j2j3_mass", "min_btagCSV", "max_btagCSV"],
-    ntrees=200,
-    learning_rate=0.025,
-    max_depth=4,
-    subsample=0.8,
-    verbose=True
-)
+n_train_samples = 0 
+# Loop over signal and background sample
+
+# get the number of events in the root file so we can determin the chunk size
+rf = ROOT.TFile.Open(infname)
+print rf
+entries = rf.Get("multiclass_6j").GetEntries()
+rf.Close()
+
+step = entries/params["n_chunks"]    
+i_start = 0
+
+# Loop over chunks from file
+for i_chunk in range(params["n_chunks"]):
+
+    # get the samples in this chunk that survive the fiducial selection + training sample selection
+    n_samples = len(root_numpy.root2array(infname, treename="multiclass_6j", branches=["evt"], selection = cut_train, start=i_start, stop=i_start+step).view(np.recarray))
+
+    # round to batch_size
+    n_train_samples += n_samples
+    i_start += step
+
+print "Total number of training samples = ", n_train_samples
+params["samples_per_epoch"] = n_train_samples
 
 
 
+########################################
+# Prepare data and scalers
+########################################
 
-#plt.hist(cls.predict_proba(dtest.loc[
-#    dtest.eval("(is_signal==0)"), cls.varlist
-#    ])[:,0], bins=np.linspace(0,1,51), normed=True, alpha=0.4
-#);
-#plt.hist(cls.predict_proba(dtest.loc[
-#    dtest.eval("(is_signal==1)"), cls.varlist
-#    ])[:,0], bins=np.linspace(0,1,51), color="red", alpha=0.4, normed=True
-#);
-#
-#plt.savefig("foo.png")
-#
-def rocplot(cut, title, classifiers, labels):
-    plt.plot([0,1],[0,1], color="black", lw=2)
-    #sel = dtest.eval(cut) 
-    #subdf = dtest[sel]
-    sig = dtest["is_signal"]==1
-    bkg = dtest["is_signal"]!=1
-    
-    rocs = []
-    idx = 0
-    for cls in classifiers:
-        probs1 = cls.predict_proba(dtest[sig][cls.varlist])[:, 1]
-        probs2 = cls.predict_proba(dtest[bkg][cls.varlist])[:, 1]
+datagen_train = datagen(cut_train, brs, infname, n_chunks=params["n_chunks"])
+datagen_test  = datagen(cut_test, brs, infname, n_chunks=params["n_chunks"])
 
-        h1 = make_df_hist((101,0,1), probs1)
-        h2 = make_df_hist((101,0,1), probs2)
-        r, e = calc_roc(h1, h2)
-        rocs += [(r,e)]
-        plt.plot(r[:, 0], r[:, 1], label=labels[idx], lw=1, ls="--")
-        #plt.fill_between(r[:,0], r[:,1]+e[:,1], r[:,1]-e[:,1],alpha=0.1, color="black")
-        #plt.fill_betweenx(r[:,1], r[:,0]-e[:,0], r[:,0]+e[:,0],alpha=0.1, color="black")
-        idx += 1
+# This function produces the necessary shape for MVA training/evaluation
+# (batch_size,1,40,40)
+# However it uses the raw values in the image
+# If we want a rescaled one, use to_image_scaled 
+def to_image(df):
+    return df[input_vars].values
 
-    plt.xlabel("tt+H(bb) efficiency", fontsize=16)
-    plt.ylabel("tt+jets efficiency", fontsize=16)
 
-    #var = "lr0"
-    #if "dl" in title:
-    #    var = "lr1"
-    
-    #h1 = make_df_hist((101,0,1), dtest[sig][var]) #dtest[sig]["genWeight"])
-    #h2 = make_df_hist((101,0,1), dtest[bkg][var]) #dtest[bkg]["genWeight"])
-    #r, e = calc_roc(h1, h2)
-    #plt.plot(r[:, 0], r[:, 1], label="MEM 022", color="black", lw=1)
-    #plt.fill_between(r[:,0], r[:,1]+e[:,1], r[:,1]-e[:,1],alpha=0.1, color="black")
+def model(params):
 
-    #plt.title(title + "\n$N_s=%d\\ N_b=%d$"%(np.sum(["id"]==0), np.sum(subdf["id"]==1)))
-    plt.legend(loc=2)
-    plt.xlim(0,1);plt.ylim(0,1);
+    classif =GradientBoostingClassifier(
+        n_estimators  = params["n_estimators"],   
+        max_leaf_nodes = params["max_leaf_nodes"],      
+        learning_rate = params["learning_rate"],  
+        subsample     = params["subsample"],      
+        verbose       = params["verbose"],        
+    )
 
-plt.clf()
+    return classif
 
-rocplot("", "foo",[cls_2var_50, cls_4var_50, cls_4var_200, cls_6var_200],["2 50", "4 50", "4 200", "6 200"])
-plt.savefig("bar.png")
-        #[cls_cat[c], cls_cat_withmem[c], cls_cat_memonly[c]],
-        #["BDT", "BDT+MEM", "MEM+blr"]
-        #[], ["BDT"]
+
+
+classifiers = [
+    Classifier("BDT", 
+               "scikit",
+               params,
+               True,
+               datagen_train,
+               datagen_test,               
+               model(params),
+               image_fun = to_image,               
+               class_names = {
+                   0: "ttb", 
+                   1: "tt2b",
+                   2: "ttbb",
+                   3: "ttcc",
+                   4: "ttll",
+               },
+               input_vars = input_vars
+               )    
+]
+
+
+
+
+########################################
+# Train/Load classifiers and make ROCs
+########################################
+
+[clf.prepare() for clf in classifiers]
+[analyze(clf) for clf in classifiers]
+
+
+ 
+
+
+
 
