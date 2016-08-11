@@ -412,13 +412,23 @@ def triggerPath(event):
     return 0
 
 if __name__ == "__main__":
+    
     if os.environ.has_key("FILE_NAMES"):
         file_names = map(getSitePrefix, os.environ["FILE_NAMES"].split())
         prefix, sample = get_prefix_sample(os.environ["DATASETPATH"])
+        skip_events = int(os.environ.get("SKIP_EVENTS", 0))
+        max_events = int(os.environ.get("MAX_EVENTS", 0))
     else:
         file_names = [getSitePrefix("/store/user/jpata/tth/tth_Jul31_V24_v1/ttHTobb_M125_13TeV_powheg_pythia8/tth_Jul31_V24_v1/160731_130548/0000/tree_{0}.root".format(i)) for i in range(1, 10)]
         prefix = ""
         sample = "ttHTobb_M125_13TeV_powheg_pythia8"
+        skip_events = 0
+        max_events = 10000
+
+    if len(file_names) == 0:
+        raise Exception("No files specified, probably a mistake")
+    if max_events == 0:
+        raise Exception("No events specified, probably a mistake")
 
     process = samples_nick[sample]
     schema = get_schema(sample)
@@ -451,7 +461,16 @@ if __name__ == "__main__":
        
         iEv = 0
 
-        for event in events:
+        for ievent, event in enumerate(events):
+            
+            if nevents < skip_events:
+                continue
+            if nevents > (skip_events + max_events):
+                logging.info("event loop: breaking due to MAX_EVENTS: {0} > {1} + {2}".format(
+                    nevents, skip_events, max_events
+                ))
+                break
+
             #apply some basic preselection
             if not (event.is_sl or event.is_dl):
                 continue
