@@ -4,6 +4,8 @@ import copy
 import sys
 import numpy as np
 import sklearn
+from TTH.Plotting.joosep.cleanPath import fixPythonPath
+sys.path = fixPythonPath(sys.path)
 import pandas
 import pickle
 import math
@@ -22,7 +24,7 @@ class MulticlassAnalyzer(FilterAnalyzer):
         super(MulticlassAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
         self.conf = cfg_ana._conf
 
-        self.pickle_filename = "BDT.pickle"
+        self.pickle_filename = self.conf.multiclass["bdtPickleFile"]
         
         # Load the BDT
         pickle_file = open(self.pickle_filename, "r")

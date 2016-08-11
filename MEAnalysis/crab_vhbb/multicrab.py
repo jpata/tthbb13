@@ -340,6 +340,7 @@ env
         os.system("cat $CMSSW_BASE/src/TTH/hash >> $CMSSW_BASE/src/TTH/logfile.md")
     
     vhbb_dir = os.environ.get("CMSSW_BASE") + "/src/VHbbAnalysis/Heppy/test"
+    tth_data_dir = os.environ.get("CMSSW_BASE") + "/src/TTH/MEAnalysis/data"
     config.JobType.inputFiles = [
         'hash',
         'analyze_log.py',
@@ -350,7 +351,7 @@ env
         'python.tar.gz',
         'data.tar.gz',
         "MEAnalysis_heppy.py",
-        'BDT.pickle',
+        tth_data_dir + '/BDT.pickle',
         vhbb_dir + '/MVAJetTags_620SLHCX_Phase1And2Upgrade.db',
         vhbb_dir + '/combined_cmssw.py',
         vhbb_dir + '/vhbb.py',
