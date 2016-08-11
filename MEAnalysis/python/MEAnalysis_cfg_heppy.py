@@ -219,6 +219,10 @@ class Conf:
         #]
     }
 
+    multiclass = {
+        "bdtPickleFile": os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/BDT.pickle"
+    }
+
     bran = {
       
         "enabled": False,

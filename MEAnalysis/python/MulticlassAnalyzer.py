@@ -22,7 +22,7 @@ class MulticlassAnalyzer(FilterAnalyzer):
         super(MulticlassAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
         self.conf = cfg_ana._conf
 
-        self.pickle_filename = "BDT.pickle"
+        self.pickle_filename = self.conf.multiclass["bdtPickleFile"]
         
         # Load the BDT
         pickle_file = open(self.pickle_filename, "r")
@@ -46,7 +46,7 @@ class MulticlassAnalyzer(FilterAnalyzer):
 
     def _process(self, event):
         event.passes_multiclass = True
-        setattr( event, 'PassedMulticlassAnalyzer', True )        
+        setattr( event, 'PassedMulticlassAnalyzer', True )
 
         if "debug" in self.conf.general["verbosity"]:
             autolog("MulticlassAnalyzer started")
