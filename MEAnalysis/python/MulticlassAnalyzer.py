@@ -4,8 +4,6 @@ import copy
 import sys
 import numpy as np
 import sklearn
-from TTH.Plotting.joosep.cleanPath import fixPythonPath
-sys.path = fixPythonPath(sys.path)
 import pandas
 import pickle
 import math
@@ -48,7 +46,7 @@ class MulticlassAnalyzer(FilterAnalyzer):
 
     def _process(self, event):
         event.passes_multiclass = True
-        setattr( event, 'PassedMulticlassAnalyzer', True )        
+        setattr( event, 'PassedMulticlassAnalyzer', True )
 
         if "debug" in self.conf.general["verbosity"]:
             autolog("MulticlassAnalyzer started")
