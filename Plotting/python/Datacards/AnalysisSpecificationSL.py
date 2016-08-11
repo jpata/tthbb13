@@ -7,10 +7,10 @@ from TTH.MEAnalysis.inputs import sparse_data
 import copy
 from copy import deepcopy
 
-input_file = sparse_data["Aug10"].infile
-ngen = sparse_data["Aug10"].ngen
-lumi = sparse_data["Aug10"].lumi
-blr_cuts = sparse_data["Aug10"].blr_cuts
+input_file = sparse_data["Aug11"].infile
+ngen = sparse_data["Aug11"].ngen
+lumi = sparse_data["Aug11"].lumi
+blr_cuts = sparse_data["Aug11"].blr_cuts
 
 do_stat_variations = False
 do_fake_data = True
