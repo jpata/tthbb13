@@ -21,7 +21,9 @@ echo "AFTER COPY content of $CMSSW_BASE/interface"
 cp -r src/* $CMSSW_BASE/src/
 echo "AFTER COPY content of $CMSSW_BASE/src"
 
-PROXYFILE=`grep "BEGIN CERTIFICATE" * | perl -pe 's/:.*//'  | grep -v heppy | tail -n 1`
+#look for the file in the current folder which contains the proxy string, but is not this file
+#FIXME: better way to discover the proxy
+PROXYFILE=`grep "BEGIN CERTIFICATE" * | perl -pe 's/:.*//'  | grep -v "env.sh" | tail -n 1`
 export X509_USER_PROXY=$PWD/$PROXYFILE
 echo Found Proxy in: $X509_USER_PROXY
 MD5SUM=`cat python.tar.gz heppy_config.py | md5sum | awk '{print $1}'`

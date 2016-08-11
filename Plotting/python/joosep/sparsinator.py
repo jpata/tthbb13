@@ -377,26 +377,26 @@ def createOutputs(dirs, systematics):
 
 def pass_HLT_sl_mu(event):
     pass_hlt = event["HLT_ttH_SL_mu"]
-    return pass_hlt and abs(event["leps_pdgId"][0]) == 13
+    return event["is_sl"] and pass_hlt and abs(event["leps_pdgId"][0]) == 13
 
 def pass_HLT_sl_el(event):
     pass_hlt = event["HLT_ttH_SL_el"]
-    return pass_hlt and abs(event["leps_pdgId"][0]) == 11
+    return event["is_sl"] and pass_hlt and abs(event["leps_pdgId"][0]) == 11
 
 def pass_HLT_dl_mumu(event):
     pass_hlt = event["HLT_ttH_DL_mumu"]
     st = sum(map(abs, event["leps_pdgId"]))
-    return pass_hlt and st == 26
+    return event["is_dl"] and pass_hlt and st == 26
 
 def pass_HLT_dl_elmu(event):
     pass_hlt = event["HLT_ttH_DL_elmu"]
     st = sum(map(abs, event["leps_pdgId"]))
-    return pass_hlt and st == 24
+    return event["is_dl"] and pass_hlt and st == 24
 
 def pass_HLT_dl_elel(event):
     pass_hlt = event["HLT_ttH_DL_elel"]
     st = sum(map(abs, event["leps_pdgId"]))
-    return pass_hlt and st == 22
+    return event["is_dl"] and pass_hlt and st == 22
 
 def triggerPath(event):
     if event["is_sl"] and pass_HLT_sl_mu(event):
@@ -419,7 +419,7 @@ if __name__ == "__main__":
         skip_events = int(os.environ.get("SKIP_EVENTS", 0))
         max_events = int(os.environ.get("MAX_EVENTS", 0))
     else:
-        file_names = [getSitePrefix("/store/user/jpata/tth/tth_Jul31_V24_v1/ttHTobb_M125_13TeV_powheg_pythia8/tth_Jul31_V24_v1/160731_130548/0000/tree_{0}.root".format(i)) for i in range(1, 10)]
+        file_names = [getSitePrefix("/store/user/jpata/tth/tth_Aug3_V24_v2/SingleMuon/tth_Aug3_V24_v2/160803_115959/0000/tree_{0}.root").format(i) for i in [10, 105, 106]]
         prefix = ""
         sample = "ttHTobb_M125_13TeV_powheg_pythia8"
         skip_events = 0
@@ -452,6 +452,9 @@ if __name__ == "__main__":
     outdict_syst = createOutputs(dirs, systematics_event+systematics_weight)
 
     nevents = 0
+    counters = OrderedDict()
+    counters["triggerPath"] = {}
+
     for file_name in file_names:
         print("opening {0}".format(file_name))
         tf = ROOT.TFile.Open(file_name)
@@ -461,8 +464,9 @@ if __name__ == "__main__":
        
         iEv = 0
 
-        for ievent, event in enumerate(events):
-            
+        for event in events:
+            nevents += 1
+            iEv += 1
             if nevents < skip_events:
                 continue
             if nevents > (skip_events + max_events):
@@ -490,6 +494,9 @@ if __name__ == "__main__":
                 ret["leptonFlavour"] = 0
                 ret["common_bdt"] = 0
                 ret["triggerPath"] = triggerPath(ret)
+                if not counters["triggerPath"].has_key(ret["triggerPath"]):
+                    counters["triggerPath"][ret["triggerPath"]] = 0
+                counters["triggerPath"][ret["triggerPath"]] += 1
 
                 ret["weight_nominal"] = 1.0
                 if schema == "mc":
@@ -510,13 +517,12 @@ if __name__ == "__main__":
                                 v.fill(ret, weight)
 
             #end of loop over event systematics
-            nevents += 1
-            iEv += 1
         #end of loop over events
         tf.Close()
     #end of loop over file names
 
     print("processed {0} events".format(nevents))
     print("writing output")
+    print(counters)
     outfile.Write()
     outfile.Close()

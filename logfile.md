@@ -344,9 +344,17 @@ MEIntegratorStandalone=02d58d6
 CMSSW=5727125
 
 
-Aug11_data_v1
+Aug11_leptonic_v1
 -------------
-tthbb13=4536d72
+tthbb13=bded573
 CommonClassifier=f326dcc
 MEIntegratorStandalone=02d58d6
 CMSSW=5727125
+
+
+Aug11_leptonic_nome_v1
+-------------
+tthbb13=bded573
+CommonClassifier=f326dcc
+MEIntegratorStandalone=02d58d6
+CMSSW=4e252ac

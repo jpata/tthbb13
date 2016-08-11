@@ -188,7 +188,7 @@ for k in ["ttHTobb", "ttHToNonbb", "TTbar_inc", "TTbar_sl1", "TTbar_sl2", "TTbar
 workflow_datasets["leptonic_nome"] = {}
 for k in ["ttHTobb", "ttHToNonbb", "TTbar_inc", "TTbar_sl1", "TTbar_sl2", "TTbar_dl"] + datanames:
     D = deepcopy(datasets[k])
-    D["perjob"] = 100
+    D["perjob"] = 50
     if "data" in D["script"]:
         D["perjob"] = 50
 
@@ -222,8 +222,7 @@ workflow_datasets["pilot"][pilot_name] = D
 #1-lumi per job, 10 job testing of a few samples
 workflow_datasets["testing"] = {}
 
-#for k in ["ttHTobb", "TTbar_inc", "SingleMuon-Run2016B-PromptReco-v2"]:
-for k in ["SingleMuon-Run2016B-PromptReco-v2"]:
+for k in ["ttHTobb", "TTbar_inc", "SingleMuon-Run2016B-PromptReco-v2"]:
     D = deepcopy(datasets[k])
     D["maxlumis"] = 40
     D["perjob"] = 2
@@ -380,7 +379,7 @@ env
     config.Data.allowNonValidInputDataset = True
 
     #config.Site.whitelist = ["T2_CH_CSCS", "T1_US_FNAL", "T2_DE_DESY", "T1_DE_KIT"]
-    config.Site.blacklist = ["T2_US_Florida", "T2_US_MIT", "T2_US_Wisconsin"]
+    config.Site.blacklist = ["T2_US_Florida", "T2_US_MIT", "T2_US_Wisconsin", "T2_US_Vanderbilt"]
 
     config.Site.storageSite = "T2_CH_CSCS"
 
