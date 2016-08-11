@@ -26,7 +26,7 @@ bweights = [
 for sdir in ["up", "down"]:
     for syst in ["cferr1", "cferr2", "hf", "hfstats1", "hfstats2", "jes", "lf", "lfstats1", "lfstats2"]:
         for tagger in ["CSV", "CMVAV2"]:
-            bweights += ["btagWeight{0}_{1}_{2}".format(tagger, syst, sdir)]
+            bweights += ["btagWeight{0}_{1}_{2}".format(tagger, sdir, syst)]
 
 #Specifies what to save for jets
 jetType = NTupleObjectType("jetType", variables = [
