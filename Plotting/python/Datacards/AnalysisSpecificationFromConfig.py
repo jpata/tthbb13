@@ -109,7 +109,7 @@ def analysisFromConfig(config_file_path):
             cuts = []
             # ..Process Cut
             if config.has_option(sample, "process_cut"):
-                cuts += processCut( config.get(sample, "process_cut"))
+                cuts += [processCut( config.get(sample, "process_cut"))]
             # ..Other cuts
             if config.has_option(sample, "cuts"):
                 for cut_name, lower, upper in triplewise(config.get(sample,"cuts").split()):
@@ -177,9 +177,9 @@ def analysisFromConfig(config_file_path):
                     scale_uncertainties[k][name] = float(uncert)
 
             if config.has_option(cat, "rebin"):
-                rebin = float(config.get(cat,"rebin"))
+                rebin = int(config.get(cat,"rebin"))
             else:
-                rebin = 1.
+                rebin = 1
 
             cats.append(
                 Category(
