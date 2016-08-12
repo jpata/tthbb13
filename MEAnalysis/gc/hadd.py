@@ -20,4 +20,4 @@ for path, dirs, files in os.walk(sys.argv[1]):
     rootfiles = map(lambda f: os.path.join(path, f), rootfiles)
     print "adding", path
     #do the hadd (in parallel)
-    par_hadd(path + ".root", rootfiles, 250, 5, 3)
+    par_hadd(path + ".root", rootfiles, 250, 1, 3)

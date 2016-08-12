@@ -166,16 +166,20 @@ sparse_data = {
             "CMS_ttH_CSVlfstats1",
             "CMS_ttH_CSVlfstats2"
         ]
-    )
+    ),
     "Aug12": SparseHistogram(
         infile = "file:///mnt/t3nfs01/data01/shome/jpata/tth/datacards/Sparse_Aug12.root",
         ngen = {
-            'TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': 9468936.0,
-            'TT_TuneCUETP8M1_13TeV-powheg-pythia8': 92886960.0,
-            'ttHToNonbb_M125_13TeV_powheg_pythia8': 3820981.0,
-            'ttHTobb_M125_13TeV_powheg_pythia8': 3912212.0,
-            'TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': 11947951.0,
-            'TTTo2L2Nu_13TeV-powheg': 104327168.0
+            'DoubleEG': 91090784.0,
+            'DoubleMuon': 116498224.0,
+            'MuonEG': 44854952.0,
+            'SingleElectron': 21175806.0,
+            'SingleMuon': 75904880.0,
+            'TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': 9450537.0,
+            'TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': 10331895.0,
+            'TT_TuneCUETP8M1_13TeV-powheg-pythia8': 2003312.0,
+            'ttHToNonbb_M125_13TeV_powheg_pythia8': 3324870.0,
+            'ttHTobb_M125_13TeV_powheg_pythia8': 3882314.0,
         },
         # brilcalc on golden json, overestimated by a few % for SingleElectron
         # http://dashb-cms-job.cern.ch/dashboard/templates/task-analysis/#user=Joosep+Pata&refresh=60&table=Mains&p=1&records=-1&sorting%5B%5D=2&sorting%5B%5D=desc&activemenu=2&pattern=*tth_Aug3_V24_v2*&task=&from=&till=&timerange=lastMonth

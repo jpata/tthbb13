@@ -337,9 +337,9 @@ axes = [
     Axis("jetsByPt_1_pt", 50, 0, 400, lambda ev: ev["jets_p4"][1].Pt()),
     Axis("jetsByPt_2_pt", 50, 0, 400, lambda ev: ev["jets_p4"][2].Pt()),
 
-    Axis("jetsByPt_0_eta", 50, 0, 400, lambda ev: ev["jets_p4"][0].Eta()),
-    Axis("jetsByPt_1_eta", 50, 0, 400, lambda ev: ev["jets_p4"][1].Eta()),
-    Axis("jetsByPt_2_eta", 50, 0, 400, lambda ev: ev["jets_p4"][2].Eta()),
+    Axis("jetsByPt_0_eta", 50, -2.5, 2.5, lambda ev: ev["jets_p4"][0].Eta()),
+    Axis("jetsByPt_1_eta", 50, -2.5, 2.5, lambda ev: ev["jets_p4"][1].Eta()),
+    Axis("jetsByPt_2_eta", 50, -2.5, 2.5, lambda ev: ev["jets_p4"][2].Eta()),
 ]
 
 def get_schema(sample):
