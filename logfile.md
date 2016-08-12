@@ -358,3 +358,11 @@ tthbb13=bded573
 CommonClassifier=f326dcc
 MEIntegratorStandalone=02d58d6
 CMSSW=4e252ac
+
+
+Aug11_leptonic_nome_v1
+-------------
+tthbb13=bdf7a86
+CommonClassifier=f326dcc
+MEIntegratorStandalone=02d58d6
+CMSSW=26ed800
