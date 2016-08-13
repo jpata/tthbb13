@@ -12,7 +12,7 @@ class MakeCategoryTestCase(unittest.TestCase):
         MakeCategory_main(
             os.path.join(
                 os.environ["CMSSW_BASE"],
-                "src/TTH/Plotting/python/Datacards/AnalysisSpecificationSL.py",
+                "src/TTH/Plotting/python/Datacards/AnalysisSpecification.py",
             ),
             "SL_7cat",
             catname

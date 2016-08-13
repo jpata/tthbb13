@@ -1,5 +1,6 @@
 [Aug11_leptonic_nome_v1__TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8]
 /store/user/jpata/tth/Aug11_leptonic_nome_v1/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/Aug11_leptonic_nome_v1/160811_213040/0000/tree_1.root = 6587
+/store/user/jpata/tth/Aug11_leptonic_nome_v1/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/Aug11_leptonic_nome_v1/160811_213040/0000/tree_10.root = 6613
 /store/user/jpata/tth/Aug11_leptonic_nome_v1/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/Aug11_leptonic_nome_v1/160811_213040/0000/tree_100.root = 6631
 /store/user/jpata/tth/Aug11_leptonic_nome_v1/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/Aug11_leptonic_nome_v1/160811_213040/0000/tree_101.root = 6578
 /store/user/jpata/tth/Aug11_leptonic_nome_v1/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/Aug11_leptonic_nome_v1/160811_213040/0000/tree_102.root = 6622
@@ -21,6 +22,7 @@
 /store/user/jpata/tth/Aug11_leptonic_nome_v1/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/Aug11_leptonic_nome_v1/160811_213040/0000/tree_117.root = 6563
 /store/user/jpata/tth/Aug11_leptonic_nome_v1/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/Aug11_leptonic_nome_v1/160811_213040/0000/tree_118.root = 6587
 /store/user/jpata/tth/Aug11_leptonic_nome_v1/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/Aug11_leptonic_nome_v1/160811_213040/0000/tree_119.root = 6585
+/store/user/jpata/tth/Aug11_leptonic_nome_v1/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/Aug11_leptonic_nome_v1/160811_213040/0000/tree_12.root = 6661
 /store/user/jpata/tth/Aug11_leptonic_nome_v1/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/Aug11_leptonic_nome_v1/160811_213040/0000/tree_120.root = 6664
 /store/user/jpata/tth/Aug11_leptonic_nome_v1/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/Aug11_leptonic_nome_v1/160811_213040/0000/tree_121.root = 6573
 /store/user/jpata/tth/Aug11_leptonic_nome_v1/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/Aug11_leptonic_nome_v1/160811_213040/0000/tree_122.root = 6561
