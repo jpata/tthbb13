@@ -531,9 +531,15 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
         plt.axhline(1.0, color="black")
         a2.set_ylim(0, 2)
         #hide last tick on ratio y axes
-        a2.set_yticks(a2.get_yticks()[:-1]);
-        a2.set_xticks(ticks);
-    return a1, a2, histograms_nominal, stacked_hists, histograms_systematic
+        a2.set_yticks(a2.get_yticks()[:-1])
+        a2.set_xticks(ticks)
+
+    return {
+        "axes": (a1, a2),
+        "nominal": histograms_nominal,
+        "stacked": stacked_hists,
+        "systematic": histograms_systematic
+    }
 
 def draw_mem_data_mc(*args, **kwargs):
     a1, a2, hs = draw_data_mc(*args, **kwargs)
