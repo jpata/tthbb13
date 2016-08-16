@@ -120,7 +120,7 @@ sparse_data = {
             'TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': 9468936.0,
             'TT_TuneCUETP8M1_13TeV-powheg-pythia8': 92886960.0,
             'ttHToNonbb_M125_13TeV_powheg_pythia8': 3820981.0,
-            'ttHTobb_M125_13TeV_powheg_pythia8': 3912212.0,
+            'ttHTobb_M125_13TeV_powheg_pythia8': 3912212.0,                     
             'TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': 11947951.0,
             'TTTo2L2Nu_13TeV-powheg': 104327168.0
         },
@@ -168,27 +168,24 @@ sparse_data = {
         ]
     ),
     "Aug12": SparseHistogram(
-        infile = "file:///mnt/t3nfs01/data01/shome/jpata/tth/datacards/Sparse_Aug12.root",
-        ngen = {
-            'DoubleEG': 91090784.0,
-            'DoubleMuon': 116498224.0,
-            'MuonEG': 44854952.0,
-            'SingleElectron': 21175806.0,
-            'SingleMuon': 75904880.0,
-            'TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': 9450537.0,
-            'TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': 10331895.0,
-            'TT_TuneCUETP8M1_13TeV-powheg-pythia8': 2003312.0,
-            'ttHToNonbb_M125_13TeV_powheg_pythia8': 3324870.0,
-            'ttHTobb_M125_13TeV_powheg_pythia8': 3882314.0,
+        infile = "file:///mnt/t3nfs01/data01/shome/gregor/tth/gc/sparse/GC2ba0316d9d2c/sparse.root",
+
+        ngen = {  
+            'TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': 11929057.0,
+            'ttHTobb_M125_13TeV_powheg_pythia8': 3912212.0,
+            'TT_TuneCUETP8M1_13TeV-powheg-pythia8': 92837064.0,
+            'ttHToNonbb_M125_13TeV_powheg_pythia8': 3860872.0,
+            'TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': 9468936.0
         },
         # brilcalc on golden json, overestimated by a few % for SingleElectron
         # http://dashb-cms-job.cern.ch/dashboard/templates/task-analysis/#user=Joosep+Pata&refresh=60&table=Mains&p=1&records=-1&sorting%5B%5D=2&sorting%5B%5D=desc&activemenu=2&pattern=*tth_Aug3_V24_v2*&task=&from=&till=&timerange=lastMonth
+        # Calculate via calcLumis.py
         lumi = {
-            "SingleMuon": 3139.799,
-            "SingleElectron": 687.397,
-            "MuonEG": 8630.293,
-            "DoubleEG": 4961.5731,
-            "DoubleMuon": 11175.781,
+            "SingleMuon": 11629.565,
+            "SingleElectron": 9287.066,
+            "MuonEG": 13574.864,
+            "DoubleEG": 10548.956,
+            "DoubleMuon": 13512.161,
         },
         blr_cuts = {
             "sl_j4_t2": 20,
