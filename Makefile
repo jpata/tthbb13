@@ -52,10 +52,10 @@ test_MEAnalysis: test_mkdir
 
 test_MEAnalysis_withme: test_mkdir
 	rm -Rf MEAnalysis/Loop_*
-	cd MEAnalysis && TTH_CALCME=1 INPUT_FILE=$(testfile_vhbb_tthbb) ME_CONF=python/cfg_local.py python python/MEAnalysis_heppy.py &> $(test_out_dir)/MEAnalysis_MEAnalysis_heppy.log
+	cd MEAnalysis && TTH_CALCME=1 INPUT_FILE=$(testfile_vhbb_tthbb) ME_CONF=python/cfg_local.py python python/MEAnalysis_heppy.py &> $(test_out_dir)/MEAnalysis_MEAnalysis_heppy_calcME.log
 	sleep 5
 	du -csh MEAnalysis/Loop_sample/tree.root &>> $(test_out_dir)/MEAnalysis_MEAnalysis_heppy_calcME.log
-	python -c "import ROOT; f=ROOT.TFile('MEAnalysis/Loop_sample/tree.root'); print f.Get('tree').GetEntries()" &>> $(test_out_dir)/MEAnalysis_MEAnalysis_heppy.log
+	python -c "import ROOT; f=ROOT.TFile('MEAnalysis/Loop_sample/tree.root'); print f.Get('tree').GetEntries()" &>> $(test_out_dir)/MEAnalysis_MEAnalysis_heppy_calcME.log
 	cp MEAnalysis/Loop_sample/tree.root $(test_out_dir)/MEAnalysis_MEAnalysis_heppy_calcME.root
 
 CODE_SPARSINATOR=python Plotting/python/joosep/sparsinator.py
