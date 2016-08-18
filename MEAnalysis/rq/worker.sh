@@ -2,4 +2,4 @@
 source env.sh
 env
 cd $SGE_O_WORKDIR
-rq worker -c settings
+python ~jpata/anaconda/bin/rq worker -c settings

@@ -532,20 +532,7 @@ def triggerPath(event):
         return TRIGGERPATH_MAP["fh"]
     return 0
 
-if __name__ == "__main__":
-    
-    if os.environ.has_key("FILE_NAMES"):
-        file_names = map(getSitePrefix, os.environ["FILE_NAMES"].split())
-        prefix, sample = get_prefix_sample(os.environ["DATASETPATH"])
-        skip_events = int(os.environ.get("SKIP_EVENTS", 0))
-        max_events = int(os.environ.get("MAX_EVENTS", 0))
-    else:
-        file_names = [getSitePrefix("/store/user/jpata/tth/Aug11_leptonic_nome_v1/SingleMuon/Aug11_leptonic_nome_v1/160811_211419/0000/tree_{0}.root").format(i) for i in [10, 105, 106]]
-        prefix = ""
-        sample = "SingleMuon"
-        skip_events = 0
-        max_events = 10000
-
+def main(file_names, sample, ofname, skip_events=0, max_events=-1):
     if len(file_names) == 0:
         raise Exception("No files specified, probably a mistake")
     if max_events == 0:
@@ -563,7 +550,7 @@ if __name__ == "__main__":
         systematics_weight = []
    
     dirs = {}
-    outfile = ROOT.TFile("out.root", "RECREATE")
+    outfile = ROOT.TFile(ofname, "RECREATE")
     dirs["sample"] = outfile.mkdir(sample)
     dirs["sample"].cd()
     dirs["sl"] = dirs["sample"].mkdir("sl")
@@ -591,11 +578,12 @@ if __name__ == "__main__":
             iEv += 1
             if nevents < skip_events:
                 continue
-            if nevents > (skip_events + max_events):
-                logging.info("event loop: breaking due to MAX_EVENTS: {0} > {1} + {2}".format(
-                    nevents, skip_events, max_events
-                ))
-                break
+            if max_events > 0:
+                if nevents > (skip_events + max_events):
+                    logging.info("event loop: breaking due to MAX_EVENTS: {0} > {1} + {2}".format(
+                        nevents, skip_events, max_events
+                    ))
+                    break
 
             #apply some basic preselection
             if not (event.is_sl or event.is_dl or event.is_fh):
@@ -648,3 +636,19 @@ if __name__ == "__main__":
     print(counters)
     outfile.Write()
     outfile.Close()
+
+if __name__ == "__main__":
+    
+    if os.environ.has_key("FILE_NAMES"):
+        file_names = map(getSitePrefix, os.environ["FILE_NAMES"].split())
+        prefix, sample = get_prefix_sample(os.environ["DATASETPATH"])
+        skip_events = int(os.environ.get("SKIP_EVENTS", 0))
+        max_events = int(os.environ.get("MAX_EVENTS", 0))
+    else:
+        file_names = [getSitePrefix("/store/user/jpata/tth/tth_Aug3_V24_v2/SingleMuon/tth_Aug3_V24_v2/160803_115959/0000/tree_{0}.root").format(i) for i in [10, 105, 106]]
+        prefix = ""
+        sample = "ttHTobb_M125_13TeV_powheg_pythia8"
+        skip_events = 0
+        max_events = 10000
+
+    main(file_names, sample, "out.root", skip_events, max_events)
