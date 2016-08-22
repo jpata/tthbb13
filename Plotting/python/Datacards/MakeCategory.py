@@ -95,7 +95,7 @@ def apply_rules(args):
             dummy = True
             logging.warning("Could not get histogram {0}, using fallback".format(inp))
             sparse_hist = input_map["ttHTobb_M125_13TeV_powheg_pythia8/sl/sparse"]
-            if not h:
+            if not sparse_hist:
                 raise Exception("Could not get fallback histogram {0}".format("ttHTobb_M125_13TeV_powheg_pythia8/sl/sparse"))
             cuts = []
 
@@ -183,8 +183,7 @@ def apply_rules_parallel(infile, rules, ncores=1):
     infile_tf.Close()
     return rets
 
-def main(analysis_spec, analysis_name, category_name, outdir=".", ncores=1):
- 
+def get_categories(analysis_spec, analysis_name, category_name):
     #load the python analysis specification
     logging.info("main: importing {0}".format(analysis_spec))
     anspec = imp.load_source("anspec", analysis_spec)
@@ -198,12 +197,14 @@ def main(analysis_spec, analysis_name, category_name, outdir=".", ncores=1):
 
     if len(categories) == 0:
         raise Exception("Could not match any categories")
+    return analysis, categories
 
+def main(analysis, categories, outdir=".", ncores=1):
     # Make all the rules
     rules = []
     for cat in categories:
-        logging.debug("main: making rules for analysis={0} category={1} discr={2}".format(
-            analysis_name, cat.name, cat.discriminator
+        logging.debug("main: making rules for category={0} discr={1}".format(
+            cat.name, cat.discriminator
         ))
         rules += make_rule_cut(cat.src_histogram, cat)
     
@@ -334,10 +335,11 @@ if __name__ == "__main__":
     if len(matched_analyses) == 0:
         raise Exception("No matched analyses")
         
-    for analysis in matched_analyses:
-        outdir = args.outdir.format(analysis=analysis)
-        logging.info("__main__: analysis {0} to dir {1}".format(analysis, outdir))
+    for analysis_name in matched_analyses:
+        outdir = args.outdir.format(analysis=analysis_name)
+        logging.info("__main__: analysis {0} to dir {1}".format(analysis_name, outdir))
         if not os.path.isdir(outdir):
             os.makedirs(outdir)
-        main(args.anspec, analysis, args.category, outdir=outdir, ncores=args.ncores)
+        analysis, categories = get_categories(args.anspec, analysis_name, args.category)
+        main(analysis, categories, outdir=outdir, ncores=args.ncores)
     

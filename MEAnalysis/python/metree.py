@@ -698,15 +698,16 @@ def getTreeProducer(conf):
                     treeProducer.globalObjects.update({
                         name + syst_suffix: NTupleObject(
                             name + syst_suffix2, memType,
-                            help="MEM result for proc={0} hypo={1}".format(proc, hypo
-                        )),
+                            help="MEM result for proc={0} hypo={1}".format(proc, hypo),
+                            mcOnly = is_mc_only
+                        ),
                     })
                     treeProducer.collections.update({
                         name + "_perm" + syst_suffix: NTupleCollection(
                             name + "_perm" + syst_suffix2, memPermType, 50,
-                            help="MEM result permutations for proc={0} hypo={1}".format(
-                                proc, hypo
-                        )),
+                            help="MEM result permutations for proc={0} hypo={1}".format(proc, hypo),
+                            mcOnly = is_mc_only
+                    ),
                     })
             if conf.bran["enabled"]:
                 for cat in conf.bran["jetCategories"].items():

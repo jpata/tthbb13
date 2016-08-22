@@ -16,6 +16,9 @@ class MakeCategoryTestCase(unittest.TestCase):
             analysis,
             catname
         )
+
+        analysis, categories = get_categories(anspec, "SL_7cat", catname)
+        MakeCategory_main(analysis, categories)
         outfile = "{0}.root".format(catname)
         self.assertTrue(os.path.isfile(outfile))
         

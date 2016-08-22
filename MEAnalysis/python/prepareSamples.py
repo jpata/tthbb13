@@ -6,26 +6,19 @@ import ROOT
 
 cmssw_base = os.environ["CMSSW_BASE"]
 
-version = "Aug2"
+version = "Aug11"
 
 samples = [
-    "gc/datasets/tth_Jul31_V24_v1_vhbbev/ttHTobb_M125_13TeV_powheg_pythia8.txt",
-    "gc/datasets/tth_Jul31_V24_v1_vhbbev/ttHToNonbb_M125_13TeV_powheg_pythia8.txt",
-    "gc/datasets/tth_Jul31_V24_v1_vhbbev/TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt",
-    "gc/datasets/tth_Jul31_V24_v1_vhbbev/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt",
-    "gc/datasets/tth_Jul31_V24_v1_vhbbev/TTTo2L2Nu_13TeV-powheg.txt",
-    "gc/datasets/tth_Jul31_V24_v1_vhbbev/TT_TuneCUETP8M1_13TeV-powheg-pythia8.txt",
-
-	#"gc/datasets/had_V24_1/BTagCSV.txt",
-	#"gc/datasets/had_V24_1/TT_TuneCUETP8M1_13TeV-powheg-pythia8.txt",
-	#"gc/datasets/had_V24_1/ttHTobb_M125_13TeV_powheg_pythia8.txt",
-	#"gc/datasets/had_V24_1/ttHToNonbb_M125_13TeV_powheg_pythia8.txt",
-	#"gc/datasets/had_V24_1/QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt",
-	#"gc/datasets/had_V24_1/QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt",
-	#"gc/datasets/had_V24_1/QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt",
-	#"gc/datasets/had_V24_1/QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt",
-	#"gc/datasets/had_V24_1/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt",
-	#"gc/datasets/had_V24_1/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt"
+    "gc/datasets/Aug11_leptonic_nome_v1/DoubleEG.txt"
+    , "gc/datasets/Aug11_leptonic_nome_v1/DoubleMuon.txt"
+    , "gc/datasets/Aug11_leptonic_nome_v1/MuonEG.txt"
+    , "gc/datasets/Aug11_leptonic_nome_v1/SingleElectron.txt"
+    , "gc/datasets/Aug11_leptonic_nome_v1/SingleMuon.txt"
+    , "gc/datasets/Aug11_leptonic_nome_v1/ttHTobb_M125_13TeV_powheg_pythia8.txt"
+    , "gc/datasets/Aug11_leptonic_nome_v1/ttHToNonbb_M125_13TeV_powheg_pythia8.txt"
+    , "gc/datasets/Aug11_leptonic_nome_v1/TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt"
+    , "gc/datasets/Aug11_leptonic_nome_v1/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt"
+    , "gc/datasets/Aug11_leptonic_nome_v1/TT_TuneCUETP8M1_13TeV-powheg-pythia8.txt"
 ]
 
 samples = ["$CMSSW_BASE/src/TTH/MEAnalysis/" + s for s in samples]
@@ -48,10 +41,10 @@ samp_py.write("samples_dict = {\n")
 for sample in samples:
 
     isMC = True
-    if "Single" in sample or "Double" in sample or "MuonEG" in sample:
-        isMC = False
     sampname = sample.split("/")[-1]
     sampname = sampname.replace(".txt", "")
+    if sampname in ["SingleMuon", "SingleElectron", "DoubleEG", "DoubleMuon", "MuonEG"]:
+        isMC = False
     x = """ 
         "{0}": cms.PSet(
             name     = cms.string("{0}"),
