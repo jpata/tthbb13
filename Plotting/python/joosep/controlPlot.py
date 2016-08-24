@@ -139,6 +139,16 @@ if __name__ == "__main__":
         "dl_jge4_tge4",
     ]
 
+    cats_fh = [
+        "fh_j9_t4",
+        "fh_j8_t3",
+        "fh_j8_t4",
+        "fh_j7_t4",
+        "fh_j7_t3",
+        "fh_jge6_t4",
+        "fh_jge6_t3",
+    ]
+
 
     args = [
         get_base_plot("/Users/joosep/Documents/tth/data/histograms/Aug12/", "Aug12", "SL_7cat", cat, var) for cat in cats_sl for var in vars_base
@@ -146,6 +156,9 @@ if __name__ == "__main__":
 
     args += [get_base_plot("/Users/joosep/Documents/tth/data/histograms/Aug12/", "Aug12", "DL", cat, var) for cat in cats_dl for var in vars_base]
 
+#    args = [
+#        get_base_plot("/shome/sdonato/tth/gc/makecategory/GCdedfe5320b02/", "Aug15_FH", "FH", cat, var) for cat in cats_fh for var in vars_base
+#    ]
 
     import multiprocessing
     pool = multiprocessing.Pool(4)

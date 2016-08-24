@@ -166,7 +166,7 @@ if __name__ == "__main__":
             #merge lumi files
 
         #merge lumi files
-        total_lumis = lumis[1]
+        total_lumis = LumiList()
         for i in range(len(lumis)):
             total_lumis = total_lumis | lumis[i]
         total_lumis.writeJSON(fileName=ofile_fn.replace(".txt", ".json"))

@@ -300,6 +300,15 @@ class Conf:
             "dl_jge4_t2": 20,
             "dl_jge4_t3": 2.3,
             "dl_jge4_tge4": -20,
+
+            ##[CHECK-ME]
+            "fh_j9_t4": -20,
+            "fh_j8_t3": -20,
+            "fh_j8_t4": -20,
+            "fh_j7_t4": -20,
+            "fh_j7_t3": -20,
+            "fh_jge6_t4": -20,
+            "fh_jge6_t3": -20,
         },
 
         #Generic event-dependent selection function applied
@@ -328,11 +337,11 @@ class Conf:
             #"SL_2w2h2t_memLR",
             #"SL_0w2h2t_memLR",
             #"DL_0w2h2t_Rndge4t",
-            #"FH_4w2h2t", #8j,4b
-            #"FH_3w2h2t", #7j,4b
-            #"FH_4w2h1t", #7j,3b & 8j,3b
-            #"FH_0w0w2h2t", #all 4b cats
-            #"FH_0w0w2h1t", #all cats
+            "FH_4w2h2t", #8j,4b
+            "FH_3w2h2t", #7j,4b
+            "FH_4w2h1t", #7j,3b & 8j,3b
+            "FH_0w0w2h2t", #all 4b cats
+            "FH_0w0w2h1t", #all cats
             #"FH_0w0w1h2t"  #all cats
         ],
 

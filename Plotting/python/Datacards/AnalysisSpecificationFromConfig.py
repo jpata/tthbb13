@@ -48,6 +48,7 @@ def splitByTriggerPath(samples, lumi):
         "mm": lumi["DoubleMuon"],
         "em": lumi["MuonEG"],
         "ee": lumi["DoubleEG"],
+        "fh": lumi["BTagCSV"],
     }
 
     for name, trigpath in TRIGGERPATH_MAP.items():
