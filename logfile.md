@@ -366,3 +366,11 @@ tthbb13=bdf7a86
 CommonClassifier=f326dcc
 MEIntegratorStandalone=02d58d6
 CMSSW=26ed800
+
+
+Aug17_leptonic_v2
+-------------
+tthbb13=7dabe1b
+CommonClassifier=f326dcc
+MEIntegratorStandalone=02d58d6
+CMSSW=26ed800
