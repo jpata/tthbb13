@@ -341,7 +341,7 @@ class MEAnalyzer(FilterAnalyzer):
                 ) if event.mem_results_tth[memidx].p > 0 else 0.0
             }
         except:
-            print "Potential error!!"
+            print "Potential error!! self.conf.mem['methodOrder'] is missing"
         #end FIXME
         self.jsonout = open("events.json", "a")
         self.jsonout.write(

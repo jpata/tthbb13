@@ -1,0 +1,2 @@
+[had_V24_1__QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8]
+/store/user/sdonato/tth/test_mc_Aug15_4/QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/test_mc_Aug15_4/160815_144915/0000/tree_1.root = 149

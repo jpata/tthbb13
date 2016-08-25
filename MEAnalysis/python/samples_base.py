@@ -77,11 +77,18 @@ samples_nick = {
     'ZZ_TuneCUETP8M1_13TeV-pythia8': "zz",
     'ttHToNonbb_M125_13TeV_powheg_pythia8': "ttH_nonhbb",
     'ttHTobb_M125_13TeV_powheg_pythia8': "ttH_hbb",
+    'QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' : 'qcd',
+    'QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' : 'qcd',
+    'QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' : 'qcd',
+    'QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' : 'qcd',
+    'QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' : 'qcd',
+    'QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' : 'qcd',
     "SingleMuon": "data_m",
     "SingleElectron": "data_e",
     "MuonEG": "data_em",
     "DoubleEG": "data_ee",
     "DoubleMuon": "data_mm",
+    "BTagCSV": "data_fh",
 }
 
 #Numeric keys for processes, used for filling the process axis
@@ -94,6 +101,7 @@ PROCESS_MAP = {
     "ttbarPlusB": 4,
     "ttbarPlusCCbar": 5,
     "ttbarOther": 6,
+    "qcd": 13,
 
 #need to keep different data samples separate at this point
     "data_e": 7,
@@ -101,6 +109,7 @@ PROCESS_MAP = {
     "data_mm": 9,
     "data_ee": 10,
     "data_em": 11,
+    "data_fh": 12,
 }
 
 TRIGGERPATH_MAP = {
@@ -109,16 +118,24 @@ TRIGGERPATH_MAP = {
     "mm": 3,
     "em": 4,
     "ee": 5,
+    "fh": 6,
 }
 
 xsec_sample = {
-    "TT_TuneCUETP8M1_13TeV-powheg-pythia8": xsec[("ttjets", "13TeV")],
-    "TT_TuneEE5C_13TeV-powheg-herwigpp": xsec[("ttjets", "13TeV")],
-    "TTTo2L2Nu_13TeV-powheg": xsec[("ttjets", "tt_to_ll", "13TeV")],
+    "TT_TuneCUETP8M1_13TeV-powheg-pythia8":     xsec[("ttjets", "13TeV")],
+    "TT_TuneEE5C_13TeV-powheg-herwigpp":        xsec[("ttjets", "13TeV")],
+    "TTTo2L2Nu_13TeV-powheg":                   xsec[("ttjets", "tt_to_ll", "13TeV")],
     "TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": 0.5*xsec[("ttjets", "tt_to_lj", "13TeV")],
-    "TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": 0.5*xsec[("ttjets", "tt_to_lj", "13TeV")],
-    "ttHTobb_M125_13TeV_powheg_pythia8": xsec[("tthbb", "13TeV")],
-    "ttHToNonbb_M125_13TeV_powheg_pythia8": xsec[("tth_nonhbb", "13TeV")],
+    "TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8":    0.5*xsec[("ttjets", "tt_to_lj", "13TeV")],
+    "ttHTobb_M125_13TeV_powheg_pythia8":        xsec[("tthbb", "13TeV")],
+    "ttHToNonbb_M125_13TeV_powheg_pythia8":     xsec[("tth_nonhbb", "13TeV")],
+
+    'QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' :   xsec[("qcd_ht300to500", "13TeV")],
+    'QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' :   xsec[("qcd_ht500to700", "13TeV")],
+    'QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' :  xsec[("qcd_ht700to1000", "13TeV")],
+    'QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' : xsec[("qcd_ht1000to1500", "13TeV")],
+    'QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' : xsec[("qcd_ht1500to2000", "13TeV")],
+    'QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' :  xsec[("qcd_ht2000toinf", "13TeV")],
 }
 
 #Configure the site-specific file path

@@ -1,0 +1,2 @@
+[had_V24_1__TT_TuneCUETP8M1_13TeV-powheg-pythia8]
+/store/user/sdonato/tth/test_mc_Aug15_4/TT_TuneCUETP8M1_13TeV-powheg-pythia8/test_mc_Aug15_4/160815_144438/0000/tree_1.root = 193

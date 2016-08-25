@@ -54,6 +54,7 @@ colors = {
     "wjets": (102, 201, 77),
     "stop": (235, 73, 247),
     "ttV": (204, 204, 251),
+    "qcd": (102, 201, 77),
     "other": (251, 73, 255),
 }
 
@@ -183,6 +184,11 @@ varnames = {
     "mem_SL_2w2h2t": "mem SL 2w2h2t",
     "mem_SL_2w2h2t_sj": "mem SL 2w2h2t sj",
     "mem_DL_0w2h2t": "mem DL 0w2h2t",
+    "mem_FH_4w2h2t": "mem FH 4w2h2t",
+    "mem_FH_3w2h2t": "mem FH 3w2h2t",
+    "mem_FH_4w2h1t": "mem FH 4w2h1t",
+    "mem_FH_0w0w2h2t": "mem FH 0w0w2h2t",
+    "mem_FH_0w0w2h1t": "mem FH 0w0w2h1t",
     "nPVs": "$N_{\\mathrm{PV}}$",
     "ntopCandidate": "$N_{\\mathrm{HTTv2}}$",
     "common_bdt": "BDT",

@@ -198,6 +198,7 @@ desc = Desc([
 
     Var(name="is_sl"),
     Var(name="is_dl"),
+    Var(name="is_fh"),
 
     Var(name="nfatjets"),
     Var(name="fatjets_pt"),
@@ -248,16 +249,31 @@ desc = Desc([
     ),
 
     Var(name="mem_SL_0w2h2t_p",
-        nominal=Func("mem_p_SL_0w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_SL_0w2h2t_p/(ev.mem_tth_SL_0w2h2t_p + sf*ev.mem_ttbb_SL_0w2h2t_p) if ev.mem_tth_SL_0w2h2t_p>0 else 0.0),
+        nominal=Func("mem_p_SL_0w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_SL_0w2h2t_p/(ev.mem_tth_SL_0w2h2t_p + sf*ev.mem_ttbb_SL_0w2h2t_p) if getattr(ev,"mem_tth_SL_0w2h2t_p",0)>0 else 0.0),
     ),
     Var(name="mem_SL_1w2h2t_p",
-        nominal=Func("mem_p_SL_1w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_SL_1w2h2t_p/(ev.mem_tth_SL_1w2h2t_p + sf*ev.mem_ttbb_SL_1w2h2t_p) if ev.mem_tth_SL_1w2h2t_p>0 else 0.0),
+        nominal=Func("mem_p_SL_1w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_SL_1w2h2t_p/(ev.mem_tth_SL_1w2h2t_p + sf*ev.mem_ttbb_SL_1w2h2t_p) if getattr(ev,"mem_tth_SL_1w2h2t_p",0)>0 else 0.0),
     ),
     Var(name="mem_SL_2w2h2t_p",
-        nominal=Func("mem_p_SL_2w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_SL_2w2h2t_p/(ev.mem_tth_SL_2w2h2t_p + sf*ev.mem_ttbb_SL_2w2h2t_p) if ev.mem_tth_SL_2w2h2t_p>0 else 0.0),
+        nominal=Func("mem_p_SL_2w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_SL_2w2h2t_p/(ev.mem_tth_SL_2w2h2t_p + sf*ev.mem_ttbb_SL_2w2h2t_p) if getattr(ev,"mem_tth_SL_2w2h2t_p",0)>0 else 0.0),
     ),
     Var(name="mem_DL_0w2h2t_p",
-        nominal=Func("mem_p_DL_0w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_DL_0w2h2t_p/(ev.mem_tth_DL_0w2h2t_p + sf*ev.mem_ttbb_DL_0w2h2t_p) if ev.mem_tth_DL_0w2h2t_p>0 else 0.0),
+        nominal=Func("mem_p_DL_0w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_DL_0w2h2t_p/(ev.mem_tth_DL_0w2h2t_p + sf*ev.mem_ttbb_DL_0w2h2t_p) if getattr(ev,"mem_tth_DL_0w2h2t_p",0)>0 else 0.0),
+    ),
+    Var(name="mem_FH_4w2h2t_p",
+        nominal=Func("mem_p_FH_4w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_FH_4w2h2t_p/(ev.mem_tth_FH_4w2h2t_p + sf*ev.mem_ttbb_FH_4w2h2t_p) if getattr(ev,"mem_tth_FH_4w2h2t_p",0)>0 else 0.0),
+    ),
+    Var(name="mem_FH_3w2h2t_p",
+        nominal=Func("mem_p_FH_3w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_FH_3w2h2t_p/(ev.mem_tth_FH_3w2h2t_p + sf*ev.mem_ttbb_FH_3w2h2t_p) if getattr(ev,"mem_tth_FH_3w2h2t_p",0)>0 else 0.0),
+    ),
+    Var(name="mem_FH_4w2h1t_p",
+        nominal=Func("mem_p_FH_4w2h1t", func=lambda ev, sf=MEM_SF: ev.mem_tth_FH_4w2h1t_p/(ev.mem_tth_FH_4w2h1t_p + sf*ev.mem_ttbb_FH_4w2h1t_p) if getattr(ev,"mem_tth_FH_4w2h1t_p",0)>0 else 0.0),
+    ),
+    Var(name="mem_FH_0w0w2h2t_p",
+        nominal=Func("mem_p_FH_0w0w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_FH_0w0w2h2t_p/(ev.mem_tth_FH_0w0w2h2t_p + sf*ev.mem_ttbb_FH_0w0w2h2t_p) if getattr(ev,"mem_tth_FH_0w0w2h2t_p",0)>0 else 0.0),
+    ),
+    Var(name="mem_FH_0w0w2h1t_p",
+        nominal=Func("mem_p_FH_0w0w2h1t", func=lambda ev, sf=MEM_SF: ev.mem_tth_FH_0w0w2h1t_p/(ev.mem_tth_FH_0w0w2h1t_p + sf*ev.mem_ttbb_FH_0w0w2h1t_p) if getattr(ev,"mem_tth_FH_0w0w2h1t_p",0)>0 else 0.0),
     ),
     
     Var(name="HLT_ttH_DL_mumu", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_DL_mumu}),
@@ -265,6 +281,7 @@ desc = Desc([
     Var(name="HLT_ttH_DL_elmu", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_DL_elmu}),
     Var(name="HLT_ttH_SL_el", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_SL_el}),
     Var(name="HLT_ttH_SL_mu", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_SL_mu}),
+    Var(name="HLT_ttH_FH", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_FH}),
 
 #MC-only branches
     Var(name="ttCls", schema=["mc"]),
@@ -356,11 +373,18 @@ axes = [
     Axis("triggerPath", 20, 0, 20, lambda ev: ev["triggerPath"]),
     Axis("counting", 1, 0, 1, lambda ev: ev["counting"]),
     Axis("parity", 1, 0, 1, lambda ev: ev["evt"]%2==0),
-#    Axis("mem_SL_2w2h2t_p", 36, 0, 1, lambda ev: ev["mem_SL_2w2h2t_p"]),
-#    Axis("mem_SL_1w2h2t_p", 36, 0, 1, lambda ev: ev["mem_SL_1w2h2t_p"]),
-#    Axis("mem_SL_0w2h2t_p", 36, 0, 1, lambda ev: ev["mem_SL_0w2h2t_p"]),
-#    Axis("mem_DL_0w2h2t_p", 36, 0, 1, lambda ev: ev["mem_DL_0w2h2t_p"]),
-#    Axis("common_bdt", 36, 0, 1, lambda ev: ev["common_bdt"]),
+
+    Axis("mem_SL_2w2h2t_p", 36, 0, 1, lambda ev: ev["mem_SL_2w2h2t_p"]),
+    Axis("mem_SL_1w2h2t_p", 36, 0, 1, lambda ev: ev["mem_SL_1w2h2t_p"]),
+    Axis("mem_SL_0w2h2t_p", 36, 0, 1, lambda ev: ev["mem_SL_0w2h2t_p"]),
+    Axis("mem_DL_0w2h2t_p", 36, 0, 1, lambda ev: ev["mem_DL_0w2h2t_p"]),
+    Axis("mem_FH_4w2h2t_p", 36, 0, 1, lambda ev: ev["mem_FH_4w2h2t_p"]),
+    Axis("mem_FH_3w2h2t_p", 36, 0, 1, lambda ev: ev["mem_FH_3w2h2t_p"]),
+    Axis("mem_FH_4w2h1t_p", 36, 0, 1, lambda ev: ev["mem_FH_4w2h1t_p"]),
+    Axis("mem_FH_0w0w2h2t_p", 36, 0, 1, lambda ev: ev["mem_FH_0w0w2h2t_p"]),
+    Axis("mem_FH_0w0w2h1t_p", 36, 0, 1, lambda ev: ev["mem_FH_0w0w2h1t_p"]),
+    Axis("common_bdt", 36, 0, 1, lambda ev: ev["common_bdt"]),
+
     Axis("numJets", 5, 3, 8, lambda ev: ev["numJets"]),
     Axis("nBCSVM", 4, 1, 5, lambda ev: ev["nBCSVM"]),
     Axis("nBCMVAM", 4, 1, 5, lambda ev: ev["nBCMVAM"]),
@@ -456,6 +480,13 @@ def createOutputs(dirs, systematics):
             axes,
             dirs["dl"]
         )
+        dirs["fh"].cd()
+        outdict["fh/sparse"] = SparseOut(
+            "sparse" + syststr,
+            lambda ev: ev["is_fh"] == 1,
+            axes,
+            dirs["fh"]
+        )
         outdict_syst[syst] = outdict
     return outdict_syst
 
@@ -482,6 +513,10 @@ def pass_HLT_dl_elel(event):
     st = sum(map(abs, event["leps_pdgId"]))
     return event["is_dl"] and pass_hlt and st == 22
 
+def pass_HLT_fh(event):
+    pass_hlt = event["HLT_ttH_FH"]
+    return event["is_fh"] and pass_hlt ## FIXME add: st == ??
+
 def triggerPath(event):
     if event["is_sl"] and pass_HLT_sl_mu(event):
         return TRIGGERPATH_MAP["m"]
@@ -493,6 +528,8 @@ def triggerPath(event):
         return TRIGGERPATH_MAP["em"]
     elif event["is_dl"] and pass_HLT_dl_elel(event):
         return TRIGGERPATH_MAP["ee"]
+    elif event["is_fh"] and pass_HLT_fh(event):
+        return TRIGGERPATH_MAP["fh"]
     return 0
 
 if __name__ == "__main__":
@@ -531,6 +568,7 @@ if __name__ == "__main__":
     dirs["sample"].cd()
     dirs["sl"] = dirs["sample"].mkdir("sl")
     dirs["dl"] = dirs["sample"].mkdir("dl")
+    dirs["fh"] = dirs["sample"].mkdir("fh")
     
     #pre-create output histograms
     outdict_syst = createOutputs(dirs, systematics_event+systematics_weight)
@@ -560,7 +598,7 @@ if __name__ == "__main__":
                 break
 
             #apply some basic preselection
-            if not (event.is_sl or event.is_dl):
+            if not (event.is_sl or event.is_dl or event.is_fh):
                 continue
             if not event.numJets >= 3:
                 continue

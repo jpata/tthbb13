@@ -101,6 +101,7 @@ def splitByTriggerPath(samples):
         "mm": lumi["DoubleMuon"],
         "em": lumi["MuonEG"],
         "ee": lumi["DoubleEG"],
+        "fh": lumi["BTagCSV"],
     }
 
     for name, trigpath in TRIGGERPATH_MAP.items():
@@ -193,6 +194,12 @@ data_samples = {
         cuts = [("triggerPath", 5, 6)]
     ),
 
+    "BTagCSV": DataSample(
+        input_name = "BTagCSV",
+        output_name = "data",
+        lumi = lumi["BTagCSV"],
+        cuts = [("triggerPath", 6, 7)]
+    ),
 }
 
 #For single-leptonic analyses, use these data samples

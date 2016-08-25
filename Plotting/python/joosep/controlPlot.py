@@ -194,7 +194,17 @@ if __name__ == "__main__":
         "dl_jge4_t3",
         "dl_jge4_tge4",
     ]
-    
+
+    cats_fh = [
+        "fh_j9_t4",
+        "fh_j8_t3",
+        "fh_j8_t4",
+        "fh_j7_t4",
+        "fh_j7_t3",
+        "fh_jge6_t4",
+        "fh_jge6_t3",
+    ]
+
     version = "GC70f0703561df"
 
     args = []
@@ -215,6 +225,10 @@ if __name__ == "__main__":
             "/mnt/t3nfs01/data01/shome/gregor/tth/gc/makecategory/"+version,
             "Aug12", "SL_7cat", cat, var) for cat in ["sl_jge6_tge4"] for var in class_vars]
     
+#    args = [
+#        get_base_plot("/shome/sdonato/tth/gc/makecategory/GCdedfe5320b02/", "Aug15_FH", "FH", cat, var) for cat in cats_fh for var in vars_base
+#    ]
+
 
     if DO_PARALLEL:
         import multiprocessing

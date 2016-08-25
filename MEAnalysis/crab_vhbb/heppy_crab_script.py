@@ -44,10 +44,6 @@ for arg in sys.argv:
     if arg.startswith("ME_CONF="):
         me_conf_name = arg.split("=")[1]
 
-JobNumber=sys.argv[1]
-print "JobNumber", JobNumber
-print PSet.process.dumpPython()
-
 crabFiles=PSet.process.source.fileNames
 crabFiles_pfn = copy.deepcopy(PSet.process.source.fileNames)
 
