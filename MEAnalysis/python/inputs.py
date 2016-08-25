@@ -168,7 +168,7 @@ sparse_data = {
         ]
     ),
     "Aug12": SparseHistogram(
-        infile = "file:///mnt/t3nfs01/data01/shome/gregor/tth/gc/sparse/GC2ba0316d9d2c/sparse.root",
+        infile = "file:///mnt/t3nfs01/data01/shome/gregor/tth/gc/sparse/GC09d01b980a3a/sparse.root",
 
         ngen = {  
             'TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': 11929057.0,
@@ -207,18 +207,18 @@ sparse_data = {
             "dl_jge4_tge4": -20,
         },
         systematics = [
-            "CMS_scale_j",
-            "CMS_res_j",
-            "pu",
-            "CMS_ttH_CSVcferr1",
-            "CMS_ttH_CSVcferr2",
-            "CMS_ttH_CSVhf",
-            "CMS_ttH_CSVhfstats1",
-            "CMS_ttH_CSVhfstats2",
-            "CMS_ttH_CSVjes",
-            "CMS_ttH_CSVlf",
-            "CMS_ttH_CSVlfstats1",
-            "CMS_ttH_CSVlfstats2"
+            #"CMS_scale_j",
+            #"CMS_res_j",
+            #"pu",
+            #"CMS_ttH_CSVcferr1",
+            #"CMS_ttH_CSVcferr2",
+            #"CMS_ttH_CSVhf",
+            #"CMS_ttH_CSVhfstats1",
+            #"CMS_ttH_CSVhfstats2",
+            #"CMS_ttH_CSVjes",
+            #"CMS_ttH_CSVlf",
+            #"CMS_ttH_CSVlfstats1",
+            #"CMS_ttH_CSVlfstats2"
         ]
     )
 }

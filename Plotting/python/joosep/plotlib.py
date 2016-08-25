@@ -8,6 +8,8 @@ if os.environ.has_key("CMSSW_BASE"):
 import ROOT
 ROOT.gROOT.SetBatch(True)
 
+import pdb
+
 import uuid
 
 import matplotlib
@@ -111,6 +113,7 @@ samplelist_d = dict(samplelist)
 varnames = {
     "jetsByPt_0_pt": r"leading jet $p_T$ [GeV]",
     "jetsByPt_1_pt": r"subleading jet $p_T$ [GeV]",
+    "jetsByPt_2_pt": r"third jet $p_T$ [GeV]",
 
     # "jet0_btagCSV": r"leading jet $b_{\mathrm{CSV}}$",
     # "jet1_btagCSV": r"subleading jet $b_{\mathrm{CSV}}$",
@@ -118,13 +121,14 @@ varnames = {
     # "jet0_btagBDT": r"leading jet $b_{\mathrm{cMVAv2}}$",
     # "jet1_btagBDT": r"subleading jet $b_{\mathrm{cMVAv2}}$",
 
-    # "jet0_eta": r"leading jet $\eta$",
-    # "jet1_eta": r"subleading jet $\eta$",
+    "jet0_eta": r"leading jet $\eta$",
+    "jet1_eta": r"subleading jet $\eta$",
+    "jet2_eta": r"third jet $\eta$",
 
     # "jet0_aeta": r"leading jet $|\eta|$",
     # "jet1_aeta": r"subleading jet $|\eta|$",
 
-    # "lep0_pt": r"leading lepton $p_T$ [GeV]",
+    "leps_0_pt": r"leading lepton $p_T$ [GeV]",
     # "lep1_pt": r"subleading jet $p_T$ [GeV]",
 
     # "lep0_eta": r"leading lepton $|\eta|$ [GeV]",
@@ -132,6 +136,9 @@ varnames = {
 
     "numJets": r"$N_{\mathrm{jets}}$",
     "numJets": r"$N_{\mathrm{CSVM}}$",
+
+    "fatjetByPt_0_pt" : r"leading CA15 jet $p_T$ [GeV]", 
+    "fatjetByPt_0_mass" : r"leading CA15 jet mass [GeV]", 
 
     "btag_LR_4b_2b_logit": r"$\log{[\mathcal{F} / (1 - \mathcal{F})]}$",
     "nfatjets": r"$N_{\mathcal{fatjets}}$",
@@ -141,7 +148,25 @@ varnames = {
     "topCandidate_fRec": r"top candidate $f_{\mathrm{rec}}$",
     "topCandidate_Ropt": r"top candidate $R_{\mathrm{opt}}$",
     "topCandidate_RoptCalc": r"top candidate $R_{\mathrm{opt}}, calc$",
-    "topCandidate_n_subjettiness": r"top candidate n-subjettiness$",
+    "topCandidate_n_subjettiness": r"top candidate n-subjettiness",
+
+    "btag_LR_4b_2b_btagCSV_logit" : "BLR (CSV)",
+
+    "multiclass_class" :  "Predicted class",
+    "multiclass_proba_ttb" : "tt+b classifier output",
+    "multiclass_proba_tt2b" : "tt+2b classifier output",
+    "multiclass_proba_ttbb" : "tt+bb classifier output",
+    "multiclass_proba_ttcc" : "tt+cc classifier output",
+    "multiclass_proba_ttll" : "tt+light classifier output",
+
+    "higgsCandidate_secondbtag_subjetfiltered" : "H candidate 2nd subjet b-tag",
+    "higgsCandidate_bbtag" : "H candidate bb-tag",
+    "higgsCandidate_tau1"  : r"H candidate $\tau_1$", 
+    "higgsCandidate_tau2"  : r"H candidate $\tau_2$", 
+    "higgsCandidate_mass" : "H candidate mass (ungroomed)", 
+    "higgsCandidate_mass_softdropz2b1filt" : "H candidate mass (softdrop)",
+    "higgsCandidate_sj12massb_subjetfiltered" : "H candidate mass (subjet-filtered)",
+    "higgsCandidate_sj12masspt_subjetfiltered" : "H candidate mass (subjet-filtered)",         
 
     "nhiggsCandidate": "Number of higgs candidates",
     "higgsCandidate_pt": "H candidate $p_T$ [GeV]",
@@ -149,7 +174,6 @@ varnames = {
     "higgsCandidate_mass": "H candidate $M$ [GeV]",
     "higgsCandidate_mass_pruned": "H candidate pruned $M$ [GeV]",
     "higgsCandidate_mass_softdrop": "H candidate softdrop $M$ [GeV]",
-    "higgsCandidate_bbtag": "H candidate bbtag",
     "higgsCandidate_n_subjettiness": "H candidate n-subjettiness",
     "higgsCandidate_dr_top":  "$\\Delta R_{h,t}$",
     "numJets": "$N_{\\mathrm{jets}}$",
@@ -314,6 +338,7 @@ def fill_overflow(hist):
 
 
 def getHistograms(tf, samples, hname):
+
     hs = OrderedDict()
     for sample, sample_name in samples:
         try:

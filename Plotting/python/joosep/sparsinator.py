@@ -32,22 +32,22 @@ ttH/sl/sparse_CMS_ttH_CSVJESUp -> event with btagWeight with JES up variation
 """
 systematic_weights = []
 btag_weights = []
-for sdir in ["up", "down"]:
-    for syst in ["cferr1", "cferr2", "hf", "hfstats1", "hfstats2", "jes", "lf", "lfstats1", "lfstats2"]:
-        for tagger in ["CSV", "CMVAV2"]:
-            bweight = "btagWeight{0}_{1}_{2}".format(tagger, sdir, syst)
-            #make systematic outputs consistent in Up/Down naming
-            sdir_cap = sdir.capitalize()
-            systematic_weights += [
-                ("CMS_ttH_{0}{1}{2}".format(tagger, syst, sdir_cap), lambda ev, bweight=bweight: ev["weight_nominal"]/ev["btagWeight"+tagger]*ev[bweight])
-            ]
-            btag_weights += [bweight]
-
-systematic_weights += [
-        ("puUp", lambda ev: ev["weight_nominal"]/ev["puWeight"] * ev["puWeightUp"]),
-        ("puDown", lambda ev: ev["weight_nominal"]/ev["puWeight"] * ev["puWeightDown"])
-]
-
+#for sdir in ["up", "down"]:
+#    for syst in ["cferr1", "cferr2", "hf", "hfstats1", "hfstats2", "jes", "lf", "lfstats1", "lfstats2"]:
+#        for tagger in ["CSV", "CMVAV2"]:
+#            bweight = "btagWeight{0}_{1}_{2}".format(tagger, sdir, syst)
+#            #make systematic outputs consistent in Up/Down naming
+#            sdir_cap = sdir.capitalize()
+#            systematic_weights += [
+#                ("CMS_ttH_{0}{1}{2}".format(tagger, syst, sdir_cap), lambda ev, bweight=bweight: ev["weight_nominal"]/ev["btagWeight"+tagger]*ev[bweight])
+#            ]
+#            btag_weights += [bweight]
+#
+#systematic_weights += [
+#        ("puUp", lambda ev: ev["weight_nominal"]/ev["puWeight"] * ev["puWeightUp"]),
+#        ("puDown", lambda ev: ev["weight_nominal"]/ev["puWeight"] * ev["puWeightDown"])
+#]
+#
 def assign_process_label(process, event):
     """
     In case the you need to decide which process an event falls into based on
@@ -160,10 +160,36 @@ Event(
 """.format(**ret2).strip()
     return r
 
-def lv_p4s(pt, eta, phi, m):
+def lv_p4s(pt, eta, phi, m, btagCSV=-100):
     ret = ROOT.TLorentzVector()
     ret.SetPtEtaPhiM(pt, eta, phi, m)
+    setattr(ret, "btagCSV", btagCSV)
     return ret
+
+extra_vars =  ["topCandidate_fRec",
+               "topCandidate_pt",
+               "topCandidate_ptcal",
+               "topCandidate_mass",
+               "topCandidate_masscal",
+               "topCandidate_n_subjettiness",
+               "topCandidate_n_subjettiness_groomed",
+            
+               "higgsCandidate_secondbtag_subjetfiltered", 
+               "higgsCandidate_bbtag", 
+               "higgsCandidate_tau1", 
+               "higgsCandidate_tau2", 
+               "higgsCandidate_mass", 
+               "higgsCandidate_mass_softdropz2b1filt", 
+               "higgsCandidate_sj12massb_subjetfiltered", 
+               "higgsCandidate_sj12masspt_subjetfiltered", 
+            
+               "multiclass_class",
+               "multiclass_proba_ttb",
+               "multiclass_proba_tt2b",
+               "multiclass_proba_ttbb",
+               "multiclass_proba_ttcc",
+               "multiclass_proba_ttll"]
+
 
 desc = Desc([
     Var(name="run"),
@@ -173,12 +199,19 @@ desc = Desc([
     Var(name="is_sl"),
     Var(name="is_dl"),
 
+    Var(name="nfatjets"),
+    Var(name="fatjets_pt"),
+    Var(name="fatjets_eta"),
+    Var(name="fatjets_mass"),
+
+    Var(name="leps_pt"),
+    Var(name="leps_eta"),
+
     Var(name="numJets", systematics="suffix"),
     Var(name="nBCSVM", systematics="suffix"),
     Var(name="nBCMVAM", systematics="suffix"),
     
     Var(name="Wmass", systematics="suffix"),
-
 
     Var(name="btag_LR_4b_2b_btagCSV_logit",
         nominal=Func("blr_CSV", func=lambda ev: logit(ev.btag_LR_4b_2b_btagCSV)),
@@ -192,24 +225,24 @@ desc = Desc([
     Var(name="jets_p4",
         nominal=Func(
             "jets_p4",
-            func=lambda ev: [lv_p4s(ev.jets_pt[i], ev.jets_eta[i], ev.jets_phi[i], ev.jets_mass[i]) for i in range(ev.njets)]
+            func=lambda ev: [lv_p4s(ev.jets_pt[i], ev.jets_eta[i], ev.jets_phi[i], ev.jets_mass[i], ev.jets_btagCSV[i]) for i in range(ev.njets)]
         ),
         systematics = {
             "CMS_scale_jUp": Func(
                 "jets_p4_JESUp",
-                func=lambda ev: [lv_p4s(ev.jets_pt[i]*float(ev.jets_corr_JESUp[i])/float(ev.jets_corr[i]), ev.jets_eta[i], ev.jets_phi[i], ev.jets_mass[i]) for i in range(ev.njets)]
+                func=lambda ev: [lv_p4s(ev.jets_pt[i]*float(ev.jets_corr_JESUp[i])/float(ev.jets_corr[i]), ev.jets_eta[i], ev.jets_phi[i], ev.jets_mass[i], ev.jets_btagCSV[i]) for i in range(ev.njets)]
             ),
             "CMS_scale_jDown": Func(
                 "jets_p4_JESDown",
-                func=lambda ev: [lv_p4s(ev.jets_pt[i]*float(ev.jets_corr_JESDown[i])/float(ev.jets_corr[i]), ev.jets_eta[i], ev.jets_phi[i], ev.jets_mass[i]) for i in range(ev.njets)]
+                func=lambda ev: [lv_p4s(ev.jets_pt[i]*float(ev.jets_corr_JESDown[i])/float(ev.jets_corr[i]), ev.jets_eta[i], ev.jets_phi[i], ev.jets_mass[i], ev.jets_btagCSV[i]) for i in range(ev.njets)]
             ),
             "CMS_res_jUp": Func(
                 "jets_p4_JERUp",
-                func=lambda ev: [lv_p4s(ev.jets_pt[i]*float(ev.jets_corr_JERUp[i])/float(ev.jets_corr_JER[i]) if ev.jets_corr_JER[i]>0 else 0.0, ev.jets_eta[i], ev.jets_phi[i], ev.jets_mass[i]) for i in range(ev.njets)]
+                func=lambda ev: [lv_p4s(ev.jets_pt[i]*float(ev.jets_corr_JERUp[i])/float(ev.jets_corr_JER[i]) if ev.jets_corr_JER[i]>0 else 0.0, ev.jets_eta[i], ev.jets_phi[i], ev.jets_mass[i], ev.jets_btagCSV[i]) for i in range(ev.njets)]
             ),
             "CMS_res_jDown": Func(
                 "jets_p4_JERDown",
-                func=lambda ev: [lv_p4s(ev.jets_pt[i]*float(ev.jets_corr_JERDown[i])/float(ev.jets_corr_JER[i]) if ev.jets_corr_JER[i]>0 else 0.0, ev.jets_eta[i], ev.jets_phi[i], ev.jets_mass[i]) for i in range(ev.njets)]
+                func=lambda ev: [lv_p4s(ev.jets_pt[i]*float(ev.jets_corr_JERDown[i])/float(ev.jets_corr_JER[i]) if ev.jets_corr_JER[i]>0 else 0.0, ev.jets_eta[i], ev.jets_phi[i], ev.jets_mass[i], ev.jets_btagCSV[i]) for i in range(ev.njets)]
             )
         }
     ),
@@ -243,8 +276,12 @@ desc = Desc([
     #nominal b-tag weight, systematic weights added later
     Var(name="btagWeightCSV", schema=["mc"]),
     Var(name="btagWeightCMVAV2", schema=["mc"]),
-    ] + [Var(name=bw, schema=["mc"]) for bw in btag_weights]
+    ] + [Var(name=bw, schema=["mc"]) for bw in btag_weights] + [Var(name=br) for br in extra_vars]
 )
+
+
+    
+
 
 class Axis:
     def __init__(self, name, nbins, lo, hi, func):
@@ -319,27 +356,74 @@ axes = [
     Axis("triggerPath", 20, 0, 20, lambda ev: ev["triggerPath"]),
     Axis("counting", 1, 0, 1, lambda ev: ev["counting"]),
     Axis("parity", 1, 0, 1, lambda ev: ev["evt"]%2==0),
-    Axis("mem_SL_2w2h2t_p", 36, 0, 1, lambda ev: ev["mem_SL_2w2h2t_p"]),
-    Axis("mem_SL_1w2h2t_p", 36, 0, 1, lambda ev: ev["mem_SL_1w2h2t_p"]),
-    Axis("mem_SL_0w2h2t_p", 36, 0, 1, lambda ev: ev["mem_SL_0w2h2t_p"]),
-    Axis("mem_DL_0w2h2t_p", 36, 0, 1, lambda ev: ev["mem_DL_0w2h2t_p"]),
-    Axis("common_bdt", 36, 0, 1, lambda ev: ev["common_bdt"]),
+#    Axis("mem_SL_2w2h2t_p", 36, 0, 1, lambda ev: ev["mem_SL_2w2h2t_p"]),
+#    Axis("mem_SL_1w2h2t_p", 36, 0, 1, lambda ev: ev["mem_SL_1w2h2t_p"]),
+#    Axis("mem_SL_0w2h2t_p", 36, 0, 1, lambda ev: ev["mem_SL_0w2h2t_p"]),
+#    Axis("mem_DL_0w2h2t_p", 36, 0, 1, lambda ev: ev["mem_DL_0w2h2t_p"]),
+#    Axis("common_bdt", 36, 0, 1, lambda ev: ev["common_bdt"]),
     Axis("numJets", 5, 3, 8, lambda ev: ev["numJets"]),
     Axis("nBCSVM", 4, 1, 5, lambda ev: ev["nBCSVM"]),
     Axis("nBCMVAM", 4, 1, 5, lambda ev: ev["nBCMVAM"]),
     
     Axis("Wmass", 100, 50, 150, lambda ev: ev["Wmass"]),
 
-    Axis("btag_LR_4b_2b_btagCSV_logit", 50, -20, 20, lambda ev: ev["btag_LR_4b_2b_btagCSV_logit"]),
-    Axis("btag_LR_4b_2b_btagCMVA_logit", 50, -20, 20, lambda ev: ev["btag_LR_4b_2b_btagCMVA_logit"]),
+    Axis("btag_LR_4b_2b_btagCSV_logit", 30, -5, 10, lambda ev: ev["btag_LR_4b_2b_btagCSV_logit"]),
+    Axis("btag_LR_4b_2b_btagCMVA_logit", 30, -5, 10, lambda ev: ev["btag_LR_4b_2b_btagCMVA_logit"]),
     
     Axis("jetsByPt_0_pt", 50, 0, 400, lambda ev: ev["jets_p4"][0].Pt()),
     Axis("jetsByPt_1_pt", 50, 0, 400, lambda ev: ev["jets_p4"][1].Pt()),
     Axis("jetsByPt_2_pt", 50, 0, 400, lambda ev: ev["jets_p4"][2].Pt()),
 
+    Axis("jetsByPt_0_btagCSV", 50, -1, 1, lambda ev: ev["jets_p4"][0].btagCSV),
+
     Axis("jetsByPt_0_eta", 50, -2.5, 2.5, lambda ev: ev["jets_p4"][0].Eta()),
     Axis("jetsByPt_1_eta", 50, -2.5, 2.5, lambda ev: ev["jets_p4"][1].Eta()),
     Axis("jetsByPt_2_eta", 50, -2.5, 2.5, lambda ev: ev["jets_p4"][2].Eta()),
+
+    Axis("fatjetByPt_0_pt", 50, 0, 600, lambda ev: ev["fatjets_pt"][0] if ev["nfatjets"] else -100),
+    Axis("fatjetByPt_0_eta", 50, -2.5, 2.5, lambda ev: ev["fatjets_eta"][0] if ev["nfatjets"] else -100),
+    Axis("fatjetByPt_0_mass", 50, 0, 600, lambda ev: ev["fatjets_mass"][0] if ev["nfatjets"] else -100),
+
+    Axis("leps_0_pt", 50, 0, 300, lambda ev: ev["leps_pt"][0]),
+    Axis("leps_0_eta", 50, -2.5, 2.5, lambda ev: ev["leps_eta"][0]),
+
+    Axis("topCandidate_fRec", 50, 0, 0.4, lambda ev: ev["topCandidate_fRec"][0] if len(ev["topCandidate_pt"]) else -100),
+    Axis("topCandidate_pt", 50, 150, 600, lambda ev: ev["topCandidate_pt"][0] if len(ev["topCandidate_pt"]) else -100),
+    Axis("topCandidate_ptcal", 50, 150, 600, lambda ev: ev["topCandidate_ptcal"][0] if len(ev["topCandidate_pt"]) else -100),
+    Axis("topCandidate_mass", 50, 0, 250, lambda ev: ev["topCandidate_mass"][0] if len(ev["topCandidate_pt"]) else -100),
+    Axis("topCandidate_masscal", 50, 0, 250, lambda ev: ev["topCandidate_masscal"][0] if len(ev["topCandidate_pt"]) else -100),
+    Axis("topCandidate_n_subjettiness", 50, 0, 1, lambda ev: ev["topCandidate_n_subjettiness"][0] if len(ev["topCandidate_pt"]) else -100),
+    Axis("topCandidate_n_subjettiness_groomed", 50, 0, 1, lambda ev: ev["topCandidate_n_subjettiness_groomed"][0] if len(ev["topCandidate_pt"]) else -100),
+
+    Axis("higgsCandidate_secondbtag_subjetfiltered", 50, -1,1, lambda ev: ev["higgsCandidate_secondbtag_subjetfiltered"][0] if len(ev["higgsCandidate_mass"]) else -100),
+    Axis("higgsCandidate_bbtag", 50, -1, 1, lambda ev: ev["higgsCandidate_bbtag"][0] if len(ev["higgsCandidate_mass"]) else -100),
+    Axis("higgsCandidate_tau1", 50, 0, 1, lambda ev: ev["higgsCandidate_tau1"][0] if len(ev["higgsCandidate_mass"]) else -100),
+    Axis("higgsCandidate_tau2", 50, 0, 1, lambda ev: ev["higgsCandidate_tau2"][0] if len(ev["higgsCandidate_mass"]) else -100),
+
+    Axis("higgsCandidate_mass", 50, 0, 200, lambda ev: ev["higgsCandidate_mass"][0] if len(ev["higgsCandidate_mass"]) else -100),
+    Axis("higgsCandidate_mass_softdropz2b1filt", 50, 0, 200, lambda ev: ev["higgsCandidate_mass_softdropz2b1filt"][0] if len(ev["higgsCandidate_mass"]) else -100),
+    Axis("higgsCandidate_sj12massb_subjetfiltered", 50, 0, 200, lambda ev: ev["higgsCandidate_sj12massb_subjetfiltered"][0] if len(ev["higgsCandidate_mass"]) else -100),
+    Axis("higgsCandidate_sj12masspt_subjetfiltered", 50, 0, 200, lambda ev: ev["higgsCandidate_sj12masspt_subjetfiltered"][0] if len(ev["higgsCandidate_mass"]) else -100),
+
+    Axis("topCandidate_pt", 50, 150, 600, lambda ev: ev["topCandidate_pt"][0] if len(ev["topCandidate_pt"]) else -100),
+    Axis("topCandidate_ptcal", 50, 150, 600, lambda ev: ev["topCandidate_ptcal"][0] if len(ev["topCandidate_pt"]) else -100),
+    Axis("topCandidate_mass", 50, 0, 250, lambda ev: ev["topCandidate_mass"][0] if len(ev["topCandidate_pt"]) else -100),
+    Axis("topCandidate_masscal", 50, 0, 250, lambda ev: ev["topCandidate_masscal"][0] if len(ev["topCandidate_pt"]) else -100),
+    Axis("topCandidate_n_subjettiness", 50, 0, 1, lambda ev: ev["topCandidate_n_subjettiness"][0] if len(ev["topCandidate_pt"]) else -100),
+    Axis("topCandidate_n_subjettiness_groomed", 50, 0, 1, lambda ev: ev["topCandidate_n_subjettiness_groomed"][0] if len(ev["topCandidate_pt"]) else -100),
+
+
+               
+
+
+
+    Axis("multiclass_class", 7, -0.5, 6.5, lambda ev:     ev["multiclass_class"]),
+    Axis("multiclass_proba_ttb", 40, 0, 0.7, lambda ev:   ev["multiclass_proba_ttb"]),
+    Axis("multiclass_proba_tt2b", 40, 0, 0.7, lambda ev:  ev["multiclass_proba_tt2b"]),
+    Axis("multiclass_proba_ttbb", 40, 0, 0.7, lambda ev:  ev["multiclass_proba_ttbb"]),
+    Axis("multiclass_proba_ttcc", 40, 0, 0.7, lambda ev:  ev["multiclass_proba_ttcc"]),
+    Axis("multiclass_proba_ttll", 40, 0, 0.7,  lambda ev: ev["multiclass_proba_ttll"]),
+
 ]
 
 def get_schema(sample):
@@ -419,9 +503,9 @@ if __name__ == "__main__":
         skip_events = int(os.environ.get("SKIP_EVENTS", 0))
         max_events = int(os.environ.get("MAX_EVENTS", 0))
     else:
-        file_names = [getSitePrefix("/store/user/jpata/tth/tth_Aug3_V24_v2/SingleMuon/tth_Aug3_V24_v2/160803_115959/0000/tree_{0}.root").format(i) for i in [10, 105, 106]]
+        file_names = [getSitePrefix("/store/user/jpata/tth/Aug11_leptonic_nome_v1/SingleMuon/Aug11_leptonic_nome_v1/160811_211419/0000/tree_{0}.root").format(i) for i in [10, 105, 106]]
         prefix = ""
-        sample = "ttHTobb_M125_13TeV_powheg_pythia8"
+        sample = "SingleMuon"
         skip_events = 0
         max_events = 10000
 

@@ -16,6 +16,9 @@ import rootpy
 from rootpy.plotting import Hist
 from rootpy.plotting import root2matplotlib as rplt
 
+DO_SYSTEMATICS = False
+DO_PARALLEL = False
+
 procs_names = [
     ("ttH_hbb", "tt+H(bb)"),
     ("ttH_nonhbb", "tt+H(non-bb)"),
@@ -27,20 +30,24 @@ procs_names = [
 ]
 procs = [x[0] for x in procs_names]
 
-syst_pairs = [
-    ("_puUp", "_puDown"),
-    ("_CMS_scale_jUp", "_CMS_scale_jDown"),
-    ("_CMS_res_jUp", "_CMS_res_jDown"),
-    ("_CMS_ttH_CSVcferr1Up", "_CMS_ttH_CSVcferr1Down"),
-    ("_CMS_ttH_CSVcferr2Up", "_CMS_ttH_CSVcferr2Down"),
-    ("_CMS_ttH_CSVhfUp", "_CMS_ttH_CSVhfDown"),
-    ("_CMS_ttH_CSVhfstats1Up", "_CMS_ttH_CSVhfstats1Down"),
-    ("_CMS_ttH_CSVhfstats2Up", "_CMS_ttH_CSVhfstats2Down"),
-    ("_CMS_ttH_CSVjesUp", "_CMS_ttH_CSVjesDown"),
-    ("_CMS_ttH_CSVlfUp", "_CMS_ttH_CSVlfDown"),
-    ("_CMS_ttH_CSVlfstats1Up", "_CMS_ttH_CSVlfstats1Down"),
-    ("_CMS_ttH_CSVlfstats2Up", "_CMS_ttH_CSVlfstats2Down")
-]
+
+syst_pairs = []
+
+if DO_SYSTEMATICS:
+    syst_pairs.extend([
+        ("_puUp", "_puaDown"),
+        ("_CMS_scale_jUp", "_CMS_scale_jDown"),
+        ("_CMS_res_jUp", "_CMS_res_jDown"),
+        ("_CMS_ttH_CSVcferr1Up", "_CMS_ttH_CSVcferr1Down"),
+        ("_CMS_ttH_CSVcferr2Up", "_CMS_ttH_CSVcferr2Down"),
+        ("_CMS_ttH_CSVhfUp", "_CMS_ttH_CSVhfDown"),
+        ("_CMS_ttH_CSVhfstats1Up", "_CMS_ttH_CSVhfstats1Down"),
+        ("_CMS_ttH_CSVhfstats2Up", "_CMS_ttH_CSVhfstats2Down"),
+        ("_CMS_ttH_CSVjesUp", "_CMS_ttH_CSVjesDown"),
+        ("_CMS_ttH_CSVlfUp", "_CMS_ttH_CSVlfDown"),
+        ("_CMS_ttH_CSVlfstats1Up", "_CMS_ttH_CSVlfstats1Down"),
+        ("_CMS_ttH_CSVlfstats2Up", "_CMS_ttH_CSVlfstats2Down")
+    ])
 
 #optional function f: TH1D -> TH1D to blind data
 def blind(h):
@@ -76,7 +83,7 @@ def plot_worker(kwargs):
     path = os.path.dirname(outname)
     if not os.path.isdir(path):
         os.makedirs(path)
-    plotlib.svfg(outname)
+    plotlib.svfg(outname + ".pdf")
     plt.clf()
 
     if do_syst:
@@ -108,8 +115,8 @@ def get_base_plot(basepath, outpath, analysis, category, variable):
         "signal_procs": ["ttH_hbb"],
         "dataname": "data", #data_obs for fake data
         "rebin": 1,
-        "xlabel": plotlib.varnames[variable],
-        "xunit": plotlib.varunits[variable],
+        "xlabel": plotlib.varnames[variable] if variable in plotlib.varnames.keys() else "PLZ add me to Varnames", 
+        "xunit": plotlib.varunits[variable] if variable in plotlib.varunits.keys() else "" ,
         "legend_fontsize": 12,
         "legend_loc": "best",
         "colors": [plotlib.colors.get(p) for p in procs],
@@ -123,7 +130,56 @@ def get_base_plot(basepath, outpath, analysis, category, variable):
 
 if __name__ == "__main__":
 
-    vars_base = ["jetsByPt_0_pt"]
+
+    # Plot for all SL categories
+    sl_vars = ["jetsByPt_0_pt", 
+               "jetsByPt_1_pt", 
+               "jetsByPt_2_pt", 
+               "jetsByPt_0_btagCSV", 
+               "jetsByPt_0_eta", 
+               "jetsByPt_1_eta", 
+               "jetsByPt_2_eta", 
+               "fatjetByPt_0_pt",  
+               "fatjetByPt_0_eta",  
+               "fatjetByPt_0_mass",
+               "leps_0_pt",  
+               "leps_0_eta",  
+               "numJets",  
+               "nBCSVM",  
+               "btag_LR_4b_2b_btagCSV_logit"]
+
+    # Plot for all DL categories
+    dl_vars = ["jetsByPt_0_pt", "leps_0_pt"]
+
+    # Top Tagging variables
+    top_vars = ["topCandidate_fRec",
+                "topCandidate_pt",
+                "topCandidate_ptcal",
+                "topCandidate_mass",
+                "topCandidate_masscal",
+                "topCandidate_n_subjettiness",
+            ]
+
+    # Higgs tagging variables
+    higgs_vars = [
+        "higgsCandidate_secondbtag_subjetfiltered", 
+        "higgsCandidate_bbtag", 
+        "higgsCandidate_tau1", 
+        "higgsCandidate_tau2", 
+        "higgsCandidate_mass", 
+        "higgsCandidate_mass_softdropz2b1filt", 
+        "higgsCandidate_sj12massb_subjetfiltered", 
+        "higgsCandidate_sj12masspt_subjetfiltered",             
+    ]
+
+    # Event classification variables
+    class_vars = ["multiclass_class",
+                  "multiclass_proba_ttb",
+                  "multiclass_proba_tt2b",
+                  "multiclass_proba_ttbb",
+                  "multiclass_proba_ttcc",
+                  "multiclass_proba_ttll"
+    ]
 
     cats_sl = [
         "sl_j4_t3", "sl_j4_tge4",
@@ -138,18 +194,34 @@ if __name__ == "__main__":
         "dl_jge4_t3",
         "dl_jge4_tge4",
     ]
+    
+    version = "GC70f0703561df"
 
+    args = []
 
-    args = [
-        get_base_plot("/Users/joosep/Documents/tth/data/histograms/Aug12/", "Aug12", "SL_7cat", cat, var) for cat in cats_sl for var in vars_base
-    ]
+    args += [get_base_plot(
+            "/mnt/t3nfs01/data01/shome/gregor/tth/gc/makecategory/"+version,
+            "Aug12", "SL_7cat", cat, var) for cat in cats_sl for var in sl_vars]
 
-    args += [get_base_plot("/Users/joosep/Documents/tth/data/histograms/Aug12/", "Aug12", "DL", cat, var) for cat in cats_dl for var in vars_base]
+    args += [get_base_plot(
+            "/mnt/t3nfs01/data01/shome/gregor/tth/gc/makecategory/"+version,
+            "Aug12", "DL", cat, var) for cat in cats_dl for var in dl_vars]
 
+    args += [get_base_plot(
+            "/mnt/t3nfs01/data01/shome/gregor/tth/gc/makecategory/"+version,
+            "Aug12", "SL_7cat", cat, var) for cat in  ["sl_j4_t3"] for var in higgs_vars + top_vars]
 
-    import multiprocessing
-    pool = multiprocessing.Pool(4)
-    pool.map(plot_worker, args)
-    pool.close()
+    args += [get_base_plot(
+            "/mnt/t3nfs01/data01/shome/gregor/tth/gc/makecategory/"+version,
+            "Aug12", "SL_7cat", cat, var) for cat in ["sl_jge6_tge4"] for var in class_vars]
+    
 
-    # map(plot_worker, args)
+    if DO_PARALLEL:
+        import multiprocessing
+        pool = multiprocessing.Pool(4)
+        pool.map(plot_worker, args)
+        pool.close()
+    else:
+        for arg in args:
+            plot_worker(arg)
+
