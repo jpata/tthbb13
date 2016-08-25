@@ -563,7 +563,6 @@ def getTreeProducer(conf):
                 tn = pref + "_BIT_" + tn[:-1]
                 if not tn in trignames:
                     trignames += [tn]
-    print trignames 
     for trig in trignames:
         treeProducer.globalVariables += [NTupleVariable(
             trig, lambda ev, name=trig: getattr(ev.input, name, -1), type=int, mcOnly=False

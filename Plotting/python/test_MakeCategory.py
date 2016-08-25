@@ -4,17 +4,16 @@ import unittest
 import logging
 import ROOT
 
+from TTH.Plotting.Datacards.MakeCategory import get_categories
+
 class MakeCategoryTestCase(unittest.TestCase):
     
     def launch_MakeCategory_test(self,catname,analysis, var):
         from TTH.Plotting.Datacards.MakeCategory import main as MakeCategory_main
-        MakeCategory_main(
-            os.path.join(
-                os.environ["CMSSW_BASE"],
-                "src/TTH/Plotting/python/Datacards/AnalysisSpecification.py",
-            ),
-            analysis,
-            catname
+
+        anspec = os.path.join(
+            os.environ["CMSSW_BASE"],
+            "src/TTH/Plotting/python/Datacards/AnalysisSpecification.py"
         )
 
         analysis, categories = get_categories(anspec, "SL_7cat", catname)

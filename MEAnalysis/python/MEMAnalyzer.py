@@ -289,6 +289,13 @@ class MEAnalyzer(FilterAnalyzer):
                 event.systResults[syst] = res
             else:
                 event.systResults[syst].passes_mem = False
+                #fill outputs that need to be there, in case event was skipped
+                for key in self.conf.mem["methodsToRun"]:
+                    for hypo in ["tth", "ttbb"]:
+                        k = "mem_{0}_{1}".format(hypo, key)
+                        if not event.systResults.has_key(k):
+                            setattr(event.systResults[syst], k, MEM.MEMOutput())
+                            setattr(event.systResults[syst], k+"_perm", [])
 
         return self.conf.general["passall"] or np.any([v.passes_mem for v in event.systResults.values()])
 

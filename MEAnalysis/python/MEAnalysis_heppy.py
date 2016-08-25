@@ -256,7 +256,7 @@ config = cfg.Config(
     events_class = Events
 )
 
-if __name__ == "__main__":
+def main():
     print "Running MEAnalysis heppy main loop"
     
     #input component
@@ -305,7 +305,7 @@ if __name__ == "__main__":
 
         #Configure the number of events to run
         from PhysicsTools.HeppyCore.framework.looper import Looper
-        nEvents = 1000
+        nEvents = 200
 
         kwargs = {}
         if conf.general.get("eventWhitelist", None) is None:
@@ -318,14 +318,8 @@ if __name__ == "__main__":
             **kwargs
         )
 
-
-        import cProfile, time
-        p = cProfile.Profile(time.clock)
-        p.runcall(looper.loop)
-        p.print_stats()
-
         #execute the code
-        #looper.loop()
+        looper.loop()
 
         tf = looper.setup.services["outputfile"].file 
         tf.cd()
@@ -334,6 +328,6 @@ if __name__ == "__main__":
         
         #write the output
         looper.write()
-    #print summaries
-    # for analyzer in looper.analyzers:
-    #     print analyzer.name, "counters = {\n", analyzer.counters, "}"
+
+if __name__ == "__main__":
+    main()

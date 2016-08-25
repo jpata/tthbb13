@@ -26,8 +26,8 @@ class MakeSparsinatorTestCase(unittest.TestCase):
     def sparsinator_checks(self, fn, sample):
         self.assertTrue(os.path.isfile(fn))
         fi = ROOT.TFile(fn)
-        hi = fi.Get("{0}/sl/sparse".format(sample))
-        self.assertFalse(hi == None)
+        k = "{0}/sl/sparse".format(sample)
+        self.assertFalse(fi.Get(k) == None)
         fi.Close()
 
     def test_sparsinator_data(self):

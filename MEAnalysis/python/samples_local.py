@@ -7,7 +7,7 @@ import os
 
 samples_dict = {
     "sample": cms.PSet(
-        name     = cms.string("sample"),
+        name     = cms.string(os.environ.get("TTH_SAMPLE", "sample")),
         nickname = cms.string("sample"),
         xSec     = cms.double("1"),
         nGen     = cms.int64(0),
