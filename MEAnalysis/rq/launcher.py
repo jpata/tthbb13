@@ -104,7 +104,7 @@ def mergeFiles(outfile, infiles, remove_inputs=True):
         shutil.copy(infiles[0], outfile)
     else:
         logger.info("merging output to {0}".format(outfile))
-        merger = ROOT.TFileMerger()
+        merger = ROOT.TFileMerger(False)
         merger.OutputFile(outfile)
         for res in infiles:
             logger.debug("adding file {0}".format(res))
