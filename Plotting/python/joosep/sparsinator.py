@@ -11,6 +11,15 @@ import numpy as np
 from TTH.MEAnalysis.samples_base import getSitePrefix, xsec, samples_nick, xsec_sample, get_prefix_sample, PROCESS_MAP, TRIGGERPATH_MAP
 from TTH.Plotting.Datacards.sparse import save_hdict
 
+# CONFIGURATION
+ADD_SYST_WEIGHTS = False
+DO_SL            = True
+DO_DL            = True
+DO_FH            = False
+EXTRA_SL         = True
+EXTRA_DL         = False
+EXTRA_FH         = False
+
 #placeholder value
 NA = -999
 
@@ -32,22 +41,24 @@ ttH/sl/sparse_CMS_ttH_CSVJESUp -> event with btagWeight with JES up variation
 """
 systematic_weights = []
 btag_weights = []
-#for sdir in ["up", "down"]:
-#    for syst in ["cferr1", "cferr2", "hf", "hfstats1", "hfstats2", "jes", "lf", "lfstats1", "lfstats2"]:
-#        for tagger in ["CSV", "CMVAV2"]:
-#            bweight = "btagWeight{0}_{1}_{2}".format(tagger, sdir, syst)
-#            #make systematic outputs consistent in Up/Down naming
-#            sdir_cap = sdir.capitalize()
-#            systematic_weights += [
-#                ("CMS_ttH_{0}{1}{2}".format(tagger, syst, sdir_cap), lambda ev, bweight=bweight: ev["weight_nominal"]/ev["btagWeight"+tagger]*ev[bweight])
-#            ]
-#            btag_weights += [bweight]
-#
-#systematic_weights += [
-#        ("puUp", lambda ev: ev["weight_nominal"]/ev["puWeight"] * ev["puWeightUp"]),
-#        ("puDown", lambda ev: ev["weight_nominal"]/ev["puWeight"] * ev["puWeightDown"])
-#]
-#
+
+if ADD_SYST_WEIGHTS:
+    for sdir in ["up", "down"]:
+        for syst in ["cferr1", "cferr2", "hf", "hfstats1", "hfstats2", "jes", "lf", "lfstats1", "lfstats2"]:
+            for tagger in ["CSV", "CMVAV2"]:
+                bweight = "btagWeight{0}_{1}_{2}".format(tagger, sdir, syst)
+                #make systematic outputs consistent in Up/Down naming
+                sdir_cap = sdir.capitalize()
+                systematic_weights += [
+                    ("CMS_ttH_{0}{1}{2}".format(tagger, syst, sdir_cap), lambda ev, bweight=bweight: ev["weight_nominal"]/ev["btagWeight"+tagger]*ev[bweight])
+                ]
+                btag_weights += [bweight]
+
+    systematic_weights += [
+            ("puUp", lambda ev: ev["weight_nominal"]/ev["puWeight"] * ev["puWeightUp"]),
+            ("puDown", lambda ev: ev["weight_nominal"]/ev["puWeight"] * ev["puWeightDown"])
+    ]
+
 def assign_process_label(process, event):
     """
     In case the you need to decide which process an event falls into based on
@@ -102,6 +113,8 @@ class Var:
     def __init__(self, **kwargs):
         self.name = kwargs.get("name")
         self.typ = kwargs.get("type")
+        
+        self.present = True
 
         #in case function not defined, just use variable name
         self.nominal_func = kwargs.get("nominal", Func(self.name))
@@ -118,10 +131,20 @@ class Var:
         self.schema = kwargs.get("schema", ["mc", "data"])
 
     def getValue(self, event, schema, systematic="nominal"):
-        if systematic == "nominal" or not self.systematics_funcs.has_key(systematic):
-            return self.funcs_schema.get(schema, self.nominal_func)(event)
-        else:
-            return self.systematics_funcs[systematic](event)
+                
+        if self.present:
+            try:
+                if systematic == "nominal" or not self.systematics_funcs.has_key(systematic):
+                    return self.funcs_schema.get(schema, self.nominal_func)(event)
+                else:
+                    return self.systematics_funcs[systematic](event)
+            except:  
+                print (self.name + " " + systematic + " DEACTIVATED")
+                self.present = False
+                return 0
+        else:            
+            return 0
+                    
 
 class Desc:
     def __init__(self, variables=[]):
@@ -368,33 +391,47 @@ class SparseOut:
         #otherwise the THnSparse is filled, but with garbage and will result in TBrowser segfaults later 
         return self.hist.Fill(valVec.data(), weight)
 
-axes = [
+# Axis we will want to have in all sparse histograms
+axes_basic_all = [
     Axis("process", 20, 0, 20, lambda ev: ev["process"]),
     Axis("triggerPath", 20, 0, 20, lambda ev: ev["triggerPath"]),
     Axis("counting", 1, 0, 1, lambda ev: ev["counting"]),
     Axis("parity", 1, 0, 1, lambda ev: ev["evt"]%2==0),
 
+    Axis("numJets", 5, 3, 8, lambda ev: ev["numJets"]),
+    Axis("nBCSVM", 4, 1, 5, lambda ev: ev["nBCSVM"]),
+    Axis("nBCMVAM", 4, 1, 5, lambda ev: ev["nBCMVAM"]),
+
+    Axis("jetsByPt_0_pt", 50, 0, 400, lambda ev: ev["jets_p4"][0].Pt()),
+    Axis("leps_0_pt", 50, 0, 300, lambda ev: ev["leps_pt"][0]),
+
+    Axis("common_bdt", 36, 0, 1, lambda ev: ev["common_bdt"]),
+]
+
+axes_basic_sl = [
     Axis("mem_SL_2w2h2t_p", 36, 0, 1, lambda ev: ev["mem_SL_2w2h2t_p"]),
     Axis("mem_SL_1w2h2t_p", 36, 0, 1, lambda ev: ev["mem_SL_1w2h2t_p"]),
     Axis("mem_SL_0w2h2t_p", 36, 0, 1, lambda ev: ev["mem_SL_0w2h2t_p"]),
+
+    Axis("btag_LR_4b_2b_btagCSV_logit", 30, -5, 10, lambda ev: ev["btag_LR_4b_2b_btagCSV_logit"]),
+    Axis("btag_LR_4b_2b_btagCMVA_logit", 30, -5, 10, lambda ev: ev["btag_LR_4b_2b_btagCMVA_logit"]),
+]
+
+axes_basic_dl = [
     Axis("mem_DL_0w2h2t_p", 36, 0, 1, lambda ev: ev["mem_DL_0w2h2t_p"]),
+]
+ 
+axes_basic_fh = [
     Axis("mem_FH_4w2h2t_p", 36, 0, 1, lambda ev: ev["mem_FH_4w2h2t_p"]),
     Axis("mem_FH_3w2h2t_p", 36, 0, 1, lambda ev: ev["mem_FH_3w2h2t_p"]),
     Axis("mem_FH_4w2h1t_p", 36, 0, 1, lambda ev: ev["mem_FH_4w2h1t_p"]),
     Axis("mem_FH_0w0w2h2t_p", 36, 0, 1, lambda ev: ev["mem_FH_0w0w2h2t_p"]),
     Axis("mem_FH_0w0w2h1t_p", 36, 0, 1, lambda ev: ev["mem_FH_0w0w2h1t_p"]),
-    Axis("common_bdt", 36, 0, 1, lambda ev: ev["common_bdt"]),
+]
 
-    Axis("numJets", 5, 3, 8, lambda ev: ev["numJets"]),
-    Axis("nBCSVM", 4, 1, 5, lambda ev: ev["nBCSVM"]),
-    Axis("nBCMVAM", 4, 1, 5, lambda ev: ev["nBCMVAM"]),
-    
+axes_extra_sl = [    
     Axis("Wmass", 100, 50, 150, lambda ev: ev["Wmass"]),
-
-    Axis("btag_LR_4b_2b_btagCSV_logit", 30, -5, 10, lambda ev: ev["btag_LR_4b_2b_btagCSV_logit"]),
-    Axis("btag_LR_4b_2b_btagCMVA_logit", 30, -5, 10, lambda ev: ev["btag_LR_4b_2b_btagCMVA_logit"]),
     
-    Axis("jetsByPt_0_pt", 50, 0, 400, lambda ev: ev["jets_p4"][0].Pt()),
     Axis("jetsByPt_1_pt", 50, 0, 400, lambda ev: ev["jets_p4"][1].Pt()),
     Axis("jetsByPt_2_pt", 50, 0, 400, lambda ev: ev["jets_p4"][2].Pt()),
 
@@ -408,7 +445,6 @@ axes = [
     Axis("fatjetByPt_0_eta", 50, -2.5, 2.5, lambda ev: ev["fatjets_eta"][0] if ev["nfatjets"] else -100),
     Axis("fatjetByPt_0_mass", 50, 0, 600, lambda ev: ev["fatjets_mass"][0] if ev["nfatjets"] else -100),
 
-    Axis("leps_0_pt", 50, 0, 300, lambda ev: ev["leps_pt"][0]),
     Axis("leps_0_eta", 50, -2.5, 2.5, lambda ev: ev["leps_eta"][0]),
 
     Axis("topCandidate_fRec", 50, 0, 0.4, lambda ev: ev["topCandidate_fRec"][0] if len(ev["topCandidate_pt"]) else -100),
@@ -436,11 +472,6 @@ axes = [
     Axis("topCandidate_n_subjettiness", 50, 0, 1, lambda ev: ev["topCandidate_n_subjettiness"][0] if len(ev["topCandidate_pt"]) else -100),
     Axis("topCandidate_n_subjettiness_groomed", 50, 0, 1, lambda ev: ev["topCandidate_n_subjettiness_groomed"][0] if len(ev["topCandidate_pt"]) else -100),
 
-
-               
-
-
-
     Axis("multiclass_class", 7, -0.5, 6.5, lambda ev:     ev["multiclass_class"]),
     Axis("multiclass_proba_ttb", 40, 0, 0.7, lambda ev:   ev["multiclass_proba_ttb"]),
     Axis("multiclass_proba_tt2b", 40, 0, 0.7, lambda ev:  ev["multiclass_proba_tt2b"]),
@@ -449,6 +480,25 @@ axes = [
     Axis("multiclass_proba_ttll", 40, 0, 0.7,  lambda ev: ev["multiclass_proba_ttll"]),
 
 ]
+
+axes_extra_dl = []
+axes_extra_fh = []
+
+# DEFINE SL AXES
+axes_sl = axes_basic_all + axes_basic_sl
+if EXTRA_SL:
+        axes_sl += axes_extra_sl
+
+# DEFINE DL AXES
+axes_dl = axes_basic_all + axes_basic_dl
+if EXTRA_DL:
+    axes_dl += axes_extra_dl
+
+# DEFINE FH AXES
+axes_fh = axes_basic_all + axes_basic_fh
+if EXTRA_FH:
+    axes_fh += axes_extra_fh
+
 
 def get_schema(sample):
     process = samples_nick[sample]
@@ -466,27 +516,32 @@ def createOutputs(dirs, systematics):
             syststr = "_" + syst
 
         outdict = {}
-        dirs["sl"].cd()
-        outdict["sl/sparse"] = SparseOut(
-            "sparse" + syststr,
-            lambda ev: ev["is_sl"] == 1,
-            axes,
-            dirs["sl"]
-        )
-        dirs["dl"].cd()
-        outdict["dl/sparse"] = SparseOut(
-            "sparse" + syststr,
-            lambda ev: ev["is_dl"] == 1,
-            axes,
-            dirs["dl"]
-        )
-        dirs["fh"].cd()
-        outdict["fh/sparse"] = SparseOut(
-            "sparse" + syststr,
-            lambda ev: ev["is_fh"] == 1,
-            axes,
-            dirs["fh"]
-        )
+
+        if DO_SL:
+            dirs["sl"].cd()
+            outdict["sl/sparse"] = SparseOut(
+                "sparse" + syststr,
+                lambda ev: ev["is_sl"] == 1,
+                axes_sl,
+                dirs["sl"]
+            )
+        if DO_DL:
+            dirs["dl"].cd()
+            outdict["dl/sparse"] = SparseOut(
+                "sparse" + syststr,
+                lambda ev: ev["is_dl"] == 1,
+                axes_dl,
+                dirs["dl"])
+            
+        if DO_FH:
+            dirs["fh"].cd()
+            outdict["fh/sparse"] = SparseOut(
+                "sparse" + syststr,
+                lambda ev: ev["is_fh"] == 1,
+                axes_fh,
+                dirs["fh"]
+            )
+
         outdict_syst[syst] = outdict
     return outdict_syst
 
