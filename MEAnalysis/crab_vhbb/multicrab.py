@@ -395,6 +395,7 @@ env
         vhbb_dir + "/Znn-spring15.weights.xml",
         vhbb_dir + "/VBF-spring15.weights.xml",
         vhbb_dir + "/ttbar-spring16-80X.weights.xml",
+        vhbb_dir + "/ttbar-spring16-500k-13d-300t.weights.xml",
         vhbb_dir + '/TMVA_blikelihood_vbf_cmssw76_h21trained.weights.xml'
     ]
 
