@@ -9,8 +9,7 @@ from TTH.Plotting.Datacards.AnalysisSpecificationClasses import make_csv_categor
 from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
 
 analyses = {}
-#for config in ["config_fh.cfg"]: 
-for config in ["config_sl.cfg", "config_dl.cfg"]:
+for config in ["config_sl.cfg", "config_dl.cfg", "config_fh.cfg"]:
     name, analysis = analysisFromConfig(os.path.join(os.environ["CMSSW_BASE"],
                                                      "src/TTH/Plotting/python/Datacards",
                                                      config))
