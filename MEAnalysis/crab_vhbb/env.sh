@@ -58,15 +58,14 @@ export ROOT_INCLUDE_PATH=.:./src:$ROOT_INCLUDE_PATH
 echo "tth_hashes"
 cat hash
 
-# Use version from IB until it migrates to the main release
-# Should work as long as both releases have same python version
-# Will need to update this path once in a while
-export IB_BASE=/cvmfs/cms-ib.cern.ch/week0/slc6_amd64_gcc530
-export PYTHONPATH=$IB_BASE/external/py2-numpy/1.11.1/lib/python2.7/site-packages:$PYTHONPATH
-export PYTHONPATH=$IB_BASE/external/py2-scikit-learn/0.17.1/lib/python2.7/site-packages:$PYTHONPATH
-export PYTHONPATH=$IB_BASE/external/py2-pandas/0.17.1-agcabg/lib/python2.7/site-packages:$PYTHONPATH
-export PYTHONPATH=$IB_BASE/external/py2-matplotlib/1.5.2/lib/python2.7/site-packages:$PYTHONPATH
-export PYTHONPATH=$IB_BASE/external/py2-scipy/0.16.1/lib/python2.7/site-packages:$PYTHONPATH
+# make sure we can access scikit learn
+# the packages are now in the right scram_arch but we need to select the right versions
+export OVERRIDE_PATH_BASE=/cvmfs/cms.cern.ch/$SCRAM_ARCH/external
+export PYTHONPATH=$OVERRIDE_PATH_BASE/py2-numpy/1.11.1/lib/python2.7/site-packages:$PYTHONPATH
+export PYTHONPATH=$OVERRIDE_PATH_BASE/py2-pandas/0.17.1-agcabg/lib/python2.7/site-packages:$PYTHONPATH
+export PYTHONPATH=$OVERRIDE_PATH_BASE/py2-matplotlib/1.5.2/lib/python2.7/site-packages:$PYTHONPATH
+export PYTHONPATH=$OVERRIDE_PATH_BASE/py2-scipy/0.16.1/lib/python2.7/site-packages:$PYTHONPATH
+export PYTHONPATH=$OVERRIDE_PATH_BASE/py2-scikit-learn/0.17.1/lib/python2.7/site-packages:$PYTHONPATH
 
 echo "Our NEW PYTHONPATH:"
 echo $PYTHONPATH
