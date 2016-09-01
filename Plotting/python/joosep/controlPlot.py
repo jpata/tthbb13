@@ -132,24 +132,27 @@ if __name__ == "__main__":
 
 
     # Plot for all SL categories
-    sl_vars = ["jetsByPt_0_pt", 
-               "jetsByPt_1_pt", 
-               "jetsByPt_2_pt", 
-               "jetsByPt_0_btagCSV", 
-               "jetsByPt_0_eta", 
-               "jetsByPt_1_eta", 
-               "jetsByPt_2_eta", 
-               "fatjetByPt_0_pt",  
-               "fatjetByPt_0_eta",  
-               "fatjetByPt_0_mass",
-               "leps_0_pt",  
-               "leps_0_eta",  
-               "numJets",  
-               "nBCSVM",  
-               "btag_LR_4b_2b_btagCSV_logit"]
+    sl_vars = [
+        "leps_0_pdgId",
+        "jetsByPt_0_pt", 
+        #"jetsByPt_1_pt", 
+        #"jetsByPt_2_pt", 
+        #"jetsByPt_0_btagCSV", 
+        #"jetsByPt_0_eta", 
+        #"jetsByPt_1_eta", 
+        #"jetsByPt_2_eta", 
+        #"fatjetByPt_0_pt",  
+        #"fatjetByPt_0_eta",  
+        #"fatjetByPt_0_mass",
+        #"leps_0_pt",  
+        #"leps_0_eta",  
+        #"numJets",  
+        #"nBCSVM",  
+        #"btag_LR_4b_2b_btagCSV_logit"
+    ]
 
     # Plot for all DL categories
-    dl_vars = ["jetsByPt_0_pt", "leps_0_pt"]
+    dl_vars = ["jetsByPt_0_pt", "leps_0_pt", "leps_0_pdgId", "leps_1_pdgId"]
 
     # Top Tagging variables
     top_vars = ["topCandidate_fRec",
@@ -205,7 +208,7 @@ if __name__ == "__main__":
         "fh_jge6_t3",
     ]
 
-    version = "GC70f0703561df"
+    version = "GC682c0f46bbb3"
 
     args = []
 
@@ -217,13 +220,13 @@ if __name__ == "__main__":
             "/mnt/t3nfs01/data01/shome/gregor/tth/gc/makecategory/"+version,
             "Aug12", "DL", cat, var) for cat in cats_dl for var in dl_vars]
 
-    args += [get_base_plot(
-            "/mnt/t3nfs01/data01/shome/gregor/tth/gc/makecategory/"+version,
-            "Aug12", "SL_7cat", cat, var) for cat in  ["sl_j4_t3"] for var in higgs_vars + top_vars]
-
-    args += [get_base_plot(
-            "/mnt/t3nfs01/data01/shome/gregor/tth/gc/makecategory/"+version,
-            "Aug12", "SL_7cat", cat, var) for cat in ["sl_jge6_tge4"] for var in class_vars]
+#    args += [get_base_plot(
+#            "/mnt/t3nfs01/data01/shome/gregor/tth/gc/makecategory/"+version,
+#            "Aug12", "SL_7cat", cat, var) for cat in  ["sl_j4_t3"] for var in higgs_vars + top_vars]
+#
+#    args += [get_base_plot(
+#            "/mnt/t3nfs01/data01/shome/gregor/tth/gc/makecategory/"+version,
+#            "Aug12", "SL_7cat", cat, var) for cat in ["sl_jge6_tge4"] for var in class_vars]
     
 #    args = [
 #        get_base_plot("/shome/sdonato/tth/gc/makecategory/GCdedfe5320b02/", "Aug15_FH", "FH", cat, var) for cat in cats_fh for var in vars_base

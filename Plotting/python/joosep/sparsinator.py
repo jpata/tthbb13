@@ -16,7 +16,7 @@ ADD_SYST_WEIGHTS = False
 DO_SL            = True
 DO_DL            = True
 DO_FH            = False
-EXTRA_SL         = True
+EXTRA_SL         = False
 EXTRA_DL         = False
 EXTRA_FH         = False
 
@@ -26,10 +26,6 @@ NA = -999
 #default MEM scale factor in the likelihood ratio
 MEM_SF = 0.1
 
-SYSTEMATICS_EVENT = [
-    "CMS_scale_jUp", "CMS_scale_jDown",
-    "CMS_res_jUp", "CMS_res_jDown"
-]
 
 """
 Create pairs of (systematic_name, weight function), which will be used on the
@@ -42,7 +38,17 @@ ttH/sl/sparse_CMS_ttH_CSVJESUp -> event with btagWeight with JES up variation
 systematic_weights = []
 btag_weights = []
 
+SYSTEMATICS_EVENT = []
+
+
 if ADD_SYST_WEIGHTS:
+
+    SYSTEMATICS_EVENT = [
+        "CMS_scale_jUp", 
+        "CMS_scale_jDown",
+        "CMS_res_jUp", 
+        "CMS_res_jDown"]
+
     for sdir in ["up", "down"]:
         for syst in ["cferr1", "cferr2", "hf", "hfstats1", "hfstats2", "jes", "lf", "lfstats1", "lfstats2"]:
             for tagger in ["CSV", "CMVAV2"]:
@@ -213,6 +219,27 @@ extra_vars =  ["topCandidate_fRec",
                "multiclass_proba_ttcc",
                "multiclass_proba_ttll"]
 
+# Calculate lepton SF on the fly
+# Currently only add muons
+# TODO: Add electrons as well
+def calc_lepton_SF(ev):
+    
+    weight = 1.
+
+    # Leading muon
+    if ev.nleps >= 1:
+        if abs(ev.leps_pdgId[0] == 13):
+            weight *= ev.leps_SF_IdCutTight[0]
+            weight *= ev.leps_SF_IsoTight[0]
+        
+    # Subleading muon
+    if ev.nleps >= 2:
+        if abs(ev.leps_pdgId[1] == 13):
+            weight *= ev.leps_SF_IdCutTight[1]
+            weight *= ev.leps_SF_IsoTight[1]
+
+    return weight
+    
 
 desc = Desc([
     Var(name="run"),
@@ -230,6 +257,7 @@ desc = Desc([
 
     Var(name="leps_pt"),
     Var(name="leps_eta"),
+    #Var(name="leps_pdgId"),
 
     Var(name="numJets", systematics="suffix"),
     Var(name="nBCSVM", systematics="suffix"),
@@ -306,12 +334,19 @@ desc = Desc([
     Var(name="HLT_ttH_SL_mu", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_SL_mu}),
     Var(name="HLT_ttH_FH", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_FH}),
 
+    Var(name="lep_SF_weight", 
+        funcs_schema={"mc": lambda ev: calc_lepton_SF(ev), 
+                      "data": lambda ev: 1.0}),
+
+
 #MC-only branches
     Var(name="ttCls", schema=["mc"]),
     Var(name="puWeight", schema=["mc"]),
     Var(name="puWeightUp", schema=["mc"]),
     Var(name="puWeightDown", schema=["mc"]),
     Var(name="triggerEmulationWeight", schema=["mc"]),
+
+
 
     #nominal b-tag weight, systematic weights added later
     Var(name="btagWeightCSV", schema=["mc"]),
@@ -415,10 +450,16 @@ axes_basic_sl = [
 
     Axis("btag_LR_4b_2b_btagCSV_logit", 30, -5, 10, lambda ev: ev["btag_LR_4b_2b_btagCSV_logit"]),
     Axis("btag_LR_4b_2b_btagCMVA_logit", 30, -5, 10, lambda ev: ev["btag_LR_4b_2b_btagCMVA_logit"]),
+
+    Axis("leps_0_pdgId", 20, -0.5, 19.5, lambda ev: abs(ev["leps_pdgId"][0])),
 ]
 
 axes_basic_dl = [
     Axis("mem_DL_0w2h2t_p", 36, 0, 1, lambda ev: ev["mem_DL_0w2h2t_p"]),
+
+    Axis("leps_0_pdgId", 20, -0.5, 19.5, lambda ev: abs(ev["leps_pdgId"][0])),
+    Axis("leps_1_pdgId", 20, -0.5, 19.5, lambda ev: abs(ev["leps_pdgId"][1])),
+
 ]
  
 axes_basic_fh = [
@@ -665,8 +706,8 @@ def main(file_names, sample, ofname, skip_events=0, max_events=-1):
 
                 ret["weight_nominal"] = 1.0
                 if schema == "mc":
-                    ret["weight_nominal"] *= ret["puWeight"] * ret["btagWeightCSV"] * ret["triggerEmulationWeight"]
-                
+                    ret["weight_nominal"] *= ret["puWeight"] * ret["btagWeightCSV"] * ret["triggerEmulationWeight"] * ret["lep_SF_weight"]
+
                 #Fill the base histogram
                 for (k, v) in outdict_syst[syst].items():
                     weight = ret["weight_nominal"]
@@ -700,9 +741,9 @@ if __name__ == "__main__":
         skip_events = int(os.environ.get("SKIP_EVENTS", 0))
         max_events = int(os.environ.get("MAX_EVENTS", 0))
     else:
-        file_names = [getSitePrefix("/store/user/jpata/tth/tth_Aug3_V24_v2/SingleMuon/tth_Aug3_V24_v2/160803_115959/0000/tree_{0}.root").format(i) for i in [10, 105, 106]]
+        file_names = [getSitePrefix("/store/user/jpata/tth/Aug11_leptonic_nome_v1/TT_TuneCUETP8M1_13TeV-powheg-pythia8/Aug11_leptonic_nome_v1/160811_212409/0000/tree_{0}.root").format(i) for i in [10, 105, 106]]
         prefix = ""
-        sample = "ttHTobb_M125_13TeV_powheg_pythia8"
+        sample = "TT_TuneCUETP8M1_13TeV-powheg-pythia8"
         skip_events = 0
         max_events = 10000
 
