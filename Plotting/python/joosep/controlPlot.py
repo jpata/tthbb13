@@ -26,7 +26,17 @@ procs_names = [
     ("ttbarPlusBBbar", "tt+bb"),
     ("ttbarPlus2B", "tt+2b"),
     ("ttbarPlusB", "tt+b"),
-    ("ttbarPlusCCbar", "tt+cc")
+    ("ttbarPlusCCbar", "tt+cc"),
+    ("qcd_ht300to500", "qcd ht 300 500"),
+    ("qcd_ht300to500", "qcd ht 300 500"),
+    ("qcd_ht500to700", "qcd ht 500 700"),
+    ("qcd_ht700to1000", "qcd ht 700 1."),
+    ("qcd_ht1000to1500", "qcd ht 1. 1.5"),
+    ("qcd_ht1500to2000", "qcd ht 1.5 2."),
+    ("qcd_ht2000toinf", "qcd ht 2. inf "),
+
+
+
 ]
 procs = [x[0] for x in procs_names]
 
@@ -211,17 +221,17 @@ if __name__ == "__main__":
         "fh_jge6_t3",
     ]
 
-    version = "GCb45a9b3f3e7e"
+    version = "GCfb2162233c5a"
 
     args = []
 
-    args += [get_base_plot(
-            "/mnt/t3nfs01/data01/shome/gregor/tth/gc/makecategory/"+version,
-            "Aug29", "SL_7cat", cat, var) for cat in cats_sl for var in sl_vars]
-
-    args += [get_base_plot(
-            "/mnt/t3nfs01/data01/shome/gregor/tth/gc/makecategory/"+version,
-            "Aug29", "DL", cat, var) for cat in cats_dl for var in dl_vars]
+#    args += [get_base_plot(
+#            "/mnt/t3nfs01/data01/shome/gregor/tth/gc/makecategory/"+version,
+#            "Aug29", "SL_7cat", cat, var) for cat in cats_sl for var in sl_vars]
+#
+#    args += [get_base_plot(
+#            "/mnt/t3nfs01/data01/shome/gregor/tth/gc/makecategory/"+version,
+#            "Aug29", "DL", cat, var) for cat in cats_dl for var in dl_vars]
 
     args += [get_base_plot(        
             "/mnt/t3nfs01/data01/shome/gregor/tth/gc/makecategory/"+version,
