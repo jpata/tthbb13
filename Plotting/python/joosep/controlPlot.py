@@ -154,6 +154,9 @@ if __name__ == "__main__":
     # Plot for all DL categories
     dl_vars = ["jetsByPt_0_pt", "leps_0_pt", "leps_0_pdgId", "leps_1_pdgId"]
 
+    # Plot for all FH categories    
+    fh_vars = ["jetsByPt_0_pt"]
+
     # Top Tagging variables
     top_vars = ["topCandidate_fRec",
                 "topCandidate_pt",
@@ -208,17 +211,22 @@ if __name__ == "__main__":
         "fh_jge6_t3",
     ]
 
-    version = "GC682c0f46bbb3"
+    version = "GCb45a9b3f3e7e"
 
     args = []
 
     args += [get_base_plot(
             "/mnt/t3nfs01/data01/shome/gregor/tth/gc/makecategory/"+version,
-            "Aug12", "SL_7cat", cat, var) for cat in cats_sl for var in sl_vars]
+            "Aug29", "SL_7cat", cat, var) for cat in cats_sl for var in sl_vars]
 
     args += [get_base_plot(
             "/mnt/t3nfs01/data01/shome/gregor/tth/gc/makecategory/"+version,
-            "Aug12", "DL", cat, var) for cat in cats_dl for var in dl_vars]
+            "Aug29", "DL", cat, var) for cat in cats_dl for var in dl_vars]
+
+    args += [get_base_plot(        
+            "/mnt/t3nfs01/data01/shome/gregor/tth/gc/makecategory/"+version,
+            "Aug29", "FH", cat, var) for cat in cats_fh for var in fh_vars]
+
 
 #    args += [get_base_plot(
 #            "/mnt/t3nfs01/data01/shome/gregor/tth/gc/makecategory/"+version,
@@ -228,9 +236,6 @@ if __name__ == "__main__":
 #            "/mnt/t3nfs01/data01/shome/gregor/tth/gc/makecategory/"+version,
 #            "Aug12", "SL_7cat", cat, var) for cat in ["sl_jge6_tge4"] for var in class_vars]
     
-#    args = [
-#        get_base_plot("/shome/sdonato/tth/gc/makecategory/GCdedfe5320b02/", "Aug15_FH", "FH", cat, var) for cat in cats_fh for var in vars_base
-#    ]
 
 
     if DO_PARALLEL:

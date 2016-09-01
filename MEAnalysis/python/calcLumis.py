@@ -27,13 +27,14 @@ import shutil
 import subprocess
 
 lxplus_username = "gregor"
-dataset_name = "Aug11_leptonic_nome_v1"
+dataset_name = "Aug29c"
 
 processes = ["SingleMuon",
              "SingleElectron",
              "MuonEG",
              "DoubleEG",
-             "DoubleMuon"
+             "DoubleMuon",
+             "BTagCSV",
 ] 
 
 dataset_base = "src/TTH/MEAnalysis/gc/datasets/"

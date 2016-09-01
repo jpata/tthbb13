@@ -17,7 +17,8 @@ workflows = [
     "testing", #single-lumi jobs, a few samples
     "localtesting", #run combined jobs locally
     "localtesting_withme", #run combined jobs locally
-    "testing_withme" #single-lumi jobs, a few samples
+    "testing_withme", #single-lumi jobs, a few samples
+    "allmc_nome", # SL, DL and FH, no matrix element
 ]
 
 import argparse
@@ -236,6 +237,15 @@ for k in datasets.keys():
         D = deepcopy(datasets[k])
 #        D["maxlumis"] = 1
         workflow_datasets["hadronic"][k] = D
+
+
+workflow_datasets["allmc_nome"] = {}
+for k in datasets.keys():
+    if "QCD" in k or k in ["ttHTobb", "ttHToNonbb", "TTbar_inc", "TTbar_sl1", "TTbar_sl2", "TTbar_dl"] :
+        D = deepcopy(datasets[k])
+        D["mem_cfg"] = me_cfgs["nome"]
+        workflow_datasets["allmc_nome"][k] = D
+
 
 #Pilot job for updating transfer functions, retraining BLR
 workflow_datasets["pilot"] = {}
