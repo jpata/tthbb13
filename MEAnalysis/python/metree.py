@@ -455,16 +455,11 @@ def getTreeProducer(conf):
             ),
 
             NTupleVariable(
-                "multiclass_proba_tt2b",
-                lambda ev: getattr(ev, "multiclass_proba_tt2b_nominal", -1),
-                help="Predicted score for tt2b"
+                "multiclass_proba_tt2bAndBb",
+                lambda ev: getattr(ev, "multiclass_proba_tt2bAndBb_nominal", -1),
+                help="Predicted score for tt2b and ttbb"
             ),
 
-            NTupleVariable(
-                "multiclass_proba_ttbb",
-                lambda ev: getattr(ev, "multiclass_proba_ttbb_nominal", -1),
-                help="Predicted score for ttbb"
-            ),
 
             NTupleVariable(
                 "multiclass_proba_ttcc",
@@ -614,6 +609,7 @@ def getTreeProducer(conf):
             ("nBCSVM",              int,      ""),
             ("nBCSVT",              int,      ""),
             ("nBCSVL",              int,      ""),
+            ("nCSVv2IVFM",              int,      ""),                
             ("nBCMVAM",             int,      "Number of good jets that pass cMVAv2 Medium WP"),
             ("nBCMVAT",             int,      "Number of good jets that pass cMVAv2 Tight WP"),
             ("nBCMVAL",             int,      "Number of good jets that pass cMVAv2 Loose WP"),

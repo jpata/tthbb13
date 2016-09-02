@@ -38,7 +38,7 @@ default_params = {
 
     "n_chunks"          : 1,
 
-    "n_estimators"   : 160,
+    "n_estimators"   : 250,
     #"max_depth"      : 2, 
     "max_leaf_nodes" : 3,
     "learning_rate"  : 0.05,    
@@ -48,12 +48,12 @@ default_params = {
     "samples_per_epoch" : None, # later filled from input files
 }
 
-infname = "/mnt/t3nfs01/data01/shome/gregor/tth/gc/mvatuple/v3/out.root"
+infname = "/mnt/t3nfs01/data01/shome/gregor/tth/gc/mvatuple/v4/out.root"
 
 
 
-cut_train =  "(evt%2==0)"
-cut_test  =  "(evt%2==1)"
+cut_train =  "(evt%3<2)"
+cut_test  =  "(evt%3==2)"
 
 
 ########################################
@@ -140,17 +140,16 @@ classifiers = [
     Classifier("BDT", 
                "scikit",
                params,
-               True,
+               False,
                datagen_train,
                datagen_test,               
                model(params),
                image_fun = to_image,               
                class_names = {
                    0: "ttb", 
-                   1: "tt2b",
-                   2: "ttbb",
-                   3: "ttcc",
-                   4: "ttll",
+                   1: "ttbb+tt2b",
+                   2: "ttcc",
+                   3: "ttll",
                },
                input_vars = input_vars
                )    

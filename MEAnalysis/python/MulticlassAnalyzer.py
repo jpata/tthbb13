@@ -72,12 +72,11 @@ class MulticlassAnalyzer(FilterAnalyzer):
             pred_probas = self.model.predict_proba(input_arr)
 
             # And store in event
-            event.multiclass_class      = pred_class
-            event.multiclass_proba_ttb  = pred_probas[0][0]
-            event.multiclass_proba_tt2b = pred_probas[0][1]
-            event.multiclass_proba_ttbb = pred_probas[0][2]
-            event.multiclass_proba_ttcc = pred_probas[0][3]
-            event.multiclass_proba_ttll = pred_probas[0][4]
+            event.multiclass_class           = pred_class
+            event.multiclass_proba_ttb       = pred_probas[0][0]
+            event.multiclass_proba_tt2bAndBb = pred_probas[0][1]                    
+            event.multiclass_proba_ttcc      = pred_probas[0][2]
+            event.multiclass_proba_ttll      = pred_probas[0][3]
         
         if "multiclass" in self.conf.general["verbosity"]:
             print '[MulticlassAnalyzer] Exiting MulticlassAnalyzer! event.PassedMulticlassAnalyzer = {0}'.format(
