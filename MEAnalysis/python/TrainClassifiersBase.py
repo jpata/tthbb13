@@ -146,9 +146,9 @@ def train_scikit(clf):
       
     df = clf.datagen_train.next()
     X = clf.image_fun(df)
-    y = df["tt_class"].values
+    y = df["tt_class_new"].values
             
-    tmp_weight_dic = df["tt_class"].value_counts().to_dict()    
+    tmp_weight_dic = df["tt_class_new"].value_counts().to_dict()    
     weight_dic = {}
     for k,v in tmp_weight_dic.iteritems():
         weight_dic[k] = float(len(X))/v 
@@ -278,6 +278,21 @@ def rocplot(clf, df):
 # Helper: datagen
 ########################################
 
+def new_class(c):
+    if c == 0:
+        return 0
+    elif c == 1:
+        return 1
+    elif c == 2:
+        return 1
+    elif c == 3:
+        return 2
+    elif c == 4:
+        return 3
+    else:
+        return 4
+    
+
 def datagen(sel, brs, infname, n_chunks=10):
 
     f = ROOT.TFile.Open(infname)
@@ -300,7 +315,11 @@ def datagen(sel, brs, infname, n_chunks=10):
             i_start = 0
             
         df = pandas.DataFrame(d)
-                    
+         
+
+        df["tt_class_new"] = df.apply(lambda x:new_class(x["tt_class"]),axis=1)
+
+
         # Shuffle
         df = df.iloc[np.random.permutation(len(df))]
                 
@@ -339,21 +358,21 @@ def analyze(clf):
     # Generate the training weight dictionary 
     # (using weights derived on testing sample would be cheating)            
 
-    tmp_weight_dic = df_train["tt_class"].value_counts().to_dict()    
+    tmp_weight_dic = df_train["tt_class_new"].value_counts().to_dict()    
     weight_dic = {}
     for k,v in tmp_weight_dic.iteritems():
         weight_dic[k] = float(len(X_train))/v 
 
     # and apply to both samples
-    weights_train = np.vectorize(weight_dic.get)(df_train["tt_class"].values)
-    weights_test  = np.vectorize(weight_dic.get)(df_test["tt_class"].values)
+    weights_train = np.vectorize(weight_dic.get)(df_train["tt_class_new"].values)
+    weights_test  = np.vectorize(weight_dic.get)(df_test["tt_class_new"].values)
 
     # Generate category matrix
     matrix = np.zeros((len(clf.classes),len(clf.classes)))
     for true_class in clf.classes:        
-        num = float( len(df_test.loc[ (df_test["tt_class"] == true_class),"evt"]))
+        num = float( len(df_test.loc[ (df_test["tt_class_new"] == true_class),"evt"]))
         for found_class in clf.classes:            
-            matrix[true_class][found_class] = len(df_test.loc[ (df_test["tt_class"] == true_class) & (df_test["output"] == found_class),"evt"])/num
+            matrix[true_class][found_class] = len(df_test.loc[ (df_test["tt_class_new"] == true_class) & (df_test["output"] == found_class),"evt"])/num
             
     # Plot the category matrix
     fig, ax = plt.subplots()
@@ -405,15 +424,15 @@ def analyze(clf):
 
         plt.clf()
 
-        min_prob = min([min( df_test.loc[ df_test["tt_class"] == true_class, "proba_{0}".format(reco_class) ]) for reco_class in clf.classes])
-        max_prob = max([max( df_test.loc[ df_test["tt_class"] == true_class, "proba_{0}".format(reco_class) ]) for reco_class in clf.classes])
+        min_prob = min([min( df_test.loc[ df_test["tt_class_new"] == true_class, "proba_{0}".format(reco_class) ]) for reco_class in clf.classes])
+        max_prob = max([max( df_test.loc[ df_test["tt_class_new"] == true_class, "proba_{0}".format(reco_class) ]) for reco_class in clf.classes])
 
         colors = ['black', 'red','blue','green','orange','green','magenta']
 
         for reco_class in clf.classes:
             
             # Test Sample
-            prob = df_test.loc[ df_test["tt_class"] == true_class, "proba_{0}".format(reco_class) ]            
+            prob = df_test.loc[ df_test["tt_class_new"] == true_class, "proba_{0}".format(reco_class) ]            
             plt.hist(prob, 
                      label="{0} proba (Test)".format(clf.class_names[reco_class]), 
                      bins=np.linspace(min_prob,max_prob,60), 
@@ -423,7 +442,7 @@ def analyze(clf):
                      normed=True)
 
             # Train Sample
-            prob = df_train.loc[ df_train["tt_class"] == true_class, "proba_{0}".format(reco_class) ]            
+            prob = df_train.loc[ df_train["tt_class_new"] == true_class, "proba_{0}".format(reco_class) ]            
             plt.hist(prob, 
                      label="{0} proba (Train)".format(clf.class_names[reco_class]), 
                      bins=np.linspace(min_prob,max_prob,60), 
@@ -449,7 +468,7 @@ def analyze(clf):
 #    predictor_test  = clf.model.staged_predict(X_test)	
 #    predictor_test_proba  = clf.model.staged_predict_proba(X_test)	
 #
-#    test_scores  = [log_loss(df_test["tt_class"], 
+#    test_scores  = [log_loss(df_test["tt_class_new"], 
 #                             predictor_test_proba.next(), 
 #                             normalize = True,
 #                             sample_weight=weights_test) for _ in range(clf.params["n_estimators"])]
@@ -457,7 +476,7 @@ def analyze(clf):
 #    print "Calculating train scores for all iterations. Samples:", len(X_train)
 #    predictor_train  = clf.model.staged_predict(X_train)	
 #    predictor_train_proba  = clf.model.staged_predict_proba(X_train)	
-#    train_scores  = [log_loss(df_train["tt_class"], 
+#    train_scores  = [log_loss(df_train["tt_class_new"], 
 #                              predictor_train_proba.next(), 
 #                              normalize = True,
 #                              sample_weight=weights_train) for _ in range(clf.params["n_estimators"])]
