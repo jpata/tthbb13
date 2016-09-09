@@ -10,6 +10,7 @@ das_client = "/afs/cern.ch/user/v/valya/public/das_client.py"
 #Each time you call multicrab.py, you choose to submit jobs from one of these workflows
 workflows = [
     "data", #real data
+    "data_leptonic", #real data, SL and DL only
     "leptonic", #ttH with SL/DL decays
     "leptonic_nome", #ttH with SL/DL decays
     "hadronic", #ttH with FH decays
@@ -226,6 +227,17 @@ for k in datasets.keys():
         D = deepcopy(datasets[k])
 #        D["maxlumis"] = 1
         workflow_datasets["data"][k] = D
+
+workflow_datasets["data_leptonic"] = {}
+for k in datasets.keys():
+    # Ignore hadronic
+    if "JetHT" in k or "BTagCSV" in k:
+        continue
+    
+    if "data" in datasets[k]["script"]:
+        D = deepcopy(datasets[k])
+        workflow_datasets["data_leptonic"][k] = D
+
 
 workflow_datasets["hadronic"] = {}
 for k in datasets.keys():
