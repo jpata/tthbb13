@@ -1,5 +1,8 @@
+import pdb
+
 import ROOT
 import logging
+
 
 import matplotlib
 from matplotlib import rc
@@ -27,13 +30,13 @@ procs_names = [
     ("ttbarPlus2B", "tt+2b"),
     ("ttbarPlusB", "tt+b"),
     ("ttbarPlusCCbar", "tt+cc"),
-    ("qcd_ht300to500", "qcd ht 300 500"),
-    ("qcd_ht300to500", "qcd ht 300 500"),
-    ("qcd_ht500to700", "qcd ht 500 700"),
-    ("qcd_ht700to1000", "qcd ht 700 1."),
-    ("qcd_ht1000to1500", "qcd ht 1. 1.5"),
-    ("qcd_ht1500to2000", "qcd ht 1.5 2."),
-    ("qcd_ht2000toinf", "qcd ht 2. inf "),
+#    ("qcd_ht300to500", "qcd ht 300 500"),
+#    ("qcd_ht300to500", "qcd ht 300 500"),
+#    ("qcd_ht500to700", "qcd ht 500 700"),
+#    ("qcd_ht700to1000", "qcd ht 700 1."),
+#    ("qcd_ht1000to1500", "qcd ht 1. 1.5"),
+#    ("qcd_ht1500to2000", "qcd ht 1.5 2."),
+#    ("qcd_ht2000toinf", "qcd ht 2. inf "),
 
 
 
@@ -89,6 +92,8 @@ def plot_worker(kwargs):
         signal_procs,
         **kwargs
     )
+    
+
     logging.info("saving {0}".format(outname))
     path = os.path.dirname(outname)
     if not os.path.isdir(path):
@@ -143,7 +148,7 @@ if __name__ == "__main__":
 
     # Plot for all SL categories
     sl_vars = [
-        "leps_0_pdgId",
+        #"leps_0_pdgId",
         "jetsByPt_0_pt", 
         #"jetsByPt_1_pt", 
         #"jetsByPt_2_pt", 
@@ -200,7 +205,9 @@ if __name__ == "__main__":
     cats_sl = [
         "sl_j4_t3", "sl_j4_tge4",
         "sl_j5_t3", "sl_j5_tge4",
-        "sl_jge6_t2", "sl_jge6_t3", "sl_jge6_tge4",
+        "sl_jge6_t2", "sl_jge6_t3", 
+        "sl_jge6_tge4",
+        "sl_jge6_tge4_blrL", "sl_jge6_tge4_blrH",        
     ]
 
     cats_dl = [
@@ -221,21 +228,21 @@ if __name__ == "__main__":
         "fh_jge6_t3",
     ]
 
-    version = "GCfb2162233c5a"
+    version = "GC47652568915d"
 
     args = []
 
-#    args += [get_base_plot(
-#            "/mnt/t3nfs01/data01/shome/gregor/tth/gc/makecategory/"+version,
-#            "Aug29", "SL_7cat", cat, var) for cat in cats_sl for var in sl_vars]
-#
+    args += [get_base_plot(
+            "/mnt/t3nfs01/data01/shome/gregor/tth/gc/makecategory/"+version,
+            "Aug12", "SL_7cat", cat, var) for cat in cats_sl for var in sl_vars]
+
 #    args += [get_base_plot(
 #            "/mnt/t3nfs01/data01/shome/gregor/tth/gc/makecategory/"+version,
 #            "Aug29", "DL", cat, var) for cat in cats_dl for var in dl_vars]
 
-    args += [get_base_plot(        
-            "/mnt/t3nfs01/data01/shome/gregor/tth/gc/makecategory/"+version,
-            "Aug29", "FH", cat, var) for cat in cats_fh for var in fh_vars]
+#    args += [get_base_plot(        
+#            "/mnt/t3nfs01/data01/shome/gregor/tth/gc/makecategory/"+version,
+#            "Aug29", "FH", cat, var) for cat in cats_fh for var in fh_vars]
 
 
 #    args += [get_base_plot(
