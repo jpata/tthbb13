@@ -237,39 +237,70 @@ def train_keras(clf):
 # Helper: rocplot
 ########################################
 
-def rocplot(clf, df):
+def rocplot(clf, 
+            df):
     
-    nbins = 100
-    min_prob = min(df["sigprob"])
-    max_prob = max(df["sigprob"])
-        
-    if min_prob >= max_prob:
-        max_prob = 1.1 * abs(min_prob)
-        
+    sig_class = 2
+    #prob = "proba_{0}".format(1)
+    prob = "blr".format(1)
+
     plt.clf()
+    plt.yscale('log')
 
-    #plt.yscale('log')
-                
-    # Signal 
-    h1 = make_df_hist((nbins*5,min_prob,max_prob), df.loc[df["is_signal_new"] == 1,"sigprob"])    
-    
-    # Background
-    h2 = make_df_hist((nbins*5,min_prob,max_prob), df.loc[df["is_signal_new"] == 0,"sigprob"])    
+    orig_names = {0: "ttb", 
+                  1: "tt2b",
+                  2: "ttbb",
+                  3: "ttcc",
+                  4: "ttll"}
 
-    # And turn into ROC
-    r, e = calc_roc(h1, h2)
 
-    plt.clf()        
-    plt.plot(r[:, 0], r[:, 1], lw=1, ls="--")
+    for bkg_class in 0,1,3,4:
         
+        nbins = 100
+        min_prob = min(df[prob])
+        max_prob = max(df[prob])
+
+        print min_prob, max_prob
+
+        if min_prob >= max_prob:
+            max_prob = 1.1 * abs(min_prob)
+
+        # Signal 
+        h1 = make_df_hist((nbins*200,min_prob,max_prob), df.loc[df["tt_class"] == sig_class,prob])    
+
+        # Background
+        h2 = make_df_hist((nbins*200,min_prob,max_prob), df.loc[df["tt_class"] == bkg_class,prob])    
+
+        # And turn into ROC
+        r, e = calc_roc(h1, h2)
+
+        plt.plot(r[:, 0], 1/r[:, 1], 
+                 lw=1, 
+                 ls="--",                 
+                 label = "BLR vs {0}".format(orig_names[bkg_class])
+             )
+        
+    plt.plot( [0.1088], [1/0.0309], ls = 'None', marker = "o",color='black',  label =  "4tag vs ttb")
+    plt.plot( [0.1088], [1/0.0374], ls = 'None', marker = "^", color='black', label = "4tag vs tt2b") 
+    plt.plot( [0.1088], [1/0.0140], ls = 'None', marker = "v", color='black', label = "4tag vs ttcc")
+    plt.plot( [0.1088], [1/0.0025], ls = 'None', marker = "s", color='black', label = "4tag vs ttll") 
+
+    plt.plot( [0.0577], [1/0.0115], ls = 'None', marker = "o",color='black',  fillstyle = 'full', label = "4tag, highBLR vs ttb")
+    plt.plot( [0.0577], [1/0.0157], ls = 'None', marker = "^", color='black', fillstyle = 'full', label = "4tag, highBLR vs tt2b") 
+    plt.plot( [0.0577], [1/0.0025], ls = 'None', marker = "v", color='black', fillstyle = 'full', label = "4tag, highBLR vs ttcc")
+    plt.plot( [0.0577], [1/0.0003], ls = 'None', marker = "s", color='black', fillstyle = 'full', label = "4tag, highBLR vs ttll") 
+
+         
     # Setup nicely
     plt.legend(loc=2)
     plt.xlabel( "signal match efficiency", fontsize=16)
-    plt.ylabel("fake match efficiency", fontsize=16)
+    plt.ylabel("1/fake match efficiency", fontsize=16)
     plt.legend(loc=2)
     plt.xlim(0,1)
-    plt.ylim(0,1)
-    
+    plt.ylim(1,1000000)
+
+    plt.legend(loc=1)
+
     plt.show()
     plt.savefig(clf.name + "-ROC.png")
 
@@ -279,18 +310,21 @@ def rocplot(clf, df):
 ########################################
 
 def new_class(c):
+
+#    return c
+
     if c == 0:
         return 0
     elif c == 1:
-        return 1
+        return 0
     elif c == 2:
         return 1
     elif c == 3:
-        return 2
+        return 0
     elif c == 4:
-        return 3
+        return 0
     else:
-        return 4
+        return 0
     
 
 def datagen(sel, brs, infname, n_chunks=10):
@@ -419,6 +453,9 @@ def analyze(clf):
         print "{0: <15}: {1:.4f}".format(f[0],f[1])
 
 
+
+    rocplot(clf, df_test)
+
     # Plot different reco probaility distribtuons for each true class
     for true_class in clf.classes:
 
@@ -451,15 +488,54 @@ def analyze(clf):
                      color = colors[reco_class],
                      normed=True)
 
+            plt.title("True {0} Events".format(clf.class_names[true_class]))
+            plt.xlabel("Probability", fontsize=16)
+            plt.ylabel("Events", fontsize=16)        
+            plt.legend(loc=1)
+            plt.xlim(min_prob,max_prob)
+            plt.show()
+            plt.savefig("{0}_probas.png".format(clf.class_names[true_class]))
 
 
-        plt.title("True {0} Events".format(clf.class_names[true_class]))
+    # Plot different classfiers outputs for all true classes
+    for reco_class in clf.classes:
+
+        plt.clf()
+
+        min_prob = min(df_test[  "proba_{0}".format(reco_class) ]) 
+        max_prob = max(df_test[  "proba_{0}".format(reco_class) ])
+
+        colors = ['black', 'red','blue','green','orange','green','magenta']
+
+        for true_class in clf.classes:
+            
+            # Test Sample
+            prob = df_test.loc[ df_test["tt_class_new"] == true_class, "proba_{0}".format(reco_class) ]            
+            plt.hist(prob, 
+                     label="True {0} (Test)".format(clf.class_names[true_class]), 
+                     bins=np.linspace(min_prob,max_prob,60), 
+                     histtype = 'step',
+                     ls="-",
+                     color = colors[true_class],
+                     normed=True)
+
+            # Train Sample
+            prob = df_train.loc[ df_train["tt_class_new"] == true_class, "proba_{0}".format(reco_class) ]            
+            plt.hist(prob, 
+                     label="True {0} (Train)".format(clf.class_names[true_class]), 
+                     bins=np.linspace(min_prob,max_prob,60), 
+                     histtype = 'step',
+                     ls=':', 
+                     color = colors[true_class],
+                     normed=True)
+
+        plt.title("{0} Classifier".format(clf.class_names[reco_class]))
         plt.xlabel("Probability", fontsize=16)
         plt.ylabel("Events", fontsize=16)        
         plt.legend(loc=1)
         plt.xlim(min_prob,max_prob)
         plt.show()
-        plt.savefig("{0}_probas.png".format(clf.class_names[true_class]))
+        plt.savefig("{0}_classifier.png".format(clf.class_names[reco_class]))
 
     
     # Loss function/time    

@@ -57,12 +57,14 @@ class MulticlassAnalyzer(FilterAnalyzer):
         if event.is_sl and event.numJets >= 6 and event.nBCSVM >= 2:
             # Calculate the input variables for the MVA
             var_dic = maketuple.calc_vars(event, "event")
-            input_var_names = ["j0_eta",  "j0_mass", "j0_btagCSV", 
-                               "j1_eta",  "j1_mass", "j1_btagCSV", 
-                               "j2_eta",  "j2_mass", "j2_btagCSV", 
-                               "j3_eta",  "j3_mass", "j3_btagCSV",  
-                               "j4_pt", "j4_eta",  "j4_mass", "j4_btagCSV", 
-                               "j5_pt", "j5_eta",  "j5_mass", "j5_btagCSV"]        
+            input_var_names = [                                
+                "j0_pt", "j0_eta",  "j0_mass",     "j0_btagCSV",     
+                "j1_pt", "j1_eta",  "j1_mass",     "j1_btagCSV",     
+                "j2_pt", "j2_eta",  "j2_mass",     "j2_btagCSV",     
+                "j3_pt", "j3_eta",  "j3_mass",     "j3_btagCSV",     
+                "j4_pt", "j4_eta",  "j4_mass",     "j4_btagCSV",     
+                "j5_pt", "j5_eta",  "j5_mass",     "j5_btagCSV",     
+            ]        
             input_list = [var_dic[v] for v in input_var_names]
             input_arr = np.array(input_list)
             input_arr = input_arr.reshape(1,-1)

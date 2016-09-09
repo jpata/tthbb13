@@ -428,9 +428,13 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
 
     processes_d = dict(processes)
 
+    counts = {}
+    
+
     for histo_dict in [histograms_nominal] + histograms_systematic.values():
         for (proc, h) in histo_dict.items():
             h.title = processes_d[proc] + " ({0:.1f})".format(h.Integral())
+            counts[proc] = h.Integral()
             h.rebin(rebin)
             if show_overflow:
                 fill_overflow(h)
@@ -576,7 +580,8 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
         "axes": (a1, a2),
         "nominal": histograms_nominal,
         "stacked": stacked_hists,
-        "systematic": histograms_systematic
+        "systematic": histograms_systematic,
+        "counts" : counts,
     }
 
 def draw_mem_data_mc(*args, **kwargs):
