@@ -22,15 +22,15 @@ DEF_VAL_FLOAT = -9999.0
 
 ntpl = {"multiclass_6j": {"int_branches"   : [],
                           "float_branches" : ["l_pt", "l_eta", "l_phi", "l_pdgid",
-                                              "met_pt", "met_phi"],
+                                              "met_pt", "met_phi",
+                                              "blr"
+                                          ],
                           "vars"           : {},
                           "var_types"      : {}}
     }
            
 
 ntpl["multiclass_6j"]["int_branches"].extend(["tt_class", "evt"])
-
-
 
 
 for j in range(6):
@@ -75,7 +75,10 @@ def make_jets(source, source_type = "tree"):
         jets.append(jet)
 
     # Sort jets by pt
-    jets.sort(key = lambda x:-x.Pt())
+    #jets.sort(key = lambda x:-x.Pt())
+
+    # Sort jets by CSV
+    jets.sort(key = lambda x:-x.btagCSV)
 
     return jets
 
@@ -110,6 +113,10 @@ def calc_vars(source, source_type="tree"):
         # Missing Et     
         v["met_pt"]   = source.met_pt
         v["met_phi"]  = source.met_phi
+        
+        # BLR
+        v["blr"] = source.btag_LR_4b_2b_btagCSV
+
     # During a ttH/Heppy analyzer module
     elif source_type == "event":
         # Lepton Variables
@@ -121,6 +128,10 @@ def calc_vars(source, source_type="tree"):
         # Missing Et     
         v["met_pt"]   = source.MET.pt
         v["met_phi"]  = source.MET.phi
+
+        # BLR
+        v["blr"] = source.btag_LR_4b_2b_btagCSV
+
 
     # ttb
     if source.ttCls == 51:
