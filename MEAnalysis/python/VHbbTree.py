@@ -1341,7 +1341,6 @@ class Jet:
     def __init__(self, tree, n):
         self.id = tree.Jet_id[n];
         self.puId = tree.Jet_puId[n];
-        self.btagCSV = tree.Jet_btagCSV[n];
         self.btagCMVA = tree.Jet_btagCMVA[n];
         self.rawPt = tree.Jet_rawPt[n];
         self.mcPt = tree.Jet_mcPt[n];
@@ -1369,12 +1368,9 @@ class Jet:
         self.btagBProb = tree.Jet_btagBProb[n];
         self.btagSoftEl = tree.Jet_btagSoftEl[n];
         self.btagSoftMu = tree.Jet_btagSoftMu[n];
-        self.btagHip = tree.Jet_btagHip[n];
-        self.btagHip2 = tree.Jet_btagHip2[n];
-        self.btagHipCMVA = tree.Jet_btagHipCMVA[n];
-        self.btagHipCMVA2 = tree.Jet_btagHipCMVA2[n];
-        self.btagCSVV0 = tree.Jet_btagCSVV0[n];
         self.btagCMVAV2 = tree.Jet_btagCMVAV2[n];
+        self.btagCSVV0 = tree.Jet_btagCSVV0[n];
+        self.btagCMVAV2NoHipMitigation = tree.Jet_btagCMVAV2NoHipMitigation[n];
         self.chHEF = tree.Jet_chHEF[n];
         self.neHEF = tree.Jet_neHEF[n];
         self.chEmEF = tree.Jet_chEmEF[n];
@@ -1412,6 +1408,8 @@ class Jet:
         self.mcIdx = tree.Jet_mcIdx[n];
         self.blike_VBF = tree.Jet_blike_VBF[n];
         self.pt_puppi = tree.Jet_pt_puppi[n];
+        self.btagCSV = tree.Jet_btagCSV[n];
+        self.btagNoHipMitigation = tree.Jet_btagNoHipMitigation[n];
         self.pt_reg = tree.Jet_pt_reg[n];
         self.pt_regVBF = tree.Jet_pt_regVBF[n];
         self.pt_reg_corrJECUp = tree.Jet_pt_reg_corrJECUp[n];
@@ -2422,8 +2420,6 @@ class EventAnalyzer(Analyzer):
         event.metType1p2_pt = getattr(event.input, "metType1p2_pt", None)
         event.tkMet_pt = getattr(event.input, "tkMet_pt", None)
         event.tkMet_phi = getattr(event.input, "tkMet_phi", None)
-        event.tkMetPVchs_pt = getattr(event.input, "tkMetPVchs_pt", None)
-        event.tkMetPVchs_phi = getattr(event.input, "tkMetPVchs_phi", None)
         event.isrJetVH = getattr(event.input, "isrJetVH", None)
         event.simPrimaryVertex_z = getattr(event.input, "simPrimaryVertex_z", None)
         event.genHiggsDecayMode = getattr(event.input, "genHiggsDecayMode", None)
