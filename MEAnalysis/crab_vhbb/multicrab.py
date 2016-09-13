@@ -379,7 +379,7 @@ env
     config.JobType.maxMemoryMB = 3000
 
     import os
-    os.system("tar czf python.tar.gz --dereference --directory $CMSSW_BASE python")
+    os.system("tar czf python.tar.gz --directory $CMSSW_BASE python `find $CMSSW_BASE/src -name python | perl -pe s#$CMSSW_BASE/## `")
     os.system("tar czf data.tar.gz --dereference --directory $CMSSW_BASE/src/TTH/MEAnalysis root")
     if not "testing" in args.workflow: 
         os.system("make -sf $CMSSW_BASE/src/TTH/Makefile get_hashes")

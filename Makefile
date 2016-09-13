@@ -13,8 +13,8 @@ melooper: Plotting/python/joosep/codeGen.py Plotting/bin/*.cc Plotting/interface
 
 #This generates the python file which describes the VHBB tree structure
 vhbb_wrapper:
-	cd $(CMSSW_BASE)/src/VHbbAnalysis/Heppy/test && python genWrapper.py
-	cp $(CMSSW_BASE)/src/VHbbAnalysis/Heppy/test/tree.py $(CMSSW_BASE)/src/TTH/MEAnalysis/python/VHbbTree.py
+	#cd $(CMSSW_BASE)/src/VHbbAnalysis/Heppy/test && python genWrapper.py
+	#cp $(CMSSW_BASE)/src/VHbbAnalysis/Heppy/test/tree.py $(CMSSW_BASE)/src/TTH/MEAnalysis/python/VHbbTree.py
 	cd $(CMSSW_BASE)/src/VHbbAnalysis/Heppy/test && python genWrapper_data.py
 	cp $(CMSSW_BASE)/src/VHbbAnalysis/Heppy/test/tree_data.py $(CMSSW_BASE)/src/TTH/MEAnalysis/python/VHbbTree_data.py
 	git diff --stat $(CMSSW_BASE)/src/TTH/MEAnalysis/python/VHbbTree*.py

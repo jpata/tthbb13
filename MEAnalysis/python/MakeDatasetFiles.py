@@ -135,8 +135,12 @@ if __name__ == "__main__":
             print files_di
             raise e
         lumis_dict = {}
-        for fi in files_run_lumi["data"]:
-            fn = fi["file"][0]["name"]
+        for fi, fi2 in zip(files_run_lumi["data"], files_di["data"]):
+            try:
+                fn = fi["file"][0]["name"]
+            #in case dataset did not have lumi info
+            except IndexError as e:
+                fn = fi2["file"][0]["name"]
             lumis_dict[fn] = {}
             for run, lumis in zip(fi["run"], fi["lumi"]):
                 run_num = run["run_number"]
@@ -159,9 +163,9 @@ if __name__ == "__main__":
                 except Exception as e:
                     print "Could not parse nevents", fi["file"][0]
                     nevents = 0
-
-                tmp_lumis = LumiList(compactList = lumis_dict[name])
-                lumis += [tmp_lumis]
+                if lumis_dict.has_key(name):
+                    tmp_lumis = LumiList(compactList = lumis_dict[name])
+                    lumis += [tmp_lumis]
                 ofile.write("{0} = {1}\n".format(name, nevents))
             #merge lumi files
 

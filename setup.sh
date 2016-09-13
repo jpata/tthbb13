@@ -1,14 +1,14 @@
 export SCRAM_ARCH=slc6_amd64_gcc530
 
-scram project -n CMSSW CMSSW CMSSW_8_0_11
+scram project -n CMSSW CMSSW CMSSW_8_0_19
 cd CMSSW/src/
 eval `scramv1 runtime -sh`
 
 git cms-init
-git cms-merge-topic vhbb:meanalysis-80x
+git cms-merge-topic -u vhbb:vhbbHeppy80X
 
 #get the TTH code
-git clone https://github.com/jpata/tthbb13.git TTH --branch meanalysis-80x 
+git clone https://github.com/jpata/tthbb13.git TTH --branch meanalysis-80x
 cd $CMSSW_BASE/src/TTH
 
 git clone https://github.com/jpata/Code.git MEIntegratorStandalone --branch v0.3

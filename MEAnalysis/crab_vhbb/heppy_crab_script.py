@@ -8,6 +8,7 @@ import PSet
 args = sys.argv
 if "--test" in sys.argv:
     import PSet_test as PSet
+
 import copy
 import json
 
@@ -74,10 +75,6 @@ print "timeto_convertPFN ",(time.time()-t0)
 handle = open("heppy_config.py", 'r')
 cfo = imp.load_source("heppy_config", "heppy_config.py", handle)
 config = cfo.config
-
-#change HLT path to HLT2
-#if "reHLT" in crabFiles_pfn[0]:
-#    cfo.fix_reHLT(config)
 
 #Setting lumis in file
 lumisToProcess = None
