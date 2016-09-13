@@ -319,7 +319,7 @@ class Conf:
                 (event.is_sl and event.nBCSVM >= 2)
                 or (event.is_dl and event.nBCSVM >= 2)
             ) or
-            (event.is_fh and event.cat in ["cat7","cat8","cat10","cat11"]
+            (event.is_fh and event.cat in ["cat7","cat8"]
             and event.btag_LR_4b_2b > 0.95)
         ),
 
@@ -339,9 +339,9 @@ class Conf:
             #"DL_0w2h2t_Rndge4t",
             "FH_4w2h2t", #8j,4b
             "FH_3w2h2t", #7j,4b
-            "FH_4w2h1t", #7j,3b & 8j,3b
-            "FH_0w0w2h2t", #all 4b cats
-            "FH_0w0w2h1t", #all cats
+            #"FH_4w2h1t", #7j,3b & 8j,3b
+            #"FH_0w0w2h2t", #all 4b cats
+            #"FH_0w0w2h1t", #all cats
             #"FH_0w0w1h2t"  #all cats
         ],
 
