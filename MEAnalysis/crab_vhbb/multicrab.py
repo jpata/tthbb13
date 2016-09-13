@@ -76,12 +76,12 @@ sets_data = [
     "/SingleMuon/Run2016E-PromptReco-v2/MINIAOD",
     "/SingleMuon/Run2016F-PromptReco-v2/MINIAOD",
 
-    "/BTagCSV/Run2016B-PromptReco-v1/MINIAOD",
-    "/BTagCSV/Run2016B-PromptReco-v2/MINIAOD",
-    "/BTagCSV/Run2016C-PromptReco-v2/MINIAOD",
-    "/BTagCSV/Run2016D-PromptReco-v2/MINIAOD",
-    "/BTagCSV/Run2016E-PromptReco-v2/MINIAOD",
-    "/BTagCSV/Run2016F-PromptReco-v2/MINIAOD",
+#    "/BTagCSV/Run2016B-PromptReco-v1/MINIAOD",
+#    "/BTagCSV/Run2016B-PromptReco-v2/MINIAOD",
+#    "/BTagCSV/Run2016C-PromptReco-v2/MINIAOD",
+#    "/BTagCSV/Run2016D-PromptReco-v2/MINIAOD",
+#    "/BTagCSV/Run2016E-PromptReco-v2/MINIAOD",
+#    "/BTagCSV/Run2016F-PromptReco-v2/MINIAOD",
 
     "/JetHT/Run2016B-PromptReco-v1/MINIAOD",
     "/JetHT/Run2016B-PromptReco-v2/MINIAOD",
@@ -155,6 +155,14 @@ datasets.update({
         "script": 'heppy_crab_script.sh'
     },
     'QCD300': {
+        "ds": '/QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 500,
+        "runtime": 40,
+        "mem_cfg": me_cfgs["hadronic"],
+        "script": 'heppy_crab_script.sh'
+    },
+    'QCD300_ext1': {
         "ds": '/QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM',
         "maxlumis": -1,
         "perjob": 500,
@@ -163,6 +171,14 @@ datasets.update({
         "script": 'heppy_crab_script.sh'
     },
     'QCD500': {
+        "ds": '/QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 500,
+        "runtime": 40,
+        "mem_cfg": me_cfgs["hadronic"],
+        "script": 'heppy_crab_script.sh'
+    },
+    'QCD500_ext1': {
         "ds": '/QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM',
         "maxlumis": -1,
         "perjob": 500,
@@ -171,6 +187,14 @@ datasets.update({
         "script": 'heppy_crab_script.sh'
     },
     'QCD700': {
+        "ds": '/QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 300,
+        "runtime": 40,
+        "mem_cfg": me_cfgs["hadronic"],
+        "script": 'heppy_crab_script.sh'
+    },
+    'QCD700_ext1': {
         "ds": '/QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM',
         "maxlumis": -1,
         "perjob": 300,
@@ -334,7 +358,7 @@ if __name__ == '__main__':
     
     def localsubmit(config, dname, opts):
         TMPDIR = "/scratch/{0}/crab_work/{1}/crab_{2}".format(os.environ["USER"], args.tag, dname)
-        CMSSW_VERSION = "CMSSW_8_0_11"
+        CMSSW_VERSION = "CMSSW_8_0_19"
         workdir = os.path.join(TMPDIR, CMSSW_VERSION, "work")
         try: 
             shutil.rmtree(TMPDIR)
