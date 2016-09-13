@@ -400,6 +400,7 @@ env
         'analyze_log.py',
         'FrameworkJobReport.xml',
         'env.sh',
+        'setenv_sklearn_cmssw.sh',
         'post.sh',
         'heppy_config.py',
         'heppy_config_data.py',
