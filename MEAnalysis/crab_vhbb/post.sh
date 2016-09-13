@@ -19,7 +19,6 @@ $exitMessage
 EOF
 fi
 
-tail -n500 log
 cat FrameworkJobReport.xml
 echo "======================== CMSRUN LOG ============================"
 head -n 500 Output/cmsRun.log 

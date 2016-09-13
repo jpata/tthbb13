@@ -20,6 +20,7 @@ workflows = [
     "localtesting_withme", #run combined jobs locally
     "testing_withme", #single-lumi jobs, a few samples
     "allmc_nome", # SL, DL and FH, no matrix element
+    "testing_hadronic_withme" #single-lumi jobs, a few samples   
 ]
 
 import argparse
@@ -241,12 +242,9 @@ for k in datasets.keys():
 
 workflow_datasets["hadronic"] = {}
 for k in datasets.keys():
-    if "QCD" in k or "ttH" in k:
+    if "QCD" in k or "ttH" in k or "TTbar_inc" in k:
         D = deepcopy(datasets[k])
-#        D["maxlumis"] = 1
-        workflow_datasets["hadronic"][k] = D
-    elif k == "TTbar_inc":
-        D = deepcopy(datasets[k])
+        D["mem_cfg"] = me_cfgs["hadronic"]
 #        D["maxlumis"] = 1
         workflow_datasets["hadronic"][k] = D
 
@@ -310,10 +308,19 @@ workflow_datasets["testing_withme"] = {}
 for k in ["ttHTobb", "TTbar_inc", "SingleMuon-Run2016B-PromptReco-v1"]:
     D = deepcopy(datasets[k])
     D["perjob"] = int(D["perjob"]/10)
-    D["maxlumis"] = 100 * D["perjob"] 
+    D["maxlumis"] = 100 * D["perjob"]
     D["runtime"] = int(D["runtime"]/5)
     D["mem_cfg"] = me_cfgs["default"]
     workflow_datasets["testing_withme"][k] = D
+
+workflow_datasets["testing_hadronic_withme"] = {}
+for k in ["ttHTobb", "TTbar_inc", "QCD1000", "JetHT-Run2016B-PromptReco-v1"]:
+    D = deepcopy(datasets[k])
+    D["perjob"] = int(5)
+    D["maxlumis"] = 10 * D["perjob"]
+    D["runtime"] = int(D["runtime"]/5)
+    D["mem_cfg"] = me_cfgs["hadronic"]
+    workflow_datasets["testing_hadronic_withme"][k] = D
 
 #Now select a set of datasets
 sel_datasets = workflow_datasets[args.workflow]
