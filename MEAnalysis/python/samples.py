@@ -5,6 +5,7 @@
 
 import FWCore.ParameterSet.Config as cms
 from TTH.MEAnalysis.samples_base import *
+import ConfigParser
 
 version = "Aug11"
 samples_dict = {
@@ -89,3 +90,29 @@ samples_dict = {
             subFiles = cms.vstring(get_files("$CMSSW_BASE/src/TTH/MEAnalysis/gc/datasets/Aug11_leptonic_nome_v1/TT_TuneCUETP8M1_13TeV-powheg-pythia8.txt")),
         ),
     }
+
+
+def samplesFromConfig(conf_fn):
+    config = ConfigParser.ConfigParser()
+    config.optionxform = str # Turn on case-sensitivity
+    config.read(conf_fn)
+    samples_list = config.get("general","sample_list").split()
+    samples = {}
+    for sample_name in samples_list:
+        isMC = bool(config.get(sample_name, "isMC"))
+        treeNameVHBB = config.get(sample_name, "treeNameVHBB")
+        treeNameTTH = config.get(sample_name, "treeNameTTH")
+        tag = config.get(sample_name, "tag")
+        subFiles_path = config.get(sample_name, "subFiles_path")
+        subFiles = get_files(subFiles_path)
+        sample = cms.PSet(
+            name = cms.string(sample_name),
+            isMC = cms.bool(isMC),
+            treeNameVHBB = cms.string(treeNameVHBB),
+            treeNameTTH = cms.string(treeNameTTH),
+            subFiles = cms.vstring(subFiles),
+        )
+        samples[sample_name] = sample
+    return samples
+if __name__ == "__main__":
+    samplesFromConfig("MEAnalysis/test/samples.cfg")

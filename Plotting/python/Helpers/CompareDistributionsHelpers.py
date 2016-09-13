@@ -199,8 +199,6 @@ def createHistograms(dic_files):
 
            draw_string = "".join(li_draw_string)
            # and actually draw
-
-           print input_tree
            
            input_tree.Draw( draw_string, p.cut )
 
