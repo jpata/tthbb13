@@ -14,6 +14,7 @@ workflows = [
     "leptonic", #ttH with SL/DL decays
     "leptonic_nome", #ttH with SL/DL decays
     "hadronic", #ttH with FH decays
+    "QCD_nome", #QCD samples without MEM
     "pilot", #ttH sample only, with no MEM
     "testing", #single-lumi jobs, a few samples
     "localtesting", #run combined jobs locally
@@ -264,6 +265,7 @@ for k in datasets.keys():
         workflow_datasets["data_leptonic"][k] = D
 
 
+
 workflow_datasets["hadronic"] = {}
 for k in datasets.keys():
     if "QCD" in k or "ttH" in k or "TTbar_inc" in k:
@@ -271,6 +273,13 @@ for k in datasets.keys():
         D["mem_cfg"] = me_cfgs["hadronic"]
 #        D["maxlumis"] = 1
         workflow_datasets["hadronic"][k] = D
+
+workflow_datasets["QCD_nome"] = {}
+for k in datasets.keys():
+    if "QCD" in k:
+        D = deepcopy(datasets[k])
+        D["mem_cfg"] = me_cfgs["nome"]
+        workflow_datasets["QCD_nome"][k] = D
 
 
 workflow_datasets["allmc_nome"] = {}
