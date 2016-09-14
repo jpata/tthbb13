@@ -149,11 +149,8 @@ if __name__ == "__main__":
     logger = logging.getLogger("main")
     
     datasets = [
-        Dataset.from_dataset_file("../gc/datasets/Aug11_leptonic_nome_v1/ttHTobb_M125_13TeV_powheg_pythia8.txt", nmax=-1, step_size={"sparse": 5}),
-        Dataset.from_dataset_file("../gc/datasets/Aug11_leptonic_nome_v1/ttHToNonbb_M125_13TeV_powheg_pythia8.txt", nmax=-1, step_size={"sparse": 10}),
-        Dataset.from_dataset_file("../gc/datasets/Aug11_leptonic_nome_v1/TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt", nmax=-1, step_size={"sparse": 100}),
-        Dataset.from_dataset_file("../gc/datasets/Aug11_leptonic_nome_v1/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt", nmax=-1, step_size={"sparse": 100}),
-        Dataset.from_dataset_file("../gc/datasets/Aug11_leptonic_nome_v1/TT_TuneCUETP8M1_13TeV-powheg-pythia8.txt", nmax=-1, step_size={"sparse": 100}),
+        Dataset.from_dataset_file("../gc/datasets/Sep13_testing_v1/ttHTobb_M125_13TeV_powheg_pythia8.txt", nmax=-1, step_size={"sparse": 1}),
+        Dataset.from_dataset_file("../gc/datasets/Sep13_testing_v1/TT_TuneCUETP8M1_13TeV-powheg-pythia8.txt", nmax=-1, step_size={"sparse": 1}),
     ]
    
     jobs = {}

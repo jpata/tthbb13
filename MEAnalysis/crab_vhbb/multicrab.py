@@ -15,6 +15,7 @@ workflows = [
     "leptonic_nome", #ttH with SL/DL decays
     "hadronic", #ttH with FH decays
     "pilot", #ttH sample only, with no MEM
+    "signal", #signal sample with common config
     "testing", #single-lumi jobs, a few samples
     "localtesting", #run combined jobs locally
     "localtesting_withme", #run combined jobs locally
@@ -235,6 +236,11 @@ for k in ["ttHTobb", "ttHToNonbb", "TTbar_inc", "TTbar_sl1", "TTbar_sl2", "TTbar
     D = deepcopy(datasets[k])
     D["mem_cfg"] = "cfg_leptonic.py"
     workflow_datasets["leptonic"][k] = D
+
+workflow_datasets["signal"] = {}
+for k in ["ttHTobb", "ttHToNonbb", "TTbar_inc"]:
+    D = deepcopy(datasets[k])
+    workflow_datasets["signal"][k] = D
 
 workflow_datasets["leptonic_nome"] = {}
 for k in ["ttHTobb", "ttHToNonbb", "TTbar_inc", "TTbar_sl1", "TTbar_sl2", "TTbar_dl"] + datanames:

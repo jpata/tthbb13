@@ -5,6 +5,8 @@ from TTH.MEAnalysis.samples import samples_dict, samplesFromConfig
 from TTH.Plotting.Datacards.sparse import save_hdict
 import os, sys
 
+import TTH.MEAnalysis.MEAnalysis_cfg_heppy as cfg
+
 import ROOT
 ROOT.TH1.SetDefaultSumw2(True)
 
@@ -219,6 +221,34 @@ if __name__ == "__main__":
             plot("dl_jge4", "btag_LR_4b_2b_btagCMVA", "is_dl && numJets>=4", "sample"),
         ],
         100,
+        0,
+        1,
+    )
+    
+    combinedPlot(
+        "btag_LR_4b_2b_btagCMVA",
+        [
+            plot("sl_jge4", "btag_LR_4b_2b_btagCMVA", "is_sl && numJets>=4", "sample"),
+            plot("dl_jge4", "btag_LR_4b_2b_btagCMVA", "is_dl && numJets>=4", "sample"),
+        ],
+        100,
+        0,
+        1,
+    )
+    
+    combinedPlot(
+        "mem",
+        [
+            plot("sl_jge6_tge4", "mem_tth_SL_2w2h2t_p / (mem_tth_SL_2w2h2t_p + 0.1 * mem_ttbb_SL_2w2h2t_p)", "is_sl && numJets>=6 && nBCSVM>=4", "sample"),
+            plot("sl_jge6_t3", "mem_tth_SL_2w2h2t_p / (mem_tth_SL_2w2h2t_p + 0.1 * mem_ttbb_SL_2w2h2t_p)", "is_sl && numJets>=6 && nBCSVM==3 && log(btag_LR_4b_2b_btagCSV/(1.0 - btag_LR_4b_2b_btagCSV))>{0}".format(cfg.Conf.mem["blr_cuts"]["sl_jge6_t3"]), "sample"),
+            plot("sl_j5_tge4", "mem_tth_SL_1w2h2t_p / (mem_tth_SL_1w2h2t_p + 0.1 * mem_ttbb_SL_1w2h2t_p)", "is_sl && numJets==5 && nBCSVM>=4", "sample"),
+            plot("sl_j5_t3", "mem_tth_SL_1w2h2t_p / (mem_tth_SL_1w2h2t_p + 0.1 * mem_ttbb_SL_1w2h2t_p)", "is_sl && numJets==5 && nBCSVM==3 && log(btag_LR_4b_2b_btagCSV/(1.0 - btag_LR_4b_2b_btagCSV))>{0}".format(cfg.Conf.mem["blr_cuts"]["sl_j5_t3"]), "sample"),
+            plot("sl_j4_tge4", "mem_tth_SL_0w2h2t_p / (mem_tth_SL_0w2h2t_p + 0.1 * mem_ttbb_SL_0w2h2t_p)", "is_sl && numJets==4 && nBCSVM>=4", "sample"),
+            plot("sl_j4_t3", "mem_tth_SL_0w2h2t_p / (mem_tth_SL_0w2h2t_p + 0.1 * mem_ttbb_SL_0w2h2t_p)", "is_sl && numJets==4 && nBCSVM==3 && log(btag_LR_4b_2b_btagCSV/(1.0 - btag_LR_4b_2b_btagCSV))>{0}".format(cfg.Conf.mem["blr_cuts"]["sl_j4_t3"]), "sample"),
+            plot("dl_jge4_tge4", "mem_tth_DL_0w2h2t_p / (mem_tth_DL_0w2h2t_p + 0.1 * mem_ttbb_DL_0w2h2t_p)", "is_dl && numJets>=4 && nBCSVM>=4", "sample"),
+            plot("dl_jge4_t3", "mem_tth_DL_0w2h2t_p / (mem_tth_DL_0w2h2t_p + 0.1 * mem_ttbb_DL_0w2h2t_p)", "is_dl && numJets>=4 && nBCSVM==3 && log(btag_LR_4b_2b_btagCSV/(1.0 - btag_LR_4b_2b_btagCSV))>{0}".format(cfg.Conf.mem["blr_cuts"]["dl_j4_t3"]), "sample"),
+        ],
+        6,
         0,
         1,
     )
