@@ -37,6 +37,7 @@ jetType = NTupleObjectType("jetType", variables = [
     NTupleVariable("id", lambda x : x.id, mcOnly=True),  
     NTupleVariable("qgl", lambda x : x.qgl),
     NTupleVariable("btagCSV", lambda x : x.btagCSV),
+    NTupleVariable("btagCSVNoHipMitigation", lambda x : x.btagNoHipMitigation),
     NTupleVariable("btagCMVA", lambda x : x.btagCMVA),
     #NTupleVariable("btagCMVA_log", lambda x : getattr(x, "btagCMVA_log", -20), help="log-transformed btagCMVA"),
     NTupleVariable("btagFlag", lambda x : getattr(x, "btagFlag", -1), help="Jet was considered to be a b in MEM according to the algo"),
