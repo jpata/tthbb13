@@ -35,18 +35,18 @@ def make_rule_cut(basehist, category):
     Returns: a list of rules to apply using apply_rule.
     """
     rules = []
-    for samp in category.samples:
+    for proc in category.processes:
         d = {
-            "input": "{0}/{1}".format(samp.input_name, basehist),
-            "cuts": str(category.cuts + samp.cuts),
+            "input": "{0}/{1}".format(proc.input_name, basehist),
+            "cuts": str(category.cuts + proc.cuts),
             "project": str([(category.discriminator, category.rebin)]),
-            "output": "{0}/{1}/{2}".format(samp.output_name, category.name, category.discriminator),
-            "xs_weight": samp.xs_weight
+            "output": "{0}/{1}/{2}".format(proc.output_name, category.name, category.discriminator),
+            "xs_weight": proc.xs_weight
         }
         rules += [d]
 
         #make systematic variations
-        systdict = category.shape_uncertainties[samp.output_name]
+        systdict = category.shape_uncertainties[proc.output_name]
         for systname, systsize in systdict.items():
             for direction in ["Up", "Down"]:
                 d2 = copy.deepcopy(d)
@@ -54,12 +54,12 @@ def make_rule_cut(basehist, category):
                 d2["output"] += "_" + systname + direction
                 rules += [d2]
 
-    for samp in category.data_samples:
+    for proc in category.data_processes:
         d = {
-            "input": "{0}/{1}".format(samp.input_name, basehist),
-            "cuts": str(category.cuts + samp.cuts),
+            "input": "{0}/{1}".format(proc.input_name, basehist),
+            "cuts": str(category.cuts + proc.cuts),
             "project": str([(category.discriminator, category.rebin)]),
-            "output": "{0}/{1}/{2}".format(samp.output_name, category.name, category.discriminator),
+            "output": "{0}/{1}/{2}".format(proc.output_name, category.name, category.discriminator),
             "xs_weight": 1.0
         }
     
@@ -230,7 +230,7 @@ def main(analysis, categories, outdir=".", ncores=1):
     event_counts = {}
     for cat in categories:
         event_counts[cat.name] = {}
-        for proc in cat.processes:
+        for proc in cat.out_processes:
             event_counts[cat.name][proc] = hdict["{0}/{1}/{2}".format(
                 proc, cat.name, cat.discriminator
             )].Integral()
@@ -268,7 +268,7 @@ def main(analysis, categories, outdir=".", ncores=1):
             tf.Close()
             
             #add the statistical uncertainties to the datacard specification
-            for proc in cat.processes:
+            for proc in cat.out_processes:
                 for syst in stathist_names[cat.name][proc]:
                     cat.shape_uncertainties[proc][syst] = 1.0
                 

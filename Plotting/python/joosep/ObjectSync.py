@@ -143,7 +143,9 @@ if __name__ == "__main__":
         "leps_pt_0",
         [
             plot("sl", "leps_pt[0]", "is_sl", "sample"),
+            plot("sl_triggerWeight", "leps_pt[0]", "triggerEmulationWeight * (is_sl)", "sample"),
             plot("dl", "leps_pt[0]", "is_dl", "sample"),
+            plot("dl_triggerWeight", "leps_pt[0]", "triggerEmulationWeight * (is_dl)", "sample"),
         ],
         100,
         0,
@@ -246,7 +248,7 @@ if __name__ == "__main__":
             plot("sl_j4_tge4", "mem_tth_SL_0w2h2t_p / (mem_tth_SL_0w2h2t_p + 0.1 * mem_ttbb_SL_0w2h2t_p)", "is_sl && numJets==4 && nBCSVM>=4", "sample"),
             plot("sl_j4_t3", "mem_tth_SL_0w2h2t_p / (mem_tth_SL_0w2h2t_p + 0.1 * mem_ttbb_SL_0w2h2t_p)", "is_sl && numJets==4 && nBCSVM==3 && log(btag_LR_4b_2b_btagCSV/(1.0 - btag_LR_4b_2b_btagCSV))>{0}".format(cfg.Conf.mem["blr_cuts"]["sl_j4_t3"]), "sample"),
             plot("dl_jge4_tge4", "mem_tth_DL_0w2h2t_p / (mem_tth_DL_0w2h2t_p + 0.1 * mem_ttbb_DL_0w2h2t_p)", "is_dl && numJets>=4 && nBCSVM>=4", "sample"),
-            plot("dl_jge4_t3", "mem_tth_DL_0w2h2t_p / (mem_tth_DL_0w2h2t_p + 0.1 * mem_ttbb_DL_0w2h2t_p)", "is_dl && numJets>=4 && nBCSVM==3 && log(btag_LR_4b_2b_btagCSV/(1.0 - btag_LR_4b_2b_btagCSV))>{0}".format(cfg.Conf.mem["blr_cuts"]["dl_j4_t3"]), "sample"),
+            plot("dl_jge4_t3", "mem_tth_DL_0w2h2t_p / (mem_tth_DL_0w2h2t_p + 0.1 * mem_ttbb_DL_0w2h2t_p)", "is_dl && numJets>=4 && nBCSVM==3 && log(btag_LR_4b_2b_btagCSV/(1.0 - btag_LR_4b_2b_btagCSV))>{0}".format(cfg.Conf.mem["blr_cuts"]["dl_jge4_t3"]), "sample"),
         ],
         6,
         0,

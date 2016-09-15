@@ -150,6 +150,11 @@ def pfn_to_lfn(fn):
     """
     return fn[fn.find("/store"):]
 
+def chunks(l, n):
+    """Yield successive n-sized chunks from l."""
+    for i in range(0, len(l), n):
+        yield l[i:i + n]
+        
 def get_files(fname):
     # Expect fname relative to CMSSW BASE
     fname = fname.replace("$CMSSW_BASE", os.environ["CMSSW_BASE"])

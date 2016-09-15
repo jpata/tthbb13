@@ -26,68 +26,84 @@ import sys
 import shutil
 import subprocess
 
-lxplus_username = "gregor"
-dataset_name = "Aug29c"
-
-processes = ["SingleMuon",
-             "SingleElectron",
-             "MuonEG",
-             "DoubleEG",
-             "DoubleMuon",
-             "BTagCSV",
-] 
-
-dataset_base = "src/TTH/MEAnalysis/gc/datasets/"
-tmpdir_name = "LUMICALC_TEMP"
+def calculate_lumi(
+    lxplus_username,
+    dataset_name,
+    processes,
+    dataset_base,
+    tmpdir_name
+    ):
 
 
-# Prepare a new and empty temp directory
-if os.path.isdir(tmpdir_name):
-    shutil.rmtree(tmpdir_name)
-os.mkdir(tmpdir_name)
+    print "This program will SSH to lxplus several times and requires previous setup, please see the documentation of calcLumis.py"
 
-# Copy all the json files there
-for process in processes:
-    shutil.copy(
-        os.path.join(os.environ["CMSSW_BASE"], dataset_base, dataset_name, process + ".json"),
-        tmpdir_name)
+    # Prepare a new and empty temp directory
+    if os.path.isdir(tmpdir_name):
+        shutil.rmtree(tmpdir_name)
+    os.mkdir(tmpdir_name)
 
-# Now build the shell script
-out = open(os.path.join(tmpdir_name, "runme.sh"), "w")
-out.write("export PATH=$HOME/.local/bin:/afs/cern.ch/cms/lumi/brilconda-1.0.3/bin:$PATH\n")
-for process in processes:
-    out.write('brilcalc lumi -b "STABLE BEAMS" --normtag=/afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i {0}.json -u /pb -o {0}.out\n'.format(process))
-out.close()
+    # Copy all the json files there
+    for process in processes:
+        shutil.copy(
+            os.path.join(os.environ["CMSSW_BASE"], dataset_base, dataset_name, process + ".json"),
+            tmpdir_name)
 
-# scp to lxplus
-scp_command = ["scp", "-r", tmpdir_name, lxplus_username + "@lxplus.cern.ch:"]
-print subprocess.Popen(scp_command, stdout=subprocess.PIPE).communicate()[0]
+    # Now build the shell script
+    out = open(os.path.join(tmpdir_name, "runme.sh"), "w")
+    out.write("export PATH=$HOME/.local/bin:/afs/cern.ch/cms/lumi/brilconda-1.0.3/bin:$PATH\n")
+    for process in processes:
+        out.write('brilcalc lumi -b "STABLE BEAMS" --normtag=/afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i {0}.json -u /pb -o {0}.out\n'.format(process))
+    out.close()
 
-# remote execute
-print "Next command is remote execute - this may take a while"
-run_command = ["ssh", lxplus_username + "@lxplus.cern.ch", "cd {0}; bash runme.sh".format(tmpdir_name)]
-print subprocess.Popen(run_command, stdout=subprocess.PIPE).communicate()[0]
+    # scp to lxplus
+    scp_command = ["scp", "-o", "PreferredAuthentications=password", "-o", "PubkeyAuthentication=no", "-r", tmpdir_name, lxplus_username + "@lxplus.cern.ch:"]
+    print subprocess.Popen(scp_command, stdout=subprocess.PIPE).communicate()[0]
 
-# get back the output
-scp_back_command = ["scp", "-r", lxplus_username + "@lxplus.cern.ch:"+tmpdir_name, tmpdir_name+"_OUT"]
-print subprocess.Popen(scp_back_command, stdout=subprocess.PIPE).communicate()[0]
+    # remote execute
+    print "Next command is remote execute - this may take a while"
+    run_command = ["ssh", "-o", "PreferredAuthentications=password", "-o", "PubkeyAuthentication=no", lxplus_username + "@lxplus.cern.ch", "cd {0}; bash runme.sh".format(tmpdir_name)]
+    print subprocess.Popen(run_command, stdout=subprocess.PIPE).communicate()[0]
 
-# and analyze it
-for process in processes:
-    inf = open(os.path.join(tmpdir_name+"_OUT", process + ".out"), "r")
-    
-    # Look for:
-    # #Summary:
-    # #nfill,nrun,nls,ncms,totdelivered(/pb),totrecorded(/pb)
-    # #66,269,101502,101495,12165.673,11629.565
-    # and extract the totrecorded
-    while True:
-        line1 = inf.readline()
-        if "Summary" in line1:
-            line2 = inf.readline()
-            line3 = inf.readline().strip()        
-            print "'{0}': {1},".format(process,line3.split(",")[-1])
-            break
+    # get back the output
+    scp_back_command = ["scp", "-o", "PreferredAuthentications=password", "-o", "PubkeyAuthentication=no", "-r", lxplus_username + "@lxplus.cern.ch:"+tmpdir_name, tmpdir_name+"_OUT"]
+    print subprocess.Popen(scp_back_command, stdout=subprocess.PIPE).communicate()[0]
 
+    # and analyze it
+    for process in processes:
+        inf = open(os.path.join(tmpdir_name+"_OUT", process + ".out"), "r")
+        
+        # Look for:
+        # #Summary:
+        # #nfill,nrun,nls,ncms,totdelivered(/pb),totrecorded(/pb)
+        # #66,269,101502,101495,12165.673,11629.565
+        # and extract the totrecorded
+        while True:
+            line1 = inf.readline()
+            if "Summary" in line1:
+                line2 = inf.readline()
+                line3 = inf.readline().strip()        
+                print "'{0}': {1},".format(process,line3.split(",")[-1])
+                break
 
+if __name__ == "__main__":
+    lxplus_username = "jpata"
+    dataset_name = "Sep14_leptonic_nome_v1"
+
+    processes = [
+        "SingleMuon",
+         "SingleElectron",
+         "MuonEG",
+         "DoubleEG",
+         "DoubleMuon",
+    ] 
+
+    dataset_base = os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/gc/datasets/"
+    tmpdir_name = "LUMICALC_TEMP"
+    calculate_lumi(
+        lxplus_username,
+        dataset_name,
+        processes,
+        dataset_base,
+        tmpdir_name
+    )
             
