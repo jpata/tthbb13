@@ -110,7 +110,7 @@ datasets.update({
     'ttHTobb': {
         "ds": '/ttHTobb_M125_13TeV_powheg_pythia8/RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1/MINIAODSIM',
         "maxlumis": -1,
-        "perjob": 10,
+        "perjob": 5,
         "runtime": 40,
         "mem_cfg": me_cfgs["default"],
         "script": 'heppy_crab_script.sh'
@@ -118,7 +118,7 @@ datasets.update({
     'ttHToNonbb': {
         "ds": '/ttHToNonbb_M125_13TeV_powheg_pythia8/RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1/MINIAODSIM',
         "maxlumis": -1,
-        "perjob": 50,
+        "perjob": 25,
         "runtime": 40,
         "mem_cfg": me_cfgs["default"],
         "script": 'heppy_crab_script.sh'
@@ -126,7 +126,7 @@ datasets.update({
     'TTbar_inc': {
         "ds": '/TT_TuneCUETP8M1_13TeV-powheg-pythia8/RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14_ext3-v1/MINIAODSIM',
         "maxlumis": -1,
-        "perjob": 200,
+        "perjob": 100,
         "runtime": 40,
         "mem_cfg": me_cfgs["default"],
         "script": 'heppy_crab_script.sh'
