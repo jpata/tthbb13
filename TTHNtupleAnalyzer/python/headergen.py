@@ -33,7 +33,7 @@ class Scalar:
 
     #returns variable at loop initialization
     def initializer(self):
-        return "%s = DEF_VAL_%s" % (self.varname, self.type.upper())
+        return "%s = 0" % (self.varname)
 
     #creates branch
     def creator(self):
@@ -65,7 +65,7 @@ class Static1DArray:
         return "%s %s[%s]" % (self.type, self.varname, self.n)
 
     def initializer(self):
-        return "SET_ZERO(%s, %s, DEF_VAL_%s)" % (self.varname, self.n, self.type.upper())
+        return "SET_ZERO(%s, %s, 0)" % (self.varname, self.n)
 
     def creator(self):
         return "tree->Branch(\"%s\", %s, \"%s[%s]/%s\")" % (
@@ -96,8 +96,8 @@ class Static2DArray:
         return "%s %s[%s][%s]" % (self.type, self.varname, self.n, self.m)
 
     def initializer(self):
-        return "SET_ZERO_2(%s, %s, %s, DEF_VAL_%s)" % (
-            self.varname, self.n, self.m, self.type.upper()
+        return "SET_ZERO_2(%s, %s, %s, 0)" % (
+            self.varname, self.n, self.m
         )
 
     def creator(self):

@@ -6,7 +6,7 @@ defines.extend([])
 process += [Scalar(k, "long") for k in ["run", "event", "lumi"]]
 
 process += [Scalar("nleps", "int"), Scalar("njets", "int")]
-process += [Scalar("hypothesis", "int"), Scalar("numcalls", "int")]
+process += [Scalar("hypothesis", "int"), Scalar("numcalls", "int"), Scalar("systematic", "int")]
 
 process += [Scalar("met_pt", "float"), Scalar("met_phi", "float")]
 
