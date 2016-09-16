@@ -16,35 +16,51 @@ $ cmsenv
 $ scram b -j 8
 ~~~
 
+Note that if you run `scram b clean`, the matrix element library OpennLoops will be deleted from CMSSW, which will result in errors like
+~~~
+[OpenLoops] ERROR: register_process: proclib folder not found, check install_path or install libraries.
+~~~
+In order to fix this, you have to re-copy the libraries, see the end of `setup.sh` for the recipe.
+
 ## Step0: environment
 
-We use rootpy in the code, which is installed on the T3 locally in `~jpata/rootpy`. In order to properly configure the environment, run the following `source setenv_psi.sh` before starting your work.
+We use rootpy in the code, which is installed on the T3 locally in `~jpata/anaconda`. In order to properly configure the environment, run the following `source setenv_psi.sh` before starting your work.
 
 ## Step1: VHBB code
 This will start with MiniAOD and produce a VHBB ntuple.
 
 In order to run a quick test of the code, use the following makefile
 ~~~
-$ make test_VHBB
-# this will call VHbbAnalysis/Heppy/test/vhbb_combined.py
-$ make test_VHBB_data
-# this will call VHbbAnalysis/Heppy/test/vhbb_combined_data.py
+$ cd $CMSSW_BASE/src/VHbbAnalysis/Heppy/test
+$ python validation/tth_sl_dl.py #run a few MC files
+$ python validation/tth_data.py #run a few data files
 ~~~
 
-Submission will proceed via `crab3`, explained in Step1+2.
+The structure of the VHBB-tree is encoded in `$CMSSW_BASE/src/TTH/MEAnalysis/python/VHbbTree.py` for MC and `VHbbTreeData.py` for data. These files are **automatically generated** using `make vhbb_wrapper`:
+
+~~~
+cd $(CMSSW_BASE)/src/VHbbAnalysis/Heppy/test && python genWrapper.py
+cd $(CMSSW_BASE)/src/VHbbAnalysis/Heppy/test && python genWrapper_data.py
+~~~
+
+Submitting jobs based on step1 will proceed via `crab3`, explained in Step1+2.
 
 ## Step2: tthbb code
-Using the VHBB ntuple, we will run the ttH(bb) and matrix element code
+Using the VHBB-tree, we will run the ttH(bb) and matrix element code (tthbb13)
 
-This is to test the code
+In order to test the code, run:
 ~~~
-$ make test_MEAnalysis
-#this will call TTH/MEAnalysis/python/MEAnalysis_heppy.py
-$ make test_MEAnalysis_withme
-#this will call TTH/MEAnalysis/python/MEAnalysis_heppy.py
+$ python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py
 ~~~
+
+This will call
+~~~
+python $CMSSW_BASE/src/TTH/MEAnalysis/python/MEAnalysis_heppy.py
+~~~
+which is currently configured by the `MEAnalysis_cfg_heppy.py` master configuration.
 
 ## Step1+2: VHBB & tthbb13 with CRAB
+In order to reduce the amount of intermediate steps and book-keeping, we run step1 (VHBB) and step2 (tthbb13) together in one job, back to back. This is configured in `$CMSSW_BASE/src/TTH/MEAnalysis/crab_vhbb
 
 To submit a few test workflows with crab do:
 

@@ -208,16 +208,16 @@ if __name__ == "__main__":
     ###
     logger.info("starting step SPARSEMERGE")
     for ds in analysis_cfg.samples:
-        ds_results = ["file://" + job.result for job in jobs["sparse"][ds]]
+        ds_results = [os.path.abspath(job.result) for job in jobs["sparse"][ds]]
         results["sparse"] += [
             mergeFiles(
-                "file://" + os.path.abspath("{0}/sparse/sparse_{1}.root".format(workdir, ds.name)),
+                os.path.abspath("{0}/sparse/sparse_{1}.root".format(workdir, ds.name)),
                 ds_results,
                 remove_inputs = True
             )
         ]
     results["sparse-merge"] = mergeFiles(
-        "file://" + os.path.abspath("{0}/sparse/merged.root".format(workdir)),
+        os.path.abspath("{0}/sparse/merged.root".format(workdir)),
         results["sparse"],
         remove_inputs = True
     )
