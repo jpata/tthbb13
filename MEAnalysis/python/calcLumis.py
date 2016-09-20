@@ -24,6 +24,7 @@ What this script does:
 import os
 import sys
 import shutil
+import getpass
 import subprocess
 
 def calculate_lumi(
@@ -86,8 +87,13 @@ def calculate_lumi(
                 break
 
 if __name__ == "__main__":
-    lxplus_username = "jpata"
-    dataset_name = "Sep14_leptonic_nome_v1"
+    
+    # Translate t3 user to lxplus user
+    lxplus_users = { "gregor" : "gregor",
+                     "jpata"  : "jpata" }
+
+    lxplus_username = lxplus_users[getpass.getuser()]
+    dataset_name = "Sep14_leptonic_nome"
 
     processes = [
         "SingleMuon",
