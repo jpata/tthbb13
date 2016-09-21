@@ -31,9 +31,9 @@ def count(filenames):
     os.remove(ofname)
     return ret
 
-def sparse(filenames, sample, outfile):
+def sparse(analysis, filenames, sample, outfile):
     ofname = tempfile.mktemp()
-    sparsinator.main(filenames, sample, ofname)
+    sparsinator.main(analysis, filenames, sample, ofname)
 
     basepath = os.path.dirname(outfile)
     if not os.path.isdir(basepath):

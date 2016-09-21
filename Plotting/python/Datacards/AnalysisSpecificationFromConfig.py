@@ -65,13 +65,6 @@ def splitByTriggerPath(processes, lumi):
 # analysisFromConfig
 ########################################
 
-def updateSamples(config, sample):
-    config.set(sample.name, "files_load", sample.files_load)
-    config.set(sample.name, "is_data", sample.is_data)
-    config.set(sample.name, "step_size_sparsinator", sample.step_size_sparsinator)
-    config.set(sample.name, "debug_max_files", sample.debug_max_files)
-    config.set(sample.name, "ngen", sample.ngen)
-
 def analysisFromConfig(config_file_path):
     """ Create Analysis object from cfg file """
 
@@ -242,6 +235,7 @@ def analysisFromConfig(config_file_path):
     ########################################
 
     analysis = Analysis(
+        config = config,
         debug = DEBUG,
         samples = samples,
         processes = processes,
