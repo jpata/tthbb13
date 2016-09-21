@@ -1,7 +1,7 @@
 import TTH.Plotting.Helpers.CompareDistributionsHelpers as compare_utils
 from TTH.Plotting.Helpers.CompareDistributionsHelpers import combinedPlot, plot
-from TTH.MEAnalysis.samples_base import getSitePrefix
-from TTH.MEAnalysis.samples import samples_dict, samplesFromConfig
+from TTH.MEAnalysis.samples_base import getSitePrefix, get_prefix_sample
+from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
 from TTH.Plotting.Datacards.sparse import save_hdict
 import os, sys
 
@@ -21,17 +21,16 @@ if __name__ == "__main__":
 
     import argparse
     parser = argparse.ArgumentParser(description='Prepares dataset lists from DAS')
-    parser.add_argument('--samples', action="store", help="path to sample configuration", required=False)
+    parser.add_argument('--cfg', action="store", help="path to analysis configuration", required=True)
     args = parser.parse_args()
 
-    if args.samples:
-        samples_dict = samplesFromConfig(args.samples)
+    an_name, analysis = analysisFromConfig(args.cfg)
 
     DATASETPATH = os.environ["DATASETPATH"]
-    sample_name = DATASETPATH.split("__")[1]
+    prefix, sample_name = get_prefix_sample(DATASETPATH)
     FILE_NAMES = os.environ["FILE_NAMES"].split()
     
-    sample = samples_dict[sample_name]
+    sample = analysis.get_sample(sample_name)
 
     combinedPlot(
         "numJets",
@@ -47,7 +46,7 @@ if __name__ == "__main__":
             plot("dl_JESDown", "numJets_JESDown", "is_dl", "sample"),
             plot("dl_JERUp", "numJets_JERUp", "is_dl", "sample"),
             plot("dl_JERDown", "numJets_JERDown", "is_dl", "sample"),
-        ] if sample.isMC else [],
+        ] if not sample.is_data else [],
         10,
         0,
         10,
@@ -72,7 +71,7 @@ if __name__ == "__main__":
             plot("dl_JESDown", "nBCSVM_JESDown", "is_dl", "sample"),
             plot("dl_JERUp", "nBCSVM_JERUp", "is_dl", "sample"),
             plot("dl_JERDown", "nBCSVM_JERDown", "is_dl", "sample"),
-        ] if sample.isMC else [],
+        ] if not sample.is_data else [],
         10,
         0,
         10,
@@ -97,7 +96,7 @@ if __name__ == "__main__":
             plot("dl_JESDown", "nBCMVAM_JESDown", "is_dl", "sample"),
             plot("dl_JERUp", "nBCMVAM_JERUp", "is_dl", "sample"),
             plot("dl_JERDown", "nBCMVAM_JERDown", "is_dl", "sample"),
-        ] if sample.isMC else [],
+        ] if not sample.is_data else [],
         10,
         0,
         10,
@@ -115,7 +114,7 @@ if __name__ == "__main__":
         ] + [
             plot("sl_bTagWeightCSV_{0}".format(bw), "jets_pt[0]", "{0} * is_sl".format(bw), "sample") for
             bw in btag_weights_csv
-        ]) if sample.isMC else [],
+        ]) if not sample.is_data else [],
         100,
         0,
         400,
@@ -133,7 +132,7 @@ if __name__ == "__main__":
         ] + [
             plot("sl_bTagWeightCSV_{0}".format(bw), "jets_eta[0]", "{0} * is_sl".format(bw), "sample") for
             bw in btag_weights_csv
-        ]) if sample.isMC else [],
+        ]) if not sample.is_data else [],
         100,
         -5,
         5,
@@ -183,7 +182,7 @@ if __name__ == "__main__":
         ] + [
             plot("sl_bTagWeightCSV_{0}".format(bw), "jets_btagCSV", "{0} * (is_sl)".format(bw), "sample") for
             bw in btag_weights_csv 
-        ] if sample.isMC else [],
+        ] if not sample.is_data else [],
         100,
         0,
         1,
@@ -199,7 +198,7 @@ if __name__ == "__main__":
         ] + [
             plot("sl_bTagWeightCMVA_{0}".format(bw), "jets_btagCMVA", "{0} * is_sl".format(bw), "sample") for
             bw in btag_weights_cmva
-        ] if sample.isMC else [],
+        ] if not sample.is_data else [],
         100,
         -1,
         1,

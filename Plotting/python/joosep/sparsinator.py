@@ -11,6 +11,8 @@ import numpy as np
 from TTH.MEAnalysis.samples_base import getSitePrefix, xsec, samples_nick, xsec_sample, get_prefix_sample, PROCESS_MAP, TRIGGERPATH_MAP
 from TTH.Plotting.Datacards.sparse import save_hdict
 
+from TTH.CommonClassifier.db import ClassifierDB
+
 # CONFIGURATION
 ADD_SYST_WEIGHTS = False
 DO_SL            = True
@@ -326,7 +328,7 @@ desc = Desc([
     Var(name="mem_FH_0w0w2h1t_p",
         nominal=Func("mem_p_FH_0w0w2h1t", func=lambda ev, sf=MEM_SF: ev.mem_tth_FH_0w0w2h1t_p/(ev.mem_tth_FH_0w0w2h1t_p + sf*ev.mem_ttbb_FH_0w0w2h1t_p) if getattr(ev,"mem_tth_FH_0w0w2h1t_p",0)>0 else 0.0),
     ),
-    
+
     Var(name="HLT_ttH_DL_mumu", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_DL_mumu}),
     Var(name="HLT_ttH_DL_elel", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_DL_elel}),
     Var(name="HLT_ttH_DL_elmu", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_DL_elmu}),
@@ -440,6 +442,7 @@ axes_basic_all = [
     Axis("jetsByPt_0_pt", 50, 0, 400, lambda ev: ev["jets_p4"][0].Pt()),
 
     Axis("common_bdt", 36, 0, 1, lambda ev: ev["common_bdt"]),
+    Axis("common_mem", 36, 0, 1, lambda ev: ev["common_mem"]),
 ]
 
 axes_basic_sl = [
@@ -630,15 +633,20 @@ def triggerPath(event):
         return TRIGGERPATH_MAP["fh"]
     return 0
 
-def main(file_names, sample, ofname, skip_events=0, max_events=-1):
+def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1):
     if len(file_names) == 0:
         raise Exception("No files specified, probably a mistake")
     if max_events == 0:
         raise Exception("No events specified, probably a mistake")
 
-    process = samples_nick[sample]
-    schema = get_schema(sample)
-
+    sample = analysis.get_sample(sample_name)
+    schema = sample.schema
+    process = sample.process
+    
+    do_classifier_db = analysis.config.get("sparsinator", "do_classifier_db")
+    if do_classifier_db:
+        cls_db = ClassifierDB(filename=sample.classifier_db_path)
+    
     #configure systematic scenarios according to MC/Data
     if schema == "mc":
         systematics_event = ["nominal"] + SYSTEMATICS_EVENT
@@ -649,7 +657,7 @@ def main(file_names, sample, ofname, skip_events=0, max_events=-1):
    
     dirs = {}
     outfile = ROOT.TFile(ofname, "RECREATE")
-    dirs["sample"] = outfile.mkdir(sample)
+    dirs["sample"] = outfile.mkdir(sample_name)
     dirs["sample"].cd()
     dirs["sl"] = dirs["sample"].mkdir("sl")
     dirs["dl"] = dirs["sample"].mkdir("dl")
@@ -709,6 +717,13 @@ def main(file_names, sample, ofname, skip_events=0, max_events=-1):
                 ret["weight_nominal"] = 1.0
                 if schema == "mc":
                     ret["weight_nominal"] *= ret["puWeight"] * ret["btagWeightCSV"] * ret["triggerEmulationWeight"] * ret["lep_SF_weight"]
+            
+                ret["common_mem"] = 0
+                if do_classifier_db:
+                    syst_index = int(analysis.config.get(syst, "index"))
+                    db_key = (int(event.run), int(event.lumi), int(event.evt), syst_index)
+                    if cls_db.data.has_key(db_key):
+                        ret["common_mem"] = cls_db.get(db_key)
 
                 #Fill the base histogram
                 for (k, v) in outdict_syst[syst].items():
@@ -736,17 +751,22 @@ def main(file_names, sample, ofname, skip_events=0, max_events=-1):
     outfile.Close()
 
 if __name__ == "__main__":
-    
+    from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
+
     if os.environ.has_key("FILE_NAMES"):
         file_names = map(getSitePrefix, os.environ["FILE_NAMES"].split())
         prefix, sample = get_prefix_sample(os.environ["DATASETPATH"])
         skip_events = int(os.environ.get("SKIP_EVENTS", 0))
         max_events = int(os.environ.get("MAX_EVENTS", 0))
-    else:
-        file_names = [getSitePrefix("/store/user/jpata/tth/Aug11_leptonic_nome_v1/TT_TuneCUETP8M1_13TeV-powheg-pythia8/Aug11_leptonic_nome_v1/160811_212409/0000/tree_{0}.root").format(i) for i in [10, 105, 106]]
-        prefix = ""
-        sample = "TT_TuneCUETP8M1_13TeV-powheg-pythia8"
-        skip_events = 0
-        max_events = 10000
+        an_name, analysis = analysisFromConfig(os.environ.get("ANALYSIS_CONFIG", 0))
 
-    main(file_names, sample, "out.root", skip_events, max_events)
+    else:
+        file_names = map(getSitePrefix, [
+            "/store/user/jpata/tth/Sep14_leptonic_nome_v1/ttHTobb_M125_13TeV_powheg_pythia8/Sep14_leptonic_nome_v1/160914_142604/0000/tree_1.root"
+        ])
+        prefix = ""
+        sample = "ttHTobb_M125_13TeV_powheg_pythia8"
+        skip_events = 0
+        max_events = 5000
+        an_name, analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/Plotting/python/Datacards/config_sl.cfg")
+    main(analysis, file_names, sample, "out.root", skip_events, max_events)

@@ -7,6 +7,8 @@ class Sample(object):
     def __init__(self, *args, **kwargs):
         self.debug = kwargs.get("debug")
         self.name = kwargs.get("name")
+        self.schema = kwargs.get("schema")
+        self.process = kwargs.get("process")
         self.is_data = bool(kwargs.get("is_data"))
         self.files_load = kwargs.get("files_load")
         self.step_size_sparsinator = int(kwargs.get("step_size_sparsinator"))
@@ -15,23 +17,30 @@ class Sample(object):
         if self.debug:
             self.file_names = self.file_names[:self.debug_max_files]
         self.ngen = int(kwargs.get("ngen"))
-
+        self.classifier_db_path = kwargs.get("classifier_db_path")
 
     @staticmethod
     def fromConfigParser(config, sample_name):
         sample = Sample(
             debug = config.getboolean("general", "debug"),
             name = sample_name,
+            process = config.get(sample_name, "process"),
             files_load = config.get(sample_name, "files_load"),
+            schema = config.get(sample_name, "schema"),
             is_data = config.get(sample_name, "is_data"),
             step_size_sparsinator = config.get(sample_name, "step_size_sparsinator"),
             debug_max_files = config.get(sample_name, "debug_max_files"),
             ngen = config.get(sample_name, "ngen"),
+            classifier_db_path = config.get(sample_name, "classifier_db_path", None),
         )
         return sample
 
     def updateConfig(self, config):
-        for field in ["files_load", "is_data", "step_size_sparsinator", "debug_max_files", "ngen"]:
+        for field in [
+            "files_load", "schema", "is_data", "step_size_sparsinator",
+            "process",
+            "debug_max_files", "ngen", "classifier_db_path"
+            ]:
             config.set(self.name, field, str(getattr(self, field)))
 
 class Process(object):
@@ -115,6 +124,7 @@ class Category:
 
 class Analysis:
     def __init__(self, **kwargs):
+        self.config = kwargs.get("config")
         self.debug = kwargs.get("debug", False)
         self.samples = kwargs.get("samples", [])
         self.processes = kwargs.get("processes")
