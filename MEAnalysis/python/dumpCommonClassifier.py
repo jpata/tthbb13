@@ -1,11 +1,8 @@
 import ROOT
 import sys, os, json, math, copy
-from TTH.MEAnalysis.samples_base import getSitePrefix
+from TTH.MEAnalysis.samples_base import getSitePrefix, get_prefix_sample
 from PhysicsTools.HeppyCore.statistics.tree import Tree
 import numpy as np
-
-DATASETPATH = os.environ["DATASETPATH"]
-FILE_NAMES = os.environ["FILE_NAMES"].split()
 
 class Scenario:
     def __init__(self, *args, **kwargs):
@@ -19,8 +16,24 @@ class Scenario:
         self.systematic_index = kwargs.get("systematic_index")
 
 if __name__ == "__main__":
+    from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
+
+    if os.environ.has_key("FILE_NAMES"):
+        file_names = map(getSitePrefix, os.environ["FILE_NAMES"].split())
+        prefix, sample_name = get_prefix_sample(os.environ["DATASETPATH"])
+        an_name, analysis = analysisFromConfig(os.environ.get("ANALYSIS_CONFIG"))
+    else:
+        file_names = map(getSitePrefix, [
+            "/store/user/jpata/tth/Sep14_leptonic_nome_v1/ttHTobb_M125_13TeV_powheg_pythia8/Sep14_leptonic_nome_v1/160914_142604/0000/tree_1.root"
+        ])
+        prefix = ""
+        sample_name = "ttHTobb_M125_13TeV_powheg_pythia8"
+        an_name, analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/Plotting/python/Datacards/config_sl.cfg")
+
+    sample = analysis.get_sample(sample_name)
+
     ch = ROOT.TChain("tree")
-    for fi in FILE_NAMES:
+    for fi in file_names:
         ch.AddFile(getSitePrefix(fi))
     
     outfile = ROOT.TFile('out.root', 'recreate')
@@ -87,26 +100,27 @@ if __name__ == "__main__":
             scale_factors = [
                 (0, 1.0),
             ]
-            if ev.jets_corr[ijet]>0:
-                scale_factors += [
-                    (1, ev.jets_corr_JESUp[ijet]/ev.jets_corr[ijet]),
-                    (2, ev.jets_corr_JESDown[ijet]/ev.jets_corr[ijet]),
-                ]
-            else:
-                scale_factors += [
-                    (1, 1.0),
-                    (2, 1.0),
-                ]
-            if ev.jets_corr_JER[ijet]>0:
-                scale_factors += [
-                    (3, ev.jets_corr_JERUp[ijet]/ev.jets_corr_JER[ijet]),
-                    (4, ev.jets_corr_JERDown[ijet]/ev.jets_corr_JER[ijet]),
-                ]
-            else:
-                scale_factors += [
-                    (3, 1.0),
-                    (4, 1.0),
-                ]
+            if sample.schema == "mc":
+                if ev.jets_corr[ijet]>0:
+                    scale_factors += [
+                        (1, ev.jets_corr_JESUp[ijet]/ev.jets_corr[ijet]),
+                        (2, ev.jets_corr_JESDown[ijet]/ev.jets_corr[ijet]),
+                    ]
+                else:
+                    scale_factors += [
+                        (1, 1.0),
+                        (2, 1.0),
+                    ]
+                if ev.jets_corr_JER[ijet]>0:
+                    scale_factors += [
+                        (3, ev.jets_corr_JERUp[ijet]/ev.jets_corr_JER[ijet]),
+                        (4, ev.jets_corr_JERDown[ijet]/ev.jets_corr_JER[ijet]),
+                    ]
+                else:
+                    scale_factors += [
+                        (3, 1.0),
+                        (4, 1.0),
+                    ]
         
         for syst_idx, sf in scale_factors:
             jets_p4_rescaled = []

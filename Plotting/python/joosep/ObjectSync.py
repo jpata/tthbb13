@@ -142,10 +142,11 @@ if __name__ == "__main__":
         "leps_pt_0",
         [
             plot("sl", "leps_pt[0]", "is_sl", "sample"),
-            plot("sl_triggerWeight", "leps_pt[0]", "triggerEmulationWeight * (is_sl)", "sample"),
             plot("dl", "leps_pt[0]", "is_dl", "sample"),
+        ] + [
+            plot("sl_triggerWeight", "leps_pt[0]", "triggerEmulationWeight * (is_sl)", "sample"),
             plot("dl_triggerWeight", "leps_pt[0]", "triggerEmulationWeight * (is_dl)", "sample"),
-        ],
+        ] if sample.schema == "mc" else [],
         100,
         0,
         300,

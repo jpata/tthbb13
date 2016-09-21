@@ -758,7 +758,7 @@ if __name__ == "__main__":
         prefix, sample = get_prefix_sample(os.environ["DATASETPATH"])
         skip_events = int(os.environ.get("SKIP_EVENTS", 0))
         max_events = int(os.environ.get("MAX_EVENTS", 0))
-        an_name, analysis = analysisFromConfig(os.environ.get("ANALYSIS_CONFIG", 0))
+        an_name, analysis = analysisFromConfig(os.environ.get("ANALYSIS_CONFIG",))
 
     else:
         file_names = map(getSitePrefix, [
