@@ -444,10 +444,10 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
     #Create top panel
     a1 = plt.axes([0.0, 0.22, 1.0, 0.8])
         
-    c.suptitle(r"$\textbf{CMS}$ preliminary $\sqrt{s} = 13$ TeV"+title_extended,
-        y=1.02, x=0.02,
-        horizontalalignment="left", verticalalignment="bottom", fontsize=16
-    )
+    #c.suptitle(r"$\textbf{CMS}$ preliminary $\sqrt{s} = 13$ TeV"+title_extended,
+    #    y=1.02, x=0.02,
+    #    horizontalalignment="left", verticalalignment="bottom", fontsize=16
+    #)
     stacked_hists = mc_stack(
         histograms_nominal.values(),
         histograms_systematic,

@@ -15,9 +15,9 @@ from TTH.Plotting.Datacards.sparse import save_hdict
 ADD_SYST_WEIGHTS = False
 DO_SL            = True
 DO_DL            = True
-DO_FH            = True
-EXTRA_SL         = False
-EXTRA_DL         = False
+DO_FH            = False
+EXTRA_SL         = True
+EXTRA_DL         = True
 EXTRA_FH         = False
 
 #placeholder value
@@ -257,7 +257,6 @@ desc = Desc([
 
     Var(name="leps_pt"),
     Var(name="leps_eta"),
-    #Var(name="leps_pdgId"),
 
     Var(name="numJets", systematics="suffix"),
     Var(name="nBCSVM", systematics="suffix"),
@@ -507,13 +506,6 @@ axes_extra_sl = [
     Axis("higgsCandidate_mass_softdropz2b1filt", 50, 0, 200, lambda ev: ev["higgsCandidate_mass_softdropz2b1filt"][0] if len(ev["higgsCandidate_mass"]) else -100),
     Axis("higgsCandidate_sj12massb_subjetfiltered", 50, 0, 200, lambda ev: ev["higgsCandidate_sj12massb_subjetfiltered"][0] if len(ev["higgsCandidate_mass"]) else -100),
     Axis("higgsCandidate_sj12masspt_subjetfiltered", 50, 0, 200, lambda ev: ev["higgsCandidate_sj12masspt_subjetfiltered"][0] if len(ev["higgsCandidate_mass"]) else -100),
-
-    Axis("topCandidate_pt", 50, 150, 600, lambda ev: ev["topCandidate_pt"][0] if len(ev["topCandidate_pt"]) else -100),
-    Axis("topCandidate_ptcal", 50, 150, 600, lambda ev: ev["topCandidate_ptcal"][0] if len(ev["topCandidate_pt"]) else -100),
-    Axis("topCandidate_mass", 50, 0, 250, lambda ev: ev["topCandidate_mass"][0] if len(ev["topCandidate_pt"]) else -100),
-    Axis("topCandidate_masscal", 50, 0, 250, lambda ev: ev["topCandidate_masscal"][0] if len(ev["topCandidate_pt"]) else -100),
-    Axis("topCandidate_n_subjettiness", 50, 0, 1, lambda ev: ev["topCandidate_n_subjettiness"][0] if len(ev["topCandidate_pt"]) else -100),
-    Axis("topCandidate_n_subjettiness_groomed", 50, 0, 1, lambda ev: ev["topCandidate_n_subjettiness_groomed"][0] if len(ev["topCandidate_pt"]) else -100),
 
     Axis("multiclass_class", 7, -0.5, 6.5, lambda ev:     ev["multiclass_class"]),
     Axis("multiclass_proba_ttb", 40, 0, 0.7, lambda ev:   ev["multiclass_proba_ttb"]),
