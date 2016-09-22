@@ -13,68 +13,12 @@ from TTH.Plotting.Datacards.sparse import save_hdict
 
 from TTH.CommonClassifier.db import ClassifierDB
 
-# CONFIGURATION
-ADD_SYST_WEIGHTS = False
-DO_SL            = True
-DO_DL            = True
-DO_FH            = False
-EXTRA_SL         = True
-EXTRA_DL         = True
-EXTRA_FH         = False
-
-#placeholder value
-NA = -999
-
-#default MEM scale factor in the likelihood ratio
-MEM_SF = 0.1
-
-
-"""
-Create pairs of (systematic_name, weight function), which will be used on the
-nominal event to create reweighted copies of the event. The systematic names
-here will define the output histograms like
-ttH/sl/sparse -> nominal event
-ttH/sl/sparse_CMS_ttH_CSVJESUp -> event with btagWeight with JES up variation
-...
-"""
-systematic_weights = []
-btag_weights = []
-
-SYSTEMATICS_EVENT = []
-
-
-if ADD_SYST_WEIGHTS:
-
-    SYSTEMATICS_EVENT = [
-        "CMS_scale_jUp", 
-        "CMS_scale_jDown",
-        "CMS_res_jUp", 
-        "CMS_res_jDown"]
-
-    for sdir in ["up", "down"]:
-        for syst in ["cferr1", "cferr2", "hf", "hfstats1", "hfstats2", "jes", "lf", "lfstats1", "lfstats2"]:
-            for tagger in ["CSV", "CMVAV2"]:
-                bweight = "btagWeight{0}_{1}_{2}".format(tagger, sdir, syst)
-                #make systematic outputs consistent in Up/Down naming
-                sdir_cap = sdir.capitalize()
-                systematic_weights += [
-                    ("CMS_ttH_{0}{1}{2}".format(tagger, syst, sdir_cap), lambda ev, bweight=bweight: ev["weight_nominal"]/ev["btagWeight"+tagger]*ev[bweight])
-                ]
-                btag_weights += [bweight]
-
-    systematic_weights += [
-            ("puUp", lambda ev: ev["weight_nominal"]/ev["puWeight"] * ev["puWeightUp"]),
-            ("puDown", lambda ev: ev["weight_nominal"]/ev["puWeight"] * ev["puWeightDown"])
-    ]
-
 def assign_process_label(process, event):
-    """
-    In case the you need to decide which process an event falls into based on
-    the event itself:
-    process (string): the input process
-    event (FIXME): the event data
+    """ In case the you need to decide which process an event falls into based on the event itself.
 
-    returns (string): the newly modified process string
+    Args:
+        process (string): the input process
+        event (dict string->data): the event data
     """
     if process == "ttbarUnsplit":
         ttCls = event["ttCls"]
@@ -97,6 +41,12 @@ def logit(x):
     return np.log(x/(1.0 - x))
 
 class Func:
+    """Describes a function that gets a value from a branch
+    
+    Attributes:
+        branch (string): Name of the branch
+        func (function TTree->value): Getter function
+    """
     def __init__(self, branch, **kwargs):
         self.branch = branch
         self.func = kwargs.get("func",
@@ -105,17 +55,6 @@ class Func:
 
     def __call__(self, event):
         return self.func(event)
-
-def fillSystSuffix(name, systematics):
-    ret = {}
-    for syst in systematics:
-        for sdir in ["Up", "Down"]:
-            suffix = syst+sdir
-            ret[suffix] = Func(
-                name + "_" + suffix,
-                func=lambda ev, suff=suffix, fallback=name: getattr(ev, suff, fallback)
-            )
-    return ret
 
 class Var:
     def __init__(self, **kwargs):
@@ -129,14 +68,25 @@ class Var:
         self.funcs_schema = kwargs.get("funcs_schema", {})
 
         self.systematics_funcs = kwargs.get("systematics", {})
-        #in case this variable is just a pre-calculated branch on the tree (e.g. numJets),
-        #append systematic suffixes to create the systematically variated branches (numJets_JESUp)
-        if self.systematics_funcs == "suffix":
-            if kwargs.has_key("nominal"):
-                raise Exception("don't know how to generate systematic function for non-default nominal")
-            self.systematics_funcs = fillSystSuffix(self.name, SYSTEMATICS_EVENT)
-
         self.schema = kwargs.get("schema", ["mc", "data"])
+
+    def fillSystematicsSuffix(self, systematics):
+        """Fills the systematic function table with suffix lookup functions
+        
+        Args:
+            systematics (list of string): Systematics to use
+        
+        Returns:
+            nothing
+        """
+        self.systematics_funcs = {}
+        for syst in systematics:
+            for sdir in ["Up", "Down"]:
+                suffix = syst + sdir
+                self.systematics_funcs[suffix] = Func(
+                    self.name + "_" + suffix,
+                    func=lambda ev, suff=suffix, fallback=self.name: getattr(ev, suff, fallback)
+                )
 
     def getValue(self, event, schema, systematic="nominal"):
                 
@@ -155,11 +105,37 @@ class Var:
                     
 
 class Desc:
-    def __init__(self, variables=[]):
-        self.variables = variables
-        self.variables_dict = OrderedDict([(v.name, v) for v in self.variables])
+    """Event description with varying systematics
+    
+    Attributes:
+        variables_dict (dict of string->Var): Variables in the event
+    """
+
+    def __init__(self, systematics, variables=[]):
+        """Creates the event description based on a list of variables
+        
+        Args:
+            systematics (list of string): systematics to use for variable lookup
+            variables (list, optional): Variables to use
+        """
+
+        for v in variables:
+            if v.systematics_funcs == "suffix":
+                v.fillSystematicsSuffix(systematics)
+
+        self.variables_dict = OrderedDict([(v.name, v) for v in variables])
 
     def getValue(self, event, schema="mc", systematic="nominal"):
+        """Returns a dict with the values of all the variables given a systematic
+        
+        Args:
+            event (TTree): The underlying data TTree
+            schema (str, optional): The schema of the data, e.g. "mc", "data"
+            systematic (str, optional): The systematic to use
+        
+        Returns:
+            dict of string->data: The values of all the variables
+        """
         ret = OrderedDict()
         for vname, v in self.variables_dict.items():
             if schema in v.schema:
@@ -197,29 +173,6 @@ def lv_p4s(pt, eta, phi, m, btagCSV=-100):
     setattr(ret, "btagCSV", btagCSV)
     return ret
 
-extra_vars =  ["topCandidate_fRec",
-               "topCandidate_pt",
-               "topCandidate_ptcal",
-               "topCandidate_mass",
-               "topCandidate_masscal",
-               "topCandidate_n_subjettiness",
-               "topCandidate_n_subjettiness_groomed",
-            
-               "higgsCandidate_secondbtag_subjetfiltered", 
-               "higgsCandidate_bbtag", 
-               "higgsCandidate_tau1", 
-               "higgsCandidate_tau2", 
-               "higgsCandidate_mass", 
-               "higgsCandidate_mass_softdropz2b1filt", 
-               "higgsCandidate_sj12massb_subjetfiltered", 
-               "higgsCandidate_sj12masspt_subjetfiltered", 
-            
-               "multiclass_class",
-               "multiclass_proba_ttb",
-               "multiclass_proba_tt2b",
-               "multiclass_proba_ttbb",
-               "multiclass_proba_ttcc",
-               "multiclass_proba_ttll"]
 
 # Calculate lepton SF on the fly
 # Currently only add muons
@@ -242,123 +195,6 @@ def calc_lepton_SF(ev):
 
     return weight
     
-
-desc = Desc([
-    Var(name="run"),
-    Var(name="lumi"),
-    Var(name="evt"),
-
-    Var(name="is_sl"),
-    Var(name="is_dl"),
-    Var(name="is_fh"),
-
-    Var(name="nfatjets"),
-    Var(name="fatjets_pt"),
-    Var(name="fatjets_eta"),
-    Var(name="fatjets_mass"),
-
-    Var(name="leps_pt"),
-    Var(name="leps_eta"),
-
-    Var(name="numJets", systematics="suffix"),
-    Var(name="nBCSVM", systematics="suffix"),
-    Var(name="nBCMVAM", systematics="suffix"),
-    
-    Var(name="Wmass", systematics="suffix"),
-
-    Var(name="btag_LR_4b_2b_btagCSV_logit",
-        nominal=Func("blr_CSV", func=lambda ev: logit(ev.btag_LR_4b_2b_btagCSV)),
-    ),
-    Var(name="btag_LR_4b_2b_btagCMVA_logit",
-        nominal=Func("blr_cMVA", func=lambda ev: logit(ev.btag_LR_4b_2b_btagCMVA)),
-    ),
-
-    Var(name="leps_pdgId", nominal=Func("leps_pdgId", func=lambda ev: [int(ev.leps_pdgId[i]) for i in range(ev.nleps)])),
-
-    Var(name="jets_p4",
-        nominal=Func(
-            "jets_p4",
-            func=lambda ev: [lv_p4s(ev.jets_pt[i], ev.jets_eta[i], ev.jets_phi[i], ev.jets_mass[i], ev.jets_btagCSV[i]) for i in range(ev.njets)]
-        ),
-        systematics = {
-            "CMS_scale_jUp": Func(
-                "jets_p4_JESUp",
-                func=lambda ev: [lv_p4s(ev.jets_pt[i]*float(ev.jets_corr_JESUp[i])/float(ev.jets_corr[i]), ev.jets_eta[i], ev.jets_phi[i], ev.jets_mass[i], ev.jets_btagCSV[i]) for i in range(ev.njets)]
-            ),
-            "CMS_scale_jDown": Func(
-                "jets_p4_JESDown",
-                func=lambda ev: [lv_p4s(ev.jets_pt[i]*float(ev.jets_corr_JESDown[i])/float(ev.jets_corr[i]), ev.jets_eta[i], ev.jets_phi[i], ev.jets_mass[i], ev.jets_btagCSV[i]) for i in range(ev.njets)]
-            ),
-            "CMS_res_jUp": Func(
-                "jets_p4_JERUp",
-                func=lambda ev: [lv_p4s(ev.jets_pt[i]*float(ev.jets_corr_JERUp[i])/float(ev.jets_corr_JER[i]) if ev.jets_corr_JER[i]>0 else 0.0, ev.jets_eta[i], ev.jets_phi[i], ev.jets_mass[i], ev.jets_btagCSV[i]) for i in range(ev.njets)]
-            ),
-            "CMS_res_jDown": Func(
-                "jets_p4_JERDown",
-                func=lambda ev: [lv_p4s(ev.jets_pt[i]*float(ev.jets_corr_JERDown[i])/float(ev.jets_corr_JER[i]) if ev.jets_corr_JER[i]>0 else 0.0, ev.jets_eta[i], ev.jets_phi[i], ev.jets_mass[i], ev.jets_btagCSV[i]) for i in range(ev.njets)]
-            )
-        }
-    ),
-
-    Var(name="mem_SL_0w2h2t_p",
-        nominal=Func("mem_p_SL_0w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_SL_0w2h2t_p/(ev.mem_tth_SL_0w2h2t_p + sf*ev.mem_ttbb_SL_0w2h2t_p) if getattr(ev,"mem_tth_SL_0w2h2t_p",0)>0 else 0.0),
-    ),
-    Var(name="mem_SL_1w2h2t_p",
-        nominal=Func("mem_p_SL_1w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_SL_1w2h2t_p/(ev.mem_tth_SL_1w2h2t_p + sf*ev.mem_ttbb_SL_1w2h2t_p) if getattr(ev,"mem_tth_SL_1w2h2t_p",0)>0 else 0.0),
-    ),
-    Var(name="mem_SL_2w2h2t_p",
-        nominal=Func("mem_p_SL_2w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_SL_2w2h2t_p/(ev.mem_tth_SL_2w2h2t_p + sf*ev.mem_ttbb_SL_2w2h2t_p) if getattr(ev,"mem_tth_SL_2w2h2t_p",0)>0 else 0.0),
-    ),
-    Var(name="mem_DL_0w2h2t_p",
-        nominal=Func("mem_p_DL_0w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_DL_0w2h2t_p/(ev.mem_tth_DL_0w2h2t_p + sf*ev.mem_ttbb_DL_0w2h2t_p) if getattr(ev,"mem_tth_DL_0w2h2t_p",0)>0 else 0.0),
-    ),
-    Var(name="mem_FH_4w2h2t_p",
-        nominal=Func("mem_p_FH_4w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_FH_4w2h2t_p/(ev.mem_tth_FH_4w2h2t_p + sf*ev.mem_ttbb_FH_4w2h2t_p) if getattr(ev,"mem_tth_FH_4w2h2t_p",0)>0 else 0.0),
-    ),
-    Var(name="mem_FH_3w2h2t_p",
-        nominal=Func("mem_p_FH_3w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_FH_3w2h2t_p/(ev.mem_tth_FH_3w2h2t_p + sf*ev.mem_ttbb_FH_3w2h2t_p) if getattr(ev,"mem_tth_FH_3w2h2t_p",0)>0 else 0.0),
-    ),
-    Var(name="mem_FH_4w2h1t_p",
-        nominal=Func("mem_p_FH_4w2h1t", func=lambda ev, sf=MEM_SF: ev.mem_tth_FH_4w2h1t_p/(ev.mem_tth_FH_4w2h1t_p + sf*ev.mem_ttbb_FH_4w2h1t_p) if getattr(ev,"mem_tth_FH_4w2h1t_p",0)>0 else 0.0),
-    ),
-    Var(name="mem_FH_0w0w2h2t_p",
-        nominal=Func("mem_p_FH_0w0w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_FH_0w0w2h2t_p/(ev.mem_tth_FH_0w0w2h2t_p + sf*ev.mem_ttbb_FH_0w0w2h2t_p) if getattr(ev,"mem_tth_FH_0w0w2h2t_p",0)>0 else 0.0),
-    ),
-    Var(name="mem_FH_0w0w2h1t_p",
-        nominal=Func("mem_p_FH_0w0w2h1t", func=lambda ev, sf=MEM_SF: ev.mem_tth_FH_0w0w2h1t_p/(ev.mem_tth_FH_0w0w2h1t_p + sf*ev.mem_ttbb_FH_0w0w2h1t_p) if getattr(ev,"mem_tth_FH_0w0w2h1t_p",0)>0 else 0.0),
-    ),
-
-    Var(name="HLT_ttH_DL_mumu", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_DL_mumu}),
-    Var(name="HLT_ttH_DL_elel", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_DL_elel}),
-    Var(name="HLT_ttH_DL_elmu", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_DL_elmu}),
-    Var(name="HLT_ttH_SL_el", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_SL_el}),
-    Var(name="HLT_ttH_SL_mu", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_SL_mu}),
-    Var(name="HLT_ttH_FH", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_FH}),
-
-    Var(name="lep_SF_weight", 
-        funcs_schema={"mc": lambda ev: calc_lepton_SF(ev), 
-                      "data": lambda ev: 1.0}),
-
-
-#MC-only branches
-    Var(name="ttCls", schema=["mc"]),
-    Var(name="puWeight", schema=["mc"]),
-    Var(name="puWeightUp", schema=["mc"]),
-    Var(name="puWeightDown", schema=["mc"]),
-    Var(name="triggerEmulationWeight", schema=["mc"]),
-
-
-
-    #nominal b-tag weight, systematic weights added later
-    Var(name="btagWeightCSV", schema=["mc"]),
-    Var(name="btagWeightCMVAV2", schema=["mc"]),
-    ] + [Var(name=bw, schema=["mc"]) for bw in btag_weights] + [Var(name=br) for br in extra_vars]
-)
-
-
-    
-
-
 class Axis:
     def __init__(self, name, nbins, lo, hi, func):
         self.name = name
@@ -427,117 +263,6 @@ class SparseOut:
         #otherwise the THnSparse is filled, but with garbage and will result in TBrowser segfaults later 
         return self.hist.Fill(valVec.data(), weight)
 
-# Axis we will want to have in all sparse histograms
-axes_basic_all = [
-    Axis("process", 20, 0, 20, lambda ev: ev["process"]),
-    Axis("triggerPath", 20, 0, 20, lambda ev: ev["triggerPath"]),
-    Axis("counting", 1, 0, 1, lambda ev: ev["counting"]),
-    Axis("parity", 1, 0, 1, lambda ev: ev["evt"]%2==0),
-
-    Axis("numJets", 5, 3, 8, lambda ev: ev["numJets"]),
-    Axis("nBCSVM", 4, 1, 5, lambda ev: ev["nBCSVM"]),
-    Axis("nBCMVAM", 4, 1, 5, lambda ev: ev["nBCMVAM"]),
-
-    Axis("jetsByPt_0_pt", 50, 0, 400, lambda ev: ev["jets_p4"][0].Pt()),
-
-    Axis("common_bdt", 36, 0, 1, lambda ev: ev["common_bdt"]),
-    Axis("common_mem", 36, 0, 1, lambda ev: ev["common_mem"]),
-]
-
-axes_basic_sl = [
-    Axis("mem_SL_2w2h2t_p", 36, 0, 1, lambda ev: ev["mem_SL_2w2h2t_p"]),
-    Axis("mem_SL_1w2h2t_p", 36, 0, 1, lambda ev: ev["mem_SL_1w2h2t_p"]),
-    Axis("mem_SL_0w2h2t_p", 36, 0, 1, lambda ev: ev["mem_SL_0w2h2t_p"]),
-
-    Axis("btag_LR_4b_2b_btagCSV_logit", 30, -5, 10, lambda ev: ev["btag_LR_4b_2b_btagCSV_logit"]),
-    Axis("btag_LR_4b_2b_btagCMVA_logit", 30, -5, 10, lambda ev: ev["btag_LR_4b_2b_btagCMVA_logit"]),
-
-    Axis("leps_0_pt", 50, 0, 300, lambda ev: ev["leps_pt"][0]),
-    Axis("leps_0_pdgId", 20, -0.5, 19.5, lambda ev: abs(ev["leps_pdgId"][0])),
-]
-
-axes_basic_dl = [
-    Axis("mem_DL_0w2h2t_p", 36, 0, 1, lambda ev: ev["mem_DL_0w2h2t_p"]),
-
-    Axis("leps_0_pt", 50, 0, 300, lambda ev: ev["leps_pt"][0]),
-
-    Axis("leps_0_pdgId", 20, -0.5, 19.5, lambda ev: abs(ev["leps_pdgId"][0])),
-    Axis("leps_1_pdgId", 20, -0.5, 19.5, lambda ev: abs(ev["leps_pdgId"][1])),
-
-]
- 
-axes_basic_fh = [
-    Axis("mem_FH_4w2h2t_p", 36, 0, 1, lambda ev: ev["mem_FH_4w2h2t_p"]),
-    Axis("mem_FH_3w2h2t_p", 36, 0, 1, lambda ev: ev["mem_FH_3w2h2t_p"]),
-    Axis("mem_FH_4w2h1t_p", 36, 0, 1, lambda ev: ev["mem_FH_4w2h1t_p"]),
-    Axis("mem_FH_0w0w2h2t_p", 36, 0, 1, lambda ev: ev["mem_FH_0w0w2h2t_p"]),
-    Axis("mem_FH_0w0w2h1t_p", 36, 0, 1, lambda ev: ev["mem_FH_0w0w2h1t_p"]),
-]
-
-axes_extra_sl = [    
-    Axis("Wmass", 100, 50, 150, lambda ev: ev["Wmass"]),
-    
-    Axis("jetsByPt_1_pt", 50, 0, 400, lambda ev: ev["jets_p4"][1].Pt()),
-    Axis("jetsByPt_2_pt", 50, 0, 400, lambda ev: ev["jets_p4"][2].Pt()),
-
-    Axis("jetsByPt_0_btagCSV", 50, -1, 1, lambda ev: ev["jets_p4"][0].btagCSV),
-
-    Axis("jetsByPt_0_eta", 50, -2.5, 2.5, lambda ev: ev["jets_p4"][0].Eta()),
-    Axis("jetsByPt_1_eta", 50, -2.5, 2.5, lambda ev: ev["jets_p4"][1].Eta()),
-    Axis("jetsByPt_2_eta", 50, -2.5, 2.5, lambda ev: ev["jets_p4"][2].Eta()),
-
-    Axis("fatjetByPt_0_pt", 50, 0, 600, lambda ev: ev["fatjets_pt"][0] if ev["nfatjets"] else -100),
-    Axis("fatjetByPt_0_eta", 50, -2.5, 2.5, lambda ev: ev["fatjets_eta"][0] if ev["nfatjets"] else -100),
-    Axis("fatjetByPt_0_mass", 50, 0, 600, lambda ev: ev["fatjets_mass"][0] if ev["nfatjets"] else -100),
-
-    Axis("leps_0_eta", 50, -2.5, 2.5, lambda ev: ev["leps_eta"][0]),
-
-    Axis("topCandidate_fRec", 50, 0, 0.4, lambda ev: ev["topCandidate_fRec"][0] if len(ev["topCandidate_pt"]) else -100),
-    Axis("topCandidate_pt", 50, 150, 600, lambda ev: ev["topCandidate_pt"][0] if len(ev["topCandidate_pt"]) else -100),
-    Axis("topCandidate_ptcal", 50, 150, 600, lambda ev: ev["topCandidate_ptcal"][0] if len(ev["topCandidate_pt"]) else -100),
-    Axis("topCandidate_mass", 50, 0, 250, lambda ev: ev["topCandidate_mass"][0] if len(ev["topCandidate_pt"]) else -100),
-    Axis("topCandidate_masscal", 50, 0, 250, lambda ev: ev["topCandidate_masscal"][0] if len(ev["topCandidate_pt"]) else -100),
-    Axis("topCandidate_n_subjettiness", 50, 0, 1, lambda ev: ev["topCandidate_n_subjettiness"][0] if len(ev["topCandidate_pt"]) else -100),
-    Axis("topCandidate_n_subjettiness_groomed", 50, 0, 1, lambda ev: ev["topCandidate_n_subjettiness_groomed"][0] if len(ev["topCandidate_pt"]) else -100),
-
-    Axis("higgsCandidate_secondbtag_subjetfiltered", 50, -1,1, lambda ev: ev["higgsCandidate_secondbtag_subjetfiltered"][0] if len(ev["higgsCandidate_mass"]) else -100),
-    Axis("higgsCandidate_bbtag", 50, -1, 1, lambda ev: ev["higgsCandidate_bbtag"][0] if len(ev["higgsCandidate_mass"]) else -100),
-    Axis("higgsCandidate_tau1", 50, 0, 1, lambda ev: ev["higgsCandidate_tau1"][0] if len(ev["higgsCandidate_mass"]) else -100),
-    Axis("higgsCandidate_tau2", 50, 0, 1, lambda ev: ev["higgsCandidate_tau2"][0] if len(ev["higgsCandidate_mass"]) else -100),
-
-    Axis("higgsCandidate_mass", 50, 0, 200, lambda ev: ev["higgsCandidate_mass"][0] if len(ev["higgsCandidate_mass"]) else -100),
-    Axis("higgsCandidate_mass_softdropz2b1filt", 50, 0, 200, lambda ev: ev["higgsCandidate_mass_softdropz2b1filt"][0] if len(ev["higgsCandidate_mass"]) else -100),
-    Axis("higgsCandidate_sj12massb_subjetfiltered", 50, 0, 200, lambda ev: ev["higgsCandidate_sj12massb_subjetfiltered"][0] if len(ev["higgsCandidate_mass"]) else -100),
-    Axis("higgsCandidate_sj12masspt_subjetfiltered", 50, 0, 200, lambda ev: ev["higgsCandidate_sj12masspt_subjetfiltered"][0] if len(ev["higgsCandidate_mass"]) else -100),
-
-    Axis("multiclass_class", 7, -0.5, 6.5, lambda ev:     ev["multiclass_class"]),
-    Axis("multiclass_proba_ttb", 40, 0, 0.7, lambda ev:   ev["multiclass_proba_ttb"]),
-    Axis("multiclass_proba_tt2b", 40, 0, 0.7, lambda ev:  ev["multiclass_proba_tt2b"]),
-    Axis("multiclass_proba_ttbb", 40, 0, 0.7, lambda ev:  ev["multiclass_proba_ttbb"]),
-    Axis("multiclass_proba_ttcc", 40, 0, 0.7, lambda ev:  ev["multiclass_proba_ttcc"]),
-    Axis("multiclass_proba_ttll", 40, 0, 0.7,  lambda ev: ev["multiclass_proba_ttll"]),
-
-]
-
-axes_extra_dl = []
-axes_extra_fh = []
-
-# DEFINE SL AXES
-axes_sl = axes_basic_all + axes_basic_sl
-if EXTRA_SL:
-        axes_sl += axes_extra_sl
-
-# DEFINE DL AXES
-axes_dl = axes_basic_all + axes_basic_dl
-if EXTRA_DL:
-    axes_dl += axes_extra_dl
-
-# DEFINE FH AXES
-axes_fh = axes_basic_all + axes_basic_fh
-if EXTRA_FH:
-    axes_fh += axes_extra_fh
-
-
 def get_schema(sample):
     process = samples_nick[sample]
     if "data" in process:
@@ -546,8 +271,21 @@ def get_schema(sample):
         schema = "mc"
     return schema
 
-def createOutputs(dirs, systematics):
+def createOutputs(config, axes, dirs, systematics):
+    """Creates an output dictionary with fillable objects in TDirectories based on categories and systematics. 
+    
+    Args:
+        config (ConfigParser): Configuration with sparsinator info
+        axes (dict of string->list of Axes): Dictionary of various kinds of Axes to save 
+        dirs (dict of string->TDirectory): dictionary of output directories
+        systematics (list of string): list of systematics for which to create outputs
+    
+    Returns:
+        dict of string->output: Dictionary of fillable outputs
+    """
     outdict_syst = {}
+    categories = config.get("sparsinator", "categories").split()
+ 
     for syst in systematics: 
         syststr = ""
         if syst != "nominal":
@@ -555,29 +293,17 @@ def createOutputs(dirs, systematics):
 
         outdict = {}
 
-        if DO_SL:
-            dirs["sl"].cd()
-            outdict["sl/sparse"] = SparseOut(
+        for cat in categories:
+            cat_name = config.get(cat, "name")
+            axes_name = config.get(cat, "axes")
+            flag = config.get(cat, "flag")
+
+            dirs[cat_name].cd()
+            outdict["{0}/sparse".format(cat_name)] = SparseOut(
                 "sparse" + syststr,
-                lambda ev: ev["is_sl"] == 1,
-                axes_sl,
-                dirs["sl"]
-            )
-        if DO_DL:
-            dirs["dl"].cd()
-            outdict["dl/sparse"] = SparseOut(
-                "sparse" + syststr,
-                lambda ev: ev["is_dl"] == 1,
-                axes_dl,
-                dirs["dl"])
-            
-        if DO_FH:
-            dirs["fh"].cd()
-            outdict["fh/sparse"] = SparseOut(
-                "sparse" + syststr,
-                lambda ev: ev["is_fh"] == 1,
-                axes_fh,
-                dirs["fh"]
+                lambda ev, flag=flag: ev[flag] == 1,
+                axes[axes_name],
+                dirs[cat_name]
             )
 
         outdict_syst[syst] = outdict
@@ -626,6 +352,322 @@ def triggerPath(event):
     return 0
 
 def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1):
+    """Summary
+    
+    Args:
+        analysis (Analysis): The main Analysis object used to configure sparsinator
+        file_names (list of string): the PFN of the files to process
+        sample_name (string): Name of the current sample
+        ofname (string): Name of the file
+        skip_events (int, optional): Number of events to skip
+        max_events (int, optional): Number of events to process
+    
+    Returns:
+        nothing
+    
+    Raises:
+        Exception: Description
+    """
+
+
+
+    MEM_SF = analysis.config.get("sparsinator", "mem_sf")
+
+    # Create pairs of (systematic_name, weight function), which will be used on the
+    # nominal event to create reweighted copies of the event. The systematic names
+    # here will define the output histograms like
+    # ttH/sl/sparse -> nominal event
+    # ttH/sl/sparse_CMS_ttH_CSVJESUp -> event with btagWeight with JES up variation
+    # ...
+    
+    systematic_weights = []
+    btag_weights = []
+
+    systematics_event = []
+
+    #Optionally add systematics
+    if analysis.config.get("sparsinator", "add_systematics"):
+
+        systematics_event = analysis.config.get("systematics", "event").split()
+
+        #systematics with weight
+
+        #create b-tagging systematics
+        for sdir in ["up", "down"]:
+            for syst in ["cferr1", "cferr2", "hf", "hfstats1", "hfstats2", "jes", "lf", "lfstats1", "lfstats2"]:
+                for tagger in ["CSV", "CMVAV2"]:
+                    bweight = "btagWeight{0}_{1}_{2}".format(tagger, sdir, syst)
+                    #make systematic outputs consistent in Up/Down naming
+                    sdir_cap = sdir.capitalize()
+                    systematic_weights += [
+                        ("CMS_ttH_{0}{1}{2}".format(tagger, syst, sdir_cap), lambda ev, bweight=bweight: ev["weight_nominal"]/ev["btagWeight"+tagger]*ev[bweight])
+                    ]
+                    btag_weights += [bweight]
+
+        systematic_weights += [
+                ("puUp", lambda ev: ev["weight_nominal"]/ev["puWeight"] * ev["puWeightUp"]),
+                ("puDown", lambda ev: ev["weight_nominal"]/ev["puWeight"] * ev["puWeightDown"])
+        ]
+
+
+    extra_vars =  ["topCandidate_fRec",
+                   "topCandidate_pt",
+                   "topCandidate_ptcal",
+                   "topCandidate_mass",
+                   "topCandidate_masscal",
+                   "topCandidate_n_subjettiness",
+                   "topCandidate_n_subjettiness_groomed",
+                
+                   "higgsCandidate_secondbtag_subjetfiltered", 
+                   "higgsCandidate_bbtag", 
+                   "higgsCandidate_tau1", 
+                   "higgsCandidate_tau2", 
+                   "higgsCandidate_mass", 
+                   "higgsCandidate_mass_softdropz2b1filt", 
+                   "higgsCandidate_sj12massb_subjetfiltered", 
+                   "higgsCandidate_sj12masspt_subjetfiltered", 
+                
+                   "multiclass_class",
+                   "multiclass_proba_ttb",
+                   "multiclass_proba_tt2b",
+                   "multiclass_proba_ttbb",
+                   "multiclass_proba_ttcc",
+                   "multiclass_proba_ttll"]
+
+    #create the event description
+    desc = Desc(
+        systematics_event,
+        [
+        Var(name="run"),
+        Var(name="lumi"),
+        Var(name="evt"),
+
+        Var(name="is_sl"),
+        Var(name="is_dl"),
+        Var(name="is_fh"),
+
+        Var(name="nfatjets"),
+        Var(name="fatjets_pt"),
+        Var(name="fatjets_eta"),
+        Var(name="fatjets_mass"),
+
+        Var(name="leps_pt"),
+        Var(name="leps_eta"),
+
+        Var(name="numJets", systematics="suffix"),
+        Var(name="nBCSVM", systematics="suffix"),
+        Var(name="nBCMVAM", systematics="suffix"),
+        
+        Var(name="Wmass", systematics="suffix"),
+
+        Var(name="btag_LR_4b_2b_btagCSV_logit",
+            nominal=Func("blr_CSV", func=lambda ev: logit(ev.btag_LR_4b_2b_btagCSV)),
+        ),
+        Var(name="btag_LR_4b_2b_btagCMVA_logit",
+            nominal=Func("blr_cMVA", func=lambda ev: logit(ev.btag_LR_4b_2b_btagCMVA)),
+        ),
+
+        Var(name="leps_pdgId", nominal=Func("leps_pdgId", func=lambda ev: [int(ev.leps_pdgId[i]) for i in range(ev.nleps)])),
+
+        Var(name="jets_p4",
+            nominal=Func(
+                "jets_p4",
+                func=lambda ev: [lv_p4s(ev.jets_pt[i], ev.jets_eta[i], ev.jets_phi[i], ev.jets_mass[i], ev.jets_btagCSV[i]) for i in range(ev.njets)]
+            ),
+            systematics = {
+                "CMS_scale_jUp": Func(
+                    "jets_p4_JESUp",
+                    func=lambda ev: [lv_p4s(ev.jets_pt[i]*float(ev.jets_corr_JESUp[i])/float(ev.jets_corr[i]), ev.jets_eta[i], ev.jets_phi[i], ev.jets_mass[i], ev.jets_btagCSV[i]) for i in range(ev.njets)]
+                ),
+                "CMS_scale_jDown": Func(
+                    "jets_p4_JESDown",
+                    func=lambda ev: [lv_p4s(ev.jets_pt[i]*float(ev.jets_corr_JESDown[i])/float(ev.jets_corr[i]), ev.jets_eta[i], ev.jets_phi[i], ev.jets_mass[i], ev.jets_btagCSV[i]) for i in range(ev.njets)]
+                ),
+                "CMS_res_jUp": Func(
+                    "jets_p4_JERUp",
+                    func=lambda ev: [lv_p4s(ev.jets_pt[i]*float(ev.jets_corr_JERUp[i])/float(ev.jets_corr_JER[i]) if ev.jets_corr_JER[i]>0 else 0.0, ev.jets_eta[i], ev.jets_phi[i], ev.jets_mass[i], ev.jets_btagCSV[i]) for i in range(ev.njets)]
+                ),
+                "CMS_res_jDown": Func(
+                    "jets_p4_JERDown",
+                    func=lambda ev: [lv_p4s(ev.jets_pt[i]*float(ev.jets_corr_JERDown[i])/float(ev.jets_corr_JER[i]) if ev.jets_corr_JER[i]>0 else 0.0, ev.jets_eta[i], ev.jets_phi[i], ev.jets_mass[i], ev.jets_btagCSV[i]) for i in range(ev.njets)]
+                )
+            }
+        ),
+
+        Var(name="mem_SL_0w2h2t_p",
+            nominal=Func("mem_p_SL_0w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_SL_0w2h2t_p/(ev.mem_tth_SL_0w2h2t_p + sf*ev.mem_ttbb_SL_0w2h2t_p) if getattr(ev,"mem_tth_SL_0w2h2t_p",0)>0 else 0.0),
+        ),
+        Var(name="mem_SL_1w2h2t_p",
+            nominal=Func("mem_p_SL_1w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_SL_1w2h2t_p/(ev.mem_tth_SL_1w2h2t_p + sf*ev.mem_ttbb_SL_1w2h2t_p) if getattr(ev,"mem_tth_SL_1w2h2t_p",0)>0 else 0.0),
+        ),
+        Var(name="mem_SL_2w2h2t_p",
+            nominal=Func("mem_p_SL_2w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_SL_2w2h2t_p/(ev.mem_tth_SL_2w2h2t_p + sf*ev.mem_ttbb_SL_2w2h2t_p) if getattr(ev,"mem_tth_SL_2w2h2t_p",0)>0 else 0.0),
+        ),
+        Var(name="mem_DL_0w2h2t_p",
+            nominal=Func("mem_p_DL_0w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_DL_0w2h2t_p/(ev.mem_tth_DL_0w2h2t_p + sf*ev.mem_ttbb_DL_0w2h2t_p) if getattr(ev,"mem_tth_DL_0w2h2t_p",0)>0 else 0.0),
+        ),
+        Var(name="mem_FH_4w2h2t_p",
+            nominal=Func("mem_p_FH_4w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_FH_4w2h2t_p/(ev.mem_tth_FH_4w2h2t_p + sf*ev.mem_ttbb_FH_4w2h2t_p) if getattr(ev,"mem_tth_FH_4w2h2t_p",0)>0 else 0.0),
+        ),
+        Var(name="mem_FH_3w2h2t_p",
+            nominal=Func("mem_p_FH_3w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_FH_3w2h2t_p/(ev.mem_tth_FH_3w2h2t_p + sf*ev.mem_ttbb_FH_3w2h2t_p) if getattr(ev,"mem_tth_FH_3w2h2t_p",0)>0 else 0.0),
+        ),
+        Var(name="mem_FH_4w2h1t_p",
+            nominal=Func("mem_p_FH_4w2h1t", func=lambda ev, sf=MEM_SF: ev.mem_tth_FH_4w2h1t_p/(ev.mem_tth_FH_4w2h1t_p + sf*ev.mem_ttbb_FH_4w2h1t_p) if getattr(ev,"mem_tth_FH_4w2h1t_p",0)>0 else 0.0),
+        ),
+        Var(name="mem_FH_0w0w2h2t_p",
+            nominal=Func("mem_p_FH_0w0w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_FH_0w0w2h2t_p/(ev.mem_tth_FH_0w0w2h2t_p + sf*ev.mem_ttbb_FH_0w0w2h2t_p) if getattr(ev,"mem_tth_FH_0w0w2h2t_p",0)>0 else 0.0),
+        ),
+        Var(name="mem_FH_0w0w2h1t_p",
+            nominal=Func("mem_p_FH_0w0w2h1t", func=lambda ev, sf=MEM_SF: ev.mem_tth_FH_0w0w2h1t_p/(ev.mem_tth_FH_0w0w2h1t_p + sf*ev.mem_ttbb_FH_0w0w2h1t_p) if getattr(ev,"mem_tth_FH_0w0w2h1t_p",0)>0 else 0.0),
+        ),
+
+        Var(name="HLT_ttH_DL_mumu", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_DL_mumu}),
+        Var(name="HLT_ttH_DL_elel", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_DL_elel}),
+        Var(name="HLT_ttH_DL_elmu", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_DL_elmu}),
+        Var(name="HLT_ttH_SL_el", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_SL_el}),
+        Var(name="HLT_ttH_SL_mu", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_SL_mu}),
+        Var(name="HLT_ttH_FH", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_FH}),
+
+        Var(name="lep_SF_weight", 
+            funcs_schema={"mc": lambda ev: calc_lepton_SF(ev), 
+                          "data": lambda ev: 1.0}),
+
+
+    #MC-only branches
+        Var(name="ttCls", schema=["mc"]),
+        Var(name="puWeight", schema=["mc"]),
+        Var(name="puWeightUp", schema=["mc"]),
+        Var(name="puWeightDown", schema=["mc"]),
+        Var(name="triggerEmulationWeight", schema=["mc"]),
+
+
+
+        #nominal b-tag weight, systematic weights added later
+        Var(name="btagWeightCSV", schema=["mc"]),
+        Var(name="btagWeightCMVAV2", schema=["mc"]),
+        ] +
+        [Var(name=bw, schema=["mc"]) for bw in btag_weights] + [Var(name=br) for br in extra_vars]
+    )
+
+    # Create the axes we want in the sparse histogram
+    # Axis we will want to have in all sparse histograms
+    axes_basic_all = [
+        Axis("process", 20, 0, 20, lambda ev: ev["process"]),
+        Axis("triggerPath", 20, 0, 20, lambda ev: ev["triggerPath"]),
+        Axis("counting", 1, 0, 1, lambda ev: ev["counting"]),
+        Axis("parity", 1, 0, 1, lambda ev: ev["evt"]%2==0),
+
+        Axis("numJets", 5, 3, 8, lambda ev: ev["numJets"]),
+        Axis("nBCSVM", 4, 1, 5, lambda ev: ev["nBCSVM"]),
+        Axis("nBCMVAM", 4, 1, 5, lambda ev: ev["nBCMVAM"]),
+
+        Axis("jetsByPt_0_pt", 50, 0, 400, lambda ev: ev["jets_p4"][0].Pt()),
+
+        Axis("common_bdt", 36, 0, 1, lambda ev: ev["common_bdt"]),
+        Axis("common_mem", 36, 0, 1, lambda ev: ev["common_mem"]),
+    ]
+
+    axes_basic_sl = [
+        Axis("mem_SL_2w2h2t_p", 36, 0, 1, lambda ev: ev["mem_SL_2w2h2t_p"]),
+        Axis("mem_SL_1w2h2t_p", 36, 0, 1, lambda ev: ev["mem_SL_1w2h2t_p"]),
+        Axis("mem_SL_0w2h2t_p", 36, 0, 1, lambda ev: ev["mem_SL_0w2h2t_p"]),
+
+        Axis("btag_LR_4b_2b_btagCSV_logit", 30, -5, 10, lambda ev: ev["btag_LR_4b_2b_btagCSV_logit"]),
+        Axis("btag_LR_4b_2b_btagCMVA_logit", 30, -5, 10, lambda ev: ev["btag_LR_4b_2b_btagCMVA_logit"]),
+
+        Axis("leps_0_pt", 50, 0, 300, lambda ev: ev["leps_pt"][0]),
+        Axis("leps_0_pdgId", 20, -0.5, 19.5, lambda ev: abs(ev["leps_pdgId"][0])),
+    ]
+
+    axes_basic_dl = [
+        Axis("mem_DL_0w2h2t_p", 36, 0, 1, lambda ev: ev["mem_DL_0w2h2t_p"]),
+
+        Axis("leps_0_pt", 50, 0, 300, lambda ev: ev["leps_pt"][0]),
+
+        Axis("leps_0_pdgId", 20, -0.5, 19.5, lambda ev: abs(ev["leps_pdgId"][0])),
+        Axis("leps_1_pdgId", 20, -0.5, 19.5, lambda ev: abs(ev["leps_pdgId"][1])),
+
+    ]
+     
+    axes_basic_fh = [
+        Axis("mem_FH_4w2h2t_p", 36, 0, 1, lambda ev: ev["mem_FH_4w2h2t_p"]),
+        Axis("mem_FH_3w2h2t_p", 36, 0, 1, lambda ev: ev["mem_FH_3w2h2t_p"]),
+        Axis("mem_FH_4w2h1t_p", 36, 0, 1, lambda ev: ev["mem_FH_4w2h1t_p"]),
+        Axis("mem_FH_0w0w2h2t_p", 36, 0, 1, lambda ev: ev["mem_FH_0w0w2h2t_p"]),
+        Axis("mem_FH_0w0w2h1t_p", 36, 0, 1, lambda ev: ev["mem_FH_0w0w2h1t_p"]),
+    ]
+
+    axes_extra_sl = [    
+        Axis("Wmass", 100, 50, 150, lambda ev: ev["Wmass"]),
+        
+        Axis("jetsByPt_1_pt", 50, 0, 400, lambda ev: ev["jets_p4"][1].Pt()),
+        Axis("jetsByPt_2_pt", 50, 0, 400, lambda ev: ev["jets_p4"][2].Pt()),
+
+        Axis("jetsByPt_0_btagCSV", 50, -1, 1, lambda ev: ev["jets_p4"][0].btagCSV),
+
+        Axis("jetsByPt_0_eta", 50, -2.5, 2.5, lambda ev: ev["jets_p4"][0].Eta()),
+        Axis("jetsByPt_1_eta", 50, -2.5, 2.5, lambda ev: ev["jets_p4"][1].Eta()),
+        Axis("jetsByPt_2_eta", 50, -2.5, 2.5, lambda ev: ev["jets_p4"][2].Eta()),
+
+        Axis("fatjetByPt_0_pt", 50, 0, 600, lambda ev: ev["fatjets_pt"][0] if ev["nfatjets"] else -100),
+        Axis("fatjetByPt_0_eta", 50, -2.5, 2.5, lambda ev: ev["fatjets_eta"][0] if ev["nfatjets"] else -100),
+        Axis("fatjetByPt_0_mass", 50, 0, 600, lambda ev: ev["fatjets_mass"][0] if ev["nfatjets"] else -100),
+
+        Axis("leps_0_eta", 50, -2.5, 2.5, lambda ev: ev["leps_eta"][0]),
+
+        Axis("topCandidate_fRec", 50, 0, 0.4, lambda ev: ev["topCandidate_fRec"][0] if len(ev["topCandidate_pt"]) else -100),
+        Axis("topCandidate_pt", 50, 150, 600, lambda ev: ev["topCandidate_pt"][0] if len(ev["topCandidate_pt"]) else -100),
+        Axis("topCandidate_ptcal", 50, 150, 600, lambda ev: ev["topCandidate_ptcal"][0] if len(ev["topCandidate_pt"]) else -100),
+        Axis("topCandidate_mass", 50, 0, 250, lambda ev: ev["topCandidate_mass"][0] if len(ev["topCandidate_pt"]) else -100),
+        Axis("topCandidate_masscal", 50, 0, 250, lambda ev: ev["topCandidate_masscal"][0] if len(ev["topCandidate_pt"]) else -100),
+        Axis("topCandidate_n_subjettiness", 50, 0, 1, lambda ev: ev["topCandidate_n_subjettiness"][0] if len(ev["topCandidate_pt"]) else -100),
+        Axis("topCandidate_n_subjettiness_groomed", 50, 0, 1, lambda ev: ev["topCandidate_n_subjettiness_groomed"][0] if len(ev["topCandidate_pt"]) else -100),
+
+        Axis("higgsCandidate_secondbtag_subjetfiltered", 50, -1,1, lambda ev: ev["higgsCandidate_secondbtag_subjetfiltered"][0] if len(ev["higgsCandidate_mass"]) else -100),
+        Axis("higgsCandidate_bbtag", 50, -1, 1, lambda ev: ev["higgsCandidate_bbtag"][0] if len(ev["higgsCandidate_mass"]) else -100),
+        Axis("higgsCandidate_tau1", 50, 0, 1, lambda ev: ev["higgsCandidate_tau1"][0] if len(ev["higgsCandidate_mass"]) else -100),
+        Axis("higgsCandidate_tau2", 50, 0, 1, lambda ev: ev["higgsCandidate_tau2"][0] if len(ev["higgsCandidate_mass"]) else -100),
+
+        Axis("higgsCandidate_mass", 50, 0, 200, lambda ev: ev["higgsCandidate_mass"][0] if len(ev["higgsCandidate_mass"]) else -100),
+        Axis("higgsCandidate_mass_softdropz2b1filt", 50, 0, 200, lambda ev: ev["higgsCandidate_mass_softdropz2b1filt"][0] if len(ev["higgsCandidate_mass"]) else -100),
+        Axis("higgsCandidate_sj12massb_subjetfiltered", 50, 0, 200, lambda ev: ev["higgsCandidate_sj12massb_subjetfiltered"][0] if len(ev["higgsCandidate_mass"]) else -100),
+        Axis("higgsCandidate_sj12masspt_subjetfiltered", 50, 0, 200, lambda ev: ev["higgsCandidate_sj12masspt_subjetfiltered"][0] if len(ev["higgsCandidate_mass"]) else -100),
+
+        Axis("multiclass_class", 7, -0.5, 6.5, lambda ev:     ev["multiclass_class"]),
+        Axis("multiclass_proba_ttb", 40, 0, 0.7, lambda ev:   ev["multiclass_proba_ttb"]),
+        Axis("multiclass_proba_tt2b", 40, 0, 0.7, lambda ev:  ev["multiclass_proba_tt2b"]),
+        Axis("multiclass_proba_ttbb", 40, 0, 0.7, lambda ev:  ev["multiclass_proba_ttbb"]),
+        Axis("multiclass_proba_ttcc", 40, 0, 0.7, lambda ev:  ev["multiclass_proba_ttcc"]),
+        Axis("multiclass_proba_ttll", 40, 0, 0.7,  lambda ev: ev["multiclass_proba_ttll"]),
+
+    ]
+
+    axes_extra_dl = []
+    axes_extra_fh = []
+
+    # DEFINE SL AXES
+    axes_sl = axes_basic_all + axes_basic_sl
+    if analysis.config.get("sparsinator", "extra_sl"):
+            axes_sl += axes_extra_sl
+
+    # DEFINE DL AXES
+    axes_dl = axes_basic_all + axes_basic_dl
+    if analysis.config.get("sparsinator", "extra_dl"):
+        axes_dl += axes_extra_dl
+
+    # DEFINE FH AXES
+    axes_fh = axes_basic_all + axes_basic_fh
+    if analysis.config.get("sparsinator", "extra_fh"):
+        axes_fh += axes_extra_fh
+
+    AXES = {
+        "sl": axes_sl,
+        "dl": axes_dl,
+        "fh": axes_fh,
+    }
+
+
     if len(file_names) == 0:
         raise Exception("No files specified, probably a mistake")
     if max_events == 0:
@@ -641,11 +683,13 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
     
     #configure systematic scenarios according to MC/Data
     if schema == "mc":
-        systematics_event = ["nominal"] + SYSTEMATICS_EVENT
+        systematics_event = ["nominal"] + systematics_event
         systematics_weight = [k[0] for k in systematic_weights]
     elif schema == "data":
         systematics_event = ["nominal"]
         systematics_weight = []
+
+    all_systematics = systematics_event+systematics_weight
    
     dirs = {}
     outfile = ROOT.TFile(ofname, "RECREATE")
@@ -656,12 +700,13 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
     dirs["fh"] = dirs["sample"].mkdir("fh")
     
     #pre-create output histograms
-    outdict_syst = createOutputs(dirs, systematics_event+systematics_weight)
+    outdict_syst = createOutputs(analysis.config, AXES, dirs, all_systematics)
 
     nevents = 0
     counters = OrderedDict()
     counters["triggerPath"] = {}
 
+    #Main loop
     for file_name in file_names:
         print("opening {0}".format(file_name))
         tf = ROOT.TFile.Open(file_name)
@@ -671,6 +716,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
        
         iEv = 0
 
+        #Loop over events
         for event in events:
             nevents += 1
             iEv += 1
@@ -760,5 +806,5 @@ if __name__ == "__main__":
         sample = "ttHTobb_M125_13TeV_powheg_pythia8"
         skip_events = 0
         max_events = 5000
-        an_name, analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/Plotting/python/Datacards/config_sl.cfg")
+        an_name, analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/Plotting/python/Datacards/config_sldl.cfg")
     main(analysis, file_names, sample, "out.root", skip_events, max_events)
