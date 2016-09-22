@@ -3,6 +3,7 @@
 ########################################
 
 import sys
+import pdb
 from copy import deepcopy
 from itertools import izip
 
@@ -81,8 +82,9 @@ def analysisFromConfig(config_file_path):
     lumi = dict([(k, float(v)) for (k, v) in config.items("lumi")])
     blr_cuts = dict([(k, float(v)) for (k, v) in config.items("blr_cuts")])
 
-    do_stat_variations = bool(config.get("general", "do_stat_variations"))
-    do_fake_data = bool(config.get("general", "do_fake_data"))
+    
+    do_stat_variations = config.getboolean("general", "do_stat_variations")    
+    do_fake_data = config.getboolean("general", "do_fake_data")
     DEBUG = config.getboolean("general", "debug")
 
     ########################################

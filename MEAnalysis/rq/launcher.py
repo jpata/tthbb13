@@ -19,6 +19,9 @@ from TTH.MEAnalysis.samples_base import getSitePrefix, chunks
 from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
 from TTH.Plotting.Datacards.AnalysisSpecificationClasses import Analysis
 from TTH.Plotting.Datacards import MakeCategory
+from TTH.Plotting.Datacards import MakeLimits
+
+
 
 import pdb
 
@@ -133,6 +136,7 @@ def getGeneratedEvents(sample):
                 args=(inputs, ),
                 timeout=60*10,
                 result_ttl=86400,
+                meta={"retries": 0}
             )
         ]
     logger.debug("getGeneratedEvents: {0} jobs launched for sample {1}".format(len(jobs), sample.name))
@@ -182,7 +186,7 @@ if __name__ == "__main__":
     logger.info("starting workflow {0}".format(workflow_id))
 
 
-    starting_points = ["ngen", "sparse", "categories", "plots"]
+    starting_points = ["ngen", "sparse", "categories", "plots", "limits"]
                        
 
     # Tell RQ what Redis connection to use
@@ -331,15 +335,7 @@ if __name__ == "__main__":
 
         os.makedirs("{0}/categories".format(workdir))
 
-        #all_jobs = []
-        #cats_by_name = {}
-        #for cat in analysis_cfg.categories:
-        #    if not cats_by_name.has_key(cat.name):
-        #        cats_by_name[cat.name] = []
-        #    cats_by_name[cat.name] += [cat]
-
-        all_jobs = []
-        
+        all_jobs = []        
         for cat in analysis_cfg.categories:
 
             os.makedirs("{0}/categories/{1}/{2}".format(workdir, cat.name, cat.discriminator))        
@@ -367,17 +363,25 @@ if __name__ == "__main__":
         cat_names = list(set([cat.name for cat in analysis_cfg.categories]))        
 
         for cat_name in cat_names:                                                        
-            print "hadd-ing", cat_name
+            logger.info("hadd-ing: {0}".format(cat_name))
             
             process = subprocess.Popen( "hadd {0}/categories/{1}.root {0}/categories/{1}/*/*.root".format(workdir, cat_name),
                                         shell=True,
                                         stdout=subprocess.PIPE)
             process.communicate()
-                        
-        # TODO: Also move text files in the right place
-        # needed for limit setting!
+
+        # move the shape text files into the right place
+        process = subprocess.Popen( "mv {0}/categories/*/*/*.txt {0}/categories/".format(workdir),
+                                    shell=True,
+                                    stdout=subprocess.PIPE)        
+
+        # and tidy up
+        for cat_name in cat_names:                                                                
+            shutil.rmtree("{0}/categories/{1}".format(workdir, cat_name))
 
         results["categories-path"] = "{0}/categories".format(workdir)
+
+        logger.info("done with post processing CATEGORIES")
         
     else:        
         logger.info("skipping step CATEGORIES")
@@ -423,3 +427,41 @@ if __name__ == "__main__":
 
     else:        
         logger.info("skipping step PLOTS")
+
+
+    ###
+    ### LIMITS
+    ###
+        
+    if starting_points.index(starting_point) <= starting_points.index("limits"):
+
+        logger.info("starting step LIMITS")
+
+        # Limits are based on categories
+        # copy categories to the right place
+        shutil.copytree(results["categories-path"], "{0}/limits".format(workdir))
+
+        # Add individual limits for all categories
+        for cat in analysis_cfg.categories:            
+            if cat.do_limit:                
+                analysis_cfg.groups[cat.name] = [cat]
+        
+        # Prepare jobs
+        all_jobs = []
+        for group in analysis_cfg.groups.keys():                        
+            all_jobs += [
+                qmain.enqueue_call(
+                    func=MakeLimits.main,
+                    args=["{0}/limits".format(workdir),
+                          analysis_cfg, 
+                          group],
+                    timeout=40*60,
+                    result_ttl=86400,
+                    meta={"retries": 0})]
+            
+        t0 = time.time()
+        waitJobs(all_jobs)
+        t1 = time.time()
+        time.sleep(5)
+        dt = t1 - t0
+        logger.info("step LIMITS done in {0:.2f} seconds".format(dt))
