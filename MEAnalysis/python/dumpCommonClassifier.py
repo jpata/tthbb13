@@ -81,8 +81,6 @@ if __name__ == "__main__":
         jets_btag = []
         jets_csv = []
         jets_cmva = []
-        jets_matchFlag = []
-        jets_hadronFlavour = []
         for ijet in range(ev.njets)[:max_jets]:
             p4 = [
                 ev.jets_pt[ijet],
@@ -94,8 +92,6 @@ if __name__ == "__main__":
             jets_btag += [ev.jets_btagFlag[ijet]]
             jets_csv += [ev.jets_btagCSV[ijet]]
             jets_cmva += [ev.jets_btagCMVA[ijet]]
-            jets_hadronFlavour += [ev.jets_hadronFlavour[ijet]]
-            jets_matchFlag += [ev.jets_matchFlag[ijet]]
 
             scale_factors = [
                 (0, 1.0),

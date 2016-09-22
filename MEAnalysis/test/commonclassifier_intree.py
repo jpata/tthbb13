@@ -12,17 +12,17 @@ process += [Scalar("met_pt", "float"), Scalar("met_phi", "float")]
 
 max_leps = 2
 process += [
-    Dynamic1DArray("leps_{0}".format(x), "float", "nleps", max_leps)
+    Dynamic1DArray("lep_{0}".format(x), "float", "nleps", max_leps)
     for x in ["pt", "eta", "phi", "mass", "charge"]
 ]
 
 max_jets = 10
 process += [
-    Dynamic1DArray("jets_{0}".format(x), "float", "njets", max_jets)
+    Dynamic1DArray("jet_{0}".format(x), "float", "njets", max_jets)
     for x in ["pt", "eta", "phi", "mass", "csv", "cmva"]
 ]
 
 process += [
-    Dynamic1DArray("jets_{0}".format(x), "int", "njets", max_jets)
+    Dynamic1DArray("jet_{0}".format(x), "int", "njets", max_jets)
     for x in ["type"]
 ]
