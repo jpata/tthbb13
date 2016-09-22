@@ -182,6 +182,8 @@ if __name__ == "__main__":
 
     lines = infile.readlines()
 
+    lines.insert(0, "//created with {0}\n".format(" ".join(sys.argv)))
+
     def insert_to(key_string, added_lines):
         i = 0
         for li in lines:
