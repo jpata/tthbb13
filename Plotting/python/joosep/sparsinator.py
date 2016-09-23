@@ -13,6 +13,53 @@ from TTH.Plotting.Datacards.sparse import save_hdict
 
 from TTH.CommonClassifier.db import ClassifierDB
 
+class BufferedTree:
+    """Class with buffered access
+    
+    Attributes:
+        branches (dict string->branch): TTree branches
+        buf (dict string->data): The buffer, according to branch name
+        iEv (int): Current event
+        maxEv (int): maximum number of events in the TTree
+        tree (TTree): Underlying TTree
+    """
+    def __init__(self, tree):
+        self.tree = tree
+        self.branches = {}
+        for br in self.tree.GetListOfBranches():
+            self.branches[br.GetName()] = br
+        self.buf = {}
+        self.iEv = 0
+        self.maxEv = int(self.tree.GetEntries())
+        
+    def __getattr__(self, attr):
+        if self.branches.has_key(attr):
+            if self.buf.has_key(attr):
+                return self.buf[attr]
+            else:
+                val = getattr(self.tree, attr)
+                self.buf[attr] = val
+                return val
+        else:
+            raise KeyError(
+                "Could not find key={0}".format(attr)
+            )
+    
+    def __iter__(self):
+        return self
+    
+    def next(self):
+        if self.iEv > self.maxEv:
+            raise StopIteration
+        self.buf = {}
+        self.iEv += 1
+        self.tree.GetEntry(self.iEv)
+        return self
+
+    def GetEntries(self):
+        return self.tree.GetEntries()
+
+
 def assign_process_label(process, event):
     """ In case the you need to decide which process an event falls into based on the event itself.
 
@@ -710,8 +757,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
     for file_name in file_names:
         print("opening {0}".format(file_name))
         tf = ROOT.TFile.Open(file_name)
-        events = tf.Get("tree")
-        print("opened {0}".format(events))
+        events = BufferedTree(tf.Get("tree"))
         print("looping over {0} events".format(events.GetEntries()))
        
         iEv = 0

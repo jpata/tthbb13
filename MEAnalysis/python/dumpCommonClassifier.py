@@ -58,8 +58,8 @@ if __name__ == "__main__":
         tree.var(v, type=int, storageType="L")
 
     for iEv, ev in enumerate(ch):
-        accept = (ev.is_sl and ev.njets >= 4 and ev.nBCSVM >= 3)
-        accept = accept or (ev.is_dl and ev.njets >= 4 and ev.nBCSVM >= 3)
+        accept = (ev.is_sl and ev.njets >= 4 and (ev.nBCSVM >= 3 or ev.nBCMVAM >= 3))
+        accept = accept or (ev.is_dl and ev.njets >= 4 and (ev.nBCSVM >= 3 or ev.nBCMVAM >= 3))
         if not accept:
             continue
        
@@ -76,7 +76,7 @@ if __name__ == "__main__":
             ]
             leps_p4 += [p4]
             leps_charge += [math.copysign(1, ev.leps_pdgId[ilep])]
-         
+        
         jets_p4 = []
         jets_btag = []
         jets_csv = []
@@ -117,7 +117,7 @@ if __name__ == "__main__":
                         (3, 1.0),
                         (4, 1.0),
                     ]
-        
+
         for syst_idx, sf in scale_factors:
             jets_p4_rescaled = []
             for p4 in jets_p4:

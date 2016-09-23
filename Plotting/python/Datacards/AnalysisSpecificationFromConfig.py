@@ -5,10 +5,9 @@
 import sys
 import pdb
 from copy import deepcopy
-from itertools import izip
 
 from TTH.MEAnalysis.samples_base import xsec
-from TTH.Plotting.Datacards.AnalysisSpecificationClasses import Sample, Process, DataProcess, Category, Analysis, make_csv_categories_abstract, make_csv_groups_abstract
+from TTH.Plotting.Datacards.AnalysisSpecificationClasses import Cut, Sample, Process, DataProcess, Category, Analysis, pairwise, triplewise, make_csv_categories_abstract, make_csv_groups_abstract
 from TTH.Plotting.joosep.sparsinator import PROCESS_MAP, TRIGGERPATH_MAP
 from TTH.MEAnalysis import samples_base
 
@@ -17,25 +16,25 @@ from TTH.MEAnalysis import samples_base
 # Helper Functions
 ########################################
 
-# From:
-# http://stackoverflow.com/questions/5389507/iterating-over-every-two-elements-in-a-list
-def pairwise(iterable):
-    "s -> (s0, s1), (s2, s3), (s4, s5), ..."
-    a = iter(iterable)
-    return izip(a, a)
-
-def triplewise(iterable):
-    "s -> (s0, s1, s2), (s3, s4, s5), (s5, s6, s7), ..."
-    a = iter(iterable)
-    return izip(a, a, a)
-
 #For tt+jets, we need to apply the selection that splits the processes into
 #different tt+jets categories (ttbarPlusBBbar, ttbarPlusCCbar etc)
 def processCut(proc):
     n = PROCESS_MAP[proc]
     return ("process", n, n+1)
 
-def splitByTriggerPath(processes, lumi):
+def processCutTree(proc):
+    if proc == "ttbarPlusB":
+        return "(ttCls == 51)"
+    elif proc == "ttbarPlus2B":
+        return "(ttCls == 52)"
+    elif proc == "ttbarPlusBBbar":
+        return "(ttCls >= 53)"
+    elif proc == "ttbarPlusCCbar":
+        return "(ttCls >= 41 && ttCls <= 45)"
+    elif proc == "ttbarOther":
+        return "(ttCls == 0)"
+
+def splitByTriggerPath(processes, lumi, cuts_dict):
     """
     Given a list of processes, add a cut on a trigger path (SLmu, SLele etc)
     and normalize to the given luminosity.
@@ -56,7 +55,7 @@ def splitByTriggerPath(processes, lumi):
                 input_name = proc.input_name,
                 output_name = proc.output_name,
                 xs_weight = _lumis[name] * proc.xs_weight,
-                cuts = proc.cuts + [("triggerPath", trigpath, trigpath+1)]
+                cuts = proc.cuts + [cuts_dict["triggerPath_{0}".format(name)]]
             )
             out += [newproc]
     return out
@@ -99,6 +98,19 @@ def analysisFromConfig(config_file_path):
 
     samples_dict = dict([(sample.name, sample) for sample in samples])
 
+
+    ########################################
+    # Cuts
+    ########################################
+
+    cuts_list = config.get("cuts","cuts_list").split()
+    cuts = []
+    for cut_name in cuts_list:
+        cut = Cut.fromConfigParser(config, cut_name)
+        cuts += [cut]
+
+    cuts_dict = dict([(cut.name, cut) for cut in cuts])
+
     ########################################
     # Processes
     ########################################
@@ -118,12 +130,9 @@ def analysisFromConfig(config_file_path):
             # Build cuts..
             cuts = []
             # ..Process Cut
-            if config.has_option(process, "process_cut"):
-                cuts += [processCut( config.get(process, "process_cut"))]
-            # ..Other cuts
             if config.has_option(process, "cuts"):
-                for cut_name, lower, upper in triplewise(config.get(process,"cuts").split()):
-                    cuts.append( (cut_name, int(lower), int(upper)) )
+                for cut in config.get(process,"cuts").split():
+                    cuts.append(cuts_dict[cut])
 
             # DATA
             if is_data == "True":
@@ -144,7 +153,11 @@ def analysisFromConfig(config_file_path):
         # End loop over processes
 
         if config.get(process_list, "split_by_trigger_path") == "True":
-            process_lists[process_list] = splitByTriggerPath(process_lists[process_list], lumi)    
+            process_lists[process_list] = splitByTriggerPath(
+                process_lists[process_list],
+                lumi,
+                cuts_dict
+            )    
     # End loop over processes lists
 
     # Prepare the process list for the analysis object
@@ -240,6 +253,7 @@ def analysisFromConfig(config_file_path):
         config = config,
         debug = DEBUG,
         samples = samples,
+        cuts = cuts_dict,
         processes = processes,
         categories = cats,
         sparse_input_file = input_file,

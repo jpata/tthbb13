@@ -36,9 +36,15 @@ def make_rule_cut(basehist, category):
     """
     rules = []
     for proc in category.processes:
+        cuts = []
+        cuts += category.cuts
+        for c in proc.cuts:
+            cuts += c.sparsinator
+        print cuts
+
         d = {
             "input": "{0}/{1}".format(proc.input_name, basehist),
-            "cuts": str(category.cuts + proc.cuts),
+            "cuts": str(cuts),
             "project": str([(category.discriminator, category.rebin)]),
             "output": "{0}/{1}/{2}".format(proc.output_name, category.name, category.discriminator),
             "xs_weight": proc.xs_weight
@@ -55,9 +61,14 @@ def make_rule_cut(basehist, category):
                 rules += [d2]
 
     for proc in category.data_processes:
+        cuts = []
+        cuts += category.cuts
+        for c in proc.cuts:
+            cuts += c.sparsinator
+        print cuts
         d = {
             "input": "{0}/{1}".format(proc.input_name, basehist),
-            "cuts": str(category.cuts + proc.cuts),
+            "cuts": str(cuts),
             "project": str([(category.discriminator, category.rebin)]),
             "output": "{0}/{1}/{2}".format(proc.output_name, category.name, category.discriminator),
             "xs_weight": 1.0
@@ -288,21 +299,9 @@ def main(analysis, categories, outdir=".", ncores=1):
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     
-    logging.info("importing default analysis specification")
-    from TTH.Plotting.Datacards.AnalysisSpecification import analyses as analyses
-
     import argparse
     parser = argparse.ArgumentParser(
         description='Creates datacards in categories based on a sparse histogram'
-    )
-    parser.add_argument(
-        '--anspec',
-        action="store",
-        help="path to file containing analysis specification",
-        default=os.path.join(
-            os.environ["CMSSW_BASE"],
-            "src/TTH/Plotting/python/Datacards/AnalysisSpecification.py"
-        ),
     )
     parser.add_argument(
         '--ncores',
@@ -312,10 +311,9 @@ if __name__ == "__main__":
         type=int
     )
     parser.add_argument(
-        '--analysis',
+        '--config',
         action="store",
-        help="name of analysis or glob pattern",
-        default="*",
+        help="Analysis configuration",
         type=str
     )
     parser.add_argument(
@@ -328,18 +326,14 @@ if __name__ == "__main__":
         '--outdir',
         action="store",
         help="per-analsyis output directory (will be created)",
-        default=r"{analysis}",
     )
+
+    from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
     args = parser.parse_args()
-    matched_analyses = [an for an in analyses.keys() if fnmatch.fnmatch(an, args.analysis)]
-    if len(matched_analyses) == 0:
-        raise Exception("No matched analyses")
-        
-    for analysis_name in matched_analyses:
-        outdir = args.outdir.format(analysis=analysis_name)
-        logging.info("__main__: analysis {0} to dir {1}".format(analysis_name, outdir))
-        if not os.path.isdir(outdir):
-            os.makedirs(outdir)
-        analysis, categories = get_categories(args.anspec, analysis_name, args.category)
-        main(analysis, categories, outdir=outdir, ncores=args.ncores)
-    
+    an_name, analysis = analysisFromConfig(args.config)
+
+    categories = [
+        c for c in analysis.categories if fnmatch.fnmatch(c.name, args.category)
+    ]
+
+    main(analysis, categories, outdir=".", ncores=args.ncores)

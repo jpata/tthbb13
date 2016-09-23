@@ -5,4 +5,3 @@ cd $DIR
 
 #run the database server
 redis-server redis.conf
-

@@ -51,7 +51,6 @@ procs = [x[0] for x in procs_names]
 
 syst_pairs = []
 
-
 def get_base_plot(basepath, outpath, analysis, category, variable):
     s = "{0}/{1}/{2}".format(basepath, analysis, category)
     return {
@@ -77,7 +76,7 @@ def get_base_plot(basepath, outpath, analysis, category, variable):
 
 
 
-def waitJobs(jobs, num_retries=3):
+def waitJobs(jobs, num_retries=0):
     done = False
     istep = 0
     perm_failed = []
@@ -86,10 +85,11 @@ def waitJobs(jobs, num_retries=3):
         logger.debug("queues: main({0}) failed({1})".format(len(qmain), len(qfail)))
         logger.debug("--- all")
         for job in jobs:
-            logger.debug("id={0} status={1} meta={2}".format(job.id, job.status, job.meta))
+            #logger.debug("id={0} status={1} meta={2}".format(job.id, job.status, job.meta))
             if job.status == "failed":
                 if job.meta["retries"] < num_retries:
                     job.meta["retries"] += 1
+                    logger.debug("requeueing job {0}".format(job.id))
                     qfail.requeue(job.id)
                 else:
                     perm_failed += [job]
@@ -122,6 +122,7 @@ def waitJobs(jobs, num_retries=3):
         sys.stdout.write("\033[F") # Cursor up one line
 
         istep += 1
+
     if workflow_failed:
         raise Exception("workflow failed, see errors above")
     results = [j.result for j in jobs]
@@ -139,7 +140,7 @@ def getGeneratedEvents(sample):
                 meta={"retries": 0}
             )
         ]
-    logger.debug("getGeneratedEvents: {0} jobs launched for sample {1}".format(len(jobs), sample.name))
+    logger.info("getGeneratedEvents: {0} jobs launched for sample {1}".format(len(jobs), sample.name))
     return jobs
 
 def mergeFiles(outfile, infiles, remove_inputs=True):
@@ -175,7 +176,7 @@ def runSparsinator_async(analysis, sample, workdir):
                 meta={"retries": 0}
             )
         ]
-    logger.debug("runSparsinator: {0} jobs launched for sample {1}".format(len(jobs), sample.name))
+    logger.info("runSparsinator: {0} jobs launched for sample {1}".format(len(jobs), sample.name))
     return jobs
 
 if __name__ == "__main__":
