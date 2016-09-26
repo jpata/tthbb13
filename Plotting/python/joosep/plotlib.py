@@ -39,7 +39,7 @@ colors = {
     "ttbarPlus2B": (80, 0, 0),
     "ttH": (44, 62, 167),
     "ttH_hbb": (44, 62, 167),
-    "ttH_nonhbb": (39, 57, 162),
+    "ttH_nonhbb": (90, 115, 203),
     "diboson": (42, 100, 198),
     "wjets": (102, 201, 77),
     "stop": (235, 73, 247),
@@ -670,36 +670,66 @@ def get_cut_at_eff(h, eff):
     idx = np.searchsorted(bins, eff)
     return idx
 
-def brazilplot(lims, ks, knames):
-    ax = plt.axes()
-    ls = []
-    errs = np.zeros((len(ks), 4))
+def brazilplot(limits, categories, category_names, axes=None):
+    """Draws the a set of limits on a brazil plot
+    
+    Args:
+        limits (dict of string->(lim, error): the actual limit data, as from CombineHelper:get_limits
+        categories (list of string): the categories (dict keys) to draw
+        category_names (list of string): The beautified names of the categories, in the same order as categories
+        axes (None, optional): the pyplot axes to use
+    
+    Returns:
+        TYPE: nothing
+    """
+    if not axes:
+        ax = plt.axes()
+    
+    central_limits = []
+    errs = np.zeros((len(categories), 4))
+
+    #fill in the data
     i = 0
-    for k in ks:
-        l = lims[k][0][2]
-        ls += [l]
+    for k in categories:
+        
+        #central value
+        central_limits += [lims[k][0][2]]
+      
+        #error band
         errs[i,0] = lims[k][0][1]
         errs[i,1] = lims[k][0][3]
         errs[i,2] = lims[k][0][0]
         errs[i,3] = lims[k][0][4]
-        #print k, ls[i], errs[i,0], errs[i,1]
+        
         i += 1
-    #print ls
-    ys = np.array(range(len(ks)))
-    for y, l, e1, e2, e3, e4 in zip(ys, ls, errs[:, 0], errs[:, 1], errs[:, 2], errs[:, 3]):
+    
+    #y coordinates
+    ys = np.array(range(len(categories)))
+
+    #draw points
+    for y, l, e1, e2, e3, e4 in zip(ys, central_limits, errs[:, 0], errs[:, 1], errs[:, 2], errs[:, 3]):
+        
+        #black line
         ax.add_line(plt.Line2D([l, l], [y, y+1.0], lw=2, color="black", ls="-"))
-        #print l, y
-        plt.text(l*1.1, y+0.5, "{0:.2f}".format(l), horizontalalignment="left", verticalalignment="center")
+        
+        #value
+        plt.text(l*1.05, y+0.5, "{0:.2f}".format(l), horizontalalignment="left", verticalalignment="center")
+        
+        #error bars
         ax.barh(y+0.1, (e4-e3), left=e3, color=np.array([254, 247, 2])/255.0, lw=0)
         ax.barh(y+0.1, (e2-e1), left=e1, color=np.array([51, 247, 2])/255.0 , lw=0)
-    plt.xlim(0, len(ks))
+        
+    #set ranges
+    plt.xlim(0, 1.2*max(central_limits))
     plt.ylim(ys[0], ys[-1]+1)
-    plt.yticks(ys+0.5, knames, verticalalignment="center", fontsize=18, ha="left")
+    
+    #set category names
+    plt.yticks(ys+0.5, category_names, verticalalignment="center", fontsize=18, ha="right")
     plt.xlabel("$\mu$")
     yax = ax.get_yaxis()
     # find the maximum width of the label on the major ticks
-    pad = 200
-    yax.set_tick_params(pad=pad)
+    #pad = 150
+    #yax.set_tick_params(pad=pad)
 
     #plt.grid()
 

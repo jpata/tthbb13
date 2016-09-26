@@ -13,27 +13,20 @@ tth_sel = [
 ]
 
 #ttbar heavy-light classification
+presel = "is_sl && numJets>=6"
 ttjets_sel = [
-    ("ttb", "ttCls == 51"),
-    ("tt2b", "ttCls == 52"),
-    ("ttbb", "ttCls == 53 || ttCls == 54 || ttCls == 55 || ttCls==56"),
-    #("ttbb", "ttCls == 53"),
-    #("ttb2b", "ttCls == 54"),
-    #("tt2b2b", "ttCls == 55"),
+    ("ttb", "ttCls == 51 && " + presel),
+    ("tt2b", "ttCls == 52 && " + presel),
+    ("ttbb", "(ttCls == 53 || ttCls == 54 || ttCls == 55 || ttCls==56) && " + presel),
 
-    ("ttcc", "(ttCls == 41 || ttCls == 42 || ttCls == 43 || ttCls == 44 || ttCls == 45)"),
-    #("ttc", "ttCls == 41"),
-    #("tt2c", "ttCls == 42"),
-    #("ttcc", "ttCls == 43"),
-    #("ttc2c", "ttCls == 44"),
-    #("tt2c2c", "ttCls == 45"),
-    ("ttll", "ttCls == 0 || ttCls<0")
+    ("ttcc", "(ttCls == 41 || ttCls == 42 || ttCls == 43 || ttCls == 44 || ttCls == 45) && " + presel),
+    ("ttll", "(ttCls == 0 || ttCls<0) && " + presel)
 ]
 
 
 #list of filename -> selection that you want to project
 inf = [
-    ("/scratch/joosep/ttjets_big.root", ttjets_sel),
+    ("/Volumes/Samsung_T3/tth_data/Jul6_leptonic_nome_v1/Jul6_leptonic_nome_v1__TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root", ttjets_sel),
 ]
 
 def chunks(l, n):
@@ -59,8 +52,10 @@ def SelectTree_par(args):
     return SelectTree(*args)
 
 import multiprocessing, os
-from TTH.TTHNtupleAnalyzer.ParHadd import hadd 
-pool = multiprocessing.Pool(40)
+#from TTH.TTHNtupleAnalyzer.ParHadd import hadd 
+def hadd(args):
+    os.system("hadd {0} {1}".format(args[0], " ".join(args[1:])))
+#pool = multiprocessing.Pool(1)
 
 for infile, cuts in inf:
     tf = ROOT.TFile(infile)
@@ -78,7 +73,7 @@ for infile, cuts in inf:
             arglist += [(infile, _ofn, "tree", cut, ch[0], len(ch))] 
             ichunk += 1 
         print "mapping", infile, cn
-        pool.map(SelectTree_par, arglist)
+        map(SelectTree_par, arglist)
         print "Merging to", outfile
         hadd((outfile, filenames))
         for fn in filenames:
