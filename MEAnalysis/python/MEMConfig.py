@@ -18,6 +18,7 @@ class MEMConfig:
 
         #Specify the MEM precision.
         self.cfg.defaultCfg(conf.mem["n_integration_points_mult"])
+        self.cfg.save_permutations = True
 
         self.b_quark_candidates = lambda event: event.selected_btagged_jets_high
         self.l_quark_candidates = lambda event: event.wquark_candidate_jets
@@ -41,22 +42,22 @@ class MEMConfig:
         return s
     def __repr__(self):
         return str(self)
-    def configure_btag_pdf(self, conf):
-        """
-        Add the jet b-tag discriminator distributions to the MEM::MEMConfig object.
-        The distributions are 3D in (pt, |eta|, CSV).
-        """
-        #btag_map = CmapDistributionTypeTH1F()
+    #def configure_btag_pdf(self, conf):
+    #    """
+    #    Add the jet b-tag discriminator distributions to the MEM::MEMConfig object.
+    #    The distributions are 3D in (pt, |eta|, CSV).
+    #    """
+    #    #btag_map = CmapDistributionTypeTH1F()
 
-        for x,y in [
-            ("b", MEM.DistributionType.csv_b),
-            ("c", MEM.DistributionType.csv_c),
-            ("l", MEM.DistributionType.csv_l),
-        ]:
-            self.cfg.add_distribution_global(
-                y,
-                conf.BTagLRAnalyzer.csv_pdfs[(x, "pt_eta")]
-            )
+    #    for x,y in [
+    #        ("b", MEM.DistributionType.csv_b),
+    #        ("c", MEM.DistributionType.csv_c),
+    #        ("l", MEM.DistributionType.csv_l),
+    #    ]:
+    #        self.cfg.add_distribution_global(
+    #            y,
+    #            conf.BTagLRAnalyzer.csv_pdfs[(x, "pt_eta")]
+    #        )
 
     def configure_transfer_function(self, conf):
         for nb in [0, 1]:

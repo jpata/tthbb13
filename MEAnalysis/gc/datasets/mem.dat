@@ -1,0 +1,5 @@
+[tth]
+/mnt/t3nfs01/data01/shome/jpata/tth/sw/CMSSW/src/TTH/MEAnalysis/gc/datasets/mem/tth_small.dat = 5000
+
+[ttjets]
+/mnt/t3nfs01/data01/shome/jpata/tth/sw/CMSSW/src/TTH/MEAnalysis/gc/datasets/mem/ttjets.dat = 4605

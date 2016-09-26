@@ -51,12 +51,10 @@ def Make_config(do_subjets=False):
     config['input_tree_name'] = 'vhbb/tree'
 
     #the path to the root files
-    config["root_file_base"] = samples_base.getSitePrefix()
-    #config["root_file_base"] = 'file:///hdfs/cms/'
-    #config["root_file_base"] = "dcap:///pnfs/psi.ch/cms/trivcat/"
+    config["root_file_base"] = samples_base.site_prefix
 
     # The config file will be copied to 'runs/{config['run_name']}'
-    config['run_name'] = samples.version
+    config['run_name'] = "Sep13_pilot_v1"
     if do_subjets:
         config['run_name'] += "_subjet"
     else:
@@ -172,7 +170,7 @@ def Make_config(do_subjets=False):
     ########################################
 
     f = open( 'cfg_outputtree.dat', 'wb' )
-    json.dump( config , f, indent=2)
+    json.dump( config , f, indent=2, encoding="ascii", ensure_ascii=True)
     f.close()
     
     

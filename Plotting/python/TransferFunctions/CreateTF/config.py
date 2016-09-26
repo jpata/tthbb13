@@ -51,7 +51,7 @@ def Make_config(tf_gc_path, filename):
     # I/O information
     ########################################
 
-    config['input_root_file_name'] = '{0}/{1}/*.root'.format(tf_gc_path, filename)
+    config['input_root_file_name'] = '{0}/{1}.root'.format(tf_gc_path, filename)
 
     config['input_tree_name'] = 'tree'
 
@@ -356,10 +356,10 @@ def Make_config(tf_gc_path, filename):
 def main():
 
     # !!! Change this line to point to output from make_TF.sh gridcontrol run !!!
-    path = "root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat///store/user/gregor/tth/gc/makeTF/GCff1ec5951d47"
+    path = "file:///mnt/t3nfs01/data01/shome/jpata/tth/gc/transfer/GCd4aacb8dd641/Sep13_pilot_v1__ttHTobb_M125_13TeV_powheg_pythia8/"
 
     for jettype in ["resolved", "subjet"]:
-        Make_config(path, '{0}_{1}'.format(samples.version, jettype))
+        Make_config(path, jettype)
 
 
 if __name__ == "__main__":

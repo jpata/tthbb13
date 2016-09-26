@@ -6,7 +6,7 @@ source common.sh
 cd $GC_SCRATCH
 
 # Get some extra stuff
-cp ${CMSSW_BASE}/src/TTH/TTHNtupleAnalyzer/python/AccessHelpers.py .
+cp ${CMSSW_BASE}/src/TTH/MEAnalysis/python/AccessHelpers.py .
 cp ${CMSSW_BASE}/src/TTH/Plotting/python/TransferFunctions/runs/$dsversion"_"$jettype/cfg_outputtree.dat .
 export PYTHONPATH=.:$PYTHONPATH
 

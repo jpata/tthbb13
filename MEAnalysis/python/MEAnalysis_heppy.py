@@ -57,7 +57,7 @@ pi_file.close()
 
 #Event contents are defined here
 #This is work in progress
-from TTH.MEAnalysis.VHbbTree import *
+from TTH.MEAnalysis.VHbbTree import EventAnalyzer
 
 #This analyzer reads branches from event.input (the TTree/TChain) to event.XYZ (XYZ is e.g. jets, leptons etc)
 evs = cfg.Analyzer(
@@ -84,13 +84,6 @@ evtid_filter = cfg.Analyzer(
 pvana = cfg.Analyzer(
     MECoreAnalyzers.PrimaryVertexAnalyzer,
     'pvana',
-    _conf = conf
-)
-
-
-evtweight = cfg.Analyzer(
-    MECoreAnalyzers.EventWeightAnalyzer,
-    'eventweight',
     _conf = conf
 )
 
@@ -164,6 +157,12 @@ subjet_analyzer = cfg.Analyzer(
     _conf = conf
 )
 
+multiclass_analyzer = cfg.Analyzer(
+    MECoreAnalyzers.MulticlassAnalyzer,
+    'multiclass',
+    _conf = conf
+)
+
 #Calls the C++ MEM integrator with good_jets, good_leptons and
 #the ME category
 mem_analyzer = cfg.Analyzer(
@@ -204,15 +203,12 @@ treevar = cfg.Analyzer(
 from TTH.MEAnalysis.metree import getTreeProducer
 treeProducer = getTreeProducer(conf)
 
-print treeProducer
-
 # definition of a sequence of analyzers,
 # the analyzers will process each event in this order
 sequence = cfg.Sequence([
     counter,
     evtid_filter,
     evs,
-    evtweight,
     pvana,
     trigger,
     leps,
@@ -226,6 +222,7 @@ sequence = cfg.Sequence([
     genrad,
     gentth,
     subjet_analyzer,
+    multiclass_analyzer,
     commoncls,
     mem_analyzer,
     mva,
@@ -259,7 +256,7 @@ config = cfg.Config(
     events_class = Events
 )
 
-if __name__ == "__main__":
+def main():
     print "Running MEAnalysis heppy main loop"
     
     #input component
@@ -272,16 +269,12 @@ if __name__ == "__main__":
         inputSamples = []
         for sn in sorted(samples_dict.keys()):
             s = samples_dict[sn]
-            sample_ngen = s.nGen.value()
             inputSample = cfg.Component(
                 s.name.value(),
                 files = map(getSitePrefix, s.subFiles.value()),
                 tree_name = s.treeName.value(),
-                n_gen = sample_ngen,
-                xs = s.xSec.value()
             )
             inputSample.isMC = s.isMC.value()
-            inputSample.skip = s.skip.value() #DS 
             inputSamples.append(inputSample)
         return inputSamples, samples_dict
     
@@ -290,9 +283,12 @@ if __name__ == "__main__":
     #Process all samples in the sample list
     for samp in inputSamples:
         if not samp.isMC:
-            continue
-        if samp.skip: #DS
-            continue
+            from TTH.MEAnalysis.VHbbTree_data import EventAnalyzer
+            evs = cfg.Analyzer(
+                EventAnalyzer,
+                'events',
+            )
+            sequence[2] = evs 
         config = cfg.Config(
             #Run across these inputs
             components = [samp],
@@ -309,7 +305,7 @@ if __name__ == "__main__":
 
         #Configure the number of events to run
         from PhysicsTools.HeppyCore.framework.looper import Looper
-        nEvents = 1000
+        nEvents = 200
 
         kwargs = {}
         if conf.general.get("eventWhitelist", None) is None:
@@ -322,14 +318,8 @@ if __name__ == "__main__":
             **kwargs
         )
 
-
-        import cProfile, time
-        p = cProfile.Profile(time.clock)
-        p.runcall(looper.loop)
-        p.print_stats()
-
         #execute the code
-        #looper.loop()
+        looper.loop()
 
         tf = looper.setup.services["outputfile"].file 
         tf.cd()
@@ -338,6 +328,6 @@ if __name__ == "__main__":
         
         #write the output
         looper.write()
-    #print summaries
-    # for analyzer in looper.analyzers:
-    #     print analyzer.name, "counters = {\n", analyzer.counters, "}"
+
+if __name__ == "__main__":
+    main()

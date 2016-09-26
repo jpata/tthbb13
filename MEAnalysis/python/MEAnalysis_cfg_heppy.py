@@ -24,6 +24,7 @@ def print_mu(mu):
 
 def el_baseline_medium(el):
 
+    #ele MVA ID preselection
     sca = abs(el.etaSc)
     ret = ((sca < 1.4442 and
         el.eleSieie < 0.012 and
@@ -45,7 +46,7 @@ def el_baseline_medium(el):
     #ret = ret and el.eleCutIdSpring15_25ns_v1 >= 3
  
     #EGamma POG MVA ID for triggering electrons (0=none, 1=WP90, 2=WP80, Spring15 training); 1 for muons
-    # We want 80%
+    # We want 80% (tight id)
     # https://twiki.cern.ch/twiki/bin/viewauth/CMS/TTbarHbbRun2ReferenceAnalysis_76XTransition#Electrons
     ret = ret and el.eleMVAIdSpring15Trig == 2
 
@@ -151,11 +152,15 @@ class Conf:
         "btagWP": "CSVM",
 
         #These working points are evaluated and stored in the trees as nB* - number of jets passing the WP
-        #https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideBTagging#Preliminary_working_or_operating
+        #https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation80X
         "btagWPs": {
             "CSVM": ("btagCSV", 0.800),
             "CSVL": ("btagCSV", 0.460),
-            "CSVT": ("btagCSV", 0.935)
+            "CSVT": ("btagCSV", 0.935),
+            
+            "CMVAM": ("btagCMVA", 0.185),
+            "CMVAL": ("btagCMVA", -0.715),
+            "CMVAT": ("btagCMVA", 0.875)
         },
 
         #if btagCSV, untagged/tagged selection for W mass and MEM is done by CSVM cut
@@ -180,7 +185,7 @@ class Conf:
     general = {
         "passall": False,
         "doQGL": False,
-        "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/ControlPlotsV20.root",
+        "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/ControlPlotsJul13.root",
         "QGLPlotsFile_flavour": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/Histos_QGL_flavour.root",
         "sampleFile": os.environ["CMSSW_BASE"]+"/python/TTH/MEAnalysis/samples.py",
         "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions.pickle",
@@ -189,7 +194,7 @@ class Conf:
         "systematics": [
             "nominal",
             "JESUp", "JESDown",
-        #    "JERUp", "JERDown"
+            "JERUp", "JERDown"
         ],
         
         
@@ -206,12 +211,16 @@ class Conf:
             #"reco", #info about reconstructed final state
             #"meminput", #info about particles used for MEM input
             #"commoninput", #print out inputs for CommonClassifier
-            "commonclassifier",
+            #"commonclassifier",
         ],
 
         #"eventWhitelist": [
-        #    (1, 6627, 1321096)
+        #    (1, 144279, 14372670)
         #]
+    }
+
+    multiclass = {
+        "bdtPickleFile": os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/BDT.pickle"
     }
 
     bran = {
@@ -291,6 +300,15 @@ class Conf:
             "dl_jge4_t2": 20,
             "dl_jge4_t3": 2.3,
             "dl_jge4_tge4": -20,
+
+            ##[CHECK-ME]
+            "fh_j9_t4": -20,
+            "fh_j8_t3": -20,
+            "fh_j8_t4": -20,
+            "fh_j7_t4": -20,
+            "fh_j7_t3": -20,
+            "fh_jge6_t4": -20,
+            "fh_jge6_t3": -20,
         },
 
         #Generic event-dependent selection function applied
@@ -301,38 +319,9 @@ class Conf:
                 (event.is_sl and event.nBCSVM >= 2)
                 or (event.is_dl and event.nBCSVM >= 2)
             ) or
-            (event.is_fh and event.cat in ["cat7","cat8","cat10","cat11"]
+            (event.is_fh and event.cat in ["cat7","cat8"]
             and event.btag_LR_4b_2b > 0.95)
         ),
-        
-        #This configures what the array elements mean
-        #Better not change this
-        "methodOrder": [
-            "SL_0w2h2t",
-            "DL_0w2h2t",
-            
-            "SL_1w2h2t",
-            "SL_2w2h1t_l",
-            "SL_2w2h1t_h",
-            "SL_2w2h2t",
-
-            #with bLR calc by mem code
-            "SL_2w2h2t_memLR",
-            "SL_0w2h2t_memLR",
-
-            # with rnd CSV values
-            "DL_0w2h2t_Rndge4t",
-            "SL_2w2h2t_sj",
-            "SL_0w2h2t_sj",
-
-            #fully-hadronic
-            "FH_4w2h2t", #8j,4b & 9j,4b
-            "FH_3w2h2t", #7j,4b
-            "FH_4w2h1t", #7j,3b & 8j,3b
-            "FH_0w0w2h2t", #all 4b cats
-            "FH_0w0w2h1t", #all cats
-            "FH_0w0w1h2t"  #all cats
-        ],
 
         #This configures the MEMs to actually run, the rest will be set to 0
         "methodsToRun": [
@@ -342,13 +331,14 @@ class Conf:
             #"SL_2w2h1t_l",
             #"SL_2w2h1t_h",
             "SL_2w2h2t",
-            "SL_2w2h2t_sj",
+            #"SL_2w2h2t_1j",
+            #"SL_2w2h2t_sj",
             #"SL_0w2h2t_sj",
             #"SL_2w2h2t_memLR",
             #"SL_0w2h2t_memLR",
             #"DL_0w2h2t_Rndge4t",
             "FH_4w2h2t", #8j,4b
-            #"FH_3w2h2t", #7j,4b
+            "FH_3w2h2t", #7j,4b
             #"FH_4w2h1t", #7j,3b & 8j,3b
             #"FH_0w0w2h2t", #all 4b cats
             #"FH_0w0w2h1t", #all cats
@@ -365,7 +355,6 @@ CvectorPSVar = getattr(ROOT, "std::vector<MEM::PSVar::PSVar>")
 ###
 ### SL_2w2h2t
 ###
-#FIXME: why == here and not >= ?
 c = MEMConfig(Conf)
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 1 and
@@ -379,6 +368,24 @@ strat.push_back(MEM.Permutations.QUntagged)
 strat.push_back(MEM.Permutations.BTagged)
 c.cfg.perm_pruning = strat
 Conf.mem_configs["SL_2w2h2t"] = c
+
+###
+### SL_2w2h2t_1j
+###
+c = MEMConfig(Conf)
+c.do_calculate = lambda ev, mcfg: (
+    len(mcfg.lepton_candidates(ev)) == 1 and
+    len(mcfg.b_quark_candidates(ev)) >= 4 and
+    len(mcfg.l_quark_candidates(ev)) >= 3
+)
+c.mem_assumptions.add("sl")
+strat = CvectorPermutations()
+strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
+strat.push_back(MEM.Permutations.QUntagged)
+strat.push_back(MEM.Permutations.BTagged)
+c.cfg.perm_pruning = strat
+c.cfg.int_code += ROOT.MEM.IntegrandType.AdditionalRadiation
+Conf.mem_configs["SL_2w2h2t_1j"] = c
 
 ###
 ### SL_1w2h2t

@@ -4,227 +4,156 @@
 
 import os
 import sys
+import pdb
 import itertools
 import random
 
 import ROOT
 
-import TTH.TTHNtupleAnalyzer.AccessHelpers as AH
+import TTH.MEAnalysis.AccessHelpers as AH
 from TTH.MEAnalysis.samples_base import getSitePrefix
+
 
 ########################################
 # Configuration
 ########################################
 
-# Take input files from command line
-
 DEF_VAL_FLOAT = -9999.0
-TOP_MASS = 172
-MAX_PERM = 20
-TOPEVENT_INCREASE_STAT = 50
 
-ntpl = {"hadtop_3j": {"int_branches"      : [],
-                         "float_branches" : [],
-                         "vars"           : {},
-                         "var_types"      : {}},
-
-        "topevent": {"int_branches"   : [],
-                     "float_branches" : [],
-                     "vars"           : {},
-                     "var_types"      : {}}
-}
+ntpl = {"multiclass_6j": {"int_branches"   : [],
+                          "float_branches" : ["l_pt", "l_eta", "l_phi", "l_pdgid",
+                                              "met_pt", "met_phi",
+                                              "blr"
+                                          ],
+                          "vars"           : {},
+                          "var_types"      : {}}
+    }
            
-ntpl["hadtop_3j"]["int_branches"].extend(["is_signal",
-                                          "w_matches",
-                                          "b_matches",
-                                          "evt"])
 
-for j in ["j1", "j2", "j3"]:
-    ntpl["hadtop_3j"]["float_branches"].extend(["{0}_{1}".format(j, x) for x in ["pt", 
-                                                                                 "eta", 
-                                                                                 "phi", 
-                                                                                 "mass", 
-                                                                                 "btagCSV"]])
+ntpl["multiclass_6j"]["int_branches"].extend(["tt_class", "evt"])
 
-ntpl["hadtop_3j"]["float_branches"].extend(["j1j2_mass", 
-                                            "j1j3_mass", 
-                                            "j2j3_mass", 
-                                            "j1j2j3_mass", 
-                                            "frec", 
-                                            "min_btagCSV", 
-                                            "max_btagCSV",
-                                            "mean_btagCSV", 
-                                            "variance_btagCSV"])
 
-ntpl["topevent"]["int_branches"].extend(["evt", "good_perm_in_event", "good_perm_in_first_n"])
-
-ntpl["topevent"]["float_branches"].extend(["mem_022", "mem_222"])
-
-for ic in range(MAX_PERM):
-    ntpl["topevent"]["float_branches"].extend(["c{0}_mass".format(ic), 
-                                               "c{0}_frec".format(ic), 
-                                               "c{0}_meanCSV".format(ic), 
-                                               "c{0}_varCSV".format(ic)])
-
+for j in range(6):
+    ntpl["multiclass_6j"]["float_branches"].extend(["j{0}_{1}".format(j, x) for x in ["pt", 
+                                                                                      "eta", 
+                                                                                      "phi", 
+                                                                                      "mass", 
+                                                                                      "btagCSV"]])
 
 
 ########################################
-# Helper: is_signal_hadtop_3j
+# Helper: make_jets
 ########################################
 
-def is_signal_hadtop_3j(jets):
-    """ Takes list of jets as input and returns bool. 
+def make_jets(source, source_type = "tree"):
 
-    True if each jet matches to a decay product from hadronic top,
-    False otherwise.
+    if source_type == "tree":
+        n_jets = source.njets
 
-    jets is a list of ROOT TLorentzVectors with extra
-    properties. Necessary are matchFlag and matchBfromHadT.
-    
-    matchFlag:
-      -1 not matched to anything
-       0 W
-       1 b from top
-       2 b from Higgs
+        # Get jet branches
+        jet_pt             = source.jets_pt
+        jet_eta            = source.jets_eta
+        jet_phi            = source.jets_phi
+        jet_mass           = source.jets_mass
+        jet_btagCSV        = source.jets_btagCSV
+    elif source_type == "event":
+        n_jets = len(source.good_jets)
 
-    matchBfromHadT:
-      -1 not matched or not b or not from top
-       0 b from leptonic top
-       1 b from hadronic top
-    """
-    
-    # We need exactly three jets
-    if not len(jets)==3:
-        return False
-
-    # Look for 2 jets from W decay
-    W_matches = len([1 for j in jets if j.matchFlag==0])
-
-    # Look for 1 jets from b decay (from hadronic top)
-    b_matches = len([1 for j in jets if j.matchFlag==1 and j.matchBfromHadT==1])
-
-    #is_signal = (W_matches == 2) and (b_matches==1)
-
-    if (W_matches==0) and (b_matches==0):
-        is_signal = 0
-    elif (W_matches==0) and (b_matches==1):
-        is_signal = 1
-    elif (W_matches==1) and (b_matches==0):
-        is_signal = 2
-    elif (W_matches==1) and (b_matches==1):
-        is_signal = 3
-    elif (W_matches==2) and (b_matches==0):
-        is_signal = 4
-    elif (W_matches==2) and (b_matches==1):
-        is_signal = 5
-    else:
-        is_signal = -1
-
-
-
-    return is_signal, W_matches, b_matches
-
-
-########################################
-# Helper: make_jets_hadtop_3j
-########################################
-
-def make_jets_hadtop_3j(tree, useTruth = True):
-
-    # Loop over truth particles
-    n_jets = tree.njets
-
-
-    # Get jet branches
-    jet_pt             = tree.jets_pt
-    jet_eta            = tree.jets_eta
-    jet_phi            = tree.jets_phi
-    jet_mass           = tree.jets_mass
-    jet_btagCSV        = tree.jets_btagCSV
-    if useTruth:
-        jet_matchFlag      = tree.jets_matchFlag
-        jet_matchBfromHadT = tree.jets_matchBfromHadT
-
+        # Get jet branches
+        jet_pt             = [j.pt for j in source.good_jets]
+        jet_eta            = [j.eta for j in source.good_jets]
+        jet_phi            = [j.phi for j in source.good_jets]
+        jet_mass           = [j.mass for j in source.good_jets]
+        jet_btagCSV        = [j.btagCSV for j in source.good_jets]
+        
     # Build jet objects (TLorentzVector + extra quantities)    
     jets = []
     for ij in range(n_jets):
         jet = AH.buildTlv(jet_pt[ij], jet_eta[ij], jet_phi[ij], jet_mass[ij])
         jet.btagCSV        = jet_btagCSV[ij]
-        if useTruth:
-            jet.matchFlag      = jet_matchFlag[ij]
-            jet.matchBfromHadT = jet_matchBfromHadT[ij]
         jet.index          = ij
         jets.append(jet)
 
     # Sort jets by pt
-    jets.sort(key = lambda x:-x.Pt())
+    #jets.sort(key = lambda x:-x.Pt())
+
+    # Sort jets by CSV
+    jets.sort(key = lambda x:-x.btagCSV)
 
     return jets
 
 
-
-
 ########################################
-# Helper: calc_vars_hadtop_3j
+# Helper: calc_vars
 ########################################
 
-def calc_vars_hadtop_3j(comb, useTruth = True):
+def calc_vars(source, source_type="tree"):
 
     v = {}
 
-    if useTruth:
-        ret = is_signal_hadtop_3j(comb)
-        v["is_signal"]  = ret[0]
-        v["w_matches"]  = ret[1]
-        v["b_matches"]  = ret[2]
+    # Prepare objects
+    jets = make_jets(source, source_type)
+
+    # Jet Variables
+    for ij in range(6):
+        v["j{0}_pt".format(ij)]      = jets[ij].Pt()
+        v["j{0}_eta".format(ij)]     = jets[ij].Eta()
+        v["j{0}_phi".format(ij)]     = jets[ij].Phi()
+        v["j{0}_mass".format(ij)]    = jets[ij].M()
+        v["j{0}_btagCSV".format(ij)] = max(jets[ij].btagCSV, 0)
+
+    # When reading from a file
+    if source_type == "tree":
+        # Lepton Variables
+        v["l_pt"]    = source.leps_pt[0]
+        v["l_eta"]   = source.leps_eta[0]
+        v["l_phi"]   = source.leps_phi[0]
+        v["l_pdgid"] = source.leps_pdgId[0]
+
+        # Missing Et     
+        v["met_pt"]   = source.met_pt
+        v["met_phi"]  = source.met_phi
+        
+        # BLR
+        v["blr"] = source.btag_LR_4b_2b_btagCSV
+
+    # During a ttH/Heppy analyzer module
+    elif source_type == "event":
+        # Lepton Variables
+        v["l_pt"]    = source.good_leptons[0].pt
+        v["l_eta"]   = source.good_leptons[0].eta
+        v["l_phi"]   = source.good_leptons[0].phi
+        v["l_pdgid"] = source.good_leptons[0].pdgId
+
+        # Missing Et     
+        v["met_pt"]   = source.MET.pt
+        v["met_phi"]  = source.MET.phi
+
+        # BLR
+        v["blr"] = source.btag_LR_4b_2b_btagCSV
+
+
+    # ttb
+    if source.ttCls == 51:
+        tt_class = 0
+    # tt2b
+    elif source.ttCls == 52:
+        tt_class = 1  
+    # ttbb
+    elif source.ttCls == 53 or source.ttCls == 54 or source.ttCls == 55 or source.ttCls==56:
+        tt_class = 2  
+    # ttcc 
+    elif source.ttCls == 41 or source.ttCls == 42 or source.ttCls == 43 or source.ttCls == 44 or source.ttCls == 45:
+        tt_class = 3  
+    # ttll
+    elif source.ttCls == 0 or source.ttCls<0:
+        tt_class = 4  
+    # should not happen
     else:
-        v["is_signal"]  = -1
-        v["w_matches"]  = -1
-        v["b_matches"]  = -1
+        print "Error determining tt+jets subsample" 
+        sys.exit()
 
-    # Leading pT jet
-    v["j1_pt"]      = comb[0].Pt()
-    v["j1_eta"]     = comb[0].Eta()
-    v["j1_phi"]     = comb[0].Phi()
-    v["j1_mass"]    = comb[0].M()
-    v["j1_btagCSV"] = max(comb[0].btagCSV, 0)
-
-    # Second pT jet
-    v["j2_pt"]      = comb[1].Pt()
-    v["j2_eta"]     = comb[1].Eta()
-    v["j2_phi"]     = comb[1].Phi()
-    v["j2_mass"]    = comb[1].M()
-    v["j2_btagCSV"] = max(comb[1].btagCSV, 0)
-
-    # Third pT jet
-    v["j3_pt"]      = comb[2].Pt()
-    v["j3_eta"]     = comb[2].Eta()
-    v["j3_phi"]     = comb[2].Phi()
-    v["j3_mass"]    = comb[2].M()
-    v["j3_btagCSV"] = max(comb[2].btagCSV, 0)
-
-    # Pairs and Triplet
-    j1j2   = comb[0]+comb[1]
-    j1j3   = comb[0]+comb[2]
-    j2j3   = comb[1]+comb[2]
-    j1j2j3 = comb[0]+comb[1]+comb[2]
-
-    v["j1j2_mass"]   = j1j2.M()
-    v["j1j3_mass"]   = j1j3.M()
-    v["j2j3_mass"]   = j2j3.M()
-    v["j1j2j3_mass"] = min(400, j1j2j3.M())
-
-    mw_over_mt = 80.4 / TOP_MASS
-    frec = min([ abs((x.M()/j1j2j3.M())/mw_over_mt - 1) for x in [j1j2, j1j3, j2j3]])
-    v["frec"] = min(0.4, frec)
-
-    # B-tagging
-    csvs = [max(0,j.btagCSV) for j in comb]
-    mean = sum(csvs) / len(csvs)
-    v["min_btagCSV"]      = min(csvs)
-    v["max_btagCSV"]      = max(csvs)
-    v["mean_btagCSV"]     = mean
-    v["variance_btagCSV"] = sum((mean - x) ** 2.0 for x in csvs) / len(csvs)
+    v["tt_class"] = tt_class
 
     return v
 
@@ -234,7 +163,6 @@ def calc_vars_hadtop_3j(comb, useTruth = True):
 ########################################
 
 if __name__ == "__main__":
-
 
     outfile = ROOT.TFile( sys.argv[1], "recreate")
 
@@ -262,17 +190,17 @@ if __name__ == "__main__":
     ########################################
 
     intree = ROOT.TChain("tree")
-    for fi in sys.argv[2:]:
-        
-        if fi in ["=","1"]:
-            continue
-        
-        print "adding", fi
-        intree.AddFile(getSitePrefix(fi))
 
-    ## For local testing:
-    #infile = ROOT.TFile(sys.argv[2])
-    #intree = infile.Get('tree')
+    if "FILE_NAMES" in os.environ.keys():
+        for fi in os.environ["FILE_NAMES"].split(" "):
+            print "adding", fi
+            intree.AddFile(getSitePrefix(fi))
+    else:
+        for fi in sys.argv[2:]:
+            print "adding", fi
+            intree.AddFile(getSitePrefix(fi))
+            #intree.AddFile(fi)
+        
 
     n_entries = intree.GetEntries()
 
@@ -290,90 +218,33 @@ if __name__ == "__main__":
         if not AH.getter(intree, "is_sl"):
             continue
 
-        # Use 6/4 events
-        if not (AH.getter(intree, "numJets") >= 6 and AH.getter(intree, "nBCSVM") >= 4):
+        # Use 6 jet events
+        if not (AH.getter(intree, "numJets") >= 6):
             continue
 
-        jets = make_jets_hadtop_3j(intree)
-            
-        # Calculate per triplet variables of all permutations
-        all_combs = []
-        for comb in itertools.combinations(jets, 3):
-            all_combs.append(calc_vars_hadtop_3j(comb))
+        # Require at least two medium b-tags
+        if not (AH.getter(intree, "nBCSVM") >= 2):
+            continue
+                    
+        # Prepare multiclass - 6 jet ntuple
+        if "multiclass_6j" in ntpl.keys():
 
-        # Prepare hadtop_3j ntuple
-        if "hadtop_3j" in ntpl.keys():
+            variables      = ntpl["multiclass_6j"]["vars"]
+            variable_types = ntpl["multiclass_6j"]["var_types"]
 
-            for comb in all_combs:
-
-                variables      = ntpl["hadtop_3j"]["vars"]
-                variable_types = ntpl["hadtop_3j"]["var_types"]
-                
-                # Reset branches
-                AH.resetBranches(variables, variable_types)
-
-                # Calculate variables and put them into the tree
-                for k,v in comb.iteritems():
-                    variables[k][0] = v
-
-                variables["evt"][0] = AH.getter(intree, "evt")
-
-                ntpl["hadtop_3j"]["tree"].Fill()    
-            # End of loop over combinations
-        # End of preparing hadtop_3j ntuple
+            # Reset branches
+            AH.resetBranches(variables, variable_types)
 
 
-        # Prepare topevent ntuple
-        if "topevent" in ntpl.keys():
+            # Calculate variables and put them into the tree
+            for k,v in calc_vars(intree).iteritems():
+                variables[k][0] = v
 
-                        
-            # Get the MEM discriminant
-            mem_022_tth  = AH.getter(intree, "mem_tth_p")[0]
-            mem_222_tth  = AH.getter(intree, "mem_tth_p")[5]
-            mem_022_ttbb = AH.getter(intree, "mem_ttbb_p")[0]
-            mem_222_ttbb = AH.getter(intree, "mem_ttbb_p")[5]
-            
-            k = 0.15
+            variables["evt"][0] = AH.getter(intree, "evt")
+                    
+            ntpl["multiclass_6j"]["tree"].Fill()    
 
-            if (mem_022_tth + k * mem_022_ttbb) > 0:
-                mem_022 = mem_022_tth / (mem_022_tth + k * mem_022_ttbb)
-
-            if (mem_222_tth + k * mem_222_ttbb) > 0:
-                mem_222 = mem_222_tth / (mem_222_tth + k * mem_222_ttbb)                        
-
-
-
-            variables      = ntpl["topevent"]["vars"]
-            variable_types = ntpl["topevent"]["var_types"]
-
-            sorted_combs = sorted(all_combs, key = lambda x:abs(x["j1j2j3_mass"] - TOP_MASS))
-            sorted_combs = sorted_combs[:MAX_PERM]
-
-
-
-            # Inflate statistics ( and make independent of ordering)
-            for _ in range(TOPEVENT_INCREASE_STAT):
-
-                random.shuffle(sorted_combs)
-
-                # Reset branches
-                AH.resetBranches(variables, variable_types)
-
-                variables["evt"][0] = AH.getter(intree, "evt")
-                variables["good_perm_in_event"][0] = any([c["is_signal"]==5 for c in sorted_combs])
-                variables["good_perm_in_first_n"][0] = any([c["is_signal"]==5 for c in sorted_combs[:MAX_PERM]])
-
-                variables["mem_022"][0] = mem_022
-                variables["mem_222"][0] = mem_222
-
-                for ic in range(MAX_PERM):                    
-                    variables["c{0}_mass".format(ic)][0]     = sorted_combs[ic]["j1j2j3_mass"]
-                    variables["c{0}_frec".format(ic)][0]     = sorted_combs[ic]["frec"]
-                    variables["c{0}_meanCSV".format(ic)][0]  = sorted_combs[ic]["mean_btagCSV"]
-                    variables["c{0}_varCSV".format(ic)][0]   = sorted_combs[ic]["variance_btagCSV"]
-
-                ntpl["topevent"]["tree"].Fill()    
-        # End of preparing topevent ntuple
+        # End of preparing multiclass - 6 jet ntuple
 
     # End of event loop
 

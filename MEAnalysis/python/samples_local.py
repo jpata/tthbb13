@@ -7,13 +7,13 @@ import os
 
 samples_dict = {
     "sample": cms.PSet(
-        name     = cms.string("sample"),
+        name     = cms.string(os.environ.get("TTH_SAMPLE", "sample")),
         nickname = cms.string("sample"),
         xSec     = cms.double("1"),
         nGen     = cms.int64(0),
         skip     = cms.bool(False),
-        isMC     = cms.bool(True),
-        treeName = cms.string("tree"),
+        isMC     = cms.bool(bool(int(os.environ.get("IS_MC", 1)))),
+        treeName = cms.string(os.environ.get("INPUT_TREE", "vhbb/tree")),
         subFiles = cms.vstring(os.environ["INPUT_FILE"]),
     )
 }

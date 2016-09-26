@@ -1,5 +1,6 @@
 #Try to find out on which site we are running
 SITE="UNKNOWN"
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 hnamestr=`hostname`
 if [[ "$hnamestr" == t3* ]]; then
     export SITE="PSI"
@@ -8,7 +9,7 @@ elif [[ "$hnamestr" == comp* ]]; then
 fi
 
 # Get private environment variables
-source env.sh
+source $DIR/env.sh
 
 env
 set -e

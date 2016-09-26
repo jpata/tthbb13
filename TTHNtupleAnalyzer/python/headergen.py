@@ -14,6 +14,7 @@ import sys, os, imp
 #add type mappings from C++ -> ROOT 1-character here
 typemap = {
     "float": "F",
+    "long": "L",
     "int": "I",
 }
 
@@ -32,7 +33,7 @@ class Scalar:
 
     #returns variable at loop initialization
     def initializer(self):
-        return "%s = DEF_VAL_%s" % (self.varname, self.type.upper())
+        return "%s = 0" % (self.varname)
 
     #creates branch
     def creator(self):
@@ -64,7 +65,7 @@ class Static1DArray:
         return "%s %s[%s]" % (self.type, self.varname, self.n)
 
     def initializer(self):
-        return "SET_ZERO(%s, %s, DEF_VAL_%s)" % (self.varname, self.n, self.type.upper())
+        return "SET_ZERO(%s, %s, 0)" % (self.varname, self.n)
 
     def creator(self):
         return "tree->Branch(\"%s\", %s, \"%s[%s]/%s\")" % (
@@ -95,8 +96,8 @@ class Static2DArray:
         return "%s %s[%s][%s]" % (self.type, self.varname, self.n, self.m)
 
     def initializer(self):
-        return "SET_ZERO_2(%s, %s, %s, DEF_VAL_%s)" % (
-            self.varname, self.n, self.m, self.type.upper()
+        return "SET_ZERO_2(%s, %s, %s, 0)" % (
+            self.varname, self.n, self.m
         )
 
     def creator(self):
@@ -132,7 +133,7 @@ class Dynamic1DArray:
         return "%s %s[%s]" % (self.type, self.varname, self.maxlength)
 
     def initializer(self):
-        return "SET_ZERO(%s, %s, DEF_VAL_%s)" % (self.varname, self.maxlength, self.type.upper())
+        return "SET_ZERO(%s, %s, 0)" % (self.varname, self.maxlength)
 
     def creator(self):
         return "tree->Branch(\"%s\", %s, \"%s[%s]/%s\")" % (
@@ -181,6 +182,8 @@ if __name__ == "__main__":
 
     lines = infile.readlines()
 
+    lines.insert(0, "//created with {0}\n".format(" ".join(sys.argv)))
+
     def insert_to(key_string, added_lines):
         i = 0
         for li in lines:
@@ -193,24 +196,24 @@ if __name__ == "__main__":
 
     for branch in branches_to_add:
         insert_to("//HEADERGEN_BRANCH_VARIABLES",
-                  "\t%s;\n" % (branch.branchvar())
+                  "    %s;\n" % (branch.branchvar())
         )
 
         insert_to("//HEADERGEN_BRANCH_INITIALIZERS",
-                  "\t\t%s;\n" % (branch.initializer())
+                  "        %s;\n" % (branch.initializer())
         )
 
         insert_to("//HEADERGEN_BRANCH_CREATOR",
-                  "\t\t%s;\n" % (branch.creator())
+                  "        %s;\n" % (branch.creator())
         )
 
         insert_to("//HEADERGEN_BRANCH_SETADDRESS",
-              "\t\t%s;\n" % (branch.setaddress())
+              "        %s;\n" % (branch.setaddress())
         )
 
         if branch.needs_copy and "//HEADERGEN_COPY_BRANCHES" in "".join(lines):
             insert_to("//HEADERGEN_COPY_BRANCHES",
-                  "\t\t%s;\n" % (branch.copy_branch())
+                  "        %s;\n" % (branch.copy_branch())
             )
 
     # Also allow inserting define statements

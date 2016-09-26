@@ -19,66 +19,48 @@ class BTagLRAnalyzer(FilterAnalyzer):
     FIXME: doc
     """
 
-    def getPdfs(self, cplots):
+    def getPdfs(self, cplots, algo):
         """
         Returns a dictionary with the b-tagging PDF-s
+        cplots (TFile): input ROOT file with the PDF-s
+        algo (string): name of the b-tagger for which to retrieve the distributiosn
         """
         csv_pdfs = {}
 
         for x in ["b", "c", "l"]:
-            for b in ["Bin0", "Bin1"]:
-                csv_pdfs[(x, b)] = cplots.Get(
-                    "{2}_{0}_{1}__rec".format(x, b, self.bTagAlgo)
-                )
             csv_pdfs[(x, "pt_eta")] = cplots.Get(
-                "{1}_{0}_pt_eta".format(x, self.bTagAlgo)
+                "{1}_{0}_pt_eta".format(x, algo)
             )
         return csv_pdfs
 
     def __init__(self, cfg_ana, cfg_comp, looperName):
         super(BTagLRAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
         self.conf = cfg_ana._conf
-        self.bTagAlgo        = self.conf.jets["btagAlgo"]
-        #self.cplots_old = ROOT.TFile(self.conf.general["controlPlotsFileOld"])
+        self.default_bTagAlgo = self.conf.jets["btagAlgo"]
+        
         self.cplots = ROOT.TFile(self.conf.general["controlPlotsFile"])
-        #self.cplots_new = ROOT.TFile(self.conf.general["controlPlotsFileNew"])
-
-        self.csv_pdfs = self.getPdfs(self.cplots)
-        #self.csv_pdfs_new = self.getPdfs(self.cplots_new)
+        self.csv_pdfs = {}
+        for algo in ["btagCSV", "btagCMVA", "btagCMVA_log"]:
+            self.csv_pdfs[algo] = self.getPdfs(self.cplots, algo)
 
         self.conf.BTagLRAnalyzer = self
         self.jlh = MEM.JetLikelihood()
 
-    def get_pdf_prob(self, csv_pdfs, flavour, pt, eta, taggerval, kind):
+    def get_pdf_prob(self, csv_pdfs, flavour, pt, eta, taggerval):
 
-        if kind == "new_eta_1bin":
-            _bin = "Bin1" if abs(eta)>1.0 else "Bin0"
-            h = csv_pdfs[(flavour, _bin)]
-        elif kind == "new_pt_eta_bin_3d":
-            h = csv_pdfs[(flavour, "pt_eta")]
-
-        assert h != None, "flavour={0} kind={1}".format(flavour, kind)
-
-        if kind == "new_eta_1bin":
-            nb = h.FindBin(taggerval)
-            if nb >= h.GetNbinsX():
-                nb = h.GetNbinsX()
-            elif nb < 1:
-                nb = 1
-            ret = h.GetBinContent(nb)
-        elif kind == "new_pt_eta_bin_3d":
-            nb = h.FindBin(pt, abs(eta), taggerval)
-            ret = h.GetBinContent(nb)
+        h = csv_pdfs[(flavour, "pt_eta")]
+        nb = h.FindBin(pt, abs(eta), taggerval)
+        ret = h.GetBinContent(nb)
         return ret
 
     def beginLoop(self, setup):
         super(BTagLRAnalyzer, self).beginLoop(setup)
 
-    def evaluate_jet_prob(self, pdfs, pt, eta, taggerval, kind):
+    def evaluate_jet_prob(self, pdfs, pt, eta, taggerval):
         return (
-            self.get_pdf_prob(pdfs, "b", pt, eta, taggerval, kind),
-            self.get_pdf_prob(pdfs, "c", pt, eta, taggerval, kind),
-            self.get_pdf_prob(pdfs, "l", pt, eta, taggerval, kind)
+            self.get_pdf_prob(pdfs, "b", pt, eta, taggerval),
+            self.get_pdf_prob(pdfs, "c", pt, eta, taggerval),
+            self.get_pdf_prob(pdfs, "l", pt, eta, taggerval)
         )
 
     def btag_likelihood2(self, probs, nB):
@@ -89,12 +71,10 @@ class BTagLRAnalyzer(FilterAnalyzer):
             jp.setProbability(MEM.JetInterpretation.c, probs[ijet][1])
             jp.setProbability(MEM.JetInterpretation.l, probs[ijet][2])
             self.jlh.push_back_object(jp)
-            #print "probas", ijet, probs[ijet]
 
         bperm = Cvectoruint()
         P = self.jlh.calcProbability(MEM.JetInterpretation.b, MEM.JetInterpretation.l, nB, bperm)
         best_perm = [bperm.at(i) for i in range(bperm.size())]
-
         return P, best_perm
         #end permutation loop
 
@@ -111,20 +91,15 @@ class BTagLRAnalyzer(FilterAnalyzer):
         jets_for_btag_lr = {}
         jet_probs        = {}
         
-        for pdf in ["new_pt_eta_bin_3d"]:
-            for tagger in taggers:
-                #Use only the first N jets by blr for likelihood ratio calculation 
-                jets_for_btag_lr[tagger] =  sorted(
-                    event.good_jets, key=lambda x, tagger=tagger: getattr(x, tagger), reverse=True
-                )[0:self.conf.jets["NJetsForBTagLR"]]
-                if tagger == "btagBDT":
-                    tagtransform = lambda x: math.log((1.0 + x)/(1.0 - x)) if x > -1 else -10
-                else:
-                    tagtransform = lambda x: x
-                jet_probs[pdf+"-"+tagger] =  [ 
-                    self.evaluate_jet_prob(pdfs, j.pt, j.eta, tagtransform(getattr(j, tagger)), pdf)
-                    for j in jets_for_btag_lr[tagger]
-                ]
+        for tagger in taggers:
+            #Use only the first N jets by b-tagger value for likelihood ratio calculation 
+            jets_for_btag_lr[tagger] =  sorted(
+                event.good_jets, key=lambda x, tagger=tagger: getattr(x, tagger), reverse=True
+            )[0:self.conf.jets["NJetsForBTagLR"]]
+            jet_probs[tagger] =  [ 
+                self.evaluate_jet_prob(pdfs[tagger], j.pt, j.eta, getattr(j, tagger))
+                for j in jets_for_btag_lr[tagger]
+            ]
         return jets_for_btag_lr, jet_probs
 
     def lratio(self, l1, l2):
@@ -135,8 +110,14 @@ class BTagLRAnalyzer(FilterAnalyzer):
 
     def _process(self, event):
 
+        #transform the btagCMVA value from -1.0 .. 1.0 to 0.0 .. 1.0
+        #followed up by a logit transform to get rid of the peaks in the edges
+        for ij in range(len(event.good_jets)):
+            x = event.good_jets[ij].btagCMVA 
+            event.good_jets[ij].btagCMVA_log = math.log((1.0 + x)/(1.0 - x))
+
         #btag algos for which to calculate btag LR
-        btagalgos = [self.bTagAlgo]
+        btagalgos = ["btagCSV", "btagCMVA_log", "btagCMVA"]
         if self.conf.bran["enabled"]:
             btagalgos += ["btagCSVRndge4t", "btagCSVInpge4t", "btagCSVRnd3t", "btagCSVInp3t"]
         jets_for_btag_lr, jet_probs = self.getJetProbs(self.csv_pdfs, event, btagalgos )
@@ -144,20 +125,25 @@ class BTagLRAnalyzer(FilterAnalyzer):
         btag_likelihood_results = {}
         btag_likelihood_ratio_results = {}
         for btagalgo in btagalgos:
-            btag_lr_4b, best_4b_perm = self.btag_likelihood2(jet_probs["new_pt_eta_bin_3d-" + btagalgo], 4)
-            btag_lr_2b, best_2b_perm = self.btag_likelihood2(jet_probs["new_pt_eta_bin_3d-" + btagalgo], 2)
+            btag_lr_4b, best_4b_perm = self.btag_likelihood2(jet_probs[btagalgo], 4)
+            btag_lr_2b, best_2b_perm = self.btag_likelihood2(jet_probs[btagalgo], 2)
             btag_likelihood_results[btagalgo] = (btag_lr_4b, btag_lr_2b, best_4b_perm, best_2b_perm)
             btag_likelihood_ratio_results[btagalgo] = self.lratio(btag_lr_4b, btag_lr_2b)
-        
+            setattr(event, "jet_perm_btag_lr_" + btagalgo,
+                [event.good_jets.index(j) for j in jets_for_btag_lr[btagalgo]]
+            )
+            setattr(event,
+                "btag_LR_4b_2b_" + btagalgo, btag_likelihood_ratio_results[btagalgo]
+            )
         #default btagger used
-        event.btag_lr_4b = btag_likelihood_results[self.bTagAlgo][0]
-        event.btag_lr_2b = btag_likelihood_results[self.bTagAlgo][1]
-        event.btag_LR_4b_2b = btag_likelihood_ratio_results[self.bTagAlgo]
-        best_4b_perm = btag_likelihood_results[self.bTagAlgo][2]
+        event.btag_lr_4b = btag_likelihood_results[self.default_bTagAlgo][0]
+        event.btag_lr_2b = btag_likelihood_results[self.default_bTagAlgo][1]
+        event.btag_LR_4b_2b = btag_likelihood_ratio_results[self.default_bTagAlgo]
+        best_4b_perm = btag_likelihood_results[self.default_bTagAlgo][2]
 
         # use default btag method always
-        event.buntagged_jets_by_LR_4b_2b = [jets_for_btag_lr[self.bTagAlgo][i] for i in best_4b_perm[4:]]
-        event.btagged_jets_by_LR_4b_2b = [jets_for_btag_lr[self.bTagAlgo][i] for i in best_4b_perm[0:4]]
+        event.buntagged_jets_by_LR_4b_2b = [jets_for_btag_lr[self.default_bTagAlgo][i] for i in best_4b_perm[4:]]
+        event.btagged_jets_by_LR_4b_2b = [jets_for_btag_lr[self.default_bTagAlgo][i] for i in best_4b_perm[0:4]]
 
         for i in range(len(event.good_jets)):
             event.good_jets[i].btagFlag = 0.0
@@ -180,7 +166,7 @@ class BTagLRAnalyzer(FilterAnalyzer):
                 len(event.selected_btagged_jets)
             ))
 
-        btagged = sorted(event.selected_btagged_jets, key=lambda x, self=self: getattr(x, self.bTagAlgo) , reverse=True)
+        btagged = sorted(event.selected_btagged_jets, key=lambda x, self=self: getattr(x, self.default_bTagAlgo) , reverse=True)
 
         #Take first 4 most b-tagged jets, these are used for the top and higgs candidates
         event.selected_btagged_jets_high = btagged[0:4]

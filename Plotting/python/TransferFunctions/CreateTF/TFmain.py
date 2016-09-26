@@ -14,6 +14,7 @@ import pickle
 import time
 import datetime
 import shutil
+import sys
 
 from config import Make_config
 from make_histograms import Make_Histograms
@@ -52,5 +53,8 @@ def main(conffile):
 # End of Main
 ########################################
 if __name__ == "__main__":
-  #main("configs/{0}_resolved/config.dat".format(samples.version))
-  main("configs/{0}_subjet/config.dat".format(samples.version))
+    #can't run two fits in the same run, so need to call with cmdline args
+    # python TFmain.py subjet
+    # python TFmain.py resolved
+    jettype = sys.argv[1]
+    main("configs/{0}/config.dat".format(jettype))

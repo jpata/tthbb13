@@ -13,7 +13,7 @@ import sys
 
 import os
 import ROOT
-import TTH.TTHNtupleAnalyzer.AccessHelpers as AH
+import TTH.MEAnalysis.AccessHelpers as AH
 import pickle
 import copy
 

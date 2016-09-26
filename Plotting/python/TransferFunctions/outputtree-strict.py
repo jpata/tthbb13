@@ -18,7 +18,7 @@ import datetime
 try: 
     import AccessHelpers as AH
 except:
-    import TTH.TTHNtupleAnalyzer.AccessHelpers as AH
+    import TTH.MEAnalysis.AccessHelpers as AH
 
 
 ########################################
@@ -316,7 +316,7 @@ def main():
     
     try:
         infile = open( 'cfg_outputtree.dat', 'rb' )
-        config = json.load( infile )
+        config = json.load( infile)
         infile.close()
     except Exception as e:
         print "Unable to open cfg_outputtree.dat", e
@@ -325,7 +325,7 @@ def main():
 
     print 'Imported configuration data'
 
-    output_root_file_name = config['output_root_file_name']
+    output_root_file_name = config['output_root_file_name'].encode("ASCII")
 
 
     # Linking switch: If Just_Jets=True, .root file will simply contain (unlinked)
@@ -402,7 +402,7 @@ def main():
         print root_file_base+input_root_file_name
         input_root_file = ROOT.TFile.Open(root_file_base+input_root_file_name)
         print input_root_file
-        input_tree = input_root_file.Get(config['input_tree_name'])
+        input_tree = input_root_file.Get(config['input_tree_name'].encode("ASCII"))
         print 'Processing {0}'.format(input_root_file_name)
         
         n_entries = input_tree.GetEntries()

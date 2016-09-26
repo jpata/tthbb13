@@ -7,79 +7,111 @@ import subprocess
 
 from CombineHelper import LimitGetter
 
+from EnvForCombine import PATH, LD_LIBRARY_PATH, PYTHONPATH
 
 print "MakeLimits.py called from cwd={0}".format(os.getcwd())
-########################################
-# Setup
-########################################
-
-if not len(sys.argv) in [3,4,5]:
-    print "Wrong number of arguments"
-    print "Usage: "
-    print "{0} datacard_file.py inout_dir [analysis_to_process [group to_process]]".format(sys.argv[0])
-    sys.exit()
-
-# Get the datacard
-dcard = imp.load_source("dcard", sys.argv[1])
-
-# Get the input/output directory
-inout_dir = sys.argv[2]
-
-if len(sys.argv) >= 4:
-    try:
-        analyses = {sys.argv[3]: dcard.analyses[sys.argv[3]]}
-    except KeyError:
-        print sys.argv[3], "is not a valid analysis"
-        print "Available are:", dcard.analyses.keys()
-        sys.exit()
-else:
-    analyses = dcard.analyses
-
-
-# If we receive a group-name from command line, only process this group
-# Otherwise do all of them
-group_to_process = ""
-if len(sys.argv) == 5:
-    group_to_process = sys.argv[4]
 
 
 ########################################
 # Actual work
 ########################################
 
-for analysis_name, analysis in analyses.iteritems():
+def main(
+        inout_dir,
+        analysis_cfg,
+        group
+):
+    
 
-    # Decide what to run on
-    if group_to_process:
-        groups = [group_to_process]
-    else:
-        groups = analysis.groups.keys()
+    ## Get the datacard
+    #dcard = imp.load_source("dcard", dcard_path)
+#
+#    # What analysis to run
+#    if analysis_arg:
+#        try:
+#            analyses = {analysis_arg: dcard.analyses[analysis_arg]}
+#        except KeyError:
+#            print analysis_arg, "is not a valid analysis"
+#            print "Available are:", dcard.analyses.keys()
+#            sys.exit()
+#
+#    else:
 
-    # Prepare the limit getter
-    lg = LimitGetter(inout_dir)
+    analyses = [analysis_cfg]
 
-    for group_name in groups:
+    for analysis in analyses:
 
-        group = analysis.groups[group_name]    
-        print "Doing {0} consisting of {1} categories".format(group_name, len(group))    
+        # Decide what to run on
+        if group:
+            groups = [group]
+        else:
+            groups = analysis.groups.keys()
 
-        # Get all the per-category datacards and use combineCards to merge into one "group datacard"
-        input_dcard_names = ["shapes_{0}.txt".format(c.full_name) for c in group]
-        add_dcard_command = ["combineCards.py"] + input_dcard_names 
-        process = subprocess.Popen(add_dcard_command, 
-                                   stdout=subprocess.PIPE, 
-                                   cwd=inout_dir)        
-        group_dcard = process.communicate()[0]
+        # Prepare the limit getter
+        lg = LimitGetter(inout_dir)
 
-        # Write the group datacard to a file
-        group_dcard_filename = os.path.join(inout_dir, "shapes_group_{0}.txt".format(group_name))
-        group_dcard_file = open(group_dcard_filename, "w")
-        group_dcard_file.write(group_dcard)
-        group_dcard_file.close()
+        for group_name in groups:
 
-        # And run limit setting on it
-        lg(group_dcard_filename)
+            group = [x for x in analysis.groups[group_name] if x.do_limit]
 
-    # End loop over groups
-# End of loop over analyses
+            print group
+            
+            print "Doing {0} consisting of {1} categories".format(group_name, len(group))    
 
+            # Get all the per-category datacards and use combineCards to merge into one "group datacard"
+            input_dcard_names = ["shapes_{0}.txt".format(c.full_name) for c in group]
+            add_dcard_command = ["combineCards.py"] + input_dcard_names 
+
+            print "Command:", add_dcard_command 
+            process = subprocess.Popen(add_dcard_command, 
+                                       stdout=subprocess.PIPE, 
+                                       cwd=inout_dir,
+                                       env=dict(os.environ, 
+                                                PATH=PATH,
+                                                LD_LIBRARY_PATH = LD_LIBRARY_PATH,
+                                                PYTHONPATH=PYTHONPATH
+                                            ))
+
+            group_dcard = process.communicate()[0]
+
+            print "Finished with group_card making"
+
+            # Write the group datacard to a file
+            group_dcard_filename = os.path.join(inout_dir, "shapes_group_{0}.txt".format(group_name))
+            group_dcard_file = open(group_dcard_filename, "w")
+            group_dcard_file.write(group_dcard)
+            group_dcard_file.close()
+
+            print "Written to file, running limit setting"
+
+            # And run limit setting on it
+            lg(group_dcard_filename)
+
+        # End loop over groups
+    # End of loop over analyses
+
+
+#if __name__ == "__main__":
+#
+#    if not len(sys.argv) in [3,4,5]:
+#        print "Wrong number of arguments"
+#        print "Usage: "
+#        print "{0} datacard_file.py inout_dir [analysis_to_process [group to_process]]".format(sys.argv[0])
+#        sys.exit()
+#
+#    dcard_path = sys.argv[1]
+#
+#    # Get the input/output directory
+#    inout_dir = sys.argv[2]
+#
+#    if len(sys.argv) >= 4:
+#        analysis_arg = sys.argv[3]
+#    else:
+#        analysis_arg = ""
+#
+#    if len(sys.argv) == 5:
+#        group_arg = sys.argv[4]
+#    else:
+#        group_arg = ""
+#
+#    main(dcard_path, inout_dir, analysis_arg, group_arg)

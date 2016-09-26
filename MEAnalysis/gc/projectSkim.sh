@@ -2,7 +2,8 @@
 
 source common.sh
 #export DATASETPATH=ttHTobb_M125_13TeV_powheg_pythia8
-#export FILE_NAMES=/store/user/jpata/VHBBHeppyV20/ttHTobb_M125_13TeV_powheg_pythia8/VHBB_HEPPY_V20_ttHTobb_M125_13TeV_powheg_Py8__fall15MAv2-pu25ns15v1_76r2as_v12-v1/160209_170826/0000/tree_1.root
+#export FILE_NAMES=/store/user/jpata/tth/Jun17_leptonic_nome/TT_TuneEE5C_13TeV-powheg-herwigpp/Jun17_leptonic_nome/160617_165529/0000/tree_1.root
+#export GC_SCRATCH=/scratch/jpata
 
 #go to work directory
 cd $GC_SCRATCH

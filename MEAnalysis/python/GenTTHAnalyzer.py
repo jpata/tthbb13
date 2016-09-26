@@ -28,6 +28,9 @@ class GenTTHAnalyzer(FilterAnalyzer):
 
     def _process(self, event):
 
+        if not self.cfg_comp.isMC:
+            return event 
+
         if "debug" in self.conf.general["verbosity"]:
             autolog("GenTTHAnalyzer started")
 
@@ -226,16 +229,22 @@ class GenTTHAnalyzer(FilterAnalyzer):
                     dr = l1.DeltaR(l2)
                     if dr < 0.3:
                         #Jet already had a match: take the one with smaller dR
-                        if matched_pairs.has_key(ij):
-                            if matched_pairs[ij][1] > dr:
-                                matched_pairs[ij] = (label, iq, dr, label_numeric, numeric_b_from_had_t)
-                        else:
-                            matched_pairs[ij] = (label, iq, dr, label_numeric, numeric_b_from_had_t)
+                        if not matched_pairs.has_key(ij):
+                            matched_pairs[ij] = []
+                        matched_pairs[ij] += [(label, iq, dr, label_numeric, numeric_b_from_had_t)]
 
         #Find the best possible match for each individual jet
+
+        #light-quarks from W
         match_jets_to_quarks(event.good_jets, event.l_quarks_gen, "wq", 0)
+        #b-quarks from top
         match_jets_to_quarks(event.good_jets, event.b_quarks_gen_t, "tb", 1)
+        #b-quarks from Higgs
         match_jets_to_quarks(event.good_jets, event.b_quarks_gen_h, "hb", 2)
+        #gluons from top
+        match_jets_to_quarks(event.good_jets, event.GenGluonFromTop, "tg", 3)
+        #gluons from b
+        match_jets_to_quarks(event.good_jets, event.GenGluonFromB, "bg", 4)
 
         #Number of reco jets matched to quarks from W, top, higgs
         event.nMatch_wq = 0
@@ -266,7 +275,19 @@ class GenTTHAnalyzer(FilterAnalyzer):
             #                         -1 if not b or not from top
             #                          0 if from leptonic top
             #                          1 if from hadronic top
-            mlabel, midx, mdr, mlabel_num, mlabel_num_bfromhadt = matched_pairs[ij]
+            matches = matched_pairs[ij]
+            if len(matches) == 1:
+                mlabel, midx, mdr, mlabel_num, mlabel_num_bfromhadt = matches[0]
+            else:
+                #select dR-ordered matches from W, t, b
+                matches_hard = filter(lambda x: x[0] in ["wq", "tb", "hb"], matches)
+                matches_hard = sorted(matches_hard, key=lambda x: x[2])
+                if len(matches_hard) >= 1:
+                    mlabel, midx, mdr, mlabel_num, mlabel_num_bfromhadt = matches_hard[0]
+                else:
+                    matches_soft = filter(lambda x: x[0] in ["tg", "bg"], matches)
+                    matches_soft = sorted(matches_soft, key=lambda x: x[2])
+                    mlabel, midx, mdr, mlabel_num, mlabel_num_bfromhadt = matches_soft[0]
 
             jet.tth_match_label = mlabel
             jet.tth_match_index = midx
