@@ -785,7 +785,7 @@ def brazilplot(limits, categories, category_names, axes=None):
         TYPE: nothing
     """
     if not axes:
-        ax = plt.axes()
+        axes = plt.axes()
     
     central_limits = []
     errs = np.zeros((len(categories), 4))
@@ -795,13 +795,13 @@ def brazilplot(limits, categories, category_names, axes=None):
     for k in categories:
         
         #central value
-        central_limits += [lims[k][0][2]]
+        central_limits += [limits[k][0][2]]
       
         #error band
-        errs[i,0] = lims[k][0][1]
-        errs[i,1] = lims[k][0][3]
-        errs[i,2] = lims[k][0][0]
-        errs[i,3] = lims[k][0][4]
+        errs[i,0] = limits[k][0][1]
+        errs[i,1] = limits[k][0][3]
+        errs[i,2] = limits[k][0][0]
+        errs[i,3] = limits[k][0][4]
         
         i += 1
     
@@ -812,14 +812,14 @@ def brazilplot(limits, categories, category_names, axes=None):
     for y, l, e1, e2, e3, e4 in zip(ys, central_limits, errs[:, 0], errs[:, 1], errs[:, 2], errs[:, 3]):
         
         #black line
-        ax.add_line(plt.Line2D([l, l], [y, y+1.0], lw=2, color="black", ls="-"))
+        axes.add_line(plt.Line2D([l, l], [y, y+1.0], lw=2, color="black", ls="-"))
         
         #value
         plt.text(l*1.05, y+0.5, "{0:.2f}".format(l), horizontalalignment="left", verticalalignment="center")
         
         #error bars
-        ax.barh(y+0.1, (e4-e3), left=e3, color=np.array([254, 247, 2])/255.0, lw=0)
-        ax.barh(y+0.1, (e2-e1), left=e1, color=np.array([51, 247, 2])/255.0 , lw=0)
+        axes.barh(y+0.1, (e4-e3), left=e3, color=np.array([254, 247, 2])/255.0, lw=0)
+        axes.barh(y+0.1, (e2-e1), left=e1, color=np.array([51, 247, 2])/255.0 , lw=0)
         
     #set ranges
     plt.xlim(0, 1.2*max(central_limits))
@@ -828,7 +828,7 @@ def brazilplot(limits, categories, category_names, axes=None):
     #set category names
     plt.yticks(ys+0.5, category_names, verticalalignment="center", fontsize=18, ha="right")
     plt.xlabel("$\mu$")
-    yax = ax.get_yaxis()
+    yax = axes.get_yaxis()
     # find the maximum width of the label on the major ticks
     #pad = 150
     #yax.set_tick_params(pad=pad)
