@@ -2,7 +2,6 @@ import ROOT, os
 import subprocess as sub
 
 server = "storage01.lcg.cscs.ch"
-path = "/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/mem/CRAB_UserFiles/crab_MEM_Sep20_v6_ttjets"
 
 def xrootd_listdir(server, directory):
     p = sub.Popen(['xrdfs', server, 'ls', '-l', directory], stdout=sub.PIPE, stderr=sub.PIPE)

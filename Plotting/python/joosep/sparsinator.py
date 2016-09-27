@@ -446,21 +446,21 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
 
         #systematics with weight
 
-        ##create b-tagging systematics
-        #for sdir in ["up", "down"]:
-        #    for syst in ["cferr1", "cferr2", "hf", "hfstats1", "hfstats2", "jes", "lf", "lfstats1", "lfstats2"]:
-        #        for tagger in ["CSV", "CMVAV2"]:
-        #            bweight = "btagWeight{0}_{1}_{2}".format(tagger, sdir, syst)
-        #            #make systematic outputs consistent in Up/Down naming
-        #            sdir_cap = sdir.capitalize()
-        #            systematic_weights += [
-        #                ("CMS_ttH_{0}{1}{2}".format(tagger, syst, sdir_cap), lambda ev, bweight=bweight: ev["weight_nominal"]/ev["btagWeight"+tagger]*ev[bweight])
-        #            ]
-        #            btag_weights += [bweight]
+        #create b-tagging systematics
+        for sdir in ["up", "down"]:
+            for syst in ["cferr1", "cferr2", "hf", "hfstats1", "hfstats2", "jes", "lf", "lfstats1", "lfstats2"]:
+                for tagger in ["CSV", "CMVAV2"]:
+                    bweight = "btagWeight{0}_{1}_{2}".format(tagger, sdir, syst)
+                    #make systematic outputs consistent in Up/Down naming
+                    sdir_cap = sdir.capitalize()
+                    systematic_weights += [
+                        ("CMS_ttH_{0}{1}{2}".format(tagger, syst, sdir_cap), lambda ev, bweight=bweight: ev["weight_nominal"]/ev["btagWeight"+tagger]*ev[bweight])
+                    ]
+                    btag_weights += [bweight]
 
         systematic_weights += [
-        #        ("puUp", lambda ev: ev["weight_nominal"]/ev["puWeight"] * ev["puWeightUp"]),
-        #        ("puDown", lambda ev: ev["weight_nominal"]/ev["puWeight"] * ev["puWeightDown"]),
+                ("puUp", lambda ev: ev["weight_nominal"]/ev["puWeight"] * ev["puWeightUp"]),
+                ("puDown", lambda ev: ev["weight_nominal"]/ev["puWeight"] * ev["puWeightDown"]),
                 ("unweighted", lambda ev: 1.0)
         ]
 

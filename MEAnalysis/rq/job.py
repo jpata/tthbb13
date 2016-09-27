@@ -34,7 +34,9 @@ def count(filenames):
     return ret
 
 def sparse(analysis, filenames, sample, outfile):
-    ofname = tempfile.mktemp(dir=os.path.joinpath("/scratch/"+os.environ["USER"]))
+    temppath = os.path.join("/scratch/{0}/".format(os.environ["USER"]))
+    os.makedirs(temppath)
+    ofname = tempfile.mktemp(dir=temppath)
     sparsinator.main(analysis, filenames, sample, ofname)
 
     basepath = os.path.dirname(outfile)

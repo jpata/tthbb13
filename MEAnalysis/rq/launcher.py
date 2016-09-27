@@ -339,10 +339,10 @@ if __name__ == "__main__":
 
         os.makedirs("{0}/categories".format(workdir))
 
-        all_jobs = []        
+        all_jobs = []
         for cat in analysis_cfg.categories:
 
-            os.makedirs("{0}/categories/{1}/{2}".format(workdir, cat.name, cat.discriminator))        
+            os.makedirs("{0}/categories/{1}/{2}".format(workdir, cat.name, cat.discriminator))
 
             all_jobs += [
                 qmain.enqueue_call(

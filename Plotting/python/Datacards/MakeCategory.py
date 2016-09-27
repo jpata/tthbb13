@@ -40,7 +40,6 @@ def make_rule_cut(basehist, category):
         cuts += category.cuts
         for c in proc.cuts:
             cuts += c.sparsinator
-        print cuts
 
         d = {
             "input": "{0}/{1}".format(proc.input_name, basehist),
@@ -65,7 +64,6 @@ def make_rule_cut(basehist, category):
         cuts += category.cuts
         for c in proc.cuts:
             cuts += c.sparsinator
-        print cuts
         d = {
             "input": "{0}/{1}".format(proc.input_name, basehist),
             "cuts": str(cuts),
@@ -91,7 +89,6 @@ def apply_rules(args):
     t0 = time.time()
     logging.info("apply_rules: len(rules)={0}".format(len(rules)))
     for rule in rules:
-        
         #convert the string of the cut list into the actual list
         cuts = eval(rule["cuts"])
         hk = rule["output"]
@@ -105,14 +102,13 @@ def apply_rules(args):
         if not sparse_hist:
             dummy = True
             logging.warning("Could not get histogram {0}, using fallback".format(inp))
-            sparse_hist = input_map["ttHTobb_M125_13TeV_powheg_pythia8/sl/sparse"]
+            sparse_hist = input_map["dummy"]
             if not sparse_hist:
                 raise Exception("Could not get fallback histogram {0}".format("ttHTobb_M125_13TeV_powheg_pythia8/sl/sparse"))
             cuts = []
 
         variables = eval(rule["project"])
         vnames = [v[0] for v in variables]
-
         ret = sparse.apply_cuts_project(sparse_hist, cuts, vnames)
 
         #dummy histogram needs to be made empty
@@ -147,51 +143,52 @@ def chunks(l, n):
     for i in range(0, len(l), n):
         yield l[i:i + n]
 
-def apply_rules_parallel(infile, rules, ncores=1):
+def apply_rules_parallel(infile, rules):
     """
     Project out all the histograms according to the projection rules.
     infile (string) - path to input root file with sparse histograms
     rules (list of dicts) - all the rules
     
     Optional:
-    ncores (int) - number of parallel cores for projection
     """ 
-    if ncores > 1:
-        p = multiprocessing.Pool(ncores)
-    inputs = []
 
-    # preload THnSparse here, once per input, in order to prevent memory leak, see
-    # https://github.com/jpata/tthbb13/issues/107
-    unique_inputs = set([r["input"] for r in rules])
-    logging.info("apply_rules_parallel: preloading {0} sparse histograms from {1}".format(
-        len(unique_inputs), infile
-    ))
+    #split rules into unique batches by input histogram
+    rules_per_input = {}
+    for rule in rules:
+        inp = rule["input"]
+        if not rules_per_input.has_key(inp):
+            rules_per_input[inp] = []
+        rules_per_input[inp].append(rule)
+
+    #process batches
+    rets = {}
     infile_tf = ROOT.TFile.Open(infile)
     if not infile_tf:
         raise FileError("Could not open file: {0}".format(infile))
-    input_map = {
-        k: infile_tf.Get(k) for k in unique_inputs
-    }
+    dummy_h = infile_tf.Get(rules[0]["input"]).Clone()
+    dummy_h.Reset()
 
-    logging.info("apply_rules_parallel: creating chunks")
-    #so that we can apply some N rules at the same time
-    #sort so that we are creating histograms that end up in the same result
-    for chunk in chunks(sorted(rules, key=lambda x: x["output"]), 100):
-        inputs += [(input_map, chunk)]
-    
-    rets = {}
-    if ncores > 1:
-        rets = reduce(sparse.add_hdict, p.map(apply_rules, inputs), rets)
-    else:
-        for inp in inputs:
-            ret = apply_rules(inp)
-            logging.debug("reducing {0}".format(len(ret)))
+    for inp, rules_batch in rules_per_input.items():
+        # preload THnSparse here, once per input, in order to prevent memory leak, see
+        # https://github.com/jpata/tthbb13/issues/107
+        _infile_tf = ROOT.TFile.Open(infile)
+        input_map = {
+            "dummy": dummy_h,
+            inp: _infile_tf.Get(inp)
+        }
+        logging.info("apply_rules_parallel: applying {0} rules for input {1}".format(
+            len(rules_batch),
+            inp
+        ))
+
+        #process in chunks of 100
+        for chunk in chunks(sorted(rules_batch, key=lambda x: x["output"]), 100):
+            ret = apply_rules((input_map, chunk))
             rets = sparse.add_hdict(rets, ret)
-            logging.debug("len(rets) = {0}".format(len(rets)))
-    
-    if ncores > 1:
-        p.close()
+         
+        _infile_tf.Close()
     infile_tf.Close()
+
     return rets
 
 def get_categories(analysis_spec, analysis_name, category_name):
@@ -210,7 +207,7 @@ def get_categories(analysis_spec, analysis_name, category_name):
         raise Exception("Could not match any categories")
     return analysis, categories
 
-def main(analysis, categories, outdir=".", ncores=1):
+def main(analysis, categories, outdir="."):
     # Make all the rules
     rules = []
     for cat in categories:
@@ -226,7 +223,7 @@ def main(analysis, categories, outdir=".", ncores=1):
 
     #project out all the histograms
     logging.info("main: applying {0} rules".format(len(rules)))
-    hdict = apply_rules_parallel(analysis.sparse_input_file, rules, ncores)
+    hdict = apply_rules_parallel(analysis.sparse_input_file, rules)
 
     #split the big dictionary to category-based dictionaries
     hdict_cat = {}
@@ -304,36 +301,33 @@ if __name__ == "__main__":
         description='Creates datacards in categories based on a sparse histogram'
     )
     parser.add_argument(
-        '--ncores',
-        action="store",
-        help="number of parallel cores",
-        default=1,
-        type=int
-    )
-    parser.add_argument(
         '--config',
-        action="store",
-        help="Analysis configuration",
-        type=str
+        action = "store",
+        help = "Analysis configuration",
+        type = str,
+        required = True
     )
     parser.add_argument(
         '--category',
-        action="store",
-        help="name of category or glob pattern",
-        default="*",
+        action = "store",
+        help = "name of category or glob pattern",
+        default = "*",
     )
     parser.add_argument(
         '--outdir',
-        action="store",
-        help="per-analsyis output directory (will be created)",
+        action = "store",
+        help = "per-analsyis output directory (will be created)",
+        default = "."
     )
 
     from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
     args = parser.parse_args()
     an_name, analysis = analysisFromConfig(args.config)
-
+    
     categories = [
-        c for c in analysis.categories if fnmatch.fnmatch(c.name, args.category)
+        c for c in analysis.categories if fnmatch.fnmatch(c.full_name, args.category)
     ]
-
-    main(analysis, categories, outdir=".", ncores=args.ncores)
+    if len(categories) == 0:
+        print "no categories matched out of:"
+        print "\n".join([c.full_name for c in analysis.categories])
+    main(analysis, categories, outdir=".")
