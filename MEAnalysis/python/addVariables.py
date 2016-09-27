@@ -31,9 +31,6 @@ def main(infile, outfile, cls_db_path):
         run = ev.run
         lumi = ev.lumi
         event = ev.evt
-        if iEv<10:
-            print run, lumi, event
-
 
         branches["common_mem"][0] = 0
         branches["common_mem_sig"][0] = 0

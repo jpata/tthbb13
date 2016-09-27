@@ -14,7 +14,7 @@ from TTH.Plotting.Datacards.sparse import save_hdict
 from TTH.CommonClassifier.db import ClassifierDB
 
 class BufferedTree:
-    """Class with buffered access
+    """Class with buffered TTree access, so that using tree.branch does not load the entry twice
     
     Attributes:
         branches (dict string->branch): TTree branches
@@ -303,6 +303,13 @@ class SparseOut:
         #loop over defined axes, calculate values
         for ax in self.axes:
             v = ax.getValue(event)
+            #Very important: manually treat underflow and overflow, put into first or last bin!
+            if v <= ax.lo:
+                v = ax.lo
+            #value of last bin
+            elif v >= ax.hi:
+                v = ax.hi - float(ax.hi - ax.lo)/float(ax.nbins)
+
             valVec.push_back(v)
         #print([v for v in valVec], "w={0}".format(weight))
 
@@ -358,11 +365,11 @@ def createOutputs(config, axes, dirs, systematics):
 
 def pass_HLT_sl_mu(event):
     pass_hlt = event["HLT_ttH_SL_mu"]
-    return event["is_sl"] and pass_hlt and abs(event["leps_pdgId"][0]) == 13
+    return event["is_sl"] and pass_hlt and int(abs(event["leps_pdgId"][0])) == 13
 
 def pass_HLT_sl_el(event):
     pass_hlt = event["HLT_ttH_SL_el"]
-    return event["is_sl"] and pass_hlt and abs(event["leps_pdgId"][0]) == 11
+    return event["is_sl"] and pass_hlt and int(abs(event["leps_pdgId"][0])) == 11
 
 def pass_HLT_dl_mumu(event):
     pass_hlt = event["HLT_ttH_DL_mumu"]
@@ -439,21 +446,22 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
 
         #systematics with weight
 
-        #create b-tagging systematics
-        for sdir in ["up", "down"]:
-            for syst in ["cferr1", "cferr2", "hf", "hfstats1", "hfstats2", "jes", "lf", "lfstats1", "lfstats2"]:
-                for tagger in ["CSV", "CMVAV2"]:
-                    bweight = "btagWeight{0}_{1}_{2}".format(tagger, sdir, syst)
-                    #make systematic outputs consistent in Up/Down naming
-                    sdir_cap = sdir.capitalize()
-                    systematic_weights += [
-                        ("CMS_ttH_{0}{1}{2}".format(tagger, syst, sdir_cap), lambda ev, bweight=bweight: ev["weight_nominal"]/ev["btagWeight"+tagger]*ev[bweight])
-                    ]
-                    btag_weights += [bweight]
+        ##create b-tagging systematics
+        #for sdir in ["up", "down"]:
+        #    for syst in ["cferr1", "cferr2", "hf", "hfstats1", "hfstats2", "jes", "lf", "lfstats1", "lfstats2"]:
+        #        for tagger in ["CSV", "CMVAV2"]:
+        #            bweight = "btagWeight{0}_{1}_{2}".format(tagger, sdir, syst)
+        #            #make systematic outputs consistent in Up/Down naming
+        #            sdir_cap = sdir.capitalize()
+        #            systematic_weights += [
+        #                ("CMS_ttH_{0}{1}{2}".format(tagger, syst, sdir_cap), lambda ev, bweight=bweight: ev["weight_nominal"]/ev["btagWeight"+tagger]*ev[bweight])
+        #            ]
+        #            btag_weights += [bweight]
 
         systematic_weights += [
-                ("puUp", lambda ev: ev["weight_nominal"]/ev["puWeight"] * ev["puWeightUp"]),
-                ("puDown", lambda ev: ev["weight_nominal"]/ev["puWeight"] * ev["puWeightDown"])
+        #        ("puUp", lambda ev: ev["weight_nominal"]/ev["puWeight"] * ev["puWeightUp"]),
+        #        ("puDown", lambda ev: ev["weight_nominal"]/ev["puWeight"] * ev["puWeightDown"]),
+                ("unweighted", lambda ev: 1.0)
         ]
 
 
@@ -852,7 +860,7 @@ if __name__ == "__main__":
         ])
         file_names = ["root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep14_leptonic_nome_v1/TT_TuneCUETP8M1_13TeV-powheg-pythia8/Sep14_leptonic_nome_v1/160914_141043/0003/tree_3602.root"]
         prefix = ""
-        sample = "TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"
+        sample = "ttHTobb_M125_13TeV_powheg_pythia8"
         skip_events = 0
         max_events = 5000
         an_name, analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/Plotting/python/Datacards/config_sldl.cfg")
