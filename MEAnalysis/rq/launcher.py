@@ -6,6 +6,7 @@ from rq import Queue
 from redis import Redis
 from rq import push_connection, get_failed_queue, Queue
 from job import count, sparse, plot_worker
+import socket
 
 import time, os, sys
 import shutil
@@ -54,10 +55,6 @@ syst_pairs = []
 # Configuation
 ####
 
-hostname = "t3ui12.psi.ch"
-queue = "short.q"
-njobs = 300
-
 def kill_jobs():
 
     proc = subprocess.Popen("qstat -u $USER | grep 'rq_worker'",
@@ -82,6 +79,7 @@ def start_jobs(queue, njobs, extra_requirements = []):
     pwd = os.getcwd()
 
     qsub_command = ["qsub", 
+                    "-q", queue,
                     "-N", "rq_worker", 
                     "-wd", pwd, 
                     "-o", pwd+"/logs/", 
@@ -94,8 +92,9 @@ def start_jobs(queue, njobs, extra_requirements = []):
 
     for _ in range(njobs):    
         subprocess.Popen(qsub_command,                         
-                         stdout=subprocess.PIPE).communicate()[0]       
-    time.sleep(5)
+                         stdout=subprocess.PIPE).communicate()[0] 
+    print "waiting 30s for jobs to be run..."
+    time.sleep(30)
 
 
 def get_base_plot(basepath, outpath, analysis, category, variable):
@@ -142,6 +141,8 @@ def waitJobs(jobs, num_retries=0):
                     qfail.requeue(job.id)
                 else:
                     perm_failed += [job]
+                    workflow_failed = True
+                    done = True
             if job.status is None:
                 import pdb
                 pdb.set_trace()
@@ -156,12 +157,12 @@ def waitJobs(jobs, num_retries=0):
             100.0 * status_counts.get("finished", 0) / sum(status_counts.values()),
         ))
 
-        if len(qfail)>0:
-            logger.error("--- failed")
-        for job in qfail.jobs:
-            workflow_failed = True
-            logger.error("job {0}, call={1} failed with message:\n{2}".format(job.id, job.get_call_string(), job.exc_info))
-            qfail.remove(job.id)
+        if len(qfail)>0 or len(perm_failed)>0:
+            logger.error("--- fail queue has {0} items".format(len(qfail)))
+            for job in qfail.jobs:
+                workflow_failed = True
+                logger.error("job {0}, call={1} failed with message:\n{2}".format(job.id, job.get_call_string(), job.exc_info))
+                qfail.remove(job.id)
         
         if status_counts.get("started", 0) == 0 and status_counts.get("queued", 0) == 0:
             done = True
@@ -235,12 +236,52 @@ if __name__ == "__main__":
 
     logger.info("starting workflow {0}".format(workflow_id))
 
-
     starting_points = ["ngen", "sparse", "categories", "plots", "limits"]
-                       
+    
+    import argparse
+    parser = argparse.ArgumentParser(
+        description='Runs the workflow'
+    )
+    parser.add_argument(
+        '--config',
+        action = "store",
+        help = "Analysis configuration",
+        type = str,
+        required = True
+    )
+    parser.add_argument(
+        '--hostname',
+        action = "store",
+        help = "Redis hostname",
+        type = str,
+        default = socket.gethostname()
+    )
+    parser.add_argument(
+        '--queue',
+        action = "store",
+        help = "Job queue",
+        type = str,
+        default = "short.q"
+    )
+    parser.add_argument(
+        '--start',
+        action = "store",
+        help = "Starting point",
+        type = str,
+        choices = starting_points,
+        default = "ngen"
+    )
+    parser.add_argument(
+        '--njobs',
+        action = "store",
+        help = "Job queue",
+        type = int,
+        default = 100
+    )
+    args = parser.parse_args()
 
     # Tell RQ what Redis connection to use
-    redis_conn = Redis(host=hostname)
+    redis_conn = Redis(host=args.hostname)
     qmain = Queue("default", connection=redis_conn)  # no args implies the default queue
     qfail = get_failed_queue(redis_conn)
     
@@ -253,18 +294,10 @@ if __name__ == "__main__":
         logging.warning("fail queue has jobs, emptying")
         qfail.empty()
 
-    conf_file_name = sys.argv[1]
     tmp_conf_name = "{0}/analysis.cfg".format(workdir)
-    analysis_name, analysis_cfg = analysisFromConfig(conf_file_name)
+    analysis_name, analysis = analysisFromConfig(args.config)
 
-    if len(sys.argv) > 2:
-        starting_point = sys.argv[2]
-    else:
-        starting_point = "ngen"
-
-    logger.info("starting point is:".format(starting_point))
-    
-    config_parser = Analysis.getConfigParser(conf_file_name)
+    logger.info("starting point is:".format(args.start))
     
     jobs = {}
     results = {}
@@ -272,16 +305,16 @@ if __name__ == "__main__":
     ###
     ### NGEN
     ###
-    if starting_points.index(starting_point) <= starting_points.index("ngen"):
+    if starting_points.index(args.start) <= starting_points.index("ngen"):
 
         kill_jobs()
-        start_jobs(queue, njobs)
+        start_jobs(args.queue, args.njobs)
 
         logger.info("starting step NGEN")
         t0 = time.time()
         jobs["ngen"] = {}
         all_jobs = []
-        for sample in analysis_cfg.samples:
+        for sample in analysis.samples:
             _jobs = getGeneratedEvents(sample)
             jobs["ngen"][sample.name] = _jobs
             all_jobs += _jobs
@@ -289,21 +322,21 @@ if __name__ == "__main__":
         #synchronize
         waitJobs(all_jobs, 0)
 
-        for sample in analysis_cfg.samples:
+        for sample in analysis.samples:
             ngen = sum(
                 [j.result["Count"] for j in jobs["ngen"][sample.name]]
             )
             sample.ngen = int(ngen)
             #propagate this change to the config parser
-            sample.updateConfig(config_parser)
+            sample.updateConfig(analysis.config)
 
         #save configuration, re-initialize parser
         with open(tmp_conf_name, "wb") as configfile:
-            config_parser.write(configfile)
-        config_parser = Analysis.getConfigParser(tmp_conf_name)
+            analysis.config.write(configfile)
+        analysis.config = Analysis.getConfigParser(tmp_conf_name)
 
         #reload the analysis from the updated configuration
-        analysis_name, analysis_cfg = analysisFromConfig(tmp_conf_name)
+        analysis_name, analysis = analysisFromConfig(tmp_conf_name)
         t1 = time.time()
         dt = t1 - t0
         logging.info("step NGEN done in {0:.2f} seconds".format(dt))
@@ -314,22 +347,21 @@ if __name__ == "__main__":
         logger.info("skipping step NGEN")
         
         logger.info("Verifying ngen is set")
-        for sample in analysis_cfg.samples:
+        for sample in analysis.samples:
             logger.info("{0}: {1}".format(sample.name, sample.ngen))
 
         # Copy the cfg also to the new output (for reference)
         with open(tmp_conf_name, "wb") as configfile:
-            config_parser.write(configfile)                        
-
+            analysis.config.write(configfile)                        
 
     ###
     ### SPARSINATOR
     ###
                         
-    if starting_points.index(starting_point) <= starting_points.index("sparse"):
+    if starting_points.index(args.start) <= starting_points.index("sparse"):
 
         kill_jobs()
-        start_jobs(queue, njobs)
+        start_jobs(args.queue, args.njobs)
 
         logger.info("starting step SPARSINATOR")
         t0 = time.time()
@@ -337,8 +369,8 @@ if __name__ == "__main__":
         results["sparse"] = []
 
         all_jobs = []
-        for ds in analysis_cfg.samples:
-            jobs["sparse"][ds] = runSparsinator_async(analysis_cfg, ds, workdir)
+        for ds in analysis.samples:
+            jobs["sparse"][ds] = runSparsinator_async(analysis, ds, workdir)
             all_jobs += jobs["sparse"][ds]
         logger.info("waiting on sparsinator jobs")
         waitJobs(all_jobs)
@@ -354,7 +386,7 @@ if __name__ == "__main__":
         ### SPARSE MERGE
         ###
         logger.info("starting step SPARSEMERGE")
-        for ds in analysis_cfg.samples:
+        for ds in analysis.samples:
             ds_results = [os.path.abspath(job.result) for job in jobs["sparse"][ds]]
             logger.info("sparsemerge: merging {0} files for sample {1}".format(len(ds_results), ds.name))
             results["sparse"] += [
@@ -369,6 +401,9 @@ if __name__ == "__main__":
             results["sparse"],
             remove_inputs = True
         )
+        analysis.config.set("sparse_data", "infile", results["sparse-merge"])
+        with open(tmp_conf_name, "wb") as configfile:
+            analysis.config.write(configfile)
 
         logger.info("step SPARSEMERGE done")
 
@@ -377,35 +412,35 @@ if __name__ == "__main__":
 
         # If we skipped sparse, we would assume that the output is in
         # the same directory as the cfg file
-        results["sparse-merge"] = os.path.join(os.path.dirname(conf_file_name), "sparse", "merged.root")
+        results["sparse-merge"] = analysis.config.get("sparse_data", "infile")
 
     
     ###
     ### CATEGORIES
     ###
 
-    if starting_points.index(starting_point) <= starting_points.index("categories"):
+    if starting_points.index(args.start) <= starting_points.index("categories"):
 
         kill_jobs()
-        start_jobs(queue, 50, ["-l", "h_vmem=6G"])
+        start_jobs(args.queue, 50, ["-l", "h_vmem=2G"])
 
         logger.info("starting step CATEGORIES")
         t0 = time.time()
 
         logger.info("running categories on file {0}".format(results["sparse-merge"]))
-        analysis_cfg.sparse_input_file = results["sparse-merge"]
+        analysis.sparse_input_file = results["sparse-merge"]
 
         os.makedirs("{0}/categories".format(workdir))
 
         all_jobs = []
-        for cat in analysis_cfg.categories:
+        for cat in analysis.categories:
 
             os.makedirs("{0}/categories/{1}/{2}".format(workdir, cat.name, cat.discriminator))
 
             all_jobs += [
                 qmain.enqueue_call(
                     func=MakeCategory.main,
-                    args=(analysis_cfg, [cat], "{0}/categories/{1}/{2}".format(workdir, cat.name, cat.discriminator), 1),
+                    args=(analysis, [cat], "{0}/categories/{1}/{2}".format(workdir, cat.name, cat.discriminator)),
                     timeout=20*60,
                     result_ttl=60*60,
                     meta={"retries": 0}
@@ -422,7 +457,7 @@ if __name__ == "__main__":
         ))
 
         # hadd Results        
-        cat_names = list(set([cat.name for cat in analysis_cfg.categories]))        
+        cat_names = list(set([cat.name for cat in analysis.categories]))        
 
         for cat_name in cat_names:                                                        
             logger.info("hadd-ing: {0}".format(cat_name))
@@ -459,7 +494,7 @@ if __name__ == "__main__":
     ### PLOTTING
     ###
         
-    if starting_points.index(starting_point) <= starting_points.index("plots"):
+    if starting_points.index(args.start) <= starting_points.index("plots"):
 
         kill_jobs()
         start_jobs(queue, njobs)
@@ -471,7 +506,7 @@ if __name__ == "__main__":
 
         all_jobs = []
 
-        for cat in analysis_cfg.categories:
+        for cat in analysis.categories:
 
             all_jobs += [
                 qmain.enqueue_call(
@@ -502,10 +537,10 @@ if __name__ == "__main__":
     ### LIMITS
     ###
         
-    if starting_points.index(starting_point) <= starting_points.index("limits"):
+    if starting_points.index(args.start) <= starting_points.index("limits"):
 
         kill_jobs()
-        start_jobs(queue, njobs)
+        start_jobs(args.queue, args.njobs)
 
         logger.info("starting step LIMITS")
 
@@ -514,18 +549,18 @@ if __name__ == "__main__":
         shutil.copytree(results["categories-path"], "{0}/limits".format(workdir))
 
         # Add individual limits for all categories
-        for cat in analysis_cfg.categories:            
-            if cat.do_limit:                
-                analysis_cfg.groups[cat.name] = [cat]
+        for cat in analysis.categories:
+            if cat.do_limit:
+                analysis.groups[cat.name] = [cat]
         
         # Prepare jobs
         all_jobs = []
-        for group in analysis_cfg.groups.keys():                        
+        for group in analysis.groups.keys():
             all_jobs += [
                 qmain.enqueue_call(
                     func=MakeLimits.main,
                     args=["{0}/limits".format(workdir),
-                          analysis_cfg, 
+                          analysis,
                           group],
                     timeout=40*60,
                     result_ttl=60*60,

@@ -47,15 +47,6 @@ def sparse(analysis, filenames, sample, outfile):
     os.remove(ofname)
     return outfile
 
-
-
-def blind(h):
-    hc = h.Clone()
-    for i in range(h.GetNbinsX()+1):
-        hc.SetBinContent(i, 0)
-        hc.SetBinError(i, 0)
-    return hc
-
 #def plot_syst_updown(nominal, up, down):
 #    plt.figure(figsize=(6,6))
 #    heplot.barhist(nominal, color="black")
