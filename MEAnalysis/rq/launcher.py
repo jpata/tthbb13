@@ -21,8 +21,6 @@ from TTH.Plotting.Datacards.AnalysisSpecificationClasses import Analysis
 from TTH.Plotting.Datacards import MakeCategory
 from TTH.Plotting.Datacards import MakeLimits
 
-
-
 import pdb
 
 import TTH.Plotting.joosep.plotlib as plotlib #heplot, 
@@ -51,6 +49,55 @@ procs = [x[0] for x in procs_names]
 
 syst_pairs = []
 
+
+####
+# Configuation
+####
+
+hostname = "t3ui12.psi.ch"
+queue = "short.q"
+njobs = 300
+
+def kill_jobs():
+
+    proc = subprocess.Popen("qstat -u $USER | grep 'rq_worker'",
+                     shell=True,
+                     stdout=subprocess.PIPE)
+    out = proc.communicate()[0]
+
+    jobs = []
+    for line in out.split("\n"):
+        if not line:
+            continue
+        jobs.append(line.split(" ")[0])
+        
+    for job in jobs:
+        subprocess.Popen("qdel {0}".format(job),
+                         shell=True,
+                         stdout=subprocess.PIPE).communicate()       
+    
+
+def start_jobs(queue, njobs, extra_requirements = []):
+    
+    pwd = os.getcwd()
+
+    qsub_command = ["qsub", 
+                    "-N", "rq_worker", 
+                    "-wd", pwd, 
+                    "-o", pwd+"/logs/", 
+                    "-e", pwd+"/logs/"]
+                    
+    if extra_requirements:
+        qsub_command += extra_requirements
+
+    qsub_command.append("worker.sh")
+
+    for _ in range(njobs):    
+        subprocess.Popen(qsub_command,                         
+                         stdout=subprocess.PIPE).communicate()[0]       
+    time.sleep(5)
+
+
 def get_base_plot(basepath, outpath, analysis, category, variable):
     
 
@@ -73,7 +120,7 @@ def get_base_plot(basepath, outpath, analysis, category, variable):
         "title_extended": r"$,\ \mathcal{L}=17\ \mathrm{fb}^{-1}$, ",
         "systematics": syst_pairs,
         "do_syst": True,
-        "blindFunc": "blind_mem" if "mem" in variable else "no_blind",
+        "blindFunc": "blind_mem" if "common" in variable else "no_blind",
     }
 
 
@@ -193,7 +240,7 @@ if __name__ == "__main__":
                        
 
     # Tell RQ what Redis connection to use
-    redis_conn = Redis(host="t3ui17.psi.ch")
+    redis_conn = Redis(host=hostname)
     qmain = Queue("default", connection=redis_conn)  # no args implies the default queue
     qfail = get_failed_queue(redis_conn)
     
@@ -227,6 +274,9 @@ if __name__ == "__main__":
     ###
     if starting_points.index(starting_point) <= starting_points.index("ngen"):
 
+        kill_jobs()
+        start_jobs(queue, njobs)
+
         logger.info("starting step NGEN")
         t0 = time.time()
         jobs["ngen"] = {}
@@ -258,6 +308,7 @@ if __name__ == "__main__":
         dt = t1 - t0
         logging.info("step NGEN done in {0:.2f} seconds".format(dt))
  
+        kill_jobs()        
     else:
 
         logger.info("skipping step NGEN")
@@ -277,6 +328,8 @@ if __name__ == "__main__":
                         
     if starting_points.index(starting_point) <= starting_points.index("sparse"):
 
+        kill_jobs()
+        start_jobs(queue, njobs)
 
         logger.info("starting step SPARSINATOR")
         t0 = time.time()
@@ -295,6 +348,7 @@ if __name__ == "__main__":
         dt = t1 - t0
         logging.info("step SPARSINATOR done in {0:.2f} seconds".format(dt))
 
+        kill_jobs()
 
         ###
         ### SPARSE MERGE
@@ -331,6 +385,10 @@ if __name__ == "__main__":
     ###
 
     if starting_points.index(starting_point) <= starting_points.index("categories"):
+
+        kill_jobs()
+        start_jobs(queue, 50, ["-l", "h_vmem=6G"])
+
         logger.info("starting step CATEGORIES")
         t0 = time.time()
 
@@ -387,6 +445,8 @@ if __name__ == "__main__":
 
         logger.info("done with post processing CATEGORIES")
         
+        kill_jobs()
+
     else:        
         logger.info("skipping step CATEGORIES")
 
@@ -400,6 +460,9 @@ if __name__ == "__main__":
     ###
         
     if starting_points.index(starting_point) <= starting_points.index("plots"):
+
+        kill_jobs()
+        start_jobs(queue, njobs)
 
         logger.info("starting step PLOTS")
         t0 = time.time()
@@ -429,6 +492,8 @@ if __name__ == "__main__":
         dt = t1 - t0
         logger.info("step PLOTS done in {0:.2f} seconds".format(dt))
 
+        kill_jobs()
+
     else:        
         logger.info("skipping step PLOTS")
 
@@ -438,6 +503,9 @@ if __name__ == "__main__":
     ###
         
     if starting_points.index(starting_point) <= starting_points.index("limits"):
+
+        kill_jobs()
+        start_jobs(queue, njobs)
 
         logger.info("starting step LIMITS")
 
@@ -469,3 +537,5 @@ if __name__ == "__main__":
         time.sleep(5)
         dt = t1 - t0
         logger.info("step LIMITS done in {0:.2f} seconds".format(dt))
+        
+        kill_jobs()
