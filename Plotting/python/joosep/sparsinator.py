@@ -418,7 +418,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
 
 
 
-    MEM_SF = analysis.config.get("sparsinator", "mem_sf")
+    MEM_SF = analysis.config.getfloat("sparsinator", "mem_sf")
 
     # Create pairs of (systematic_name, weight function), which will be used on the
     # nominal event to create reweighted copies of the event. The systematic names
@@ -807,7 +807,9 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                     syst_index = int(analysis.config.get(syst, "index"))
                     db_key = (int(event.run), int(event.lumi), int(event.evt), syst_index)
                     if cls_db.data.has_key(db_key):
-                        ret["common_mem"] = cls_db.get(db_key)
+                        classifiers = cls_db.get(db_key)
+                        if classifiers.mem_p_sig > 0:
+                            ret["common_mem"] = classifiers.mem_p_sig / (classifiers.mem_p_sig + float(MEM_SF) * classifiers.mem_p_bkg)
 
                 #Fill the base histogram
                 for (k, v) in outdict_syst[syst].items():
@@ -848,8 +850,9 @@ if __name__ == "__main__":
         file_names = map(getSitePrefix, [
             "/store/user/jpata/tth/Sep14_leptonic_nome_v1/ttHTobb_M125_13TeV_powheg_pythia8/Sep14_leptonic_nome_v1/160914_142604/0000/tree_1.root"
         ])
+        file_names = ["root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep14_leptonic_nome_v1/TT_TuneCUETP8M1_13TeV-powheg-pythia8/Sep14_leptonic_nome_v1/160914_141043/0003/tree_3602.root"]
         prefix = ""
-        sample = "ttHTobb_M125_13TeV_powheg_pythia8"
+        sample = "TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"
         skip_events = 0
         max_events = 5000
         an_name, analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/Plotting/python/Datacards/config_sldl.cfg")

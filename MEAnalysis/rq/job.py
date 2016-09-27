@@ -24,6 +24,8 @@ from rootpy.plotting import root2matplotlib as rplt
 
 
 
+def copy_rsync(src, dst):
+    os.system("rsync --bwlimit=20000 {0} {1}".format(src, dst))
 
 def count(filenames):
     ofname = tempfile.mktemp() 
@@ -32,14 +34,14 @@ def count(filenames):
     return ret
 
 def sparse(analysis, filenames, sample, outfile):
-    ofname = tempfile.mktemp()
+    ofname = tempfile.mktemp(dir=os.path.joinpath("/scratch/"+os.environ["USER"]))
     sparsinator.main(analysis, filenames, sample, ofname)
 
     basepath = os.path.dirname(outfile)
     if not os.path.isdir(basepath):
         os.makedirs(basepath)
 
-    copyfile(ofname, outfile)
+    copy_rsync(ofname, outfile)
     os.remove(ofname)
     return outfile
 

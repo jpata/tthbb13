@@ -35,8 +35,8 @@ def get_limits(fn):
         quantiles = np.zeros(6)
         lims[:] = 99999
         return lims, quantiles
-    lims = np.zeros(tt.GetEntries())
-    quantiles = np.zeros(tt.GetEntries())
+    lims = np.zeros(6)
+    quantiles = np.zeros(6)
     for i in range(tt.GetEntries()):
         tt.GetEntry(i)
         lims[i] = tt.limit
