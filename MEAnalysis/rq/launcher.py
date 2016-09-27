@@ -5,7 +5,7 @@ logger = logging.getLogger("main")
 from rq import Queue
 from redis import Redis
 from rq import push_connection, get_failed_queue, Queue
-from job import count, sparse, plot_worker
+from job import count, sparse, plot
 import socket
 
 import time, os, sys
@@ -118,7 +118,7 @@ def get_base_plot(basepath, outpath, analysis, category, variable):
         "show_overflow": True,
         "title_extended": r"$,\ \mathcal{L}=17\ \mathrm{fb}^{-1}$, ",
         "systematics": syst_pairs,
-        "do_syst": True,
+        "do_syst": False, #currently crashes with True due to some dvipng/DISPLAY issue
         "blindFunc": "blind_mem" if "common" in variable else "no_blind",
     }
 
@@ -143,6 +143,7 @@ def waitJobs(jobs, num_retries=0):
                     perm_failed += [job]
                     workflow_failed = True
                     done = True
+                    break
             if job.status is None:
                 import pdb
                 pdb.set_trace()
@@ -150,10 +151,11 @@ def waitJobs(jobs, num_retries=0):
         status_counts = dict(Counter(status))
 
         sys.stdout.write("\033[K") # Clear this line
-        sys.stdout.write("\033[92mstatus\033[0m {3:.2f}%\tq={0}\ts={1}\tf={2}\n".format(
+        sys.stdout.write("\033[92mstatus\033[0m {3:.2f}%\tq={0}\ts={1}\tf={2}\tE={3}\n".format(
             status_counts.get("queued", 0),
             status_counts.get("started", 0),
             status_counts.get("finished", 0),
+            status_counts.get("failed", 0),
             100.0 * status_counts.get("finished", 0) / sum(status_counts.values()),
         ))
 
@@ -307,8 +309,9 @@ if __name__ == "__main__":
     ###
     if starting_points.index(args.start) <= starting_points.index("ngen"):
 
-        kill_jobs()
-        start_jobs(args.queue, args.njobs)
+        if args.queue != "EXISTING":
+            kill_jobs()
+            start_jobs(args.queue, args.njobs)
 
         logger.info("starting step NGEN")
         t0 = time.time()
@@ -341,7 +344,8 @@ if __name__ == "__main__":
         dt = t1 - t0
         logging.info("step NGEN done in {0:.2f} seconds".format(dt))
  
-        kill_jobs()        
+        if args.queue != "EXISTING":
+            kill_jobs()        
     else:
 
         logger.info("skipping step NGEN")
@@ -360,8 +364,9 @@ if __name__ == "__main__":
                         
     if starting_points.index(args.start) <= starting_points.index("sparse"):
 
-        kill_jobs()
-        start_jobs(args.queue, args.njobs)
+        if args.queue != "EXISTING":
+            kill_jobs()
+            start_jobs(args.queue, args.njobs)
 
         logger.info("starting step SPARSINATOR")
         t0 = time.time()
@@ -380,7 +385,8 @@ if __name__ == "__main__":
         dt = t1 - t0
         logging.info("step SPARSINATOR done in {0:.2f} seconds".format(dt))
 
-        kill_jobs()
+        if args.queue != "EXISTING":
+            kill_jobs()
 
         ###
         ### SPARSE MERGE
@@ -421,8 +427,9 @@ if __name__ == "__main__":
 
     if starting_points.index(args.start) <= starting_points.index("categories"):
 
-        kill_jobs()
-        start_jobs(args.queue, 50, ["-l", "h_vmem=2G"])
+        if args.queue != "EXISTING":
+            kill_jobs()
+            start_jobs(args.queue, 50, ["-l", "h_vmem=2G"])
 
         logger.info("starting step CATEGORIES")
         t0 = time.time()
@@ -480,14 +487,15 @@ if __name__ == "__main__":
 
         logger.info("done with post processing CATEGORIES")
         
-        kill_jobs()
+        if args.queue != "EXISTING":
+            kill_jobs()
 
     else:        
         logger.info("skipping step CATEGORIES")
 
         # If we skipped categories, we would assume that the output is in
         # the same directory as the cfg file
-        results["categories-path"] = os.path.join(os.path.dirname(conf_file_name), "categories")
+        results["categories-path"] = os.path.join(os.path.dirname(args.config), "categories")
 
 
     ###
@@ -496,8 +504,9 @@ if __name__ == "__main__":
         
     if starting_points.index(args.start) <= starting_points.index("plots"):
 
-        kill_jobs()
-        start_jobs(queue, njobs)
+        if args.queue != "EXISTING":
+            kill_jobs()
+            start_jobs(args.queue, args.njobs)
 
         logger.info("starting step PLOTS")
         t0 = time.time()
@@ -510,7 +519,7 @@ if __name__ == "__main__":
 
             all_jobs += [
                 qmain.enqueue_call(
-                    func=plot_worker,
+                    func=plot,
                     args=[get_base_plot(results["categories-path"], 
                                         os.path.join(workdir, "plots"),
                                         "", cat.name, cat.discriminator)],
@@ -527,7 +536,8 @@ if __name__ == "__main__":
         dt = t1 - t0
         logger.info("step PLOTS done in {0:.2f} seconds".format(dt))
 
-        kill_jobs()
+        if args.queue != "EXISTING":
+            kill_jobs()
 
     else:        
         logger.info("skipping step PLOTS")
@@ -539,8 +549,9 @@ if __name__ == "__main__":
         
     if starting_points.index(args.start) <= starting_points.index("limits"):
 
-        kill_jobs()
-        start_jobs(args.queue, args.njobs)
+        if args.queue != "EXISTING":
+            kill_jobs()
+            start_jobs(args.queue, args.njobs)
 
         logger.info("starting step LIMITS")
 
@@ -573,4 +584,5 @@ if __name__ == "__main__":
         dt = t1 - t0
         logger.info("step LIMITS done in {0:.2f} seconds".format(dt))
         
-        kill_jobs()
+        if args.queue != "EXISTING":
+            kill_jobs()

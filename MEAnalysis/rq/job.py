@@ -22,6 +22,7 @@ import rootpy
 from rootpy.plotting import Hist
 from rootpy.plotting import root2matplotlib as rplt
 
+from TTH.Plotting.joosep import controlPlot
 
 
 def copy_rsync(src, dst):
@@ -56,26 +57,5 @@ def sparse(analysis, filenames, sample, outfile):
 
 
 
-def plot_worker(kwargs):
-    inf = rootpy.io.File(kwargs.pop("infile"))
-    outname = kwargs.pop("outname")
-    histname = kwargs.pop("histname")
-    procs = kwargs.pop("procs")
-    signal_procs = kwargs.pop("signal_procs")
-    do_syst = kwargs.pop("do_syst")
-
-    fig = plt.figure(figsize=(6,6))
-    ret = plotlib.draw_data_mc(
-        inf,
-        histname,
-        procs,
-        signal_procs,
-        **kwargs
-    )
-    
-    path = os.path.dirname(outname)
-    if not os.path.isdir(path):
-        os.makedirs(path)
-    plotlib.svfg(outname + ".pdf")
-    plt.clf()    
-    inf.Close()
+def plot(kwargs):
+    return controlPlot.plot_worker(kwargs)
