@@ -116,9 +116,13 @@ def analysisFromConfig(config_file_path):
     ########################################
     
     process_lists = {}
+    process_lists_original = {}
     for process_list in config.get("general","process_lists").split():
 
+
+        process_lists_original[process_list] = []
         process_lists[process_list] = []
+
 
         is_data =  config.get(process_list, "is_data")
 
@@ -152,7 +156,10 @@ def analysisFromConfig(config_file_path):
                         xs_weight = samples_base.xsec_sample[in_name]/samples_dict[in_name].ngen))
         # End loop over processes
 
+        #post-processing of processes
+        #split by trigger path
         if config.get(process_list, "split_by_trigger_path") == "True":
+            process_lists_original[process_list] = process_lists[process_list]
             process_lists[process_list] = splitByTriggerPath(
                 process_lists[process_list],
                 lumi,
@@ -163,7 +170,12 @@ def analysisFromConfig(config_file_path):
     # Prepare the process list for the analysis object
     # TODO: check if needed since we also have per category process lists
     processes = sum([process_lists[x] for x in config.get("general", "processes").split()],[])
-            
+
+    #Processes in unsplit form
+    processes_original = []
+    for pl in process_lists_original.values():
+        for proc in pl:
+            processes_original.append(proc)
 
     ########################################
     # Categories
@@ -255,6 +267,7 @@ def analysisFromConfig(config_file_path):
         samples = samples,
         cuts = cuts_dict,
         processes = processes,
+        processes_unsplit = processes_original,
         categories = cats,
         sparse_input_file = input_file,
         groups = analysis_groups,

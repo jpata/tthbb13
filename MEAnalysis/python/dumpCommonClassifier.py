@@ -4,11 +4,63 @@ from TTH.MEAnalysis.samples_base import getSitePrefix, get_prefix_sample
 from PhysicsTools.HeppyCore.statistics.tree import Tree
 import numpy as np
 
+class Correction:
+    def __init__(self, *args, **kwargs):
+        self.name = kwargs.get("name")
+        self.nominal = kwargs.get("nominal")
+        self.variated = kwargs.get("variated")
+
+class Jet:
+    def __init__(self, *args, **kwargs):
+        self.pt = kwargs.get("pt")
+        self.eta = kwargs.get("eta")
+        self.phi = kwargs.get("phi")
+        self.mass = kwargs.get("mass")
+
+        self.csv = kwargs.get("csv")
+        self.cmva = kwargs.get("cmva")
+        self.corrections = kwargs.get("corrections")
+
+    def correct(self, correction):
+        return Jet(
+            pt = correction.variated * self.pt / correction.nominal if correction.nominal > 0 else self.pt,
+            eta = self.eta,
+            phi = self.phi,
+            mass = correction.variated * self.mass / correction.nominal if correction.nominal > 0 else self.mass,
+            csv = self.csv,
+            cmva = self.cmva,
+            corrections = self.corrections
+        )
+
+def make_corrections(event, schema, jet_base, ijet):
+    corrs = []
+
+    corrs += [Correction(
+        name = "nominal",
+        nominal=1.0,
+        variated=1.0,
+    )]
+
+    if schema == "mc":
+        for nominal, variated in [
+            ("corr", "JESUp"),
+            ("corr", "JESDown"),
+            ("corr_JER", "JERUp"),
+            ("corr_JER", "JERDown"),
+        ]:
+            corrs += [
+                Correction(
+                    name = variated,
+                    nominal=getattr(event, "{0}_{1}".format(jet_base, nominal))[ijet],
+                    variated=getattr(event, "{0}_{1}".format(jet_base, "corr_" + variated))[ijet],
+                )
+            ]
+    return corrs
+
 class Scenario:
     def __init__(self, *args, **kwargs):
-        self.jets_p4 = kwargs.get("jets_p4")
-        self.jets_csv = kwargs.get("jets_csv")
-        self.jets_cmva = kwargs.get("jets_cmva")
+        self.jets = kwargs.get("jets")
+        self.loose_jets = kwargs.get("loose_jets")
         self.leps_p4 = kwargs.get("leps_p4")
         self.leps_charge = kwargs.get("leps_charge")
         self.met_pt = kwargs.get("met_pt")
@@ -28,7 +80,7 @@ if __name__ == "__main__":
         ])
         prefix = ""
         sample_name = "ttHTobb_M125_13TeV_powheg_pythia8"
-        an_name, analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/Plotting/python/Datacards/config_sl.cfg")
+        an_name, analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/Plotting/python/Datacards/config_sldl.cfg")
 
     sample = analysis.get_sample(sample_name)
 
@@ -41,8 +93,12 @@ if __name__ == "__main__":
     tree.var('systematic', type=int)
     tree.var('njets', type=int)
     max_jets = 10
+    tree.var('nloose_jets', type=int)
+    max_loose_jets = 5
     for v in ["jet_pt", "jet_eta", "jet_phi", "jet_mass", "jet_csv", "jet_cmva"]:
         tree.vector(v, "njets", maxlen=max_jets, type=float, storageType="F")
+    for v in ["loose_jet_pt", "loose_jet_eta", "loose_jet_phi", "loose_jet_mass", "loose_jet_csv", "loose_jet_cmva"]:
+        tree.vector(v, "nloose_jets", maxlen=max_loose_jets, type=float, storageType="F")
     for v in ["jet_type"]:
         tree.vector(v, "njets", maxlen=max_jets, type=int, storageType="i")
     
@@ -63,7 +119,6 @@ if __name__ == "__main__":
         if not accept:
             continue
        
-        scenarios = []
 
         leps_p4 = []
         leps_charge = []
@@ -76,76 +131,62 @@ if __name__ == "__main__":
             ]
             leps_p4 += [p4]
             leps_charge += [math.copysign(1, ev.leps_pdgId[ilep])]
-        
-        jets_p4 = []
-        jets_btag = []
-        jets_csv = []
-        jets_cmva = []
+ 
+        jets = []       
+        loose_jets = []
+
         for ijet in range(ev.njets)[:max_jets]:
-            p4 = [
-                ev.jets_pt[ijet],
-                ev.jets_eta[ijet],
-                ev.jets_phi[ijet],
-                ev.jets_mass[ijet]
-            ]
-            jets_p4 += [p4]
-            jets_btag += [ev.jets_btagFlag[ijet]]
-            jets_csv += [ev.jets_btagCSV[ijet]]
-            jets_cmva += [ev.jets_btagCMVA[ijet]]
+            jets += [Jet(
+                pt = ev.jets_pt[ijet],
+                eta = ev.jets_eta[ijet],
+                phi = ev.jets_phi[ijet],
+                mass = ev.jets_mass[ijet],
+                csv = ev.jets_btagCSV[ijet],
+                cmva = ev.jets_btagCMVA[ijet],
+                corrections = make_corrections(ev, sample.schema, "jets", ijet)
+            )]
 
-            scale_factors = [
-                (0, 1.0),
-            ]
-            if sample.schema == "mc":
-                if ev.jets_corr[ijet]>0:
-                    scale_factors += [
-                        (1, ev.jets_corr_JESUp[ijet]/ev.jets_corr[ijet]),
-                        (2, ev.jets_corr_JESDown[ijet]/ev.jets_corr[ijet]),
-                    ]
-                else:
-                    scale_factors += [
-                        (1, 1.0),
-                        (2, 1.0),
-                    ]
-                if ev.jets_corr_JER[ijet]>0:
-                    scale_factors += [
-                        (3, ev.jets_corr_JERUp[ijet]/ev.jets_corr_JER[ijet]),
-                        (4, ev.jets_corr_JERDown[ijet]/ev.jets_corr_JER[ijet]),
-                    ]
-                else:
-                    scale_factors += [
-                        (3, 1.0),
-                        (4, 1.0),
-                    ]
+        for ijet in range(ev.nloose_jets)[:max_loose_jets]:
+            loose_jets += [Jet(
+                pt = ev.loose_jets_pt[ijet],
+                eta = ev.loose_jets_eta[ijet],
+                phi = ev.loose_jets_phi[ijet],
+                mass = ev.loose_jets_mass[ijet],
+                csv = ev.loose_jets_btagCSV[ijet],
+                cmva = ev.loose_jets_btagCMVA[ijet],
+                corrections = make_corrections(ev, sample.schema, "loose_jets", ijet)
+            )]
 
-        for syst_idx, sf in scale_factors:
-            jets_p4_rescaled = []
-            for p4 in jets_p4:
-                pt_new = sf * p4[0]
-                mass_new = sf * p4[3]
-                jets_p4_rescaled += [(pt_new, p4[1], p4[2], mass_new)]
-
+        scenarios = []
+        for isf in range(len(jets[0].corrections)):
             scenario = Scenario(
-                jets_p4 = jets_p4_rescaled,
-                jets_csv = jets_csv,
-                jets_cmva = jets_cmva,
+                jets = [j.correct(j.corrections[isf]) for j in jets],
+                loose_jets = [j.correct(j.corrections[isf]) for j in loose_jets],
                 leps_p4 = leps_p4,
                 leps_charge = leps_charge,
                 met_pt = ev.met_pt,
                 met_phi = ev.met_phi,
-                systematic_index = syst_idx
+                systematic_index = isf
             )
             scenarios += [scenario]
 
         for scenario in scenarios:
-            tree.fill('njets', len(scenario.jets_p4))
-            tree.vfill('jet_pt', [x[0] for x in scenario.jets_p4])
-            tree.vfill('jet_eta', [x[1] for x in scenario.jets_p4])
-            tree.vfill('jet_phi', [x[2] for x in scenario.jets_p4])
-            tree.vfill('jet_mass', [x[3] for x in scenario.jets_p4])
-            tree.vfill('jet_csv', scenario.jets_csv)
-            tree.vfill('jet_cmva', scenario.jets_cmva)
-            
+            tree.fill('njets', len(scenario.jets))
+            tree.vfill('jet_pt', [x.pt for x in scenario.jets])
+            tree.vfill('jet_eta', [x.eta for x in scenario.jets])
+            tree.vfill('jet_phi', [x.phi for x in scenario.jets])
+            tree.vfill('jet_mass', [x.mass for x in scenario.jets])
+            tree.vfill('jet_csv', [x.csv for x in scenario.jets])
+            tree.vfill('jet_cmva', [x.cmva for x in scenario.jets])
+
+            tree.fill('nloose_jets', len(scenario.loose_jets))
+            tree.vfill('loose_jet_pt', [x.pt for x in scenario.loose_jets])
+            tree.vfill('loose_jet_eta', [x.eta for x in scenario.loose_jets])
+            tree.vfill('loose_jet_phi', [x.phi for x in scenario.loose_jets])
+            tree.vfill('loose_jet_mass', [x.mass for x in scenario.loose_jets])
+            tree.vfill('loose_jet_csv', [x.csv for x in scenario.loose_jets])
+            tree.vfill('loose_jet_cmva', [x.cmva for x in scenario.loose_jets])
+
             tree.fill('nleps', len(scenario.leps_p4))
             tree.vfill('lep_pt', [x[0] for x in scenario.leps_p4])
             tree.vfill('lep_eta', [x[1] for x in scenario.leps_p4])

@@ -52,6 +52,8 @@ procs = [x[0] for x in procs_names]
 syst_pairs = []
 
 def get_base_plot(basepath, outpath, analysis, category, variable):
+    
+
     s = "{0}/{1}/{2}".format(basepath, analysis, category)
     return {
         "infile": s + ".root",
@@ -61,17 +63,17 @@ def get_base_plot(basepath, outpath, analysis, category, variable):
         "signal_procs": ["ttH_hbb"],
         "dataname": "data", #data_obs for fake data
         "rebin": 1,
-        "xlabel": plotlib.varnames[variable] if variable in plotlib.varnames.keys() else "PLZ add me to Varnames", 
-        "xunit": plotlib.varunits[variable] if variable in plotlib.varunits.keys() else "" ,
+        "xlabel": plotlib.varnames[variable] if variable in plotlib.varnames.keys() else "PLZ add me to Varnames",
+        "xunit": plotlib.varunits[variable] if variable in plotlib.varunits.keys() else "",
         "legend_fontsize": 12,
         "legend_loc": "best",
         "colors": [plotlib.colors.get(p) for p in procs],
         "do_legend": True,
         "show_overflow": True,
-        "title_extended": r"$,\ \mathcal{L}=00.0\ \mathrm{fb}^{-1}$, ",
+        "title_extended": r"$,\ \mathcal{L}=17\ \mathrm{fb}^{-1}$, ",
         "systematics": syst_pairs,
         "do_syst": True,
-        #"blindFunc": blind,
+        "blindFunc": "blind_mem" if "mem" in variable else "no_blind",
     }
 
 
@@ -111,7 +113,7 @@ def waitJobs(jobs, num_retries=0):
             logger.error("--- failed")
         for job in qfail.jobs:
             workflow_failed = True
-            logger.error("job {0} failed with message:\n{1}".format(job.id, job.exc_info))
+            logger.error("job {0}, call={1} failed with message:\n{2}".format(job.id, job.get_call_string(), job.exc_info))
             qfail.remove(job.id)
         
         if status_counts.get("started", 0) == 0 and status_counts.get("queued", 0) == 0:
@@ -136,7 +138,7 @@ def getGeneratedEvents(sample):
                 func=count,
                 args=(inputs, ),
                 timeout=60*10,
-                result_ttl=86400,
+                result_ttl=60*60,
                 meta={"retries": 0}
             )
         ]
@@ -172,7 +174,7 @@ def runSparsinator_async(analysis, sample, workdir):
                 func=sparse,
                 args=(analysis, inputs, sample.name, ofname),
                 timeout=60*60,
-                result_ttl=86400,
+                result_ttl=60*60,
                 meta={"retries": 0}
             )
         ]
@@ -300,6 +302,7 @@ if __name__ == "__main__":
         logger.info("starting step SPARSEMERGE")
         for ds in analysis_cfg.samples:
             ds_results = [os.path.abspath(job.result) for job in jobs["sparse"][ds]]
+            logger.info("sparsemerge: merging {0} files for sample {1}".format(len(ds_results), ds.name))
             results["sparse"] += [
                 mergeFiles(
                     os.path.abspath("{0}/sparse/sparse_{1}.root".format(workdir, ds.name)),
@@ -346,7 +349,7 @@ if __name__ == "__main__":
                     func=MakeCategory.main,
                     args=(analysis_cfg, [cat], "{0}/categories/{1}/{2}".format(workdir, cat.name, cat.discriminator), 1),
                     timeout=20*60,
-                    result_ttl=86400,
+                    result_ttl=60*60,
                     meta={"retries": 0}
                 )
             ]
@@ -414,7 +417,7 @@ if __name__ == "__main__":
                                         os.path.join(workdir, "plots"),
                                         "", cat.name, cat.discriminator)],
                     timeout=20*60,
-                    result_ttl=86400,
+                    result_ttl=60*60,
                     meta={"retries": 0}
                 )
             ]
@@ -457,7 +460,7 @@ if __name__ == "__main__":
                           analysis_cfg, 
                           group],
                     timeout=40*60,
-                    result_ttl=86400,
+                    result_ttl=60*60,
                     meta={"retries": 0})]
             
         t0 = time.time()

@@ -174,6 +174,7 @@ class Analysis:
         self.samples = kwargs.get("samples", [])
         self.cuts = kwargs.get("cuts", {})
         self.processes = kwargs.get("processes")
+        self.processes_unsplit = kwargs.get("processes_unsplit")
         self.categories = kwargs.get("categories")
         self.sparse_input_file = kwargs.get("sparse_input_file")
 
