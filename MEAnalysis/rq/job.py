@@ -24,6 +24,7 @@ from rootpy.plotting import root2matplotlib as rplt
 
 from TTH.Plotting.joosep import controlPlot
 
+from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
 
 def copy_rsync(src, dst):
     os.system("rsync --bwlimit=20000 {0} {1}".format(src, dst))
@@ -34,9 +35,11 @@ def count(filenames):
     os.remove(ofname)
     return ret
 
-def sparse(analysis, filenames, sample, outfile):
+def sparse(config_path, filenames, sample, outfile):
+    an_name, analysis = analysisFromConfig(config_path)
     temppath = os.path.join("/scratch/{0}/".format(os.environ["USER"]))
-    os.makedirs(temppath)
+    if not os.path.isdir(temppath): 
+        os.makedirs(temppath)
     ofname = tempfile.mktemp(dir=temppath)
     sparsinator.main(analysis, filenames, sample, ofname)
 

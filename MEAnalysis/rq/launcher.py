@@ -213,7 +213,7 @@ def mergeFiles(outfile, infiles, remove_inputs=True):
                 os.remove(res)
     return outfile
 
-def runSparsinator_async(analysis, sample, workdir):
+def runSparsinator_async(config_path, sample, workdir):
     jobs = []
     for ijob, inputs in enumerate(chunks(sample.file_names, sample.step_size_sparsinator)):
         ofname = "{0}/sparse/{1}/sparse_{2}.root".format(
@@ -222,7 +222,7 @@ def runSparsinator_async(analysis, sample, workdir):
         jobs += [
             qmain.enqueue_call(
                 func=sparse,
-                args=(analysis, inputs, sample.name, ofname),
+                args=(config_path, inputs, sample.name, ofname),
                 timeout=60*60,
                 result_ttl=60*60,
                 meta={"retries": 0}
@@ -375,7 +375,7 @@ if __name__ == "__main__":
 
         all_jobs = []
         for ds in analysis.samples:
-            jobs["sparse"][ds] = runSparsinator_async(analysis, ds, workdir)
+            jobs["sparse"][ds] = runSparsinator_async(tmp_conf_name, ds, workdir)
             all_jobs += jobs["sparse"][ds]
         logger.info("waiting on sparsinator jobs")
         waitJobs(all_jobs)
