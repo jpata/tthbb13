@@ -813,6 +813,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                     ret["weight_nominal"] *= ret["puWeight"] * ret["btagWeightCSV"] * ret["triggerEmulationWeight"] * ret["lep_SF_weight"]
             
                 ret["common_mem"] = 0
+                ret["common_bdt"] = 0
                 if do_classifier_db:
                     syst_index = int(analysis.config.get(syst, "index"))
                     db_key = (int(event.run), int(event.lumi), int(event.evt), syst_index)
