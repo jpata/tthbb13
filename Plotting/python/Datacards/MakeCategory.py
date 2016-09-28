@@ -212,8 +212,7 @@ def get_categories(analysis_spec, analysis_name, category_name):
         raise Exception("Could not match any categories")
     return analysis, categories
 
-def main(analysis, categories, outdir="."):
-    # Make all the rules
+def make_rules(analysis, categories):
     rules = []
     for cat in categories:
         logging.debug("main: making rules for category={0} discr={1}".format(
@@ -221,15 +220,27 @@ def main(analysis, categories, outdir="."):
         ))
         rules += make_rule_cut(cat.src_histogram, cat)
     
-    of = open("rules.json", "w")
-    logging.info("writing {0} rules".format(len(rules)))
-    of.write(json.dumps(rules, indent=2))
-    of.close()
+    #of = open("rules.json", "w")
+    #logging.info("writing {0} rules".format(len(rules)))
+    #of.write(json.dumps(rules, indent=2))
+    #of.close()
+
+    return rules
 
     #project out all the histograms
     logging.info("main: applying {0} rules".format(len(rules)))
     hdict = apply_rules_parallel(analysis.sparse_input_file, rules)
 
+def main(analysis, categories, outdir="."):
+    
+    rules = make_rules(analysis, categories)
+
+    #project out all the histograms
+    logging.info("main: applying {0} rules".format(len(rules)))
+    hdict = apply_rules_parallel(analysis.sparse_input_file, rules)
+    return make_datacard(analysis, categories, outdir, hdict)
+
+def make_datacard(analysis, categories, outdir, hdict):
     #split the big dictionary to category-based dictionaries
     hdict_cat = {}
     for k in hdict.keys():

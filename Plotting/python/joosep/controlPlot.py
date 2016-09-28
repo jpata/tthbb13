@@ -6,9 +6,6 @@ import logging
 
 import matplotlib
 from matplotlib import rc
-#temporarily disable true latex for fast testing
-rc('text', usetex=False)
-matplotlib.use('PS') #needed on T3
 import matplotlib.pyplot as plt
 
 import sys, os, copy
@@ -91,6 +88,10 @@ blind_funcs = {
 }
 
 def plot_worker(kwargs):
+    #temporarily disable true latex for fast testing
+    rc('text', usetex=False)
+    matplotlib.use('PS') #needed on T3
+
     inf = rootpy.io.File(kwargs.pop("infile"))
     outname = kwargs.pop("outname")
     histname = kwargs.pop("histname")
@@ -114,9 +115,6 @@ def plot_worker(kwargs):
     
 
     logging.info("saving {0}".format(outname))
-    path = os.path.dirname(outname)
-    if not os.path.isdir(path):
-        os.makedirs(path)
     plotlib.svfg(outname + ".pdf")
     plt.clf()
 
@@ -129,8 +127,6 @@ def plot_worker(kwargs):
                 hup = ret["systematic"][systUp][samp]
                 hdown = ret["systematic"][systDown][samp]
                 plot_syst_updown(hnom, hup, hdown)
-                if not os.path.isdir(path_with_syst):
-                    os.makedirs(path_with_syst)
                 outname_syst = os.path.join(path_with_syst, samp)
                 logging.info("saving systematic {0}".format(outname_syst))
                 plotlib.svfg(outname_syst)

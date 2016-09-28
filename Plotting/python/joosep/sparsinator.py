@@ -803,7 +803,6 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 ret["syst"] = syst
                 ret["counting"] = 0
                 ret["leptonFlavour"] = 0
-                ret["common_bdt"] = 0
                 ret["triggerPath"] = triggerPath(ret)
                 if not counters["triggerPath"].has_key(ret["triggerPath"]):
                     counters["triggerPath"][ret["triggerPath"]] = 0
@@ -819,6 +818,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                     db_key = (int(event.run), int(event.lumi), int(event.evt), syst_index)
                     if cls_db.data.has_key(db_key):
                         classifiers = cls_db.get(db_key)
+                        ret["common_bdt"] = classifiers.bdt
                         if classifiers.mem_p_sig > 0:
                             ret["common_mem"] = classifiers.mem_p_sig / (classifiers.mem_p_sig + float(MEM_SF) * classifiers.mem_p_bkg)
 

@@ -66,11 +66,10 @@ def makecategory(*args):
     new_args = tuple(new_args)
     return MakeCategory.main(*new_args)
 
-def plot(kwargs):
-    return controlPlot.plot_worker(kwargs)
+def plot(*kwargs):
+    return controlPlot.plot_worker(*kwargs)
 
 def makelimits(*args):
-    an_name, analysis = analysisFromConfig(args[0])
-    new_args = [analysis] + list(args)[1:]
-    new_args = tuple(new_args)
+    an_name, analysis = analysisFromConfig(args[1])
+    new_args = (args[0], analysis, args[2])
     return MakeLimits.main(*new_args)

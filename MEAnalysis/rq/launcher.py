@@ -19,6 +19,8 @@ import ROOT
 from TTH.MEAnalysis.samples_base import getSitePrefix, chunks
 from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
 from TTH.Plotting.Datacards.AnalysisSpecificationClasses import Analysis
+from TTH.Plotting.Datacards.MakeCategory import apply_rules_parallel, make_rules, make_datacard
+from TTH.Plotting.Datacards.sparse import add_hdict
 
 import pdb
 
@@ -88,8 +90,8 @@ def start_jobs(queue, njobs, extra_requirements = []):
 
     qsub_command.append("worker.sh")
 
-    for _ in range(njobs):    
-        subprocess.Popen(qsub_command,                         
+    for _ in range(njobs):
+        subprocess.Popen(qsub_command, 
                          stdout=subprocess.PIPE).communicate()[0] 
     print "waiting 30s for jobs to be run..."
     time.sleep(30)
@@ -102,7 +104,7 @@ def get_base_plot(basepath, outpath, analysis, category, variable):
     return {
         "infile": s + ".root",
         "histname": "/".join([category, variable]),
-        "outname": "/".join([outpath, category, variable]),
+        "outname": os.path.abspath("/".join([outpath, category, variable])),
         "procs": procs_names,
         "signal_procs": ["ttH_hbb"],
         "dataname": "data", #data_obs for fake data
@@ -116,7 +118,7 @@ def get_base_plot(basepath, outpath, analysis, category, variable):
         "show_overflow": True,
         "title_extended": r"$,\ \mathcal{L}=17\ \mathrm{fb}^{-1}$, ",
         "systematics": syst_pairs,
-        "do_syst": False, #currently crashes with True due to some dvipng/DISPLAY issue
+        "do_syst": True, #currently crashes with True due to some dvipng/DISPLAY issue
         "blindFunc": "blind_mem" if "common" in variable else "no_blind",
     }
 
@@ -137,7 +139,7 @@ def waitJobs(jobs, redis_conn, num_retries=0):
         logger.debug("--- all")
         
         workers = Worker.all(connection=redis_conn)
-        if n_workers != len(workers):
+        if len(workers) < n_workers:
             raise Exception("some workers died, aborting workflow")
 
         for job in jobs:
@@ -435,7 +437,7 @@ if __name__ == "__main__":
 
         if args.queue != "EXISTING":
             kill_jobs()
-            start_jobs(args.queue, 50, ["-l", "h_vmem=5G"])
+            start_jobs(args.queue, 300)
 
         logger.info("starting step CATEGORIES")
         t0 = time.time()
@@ -446,19 +448,28 @@ if __name__ == "__main__":
         os.makedirs("{0}/categories".format(workdir))
 
         all_jobs = []
+        cat_jobs = {}
         for cat in analysis.categories:
+        
+            cat.outdir = "{0}/categories/{1}/{2}".format(workdir, cat.name, cat.discriminator)
+            os.makedirs(cat.outdir)
+            
+            rules = sorted(make_rules(analysis, [cat]), key=lambda x: x["input"])
+            logger.debug("made {0} rules for cat {1}".format(len(rules), cat.full_name))
+            cat_jobs[cat] = []
+            for ijob, inputs in enumerate(chunks(rules, 50)):
+                logger.debug("enqueued {0} rules".format(len(inputs)))
+                cat_jobs[cat] += [
+                    qmain.enqueue_call(
+                        func=apply_rules_parallel,
+                        args=(results["sparse-merge"], inputs),
+                        timeout=20*60,
+                        result_ttl=60*60,
+                        meta={"retries": 0}
+                    )
+                ]
+            all_jobs += cat_jobs[cat]
 
-            os.makedirs("{0}/categories/{1}/{2}".format(workdir, cat.name, cat.discriminator))
-
-            all_jobs += [
-                qmain.enqueue_call(
-                    func=makecategory,
-                    args=(tmp_conf_name, [cat], "{0}/categories/{1}/{2}".format(workdir, cat.name, cat.discriminator)),
-                    timeout=20*60,
-                    result_ttl=60*60,
-                    meta={"retries": 0}
-                )
-            ]
         waitJobs(all_jobs, redis_conn)
         t1 = time.time()
         time.sleep(5)
@@ -468,6 +479,12 @@ if __name__ == "__main__":
         logger.info("all done, len(qmain)={0} len(qfail)={1}".format(
             len(qmain), len(qfail)
         ))
+
+        for cat in analysis.categories:
+            hdict = {}
+            for job in cat_jobs[cat]:
+                hdict = add_hdict(hdict, job.result)
+            make_datacard(analysis, [cat], cat.outdir, hdict)
 
         # hadd Results        
         cat_names = list(set([cat.name for cat in analysis.categories]))        

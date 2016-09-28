@@ -1,4 +1,5 @@
 import os
+import time
 
 if os.environ.has_key("CMSSW_BASE"):
     from cleanPath import fixPythonPath
@@ -709,6 +710,7 @@ def svfg(fn, **kwargs):
     path = os.path.dirname(fn)
     if not os.path.exists(path):
         os.makedirs(path)
+        time.sleep(1) #for NFS
     plt.savefig(fn, pad_inches=0.5, bbox_inches='tight', **kwargs)
     #plt.clf()
 
