@@ -125,11 +125,10 @@ def plot_worker(kwargs):
             hnom = ret["nominal"][samp]
             for systUp, systDown in kwargs["systematics"]:
                 syst_name = systUp[1:-2]
-                path_with_syst = os.path.join(os.path.basename(outname), syst_name)
                 hup = ret["systematic"][systUp][samp]
                 hdown = ret["systematic"][systDown][samp]
                 plot_syst_updown(hnom, hup, hdown)
-                outname_syst = os.path.join(path_with_syst, samp)
+                outname_syst = os.path.join(outname, syst_name, samp)
                 logging.info("saving systematic {0}".format(outname_syst))
                 plotlib.svfg(outname_syst + ".pdf")
                 plotlib.svfg(outname_syst + ".pdf")

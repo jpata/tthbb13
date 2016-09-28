@@ -710,7 +710,7 @@ def svfg(fn, **kwargs):
     path = os.path.dirname(fn)
     if not os.path.exists(path):
         os.makedirs(path)
-        time.sleep(1) #for NFS
+        time.sleep(2) #for NFS
     plt.savefig(fn, pad_inches=0.5, bbox_inches='tight', **kwargs)
     #plt.clf()
 

@@ -144,18 +144,10 @@ def waitJobs(jobs, redis_conn, num_retries=0):
     perm_failed = []
     workflow_failed = False
 
-    workers = Worker.all(connection=redis_conn)
-    n_workers = len(workers) 
-    logger.info("waitJobs: {0} active workers".format(n_workers))
-
     while not done:
         logger.debug("queues: main({0}) failed({1})".format(len(qmain), len(qfail)))
         logger.debug("--- all")
         
-        workers = Worker.all(connection=redis_conn)
-        if len(workers) < n_workers:
-            raise Exception("some workers died, aborting workflow")
-
         for job in jobs:
             #logger.debug("id={0} status={1} meta={2}".format(job.id, job.status, job.meta))
             if job.status == "failed":
