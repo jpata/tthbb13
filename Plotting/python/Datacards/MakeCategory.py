@@ -151,6 +151,11 @@ def apply_rules_parallel(infile, rules):
     
     Optional:
     """ 
+    
+    rets = {}
+    if len(rules) == 0:
+        logging.error("no rules!")
+        return rets
 
     #split rules into unique batches by input histogram
     rules_per_input = {}
@@ -161,20 +166,19 @@ def apply_rules_parallel(infile, rules):
         rules_per_input[inp].append(rule)
 
     #process batches
-    rets = {}
     infile_tf = ROOT.TFile.Open(infile)
     if not infile_tf:
         raise FileError("Could not open file: {0}".format(infile))
+    
     dummy_h = infile_tf.Get(rules[0]["input"]).Clone()
     dummy_h.Reset()
 
     for inp, rules_batch in rules_per_input.items():
         # preload THnSparse here, once per input, in order to prevent memory leak, see
         # https://github.com/jpata/tthbb13/issues/107
-        _infile_tf = ROOT.TFile.Open(infile)
         input_map = {
             "dummy": dummy_h,
-            inp: _infile_tf.Get(inp)
+            inp: infile_tf.Get(inp)
         }
         logging.info("apply_rules_parallel: applying {0} rules for input {1}".format(
             len(rules_batch),
@@ -185,8 +189,9 @@ def apply_rules_parallel(infile, rules):
         for chunk in chunks(sorted(rules_batch, key=lambda x: x["output"]), 100):
             ret = apply_rules((input_map, chunk))
             rets = sparse.add_hdict(rets, ret)
-         
-        _infile_tf.Close()
+    
+        input_map[inp].Delete()
+
     infile_tf.Close()
 
     return rets

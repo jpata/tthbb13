@@ -116,6 +116,22 @@ datasets.update({
         "mem_cfg": me_cfgs["default"],
         "script": 'heppy_crab_script.sh'
     },
+    'ttHTobb_tranche3': {
+        "ds": '/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 5,
+        "runtime": 40,
+        "mem_cfg": me_cfgs["default"],
+        "script": 'heppy_crab_script.sh'
+    },
+    'ttHToNonbb_tranche3': {
+        "ds": '/ttHToNonbb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 5,
+        "runtime": 40,
+        "mem_cfg": me_cfgs["default"],
+        "script": 'heppy_crab_script.sh'
+    },
     'ttHToNonbb': {
         "ds": '/ttHToNonbb_M125_13TeV_powheg_pythia8/RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1/MINIAODSIM',
         "maxlumis": -1,
@@ -124,6 +140,7 @@ datasets.update({
         "mem_cfg": me_cfgs["default"],
         "script": 'heppy_crab_script.sh'
     },
+
     'TTbar_inc': {
         "ds": '/TT_TuneCUETP8M1_13TeV-powheg-pythia8/RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14_ext3-v1/MINIAODSIM',
         "maxlumis": -1,
@@ -132,8 +149,41 @@ datasets.update({
         "mem_cfg": me_cfgs["default"],
         "script": 'heppy_crab_script.sh'
     },
-    'TTbar_sl1': {
-        "ds": '/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM',
+    'TTbar_inc_scaleup': {
+        "ds": '/TT_TuneCUETP8M1_13TeV-powheg-scaleup-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 100,
+        "runtime": 40,
+        "mem_cfg": me_cfgs["default"],
+        "script": 'heppy_crab_script.sh'
+    },
+    'TTbar_inc_scaledown': {
+        "ds": '/TT_TuneCUETP8M1_13TeV-powheg-scaledown-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 100,
+        "runtime": 40,
+        "mem_cfg": me_cfgs["default"],
+        "script": 'heppy_crab_script.sh'
+    },
+
+    'TTbar_sl': {
+        "ds": '/TTToSemiLeptonic_13TeV-powheg/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v2/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 50,
+        "runtime": 40,
+        "mem_cfg": me_cfgs["leptonic"],
+        "script": 'heppy_crab_script.sh'
+    },
+    'TTbar_sl_scaleup': {
+        "ds": '/TTToSemiLeptonic_13TeV_ScaleUp-powheg/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 50,
+        "runtime": 40,
+        "mem_cfg": me_cfgs["leptonic"],
+        "script": 'heppy_crab_script.sh'
+    },
+    'TTbar_sl_scaledown': {
+        "ds": '/TTToSemiLeptonic_13TeV_ScaleDown-powheg/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM',
         "maxlumis": -1,
         "perjob": 50,
         "runtime": 40,
@@ -156,6 +206,7 @@ datasets.update({
         "mem_cfg": me_cfgs["leptonic"],
         "script": 'heppy_crab_script.sh'
     },
+
     'QCD300': {
         "ds": '/QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM',
         "maxlumis": -1,
@@ -233,7 +284,16 @@ datasets.update({
 #now we construct the workflows from all the base datasets
 workflow_datasets = {}
 workflow_datasets["leptonic"] = {}
-for k in ["ttHTobb", "ttHToNonbb", "TTbar_inc", "TTbar_sl1", "TTbar_sl2", "TTbar_dl"]:
+for k in [
+        "ttHTobb", "ttHToNonbb",
+        "ttHTobb_tranche3", "ttHToNonbb_tranche3",
+        "TTbar_inc",
+        "TTbar_inc_scaleup", "TTbar_inc_scaledown",
+        "TTbar_sl",
+        "TTbar_sl_scaleup", "TTbar_sl_scaledown",
+        "TTbar_sl1", "TTbar_sl2",
+        "TTbar_dl"
+    ]:
     D = deepcopy(datasets[k])
     D["mem_cfg"] = "cfg_leptonic.py"
     workflow_datasets["leptonic"][k] = D
@@ -244,11 +304,21 @@ for k in ["ttHTobb", "ttHToNonbb", "TTbar_inc"]:
     workflow_datasets["signal"][k] = D
 
 workflow_datasets["leptonic_nome"] = {}
-for k in ["ttHTobb", "ttHToNonbb", "TTbar_inc", "TTbar_sl1", "TTbar_sl2", "TTbar_dl"] + datanames:
+for k in [
+        "ttHTobb", "ttHToNonbb",
+        "ttHTobb_tranche3", "ttHToNonbb_tranche3",
+        "TTbar_inc",
+        "TTbar_inc_scaleup", "TTbar_inc_scaledown",
+        "TTbar_sl",
+        "TTbar_sl_scaleup", "TTbar_sl_scaledown",
+        "TTbar_sl1", "TTbar_sl2",
+        "TTbar_dl"
+    ] + datanames:
     D = deepcopy(datasets[k])
     D["perjob"] = 50
     if "data" in D["script"]:
-        D["perjob"] = 50
+        D["perjob"] = 10
+        D["runtime"] = 10
 
     D["mem_cfg"] = "cfg_noME.py"
     workflow_datasets["leptonic_nome"][k] = D

@@ -4,8 +4,8 @@ logger = logging.getLogger("main")
 
 from rq import Queue
 from redis import Redis
-from rq import push_connection, get_failed_queue, Queue
-from job import count, sparse, plot
+from rq import push_connection, get_failed_queue, Queue, Worker
+from job import count, sparse, plot, makecategory, makelimits
 import socket
 
 import time, os, sys
@@ -19,8 +19,6 @@ import ROOT
 from TTH.MEAnalysis.samples_base import getSitePrefix, chunks
 from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
 from TTH.Plotting.Datacards.AnalysisSpecificationClasses import Analysis
-from TTH.Plotting.Datacards import MakeCategory
-from TTH.Plotting.Datacards import MakeLimits
 
 import pdb
 
@@ -124,14 +122,24 @@ def get_base_plot(basepath, outpath, analysis, category, variable):
 
 
 
-def waitJobs(jobs, num_retries=0):
+def waitJobs(jobs, redis_conn, num_retries=0):
     done = False
     istep = 0
     perm_failed = []
     workflow_failed = False
+
+    workers = Worker.all(connection=redis_conn)
+    n_workers = len(workers) 
+    logger.info("waitJobs: {0} active workers".format(n_workers))
+
     while not done:
         logger.debug("queues: main({0}) failed({1})".format(len(qmain), len(qfail)))
         logger.debug("--- all")
+        
+        workers = Worker.all(connection=redis_conn)
+        if n_workers != len(workers):
+            raise Exception("some workers died, aborting workflow")
+
         for job in jobs:
             #logger.debug("id={0} status={1} meta={2}".format(job.id, job.status, job.meta))
             if job.status == "failed":
@@ -141,17 +149,14 @@ def waitJobs(jobs, num_retries=0):
                     qfail.requeue(job.id)
                 else:
                     perm_failed += [job]
-                    workflow_failed = True
-                    done = True
-                    break
             if job.status is None:
-                import pdb
-                pdb.set_trace()
+                raise Exception("Job status is None")
+
         status = [j.status for j in jobs]
         status_counts = dict(Counter(status))
 
         sys.stdout.write("\033[K") # Clear this line
-        sys.stdout.write("\033[92mstatus\033[0m {3:.2f}%\tq={0}\ts={1}\tf={2}\tE={3}\n".format(
+        sys.stdout.write("\033[92mstatus\033[0m {4:.2f}%\tq={0}\ts={1}\tf={2}\tE={3}\n".format(
             status_counts.get("queued", 0),
             status_counts.get("started", 0),
             status_counts.get("finished", 0),
@@ -169,6 +174,7 @@ def waitJobs(jobs, num_retries=0):
         if status_counts.get("started", 0) == 0 and status_counts.get("queued", 0) == 0:
             done = True
             break
+
         time.sleep(1)
         
         sys.stdout.write("\033[F") # Cursor up one line
@@ -323,7 +329,7 @@ if __name__ == "__main__":
             all_jobs += _jobs
 
         #synchronize
-        waitJobs(all_jobs, 0)
+        waitJobs(all_jobs, redis_conn, 0)
 
         for sample in analysis.samples:
             ngen = sum(
@@ -378,7 +384,7 @@ if __name__ == "__main__":
             jobs["sparse"][ds] = runSparsinator_async(tmp_conf_name, ds, workdir)
             all_jobs += jobs["sparse"][ds]
         logger.info("waiting on sparsinator jobs")
-        waitJobs(all_jobs)
+        waitJobs(all_jobs, redis_conn)
         #just in case to make sure NFS is synced
         t1 = time.time()
         time.sleep(5)
@@ -429,7 +435,7 @@ if __name__ == "__main__":
 
         if args.queue != "EXISTING":
             kill_jobs()
-            start_jobs(args.queue, 50, ["-l", "h_vmem=2G"])
+            start_jobs(args.queue, 50, ["-l", "h_vmem=5G"])
 
         logger.info("starting step CATEGORIES")
         t0 = time.time()
@@ -446,14 +452,14 @@ if __name__ == "__main__":
 
             all_jobs += [
                 qmain.enqueue_call(
-                    func=MakeCategory.main,
-                    args=(analysis, [cat], "{0}/categories/{1}/{2}".format(workdir, cat.name, cat.discriminator)),
+                    func=makecategory,
+                    args=(tmp_conf_name, [cat], "{0}/categories/{1}/{2}".format(workdir, cat.name, cat.discriminator)),
                     timeout=20*60,
                     result_ttl=60*60,
                     meta={"retries": 0}
                 )
             ]
-        waitJobs(all_jobs)
+        waitJobs(all_jobs, redis_conn)
         t1 = time.time()
         time.sleep(5)
         dt = t1 - t0
@@ -530,7 +536,7 @@ if __name__ == "__main__":
             ]
 
         t0 = time.time()
-        waitJobs(all_jobs)
+        waitJobs(all_jobs, redis_conn)
         t1 = time.time()
         time.sleep(5)
         dt = t1 - t0
@@ -569,16 +575,16 @@ if __name__ == "__main__":
         for group in analysis.groups.keys():
             all_jobs += [
                 qmain.enqueue_call(
-                    func=MakeLimits.main,
+                    func=makelimits,
                     args=["{0}/limits".format(workdir),
-                          analysis,
+                          tmp_conf_name,
                           group],
                     timeout=40*60,
                     result_ttl=60*60,
                     meta={"retries": 0})]
             
         t0 = time.time()
-        waitJobs(all_jobs)
+        waitJobs(all_jobs, redis_conn)
         t1 = time.time()
         time.sleep(5)
         dt = t1 - t0

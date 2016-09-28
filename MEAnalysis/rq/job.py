@@ -25,6 +25,8 @@ from rootpy.plotting import root2matplotlib as rplt
 from TTH.Plotting.joosep import controlPlot
 
 from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
+from TTH.Plotting.Datacards import MakeCategory
+from TTH.Plotting.Datacards import MakeLimits
 
 def copy_rsync(src, dst):
     os.system("rsync --bwlimit=20000 {0} {1}".format(src, dst))
@@ -58,7 +60,17 @@ def sparse(config_path, filenames, sample, outfile):
 #    heplot.barhist(down, color="blue")
 
 
-
+def makecategory(*args):
+    an_name, analysis = analysisFromConfig(args[0])
+    new_args = [analysis] + list(args)[1:]
+    new_args = tuple(new_args)
+    return MakeCategory.main(*new_args)
 
 def plot(kwargs):
     return controlPlot.plot_worker(kwargs)
+
+def makelimits(*args):
+    an_name, analysis = analysisFromConfig(args[0])
+    new_args = [analysis] + list(args)[1:]
+    new_args = tuple(new_args)
+    return MakeLimits.main(*new_args)
