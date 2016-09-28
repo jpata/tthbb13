@@ -9,6 +9,7 @@ from matplotlib import rc
 import matplotlib.pyplot as plt
 
 import sys, os, copy
+import os.path
 from collections import OrderedDict
 import heplot, plotlib
 
@@ -43,7 +44,7 @@ procs = [x[0] for x in procs_names]
 syst_pairs = []
 
 syst_pairs.extend([
-    ("_puUp", "_puaDown"),
+    ("_puUp", "_puDown"),
     ("_CMS_scale_jUp", "_CMS_scale_jDown"),
     ("_CMS_res_jUp", "_CMS_res_jDown"),
     ("_CMS_ttH_CSVcferr1Up", "_CMS_ttH_CSVcferr1Down"),
@@ -116,6 +117,7 @@ def plot_worker(kwargs):
 
     logging.info("saving {0}".format(outname))
     plotlib.svfg(outname + ".pdf")
+    plotlib.svfg(outname + ".png")
     plt.clf()
 
     if do_syst:
@@ -123,13 +125,14 @@ def plot_worker(kwargs):
             hnom = ret["nominal"][samp]
             for systUp, systDown in kwargs["systematics"]:
                 syst_name = systUp[1:-2]
-                path_with_syst = os.path.join(path, os.path.basename(outname), syst_name)
+                path_with_syst = os.path.join(os.path.basename(outname), syst_name)
                 hup = ret["systematic"][systUp][samp]
                 hdown = ret["systematic"][systDown][samp]
                 plot_syst_updown(hnom, hup, hdown)
                 outname_syst = os.path.join(path_with_syst, samp)
                 logging.info("saving systematic {0}".format(outname_syst))
-                plotlib.svfg(outname_syst)
+                plotlib.svfg(outname_syst + ".pdf")
+                plotlib.svfg(outname_syst + ".pdf")
                 plt.clf()
 
     inf.Close()

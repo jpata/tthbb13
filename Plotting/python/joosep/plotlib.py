@@ -269,14 +269,14 @@ def mc_stack(
 
     for h in hlist:
         h.fillstyle = "solid"
-
+    
     #FIXME: Temporary workaround for failed fill, only works when hatch is specified
     stack = hist(hlist, stacked=True, hatch=".", lw=2)
     htot = sum(hlist)
     htot.color="black"
 
-    htot_u = htot.Clone()
-    htot_d = htot.Clone()
+    htot_u = rootpy.asrootpy(htot.Clone())
+    htot_d = rootpy.asrootpy(htot.Clone())
     for i in range(1, htot.nbins()+1):
         htot_u.set_bin_content(i, htot.get_bin_content(i) + htot.get_bin_error(i))
         htot_d.set_bin_content(i, htot.get_bin_content(i) - htot.get_bin_error(i))
@@ -359,11 +359,11 @@ def getHistograms(tf, samples, hname):
             h = tf.get(sample + "/" + hname).Clone()
         except rootpy.io.file.DoesNotExist as e:
             continue
-        hs[sample] = h
+        hs[sample] = rootpy.asrootpy(h)
     for sample, sample_name in samples:
         if not hs.has_key(sample):
             if len(hs)>0:
-                hs[sample] = 0.0*hs.values()[0].Clone()
+                hs[sample] = rootpy.asrootpy(0.0*hs.values()[0].Clone())
             else:
                 return hs
     return hs

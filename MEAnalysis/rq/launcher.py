@@ -33,10 +33,12 @@ rc('text', usetex=False)
 matplotlib.use('PS') #needed on T3
 import matplotlib.pyplot as plt
 
+import rootpy
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("main")
 
+#FIXME: configure all these via conf file!
 procs_names = [
     ("ttH_hbb", "tt+H(bb)"),
     ("ttH_nonhbb", "tt+H(non-bb)"),
@@ -48,8 +50,20 @@ procs_names = [
 ]
 procs = [x[0] for x in procs_names]
 
-syst_pairs = []
-
+syst_pairs = [
+    ("_puUp", "_puDown"),
+    ("_CMS_scale_jUp", "_CMS_scale_jDown"),
+    ("_CMS_res_jUp", "_CMS_res_jDown"),
+    ("_CMS_ttH_CSVcferr1Up", "_CMS_ttH_CSVcferr1Down"),
+    ("_CMS_ttH_CSVcferr2Up", "_CMS_ttH_CSVcferr2Down"),
+    ("_CMS_ttH_CSVhfUp", "_CMS_ttH_CSVhfDown"),
+    ("_CMS_ttH_CSVhfstats1Up", "_CMS_ttH_CSVhfstats1Down"),
+    ("_CMS_ttH_CSVhfstats2Up", "_CMS_ttH_CSVhfstats2Down"),
+    ("_CMS_ttH_CSVjesUp", "_CMS_ttH_CSVjesDown"),
+    ("_CMS_ttH_CSVlfUp", "_CMS_ttH_CSVlfDown"),
+    ("_CMS_ttH_CSVlfstats1Up", "_CMS_ttH_CSVlfstats1Down"),
+    ("_CMS_ttH_CSVlfstats2Up", "_CMS_ttH_CSVlfstats2Down")
+]
 
 ####
 # Configuation
@@ -502,6 +516,7 @@ if __name__ == "__main__":
                                     shell=True,
                                     stdout=subprocess.PIPE)        
 
+        time.sleep(1) #NFS
         # and tidy up
         for cat_name in cat_names:                                                                
             shutil.rmtree("{0}/categories/{1}".format(workdir, cat_name))
@@ -594,7 +609,7 @@ if __name__ == "__main__":
                 qmain.enqueue_call(
                     func=makelimits,
                     args=["{0}/limits".format(workdir),
-                          tmp_conf_name,
+                          analysis,
                           group],
                     timeout=40*60,
                     result_ttl=60*60,

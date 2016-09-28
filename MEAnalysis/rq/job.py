@@ -70,6 +70,5 @@ def plot(*kwargs):
     return controlPlot.plot_worker(*kwargs)
 
 def makelimits(*args):
-    an_name, analysis = analysisFromConfig(args[1])
-    new_args = (args[0], analysis, args[2])
-    return MakeLimits.main(*new_args)
+    #an_name, analysis = analysisFromConfig(args[1])
+    return MakeLimits.main(*args)
