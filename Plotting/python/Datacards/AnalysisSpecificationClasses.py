@@ -167,6 +167,15 @@ class Category:
         )
         return s
 
+    # Define equality via the representation string
+    def __eq__(self,other):
+        return self.__repr__() == other.__repr__()
+
+    # hash(object) = hash(representation(object))
+    def __hash__(self):
+        return self.__repr__().__hash__()
+
+
 class Analysis:
     def __init__(self, **kwargs):
         self.config = kwargs.get("config")

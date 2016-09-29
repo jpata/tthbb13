@@ -183,6 +183,8 @@ def analysisFromConfig(config_file_path):
 
     analysis_groups = {}
 
+    all_cats = []
+    
     for group in config.get("general","analysis_groups").split():
 
         cats = []
@@ -192,7 +194,7 @@ def analysisFromConfig(config_file_path):
 
             cuts = []
             for cut_name, lower, upper in triplewise(config.get(cat,"cuts").split()):
-                cuts.append( (cut_name, int(lower), int(upper)) )
+                cuts.append( (cut_name, float(lower), float(upper)) )
 
             mc_processes = sum([process_lists[x] for x in config.get(template, "mc_processes").split()], [])
             data_processes = sum([process_lists[x] for x in config.get(template, "data_processes").split()], [])
@@ -253,8 +255,12 @@ def analysisFromConfig(config_file_path):
 
             # End loop over categories
             
-        analysis_groups[group] = cats        
+        analysis_groups[group] = cats   
+        all_cats.extend(cats)
     # End loop over groups of categories
+
+    # Uniquify all categories
+    all_cats = list(set(all_cats))
 
 
     ########################################
@@ -268,7 +274,7 @@ def analysisFromConfig(config_file_path):
         cuts = cuts_dict,
         processes = processes,
         processes_unsplit = processes_original,
-        categories = cats,
+        categories = all_cats,
         sparse_input_file = input_file,
         groups = analysis_groups,
         do_fake_data = do_fake_data,
