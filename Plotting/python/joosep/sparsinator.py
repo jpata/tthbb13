@@ -454,13 +454,14 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                     #make systematic outputs consistent in Up/Down naming
                     sdir_cap = sdir.capitalize()
                     systematic_weights += [
-                        ("CMS_ttH_{0}{1}{2}".format(tagger, syst, sdir_cap), lambda ev, bweight=bweight: ev["weight_nominal"]/ev["btagWeight"+tagger]*ev[bweight])
+                        ("CMS_ttH_{0}{1}{2}".format(tagger, syst, sdir_cap), lambda ev, bweight=bweight:
+                            ev["puWeight"] * ev["triggerEmulationWeight"] * ev["lep_SF_weight"] * ev[bweight])
                     ]
                     btag_weights += [bweight]
 
         systematic_weights += [
-                ("puUp", lambda ev: ev["weight_nominal"]/ev["puWeight"] * ev["puWeightUp"]),
-                ("puDown", lambda ev: ev["weight_nominal"]/ev["puWeight"] * ev["puWeightDown"]),
+                ("puUp", lambda ev: ev["btagWeightCSV"] * ev["triggerEmulationWeight"] * ev["lep_SF_weight"] * ev["puWeightUp"]),
+                ("puDown", lambda ev: ev["btagWeightCSV"] * ev["triggerEmulationWeight"] * ev["lep_SF_weight"] * ev["puWeightDown"]),
                 ("unweighted", lambda ev: 1.0)
         ]
 

@@ -292,7 +292,7 @@ if __name__ == "__main__":
         action = "store",
         help = "Job queue",
         type = int,
-        default = 100
+        default = 200
     )
     args = parser.parse_args()
 
