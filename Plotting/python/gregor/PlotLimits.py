@@ -26,7 +26,7 @@ import numpy as np
 ########################################
 
 # Where to get the data from
-limits_base = "/mnt/t3nfs01/data01/shome/gregor/VHBB-8019/CMSSW_8_0_19/src/TTH/MEAnalysis/rq/results/8d5afab4-ce92-48cb-97b8-e6d3f078be53/limits/"
+limits_base = "/mnt/t3nfs01/data01/shome/gregor/VHBB-8019/CMSSW_8_0_19/src/TTH/MEAnalysis/rq/results/9401fa16-4607-4573-9ee6-a7918d186a1d/limits/"
 
 # List of plots
 # plots: list with two entries
@@ -37,7 +37,7 @@ plots = [
     ["total_dl",["group_dl_mem", "group_dl_bdt", "group_dl_2d"]],
     ["total_sldl",["group_sldl_mem", "group_sldl_bdt", "group_sldl_2d"]],
 
-    ["dl_2d", ["dl_jge4_tge4_bdtL", "dl_jge4_tge4_bdtH", "dl_jge4_t3_bdtL", "dl_jge4_t3_bdtH", "dl_jge4_t2_bdt", "dl_j3_t3_bdtL", "dl_j3_t3_bdtH", "dl_j3_t2_bdt"]],
+    ["dl_2d", ["dl_jge4_tge4_bdtL", "dl_jge4_tge4_bdtH", "dl_jge4_t3_bdtL", "dl_jge4_t3_bdtH", "dl_jge4_t2_bdt", "dl_j3_t3_bdt", "dl_j3_t2_bdt"]],
     ["dl_bdt", ["dl_jge4_tge4_bdt",  "dl_jge4_t3_bdt", "dl_jge4_t2_bdt",  "dl_j3_t3_bdt", "dl_j3_t2_bdt"]],
     ["dl_mem", ["dl_jge4_tge4",  "dl_jge4_t3", "dl_jge4_t2",  "dl_j3_t3", "dl_j3_t2"]],
 
@@ -59,9 +59,11 @@ plots = [
 
     
 nice_names = {
+    "sl_j4_t2"          : "SL: =4j =2b",
     "sl_j4_t3"          : "SL: =4j =3b",
     "sl_j4_tge4"        : "SL: =4j $\geq$3b",
     "sl_j5_t3"          : "SL: =5j = 3b",
+    "sl_j5_t2"          : "SL: =5j = 2b",
     "sl_j5_tge4"        : "SL: =5j $\geq$4b",
     "sl_jge6_t2"        : "SL: $\geq$6j  =2b",
     "sl_jge6_t3"        : "SL: $\geq$6j  =3b",
