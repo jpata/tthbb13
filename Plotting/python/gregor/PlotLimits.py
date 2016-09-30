@@ -26,31 +26,34 @@ import numpy as np
 ########################################
 
 # Where to get the data from
-limits_base = "/mnt/t3nfs01/data01/shome/gregor/VHBB-8019/CMSSW_8_0_19/src/TTH/MEAnalysis/rq/results/5d570727-dc2f-4c89-b27b-80bec0c03324/limits/"
+limits_base = "/mnt/t3nfs01/data01/shome/gregor/VHBB-8019/CMSSW_8_0_19/src/TTH/MEAnalysis/rq/results/8d5afab4-ce92-48cb-97b8-e6d3f078be53/limits/"
 
 # List of plots
 # plots: list with two entries
 #          -first entry: desired output filename
 #          -second entry: list of limit names to include in plot
-plots = [
-    ["total_sldl",["group_sldl_7cat", "group_sldl_7cat_blrsplit", "group_sldl_7cat_bdt", "group_sldl_7cat_2d"]],
-    ["total_sl",["group_sl_7cat", "group_sl_7cat_blrsplit", "group_sl_7cat_bdt", "group_sl_7cat_2d"]],
+plots = [    
+    ["total_sl",["group_sl_mem", "group_sl_bdt", "group_sl_2d"]],
+    ["total_dl",["group_dl_mem", "group_dl_bdt", "group_dl_2d"]],
+    ["total_sldl",["group_sldl_mem", "group_sldl_bdt", "group_sldl_2d"]],
 
-    ["sl_2d", ["sl_jge6_t2_bdtL", 	"sl_jge6_t2_bdtH", 	"sl_jge6_t3_bdtL", 	"sl_jge6_t3_bdtH", 	 	"sl_jge6_tge4_bdtL", "sl_jge6_tge4_bdtH", 	"sl_j5_t3_bdtL", 	"sl_j5_t3_bdtH", 	"sl_j5_tge4_bdtL", 	"sl_j5_tge4_bdtH", 	"sl_j4_t3_bdtL", 	"sl_j4_t3_bdtH", 	"sl_j4_tge4_bdtL", 	"sl_j4_tge4_bdtH"]],
+    ["dl_2d", ["dl_jge4_tge4_bdtL", "dl_jge4_tge4_bdtH", "dl_jge4_t3_bdtL", "dl_jge4_t3_bdtH", "dl_jge4_t2_bdt", "dl_j3_t3_bdtL", "dl_j3_t3_bdtH", "dl_j3_t2_bdt"]],
+    ["dl_bdt", ["dl_jge4_tge4_bdt",  "dl_jge4_t3_bdt", "dl_jge4_t2_bdt",  "dl_j3_t3_bdt", "dl_j3_t2_bdt"]],
+    ["dl_mem", ["dl_jge4_tge4",  "dl_jge4_t3", "dl_jge4_t2",  "dl_j3_t3", "dl_j3_t2"]],
 
-    ["sl_7cat_blrsplit", ["sl_jge6_t2_blrL", 	"sl_jge6_t2_blrH", 	"sl_jge6_t3_blrL", 	"sl_jge6_t3_blrH", 	 	"sl_jge6_tge4_blrL", "sl_jge6_tge4_blrH", 	"sl_j5_t3_blrL", 	"sl_j5_t3_blrH", 	"sl_j5_tge4_blrL", 	"sl_j5_tge4_blrH", 	"sl_j4_t3_blrL", 	"sl_j4_t3_blrH", 	"sl_j4_tge4_blrL", 	"sl_j4_tge4_blrH"]],
+    ["sl", ["sl_j4_t2", "sl_j4_t3", "sl_j4_tge4","sl_j5_t2", "sl_j5_t3", "sl_j5_tge4", "sl_jge6_t2", "sl_jge6_t3", "sl_jge6_tge4"]],    
+    ["sl_bdt", ["sl_j4_t2", "sl_j4_t3_bdt", "sl_j4_tge4_bdt","sl_j5_t2", "sl_j5_t3_bdt", "sl_j5_tge4_bdt", "sl_jge6_t2_bdt", "sl_jge6_t3_bdt", "sl_jge6_tge4_bdt"]],    
+    
+#    ["sl_2d", ["sl_jge6_t2_bdtL", 	"sl_jge6_t2_bdtH", 	"sl_jge6_t3_bdtL", 	"sl_jge6_t3_bdtH", 	 	"sl_jge6_tge4_bdtL", "sl_jge6_tge4_bdtH", 	"sl_j5_t3_bdtL", 	"sl_j5_t3_bdtH", 	"sl_j5_tge4_bdtL", 	"sl_j5_tge4_bdtH", 	"sl_j4_t3_bdtL", 	"sl_j4_t3_bdtH", 	"sl_j4_tge4_bdtL", 	"sl_j4_tge4_bdtH"]],
 
-    ["sl", ["sl_j4_t3", 	"sl_j4_tge4", 	"sl_j5_t3", 	"sl_j5_tge4", 	"sl_jge6_t2", 	"sl_jge6_t3", 	"sl_jge6_tge4"]],
-    ["sl_bdt", ["sl_j4_t3_bdt", 	"sl_j4_tge4_bdt", 	"sl_j5_t3_bdt", 	"sl_j5_tge4_bdt", 	"sl_jge6_t2_bdt", 	"sl_jge6_t3_bdt", 	"sl_jge6_tge4_bdt"]],
+#    ["sl_7cat_blrsplit", ["sl_jge6_t2_blrL", 	"sl_jge6_t2_blrH", 	"sl_jge6_t3_blrL", 	"sl_jge6_t3_blrH", 	 	"sl_jge6_tge4_blrL", "sl_jge6_tge4_blrH", 	"sl_j5_t3_blrL", 	"sl_j5_t3_blrH", 	"sl_j5_tge4_blrL", 	"sl_j5_tge4_blrH", 	"sl_j4_t3_blrL", 	"sl_j4_t3_blrH", 	"sl_j4_tge4_blrL", 	"sl_j4_tge4_blrH"]],
+
+#    
+#    ["sl_bdt", ["sl_j4_t3_bdt", 	"sl_j4_tge4_bdt", 	"sl_j5_t3_bdt", 	"sl_j5_tge4_bdt", 	"sl_jge6_t2_bdt", 	"sl_jge6_t3_bdt", 	"sl_jge6_tge4_bdt"]],
 
 ]
 
 
-	
-
-
-	
-     
 
 	
 
@@ -85,6 +88,17 @@ nice_names = {
     "group_sl_7cat" : "SL comb. (7 cats)",
     "group_dl"      : "DL comb.",
 
+    "group_sl_mem"  : "SL (MEM)",
+    "group_sl_bdt"  : "SL (BDT)",
+    "group_sl_2d"   : "SL (2D)",
+    "group_dl_mem"  : "DL (MEM)",
+    "group_dl_bdt"  : "DL (BDT)",
+    "group_dl_2d"   : "DL (2D)",
+    "group_sldl_mem": "SL+DL (MEM)", 
+    "group_sldl_bdt": "SL+DL (BDT)",
+    "group_sldl_2d" : "SL+DL (2D)",
+
+
     "group_sldl_7cat" : "SL(MEM) + DL",
     "group_sldl_7cat_blrsplit": "SL(MEM+BLR) + DL",
     "group_sldl_7cat_bdt" : "SL(BDT, 7cat) + DL",
@@ -94,51 +108,6 @@ nice_names = {
     "group_sl_7cat_blrsplit": "SL(MEM+BLR)",
     "group_sl_7cat_bdt" : "SL(BDT, 7cat)",
     "group_sl_7cat_2d" : "SL(2d)",
-
-    "sl_jge6_t2_bdtL"     :   "sl_jge6_t2_bdtL",
-    "sl_jge6_t2_bdtH"     :   "sl_jge6_t2_bdtH" ,
-    "sl_jge6_t3_bdtL"     :   "sl_jge6_t3_bdtL", 
-    "sl_jge6_t3_bdtH"     :   "sl_jge6_t3_bdtH", 
-    "sl_jge6_tge4_bdtL"   :   "sl_jge6_tge4_bdtL",
-    "sl_jge6_tge4_bdtH"   :   "sl_jge6_tge4_bdtH",
-    "sl_j5_t3_bdtL"       :   "sl_j5_t3_bdtL",   
-    "sl_j5_t3_bdtH"       :   "sl_j5_t3_bdtH",   
-    "sl_j5_tge4_bdtL"     :   "sl_j5_tge4_bdtL", 
-    "sl_j5_tge4_bdtH"     :   "sl_j5_tge4_bdtH", 
-    "sl_j4_t3_bdtL"       :   "sl_j4_t3_bdtL" ,  
-    "sl_j4_t3_bdtH"       :   "sl_j4_t3_bdtH" ,  
-    "sl_j4_tge4_bdtL"     :   "sl_j4_tge4_bdtL", 
-    "sl_j4_tge4_bdtH"     :   "sl_j4_tge4_bdtH", 
-
-    "sl_jge6_t2_blrL"     :   "sl_jge6_t2_blrL",
-    "sl_jge6_t2_blrH"     :   "sl_jge6_t2_blrH" ,
-    "sl_jge6_t3_blrL"     :   "sl_jge6_t3_blrL", 
-    "sl_jge6_t3_blrH"     :   "sl_jge6_t3_blrH", 
-    "sl_jge6_tge4_blrL"   :   "sl_jge6_tge4_blrL",
-    "sl_jge6_tge4_blrH"   :   "sl_jge6_tge4_blrH",
-    "sl_j5_t3_blrL"       :   "sl_j5_t3_blrL",   
-    "sl_j5_t3_blrH"       :   "sl_j5_t3_blrH",   
-    "sl_j5_tge4_blrL"     :   "sl_j5_tge4_blrL", 
-    "sl_j5_tge4_blrH"     :   "sl_j5_tge4_blrH", 
-    "sl_j4_t3_blrL"       :   "sl_j4_t3_blrL" ,  
-    "sl_j4_t3_blrH"       :   "sl_j4_t3_blrH" ,  
-    "sl_j4_tge4_blrL"     :   "sl_j4_tge4_blrL", 
-    "sl_j4_tge4_blrH"     :   "sl_j4_tge4_blrH", 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }
 
@@ -169,11 +138,20 @@ for plot in plots:
 
     plt.figure(figsize=(5, 5))
     ax = plt.axes()
+
+    
+    cat_names = []
+    for cat in cats:
+        if cat in nice_names.keys():
+            cat_names.append(nice_names[cat])
+        else:
+            cat_names.append(cat)
+    
     plotlib.brazilplot(
         axes=ax,
         limits=lims,
         categories=cats,
-        category_names=[nice_names[cat] for cat in cats],
+        category_names=cat_names,
     )
 
     plotlib.svfg("limits/{0}.png".format(plot_name))
