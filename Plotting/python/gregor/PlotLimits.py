@@ -42,9 +42,8 @@ plots = [
     ["dl_mem", ["dl_jge4_tge4",  "dl_jge4_t3", "dl_jge4_t2",  "dl_j3_t3", "dl_j3_t2"]],
 
     ["sl", ["sl_j4_t2", "sl_j4_t3", "sl_j4_tge4","sl_j5_t2", "sl_j5_t3", "sl_j5_tge4", "sl_jge6_t2", "sl_jge6_t3", "sl_jge6_tge4"]],    
-    ["sl_bdt", ["sl_j4_t2", "sl_j4_t3_bdt", "sl_j4_tge4_bdt","sl_j5_t2", "sl_j5_t3_bdt", "sl_j5_tge4_bdt", "sl_jge6_t2_bdt", "sl_jge6_t3_bdt", "sl_jge6_tge4_bdt"]],    
-    
-#    ["sl_2d", ["sl_jge6_t2_bdtL", 	"sl_jge6_t2_bdtH", 	"sl_jge6_t3_bdtL", 	"sl_jge6_t3_bdtH", 	 	"sl_jge6_tge4_bdtL", "sl_jge6_tge4_bdtH", 	"sl_j5_t3_bdtL", 	"sl_j5_t3_bdtH", 	"sl_j5_tge4_bdtL", 	"sl_j5_tge4_bdtH", 	"sl_j4_t3_bdtL", 	"sl_j4_t3_bdtH", 	"sl_j4_tge4_bdtL", 	"sl_j4_tge4_bdtH"]],
+    ["sl_bdt", ["sl_j4_t2", "sl_j4_t3_bdt", "sl_j4_tge4_bdt","sl_j5_t2", "sl_j5_t3_bdt", "sl_j5_tge4_bdt", "sl_jge6_t2_bdt", "sl_jge6_t3_bdt", "sl_jge6_tge4_bdt"]],        
+    ["sl_2d", ["sl_jge6_t2_bdtL", 	"sl_jge6_t2_bdtH", 	"sl_jge6_t3_bdtL", 	"sl_jge6_t3_bdtH", 	 	"sl_jge6_tge4_bdtL", "sl_jge6_tge4_bdtH", "sl_j5_t2",	"sl_j5_t3_bdtL", 	"sl_j5_t3_bdtH", 	"sl_j5_tge4_bdtL", 	"sl_j5_tge4_bdtH", "sl_j4_t2", 	"sl_j4_t3_bdtL", 	"sl_j4_t3_bdtH", 	"sl_j4_tge4_bdtL", 	"sl_j4_tge4_bdtH"]],
 
 #    ["sl_7cat_blrsplit", ["sl_jge6_t2_blrL", 	"sl_jge6_t2_blrH", 	"sl_jge6_t3_blrL", 	"sl_jge6_t3_blrH", 	 	"sl_jge6_tge4_blrL", "sl_jge6_tge4_blrH", 	"sl_j5_t3_blrL", 	"sl_j5_t3_blrH", 	"sl_j5_tge4_blrL", 	"sl_j5_tge4_blrH", 	"sl_j4_t3_blrL", 	"sl_j4_t3_blrH", 	"sl_j4_tge4_blrL", 	"sl_j4_tge4_blrH"]],
 
