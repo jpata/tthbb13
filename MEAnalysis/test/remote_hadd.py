@@ -64,6 +64,6 @@ if __name__ == "__main__":
     parser.add_argument('--server', action="store", help="XRootD server", default="storage01.lcg.cscs.ch")
     parser.add_argument('--filter', action="store", help="Good file filter function", default="default", choices=sorted(filters.keys()))
     parser.add_argument('--path', action="store", help="Remote path on server")
-    parser.add_argument('--outfile', action="store", help="Output file")
+    parser.add_argument('--outfile', action="store", help="Output file", required=True)
     args = parser.parse_args()
     xrootd_hadd(args.server, args.path, filters[args.filter], args.outfile)

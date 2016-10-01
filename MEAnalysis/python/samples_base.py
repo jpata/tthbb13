@@ -102,7 +102,21 @@ PROCESS_MAP = {
     "ttbarPlusCCbar": 5,
     "ttbarOther": 6,
     "qcd": 13,
+    
+    "ww": 14,
+    "wz": 15,
+    "zz": 16,
+    
+    "st_t": 17,
+    "stbar_t": 18,
+    "st_tw": 19,
+    "stbar_tw": 20,
+    "st_s": 21,
 
+    "ttw_wqq": 22,
+    "ttz_zqq": 23,
+    "ttw_wlnu": 24,
+    
 #need to keep different data samples separate at this point
     "data_e": 7,
     "data_m": 8,
@@ -121,6 +135,12 @@ TRIGGERPATH_MAP = {
     "fh": 6,
 }
 
+xsec[("stop_tW", "13TeV")] = 35.6
+xsec[("stop_tbarW", "13TeV")] = 35.6
+xsec[("stop_t", "13TeV")] = 45.34
+xsec[("stop_tbar", "13TeV")] = 26.98 
+xsec[("stop_s", "13TeV")] = 3.44
+
 xsec_sample = {
     "TT_TuneCUETP8M1_13TeV-powheg-pythia8":     xsec[("ttjets", "13TeV")],
     "TT_TuneEE5C_13TeV-powheg-herwigpp":        xsec[("ttjets", "13TeV")],
@@ -129,6 +149,19 @@ xsec_sample = {
     "TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8":    0.5*xsec[("ttjets", "tt_to_lj", "13TeV")],
     "ttHTobb_M125_13TeV_powheg_pythia8":        xsec[("tthbb", "13TeV")],
     "ttHToNonbb_M125_13TeV_powheg_pythia8":     xsec[("tth_nonhbb", "13TeV")],
+    
+    'WW_TuneCUETP8M1_13TeV-pythia8' :  xsec[("ww", "13TeV")],
+    'WZ_TuneCUETP8M1_13TeV-pythia8' :  xsec[("wz", "13TeV")],
+    'ZZ_TuneCUETP8M1_13TeV-pythia8' :  xsec[("zz", "13TeV")],
+
+    'TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8': xsec[("ttw_wqq", "13TeV")],
+    'TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8': xsec[("ttz_zqq", "13TeV")],
+
+    'ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1': xsec[("stop_tW", "13TeV")],
+    'ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1': xsec[("stop_tbarW", "13TeV")],
+    'ST_t-channel_top_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1': xsec[("stop_t", "13TeV")],
+    'ST_t-channel_antitop_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1': xsec[("stop_tbar", "13TeV")],
+    'ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1': xsec[("stop_s", "13TeV")],
 
     'QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' :   xsec[("qcd_ht300to500", "13TeV")],
     'QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' :   xsec[("qcd_ht500to700", "13TeV")],
@@ -136,6 +169,7 @@ xsec_sample = {
     'QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' : xsec[("qcd_ht1000to1500", "13TeV")],
     'QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' : xsec[("qcd_ht1500to2000", "13TeV")],
     'QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' :  xsec[("qcd_ht2000toinf", "13TeV")],
+    
 }
 
 #Configure the site-specific file path

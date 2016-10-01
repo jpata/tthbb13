@@ -3,15 +3,18 @@ import pdb
 import ROOT
 import logging
 
-
 import matplotlib
 from matplotlib import rc
+if __name__== "__main__":
+    matplotlib.use('PS')
 import matplotlib.pyplot as plt
 
 import sys, os, copy
 import os.path
 from collections import OrderedDict
 import heplot, plotlib
+
+from plotlib import escape_string, zero_error
 
 import rootpy
 from rootpy.plotting import Hist
@@ -27,17 +30,9 @@ procs_names = [
     ("ttbarPlus2B", "tt+2b"),
     ("ttbarPlusB", "tt+b"),
     ("ttbarPlusCCbar", "tt+cc"),
-#    ("qcd_ht300to500", "qcd ht 300 500"),
-#    ("qcd_ht300to500", "qcd ht 300 500"),
-#    ("qcd_ht500to700", "qcd ht 500 700"),
-#    ("qcd_ht700to1000", "qcd ht 700 1."),
-#    ("qcd_ht1000to1500", "qcd ht 1. 1.5"),
-#    ("qcd_ht1500to2000", "qcd ht 1.5 2."),
-#    ("qcd_ht2000toinf", "qcd ht 2. inf "),
-
-
-
+    ("diboson", "diboson"),
 ]
+
 procs = [x[0] for x in procs_names]
 
 
@@ -68,9 +63,28 @@ def blind(h):
 
 def plot_syst_updown(nominal, up, down):
     plt.figure(figsize=(6,6))
-    heplot.barhist(nominal, color="black")
+    a1 = plt.axes([0.0, 0.52, 1.0, 0.5])
+    heplot.barhist(nominal, color="black", label="nominal")
+    heplot.barhist(up, color="red", label="up")
+    heplot.barhist(down, color="blue", label="down")
+    ticks = a1.get_xticks()
+    a1.get_xaxis().set_visible(False)
+    a1.grid()
+
+    a2 = plt.axes([0.0, 0.0, 1.0, 0.48], sharex=a1)
+    up = up.Clone()
+    up.Divide(nominal)
+    zero_error(up)
+
+    down = down.Clone()
+    down.Divide(nominal)
+    zero_error(down)
+
     heplot.barhist(up, color="red")
     heplot.barhist(down, color="blue")
+    plt.axhline(1.0, color="black")
+    a2.set_ylim(0.5, 1.5)
+    a2.grid()
 
 def blind_mem(h):
     h = h.Clone()
@@ -128,9 +142,10 @@ def plot_worker(kwargs):
                 hup = ret["systematic"][systUp][samp]
                 hdown = ret["systematic"][systDown][samp]
                 plot_syst_updown(hnom, hup, hdown)
+                plt.suptitle(escape_string(systUp.replace("Up", "")) + " " + sampname)
+                plt.xlabel(kwargs["xlabel"]) 
                 outname_syst = os.path.join(outname, syst_name, samp)
                 logging.info("saving systematic {0}".format(outname_syst))
-                plotlib.svfg(outname_syst + ".pdf")
                 plotlib.svfg(outname_syst + ".pdf")
                 plt.clf()
 
@@ -164,8 +179,8 @@ if __name__ == "__main__":
 
     # Plot for all SL categories
     simple_vars = [
-        "jetsByPt_0_pt", 
-        "leps_0_pt",  
+        "jetsByPt_0_pt",
+        "leps_0_pt",
         "btag_LR_4b_2b_btagCSV_logit",
         "common_mem"
     ]
@@ -178,7 +193,7 @@ if __name__ == "__main__":
     args = []
 
     args += [get_base_plot(
-        "/mnt/t3nfs01/data01/shome/jpata/tth/sw/CMSSW/src/TTH/MEAnalysis/rq/results/fa2ce3d2-edce-4482-b1f7-eda9e46bd1b7/",
+        "/mnt/t3nfs01/data01/shome/jpata/tth/sw/CMSSW/src/TTH/MEAnalysis/rq/results/6a20e79f-22b9-466a-ae9a-2741b93743e1/",
         "test", "categories", cat, var) for cat in cats for var in simple_vars 
     ]
 

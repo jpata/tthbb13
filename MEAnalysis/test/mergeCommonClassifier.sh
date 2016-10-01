@@ -1,7 +1,21 @@
 #!/bin/bash
 set +e
-python remote_hadd.py --server storage01.lcg.cscs.ch --path /pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/mem/CRAB_UserFiles/crab_MEM_Sep26_v1_ttH_nonhbb --outfile ttH_nonhbb.root
-python remote_hadd.py --server storage01.lcg.cscs.ch --path /pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/mem/CRAB_UserFiles/crab_MEM_Sep26_v1_ttH_hbb --outfile ttH_hbb.root
-python remote_hadd.py --server storage01.lcg.cscs.ch --path /pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/mem/CRAB_UserFiles/crab_MEM_Sep26_v1_ttjetsUnsplit --outfile ttjetsUnsplit.root
-python remote_hadd.py --server storage01.lcg.cscs.ch --path /pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/mem/CRAB_UserFiles/crab_MEM_Sep26_v1_ttjets_sl_t --outfile ttjets_sl_t.root
-python remote_hadd.py --server storage01.lcg.cscs.ch --path /pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/mem/CRAB_UserFiles/crab_MEM_Sep26_v1_ttjets_sl_tbar --outfile ttjets_sl_tbar.root
+
+#python remote_hadd.py --server storage01.lcg.cscs.ch --path /pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/mem/CRAB_UserFiles/crab_MEM_Sep29_ETH_v1_ttH_nonhbb --outfile ttH_nonhbb.root
+#python remote_hadd.py --server storage01.lcg.cscs.ch --path /pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/mem/CRAB_UserFiles/crab_MEM_Sep29_ETH_v1_ttH_hbb --outfile ttH_hbb.root
+#python remote_hadd.py --server storage01.lcg.cscs.ch --path /pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/mem/CRAB_UserFiles/crab_MEM_Sep29_ETH_v1_ttjetsUnsplit --outfile ttjetsUnsplit.root
+#python remote_hadd.py --server storage01.lcg.cscs.ch --path /pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/mem/CRAB_UserFiles/crab_MEM_Sep29_ETH_v1_data_m --outfile data_m.root
+#python remote_hadd.py --server storage01.lcg.cscs.ch --path /pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/mem/CRAB_UserFiles/crab_MEM_Sep29_ETH_v1_data_e --outfile data_e.root
+#python remote_hadd.py --server storage01.lcg.cscs.ch --path /pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/mem/CRAB_UserFiles/crab_MEM_Sep29_ETH_v1_data_mm --outfile data_mm.root
+#python remote_hadd.py --server storage01.lcg.cscs.ch --path /pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/mem/CRAB_UserFiles/crab_MEM_Sep29_ETH_v1_data_em --outfile data_em.root
+#python remote_hadd.py --server storage01.lcg.cscs.ch --path /pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/mem/CRAB_UserFiles/crab_MEM_Sep29_ETH_v1_data_ee --outfile data_ee.root
+#python remote_hadd.py --server storage01.lcg.cscs.ch --path /pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/mem/CRAB_UserFiles/crab_MEM_Sep29_ETH_v1_ttjets_sl_t --outfile ttjets_sl_t.root
+#python remote_hadd.py --server storage01.lcg.cscs.ch --path /pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/mem/CRAB_UserFiles/crab_MEM_Sep29_ETH_v1_ttjets_sl_tbar --outfile ttjets_sl_tbar.root
+
+FILES="crab_MEM_Sep29_DESY_v1_ttbarH125tobbbar_JESUP crab_MEM_Sep29_DESY_v1_ttbarsignalplustau_fromDilepton0 crab_MEM_Sep29_DESY_v1_ttbarsignalplustau_fromDilepton0_JESDOWN crab_MEM_Sep29_DESY_v1_ttbarsignalplustau_fromDilepton0_JESUP crab_MEM_Sep29_DESY_v1_ttbarH125tobbbar_JERDOWN crab_MEM_Sep29_DESY_v1_ttbarsignalplustau_fromDilepton0_JERUP crab_MEM_Sep29_DESY_v1_ttbarH125tobbbar_JESDOWN crab_MEM_Sep29_DESY_v1_ttbarsignalplustau_fromDilepton0_JERDOWN crab_MEM_Sep29_DESY_v1_ttbarH125tobbbar_JERUP crab_MEM_Sep29_DESY_v1_ttbarH125tobbbarrab_MEM_Sep29_DESY_v1_ttbarH125tobbbar_JERUP crab_MEM_Sep29_DESY_v1_ttbarH125tobbbar"
+for f in $FILES
+do
+    python remote_hadd.py --server storage01.lcg.cscs.ch --path /pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/mem/CRAB_UserFiles/$f --outfile $f.root
+done
+
+

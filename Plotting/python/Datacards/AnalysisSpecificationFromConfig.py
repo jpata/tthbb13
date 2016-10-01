@@ -76,7 +76,6 @@ def analysisFromConfig(config_file_path):
     config = Analysis.getConfigParser(config_file_path)
 
     # Get information on sparse input
-    sparse_version = config.get("general", "sparse_version")
     input_file = config.get("sparse_data", "infile")
     lumi = dict([(k, float(v)) for (k, v) in config.items("lumi")])
     blr_cuts = dict([(k, float(v)) for (k, v) in config.items("blr_cuts")])

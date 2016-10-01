@@ -54,7 +54,7 @@ colors = {
     "diboson": (42, 100, 198),
     "wjets": (102, 201, 77),
     "stop": (235, 73, 247),
-    "ttV": (204, 204, 251),
+    "ttv": (204, 204, 251),
     "qcd": (102, 201, 77),
     "qcd_ht300to500"   : (102, 201, 76),
     "qcd_ht300to500"   : (102, 201, 78),
@@ -200,6 +200,7 @@ varnames = {
     "nPVs": "$N_{\\mathrm{PV}}$",
     "ntopCandidate": "$N_{\\mathrm{HTTv2}}$",
     "common_bdt": "BDT",
+    "common_mem": "MEM",
     "Wmass": "$m_{qq}$"
 }
 
@@ -335,6 +336,10 @@ def make_uoflow(h):
     h.SetBinContent(nb+1, h.GetBinContent(nb) + h.GetBinContent(nb + 1))
     h.SetBinError(1, math.sqrt(h.GetBinError(0)**2 + h.GetBinError(1)**2))
     h.SetBinError(nb+1, math.sqrt(h.GetBinError(nb)**2 + h.GetBinError(nb + 1)**2))
+
+def zero_error(h):
+    for i in range(1, h.GetNbinsX()+1):
+        h.SetBinError(i, 0)
 
 def fill_overflow(hist):
     """

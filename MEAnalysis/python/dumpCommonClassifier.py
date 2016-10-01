@@ -109,16 +109,22 @@ if __name__ == "__main__":
     
     tree.var('met_pt', type=float, storageType="F")
     tree.var('met_phi', type=float, storageType="F")
+    
+    tree.var('hypo', type=int, storageType="I")
    
     for v in ["event", "run", "lumi"]:
         tree.var(v, type=int, storageType="L")
 
     for iEv, ev in enumerate(ch):
-        accept = (ev.is_sl and ev.njets >= 4 and (ev.nBCSVM >= 3 or ev.nBCMVAM >= 3))
-        accept = accept or (ev.is_dl and ev.njets >= 4 and (ev.nBCSVM >= 3 or ev.nBCMVAM >= 3))
+        accept = (ev.is_sl and ev.njets >= 4 and (ev.nBCSVM >= 2))
+        accept = accept or (ev.is_dl and ev.njets >= 3 and (ev.nBCSVM >= 2))
+
         if not accept:
             continue
-       
+        calc_mem = ev.njets >= 4 and ev.nBCSVM >= 3
+        hypo = -2
+        if calc_mem:
+            hypo = 0
 
         leps_p4 = []
         leps_charge = []
@@ -132,7 +138,7 @@ if __name__ == "__main__":
             leps_p4 += [p4]
             leps_charge += [math.copysign(1, ev.leps_pdgId[ilep])]
  
-        jets = []       
+        jets = []
         loose_jets = []
 
         for ijet in range(ev.njets)[:max_jets]:
@@ -202,6 +208,7 @@ if __name__ == "__main__":
             tree.fill('lumi', ev.lumi)
             
             tree.fill('systematic', scenario.systematic_index)
+            tree.fill('hypo', hypo)
             
             tree.tree.Fill()
     

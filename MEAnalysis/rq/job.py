@@ -11,6 +11,7 @@ import ROOT
 import TTH.MEAnalysis.counts as counts
 import TTH.Plotting.joosep.sparsinator as sparsinator
 import tempfile, os
+import shutil
 from shutil import copyfile
 
 import sys, os, copy
@@ -59,6 +60,21 @@ def sparse(config_path, filenames, sample, outfile):
 #    heplot.barhist(up, color="red")
 #    heplot.barhist(down, color="blue")
 
+
+def mergeFiles(outfile, infiles, remove_inputs=True):
+    if len(infiles) == 1:
+        shutil.copy(infiles[0], outfile)
+    else:
+        merger = ROOT.TFileMerger(False)
+        merger.OutputFile(outfile)
+        for res in infiles:
+            merger.AddFile(res, False)
+        merger.Merge()
+    if remove_inputs:
+        for res in infiles:
+            if os.path.isfile(res):
+                os.remove(res)
+    return outfile
 
 def makecategory(*args):
     an_name, analysis = analysisFromConfig(args[0])

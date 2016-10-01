@@ -5,7 +5,7 @@ logger = logging.getLogger("main")
 from rq import Queue
 from redis import Redis
 from rq import push_connection, get_failed_queue, Queue, Worker
-from job import count, sparse, plot, makecategory, makelimits
+from job import count, sparse, plot, makecategory, makelimits, mergeFiles
 import socket
 
 import time, os, sys
@@ -47,6 +47,9 @@ procs_names = [
     ("ttbarPlus2B", "tt+2b"),
     ("ttbarPlusB", "tt+b"),
     ("ttbarPlusCCbar", "tt+cc"),
+    ("diboson", "diboson"),
+    ("stop", "single top"),
+    ("ttv", "tt+V"),
 ]
 procs = [x[0] for x in procs_names]
 
@@ -208,24 +211,6 @@ def getGeneratedEvents(sample):
         ]
     logger.info("getGeneratedEvents: {0} jobs launched for sample {1}".format(len(jobs), sample.name))
     return jobs
-
-def mergeFiles(outfile, infiles, remove_inputs=True):
-    if len(infiles) == 1:
-        logger.debug("copying output to {0}".format(outfile))
-        shutil.copy(infiles[0], outfile)
-    else:
-        logger.debug("merging output to {0}".format(outfile))
-        merger = ROOT.TFileMerger(False)
-        merger.OutputFile(outfile)
-        for res in infiles:
-            logger.debug("adding file {0}".format(res))
-            merger.AddFile(res, False)
-        merger.Merge()
-    if remove_inputs:
-        for res in infiles:
-            if os.path.isfile(res):
-                os.remove(res)
-    return outfile
 
 def runSparsinator_async(config_path, sample, workdir):
     jobs = []
@@ -406,16 +391,26 @@ if __name__ == "__main__":
         ### SPARSE MERGE
         ###
         logger.info("starting step SPARSEMERGE")
+
+        if args.queue != "EXISTING":
+            kill_jobs()
+            start_jobs(args.queue, args.njobs)
+
+        all_jobs = []
         for ds in analysis.samples:
             ds_results = [os.path.abspath(job.result) for job in jobs["sparse"][ds]]
-            logger.info("sparsemerge: merging {0} files for sample {1}".format(len(ds_results), ds.name))
-            results["sparse"] += [
-                mergeFiles(
-                    os.path.abspath("{0}/sparse/sparse_{1}.root".format(workdir, ds.name)),
-                    ds_results,
-                    remove_inputs = True
-                )
-            ]
+            logger.info("sparsemerge: submitting merge of {0} files for sample {1}".format(len(ds_results), ds.name))
+            all_jobs += [qmain.enqueue_call(
+                func=mergeFiles,
+                args=(os.path.abspath("{0}/sparse/sparse_{1}.root".format(workdir, ds.name)), ds_results),
+                timeout=20*60,
+                result_ttl=60*60,
+                meta={"retries": 0}
+            )]
+        waitJobs(all_jobs, redis_conn)
+        results["sparse"] = [j.result for j in all_jobs]
+
+        logger.info("sparsemerge: merging final sparse out of {0} files".format(len(results["sparse"])))
         results["sparse-merge"] = mergeFiles(
             os.path.abspath("{0}/sparse/merged.root".format(workdir)),
             results["sparse"],
@@ -424,6 +419,9 @@ if __name__ == "__main__":
         analysis.config.set("sparse_data", "infile", results["sparse-merge"])
         with open(tmp_conf_name, "wb") as configfile:
             analysis.config.write(configfile)
+
+        if args.queue != "EXISTING":
+            kill_jobs()
 
         logger.info("step SPARSEMERGE done")
 
@@ -458,7 +456,8 @@ if __name__ == "__main__":
         for cat in analysis.categories:
         
             cat.outdir = "{0}/categories/{1}/{2}".format(workdir, cat.name, cat.discriminator)
-            os.makedirs(cat.outdir)
+            if not os.path.exists(cat.outdir):
+                os.makedirs(cat.outdir)
             
             rules = sorted(make_rules(analysis, [cat]), key=lambda x: x["input"])
             logger.debug("made {0} rules for cat {1}".format(len(rules), cat.full_name))
