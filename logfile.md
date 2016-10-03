@@ -494,3 +494,11 @@ tthbb13=9ce4e43
 CommonClassifier=29d4ac7
 MEIntegratorStandalone=7bb8b79
 CMSSW=235b9a2
+
+
+Sep29_v1
+-------------
+tthbb13=0346e7d
+CommonClassifier=29d4ac7
+MEIntegratorStandalone=7bb8b79
+CMSSW=235b9a2

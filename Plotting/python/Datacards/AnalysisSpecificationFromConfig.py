@@ -152,7 +152,7 @@ def analysisFromConfig(config_file_path):
                         input_name = in_name,
                         output_name = out_name,
                         cuts = cuts,
-                        xs_weight = samples_base.xsec_sample[in_name]/samples_dict[in_name].ngen))
+                        xs_weight = samples_dict[in_name].xsec/samples_dict[in_name].ngen))
         # End loop over processes
 
         #post-processing of processes

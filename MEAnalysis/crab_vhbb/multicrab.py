@@ -1,3 +1,4 @@
+#!/bin/bash
 import sys, re, shutil
 from copy import deepcopy
 import subprocess
@@ -322,8 +323,27 @@ datasets.update({
         "mem_cfg": me_cfgs["leptonic"],
         "script": 'heppy_crab_script.sh'
     },
+
+
     'wjets_ht_2500_inf': {
         "ds": '/WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 20,
+        "runtime": 10,
+        "mem_cfg": me_cfgs["leptonic"],
+        "script": 'heppy_crab_script.sh'
+    },
+
+    'dy_10_50': {
+        "ds": '/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 20,
+        "runtime": 10,
+        "mem_cfg": me_cfgs["leptonic"],
+        "script": 'heppy_crab_script.sh'
+    },
+    'dy_50_inf': {
+        "ds": '/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring16MiniAODv1-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/MINIAODSIM',
         "maxlumis": -1,
         "perjob": 20,
         "runtime": 10,
@@ -471,13 +491,15 @@ for k in ["ttHTobb", "ttHToNonbb", "TTbar_inc"]:
 
 workflow_datasets["leptonic_nome"] = {}
 for k in [
-        #"ttHTobb", "ttHToNonbb",
+        "ttHTobb",
+        "ttHToNonbb",
         #"ttHTobb_tranche3", "ttHToNonbb_tranche3",
         #"TTbar_inc",
         #"TTbar_inc_scaleup", "TTbar_inc_scaledown",
         #"TTbar_sl",
         "TTbar_sl_tranche3",
-        #"TTbar_sl_scaleup", "TTbar_sl_scaledown",
+        "TTbar_sl_scaleup",
+        #"TTbar_sl_scaledown",
         #"TTbar_sl1", "TTbar_sl2",
         #"TTbar_dl",
         #"ww", "wz", "zz",
@@ -494,6 +516,8 @@ for k in [
         # "wjets_ht_800_1200",
         # "wjets_ht_1200_2500",
         # "wjets_ht_2500_inf",
+        "dy_10_50",
+        "dy_50_inf"
     ]:
     D = deepcopy(datasets[k])
 
@@ -759,4 +783,4 @@ env
             except Exception as e:
                 print e
                 print "skipping"
-                                                                                                                                                                                                                               
+                                                                                                                                                                                                                   
