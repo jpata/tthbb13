@@ -223,6 +223,14 @@ datasets.update({
         "mem_cfg": me_cfgs["leptonic"],
         "script": 'heppy_crab_script.sh'
     },
+    'TTbar_dl_tranche3': {
+        "ds": '/TTTo2L2Nu_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 150,
+        "runtime": 20,
+        "mem_cfg": me_cfgs["leptonic"],
+        "script": 'heppy_crab_script.sh'
+    },
     
     'ww': {
         "ds": '/WW_TuneCUETP8M1_13TeV-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM',
@@ -345,7 +353,7 @@ datasets.update({
     'dy_50_inf': {
         "ds": '/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring16MiniAODv1-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/MINIAODSIM',
         "maxlumis": -1,
-        "perjob": 20,
+        "perjob": 40,
         "runtime": 10,
         "mem_cfg": me_cfgs["leptonic"],
         "script": 'heppy_crab_script.sh'
@@ -491,17 +499,18 @@ for k in ["ttHTobb", "ttHToNonbb", "TTbar_inc"]:
 
 workflow_datasets["leptonic_nome"] = {}
 for k in [
-        "ttHTobb",
-        "ttHToNonbb",
+        #"ttHTobb",
+        #"ttHToNonbb",
         #"ttHTobb_tranche3", "ttHToNonbb_tranche3",
         #"TTbar_inc",
         #"TTbar_inc_scaleup", "TTbar_inc_scaledown",
         #"TTbar_sl",
         "TTbar_sl_tranche3",
-        "TTbar_sl_scaleup",
+        #"TTbar_sl_scaleup",
         #"TTbar_sl_scaledown",
         #"TTbar_sl1", "TTbar_sl2",
         #"TTbar_dl",
+        #"TTbar_dl_tranche3",
         #"ww", "wz", "zz",
         #"st_t", "stbar_t",
         #"st_tw", "stbar_tw",
@@ -516,7 +525,7 @@ for k in [
         # "wjets_ht_800_1200",
         # "wjets_ht_1200_2500",
         # "wjets_ht_2500_inf",
-        "dy_10_50",
+        #"dy_10_50",
         "dy_50_inf"
     ]:
     D = deepcopy(datasets[k])

@@ -90,6 +90,8 @@ class Sample(object):
 
     def updateConfig(self, config):
         for field in dir(self):
+            if field.startswith("__"):
+                continue
             config.set(self.name, field, str(getattr(self, field)))
 
 class Process(object):

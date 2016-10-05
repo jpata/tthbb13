@@ -52,12 +52,13 @@ def xrootd_hadd(server, directory, match, outfile):
     print "Merged output in {0}, {1:.2f} MB".format(outfile, os.path.getsize(outfile)/1024.0/1024.0)
     return outfile
 
+#configurations go here
+filters = {
+    "default": lambda x: ".root" in x and not "failed" in x
+}
+
 if __name__ == "__main__":
 
-    #configurations go here
-    filters = {
-        "default": lambda x: ".root" in x and not "failed" in x
-    }
 
     import argparse
     parser = argparse.ArgumentParser(description='Mergers files on a remote SE via XRootD')

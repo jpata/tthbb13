@@ -809,6 +809,10 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                         ret["common_bdt"] = classifiers.bdt
                         if classifiers.mem_p_sig > 0:
                             ret["common_mem"] = classifiers.mem_p_sig / (classifiers.mem_p_sig + float(MEM_SF) * classifiers.mem_p_bkg)
+                    else:
+                        ret["common_bdt"] = -99
+                        ret["common_mem"] = -99
+                print(ret["common_bdt"], ret["common_mem"])
 
                 #Fill the base histogram
                 for (k, v) in outdict_syst[syst].items():
@@ -847,12 +851,15 @@ if __name__ == "__main__":
 
     else:
         file_names = map(getSitePrefix, [
-            "/store/user/jpata/tth/Sep14_leptonic_nome_v1/ttHTobb_M125_13TeV_powheg_pythia8/Sep14_leptonic_nome_v1/160914_142604/0000/tree_1.root"
+            "/store/user/jpata/tth/Sep14_leptonic_nome_v1/ttHTobb_M125_13TeV_powheg_pythia8/Sep14_leptonic_nome_v1/160914_142604/0000/tree_1.root",
+            "/store/user/jpata/tth/Sep14_leptonic_nome_v1/ttHTobb_M125_13TeV_powheg_pythia8/Sep14_leptonic_nome_v1/160914_142604/0000/tree_10.root",
+            "/store/user/jpata/tth/Sep14_leptonic_nome_v1/ttHTobb_M125_13TeV_powheg_pythia8/Sep14_leptonic_nome_v1/160914_142604/0000/tree_100.root",
+            "/store/user/jpata/tth/Sep14_leptonic_nome_v1/ttHTobb_M125_13TeV_powheg_pythia8/Sep14_leptonic_nome_v1/160914_142604/0000/tree_101.root",
+            "/store/user/jpata/tth/Sep14_leptonic_nome_v1/ttHTobb_M125_13TeV_powheg_pythia8/Sep14_leptonic_nome_v1/160914_142604/0000/tree_102.root",
         ])
-        file_names = ["root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep14_leptonic_nome_v1/TT_TuneCUETP8M1_13TeV-powheg-pythia8/Sep14_leptonic_nome_v1/160914_141043/0003/tree_3602.root"]
         prefix = ""
         sample = "ttHTobb_M125_13TeV_powheg_pythia8"
         skip_events = 0
-        max_events = 5000
+        max_events = 10000
         an_name, analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/Plotting/python/Datacards/config_sldl.cfg")
     main(analysis, file_names, sample, "out.root", skip_events, max_events)

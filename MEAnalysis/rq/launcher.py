@@ -50,6 +50,7 @@ procs_names = [
     ("diboson", "diboson"),
     ("stop", "single top"),
     ("ttv", "tt+V"),
+    ("wjets", "w+jets")
 ]
 procs = [x[0] for x in procs_names]
 
