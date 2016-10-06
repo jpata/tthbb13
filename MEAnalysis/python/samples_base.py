@@ -126,6 +126,9 @@ PROCESS_MAP = {
     "wjets_ht_1200_2500": 32,
     "wjets_ht_2500_inf": 33,
 
+    "ttbar_dl": 34,
+    "dy_10_50": 35,
+
 #need to keep different data samples separate at this point
     "data_e": 7,
     "data_m": 8,

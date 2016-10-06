@@ -110,7 +110,7 @@ if __name__ == "__main__":
     tree.var('met_pt', type=float, storageType="F")
     tree.var('met_phi', type=float, storageType="F")
     
-    tree.var('hypo', type=int, storageType="I")
+    tree.var('hypothesis', type=int, storageType="I")
    
     for v in ["event", "run", "lumi"]:
         tree.var(v, type=int, storageType="L")
@@ -208,7 +208,7 @@ if __name__ == "__main__":
             tree.fill('lumi', ev.lumi)
             
             tree.fill('systematic', scenario.systematic_index)
-            tree.fill('hypo', hypo)
+            tree.fill('hypothesis', hypo)
             
             tree.tree.Fill()
     
