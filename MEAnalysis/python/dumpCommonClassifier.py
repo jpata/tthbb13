@@ -60,7 +60,6 @@ def make_corrections(event, schema, jet_base, ijet):
 class Scenario:
     def __init__(self, *args, **kwargs):
         self.jets = kwargs.get("jets")
-        self.loose_jets = kwargs.get("loose_jets")
         self.leps_p4 = kwargs.get("leps_p4")
         self.leps_charge = kwargs.get("leps_charge")
         self.met_pt = kwargs.get("met_pt")
@@ -93,12 +92,9 @@ if __name__ == "__main__":
     tree.var('systematic', type=int)
     tree.var('njets', type=int)
     max_jets = 10
-    tree.var('nloose_jets', type=int)
-    max_loose_jets = 5
     for v in ["jet_pt", "jet_eta", "jet_phi", "jet_mass", "jet_csv", "jet_cmva"]:
         tree.vector(v, "njets", maxlen=max_jets, type=float, storageType="F")
-    for v in ["loose_jet_pt", "loose_jet_eta", "loose_jet_phi", "loose_jet_mass", "loose_jet_csv", "loose_jet_cmva"]:
-        tree.vector(v, "nloose_jets", maxlen=max_loose_jets, type=float, storageType="F")
+
     for v in ["jet_type"]:
         tree.vector(v, "njets", maxlen=max_jets, type=int, storageType="i")
     
@@ -116,15 +112,12 @@ if __name__ == "__main__":
         tree.var(v, type=int, storageType="L")
 
     for iEv, ev in enumerate(ch):
-        accept = (ev.is_sl and ev.njets >= 4 and (ev.nBCSVM >= 2))
-        accept = accept or (ev.is_dl and ev.njets >= 3 and (ev.nBCSVM >= 2))
+        accept = (ev.is_sl and ev.njets >= 4 and (ev.nBCSVM >= 3 or ev.nBCMVAM >= 3))
+        accept = accept or (ev.is_dl and ev.njets >= 4 and (ev.nBCSVM >= 3 or ev.nBCMVAM >= 3))
 
         if not accept:
             continue
-        calc_mem = ev.njets >= 4 and ev.nBCSVM >= 3
-        hypo = -2
-        if calc_mem:
-            hypo = 0
+        hypo = -1
 
         leps_p4 = []
         leps_charge = []
@@ -139,7 +132,6 @@ if __name__ == "__main__":
             leps_charge += [math.copysign(1, ev.leps_pdgId[ilep])]
  
         jets = []
-        loose_jets = []
 
         for ijet in range(ev.njets)[:max_jets]:
             jets += [Jet(
@@ -152,22 +144,10 @@ if __name__ == "__main__":
                 corrections = make_corrections(ev, sample.schema, "jets", ijet)
             )]
 
-        for ijet in range(ev.nloose_jets)[:max_loose_jets]:
-            loose_jets += [Jet(
-                pt = ev.loose_jets_pt[ijet],
-                eta = ev.loose_jets_eta[ijet],
-                phi = ev.loose_jets_phi[ijet],
-                mass = ev.loose_jets_mass[ijet],
-                csv = ev.loose_jets_btagCSV[ijet],
-                cmva = ev.loose_jets_btagCMVA[ijet],
-                corrections = make_corrections(ev, sample.schema, "loose_jets", ijet)
-            )]
-
         scenarios = []
         for isf in range(len(jets[0].corrections)):
             scenario = Scenario(
                 jets = [j.correct(j.corrections[isf]) for j in jets],
-                loose_jets = [j.correct(j.corrections[isf]) for j in loose_jets],
                 leps_p4 = leps_p4,
                 leps_charge = leps_charge,
                 met_pt = ev.met_pt,
@@ -184,14 +164,6 @@ if __name__ == "__main__":
             tree.vfill('jet_mass', [x.mass for x in scenario.jets])
             tree.vfill('jet_csv', [x.csv for x in scenario.jets])
             tree.vfill('jet_cmva', [x.cmva for x in scenario.jets])
-
-            tree.fill('nloose_jets', len(scenario.loose_jets))
-            tree.vfill('loose_jet_pt', [x.pt for x in scenario.loose_jets])
-            tree.vfill('loose_jet_eta', [x.eta for x in scenario.loose_jets])
-            tree.vfill('loose_jet_phi', [x.phi for x in scenario.loose_jets])
-            tree.vfill('loose_jet_mass', [x.mass for x in scenario.loose_jets])
-            tree.vfill('loose_jet_csv', [x.csv for x in scenario.loose_jets])
-            tree.vfill('loose_jet_cmva', [x.cmva for x in scenario.loose_jets])
 
             tree.fill('nleps', len(scenario.leps_p4))
             tree.vfill('lep_pt', [x[0] for x in scenario.leps_p4])

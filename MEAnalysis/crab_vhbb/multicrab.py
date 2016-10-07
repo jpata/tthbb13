@@ -510,7 +510,7 @@ for k in [
         #"TTbar_sl_scaledown",
         #"TTbar_sl1", "TTbar_sl2",
         #"TTbar_dl",
-        #"TTbar_dl_tranche3",
+        "TTbar_dl_tranche3",
         #"ww", "wz", "zz",
         #"st_t", "stbar_t",
         #"st_tw", "stbar_tw",
@@ -526,7 +526,7 @@ for k in [
         # "wjets_ht_1200_2500",
         # "wjets_ht_2500_inf",
         #"dy_10_50",
-        "dy_50_inf"
+        #"dy_50_inf"
     ]:
     D = deepcopy(datasets[k])
 
@@ -702,7 +702,7 @@ env
 
     config.JobType.pluginName = 'Analysis'
     config.JobType.psetName = 'heppy_crab_fake_pset.py'
-    config.JobType.maxMemoryMB = 3000
+    config.JobType.maxMemoryMB = 2000
 
     import os
     os.system("tar czf python.tar.gz --directory $CMSSW_BASE python `find $CMSSW_BASE/src -name python | perl -pe s#$CMSSW_BASE/## `")
@@ -755,7 +755,7 @@ env
     config.Data.allowNonValidInputDataset = True
 
     #config.Site.whitelist = ["T2_CH_CSCS", "T1_US_FNAL", "T2_DE_DESY", "T1_DE_KIT"]
-    config.Site.blacklist = ["T2_US_Florida", "T2_US_MIT", "T2_US_Wisconsin", "T2_US_Vanderbilt"]
+    #config.Site.blacklist = ["T2_US_Florida", "T2_US_MIT", "T2_US_Wisconsin", "T2_US_Vanderbilt"]
 
     config.Site.storageSite = "T2_CH_CSCS"
 

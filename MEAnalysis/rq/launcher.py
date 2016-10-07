@@ -263,7 +263,7 @@ if __name__ == "__main__":
         action = "store",
         help = "Job queue",
         type = str,
-        default = "short.q"
+        default = "all.q"
     )
     parser.add_argument(
         '--start',
