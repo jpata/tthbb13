@@ -126,19 +126,25 @@ class BTagLRAnalyzer(FilterAnalyzer):
         btag_likelihood_ratio_results = {}
         for btagalgo in btagalgos:
             btag_lr_4b, best_4b_perm = self.btag_likelihood2(jet_probs[btagalgo], 4)
+            btag_lr_3b, best_3b_perm = self.btag_likelihood3(jet_probs[btagalgo], 3)
             btag_lr_2b, best_2b_perm = self.btag_likelihood2(jet_probs[btagalgo], 2)
             btag_likelihood_results[btagalgo] = (btag_lr_4b, btag_lr_2b, best_4b_perm, best_2b_perm)
             btag_likelihood_ratio_results[btagalgo] = self.lratio(btag_lr_4b, btag_lr_2b)
+            btag_likelihood_ratio_results_3b_2b[btagalgo] = self.lratio(btag_lr_4b, btag_lr_3b)
             setattr(event, "jet_perm_btag_lr_" + btagalgo,
                 [event.good_jets.index(j) for j in jets_for_btag_lr[btagalgo]]
             )
             setattr(event,
                 "btag_LR_4b_2b_" + btagalgo, btag_likelihood_ratio_results[btagalgo]
             )
+            setattr(event,
+                "btag_LR_3b_2b_" + btagalgo, btag_likelihood_ratio_results_3b_2b[btagalgo]
+            )
         #default btagger used
         event.btag_lr_4b = btag_likelihood_results[self.default_bTagAlgo][0]
         event.btag_lr_2b = btag_likelihood_results[self.default_bTagAlgo][1]
         event.btag_LR_4b_2b = btag_likelihood_ratio_results[self.default_bTagAlgo]
+        event.btag_LR_3b_2b = btag_likelihood_ratio_results_3b_2b[self.default_bTagAlgo]
         best_4b_perm = btag_likelihood_results[self.default_bTagAlgo][2]
 
         # use default btag method always
