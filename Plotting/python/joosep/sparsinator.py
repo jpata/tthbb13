@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 import ROOT
+import math
 
 import sys, os
 from collections import OrderedDict
@@ -12,6 +13,27 @@ from TTH.MEAnalysis.samples_base import getSitePrefix, samples_nick, get_prefix_
 from TTH.Plotting.Datacards.sparse import save_hdict
 
 from TTH.CommonClassifier.db import ClassifierDB
+
+CvectorLorentz = getattr(ROOT, "std::vector<TLorentzVector>")
+Cvectordouble = getattr(ROOT, "std::vector<double>")
+CvectorJetType = getattr(ROOT, "std::vector<MEMClassifier::JetType>")
+
+
+def vec_from_list(vec_type, src):
+    """
+    Creates a std::vector<T> from a python list.
+    vec_type (ROOT type): vector datatype, ex: std::vector<double>
+    src (iterable): python list
+    """
+    v = vec_type()
+    for item in src:
+        v.push_back(item)
+    return v
+
+def l4p(pt, eta, phi, m):
+    v = ROOT.TLorentzVector()
+    v.SetPtEtaPhiM(pt, eta, phi, m)
+    return v
 
 class BufferedTree:
     """Class with buffered TTree access, so that using tree.branch does not load the entry twice
@@ -439,6 +461,10 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
 
     systematics_event = []
 
+
+    cls_bdt_sl = ROOT.BlrBDTClassifier()
+    cls_bdt_dl = ROOT.DLBDTClassifier()
+
     #Optionally add systematics
     if analysis.config.get("sparsinator", "add_systematics"):
 
@@ -516,14 +542,25 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
         
         Var(name="Wmass", systematics="suffix"),
 
+        Var(name="btag_LR_4b_2b_btagCSV",
+            nominal=Func("blr_CSV", func=lambda ev: logit(ev.btag_LR_4b_2b)),
+        ),
+
         Var(name="btag_LR_4b_2b_btagCSV_logit",
-            nominal=Func("blr_CSV", func=lambda ev: logit(ev.btag_LR_4b_2b_btagCSV)),
+            nominal=Func("blr_CSV_logit", func=lambda ev: logit(ev.btag_LR_4b_2b_btagCSV)),
         ),
         Var(name="btag_LR_4b_2b_btagCMVA_logit",
-            nominal=Func("blr_cMVA", func=lambda ev: logit(ev.btag_LR_4b_2b_btagCMVA)),
+            nominal=Func("blr_cMVA_logit", func=lambda ev: logit(ev.btag_LR_4b_2b_btagCMVA)),
         ),
 
         Var(name="leps_pdgId", nominal=Func("leps_pdgId", func=lambda ev: [int(ev.leps_pdgId[i]) for i in range(ev.nleps)])),
+        Var(name="leps_charge", nominal=Func("leps_charge", func=lambda ev: [float(math.copysign(1.0, ev.leps_pdgId[i])) for i in range(ev.nleps)])),
+        Var(name="leps_p4",
+            nominal=Func(
+                "leps_p4",
+                func=lambda ev: [l4p(ev.leps_pt[i], ev.leps_eta[i], ev.leps_phi[i], ev.leps_mass[i]) for i in range(ev.nleps)]
+            )
+        ),
 
         Var(name="jets_p4",
             nominal=Func(
@@ -546,6 +583,31 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 "CMS_res_jDown": Func(
                     "jets_p4_JERDown",
                     func=lambda ev: [lv_p4s(ev.jets_pt[i]*float(ev.jets_corr_JERDown[i])/float(ev.jets_corr_JER[i]) if ev.jets_corr_JER[i]>0 else 0.0, ev.jets_eta[i], ev.jets_phi[i], ev.jets_mass[i], ev.jets_btagCSV[i]) for i in range(ev.njets)]
+                )
+            }
+        ),
+
+        Var(name="loose_jets_p4",
+            nominal=Func(
+                "loose_jets_p4",
+                func=lambda ev: [lv_p4s(ev.loose_jets_pt[i], ev.loose_jets_eta[i], ev.loose_jets_phi[i], ev.loose_jets_mass[i], ev.loose_jets_btagCSV[i]) for i in range(ev.nloose_jets)]
+            ),
+            systematics = {
+                "CMS_scale_jUp": Func(
+                    "loose_jets_p4_JESUp",
+                    func=lambda ev: [lv_p4s(ev.loose_jets_pt[i]*float(ev.loose_jets_corr_JESUp[i])/float(ev.loose_jets_corr[i]), ev.loose_jets_eta[i], ev.loose_jets_phi[i], ev.loose_jets_mass[i], ev.loose_jets_btagCSV[i]) for i in range(ev.nloose_jets)]
+                ),
+                "CMS_scale_jDown": Func(
+                    "loose_jets_p4_JESDown",
+                    func=lambda ev: [lv_p4s(ev.loose_jets_pt[i]*float(ev.loose_jets_corr_JESDown[i])/float(ev.loose_jets_corr[i]), ev.loose_jets_eta[i], ev.loose_jets_phi[i], ev.loose_jets_mass[i], ev.loose_jets_btagCSV[i]) for i in range(ev.nloose_jets)]
+                ),
+                "CMS_res_jUp": Func(
+                    "loose_jets_p4_JERUp",
+                    func=lambda ev: [lv_p4s(ev.loose_jets_pt[i]*float(ev.loose_jets_corr_JERUp[i])/float(ev.loose_jets_corr_JER[i]) if ev.loose_jets_corr_JER[i]>0 else 0.0, ev.loose_jets_eta[i], ev.loose_jets_phi[i], ev.loose_jets_mass[i], ev.loose_jets_btagCSV[i]) for i in range(ev.nloose_jets)]
+                ),
+                "CMS_res_jDown": Func(
+                    "loose_jets_p4_JERDown",
+                    func=lambda ev: [lv_p4s(ev.loose_jets_pt[i]*float(ev.loose_jets_corr_JERDown[i])/float(ev.loose_jets_corr_JER[i]) if ev.loose_jets_corr_JER[i]>0 else 0.0, ev.loose_jets_eta[i], ev.loose_jets_phi[i], ev.loose_jets_mass[i], ev.loose_jets_btagCSV[i]) for i in range(ev.nloose_jets)]
                 )
             }
         ),
@@ -812,6 +874,28 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                     else:
                         ret["common_bdt"] = -99
                         ret["common_mem"] = -99
+
+
+                if ret["is_sl"]:
+                    ret_bdt = cls_bdt_sl.GetBDTOutput(
+                        vec_from_list(CvectorLorentz, ret["leps_p4"]),
+                        vec_from_list(CvectorLorentz, ret["jets_p4"]),
+                        vec_from_list(Cvectordouble, [v.btagCSV for v in ret["jets_p4"]]),
+                        vec_from_list(CvectorLorentz, ret["loose_jets_p4"]),
+                        vec_from_list(Cvectordouble, [v.btagCSV for v in ret["loose_jets_p4"]]),
+                        l4p(event.met_pt, 0, event.met_phi, 0),
+                        ret["btag_LR_4b_2b_btagCSV"]
+                    )
+                    ret["common_bdt"] = ret_bdt
+                elif ret["is_dl"]:
+                    ret_bdt = cls_bdt_dl.GetBDTOutput(
+                        vec_from_list(CvectorLorentz, ret["leps_p4"]),
+                        vec_from_list(Cvectordouble, ret["leps_charge"]),
+                        vec_from_list(CvectorLorentz, ret["jets_p4"]),
+                        vec_from_list(Cvectordouble, [v.btagCSV for v in ret["jets_p4"]]),
+                        l4p(event.met_pt, 0, event.met_phi, 0),
+                    )
+                    ret["common_bdt"] = ret_bdt
                 print(ret["common_bdt"], ret["common_mem"])
 
                 #Fill the base histogram
