@@ -161,6 +161,7 @@ def waitJobs(jobs, redis_conn, num_retries=0):
                     qfail.requeue(job.id)
                 else:
                     perm_failed += [job]
+                    raise Exception("job failed: {0}".format(job.exc_info))
             if job.status is None:
                 raise Exception("Job status is None")
 
