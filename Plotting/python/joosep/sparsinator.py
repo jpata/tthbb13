@@ -802,9 +802,34 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
     outfile = ROOT.TFile(ofname, "RECREATE")
     dirs["sample"] = outfile.mkdir(sample_name)
     dirs["sample"].cd()
+    outtree = ROOT.TTree("tree", "tree")
+    bufs = {}
+    bufs["event"] = np.zeros(1, dtype=np.int64)
+    bufs["run"] = np.zeros(1, dtype=np.int64)
+    bufs["lumi"] = np.zeros(1, dtype=np.int64)
+    bufs["systematic"] = np.zeros(1, dtype=np.int64)
+    bufs["mem"] = np.zeros(1, dtype=np.float32)
+    bufs["bdt"] = np.zeros(1, dtype=np.float32)
+    bufs["is_sl"] = np.zeros(1, dtype=np.int32)
+    bufs["is_dl"] = np.zeros(1, dtype=np.int32)
+    bufs["is_fh"] = np.zeros(1, dtype=np.int32)
+    bufs["numJets"] = np.zeros(1, dtype=np.int32)
+    bufs["nBCSVM"] = np.zeros(1, dtype=np.int32)
+    
     dirs["sl"] = dirs["sample"].mkdir("sl")
     dirs["dl"] = dirs["sample"].mkdir("dl")
     dirs["fh"] = dirs["sample"].mkdir("fh")
+    
+    outtree.Branch("event", bufs["event"], "event/L")
+    outtree.Branch("run", bufs["run"], "run/L")
+    outtree.Branch("lumi", bufs["lumi"], "lumi/L")
+    outtree.Branch("systematic", bufs["systematic"], "systematic/L")
+    outtree.Branch("mem", bufs["mem"], "mem/F")
+    outtree.Branch("bdt", bufs["bdt"], "bdt/F")
+    outtree.Branch("numJets", bufs["numJets"], "numJets/I")
+    outtree.Branch("nBCSVM", bufs["nBCSVM"], "nBCSVM/I")
+    outtree.Branch("is_sl", bufs["is_sl"], "is_sl/I")
+    outtree.Branch("is_dl", bufs["is_dl"], "is_dl/I")
     
     #pre-create output histograms
     outdict_syst = createOutputs(analysis.config, AXES, dirs, all_systematics)
@@ -845,7 +870,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
             if schema == "data" and not event.json:
                 continue
 
-            for syst in systematics_event:
+            for iSyst, syst in enumerate(systematics_event):
                 ret = desc.getValue(event, schema, syst)
                 proc_label = assign_process_label(process, ret)
                 ret["process"] = PROCESS_MAP[proc_label]
@@ -860,22 +885,23 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 ret["weight_nominal"] = 1.0
                 if schema == "mc":
                     ret["weight_nominal"] *= ret["puWeight"] * ret["btagWeightCSV"] * ret["triggerEmulationWeight"] * ret["lep_SF_weight"]
-            
-                ret["common_mem"] = 0
-                ret["common_bdt"] = 0
+           
+                #get MEM
+                ret["common_mem"] = -99
                 if do_classifier_db:
                     syst_index = int(analysis.config.get(syst, "index"))
-                    db_key = (int(event.run), int(event.lumi), int(event.evt), syst_index)
+                    db_key = int(event.run), int(event.lumi), int(event.evt), int(syst_index)
                     if cls_db.data.has_key(db_key):
                         classifiers = cls_db.get(db_key)
-                        ret["common_bdt"] = classifiers.bdt
                         if classifiers.mem_p_sig > 0:
                             ret["common_mem"] = classifiers.mem_p_sig / (classifiers.mem_p_sig + float(MEM_SF) * classifiers.mem_p_bkg)
                     else:
-                        ret["common_bdt"] = -99
                         ret["common_mem"] = -99
-
-
+                if event.is_sl and ret["numJets"] >= 6 and ret["nBCSVM"] >= 4: 
+                    print(event.run, event.lumi, event.evt, syst_index, ret["common_mem"])
+                
+                ret["common_bdt"] = 0
+                #calculate BDT
                 if ret["is_sl"]:
                     ret_bdt = cls_bdt_sl.GetBDTOutput(
                         vec_from_list(CvectorLorentz, ret["leps_p4"]),
@@ -896,14 +922,28 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                         l4p(event.met_pt, 0, event.met_phi, 0),
                     )
                     ret["common_bdt"] = ret_bdt
-                print(ret["common_bdt"], ret["common_mem"])
+               
+                bufs["event"][0] = event.evt
+                bufs["run"][0] = event.run
+                bufs["lumi"][0] = event.lumi
+                bufs["systematic"][0] = iSyst
+                bufs["mem"][0] = ret["common_mem"]
+                bufs["bdt"][0] = ret["common_bdt"]
+                bufs["is_sl"][0] = event.is_sl
+                bufs["is_dl"][0] = event.is_dl
+                bufs["is_fh"][0] = event.is_fh
+                bufs["numJets"][0] = event.numJets
+                bufs["nBCSVM"][0] = event.nBCSVM
+
+                outtree.Fill()
 
                 #Fill the base histogram
                 for (k, v) in outdict_syst[syst].items():
                     weight = ret["weight_nominal"]
                     if v.cut(ret):
                         v.fill(ret, weight)
-               
+              
+                
                 #nominal event, fill also histograms with systematic weights
                 if syst == "nominal" and schema == "mc":
                     for (syst_weight, weightfunc) in systematic_weights:

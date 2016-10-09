@@ -206,8 +206,8 @@ def getGeneratedEvents(sample):
             qmain.enqueue_call(
                 func=count,
                 args=(inputs, ),
-                timeout=60*60,
-                result_ttl=60*60,
+                timeout=5*60*60,
+                result_ttl=5*60*60,
                 meta={"retries": 0}
             )
         ]
