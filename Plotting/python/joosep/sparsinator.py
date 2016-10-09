@@ -897,8 +897,6 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                             ret["common_mem"] = classifiers.mem_p_sig / (classifiers.mem_p_sig + float(MEM_SF) * classifiers.mem_p_bkg)
                     else:
                         ret["common_mem"] = -99
-                if event.is_sl and ret["numJets"] >= 6 and ret["nBCSVM"] >= 4: 
-                    print(event.run, event.lumi, event.evt, syst_index, ret["common_mem"])
                 
                 ret["common_bdt"] = 0
                 #calculate BDT
@@ -974,15 +972,11 @@ if __name__ == "__main__":
         an_name, analysis = analysisFromConfig(os.environ.get("ANALYSIS_CONFIG",))
 
     else:
-        file_names = map(getSitePrefix, [
-            "/store/user/jpata/tth/Sep14_leptonic_nome_v1/ttHTobb_M125_13TeV_powheg_pythia8/Sep14_leptonic_nome_v1/160914_142604/0000/tree_1.root",
-            "/store/user/jpata/tth/Sep14_leptonic_nome_v1/ttHTobb_M125_13TeV_powheg_pythia8/Sep14_leptonic_nome_v1/160914_142604/0000/tree_10.root",
-            "/store/user/jpata/tth/Sep14_leptonic_nome_v1/ttHTobb_M125_13TeV_powheg_pythia8/Sep14_leptonic_nome_v1/160914_142604/0000/tree_100.root",
-            "/store/user/jpata/tth/Sep14_leptonic_nome_v1/ttHTobb_M125_13TeV_powheg_pythia8/Sep14_leptonic_nome_v1/160914_142604/0000/tree_101.root",
-            "/store/user/jpata/tth/Sep14_leptonic_nome_v1/ttHTobb_M125_13TeV_powheg_pythia8/Sep14_leptonic_nome_v1/160914_142604/0000/tree_102.root",
-        ])
+        file_names = [
+            "root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_694.root"
+        ]
         prefix = ""
-        sample = "ttHTobb_M125_13TeV_powheg_pythia8"
+        sample = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
         skip_events = 0
         max_events = 10000
         an_name, analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/Plotting/python/Datacards/config_sldl.cfg")

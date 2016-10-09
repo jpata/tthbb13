@@ -157,12 +157,17 @@ def waitJobs(jobs, redis_conn, num_retries=0):
             if job.status == "failed":
                 if job.meta["retries"] < num_retries:
                     job.meta["retries"] += 1
-                    logger.debug("requeueing job {0}".format(job.id))
+                    logger.info("requeueing job {0}".format(job.id))
                     qfail.requeue(job.id)
                 else:
                     perm_failed += [job]
+                    print "job dict", job.__dict__
+                    import pdb
+                    pdb.set_trace()
                     raise Exception("job failed: {0}".format(job.exc_info))
             if job.status is None:
+                import pdb
+                pdb.set_trace()
                 raise Exception("Job status is None")
 
         status = [j.status for j in jobs]
@@ -224,9 +229,10 @@ def runSparsinator_async(config_path, sample, workdir):
             qmain.enqueue_call(
                 func=sparse,
                 args=(config_path, inputs, sample.name, ofname),
-                timeout=5*60*60,
-                result_ttl=5*60*60,
-                meta={"retries": 0}
+                timeout=10*60*60,
+                ttl=10*60*60,
+                result_ttl=10*60*60,
+                meta={"retries": 2}
             )
         ]
     logger.info("runSparsinator: {0} jobs launched for sample {1}".format(len(jobs), sample.name))
@@ -367,7 +373,7 @@ if __name__ == "__main__":
 
         if args.queue != "EXISTING":
             kill_jobs()
-            start_jobs(args.queue, args.njobs)
+            start_jobs(args.queue, args.njobs, ["-l", "h_vmem=4G"])
 
         logger.info("starting step SPARSINATOR")
         t0 = time.time()
