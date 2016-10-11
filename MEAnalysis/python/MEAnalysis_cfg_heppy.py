@@ -184,7 +184,9 @@ class Conf:
 
     general = {
         "passall": False,
-        "doQGL": False,
+        "QGLtoDo": {
+            3:[(3,0),(3,2),(4,0),(4,3),(5,4)], 
+            4:[(3,0),(3,2),(4,0),(4,3)] },
         "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/ControlPlotsJul13.root",
         "QGLPlotsFile_flavour": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/Histos_QGL_flavour.root",
         "sampleFile": os.environ["CMSSW_BASE"]+"/python/TTH/MEAnalysis/samples.py",
