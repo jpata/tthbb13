@@ -13,7 +13,6 @@ class QGLRAnalyzer(FilterAnalyzer):
     def __init__(self, cfg_ana, cfg_comp, looperName):
         super(QGLRAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
         self.conf = cfg_ana._conf
-        self.bTagAlgo = self.conf.jets["btagAlgo"]
         self.qglplots_flavour = ROOT.TFile(self.conf.general["QGLPlotsFile_flavour"])
       
         self.qgl_flavour_pdfs = {
@@ -70,8 +69,8 @@ class QGLRAnalyzer(FilterAnalyzer):
             #print "permutation ",perm
             p = 1.0
              
-            maxj = 4
-            if (len(probs)<4):
+            maxj = 10
+            if (len(probs)<10):
                 maxj = len(probs)
 
             for i in range(0, nQ):
@@ -92,7 +91,7 @@ class QGLRAnalyzer(FilterAnalyzer):
         assert nperms > 0
         return P, best_perm
         #end permutation loop
- 
+     
     def process(self, event):
         for (syst, event_syst) in event.systResults.items():
             if event_syst.passes_btag:
@@ -106,91 +105,46 @@ class QGLRAnalyzer(FilterAnalyzer):
         if "debug" in self.conf.general["verbosity"]:
             autolog("QGLRAnalyzer started")
         event.passes_qgl = True
-        if not self.conf.general["doQGL"]:
+        toDo =  self.conf.general["QGLtoDo"]
+        if len(toDo)==0:
             return event
-
-        jets_for_qg_lr = event.buntagged_jets_bdisc[0:6]
-      
-        jet_probs = {
-            kind: [
-                self.evaluate_jet_prob(j.pt, j.eta, j.qgl, kind)
-                for j in jets_for_qg_lr
-            ]
-            for kind in [
-                "flavour"
-            ]
-        }
-
-        best_4q_perm = 0
-        best_0q_perm = 0
-        best_flavour_4q_perm = 0
-        best_flavour_3q_perm = 0
-        best_flavour_2q_perm = 0
-        best_flavour_1q_perm = 0
-        best_flavour_0q_perm = 0
-
-        nqs4 = 4
-        if (len(jets_for_qg_lr)<4):
-            nqs4 = len(jets_for_qg_lr)   
-
-        nqs3 = 3
-        if (len(jets_for_qg_lr)<3):
-            nqs3 = len(jets_for_qg_lr)
-
-        nqs2 = 2
-        if (len(jets_for_qg_lr)<2):
-            nqs2 = len(jets_for_qg_lr) 
         
-        nqs1 = 1
-        if (len(jets_for_qg_lr)<1):
-            nqs1 = len(jets_for_qg_lr)
-    
-
-        event.qg_lr_flavour_4q, best_flavour_4q_perm = self.qg_likelihood(jet_probs["flavour"], nqs4)
-        event.qg_lr_flavour_3q, best_flavour_3q_perm = self.qg_likelihood(jet_probs["flavour"], nqs3)
-        event.qg_lr_flavour_2q, best_flavour_2q_perm = self.qg_likelihood(jet_probs["flavour"], nqs2)
-        event.qg_lr_flavour_1q, best_flavour_1q_perm = self.qg_likelihood(jet_probs["flavour"], nqs1)
-        event.qg_lr_flavour_0q, best_flavour_0q_perm = self.qg_likelihood(jet_probs["flavour"], 0)
-
+        toDo = {
+            #nB:[(nQ1,nQ2),...] = test the hypothesis nQ1 quarks vs nQ2 quarks, given nB b-quarks (that are removed from the quarks/gluon likelihood computing).
+            3:[(3,0),(3,2),(4,0),(4,3),(5,4)], 
+            4:[(3,0),(3,2),(4,0),(4,3)]
+        }
+        
+        maxLikelihood_perm = {}
+        maxLikelihood = {}
+        for nB in toDo:
+            jets_for_qg_lr =  getattr(event,"buntagged_jets_maxLikelihood_%sb"%nB)[:]
+            jet_probs = {
+                kind: [
+                    self.evaluate_jet_prob(j.pt, j.eta, j.qgl, kind)
+                    for j in jets_for_qg_lr
+                ]
+                for kind in [
+                    "flavour"
+                ]
+            }
+            allQ = set()
+            for (nQ1,nQ2) in toDo[nB]:
+                allQ.add(nQ1)
+                allQ.add(nQ2)
+            for nQ in allQ:
+                maxLikelihood[(nB,nQ)], maxLikelihood_perm[(nB,nQ)] = self.qg_likelihood(jet_probs["flavour"], min(len(jets_for_qg_lr),nQ))
+                
+        
         def lratio(l1, l2):
             if l1+l2>0:
                 return l1/(l1+l2)
             else:
                 return 0.0
-
-        def lratio2(l1, l2, l3):
-            if l1+l2+l3>0:
-                return l1/(l1+l2+l3)
-            else:
-                return 0.0
-
-        def lratio3(l1, l2, l3, l4):
-            if l1+l2+l3+l4>0:
-                return l1/(l1+l2+l3+l4)
-            else:
-                return 0.0 
-
-        def lratio4(l1, l2, l3, l4, l5):
-            if l1+l2+l3+l4+l5>0:
-                return l1/(l1+l2+l3+l4+l5)
-            else:
-                return 0.0   
-       
-
-        event.qg_LR_flavour_4q_0q =  lratio(event.qg_lr_flavour_4q, event.qg_lr_flavour_0q)
-        event.qg_LR_flavour_4q_1q =  lratio(event.qg_lr_flavour_4q, event.qg_lr_flavour_1q)
-        event.qg_LR_flavour_4q_2q =  lratio(event.qg_lr_flavour_4q, event.qg_lr_flavour_2q)
-        event.qg_LR_flavour_4q_3q =  lratio(event.qg_lr_flavour_4q, event.qg_lr_flavour_3q)
-
-        event.qg_LR_flavour_4q_0q_1q =  lratio2(event.qg_lr_flavour_4q, event.qg_lr_flavour_0q, event.qg_lr_flavour_1q)
-        event.qg_LR_flavour_4q_1q_2q =  lratio2(event.qg_lr_flavour_4q, event.qg_lr_flavour_1q, event.qg_lr_flavour_2q)
-        event.qg_LR_flavour_4q_2q_3q =  lratio2(event.qg_lr_flavour_4q, event.qg_lr_flavour_2q, event.qg_lr_flavour_3q)
-
-        event.qg_LR_flavour_4q_0q_1q_2q =  lratio3(event.qg_lr_flavour_4q, event.qg_lr_flavour_0q, event.qg_lr_flavour_1q, event.qg_lr_flavour_2q)
-        event.qg_LR_flavour_4q_1q_2q_3q =  lratio3(event.qg_lr_flavour_4q, event.qg_lr_flavour_1q, event.qg_lr_flavour_2q, event.qg_lr_flavour_3q)
-
-        event.qg_LR_flavour_4q_0q_1q_2q_3q =  lratio4(event.qg_lr_flavour_4q, event.qg_lr_flavour_0q, event.qg_lr_flavour_1q, event.qg_lr_flavour_2q, event.qg_lr_flavour_3q)
-
+        
+        for nB in toDo:
+            for (nQ1,nQ2) in toDo[nB]:
+                setattr(event,"qg_LR_%sb_flavour_%sq_%sq"%(nB,nQ1,nQ2),lratio(maxLikelihood[(nB,nQ1)],maxLikelihood[(nB,nQ2)]))
         
         event.passes_qgl = True
         return event
