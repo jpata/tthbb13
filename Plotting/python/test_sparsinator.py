@@ -30,23 +30,22 @@ class MakeSparsinatorTestCase(unittest.TestCase):
         self.assertFalse(fi.Get(k) == None)
         fi.Close()
 
-    def test_sparsinator_data(self):
-        run_sparsinator(read_inputs("MEAnalysis/gc/datasets/tth_Jul31_V24_v1/SingleMuon.txt")[:10], "SingleMuon", 5000)
-        self.sparsinator_checks("out.root", "SingleMuon") 
+#    def test_sparsinator_data(self):
+#        run_sparsinator(read_inputs("MEAnalysis/gc/datasets/tth_Jul31_V24_v1/SingleMuon.txt")[:10], "SingleMuon", 5000)
+#        self.sparsinator_checks("out.root", "SingleMuon") 
 
 ##for FH
-#    def test_sparsinator_data_FH(self):
-#        run_sparsinator(read_inputs("MEAnalysis/gc/datasets/had_V24_1/BTagCSV.txt")[:14], "BTagCSV", 5000)
-#        self.sparsinator_checks("out.root", "BTagCSV") 
-    
+    def test_sparsinator_data_FH(self):
+        run_sparsinator(read_inputs("MEAnalysis/gc/datasets/had_V24_3/JetHT.txt")[:14], "JetHT", 5000)
+        self.sparsinator_checks("out.root", "JetHT") 
+
     def test_sparsinator_mc(self):
         run_sparsinator(
-            read_inputs("MEAnalysis/gc/datasets/had_V24_1/ttHTobb_M125_13TeV_powheg_pythia8.txt")[:1],
+            read_inputs("MEAnalysis/gc/datasets/had_V24_3/ttHTobb_M125_13TeV_powheg_pythia8.txt")[:1],
             "ttHTobb_M125_13TeV_powheg_pythia8",
             5000
         )
         self.sparsinator_checks("out.root", "ttHTobb_M125_13TeV_powheg_pythia8") 
-        
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
