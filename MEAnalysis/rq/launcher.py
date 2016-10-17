@@ -33,8 +33,6 @@ rc('text', usetex=False)
 matplotlib.use('PS') #needed on T3
 import matplotlib.pyplot as plt
 
-import rootpy
-
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("main")
 
@@ -50,7 +48,8 @@ procs_names = [
     ("diboson", "diboson"),
     ("stop", "single top"),
     ("ttv", "tt+V"),
-    ("wjets", "w+jets")
+    ("wjets", "w+jets"),
+    ("dy", "dy")
 ]
 procs = [x[0] for x in procs_names]
 
@@ -92,8 +91,13 @@ def kill_jobs():
                          stdout=subprocess.PIPE).communicate()       
     
 
-def start_jobs(queue, njobs, extra_requirements = []):
-    
+def start_jobs(queue, njobs, extra_requirements = [], redis_host=None, redis_port=None):
+
+    if redis_host is None:
+        redis_host = socket.gethostname()
+    if redis_port is None:
+        redis_port = 6379
+
     pwd = os.getcwd()
 
     qsub_command = ["qsub", 
@@ -107,6 +111,7 @@ def start_jobs(queue, njobs, extra_requirements = []):
         qsub_command += extra_requirements
 
     qsub_command.append("worker.sh")
+    qsub_command.append("redis://{0}:{1}".format(redis_host, redis_port))
 
     for _ in range(njobs):
         subprocess.Popen(qsub_command, 
@@ -161,13 +166,8 @@ def waitJobs(jobs, redis_conn, num_retries=0):
                     qfail.requeue(job.id)
                 else:
                     perm_failed += [job]
-                    print "job dict", job.__dict__
-                    import pdb
-                    pdb.set_trace()
                     raise Exception("job failed: {0}".format(job.exc_info))
             if job.status is None:
-                import pdb
-                pdb.set_trace()
                 raise Exception("Job status is None")
 
         status = [j.status for j in jobs]
@@ -266,6 +266,13 @@ if __name__ == "__main__":
         default = socket.gethostname()
     )
     parser.add_argument(
+        '--port',
+        action = "store",
+        help = "Redis port",
+        type = int,
+        default = 6379
+    )
+    parser.add_argument(
         '--queue',
         action = "store",
         help = "Job queue",
@@ -290,7 +297,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Tell RQ what Redis connection to use
-    redis_conn = Redis(host=args.hostname)
+    redis_conn = Redis(host=args.hostname, port=args.port)
     qmain = Queue("default", connection=redis_conn)  # no args implies the default queue
     qfail = get_failed_queue(redis_conn)
     
@@ -310,7 +317,7 @@ if __name__ == "__main__":
     
     jobs = {}
     results = {}
-
+        
     ###
     ### NGEN
     ###
@@ -318,7 +325,7 @@ if __name__ == "__main__":
 
         if args.queue != "EXISTING":
             kill_jobs()
-            start_jobs(args.queue, args.njobs)
+            start_jobs(args.queue, args.njobs, [], args.hostname, args.port)
 
         logger.info("starting step NGEN")
         t0 = time.time()
@@ -373,7 +380,7 @@ if __name__ == "__main__":
 
         if args.queue != "EXISTING":
             kill_jobs()
-            start_jobs(args.queue, args.njobs, ["-l", "h_vmem=4G"])
+            start_jobs(args.queue, args.njobs, ["-l", "h_vmem=6G"], args.hostname, args.port)
 
         logger.info("starting step SPARSINATOR")
         t0 = time.time()
@@ -381,9 +388,9 @@ if __name__ == "__main__":
         results["sparse"] = []
 
         all_jobs = []
-        for ds in analysis.samples:
-            jobs["sparse"][ds] = runSparsinator_async(tmp_conf_name, ds, workdir)
-            all_jobs += jobs["sparse"][ds]
+        for sample in analysis.samples:
+            jobs["sparse"][sample] = runSparsinator_async(tmp_conf_name, sample, workdir)
+            all_jobs += jobs["sparse"][sample]
         logger.info("waiting on sparsinator jobs")
         waitJobs(all_jobs, redis_conn)
         #just in case to make sure NFS is synced
@@ -402,7 +409,7 @@ if __name__ == "__main__":
 
         if args.queue != "EXISTING":
             kill_jobs()
-            start_jobs(args.queue, args.njobs)
+            start_jobs(args.queue, args.njobs, [], args.hostname, args.port)
 
         all_jobs = []
         for ds in analysis.samples:
@@ -449,7 +456,7 @@ if __name__ == "__main__":
 
         if args.queue != "EXISTING":
             kill_jobs()
-            start_jobs(args.queue, 300)
+            start_jobs(args.queue, 300, ["-l", "h_vmem=6G"], args.hostname, args.port)
 
         logger.info("starting step CATEGORIES")
         t0 = time.time()
@@ -543,7 +550,7 @@ if __name__ == "__main__":
 
         if args.queue != "EXISTING":
             kill_jobs()
-            start_jobs(args.queue, args.njobs)
+            start_jobs(args.queue, args.njobs, [], args.hostname, args.port), 
 
         logger.info("starting step PLOTS")
         t0 = time.time()
@@ -588,7 +595,7 @@ if __name__ == "__main__":
 
         if args.queue != "EXISTING":
             kill_jobs()
-            start_jobs(args.queue, args.njobs)
+            start_jobs(args.queue, args.njobs, [], args.hostname, args.port)
 
         logger.info("starting step LIMITS")
 
