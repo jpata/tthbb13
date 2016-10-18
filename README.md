@@ -574,7 +574,7 @@ source $CMSSW_BASE/src/TTH/setenv_psi.sh
 source $CMSSW_BASE/src/TTH/setenv_sklearn_cmssw.sh
 rm -r Output* #otherwise it will crash (at the end it looks for "Output/tree.root")
 #edit heppy_crab_script.py: use PSet.py instead of PSet_local.py
-FILE_NAMES="file:///shome/sdonato/QCD_HT2000toInf_MINIAODSIM.root" MAX_EVENTS=100 SKIP_EVENTS=0 python heppy_crab_script.py >& log &
+FILE_NAMES="file:///shome/sdonato/QCD_HT2000toInf_MINIAODSIM.root" MAX_EVENTS=100 SKIP_EVENTS=0 python --local heppy_crab_script.py >& log &
 #restore heppy_crab_script.py: use PSet_local.py instead of PSet.py
 
 ~~~
