@@ -44,47 +44,47 @@ me_cfgs = {
 }
 
 sets_data = [
-    "/DoubleEG/Run2016B-PromptReco-v1/MINIAOD",
-    "/DoubleEG/Run2016B-PromptReco-v2/MINIAOD",
-    "/DoubleEG/Run2016C-PromptReco-v2/MINIAOD",
-    "/DoubleEG/Run2016D-PromptReco-v2/MINIAOD",
-    "/DoubleEG/Run2016E-PromptReco-v2/MINIAOD",
-    "/DoubleEG/Run2016F-PromptReco-v2/MINIAOD",
+#    "/DoubleEG/Run2016B-PromptReco-v1/MINIAOD",
+#    "/DoubleEG/Run2016B-PromptReco-v2/MINIAOD",
+#    "/DoubleEG/Run2016C-PromptReco-v2/MINIAOD",
+#    "/DoubleEG/Run2016D-PromptReco-v2/MINIAOD",
+#    "/DoubleEG/Run2016E-PromptReco-v2/MINIAOD",
+#    "/DoubleEG/Run2016F-PromptReco-v2/MINIAOD",
 
-    "/DoubleMuon/Run2016B-PromptReco-v1/MINIAOD",
-    "/DoubleMuon/Run2016B-PromptReco-v2/MINIAOD",
-    "/DoubleMuon/Run2016C-PromptReco-v2/MINIAOD",
-    "/DoubleMuon/Run2016D-PromptReco-v2/MINIAOD",
-    "/DoubleMuon/Run2016E-PromptReco-v2/MINIAOD",
-    "/DoubleMuon/Run2016F-PromptReco-v2/MINIAOD",
+#    "/DoubleMuon/Run2016B-PromptReco-v1/MINIAOD",
+#    "/DoubleMuon/Run2016B-PromptReco-v2/MINIAOD",
+#    "/DoubleMuon/Run2016C-PromptReco-v2/MINIAOD",
+#    "/DoubleMuon/Run2016D-PromptReco-v2/MINIAOD",
+#    "/DoubleMuon/Run2016E-PromptReco-v2/MINIAOD",
+#    "/DoubleMuon/Run2016F-PromptReco-v2/MINIAOD",
 
-    "/MuonEG/Run2016B-PromptReco-v1/MINIAOD",
-    "/MuonEG/Run2016B-PromptReco-v2/MINIAOD",
-    "/MuonEG/Run2016C-PromptReco-v2/MINIAOD",
-    "/MuonEG/Run2016D-PromptReco-v2/MINIAOD",
-    "/MuonEG/Run2016E-PromptReco-v2/MINIAOD",
-    "/MuonEG/Run2016F-PromptReco-v2/MINIAOD",
+#    "/MuonEG/Run2016B-PromptReco-v1/MINIAOD",
+#    "/MuonEG/Run2016B-PromptReco-v2/MINIAOD",
+#    "/MuonEG/Run2016C-PromptReco-v2/MINIAOD",
+#    "/MuonEG/Run2016D-PromptReco-v2/MINIAOD",
+#    "/MuonEG/Run2016E-PromptReco-v2/MINIAOD",
+#    "/MuonEG/Run2016F-PromptReco-v2/MINIAOD",
 
-    "/SingleElectron/Run2016B-PromptReco-v1/MINIAOD",
-    "/SingleElectron/Run2016B-PromptReco-v2/MINIAOD",
-    "/SingleElectron/Run2016C-PromptReco-v2/MINIAOD",
-    "/SingleElectron/Run2016D-PromptReco-v2/MINIAOD",
-    "/SingleElectron/Run2016E-PromptReco-v2/MINIAOD",
-    "/SingleElectron/Run2016F-PromptReco-v2/MINIAOD",
+#    "/SingleElectron/Run2016B-PromptReco-v1/MINIAOD",
+#    "/SingleElectron/Run2016B-PromptReco-v2/MINIAOD",
+#    "/SingleElectron/Run2016C-PromptReco-v2/MINIAOD",
+#    "/SingleElectron/Run2016D-PromptReco-v2/MINIAOD",
+#    "/SingleElectron/Run2016E-PromptReco-v2/MINIAOD",
+#    "/SingleElectron/Run2016F-PromptReco-v2/MINIAOD",
 
-    "/SingleMuon/Run2016B-PromptReco-v1/MINIAOD",
-    "/SingleMuon/Run2016B-PromptReco-v2/MINIAOD",
-    "/SingleMuon/Run2016C-PromptReco-v2/MINIAOD",
-    "/SingleMuon/Run2016D-PromptReco-v2/MINIAOD",
-    "/SingleMuon/Run2016E-PromptReco-v2/MINIAOD",
-    "/SingleMuon/Run2016F-PromptReco-v2/MINIAOD",
+#    "/SingleMuon/Run2016B-PromptReco-v1/MINIAOD",
+#    "/SingleMuon/Run2016B-PromptReco-v2/MINIAOD",
+#    "/SingleMuon/Run2016C-PromptReco-v2/MINIAOD",
+#    "/SingleMuon/Run2016D-PromptReco-v2/MINIAOD",
+#    "/SingleMuon/Run2016E-PromptReco-v2/MINIAOD",
+#    "/SingleMuon/Run2016F-PromptReco-v2/MINIAOD",
 
-#    "/BTagCSV/Run2016B-PromptReco-v1/MINIAOD",
-#    "/BTagCSV/Run2016B-PromptReco-v2/MINIAOD",
-#    "/BTagCSV/Run2016C-PromptReco-v2/MINIAOD",
-#    "/BTagCSV/Run2016D-PromptReco-v2/MINIAOD",
-#    "/BTagCSV/Run2016E-PromptReco-v2/MINIAOD",
-#    "/BTagCSV/Run2016F-PromptReco-v2/MINIAOD",
+    "/BTagCSV/Run2016B-PromptReco-v1/MINIAOD",
+    "/BTagCSV/Run2016B-PromptReco-v2/MINIAOD",
+    "/BTagCSV/Run2016C-PromptReco-v2/MINIAOD",
+    "/BTagCSV/Run2016D-PromptReco-v2/MINIAOD",
+    "/BTagCSV/Run2016E-PromptReco-v2/MINIAOD",
+    "/BTagCSV/Run2016F-PromptReco-v2/MINIAOD",
 
     "/JetHT/Run2016B-PromptReco-v1/MINIAOD",
     "/JetHT/Run2016B-PromptReco-v2/MINIAOD",
@@ -587,7 +587,7 @@ workflow_datasets["pilot"][pilot_name] = D
 #1-lumi per job, 10 job testing of a few samples
 workflow_datasets["testing"] = {}
 
-for k in ["ttHTobb", "TTbar_inc", "SingleMuon-Run2016B-PromptReco-v2"]:
+for k in ["ttHTobb", "TTbar_inc", ]:
     D = deepcopy(datasets[k])
     D["maxlumis"] = 40
     D["perjob"] = 2
@@ -624,7 +624,7 @@ for k in ["mc", "data"]:
     workflow_datasets["localtesting_withme"][k] = D
 
 workflow_datasets["testing_withme"] = {}
-for k in ["ttHTobb", "TTbar_inc", "SingleMuon-Run2016B-PromptReco-v1"]:
+for k in ["ttHTobb", "TTbar_inc",]:
     D = deepcopy(datasets[k])
     D["perjob"] = int(D["perjob"]/10)
     D["maxlumis"] = 100 * D["perjob"]

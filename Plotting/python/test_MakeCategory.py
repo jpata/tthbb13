@@ -16,7 +16,7 @@ class MakeCategoryTestCase(unittest.TestCase):
             "src/TTH/Plotting/python/Datacards/AnalysisSpecification.py"
         )
 
-        analysis, categories = get_categories(anspec, "SL_7cat", catname)
+        analysis, categories = get_categories(anspec, "FH", catname)
         MakeCategory_main(analysis, categories)
         outfile = "{0}.root".format(catname)
         self.assertTrue(os.path.isfile(outfile))
@@ -31,13 +31,15 @@ class MakeCategoryTestCase(unittest.TestCase):
             logging.debug("test_MakeCategory_run: {0} integral={1}".format(hname, h.Integral()))
             self.assertFalse(h == None)
             self.assertTrue(h.Integral() > 0.0)
-    
+
+    def test_MakeCategory_run_FH(self):
+        self.launch_MakeCategory_test("fh_j8_t4","FH","jetsByPt_0_pt")
+
+'''    
     def test_MakeCategory_run_SL(self):
         self.launch_MakeCategory_test("sl_jge6_tge4","SL_7cat","jetsByPt_0_pt")
+'''
 
-##for FH
-#    def test_MakeCategory_run_FH(self):
-#        self.launch_MakeCategory_test("fh_j7_t3","FH","btag_LR_4b_2b_btagCMVA_logit")
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)

@@ -88,7 +88,8 @@ samples_nick = {
     "MuonEG": "data_em",
     "DoubleEG": "data_ee",
     "DoubleMuon": "data_mm",
-    "BTagCSV": "data_fh",
+#    "BTagCSV": "data_fh",
+    "JetHT": "data_fh",
 }
 
 #Numeric keys for processes, used for filling the process axis

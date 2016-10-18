@@ -6,19 +6,19 @@ import ROOT
 
 cmssw_base = os.environ["CMSSW_BASE"]
 
-version = "Aug11"
+version = "Sep22"
 
 samples = [
-    "gc/datasets/Aug11_leptonic_nome_v1/DoubleEG.txt"
-    , "gc/datasets/Aug11_leptonic_nome_v1/DoubleMuon.txt"
-    , "gc/datasets/Aug11_leptonic_nome_v1/MuonEG.txt"
-    , "gc/datasets/Aug11_leptonic_nome_v1/SingleElectron.txt"
-    , "gc/datasets/Aug11_leptonic_nome_v1/SingleMuon.txt"
-    , "gc/datasets/Aug11_leptonic_nome_v1/ttHTobb_M125_13TeV_powheg_pythia8.txt"
-    , "gc/datasets/Aug11_leptonic_nome_v1/ttHToNonbb_M125_13TeV_powheg_pythia8.txt"
-    , "gc/datasets/Aug11_leptonic_nome_v1/TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt"
-    , "gc/datasets/Aug11_leptonic_nome_v1/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt"
-    , "gc/datasets/Aug11_leptonic_nome_v1/TT_TuneCUETP8M1_13TeV-powheg-pythia8.txt"
+    "gc/datasets/had_V24_4/TT_TuneCUETP8M1_13TeV-powheg-pythia8.txt",
+    "gc/datasets/had_V24_4/ttHToNonbb_M125_13TeV_powheg_pythia8.txt",
+    "gc/datasets/had_V24_4/ttHTobb_M125_13TeV_powheg_pythia8.txt",
+    "gc/datasets/had_V24_4/JetHT.txt",
+    "gc/datasets/had_V24_4/QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt",
+    "gc/datasets/had_V24_4/QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt",
+    "gc/datasets/had_V24_4/QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt",
+    "gc/datasets/had_V24_4/QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt",
+    "gc/datasets/had_V24_4/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt",
+    "gc/datasets/had_V24_4/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt",
 ]
 
 samples = ["$CMSSW_BASE/src/TTH/MEAnalysis/" + s for s in samples]

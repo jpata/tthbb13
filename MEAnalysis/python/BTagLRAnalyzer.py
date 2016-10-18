@@ -124,36 +124,54 @@ class BTagLRAnalyzer(FilterAnalyzer):
 
         btag_likelihood_results = {}
         btag_likelihood_ratio_results = {}
+        btag_likelihood_ratio_results_4b_3b = {}
+        btag_likelihood_ratio_results_3b_2b = {}
         for btagalgo in btagalgos:
             btag_lr_4b, best_4b_perm = self.btag_likelihood2(jet_probs[btagalgo], 4)
+            btag_lr_3b, best_3b_perm = self.btag_likelihood2(jet_probs[btagalgo], 3)
             btag_lr_2b, best_2b_perm = self.btag_likelihood2(jet_probs[btagalgo], 2)
-            btag_likelihood_results[btagalgo] = (btag_lr_4b, btag_lr_2b, best_4b_perm, best_2b_perm)
+            btag_likelihood_results[btagalgo] = (btag_lr_4b, btag_lr_2b, best_4b_perm, best_2b_perm, btag_lr_3b, best_3b_perm)
             btag_likelihood_ratio_results[btagalgo] = self.lratio(btag_lr_4b, btag_lr_2b)
+            btag_likelihood_ratio_results_4b_3b[btagalgo] = self.lratio(btag_lr_4b, btag_lr_3b)
+            btag_likelihood_ratio_results_3b_2b[btagalgo] = self.lratio(btag_lr_3b, btag_lr_2b)
             setattr(event, "jet_perm_btag_lr_" + btagalgo,
                 [event.good_jets.index(j) for j in jets_for_btag_lr[btagalgo]]
             )
             setattr(event,
                 "btag_LR_4b_2b_" + btagalgo, btag_likelihood_ratio_results[btagalgo]
             )
+            setattr(event,
+                "btag_LR_4b_3b_" + btagalgo, btag_likelihood_ratio_results_4b_3b[btagalgo]
+            )
+            setattr(event,
+                "btag_LR_3b_2b_" + btagalgo, btag_likelihood_ratio_results_3b_2b[btagalgo]
+            )
         #default btagger used
         event.btag_lr_4b = btag_likelihood_results[self.default_bTagAlgo][0]
+        event.btag_lr_3b = btag_likelihood_results[self.default_bTagAlgo][4]
         event.btag_lr_2b = btag_likelihood_results[self.default_bTagAlgo][1]
         event.btag_LR_4b_2b = btag_likelihood_ratio_results[self.default_bTagAlgo]
+        event.btag_LR_4b_3b = btag_likelihood_ratio_results_4b_3b[self.default_bTagAlgo]
+        event.btag_LR_3b_2b = btag_likelihood_ratio_results_3b_2b[self.default_bTagAlgo]
         best_4b_perm = btag_likelihood_results[self.default_bTagAlgo][2]
-
+        best_3b_perm = btag_likelihood_results[self.default_bTagAlgo][5]
+        
         # use default btag method always
-        event.buntagged_jets_by_LR_4b_2b = [jets_for_btag_lr[self.default_bTagAlgo][i] for i in best_4b_perm[4:]]
-        event.btagged_jets_by_LR_4b_2b = [jets_for_btag_lr[self.default_bTagAlgo][i] for i in best_4b_perm[0:4]]
-
+        event.buntagged_jets_maxLikelihood_4b = [jets_for_btag_lr[self.default_bTagAlgo][i] for i in best_4b_perm[4:]]
+        event.btagged_jets_maxLikelihood_4b = [jets_for_btag_lr[self.default_bTagAlgo][i] for i in best_4b_perm[0:4]]
+        
+        event.buntagged_jets_maxLikelihood_3b = [jets_for_btag_lr[self.default_bTagAlgo][i] for i in best_3b_perm[3:]]
+        event.btagged_jets_maxLikelihood_3b = [jets_for_btag_lr[self.default_bTagAlgo][i] for i in best_3b_perm[0:3]]
+        
         for i in range(len(event.good_jets)):
             event.good_jets[i].btagFlag = 0.0
-
+        
         #Jets are untagged according to the b-tagging likelihood ratio permutation
         if self.conf.jets["untaggedSelection"] == "btagLR":
             if "debug" in self.conf.general["verbosity"]:
                 autolog("using btagLR for btag/untag jet selection")
-            event.buntagged_jets = event.buntagged_jets_by_LR_4b_2b
-            event.selected_btagged_jets = event.btagged_jets_by_LR_4b_2b
+            event.buntagged_jets = event.buntagged_jets_maxLikelihood_4b
+            event.selected_btagged_jets = event.btagged_jets_maxLikelihood_4b
         #Jets are untagged according to b-discriminatr
         elif self.conf.jets["untaggedSelection"] == "btagCSV":
             if "debug" in self.conf.general["verbosity"]:
