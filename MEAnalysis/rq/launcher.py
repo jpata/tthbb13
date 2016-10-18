@@ -1,5 +1,5 @@
 import logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("main")
 
 from rq import Queue
@@ -12,6 +12,7 @@ import time, os, sys
 import shutil
 from collections import Counter
 import uuid
+import cPickle as pickle
 
 import subprocess
 
@@ -22,8 +23,6 @@ from TTH.Plotting.Datacards.AnalysisSpecificationClasses import Analysis
 from TTH.Plotting.Datacards.MakeCategory import apply_rules_parallel, make_rules, make_datacard
 from TTH.Plotting.Datacards.sparse import add_hdict
 
-import pdb
-
 import TTH.Plotting.joosep.plotlib as plotlib #heplot, 
 
 import matplotlib
@@ -32,9 +31,6 @@ from matplotlib import rc
 rc('text', usetex=False)
 matplotlib.use('PS') #needed on T3
 import matplotlib.pyplot as plt
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("main")
 
 #FIXME: configure all these via conf file!
 procs_names = [
@@ -163,13 +159,20 @@ def waitJobs(jobs, redis_conn, num_retries=0):
                 if job.meta["retries"] < num_retries:
                     job.meta["retries"] += 1
                     logger.info("requeueing job {0}".format(job.id))
+                    logger.error("job error: {0}".format(job.exc_info))
                     qfail.requeue(job.id)
                 else:
                     perm_failed += [job]
                     raise Exception("job failed: {0}".format(job.exc_info))
             if job.status is None:
                 raise Exception("Job status is None")
-
+            if job.status == "finished":
+                key = (job.func.func_name, job.meta["args"])
+                if job.meta["args"] != "": 
+                    hkey = hash(str(key))
+                    if not redis_conn.exists(hkey):
+                        logger.debug("setting key {0} in db".format(hkey))
+                        redis_conn.set(hkey, pickle.dumps(job.result))
         status = [j.status for j in jobs]
         status_counts = dict(Counter(status))
 
@@ -204,17 +207,38 @@ def waitJobs(jobs, redis_conn, num_retries=0):
     results = [j.result for j in jobs]
     return results
 
+class JobMemoize:
+    def __init__(self, result, func, args, meta):
+        self.result = result
+        self.status = "finished"
+        self.func = func
+        self.args = args
+        self.meta = meta
+
+def enqueue_memoize(queue, **kwargs):
+    key = (kwargs.get("func").func_name, kwargs.get("meta")["args"])
+    hkey = hash(str(key))
+    logger.debug("checking for key {0} -> {1}".format(hkey, str(key)))
+    if redis_conn.exists(hkey):
+        res = pickle.loads(redis_conn.get(hkey))
+        logger.debug("found key {0}, res={1}".format(hkey, res))
+        return JobMemoize(res, kwargs.get("func"), kwargs.get("args"), kwargs.get("meta"))
+    else:
+        logger.debug("didn't find key, enqueueing")
+        return queue.enqueue_call(**kwargs)
+
 def getGeneratedEvents(sample):
     jobs = []
     for ijob, inputs in enumerate(chunks(sample.file_names, sample.step_size_sparsinator)):
         jobs += [
-            qmain.enqueue_call(
+            enqueue_memoize(
+                qmain,
                 func=count,
                 args=(inputs, ),
                 timeout=2*60*60,
                 ttl=2*60*60,
                 result_ttl=2*60*60,
-                meta={"retries": 0}
+                meta={"retries": 0, "args": str((inputs, ))}
             )
         ]
     logger.info("getGeneratedEvents: {0} jobs launched for sample {1}".format(len(jobs), sample.name))
@@ -227,13 +251,14 @@ def runSparsinator_async(config_path, sample, workdir):
             workdir, sample.name, ijob
         )
         jobs += [
-            qmain.enqueue_call(
+            enqueue_memoize(
+                qmain,
                 func=sparse,
                 args=(config_path, inputs, sample.name, ofname),
                 timeout=2*60*60,
                 ttl=2*60*60,
                 result_ttl=2*60*60,
-                meta={"retries": 2}
+                meta={"retries": 2, "args": str((inputs, sample.name))}
             )
         ]
     logger.info("runSparsinator: {0} jobs launched for sample {1}".format(len(jobs), sample.name))
@@ -421,7 +446,7 @@ if __name__ == "__main__":
                 args=(os.path.abspath("{0}/sparse/sparse_{1}.root".format(workdir, ds.name)), ds_results),
                 timeout=20*60,
                 result_ttl=60*60,
-                meta={"retries": 0}
+                meta={"retries": 0, "args": ""}
             )]
         waitJobs(all_jobs, redis_conn)
         results["sparse"] = [j.result for j in all_jobs]
@@ -430,7 +455,7 @@ if __name__ == "__main__":
         results["sparse-merge"] = mergeFiles(
             os.path.abspath("{0}/sparse/merged.root".format(workdir)),
             results["sparse"],
-            remove_inputs = True
+            remove_inputs = False
         )
         analysis.config.set("sparse_data", "infile", results["sparse-merge"])
         with open(tmp_conf_name, "wb") as configfile:
@@ -486,7 +511,7 @@ if __name__ == "__main__":
                         args=(results["sparse-merge"], inputs),
                         timeout=20*60,
                         result_ttl=60*60,
-                        meta={"retries": 0}
+                        meta={"retries": 0, "args": ""}
                     )
                 ]
             all_jobs += cat_jobs[cat]
@@ -570,7 +595,7 @@ if __name__ == "__main__":
                                         "", cat.name, cat.discriminator)],
                     timeout=20*60,
                     result_ttl=60*60,
-                    meta={"retries": 0}
+                    meta={"retries": 0, args: ""}
                 )
             ]
 
@@ -620,7 +645,7 @@ if __name__ == "__main__":
                           group],
                     timeout=40*60,
                     result_ttl=60*60,
-                    meta={"retries": 0})]
+                    meta={"retries": 0, "args": ""})]
             
         t0 = time.time()
         waitJobs(all_jobs, redis_conn)

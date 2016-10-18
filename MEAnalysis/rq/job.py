@@ -61,7 +61,11 @@ def sparse(config_path, filenames, sample, outfile):
 #    heplot.barhist(down, color="blue")
 
 
-def mergeFiles(outfile, infiles, remove_inputs=True):
+def mergeFiles(outfile, infiles, remove_inputs=False):
+    basepath = os.path.dirname(outfile)
+    if not os.path.isdir(basepath):
+        os.makedirs(basepath)
+
     if len(infiles) == 1:
         shutil.copy(infiles[0], outfile)
     else:
@@ -88,3 +92,9 @@ def plot(*kwargs):
 def makelimits(*args):
     #an_name, analysis = analysisFromConfig(args[1])
     return MakeLimits.main(*args)
+
+if __name__ == "__main__":
+    sparse(
+        'results/29d43491-3535-4ab2-9c34-85ae14cc2e91/analysis.cfg', ['root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/TT_TuneCUETP8M1_13TeV-powheg-pythia8/Sep29_v1/160930_165709/0000/tree_1.root', 'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/TT_TuneCUETP8M1_13TeV-powheg-pythia8/Sep29_v1/160930_165709/0000/tree_10.root'], 'TT_TuneCUETP8M1_13TeV-powheg-pythia8',
+        'results/29d43491-3535-4ab2-9c34-85ae14cc2e91/sparse/TT_TuneCUETP8M1_13TeV-powheg-pythia8/sparse_0.root'
+    )
