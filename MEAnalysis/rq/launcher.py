@@ -211,8 +211,9 @@ def getGeneratedEvents(sample):
             qmain.enqueue_call(
                 func=count,
                 args=(inputs, ),
-                timeout=5*60*60,
-                result_ttl=5*60*60,
+                timeout=2*60*60,
+                ttl=2*60*60,
+                result_ttl=2*60*60,
                 meta={"retries": 0}
             )
         ]
@@ -229,9 +230,9 @@ def runSparsinator_async(config_path, sample, workdir):
             qmain.enqueue_call(
                 func=sparse,
                 args=(config_path, inputs, sample.name, ofname),
-                timeout=10*60*60,
-                ttl=10*60*60,
-                result_ttl=10*60*60,
+                timeout=2*60*60,
+                ttl=2*60*60,
+                result_ttl=2*60*60,
                 meta={"retries": 2}
             )
         ]

@@ -14,6 +14,8 @@ from TTH.Plotting.Datacards.sparse import save_hdict
 
 from TTH.CommonClassifier.db import ClassifierDB
 
+import rootpy
+
 CvectorLorentz = getattr(ROOT, "std::vector<TLorentzVector>")
 Cvectordouble = getattr(ROOT, "std::vector<double>")
 CvectorJetType = getattr(ROOT, "std::vector<MEMClassifier::JetType>")
@@ -874,6 +876,11 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
             if not (event.nBCSVM>=2 or event.nBCMVAM>=2):
                 continue
             if schema == "data" and not event.json:
+                continue
+
+            #Found a monster event in ttH (bug?)
+            if event.jets_pt[0] > 10000:
+                logging.error("ANOMALOUS MEGAPT EVENT: {0}:{1}:{2}".format(event.run, event.lumi, event.evt))
                 continue
 
             for iSyst, syst in enumerate(systematics_event):
