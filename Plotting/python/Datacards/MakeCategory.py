@@ -14,7 +14,7 @@ import gc
 ROOT.TH1.AddDirectory(False)
 ROOT.gROOT.SetBatch(True)
 
-def make_rule_cut(basehist, category):
+def make_rule_cut(infile, basehist, category, processes):
     """
     Given a THnSparse base histogram and a list of cuts, makes the rules to
     project out the given variables into a TH1D histogram. The rules are a list
@@ -35,13 +35,14 @@ def make_rule_cut(basehist, category):
     Returns: a list of rules to apply using apply_rule.
     """
     rules = []
-    for proc in category.processes:
+    for proc in processes:
         cuts = []
         cuts += category.cuts
         for c in proc.cuts:
             cuts += c.sparsinator
 
         d = {
+            "infile": infile,
             "input": "{0}/{1}".format(proc.input_name, basehist),
             "cuts": str(cuts),
             "project": str([(category.discriminator, category.rebin)]),
@@ -49,28 +50,16 @@ def make_rule_cut(basehist, category):
             "xs_weight": proc.xs_weight
         }
         rules += [d]
-
-        #make systematic variations
-        systdict = category.shape_uncertainties[proc.output_name]
-        for systname, systsize in systdict.items():
-            for direction in ["Up", "Down"]:
-                d2 = copy.deepcopy(d)
-                d2["input"] += "_" + systname + direction
-                d2["output"] += "_" + systname + direction
-                rules += [d2]
-
-    for proc in category.data_processes:
-        cuts = []
-        cuts += category.cuts
-        for c in proc.cuts:
-            cuts += c.sparsinator
-        d = {
-            "input": "{0}/{1}".format(proc.input_name, basehist),
-            "cuts": str(cuts),
-            "project": str([(category.discriminator, category.rebin)]),
-            "output": "{0}/{1}/{2}".format(proc.output_name, category.name, category.discriminator),
-            "xs_weight": 1.0
-        }
+    
+        if proc not in category.data_processes:
+            #make systematic variations
+            systdict = category.shape_uncertainties[proc.output_name]
+            for systname, systsize in systdict.items():
+                for direction in ["Up", "Down"]:
+                    d2 = copy.deepcopy(d)
+                    d2["input"] += "_" + systname + direction
+                    d2["output"] += "_" + systname + direction
+                    rules += [d2]
     
         rules += [d]
     return rules
@@ -143,7 +132,7 @@ def chunks(l, n):
     for i in range(0, len(l), n):
         yield l[i:i + n]
 
-def apply_rules_parallel(infile, rules):
+def apply_rules_parallel(rules):
     """
     Project out all the histograms according to the projection rules.
     infile (string) - path to input root file with sparse histograms
@@ -160,20 +149,26 @@ def apply_rules_parallel(infile, rules):
     #split rules into unique batches by input histogram
     rules_per_input = {}
     for rule in rules:
+        infile = rule["infile"]
         inp = rule["input"]
-        if not rules_per_input.has_key(inp):
-            rules_per_input[inp] = []
-        rules_per_input[inp].append(rule)
-
-    #process batches
-    infile_tf = ROOT.TFile.Open(infile)
-    if not infile_tf:
-        raise FileError("Could not open file: {0}".format(infile))
-    
-    dummy_h = infile_tf.Get(rules[0]["input"]).Clone()
+        if not rules_per_input.has_key((infile, inp)):
+            rules_per_input[(infile, inp)] = []
+        rules_per_input[(infile, inp)].append(rule)
+   
+    infile_dummy = ROOT.TFile.Open(rules[0]["infile"])
+    dummy_h = infile_dummy.Get(rules[0]["input"]).Clone()
     dummy_h.Reset()
 
-    for inp, rules_batch in rules_per_input.items():
+    #process batches
+    for (infile, inp), rules_batch in rules_per_input.items():
+    
+        infile_tf = ROOT.TFile.Open(infile)
+        
+        if not infile_tf:
+            raise FileError("Could not open file: {0}".format(infile))
+       
+        print infile, rules_batch[0]["input"]
+        
         # preload THnSparse here, once per input, in order to prevent memory leak, see
         # https://github.com/jpata/tthbb13/issues/107
         input_map = {
@@ -192,7 +187,7 @@ def apply_rules_parallel(infile, rules):
     
         input_map[inp].Delete()
 
-    infile_tf.Close()
+        infile_tf.Close()
 
     return rets
 
@@ -212,32 +207,26 @@ def get_categories(analysis_spec, analysis_name, category_name):
         raise Exception("Could not match any categories")
     return analysis, categories
 
-def make_rules(analysis, categories):
+def make_rules(analysis, infile, categories, processes=None):
     rules = []
     for cat in categories:
         logging.debug("main: making rules for category={0} discr={1}".format(
             cat.name, cat.discriminator
         ))
-        rules += make_rule_cut(cat.src_histogram, cat)
-    
-    #of = open("rules.json", "w")
-    #logging.info("writing {0} rules".format(len(rules)))
-    #of.write(json.dumps(rules, indent=2))
-    #of.close()
+        _processes = processes
+        if processes is None:
+            _processes = cat.processes + cat.data_processes
+        rules += make_rule_cut(infile, cat.src_histogram, cat, _processes)
 
     return rules
 
-    #project out all the histograms
-    logging.info("main: applying {0} rules".format(len(rules)))
-    hdict = apply_rules_parallel(analysis.sparse_input_file, rules)
-
 def main(analysis, categories, outdir="."):
     
-    rules = make_rules(analysis, categories)
+    rules = make_rules(analysis, analysis.sparse_input_file, categories)
 
     #project out all the histograms
     logging.info("main: applying {0} rules".format(len(rules)))
-    hdict = apply_rules_parallel(analysis.sparse_input_file, rules)
+    hdict = apply_rules_parallel(rules)
     return make_datacard(analysis, categories, outdir, hdict)
 
 def make_datacard(analysis, categories, outdir, hdict):

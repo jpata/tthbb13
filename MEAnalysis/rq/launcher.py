@@ -1,5 +1,5 @@
 import logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("main")
 
 from rq import Queue
@@ -185,11 +185,11 @@ def waitJobs(jobs, redis_conn, num_retries=0):
             100.0 * status_counts.get("finished", 0) / sum(status_counts.values()),
         ))
 
-        if len(qfail)>0 or len(perm_failed)>0:
+        if len(perm_failed)>0:
             logger.error("--- fail queue has {0} items".format(len(qfail)))
             for job in qfail.jobs:
                 workflow_failed = True
-                logger.error("job {0}, call={1} failed with message:\n{2}".format(job.id, job.get_call_string(), job.exc_info))
+                logger.error("job {0} failed with message:\n{1}".format(job.id, job.exc_info))
                 qfail.remove(job.id)
         
         if status_counts.get("started", 0) == 0 and status_counts.get("queued", 0) == 0:
@@ -208,6 +208,9 @@ def waitJobs(jobs, redis_conn, num_retries=0):
     return results
 
 class JobMemoize:
+    """
+    Fake job instance with manually configured properties
+    """
     def __init__(self, result, func, args, meta):
         self.result = result
         self.status = "finished"
@@ -216,6 +219,9 @@ class JobMemoize:
         self.meta = meta
 
 def enqueue_memoize(queue, **kwargs):
+    """
+    Check if result already exists in redis DB and return it or compute it.
+    """
     key = (kwargs.get("func").func_name, kwargs.get("meta")["args"])
     hkey = hash(str(key))
     logger.debug("checking for key {0} -> {1}".format(hkey, str(key)))
@@ -438,26 +444,27 @@ if __name__ == "__main__":
             start_jobs(args.queue, args.njobs, [], args.hostname, args.port)
 
         all_jobs = []
+        jobs_by_sample = {}
         for ds in analysis.samples:
             ds_results = [os.path.abspath(job.result) for job in jobs["sparse"][ds]]
             logger.info("sparsemerge: submitting merge of {0} files for sample {1}".format(len(ds_results), ds.name))
-            all_jobs += [qmain.enqueue_call(
+            outfile = os.path.abspath("{0}/sparse/sparse_{1}.root".format(workdir, ds.name))
+            job = enqueue_memoize(
+                qmain,
                 func=mergeFiles,
-                args=(os.path.abspath("{0}/sparse/sparse_{1}.root".format(workdir, ds.name)), ds_results),
+                args=(outfile, ds_results),
                 timeout=20*60,
                 result_ttl=60*60,
-                meta={"retries": 0, "args": ""}
-            )]
+                meta={"retries": 0, "args": ds.name}
+            )
+            jobs_by_sample[ds.name] = job
+            all_jobs += [job]
         waitJobs(all_jobs, redis_conn)
         results["sparse"] = [j.result for j in all_jobs]
 
         logger.info("sparsemerge: merging final sparse out of {0} files".format(len(results["sparse"])))
-        results["sparse-merge"] = mergeFiles(
-            os.path.abspath("{0}/sparse/merged.root".format(workdir)),
-            results["sparse"],
-            remove_inputs = False
-        )
-        analysis.config.set("sparse_data", "infile", results["sparse-merge"])
+        results["sparse-merge"] = {k: v.result for (k, v) in jobs_by_sample.items()}
+        analysis.config.set("sparse_data", "infile", str(results["sparse-merge"]))
         with open(tmp_conf_name, "wb") as configfile:
             analysis.config.write(configfile)
 
@@ -487,34 +494,33 @@ if __name__ == "__main__":
         logger.info("starting step CATEGORIES")
         t0 = time.time()
 
-        logger.info("running categories on file {0}".format(results["sparse-merge"]))
-        analysis.sparse_input_file = results["sparse-merge"]
-
+        #analysis.sparse_input_file = results["sparse-merge"]
         os.makedirs("{0}/categories".format(workdir))
 
         all_jobs = []
         cat_jobs = {}
         for cat in analysis.categories:
+            logger.info("running category {0}".format(cat.full_name))
         
             cat.outdir = "{0}/categories/{1}/{2}".format(workdir, cat.name, cat.discriminator)
             if not os.path.exists(cat.outdir):
                 os.makedirs(cat.outdir)
             
-            rules = sorted(make_rules(analysis, [cat]), key=lambda x: x["input"])
-            logger.debug("made {0} rules for cat {1}".format(len(rules), cat.full_name))
             cat_jobs[cat] = []
-            for ijob, inputs in enumerate(chunks(rules, 50)):
-                logger.debug("enqueued {0} rules".format(len(inputs)))
-                cat_jobs[cat] += [
-                    qmain.enqueue_call(
+            for ds in analysis.samples:
+                rules = sorted(make_rules(analysis, results["sparse-merge"][ds.name], [cat], [p for p in cat.processes+cat.data_processes if p.input_name == ds.name]), key=lambda x: x["input"])
+                logger.debug("made {0} rules for cat {1}".format(len(rules), cat.full_name))
+                for ijob, inputs in enumerate(chunks(rules, 50)):
+                    logger.debug("enqueued {0} rules".format(len(inputs)))
+                    job = qmain.enqueue_call(
                         func=apply_rules_parallel,
-                        args=(results["sparse-merge"], inputs),
+                        args=(inputs, ),
                         timeout=20*60,
                         result_ttl=60*60,
                         meta={"retries": 0, "args": ""}
                     )
-                ]
-            all_jobs += cat_jobs[cat]
+                    cat_jobs[cat] += [job]
+                    all_jobs += [job]
 
         waitJobs(all_jobs, redis_conn)
         t1 = time.time()
@@ -595,7 +601,7 @@ if __name__ == "__main__":
                                         "", cat.name, cat.discriminator)],
                     timeout=20*60,
                     result_ttl=60*60,
-                    meta={"retries": 0, args: ""}
+                    meta={"retries": 0, "args": ""}
                 )
             ]
 

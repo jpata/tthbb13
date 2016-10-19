@@ -13,6 +13,7 @@ import TTH.Plotting.joosep.sparsinator as sparsinator
 import tempfile, os
 import shutil
 from shutil import copyfile
+import glob
 
 import sys, os, copy
 from collections import OrderedDict
@@ -94,7 +95,11 @@ def makelimits(*args):
     return MakeLimits.main(*args)
 
 if __name__ == "__main__":
-    sparse(
-        'results/29d43491-3535-4ab2-9c34-85ae14cc2e91/analysis.cfg', ['root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/TT_TuneCUETP8M1_13TeV-powheg-pythia8/Sep29_v1/160930_165709/0000/tree_1.root', 'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/TT_TuneCUETP8M1_13TeV-powheg-pythia8/Sep29_v1/160930_165709/0000/tree_10.root'], 'TT_TuneCUETP8M1_13TeV-powheg-pythia8',
-        'results/29d43491-3535-4ab2-9c34-85ae14cc2e91/sparse/TT_TuneCUETP8M1_13TeV-powheg-pythia8/sparse_0.root'
+    f = filter(
+        lambda x: x.endswith(".root"),
+        glob.glob("/mnt/t3nfs01/data01/shome/jpata/tth/sw/CMSSW/src/TTH/MEAnalysis/rq/results/ff7b3731-b583-42e0-961e-66f90d261cc1/sparse/TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/*.root")
+    )
+    mergeFiles(
+        "./sparse2.root",
+        f    
     )
