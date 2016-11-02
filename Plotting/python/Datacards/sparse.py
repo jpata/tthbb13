@@ -50,7 +50,10 @@ def set_range(h, axname, loval, hival):
     """
     iaxis = find_axis(h, axname)
     lobin = h.GetAxis(iaxis).FindBin(loval)
-    hibin = h.GetAxis(iaxis).FindBin(hival) - 1
+    hibin = h.GetAxis(iaxis).FindBin(hival) - 1 #this is here to make the upper edge exclusive
+    if lobin > hibin:
+        LOG_MODULE_NAME.warning("set_range: incorrect ranges: {0} {1}".format(loval, hival))
+        hibin = lobin
     LOG_MODULE_NAME.debug("set_range: {0} h.GetAxis({1}).SetRange({2}, {3})".format(axname, iaxis, lobin, hibin))
     h.GetAxis(iaxis).SetRange(lobin, hibin)
 
@@ -69,6 +72,7 @@ def apply_cuts_project(h, cuts, projections):
 
     for i in range(h.GetNdimensions()):
         h.GetAxis(i).SetRange(0, h.GetAxis(i).GetNbins() + 1)
+        h.GetAxis(i).SetBit(ROOT.TAxis.kAxisRange)
 
     for c in cuts:
         set_range(h, c[0], c[1], c[2])

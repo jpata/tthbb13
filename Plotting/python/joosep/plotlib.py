@@ -1,4 +1,5 @@
 import os
+import time
 
 if os.environ.has_key("CMSSW_BASE"):
     from cleanPath import fixPythonPath
@@ -52,8 +53,9 @@ colors = {
     "ttH_nonhbb": (90, 115, 203),
     "diboson": (42, 100, 198),
     "wjets": (102, 201, 77),
+    "zjets": (102, 201, 77),
     "stop": (235, 73, 247),
-    "ttV": (204, 204, 251),
+    "ttv": (204, 204, 251),
     "qcd": (102, 201, 77),
     "qcd_ht300to500"   : (102, 201, 76),
     "qcd_ht300to500"   : (102, 201, 78),
@@ -199,6 +201,7 @@ varnames = {
     "nPVs": "$N_{\\mathrm{PV}}$",
     "ntopCandidate": "$N_{\\mathrm{HTTv2}}$",
     "common_bdt": "BDT",
+    "common_mem": "MEM",
     "Wmass": "$m_{qq}$"
 }
 
@@ -268,14 +271,14 @@ def mc_stack(
 
     for h in hlist:
         h.fillstyle = "solid"
-
+    
     #FIXME: Temporary workaround for failed fill, only works when hatch is specified
     stack = hist(hlist, stacked=True, hatch=".", lw=2)
     htot = sum(hlist)
     htot.color="black"
 
-    htot_u = htot.Clone()
-    htot_d = htot.Clone()
+    htot_u = rootpy.asrootpy(htot.Clone())
+    htot_d = rootpy.asrootpy(htot.Clone())
     for i in range(1, htot.nbins()+1):
         htot_u.set_bin_content(i, htot.get_bin_content(i) + htot.get_bin_error(i))
         htot_d.set_bin_content(i, htot.get_bin_content(i) - htot.get_bin_error(i))
@@ -335,6 +338,10 @@ def make_uoflow(h):
     h.SetBinError(1, math.sqrt(h.GetBinError(0)**2 + h.GetBinError(1)**2))
     h.SetBinError(nb+1, math.sqrt(h.GetBinError(nb)**2 + h.GetBinError(nb + 1)**2))
 
+def zero_error(h):
+    for i in range(1, h.GetNbinsX()+1):
+        h.SetBinError(i, 0)
+
 def fill_overflow(hist):
     """
     Puts the contents of the overflow bin in the last visible bin
@@ -350,19 +357,19 @@ def fill_overflow(hist):
     hist.SetBinError(nb+1, 0)
 
 
-def getHistograms(tf, samples, hname):
+def getHistograms(tf, samples, hname, pattern="{sample}/{hname}"):
 
     hs = OrderedDict()
     for sample, sample_name in samples:
         try:
-            h = tf.get(sample + "/" + hname).Clone()
+            h = tf.get(pattern.format(sample=sample, hname=hname)).Clone()
         except rootpy.io.file.DoesNotExist as e:
             continue
-        hs[sample] = h
+        hs[sample] = rootpy.asrootpy(h)
     for sample, sample_name in samples:
         if not hs.has_key(sample):
             if len(hs)>0:
-                hs[sample] = 0.0*hs.values()[0].Clone()
+                hs[sample] = rootpy.asrootpy(0.0*hs.values()[0].Clone())
             else:
                 return hs
     return hs
@@ -409,20 +416,22 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
 
     #function f: TH1D -> TH1D to apply on data to blind it.
     blindFunc = kwargs.get("blindFunc", None)
+    
+    pattern = kwargs.get("pattern", "{sample}/{hname}")
 
     #array of up-down pairs for systematic names to use for the systematic band,
     #e.g.[("_CMS_scale_jUp", "_CMS_scale_jDown")]
     systematics = kwargs.get("systematics", [])
 
-    histograms_nominal = getHistograms(tf, processes, hname)
+    histograms_nominal = getHistograms(tf, processes, hname, pattern=pattern)
     if len(histograms_nominal) == 0:
         raise KeyError("did not find any histograms for MC")
 
     histograms_systematic = OrderedDict()
     #get the systematically variated histograms
     for systUp, systDown in systematics:
-        histograms_systematic[systUp] = getHistograms(tf, processes, hname+systUp)
-        histograms_systematic[systDown] = getHistograms(tf, processes, hname+systDown)
+        histograms_systematic[systUp] = getHistograms(tf, processes, hname+systUp, pattern=pattern)
+        histograms_systematic[systDown] = getHistograms(tf, processes, hname+systDown, pattern=pattern)
         if len(histograms_systematic[systUp])==0 or len(histograms_systematic[systDown])==0:
             print "Could not read histograms for {0}".format(hname+systUp)
 
@@ -478,7 +487,7 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
     #Get the data histogram
     data = None
     if dataname != "":
-        data = tf.get(dataname + "/" + hname)
+        data = tf.get(pattern.format(sample=dataname, hname=hname))
         data.rebin(rebin)
         if blindFunc:
             data = blindFunc(data)
@@ -564,7 +573,7 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
             color="gray", hatch=r"\\\\",
             alpha=1.0, linewidth=0, facecolor="none", edgecolor="gray", zorder=10,
         )
-        plt.title("data={0:.1f}\ MC={1:.1f}".format(
+        plt.title("data={0:.1f} MC={1:.1f}".format(
             data.Integral(),
             stacked_hists["tot"].Integral()
             ), x=0.01, y=0.8, fontsize=10, horizontalalignment="left"
@@ -709,6 +718,7 @@ def svfg(fn, **kwargs):
     path = os.path.dirname(fn)
     if not os.path.exists(path):
         os.makedirs(path)
+        time.sleep(2) #for NFS
     plt.savefig(fn, pad_inches=0.5, bbox_inches='tight', **kwargs)
     #plt.clf()
 
@@ -785,7 +795,7 @@ def brazilplot(limits, categories, category_names, axes=None):
         TYPE: nothing
     """
     if not axes:
-        ax = plt.axes()
+        axes = plt.axes()
     
     central_limits = []
     errs = np.zeros((len(categories), 4))
@@ -795,13 +805,13 @@ def brazilplot(limits, categories, category_names, axes=None):
     for k in categories:
         
         #central value
-        central_limits += [lims[k][0][2]]
+        central_limits += [limits[k][0][2]]
       
         #error band
-        errs[i,0] = lims[k][0][1]
-        errs[i,1] = lims[k][0][3]
-        errs[i,2] = lims[k][0][0]
-        errs[i,3] = lims[k][0][4]
+        errs[i,0] = limits[k][0][1]
+        errs[i,1] = limits[k][0][3]
+        errs[i,2] = limits[k][0][0]
+        errs[i,3] = limits[k][0][4]
         
         i += 1
     
@@ -812,14 +822,14 @@ def brazilplot(limits, categories, category_names, axes=None):
     for y, l, e1, e2, e3, e4 in zip(ys, central_limits, errs[:, 0], errs[:, 1], errs[:, 2], errs[:, 3]):
         
         #black line
-        ax.add_line(plt.Line2D([l, l], [y, y+1.0], lw=2, color="black", ls="-"))
+        axes.add_line(plt.Line2D([l, l], [y, y+1.0], lw=2, color="black", ls="-"))
         
         #value
         plt.text(l*1.05, y+0.5, "{0:.2f}".format(l), horizontalalignment="left", verticalalignment="center")
         
         #error bars
-        ax.barh(y+0.1, (e4-e3), left=e3, color=np.array([254, 247, 2])/255.0, lw=0)
-        ax.barh(y+0.1, (e2-e1), left=e1, color=np.array([51, 247, 2])/255.0 , lw=0)
+        axes.barh(y+0.1, (e4-e3), left=e3, color=np.array([254, 247, 2])/255.0, lw=0)
+        axes.barh(y+0.1, (e2-e1), left=e1, color=np.array([51, 247, 2])/255.0 , lw=0)
         
     #set ranges
     plt.xlim(0, 1.2*max(central_limits))
@@ -828,7 +838,7 @@ def brazilplot(limits, categories, category_names, axes=None):
     #set category names
     plt.yticks(ys+0.5, category_names, verticalalignment="center", fontsize=18, ha="right")
     plt.xlabel("$\mu$")
-    yax = ax.get_yaxis()
+    yax = axes.get_yaxis()
     # find the maximum width of the label on the major ticks
     #pad = 150
     #yax.set_tick_params(pad=pad)

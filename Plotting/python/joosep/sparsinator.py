@@ -651,7 +651,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
         Axis("jetsByPt_1_pt", 50, 0, 400, lambda ev: ev["jets_p4"][1].Pt()),
         Axis("jetsByPt_2_pt", 50, 0, 400, lambda ev: ev["jets_p4"][2].Pt()),
 
-        Axis("jetsByPt_0_btagCSV", 50, -1, 1, lambda ev: ev["jets_p4"][0].btagCSV),
+        Axis("jetsByPt_0_btagCSV", 50, 0, 1, lambda ev: ev["jets_p4"][0].btagCSV),
 
         Axis("jetsByPt_0_eta", 50, -2.5, 2.5, lambda ev: ev["jets_p4"][0].Eta()),
         Axis("jetsByPt_1_eta", 50, -2.5, 2.5, lambda ev: ev["jets_p4"][1].Eta()),
