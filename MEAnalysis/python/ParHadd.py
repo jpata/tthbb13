@@ -109,6 +109,7 @@ def par_hadd(outfile, infiles, nchunks, njobs, nsteps):
 		of = chunked_step(pool, of, i, nchunks=nchunks, delete_inputs=i>0)
 		if len(of)==1:
 			break
+	pool.close()
 	hadd((outfile, of))
 
 if __name__ == "__main__":

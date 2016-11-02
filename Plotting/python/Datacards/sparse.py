@@ -10,13 +10,6 @@ import logging
 
 LOG_MODULE_NAME = logging.getLogger(__name__)
 
-HAVE_ROOTPY = False
-try:
-    import rootpy
-    HAVE_ROOTPY = True
-except ImportError:
-    LOG_MODULE_NAME.warning("Could not import rootpy, disabling")
-
 def find_axis(h, axname):
     """
     Returns the index of the axis with the given name in the sparse histogram
@@ -80,10 +73,7 @@ def apply_cuts_project(h, cuts, projections):
     hp = h.Projection(*axs)
     hp.SetDirectory(0)
     hp.SetName("__".join(["__".join(map(str, c)) for c in cuts]) + "__" + "__".join(projections))
-    if HAVE_ROOTPY:
-        return rootpy.asrootpy(hp)
-    else:
-        return hp
+    return hp
 
 def mkdirs(fi, path):
     path = path.encode("ascii", "ignore")

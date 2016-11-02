@@ -76,7 +76,6 @@ def analysisFromConfig(config_file_path):
     config = Analysis.getConfigParser(config_file_path)
 
     # Get information on sparse input
-    sparse_version = config.get("general", "sparse_version")
     input_file = config.get("sparse_data", "infile")
     lumi = dict([(k, float(v)) for (k, v) in config.items("lumi")])
     blr_cuts = dict([(k, float(v)) for (k, v) in config.items("blr_cuts")])
@@ -116,9 +115,13 @@ def analysisFromConfig(config_file_path):
     ########################################
     
     process_lists = {}
+    process_lists_original = {}
     for process_list in config.get("general","process_lists").split():
 
+
+        process_lists_original[process_list] = []
         process_lists[process_list] = []
+
 
         is_data =  config.get(process_list, "is_data")
 
@@ -149,10 +152,13 @@ def analysisFromConfig(config_file_path):
                         input_name = in_name,
                         output_name = out_name,
                         cuts = cuts,
-                        xs_weight = samples_base.xsec_sample[in_name]/samples_dict[in_name].ngen))
+                        xs_weight = samples_dict[in_name].xsec/samples_dict[in_name].ngen))
         # End loop over processes
 
+        #post-processing of processes
+        #split by trigger path
         if config.get(process_list, "split_by_trigger_path") == "True":
+            process_lists_original[process_list] = process_lists[process_list]
             process_lists[process_list] = splitByTriggerPath(
                 process_lists[process_list],
                 lumi,
@@ -163,7 +169,12 @@ def analysisFromConfig(config_file_path):
     # Prepare the process list for the analysis object
     # TODO: check if needed since we also have per category process lists
     processes = sum([process_lists[x] for x in config.get("general", "processes").split()],[])
-            
+
+    #Processes in unsplit form
+    processes_original = []
+    for pl in process_lists_original.values():
+        for proc in pl:
+            processes_original.append(proc)
 
     ########################################
     # Categories
@@ -171,6 +182,8 @@ def analysisFromConfig(config_file_path):
 
     analysis_groups = {}
 
+    all_cats = []
+    
     for group in config.get("general","analysis_groups").split():
 
         cats = []
@@ -180,7 +193,7 @@ def analysisFromConfig(config_file_path):
 
             cuts = []
             for cut_name, lower, upper in triplewise(config.get(cat,"cuts").split()):
-                cuts.append( (cut_name, int(lower), int(upper)) )
+                cuts.append( (cut_name, float(lower), float(upper)) )
 
             mc_processes = sum([process_lists[x] for x in config.get(template, "mc_processes").split()], [])
             data_processes = sum([process_lists[x] for x in config.get(template, "data_processes").split()], [])
@@ -241,8 +254,12 @@ def analysisFromConfig(config_file_path):
 
             # End loop over categories
             
-        analysis_groups[group] = cats        
+        analysis_groups[group] = cats   
+        all_cats.extend(cats)
     # End loop over groups of categories
+
+    # Uniquify all categories
+    all_cats = list(set(all_cats))
 
 
     ########################################
@@ -255,7 +272,8 @@ def analysisFromConfig(config_file_path):
         samples = samples,
         cuts = cuts_dict,
         processes = processes,
-        categories = cats,
+        processes_unsplit = processes_original,
+        categories = all_cats,
         sparse_input_file = input_file,
         groups = analysis_groups,
         do_fake_data = do_fake_data,

@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 import ROOT
+import math
 
 import sys, os
 from collections import OrderedDict
@@ -8,13 +9,36 @@ import logging
 LOG_MODULE_NAME = logging.getLogger(__name__)
     
 import numpy as np
-from TTH.MEAnalysis.samples_base import getSitePrefix, xsec, samples_nick, xsec_sample, get_prefix_sample, PROCESS_MAP, TRIGGERPATH_MAP
+from TTH.MEAnalysis.samples_base import getSitePrefix, samples_nick, get_prefix_sample, PROCESS_MAP, TRIGGERPATH_MAP
 from TTH.Plotting.Datacards.sparse import save_hdict
 
 from TTH.CommonClassifier.db import ClassifierDB
 
+import rootpy
+
+CvectorLorentz = getattr(ROOT, "std::vector<TLorentzVector>")
+Cvectordouble = getattr(ROOT, "std::vector<double>")
+CvectorJetType = getattr(ROOT, "std::vector<MEMClassifier::JetType>")
+
+
+def vec_from_list(vec_type, src):
+    """
+    Creates a std::vector<T> from a python list.
+    vec_type (ROOT type): vector datatype, ex: std::vector<double>
+    src (iterable): python list
+    """
+    v = vec_type()
+    for item in src:
+        v.push_back(item)
+    return v
+
+def l4p(pt, eta, phi, m):
+    v = ROOT.TLorentzVector()
+    v.SetPtEtaPhiM(pt, eta, phi, m)
+    return v
+
 class BufferedTree:
-    """Class with buffered access
+    """Class with buffered TTree access, so that using tree.branch does not load the entry twice
     
     Attributes:
         branches (dict string->branch): TTree branches
@@ -303,6 +327,13 @@ class SparseOut:
         #loop over defined axes, calculate values
         for ax in self.axes:
             v = ax.getValue(event)
+            #Very important: manually treat underflow and overflow, put into first or last bin!
+            if v <= ax.lo:
+                v = ax.lo
+            #value of last bin
+            elif v >= ax.hi:
+                v = ax.hi - float(ax.hi - ax.lo)/float(ax.nbins)
+
             valVec.push_back(v)
         #print([v for v in valVec], "w={0}".format(weight))
 
@@ -358,11 +389,11 @@ def createOutputs(config, axes, dirs, systematics):
 
 def pass_HLT_sl_mu(event):
     pass_hlt = event["HLT_ttH_SL_mu"]
-    return event["is_sl"] and pass_hlt and abs(event["leps_pdgId"][0]) == 13
+    return event["is_sl"] and pass_hlt and int(abs(event["leps_pdgId"][0])) == 13
 
 def pass_HLT_sl_el(event):
     pass_hlt = event["HLT_ttH_SL_el"]
-    return event["is_sl"] and pass_hlt and abs(event["leps_pdgId"][0]) == 11
+    return event["is_sl"] and pass_hlt and int(abs(event["leps_pdgId"][0])) == 11
 
 def pass_HLT_dl_mumu(event):
     pass_hlt = event["HLT_ttH_DL_mumu"]
@@ -418,7 +449,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
 
 
 
-    MEM_SF = analysis.config.get("sparsinator", "mem_sf")
+    MEM_SF = analysis.config.getfloat("sparsinator", "mem_sf")
 
     # Create pairs of (systematic_name, weight function), which will be used on the
     # nominal event to create reweighted copies of the event. The systematic names
@@ -431,6 +462,11 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
     btag_weights = []
 
     systematics_event = []
+
+    calculate_bdt = analysis.config.getboolean("sparsinator", "calculate_bdt")
+    if calculate_bdt:
+        cls_bdt_sl = ROOT.BlrBDTClassifier()
+        cls_bdt_dl = ROOT.DLBDTClassifier()
 
     #Optionally add systematics
     if analysis.config.get("sparsinator", "add_systematics"):
@@ -447,13 +483,15 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                     #make systematic outputs consistent in Up/Down naming
                     sdir_cap = sdir.capitalize()
                     systematic_weights += [
-                        ("CMS_ttH_{0}{1}{2}".format(tagger, syst, sdir_cap), lambda ev, bweight=bweight: ev["weight_nominal"]/ev["btagWeight"+tagger]*ev[bweight])
+                        ("CMS_ttH_{0}{1}{2}".format(tagger, syst, sdir_cap), lambda ev, bweight=bweight:
+                            ev["puWeight"] * ev["triggerEmulationWeight"] * ev["lep_SF_weight"] * ev[bweight])
                     ]
                     btag_weights += [bweight]
 
         systematic_weights += [
-                ("puUp", lambda ev: ev["weight_nominal"]/ev["puWeight"] * ev["puWeightUp"]),
-                ("puDown", lambda ev: ev["weight_nominal"]/ev["puWeight"] * ev["puWeightDown"])
+                ("puUp", lambda ev: ev["btagWeightCSV"] * ev["triggerEmulationWeight"] * ev["lep_SF_weight"] * ev["puWeightUp"]),
+                ("puDown", lambda ev: ev["btagWeightCSV"] * ev["triggerEmulationWeight"] * ev["lep_SF_weight"] * ev["puWeightDown"]),
+                ("unweighted", lambda ev: 1.0)
         ]
 
 
@@ -507,14 +545,25 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
         
         Var(name="Wmass", systematics="suffix"),
 
+        Var(name="btag_LR_4b_2b_btagCSV",
+            nominal=Func("blr_CSV", func=lambda ev: logit(ev.btag_LR_4b_2b)),
+        ),
+
         Var(name="btag_LR_4b_2b_btagCSV_logit",
-            nominal=Func("blr_CSV", func=lambda ev: logit(ev.btag_LR_4b_2b_btagCSV)),
+            nominal=Func("blr_CSV_logit", func=lambda ev: logit(ev.btag_LR_4b_2b_btagCSV)),
         ),
         Var(name="btag_LR_4b_2b_btagCMVA_logit",
-            nominal=Func("blr_cMVA", func=lambda ev: logit(ev.btag_LR_4b_2b_btagCMVA)),
+            nominal=Func("blr_cMVA_logit", func=lambda ev: logit(ev.btag_LR_4b_2b_btagCMVA)),
         ),
 
         Var(name="leps_pdgId", nominal=Func("leps_pdgId", func=lambda ev: [int(ev.leps_pdgId[i]) for i in range(ev.nleps)])),
+        Var(name="leps_charge", nominal=Func("leps_charge", func=lambda ev: [float(math.copysign(1.0, ev.leps_pdgId[i])) for i in range(ev.nleps)])),
+        Var(name="leps_p4",
+            nominal=Func(
+                "leps_p4",
+                func=lambda ev: [l4p(ev.leps_pt[i], ev.leps_eta[i], ev.leps_phi[i], ev.leps_mass[i]) for i in range(ev.nleps)]
+            )
+        ),
 
         Var(name="jets_p4",
             nominal=Func(
@@ -537,6 +586,31 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 "CMS_res_jDown": Func(
                     "jets_p4_JERDown",
                     func=lambda ev: [lv_p4s(ev.jets_pt[i]*float(ev.jets_corr_JERDown[i])/float(ev.jets_corr_JER[i]) if ev.jets_corr_JER[i]>0 else 0.0, ev.jets_eta[i], ev.jets_phi[i], ev.jets_mass[i], ev.jets_btagCSV[i]) for i in range(ev.njets)]
+                )
+            }
+        ),
+
+        Var(name="loose_jets_p4",
+            nominal=Func(
+                "loose_jets_p4",
+                func=lambda ev: [lv_p4s(ev.loose_jets_pt[i], ev.loose_jets_eta[i], ev.loose_jets_phi[i], ev.loose_jets_mass[i], ev.loose_jets_btagCSV[i]) for i in range(ev.nloose_jets)]
+            ),
+            systematics = {
+                "CMS_scale_jUp": Func(
+                    "loose_jets_p4_JESUp",
+                    func=lambda ev: [lv_p4s(ev.loose_jets_pt[i]*float(ev.loose_jets_corr_JESUp[i])/float(ev.loose_jets_corr[i]), ev.loose_jets_eta[i], ev.loose_jets_phi[i], ev.loose_jets_mass[i], ev.loose_jets_btagCSV[i]) for i in range(ev.nloose_jets)]
+                ),
+                "CMS_scale_jDown": Func(
+                    "loose_jets_p4_JESDown",
+                    func=lambda ev: [lv_p4s(ev.loose_jets_pt[i]*float(ev.loose_jets_corr_JESDown[i])/float(ev.loose_jets_corr[i]), ev.loose_jets_eta[i], ev.loose_jets_phi[i], ev.loose_jets_mass[i], ev.loose_jets_btagCSV[i]) for i in range(ev.nloose_jets)]
+                ),
+                "CMS_res_jUp": Func(
+                    "loose_jets_p4_JERUp",
+                    func=lambda ev: [lv_p4s(ev.loose_jets_pt[i]*float(ev.loose_jets_corr_JERUp[i])/float(ev.loose_jets_corr_JER[i]) if ev.loose_jets_corr_JER[i]>0 else 0.0, ev.loose_jets_eta[i], ev.loose_jets_phi[i], ev.loose_jets_mass[i], ev.loose_jets_btagCSV[i]) for i in range(ev.nloose_jets)]
+                ),
+                "CMS_res_jDown": Func(
+                    "loose_jets_p4_JERDown",
+                    func=lambda ev: [lv_p4s(ev.loose_jets_pt[i]*float(ev.loose_jets_corr_JERDown[i])/float(ev.loose_jets_corr_JER[i]) if ev.loose_jets_corr_JER[i]>0 else 0.0, ev.loose_jets_eta[i], ev.loose_jets_phi[i], ev.loose_jets_mass[i], ev.loose_jets_btagCSV[i]) for i in range(ev.nloose_jets)]
                 )
             }
         ),
@@ -610,33 +684,22 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
         Axis("nBCMVAM", 4, 1, 5, lambda ev: ev["nBCMVAM"]),
 
         Axis("jetsByPt_0_pt", 50, 0, 400, lambda ev: ev["jets_p4"][0].Pt()),
+        
+        Axis("btag_LR_4b_2b_btagCSV_logit", 30, -5, 10, lambda ev: ev["btag_LR_4b_2b_btagCSV_logit"]),
+        Axis("btag_LR_4b_2b_btagCMVA_logit", 30, -5, 10, lambda ev: ev["btag_LR_4b_2b_btagCMVA_logit"]),
 
-        Axis("common_bdt", 36, 0, 1, lambda ev: ev["common_bdt"]),
+        Axis("common_bdt", 36, -1, 1, lambda ev: ev["common_bdt"]),
         Axis("common_mem", 36, 0, 1, lambda ev: ev["common_mem"]),
     ]
 
     axes_basic_sl = [
-        Axis("mem_SL_2w2h2t_p", 36, 0, 1, lambda ev: ev["mem_SL_2w2h2t_p"]),
-        Axis("mem_SL_1w2h2t_p", 36, 0, 1, lambda ev: ev["mem_SL_1w2h2t_p"]),
-        Axis("mem_SL_0w2h2t_p", 36, 0, 1, lambda ev: ev["mem_SL_0w2h2t_p"]),
-
-        Axis("btag_LR_4b_2b_btagCSV_logit", 30, -5, 10, lambda ev: ev["btag_LR_4b_2b_btagCSV_logit"]),
-        Axis("btag_LR_4b_2b_btagCMVA_logit", 30, -5, 10, lambda ev: ev["btag_LR_4b_2b_btagCMVA_logit"]),
-
         Axis("leps_0_pt", 50, 0, 300, lambda ev: ev["leps_pt"][0]),
-        Axis("leps_0_pdgId", 20, -0.5, 19.5, lambda ev: abs(ev["leps_pdgId"][0])),
     ]
 
     axes_basic_dl = [
-        Axis("mem_DL_0w2h2t_p", 36, 0, 1, lambda ev: ev["mem_DL_0w2h2t_p"]),
-
         Axis("leps_0_pt", 50, 0, 300, lambda ev: ev["leps_pt"][0]),
-
-        Axis("leps_0_pdgId", 20, -0.5, 19.5, lambda ev: abs(ev["leps_pdgId"][0])),
-        Axis("leps_1_pdgId", 20, -0.5, 19.5, lambda ev: abs(ev["leps_pdgId"][1])),
-
     ]
-     
+
     axes_basic_fh = [
         Axis("mem_FH_4w2h2t_p", 36, 0, 1, lambda ev: ev["mem_FH_4w2h2t_p"]),
         Axis("mem_FH_3w2h2t_p", 36, 0, 1, lambda ev: ev["mem_FH_3w2h2t_p"]),
@@ -724,7 +787,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
     schema = sample.schema
     process = sample.process
     
-    do_classifier_db = analysis.config.get("sparsinator", "do_classifier_db")
+    do_classifier_db = analysis.config.getboolean("sparsinator", "do_classifier_db")
     if do_classifier_db:
         cls_db = ClassifierDB(filename=sample.classifier_db_path)
     
@@ -742,9 +805,39 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
     outfile = ROOT.TFile(ofname, "RECREATE")
     dirs["sample"] = outfile.mkdir(sample_name)
     dirs["sample"].cd()
+    outtree = ROOT.TTree("tree", "tree")
+    bufs = {}
+    bufs["event"] = np.zeros(1, dtype=np.int64)
+    bufs["run"] = np.zeros(1, dtype=np.int64)
+    bufs["lumi"] = np.zeros(1, dtype=np.int64)
+    bufs["systematic"] = np.zeros(1, dtype=np.int64)
+    bufs["mem"] = np.zeros(1, dtype=np.float32)
+    bufs["bdt"] = np.zeros(1, dtype=np.float32)
+    bufs["is_sl"] = np.zeros(1, dtype=np.int32)
+    bufs["is_dl"] = np.zeros(1, dtype=np.int32)
+    bufs["is_fh"] = np.zeros(1, dtype=np.int32)
+    bufs["ttCls"] = np.zeros(1, dtype=np.int32)
+    bufs["btag_LR_4b_2b"] = np.zeros(1, dtype=np.float32)
+    bufs["numJets"] = np.zeros(1, dtype=np.int32)
+    bufs["nBCSVM"] = np.zeros(1, dtype=np.int32)
+    
     dirs["sl"] = dirs["sample"].mkdir("sl")
     dirs["dl"] = dirs["sample"].mkdir("dl")
     dirs["fh"] = dirs["sample"].mkdir("fh")
+    
+    outtree.Branch("event", bufs["event"], "event/L")
+    outtree.Branch("run", bufs["run"], "run/L")
+    outtree.Branch("lumi", bufs["lumi"], "lumi/L")
+    outtree.Branch("systematic", bufs["systematic"], "systematic/L")
+    outtree.Branch("mem", bufs["mem"], "mem/F")
+    outtree.Branch("bdt", bufs["bdt"], "bdt/F")
+    outtree.Branch("numJets", bufs["numJets"], "numJets/I")
+    outtree.Branch("nBCSVM", bufs["nBCSVM"], "nBCSVM/I")
+    outtree.Branch("is_sl", bufs["is_sl"], "is_sl/I")
+    outtree.Branch("is_dl", bufs["is_dl"], "is_dl/I")
+    outtree.Branch("is_fh", bufs["is_fh"], "is_fh/I")
+    outtree.Branch("btag_LR_4b_2b", bufs["btag_LR_4b_2b"], "btag_LR_4b_2b/F")
+    outtree.Branch("ttCls", bufs["ttCls"], "ttCls/I")
     
     #pre-create output histograms
     outdict_syst = createOutputs(analysis.config, AXES, dirs, all_systematics)
@@ -785,14 +878,18 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
             if schema == "data" and not event.json:
                 continue
 
-            for syst in systematics_event:
+            #Found a monster event in ttH (bug?)
+            if event.jets_pt[0] > 10000:
+                logging.error("ANOMALOUS MEGAPT EVENT: {0}:{1}:{2}".format(event.run, event.lumi, event.evt))
+                continue
+
+            for iSyst, syst in enumerate(systematics_event):
                 ret = desc.getValue(event, schema, syst)
                 proc_label = assign_process_label(process, ret)
                 ret["process"] = PROCESS_MAP[proc_label]
                 ret["syst"] = syst
                 ret["counting"] = 0
                 ret["leptonFlavour"] = 0
-                ret["common_bdt"] = 0
                 ret["triggerPath"] = triggerPath(ret)
                 if not counters["triggerPath"].has_key(ret["triggerPath"]):
                     counters["triggerPath"][ret["triggerPath"]] = 0
@@ -801,27 +898,74 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 ret["weight_nominal"] = 1.0
                 if schema == "mc":
                     ret["weight_nominal"] *= ret["puWeight"] * ret["btagWeightCSV"] * ret["triggerEmulationWeight"] * ret["lep_SF_weight"]
-            
-                ret["common_mem"] = 0
+           
+                #get MEM
+                ret["common_mem"] = -99
                 if do_classifier_db:
                     syst_index = int(analysis.config.get(syst, "index"))
-                    db_key = (int(event.run), int(event.lumi), int(event.evt), syst_index)
+                    db_key = int(event.run), int(event.lumi), int(event.evt), int(syst_index)
                     if cls_db.data.has_key(db_key):
-                        ret["common_mem"] = cls_db.get(db_key)
+                        classifiers = cls_db.get(db_key)
+                        if classifiers.mem_p_sig > 0:
+                            ret["common_mem"] = classifiers.mem_p_sig / (classifiers.mem_p_sig + float(MEM_SF) * classifiers.mem_p_bkg)
+                    else:
+                        ret["common_mem"] = -99
+                
+                ret["common_bdt"] = 0
 
-                #Fill the base histogram
-                for (k, v) in outdict_syst[syst].items():
-                    weight = ret["weight_nominal"]
-                    if v.cut(ret):
-                        v.fill(ret, weight)
+                #calculate BDT using the CommonClassifier
+                if calculate_bdt:
+                    if ret["is_sl"]:
+                        ret_bdt = cls_bdt_sl.GetBDTOutput(
+                            vec_from_list(CvectorLorentz, ret["leps_p4"]),
+                            vec_from_list(CvectorLorentz, ret["jets_p4"]),
+                            vec_from_list(Cvectordouble, [v.btagCSV for v in ret["jets_p4"]]),
+                            vec_from_list(CvectorLorentz, ret["loose_jets_p4"]),
+                            vec_from_list(Cvectordouble, [v.btagCSV for v in ret["loose_jets_p4"]]),
+                            l4p(event.met_pt, 0, event.met_phi, 0),
+                            ret["btag_LR_4b_2b_btagCSV"]
+                        )
+                        ret["common_bdt"] = ret_bdt
+                    elif ret["is_dl"]:
+                        ret_bdt = cls_bdt_dl.GetBDTOutput(
+                            vec_from_list(CvectorLorentz, ret["leps_p4"]),
+                            vec_from_list(Cvectordouble, ret["leps_charge"]),
+                            vec_from_list(CvectorLorentz, ret["jets_p4"]),
+                            vec_from_list(Cvectordouble, [v.btagCSV for v in ret["jets_p4"]]),
+                            l4p(event.met_pt, 0, event.met_phi, 0),
+                        )
+                        ret["common_bdt"] = ret_bdt
                
-                #nominal event, fill also histograms with systematic weights
-                if syst == "nominal" and schema == "mc":
-                    for (syst_weight, weightfunc) in systematic_weights:
-                        weight = weightfunc(ret)
-                        for (k, v) in outdict_syst[syst_weight].items():
-                            if v.cut(ret):
-                                v.fill(ret, weight)
+                bufs["event"][0] = event.evt
+                bufs["run"][0] = event.run
+                bufs["lumi"][0] = event.lumi
+                bufs["systematic"][0] = iSyst
+                bufs["mem"][0] = ret["common_mem"]
+                bufs["bdt"][0] = ret["common_bdt"]
+                bufs["is_sl"][0] = event.is_sl
+                bufs["is_dl"][0] = event.is_dl
+                bufs["is_fh"][0] = event.is_fh
+                bufs["numJets"][0] = event.numJets
+                bufs["nBCSVM"][0] = event.nBCSVM
+                bufs["btag_LR_4b_2b"][0] = ret["btag_LR_4b_2b_btagCSV_logit"]
+
+                outtree.Fill()
+
+                if analysis.config.getboolean("sparsinator", "do_sparse_hist"):
+                    #Fill the base histogram
+                    for (k, v) in outdict_syst[syst].items():
+                        weight = ret["weight_nominal"]
+                        if v.cut(ret):
+                            v.fill(ret, weight)
+                    
+                    
+                    #nominal event, fill also histograms with systematic weights
+                    if syst == "nominal" and schema == "mc":
+                        for (syst_weight, weightfunc) in systematic_weights:
+                            weight = weightfunc(ret)
+                            for (k, v) in outdict_syst[syst_weight].items():
+                                if v.cut(ret):
+                                    v.fill(ret, weight)
 
             #end of loop over event systematics
         #end of loop over events
@@ -845,12 +989,21 @@ if __name__ == "__main__":
         an_name, analysis = analysisFromConfig(os.environ.get("ANALYSIS_CONFIG",))
 
     else:
-        file_names = map(getSitePrefix, [
-            "/store/user/jpata/tth/Sep14_leptonic_nome_v1/ttHTobb_M125_13TeV_powheg_pythia8/Sep14_leptonic_nome_v1/160914_142604/0000/tree_1.root"
-        ])
+        file_names = [
+            'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_694.root', 'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_695.root',
+            'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_696.root', 'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_697.root',
+            'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_698.root', 'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_699.root',
+            'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_7.root', 'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_70.root',
+            'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_700.root', 'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_701.root',
+            'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_702.root', 'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_703.root',
+            'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_704.root', 'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_705.root',
+            'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_706.root', 'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_707.root',
+            'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_708.root', 'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_709.root',
+            'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_71.root', 'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_710.root'
+        ] 
         prefix = ""
-        sample = "ttHTobb_M125_13TeV_powheg_pythia8"
+        sample = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
         skip_events = 0
-        max_events = 5000
+        max_events = 40000
         an_name, analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/Plotting/python/Datacards/config_sldl.cfg")
     main(analysis, file_names, sample, "out.root", skip_events, max_events)

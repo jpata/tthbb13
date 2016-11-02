@@ -2,6 +2,7 @@ import os
 import ConfigParser
 from itertools import izip
 
+from TTH.MEAnalysis import samples_base
 from TTH.MEAnalysis.samples_base import get_files, getSitePrefix
 
 # From:
@@ -60,6 +61,12 @@ class Sample(object):
         if self.debug:
             self.file_names = self.file_names[:self.debug_max_files]
         self.ngen = int(kwargs.get("ngen"))
+        self.xsec = kwargs.get("xsec")
+        
+        #temporary workaround for old way of specifying xs in python file
+        if not self.xsec:
+            self.xsec = samples_base.xsec_sample[self.name]
+
         self.classifier_db_path = kwargs.get("classifier_db_path")
         self.skim_file = kwargs.get("skim_file")
 
@@ -74,18 +81,17 @@ class Sample(object):
             is_data = config.get(sample_name, "is_data"),
             step_size_sparsinator = config.get(sample_name, "step_size_sparsinator"),
             debug_max_files = config.get(sample_name, "debug_max_files"),
-            ngen = config.get(sample_name, "ngen"),
+            ngen = config.getfloat(sample_name, "ngen"),
             classifier_db_path = config.get(sample_name, "classifier_db_path", None),
             skim_file = config.get(sample_name, "skim_file", None),
+            xsec = config.getfloat(sample_name, "xsec"),
         )
         return sample
 
     def updateConfig(self, config):
-        for field in [
-            "files_load", "schema", "is_data", "step_size_sparsinator",
-            "process", "skim_file",
-            "debug_max_files", "ngen", "classifier_db_path"
-            ]:
+        for field in dir(self):
+            if field.startswith("__"):
+                continue
             config.set(self.name, field, str(getattr(self, field)))
 
 class Process(object):
@@ -167,6 +173,15 @@ class Category:
         )
         return s
 
+    # Define equality via the representation string
+    def __eq__(self,other):
+        return self.__repr__() == other.__repr__()
+
+    # hash(object) = hash(representation(object))
+    def __hash__(self):
+        return self.__repr__().__hash__()
+
+
 class Analysis:
     def __init__(self, **kwargs):
         self.config = kwargs.get("config")
@@ -174,6 +189,7 @@ class Analysis:
         self.samples = kwargs.get("samples", [])
         self.cuts = kwargs.get("cuts", {})
         self.processes = kwargs.get("processes")
+        self.processes_unsplit = kwargs.get("processes_unsplit")
         self.categories = kwargs.get("categories")
         self.sparse_input_file = kwargs.get("sparse_input_file")
 

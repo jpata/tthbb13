@@ -51,8 +51,8 @@ crabFiles_pfn = copy.deepcopy(PSet.process.source.fileNames)
 ###
 ### Convert LFN to PFN
 ###
-#in case of ignoreLocality = True
-#for i in xrange(0,len(crabFiles)) :
+##in case of ignoreLocality = True
+#for i in xrange(0, len(crabFiles)) :
 #    crabFiles[i]="root://cms-xrd-global.cern.ch/"+crabFiles[i]
 print "--------------- using edmFileUtil to convert PFN to LFN -------------------------"
 for i in xrange(0,len(crabFiles)) :
