@@ -9,7 +9,6 @@ import ConfigParser
 
 version = "Aug11"
 samples_dict = {
- 
         "DoubleEG": cms.PSet(
             name     = cms.string("DoubleEG"),
             nickname = cms.string("DoubleEG"),

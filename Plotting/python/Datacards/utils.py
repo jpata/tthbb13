@@ -1,6 +1,97 @@
 #!/usr/bin/env python
 import ROOT
-import sys, imp, os, copy
+import os
+
+import math
+from collections import OrderedDict
+
+class NestedDict(OrderedDict):
+    def __getitem__(self, key):
+        if key in self:
+            return self.get(key)
+        return self.setdefault(key, NestedDict())
+
+def get_bins(hist):
+    """Returns the (bin, error) data corresponding to a histogram
+    
+    Args:
+        hist (TH1D): Input histogram
+    
+    Returns:
+        dictionary (string -> (float, float)): Description
+    """
+    ret = OrderedDict()
+    for ibin in range(1, hist.GetNbinsX()+1):
+        ret["bin_{0}".format(ibin)] = (hist.GetBinContent(ibin), hist.GetBinError(ibin))
+    return ret
+
+def bins_to_category(data):
+    """Given a nested dictionary of data[category][sample][sytematic][bin] -> bin data,
+    creates per-bin categories
+    
+    Args:
+        data (dict): bin data in a nested dict as [category][sample][sytematic][bin]
+    
+    Returns:
+        dict: a dictionary of [bin category][sample][systematic]
+    """
+    ret = NestedDict()
+    for cat in data.keys():
+        for samp in data[cat].keys():
+            for syst in data[cat][samp].keys():
+                bins = data[cat][samp][syst]
+                for b in bins.keys():
+                    ret[(cat, b)][samp][syst] = bins[b]
+    return ret
+
+def reduce_dict(nd, func):
+    """Given a dictionary of key -> val and a reduction function, produces
+    a dictionary of key -> func(val)
+    
+    Args:
+        nd (dict): Input dictionary
+        func (TYPE): Reduction method that maps input dictionary values to output values 
+    
+    Returns:
+        dict: output dictionary
+    """
+    ret = OrderedDict()
+    for k in nd.keys():
+        ret[k] = func(nd[k])
+    return ret
+
+def sum_sig_bkg(cat, samples_sig, samples_bkg):
+    res = OrderedDict()
+    res["sig"] = 0.0
+    res["bkg"] = 0.0
+    res["other"] = 0.0
+    for samp, data in cat.items():
+        if samp in samples_sig:
+            k2 = "sig"
+        elif samp in samples_bkg:
+            k2 = "bkg"
+        else:
+            k2 = "other"
+
+        res[k2] += data["nominal"][0]
+    res["sob"] = -1
+    if res["bkg"]>0:
+        res["sob"] = res["sig"]/math.sqrt(res["bkg"])
+    res.pop("sig")
+    res.pop("bkg")
+    return res["sob"]
+
+def make_hist(name, cat, sob_data, nbins=10, lo=0, hi=0.5):
+    nb = len(cat)
+    h = ROOT.TH1D(name, name, nbins, lo, hi)
+    for i in range(nb):
+        sob = sob_data[i]
+        ibin = h.FindBin(sob)
+        b = h.GetBinContent(ibin)
+        e = h.GetBinError(ibin)
+        h.SetBinContent(ibin, b+cat[i][0])
+        h.SetBinError(ibin, math.sqrt(e**2 + cat[i][1]**2))
+    return h
 
 def PrintDatacard(categories, event_counts, filenames, dcof):
     number_of_bins = len(categories)

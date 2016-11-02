@@ -592,7 +592,9 @@ if __name__ == "__main__":
         all_jobs = []
 
         for cat in analysis.categories:
-
+            outpath = os.path.abspath("/".join([workdir, plots, cat.name, cat.discriminator]))
+            if not os.path.exists(outpath):
+                os.makedirs(outpath)
             all_jobs += [
                 qmain.enqueue_call(
                     func=plot,
