@@ -1,0 +1,25 @@
+<bin   file="MakePostFitPlotsFWlite.cc" name="MakePostFitPlotsFWlite">
+ <use   name="DataFormats/FWLite"/>
+ <use   name="FWCore/FWLite"/>
+ <use   name="FWCore/PythonParameterSet"/>
+ <use   name="FWCore/Framework"/> 
+ <use   name="FWCore/MessageLogger"/>
+ <use   name="FWCore/Utilities"/>
+ <use   name="FWCore/ParameterSet"/>
+ <use   name="PhysicsTools/FWLite"/>
+ <use   name="PhysicsTools/Utilities"/>
+ <use   name="PhysicsTools/CandUtils"/>
+ <use   name="PhysicsTools/SelectorUtils"/>
+ <use   name="CommonTools/Utils"/>
+ <use   name="root"/>
+ <use   name="roostats"/>
+ <use   name="rootgraphics"/>
+ <use   name="roofit"/>
+ <use   name="rootminuit"/>
+ <use   name="rootminuit2"/>
+ <use   name="roottmva"/>
+ <use   name="classlib"/>
+ <use   name="boost"/>
+ <use   name="lhapdf"/>
+ <use   name="fastjet"/>
+</bin>

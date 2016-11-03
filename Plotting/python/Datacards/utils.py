@@ -5,6 +5,8 @@ import os
 import math
 from collections import OrderedDict
 
+import numpy as np
+
 class NestedDict(OrderedDict):
     def __getitem__(self, key):
         if key in self:
@@ -76,21 +78,36 @@ def sum_sig_bkg(cat, samples_sig, samples_bkg):
         res[k2] += data["nominal"][0]
     res["sob"] = -1
     if res["bkg"]>0:
-        res["sob"] = res["sig"]/math.sqrt(res["bkg"])
+        res["sob"] = res["sig"]/res["bkg"]
     res.pop("sig")
     res.pop("bkg")
-    return res["sob"]
+    res.pop("other")
+    res["sob_log"] = -10000
+    if res["sob"] > 0:
+        res["sob_log"] = np.log10(res["sob"])
+    return res["sob_log"]
 
 def make_hist(name, cat, sob_data, nbins=10, lo=0, hi=0.5):
     nb = len(cat)
     h = ROOT.TH1D(name, name, nbins, lo, hi)
+    ks = cat.keys()
     for i in range(nb):
         sob = sob_data[i]
         ibin = h.FindBin(sob)
         b = h.GetBinContent(ibin)
         e = h.GetBinError(ibin)
-        h.SetBinContent(ibin, b+cat[i][0])
-        h.SetBinError(ibin, math.sqrt(e**2 + cat[i][1]**2))
+        h.SetBinContent(ibin, b+cat[ks[i]][0])
+        h.SetBinError(ibin, math.sqrt(e**2 + cat[ks[i]][1]**2))
+    return h
+
+def make_hist_bins(name, cat, sob_data, nbins=10, lo=0, hi=0.5):
+    nb = len(cat)
+    h = ROOT.TH1D(name, name, nb, 0, nb)
+    ks = cat.keys()
+    for i in range(nb):
+        h.SetBinContent(i + 1, cat[ks[i]][0])
+        h.SetBinError(i + 1, cat[ks[i]][1])
+        h.GetXaxis().SetBinLabel(i + 1, "_".join(list(ks[i])))
     return h
 
 def PrintDatacard(categories, event_counts, filenames, dcof):
