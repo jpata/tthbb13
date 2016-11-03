@@ -173,9 +173,9 @@ void getShapesAndNorms(RooAbsPdf *pdf, const RooArgSet &obs, std::map<std::strin
 
 
 void getNormalizations(RooAbsPdf *pdf, const RooArgSet &obs, RooArgSet &out, 
-		       NuisanceSampler & sampler, 
-		       TDirectory *fOut, 
-		       const std::string &postfix) {
+               NuisanceSampler & sampler, 
+               TDirectory *fOut, 
+               const std::string &postfix) {
 
   // fill in a map
   std::map<std::string,ShapeAndNorm> snm;
@@ -198,10 +198,10 @@ void getNormalizations(RooAbsPdf *pdf, const RooArgSet &obs, RooArgSet &out,
     for (IT it = snm.begin(), ed = snm.end(); it != ed; ++it) {
       TDirectory *& sub = shapesByChannel[it->second.channel];
       if (sub == 0){
-	if( shapeDir->GetDirectory( it->second.channel.c_str() )==0 )
-	  sub = shapeDir->mkdir(it->second.channel.c_str());
-	else
-	  sub = shapeDir->GetDirectory( it->second.channel.c_str() );
+    if( shapeDir->GetDirectory( it->second.channel.c_str() )==0 )
+      sub = shapeDir->mkdir(it->second.channel.c_str());
+    else
+      sub = shapeDir->GetDirectory( it->second.channel.c_str() );
       }
     }
   }
@@ -222,33 +222,33 @@ void getNormalizations(RooAbsPdf *pdf, const RooArgSet &obs, RooArgSet &out,
       hist->SetDirectory(shapesByChannel[pair->second.channel]);
       shapes[i] = hist;
       if ( true ) {
-	shapes2[i] = (TH1*) hist->Clone();
-	shapes2[i]->SetDirectory(0);
-	shapes2[i]->Reset();
-	bins[i] = hist->GetNbinsX();
-	TH1 *&htot = totByCh[pair->second.channel];
-	if (htot == 0) {
-	  htot = (TH1*) hist->Clone();
-	  htot->SetName("total");
-	  htot->SetDirectory(shapesByChannel[pair->second.channel]);
-	  TH1 *htot2 = (TH1*) hist->Clone(); htot2->Reset();
-	  htot2->SetDirectory(0);
-	  totByCh2[pair->second.channel] = htot2;
-	} else {
-	  htot->Add(hist);
-	}
-	sig[i] = pair->second.signal;
-	TH1 *&hpart = (sig[i] ? sigByCh : bkgByCh)[pair->second.channel];
-	if (hpart == 0) {
-	  hpart = (TH1*) hist->Clone();
-	  hpart->SetName((sig[i] ? "total_signal" : "total_background"));
-	  hpart->SetDirectory(shapesByChannel[pair->second.channel]);
-	  TH1 *hpart2 = (TH1*) hist->Clone(); hpart2->Reset();
-	  hpart2->SetDirectory(0);
-	  (sig[i] ? sigByCh2 : bkgByCh2)[pair->second.channel] = hpart2;
-	} else {
-	  hpart->Add(hist);
-	}
+    shapes2[i] = (TH1*) hist->Clone();
+    shapes2[i]->SetDirectory(0);
+    shapes2[i]->Reset();
+    bins[i] = hist->GetNbinsX();
+    TH1 *&htot = totByCh[pair->second.channel];
+    if (htot == 0) {
+      htot = (TH1*) hist->Clone();
+      htot->SetName("total");
+      htot->SetDirectory(shapesByChannel[pair->second.channel]);
+      TH1 *htot2 = (TH1*) hist->Clone(); htot2->Reset();
+      htot2->SetDirectory(0);
+      totByCh2[pair->second.channel] = htot2;
+    } else {
+      htot->Add(hist);
+    }
+    sig[i] = pair->second.signal;
+    TH1 *&hpart = (sig[i] ? sigByCh : bkgByCh)[pair->second.channel];
+    if (hpart == 0) {
+      hpart = (TH1*) hist->Clone();
+      hpart->SetName((sig[i] ? "total_signal" : "total_background"));
+      hpart->SetDirectory(shapesByChannel[pair->second.channel]);
+      TH1 *hpart2 = (TH1*) hist->Clone(); hpart2->Reset();
+      hpart2->SetDirectory(0);
+      (sig[i] ? sigByCh2 : bkgByCh2)[pair->second.channel] = hpart2;
+    } else {
+      hpart->Add(hist);
+    }
       }
     }
   }
@@ -269,49 +269,49 @@ void getNormalizations(RooAbsPdf *pdf, const RooArgSet &obs, RooArgSet &out,
       // randomize numbers
       params->assignValueOnly( sampler.get(t) );
       for (pair = bg, i = 0; pair != ed; ++pair, ++i) { 
-	// add up deviations in numbers for each channel
-	sumx2[i] += std::pow(pair->second.norm->getVal() - vals[i], 2);  
-	if ( true && pair->second.obs.getSize() == 1) {
-	  // and also deviations in the shapes
-	  RooRealVar *x = (RooRealVar*)pair->second.obs.at(0);
-	  std::auto_ptr<TH1> hist(pair->second.pdf->createHistogram(pair->second.pdf->GetName(), *x));
-	  hist->Scale(pair->second.norm->getVal() / hist->Integral("width"));
-	  for (int b = 1; b <= bins[i]; ++b) {
-	    shapes2[i]->AddBinContent(b, std::pow(hist->GetBinContent(b) - shapes[i]->GetBinContent(b), 2));
-	  }
-	  // and cumulate in the total for this toy as well
-	  totByCh1[pair->second.channel]->Add(&*hist);
-	  (sig[i] ? sigByCh1 : bkgByCh1)[pair->second.channel]->Add(&*hist);
-	}
+    // add up deviations in numbers for each channel
+    sumx2[i] += std::pow(pair->second.norm->getVal() - vals[i], 2);  
+    if ( true && pair->second.obs.getSize() == 1) {
+      // and also deviations in the shapes
+      RooRealVar *x = (RooRealVar*)pair->second.obs.at(0);
+      std::auto_ptr<TH1> hist(pair->second.pdf->createHistogram(pair->second.pdf->GetName(), *x));
+      hist->Scale(pair->second.norm->getVal() / hist->Integral("width"));
+      for (int b = 1; b <= bins[i]; ++b) {
+        shapes2[i]->AddBinContent(b, std::pow(hist->GetBinContent(b) - shapes[i]->GetBinContent(b), 2));
+      }
+      // and cumulate in the total for this toy as well
+      totByCh1[pair->second.channel]->Add(&*hist);
+      (sig[i] ? sigByCh1 : bkgByCh1)[pair->second.channel]->Add(&*hist);
+    }
       }
       // now add up the deviations in this toy
       for (IH h = totByCh1.begin(), eh = totByCh1.end(); h != eh; ++h) {
-	TH1 *target = totByCh2[h->first], *reference = totByCh[h->first];
-	for (int b = 1, nb = target->GetNbinsX(); b <= nb; ++b) {
-	  target->AddBinContent(b, std::pow(h->second->GetBinContent(b) - reference->GetBinContent(b), 2));
-	}
+    TH1 *target = totByCh2[h->first], *reference = totByCh[h->first];
+    for (int b = 1, nb = target->GetNbinsX(); b <= nb; ++b) {
+      target->AddBinContent(b, std::pow(h->second->GetBinContent(b) - reference->GetBinContent(b), 2));
+    }
       }
       for (IH h = sigByCh1.begin(), eh = sigByCh1.end(); h != eh; ++h) {
-	TH1 *target = sigByCh2[h->first], *reference = sigByCh[h->first];
-	for (int b = 1, nb = target->GetNbinsX(); b <= nb; ++b) {
-	  target->AddBinContent(b, std::pow(h->second->GetBinContent(b) - reference->GetBinContent(b), 2));
-	}
+    TH1 *target = sigByCh2[h->first], *reference = sigByCh[h->first];
+    for (int b = 1, nb = target->GetNbinsX(); b <= nb; ++b) {
+      target->AddBinContent(b, std::pow(h->second->GetBinContent(b) - reference->GetBinContent(b), 2));
+    }
       }           
       for (IH h = bkgByCh1.begin(), eh = bkgByCh1.end(); h != eh; ++h) {
-	TH1 *target = bkgByCh2[h->first], *reference = bkgByCh[h->first];
-	for (int b = 1, nb = target->GetNbinsX(); b <= nb; ++b) {
-	  target->AddBinContent(b, std::pow(h->second->GetBinContent(b) - reference->GetBinContent(b), 2));
-	}
+    TH1 *target = bkgByCh2[h->first], *reference = bkgByCh[h->first];
+    for (int b = 1, nb = target->GetNbinsX(); b <= nb; ++b) {
+      target->AddBinContent(b, std::pow(h->second->GetBinContent(b) - reference->GetBinContent(b), 2));
+    }
       }           
     } // end of the toy loop
     // now take square roots and such
     for (pair = bg, i = 0; pair != ed; ++pair, ++i) {
       sumx2[i] = sqrt(sumx2[i]/ntoys);
       if (shapes2[i]) {
-	for (int b = 1; b <= bins[i]; ++b) {
-	  shapes[i]->SetBinError(b, std::sqrt(shapes2[i]->GetBinContent(b)/ntoys));
-	}
-	delete shapes2[i]; shapes2[i] = 0;
+    for (int b = 1; b <= bins[i]; ++b) {
+      shapes[i]->SetBinError(b, std::sqrt(shapes2[i]->GetBinContent(b)/ntoys));
+    }
+    delete shapes2[i]; shapes2[i] = 0;
       }
       
     }
@@ -319,21 +319,21 @@ void getNormalizations(RooAbsPdf *pdf, const RooArgSet &obs, RooArgSet &out,
     for (IH h = totByCh.begin(), eh = totByCh.end(); h != eh; ++h) {
       TH1 *sum2 = totByCh2[h->first];
       for (int b = 1, nb = sum2->GetNbinsX(); b <= nb; ++b) {
-	h->second->SetBinError(b, std::sqrt(sum2->GetBinContent(b)/ntoys));
+    h->second->SetBinError(b, std::sqrt(sum2->GetBinContent(b)/ntoys));
       }
       delete sum2; delete totByCh1[h->first];
     }
     for (IH h = sigByCh.begin(), eh = sigByCh.end(); h != eh; ++h) {
       TH1 *sum2 = sigByCh2[h->first];
       for (int b = 1, nb = sum2->GetNbinsX(); b <= nb; ++b) {
-	h->second->SetBinError(b, std::sqrt(sum2->GetBinContent(b)/ntoys));
+    h->second->SetBinError(b, std::sqrt(sum2->GetBinContent(b)/ntoys));
       }
       delete sum2; delete sigByCh1[h->first];
     }
     for (IH h = bkgByCh.begin(), eh = bkgByCh.end(); h != eh; ++h) {
       TH1 *sum2 = bkgByCh2[h->first];
       for (int b = 1, nb = sum2->GetNbinsX(); b <= nb; ++b) {
-	h->second->SetBinError(b, std::sqrt(sum2->GetBinContent(b)/ntoys));
+    h->second->SetBinError(b, std::sqrt(sum2->GetBinContent(b)/ntoys));
       }
       delete sum2; delete bkgByCh1[h->first];
     }
