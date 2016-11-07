@@ -4,163 +4,119 @@ from collections import OrderedDict
 
 from sparse import save_hdict
 from utils import bins_to_category, reduce_dict, make_hist, make_hist_bins
-from representations import KIT_SL_v13_DatacardRepresentation, DESY_DL_v13_DatacardRepresentation
+from representations import KIT_SL_v13_DatacardRepresentation, DESY_DL_v13_DatacardRepresentation, CombineRepresentation
 
-def convert_categories_to_sob(datacard_representation, infile, outfile, sob_hi):
-    """Given an input datacard file that contains all the categories and final discriminants,
-    create a signal-over-background sorted plot of all the bins.
-    
-    Args:
-        infile (string): Input file, should contain TH1D-s for each category
-            $ rootls /mnt/t3nfs01/data01/shome/jpata/tth/datacards/v13/common/ttH_hbb_13TeV_sl.root | grep "^ttH_hbb" | grep final | head -n5
-            ttH_hbb_finaldiscr_ljets_j4_t2
-            ttH_hbb_finaldiscr_ljets_j4_t2_CMS_res_jDown
-            ttH_hbb_finaldiscr_ljets_j4_t2_CMS_res_jUp
-            ttH_hbb_finaldiscr_ljets_j4_t2_CMS_scale_jDown
-            ttH_hbb_finaldiscr_ljets_j4_t2_CMS_scale_jUp
-            ...
-
-        outfile (TYPE): Description
-        sob_hi (float): high value of SoB histogram
-    Returns:
-        TYPE: Description
-    """
-    nd = datacard_representation.get_representation(
-        infile
-    )
-
-
-    print("categories in file")
-    for cat in sorted(datacard_representation.all_categories):
-        print(" " + cat)
-
-    print("samples in file")
-    for samp in sorted(datacard_representation.all_samples):
-        print(" " + samp)
-
-    print("systematics in file")
-    for syst in sorted(datacard_representation.all_systematics):
-        print(" " + syst)
-
-    #create individual categories from bins
-    nd2 = bins_to_category(nd)
-
-    #create a dictionary with [bin category] -> signal over background value
-    ret = reduce_dict(
-        nd2,
-        datacard_representation.calculate_signal_over_background
-    )
-
-    bins_sorted = sorted(ret.keys(), key=lambda x: ret[x], reverse=False)
-    sob_data = [ret[b] for b in bins_sorted]
-
-    #print best bins
-    print("Best bins by SoB are")
-    for bs in bins_sorted[-10:]:
-        print(" {0} {1}".format(bs, ret[bs]))
-
-    #create the [sample][systematic][bin category] -> (bin, error) dict
-    #such that sample information is aggregated
-    nd3 = OrderedDict()
-    for samp in sorted(datacard_representation.all_samples):
-        nd3[samp] = OrderedDict()
-        for syst in datacard_representation.all_systematics:
-            nd3[samp][syst] = OrderedDict()
-            for cat, b in bins_sorted:
-                if not nd[cat][samp].has_key(syst):
-                    nd3[samp][syst][(cat, b)] = (0.0, 0.0)
-                else:
-                    nd3[samp][syst][(cat, b)] = nd[cat][samp][syst][b]
-
-
-    #convert bins to histogram with name={sample}_sob_{systematic}
-    hists = OrderedDict()
-    for samp in nd3.keys():
-        for syst in nd3[samp].keys():
-            name = "_".join([samp, "sob", syst])
-            if len(nd3[samp][syst]) > 0:
-                name = name.replace("_nominal", "")
-                hists[name] = make_hist(
-                    name,
-                    nd3[samp][syst].values(),
-                    sob_data,
-                    nbins=20,
-                    lo=0.0,
-                    hi=sob_hi
-                )
-
-    print("saving {0} histograms".format(
-        len(hists)
-    ))
-    save_hdict(outfile, hists)
+import numpy as np
 
 if __name__ == "__main__":
+    
+    path = "/Users/joosep/Documents/datacards_v13/"
+
+    dcard_repr = CombineRepresentation()
+    hists = dcard_repr.get_representation(path + "mlfitNamesShapes.root")
 
     dcard_repr_sl = KIT_SL_v13_DatacardRepresentation()
-
     nd_tot = OrderedDict()
     nd = dcard_repr_sl.get_representation(
-        "/mnt/t3nfs01/data01/shome/jpata/tth/datacards/v13/common/ttH_hbb_13TeV_sl.root"
+        path + "/common/ttH_hbb_13TeV_sl.root"
     )
-    for k in sorted(nd.keys()):
-        print("sl cat {0}".format(k))
     nd_tot.update(nd)
-    nd2_sl = bins_to_category(nd)
-    for k1 in sorted(nd2_sl.keys()):
-        for k2 in sorted(nd2_sl[k1].keys()):
-            for k3 in sorted(nd2_sl[k1][k2].keys()):
-                print("sl bincat {0} {1} {2}".format(k1, k2, k3))
+
+    # nd2_sl = bins_to_category(nd)
 
     dcard_repr_dl = DESY_DL_v13_DatacardRepresentation()
 
     nd = dcard_repr_dl.get_representation(
-        "/mnt/t3nfs01/data01/shome/jpata/tth/datacards/v13/common/ttH_hbb_13TeV_dl.root"
+        path + "/common/ttH_hbb_13TeV_dl.root"
     )
-    for k in sorted(nd.keys()):
-        print("dl cat {0}".format(k))
     nd_tot.update(nd)
-    nd2_dl = bins_to_category(nd)
-    for k1 in sorted(nd2_dl.keys()):
-        for k2 in sorted(nd2_dl[k1].keys()):
-            for k3 in sorted(nd2_dl[k1][k2].keys()):
-                print("dl bincat {0} {1} {2}".format(k1, k2, k3))
 
-    print(nd2_sl.keys())
-    print(nd2_dl.keys())
+    category_mapper = {
+        'dl_3j3t': 'dl_j3_t3_BDT',
+        'dl_ge4j3t_high': 'dl_gej4_t3_high_BDT',
+        'dl_ge4j3t_low': 'dl_gej4_t3_low_BDT',
+        'dl_ge4jge4t_high': 'dl_gej4_get4_high_BDT',
+        'dl_ge4jge4t_low': 'dl_gej4_get4_low_BDT',
+        'sl_j4_t4_high': 'finaldiscr_ljets_j4_t4_high',
+        'sl_j4_t4_low': 'finaldiscr_ljets_j4_t4_low',
+        'sl_j5_tge4_high': 'finaldiscr_ljets_j5_tge4_high',
+        'sl_j5_tge4_low': 'finaldiscr_ljets_j5_tge4_low',
+        'sl_jge6_t3_high': 'finaldiscr_ljets_jge6_t3_high',
+        'sl_jge6_t3_low': 'finaldiscr_ljets_jge6_t3_low',
+        'sl_jge6_tge4_high': 'finaldiscr_ljets_jge6_tge4_high',
+        'sl_jge6_tge4_low': 'finaldiscr_ljets_jge6_tge4_low',
+    }
 
-    ret_sl = reduce_dict(
-        nd2_sl,
-        dcard_repr_sl.calculate_signal_over_background
+    # histo_binning = np.array([
+    #     -2.4,
+    #     -2.3,
+    #     -2.2,
+    #     -2.1,
+    #     -2.0,
+    #     -1.9,
+    #     -1.8,
+    #     -1.7,
+    #     -1.6,
+    #     -1.5,
+    #     -1.4,
+    #     -1.3,
+    #     -1.2,
+    #     -1.1,
+    #     -1.0,
+    #     -0.9,
+    #     -0.8,
+    #     -0.6,
+    #     -0.4,
+    #     -0.2
+    # ])
+
+    histo_binning = np.array([
+        -2.4,
+        -2.2,
+        -2.0,
+        -1.8,
+        -1.6,
+        -1.4,
+        -1.2,
+        -1.0,
+        -0.8,
+        -0.6,
+        -0.4,
+        -0.2
+    ])
+
+    for cat in hists.keys():
+        hists[cat]["data_obs"] = OrderedDict()
+        hists[cat]["data_obs"]["shapes_prefit"] = nd_tot[category_mapper[cat]]["data_obs"]["nominal"]
+        for samp in hists[cat].keys():
+            for syst in hists[cat][samp].keys():
+                old_d = hists[cat][samp][syst]
+                new_d = OrderedDict()
+                for ibin in range(1, len(hists[cat]["data_obs"]["shapes_prefit"]) + 1):
+                    label = "bin_{0}".format(ibin)
+                    new_d[label] = old_d[label]
+                hists[cat][samp][syst] = new_d
+
+    bins = bins_to_category(hists)
+    bins_sob = reduce_dict(
+        bins,
+        dcard_repr.calculate_signal_over_background
     )
-
-    ret_dl = reduce_dict(
-        nd2_dl,
-        dcard_repr_dl.calculate_signal_over_background
-    )
-
-    ret_tot = OrderedDict()
-    ret_tot.update(ret_sl)
-    ret_tot.update(ret_dl)
-
-    bins_sorted = sorted(ret_tot.keys(), key=lambda x: ret_tot[x], reverse=False)
-    sob_data = [ret_tot[b] for b in bins_sorted]
-
+    bins_sorted = sorted(bins_sob.keys(), key=lambda x: bins_sob[x], reverse=False)
+    sob_data = [bins_sob[b] for b in bins_sorted]
     print("Best bins by SoB are")
     for bs in bins_sorted[-10:]:
-        print(" {0} {1:.4f}".format(bs, ret_tot[bs]))
+        print(" {0} {1:.4f}".format(bs, bins_sob[bs]))
 
     nd3 = OrderedDict()
-    for samp in sorted(set(dcard_repr_sl.all_samples + dcard_repr_dl.all_samples)):
+    for samp in ["total_signal", "total_background", "data_obs"]:
         nd3[samp] = OrderedDict()
-        for syst in set(dcard_repr_sl.all_systematics + dcard_repr_dl.all_systematics):
+        for syst in ["shapes_prefit", "shapes_fit_s", "shapes_fit_b"]:
             nd3[samp][syst] = OrderedDict()
+            if not hists[cat][samp].has_key(syst):
+                continue
             for cat, b in bins_sorted:
-                if nd_tot[cat].has_key(samp):
-                    if not nd_tot[cat][samp].has_key(syst):
-                        nd3[samp][syst][(cat, b)] = (0.0, 0.0)
-                    else:
-                        nd3[samp][syst][(cat, b)] = nd_tot[cat][samp][syst][b]
-
+                nd3[samp][syst][(cat, b)] = hists[cat][samp][syst][b]
 
     #convert bins to histogram with name={sample}_sob_{systematic}
     hists = OrderedDict()
@@ -173,35 +129,17 @@ if __name__ == "__main__":
                     name,
                     nd3[samp][syst],
                     sob_data,
-                    nbins=20,
-                    lo=-4,
-                    hi=0.0
+                    histo_binning
                 )
+    # for samp in nd3.keys():
+    #     for syst in nd3[samp].keys():
+    #         name = "_".join([samp, "bins", syst])
+    #         if len(nd3[samp][syst]) > 0:
+    #             name = name.replace("_nominal", "")
+    #             hists[name] = make_hist_bins(
+    #                 name,
+    #                 nd3[samp][syst],
+    #                 sob_data,
+    #             )
 
-    for samp in nd3.keys():
-        for syst in nd3[samp].keys():
-            name = "_".join([samp, "bins", syst])
-            if len(nd3[samp][syst]) > 0:
-                name = name.replace("_nominal", "")
-                hists[name] = make_hist_bins(
-                    name,
-                    nd3[samp][syst],
-                    sob_data,
-                    nbins=20,
-                    lo=-4,
-                    hi=0.0
-                )
-
-    print("saving {0} histograms".format(
-            len(hists)
-        ))
     save_hdict("sob.root", hists)
-    # infile = 
-    # outfile = "sob_sl.root"
-    # convert_categories_to_sob(dcard_repr, infile, outfile, 1.0)
-
-    # dcard_repr = DESY_DL_v13_DatacardRepresentation()
-    # infile = "/mnt/t3nfs01/data01/shome/jpata/tth/datacards/v13/common/ttH_hbb_13TeV_dl.root"
-    # outfile = "sob_dl.root"
-    # convert_categories_to_sob(dcard_repr, infile, outfile, 0.5)
-    

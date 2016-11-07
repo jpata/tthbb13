@@ -358,7 +358,7 @@ def fill_overflow(hist):
     hist.SetBinError(nb+1, 0)
 
 
-def getHistograms(tf, samples, hname, pattern="{sample}/{hname}"):
+def getHistograms(tf, samples, hname, pattern="{sample}/{hname}", rename_func=lambda x: x):
 
     hs = OrderedDict()
     for sample, sample_name in samples:
@@ -366,11 +366,14 @@ def getHistograms(tf, samples, hname, pattern="{sample}/{hname}"):
             h = tf.get(pattern.format(sample=sample, hname=hname)).Clone()
         except rootpy.io.file.DoesNotExist as e:
             continue
-        hs[sample] = rootpy.asrootpy(h)
+        if not hs.has_key(rename_func(sample)):
+            hs[rename_func(sample)] = rootpy.asrootpy(h)
+        else:
+            hs[rename_func(sample)] += rootpy.asrootpy(h)
     for sample, sample_name in samples:
         if not hs.has_key(sample):
             if len(hs)>0:
-                hs[sample] = rootpy.asrootpy(0.0*hs.values()[0].Clone())
+                hs[rename_func(sample)] = rootpy.asrootpy(0.0*hs.values()[0].Clone())
             else:
                 return hs
     return hs
@@ -400,7 +403,8 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
     xunit = kwargs.get("xunit", "XUNIT")
     ylabel = kwargs.get("ylabel", "auto")
     rebin = kwargs.get("rebin", 1)
-    title_extended = kwargs.get("title_extended", "")
+
+    rename_func = kwargs.get("rename_func", lambda x: x)
 
     #legend properties
     do_legend = kwargs.get("do_legend", True)
@@ -424,15 +428,15 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
     #e.g.[("_CMS_scale_jUp", "_CMS_scale_jDown")]
     systematics = kwargs.get("systematics", [])
 
-    histograms_nominal = getHistograms(tf, processes, hname, pattern=pattern)
+    histograms_nominal = getHistograms(tf, processes, hname, pattern=pattern, rename_func=rename_func)
     if len(histograms_nominal) == 0:
         raise KeyError("did not find any histograms for MC")
 
     histograms_systematic = OrderedDict()
     #get the systematically variated histograms
     for systUp, systDown in systematics:
-        histograms_systematic[systUp] = getHistograms(tf, processes, hname+systUp, pattern=pattern)
-        histograms_systematic[systDown] = getHistograms(tf, processes, hname+systDown, pattern=pattern)
+        histograms_systematic[systUp] = getHistograms(tf, processes, hname+systUp, pattern=pattern, rename_func=rename_func)
+        histograms_systematic[systDown] = getHistograms(tf, processes, hname+systDown, pattern=pattern, rename_func=rename_func)
         if len(histograms_systematic[systUp])==0 or len(histograms_systematic[systDown])==0:
             print "Could not read histograms for {0}".format(hname+systUp)
 

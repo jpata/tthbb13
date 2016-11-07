@@ -4,6 +4,8 @@ from collections import OrderedDict
 
 from utils import sum_sig_bkg, get_bins
 
+import numpy as np
+
 class DatacardRepresentation(object):
     def __init__(self, samples_sig=[], samples_bkg=[]):
         self.samples_sig = samples_sig
@@ -56,7 +58,7 @@ class DatacardRepresentation(object):
         cats = set([])
         samps = set([])
         systs = set([])
-        for k in histograms.keys():
+        for k in sorted(histograms.keys()):
             samp, cat, syst = self.get_key(k)
             if not self.filter_key((samp, cat, syst)):
                 continue
@@ -200,6 +202,53 @@ class DESY_DL_v13_DatacardRepresentation(DatacardRepresentation):
             samp = rest
             syst = "nominal"
         return samp, cat, syst
+
+class CombineRepresentation(DatacardRepresentation):
+    def __init__(self):
+        super(CombineRepresentation, self).__init__(
+            samples_sig = [
+                'total_signal'
+            ],
+            samples_bkg = [
+                'total_background'
+            ]
+        )
+
+    def get_all_histograms(self, infile):
+        fi = ROOT.TFile(infile)
+        ROOT.gROOT.cd()
+        all_histograms = {}
+        for shape_dir in ["shapes_fit_s", "shapes_fit_b", "shapes_prefit"]:
+            sdir = fi.Get(shape_dir)
+            cats = [k.GetName() for k in sdir.GetListOfKeys()]
+            for cat in cats:
+                cat_dir = sdir.Get(cat)
+                hists = [k for k in cat_dir.GetListOfKeys()]
+                for h in hists:
+                    if h.GetName() in self.samples_sig+self.samples_bkg:
+                        name = "{0}/{1}/{2}".format(
+                            shape_dir,
+                            cat,
+                            h.GetName()
+                        )
+                        all_histograms[name] = h.ReadObj().Clone()
+        fi.Close()
+        return all_histograms
+
+    def get_key(self, name):
+        syst, cat, samp = name.split("/")
+        return samp, cat, syst
+
+    def filter_hist(self, name):
+        return not "total_covar" in name
+
+    def calculate_signal_over_background(self, data):
+        ret = -100000
+        if data["total_background"]["shapes_prefit"][0] > 0:
+            ret = np.log10(
+                data["total_signal"]["shapes_prefit"][0] / data["total_background"]["shapes_prefit"][0]
+            )
+        return ret
 
 all_representations = {
     "KIT_SL_v13_DatacardRepresentation": KIT_SL_v13_DatacardRepresentation,

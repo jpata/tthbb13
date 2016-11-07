@@ -23,8 +23,11 @@ def get_bins(hist):
         dictionary (string -> (float, float)): Description
     """
     ret = OrderedDict()
-    for ibin in range(1, hist.GetNbinsX()+1):
-        ret["bin_{0}".format(ibin)] = (hist.GetBinContent(ibin), hist.GetBinError(ibin))
+    for ibin in range(1, hist.GetNbinsX() + 1):
+        ret["bin_{0}".format(ibin)] = (
+            hist.GetBinContent(ibin),
+            hist.GetBinError(ibin)
+        )
     return ret
 
 def bins_to_category(data):
@@ -87,9 +90,9 @@ def sum_sig_bkg(cat, samples_sig, samples_bkg):
         res["sob_log"] = np.log10(res["sob"])
     return res["sob_log"]
 
-def make_hist(name, cat, sob_data, nbins=10, lo=0, hi=0.5):
+def make_hist(name, cat, sob_data, bins):
     nb = len(cat)
-    h = ROOT.TH1D(name, name, nbins, lo, hi)
+    h = ROOT.TH1D(name, name, len(bins), bins)
     ks = cat.keys()
     for i in range(nb):
         sob = sob_data[i]
