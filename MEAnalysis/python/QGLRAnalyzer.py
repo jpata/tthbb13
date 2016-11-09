@@ -20,11 +20,11 @@ class QGLRAnalyzer(FilterAnalyzer):
         for x in ["q","g"]:
             if (x=="q"):
                 self.qgl_flavour_pdfs[x] = self.qglplots_flavour.Get(
-                    "hflavour_qgl_0_3"
+                    "histo3D_quark"
                 )
             else:
                 self.qgl_flavour_pdfs[x] = self.qglplots_flavour.Get(
-                    "hflavour_qgl_0_0"
+                    "histo3D_gluon"
                 )
             self.qgl_flavour_pdfs[x].Scale(1.0 / self.qgl_flavour_pdfs[x].Integral())
 
@@ -43,7 +43,7 @@ class QGLRAnalyzer(FilterAnalyzer):
             qgl = 1.0
       
         if (kind == "flavour"):        
-            nb = h.FindBin(qgl)
+            nb = h.FindBin(qgl,pt,eta)
             ret = h.GetBinContent(nb)
         return ret
 

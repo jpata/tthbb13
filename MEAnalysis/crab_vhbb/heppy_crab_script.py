@@ -6,6 +6,7 @@ import PhysicsTools.HeppyCore.framework.config as cfg
 cfg.Analyzer.nosubdir=True
 import PSet
 args = sys.argv
+print args
 if "--test" in sys.argv:
     import PSet_test as PSet
 

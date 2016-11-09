@@ -81,8 +81,8 @@ if __name__ == "__main__":
             if ds_name in ds_list:
                 dupe = True
             ds_list += [ds_name]
-        if dupe:
-            raise Exception("Found duplicate datasets, please disambiguate manually")
+        #if dupe:
+        #    raise Exception("Found duplicate datasets, please disambiguate manually")
     else:
         datasets = filter(
             lambda x: len(x)>0,

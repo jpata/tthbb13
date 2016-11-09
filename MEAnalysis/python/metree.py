@@ -578,7 +578,10 @@ def getTreeProducer(conf):
             ("cat_btag",            int,        "ME category (b-tag)", "cat_btag_n"),
             ("cat_gen",             int,        "top decay category (-1 unknown, 0 single-leptonic, 1 di-leptonic, 2 fully hadronic)", "cat_gen_n"),
             ("btag_lr_4b",          float,      "4b, N-4 light, probability, 3D binning"),
+            ("btag_lr_3b",          float,      "3b, N-3 light, probability, 3D binning"),
             ("btag_lr_2b",          float,      "2b, N-2 Nlight probability, 3D binning"),
+            ("btag_lr_1b",          float,      "1b, N-1 Nlight probability, 3D binning"),
+            ("btag_lr_0b",          float,      "0b, N   Nlight probability, 3D binning"),
             #("btag_lr_4b_Rndge4t",  float,      "4b, N-4 light, probability, 3D binning, ge4t random"),
             #("btag_lr_2b_Rndge4t",  float,      "2b, N-2 Nlight probability, 3D binning, ge4t random"),
             #("btag_lr_4b_Inpge4t",  float,      "4b, N-4 light, probability, 3D binning, ge4t input"),
@@ -600,6 +603,10 @@ def getTreeProducer(conf):
             ("btag_LR_3b_2b_btagCMVA_log",        float,      ""),
             ("btag_LR_3b_2b_btagCMVA",        float,      ""),
             ("btag_LR_3b_2b_btagCSV",        float,      ""),
+
+            ("btag_LR_geq2b_leq1b_btagCMVA_log",        float,      ""),
+            ("btag_LR_geq2b_leq1b_btagCMVA",        float,      ""),
+            ("btag_LR_geq2b_leq1b_btagCSV",        float,      ""),
 
             #("btag_LR_4b_2b_ded",        float,      ""),
             #("btag_LR_4b_2b_Rndge4t",float,      ""),

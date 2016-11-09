@@ -126,14 +126,18 @@ class BTagLRAnalyzer(FilterAnalyzer):
         btag_likelihood_ratio_results = {}
         btag_likelihood_ratio_results_4b_3b = {}
         btag_likelihood_ratio_results_3b_2b = {}
+        btag_likelihood_ratio_results_geq2b_leq1b = {}
         for btagalgo in btagalgos:
             btag_lr_4b, best_4b_perm = self.btag_likelihood2(jet_probs[btagalgo], 4)
             btag_lr_3b, best_3b_perm = self.btag_likelihood2(jet_probs[btagalgo], 3)
             btag_lr_2b, best_2b_perm = self.btag_likelihood2(jet_probs[btagalgo], 2)
-            btag_likelihood_results[btagalgo] = (btag_lr_4b, btag_lr_2b, best_4b_perm, best_2b_perm, btag_lr_3b, best_3b_perm)
+            btag_lr_1b, best_1b_perm = self.btag_likelihood2(jet_probs[btagalgo], 1)
+            btag_lr_0b, best_0b_perm = self.btag_likelihood2(jet_probs[btagalgo], 0)
+            btag_likelihood_results[btagalgo] = (btag_lr_4b, btag_lr_2b, best_4b_perm, best_2b_perm, btag_lr_3b, best_3b_perm, btag_lr_1b, best_1b_perm, btag_lr_0b, best_0b_perm)
             btag_likelihood_ratio_results[btagalgo] = self.lratio(btag_lr_4b, btag_lr_2b)
             btag_likelihood_ratio_results_4b_3b[btagalgo] = self.lratio(btag_lr_4b, btag_lr_3b)
             btag_likelihood_ratio_results_3b_2b[btagalgo] = self.lratio(btag_lr_3b, btag_lr_2b)
+            btag_likelihood_ratio_results_geq2b_leq1b[btagalgo] = self.lratio(max(btag_lr_4b,btag_lr_3b,btag_lr_2b), max(btag_lr_1b,btag_lr_0b))
             setattr(event, "jet_perm_btag_lr_" + btagalgo,
                 [event.good_jets.index(j) for j in jets_for_btag_lr[btagalgo]]
             )
@@ -146,10 +150,15 @@ class BTagLRAnalyzer(FilterAnalyzer):
             setattr(event,
                 "btag_LR_3b_2b_" + btagalgo, btag_likelihood_ratio_results_3b_2b[btagalgo]
             )
+            setattr(event,
+                "btag_LR_geq2b_leq1b_" + btagalgo, btag_likelihood_ratio_results_geq2b_leq1b[btagalgo]
+            )
         #default btagger used
         event.btag_lr_4b = btag_likelihood_results[self.default_bTagAlgo][0]
         event.btag_lr_3b = btag_likelihood_results[self.default_bTagAlgo][4]
         event.btag_lr_2b = btag_likelihood_results[self.default_bTagAlgo][1]
+        event.btag_lr_1b = btag_likelihood_results[self.default_bTagAlgo][6]
+        event.btag_lr_0b = btag_likelihood_results[self.default_bTagAlgo][8]
         event.btag_LR_4b_2b = btag_likelihood_ratio_results[self.default_bTagAlgo]
         event.btag_LR_4b_3b = btag_likelihood_ratio_results_4b_3b[self.default_bTagAlgo]
         event.btag_LR_3b_2b = btag_likelihood_ratio_results_3b_2b[self.default_bTagAlgo]

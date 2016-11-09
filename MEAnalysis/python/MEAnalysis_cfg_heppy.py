@@ -125,7 +125,7 @@ class Conf:
 
     jets = {
         # pt, |eta| thresholds for **leading two jets** (common between sl and dl channel)
-        "pt":   30,
+        "pt":   25, ## FIXME: to put back to 30 GeV
         "eta":  2.4,
 
         # pt, |eta| thresholds for **leading jets** specific to sl channel
@@ -185,10 +185,12 @@ class Conf:
     general = {
         "passall": False,
         "QGLtoDo": {
+            #eg. 3:[(3,0)] means "evalute qg likelihood ratio of 3 quarks vs 0 quarks, considering only light jets, in events with 3 b-jets"
             3:[(3,0),(3,2),(4,0),(4,3),(5,4)], 
             4:[(3,0),(3,2),(4,0),(4,3)] },
         "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/ControlPlotsJul13.root",
-        "QGLPlotsFile_flavour": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/Histos_QGL_flavour.root",
+#        "QGLPlotsFile_flavour": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/Histos_QGL_flavour.root",
+        "QGLPlotsFile_flavour": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/QGL_3dPlot.root",
         "sampleFile": os.environ["CMSSW_BASE"]+"/python/TTH/MEAnalysis/samples.py",
         "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions.pickle",
         "transferFunctions_sj_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions_sj.pickle",

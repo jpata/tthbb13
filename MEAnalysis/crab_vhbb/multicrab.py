@@ -23,7 +23,9 @@ workflows = [
     "localtesting_withme", #run combined jobs locally
     "testing_withme", #single-lumi jobs, a few samples
     "allmc_nome", # SL, DL and FH, no matrix element
-    "testing_hadronic_withme" #single-lumi jobs, a few samples   
+    "testing_hadronic_withme", #single-lumi jobs, a few samples   
+    "fh_test", #fully hadronic test
+    "fh_nome" #fully hadronic samples without matrix element
 ]
 
 import argparse
@@ -65,19 +67,19 @@ sets_data = [
 #    "/MuonEG/Run2016E-PromptReco-v2/MINIAOD",
 #    "/MuonEG/Run2016F-PromptReco-v2/MINIAOD",
 
-#    "/SingleElectron/Run2016B-PromptReco-v1/MINIAOD",
-#    "/SingleElectron/Run2016B-PromptReco-v2/MINIAOD",
-#    "/SingleElectron/Run2016C-PromptReco-v2/MINIAOD",
-#    "/SingleElectron/Run2016D-PromptReco-v2/MINIAOD",
-#    "/SingleElectron/Run2016E-PromptReco-v2/MINIAOD",
-#    "/SingleElectron/Run2016F-PromptReco-v2/MINIAOD",
+    "/SingleElectron/Run2016B-PromptReco-v1/MINIAOD",
+    "/SingleElectron/Run2016B-PromptReco-v2/MINIAOD",
+    "/SingleElectron/Run2016C-PromptReco-v2/MINIAOD",
+    "/SingleElectron/Run2016D-PromptReco-v2/MINIAOD",
+    "/SingleElectron/Run2016E-PromptReco-v2/MINIAOD",
+    "/SingleElectron/Run2016F-PromptReco-v2/MINIAOD",
 
-#    "/SingleMuon/Run2016B-PromptReco-v1/MINIAOD",
-#    "/SingleMuon/Run2016B-PromptReco-v2/MINIAOD",
-#    "/SingleMuon/Run2016C-PromptReco-v2/MINIAOD",
-#    "/SingleMuon/Run2016D-PromptReco-v2/MINIAOD",
-#    "/SingleMuon/Run2016E-PromptReco-v2/MINIAOD",
-#    "/SingleMuon/Run2016F-PromptReco-v2/MINIAOD",
+    "/SingleMuon/Run2016B-PromptReco-v1/MINIAOD",
+    "/SingleMuon/Run2016B-PromptReco-v2/MINIAOD",
+    "/SingleMuon/Run2016C-PromptReco-v2/MINIAOD",
+    "/SingleMuon/Run2016D-PromptReco-v2/MINIAOD",
+    "/SingleMuon/Run2016E-PromptReco-v2/MINIAOD",
+    "/SingleMuon/Run2016F-PromptReco-v2/MINIAOD",
 
     "/BTagCSV/Run2016B-PromptReco-v1/MINIAOD",
     "/BTagCSV/Run2016B-PromptReco-v2/MINIAOD",
@@ -550,8 +552,6 @@ for k in datasets.keys():
         D = deepcopy(datasets[k])
         workflow_datasets["data_leptonic"][k] = D
 
-
-
 workflow_datasets["hadronic"] = {}
 for k in datasets.keys():
     if "QCD" in k or "ttH" in k or "TTbar_inc" in k:
@@ -559,6 +559,24 @@ for k in datasets.keys():
         D["mem_cfg"] = me_cfgs["hadronic"]
 #        D["maxlumis"] = 1
         workflow_datasets["hadronic"][k] = D
+
+workflow_datasets["fh_test"] = {}
+for k in datasets.keys():
+    if "QCD700_ext1" in k or "ttHTobb_tranche3" in k or "JetHT-Run2016F-PromptReco-v1" in k:
+        D = deepcopy(datasets[k])
+#        D["mem_cfg"] = me_cfgs["hadronic"]
+        D["mem_cfg"] = me_cfgs["nome"]
+        D["maxlumis"] = 1000
+        workflow_datasets["fh_test"][k] = D
+
+workflow_datasets["fh_nome"] = {}
+for k in datasets.keys():
+    if ("QCD" in k) or (k in ["ttHTobb", "ttHToNonbb", "TTbar_inc"]) or ("data" in datasets[k]["script"]):
+        D = deepcopy(datasets[k])
+#        D["mem_cfg"] = me_cfgs["hadronic"]
+        D["mem_cfg"] = me_cfgs["nome"]
+#        D["maxlumis"] = 1000
+        workflow_datasets["fh_nome"][k] = D
 
 workflow_datasets["QCD_nome"] = {}
 for k in datasets.keys():
@@ -702,7 +720,7 @@ env
 
     config.JobType.pluginName = 'Analysis'
     config.JobType.psetName = 'heppy_crab_fake_pset.py'
-    config.JobType.maxMemoryMB = 2000
+    config.JobType.maxMemoryMB = 3000
 
     import os
     os.system("tar czf python.tar.gz --directory $CMSSW_BASE python `find $CMSSW_BASE/src -name python | perl -pe s#$CMSSW_BASE/## `")
@@ -792,4 +810,3 @@ env
             except Exception as e:
                 print e
                 print "skipping"
-                                                                                                                                                                                                                   
