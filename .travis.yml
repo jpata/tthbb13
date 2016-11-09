@@ -1,9 +1,6 @@
-jpata/cmssw:CMSSW_8_0_19_tth
-
-
 sudo: required
 
-language: ruby
+language: python
 
 services:
   - docker
