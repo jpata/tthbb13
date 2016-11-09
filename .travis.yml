@@ -5,9 +5,9 @@ language: python
 services:
   - docker
 
-  before_install:
+before_install:
   - docker pull jpata/cmssw:CMSSW_8_0_19_tth
   - docker run --privileged -u 0 jpata/cmssw:CMSSW_8_0_19_tth ls /cvmfs/
 
-  script:
+script:
   - ls
