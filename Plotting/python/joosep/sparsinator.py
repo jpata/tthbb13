@@ -14,11 +14,6 @@ from TTH.Plotting.Datacards.sparse import save_hdict
 
 from TTH.CommonClassifier.db import ClassifierDB
 
-CvectorLorentz = getattr(ROOT, "std::vector<TLorentzVector>")
-Cvectordouble = getattr(ROOT, "std::vector<double>")
-CvectorJetType = getattr(ROOT, "std::vector<MEMClassifier::JetType>")
-
-
 def vec_from_list(vec_type, src):
     """
     Creates a std::vector<T> from a python list.
@@ -444,6 +439,11 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
     Raises:
         Exception: Description
     """
+
+    #need to import here, not in base, because needs special ROOT libraries
+    CvectorLorentz = getattr(ROOT, "std::vector<TLorentzVector>")
+    Cvectordouble = getattr(ROOT, "std::vector<double>")
+    CvectorJetType = getattr(ROOT, "std::vector<MEMClassifier::JetType>")
 
 
 

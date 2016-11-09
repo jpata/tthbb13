@@ -356,12 +356,13 @@ def fill_overflow(hist):
     hist.SetBinError(nb+1, 0)
 
 
-def getHistograms(tf, samples, hname):
+def getHistograms(tf, samples, hname, pattern="{sample}/{hname}"):
 
     hs = OrderedDict()
     for sample, sample_name in samples:
         try:
-            h = tf.get(sample + "/" + hname).Clone()
+            print pattern.format(sample=sample, hname=hname)
+            h = tf.get(pattern.format(sample=sample, hname=hname)).Clone()
         except rootpy.io.file.DoesNotExist as e:
             continue
         hs[sample] = rootpy.asrootpy(h)
@@ -415,20 +416,22 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
 
     #function f: TH1D -> TH1D to apply on data to blind it.
     blindFunc = kwargs.get("blindFunc", None)
+    
+    pattern = kwargs.get("pattern", "{sample}/{hname}")
 
     #array of up-down pairs for systematic names to use for the systematic band,
     #e.g.[("_CMS_scale_jUp", "_CMS_scale_jDown")]
     systematics = kwargs.get("systematics", [])
 
-    histograms_nominal = getHistograms(tf, processes, hname)
+    histograms_nominal = getHistograms(tf, processes, hname, pattern=pattern)
     if len(histograms_nominal) == 0:
         raise KeyError("did not find any histograms for MC")
 
     histograms_systematic = OrderedDict()
     #get the systematically variated histograms
     for systUp, systDown in systematics:
-        histograms_systematic[systUp] = getHistograms(tf, processes, hname+systUp)
-        histograms_systematic[systDown] = getHistograms(tf, processes, hname+systDown)
+        histograms_systematic[systUp] = getHistograms(tf, processes, hname+systUp, pattern=pattern)
+        histograms_systematic[systDown] = getHistograms(tf, processes, hname+systDown, pattern=pattern)
         if len(histograms_systematic[systUp])==0 or len(histograms_systematic[systDown])==0:
             print "Could not read histograms for {0}".format(hname+systUp)
 
