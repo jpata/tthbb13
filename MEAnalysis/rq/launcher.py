@@ -12,6 +12,7 @@ import time, os, sys
 import shutil
 from collections import Counter
 import uuid
+import cPickle as pickle
 
 import subprocess
 
@@ -22,8 +23,6 @@ from TTH.Plotting.Datacards.AnalysisSpecificationClasses import Analysis
 from TTH.Plotting.Datacards.MakeCategory import apply_rules_parallel, make_rules, make_datacard
 from TTH.Plotting.Datacards.sparse import add_hdict
 
-import pdb
-
 import TTH.Plotting.joosep.plotlib as plotlib #heplot, 
 
 import matplotlib
@@ -32,11 +31,6 @@ from matplotlib import rc
 rc('text', usetex=False)
 matplotlib.use('PS') #needed on T3
 import matplotlib.pyplot as plt
-
-import rootpy
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("main")
 
 #FIXME: configure all these via conf file!
 procs_names = [
@@ -50,7 +44,8 @@ procs_names = [
     ("diboson", "diboson"),
     ("stop", "single top"),
     ("ttv", "tt+V"),
-    ("wjets", "w+jets")
+    ("wjets", "w+jets"),
+    ("dy", "dy")
 ]
 procs = [x[0] for x in procs_names]
 
@@ -92,8 +87,13 @@ def kill_jobs():
                          stdout=subprocess.PIPE).communicate()       
     
 
-def start_jobs(queue, njobs, extra_requirements = []):
-    
+def start_jobs(queue, njobs, extra_requirements = [], redis_host=None, redis_port=None):
+
+    if redis_host is None:
+        redis_host = socket.gethostname()
+    if redis_port is None:
+        redis_port = 6379
+
     pwd = os.getcwd()
 
     qsub_command = ["qsub", 
@@ -107,6 +107,7 @@ def start_jobs(queue, njobs, extra_requirements = []):
         qsub_command += extra_requirements
 
     qsub_command.append("worker.sh")
+    qsub_command.append("redis://{0}:{1}".format(redis_host, redis_port))
 
     for _ in range(njobs):
         subprocess.Popen(qsub_command, 
@@ -158,18 +159,20 @@ def waitJobs(jobs, redis_conn, num_retries=0):
                 if job.meta["retries"] < num_retries:
                     job.meta["retries"] += 1
                     logger.info("requeueing job {0}".format(job.id))
+                    logger.error("job error: {0}".format(job.exc_info))
                     qfail.requeue(job.id)
                 else:
                     perm_failed += [job]
-                    print "job dict", job.__dict__
-                    import pdb
-                    pdb.set_trace()
                     raise Exception("job failed: {0}".format(job.exc_info))
             if job.status is None:
-                import pdb
-                pdb.set_trace()
                 raise Exception("Job status is None")
-
+            if job.status == "finished":
+                key = (job.func.func_name, job.meta["args"])
+                if job.meta["args"] != "": 
+                    hkey = hash(str(key))
+                    if not redis_conn.exists(hkey):
+                        logger.debug("setting key {0} in db".format(hkey))
+                        redis_conn.set(hkey, pickle.dumps(job.result))
         status = [j.status for j in jobs]
         status_counts = dict(Counter(status))
 
@@ -182,11 +185,11 @@ def waitJobs(jobs, redis_conn, num_retries=0):
             100.0 * status_counts.get("finished", 0) / sum(status_counts.values()),
         ))
 
-        if len(qfail)>0 or len(perm_failed)>0:
+        if len(perm_failed)>0:
             logger.error("--- fail queue has {0} items".format(len(qfail)))
             for job in qfail.jobs:
                 workflow_failed = True
-                logger.error("job {0}, call={1} failed with message:\n{2}".format(job.id, job.get_call_string(), job.exc_info))
+                logger.error("job {0} failed with message:\n{1}".format(job.id, job.exc_info))
                 qfail.remove(job.id)
         
         if status_counts.get("started", 0) == 0 and status_counts.get("queued", 0) == 0:
@@ -204,16 +207,44 @@ def waitJobs(jobs, redis_conn, num_retries=0):
     results = [j.result for j in jobs]
     return results
 
+class JobMemoize:
+    """
+    Fake job instance with manually configured properties
+    """
+    def __init__(self, result, func, args, meta):
+        self.result = result
+        self.status = "finished"
+        self.func = func
+        self.args = args
+        self.meta = meta
+
+def enqueue_memoize(queue, **kwargs):
+    """
+    Check if result already exists in redis DB and return it or compute it.
+    """
+    key = (kwargs.get("func").func_name, kwargs.get("meta")["args"])
+    hkey = hash(str(key))
+    logger.debug("checking for key {0} -> {1}".format(hkey, str(key)))
+    if redis_conn.exists(hkey):
+        res = pickle.loads(redis_conn.get(hkey))
+        logger.debug("found key {0}, res={1}".format(hkey, res))
+        return JobMemoize(res, kwargs.get("func"), kwargs.get("args"), kwargs.get("meta"))
+    else:
+        logger.debug("didn't find key, enqueueing")
+        return queue.enqueue_call(**kwargs)
+
 def getGeneratedEvents(sample):
     jobs = []
     for ijob, inputs in enumerate(chunks(sample.file_names, sample.step_size_sparsinator)):
         jobs += [
-            qmain.enqueue_call(
+            enqueue_memoize(
+                qmain,
                 func=count,
                 args=(inputs, ),
-                timeout=5*60*60,
-                result_ttl=5*60*60,
-                meta={"retries": 0}
+                timeout=2*60*60,
+                ttl=2*60*60,
+                result_ttl=2*60*60,
+                meta={"retries": 0, "args": str((inputs, ))}
             )
         ]
     logger.info("getGeneratedEvents: {0} jobs launched for sample {1}".format(len(jobs), sample.name))
@@ -226,13 +257,14 @@ def runSparsinator_async(config_path, sample, workdir):
             workdir, sample.name, ijob
         )
         jobs += [
-            qmain.enqueue_call(
+            enqueue_memoize(
+                qmain,
                 func=sparse,
                 args=(config_path, inputs, sample.name, ofname),
-                timeout=10*60*60,
-                ttl=10*60*60,
-                result_ttl=10*60*60,
-                meta={"retries": 2}
+                timeout=2*60*60,
+                ttl=2*60*60,
+                result_ttl=2*60*60,
+                meta={"retries": 2, "args": str((inputs, sample.name))}
             )
         ]
     logger.info("runSparsinator: {0} jobs launched for sample {1}".format(len(jobs), sample.name))
@@ -266,6 +298,13 @@ if __name__ == "__main__":
         default = socket.gethostname()
     )
     parser.add_argument(
+        '--port',
+        action = "store",
+        help = "Redis port",
+        type = int,
+        default = 6379
+    )
+    parser.add_argument(
         '--queue',
         action = "store",
         help = "Job queue",
@@ -290,7 +329,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Tell RQ what Redis connection to use
-    redis_conn = Redis(host=args.hostname)
+    redis_conn = Redis(host=args.hostname, port=args.port)
     qmain = Queue("default", connection=redis_conn)  # no args implies the default queue
     qfail = get_failed_queue(redis_conn)
     
@@ -310,7 +349,7 @@ if __name__ == "__main__":
     
     jobs = {}
     results = {}
-
+        
     ###
     ### NGEN
     ###
@@ -318,7 +357,7 @@ if __name__ == "__main__":
 
         if args.queue != "EXISTING":
             kill_jobs()
-            start_jobs(args.queue, args.njobs)
+            start_jobs(args.queue, args.njobs, [], args.hostname, args.port)
 
         logger.info("starting step NGEN")
         t0 = time.time()
@@ -373,7 +412,7 @@ if __name__ == "__main__":
 
         if args.queue != "EXISTING":
             kill_jobs()
-            start_jobs(args.queue, args.njobs, ["-l", "h_vmem=4G"])
+            start_jobs(args.queue, args.njobs, ["-l", "h_vmem=6G"], args.hostname, args.port)
 
         logger.info("starting step SPARSINATOR")
         t0 = time.time()
@@ -381,9 +420,9 @@ if __name__ == "__main__":
         results["sparse"] = []
 
         all_jobs = []
-        for ds in analysis.samples:
-            jobs["sparse"][ds] = runSparsinator_async(tmp_conf_name, ds, workdir)
-            all_jobs += jobs["sparse"][ds]
+        for sample in analysis.samples:
+            jobs["sparse"][sample] = runSparsinator_async(tmp_conf_name, sample, workdir)
+            all_jobs += jobs["sparse"][sample]
         logger.info("waiting on sparsinator jobs")
         waitJobs(all_jobs, redis_conn)
         #just in case to make sure NFS is synced
@@ -402,29 +441,30 @@ if __name__ == "__main__":
 
         if args.queue != "EXISTING":
             kill_jobs()
-            start_jobs(args.queue, args.njobs)
+            start_jobs(args.queue, args.njobs, [], args.hostname, args.port)
 
         all_jobs = []
+        jobs_by_sample = {}
         for ds in analysis.samples:
             ds_results = [os.path.abspath(job.result) for job in jobs["sparse"][ds]]
             logger.info("sparsemerge: submitting merge of {0} files for sample {1}".format(len(ds_results), ds.name))
-            all_jobs += [qmain.enqueue_call(
+            outfile = os.path.abspath("{0}/sparse/sparse_{1}.root".format(workdir, ds.name))
+            job = enqueue_memoize(
+                qmain,
                 func=mergeFiles,
-                args=(os.path.abspath("{0}/sparse/sparse_{1}.root".format(workdir, ds.name)), ds_results),
+                args=(outfile, ds_results),
                 timeout=20*60,
                 result_ttl=60*60,
-                meta={"retries": 0}
-            )]
+                meta={"retries": 0, "args": ds.name}
+            )
+            jobs_by_sample[ds.name] = job
+            all_jobs += [job]
         waitJobs(all_jobs, redis_conn)
         results["sparse"] = [j.result for j in all_jobs]
 
         logger.info("sparsemerge: merging final sparse out of {0} files".format(len(results["sparse"])))
-        results["sparse-merge"] = mergeFiles(
-            os.path.abspath("{0}/sparse/merged.root".format(workdir)),
-            results["sparse"],
-            remove_inputs = True
-        )
-        analysis.config.set("sparse_data", "infile", results["sparse-merge"])
+        results["sparse-merge"] = {k: v.result for (k, v) in jobs_by_sample.items()}
+        analysis.config.set("sparse_data", "infile", str(results["sparse-merge"]))
         with open(tmp_conf_name, "wb") as configfile:
             analysis.config.write(configfile)
 
@@ -449,39 +489,38 @@ if __name__ == "__main__":
 
         if args.queue != "EXISTING":
             kill_jobs()
-            start_jobs(args.queue, 300)
+            start_jobs(args.queue, 300, ["-l", "h_vmem=6G"], args.hostname, args.port)
 
         logger.info("starting step CATEGORIES")
         t0 = time.time()
 
-        logger.info("running categories on file {0}".format(results["sparse-merge"]))
-        analysis.sparse_input_file = results["sparse-merge"]
-
+        #analysis.sparse_input_file = results["sparse-merge"]
         os.makedirs("{0}/categories".format(workdir))
 
         all_jobs = []
         cat_jobs = {}
         for cat in analysis.categories:
+            logger.info("running category {0}".format(cat.full_name))
         
             cat.outdir = "{0}/categories/{1}/{2}".format(workdir, cat.name, cat.discriminator)
             if not os.path.exists(cat.outdir):
                 os.makedirs(cat.outdir)
             
-            rules = sorted(make_rules(analysis, [cat]), key=lambda x: x["input"])
-            logger.debug("made {0} rules for cat {1}".format(len(rules), cat.full_name))
             cat_jobs[cat] = []
-            for ijob, inputs in enumerate(chunks(rules, 50)):
-                logger.debug("enqueued {0} rules".format(len(inputs)))
-                cat_jobs[cat] += [
-                    qmain.enqueue_call(
+            for ds in analysis.samples:
+                rules = sorted(make_rules(analysis, results["sparse-merge"][ds.name], [cat], [p for p in cat.processes+cat.data_processes if p.input_name == ds.name]), key=lambda x: x["input"])
+                logger.debug("made {0} rules for cat {1}".format(len(rules), cat.full_name))
+                for ijob, inputs in enumerate(chunks(rules, 50)):
+                    logger.debug("enqueued {0} rules".format(len(inputs)))
+                    job = qmain.enqueue_call(
                         func=apply_rules_parallel,
-                        args=(results["sparse-merge"], inputs),
+                        args=(inputs, ),
                         timeout=20*60,
                         result_ttl=60*60,
-                        meta={"retries": 0}
+                        meta={"retries": 0, "args": ""}
                     )
-                ]
-            all_jobs += cat_jobs[cat]
+                    cat_jobs[cat] += [job]
+                    all_jobs += [job]
 
         waitJobs(all_jobs, redis_conn)
         t1 = time.time()
@@ -543,7 +582,7 @@ if __name__ == "__main__":
 
         if args.queue != "EXISTING":
             kill_jobs()
-            start_jobs(args.queue, args.njobs)
+            start_jobs(args.queue, args.njobs, [], args.hostname, args.port), 
 
         logger.info("starting step PLOTS")
         t0 = time.time()
@@ -553,7 +592,9 @@ if __name__ == "__main__":
         all_jobs = []
 
         for cat in analysis.categories:
-
+            outpath = os.path.abspath("/".join([workdir, plots, cat.name, cat.discriminator]))
+            if not os.path.exists(outpath):
+                os.makedirs(outpath)
             all_jobs += [
                 qmain.enqueue_call(
                     func=plot,
@@ -562,7 +603,7 @@ if __name__ == "__main__":
                                         "", cat.name, cat.discriminator)],
                     timeout=20*60,
                     result_ttl=60*60,
-                    meta={"retries": 0}
+                    meta={"retries": 0, "args": ""}
                 )
             ]
 
@@ -588,7 +629,7 @@ if __name__ == "__main__":
 
         if args.queue != "EXISTING":
             kill_jobs()
-            start_jobs(args.queue, args.njobs)
+            start_jobs(args.queue, args.njobs, [], args.hostname, args.port)
 
         logger.info("starting step LIMITS")
 
@@ -612,7 +653,7 @@ if __name__ == "__main__":
                           group],
                     timeout=40*60,
                     result_ttl=60*60,
-                    meta={"retries": 0})]
+                    meta={"retries": 0, "args": ""})]
             
         t0 = time.time()
         waitJobs(all_jobs, redis_conn)

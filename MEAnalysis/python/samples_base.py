@@ -128,6 +128,7 @@ PROCESS_MAP = {
 
     "ttbar_dl": 34,
     "dy_10_50": 35,
+    "dy_50_inf": 36,
 
 #need to keep different data samples separate at this point
     "data_e": 7,

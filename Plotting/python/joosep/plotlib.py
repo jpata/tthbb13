@@ -53,6 +53,7 @@ colors = {
     "ttH_nonhbb": (90, 115, 203),
     "diboson": (42, 100, 198),
     "wjets": (102, 201, 77),
+    "zjets": (102, 201, 77),
     "stop": (235, 73, 247),
     "ttv": (204, 204, 251),
     "qcd": (102, 201, 77),
@@ -63,6 +64,7 @@ colors = {
     "qcd_ht1000to1500" : (102, 201, 81),
     "qcd_ht1500to2000" : (102, 201, 82),
     "qcd_ht2000toinf"  : (102, 201, 83),
+    "dy": (251, 73, 255),
     "other": (251, 73, 255),
 }
 
@@ -356,20 +358,22 @@ def fill_overflow(hist):
     hist.SetBinError(nb+1, 0)
 
 
-def getHistograms(tf, samples, hname, pattern="{sample}/{hname}"):
+def getHistograms(tf, samples, hname, pattern="{sample}/{hname}", rename_func=lambda x: x):
 
     hs = OrderedDict()
     for sample, sample_name in samples:
         try:
-            print pattern.format(sample=sample, hname=hname)
             h = tf.get(pattern.format(sample=sample, hname=hname)).Clone()
         except rootpy.io.file.DoesNotExist as e:
             continue
-        hs[sample] = rootpy.asrootpy(h)
+        if not hs.has_key(rename_func(sample)):
+            hs[rename_func(sample)] = rootpy.asrootpy(h)
+        else:
+            hs[rename_func(sample)] += rootpy.asrootpy(h)
     for sample, sample_name in samples:
         if not hs.has_key(sample):
             if len(hs)>0:
-                hs[sample] = rootpy.asrootpy(0.0*hs.values()[0].Clone())
+                hs[rename_func(sample)] = rootpy.asrootpy(0.0*hs.values()[0].Clone())
             else:
                 return hs
     return hs
@@ -399,7 +403,8 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
     xunit = kwargs.get("xunit", "XUNIT")
     ylabel = kwargs.get("ylabel", "auto")
     rebin = kwargs.get("rebin", 1)
-    title_extended = kwargs.get("title_extended", "")
+
+    rename_func = kwargs.get("rename_func", lambda x: x)
 
     #legend properties
     do_legend = kwargs.get("do_legend", True)
@@ -423,15 +428,15 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
     #e.g.[("_CMS_scale_jUp", "_CMS_scale_jDown")]
     systematics = kwargs.get("systematics", [])
 
-    histograms_nominal = getHistograms(tf, processes, hname, pattern=pattern)
+    histograms_nominal = getHistograms(tf, processes, hname, pattern=pattern, rename_func=rename_func)
     if len(histograms_nominal) == 0:
         raise KeyError("did not find any histograms for MC")
 
     histograms_systematic = OrderedDict()
     #get the systematically variated histograms
     for systUp, systDown in systematics:
-        histograms_systematic[systUp] = getHistograms(tf, processes, hname+systUp, pattern=pattern)
-        histograms_systematic[systDown] = getHistograms(tf, processes, hname+systDown, pattern=pattern)
+        histograms_systematic[systUp] = getHistograms(tf, processes, hname+systUp, pattern=pattern, rename_func=rename_func)
+        histograms_systematic[systDown] = getHistograms(tf, processes, hname+systDown, pattern=pattern, rename_func=rename_func)
         if len(histograms_systematic[systUp])==0 or len(histograms_systematic[systDown])==0:
             print "Could not read histograms for {0}".format(hname+systUp)
 
@@ -487,7 +492,7 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
     #Get the data histogram
     data = None
     if dataname != "":
-        data = tf.get(dataname + "/" + hname)
+        data = tf.get(pattern.format(sample=dataname, hname=hname))
         data.rebin(rebin)
         if blindFunc:
             data = blindFunc(data)
@@ -573,7 +578,7 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
             color="gray", hatch=r"\\\\",
             alpha=1.0, linewidth=0, facecolor="none", edgecolor="gray", zorder=10,
         )
-        plt.title("data={0:.1f}\ MC={1:.1f}".format(
+        plt.title("data={0:.1f} MC={1:.1f}".format(
             data.Integral(),
             stacked_hists["tot"].Integral()
             ), x=0.01, y=0.8, fontsize=10, horizontalalignment="left"

@@ -13,6 +13,7 @@ import TTH.Plotting.joosep.sparsinator as sparsinator
 import tempfile, os
 import shutil
 from shutil import copyfile
+import glob
 
 import sys, os, copy
 from collections import OrderedDict
@@ -61,7 +62,11 @@ def sparse(config_path, filenames, sample, outfile):
 #    heplot.barhist(down, color="blue")
 
 
-def mergeFiles(outfile, infiles, remove_inputs=True):
+def mergeFiles(outfile, infiles, remove_inputs=False):
+    basepath = os.path.dirname(outfile)
+    if not os.path.isdir(basepath):
+        os.makedirs(basepath)
+
     if len(infiles) == 1:
         shutil.copy(infiles[0], outfile)
     else:
@@ -88,3 +93,13 @@ def plot(*kwargs):
 def makelimits(*args):
     #an_name, analysis = analysisFromConfig(args[1])
     return MakeLimits.main(*args)
+
+if __name__ == "__main__":
+    f = filter(
+        lambda x: x.endswith(".root"),
+        glob.glob("/mnt/t3nfs01/data01/shome/jpata/tth/sw/CMSSW/src/TTH/MEAnalysis/rq/results/ff7b3731-b583-42e0-961e-66f90d261cc1/sparse/TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/*.root")
+    )
+    mergeFiles(
+        "./sparse2.root",
+        f    
+    )
