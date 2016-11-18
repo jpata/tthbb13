@@ -218,6 +218,9 @@ class JobMemoize:
         self.args = args
         self.meta = meta
 
+def enqueue_nomemoize(queue, **kwargs):
+    return queue.enqueue_call(**kwargs)
+
 def enqueue_memoize(queue, **kwargs):
     """
     Check if result already exists in redis DB and return it or compute it.
@@ -237,7 +240,7 @@ def getGeneratedEvents(sample):
     jobs = []
     for ijob, inputs in enumerate(chunks(sample.file_names, sample.step_size_sparsinator)):
         jobs += [
-            enqueue_memoize(
+            enqueue_nomemoize(
                 qmain,
                 func=count,
                 args=(inputs, ),
@@ -257,7 +260,7 @@ def runSparsinator_async(config_path, sample, workdir):
             workdir, sample.name, ijob
         )
         jobs += [
-            enqueue_memoize(
+            enqueue_nomemoize(
                 qmain,
                 func=sparse,
                 args=(config_path, inputs, sample.name, ofname),
@@ -309,7 +312,7 @@ if __name__ == "__main__":
         action = "store",
         help = "Job queue",
         type = str,
-        default = "all.q"
+        default = "EXISTING"
     )
     parser.add_argument(
         '--start',
@@ -349,7 +352,7 @@ if __name__ == "__main__":
     
     jobs = {}
     results = {}
-        
+    
     ###
     ### NGEN
     ###
@@ -449,7 +452,7 @@ if __name__ == "__main__":
             ds_results = [os.path.abspath(job.result) for job in jobs["sparse"][ds]]
             logger.info("sparsemerge: submitting merge of {0} files for sample {1}".format(len(ds_results), ds.name))
             outfile = os.path.abspath("{0}/sparse/sparse_{1}.root".format(workdir, ds.name))
-            job = enqueue_memoize(
+            job = enqueue_nomemoize(
                 qmain,
                 func=mergeFiles,
                 args=(outfile, ds_results),
@@ -461,10 +464,12 @@ if __name__ == "__main__":
             all_jobs += [job]
         waitJobs(all_jobs, redis_conn)
         results["sparse"] = [j.result for j in all_jobs]
-
         logger.info("sparsemerge: merging final sparse out of {0} files".format(len(results["sparse"])))
-        results["sparse-merge"] = {k: v.result for (k, v) in jobs_by_sample.items()}
-        analysis.config.set("sparse_data", "infile", str(results["sparse-merge"]))
+        final_merge = os.path.abspath("{0}/merged.root".format(workdir))
+        mergeFiles(final_merge, results["sparse"])
+
+        results["sparse-merge"] = final_merge
+        #analysis.config.set("sparse_data", "infile", str(results["sparse-merge"]))
         with open(tmp_conf_name, "wb") as configfile:
             analysis.config.write(configfile)
 
@@ -478,65 +483,30 @@ if __name__ == "__main__":
 
         # If we skipped sparse, we would assume that the output is in
         # the same directory as the cfg file
-        results["sparse-merge"] = analysis.config.get("sparse_data", "infile")
+        #results["sparse-merge"] = analysis.config.get("sparse_data", "infile")
 
     
     ###
     ### CATEGORIES
     ###
-
     if starting_points.index(args.start) <= starting_points.index("categories"):
+        hdict = {}
 
-        if args.queue != "EXISTING":
-            kill_jobs()
-            start_jobs(args.queue, 300, ["-l", "h_vmem=6G"], args.hostname, args.port)
+        logging.info("Opening {0}".format(results["sparse-merge"]))
+        tf = ROOT.TFile(results["sparse-merge"])
+        ROOT.gROOT.cd()
+        for k in tf.GetListOfKeys():
 
-        logger.info("starting step CATEGORIES")
-        t0 = time.time()
+            #check if this is a valid histogram according to its name
+            if len(k.GetName().split("__")) >= 3:
+                hdict[k.GetName()] = k.ReadObj().Clone()
 
-        #analysis.sparse_input_file = results["sparse-merge"]
-        os.makedirs("{0}/categories".format(workdir))
-
-        all_jobs = []
-        cat_jobs = {}
+        #make all the datacards for all the categories
         for cat in analysis.categories:
-            logger.info("running category {0}".format(cat.full_name))
-        
-            cat.outdir = "{0}/categories/{1}/{2}".format(workdir, cat.name, cat.discriminator)
-            if not os.path.exists(cat.outdir):
-                os.makedirs(cat.outdir)
-            
-            cat_jobs[cat] = []
-            for ds in analysis.samples:
-                rules = sorted(make_rules(analysis, results["sparse-merge"][ds.name], [cat], [p for p in cat.processes+cat.data_processes if p.input_name == ds.name]), key=lambda x: x["input"])
-                logger.debug("made {0} rules for cat {1}".format(len(rules), cat.full_name))
-                for ijob, inputs in enumerate(chunks(rules, 50)):
-                    logger.debug("enqueued {0} rules".format(len(inputs)))
-                    job = qmain.enqueue_call(
-                        func=apply_rules_parallel,
-                        args=(inputs, ),
-                        timeout=20*60,
-                        result_ttl=60*60,
-                        meta={"retries": 0, "args": ""}
-                    )
-                    cat_jobs[cat] += [job]
-                    all_jobs += [job]
-
-        waitJobs(all_jobs, redis_conn)
-        t1 = time.time()
-        time.sleep(5)
-        dt = t1 - t0
-        logger.info("step CATEGORIES done in {0:.2f} seconds".format(dt))
-
-        logger.info("all done, len(qmain)={0} len(qfail)={1}".format(
-            len(qmain), len(qfail)
-        ))
-
-        for cat in analysis.categories:
-            hdict = {}
-            for job in cat_jobs[cat]:
-                hdict = add_hdict(hdict, job.result)
-            make_datacard(analysis, [cat], cat.outdir, hdict)
+            category_dir = "{0}/categories/{1}/{2}".format(workdir, cat.name, cat.discriminator.name)
+            logging.info("creating category to {0}".format(category_dir))
+            os.makedirs(category_dir)
+            make_datacard(analysis, [cat], category_dir, hdict)
 
         # hadd Results        
         cat_names = list(set([cat.name for cat in analysis.categories]))        
@@ -555,9 +525,9 @@ if __name__ == "__main__":
                                     stdout=subprocess.PIPE)        
 
         time.sleep(1) #NFS
-        # and tidy up
-        for cat_name in cat_names:                                                                
-            shutil.rmtree("{0}/categories/{1}".format(workdir, cat_name))
+#        # and tidy up
+#        for cat_name in cat_names:                                                                
+#            shutil.rmtree("{0}/categories/{1}".format(workdir, cat_name))
 
         results["categories-path"] = "{0}/categories".format(workdir)
 
@@ -592,7 +562,7 @@ if __name__ == "__main__":
         all_jobs = []
 
         for cat in analysis.categories:
-            outpath = os.path.abspath("/".join([workdir, plots, cat.name, cat.discriminator]))
+            outpath = os.path.abspath("/".join([workdir, "plots", cat.name, cat.discriminator.name]))
             if not os.path.exists(outpath):
                 os.makedirs(outpath)
             all_jobs += [
@@ -600,7 +570,7 @@ if __name__ == "__main__":
                     func=plot,
                     args=[get_base_plot(results["categories-path"], 
                                         os.path.join(workdir, "plots"),
-                                        "", cat.name, cat.discriminator)],
+                                        "", cat.name, cat.discriminator.name)],
                     timeout=20*60,
                     result_ttl=60*60,
                     meta={"retries": 0, "args": ""}

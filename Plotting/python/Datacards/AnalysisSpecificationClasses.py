@@ -2,6 +2,8 @@ import os
 import ConfigParser
 from itertools import izip
 
+import ROOT
+
 from TTH.MEAnalysis import samples_base
 from TTH.MEAnalysis.samples_base import get_files, getSitePrefix
 
@@ -118,11 +120,36 @@ class DataProcess(Process):
         super(DataProcess, self).__init__(self, *args, **kwargs)
         self.lumi = kwargs.get("lumi", 1.0)
 
+class Histogram:
+    def __init__(self, name, func, bins):
+        self.name = name
+        self.func = func
+        self.bins = bins
+
+    @staticmethod
+    def from_string(s):
+        name, func, bins = s.split()
+        return Histogram(name, func, bins)
+
+    def to_string(self):
+        return "{0} {1} {2}".format(self.name, self.func, self.bins)
+
+    def get_binning(self):
+        bs = self.bins.split(",")
+        if len(bs) == 3:
+            return int(bs[0]), float(bs[1]), float(bs[2])
+        else:
+            raise Exception("Unknown binning spec")
+
+    def get_TH1(self, name):
+        th = ROOT.TH1D(name, name, *self.get_binning())
+        return th
+
 class Category:
     def __init__(self, **kwargs):
         self.name = kwargs.get("name")
         self.discriminator = kwargs.get("discriminator")
-        self.full_name = "{0}_{1}".format(self.name, self.discriminator)
+        self.full_name = "{0}_{1}".format(self.name, self.discriminator.name)
         self.src_histogram = kwargs.get("src_histogram")
         self.rebin = kwargs.get("rebin", 1)
         self.do_limit = kwargs.get("do_limit", True)
@@ -191,7 +218,6 @@ class Analysis:
         self.processes = kwargs.get("processes")
         self.processes_unsplit = kwargs.get("processes_unsplit")
         self.categories = kwargs.get("categories")
-        self.sparse_input_file = kwargs.get("sparse_input_file")
 
         # groups represent calls to combine, i.e. 
         # {"myCombination1": ["cat1", "cat2"] }
@@ -209,7 +235,6 @@ class Analysis:
     
     def __repr__(self):
         s = "Analysis:\n"
-        s += "  input file: {0}\n".format(self.sparse_input_file)
         s += "  processes:\n"
         for proc in self.processes:
             s += "    {0}\n".format(proc)

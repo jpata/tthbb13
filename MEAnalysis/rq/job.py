@@ -42,14 +42,18 @@ def count(filenames):
 def sparse(config_path, filenames, sample, outfile):
     an_name, analysis = analysisFromConfig(config_path)
     temppath = os.path.join("/scratch/{0}/".format(os.environ["USER"]))
-    if not os.path.isdir(temppath): 
+    try:
         os.makedirs(temppath)
+    except OSError as e:
+        print e
     ofname = tempfile.mktemp(dir=temppath)
     sparsinator.main(analysis, filenames, sample, ofname)
 
     basepath = os.path.dirname(outfile)
-    if not os.path.isdir(basepath):
+    try:
         os.makedirs(basepath)
+    except OSError as e:
+        print e
 
     copy_rsync(ofname, outfile)
     os.remove(ofname)

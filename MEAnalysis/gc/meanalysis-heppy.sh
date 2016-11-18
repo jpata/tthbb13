@@ -20,8 +20,8 @@ cd $GC_SCRATCH
 
 # Make sure we process all events (as currently using file based splitting)
 # Change back if we go to event bases
-export SKIP_EVENTS=0
-export MAX_EVENTS=9999999999
+#export SKIP_EVENTS=0
+#export MAX_EVENTS=9999999999
 
 #print out the environment
 env

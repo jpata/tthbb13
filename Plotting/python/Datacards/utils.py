@@ -1,125 +1,17 @@
-#!/usr/bin/env python
-
 import ROOT
 import os
 
 import math
 from collections import OrderedDict
 
-import numpy as np
-
-class NestedDict(OrderedDict):
-    def __getitem__(self, key):
-        if key in self:
-            return self.get(key)
-        return self.setdefault(key, NestedDict())
-
-def get_bins(hist):
-    """Returns the (bin, error) data corresponding to a histogram
-    
-    Args:
-        hist (TH1D): Input histogram
-    
-    Returns:
-        dictionary (string -> (float, float)): Description
-    """
-    ret = OrderedDict()
-    for ibin in range(1, hist.GetNbinsX() + 1):
-        ret["bin_{0}".format(ibin)] = (
-            hist.GetBinContent(ibin),
-            hist.GetBinError(ibin)
-        )
-    return ret
-
-def bins_to_category(data):
-    """Given a nested dictionary of data[category][sample][sytematic][bin] -> bin data,
-    creates per-bin categories
-    
-    Args:
-        data (dict): bin data in a nested dict as [category][sample][sytematic][bin]
-    
-    Returns:
-        dict: a dictionary of [bin category][sample][systematic]
-    """
-    ret = NestedDict()
-    for cat in data.keys():
-        for samp in data[cat].keys():
-            for syst in data[cat][samp].keys():
-                bins = data[cat][samp][syst]
-                for b in bins.keys():
-                    ret[(cat, b)][samp][syst] = bins[b]
-    return ret
-
-def reduce_dict(nd, func):
-    """Given a dictionary of key -> val and a reduction function, produces
-    a dictionary of key -> func(val)
-    
-    Args:
-        nd (dict): Input dictionary
-        func (TYPE): Reduction method that maps input dictionary values to output values 
-    
-    Returns:
-        dict: output dictionary
-    """
-    ret = OrderedDict()
-    for k in nd.keys():
-        ret[k] = func(nd[k])
-    return ret
-
-def sum_sig_bkg(cat, samples_sig, samples_bkg):
-    res = OrderedDict()
-    res["sig"] = 0.0
-    res["bkg"] = 0.0
-    res["other"] = 0.0
-    for samp, data in cat.items():
-        if samp in samples_sig:
-            k2 = "sig"
-        elif samp in samples_bkg:
-            k2 = "bkg"
-        else:
-            k2 = "other"
-
-        res[k2] += data["nominal"][0]
-    res["sob"] = -1
-    if res["bkg"]>0:
-        res["sob"] = res["sig"]/res["bkg"]
-    res.pop("sig")
-    res.pop("bkg")
-    res.pop("other")
-    res["sob_log"] = -10000
-    if res["sob"] > 0:
-        res["sob_log"] = np.log10(res["sob"])
-    return res["sob_log"]
-
-def make_hist(name, cat, sob_data, bins):
-    nb = len(cat)
-    h = ROOT.TH1D(name, name, len(bins), bins)
-    ks = cat.keys()
-    for i in range(nb):
-        sob = sob_data[i]
-        ibin = h.FindBin(sob)
-        b = h.GetBinContent(ibin)
-        e = h.GetBinError(ibin)
-        h.SetBinContent(ibin, b+cat[ks[i]][0])
-        h.SetBinError(ibin, math.sqrt(e**2 + cat[ks[i]][1]**2))
-    return h
-
-def make_hist_bins(name, cat, sob_data, nbins=10, lo=0, hi=0.5):
-    nb = len(cat)
-    h = ROOT.TH1D(name, name, nb, 0, nb)
-    ks = cat.keys()
-    for i in range(nb):
-        h.SetBinContent(i + 1, cat[ks[i]][0])
-        h.SetBinError(i + 1, cat[ks[i]][1])
-        h.GetXaxis().SetBinLabel(i + 1, "_".join(list(ks[i])))
-    return h
+import logging
 
 def PrintDatacard(categories, event_counts, filenames, dcof):
     number_of_bins = len(categories)
-    number_of_backgrounds = len(list(set(reduce(lambda x,y:x+y, [c.out_processes for c in categories], [])))) - 1 
+    number_of_backgrounds = len(list(set(reduce(lambda x,y:x+y, [c.out_processes for c in categories], [])))) - 1
     analysis_categories = list(set([c.name for c in categories]))
 
-    
+
     dcof.write("imax {0}\n".format(number_of_bins))
     dcof.write("jmax {0}\n".format(number_of_backgrounds))
     dcof.write("kmax *\n")
@@ -132,7 +24,7 @@ def PrintDatacard(categories, event_counts, filenames, dcof):
             os.path.basename(filenames[cat.name]),
             analysis_var)
         )
-        
+
     dcof.write("---------------\n")
 
     dcof.write("bin\t" +  "\t".join(analysis_categories) + "\n")
@@ -144,7 +36,7 @@ def PrintDatacard(categories, event_counts, filenames, dcof):
     processes_1 = []
     rates       = []
 
-    # Conversion: 
+    # Conversion:
     # Example: ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8_hbb -> ttH_hbb
 
     for cat in categories:
@@ -161,9 +53,9 @@ def PrintDatacard(categories, event_counts, filenames, dcof):
     dcof.write("process\t"+"\t".join(processes_1)+"\n")
     dcof.write("rate\t"+"\t".join(rates)+"\n")
     dcof.write("---------------\n")
-    
-    
-    
+
+
+
     # Gather all shape uncerainties
     all_shape_uncerts = []
     all_scale_uncerts = []
@@ -174,7 +66,7 @@ def PrintDatacard(categories, event_counts, filenames, dcof):
     # Uniquify
     all_shape_uncerts = sorted(list(set(all_shape_uncerts)))
     all_scale_uncerts = sorted(list(set(all_scale_uncerts)))
-    
+
     for syst in all_shape_uncerts:
         dcof.write(syst + "\t shape \t")
         for cat in categories:
@@ -186,7 +78,7 @@ def PrintDatacard(categories, event_counts, filenames, dcof):
                     dcof.write("-")
                 dcof.write("\t")
         dcof.write("\n")
-    
+
 
     for syst in all_scale_uncerts:
         dcof.write(syst + "\t lnN \t")
@@ -199,7 +91,7 @@ def PrintDatacard(categories, event_counts, filenames, dcof):
                     dcof.write("-")
                 dcof.write("\t")
         dcof.write("\n")
-    # 
+    #
     # shapename = os.path.basename(datacard.output_datacardname)
     # shapename_base = shapename.split(".")[0]
     # dcof.write("# Execute with:\n")
@@ -243,17 +135,21 @@ def makeStatVariations(tf, of, categories):
 def fakeData(infile, outfile, categories):
     dircache = {}
     for cat in categories:
-        h = infile.Get("{0}/{1}/{2}".format(
-            cat.out_processes[0], cat.name, cat.discriminator
+        h = infile.Get("{0}__{1}__{2}".format(
+            cat.out_processes[0], cat.name, cat.discriminator.name
         )).Clone()
         for proc in cat.out_processes[1:]:
-            h2 = infile.Get("{0}/{1}/{2}".format(
-                proc, cat.name, cat.discriminator
-            ))
+            name = "{0}__{1}__{2}".format(
+                proc, cat.name, cat.discriminator.name
+            )
+            h2 = infile.Get(name)
+            if not h2:
+                logging.error("could not get histo {0}".format(name))
+                continue
             h.Add(h2)
 
         outdir = "data_obs/{0}".format(cat.name)
-        dircache[outdir] = h 
+        dircache[outdir] = h
 
     # End of loop over categories
     for (k, v) in dircache.items():

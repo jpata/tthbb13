@@ -231,23 +231,25 @@ def main(analysis, categories, outdir="."):
 
 def make_datacard(analysis, categories, outdir, hdict):
     #split the big dictionary to category-based dictionaries
-    hdict_cat = {}
-    for k in hdict.keys():
-        catname = k.split("/")[1]
-        if not hdict_cat.has_key(catname):
-            hdict_cat[catname] = {}
-        hdict_cat[catname][k] = hdict[k]
-
     #produce the event counts per category
     logging.info("main: producing event counts")
     event_counts = {}
+    hdict_cat = {}
     for cat in categories:
         event_counts[cat.name] = {}
+        hdict_cat[cat.name] = {}
         for proc in cat.out_processes:
-            event_counts[cat.name][proc] = hdict["{0}/{1}/{2}".format(
-                proc, cat.name, cat.discriminator
-            )].Integral()
-    
+            k = "{0}__{1}__{2}".format(
+                proc, cat.name, cat.discriminator.name
+            )
+            logging.debug("getting {0}".format(k))
+            v = 0.0
+            if hdict.has_key(k):
+                v = hdict[k].Integral()
+                hdict_cat[cat.name][k] = hdict[k].Clone()
+            event_counts[cat.name][proc] = v
+    import pdb
+    pdb.set_trace()
     #catname -> file name
     category_files = {}
 
@@ -276,7 +278,7 @@ def make_datacard(analysis, categories, outdir, hdict):
         from utils import makeStatVariations
         for cat in categories:
             hfile = category_files[cat.name]
-            tf = ROOT.TFile(hfile, "UPDATE")
+            c = ROOT.TFile(hfile, "UPDATE")
             stathist_names = makeStatVariations(tf, tf, [cat])
             tf.Close()
             

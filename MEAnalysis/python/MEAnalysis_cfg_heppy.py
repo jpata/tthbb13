@@ -193,8 +193,8 @@ class Conf:
         #"systematics": ["nominal"],
         "systematics": [
             "nominal",
-            "JESUp", "JESDown",
-            "JERUp", "JERDown"
+            #"JESUp", "JESDown",
+            #"JERUp", "JERDown"
         ],
         
         
@@ -284,21 +284,21 @@ class Conf:
 
         "blr_cuts": {
             "sl_j4_t2": 20,
-            "sl_j4_t3": 1.1,
+            "sl_j4_t3": -20,
             "sl_j4_tge4": -20,
             
             "sl_j5_t2": 20,
-            "sl_j5_t3": 2.3,
+            "sl_j5_t3": -20,
             "sl_j5_tge4": -20,
             
-            "sl_jge6_t2": -0.4,
-            "sl_jge6_t3": 2.9,
+            "sl_jge6_t2": 20,
+            "sl_jge6_t3": -20,
             "sl_jge6_tge4": -20,
 
             "dl_j3_t2": 20,
             "dl_j3_t3": -20,
             "dl_jge4_t2": 20,
-            "dl_jge4_t3": 2.3,
+            "dl_jge4_t3": -20,
             "dl_jge4_tge4": -20,
 
             ##[CHECK-ME]

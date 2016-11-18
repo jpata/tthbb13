@@ -10,16 +10,21 @@ LOG_MODULE_NAME = logging.getLogger(__name__)
     
 import numpy as np
 from TTH.MEAnalysis.samples_base import getSitePrefix, samples_nick, get_prefix_sample, PROCESS_MAP, TRIGGERPATH_MAP
-from TTH.Plotting.Datacards.sparse import save_hdict
 
 from TTH.CommonClassifier.db import ClassifierDB
-
-import rootpy
 
 CvectorLorentz = getattr(ROOT, "std::vector<TLorentzVector>")
 Cvectordouble = getattr(ROOT, "std::vector<double>")
 CvectorJetType = getattr(ROOT, "std::vector<MEMClassifier::JetType>")
 
+FUNCTION_TABLE = {
+    "jetsByPt_0_pt": lambda ev: ev["jets_p4"][0].Pt(),
+    "jetsByPt_0_eta": lambda ev: ev["jets_p4"][0].Eta(),
+    "leps_0_pt": lambda ev: ev["leps_pt"][0],
+    "btag_LR_4b_2b_btagCSV_logit": lambda ev: logit(ev["btag_LR_4b_2b_btagCSV"]) if ev["btag_LR_4b_2b_btagCSV"]>0.0 else -50,
+    "common_mem": lambda ev: ev["common_mem"],
+    "common_bdt": lambda ev: ev["common_bdt"],
+}
 
 def vec_from_list(vec_type, src):
     """
@@ -49,6 +54,7 @@ class BufferedTree:
     """
     def __init__(self, tree):
         self.tree = tree
+        self.tree.SetCacheSize(100*1024*1024)
         self.branches = {}
         for br in self.tree.GetListOfBranches():
             self.branches[br.GetName()] = br
@@ -213,31 +219,6 @@ class Desc:
                 ret[vname] = v.getValue(event, schema, systematic)
         return ret
 
-def event_as_str(ret):
-    NA = "NA"
-    ret2 = {}
-    ret2.update(ret)
-    ret2["jets_p4_spherical"] = ",\n".join([
-        "    jet(pt={:.2f} eta={:.2f} phi={:.2f} m={:.2f})".format(
-            lv.Pt(), lv.Eta(), lv.Phi(), lv.M()
-        ) for lv in ret["jets_p4"]
-    ])
-
-    r = """
-Event(
-  run:lumi:event = {run}:{lumi}:{evt}
-  syst = {syst}
-  numJets = {numJets}
-  nBCSVM = {nBCSVM} nBCMVAM = {nBCMVAM}
-  blr_CSV = {btag_LR_4b_2b_btagCSV_logit:.2f} blr_cMVA = {btag_LR_4b_2b_btagCMVA_logit:.2f}
-  jets_p4 =
-{jets_p4_spherical}
-  mem_SL_0w2h2t_p = {mem_SL_0w2h2t_p:.4f} mem_SL_1w2h2t_p = {mem_SL_1w2h2t_p:.4f} mem_SL_2w2h2t_p = {mem_SL_2w2h2t_p:.4f}
-  ttCls = {ttCls}
-)
-""".format(**ret2).strip()
-    return r
-
 def lv_p4s(pt, eta, phi, m, btagCSV=-100):
     ret = ROOT.TLorentzVector()
     ret.SetPtEtaPhiM(pt, eta, phi, m)
@@ -265,81 +246,29 @@ def calc_lepton_SF(ev):
             weight *= ev.leps_SF_IsoTight[1]
 
     return weight
-    
-class Axis:
-    def __init__(self, name, nbins, lo, hi, func):
-        self.name = name
-        self.nbins = nbins 
-        self.lo = lo
-        self.hi = hi
+
+class HistogramOutput:
+    def __init__(self, hist, func, cut_name):
+        self.hist = hist
         self.func = func
+        self.cut_name = cut_name
 
-    def getValue(self, event):
-        return self.func(event)
+    def cut(self, event):
+        return event[self.cut_name]
 
-class SparseOut:
-    def __init__(self, name, cut, axes, outdir):
-        """
-        Creates a sparse histogram.
-        name (string): name of the histogram, will also be used for the ROOT file
-        cut (function event -> bool): decides if this event should be filled 
-        axes (list of Axis objects): defines the axes of this sparse histogram
-        outdir (TDirectory): the output directory where the THnSparse will be saved
-        """
-        self.cut = cut
-        self.axes = axes
+    def fill(self, event, weight = 1.0):
+        self.hist.Fill(self.func(event), weight)
 
-        #create the bin arrays
-        nbinVec = getattr(ROOT, "std::vector<int>")()
-        minVec = getattr(ROOT, "std::vector<double>")()
-        maxVec = getattr(ROOT, "std::vector<double>")()
-        for ax in axes:
-            nbinVec.push_back(ax.nbins)
-            minVec.push_back(ax.lo)
-            maxVec.push_back(ax.hi)
-        ROOT.gROOT.cd()
-        self.hist = ROOT.THnSparseF(
-            name,
-            name,
-            len(axes),
-            nbinVec.data(),
-            minVec.data(),
-            maxVec.data(),
-        )
-        #make sure this histogram is saved
-        outdir.Add(self.hist)
-        for iax, ax in enumerate(self.axes):
-            self.hist.GetAxis(iax).SetName(ax.name)
-            self.hist.GetAxis(iax).SetTitle(ax.name)
+class CategoryCut:
+    def __init__(self, cuts):
+        self.cuts = cuts
 
-        self.hist.Sumw2()
-    
-    def fill(self, event, weight=1.0):
-        """
-        Fill this sparse histogram based on the values defined in the axes.
-        event (dict of string->object): the data of this event (under a certain systematic assumption)
-        weight (float): weight to be used for this event:w
-        
-        """
-        #Very important: need to use double, not float (despite name THnSparseF pointing to float)
-        valVec = getattr(ROOT, "std::vector<double>")()
-
-        #loop over defined axes, calculate values
-        for ax in self.axes:
-            v = ax.getValue(event)
-            #Very important: manually treat underflow and overflow, put into first or last bin!
-            if v <= ax.lo:
-                v = ax.lo
-            #value of last bin
-            elif v >= ax.hi:
-                v = ax.hi - float(ax.hi - ax.lo)/float(ax.nbins)
-
-            valVec.push_back(v)
-        #print([v for v in valVec], "w={0}".format(weight))
-
-        #Very important: here we need to take the pointer to the start of the value vector with std::vector<double)::data() -> double*
-        #otherwise the THnSparse is filled, but with garbage and will result in TBrowser segfaults later 
-        return self.hist.Fill(valVec.data(), weight)
+    def cut(self, event):
+        ret = True
+        for cname, clow, chigh in self.cuts:
+            v = event[cname]
+            ret = ret and (v >= clow and v < chigh)
+        return ret
 
 def get_schema(sample):
     process = samples_nick[sample]
@@ -349,43 +278,48 @@ def get_schema(sample):
         schema = "mc"
     return schema
 
-def createOutputs(config, axes, dirs, systematics):
+def createOutputs(outdir, analysis, sample, systematics):
     """Creates an output dictionary with fillable objects in TDirectories based on categories and systematics. 
     
     Args:
-        config (ConfigParser): Configuration with sparsinator info
-        axes (dict of string->list of Axes): Dictionary of various kinds of Axes to save 
-        dirs (dict of string->TDirectory): dictionary of output directories
+        outdir (TYPE): Description
+        analysis (TYPE): Description
+        sample (TYPE): Description
         systematics (list of string): list of systematics for which to create outputs
     
     Returns:
         dict of string->output: Dictionary of fillable outputs
     """
+
     outdict_syst = {}
-    categories = config.get("sparsinator", "categories").split()
- 
-    for syst in systematics: 
+    outdict_cuts = {}
+
+    for syst in systematics:
+        outdict_syst[syst] = {} 
         syststr = ""
         if syst != "nominal":
-            syststr = "_" + syst
+            syststr = "__" + syst
+        for k in analysis.groups.keys():
+            for cat in analysis.groups[k]:
+                if not outdict_cuts.has_key(cat.name):
+                    outdict_cuts[cat.name] = CategoryCut(cat.cuts)
 
-        outdict = {}
+                proc_out_name = sample.process
+                for proc in analysis.processes:
+                    if proc.input_name == sample.process:
+                        proc_out_name = proc.output_name
+                        break
 
-        for cat in categories:
-            cat_name = config.get(cat, "name")
-            axes_name = config.get(cat, "axes")
-            flag = config.get(cat, "flag")
-
-            dirs[cat_name].cd()
-            outdict["{0}/sparse".format(cat_name)] = SparseOut(
-                "sparse" + syststr,
-                lambda ev, flag=flag: ev[flag] == 1,
-                axes[axes_name],
-                dirs[cat_name]
-            )
-
-        outdict_syst[syst] = outdict
-    return outdict_syst
+                name = "{proc}__{cat}__{discr}".format(
+                    proc = proc_out_name,
+                    cat = cat.name,
+                    discr = cat.discriminator.name
+                ) + syststr
+                if not outdict_syst[syst].has_key(name):
+                    h = cat.discriminator.get_TH1(name)
+                    h.SetDirectory(outdir)
+                    outdict_syst[syst][name] = HistogramOutput(h, FUNCTION_TABLE[cat.discriminator.func], cat.name)
+    return outdict_syst, outdict_cuts
 
 def pass_HLT_sl_mu(event):
     pass_hlt = event["HLT_ttH_SL_mu"]
@@ -451,8 +385,6 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
     CvectorLorentz = getattr(ROOT, "std::vector<TLorentzVector>")
     Cvectordouble = getattr(ROOT, "std::vector<double>")
     CvectorJetType = getattr(ROOT, "std::vector<MEMClassifier::JetType>")
-
-
 
     MEM_SF = analysis.config.getfloat("sparsinator", "mem_sf")
 
@@ -551,7 +483,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
         Var(name="Wmass", systematics="suffix"),
 
         Var(name="btag_LR_4b_2b_btagCSV",
-            nominal=Func("blr_CSV", func=lambda ev: logit(ev.btag_LR_4b_2b)),
+            nominal=Func("blr_CSV", func=lambda ev: ev.btag_LR_4b_2b_btagCSV),
         ),
 
         Var(name="btag_LR_4b_2b_btagCSV_logit",
@@ -676,113 +608,6 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
         [Var(name=bw, schema=["mc"]) for bw in btag_weights] + [Var(name=br) for br in extra_vars]
     )
 
-    # Create the axes we want in the sparse histogram
-    # Axis we will want to have in all sparse histograms
-    axes_basic_all = [
-        Axis("process", 20, 0, 20, lambda ev: ev["process"]),
-        Axis("triggerPath", 20, 0, 20, lambda ev: ev["triggerPath"]),
-        Axis("counting", 1, 0, 1, lambda ev: ev["counting"]),
-        Axis("parity", 1, 0, 1, lambda ev: ev["evt"]%2==0),
-
-        Axis("numJets", 5, 3, 8, lambda ev: ev["numJets"]),
-        Axis("nBCSVM", 4, 1, 5, lambda ev: ev["nBCSVM"]),
-        Axis("nBCMVAM", 4, 1, 5, lambda ev: ev["nBCMVAM"]),
-
-        Axis("jetsByPt_0_pt", 50, 0, 400, lambda ev: ev["jets_p4"][0].Pt()),
-        
-        Axis("btag_LR_4b_2b_btagCSV_logit", 30, -5, 10, lambda ev: ev["btag_LR_4b_2b_btagCSV_logit"]),
-        Axis("btag_LR_4b_2b_btagCMVA_logit", 30, -5, 10, lambda ev: ev["btag_LR_4b_2b_btagCMVA_logit"]),
-
-        Axis("common_bdt", 36, -1, 1, lambda ev: ev["common_bdt"]),
-        Axis("common_mem", 36, 0, 1, lambda ev: ev["common_mem"]),
-    ]
-
-    axes_basic_sl = [
-        Axis("leps_0_pt", 50, 0, 300, lambda ev: ev["leps_pt"][0]),
-    ]
-
-    axes_basic_dl = [
-        Axis("leps_0_pt", 50, 0, 300, lambda ev: ev["leps_pt"][0]),
-    ]
-
-    axes_basic_fh = [
-        Axis("mem_FH_4w2h2t_p", 36, 0, 1, lambda ev: ev["mem_FH_4w2h2t_p"]),
-        Axis("mem_FH_3w2h2t_p", 36, 0, 1, lambda ev: ev["mem_FH_3w2h2t_p"]),
-        Axis("mem_FH_4w2h1t_p", 36, 0, 1, lambda ev: ev["mem_FH_4w2h1t_p"]),
-        Axis("mem_FH_0w0w2h2t_p", 36, 0, 1, lambda ev: ev["mem_FH_0w0w2h2t_p"]),
-        Axis("mem_FH_0w0w2h1t_p", 36, 0, 1, lambda ev: ev["mem_FH_0w0w2h1t_p"]),
-    ]
-
-    axes_extra_sl = [    
-        Axis("Wmass", 100, 50, 150, lambda ev: ev["Wmass"]),
-        
-        Axis("jetsByPt_1_pt", 50, 0, 400, lambda ev: ev["jets_p4"][1].Pt()),
-        Axis("jetsByPt_2_pt", 50, 0, 400, lambda ev: ev["jets_p4"][2].Pt()),
-
-        Axis("jetsByPt_0_btagCSV", 50, 0, 1, lambda ev: ev["jets_p4"][0].btagCSV),
-
-        Axis("jetsByPt_0_eta", 50, -2.5, 2.5, lambda ev: ev["jets_p4"][0].Eta()),
-        Axis("jetsByPt_1_eta", 50, -2.5, 2.5, lambda ev: ev["jets_p4"][1].Eta()),
-        Axis("jetsByPt_2_eta", 50, -2.5, 2.5, lambda ev: ev["jets_p4"][2].Eta()),
-
-        Axis("fatjetByPt_0_pt", 50, 0, 600, lambda ev: ev["fatjets_pt"][0] if ev["nfatjets"] else -100),
-        Axis("fatjetByPt_0_eta", 50, -2.5, 2.5, lambda ev: ev["fatjets_eta"][0] if ev["nfatjets"] else -100),
-        Axis("fatjetByPt_0_mass", 50, 0, 600, lambda ev: ev["fatjets_mass"][0] if ev["nfatjets"] else -100),
-
-        Axis("leps_0_eta", 50, -2.5, 2.5, lambda ev: ev["leps_eta"][0]),
-
-        Axis("topCandidate_fRec", 50, 0, 0.4, lambda ev: ev["topCandidate_fRec"][0] if len(ev["topCandidate_pt"]) else -100),
-        Axis("topCandidate_pt", 50, 150, 600, lambda ev: ev["topCandidate_pt"][0] if len(ev["topCandidate_pt"]) else -100),
-        Axis("topCandidate_ptcal", 50, 150, 600, lambda ev: ev["topCandidate_ptcal"][0] if len(ev["topCandidate_pt"]) else -100),
-        Axis("topCandidate_mass", 50, 0, 250, lambda ev: ev["topCandidate_mass"][0] if len(ev["topCandidate_pt"]) else -100),
-        Axis("topCandidate_masscal", 50, 0, 250, lambda ev: ev["topCandidate_masscal"][0] if len(ev["topCandidate_pt"]) else -100),
-        Axis("topCandidate_n_subjettiness", 50, 0, 1, lambda ev: ev["topCandidate_n_subjettiness"][0] if len(ev["topCandidate_pt"]) else -100),
-        Axis("topCandidate_n_subjettiness_groomed", 50, 0, 1, lambda ev: ev["topCandidate_n_subjettiness_groomed"][0] if len(ev["topCandidate_pt"]) else -100),
-
-        Axis("higgsCandidate_secondbtag_subjetfiltered", 50, -1,1, lambda ev: ev["higgsCandidate_secondbtag_subjetfiltered"][0] if len(ev["higgsCandidate_mass"]) else -100),
-        Axis("higgsCandidate_bbtag", 50, -1, 1, lambda ev: ev["higgsCandidate_bbtag"][0] if len(ev["higgsCandidate_mass"]) else -100),
-        Axis("higgsCandidate_tau1", 50, 0, 1, lambda ev: ev["higgsCandidate_tau1"][0] if len(ev["higgsCandidate_mass"]) else -100),
-        Axis("higgsCandidate_tau2", 50, 0, 1, lambda ev: ev["higgsCandidate_tau2"][0] if len(ev["higgsCandidate_mass"]) else -100),
-
-        Axis("higgsCandidate_mass", 50, 0, 200, lambda ev: ev["higgsCandidate_mass"][0] if len(ev["higgsCandidate_mass"]) else -100),
-        Axis("higgsCandidate_mass_softdropz2b1filt", 50, 0, 200, lambda ev: ev["higgsCandidate_mass_softdropz2b1filt"][0] if len(ev["higgsCandidate_mass"]) else -100),
-        Axis("higgsCandidate_sj12massb_subjetfiltered", 50, 0, 200, lambda ev: ev["higgsCandidate_sj12massb_subjetfiltered"][0] if len(ev["higgsCandidate_mass"]) else -100),
-        Axis("higgsCandidate_sj12masspt_subjetfiltered", 50, 0, 200, lambda ev: ev["higgsCandidate_sj12masspt_subjetfiltered"][0] if len(ev["higgsCandidate_mass"]) else -100),
-
-        Axis("multiclass_class", 7, -0.5, 6.5, lambda ev:     ev["multiclass_class"]),
-        Axis("multiclass_proba_ttb", 40, 0, 0.7, lambda ev:   ev["multiclass_proba_ttb"]),
-        Axis("multiclass_proba_tt2b", 40, 0, 0.7, lambda ev:  ev["multiclass_proba_tt2b"]),
-        Axis("multiclass_proba_ttbb", 40, 0, 0.7, lambda ev:  ev["multiclass_proba_ttbb"]),
-        Axis("multiclass_proba_ttcc", 40, 0, 0.7, lambda ev:  ev["multiclass_proba_ttcc"]),
-        Axis("multiclass_proba_ttll", 40, 0, 0.7,  lambda ev: ev["multiclass_proba_ttll"]),
-
-    ]
-
-    axes_extra_dl = []
-    axes_extra_fh = []
-
-    # DEFINE SL AXES
-    axes_sl = axes_basic_all + axes_basic_sl
-    if analysis.config.get("sparsinator", "extra_sl"):
-            axes_sl += axes_extra_sl
-
-    # DEFINE DL AXES
-    axes_dl = axes_basic_all + axes_basic_dl
-    if analysis.config.get("sparsinator", "extra_dl"):
-        axes_dl += axes_extra_dl
-
-    # DEFINE FH AXES
-    axes_fh = axes_basic_all + axes_basic_fh
-    if analysis.config.get("sparsinator", "extra_fh"):
-        axes_fh += axes_extra_fh
-
-    AXES = {
-        "sl": axes_sl,
-        "dl": axes_dl,
-        "fh": axes_fh,
-    }
-
-
     if len(file_names) == 0:
         raise Exception("No files specified, probably a mistake")
     if max_events == 0:
@@ -806,10 +631,9 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
 
     all_systematics = systematics_event+systematics_weight
    
-    dirs = {}
     outfile = ROOT.TFile(ofname, "RECREATE")
-    dirs["sample"] = outfile.mkdir(sample_name)
-    dirs["sample"].cd()
+    outfile.cd()
+
     outtree = ROOT.TTree("tree", "tree")
     bufs = {}
     bufs["event"] = np.zeros(1, dtype=np.int64)
@@ -826,10 +650,6 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
     bufs["numJets"] = np.zeros(1, dtype=np.int32)
     bufs["nBCSVM"] = np.zeros(1, dtype=np.int32)
     
-    dirs["sl"] = dirs["sample"].mkdir("sl")
-    dirs["dl"] = dirs["sample"].mkdir("dl")
-    dirs["fh"] = dirs["sample"].mkdir("fh")
-    
     outtree.Branch("event", bufs["event"], "event/L")
     outtree.Branch("run", bufs["run"], "run/L")
     outtree.Branch("lumi", bufs["lumi"], "lumi/L")
@@ -845,14 +665,18 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
     outtree.Branch("ttCls", bufs["ttCls"], "ttCls/I")
     
     #pre-create output histograms
-    outdict_syst = createOutputs(analysis.config, AXES, dirs, all_systematics)
+    outdict_syst, outdict_cuts = createOutputs(outfile, analysis, sample, all_systematics)
 
     nevents = 0
     counters = OrderedDict()
     counters["triggerPath"] = {}
 
+    break_file_loop = False
+
     #Main loop
     for file_name in file_names:
+        if break_file_loop:
+            break
         print("opening {0}".format(file_name))
         tf = ROOT.TFile.Open(file_name)
         events = BufferedTree(tf.Get("tree"))
@@ -862,8 +686,6 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
 
         #Loop over events
         for event in events:
-            nevents += 1
-            iEv += 1
             if nevents < skip_events:
                 continue
             if max_events > 0:
@@ -871,6 +693,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                     logging.info("event loop: breaking due to MAX_EVENTS: {0} > {1} + {2}".format(
                         nevents, skip_events, max_events
                     ))
+                    break_file_loop = True
                     break
 
             #apply some basic preselection
@@ -956,23 +779,27 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
 
                 outtree.Fill()
 
-                if analysis.config.getboolean("sparsinator", "do_sparse_hist"):
-                    #Fill the base histogram
-                    for (k, v) in outdict_syst[syst].items():
-                        weight = ret["weight_nominal"]
-                        if v.cut(ret):
-                            v.fill(ret, weight)
-                    
-                    
-                    #nominal event, fill also histograms with systematic weights
-                    if syst == "nominal" and schema == "mc":
-                        for (syst_weight, weightfunc) in systematic_weights:
-                            weight = weightfunc(ret)
-                            for (k, v) in outdict_syst[syst_weight].items():
-                                if v.cut(ret):
-                                    v.fill(ret, weight)
+                #pre-calculate all category cuts
+                for catname, cut in outdict_cuts.items():
+                    ret[catname] = cut.cut(ret)
+
+                #Fill the base histogram
+                for (k, v) in outdict_syst[syst].items():
+                    weight = ret["weight_nominal"]
+                    if v.cut(ret):
+                        v.fill(ret, weight)
+                
+                #nominal event, fill also histograms with systematic weights
+                if syst == "nominal" and schema == "mc":
+                    for (syst_weight, weightfunc) in systematic_weights:
+                        weight = weightfunc(ret)
+                        for (k, v) in outdict_syst[syst_weight].items():
+                            if v.cut(ret):
+                                v.fill(ret, weight)
 
             #end of loop over event systematics
+            nevents += 1
+            iEv += 1
         #end of loop over events
         tf.Close()
     #end of loop over file names
@@ -1009,6 +836,6 @@ if __name__ == "__main__":
         prefix = ""
         sample = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
         skip_events = 0
-        max_events = 40000
+        max_events = 1000
         an_name, analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/Plotting/python/Datacards/config_sldl.cfg")
     main(analysis, file_names, sample, "out.root", skip_events, max_events)

@@ -7,7 +7,7 @@ import pdb
 from copy import deepcopy
 
 from TTH.MEAnalysis.samples_base import xsec
-from TTH.Plotting.Datacards.AnalysisSpecificationClasses import Cut, Sample, Process, DataProcess, Category, Analysis, pairwise, triplewise, make_csv_categories_abstract, make_csv_groups_abstract
+from TTH.Plotting.Datacards.AnalysisSpecificationClasses import Histogram, Cut, Sample, Process, DataProcess, Category, Analysis, pairwise, triplewise, make_csv_categories_abstract, make_csv_groups_abstract
 from TTH.Plotting.joosep.sparsinator import PROCESS_MAP, TRIGGERPATH_MAP
 from TTH.MEAnalysis import samples_base
 
@@ -76,7 +76,6 @@ def analysisFromConfig(config_file_path):
     config = Analysis.getConfigParser(config_file_path)
 
     # Get information on sparse input
-    input_file = config.get("sparse_data", "infile")
     lumi = dict([(k, float(v)) for (k, v) in config.items("lumi")])
     blr_cuts = dict([(k, float(v)) for (k, v) in config.items("blr_cuts")])
 
@@ -227,14 +226,17 @@ def analysisFromConfig(config_file_path):
                     common_shape_uncertainties = common_shape_uncertainties, 
                     common_scale_uncertainties = common_scale_uncertainties, 
                     scale_uncertainties = scale_uncertainties, 
-                    discriminator = config.get(cat, "discriminator"),
-                    src_histogram = config.get(template, "src_histogram"),
+                    discriminator = Histogram.from_string(config.get(cat, "discriminator")),
                     rebin = rebin,
-                    do_limit = True))
+                    do_limit = True
+                )
+            )
 
-            # Also add control variables
+            # Also add control variables as separate categories
             if config.has_option(cat, "control_variables"):
-                for cv in config.get(cat, "control_variables").split():
+                for cv in config.get(cat, "control_variables").split('\n'):
+                    if len(cv) == 0:
+                        continue
                     cats.append(
                         Category(
                             name = cat,
@@ -245,10 +247,11 @@ def analysisFromConfig(config_file_path):
                             common_shape_uncertainties = common_shape_uncertainties, 
                             common_scale_uncertainties = common_scale_uncertainties, 
                             scale_uncertainties = scale_uncertainties, 
-                            discriminator = cv,
-                            src_histogram = config.get(template, "src_histogram"),
+                            discriminator = Histogram.from_string(cv),
                             rebin = rebin,
-                            do_limit = False))
+                            do_limit = False
+                    )
+                )
                 
 
 
@@ -274,7 +277,6 @@ def analysisFromConfig(config_file_path):
         processes = processes,
         processes_unsplit = processes_original,
         categories = all_cats,
-        sparse_input_file = input_file,
         groups = analysis_groups,
         do_fake_data = do_fake_data,
         do_stat_variations = do_stat_variations
