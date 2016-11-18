@@ -11,6 +11,7 @@ if "--test" in sys.argv:
 
 import copy
 import json
+from PhysicsTools.HeppyCore.framework.looper import Looper
 
 def getLumisProcessed(vlumiblock): 
     lumidict = {}
@@ -91,7 +92,6 @@ config.components[0].files=crabFiles_pfn
 
 if not "--nostep1" in args:
     print "heppy_config", config
-    from PhysicsTools.HeppyCore.framework.looper import Looper
     if hasattr(PSet.process.source, "skipEvents") and PSet.process.source.skipEvents.value()>=0:
         nfirst = int(PSet.process.source.skipEvents.value())
         nmax = int(PSet.process.maxEvents.input.value())
@@ -142,22 +142,36 @@ inf1 = ROOT.TFile("Output/tree.root")
 inf2 = ROOT.TFile("Output_tth/tree.root")
 tof = ROOT.TFile("tree.root", "RECREATE")
 vhbb_dir = tof.mkdir("vhbb")
-def copyTo(src, dst):
+def copyTo(src, dst, keys=[]):
     #copy ttjets output
     dst.cd()
-    for k in src.GetListOfKeys():
-        o = k.ReadObj()
+    if len(keys) == 0:
+        keys = list(set([k.GetName() for k in src.GetListOfKeys()]))
+    for k in keys:
+        o = src.Get(k)
         if o.ClassName() == "TTree":
             o = o.CloneTree()
         else:
             o = o.Clone()
-        print k, o 
-        dst.Add(o) 
+        print "copying", k, o
+        dst.Add(o)
         o.Write("", ROOT.TObject.kOverwrite)
 
 copyTo(inf1, vhbb_dir)
 copyTo(inf2, tof)
+dump = ROOT.TNamed("PSet_process_dumpPython", PSet.process.dumpPython())
+dump.Write()
 tof.Close()
+
+def getEntries(inf, tree):
+    tf = ROOT.TFile(inf)
+    tt = tf.Get(tree)
+    n = tt.GetEntries()
+    tf.Close()
+    return n
+
+assert(getEntries("Output/tree.root", "tree") == getEntries("tree.root", "vhbb/tree"))
+assert(getEntries("Output_tth/tree.root", "tree") == getEntries("tree.root", "tree"))
 
 def getEventsLumisInFile(infile):
     from DataFormats.FWLite import Lumis, Handle, Events
