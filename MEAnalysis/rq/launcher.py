@@ -20,7 +20,7 @@ import ROOT
 from TTH.MEAnalysis.samples_base import getSitePrefix, chunks
 from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
 from TTH.Plotting.Datacards.AnalysisSpecificationClasses import Analysis
-from TTH.Plotting.Datacards.MakeCategory import apply_rules_parallel, make_rules, make_datacard
+from TTH.Plotting.Datacards.MakeCategory import make_datacard
 from TTH.Plotting.Datacards.sparse import add_hdict
 
 import TTH.Plotting.joosep.plotlib as plotlib #heplot, 
@@ -31,38 +31,6 @@ from matplotlib import rc
 rc('text', usetex=False)
 matplotlib.use('PS') #needed on T3
 import matplotlib.pyplot as plt
-
-#FIXME: configure all these via conf file!
-procs_names = [
-    ("ttH_hbb", "tt+H(bb)"),
-    ("ttH_nonhbb", "tt+H(non-bb)"),
-    ("ttbarOther", "tt+light"),
-    ("ttbarPlusBBbar", "tt+bb"),
-    ("ttbarPlus2B", "tt+2b"),
-    ("ttbarPlusB", "tt+b"),
-    ("ttbarPlusCCbar", "tt+cc"),
-    ("diboson", "diboson"),
-    ("stop", "single top"),
-    ("ttv", "tt+V"),
-    ("wjets", "w+jets"),
-    ("dy", "dy")
-]
-procs = [x[0] for x in procs_names]
-
-syst_pairs = [
-    ("_puUp", "_puDown"),
-    ("_CMS_scale_jUp", "_CMS_scale_jDown"),
-    ("_CMS_res_jUp", "_CMS_res_jDown"),
-    ("_CMS_ttH_CSVcferr1Up", "_CMS_ttH_CSVcferr1Down"),
-    ("_CMS_ttH_CSVcferr2Up", "_CMS_ttH_CSVcferr2Down"),
-    ("_CMS_ttH_CSVhfUp", "_CMS_ttH_CSVhfDown"),
-    ("_CMS_ttH_CSVhfstats1Up", "_CMS_ttH_CSVhfstats1Down"),
-    ("_CMS_ttH_CSVhfstats2Up", "_CMS_ttH_CSVhfstats2Down"),
-    ("_CMS_ttH_CSVjesUp", "_CMS_ttH_CSVjesDown"),
-    ("_CMS_ttH_CSVlfUp", "_CMS_ttH_CSVlfDown"),
-    ("_CMS_ttH_CSVlfstats1Up", "_CMS_ttH_CSVlfstats1Down"),
-    ("_CMS_ttH_CSVlfstats2Up", "_CMS_ttH_CSVlfstats2Down")
-]
 
 ####
 # Configuation
@@ -115,35 +83,21 @@ def start_jobs(queue, njobs, extra_requirements = [], redis_host=None, redis_por
     print "waiting 30s for jobs to be run..."
     time.sleep(30)
 
-
-def get_base_plot(basepath, outpath, analysis, category, variable):
+def basic_job_status(jobs):
+    status = [j.status for j in jobs]
+    status_counts = dict(Counter(status))
     
+    sys.stdout.write("\033[K") # Clear this line
+    sys.stdout.write("\033[92mstatus\033[0m {4:.2f}%\tq={0}\ts={1}\tf={2}\tE={3}\n".format(
+        status_counts.get("queued", 0),
+        status_counts.get("started", 0),
+        status_counts.get("finished", 0),
+        status_counts.get("failed", 0),
+        100.0 * status_counts.get("finished", 0) / sum(status_counts.values()),
+    ))
+    sys.stdout.write("\033[F") # Cursor up one line
 
-    s = "{0}/{1}/{2}".format(basepath, analysis, category)
-    return {
-        "infile": s + ".root",
-        "histname": "/".join([category, variable]),
-        "outname": os.path.abspath("/".join([outpath, category, variable])),
-        "procs": procs_names,
-        "signal_procs": ["ttH_hbb"],
-        "dataname": "data", #data_obs for fake data
-        "rebin": 1,
-        "xlabel": plotlib.varnames[variable] if variable in plotlib.varnames.keys() else "PLZ add me to Varnames",
-        "xunit": plotlib.varunits[variable] if variable in plotlib.varunits.keys() else "",
-        "legend_fontsize": 12,
-        "legend_loc": "best",
-        "colors": [plotlib.colors.get(p) for p in procs],
-        "do_legend": True,
-        "show_overflow": True,
-        "title_extended": r"$,\ \mathcal{L}=17\ \mathrm{fb}^{-1}$, ",
-        "systematics": syst_pairs,
-        "do_syst": True, #currently crashes with True due to some dvipng/DISPLAY issue
-        "blindFunc": "blind_mem" if "common" in variable else "no_blind",
-    }
-
-
-
-def waitJobs(jobs, redis_conn, num_retries=0):
+def waitJobs(jobs, redis_conn, qmain, qfail, num_retries=0, callback=basic_job_status):
     done = False
     istep = 0
     perm_failed = []
@@ -173,19 +127,11 @@ def waitJobs(jobs, redis_conn, num_retries=0):
                     if not redis_conn.exists(hkey):
                         logger.debug("setting key {0} in db".format(hkey))
                         redis_conn.set(hkey, pickle.dumps(job.result))
+        
         status = [j.status for j in jobs]
         status_counts = dict(Counter(status))
 
-        sys.stdout.write("\033[K") # Clear this line
-        sys.stdout.write("\033[92mstatus\033[0m {4:.2f}%\tq={0}\ts={1}\tf={2}\tE={3}\n".format(
-            status_counts.get("queued", 0),
-            status_counts.get("started", 0),
-            status_counts.get("finished", 0),
-            status_counts.get("failed", 0),
-            100.0 * status_counts.get("finished", 0) / sum(status_counts.values()),
-        ))
-
-        if len(perm_failed)>0:
+        if len(perm_failed) > 0:
             logger.error("--- fail queue has {0} items".format(len(qfail)))
             for job in qfail.jobs:
                 workflow_failed = True
@@ -198,8 +144,8 @@ def waitJobs(jobs, redis_conn, num_retries=0):
 
         time.sleep(1)
         
-        sys.stdout.write("\033[F") # Cursor up one line
-
+        if not callback is None:
+            callback(jobs)
         istep += 1
 
     if workflow_failed:
@@ -236,49 +182,307 @@ def enqueue_memoize(queue, **kwargs):
         logger.debug("didn't find key, enqueueing")
         return queue.enqueue_call(**kwargs)
 
-def getGeneratedEvents(sample):
-    jobs = []
-    for ijob, inputs in enumerate(chunks(sample.file_names, sample.step_size_sparsinator)):
-        jobs += [
-            enqueue_nomemoize(
-                qmain,
-                func=count,
-                args=(inputs, ),
-                timeout=2*60*60,
-                ttl=2*60*60,
-                result_ttl=2*60*60,
-                meta={"retries": 0, "args": str((inputs, ))}
-            )
-        ]
-    logger.info("getGeneratedEvents: {0} jobs launched for sample {1}".format(len(jobs), sample.name))
-    return jobs
+class Task(object):
+    def __init__(self, workdir, name, analysis):
+        self.workdir = workdir
+        self.name = name
+        self.analysis = analysis
 
-def runSparsinator_async(config_path, sample, workdir):
-    jobs = []
-    for ijob, inputs in enumerate(chunks(sample.file_names, sample.step_size_sparsinator)):
-        ofname = "{0}/sparse/{1}/sparse_{2}.root".format(
-            workdir, sample.name, ijob
+    def run(self, inputs, redis_conn, qmain, qfail):
+        jobs = {}
+        return jobs
+
+    def get_analysis_config(self, workdir = None):
+        if not workdir:
+            workdir = self.workdir
+        return os.path.join(workdir, "analysis.pickle")
+
+    def save_state(self):
+        self.analysis.serialize(self.get_analysis_config())
+
+    def load_state(self, workdir):
+        self.analysis = self.analysis.deserialize(
+            self.get_analysis_config(workdir)
         )
-        jobs += [
-            enqueue_nomemoize(
-                qmain,
-                func=sparse,
-                args=(config_path, inputs, sample.name, ofname),
-                timeout=2*60*60,
-                ttl=2*60*60,
-                result_ttl=2*60*60,
-                meta={"retries": 2, "args": str((inputs, sample.name))}
-            )
-        ]
-    logger.info("runSparsinator: {0} jobs launched for sample {1}".format(len(jobs), sample.name))
-    return jobs
 
-if __name__ == "__main__":
+class TaskNumGen(Task):
+    def __init__(self, workdir, name, analysis):
+        super(TaskNumGen, self).__init__(workdir, name, analysis)
+
+    def run(self, inputs, redis_conn, qmain, qfail):
+        all_jobs = []
+        jobs = {}
+        for sample in self.analysis.samples:
+            _jobs = TaskNumGen.getGeneratedEvents(sample, qmain)
+            jobs[sample.name] = _jobs
+            all_jobs += _jobs
+
+        #synchronize
+        waitJobs(all_jobs, redis_conn, qmain, qfail, 0)
+
+        for sample in analysis.samples:
+            ngen = sum(
+                [j.result["Count"] for j in jobs[sample.name]]
+            )
+            sample.ngen = int(ngen)
+        self.save_state()
+        return jobs
+
+    @staticmethod
+    def getGeneratedEvents(sample, queue):
+        jobs = []
+        for ijob, inputs in enumerate(chunks(sample.file_names, sample.step_size_sparsinator)):
+            jobs += [
+                enqueue_memoize(
+                    queue,
+                    func = count,
+                    args = (inputs, ),
+                    timeout = 2*60*60,
+                    ttl = 2*60*60,
+                    result_ttl = 2*60*60,
+                    meta = {"retries": 0, "args": str((inputs, ))}
+                )
+            ]
+        logger.info("getGeneratedEvents: {0} jobs launched for sample {1}".format(len(jobs), sample.name))
+        return jobs
+
+class TaskSparsinator(Task):
+    def __init__(self, workdir, name, analysis):
+        super(TaskSparsinator, self).__init__(workdir, name, analysis)
+
+    def run(self, inputs, redis_conn, qmain, qfail):
+        all_jobs = []
+        jobs = {}
+        for sample in self.analysis.samples:
+            if not sample.name in [p.input_name for p in self.analysis.processes]:
+                logging.info("Skipping sample {0} because matched to no process".format(
+                    sample.name
+                ))
+                continue
+            jobs[sample.name] = TaskSparsinator.runSparsinator_async(
+                self.get_analysis_config(workdir),
+                sample,
+                self.workdir
+            )
+            all_jobs += jobs[sample.name]
+        logger.info("waiting on sparsinator jobs")
+        waitJobs(all_jobs, redis_conn, qmain, qfail, callback=self.status_callback)
+        self.save_state()
+        return jobs
+
+    @staticmethod
+    def status_callback(jobs):
+
+        basic_job_status(jobs)
+
+        res = []
+        samples = set()
+        for job in jobs:
+            sample_name = job.args[2]
+            k = (sample_name, job.status)
+            samples.add(sample_name)
+            res += [k]
+
+        res = dict(Counter(res))
+        res_by_sample = {sample: {"queued": 0, "started": 0, "finished": 0} for sample in samples}
+        for k in res.keys():
+            res_by_sample[k[0]][k[1]] = res[k]
+        
+        stat = open("status.md", "w")
+        for sample in sorted(samples):
+            s = "| " + sample + " | "
+            s += " | ".join([str(res_by_sample[sample][k]) for k in ["queued", "started", "finished"]])
+            stat.write(s + "\n")
+        stat.close()
+
+    @staticmethod
+    def runSparsinator_async(config_path, sample, workdir):
+        jobs = []
+        for ijob, inputs in enumerate(chunks(sample.file_names, sample.step_size_sparsinator)):
+            ofname = "{0}/sparse/{1}/sparse_{2}.root".format(
+                workdir, sample.name, ijob
+            )
+            jobs += [
+                enqueue_memoize(
+                    qmain,
+                    func = sparse,
+                    args = (config_path, inputs, sample.name, ofname),
+                    timeout = 2*60*60,
+                    ttl = 2*60*60,
+                    result_ttl = 2*60*60,
+                    meta = {"retries": 2, "args": str((inputs, sample.name))}
+                )
+            ]
+        logger.info("runSparsinator: {0} jobs launched for sample {1}".format(len(jobs), sample.name))
+        return jobs
+
+class TaskSparseMerge(Task):
+    def __init__(self, workdir, name, analysis):
+        super(TaskSparseMerge, self).__init__(workdir, name, analysis)
+
+    def run(self, inputs, redis_conn, qmain, qfail):
+        all_jobs = []
+        jobs_by_sample = {}
+
+        for sample in analysis.samples:
+            
+            if not sample.name in inputs.keys():
+                continue
+
+            sample_results = [os.path.abspath(job.result) for job in inputs[sample.name]]
+            logger.info("sparsemerge: submitting merge of {0} files for sample {1}".format(len(sample_results), sample.name))
+            outfile = os.path.abspath("{0}/sparse/sparse_{1}.root".format(workdir, sample.name))
+            job = enqueue_memoize(
+                qmain,
+                func = mergeFiles,
+                args = (outfile, sample_results),
+                timeout = 20*60,
+                result_ttl = 60*60,
+                meta = {"retries": 0, "args": sample.name}
+            )
+            jobs_by_sample[sample.name] = job
+            all_jobs += [job]
+        waitJobs(all_jobs, redis_conn, qmain, qfail, callback=TaskSparseMerge.status_callback)
+        results = [j.result for j in all_jobs]
+        logger.info("sparsemerge: merging final sparse out of {0} files".format(len(results)))
+        final_merge = os.path.abspath("{0}/merged.root".format(workdir))
+        job = enqueue_memoize(
+            qmain,
+            func = mergeFiles,
+            args = (final_merge, results),
+            timeout = 20*60,
+            result_ttl = 60*60,
+            meta = {"retries": 0, "args": ("final", final_merge, results)}
+        )
+        waitJobs([job], redis_conn, qmain, qfail, callback=TaskSparseMerge.status_callback)
+        self.save_state()
+        return final_merge
+
+    @staticmethod
+    def status_callback(jobs):
+
+        basic_job_status(jobs)
+
+        res = []
+        samples = set()
+        for job in jobs:
+            sample_name = job.args[0]
+            k = (sample_name, job.status)
+            samples.add(sample_name)
+            res += [k]
+
+        res = dict(Counter(res))
+        res_by_sample = {sample: {"queued": 0, "started": 0, "finished": 0} for sample in samples}
+        for k in res.keys():
+            res_by_sample[k[0]][k[1]] = res[k]
+        
+        stat = open("status.md", "w")
+        for sample in sorted(samples):
+            s = "| " + sample + " | "
+            s += " | ".join([str(res_by_sample[sample][k]) for k in ["queued", "started", "finished"]])
+            stat.write(s + "\n")
+        stat.close()
+class TaskCategories(Task):
+    def __init__(self, workdir, name, analysis):
+        super(TaskCategories, self).__init__(workdir, name, analysis)
+
+    def run(self, inputs, redis_conn, qmain, qfail):
+        hdict = {}
+
+        logging.info("Opening {0}".format(inputs))
+        tf = ROOT.TFile(inputs)
+        ROOT.gROOT.cd()
+        for k in tf.GetListOfKeys():
+
+            #check if this is a valid histogram according to its name
+            if len(k.GetName().split("__")) >= 3:
+                hdict[k.GetName()] = k.ReadObj().Clone()
+
+        #make all the datacards for all the categories
+        for cat in self.analysis.categories:
+            category_dir = "{0}/categories/{1}/{2}".format(
+                workdir, cat.name, cat.discriminator.name
+            )
+            logging.info("creating category to {0}".format(category_dir))
+            os.makedirs(category_dir)
+            make_datacard(self.analysis, [cat], category_dir, hdict)
+
+        # hadd Results        
+        cat_names = list(set([cat.name for cat in self.analysis.categories]))        
+
+        for cat_name in cat_names:                                                        
+            logger.info("hadd-ing: {0}".format(cat_name))
+            
+            process = subprocess.Popen(
+                "hadd {0}/categories/{1}.root {0}/categories/{1}/*/*.root".format(workdir, cat_name),
+                shell=True,
+                stdout=subprocess.PIPE
+            )
+            process.communicate()
+
+        # move the shape text files into the right place
+        process = subprocess.Popen(
+            "mv {0}/categories/*/*/*.txt {0}/categories/".format(workdir),
+            shell=True,
+            stdout=subprocess.PIPE
+        )
+
+        time.sleep(1) #NFS
+
+        result = "{0}/categories".format(workdir)
+        self.save_state()
+        return result
+
+class TaskPlotting(Task):
+    def __init__(self, workdir, name, analysis):
+        super(TaskPlotting, self).__init__(workdir, name, analysis)
+
+    def run(self, inputs, redis_conn, qmain, qfail):
+        from plots import run_plots
+       
+        run_plots(
+            workdir,
+            analysis,
+            inputs,
+            redis_conn,
+            qmain,
+            qfail
+        )
+
+class TaskLimits(Task):
+    def __init__(self, workdir, name, analysis):
+        super(TaskLimits, self).__init__(workdir, name, analysis)
+
+    def run(self, inputs, redis_conn, qmain, qfail):
+
+        # Prepare jobs
+        all_jobs = []
+        for group in self.analysis.groups.keys():
+            all_jobs += [
+                qmain.enqueue_call(
+                    func = makelimits,
+                    args = [
+                        "{0}/limits".format(workdir),
+                        self.analysis,
+                        group
+                    ],
+                    timeout = 40*60,
+                    result_ttl = 60*60,
+                    meta = {"retries": 0, "args": ""})]
+            
+        waitJobs(all_jobs, redis_conn)
+        self.save_state()
+
+def make_workdir():
     workflow_id = uuid.uuid4()
     workdir = "results/{0}".format(workflow_id)
     os.makedirs(workdir)
+    return workdir
 
-    logger.info("starting workflow {0}".format(workflow_id))
+if __name__ == "__main__":
+    workdir = make_workdir()
+
+    logger.info("starting workflow {0}".format(workdir))
 
     starting_points = ["ngen", "sparse", "categories", "plots", "limits"]
     
@@ -331,9 +535,12 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
+    queue_kwargs = {}
+    if args.queue == "SYNC":
+        queue_kwargs["async"] = False
     # Tell RQ what Redis connection to use
     redis_conn = Redis(host=args.hostname, port=args.port)
-    qmain = Queue("default", connection=redis_conn)  # no args implies the default queue
+    qmain = Queue("default", connection=redis_conn, **queue_kwargs)  # no args implies the default queue
     qfail = get_failed_queue(redis_conn)
     
     #clean queues in case they are full
@@ -345,292 +552,18 @@ if __name__ == "__main__":
         logging.warning("fail queue has jobs, emptying")
         qfail.empty()
 
-    tmp_conf_name = "{0}/analysis.cfg".format(workdir)
-    analysis_name, analysis = analysisFromConfig(args.config)
+    analysis = analysisFromConfig(args.config)
 
-    logger.info("starting point is:".format(args.start))
-    
-    jobs = {}
-    results = {}
-    
-    ###
-    ### NGEN
-    ###
-    if starting_points.index(args.start) <= starting_points.index("ngen"):
+    tasks = []
+    tasks += [
+        TaskNumGen(workdir, "NGEN", analysis),
+        TaskSparsinator(workdir, "SPARSE", analysis),
+        TaskSparseMerge(workdir, "MERGE", analysis),
+        TaskCategories(workdir, "CAT", analysis),
+        TaskPlotting(workdir, "PLOT", analysis),
+    ]
 
-        if args.queue != "EXISTING":
-            kill_jobs()
-            start_jobs(args.queue, args.njobs, [], args.hostname, args.port)
-
-        logger.info("starting step NGEN")
-        t0 = time.time()
-        jobs["ngen"] = {}
-        all_jobs = []
-        for sample in analysis.samples:
-            _jobs = getGeneratedEvents(sample)
-            jobs["ngen"][sample.name] = _jobs
-            all_jobs += _jobs
-
-        #synchronize
-        waitJobs(all_jobs, redis_conn, 0)
-
-        for sample in analysis.samples:
-            ngen = sum(
-                [j.result["Count"] for j in jobs["ngen"][sample.name]]
-            )
-            sample.ngen = int(ngen)
-            #propagate this change to the config parser
-            sample.updateConfig(analysis.config)
-
-        #save configuration, re-initialize parser
-        with open(tmp_conf_name, "wb") as configfile:
-            analysis.config.write(configfile)
-        analysis.config = Analysis.getConfigParser(tmp_conf_name)
-
-        #reload the analysis from the updated configuration
-        analysis_name, analysis = analysisFromConfig(tmp_conf_name)
-        t1 = time.time()
-        dt = t1 - t0
-        logging.info("step NGEN done in {0:.2f} seconds".format(dt))
- 
-        if args.queue != "EXISTING":
-            kill_jobs()        
-    else:
-
-        logger.info("skipping step NGEN")
-        
-        logger.info("Verifying ngen is set")
-        for sample in analysis.samples:
-            logger.info("{0}: {1}".format(sample.name, sample.ngen))
-
-        # Copy the cfg also to the new output (for reference)
-        with open(tmp_conf_name, "wb") as configfile:
-            analysis.config.write(configfile)                        
-
-    ###
-    ### SPARSINATOR
-    ###
-                        
-    if starting_points.index(args.start) <= starting_points.index("sparse"):
-
-        if args.queue != "EXISTING":
-            kill_jobs()
-            start_jobs(args.queue, args.njobs, ["-l", "h_vmem=6G"], args.hostname, args.port)
-
-        logger.info("starting step SPARSINATOR")
-        t0 = time.time()
-        jobs["sparse"] = {}
-        results["sparse"] = []
-
-        all_jobs = []
-        for sample in analysis.samples:
-            jobs["sparse"][sample] = runSparsinator_async(tmp_conf_name, sample, workdir)
-            all_jobs += jobs["sparse"][sample]
-        logger.info("waiting on sparsinator jobs")
-        waitJobs(all_jobs, redis_conn)
-        #just in case to make sure NFS is synced
-        t1 = time.time()
-        time.sleep(5)
-        dt = t1 - t0
-        logging.info("step SPARSINATOR done in {0:.2f} seconds".format(dt))
-
-        if args.queue != "EXISTING":
-            kill_jobs()
-
-        ###
-        ### SPARSE MERGE
-        ###
-        logger.info("starting step SPARSEMERGE")
-
-        if args.queue != "EXISTING":
-            kill_jobs()
-            start_jobs(args.queue, args.njobs, [], args.hostname, args.port)
-
-        all_jobs = []
-        jobs_by_sample = {}
-        for ds in analysis.samples:
-            ds_results = [os.path.abspath(job.result) for job in jobs["sparse"][ds]]
-            logger.info("sparsemerge: submitting merge of {0} files for sample {1}".format(len(ds_results), ds.name))
-            outfile = os.path.abspath("{0}/sparse/sparse_{1}.root".format(workdir, ds.name))
-            job = enqueue_nomemoize(
-                qmain,
-                func=mergeFiles,
-                args=(outfile, ds_results),
-                timeout=20*60,
-                result_ttl=60*60,
-                meta={"retries": 0, "args": ds.name}
-            )
-            jobs_by_sample[ds.name] = job
-            all_jobs += [job]
-        waitJobs(all_jobs, redis_conn)
-        results["sparse"] = [j.result for j in all_jobs]
-        logger.info("sparsemerge: merging final sparse out of {0} files".format(len(results["sparse"])))
-        final_merge = os.path.abspath("{0}/merged.root".format(workdir))
-        mergeFiles(final_merge, results["sparse"])
-
-        results["sparse-merge"] = final_merge
-        #analysis.config.set("sparse_data", "infile", str(results["sparse-merge"]))
-        with open(tmp_conf_name, "wb") as configfile:
-            analysis.config.write(configfile)
-
-        if args.queue != "EXISTING":
-            kill_jobs()
-
-        logger.info("step SPARSEMERGE done")
-
-    else:
-        logger.info("skipping steps SPARSINATOR & SPARSEMERGE" )
-
-        # If we skipped sparse, we would assume that the output is in
-        # the same directory as the cfg file
-        #results["sparse-merge"] = analysis.config.get("sparse_data", "infile")
-
-    
-    ###
-    ### CATEGORIES
-    ###
-    if starting_points.index(args.start) <= starting_points.index("categories"):
-        hdict = {}
-
-        logging.info("Opening {0}".format(results["sparse-merge"]))
-        tf = ROOT.TFile(results["sparse-merge"])
-        ROOT.gROOT.cd()
-        for k in tf.GetListOfKeys():
-
-            #check if this is a valid histogram according to its name
-            if len(k.GetName().split("__")) >= 3:
-                hdict[k.GetName()] = k.ReadObj().Clone()
-
-        #make all the datacards for all the categories
-        for cat in analysis.categories:
-            category_dir = "{0}/categories/{1}/{2}".format(workdir, cat.name, cat.discriminator.name)
-            logging.info("creating category to {0}".format(category_dir))
-            os.makedirs(category_dir)
-            make_datacard(analysis, [cat], category_dir, hdict)
-
-        # hadd Results        
-        cat_names = list(set([cat.name for cat in analysis.categories]))        
-
-        for cat_name in cat_names:                                                        
-            logger.info("hadd-ing: {0}".format(cat_name))
-            
-            process = subprocess.Popen( "hadd {0}/categories/{1}.root {0}/categories/{1}/*/*.root".format(workdir, cat_name),
-                                        shell=True,
-                                        stdout=subprocess.PIPE)
-            process.communicate()
-
-        # move the shape text files into the right place
-        process = subprocess.Popen( "mv {0}/categories/*/*/*.txt {0}/categories/".format(workdir),
-                                    shell=True,
-                                    stdout=subprocess.PIPE)        
-
-        time.sleep(1) #NFS
-#        # and tidy up
-#        for cat_name in cat_names:                                                                
-#            shutil.rmtree("{0}/categories/{1}".format(workdir, cat_name))
-
-        results["categories-path"] = "{0}/categories".format(workdir)
-
-        logger.info("done with post processing CATEGORIES")
-        
-        if args.queue != "EXISTING":
-            kill_jobs()
-
-    else:        
-        logger.info("skipping step CATEGORIES")
-
-        # If we skipped categories, we would assume that the output is in
-        # the same directory as the cfg file
-        results["categories-path"] = os.path.join(os.path.dirname(args.config), "categories")
-
-
-    ###
-    ### PLOTTING
-    ###
-        
-    if starting_points.index(args.start) <= starting_points.index("plots"):
-
-        if args.queue != "EXISTING":
-            kill_jobs()
-            start_jobs(args.queue, args.njobs, [], args.hostname, args.port), 
-
-        logger.info("starting step PLOTS")
-        t0 = time.time()
-
-        logger.info("running plotting on directory {0}".format(results["categories-path"]))
-
-        all_jobs = []
-
-        for cat in analysis.categories:
-            outpath = os.path.abspath("/".join([workdir, "plots", cat.name, cat.discriminator.name]))
-            if not os.path.exists(outpath):
-                os.makedirs(outpath)
-            all_jobs += [
-                qmain.enqueue_call(
-                    func=plot,
-                    args=[get_base_plot(results["categories-path"], 
-                                        os.path.join(workdir, "plots"),
-                                        "", cat.name, cat.discriminator.name)],
-                    timeout=20*60,
-                    result_ttl=60*60,
-                    meta={"retries": 0, "args": ""}
-                )
-            ]
-
-        t0 = time.time()
-        waitJobs(all_jobs, redis_conn)
-        t1 = time.time()
-        time.sleep(5)
-        dt = t1 - t0
-        logger.info("step PLOTS done in {0:.2f} seconds".format(dt))
-
-        if args.queue != "EXISTING":
-            kill_jobs()
-
-    else:        
-        logger.info("skipping step PLOTS")
-
-
-    ###
-    ### LIMITS
-    ###
-        
-    if starting_points.index(args.start) <= starting_points.index("limits"):
-
-        if args.queue != "EXISTING":
-            kill_jobs()
-            start_jobs(args.queue, args.njobs, [], args.hostname, args.port)
-
-        logger.info("starting step LIMITS")
-
-        # Limits are based on categories
-        # copy categories to the right place
-        shutil.copytree(results["categories-path"], "{0}/limits".format(workdir))
-
-        # Add individual limits for all categories
-        for cat in analysis.categories:
-            if cat.do_limit:
-                analysis.groups[cat.name] = [cat]
-        
-        # Prepare jobs
-        all_jobs = []
-        for group in analysis.groups.keys():
-            all_jobs += [
-                qmain.enqueue_call(
-                    func=makelimits,
-                    args=["{0}/limits".format(workdir),
-                          analysis,
-                          group],
-                    timeout=40*60,
-                    result_ttl=60*60,
-                    meta={"retries": 0, "args": ""})]
-            
-        t0 = time.time()
-        waitJobs(all_jobs, redis_conn)
-        t1 = time.time()
-        time.sleep(5)
-        dt = t1 - t0
-        logger.info("step LIMITS done in {0:.2f} seconds".format(dt))
-        
-        if args.queue != "EXISTING":
-            kill_jobs()
+    inputs = []
+    for task in tasks:
+        res = task.run(inputs, redis_conn, qmain, qfail)
+        inputs = res

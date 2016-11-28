@@ -18,7 +18,7 @@ import glob
 import sys, os, copy
 from collections import OrderedDict
 import TTH.Plotting.joosep.plotlib as plotlib #heplot, 
-
+import subprocess
 
 import rootpy
 from rootpy.plotting import Hist
@@ -26,6 +26,7 @@ from rootpy.plotting import root2matplotlib as rplt
 
 from TTH.Plotting.joosep import controlPlot
 
+from TTH.Plotting.Datacards.AnalysisSpecificationClasses import Analysis
 from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
 from TTH.Plotting.Datacards import MakeCategory
 from TTH.Plotting.Datacards import MakeLimits
@@ -40,12 +41,17 @@ def count(filenames):
     return ret
 
 def sparse(config_path, filenames, sample, outfile):
-    an_name, analysis = analysisFromConfig(config_path)
+    analysis = Analysis.deserialize(config_path)
+
     temppath = os.path.join("/scratch/{0}/".format(os.environ["USER"]))
+    
+    #output path may already be created by other jobs, so just assume it's there
     try:
         os.makedirs(temppath)
     except OSError as e:
         print e
+    #create a temporary file name
+    
     ofname = tempfile.mktemp(dir=temppath)
     sparsinator.main(analysis, filenames, sample, ofname)
 
@@ -74,11 +80,16 @@ def mergeFiles(outfile, infiles, remove_inputs=False):
     if len(infiles) == 1:
         shutil.copy(infiles[0], outfile)
     else:
-        merger = ROOT.TFileMerger(False)
-        merger.OutputFile(outfile)
-        for res in infiles:
-            merger.AddFile(res, False)
-        merger.Merge()
+        cmd = ["hadd", "-f", outfile] + infiles
+        process = subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE, 
+            stderr=subprocess.PIPE
+        )
+        out, err = process.communicate()
+        retcode = process.returncode
+        if retcode != 0:
+            raise Exception("Could not merge: {0}".format(err))
     if remove_inputs:
         for res in infiles:
             if os.path.isfile(res):

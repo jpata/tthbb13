@@ -88,7 +88,7 @@ def mkdirs(fi, path):
     return sfi
 
 
-def save_hdict(ofn, hdict):
+def save_hdict(ofn="", hdict={}, outfile=None):
     """
     Saves a dictionary of ROOT objects in an output file. The objects will be
     renamed according to the keys in the dictionary.
@@ -98,7 +98,8 @@ def save_hdict(ofn, hdict):
         be saved to the output.
     returns: nothing
     """
-    outfile = ROOT.TFile(ofn, "recreate")
+    if not outfile:
+        outfile = ROOT.TFile(ofn, "recreate")
     if not outfile or outfile.IsZombie():
         raise Exception(
             "Could not open output file {0}".format(ofn)

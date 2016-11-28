@@ -397,7 +397,7 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
     # name (string) of the data process.
     # Example: "data" (real data), "data_obs" (fake data)
     #must exist in the input file
-    dataname = kwargs.get("dataname", "data_obs")
+    dataname = kwargs.get("dataname", None)
     
     xlabel = kwargs.get("xlabel", escape_string(hname))
     xunit = kwargs.get("xunit", "XUNIT")
@@ -422,7 +422,7 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
     #function f: TH1D -> TH1D to apply on data to blind it.
     blindFunc = kwargs.get("blindFunc", None)
     
-    pattern = kwargs.get("pattern", "{sample}/{hname}")
+    pattern = kwargs.get("pattern", "{sample}__{hname}")
 
     #array of up-down pairs for systematic names to use for the systematic band,
     #e.g.[("_CMS_scale_jUp", "_CMS_scale_jDown")]
@@ -430,7 +430,10 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
 
     histograms_nominal = getHistograms(tf, processes, hname, pattern=pattern, rename_func=rename_func)
     if len(histograms_nominal) == 0:
-        raise KeyError("did not find any histograms for MC")
+        raise KeyError(
+            "getHistograms: processes={0} hname={1} pattern={2}".format(processes, hname, pattern) +
+            "did not find any histograms for MC"
+        )
 
     histograms_systematic = OrderedDict()
     #get the systematically variated histograms
@@ -491,7 +494,7 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
     
     #Get the data histogram
     data = None
-    if dataname != "":
+    if not dataname is None:
         data = tf.get(pattern.format(sample=dataname, hname=hname))
         data.rebin(rebin)
         if blindFunc:
@@ -512,7 +515,7 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
         if data:
             dataline = mlines.Line2D([], [], color='black', marker='o', label=data.title)
             patches += [dataline]
-        for (line1, line2), h in zip(stacked_hists["hists"], histograms_nominal.values()):
+        for line1, h in zip(stacked_hists["hists"], histograms_nominal.values()):
             patch = mpatches.Patch(color=line1.get_color(), label=h.title)
             patches += [patch]
         patches += [mpatches.Patch(facecolor="none", edgecolor="black", label="stat", hatch="////////")]

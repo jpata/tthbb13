@@ -10,6 +10,7 @@ LOG_MODULE_NAME = logging.getLogger(__name__)
     
 import numpy as np
 from TTH.MEAnalysis.samples_base import getSitePrefix, samples_nick, get_prefix_sample, PROCESS_MAP, TRIGGERPATH_MAP
+from TTH.Plotting.Datacards.sparse import add_hdict, save_hdict
 
 from TTH.CommonClassifier.db import ClassifierDB
 
@@ -265,9 +266,10 @@ class CategoryCut:
 
     def cut(self, event):
         ret = True
-        for cname, clow, chigh in self.cuts:
-            v = event[cname]
-            ret = ret and (v >= clow and v < chigh)
+        for cut in self.cuts:
+            for cname, clow, chigh in cut.sparsinator:
+                v = event[cname]
+                ret = ret and (v >= clow and v < chigh)
         return ret
 
 def get_schema(sample):
@@ -278,7 +280,7 @@ def get_schema(sample):
         schema = "mc"
     return schema
 
-def createOutputs(outdir, analysis, sample, systematics):
+def createOutputs(outdir, analysis, process, systematics):
     """Creates an output dictionary with fillable objects in TDirectories based on categories and systematics. 
     
     Args:
@@ -294,6 +296,8 @@ def createOutputs(outdir, analysis, sample, systematics):
     outdict_syst = {}
     outdict_cuts = {}
 
+    ROOT.TH1.AddDirectory(False)
+
     for syst in systematics:
         outdict_syst[syst] = {} 
         syststr = ""
@@ -302,23 +306,18 @@ def createOutputs(outdir, analysis, sample, systematics):
         for k in analysis.groups.keys():
             for cat in analysis.groups[k]:
                 if not outdict_cuts.has_key(cat.name):
-                    outdict_cuts[cat.name] = CategoryCut(cat.cuts)
-
-                proc_out_name = sample.process
-                for proc in analysis.processes:
-                    if proc.input_name == sample.process:
-                        proc_out_name = proc.output_name
-                        break
+                    outdict_cuts[(cat, process)] = CategoryCut(
+                        cat.cuts + process.cuts
+                    )
 
                 name = "{proc}__{cat}__{discr}".format(
-                    proc = proc_out_name,
+                    proc = process.output_name,
                     cat = cat.name,
                     discr = cat.discriminator.name
                 ) + syststr
                 if not outdict_syst[syst].has_key(name):
                     h = cat.discriminator.get_TH1(name)
-                    h.SetDirectory(outdir)
-                    outdict_syst[syst][name] = HistogramOutput(h, FUNCTION_TABLE[cat.discriminator.func], cat.name)
+                    outdict_syst[syst][name] = HistogramOutput(h, FUNCTION_TABLE[cat.discriminator.func], (cat, process))
     return outdict_syst, outdict_cuts
 
 def pass_HLT_sl_mu(event):
@@ -616,7 +615,13 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
     sample = analysis.get_sample(sample_name)
     schema = sample.schema
     process = sample.process
-    
+
+    #now we find which processes are matched to have this sample as an input
+    #these processes are used to generate histograms
+    matched_processes = [p for p in analysis.processes if p.input_name == sample.name]
+    if len(matched_processes) == 0:
+        LOG_MODULE_NAME.error("Could not match any processes to sample, will not generate histograms {0}".format(sample.name))
+
     do_classifier_db = analysis.config.getboolean("sparsinator", "do_classifier_db")
     if do_classifier_db:
         cls_db = ClassifierDB(filename=sample.classifier_db_path)
@@ -665,7 +670,10 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
     outtree.Branch("ttCls", bufs["ttCls"], "ttCls/I")
     
     #pre-create output histograms
-    outdict_syst, outdict_cuts = createOutputs(outfile, analysis, sample, all_systematics)
+    for proc in matched_processes:
+        outdict_syst, outdict_cuts = createOutputs(outfile, analysis, proc, all_systematics)
+        proc.outdict_syst = outdict_syst
+        proc.outdict_cuts = outdict_cuts
 
     nevents = 0
     counters = OrderedDict()
@@ -690,7 +698,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 continue
             if max_events > 0:
                 if nevents > (skip_events + max_events):
-                    logging.info("event loop: breaking due to MAX_EVENTS: {0} > {1} + {2}".format(
+                    LOG_MODULE_NAME.info("event loop: breaking due to MAX_EVENTS: {0} > {1} + {2}".format(
                         nevents, skip_events, max_events
                     ))
                     break_file_loop = True
@@ -705,16 +713,16 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 continue
             if schema == "data" and not event.json:
                 continue
+            #print(nevents)
 
             #Found a monster event in ttH (bug?)
             if event.jets_pt[0] > 10000:
-                logging.error("ANOMALOUS MEGAPT EVENT: {0}:{1}:{2}".format(event.run, event.lumi, event.evt))
+                LOG_MODULE_NAME.error("ANOMALOUS MEGAPT EVENT: {0}:{1}:{2}".format(event.run, event.lumi, event.evt))
                 continue
 
             for iSyst, syst in enumerate(systematics_event):
                 ret = desc.getValue(event, schema, syst)
-                proc_label = assign_process_label(process, ret)
-                ret["process"] = PROCESS_MAP[proc_label]
+                ret["process"] = PROCESS_MAP[assign_process_label(sample.process, ret)]
                 ret["syst"] = syst
                 ret["counting"] = 0
                 ret["leptonFlavour"] = 0
@@ -780,22 +788,26 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 outtree.Fill()
 
                 #pre-calculate all category cuts
-                for catname, cut in outdict_cuts.items():
-                    ret[catname] = cut.cut(ret)
+                for proc in matched_processes:
+                    for (cat, process), cut in proc.outdict_cuts.items():
+                        #print("cut", cat.name, proc.input_name, proc.output_name)
+                        ret[(cat, process)] = cut.cut(ret)
 
                 #Fill the base histogram
-                for (k, v) in outdict_syst[syst].items():
-                    weight = ret["weight_nominal"]
-                    if v.cut(ret):
-                        v.fill(ret, weight)
+                for proc in matched_processes:
+                    for (k, v) in proc.outdict_syst[syst].items():
+                        weight = ret["weight_nominal"] * proc.xs_weight
+                        if v.cut(ret):
+                            v.fill(ret, weight)
                 
                 #nominal event, fill also histograms with systematic weights
                 if syst == "nominal" and schema == "mc":
                     for (syst_weight, weightfunc) in systematic_weights:
                         weight = weightfunc(ret)
-                        for (k, v) in outdict_syst[syst_weight].items():
-                            if v.cut(ret):
-                                v.fill(ret, weight)
+                        for proc in matched_processes:
+                            for (k, v) in proc.outdict_syst[syst_weight].items():
+                                if v.cut(ret):
+                                    v.fill(ret, weight * proc.xs_weight)
 
             #end of loop over event systematics
             nevents += 1
@@ -804,11 +816,17 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
         tf.Close()
     #end of loop over file names
 
+    outdict = {}
+    for proc in matched_processes:
+        for (syst, hists_syst) in proc.outdict_syst.items():
+            outdict = add_hdict(outdict, {k: v.hist for (k, v) in hists_syst.items()})
+    save_hdict(hdict=outdict, outfile=outfile, )
+
     print("processed {0} events".format(nevents))
     print("writing output")
-    print(counters)
-    outfile.Write()
-    outfile.Close()
+    # print(counters)
+    # outfile.Write()
+    # outfile.Close()
 
 if __name__ == "__main__":
     from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
@@ -822,20 +840,11 @@ if __name__ == "__main__":
 
     else:
         file_names = [
-            'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_694.root', 'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_695.root',
-            'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_696.root', 'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_697.root',
-            'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_698.root', 'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_699.root',
-            'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_7.root', 'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_70.root',
-            'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_700.root', 'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_701.root',
-            'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_702.root', 'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_703.root',
-            'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_704.root', 'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_705.root',
-            'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_706.root', 'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_707.root',
-            'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_708.root', 'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_709.root',
-            'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_71.root', 'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep29_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Sep29_v1/160930_103104/0000/tree_710.root'
+            'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep14_leptonic_nome_v1/SingleMuon/Sep14_leptonic_nome_v1/160914_135655/0000/tree_1.root',
         ] 
         prefix = ""
-        sample = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
+        sample = "SingleMuon"
         skip_events = 0
-        max_events = 1000
+        max_events = 100
         an_name, analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/Plotting/python/Datacards/config_sldl.cfg")
     main(analysis, file_names, sample, "out.root", skip_events, max_events)

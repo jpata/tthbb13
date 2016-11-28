@@ -1,6 +1,7 @@
 import os
 import ConfigParser
 from itertools import izip
+import cPickle as pickle
 
 import ROOT
 
@@ -19,35 +20,44 @@ def triplewise(iterable):
     a = iter(iterable)
     return izip(a, a, a)
 
-def string_to_cuts(s):
-    cuts = []
-    for cut_name, lower, upper in triplewise(s):
-        cuts.append((cut_name, float(lower), float(upper)))
-    return cuts
-
-def cuts_to_string(cuts):
-    s = ""
-    for cut_name, lower, upper in cuts:
-        s += "{0} {1} {2}\n".format(cut_name, lower, upper)
-    return s
-
 class Cut(object):
+
+    @staticmethod
+    def string_to_cuts(s):
+        cuts = []
+        for cut_name, lower, upper in triplewise(s):
+            cuts.append((cut_name, float(lower), float(upper)))
+        return cuts
+
+    @staticmethod
+    def cuts_to_string(cuts):
+        s = ""
+        for cut_name, lower, upper in cuts:
+            s += "{0} {1} {2}\n".format(cut_name, lower, upper)
+        return s
+
     def __init__(self, *args, **kwargs):
         self.name = kwargs.get("name")
-        self.sparsinator = kwargs.get("sparsinator")
-        self.skim = kwargs.get("skim")
+        self.sparsinator = kwargs.get("sparsinator", [])
+        self.skim = kwargs.get("skim", None)
 
     @staticmethod
     def fromConfigParser(config, name):
         return Cut(
             name = name,
-            sparsinator = string_to_cuts(config.get(name, "sparsinator").split()),
+            sparsinator = Cut.string_to_cuts(config.get(name, "sparsinator").split()),
             skim = config.get(name, "skim")
         )
 
     def updateConfig(self, config):
-        config.set(self.name, "sparsinator", cuts_to_string(self.sparsinator))
-        config.set(self.name, "skim", cuts_to_string(self.skim))
+        config.set(self.name, "sparsinator", Cut.cuts_to_string(self.sparsinator))
+        config.set(self.name, "skim", Cut.cuts_to_string(self.skim))
+
+    def __str__(self):
+        s = []
+        for c in self.sparsinator:
+            s += ["({1} <= {0} < {2})".format(*c)]
+        return "AND".join(s)
 
 class Sample(object):
     def __init__(self, *args, **kwargs):
@@ -163,7 +173,7 @@ class Category:
         #self.lumi = sum([d.lumi for d in self.data_samples])
 
         self.signal_processes = kwargs.get("signal_processes", [])
-        self.out_processes = list(set([s.output_name for s in self.processes]))
+        self.out_processes = list(set([s.output_name for s in self.processes + self.data_processes]))
 
         #[process][syst]
         self.shape_uncertainties = {}
@@ -190,7 +200,7 @@ class Category:
             self.scale_uncertainties[k].update(v)
 
     
-    def __repr__(self):
+    def __str__(self):
         s = "Category: {0} ({1}) discr={2} cuts={3} do_limit={4}".format(
             self.name,
             self.full_name,
@@ -200,13 +210,13 @@ class Category:
         )
         return s
 
-    # Define equality via the representation string
-    def __eq__(self,other):
-        return self.__repr__() == other.__repr__()
+    # # Define equality via the representation string
+    # def __eq__(self,other):
+    #     return self.__repr__() == other.__repr__()
 
-    # hash(object) = hash(representation(object))
-    def __hash__(self):
-        return self.__repr__().__hash__()
+    # # hash(object) = hash(representation(object))
+    # def __hash__(self):
+    #     return self.__repr__().__hash__()
 
 
 class Analysis:
@@ -246,6 +256,18 @@ class Analysis:
         for groupname, cats in self.groups.items():
             s += "    {0}: {1}\n".format(groupname, [c.name for c in self.groups[groupname]])
         return s
+
+    @staticmethod
+    def deserialize(filename):
+        fi = open(filename, "rb")
+        an = pickle.load(fi)
+        fi.close()
+        return an
+
+    def serialize(self, filename):
+        fi = open(filename, "wb")
+        pickle.dump(self, fi)
+        fi.close()
 
     @staticmethod
     def getConfigParser(config_file_name):

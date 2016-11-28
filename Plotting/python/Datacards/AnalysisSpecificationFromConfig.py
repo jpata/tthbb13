@@ -76,9 +76,8 @@ def analysisFromConfig(config_file_path):
     config = Analysis.getConfigParser(config_file_path)
 
     # Get information on sparse input
-    lumi = dict([(k, float(v)) for (k, v) in config.items("lumi")])
-    blr_cuts = dict([(k, float(v)) for (k, v) in config.items("blr_cuts")])
-
+    lumi = {k: float(v) for (k, v) in config.items("lumi")}
+    #blr_cuts = {k: float(v) for (k, v) in config.items("blr_cuts")}
     
     do_stat_variations = config.getboolean("general", "do_stat_variations")    
     do_fake_data = config.getboolean("general", "do_fake_data")
@@ -94,8 +93,7 @@ def analysisFromConfig(config_file_path):
         sample = Sample.fromConfigParser(config, sample_name)
         samples += [sample]
 
-    samples_dict = dict([(sample.name, sample) for sample in samples])
-
+    samples_dict = {_sample.name: _sample for _sample in samples}
 
     ########################################
     # Cuts
@@ -107,7 +105,7 @@ def analysisFromConfig(config_file_path):
         cut = Cut.fromConfigParser(config, cut_name)
         cuts += [cut]
 
-    cuts_dict = dict([(cut.name, cut) for cut in cuts])
+    cuts_dict = {_cut.name: _cut for _cut in cuts}
 
     ########################################
     # Processes
@@ -190,9 +188,7 @@ def analysisFromConfig(config_file_path):
 
             template = config.get(cat, "template")
 
-            cuts = []
-            for cut_name, lower, upper in triplewise(config.get(cat,"cuts").split()):
-                cuts.append( (cut_name, float(lower), float(upper)) )
+            cut = Cut(sparsinator = Cut.string_to_cuts(config.get(cat, "cuts").split()))
 
             mc_processes = sum([process_lists[x] for x in config.get(template, "mc_processes").split()], [])
             data_processes = sum([process_lists[x] for x in config.get(template, "data_processes").split()], [])
@@ -219,7 +215,7 @@ def analysisFromConfig(config_file_path):
             cats.append(
                 Category(
                     name = cat,
-                    cuts = cuts,
+                    cuts = [cut],
                     processes = mc_processes,
                     data_processes = data_processes,
                     signal_processes = signal_processes, 
@@ -240,7 +236,7 @@ def analysisFromConfig(config_file_path):
                     cats.append(
                         Category(
                             name = cat,
-                            cuts = cuts,
+                            cuts = [cut],
                             processes = mc_processes,
                             data_processes = data_processes,
                             signal_processes = signal_processes, 
@@ -282,7 +278,7 @@ def analysisFromConfig(config_file_path):
         do_stat_variations = do_stat_variations
      )   
 
-    return config.get("general","name"), analysis
+    return analysis
 
 # end of analysisFromConfig
 

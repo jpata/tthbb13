@@ -236,8 +236,8 @@ def make_datacard(analysis, categories, outdir, hdict):
     event_counts = {}
     hdict_cat = {}
     for cat in categories:
-        event_counts[cat.name] = {}
-        hdict_cat[cat.name] = {}
+        event_counts[cat.full_name] = {}
+        hdict_cat[cat.full_name] = {}
         for proc in cat.out_processes:
             k = "{0}__{1}__{2}".format(
                 proc, cat.name, cat.discriminator.name
@@ -246,10 +246,25 @@ def make_datacard(analysis, categories, outdir, hdict):
             v = 0.0
             if hdict.has_key(k):
                 v = hdict[k].Integral()
-                hdict_cat[cat.name][k] = hdict[k].Clone()
-            event_counts[cat.name][proc] = v
-    import pdb
-    pdb.set_trace()
+                if not hdict_cat[cat.full_name].has_key(k):
+                    hdict_cat[cat.full_name][k] = hdict[k].Clone()
+                else:
+                    hdict_cat[cat.full_name][k].Add(hdict[k])
+                logging.debug("I={0:.2f} N={1:.2f}".format(
+                    hdict[k].Integral(), hdict[k].GetEntries())
+                )
+            else:
+                logging.error("didn't find key {0}".format(k))
+            if not event_counts[cat.full_name].has_key(proc):
+                event_counts[cat.full_name][proc] = 0.0
+            event_counts[cat.full_name][proc] += v
+
+            for syst_key in filter(lambda x: x.startswith(k), hdict.keys()):
+                logging.debug("getting {0} I={1:.2f} N={2:.2f}".format(
+                    syst_key, hdict[syst_key].Integral(), hdict[syst_key].GetEntries()
+                ))
+                hdict_cat[cat.full_name][syst_key] = hdict[syst_key]
+
     #catname -> file name
     category_files = {}
 
@@ -267,7 +282,7 @@ def make_datacard(analysis, categories, outdir, hdict):
     if analysis.do_fake_data:
         logging.info("main: adding fake data")
         for cat in categories:
-            hfile = category_files[cat.name]
+            hfile = category_files[cat.full_name]
             tf = ROOT.TFile(hfile, "UPDATE")
             fakeData(tf, tf, [cat])
             tf.Close()
@@ -277,14 +292,14 @@ def make_datacard(analysis, categories, outdir, hdict):
         logging.info("main: adding stat variations")
         from utils import makeStatVariations
         for cat in categories:
-            hfile = category_files[cat.name]
+            hfile = category_files[cat.full_name]
             c = ROOT.TFile(hfile, "UPDATE")
             stathist_names = makeStatVariations(tf, tf, [cat])
             tf.Close()
             
             #add the statistical uncertainties to the datacard specification
             for proc in cat.out_processes:
-                for syst in stathist_names[cat.name][proc]:
+                for syst in stathist_names[cat.full_name][proc]:
                     cat.shape_uncertainties[proc][syst] = 1.0
                 
     from utils import PrintDatacard

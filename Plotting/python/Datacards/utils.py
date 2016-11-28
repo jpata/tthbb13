@@ -21,7 +21,7 @@ def PrintDatacard(categories, event_counts, filenames, dcof):
         analysis_var = cat.discriminator
         dcof.write("shapes * {0} {1} $PROCESS/$CHANNEL/{2} $PROCESS/$CHANNEL/{2}_$SYSTEMATIC\n".format(
             cat.name,
-            os.path.basename(filenames[cat.name]),
+            os.path.basename(filenames[cat.full_name]),
             analysis_var)
         )
 
@@ -41,12 +41,12 @@ def PrintDatacard(categories, event_counts, filenames, dcof):
 
     for cat in categories:
         for i_sample, sample in enumerate(cat.out_processes):
-            bins.append(cat.name)
+            bins.append(cat.full_name)
             processes_0.append(sample)
             if sample in cat.signal_processes:
                 i_sample = -i_sample
             processes_1.append(str(i_sample))
-            rates.append(str(event_counts[cat.name][sample]))
+            rates.append(str(event_counts[cat.full_name][sample]))
 
     dcof.write("bin\t"+"\t".join(bins)+"\n")
     dcof.write("process\t"+"\t".join(processes_0)+"\n")
