@@ -330,7 +330,7 @@ cd $CMSSW_BASE/src/TTH/MEAnalysis/gc/datasets
 /afs/cern.ch/user/v/valya/public/das_client.py --limit 0 --query "dataset dataset=/*/sdonato-data_Aug15-*/USER instance=prod/phys03"  > datasetsFH.txt
 #check and remove duplicates in datasetsFH.txt
 cd $CMSSW_BASE/src/TTH/MEAnalysis/gc/
-python ../python/MakeDatasetFiles.py --datasetfile datasets/datasetsFH.txt --version had_V24_2 --instance prod/phys03
+python ../python/MakeDatasetFiles.py --version Jan6
 ~~~
 
 ## Step3: skim with `projectSkim`
